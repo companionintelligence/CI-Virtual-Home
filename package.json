@@ -1,0 +1,43 @@
+{
+  "name": "ci-virtual-home",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "Companion Intelligence virtual-home generator: one HouseSpec JSON per house → 3D scenes, CAD floor plans, isometric SVG/Lottie and product-shot videos.",
+  "type": "module",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=22.15"
+  },
+  "scripts": {
+    "build": "node --experimental-strip-types scripts/build-house-assets.mts",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p assets/tsconfig.json",
+    "validate": "node --experimental-strip-types scripts/validate-house-spec.mts",
+    "test": "node --experimental-strip-types --test scripts/test-floorplan-graph.mts",
+    "check": "node --experimental-strip-types scripts/check-house.mts",
+    "check:quick": "node --experimental-strip-types scripts/check-house.mts --quick",
+    "goldens": "node --experimental-strip-types scripts/test-goldens.mts",
+    "goldens:update": "node --experimental-strip-types scripts/test-goldens.mts --update",
+    "frame-hash": "node --experimental-strip-types scripts/test-frame-hash.mts",
+    "shots": "node --experimental-strip-types scripts/render-house-shots.mts",
+    "plans": "node --experimental-strip-types scripts/build-house-plan.mts",
+    "iso": "python3 scripts/generate_house_iso.py",
+    "floorplans": "python3 scripts/generate_floor_plans.py",
+    "catalog": "node --experimental-strip-types scripts/build-prop-catalog.mts",
+    "index": "node --experimental-strip-types scripts/build-house-index.mts",
+    "prop-sheet": "node --experimental-strip-types scripts/prop-sheet.mts",
+    "export:core": "node --experimental-strip-types scripts/export-core-gltf.mts",
+    "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "esbuild": "^0.28.2",
+    "playwright": "1.64.0-alpha-1789764292000",
+    "typescript": "^5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

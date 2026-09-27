@@ -1,0 +1,179 @@
+# HouseSpec v1 — single source of truth for 3D, CAD floor plans, and isometric/Lottie renders
+
+One JSON file per house in `content/houses/<id>.json`. Three consumers read it:
+
+| Consumer | Output |
+|---|---|
+| `assets/house-builder.ts` → `.js` (browser, Three.js) | 3D scene in `room-creator.html`, auto camera splines, product-shot video |
+| `scripts/generate_floor_plans.py` (Python, `pnpm run floorplans`) | CAD sheets `scenes/floorplans/fp-<id>-l<n>.svg` + `floorplans.json` |
+| `scripts/generate_house_iso.py` (Python, `pnpm run iso`) | Isometric SVG + Lottie scene `scenes/svg/house-<id>.svg`, `scenes/lottie-scenes/house-<id>.json` |
+
+**Never hand-edit derived files. Edit the spec, re-run the generators.** After editing specs: `pnpm run validate`, then
+`pnpm run plans` (the `<id>.plan.json` twins), `pnpm run iso`, `pnpm run floorplans`, and `pnpm run check` for the
+render gate (see the README).
+
+## Coordinate system
+
+- Metres. Y up. Origin `(0,0)` = centre of the lot.
+- **+Z is SOUTH = the street / front of the house.** −Z is north / back yard.
+- +X is EAST. Isometric default camera looks from the south-east, so the S and E walls are the "cutaway" walls.
+- Rectangles are `{ "x", "z", "w", "d" }` where `x,z` is the **min corner** (west, north) and `w` spans +X, `d` spans +Z.
+- Rotations `rot` are degrees, counter-clockwise seen from above (0 = faces south / +Z).
+
+## Top level
+
+```jsonc
+{
+  "$schema": "house-spec/v1",
+  "id": "aurora",                       // kebab-case, matches file name
+  "name": "Base Game Aurora",
+  "author": "Ornilia",                  // SimsTree build author (credit)
+  "source": "SimsTree slide 02",
+  "style": "Two-storey white modern, flat roofs, front pool",  // one line
+  "emoji": "🏢",
+  "lot":  { "w": 30, "d": 24, "ground": "lawn" },   // ground: lawn | desert | forest | urban | waterfront
+  "palette": {
+    "wall": "#f8fafc", "trim": "#1e293b", "roof": "#334155",
+    "accent": "#0f766e", "material": "stucco"          // stucco | siding | brick | stone | timber | corrugated | glass
+  },
+  "levels": [ /* see Level */ ],
+  "roofs":  [ /* see Roof  */ ],
+  "site":   [ /* see Site  */ ],
+  "hero":   { "level": "l1", "at": [-4.5, -2.0], "rot": 0, "device": "chalk", "pose": "prone", "surface": "desk" },
+  "entry":  { "level": "l1", "side": "S", "at": 0 },   // which opening is the front door
+  "lighting": "day",                    // day | golden | dusk | night (assets/environment.ts; old names alias: pascal-daylight/ci-mist/ci-biophilic → day, ci-twilight → golden, ci-dark → dusk)
+  "shots":  [ { "id": "door-to-core", "type": "door-to-core", "duration": 12 },
+              { "id": "orbit",        "type": "orbit",        "duration": 10 } ],
+  "areaSqm": 168                        // optional; generators compute from footprints when omitted
+}
+```
+
+## Level
+
+```jsonc
+{
+  "id": "l1", "name": "Ground Floor", "sheet": "A-101",
+  "y": 0,            // slab top elevation (l2 is typically 2.8 or 3.0)
+  "height": 2.8,     // wall height on this level
+  "floor": "oak",    // oak | herringbone | terrazzo | phthalo-terrazzo | charcoal-terrazzo | marble | concrete | deck | tile
+  "footprint": [ { "x": -6, "z": -4, "w": 12, "d": 8 }, { "x": 6, "z": 0, "w": 4, "d": 4 } ],
+                     // union of axis-aligned rects → perimeter walls are derived automatically
+  "wallColor": "#…", "trimColor": "#…",   // optional per-level overrides of palette
+  "openings": [
+    // side = S|N|E|W. `at` is the X coordinate for S/N walls and the Z coordinate for E/W walls
+    // (the world coordinate of the opening centre). The builder finds the perimeter edge on that side.
+    { "side": "S", "at": 0,    "type": "door",   "w": 1.0, "h": 2.1, "style": "entry" },   // style: entry | cased | glass-slider
+    { "side": "S", "at": -3.5, "type": "window", "w": 1.4, "h": 1.3, "sill": 0.9 },
+    { "side": "N", "at": 2,    "type": "slider", "w": 2.4, "h": 2.2 },                       // sliding glass patio door
+    { "side": "E", "at": 0,    "type": "glass",  "w": 6,   "h": 2.7 },                       // floor-to-ceiling glazing span
+    { "side": "S", "at": 4,    "type": "garage", "w": 2.6, "h": 2.2 }                        // garage door (closed leaf)
+  ],
+  "partitions": [
+    { "from": [-2, -4], "to": [-2, 4], "door": 1.5, "doorW": 0.9, "height": 2.7 }   // door = distance from `from` along the wall, or null
+  ],
+  "stairs":  { "type": "timber", "at": [3, 0], "rot": 180, "to": "l2" },   // timber | colonial | spiral ; at = bottom step; rot = ascent direction (0 = ascends toward +Z)
+  "voids":   [ { "x": 2.4, "z": -1.8, "w": 1.2, "d": 3.6 } ],              // slab cut-outs; only meaningful when y > 0
+  "balustrades": [ { "from": [x,z], "to": [x,z], "style": "glass" } ],      // glass | colonial ; for mezzanine edges
+  "rooms": [
+    {
+      "no": "01", "name": "Living Salon",
+      "bounds": { "x": -6, "z": -4, "w": 6, "d": 8 },   // used for CAD labels + area; must lie inside the footprint
+      "items": [
+        { "type": "sectional",    "at": [-3, 0],   "rot": 0 },
+        { "type": "coffee-table", "at": [-3, 1.4] },
+        { "type": "fiddle-leaf",  "at": [-5.5, -3.5] }
+      ]
+    }
+  ]
+}
+```
+
+## Roof
+
+```jsonc
+{ "over": { "x": -6, "z": -4, "w": 12, "d": 8 },   // plan rectangle the roof covers (usually a footprint rect + overhang)
+  "y": 2.8,                 // eave elevation (top of the walls it sits on)
+  "type": "gable",          // gable | hip | shed | flat | aframe-glass | terracotta (= hip, tile colour)
+  "ridge": "x",             // ridge runs along X or Z (gable/shed/aframe)
+  "pitch": 32,              // degrees (gable/hip/shed/aframe)
+  "overhang": 0.4,
+  "color": "#3f2a1d",
+  "parapet": 0.35,          // flat roofs: parapet height
+  "dormers": [ { "at": 2.0, "w": 1.4 } ],   // gable only: position along the ridge axis
+  "chimney": { "at": [4, -2] } }
+```
+
+## Site items
+
+`{ "type": …, "at": [x, z], "w", "d", "rot", "h" }` — `at` is the centre.
+
+| type | notes |
+|---|---|
+| `pool` | `w × d` water slab, stone coping (lifted 0.16 m so it reads above a `patio`/`deck` on the same rect) |
+| `turtle-pool` | Schnucko sea-turtle mosaic pool `w × d` (own coping) |
+| `pond`, `hottub` | natural / round water |
+| `deck` | timber slab (`h` = elevation, default 0.1); above 0.35 m it is a stilted platform — 0.15 m slab with its top at `h`, posts, rail on the S and E edges — so an upper-floor terrace reads as one, not as a block |
+| `tree` | seeded low-poly tree; `species`: round \| oval \| layered \| conical \| birch (default: seeded pick), `h`, `color`, `autumn`; scale/lean/spin jitter unless `jitter: false` |
+| `shrub` | 1–3 clumped blobs, seeded size and leaf colour; `r`, `color` |
+| `flowers` | a flowering clump; `r`, `color` |
+| `rock` | one boulder; `r` |
+| `bed` | planted bed on soil: `poly: [[x,z],…]` (any polygon) or `at,w,d`; `plants`: mixed \| flowers \| shrubs \| grass; `density` per m² |
+| `hedge` | clipped hedge along `path: [[x,z],…]`; `h`, `w`, `color` |
+| `path` | paved strip along `path: [[x,z],…]`; `w`, `color` — lay it on lawn, not over a patio (a patio is taller) |
+| `scatter` | seeded cluster in a disc: `at`, `r`, `n`, `species: ['shrub','rock','flowers','tree']` |
+| `grove` | `n` trees clustered in `r` around `at`, one `species` or a list, `h` |
+
+Site items with seeded variation are resolved by the three.js builder; `scripts/build-house-plan.mts` writes each house's instances to `content/houses/<id>.plan.json` and `generate_house_iso.py` draws them from there (run it after editing specs or `assets/site.js`, before the isometrics).
+| `patio`, `driveway` | concrete / paver slab |
+| `turf` | soccer pitch |
+| `fence` | picket/privacy fence along a segment: `from`/`to` instead of `at` |
+| `wall-low` | garden wall segment: `from`/`to`, `h` |
+| `porch` | colonnade porch `w × d` (columns + roof) |
+| `pergola`, `gazebo`, `greenhouse`, `garden-beds`, `monkeybars`, `firepit`, `loungers`, `bench`, `car`, `planter`, `steps` | props |
+| `bridge` | timber stepping bridge / boardwalk `w × d` (d runs along Z at `rot` 0) |
+| `soccer-goal` | goal frame (pair with `turf`) |
+| `tree`, `cypress`, `palm`, `shrub`, `cactus` | vegetation (`cactus` = saguaro group) |
+
+## Item catalog (furniture `type` → footprint w × d, metres)
+
+| type | footprint | type | footprint |
+|---|---|---|---|
+| `sectional` | 3.2 × 2.0 | `platform-bed` | 2.2 × 2.3 |
+| `club-chair` | 0.9 × 0.9 | `wardrobe` | 2.2 × 0.6 |
+| `coffee-table` | 1.2 × 0.6 | `crib` | 1.3 × 0.7 |
+| `octagonal-table` | 1.2 × 1.2 | `ensuite` | 2.4 × 2.0 (bath + vanity) |
+| `dining-set` | 2.0 × 0.95 (table + chairs) | `bookshelf` | 1.2 × 0.35 |
+| `dining-table` | 2.1 × 1.0 | `walnut-desk` | 1.6 × 0.8 |
+| `kitchen-island` | 2.4 × 0.9 | `task-chair` | 0.6 × 0.6 |
+| `kitchen-cabinetry` | 3.6 × 0.65 (against a wall) | `curved-monitor` | on desk |
+| `media-credenza` | 1.8 × 0.45 | `chalk-tower` / `charcoal-tower` / `strix-mini` | on desk/credenza |
+| `wall-tv` | 1.6 × 0.1 (against a wall) | `speakers` | on desk |
+| `fireplace` | 1.6 × 0.5 (against a wall) | `halo-lamp` | 0.4 × 0.4 |
+| `area-rug` | 3.2 × 2.2 | `circular-rug` | r 2.0 |
+| `concentric-rug` | r 1.6 | `fiddle-leaf` / `monstera` / `bonsai` / `bamboo` / `cactus-group` | plants |
+| `sun-lounger` | 0.7 × 2.0 | `telescope` | 0.6 × 0.6 |
+| `bench` | 1.8 × 0.5 | `soccer-goal` | 1.8 × 0.6 |
+| `column` | r 0.16 (`r` or square `size`; `style` modern \| colonial \| steel; `h` defaults to level height − 0.18) | | |
+
+Any item may pass `"w"`, `"d"`, `"color"` overrides where the underlying builder supports them.
+
+## Hero / entry / shots
+
+- `hero` = where the Companion Core sits (the flythrough destination). `surface`: `desk` (adds walnut desk + monitor + chair), `credenza`, `island`, `shelf` (headless: a floating shelf on the wall the hero backs onto, the Core and a few books on it, one power cord down the wall; `shelfHeight` in metres, default 0.8 — under the 0.85 m cutaway line), `none`. The Core is always plugged in: a power cord from the rear inlet off the back of its surface to the floor, and on a desk a display lead to the monitor. `device`: `chalk` | `charcoal` (the Companion Core — 232 × 205 × 90 mm, mesh front/sides/top, 120 mm fan under the top mesh, power button on the front) | `strix` (the AMD reference mini PC). `pose`: `prone` (default; 232 wide × 90 high, as the campaign draws it) | `upright` (stood on its side: 90 wide × 232 tall, fan side outward). `rot` is the heading the desk backs onto (rot 0 → monitor against the north wall, user south of it). Room items `chalk-tower` / `charcoal-tower` take the same `pose`. A headless Core elsewhere in the home is the `core-shelf` item: `at` is the wall face, `rot` the wall heading (same sense as `hero.rot`), `finish`, `pose`, `h` shelf height, `w` shelf width.
+- Shots turn the Core on: it is dark until the camera comes round the desk (`door-to-core` at 74 %, `hero-reveal` at 55 %, `walkthrough` at 80 %), then the button is pressed, the LED ring and hub ring light, and the fan spins up over 1.5 s; `orbit` has it on throughout.
+- `palette` is compiled by the material kit (`assets/materials.js`): `material` (brick | siding | stucco | stone | timber | corrugated) becomes a seeded, world-mapped PBR cladding (albedo + normal + roughness, `assets/textures.js`) on the outward face of every exterior wall, tinted by `wall`; the inside of those walls and the partitions take `interior` (optional; default: `wall` lifted toward off-white when it is dark); `accent` becomes the accent role; and every prop is recoloured by role — fabric, fabric2, wood, cabinet, rug, accent — from seeded picks that harmonise with the accent, so two houses never share a scheme. An item with its own `color` keeps it; the Companion Core family is never themed; any other saturated colour on a themed prop or a site asset (porch deck, pool basin, gazebo) is pulled toward restraint, and so are a saturated `wall` and `roof` (a lemon wall builds cream, a terracotta roof builds fired clay; brick keeps more of its red). Pool and pond water on a site asset is the kit's `water()` (a deep teal). Level `floor` accepts oak | herringbone | terrazzo | phthalo-terrazzo | charcoal-terrazzo | marble | concrete | tile | deck: seeded PBR sets mapped in world metres (0.18 m oak boards, 0.6 m tiles), boards along the level's long axis. Roofs take `kit.roofMaterial(type, color)`: gable/hip → asphalt shingle, shed → standing seam, terracotta → clay tile, flat → membrane (a dark roof colour is pulled toward neutral charcoal; a light one keeps its colour); the lot `ground`, patios, driveways and steps take `kit.surface(name)`.
+- Room items come from two catalogs: the page's AssetFactory builders and the prop registry (`assets/props/*.js`, one module per category — seating, tables, storage, beds, kitchen, bathroom, lighting, soft, plants, kids, office, outdoor, decor; ~150 props). Every type's measured footprint, height, surface flag and honoured params are in `content/house-catalog.json` (`scripts/build-prop-catalog.mts`); the validator accepts every registered type, the isometric twin draws registry props from their iso hints, and `scripts/prop-sheet.mts --module <category>` renders a review sheet. Wall-mounted props take `y` or their `mountY`; surface props sit on the desk/counter top.
+- `entry` = the front-door opening (must match an opening in `levels[].openings`).
+- Shot types: `door-to-core` (establishing → approach entry → through door → hero close-up, climbs stairs when hero is on an upper level), `orbit` (360° around the lot), `hero-reveal`, `walkthrough`. The builder derives waypoints from the spec; no hand-authored coordinates. Inside the house `door-to-core` **walks each storey** on a 0.25 m nav grid — through partition doorways, off the perimeter, and around anything taller than 1.1 m (wardrobes, bookshelves, ensuites, big plants) — from the door to the stair foot, landing to landing, and the last landing to the desk; a leg whose straight line is already clear stays straight. So furniture never has to be arranged around the camera; only the 2 m in front of the hero and the 1.2 m around it stay clear (the QA gate's `item-clip` warning names anything the eye still meets).
+- Shots render the house **complete**: full-height walls and roofs on, whatever wall mode the editor is in. Once the eye passes under a ceiling the roofs fade out over the last 5 % of the approach and stay off; walls stay full, so every interior leg goes through doorways (the QA gate tests full walls — a `wall-clip` is an error). Offline frames go through GTAO (ambient occlusion) + SMAA; the editor's live view does not. Frames are deterministic — seeded procedural textures and AO noise, no wall-clock animation while a shot records — and `scripts/test-frame-hash.mts` proves it (two fresh contexts, pixel-compared) before goldens or a re-lay are trusted.
+- Doors: a hinged leaf hangs on the wall's local −x jamb (the `from` end of an along-X partition, the `to` end of an along-Z one) and stands open 88° flat to the wall; openings wider than 1.1 m are cased openings with no leaf; an entry `slider` parks both panels on its local +x half and the shot enters through the other.
+- `balustrades` rail a void's **drop** edges only — never the edge the stair arrives at (`stairs.at + dir × run`, run 3.36 m by default): that edge is the landing, and the validator rejects a rail across it.
+
+## Authoring rules
+
+1. Footprint rects **must overlap or share edges** if they are meant to be one building; detached garages are separate rects that don't touch (they get their own perimeter).
+2. Opening centres must be ≥ `w/2 + 0.2` from a wall end and must not overlap each other on the same side.
+3. Every level with `y > 0` needs a `stairs` entry on the level below and a `voids` cut-out over the stair run (≈ `1.2 × 3.4`).
+4. Keep furniture inside `rooms[].bounds`; the CAD generator lists `items` under each room.
+5. Interiors are stylised: 5–12 items per room, colours from `palette`.
+6. Faithfulness priority: massing (storeys, footprint shape, roof type/colour) → key exterior features (pool, garage, porch, deck, fence, trees) → interior room layout → furniture.

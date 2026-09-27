@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FloorplanGraph Demo · HouseSpec → graph → mitred walls</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./assets/vendor/three/three.module.min.js",
+      "three/addons/": "./assets/vendor/three/"
+    }
+  }
+  </script>
+  <style>
+    :root {
+      --bg-base: #041620; --bg-surface: #0a222e; --bg-panel: rgba(12, 50, 60, 0.88);
+      --border-subtle: rgba(197, 232, 220, 0.14); --text-primary: #e8f2f4; --text-secondary: #a3babf; --text-muted: #70a6af;
+      --accent-aqua: #00a9a7; --accent-aqua-light: #72ddd4; --accent-sage: #c5e8dc; --accent-amber: #fbbf24; --accent-rose: #ef7070;
+      --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { background: var(--bg-base); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; display: flex; flex-direction: column; overflow: hidden; }
+    header { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: var(--bg-panel); border-bottom: 1px solid var(--border-subtle); flex-wrap: wrap; }
+    header h1 { font-size: 15px; font-weight: 700; letter-spacing: 0.01em; }
+    header h1 small { color: var(--text-muted); font-weight: 500; margin-left: 8px; }
+    label { color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+    select, button { font: inherit; color: var(--text-primary); background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 5px 9px; cursor: pointer; }
+    select { max-width: 260px; }
+    button.active { border-color: var(--accent-aqua); box-shadow: 0 0 0 1px var(--accent-aqua) inset; color: var(--accent-aqua-light); }
+    .group { display: flex; gap: 4px; }
+    #stats { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); margin-left: auto; white-space: nowrap; }
+    #stats b { color: var(--accent-aqua-light); font-weight: 500; }
+    #stats .warn { color: var(--accent-amber); }
+    main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; min-height: 0; }
+    .pane { position: relative; min-width: 0; min-height: 0; border-right: 1px solid var(--border-subtle); }
+    .pane:last-child { border-right: none; }
+    .pane .caption { position: absolute; top: 10px; left: 12px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); pointer-events: none; z-index: 2; }
+    .pane .caption b { color: var(--text-secondary); font-weight: 500; }
+    svg#plan { width: 100%; height: 100%; display: block; background: radial-gradient(ellipse at center, #0a222e 0%, #041620 100%); }
+    canvas#view { width: 100%; height: 100%; display: block; }
+    .legend { position: absolute; bottom: 10px; left: 12px; display: flex; gap: 12px; font-size: 11px; color: var(--text-secondary); font-family: var(--font-mono); }
+    .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+    details { border-top: 1px solid var(--border-subtle); background: var(--bg-surface); }
+    details summary { padding: 6px 16px; cursor: pointer; color: var(--text-secondary); font-family: var(--font-mono); font-size: 12px; }
+    details pre { max-height: 220px; overflow: auto; padding: 8px 16px 14px; font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); white-space: pre; user-select: text; }
+    .room-label { font-family: var(--font-sans); font-size: 0.42px; fill: var(--text-primary); text-anchor: middle; pointer-events: none; }
+    .room-area { font-family: var(--font-mono); font-size: 0.3px; fill: var(--text-secondary); text-anchor: middle; pointer-events: none; }
+    .corner-label { font-family: var(--font-mono); font-size: 0.24px; fill: var(--text-muted); pointer-events: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FloorplanGraph <small>HouseSpec → Corner/Wall/HalfEdge/Room → mitred wall meshes</small></h1>
+    <label>House <select id="house"></select></label>
+    <label>Level <select id="level"></select></label>
+    <div class="group" id="modes">
+      <button data-mode="up">Walls up</button>
+      <button data-mode="cutaway" class="active">Cutaway</button>
+      <button data-mode="down">Down</button>
+    </div>
+    <label><input type="checkbox" id="showFaces" checked> mitred faces</label>
+    <button id="roundtrip">JSON round-trip</button>
+    <div id="stats">loading…</div>
+  </header>
+  <main>
+    <div class="pane">
+      <div class="caption"><b>2D graph</b> · corners, walls (solid = mitred faces), detected rooms</div>
+      <svg id="plan" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="legend">
+        <span><i style="background:#fbbf24"></i>door</span><span><i style="background:#72ddd4"></i>window / glass</span>
+        <span><i style="background:#ef7070"></i>dangling corner</span><span><i style="background:repeating-linear-gradient(45deg,#70a6af 0 2px,transparent 2px 4px)"></i>outdoor cycle</span>
+      </div>
+    </div>
+    <div class="pane">
+      <div class="caption"><b>3D</b> · one mesh per wall, holes cut through, cutaway via material clipping planes</div>
+      <canvas id="view"></canvas>
+    </div>
+  </main>
+  <details>
+    <summary>graph.toJSON()</summary>
+    <pre id="json"></pre>
+  </details>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/OrbitControls.js';
+    import { FloorplanGraph } from './assets/floorplan-graph.js';
+    import { createWallCompiler, applyCutawayAll, enableCutaway, wallFaces } from './assets/wall-compiler.js';
+
+    const $ = id => document.getElementById(id);
+    const params = new URLSearchParams(location.search);
+    const ROOM_COLORS = ['#0a6358', '#0e4a52', '#1d4f6b', '#3b4f7a', '#5b4a72', '#6b4a4f', '#4f6b3b', '#6b5a2e', '#2e6b6b', '#4a3b6b'];
+
+    // ---------------------------------------------------------------------------------------
+    // Three.js view
+    // ---------------------------------------------------------------------------------------
+    const canvas = $('view');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+    enableCutaway(renderer);                       // material clipping planes need renderer.localClippingEnabled
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a222e);
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 500);
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping = true;
+    scene.add(new THREE.HemisphereLight(0xdfe9f3, 0x2b3a2b, 0.9));
+    const sun = new THREE.DirectionalLight(0xfff4e0, 2.2);
+    sun.position.set(18, 30, 22); sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048); sun.shadow.camera.left = -30; sun.shadow.camera.right = 30; sun.shadow.camera.top = 30; sun.shadow.camera.bottom = -30;
+    scene.add(sun);
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x4d7c3a, roughness: 1 }));
+    ground.rotation.x = -Math.PI / 2; ground.position.y = -0.01; ground.receiveShadow = true; scene.add(ground);
+    const house = new THREE.Group(); scene.add(house);
+    const compiler = createWallCompiler({ THREE });
+
+    function resize() {
+      const w = canvas.clientWidth || 1, h = canvas.clientHeight || 1;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(resize).observe(canvas.parentElement);
+    renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+
+    function disposeGroup(g) {
+      g.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.dispose()); });
+      g.clear();
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // State
+    // ---------------------------------------------------------------------------------------
+    let index = null, spec = null, level = null, graph = null, compiled = null, mode = 'cutaway';
+
+    async function loadIndex() {
+      index = await (await fetch('./content/houses/index.json')).json();
+      const sel = $('house');
+      for (const h of index.houses) { const o = document.createElement('option'); o.value = h.id; o.textContent = `${h.emoji || '🏠'} ${h.name} (${h.id})`; sel.appendChild(o); }
+      sel.value = params.get('house') && index.houses.some(h => h.id === params.get('house')) ? params.get('house') : index.houses[0].id;
+      sel.addEventListener('change', () => { params.set('house', sel.value); params.delete('level'); history.replaceState(null, '', `?${params}`); loadHouse(sel.value); });
+      $('level').addEventListener('change', () => { params.set('level', $('level').value); history.replaceState(null, '', `?${params}`); build($('level').value); });
+      await loadHouse(sel.value);
+    }
+
+    async function loadHouse(id) {
+      spec = await (await fetch(`./content/houses/${id}.json`)).json();
+      const sel = $('level'); sel.innerHTML = '';
+      for (const lv of spec.levels) { const o = document.createElement('option'); o.value = lv.id; o.textContent = `${lv.id} · ${lv.name || ''}`; sel.appendChild(o); }
+      const want = params.get('level');
+      sel.value = want && spec.levels.some(l => l.id === want) ? want : spec.levels[0].id;
+      build(sel.value);
+    }
+
+    function build(levelId) {
+      level = spec.levels.find(l => l.id === levelId) || spec.levels[0];
+      graph = FloorplanGraph.fromLevel(level, { entry: spec.entry });
+      render3D();
+      render2D();
+      $('json').textContent = JSON.stringify(graph.toJSON(), null, 2);
+      const indoor = graph.rooms.filter(r => !r.outdoor), authored = (level.rooms || []).length;
+      const openings = graph.walls.reduce((n, w) => n + w.openings.length, 0);
+      const tris = compiled.meshes.reduce((n, m) => n + m.geometry.attributes.position.count / 3, 0);
+      const roomNote = indoor.length === authored ? '' : ` <span class="warn">(spec ${authored})</span>`;
+      $('stats').innerHTML = `corners <b>${graph.corners.length}</b> · walls <b>${graph.walls.length}</b> · rooms <b>${indoor.length}</b>${roomNote}${graph.rooms.length > indoor.length ? ` +${graph.rooms.length - indoor.length} outdoor` : ''} · openings <b>${openings}</b> · meshes <b>${compiled.meshes.length}</b> · tris <b>${tris}</b>`;
+      console.log(`[floorplan-graph-demo] ${spec.id}/${level.id}: ${graph.corners.length} corners, ${graph.walls.length} walls, ${indoor.length} rooms (spec ${authored}), ${openings} openings, ${compiled.meshes.length} meshes, ${tris} triangles`);
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // 3D: walls from the compiler + per-room floors + placeholder units in the holes
+    // ---------------------------------------------------------------------------------------
+    const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.35, roughness: 0.08, metalness: 0.05, side: THREE.DoubleSide });
+    const leafMat = new THREE.MeshStandardMaterial({ color: 0x3f2a1d, roughness: 0.6 });
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
+
+    function unitFor(op) {
+      // Placeholder for the ProceduralArchitecture door/window unit: local X along the wall, +Z outward.
+      const r = op.worldRect, g = new THREE.Group();
+      g.position.set(r.x, r.y, r.z); g.rotation.y = r.rotationY;
+      const frame = (w, h, x, y) => { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, r.thickness + 0.02), frameMat); m.position.set(x, y, 0); return m; };
+      g.add(frame(0.05, r.h, -r.w / 2 + 0.025, r.h / 2), frame(0.05, r.h, r.w / 2 - 0.025, r.h / 2), frame(r.w, 0.05, 0, r.h - 0.025));
+      if (op.kind === 'door' || op.kind === 'garage') {
+        const leaf = new THREE.Mesh(new THREE.BoxGeometry(r.w - 0.1, r.h - 0.05, 0.045), leafMat);
+        leaf.geometry.translate((r.w - 0.1) / 2, 0, 0);
+        leaf.position.set(-r.w / 2 + 0.05, (r.h - 0.05) / 2, 0);
+        if (op.entry) leaf.rotation.y = -Math.PI * 0.38;   // front door swung open, like the builder does
+        leaf.castShadow = true;
+        g.add(leaf);
+      } else {
+        const pane = new THREE.Mesh(new THREE.PlaneGeometry(r.w - 0.1, r.h - 0.05), glassMat);
+        pane.position.set(0, r.h / 2, 0); g.add(pane);
+        if (op.kind === 'window') { const m = new THREE.Mesh(new THREE.BoxGeometry(0.03, r.h - 0.05, 0.04), frameMat); m.position.y = r.h / 2; g.add(m); }
+      }
+      return g;
+    }
+
+    function render3D() {
+      disposeGroup(house);
+      const baseY = level.y || 0;
+      const palette = { wall: '#f8fafc', ...(spec.palette || {}) };
+      const wallColor = new THREE.Color(level.wallColor || palette.wall);
+      compiled = compiler.compileGraph(graph, { baseY, height: level.height || 2.8 });
+      for (const w of compiled.walls) {
+        w.mesh.material.color.copy(wallColor);
+        if (!w.exterior) w.mesh.material.color.lerp(new THREE.Color(0xffffff), 0.3);
+        house.add(w.mesh);
+      }
+      applyCutawayAll(compiled.meshes, mode);
+      graph.rooms.forEach((r, i) => {
+        if (r.outdoor) return;
+        const floor = compiler.compileRoomFloor(r, { baseY, color: new THREE.Color(ROOM_COLORS[i % ROOM_COLORS.length]).lerp(new THREE.Color(0xffffff), 0.35) });
+        if (floor) house.add(floor);
+      });
+      for (const op of compiled.openings) house.add(unitFor(op));
+      if (baseY > 0) {   // slab under an upper level so the walls are not floating
+        const b = graph.bounds();
+        const slab = new THREE.Mesh(new THREE.BoxGeometry(b.maxX - b.minX + 0.4, 0.18, b.maxZ - b.minZ + 0.4), new THREE.MeshStandardMaterial({ color: 0xd6d3d1, roughness: 0.9 }));
+        slab.position.set((b.minX + b.maxX) / 2, baseY - 0.09, (b.minZ + b.maxZ) / 2); slab.receiveShadow = true; house.add(slab);
+      }
+      // camera from the south-east, framing the level
+      const b = graph.bounds(), cx = (b.minX + b.maxX) / 2, cz = (b.minZ + b.maxZ) / 2;
+      const span = Math.max(b.maxX - b.minX, b.maxZ - b.minZ, 6);
+      camera.position.set(cx + span * 0.9, baseY + span * 0.75, cz + span * 0.9);
+      controls.target.set(cx, baseY + 1, cz); controls.update();
+      resize();
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // 2D SVG: rooms (coloured), mitred wall solids, centrelines, openings, corners
+    // ---------------------------------------------------------------------------------------
+    const NS = 'http://www.w3.org/2000/svg';
+    const el = (tag, attrs = {}, text) => { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (text != null) n.textContent = text; return n; };
+    const pts = poly => poly.map(p => `${p[0].toFixed(3)},${p[1].toFixed(3)}`).join(' ');
+
+    function render2D() {
+      const svg = $('plan'); svg.innerHTML = '';
+      const b = graph.bounds(), pad = 1.2;
+      svg.setAttribute('viewBox', `${b.minX - pad} ${b.minZ - pad} ${b.maxX - b.minX + 2 * pad} ${b.maxZ - b.minZ + 2 * pad}`);
+      const defs = el('defs');
+      const pat = el('pattern', { id: 'hatch', width: 0.3, height: 0.3, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
+      pat.appendChild(el('rect', { width: 0.3, height: 0.08, fill: '#70a6af', opacity: 0.5 })); defs.appendChild(pat); svg.appendChild(defs);
+      // grid
+      const grid = el('g', { stroke: 'rgba(197,232,220,0.06)', 'stroke-width': 0.02 });
+      for (let x = Math.floor(b.minX - pad); x <= b.maxX + pad; x++) grid.appendChild(el('line', { x1: x, y1: b.minZ - pad, x2: x, y2: b.maxZ + pad }));
+      for (let z = Math.floor(b.minZ - pad); z <= b.maxZ + pad; z++) grid.appendChild(el('line', { x1: b.minX - pad, y1: z, x2: b.maxX + pad, y2: z }));
+      svg.appendChild(grid);
+      // rooms
+      const rooms = el('g');
+      graph.rooms.forEach((r, i) => {
+        const poly = r.interiorPolygon();
+        rooms.appendChild(el('polygon', { points: pts(poly), fill: r.outdoor ? 'url(#hatch)' : ROOM_COLORS[i % ROOM_COLORS.length], 'fill-opacity': r.outdoor ? 1 : 0.55, stroke: 'none' }));
+        const [cx, cz] = r.centroid();
+        const fs = Math.max(0.2, Math.min(0.42, Math.sqrt(r.area()) * 0.09));   // small rooms get smaller labels
+        rooms.appendChild(el('text', { x: cx, y: cz - fs * 0.25, class: 'room-label', style: `font-size:${fs}px` }, r.name ? `${r.no ? r.no + ' ' : ''}${r.name}` : (r.outdoor ? 'outdoor' : r.id)));
+        rooms.appendChild(el('text', { x: cx, y: cz + fs * 0.75, class: 'room-area', style: `font-size:${fs * 0.7}px` }, `${r.area().toFixed(1)} m²`));
+      });
+      svg.appendChild(rooms);
+      // walls: mitred solid (both faces) + centreline
+      const showFaces = $('showFaces').checked;
+      const walls = el('g');
+      for (const w of graph.walls) {
+        const f = wallFaces(w);
+        if (showFaces && f) walls.appendChild(el('polygon', { points: pts([...f.faceA, ...[...f.faceB].reverse()]), fill: w.kind === 'partition' ? '#a3babf' : '#e8f2f4', 'fill-opacity': 0.9, stroke: '#041620', 'stroke-width': 0.015 }));
+        walls.appendChild(el('line', { x1: w.start.x, y1: w.start.z, x2: w.end.x, y2: w.end.z, stroke: showFaces ? 'rgba(4,22,32,0.5)' : '#e8f2f4', 'stroke-width': showFaces ? 0.015 : 0.08, 'stroke-dasharray': showFaces ? '0.12 0.08' : 'none' }));
+        for (const op of w.openings) {
+          const [dx, dz] = w.direction(), [cx, cz] = w.pointAt(op.at);
+          const colour = op.kind === 'door' || op.kind === 'garage' ? '#fbbf24' : '#72ddd4';
+          walls.appendChild(el('line', { x1: cx - dx * op.w / 2, y1: cz - dz * op.w / 2, x2: cx + dx * op.w / 2, y2: cz + dz * op.w / 2, stroke: colour, 'stroke-width': w.thickness + 0.04, 'stroke-linecap': 'butt' }));
+          if (op.entry) walls.appendChild(el('circle', { cx, cy: cz, r: 0.22, fill: 'none', stroke: '#fbbf24', 'stroke-width': 0.04 }));
+        }
+      }
+      svg.appendChild(walls);
+      // corners
+      const corners = el('g');
+      for (const c of graph.corners) {
+        corners.appendChild(el('circle', { cx: c.x, cy: c.z, r: 0.11, fill: c.degree() === 1 ? '#ef7070' : '#00a9a7', stroke: '#041620', 'stroke-width': 0.02 }));
+        corners.appendChild(el('text', { x: c.x + 0.15, y: c.z - 0.15, class: 'corner-label' }, c.id));
+      }
+      svg.appendChild(corners);
+      // compass
+      svg.appendChild(el('text', { x: b.maxX + pad - 0.6, y: b.minZ - pad + 0.5, class: 'room-area', fill: '#70a6af' }, 'N ↑'));
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // Controls
+    // ---------------------------------------------------------------------------------------
+    for (const btn of document.querySelectorAll('#modes button')) btn.addEventListener('click', () => {
+      mode = btn.dataset.mode;
+      document.querySelectorAll('#modes button').forEach(b => b.classList.toggle('active', b === btn));
+      applyCutawayAll(compiled.meshes, mode);
+    });
+    $('showFaces').addEventListener('change', render2D);
+    $('roundtrip').addEventListener('click', () => {
+      const json = graph.toJSON();
+      const back = FloorplanGraph.fromJSON(JSON.parse(JSON.stringify(json)));
+      const same = JSON.stringify(back.toJSON()) === JSON.stringify(json);
+      graph = back; render3D(); render2D();
+      $('json').textContent = JSON.stringify(graph.toJSON(), null, 2);
+      console.log(`[floorplan-graph-demo] JSON round-trip ${same ? 'identical' : 'DIFFERS'}: ${back.corners.length} corners, ${back.walls.length} walls, ${back.rooms.length} rooms`);
+      $('roundtrip').textContent = same ? 'JSON round-trip ✓ identical' : 'JSON round-trip ✗ differs';
+      setTimeout(() => { $('roundtrip').textContent = 'JSON round-trip'; }, 2500);
+    });
+
+    loadIndex().catch(err => { console.error(err); $('stats').textContent = `error: ${err.message}`; });
+  </script>
+</body>
+</html>

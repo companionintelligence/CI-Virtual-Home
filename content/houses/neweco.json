@@ -1,0 +1,1425 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "neweco",
+  "name": "The New Eco Base Game",
+  "author": "plnch25",
+  "source": "SimsTree slide 04",
+  "style": "Two-storey eco-modern: teal corrugated panels and dark timber over grey-blue cladding, brown shingle gable with glass roof sections, timber-framed window walls, single-storey glass sunroom, attached garage and paver drive, raised timber entry deck",
+  "emoji": "🌿",
+  "lot": {
+    "w": 32,
+    "d": 28,
+    "ground": "lawn"
+  },
+  "palette": {
+    "wall": "#b8c4cf",
+    "trim": "#4a2c1a",
+    "roof": "#5c3a24",
+    "accent": "#5f8f86",
+    "material": "corrugated"
+  },
+  "lighting": "pascal-daylight",
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Ground Floor",
+      "sheet": "A-101",
+      "y": 0,
+      "height": 3,
+      "floor": "oak",
+      "footprint": [
+        {
+          "x": -3,
+          "z": -6,
+          "w": 7,
+          "d": 12
+        },
+        {
+          "x": -8.5,
+          "z": -6,
+          "w": 5.5,
+          "d": 12
+        },
+        {
+          "x": 4,
+          "z": -2,
+          "w": 5.5,
+          "d": 8
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": 1.5,
+          "type": "door",
+          "w": 1.6,
+          "h": 2.4,
+          "style": "glass-slider"
+        },
+        {
+          "side": "S",
+          "at": -1,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.6,
+          "sill": 0.2
+        },
+        {
+          "side": "S",
+          "at": -5.75,
+          "type": "glass",
+          "w": 4.8,
+          "h": 2.8
+        },
+        {
+          "side": "S",
+          "at": 6.75,
+          "type": "garage",
+          "w": 3,
+          "h": 2.3
+        },
+        {
+          "side": "W",
+          "at": 3,
+          "type": "glass",
+          "w": 5,
+          "h": 2.8
+        },
+        {
+          "side": "W",
+          "at": -3,
+          "type": "window",
+          "w": 2,
+          "h": 1.5,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": -5.75,
+          "type": "window",
+          "w": 2.4,
+          "h": 1.5,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 0.5,
+          "type": "window",
+          "w": 2,
+          "h": 1.2,
+          "sill": 1.2
+        },
+        {
+          "side": "N",
+          "at": 6.75,
+          "type": "window",
+          "w": 1.4,
+          "h": 1,
+          "sill": 1.5
+        },
+        {
+          "side": "E",
+          "at": -4,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.4,
+          "sill": 1.1
+        },
+        {
+          "side": "E",
+          "at": 2,
+          "type": "window",
+          "w": 1.2,
+          "h": 0.9,
+          "sill": 1.5
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -3,
+            -6
+          ],
+          "to": [
+            -3,
+            0
+          ],
+          "door": 3,
+          "doorW": 1.2,
+          "height": 2.9
+        },
+        {
+          "from": [
+            -3,
+            0
+          ],
+          "to": [
+            -3,
+            6
+          ],
+          "door": 2,
+          "doorW": 1.6,
+          "height": 2.9
+        },
+        {
+          "from": [
+            -8.5,
+            0
+          ],
+          "to": [
+            -3,
+            0
+          ],
+          "door": 2.75,
+          "doorW": 2.4,
+          "height": 2.9
+        },
+        {
+          "from": [
+            -3,
+            -1
+          ],
+          "to": [
+            4,
+            -1
+          ],
+          "door": 3.5,
+          "doorW": 2,
+          "height": 2.9
+        },
+        {
+          "from": [
+            4,
+            -2
+          ],
+          "to": [
+            4,
+            6
+          ],
+          "door": 1.5,
+          "doorW": 0.9,
+          "height": 2.9
+        }
+      ],
+      "stairs": {
+        "type": "timber",
+        "at": [
+          3.4,
+          4.5
+        ],
+        "rot": 180,
+        "to": "l2"
+      },
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Entry Hall",
+          "bounds": {
+            "x": -3,
+            "z": -1,
+            "w": 7,
+            "d": 7
+          },
+          "items": [
+            {
+              "type": "area-rug",
+              "at": [
+                -0.2,
+                3.6
+              ],
+              "rot": 0,
+              "w": 3,
+              "d": 2.4
+            },
+            {
+              "type": "bench",
+              "at": [
+                -1,
+                5.7
+              ],
+              "rot": 180
+            },
+            {
+              "type": "media-credenza",
+              "at": [
+                -2.75,
+                4.4
+              ],
+              "rot": 90,
+              "w": 1.4
+            },
+            {
+              "type": "wall-tv",
+              "at": [
+                -2.9,
+                4.4
+              ],
+              "rot": 90,
+              "w": 1.4
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                0.5,
+                3
+              ],
+              "rot": 270
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                0.5,
+                4.2
+              ],
+              "rot": 270
+            },
+            {
+              "type": "coffee-table",
+              "at": [
+                -1.2,
+                3.6
+              ],
+              "rot": 90
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -2.7,
+                5.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                2.3,
+                -0.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "monstera",
+              "at": [
+                3.4,
+                0.4
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "02",
+          "name": "Kitchen",
+          "bounds": {
+            "x": -3,
+            "z": -6,
+            "w": 7,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "kitchen-cabinetry",
+              "at": [
+                0.5,
+                -5.675
+              ],
+              "rot": 0,
+              "w": 5.7
+            },
+            {
+              "type": "kitchen-cabinetry",
+              "at": [
+                -2.675,
+                -4.85
+              ],
+              "rot": 90,
+              "w": 2.3
+            },
+            {
+              "type": "kitchen-island",
+              "at": [
+                0.5,
+                -3.5
+              ],
+              "rot": 0,
+              "w": 3.4
+            },
+            {
+              "type": "bench",
+              "at": [
+                1,
+                -2.7
+              ],
+              "rot": 180
+            },
+            {
+              "type": "bamboo",
+              "at": [
+                -2.5,
+                -1.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "monstera",
+              "at": [
+                3.5,
+                -4
+              ],
+              "rot": 0
+            },
+            {
+              "type": "cactus-group",
+              "at": [
+                3.5,
+                -2.3
+              ],
+              "rot": 0
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                3.6,
+                -1.5
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "03",
+          "name": "Dining Room",
+          "bounds": {
+            "x": -8.5,
+            "z": -6,
+            "w": 5.5,
+            "d": 6
+          },
+          "items": [
+            {
+              "type": "area-rug",
+              "at": [
+                -5.75,
+                -3.2
+              ],
+              "rot": 0,
+              "w": 3.4,
+              "d": 2.4
+            },
+            {
+              "type": "dining-set",
+              "at": [
+                -5.75,
+                -3.2
+              ],
+              "rot": 0
+            },
+            {
+              "type": "media-credenza",
+              "at": [
+                -5.75,
+                -5.775
+              ],
+              "rot": 0
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -8.325,
+                -1
+              ],
+              "rot": 90
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -8,
+                -3
+              ],
+              "rot": 90
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                -8.1,
+                -5.5
+              ],
+              "rot": 0
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -3.4,
+                -5.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "bonsai",
+              "at": [
+                -3.5,
+                -0.6
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "04",
+          "name": "Sunroom Lounge",
+          "bounds": {
+            "x": -8.5,
+            "z": 0,
+            "w": 5.5,
+            "d": 6
+          },
+          "items": [
+            {
+              "type": "area-rug",
+              "at": [
+                -6.3,
+                4.2
+              ],
+              "rot": 0,
+              "w": 3.8,
+              "d": 3.2
+            },
+            {
+              "type": "sectional",
+              "at": [
+                -8,
+                4.8
+              ],
+              "rot": 90
+            },
+            {
+              "type": "octagonal-table",
+              "at": [
+                -6.4,
+                4.2
+              ],
+              "rot": 0
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -4.8,
+                4.2
+              ],
+              "rot": 270
+            },
+            {
+              "type": "telescope",
+              "at": [
+                -8.1,
+                2.4
+              ],
+              "rot": 0
+            },
+            {
+              "type": "core-shelf",
+              "at": [
+                -7.7,
+                0
+              ],
+              "rot": 0,
+              "finish": "charcoal",
+              "pose": "prone"
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -3.2,
+                4.2
+              ],
+              "rot": 270
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -3.3,
+                3.2
+              ],
+              "rot": 0
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                -3.6,
+                5.5
+              ],
+              "rot": 0
+            },
+            {
+              "type": "monstera",
+              "at": [
+                -3.9,
+                0.5
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "05",
+          "name": "Garage & Workshop",
+          "bounds": {
+            "x": 4,
+            "z": -2,
+            "w": 5.5,
+            "d": 8
+          },
+          "items": [
+            {
+              "type": "walnut-desk",
+              "at": [
+                9.1,
+                -1
+              ],
+              "rot": 270
+            },
+            {
+              "type": "task-chair",
+              "at": [
+                8.3,
+                -1
+              ],
+              "rot": 90
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                9.325,
+                0.6
+              ],
+              "rot": 270
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                9.325,
+                4.5
+              ],
+              "rot": 270
+            },
+            {
+              "type": "bench",
+              "at": [
+                6.75,
+                -1.7
+              ],
+              "rot": 0
+            },
+            {
+              "type": "bench",
+              "at": [
+                4.25,
+                3
+              ],
+              "rot": 90
+            },
+            {
+              "type": "cactus-group",
+              "at": [
+                4.6,
+                -1.5
+              ],
+              "rot": 0
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                8.9,
+                5.6
+              ],
+              "rot": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "name": "Upper Floor",
+      "sheet": "A-102",
+      "y": 3,
+      "height": 2.7,
+      "floor": "oak",
+      "footprint": [
+        {
+          "x": -3,
+          "z": -6,
+          "w": 7,
+          "d": 12
+        },
+        {
+          "x": -8.5,
+          "z": -6,
+          "w": 5.5,
+          "d": 5
+        }
+      ],
+      "voids": [
+        {
+          "x": 2.8,
+          "z": 1.1,
+          "w": 1.2,
+          "d": 3.4
+        }
+      ],
+      "balustrades": [
+        {
+          "from": [
+            2.8,
+            1.1
+          ],
+          "to": [
+            2.8,
+            4.5
+          ],
+          "style": "glass"
+        },
+        {
+          "from": [
+            2.8,
+            4.5
+          ],
+          "to": [
+            4,
+            4.5
+          ],
+          "style": "glass"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -1,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.2
+        },
+        {
+          "side": "S",
+          "at": 2,
+          "type": "window",
+          "w": 2.4,
+          "h": 1.6,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": -5.75,
+          "type": "window",
+          "w": 2,
+          "h": 1.4,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": -5.75,
+          "type": "window",
+          "w": 2.4,
+          "h": 1.4,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 0.5,
+          "type": "window",
+          "w": 2.4,
+          "h": 1.4,
+          "sill": 0.9
+        },
+        {
+          "side": "E",
+          "at": -3.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.4,
+          "sill": 0.9
+        },
+        {
+          "side": "E",
+          "at": 3,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.4,
+          "sill": 0.9
+        },
+        {
+          "side": "W",
+          "at": -4,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.4,
+          "sill": 0.9
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -3,
+            -1
+          ],
+          "to": [
+            4,
+            -1
+          ],
+          "door": 5,
+          "doorW": 1,
+          "height": 2.6
+        },
+        {
+          "from": [
+            0.5,
+            -1
+          ],
+          "to": [
+            0.5,
+            6
+          ],
+          "door": 3,
+          "doorW": 0.9,
+          "height": 2.6
+        },
+        {
+          "from": [
+            -3,
+            -6
+          ],
+          "to": [
+            -3,
+            -1
+          ],
+          "door": 1,
+          "doorW": 0.9,
+          "height": 2.6
+        }
+      ],
+      "rooms": [
+        {
+          "no": "06",
+          "name": "Study",
+          "bounds": {
+            "x": -3,
+            "z": -1,
+            "w": 3.5,
+            "d": 7
+          },
+          "items": [
+            {
+              "type": "bookshelf",
+              "at": [
+                -2.825,
+                0
+              ],
+              "rot": 90
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -2.825,
+                1.5
+              ],
+              "rot": 90
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -1,
+                -0.3
+              ],
+              "rot": 0
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                0,
+                0.8
+              ],
+              "rot": 270
+            },
+            {
+              "type": "coffee-table",
+              "at": [
+                -1.2,
+                1
+              ],
+              "rot": 0
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -0.2,
+                -0.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                0.25,
+                5.65
+              ],
+              "rot": 0
+            },
+            {
+              "type": "circular-rug",
+              "at": [
+                -1.2,
+                2.4
+              ],
+              "rot": 0,
+              "r": 0.9
+            },
+            {
+              "type": "monstera",
+              "at": [
+                -2.6,
+                5.6
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "07",
+          "name": "Upper Landing",
+          "bounds": {
+            "x": 0.5,
+            "z": -1,
+            "w": 3.5,
+            "d": 7
+          },
+          "items": [
+            {
+              "type": "bench",
+              "at": [
+                1.6,
+                5.7
+              ],
+              "rot": 180
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                3.6,
+                5.5
+              ],
+              "rot": 0
+            },
+            {
+              "type": "circular-rug",
+              "at": [
+                1.6,
+                0.2
+              ],
+              "rot": 0,
+              "r": 0.8
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                0.9,
+                -0.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                0.675,
+                3.5
+              ],
+              "rot": 90
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                1.9,
+                3.4
+              ],
+              "rot": 270
+            },
+            {
+              "type": "monstera",
+              "at": [
+                2.3,
+                5
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "08",
+          "name": "Primary Bedroom",
+          "bounds": {
+            "x": -3,
+            "z": -6,
+            "w": 7,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "platform-bed",
+              "at": [
+                0.5,
+                -4.85
+              ],
+              "rot": 0
+            },
+            {
+              "type": "bench",
+              "at": [
+                0.5,
+                -3.35
+              ],
+              "rot": 0
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                -1.5,
+                -1.3
+              ],
+              "rot": 180
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                -2.7,
+                -3
+              ],
+              "rot": 90,
+              "w": 1.4,
+              "h": 1
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                3.4,
+                -1.6
+              ],
+              "rot": 180
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                3.4,
+                -3
+              ],
+              "rot": 270
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                3.6,
+                -2.3
+              ],
+              "rot": 0
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -2,
+                -5.825
+              ],
+              "rot": 0
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -0.9,
+                -5.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "area-rug",
+              "at": [
+                0.5,
+                -2.6
+              ],
+              "rot": 0,
+              "w": 3,
+              "d": 2
+            },
+            {
+              "type": "monstera",
+              "at": [
+                2.6,
+                -5.6
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "09",
+          "name": "Primary Bath & Dressing",
+          "bounds": {
+            "x": -8.5,
+            "z": -6,
+            "w": 5.5,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "ensuite",
+              "at": [
+                -7.3,
+                -5
+              ],
+              "rot": 0
+            },
+            {
+              "type": "low-wall",
+              "at": [
+                -5.95,
+                -5
+              ],
+              "rot": 90,
+              "w": 2,
+              "h": 1.4
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                -7.7,
+                -1.3
+              ],
+              "rot": 180,
+              "w": 1.6
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                -3.7,
+                -1.3
+              ],
+              "rot": 180,
+              "w": 1.4
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                -8.2,
+                -2.5
+              ],
+              "rot": 90,
+              "w": 1.4,
+              "h": 1
+            },
+            {
+              "type": "bench",
+              "at": [
+                -5.75,
+                -2.5
+              ],
+              "rot": 0
+            },
+            {
+              "type": "circular-rug",
+              "at": [
+                -5.75,
+                -3.4
+              ],
+              "rot": 0,
+              "r": 1
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -3.3,
+                -3
+              ],
+              "rot": 0
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                -4.8,
+                -5.6
+              ],
+              "rot": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -3.4,
+        "z": -6.4,
+        "w": 7.8,
+        "d": 12.8
+      },
+      "y": 5.7,
+      "type": "gable",
+      "ridge": "x",
+      "pitch": 24,
+      "overhang": 0.4,
+      "color": "#5c3a24"
+    },
+    {
+      "over": {
+        "x": -8.9,
+        "z": -6.4,
+        "w": 6.1,
+        "d": 5.8
+      },
+      "y": 5.7,
+      "type": "aframe-glass",
+      "ridge": "x",
+      "pitch": 24,
+      "overhang": 0.4,
+      "color": "#5c3a24"
+    },
+    {
+      "over": {
+        "x": -8.9,
+        "z": -1,
+        "w": 6.1,
+        "d": 7.4
+      },
+      "y": 3,
+      "type": "flat",
+      "parapet": 0.3,
+      "color": "#5c3a24"
+    },
+    {
+      "over": {
+        "x": 3.6,
+        "z": -2.4,
+        "w": 6.3,
+        "d": 8.8
+      },
+      "y": 3,
+      "type": "shed",
+      "ridge": "x",
+      "pitch": 18,
+      "overhang": 0.4,
+      "color": "#5c3a24"
+    }
+  ],
+  "site": [
+    {
+      "type": "deck",
+      "at": [
+        0.5,
+        7
+      ],
+      "w": 7,
+      "d": 2,
+      "h": 0.3
+    },
+    {
+      "type": "steps",
+      "at": [
+        1.5,
+        8.5
+      ],
+      "rot": 0
+    },
+    {
+      "type": "patio",
+      "at": [
+        1.5,
+        11
+      ],
+      "w": 1.6,
+      "d": 6
+    },
+    {
+      "type": "driveway",
+      "at": [
+        6.75,
+        10
+      ],
+      "w": 5.5,
+      "d": 8
+    },
+    {
+      "type": "car",
+      "at": [
+        6.75,
+        10.5
+      ],
+      "rot": 0
+    },
+    {
+      "type": "patio",
+      "at": [
+        0,
+        13.5
+      ],
+      "w": 32,
+      "d": 1.6
+    },
+    {
+      "type": "planter",
+      "at": [
+        4.2,
+        6.8
+      ]
+    },
+    {
+      "type": "planter",
+      "at": [
+        -3.2,
+        6.8
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -6,
+        8.5
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -3.5,
+        8.2
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -1.5,
+        9.5
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -8.5,
+        9.5
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        4,
+        8.2
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        10.5,
+        7
+      ]
+    },
+    {
+      "type": "garden-beds",
+      "at": [
+        -9.5,
+        10.5
+      ],
+      "w": 3,
+      "d": 1.2
+    },
+    {
+      "type": "palm",
+      "at": [
+        -13,
+        8
+      ]
+    },
+    {
+      "type": "palm",
+      "at": [
+        12.5,
+        -2
+      ]
+    },
+    {
+      "type": "palm",
+      "at": [
+        -12,
+        -8
+      ]
+    },
+    {
+      "type": "palm",
+      "at": [
+        13,
+        9
+      ]
+    },
+    {
+      "type": "tree",
+      "at": [
+        -11,
+        2
+      ]
+    },
+    {
+      "type": "tree",
+      "at": [
+        10,
+        -8
+      ]
+    },
+    {
+      "type": "patio",
+      "at": [
+        -2,
+        -8.5
+      ],
+      "w": 12,
+      "d": 4
+    },
+    {
+      "type": "bench",
+      "at": [
+        -6,
+        -8.5
+      ],
+      "rot": 0
+    },
+    {
+      "type": "firepit",
+      "at": [
+        2,
+        -9
+      ]
+    }
+  ],
+  "hero": {
+    "level": "l2",
+    "at": [
+      -1,
+      5.3
+    ],
+    "rot": 180,
+    "device": "chalk",
+    "pose": "prone",
+    "surface": "desk"
+  },
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": 1.5
+  },
+  "shots": [
+    {
+      "id": "door-to-core",
+      "type": "door-to-core",
+      "duration": 12
+    },
+    {
+      "id": "orbit",
+      "type": "orbit",
+      "duration": 10
+    }
+  ],
+  "areaSqm": 306
+}

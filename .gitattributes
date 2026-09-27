@@ -1,0 +1,8 @@
+# Git LFS for the golden-image baselines (scripts/test-goldens.mts): 120 PNGs, ~20 MB, rewritten wholesale
+# every time the look is re-blessed on purpose. Scoped by extension so goldens/<profile>/PROFILE.json stays
+# plain text that reads in a diff.
+#
+# A fresh clone needs `git lfs install` (once per machine) before `git clone`, or `git lfs pull` after it.
+# Without LFS the baselines check out as pointer text — a .png that is not an image — and test-goldens.mts
+# says so rather than reporting 120 decode failures.
+test/goldens/**/*.png   filter=lfs diff=lfs merge=lfs -text

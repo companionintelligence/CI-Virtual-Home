@@ -1,0 +1,5363 @@
+{
+  "builds": [
+    {
+      "id": "seraphine",
+      "title": "Base Game Seraphine",
+      "author": "Ornilia",
+      "style": "Two-storey neoclassical colonial manor: slate weatherboard with white trim, steep side-gabled shingle roof with dormers and cross-gables, Doric colonnade porch, imperial staircase, rear pool terrace and front driveway",
+      "total_area_sqm": 272.0,
+      "total_area_sqft": 2928,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor Plan",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-seraphine-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Room",
+              "area_sqm": 42.5,
+              "elev": "±0.00m",
+              "items": [
+                "Bookshelf ×3",
+                "Wardrobe",
+                "Sectional",
+                "Coffee Table",
+                "Area Rug",
+                "Club Chair ×2",
+                "Media Credenza",
+                "Wall TV",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Powder Bath",
+              "area_sqm": 5.8,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Bookshelf",
+                "Circular Rug"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen",
+              "area_sqm": 16.0,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry ×2",
+                "Kitchen Island",
+                "Bench",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Foyer & Stair Hall",
+              "area_sqm": 28.3,
+              "elev": "±0.00m",
+              "items": [
+                "Circular Rug",
+                "Club Chair",
+                "Coffee Table",
+                "Media Credenza",
+                "Halo Lamp",
+                "Bench",
+                "Fiddle Leaf",
+                "Bookshelf"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Master Suite",
+              "area_sqm": 40.0,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Media Credenza",
+                "Wall TV",
+                "Sectional",
+                "Coffee Table",
+                "Area Rug",
+                "Bench",
+                "Halo Lamp ×2",
+                "Wardrobe ×2",
+                "Platform Bed",
+                "Walnut Desk",
+                "Task Chair",
+                "Telescope",
+                "Fiddle Leaf"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Mezzanine & Nursery",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-seraphine-l2.svg",
+          "rooms": [
+            {
+              "no": "06",
+              "name": "Guest Suite",
+              "area_sqm": 22.0,
+              "elev": "+2.80m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Ensuite",
+                "Walnut Desk",
+                "Curved Monitor",
+                "Task Chair",
+                "Club Chair",
+                "Halo Lamp",
+                "Monstera",
+                "Area Rug"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Kids' Room",
+              "area_sqm": 12.0,
+              "elev": "+2.80m",
+              "items": [
+                "Platform Bed",
+                "Bookshelf",
+                "Wardrobe",
+                "Halo Lamp",
+                "Circular Rug"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Upper Landing",
+              "area_sqm": 46.8,
+              "elev": "+2.80m",
+              "items": [
+                "Circular Rug",
+                "Octagonal Table",
+                "Club Chair ×2",
+                "Halo Lamp",
+                "Walnut Desk",
+                "Curved Monitor",
+                "Task Chair",
+                "Bookshelf",
+                "Bench",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Nursery",
+              "area_sqm": 14.0,
+              "elev": "+2.80m",
+              "items": [
+                "Platform Bed",
+                "Crib",
+                "Wardrobe",
+                "Bookshelf",
+                "Club Chair",
+                "Circular Rug",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Family Bath",
+              "area_sqm": 12.0,
+              "elev": "+2.80m",
+              "items": [
+                "Ensuite",
+                "Bookshelf",
+                "Bench",
+                "Halo Lamp",
+                "Circular Rug"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Teen Bedroom",
+              "area_sqm": 29.2,
+              "elev": "+2.80m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe ×2",
+                "Bookshelf",
+                "Walnut Desk",
+                "Curved Monitor",
+                "Task Chair",
+                "Club Chair",
+                "Circular Rug",
+                "Bench",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lakecabin",
+      "title": "Base Game Lake Cabin",
+      "author": "MadamRedo",
+      "style": "Two-storey waterfront timber lodge: double-height glass solarium under an A-frame glass gable, flat-roofed loft wing with stone chimney, cantilevered cedar deck with telescope over the lake",
+      "total_area_sqm": 144.0,
+      "total_area_sqft": 1550,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Main Floor & Water Deck",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-lakecabin-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Panoramic Great Room",
+              "area_sqm": 41.4,
+              "elev": "±0.00m",
+              "items": [
+                "Column ×3",
+                "Circular Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Lakeside Foyer",
+              "area_sqm": 12.4,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Walnut Desk",
+                "Task Chair",
+                "Bench",
+                "Halo Lamp",
+                "Bamboo"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Quartz Atelier",
+              "area_sqm": 29.4,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry",
+                "Wardrobe",
+                "Kitchen Island",
+                "Dining Set",
+                "Halo Lamp",
+                "Monstera",
+                "Bookshelf"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Lake Bath",
+              "area_sqm": 6.8,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Bonsai",
+                "Bookshelf",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Stair Hall",
+              "area_sqm": 5.1,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Loft Mezzanine & Nursery",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-lakecabin-l2.svg",
+          "rooms": [
+            {
+              "no": "06",
+              "name": "Lakeview Master Suite",
+              "area_sqm": 12.9,
+              "elev": "+2.80m",
+              "items": [
+                "Area Rug",
+                "Platform Bed",
+                "Coffee Table ×2",
+                "Wardrobe",
+                "Club Chair"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Loft Study",
+              "area_sqm": 9.7,
+              "elev": "+2.80m",
+              "items": [
+                "Bookshelf ×2",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Whimsical Lake Nursery",
+              "area_sqm": 9.7,
+              "elev": "+2.80m",
+              "items": [
+                "Concentric Rug",
+                "Crib",
+                "Halo Lamp",
+                "Bookshelf",
+                "Club Chair",
+                "Wardrobe",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Loft Bath",
+              "area_sqm": 3.9,
+              "elev": "+2.80m",
+              "items": [
+                "Ensuite",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Stair Landing",
+              "area_sqm": 2.1,
+              "elev": "+2.80m",
+              "items": [
+                "Area Rug"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mesamariposa",
+      "title": "Villa Mesa Mariposa",
+      "author": "Schnucko",
+      "style": "Two-storey desert-modern adobe villa: staggered dark shed roofs, glass conservatory salon wing, walled courtyard with turtle-mosaic pool and fire pit lounge, saguaros and palms",
+      "total_area_sqm": 180.0,
+      "total_area_sqft": 1938,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Desert Compound & Courtyard",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-mesamariposa-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Sunken Desert Salon",
+              "area_sqm": 58.5,
+              "elev": "±0.00m",
+              "items": [
+                "Circular Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Halo Lamp",
+                "Bookshelf ×2",
+                "Fireplace",
+                "Monstera",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Solarium Dining Atrium",
+              "area_sqm": 49.5,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry",
+                "Kitchen Island",
+                "Dining Set",
+                "Wardrobe",
+                "Halo Lamp",
+                "Cactus Group",
+                "Bench",
+                "Bamboo"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-mesamariposa-l2.svg",
+          "rooms": [
+            {
+              "no": "03",
+              "name": "Primary Suite",
+              "area_sqm": 40.5,
+              "elev": "+3.20m",
+              "items": [
+                "Ensuite",
+                "Wardrobe ×2",
+                "Platform Bed",
+                "Area Rug",
+                "Halo Lamp ×2",
+                "Bookshelf",
+                "Club Chair",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Kids' Room & Landing",
+              "area_sqm": 31.5,
+              "elev": "+3.20m",
+              "items": [
+                "Bookshelf",
+                "Cactus Group",
+                "Walnut Desk",
+                "Curved Monitor",
+                "Task Chair",
+                "Platform Bed",
+                "Wardrobe",
+                "Halo Lamp",
+                "Club Chair",
+                "Bonsai"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "valleyview",
+      "title": "Valley-View Villa",
+      "author": "Axiisims",
+      "style": "White multi-tier modern villa: cantilevered upper suite with glass-railed roof terrace, single-storey glass lounge wing, tiered pool with curtained cabana, sunken turf pitch and exterior floating stair",
+      "total_area_sqm": 168.0,
+      "total_area_sqft": 1808,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Tiered Living & Lounge",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-valleyview-l1.svg",
+          "rooms": [
+            {
+              "no": "04",
+              "name": "Valley-View Salon",
+              "area_sqm": 56.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Fireplace",
+                "Wall TV",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Bookshelf",
+                "Bench",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Cabana Bar & Lounge",
+              "area_sqm": 56.0,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Island",
+                "Wall TV",
+                "Speakers",
+                "Monstera",
+                "Bamboo",
+                "Area Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Halo Lamp",
+                "Fiddle Leaf"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Cantilevered Suite & Roof Terrace",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-valleyview-l2.svg",
+          "rooms": [
+            {
+              "no": "06",
+              "name": "AI Console Gallery",
+              "area_sqm": 15.7,
+              "elev": "+2.80m",
+              "items": [
+                "Bookshelf",
+                "Club Chair ×2",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Telescope",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Entry Landing",
+              "area_sqm": 21.0,
+              "elev": "+2.80m",
+              "items": [
+                "Area Rug",
+                "Bench",
+                "Club Chair",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Sunset Terrace Suite",
+              "area_sqm": 12.6,
+              "elev": "+2.80m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Area Rug",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Ensuite",
+              "area_sqm": 6.7,
+              "elev": "+2.80m",
+              "items": [
+                "Ensuite",
+                "Bonsai"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "familyhome",
+      "title": "Base Game Family Home",
+      "author": "TheClumsySimmer",
+      "style": "Two-storey butter-yellow suburban homestead with white colonial trim, side-gabled shingle roof with front cross-gables, single-storey west wing, turned-column front porch and a backyard oasis (lily pond gazebo, greenhouse, raised beds, monkey bars)",
+      "total_area_sqm": 196.0,
+      "total_area_sqft": 2110,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-familyhome-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Cozy Family Salon",
+              "area_sqm": 59.5,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Sectional",
+                "Curtains ×2",
+                "Side Table ×2",
+                "Table Lamp ×2",
+                "Octagonal Table",
+                "Vase",
+                "Pendant Lamp",
+                "Club Chair ×2",
+                "Fireplace",
+                "Wingback Armchair",
+                "Tripod Floor Lamp",
+                "Crib",
+                "Console Table",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Farmhouse Kitchen",
+              "area_sqm": 31.5,
+              "elev": "±0.00m",
+              "items": [
+                "Counter Run",
+                "Coffee Maker",
+                "Upper Cabinets",
+                "Dishwasher",
+                "Sink Run",
+                "Range",
+                "Range Hood",
+                "Fridge",
+                "Pantry",
+                "Runner Rug",
+                "Kitchen Island",
+                "Fruit Bowl",
+                "Pendant Lamp ×2",
+                "Bar Stool ×2"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Dining & Stair Hall",
+              "area_sqm": 28.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Dining Set",
+                "Chandelier",
+                "Sideboard",
+                "Wall Art",
+                "Wall Sconce",
+                "Wine Rack",
+                "Curtains",
+                "Ficus Tree",
+                "Snake Plant"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-familyhome-l2.svg",
+          "rooms": [
+            {
+              "no": "06",
+              "name": "Upper Landing",
+              "area_sqm": 11.7,
+              "elev": "+3.40m",
+              "items": [
+                "Runner Rug",
+                "Console Table",
+                "Round Mirror"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Kids' Bedroom",
+              "area_sqm": 26.6,
+              "elev": "+3.40m",
+              "items": [
+                "Single Bed ×2",
+                "Teddy Bear",
+                "Nightstand",
+                "Table Lamp",
+                "Curtains",
+                "Area Rug",
+                "Toy Box",
+                "Play Tent",
+                "Writing Desk",
+                "Desk Lamp",
+                "Gaming Chair",
+                "Low Bookshelf",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Primary Suite",
+              "area_sqm": 38.2,
+              "elev": "+3.40m",
+              "items": [
+                "Headboard Bed",
+                "Curtains ×2",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Area Rug",
+                "Wardrobe",
+                "Dresser",
+                "Low Wall",
+                "Ensuite",
+                "Wingback Armchair",
+                "Floor Lamp",
+                "Linen Tower"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "asymmetry",
+      "title": "BG Modern Asymmetry House",
+      "author": "SimsWithNora",
+      "style": "Three-storey stacked modern on a slope: teal-brick garage plinth, two cream-siding living levels stepping back under dark timber flat roofs, terraced planters and a side pool terrace",
+      "total_area_sqm": 385.0,
+      "total_area_sqft": 4144,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Garage & Lower Level",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-asymmetry-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Garage",
+              "area_sqm": 48.0,
+              "elev": "±0.00m",
+              "items": [
+                "Tall Cabinet ×2",
+                "Open Shelving ×2",
+                "Counter Run",
+                "Bicycle",
+                "Wheelbarrow",
+                "Storage Bench",
+                "Server Rack",
+                "Pet Bed",
+                "Ceiling Light",
+                "Wall Hooks"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Bar Lounge",
+              "area_sqm": 36.0,
+              "elev": "±0.00m",
+              "items": [
+                "Counter Run",
+                "Upper Cabinets",
+                "Wine Rack",
+                "Bar Stool ×2",
+                "Wall Sconce",
+                "Loveseat",
+                "Octagonal Table",
+                "Area Rug",
+                "Wingback Armchair",
+                "Arc Floor Lamp",
+                "Wall Art",
+                "Ficus Tree",
+                "Fruit Bowl"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Gym & Cellar",
+              "area_sqm": 84.0,
+              "elev": "±0.00m",
+              "items": [
+                "Wine Rack ×2",
+                "Tall Cabinet",
+                "Washing Machine",
+                "Dryer",
+                "Linen Tower",
+                "Bench",
+                "Area Rug",
+                "Cube Storage",
+                "Club Chair",
+                "Side Table",
+                "Floor Lamp",
+                "Snake Plant",
+                "Wall Art"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Living Level",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-asymmetry-l2.svg",
+          "rooms": [
+            {
+              "no": "04",
+              "name": "Stair Hall",
+              "area_sqm": 40.0,
+              "elev": "+2.80m",
+              "items": [
+                "Runner Rug",
+                "Console Table",
+                "Round Mirror",
+                "Ladder Shelf",
+                "Fiddle Leaf",
+                "Snake Plant",
+                "Indoor Palm",
+                "Wall Art",
+                "Pendant Lamp",
+                "Pouf"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Kitchen",
+              "area_sqm": 24.0,
+              "elev": "+2.80m",
+              "items": [
+                "Sink Run",
+                "Upper Cabinets",
+                "Range",
+                "Range Hood",
+                "Fridge",
+                "Breakfast Bar",
+                "Bar Stool ×2",
+                "Microwave",
+                "Coffee Maker",
+                "Herb Pots",
+                "Wall Art",
+                "Runner Rug",
+                "Pendant Lamp"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Dining",
+              "area_sqm": 13.0,
+              "elev": "+2.80m",
+              "items": [
+                "Farmhouse Table",
+                "Dining Chair ×4",
+                "Area Rug",
+                "Pendant Lamp ×2",
+                "Sideboard",
+                "Wall Art",
+                "Candle Set",
+                "Snake Plant",
+                "Wall Clock"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Powder Room",
+              "area_sqm": 5.2,
+              "elev": "+2.80m",
+              "items": [
+                "Vanity Sink",
+                "Toilet",
+                "Towel Rail",
+                "Bath Mat",
+                "Wall Art",
+                "Snake Plant",
+                "Soap Set",
+                "Wall Sconce",
+                "Wall Hooks"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Living Salon",
+              "area_sqm": 37.0,
+              "elev": "+2.80m",
+              "items": [
+                "Sectional",
+                "Wall Art",
+                "Wall TV",
+                "Media Credenza",
+                "Coffee Table",
+                "Area Rug",
+                "Club Chair ×2",
+                "Side Table",
+                "Table Lamp",
+                "Ladder Shelf",
+                "Curtains",
+                "Snake Plant",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Guest Room",
+              "area_sqm": 15.6,
+              "elev": "+2.80m",
+              "items": [
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp",
+                "Curtains",
+                "Ladder Shelf",
+                "Wingback Armchair",
+                "Snake Plant",
+                "Area Rug",
+                "Pendant Lamp",
+                "Wall Art",
+                "Dresser",
+                "Laundry Hamper"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Terrace Lobby",
+              "area_sqm": 5.2,
+              "elev": "+2.80m",
+              "items": [
+                "Daybed",
+                "Olive Tree Pot",
+                "Side Table",
+                "Floor Lamp",
+                "Hanging Plant",
+                "Wall Art",
+                "Book Stack"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "title": "Upper Level",
+          "sheet": "A-103",
+          "svg": "scenes/floorplans/fp-asymmetry-l3.svg",
+          "rooms": [
+            {
+              "no": "11",
+              "name": "AI Studio",
+              "area_sqm": 45.5,
+              "elev": "+5.80m",
+              "items": [
+                "Bookshelf ×2",
+                "Filing Cabinet",
+                "Snake Plant",
+                "Wingback Armchair",
+                "Side Table",
+                "Floor Lamp",
+                "Concentric Rug",
+                "Wall Art",
+                "Open Shelving",
+                "Tall Cactus",
+                "Pin Board",
+                "Ficus Tree",
+                "Cube Storage"
+              ]
+            },
+            {
+              "no": "12",
+              "name": "Primary Suite",
+              "area_sqm": 31.5,
+              "elev": "+5.80m",
+              "items": [
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp",
+                "Wardrobe",
+                "Dresser",
+                "Round Mirror",
+                "Curtains",
+                "Chaise Lounge",
+                "Area Rug",
+                "Ensuite",
+                "Low Wall",
+                "Wall Art",
+                "Snake Plant"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aurora",
+      "title": "Base Game Aurora",
+      "author": "Ornilia",
+      "style": "Two-storey white modern villa, stacked flat roofs, glass balconies, front plunge pool and paved forecourt",
+      "total_area_sqm": 298.0,
+      "total_area_sqft": 3208,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-aurora-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Kitchen",
+              "area_sqm": 21.6,
+              "elev": "±0.00m",
+              "items": [
+                "Sink Run",
+                "Dishwasher",
+                "Range",
+                "Range Hood",
+                "Upper Cabinets",
+                "Fridge",
+                "Pantry",
+                "Kitchen Island",
+                "Bar Stool ×2",
+                "Coffee Maker",
+                "Fruit Bowl",
+                "Pendant Lamp"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Stair Hall",
+              "area_sqm": 9.9,
+              "elev": "±0.00m",
+              "items": [
+                "Console Table",
+                "Round Mirror",
+                "Wall Sconce",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Bath & Laundry",
+              "area_sqm": 9.6,
+              "elev": "±0.00m",
+              "items": [
+                "Vanity Sink",
+                "Toilet",
+                "Shower Cubicle",
+                "Washing Machine",
+                "Dryer",
+                "Linen Tower",
+                "Towel Rail",
+                "Bath Mat",
+                "Snake Plant",
+                "Laundry Basket"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Hall",
+              "area_sqm": 8.4,
+              "elev": "±0.00m",
+              "items": [
+                "Console Table",
+                "Round Mirror",
+                "Coat Rack",
+                "Runner Rug",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Dining",
+              "area_sqm": 31.9,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Dining Set",
+                "Dining Chair ×2",
+                "Vase",
+                "Chandelier",
+                "Sideboard",
+                "Wall Art",
+                "Curtains",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Sitting Room",
+              "area_sqm": 28.6,
+              "elev": "±0.00m",
+              "items": [
+                "Concentric Rug",
+                "Loveseat",
+                "Coffee Table",
+                "Wingback Armchair ×2",
+                "Side Table",
+                "Table Lamp",
+                "Floor Lamp",
+                "Daybed",
+                "Console Table",
+                "Round Mirror",
+                "Wall Art",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Living Room",
+              "area_sqm": 33.0,
+              "elev": "±0.00m",
+              "items": [
+                "Wall TV",
+                "Media Credenza",
+                "Sectional",
+                "Area Rug",
+                "Coffee Table",
+                "Candle Set",
+                "Club Chair ×2",
+                "Curtains",
+                "Indoor Palm",
+                "Floor Lamp",
+                "Console Table",
+                "Wall Art"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Study",
+              "area_sqm": 17.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Writing Desk",
+                "Dining Chair",
+                "Laptop",
+                "Desk Lamp",
+                "Filing Cabinet",
+                "Printer",
+                "Bookshelf",
+                "Pin Board",
+                "Club Chair",
+                "Wall Art",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Garden Lounge",
+              "area_sqm": 18.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Outdoor Sofa ×2",
+                "Coffee Table",
+                "Candle Set",
+                "Club Chair ×2",
+                "Olive Tree Pot",
+                "Lantern",
+                "String Lights"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-aurora-l2.svg",
+          "rooms": [
+            {
+              "no": "10",
+              "name": "Upper Lounge & Studio",
+              "area_sqm": 75.0,
+              "elev": "+3.00m",
+              "items": [
+                "Bookshelf ×2",
+                "Curtains ×2",
+                "Wall Art",
+                "Circular Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Floor Lamp",
+                "Indoor Palm",
+                "Easel",
+                "Console Table"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Primary Bath",
+              "area_sqm": 20.2,
+              "elev": "+3.00m",
+              "items": [
+                "Bathtub",
+                "Vanity Sink ×2",
+                "Toilet",
+                "Shower Cubicle",
+                "Heated Towel Rail",
+                "Linen Tower",
+                "Bath Mat",
+                "Orchid",
+                "Snake Plant",
+                "Laundry Basket"
+              ]
+            },
+            {
+              "no": "12",
+              "name": "Primary Bedroom",
+              "area_sqm": 24.8,
+              "elev": "+3.00m",
+              "items": [
+                "Area Rug",
+                "Headboard Bed",
+                "Nightstand",
+                "Table Lamp",
+                "Wardrobe",
+                "Dresser",
+                "Wall Art",
+                "Curtains",
+                "Wingback Armchair",
+                "Ottoman",
+                "Laundry Hamper",
+                "Snake Plant"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bgfamily",
+      "title": "Base Game House BG Family",
+      "author": "Turbogoku",
+      "style": "Two-storey white siding and grey stone family home, steep near-black gables with a big front cross-gable and balcony, single-storey glazed kitchen and living wings, pergola carport, white picket fence, rear pool patio",
+      "total_area_sqm": 354.0,
+      "total_area_sqft": 3810,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-bgfamily-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Sunroom",
+              "area_sqm": 35.0,
+              "elev": "±0.00m",
+              "items": [
+                "Wingback Armchair ×2",
+                "Side Table",
+                "Area Rug",
+                "Curtains ×2",
+                "Indoor Palm",
+                "Olive Tree Pot",
+                "Tripod Floor Lamp",
+                "Wall Art",
+                "Hanging Plant"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Guest Bath",
+              "area_sqm": 4.2,
+              "elev": "±0.00m",
+              "items": [
+                "Bathtub",
+                "Toilet",
+                "Vanity Sink",
+                "Towel Rail",
+                "Bath Mat",
+                "Wall Hooks",
+                "Orchid",
+                "Soap Set"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Study",
+              "area_sqm": 14.0,
+              "elev": "±0.00m",
+              "items": [
+                "Writing Desk",
+                "Dining Chair",
+                "Laptop",
+                "Desk Lamp",
+                "Cube Storage",
+                "TV Stand",
+                "Filing Cabinet",
+                "Bookshelf",
+                "Monstera",
+                "Pin Board"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Kitchen",
+              "area_sqm": 15.4,
+              "elev": "±0.00m",
+              "items": [
+                "Sink Run",
+                "Range",
+                "Range Hood",
+                "Counter Run",
+                "Upper Cabinets",
+                "Dishwasher",
+                "Fridge",
+                "Breakfast Bar",
+                "Bar Stool ×2",
+                "Ladder Shelf",
+                "Pendant Lamp",
+                "Fruit Bowl",
+                "Olive Tree Pot"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Dining",
+              "area_sqm": 13.2,
+              "elev": "±0.00m",
+              "items": [
+                "Fireplace",
+                "Wall Art",
+                "Farmhouse Table",
+                "Dining Chair ×6",
+                "Area Rug",
+                "Chandelier",
+                "Pampas Vase",
+                "Snake Plant",
+                "Candle Set"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "TV Lounge",
+              "area_sqm": 15.6,
+              "elev": "±0.00m",
+              "items": [
+                "Loveseat",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Area Rug",
+                "Floor Lamp",
+                "Pampas Vase",
+                "Monstera",
+                "Wall Sconce",
+                "Side Table",
+                "Table Lamp",
+                "Low Wall ×2"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Living Room",
+              "area_sqm": 69.6,
+              "elev": "±0.00m",
+              "items": [
+                "Circular Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Side Table",
+                "Curtains ×2",
+                "Console Table",
+                "Fiddle Leaf",
+                "Olive Tree Pot",
+                "Bookshelf",
+                "Wall Art",
+                "Floor Lamp"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Bathroom",
+              "area_sqm": 20.0,
+              "elev": "±0.00m",
+              "items": [
+                "Shower Cubicle",
+                "Vanity Sink",
+                "Heated Towel Rail",
+                "Toilet",
+                "Linen Tower",
+                "Towel Rail",
+                "Bath Mat",
+                "Laundry Basket",
+                "Monstera",
+                "Wall Hooks",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Laundry & Mudroom",
+              "area_sqm": 35.0,
+              "elev": "±0.00m",
+              "items": [
+                "Washing Machine",
+                "Dryer",
+                "Counter Run",
+                "Upper Cabinets",
+                "Tall Cabinet",
+                "Storage Bench",
+                "Coat Rack",
+                "Shoe Rack",
+                "Wall Hooks",
+                "Bicycle",
+                "Pet Bed",
+                "Monstera",
+                "Runner Rug",
+                "Curtains"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-bgfamily-l2.svg",
+          "rooms": [
+            {
+              "no": "10",
+              "name": "Family Bathroom",
+              "area_sqm": 11.7,
+              "elev": "+3.00m",
+              "items": [
+                "Bathtub",
+                "Vanity Sink",
+                "Heated Towel Rail",
+                "Toilet",
+                "Towel Rail",
+                "Bath Mat",
+                "Linen Tower",
+                "Orchid",
+                "Snake Plant",
+                "Wall Hooks",
+                "Laundry Hamper"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Primary Bedroom",
+              "area_sqm": 18.9,
+              "elev": "+3.00m",
+              "items": [
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Wall Art",
+                "Dresser",
+                "Wingback Armchair",
+                "Ladder Shelf",
+                "Area Rug",
+                "Curtains",
+                "Guitar Stand",
+                "Floor Lamp"
+              ]
+            },
+            {
+              "no": "12",
+              "name": "Kids Room",
+              "area_sqm": 10.8,
+              "elev": "+3.00m",
+              "items": [
+                "Single Bed",
+                "Nightstand",
+                "Table Lamp",
+                "Dresser",
+                "Toy Box",
+                "Low Bookshelf",
+                "Cube Storage",
+                "Circular Rug",
+                "Wall Hanging",
+                "Teddy Bear",
+                "Pendant Lamp",
+                "Height Chart",
+                "Building Blocks"
+              ]
+            },
+            {
+              "no": "13",
+              "name": "Nursery",
+              "area_sqm": 12.6,
+              "elev": "+3.00m",
+              "items": [
+                "Crib",
+                "Wardrobe",
+                "Toy Box",
+                "Kids Table",
+                "Dining Chair ×2",
+                "Rocking Chair",
+                "Area Rug",
+                "Curtains",
+                "Teddy Bear",
+                "Wall Hanging",
+                "Pendant Lamp"
+              ]
+            },
+            {
+              "no": "14",
+              "name": "Upper Hall",
+              "area_sqm": 17.5,
+              "elev": "+3.00m",
+              "items": [
+                "Runner Rug",
+                "Console Table",
+                "Round Mirror",
+                "Plant Stand",
+                "Monstera",
+                "Wall Art",
+                "Storage Bench",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "15",
+              "name": "Study",
+              "area_sqm": 15.0,
+              "elev": "+3.00m",
+              "items": [
+                "Bookshelf",
+                "Ladder Shelf",
+                "Filing Cabinet",
+                "Wall Art",
+                "Snake Plant",
+                "Pampas Vase",
+                "Wall Sconce",
+                "Pouf",
+                "Area Rug"
+              ]
+            },
+            {
+              "no": "16",
+              "name": "Landing",
+              "area_sqm": 45.5,
+              "elev": "+3.00m",
+              "items": [
+                "Bookshelf",
+                "Console Table",
+                "Area Rug",
+                "Cushioned Bench",
+                "Kids Table",
+                "Dining Chair ×3",
+                "Writing Desk",
+                "Snake Plant",
+                "Olive Tree Pot",
+                "Wall Art",
+                "Curtains",
+                "Floor Lamp"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bghouse-olcia",
+      "title": "Base Game House",
+      "author": "olciaxxx_05",
+      "style": "Two-storey pale-grey siding family home over a brick garage level, external stair to the upper-floor front door, twin front gables with a brick chimney, tall cypresses",
+      "total_area_sqm": 205.0,
+      "total_area_sqft": 2207,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Garage Level",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-bghouse-olcia-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Garage",
+              "area_sqm": 70.0,
+              "elev": "±0.00m",
+              "items": [
+                "Counter Run",
+                "Tall Cabinet",
+                "Cube Storage",
+                "Washing Machine",
+                "Dryer",
+                "Bicycle",
+                "Wheelbarrow",
+                "Open Shelving",
+                "Storage Bench",
+                "Pet Bed",
+                "Wall Hooks",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Lower Hall",
+              "area_sqm": 27.0,
+              "elev": "±0.00m",
+              "items": [
+                "Console Table",
+                "Round Mirror",
+                "Coat Rack",
+                "Shoe Rack",
+                "Runner Rug",
+                "Snake Plant",
+                "Low Bookshelf",
+                "Wall Hanging",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Under-Stair Store",
+              "area_sqm": 5.6,
+              "elev": "±0.00m",
+              "items": [
+                "Tall Cabinet",
+                "Linen Tower",
+                "Cube Storage",
+                "Laundry Basket",
+                "Wall Hooks",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Guest Bedroom",
+              "area_sqm": 33.0,
+              "elev": "±0.00m",
+              "items": [
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Wardrobe",
+                "Ensuite",
+                "Runner Rug",
+                "Club Chair",
+                "Floor Lamp",
+                "Curtains",
+                "Wall Art"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Main Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-bghouse-olcia-l2.svg",
+          "rooms": [
+            {
+              "no": "05",
+              "name": "Living & Dining",
+              "area_sqm": 38.5,
+              "elev": "+2.70m",
+              "items": [
+                "Fireplace",
+                "Media Credenza",
+                "Wall TV",
+                "Wall Art",
+                "Curtains",
+                "Sectional",
+                "Area Rug",
+                "Club Chair ×2",
+                "Side Table",
+                "Table Lamp",
+                "Floor Lamp",
+                "Monstera",
+                "Farmhouse Table",
+                "Dining Chair ×4",
+                "Chandelier",
+                "Sideboard",
+                "Vase"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Kitchen",
+              "area_sqm": 31.5,
+              "elev": "+2.70m",
+              "items": [
+                "Fridge",
+                "Sink Run",
+                "Counter Run ×2",
+                "Range",
+                "Range Hood",
+                "Upper Cabinets",
+                "Kitchen Island",
+                "Bar Stool ×2",
+                "Pantry",
+                "Pendant Lamp",
+                "Coffee Maker",
+                "Fruit Bowl",
+                "Tall Cactus"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Entry Hall",
+              "area_sqm": 27.0,
+              "elev": "+2.70m",
+              "items": [
+                "Ensuite",
+                "Console Table",
+                "Round Mirror",
+                "Coat Rack",
+                "Storage Bench",
+                "Runner Rug",
+                "Olive Tree Pot",
+                "Wall Hanging",
+                "Snake Plant",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Vestibule",
+              "area_sqm": 5.6,
+              "elev": "+2.70m",
+              "items": [
+                "Storage Bench",
+                "Wall Hooks",
+                "Runner Rug",
+                "Lantern",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Study",
+              "area_sqm": 16.5,
+              "elev": "+2.70m",
+              "items": [
+                "Bookshelf",
+                "Snake Plant",
+                "Filing Cabinet",
+                "Ladder Shelf",
+                "Wall Art",
+                "Loveseat",
+                "Runner Rug",
+                "Bistro Table",
+                "Succulent Tray",
+                "Floor Lamp"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Primary Bedroom",
+              "area_sqm": 16.5,
+              "elev": "+2.70m",
+              "items": [
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Dresser",
+                "Tall Cabinet",
+                "Runner Rug",
+                "Curtains",
+                "Wall Art",
+                "Wingback Armchair"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cocoon",
+      "title": "Cocoon Base Game",
+      "author": "Schnuck01",
+      "style": "Two-storey teal siding with white trim and brown shingle gables, front-facing garage wing with rear family room, gabled entry portico, hedged rear sunken patio with pool",
+      "total_area_sqm": 304.0,
+      "total_area_sqft": 3272,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-cocoon-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Room",
+              "area_sqm": 30.0,
+              "elev": "±0.00m",
+              "items": [
+                "Fireplace",
+                "Round Mirror",
+                "Wall Sconce ×2",
+                "Area Rug",
+                "Bench",
+                "Coffee Table",
+                "Sectional",
+                "Wingback Armchair",
+                "Side Table",
+                "Table Lamp",
+                "Console Table",
+                "Fiddle Leaf",
+                "Curtains"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen",
+              "area_sqm": 24.0,
+              "elev": "±0.00m",
+              "items": [
+                "Sink Run",
+                "Counter Run",
+                "Range",
+                "Range Hood",
+                "Upper Cabinets",
+                "Fridge",
+                "Kitchen Island",
+                "Bar Stool ×2",
+                "Pendant Lamp ×2",
+                "Pantry",
+                "Fruit Bowl",
+                "Coffee Maker"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Entry Hall",
+              "area_sqm": 27.0,
+              "elev": "±0.00m",
+              "items": [
+                "Low Wall",
+                "Console Table",
+                "Table Lamp",
+                "Pampas Vase",
+                "Indoor Palm",
+                "Open Shelving",
+                "Runner Rug",
+                "Storage Bench",
+                "Coat Rack",
+                "Wall Art",
+                "Chandelier"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Dining Room",
+              "area_sqm": 27.0,
+              "elev": "±0.00m",
+              "items": [
+                "Dining Set",
+                "Area Rug",
+                "Chandelier",
+                "Sideboard",
+                "Candle Set",
+                "Wall Art",
+                "Wine Rack",
+                "Cushioned Bench",
+                "Olive Tree Pot",
+                "Fruit Bowl",
+                "Curtains"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Family Room",
+              "area_sqm": 36.0,
+              "elev": "±0.00m",
+              "items": [
+                "Wall TV",
+                "Media Credenza",
+                "Sectional",
+                "Area Rug",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Side Table",
+                "Floor Lamp",
+                "Bookshelf",
+                "Monstera",
+                "Curtains",
+                "Wall Art",
+                "Pet Bed"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Garage",
+              "area_sqm": 36.0,
+              "elev": "±0.00m",
+              "items": [
+                "Washing Machine",
+                "Dryer",
+                "Counter Run",
+                "Tall Cabinet ×2",
+                "Bicycle",
+                "Cube Storage",
+                "Shoe Rack",
+                "Storage Bench",
+                "Wheelbarrow",
+                "Laundry Basket",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Den",
+              "area_sqm": 16.0,
+              "elev": "±0.00m",
+              "items": [
+                "Daybed",
+                "Area Rug",
+                "Wingback Armchair",
+                "Side Table",
+                "Table Lamp",
+                "Bookshelf",
+                "Low Bookshelf",
+                "Snake Plant",
+                "Wall Art",
+                "Floor Lamp",
+                "Pouf",
+                "Curtains"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-cocoon-l2.svg",
+          "rooms": [
+            {
+              "no": "08",
+              "name": "Study",
+              "area_sqm": 18.0,
+              "elev": "+3.00m",
+              "items": [
+                "Bookshelf ×2",
+                "Wingback Armchair",
+                "Side Table",
+                "Table Lamp",
+                "Ladder Shelf",
+                "Filing Cabinet",
+                "Snake Plant",
+                "Pampas Vase",
+                "Wall Art",
+                "Curtains",
+                "Pendant Lamp"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Landing",
+              "area_sqm": 36.0,
+              "elev": "+3.00m",
+              "items": [
+                "Runner Rug",
+                "Console Table",
+                "Round Mirror",
+                "Wingback Armchair",
+                "Side Table",
+                "Table Lamp",
+                "Bookshelf",
+                "Ficus Tree",
+                "Wall Art",
+                "Cushioned Bench",
+                "Snake Plant",
+                "Pendant Lamp",
+                "Curtains"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Primary Suite",
+              "area_sqm": 27.0,
+              "elev": "+3.00m",
+              "items": [
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Area Rug",
+                "Ensuite",
+                "Wardrobe",
+                "Curtains",
+                "Wall Art",
+                "Snake Plant",
+                "Laundry Hamper",
+                "Pendant Lamp"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Kids Bedroom",
+              "area_sqm": 27.0,
+              "elev": "+3.00m",
+              "items": [
+                "Bunk Bed",
+                "Single Bed",
+                "Nightstand",
+                "Table Lamp",
+                "Area Rug",
+                "Writing Desk",
+                "Gaming Chair",
+                "Low Bookshelf",
+                "Toy Box",
+                "Play Tent",
+                "Beanbag",
+                "Wall Hanging",
+                "Height Chart",
+                "Curtains"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cutestarter",
+      "title": "Cute Basegame Starter",
+      "author": "TheClumsySimmer",
+      "style": "Small brick Cape Cod, steep dark shingle gable with two dormers and end chimney, blue shutters and window boxes, gabled front porch with brick steps",
+      "total_area_sqm": 70.0,
+      "total_area_sqft": 753,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-cutestarter-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Kitchen",
+              "area_sqm": 6.8,
+              "elev": "±0.00m",
+              "items": [
+                "Fridge",
+                "Counter Run",
+                "Range",
+                "Range Hood",
+                "Sink Run",
+                "Upper Cabinets",
+                "Herb Pots",
+                "Coffee Maker",
+                "Fruit Bowl",
+                "Wall Clock",
+                "Runner Rug",
+                "Pendant Lamp"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Dining",
+              "area_sqm": 8.3,
+              "elev": "±0.00m",
+              "items": [
+                "Round Dining Table",
+                "Dining Chair ×4",
+                "Vase",
+                "Runner Rug",
+                "Sideboard",
+                "Wall Art",
+                "Plant Stand",
+                "Chandelier"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Bathroom",
+              "area_sqm": 3.6,
+              "elev": "±0.00m",
+              "items": [
+                "Toilet",
+                "Shower Cubicle",
+                "Vanity Sink",
+                "Fern",
+                "Bath Mat",
+                "Towel Rail",
+                "Laundry Hamper",
+                "Wall Hooks",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Bedroom",
+              "area_sqm": 10.6,
+              "elev": "±0.00m",
+              "items": [
+                "Headboard Bed",
+                "Nightstand",
+                "Table Lamp",
+                "Wall Sconce",
+                "Curtains",
+                "Dresser",
+                "Wall Art",
+                "Runner Rug",
+                "Snake Plant",
+                "Laundry Basket",
+                "Low Wall",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Hall",
+              "area_sqm": 4.3,
+              "elev": "±0.00m",
+              "items": [
+                "Console Table",
+                "Round Mirror",
+                "Vase",
+                "Runner Rug",
+                "Snake Plant",
+                "Coat Rack",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Living",
+              "area_sqm": 25.5,
+              "elev": "±0.00m",
+              "items": [
+                "Loveseat",
+                "Runner Rug",
+                "Coffee Table",
+                "Club Chair",
+                "Monstera",
+                "Floor Lamp",
+                "Low Wall",
+                "Fireplace",
+                "Pampas Vase ×2",
+                "Storage Bench",
+                "Curtains",
+                "Wall Art",
+                "Pendant Lamp"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Kids Nook",
+              "area_sqm": 10.9,
+              "elev": "±0.00m",
+              "items": [
+                "Single Bed",
+                "Teddy Bear",
+                "Nightstand",
+                "Table Lamp",
+                "Chest",
+                "Toy Box",
+                "Snake Plant",
+                "Runner Rug",
+                "Wall Hanging",
+                "Curtains",
+                "Ceiling Light"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "epiphany",
+      "title": "Epiphany",
+      "author": "Schnuck01",
+      "style": "Two-storey dark-brick modern under a sweeping dark-brown standing-seam gable roof with dormers and chimney, double-height glazed entry slot cutting the roof, attached double garage, gravel forecourt with planting beds",
+      "total_area_sqm": 288.0,
+      "total_area_sqft": 3100,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-epiphany-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Room",
+              "area_sqm": 30.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Loveseat ×2",
+                "Coffee Table",
+                "Side Table",
+                "Table Lamp",
+                "Book Stack",
+                "Wall Art ×2",
+                "Curtains",
+                "Fiddle Leaf",
+                "Floor Lamp",
+                "Tripod Floor Lamp",
+                "Pouf"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Entrance Hall",
+              "area_sqm": 7.2,
+              "elev": "±0.00m",
+              "items": [
+                "Runner Rug",
+                "Coat Rack",
+                "Snake Plant",
+                "Round Mirror"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Powder Room",
+              "area_sqm": 4.3,
+              "elev": "±0.00m",
+              "items": [
+                "Shower Cubicle",
+                "Toilet",
+                "Vanity Sink",
+                "Mirror Cabinet",
+                "Towel Rail",
+                "Bath Mat",
+                "Soap Set",
+                "Fern"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Dining Room",
+              "area_sqm": 25.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Farmhouse Table",
+                "Dining Chair ×8",
+                "Chandelier",
+                "Sideboard",
+                "Wall Clock ×2",
+                "Olive Tree Pot"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Kitchen",
+              "area_sqm": 36.0,
+              "elev": "±0.00m",
+              "items": [
+                "Fridge",
+                "Sink Run",
+                "Range",
+                "Range Hood",
+                "Upper Cabinets",
+                "Counter Run",
+                "Dishwasher",
+                "Microwave",
+                "Kitchen Island",
+                "Bar Stool ×2",
+                "Fruit Bowl",
+                "Pendant Lamp",
+                "Pantry",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Study",
+              "area_sqm": 24.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Bookshelf",
+                "Open Shelving",
+                "Wingback Armchair",
+                "Side Table",
+                "Floor Lamp",
+                "Filing Cabinet",
+                "Pin Board",
+                "Wall Art",
+                "Monstera",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Guest Bedroom",
+              "area_sqm": 24.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Curtains ×2",
+                "Dresser",
+                "Wall Art",
+                "TV Stand",
+                "Wingback Armchair",
+                "Floor Lamp",
+                "Chest"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Garage",
+              "area_sqm": 48.0,
+              "elev": "±0.00m",
+              "items": [
+                "Counter Run",
+                "Tall Cabinet",
+                "Washing Machine",
+                "Dryer",
+                "Cube Storage",
+                "Wall Hooks",
+                "Shoe Rack",
+                "Bicycle ×2",
+                "Wheelbarrow",
+                "Storage Bench",
+                "Ceiling Light"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-epiphany-l2.svg",
+          "rooms": [
+            {
+              "no": "09",
+              "name": "Landing",
+              "area_sqm": 24.6,
+              "elev": "+2.90m",
+              "items": [
+                "Runner Rug",
+                "Console Table",
+                "Round Mirror",
+                "Ladder Shelf",
+                "Wall Art",
+                "Cushioned Bench",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Primary Suite",
+              "area_sqm": 28.0,
+              "elev": "+2.90m",
+              "items": [
+                "Area Rug",
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Wall Art",
+                "Cushioned Bench",
+                "TV Stand",
+                "Dresser",
+                "Round Mirror",
+                "Curtains",
+                "Wingback Armchair",
+                "Floor Lamp"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Bedroom Two",
+              "area_sqm": 33.6,
+              "elev": "+2.90m",
+              "items": [
+                "Area Rug",
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Wall Art",
+                "Wardrobe",
+                "Curtains",
+                "Writing Desk",
+                "Gaming Chair",
+                "Low Bookshelf",
+                "Floor Lamp",
+                "Snake Plant"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "familyhouse-nora",
+      "title": "Base Game Family House",
+      "author": "SimsWithNora",
+      "style": "Split-level family home: grey stone piers and dark blue siding under opposing skillion roofs, tuck-under garage with balcony room above, raised colonnade porch with white railing, stepping-stone path through lush cottage planting",
+      "total_area_sqm": 230.0,
+      "total_area_sqft": 2476,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Main Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-familyhouse-nora-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Room",
+              "area_sqm": 25.0,
+              "elev": "±0.00m",
+              "items": [
+                "Loveseat",
+                "Wall Art",
+                "Area Rug",
+                "Coffee Table",
+                "Book Stack",
+                "Club Chair ×2",
+                "Side Table",
+                "Vase",
+                "Tripod Floor Lamp",
+                "Curtains",
+                "Snake Plant",
+                "Pouf"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Entry & Sitting Room",
+              "area_sqm": 20.0,
+              "elev": "±0.00m",
+              "items": [
+                "Console Table",
+                "Round Mirror",
+                "Coat Rack",
+                "Shoe Rack",
+                "Runner Rug",
+                "Wingback Armchair",
+                "Side Table",
+                "Table Lamp",
+                "Bookshelf",
+                "Ficus Tree",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Kitchen & Dining",
+              "area_sqm": 24.0,
+              "elev": "±0.00m",
+              "items": [
+                "Fridge",
+                "Sink Run",
+                "Upper Cabinets",
+                "Range",
+                "Range Hood",
+                "Counter Run",
+                "Pantry",
+                "Kitchen Cart",
+                "Herb Pots",
+                "Farmhouse Table",
+                "Dining Chair ×4",
+                "Pendant Lamp",
+                "Runner Rug"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Hall",
+              "area_sqm": 5.0,
+              "elev": "±0.00m",
+              "items": [
+                "Runner Rug",
+                "Wall Sconce",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Bathroom",
+              "area_sqm": 5.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bathtub",
+                "Vanity Sink",
+                "Mirror Cabinet",
+                "Toilet",
+                "Heated Towel Rail",
+                "Bath Mat",
+                "Fern",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Bedroom",
+              "area_sqm": 20.0,
+              "elev": "±0.00m",
+              "items": [
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Wardrobe",
+                "Dresser",
+                "Round Mirror",
+                "Area Rug",
+                "Curtains",
+                "Wall Art",
+                "Floor Lamp",
+                "Laundry Hamper"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Media Room",
+              "area_sqm": 25.0,
+              "elev": "±0.00m",
+              "items": [
+                "Sectional",
+                "Curtains",
+                "Wall TV",
+                "Media Credenza",
+                "Area Rug",
+                "Coffee Table",
+                "Club Chair",
+                "Fireplace",
+                "Floor Lamp",
+                "Bookshelf",
+                "Wall Art",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Garage",
+              "area_sqm": 37.5,
+              "elev": "±0.00m",
+              "items": [
+                "Washing Machine",
+                "Dryer",
+                "Tall Cabinet ×2",
+                "Laundry Basket",
+                "Bicycle",
+                "Wheelbarrow",
+                "Storage Bench",
+                "Wall Hooks",
+                "Ceiling Light"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Balcony Level",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-familyhouse-nora-l2.svg",
+          "rooms": [
+            {
+              "no": "09",
+              "name": "Balcony Bedroom",
+              "area_sqm": 35.8,
+              "elev": "+2.60m",
+              "items": [
+                "Headboard Bed",
+                "Nightstand ×2",
+                "Table Lamp ×2",
+                "Wardrobe",
+                "Dresser",
+                "Wall Art",
+                "Area Rug",
+                "Wingback Armchair",
+                "Floor Lamp",
+                "Curtains",
+                "Laundry Hamper"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Study",
+              "area_sqm": 32.5,
+              "elev": "+2.60m",
+              "items": [
+                "Bookshelf ×2",
+                "Fiddle Leaf",
+                "Filing Cabinet",
+                "Writing Desk",
+                "Gaming Chair",
+                "Whiteboard",
+                "Wall Art",
+                "Area Rug",
+                "Floor Lamp",
+                "Ladder Shelf",
+                "Snake Plant"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "flowerycottage",
+      "title": "Base Game Flowery Cottage",
+      "author": "MadamRedo",
+      "style": "Single-storey sage-green cottage with shingle gable roofs, projecting entry gable, attached garage, flower-roofed sunroom, front creek and rear vegetable garden",
+      "total_area_sqm": 147.0,
+      "total_area_sqft": 1582,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-flowerycottage-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Entry Hall",
+              "area_sqm": 10.5,
+              "elev": "±0.00m",
+              "items": [
+                "Runner Rug",
+                "Console Table",
+                "Round Mirror",
+                "Wall Sconce",
+                "Coat Rack",
+                "Shoe Rack",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Living Room",
+              "area_sqm": 30.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Sectional",
+                "Coffee Table",
+                "Media Credenza",
+                "Wall TV",
+                "Floor Lamp",
+                "Side Table",
+                "Table Lamp",
+                "Wingback Armchair",
+                "Curtains",
+                "Wall Art",
+                "Monstera",
+                "Snake Plant"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Kitchen",
+              "area_sqm": 12.0,
+              "elev": "±0.00m",
+              "items": [
+                "Fridge",
+                "Sink Run",
+                "Upper Cabinets ×2",
+                "Range",
+                "Range Hood",
+                "Counter Run",
+                "Coffee Maker",
+                "Fruit Bowl",
+                "Herb Pots",
+                "Runner Rug",
+                "Pendant Lamp",
+                "Wall Clock"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Study",
+              "area_sqm": 16.0,
+              "elev": "±0.00m",
+              "items": [
+                "Fireplace",
+                "Writing Desk",
+                "Gaming Chair",
+                "Laptop",
+                "Desk Lamp",
+                "Wall Art",
+                "Bookshelf",
+                "Floor Lamp",
+                "Snake Plant",
+                "Pampas Vase",
+                "Plant Stand"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Bathroom",
+              "area_sqm": 6.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bathtub",
+                "Vanity Sink",
+                "Toilet",
+                "Soap Set",
+                "Towel Rail",
+                "Bath Mat",
+                "Laundry Basket",
+                "Snake Plant",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Dining Room",
+              "area_sqm": 21.0,
+              "elev": "±0.00m",
+              "items": [
+                "Farmhouse Table",
+                "Cushioned Bench",
+                "Dining Chair ×4",
+                "Pendant Lamp",
+                "Candle Set",
+                "Sideboard",
+                "Orchid",
+                "Curtains",
+                "Wall Art",
+                "Ficus Tree"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Sunroom",
+              "area_sqm": 18.0,
+              "elev": "±0.00m",
+              "items": [
+                "Olive Tree Pot",
+                "Monstera",
+                "Indoor Palm",
+                "Easel",
+                "Bistro Table",
+                "Dining Chair ×2",
+                "Trailing Ivy",
+                "Rocking Chair",
+                "Hanging Plant ×2",
+                "Pendant Lamp"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Garage",
+              "area_sqm": 33.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bench",
+                "Open Shelving",
+                "Tall Cabinet",
+                "Wheelbarrow",
+                "Washing Machine",
+                "Dryer",
+                "Wall Clock",
+                "Bicycle",
+                "Shoe Rack",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Garden Terrace",
+              "area_sqm": 31.5,
+              "elev": "±0.00m",
+              "items": [
+                "Bbq Grill",
+                "String Lights",
+                "Olive Tree Pot",
+                "Umbrella Table",
+                "Fire Bowl",
+                "Bird Bath",
+                "Lantern"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gardennook",
+      "title": "Garden Nook (Base Game)",
+      "author": "HoldenRoark",
+      "style": "Single-storey pale-blue cottage, terracotta tile roof with white glass-gabled garden studio, string-lit front pergola over a gravel courtyard of curved planter beds, rear hot-tub terrace",
+      "total_area_sqm": 134.0,
+      "total_area_sqft": 1442,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-gardennook-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Nursery",
+              "area_sqm": 22.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Crib",
+                "Curtains",
+                "Dresser",
+                "Table Lamp",
+                "Cube Storage",
+                "Toy Box",
+                "Rocking Chair",
+                "Monstera",
+                "Pendant Lamp",
+                "Wall Art",
+                "Height Chart"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Playroom",
+              "area_sqm": 22.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Play Tent",
+                "Low Bookshelf",
+                "Rocking Horse",
+                "Building Blocks",
+                "Kids Table",
+                "Bean Bag",
+                "Club Chair",
+                "Cube Storage",
+                "Monstera",
+                "Snake Plant",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Kitchen",
+              "area_sqm": 14.0,
+              "elev": "±0.00m",
+              "items": [
+                "Counter Run",
+                "Sink Run",
+                "Range",
+                "Range Hood",
+                "Upper Cabinets",
+                "Fridge",
+                "Pantry",
+                "Breakfast Bar",
+                "Bar Stool ×2",
+                "Fruit Bowl",
+                "Coffee Maker",
+                "Vase",
+                "Pendant Lamp"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Bathroom",
+              "area_sqm": 6.2,
+              "elev": "±0.00m",
+              "items": [
+                "Vanity Sink",
+                "Toilet",
+                "Bathtub",
+                "Towel Rail",
+                "Bath Mat",
+                "Laundry Basket",
+                "Snake Plant",
+                "Wall Hooks",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Entry Hall",
+              "area_sqm": 8.0,
+              "elev": "±0.00m",
+              "items": [
+                "Runner Rug",
+                "Console Table",
+                "Vase",
+                "Round Mirror",
+                "Coat Rack",
+                "Wall Hooks",
+                "Snake Plant",
+                "Ceiling Light"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Living Room",
+              "area_sqm": 12.2,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Loveseat",
+                "Coffee Table",
+                "Book Stack",
+                "Club Chair",
+                "Media Credenza",
+                "Curtains",
+                "Side Table",
+                "Table Lamp",
+                "Floor Lamp",
+                "Wall Art",
+                "Olive Tree Pot"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Dining Room",
+              "area_sqm": 15.8,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Farmhouse Table",
+                "Candle Set",
+                "Dining Chair ×4",
+                "Sideboard",
+                "Chandelier",
+                "Wall Art",
+                "Curtains",
+                "Pampas Vase",
+                "Wine Rack"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Garden Studio",
+              "area_sqm": 30.0,
+              "elev": "±0.00m",
+              "items": [
+                "Circular Rug",
+                "Daybed",
+                "Bistro Table",
+                "Dining Chair ×2",
+                "Bookshelf",
+                "Ficus Tree",
+                "Wingback Armchair",
+                "Side Table",
+                "Table Lamp",
+                "Olive Tree Pot",
+                "Curtains",
+                "Wall Art",
+                "Floor Lamp"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mediterranean",
+      "title": "Base Game Mediterranean",
+      "author": "TheClumsySimmer",
+      "style": "Symmetrical blue-grey stucco villa: two-storey centre with balconies, single-storey wings under terracotta hip roofs, arched entry, walled cypress forecourt with fountain, rear pool terrace with pergola",
+      "total_area_sqm": 345.0,
+      "total_area_sqft": 3714,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-mediterranean-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Entry Hall",
+              "area_sqm": 22.8,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Bookshelf",
+                "Media Credenza",
+                "Halo Lamp",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Dining",
+              "area_sqm": 19.5,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Dining Set",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Lounge",
+              "area_sqm": 51.8,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Sectional ×2",
+                "Coffee Table",
+                "Halo Lamp ×2",
+                "Bookshelf",
+                "Octagonal Table",
+                "Club Chair ×2",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Kitchen",
+              "area_sqm": 35.0,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry ×2",
+                "Kitchen Island ×2",
+                "Wardrobe",
+                "Halo Lamp",
+                "Bamboo",
+                "Club Chair"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Family Room",
+              "area_sqm": 40.2,
+              "elev": "±0.00m",
+              "items": [
+                "Bench",
+                "Low Wall ×2",
+                "Halo Lamp ×3",
+                "Monstera",
+                "Fireplace",
+                "Concentric Rug",
+                "Octagonal Table",
+                "Club Chair ×6",
+                "Kitchen Island"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Bedroom",
+              "area_sqm": 40.0,
+              "elev": "±0.00m",
+              "items": [
+                "Platform Bed",
+                "Halo Lamp ×2",
+                "Area Rug",
+                "Wardrobe",
+                "Club Chair",
+                "Walnut Desk",
+                "Task Chair",
+                "Bookshelf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Bathroom",
+              "area_sqm": 17.5,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Low Wall",
+                "Bench",
+                "Area Rug",
+                "Halo Lamp",
+                "Bamboo"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-mediterranean-l2.svg",
+          "rooms": [
+            {
+              "no": "08",
+              "name": "Upper Landing",
+              "area_sqm": 39.0,
+              "elev": "+3.20m",
+              "items": [
+                "Area Rug",
+                "Bench",
+                "Club Chair",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Study",
+              "area_sqm": 21.0,
+              "elev": "+3.20m",
+              "items": [
+                "Bookshelf",
+                "Circular Rug",
+                "Club Chair",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Primary Suite",
+              "area_sqm": 55.0,
+              "elev": "+3.20m",
+              "items": [
+                "Platform Bed",
+                "Bench",
+                "Wardrobe",
+                "Ensuite",
+                "Club Chair",
+                "Circular Rug",
+                "Halo Lamp ×2",
+                "Fiddle Leaf"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mirage",
+      "title": "The Mirage",
+      "author": "Schnuck01",
+      "style": "Three-tier hillside modern in dark timber and stacked stone, flat roofs stepping down the slope, glass-fronted upper floors, koi pond with boulders and palms",
+      "total_area_sqm": 475.0,
+      "total_area_sqft": 5113,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Lower Tier",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-mirage-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Garage",
+              "area_sqm": 28.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bookshelf ×2",
+                "Bench",
+                "Low Wall",
+                "Cactus Group"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Entry Hall",
+              "area_sqm": 14.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bench",
+                "Monstera",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Mudroom & Utility",
+              "area_sqm": 30.0,
+              "elev": "±0.00m",
+              "items": [
+                "Wardrobe",
+                "Kitchen Cabinetry",
+                "Bench",
+                "Bookshelf",
+                "Monstera",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Kitchen",
+              "area_sqm": 30.0,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry ×2",
+                "Kitchen Island",
+                "Bookshelf",
+                "Bamboo",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Library",
+              "area_sqm": 40.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bookshelf ×3",
+                "Bench",
+                "Circular Rug",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Halo Lamp",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Living Lounge",
+              "area_sqm": 84.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug ×2",
+                "Sectional",
+                "Halo Lamp",
+                "Club Chair ×3",
+                "Coffee Table ×3",
+                "Bamboo",
+                "Dining Set",
+                "Monstera",
+                "Circular Rug",
+                "Wall TV",
+                "Media Credenza",
+                "Fiddle Leaf"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Middle Tier",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-mirage-l2.svg",
+          "rooms": [
+            {
+              "no": "07",
+              "name": "Bedroom Two",
+              "area_sqm": 32.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Bookshelf",
+                "Walnut Desk",
+                "Task Chair",
+                "Halo Lamp",
+                "Monstera",
+                "Area Rug"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Bedroom Three",
+              "area_sqm": 32.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Walnut Desk",
+                "Task Chair",
+                "Bookshelf",
+                "Halo Lamp",
+                "Bonsai",
+                "Area Rug"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Upper Lounge",
+              "area_sqm": 54.0,
+              "elev": "+3.00m",
+              "items": [
+                "Circular Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair",
+                "Bookshelf",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Primary Suite",
+              "area_sqm": 54.0,
+              "elev": "+3.00m",
+              "items": [
+                "Ensuite",
+                "Low Wall",
+                "Platform Bed",
+                "Wardrobe",
+                "Bookshelf",
+                "Bench",
+                "Club Chair",
+                "Halo Lamp",
+                "Monstera",
+                "Area Rug"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 3,
+          "title": "Sky Tier",
+          "sheet": "A-103",
+          "svg": "scenes/floorplans/fp-mirage-l3.svg",
+          "rooms": [
+            {
+              "no": "11",
+              "name": "Sky Study",
+              "area_sqm": 77.0,
+              "elev": "+6.00m",
+              "items": [
+                "Bookshelf ×2",
+                "Circular Rug",
+                "Club Chair ×3",
+                "Coffee Table",
+                "Telescope",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modernhome-nora",
+      "title": "Base Game Modern Home",
+      "author": "SimsWithNora",
+      "style": "Two-storey flat-roof modern in white and black, cantilevered white upper box over a front carport, full-width glass balcony, taller black stair tower, rear pool with pergola",
+      "total_area_sqm": 260.0,
+      "total_area_sqft": 2799,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-modernhome-nora-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Lounge",
+              "area_sqm": 36.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Sectional",
+                "Octagonal Table",
+                "Club Chair ×2",
+                "Bookshelf",
+                "Monstera",
+                "Fiddle Leaf",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen & Dining",
+              "area_sqm": 24.0,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry",
+                "Kitchen Island",
+                "Dining Set",
+                "Bookshelf",
+                "Cactus Group",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Guest Bedroom",
+              "area_sqm": 20.0,
+              "elev": "±0.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe ×2",
+                "Bookshelf",
+                "Concentric Rug",
+                "Club Chair",
+                "Bonsai",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Entry Hall",
+              "area_sqm": 28.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bench",
+                "Bookshelf",
+                "Wardrobe",
+                "Bamboo",
+                "Bonsai",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Bathroom",
+              "area_sqm": 12.0,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Wardrobe",
+                "Bamboo",
+                "Bonsai",
+                "Halo Lamp"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-modernhome-nora-l2.svg",
+          "rooms": [
+            {
+              "no": "06",
+              "name": "Kids' Room",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Walnut Desk",
+                "Task Chair",
+                "Bookshelf",
+                "Area Rug",
+                "Halo Lamp",
+                "Club Chair",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Primary Bedroom",
+              "area_sqm": 20.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe ×2",
+                "Area Rug",
+                "Halo Lamp ×2",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Bathroom",
+              "area_sqm": 20.0,
+              "elev": "+3.00m",
+              "items": [
+                "Ensuite",
+                "Bench",
+                "Wardrobe",
+                "Club Chair",
+                "Fiddle Leaf",
+                "Bamboo",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Terrace Lounge",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Area Rug",
+                "Sun Lounger ×2",
+                "Bamboo",
+                "Cactus Group",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Landing",
+              "area_sqm": 24.0,
+              "elev": "+3.00m",
+              "items": [
+                "Bench",
+                "Bookshelf",
+                "Monstera",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "AI Studio",
+              "area_sqm": 16.0,
+              "elev": "+3.00m",
+              "items": [
+                "Bookshelf",
+                "Club Chair",
+                "Concentric Rug",
+                "Fiddle Leaf",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modernhouse-nora",
+      "title": "Base Game Modern House",
+      "author": "SimsWithNora",
+      "style": "Low modern pavilion with opposing slanted shed roofs, timber-column entry colonnade, front reflecting basin, upper bedroom box with balcony, rear pool and Japanese courtyard",
+      "total_area_sqm": 210.0,
+      "total_area_sqft": 2260,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-modernhouse-nora-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Lounge",
+              "area_sqm": 54.0,
+              "elev": "±0.00m",
+              "items": [
+                "Sectional",
+                "Bookshelf",
+                "Halo Lamp",
+                "Area Rug",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Media Credenza",
+                "Wall TV",
+                "Fiddle Leaf",
+                "Bench",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen",
+              "area_sqm": 16.0,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry",
+                "Wardrobe",
+                "Area Rug",
+                "Kitchen Island",
+                "Club Chair",
+                "Coffee Table",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Entry Hall",
+              "area_sqm": 20.0,
+              "elev": "±0.00m",
+              "items": [
+                "Walnut Desk",
+                "Task Chair",
+                "Curved Monitor",
+                "Bookshelf",
+                "Wardrobe",
+                "Area Rug",
+                "Monstera",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Bathroom",
+              "area_sqm": 6.5,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Breakfast Nook",
+              "area_sqm": 4.9,
+              "elev": "±0.00m",
+              "items": [
+                "Dining Set",
+                "Bookshelf",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Garden Hall",
+              "area_sqm": 17.2,
+              "elev": "±0.00m",
+              "items": [
+                "Concentric Rug",
+                "Media Credenza",
+                "Club Chair",
+                "Coffee Table",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Bookshelf"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Garden Room",
+              "area_sqm": 19.6,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Club Chair ×2",
+                "Octagonal Table",
+                "Bench",
+                "Halo Lamp",
+                "Monstera",
+                "Bamboo",
+                "Cactus Group"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Suite",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-modernhouse-nora-l2.svg",
+          "rooms": [
+            {
+              "no": "08",
+              "name": "Primary Suite",
+              "area_sqm": 60.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Bookshelf ×2",
+                "Halo Lamp ×2",
+                "Club Chair",
+                "Circular Rug",
+                "Monstera",
+                "Wardrobe",
+                "Fiddle Leaf",
+                "Cactus Group",
+                "Bamboo"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modernhouse1",
+      "title": "Base Game Modern House 1",
+      "author": "SimsWithNora",
+      "style": "Two-storey white-and-dark-timber modern: flat-roofed cantilevered upper studio box over a mid-century living room, tall white A-frame gable fin over the west suite, reflection pond with timber bridge, driveway and sports car",
+      "total_area_sqm": 126.0,
+      "total_area_sqft": 1356,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-modernhouse1-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Primary Suite",
+              "area_sqm": 29.4,
+              "elev": "±0.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe ×3",
+                "Area Rug",
+                "Ensuite",
+                "Halo Lamp",
+                "Monstera",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Mid-Century Living",
+              "area_sqm": 54.6,
+              "elev": "±0.00m",
+              "items": [
+                "Column ×2",
+                "Area Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Media Credenza",
+                "Speakers",
+                "Bookshelf ×2",
+                "Halo Lamp",
+                "Bench",
+                "Monstera",
+                "Fiddle Leaf"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Cantilever Studio",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-modernhouse1-l2.svg",
+          "rooms": [
+            {
+              "no": "03",
+              "name": "Cantilever Studio",
+              "area_sqm": 42.0,
+              "elev": "+2.80m",
+              "items": [
+                "Bookshelf ×2",
+                "Wardrobe",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Circular Rug",
+                "Halo Lamp",
+                "Telescope",
+                "Monstera",
+                "Fiddle Leaf"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "newcrest",
+      "title": "Base Game Newcrest House",
+      "author": "xxSarina_27xx",
+      "style": "Tall narrow steep-gable house, white siding with stone and dark timber trim, split-level front terrace with steps, west lean-to study",
+      "total_area_sqm": 258.0,
+      "total_area_sqft": 2777,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-newcrest-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Lounge",
+              "area_sqm": 46.9,
+              "elev": "±0.00m",
+              "items": [
+                "Fireplace",
+                "Sectional",
+                "Circular Rug",
+                "Coffee Table",
+                "Club Chair",
+                "Wall TV",
+                "Media Credenza",
+                "Walnut Desk",
+                "Task Chair",
+                "Area Rug",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Bookshelf"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Hall",
+              "area_sqm": 8.3,
+              "elev": "±0.00m",
+              "items": [
+                "Bookshelf",
+                "Bench",
+                "Monstera",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Bath",
+              "area_sqm": 7.8,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Bench",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Kitchen",
+              "area_sqm": 42.0,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry",
+                "Kitchen Island",
+                "Bookshelf",
+                "Area Rug",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Dining",
+              "area_sqm": 21.0,
+              "elev": "±0.00m",
+              "items": [
+                "Dining Set",
+                "Area Rug",
+                "Bookshelf",
+                "Monstera",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Study",
+              "area_sqm": 24.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bookshelf ×2",
+                "Halo Lamp",
+                "Bonsai",
+                "Club Chair",
+                "Monstera"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-newcrest-l2.svg",
+          "rooms": [
+            {
+              "no": "07",
+              "name": "Primary Bedroom",
+              "area_sqm": 27.0,
+              "elev": "+2.90m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Club Chair",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Area Rug",
+                "Bench",
+                "Bookshelf"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Bath",
+              "area_sqm": 8.7,
+              "elev": "+2.90m",
+              "items": [
+                "Ensuite",
+                "Bench",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Nursery",
+              "area_sqm": 8.7,
+              "elev": "+2.90m",
+              "items": [
+                "Crib",
+                "Wardrobe",
+                "Concentric Rug",
+                "Club Chair",
+                "Bookshelf",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Landing",
+              "area_sqm": 9.6,
+              "elev": "+2.90m",
+              "items": []
+            },
+            {
+              "no": "11",
+              "name": "Living",
+              "area_sqm": 27.0,
+              "elev": "+2.90m",
+              "items": [
+                "Wall TV",
+                "Media Credenza",
+                "Sectional",
+                "Coffee Table",
+                "Area Rug",
+                "Club Chair",
+                "Halo Lamp",
+                "Monstera",
+                "Bookshelf"
+              ]
+            },
+            {
+              "no": "12",
+              "name": "Dining & Kitchenette",
+              "area_sqm": 27.0,
+              "elev": "+2.90m",
+              "items": [
+                "Kitchen Cabinetry",
+                "Dining Set",
+                "Area Rug",
+                "Bookshelf",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "neweco",
+      "title": "The New Eco Base Game",
+      "author": "plnch25",
+      "style": "Two-storey eco-modern: teal corrugated panels and dark timber over grey-blue cladding, brown shingle gable with glass roof sections, timber-framed window walls, single-storey glass sunroom, attached garage and paver drive, raised timber entry deck",
+      "total_area_sqm": 306.0,
+      "total_area_sqft": 3294,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-neweco-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Entry Hall",
+              "area_sqm": 49.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Bench",
+                "Media Credenza",
+                "Wall TV",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen",
+              "area_sqm": 35.0,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry ×2",
+                "Kitchen Island",
+                "Bench",
+                "Bamboo",
+                "Monstera",
+                "Cactus Group",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Dining Room",
+              "area_sqm": 33.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Dining Set",
+                "Media Credenza",
+                "Bookshelf",
+                "Club Chair",
+                "Fiddle Leaf",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Sunroom Lounge",
+              "area_sqm": 33.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Sectional",
+                "Octagonal Table",
+                "Club Chair",
+                "Telescope",
+                "Core Shelf",
+                "Bookshelf",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Garage & Workshop",
+              "area_sqm": 44.0,
+              "elev": "±0.00m",
+              "items": [
+                "Walnut Desk",
+                "Task Chair",
+                "Bookshelf ×2",
+                "Bench ×2",
+                "Cactus Group",
+                "Halo Lamp"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-neweco-l2.svg",
+          "rooms": [
+            {
+              "no": "06",
+              "name": "Study",
+              "area_sqm": 24.5,
+              "elev": "+3.00m",
+              "items": [
+                "Bookshelf ×2",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Halo Lamp ×2",
+                "Circular Rug",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Upper Landing",
+              "area_sqm": 24.5,
+              "elev": "+3.00m",
+              "items": [
+                "Bench",
+                "Fiddle Leaf",
+                "Circular Rug",
+                "Halo Lamp",
+                "Bookshelf",
+                "Club Chair",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Primary Bedroom",
+              "area_sqm": 35.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Bench",
+                "Wardrobe ×2",
+                "Club Chair ×2",
+                "Halo Lamp ×2",
+                "Bookshelf",
+                "Area Rug",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Primary Bath & Dressing",
+              "area_sqm": 27.5,
+              "elev": "+3.00m",
+              "items": [
+                "Ensuite",
+                "Low Wall",
+                "Wardrobe ×3",
+                "Bench",
+                "Circular Rug",
+                "Halo Lamp",
+                "Fiddle Leaf"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "onestory",
+      "title": "Base Game One-Story House",
+      "author": "SimsWithNora",
+      "style": "Storey-and-a-half light-blue cottage, terracotta tile gable roofs with cross gable, dormer and stone chimney, timber-clad arched entry porch, front bay window, rear deck and oval pool",
+      "total_area_sqm": 201.0,
+      "total_area_sqft": 2164,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-onestory-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Room",
+              "area_sqm": 31.5,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Fireplace",
+                "Bookshelf",
+                "Halo Lamp",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Entry Hall",
+              "area_sqm": 20.2,
+              "elev": "±0.00m",
+              "items": [
+                "Bookshelf",
+                "Bench",
+                "Area Rug",
+                "Halo Lamp",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Kitchen",
+              "area_sqm": 24.5,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry ×2",
+                "Kitchen Island",
+                "Wardrobe",
+                "Area Rug",
+                "Monstera",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Dining Room",
+              "area_sqm": 15.8,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Dining Set",
+                "Media Credenza",
+                "Bookshelf",
+                "Bench",
+                "Halo Lamp",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Primary Bedroom",
+              "area_sqm": 17.5,
+              "elev": "±0.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe ×2",
+                "Area Rug",
+                "Wall TV",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Bathroom",
+              "area_sqm": 10.5,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Wardrobe",
+                "Bench",
+                "Area Rug",
+                "Halo Lamp",
+                "Bamboo"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Attic Loft",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-onestory-l2.svg",
+          "rooms": [
+            {
+              "no": "07",
+              "name": "Loft Study",
+              "area_sqm": 35.0,
+              "elev": "+2.80m",
+              "items": [
+                "Circular Rug",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Bookshelf",
+                "Walnut Desk",
+                "Task Chair",
+                "Curved Monitor",
+                "Halo Lamp",
+                "Monstera",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Attic Bedroom",
+              "area_sqm": 31.2,
+              "elev": "+2.80m",
+              "items": [
+                "Platform Bed",
+                "Bench",
+                "Area Rug",
+                "Wardrobe ×2",
+                "Bookshelf",
+                "Club Chair",
+                "Telescope",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "palms",
+      "title": "The Palms Base Game Fix",
+      "author": "Schnuck01",
+      "style": "Two-storey stone and dark-timber modern with shed roofs and double-height glazing, rear timber deck with pool, hot tub and gazebo, palms and cypress at the front, house number 380",
+      "total_area_sqm": 245.0,
+      "total_area_sqft": 2637,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-palms-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living",
+              "area_sqm": 33.0,
+              "elev": "±0.00m",
+              "items": [
+                "Fireplace",
+                "Fiddle Leaf",
+                "Sectional",
+                "Coffee Table",
+                "Area Rug",
+                "Club Chair",
+                "Media Credenza",
+                "Wall TV",
+                "Speakers",
+                "Halo Lamp ×2"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Study Nook",
+              "area_sqm": 33.0,
+              "elev": "±0.00m",
+              "items": [
+                "Walnut Desk",
+                "Task Chair",
+                "Curved Monitor",
+                "Core Shelf",
+                "Bonsai",
+                "Club Chair",
+                "Halo Lamp",
+                "Bookshelf",
+                "Bench",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Kitchen & Dining",
+              "area_sqm": 29.9,
+              "elev": "±0.00m",
+              "items": [
+                "Wardrobe ×2",
+                "Kitchen Cabinetry",
+                "Dining Set",
+                "Kitchen Island",
+                "Bamboo",
+                "Monstera",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Entry Hall",
+              "area_sqm": 10.3,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Bench",
+                "Bonsai",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Atrium Garden",
+              "area_sqm": 10.3,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Monstera",
+                "Bamboo",
+                "Fiddle Leaf",
+                "Cactus Group",
+                "Bonsai",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Back Hall",
+              "area_sqm": 6.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Bench",
+                "Bookshelf",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Office",
+              "area_sqm": 30.6,
+              "elev": "±0.00m",
+              "items": [
+                "Walnut Desk",
+                "Task Chair",
+                "Curved Monitor",
+                "Halo Lamp",
+                "Bookshelf",
+                "Wardrobe",
+                "Area Rug",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Bench",
+                "Fiddle Leaf"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-palms-l2.svg",
+          "rooms": [
+            {
+              "no": "06",
+              "name": "AI Studio",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Concentric Rug",
+                "Bookshelf ×2",
+                "Club Chair",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Monstera",
+                "Bench"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Landing & Lounge",
+              "area_sqm": 36.0,
+              "elev": "+3.00m",
+              "items": [
+                "Concentric Rug",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Bookshelf",
+                "Fiddle Leaf",
+                "Halo Lamp",
+                "Wardrobe",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Primary Suite",
+              "area_sqm": 25.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Area Rug",
+                "Bench",
+                "Wardrobe",
+                "Ensuite",
+                "Club Chair",
+                "Halo Lamp",
+                "Bonsai",
+                "Fiddle Leaf"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "palnknoll",
+      "title": "Paln Knoll of Ermosa",
+      "author": "Schnuck01",
+      "style": "Two-storey white modern on a knoll: flat roofs with dark fascias, two-storey glazing at the entry, attached sloping-roof garage with gravel drive, front steps to a raised entry, east terrace and stepped reflecting ponds among palms",
+      "total_area_sqm": 282.0,
+      "total_area_sqft": 3035,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-palnknoll-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Room",
+              "area_sqm": 25.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug ×2",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Halo Lamp",
+                "Telescope",
+                "Fiddle Leaf",
+                "Dining Table",
+                "Bench",
+                "Bookshelf"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Entry Hall",
+              "area_sqm": 25.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Media Credenza",
+                "Halo Lamp",
+                "Bonsai",
+                "Fiddle Leaf",
+                "Circular Rug",
+                "Club Chair ×2",
+                "Coffee Table"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Dining",
+              "area_sqm": 40.0,
+              "elev": "±0.00m",
+              "items": [
+                "Circular Rug",
+                "Dining Set",
+                "Club Chair ×2",
+                "Bench",
+                "Monstera",
+                "Fiddle Leaf",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Kitchen",
+              "area_sqm": 22.5,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry ×2",
+                "Wardrobe",
+                "Kitchen Island",
+                "Halo Lamp",
+                "Bamboo"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Bathroom",
+              "area_sqm": 7.5,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Circular Rug",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Garage",
+              "area_sqm": 42.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bookshelf",
+                "Wardrobe",
+                "Bench",
+                "Cactus Group"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-palnknoll-l2.svg",
+          "rooms": [
+            {
+              "no": "07",
+              "name": "Upper Landing",
+              "area_sqm": 35.0,
+              "elev": "+3.00m",
+              "items": [
+                "Circular Rug",
+                "Bookshelf",
+                "Club Chair",
+                "Halo Lamp",
+                "Monstera",
+                "Bench"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Guest Bedroom",
+              "area_sqm": 25.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Club Chair",
+                "Circular Rug",
+                "Halo Lamp",
+                "Bonsai",
+                "Walnut Desk",
+                "Task Chair"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Primary Suite",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Bench",
+                "Ensuite",
+                "Wardrobe",
+                "Club Chair",
+                "Circular Rug",
+                "Halo Lamp",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Glass Studio",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Area Rug",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Bookshelf",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "payorote",
+      "title": "Payorote (Base Game)",
+      "author": "plnch25",
+      "style": "Dark stained timber treehouse: two flat-roofed pods raised on a stilted deck around a great tree, ladder down to a wildflower garden, hanging paper lanterns",
+      "total_area_sqm": 91.0,
+      "total_area_sqft": 980,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Trunk Vestibule",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-payorote-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Trunk Vestibule",
+              "area_sqm": 10.2,
+              "elev": "±0.00m",
+              "items": [
+                "Bench",
+                "Bookshelf",
+                "Halo Lamp",
+                "Bonsai",
+                "Bamboo"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Treehouse Deck",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-payorote-l2.svg",
+          "rooms": [
+            {
+              "no": "02",
+              "name": "Sleeping Nook & Study",
+              "area_sqm": 15.0,
+              "elev": "+2.60m",
+              "items": [
+                "Platform Bed",
+                "Circular Rug",
+                "Bookshelf",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Living Room",
+              "area_sqm": 20.0,
+              "elev": "+2.60m",
+              "items": [
+                "Fireplace",
+                "Wall TV",
+                "Fiddle Leaf",
+                "Concentric Rug",
+                "Coffee Table",
+                "Sectional",
+                "Club Chair ×2",
+                "Halo Lamp",
+                "Bamboo"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Galley Kitchen",
+              "area_sqm": 10.0,
+              "elev": "+2.60m",
+              "items": [
+                "Kitchen Cabinetry ×2",
+                "Wardrobe",
+                "Dining Set",
+                "Halo Lamp",
+                "Monstera",
+                "Bamboo"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Study Pod",
+              "area_sqm": 8.8,
+              "elev": "+2.60m",
+              "items": [
+                "Bookshelf ×2",
+                "Walnut Desk",
+                "Task Chair",
+                "Curved Monitor",
+                "Area Rug",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Bathroom",
+              "area_sqm": 7.5,
+              "elev": "+2.60m",
+              "items": [
+                "Ensuite",
+                "Wardrobe",
+                "Circular Rug",
+                "Bamboo"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Hall",
+              "area_sqm": 3.0,
+              "elev": "+2.60m",
+              "items": [
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Tree Bedroom",
+              "area_sqm": 16.5,
+              "elev": "+2.60m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe ×2",
+                "Halo Lamp",
+                "Bookshelf",
+                "Area Rug",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "riverbend",
+      "title": "Riverbend Drive",
+      "author": "Schnuck01",
+      "style": "Two-storey brick-and-stone craftsman, steep dark shingle gables with front-facing dormers, bay window, columned entry porch, two-car garage and driveway, willow pond",
+      "total_area_sqm": 457.0,
+      "total_area_sqft": 4919,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-riverbend-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Two-Car Garage",
+              "area_sqm": 56.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bookshelf ×2",
+                "Bench",
+                "Cactus Group"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen",
+              "area_sqm": 26.5,
+              "elev": "±0.00m",
+              "items": [
+                "Wardrobe",
+                "Kitchen Cabinetry ×2",
+                "Kitchen Island",
+                "Bench",
+                "Bookshelf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Dining",
+              "area_sqm": 23.5,
+              "elev": "±0.00m",
+              "items": [
+                "Dining Set",
+                "Media Credenza",
+                "Bookshelf",
+                "Halo Lamp",
+                "Club Chair",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Living Room",
+              "area_sqm": 60.0,
+              "elev": "±0.00m",
+              "items": [
+                "Circular Rug",
+                "Sectional ×2",
+                "Coffee Table",
+                "Club Chair",
+                "Halo Lamp",
+                "Bookshelf",
+                "Bench",
+                "Fiddle Leaf",
+                "Column"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Bay Window",
+              "area_sqm": 4.8,
+              "elev": "±0.00m",
+              "items": [
+                "Media Credenza",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Family Room",
+              "area_sqm": 60.0,
+              "elev": "±0.00m",
+              "items": [
+                "Fireplace",
+                "Circular Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair ×2",
+                "Bookshelf",
+                "Bench",
+                "Fiddle Leaf",
+                "Monstera",
+                "Halo Lamp"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-riverbend-l2.svg",
+          "rooms": [
+            {
+              "no": "07",
+              "name": "Bedroom Two",
+              "area_sqm": 56.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Bench",
+                "Circular Rug",
+                "Wardrobe",
+                "Walnut Desk",
+                "Task Chair",
+                "Bookshelf",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Primary Suite",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Bench",
+                "Area Rug",
+                "Wardrobe ×2",
+                "Halo Lamp ×2",
+                "Club Chair",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Bathroom",
+              "area_sqm": 4.5,
+              "elev": "+3.00m",
+              "items": [
+                "Ensuite"
+              ]
+            },
+            {
+              "no": "10",
+              "name": "Upper Hall",
+              "area_sqm": 12.8,
+              "elev": "+3.00m",
+              "items": [
+                "Halo Lamp",
+                "Bench"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Study",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Bookshelf ×2",
+                "Circular Rug",
+                "Club Chair ×2",
+                "Coffee Table",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "12",
+              "name": "Landing",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Bench",
+                "Bookshelf",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "13",
+              "name": "Bedroom Three",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Bench",
+                "Area Rug",
+                "Wardrobe",
+                "Bookshelf",
+                "Walnut Desk",
+                "Task Chair",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "14",
+              "name": "Nursery",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Crib",
+                "Wardrobe ×2",
+                "Circular Rug",
+                "Club Chair",
+                "Bookshelf",
+                "Bench",
+                "Monstera",
+                "Halo Lamp"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "starter18k",
+      "title": "Base Game Starter 18k 2/1",
+      "author": "Ornilia",
+      "style": "Single-storey grey siding cottage, dark gable roof with two dormers and a stone chimney, twin glass sunrooms flanking the front door, fenced rear patio yard",
+      "total_area_sqm": 115.0,
+      "total_area_sqft": 1238,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-starter18k-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Sunroom",
+              "area_sqm": 27.0,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Sectional",
+                "Coffee Table",
+                "Media Credenza",
+                "Wall TV",
+                "Fiddle Leaf",
+                "Club Chair",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen & Dining",
+              "area_sqm": 22.5,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry ×2",
+                "Bookshelf",
+                "Dining Set",
+                "Media Credenza",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Bathroom",
+              "area_sqm": 7.5,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Bookshelf",
+                "Bench",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Entry Hall",
+              "area_sqm": 12.5,
+              "elev": "±0.00m",
+              "items": [
+                "Area Rug",
+                "Bench",
+                "Bonsai",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Primary Bedroom",
+              "area_sqm": 20.2,
+              "elev": "±0.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe ×2",
+                "Bookshelf",
+                "Halo Lamp",
+                "Area Rug"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Kids Room",
+              "area_sqm": 22.0,
+              "elev": "±0.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Bench",
+                "Halo Lamp",
+                "Circular Rug",
+                "Club Chair",
+                "Bookshelf",
+                "Coffee Table",
+                "Bonsai"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunnyhome",
+      "title": "Base Game Sunny Home",
+      "author": "MadamRedo",
+      "style": "Twin glass A-frame gables in dark brick and black steel, double-height glazed entry gable with brick chimney, timber-clad bedroom wing, rear paver terrace with round plunge pool",
+      "total_area_sqm": 194.0,
+      "total_area_sqft": 2088,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-sunnyhome-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Living Room",
+              "area_sqm": 22.8,
+              "elev": "±0.00m",
+              "items": [
+                "Sectional",
+                "Area Rug",
+                "Coffee Table",
+                "Club Chair",
+                "Halo Lamp ×2",
+                "Bookshelf",
+                "Dining Set",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen",
+              "area_sqm": 29.2,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry",
+                "Wardrobe",
+                "Monstera",
+                "Kitchen Island",
+                "Octagonal Table",
+                "Club Chair ×2"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Entry Hall",
+              "area_sqm": 28.0,
+              "elev": "±0.00m",
+              "items": [
+                "Halo Lamp",
+                "Monstera",
+                "Bench"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Vestibule",
+              "area_sqm": 16.5,
+              "elev": "±0.00m",
+              "items": [
+                "Bench",
+                "Monstera",
+                "Bonsai",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Bathroom",
+              "area_sqm": 7.5,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Bamboo"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Primary Bedroom",
+              "area_sqm": 37.5,
+              "elev": "±0.00m",
+              "items": [
+                "Wardrobe",
+                "Platform Bed",
+                "Halo Lamp ×3",
+                "Circular Rug",
+                "Club Chair ×2",
+                "Fireplace",
+                "Fiddle Leaf",
+                "Monstera"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Loft",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-sunnyhome-l2.svg",
+          "rooms": [
+            {
+              "no": "07",
+              "name": "Loft Study",
+              "area_sqm": 29.2,
+              "elev": "+2.90m",
+              "items": [
+                "Bookshelf",
+                "Club Chair",
+                "Circular Rug",
+                "Halo Lamp",
+                "Fiddle Leaf",
+                "Bench",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Loft Bedroom",
+              "area_sqm": 22.8,
+              "elev": "+2.90m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Concentric Rug",
+                "Halo Lamp",
+                "Monstera",
+                "Club Chair"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vanilla",
+      "title": "Base Game Vanilla House",
+      "author": "MadamRedo",
+      "style": "White brick modern: tall double-height gable block beside a flat-roofed wing, low glazed living wing with chimney, plunge-pool deck, pergolas and lush terraced garden",
+      "total_area_sqm": 355.0,
+      "total_area_sqft": 3821,
+      "levels": [
+        {
+          "level": 1,
+          "title": "Ground Floor",
+          "sheet": "A-101",
+          "svg": "scenes/floorplans/fp-vanilla-l1.svg",
+          "rooms": [
+            {
+              "no": "01",
+              "name": "Greenhouse",
+              "area_sqm": 24.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bench ×2",
+                "Cactus Group",
+                "Bonsai",
+                "Bamboo",
+                "Monstera",
+                "Fiddle Leaf",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "02",
+              "name": "Kitchen",
+              "area_sqm": 18.0,
+              "elev": "±0.00m",
+              "items": [
+                "Kitchen Cabinetry",
+                "Kitchen Island",
+                "Bookshelf",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "03",
+              "name": "Bathroom",
+              "area_sqm": 9.0,
+              "elev": "±0.00m",
+              "items": [
+                "Ensuite",
+                "Wardrobe",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "04",
+              "name": "Stair Passage",
+              "area_sqm": 9.0,
+              "elev": "±0.00m",
+              "items": [
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "05",
+              "name": "Entry Hall",
+              "area_sqm": 30.0,
+              "elev": "±0.00m",
+              "items": [
+                "Media Credenza",
+                "Bench",
+                "Area Rug",
+                "Fiddle Leaf",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "06",
+              "name": "Study & Bar",
+              "area_sqm": 36.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bookshelf ×3",
+                "Media Credenza",
+                "Club Chair ×2",
+                "Area Rug",
+                "Halo Lamp",
+                "Fiddle Leaf"
+              ]
+            },
+            {
+              "no": "07",
+              "name": "Conservatory",
+              "area_sqm": 18.0,
+              "elev": "±0.00m",
+              "items": [
+                "Bench",
+                "Cactus Group",
+                "Bonsai",
+                "Monstera",
+                "Halo Lamp"
+              ]
+            },
+            {
+              "no": "08",
+              "name": "Living & Dining",
+              "area_sqm": 63.0,
+              "elev": "±0.00m",
+              "items": [
+                "Fireplace",
+                "Wall TV",
+                "Bookshelf",
+                "Circular Rug",
+                "Sectional",
+                "Coffee Table",
+                "Club Chair",
+                "Halo Lamp",
+                "Dining Set",
+                "Monstera",
+                "Fiddle Leaf",
+                "Bench",
+                "Telescope"
+              ]
+            },
+            {
+              "no": "09",
+              "name": "Guest Bedroom",
+              "area_sqm": 28.0,
+              "elev": "±0.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Bookshelf",
+                "Club Chair",
+                "Area Rug",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            }
+          ]
+        },
+        {
+          "level": 2,
+          "title": "Upper Floor",
+          "sheet": "A-102",
+          "svg": "scenes/floorplans/fp-vanilla-l2.svg",
+          "rooms": [
+            {
+              "no": "10",
+              "name": "Primary Suite",
+              "area_sqm": 36.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Bench",
+                "Wardrobe",
+                "Ensuite",
+                "Club Chair",
+                "Area Rug",
+                "Halo Lamp",
+                "Monstera"
+              ]
+            },
+            {
+              "no": "11",
+              "name": "Gallery Landing",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Bench",
+                "Bookshelf",
+                "Area Rug",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "12",
+              "name": "Bedroom Two",
+              "area_sqm": 30.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Wardrobe",
+                "Bookshelf",
+                "Walnut Desk",
+                "Task Chair",
+                "Area Rug",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            },
+            {
+              "no": "13",
+              "name": "Kids Room",
+              "area_sqm": 24.0,
+              "elev": "+3.00m",
+              "items": [
+                "Platform Bed",
+                "Circular Rug",
+                "Bookshelf",
+                "Walnut Desk",
+                "Task Chair",
+                "Wardrobe",
+                "Halo Lamp",
+                "Bonsai"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

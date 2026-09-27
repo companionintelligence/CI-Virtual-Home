@@ -1,0 +1,55 @@
+# ci-virtual-home — the checks that need no GPU.
+# ============================================================================
+# Install, compile the three.js engine (assets/**/*.ts → .js), typecheck scripts/ and assets/, validate the 30
+# HouseSpecs, and run the pure-Node tests (floor-plan graph + wall compiler over every spec).
+#
+# The render gate — shot QA, determinism and the 120 golden frames — is deliberately NOT here: through a
+# software rasteriser it costs the better part of an hour of runner time per push, against a couple of minutes
+# on a GPU. Run `pnpm run check` locally before pushing (see README.md → How verification works). The goldens
+# are Git LFS objects and this job does not fetch them.
+# ============================================================================
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: build · typecheck · validate · test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm (version from package.json → packageManager)
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build browser assets
+        run: pnpm run build
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Validate the HouseSpecs
+        run: pnpm run validate
+
+      - name: Floor-plan graph + wall compiler tests
+        run: pnpm run test

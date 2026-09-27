@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# The house-builder's three.js engine is TypeScript (assets/**/*.ts), but room-creator.html loads it as
+# browser-native ES modules, which cannot execute .ts. `pnpm run build` (scripts/build-house-assets.mts,
+# also run first by `pnpm run check`) type-strips each file to a sibling .js: build output, not source.
+# assets/vendor/ is untouched third-party code and stays real, tracked .js.
+assets/**/*.js
+!assets/vendor/**/*.js
+
+# Build output (scripts/export-core-gltf.mts writes dist/models/*.glb)
+dist/
+*.tsbuildinfo
+
+# Rendered output. render-house-shots.mts writes video/houses/, prop-sheet.mts video/props/ — every frame is
+# a pure function of the tree, so none of it is source. video/houses/index.html is the one tracked file: the
+# static browser for those renders.
+/video/*
+!/video/houses/
+/video/houses/*
+!/video/houses/index.html
+
+# PNG previews from `pnpm run iso --png` (rsvg-convert of scenes/svg/*) — reproducible from the SVGs
+scenes/renders/
+
+# Golden-image gate run artefacts (scripts/test-goldens.mts). The baselines themselves ARE committed, under
+# test/goldens/<profile>/ in Git LFS; these are what a run produces about them.
+test/diff/
+test/qa/
+test/goldens.*.json
+
+# Python bytecode from scripts/ (generate_house_iso.py imports its sibling modules)
+__pycache__/
+*.pyc
+
+# Logs and OS / editor noise
+*.log
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,906 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "starter18k",
+  "name": "Base Game Starter 18k 2/1",
+  "author": "Ornilia",
+  "source": "SimsTree slide 17",
+  "style": "Single-storey grey siding cottage, dark gable roof with two dormers and a stone chimney, twin glass sunrooms flanking the front door, fenced rear patio yard",
+  "emoji": "🏡",
+  "lot": {
+    "w": 26,
+    "d": 28,
+    "ground": "lawn"
+  },
+  "palette": {
+    "wall": "#9ca3af",
+    "trim": "#f8fafc",
+    "roof": "#3f3a33",
+    "accent": "#5b7c99",
+    "material": "siding"
+  },
+  "lighting": "pascal-daylight",
+  "areaSqm": 115,
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Ground Floor",
+      "sheet": "A-101",
+      "y": 0,
+      "height": 2.7,
+      "floor": "oak",
+      "footprint": [
+        {
+          "x": -6,
+          "z": -4,
+          "w": 12,
+          "d": 8
+        },
+        {
+          "x": -6,
+          "z": 4,
+          "w": 4.5,
+          "d": 2.5
+        },
+        {
+          "x": 2,
+          "z": 4,
+          "w": 4,
+          "d": 2
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": 0.25,
+          "type": "door",
+          "w": 1,
+          "h": 2.1,
+          "style": "entry"
+        },
+        {
+          "side": "S",
+          "at": -3.75,
+          "type": "glass",
+          "w": 4,
+          "h": 2.5
+        },
+        {
+          "side": "S",
+          "at": 4,
+          "type": "glass",
+          "w": 3.4,
+          "h": 2.5
+        },
+        {
+          "side": "W",
+          "at": 5.25,
+          "type": "glass",
+          "w": 2,
+          "h": 2.5
+        },
+        {
+          "side": "W",
+          "at": 2,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "W",
+          "at": -2,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.2,
+          "sill": 1
+        },
+        {
+          "side": "E",
+          "at": 5,
+          "type": "glass",
+          "w": 1.6,
+          "h": 2.5
+        },
+        {
+          "side": "E",
+          "at": -2,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": -3.5,
+          "type": "window",
+          "w": 1.4,
+          "h": 1,
+          "sill": 1.2
+        },
+        {
+          "side": "N",
+          "at": 0.2,
+          "type": "window",
+          "w": 0.8,
+          "h": 0.8,
+          "sill": 1.4
+        },
+        {
+          "side": "N",
+          "at": 1.8,
+          "type": "window",
+          "w": 1,
+          "h": 1.2,
+          "sill": 1
+        },
+        {
+          "side": "N",
+          "at": 3.5,
+          "type": "door",
+          "w": 1,
+          "h": 2.1,
+          "style": "cased"
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -1,
+            -4
+          ],
+          "to": [
+            -1,
+            -1
+          ],
+          "door": null,
+          "height": 2.7
+        },
+        {
+          "from": [
+            -1,
+            0.5
+          ],
+          "to": [
+            -1,
+            4
+          ],
+          "door": 1,
+          "doorW": 1.4,
+          "height": 2.7
+        },
+        {
+          "from": [
+            -1,
+            -1
+          ],
+          "to": [
+            1.5,
+            -1
+          ],
+          "door": 1.2,
+          "doorW": 0.8,
+          "height": 2.7
+        },
+        {
+          "from": [
+            1.5,
+            -4
+          ],
+          "to": [
+            1.5,
+            0.5
+          ],
+          "door": 3.8,
+          "doorW": 0.9,
+          "height": 2.7
+        },
+        {
+          "from": [
+            1.5,
+            0.5
+          ],
+          "to": [
+            6,
+            0.5
+          ],
+          "door": null,
+          "height": 2.7
+        },
+        {
+          "from": [
+            2,
+            0.5
+          ],
+          "to": [
+            2,
+            4
+          ],
+          "door": 2.5,
+          "doorW": 0.9,
+          "height": 2.7
+        },
+        {
+          "from": [
+            -6,
+            0.5
+          ],
+          "to": [
+            -2.4,
+            0.5
+          ],
+          "door": null,
+          "height": 2.7
+        }
+      ],
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Living Sunroom",
+          "bounds": {
+            "x": -6,
+            "z": 0.5,
+            "w": 4.5,
+            "d": 6
+          },
+          "items": [
+            {
+              "type": "area-rug",
+              "at": [
+                -3.75,
+                3.9
+              ],
+              "w": 3.4,
+              "d": 2.6
+            },
+            {
+              "type": "sectional",
+              "at": [
+                -3.75,
+                5.4
+              ],
+              "rot": 180
+            },
+            {
+              "type": "coffee-table",
+              "at": [
+                -3.75,
+                3.7
+              ],
+              "rot": 0
+            },
+            {
+              "type": "media-credenza",
+              "at": [
+                -4.2,
+                0.85
+              ],
+              "rot": 0
+            },
+            {
+              "type": "wall-tv",
+              "at": [
+                -4.2,
+                0.55
+              ],
+              "rot": 0
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                -2.8,
+                0.95
+              ]
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -2,
+                2.9
+              ],
+              "rot": 270
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -1.9,
+                3.7
+              ]
+            }
+          ]
+        },
+        {
+          "no": "02",
+          "name": "Kitchen & Dining",
+          "bounds": {
+            "x": -6,
+            "z": -4,
+            "w": 5,
+            "d": 4.5
+          },
+          "items": [
+            {
+              "type": "kitchen-cabinetry",
+              "at": [
+                -3.65,
+                -3.675
+              ],
+              "rot": 0,
+              "w": 3.4
+            },
+            {
+              "type": "kitchen-cabinetry",
+              "at": [
+                -5.675,
+                -2.75
+              ],
+              "rot": 90,
+              "w": 2.5
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -5.675,
+                -1.15
+              ],
+              "rot": 90,
+              "w": 0.7,
+              "h": 2,
+              "d": 0.65
+            },
+            {
+              "type": "dining-set",
+              "at": [
+                -3,
+                -1.4
+              ],
+              "rot": 0
+            },
+            {
+              "type": "media-credenza",
+              "at": [
+                -1.25,
+                -1.8
+              ],
+              "rot": 270,
+              "w": 1.4
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                -1.5,
+                -3.5
+              ]
+            },
+            {
+              "type": "monstera",
+              "at": [
+                -5.5,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "no": "03",
+          "name": "Bathroom",
+          "bounds": {
+            "x": -1,
+            "z": -4,
+            "w": 2.5,
+            "d": 3
+          },
+          "items": [
+            {
+              "type": "ensuite",
+              "at": [
+                0.25,
+                -3.1
+              ],
+              "rot": 0,
+              "d": 1.8
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                1.3,
+                -1.85
+              ],
+              "rot": 270,
+              "w": 0.6,
+              "h": 1.2
+            },
+            {
+              "type": "bench",
+              "at": [
+                0.95,
+                -1.25
+              ],
+              "rot": 0,
+              "w": 0.6,
+              "d": 0.4
+            },
+            {
+              "type": "bonsai",
+              "at": [
+                -0.6,
+                -1.5
+              ]
+            }
+          ]
+        },
+        {
+          "no": "04",
+          "name": "Entry Hall",
+          "bounds": {
+            "x": -1,
+            "z": -1,
+            "w": 2.5,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "area-rug",
+              "at": [
+                0.25,
+                1.6
+              ],
+              "w": 1.4,
+              "d": 2.2
+            },
+            {
+              "type": "bench",
+              "at": [
+                -0.7,
+                3.4
+              ],
+              "rot": 90,
+              "w": 1.2
+            },
+            {
+              "type": "bonsai",
+              "at": [
+                1.1,
+                1
+              ]
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                1.25,
+                3.7
+              ]
+            }
+          ]
+        },
+        {
+          "no": "05",
+          "name": "Primary Bedroom",
+          "bounds": {
+            "x": 1.5,
+            "z": -4,
+            "w": 4.5,
+            "d": 4.5
+          },
+          "items": [
+            {
+              "type": "platform-bed",
+              "at": [
+                5,
+                -3
+              ],
+              "rot": 0,
+              "w": 1.9,
+              "d": 2
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                1.8,
+                -2.6
+              ],
+              "rot": 90,
+              "w": 1.6,
+              "h": 2
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                2.3,
+                -3.7
+              ],
+              "rot": 0,
+              "w": 1.2,
+              "h": 1
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                1.675,
+                -1.25
+              ],
+              "rot": 90,
+              "w": 1
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                2.15,
+                -0.95
+              ]
+            },
+            {
+              "type": "area-rug",
+              "at": [
+                3.3,
+                -2.2
+              ],
+              "w": 2.2,
+              "d": 2.6
+            }
+          ]
+        },
+        {
+          "no": "06",
+          "name": "Kids Room",
+          "bounds": {
+            "x": 2,
+            "z": 0.5,
+            "w": 4,
+            "d": 5.5
+          },
+          "items": [
+            {
+              "type": "platform-bed",
+              "at": [
+                4.9,
+                1.15
+              ],
+              "rot": 270,
+              "w": 1.2,
+              "d": 2
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                2.7,
+                0.8
+              ],
+              "rot": 0,
+              "w": 1,
+              "h": 1
+            },
+            {
+              "type": "bench",
+              "at": [
+                3.5,
+                1.15
+              ],
+              "rot": 90,
+              "w": 1
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                2.3,
+                1.6
+              ]
+            },
+            {
+              "type": "circular-rug",
+              "at": [
+                4,
+                5
+              ],
+              "r": 1
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                5.4,
+                3
+              ],
+              "rot": 270
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                2.2,
+                4.8
+              ],
+              "rot": 90,
+              "w": 1,
+              "h": 1.2
+            },
+            {
+              "type": "coffee-table",
+              "at": [
+                4.4,
+                4.9
+              ],
+              "rot": 0,
+              "w": 0.8,
+              "d": 0.6
+            },
+            {
+              "type": "bonsai",
+              "at": [
+                5.6,
+                5.6
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -6.4,
+        "z": -4.4,
+        "w": 12.8,
+        "d": 8.8
+      },
+      "y": 2.7,
+      "type": "gable",
+      "ridge": "x",
+      "pitch": 40,
+      "overhang": 0.4,
+      "color": "#3f3a33",
+      "dormers": [
+        {
+          "at": -2.4,
+          "w": 1.5
+        },
+        {
+          "at": 2.4,
+          "w": 1.5
+        }
+      ],
+      "chimney": {
+        "at": [
+          -4.2,
+          -1.2
+        ]
+      }
+    },
+    {
+      "over": {
+        "x": -6.4,
+        "z": 3.6,
+        "w": 5.3,
+        "d": 3.3
+      },
+      "y": 2.7,
+      "type": "gable",
+      "ridge": "z",
+      "pitch": 30,
+      "overhang": 0.4,
+      "color": "#3f3a33"
+    },
+    {
+      "over": {
+        "x": 1.6,
+        "z": 3.6,
+        "w": 4.8,
+        "d": 2.8
+      },
+      "y": 2.7,
+      "type": "gable",
+      "ridge": "z",
+      "pitch": 30,
+      "overhang": 0.4,
+      "color": "#3f3a33"
+    }
+  ],
+  "site": [
+    {
+      "type": "patio",
+      "at": [
+        0.25,
+        8
+      ],
+      "w": 1.6,
+      "d": 8
+    },
+    {
+      "type": "porch",
+      "at": [
+        3.5,
+        -5
+      ],
+      "w": 3,
+      "d": 2
+    },
+    {
+      "type": "steps",
+      "at": [
+        5.4,
+        -5
+      ],
+      "rot": 270
+    },
+    {
+      "type": "fence",
+      "from": [
+        -7,
+        -4
+      ],
+      "to": [
+        -7,
+        -13
+      ]
+    },
+    {
+      "type": "fence",
+      "from": [
+        -7,
+        -13
+      ],
+      "to": [
+        7,
+        -13
+      ]
+    },
+    {
+      "type": "fence",
+      "from": [
+        7,
+        -13
+      ],
+      "to": [
+        7,
+        -4
+      ]
+    },
+    {
+      "type": "patio",
+      "at": [
+        -2.5,
+        -9
+      ],
+      "w": 7,
+      "d": 6
+    },
+    {
+      "type": "bench",
+      "at": [
+        -2.5,
+        -8
+      ],
+      "rot": 0
+    },
+    {
+      "type": "loungers",
+      "at": [
+        -4,
+        -11.2
+      ],
+      "rot": 0
+    },
+    {
+      "type": "garden-beds",
+      "at": [
+        4.5,
+        -10.5
+      ],
+      "w": 3.5,
+      "d": 3.5
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -6.2,
+        -6
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -6.2,
+        -12
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        6.2,
+        -12
+      ]
+    },
+    {
+      "type": "tree",
+      "at": [
+        -10,
+        5
+      ]
+    },
+    {
+      "type": "tree",
+      "at": [
+        10,
+        -3
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -6.8,
+        7.4
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        1.6,
+        7
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        3.6,
+        7.6
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -8.5,
+        3
+      ]
+    },
+    {
+      "type": "planter",
+      "at": [
+        1.4,
+        5
+      ]
+    },
+    {
+      "type": "bench",
+      "at": [
+        7.5,
+        8.5
+      ],
+      "rot": 0
+    },
+    {
+      "type": "garden-beds",
+      "at": [
+        6.5,
+        10.5
+      ],
+      "w": 3,
+      "d": 1.5
+    }
+  ],
+  "hero": {
+    "level": "l1",
+    "at": [
+      5.5,
+      -1
+    ],
+    "rot": 270,
+    "device": "charcoal",
+    "pose": "prone",
+    "surface": "desk"
+  },
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": 0.25
+  },
+  "shots": [
+    {
+      "id": "door-to-core",
+      "type": "door-to-core",
+      "duration": 12
+    },
+    {
+      "id": "orbit",
+      "type": "orbit",
+      "duration": 10
+    }
+  ]
+}

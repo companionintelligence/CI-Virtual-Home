@@ -1,0 +1,24 @@
+{
+  "profile": "macos-metal",
+  "chromium": "154.0.8037.0",
+  "args": [
+    "--use-angle=metal",
+    "--ignore-gpu-blocklist",
+    "--enable-gpu-rasterization"
+  ],
+  "res": "360",
+  "fps": 60,
+  "frames": {
+    "door-to-core": [
+      0.55,
+      1
+    ],
+    "orbit": [
+      0.55
+    ],
+    "hero-reveal": [
+      1
+    ]
+  },
+  "supersample": 2
+}

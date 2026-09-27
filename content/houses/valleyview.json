@@ -1,0 +1,910 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "valleyview",
+  "name": "Valley-View Villa",
+  "author": "Axiisims",
+  "source": "SimsTree slide 20",
+  "style": "White multi-tier modern villa: cantilevered upper suite with glass-railed roof terrace, single-storey glass lounge wing, tiered pool with curtained cabana, sunken turf pitch and exterior floating stair",
+  "emoji": "⚽",
+  "lot": {
+    "w": 30,
+    "d": 26,
+    "ground": "lawn"
+  },
+  "palette": {
+    "wall": "#f8fafc",
+    "trim": "#94a3b8",
+    "roof": "#e2e8f0",
+    "accent": "#0ea5e9",
+    "material": "stucco"
+  },
+  "lighting": "ci-biophilic",
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Tiered Living & Lounge",
+      "sheet": "A-101",
+      "y": 0,
+      "height": 2.8,
+      "floor": "terrazzo",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -5,
+          "w": 16,
+          "d": 7
+        }
+      ],
+      "openings": [
+        {
+          "side": "N",
+          "at": -4,
+          "type": "glass",
+          "w": 7.6,
+          "h": 2.8
+        },
+        {
+          "side": "N",
+          "at": 4,
+          "type": "window",
+          "w": 2,
+          "h": 1.4,
+          "sill": 1
+        },
+        {
+          "side": "S",
+          "at": -4,
+          "type": "slider",
+          "w": 2.4,
+          "h": 2.4
+        },
+        {
+          "side": "S",
+          "at": 4,
+          "type": "glass",
+          "w": 6,
+          "h": 2.7
+        },
+        {
+          "side": "E",
+          "at": -1.5,
+          "type": "glass",
+          "w": 5,
+          "h": 2.7
+        },
+        {
+          "side": "W",
+          "at": 0.8,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.4,
+          "sill": 1
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            0,
+            -5
+          ],
+          "to": [
+            0,
+            2
+          ],
+          "door": 3.5,
+          "doorW": 1.2,
+          "height": 2.8
+        }
+      ],
+      "stairs": {
+        "type": "timber",
+        "at": [
+          -5.5,
+          5.5
+        ],
+        "rot": 180,
+        "to": "l2"
+      },
+      "rooms": [
+        {
+          "no": "04",
+          "name": "Valley-View Salon",
+          "bounds": {
+            "x": -8,
+            "z": -5,
+            "w": 8,
+            "d": 7
+          },
+          "items": [
+            {
+              "type": "area-rug",
+              "at": [
+                -3.9,
+                -2.2
+              ],
+              "rot": 0,
+              "w": 4.4,
+              "d": 3,
+              "color": "#d6d3d1"
+            },
+            {
+              "type": "sectional",
+              "at": [
+                -4,
+                -4
+              ],
+              "rot": 0
+            },
+            {
+              "type": "coffee-table",
+              "at": [
+                -3.4,
+                -2
+              ],
+              "rot": 0
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -5,
+                -2.5
+              ],
+              "rot": 90,
+              "color": "#3f2e24"
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -5,
+                -1.3
+              ],
+              "rot": 90,
+              "color": "#3f2e24"
+            },
+            {
+              "type": "fireplace",
+              "at": [
+                -0.35,
+                -3
+              ],
+              "rot": 270
+            },
+            {
+              "type": "wall-tv",
+              "at": [
+                -0.2,
+                -3
+              ],
+              "rot": 270,
+              "y": 1.9
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -6.2,
+                -4.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                -1,
+                -4.4
+              ],
+              "rot": 0
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -7.8,
+                -0.8
+              ],
+              "rot": 90
+            },
+            {
+              "type": "bench",
+              "at": [
+                -7.7,
+                0.8
+              ],
+              "rot": 90
+            },
+            {
+              "type": "monstera",
+              "at": [
+                -0.8,
+                1.4
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "03",
+          "name": "Cabana Bar & Lounge",
+          "bounds": {
+            "x": 0,
+            "z": -5,
+            "w": 8,
+            "d": 7
+          },
+          "items": [
+            {
+              "type": "kitchen-island",
+              "at": [
+                6.3,
+                -4.3
+              ],
+              "rot": 0,
+              "color": "#bfdbfe"
+            },
+            {
+              "type": "wall-tv",
+              "at": [
+                6.3,
+                -4.95
+              ],
+              "rot": 0,
+              "y": 1.7
+            },
+            {
+              "type": "speakers",
+              "at": [
+                5.6,
+                -4.3
+              ],
+              "rot": 0,
+              "y": 0.92
+            },
+            {
+              "type": "monstera",
+              "at": [
+                4.5,
+                -4.5
+              ],
+              "rot": 0
+            },
+            {
+              "type": "bamboo",
+              "at": [
+                7.5,
+                -3.3
+              ],
+              "rot": 0
+            },
+            {
+              "type": "area-rug",
+              "at": [
+                2.6,
+                -0.8
+              ],
+              "rot": 0,
+              "w": 3.6,
+              "d": 3.2,
+              "color": "#bfdbfe"
+            },
+            {
+              "type": "sectional",
+              "at": [
+                2.6,
+                1
+              ],
+              "rot": 180
+            },
+            {
+              "type": "coffee-table",
+              "at": [
+                2.6,
+                -0.7
+              ],
+              "rot": 0
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                1.9,
+                -2.2
+              ],
+              "rot": 0,
+              "color": "#dbe7f3"
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                3.3,
+                -2.2
+              ],
+              "rot": 0,
+              "color": "#dbe7f3"
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                0.5,
+                -4.2
+              ],
+              "rot": 0
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                7.4,
+                1.5
+              ],
+              "rot": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "name": "Cantilevered Suite & Roof Terrace",
+      "sheet": "A-102",
+      "y": 2.8,
+      "height": 2.8,
+      "floor": "terrazzo",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -5,
+          "w": 8,
+          "d": 7
+        }
+      ],
+      "balustrades": [
+        {
+          "from": [
+            0,
+            2
+          ],
+          "to": [
+            8,
+            2
+          ],
+          "style": "glass"
+        },
+        {
+          "from": [
+            8,
+            2
+          ],
+          "to": [
+            8,
+            -5
+          ],
+          "style": "glass"
+        },
+        {
+          "from": [
+            0,
+            -5
+          ],
+          "to": [
+            8,
+            -5
+          ],
+          "style": "glass"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -5.5,
+          "type": "slider",
+          "w": 1.6,
+          "h": 2.4
+        },
+        {
+          "side": "S",
+          "at": -2.3,
+          "type": "glass",
+          "w": 4,
+          "h": 2.7
+        },
+        {
+          "side": "E",
+          "at": -1,
+          "type": "slider",
+          "w": 2,
+          "h": 2.4
+        },
+        {
+          "side": "N",
+          "at": -4,
+          "type": "glass",
+          "w": 7.6,
+          "h": 2.7
+        },
+        {
+          "side": "W",
+          "at": -2.5,
+          "type": "window",
+          "w": 1.4,
+          "h": 0.8,
+          "sill": 1.5
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -3,
+            -1.4
+          ],
+          "to": [
+            -3,
+            2
+          ],
+          "door": null,
+          "doorW": 0.9,
+          "height": 2.7
+        },
+        {
+          "from": [
+            -2.4,
+            -2.2
+          ],
+          "to": [
+            0,
+            -2.2
+          ],
+          "door": 1.7,
+          "doorW": 0.8,
+          "height": 2.7
+        },
+        {
+          "from": [
+            -2.4,
+            -5
+          ],
+          "to": [
+            -2.4,
+            -2.2
+          ],
+          "door": null,
+          "doorW": 0.9,
+          "height": 2.7
+        },
+        {
+          "from": [
+            -5.2,
+            -3.05
+          ],
+          "to": [
+            -2.4,
+            -3.05
+          ],
+          "door": null,
+          "doorW": 0.9,
+          "height": 2.7
+        }
+      ],
+      "rooms": [
+        {
+          "no": "06",
+          "name": "AI Console Gallery",
+          "bounds": {
+            "x": -8,
+            "z": -5,
+            "w": 5.6,
+            "d": 2.8
+          },
+          "items": [
+            {
+              "type": "bookshelf",
+              "at": [
+                -7.8,
+                -4
+              ],
+              "rot": 90
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -6.6,
+                -3.4
+              ],
+              "rot": 90,
+              "color": "#3f2e24"
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -7.4,
+                -2.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                -6.2,
+                -4.6
+              ],
+              "rot": 0
+            },
+            {
+              "type": "telescope",
+              "at": [
+                -5.2,
+                -4.4
+              ],
+              "rot": 180
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -3.8,
+                -4.1
+              ],
+              "rot": 180,
+              "color": "#3f2e24"
+            },
+            {
+              "type": "monstera",
+              "at": [
+                -2.9,
+                -4.3
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "07",
+          "name": "Entry Landing",
+          "bounds": {
+            "x": -8,
+            "z": -2.2,
+            "w": 5,
+            "d": 4.2
+          },
+          "items": [
+            {
+              "type": "area-rug",
+              "at": [
+                -5,
+                -0.6
+              ],
+              "rot": 0,
+              "w": 2.6,
+              "d": 2.4,
+              "color": "#cbd5e1"
+            },
+            {
+              "type": "bench",
+              "at": [
+                -7.7,
+                0.6
+              ],
+              "rot": 90
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -7.5,
+                -0.9
+              ],
+              "rot": 90,
+              "color": "#3f2e24"
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -7.6,
+                -1.8
+              ],
+              "rot": 0
+            },
+            {
+              "type": "monstera",
+              "at": [
+                -3.5,
+                1.5
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "05",
+          "name": "Sunset Terrace Suite",
+          "bounds": {
+            "x": -3,
+            "z": -2.2,
+            "w": 3,
+            "d": 4.2
+          },
+          "items": [
+            {
+              "type": "platform-bed",
+              "at": [
+                -1.75,
+                1
+              ],
+              "rot": 90,
+              "w": 2,
+              "color": "#f1f5f9"
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                -2.6,
+                -0.7
+              ],
+              "rot": 90,
+              "w": 1.2
+            },
+            {
+              "type": "area-rug",
+              "at": [
+                -1.6,
+                -0.9
+              ],
+              "rot": 0,
+              "w": 2,
+              "d": 1.6,
+              "color": "#e2e8f0"
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -0.35,
+                1.7
+              ],
+              "rot": 0
+            },
+            {
+              "type": "bonsai",
+              "at": [
+                -1.3,
+                -0.45
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "08",
+          "name": "Ensuite",
+          "bounds": {
+            "x": -2.4,
+            "z": -5,
+            "w": 2.4,
+            "d": 2.8
+          },
+          "items": [
+            {
+              "type": "ensuite",
+              "at": [
+                -1.2,
+                -4.05
+              ],
+              "rot": 0,
+              "w": 2.2,
+              "d": 1.9
+            },
+            {
+              "type": "bonsai",
+              "at": [
+                -1.9,
+                -2.65
+              ],
+              "rot": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -8.3,
+        "z": -5.3,
+        "w": 8.6,
+        "d": 7.6
+      },
+      "y": 5.6,
+      "type": "flat",
+      "parapet": 0.35,
+      "color": "#e2e8f0"
+    },
+    {
+      "over": {
+        "x": 0,
+        "z": -5,
+        "w": 8,
+        "d": 7
+      },
+      "y": 2.8,
+      "type": "flat",
+      "parapet": 0.12,
+      "color": "#e2e8f0"
+    }
+  ],
+  "site": [
+    {
+      "type": "patio",
+      "at": [
+        4.5,
+        5
+      ],
+      "w": 9,
+      "d": 6
+    },
+    {
+      "type": "pool",
+      "at": [
+        4.5,
+        5.2
+      ],
+      "w": 6,
+      "d": 4
+    },
+    {
+      "type": "loungers",
+      "at": [
+        3.5,
+        2.6
+      ],
+      "rot": 90
+    },
+    {
+      "type": "loungers",
+      "at": [
+        5.5,
+        2.6
+      ],
+      "rot": 90
+    },
+    {
+      "type": "pergola",
+      "at": [
+        10,
+        5.2
+      ],
+      "w": 3,
+      "d": 4
+    },
+    {
+      "type": "turf",
+      "at": [
+        -9.5,
+        4.75
+      ],
+      "w": 6,
+      "d": 4.5
+    },
+    {
+      "type": "soccer-goal",
+      "at": [
+        -9.5,
+        6.7
+      ],
+      "rot": 180
+    },
+    {
+      "type": "bench",
+      "at": [
+        -2.5,
+        3.2
+      ],
+      "rot": 0
+    },
+    {
+      "type": "bench",
+      "at": [
+        -9.5,
+        8
+      ],
+      "rot": 180
+    },
+    {
+      "type": "wall-low",
+      "from": [
+        -13,
+        8.2
+      ],
+      "to": [
+        13,
+        8.2
+      ],
+      "h": 0.6
+    },
+    {
+      "type": "steps",
+      "at": [
+        0,
+        8.8
+      ],
+      "rot": 0
+    },
+    {
+      "type": "cypress",
+      "at": [
+        9.4,
+        1
+      ]
+    },
+    {
+      "type": "cypress",
+      "at": [
+        -13,
+        -2
+      ]
+    },
+    {
+      "type": "tree",
+      "at": [
+        12,
+        -9
+      ]
+    },
+    {
+      "type": "tree",
+      "at": [
+        -12,
+        -9
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        1,
+        9.6
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        8,
+        9.6
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -5,
+        9.6
+      ]
+    },
+    {
+      "type": "planter",
+      "at": [
+        -2.8,
+        5.6
+      ]
+    }
+  ],
+  "hero": {
+    "level": "l2",
+    "at": [
+      -4,
+      -2.5
+    ],
+    "rot": 0,
+    "device": "charcoal",
+    "pose": "prone",
+    "surface": "shelf"
+  },
+  "entry": {
+    "level": "l2",
+    "side": "S",
+    "at": -5.5
+  },
+  "shots": [
+    {
+      "id": "door-to-core",
+      "type": "door-to-core",
+      "duration": 12
+    },
+    {
+      "id": "orbit",
+      "type": "orbit",
+      "duration": 10
+    }
+  ],
+  "areaSqm": 168
+}

@@ -1,0 +1,838 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "mesamariposa",
+  "name": "Villa Mesa Mariposa",
+  "author": "Schnucko",
+  "source": "SimsTree slide 16",
+  "style": "Two-storey desert-modern adobe villa: staggered dark shed roofs, glass conservatory salon wing, walled courtyard with turtle-mosaic pool and fire pit lounge, saguaros and palms",
+  "emoji": "🌵",
+  "lot": {
+    "w": 30,
+    "d": 24,
+    "ground": "desert"
+  },
+  "palette": {
+    "wall": "#d4a373",
+    "trim": "#451a03",
+    "roof": "#3b2a1a",
+    "accent": "#0d9488",
+    "material": "stucco"
+  },
+  "lighting": "ci-twilight",
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Desert Compound & Courtyard",
+      "sheet": "A-101",
+      "y": 0,
+      "height": 3.2,
+      "floor": "terrazzo",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -5,
+          "w": 12,
+          "d": 9
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -1,
+          "type": "door",
+          "w": 1.8,
+          "h": 2.3,
+          "style": "entry"
+        },
+        {
+          "side": "S",
+          "at": -5.5,
+          "type": "window",
+          "w": 2.2,
+          "h": 1.8,
+          "sill": 0.6
+        },
+        {
+          "side": "S",
+          "at": 2.2,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.4,
+          "sill": 0.8
+        },
+        {
+          "side": "E",
+          "at": -2.3,
+          "type": "glass",
+          "w": 5,
+          "h": 2.9
+        },
+        {
+          "side": "E",
+          "at": 1.6,
+          "type": "slider",
+          "w": 2.2,
+          "h": 2.3
+        },
+        {
+          "side": "N",
+          "at": -4.5,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.2,
+          "sill": 1.1
+        },
+        {
+          "side": "N",
+          "at": 1.5,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.2,
+          "sill": 1.1
+        },
+        {
+          "side": "W",
+          "at": 2.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 0.8,
+          "sill": 1.8
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -1.5,
+            -1.75
+          ],
+          "to": [
+            -1.5,
+            2.75
+          ],
+          "door": 2.25,
+          "doorW": 1.6,
+          "height": 3.2
+        }
+      ],
+      "stairs": {
+        "type": "timber",
+        "at": [
+          3.2,
+          -0.8
+        ],
+        "rot": 180,
+        "to": "l2"
+      },
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Sunken Desert Salon",
+          "bounds": {
+            "x": -8,
+            "z": -5,
+            "w": 6.5,
+            "d": 9
+          },
+          "items": [
+            {
+              "type": "circular-rug",
+              "at": [
+                -5.3,
+                1.5
+              ],
+              "r": 1.7,
+              "color": "#1c1917"
+            },
+            {
+              "type": "sectional",
+              "at": [
+                -5.1,
+                3
+              ],
+              "rot": 180
+            },
+            {
+              "type": "coffee-table",
+              "at": [
+                -5.3,
+                1.1
+              ],
+              "rot": 0,
+              "w": 1.3,
+              "d": 1.3
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -7.5,
+                0.4
+              ],
+              "rot": 90
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -7.5,
+                1.9
+              ],
+              "rot": 90
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -7.7,
+                1.15
+              ]
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -7.35,
+                3.8
+              ],
+              "rot": 180
+            },
+            {
+              "type": "fireplace",
+              "at": [
+                -2.6,
+                -4.75
+              ],
+              "rot": 0
+            },
+            {
+              "type": "monstera",
+              "at": [
+                -1.9,
+                -3.7
+              ]
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -7.8,
+                -3.6
+              ],
+              "rot": 90
+            },
+            {
+              "type": "fiddle-leaf",
+              "at": [
+                -7.2,
+                -4.5
+              ]
+            }
+          ]
+        },
+        {
+          "no": "02",
+          "name": "Solarium Dining Atrium",
+          "bounds": {
+            "x": -1.5,
+            "z": -5,
+            "w": 5.5,
+            "d": 9
+          },
+          "items": [
+            {
+              "type": "kitchen-cabinetry",
+              "at": [
+                0.4,
+                -4.65
+              ],
+              "rot": 0
+            },
+            {
+              "type": "kitchen-island",
+              "at": [
+                1,
+                -2.5
+              ],
+              "rot": 0
+            },
+            {
+              "type": "dining-set",
+              "at": [
+                0.8,
+                0.9
+              ],
+              "rot": 0
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                0.6,
+                3.75
+              ],
+              "rot": 180,
+              "w": 1.2,
+              "h": 1,
+              "d": 0.5
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                1.6,
+                3.7
+              ]
+            },
+            {
+              "type": "cactus-group",
+              "at": [
+                2.6,
+                3.5
+              ]
+            },
+            {
+              "type": "bench",
+              "at": [
+                3.7,
+                3.4
+              ],
+              "rot": 270,
+              "w": 1.2
+            },
+            {
+              "type": "bamboo",
+              "at": [
+                -1.1,
+                -1.2
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "name": "Upper Floor",
+      "sheet": "A-102",
+      "y": 3.2,
+      "height": 2.8,
+      "floor": "oak",
+      "footprint": [
+        {
+          "x": -4,
+          "z": -5,
+          "w": 8,
+          "d": 9
+        }
+      ],
+      "voids": [
+        {
+          "x": 2.55,
+          "z": -4.4,
+          "w": 1.3,
+          "d": 3.8
+        }
+      ],
+      "balustrades": [
+        {
+          "from": [
+            2.55,
+            -0.6
+          ],
+          "to": [
+            3.85,
+            -0.6
+          ],
+          "style": "glass"
+        },
+        {
+          "from": [
+            2.55,
+            -4.4
+          ],
+          "to": [
+            2.55,
+            -0.6
+          ],
+          "style": "glass"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -1,
+          "type": "glass",
+          "w": 3,
+          "h": 2.4
+        },
+        {
+          "side": "S",
+          "at": 2.4,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": -2,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 1.2,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "E",
+          "at": -2.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "W",
+          "at": 1.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.3,
+          "sill": 0.9
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            0.5,
+            -5
+          ],
+          "to": [
+            0.5,
+            4
+          ],
+          "door": 6.5,
+          "doorW": 0.9,
+          "height": 2.7
+        }
+      ],
+      "rooms": [
+        {
+          "no": "03",
+          "name": "Primary Suite",
+          "bounds": {
+            "x": -4,
+            "z": -5,
+            "w": 4.5,
+            "d": 9
+          },
+          "items": [
+            {
+              "type": "ensuite",
+              "at": [
+                -2.8,
+                -4
+              ],
+              "rot": 0
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                -0.35,
+                -4.7
+              ],
+              "rot": 0,
+              "w": 1.5
+            },
+            {
+              "type": "platform-bed",
+              "at": [
+                -2.85,
+                1.5
+              ],
+              "rot": 90
+            },
+            {
+              "type": "area-rug",
+              "at": [
+                -1.4,
+                1.5
+              ],
+              "rot": 0,
+              "w": 2.4,
+              "d": 3.2,
+              "color": "#a16207"
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -3.6,
+                -0.1
+              ]
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                -3.6,
+                3.1
+              ]
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -3.3,
+                3.8
+              ],
+              "rot": 180
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                0.2,
+                -1.5
+              ],
+              "rot": 270,
+              "w": 1.2,
+              "h": 1,
+              "d": 0.5
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -0.5,
+                -3.5
+              ],
+              "rot": 0
+            },
+            {
+              "type": "monstera",
+              "at": [
+                -0.6,
+                3.4
+              ]
+            }
+          ]
+        },
+        {
+          "no": "05",
+          "name": "Kids' Room & Landing",
+          "bounds": {
+            "x": 0.5,
+            "z": -5,
+            "w": 3.5,
+            "d": 9
+          },
+          "items": [
+            {
+              "type": "bookshelf",
+              "at": [
+                0.7,
+                -0.7
+              ],
+              "rot": 90
+            },
+            {
+              "type": "cactus-group",
+              "at": [
+                1,
+                -2.3
+              ]
+            },
+            {
+              "type": "walnut-desk",
+              "at": [
+                3.6,
+                1.3
+              ],
+              "rot": 270
+            },
+            {
+              "type": "curved-monitor",
+              "at": [
+                3.7,
+                1.3
+              ],
+              "rot": 90
+            },
+            {
+              "type": "task-chair",
+              "at": [
+                2.8,
+                1.3
+              ],
+              "rot": 90
+            },
+            {
+              "type": "platform-bed",
+              "at": [
+                1.7,
+                3
+              ],
+              "rot": 180,
+              "w": 1.2,
+              "d": 2,
+              "color": "#f9a8d4"
+            },
+            {
+              "type": "wardrobe",
+              "at": [
+                0.75,
+                3
+              ],
+              "rot": 90,
+              "w": 1.2,
+              "h": 1,
+              "d": 0.5
+            },
+            {
+              "type": "halo-lamp",
+              "at": [
+                2.5,
+                3.7
+              ]
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                3.3,
+                3.4
+              ],
+              "rot": 270
+            },
+            {
+              "type": "bonsai",
+              "at": [
+                3.7,
+                2.5
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -8.4,
+        "z": -5.4,
+        "w": 4.6,
+        "d": 9.8
+      },
+      "y": 3.2,
+      "type": "shed",
+      "ridge": "z",
+      "pitch": 18,
+      "overhang": 0.4,
+      "color": "#7dd3fc"
+    },
+    {
+      "over": {
+        "x": -4.4,
+        "z": -5.4,
+        "w": 8.8,
+        "d": 9.8
+      },
+      "y": 6,
+      "type": "shed",
+      "ridge": "z",
+      "pitch": 12,
+      "overhang": 0.5,
+      "color": "#3b2a1a",
+      "chimney": {
+        "at": [
+          -3.6,
+          -0.4
+        ]
+      }
+    }
+  ],
+  "site": [
+    {
+      "type": "patio",
+      "at": [
+        8,
+        0.25
+      ],
+      "w": 8,
+      "d": 10.5
+    },
+    {
+      "type": "turtle-pool",
+      "at": [
+        8.5,
+        -2.25
+      ],
+      "w": 6,
+      "d": 4.5
+    },
+    {
+      "type": "loungers",
+      "at": [
+        4.9,
+        -1.5
+      ],
+      "rot": 0
+    },
+    {
+      "type": "loungers",
+      "at": [
+        4.9,
+        -3.6
+      ],
+      "rot": 0
+    },
+    {
+      "type": "firepit",
+      "at": [
+        8.5,
+        3
+      ]
+    },
+    {
+      "type": "wall-low",
+      "from": [
+        4,
+        -5
+      ],
+      "to": [
+        12,
+        -5
+      ],
+      "h": 2.2
+    },
+    {
+      "type": "wall-low",
+      "from": [
+        12,
+        -5
+      ],
+      "to": [
+        12,
+        5.5
+      ],
+      "h": 2.2
+    },
+    {
+      "type": "wall-low",
+      "from": [
+        4,
+        5.5
+      ],
+      "to": [
+        12,
+        5.5
+      ],
+      "h": 2.2
+    },
+    {
+      "type": "patio",
+      "at": [
+        -1,
+        5.2
+      ],
+      "w": 6,
+      "d": 2.4
+    },
+    {
+      "type": "steps",
+      "at": [
+        -1,
+        6.8
+      ],
+      "rot": 0
+    },
+    {
+      "type": "pond",
+      "at": [
+        -4.5,
+        5.6
+      ],
+      "w": 4,
+      "d": 2.5
+    },
+    {
+      "type": "cactus",
+      "at": [
+        -1.8,
+        7.2
+      ]
+    },
+    {
+      "type": "cactus",
+      "at": [
+        2.9,
+        5.6
+      ]
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -7.6,
+        7.4
+      ]
+    },
+    {
+      "type": "palm",
+      "at": [
+        -9.6,
+        6
+      ]
+    },
+    {
+      "type": "palm",
+      "at": [
+        6,
+        7.6
+      ]
+    },
+    {
+      "type": "palm",
+      "at": [
+        -10,
+        -6
+      ]
+    },
+    {
+      "type": "palm",
+      "at": [
+        13.4,
+        2
+      ]
+    },
+    {
+      "type": "tree",
+      "at": [
+        -12.5,
+        -2
+      ]
+    }
+  ],
+  "hero": {
+    "level": "l1",
+    "at": [
+      -4.5,
+      -2.8
+    ],
+    "rot": 0,
+    "device": "chalk",
+    "pose": "prone",
+    "surface": "desk"
+  },
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": -1
+  },
+  "shots": [
+    {
+      "id": "door-to-core",
+      "type": "door-to-core",
+      "duration": 12
+    },
+    {
+      "id": "orbit",
+      "type": "orbit",
+      "duration": 10
+    }
+  ],
+  "areaSqm": 180
+}

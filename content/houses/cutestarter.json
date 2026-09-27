@@ -1,0 +1,1577 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "cutestarter",
+  "name": "Cute Basegame Starter",
+  "author": "TheClumsySimmer",
+  "source": "SimsTree slide 21",
+  "style": "Small brick Cape Cod, steep dark shingle gable with two dormers and end chimney, blue shutters and window boxes, gabled front porch with brick steps",
+  "emoji": "🏠",
+  "lot": {
+    "w": 22,
+    "d": 24,
+    "ground": "lawn"
+  },
+  "palette": {
+    "wall": "#8a4b3b",
+    "trim": "#edf1f4",
+    "roof": "#3b2a1e",
+    "accent": "#6e8ebb",
+    "material": "brick",
+    "interior": "#b9a992"
+  },
+  "lighting": "ci-twilight",
+  "areaSqm": 70,
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Ground Floor",
+      "sheet": "A-101",
+      "y": 0,
+      "height": 2.7,
+      "floor": "oak",
+      "footprint": [
+        {
+          "x": -5,
+          "z": -3.5,
+          "w": 10,
+          "d": 7
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": 0,
+          "type": "door",
+          "w": 1,
+          "h": 2.1,
+          "style": "entry"
+        },
+        {
+          "side": "S",
+          "at": -3,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 3,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": -0.2,
+          "type": "slider",
+          "w": 1.6,
+          "h": 2.1
+        },
+        {
+          "side": "N",
+          "at": -3.2,
+          "type": "window",
+          "w": 1.2,
+          "h": 0.9,
+          "sill": 1.1
+        },
+        {
+          "side": "N",
+          "at": 3.75,
+          "type": "window",
+          "w": 0.8,
+          "h": 0.7,
+          "sill": 1.4
+        },
+        {
+          "side": "E",
+          "at": 1,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "W",
+          "at": 0.5,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.3,
+          "sill": 0.9
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -2.4,
+            -3.5
+          ],
+          "to": [
+            -2.4,
+            -1.4
+          ],
+          "door": null,
+          "height": 2.7
+        },
+        {
+          "from": [
+            0.8,
+            -3.5
+          ],
+          "to": [
+            0.8,
+            -1.5
+          ],
+          "door": 0.6,
+          "doorW": 0.8,
+          "height": 2.7
+        },
+        {
+          "from": [
+            0.8,
+            -1.5
+          ],
+          "to": [
+            2.6,
+            -1.5
+          ],
+          "door": null,
+          "height": 2.7
+        },
+        {
+          "from": [
+            2.6,
+            -3.5
+          ],
+          "to": [
+            2.6,
+            -1.5
+          ],
+          "door": null,
+          "height": 2.7
+        }
+      ],
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Kitchen",
+          "bounds": {
+            "x": -5,
+            "z": -3.5,
+            "w": 2.6,
+            "d": 2.6
+          },
+          "items": [
+            {
+              "type": "fridge",
+              "at": [
+                -4.55,
+                -3.13
+              ],
+              "rot": 0,
+              "w": 0.9,
+              "d": 0.74,
+              "h": 1.8,
+              "color": "#f3f2ee",
+              "finish": "matte"
+            },
+            {
+              "type": "counter-run",
+              "at": [
+                -3.6,
+                -3.19
+              ],
+              "rot": 0,
+              "w": 1,
+              "d": 0.62,
+              "color": "#f3f2ee"
+            },
+            {
+              "type": "range",
+              "at": [
+                -2.8,
+                -3.175
+              ],
+              "rot": 0,
+              "w": 0.6,
+              "d": 0.65,
+              "color": "#f3f2ee",
+              "finish": "matte"
+            },
+            {
+              "type": "range-hood",
+              "at": [
+                -2.8,
+                -3.245
+              ],
+              "rot": 0,
+              "w": 0.6,
+              "d": 0.51,
+              "y": 1.55,
+              "color": "#f3f2ee"
+            },
+            {
+              "type": "sink-run",
+              "at": [
+                -4.68,
+                -1.9
+              ],
+              "rot": 90,
+              "w": 1.4,
+              "d": 0.64,
+              "color": "#f3f2ee"
+            },
+            {
+              "type": "upper-cabinets",
+              "at": [
+                -4.815,
+                -1.9
+              ],
+              "rot": 90,
+              "w": 1.2,
+              "d": 0.37,
+              "y": 1.5,
+              "color": "#eef0e9"
+            },
+            {
+              "type": "herb-pots",
+              "at": [
+                -3.9,
+                -3.28
+              ],
+              "rot": 0,
+              "y": 0.96
+            },
+            {
+              "type": "coffee-maker",
+              "at": [
+                -3.35,
+                -3.3
+              ],
+              "rot": 0,
+              "y": 0.96,
+              "finish": "matte"
+            },
+            {
+              "type": "fruit-bowl",
+              "at": [
+                -4.68,
+                -2.4
+              ],
+              "rot": 0,
+              "y": 1
+            },
+            {
+              "type": "wall-clock",
+              "at": [
+                -2.435,
+                -2
+              ],
+              "rot": 270,
+              "y": 1.9,
+              "color": "#4a3526"
+            },
+            {
+              "type": "runner-rug",
+              "at": [
+                -3.6,
+                -1.8
+              ],
+              "rot": 0,
+              "w": 1,
+              "d": 1.6,
+              "color": "#c2a89c"
+            },
+            {
+              "type": "pendant-lamp",
+              "at": [
+                -3.6,
+                -1.9
+              ],
+              "rot": 0,
+              "y": 2.45,
+              "drop": 0.5,
+              "color": "#eef0e9"
+            }
+          ]
+        },
+        {
+          "no": "02",
+          "name": "Dining",
+          "bounds": {
+            "x": -2.4,
+            "z": -3.5,
+            "w": 3.2,
+            "d": 2.6
+          },
+          "items": [
+            {
+              "type": "round-dining-table",
+              "at": [
+                -1.35,
+                -2
+              ],
+              "rot": 0,
+              "r": 0.55,
+              "seats": 4,
+              "color": "#c9a06a"
+            },
+            {
+              "type": "dining-chair",
+              "at": [
+                -1.35,
+                -2.8
+              ],
+              "rot": 0,
+              "color": "#c9a06a"
+            },
+            {
+              "type": "dining-chair",
+              "at": [
+                -1.35,
+                -1.2
+              ],
+              "rot": 180,
+              "color": "#c9a06a"
+            },
+            {
+              "type": "dining-chair",
+              "at": [
+                -2.15,
+                -2
+              ],
+              "rot": 90,
+              "color": "#c9a06a"
+            },
+            {
+              "type": "dining-chair",
+              "at": [
+                -0.55,
+                -2
+              ],
+              "rot": 270,
+              "color": "#c9a06a"
+            },
+            {
+              "type": "vase",
+              "at": [
+                -1.35,
+                -2
+              ],
+              "rot": 0,
+              "y": 0.78,
+              "h": 0.4
+            },
+            {
+              "type": "runner-rug",
+              "at": [
+                -1.35,
+                -2
+              ],
+              "rot": 0,
+              "w": 1.7,
+              "d": 1.9,
+              "color": "#e2d8c6"
+            },
+            {
+              "type": "sideboard",
+              "at": [
+                -1.75,
+                -3.275
+              ],
+              "rot": 0,
+              "w": 1.3,
+              "d": 0.45,
+              "h": 0.9,
+              "doors": 3,
+              "color": "#c9a06a"
+            },
+            {
+              "type": "wall-art",
+              "at": [
+                -1.75,
+                -3.48
+              ],
+              "rot": 0,
+              "w": 0.9,
+              "h": 0.6,
+              "y": 1.7,
+              "color": "#6e8ebb",
+              "motif": "landscape"
+            },
+            {
+              "type": "plant-stand",
+              "at": [
+                0.55,
+                -1.25
+              ],
+              "rot": 0,
+              "h": 0.95,
+              "color": "#eef0e9"
+            },
+            {
+              "type": "chandelier",
+              "at": [
+                -1.35,
+                -2
+              ],
+              "rot": 0,
+              "y": 2.6,
+              "drop": 0.55,
+              "w": 0.7,
+              "color": "#eef0e9"
+            }
+          ]
+        },
+        {
+          "no": "03",
+          "name": "Bathroom",
+          "bounds": {
+            "x": 0.8,
+            "z": -3.5,
+            "w": 1.8,
+            "d": 2
+          },
+          "items": [
+            {
+              "type": "toilet",
+              "at": [
+                1.19,
+                -3.3
+              ],
+              "rot": 90,
+              "color": "#f3f2ee"
+            },
+            {
+              "type": "shower-cubicle",
+              "at": [
+                2.15,
+                -3.05
+              ],
+              "rot": 0,
+              "w": 0.85,
+              "d": 0.9,
+              "h": 2
+            },
+            {
+              "type": "vanity-sink",
+              "at": [
+                2.35,
+                -2.1
+              ],
+              "rot": 270,
+              "w": 0.8,
+              "d": 0.45,
+              "color": "#f3f2ee"
+            },
+            {
+              "type": "fern",
+              "at": [
+                2.29,
+                -2.1
+              ],
+              "rot": 0,
+              "y": 0.95
+            },
+            {
+              "type": "bath-mat",
+              "at": [
+                1.8,
+                -2.15
+              ],
+              "rot": 0,
+              "w": 0.6,
+              "d": 0.4,
+              "color": "#6e8ebb"
+            },
+            {
+              "type": "towel-rail",
+              "at": [
+                1.9,
+                -1.57
+              ],
+              "rot": 180,
+              "w": 0.6,
+              "y": 1.1,
+              "color": "#eef0e9"
+            },
+            {
+              "type": "laundry-hamper",
+              "at": [
+                1.25,
+                -1.85
+              ],
+              "rot": 0,
+              "color": "#eef0e9"
+            },
+            {
+              "type": "wall-hooks",
+              "at": [
+                1.1,
+                -1.555
+              ],
+              "rot": 180,
+              "w": 0.6,
+              "y": 1.6,
+              "color": "#6e8ebb"
+            },
+            {
+              "type": "ceiling-light",
+              "at": [
+                1.7,
+                -2.5
+              ],
+              "rot": 0,
+              "y": 2.55,
+              "color": "#eef0e9"
+            }
+          ]
+        },
+        {
+          "no": "04",
+          "name": "Bedroom",
+          "bounds": {
+            "x": 2.6,
+            "z": -3.5,
+            "w": 2.4,
+            "d": 4.4
+          },
+          "items": [
+            {
+              "type": "headboard-bed",
+              "at": [
+                3.7,
+                -2.45
+              ],
+              "rot": 0,
+              "w": 1.5,
+              "d": 2.1,
+              "h": 1.2,
+              "color": "#6e8ebb"
+            },
+            {
+              "type": "nightstand",
+              "at": [
+                4.72,
+                -3.27
+              ],
+              "rot": 0,
+              "color": "#4a3526"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                4.72,
+                -3.27
+              ],
+              "rot": 0,
+              "y": 0.6,
+              "color": "#eef0e9"
+            },
+            {
+              "type": "wall-sconce",
+              "at": [
+                4.72,
+                -3.38
+              ],
+              "rot": 0,
+              "y": 1.55,
+              "color": "#eef0e9"
+            },
+            {
+              "type": "curtains",
+              "at": [
+                3.75,
+                -3.435
+              ],
+              "rot": 0,
+              "w": 1.6,
+              "h": 2.2,
+              "color": "#e7dfc9"
+            },
+            {
+              "type": "dresser",
+              "at": [
+                4.73,
+                -1
+              ],
+              "rot": 270,
+              "w": 1.23,
+              "d": 0.54,
+              "h": 0.85,
+              "color": "#4a3526"
+            },
+            {
+              "type": "wall-art",
+              "at": [
+                4.98,
+                -1
+              ],
+              "rot": 270,
+              "w": 1,
+              "h": 0.55,
+              "y": 1.45,
+              "color": "#4a3526",
+              "motif": "abstract"
+            },
+            {
+              "type": "runner-rug",
+              "at": [
+                3.7,
+                -0.85
+              ],
+              "rot": 0,
+              "w": 1.6,
+              "d": 1.1,
+              "color": "#8c9aa8"
+            },
+            {
+              "type": "snake-plant",
+              "at": [
+                2.78,
+                -1.2
+              ],
+              "rot": 0,
+              "h": 0.9
+            },
+            {
+              "type": "laundry-basket",
+              "at": [
+                4.7,
+                -0.05
+              ],
+              "rot": 0,
+              "color": "#eef0e9"
+            },
+            {
+              "type": "low-wall",
+              "at": [
+                3.9,
+                0.8
+              ],
+              "rot": 0,
+              "w": 2.1,
+              "h": 0.9
+            },
+            {
+              "type": "ceiling-light",
+              "at": [
+                3.7,
+                -1.5
+              ],
+              "rot": 0,
+              "y": 2.6,
+              "color": "#eef0e9"
+            }
+          ]
+        },
+        {
+          "no": "05",
+          "name": "Hall",
+          "bounds": {
+            "x": 0.8,
+            "z": -1.5,
+            "w": 1.8,
+            "d": 2.4
+          },
+          "items": [
+            {
+              "type": "console-table",
+              "at": [
+                1.6,
+                -1.325
+              ],
+              "rot": 180,
+              "w": 1,
+              "color": "#c9a06a"
+            },
+            {
+              "type": "round-mirror",
+              "at": [
+                1.6,
+                -1.48
+              ],
+              "rot": 180,
+              "r": 0.3,
+              "y": 1.6
+            },
+            {
+              "type": "vase",
+              "at": [
+                1.3,
+                -1.32
+              ],
+              "rot": 0,
+              "y": 0.88,
+              "h": 0.45
+            },
+            {
+              "type": "runner-rug",
+              "at": [
+                1.7,
+                0
+              ],
+              "rot": 0,
+              "w": 0.9,
+              "d": 1.8,
+              "color": "#c2a89c"
+            },
+            {
+              "type": "snake-plant",
+              "at": [
+                1.05,
+                0.5
+              ],
+              "rot": 0,
+              "h": 0.95
+            },
+            {
+              "type": "coat-rack",
+              "at": [
+                2.35,
+                0.55
+              ],
+              "rot": 0,
+              "color": "#4a3526"
+            },
+            {
+              "type": "ceiling-light",
+              "at": [
+                1.7,
+                -0.3
+              ],
+              "rot": 0,
+              "y": 2.6,
+              "color": "#eef0e9"
+            }
+          ]
+        },
+        {
+          "no": "06",
+          "name": "Living",
+          "bounds": {
+            "x": -5,
+            "z": -0.9,
+            "w": 5.8,
+            "d": 4.4
+          },
+          "items": [
+            {
+              "type": "loveseat",
+              "at": [
+                -4.5,
+                0.6
+              ],
+              "rot": 90,
+              "w": 2,
+              "d": 0.9,
+              "color": "#ddd5c4"
+            },
+            {
+              "type": "runner-rug",
+              "at": [
+                -3.1,
+                0.6
+              ],
+              "rot": 0,
+              "w": 2.6,
+              "d": 2.4,
+              "color": "#c2a89c"
+            },
+            {
+              "type": "coffee-table",
+              "at": [
+                -3.3,
+                0.6
+              ],
+              "rot": 0,
+              "w": 1.1,
+              "d": 0.55,
+              "color": "#c9a06a"
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -2,
+                0.6
+              ],
+              "rot": 270,
+              "color": "#cfc6b4"
+            },
+            {
+              "type": "monstera",
+              "at": [
+                -3.5,
+                -0.3
+              ],
+              "rot": 0
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                -4.7,
+                -0.65
+              ],
+              "rot": 0,
+              "h": 1.65,
+              "color": "#eef0e9"
+            },
+            {
+              "type": "low-wall",
+              "at": [
+                0.7,
+                1.2
+              ],
+              "rot": 90,
+              "w": 1.4,
+              "h": 0.9
+            },
+            {
+              "type": "fireplace",
+              "at": [
+                0.42,
+                1.2
+              ],
+              "rot": 90
+            },
+            {
+              "type": "pampas-vase",
+              "at": [
+                0.45,
+                -0.35
+              ],
+              "rot": 0,
+              "h": 1.2
+            },
+            {
+              "type": "pampas-vase",
+              "at": [
+                -0.68,
+                3.25
+              ],
+              "rot": 0,
+              "h": 1.25
+            },
+            {
+              "type": "storage-bench",
+              "at": [
+                -1.35,
+                3.3
+              ],
+              "rot": 180,
+              "w": 1,
+              "color": "#6e8ebb"
+            },
+            {
+              "type": "curtains",
+              "at": [
+                -3,
+                3.435
+              ],
+              "rot": 180,
+              "w": 1.8,
+              "h": 2.2,
+              "color": "#e7dfc9"
+            },
+            {
+              "type": "wall-art",
+              "at": [
+                -4.97,
+                1.9
+              ],
+              "rot": 90,
+              "w": 0.9,
+              "h": 0.65,
+              "y": 1.6,
+              "color": "#6e8ebb",
+              "motif": "botanical"
+            },
+            {
+              "type": "pendant-lamp",
+              "at": [
+                -3.1,
+                0.6
+              ],
+              "rot": 0,
+              "y": 2.5,
+              "drop": 0.5,
+              "color": "#eef0e9"
+            }
+          ]
+        },
+        {
+          "no": "07",
+          "name": "Kids Nook",
+          "bounds": {
+            "x": 0.8,
+            "z": 0.9,
+            "w": 4.2,
+            "d": 2.6
+          },
+          "items": [
+            {
+              "type": "single-bed",
+              "at": [
+                4.45,
+                1.95
+              ],
+              "rot": 0,
+              "w": 1,
+              "d": 2,
+              "color": "#6e8ebb"
+            },
+            {
+              "type": "teddy-bear",
+              "at": [
+                4.2,
+                1.3
+              ],
+              "rot": 0,
+              "y": 0.62
+            },
+            {
+              "type": "nightstand",
+              "at": [
+                3.62,
+                1.2
+              ],
+              "rot": 0,
+              "color": "#4a3526"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                3.62,
+                1.2
+              ],
+              "rot": 0,
+              "y": 0.62,
+              "color": "#e0a898"
+            },
+            {
+              "type": "chest",
+              "at": [
+                3.34,
+                2.3
+              ],
+              "rot": 90,
+              "w": 1.03,
+              "d": 0.48,
+              "color": "#4a3526"
+            },
+            {
+              "type": "toy-box",
+              "at": [
+                3.55,
+                3.15
+              ],
+              "rot": 180,
+              "w": 0.8,
+              "d": 0.45,
+              "color": "#6e8ebb",
+              "open": false
+            },
+            {
+              "type": "snake-plant",
+              "at": [
+                3.05,
+                1.15
+              ],
+              "rot": 0,
+              "h": 0.95
+            },
+            {
+              "type": "runner-rug",
+              "at": [
+                3.5,
+                2.4
+              ],
+              "rot": 0,
+              "w": 1,
+              "d": 1.6,
+              "color": "#8c9aa8"
+            },
+            {
+              "type": "wall-hanging",
+              "at": [
+                4.98,
+                1.9
+              ],
+              "rot": 270,
+              "w": 0.6,
+              "y": 1.5,
+              "color": "#6e8ebb"
+            },
+            {
+              "type": "curtains",
+              "at": [
+                3.1,
+                3.435
+              ],
+              "rot": 180,
+              "w": 1.4,
+              "h": 2.2,
+              "color": "#e7dfc9"
+            },
+            {
+              "type": "ceiling-light",
+              "at": [
+                3.4,
+                2.2
+              ],
+              "rot": 0,
+              "y": 2.6,
+              "color": "#eef0e9"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -5.4,
+        "z": -3.9,
+        "w": 10.8,
+        "d": 7.8
+      },
+      "y": 2.7,
+      "type": "gable",
+      "ridge": "x",
+      "pitch": 45,
+      "overhang": 0.4,
+      "color": "#3b2a1e",
+      "dormers": [
+        {
+          "at": -2.2,
+          "w": 1.4
+        },
+        {
+          "at": 2.2,
+          "w": 1.4
+        }
+      ],
+      "chimney": {
+        "at": [
+          4.6,
+          -1.5
+        ]
+      }
+    },
+    {
+      "over": {
+        "x": -1.4,
+        "z": 3.5,
+        "w": 2.8,
+        "d": 1.8
+      },
+      "y": 2.5,
+      "type": "gable",
+      "ridge": "z",
+      "pitch": 35,
+      "overhang": 0.2,
+      "color": "#3b2a1e"
+    }
+  ],
+  "site": [
+    {
+      "type": "porch",
+      "at": [
+        0,
+        4.3
+      ],
+      "w": 2.6,
+      "d": 1.6
+    },
+    {
+      "type": "steps",
+      "at": [
+        0,
+        5.5
+      ],
+      "rot": 0
+    },
+    {
+      "type": "patio",
+      "at": [
+        0,
+        8.8
+      ],
+      "w": 1.4,
+      "d": 5.5
+    },
+    {
+      "type": "garden-beds",
+      "at": [
+        -3.3,
+        5
+      ],
+      "w": 3.2,
+      "d": 1.4
+    },
+    {
+      "type": "garden-beds",
+      "at": [
+        3.3,
+        5
+      ],
+      "w": 3.2,
+      "d": 1.4
+    },
+    {
+      "type": "bench",
+      "at": [
+        7.5,
+        9
+      ],
+      "rot": 0
+    },
+    {
+      "type": "wall-low",
+      "from": [
+        -11,
+        11.5
+      ],
+      "to": [
+        11,
+        11.5
+      ],
+      "h": 0.3
+    },
+    {
+      "type": "path",
+      "path": [
+        [
+          0,
+          6.3
+        ],
+        [
+          0,
+          5.3
+        ]
+      ],
+      "w": 1.5,
+      "color": "#b9a893"
+    },
+    {
+      "type": "path",
+      "path": [
+        [
+          1.5,
+          6.9
+        ],
+        [
+          4,
+          6.5
+        ],
+        [
+          6,
+          4.8
+        ],
+        [
+          6.3,
+          1
+        ],
+        [
+          5.8,
+          -2.6
+        ]
+      ],
+      "w": 0.9,
+      "color": "#b9a893"
+    },
+    {
+      "type": "path",
+      "path": [
+        [
+          -1.6,
+          7.3
+        ],
+        [
+          -4.2,
+          7.1
+        ],
+        [
+          -6.3,
+          6
+        ],
+        [
+          -6.5,
+          2.2
+        ]
+      ],
+      "w": 0.9,
+      "color": "#b9a893"
+    },
+    {
+      "type": "bed",
+      "poly": [
+        [
+          -4.7,
+          3.9
+        ],
+        [
+          -1.6,
+          3.9
+        ],
+        [
+          -1.5,
+          5.3
+        ],
+        [
+          -2.7,
+          6.1
+        ],
+        [
+          -4.3,
+          5.9
+        ],
+        [
+          -5,
+          4.8
+        ]
+      ],
+      "plants": "mixed",
+      "density": 1.15
+    },
+    {
+      "type": "bed",
+      "poly": [
+        [
+          1.5,
+          3.9
+        ],
+        [
+          4.7,
+          3.9
+        ],
+        [
+          5,
+          4.9
+        ],
+        [
+          4.3,
+          6
+        ],
+        [
+          2.7,
+          6.1
+        ],
+        [
+          1.5,
+          5.3
+        ]
+      ],
+      "plants": "mixed",
+      "density": 1.15
+    },
+    {
+      "type": "bed",
+      "poly": [
+        [
+          -6.2,
+          -1.2
+        ],
+        [
+          -5.3,
+          -1.5
+        ],
+        [
+          -5.25,
+          2.3
+        ],
+        [
+          -5.8,
+          2.9
+        ],
+        [
+          -6.4,
+          1.4
+        ]
+      ],
+      "plants": "shrubs",
+      "density": 0.85
+    },
+    {
+      "type": "bed",
+      "poly": [
+        [
+          -3.2,
+          -5.7
+        ],
+        [
+          0.4,
+          -6
+        ],
+        [
+          2.6,
+          -5.4
+        ],
+        [
+          2.3,
+          -4.2
+        ],
+        [
+          -1,
+          -4
+        ],
+        [
+          -2.9,
+          -4.4
+        ]
+      ],
+      "plants": "flowers",
+      "density": 1
+    },
+    {
+      "type": "tree",
+      "at": [
+        -6.2,
+        3.4
+      ],
+      "h": 6.6,
+      "species": "conical"
+    },
+    {
+      "type": "tree",
+      "at": [
+        6.2,
+        3.2
+      ],
+      "h": 7,
+      "species": "conical"
+    },
+    {
+      "type": "tree",
+      "at": [
+        6.5,
+        -0.4
+      ],
+      "h": 5.4,
+      "species": "conical"
+    },
+    {
+      "type": "tree",
+      "at": [
+        -8.4,
+        -6.2
+      ],
+      "h": 7.4,
+      "species": "round"
+    },
+    {
+      "type": "tree",
+      "at": [
+        8,
+        -5.2
+      ],
+      "h": 8,
+      "species": "oval"
+    },
+    {
+      "type": "tree",
+      "at": [
+        8.6,
+        6.2
+      ],
+      "h": 5.8,
+      "species": "layered",
+      "color": "#9d86c2"
+    },
+    {
+      "type": "tree",
+      "at": [
+        -9.2,
+        7.6
+      ],
+      "h": 5.2,
+      "species": "birch"
+    },
+    {
+      "type": "hedge",
+      "path": [
+        [
+          -10.2,
+          -9.2
+        ],
+        [
+          -10.2,
+          2
+        ],
+        [
+          -9.7,
+          7.2
+        ]
+      ],
+      "h": 1.2,
+      "w": 0.7
+    },
+    {
+      "type": "hedge",
+      "path": [
+        [
+          10.2,
+          -9.2
+        ],
+        [
+          10.2,
+          3
+        ],
+        [
+          9.8,
+          8.2
+        ]
+      ],
+      "h": 1.2,
+      "w": 0.7
+    },
+    {
+      "type": "hedge",
+      "path": [
+        [
+          -9.4,
+          -10.6
+        ],
+        [
+          0,
+          -10.9
+        ],
+        [
+          9.4,
+          -10.6
+        ]
+      ],
+      "h": 1.4,
+      "w": 0.8
+    },
+    {
+      "type": "flowers",
+      "at": [
+        -2.1,
+        7.8
+      ],
+      "r": 0.85,
+      "color": "#e8a33d"
+    },
+    {
+      "type": "flowers",
+      "at": [
+        1.9,
+        8.6
+      ],
+      "r": 0.7,
+      "color": "#f0ece0"
+    },
+    {
+      "type": "flowers",
+      "at": [
+        -5.6,
+        6.8
+      ],
+      "r": 0.6,
+      "color": "#e8a33d"
+    },
+    {
+      "type": "shrub",
+      "at": [
+        3.4,
+        8.2
+      ],
+      "r": 0.7
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -3.6,
+        9.4
+      ],
+      "r": 0.6
+    },
+    {
+      "type": "rock",
+      "at": [
+        -7.6,
+        1
+      ],
+      "r": 0.5
+    },
+    {
+      "type": "rock",
+      "at": [
+        7.3,
+        4.6
+      ],
+      "r": 0.4
+    },
+    {
+      "type": "planter",
+      "at": [
+        -1.45,
+        3.9
+      ]
+    },
+    {
+      "type": "planter",
+      "at": [
+        1.45,
+        3.9
+      ]
+    },
+    {
+      "type": "scatter",
+      "at": [
+        7,
+        -7.8
+      ],
+      "r": 3,
+      "n": 9,
+      "species": [
+        "shrub",
+        "rock",
+        "flowers"
+      ]
+    },
+    {
+      "type": "grove",
+      "at": [
+        -7.6,
+        -8.6
+      ],
+      "r": 2.6,
+      "n": 5,
+      "h": 5,
+      "species": "conical"
+    }
+  ],
+  "hero": {
+    "level": "l1",
+    "at": [
+      1.8,
+      2.9
+    ],
+    "rot": 180,
+    "device": "chalk",
+    "pose": "upright",
+    "surface": "shelf"
+  },
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": 0
+  },
+  "shots": [
+    {
+      "id": "door-to-core",
+      "type": "door-to-core",
+      "duration": 12
+    },
+    {
+      "id": "orbit",
+      "type": "orbit",
+      "duration": 10
+    }
+  ]
+}

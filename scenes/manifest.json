@@ -1,0 +1,482 @@
+{
+  "houses": [
+    {
+      "id": "house-asymmetry",
+      "specId": "asymmetry",
+      "title": "BG Modern Asymmetry House",
+      "author": "SimsWithNora",
+      "style": "Three-storey stacked modern on a slope: teal-brick garage plinth, two cream-siding living levels stepping back under dark timber flat roofs, terraced planters and a side pool terrace",
+      "emoji": "\ud83e\uddf1",
+      "svgLandscape": "scenes/svg/house-asymmetry.svg",
+      "svgPortrait": "scenes/svg/house-asymmetry.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-asymmetry.json",
+      "floorplans": [
+        "scenes/floorplans/fp-asymmetry-l1.svg",
+        "scenes/floorplans/fp-asymmetry-l2.svg",
+        "scenes/floorplans/fp-asymmetry-l3.svg"
+      ],
+      "creator3d": "room-creator.html?house=asymmetry"
+    },
+    {
+      "id": "house-aurora",
+      "specId": "aurora",
+      "title": "Base Game Aurora",
+      "author": "Ornilia",
+      "style": "Two-storey white modern villa, stacked flat roofs, glass balconies, front plunge pool and paved forecourt",
+      "emoji": "\ud83c\udfe2",
+      "svgLandscape": "scenes/svg/house-aurora.svg",
+      "svgPortrait": "scenes/svg/house-aurora.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-aurora.json",
+      "floorplans": [
+        "scenes/floorplans/fp-aurora-l1.svg",
+        "scenes/floorplans/fp-aurora-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=aurora"
+    },
+    {
+      "id": "house-bgfamily",
+      "specId": "bgfamily",
+      "title": "Base Game House BG Family",
+      "author": "Turbogoku",
+      "style": "Two-storey white siding and grey stone family home, steep near-black gables with a big front cross-gable and balcony, single-storey glazed kitchen and living wings, pergola carport, white picket fence, rear pool patio",
+      "emoji": "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67",
+      "svgLandscape": "scenes/svg/house-bgfamily.svg",
+      "svgPortrait": "scenes/svg/house-bgfamily.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-bgfamily.json",
+      "floorplans": [
+        "scenes/floorplans/fp-bgfamily-l1.svg",
+        "scenes/floorplans/fp-bgfamily-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=bgfamily"
+    },
+    {
+      "id": "house-bghouse-olcia",
+      "specId": "bghouse-olcia",
+      "title": "Base Game House",
+      "author": "olciaxxx_05",
+      "style": "Two-storey pale-grey siding family home over a brick garage level, external stair to the upper-floor front door, twin front gables with a brick chimney, tall cypresses",
+      "emoji": "\ud83c\udfe1",
+      "svgLandscape": "scenes/svg/house-bghouse-olcia.svg",
+      "svgPortrait": "scenes/svg/house-bghouse-olcia.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-bghouse-olcia.json",
+      "floorplans": [
+        "scenes/floorplans/fp-bghouse-olcia-l1.svg",
+        "scenes/floorplans/fp-bghouse-olcia-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=bghouse-olcia"
+    },
+    {
+      "id": "house-cocoon",
+      "specId": "cocoon",
+      "title": "Cocoon Base Game",
+      "author": "Schnuck01",
+      "style": "Two-storey teal siding with white trim and brown shingle gables, front-facing garage wing with rear family room, gabled entry portico, hedged rear sunken patio with pool",
+      "emoji": "\ud83c\udfe0",
+      "svgLandscape": "scenes/svg/house-cocoon.svg",
+      "svgPortrait": "scenes/svg/house-cocoon.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-cocoon.json",
+      "floorplans": [
+        "scenes/floorplans/fp-cocoon-l1.svg",
+        "scenes/floorplans/fp-cocoon-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=cocoon"
+    },
+    {
+      "id": "house-cutestarter",
+      "specId": "cutestarter",
+      "title": "Cute Basegame Starter",
+      "author": "TheClumsySimmer",
+      "style": "Small brick Cape Cod, steep dark shingle gable with two dormers and end chimney, blue shutters and window boxes, gabled front porch with brick steps",
+      "emoji": "\ud83c\udfe0",
+      "svgLandscape": "scenes/svg/house-cutestarter.svg",
+      "svgPortrait": "scenes/svg/house-cutestarter.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-cutestarter.json",
+      "floorplans": [
+        "scenes/floorplans/fp-cutestarter-l1.svg"
+      ],
+      "creator3d": "room-creator.html?house=cutestarter"
+    },
+    {
+      "id": "house-epiphany",
+      "specId": "epiphany",
+      "title": "Epiphany",
+      "author": "Schnuck01",
+      "style": "Two-storey dark-brick modern under a sweeping dark-brown standing-seam gable roof with dormers and chimney, double-height glazed entry slot cutting the roof, attached double garage, gravel forecourt with planting beds",
+      "emoji": "\ud83d\udca1",
+      "svgLandscape": "scenes/svg/house-epiphany.svg",
+      "svgPortrait": "scenes/svg/house-epiphany.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-epiphany.json",
+      "floorplans": [
+        "scenes/floorplans/fp-epiphany-l1.svg",
+        "scenes/floorplans/fp-epiphany-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=epiphany"
+    },
+    {
+      "id": "house-familyhome",
+      "specId": "familyhome",
+      "title": "Base Game Family Home",
+      "author": "TheClumsySimmer",
+      "style": "Two-storey butter-yellow suburban homestead with white colonial trim, side-gabled shingle roof with front cross-gables, single-storey west wing, turned-column front porch and a backyard oasis (lily pond gazebo, greenhouse, raised beds, monkey bars)",
+      "emoji": "\ud83c\udf3b",
+      "svgLandscape": "scenes/svg/house-familyhome.svg",
+      "svgPortrait": "scenes/svg/house-familyhome.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-familyhome.json",
+      "floorplans": [
+        "scenes/floorplans/fp-familyhome-l1.svg",
+        "scenes/floorplans/fp-familyhome-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=familyhome"
+    },
+    {
+      "id": "house-familyhouse-nora",
+      "specId": "familyhouse-nora",
+      "title": "Base Game Family House",
+      "author": "SimsWithNora",
+      "style": "Split-level family home: grey stone piers and dark blue siding under opposing skillion roofs, tuck-under garage with balcony room above, raised colonnade porch with white railing, stepping-stone path through lush cottage planting",
+      "emoji": "\ud83c\udfe1",
+      "svgLandscape": "scenes/svg/house-familyhouse-nora.svg",
+      "svgPortrait": "scenes/svg/house-familyhouse-nora.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-familyhouse-nora.json",
+      "floorplans": [
+        "scenes/floorplans/fp-familyhouse-nora-l1.svg",
+        "scenes/floorplans/fp-familyhouse-nora-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=familyhouse-nora"
+    },
+    {
+      "id": "house-flowerycottage",
+      "specId": "flowerycottage",
+      "title": "Base Game Flowery Cottage",
+      "author": "MadamRedo",
+      "style": "Single-storey sage-green cottage with shingle gable roofs, projecting entry gable, attached garage, flower-roofed sunroom, front creek and rear vegetable garden",
+      "emoji": "\ud83c\udf38",
+      "svgLandscape": "scenes/svg/house-flowerycottage.svg",
+      "svgPortrait": "scenes/svg/house-flowerycottage.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-flowerycottage.json",
+      "floorplans": [
+        "scenes/floorplans/fp-flowerycottage-l1.svg"
+      ],
+      "creator3d": "room-creator.html?house=flowerycottage"
+    },
+    {
+      "id": "house-gardennook",
+      "specId": "gardennook",
+      "title": "Garden Nook (Base Game)",
+      "author": "HoldenRoark",
+      "style": "Single-storey pale-blue cottage, terracotta tile roof with white glass-gabled garden studio, string-lit front pergola over a gravel courtyard of curved planter beds, rear hot-tub terrace",
+      "emoji": "\ud83c\udf37",
+      "svgLandscape": "scenes/svg/house-gardennook.svg",
+      "svgPortrait": "scenes/svg/house-gardennook.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-gardennook.json",
+      "floorplans": [
+        "scenes/floorplans/fp-gardennook-l1.svg"
+      ],
+      "creator3d": "room-creator.html?house=gardennook"
+    },
+    {
+      "id": "house-lakecabin",
+      "specId": "lakecabin",
+      "title": "Base Game Lake Cabin",
+      "author": "MadamRedo",
+      "style": "Two-storey waterfront timber lodge: double-height glass solarium under an A-frame glass gable, flat-roofed loft wing with stone chimney, cantilevered cedar deck with telescope over the lake",
+      "emoji": "\ud83d\udef6",
+      "svgLandscape": "scenes/svg/house-lakecabin.svg",
+      "svgPortrait": "scenes/svg/house-lakecabin.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-lakecabin.json",
+      "floorplans": [
+        "scenes/floorplans/fp-lakecabin-l1.svg",
+        "scenes/floorplans/fp-lakecabin-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=lakecabin"
+    },
+    {
+      "id": "house-mediterranean",
+      "specId": "mediterranean",
+      "title": "Base Game Mediterranean",
+      "author": "TheClumsySimmer",
+      "style": "Symmetrical blue-grey stucco villa: two-storey centre with balconies, single-storey wings under terracotta hip roofs, arched entry, walled cypress forecourt with fountain, rear pool terrace with pergola",
+      "emoji": "\ud83c\udf34",
+      "svgLandscape": "scenes/svg/house-mediterranean.svg",
+      "svgPortrait": "scenes/svg/house-mediterranean.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-mediterranean.json",
+      "floorplans": [
+        "scenes/floorplans/fp-mediterranean-l1.svg",
+        "scenes/floorplans/fp-mediterranean-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=mediterranean"
+    },
+    {
+      "id": "house-mesamariposa",
+      "specId": "mesamariposa",
+      "title": "Villa Mesa Mariposa",
+      "author": "Schnucko",
+      "style": "Two-storey desert-modern adobe villa: staggered dark shed roofs, glass conservatory salon wing, walled courtyard with turtle-mosaic pool and fire pit lounge, saguaros and palms",
+      "emoji": "\ud83c\udf35",
+      "svgLandscape": "scenes/svg/house-mesamariposa.svg",
+      "svgPortrait": "scenes/svg/house-mesamariposa.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-mesamariposa.json",
+      "floorplans": [
+        "scenes/floorplans/fp-mesamariposa-l1.svg",
+        "scenes/floorplans/fp-mesamariposa-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=mesamariposa"
+    },
+    {
+      "id": "house-mirage",
+      "specId": "mirage",
+      "title": "The Mirage",
+      "author": "Schnuck01",
+      "style": "Three-tier hillside modern in dark timber and stacked stone, flat roofs stepping down the slope, glass-fronted upper floors, koi pond with boulders and palms",
+      "emoji": "\ud83c\udf34",
+      "svgLandscape": "scenes/svg/house-mirage.svg",
+      "svgPortrait": "scenes/svg/house-mirage.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-mirage.json",
+      "floorplans": [
+        "scenes/floorplans/fp-mirage-l1.svg",
+        "scenes/floorplans/fp-mirage-l2.svg",
+        "scenes/floorplans/fp-mirage-l3.svg"
+      ],
+      "creator3d": "room-creator.html?house=mirage"
+    },
+    {
+      "id": "house-modernhome-nora",
+      "specId": "modernhome-nora",
+      "title": "Base Game Modern Home",
+      "author": "SimsWithNora",
+      "style": "Two-storey flat-roof modern in white and black, cantilevered white upper box over a front carport, full-width glass balcony, taller black stair tower, rear pool with pergola",
+      "emoji": "\ud83c\udf06",
+      "svgLandscape": "scenes/svg/house-modernhome-nora.svg",
+      "svgPortrait": "scenes/svg/house-modernhome-nora.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-modernhome-nora.json",
+      "floorplans": [
+        "scenes/floorplans/fp-modernhome-nora-l1.svg",
+        "scenes/floorplans/fp-modernhome-nora-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=modernhome-nora"
+    },
+    {
+      "id": "house-modernhouse-nora",
+      "specId": "modernhouse-nora",
+      "title": "Base Game Modern House",
+      "author": "SimsWithNora",
+      "style": "Low modern pavilion with opposing slanted shed roofs, timber-column entry colonnade, front reflecting basin, upper bedroom box with balcony, rear pool and Japanese courtyard",
+      "emoji": "\ud83c\udf8b",
+      "svgLandscape": "scenes/svg/house-modernhouse-nora.svg",
+      "svgPortrait": "scenes/svg/house-modernhouse-nora.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-modernhouse-nora.json",
+      "floorplans": [
+        "scenes/floorplans/fp-modernhouse-nora-l1.svg",
+        "scenes/floorplans/fp-modernhouse-nora-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=modernhouse-nora"
+    },
+    {
+      "id": "house-modernhouse1",
+      "specId": "modernhouse1",
+      "title": "Base Game Modern House 1",
+      "author": "SimsWithNora",
+      "style": "Two-storey white-and-dark-timber modern: flat-roofed cantilevered upper studio box over a mid-century living room, tall white A-frame gable fin over the west suite, reflection pond with timber bridge, driveway and sports car",
+      "emoji": "\ud83c\udfe1",
+      "svgLandscape": "scenes/svg/house-modernhouse1.svg",
+      "svgPortrait": "scenes/svg/house-modernhouse1.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-modernhouse1.json",
+      "floorplans": [
+        "scenes/floorplans/fp-modernhouse1-l1.svg",
+        "scenes/floorplans/fp-modernhouse1-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=modernhouse1"
+    },
+    {
+      "id": "house-newcrest",
+      "specId": "newcrest",
+      "title": "Base Game Newcrest House",
+      "author": "xxSarina_27xx",
+      "style": "Tall narrow steep-gable house, white siding with stone and dark timber trim, split-level front terrace with steps, west lean-to study",
+      "emoji": "\ud83c\udfe0",
+      "svgLandscape": "scenes/svg/house-newcrest.svg",
+      "svgPortrait": "scenes/svg/house-newcrest.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-newcrest.json",
+      "floorplans": [
+        "scenes/floorplans/fp-newcrest-l1.svg",
+        "scenes/floorplans/fp-newcrest-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=newcrest"
+    },
+    {
+      "id": "house-neweco",
+      "specId": "neweco",
+      "title": "The New Eco Base Game",
+      "author": "plnch25",
+      "style": "Two-storey eco-modern: teal corrugated panels and dark timber over grey-blue cladding, brown shingle gable with glass roof sections, timber-framed window walls, single-storey glass sunroom, attached garage and paver drive, raised timber entry deck",
+      "emoji": "\ud83c\udf3f",
+      "svgLandscape": "scenes/svg/house-neweco.svg",
+      "svgPortrait": "scenes/svg/house-neweco.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-neweco.json",
+      "floorplans": [
+        "scenes/floorplans/fp-neweco-l1.svg",
+        "scenes/floorplans/fp-neweco-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=neweco"
+    },
+    {
+      "id": "house-onestory",
+      "specId": "onestory",
+      "title": "Base Game One-Story House",
+      "author": "SimsWithNora",
+      "style": "Storey-and-a-half light-blue cottage, terracotta tile gable roofs with cross gable, dormer and stone chimney, timber-clad arched entry porch, front bay window, rear deck and oval pool",
+      "emoji": "\ud83c\udfe1",
+      "svgLandscape": "scenes/svg/house-onestory.svg",
+      "svgPortrait": "scenes/svg/house-onestory.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-onestory.json",
+      "floorplans": [
+        "scenes/floorplans/fp-onestory-l1.svg",
+        "scenes/floorplans/fp-onestory-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=onestory"
+    },
+    {
+      "id": "house-palms",
+      "specId": "palms",
+      "title": "The Palms Base Game Fix",
+      "author": "Schnuck01",
+      "style": "Two-storey stone and dark-timber modern with shed roofs and double-height glazing, rear timber deck with pool, hot tub and gazebo, palms and cypress at the front, house number 380",
+      "emoji": "\ud83c\udf34",
+      "svgLandscape": "scenes/svg/house-palms.svg",
+      "svgPortrait": "scenes/svg/house-palms.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-palms.json",
+      "floorplans": [
+        "scenes/floorplans/fp-palms-l1.svg",
+        "scenes/floorplans/fp-palms-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=palms"
+    },
+    {
+      "id": "house-palnknoll",
+      "specId": "palnknoll",
+      "title": "Paln Knoll of Ermosa",
+      "author": "Schnuck01",
+      "style": "Two-storey white modern on a knoll: flat roofs with dark fascias, two-storey glazing at the entry, attached sloping-roof garage with gravel drive, front steps to a raised entry, east terrace and stepped reflecting ponds among palms",
+      "emoji": "\ud83c\udfdd\ufe0f",
+      "svgLandscape": "scenes/svg/house-palnknoll.svg",
+      "svgPortrait": "scenes/svg/house-palnknoll.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-palnknoll.json",
+      "floorplans": [
+        "scenes/floorplans/fp-palnknoll-l1.svg",
+        "scenes/floorplans/fp-palnknoll-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=palnknoll"
+    },
+    {
+      "id": "house-payorote",
+      "specId": "payorote",
+      "title": "Payorote (Base Game)",
+      "author": "plnch25",
+      "style": "Dark stained timber treehouse: two flat-roofed pods raised on a stilted deck around a great tree, ladder down to a wildflower garden, hanging paper lanterns",
+      "emoji": "\ud83c\udf33",
+      "svgLandscape": "scenes/svg/house-payorote.svg",
+      "svgPortrait": "scenes/svg/house-payorote.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-payorote.json",
+      "floorplans": [
+        "scenes/floorplans/fp-payorote-l1.svg",
+        "scenes/floorplans/fp-payorote-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=payorote"
+    },
+    {
+      "id": "house-riverbend",
+      "specId": "riverbend",
+      "title": "Riverbend Drive",
+      "author": "Schnuck01",
+      "style": "Two-storey brick-and-stone craftsman, steep dark shingle gables with front-facing dormers, bay window, columned entry porch, two-car garage and driveway, willow pond",
+      "emoji": "\ud83c\udfd8\ufe0f",
+      "svgLandscape": "scenes/svg/house-riverbend.svg",
+      "svgPortrait": "scenes/svg/house-riverbend.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-riverbend.json",
+      "floorplans": [
+        "scenes/floorplans/fp-riverbend-l1.svg",
+        "scenes/floorplans/fp-riverbend-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=riverbend"
+    },
+    {
+      "id": "house-seraphine",
+      "specId": "seraphine",
+      "title": "Base Game Seraphine",
+      "author": "Ornilia",
+      "style": "Two-storey neoclassical colonial manor: slate weatherboard with white trim, steep side-gabled shingle roof with dormers and cross-gables, Doric colonnade porch, imperial staircase, rear pool terrace and front driveway",
+      "emoji": "\ud83c\udff0",
+      "svgLandscape": "scenes/svg/house-seraphine.svg",
+      "svgPortrait": "scenes/svg/house-seraphine.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-seraphine.json",
+      "floorplans": [
+        "scenes/floorplans/fp-seraphine-l1.svg",
+        "scenes/floorplans/fp-seraphine-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=seraphine"
+    },
+    {
+      "id": "house-starter18k",
+      "specId": "starter18k",
+      "title": "Base Game Starter 18k 2/1",
+      "author": "Ornilia",
+      "style": "Single-storey grey siding cottage, dark gable roof with two dormers and a stone chimney, twin glass sunrooms flanking the front door, fenced rear patio yard",
+      "emoji": "\ud83c\udfe1",
+      "svgLandscape": "scenes/svg/house-starter18k.svg",
+      "svgPortrait": "scenes/svg/house-starter18k.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-starter18k.json",
+      "floorplans": [
+        "scenes/floorplans/fp-starter18k-l1.svg"
+      ],
+      "creator3d": "room-creator.html?house=starter18k"
+    },
+    {
+      "id": "house-sunnyhome",
+      "specId": "sunnyhome",
+      "title": "Base Game Sunny Home",
+      "author": "MadamRedo",
+      "style": "Twin glass A-frame gables in dark brick and black steel, double-height glazed entry gable with brick chimney, timber-clad bedroom wing, rear paver terrace with round plunge pool",
+      "emoji": "\u2600\ufe0f",
+      "svgLandscape": "scenes/svg/house-sunnyhome.svg",
+      "svgPortrait": "scenes/svg/house-sunnyhome.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-sunnyhome.json",
+      "floorplans": [
+        "scenes/floorplans/fp-sunnyhome-l1.svg",
+        "scenes/floorplans/fp-sunnyhome-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=sunnyhome"
+    },
+    {
+      "id": "house-valleyview",
+      "specId": "valleyview",
+      "title": "Valley-View Villa",
+      "author": "Axiisims",
+      "style": "White multi-tier modern villa: cantilevered upper suite with glass-railed roof terrace, single-storey glass lounge wing, tiered pool with curtained cabana, sunken turf pitch and exterior floating stair",
+      "emoji": "\u26bd",
+      "svgLandscape": "scenes/svg/house-valleyview.svg",
+      "svgPortrait": "scenes/svg/house-valleyview.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-valleyview.json",
+      "floorplans": [
+        "scenes/floorplans/fp-valleyview-l1.svg",
+        "scenes/floorplans/fp-valleyview-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=valleyview"
+    },
+    {
+      "id": "house-vanilla",
+      "specId": "vanilla",
+      "title": "Base Game Vanilla House",
+      "author": "MadamRedo",
+      "style": "White brick modern: tall double-height gable block beside a flat-roofed wing, low glazed living wing with chimney, plunge-pool deck, pergolas and lush terraced garden",
+      "emoji": "\ud83c\udf3f",
+      "svgLandscape": "scenes/svg/house-vanilla.svg",
+      "svgPortrait": "scenes/svg/house-vanilla.mobile.svg",
+      "lottie": "scenes/lottie-scenes/house-vanilla.json",
+      "floorplans": [
+        "scenes/floorplans/fp-vanilla-l1.svg",
+        "scenes/floorplans/fp-vanilla-l2.svg"
+      ],
+      "creator3d": "room-creator.html?house=vanilla"
+    }
+  ]
+}
