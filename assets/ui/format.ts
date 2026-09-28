@@ -13,7 +13,7 @@ export const SHOT_HINTS: Record<string, string> = {
   'walkthrough': 'Through each room, ending at the Companion Core',
   'core-orbit': 'Close round the Companion Core',
 };
-export const shotLabel = (type: string, id = type): string => SHOT_LABELS[id] || SHOT_LABELS[type] || id.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
+export const shotLabel = (type: string, id = type): string => SHOT_LABELS[id] || id.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
 
 /** A still's pixel size (plan §6 P0 2): `res` is the short side (1080, 1440, 2160) and the long side is capped at 3840,
  *  so 4K is 3840 × 2160 landscape and 2160 × 3840 portrait. Both sides even (video and PNG alike). */

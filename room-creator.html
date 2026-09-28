@@ -403,8 +403,10 @@
     .qa-badge {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       height: 32px;
+      min-width: var(--rc-hit);
       padding: 0 10px;
       background: transparent;
       border: 1px solid var(--rc-hairline-strong);
@@ -1319,6 +1321,7 @@
       .anim-play-btn { width: 44px; height: 44px; }
       .shot-select, .select-frame, .shot-select select.select-ctrl, .select-frame select.select-ctrl { height: 44px; }
       .rc-tl-mark { width: 24px; height: 24px; margin-left: -12px; }
+      .rc-tl-mark::before { content: ""; position: absolute; inset: -10px; }   /* a 44 px hit area round a 24 px marker */
       .rc-tl-marks { height: 24px; }
       .rc-tl-head { top: 24px; }
       .swatch { width: 36px; height: 36px; }
@@ -1864,9 +1867,10 @@
 
 
     // Wall Cutaway Mode Event Handlers
-    document.getElementById('btn-wall-cutaway')?.addEventListener('click', () => setGlobalWallMode('cutaway'));
-    document.getElementById('btn-wall-down')?.addEventListener('click', () => setGlobalWallMode('down'));
-    document.getElementById('btn-wall-up')?.addEventListener('click', () => setGlobalWallMode('up'));
+    // (setWallModeUi: the editor takes the camera back from a shot first, and Plan view keeps its roofs off)
+    document.getElementById('btn-wall-cutaway')?.addEventListener('click', () => setWallModeUi('cutaway'));
+    document.getElementById('btn-wall-down')?.addEventListener('click', () => setWallModeUi('down'));
+    document.getElementById('btn-wall-up')?.addEventListener('click', () => setWallModeUi('up'));
 
     // Floor Layer Visibility: All, then one button a storey, made from the home's levels when it builds (buildFloorButtons)
     document.getElementById('btn-layer-all')?.addEventListener('click', () => setGlobalLayerVisibility('all'));
@@ -6254,6 +6258,7 @@
         if (!selectedObject || before === null) return;
         const mats = selectionMaterials(selectedObject).filter(pred), was = before, v = parseFloat(e.target.value), obj = selectedObject;
         before = null;
+        if (was.every(x => x === v)) return;   // nothing changed: not a step to undo
         undo.push({ label, undo: () => { mats.forEach((m, i) => { m[key] = was[i]; }); if (selectedObject === obj) syncMaterialControls(obj); }, redo: () => { mats.forEach(m => { m[key] = v; }); if (selectedObject === obj) syncMaterialControls(obj); } });
       });
     }
@@ -7184,9 +7189,12 @@
       });
     }
 
-    // ---- the checks (plan §6 P0 3): scene QA and every shot's QA, once a home is built -----------------------------
+    // ---- the checks (plan §6 P0 3): scene QA and the QA of every shot the gate checks, once a home is built ---------
     // Run after the first paint, in idle time, one shot at a time (each yields), so the page stays live. Skipped in a
     // page a harness drives (navigator.webdriver), which runs the same gates itself — unless the URL says ?qa=1.
+    // The shots are check-house's (GATE_SHOTS): the walkthrough is not in the gate (it can walk through a partition:
+    // plan Completeness B, S5's to route or retire), so its card says so instead of counting errors nobody gates on.
+    const GATE_SHOTS = ['door-to-core', 'orbit', 'hero-reveal', 'core-orbit'];
     const qaBadge = document.getElementById('btn-qa'), qaList = document.getElementById('qa-list');
     let qaReport = null, qaRun = 0;
     const qaWanted = () => !VIEW_MODE && (!navigator.webdriver || urlParams.get('qa') === '1');
@@ -7199,7 +7207,7 @@
       await idle();
       if (run !== qaRun || house !== activeHouse || isAnimPlaying || recording) return;
       try { report.scene = window.__houseSceneQA(); } catch (e) { report.scene = { errors: [{ code: 'qa-failed', message: String(e.message || e) }], warnings: [] }; }
-      for (const s of Object.keys(house.shots).filter(s => HOUSE_SHOT_TYPES.includes(s))) {
+      for (const s of Object.keys(house.shots).filter(s => GATE_SHOTS.includes(s))) {
         await idle();
         if (run !== qaRun || house !== activeHouse) return;
         if (isAnimPlaying || recording) { scheduleQA(); return; }   // a shot is playing: check once it stops
@@ -7260,7 +7268,8 @@
         b.type = 'button'; b.className = 'shot-card'; b.setAttribute('aria-pressed', String(splineSelect.value === key));
         b.innerHTML = `<span class="shot-card-name">${esc(shotTitle(key))}</span><span class="shot-card-dur">${(p.duration || animDuration).toFixed(1)} s</span>`
           + (SHOT_HINTS[type] ? `<span class="shot-card-hint">${esc(SHOT_HINTS[type])}</span>` : '')
-          + (qaReport && key.startsWith('house:') && HOUSE_SHOT_TYPES.includes(id) ? `<span class="shot-card-qa">${e ? `<span class="qa-n-err">${icon('alert')} ${e}</span>` : ''}${w ? `<span class="qa-n-warn">${icon('info')} ${w}</span>` : ''}${!e && !w ? `<span>${icon('check')} Clear</span>` : ''}</span>` : '');
+          + (qaReport && key.startsWith('house:') && GATE_SHOTS.includes(id) ? `<span class="shot-card-qa">${e ? `<span class="qa-n-err">${icon('alert')} ${e}</span>` : ''}${w ? `<span class="qa-n-warn">${icon('info')} ${w}</span>` : ''}${!e && !w ? `<span>${icon('check')} Clear</span>` : ''}</span>` : '')
+          + (qaReport && key.startsWith('house:') && !GATE_SHOTS.includes(id) ? '<span class="shot-card-qa"><span>Not checked by the gate</span></span>' : '');
         b.addEventListener('click', () => jumpTo(key, 0));
         return b;
       }));
@@ -7323,6 +7332,11 @@
       updateHUD();
     }
     function hidePlanRoofs() { for (const r of trackedRoofs) r.visible = false; for (const c of trackedCeilings) c.obj.visible = false; }
+    function setWallModeUi(mode) {
+      takeCameraBack();
+      setGlobalWallMode(mode);
+      if (planView) hidePlanRoofs();
+    }
 
     btnCamIso.addEventListener('click', () => {
       takeCameraBack();
@@ -7452,21 +7466,14 @@
       if (k === 'Home' || k === 'End') { if (onOtherRange) return; e.preventDefault(); jumpTo(splineSelect.value, k === 'End' ? 1 : 0); return; }
       if (k === 'Escape') { if (shotDressing() || isAnimPlaying) { takeCameraBack(); return; } selectObject(null); closeDrawers(); return; }
       if (k === 'Delete' || k === 'Backspace') { if (selectedObject) { e.preventDefault(); deleteObject(selectedObject); } return; }
-      const key = k.toLowerCase();
-      if (uiMode === 'edit') {
-        if (key === 'w') return setGizmoMode('translate', btnModeTranslate);
-        if (key === 'e') return setGizmoMode('rotate', btnModeRotate);
-        if (key === 'r') return setGizmoMode('scale', btnModeScale);
-      }
-      if (key === 'p') return btnToggleSplinePath.click();
-      if (key === 'm') return document.getElementById('btn-toggle-plan').click();
-      if (key === 'f') return document.getElementById('btn-reset-view').click();
-      if (key === 'g') return document.getElementById('btn-house-picker').click();
-      if (key === 'l') return btnLoopToggle.click();
-      if (key === 'b') return document.getElementById('btn-loop-beat').click();
-      if (key === 'i') return btnCamIso.click();
-      if (key === 'o') return btnCamOrbit.click();
-      if (key === 't') return btnCamTop.click();
+      const acts = {
+        p: () => btnToggleSplinePath.click(), m: () => document.getElementById('btn-toggle-plan').click(), f: () => document.getElementById('btn-reset-view').click(),
+        g: () => document.getElementById('btn-house-picker').click(), l: () => btnLoopToggle.click(), b: () => document.getElementById('btn-loop-beat').click(),
+        i: () => btnCamIso.click(), o: () => btnCamOrbit.click(), t: () => btnCamTop.click(),
+        ...(uiMode === 'edit' ? { w: () => setGizmoMode('translate', btnModeTranslate), e: () => setGizmoMode('rotate', btnModeRotate), r: () => setGizmoMode('scale', btnModeScale) } : {}),
+      };
+      const act = acts[k.toLowerCase()];
+      if (act) { e.preventDefault(); act(); }   // (G opens a search box: the key must not type into it)
     });
 
     // -------------------------------------------------------------
@@ -7572,6 +7579,7 @@
     exportBgSelect.addEventListener('change', () => { updateExportSummary(); queuePreview(); });
     function queuePreview() { clearTimeout(previewTimer); previewTimer = window.setTimeout(generateExportPreview, 60); }
     async function generateExportPreview() {
+      if (!exportDialog.open) return;
       const { w, h } = exportSize(360, exportAspect);
       const blob = await renderStill({ w, h, bg: exportBgSelect.value });
       if (lastPreviewUrl) URL.revokeObjectURL(lastPreviewUrl);
@@ -7595,7 +7603,15 @@
       g.putImageData(img, 0, 0);
       return new Promise((res, rej) => c.toBlob(b => (b ? res(b) : rej(new Error('the PNG could not be encoded'))), 'image/png'));
     }
-    async function renderStill({ w, h, bg }) {
+    // one still at a time: the dialog's preview and the download both borrow the renderer, and each restores what it
+    // found — two at once would restore each other's borrowed state
+    let stillQueue = Promise.resolve();
+    function renderStill(opts) {
+      const run = stillQueue.then(() => renderStillNow(opts));
+      stillQueue = run.catch(() => {});
+      return run;
+    }
+    async function renderStillNow({ w, h, bg }) {
       const cam = activeCamera;
       const prev = {
         ratio: renderer.getPixelRatio(), bg: scene.background, fog: scene.fog, clear: renderer.getClearColor(new THREE.Color()), clearAlpha: renderer.getClearAlpha(),
@@ -8784,25 +8800,22 @@
 
     initialLoad.then(() => {
       syncFlythroughWithScene(initialPreset);
+      // ?flythrough=1 plays the shot at once; ?t= opens paused there (the player reads ?shot= ?t= ?tod= ?play= itself).
+      // Play does what "Fly through the door" did (Completeness J: the two overlapped): the shot's camera, from its start.
+      if (!VIEW_MODE && (urlParams.get('flythrough') === '1' || urlParams.has('t'))) {
+        selectObject(null);
+        if (activeCamera !== persCamera) setActiveCamera(persCamera, btnCamOrbit);
+        const fly = urlParams.get('flythrough') === '1';
+        animProgress = fly ? 0 : Math.max(0, Math.min(1, parseFloat(urlParams.get('t')) || 0));
+        applySplineFrame(animProgress);
+        if (fly) play(); else writeTimeSoon();
+      }
       if (urlParams.get('autorecord') === '1') {
         if (urlParams.get('res') && videoResSelect) videoResSelect.value = urlParams.get('res');
         if (urlParams.get('aspect') && videoAspectSelect) videoAspectSelect.value = urlParams.get('aspect');
         setTimeout(() => startRecording(), 400);
       }
     });
-
-    // ?flythrough=1 plays the shot at once; ?t= opens paused there (the player reads ?shot= ?t= ?tod= ?play= itself).
-    // Play does what "Fly through the door" did (Completeness J: the two overlapped): the shot's camera, from its start.
-    if (!VIEW_MODE && (urlParams.get('flythrough') === '1' || urlParams.has('t'))) {
-      initialLoad.then(() => setTimeout(() => {
-        selectObject(null);
-        if (activeCamera !== persCamera) setActiveCamera(persCamera, btnCamOrbit);
-        const fly = urlParams.get('flythrough') === '1';
-        animProgress = fly ? 0 : Math.max(0, Math.min(1, parseFloat(urlParams.get('t')) || 0));
-        applySplineFrame(animProgress);
-        if (fly) play();
-      }, 150));
-    }
 
     function easeInOutCubic(x) {
       return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
@@ -9152,7 +9165,9 @@
       const t0 = performance.now();
       try {
         const res = await recordFrames({
-          begin: () => window.__houseRenderBegin({ shot: plan.key, res: plan.res, aspect: plan.aspect, fps: plan.fps }),
+          // the film's size, then one warm-up frame through its composer (SMAA's lookups decode asynchronously: the
+          // first frame through a cold composer is a different picture — the capture scripts do the same)
+          begin: async () => { const info = window.__houseRenderBegin({ shot: plan.key, res: plan.res, aspect: plan.aspect, fps: plan.fps }); await warmComposer(info.w, info.h); return info; },
           frame: i => { window.__houseRenderFrames(i, 1, null); },
           end: () => window.__houseRenderEnd(),
           canvas, gl: renderer.getContext(),
@@ -9187,7 +9202,12 @@
       }
     }
     // for scripts/test-ui.mts: the editor's two outputs, driven as the buttons drive them
-    window.__houseUi = { startRecording, exportStill, setUiMode, openScene, qa: () => ({ report: qaReport, issues: qaIssues() }), runQA, timeline, planInset, pathOverlay, undo };
+    window.__houseUi = {
+      startRecording, exportStill, setUiMode, openScene, runQA, timeline, planInset, pathOverlay, undo,
+      qa: () => ({ report: qaReport, issues: qaIssues() }),
+      select: obj => selectObject(obj), placed: () => placedItems, selected: () => selectedObject,
+      state: () => ({ t: animProgress, playing: isAnimPlaying, shot: activeShot && activeShot.key, duration: animDuration, mode: uiMode, lighting: lightingAim.preset, uiLighting, layer: currentLayerFilter, wallMode: currentWallMode, plan: planView, recording, scene: currentSceneKey }),
+    };
 
     // -------------------------------------------------------------
     // Animation & Render Loop

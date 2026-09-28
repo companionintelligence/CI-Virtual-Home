@@ -15,6 +15,15 @@ export function levelAt(levels: Array<{ id: string; y: number; height: number }>
   for (let i = 0; i < levels.length; i++) if (y >= (levels[i].y || 0) - 0.3) best = i;
   return best;
 }
+/** The storey the camera is on: by height where it stands over the house, the entry's storey while it is outside
+ *  (an establishing shot 8 m up is looking at the front door, not at the loft). */
+export function storeyOf(spec: any, eye: [number, number, number]): number {
+  const levels = (spec && spec.levels) || [];
+  const over = levels.some((lv: any) => (lv.footprint || []).some((r: any) => eye[0] >= r.x - 0.3 && eye[0] <= r.x + r.w + 0.3 && eye[2] >= r.z - 0.3 && eye[2] <= r.z + r.d + 0.3));
+  if (over) return levelAt(levels, eye[1]);
+  const entry = spec && spec.entry && levels.findIndex((lv: any) => lv.id === spec.entry.level);
+  return entry > 0 ? entry : 0;
+}
 
 export function createPlanInset(canvas: HTMLCanvasElement, { onSeek, onLevel }: { onSeek: (t: number) => void; onLevel?: (label: string) => void }) {
   let spec: any = null, anchors: any = null, track: InsetTrack | null = null;
@@ -45,14 +54,14 @@ export function createPlanInset(canvas: HTMLCanvasElement, { onSeek, onLevel }: 
     fit(r.width, r.height);
     const fg = css('--foreground'), muted = css('--muted-foreground'), hair = css('--rc-hairline-strong'), route = css('--chart-2'), core = css('--chart-1');
     const levels = spec.levels || [];
-    const lv = levels[level];
+    const L = Math.max(0, level), lv = levels[L];
     // the lot
     const lot = spec.lot || { w: 30, d: 24 };
     g.strokeStyle = hair; g.lineWidth = 1; g.setLineDash([3, 3]);
     g.beginPath(); rect(g, { x: -lot.w / 2, z: -lot.d / 2, w: lot.w, d: lot.d }); g.stroke(); g.setLineDash([]);
     // the other storeys' footprints, faint
     g.strokeStyle = hair;
-    for (const [i, o] of levels.entries()) if (i !== level) { g.beginPath(); for (const f of o.footprint || []) rect(g, f); g.stroke(); }
+    for (const [i, o] of levels.entries()) if (i !== L) { g.beginPath(); for (const f of o.footprint || []) rect(g, f); g.stroke(); }
     if (lv) {
       // this storey: footprint, rooms (the showcase ones and the Core's tinted), partitions, stairs
       g.fillStyle = css('--rc-tile'); g.beginPath(); for (const f of lv.footprint || []) rect(g, f); g.fill();
@@ -87,7 +96,7 @@ export function createPlanInset(canvas: HTMLCanvasElement, { onSeek, onLevel }: 
       let prevOn: boolean | null = null;
       g.beginPath();
       for (let i = 0; i < track.samples; i += 2) {
-        const x = X(track.pos[3 * i]), z = Z(track.pos[3 * i + 2]), on = levelAt(levels, track.pos[3 * i + 1]) === level;
+        const x = X(track.pos[3 * i]), z = Z(track.pos[3 * i + 2]), on = storeyOf(spec, [track.pos[3 * i], track.pos[3 * i + 1], track.pos[3 * i + 2]]) === L;
         if (on !== prevOn) { if (prevOn !== null) { g.lineTo(x, z); g.strokeStyle = route; g.globalAlpha = prevOn ? 1 : 0.3; g.stroke(); } g.beginPath(); g.moveTo(x, z); prevOn = on; }
         else g.lineTo(x, z);
       }
@@ -108,7 +117,7 @@ export function createPlanInset(canvas: HTMLCanvasElement, { onSeek, onLevel }: 
     const r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
     let best = -1, bd = 14 * 14;
     for (let i = 0; i < track.samples; i++) {
-      if (levelAt(spec.levels || [], track.pos[3 * i + 1]) !== level) continue;
+      if (storeyOf(spec, [track.pos[3 * i], track.pos[3 * i + 1], track.pos[3 * i + 2]]) !== Math.max(0, level)) continue;
       const dx = X(track.pos[3 * i]) - mx, dz = Z(track.pos[3 * i + 2]) - my, d = dx * dx + dz * dz;
       if (d < bd) { bd = d; best = i; }
     }
@@ -116,17 +125,17 @@ export function createPlanInset(canvas: HTMLCanvasElement, { onSeek, onLevel }: 
   });
 
   return {
-    setHouse(s: any, a: any) { spec = s; anchors = a; level = 0; draw(); },
+    setHouse(s: any, a: any) { spec = s; anchors = a; level = -1; draw(); },   // -1: the next setView names its storey
     setTrack(tr: InsetTrack | null) { track = tr; draw(); },
     /** the playhead: t (0…1), the eye and look points, the vertical field of view (degrees) and the view's aspect */
     setView(v: number, e: [number, number, number] | null, l: [number, number, number] | null, fovDeg = 42, aspect = 16 / 9) {
       t = v; eye = e; look = l;
       hfov = Math.atan(Math.tan((fovDeg * Math.PI) / 360) * aspect);
-      const lvIdx = spec && e ? levelAt(spec.levels || [], e[1]) : 0;
+      const lvIdx = spec && e ? storeyOf(spec, e) : 0;
       if (lvIdx !== level) { level = lvIdx; onLevel?.((spec.levels[level] || {}).name || `Level ${level + 1}`); }
       draw();
     },
-    get level() { return level; },
+    get level() { return Math.max(0, level); },
     get time() { return t; },
     draw,
   };

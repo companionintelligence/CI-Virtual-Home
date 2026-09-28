@@ -14,6 +14,11 @@ import { spawnSync } from 'node:child_process';
 import { muxMp4, mp4Boxes, mp4Summary, frameTicks } from '../assets/ui/mp4-mux.js';
 import { muxWebm } from '../assets/ui/webm-mux.js';
 import { avcCodecFor, bitrateFor } from '../assets/ui/recorder.js';
+import { exportSize, downloadName, stamp, fmtClock, v1Phases, trackRates, shotLabel } from '../assets/ui/format.js';
+import { readUiState, stateSearch } from '../assets/ui/url-state.js';
+import { collectIssues, qaCounts } from '../assets/ui/qa.js';
+import { createUndo } from '../assets/ui/undo.js';
+import { storeyOf, levelAt } from '../assets/ui/plan-inset.js';
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-ui-'));
 const has = (bin: string) => spawnSync(bin, ['-version'], { stdio: 'ignore' }).status === 0;
@@ -61,7 +66,8 @@ test('avcCodecFor picks a High-profile level that holds the film; bitrateFor has
   assert.equal(avcCodecFor(1920, 1080, 30)[0], 'avc1.640028');
   assert.equal(avcCodecFor(3840, 2160, 60)[0], 'avc1.640034');
   assert.equal(avcCodecFor(640, 360, 30)[0], 'avc1.64001f');
-  assert.equal(bitrateFor(640, 360, 30), 8e6);
+  assert.equal(bitrateFor(640, 360, 30), 20e6);
+  assert.equal(bitrateFor(3840, 2160, 60), 80e6);
 });
 
 test('muxMp4 writes a file ffprobe reads as the frames it was given, and they decode bit for bit', { skip: !FFMPEG && 'no ffmpeg/ffprobe' }, () => {
@@ -120,6 +126,77 @@ test('muxWebm writes a VP9 file ffprobe reads as the frames it was given, and th
   assert.equal(Number(v.nb_read_frames), n);
   assert.ok(Math.abs(Number(p.format.duration) - n / fps) < 0.02, `duration ${p.format.duration}`);
   assert.deepEqual(framemd5(file), framemd5(ivf));
+});
+
+test('exportSize: the short side as asked, the long side capped at 3840, both even', () => {
+  assert.deepEqual(exportSize(2160, '16:9'), { w: 3840, h: 2160 });
+  assert.deepEqual(exportSize(2160, '9:16'), { w: 2160, h: 3840 });
+  assert.deepEqual(exportSize(1080, '9:16'), { w: 1080, h: 1920 });
+  assert.deepEqual(exportSize(2160, '1:1'), { w: 2160, h: 2160 });
+  assert.deepEqual(exportSize(2160, '4:3'), { w: 2880, h: 2160 });
+  assert.deepEqual(exportSize(2160, '21:9'), { w: 3840, h: 1646 });
+  assert.deepEqual(exportSize(1440, '16:9'), { w: 2560, h: 1440 });
+});
+
+test('download names: no colons, the time of day in them', () => {
+  const d = new Date(2026, 8, 28, 9, 5, 7);
+  assert.equal(stamp(d), '20260928-090507');
+  assert.equal(downloadName({ house: 'aurora', shot: 'door-to-core', tod: 'golden', date: d, ext: 'mp4' }), 'aurora-door-to-core-golden-20260928-090507.mp4');
+  assert.equal(downloadName({ house: 'house:Weird Name!', shot: 'still', tod: null, date: d, ext: 'png', extra: '3840x2160' }), 'house-weird-name-still-3840x2160-20260928-090507.png');
+  assert.equal(fmtClock(4.25), '0:04.25');
+  assert.equal(fmtClock(75.5), '1:15.50');
+  assert.equal(shotLabel('door-to-core'), 'Door to Core');
+  assert.equal(shotLabel('door-to-core', 'front-door'), 'Front door');
+});
+
+test('v1 phases come from the shot\'s own structure, and the track rates from its samples', () => {
+  const ph = v1Phases('door-to-core', { orbit: { t0: 0.8, tIn: 0.7 } }, { duration: 12, events: { enterT: 3 } });
+  assert.deepEqual(ph.map(p => [p.name, +p.t0.toFixed(3), +p.t1.toFixed(3)]), [['outside', 0, 0.25], ['inside', 0.25, 0.7], ['push-in', 0.7, 0.8], ['orbit', 0.8, 1]]);
+  assert.ok(ph.every(p => p.derived));
+  assert.deepEqual(v1Phases('orbit', {}, null).map(p => p.name), ['orbit']);
+  // a straight line at 2 m/s, turning at 90°/s
+  const n = 121, dt = 1 / 120, pos = new Float32Array(3 * n), look = new Float32Array(3 * n);
+  for (let i = 0; i < n; i++) { const t = i * dt, a = t * Math.PI / 2; pos[3 * i] = 2 * t; look[3 * i] = 2 * t + Math.sin(a); look[3 * i + 2] = Math.cos(a); }
+  const r = trackRates({ samples: n, dt, pos, look });
+  assert.ok(Math.abs(r.speed[60] - 2) < 1e-3, `speed ${r.speed[60]}`);
+  assert.ok(Math.abs(r.yaw[60] - 90) < 0.5, `yaw ${r.yaw[60]}`);
+});
+
+test('the URL state round-trips and keeps every other parameter', () => {
+  const q = stateSearch('?res=1080&house=aurora&tone=agx', { shot: 'orbit', t: 0.41234, lighting: 'dusk', mode: 'review' });
+  assert.equal(q, '?house=aurora&shot=orbit&t=0.412&lighting=dusk&mode=review&res=1080&tone=agx');
+  assert.deepEqual(readUiState(q), { house: 'aurora', shot: 'orbit', t: 0.412, lighting: 'dusk', mode: 'review' });
+  assert.equal(stateSearch(q, { t: null, lighting: '' }), '?house=aurora&shot=orbit&mode=review&res=1080&tone=agx');
+  assert.equal(readUiState('?mode=view').mode, null);
+  assert.equal(readUiState('?t=7').t, 1);
+});
+
+test('QA findings: errors first, the counts, a failed gate is an error', () => {
+  const issues = collectIssues({ scene: { errors: [], warnings: [{ code: 'planting-grid', message: 'grid' }] }, shots: { 'door-to-core': { errors: [{ code: 'wall-clip', t: 0.4, tEnd: 0.41, message: 'm' }], warnings: [{ code: 'core-small', t: 1, message: 'n' }] }, orbit: { failed: 'boom' } } });
+  assert.deepEqual(issues.map(i => `${i.level}:${i.code}`), ['error:wall-clip', 'error:qa-failed', 'warn:planting-grid', 'warn:core-small']);
+  assert.deepEqual(qaCounts(issues), { errors: 2, warnings: 2 });
+});
+
+test('undo and redo', () => {
+  let v = 0, dropped = 0;
+  const seen: boolean[] = [];
+  const u = createUndo({ onChange: s => seen.push(s.canUndo) });
+  u.push({ label: 'a', undo: () => { v = 0; }, redo: () => { v = 1; } }); v = 1;
+  u.push({ label: 'b', undo: () => { v = 1; }, redo: () => { v = 2; }, drop: () => { dropped++; } }); v = 2;
+  assert.equal(u.undo()!.label, 'b'); assert.equal(v, 1);
+  assert.equal(u.redo()!.label, 'b'); assert.equal(v, 2);
+  u.undo(); u.push({ label: 'c', undo: () => {}, redo: () => {} });
+  assert.equal(dropped, 1, 'a new step drops what could be redone');
+  assert.equal(u.redo(), null);
+  assert.ok(seen.length >= 5);
+});
+
+test('the plan inset\'s storey: by height over the house, the entry\'s outside it', () => {
+  const spec = { entry: { level: 'l1' }, levels: [{ id: 'l1', y: 0, height: 2.8, footprint: [{ x: -5, z: -4, w: 10, d: 8 }] }, { id: 'l2', y: 2.8, height: 2.7, footprint: [{ x: -5, z: -4, w: 10, d: 8 }] }] };
+  assert.equal(storeyOf(spec, [0, 4.2, 0]), 1);
+  assert.equal(storeyOf(spec, [0, 1.5, 0]), 0);
+  assert.equal(storeyOf(spec, [0, 9, 12]), 0, 'an establishing shot high over the lawn is at the entry');
+  assert.equal(levelAt(spec.levels, 2.6), 1);
 });
 
 test.after(() => fs.rmSync(TMP, { recursive: true, force: true }));

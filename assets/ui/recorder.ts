@@ -6,7 +6,8 @@
 //
 //   recordFrames(hooks, { prefer, bitrate, keyEvery, signal, onProgress }) → RecordResult
 //
-// hooks.begin() sizes the renderer for the film and returns { w, h, fps, frames, duration }; hooks.frame(i) leaves
+// hooks.begin() sizes the renderer for the film (and warms its composer: a cold one draws its first frame differently)
+// and returns, or resolves to, { w, h, fps, frames, duration }; hooks.frame(i) leaves
 // frame i on hooks.canvas (the WebGL canvas, drawn with preserveDrawingBuffer); hooks.end() puts the page back. Frame
 // i is handed to the encoder in the same task that drew it (animate() may repaint the canvas between tasks), and
 // before it is encoded its pixels are hashed — sha256 of the raw RGBA readPixels rows, bottom row first, 16 hex
@@ -18,8 +19,9 @@
 import { muxMp4 } from './mp4-mux.js';
 import { muxWebm } from './webm-mux.js';
 
+export type RenderInfo = { w: number; h: number; fps: number; frames: number; duration: number };
 export type RecordHooks = {
-  begin: () => { w: number; h: number; fps: number; frames: number; duration: number };
+  begin: () => RenderInfo | Promise<RenderInfo>;
   frame: (i: number) => void;
   end: () => void;
   canvas: HTMLCanvasElement;
@@ -49,10 +51,11 @@ export function avcCodecFor(w: number, h: number, fps: number): string[] {
   const fs = Math.ceil(w / 16) * Math.ceil(h / 16), mbps = fs * fps;
   return AVC_LEVELS.filter(([, maxMbps, maxFs]) => mbps <= maxMbps && fs <= maxFs).map(([lv]) => `avc1.6400${lv}`);
 }
-/** Bits a second for a film: ~0.15 bit a pixel a frame, never under 8 Mb/s — high enough that a frame decodes
- *  within 40 dB PSNR of what was rendered (scripts/test-ui.mts checks it). */
+/** Bits a second for a film: ~0.25 bit a pixel a frame, never under 20 Mb/s — high enough that every frame, the
+ *  first keyframe too (a rate controller starts cautious), decodes within 40 dB PSNR of what was rendered
+ *  (scripts/test-ui.mts checks it). 1080p60 is ~31 Mb/s, 4K60 is capped at 80. */
 export function bitrateFor(w: number, h: number, fps: number): number {
-  return Math.round(Math.max(8e6, Math.min(80e6, w * h * fps * 0.15)));
+  return Math.round(Math.max(20e6, Math.min(80e6, w * h * fps * 0.25)));
 }
 
 /** The codec this browser will encode the film with: H.264 (MP4) when it can, else VP9 (WebM); null without WebCodecs. */
@@ -81,8 +84,9 @@ export async function recordFrames(hooks: RecordHooks, opts: RecordOptions = {})
   const VE = (globalThis as any).VideoEncoder, VF = (globalThis as any).VideoFrame;
   if (!VE || !VF) throw new Error('This browser has no WebCodecs video encoder. Use a recent Chrome, Edge or Safari.');
   const { signal, onProgress, onStart, keyEvery = 1, hash = true } = opts;
-  const info = hooks.begin();
   let encoder: any = null;
+  let info: RenderInfo;
+  try { info = await hooks.begin(); } catch (e) { hooks.end(); throw e; }
   try {
     const { w, h, fps, frames, duration } = info;
     const choice = await pickCodec(w, h, fps, opts.prefer || 'h264');
