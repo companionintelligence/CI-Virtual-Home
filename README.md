@@ -101,17 +101,34 @@ room-creator.html?mode=view&house=<id>[&shot=<shot>][&t=<0…1>][&tod=day|golden
 ```
 
 — the editor's own renderer with its chrome put away. `t` is the fraction of the shot; a link with `t` opens
-paused there, one without plays from the start. The player lists the shots from the house's presets (so
-`core-orbit` and any later shot type appear by themselves), plays them through the page's `applySplineFrame`
-(its frames are the recorder's frames), and adds a scrubber, speed, time of day, the camera path drawn in the
-scene, a free-flying camera (drag, WASD, Q/E, Esc back to the shot; O for an overview and C for a cutaway that
-opens the house, with the shot's camera flying on as a ghost), share links, full screen and prev/next. Keys:
-Space, ←/→ (Shift: 5 s), Home/End, 1–9, T, P, F, O, C, Esc, [ ], Shift F, ?. Everything under `?mode=view` is additive: without it the page is the editor, and
-every `__house*` hook behaves as before.
+paused there, one without plays from the start, and `play=1|0` says so outright — but nothing starts moving by
+itself for a visitor whose system asks for reduced motion (the gallery's links carry no `play`). The player lists
+the shots from the house's presets (so `core-orbit` and any later shot type appear by themselves), plays them
+through the page's `applySplineFrame` (its frames are the recorder's frames), and adds a scrubber, speed, time of
+day, the camera path drawn in the scene, a free-flying camera (drag, WASD, Q/E, Esc back to the shot; O for an
+overview and C for a cutaway that opens the house; taking the camera pauses the shot, whose own camera stays in
+the scene as a ghost that Play moves along the path; the free camera stays above the lot's ground), share links,
+full screen and prev/next. Keys: Space, ←/→ (Shift: 5 s), Home/End, 1–9, T, P, F, O, C, Esc, [ ], Shift F, ?
+(Space on a focused button presses that button). Everything under `?mode=view` is additive: without it the page
+is the editor, and every `__house*` hook behaves as before.
+
+Until the player's module has mounted, `room-creator.html`'s head script is the player: the house's poster, its
+name once `index.json` is in, a loader that says so when a slow connection makes it take a while, and a card with
+**Try again** and **See all homes** when the page cannot start (no WebGL 2, a module that did not download, an
+engine that threw). An id the index does not list gets the error card at once, with nothing built behind it. The
+player asks no third party for anything: its fonts, including the ones the scene draws text in, are the repo's
+own (`portal/viewer.css`); only the editor links Google Fonts.
+
+The share button hands out `homes/<id>.html`: `portal:build` writes one page per home with the home's own title,
+description and thumbnail as link-preview tags (an unfurler never runs the player, and `room-creator.html`'s static
+title is the editor's), and it forwards to the player with the link's query. A checkout served as it is has no such
+pages, and shares the player's own URL.
 
 Every URL in the site is relative, because Pages serves it at `/ci-virtual-home/`. `portal:build` copies only
-what the site loads into `dist/`, and [`.github/workflows/pages.yml`](.github/workflows/pages.yml) deploys it on
-every push to `main` (and on demand); Pages has to be enabled for the repository with **GitHub Actions** as the
+what the site loads into `dist/` (and refuses stale compiled assets, a missing spec or thumbnail, a link to a file it
+does not ship, a root-relative URL, and hero figures in `index.html` that disagree with `index.json`); CI runs it on
+every PR, and [`.github/workflows/pages.yml`](.github/workflows/pages.yml) deploys it on every push to `main` (and
+on demand); Pages has to be enabled for the repository with **GitHub Actions** as the
 source. Nothing renders in CI: when a house's look changes, re-run `pnpm run portal:thumbs --house <id>` on a
 GPU and commit the new thumbnail with the change. `portal:test` is the check to run before pushing portal work.
 

@@ -49,9 +49,15 @@ are deployed to GitHub Pages under `/ci-virtual-home/`:
   `applySplineFrame`, never a copy of it.
 - The player may use the clock (nothing it draws is a product frame), but it must restore anything of the
   renderer's it changes for its own frame (it puts `shadowMap.autoUpdate` back after each one).
+- Until the player mounts, `room-creator.html`'s head script (view mode only) is the player: poster, loader and
+  the failure card. Anything that can stop the page before `mountViewer` must end on that card, never on an
+  endless loader.
+- `portal:build` writes more than copies: `dist/homes/<id>.html` share pages, and one `<meta name="vh-share">` in
+  `dist/room-creator.html` that tells the player they exist.
 - `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
 
-**Verify before you push.** CI only builds, typechecks, validates and runs the floor-plan-graph tests. The
+**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and assembles
+the portal (`portal:build`'s link and staleness checks). The
 render gate needs a GPU and runs here:
 
 ```bash
