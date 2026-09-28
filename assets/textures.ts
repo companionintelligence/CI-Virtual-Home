@@ -558,6 +558,190 @@ const GEN: Record<string, (c: Ctx, o: any) => Gen> = {
       }
     };
   },
+
+  // ---- room finishes (kit.finish, plan S1: S2's per-room floors and walls). Power-of-two maps throughout. -----
+  // hexagonal tile, flat-topped, `size` across the flats (default 0.2 m): two offset lattices, the nearer centre
+  // owns the pixel, and the distance to that hexagon's edge draws the grout
+  hextile: (c, o) => {
+    const flat = o.size ?? 0.2, a = flat / Math.sqrt(3), cu = 3 * a, cv = Math.sqrt(3) * a, pu = 2 * cu, pv = 2 * cv, W = 512, H = 512, gw = o.grout ?? 0.003;
+    const base = rgbOf(o.color ?? 0xe7e3dc), grout = rgbOf(o.groutColor ?? 0xb9b3a8), mott = c.fbm(4, 4, 3), rin = cv / 2;
+    const N = [[0, 1], [Math.sqrt(3) / 2, 0.5], [-Math.sqrt(3) / 2, 0.5]];
+    return {
+      W, H, period: [pu, pv], normalScale: 0.7,
+      fn: (u, v, s, t, px) => {
+        let best = 1e9, bi = 0, bj = 0, bl = 0, dx = 0, dy = 0;
+        for (let l = 0; l < 2; l++) for (let i = -1; i <= 2; i++) for (let j = -1; j <= 2; j++) {
+          const cx = i * cu + (l ? 1.5 * a : 0), cy = j * cv + (l ? cv / 2 : 0), ex = s - cx, ey = t - cy, d = ex * ex + ey * ey;
+          if (d < best) { best = d; bi = i; bj = j; bl = l; dx = ex; dy = ey; }
+        }
+        const hd = Math.max(...N.map(n => Math.abs(dx * n[0] + dy * n[1]))), ed = rin - hd;
+        const k = smooth(gw * 0.5 - 0.0006, gw * 0.5 + 0.0006, ed);
+        const id = (((bi % 2) + 2) % 2) * 2 + (((bj % 2) + 2) % 2);   // eight tiles a period, each its own tone
+        const tone = 1 + (c.hash(id, bl, 51) - 0.5) * 0.08 + 0.04 * mott(u, v);
+        px.r = grout[0] + (base[0] * tone - grout[0]) * k; px.g = grout[1] + (base[1] * tone - grout[1]) * k; px.b = grout[2] + (base[2] * tone - grout[2]) * k;
+        px.h = -0.0012 * (1 - smooth(gw * 0.5, gw * 0.5 + 0.003, ed)); px.ro = 0.28 + 0.55 * (1 - k);
+      }
+    };
+  },
+  // checkerboard: `size` squares (default 0.3 m) alternating `color` and `color2`
+  checker: (c, o) => {
+    const size = o.size ?? 0.3, P = 2 * size, W = 512, H = 512, gw = 0.002;
+    const A = rgbOf(o.color ?? 0xece8e1), B = rgbOf(o.color2 ?? 0x2b2c2e), grout = rgbOf(o.groutColor ?? 0x9d978d), mott = c.fbm(6, 6, 3);
+    return {
+      W, H, period: [P, P], normalScale: 0.5,
+      fn: (u, v, s, t, px) => {
+        const i = Math.floor(s / size), j = Math.floor(t / size), lx = s - i * size, ly = t - j * size;
+        const ed = Math.min(lx, size - lx, ly, size - ly), k = smooth(gw * 0.5 - 0.0005, gw * 0.5 + 0.0005, ed);
+        const col = (i + j) % 2 ? B : A, tone = 1 + (c.hash(i, j, 61) - 0.5) * 0.05 + 0.03 * mott(u, v);
+        px.r = grout[0] + (col[0] * tone - grout[0]) * k; px.g = grout[1] + (col[1] * tone - grout[1]) * k; px.b = grout[2] + (col[2] * tone - grout[2]) * k;
+        px.h = -0.001 * (1 - k); px.ro = 0.25 + 0.5 * (1 - k);
+      }
+    };
+  },
+  // terracotta: 0.3 m hand-made clay squares, warm, each tile its own fired tone, 6 mm sandy joints, soft edges
+  terracotta: (c, o) => {
+    const size = o.size ?? 0.3, n = 4, P = size * n, W = 512, H = 512, gw = 0.006;
+    const base = rgbOf(o.color ?? 0xb0694a), grout = rgbOf(o.groutColor ?? 0xc9bba4), mott = c.fbm(8, 8, 4, 0.55), fine = c.fbm(64, 64, 2);
+    return {
+      W, H, period: [P, P], normalScale: 0.9,
+      fn: (u, v, s, t, px) => {
+        const i = Math.floor(s / size), j = Math.floor(t / size), lx = s - i * size, ly = t - j * size;
+        const wob = 0.0015 * Math.sin(ly * 40 + c.hash(i, j, 71) * 6) + 0.0015 * Math.sin(lx * 37 + c.hash(i, j, 72) * 6);
+        const ed = Math.min(lx, size - lx, ly, size - ly) + wob, k = smooth(gw * 0.5 - 0.001, gw * 0.5 + 0.0012, ed);
+        const h1 = c.hash(i, j, 73), h2 = c.hash(i, j, 74);
+        const tc: RGB = [base[0] * (1 + (h1 - 0.5) * 0.22), base[1] * (1 + (h1 - 0.5) * 0.18 - (h2 - 0.5) * 0.1), base[2] * (1 + (h2 - 0.5) * 0.2)];
+        const g = 1 + 0.08 * mott(u, v) + 0.04 * fine(u, v);
+        px.r = grout[0] + (tc[0] * g - grout[0]) * k; px.g = grout[1] + (tc[1] * g - grout[1]) * k; px.b = grout[2] + (tc[2] * g - grout[2]) * k;
+        px.h = -0.002 * (1 - k) + 0.0003 * mott(u, v); px.ro = 0.72 + 0.1 * (1 - k);
+      }
+    };
+  },
+  // stone pavers: ashlar courses 0.4 m deep, lengths 0.4–0.9 m, 8 mm joints, each stone its own tone
+  pavers: (c, o) => {
+    const pu = 2.0, pv = 1.6, W = 512, H = 512, rowH = 0.4, rows = Math.round(pv / rowH), m = 0.008;
+    const base = rgbOf(o.color ?? 0xb9b2a5), joint = rgbOf(o.groutColor ?? 0x8f897e), mott = c.fbm(10, 8, 4);
+    const rowsCuts: number[][] = [];
+    for (let r = 0; r < rows; r++) { const t0 = c.rng() * pu, cuts = [t0]; let x = t0; for (;;) { const w = 0.4 + c.rng() * 0.5; if (x + w > t0 + pu - 0.35) break; x += w; cuts.push(x); } rowsCuts.push(cuts.map(q => q % pu).sort((a, b) => a - b)); }
+    return {
+      W, H, period: [pu, pv], normalScale: 1.0,
+      fn: (u, v, s, t, px) => {
+        const r = Math.min(rows - 1, Math.floor(t / rowH)), ly = t - r * rowH, cuts = rowsCuts[r];
+        let i = cuts.length - 1; for (let q = 0; q < cuts.length; q++) if (cuts[q] <= s) i = q;
+        const ex = Math.min(wrapD(s - cuts[i], pu), wrapD(cuts[(i + 1) % cuts.length] - s, pu));
+        const ed = Math.min(ex, ly, rowH - ly) - m / 2, st = smooth(-0.001, 0.003, ed);
+        const tone = 1 + (c.hash(i, r, 81) - 0.5) * 0.18, warm = (c.hash(i, r, 82) - 0.5) * 0.06, mm = mott(u, v);
+        const sc: RGB = [base[0] * tone * (1 + warm), base[1] * tone, base[2] * tone * (1 - warm)];
+        put(px, mixRgb(joint, sc, st), 1 + 0.08 * mm * st);
+        px.h = -0.004 * (1 - st) + 0.0008 * mm * st; px.ro = 0.8 + 0.1 * (1 - st);
+      }
+    };
+  },
+  // carpet: a cut-pile field — fine fibre noise over a slow mottle, matte, almost no relief
+  carpet: (c, o) => {
+    const P = 1.0, W = 512, H = 512, base = rgbOf(o.color ?? 0xb8ae9f), mott = c.fbm(3, 3, 4), fib = c.fbm(96, 96, 2);
+    return {
+      W, H, period: [P, P], normalScale: 0.35,
+      fn: (u, v, s, t, px) => {
+        const g = c.hash(Math.floor(u * W), Math.floor(v * H), 91), m = mott(u, v), f = fib(u, v);
+        put(px, base, 1 + 0.05 * m + 0.05 * f + (g - 0.5) * 0.06);
+        px.h = 0.0006 * f + (g - 0.5) * 0.0003; px.ro = 0.97;
+      }
+    };
+  },
+  // flat interior paint: the roller's faint orange-peel and nothing else
+  paint: (c, o) => {
+    const P = 2.0, W = 256, H = 256, base = rgbOf(o.color ?? 0xefece6), mott = c.fbm(4, 4, 3), fine = c.fbm(64, 64, 2);
+    return {
+      W, H, period: [P, P], normalScale: 0.25,
+      fn: (u, v, s, t, px) => { put(px, base, 1 + 0.012 * mott(u, v) + 0.008 * fine(u, v)); px.h = 0.0002 * fine(u, v); px.ro = 0.88; }
+    };
+  },
+  // painted brick: a running bond under one coat of paint — the bond reads by relief, the colour barely varies
+  paintedbrick: (c, o) => {
+    const pu = 2.0, pv = 1.0, W = 512, H = 256, wall = rgbOf(o.color ?? 0xeeeae3), m = 0.01, mott = c.fbm(8, 4, 3);
+    const rows = Math.round(pv / (0.065 + m)), rowH = pv / rows, cols = Math.round(pu / (0.215 + m)), colW = pu / cols;
+    const mortar = mixRgb(wall, [0, 0, 0], 0.08);
+    return {
+      W, H, period: [pu, pv], normalScale: 1.1,
+      fn: (u, v, s, t, px) => {
+        const r = Math.min(rows - 1, Math.floor(t / rowH)), off = (r % 2) * colW / 2;
+        const ss = ((s + off) % pu + pu) % pu, ci = Math.floor(ss / colW), lx = ss - ci * colW, ly = t - r * rowH;
+        const brick = smooth(-0.0005, 0.002, Math.min(lx, colW - m - lx, ly, rowH - m - ly));
+        put(px, mixRgb(mortar, wall, brick), 1 + 0.02 * mott(u, v) + (c.hash(ci, r, 95) - 0.5) * 0.02);
+        px.h = -0.005 * (1 - brick) + 0.0004 * mott(u, v); px.ro = 0.82;
+      }
+    };
+  },
+  // wallpaper: one 0.52 m roll repeat — pattern 'stripe' (two widths), 'dot' (staggered spots) or 'botanical'
+  // (seeded sprigs: a stem and four leaves, one sprig a cell) in color2 over color
+  wallpaper: (c, o) => {
+    const pattern = o.pattern || 'stripe', pu = 0.52, pv = pattern === 'stripe' ? 0.52 : 0.52, W = 512, H = 512;
+    const A = rgbOf(o.color ?? 0xeae4d8), base = rgbOf(o.color ?? 0xeae4d8);
+    const B = rgbOf(o.color2 ?? (() => { const k = (A[0] + A[1] + A[2]) / 765; return k > 0.6 ? mixRgb(A, [70, 90, 80], 0.45) : mixRgb(A, [255, 255, 255], 0.45); })());
+    const paper = c.fbm(32, 32, 2), sprigs: Array<[number, number, number, number]> = [];
+    if (pattern === 'botanical') for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) sprigs.push([(i + 0.2 + c.rng() * 0.6) / 4 * pu, (j + 0.2 + c.rng() * 0.6) / 4 * pv, (c.rng() - 0.5) * 1.6, 0.035 + c.rng() * 0.02]);
+    const signedWrap = (d: number, p: number) => (((d + p / 2) % p) + p) % p - p / 2;   // nearest image, signed
+    const leaf = (s: number, t: number, x: number, y: number, ang: number, L: number, wr = 0.38) => {   // an ellipse along ang
+      const dx = signedWrap(s - x, pu), dy = signedWrap(t - y, pv);
+      const ca = Math.cos(ang), sa = Math.sin(ang), a = dx * ca + dy * sa, b = -dx * sa + dy * ca;
+      return (a / L) ** 2 + (b / (L * wr)) ** 2;
+    };
+    return {
+      W, H, period: [pu, pv], normalScale: 0.2,
+      fn: (u, v, s, t, px) => {
+        let k = 0;
+        if (pattern === 'stripe') { const x = s / pu; k = (x % 0.25) < 0.09 ? 1 : ((x % 0.25) > 0.16 && (x % 0.25) < 0.18 ? 0.6 : 0); }
+        else if (pattern === 'dot') {
+          const g = 0.065, r = 0.011, row = Math.floor(t / g), off = (row % 2) * g / 2;
+          const dx = wrapD(s - off - Math.round((s - off) / g) * g, pu), dy = t - (row + 0.5) * g;
+          k = 1 - smooth(r - 0.0012, r + 0.0012, Math.hypot(dx, dy));
+        } else {
+          for (const [x, y, ang, L] of sprigs) {
+            for (let q = 0; q < 4; q++) {
+              const a2 = ang + (q % 2 ? 0.7 : -0.7), off = (q < 2 ? 0.3 : 0.75) * L * 1.6;
+              const lx = x + Math.sin(ang) * off, ly = y + Math.cos(ang) * off;
+              k = Math.max(k, 1 - smooth(0.8, 1.1, leaf(s, t, lx, ly, Math.PI / 2 - a2, L * 0.55)));
+            }
+            k = Math.max(k, 1 - smooth(0.8, 1.1, leaf(s, t, x + Math.sin(ang) * L * 0.8, y + Math.cos(ang) * L * 0.8, Math.PI / 2 - ang, L * 1.25, 0.045)));   // the stem: a thin ellipse
+          }
+        }
+        const p = 1 + 0.015 * paper(u, v);
+        put(px, mixRgb(base, B, k), p);
+        px.h = 0.0001 * paper(u, v) + 0.00008 * k; px.ro = 0.8 - 0.1 * k;
+      }
+    };
+  },
+  // wainscot: raised panels to `h` (default 0.9 m, a chair rail on top) and paint above, in one colour; the
+  // material's world-UV offset puts t = 0 on the storey's floor (kit.finish's yBase), the period is 3.2 m tall
+  wainscot: (c, o) => {
+    const pu = 0.6, pv = 3.2, W = 256, H = 1024, hh = o.h ?? 0.9, base = rgbOf(o.color ?? 0xf1eee8), fine = c.fbm(16, 64, 2);
+    return {
+      W, H, period: [pu, pv], normalScale: 1.0,
+      fn: (u, v, s, t, px) => {
+        let h = 0, k = 1;
+        if (t < hh) {
+          const ex = Math.min(s - 0.06, pu - 0.06 - s), ey = Math.min(t - 0.18, hh - 0.12 - t), inPanel = Math.min(ex, ey);
+          h = inPanel > 0 ? 0.004 + 0.002 * smooth(0, 0.02, inPanel) : 0.006;   // stiles and rails proud, panel fields raised
+          if (t < 0.12) { h = 0.012; k = 0.97; }   // the skirting
+          k *= inPanel > -0.004 && inPanel < 0.004 ? 0.9 : 1;   // the field's bevel shadow
+        } else if (t < hh + 0.05) { h = 0.014; k = 0.98; }   // the chair rail
+        put(px, base, k * (1 + 0.006 * fine(u, v)));
+        px.h = h; px.ro = t < hh + 0.05 ? 0.55 : 0.88;
+      }
+    };
+  },
+  // board and batten: 0.3 m vertical boards with 50 mm battens over the joints
+  battens: (c, o) => {
+    const bw = 0.3, pu = 1.2, pv = 2.4, W = 512, H = 1024, wall = rgbOf(o.color ?? 0xece8df), grain = c.fbm(8, 24, 2);
+    return {
+      W, H, period: [pu, pv], normalScale: 1.1,
+      fn: (u, v, s, t, px) => {
+        const b = Math.floor(s / bw), lx = s - b * bw, d = Math.min(lx, bw - lx), batten = 1 - smooth(0.022, 0.027, d);
+        put(px, wall, (1 + 0.012 * grain(u, v)) * (1 - 0.1 * (1 - smooth(0.02, 0.034, d)) * (1 - batten)));
+        px.h = 0.012 * batten; px.ro = 0.7;
+      }
+    };
+  },
 };
 
 export const TEXTURE_KINDS = Object.keys(GEN);

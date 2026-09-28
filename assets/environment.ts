@@ -121,16 +121,60 @@ export const LIGHTING_ALIASES: Record<string, string> = {
   'cyberpunk': 'night',
 };
 export const DEFAULT_LIGHTING = 'day';
-export const lightingName = (n?: string | null): string => (n && TIME_OF_DAY[n] ? n : (n && LIGHTING_ALIASES[n]) || DEFAULT_LIGHTING);
+/** a preset's name — a TIME_OF_DAY key, an alias, or a spec's `lighting` object ({ preset, sunBearing }) — resolved */
+export const lightingName = (n?: any): string => {
+  const k = n && typeof n === 'object' ? n.preset : n;
+  return typeof k === 'string' && TIME_OF_DAY[k] ? k : (typeof k === 'string' && LIGHTING_ALIASES[k]) || DEFAULT_LIGHTING;
+};
+
+// ---- the look generation (plan S1: defaults 2) ---------------------------------------------------------------
+// Look 1 is each preset as above. Look 2 — the true-white look a house gets under `"defaults": 2` — keeps the hour
+// (the sun's height, colour and shadows, the lit windows, the sunset sky behind the house) but stops the light
+// from repainting the house: golden hour and dusk turned white walls pink and a cobalt wall grey. It
+//   - pulls the light colours (sun, hemisphere, fill) and the environment's sky part-way to the grey of the same
+//     luma, so a white wall in the shade is lit by something near white;
+//   - white-balances the frame part-way toward the key light, as a photographer would at golden hour;
+//   - holds the grade's saturation at 0.9 or above, so a signature colour (palette.keep) survives dusk.
+// The backdrop sky and the fog keep the preset's own colours. Pure data again: lookOf(p, 2) is a new preset.
+const hexStr = (c: number) => '#' + c.toString(16).padStart(6, '0');
+const towardGrey = (c: string, k: number): string => {
+  const n = hexOf(c), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255, y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  const f = (x: number) => Math.round(x + (y - x) * k);
+  return hexStr((f(r) << 16) | (f(g) << 8) | f(b));
+};
+export type Look = 1 | 2;
+export function lookOf(p: Preset, look: Look = 1): Preset & { envSky?: [string, string, string]; balance?: [number, number, number] } {
+  if (look !== 2) return p;
+  const q: any = {
+    ...p,
+    sun: { ...p.sun, color: towardGrey(p.sun.color, 0.45) },
+    hemi: { ...p.hemi, sky: towardGrey(p.hemi.sky, 0.6), ground: towardGrey(p.hemi.ground, 0.75) },
+    fill: { ...p.fill, color: towardGrey(p.fill.color, 0.5) },
+    envSky: p.sky.map(c => towardGrey(c, 0.55)) as [string, string, string],
+    grade: { ...p.grade, saturation: Math.max(p.grade.saturation, 0.9) },
+  };
+  // white balance: what a white wall facing the sun reads under this light (sRGB-ish linear weights), corrected
+  // half-way toward neutral and normalised to luma 1, so exposure is untouched
+  const lin = (c: string) => { const n = hexOf(c); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => (v / 255) ** 2.2); };
+  const sun = lin(q.sun.color), hs = lin(q.hemi.sky), hg = lin(q.hemi.ground);
+  const W = [0, 1, 2].map(k => sun[k] * q.sun.intensity * 0.5 + hs[k] * q.hemi.intensity * 0.5 + hg[k] * q.hemi.intensity * 0.2);
+  const Y = 0.2126 * W[0] + 0.7152 * W[1] + 0.0722 * W[2];
+  const bal = W.map(w => Math.pow(Y / Math.max(w, 1e-6), 0.5));
+  const bY = 0.2126 * bal[0] + 0.7152 * bal[1] + 0.0722 * bal[2];
+  q.balance = bal.map(v => +(v / bY).toFixed(4)) as [number, number, number];
+  return q;
+}
 
 const hexOf = (c: string): number => parseInt(c.replace('#', ''), 16);
 const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
 const smooth = (e0: number, e1: number, x: number): number => { const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
 
 // Unit vector toward the sun, from the preset and the bearing the entry faces ([fx, fz] in the ground plane).
-export function sunDirection(p: Preset, front: [number, number] = [0, 1]): [number, number, number] {
+// `swing` (degrees round from the front, + = to the front's left) replaces the preset's own: a house's seeded
+// swing under defaults 2, or the swing an authored lighting.sunBearing works out to (kit-rules.ts).
+export function sunDirection(p: Preset, front: [number, number] = [0, 1], swing: number = p.sun.swing): [number, number, number] {
   const DEG = Math.PI / 180;
-  const az = Math.atan2(front[0], front[1]) + p.sun.swing * DEG, el = p.sun.elevation * DEG;
+  const az = Math.atan2(front[0], front[1]) + swing * DEG, el = p.sun.elevation * DEG;
   return [Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)];
 }
 
@@ -195,13 +239,15 @@ export function createSkyBaker(THREE: any, renderer: any) {
   pmrem.compileEquirectangularShader();
   let current: any = null;
   return {
-    bake(name: string, p: Preset, sun: number[]) {
-      const key = `${name}|${p.sky.join()}|${p.sun.color}|${p.sunGlow}|${sun.map(v => v.toFixed(4)).join()}`;
+    // `backdrop`: the preset the backdrop is baked from when it differs from the environment's (look 2 keeps the
+    // preset's own sky behind the house while its light is neutralised)
+    bake(name: string, p: Preset, sun: number[], backdrop: Preset = p) {
+      const key = `${name}|${p.sky.join()}|${p.sun.color}|${p.sunGlow}|${sun.map(v => v.toFixed(4)).join()}` + (backdrop === p ? '' : `|${backdrop.sky.join()}|${backdrop.sun.color}`);
       if (current && current.key === key) return current;
       const envSky = skyEquirect(THREE, p, sun, { width: 256, height: 128, below: 'ground' });
       const rt = pmrem.fromEquirectangular(envSky);
       envSky.dispose();
-      const background = skyEquirect(THREE, p, sun, { width: 512, height: 256, below: 'backdrop' });
+      const background = skyEquirect(THREE, backdrop, sun, { width: 512, height: 256, below: 'backdrop' });
       const prev = current;
       current = { key, rt, environment: rt.texture, background };
       if (prev) { prev.rt.dispose(); prev.background.dispose(); }
@@ -302,6 +348,12 @@ export function applyHouseGlow(THREE: any, root: any, p: Preset): { fixtures: nu
 // The composer's scene-referred grade, applied in linear light before tone mapping: contrast about mid-grey
 // and a saturation lift (the pivot-and-lift of pascalorg/editor's post-processing GRADE_PARAMS, MIT), then a
 // soft vignette.
+// `look` and `balance` belong to the look generation (lookOf): look.x multiplies the saturation, balance is a per-
+// channel white balance. Their values are ONE object each shared by every copy of the shader (no isVector flag,
+// so ShaderPass's uniform clone keeps the reference, as installSkyFog does with its colours), which applyLighting
+// sets for the house on screen; at look 1 they are exactly 1 and the grade is the one above.
+export const GRADE_LOOK = { x: 1, y: 1, z: 1 };
+export const GRADE_BALANCE = { x: 1, y: 1, z: 1 };
 export const GradeShader = {
   name: 'HouseGradeShader',
   uniforms: {
@@ -310,6 +362,8 @@ export const GradeShader = {
     saturation: { value: 1.0 },
     vignette: { value: 0.0 },
     aspect: { value: 16 / 9 },
+    look: { value: GRADE_LOOK },
+    balance: { value: GRADE_BALANCE },
   },
   vertexShader: /* glsl */`
     varying vec2 vUv;
@@ -317,13 +371,14 @@ export const GradeShader = {
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse;
     uniform float contrast, saturation, vignette, aspect;
+    uniform vec3 look, balance;
     varying vec2 vUv;
     void main() {
       vec4 c = texture2D(tDiffuse, vUv);
-      vec3 rgb = max(c.rgb, vec3(0.0));
+      vec3 rgb = max(c.rgb, vec3(0.0)) * balance;
       rgb = pow(rgb / 0.18, vec3(contrast)) * 0.18;
       float l = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
-      rgb = max(mix(vec3(l), rgb, saturation), vec3(0.0));
+      rgb = max(mix(vec3(l), rgb, saturation * look.x), vec3(0.0));
       vec2 d = (vUv - 0.5) * vec2(aspect, 1.0) / length(vec2(aspect, 1.0)) * 2.0;   // 0 centre, 1 corners
       rgb *= 1.0 - vignette * smoothstep(0.35, 1.0, length(d));
       gl_FragColor = vec4(rgb, c.a);
@@ -338,15 +393,25 @@ export const GradeShader = {
 export function createLighting({ THREE, scene, renderer, sunLight, hemisphereLight, ambientLight, rimLight, skyBaker, skyFog, refitShadow,
   toneMapping: houseToneMapping, toneExposure: houseToneExposure, select: lightingSelect, override: LIGHTING_OVERRIDE }: any) {
   // The house the lights are aimed at, kept so the UI's preset select can re-light without rebuilding.
-  const lightingAim = { front: [0, 1], centre: [0, 0], preset: 'day' };
+  // `swing` / `bearing`: the house's own sun (kit-build.ts lightHouse: a seeded swing under defaults 2, or the
+  // compass bearing lighting.sunBearing names); `look`: the look generation. The builder's aim sets all three every
+  // build, so they never carry from one house to the next; the UI's preset select keeps them for the house.
+  const lightingAim: any = { front: [0, 1], centre: [0, 0], preset: 'day', swing: null, bearing: null, look: 1 };
   const DEG = Math.PI / 180;
   function applyLighting(preset, aim: any = {}) {
     if (preset) lightingAim.preset = lightingName(preset);
     if (aim.front) lightingAim.front = aim.front;
     if (aim.centre) lightingAim.centre = aim.centre;
-    const name = lightingAim.preset, p = TIME_OF_DAY[name];
+    if ('swing' in aim) lightingAim.swing = typeof aim.swing === 'number' ? aim.swing : null;
+    if ('bearing' in aim) lightingAim.bearing = typeof aim.bearing === 'number' ? aim.bearing : null;
+    if ('look' in aim) lightingAim.look = aim.look === 2 ? 2 : 1;
+    const name = lightingAim.preset, p0 = TIME_OF_DAY[name], p = lookOf(p0, lightingAim.look);
     const [cx, cz] = lightingAim.centre;
-    const s = sunDirection(p, lightingAim.front as [number, number]), D = 34;
+    const fr = lightingAim.front as [number, number];
+    // a bearing is a compass direction (0 = north, the page's −Z); the swing it means depends on the front
+    const swing = lightingAim.bearing !== null ? (180 - lightingAim.bearing) - Math.atan2(fr[0], fr[1]) / DEG
+      : lightingAim.swing !== null && name !== 'night' ? lightingAim.swing : p.sun.swing;
+    const s = sunDirection(p, fr, swing), D = 34;
     // sun: the key, the only shadow caster. shadow.intensity < 1 leaves some sky in the shade (Pascal: 0.75).
     sunLight.color.set(p.sun.color); sunLight.intensity = p.sun.intensity;
     sunLight.position.set(cx + s[0] * D, s[1] * D, cz + s[2] * D);
@@ -360,7 +425,8 @@ export function createLighting({ THREE, scene, renderer, sunLight, hemisphereLig
     rimLight.position.set(cx + Math.sin(faz) * Math.cos(fel) * F, Math.sin(fel) * F, cz + Math.cos(faz) * Math.cos(fel) * F);
     rimLight.target.position.set(cx, 1, cz); rimLight.target.updateMatrixWorld();
     // sky: PMREM environment + backdrop; fog to the horizon colour
-    const sky = skyBaker.bake(name, p, s);
+    const envP = (p as any).envSky ? { ...p, sky: (p as any).envSky } : p;
+    const sky = envP === p ? skyBaker.bake(name, p, s) : skyBaker.bake(name, envP, s, p0);
     scene.environment = sky.environment; scene.environmentIntensity = p.env;
     scene.background = sky.background; scene.backgroundIntensity = 1;
     scene.fog.color.set(p.sky[1]); scene.fog.near = p.fog[0]; scene.fog.far = p.fog[1];
@@ -368,11 +434,17 @@ export function createLighting({ THREE, scene, renderer, sunLight, hemisphereLig
     scene.userData.horizon = parseInt(p.sky[1].slice(1), 16);
     renderer.toneMapping = houseToneMapping;
     renderer.toneMappingExposure = p.exposure * houseToneExposure;
+    // the grade's look uniforms (the composer's grade pass shares these objects): 1 at look 1
+    const bal = (p as any).balance || [1, 1, 1];
+    GRADE_BALANCE.x = bal[0]; GRADE_BALANCE.y = bal[1]; GRADE_BALANCE.z = bal[2];
+    GRADE_LOOK.x = p0.grade.saturation > 0 ? p.grade.saturation / p0.grade.saturation : 1;
     refitShadow();   // a low sun throws long shadows: the box has to hold them, not just the lot
     // the house's own light: tagged fixtures × lampGain, tagged window glass glowing (bloom/grade: composerFor)
     const glow = applyHouseGlow(THREE, scene, p);
     const w = window as any;
-    w.__houseLighting = { preset: name, label: p.label, lampGain: p.lampGain, windowGlow: p.windowGlow, glowColor: p.glowColor, horizon: scene.userData.horizon, sky: p.sky.slice(), sun: s, tagged: glow };
+    const bearing = ((180 - (Math.atan2(fr[0], fr[1]) / DEG + swing)) % 360 + 360) % 360;
+    w.__houseLighting = { preset: name, label: p.label, lampGain: p.lampGain, windowGlow: p.windowGlow, glowColor: p.glowColor, horizon: scene.userData.horizon, sky: p.sky.slice(), sun: s, tagged: glow,
+      swing: +swing.toFixed(2), sunBearing: +bearing.toFixed(2), look: lightingAim.look, grade: { ...p.grade }, balance: bal.slice() };
     window.dispatchEvent(new CustomEvent('house:lighting', { detail: w.__houseLighting }));
   }
   // The builder's dep, and the UI select, both land here. `preset` is optional — applyLighting's own
@@ -381,6 +453,8 @@ export function createLighting({ THREE, scene, renderer, sunLight, hemisphereLig
   // here defeated that guard by always handing applyLighting something truthy, forcing every build back to
   // the default preset even when the caller passed nothing. The builder always passes an aim; the UI never
   // does — so ?lighting= overrides the spec's preset, not the viewer's own choice.
+  // `preset`: a name, an alias or a spec's lighting object ({ preset, sunBearing }). `aim`: the builder's — front,
+  // centre, and the house's swing, bearing and look (kit-build.ts lightHouse).
   function setLightingPreset(preset, aim?) {
     if (aim && LIGHTING_OVERRIDE) preset = LIGHTING_OVERRIDE;
     const name = preset ? lightingName(preset) : undefined;
