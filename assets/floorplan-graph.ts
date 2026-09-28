@@ -407,8 +407,9 @@ export class FloorplanGraph {
    * blueprint3d Floorplan.findRooms: for every (corner, adjacent) pair walk the graph always taking
    * the tightest turn; de-duplicate the cycles and drop the clockwise ones (the outer face).
    * Not in blueprint3d: cycles narrower than a wall (MIN_ROOM_WIDTH) are dropped too. They are gaps
-   * inside the wall solids, not floor: façade cladding laid a few cm outside a perimeter wall whose
-   * end snaps onto it (aurora L2/L3), or the two leaves of a two-tone partition (familyhouse-nora L1).
+   * inside the wall solids, not floor: the two leaves of a two-tone partition (familyhouse-nora L1).
+   * Façade dressing outside the footprint (aurora's cladding) no longer closes one, since fromFootprint
+   * doesn't snap it, but the width rule would still catch a pocket drawn some other way.
    */
   static findRooms(corners) {
     const theta = (prev, cur, next) => angle2pi(prev.x - cur.x, prev.z - cur.z, next.x - cur.x, next.z - cur.z);
@@ -503,16 +504,21 @@ export class FloorplanGraph {
       for (let i = 0; i < loop.length; i++) segs.push({ a: [...loop[i]], b: [...loop[(i + 1) % loop.length]], kind: 'exterior', thickness, height });
     }
     for (const p of partitions || []) {
-      segs.push({ a: [...p.from], b: [...p.to], kind: 'partition', thickness: p.thickness || partitionThickness, height: p.height || partitionHeight, partition: p });
+      // a partition standing outside the footprint is facade dressing (a coloured frame or fin a few cm
+      // off the exterior wall, e.g. aurora's), not a room divider
+      const dressing = !rects.some(rc => inRect((p.from[0] + p.to[0]) / 2, (p.from[1] + p.to[1]) / 2, rc));
+      segs.push({ a: [...p.from], b: [...p.to], kind: 'partition', thickness: p.thickness || partitionThickness, height: p.height || partitionHeight, partition: p, dressing });
     }
 
-    // 1. snap partition ends onto any segment within `snap` (authored coordinates vs the 0.1 m raster outline)
+    // 1. snap partition ends onto any segment within `snap` (authored coordinates vs the 0.1 m raster outline).
+    //    Dressing stays where it is authored: snapped onto the wall it runs beside, a frame's free end would
+    //    close a sliver between the two that counts as a room.
     for (const s of segs) {
-      if (s.kind !== 'partition') continue;
+      if (s.kind !== 'partition' || s.dressing) continue;
       for (const key of ['a', 'b']) {
         const p = s[key]; let best = null;
         for (const o of segs) {
-          if (o === s) continue;
+          if (o === s || o.dressing) continue;
           const c = closestPointOnSegment(p[0], p[1], o.a[0], o.a[1], o.b[0], o.b[1]);
           if (c.dist < snap && (!best || c.dist < best.dist)) best = c;
         }
