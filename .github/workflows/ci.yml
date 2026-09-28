@@ -9,6 +9,7 @@
 # on a GPU. Run `pnpm run check` locally before pushing (see README.md → How verification works). The goldens
 # are Git LFS objects and this job does not fetch them.
 # ============================================================================
+# deploy.yml publishes main only after this workflow passes, and finds it by this name: renaming it stops deploys.
 name: ci
 
 on:
