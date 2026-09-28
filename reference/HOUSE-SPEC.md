@@ -72,8 +72,8 @@ any value but 1 or 2.
   "footprint": [ { "x": -6, "z": -4, "w": 12, "d": 8 }, { "x": 6, "z": 0, "w": 4, "d": 4 } ],
                      // union of axis-aligned rects → perimeter walls are derived automatically
   "wallColor": "#…", "trimColor": "#…",   // optional per-level overrides of palette. wallColor drives this storey's
-                                          // stucco trim band, painted eaves and default interior — NOT its cladding,
-                                          // which is palette.wall's, one material a house
+                                          // stucco trim band, painted eaves and default interior; it clads the storey
+                                          // too with `material` (or under "defaults": 2) — see Kit (S1)
   "interior": "#…",  // optional: this storey's inside wall colour (default palette.interior, else wall lifted)
   "openings": [
     // side = S|N|E|W. `at` is the X coordinate for S/N walls and the Z coordinate for E/W walls
@@ -89,7 +89,7 @@ any value but 1 or 2.
   "partitions": [
     { "from": [-2, -4], "to": [-2, 4], "door": 1.5, "doorW": 0.9, "height": 2.7, "color": "#…" }
                      // door = distance from `from` along the wall, or null; height (default level height − 0.1);
-                     // color (default the storey's interior colour) — the door leaf stays teal
+                     // color (default the storey's interior colour); the leaf: doorColor / doorStyle (Kit, S1)
   ],
   "stairs":  { "type": "timber", "at": [3, 0], "rot": 180, "to": "l2", "w": 1.1, "run": 3.36 },
                      // timber | colonial | spiral ; at = bottom step; rot = ascent direction (0 = ascends toward +Z);
@@ -204,7 +204,7 @@ Any item may pass `"w"`, `"d"`, `"color"` overrides where the underlying builder
 - **The Core orbit** (`assets/core-orbit.ts`) — door-to-core's last third and all of core-orbit. The builder probes a circle round the Core every 5° (radius 0.8 m for a shelf Core, 0.9 m on a desk, 0.2 m wider for core-orbit; eye 0.45 → 0.36 m above the Core's centre, lower under a low ceiling): an angle is free where the eye is 0.3 m off every wall, clear of every piece of furniture (0.22 m from one standing at eye height, like the monitor), under the ceiling, and a ray to the Core meets nothing. The orbit takes the free run through the Core's front and **ends on the front** — 15–45° past straight-on, so the last frames hold the button and LED ring at a three-quarter with the room (or the monitor) behind — core-orbit starts as far round as the run allows (up to 200°; the QA gate warns under 120°), and where nothing round the Core is free at any radius it falls back to a slow push-in on its front (`note` says so; the gate warns `core-orbit-fallback`). door-to-core's finale **starts where the walk arrives**: it weighs both directions round the Core and every start from the longest sweep (150°) down to 45° against the curve the walk will actually fly — above all the degrees its last 4 m and the push-in travel round the Core *against* the orbit while the Core is in sight (circling one way for the orbit to sweep back over the same arc is the one thing a long sweep must never cost), then how near it passes the Core's dark front and how hard it turns into the push-in and the orbit. A walk that arrives from one side gets a long sweep that carries on round; one that comes straight at the front gets 45–60° from the front to a three-quarter (60–125° across the 30 houses). Its walk ends at an **approach** 1.2–2 m out on the orbit's starting side, then pushes in along a line that keeps the Core in sight. A flight that lands beside the Core (lakecabin, modernhouse1, payorote) has carried the eye round it before the walk starts, and no orbit that ends on the front can undo that; the gate warns `orbit-swing-back` over 20° in the 2.5 s before the orbit, and `orbit-short` under 60°. Waypoints every ≤ 15° keep the Catmull-Rom circular; the look is locked on the Core, turned so it sits off-centre (door-to-core ~a quarter of the frame, core-orbit slightly) with the room it is heading into on the other side.
 - **Timing** (`assets/shot-path.ts`): door-to-core and core-orbit pin each waypoint to a moment in the shot instead of spreading one ease over the path's arc length. door-to-core gives the orbit a third of its 12 s at 25–40°/s (about 4 s: 30 % of a 14 s shot), the push-in about a second, and the rest to the travel — the fly-in and the street at 2.2× and 1.5× the indoor pace, the doorway and the stairs a little under it — and moves from its first frame. The look turns against time, and no leg turns it faster than 110°/s at any moment: a leg that swings it round (the turn just inside a door, the U-turn at the foot of a switchback stair) is given the seconds that keep its *peak* rate — yaw and pitch together, as the monotone cubic through the waypoints' looks turns it — under 110°/s, and the straight legs make them up. A shot too short for all that runs its orbit at 40°/s, then raises the budget for every turning leg alike rather than leaving one a whip (the gate warns `look-whip` over 125°/s and fails it over 300°/s; `validate` refuses a door-to-core under 8 s). The Core's off-centre framing turns in over the push-in; core-orbit eases in and out of a steady turn. The timing is laid out for the duration the spec pins (`shots[]`), 12 s by default; a house whose walk is long (three storeys, or 40 m+ that would take the indoor pace past ~4 m/s — asymmetry, bgfamily, mirage, palms, palnknoll) pins door-to-core at 14 s, the most it should take. A monotone cubic through the (time, distance) knots keeps the speed smooth, and the look direction turns by heading and pitch between waypoints, so it never flips over the eye. Frames stay random access: `shot.frameAt(t, aspect)` is a pure function of t. Inside the house `door-to-core` **walks each storey** on a 0.25 m nav grid — through partition doorways, off the perimeter, and around anything taller than 1.1 m (wardrobes, bookshelves, ensuites, big plants) — from the door to the stair foot, landing to landing, and the last landing to the desk; a leg whose straight line is already clear stays straight. A flight is an obstacle on the storey it climbs from — the walk goes round it to its foot, never under it — and a flight whose first step is against a wall (nowhere to stand in line with it) is reached from the side of its first steps. The walk also keeps 0.2 m off the walls as built (the jambs, and an open door's leaf standing out into the room); where the furnished storey leaves no way through it eases the margins, then squeezes between the pieces of furniture at eye height, then keeps to walls and stairs alone, then squeezes past an open door standing across a corridor (0.16 m off its edge) — never the straight line through a partition. The finished curve is then checked every 3 cm against the walls, the stairs' treads and spine and the furniture, and a waypoint goes on the chord wherever the Catmull-Rom swings into one. So furniture never has to be arranged around the camera (the QA gate's `item-clip` warning names anything the eye still meets).
 - Shots render the house **complete**: full-height walls and roofs on, whatever wall mode the editor is in. Once the eye passes under a ceiling the roofs fade out over the last 5 % of the approach and stay off; walls stay full, so every interior leg goes through doorways (the QA gate tests full walls — a `wall-clip` is an error). Offline frames go through GTAO (ambient occlusion) + SMAA; the editor's live view does not. Frames are deterministic — seeded procedural textures and AO noise, no wall-clock animation while a shot records — and `scripts/test-frame-hash.mts` proves it (two fresh contexts, pixel-compared) before goldens or a re-lay are trusted.
-- Doors: a hinged leaf hangs on the wall's local −x jamb (the `from` end of an along-X partition, the `to` end of an along-Z one) and stands open 88° flat to the wall; openings wider than 1.1 m are cased openings with no leaf; an entry `slider` parks both panels on its local +x half and the shot enters through the other.
+- Doors: a hinged leaf hangs on the wall's local −x jamb (the `from` end of an along-X partition, the `to` end of an along-Z one) and stands open 88° from shut (under `"defaults": 2` folded flat along the wall); openings wider than 1.1 m are cased openings with no leaf unless they name a `leaf` (Kit, S1); an entry `slider` parks both panels on its local +x half and the shot enters through the other.
 - **Fixtures follow the room's name** (`assets/fixtures.ts`): the name picks a kind — service (garage, storage,
   laundry …), bath, bed (bed, suite, nursery, kids, guest …), kitchen, dining, living (living, lounge, family,
   den, media, sunroom, playroom, `bar` …), work (study, office, studio, library …), hall (hall, landing, entry,
@@ -240,7 +240,82 @@ its fragment under `assets/spec/`, its lints in its plugin under `scripts/valida
 ### Kit (S1)
 
 Doors, palette restraint, per-level cladding, room fixtures, hero surfaces and lighting (`assets/spec/kit.ts`,
-`scripts/validate/kit.mts`). Nothing yet.
+`scripts/validate/kit.mts` and `hero.mts`; the rules are `assets/kit-rules.ts`; fixtures
+`test/fixtures/houses/s1-kit-*.json`; tests `scripts/test-kit.mts`, `scripts/test-kit-hero.mts`).
+
+**Two fleet fixes** apply to every house: the curved monitor's pole stands behind its chassis and its screen is
+matte (no pole through the UI, no ghosted room), and ceilings are a neutral white lit without the hour's ground
+tint (no olive ceilings in daylight). Everything else below is a new field, or a look-changing default that
+applies only under `"defaults": 2`.
+
+```jsonc
+"lighting": { "preset": "golden", "sunBearing": 225 },   // or "golden". sunBearing: the sun's compass bearing,
+                                                          // degrees (0 north = −Z, 90 east, 180 south = the street)
+"palette": {
+  "door": "#7a5236",            // every hinged exterior leaf, the entry's too, unless the opening has its own color
+  "restraint": 0.5,             // 0..1: how far wall / roof / interior are pulled toward restraint (1 = today's)
+  "keep": ["wall", "accent"],   // roles exempt from restraint: wall | trim | accent | roof | door | interior
+                                // (a kept roof colour renders within ΔE 3 of itself: no charcoal pull either)
+  "roofPull": false             // no roof pulled toward charcoal
+},
+"levels": [{ "material": "brick", "wallColor": "#9a4b3a",   // this storey's own cladding, in its own colour
+  "openings": [
+    { "type": "door", "w": 1.6, "leaf": "french", "transom": 0.45, "frame": "#3b3530", "grid": "vertical",
+      "lantern": true, "head": "arch", "swing": "in", "id": "front" },
+    // leaf: single | glazed | double | french | none — a pair hinges on both jambs (a door over 1.1 m without a
+    //   leaf is still a cased opening; under defaults 2 a 1.2–1.8 m door gets a pair)
+    // transom: metres of glass over the leaf. frame: the colour of window frames, a slider's frames, a transom.
+    // grid: none | 2x2 | vertical | prairie muntins. lantern: a lantern each side (default: the entry and a garage).
+    // head: flat | arch | segmental — the wall hole's top follows the arc (windows and doors), with an arched
+    //   frame, fanlight and casing (S2 dresses it). swing: which way an open leaf parks.
+    { "type": "garage", "w": 2.4, "color": "#4f6b52" },   // a garage's leaf, a slider's frame: `color` is honoured
+  ],
+  "partitions": [{ "from": [0, 0], "to": [0, 4], "door": 2, "doorColor": "#6a4e33", "doorStyle": "glazed", "doorSwing": "in" }],
+  "rooms": [{ "name": "Den", "program": "den",                // S3's program decides the fixtures' room kind
+    "fixtures": { "fan": false, "pendants": 2, "ceiling": "chandelier", "lamp": "globe" } }]
+  // fixtures: fan true | false; pendants over the island / table (0 = none); ceiling flush (cans) | chandelier |
+  //   none; lamp: what the room's floor lamps become — drum | globe | cone | mushroom | tripod
+}],
+"hero": { "surface": "island", "surfaceColor": "#e8e4dc", "desk": { "style": "oak", "color": "#…", "w": 1.6 },
+          "monitor": "flat", "chair": { "kind": "task", "pose": "turned" }, "shelfWidth": 1.2, "upstairs": true }
+```
+
+- **Hero surfaces.** `surface`: `desk` | `shelf` | `credenza` | `island` | `console` | `counter` | `none`, or any type
+  in `assets/item-map.ts` SURFACE_TYPES (sideboard, dresser, writing-desk …). A piece backs onto the wall `rot` names,
+  its front to the room; the Core stands on its real top (a ray cast finds it: the credenza's 0.605 m, the island's
+  0.94 m, past a turntable, a bowl, a faucet or a cooktop — on the island at the user-side end, ≥ 0.35 m from both at
+  any rotation). The island's stone is `surfaceColor` or a seeded stone, and it brings no stools into a room that has
+  its own. `anchors.hero.coreBox` is the device's exact box (never its desk-glow decal); the scene QA's `hero-float`
+  fails a Core more than 5 mm above its top. `desk` (style walnut | oak | white | black, `color`, `w`), `monitor`
+  (curved | flat | none) and `chair` (`kind` task | lounge | none, `pose` turned | tucked — S5 reads the pose) dress a
+  desk hero.
+- **Page furniture parameters** (`assets/item-map.ts` ITEM_PARAMS, published for S3's catalog): sectional `w`,
+  `handed`; dining-table `chairs` (0–8); kitchen-island `stools`; kitchen-cabinetry `h`, `counter`, `uppers` (shelf |
+  solid | glass | none), `sink`, `cooktop`; media-credenza `turntable`; fireplace `style` (modern | mantel | stone |
+  painted-brick | tv-breast). Under `defaults: 2` an item's `color` paints the part it names and the house's theme
+  still colours the rest (without it, `color` switches theming off for the whole item, and a builder that ignores
+  `color` ignores it — the validator's `kit:silent-param` says which).
+- **Under `"defaults": 2`:** hinged leaves are derived, never teal — the trim on a modern dark-trimmed house, else a
+  timber leaf (the kit's seeded wood, never near-black); partition leaves the casing white or the timber; a 1.2–1.8 m
+  door gets a pair; the entry swings in and every open leaf parks flat along its wall (within 10° of it); no automatic
+  lanterns; a storey's `wallColor` clads it; ceiling fans in at most a quarter of the rooms that could take one, never
+  a kitchen, a bath or the hero's room; each room's floor lamps take one of five heads; seeded wood, fabric and cabinet
+  roles are lifted clear of black; a roof is pulled toward charcoal only when it has no colour of its own; each house
+  gets its own seeded sun (18–70° either side of its entry), and the true-white look — the hour's light and sky
+  bounce pulled toward white, a partial white balance, saturation held at 0.86 — so golden hour and dusk stop turning
+  white walls pink and a blue wall grey. Use `palette.keep` for the one committed hue.
+- **Anchors** (and `<id>.plan.json`'s `kit` key): `anchors.doors[]` — every hinged leaf in world terms (`hinge`,
+  `closedYaw`, `openYaw`, `w`, `h`, `y0`, `swing`, `kind`: entry | exterior | interior), for S5 to open doors;
+  `anchors.openings[]` — every perimeter opening (`centre`, `normal`, `w`, `h`, `sill`, `head`), for S2's dressing;
+  `anchors.lighting`. **For other streams:** `kit.cladding({ kind, color })` (cached per pair), `kit.roofMaterial({
+  finish, color })`, `kit.finish(kind, { color, pattern, scale, yBase })` — floors: oak, honey-oak, walnut, cherry,
+  white-oak, grey-wash, herringbone, tile (pattern square | hex | checker), terracotta, pavers, concrete, carpet,
+  marble, terrazzo; walls: paint, painted-brick, wallpaper (stripe | dot | botanical), wainscot, board-and-batten,
+  brick, stone, timber — and `roomKind(room)` (`assets/fixtures.ts`).
+- **Lints** (warnings): `kit:lighting-alias`, `kit:silent-param`, `kit:style`, `kit:wide-leaf`, `kit:fan-over-hero`,
+  `kit:no-top`; the Core policy (`hero.mts`, §4.6): `hero:one-core`, `hero:storey`, `hero:wall` (a desk or shelf ≤
+  0.45 m off its wall), `hero:doorway`, `hero:approach` (2 m clear in front), `hero:contrast` (charcoal on walnut). A
+  malformed S1 field is an error.
 
 ### Architecture (S2)
 

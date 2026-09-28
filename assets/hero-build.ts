@@ -90,7 +90,8 @@ export function createHeroBuild(bctx, { DESK_TOP }: any = {}) {
       // 0.8 m by default — console height, and under the 0.85 m cutaway line, so on a cut wall the shelf
       // still has a wall behind it; hero.shelfHeight raises it where the wall stays full height
       const sx = hx - fwd[0] * 0.4, sz = hz - fwd[1] * 0.4, shelfH = spec.hero.shelfHeight || 0.8;
-      const sh = put(() => spec.hero.surfaceColor ? AssetFactory.createFloatingShelf(0.9, 0.26, shelfH, hex(spec.hero.surfaceColor)) : AssetFactory.createFloatingShelf(0.9, 0.26, shelfH), sx, sz, y, 'Hero Shelf'); sh.rotation.y = rot + Math.PI;   // plank extends local +Z = fwd, into the room
+      const shelfW = spec.hero.shelfWidth || 0.9;   // hero.shelfWidth: a longer plank for books and a plant either side
+      const sh = put(() => spec.hero.surfaceColor ? AssetFactory.createFloatingShelf(shelfW, 0.26, shelfH, hex(spec.hero.surfaceColor)) : AssetFactory.createFloatingShelf(shelfW, 0.26, shelfH), sx, sz, y, 'Hero Shelf'); sh.rotation.y = rot + Math.PI;   // plank extends local +Z = fwd, into the room
       surfaceObj = sh; surfaceType = 'shelf';
       cx = sx + fwd[0] * 0.13; cz = sz + fwd[1] * 0.13; dy = shelfH;
       // a couple of books to one side, so it reads as a shelf and not a mount

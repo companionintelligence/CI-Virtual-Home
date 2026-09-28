@@ -98,6 +98,8 @@ export interface KitHero {
   monitor?: 'curved' | 'flat' | 'none';
   /** the desk chair: its kind, and its pose for the finale (S5 reads pose) — or the kind alone */
   chair?: 'task' | 'lounge' | 'none' | { kind?: 'task' | 'lounge' | 'none'; pose?: 'turned' | 'tucked' };
+  /** a shelf hero's plank length, metres (default 0.9) */
+  shelfWidth?: number;
   /** the photo's signature room is upstairs: the Core policy lint (validate/hero.mts) allows it off the entry storey */
   upstairs?: boolean;
 }

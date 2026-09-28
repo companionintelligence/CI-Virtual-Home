@@ -163,6 +163,8 @@ const check: Check = (spec, ctx) => {
     }
   }
   if (h.upstairs !== undefined && typeof h.upstairs !== 'boolean') err(`hero.upstairs ${JSON.stringify(h.upstairs)} (true | false)`);
+  if (h.shelfWidth !== undefined && !(typeof h.shelfWidth === 'number' && h.shelfWidth >= 0.5 && h.shelfWidth <= 2.4)) err(`hero.shelfWidth ${JSON.stringify(h.shelfWidth)} (metres, 0.5–2.4)`);
+  if (h.shelfWidth !== undefined && (h.surface || 'desk') !== 'shelf') warn(`hero.shelfWidth is for a shelf surface (this hero stands on a ${h.surface || 'desk'})`, 'silent-param');
 
   // ---- a ceiling fan over the Core: the hero's room is a fan room, nothing hung keeps it off, and nothing says no
   const hr = heroRoom(spec);
