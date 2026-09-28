@@ -172,35 +172,60 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
 The site is the Cloudflare Pages project `ci-virtual-home`, a direct-upload project (Cloudflare does not watch
 the repository), served at <https://homes.ci.computer/> and <https://ci-virtual-home.pages.dev/>.
 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds the site (`pnpm install`, `build`,
-`portal:build --site-url …`) and uploads `dist/` with Wrangler, through `cloudflare/wrangler-action`:
+`portal:build --site-url …`) and uploads it with a pinned Wrangler:
 
 | When | Where it goes |
 |---|---|
-| A push to `main`, or **Run workflow** on `main` | Production: <https://homes.ci.computer/> |
-| A pull request from a branch of this repository | A preview at `https://pr-<number>.ci-virtual-home.pages.dev/`, replaced on every push to the PR. The run's summary links it. |
-| **Run workflow** on any other branch | A preview under the branch's name, slugged (`clau/p4-s1` → `https://clau-p4-s1.ci-virtual-home.pages.dev/`). |
+| `ci` passes on a push to `main` (or **Run workflow** on `main`, which checks that `ci` passed on its head) | Production: <https://homes.ci.computer/> |
+| A pull request from a branch of this repository, once someone approves it | A preview at `https://pr-<number>.ci-virtual-home.pages.dev/`, replaced on every approved push to the PR. The PR's deployment and the run's summary link it. |
+| **Run workflow** on any other branch, once someone approves it | A preview under the branch's name, slugged (`clau/p4-s1` → `https://clau-p4-s1.ci-virtual-home.pages.dev/`). |
 
-A preview's link previews point at the preview itself, never at production.
+Production waits for [`ci.yml`](.github/workflows/ci.yml) (build, typecheck, validate, tests, `portal:build`), so a
+red `main` does not go live; it stays on the last commit that passed. A preview's link previews point at the preview
+itself, never at production. The preview is built from the PR's head commit, and the deployment is labelled with it.
 
-**Owner setup, once.** Deploys need one repository secret, `CLOUDFLARE_API_TOKEN`. Create it as a Cloudflare API
-token (dash.cloudflare.com → My Profile → API Tokens → Create Token → Custom token) with the permission
-**Account · Cloudflare Pages · Edit**, limited to the account that holds the project. Add it in the repository's
-Settings → Secrets and variables → Actions as a *repository* secret (the workflow uses no GitHub environment, so an
-environment secret would not reach it). Until the secret exists, the deploy job is skipped with a notice, not failed,
-so `main` stays green. The account ID is set in the workflow (`PAGES_ACCOUNT_ID`); a `CLOUDFLARE_ACCOUNT_ID`
-repository variable or secret overrides it. Pull requests from forks, and Dependabot's, get no preview, because
-GitHub gives them no secrets.
+**What the token can do.** Cloudflare's **Pages · Edit** permission cannot be limited to one project: the token can
+publish to, or delete, every Pages project on the account, and this account holds seven today, among them the
+public website and the docs. So the workflow never lets a branch near it. The upload job is the only one that holds the
+token; it checks out nothing and installs nothing from the repository, and it runs in a GitHub *environment*:
+production only for `main`, and only from the copy of `deploy.yml` on `main`; previews only after a reviewer
+approves the run (a preview runs the branch's own workflow and code, so approve only a change you have read). To
+take the rest of the account out of reach entirely, move the project to a Cloudflare account of its own.
 
-**By hand**, from a checkout, with Wrangler logged in to that account (`pnpm dlx wrangler@4 login`). This is the
-same build and upload the workflow runs:
+**Owner setup, once.**
+
+1. Create an account API token (dash.cloudflare.com → Manage Account → **Account API Tokens** → Create Token; it
+   needs a Super Administrator), with the one permission **Account · Cloudflare Pages · Edit** on the account that
+   holds the project. An account token outlives any one person's membership; a My Profile token does not.
+2. In the repository's Settings → Environments, create **`production`**: Deployment branches and tags → Selected
+   branches and tags → `main` only. Add the token to it as the environment secret `CLOUDFLARE_API_TOKEN`.
+3. For previews (optional), create **`preview`**: Required reviewers → the people who may publish a preview (tick
+   *Prevent self-review*). Add the same secret to it.
+4. Never add the token as a repository or organisation secret: every branch's workflows can read those, and the
+   workflow fails if it finds one.
+
+Until an environment exists, is protected as above and holds the secret, deploys to it are skipped with a notice,
+never failed, so `main` stays green. With no `preview` environment there are no previews at all. The account ID is
+set in the workflow (`PAGES_ACCOUNT_ID`); a `CLOUDFLARE_ACCOUNT_ID` repository variable overrides it. Pull requests
+from forks, and Dependabot's, get no preview.
+
+Previews are public: anyone with a `pr-<n>` address, or the address of one deployment, can open the unmerged tree,
+and PR numbers are easy to guess. Nothing removes a closed PR's preview. If that matters, turn on Cloudflare Access
+for the project's preview deployments in its Pages settings, and delete old deployments in the dashboard.
+
+**By hand** — only when the workflow cannot, since it skips `ci` and both environments. From a clean clone of
+`main`, with Wrangler logged in to that account (`pnpm dlx wrangler@4.143.0 login`). `portal:build` leaves files it
+does not own in `dist/` (`export:core`'s models, for one), so start from an empty `dist/`:
 
 ```bash
-pnpm run build && pnpm run portal:build --site-url https://homes.ci.computer/
-pnpm dlx wrangler@4 pages deploy dist --project-name=ci-virtual-home --branch=main   # any other --branch is a preview
+rm -rf dist && pnpm install --frozen-lockfile && pnpm run build
+pnpm run portal:build --site-url https://homes.ci.computer/
+pnpm dlx wrangler@4.143.0 pages deploy dist --project-name=ci-virtual-home --branch=main
 ```
 
-Wrangler is deliberately not a devDependency: the workflow's action adds it for its own job, so a normal
-`pnpm install` does not pull it in.
+Any other `--branch` is a preview; build it with that preview's own `--site-url`
+(`https://<branch>.ci-virtual-home.pages.dev/`), or its link previews point at production. Wrangler is deliberately
+not a devDependency: the workflow runs it from an empty directory, so a normal `pnpm install` does not pull it in.
 
 **GitHub Pages is retired** for this repository. Its github.io address redirects to the organisation's old custom
 domain (store.ci.computer), which serves nothing, so the former `pages.yml` deployed to nowhere and has been

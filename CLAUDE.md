@@ -42,14 +42,15 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 **The portal.** `index.html` (the gallery) and `room-creator.html?mode=view` (the player, `assets/viewer.ts`)
 are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 
-- `.github/workflows/deploy.yml` deploys `main` to production on every push, and each PR from a branch of this
-  repo to a preview at `https://pr-<n>.ci-virtual-home.pages.dev/` (README → Deploying). It needs the repository
-  secret `CLOUDFLARE_API_TOKEN`, a Cloudflare API token with **Account · Cloudflare Pages · Edit** on the account
-  that holds the `ci-virtual-home` project. Without it the deploy job is skipped with a notice, never failed.
-  Only the owner adds that secret; never ask for the token or put one in the repo.
-- GitHub Pages is retired: its github.io address redirects to a dead org domain. Do not bring a github.io deploy
-  back, and do not make Wrangler a devDependency (the workflow's action installs it; by hand it is
-  `pnpm dlx wrangler@4 pages deploy dist --project-name=ci-virtual-home --branch=main`).
+- `.github/workflows/deploy.yml` deploys `main` to production after `ci.yml` passes on it, and a PR from a branch
+  of this repo to `https://pr-<n>.ci-virtual-home.pages.dev/` once a reviewer approves (README → Deploying). Its
+  token (`CLOUDFLARE_API_TOKEN`, Cloudflare Pages · Edit) can publish to or delete every Pages project on the
+  account, so it lives only in the `production` and `preview` GitHub environments, and only the upload job — which
+  checks out and installs nothing — holds it. Keep it that way: no repository secret, no checkout, install or
+  repository script in that job, actions pinned to commits. Only the owner sets the token; never ask for it.
+- Do not deploy by hand; merge, or ask the owner to run the workflow. The by-hand steps in the README are the
+  owner's fallback. GitHub Pages is retired (its github.io address redirects to a dead org domain): do not bring a
+  github.io deploy back, and do not make Wrangler a devDependency.
 - Every URL in them must be relative — no leading `/`. `portal:build` fails on a root-relative one, and
   `portal:test` serves the site under a sub-path (`/ci-virtual-home/`) so that one fails there too.
 - The player is additive: everything it needs from the page goes through the one object `room-creator.html`
@@ -69,8 +70,8 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 - `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
 
 **Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and assembles
-the portal (`portal:build`'s link and staleness checks); once the deploy secret is set, a merge to `main` goes
-live on its own. The render gate needs a GPU and runs here:
+the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
+passes those goes live on its own. The render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
