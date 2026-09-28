@@ -53,10 +53,17 @@ export const metrics: Metric[] = [
     id: 'axis-aligned-edges', title: 'Axis-aligned bed and path edges', stream: 'S4', target: '≤ 20 % of their length',
     compute(f) {
       const rows = [];
-      let all = 0, axis = 0;
+      let all = 0, axis = 0, built = 0;
       for (const h of f.houses) {
         let a = 0, t = 0;
-        for (const s of h.spec.site || []) for (const [p, q] of edges(s)) {
+        // as built when the house's plan carries them (fleet-audit --built: curves resolved, plantings' beds laid out,
+        // a bed's straight edge against the house left out), else as authored
+        const planEdges = h.plan && h.plan.site && !Array.isArray(h.plan.site) && Array.isArray(h.plan.site.edges) ? h.plan.site.edges : null;
+        if (planEdges) built++;
+        const segsOf = planEdges
+          ? planEdges.flatMap(e => (e.pts as number[][]).map((p, i) => [p, e.pts[(i + 1) % e.pts.length], e.wall ? e.wall[i] : false] as [number[], number[], boolean]).slice(0, e.closed ? e.pts.length : e.pts.length - 1).filter(x => !x[2]).map(x => [x[0], x[1]] as [number[], number[]]))
+          : (h.spec.site || []).flatMap(s => edges(s));
+        for (const [p, q] of segsOf) {
           const dx = q[0] - p[0], dz = q[1] - p[1], len = Math.hypot(dx, dz);
           if (len < 1e-6) continue;
           const deg = Math.atan2(Math.abs(dz), Math.abs(dx)) * 180 / Math.PI;   // 0 along x, 90 along z
@@ -68,7 +75,7 @@ export const metrics: Metric[] = [
       const share = all ? axis / all : 0;
       return {
         value: `${(share * 100).toFixed(0)} % of ${all.toFixed(0)} m`, measure: +share.toFixed(4), pass: all ? share <= 0.2 : null,
-        detail: 'Bed outlines (a polygon, or the rectangle at w × d) and path centre lines on the 30 real lots, by length; an edge within 1° of the x or z axis counts as axis-aligned. Authored geometry only: once S4 resolves `planting`, `smooth` and walks at build time, this should measure the built edges (house.plan — export them from assets/plan-export/site.ts and run `fleet-audit --built`).',
+        detail: `Bed outlines and path centre lines on the real lots, by length; an edge within 1° of the x or z axis counts as axis-aligned. ${built ? `Measured as built on ${built} of ${f.houses.length} houses (their plan's site.edges: curves resolved, plantings laid out, a bed's edge against the house left out)` : 'As authored (run `fleet-audit --built` to measure the edges the builder resolves)'}.`,
         table: { head: ['house', 'edge length (m)', 'axis-aligned'], rows: rows.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2])) },
       };
     },

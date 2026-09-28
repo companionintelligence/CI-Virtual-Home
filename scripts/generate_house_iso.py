@@ -509,7 +509,15 @@ class HouseRenderer:
     # Site types the three.js site kit resolves with seeded variation (assets/site.js). Their instances come
     # from <id>.plan.json (scripts/build-house-plan.mts) as world boxes + shape + colour, so this twin draws
     # exactly what the 3D built instead of re-implementing the seeded builders.
-    PLAN_TYPES = {"tree", "shrub", "flowers", "rock", "bed", "path", "hedge", "scatter", "grove"}
+    PLAN_TYPES = {"tree", "shrub", "flowers", "rock", "bed", "path", "hedge", "scatter", "grove",
+                  # S4's generators and structures: plantings, terraces, stairs, shaped water, climbers, lights
+                  "planting", "terrace", "stair", "rill", "channel", "climber", "string-lights"}
+
+    @staticmethod
+    def plan_instances(plan):
+        # plan.json's `site` key: a list of instances (before S4), or { instances, solids, edges }
+        site = (plan or {}).get("site", [])
+        return site.get("instances", []) if isinstance(site, dict) else site
 
     def draw_site(self):
         plan = None
@@ -517,11 +525,16 @@ class HouseRenderer:
         if pp.exists():
             try: plan = json.loads(pp.read_text())
             except Exception: plan = None
+        instances = self.plan_instances(plan)
+        by_site = {}
+        for ins in instances: by_site.setdefault(ins.get("site"), []).append(ins)
         for i, s in enumerate(self.spec.get("site", [])):
             t = s.get("type")
-            if t in self.PLAN_TYPES:
+            # anything the builder described itself (a kit type, or an S4 item in a new form: a shaped pool, a
+            # patio drawn round a polygon, a terrace) is drawn from what it built
+            if t in self.PLAN_TYPES or (plan is not None and i in by_site and any(ins.get("shape") == "poly" for ins in by_site[i])):
                 if plan is not None:
-                    self.site_from_plan(s, [ins for ins in plan.get("site", []) if ins.get("site") == i])
+                    self.site_from_plan(s, by_site.get(i, []))
                     continue
                 if t in ("tree", "shrub"):   # no plan: the old fixed drawings
                     getattr(self, "site_" + t)(s); continue
@@ -539,12 +552,17 @@ class HouseRenderer:
         xs = [b for ins in instances for b in (ins["box"][0], ins["box"][3])]
         zs = [b for ins in instances for b in (ins["box"][2], ins["box"][5])]
         ys = [b for ins in instances for b in (ins["box"][1], ins["box"][4])]
-        it = self.new((min(xs), max(xs), min(ys), max(ys), min(zs), max(zs)), name=s.get("type"), prio=1 if s.get("type") in ("path", "bed") else 2)
-        # paint back-to-front within the item: farther (smaller x+z) first, then lower
-        for ins in sorted(instances, key=lambda i: ((i["box"][0] + i["box"][3]) + (i["box"][2] + i["box"][5]), i["box"][1])):
+        it = self.new((min(xs), max(xs), min(ys), max(ys), min(zs), max(zs)), name=s.get("type"), prio=1 if s.get("type") in ("path", "bed", "planting", "terrace", "rill", "channel", "patio", "driveway", "pool") else 2)
+        # paint back-to-front within the item: flat outlines (beds, water, a terrace's plateau) first, then
+        # farther (smaller x+z) first, then lower
+        for ins in sorted(instances, key=lambda i: (0 if i["shape"] == "poly" else 1, (i["box"][0] + i["box"][3]) + (i["box"][2] + i["box"][5]), i["box"][1])):
             x0, y0, z0, x1, y1, z1 = ins["box"]
             col = ins.get("color", "#888888")
-            if ins["shape"] == "box" or ins["shape"] == "cyl" and (y1 - y0) < 0.2:
+            if ins["shape"] == "poly":   # S4: an outline in plan at its top (a bed, a pool's water, a terrace, a patio)
+                P = self.ctx.P
+                pts = [P(p[0], y1, p[1]) for p in ins.get("poly", [])]
+                if len(pts) >= 3: add_poly(self.ctx, it, pts, col, stroke=shade(col, -0.3), sw=0.6)
+            elif ins["shape"] == "box" or ins["shape"] == "cyl" and (y1 - y0) < 0.2:
                 box(self.ctx, it, x0, y0, z0, x1 - x0, y1 - y0, z1 - z0, (col, shade(col, -0.18), shade(col, -0.36)), stroke=shade(col, -0.45), sw=0.5)
             elif ins["shape"] == "cyl":   # a trunk: a thin box
                 box(self.ctx, it, x0, y0, z0, x1 - x0, y1 - y0, z1 - z0, (col, shade(col, -0.18), shade(col, -0.36)))

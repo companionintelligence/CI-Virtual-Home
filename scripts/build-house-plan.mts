@@ -1,8 +1,8 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Writes content/houses/<id>.plan.json — what the three.js builder resolved from the spec that the Python twins
 // cannot derive themselves: the seeded site instances (assets/site.js: trees of every species, shrubs, flowers,
-// rocks, beds, hedges, paths, scatters, groves) as world boxes with shape and colour. generate_house_iso.py draws
-// from it. One key per stream (assets/plan-export/: site, kit, and arch / compose / shots once those streams
+// rocks, beds, hedges, paths, scatters, groves, plantings) as world boxes with shape and colour, the site's solids
+// and its edges as built (assets/plan-export/site.ts). generate_house_iso.py draws from it. One key per stream (assets/plan-export/: site, kit, and arch / compose / shots once those streams
 // export anything). Run after editing specs or the site kit, before the isometrics:
 //   pnpm run plans [--house id[,id…]] [--out <dir>]      (node --experimental-strip-types scripts/build-house-plan.mts — any cwd)
 // --out writes the plans somewhere else (fleet-audit.mts --built: test/qa/plans), leaving the committed ones alone.
@@ -11,6 +11,8 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((a, x, i, arr) => {
 const ROOT = path.resolve(import.meta.dirname, '..');
 const HOUSES = path.join(ROOT, 'content', 'houses');
 const ids = args.house ? args.house.split(',') : JSON.parse(fs.readFileSync(path.join(HOUSES, 'index.json'), 'utf8')).houses.map(h => h.id);
+// a fixture id (test/fixtures/houses/<id>.json) answers as a house, so `--house s4-site-garden --out …` plans a fixture
+const FIXTURES = path.join(ROOT, 'test', 'fixtures', 'houses');
 const OUT_DIR = args.out && args.out !== 'true' ? path.resolve(args.out) : HOUSES;
 fs.mkdirSync(OUT_DIR, { recursive: true });
 async function loadPlaywright() {
@@ -25,7 +27,7 @@ async function loadPlaywright() {
   console.error('playwright is not resolvable'); process.exit(2);
 }
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.glb': 'model/gltf-binary' };
-const server = http.createServer((req, res) => { const f = path.join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname)); if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); } res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res); });
+const server = http.createServer((req, res) => { const u = decodeURIComponent(new URL(req.url, 'http://x').pathname), fx = u.match(/^\/content\/houses\/([a-z0-9-]+)\.json$/); const f = fx && !fs.existsSync(path.join(ROOT, u)) && fs.existsSync(path.join(FIXTURES, `${fx[1]}.json`)) ? path.join(FIXTURES, `${fx[1]}.json`) : path.join(ROOT, u); if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end(); } res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(res); });
 await new Promise<void>(resolve => server.listen(0, () => resolve()));
 const port = (server.address() as import('node:net').AddressInfo).port;
 const pw = await loadPlaywright();
@@ -39,7 +41,8 @@ for (const id of ids) {
   // Node type-check does not try to resolve it from scripts/)
   const plan: Record<string, any> = await page.evaluate(async () => { const { planOf } = await import(new URL('assets/plan-export/index.js', location.href).href); return planOf(__houseDebug().house.anchors); });
   fs.writeFileSync(path.join(OUT_DIR, `${id}.plan.json`), JSON.stringify({ id, generated: 'build-house-plan.mjs', ...plan }));
-  console.log(`${id}: ${(plan.site || []).length} site instances${Object.keys(plan).length > 2 ? ` (+ ${Object.keys(plan).filter(k => k !== 'site' && k !== 'kit').join(', ')})` : ''}`); n++;
+  const site = plan.site && !Array.isArray(plan.site) ? plan.site : { instances: plan.site || [], solids: [] };
+  console.log(`${id}: ${site.instances.length} site instances, ${site.solids.length} site solids${Object.keys(plan).length > 2 ? ` (+ ${Object.keys(plan).filter(k => k !== 'site' && k !== 'kit').join(', ')})` : ''}`); n++;
 }
 await browser.close(); server.close();
 console.log(`${n} plans → ${OUT_DIR}`);
