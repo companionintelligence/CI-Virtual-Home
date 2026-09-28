@@ -2,7 +2,8 @@
 // Writes content/houses/<id>.plan.json — what the three.js builder resolved from the spec that the Python twins
 // cannot derive themselves: the seeded site instances (assets/site.js: trees of every species, shrubs, flowers,
 // rocks, beds, hedges, paths, scatters, groves) as world boxes with shape and colour. generate_house_iso.py draws
-// from it. Run after editing specs or the site kit, before the isometrics:
+// from it. One key per stream (assets/plan-export.ts: site, kit, and arch / compose / shots once those streams
+// export anything). Run after editing specs or the site kit, before the isometrics:
 //   pnpm run plans [--house id[,id…]]      (node --experimental-strip-types scripts/build-house-plan.mts — any cwd)
 import fs from 'node:fs'; import path from 'node:path'; import http from 'node:http';
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, x, i, arr) => { if (x.startsWith('--')) a.push([x.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : 'true']); return a; }, []));
@@ -31,9 +32,11 @@ let n = 0;
 for (const id of ids) {
   await page.goto(`http://localhost:${port}/room-creator.html?house=${id}`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(h => document.documentElement.dataset.houseReady === h, id);
-  const plan = await page.evaluate(() => { const a = __houseDebug().house.anchors; return { site: a.siteInstances || [], kit: a.kit || null }; });
+  // assets/plan-export.ts picks each stream's key off the anchors, in the page (its URL built at run time, so the
+  // Node type-check does not try to resolve it from scripts/)
+  const plan: Record<string, any> = await page.evaluate(async () => { const { planOf } = await import(new URL('assets/plan-export.js', location.href).href); return planOf(__houseDebug().house.anchors); });
   fs.writeFileSync(path.join(HOUSES, `${id}.plan.json`), JSON.stringify({ id, generated: 'build-house-plan.mjs', ...plan }));
-  console.log(`${id}: ${plan.site.length} site instances`); n++;
+  console.log(`${id}: ${(plan.site || []).length} site instances${Object.keys(plan).length > 2 ? ` (+ ${Object.keys(plan).filter(k => k !== 'site' && k !== 'kit').join(', ')})` : ''}`); n++;
 }
 await browser.close(); server.close();
 console.log(`${n} plans → ${HOUSES}`);
