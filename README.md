@@ -44,13 +44,16 @@ root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `
 |---|---|
 | `pnpm run build` | Type-strips `assets/**/*.ts` to the `.js` the browser loads (esbuild `transform`, not a bundle). Run after any asset edit; `check` runs it first. |
 | `pnpm run typecheck` | `tsc` over `scripts/` (Node) and over `assets/` (browser). |
-| `pnpm run validate` | All 30 specs against the schema, the prop catalog and the registry. `--shots` adds the headless camera-path QA. |
+| `pnpm run validate` | All 30 specs against the schema, the prop catalog and the registry, then every `scripts/validate/*.mts` plugin. `--shots` adds the headless camera-path QA; `--layout` the layout lints. |
 | `pnpm run test` | `scripts/test-floorplan-graph.mts` under `node --test` — the floor-plan graph, mitres, and the wall compiler over every spec. Needs `build`. |
-| `pnpm run check` | **The gate** — all five checks below, in order. `--house a,b`, `--jobs N`, `--res`, `--update-goldens`. |
+| `pnpm run check` | **The gate** — every check below, in order. `--house a,b`, `--jobs N`, `--res`, `--update-goldens`, `--no-perf`. |
 | `pnpm run check:quick` | assets + specs + shots only: the fast loop while editing. |
 | `pnpm run shots` | Render product shots to `video/houses/` (`--house`, `--shot`, `--res 1080`, `--aspect 16:9`, `--poster-only`, `--qa-only`, `--jobs`). |
 | `pnpm run goldens` / `goldens:update` | Compare 150 frames with the committed baselines / re-bless them. |
 | `pnpm run frame-hash` | Two fresh browser contexts must render the same frames. |
+| `pnpm run fixtures` | Validate, QA and render the fixture houses in `test/fixtures/houses/` to stills (`test/fixtures/out/`, to look at) and compare their frame hashes (`--fixture`, `--update` to bless). |
+| `pnpm run perf` | Build, track and shot-QA timings against their budgets (3 s / 1 s / 0.5 s), report-only (`--house`, `--all`). |
+| `pnpm run fleet-audit` | The fleet sameness metrics (door colours, claddings, lighting, furniture repetition, planting …) → `test/qa/fleet-audit.md`. |
 | `pnpm run plans` | Rebuild `content/houses/<id>.plan.json` — the seeded site instances the isometric twin draws. |
 | `pnpm run iso` | Rebuild the isometric SVGs, Lotties and `scenes/manifest.json` (`--only <id>`, `--png`). |
 | `pnpm run floorplans` | Rebuild the CAD sheets and `floorplans.json` (`--only <id>`, `--no-png`, `--fit lot`). |
@@ -75,8 +78,14 @@ index.html                 the portal's gallery (portal/gallery.css, portal/gall
 portal/                    the portal's styles and script, thumbs/<id>.webp and hero.webp, and the link-preview
                            JPEGs previews/<id>.jpg and hero.jpg (derived, committed)
 floorplan-graph-demo.html  the Phase 2 floor-plan graph beside its compiled walls
-assets/                    the three.js engine, in TypeScript (house-builder, house-geometry, wall-compiler,
-                           floorplan-graph, roofs, fixtures, site, world, materials, textures, environment)
+assets/                    the three.js engine, in TypeScript. house-builder.ts is the orchestrator; each part is a
+                           module one stream owns: item-map + hero-build (kit), structure-build (architecture),
+                           rooms-build (compose), site-build (site), shot-planner-v1 + shot-track (shot),
+                           visibility (the page's wall modes and roof fade). Beside them house-geometry,
+                           wall-compiler, floorplan-graph, roofs, fixtures, site, world, materials, textures,
+                           environment, core-orbit, shot-path, plan-export
+  spec/                    the HouseSpec as a TypeScript type: base.ts + one fragment per stream, merged in index.ts
+  scene-qa/                the scene checks each stream registers with __houseSceneQA
   props/                   the prop registry — one module per category, ~150 props
   vendor/three/            three.js r169 + addons, vendored (one local patch; see THIRD_PARTY.md)
   fonts/                   Manrope + JetBrains Mono woff2 the capture scripts serve instead of Google Fonts
@@ -86,9 +95,13 @@ content/houses/            <id>.json — the 30 HouseSpecs (source); <id>.plan.j
 content/house-catalog.json every item type's measured footprint, height and iso parts (derived)
 scenes/                    isometric SVG + Lottie, CAD floor plans, and their manifests (all derived, committed)
 scripts/                   the pipeline: build, validate, render, gate (.mts) and the Python generators (.py)
+  validate/                validator plugins, one per stream (validate-house-spec.mts loads them)
+  fleet/                   fleet-audit metrics, one file per stream
 reference/                 HOUSE-SPEC.md (the schema), PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
                            HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review)
 test/goldens/macos-metal/  150 committed baseline frames (Git LFS) + PROFILE.json (the renderer that made them)
+test/goldens/expected-diffs.json  the golden ledger: frames a branch is declared to move (see How verification works)
+test/fixtures/houses/      fixture specs each stream proves its features on; hashes/<profile>.json their frame hashes
 video/houses/index.html    browser for rendered shots; the renders beside it are gitignored
 ```
 
@@ -169,7 +182,7 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
 
 ## How verification works
 
-`pnpm run check` runs five checks, each depending on the one before:
+`pnpm run check` runs these checks, the first five each depending on the one before:
 
 1. **assets** — compile `assets/**/*.ts`.
 2. **specs** — validate the 30 HouseSpecs.
@@ -187,6 +200,13 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
    door-to-core and hero-reveal final frames, at 640 × 360 through the full composer) and compare them to `test/goldens/<profile>/` with pixelmatch plus a
    mean-absolute-difference bar, so both "something moved" and "everything shifted a little" fail. Skipped if
    determinism failed, because a baseline compared against a renderer that disagrees with itself is noise.
+   A branch whose change is meant to move frames lists each in the **golden ledger**,
+   `test/goldens/expected-diffs.json` (`{ "<house>/<shot>@<t>": { "cause", "stream" } }`): a listed frame that
+   moved passes as expected, one that did not move fails, and anything unlisted that moved fails as before.
+6. **tests** — every `scripts/test-*.mts`, found by glob; a script opts out or into `--quick` with an
+   `@check-house` line in its header. Among them `test-fixtures.mts`, the fixture houses' QA and frame hashes.
+7. **perf** — build ≤ 3 s, `__houseShotTrack` ≤ 1 s and shot QA ≤ 0.5 s a shot on aurora, mirage and vanilla:
+   report-only, it never fails the gate.
 
 Baselines belong to a renderer profile (GPU + Chromium build), which is why `playwright` is pinned exactly.
 They are re-blessed **only on purpose** — `pnpm run goldens:update` after a change meant to alter the look,
