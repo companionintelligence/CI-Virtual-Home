@@ -185,8 +185,8 @@ A preview's link previews point at the preview itself, never at production.
 **Owner setup, once.** Deploys need one repository secret, `CLOUDFLARE_API_TOKEN`. Create it as a Cloudflare API
 token (dash.cloudflare.com → My Profile → API Tokens → Create Token → Custom token) with the permission
 **Account · Cloudflare Pages · Edit**, limited to the account that holds the project. Add it in the repository's
-Settings → Secrets and variables → Actions as a *repository* secret, not an environment secret: the workflow looks
-for it before any environment applies. Until the secret exists, the deploy job is skipped with a notice, not failed,
+Settings → Secrets and variables → Actions as a *repository* secret (the workflow uses no GitHub environment, so an
+environment secret would not reach it). Until the secret exists, the deploy job is skipped with a notice, not failed,
 so `main` stays green. The account ID is set in the workflow (`PAGES_ACCOUNT_ID`); a `CLOUDFLARE_ACCOUNT_ID`
 repository variable or secret overrides it. Pull requests from forks, and Dependabot's, get no preview, because
 GitHub gives them no secrets.
@@ -203,8 +203,8 @@ Wrangler is deliberately not a devDependency: the workflow's action adds it for 
 `pnpm install` does not pull it in.
 
 **GitHub Pages is retired** for this repository. Its github.io address redirects to the organisation's old custom
-domain, which serves nothing, so the former `pages.yml` deployed to nowhere and has been removed. Nothing depends on
-GitHub Pages, so it can be switched off in the repository's settings.
+domain (store.ci.computer), which serves nothing, so the former `pages.yml` deployed to nowhere and has been
+removed. Nothing depends on GitHub Pages, so it can be switched off in the repository's settings.
 
 ## How verification works
 
