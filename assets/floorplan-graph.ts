@@ -18,6 +18,7 @@ export const DEFAULT_WALL_HEIGHT = 2.8;
 export const DEFAULT_DOOR_HEIGHT = 2.05;
 export const CORNER_TOLERANCE = 0.02;            // metres: corners closer than this are one corner
 export const SNAP_TOLERANCE = 0.06;              // metres: partition ends this close to a wall snap onto it
+export const MIN_ROOM_WIDTH = DEFAULT_WALL_THICKNESS;   // metres: a cycle narrower than a wall is a sliver, not a room
 
 // ---------------------------------------------------------------------------------------
 // 2D helpers (blueprint3d core/utils.ts, minus the jQuery)
@@ -48,6 +49,15 @@ export function signedArea(points) {
 }
 /** blueprint3d's isClockwise: true when the loop is not the room orientation. */
 export const isClockwise = points => signedArea(points) <= 0;
+/** 2·area / perimeter: a strip's width, half a square's side; 0 for a loop that doubles back on itself. */
+export function meanWidth(points) {
+  let perimeter = 0;
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i], q = points[(i + 1) % points.length];
+    perimeter += Math.hypot(q.x - p.x, q.z - p.z);
+  }
+  return perimeter < EPS ? 0 : 2 * Math.abs(signedArea(points)) / perimeter;
+}
 
 export function closestPointOnSegment(px, pz, ax, az, bx, bz) {
   const dx = bx - ax, dz = bz - az, l2 = dx * dx + dz * dz;
@@ -396,6 +406,9 @@ export class FloorplanGraph {
   /**
    * blueprint3d Floorplan.findRooms: for every (corner, adjacent) pair walk the graph always taking
    * the tightest turn; de-duplicate the cycles and drop the clockwise ones (the outer face).
+   * Not in blueprint3d: cycles narrower than a wall (MIN_ROOM_WIDTH) are dropped too. They are gaps
+   * inside the wall solids, not floor: façade cladding laid a few cm outside a perimeter wall whose
+   * end snaps onto it (aurora L2/L3), or the two leaves of a two-tone partition (familyhouse-nora L1).
    */
   static findRooms(corners) {
     const theta = (prev, cur, next) => angle2pi(prev.x - cur.x, prev.z - cur.z, next.x - cur.x, next.z - cur.z);
@@ -440,7 +453,7 @@ export class FloorplanGraph {
 
     const loops = [];
     for (const first of corners) for (const second of first.adjacentCorners()) loops.push(_findTightestCycle(first, second));
-    return _removeDuplicateRooms(loops).filter(loop => loop.length >= 3 && !isClockwise(loop));
+    return _removeDuplicateRooms(loops).filter(loop => loop.length >= 3 && !isClockwise(loop) && meanWidth(loop) >= MIN_ROOM_WIDTH);
   }
 
   // -------------------------------------------------------------------------------------
