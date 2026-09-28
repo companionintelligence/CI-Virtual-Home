@@ -212,9 +212,9 @@ the upload job treats as files (it strips Pages Workers) and never runs. To take
 entirely, move the project to a Cloudflare account of its own.
 
 That makes **`main`'s protection the whole guard**: anyone who can put a change to `deploy.yml` on `main` can read the
-token, and seven collaborators besides the owner can push to this repository. So `main` must take changes only through a pull request that a
-code owner reviews (step 1 below; [`.github/CODEOWNERS`](.github/CODEOWNERS) makes the owner the code owner of
-`.github/`), and `deploy.yml` does not deploy until it does.
+token, and seven collaborators besides the owner can push to this repository. So `main` must take changes only through
+a pull request that a code owner reviews (step 1 below; [`.github/CODEOWNERS`](.github/CODEOWNERS) makes the owner the
+code owner of `.github/`), and `deploy.yml` does not deploy until it does.
 
 **Owner setup, once.**
 
