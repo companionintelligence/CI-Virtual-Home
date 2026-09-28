@@ -7,9 +7,11 @@
 //   portal/thumbs/<id>.webp   640 × 360, ≤ --max-kb (quality stepped down until it fits)
 //   portal/hero.webp          1600 × 900 of --hero (default aurora, the house index.html's hero plays), ≤ 190 KB
 //
-// The camera stands in front of the entry (anchors.entry.out is the door's outward normal), swung 34° toward
-// the side the time-of-day rig puts the sun on, 34° up, far enough back for the bounds to fill the frame — the
-// framing scratchpad/look.mjs settled on for the look reviews, aimed per house instead of at a fixed bearing.
+// The camera stands in front of the entry (anchors.entry.out is the door's outward normal), swung 34° away from
+// the side the time-of-day rig puts the sun on (so the façade takes the light and the flank the camera also sees
+// falls into shade), 34° up, far enough back for the bounds to fill the frame: the aerial ¾ framing of the look
+// reviews, aimed per house instead of at one fixed bearing. SIDE below flips a house by hand; THUMB_SIDE=1|-1
+// in the environment forces one side for every house, for comparing the two.
 // Rendering is __houseSnapshot (a JPEG at q 1.0 of one composer frame); the page re-encodes it to WebP itself
 // (canvas.toDataURL('image/webp')), so nothing here needs an image library. The frames are deterministic, so
 // re-running on an unchanged tree rewrites the same files.
