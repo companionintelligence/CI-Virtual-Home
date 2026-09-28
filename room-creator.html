@@ -3200,7 +3200,10 @@
         [-width / 2 - 0.04, width / 2 + 0.04].forEach(sx => {
           const stringer = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.28, diagLen + 0.4), riserMat);
           stringer.position.set(sx, totalHeight / 2, run / 2);
-          stringer.rotation.x = inclineAngle;
+          // −: the stringers climb with the treads (+z up), as the timber flight's spine does. They used to be +,
+          // which sent each one from the height of the upper floor over the foot of the flight down to the floor
+          // under its top, so the two white boards crossed the treads in an X.
+          stringer.rotation.x = -inclineAngle;
           stringer.castShadow = true;
           group.add(stringer);
         });
