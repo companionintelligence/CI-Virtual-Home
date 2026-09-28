@@ -1,11 +1,19 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Assembles the web portal for GitHub Pages: exactly the files the site loads, nothing else.
 //
-//   pnpm run build && pnpm run portal:build [--out dist]
+//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://…/ci-virtual-home/]
 //   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
 //
 //   <out>/index.html                 the gallery (portal/gallery.css + gallery.js, portal/thumbs/, portal/hero.webp)
-//   <out>/room-creator.html          the player (?mode=view: portal/viewer.css + assets/viewer.js) and the editor
+//   <out>/room-creator.html          the player (?mode=view: portal/viewer.css + assets/viewer.js) and the editor,
+//                                    plus one tag: <meta name="vh-share" content="homes/">, which tells the player
+//                                    the share pages below exist
+//   <out>/homes/<id>.html            what the player's share button hands out: a page with the home's own title,
+//                                    description and thumbnail for link previews (Slack, iMessage, social cards
+//                                    never run the player's script, so room-creator.html's static title is all they
+//                                    would see), which forwards to room-creator.html?mode=view&house=<id> with the
+//                                    link's query. --site-url makes og:image absolute, as unfurlers want; the
+//                                    Pages workflow passes the site's address
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
@@ -14,7 +22,8 @@
 // Everything the site references is relative, so the same tree works at / and under /ci-virtual-home/. No
 // goldens, scripts, scenes, videos or TypeScript sources go out. The build refuses to run on stale or missing
 // compiled assets (a .ts newer than its .js), and checks that every house in index.json has a spec and a
-// thumbnail and that nothing the HTML links is missing from the output.
+// thumbnail, that nothing the HTML links is missing from the output, and that the gallery's static hero figures
+// (what a crawler or a visitor without JavaScript reads) are the ones gallery.js computes from index.json.
 //
 // Only the paths it writes are replaced in <out>; anything else there (dist/models from export:core) is left.
 import fs from 'node:fs';
@@ -52,7 +61,7 @@ const stale = sources.filter(ts => { const js = path.join(ROOT, ts.replace(/\.ts
 if (stale.length) { console.error(`compiled assets are missing or older than their source (${stale.slice(0, 3).join(', ')}${stale.length > 3 ? ', …' : ''}): run pnpm run build first`); process.exit(2); }
 
 // 1. start from a clean copy of what this script owns
-const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', '.nojekyll'];
+const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '.nojekyll'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
 
@@ -78,6 +87,69 @@ for (const h of index.houses || []) {
 }
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 
+// 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes, distinct builders, floor
+// area rounded to 10 m²), or a visitor sees them change as the page hydrates and a crawler keeps the wrong ones
+{
+  const houses: { author?: string; areaSqm?: number }[] = index.houses || [];
+  const want: Record<string, string> = {
+    homes: String(houses.length),
+    builders: String(new Set(houses.map(h => h.author).filter(Boolean)).size),
+    area: new Intl.NumberFormat('en').format(Math.round(houses.reduce((a, h) => a + (h.areaSqm || 0), 0) / 10) * 10),
+  };
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  for (const [k, v] of Object.entries(want)) {
+    const got = html.match(new RegExp(`data-stat="${k}">([^<]*)<`));
+    if (!got) problems.push(`index.html: no data-stat="${k}" figure`);
+    else if (got[1] !== v) problems.push(`index.html: the static ${k} figure is ${got[1]}, index.json says ${v}`);
+  }
+}
+
+// 5c. share pages: homes/<id>.html, one per home (see the header), and the tag that tells the player they exist
+{
+  const esc = (v: unknown): string => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const site = args['site-url'] && args['site-url'] !== 'true' ? args['site-url'].replace(/\/?$/, '/') : '';
+  const shortStyle = (s?: string): string => (s || '').split(/[:;,(]| with | over | under /)[0].trim();
+  fs.mkdirSync(path.join(OUT, 'homes'), { recursive: true });
+  for (const h of index.houses || []) {
+    if (!/^[a-z0-9-]+$/.test(h.id)) { problems.push(`house id ${JSON.stringify(h.id)} is not [a-z0-9-]: no share page`); continue; }
+    const player = `../room-creator.html?mode=view&house=${h.id}`;
+    const image = site ? new URL(`portal/thumbs/${h.id}.webp`, site).href : `../portal/thumbs/${h.id}.webp`;
+    const style = shortStyle(h.style);
+    const desc = `${style ? `${style}. ` : ''}${h.author ? `After a Sims 4 build by ${h.author}. ` : ''}Built live in 3D in your browser: fly its camera paths and change the hour.`;
+    const page = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${esc(h.name)} · Companion virtual homes</title>
+  <meta name="description" content="${esc(desc)}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Companion virtual homes">
+  <meta property="og:title" content="${esc(h.name)}">
+  <meta property="og:description" content="${esc(desc)}">
+  <meta property="og:image" content="${esc(image)}">
+  <meta property="og:image:type" content="image/webp">
+  <meta property="og:image:width" content="640">
+  <meta property="og:image:height" content="360">
+  <meta property="og:image:alt" content="${esc(`An aerial view of ${h.name}`)}">${site ? `\n  <meta property="og:url" content="${esc(new URL(`homes/${h.id}.html`, site).href)}">` : ''}
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/brand/ci-logo-mark.svg" type="image/svg+xml">
+  <script>location.replace(${JSON.stringify(player)} + (location.search ? '&' + location.search.slice(1) : '') + location.hash);</script>
+</head>
+<body>
+  <p><a href="${esc(player)}">Open ${esc(h.name)} in 3D</a></p>
+</body>
+</html>
+`;
+    fs.writeFileSync(path.join(OUT, 'homes', `${h.id}.html`), page);
+    files++; bytes += page.length;
+  }
+  const rc = path.join(OUT, 'room-creator.html');
+  const text = fs.readFileSync(rc, 'utf8');
+  if (!text.includes('</head>')) problems.push('room-creator.html has no </head> for the share tag');
+  else fs.writeFileSync(rc, text.replace('</head>', '  <meta name="vh-share" content="homes/">\n</head>'));
+}
+
 // 6. every relative URL the pages and stylesheets name must be in the output (a query or a fragment is fine)
 const refs = new Set<string>();
 const scan = (fileRel: string, re: RegExp): void => {
@@ -90,7 +162,7 @@ const scan = (fileRel: string, re: RegExp): void => {
     refs.add(path.normalize(path.join(path.dirname(fileRel), clean)));
   }
 };
-for (const p of ['index.html', 'room-creator.html']) scan(p, /(?:href|src)="([^"]+)"/g);
+for (const p of ['index.html', 'room-creator.html', ...(fs.existsSync(path.join(OUT, 'homes')) ? fs.readdirSync(path.join(OUT, 'homes')).map(f => path.join('homes', f)) : [])]) scan(p, /(?:href|src)="([^"]+)"/g);
 for (const p of ['index.html', 'room-creator.html']) scan(p, /from '(\.[^']+)'/g);
 for (const p of walk('portal', f => f.endsWith('.css'))) scan(p, /url\("?(\.[^")]+)"?\)/g);
 for (const r of refs) if (!fs.existsSync(path.join(OUT, r))) problems.push(`${r} is linked but not in ${rel(OUT)}`);

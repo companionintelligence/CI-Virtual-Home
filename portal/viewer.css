@@ -20,6 +20,21 @@
   font-weight: 100 800;
   font-display: swap;
 }
+/* The editor's own families, from the same files: room-creator.html links Google Fonts only outside ?mode=view,
+   and what the page draws in these names (the Core's screen, the canvas labels) then comes from here, the same
+   woff2 the goldens stub Google Fonts with. So the player asks no third party for anything. */
+@font-face {
+  font-family: "Manrope";
+  src: url("../assets/fonts/manrope-latin-var.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../assets/fonts/jetbrains-mono-latin-var.woff2") format("woff2");
+  font-weight: 100 800;
+  font-display: swap;
+}
 
 html[data-mode="view"] {
   --vh-font: "VH Manrope", "Manrope", system-ui, sans-serif;
@@ -63,32 +78,63 @@ html[data-mode="view"] #three-canvas:active { cursor: grabbing; }
 html[data-mode="view"] #viewport-box:has(.vh-idle) #three-canvas { cursor: none; }
 
 /* Before the player's module has loaded (three.js and the house engine come first) the page shows the same
-   poster the loading screen will, so there is never an empty frame. */
+   poster the loading screen will, the home's name once the head script has index.json (--vh-boot-name), and a
+   moving bar with a line under it that, after eight seconds, names a slow connection as the reason
+   (data-boot="slow"). Pseudo-elements, so all of it is there from the first paint, before the body has parsed. */
 html[data-mode="view"]:not([data-viewer]) body::before,
-html[data-mode="view"]:not([data-viewer]) body::after { content: ""; position: fixed; z-index: 100; pointer-events: none; }
-html[data-mode="view"]:not([data-viewer]) body::before {
+html[data-mode="view"]:not([data-viewer]) body::after,
+html[data-mode="view"]:is([data-viewer="failed"], [data-viewer="no-webgl"]) body::before { position: fixed; z-index: 100; pointer-events: none; }
+html[data-mode="view"]:not([data-viewer]) body::before,
+html[data-mode="view"]:is([data-viewer="failed"], [data-viewer="no-webgl"]) body::before {
+  content: var(--vh-boot-name, "");
   inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 24px 76px;   /* the name sits above the bar */
+  text-align: center; font: 700 21px/1.25 var(--vh-font); color: var(--foreground);
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--background) 55%, transparent), color-mix(in srgb, var(--background) 85%, transparent)),
     var(--vh-poster, none) center / cover no-repeat,
     var(--background);
 }
+html[data-mode="view"]:is([data-viewer="failed"], [data-viewer="no-webgl"]) body::before { content: ""; }
 html[data-mode="view"]:not([data-viewer]) body::after {
-  left: 50%; top: 50%; width: 160px; height: 3px; margin-left: -80px;
-  border-radius: 3px;
-  background: linear-gradient(90deg, transparent 0 35%, var(--primary) 35% 65%, transparent 65%) 0 0 / 200% 100%,
-    color-mix(in srgb, var(--foreground) 14%, transparent);
+  content: "Getting the 3D player ready";
+  left: 50%; top: 50%; width: 280px; margin-left: -140px; padding-top: 16px;
+  text-align: center; font: 500 12.5px/1.45 var(--vh-font); color: var(--muted-foreground);
+  background:
+    linear-gradient(90deg, transparent 0 35%, var(--primary) 35% 65%, transparent 65%) 0 0 / 200% 3px no-repeat,
+    linear-gradient(color-mix(in srgb, var(--foreground) 14%, transparent), color-mix(in srgb, var(--foreground) 14%, transparent)) 0 0 / 100% 3px no-repeat;
   animation: vh-slide 1.1s linear infinite;
 }
-/* no WebGL: the page cannot draw, so say so where the loader would have been */
-html[data-mode="view"][data-viewer="no-webgl"] body::before {
-  content: "This browser cannot draw 3D (WebGL is off or missing). Try a recent Chrome, Edge, Firefox or Safari.";
-  position: fixed; inset: 0; z-index: 100;
-  display: grid; place-items: center; padding: 32px;
-  text-align: center; font: 600 15px/1.5 var(--vh-font); color: var(--foreground);
-  background: var(--background);
-}
+html[data-mode="view"][data-boot="slow"]:not([data-viewer]) body::after { content: "Still loading. On a slow connection this takes up to a minute."; }
 @keyframes vh-slide { from { background-position: 100% 0, 0 0; } to { background-position: -100% 0, 0 0; } }
+
+/* The page could not start: no WebGL 2, a module that did not download, an engine that threw before the player
+   mounted. The head script of room-creator.html builds this card; it stands over the poster. */
+html[data-mode="view"]:is([data-viewer="failed"], [data-viewer="no-webgl"]) .vh { display: none; }
+html[data-mode="view"] .vh-fail {
+  position: fixed; left: 50%; top: 50%; z-index: 101;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100% - 32px));
+  padding: 24px 26px 22px;
+  border-radius: 20px;
+  text-align: center;
+  font: 400 13.5px/1.45 var(--vh-font);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--rc-rail, #021018) 88%, transparent);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 12px 32px -12px rgba(0, 0, 0, 0.5), inset 0 0 0 1px color-mix(in srgb, var(--foreground) 11%, transparent);
+}
+html[data-mode="view"] .vh-fail h2 { margin: 0 0 6px; font-size: 18px; font-weight: 700; line-height: 1.25; }
+html[data-mode="view"] .vh-fail p { margin: 0 0 18px; color: var(--muted-foreground); }
+html[data-mode="view"] .vh-fail-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+html[data-mode="view"] .vh-fail-actions > * {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 36px; padding: 0 16px; border: 0; border-radius: 10px;
+  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
+  color: var(--foreground); background: color-mix(in srgb, var(--foreground) 9%, transparent);
+}
+html[data-mode="view"] .vh-fail-actions > :first-child { background: var(--primary); color: var(--primary-foreground); }
 
 /* ---------------- the player ---------------- */
 .vh {

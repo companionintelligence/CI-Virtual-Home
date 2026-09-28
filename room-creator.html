@@ -7,21 +7,72 @@
   <meta name="description" content="Browser-based 3D architectural room creator, device staging, and marketing design studio powered by WebGL/WebGPU Three.js. Inspired by Pascal Editor.">
   <!-- ?mode=view is the portal's player: decided before the body parses, so the editor chrome never flashes.
        portal/viewer.css hides the editor and assets/viewer.js (mounted at the end of the module) plays the house.
-       Without it this block does nothing and the page is the editor, unchanged. -->
+       Until the player mounts, this block is all of it: the poster and the loader (with the home's name once
+       index.json is in, and a word when a slow connection makes it take a while), and a message with a way out
+       if the page cannot start (no WebGL 2, a module that did not download, an engine that threw). The player
+       uses the repo's own fonts (viewer.css), so it asks Google for nothing.
+       Without ?mode=view this block only writes the editor's Google Fonts links, and the page is the editor. -->
   <script>
     (function () {
       var q = new URLSearchParams(location.search), d = document.documentElement, id = q.get('house') || 'aurora';
-      if (q.get('mode') !== 'view') return;
+      if (q.get('mode') !== 'view') {
+        document.write('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+          + '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">');
+        return;
+      }
       d.dataset.mode = 'view';
-      try { var c = document.createElement('canvas'); if (!(c.getContext('webgl2') || c.getContext('webgl'))) d.dataset.viewer = 'no-webgl'; } catch (e) { d.dataset.viewer = 'no-webgl'; }
       if (/^[a-z0-9-]+$/.test(id)) d.style.setProperty('--vh-poster', 'url("' + new URL('./portal/thumbs/' + id + '.webp', location.href).href + '")');
       document.write('<link rel="stylesheet" href="./portal/viewer.css">');
+      // The list of homes, asked for now, beside three.js and the engine: the loader names the home long before
+      // the player mounts, and viewer.ts and the page's first build take this promise instead of fetching again.
+      window.__vhIndex = fetch('./content/houses/index.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+      window.__vhIndex.then(function (j) {
+        var h = j && (j.houses || []).filter(function (x) { return x.id === id; })[0];
+        if (h) d.style.setProperty('--vh-boot-name', '"' + String(h.name).replace(/["\\]/g, '\\$&') + '"');
+        // an id the list does not have has no thumbnail either: drop the poster before the player's loader asks
+        // for it a second time (the first paint may already have asked once)
+        else if (j) d.style.removeProperty('--vh-poster');
+      });
+      setTimeout(function () { if (!d.dataset.viewer) d.dataset.boot = 'slow'; }, 8000);
+      // Before the player mounts, a failure has nowhere else to show: this puts a card over the poster, with a way
+      // out. The page's module calls __vhBooted() when it has run to its end, so an error before that is the module
+      // stopping (nothing can be waiting on a timer yet) and one after it is some callback's, not ours to judge. A
+      // script that failed to download fires its error at the <script> element, which only a capturing listener
+      // on window sees.
+      var booted = false;
+      function card(state, title, msg, retry) {
+        if (d.dataset.viewer === 'no-webgl' || d.dataset.viewer === 'failed') return;
+        d.dataset.viewer = state;
+        var box = document.createElement('div');
+        box.className = 'vh-fail'; box.setAttribute('role', 'alert');
+        box.innerHTML = '<h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./index.html">See all homes</a></div>';
+        box.querySelector('h2').textContent = title;
+        box.querySelector('p').textContent = msg;
+        if (retry) box.querySelector('button').addEventListener('click', function () { location.reload(); });
+        (function put() { if (document.body) document.body.appendChild(box); else setTimeout(put, 30); })();
+      }
+      function fail(msg) { card('failed', 'This home could not be opened.', msg, true); }
+      window.__vhFail = fail;
+      window.__vhBooted = function () { booted = true; };
+      // three.js r169 draws with WebGL 2 only: a browser with just WebGL 1 would pass a looser test and then fail
+      var gl2 = false;
+      try {
+        var probe = document.createElement('canvas').getContext('webgl2'), lose = probe && probe.getExtension('WEBGL_lose_context');
+        gl2 = !!probe;
+        if (lose) lose.loseContext();   // hand the context back now rather than at the next GC
+      } catch (e) { /* no canvas at all */ }
+      if (!gl2) card('no-webgl', 'This browser cannot draw 3D.', 'WebGL 2 is off or missing. Try a recent Chrome, Edge, Firefox or Safari, with hardware acceleration on.', false);
+      addEventListener('error', function (e) {
+        if (d.dataset.viewer) return;   // mounted (the player shows its own errors), or already said
+        var t = e.target;
+        if (t && t.tagName === 'SCRIPT') fail('Part of the player did not download. Check the connection and try again.');
+        else if (t === window && !booted) fail(/webgl/i.test(e.message || '')
+          ? 'This browser could not start 3D (WebGL 2 would not open). Try a recent Chrome, Edge, Firefox or Safari, with hardware acceleration on.'
+          : 'The player stopped while starting. Try again, or pick another home.');
+      }, true);
     })();
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  
+
   <!-- Import Map for Three.js and Addons -->
   <script type="importmap">
   {
@@ -7015,7 +7066,10 @@
 
     async function fetchHouseSpec(id) {
       if (houseSpecs.has(id)) return houseSpecs.get(id);
-      const res = await fetch(`./content/houses/${encodeURIComponent(id)}.json`, { cache: 'no-store' });
+      // The editor always reads the spec on disk (it is where specs are edited); the portal's player goes through
+      // the HTTP cache, so the spec the gallery warmed on hover is the one it builds.
+      const viewMode = document.documentElement.dataset.mode === 'view';
+      const res = await fetch(`./content/houses/${encodeURIComponent(id)}.json`, { cache: viewMode ? 'default' : 'no-store' });
       if (!res.ok) throw new Error(`House spec "${id}" not found (${res.status})`);
       const spec = await res.json();
       houseSpecs.set(id, spec);
@@ -7118,8 +7172,14 @@
     const houseParam = initialPreset.startsWith('house:') ? initialPreset.slice(6) : null;
 
     // Load preset on startup (spec-driven houses are async; the flythrough sync below awaits them)
-    const initialLoad = houseParam ? loadHouse(houseParam).catch(err => { console.error(err); loadPresetScene('pascal-garden-house'); }) : Promise.resolve(loadPresetScene(initialPreset));
-    populateHouseCatalog();
+    // The player builds nothing but the house it was asked for: it takes the head script's index.json (in long
+    // before this module runs), skips an id the index does not list, and on a failure leaves the scene empty for
+    // viewer.ts to say so, instead of building the editor's garden house behind the message. It has no use for the
+    // editor's scene-preset catalogue either.
+    const initialLoad = VIEW_MODE
+      ? Promise.resolve(window.__vhIndex).then(j => (j && !(j.houses || []).some(h => h.id === houseParam) ? null : loadHouse(houseParam))).catch(err => { console.warn('viewer: could not load', houseParam, err); return null; })
+      : houseParam ? loadHouse(houseParam).catch(err => { console.error(err); loadPresetScene('pascal-garden-house'); }) : Promise.resolve(loadPresetScene(initialPreset));
+    if (!VIEW_MODE) populateHouseCatalog();
 
     // -------------------------------------------------------------
     // Camera Switching & Controls
@@ -8761,9 +8821,20 @@
           lighting: () => lightingAim.preset,
           setLighting: name => setLightingPreset(name),
           hideEditorHelpers() { gridHelper.visible = false; transformControls.detach(); },
-          render(hq) { if (hq) renderFrame(width, height); else renderer.render(scene, persCamera); },
+          // HQ goes through the recorder's composer at the canvas's own resolution — the CSS size times the pixel
+          // ratio the player has settled on — not the CSS size: renderFrame supersamples 2× only up to 1080p, so a
+          // large hi-DPI window would otherwise get a quarter of the pixels the plain path draws, upscaled. Capped
+          // at 4K's pixel count, past which the composer's half-float MSAA buffers cost more than they show.
+          render(hq) {
+            if (!hq) { renderer.render(scene, persCamera); return; }
+            const pr = renderer.getPixelRatio(), k = Math.min(1, Math.sqrt((3840 * 2160) / (width * pr * height * pr)));
+            renderFrame(Math.max(2, Math.round(width * pr * k)), Math.max(2, Math.round(height * pr * k)));
+          },
         });
-      }).catch(err => console.error('viewer failed to start', err));
+      }).catch(err => {
+        console.error('viewer failed to start', err);
+        window.__vhFail?.(/import|fetch/i.test(String(err && err.message)) ? 'Part of the player did not download. Check the connection and try again.' : 'The player stopped while starting. Try again, or pick another home.');
+      });
     }
 
     function animate() {
@@ -8807,6 +8878,7 @@
     }
 
     animate();
+    window.__vhBooted?.();   // ?mode=view: the module ran to its end (see the head script); the editor has no such hook
   </script>
 </body>
 </html>

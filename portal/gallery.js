@@ -24,7 +24,9 @@ const TAGS = [
 ];
 
 const $ = sel => document.querySelector(sel);
-const viewerHref = (id, extra = '') => `./room-creator.html?mode=view&house=${encodeURIComponent(id)}&play=1${extra}`;
+// No play=: the player starts the shot by itself, except for a visitor whose system asks for reduced motion, and
+// that is the player's call (it can read the setting; a link cannot).
+const viewerHref = id => `./room-creator.html?mode=view&house=${encodeURIComponent(id)}`;
 // the first clause of the spec's style paragraph: "Two-storey white modern villa, stacked flat roofs, …" → "Two-storey white modern villa"
 const shortStyle = s => (s || '').split(/[:;,(]| with | over | under /)[0].trim();
 const nf = new Intl.NumberFormat('en');
@@ -168,13 +170,17 @@ async function main() {
   apply();
 
   // The player's heaviest files, fetched into the cache the first time a card is pointed at or focused, so the
-  // click lands on a warm three.js and engine.
+  // click lands on a warm three.js and engine; and the pointed-at home's spec, which the player fetches with the
+  // HTTP cache (room-creator.html itself is not warmed: the player's URL carries a query, so a prefetch of the
+  // bare page would never be the one used). Not on touch: a finger that starts a scroll on a card is not a
+  // choice, and a phone's data is not ours to spend on one.
   let warmed = false;
   const warm = e => {
+    if (e.pointerType === 'touch') return;
     const a = e.target.closest && e.target.closest('.card a, #hero-play, #hero-media');
     if (!a) return;
     const id = new URL(a.href).searchParams.get('house');
-    const urls = warmed ? [] : ['./room-creator.html', './assets/vendor/three/three.module.min.js', './assets/house-builder.js', './assets/viewer.js'];
+    const urls = warmed ? [] : ['./assets/vendor/three/three.module.min.js', './assets/house-builder.js', './assets/viewer.js'];
     if (id) urls.push(`./content/houses/${encodeURIComponent(id)}.json`);
     warmed = true;
     for (const href of urls) {
@@ -182,7 +188,7 @@ async function main() {
       const l = document.createElement('link'); l.rel = 'prefetch'; l.href = href; document.head.append(l);
     }
   };
-  for (const ev of ['pointerover', 'focusin', 'touchstart']) document.addEventListener(ev, warm, { passive: true });
+  for (const ev of ['pointerover', 'focusin']) document.addEventListener(ev, warm, { passive: true });
 
   let typing = 0;
   $('#q').addEventListener('input', e => { clearTimeout(typing); typing = setTimeout(() => { state.q = e.target.value.trim(); apply(); }, 80); });

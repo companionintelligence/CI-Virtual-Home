@@ -2,6 +2,9 @@
 //
 //   room-creator.html?mode=view&house=<id>[&shot=<shot>][&t=<0…1>][&tod=day|golden|dusk|night][&play=1|0]
 //
+// A link without t plays the shot from the start; one with t opens paused there. play=1 or play=0 says so
+// outright, except that nothing starts moving by itself for a visitor whose system asks for reduced motion.
+//
 // A minimal, full-bleed player over the editor's renderer: pick a camera shot (listed from the house's own
 // presets), play, pause and scrub it, change the time of day, show the camera path in the scene, and leave the
 // path to fly the camera yourself. The editor's chrome is hidden by portal/viewer.css; this module builds the
@@ -15,7 +18,9 @@
 //
 // Fly mode: OrbitControls (the editor's own instance on the perspective camera) plus WASD / arrow keys to move,
 // Q / E to sink and rise, Shift to hurry, the wheel to glide forward. Dragging the view enters it; Esc returns
-// to the shot. While flying, the shot keeps its own camera as a ghost that plays along the path.
+// to the shot. Taking the camera pauses the shot: its own camera stays in the scene as a ghost, parked at the
+// moment you left, and Play (or the scrubber) moves it along the path while you watch from wherever you are.
+// The free camera keeps above the lot's ground: it can dive into a room, not under the house.
 //
 // Icons: path data from Lucide (lucide-react 0.469.0, ISC — see THIRD_PARTY.md), as in room-creator's sprite.
 
@@ -71,6 +76,7 @@ const SPEEDS = [0.25, 0.5, 1, 1.5, 2];
 const FLY_SPEED = 4;          // m/s; Shift × 3
 const DRAG_TO_FLY = 6;        // px of drag on the scene before it counts as taking the camera
 const IDLE_MS = 2600;         // controls fade after this long without input while a shot plays
+const FLY_FLOOR = 0.25;       // m: the lowest the free camera goes (the lot's ground is y = 0)
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 const fmt = (s: number): string => { const d = Math.floor(s * 10 + 1e-6), m = Math.floor(d / 600), r = (d % 600) / 10; return `${m}:${r < 10 ? '0' : ''}${r.toFixed(1)}`; };
@@ -215,7 +221,10 @@ export function mountViewer(api: Api) {
   let dirty = true;          // something changed: draw a frame even while paused
   let loadToken = 0;
 
-  const indexReady = fetch('./content/houses/index.json').then(r => (r.ok ? r.json() : { houses: [] })).then(j => { index = j.houses || []; return index; }).catch(() => (index = []));
+  // room-creator.html's head script asked for the list as the page started (window.__vhIndex); fetch it only
+  // when the player was mounted some other way
+  const indexReady: Promise<IndexEntry[]> = Promise.resolve((window as any).__vhIndex || fetch('./content/houses/index.json').then(r => (r.ok ? r.json() : null)))
+    .then((j: any) => (index = (j && j.houses) || []), () => (index = []));
 
   // ------------------------------------------------------------------ scene overlays: the path and the ghost camera
   const cssColor = (name: string, fallback: string): any => new THREE.Color((getComputedStyle(root).getPropertyValue(name) || '').trim() || fallback);
@@ -368,6 +377,18 @@ export function mountViewer(api: Api) {
     return `${location.pathname}?${q.toString()}`;
   }
   const syncUrl = () => { try { history.replaceState(null, '', url(false)); } catch { /* sandboxed */ } };
+  // What the share button hands out. Deployed, that is homes/<id>.html: scripts/build-portal.mts writes one page
+  // per home carrying the home's own title, description and thumbnail for link previews (which never run this
+  // script, so they would otherwise show the editor's title), and it forwards here with the query. It marks the
+  // built room-creator.html with <meta name="vh-share" content="homes/">; a checkout served as it is has no such
+  // pages, and shares this page's own URL.
+  const sharePages = (document.querySelector('meta[name="vh-share"]') as HTMLMetaElement | null)?.content || '';
+  function shareUrl(): string {
+    if (!sharePages || !/^[a-z0-9-]+\/$/.test(sharePages)) return new URL(url(true), location.href).href;
+    const q = new URLSearchParams(new URL(url(true), location.href).search);
+    q.delete('mode'); q.delete('house');
+    return new URL(`./${sharePages}${encodeURIComponent(houseId)}.html?${q.toString()}`, location.href).href;
+  }
 
   // ------------------------------------------------------------------ building the chips
   function renderShots() {
@@ -543,6 +564,14 @@ export function mountViewer(api: Api) {
     camera.position.add(move); controls.target.add(move);
     return true;
   }
+  // The floor under the free camera. Camera and target rise together, so the view keeps its direction: flying
+  // down into the lawn slides you along it instead of through it.
+  function keepAboveGround(): boolean {
+    const dy = FLY_FLOOR - camera.position.y;
+    if (dy <= 0) return false;
+    camera.position.y += dy; controls.target.y += dy;
+    return true;
+  }
   // Overview: the free camera eases up to a ¾ aerial that holds the whole path (the thumbnail's framing, aimed
   // at the path instead of the house), so the route the shot flies reads at a glance.
   let tween: { t: number; dur: number; p0: any; p1: any; q0: any; q1: any } | null = null;
@@ -668,7 +697,8 @@ export function mountViewer(api: Api) {
       ghost.scale.setScalar(Math.max(0.7, Math.min(5, camera.position.distanceTo(ghost.position) / 9)));
       const walked = flyMove(delta) || stepTween(delta);
       const turned = controls.update();
-      if (walked || turned || !wasFlying || dirty || moved) { flyDress(); dirty = true; }
+      const floored = keepAboveGround();
+      if (walked || turned || floored || !wasFlying || dirty || moved) { flyDress(); dirty = true; }
     } else if (moved || dirty || wasFlying) {
       api.applyFrame(t);
       dirty = true;
@@ -685,7 +715,9 @@ export function mountViewer(api: Api) {
     const e = houseEntry(id);
     el.loadingName.textContent = (e && e.name) || id;
     el.loadingMeta.textContent = e ? metaLine(e) : '';
-    if (/^[a-z0-9-]+$/.test(id)) root.style.setProperty('--vh-poster', `url("${new URL(`./portal/thumbs/${id}.webp`, location.href).href}")`);
+    // the poster: the head script set it on <html> for the first home (the root inherits it); a home the index
+    // lists gets its own here, and an id it does not list asks for no picture at all
+    if (e) root.style.setProperty('--vh-poster', `url("${new URL(`./portal/thumbs/${encodeURIComponent(id)}.webp`, location.href).href}")`);
     el.error.hidden = true; el.loadingCard.hidden = false;
     root.dataset.state = 'loading';
     html.dataset.viewer = 'mounted';
@@ -770,7 +802,7 @@ export function mountViewer(api: Api) {
     poke();
   }
   async function share() {
-    const href = new URL(url(true), location.href).href;
+    const href = shareUrl();
     const title = el.name.textContent || 'Companion virtual home';
     if (coarse && (navigator as any).share) { try { await (navigator as any).share({ title, url: href }); return; } catch { /* dismissed: fall back to copying */ } }
     try { await navigator.clipboard.writeText(href); toast('Link copied. It opens at this moment.'); }
@@ -855,7 +887,11 @@ export function mountViewer(api: Api) {
     if (k === 'shift') { keys.add('shift'); return; }
     if (!ready) return;
     const onRange = tag === 'INPUT';
-    if (k === ' ' || k === 'spacebar') { e.preventDefault(); setPlaying(!playing); return; }
+    // Space (and Enter) on a focused button or link is that control's own key: a keyboard user who tabs to Path
+    // and presses Space means Path. (A pointer press hands focus back to the page, below, so Space still plays.)
+    const onControl = tag === 'BUTTON' || tag === 'A';
+    if ((k === ' ' || k === 'spacebar') && !onControl) { e.preventDefault(); setPlaying(!playing); return; }
+    if ((k === ' ' || k === 'spacebar' || k === 'enter') && onControl) return;
     if ((k === 'arrowleft' || k === 'arrowright') && !onRange) { e.preventDefault(); const step = (e.shiftKey ? 5 : 1) / shotDuration(); seek(t + (k === 'arrowleft' ? -step : step)); if (flying) ghostDirty = true; return; }
     if ((k === 'home' || k === 'end') && !onRange) { e.preventDefault(); seek(k === 'home' ? 0 : 1); if (flying) ghostDirty = true; return; }
     if (k === 'escape') { if (!el.help.hidden) toggleHelp(false); else exitFly(); return; }
@@ -885,14 +921,21 @@ export function mountViewer(api: Api) {
     const want = params.get('house') || 'aurora';
     showLoading(want);
     await indexReady;
+    // an id the index does not list fails now, without waiting on a build that will not come (room-creator.html
+    // skips it too) and without a poster request for a thumbnail that does not exist
+    if (index.length && !houseEntry(want)) {
+      html.style.removeProperty('--vh-poster');
+      showError(`There is no home called “${want}”. Pick one from the gallery.`);
+      return;
+    }
     showLoading(want);   // again, now with the name and the credit
     await api.ready;
     const h = api.house();
-    if (!h) { showError(`There is no home called “${want}”. Pick one from the gallery.`); return; }
+    if (!h) { showError(houseEntry(want) ? 'This home did not load. Check the connection and try again.' : `There is no home called “${want}”. Pick one from the gallery.`); return; }
     const tq = params.get('t');
     const at = tq !== null && Number.isFinite(Number(tq)) ? clamp01(Number(tq)) : 0;
     const pq = params.get('play');
-    const play = pq !== null ? pq === '1' : tq === null && !reducedMotion;
+    const play = pq === '0' ? false : (pq === '1' || tq === null) && !reducedMotion;
     const tq2 = params.get('tod');
     if (tq2 && api.TIME_OF_DAY[api.lightingName(tq2)]) tod = api.lightingName(tq2);
     onHouse({ shotKey: params.get('shot'), at, play });
