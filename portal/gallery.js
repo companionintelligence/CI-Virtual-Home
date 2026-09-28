@@ -167,6 +167,23 @@ async function main() {
   $('#grid').replaceChildren(...homes.map(card));
   apply();
 
+  // The player's heaviest files, fetched into the cache the first time a card is pointed at or focused, so the
+  // click lands on a warm three.js and engine.
+  let warmed = false;
+  const warm = e => {
+    const a = e.target.closest && e.target.closest('.card a, #hero-play, #hero-media');
+    if (!a) return;
+    const id = new URL(a.href).searchParams.get('house');
+    const urls = warmed ? [] : ['./room-creator.html', './assets/vendor/three/three.module.min.js', './assets/house-builder.js', './assets/viewer.js'];
+    if (id) urls.push(`./content/houses/${encodeURIComponent(id)}.json`);
+    warmed = true;
+    for (const href of urls) {
+      if (document.querySelector(`link[rel="prefetch"][href="${href}"]`)) continue;
+      const l = document.createElement('link'); l.rel = 'prefetch'; l.href = href; document.head.append(l);
+    }
+  };
+  for (const ev of ['pointerover', 'focusin', 'touchstart']) document.addEventListener(ev, warm, { passive: true });
+
   let typing = 0;
   $('#q').addEventListener('input', e => { clearTimeout(typing); typing = setTimeout(() => { state.q = e.target.value.trim(); apply(); }, 80); });
   for (const b of document.querySelectorAll('#storeys button')) b.addEventListener('click', () => { state.storeys = b.dataset.storeys; apply(); });
