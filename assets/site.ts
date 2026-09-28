@@ -60,7 +60,9 @@ const DEFAULT_SPECIES = ['broad', 'broad', 'broad', 'oval', 'oval', 'conical', '
 const FLOWER_KINDS = ['daisy', 'tulip', 'lavender', 'bloom', 'bloom'];
 const PETAL = { daisy: [0xefeadb, 0xe8dcc0], tulip: [0xc46b7b, 0xd6a04b, 0xb45a4b, 0xd595a6], lavender: [0x8f7cb8, 0x9b88c0], bloom: BLOOM };
 
-export function createSiteKit({ THREE, seed = 'house', std, mix }) {
+// `keepOut` is the ground storey's footprint ({ x, z, w, d } rects): the walls stand on its edge, and a bed plants
+// nothing that would reach through them.
+export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [] }) {
   const hex = c => typeof c === 'string' ? parseInt(c.replace('#', ''), 16) : c;
   const group = name => { const g = new THREE.Group(); g.name = name; g.userData = { category: 'Site' }; return g; };
   const rngFor = (item, index) => mulberry32(fnv1a(`${seed}:site:${index}:${item.type}`));
@@ -549,8 +551,21 @@ export function createSiteKit({ THREE, seed = 'house', std, mix }) {
   const polyOf = s => s.poly ? s.poly : [[s.at[0] - s.w / 2, s.at[1] - s.d / 2], [s.at[0] + s.w / 2, s.at[1] - s.d / 2], [s.at[0] + s.w / 2, s.at[1] + s.d / 2], [s.at[0] - s.w / 2, s.at[1] + s.d / 2]];
   const inPoly = (x, z, poly) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [xi, zi] = poly[i], [xj, zj] = poly[j]; if ((zi > z) !== (zj > z) && x < (xj - xi) * (z - zi) / (zj - zi) + xi) c = !c; } return c; };
   const areaOf = poly => Math.abs(poly.reduce((a, p, i) => { const q = poly[(i + 1) % poly.length]; return a + (p[0] * q[1] - q[0] * p[1]); }, 0) / 2);
+  // Room to grow beside the house: how far a plant centred at (x, z) may reach before it touches a ground-storey
+  // wall — the distance to the footprint less WALL_OUT (the walls are 0.16 m thick and centred on the footprint
+  // edge, and their sills and casings stand a little proud of that). Negative inside the house.
+  const WALL_OUT = 0.12;
+  const rectGap = (x, z, b) => Math.hypot(Math.max(b.x - x, 0, x - (b.x + b.w)), Math.max(b.z - z, 0, z - (b.z + b.d)));
+  const houseGap = (x, z) => keepOut.reduce((m, b) => Math.min(m, rectGap(x, z, b)), Infinity);   // 0 inside the footprint
+  const roomAt = (x, z) => houseGap(x, z) - WALL_OUT;
+  // how far a plant variant reaches from its stem, in plan
+  const reachOf = geo => { const p = geo.attributes.position; let m = 0; for (let i = 0; i < p.count; i++) m = Math.max(m, Math.hypot(p.getX(i), p.getZ(i))); return m; };
   // A bed is mulch inside a stone kerb, planted by dart-throwing (a minimum spacing, so it never reads as a grid)
   // and in drifts (gardeners plant in sweeps, not confetti). Every plant kind is ONE InstancedMesh per variant.
+  // A foundation bed runs up to a wall, so nothing is planted without room for at least a flower clump
+  // (BED_MIN_ROOM, its leaves and heads), and every plant is shrunk to fit the room it has — the ones against the
+  // wall are the small ones, and none reaches through into the rooms.
+  const BED_MIN_ROOM = 0.26;
   function bed(s, r) {
     const poly = polyOf(s), g = group('Planted Bed'), M = mats();
     const shape = new THREE.Shape(poly.map(p => new THREE.Vector2(p[0], p[1])));
@@ -559,18 +574,30 @@ export function createSiteKit({ THREE, seed = 'house', std, mix }) {
     // Kerb: a flat outline a touch wider than the soil, sitting just under it, so it peeks out as a visible
     // border rather than being hidden under the soil block it shares a footprint with — offset outward from
     // the polygon's own centroid rather than true polygon buffering, which is overkill for beds this size.
+    // The soil's rotateX(+90°) takes shape (x, y) to world (x, 0, y), but a ShapeGeometry laid flat face-up
+    // (rotation.x = −90°) takes it to (x, 0, −y) — so the kerb is drawn in (x, −z). Drawn in (x, z) it landed
+    // mirrored across z = 0, a grey patch on the far side of the lot. ShapeGeometry winds every face to +z
+    // whichever way the outline runs, so it faces up and needs no DoubleSide. It sits above the ground storey's
+    // floor, so a corner the widening would carry into the footprint keeps the bed's own corner instead —
+    // otherwise a foundation bed's kerb shows as a grey sliver on the room floor behind the wall.
     const cx0 = poly.reduce((a, p) => a + p[0], 0) / poly.length, cz0 = poly.reduce((a, p) => a + p[1], 0) / poly.length;
-    const kerbShape = new THREE.Shape(poly.map(p => new THREE.Vector2(cx0 + (p[0] - cx0) * 1.06, cz0 + (p[1] - cz0) * 1.06)));
-    const edging = new THREE.Mesh(new THREE.ShapeGeometry(kerbShape), std(KERB, { roughness: 0.9, side: THREE.DoubleSide })); edging.rotation.x = -Math.PI / 2; edging.position.y = 0.005; g.add(edging); // ground shadow of the kerb
+    const kerbShape = new THREE.Shape(poly.map(([px, pz]) => {
+      let x = cx0 + (px - cx0) * 1.06, z = cz0 + (pz - cz0) * 1.06;
+      if (houseGap(x, z) === 0 && houseGap(px, pz) > 0) { x = px; z = pz; }
+      return new THREE.Vector2(x, -z);
+    }));
+    const edging = new THREE.Mesh(new THREE.ShapeGeometry(kerbShape), std(KERB, { roughness: 0.9 })); edging.rotation.x = -Math.PI / 2; edging.position.y = 0.005; g.add(edging); // ground shadow of the kerb
     const xs = poly.map(p => p[0]), zs = poly.map(p => p[1]);
     const minX = Math.min(...xs), maxX = Math.max(...xs), minZ = Math.min(...zs), maxZ = Math.max(...zs);
     const kind = s.plants || 'mixed', area = areaOf(poly), n = Math.round((s.density || 1.2) * area);
     const gap = Math.sqrt(area / Math.max(1, n)) * 0.6, pts = [];
     for (let tries = 0; pts.length < n && tries < n * 40; tries++) {
       const x = minX + r() * (maxX - minX), z = minZ + r() * (maxZ - minZ);
-      if (!inPoly(x, z, poly) || pts.some(p => Math.hypot(p[0] - x, p[1] - z) < gap)) continue;
+      if (!inPoly(x, z, poly) || roomAt(x, z) < BED_MIN_ROOM || pts.some(p => Math.hypot(p[0] - x, p[1] - z) < gap)) continue;
       pts.push([x, z]);
     }
+    // a plant's scale, no bigger than the room it has for its reach
+    const fit = (x, z, s0, reach) => Math.min(s0, roomAt(x, z) / reach);
     // drifts: a slow seeded wave across the bed decides what grows where
     const ang = r() * Math.PI, ph = r() * 6.28, wave = (x, z) => Math.sin((x * Math.cos(ang) + z * Math.sin(ang)) * 1.3 + ph) * 0.5 + 0.5;
     const kinds = { shrub: [], grass: [], flowerA: [], flowerB: [] };
@@ -583,18 +610,18 @@ export function createSiteKit({ THREE, seed = 'house', std, mix }) {
     }
     const y0 = 0.1;
     if (kinds.shrub.length) {
-      const geo = bushGeo(r, 0.34, { n: 8, size: 0.13, flat: 0.72 });
-      g.add(instanced(geo, M(pick(r, GREEN.shrub), leafOpts), kinds.shrub.map(([x, z]) => { const s0 = 0.75 + r() * 0.6; return { x, y: y0 - 0.02, z, ry: r() * Math.PI * 2, s: s0, tint: 0.9 + r() * 0.18 }; }), 'Bed shrubs', { isoShape: 'blob' }));
+      const geo = bushGeo(r, 0.34, { n: 8, size: 0.13, flat: 0.72 }), reach = reachOf(geo);
+      g.add(instanced(geo, M(pick(r, GREEN.shrub), leafOpts), kinds.shrub.map(([x, z]) => { const s0 = 0.75 + r() * 0.6; return { x, y: y0 - 0.02, z, ry: r() * Math.PI * 2, s: fit(x, z, s0, reach), tint: 0.9 + r() * 0.18 }; }), 'Bed shrubs', { isoShape: 'blob' }));
     }
     if (kinds.grass.length) {
-      const geo = grassTuft(r, 0.5, 22, 0.08);
-      g.add(instanced(geo, M(pick(r, GREEN.grass), { ...leafOpts, side: THREE.DoubleSide }), kinds.grass.map(([x, z]) => ({ x, y: y0, z, ry: r() * Math.PI * 2, s: 0.8 + r() * 0.5, tint: 0.9 + r() * 0.2 })), 'Bed grasses', { isoShape: 'blob' }));
+      const geo = grassTuft(r, 0.5, 22, 0.08), reach = reachOf(geo);
+      g.add(instanced(geo, M(pick(r, GREEN.grass), { ...leafOpts, side: THREE.DoubleSide }), kinds.grass.map(([x, z]) => ({ x, y: y0, z, ry: r() * Math.PI * 2, s: fit(x, z, 0.8 + r() * 0.5, reach), tint: 0.9 + r() * 0.2 })), 'Bed grasses', { isoShape: 'blob' }));
     }
     for (const key of ['flowerA', 'flowerB']) {
       const spots = kinds[key]; if (!spots.length) continue;
       const fk = pick(r, FLOWER_KINDS), color = s.color ? hex(s.color) : pick(r, PETAL[fk]);
-      const mound = bushGeo(r, 0.17, { n: 5, size: 0.07, flat: 0.55, detail: 0 });
-      g.add(instanced(mound, M(pick(r, GREEN.shrub), leafOpts), spots.map(([x, z]) => ({ x, y: y0 - 0.01, z, ry: r() * Math.PI * 2, s: 0.8 + r() * 0.5, tint: 0.9 + r() * 0.2 })), 'Bed foliage', { isoShape: 'blob' }));
+      const mound = bushGeo(r, 0.17, { n: 5, size: 0.07, flat: 0.55, detail: 0 }), reach = reachOf(mound);
+      g.add(instanced(mound, M(pick(r, GREEN.shrub), leafOpts), spots.map(([x, z]) => ({ x, y: y0 - 0.01, z, ry: r() * Math.PI * 2, s: fit(x, z, 0.8 + r() * 0.5, reach), tint: 0.9 + r() * 0.2 })), 'Bed foliage', { isoShape: 'blob' }));
       const heads = []; for (const [x, z] of spots) for (let i = 0, m = 3 + Math.floor(r() * 3); i < m; i++) { const a = r() * Math.PI * 2, d = r() * 0.13; heads.push(V(x + Math.cos(a) * d, y0 + 0.12 + r() * 0.05, z + Math.sin(a) * d)); }
       flowerHeads(g, fk, color, heads, r, M, 1.0);
     }
