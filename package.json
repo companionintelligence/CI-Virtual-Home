@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "license": "UNLICENSED",
-  "description": "Companion Intelligence virtual-home generator: one HouseSpec JSON per house → 3D scenes, CAD floor plans, isometric SVG/Lottie and product-shot videos.",
+  "description": "Companion Intelligence virtual-home generator: one HouseSpec JSON per house \u2192 3D scenes, CAD floor plans, isometric SVG/Lottie and product-shot videos.",
   "type": "module",
   "packageManager": "pnpm@10.34.5",
   "engines": {
@@ -27,6 +27,10 @@
     "index": "node --experimental-strip-types scripts/build-house-index.mts",
     "prop-sheet": "node --experimental-strip-types scripts/prop-sheet.mts",
     "export:core": "node --experimental-strip-types scripts/export-core-gltf.mts",
+    "portal:thumbs": "node --experimental-strip-types scripts/build-thumbs.mts",
+    "portal:build": "node --experimental-strip-types scripts/build-portal.mts",
+    "portal:test": "node --experimental-strip-types scripts/test-portal.mts",
+    "portal:preview": "node --experimental-strip-types scripts/build-portal.mts --serve",
     "serve": "python3 -m http.server 8080"
   },
   "devDependencies": {

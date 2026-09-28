@@ -9,7 +9,7 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 ## Rules
 
 **Source vs derived.** The sources are `content/houses/<id>.json`, `assets/**/*.ts`, `room-creator.html`,
-`scripts/` and `reference/`. Everything else is generated — never hand-edit it; change the source and re-run:
+`index.html`, `portal/*.css` and `portal/*.js`, `scripts/` and `reference/`. Everything else is generated — never hand-edit it; change the source and re-run:
 
 | Derived file | Regenerate with |
 |---|---|
@@ -20,6 +20,8 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` | `pnpm run iso` |
 | `scenes/floorplans/` | `pnpm run floorplans` |
 | `test/goldens/<profile>/` | `pnpm run goldens:update` — only on purpose, see below |
+| `portal/thumbs/<id>.webp`, `portal/hero.webp` | `pnpm run portal:thumbs [--house <id>]` — after a change to how a house looks |
+| `dist/` (gitignored) | `pnpm run portal:build` |
 
 Edit `assets/*.ts`, never the compiled `.js` beside it. `assets/vendor/` is third-party: do not edit it (the
 one existing patch is documented in THIRD_PARTY.md) and do not run the build over it.
@@ -36,6 +38,18 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `fonts.googleapis.com` with `assets/fonts/` and await `document.fonts.ready`, as test-goldens.mts does.
 - The Python generators are deterministic too (`random.Random(spec id)`); re-running one on an unchanged tree
   must leave `git status` clean.
+
+**The portal.** `index.html` (the gallery) and `room-creator.html?mode=view` (the player, `assets/viewer.ts`)
+are deployed to GitHub Pages under `/ci-virtual-home/`:
+
+- Every URL in them must be relative — no leading `/`. `portal:build` fails on a root-relative one.
+- The player is additive: everything it needs from the page goes through the one object `room-creator.html`
+  hands `mountViewer`, and every editor change it needs is behind `VIEW_MODE`. Without `?mode=view` the page
+  must stay the editor exactly, and the `__house*` hooks the gates use must not change. It plays shots through
+  `applySplineFrame`, never a copy of it.
+- The player may use the clock (nothing it draws is a product frame), but it must restore anything of the
+  renderer's it changes for its own frame (it puts `shadowMap.autoUpdate` back after each one).
+- `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
 
 **Verify before you push.** CI only builds, typechecks, validates and runs the floor-plan-graph tests. The
 render gate needs a GPU and runs here:

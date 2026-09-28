@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Isometric 3D Room Creator · Companion Intelligence & SimsTree Studio</title>
   <meta name="description" content="Browser-based 3D architectural room creator, device staging, and marketing design studio powered by WebGL/WebGPU Three.js. Inspired by Pascal Editor.">
+  <!-- ?mode=view is the portal's player: decided before the body parses, so the editor chrome never flashes.
+       portal/viewer.css hides the editor and assets/viewer.js (mounted at the end of the module) plays the house.
+       Without it this block does nothing and the page is the editor, unchanged. -->
+  <script>
+    (function () {
+      var q = new URLSearchParams(location.search), d = document.documentElement, id = q.get('house') || 'aurora';
+      if (q.get('mode') !== 'view') return;
+      d.dataset.mode = 'view';
+      try { var c = document.createElement('canvas'); if (!(c.getContext('webgl2') || c.getContext('webgl'))) d.dataset.viewer = 'no-webgl'; } catch (e) { d.dataset.viewer = 'no-webgl'; }
+      if (/^[a-z0-9-]+$/.test(id)) d.style.setProperty('--vh-poster', 'url("' + new URL('./portal/thumbs/' + id + '.webp', location.href).href + '")');
+      document.write('<link rel="stylesheet" href="./portal/viewer.css">');
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -7100,7 +7113,8 @@
     //   ?flythrough=1 (autoplay)      ?autorecord=1 (start the video recorder once the shot is loaded)
     //   ?res=1080&aspect=16:9 (recorder settings)
     const urlParams = new URLSearchParams(window.location.search);
-    const initialPreset = resolveSceneKey(urlParams.get('house') ? `house:${urlParams.get('house')}` : (urlParams.get('preset') || 'pascal-garden-house'));
+    const VIEW_MODE = urlParams.get('mode') === 'view';   // the portal's player (assets/viewer.ts): always a spec house
+    const initialPreset = resolveSceneKey(urlParams.get('house') ? `house:${urlParams.get('house')}` : VIEW_MODE ? 'house:aurora' : (urlParams.get('preset') || 'pascal-garden-house'));
     const houseParam = initialPreset.startsWith('house:') ? initialPreset.slice(6) : null;
 
     // Load preset on startup (spec-driven houses are async; the flythrough sync below awaits them)
@@ -7196,6 +7210,7 @@
 
     // Keyboard Shortcuts
     window.addEventListener('keydown', (e) => {
+      if (VIEW_MODE) return;   // the player has its own keys (and WASD there means fly, not the gizmo)
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
       if (e.key === 'w' || e.key === 'W') setGizmoMode('translate', btnModeTranslate);
       if (e.key === 'e' || e.key === 'E') setGizmoMode('rotate', btnModeRotate);
@@ -7221,6 +7236,7 @@
     // Mouse Raycasting & Object Selection
     // -------------------------------------------------------------
     canvas.addEventListener('pointerdown', (e) => {
+      if (VIEW_MODE) return;   // nothing is selectable in the player
       // If clicking transform gizmo, don't deselect
       if (transformControls.dragging) return;
 
@@ -8431,7 +8447,9 @@
     }
 
     // Auto-trigger flythrough or jump to specific timestamp if requested via URL
-    if (urlParams.get('flythrough') === '1') {
+    if (VIEW_MODE) {
+      // the player reads ?shot= ?t= ?tod= ?play= itself, once the house is built
+    } else if (urlParams.get('flythrough') === '1') {
       initialLoad.then(() => setTimeout(() => {
         selectObject(null);
         showSplinePath = false;
@@ -8775,11 +8793,37 @@
     // -------------------------------------------------------------
     let clock = new THREE.Clock();
 
+    // ?mode=view — the portal's player (assets/viewer.ts; portal/viewer.css hides the editor chrome). Once it has
+    // mounted it owns the frame: animate() hands it the delta and returns, and it plays the shots through the same
+    // applySplineFrame the recorder uses. It reaches the page only through this object, so every __house* hook
+    // above behaves exactly as it does in the editor; without ?mode=view none of this runs.
+    let viewer = null;
+    if (VIEW_MODE) {
+      import('./assets/viewer.js').then(({ mountViewer }) => {
+        viewer = mountViewer({
+          THREE, scene, renderer, canvas, camera: persCamera, controls: orbitControls, TIME_OF_DAY, lightingName,
+          ready: initialLoad,
+          house: () => activeHouse,
+          loadHouse,
+          useShot(key) { splineSelect.value = key; if (videoSplineSync) videoSplineSync.value = key; buildSplineFromPreset(key); },
+          splines: () => ({ eye: activeEyeSpline, target: activeTargetSpline, shot: activeShot }),
+          applyFrame: t => applySplineFrame(t),
+          dress: (dressing, eye, target) => applyShotCutaway({ dressing }, 0, eye, target),
+          houseInside,
+          lighting: () => lightingAim.preset,
+          setLighting: name => setLightingPreset(name),
+          hideEditorHelpers() { gridHelper.visible = false; transformControls.detach(); },
+          render(hq) { if (hq) renderFrame(width, height); else renderer.render(scene, persCamera); },
+        });
+      }).catch(err => console.error('viewer failed to start', err));
+    }
+
     function animate() {
       requestAnimationFrame(animate);
 
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
+      if (viewer) { viewer.frame(delta); return; }
 
       // Live playback of camera motion spline
       if (isAnimPlaying && !isRecordingVideo) {

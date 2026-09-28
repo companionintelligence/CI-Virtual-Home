@@ -12,6 +12,7 @@ compiled from it:
 | **CAD floor plans** — one blueprint sheet per level, SVG + PNG, and a `floorplans.json` index | `scripts/generate_floor_plans.py` | `scenes/floorplans/` |
 | **Isometric cutaways** — landscape + portrait SVG and a pure-vector Lottie animation per house | `scripts/generate_house_iso.py` | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` |
 | **Product-shot videos** — frame-stepped, deterministic H.264 per house × shot, with posters | `scripts/render-house-shots.mts` (headless Chromium) | `video/houses/` (gitignored; browse with `video/houses/index.html`) |
+| **Web portal** — a gallery of the homes and a live player to fly their camera paths, for GitHub Pages | [`index.html`](index.html), `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://companionintelligence.github.io/ci-virtual-home/> |
 
 30 houses ship today, each a Sims 4 gallery build re-authored as a spec (see [THIRD_PARTY.md](THIRD_PARTY.md)
 for how they are credited).
@@ -28,13 +29,14 @@ git clone <this repo> && cd ci-virtual-home
 pnpm install                       # esbuild, typescript, and the exact Playwright the goldens were blessed on
 pnpm exec playwright install chromium   # its browser, once (skipped if ~/Library/Caches/ms-playwright has it)
 pnpm run build                     # assets/**/*.ts → sibling .js the page loads
-pnpm run serve                     # http://localhost:8080/room-creator.html?house=aurora
+pnpm run serve                     # http://localhost:8080/room-creator.html?house=aurora — the editor
+                                   # http://localhost:8080/ — the portal's gallery
 ```
 
 `room-creator.html` is plain ES modules with an importmap — no bundler — so any static server over the repo
 root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `shot=door-to-core|orbit|hero-reveal|walkthrough|core-orbit`,
-`flythrough=1`, `lighting=day|golden|dusk|night`, `res`, `aspect`. Its "Hub" link points at `./index.html`,
-which the web portal will provide.
+`flythrough=1`, `lighting=day|golden|dusk|night`, `res`, `aspect`. Its "Hub" link opens the portal's gallery,
+`./index.html`; `mode=view` turns the page into the portal's player (see [The web portal](#the-web-portal)).
 
 ## Commands
 
@@ -56,6 +58,10 @@ which the web portal will provide.
 | `pnpm run index` | Validate every spec and rebuild `content/houses/index.json` (the page's house list). |
 | `pnpm run prop-sheet` | Contact sheet of props, measured against their declared sizes (`--types`, `--module`, `--all`). |
 | `pnpm run export:core` | The Companion Core as glTF (`--finish`, `--pose`) → `dist/models/`. |
+| `pnpm run portal:thumbs` | Render the gallery's thumbnails → `portal/thumbs/<id>.webp` and `portal/hero.webp` (`--house`, `--hero`, `--hero-tod`, `--max-kb`). Needs a GPU; commit the output. |
+| `pnpm run portal:build` | Assemble the Pages site in `dist/` — only what it loads — and check its links. Needs `build`. |
+| `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
+| `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`). |
 
 Every script resolves the repo from its own location, so they run from any directory. After editing a spec:
 `validate` → `plans` → `iso` → `floorplans` → `check`, and commit the regenerated files with the spec.
@@ -63,7 +69,10 @@ Every script resolves the repo from its own location, so they run from any direc
 ## Layout
 
 ```
-room-creator.html          the editor + renderer page; loads assets/*.js and content/houses/*.json
+room-creator.html          the editor + renderer page; loads assets/*.js and content/houses/*.json.
+                           ?mode=view is the portal's player (assets/viewer.ts, portal/viewer.css)
+index.html                 the portal's gallery (portal/gallery.css, portal/gallery.js)
+portal/                    the portal's styles and script, thumbs/<id>.webp and hero.webp (derived, committed)
 floorplan-graph-demo.html  the Phase 2 floor-plan graph beside its compiled walls
 assets/                    the three.js engine, in TypeScript (house-builder, house-geometry, wall-compiler,
                            floorplan-graph, roofs, fixtures, site, world, materials, textures, environment)
@@ -71,6 +80,7 @@ assets/                    the three.js engine, in TypeScript (house-builder, ho
   vendor/three/            three.js r169 + addons, vendored (one local patch; see THIRD_PARTY.md)
   fonts/                   Manrope + JetBrains Mono woff2 the capture scripts serve instead of Google Fonts
   brand/                   the CI mark the page shows
+  viewer.ts                the portal's player: shots, scrubber, time of day, path, fly (room-creator ?mode=view)
 content/houses/            <id>.json — the 30 HouseSpecs (source); <id>.plan.json and index.json — derived
 content/house-catalog.json every item type's measured footprint, height and iso parts (derived)
 scenes/                    isometric SVG + Lottie, CAD floor plans, and their manifests (all derived, committed)
@@ -80,6 +90,33 @@ reference/                 HOUSE-SPEC.md (the schema), PARAMETRIC-INTERIORS-PLAN
 test/goldens/macos-metal/  120 committed baseline frames (Git LFS) + PROFILE.json (the renderer that made them)
 video/houses/index.html    browser for rendered shots; the renders beside it are gitignored
 ```
+
+## The web portal
+
+A static site anyone can open: [`index.html`](index.html) lists the homes from `content/houses/index.json` with
+the committed thumbnails (no WebGL on the gallery), and a card opens the live player,
+
+```
+room-creator.html?mode=view&house=<id>[&shot=<shot>][&t=<0…1>][&tod=day|golden|dusk|night][&play=1|0]
+```
+
+— the editor's own renderer with its chrome put away. `t` is the fraction of the shot; a link with `t` opens
+paused there, one without plays from the start. The player lists the shots from the house's presets (so
+`core-orbit` and any later shot type appear by themselves), plays them through the page's `applySplineFrame`
+(its frames are the recorder's frames), and adds a scrubber, speed, time of day, the camera path drawn in the
+scene, a free-flying camera (drag, WASD, Q/E, Esc back to the shot; O for an overview and C for a cutaway that
+opens the house, with the shot's camera flying on as a ghost), share links, full screen and prev/next. Keys:
+Space, ←/→ (Shift: 5 s), Home/End, 1–9, T, P, F, O, C, Esc, [ ], Shift F, ?. Everything under `?mode=view` is additive: without it the page is the editor, and
+every `__house*` hook behaves as before.
+
+Every URL in the site is relative, because Pages serves it at `/ci-virtual-home/`. `portal:build` copies only
+what the site loads into `dist/`, and [`.github/workflows/pages.yml`](.github/workflows/pages.yml) deploys it on
+every push to `main` (and on demand); Pages has to be enabled for the repository with **GitHub Actions** as the
+source. Nothing renders in CI: when a house's look changes, re-run `pnpm run portal:thumbs --house <id>` on a
+GPU and commit the new thumbnail with the change. `portal:test` is the check to run before pushing portal work.
+
+The Pages site is public to anyone with its address, and it serves what a browser needs to draw the homes: the
+compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
 
 ## How verification works
 

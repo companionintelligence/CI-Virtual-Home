@@ -14,7 +14,7 @@ its licence text lives. When you add, upgrade or adapt one, update this file in 
 | [pixelmatch](https://github.com/mapbox/pixelmatch) | 7.2.0 | ISC — © 2025 Mapbox | [`scripts/vendor/pixelmatch.mjs`](scripts/vendor/pixelmatch.mjs) | [`scripts/vendor/LICENSE-pixelmatch.txt`](scripts/vendor/LICENSE-pixelmatch.txt) |
 | [Manrope](https://github.com/sharanda/manrope) — variable, Latin subset (from `@fontsource-variable/manrope` 5.3.0, via CI-Common `styles/fonts/files/`) | v4.504 | OFL-1.1 — © 2019 The Manrope Project Authors | [`assets/fonts/manrope-latin-var.woff2`](assets/fonts/manrope-latin-var.woff2) | [`assets/fonts/LICENSE-Manrope.txt`](assets/fonts/LICENSE-Manrope.txt) |
 | [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) — variable, Latin subset (from `@fontsource-variable/jetbrains-mono` 5.3.0, via CI-Common) | v2.211 | OFL-1.1 — © 2020 The JetBrains Mono Project Authors | [`assets/fonts/jetbrains-mono-latin-var.woff2`](assets/fonts/jetbrains-mono-latin-var.woff2) | [`assets/fonts/LICENSE-JetBrains-Mono.txt`](assets/fonts/LICENSE-JetBrains-Mono.txt) |
-| [Lucide](https://lucide.dev) icon path data (from `lucide-react` 0.469.0), inlined as the SVG sprite | 0.469.0 | ISC — © Lucide Contributors 2022; portions © Cole Bemis 2013-2022 (Feather, MIT) | [`room-creator.html`](room-creator.html) (the `<symbol>` sprite) | inline, above the sprite |
+| [Lucide](https://lucide.dev) icon path data (from `lucide-react` 0.469.0), inlined as the SVG sprite | 0.469.0 | ISC — © Lucide Contributors 2022; portions © Cole Bemis 2013-2022 (Feather, MIT) | [`room-creator.html`](room-creator.html) (the `<symbol>` sprite), [`index.html`](index.html) (the gallery's sprite), [`assets/viewer.ts`](assets/viewer.ts) (the player's `ICONS`) | inline, above the room-creator sprite |
 
 **Local modification.** The three.js files are byte-identical to the `three@0.169.0` npm package except one:
 `postprocessing/GTAOPass.js` `generateNoise()` seeds its `SimplexNoise` with mulberry32 instead of
@@ -52,9 +52,14 @@ Their licence texts are reproduced at the end of this file.
   from those builds or from The Sims are in this repository — the reference photos they were read from are
   third-party images and are deliberately not committed.
 
+The web portal (`pnpm run portal:build` → GitHub Pages) redistributes three.js with its `LICENSE`, and the two
+fonts with theirs (`assets/fonts/LICENSE-*.txt` are copied beside the woff2), which is what MIT and OFL-1.1 ask.
+The gallery (`index.html`) and the player's stylesheet load them from `assets/fonts/`; `room-creator.html` itself
+still links the Google Fonts stylesheet below, in the player as in the editor.
+
 ## Loaded at runtime (not in the repository)
 
-- **Google Fonts** — `room-creator.html`, `floorplan-graph-demo.html` and `video/houses/index.html` link the
+- **Google Fonts** — `room-creator.html` (and so the portal's player), `floorplan-graph-demo.html` and `video/houses/index.html` link the
   Manrope, Plus Jakarta Sans and JetBrains Mono stylesheets from `fonts.googleapis.com` (all OFL-1.1). The
   capture scripts intercept that request and serve `assets/fonts/` instead (Plus Jakarta Sans → Manrope).
 
@@ -66,6 +71,10 @@ Their licence texts are reproduced at the end of this file.
 | [`esbuild`](https://esbuild.github.io) | ^0.28.2 | MIT |
 | [`typescript`](https://www.typescriptlang.org) | ^5 | Apache-2.0 |
 | [`@types/node`](https://github.com/DefinitelyTyped/DefinitelyTyped) | ^22 | MIT |
+
+The Pages workflow (`.github/workflows/pages.yml`) runs GitHub's own `actions/checkout`, `actions/setup-node`,
+`actions/configure-pages`, `actions/upload-pages-artifact` and `actions/deploy-pages` (MIT) and
+`pnpm/action-setup` (MIT); none of their code is in the site.
 
 External tools the scripts call but this repository does not include: **ffmpeg** (`render-house-shots.mts`,
 `prop-sheet.mts`; LGPL-2.1+/GPL depending on build), **rsvg-convert** from librsvg (`generate_floor_plans.py`,

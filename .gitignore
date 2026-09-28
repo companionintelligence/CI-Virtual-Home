@@ -29,6 +29,9 @@ test/diff/
 test/qa/
 test/goldens.*.json
 
+# Screenshots from the portal's end-to-end check (scripts/test-portal.mts)
+test/portal/
+
 # Python bytecode from scripts/ (generate_house_iso.py imports its sibling modules)
 __pycache__/
 *.pyc
