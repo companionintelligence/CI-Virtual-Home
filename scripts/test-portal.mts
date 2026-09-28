@@ -189,6 +189,14 @@ async function player(id: string, viewport: { width: number; height: number }, m
     const p2 = await camPos(page);
     ok(p2[1] > p1[1] + 0.3, 'E rises');
   }
+  // overview opens the house (cutaway) and frames the path from above
+  const beforeOverview = await camPos(page);
+  if (mobile) await page.tap('[data-act="overview"]'); else await page.keyboard.press('o');
+  await sleep(1400);
+  const afterOverview = await camPos(page);
+  ok(dist(beforeOverview, afterOverview) > 1 && (await page.getAttribute('[data-act="cutaway"]', 'aria-pressed')) === 'true', `overview lifts the camera ${dist(beforeOverview, afterOverview).toFixed(1)} m and opens the cutaway`);
+  ok(await page.evaluate(() => { const s = (window as any).__houseDebug().scene; let roofs = 0, shown = 0; s.traverse((o: any) => { if (o.userData && o.userData.isRoof) { roofs++; if (o.visible) shown++; } }); return roofs === 0 || shown === 0; }), 'the cutaway takes the roofs off');
+  await shot(page, `player-${id}-${label}-overview`);
   // drag turns the view
   const q0 = await page.evaluate(() => (window as any).__houseDebug().camera.quaternion.toArray());
   const cx = viewport.width / 2, cy = viewport.height * 0.4;

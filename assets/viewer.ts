@@ -135,6 +135,7 @@ export function mountViewer(api: Api) {
       <span class="vh-flybar-label">${icon('fly')}<b>Free camera</b></span>
       <span class="vh-flybar-hint vh-hide-coarse">Drag to look. WASD to move, Q and E to sink and rise.</span>
       <span class="vh-flybar-hint vh-show-coarse">Drag to look. Pinch to move closer.</span>
+      <button class="vh-pill vh-pill-quiet" data-act="cutaway" aria-pressed="false" title="Cut the roof and the walls you look through  C">Cutaway</button>
       <button class="vh-pill vh-pill-quiet" data-act="overview" title="See the whole path from above  O">Overview</button>
       <button class="vh-pill" data-act="exit-fly">Back to shot<kbd class="vh-hide-coarse">Esc</kbd></button>
     </div>
@@ -175,6 +176,7 @@ export function mountViewer(api: Api) {
         <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Move while flying (Shift: faster)</dd>
         <dt><kbd>Q</kbd> <kbd>E</kbd></dt><dd>Sink and rise while flying</dd>
         <dt><kbd>O</kbd></dt><dd>Overview of the whole path</dd>
+        <dt><kbd>C</kbd></dt><dd>Cutaway: open the house while flying</dd>
         <dt><kbd>Esc</kbd></dt><dd>Back to the shot</dd>
         <dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Previous or next home</dd>
         <dt><kbd>Shift</kbd> <kbd>F</kbd></dt><dd>Full screen</dd>
@@ -314,7 +316,12 @@ export function mountViewer(api: Api) {
     const floors = ((api.house() || {}).spec || {}).levels || [];
     const floorUnder = (v: any) => floors.reduce((y: number, l: any) => (l.y || 0) <= v.y - 0.3 && (l.footprint || []).some((r: any) => v.x >= r.x && v.x <= r.x + r.w && v.z >= r.z && v.z <= r.z + r.d) ? Math.max(y, l.y || 0) : y, 0);
     const plumbs: any[] = [];
-    for (const v of p.eyePoints || []) { const y = floorUnder(v); if (v.y - y > 0.4) plumbs.push(v, new THREE.Vector3(v.x, y, v.z)); }
+    let last: any = null;   // one every 1.2 m at most: an orbit's close-set waypoints would read as a fence
+    for (const v of p.eyePoints || []) {
+      const y = floorUnder(v);
+      if (v.y - y <= 0.4 || (last && Math.hypot(v.x - last.x, v.z - last.z) < 1.2)) continue;
+      plumbs.push(v, new THREE.Vector3(v.x, y, v.z)); last = v;
+    }
     g.add(helper(new THREE.LineSegments(pointsOf(plumbs), lineMat(COLORS.eye, 0.35)), 998));
     g.add(helper(new THREE.Points(pointsOf(p.eyePoints || []), dotMat(COLORS.halo, 14, DISC, 0.45)), 1002));
     g.add(helper(new THREE.Points(pointsOf(p.eyePoints || []), dotMat(COLORS.eye, 11, RING)), 1003));
@@ -494,6 +501,7 @@ export function mountViewer(api: Api) {
     if (!flying) return;
     flying = false;
     tween = null;
+    setCutaway(false);
     keys.clear();
     clearControlDeltas();
     root.dataset.fly = '0';
@@ -542,11 +550,13 @@ export function mountViewer(api: Api) {
     if (!flying) enterFly();
     const pts = pathGroup ? pathGroup.children[0].geometry.attributes.position : null;
     const box = new THREE.Box3();
-    if (pts) box.setFromBufferAttribute(pts);
     const h = api.house();
-    if (h && h.anchors && h.anchors.bounds) { const b = h.anchors.bounds; box.expandByPoint(new THREE.Vector3(b.minX, 0, b.minZ)); box.expandByPoint(new THREE.Vector3(b.maxX, 4, b.maxZ)); }
+    if (pts) box.setFromBufferAttribute(pts);
+    else if (h && h.anchors && h.anchors.bounds) { const b = h.anchors.bounds; box.set(new THREE.Vector3(b.minX, 0, b.minZ), new THREE.Vector3(b.maxX, 4, b.maxZ)); }
     if (box.isEmpty()) return;
+    // the path, with room round it: a 2 m orbit of the Core is framed with its room, not filling the screen
     const sphere = box.getBoundingSphere(new THREE.Sphere());
+    sphere.radius = Math.max(sphere.radius, 5);
     // from the front of the house, swung 34° off the entry's axis, 40° up (the thumbnails' view)
     const out = (h && h.anchors && h.anchors.entry && h.anchors.entry.out) || [0, 1];
     const az = Math.atan2(out[0], out[1]) + (34 * Math.PI) / 180, el = (40 * Math.PI) / 180;
@@ -557,6 +567,7 @@ export function mountViewer(api: Api) {
     const q1 = sphere.center.clone(); q1.y -= Math.tan(vHalf) * d * 0.12;
     tween = { t: 0, dur: 0.9, p0: camera.position.clone(), p1, q0: controls.target.clone(), q1 };
     clearControlDeltas();
+    setCutaway(true);   // from above, the path is inside: open the house
     dirty = true;
   }
   function stepTween(delta: number): boolean {
@@ -576,8 +587,18 @@ export function mountViewer(api: Api) {
     dirty = true;
   }
   // While flying the house is dressed for where you are, not for the shot's moment: walls up, the roof on from
-  // outside and off once you are under it (ceilings show only while you are below them, as in a shot).
+  // outside and off once you are under it (ceilings show only while you are below them, as in a shot). The
+  // cutaway opens it the way the game does, to see a path threaded through it: roofs off, and each exterior
+  // wall you are looking through cut down (the page's own Sims rule, decided per wall per frame).
+  let cutaway = false;
+  function setCutaway(on: boolean) {
+    cutaway = on;
+    const b = root.querySelector('[data-act="cutaway"]');
+    if (b) { b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }
+    dirty = true;
+  }
   function flyDress() {
+    if (cutaway) { api.dress({ walls: 'sims', roof: 'off' }, camera.position, controls.target); return; }
     const inside = api.houseInside(camera.position);
     api.dress({ walls: 'up', roof: inside ? 'off' : 'on' }, camera.position, controls.target);
   }
@@ -779,6 +800,7 @@ export function mountViewer(api: Api) {
     else if (act === 'fly') (flying ? exitFly() : enterFly());
     else if (act === 'exit-fly') exitFly();
     else if (act === 'overview') overview();
+    else if (act === 'cutaway') { if (!flying) enterFly(); setCutaway(!cutaway); }
     else if (act === 'hq') setHq(!hq);
     else if (act === 'prev') goHouse(neighbour(-1)!);
     else if (act === 'next') goHouse(neighbour(1)!);
@@ -841,6 +863,7 @@ export function mountViewer(api: Api) {
     if (k === 'f') { flying ? exitFly() : enterFly(); return; }
     if (k === 'p') { setPath(!showPath); return; }
     if (k === 'o') { overview(); return; }
+    if (k === 'c') { if (!flying) enterFly(); setCutaway(!cutaway); return; }
     if (k === 't') { cycleTod(e.shiftKey ? -1 : 1); return; }
     if (k === '[') { goHouse(neighbour(-1)!); return; }
     if (k === ']') { goHouse(neighbour(1)!); return; }

@@ -104,9 +104,9 @@ room-creator.html?mode=view&house=<id>[&shot=<shot>][&t=<0…1>][&tod=day|golden
 paused there, one without plays from the start. The player lists the shots from the house's presets (so
 `core-orbit` and any later shot type appear by themselves), plays them through the page's `applySplineFrame`
 (its frames are the recorder's frames), and adds a scrubber, speed, time of day, the camera path drawn in the
-scene, a free-flying camera (drag, WASD, Q/E, Esc back to the shot, O for an overview with the shot's camera
-as a ghost), share links, full screen and prev/next. Keys: Space, ←/→ (Shift: 5 s), Home/End, 1–9, T, P, F,
-O, Esc, [ ], Shift F, ?. Everything under `?mode=view` is additive: without it the page is the editor, and
+scene, a free-flying camera (drag, WASD, Q/E, Esc back to the shot; O for an overview and C for a cutaway that
+opens the house, with the shot's camera flying on as a ghost), share links, full screen and prev/next. Keys:
+Space, ←/→ (Shift: 5 s), Home/End, 1–9, T, P, F, O, C, Esc, [ ], Shift F, ?. Everything under `?mode=view` is additive: without it the page is the editor, and
 every `__house*` hook behaves as before.
 
 Every URL in the site is relative, because Pages serves it at `/ci-virtual-home/`. `portal:build` copies only
