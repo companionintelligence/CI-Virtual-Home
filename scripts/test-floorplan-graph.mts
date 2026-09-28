@@ -3,8 +3,6 @@
 // Usage: pnpm run test      (node --experimental-strip-types --test scripts/test-floorplan-graph.mts; needs `pnpm run build` first)
 // @check-house node-test
 // @check-house quick
-// @check-house advisory — case 9 (aurora/l2: 9 rooms > 8 authored) is red on main too; the fix is on
-//   fix/aurora-l2-room-count (e3da9cd). Delete this directive when that merges, and the gate enforces it again.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
