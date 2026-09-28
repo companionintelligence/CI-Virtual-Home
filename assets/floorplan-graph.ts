@@ -78,6 +78,26 @@ export function segmentCrossing(a0, a1, b0, b1) {
   return { t, u };
 }
 
+/**
+ * Signed distance along the unit axis (dx,dz) from p to where the line through p meets segment a→b: positive
+ * ahead of p, negative behind it; null when the line misses the segment. A collinear segment is met at p when
+ * it covers p, else at its nearer end.
+ */
+export function axisHit(p, dx, dz, a, b) {
+  const ex = b[0] - a[0], ez = b[1] - a[1], qx = a[0] - p[0], qz = a[1] - p[1];
+  const len = Math.hypot(ex, ez), den = dx * ez - dz * ex;
+  if (len < EPS) return null;
+  if (Math.abs(den) < EPS * len) {                                   // parallel
+    if (Math.abs(qx * dz - qz * dx) > EPS) return null;              // … and off the line
+    const ua = qx * dx + qz * dz, ub = (b[0] - p[0]) * dx + (b[1] - p[1]) * dz;
+    if (Math.min(ua, ub) <= 0 && Math.max(ua, ub) >= 0) return 0;
+    return Math.abs(ua) < Math.abs(ub) ? ua : ub;
+  }
+  const v = (qx * dz - qz * dx) / den;                               // fraction along a→b
+  if (v < -EPS || v > 1 + EPS) return null;
+  return (qx * ez - qz * ex) / den;
+}
+
 /** Ray-casting point-in-polygon for [[x,z], …] loops. */
 export function polygonContains(poly, x, z) {
   let inside = false;
@@ -510,19 +530,51 @@ export class FloorplanGraph {
       segs.push({ a: [...p.from], b: [...p.to], kind: 'partition', thickness: p.thickness || partitionThickness, height: p.height || partitionHeight, partition: p, dressing });
     }
 
-    // 1. snap partition ends onto any segment within `snap` (authored coordinates vs the 0.1 m raster outline).
-    //    Dressing stays where it is authored: snapped onto the wall it runs beside, a frame's free end would
-    //    close a sliver between the two that counts as a room.
+    // 1. snap partition ends onto a segment within `snap` (authored coordinates vs the 0.1 m raster outline). An end
+    //    only moves along its partition's own axis, extended or trimmed to meet a segment it points into, never
+    //    sideways: an axis-aligned partition stays axis-aligned, and one laid parallel to a wall or partition a few cm
+    //    off it stays where it is authored instead of folding onto it or skewing into it. Dressing neither snaps nor
+    //    takes a snap: it stays exactly where it is authored.
     for (const s of segs) {
       if (s.kind !== 'partition' || s.dressing) continue;
-      for (const key of ['a', 'b']) {
-        const p = s[key]; let best = null;
+      for (const [key, other] of [['a', 'b'], ['b', 'a']]) {
+        const p = s[key], q = s[other];
+        const len = distance(q[0], q[1], p[0], p[1]);
+        if (len < EPS) continue;
+        const dx = (p[0] - q[0]) / len, dz = (p[1] - q[1]) / len;       // unit axis, out through this end
+        let best = null;
         for (const o of segs) {
           if (o === s || o.dressing) continue;
-          const c = closestPointOnSegment(p[0], p[1], o.a[0], o.a[1], o.b[0], o.b[1]);
-          if (c.dist < snap && (!best || c.dist < best.dist)) best = c;
+          const u = axisHit(p, dx, dz, o.a, o.b);
+          if (u !== null && Math.abs(u) < snap && len + u > CORNER_TOLERANCE && (best === null || Math.abs(u) < Math.abs(best))) best = u;
         }
-        if (best) s[key] = [best.x, best.z];
+        if (best) s[key] = [p[0] + dx * best, p[1] + dz * best];
+      }
+    }
+    // 1b. jogs: an end that still meets nothing but sits within `snap` of the end of a parallel partition carrying on
+    //     past it (cocoon L1's 1.05 m half-wall, 5 cm off the full-height partition it continues) is joined to that
+    //     end by a short wall square to both, so the run still closes its rooms without either leg skewing
+    const touches = (p, s) => segs.some(o => o !== s && closestPointOnSegment(p[0], p[1], o.a[0], o.a[1], o.b[0], o.b[1]).dist < CORNER_TOLERANCE);
+    for (const s of segs.filter(s => s.kind === 'partition' && !s.dressing)) {
+      for (const [key, other] of [['a', 'b'], ['b', 'a']]) {
+        const p = s[key], q = s[other];
+        const len = distance(q[0], q[1], p[0], p[1]);
+        if (len < EPS || touches(p, s)) continue;
+        const dx = (p[0] - q[0]) / len, dz = (p[1] - q[1]) / len;
+        let best = null;
+        for (const t of segs) {
+          if (t === s || t.kind !== 'partition' || t.dressing) continue;
+          for (const [rk, rk2] of [['a', 'b'], ['b', 'a']]) {
+            const r = t[rk], r2 = t[rk2];
+            const along = (r[0] - p[0]) * dx + (r[1] - p[1]) * dz, side = (r[0] - p[0]) * dz - (r[1] - p[1]) * dx;
+            const onward = (r2[0] - r[0]) * dx + (r2[1] - r[1]) * dz, twist = (r2[0] - r[0]) * dz - (r2[1] - r[1]) * dx;
+            const d = distance(p[0], p[1], r[0], r[1]);
+            if (d < snap && Math.abs(side) > EPS && onward > EPS && Math.abs(twist) < EPS && len + along > CORNER_TOLERANCE && (!best || d < best.d)) best = { t, r, along, d };
+          }
+        }
+        if (!best) continue;
+        s[key] = [p[0] + dx * best.along, p[1] + dz * best.along];             // square the jog: along the axis only
+        segs.push({ a: s[key], b: [...best.r], kind: 'partition', thickness: Math.min(s.thickness, best.t.thickness), height: Math.min(s.height, best.t.height) });
       }
     }
 
