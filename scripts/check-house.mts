@@ -2,7 +2,7 @@
 // Every check the house pipeline has, in one command, on this machine.
 //
 //   pnpm run check [--house aurora,mirage] [--jobs 2] [--res 360] [--update-goldens]
-//   pnpm run check:quick                                   # assets + specs + shots only
+//   pnpm run check:quick                                   # assets + specs + shots + the quick tests
 //   node --experimental-strip-types scripts/check-house.mts [--quick] [--house …] [--jobs 2] [--res 360] [--update-goldens]
 //
 // Works from any cwd: every path resolves from this file's own location.
@@ -27,6 +27,9 @@
 //                                               // @check-house skip — <why>     not run here (e.g. a step above)
 //                                               // @check-house node-test        run under `node --test`
 //                                               // @check-house quick            also run by --quick
+//                                               // @check-house advisory — <why> runs and reports, cannot fail the
+//                                               //                              gate (a test that is red on main
+//                                               //                              too, until the fix that greens it lands)
 //   6. perf       perf-house.mts            — build / track / shot-QA timings against their budgets (plan A4):
 //                                             report-only, it never fails the gate (`--no-perf` skips it)
 //
@@ -64,7 +67,7 @@ const testSteps: Step[] = fs.readdirSync(path.join(ROOT, 'scripts')).filter(f =>
   const head = fs.readFileSync(path.join(ROOT, 'scripts', f), 'utf8').split('\n').slice(0, 40).join('\n');
   const words = [...head.matchAll(/@check-house\s+([a-z-]+)/g)].map(m => m[1]);   // one directive a line
   if (words.includes('skip')) return [];
-  return [{ key: `test:${f.replace(/^test-|\.mts$/g, '')}`, script: S(f), args: [], quick: words.includes('quick') ? undefined : false, nodeTest: words.includes('node-test') }];
+  return [{ key: `test:${f.replace(/^test-|\.mts$/g, '')}`, script: S(f), args: [], quick: words.includes('quick') ? undefined : false, nodeTest: words.includes('node-test'), advisory: words.includes('advisory') }];
 });
 const steps: Step[] = [
   { key: 'assets', script: S('build-house-assets.mts'), args: [] },
@@ -102,6 +105,8 @@ for (const r of results) {
 }
 const failed = results.filter(r => r.state === 'fail'), advisory = results.filter(r => r.state === 'warn');
 const also = advisory.length ? ` (${advisory.map(r => r.key).join(', ')}: advisory, did not finish cleanly)` : '';
-if (failed.length) console.log(`\n\x1b[31m${failed.length} of ${results.filter(r => r.state !== 'skipped').length} checks failed.\x1b[0m${also}`);
-else console.log(`\n\x1b[32mAll ${results.filter(r => r.state !== 'skipped').length} checks passed.\x1b[0m${also}`);
+// an advisory step counts on neither side: it is reported beside the tally, never in it
+const gating = results.filter(r => r.state === 'pass' || r.state === 'fail').length;
+if (failed.length) console.log(`\n\x1b[31m${failed.length} of ${gating} checks failed.\x1b[0m${also}`);
+else console.log(`\n\x1b[32mAll ${gating} checks passed.\x1b[0m${also}`);
 process.exit(failed.length ? 1 : 0);
