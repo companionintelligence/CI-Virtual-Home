@@ -13,6 +13,7 @@
       var q = new URLSearchParams(location.search), d = document.documentElement, id = q.get('house') || 'aurora';
       if (q.get('mode') !== 'view') return;
       d.dataset.mode = 'view';
+      try { var c = document.createElement('canvas'); if (!(c.getContext('webgl2') || c.getContext('webgl'))) d.dataset.viewer = 'no-webgl'; } catch (e) { d.dataset.viewer = 'no-webgl'; }
       if (/^[a-z0-9-]+$/.test(id)) d.style.setProperty('--vh-poster', 'url("' + new URL('./portal/thumbs/' + id + '.webp', location.href).href + '")');
       document.write('<link rel="stylesheet" href="./portal/viewer.css">');
     })();

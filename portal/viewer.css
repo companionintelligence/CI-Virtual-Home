@@ -80,6 +80,14 @@ html[data-mode="view"]:not([data-viewer]) body::after {
     color-mix(in srgb, var(--foreground) 14%, transparent);
   animation: vh-slide 1.1s linear infinite;
 }
+/* no WebGL: the page cannot draw, so say so where the loader would have been */
+html[data-mode="view"][data-viewer="no-webgl"] body::before {
+  content: "This browser cannot draw 3D (WebGL is off or missing). Try a recent Chrome, Edge, Firefox or Safari.";
+  position: fixed; inset: 0; z-index: 100;
+  display: grid; place-items: center; padding: 32px;
+  text-align: center; font: 600 15px/1.5 var(--vh-font); color: var(--foreground);
+  background: var(--background);
+}
 @keyframes vh-slide { from { background-position: 100% 0, 0 0; } to { background-position: -100% 0, 0 0; } }
 
 /* ---------------- the player ---------------- */
@@ -381,7 +389,8 @@ html[data-mode="view"]:not([data-viewer]) body::after {
 .vh-toast.on { opacity: 1; transform: translate(-50%, 0); }
 .vh-help {
   position: absolute; right: calc(var(--vh-gap) + env(safe-area-inset-right, 0px)); top: calc(64px + env(safe-area-inset-top, 0px));
-  width: 300px;
+  width: 320px;
+  max-width: calc(100% - 2 * var(--vh-gap));
   padding: 10px 14px 12px;
   border-radius: var(--vh-radius);
   pointer-events: auto;
