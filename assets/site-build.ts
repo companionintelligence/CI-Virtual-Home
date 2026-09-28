@@ -8,6 +8,9 @@ import { createSiteKit } from './site.js';
 import { buildWorld } from './world.js';
 import { DEG, hex, mix } from './build-context.js';
 
+// The site types buildSite() builds itself, beside SITE's and the site kit's (the validator reads all three lists)
+export const SITE_LOOP_TYPES: readonly string[] = ['fence', 'wall-low'];
+
 const GROUND_COLORS = { lawn: 0x384a2c, desert: 0xc5ae88, forest: 0x3b4a2c, urban: 0x9c9b97, waterfront: 0x384a2c };   // restrained fallbacks; gcol is the kit surface's mean
 
 export function createSiteBuild(bctx) {

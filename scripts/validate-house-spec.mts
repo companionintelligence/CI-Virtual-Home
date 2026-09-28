@@ -12,6 +12,11 @@
 // Plugins: every scripts/validate/*.mts (not "_*") runs after the checks below, in name order — one per stream
 // (scripts/validate/_types.mts has the contract). A plugin that exports `flag` runs only when that flag is given:
 // `pnpm run validate --layout` runs layout.mts. Plugin issues print like the checks' own, with their code last.
+// A plugin also owns its stream's share of the checks below: `extend` adds values to the vocabulary they test
+// against (VOCAB: a new roof type, site type, ground …) and `replaces` takes a whole rule over (RULES: the core
+// skips it, the plugin checks its own version — S2's stairs arrays, S5's duration 'auto'), so no stream edits
+// this file. The item and site types are not listed here at all: they are read off the builders (item-map.ts's
+// ITEMS and the prop registry; site-build.ts's SITE, its loop's own types and the site kit's).
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -21,20 +26,35 @@ import { perimeterEdges } from '../assets/house-geometry.js';
 import type { Check, ValidateContext } from './validate/_types.mts';
 export { perimeterEdges };
 
-const SIDES = ['S', 'N', 'E', 'W'];
-const OPENING_TYPES = ['door', 'window', 'slider', 'glass', 'garage'];
-const ROOF_TYPES = ['gable', 'hip', 'shed', 'flat', 'aframe-glass', 'terracotta'];
-const FLOORS = ['oak', 'herringbone', 'terrazzo', 'phthalo-terrazzo', 'charcoal-terrazzo', 'marble', 'concrete', 'deck', 'tile', 'grass', 'lawn'];
-const GROUNDS = ['lawn', 'desert', 'forest', 'urban', 'waterfront'];
-const SITE_TYPES = ['pool', 'pond', 'hottub', 'deck', 'patio', 'driveway', 'turf', 'fence', 'wall-low', 'porch', 'pergola', 'gazebo', 'greenhouse', 'garden-beds', 'monkeybars', 'firepit', 'loungers', 'bench', 'car', 'planter', 'steps', 'tree', 'cypress', 'palm', 'shrub', 'turtle-pool', 'bridge', 'soccer-goal', 'cactus',
-  'flowers', 'rock', 'bed', 'path', 'hedge', 'scatter', 'grove'];   // assets/site.js: seeded planting, beds, hedges, paths
 import { PROPS } from '../assets/props/index.js';   // registry props are valid item types too
-const ITEM_TYPES = [...PROPS.keys(), 'sectional', 'club-chair', 'coffee-table', 'octagonal-table', 'dining-set', 'dining-table', 'kitchen-island', 'kitchen-cabinetry', 'media-credenza', 'wall-tv', 'fireplace', 'area-rug', 'circular-rug', 'concentric-rug', 'sun-lounger', 'bench', 'platform-bed', 'wardrobe', 'crib', 'ensuite', 'bookshelf', 'walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'core-shelf', 'speakers', 'halo-lamp', 'fiddle-leaf', 'monstera', 'bonsai', 'bamboo', 'cactus-group', 'telescope', 'soccer-goal', 'low-wall', 'column'];
-const STAIR_TYPES = ['timber', 'colonial', 'spiral'];
-// house-builder.js shotsFor(): the five generated shots, and the dressing a spec may put on one
-const SHOT_TYPES = ['door-to-core', 'orbit', 'hero-reveal', 'walkthrough', 'core-orbit'];
-const SHOT_WALLS = ['up', 'cutaway', 'down', 'sims'];
-const SHOT_ROOFS = ['on', 'off', 'auto'];
+import { createItemMap } from '../assets/item-map.js';
+import { createSiteBuild, SITE_LOOP_TYPES } from '../assets/site-build.js';
+import { SITE_KIT_TYPES } from '../assets/site.js';
+import { VOCAB_KEYS, RULES } from './validate/_types.mts';
+import type { Vocab, VocabKey, Rule } from './validate/_types.mts';
+
+// The vocabulary the checks below test against, before the plugins extend it. Item and site types come off the
+// builders themselves (their factories only define closures, so an empty context is enough to list their keys).
+const BASE_VOCAB: Vocab = {
+  sides: ['S', 'N', 'E', 'W'],
+  openingTypes: ['door', 'window', 'slider', 'glass', 'garage'],
+  roofTypes: ['gable', 'hip', 'shed', 'flat', 'aframe-glass', 'terracotta'],
+  floors: ['oak', 'herringbone', 'terrazzo', 'phthalo-terrazzo', 'charcoal-terrazzo', 'marble', 'concrete', 'deck', 'tile', 'grass', 'lawn'],
+  grounds: ['lawn', 'desert', 'forest', 'urban', 'waterfront'],
+  // site-build.ts's page builders, the ones its site loop builds itself (fence, wall-low), and assets/site.ts's
+  // seeded kit (planting, beds, hedges, paths)
+  siteTypes: [...Object.keys(createSiteBuild({}).SITE), ...SITE_LOOP_TYPES, ...SITE_KIT_TYPES],
+  // the prop registry, then item-map.ts's page builders
+  itemTypes: [...PROPS.keys(), ...Object.keys(createItemMap({}).ITEMS)],
+  stairTypes: ['timber', 'colonial', 'spiral'],
+  // shot-planner-v1.ts shotsFor(): the five generated shots, and the dressing a spec may put on one
+  shotTypes: ['door-to-core', 'orbit', 'hero-reveal', 'walkthrough', 'core-orbit'],
+  shotWalls: ['up', 'cutaway', 'down', 'sims'],
+  shotRoofs: ['on', 'off', 'auto'],
+  heroDevices: ['chalk', 'charcoal', 'strix'],
+  heroPoses: ['prone', 'upright'],
+  heroSurfaces: ['desk', 'credenza', 'island', 'shelf', 'none'],
+};
 
 const isRect = r => r && ['x', 'z', 'w', 'd'].every(k => typeof r[k] === 'number') && r.w > 0 && r.d > 0;
 const inRect = (px, pz, r, tol = 0.01) => px >= r.x - tol && px <= r.x + r.w + tol && pz >= r.z - tol && pz <= r.z + r.d + tol;
@@ -48,12 +68,34 @@ const rectInside = (a, rects) => {
 type Plugin = { name: string; check: Check; flag: string | null };
 const PLUGIN_DIR = path.join(import.meta.dirname, 'validate');
 export const PLUGINS: Plugin[] = [];
+const vocab = Object.fromEntries(VOCAB_KEYS.map(k => [k, [...BASE_VOCAB[k]]])) as { [K in VocabKey]: string[] };
+const replaced = new Map<Rule, string>();   // rule → the plugin that took it over
 for (const f of (fs.existsSync(PLUGIN_DIR) ? fs.readdirSync(PLUGIN_DIR) : []).filter(f => f.endsWith('.mts') && !f.startsWith('_')).sort()) {
-  const m = await import(pathToFileURL(path.join(PLUGIN_DIR, f)).href);
-  if (typeof m.default !== 'function') throw new Error(`scripts/validate/${f}: no default export (a check(spec, ctx) function)`);
-  PLUGINS.push({ name: f.replace(/\.mts$/, ''), check: m.default, flag: typeof m.flag === 'string' ? m.flag : null });
+  const m = await import(pathToFileURL(path.join(PLUGIN_DIR, f)).href), name = f.replace(/\.mts$/, '');
+  const where = `scripts/validate/${f}`;
+  if (typeof m.default !== 'function') throw new Error(`${where}: no default export (a check(spec, ctx) function)`);
+  const flag = typeof m.flag === 'string' ? m.flag : null;
+  for (const [k, vals] of Object.entries(m.extend || {})) {
+    if (!(VOCAB_KEYS as readonly string[]).includes(k)) throw new Error(`${where}: extend.${k} is not a vocabulary (${VOCAB_KEYS.join(', ')})`);
+    if (!Array.isArray(vals) || !vals.every(v => typeof v === 'string')) throw new Error(`${where}: extend.${k} must be a string array`);
+    for (const v of vals as string[]) if (!vocab[k].includes(v)) vocab[k].push(v);
+  }
+  for (const r of m.replaces || []) {
+    if (!(RULES as readonly string[]).includes(r)) throw new Error(`${where}: replaces "${r}", which is not a rule (${RULES.join(', ')})`);
+    // a flag-gated plugin does not run on a plain validate, so a rule it took over would go unchecked there
+    if (flag) throw new Error(`${where}: a --${flag} plugin cannot replace a rule (it does not run without the flag)`);
+    if (replaced.has(r)) throw new Error(`${where}: rule "${r}" is already replaced by ${replaced.get(r)}`);
+    replaced.set(r, name);
+  }
+  PLUGINS.push({ name, check: m.default, flag });
 }
 export const PLUGIN_FLAGS = new Set(PLUGINS.map(p => p.flag).filter(Boolean));
+/** the vocabulary after every plugin's `extend` (read-only to plugins: ctx.vocab) */
+export const VOCAB: Readonly<Vocab> = vocab;
+/** is this core rule still the core's (no plugin `replaces` it)? */
+const core = (r: Rule) => !replaced.has(r);
+const { sides: SIDES, openingTypes: OPENING_TYPES, roofTypes: ROOF_TYPES, floors: FLOORS, grounds: GROUNDS, siteTypes: SITE_TYPES, itemTypes: ITEM_TYPES,
+  stairTypes: STAIR_TYPES, shotTypes: SHOT_TYPES, shotWalls: SHOT_WALLS, shotRoofs: SHOT_ROOFS, heroDevices: HERO_DEVICES, heroPoses: HERO_POSES, heroSurfaces: HERO_SURFACES } = vocab;
 
 export function validate(spec, file = '<spec>', { flags = new Set<string>() }: { flags?: ReadonlySet<string> } = {}) {
   const errors = [], warnings = [];
@@ -94,7 +136,7 @@ export function validate(spec, file = '<spec>', { flags = new Set<string>() }: {
       if (Math.abs(p.from[0] - p.to[0]) > 1e-6 && Math.abs(p.from[1] - p.to[1]) > 1e-6) err(`${L}: partition must be axis-aligned`);
       if (!lv.footprint.some(r => inRect(p.from[0], p.from[1], r, 0.05)) || !lv.footprint.some(r => inRect(p.to[0], p.to[1], r, 0.05))) warn(`${L}: partition endpoint outside footprint`);
     }
-    if (lv.stairs) {
+    if (lv.stairs && core('stairs')) {
       if (!STAIR_TYPES.includes(lv.stairs.type)) err(`${L}: stairs.type "${lv.stairs.type}"`);
       if (!Array.isArray(lv.stairs.at)) err(`${L}: stairs.at required`);
     }
@@ -110,7 +152,7 @@ export function validate(spec, file = '<spec>', { flags = new Set<string>() }: {
       }
     }
   }
-  for (const lv of spec.levels || []) if (lv.y > 0) {
+  if (core('raised-level')) for (const lv of spec.levels || []) if (lv.y > 0) {
     const below = (spec.levels || []).find(l => l.stairs && l.stairs.to === lv.id);
     if (!below) err(`level ${lv.id} (y=${lv.y}) has no stairs leading to it`);
     if (!(lv.voids || []).length) warn(`level ${lv.id}: no voids over the stairwell`);
@@ -135,6 +177,7 @@ export function validate(spec, file = '<spec>', { flags = new Set<string>() }: {
   }
   for (const s of spec.site || []) {
     if (!SITE_TYPES.includes(s.type)) err(`site type "${s.type}" unknown`);
+    if (!core('site-needs')) continue;
     const needs = ['fence', 'wall-low'].includes(s.type) ? 'from/to' : ['path', 'hedge'].includes(s.type) ? 'path' : s.type === 'bed' ? 'poly or at' : 'at';
     const ok = needs === 'from/to' ? !!(s.from && s.to) : needs === 'path' ? Array.isArray(s.path) && s.path.length >= 2 : needs === 'poly or at' ? (Array.isArray(s.poly) && s.poly.length >= 3) || Array.isArray(s.at) : Array.isArray(s.at);
     if (!ok) err(`site ${s.type}: needs ${needs}`);
@@ -143,9 +186,9 @@ export function validate(spec, file = '<spec>', { flags = new Set<string>() }: {
     if (!levelIds.has(spec.hero.level)) err(`hero.level "${spec.hero.level}" not a level`);
     const lv = (spec.levels || []).find(l => l.id === spec.hero.level);
     if (lv && Array.isArray(spec.hero.at) && !lv.footprint.some(r => inRect(spec.hero.at[0], spec.hero.at[1], r))) err('hero.at outside footprint');
-    if (spec.hero.device !== undefined && !['chalk', 'charcoal', 'strix'].includes(spec.hero.device)) err(`hero.device "${spec.hero.device}" (chalk | charcoal | strix)`);
-    if (spec.hero.pose !== undefined && !['prone', 'upright'].includes(spec.hero.pose)) err(`hero.pose "${spec.hero.pose}" (prone | upright)`);
-    if (spec.hero.surface !== undefined && !['desk', 'credenza', 'island', 'shelf', 'none'].includes(spec.hero.surface)) err(`hero.surface "${spec.hero.surface}"`);
+    if (spec.hero.device !== undefined && !HERO_DEVICES.includes(spec.hero.device)) err(`hero.device "${spec.hero.device}" (${HERO_DEVICES.join(' | ')})`);
+    if (spec.hero.pose !== undefined && !HERO_POSES.includes(spec.hero.pose)) err(`hero.pose "${spec.hero.pose}" (${HERO_POSES.join(' | ')})`);
+    if (spec.hero.surface !== undefined && !HERO_SURFACES.includes(spec.hero.surface)) err(`hero.surface "${spec.hero.surface}"`);
     if (spec.hero.shelfHeight !== undefined && !(spec.hero.shelfHeight > 0.3 && spec.hero.shelfHeight < 2.2)) err(`hero.shelfHeight ${spec.hero.shelfHeight} (metres, 0.3–2.2)`);
   }
   if (spec.entry) {
@@ -159,10 +202,12 @@ export function validate(spec, file = '<spec>', { flags = new Set<string>() }: {
   for (const sh of spec.shots || []) {
     const S = `shot ${sh.id || sh.type}`;
     if (!SHOT_TYPES.includes(sh.type)) { err(`${S}: type "${sh.type}" (${SHOT_TYPES.join(' | ')})`); continue; }
-    if (sh.duration !== undefined && !(sh.duration >= 2 && sh.duration <= 60)) err(`${S}: duration ${sh.duration} (seconds, 2–60)`);
-    // door-to-core walks the house, climbs its stairs and orbits the Core: under 8 s the walk is a blur of whip
-    // pans (house-builder.ts lays its timing out for the pinned duration and raises the pan budget to fit)
-    else if (sh.type === 'door-to-core' && sh.duration !== undefined && sh.duration < 8) err(`${S}: duration ${sh.duration} (door-to-core needs at least 8 s)`);
+    if (core('shot-duration')) {
+      if (sh.duration !== undefined && !(sh.duration >= 2 && sh.duration <= 60)) err(`${S}: duration ${sh.duration} (seconds, 2–60)`);
+      // door-to-core walks the house, climbs its stairs and orbits the Core: under 8 s the walk is a blur of whip
+      // pans (house-builder.ts lays its timing out for the pinned duration and raises the pan budget to fit)
+      else if (sh.type === 'door-to-core' && sh.duration !== undefined && sh.duration < 8) err(`${S}: duration ${sh.duration} (door-to-core needs at least 8 s)`);
+    }
     if (sh.walls !== undefined && !SHOT_WALLS.includes(sh.walls)) err(`${S}: walls "${sh.walls}" (${SHOT_WALLS.join(' | ')})`);
     if (sh.roof !== undefined && !SHOT_ROOFS.includes(sh.roof)) err(`${S}: roof "${sh.roof}" (${SHOT_ROOFS.join(' | ')})`);
     if (sh.enterT !== undefined && !(sh.enterT >= 0 && sh.enterT <= 1)) err(`${S}: enterT ${sh.enterT} (fraction of the shot, 0–1)`);
@@ -171,7 +216,7 @@ export function validate(spec, file = '<spec>', { flags = new Set<string>() }: {
     else shotSeen.set(sh.type, sh.id || sh.type);
   }
   // plugins (scripts/validate/*.mts), after every check above so their findings print after the schema's
-  const ctx: ValidateContext = { file, flags, itemTypes: ITEM_TYPES, siteTypes: SITE_TYPES, props: PROPS, perimeterEdges };
+  const ctx: ValidateContext = { file, flags, itemTypes: ITEM_TYPES, siteTypes: SITE_TYPES, vocab: VOCAB, replaced: new Set(replaced.keys()), props: PROPS, perimeterEdges };
   for (const pl of PLUGINS) {
     if (pl.flag && !flags.has(pl.flag)) continue;
     let issues;

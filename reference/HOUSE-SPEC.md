@@ -232,6 +232,10 @@ its fragment under `assets/spec/`, its lints in its plugin under `scripts/valida
   an array), redeclare it there, wider: `assets/spec/index.ts` lets a fragment's field replace the base's and fails
   the compile if it narrows. `scripts/test-spec-types.mts` type-checks the 30 specs and every fixture against
   `HouseSpec`, so a fixture that uses a field no fragment declares fails the gate.
+- **Validation.** The validator's core never changes for a stream. Its plugin `extend`s a vocabulary the core checks
+  against (a new roof type, floor, ground, hero surface, shot type) and `replaces` a core rule whose meaning it
+  changes (`stairs`, `raised-level`, `site-needs`, `shot-duration`); item and site types are read off the builders,
+  so a new builder is a valid type at once. The contract is `scripts/validate/_types.mts`.
 
 ### Kit (S1)
 
