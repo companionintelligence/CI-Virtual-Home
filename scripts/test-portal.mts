@@ -1,5 +1,6 @@
 #!/usr/bin/env -S node --experimental-strip-types
-// End-to-end check of the built portal, served the way GitHub Pages serves it: dist/ under /ci-virtual-home/.
+// End-to-end check of the built portal, served under a sub-path (dist/ at /ci-virtual-home/), where a
+// root-relative URL fails.
 //
 //   pnpm run build && pnpm run portal:build && pnpm run portal:test [--dir dist] [--base /ci-virtual-home/]
 //        [--house aurora,lakecabin,mirage] [--shots test/portal] [--headed]

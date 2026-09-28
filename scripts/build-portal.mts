@@ -1,5 +1,5 @@
 #!/usr/bin/env -S node --experimental-strip-types
-// Assembles the web portal for GitHub Pages: exactly the files the site loads, nothing else.
+// Assembles the web portal for Cloudflare Pages: exactly the files the site loads, nothing else.
 //
 //   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/]
 //   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
@@ -18,7 +18,7 @@
 //                                    link's query. Its image is portal/previews/<id>.jpg (1200 × 630 JPEG: LinkedIn
 //                                    and some others read no WebP). og:image and og:url are absolute, as unfurlers
 //                                    want: the site's address is --site-url, else $SITE_URL, else the live site
-//                                    (https://homes.ci.computer/); the GitHub Pages workflow passes its own
+//                                    (https://homes.ci.computer/); deploy.yml passes the preview's own
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
@@ -231,7 +231,7 @@ for (const p of ['index.html', 'room-creator.html', ...walk('portal', f => /\.(c
 if (problems.length) { console.error(problems.map(p => `  ✗ ${p}`).join('\n')); process.exit(1); }
 console.log(`portal: ${files} files, ${(bytes / 1024 / 1024).toFixed(1)} MB → ${rel(OUT)}/`);
 
-// --serve: preview the tree the way Pages will serve it, under the repository's sub-path
+// --serve: preview the tree under a sub-path, which proves every URL in it is relative
 if (args.serve === 'true') {
   const srv = await serve(OUT, '/ci-virtual-home/', Number(args.port || 8081));
   console.log(`preview: ${srv.url()}  (Ctrl-C to stop)`);
