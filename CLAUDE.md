@@ -42,12 +42,16 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 **The portal.** `index.html` (the gallery) and `room-creator.html?mode=view` (the player, `assets/viewer.ts`)
 are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 
-- `.github/workflows/deploy.yml` deploys `main` to production after `ci.yml` passes on it, and a PR from a branch
-  of this repo to `https://pr-<n>.ci-virtual-home.pages.dev/` once a reviewer approves (README → Deploying). Its
-  token (`CLOUDFLARE_API_TOKEN`, Cloudflare Pages · Edit) can publish to or delete every Pages project on the
-  account, so it lives only in the `production` and `preview` GitHub environments, and only the upload job — which
-  checks out and installs nothing — holds it. Keep it that way: no repository secret, no checkout, install or
-  repository script in that job, actions pinned to commits. Only the owner sets the token; never ask for it.
+- `.github/workflows/ci.yml` assembles the site and keeps it as an artifact; `.github/workflows/deploy.yml` publishes
+  that artifact — `main` to production once `ci` passes on it, a same-repo PR to
+  `https://pr-<n>.ci-virtual-home.pages.dev/` (README → Deploying). Its token (`CLOUDFLARE_API_TOKEN`, Cloudflare
+  Pages · Edit) can publish to or delete every Pages project on the account, so it lives only in the `production` and
+  `preview` GitHub environments (each limited to `main`), and only `deploy.yml`'s upload job holds it. Keep it that
+  way: no repository secret, no checkout or repository script in `deploy.yml`, no code from a branch run in it (a PR
+  is built in `ci.yml`'s own run and arrives as an artifact), actions pinned to commits in both workflows. `main`
+  must stay protected — pull requests only, a code owner's review, `.github/CODEOWNERS` covering `.github/` — because
+  whoever can change `deploy.yml` on `main` can read the token; `deploy.yml` skips until it is. Only the owner sets
+  the token; never ask for it.
 - Do not deploy by hand; merge, or ask the owner to run the workflow. The by-hand steps in the README are the
   owner's fallback. GitHub Pages is retired (its github.io address redirects to a dead org domain): do not bring a
   github.io deploy back, and do not make Wrangler a devDependency.
