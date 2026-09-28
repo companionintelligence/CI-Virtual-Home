@@ -1,4 +1,4 @@
-# ci-virtual-home
+# Companion Core Virtual Homes
 
 > **Private & Confidential — Property of Lifescope Inc. Do not distribute.** See [NOTICE.md](NOTICE.md).
 
