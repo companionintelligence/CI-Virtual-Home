@@ -110,7 +110,7 @@ kbd {
 .site-head {
   max-width: var(--pg-wide);
   margin: 0 auto;
-  padding: 18px var(--pg-gutter);
+  padding: 14px var(--pg-gutter);
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
 .brand { display: inline-flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; }
@@ -119,30 +119,36 @@ kbd {
 .brand-text span { font-size: 12px; color: var(--muted-foreground); font-weight: 500; }
 .site-nav { display: flex; gap: 4px; }
 .site-nav a {
+  display: inline-flex; align-items: center; gap: 4px;
+  min-height: 36px;
   color: var(--muted-foreground); text-decoration: none; font-weight: 600; font-size: 14px;
-  padding: 7px 12px; border-radius: 999px;
+  padding: 0 12px; border-radius: 999px;
 }
 .site-nav a:hover { color: var(--foreground); background: var(--pg-hairline); }
+.site-nav .i-out { width: 14px; height: 14px; }
 
-/* ---------------- hero ---------------- */
+/* ---------------- hero ----------------
+   Sized so the first row of homes starts inside the first screen: on a 1440 × 900 laptop the thumbnails of the
+   first row show under the hero, and on a shorter screen (or a tablet, stacked) the eyebrow and the figures give
+   way before the homes do. */
 .hero {
   max-width: var(--pg-wide);
   margin: 0 auto;
-  padding: clamp(16px, 4vw, 48px) var(--pg-gutter) clamp(40px, 6vw, 72px);
+  padding: clamp(12px, 1.8vw, 24px) var(--pg-gutter) clamp(28px, 2.8vw, 40px);
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
   gap: clamp(28px, 5vw, 64px);
   align-items: center;
 }
 .eyebrow {
-  margin: 0 0 14px;
+  margin: 0 0 10px;
   display: inline-flex; align-items: center; gap: 8px;
   font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--primary);
 }
 .hero h1 {
   margin: 0;
-  font-size: clamp(38px, 5.2vw, 60px);
+  font-size: clamp(38px, 4.8vw, 56px);
   line-height: 1.02;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -150,14 +156,25 @@ kbd {
   text-wrap: balance;
 }
 .lede {
-  margin: 20px 0 0;
+  margin: 14px 0 0;
   max-width: 34em;
   font-size: 17px;
   line-height: 1.6;
   color: var(--muted-foreground);
   text-wrap: pretty;
 }
-.hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.core-line {
+  margin: 12px 0 0;
+  max-width: 34em;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14.5px; line-height: 1.55;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+.core-line .i { width: 18px; height: 18px; margin-top: 2px; color: var(--primary); }
+.core-line b { color: var(--foreground); font-weight: 700; }
+.core-line a { font-weight: 600; text-underline-offset: 3px; white-space: nowrap; }
+.hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
   height: 46px; padding: 0 20px;
@@ -174,12 +191,12 @@ kbd {
 .btn-ghost:hover { background: var(--pg-hairline); }
 .stats {
   display: flex; flex-wrap: wrap; gap: 12px 36px;
-  margin: 40px 0 0; padding: 22px 0 0;
+  margin: 24px 0 0; padding: 16px 0 0;
   border-top: 1px solid var(--pg-hairline);
 }
 .stats div { display: flex; flex-direction: column-reverse; }
 .stats dt { font-size: 12.5px; color: var(--muted-foreground); font-weight: 500; }
-.stats dd { margin: 0; font-size: 38px; line-height: 1.1; font-weight: 200; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.stats dd { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 200; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
 
 .hero-media {
   position: relative;
@@ -204,7 +221,7 @@ kbd {
   background: color-mix(in srgb, #041620 55%, transparent);
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
 }
-.hero-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--heat); box-shadow: 0 0 0 3px color-mix(in srgb, var(--heat) 30%, transparent); }
+.hero-badge .i { width: 14px; height: 14px; }
 .hero-play {
   position: absolute; left: 50%; top: 50%;
   width: 72px; height: 72px; margin: -36px 0 0 -36px;
@@ -222,12 +239,12 @@ kbd {
 .homes {
   max-width: var(--pg-wide);
   margin: 0 auto;
-  padding: 8px var(--pg-gutter) 72px;
+  padding: 0 var(--pg-gutter) 72px;
   scroll-margin-top: 16px;
 }
 .homes-head {
   display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px 24px;
-  padding-bottom: 18px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--pg-hairline);
 }
 .homes h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 10px; }
@@ -246,35 +263,49 @@ kbd {
 .search input::placeholder { color: color-mix(in srgb, var(--muted-foreground) 80%, transparent); }
 .search input::-webkit-search-cancel-button { -webkit-appearance: none; }
 .search .i { width: 16px; height: 16px; }
+/* The storeys control and the style tags are small pills with a 44 px touch target: the element is 44 px tall
+   and a transparent border keeps the drawn pill (background-clip: padding-box) at its visual size. */
 .seg {
-  display: inline-flex; padding: 3px; gap: 2px;
+  display: inline-flex; align-items: center; padding: 0 3px; gap: 2px;
+  height: 44px;
   border-radius: 999px;
   background: var(--pg-surface);
   box-shadow: inset 0 0 0 1px var(--pg-hairline), var(--shadow-sm);
 }
+.seg-label { padding: 0 6px 0 12px; font-size: 12.5px; font-weight: 600; color: var(--muted-foreground); white-space: nowrap; }
 .seg button {
-  height: 34px; padding: 0 14px;
-  border: 0; border-radius: 999px; background: none; cursor: pointer;
+  height: 44px; min-width: 44px; padding: 0 13px;
+  border: 0; border-block: 5px solid transparent; background-clip: padding-box;
+  border-radius: 999px; background-color: transparent; cursor: pointer;
   font-size: 13.5px; font-weight: 600; color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .seg button:hover { color: var(--foreground); }
-.seg button[aria-pressed="true"] { background: var(--primary); color: var(--primary-foreground); }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 16px 0 6px; }
+.seg button[aria-pressed="true"] { background-color: var(--primary); color: var(--primary-foreground); }
+.tags { display: flex; flex-wrap: wrap; gap: 0 6px; padding: 6px 0 0; }
 .tag {
-  height: 32px; padding: 0 13px;
-  border: 0; border-radius: 999px; cursor: pointer;
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--pg-hairline);
+  height: 44px; padding: 0 13px;
+  border: 0; border-block: 6px solid transparent; background-clip: padding-box;
+  border-radius: 999px; cursor: pointer;
+  background-color: transparent;
   font-size: 13px; font-weight: 600; color: var(--muted-foreground);
   display: inline-flex; align-items: center; gap: 6px;
+  position: relative;
 }
-.tag small { font-size: 11px; font-weight: 500; opacity: 0.7; font-variant-numeric: tabular-nums; }
-.tag:hover { color: var(--foreground); background: var(--pg-hairline); }
-.tag[aria-pressed="true"] { background: color-mix(in srgb, var(--primary) 12%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 45%, transparent); color: var(--primary); }
+/* the hairline ring, drawn on the pill (an inset shadow would ring the whole 44 px box) */
+.tag::before { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px var(--pg-hairline); pointer-events: none; }
+.tag small { font-size: 11.5px; font-weight: 600; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+.tag:hover:not(:disabled) { color: var(--foreground); background-color: var(--pg-hairline); }
+.tag[aria-pressed="true"] { background-color: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
+.tag[aria-pressed="true"]::before { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 45%, transparent); }
+.tag[aria-pressed="true"] small { color: inherit; }
+.tag:disabled { cursor: default; color: color-mix(in srgb, var(--muted-foreground) 55%, transparent); }
+.tag:disabled small { color: inherit; }
+.filters.off { opacity: 0.45; }
 
 .grid {
-  list-style: none; margin: 0; padding: 22px 0 0;
+  list-style: none; margin: 0; padding: 16px 0 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 272px), 1fr));
   gap: 34px 26px;
@@ -293,7 +324,17 @@ kbd {
 }
 .thumb::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--foreground) 8%, transparent); pointer-events: none; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
-.thumb img.missing { opacity: 0; }
+.thumb.missing img { opacity: 0; }
+/* a thumbnail that did not load: the home's initial and name on a tinted tile */
+.thumb-missing {
+  position: absolute; inset: 0; z-index: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  padding: 12px; text-align: center;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--primary) 16%, var(--pg-thumb-bg)), var(--pg-thumb-bg));
+  color: var(--primary);
+}
+.thumb-missing b { font-size: 40px; line-height: 1; font-weight: 200; }
+.thumb-missing span { font-size: 13px; font-weight: 600; color: var(--muted-foreground); }
 .card a:hover .thumb, .card a:focus-visible .thumb { transform: translateY(-3px); box-shadow: var(--shadow-lg), 0 18px 36px -18px rgba(4, 22, 32, 0.35); }
 .card a:hover .thumb img { transform: scale(1.035); }
 .thumb-play {
@@ -324,6 +365,16 @@ kbd {
 .empty { text-align: center; padding: 56px 16px; color: var(--muted-foreground); }
 .empty p { margin: 0 0 16px; }
 .empty b { color: var(--foreground); }
+.empty .btn-primary .i { width: 16px; height: 16px; }
+
+/* placeholder cards while index.json loads */
+.skel .thumb { box-shadow: none; }
+.skel .thumb, .skel i { background: var(--pg-thumb-bg); animation: pg-pulse 1.6s ease-in-out infinite; }
+.skel i { display: block; height: 12px; border-radius: 6px; margin-top: 10px; }
+.skel i:nth-child(1) { width: 55%; height: 15px; margin-top: 2px; }
+.skel i:nth-child(2) { width: 80%; }
+.skel i:nth-child(3) { width: 40%; height: 22px; border-radius: 999px; margin-top: 12px; }
+@keyframes pg-pulse { 50% { opacity: 0.55; } }
 
 /* ---------------- footer ---------------- */
 .site-foot {
@@ -338,33 +389,81 @@ kbd {
 .foot-grid p { margin: 0 0 6px; max-width: 46em; }
 .foot-grid b { color: var(--foreground); font-weight: 700; }
 .foot-brand { display: flex; align-items: center; gap: 8px; }
+/* every home against the build it was written from (gallery.js credits()) */
+.builds { margin-top: 8px; }
+.builds summary { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; cursor: pointer; color: var(--foreground); font-weight: 600; list-style: none; }
+.builds summary::-webkit-details-marker { display: none; }
+.builds summary::before { content: ""; width: 6px; height: 6px; margin: 0 3px 0 1px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(-45deg); transition: transform 0.15s ease; }
+.builds[open] summary::before { transform: rotate(45deg); }
+.builds ul { margin: 8px 0 0; padding: 0; list-style: none; columns: 2 220px; column-gap: 28px; font-size: 12.5px; line-height: 1.45; }
+.builds li { break-inside: avoid; margin: 0 0 5px; }
+.builds li b { color: var(--foreground); font-weight: 600; }
 .legal { margin: 28px 0 0; font-size: 12px; }
 
+/* a short desktop screen (a 1280 × 800 laptop, a 1024 × 768 tablet on its side): the eyebrow and the figures go,
+   so the homes start on the first screen */
+@media (min-width: 901px) and (max-height: 860px) {
+  .eyebrow, .stats { display: none; }
+}
+
 /* ---------------- narrow ---------------- */
+/* Stacked (a tablet held upright): the picture, a shorter one, over the copy; no eyebrow, no figures and no second
+   sentence, so the first homes start inside the first screen; the heading and the filters share a row when they fit. */
 @media (max-width: 900px) {
-  .hero { grid-template-columns: 1fr; }
-  .hero-media { order: -1; aspect-ratio: 16 / 10; border-radius: 18px; }
-  .homes-head { align-items: stretch; flex-direction: column; }
-  .filters { width: 100%; }
-  .search { flex: 1 1 240px; width: auto; }
+  .hero { grid-template-columns: 1fr; gap: 20px; }
+  .hero-media { order: -1; aspect-ratio: 21 / 9; border-radius: 18px; }
+  .eyebrow, .lede-more, .stats { display: none; }
+  .search { flex: 1 1 220px; width: auto; }
+  .search kbd { display: none; }
+  .filters { flex: 1 1 auto; justify-content: flex-end; }
   .foot-grid { grid-template-columns: 1fr; }
 }
+@media (max-width: 700px) {
+  .homes-head { align-items: stretch; flex-direction: column; }
+  .filters { width: 100%; justify-content: flex-start; }
+}
+/* Phones: the hero keeps the picture, the headline, the Core line and one button (the stats and the second
+   button are for wider screens), the filters sit in two rows, and the homes go two to a row, compact: name,
+   picture and builder, so the first homes show on the first screen. */
 @media (max-width: 520px) {
-  .site-head { padding-top: 14px; padding-bottom: 10px; }
-  .site-nav a[href="./room-creator.html"] { display: none; }
-  .hero { padding-top: 4px; gap: 22px; }
-  .hero-play { width: 60px; height: 60px; margin: -30px 0 0 -30px; }
-  .lede { font-size: 16px; }
+  .site-head { padding-top: 10px; padding-bottom: 8px; }
+  .site-nav a[href="#homes"] { display: none; }
+  .hero { padding-top: 2px; padding-bottom: 28px; gap: 18px; }
+  .hero-media { aspect-ratio: 16 / 9; }
+  .hero-play { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
+  .hero-play .i { width: 22px; height: 22px; }
+  .eyebrow, .lede-more { display: none; }
+  .hero h1 { font-size: 34px; }
+  .lede { font-size: 15.5px; margin-top: 10px; }
+  .core-line { font-size: 14px; margin-top: 12px; }
+  .hero-cta { margin-top: 18px; }
   .hero-cta .btn { flex: 1 1 auto; }
-  .stats { gap: 10px 22px; margin-top: 28px; }
-  .stats dd { font-size: 30px; }
+  .hero-browse, .stats { display: none; }
+  .homes-head { gap: 10px; padding-bottom: 12px; }
+  .search { height: 44px; }
   .search kbd { display: none; }
   .seg { width: 100%; }
-  .seg button { flex: 1; padding: 0 8px; }
-  .tags { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--pg-gutter)); padding-left: var(--pg-gutter); padding-right: var(--pg-gutter); }
+  .seg button { flex: 1; padding: 0 6px; }
+  .tags { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--pg-gutter)); padding: 4px var(--pg-gutter) 0; }
   .tags::-webkit-scrollbar { display: none; }
   .tag { flex: none; }
-  .grid { gap: 28px; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; padding-top: 14px; }
+  .thumb { border-radius: 11px; }
+  .card-body { padding-top: 8px; }
+  .card h3 { font-size: 14px; line-height: 1.25; }
+  .card .style { display: none; }
+  .card .facts { margin-top: 4px; }
+  .card .fact { display: none; }
+  .credit { margin-left: 0; max-width: 100%; font-size: 12px; }
+  /* on a two-up card the pill is only its play mark */
+  .thumb-play { right: 6px; bottom: 6px; width: 28px; height: 28px; padding: 0; justify-content: center; font-size: 0; gap: 0; }
+  .thumb-play .i { width: 11px; height: 11px; margin-left: 2px; }
+  .thumb-missing b { font-size: 28px; }
+  .thumb-missing span { font-size: 11.5px; }
+}
+@media (pointer: coarse) {
+  .search { height: 44px; }
+  .site-nav a, .brand, .builds summary { min-height: 44px; }
 }
 @media (hover: none) {
   .thumb-play { opacity: 1; transform: none; }
