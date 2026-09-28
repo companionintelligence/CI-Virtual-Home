@@ -8077,6 +8077,12 @@
     //   warn   item-clip     eye inside a furniture item's box (bookshelf, glass, chair …)
     //   warn   wall-graze    eye within 0.3 m of a wall in the last quarter of the shot
     //   warn   core-small    final frame: Core spans < 10 % of the frame height
+    // A shot with an orbit round the Core (preset.orbit — door-to-core's finale, core-orbit), every sample from its t0:
+    //   error  orbit-core-out-of-frame   Core centre outside the middle 60 % of the frame
+    //   error  orbit-core-occluded       something between the eye and the Core's centre
+    //   error  orbit-clip                eye inside a furniture item's box
+    //   warn   orbit-short               the orbit sweeps less than 120° round the Core
+    //   warn   orbit-yaw-rate            the camera turns faster than 45°/s while it orbits
     // Geometry is the scene as built (walls at their current mode height, cutaway roofs hidden), because
     // that is what gets recorded. Restores the camera afterwards.
     // ---------------------------------------------------------------------------------------
@@ -8135,11 +8141,30 @@
         const heroLevel = levels.find(l => l.id === spec.hero.level) || levels[0];
         const entryLevel = levels.find(l => l.id === (spec.entry && spec.entry.level)) || levels[0];
         const framesCore = shotType !== 'orbit';
+        // what stands between an eye and a point on the Core (null: nothing), among `among` (default: everything)
+        const occluder = (from, to, among = scene.children) => {
+          const dir = to.clone().sub(from); const dist = dir.length(); dir.normalize();
+          const rc = new THREE.Raycaster(from, dir, 0.05, dist - 0.02);
+          // Raycaster ignores visibility, so drop hits inside hidden groups (the full-height wall behind a cutaway)
+          const hits = rc.intersectObjects(among, true).filter(h => shown(h.object) && !waypointMarkers.includes(h.object) && h.object !== splineLineMesh && !isHelper(h.object));
+          const blocker = hits.find(h => { let o = h.object; while (o) { if (o === core) return false; o = o.parent; } return true; });
+          return blocker ? { blocker, dist } : null;
+        };
+        const chainOf = o => { const chain = []; for (; o && o !== scene; o = o.parent) chain.push(o.name || `${o.type}${o.geometry ? '<' + o.geometry.type + '>' : ''}${o.userData && o.userData.itemType ? '#' + o.userData.itemType : ''}`); return chain.reverse().join(' › '); };
+        // the orbit: the Core's centre as the final-frame test measures it, and the objects near enough to hide it
+        const orbit = preset.orbit && core ? preset.orbit : null;
+        const coreCentre = orbit ? new THREE.Box3().setFromObject(core).getCenter(new THREE.Vector3()) : null;
+        const nearCore = orbit ? scene.children.filter(o => { const bb = new THREE.Box3().setFromObject(o); return !bb.isEmpty() && bb.distanceToPoint(coreCentre) < orbit.radius + 1; }) : null;
+        const lookDir = new THREE.Vector3(), secs = preset.duration || animDuration;
+        let swept = 0, lastAng = null, lastYaw = null, lastT = 0, yawMax = 0, yawMaxAll = 0, orbitSamples = 0;
 
         const n = Math.max(24, Math.round((preset.duration || animDuration) * perSecond));
         let wasInside = null, entered = false;
-        for (let i = 0; i <= n; i++) {
-          const t = i / n;
+        // the regular samples, plus the orbit's first moment so its sweep is measured from where it starts
+        const ts = Array.from({ length: n + 1 }, (_, i) => i / n);
+        if (orbit && !ts.includes(orbit.t0)) { ts.push(orbit.t0); ts.sort((a, b) => a - b); }
+        let yawAt = 0;
+        for (const t of ts) {
           applySplineFrame(t);
           if (perFrameWalls) walls = collectWalls();
           const eye = persCamera.position;
@@ -8168,6 +8193,34 @@
             }
             wasInside = insideEntry;
           }
+          // yaw rate of the look direction, sample to sample
+          persCamera.getWorldDirection(lookDir);
+          const yaw = Math.atan2(lookDir.x, lookDir.z);
+          if (lastYaw !== null) {
+            const d = Math.abs(Math.atan2(Math.sin(yaw - lastYaw), Math.cos(yaw - lastYaw))) * 180 / Math.PI / ((t - lastT) * secs);
+            if (d > yawMaxAll) { yawMaxAll = d; yawAt = t; }
+            if (orbit && lastT >= orbit.t0 - 1e-6) yawMax = Math.max(yawMax, d);
+          }
+          lastYaw = yaw; lastT = t;
+          if (orbit && t >= orbit.t0 - 1e-6) {
+            orbitSamples++;
+            persCamera.updateMatrixWorld();
+            const ndc = coreCentre.clone().project(persCamera);
+            if (ndc.z > 1 || Math.abs(ndc.x) > 0.6 || Math.abs(ndc.y) > 0.6) E('orbit-core-out-of-frame', t, `Core centre projects to (${ndc.x.toFixed(2)}, ${ndc.y.toFixed(2)}) — outside the middle 60 % of the frame`);
+            const oc = occluder(eye.clone(), coreCentre, nearCore);
+            if (oc) E('orbit-core-occluded', t, `${chainOf(oc.blocker.object)} is ${(oc.dist - oc.blocker.distance).toFixed(2)} m in front of the Core`, chainOf(oc.blocker.object));
+            for (const { o, box: b } of items) if (b.containsPoint(eye)) { const nm = o.name || o.userData.itemType || 'item'; E('orbit-clip', t, `eye inside "${nm}" while orbiting the Core`, nm); break; }
+            const ang = Math.atan2(eye.x - orbit.centre[0], eye.z - orbit.centre[2]);
+            if (lastAng !== null) swept += Math.atan2(Math.sin(ang - lastAng), Math.cos(ang - lastAng));
+            lastAng = ang;
+          }
+        }
+        let orbitStats = null;
+        if (orbit) {
+          const arc = Math.abs(swept) * 180 / Math.PI;
+          if (arc < 119.5) W('orbit-short', orbit.t0, `the Core orbit sweeps ${arc.toFixed(0)}° (free run ${orbit.run[0]}° … ${orbit.run[1]}° at r ${orbit.radius} m) — under 120°`);
+          if (yawMax > 45) W('orbit-yaw-rate', orbit.t0, `the camera turns at up to ${yawMax.toFixed(0)}°/s while it orbits the Core — over 45°/s`);
+          orbitStats = { arc: +arc.toFixed(1), yawMax: +yawMax.toFixed(1), samples: orbitSamples, radius: orbit.radius, from: orbit.from, to: orbit.to, t0: orbit.t0, power: preset.power ? preset.power.at : null };
         }
         // final frame
         applySplineFrame(1);
@@ -8188,16 +8241,12 @@
               for (const cx of [box.min.x, box.max.x]) for (const cy of [box.min.y, box.max.y]) for (const cz of [box.min.z, box.max.z]) ys.push(new THREE.Vector3(cx, cy, cz).project(persCamera).y);
               const span = (Math.max(...ys) - Math.min(...ys)) / 2;
               if (span < 0.10) W('core-small', 1, `Core spans ${(span * 100).toFixed(0)} % of the frame height`);
-              const dir = centre.clone().sub(eye); const dist = dir.length(); dir.normalize();
-              const rc = new THREE.Raycaster(eye, dir, 0.05, dist - 0.02);
-              // Raycaster ignores visibility, so drop hits inside hidden groups (the full-height wall behind a cutaway)
-              const hits = rc.intersectObjects(scene.children, true).filter(h => shown(h.object) && !waypointMarkers.includes(h.object) && h.object !== splineLineMesh && !isHelper(h.object));
-              const blocker = hits.find(h => { let o = h.object; while (o) { if (o === core) return false; o = o.parent; } return true; });
-              if (blocker) { const chain = []; for (let o = blocker.object; o && o !== scene; o = o.parent) chain.push(o.name || `${o.type}${o.geometry ? '<' + o.geometry.type + '>' : ''}${o.userData && o.userData.itemType ? '#' + o.userData.itemType : ''}`); E('core-occluded', 1, `${chain.reverse().join(' › ')} is ${(dist - blocker.distance).toFixed(2)} m in front of the Core (ray ${blocker.distance.toFixed(2)} m of ${dist.toFixed(2)} m)`); }
+              const oc = occluder(eye, centre);
+              if (oc) E('core-occluded', 1, `${chainOf(oc.blocker.object)} is ${(oc.dist - oc.blocker.distance).toFixed(2)} m in front of the Core (ray ${oc.blocker.distance.toFixed(2)} m of ${oc.dist.toFixed(2)} m)`);
             }
           }
         }
-        return { id: activeHouse.id, shot: shotType, samples: n + 1, errors, warnings, finalEye: [+eye.x.toFixed(2), +eye.y.toFixed(2), +eye.z.toFixed(2)] };
+        return { id: activeHouse.id, shot: shotType, samples: n + 1, errors, warnings, finalEye: [+eye.x.toFixed(2), +eye.y.toFixed(2), +eye.z.toFixed(2)], yawMax: +yawMaxAll.toFixed(1), yawAt: +yawAt.toFixed(3), orbit: orbitStats };
       } finally {
         isRecordingVideo = prevRec;
         endShotCutaway();
