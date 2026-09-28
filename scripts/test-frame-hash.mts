@@ -1,5 +1,6 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Determinism test for the house renderer: the same frames rendered in two fresh browser contexts must agree.
+// @check-house skip — check-house runs it as its determinism steps
 // Every re-lay and every rendering change is measured against goldens, and goldens are only meaningful if two
 // runs of the same tree agree — so this runs first. Raw RGBA is read back from the canvas (no JPEG in the loop);
 // a frame passes when no pixel differs by more than --tol (8/255) and fewer than --ratio (0.01 %) differ at
