@@ -16,15 +16,15 @@
 // agrees with the tree we blessed. Run the hash test first — a baseline against a non-deterministic renderer
 // is worthless.
 //
-// FRAMES picks four frames a house: the poster of each shot, plus the last frame of the two shots that end
-// framed on the Core. 120 baselines at 640 × 360 is ~11 MB, which is what makes committing them reasonable.
+// FRAMES picks five frames a house: the poster of each shot, plus the last frame of the two shots that end
+// framed on the Core. 150 baselines at 640 × 360 is ~14 MB, which is what makes committing them reasonable.
 //
-// This runs on a developer's machine, not in CI. 120 frames through a software rasteriser cost an hour of
+// This runs on a developer's machine, not in CI. 150 frames through a software rasteriser cost an hour of
 // GitHub Actions per push, which is not what that budget is for; `pnpm run check` (scripts/check-house.mts)
 // runs it, and the four checks around it, in a couple of minutes on a GPU.
 //
 // Baselines are per renderer profile, because a GPU is part of the render: test/goldens/<profile>/.
-// A profile with no baselines at all exits 3 ("nothing to compare against") rather than reporting 120
+// A profile with no baselines at all exits 3 ("nothing to compare against") rather than reporting 150
 // regressions — that is the signal to bless a set for this machine on purpose, with --update.
 //
 // Exit codes:  0 pass · 1 one or more frames differ, or one has no baseline · 2 a frame failed to render
@@ -87,7 +87,7 @@ const DIFF_OUT = args.out ? path.resolve(args.out) : path.join(ROOT, 'test', 'di
 // Playwright downloads, so the rasteriser is pinned by the Playwright version rather than by whatever mesa
 // the box happens to carry. It is not the lavapipe recipe three.js publishes — that one reaches Lavapipe
 // through Dawn/WebGPU and this pipeline is WebGL2 (r169 WebGLRenderer + EffectComposer + GTAO + SMAA).
-// Expect it to be slow: an hour for 120 frames, against a couple of minutes on a GPU.
+// Expect it to be slow: an hour for 150 frames, against a couple of minutes on a GPU.
 const PROFILES = {
   'macos-metal': { platform: 'darwin', args: ['--use-angle=metal', '--ignore-gpu-blocklist', '--enable-gpu-rasterization'] },
   'linux-swiftshader': { platform: 'linux', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--disable-gpu-watchdog', '--no-sandbox', '--hide-scrollbars'] },
@@ -105,6 +105,7 @@ const FRAMES = {
   'door-to-core': [0.55, 1],
   'orbit': [0.55],
   'hero-reveal': [1],
+  'core-orbit': [0.55],
 };
 const SHOTS = (args.shot || Object.keys(FRAMES).join(',')).split(',').filter(Boolean);
 for (const s of SHOTS) if (!FRAMES[s]) { console.error(`no golden frames defined for shot "${s}" (${Object.keys(FRAMES).join(', ')})`); process.exit(2); }
@@ -161,7 +162,7 @@ const browser = await pw.chromium.launch({ headless: true, channel: 'chromium', 
 
 // A baseline belongs to a browser build as much as to a GPU: a different Chromium revision is a different
 // rasteriser and a different text shaper. PROFILE.json records which one produced the set, so a mismatch
-// reads as one line rather than as 120 mysterious diffs. It warns instead of failing — a newer Chromium
+// reads as one line rather than as 150 mysterious diffs. It warns instead of failing — a newer Chromium
 // usually renders these frames identically, and being told is enough to explain it when it does not.
 const MANIFEST = path.join(GOLDEN_DIR, 'PROFILE.json');
 const identity = { profile: PROFILE, chromium: browser.version(), args: PROFILES[PROFILE].args, res: RES, fps: FPS, frames: FRAMES, supersample: 2 };
@@ -172,7 +173,7 @@ if (!UPDATE && fs.existsSync(MANIFEST)) {
 }
 
 // Baseline coverage is decided before anything renders: an unbaselined profile is a different situation from
-// a failing one, and saying so is the difference between "go baseline this" and "you broke 120 shots".
+// a failing one, and saying so is the difference between "go baseline this" and "you broke 150 shots".
 const expected = HOUSES.flatMap(h => SHOTS.flatMap(s => FRAMES[s].map(t => goldenPath(h, s, t))));
 const present = expected.filter(p => fs.existsSync(p));
 if (!UPDATE && present.length === 0) {
@@ -190,7 +191,7 @@ async function worker() {
   // A load that times out leaves its navigation in flight, and the next goto on that page is then rejected
   // with "interrupted by another navigation to <the previous house>" — so ONE slow house used to take every
   // house after it on the same worker down with it. Measured on a software rasteriser, that cascade cost 92
-  // of 120 frames. Recovery is a fresh context, not another go on the poisoned one.
+  // of 150 frames. Recovery is a fresh context, not another go on the poisoned one.
   const freshPage = async () => {
     if (ctx) await ctx.close().catch(() => {});
     ctx = await browser.newContext({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
@@ -331,7 +332,7 @@ if (UPDATE) {
 const differ = by('differ'), errors = by('error').concat(by('size')), missing = by('missing');
 console.log(`\n${results.length} frames against "${PROFILE}" in ${secs}s: ${by('pass').length} pass, ${differ.length} differ, ${missing.length} without a baseline, ${errors.length} errored`);
 // An LFS pointer checked out as text is a .png that is not an image, and it is the likeliest way this gate
-// goes wrong on a fresh machine — so name it rather than reporting 120 decode failures.
+// goes wrong on a fresh machine — so name it rather than reporting 150 decode failures.
 if (errors.some(e => /not a PNG/.test(e.message || ''))) console.log(`\nSome baselines are not PNGs. If this is a fresh clone, they are Git LFS pointers:  git lfs install && git lfs pull`);
 if (differ.length) {
   console.log(`\ndiffers:`);

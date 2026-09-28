@@ -8,7 +8,7 @@ compiled from it:
 
 | Output | Made by | Lands in |
 |---|---|---|
-| **3D scene** — walls, roofs, openings, stairs, furniture, planting, lighting, the Companion Core, and auto-generated camera splines (door → Core, orbit, hero reveal, walkthrough) | `assets/house-builder.ts` and friends (three.js r169, in the browser) | [`room-creator.html?house=<id>`](room-creator.html) |
+| **3D scene** — walls, roofs, openings, stairs, furniture, planting, lighting, the Companion Core, and auto-generated camera splines (door → Core ending in an orbit round it, orbit, hero reveal, walkthrough, Core orbit) | `assets/house-builder.ts` and friends (three.js r169, in the browser) | [`room-creator.html?house=<id>`](room-creator.html) |
 | **CAD floor plans** — one blueprint sheet per level, SVG + PNG, and a `floorplans.json` index | `scripts/generate_floor_plans.py` | `scenes/floorplans/` |
 | **Isometric cutaways** — landscape + portrait SVG and a pure-vector Lottie animation per house | `scripts/generate_house_iso.py` | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` |
 | **Product-shot videos** — frame-stepped, deterministic H.264 per house × shot, with posters | `scripts/render-house-shots.mts` (headless Chromium) | `video/houses/` (gitignored; browse with `video/houses/index.html`) |
@@ -34,7 +34,7 @@ pnpm run serve                     # http://localhost:8080/room-creator.html?hou
 ```
 
 `room-creator.html` is plain ES modules with an importmap — no bundler — so any static server over the repo
-root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `shot=door-to-core|orbit|hero-reveal|walkthrough`,
+root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `shot=door-to-core|orbit|hero-reveal|walkthrough|core-orbit`,
 `flythrough=1`, `lighting=day|golden|dusk|night`, `res`, `aspect`. Its "Hub" link opens the portal's gallery,
 `./index.html`; `mode=view` turns the page into the portal's player (see [The web portal](#the-web-portal)).
 
@@ -49,7 +49,7 @@ root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `
 | `pnpm run check` | **The gate** — all five checks below, in order. `--house a,b`, `--jobs N`, `--res`, `--update-goldens`. |
 | `pnpm run check:quick` | assets + specs + shots only: the fast loop while editing. |
 | `pnpm run shots` | Render product shots to `video/houses/` (`--house`, `--shot`, `--res 1080`, `--aspect 16:9`, `--poster-only`, `--qa-only`, `--jobs`). |
-| `pnpm run goldens` / `goldens:update` | Compare 120 frames with the committed baselines / re-bless them. |
+| `pnpm run goldens` / `goldens:update` | Compare 150 frames with the committed baselines / re-bless them. |
 | `pnpm run frame-hash` | Two fresh browser contexts must render the same frames. |
 | `pnpm run plans` | Rebuild `content/houses/<id>.plan.json` — the seeded site instances the isometric twin draws. |
 | `pnpm run iso` | Rebuild the isometric SVGs, Lotties and `scenes/manifest.json` (`--only <id>`, `--png`). |
@@ -87,7 +87,7 @@ scenes/                    isometric SVG + Lottie, CAD floor plans, and their ma
 scripts/                   the pipeline: build, validate, render, gate (.mts) and the Python generators (.py)
 reference/                 HOUSE-SPEC.md (the schema), PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
                            HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review)
-test/goldens/macos-metal/  120 committed baseline frames (Git LFS) + PROFILE.json (the renderer that made them)
+test/goldens/macos-metal/  150 committed baseline frames (Git LFS) + PROFILE.json (the renderer that made them)
 video/houses/index.html    browser for rendered shots; the renders beside it are gitignored
 ```
 
@@ -141,16 +141,18 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
 
 1. **assets** — compile `assets/**/*.ts`.
 2. **specs** — validate the 30 HouseSpecs.
-3. **shots** — build every house headless and walk the door-to-core, orbit and hero-reveal camera paths
-   against its geometry: through a wall, under a floor, in through a window instead of the door, ending
-   outside the hero room, Core out of frame. Also a scene check per house (dressing present, nothing buried in
-   a wall, planting not on a grid). 90 shots, 30 scenes; errors fail, warnings are reported.
-4. **determinism** — render frames 0, 200 and 719 of aurora's door-to-core in two fresh browser contexts and
-   compare raw pixels. Frames are random access (`__houseRenderFrames(i)` renders frame *i* from scratch), and
+3. **shots** — build every house headless and walk the door-to-core, orbit, hero-reveal and core-orbit camera
+   paths against its geometry: through a wall, under a floor or a flight of stairs, in through a window instead
+   of the door, ending outside the hero room, Core out of frame — and through the push-in and the orbit round the
+   Core, every frame keeps it framed and in sight. Sampled again at 60/s: whip pans before the orbit, and the eye
+   swinging round the Core one way before the orbit sweeps it back. Also a scene check per house (dressing present, nothing buried in a wall, planting
+   not on a grid). 120 shots, 30 scenes; errors fail, warnings are reported.
+4. **determinism** — render frames 0, 200 and 719 of aurora's door-to-core, and 0, 240 and 479 of its core-orbit,
+   in two fresh browser contexts and compare raw pixels. Frames are random access (`__houseRenderFrames(i)` renders frame *i* from scratch), and
    nothing a frame depends on may use `Math.random` or the clock — every seed comes from mulberry32 / fnv1a in
    `assets/materials.ts`.
-5. **goldens** — render 120 frames (per house: the door-to-core and orbit posters and the door-to-core and
-   hero-reveal final frames, at 640 × 360 through the full composer) and compare them to `test/goldens/<profile>/` with pixelmatch plus a
+5. **goldens** — render 150 frames (per house: the door-to-core, orbit and core-orbit posters and the
+   door-to-core and hero-reveal final frames, at 640 × 360 through the full composer) and compare them to `test/goldens/<profile>/` with pixelmatch plus a
    mean-absolute-difference bar, so both "something moved" and "everything shifted a little" fail. Skipped if
    determinism failed, because a baseline compared against a renderer that disagrees with itself is noise.
 
@@ -160,7 +162,7 @@ reviewed frame by frame, committed with that change. Failing runs leave `*.actua
 `test/diff/`.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs what needs no GPU: install, build, typecheck,
-spec validation and the floor-plan-graph tests. 120 frames through a software rasteriser would cost the better
+spec validation and the floor-plan-graph tests. 150 frames through a software rasteriser would cost the better
 part of an hour of runner time per push, so the render gate runs locally before you push, as it did in
 CI-Common.
 

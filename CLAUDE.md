@@ -62,12 +62,12 @@ render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
-pnpm run check          # assets, specs, shots (90 / 0 errors), determinism, goldens (120 / 120)
+pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (150 / 150)
 pnpm run check:quick    # while iterating: assets + specs + shots
 ```
 
 A clean run has 0 shot errors and 0 scene errors (warnings are reported but do not fail — compare their count
-with the previous run by hand; the full list is in `test/qa/qa.json`), `deterministic`, and 120 goldens passing.
+with the previous run by hand; the full list is in `test/qa/qa.json`), `deterministic`, and 150 goldens passing.
 After a spec change also re-run `plans`, `iso` and `floorplans` and commit their output with the spec.
 
 **Goldens are re-blessed only on purpose.** A golden failure means the picture changed. If the change was not
