@@ -1752,6 +1752,12 @@ def fit_ctx(spec, W, H, portrait=False):
 # ---------------------------------------------------------------------------
 # SVG assembly
 # ---------------------------------------------------------------------------
+def lighting_name(spec):
+    """The spec's lighting preset name: `lighting` is a name, or (plan S1) an object { preset, sunBearing }."""
+    l = spec.get("lighting", "ci-dark")
+    return (l.get("preset") or "day") if isinstance(l, dict) else l
+
+
 def svg_defs(sid, lighting, scale):
     bg = LIGHTING_BG.get(lighting, LIGHTING_BG["ci-dark"])
     return f'''<defs>
@@ -1820,7 +1826,7 @@ def generate_svg(spec, W, H, portrait=False):
     ctx = fit_ctx(spec, W, H, portrait)
     r = HouseRenderer(spec, ctx, sid)
     items = r.build()
-    lighting = spec.get("lighting", "ci-dark")
+    lighting = lighting_name(spec)
     area = spec.get("areaSqm") or sum(union_area(lv["footprint"]) for lv in spec.get("levels", []))
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">', svg_defs(sid, lighting, ctx.s),
            f'<rect width="{W}" height="{H}" fill="url(#bg_{sid})"/>']
@@ -1897,7 +1903,7 @@ def build_lottie(spec, fps=30, total=180):
     items = r.build()
     comp = lot.create_comp(f"Companion_Core_{sid}", total, W, H, fps)
     layers = []
-    bg = LIGHTING_BG.get(spec.get("lighting", "ci-dark"), LIGHTING_BG["ci-dark"])[1]
+    bg = LIGHTING_BG.get(lighting_name(spec), LIGHTING_BG["ci-dark"])[1]
 
     ground = [s for it in items if it.prio < 2 for s in it.shapes]
     house = [s for it in items if it.prio >= 2 and it not in (r.core_item, r.plumbob_item) for s in it.shapes]

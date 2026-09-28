@@ -134,7 +134,8 @@ export const lightingName = (n?: any): string => {
 //   - pulls the light colours (sun, hemisphere, fill) and the environment's sky part-way to the grey of the same
 //     luma, so a white wall in the shade is lit by something near white;
 //   - white-balances the frame part-way toward the key light, as a photographer would at golden hour;
-//   - holds the grade's saturation at 0.9 or above, so a signature colour (palette.keep) survives dusk.
+//   - holds the grade's saturation at 0.86 or above, so a signature colour (palette.keep) survives dusk (dusk's own
+//     0.72 is what greyed a blue wall; 0.86 keeps a lawn from reading as green paint).
 // The backdrop sky and the fog keep the preset's own colours. Pure data again: lookOf(p, 2) is a new preset.
 const hexStr = (c: number) => '#' + c.toString(16).padStart(6, '0');
 const towardGrey = (c: string, k: number): string => {
@@ -151,7 +152,7 @@ export function lookOf(p: Preset, look: Look = 1): Preset & { envSky?: [string, 
     hemi: { ...p.hemi, sky: towardGrey(p.hemi.sky, 0.6), ground: towardGrey(p.hemi.ground, 0.75) },
     fill: { ...p.fill, color: towardGrey(p.fill.color, 0.5) },
     envSky: p.sky.map(c => towardGrey(c, 0.55)) as [string, string, string],
-    grade: { ...p.grade, saturation: Math.max(p.grade.saturation, 0.9) },
+    grade: { ...p.grade, saturation: Math.max(p.grade.saturation, 0.86) },
   };
   // white balance: what a white wall facing the sun reads under this light (sRGB-ish linear weights), corrected
   // half-way toward neutral and normalised to luma 1, so exposure is untouched

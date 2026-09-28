@@ -1,0 +1,64 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "s1-kit-doors",
+  "name": "S1 Kit — the door family",
+  "author": "ci-virtual-home",
+  "source": "test fixture (plan S1): the door family, transoms, frames, grids, arched and segmental heads, garage colour",
+  "style": "One-storey stucco villa: a timber French entry under a transom, arched windows, a green garage door",
+  "emoji": "🚪",
+  "fixture": {
+    "note": "a 1.6 m timber entry pair with glazed leaves and a transom, French sliders with a bronze frame, a coloured garage door, arched and segmental heads, a glazed partition door, lanterns on the entry only",
+    "frames": { "door-to-core": [0.3, 0.55, 1], "orbit": [0.55], "core-orbit": [0.55] }
+  },
+  "lot": { "w": 26, "d": 22, "ground": "lawn" },
+  "palette": { "wall": "#ece6da", "trim": "#3b3530", "roof": "#6e4a3a", "accent": "#5d7a6a", "material": "stucco", "door": "#7a5236" },
+  "lighting": "day",
+  "levels": [
+    {
+      "id": "l1", "name": "Ground Floor", "y": 0, "height": 3.0, "floor": "oak",
+      "footprint": [ { "x": -6, "z": -4, "w": 12, "d": 8 }, { "x": 6, "z": -1, "w": 3.6, "d": 5 } ],
+      "openings": [
+        { "side": "S", "at": 0, "type": "door", "w": 1.6, "h": 2.2, "style": "entry", "leaf": "french", "transom": 0.45, "frame": "#3b3530", "grid": "vertical", "lantern": true },
+        { "side": "S", "at": -3.6, "type": "window", "w": 1.3, "h": 1.4, "sill": 0.8, "head": "arch", "grid": "2x2" },
+        { "side": "S", "at": 3.4, "type": "window", "w": 1.4, "h": 1.3, "sill": 0.9, "head": "segmental", "frame": "#6b4a2b" },
+        { "side": "S", "at": 7.8, "type": "garage", "w": 2.4, "h": 2.2, "color": "#4f6b52", "lantern": false },
+        { "side": "N", "at": -2.5, "type": "slider", "w": 2.4, "h": 2.3, "frame": "#6a4e33", "grid": "prairie" },
+        { "side": "N", "at": 2.5, "type": "door", "w": 0.9, "h": 2.1, "leaf": "glazed", "grid": "2x2", "color": "#556b75" },
+        { "side": "W", "at": 0, "type": "window", "w": 1.0, "h": 1.6, "sill": 0.6, "head": "arch" },
+        { "side": "E", "at": -2.5, "type": "window", "w": 1.2, "h": 1.2, "sill": 0.9 }
+      ],
+      "partitions": [
+        { "from": [-1.6, -4], "to": [-1.6, 4], "door": 2.2, "doorW": 0.9, "doorStyle": "glazed", "doorColor": "#e9e4da" },
+        { "from": [6, -1], "to": [6, 4], "door": 2.5, "doorW": 0.9, "doorColor": "#6a4e33" }
+      ],
+      "rooms": [
+        { "no": "01", "name": "Living Room", "bounds": { "x": -1.6, "z": -4, "w": 7.6, "d": 8 },
+          "items": [
+            { "type": "sectional", "at": [2.4, -2.6], "rot": 0 },
+            { "type": "coffee-table", "at": [2.4, -1.2] },
+            { "type": "area-rug", "at": [2.4, -1.6], "w": 3.0, "d": 2.2 },
+            { "type": "fiddle-leaf", "at": [5.4, -3.4] }
+          ] },
+        { "no": "02", "name": "Study", "bounds": { "x": -6, "z": -4, "w": 4.4, "d": 8 },
+          "items": [
+            { "type": "bookshelf", "at": [-4.6, -3.75] },
+            { "type": "monstera", "at": [-5.4, 3.4] }
+          ] },
+        { "no": "03", "name": "Garage", "bounds": { "x": 6, "z": -1, "w": 3.6, "d": 5 }, "items": [] }
+      ]
+    }
+  ],
+  "roofs": [
+    { "over": { "x": -6.4, "z": -4.4, "w": 12.8, "d": 8.8 }, "y": 3.0, "type": "hip", "pitch": 26, "overhang": 0.4, "color": "#6e4a3a" },
+    { "over": { "x": 6, "z": -1.3, "w": 3.9, "d": 5.6 }, "y": 3.0, "type": "flat", "color": "#4a4541" }
+  ],
+  "site": [
+    { "type": "path", "path": [[0, 4.2], [0, 11]], "w": 1.6 },
+    { "type": "driveway", "at": [7.8, 7.5], "w": 3, "d": 7 },
+    { "type": "tree", "at": [-9, 6], "h": 5.5 },
+    { "type": "shrub", "at": [-2.2, 4.8] },
+    { "type": "shrub", "at": [2.2, 4.8] }
+  ],
+  "hero": { "level": "l1", "at": [-3.8, -3.55], "rot": 0, "device": "chalk", "pose": "prone", "surface": "desk" },
+  "entry": { "level": "l1", "side": "S", "at": 0 }
+}

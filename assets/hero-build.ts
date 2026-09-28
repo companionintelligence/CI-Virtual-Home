@@ -118,6 +118,13 @@ export function createHeroBuild(bctx, { DESK_TOP }: any = {}) {
     } else { dy = 0; }
     const dev = put(devFn, cx, cz, y + dy, 'Companion Core (Hero)', 'hero');
     dev.rotation.y = rot;
+    // on a piece of furniture the device's own floor (its rubber feet) meets the top exactly; the desk and the shelf
+    // keep the placement they always had (the feet 4 mm into the top — inside hero-float's 5 mm)
+    if (surfaceType && surfaceType !== 'walnut-desk' && surfaceType !== 'shelf') {
+      dev.updateMatrixWorld(true);
+      const b0 = dev.userData.core && typeof dev.userData.core.box === 'function' ? dev.userData.core.box() : new THREE.Box3().setFromObject(dev);
+      dev.position.y += (y + dy) - b0.min.y;
+    }
     // The hero anchor is the DEVICE (what the flythrough frames), not the desk centre. centreY is where the
     // camera should look: the middle of the slab in its pose.
     anchors.hero = { x: cx, y: y + dy, z: cz, deskX: hx, deskZ: hz, level: spec.hero.level, fwd, rot, surface, pose, centreY: y + dy + (pose === 'upright' ? 0.116 : 0.045) };
@@ -192,9 +199,9 @@ export function createHeroBuild(bctx, { DESK_TOP }: any = {}) {
     obj.traverse(m => { if (m.isMesh) { m.geometry.computeBoundingBox(); const b = m.geometry.boundingBox.clone().applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, m.matrixWorld)); lb.union(b); } });
     const hw = (lb.max.x - lb.min.x) / 2, hd = (lb.max.z - lb.min.z) / 2, midX = (lb.max.x + lb.min.x) / 2, midZ = (lb.max.z + lb.min.z) / 2;
     const [ax, az] = CORE_HALF[pose] || CORE_HALF.prone, reachX = Math.max(0, hw - ax - 0.03), reachZ = Math.max(0, hd - az - 0.02);
-    // preferred spots: the island's user-side end (≥ 0.35 m from its faucet at (0.45, 0.15) and its cooktop at x ≤ −0.05),
+    // preferred spots: the island's user-side end (its edge ≥ 0.35 m from the faucet at (0.45, 0.15) and the cooktop at x ≤ −0.05),
     // the credenza's +x half (its turntable stands on −x), otherwise the right third, then outward in both directions
-    const pref = type === 'kitchen-island' ? [[0.85, 0.15], [0.85, 0.05], [-0.95, 0.15]]
+    const pref = type === 'kitchen-island' ? [[0.95, 0.2], [0.95, 0.1], [-1.0, 0.2]]
       : type === 'media-credenza' ? [[0.4, 0], [0.55, 0], [0.25, 0]]
       : [[0.3, 0], [-0.3, 0], [0.15, 0], [-0.15, 0], [0, 0], [0.45, 0], [-0.45, 0]];
     const cands = pref.map(([x, z]) => [Math.max(-reachX, Math.min(reachX, x)), Math.max(-reachZ, Math.min(reachZ, z))]);

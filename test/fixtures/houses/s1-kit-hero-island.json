@@ -1,0 +1,210 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "s1-kit-hero-island",
+  "name": "S1 Kit \u2014 the Core on a island",
+  "author": "ci-virtual-home",
+  "source": "test fixture (plan S1): hero surfaces",
+  "style": "One-storey siding cottage, the Core on the kitchen island",
+  "emoji": "\ud83e\uddea",
+  "fixture": {
+    "note": "the Core on the kitchen island at rot 90 (it used to fall off the edge): a themed stone top, the user side clear of faucet and cooktop, and no island stools \u2014 the room has its own",
+    "frames": {
+      "door-to-core": [
+        1
+      ],
+      "hero-reveal": [
+        1
+      ],
+      "core-orbit": [
+        0.55
+      ]
+    }
+  },
+  "lot": {
+    "w": 22,
+    "d": 18,
+    "ground": "lawn"
+  },
+  "palette": {
+    "wall": "#eeeae3",
+    "trim": "#2b2f33",
+    "roof": "#3a3d42",
+    "accent": "#5d7a6a",
+    "material": "siding"
+  },
+  "lighting": "day",
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Ground Floor",
+      "y": 0,
+      "height": 2.8,
+      "floor": "oak",
+      "footprint": [
+        {
+          "x": -5,
+          "z": -3,
+          "w": 10,
+          "d": 6
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -1.5,
+          "type": "door",
+          "w": 1.0,
+          "h": 2.1,
+          "style": "entry",
+          "color": "#3b4a5a"
+        },
+        {
+          "side": "S",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 2.8,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.4,
+          "sill": 0.8
+        },
+        {
+          "side": "N",
+          "at": -2.5,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.2,
+          "sill": 0.9
+        },
+        {
+          "side": "E",
+          "at": 0,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "W",
+          "at": 0,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.2,
+          "sill": 0.9
+        }
+      ],
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Kitchen",
+          "bounds": {
+            "x": -5,
+            "z": -3,
+            "w": 10,
+            "d": 6
+          },
+          "items": [
+            {
+              "type": "kitchen-cabinetry",
+              "at": [
+                1.8,
+                -2.6
+              ],
+              "w": 3.0
+            },
+            {
+              "type": "bar-stool",
+              "at": [
+                0.9,
+                0.9
+              ]
+            },
+            {
+              "type": "bar-stool",
+              "at": [
+                1.5,
+                0.9
+              ]
+            },
+            {
+              "type": "monstera",
+              "at": [
+                4.4,
+                2.4
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -5.4,
+        "z": -3.4,
+        "w": 10.8,
+        "d": 6.8
+      },
+      "y": 2.8,
+      "type": "gable",
+      "ridge": "x",
+      "pitch": 28,
+      "overhang": 0.4,
+      "color": "#3a3d42"
+    }
+  ],
+  "site": [
+    {
+      "type": "path",
+      "path": [
+        [
+          -1.5,
+          3.2
+        ],
+        [
+          -1.5,
+          9
+        ]
+      ],
+      "w": 1.2
+    },
+    {
+      "type": "tree",
+      "at": [
+        -8,
+        5
+      ],
+      "h": 5.5
+    },
+    {
+      "type": "shrub",
+      "at": [
+        1.5,
+        3.8
+      ]
+    }
+  ],
+  "hero": {
+    "level": "l1",
+    "at": [
+      1.8,
+      0.2
+    ],
+    "rot": 90,
+    "device": "charcoal",
+    "pose": "prone",
+    "surface": "island"
+  },
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": -1.5
+  }
+}

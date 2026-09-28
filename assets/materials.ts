@@ -120,7 +120,7 @@ export const FINISHES: Record<string, [string, any]> = {
   terracotta: ['terracotta', {}], pavers: ['pavers', {}], 'stone-pavers': ['pavers', {}], concrete: ['concrete', {}], carpet: ['carpet', {}],
   marble: ['marble', {}], terrazzo: ['terrazzo', {}],
   paint: ['paint', {}], 'painted-brick': ['paintedbrick', {}], wallpaper: ['wallpaper', {}], wainscot: ['wainscot', {}], 'board-and-batten': ['battens', {}],
-  brick: ['brick', { color: 0xa0573f }], stone: ['stone', { color: 0xb3aa9b }], timber: ['timber', { color: 0x9c7f62 }],
+  brick: ['brick', { color: 0xa0573f }], stone: ['stone', { color: 0xb3aa9b }], timber: ['timber', { color: 0x9c7f62, pow2: true }],
 };
 export const FINISH_KINDS = Object.keys(FINISHES);
 
@@ -233,7 +233,15 @@ export function createMaterialKit({ THREE, palette = {}, seed = 'house', keep = 
       : kind === 'clay-tile' ? (pull ? mix(restrain(c0, 0.22, 0.25), 0x3a3531, 0.12) : restrain(c0, 0.22, 0.25))
       : kind === 'membrane' ? (dark && pull ? mix(restrain(c0, 0.12, 0.3), 0x34363a, 0.4) : restrain(c0, 0.15, 0.3))
       : dark && pull ? mix(restrain(c0, 0.12, 0.3), kind === 'standing-seam' ? 0x31353b : 0x282b31, 0.42) : restrain(c0, 0.2, 0.35);
-    const mat = pbr(lib.set(kind, { color: c }), { mode: 'slope', ...extra });
+    // a kept colour is the roof's colour as it renders: the set's courses and joints darken its mean, so the base
+    // is lifted by the ratio once (the generators are linear in their base colour) — within ΔE 3 of what was asked
+    let set = lib.set(kind, { color: c });
+    if (kept) {
+      const m = toRgb(set.meanHex), t = toRgb(c);
+      const c2 = fromRgb(t.map((v, k) => v * (v / Math.max(1, m[k]))) as [number, number, number]);
+      if (c2 !== c) set = lib.set(kind, { color: c2 });
+    }
+    const mat = pbr(set, { mode: 'slope', ...extra });
     mat.userData.roofKind = kind;
     return mat;
   }

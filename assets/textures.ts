@@ -536,8 +536,8 @@ const GEN: Record<string, (c: Ctx, o: any) => Gen> = {
       }
     };
   },
-  timber: (c, o) => {
-    const pu = 1.8, pv = 2.0, W = 512, H = 568, wall = rgbOf(o.color), bw = 0.15, grain = c.fbm(12 * 12, 3, 3, 0.55);
+  timber: (c, o) => {   // o.pow2: a 512 × 512 map (kit.finish's timber wall; the cladding keeps its own size)
+    const pu = 1.8, pv = 2.0, W = 512, H = o.pow2 ? 512 : 568, wall = rgbOf(o.color), bw = 0.15, grain = c.fbm(12 * 12, 3, 3, 0.55);
     return {
       W, H, period: [pu, pv], normalScale: 1.0,
       fn: (u, v, s, t, px) => {
