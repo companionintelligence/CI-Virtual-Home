@@ -139,8 +139,10 @@ any value but 1 or 2.
 ## Site items
 
 `{ "type": …, "at": [x, z], "w", "d", "rot", "h", "y" }` — `at` is the centre; `y` lifts the item off the ground
-(a planter on a deck, a pool on a terrace; default 0). A type the builder does not know is dropped without a word
-— the validator refuses it.
+(a planter on a deck, a pool on a terrace; default 0, or the terrace it stands on — Site (S4)). A type the builder
+does not know is refused by the validator, and reported by the scene QA (`site-dropped`) if one ever reaches it.
+S4's fields (planting, curves, surfaces, water shapes, terraces, stairs, fence styles, the lot's context and water)
+are under [Pass-4 fields → Site (S4)](#pass-4-fields).
 
 | type | notes |
 |---|---|
@@ -162,7 +164,7 @@ any value but 1 or 2.
 | `fence` | picket/privacy fence along a segment: `from`/`to` instead of `at` |
 | `wall-low` | garden wall segment: `from`/`to`, `h` |
 | `porch` | colonnade porch `w × d`: a raised timber deck, four columns and a header beam along its +Z edge — **no roof** |
-| `pergola`, `gazebo`, `greenhouse`, `garden-beds`, `monkeybars`, `firepit`, `loungers`, `bench`, `car`, `planter` | props (`pergola` builds a curtained cabana; `garden-beds` are raised vegetable crates, `count`) |
+| `pergola`, `cabana`, `gazebo`, `greenhouse`, `garden-beds`, `monkeybars`, `firepit`, `loungers`, `bench`, `car`, `planter` | props (`pergola` is an open frame, `cabana` the curtained lounge it used to build — see Site (S4); `garden-beds` are raised vegetable crates, `count`) |
 | `steps` | a flight of `n` steps (default 3), `w` wide (1.6), 0.16 m risers and 0.32 m treads rising toward −Z at `rot` 0 |
 | `bridge` | timber stepping bridge / boardwalk `w × d` (d runs along Z at `rot` 0) |
 | `soccer-goal` | goal frame (pair with `turf`) |
@@ -255,7 +257,124 @@ Room programs and the composer's inputs (`assets/spec/compose.ts`, `scripts/vali
 ### Site (S4)
 
 Planting generators, curves, hardscape, water, fences, structures, the lot and its world (`assets/spec/site.ts`,
-`scripts/validate/site.mts`). Nothing yet.
+`scripts/validate/site.mts`, `assets/scene-qa/site.ts`; fixtures `test/fixtures/houses/s4-site-*.json`; metrics
+`scripts/test-site.mts`). Every field is optional: a lot that uses none builds exactly as before.
+
+**The planting generator** — `{ "type": "planting", "kind", "along" | "poly" | "at", "depth", "layers", "mix",
+"density", "bloom", "side", "edge", "mulch", "seed" }` lays out beds and plants them back to front: a back layer
+1.2–2 m, a mid layer 0.6–1 m and groundcover about 0.3 m, each placed by Poisson-disk sampling (no two plants on a
+grid, none on top of another), the species in drifts along the bed, groundcover filling what mulch is left. Plants
+shrink to the room they have before a wall and never reach into the house.
+
+| `kind` | lays out | `along` |
+|---|---|---|
+| `foundation` | a band along the facade, rounded at its ends, broken at doors, paths and porches; the back row a crown off the wall | `facade:S`, `facade:S,E`, `facade:all` |
+| `walk` | beds both sides of a path, meeting its edge with no lawn between | `path:<site index or id>` (or a polyline and `w`) |
+| `border` | a band on one `side` (`left` of travel by default) of a line — a fence, a lot line | a polyline |
+| `terrace` | a band inside a terrace's edge, trailing plants at the coping | `terrace:<index or id>` (or a polyline and `side`) |
+| `meadow` | grasses and perennials over a `poly` (or `at`, `r`), heights in drifts, on a meadow floor, no mulch | — |
+| `grove` | trees spaced by their crowns (`species`, `spread`, `n`) with an understorey and a woodland floor | — |
+
+`depth` is the band's depth in metres (foundation 1.8, border 1.7, walk 1.0, terrace 1.1); `layers` 1–3 (3);
+`density` multiplies the mix's own; `bloom` pins the flower colours (`["#hex", …]`); `mulch` is `none` or a colour;
+`edge` is the beds' edging (below); `seed` gives another layout of the same outline. `mix`:
+
+| mix | back | mid | front |
+|---|---|---|---|
+| `cottage` | hydrangea, delphinium spikes, roses | lavender, roses, allium, daisies | daisies, blooms, tulips |
+| `modern` | tall grasses, clipped cones, columnar yew | grasses, topiary balls, box | low grasses, groundcover, sedum |
+| `mediterranean` | rosemary, cypress, clipped cones | lavender, agave, grasses | silver groundcover, lavender, sedum |
+| `desert` | yucca, cactus, tall grasses | agave, grasses | succulents, rocks, sedum (light gravel mulch) |
+| `woodland` | hydrangea, shrubs | ferns, hosta | groundcover, ferns (under birch and maple in a grove) |
+| `tropical` | broadleaf (banana, elephant ear), yucca | ferns, broadleaf, agave | groundcover, blooms (fan palms in a grove) |
+| `formal` | topiary cones in a row | topiary balls in a row | a box edging (gravel between) |
+| `meadow` | tall grasses, spikes | grasses, allium, daisies | low grasses, daisies, blooms |
+
+or your own: `{ "kinds": ["lavender", "agave", "rosemary", …], "weights": [3, 1, 2, …] }`, sorted into layers by
+height. The species: hydrangea, shrub, spreading, topiary-cone, topiary-ball, columnar, boxwood, box-edging, yucca,
+agave, succulent, cactus, rosemary, broadleaf, fern, hosta, grass, grass-tall, grass-low, groundcover, silver, sedum,
+lavender, spike, rose, allium, daisy, tulip, bloom, rock; and in a grove olive, maple, birch, cherry, fan-palm,
+cypress, broad, oval, conical, willow.
+
+**Species on their own.** `tree.species` adds `willow` (a curtain of hanging strands), `cherry` (a pink cloud),
+`olive` (gnarled stems, a silver crown), `fan-palm`, `shade` (9 m broad), `maple` (layered); `spread` widens or
+narrows a crown (0.5–2). `shrub.form` adds `hydrangea`, `fern`, `topiary-ball`, `topiary-cone`, `agave`, `yucca`,
+`columnar`, `rosemary`, `hosta`, `broadleaf`, `succulent`, `cactus`, `groundcover`, `silver`, `sedum` (`r` its crown,
+`h` its height). `flowers.kind`: `lavender` | `daisy` | `tulip` | `allium` | `rose` | `bloom` | `spike` — independent
+of `color`, which pins the bloom.
+
+**Curves and surfaces.** `smooth: true` (or a tension 0–0.95) runs a centripetal Catmull-Rom through the points of a
+`bed.poly`, `path.path`, `hedge.path`, a fence's or `wall-low`'s `path`, a `terrace.poly`, a `pool.poly`, a patio's
+`poly`, resampled every 0.25 m. `path.surface`: `gravel` | `flagstone` (crazy paving) | `stepping` (stepping
+stones) | `brick` | `decking` (boards across the walk) | `terracotta` | `concrete`, with `color`. A path with
+`smooth` or `surface` is a ribbon along its line. `bed.edge`: `{ "color", "h", "w" }` or `"none"` — a kerb as a true
+offset of the outline (a smoothed bed, and every bed under `defaults: 2`, gets one). `scatter.layout: "poisson"`
+spaces its items evenly at random. `patio` and `driveway` take `poly`, `smooth`, `surface` (concrete, gravel, brick,
+terracotta, stone) and `color`, and are cut round the water inside them.
+
+**Water.** A `pool` with a `shape` — `rect` | `lap` (lane lines) | `kidney` | `free` | `round` | `poly` (its `poly`) |
+`basin` — or with `coping` or a `poly` is a basin you can see into (walls, floor, water), `depth` deep, its rim at
+its `y` (else the ground under it), a `coping: { "w", "material", "color" }` round it (false: none). The lawn, a
+patio, a deck or a terrace over it is cut round its outline. `basin` is a formal reflecting basin (dark, 0.45 m):
+`island: { "w", "d", "h", "plants": "topiary-ball" | "lavender" | "tree" | …, "color" }` and `fountains: n` jets
+along its long axis. `rill` (0.45 m) and `channel` (1.2 m) are narrow runs of water: `at`, `w`, `d` (its length),
+`rot`. A `pond` with a `poly` (or `shape: "organic"`) has a noise shore, seeded rocks of varied size and count,
+marginal tufts and lily pads. A pool with none of these is the old slab pool, unchanged.
+
+**Terrain (A3).** `{ "type": "terrace", "poly" (or at, w, d, rot), "y", "edge", "surface", "smooth", "id" }` raises
+the ground over its outline to `y`. The ground follows it: a tree, a shrub, a bed, a planting, a patio, a prop or a
+pool on it stands on it unless it gives its own `y`, and a terrace inside another stands on that one. `edge`:
+`retaining` (vertical faces in `material` — stone, stucco, brick, concrete, timber — and `color`, under a coping,
+the default), `rail` (the same with a rail round it: `rail` a style, `railColor`), `planted` (a bank falling
+outward at 1:1.6, planted; `mix: "desert"` for succulents), `slope` (a grass bank). An edge along the house has no
+face or rail. `surface` is its top (the lot's own ground by default: the ground follows). `steps` with no `h` climb
+the terrace their flight reaches: the rise and the count follow. A storey standing on a terrace at its height keeps
+its floor (the terrace drops a centimetre under it).
+
+**Structures.**
+- `steps`: `h` (the rise; the risers follow at about 0.17 m), `d` (the run), `rail` (true, a style, or
+  `{ style, color }`), `style` (stone, brick, timber), `color`; on a terraced lot a flight is solid to the ground.
+- `stair`: `{ "from": [x, z, y0], "to": [x, z, y1], "w", "style": "stone" | "concrete" | "timber" | "steel",
+  "rail", "color", "landing" }` — an exterior flight (open treads on stringers for timber and steel), a landing half
+  way when it climbs more than 16 risers; `y0` / `y1` default to the ground there.
+- `deck`: `posts` (true: posts from its underside to the ground; false: none — a balcony, a roof deck; unset: the old
+  rule), `rails` (`["S", "E", …]` deck-local sides before `rot`, `"all"`, `"none"`, or `{ sides, style, color }`),
+  `railStyle`, `railColor`, `color` (its boards). A deck cuts the water it would bury.
+- `fence`: `style` `picket` | `privacy` | `slat-h` | `post-rail` | `metal` | `glass` | `stone-wall`, `color`, `h`,
+  `y`, and `from` / `to` at any angle or a `path` (curved with `smooth`). `wall-low`: `surface` (stone, brick,
+  stucco, render, concrete), `color`, `cap` (its coping's colour), `t` (thickness), a `path`, `y`.
+- `pergola` is an open frame — posts, two beams, rafters (and fine slats for `style: "modern"`), `color` its frame,
+  `climber`: `wisteria` (hanging racemes) | `vine` | `rose` | `none`, `h`. The old curtained build is `cabana`.
+- `gazebo`: `color` roofs it, `trim` paints its columns and rails.
+- `climber`: a wall climber (`species`: `ivy` | `wisteria` | `rose`) from `from` to `to`, `h` high, at `y`.
+- `string-lights`: festoon lights along `path` at `h`, sagging (`sag`) between posts (`posts: false`: none).
+- Every outdoor registry prop is a site item: `patio-set`, `lounger-set`, `hammock`, `bbq-grill`, `fire-bowl`,
+  `outdoor-sofa`, `umbrella-table`, `bird-bath`, `mailbox`, `bicycle`, `swing-set`, `sandbox`, `trampoline`,
+  `dog-house`, `wheelbarrow`, `garden-fountain`, `picnic-table`, `patio-heater` (`at`, `rot`, `y`, `color`).
+
+**The lot and its world.**
+- `lot.street`: `S` | `N` | `E` | `W` | `none` — the street's side, decoupled from the entry's (a lake-side entry
+  with the street behind the house); `none` builds no street.
+- `lot.context`: `suburb` (the default) | `city` (narrow two- to four-storey houses close to the walk, brick and
+  render, flat roofs and gables, a skyline) | `forest` (conifer woods, one neighbour a side) | `desert` (a sparse road
+  of stucco houses under hip and flat roofs) | `rural` (fields, hedgerows, a barn, a far neighbour) | `hillside` (the
+  ground rises behind the lot, houses and trees stepped up it) | `waterfront` (a lake behind).
+- `lot.water`: `lake` | `river` | `canal` | `sea`, or `{ "kind", "sides": ["N", …] (default ["N"], at most three),
+  "width" (river 26, canal 11, a lake or the sea to the horizon), "farBank": "trees" | "houses" | "hills" | "none",
+  "edge": "bank" | "wall" | "beach" }` — water below the lot on those sides. An item over it (a jetty) is not off the lot.
+- `lot.setback`: the neighbours' street line (m). `lot.ground` adds `meadow` and `gravel`.
+- Under `defaults: 2` (and in any context but the plain suburb) the neighbours vary in palette and style.
+
+**What the builder records.** `anchors.siteSolids` — `{ kind, x, z, r | w, d, rot, yMin, yMax }` (and `poly` for a
+terrace or shaped water): trunks and crowns, posts, fences, walls, hedges, structures, water, decks, stairs, terraces
+and their retaining faces — for the shot planner (S5). `anchors.siteEdges` — bed, planting and path outlines as
+built. Both, with the instances the isometric twin draws, go to `<id>.plan.json`'s `site` key (`{ instances, solids,
+edges }`). An item no builder built is recorded (`anchors.siteDropped`) and reported by the scene QA
+(`site-dropped`), never dropped silently.
+
+**Lints** (`scripts/validate/site.mts`, warnings): `unknown-name`, `planting-ref`, `front-crates` (vegetable crates in
+the front garden), `in-house`, `off-lot`, `buried-water`, `bed-on-slab`, `steep-stair`, `water-sides`. Scene QA:
+`site-dropped`, `site-in-house`, `site-buried`.
 
 ### Shots (S5)
 
