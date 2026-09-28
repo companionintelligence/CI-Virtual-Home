@@ -206,6 +206,10 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
   //                 | 'down' | 'sims' (per wall, per frame, above)
   // dressing.roof:  'on' | 'off' | 'auto' (fades out over the 5 % of the shot before the eye goes indoors)
   function applyShotCutaway(preset, sampleT, eye, target) {
+    // put back what the last frame's shotHidden() hooks hid BEFORE this frame's dressing decides anything: the
+    // roofs and ceilings below are placed objects too, and restoring after them would hand a ceiling the last
+    // frame's visibility, not this one's (frame i would depend on frame i − 1)
+    restoreShotHidden();
     const d = (preset && preset.dressing) || { walls: 'up', roof: 'auto' };
     if (!shotCutaway) shotCutaway = { savedMode: wallMode(), walls: null };
     if (d.walls === 'sims') {
@@ -275,7 +279,8 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
   // ---- shotHidden(): what a shot hides, frame by frame (plan Completeness C4 — the hook is S5's) --------------
   // shotHidden(fn) registers fn(obj, frame) → true to hide a placed object for this frame of a shot, where frame is
   // { preset, s, eye, target } (s: the path's sample fraction, as the roof fade reads it). It returns a function
-  // that unregisters it. Every frame first puts back what the last frame hid and then decides afresh, so frame i
+  // that unregisters it. Every frame first puts back what the last frame hid (applyShotCutaway's first step, before
+  // its dressing sets the roofs' and ceilings' visibility), then dresses, then asks the hooks afresh — so frame i
   // never depends on frame i − 1 (__houseRenderFrames is random access); endShotCutaway puts everything back.
   // With nothing registered it does nothing at all.
   const shotHiddenHooks = [];
@@ -288,8 +293,7 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
     for (const { obj, visible } of shotHiddenNow) obj.visible = visible;
     shotHiddenNow = [];
   }
-  function applyShotHidden(frame) {
-    restoreShotHidden();
+  function applyShotHidden(frame) {   // after restoreShotHidden() and this frame's dressing
     if (!shotHiddenHooks.length) return;
     for (const obj of placedItems) if (obj && obj.visible && shotHiddenHooks.some(fn => fn(obj, frame))) { shotHiddenNow.push({ obj, visible: obj.visible }); obj.visible = false; }
   }
