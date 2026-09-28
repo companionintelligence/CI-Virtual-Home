@@ -32,6 +32,10 @@ test/goldens.*.json
 # Screenshots from the portal's end-to-end check (scripts/test-portal.mts)
 test/portal/
 
+# Fixture stills (scripts/test-fixtures.mts) — rendered to be looked at; their hashes are committed, under
+# test/fixtures/hashes/<profile>.json
+test/fixtures/out/
+
 # Python bytecode from scripts/ (generate_house_iso.py imports its sibling modules)
 __pycache__/
 *.pyc

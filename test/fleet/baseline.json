@@ -1,0 +1,620 @@
+{
+ "when": "2026-09-28T20:52:43.264Z",
+ "houses": 30,
+ "built": false,
+ "results": {
+  "roof-finishes": {
+   "value": "membrane 21 · shingle 19 · seam 15 · glass 6 · tile 1 (21 houses with two or more)",
+   "pass": null,
+   "detail": "Houses per finish (a house counts once per finish it uses): today the finish follows the roof type (gable and hip → shingle, shed → standing seam, terracotta → clay tile, flat → membrane).",
+   "table": {
+    "head": [
+     "finish",
+     "houses",
+     "share"
+    ],
+    "rows": [
+     [
+      "membrane",
+      21,
+      "70 %"
+     ],
+     [
+      "shingle",
+      19,
+      "63 %"
+     ],
+     [
+      "seam",
+      15,
+      "50 %"
+     ],
+     [
+      "glass",
+      6,
+      "20 %"
+     ],
+     [
+      "tile",
+      1,
+      "3 %"
+     ]
+    ]
+   }
+  },
+  "furniture-repetition": {
+   "value": "46 types in 20 or more houses; the top 12 are 985 of 4052 items",
+   "measure": 985,
+   "pass": null,
+   "detail": "164 item types in use over 4052 room items (the hero desk set left out). The composer's target is measured against the baseline (test/fleet/baseline.json, the hand-authored fleet at S0). Authored items only: once S3 composes rooms at build time, count the built rooms instead (house.plan — export them from assets/plan-export/compose.ts and run `fleet-audit --built`).",
+   "table": {
+    "head": [
+     "type",
+     "houses",
+     "items"
+    ],
+    "rows": [
+     [
+      "wall-art",
+      30,
+      187
+     ],
+     [
+      "table-lamp",
+      30,
+      135
+     ],
+     [
+      "runner-rug",
+      30,
+      96
+     ],
+     [
+      "counter-run",
+      30,
+      72
+     ],
+     [
+      "loveseat",
+      30,
+      61
+     ],
+     [
+      "vanity-sink",
+      30,
+      59
+     ],
+     [
+      "snake-plant",
+      29,
+      74
+     ],
+     [
+      "vase",
+      29,
+      55
+     ],
+     [
+      "toilet",
+      29,
+      53
+     ],
+     [
+      "bath-mat",
+      29,
+      48
+     ],
+     [
+      "wingback-armchair",
+      29,
+      47
+     ],
+     [
+      "nightstand",
+      28,
+      98
+     ]
+    ]
+   }
+  },
+  "palette-spread": {
+   "value": "wall 25 distinct · trim 16 distinct · roof 16 distinct · door 12 distinct",
+   "pass": null,
+   "detail": "Pairwise CIEDE2000 across the houses. Wall: the palette after restraint (materials.ts restrainPalette). Roof: the largest roof, its own colour or the per-type default, after roofMaterial's restraint and charcoal pull. Door: the entry leaf (teal when the spec gives none; cased openings and sliders have no leaf).",
+   "table": {
+    "head": [
+     "role",
+     "houses",
+     "distinct (ΔE ≥ 3)",
+     "median ΔE",
+     "pairs under ΔE 5"
+    ],
+    "rows": [
+     [
+      "wall",
+      30,
+      25,
+      "28.0",
+      "4 %"
+     ],
+     [
+      "trim",
+      30,
+      16,
+      "31.9",
+      "14 %"
+     ],
+     [
+      "roof",
+      29,
+      16,
+      "13.2",
+      "25 %"
+     ],
+     [
+      "door",
+      14,
+      12,
+      "28.9",
+      "2 %"
+     ]
+    ]
+   }
+  },
+  "door-colours": {
+   "value": "12 distinct leaf colours (0 of 14 leaves are the default teal)",
+   "measure": 12,
+   "pass": false,
+   "detail": "Entries without a leaf: 1 cased, 15 slider.",
+   "table": {
+    "head": [
+     "leaf colour",
+     "houses",
+     "ids"
+    ],
+    "rows": [
+     [
+      "`#a8834f`",
+      2,
+      "gardennook, vanilla"
+     ],
+     [
+      "`#3a2c22`",
+      1,
+      "asymmetry"
+     ],
+     [
+      "`#8ea9bd`",
+      1,
+      "bghouse-olcia"
+     ],
+     [
+      "`#1b1f24`",
+      1,
+      "cocoon"
+     ],
+     [
+      "`#4e6690`",
+      1,
+      "cutestarter"
+     ],
+     [
+      "`#e8e4d6`",
+      1,
+      "familyhome"
+     ],
+     [
+      "`#6e5644`",
+      1,
+      "familyhouse-nora"
+     ],
+     [
+      "`#3e5262`",
+      1,
+      "flowerycottage"
+     ],
+     [
+      "`#5c2a1e`",
+      1,
+      "mesamariposa"
+     ],
+     [
+      "`#4a3121`",
+      1,
+      "mirage"
+     ],
+     [
+      "`#34251b`",
+      1,
+      "onestory"
+     ],
+     [
+      "`#4f544b`",
+      1,
+      "seraphine"
+     ],
+     [
+      "`#3e4548`",
+      1,
+      "valleyview"
+     ]
+    ]
+   }
+  },
+  "claddings": {
+   "value": "median 1 (0 of 30 houses declare 2 or more)",
+   "measure": 1,
+   "pass": false,
+   "detail": "Declared in the spec (palette.material, levels[].material, footprint[].material, facade[].material). Rendered today: one per house — kit.cladding() caches a single material.",
+   "table": {
+    "head": [
+     "cladding",
+     "houses"
+    ],
+    "rows": [
+     [
+      "stucco",
+      9
+     ],
+     [
+      "siding",
+      8
+     ],
+     [
+      "brick",
+      6
+     ],
+     [
+      "timber",
+      4
+     ],
+     [
+      "stone",
+      3
+     ]
+    ]
+   }
+  },
+  "lighting-share": {
+   "value": "top preset day 73 %, top sun bucket 315° 73 %",
+   "measure": 0.7333,
+   "pass": false,
+   "detail": "0 specs name their preset by a legacy alias. The sun stands at the entry's bearing plus the preset's swing (environment.ts sunDirection), so houses whose entries face one way share one sun per preset.",
+   "table": {
+    "head": [
+     "preset",
+     "houses",
+     "share"
+    ],
+    "rows": [
+     [
+      "day",
+      22,
+      "73 %"
+     ],
+     [
+      "golden",
+      6,
+      "20 %"
+     ],
+     [
+      "dusk",
+      2,
+      "7 %"
+     ],
+     [
+      "sun 315°–330°",
+      22,
+      "73 %"
+     ],
+     [
+      "sun 300°–315°",
+      6,
+      "20 %"
+     ],
+     [
+      "sun 285°–300°",
+      2,
+      "7 %"
+     ]
+    ]
+   }
+  },
+  "establish-share": {
+   "value": "v1 aerial (default) on 30 of 30",
+   "measure": 1,
+   "pass": false,
+   "table": {
+    "head": [
+     "establishing style",
+     "houses"
+    ],
+    "rows": [
+     [
+      "v1 aerial (default)",
+      30
+     ]
+    ]
+   }
+  },
+  "planting-types": {
+   "value": "bed 30/30 · shrub 29/30 · tree 29/30 · flowers 27/30 · planter 23/30",
+   "pass": null,
+   "detail": "Houses using each planting type, and how many items of it. S4's `planting` generator (mix, layers) reports here as it lands.",
+   "table": {
+    "head": [
+     "type",
+     "houses",
+     "items"
+    ],
+    "rows": [
+     [
+      "bed",
+      30,
+      152
+     ],
+     [
+      "shrub",
+      29,
+      304
+     ],
+     [
+      "tree",
+      29,
+      107
+     ],
+     [
+      "flowers",
+      27,
+      274
+     ],
+     [
+      "planter",
+      23,
+      119
+     ],
+     [
+      "hedge",
+      22,
+      36
+     ],
+     [
+      "scatter",
+      21,
+      63
+     ],
+     [
+      "cypress",
+      21,
+      61
+     ],
+     [
+      "grove",
+      20,
+      31
+     ],
+     [
+      "rock",
+      17,
+      121
+     ],
+     [
+      "palm",
+      9,
+      37
+     ],
+     [
+      "garden-beds",
+      4,
+      10
+     ],
+     [
+      "cactus",
+      3,
+      6
+     ]
+    ]
+   }
+  },
+  "front-garden-beds": {
+   "value": "0 (0 houses)",
+   "measure": 0,
+   "pass": true,
+   "detail": "`garden-beds` (raised vegetable crates) between the entry facade and the street.",
+   "table": {
+    "head": [
+     "house",
+     "at",
+     "crates"
+    ],
+    "rows": []
+   }
+  },
+  "axis-aligned-edges": {
+   "value": "49 % of 3320 m",
+   "measure": 0.4898,
+   "pass": false,
+   "detail": "Bed outlines (a polygon, or the rectangle at w × d) and path centre lines on the 30 real lots, by length; an edge within 1° of the x or z axis counts as axis-aligned. Authored geometry only: once S4 resolves `planting`, `smooth` and walks at build time, this should measure the built edges (house.plan — export them from assets/plan-export/site.ts and run `fleet-audit --built`).",
+   "table": {
+    "head": [
+     "house",
+     "edge length (m)",
+     "axis-aligned"
+    ],
+    "rows": [
+     [
+      "modernhome-nora",
+      "144.5",
+      "86 %"
+     ],
+     [
+      "seraphine",
+      "166.2",
+      "86 %"
+     ],
+     [
+      "modernhouse-nora",
+      "221.9",
+      "84 %"
+     ],
+     [
+      "modernhouse1",
+      "77.4",
+      "84 %"
+     ],
+     [
+      "mesamariposa",
+      "88.1",
+      "73 %"
+     ],
+     [
+      "aurora",
+      "123.7",
+      "66 %"
+     ],
+     [
+      "vanilla",
+      "300.6",
+      "66 %"
+     ],
+     [
+      "mediterranean",
+      "132.5",
+      "56 %"
+     ],
+     [
+      "palms",
+      "63.3",
+      "53 %"
+     ],
+     [
+      "bgfamily",
+      "30.5",
+      "49 %"
+     ],
+     [
+      "familyhome",
+      "87.4",
+      "48 %"
+     ],
+     [
+      "epiphany",
+      "61.1",
+      "47 %"
+     ],
+     [
+      "lakecabin",
+      "188.5",
+      "47 %"
+     ],
+     [
+      "onestory",
+      "180.6",
+      "46 %"
+     ],
+     [
+      "riverbend",
+      "33.8",
+      "45 %"
+     ],
+     [
+      "bghouse-olcia",
+      "95.8",
+      "44 %"
+     ],
+     [
+      "neweco",
+      "148.2",
+      "43 %"
+     ],
+     [
+      "mirage",
+      "38.7",
+      "41 %"
+     ],
+     [
+      "flowerycottage",
+      "133.8",
+      "40 %"
+     ],
+     [
+      "cocoon",
+      "60.0",
+      "37 %"
+     ],
+     [
+      "palnknoll",
+      "169.9",
+      "33 %"
+     ],
+     [
+      "sunnyhome",
+      "75.4",
+      "30 %"
+     ],
+     [
+      "starter18k",
+      "73.5",
+      "26 %"
+     ],
+     [
+      "cutestarter",
+      "58.4",
+      "22 %"
+     ],
+     [
+      "gardennook",
+      "199.2",
+      "21 %"
+     ],
+     [
+      "asymmetry",
+      "112.0",
+      "16 %"
+     ],
+     [
+      "payorote",
+      "26.3",
+      "10 %"
+     ],
+     [
+      "familyhouse-nora",
+      "169.7",
+      "7 %"
+     ],
+     [
+      "newcrest",
+      "51.9",
+      "0 %"
+     ],
+     [
+      "valleyview",
+      "7.2",
+      "0 %"
+     ]
+    ]
+   }
+  },
+  "mix-context": {
+   "value": "top mix (none) 30/30, top context (suburb: the default) 30/30",
+   "pass": null,
+   "detail": "S4's `planting.mix` and `lot.context` — not authored yet on any house, so every lot is the same suburb.",
+   "table": {
+    "head": [
+     "mix / context",
+     "houses"
+    ],
+    "rows": [
+     [
+      "mix: (none)",
+      30
+     ],
+     [
+      "context: (suburb: the default)",
+      30
+     ]
+    ]
+   }
+  }
+ }
+}

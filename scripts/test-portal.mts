@@ -1,6 +1,7 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // End-to-end check of the built portal, served under a sub-path (dist/ at /ci-virtual-home/), where a
 // root-relative URL fails.
+// @check-house skip — it tests dist/, which `pnpm run portal:build` makes; run `pnpm run portal:test` after portal work
 //
 //   pnpm run build && pnpm run portal:build && pnpm run portal:test [--dir dist] [--base /ci-virtual-home/]
 //        [--house aurora,lakecabin,mirage] [--shots test/portal] [--headed]

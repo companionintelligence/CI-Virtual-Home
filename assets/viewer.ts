@@ -23,6 +23,11 @@
 // moment you left, and Play (or the scrubber) moves it along the path while you watch from wherever you are.
 // The free camera keeps above the lot's ground: it can dive into a room, not under the house.
 //
+// Owner: S6 (ui) in pass 4's streams (it postdates the plan; S6 owns the editor and the portal's UI). It reads three
+// v1 shot internals that S5's planner v2 changes — t as a 0–1 fraction of applySplineFrame's path, a 10 s duration
+// fallback (shotDuration) and preset.power for the press — so when v2 lands S6 moves it onto window.__houseShotTrack
+// (duration, events.pressT, events.enterT in seconds) rather than S5 editing it.
+//
 // Icons: path data from Lucide (lucide-react 0.469.0, ISC — see THIRD_PARTY.md), as in room-creator's sprite.
 //
 // Framing: shots are authored for 16:9 with a fixed vertical field of view, so a narrower window (a phone held

@@ -1,0 +1,82 @@
+{
+ "when": "2026-09-28T20:54:43.849Z",
+ "load": [
+  5.3,
+  6.2,
+  8.1
+ ],
+ "cores": 12,
+ "budget": {
+  "buildMs": 3000,
+  "trackMs": 1000,
+  "shotQAMs": 500
+ },
+ "shots": [
+  "door-to-core",
+  "orbit",
+  "hero-reveal",
+  "core-orbit"
+ ],
+ "results": [
+  {
+   "house": "aurora",
+   "runs": 2,
+   "loadMs": 2607,
+   "buildMs": 1006.1999999880791,
+   "builderMs": 903.6999999880791,
+   "shotsForMs": 101.09999999403954,
+   "trackMs": {
+    "door-to-core": 2.0999999940395355,
+    "orbit": 1.5,
+    "hero-reveal": 1,
+    "core-orbit": 0.9000000059604645
+   },
+   "shotQAMs": {
+    "door-to-core": 177.80000001192093,
+    "orbit": 38.80000001192093,
+    "hero-reveal": 31.400000005960464,
+    "core-orbit": 160.7000000178814
+   }
+  },
+  {
+   "house": "mirage",
+   "runs": 2,
+   "loadMs": 2855,
+   "buildMs": 1262.5999999642372,
+   "builderMs": 1101.2999999821186,
+   "shotsForMs": 158.40000000596046,
+   "trackMs": {
+    "door-to-core": 2.100000023841858,
+    "orbit": 1.199999988079071,
+    "hero-reveal": 1,
+    "core-orbit": 0.8999999761581421
+   },
+   "shotQAMs": {
+    "door-to-core": 121.90000000596046,
+    "orbit": 35.80000001192093,
+    "hero-reveal": 30.5,
+    "core-orbit": 82.30000001192093
+   }
+  },
+  {
+   "house": "vanilla",
+   "runs": 2,
+   "loadMs": 2896,
+   "buildMs": 1277.199999988079,
+   "builderMs": 1049.0999999940395,
+   "shotsForMs": 228.09999999403954,
+   "trackMs": {
+    "door-to-core": 2,
+    "orbit": 1.4000000059604645,
+    "hero-reveal": 1,
+    "core-orbit": 1
+   },
+   "shotQAMs": {
+    "door-to-core": 203.59999999403954,
+    "orbit": 37,
+    "hero-reveal": 32.099999994039536,
+    "core-orbit": 226.2000000178814
+   }
+  }
+ ]
+}

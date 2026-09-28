@@ -14,8 +14,10 @@ declare global {
     __houseRenderBegin?: (...args: any[]) => any;
     __houseRenderEnd?: (...args: any[]) => any;
     __houseRenderFrames?: (...args: any[]) => any;
-    __houseSceneQA?: (...args: any[]) => any;
+    __houseSceneQA?: ((...args: any[]) => any) & { register?: (code: string, fn: (ctx: any) => any) => void };
     __houseShotQA?: (...args: any[]) => any;
+    __houseShotTrack?: (...args: any[]) => any;
+    __houseVisibility?: any;
     __houseSupersample?: any;
   }
   var __THREE: any;
@@ -27,8 +29,10 @@ declare global {
   var __houseRenderBegin: (...args: any[]) => any;
   var __houseRenderEnd: (...args: any[]) => any;
   var __houseRenderFrames: (...args: any[]) => any;
-  var __houseSceneQA: (...args: any[]) => any;
+  var __houseSceneQA: ((...args: any[]) => any) & { register?: (code: string, fn: (ctx: any) => any) => void };
   var __houseShotQA: (...args: any[]) => any;
+  var __houseShotTrack: (...args: any[]) => any;
+  var __houseVisibility: any;
   var __houseSupersample: any;
 }
 export {};

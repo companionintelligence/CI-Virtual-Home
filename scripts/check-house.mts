@@ -2,7 +2,7 @@
 // Every check the house pipeline has, in one command, on this machine.
 //
 //   pnpm run check [--house aurora,mirage] [--jobs 2] [--res 360] [--update-goldens]
-//   pnpm run check:quick                                   # assets + specs + shots only
+//   pnpm run check:quick                                   # assets + specs + shots + the quick tests
 //   node --experimental-strip-types scripts/check-house.mts [--quick] [--house …] [--jobs 2] [--res 360] [--update-goldens]
 //
 // Works from any cwd: every path resolves from this file's own location.
@@ -19,7 +19,19 @@
 //                                             in frame through its orbits; and the scene gate: dressing,
 //                                             clashes, planting
 //   3. determinism test-frame-hash.mts      — two runs of THIS tree must agree (door-to-core, then core-orbit)
-//   4. goldens    test-goldens.mts          — this tree must still agree with the tree we blessed
+//   4. goldens    test-goldens.mts          — this tree must still agree with the tree we blessed, less the frames
+//                                             test/goldens/expected-diffs/ declares as moving (the ledger)
+//   5. test:*     scripts/test-*.mts        — every test script, found by glob (plan Completeness C8), so a stream
+//                                             adds its test by adding the file, never by editing this one. A file
+//                                             steers itself with a directive in its first lines:
+//                                               // @check-house skip — <why>     not run here (e.g. a step above)
+//                                               // @check-house node-test        run under `node --test`
+//                                               // @check-house quick            also run by --quick
+//                                               // @check-house advisory — <why> runs and reports, cannot fail the
+//                                               //                              gate (a test that is red on main
+//                                               //                              too, until the fix that greens it lands)
+//   6. perf       perf-house.mts            — build / track / shot-QA timings against their budgets (plan A4):
+//                                             report-only, it never fails the gate (`--no-perf` skips it)
 //
 // The order is a dependency chain, not a preference: goldens compared against a renderer that is not
 // deterministic are noise, so a failed determinism check skips them rather than reporting a hundred lies.
@@ -49,7 +61,14 @@ const QA_OUT = path.join(ROOT, 'test', 'qa');
 // order to prevent.
 const RES = val('res', '360');
 
-type Step = { key: string; script: string; args: string[]; quick?: boolean; needs?: string };
+type Step = { key: string; script: string; args: string[]; quick?: boolean; needs?: string; nodeTest?: boolean; advisory?: boolean };
+// scripts/test-*.mts, each steered by its own "@check-house" directive (header)
+const testSteps: Step[] = fs.readdirSync(path.join(ROOT, 'scripts')).filter(f => /^test-.+\.mts$/.test(f)).sort().flatMap(f => {
+  const head = fs.readFileSync(path.join(ROOT, 'scripts', f), 'utf8').split('\n').slice(0, 40).join('\n');
+  const words = [...head.matchAll(/@check-house\s+([a-z-]+)/g)].map(m => m[1]);   // one directive a line
+  if (words.includes('skip')) return [];
+  return [{ key: `test:${f.replace(/^test-|\.mts$/g, '')}`, script: S(f), args: [], quick: words.includes('quick') ? undefined : false, nodeTest: words.includes('node-test'), advisory: words.includes('advisory') }];
+});
 const steps: Step[] = [
   { key: 'assets', script: S('build-house-assets.mts'), args: [] },
   { key: 'specs', script: S('validate-house-spec.mts'), args: [] },
@@ -58,9 +77,11 @@ const steps: Step[] = [
   // the 8 s product orbit, stepped as random access too (its own path function, not door-to-core's)
   { key: 'determinism:core-orbit', script: S('test-frame-hash.mts'), args: ['--res', RES!, '--shot', 'core-orbit', '--frames', '0,240,479', ...(HOUSE ? ['--house', HOUSE.split(',')[0]] : [])], quick: false },
   { key: 'goldens', script: S('test-goldens.mts'), args: ['--res', RES!, '--jobs', JOBS!, ...(flag('update-goldens') ? ['--update'] : []), ...houseArgs], quick: false, needs: 'determinism,determinism:core-orbit' },
+  ...testSteps,
+  ...(flag('no-perf') ? [] : [{ key: 'perf', script: S('perf-house.mts'), args: HOUSE ? ['--house', HOUSE] : [], quick: false, advisory: true }]),
 ];
 
-type Result = Step & { state: 'pass' | 'fail' | 'skipped'; why?: string; code?: number | null; secs?: string };
+type Result = Step & { state: 'pass' | 'fail' | 'warn' | 'skipped'; why?: string; code?: number | null; secs?: string };
 const results: Result[] = [];
 for (const step of steps) {
   if (flag('quick') && step.quick === false) { results.push({ ...step, state: 'skipped', why: '--quick' }); continue; }
@@ -71,17 +92,21 @@ for (const step of steps) {
   }
   console.log(`\n\x1b[1m── ${step.key} ──\x1b[0m ${step.script} ${step.args.join(' ')}`);
   const t = Date.now();
-  const r = spawnSync(process.execPath, ['--experimental-strip-types', step.script, ...step.args], { stdio: 'inherit' });
-  results.push({ ...step, state: r.status === 0 ? 'pass' : 'fail', code: r.status, secs: ((Date.now() - t) / 1000).toFixed(0) });
+  const r = spawnSync(process.execPath, ['--experimental-strip-types', ...(step.nodeTest ? ['--test'] : []), step.script, ...step.args], { stdio: 'inherit' });
+  // an advisory step (perf) reports; it cannot fail the gate
+  results.push({ ...step, state: r.status === 0 ? 'pass' : step.advisory ? 'warn' : 'fail', code: r.status, secs: ((Date.now() - t) / 1000).toFixed(0) });
 }
 
 console.log('\n\x1b[1m── summary ──\x1b[0m');
 for (const r of results) {
-  const mark = r.state === 'pass' ? '\x1b[32m✓\x1b[0m' : r.state === 'fail' ? '\x1b[31m✗\x1b[0m' : '\x1b[2m–\x1b[0m';
+  const mark = r.state === 'pass' ? '\x1b[32m✓\x1b[0m' : r.state === 'fail' ? '\x1b[31m✗\x1b[0m' : r.state === 'warn' ? '\x1b[33m!\x1b[0m' : '\x1b[2m–\x1b[0m';
   const note = r.state === 'skipped' ? `skipped (${r.why})` : `${r.state}${r.code ? ` (exit ${r.code})` : ''} in ${r.secs}s`;
   console.log(`  ${mark} ${r.key.padEnd(22)} ${note}`);
 }
-const failed = results.filter(r => r.state === 'fail');
-if (failed.length) console.log(`\n\x1b[31m${failed.length} of ${results.filter(r => r.state !== 'skipped').length} checks failed.\x1b[0m`);
-else console.log(`\n\x1b[32mAll ${results.filter(r => r.state !== 'skipped').length} checks passed.\x1b[0m`);
+const failed = results.filter(r => r.state === 'fail'), advisory = results.filter(r => r.state === 'warn');
+const also = advisory.length ? ` (${advisory.map(r => r.key).join(', ')}: advisory, did not finish cleanly)` : '';
+// an advisory step counts on neither side: it is reported beside the tally, never in it
+const gating = results.filter(r => r.state === 'pass' || r.state === 'fail').length;
+if (failed.length) console.log(`\n\x1b[31m${failed.length} of ${gating} checks failed.\x1b[0m${also}`);
+else console.log(`\n\x1b[32mAll ${gating} checks passed.\x1b[0m${also}`);
 process.exit(failed.length ? 1 : 0);

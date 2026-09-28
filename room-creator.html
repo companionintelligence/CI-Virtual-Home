@@ -1780,9 +1780,12 @@
     import { TransformControls } from 'three/addons/TransformControls.js';
     import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
     import { createHouseBuilder } from './assets/house-builder.js';
+    import { createVisibility, ISO_VIEW, placeIsoCamera } from './assets/visibility.js';
+    import { trackFromV1 } from './assets/shot-track.js';
+    import { registerSceneCheck, runSceneChecks } from './assets/scene-qa/index.js';
     import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
-    import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, sunDirection, createSkyBaker, installSkyFog, applyHouseGlow, GradeShader } from './assets/environment.js';
+    import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, createSkyBaker, installSkyFog, GradeShader, createLighting } from './assets/environment.js';
 
     // -------------------------------------------------------------
     // Global State & Config
@@ -1843,18 +1846,8 @@
 
     // Setup True Isometric Angle
     // In axonometric isometric projection: yaw = 45 deg, pitch = atan(1 / sqrt(2)) ~ 35.264 deg
-    const ISO_DIST = 35;
-    const ISO_PITCH = Math.asin(1 / Math.sqrt(3)); // 35.264 deg
-    const ISO_YAW = Math.PI / 4; // 45 deg
-    
-    function setIsoCameraPosition(angleYaw = Math.PI / 4) {
-      const radius = ISO_DIST;
-      const x = radius * Math.cos(ISO_PITCH) * Math.sin(angleYaw);
-      const y = radius * Math.sin(ISO_PITCH);
-      const z = radius * Math.cos(ISO_PITCH) * Math.cos(angleYaw);
-      orthoCamera.position.set(x, y, z);
-      orthoCamera.lookAt(0, 1.2, 0);
-    }
+    const { ISO_DIST, ISO_PITCH, ISO_YAW } = ISO_VIEW;   // assets/visibility.ts
+    const setIsoCameraPosition = (angleYaw = Math.PI / 4) => placeIsoCamera(orthoCamera, angleYaw);
     setIsoCameraPosition();
 
     persCamera.position.set(16, 12, 16);
@@ -2150,258 +2143,27 @@
     // Inspired by Pascal garden-house.ts, Codrops 3D Kitchen Designer & R3F Grass
     // =========================================================================
     let currentWallMode = 'cutaway'; // 'cutaway' | 'down' | 'up'
-    const trackedWalls = [];
     let currentLayerFilter = 'all'; // 'all' | 'floor1' | 'floor2'
     const FLOOR2_THRESHOLD = 1.8; // Y height (metres) above which items belong to upper floor
-
-    function registerTrackedWall(mesh, orientation, fullH = 2.7, cutawayH = 0.85, downH = 0.15) {
-      mesh.userData.isWall = true;
-      mesh.userData.role = 'wall';
-      mesh.userData.orientation = orientation; // 'south' | 'east' | 'north' | 'west' | 'partition'
-      mesh.userData.orientationExplicit = true;
-      mesh.userData.fullHeight = fullH;
-      mesh.userData.cutawayHeight = Math.min(cutawayH, fullH);
-      mesh.userData.downHeight = Math.min(downH, fullH);
-      if (!trackedWalls.includes(mesh)) trackedWalls.push(mesh);
-      applyWallModeToMesh(mesh, currentWallMode);
-      return mesh;
-    }
-
-    // Walls built by AssetFactory (solid / glass / low partition) tag themselves with
-    // userData.isWall but do not know which side of the house they are on until they are
-    // placed. addItemToScene calls this after positioning: it infers the orientation from
-    // the world position (unless a preset registered it explicitly) and tracks the wall so
-    // the cutaway / down / up modes apply to EVERY wall, not only parametric ones.
-    function autoRegisterWall(obj) {
-      if (!obj || !obj.userData || !obj.userData.isWall) return;
-      obj.userData.role = 'wall';
-      if (!obj.userData.orientationExplicit) {
-        const { x, z } = obj.position;
-        const rotated = Math.abs(Math.sin(obj.rotation.y)) > 0.5; // runs along Z
-        let ori;
-        if (rotated) ori = x >= 0 ? 'east' : 'west';
-        else ori = z >= 0 ? 'south' : 'north';
-        if (obj.userData.partition) ori = 'partition';
-        obj.userData.orientation = ori;
-      }
-      if (!trackedWalls.includes(obj)) trackedWalls.push(obj);
-      applyWallModeToMesh(obj, currentWallMode);
-    }
-
-    // Roofs are hidden unless walls are fully up (Sims-style cutaway removes the roof).
-    const trackedRoofs = [];
-    // Ceilings (one per storey with nothing above it) show with the roofs in 'up' mode; during a shot each is
-    // visible only while the eye is below it, so a descent from above never lands on it.
-    const trackedCeilings = [];   // [{ obj, y }]
-    function registerCeiling(obj, y) {
-      obj.userData.isCeiling = true;
-      obj.userData.role = 'ceiling';
-      trackedCeilings.push({ obj, y });
-      obj.visible = currentWallMode === 'up';
-    }
-    function registerRoof(obj) {
-      obj.userData.isRoof = true;
-      obj.userData.role = 'roof';
-      if (!trackedRoofs.includes(obj)) trackedRoofs.push(obj);
-      // remember each material's own blend state (the A-frame glass roofs are transparent to begin with) so a
-      // shot's fade can restore it exactly
-      // An opaque roof fades by hashed-alpha dissolve (r169's own `alphaHash`), not by turning transparent.
-      // A transparent roof drops out of the depth buffer and out of the GTAO pass — which skips transparent
-      // materials — so the contact shadows indoors used to jump the instant the fade began, while the roof
-      // was still fully drawn. Dissolving keeps the material opaque in every pass: the AO and the shadow
-      // both go the moment the roof does. The threshold is hashed from object-space position, so the
-      // pattern is stable under camera motion and identical run to run. Glass roofs start out transparent
-      // and keep the alpha fade — GTAO already excludes them.
-      obj.traverse(m => { if (!m.isMesh) return; for (const mat of (Array.isArray(m.material) ? m.material : [m.material])) { if (!mat || mat.userData.orig) continue; mat.userData.orig = { transparent: mat.transparent, opacity: mat.opacity, depthWrite: mat.depthWrite }; if (!mat.transparent) { mat.alphaHash = true; mat.needsUpdate = true; } } });
-      obj.visible = currentWallMode === 'up';
-    }
-
-    // mode: 'up' | 'cutaway' | 'down' — the editor's global modes, where 'cutaway' means the south/east/
-    // partition convention — or 'cut' | 'keep', where the caller has already decided about THIS wall (the
-    // Sims rule below picks them per wall, per frame).
-    function applyWallModeToMesh(mesh, mode) {
-      if (!mesh || !mesh.userData) return;
-      const ori = mesh.userData.orientation;
-      const perWall = mode === 'cut' || mode === 'keep';
-      const isCutawayTarget = perWall ? mode === 'cut' : (ori === 'south' || ori === 'east' || ori === 'partition');
-      if (perWall) mode = 'cutaway';
-
-      // 1. If parametric wall with discrete full, cutaway, and baseboard plan groups
-      if (mesh.userData.fullGroup && mesh.userData.cutawayGroup && mesh.userData.baseboardGroup) {
-        if (mode === 'cutaway') {
-          if (isCutawayTarget) {
-            mesh.userData.cutawayGroup.visible = true;
-            mesh.userData.fullGroup.visible = false;
-            mesh.userData.baseboardGroup.visible = false;
-          } else {
-            mesh.userData.cutawayGroup.visible = false;
-            mesh.userData.fullGroup.visible = true;
-            mesh.userData.baseboardGroup.visible = false;
-          }
-        } else if (mode === 'down') {
-          mesh.userData.cutawayGroup.visible = false;
-          mesh.userData.fullGroup.visible = false;
-          mesh.userData.baseboardGroup.visible = true;
-        } else { // 'up'
-          mesh.userData.cutawayGroup.visible = false;
-          mesh.userData.fullGroup.visible = true;
-          mesh.userData.baseboardGroup.visible = false;
-        }
-        mesh.scale.set(1, 1, 1);
-        // NOTE: never touch position.y here — upper-storey walls live at y = slab elevation.
-        return;
-      }
-
-      // 2. Fallback for simple solid/partition mesh groups
-      const fullH = mesh.userData.fullHeight || 2.7;
-      const cutawayH = mesh.userData.cutawayHeight || 0.85;
-      const downH = mesh.userData.downHeight || 0.15;
-
-      let targetH = fullH;
-      if (mode === 'down') {
-        targetH = downH;
-      } else if (mode === 'cutaway') {
-        targetH = isCutawayTarget ? cutawayH : fullH;
-      } else {
-        targetH = fullH;
-      }
-
-      const scaleY = targetH / fullH;
-      // Scaling about the group origin keeps the wall base on its own floor (local y = 0),
-      // whether that floor is the ground or an upper slab.
-      mesh.scale.y = scaleY;
-    }
-
-    // ---- Camera-aware cutaway for house shots -------------------------------------------------------------
-    // While a house shot plays or renders, the manual wall mode is set aside: walls are full and the roofs are on
-    // (the shot walks through doorways, so nothing needs cutting), and the roofs fade out over the last 5 % of the
-    // approach before the eye passes under a ceiling, then stay off. Before this every video was recorded in the
-    // 'cutaway' mode — S/E walls at 0.85 m and no roofs — so the houses read as dollhouses from the street.
-    let shotCutaway = null;   // { savedMode, walls } while a house shot drives the camera
     // The shot driving the camera — { key, preset, type } — set by buildSplineFromPreset. Every frame
     // decision used to be a substring test on the preset KEY, so a spec that aliased its opener to
     // "front-door" silently lost door-to-core's ease and its dolly zoom, and the video pipeline could only
     // ask whether a key started with "house:".
     let activeShot = null;
-    function houseInside(eye) {
-      const h = activeHouse; if (!h) return false;
-      for (const lv of h.spec.levels || []) {
-        const y = lv.y || 0, H = lv.height || 2.8;
-        if (eye.y < y - 0.2 || eye.y > y + H + 0.5) continue;
-        if ((lv.footprint || []).some(r => eye.x >= r.x - 0.3 && eye.x <= r.x + r.w + 0.3 && eye.z >= r.z - 0.3 && eye.z <= r.z + r.d + 0.3)) return true;
-      }
-      return false;
-    }
-    // ---- Sims rule ---------------------------------------------------------------------------------
-    // A shot can dress its exterior walls the way the game does: cut only the walls the eye is actually
-    // looking through. A wall is cut when the eye stands on its outward side AND either the eye is above
-    // the cut line (looking down into the plan) or the shot is aimed at something indoors. Interior
-    // partitions stay up — cutting those as well turns the house into a floor plan.
-    //
-    // The decision is a pure function of this frame's eye and target. No hysteresis on t: frames are
-    // rendered by random access (the hash test renders 0, 330 and 719 straight off), so anything stateful
-    // would make frame 330 depend on whether 329 had been drawn. The 0.15 m dead band on the facing test
-    // does the job the hysteresis was there for — a wall the eye slides along does not flicker.
-    const WALL_OUT = { south: [0, 1], north: [0, -1], east: [1, 0], west: [-1, 0] };
-    const _simsBox = new THREE.Box3();
-    function simsAnchor(wall) {
-      if (wall.userData.simsAnchor) return wall.userData.simsAnchor;
-      wall.updateWorldMatrix(true, false);
-      _simsBox.setFromObject(wall);   // includes the hidden cutaway group: scaling never moves the base or the centre
-      return (wall.userData.simsAnchor = { x: (_simsBox.min.x + _simsBox.max.x) / 2, z: (_simsBox.min.z + _simsBox.max.z) / 2, cut: _simsBox.min.y + (wall.userData.cutawayHeight || 0.85) });
-    }
-    function simsCut(wall, eye, target) {
-      const n = WALL_OUT[wall.userData.orientation];
-      if (!n || !eye) return false;
-      const a = simsAnchor(wall);
-      if (n[0] * (eye.x - a.x) + n[1] * (eye.z - a.z) <= 0.15) return false;   // eye indoors of it, or in its plane
-      return eye.y > a.cut || (!!target && houseInside(target));
-    }
+    // Wall modes, the roof and ceiling registries, the shot's cutaway and roof fade, the floor-layer filter and the
+    // shotHidden() hook: assets/visibility.ts. This page keeps the state its other regions read and lends it.
+    const visibility = createVisibility({
+      THREE, placedItems, FLOOR2_THRESHOLD,
+      wallMode: () => currentWallMode, setWallMode: mode => { currentWallMode = mode; }, setLayerFilter: layer => { currentLayerFilter = layer; },
+      house: () => activeHouse, eyeSpline: () => activeEyeSpline
+    });
+    const {
+      trackedWalls, trackedRoofs, trackedCeilings, registerTrackedWall, autoRegisterWall, registerCeiling, registerRoof, applyWallModeToMesh,
+      houseInside, simsCut, shotEnterT, applyShotCutaway, endShotCutaway, setGlobalWallMode, setGlobalLayerVisibility
+    } = visibility;
     window.__houseSimsCut = simsCut;   // QA hook: the gate decides with the same function the frame does
-
-    // first sample-space t at which the eye is under a ceiling (Infinity: the shot never goes in)
-    function shotEnterT(preset) {
-      if (preset.enterT !== undefined) return preset.enterT;
-      let enter = Infinity;
-      if (activeEyeSpline) for (let i = 0; i <= 240; i++) { const s = i / 240; if (houseInside(activeEyeSpline.getPointAt(s))) { enter = s; break; } }
-      preset.enterT = enter; return enter;
-    }
-    function setRoofOpacity(o) {
-      for (const r of trackedRoofs) {
-        r.visible = o > 0.01;
-        r.traverse(m => { if (!m.isMesh) return; const mats = Array.isArray(m.material) ? m.material : [m.material]; for (const mat of mats) { if (!mat) continue; const orig = mat.userData.orig || { transparent: false, opacity: 1, depthWrite: true }; mat.opacity = orig.opacity * o; if (mat.alphaHash) continue;   // dissolves on opacity alone; stays opaque, keeps writing depth
-          if (o < 0.999) { mat.transparent = true; mat.depthWrite = false; } else { mat.transparent = orig.transparent; mat.depthWrite = orig.depthWrite; } } });
-      }
-    }
-    // The shot says what the walls and the roofs do; the editor's buttons no longer leak into the video.
-    // dressing.walls: 'up' (full height — the eye uses the doorways) | 'cutaway' (the editor's dollhouse)
-    //                 | 'down' | 'sims' (per wall, per frame, above)
-    // dressing.roof:  'on' | 'off' | 'auto' (fades out over the 5 % of the shot before the eye goes indoors)
-    function applyShotCutaway(preset, sampleT, eye, target) {
-      const d = (preset && preset.dressing) || { walls: 'up', roof: 'auto' };
-      if (!shotCutaway) shotCutaway = { savedMode: currentWallMode, walls: null };
-      if (d.walls === 'sims') {
-        for (const w of trackedWalls) applyWallModeToMesh(w, simsCut(w, eye, target) ? 'cut' : 'keep');
-        shotCutaway.walls = 'sims';
-      } else if (shotCutaway.walls !== d.walls) {
-        for (const w of trackedWalls) applyWallModeToMesh(w, d.walls === 'cutaway' || d.walls === 'down' ? d.walls : 'up');
-        shotCutaway.walls = d.walls;
-      }
-      // A sims shot looks in from outside and above, so it never reaches an 'auto' roof's fade: there, auto
-      // means off, or the cut walls open onto a roof underside.
-      const roof = d.roof === 'auto' && d.walls === 'sims' ? 'off' : (d.roof || 'auto');
-      let o = 1;
-      if (roof === 'off') o = 0;
-      else if (roof === 'auto') {
-        const enter = shotEnterT(preset), fadeStart = enter - 0.05;
-        o = enter === Infinity ? 1 : sampleT <= fadeStart ? 1 : sampleT >= enter ? 0 : 1 - ((sampleT - fadeStart) / 0.05) ** 2;
-      }
-      setRoofOpacity(o);
-      for (const c of trackedCeilings) c.obj.visible = !eye || eye.y < c.y - 0.1;
-    }
-    function endShotCutaway() {
-      if (!shotCutaway) return;
-      const mode = shotCutaway.savedMode; shotCutaway = null;
-      setRoofOpacity(1);
-      setGlobalWallMode(mode);
-    }
     window.__houseShotCutaway = { houseInside, shotEnterT, end: endShotCutaway };   // QA hook
-
-    function setGlobalWallMode(mode) {
-      currentWallMode = mode;
-      document.querySelectorAll('#wall-cutaway-ctrl-group .btn-ctrl').forEach(b => b.classList.remove('active'));
-      const activeBtn = document.getElementById(`btn-wall-${mode}`);
-      if (activeBtn) activeBtn.classList.add('active');
-
-      trackedWalls.forEach(w => applyWallModeToMesh(w, mode));
-      trackedRoofs.forEach(r => { r.visible = (mode === 'up'); });
-      trackedCeilings.forEach(c => { c.obj.visible = (mode === 'up'); });
-    }
-
-    // =========================================================================
-    // FLOOR LAYER VISIBILITY
-    // Toggle between all floors, ground floor only (L1), or upper floor only (L2)
-    // Items at y >= FLOOR2_THRESHOLD are considered upper floor furniture.
-    // =========================================================================
-    function setGlobalLayerVisibility(layer) {
-      currentLayerFilter = layer;
-      document.querySelectorAll('#floor-layer-ctrl-group .btn-ctrl').forEach(b => b.classList.remove('active'));
-      const activeBtn = document.getElementById(`btn-layer-${layer}`);
-      if (activeBtn) activeBtn.classList.add('active');
-
-      placedItems.forEach(obj => {
-        if (!obj) return;
-        if (layer === 'all') {
-          obj.visible = true;
-        } else if (layer === 'floor1') {
-          // Show items on/near the ground floor (y < FLOOR2_THRESHOLD)
-          obj.visible = obj.position.y < FLOOR2_THRESHOLD;
-        } else if (layer === 'floor2') {
-          // Show only upper-floor items (y >= FLOOR2_THRESHOLD)
-          obj.visible = obj.position.y >= FLOOR2_THRESHOLD;
-        }
-      });
-    }
+    window.__houseVisibility = visibility;   // QA hook — and shotHidden(fn), how a shot hides things frame by frame
 
     // Exterior wall lantern (createParametricWall hangs them by the entry and the garage): a black cage round a
     // lamp, and a soft pool of light washed down the wall. The lamp and the wash are emissive and carry
@@ -6462,55 +6224,14 @@
     const toneName = TONE_MAPPERS[lightingParams.get('tone')] ? lightingParams.get('tone') : 'aces';
     const houseToneMapping = TONE_MAPPERS[toneName], houseToneExposure = TONE_EXPOSURE[toneName] ?? 1;
 
-    // The house the lights are aimed at, kept so the UI's preset select can re-light without rebuilding.
-    let lightingAim = { front: [0, 1], centre: [0, 0], preset: 'day' };
-    const DEG = Math.PI / 180;
-    function applyLighting(preset, aim = {}) {
-      if (preset) lightingAim.preset = lightingName(preset);
-      if (aim.front) lightingAim.front = aim.front;
-      if (aim.centre) lightingAim.centre = aim.centre;
-      const name = lightingAim.preset, p = TIME_OF_DAY[name];
-      const [cx, cz] = lightingAim.centre;
-      const s = sunDirection(p, lightingAim.front), D = 34;
-      // sun: the key, the only shadow caster. shadow.intensity < 1 leaves some sky in the shade (Pascal: 0.75).
-      sunLight.color.set(p.sun.color); sunLight.intensity = p.sun.intensity;
-      sunLight.position.set(cx + s[0] * D, s[1] * D, cz + s[2] * D);
-      sunLight.target.position.set(cx, 0, cz); sunLight.target.updateMatrixWorld();
-      sunLight.shadow.intensity = p.shadow;
-      // sky / ground bounce, and a cool fill from the far side at 35°
-      hemisphereLight.color.set(p.hemi.sky); hemisphereLight.groundColor.set(p.hemi.ground); hemisphereLight.intensity = p.hemi.intensity;
-      ambientLight.color.set(0xffffff); ambientLight.intensity = p.ambient;
-      const faz = Math.atan2(s[0], s[2]) + Math.PI, fel = 35 * DEG, F = 28;
-      rimLight.color.set(p.fill.color); rimLight.intensity = p.fill.intensity;
-      rimLight.position.set(cx + Math.sin(faz) * Math.cos(fel) * F, Math.sin(fel) * F, cz + Math.cos(faz) * Math.cos(fel) * F);
-      rimLight.target.position.set(cx, 1, cz); rimLight.target.updateMatrixWorld();
-      // sky: PMREM environment + backdrop; fog to the horizon colour
-      const sky = skyBaker.bake(name, p, s);
-      scene.environment = sky.environment; scene.environmentIntensity = p.env;
-      scene.background = sky.background; scene.backgroundIntensity = 1;
-      scene.fog.color.set(p.sky[1]); scene.fog.near = p.fog[0]; scene.fog.far = p.fog[1];
-      skyFog.ground.set(p.sky[2]); skyFog.sky.set(p.sky[0]);
-      scene.userData.horizon = parseInt(p.sky[1].slice(1), 16);
-      renderer.toneMapping = houseToneMapping;
-      renderer.toneMappingExposure = p.exposure * houseToneExposure;
-      refitShadow();   // a low sun throws long shadows: the box has to hold them, not just the lot
-      // the house's own light: tagged fixtures × lampGain, tagged window glass glowing (bloom/grade: composerFor)
-      const glow = applyHouseGlow(THREE, scene, p);
-      window.__houseLighting = { preset: name, label: p.label, lampGain: p.lampGain, windowGlow: p.windowGlow, glowColor: p.glowColor, horizon: scene.userData.horizon, sky: p.sky.slice(), sun: s, tagged: glow };
-      window.dispatchEvent(new CustomEvent('house:lighting', { detail: window.__houseLighting }));
-    }
-    // The builder's dep, and the UI select, both land here. `preset` is optional — applyLighting's own
-    // `if (preset)` guard is what leaves the current preset untouched when it's omitted (a spec without
-    // `lighting` still gets its sun aimed, per the builder's call site). Resolving a name unconditionally
-    // here defeated that guard by always handing applyLighting something truthy, forcing every build back to
-    // the default preset even when the caller passed nothing. The builder always passes an aim; the UI never
-    // does — so ?lighting= overrides the spec's preset, not the viewer's own choice.
-    function setLightingPreset(preset, aim) {
-      if (aim && LIGHTING_OVERRIDE) preset = LIGHTING_OVERRIDE;
-      const name = preset ? lightingName(preset) : undefined;
-      if (name && lightingSelect && lightingSelect.value !== name) lightingSelect.value = name;
-      applyLighting(name, aim);
-    }
+    // The light: assets/environment.ts createLighting (S1 owns it, plan Completeness A1) — applyLighting and
+    // setLightingPreset, the API the builder and the time-of-day control call, and lightingAim, the house the lights
+    // are aimed at (kept so the UI's preset select can re-light without rebuilding; refitShadow and the composer's
+    // look read it).
+    const { aim: lightingAim, applyLighting, setLightingPreset } = createLighting({
+      THREE, scene, renderer, sunLight, hemisphereLight, ambientLight, rimLight, skyBaker, skyFog, refitShadow,
+      toneMapping: houseToneMapping, toneExposure: houseToneExposure, select: lightingSelect, override: LIGHTING_OVERRIDE
+    });
     window.__houseSetLighting = (preset) => { setLightingPreset(preset); return window.__houseLighting; };   // QA hook
     applyLighting(LIGHTING_OVERRIDE || 'day');   // the editor's own view gets the same sky before any house loads
 
@@ -7086,10 +6807,20 @@
     // -------------------------------------------------------------
     // Spec-driven houses (HouseSpec v1 → ./assets/house-builder.js)
     // -------------------------------------------------------------
-    const houseBuilder = createHouseBuilder({
+    const houseBuilderDeps = {
       THREE, AssetFactory, ProceduralArchitecture, addItemToScene, registerTrackedWall, registerRoof, registerCeiling, fitShadow, setLightingPreset,
       textures: { oak: oakTexture, terrazzo: terrazzoTexture, 'phthalo-terrazzo': phthaloTerrazzoTexture, marble: carraraMarbleTexture, concrete: concreteTexture }
-    });
+    };
+    // A stream that needs one more page dependency in its builder module adds it on a new line under its own slot —
+    // `houseBuilderDeps.raycast = …;` — and reads it there as bctx.extra.<name> (assets/build-context.ts). Insertions
+    // under different slots merge cleanly; do not edit the object above or another stream's slot.
+    // S1 (kit):
+    // S2 (arch):
+    // S3 (compose):
+    // S4 (site):
+    // S5 (shot):
+    // S6 (ui):
+    const houseBuilder = createHouseBuilder(houseBuilderDeps);
     window.__houseBuilderRef = houseBuilder; window.__THREE = THREE;   // catalog builder / QA hooks
     const houseSpecs = new Map();      // id → spec (cached fetches)
     let activeHouse = null;            // { spec, anchors, shots }
@@ -7873,13 +7604,20 @@
       activeEyeSpline = new THREE.CatmullRomCurve3(preset.eyePoints, preset.closed, 'centripetal');
       activeTargetSpline = new THREE.CatmullRomCurve3(preset.targetPoints, preset.closed, 'centripetal');
 
+      // the path as data — 161 points along the eye curve and the waypoints — drawn by the overlay (drawShotPath)
+      drawShotPath(activeEyeSpline.getPoints(160), preset.eyePoints);
+    }
+
+    // ---- The shot's overlay (owner: S6 ui — plan Completeness C5: the shot planner hands over path data only; how
+    // the path, its markers and the time readout look is the editor's). drawShotPath replaces the drawn path with
+    // `points` (the eye curve, sampled) and a marker per waypoint; showShotTime moves the timeline and its readout.
+    function drawShotPath(points, waypoints) {
       // Remove previous line & markers
       if (splineLineMesh) scene.remove(splineLineMesh);
       waypointMarkers.forEach(m => scene.remove(m));
       waypointMarkers = [];
 
       // Create visual 3D trajectory line
-      const points = activeEyeSpline.getPoints(160);
       const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
       const lineMat = new THREE.LineBasicMaterial({
         color: 0x38bdf8,
@@ -7892,10 +7630,10 @@
       scene.add(splineLineMesh);
 
       // Create waypoint markers
-      preset.eyePoints.forEach((pt, i) => {
+      waypoints.forEach((pt, i) => {
         const markerGeo = new THREE.SphereGeometry(0.12, 12, 12);
         const markerMat = new THREE.MeshBasicMaterial({
-          color: (i === 0 ? 0x10b981 : (i === preset.eyePoints.length - 1 ? 0xf43f5e : 0xfbbf24))
+          color: (i === 0 ? 0x10b981 : (i === waypoints.length - 1 ? 0xf43f5e : 0xfbbf24))
         });
         const marker = new THREE.Mesh(markerGeo, markerMat);
         marker.position.copy(pt);
@@ -7903,6 +7641,13 @@
         scene.add(marker);
         waypointMarkers.push(marker);
       });
+    }
+    // t: the shot's 0–1 progress; duration: seconds
+    function showShotTime(t, duration) {
+      animTimelineSlider.value = Math.round(t * 1000);
+      const curSec = Math.floor(t * duration);
+      const curMs = Math.floor((t * duration % 1) * 10);
+      animTimeReadout.textContent = `00:${curSec.toString().padStart(2, '0')}.${curMs} / 00:${duration.toString().padStart(2, '0')}`;
     }
 
     function syncFlythroughWithScene(sceneKey) {
@@ -7935,6 +7680,18 @@
     // Returns [{ id, url (jpeg data URL), errors }]. Used by the contact-sheet QA harness and the
     // gallery poster exporter. camera: 'iso' (SE isometric, zoom fits the lot) | 'shot' (spline frame t).
     window.__houseShotDuration = (id, shot) => (SplinePresets[`house:${id}:${shot}`] || {}).duration || animDuration;
+    // The shot as a baked track (assets/shot-track.ts): eye, look, field of view and roof fade at 120 Hz, and its
+    // events, in seconds — what the timeline reads. Sampled from the v1 path the way applySplineFrame flies it, with no
+    // beats yet (planner v2 bakes them). Reads the preset, writes nothing: asking never changes a frame.
+    //   __houseShotTrack('door-to-core' | 'house:<id>:<shot>' | preset, { fps, aspect })
+    window.__houseShotTrack = function (shot = 'door-to-core', { fps = 120, aspect = 16 / 9 } = {}) {
+      if (!activeHouse) throw new Error('no house loaded');
+      const key = typeof shot === 'string' ? (shot.startsWith('house:') ? shot : `house:${activeHouse.id}:${shot}`) : null;
+      const preset = key ? SplinePresets[key] : shot;
+      if (!preset || !preset.eyePoints) throw new Error(`unknown shot ${key || shot}`);
+      const type = preset.type || (key ? key.split(':').pop() : '');
+      return trackFromV1(THREE, preset, { type, duration: preset.duration || animDuration, fps, aspect, houseInside });
+    };
     // headless QA hook (render-house-shots.mts / frame checks): the loaded house's spec + anchors, the scene and camera
     window.__houseDebug = () => ({ house: activeHouse, scene, camera: activeCamera, presets: SplinePresets, renderer });
     // Prop sheet (scripts/prop-sheet.mts): each type built alone on a neutral floor, shot from the front-right
@@ -8516,12 +8273,17 @@
           if (frac > 0.3) W('planting-grid', (frac * 100).toFixed(0) + ' % of plant pairs share an x or a z within 5 cm over ' + pts.length + ' plants — that is a grid');
         }
 
+        // --- the checks the streams register (assets/scene-qa/: one code each, after the page's own)
+        for (const is of runSceneChecks({ THREE, scene, house: activeHouse, placedItems, trackedWalls, trackedRoofs, trackedCeilings, dressing, shown })) (is.level === 'error' ? E : W)(is.code, is.message, is.subject);
+
         return { id: activeHouse.id, errors, warnings, walls: trackedWalls.length, roofs: trackedRoofs.length, items: placedItems.length };
       } finally {
         endShotCutaway();
         setGlobalWallMode(prevMode);
       }
     };
+    // register(code, ctx => issues): a scene check added at run time, beside the modules' (assets/scene-qa/registry.ts)
+    window.__houseSceneQA.register = registerSceneCheck;
 
     window.houseContactSheet = async function (ids, { wallMode = 'up', camera = 'iso', shot = 'orbit', t = 0, zoom = null } = {}) {
       const out = [];
@@ -8729,11 +8491,8 @@
         }
       }
 
-      // Update timeline slider & time readout
-      animTimelineSlider.value = Math.round(clampedT * 1000);
-      const curSec = Math.floor(clampedT * animDuration);
-      const curMs = Math.floor((clampedT * animDuration % 1) * 10);
-      animTimeReadout.textContent = `00:${curSec.toString().padStart(2, '0')}.${curMs} / 00:${animDuration.toString().padStart(2, '0')}`;
+      // Update timeline slider & time readout (the overlay's: showShotTime)
+      showShotTime(clampedT, animDuration);
     }
 
     splineSelect.addEventListener('change', (e) => {
