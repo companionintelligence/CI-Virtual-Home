@@ -2,8 +2,10 @@
 //
 // Types only: nothing here runs. The parts are FLAT (no nested arrays of other parts): assets/spec/index.ts
 // composes them into the full HouseSpec together with each stream's fragment (kit.ts, arch.ts, compose.ts,
-// site.ts, shots.ts), so a stream adds a field by editing only its own fragment. Owned by S0 and frozen; a
-// stream that must WIDEN a field declared here (a string becoming string | object) edits that one line.
+// site.ts, shots.ts), so a stream adds a field by editing only its own fragment. Owned by S0 and frozen — a
+// stream that must WIDEN a field declared here (a string becoming string | object, one more enum value)
+// redeclares it, wider, in its own fragment: index.ts lets the fragment's replace this one, and fails the
+// compile if it narrows instead.
 //
 // Loose on purpose where the builders are: item and site entries carry builder-specific parameters, so they
 // keep an index signature.
@@ -39,7 +41,8 @@ export interface BaseOpening {
   w: number;
   h?: number;
   sill?: number;
-  style?: 'entry' | 'cased' | 'glass-slider';
+  /** a door's unit: `garage` is a sectional door on a hinged-door opening (type `garage` implies it) */
+  style?: 'entry' | 'cased' | 'glass-slider' | 'garage';
   open?: boolean;
   /** leaf colour of a hinged door (≤ 1.1 m wide; wider doors are cased openings with no leaf) */
   color?: Colour;
@@ -91,6 +94,14 @@ export interface BaseRoom {
   bounds: Rect;
 }
 
+/** one rect of a storey's footprint */
+export interface BaseFootprintRect {
+  x: number;
+  z: number;
+  w: number;
+  d: number;
+}
+
 export interface BaseLevel {
   id: string;
   name?: string;
@@ -98,7 +109,7 @@ export interface BaseLevel {
   y: number;
   height: number;
   floor?: string;
-  footprint: Rect[];
+  footprint: BaseFootprintRect[];
   wallColor?: Colour;
   trimColor?: Colour;
   interior?: Colour;
@@ -179,4 +190,7 @@ export interface BaseHouseSpec {
    * variety, restraint). Read it through specDefaults(spec), never directly.
    */
   defaults?: 1 | 2;
+  /** test/fixtures/houses only: what scripts/test-fixtures.mts renders of it (`frames`: shot → t list) and whether
+   *  it runs the QA (`qa: false` skips it); ignored by the builder */
+  fixture?: { note?: string; frames?: Record<string, number[]>; qa?: boolean };
 }

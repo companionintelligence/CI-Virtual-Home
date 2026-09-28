@@ -79,7 +79,7 @@ any value but 1 or 2.
     // side = S|N|E|W. `at` is the X coordinate for S/N walls and the Z coordinate for E/W walls
     // (the world coordinate of the opening centre). The builder finds the perimeter edge on that side.
     { "side": "S", "at": 0,    "type": "door",   "w": 1.0, "h": 2.1, "style": "entry", "color": "#…" },
-                     // style: entry | cased | glass-slider. color: the leaf's (default teal #0f766e). A door wider
+                     // style: entry | cased | glass-slider | garage. color: the leaf's (default teal #0f766e). A door wider
                      // than 1.1 m is a cased opening with no leaf, so its color does nothing
     { "side": "S", "at": -3.5, "type": "window", "w": 1.4, "h": 1.3, "sill": 0.9 },
     { "side": "N", "at": 2,    "type": "slider", "w": 2.4, "h": 2.2 },                       // sliding glass patio door
@@ -226,6 +226,12 @@ Each stream of pass 4 documents the fields it adds in its own section here, as t
 its fragment under `assets/spec/`, its lints in its plugin under `scripts/validate/`, and its fixtures in
 `test/fixtures/houses/<stream>-*.json`. Every field is optional, and a look-changing default applies only under
 `"defaults": 2`.
+
+- **Types.** A field is declared in the stream's fragment. To widen one this document already defines (another
+  enum value, a string that may also be an object — `lighting`, `hero.surface`, `lot.ground`, `levels[].stairs` as
+  an array), redeclare it there, wider: `assets/spec/index.ts` lets a fragment's field replace the base's and fails
+  the compile if it narrows. `scripts/test-spec-types.mts` type-checks the 30 specs and every fixture against
+  `HouseSpec`, so a fixture that uses a field no fragment declares fails the gate.
 
 ### Kit (S1)
 
