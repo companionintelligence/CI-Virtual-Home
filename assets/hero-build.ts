@@ -31,7 +31,7 @@ export const heroIslandStone = (spec: any): number => spec.hero && spec.hero.sur
 export function heroSurfaceColour(spec: any): number | null {
   const h = spec.hero || {}, s = h.surface || 'desk';
   if (h.surfaceColor) return hex(h.surfaceColor);
-  if (s === 'desk') return h.desk && h.desk.color ? hex(h.desk.color) : ({ walnut: 0x452818, oak: 0xa88b69, white: 0xe9e6e0, black: 0x1f1f21 })[(h.desk && h.desk.style) || 'walnut'] ?? 0x452818;
+  if (s === 'desk') return h.desk && h.desk.color ? hex(h.desk.color) : ({ walnut: 0x452818, oak: 0xa88b69, white: 0xd4d0c9, black: 0x1f1f21 })[(h.desk && h.desk.style) || 'walnut'] ?? 0x452818;
   if (s === 'shelf') return 0x6b4a2b;
   if (s === 'island' || s === 'kitchen-island') return heroIslandStone(spec);
   if (s === 'none') return null;

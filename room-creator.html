@@ -4167,9 +4167,10 @@
         // Desktop
         const topGeo = new THREE.BoxGeometry(w, 0.06, 0.85);
         const topMat = new THREE.MeshStandardMaterial({
-          color: color !== undefined ? color : ({ walnut: 0x452818, oak: 0xa88b69, white: 0xe9e6e0, black: 0x1f1f21 })[style] ?? 0x452818,
-          roughness: 0.35,
-          metalness: 0.1
+          // a painted top is matte and a shade under paper white: under a room's own light it would read as a lamp
+          color: color !== undefined ? color : ({ walnut: 0x452818, oak: 0xa88b69, white: 0xd4d0c9, black: 0x1f1f21 })[style] ?? 0x452818,
+          roughness: style === 'walnut' && color === undefined ? 0.35 : 0.55,
+          metalness: style === 'walnut' && color === undefined ? 0.1 : 0.02
         });
         const top = new THREE.Mesh(topGeo, topMat);
         top.position.y = 0.74;
