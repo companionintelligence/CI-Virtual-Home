@@ -10,11 +10,57 @@ import { createWallCompiler } from './wall-compiler.js';
 import { buildRoofs } from './roofs.js';
 import { DEG, hex, mix } from './build-context.js';
 import { specDefaults } from './spec/index.js';
+import { levelStairs, stairPlan, createStairBuilder } from './stairs.js';
+import { slabOpenings, archEdges, edgeFor, rectOfEdge, edgeHeight, wallPieces, volumeSteps } from './arch-plan.js';
+import { createArchMaterials } from './arch-materials.js';
+import { createFeatures } from './features.js';
 
 // kitb (kit-build.ts, S1) turns the spec's doors, colours and finishes into the parameters below; this module
 // keeps the geometry round each call.
 export function createStructureBuild(bctx, { kitb }) {
   const { THREE, AssetFactory, ProceduralArchitecture, registerTrackedWall, registerRoof, registerCeiling, textures, useGraphWalls, std, group } = bctx;
+  const stairBuilder = createStairBuilder({ THREE, ProceduralArchitecture, textures });
+  const features = createFeatures(bctx);
+  const FULL = [{ lo: 0, hi: 0, party: false }];   // a v1 wall: one piece, the storey's full height
+
+  // ---- S2's wall helpers ----------------------------------------------------------------------------------------
+  // a lower wall (a knee wall, a low volume): its openings stop under its head
+  const clipOpenings = (openings, hh) => openings.map(o => {
+    if (o.type === 'window') { const top = (o.sillY ?? 0.9) + (o.height ?? 1.2); return top > hh - 0.08 ? { ...o, height: Math.max(0.2, hh - 0.08 - (o.sillY ?? 0.9)) } : o; }
+    return (o.height ?? 2.1) > hh - 0.08 ? { ...o, height: hh - 0.08 } : o;
+  });
+  // the openings that reach a band [lo, hi] of a wall, in the band's own frame
+  const bandHoles = (openings, lo, hi) => openings.map(o => {
+    const b0 = o.type === 'window' ? (o.sillY ?? 0.9) : 0, b1 = b0 + (o.height ?? (o.type === 'window' ? 1.2 : 2.1));
+    const y0 = Math.max(0, b0 - lo), y1 = Math.min(hi - lo, b1 - lo);
+    return y1 - y0 > 0.03 ? { x0: o.offset - o.width / 2, x1: o.offset + o.width / 2, y0, y1, glazed: o.type === 'window' } : null;
+  }).filter(Boolean);
+  // A plain wall band — a strip of a shared split-level wall, or the wall a tower stands on over a lower wing: boxes
+  // round its holes, paint inside, the cladding (or paint: a party band) outside, a white section on top. Built in the
+  // wall frame (local +z out), its base at local y 0.
+  function bandWall({ length, h, holes, inside, outside, name }) {
+    const g = group(name, { category: 'Architecture', isWall: true, band: true });
+    const T = 0.16, paint = std(inside, { roughness: 0.7 }), cap = std(0xf6f5f2, { roughness: 0.92 });
+    const mats = [paint, paint, cap, paint, outside || paint, paint];
+    const xs = [...new Set([-length / 2, length / 2, ...holes.flatMap(o => [Math.max(-length / 2, o.x0), Math.min(length / 2, o.x1)])])].sort((a, b) => a - b);
+    for (let i = 0; i < xs.length - 1; i++) {
+      const x0 = xs[i], x1 = xs[i + 1], xm = (x0 + x1) / 2;
+      if (x1 - x0 < 0.005) continue;
+      const cut = holes.filter(o => xm > o.x0 && xm < o.x1).map(o => [o.y0, o.y1]).sort((a, b) => a[0] - b[0]);
+      let yy = 0;
+      for (const [c0, c1] of [...cut, [h, h]]) {
+        if (c0 - yy > 0.005) { const m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, c0 - yy, T), mats); m.position.set(xm, (yy + c0) / 2, 0); m.castShadow = true; m.receiveShadow = true; g.add(m); }
+        yy = Math.max(yy, c1);
+      }
+    }
+    const frame = std(0x2b2f33, { roughness: 0.5 });
+    for (const o of holes.filter(o => o.glazed)) {
+      const w = o.x1 - o.x0, hh = o.y1 - o.y0, xm = (o.x0 + o.x1) / 2, ym = (o.y0 + o.y1) / 2;
+      const gl = new THREE.Mesh(new THREE.PlaneGeometry(w - 0.1, hh - 0.1), bctx.glassMat()); gl.position.set(xm, ym, 0.045); gl.userData.windowGlow = true; g.add(gl);
+      for (const [bw, bh, bx, by] of [[w, 0.05, xm, o.y0 + 0.025], [w, 0.05, xm, o.y1 - 0.025], [0.05, hh, o.x0 + 0.025, ym], [0.05, hh, o.x1 - 0.025, ym]]) { const b = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.06), frame); b.position.set(bx, by, 0.045); g.add(b); }
+    }
+    return g;
+  }
 
   // Roofs: assets/roofs.ts (eaves hung below the wall top, fascia, gutters and downspouts, ridge caps, gable ends).
 
@@ -53,6 +99,7 @@ export function createStructureBuild(bctx, { kitb }) {
   function buildLevel({ spec, lv, levelById, palette, kit, anchors, put, graphs }) {
     const floorTex = name => textures[name === 'oak' ? 'oak' : name] || kit.floorTexture(name) || textures.oak;
     const defaults = specDefaults(spec);
+    let _am = null; const am = () => _am || (_am = createArchMaterials(THREE, kit));   // S2's materials, made only when asked for
     const y = lv.y || 0, H = lv.height || 2.8;
     const wallColor = hex(lv.wallColor || palette.wall), trimColor = hex(lv.trimColor || palette.trim);
     // interior paint: palette.interior / lv.interior, else the wall colour lifted toward off-white when the
@@ -79,7 +126,11 @@ export function createStructureBuild(bctx, { kitb }) {
         const g = group(`Upper Floor Slab (${lv.id} @ y=${y})`, { category: 'Architecture' });
         const shape = new THREE.Shape(loops.outer.map(p => new THREE.Vector2(p[0], p[1])));
         for (const h of loops.holes) shape.holes.push(new THREE.Path(h.map(p => new THREE.Vector2(p[0], p[1]))));
-        for (const v of lv.voids || []) shape.holes.push(new THREE.Path([[v.x, v.z], [v.x + v.w, v.z], [v.x + v.w, v.z + v.d], [v.x, v.z + v.d]].map(p => new THREE.Vector2(p[0], p[1]))));
+        const openings = slabOpenings(spec, lv);
+        if (!openings) for (const v of lv.voids || []) shape.holes.push(new THREE.Path([[v.x, v.z], [v.x + v.w, v.z], [v.x + v.w, v.z + v.d], [v.x, v.z + v.d]].map(p => new THREE.Vector2(p[0], p[1]))));
+        // S2: flights with autoVoid and double-height rooms below open the slab too — the union of every opening, one
+        // hole per loop (overlapping holes break the triangulation)
+        else for (const loop of openings) shape.holes.push(new THREE.Path(loop.map(p => new THREE.Vector2(p[0], p[1]))));
         const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.18, bevelEnabled: false });
         geo.rotateX(Math.PI / 2); // shape XY → plan XZ (y down by depth)
         const mesh = new THREE.Mesh(geo, floorMat); mesh.castShadow = true; mesh.receiveShadow = true;
@@ -95,26 +146,49 @@ export function createStructureBuild(bctx, { kitb }) {
     if (useGraphWalls) {
       graphs[lv.id] = buildGraphWalls(spec, lv, y, H, wallColor, anchors, put);
     } else {
-      // perimeter walls with openings
-      const ops = (lv.openings || []).map(op => ({ ...op, edge: edgeForOpening(edges, op.side, op.at) })).filter(o => o.edge);
-      for (const e of edges) {
+      // perimeter walls with openings. S2 splits a wall where the volume behind it changes (footprint[i].material,
+      // .color, .h), lowers it for knee walls, and in a split-level house builds only the bands of a wall another
+      // storey does not (arch-plan.ts wallEdges / wallPieces). For a storey that asks for none of it every edge is one
+      // piece, full height — the v1 wall, built by the v1 call.
+      const wallEdges = archEdges(spec, lv, edges);
+      const special = wallEdges !== edges || lv.knee !== undefined;
+      const ops = (lv.openings || []).map(op => ({ ...op, edge: edgeFor(wallEdges, op) })).filter(o => o.edge);
+      for (const e of wallEdges) {
         const horiz = e.side === 'S' || e.side === 'N';
         const mid = horiz ? (e.a[0] + e.b[0]) / 2 : (e.a[1] + e.b[1]) / 2;
         const cx = horiz ? mid : e.a[0], cz = horiz ? e.a[1] : mid;
         const mine = ops.filter(o => o.edge === e);
         const isEntry = op => spec.entry && spec.entry.level === lv.id && spec.entry.side === op.side && Math.abs(spec.entry.at - op.at) < 1e-6;
-        const openings = mine.map(op => ({ ...kitb.openingParams(op, H, isEntry(op), { spec, defaults, lv }), offset: localOffset(e.side, op.at, mid) }));
+        const rect = special ? rectOfEdge(lv, e) : null;
+        const Hw = special ? edgeHeight(lv, rect, H) : H;
+        const openings = mine.map(op => ({ ...kitb.openingParams(op, Hw, isEntry(op), { spec, defaults, lv }), offset: localOffset(e.side, op.at, mid) }));
         // is the wall's local +x end an outside corner? (beyond that end, on both sides of the wall line, is
         // outside the footprint) — the wall fills and trims that corner (createParametricWall)
         const dx = { S: [1, 0], N: [-1, 0], E: [0, -1], W: [0, 1] }[e.side], nv = { S: [0, 1], N: [0, -1], E: [1, 0], W: [-1, 0] }[e.side];
         const pe = e.a[0] * dx[0] + e.a[1] * dx[1] > e.b[0] * dx[0] + e.b[1] * dx[1] ? e.a : e.b;
         const outerCorner = [1, -1].every(k => { const px = pe[0] + dx[0] * 0.05 + k * nv[0] * 0.05, pz = pe[1] + dx[1] * 0.05 + k * nv[1] * 0.05; return !lv.footprint.some(r => px > r.x && px < r.x + r.w && pz > r.z && pz < r.z + r.d); });
-        const w = put(() => ProceduralArchitecture.createParametricWall({
-          length: e.length, height: H, wallColor: interior, trimColor, baseboardColor: mix(interior, 0xffffff, 0.5),
-          orientation: SIDE_ORI[e.side], openings, cladding: kitb.wallCladding(kit, { spec, defaults, lv, edge: e }), exteriorColor: wallColor, outerCorner
-        }), cx, cz, y);
-        w.rotation.y = SIDE_ROT[e.side];
-        registerTrackedWall(w, SIDE_ORI[e.side], H, 0.85);
+        // the volume's own cladding (per-volume cladding), else the kit's
+        const volClad = rect && (rect.material !== undefined || rect.color !== undefined) ? am().cladding({ kind: rect.material || palette.material || 'stucco', color: rect.color || lv.wallColor || palette.wall }) : null;
+        const extColor = rect && rect.color !== undefined ? hex(rect.color) : wallColor;
+        let w = null;
+        for (const pc of special ? wallPieces(spec, lv, e, Hw) : FULL) {
+          if (!special || (pc.lo === 0 && !pc.party)) {
+            const hh = special ? pc.hi : H;
+            w = put(() => ProceduralArchitecture.createParametricWall({
+              length: e.length, height: hh, wallColor: interior, trimColor, baseboardColor: mix(interior, 0xffffff, 0.5),
+              orientation: SIDE_ORI[e.side], openings: special ? clipOpenings(openings, hh) : openings, cladding: volClad || kitb.wallCladding(kit, { spec, defaults, lv, edge: e }), exteriorColor: extColor, outerCorner
+            }), cx, cz, y);
+            w.rotation.y = SIDE_ROT[e.side];
+            registerTrackedWall(w, SIDE_ORI[e.side], hh, 0.85);
+          } else {
+            // a band of a shared (split-level) wall, or a party band: its own box work round the openings that reach it
+            const band = put(() => bandWall({ length: e.length, h: pc.hi - pc.lo, holes: bandHoles(openings, pc.lo, pc.hi), inside: interior,
+              outside: pc.party ? null : (volClad || kitb.wallCladding(kit, { spec, defaults, lv, edge: e })), name: `Wall band (${e.side} ${lv.id} +${+pc.lo.toFixed(2)}–${+pc.hi.toFixed(2)}m${pc.party ? ', party' : ''})` }), cx, cz, y + pc.lo, null, null);
+            band.rotation.y = SIDE_ROT[e.side];
+            registerTrackedWall(band, pc.party ? 'partition' : SIDE_ORI[e.side], pc.hi - pc.lo, Math.min(0.85, pc.hi - pc.lo));
+            if (!w) w = band;
+          }
+        }
         mine.forEach((op, i) => kitb.noteOpening({ spec, defaults, lv, anchors, op, param: openings[i], side: e.side, y, isEntry: isEntry(op) }));
         for (const op of mine) if (isEntry(op)) {
           const out = { S: [0, 1], N: [0, -1], E: [1, 0], W: [-1, 0] }[op.side];
@@ -125,9 +199,20 @@ export function createStructureBuild(bctx, { kitb }) {
           anchors.entry = { x: (horiz ? op.at : e.a[0]) + (horiz ? (op.side === 'S' ? -shift : shift) : 0), y, z: (horiz ? e.a[1] : op.at) + (horiz ? 0 : (op.side === 'E' ? shift : -shift)), out, side: op.side, level: lv.id, width: op.w };
         }
       }
+      // per-rect heights: where a taller volume stands over a lower one, the wall between them above the lower
+      for (const st of volumeSteps(lv, H)) {
+        const horiz = st.side === 'S' || st.side === 'N', m = (horiz ? st.a[0] + st.b[0] : st.a[1] + st.b[1]) / 2;
+        const clad = st.rect.material !== undefined || st.rect.color !== undefined ? am().cladding({ kind: st.rect.material || palette.material || 'stucco', color: st.rect.color || lv.wallColor || palette.wall }) : kitb.wallCladding(kit, { spec, defaults, lv, edge: st });
+        const band = put(() => bandWall({ length: st.length + 0.16, h: st.hi - st.lo, holes: [], inside: interior, outside: clad, name: `Volume step (${st.side} ${lv.id} +${+st.lo.toFixed(2)}–${+st.hi.toFixed(2)}m)` }),
+          horiz ? m : st.a[0], horiz ? st.a[1] : m, y + st.lo, null, null);
+        band.rotation.y = SIDE_ROT[st.side];
+        registerTrackedWall(band, SIDE_ORI[st.side], st.hi - st.lo, Math.min(0.85, st.hi - st.lo));
+      }
 
-      // partitions
-      for (const p of lv.partitions || []) {
+      // partitions (a partition with a `style` other than solid is built by features.ts)
+      const topStorey = !(spec.levels || []).some(o => (o.y || 0) > y + 0.5);
+      (lv.partitions || []).forEach((p, pi) => {
+        if (p.style && p.style !== 'solid') { features.partition({ spec, lv, p, index: pi, y, H, interior, trimColor, put, am: am(), kitb, defaults }); return; }
         const alongX = Math.abs(p.from[1] - p.to[1]) < 1e-6;
         const len = Math.abs(alongX ? p.to[0] - p.from[0] : p.to[1] - p.from[1]);
         const cx = (p.from[0] + p.to[0]) / 2, cz = (p.from[1] + p.to[1]) / 2;
@@ -136,34 +221,52 @@ export function createStructureBuild(bctx, { kitb }) {
         // sits past `to`). Without this every N–S partition had its doorway mirrored about the wall's middle.
         const dir = alongX ? Math.sign(p.to[0] - p.from[0]) || 1 : -(Math.sign(p.to[1] - p.from[1]) || 1);
         const door = p.door === null || p.door === undefined ? null : dir * (p.door - len / 2);
-        const wall = put(() => ProceduralArchitecture.createInteriorPartitionWall({
-          length: len, height: p.height || H - 0.1, ...kitb.partitionParams(p, { spec, defaults, lv, interior, trimColor }), doorOffset: door
+        // under `defaults: 2` a top storey's partition meets its ceiling (the 8 cm slot under it read as a black line)
+        const ph = p.height || (defaults >= 2 && topStorey ? H - 0.025 : H - 0.1);
+        let wall;
+        if (Array.isArray(p.doors) && p.doors.length) {
+          // more than one doorway: the partition's wall unit with every door in it (S1's partition params spread)
+          const pp = kitb.partitionParams(p, { spec, defaults, lv, interior, trimColor });
+          const doors = [...(door !== null ? [{ offset: door, width: pp.doorWidth }] : []), ...p.doors.map(d => ({ offset: dir * (d.at - len / 2), width: d.w || pp.doorWidth, height: d.h }))];
+          wall = put(() => ProceduralArchitecture.createParametricWall({
+            length: len, height: ph, thickness: 0.14, wallColor: pp.wallColor, trimColor: pp.trimColor, baseboardColor: pp.baseboardColor ?? 0xe2e8f0, orientation: 'partition',
+            openings: doors.map(d => ({ type: 'door', offset: d.offset, width: d.width, height: d.height || pp.doorHeight || 2.1, style: 'cased', open: true, ...(pp.leafColor !== undefined ? { leafColor: pp.leafColor } : {}) }))
+          }), cx, cz, y);
+        } else wall = put(() => ProceduralArchitecture.createInteriorPartitionWall({
+          length: len, height: ph, ...kitb.partitionParams(p, { spec, defaults, lv, interior, trimColor }), doorOffset: door
         }), cx, cz, y);
         if (!alongX) wall.rotation.y = Math.PI / 2;
-        registerTrackedWall(wall, 'partition', p.height || H - 0.1, 0.85);
-      }
+        registerTrackedWall(wall, 'partition', ph, 0.85);
+      });
     }
 
-    // stairs
-    if (lv.stairs) {
-      const to = levelById[lv.stairs.to];
-      const total = to ? (to.y - y) : 2.8;
-      const st = lv.stairs;
-      const fn = st.type === 'colonial' ? () => ProceduralArchitecture.createColonialStairs({ totalHeight: total, steps: Math.round(total / 0.2), width: st.w || 1.2, run: st.run || 3.36 })
-        : st.type === 'spiral' ? () => ProceduralArchitecture.createSpiralStairs({ totalHeight: total, steps: Math.round(total / 0.18) })
-        : () => ProceduralArchitecture.createFloatingTimberStairs({ totalHeight: total, steps: Math.round(total / 0.2), width: st.w || 1.1, run: st.run || 3.36 });
-      const s = put(fn, st.at[0], st.at[1], y, null, 'structure');
+    // stairs (stairs.ts): one flight or several (levels[].stairs may be an array: Completeness A2); straight,
+    // spiral, L and U. A single straight or spiral flight is built with the v1 call and anchored with the v1
+    // numbers exactly — the shot planner reads them.
+    levelStairs(lv).forEach((st, index) => {
+      const p = stairPlan(st, lv, levelById, index);
+      if (!p) return;
+      const s = put(() => stairBuilder.build(p, st), st.at[0], st.at[1], y, null, 'structure');
       s.rotation.y = (st.rot || 0) * DEG;
       s.userData.stair = true;   // the shot gate's stair-clip test and door-to-core's clip repair look for it
-      // top-of-stairs position: run along the ascent direction (rot 0 → +Z)
+      const total = p.rise;
+      // top-of-stairs position: run along the ascent direction (rot 0 → +Z); a turning flight: its last step, and the
+      // heading off it
+      const turning = p.shape === 'L' || p.shape === 'U';
       const run = st.type === 'spiral' ? 0 : (st.run || 3.36);
-      const dir = [Math.sin((st.rot || 0) * DEG), Math.cos((st.rot || 0) * DEG)];
+      const dir = turning ? p.dir : [Math.sin((st.rot || 0) * DEG), Math.cos((st.rot || 0) * DEG)];
+      const topXZ = turning ? p.top : [st.at[0] + dir[0] * run, st.at[1] + dir[1] * run];
       // plan: the flight's footprint on its own storey — somewhere a walk there must go round, not under
       s.updateMatrixWorld(true);
       const sb = new THREE.Box3().setFromObject(s);
-      anchors.stairs.push({ from: lv.id, to: st.to, bottom: [st.at[0], y, st.at[1]], top: [st.at[0] + dir[0] * run, y + total, st.at[1] + dir[1] * run], dir,
-        plan: { minX: sb.min.x, maxX: sb.max.x, minZ: sb.min.z, maxZ: sb.max.z } });
-    }
+      anchors.stairs.push({ from: lv.id, to: st.to, bottom: [st.at[0], y, st.at[1]], top: [topXZ[0], y + total, topXZ[1]], dir,
+        plan: { minX: sb.min.x, maxX: sb.max.x, minZ: sb.min.z, maxZ: sb.max.z },
+        // S2's own (Completeness A2, for S5's routing and S6's plan inset): what the flight is, its first heading, the
+        // walking line first step to last (world, y absolute), landings, outline, the void it needs, its step-off
+        ...(p.shape !== 'straight' || index > 0 || Array.isArray(lv.stairs) ? { type: p.type, shape: p.shape, index, dir0: p.dir0, w: p.w,
+          path: p.path.map(([px, py, pz]) => [px, y + py, pz]), landings: p.landings.map(l => ({ ...l, y: y + l.y })),
+          outline: p.outline, voidRects: p.voidRects, stepOff: p.stepOff } : {}) });
+    });
 
     // balustrades
     for (const bl of lv.balustrades || []) {

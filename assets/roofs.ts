@@ -81,6 +81,88 @@ const RAKE = 0.3;                // most a gable's rake overhangs its end wall
 const KEEP_OUT = { porch: [6, 2.5], pergola: [4, 3], greenhouse: [3.6, 2.4], pool: [6, 4], 'turtle-pool': [8, 6], pond: [4, 3], hottub: [2.2, 2.2], gazebo: [4.4, 4.4] };
 const GROUND_COVER = { deck: 0.12, patio: 0.08, driveway: 0.06 };
 
+// The THREE-free plan of every roof of a spec: its wall rectangle, overhangs, faces and the height functions (under: the
+// deck's underside over the eave elevation; topAt: the deck's top, absolute). S2's chimney stacks, knee-wall ceilings
+// and lints read these too.
+export function planRoofModels(spec) { return (spec.roofs || []).map(rf => planRoofModel(spec, rf)); }
+/** the highest roof top over (x, z), or null where no roof covers it */
+export function roofTopAt(models, x, z) { let h = null; for (const m of models) if (inRect(x, z, m.o)) { const t = m.topAt(x, z); if (h === null || t > h) h = t; } return h; }
+/** the lowest roof underside over (x, z) (absolute), or null */
+export function roofUnderAt(models, x, z) { let h = null; for (const m of models) if (inRect(x, z, m.o)) { const u = m.y + (m.type === 'flat' ? 0 : m.under(x, z)); if (h === null || u < h) h = u; } return h; }
+
+function planRoofModel(spec, rf) {
+  const levels = spec.levels || [];
+  const type = rf.type || 'gable';
+  const y = rf.y ?? 2.8;
+  const over = rf.over;
+  const oh = rf.overhang ?? 0;
+  const O: Rect = { x0: over.x, x1: over.x + over.w, z0: over.z, z1: over.z + over.d };
+  // the wall rectangle: the storey this roof caps (its top is the eave elevation), clipped to `over`
+  const lv = levels.find(l => Math.abs((l.y || 0) + (l.height || 2.8) - y) < 0.05);
+  const W: Rect = { ...O };
+  if (lv) {
+    const rs = (lv.footprint || []).filter(r => r.x < O.x1 && r.x + r.w > O.x0 && r.z < O.z1 && r.z + r.d > O.z0);
+    if (rs.length) {
+      W.x0 = Math.max(O.x0, Math.min(...rs.map(r => r.x))); W.x1 = Math.min(O.x1, Math.max(...rs.map(r => r.x + r.w)));
+      W.z0 = Math.max(O.z0, Math.min(...rs.map(r => r.z))); W.z1 = Math.min(O.z1, Math.max(...rs.map(r => r.z + r.d)));
+    }
+  }
+  // A side abuts when a storey whose walls rise past this eave stands just beyond it (a wing roof against the
+  // upper floor, a lean-to against the house): no overhang there, and a roof that reaches into that storey
+  // stops at its wall.
+  const rising = levels.filter(l => l !== lv && (l.y || 0) < y + 0.05 && (l.y || 0) + (l.height || 2.8) > y + 0.05).flatMap(l => l.footprint || []);
+  const abut: Record<Side, boolean> = { N: false, S: false, E: false, W: false };
+  for (const s of SIDES) {
+    const [nx, nz] = OUT[s], ax = along(s);
+    const hits = [0.1, 0.3, 0.5, 0.7, 0.9].map(f => {
+      const x = ax === 0 ? W.x0 + (W.x1 - W.x0) * f : edgeOf(W, s) + nx * 0.05, z = ax === 0 ? edgeOf(W, s) + nz * 0.05 : W.z0 + (W.z1 - W.z0) * f;
+      return rising.find(r => inR(x, z, r));
+    });
+    if (!hits.some(Boolean)) continue;
+    abut[s] = true;
+    if (hits.every(Boolean)) {
+      if (s === 'E') W.x1 = Math.max(W.x0 + 1, Math.min(W.x1, ...hits.map(r => r.x)));
+      if (s === 'W') W.x0 = Math.min(W.x1 - 1, Math.max(W.x0, ...hits.map(r => r.x + r.w)));
+      if (s === 'S') W.z1 = Math.max(W.z0 + 1, Math.min(W.z1, ...hits.map(r => r.z)));
+      if (s === 'N') W.z0 = Math.min(W.z1 - 1, Math.max(W.z0, ...hits.map(r => r.z + r.d)));
+    }
+  }
+  const builtIn = (s: Side) => Math.max(0, s === 'N' ? W.z0 - O.z0 : s === 'S' ? O.z1 - W.z1 : s === 'E' ? O.x1 - W.x1 : W.x0 - O.x0);
+  const hip = type === 'hip' || type === 'terracotta';
+  const ridgeX = (rf.ridge || 'x') === 'x';
+  const high: Side = rf.high || 'N';
+  const low: Side = ({ N: 'S', S: 'N', E: 'W', W: 'E' } as Record<Side, Side>)[high];
+  const faces: Side[] = type === 'flat' ? [] : hip ? ['S', 'N', 'E', 'W'] : type === 'shed' ? [low] : ridgeX ? ['S', 'N'] : ['E', 'W'];
+  // `over` is the footprint plus the overhang already (HOUSE-SPEC: "usually a footprint rect + overhang"), so a
+  // side reaches whichever is larger, never their sum — the sum hung 0.8–1 m eaves on every house. Only an
+  // `over` carried well past the walls (a roof run out over a porch or a carport) keeps its whole reach.
+  const reach = (s: Side) => { const b = builtIn(s); return b > oh + 0.15 ? b : Math.max(b, oh); };
+  const ov: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 };
+  for (const s of SIDES) ov[s] = abut[s] ? 0 : reach(s);
+  // rakes stay tight: a gable end reads as a crisp outline, not as a second eave
+  const rakes: Side[] = type === 'flat' || hip ? [] : type === 'shed' ? SIDES.filter(s => s !== low && s !== high) : ridgeX ? ['E', 'W'] : ['N', 'S'];
+  for (const s of rakes) if (!abut[s] && builtIn(s) <= oh + 0.15) ov[s] = Math.min(ov[s], RAKE);
+  if (hip) {   // a hip's eaves run level all round only when every free side overhangs the same amount
+    const free = SIDES.filter(s => !abut[s]);
+    const u = free.length ? Math.min(...free.map(s => ov[s])) : 0;
+    for (const s of free) ov[s] = u;
+  }
+  const o: Rect = { x0: W.x0 - ov.W, x1: W.x1 + ov.E, z0: W.z0 - ov.N, z1: W.z1 + ov.S };
+  const pitch = (rf.pitch || (hip ? 28 : type === 'shed' ? 14 : 32)) * DEG, t = Math.tan(pitch);
+  // The drip edge hangs below the wall top by overhang × tan(pitch), but never more than DROP: past that a
+  // deep eave on a steep roof swallows the upper-floor windows. The rest is a raised heel — the plane crosses
+  // the wall line that far above the wall top, and a frieze in the wall's cladding closes the gap.
+  const drop: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 }, heel: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 };
+  for (const s of SIDES) { drop[s] = Math.min(ov[s] * t, DROP); heel[s] = ov[s] * t - drop[s]; }
+  // height of a face's underside above the eave elevation: `heel` on its own wall line, rising inward
+  const plane = (s: Side, x: number, z: number) => (s === 'S' ? W.z1 - z : s === 'N' ? z - W.z0 : s === 'E' ? W.x1 - x : x - W.x0) * t + heel[s];
+  const under = (x: number, z: number) => (faces.length ? Math.min(...faces.map(s => plane(s, x, z))) : 0);
+  const T = type === 'flat' ? 0.22 : type === 'aframe-glass' ? 0.06 : 0.14 / Math.cos(pitch);   // vertical deck thickness
+  const topAt = (x: number, z: number) => y + (type === 'flat' ? 0.22 : under(Math.min(o.x1, Math.max(o.x0, x)), Math.min(o.z1, Math.max(o.z0, z))) + T);
+  return { rf, type, y, lv, W, o, ov, abut, pitch, t, T, faces, plane, under, topAt, hip, ridgeX, high, low, heel };
+}
+
+
 export function buildRoofs(spec, deps) {
   const { THREE, kit = null, palette = {} } = deps;
   const levels = spec.levels || [];
@@ -122,80 +204,9 @@ export function buildRoofs(spec, deps) {
   };
 
   // plan every roof first: a downspout lands on a lower roof, so each roof needs the others' surfaces
-  const models = (spec.roofs || []).map(planRoof);
+  const models = planRoofModels(spec);
   const spouts: P2[] = [];   // plan positions already taken (two roofs meeting at a corner share one pipe)
   return models.map(buildRoof);
-
-  function planRoof(rf) {
-    const type = rf.type || 'gable';
-    const y = rf.y ?? 2.8;
-    const over = rf.over;
-    const oh = rf.overhang ?? 0;
-    const O: Rect = { x0: over.x, x1: over.x + over.w, z0: over.z, z1: over.z + over.d };
-    // the wall rectangle: the storey this roof caps (its top is the eave elevation), clipped to `over`
-    const lv = levels.find(l => Math.abs((l.y || 0) + (l.height || 2.8) - y) < 0.05);
-    const W: Rect = { ...O };
-    if (lv) {
-      const rs = (lv.footprint || []).filter(r => r.x < O.x1 && r.x + r.w > O.x0 && r.z < O.z1 && r.z + r.d > O.z0);
-      if (rs.length) {
-        W.x0 = Math.max(O.x0, Math.min(...rs.map(r => r.x))); W.x1 = Math.min(O.x1, Math.max(...rs.map(r => r.x + r.w)));
-        W.z0 = Math.max(O.z0, Math.min(...rs.map(r => r.z))); W.z1 = Math.min(O.z1, Math.max(...rs.map(r => r.z + r.d)));
-      }
-    }
-    // A side abuts when a storey whose walls rise past this eave stands just beyond it (a wing roof against the
-    // upper floor, a lean-to against the house): no overhang there, and a roof that reaches into that storey
-    // stops at its wall.
-    const rising = levels.filter(l => l !== lv && (l.y || 0) < y + 0.05 && (l.y || 0) + (l.height || 2.8) > y + 0.05).flatMap(l => l.footprint || []);
-    const abut: Record<Side, boolean> = { N: false, S: false, E: false, W: false };
-    for (const s of SIDES) {
-      const [nx, nz] = OUT[s], ax = along(s);
-      const hits = [0.1, 0.3, 0.5, 0.7, 0.9].map(f => {
-        const x = ax === 0 ? W.x0 + (W.x1 - W.x0) * f : edgeOf(W, s) + nx * 0.05, z = ax === 0 ? edgeOf(W, s) + nz * 0.05 : W.z0 + (W.z1 - W.z0) * f;
-        return rising.find(r => inR(x, z, r));
-      });
-      if (!hits.some(Boolean)) continue;
-      abut[s] = true;
-      if (hits.every(Boolean)) {
-        if (s === 'E') W.x1 = Math.max(W.x0 + 1, Math.min(W.x1, ...hits.map(r => r.x)));
-        if (s === 'W') W.x0 = Math.min(W.x1 - 1, Math.max(W.x0, ...hits.map(r => r.x + r.w)));
-        if (s === 'S') W.z1 = Math.max(W.z0 + 1, Math.min(W.z1, ...hits.map(r => r.z)));
-        if (s === 'N') W.z0 = Math.min(W.z1 - 1, Math.max(W.z0, ...hits.map(r => r.z + r.d)));
-      }
-    }
-    const builtIn = (s: Side) => Math.max(0, s === 'N' ? W.z0 - O.z0 : s === 'S' ? O.z1 - W.z1 : s === 'E' ? O.x1 - W.x1 : W.x0 - O.x0);
-    const hip = type === 'hip' || type === 'terracotta';
-    const ridgeX = (rf.ridge || 'x') === 'x';
-    const high: Side = rf.high || 'N';
-    const low: Side = ({ N: 'S', S: 'N', E: 'W', W: 'E' } as Record<Side, Side>)[high];
-    const faces: Side[] = type === 'flat' ? [] : hip ? ['S', 'N', 'E', 'W'] : type === 'shed' ? [low] : ridgeX ? ['S', 'N'] : ['E', 'W'];
-    // `over` is the footprint plus the overhang already (HOUSE-SPEC: "usually a footprint rect + overhang"), so a
-    // side reaches whichever is larger, never their sum — the sum hung 0.8–1 m eaves on every house. Only an
-    // `over` carried well past the walls (a roof run out over a porch or a carport) keeps its whole reach.
-    const reach = (s: Side) => { const b = builtIn(s); return b > oh + 0.15 ? b : Math.max(b, oh); };
-    const ov: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 };
-    for (const s of SIDES) ov[s] = abut[s] ? 0 : reach(s);
-    // rakes stay tight: a gable end reads as a crisp outline, not as a second eave
-    const rakes: Side[] = type === 'flat' || hip ? [] : type === 'shed' ? SIDES.filter(s => s !== low && s !== high) : ridgeX ? ['E', 'W'] : ['N', 'S'];
-    for (const s of rakes) if (!abut[s] && builtIn(s) <= oh + 0.15) ov[s] = Math.min(ov[s], RAKE);
-    if (hip) {   // a hip's eaves run level all round only when every free side overhangs the same amount
-      const free = SIDES.filter(s => !abut[s]);
-      const u = free.length ? Math.min(...free.map(s => ov[s])) : 0;
-      for (const s of free) ov[s] = u;
-    }
-    const o: Rect = { x0: W.x0 - ov.W, x1: W.x1 + ov.E, z0: W.z0 - ov.N, z1: W.z1 + ov.S };
-    const pitch = (rf.pitch || (hip ? 28 : type === 'shed' ? 14 : 32)) * DEG, t = Math.tan(pitch);
-    // The drip edge hangs below the wall top by overhang × tan(pitch), but never more than DROP: past that a
-    // deep eave on a steep roof swallows the upper-floor windows. The rest is a raised heel — the plane crosses
-    // the wall line that far above the wall top, and a frieze in the wall's cladding closes the gap.
-    const drop: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 }, heel: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 };
-    for (const s of SIDES) { drop[s] = Math.min(ov[s] * t, DROP); heel[s] = ov[s] * t - drop[s]; }
-    // height of a face's underside above the eave elevation: `heel` on its own wall line, rising inward
-    const plane = (s: Side, x: number, z: number) => (s === 'S' ? W.z1 - z : s === 'N' ? z - W.z0 : s === 'E' ? W.x1 - x : x - W.x0) * t + heel[s];
-    const under = (x: number, z: number) => (faces.length ? Math.min(...faces.map(s => plane(s, x, z))) : 0);
-    const T = type === 'flat' ? 0.22 : type === 'aframe-glass' ? 0.06 : 0.14 / Math.cos(pitch);   // vertical deck thickness
-    const topAt = (x: number, z: number) => y + (type === 'flat' ? 0.22 : under(Math.min(o.x1, Math.max(o.x0, x)), Math.min(o.z1, Math.max(o.z0, z))) + T);
-    return { rf, type, y, lv, W, o, ov, abut, pitch, t, T, faces, plane, under, topAt, hip, ridgeX, high, low, heel };
-  }
 
   function buildRoof(m) {
     const { rf, type, W, o, ov, abut, t, T, faces, plane, under, heel } = m;
