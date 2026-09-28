@@ -1,4 +1,4 @@
-# ci-virtual-home
+# Companion Core Virtual Homes
 
 > **Private & Confidential — Property of Lifescope Inc. Do not distribute.** See [NOTICE.md](NOTICE.md).
 
@@ -12,7 +12,7 @@ compiled from it:
 | **CAD floor plans** — one blueprint sheet per level, SVG + PNG, and a `floorplans.json` index | `scripts/generate_floor_plans.py` | `scenes/floorplans/` |
 | **Isometric cutaways** — landscape + portrait SVG and a pure-vector Lottie animation per house | `scripts/generate_house_iso.py` | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` |
 | **Product-shot videos** — frame-stepped, deterministic H.264 per house × shot, with posters | `scripts/render-house-shots.mts` (headless Chromium) | `video/houses/` (gitignored; browse with `video/houses/index.html`) |
-| **Web portal** — a gallery of the homes and a live player to fly their camera paths, for GitHub Pages | [`index.html`](index.html), `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://companionintelligence.github.io/ci-virtual-home/> |
+| **Web portal** — a gallery of the homes and a live player to fly their camera paths | [`index.html`](index.html), `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://homes.ci.computer/> (Cloudflare Pages) and <https://companionintelligence.github.io/ci-virtual-home/> |
 
 30 houses ship today, each a Sims 4 gallery build re-authored as a spec (see [THIRD_PARTY.md](THIRD_PARTY.md)
 for how they are credited).
@@ -58,7 +58,7 @@ root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `
 | `pnpm run index` | Validate every spec and rebuild `content/houses/index.json` (the page's house list). |
 | `pnpm run prop-sheet` | Contact sheet of props, measured against their declared sizes (`--types`, `--module`, `--all`). |
 | `pnpm run export:core` | The Companion Core as glTF (`--finish`, `--pose`) → `dist/models/`. |
-| `pnpm run portal:thumbs` | Render the gallery's thumbnails → `portal/thumbs/<id>.webp` and `portal/hero.webp` (`--house`, `--hero`, `--hero-tod`, `--max-kb`). Needs a GPU; commit the output. |
+| `pnpm run portal:thumbs` | Render the gallery's thumbnails → `portal/thumbs/<id>.webp` and `portal/hero.webp`, and the link-preview JPEGs → `portal/previews/<id>.jpg` and `portal/hero.jpg` (`--house`, `--hero`, `--hero-tod`, `--max-kb`). Needs a GPU; commit the output. |
 | `pnpm run portal:build` | Assemble the Pages site in `dist/` — only what it loads — and check its links. Needs `build`. |
 | `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
 | `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`). |
@@ -72,7 +72,8 @@ Every script resolves the repo from its own location, so they run from any direc
 room-creator.html          the editor + renderer page; loads assets/*.js and content/houses/*.json.
                            ?mode=view is the portal's player (assets/viewer.ts, portal/viewer.css)
 index.html                 the portal's gallery (portal/gallery.css, portal/gallery.js)
-portal/                    the portal's styles and script, thumbs/<id>.webp and hero.webp (derived, committed)
+portal/                    the portal's styles and script, thumbs/<id>.webp and hero.webp, and the link-preview
+                           JPEGs previews/<id>.jpg and hero.jpg (derived, committed)
 floorplan-graph-demo.html  the Phase 2 floor-plan graph beside its compiled walls
 assets/                    the three.js engine, in TypeScript (house-builder, house-geometry, wall-compiler,
                            floorplan-graph, roofs, fixtures, site, world, materials, textures, environment)
@@ -112,6 +113,33 @@ full screen and prev/next. Keys: Space, ←/→ (Shift: 5 s), Home/End, 1–9, T
 (Space on a focused button presses that button). Everything under `?mode=view` is additive: without it the page
 is the editor, and every `__house*` hook behaves as before.
 
+A few things the player does that the editor does not:
+
+- **Names.** The portal calls a home by `displayName` ([`assets/home-names.ts`](assets/home-names.ts)): the spec's
+  title with the Sims gallery shorthand taken out ("Base Game", "BG", a build budget, "Fix"), or a hand-picked
+  name where that would leave a twin, nothing or what reads as a typo ("Base Game Modern House 1" → "Modern
+  Studio House"). The gallery, the player, the pre-mount loader and the share pages all use it; the spec's own
+  title stays the credit: the gallery's footer lists every home against it and its builder, a share page's
+  description names it, and it is the tooltip beside the builder's name. The specs are not edited for it.
+- **Framing.** Shots are framed for 16:9. For a narrower window the player widens the field of view after
+  `applySplineFrame` has set the shot's own (`fitFov`: the geometric mean of keeping the vertical and keeping the
+  horizontal field, capped at 80°), so a phone held upright sees the house at the door and the Core with its desk
+  at the end; turned while flying, the free camera takes the field the shot would have at the new shape. The eye
+  path is untouched, and nothing a golden or a video renders goes through the player.
+- **The first shot.** A link without `shot` opens on the house's Orbit, the whole house from above, which reads on
+  every screen; Door to Core spends its middle in doorways and stairwells and is one tap away.
+- **The end of a shot** is a card over the dock: replay, another shot, the next home, and one line on what the
+  Companion Core is, linking to <https://ci.computer>. The title steps back while it shows. Where the card would
+  cover the Core (a phone on its side, a 4:3 tablet) it moves to the end of the dock away from the Core, or drops
+  its sentence and keeps the heading, the link and the buttons.
+- **Phones** (and short landscape screens) get a compact dock: one scrolling row of shot and time-of-day chips,
+  then play, the seek bar, the time and a More button whose sheet holds speed, path, fly, best quality and full
+  screen. Every control is a 44 px target on a touch screen, and the controls fade a few seconds into playback
+  (a tap on the scene brings them back). Between 761 and 1011 px (a tablet held upright) the full dock puts the
+  time of day on a row of its own, so every shot's chip shows. The orange tick where the Core wakes names itself
+  under the seek bar when pointed at, when the playhead reaches it, and on a touch screen as a shot starts; where
+  the free-camera bar has no room for its how-to, it shows once as a toast.
+
 Until the player's module has mounted, `room-creator.html`'s head script is the player: the house's poster, its
 name once `index.json` is in, a loader that says so when a slow connection makes it take a while, and a card with
 **Try again** and **See all homes** when the page cannot start (no WebGL 2, a module that did not download, an
@@ -120,9 +148,13 @@ player asks no third party for anything: its fonts, including the ones the scene
 own (`portal/viewer.css`); only the editor links Google Fonts.
 
 The share button hands out `homes/<id>.html`: `portal:build` writes one page per home with the home's own title,
-description and thumbnail as link-preview tags (an unfurler never runs the player, and `room-creator.html`'s static
-title is the editor's), and it forwards to the player with the link's query. A checkout served as it is has no such
-pages, and shares the player's own URL.
+description and preview image as link-preview tags (an unfurler never runs the player), and it forwards to the
+player with the link's query. Preview images are JPEG at 1200 × 630 (`portal/previews/<id>.jpg`, and
+`portal/hero.jpg` for the gallery and the player): LinkedIn and some other unfurlers read no WebP. A checkout served as it is has no such pages, and shares the player's own URL. The gallery
+carries preview tags too, and in `dist/` `room-creator.html`'s static title and description (the editor's, in the
+source) are replaced by the site's, so a player URL copied from the address bar never unfurls as the editor.
+Preview images must be absolute: `portal:build` takes the site's address from `--site-url`, else `$SITE_URL`, else
+the live site, `https://homes.ci.computer/`.
 
 Every URL in the site is relative, because Pages serves it at `/ci-virtual-home/`. `portal:build` copies only
 what the site loads into `dist/` (and refuses stale compiled assets, a missing spec or thumbnail, a link to a file it
@@ -130,7 +162,7 @@ does not ship, a root-relative URL, and hero figures in `index.html` that disagr
 every PR, and [`.github/workflows/pages.yml`](.github/workflows/pages.yml) deploys it on every push to `main` (and
 on demand); Pages has to be enabled for the repository with **GitHub Actions** as the
 source. Nothing renders in CI: when a house's look changes, re-run `pnpm run portal:thumbs --house <id>` on a
-GPU and commit the new thumbnail with the change. `portal:test` is the check to run before pushing portal work.
+GPU and commit the new thumbnail and preview with the change. `portal:test` is the check to run before pushing portal work.
 
 The Pages site is public to anyone with its address, and it serves what a browser needs to draw the homes: the
 compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.

@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Virtual homes · Companion Intelligence</title>
   <meta name="description" content="Thirty homes, each built live in your browser from one spec file. Fly the camera paths, change the hour, walk in to the Companion Core.">
+  <!-- link previews: scripts/build-portal.mts makes og:image and og:url absolute for the deployed site -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Companion Intelligence">
+  <meta property="og:title" content="Virtual homes · Companion Intelligence">
+  <meta property="og:description" content="Thirty homes, each built live in your browser from one spec file. Fly the camera paths, change the hour, walk in to the Companion Core.">
+  <meta property="og:image" content="./portal/hero.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser.">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
   <!--
@@ -18,6 +29,9 @@
   <link rel="preload" href="./assets/fonts/manrope-latin-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./content/houses/index.json" as="fetch" crossorigin>
   <link rel="stylesheet" href="./portal/gallery.css">
+  <!-- gallery.js imports the portal's names when it runs, and lists the homes without them if they fail to come -->
+  <link rel="modulepreload" href="./assets/home-names.js">
+  <noscript><style>.skel { display: none; }</style></noscript>
   <script type="module" src="./portal/gallery.js"></script>
 </head>
 <body>
@@ -28,6 +42,9 @@
       <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
       <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
       <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+      <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
+      <symbol id="i-out" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+      <symbol id="i-retry" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></symbol>
     </defs>
   </svg>
 
@@ -40,7 +57,7 @@
     </a>
     <nav class="site-nav" aria-label="Site">
       <a href="#homes">Homes</a>
-      <a href="./room-creator.html" title="The editor these homes are built in">Editor</a>
+      <a href="https://ci.computer" rel="noopener">Companion Core<svg class="i i-out" aria-hidden="true"><use href="#i-out"/></svg></a>
     </nav>
   </header>
 
@@ -49,20 +66,21 @@
       <div class="hero-copy">
         <p class="eyebrow">Live 3D, in your browser</p>
         <h1 id="hero-title">Walk into thirty homes.</h1>
-        <p class="lede">Each home here is one spec file, built while you watch into walls, rooms, furniture, a garden and light, with a Companion Core waiting on the desk. Pick a home, fly its camera paths, change the hour.</p>
+        <p class="lede">Your browser builds each home from one spec file: walls, rooms, furniture, garden and light.<span class="lede-more"> Pick a home, fly its camera paths, change the hour.</span></p>
+        <p class="core-line"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg><span>The small computer on every desk is a <b>Companion Core</b>: your own AI, apps and memory, running at home. <a href="https://ci.computer" rel="noopener">What is Companion Core?</a></span></p>
         <div class="hero-cta">
           <a class="btn btn-primary" id="hero-play" href="./room-creator.html?mode=view&amp;house=aurora"><svg class="i i-fill"><use href="#i-play"/></svg><span>Watch <span data-hero-name>Aurora</span></span></a>
-          <a class="btn btn-ghost" href="#homes"><span>Browse the homes</span><svg class="i"><use href="#i-down"/></svg></a>
+          <a class="btn btn-ghost hero-browse" href="#homes"><span>Browse the homes</span><svg class="i"><use href="#i-down"/></svg></a>
         </div>
         <dl class="stats" aria-label="The collection">
           <div><dt>Homes</dt><dd data-stat="homes">30</dd></div>
           <div><dt>Builders credited</dt><dd data-stat="builders">12</dd></div>
-          <div><dt>Square metres of floor</dt><dd data-stat="area">7,300</dd></div>
+          <div><dt>Square metres of floor</dt><dd data-stat="area">7,680</dd></div>
         </dl>
       </div>
       <a class="hero-media" id="hero-media" href="./room-creator.html?mode=view&amp;house=aurora" aria-label="Play Aurora in 3D">
         <img src="./portal/hero.webp" alt="An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser." width="1600" height="900" fetchpriority="high">
-        <span class="hero-badge"><span class="dot" aria-hidden="true"></span>Live 3D</span>
+        <span class="hero-badge"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg>Interactive 3D</span>
         <span class="hero-play" aria-hidden="true"><svg class="i i-fill"><use href="#i-play"/></svg></span>
       </a>
     </section>
@@ -70,25 +88,38 @@
     <section class="homes" id="homes" aria-labelledby="homes-title">
       <div class="homes-head">
         <h2 id="homes-title">All homes <span class="count" aria-live="polite"></span></h2>
-        <div class="filters">
+        <div class="filters" id="filters">
           <label class="search">
             <svg class="i"><use href="#i-search"/></svg>
             <input type="search" id="q" placeholder="Search name, style or builder" aria-label="Search homes" autocomplete="off" spellcheck="false">
             <kbd aria-hidden="true">/</kbd>
           </label>
           <div class="seg" role="group" aria-label="Storeys" id="storeys">
-            <button type="button" data-storeys="" aria-pressed="true">Any</button>
-            <button type="button" data-storeys="1" aria-pressed="false">1 storey</button>
-            <button type="button" data-storeys="2" aria-pressed="false">2</button>
-            <button type="button" data-storeys="3" aria-pressed="false">3</button>
+            <span class="seg-label" aria-hidden="true">Storeys</span>
+            <button type="button" data-storeys="" aria-pressed="true" aria-label="Any number of storeys">Any</button>
+            <button type="button" data-storeys="1" aria-pressed="false" aria-label="1 storey">1</button>
+            <button type="button" data-storeys="2" aria-pressed="false" aria-label="2 storeys">2</button>
+            <button type="button" data-storeys="3" aria-pressed="false" aria-label="3 or more storeys">3+</button>
           </div>
         </div>
       </div>
       <div class="tags" role="group" aria-label="Style" id="tags"></div>
-      <ul class="grid" id="grid"></ul>
+      <!-- placeholder cards until index.json is in: the grid holds its place, so nothing jumps -->
+      <ul class="grid" id="grid" aria-busy="true">
+        <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
+        <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
+        <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
+        <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
+        <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
+        <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
+      </ul>
       <div class="empty" id="empty" hidden>
         <p><b>No homes match.</b> Try fewer words, or clear the filters.</p>
         <button type="button" class="btn btn-ghost" id="clear">Clear filters</button>
+      </div>
+      <div class="empty" id="failed" role="alert" hidden>
+        <p><b>The list of homes did not load.</b> Check the connection and try again.</p>
+        <button type="button" class="btn btn-primary" id="retry"><svg class="i"><use href="#i-retry"/></svg><span>Try again</span></button>
       </div>
       <noscript><p class="empty">The gallery needs JavaScript to list the homes.</p></noscript>
     </section>
@@ -102,7 +133,11 @@
       </div>
       <div>
         <p><b>Credits</b></p>
-        <p>Each home is a HouseSpec written by hand from the Sims 4 gallery build it is named after, and each card names the builder. No files, textures or screenshots from those builds or from The Sims are used.</p>
+        <p>Each home is a HouseSpec written by hand from a Sims 4 gallery build, and each card names its builder. No files, textures or screenshots from those builds or from The Sims are used.</p>
+        <details class="builds" id="builds" hidden>
+          <summary>The builds, by their own titles</summary>
+          <ul id="builds-list"></ul>
+        </details>
       </div>
     </div>
     <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence. <a href="https://ci.computer">ci.computer</a></p>
