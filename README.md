@@ -12,7 +12,7 @@ compiled from it:
 | **CAD floor plans** — one blueprint sheet per level, SVG + PNG, and a `floorplans.json` index | `scripts/generate_floor_plans.py` | `scenes/floorplans/` |
 | **Isometric cutaways** — landscape + portrait SVG and a pure-vector Lottie animation per house | `scripts/generate_house_iso.py` | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` |
 | **Product-shot videos** — frame-stepped, deterministic H.264 per house × shot, with posters | `scripts/render-house-shots.mts` (headless Chromium) | `video/houses/` (gitignored; browse with `video/houses/index.html`) |
-| **Web portal** — a gallery of the homes and a live player to fly their camera paths | [`index.html`](index.html), `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://homes.ci.computer/> (Cloudflare Pages) and <https://companionintelligence.github.io/ci-virtual-home/> |
+| **Web portal** — a gallery of the homes and a live player to fly their camera paths | [`index.html`](index.html), `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://homes.ci.computer/> (Cloudflare Pages, deployed from `main`; see [Deploying](#deploying)) |
 
 30 houses ship today, each a Sims 4 gallery build re-authored as a spec (see [THIRD_PARTY.md](THIRD_PARTY.md)
 for how they are credited).
@@ -156,16 +156,55 @@ source) are replaced by the site's, so a player URL copied from the address bar 
 Preview images must be absolute: `portal:build` takes the site's address from `--site-url`, else `$SITE_URL`, else
 the live site, `https://homes.ci.computer/`.
 
-Every URL in the site is relative, because Pages serves it at `/ci-virtual-home/`. `portal:build` copies only
-what the site loads into `dist/` (and refuses stale compiled assets, a missing spec or thumbnail, a link to a file it
-does not ship, a root-relative URL, and hero figures in `index.html` that disagree with `index.json`); CI runs it on
-every PR, and [`.github/workflows/pages.yml`](.github/workflows/pages.yml) deploys it on every push to `main` (and
-on demand); Pages has to be enabled for the repository with **GitHub Actions** as the
-source. Nothing renders in CI: when a house's look changes, re-run `pnpm run portal:thumbs --house <id>` on a
-GPU and commit the new thumbnail and preview with the change. `portal:test` is the check to run before pushing portal work.
+Every URL in the site is relative, so the same tree works at the root of any host (the live site, a preview's
+`pages.dev` address) and under a sub-path; `portal:preview` and `portal:test` serve it at `/ci-virtual-home/` to
+prove it. `portal:build` copies only what the site loads into `dist/` (and refuses stale compiled assets, a missing
+spec or thumbnail, a link to a file it does not ship, a root-relative URL, and hero figures in `index.html` that
+disagree with `index.json`); CI runs it on every PR. Nothing renders in CI: when a house's look changes, re-run
+`pnpm run portal:thumbs --house <id>` on a GPU and commit the new thumbnail and preview with the change.
+`portal:test` is the check to run before pushing portal work.
 
-The Pages site is public to anyone with its address, and it serves what a browser needs to draw the homes: the
+The site is public to anyone with its address, and it serves what a browser needs to draw the homes: the
 compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
+
+### Deploying
+
+The site is the Cloudflare Pages project `ci-virtual-home`, a direct-upload project (Cloudflare does not watch
+the repository), served at <https://homes.ci.computer/> and <https://ci-virtual-home.pages.dev/>.
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds the site (`pnpm install`, `build`,
+`portal:build --site-url …`) and uploads `dist/` with Wrangler, through `cloudflare/wrangler-action`:
+
+| When | Where it goes |
+|---|---|
+| A push to `main`, or **Run workflow** on `main` | Production: <https://homes.ci.computer/> |
+| A pull request from a branch of this repository | A preview at `https://pr-<number>.ci-virtual-home.pages.dev/`, replaced on every push to the PR. The run's summary links it. |
+| **Run workflow** on any other branch | A preview under the branch's name, slugged (`clau/p4-s1` → `https://clau-p4-s1.ci-virtual-home.pages.dev/`). |
+
+A preview's link previews point at the preview itself, never at production.
+
+**Owner setup, once.** Deploys need one repository secret, `CLOUDFLARE_API_TOKEN`. Create it as a Cloudflare API
+token (dash.cloudflare.com → My Profile → API Tokens → Create Token → Custom token) with the permission
+**Account · Cloudflare Pages · Edit**, limited to the account that holds the project. Add it in the repository's
+Settings → Secrets and variables → Actions as a *repository* secret, not an environment secret: the workflow looks
+for it before any environment applies. Until the secret exists, the deploy job is skipped with a notice, not failed,
+so `main` stays green. The account ID is set in the workflow (`PAGES_ACCOUNT_ID`); a `CLOUDFLARE_ACCOUNT_ID`
+repository variable or secret overrides it. Pull requests from forks, and Dependabot's, get no preview, because
+GitHub gives them no secrets.
+
+**By hand**, from a checkout, with Wrangler logged in to that account (`pnpm dlx wrangler@4 login`). This is the
+same build and upload the workflow runs:
+
+```bash
+pnpm run build && pnpm run portal:build --site-url https://homes.ci.computer/
+pnpm dlx wrangler@4 pages deploy dist --project-name=ci-virtual-home --branch=main   # any other --branch is a preview
+```
+
+Wrangler is deliberately not a devDependency: the workflow's action adds it for its own job, so a normal
+`pnpm install` does not pull it in.
+
+**GitHub Pages is retired** for this repository. Its github.io address redirects to the organisation's old custom
+domain, which serves nothing, so the former `pages.yml` deployed to nowhere and has been removed. Nothing depends on
+GitHub Pages, so it can be switched off in the repository's settings.
 
 ## How verification works
 
