@@ -8,11 +8,17 @@
 // geometry — wall and floor clips, entering through a wall instead of the door, ending outside the house, Core out
 // of frame or occluded on the last frame, and through a Core orbit the Core kept in frame and in sight. Shot errors fail the file like schema errors do, so CI can gate a spec
 // before anyone renders it. Needs Playwright's Chromium (see render-house-shots.mts); ~2 s per house × shot.
+//
+// Plugins: every scripts/validate/*.mts (not "_*") runs after the checks below, in name order — one per stream
+// (scripts/validate/_types.mts has the contract). A plugin that exports `flag` runs only when that flag is given:
+// `pnpm run validate --layout` runs layout.mts. Plugin issues print like the checks' own, with their code last.
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import { pathToFileURL } from 'node:url';
 import { perimeterEdges } from '../assets/house-geometry.js';
+import type { Check, ValidateContext } from './validate/_types.mts';
 export { perimeterEdges };
 
 const SIDES = ['S', 'N', 'E', 'W'];
@@ -38,7 +44,18 @@ const rectInside = (a, rects) => {
   return pts.every(([px, pz]) => rects.some(r => inRect(px, pz, r, 0.05)));
 };
 
-export function validate(spec, file = '<spec>') {
+// ---- plugins: scripts/validate/*.mts --------------------------------------------------------------------------
+type Plugin = { name: string; check: Check; flag: string | null };
+const PLUGIN_DIR = path.join(import.meta.dirname, 'validate');
+export const PLUGINS: Plugin[] = [];
+for (const f of (fs.existsSync(PLUGIN_DIR) ? fs.readdirSync(PLUGIN_DIR) : []).filter(f => f.endsWith('.mts') && !f.startsWith('_')).sort()) {
+  const m = await import(pathToFileURL(path.join(PLUGIN_DIR, f)).href);
+  if (typeof m.default !== 'function') throw new Error(`scripts/validate/${f}: no default export (a check(spec, ctx) function)`);
+  PLUGINS.push({ name: f.replace(/\.mts$/, ''), check: m.default, flag: typeof m.flag === 'string' ? m.flag : null });
+}
+export const PLUGIN_FLAGS = new Set(PLUGINS.map(p => p.flag).filter(Boolean));
+
+export function validate(spec, file = '<spec>', { flags = new Set<string>() }: { flags?: ReadonlySet<string> } = {}) {
   const errors = [], warnings = [];
   const err = m => errors.push(`${file}: ${m}`), warn = m => warnings.push(`${file}: ${m}`);
   for (const k of ['id', 'name', 'author', 'lot', 'palette', 'levels', 'hero', 'entry']) if (!(k in spec)) err(`missing "${k}"`);
@@ -153,6 +170,14 @@ export function validate(spec, file = '<spec>') {
     if (shotSeen.has(sh.type)) err(`${S}: type "${sh.type}" is already tuned by "${shotSeen.get(sh.type)}" — they are one shot, so this overwrites it`);
     else shotSeen.set(sh.type, sh.id || sh.type);
   }
+  // plugins (scripts/validate/*.mts), after every check above so their findings print after the schema's
+  const ctx: ValidateContext = { file, flags, itemTypes: ITEM_TYPES, siteTypes: SITE_TYPES, props: PROPS, perimeterEdges };
+  for (const pl of PLUGINS) {
+    if (pl.flag && !flags.has(pl.flag)) continue;
+    let issues;
+    try { issues = pl.check(spec, ctx) || []; } catch (e) { err(`validator plugin ${pl.name} threw: ${e.message}`); continue; }
+    for (const is of issues) (is.level === 'error' ? err : warn)(is.code ? `${is.message} [${pl.name}:${is.code}]` : is.message);
+  }
   return { errors, warnings };
 }
 
@@ -161,6 +186,13 @@ if (process.argv[1] && import.meta.filename === path.resolve(process.argv[1])) {
   const flag = (name, dflt) => { const i = argv.indexOf(`--${name}`); if (i === -1) return null; const v = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv.splice(i, 2)[1] : (argv.splice(i, 1), dflt); return v; };
   const shots = flag('shots', 'door-to-core,orbit,hero-reveal,core-orbit');
   const jobs = flag('jobs', '3') || '3';
+  // plugin flags (`--layout` …): anything else that starts with -- is refused rather than read as a file name
+  const pluginFlags = new Set<string>();
+  for (const a of argv.filter(x => x.startsWith('--'))) {
+    const n = a.slice(2);
+    if (!PLUGIN_FLAGS.has(n)) { console.error(`unknown option ${a} (plugin flags: ${[...PLUGIN_FLAGS].map(f => '--' + f).join(', ') || 'none'})`); process.exit(2); }
+    pluginFlags.add(n); argv.splice(argv.indexOf(a), 1);
+  }
   const files = argv.length ? argv
     // .plan.json beside a spec is build output (build-house-plan.mts), not a spec of its own. Listed relative to
     // the cwd so the report reads `content/houses/aurora.json` from the repo root, wherever the script lives.
@@ -170,7 +202,7 @@ if (process.argv[1] && import.meta.filename === path.resolve(process.argv[1])) {
   for (const f of files) {
     let spec;
     try { spec = JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) { console.log(`✗ ${f}: invalid JSON — ${e.message}`); bad++; continue; }
-    const { errors, warnings } = validate(spec, f);
+    const { errors, warnings } = validate(spec, f, { flags: pluginFlags });
     errors.forEach(e => console.log('  ERROR ' + e)); warnings.forEach(w => console.log('  warn  ' + w));
     console.log(`${errors.length ? '✗' : '✓'} ${f}  (${errors.length} errors, ${warnings.length} warnings)`);
     if (errors.length) bad++; else valid.push({ f, id: spec.id });
