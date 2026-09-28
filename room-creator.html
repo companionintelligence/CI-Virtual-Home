@@ -7918,9 +7918,17 @@
     // One frame from wherever persCamera is right now (no spline), at record size — for close-up QA of assets.
     // `dressing` dresses the scene the way a shot would ({ walls, roof }) for the length of the snapshot —
     // there is no camera path here, so 'auto' has no fade to sit in front of and means 'on'.
+    // Nor is there a shot to drive the devices, so the snapshot stills what the live view's clock moves: animate()
+    // turns every powered fan and runs every screen, and a monitor seen through a window came out at a different
+    // point in its timeline in every snapshot (seraphine's and asymmetry's gallery thumbnails, until layout pass 4
+    // moved their desks out of the framing). Screens stand at the live view's own start, fans at rest. Power is
+    // left as the page has it, like the camera: it is set by the house's opening frame or a shot, never by the
+    // clock. The live view carries on from its own clock afterwards.
     window.__houseSnapshot = function ({ res = '1080', aspect = '16:9', quality = 0.95, dressing = null } = {}) {
       const { w, h } = recordSize(res, aspect);
       const prevRatio = renderer.getPixelRatio(), prevRec = isRecordingVideo;
+      for (const c of coreDevices()) c.spin(0);
+      for (const s of screenDevices()) s.setTime(LIVE_SCREEN_START);
       isRecordingVideo = true;
       renderer.setPixelRatio(1); renderer.setSize(w, h, false);
       setActiveCamera(persCamera, btnCamOrbit); persCamera.aspect = w / h; persCamera.updateProjectionMatrix();
@@ -8440,7 +8448,8 @@
       for (const c of coreDevices()) { c.setPower(on, pressed); c.spin(fanAngleAfter(seconds)); }
       for (const s of screenDevices()) s.setTime(seconds - SCREEN_WAKE_DELAY);
     }
-    let liveScreenSeconds = 30;   // live view: screens start in their steady state and keep running
+    const LIVE_SCREEN_START = 30;   // live view: screens start in their steady state and keep running
+    let liveScreenSeconds = LIVE_SCREEN_START;
 
     function applySplineFrame(t) {
       if (!activeEyeSpline || !activeTargetSpline) return;
