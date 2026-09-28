@@ -8450,9 +8450,12 @@
       const shotType = activeShot ? activeShot.type : '';
       driveCoresForShot(preset, clampedT);
       const isFlythrough = shotType === 'door-to-core' || shotType === 'sunset-timelapse';
-      const sampleT = isFlythrough ? easeInOutCubic(clampedT) : clampedT;
-      const eyePos = activeEyeSpline.getPointAt(sampleT);
-      const lookTarget = activeTargetSpline.getPointAt(sampleT);
+      // A house shot with its own timing (assets/shot-path.ts: per-waypoint time keys, the orbit's framing) is
+      // one pure function of t; sampleT is then its arc-length fraction, which the roof fade and the dolly read.
+      const fr = preset && preset.frameAt ? preset.frameAt(clampedT, persCamera.aspect) : null;
+      const sampleT = fr ? fr.s : isFlythrough ? easeInOutCubic(clampedT) : clampedT;
+      const eyePos = fr ? fr.eye : activeEyeSpline.getPointAt(sampleT);
+      const lookTarget = fr ? fr.target : activeTargetSpline.getPointAt(sampleT);
 
       // Switch to Perspective Camera for smooth cinematic flying
       if (activeCamera !== persCamera) {
