@@ -84,7 +84,7 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
                            visibility (the page's wall modes and roof fade) and viewer (the portal's player) (ui),
                            kit-build (the kit's spec → parameters, the palette and the light). Beside them house-geometry,
                            wall-compiler, floorplan-graph, roofs, fixtures, site, world, materials, textures,
-                           environment, core-orbit, shot-path, plan-export
+                           environment, core-orbit, shot-path, plan-export/ (one plan.json key per stream)
   spec/                    the HouseSpec as a TypeScript type: base.ts + one fragment per stream, merged in index.ts
   scene-qa/                the scene checks each stream registers with __houseSceneQA
   props/                   the prop registry — one module per category, ~150 props

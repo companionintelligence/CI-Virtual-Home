@@ -76,7 +76,7 @@ After a spec change also re-run `plans`, `iso` and `floorplans` and commit their
 **Pass 4 works in streams** (S0 seams, then S1 kit, S2 architecture, S3 compose, S4 site, S5 shot, S6 ui, each on
 its own branch). Each owns its modules (house-builder.ts's header lists them), its HouseSpec fragment
 (`assets/spec/`), its validator plugin (`scripts/validate/`), its scene checks (`assets/scene-qa/`), its fleet
-metrics (`scripts/fleet/`) and its `plan.json` key (`assets/plan-export.ts`); stay in yours. Every new spec field is
+metrics (`scripts/fleet/`) and its `plan.json` key (`assets/plan-export/<stream>.ts`); stay in yours. Every new spec field is
 optional and a look-changing default applies only under `"defaults": 2` (`specDefaults()`). Streams never edit
 `content/houses/`: prove a feature on `test/fixtures/houses/<stream>-*.json` (`pnpm run fixtures --fixture <id>
 --update` blesses your own), and never re-bless goldens — list every frame the branch moves, with its cause, in
