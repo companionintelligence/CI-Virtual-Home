@@ -2,6 +2,7 @@
 // factories, the scene hooks) and the small helpers every builder module uses (std, box, group, hex, mix).
 //
 // house-builder.ts creates one per page (createHouseBuilder) and hands it to each seam module:
+//   kit-build.ts       palette, kit, and the spec → parameters the others ask it for   (S1 kit)
 //   item-map.ts        the ITEMS map — spec item type → AssetFactory builder            (S1 kit)
 //   hero-build.ts      the Companion Core, its surface and its cables                  (S1 kit)
 //   structure-build.ts slabs, walls, partitions, stairs, balustrades, ceilings, roofs  (S2 architecture)
@@ -9,7 +10,9 @@
 //   site-build.ts      the lot, the world, the site builders and the site loop         (S4 site)
 //   shot-planner-v1.ts shotsFor and its routing (door-to-core, orbits, reveal)         (S5 shot)
 //
-// Owned by S0 and frozen: a stream that needs another helper adds it to its own module.
+// Owned by S0 and frozen: a stream that needs another helper adds it to its own module. A stream that needs another
+// page dependency (S5's raycaster …) has the page pass it (room-creator.html, houseBuilderDeps — one slot per
+// stream) and reads it here as `bctx.extra.<name>`: every dep this file does not name lands in `extra`.
 
 export const DEG = Math.PI / 180;
 export const hex = c => (typeof c === 'number' ? c : parseInt(String(c || '#ffffff').replace('#', ''), 16));
@@ -24,7 +27,7 @@ export type BuildContext = ReturnType<typeof createBuildContext>;
 export function createBuildContext(deps) {
   const {
     THREE, AssetFactory, ProceduralArchitecture, addItemToScene, registerTrackedWall, registerRoof, registerCeiling, fitShadow,
-    setLightingPreset, textures = {}, useGraphWalls = false
+    setLightingPreset, textures = {}, useGraphWalls = false, ...extra
   } = deps;
 
   // ---------------------------------------------------------------------------------------
@@ -42,6 +45,8 @@ export function createBuildContext(deps) {
   return {
     THREE, AssetFactory, ProceduralArchitecture, addItemToScene, registerTrackedWall, registerRoof, registerCeiling, fitShadow,
     setLightingPreset, textures, useGraphWalls,
-    std, glassMat, box, group, hex, mix, DEG
+    std, glassMat, box, group, hex, mix, DEG,
+    /** every page dependency not named above, by the name the page passed it under */
+    extra: extra as Record<string, any>
   };
 }

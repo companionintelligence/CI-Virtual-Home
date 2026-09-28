@@ -4,8 +4,9 @@
 // Seam module (plan S0): moved verbatim out of house-builder.ts. Owner: S3 (compose).
 import { PROPS } from './props/index.js';
 import { DEG, hex, mix } from './build-context.js';
+import { HERO_SET } from './item-map.js';
 
-export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE }) {
+export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
   const { THREE, AssetFactory, std, box, group } = bctx;
 
   // The registry props' build context for one house: its role colours and a per-instance seeded stream, counted
@@ -26,7 +27,6 @@ export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE }) {
     // 25 specs also list the desk set as room items at hero.at; whatever surface the hero uses, those are
     // the hero set's copy, not extra furniture (a shelf hero with a room-item desk under it is two heroes)
     const heroHere = spec.hero && spec.hero.level === lv.id;
-    const HERO_SET = new Set(['walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
     // The page's own plant builders (the registry marks its plants foliage itself): a splayed leaf's box
     // covers far more than the leaf, so the scene QA's box tests would call every plant near a wall a clash.
     const PAGE_FOLIAGE = new Set(['fiddle-leaf', 'monstera', 'bonsai', 'bamboo', 'cactus-group']);
@@ -43,7 +43,7 @@ export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE }) {
         o.userData.onSurface = ON_SURFACE.has(it.type) || !!(prop && prop.surface);
         o.userData.mounted = !!(prop && prop.mountY !== undefined);   // art, sconces, upper cabinets: they live IN the wall plane by design, whatever y they mount at
         o.userData.foliage = !!(prop && prop.foliage) || PAGE_FOLIAGE.has(it.type);
-        kit.theme(o, { skip: HERO_SET.has(it.type) || it.type === 'core-shelf' || it.color !== undefined });   // props take the house's role colours; the Core and explicitly coloured items keep theirs
+        kitb.themeItem(kit, o, it);   // props take the house's role colours; the Core and explicitly coloured items keep theirs (kit-build.ts)
         // anything the door-to-core eye (1.45 m up) could meet is a routing obstacle on this storey — a desk
         // ornament sitting at DESK_TOP + its own height clears 1.1 m easily without blocking anything at floor
         // or eye level, so this reads o.userData.onSurface (registry surface: true included) rather than

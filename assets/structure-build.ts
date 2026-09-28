@@ -9,8 +9,11 @@ import { FloorplanGraph } from './floorplan-graph.js';
 import { createWallCompiler } from './wall-compiler.js';
 import { buildRoofs } from './roofs.js';
 import { DEG, hex, mix } from './build-context.js';
+import { specDefaults } from './spec/index.js';
 
-export function createStructureBuild(bctx) {
+// kitb (kit-build.ts, S1) turns the spec's doors, colours and finishes into the parameters below; this module
+// keeps the geometry round each call.
+export function createStructureBuild(bctx, { kitb }) {
   const { THREE, AssetFactory, ProceduralArchitecture, registerTrackedWall, registerRoof, registerCeiling, textures, useGraphWalls, std, group } = bctx;
 
   // Roofs: assets/roofs.ts (eaves hung below the wall top, fascia, gutters and downspouts, ridge caps, gable ends).
@@ -22,14 +25,6 @@ export function createStructureBuild(bctx) {
   const SIDE_ROT = { S: 0, N: Math.PI, E: Math.PI / 2, W: -Math.PI / 2 };
   const SIDE_ORI = { S: 'south', N: 'north', E: 'east', W: 'west' };
   const localOffset = (side, at, mid) => (side === 'S' || side === 'W') ? at - mid : -(at - mid);
-
-  function openingToParam(op, height, isEntry) {
-    if (op.type === 'window') return { type: 'window', width: op.w, height: op.h || 1.2, sillY: op.sill ?? 0.9 };
-    if (op.type === 'glass')  return { type: 'window', width: op.w, height: Math.min(op.h || height - 0.1, height - 0.1), sillY: 0.05 };
-    if (op.type === 'slider') return { type: 'door', width: op.w, height: op.h || 2.2, style: 'glass-slider', entry: !!isEntry };
-    if (op.type === 'garage') return { type: 'door', width: op.w, height: op.h || 2.2, style: 'garage' };
-    return { type: 'door', width: op.w, height: op.h || 2.1, style: op.style || 'entry', open: isEntry || op.open === true, entry: !!isEntry, leafColor: op.color ? hex(op.color) : undefined };
-  }
 
   // ---------------------------------------------------------------------------------------
   // Graph walls (opt-in: deps.useGraphWalls, off by default — houses look exactly as before
@@ -57,6 +52,7 @@ export function createStructureBuild(bctx) {
   // Returns the storey's elevation and wall height, which its rooms and fixtures are built at.
   function buildLevel({ spec, lv, levelById, palette, kit, anchors, put, graphs }) {
     const floorTex = name => textures[name === 'oak' ? 'oak' : name] || kit.floorTexture(name) || textures.oak;
+    const defaults = specDefaults(spec);
     const y = lv.y || 0, H = lv.height || 2.8;
     const wallColor = hex(lv.wallColor || palette.wall), trimColor = hex(lv.trimColor || palette.trim);
     // interior paint: palette.interior / lv.interior, else the wall colour lifted toward off-white when the
@@ -90,7 +86,7 @@ export function createStructureBuild(bctx) {
         mesh.position.y = 0; // extrude goes from y=0 downward after rotateX → top at slab elevation
         g.add(mesh);
         // ceiling underside
-        const ceil = new THREE.Mesh(new THREE.ShapeGeometry(shape), std(0xf1f5f9, { side: THREE.DoubleSide }));
+        const ceil = new THREE.Mesh(new THREE.ShapeGeometry(shape), kitb.ceilingMaterial({ spec, defaults, lv, where: 'slab-underside' }));
         ceil.rotation.x = Math.PI / 2; ceil.position.y = -0.185; g.add(ceil);
         return g;
       }, 0, 0, y, null, 'floor');
@@ -107,7 +103,7 @@ export function createStructureBuild(bctx) {
         const cx = horiz ? mid : e.a[0], cz = horiz ? e.a[1] : mid;
         const mine = ops.filter(o => o.edge === e);
         const isEntry = op => spec.entry && spec.entry.level === lv.id && spec.entry.side === op.side && Math.abs(spec.entry.at - op.at) < 1e-6;
-        const openings = mine.map(op => ({ ...openingToParam(op, H, isEntry(op)), offset: localOffset(e.side, op.at, mid) }));
+        const openings = mine.map(op => ({ ...kitb.openingParams(op, H, isEntry(op), { spec, defaults, lv }), offset: localOffset(e.side, op.at, mid) }));
         // is the wall's local +x end an outside corner? (beyond that end, on both sides of the wall line, is
         // outside the footprint) — the wall fills and trims that corner (createParametricWall)
         const dx = { S: [1, 0], N: [-1, 0], E: [0, -1], W: [0, 1] }[e.side], nv = { S: [0, 1], N: [0, -1], E: [1, 0], W: [-1, 0] }[e.side];
@@ -115,10 +111,11 @@ export function createStructureBuild(bctx) {
         const outerCorner = [1, -1].every(k => { const px = pe[0] + dx[0] * 0.05 + k * nv[0] * 0.05, pz = pe[1] + dx[1] * 0.05 + k * nv[1] * 0.05; return !lv.footprint.some(r => px > r.x && px < r.x + r.w && pz > r.z && pz < r.z + r.d); });
         const w = put(() => ProceduralArchitecture.createParametricWall({
           length: e.length, height: H, wallColor: interior, trimColor, baseboardColor: mix(interior, 0xffffff, 0.5),
-          orientation: SIDE_ORI[e.side], openings, cladding: kit.cladding(), exteriorColor: wallColor, outerCorner
+          orientation: SIDE_ORI[e.side], openings, cladding: kitb.wallCladding(kit, { spec, defaults, lv, edge: e }), exteriorColor: wallColor, outerCorner
         }), cx, cz, y);
         w.rotation.y = SIDE_ROT[e.side];
         registerTrackedWall(w, SIDE_ORI[e.side], H, 0.85);
+        mine.forEach((op, i) => kitb.noteOpening({ spec, defaults, lv, anchors, op, param: openings[i], side: e.side, y, isEntry: isEntry(op) }));
         for (const op of mine) if (isEntry(op)) {
           const out = { S: [0, 1], N: [0, -1], E: [1, 0], W: [-1, 0] }[op.side];
           // an entry slider opens on its local −x half (see createParametricWall): the door axis the shot
@@ -140,7 +137,7 @@ export function createStructureBuild(bctx) {
         const dir = alongX ? Math.sign(p.to[0] - p.from[0]) || 1 : -(Math.sign(p.to[1] - p.from[1]) || 1);
         const door = p.door === null || p.door === undefined ? null : dir * (p.door - len / 2);
         const wall = put(() => ProceduralArchitecture.createInteriorPartitionWall({
-          length: len, height: p.height || H - 0.1, wallColor: hex(p.color || interior), trimColor, doorOffset: door, doorWidth: p.doorW || 0.9
+          length: len, height: p.height || H - 0.1, ...kitb.partitionParams(p, { spec, defaults, lv, interior, trimColor }), doorOffset: door
         }), cx, cz, y);
         if (!alongX) wall.rotation.y = Math.PI / 2;
         registerTrackedWall(wall, 'partition', p.height || H - 0.1, 0.85);
@@ -180,6 +177,7 @@ export function createStructureBuild(bctx) {
   }
 
   function buildCeilings({ spec, put }) {
+    const defaults = specDefaults(spec);
     // ---- ceilings: wherever a storey has no storey above it. With the roofs on they are hidden under the
     // roof; once a shot fades the roofs out (eye under a ceiling) the storey would otherwise open to the sky.
     // Built from 0.25 m cells of the storey's footprint not covered by any higher storey — robust for every
@@ -198,7 +196,7 @@ export function createStructureBuild(bctx) {
       const pos = new Float32Array(quads.length * 18); let k = 0;
       for (const [x0, z0, x1, z1] of quads) for (const [px, pz] of [[x0, z0], [x1, z0], [x1, z1], [x0, z0], [x1, z1], [x0, z1]]) { pos[k++] = px; pos[k++] = 0; pos[k++] = pz; }
       const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.computeVertexNormals();
-      const ceil = put(() => { const g = group(`Ceiling (${lv.id})`, { category: 'Architecture' }); const m = new THREE.Mesh(geo, std(0xf1f5f9, { side: THREE.DoubleSide, roughness: 0.9 })); m.receiveShadow = true; g.add(m); return g; }, 0, 0, y + H - 0.02);
+      const ceil = put(() => { const g = group(`Ceiling (${lv.id})`, { category: 'Architecture' }); const m = new THREE.Mesh(geo, kitb.ceilingMaterial({ spec, defaults, lv, where: 'ceiling' })); m.receiveShadow = true; g.add(m); return g; }, 0, 0, y + H - 0.02);
       if (typeof registerCeiling === 'function') registerCeiling(ceil, y + H - 0.02);
     }
   }

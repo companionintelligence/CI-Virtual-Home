@@ -5,6 +5,10 @@
 // parameters are published to the catalog from here.
 import { hex } from './build-context.js';
 
+// The hero desk set: the Companion Core's own pieces. The rooms loop skips a room-item copy of them at hero.at (the
+// hero block places the real set), and theming leaves them their own colours (kit-build.ts themeItem, buildProp).
+export const HERO_SET: ReadonlySet<string> = new Set(['walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
+
 export function createItemMap(bctx) {
   const { THREE, AssetFactory, ProceduralArchitecture, std, group } = bctx;
 

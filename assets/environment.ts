@@ -6,7 +6,7 @@
 //              bounce from below); as an equirect it is the backdrop, fading below the horizon into the ground
 //              colour by exactly the function the fog uses, so fogged ground and backdrop meet without a seam.
 //   sun        colour / intensity / elevation / swing (degrees round from straight in front of the entry, + = to
-//              the front's left). Where it stands comes from the house — room-creator.html's applyLighting aims it.
+//              the front's left). Where it stands comes from the house — createLighting's applyLighting (below) aims it.
 //   hemi, fill the sky/ground bounce and a cool fill opposite the sun. Neither casts shadows.
 //   fog        [near, far] in metres, to the horizon colour. far stays inside the camera's far plane (160 m) so
 //              the ground is fully hazed before it is clipped.
@@ -329,3 +329,63 @@ export const GradeShader = {
       gl_FragColor = vec4(rgb, c.a);
     }`,
 };
+
+// ---- the light on the page: a preset and an aim, applied to the scene ------------------------------------------
+// Moved out of room-creator.html (plan S0; Completeness A1 gives the light to S1, which owns this file): the page
+// creates one with its lights, sky and renderer and destructures the names it used to declare, so every caller is
+// unchanged. `aim` is the live aim (the house the lights point at), which the page's shadow box and composer read.
+// setLightingPreset is the API the builder (kit-build.ts lightHouse) and the editor's time-of-day control call.
+export function createLighting({ THREE, scene, renderer, sunLight, hemisphereLight, ambientLight, rimLight, skyBaker, skyFog, refitShadow,
+  toneMapping: houseToneMapping, toneExposure: houseToneExposure, select: lightingSelect, override: LIGHTING_OVERRIDE }: any) {
+  // The house the lights are aimed at, kept so the UI's preset select can re-light without rebuilding.
+  const lightingAim = { front: [0, 1], centre: [0, 0], preset: 'day' };
+  const DEG = Math.PI / 180;
+  function applyLighting(preset, aim: any = {}) {
+    if (preset) lightingAim.preset = lightingName(preset);
+    if (aim.front) lightingAim.front = aim.front;
+    if (aim.centre) lightingAim.centre = aim.centre;
+    const name = lightingAim.preset, p = TIME_OF_DAY[name];
+    const [cx, cz] = lightingAim.centre;
+    const s = sunDirection(p, lightingAim.front as [number, number]), D = 34;
+    // sun: the key, the only shadow caster. shadow.intensity < 1 leaves some sky in the shade (Pascal: 0.75).
+    sunLight.color.set(p.sun.color); sunLight.intensity = p.sun.intensity;
+    sunLight.position.set(cx + s[0] * D, s[1] * D, cz + s[2] * D);
+    sunLight.target.position.set(cx, 0, cz); sunLight.target.updateMatrixWorld();
+    sunLight.shadow.intensity = p.shadow;
+    // sky / ground bounce, and a cool fill from the far side at 35°
+    hemisphereLight.color.set(p.hemi.sky); hemisphereLight.groundColor.set(p.hemi.ground); hemisphereLight.intensity = p.hemi.intensity;
+    ambientLight.color.set(0xffffff); ambientLight.intensity = p.ambient;
+    const faz = Math.atan2(s[0], s[2]) + Math.PI, fel = 35 * DEG, F = 28;
+    rimLight.color.set(p.fill.color); rimLight.intensity = p.fill.intensity;
+    rimLight.position.set(cx + Math.sin(faz) * Math.cos(fel) * F, Math.sin(fel) * F, cz + Math.cos(faz) * Math.cos(fel) * F);
+    rimLight.target.position.set(cx, 1, cz); rimLight.target.updateMatrixWorld();
+    // sky: PMREM environment + backdrop; fog to the horizon colour
+    const sky = skyBaker.bake(name, p, s);
+    scene.environment = sky.environment; scene.environmentIntensity = p.env;
+    scene.background = sky.background; scene.backgroundIntensity = 1;
+    scene.fog.color.set(p.sky[1]); scene.fog.near = p.fog[0]; scene.fog.far = p.fog[1];
+    skyFog.ground.set(p.sky[2]); skyFog.sky.set(p.sky[0]);
+    scene.userData.horizon = parseInt(p.sky[1].slice(1), 16);
+    renderer.toneMapping = houseToneMapping;
+    renderer.toneMappingExposure = p.exposure * houseToneExposure;
+    refitShadow();   // a low sun throws long shadows: the box has to hold them, not just the lot
+    // the house's own light: tagged fixtures × lampGain, tagged window glass glowing (bloom/grade: composerFor)
+    const glow = applyHouseGlow(THREE, scene, p);
+    const w = window as any;
+    w.__houseLighting = { preset: name, label: p.label, lampGain: p.lampGain, windowGlow: p.windowGlow, glowColor: p.glowColor, horizon: scene.userData.horizon, sky: p.sky.slice(), sun: s, tagged: glow };
+    window.dispatchEvent(new CustomEvent('house:lighting', { detail: w.__houseLighting }));
+  }
+  // The builder's dep, and the UI select, both land here. `preset` is optional — applyLighting's own
+  // `if (preset)` guard is what leaves the current preset untouched when it's omitted (a spec without
+  // `lighting` still gets its sun aimed, per the builder's call site). Resolving a name unconditionally
+  // here defeated that guard by always handing applyLighting something truthy, forcing every build back to
+  // the default preset even when the caller passed nothing. The builder always passes an aim; the UI never
+  // does — so ?lighting= overrides the spec's preset, not the viewer's own choice.
+  function setLightingPreset(preset, aim?) {
+    if (aim && LIGHTING_OVERRIDE) preset = LIGHTING_OVERRIDE;
+    const name = preset ? lightingName(preset) : undefined;
+    if (name && lightingSelect && lightingSelect.value !== name) lightingSelect.value = name;
+    applyLighting(name, aim);
+  }
+  return { aim: lightingAim, applyLighting, setLightingPreset };
+}

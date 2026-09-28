@@ -10,7 +10,9 @@
 // This file is the orchestrator (plan S0 "seams"): it owns the ORDER things are built in and nothing else, and
 // is frozen. Each part lives in its own module, owned by one stream:
 //   build-context.ts   the page's dependencies and the shared helpers (std, box, group, hex, mix)      S0
-//   item-map.ts        spec item type → AssetFactory builder, DESK_TOP, the on-surface set              S1 kit
+//   kit-build.ts       palette and kit, and the spec → parameters every other module asks it for:     S1 kit
+//                      doors and windows, partition doors, cladding, ceilings, theming, lighting
+//   item-map.ts        spec item type → AssetFactory builder, DESK_TOP, the on-surface and hero sets   S1 kit
 //   hero-build.ts      the Companion Core, its surface and its cables                                  S1 kit
 //   structure-build.ts slabs, walls, openings, partitions, stairs, balustrades, ceilings, roofs         S2 arch
 //   rooms-build.ts     the rooms loop                                                                  S3 compose
@@ -19,11 +21,12 @@
 // The order below is load-bearing: scene objects, materials and seeded streams are created in it, and a frame
 // depends on all three (object and material ids break ties in three.js's render sort). Do not reorder.
 
-import { createMaterialKit, restrainPalette } from './materials.js';
+import { createMaterialKit } from './materials.js';
 import { PROPS } from './props/index.js';
 import { dressLevel } from './fixtures.js';
 import { createBuildContext } from './build-context.js';
-import { createItemMap } from './item-map.js';
+import { createKitBuild } from './kit-build.js';
+import { createItemMap, HERO_SET } from './item-map.js';
 import { createHeroBuild } from './hero-build.js';
 import { createStructureBuild } from './structure-build.js';
 import { createRoomsBuild } from './rooms-build.js';
@@ -32,28 +35,29 @@ import { createShotPlannerV1 } from './shot-planner-v1.js';
 
 export function createHouseBuilder(deps) {
   const bctx = createBuildContext(deps);
-  const { THREE, addItemToScene, registerCeiling, fitShadow, setLightingPreset, std, box, group, hex, mix } = bctx;
+  const { THREE, addItemToScene, registerCeiling, fitShadow, std, box, group, hex, mix } = bctx;
+  const kitb = createKitBuild(bctx);
   const { ITEMS, DESK_TOP, ON_SURFACE } = createItemMap(bctx);
   const site = createSiteBuild(bctx);
-  const structure = createStructureBuild(bctx);   // (makes the graph-wall compiler, when deps.useGraphWalls)
-  const rooms = createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE });
+  const structure = createStructureBuild(bctx, { kitb });   // (makes the graph-wall compiler, when deps.useGraphWalls)
+  const rooms = createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb });
   const hero = createHeroBuild(bctx, { DESK_TOP });
-  const planner = createShotPlannerV1({ THREE });
+  const planner = createShotPlannerV1(bctx);   // the whole context: a dep the page adds (bctx.extra) reaches it
 
   // ---------------------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------------------
   function build(spec) {
-    const palette = restrainPalette({ wall: '#f8fafc', trim: '#1e293b', roof: '#3f2a1d', accent: '#0f766e', ...(spec.palette || {}) });   // saturated walls/roofs pulled toward restraint
+    const palette = kitb.housePalette(spec);   // saturated walls/roofs pulled toward restraint (kit-build.ts)
     const anchors: Record<string, any> = { spec: spec.id, entry: null, hero: null, stairs: [], levels: {}, bounds: null, lot: spec.lot, solids: {} };
     if (typeof fitShadow === 'function') fitShadow({ w: (spec.lot || {}).w || 30, d: (spec.lot || {}).d || 24 });   // the page fits the sun's shadow box to this lot
     // the material kit compiles the palette: exterior cladding, floor textures the page lacks, and role colours
     // (fabric, wood, cabinet, rug, accent) that theme every prop — seeded by the house id
-    const kit = createMaterialKit({ THREE, palette, seed: spec.id });
+    const kit = kitb.houseKit(spec, palette);
     site.setKit(kit);
     const siteKit = site.siteKitFor(spec);
     const propCtx = rooms.propContextFor(kit);
-    anchors.kit = { colors: kit.colors, cladding: kit.cladding().userData.cladding };
+    anchors.kit = kitb.kitAnchors(kit, spec);
     const placed = [];
     // shotsFor(spec, anchors) probes the built scene round the Core (assets/core-orbit.ts); non-enumerable, so
     // anything that serialises anchors (build-house-plan.mts) never walks the scene graph
@@ -86,13 +90,8 @@ export function createHouseBuilder(deps) {
     // ---- site (site-build.ts)
     site.buildSite({ spec, kit, siteKit, put, anchors, water });
 
-    // The preset says what the light is made of; the house says where it stands — the sun swings round
-    // from the bearing the entry faces, so the façade the shots open on is the lit one. A spec without a
-    // `lighting` still gets its sun aimed; it just keeps the default preset.
-    if (setLightingPreset) setLightingPreset(spec.lighting, {
-      front: anchors.entry ? anchors.entry.out : [0, 1],
-      centre: anchors.bounds ? [(anchors.bounds.minX + anchors.bounds.maxX) / 2, (anchors.bounds.minZ + anchors.bounds.maxZ) / 2] : [0, 0],
-    });
+    // ---- the light: the spec's preset, the sun aimed from the entry's bearing (kit-build.ts)
+    kitb.lightHouse({ spec, anchors });
     return { anchors, placed, graphs };
   }
 
@@ -109,10 +108,9 @@ export function createHouseBuilder(deps) {
     const prop = PROPS.get(type);
     const ctx = { THREE, std, box, group, mix, hex, colors: kit.colors, rng: kit.itemRng(type) };
     const o = prop ? prop.create(it, ctx) : ITEMS[type] ? ITEMS[type](it, { H: 2.8, y: 0, palette }) : null;
-    if (o && !prop) kit.theme(o, { skip: HERO_SET_PUBLIC.has(type) });
+    if (o && !prop) kit.theme(o, { skip: HERO_SET.has(type) || type === 'core-shelf' });
     return o;
   }
-  const HERO_SET_PUBLIC = new Set(['walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers', 'core-shelf']);
   const { SITE } = site;
   return { build, shotsFor, buildProp, ITEMS, SITE, PROPS };
 }
