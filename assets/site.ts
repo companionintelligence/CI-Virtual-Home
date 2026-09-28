@@ -60,6 +60,10 @@ const DEFAULT_SPECIES = ['broad', 'broad', 'broad', 'oval', 'oval', 'conical', '
 const FLOWER_KINDS = ['daisy', 'tulip', 'lavender', 'bloom', 'bloom'];
 const PETAL = { daisy: [0xefeadb, 0xe8dcc0], tulip: [0xc46b7b, 0xd6a04b, 0xb45a4b, 0xd595a6], lavender: [0x8f7cb8, 0x9b88c0], bloom: BLOOM };
 
+// The site types build() below answers (its switch's cases): the validator reads this list, so a type added to
+// build() is added here too, or specs using it fail validation.
+export const SITE_KIT_TYPES: readonly string[] = ['tree', 'cypress', 'palm', 'shrub', 'planter', 'flowers', 'rock', 'bed', 'path', 'hedge', 'scatter', 'grove'];
+
 // `keepOut` is the ground storey's footprint ({ x, z, w, d } rects): the walls stand on its edge, and a bed plants
 // nothing that would reach through them.
 export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [] }) {

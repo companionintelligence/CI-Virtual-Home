@@ -1,8 +1,9 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Golden-image gate for the HouseSpec product shots (review item 4).
+// @check-house skip — check-house runs it as its goldens step
 //
 //   pnpm run goldens [--house aurora,mirage] [--shot door-to-core,orbit,hero-reveal]
-//        [--profile auto] [--update] [--jobs 3] [--timeout 60000]
+//        [--profile auto] [--update] [--record <stream>] [--jobs 3] [--timeout 60000]
 //        [--threshold 0.1] [--ratio 0.001] [--mae 0.01] [--out <root>/test/diff]
 //
 // For every house × shot it renders a small, fixed set of frames through the SAME path the video uses —
@@ -27,14 +28,30 @@
 // A profile with no baselines at all exits 3 ("nothing to compare against") rather than reporting 150
 // regressions — that is the signal to bless a set for this machine on purpose, with --update.
 //
-// Exit codes:  0 pass · 1 one or more frames differ, or one has no baseline · 2 a frame failed to render
-//               3 the profile has no baselines at all
+// The golden ledger (plan Completeness I; scripts/golden-ledger.mts has the whole contract). Goldens are never
+// re-blessed on a stream branch, so a branch whose change is MEANT to move frames declares each one in its own
+// stream's file, test/goldens/expected-diffs/<stream>.json:
+//
+//   { "vanilla/door-to-core@1": { "cause": "monitor pole moved behind the screen" }, … }
+//
+// and records what each moved TO with `--record <stream>` (the render, beside the ledger, in LFS). A declared frame
+// passes as "expected" when it matches a declaring stream's recorded frame, with this gate's own tolerance (its diff
+// against the baseline is still written for review); an undeclared frame that moved fails as before; and a declared
+// frame fails when it did NOT move ("unmoved" — the fix stopped taking effect, or the entry is stale), was never
+// recorded here ("unrecorded"), or moved to something else ("elsewhere" — a regression on top of the declared change).
+// Entries for frames this run does not render (--house / --shot) are not judged. The one re-bless at integration
+// empties the folder.
+//
+// Exit codes:  0 pass · 1 one or more frames differ unexpectedly, are declared but unmoved / unrecorded / moved
+//               elsewhere, or have no baseline · 2 a frame failed to render, or the ledger is malformed
+//               3 the profile has no baselines
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import crypto from 'node:crypto';
 import pixelmatch from './vendor/pixelmatch.mjs';
 import { encodePNG, decodePNG } from './vendor/png.mjs';
+import { loadLedger, pendingPath, causes, streamName, streamFile, ledgerDir, type LedgerEntry } from './golden-ledger.mts';
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, x, i, arr) => {
   if (x.startsWith('--')) a.push([x.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : 'true']);
@@ -52,6 +69,9 @@ const JOBS = Math.max(1, parseInt(args.jobs || '3', 10));
 // the load budget is a flag: the default suits a GPU, and a software rasteriser wants several times more.
 const LOAD_MS = Math.max(10000, parseInt(args.timeout || '60000', 10));
 const UPDATE = args.update === 'true';
+const RECORD = args.record && args.record !== 'true' ? streamName(args.record + '.json') : null;   // --record s1
+if (args.record === 'true') { console.error('--record needs a stream: --record s1'); process.exit(2); }
+if (RECORD && UPDATE) { console.error('--record and --update are two different things: record a branch\'s moved frames, or re-bless the baselines'); process.exit(2); }
 const THRESHOLD = Number(args.threshold ?? 0.1);     // pixelmatch per-pixel YIQ threshold — three.js's value
 const RATIO = Number(args.ratio ?? 0.001);           // ≤ 0.1 % of pixels may differ — three.js's value
 // pixelmatch answers "did anything MOVE". Its threshold is a perceptual distance applied per pixel, so a
@@ -115,6 +135,24 @@ const HOUSES = (args.house || fs.readdirSync(path.join(ROOT, 'content', 'houses'
   .map(f => f.replace(/\.json$/, '')).join(',')).split(',').filter(Boolean);
 
 const goldenPath = (house, shot, t) => path.join(GOLDEN_DIR, house, `${shot}@${String(t).replace('.', '_')}.png`);
+
+// the golden ledger (header; scripts/golden-ledger.mts): frame key → the streams that declare it. Fixture keys are
+// test-fixtures.mts's to judge; here they only have to name a fixture.
+const frameKey = (house, shot, t) => `${house}/${shot}@${t}`;
+const LEDGER_DIR = ledgerDir(ROOT);
+const GOLDEN_KEYS = new Set(fs.readdirSync(path.join(ROOT, 'content', 'houses')).filter(f => f.endsWith('.json') && f !== 'index.json' && !f.endsWith('.plan.json'))
+  .map(f => f.replace(/\.json$/, '')).flatMap(h => Object.entries(FRAMES).flatMap(([s, ts]) => ts.map(t => frameKey(h, s, t)))));
+const FIXTURE_IDS = new Set(fs.existsSync(path.join(ROOT, 'test', 'fixtures', 'houses')) ? fs.readdirSync(path.join(ROOT, 'test', 'fixtures', 'houses')).filter(f => f.endsWith('.json')).map(f => f.replace(/\.json$/, '')) : []);
+const ledger = loadLedger(ROOT, k => GOLDEN_KEYS.has(k) || FIXTURE_IDS.has(k.split('/')[0]));
+if (ledger.problems.length) { console.error(`the golden ledger (${path.relative(process.cwd(), LEDGER_DIR)}):\n  ${ledger.problems.join('\n  ')}`); process.exit(2); }
+const LEDGER = new Map([...ledger.entries].filter(([k]) => GOLDEN_KEYS.has(k)));   // key → LedgerEntry[]
+if (RECORD && !ledger.byStream.has(RECORD)) { console.error(`--record ${args.record}: no ${path.relative(process.cwd(), path.join(LEDGER_DIR, streamFile(RECORD) + '.json'))} — declare the frames it moves there first`); process.exit(2); }
+// does `actual` match a recorded frame within the gate's tolerance?
+function sameFrame(recorded, actual, w, h) {
+  if (recorded.width !== w || recorded.height !== h) return false;
+  const ratio = pixelmatch(recorded.data, actual, null, w, h, { threshold: THRESHOLD }) / (w * h);
+  return ratio <= RATIO && meanAbsDiff(recorded.data, actual).mae <= MAE;
+}
 
 async function loadPlaywright() {
   try { return await import('playwright'); } catch {}
@@ -281,7 +319,11 @@ async function worker() {
           const differing = pixelmatch(golden.data, actual, diff, shot_.w, shot_.h, { threshold: THRESHOLD });
           const ratio = differing / (shot_.w * shot_.h);
           const { mae, maxd } = meanAbsDiff(golden.data, actual);
-          if (ratio <= RATIO && mae <= MAE) {
+          const key = frameKey(house, shot, t), declared: LedgerEntry[] | undefined = LEDGER.get(key);
+          if (ratio <= RATIO && mae <= MAE && declared) {
+            results.push({ house, shot, t, state: 'unmoved', differing, ratio, mae, maxd, cause: causes(declared) });
+            console.log(`  ✗ ${label}  unmoved: the ledger says it moves (${causes(declared)}), and it matches its baseline`);
+          } else if (ratio <= RATIO && mae <= MAE) {
             results.push({ house, shot, t, state: 'pass', differing, ratio, mae, maxd });
             console.log(`  ✓ ${label}${differing ? `  ${differing} px (${(ratio * 100).toFixed(3)} %)` : ''}${mae > 0 ? `  mae ${mae.toFixed(4)}` : ''}`);
           } else {
@@ -291,8 +333,26 @@ async function worker() {
             fs.writeFileSync(`${stem}.expected.png`, encodePNG(golden.data, shot_.w, shot_.h));
             fs.writeFileSync(`${stem}.diff.png`, encodePNG(diff, shot_.w, shot_.h));
             const why = ratio > RATIO && mae > MAE ? 'moved and shifted' : ratio > RATIO ? 'moved' : 'shifted';
-            results.push({ house, shot, t, state: 'differ', why, differing, ratio, mae, maxd, diff: path.relative(process.cwd(), `${stem}.diff.png`) });
-            console.log(`  ✗ ${label}  ${why}: ${differing} px (${(ratio * 100).toFixed(3)} % / ${(RATIO * 100).toFixed(3)} %), mae ${mae.toFixed(2)} (/ ${MAE}), max Δ${maxd} → ${path.relative(process.cwd(), stem)}.diff.png`);
+            // a declared frame: did it move to what a declaring stream recorded? (--record: record it now, for that stream)
+            let state = 'differ', note = '';
+            if (declared) {
+              const mine = RECORD && declared.find(e => e.stream === RECORD);
+              if (mine) {
+                const pp = pendingPath(ROOT, RECORD, PROFILE, key);
+                fs.mkdirSync(path.dirname(pp), { recursive: true }); fs.writeFileSync(pp, encodePNG(actual, shot_.w, shot_.h));
+                state = 'recorded'; note = ` (recorded for ${RECORD} → ${path.relative(process.cwd(), pp)})`;
+              } else {
+                const recs = declared.map(e => ({ e, pp: pendingPath(ROOT, e.stream, PROFILE, key) })).filter(r => fs.existsSync(r.pp));
+                const hit = recs.find(r => sameFrame(decodePNG(fs.readFileSync(r.pp)), actual, shot_.w, shot_.h));
+                state = hit ? 'expected' : recs.length ? 'elsewhere' : 'unrecorded';
+                note = hit ? ` (expected — ${causes(declared)})`
+                  : recs.length ? ` — declared (${causes(declared)}), but it moved to something other than what ${recs.map(r => r.e.stream).join(' / ')} recorded`
+                  : ` — declared (${causes(declared)}), but its moved frame is not recorded on ${PROFILE}: pnpm run goldens --record ${streamFile(declared[0].stream)} --house ${house}`;
+                if (!hit && recs.length) fs.writeFileSync(`${stem}.recorded.png`, fs.readFileSync(recs[0].pp));
+              }
+            }
+            results.push({ house, shot, t, state, why, differing, ratio, mae, maxd, diff: path.relative(process.cwd(), `${stem}.diff.png`), ...(declared ? { cause: causes(declared) } : {}) });
+            console.log(`  ${state === 'expected' || state === 'recorded' ? '≈' : '✗'} ${label}  ${why}${note}: ${differing} px (${(ratio * 100).toFixed(3)} % / ${(RATIO * 100).toFixed(3)} %), mae ${mae.toFixed(2)} (/ ${MAE}), max Δ${maxd} → ${path.relative(process.cwd(), stem)}.diff.png`);
           }
         } catch (e) {
           results.push({ house, shot, t, state: 'error', message: e.message.split('\n')[0] });
@@ -314,7 +374,7 @@ fs.mkdirSync(path.join(ROOT, 'test'), { recursive: true });
 const reportPath = path.join(ROOT, 'test', `goldens.${PROFILE}.json`);
 fs.writeFileSync(reportPath, JSON.stringify({
   profile: PROFILE, res: RES, size: `${RES === '360' ? '640×360' : RES}`, threshold: THRESHOLD, ratio: RATIO, mae: MAE,
-  houses: HOUSES.length, shots: SHOTS, frames: FRAMES, update: UPDATE,
+  houses: HOUSES.length, shots: SHOTS, frames: FRAMES, update: UPDATE, record: RECORD, ledger: LEDGER.size,
   // the gate's own identity: change any of it and every baseline is expected to move
   gate: crypto.createHash('sha256').update(JSON.stringify({ RES, FPS, FRAMES, THRESHOLD, RATIO, MAE, profile: PROFILE })).digest('hex').slice(0, 12),
   results,
@@ -326,11 +386,18 @@ if (UPDATE) {
   const bytes = results.reduce((n, r) => n + (r.bytes || 0), 0);
   console.log(`\n${results.length} baselines for "${PROFILE}" in ${secs}s: ${by('added').length} added, ${by('updated').length} updated, ${by('unchanged').length} unchanged — ${(bytes / 1048576).toFixed(1)} MB total`);
   console.log(`→ ${path.relative(process.cwd(), GOLDEN_DIR)}  (report: ${path.relative(process.cwd(), reportPath)})`);
+  if (ledger.entries.size) console.log(`note: the ledger still lists ${ledger.entries.size} expected diff(s) — a re-bless takes them in, so empty ${path.relative(process.cwd(), LEDGER_DIR)} (the entries and their recorded frames) in the same commit`);
   process.exit(by('error').length ? 2 : 0);
 }
 
-const differ = by('differ'), errors = by('error').concat(by('size')), missing = by('missing');
-console.log(`\n${results.length} frames against "${PROFILE}" in ${secs}s: ${by('pass').length} pass, ${differ.length} differ, ${missing.length} without a baseline, ${errors.length} errored`);
+const differ = by('differ'), errors = by('error').concat(by('size')), missing = by('missing'), expectedDiffs = by('expected'), unmoved = by('unmoved');
+const unrecorded = by('unrecorded'), elsewhere = by('elsewhere'), recorded = by('recorded');
+if (RECORD) {
+  // a frame this stream no longer declares keeps no recorded frame (only among the frames this run rendered)
+  const mine = ledger.byStream.get(RECORD) || {}, rendered = new Set(results.map(r => frameKey(r.house, r.shot, r.t)));
+  for (const k of rendered) if (!mine[k] && GOLDEN_KEYS.has(k)) { const pp = pendingPath(ROOT, RECORD, PROFILE, k); if (fs.existsSync(pp)) { fs.rmSync(pp); console.log(`  - ${k}  no longer declared by ${RECORD}: its recorded frame is removed`); } }
+}
+console.log(`\n${results.length} frames against "${PROFILE}" in ${secs}s: ${by('pass').length} pass, ${expectedDiffs.length} expected (ledger)${RECORD ? `, ${recorded.length} recorded for ${RECORD}` : ''}, ${differ.length} differ, ${unmoved.length + unrecorded.length + elsewhere.length} declared but unmoved / unrecorded / moved elsewhere, ${missing.length} without a baseline, ${errors.length} errored`);
 // An LFS pointer checked out as text is a .png that is not an image, and it is the likeliest way this gate
 // goes wrong on a fresh machine — so name it rather than reporting 150 decode failures.
 if (errors.some(e => /not a PNG/.test(e.message || ''))) console.log(`\nSome baselines are not PNGs. If this is a fresh clone, they are Git LFS pointers:  git lfs install && git lfs pull`);
@@ -338,6 +405,22 @@ if (differ.length) {
   console.log(`\ndiffers:`);
   for (const r of differ.sort((a, b) => (b.mae - a.mae) || (b.ratio - a.ratio))) console.log(`  ${r.why.padEnd(18)} ${(r.ratio * 100).toFixed(3).padStart(7)} %  mae ${r.mae.toFixed(2).padStart(6)}  ${r.house}/${r.shot}@${r.t}  ${r.diff}`);
   console.log(`\nIf the change was intended, re-baseline:  pnpm run goldens:update`);
+}
+if (expectedDiffs.length || recorded.length) {
+  console.log(`\nexpected (declared in ${path.relative(process.cwd(), LEDGER_DIR)}, matching what was recorded):`);
+  for (const r of expectedDiffs.concat(recorded)) console.log(`  ${r.why.padEnd(18)} ${(r.ratio * 100).toFixed(3).padStart(7)} %  mae ${r.mae.toFixed(2).padStart(6)}  ${r.house}/${r.shot}@${r.t}  ${r.cause}${r.state === 'recorded' ? '  (recorded now)' : ''}`);
+}
+if (unmoved.length) {
+  console.log(`\n${unmoved.length} frames the ledger declares as moving match their baselines — the change did not take, or the entry is stale:`);
+  for (const r of unmoved) console.log(`  ${r.house}/${r.shot}@${r.t}  ${r.cause}`);
+}
+if (unrecorded.length) {
+  console.log(`\n${unrecorded.length} declared frames moved, but nobody recorded what they moved to on ${PROFILE} — look at the diffs, then record them:  pnpm run goldens --record <stream>`);
+  for (const r of unrecorded) console.log(`  ${r.house}/${r.shot}@${r.t}  ${r.cause}  ${r.diff}`);
+}
+if (elsewhere.length) {
+  console.log(`\n${elsewhere.length} declared frames moved to something other than what was recorded (a regression on top of the declared change, or two streams meeting — record again, with both causes):`);
+  for (const r of elsewhere) console.log(`  ${r.house}/${r.shot}@${r.t}  ${r.cause}  ${r.diff}`);
 }
 if (missing.length) {
   // Not a pass. A frame nobody has blessed is a frame nobody is checking, and the ways to get here — a new
@@ -348,4 +431,4 @@ if (missing.length) {
   console.log(`Add them with:  pnpm run goldens:update`);
 }
 console.log(`report: ${path.relative(process.cwd(), reportPath)}`);
-process.exit(errors.length ? 2 : (differ.length || missing.length) ? 1 : 0);
+process.exit(errors.length ? 2 : (differ.length || missing.length || unmoved.length || unrecorded.length || elsewhere.length) ? 1 : 0);

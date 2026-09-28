@@ -83,6 +83,21 @@ A clean run has 0 shot errors and 0 scene errors (warnings are reported but do n
 with the previous run by hand; the full list is in `test/qa/qa.json`), `deterministic`, and 150 goldens passing.
 After a spec change also re-run `plans`, `iso` and `floorplans` and commit their output with the spec.
 
+**Pass 4 works in streams** (S0 seams, then S1 kit, S2 architecture, S3 compose, S4 site, S5 shot, S6 ui, each on
+its own branch). Each owns its modules (house-builder.ts's header lists them), its HouseSpec fragment
+(`assets/spec/`), its validator plugin (`scripts/validate/`), its scene checks (`assets/scene-qa/`), its fleet
+metrics (`scripts/fleet/`) and its `plan.json` key (`assets/plan-export/<stream>.ts`); stay in yours. The shared
+files have a seam for each stream instead of a hunk: widen a base spec field by redeclaring it in your fragment
+(`test-spec-types` type-checks every spec and fixture), widen what the validator accepts with your plugin's
+`extend` / `replaces` (`scripts/validate/_types.mts`), and add a page dependency for your builder module under your
+slot below `houseBuilderDeps` in room-creator.html (it arrives as `bctx.extra`). Every new spec field is
+optional and a look-changing default applies only under `"defaults": 2` (`specDefaults()`). Streams never edit
+`content/houses/`: prove a feature on `test/fixtures/houses/<stream>-*.json` (`pnpm run fixtures --fixture <id>
+--update` blesses your own), and never re-bless goldens — list every frame the branch moves, with its cause, in
+your stream's `test/goldens/expected-diffs/<stream>.json` and record what it moved to (`pnpm run goldens --record
+<stream>`, and `fixtures --record <stream>` for another stream's fixture). The integration re-blesses once and
+empties that ledger.
+
 **Goldens are re-blessed only on purpose.** A golden failure means the picture changed. If the change was not
 meant to alter the look, fix the code. If it was, run `pnpm run goldens:update`, look at the frames that moved
 (`test/diff/` from the failing run), and commit the new baselines in the same commit as the change, saying why.

@@ -1,6 +1,8 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Tests for assets/floorplan-graph.js (+ the wall compiler under the vendored three.js).
 // Usage: pnpm run test      (node --experimental-strip-types --test scripts/test-floorplan-graph.mts; needs `pnpm run build` first)
+// @check-house node-test
+// @check-house quick
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
