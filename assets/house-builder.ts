@@ -932,18 +932,22 @@ export function createHouseBuilder(deps) {
       // whose push-in to the orbit is clear. Pushing in from across the Core to an orbit that starts behind it is
       // a whip pan, not a push-in, so the approach stands on the orbit's starting side; where nothing there works
       // the orbit starts later (a shorter sweep, down to 100°), and only failing that is the approach anywhere.
-      const blockedHero = fin ? blockedTest(heroLevel, solidsOn(heroLevel)) : null;
+      // The approach stands at eye height — under the ceiling of a low storey (an attic's 1.5 m) — and keeps off
+      // what stands tall enough to meet the eye there; a bed's 1.1 m headboard it may look over.
+      const yA = heroLevel.y + Math.min(1.42, (heroLevel.height || 2.8) - 0.35);
+      const blockedHero = fin ? blockedTest(heroLevel, solidsOn(heroLevel).filter(so => !(so.top < yA - 0.2))) : null;
       const approachCandidates = opt => {
-        const out = [], yA = heroLevel.y + 1.42;
+        const out = [];
         const tryAt = (sw, ds, relaxed) => {
           const from = sw.from, S = orbitPoint(THREE, fin.centre, hero.fwd, fin.r, from, fin.centre.y + fin.hs[0]);
-          for (const d of ds) for (const D of [2.0, 1.7, 1.4]) {
-            if (D < fin.r + 0.35) continue;
+          // 1.2 m out is a last resort (a Core with furniture 1.5 m off its side): the push-in is then a nudge
+          for (const d of ds) for (const D of [2.0, 1.7, 1.4, 1.2]) {
+            if (D < fin.r + 0.3) continue;
             const p = orbitPoint(THREE, fin.centre, hero.fwd, D, from + opt.dir * d, yA);
             if (blockedHero(p.x, p.z) || !orbitCtx.probe.free(p.x, p.y, p.z) || !orbitCtx.probe.sees(p.x, p.y, p.z)) continue;
             const n = Math.ceil(p.distanceTo(S) / 0.1);
             let clear = true; for (let i = 1; i < n && clear; i++) { const q = p.clone().lerp(S, i / n); clear = orbitCtx.probe.free(q.x, q.y, q.z); }
-            if (clear) out.push({ opt, sw, from, d, p, S, relaxed, arc: sw.arc });
+            if (clear) out.push({ opt, sw, from, d, D, p, S, relaxed, arc: sw.arc });
           }
         };
         // the start moves round in 10° steps, the end's overshoot growing to keep the sweep near aWant
@@ -960,7 +964,8 @@ export function createHouseBuilder(deps) {
       // degree the route turns into the push-in (a route
       // that doubles back is a whip pan) and 0.4 for every degree over 90 the push-in turns into the orbit (it
       // hooks back on itself), 30 if its last straight leg is under 1.2 m (it zig-zags round the desk into it),
-      // 60 for an approach off the orbit's starting side, 0.15 per degree it stands off the start.
+      // 60 for an approach off the orbit's starting side, 0.15 per degree it stands off the start, 0.6 for every
+      // degree under 45 the orbit travels before the front comes round, 10 for an approach only 1.2 m out.
       const chooseApproach = start => {
         if (!fin) return null;
         let best = null;
@@ -973,7 +978,11 @@ export function createHouseBuilder(deps) {
           // the orbit's heading as it leaves S: d/dθ of centre + r(cos θ·fwd + sin θ·side), in the sweep's direction
           const a = c.from * DEG, f = hero.fwd, sd = [f[1], -f[0]], tx = c.sw.dir * (-Math.sin(a) * f[0] + Math.cos(a) * sd[0]), tz = c.sw.dir * (-Math.sin(a) * f[1] + Math.cos(a) * sd[1]);
           const entry = Math.acos(Math.max(-1, Math.min(1, (px * tx + pz * tz) / pl))) / DEG;
-          const score = Math.min(c.arc, 150) + 0.5 * Math.min(c.arc, 120) - 0.3 * turn - 0.4 * Math.max(0, entry - 90) - (leg < 1.2 ? 30 : 0) - (c.relaxed ? 60 : 0) - 0.15 * Math.abs(c.d);
+          // the degrees the orbit travels before it reaches the Core's front: under 45 and the front is shown at
+          // the start and the orbit turns away from it
+          const lead = -c.from * c.sw.dir;
+          const score = Math.min(c.arc, 150) + 0.5 * Math.min(c.arc, 120) - 0.3 * turn - 0.4 * Math.max(0, entry - 90) - (leg < 1.2 ? 30 : 0) - (c.relaxed ? 60 : 0) - 0.15 * Math.abs(c.d)
+            - 0.6 * Math.max(0, 45 - lead) - (c.D < 1.4 ? 10 : 0);
           if (!best || score > best.score) best = { ...c, score };
         }
         if (!best) return null;
@@ -1024,13 +1033,16 @@ export function createHouseBuilder(deps) {
           stairPts.add(eye.length);
           eye.push(landing); tgt.push(after);
           if (last) {
-            // landing → desk approach through the upper rooms; a straight leg keeps the old blend point
-            const to = [after.x - landing.x, after.z - landing.z], dist = Math.hypot(to[0], to[1]);
+            // landing → desk approach through the upper rooms; a straight leg keeps the old blend point (toward
+            // the approach, where the orbit has one: toward the hero it could stand past the approach — a hook)
             approach = chooseApproach(landing) || fallbackApproach();
+            const aim = fin ? approach : after, to = [aim.x - landing.x, aim.z - landing.z], dist = Math.hypot(to[0], to[1]);
             if (!walk(levelOf(st.to), landing, approach, V(hero.x, hero.y + 0.3, hero.z)) && dist > 3.5) { eye.push(clearPoint(V(landing.x + to[0] / dist * 1.6, ty + 1.45, landing.z + to[1] / dist * 1.6), levelOf(st.to), 0.7)); tgt.push(after); }
           }
         });
-      } else if (!walk(heroLevel, eye[inDoor], approach = chooseApproach(eye[inDoor]) || fallbackApproach(), V(hero.x, hero.y + 0.3, hero.z))) {
+      } else if (!walk(heroLevel, eye[inDoor], approach = chooseApproach(eye[inDoor]) || fallbackApproach(), V(hero.x, hero.y + 0.3, hero.z)) && !fin) {
+        // a straight leg: a blend point halfway to the hero (not with an orbit — the approach stands beside the
+        // Core, and a point halfway to the Core can stand past it, which hooks the walk back on itself)
         eye.push(clearPoint(V((ex - ox * 1.2 + hero.x) / 2, ey + 1.45, (ez - oz * 1.2 + hero.z) / 2), heroLevel, 0.6)); tgt.push(V(hero.x, hero.y + 0.3, hero.z));
       }
       approach ||= fallbackApproach();   // (a chain of stairs that never reached the hero's storey)
