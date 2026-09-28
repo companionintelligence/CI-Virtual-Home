@@ -329,7 +329,9 @@ export function createHouseBuilder(deps) {
     // (fabric, wood, cabinet, rug, accent) that theme every prop — seeded by the house id
     const kit = createMaterialKit({ THREE, palette, seed: spec.id });
     kitNow = kit;
-    const siteKit = createSiteKit({ THREE, seed: spec.id, std, mix });   // seeded vegetation, beds, hedges, paths
+    // seeded vegetation, beds, hedges, paths; a bed keeps its plants clear of the ground storey's walls
+    const groundRects = (spec.levels || []).filter(l => (l.y || 0) <= 0.001 && Array.isArray(l.footprint)).flatMap(l => l.footprint);
+    const siteKit = createSiteKit({ THREE, seed: spec.id, std, mix, keepOut: groundRects });
     let propIndex = 0;
     const propCtx = (it, H) => ({ THREE, std, box, group, mix, hex, colors: kit.colors, rng: kit.itemRng(`${it.type}:${propIndex++}`), H });   // registry props (assets/props/)
     anchors.kit = { colors: kit.colors, cladding: kit.cladding().userData.cladding };
