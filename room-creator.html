@@ -1781,6 +1781,7 @@
     import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
     import { createHouseBuilder } from './assets/house-builder.js';
     import { createVisibility, ISO_VIEW, placeIsoCamera } from './assets/visibility.js';
+    import { trackFromV1 } from './assets/shot-track.js';
     import { registerSceneCheck, runSceneChecks } from './assets/scene-qa/index.js';
     import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
@@ -7696,6 +7697,18 @@
     // Returns [{ id, url (jpeg data URL), errors }]. Used by the contact-sheet QA harness and the
     // gallery poster exporter. camera: 'iso' (SE isometric, zoom fits the lot) | 'shot' (spline frame t).
     window.__houseShotDuration = (id, shot) => (SplinePresets[`house:${id}:${shot}`] || {}).duration || animDuration;
+    // The shot as a baked track (assets/shot-track.ts): eye, look, field of view and roof fade at 120 Hz, and its
+    // events, in seconds — what the timeline reads. Sampled from the v1 path the way applySplineFrame flies it, with no
+    // beats yet (planner v2 bakes them). Reads the preset, writes nothing: asking never changes a frame.
+    //   __houseShotTrack('door-to-core' | 'house:<id>:<shot>' | preset, { fps, aspect })
+    window.__houseShotTrack = function (shot = 'door-to-core', { fps = 120, aspect = 16 / 9 } = {}) {
+      if (!activeHouse) throw new Error('no house loaded');
+      const key = typeof shot === 'string' ? (shot.startsWith('house:') ? shot : `house:${activeHouse.id}:${shot}`) : null;
+      const preset = key ? SplinePresets[key] : shot;
+      if (!preset || !preset.eyePoints) throw new Error(`unknown shot ${key || shot}`);
+      const type = preset.type || (key ? key.split(':').pop() : '');
+      return trackFromV1(THREE, preset, { type, duration: preset.duration || animDuration, fps, aspect, houseInside });
+    };
     // headless QA hook (render-house-shots.mts / frame checks): the loaded house's spec + anchors, the scene and camera
     window.__houseDebug = () => ({ house: activeHouse, scene, camera: activeCamera, presets: SplinePresets, renderer });
     // Prop sheet (scripts/prop-sheet.mts): each type built alone on a neutral floor, shot from the front-right
