@@ -7604,13 +7604,20 @@
       activeEyeSpline = new THREE.CatmullRomCurve3(preset.eyePoints, preset.closed, 'centripetal');
       activeTargetSpline = new THREE.CatmullRomCurve3(preset.targetPoints, preset.closed, 'centripetal');
 
+      // the path as data — 161 points along the eye curve and the waypoints — drawn by the overlay (drawShotPath)
+      drawShotPath(activeEyeSpline.getPoints(160), preset.eyePoints);
+    }
+
+    // ---- The shot's overlay (owner: S6 ui — plan Completeness C5: the shot planner hands over path data only; how
+    // the path, its markers and the time readout look is the editor's). drawShotPath replaces the drawn path with
+    // `points` (the eye curve, sampled) and a marker per waypoint; showShotTime moves the timeline and its readout.
+    function drawShotPath(points, waypoints) {
       // Remove previous line & markers
       if (splineLineMesh) scene.remove(splineLineMesh);
       waypointMarkers.forEach(m => scene.remove(m));
       waypointMarkers = [];
 
       // Create visual 3D trajectory line
-      const points = activeEyeSpline.getPoints(160);
       const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
       const lineMat = new THREE.LineBasicMaterial({
         color: 0x38bdf8,
@@ -7623,10 +7630,10 @@
       scene.add(splineLineMesh);
 
       // Create waypoint markers
-      preset.eyePoints.forEach((pt, i) => {
+      waypoints.forEach((pt, i) => {
         const markerGeo = new THREE.SphereGeometry(0.12, 12, 12);
         const markerMat = new THREE.MeshBasicMaterial({
-          color: (i === 0 ? 0x10b981 : (i === preset.eyePoints.length - 1 ? 0xf43f5e : 0xfbbf24))
+          color: (i === 0 ? 0x10b981 : (i === waypoints.length - 1 ? 0xf43f5e : 0xfbbf24))
         });
         const marker = new THREE.Mesh(markerGeo, markerMat);
         marker.position.copy(pt);
@@ -7634,6 +7641,13 @@
         scene.add(marker);
         waypointMarkers.push(marker);
       });
+    }
+    // t: the shot's 0–1 progress; duration: seconds
+    function showShotTime(t, duration) {
+      animTimelineSlider.value = Math.round(t * 1000);
+      const curSec = Math.floor(t * duration);
+      const curMs = Math.floor((t * duration % 1) * 10);
+      animTimeReadout.textContent = `00:${curSec.toString().padStart(2, '0')}.${curMs} / 00:${duration.toString().padStart(2, '0')}`;
     }
 
     function syncFlythroughWithScene(sceneKey) {
@@ -8477,11 +8491,8 @@
         }
       }
 
-      // Update timeline slider & time readout
-      animTimelineSlider.value = Math.round(clampedT * 1000);
-      const curSec = Math.floor(clampedT * animDuration);
-      const curMs = Math.floor((clampedT * animDuration % 1) * 10);
-      animTimeReadout.textContent = `00:${curSec.toString().padStart(2, '0')}.${curMs} / 00:${animDuration.toString().padStart(2, '0')}`;
+      // Update timeline slider & time readout (the overlay's: showShotTime)
+      showShotTime(clampedT, animDuration);
     }
 
     splineSelect.addEventListener('change', (e) => {

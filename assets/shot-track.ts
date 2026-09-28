@@ -14,6 +14,10 @@
 // function of its inputs, so asking for a track never changes a frame.
 //
 // Owner: S5 (shot). THREE is injected (only CatmullRomCurve3 and Vector3 are used), so it runs in Node too.
+//
+// Also S5's roof rule — when the roofs fade during a shot (shotRoofMode, shotEnterS, shotRoofAlpha below). The
+// page's visibility.ts (S6) applies it to the scene every frame and trackFromV1 bakes it into roofAlpha, so the
+// two can never disagree; planner v2 changes the rule here (plan §3.2: fade from events.enterT over 0.35 s).
 
 const DEG = Math.PI / 180;
 // room-creator.html's easeInOutCubic: door-to-core without timing plays under it
@@ -37,26 +41,39 @@ export type ShotTrack = {
   metrics: Record<string, number | null>;
 };
 
+// ---- the roof during a shot --------------------------------------------------------------------------------------
+/** the roof mode a shot's dressing resolves to: a 'sims' shot looks in from outside and above, so it never reaches
+ *  an 'auto' roof's fade — there, auto means off, or the cut walls open onto a roof underside */
+export function shotRoofMode(dressing?: { walls?: string; roof?: string } | null): string {
+  const d = dressing || { walls: 'up', roof: 'auto' };
+  return d.roof === 'auto' && d.walls === 'sims' ? 'off' : (d.roof || 'auto');
+}
+/** the first of 241 steps along the eye curve (sample fraction s) at which the eye is under a ceiling; Infinity when
+ *  it never goes in (or there is no curve, or no house to be inside) */
+export function shotEnterS(curve: { getPointAt: (s: number) => any } | null, houseInside: ((p: any) => boolean) | null): number {
+  if (curve && houseInside) for (let i = 0; i <= 240; i++) { const s = i / 240; if (houseInside(curve.getPointAt(s))) return s; }
+  return Infinity;
+}
+/** The roofs' opacity on one frame of a shot. frame: { preset, s (the path's sample fraction), enter () → the
+ *  enter fraction (asked only when the mode is 'auto': the page caches it on the preset) }. 'auto' fades over the
+ *  5 % of the path before the eye goes under a ceiling, on a squared ease, and stays off. */
+export function shotRoofAlpha(frame: { preset: any; s: number; enter: () => number }): number {
+  const roof = shotRoofMode(frame.preset && frame.preset.dressing);
+  if (roof === 'off') return 0;
+  if (roof !== 'auto') return 1;
+  const enter = frame.enter(), fadeStart = enter - 0.05, sv = frame.s;
+  return enter === Infinity ? 1 : sv <= fadeStart ? 1 : sv >= enter ? 0 : 1 - ((sv - fadeStart) / 0.05) ** 2;
+}
+
 export function trackFromV1(THREE, preset, { type = '', duration = 10, fps = 120, aspect = 16 / 9, houseInside = null as null | ((p: any) => boolean) } = {}): ShotTrack {
   const n = Math.max(2, Math.round(duration * fps) + 1), dt = duration / (n - 1);
   const flythrough = type === 'door-to-core' || type === 'sunset-timelapse';
   const eyeC = preset.frameAt ? null : new THREE.CatmullRomCurve3(preset.eyePoints, preset.closed, 'centripetal');
   const tgtC = preset.frameAt ? null : new THREE.CatmullRomCurve3(preset.targetPoints, preset.closed, 'centripetal');
-  // the roof fade, as applyShotCutaway decides it (enter: the first of 241 steps along the eye curve under a ceiling)
-  const d = preset.dressing || { walls: 'up', roof: 'auto' };
-  const roof = d.roof === 'auto' && d.walls === 'sims' ? 'off' : (d.roof || 'auto');
+  // the roof fade, by the same rule the page applies (shotRoofAlpha above); enter computed once, never cached
   let enterS = preset.enterT;
-  if (roof === 'auto' && enterS === undefined) {
-    enterS = Infinity;
-    const curve = new THREE.CatmullRomCurve3(preset.eyePoints, preset.closed, 'centripetal');
-    if (houseInside) for (let i = 0; i <= 240; i++) { const sv = i / 240; if (houseInside(curve.getPointAt(sv))) { enterS = sv; break; } }
-  }
-  const roofAt = sv => {
-    if (roof === 'off') return 0;
-    if (roof !== 'auto') return 1;
-    const fadeStart = enterS - 0.05;
-    return enterS === Infinity ? 1 : sv <= fadeStart ? 1 : sv >= enterS ? 0 : 1 - ((sv - fadeStart) / 0.05) ** 2;
-  };
+  if (shotRoofMode(preset.dressing) === 'auto' && enterS === undefined) enterS = shotEnterS(new THREE.CatmullRomCurve3(preset.eyePoints, preset.closed, 'centripetal'), houseInside);
+  const roofAt = sv => shotRoofAlpha({ preset, s: sv, enter: () => enterS });
 
   const S = new Float32Array(n), pos = new Float32Array(3 * n), look = new Float32Array(3 * n), fov = new Float32Array(n), roofAlpha = new Float32Array(n);
   let enterT = null, outside = 0, length = 0, maxSpeed = 0, maxYawRate = 0, firstSecond = 0, prevYaw = null;

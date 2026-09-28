@@ -3,8 +3,11 @@
 // the shotHidden() hook, and the isometric camera's placement.
 //
 // Moved out of room-creator.html (plan S0, Completeness C4): the page creates one with createVisibility(deps) and
-// destructures the same names it used to declare, so every caller is unchanged. Owner: S6 (ui); S5 hides things
-// during a shot through shotHidden(), S2 tags roles on what it builds and registers roofs through registerRoof.
+// destructures the same names it used to declare, so every caller is unchanged. Owner: S6 (ui). S5 owns the
+// decisions a shot makes and this module applies: the roof's opacity frame by frame (shot-track.ts shotRoofAlpha,
+// shotEnterS) and what a shot hides (shotHidden()). S2 tags roles on what it builds (a role set before
+// registerTrackedWall is kept — a 'finish' liner registers for the cutaway and stays a liner) and registers roofs
+// through registerRoof.
 //
 // The page keeps the state other regions read — currentWallMode, currentLayerFilter, FLOOR2_THRESHOLD, activeShot,
 // activeHouse, activeEyeSpline, placedItems — and hands this module accessors to it.
@@ -25,12 +28,14 @@ export function placeIsoCamera(orthoCamera, angleYaw = Math.PI / 4) {
   orthoCamera.lookAt(0, 1.2, 0);
 }
 
+import { shotEnterS, shotRoofAlpha } from './shot-track.js';
+
 export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMode, setWallMode, setLayerFilter, house, eyeSpline }) {
   const trackedWalls = [];
 
   function registerTrackedWall(mesh, orientation, fullH = 2.7, cutawayH = 0.85, downH = 0.15) {
     mesh.userData.isWall = true;
-    mesh.userData.role = 'wall';
+    if (!mesh.userData.role) mesh.userData.role = 'wall';   // a role the builder tagged first (S2's liners) is kept
     mesh.userData.orientation = orientation; // 'south' | 'east' | 'north' | 'west' | 'partition'
     mesh.userData.orientationExplicit = true;
     mesh.userData.fullHeight = fullH;
@@ -48,7 +53,7 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
   // the cutaway / down / up modes apply to EVERY wall, not only parametric ones.
   function autoRegisterWall(obj) {
     if (!obj || !obj.userData || !obj.userData.isWall) return;
-    obj.userData.role = 'wall';
+    if (!obj.userData.role) obj.userData.role = 'wall';
     if (!obj.userData.orientationExplicit) {
       const { x, z } = obj.position;
       const rotated = Math.abs(Math.sin(obj.rotation.y)) > 0.5; // runs along Z
@@ -187,11 +192,10 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
     return eye.y > a.cut || (!!target && houseInside(target));
   }
 
-  // first sample-space t at which the eye is under a ceiling (Infinity: the shot never goes in)
+  // first sample-space t at which the eye is under a ceiling (Infinity: the shot never goes in), cached on the preset
   function shotEnterT(preset) {
     if (preset.enterT !== undefined) return preset.enterT;
-    let enter = Infinity;
-    const spline = eyeSpline(); if (spline) for (let i = 0; i <= 240; i++) { const s = i / 240; if (houseInside(spline.getPointAt(s))) { enter = s; break; } }
+    const enter = shotEnterS(eyeSpline(), houseInside);
     preset.enterT = enter; return enter;
   }
   function setRoofOpacity(o) {
@@ -204,7 +208,8 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
   // The shot says what the walls and the roofs do; the editor's buttons no longer leak into the video.
   // dressing.walls: 'up' (full height — the eye uses the doorways) | 'cutaway' (the editor's dollhouse)
   //                 | 'down' | 'sims' (per wall, per frame, above)
-  // dressing.roof:  'on' | 'off' | 'auto' (fades out over the 5 % of the shot before the eye goes indoors)
+  // dressing.roof:  'on' | 'off' | 'auto' (fades out over the 5 % of the shot before the eye goes indoors) — the
+  //                 opacity is S5's rule, shot-track.ts shotRoofAlpha
   function applyShotCutaway(preset, sampleT, eye, target) {
     // put back what the last frame's shotHidden() hooks hid BEFORE this frame's dressing decides anything: the
     // roofs and ceilings below are placed objects too, and restoring after them would hand a ceiling the last
@@ -219,16 +224,7 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
       for (const w of trackedWalls) applyWallModeToMesh(w, d.walls === 'cutaway' || d.walls === 'down' ? d.walls : 'up');
       shotCutaway.walls = d.walls;
     }
-    // A sims shot looks in from outside and above, so it never reaches an 'auto' roof's fade: there, auto
-    // means off, or the cut walls open onto a roof underside.
-    const roof = d.roof === 'auto' && d.walls === 'sims' ? 'off' : (d.roof || 'auto');
-    let o = 1;
-    if (roof === 'off') o = 0;
-    else if (roof === 'auto') {
-      const enter = shotEnterT(preset), fadeStart = enter - 0.05;
-      o = enter === Infinity ? 1 : sampleT <= fadeStart ? 1 : sampleT >= enter ? 0 : 1 - ((sampleT - fadeStart) / 0.05) ** 2;
-    }
-    setRoofOpacity(o);
+    setRoofOpacity(shotRoofAlpha({ preset, s: sampleT, enter: () => shotEnterT(preset) }));
     for (const c of trackedCeilings) c.obj.visible = !eye || eye.y < c.y - 0.1;
     applyShotHidden({ preset, s: sampleT, eye, target });
   }
