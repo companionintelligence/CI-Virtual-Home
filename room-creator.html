@@ -1781,6 +1781,7 @@
     import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
     import { createHouseBuilder } from './assets/house-builder.js';
     import { createVisibility, ISO_VIEW, placeIsoCamera } from './assets/visibility.js';
+    import { registerSceneCheck, runSceneChecks } from './assets/scene-qa/index.js';
     import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
     import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, sunDirection, createSkyBaker, installSkyFog, applyHouseGlow, GradeShader } from './assets/environment.js';
@@ -8268,12 +8269,17 @@
           if (frac > 0.3) W('planting-grid', (frac * 100).toFixed(0) + ' % of plant pairs share an x or a z within 5 cm over ' + pts.length + ' plants — that is a grid');
         }
 
+        // --- the checks the streams register (assets/scene-qa/: one code each, after the page's own)
+        for (const is of runSceneChecks({ THREE, scene, house: activeHouse, placedItems, trackedWalls, trackedRoofs, trackedCeilings, dressing, shown })) (is.level === 'error' ? E : W)(is.code, is.message, is.subject);
+
         return { id: activeHouse.id, errors, warnings, walls: trackedWalls.length, roofs: trackedRoofs.length, items: placedItems.length };
       } finally {
         endShotCutaway();
         setGlobalWallMode(prevMode);
       }
     };
+    // register(code, ctx => issues): a scene check added at run time, beside the modules' (assets/scene-qa/registry.ts)
+    window.__houseSceneQA.register = registerSceneCheck;
 
     window.houseContactSheet = async function (ids, { wallMode = 'up', camera = 'iso', shot = 'orbit', t = 0, zoom = null } = {}) {
       const out = [];
