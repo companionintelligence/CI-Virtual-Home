@@ -35,8 +35,11 @@ export type { Vec2, Rect, Side, Colour } from './base.js';
 // ---- the merge rule ------------------------------------------------------------------------------------------
 /** the fields any of the five fragments of one part declares */
 type Declared<A, B, C, D, E> = keyof A | keyof B | keyof C | keyof D | keyof E;
+/** the fields a type declares by name — an index signature (site and room items keep one: `[param: string]: unknown`)
+ *  is not a declaration, so a fragment adding a typed item param adds a field rather than "narrowing unknown" */
+type KnownKeys<T> = keyof { [K in keyof T as string extends K ? never : number extends K ? never : K]: T[K] };
 /** the base's fields a fragment redeclares NARROWER than the base (never, when it only widens or adds) */
-type Narrowed<Base, F> = { [K in keyof Base & keyof F]-?: [Base[K]] extends [F[K]] ? never : K }[keyof Base & keyof F];
+type Narrowed<Base, F> = { [K in KnownKeys<Base> & keyof F]-?: [Base[K]] extends [F[K]] ? never : K }[KnownKeys<Base> & keyof F];
 /** compiles only when T is never: `Type '"surface"' does not satisfy the constraint 'never'` names the field */
 type OnlyWidens<T extends never> = T;
 type Narrowed5<Base, A, B, C, D, E> = Narrowed<Base, A> | Narrowed<Base, B> | Narrowed<Base, C> | Narrowed<Base, D> | Narrowed<Base, E>;
