@@ -25,6 +25,7 @@
 // __houseRenderFrames stays random access. Everything is seeded from the house id.
 import { mulberry32, fnv1a } from './materials.js';
 import { inRect } from './house-geometry.js';
+import { programKind, fanPlan, lampPlan } from './kit-rules.js';
 
 export const LIGHT_CAP = 16;          // dynamic lights per house (one per room at most)
 const DAY_GAIN = 0.035;               // lamp gain when no environment has announced one (a daylight preset's)
@@ -42,9 +43,20 @@ const KINDS: Array<[string, RegExp]> = [
   ['work', /study|office|studio|atelier|library|console|pod\b|loft/i],
   ['hall', /hall|landing|entry|entrance|foyer|vestibule|stair|passage|lobby/i],
 ];
-export const roomKind = (name = ''): string => (KINDS.find(([, re]) => re.test(name)) || ['room'])[0];
-const WEIGHT = { living: 3, kitchen: 3, dining: 2.6, bed: 2.4, work: 2.2, room: 2, bath: 1.4, hall: 1.2, service: 0.8 };
+/** A room's kind: its rooms[].program when it has one (S3's program list; plan Completeness C2), else from its name.
+ *  Takes the room, or (as before) just its name. */
+export const roomKind = (room: any = ''): string => {
+  if (room && typeof room === 'object') { const k = programKind(room.program); if (k) return k; room = room.name || ''; }
+  const name = String(room || '');
+  return (KINDS.find(([, re]) => re.test(name)) || ['room'])[0];
+};
+const WEIGHT = { living: 3, kitchen: 3, dining: 2.6, bed: 2.4, work: 2.2, room: 2, bath: 1.4, hall: 1.2, service: 0.8, outdoor: 0 };
 const FAN_KINDS = new Set(['living', 'bed', 'room', 'work']);   // Pascal's cut views show a fan in nearly every bedroom, den and study
+/** could this room take a ceiling fan at all (its kind and size; placement may still find no clear spot)? */
+export const fanEligible = (room: any): boolean => {
+  const b = room && room.bounds; if (!b) return false;
+  return FAN_KINDS.has(roomKind(room)) && b.w * b.d >= 8 && Math.min(b.w, b.d) >= 2.6;
+};
 // what a pendant hangs over (catalog and registry types) and what already hangs from a ceiling
 const PENDANT_OVER = { 'kitchen-island': 'island', 'breakfast-bar': 'island', 'dining-set': 'dining', 'dining-table': 'dining', 'farmhouse-table': 'dining', 'round-dining-table': 'round' };
 const HUNG = new Set(['pendant-lamp', 'chandelier', 'ceiling-light']);
@@ -89,7 +101,8 @@ function stateFor(ctx) {
   (spec.levels || []).forEach((lv, li) => (lv.rooms || []).forEach((r, ri) => {
     if (!r.bounds) return;
     const area = r.bounds.w * r.bounds.d; if (area < ROOM_MIN_AREA) return;
-    ranked.push({ key: `${lv.id}#${ri}`, score: WEIGHT[roomKind(r.name)] * Math.sqrt(area), li, ri });
+    const kind = roomKind(r); if (kind === 'outdoor') return;
+    ranked.push({ key: `${lv.id}#${ri}`, score: WEIGHT[kind] * Math.sqrt(area), li, ri });
   }));
   ranked.sort((a, b) => b.score - a.score || a.li - b.li || a.ri - b.ri);
   const lit = new Set(ranked.slice(0, LIGHT_CAP).map(r => r.key));
@@ -120,7 +133,10 @@ function stateFor(ctx) {
   s = {
     rng, pick, lit, M, G, fanStyle, diningStyle: pick(['dome', 'globe', 'dome']),
     lights: [], gain: readGain(),
-    stats: { recessed: 0, pendants: 0, fans: 0, lights: 0, glass: 0, halos: 0 },
+    stats: { recessed: 0, pendants: 0, fans: 0, lights: 0, glass: 0, halos: 0, lamps: {} as Record<string, number> },
+    // kit-rules.ts: which rooms may hang a fan (rooms[].fixtures.fan; under defaults 2 a seeded minority), and the
+    // lamp kind each room's floor lamps become (rooms[].fixtures.lamp; defaults 2 seeded) — both keyed lv#room
+    fans: fanPlan(spec, fanEligible), lamps: lampPlan(spec),
   };
   states.set(ctx.anchors, s);
   current = s;
@@ -151,11 +167,12 @@ function tagWindowGlass(placed, s) {
 // lamp gain (fixture = 'lamp', like the registry's lamps). The drum stays inside the ring's old box (r 0.185
 // against the base's 0.2, y 1.31–1.61 against 1.19–1.71), so nothing new meets the camera. The PointLight goes:
 // this module's one-per-room lights replace it.
-function toneHaloLamps(placed, s, THREE) {
+function toneHaloLamps(placed, s, THREE, lampOf) {
   for (const o of placed) {
     const u = o.userData || {};
     if (u.itemType !== 'halo-lamp' || u.haloToned) continue;
     u.haloToned = true;
+    const kind = lampOf(u.room);
     const lights = [], rings = [];
     o.traverse(m => {
       if (m.isLight) lights.push(m);
@@ -166,15 +183,42 @@ function toneHaloLamps(placed, s, THREE) {
     for (const r of rings) {
       const at = r.parent, y0 = r.position.y + 0.01;
       at.remove(r);
+      if (kind && kind !== 'drum') { at.add(lampHead(THREE, s, kind, y0)); continue; }
       const shade = new THREE.Mesh(s.G.drum, s.M.drumShade); shade.name = 'Drum Shade';
       shade.position.y = y0; shade.castShadow = true; shade.receiveShadow = true; shade.userData.fixture = 'lamp';
       const foot = new THREE.Mesh(s.G.diffuser, s.M.diffuser); foot.name = 'Diffuser';
       foot.position.y = y0 - 0.13; foot.userData.fixture = 'lamp';
       at.add(shade, foot);
     }
-    o.name = 'Drum Floor Lamp';
+    o.name = `${kind && kind !== 'drum' ? kind[0].toUpperCase() + kind.slice(1) : 'Drum'} Floor Lamp`;
     s.stats.halos++;
+    s.stats.lamps[kind || 'drum'] = (s.stats.lamps[kind || 'drum'] || 0) + 1;
   }
+}
+
+// The other lamp heads (kit-rules.ts LAMP_KINDS; rooms[].fixtures.lamp, or seeded per room under defaults 2), each
+// inside the drum's old box so nothing new meets the camera: an opal globe, a spun-metal cone and a mushroom
+// dome (both lit from inside, open underneath), and a tripod — a drum on three splayed legs round the old rod.
+function lampHead(THREE, s, kind: string, y0: number) {
+  const g = new THREE.Group(); g.name = `Lamp Head (${kind})`;
+  const lit = (m) => { m.userData.fixture = 'lamp'; return m; };
+  if (kind === 'globe') {
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.16, 28, 18), s.M.globe); b.position.y = y0; b.castShadow = true; g.add(lit(b));
+  } else if (kind === 'cone' || kind === 'mushroom') {
+    const shell = kind === 'cone' ? new THREE.CylinderGeometry(0.05, 0.18, 0.26, 28, 1, true) : new THREE.SphereGeometry(0.19, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+    const sh = new THREE.Mesh(shell, s.M.shade); sh.position.y = kind === 'cone' ? y0 : y0 - 0.12; sh.castShadow = true; g.add(sh);
+    const glow = new THREE.Mesh(new THREE.CircleGeometry(kind === 'cone' ? 0.17 : 0.18, 28).rotateX(Math.PI / 2), s.M.shadeGlow);
+    glow.position.y = kind === 'cone' ? y0 - 0.12 : y0 - 0.11; g.add(lit(glow));
+  } else if (kind === 'tripod') {
+    const shade = new THREE.Mesh(s.G.drum, s.M.drumShade); shade.position.y = y0; shade.castShadow = true; g.add(lit(shade));
+    const foot = new THREE.Mesh(s.G.diffuser, s.M.diffuser); foot.position.y = y0 - 0.13; g.add(lit(foot));
+    for (let k = 0; k < 3; k++) {
+      const a = Math.PI / 2 + k * 2 * Math.PI / 3, A = new THREE.Vector3(0.17 * Math.cos(a), 0.02, 0.17 * Math.sin(a)), B = new THREE.Vector3(0.02 * Math.cos(a), y0 - 0.2, 0.02 * Math.sin(a));
+      const d = B.clone().sub(A), leg = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, d.length(), 8), s.M.lampStand);
+      leg.position.copy(A).add(B).multiplyScalar(0.5); leg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); leg.castShadow = true; g.add(leg);
+    }
+  }
+  return g;
 }
 
 // ---- builders (origin at the ceiling point; everything hangs into −y) -------------------------------------------
@@ -215,13 +259,34 @@ function pendant(THREE, s, style, drop, r) {
   return g;
 }
 
+// a chandelier: a canopy, a rod, and six opal globes on a ring (rooms[].fixtures.ceiling 'chandelier')
+function chandelier(THREE, s, drop: number) {
+  const g = new THREE.Group(); g.name = 'Chandelier';
+  const add = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = false; g.add(o); return o; };
+  add(new THREE.CylinderGeometry(0.07, 0.07, 0.03, 18), s.M.canopy, 0, -0.015, 0);
+  add(new THREE.CylinderGeometry(0.008, 0.008, drop, 8), s.M.canopy, 0, -drop / 2, 0);
+  const ring = add(new THREE.TorusGeometry(0.34, 0.009, 8, 40).rotateX(Math.PI / 2), s.M.canopy, 0, -drop, 0);
+  ring.castShadow = true;
+  for (let k = 0; k < 6; k++) {
+    const a = k * Math.PI / 3, x = 0.34 * Math.cos(a), z = 0.34 * Math.sin(a);
+    add(new THREE.CylinderGeometry(0.006, 0.006, 0.07, 6), s.M.canopy, x, -drop + 0.035, z);
+    add(new THREE.SphereGeometry(0.065, 18, 12), s.M.globe, x, -drop + 0.1, z).userData.fixture = 'pendant';
+  }
+  return g;
+}
+
 // ---- dressLevel ------------------------------------------------------------------------------------------------
 export function dressLevel(ctx) {
   const { THREE, spec, lv, y, H, put, placed, registerCeiling } = ctx;
   const cans: Array<{ p: Pt; ceil: number }> = [];   // the storey's recessed cans, built after the rooms
   const s = stateFor(ctx);
   tagWindowGlass(placed, s);
-  toneHaloLamps(placed, s, THREE);
+  // a room's lamp kind (by its name on this storey — the rooms loop tags each item with its room's name); a room
+  // with a program (S3's composer dresses its own lamps: plan Completeness C9) keeps what it placed
+  const roomIndex = new Map((lv.rooms || []).map((r, ri) => [r.name, ri]));
+  const lampOf = (name: string) => { const ri = roomIndex.get(name); return ri === undefined ? null : s.lamps.get(`${lv.id}#${ri}`) || null; };
+  const programmed = new Set((lv.rooms || []).filter(r => r.program).map(r => r.name));
+  toneHaloLamps(placed.filter(o => !(o.userData && programmed.has(o.userData.room) && o.position.y > y - 0.05 && o.position.y < y + H)), s, THREE, lampOf);
 
   // the ceiling underside at (x, z): this storey's own ceiling, or the slab of a storey above (0.18 m thick,
   // ceiling sheet 5 mm under it). null over a stairwell void: nothing hangs in a stairwell.
@@ -261,7 +326,11 @@ export function dressLevel(ctx) {
   (lv.rooms || []).forEach((room, ri) => {
     const b = room.bounds; if (!b) return;
     const area = b.w * b.d; if (area < 1.2) return;
-    const kind = roomKind(room.name);
+    const kind = roomKind(room);
+    if (kind === 'outdoor') return;   // an outdoor program: no ceiling, nothing hangs
+    // rooms[].fixtures: { fan, pendants, ceiling: 'flush' | 'chandelier' | 'none', lamp }
+    const fx = room.fixtures || {};
+    const fanOk = s.fans.get(`${lv.id}#${ri}`);   // true / false, or undefined: the geometry decides (today's rule)
     const cx = b.x + b.w / 2, cz = b.z + b.d / 2;
     const items = roomItems(room.name);
     const hung = items.filter(i => HUNG.has(i.type)).map(i => ({ x: (i.box.min.x + i.box.max.x) / 2, z: (i.box.min.z + i.box.max.z) / 2 }));
@@ -281,12 +350,12 @@ export function dressLevel(ctx) {
     const span = it => Math.max(it.box.max.x - it.box.min.x, it.box.max.z - it.box.min.z);
     const over = ['island', 'dining'].map(kindOf => items.filter(i => PENDANT_OVER[i.type] && (PENDANT_OVER[i.type] === 'island') === (kindOf === 'island'))
       .sort((p, q) => span(q) - span(p))[0]).filter(Boolean);
-    for (const it of over) {
+    for (const it of fx.pendants === 0 ? [] : over) {
       const role = PENDANT_OVER[it.type];
       const c = { x: (it.box.min.x + it.box.max.x) / 2, z: (it.box.min.z + it.box.max.z) / 2 };
       if (hung.some(h => Math.hypot(h.x - c.x, h.z - c.z) < 1.3)) continue;
       const ex = it.box.max.x - it.box.min.x, ez = it.box.max.z - it.box.min.z, alongX = ex >= ez, long = Math.max(ex, ez);
-      const n = role === 'island' ? (long >= 2.1 ? 3 : 2) : role === 'round' ? 1 : (long >= 2.4 ? 2 : 1);
+      const n = typeof fx.pendants === 'number' && fx.pendants > 0 ? Math.min(6, Math.round(fx.pendants)) : role === 'island' ? (long >= 2.1 ? 3 : 2) : role === 'round' ? 1 : (long >= 2.4 ? 2 : 1);
       const step = role === 'island' ? Math.min(0.78, (long - 0.5) / Math.max(1, n - 1)) : 0.95;
       const style = role === 'island' ? 'dome' : s.diningStyle;
       const r = style === 'globe' ? 0.14 : (role === 'island' ? 0.13 : (n === 1 ? 0.24 : 0.19));
@@ -304,9 +373,21 @@ export function dressLevel(ctx) {
       if (cluster.children.length) place(cluster, c.x, c.z);
     }
 
+    // a chandelier (rooms[].fixtures.ceiling 'chandelier'): a ring of globes at the room's centre, where the fan
+    // would hang; it keeps the fan off, like an authored chandelier does
+    if (fx.ceiling === 'chandelier') {
+      const p = { x: cx, z: cz }, ceil = ceilAt(p.x, p.z);
+      if (ceil !== null && ceil - y >= 2.4 && clearOf(p, 0.45) && tallestNear(items, p, 0.45) < ceil - 1.0) {
+        const ch = chandelier(THREE, s, Math.max(0.35, Math.min(0.9, ceil - y - 2.05)));
+        ch.position.y = ceil - y; const hh = holder('Chandelier', 'fixtures, chandelier, light'); hh.add(ch); place(hh, p.x, p.z);
+        occupied.push({ ...p, r: 1.0 }); s.stats.pendants++;
+      }
+    }
     // a ceiling fan in a living room, bedroom or study that is big enough, at the centre or the nearest clear spot
+    // (rooms[].fixtures.fan: true / false decides; under defaults 2 only a seeded minority of rooms may: kit-rules.ts)
     const minDim = Math.min(b.w, b.d);
-    if (FAN_KINDS.has(kind) && area >= 8 && minDim >= 2.6) {
+    const fanRule = fanOk === undefined ? FAN_KINDS.has(kind) && area >= 8 && minDim >= 2.6 : fanOk && area >= 4 && minDim >= 2.0;
+    if (fanRule && fx.ceiling !== 'chandelier') {
       const R = 0.72, alongX = b.w >= b.d;
       const cands = [0, -0.18, 0.18, -0.3, 0.3].map(f => ({ x: cx + (alongX ? f * b.w : 0), z: cz + (alongX ? 0 : f * b.d) }));
       for (const p of cands) {
@@ -326,7 +407,7 @@ export function dressLevel(ctx) {
     // Collected for the whole storey and built after the rooms (below).
     const m = 0.7, spacing = 2.0;
     const axis = (len: number) => { const span = len - 2 * m; if (span < 0.5) return [len / 2]; const n = Math.min(5, Math.max(1, Math.round(span / spacing) + 1)); return n === 1 ? [len / 2] : Array.from({ length: n }, (_, i) => m + span * i / (n - 1)); };
-    for (const ox of axis(b.w)) for (const oz of axis(b.d)) {
+    if (fx.ceiling !== 'none') for (const ox of axis(b.w)) for (const oz of axis(b.d)) {
       const p = { x: b.x + ox, z: b.z + oz };
       const ceil = ceilAt(p.x, p.z);
       if (ceil === null || !clearOf(p, 0.1) || !offWalls(p, 0.3)) continue;
