@@ -60,6 +60,23 @@ test('island partition box → inner room wins roomAt()', () => {
   assert.equal(g.roomAt(1, 1).name, 'Hall');
 });
 
+test('facade dressing outside the footprint stays where authored and closes no room', () => {
+  // an L of frame strips 4 cm off the SW corner, and a frame down the E wall with a gap at its door
+  // (aurora's frames): snapped onto the walls beside them, their free ends closed slivers that counted as rooms
+  const g = FloorplanGraph.fromFootprint([{ x: 0, z: 0, w: 10, d: 8 }], [
+    { from: [-0.04, 8.04], to: [3, 8.04] }, { from: [-0.04, 5], to: [-0.04, 8.04] },
+    { from: [10.04, -0.04], to: [10.04, 3.55] }, { from: [10.04, 4.45], to: [10.04, 8.04] }
+  ], { openings: [{ side: 'E', at: 4, type: 'door', w: 0.9, h: 2.1 }] });
+  assert.equal(g.rooms.length, 1);
+  near(g.rooms[0].area(), 80);
+  const strips = g.walls.filter(w => w.kind === 'partition');
+  assert.equal(strips.length, 4);
+  assert.ok(strips.every(w => w.orphan), 'every strip is an orphan');
+  assert.ok(strips.every(w => Math.abs(w.start.x - w.end.x) < 1e-9 || Math.abs(w.start.z - w.end.z) < 1e-9), 'strips stay straight');
+  const door = g.walls.flatMap(w => w.openings).find(o => o.side === 'E');
+  near(door.w, 0.9, 1e-6, 'the door keeps its width (the strips no longer cut its wall at the jambs)');
+});
+
 // ---------------------------------------------------------------------------------------
 // Mitred offsets
 // ---------------------------------------------------------------------------------------
