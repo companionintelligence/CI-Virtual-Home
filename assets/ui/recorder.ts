@@ -131,7 +131,7 @@ export async function recordFrames(hooks: RecordHooks, opts: RecordOptions = {})
       ? muxMp4({ width: w, height: h, fps, avcC: description!, samples, colour })
       : muxWebm({ width: w, height: h, fps, codec: 'V_VP9', samples });
     return {
-      blob: new Blob([data], { type: choice.mimeType }), mimeType: choice.mimeType, ext: choice.ext, codec: choice.codec, kind: choice.kind,
+      blob: new Blob([data as Uint8Array<ArrayBuffer>], { type: choice.mimeType }), mimeType: choice.mimeType, ext: choice.ext, codec: choice.codec, kind: choice.kind,
       width: w, height: h, fps, frames, duration, bitrate, frameHashes: await Promise.all(hashes), encodeMs: Math.round(performance.now() - t0),
     };
   } finally {
