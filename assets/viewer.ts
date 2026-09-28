@@ -444,7 +444,7 @@ export function mountViewer(api: Api) {
     const pw = s.preset.power;
     if (pw && pw.at >= 0 && pw.at <= 1) { el.mark.hidden = false; el.mark.style.left = `${(pw.at * 100).toFixed(2)}%`; } else el.mark.hidden = true;
     buildPath();
-    ghostFov = -1;
+    ghostFov = -1; ghostDirty = true;
     playing = play;
     dirty = true;
     syncChips(); syncTransport(true); syncUrl();
@@ -559,10 +559,10 @@ export function mountViewer(api: Api) {
     sphere.radius = Math.max(sphere.radius, 5);
     // from the front of the house, swung 34° off the entry's axis, 40° up (the thumbnails' view)
     const out = (h && h.anchors && h.anchors.entry && h.anchors.entry.out) || [0, 1];
-    const az = Math.atan2(out[0], out[1]) + (34 * Math.PI) / 180, el = (40 * Math.PI) / 180;
+    const az = Math.atan2(out[0], out[1]) + (34 * Math.PI) / 180, elev = (40 * Math.PI) / 180;
     const vHalf = (camera.fov * Math.PI) / 360, hHalf = Math.atan(Math.tan(vHalf) * camera.aspect);
     const d = (sphere.radius / Math.sin(Math.min(vHalf, hHalf))) * 0.95;
-    const p1 = sphere.center.clone().add(new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)).multiplyScalar(d));
+    const p1 = sphere.center.clone().add(new THREE.Vector3(Math.sin(az) * Math.cos(elev), Math.sin(elev), Math.cos(az) * Math.cos(elev)).multiplyScalar(d));
     // aim a little below the centre: the dock covers the bottom of the frame, so the path sits above it
     const q1 = sphere.center.clone(); q1.y -= Math.tan(vHalf) * d * 0.12;
     tween = { t: 0, dur: 0.9, p0: camera.position.clone(), p1, q0: controls.target.clone(), q1 };
