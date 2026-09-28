@@ -6993,7 +6993,7 @@
     window.__houseBuilderRef = houseBuilder; window.__THREE = THREE;   // catalog builder / QA hooks
     const houseSpecs = new Map();      // id → spec (cached fetches)
     let activeHouse = null;            // { spec, anchors, shots }
-    const HOUSE_SHOT_TYPES = ['door-to-core', 'orbit', 'hero-reveal', 'walkthrough'];
+    const HOUSE_SHOT_TYPES = ['door-to-core', 'orbit', 'hero-reveal', 'walkthrough', 'core-orbit'];
     // Hand-tuned cinematic tours (SplinePresets below) authored against these houses' coordinates.
     const HOUSE_TOURS = {
       seraphine: ['seraphine-grand-tour'], lakecabin: ['lake-cabin-flight'], mesamariposa: ['mesa-mariposa-flight'],
@@ -7096,7 +7096,7 @@
     }
 
     // Read URL parameters for initial preset & camera
-    //   ?preset=<hand-built preset>   ?house=<spec id>   ?shot=<door-to-core|orbit|hero-reveal|walkthrough>
+    //   ?preset=<hand-built preset>   ?house=<spec id>   ?shot=<door-to-core|orbit|hero-reveal|walkthrough|core-orbit>
     //   ?flythrough=1 (autoplay)      ?autorecord=1 (start the video recorder once the shot is loaded)
     //   ?res=1080&aspect=16:9 (recorder settings)
     const urlParams = new URLSearchParams(window.location.search);
@@ -7798,7 +7798,7 @@
       let splineKey = 'garden-house-door-to-core';
       if (typeof sceneKey === 'string' && sceneKey.startsWith('house:')) {
         const id = sceneKey.slice(6);
-        // Not gated against HOUSE_SHOT_TYPES: that list is the 4 canonical shot names, and a spec can alias
+        // Not gated against HOUSE_SHOT_TYPES: that list is the 5 canonical shot names, and a spec can alias
         // one under its own id (shotsFor's `if (s.id && s.id !== s.type) shots[s.id] = sh`) — gating here
         // rejected exactly those aliases from a `?shot=` URL. The existence check on the next line already
         // guards a garbage or not-yet-built shot id, canonical or aliased alike.

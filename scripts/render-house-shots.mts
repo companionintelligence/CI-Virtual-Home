@@ -1,7 +1,7 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Headless product-shot renderer + shot QA for HouseSpec houses.
 //
-//   pnpm run shots [--house <id>[,<id>…]] [--shot door-to-core,orbit,…]
+//   pnpm run shots [--house <id>[,<id>…]] [--shot door-to-core,orbit,core-orbit,…]
 //        [--res 1080] [--aspect 16:9] [--fps 60] [--out video/houses] [--jobs 1]
 //   (node --experimental-strip-types scripts/render-house-shots.mts — any cwd; --out is relative to the cwd)
 //        [--poster-only] [--skip-existing] [--qa-only] [--no-gate] [--software]
@@ -11,8 +11,9 @@
 //
 //   1. QA gate — window.__houseShotQA samples the shot's camera path against the built house (wall clips,
 //      floor clips, entering through a wall instead of the door, ending outside the hero room, Core out of
-//      frame or occluded on the last frame). Errors skip the render and are recorded in the manifest; --no-gate
-//      renders anyway. --qa-only runs just this for every house × shot, writes <out>/qa.json, exits 1 on errors.
+//      frame or occluded on the last frame, or at any moment of an orbit round it). Errors skip the render and
+//      are recorded in the manifest; --no-gate renders anyway. --qa-only runs just this for every house × shot,
+//      writes <out>/qa.json, exits 1 on errors.
 //   2. Deterministic capture — window.__houseRenderBegin/Frames/End step the spline one frame at a time
 //      (frame i = t of i / (N - 1), N = fps × duration) and hand each frame back as a JPEG (q 0.95). No
 //      MediaRecorder, no rAF, no wall clock: the output is byte-identical run to run and whether the machine
@@ -44,7 +45,7 @@ const RES = args.res || '1080';
 const ASPECT = args.aspect || '16:9';
 const FPS = parseInt(args.fps || '60', 10);
 const JOBS = Math.max(1, parseInt(args.jobs || '1', 10));
-const SHOTS = (args.shot || 'door-to-core,orbit').split(',').map(s => s.trim()).filter(Boolean);
+const SHOTS = (args.shot || 'door-to-core,orbit,core-orbit').split(',').map(s => s.trim()).filter(Boolean);
 const index = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/houses/index.json'), 'utf8'));
 const HOUSES = args.house ? args.house.split(',') : index.houses.map(h => h.id);
 const POSTER_ONLY = args['poster-only'] === 'true';

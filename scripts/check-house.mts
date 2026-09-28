@@ -15,8 +15,9 @@
 //   0. assets     build-house-assets.mts    — compiles assets/*.ts (the three.js engine) to the .js
 //                                             room-creator.html's browser-native ES modules actually load
 //   1. specs      validate-house-spec.mts   — 30 HouseSpecs against the schema, the catalog and the registry
-//   2. shots      render-house-shots.mts    — camera paths through walls, floors, furniture; and the scene
-//                                             gate: dressing, clashes, planting
+//   2. shots      render-house-shots.mts    — camera paths through walls, floors, furniture, and the Core kept
+//                                             in frame through its orbits; and the scene gate: dressing,
+//                                             clashes, planting
 //   3. determinism test-frame-hash.mts      — two runs of THIS tree must agree
 //   4. goldens    test-goldens.mts          — this tree must still agree with the tree we blessed
 //
@@ -52,7 +53,7 @@ type Step = { key: string; script: string; args: string[]; quick?: boolean; need
 const steps: Step[] = [
   { key: 'assets', script: S('build-house-assets.mts'), args: [] },
   { key: 'specs', script: S('validate-house-spec.mts'), args: [] },
-  { key: 'shots', script: S('render-house-shots.mts'), args: ['--qa-only', '--shot', 'door-to-core,orbit,hero-reveal', '--jobs', JOBS!, '--out', QA_OUT, ...houseArgs] },
+  { key: 'shots', script: S('render-house-shots.mts'), args: ['--qa-only', '--shot', 'door-to-core,orbit,hero-reveal,core-orbit', '--jobs', JOBS!, '--out', QA_OUT, ...houseArgs] },
   { key: 'determinism', script: S('test-frame-hash.mts'), args: ['--res', RES!, '--frames', '0,200,719', ...(HOUSE ? ['--house', HOUSE.split(',')[0]] : [])], quick: false },
   { key: 'goldens', script: S('test-goldens.mts'), args: ['--res', RES!, '--jobs', JOBS!, ...(flag('update-goldens') ? ['--update'] : []), ...houseArgs], quick: false, needs: 'determinism' },
 ];

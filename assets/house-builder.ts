@@ -1155,6 +1155,20 @@ export function createHouseBuilder(deps) {
       for (let i = 0; i < 8; i++) { const a = Math.PI / 4 + i * Math.PI / 4; eye.push(V(cx + Math.cos(a) * r, h, cz + Math.sin(a) * r)); tgt.push(V(cx, 1.2, cz)); }
       shots['orbit'] = { type: 'orbit', dressing: { walls: 'up', roof: 'on' }, name: `${spec.emoji || '🏠'} ${spec.name}: 360° Orbit`, duration: 10, closed: true, eyePoints: eye, targetPoints: tgt, power: { at: -1 } };
     }
+    // --- core orbit: a slow product orbit round the Core alone, powered on throughout — the same free-arc search
+    //     as door-to-core's finale, a little wider, the whole free run up to 200°, easing in and out and ending
+    //     on the Core's front
+    {
+      const co = heroOrbit('product');
+      if (co) {
+        const subject = V(co.centre.x, co.centre.y + 0.03, co.centre.z), m = co.pts.length - 1;
+        const shot = { type: 'core-orbit', dressing: { walls: 'up', roof: 'auto' }, name: `${spec.emoji || '🏠'} ${spec.name}: Companion Core Orbit`, duration: 8, closed: false,
+          eyePoints: co.pts.map(w => w.p), targetPoints: co.pts.map(() => subject.clone()), power: { at: -1 },
+          timing: { times: co.pts.map((_, i) => i / m), startSpeed: 0.3, endSpeed: 0.3 },
+          compose: { subject, ndcX: -co.dir * 0.12, fov: 42 }, orbit: orbitMeta(co, 0) };
+        shots['core-orbit'] = attachFrameAt(THREE, shot);
+      }
+    }
     // --- hero reveal: descend from above onto the core — or, when there is a storey over the desk, pull in
     //     from across the room just under its ceiling (the old descent went through the upper floor's slab)
     {

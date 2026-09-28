@@ -8,7 +8,7 @@ compiled from it:
 
 | Output | Made by | Lands in |
 |---|---|---|
-| **3D scene** — walls, roofs, openings, stairs, furniture, planting, lighting, the Companion Core, and auto-generated camera splines (door → Core, orbit, hero reveal, walkthrough) | `assets/house-builder.ts` and friends (three.js r169, in the browser) | [`room-creator.html?house=<id>`](room-creator.html) |
+| **3D scene** — walls, roofs, openings, stairs, furniture, planting, lighting, the Companion Core, and auto-generated camera splines (door → Core ending in an orbit round it, orbit, hero reveal, walkthrough, Core orbit) | `assets/house-builder.ts` and friends (three.js r169, in the browser) | [`room-creator.html?house=<id>`](room-creator.html) |
 | **CAD floor plans** — one blueprint sheet per level, SVG + PNG, and a `floorplans.json` index | `scripts/generate_floor_plans.py` | `scenes/floorplans/` |
 | **Isometric cutaways** — landscape + portrait SVG and a pure-vector Lottie animation per house | `scripts/generate_house_iso.py` | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` |
 | **Product-shot videos** — frame-stepped, deterministic H.264 per house × shot, with posters | `scripts/render-house-shots.mts` (headless Chromium) | `video/houses/` (gitignored; browse with `video/houses/index.html`) |
@@ -32,7 +32,7 @@ pnpm run serve                     # http://localhost:8080/room-creator.html?hou
 ```
 
 `room-creator.html` is plain ES modules with an importmap — no bundler — so any static server over the repo
-root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `shot=door-to-core|orbit|hero-reveal|walkthrough`,
+root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `shot=door-to-core|orbit|hero-reveal|walkthrough|core-orbit`,
 `flythrough=1`, `lighting=day|golden|dusk|night`, `res`, `aspect`. Its "Hub" link points at `./index.html`,
 which the web portal will provide.
 
@@ -87,10 +87,11 @@ video/houses/index.html    browser for rendered shots; the renders beside it are
 
 1. **assets** — compile `assets/**/*.ts`.
 2. **specs** — validate the 30 HouseSpecs.
-3. **shots** — build every house headless and walk the door-to-core, orbit and hero-reveal camera paths
-   against its geometry: through a wall, under a floor, in through a window instead of the door, ending
-   outside the hero room, Core out of frame. Also a scene check per house (dressing present, nothing buried in
-   a wall, planting not on a grid). 90 shots, 30 scenes; errors fail, warnings are reported.
+3. **shots** — build every house headless and walk the door-to-core, orbit, hero-reveal and core-orbit camera
+   paths against its geometry: through a wall, under a floor, in through a window instead of the door, ending
+   outside the hero room, Core out of frame — and through an orbit round the Core, every frame keeps it in the
+   middle 60 % and in sight. Also a scene check per house (dressing present, nothing buried in a wall, planting
+   not on a grid). 120 shots, 30 scenes; errors fail, warnings are reported.
 4. **determinism** — render frames 0, 200 and 719 of aurora's door-to-core in two fresh browser contexts and
    compare raw pixels. Frames are random access (`__houseRenderFrames(i)` renders frame *i* from scratch), and
    nothing a frame depends on may use `Math.random` or the clock — every seed comes from mulberry32 / fnv1a in

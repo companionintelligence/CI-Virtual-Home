@@ -42,7 +42,7 @@ render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
-pnpm run check          # assets, specs, shots (90 / 0 errors), determinism, goldens (120 / 120)
+pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (120 / 120)
 pnpm run check:quick    # while iterating: assets + specs + shots
 ```
 
