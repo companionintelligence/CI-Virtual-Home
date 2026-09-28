@@ -29,22 +29,23 @@
       // the player mounts, and viewer.ts and the page's first build take this promise instead of fetching again.
       // The name is the portal's (assets/home-names.js), which the script after the import map imports and hands
       // to __vhNames: a module asked for before the import map would make a browser without multiple-import-map
-      // support drop the map, and three.js with it. A copy of it that did not download leaves the spec's name.
+      // support drop the map, and three.js with it. If it did not download, the loader says "Loading" and the tab
+      // keeps the site's title: the spec's own name is the Sims build's, jargon and all, and not the portal's.
       window.__vhIndex = fetch('./content/houses/index.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
       var cssString = function (v) { return '"' + String(v).replace(/["\\]/g, '\\$&') + '"'; };
       window.__vhNames = function (names) { Promise.all([window.__vhIndex, names]).then(function (r) {
         var j = r[0], n = r[1];
         var h = j && (j.houses || []).filter(function (x) { return x.id === id; })[0];
         if (h) {
-          var name = n ? n.displayName(h) : h.name;
-          d.style.setProperty('--vh-boot-name', cssString(name));
+          var name = n && n.displayName(h);
+          if (name) d.style.setProperty('--vh-boot-name', cssString(name));
           // the credit and the facts, as the player's loading card writes them (viewer.ts metaLine)
           var meta = [];
           if (h.author) meta.push('By ' + h.author);
           if (h.storeys) meta.push(h.storeys + (h.storeys === 1 ? ' storey' : ' storeys'));
           if (h.areaSqm) meta.push(h.areaSqm + ' m²');
           if (meta.length) d.style.setProperty('--vh-boot-meta', cssString(meta.join(' · ')));
-          if (!d.dataset.viewer || d.dataset.viewer === 'failed' || d.dataset.viewer === 'no-webgl') document.title = name + ' · Virtual homes';
+          if (name && (!d.dataset.viewer || d.dataset.viewer === 'failed' || d.dataset.viewer === 'no-webgl')) document.title = name + ' · Virtual homes';
         }
         // an id the list does not have has no thumbnail either: drop the poster before the player's loader asks
         // for it a second time (the first paint may already have asked once)

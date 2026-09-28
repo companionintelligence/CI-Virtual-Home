@@ -2,8 +2,9 @@
 //
 //   room-creator.html?mode=view&house=<id>[&shot=<shot>][&t=<0…1>][&tod=day|golden|dusk|night][&play=1|0]
 //
-// A link without t plays the shot from the start; one with t opens paused there. play=1 or play=0 says so
-// outright, except that nothing starts moving by itself for a visitor whose system asks for reduced motion.
+// A link without shot opens on the house's Orbit. A link without t plays the shot from the start; one with t opens
+// paused there. play=1 or play=0 says so outright, except that nothing starts moving by itself for a visitor whose
+// system asks for reduced motion.
 //
 // A minimal, full-bleed player over the editor's renderer: pick a camera shot (listed from the house's own
 // presets), play, pause and scrub it, change the time of day, show the camera path in the scene, and leave the
@@ -98,6 +99,8 @@ const IDLE_MS = 2600;         // controls fade after this long without input whi
 const IDLE_TOUCH_MS = 4000;   // on a touch screen, a little longer (a tap brings them back)
 const REF_ASPECT = 16 / 9;    // the aspect the shots are framed for
 const CORE_URL = 'https://ci.computer';
+const DEFAULT_SHOT = 'orbit';   // what a link without shot= opens on (onHouse)
+const CORE_NAME = 'Companion Core (Hero)';   // the house builder's name for the desk's Core (the QA gate finds it by it too)
 const FLY_FLOOR = 0.25;       // m: the lowest the free camera goes (the lot's ground is y = 0)
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
@@ -181,7 +184,7 @@ export function mountViewer(api: Api) {
     <div class="vh-dock" role="group" aria-label="Player">
       <div class="vh-end" hidden role="group" aria-labelledby="vh-end-title">
         <h2 id="vh-end-title">Meet the Companion Core.</h2>
-        <p>The small computer on the desk runs your own AI, apps and memory at home, not in someone else's cloud. <a href="${CORE_URL}" target="_blank" rel="noopener">What is Companion Core?${icon('out', 'vh-i-out')}</a></p>
+        <p><span class="vh-end-body">The small computer on the desk runs your own AI, apps and memory at home, not in someone else's cloud. </span><a href="${CORE_URL}" target="_blank" rel="noopener">What is Companion Core?${icon('out', 'vh-i-out')}</a></p>
         <div class="vh-end-actions">
           <button class="vh-end-btn" data-act="replay">${icon('replay')}<span>Replay</span></button>
           <button class="vh-end-btn" data-act="try-shot">${icon('play', 'vh-i-play')}<span class="vh-try-label"></span></button>
@@ -246,6 +249,7 @@ export function mountViewer(api: Api) {
     path: $('[data-act="path"]'), fly: $('[data-act="fly"]'), hq: $('[data-act="hq"]'),
     toast: $('.vh-toast'), help: $('.vh-help'), flybar: $('.vh-flybar'), more: $('[data-act="more"]'), tools: $('.vh-tools'),
     end: $('.vh-end'), tryShot: $<HTMLButtonElement>('[data-act="try-shot"]'), tryLabel: $('.vh-try-label'),
+    dock: $('.vh-dock'), top: $('.vh-top'),
   };
   const fsEnabled = !!(document.fullscreenEnabled || (document as any).webkitFullscreenEnabled);
   if (!fsEnabled) for (const b of root.querySelectorAll<HTMLElement>('[data-act="fullscreen"]')) b.hidden = true;
@@ -268,6 +272,8 @@ export function mountViewer(api: Api) {
   let scrubbing = false;
   let moreOpen = false;       // the phone's sheet of tools (speed, path, fly, quality, full screen)
   let hqWarm = false, hqFirst = false;   // the first best-quality frame builds the composer: say so while it does
+  let endPlaced = false;      // the end card has been put where it does not cover the Core (placeEndCard)
+  let flyHinted = false;      // the free camera's how-to has been said once where the bar has no room for it
 
   // room-creator.html's head script asked for the list as the page started (window.__vhIndex); fetch it only
   // when the player was mounted some other way
@@ -509,12 +515,79 @@ export function mountViewer(api: Api) {
     el.end.hidden = !on;
     root.dataset.endcard = on ? '1' : '0';
     if (on) {
+      endPlaced = false;   // placed after the end frame is drawn (frame())
       root.classList.remove('vh-idle', 'vh-chrome-off');
       const n = nextShotFor(shot);
       el.tryShot.hidden = !n;
       if (n) { el.tryLabel.textContent = n.label; el.tryShot.dataset.shot = n.key; el.tryShot.setAttribute('aria-label', `Play the ${n.label} shot`); }
       el.end.querySelector<HTMLElement>('.vh-end-primary')!.hidden = index.length < 2;
     }
+  }
+  // Where the end card goes. It sits centred over the dock; where that would cover the Core (a phone on its side,
+  // whose card spans the dock just under the Core, or a 4:3 tablet) it moves to the end of the dock away from the
+  // Core, as wide as the room there (never so narrow, or so tall, that it reaches the top bar); failing that it
+  // drops its sentence on what the Core is (heading, link and buttons stay) where it stands, then at the side. If
+  // nothing clears the Core, the placing that covers least of it wins. Run once the end frame has been drawn (the
+  // Core's place on the screen is that frame's) and again when the window changes.
+  const corner = new THREE.Vector3();
+  function coreRect(): { l: number; t: number; r: number; b: number } | null {
+    const core = api.scene.getObjectByName(CORE_NAME);
+    if (!core) return null;
+    const cb = canvas.getBoundingClientRect();
+    let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity, behind = false;
+    core.updateMatrixWorld(true);
+    // each visible part's own box, projected: tighter than one world-aligned box round the lot
+    core.traverseVisible((m: any) => {
+      if (!m.isMesh || !m.geometry) return;
+      if (!m.geometry.boundingBox) m.geometry.computeBoundingBox();
+      const bb = m.geometry.boundingBox;
+      for (let i = 0; i < 8; i++) {
+        corner.set(i & 1 ? bb.max.x : bb.min.x, i & 2 ? bb.max.y : bb.min.y, i & 4 ? bb.max.z : bb.min.z).applyMatrix4(m.matrixWorld).project(camera);
+        if (corner.z > 1) behind = true;
+        const x = cb.left + ((corner.x + 1) / 2) * cb.width, y = cb.top + ((1 - corner.y) / 2) * cb.height;
+        l = Math.min(l, x); r = Math.max(r, x); t = Math.min(t, y); b = Math.max(b, y);
+      }
+    });
+    if (behind) return null;   // the camera is inside or past it: nothing in the frame to cover
+    l = Math.max(l, cb.left); r = Math.min(r, cb.right); t = Math.max(t, cb.top); b = Math.min(b, cb.bottom);
+    return r > l && b > t ? { l, t, r, b } : null;
+  }
+  function placeEndCard() {
+    endPlaced = true;
+    const set = (side: string, w: number, compact: boolean) => {
+      if (side) { root.dataset.endSide = side; el.end.style.setProperty('--vh-end-w', `${Math.floor(w)}px`); }
+      else { delete root.dataset.endSide; el.end.style.removeProperty('--vh-end-w'); }
+      if (compact) root.dataset.endCompact = '1'; else delete root.dataset.endCompact;
+    };
+    set('', 0, false);
+    const core = coreRect();
+    if (!core) return;
+    const area = (core.r - core.l) * (core.b - core.t);
+    const topBar = el.top.getBoundingClientRect().bottom + 4;
+    // the share of the Core the card covers where it comes to rest (a card that would reach the top bar counts as
+    // 1); the rect is taken while its rise-in animation still holds it a few pixels low, so that is taken off
+    const cover = (): number => {
+      const r = el.end.getBoundingClientRect(), tf = getComputedStyle(el.end).transform;
+      const dy = tf && tf !== 'none' ? new DOMMatrixReadOnly(tf).m42 : 0;
+      const c = { left: r.left, right: r.right, top: r.top - dy, bottom: r.bottom - dy };
+      if (c.top < topBar) return 1;
+      return (Math.max(0, Math.min(c.right, core.r) - Math.max(c.left, core.l)) * Math.max(0, Math.min(c.bottom, core.b) - Math.max(c.top, core.t))) / area;
+    };
+    const dock = el.dock.getBoundingClientRect(), GAP = 12, MIN = 260;
+    const left = core.l - dock.left - GAP, right = dock.right - core.r - GAP;
+    const side = left >= right ? 'left' : 'right', room = Math.min(540, Math.max(left, right));
+    const tries: [string, number, boolean][] = [['', 0, false]];
+    if (room >= MIN) tries.push([side, room, false]);
+    tries.push(['', 0, true]);
+    if (room >= MIN) tries.push([side, room, true]);
+    let best = tries[0], least = Infinity;
+    for (const tr of tries) {
+      set(...tr);
+      const c = cover();
+      if (c < 0.01) return;
+      if (c < least) { least = c; best = tr; }
+    }
+    set(...best);
   }
   function setPlaying(on: boolean) {
     if (on && t >= 1 && !(shot && shot.preset.closed)) t = 0;   // play at the end starts over
@@ -536,7 +609,13 @@ export function mountViewer(api: Api) {
     t = clamp01(at);
     el.dur.textContent = ` / ${fmtWhole(shotDuration())}`;
     const pw = s.preset.power;
-    if (pw && pw.at >= 0 && pw.at <= 1) { el.mark.hidden = false; el.mark.style.left = `${(pw.at * 100).toFixed(2)}%`; } else el.mark.hidden = true;
+    if (pw && pw.at >= 0 && pw.at <= 1) {
+      el.mark.hidden = false; el.mark.style.left = `${(pw.at * 100).toFixed(2)}%`;
+      // the label hangs from the tick toward the middle of the bar, so it never runs past either end
+      el.mark.dataset.side = pw.at > 0.6 ? 'end' : pw.at < 0.4 ? 'start' : '';
+      // a finger cannot point at the tick to be told what it is: say it while the controls show at the start
+      if (coarse && play) sayMark(3200);
+    } else el.mark.hidden = true;
     buildPath();
     ghostFov = -1; ghostDirty = true;
     playing = play;
@@ -602,8 +681,14 @@ export function mountViewer(api: Api) {
     if (!pathTouched) setPath(true, false);
     ghost.visible = ghostRay.visible = true;
     ghostDirty = true; dirty = true;
+    flyAspect = camera.aspect;
     syncTransport();
     poke();
+    // where the bar has no room for its how-to (a phone, a narrow window), say it once as a toast under the bar
+    if (!flyHinted) {
+      const hint = root.querySelector<HTMLElement>(`.vh-flybar-hint.${coarse ? 'vh-show-coarse' : 'vh-hide-coarse'}`);
+      if (hint && getComputedStyle(hint).display === 'none') { flyHinted = true; toast(hint.textContent || '', 4000); }
+    }
   }
   function exitFly() {
     if (!flying) return;
@@ -624,9 +709,12 @@ export function mountViewer(api: Api) {
   // the walls and the Core for t, which is what the ghost's moment should look like), read it, put ours back.
   let ghostDirty = true;
   const saved = { pos: new THREE.Vector3(), quat: new THREE.Quaternion(), target: new THREE.Vector3(), fov: 42 };
+  let ghostShotFov = 42;     // the shot's own field of view at the ghost's moment (before fitFov)
+  let flyAspect = 0;         // the window's aspect the free camera's field of view was fitted to
   function placeGhost() {
     saved.pos.copy(camera.position); saved.quat.copy(camera.quaternion); saved.target.copy(controls.target); saved.fov = camera.fov;
     api.applyFrame(t);
+    ghostShotFov = camera.fov;
     ghost.position.copy(camera.position); ghost.quaternion.copy(camera.quaternion);
     shapeGhost(fitFov(camera.fov, camera.aspect), camera.aspect);
     const ray = ghostRay.geometry.attributes.position;
@@ -788,8 +876,9 @@ export function mountViewer(api: Api) {
     if (playing || flying) adapt(delta); else { perfTime = 0; perfFrames = 0; }
     let moved = false;
     if (playing) {
-      const d = shotDuration();
+      const d = shotDuration(), t0 = t, pw = shot && shot.preset.power;
       t += (delta * rate) / d;
+      if (pw && t0 < pw.at && t >= pw.at) sayMark();
       if (t >= 1) {
         if (shot && shot.preset.closed) t %= 1;
         else { t = 1; playing = false; poke(); }
@@ -800,6 +889,15 @@ export function mountViewer(api: Api) {
     }
     if (flying) {
       if (ghostDirty || !wasFlying) placeGhost();
+      // The free camera keeps the field of view it was given, until the window changes shape (a phone turned
+      // while flying): then it takes the one the shot would have at the new aspect, not a portrait's wide lens
+      // stretched across a landscape screen.
+      if (Math.abs(camera.aspect - flyAspect) > 1e-3) {
+        flyAspect = camera.aspect;
+        const f = fitFov(ghostShotFov, camera.aspect);
+        if (Math.abs(f - camera.fov) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); }
+        dirty = true;
+      }
       // the ghost keeps a readable size however far away you fly
       ghost.scale.setScalar(Math.max(0.7, Math.min(5, camera.position.distanceTo(ghost.position) / 9)));
       const walked = flyMove(delta) || stepTween(delta);
@@ -816,6 +914,7 @@ export function mountViewer(api: Api) {
     nowTarget.visible = showPath && !flying;
     if (nowTarget.visible && dirty) { const p = nowTarget.geometry.attributes.position; p.setXYZ(0, controls.target.x, controls.target.y, controls.target.z); p.needsUpdate = true; }
     if (dirty) { render(); dirty = false; }
+    if (shownEndCard && !endPlaced) placeEndCard();
   }
 
   // ------------------------------------------------------------------ loading a house
@@ -855,7 +954,9 @@ export function mountViewer(api: Api) {
     if (tod) api.setLighting(tod);   // a building resets the hour to the spec's; keep the viewer's choice
     shots = listShots();
     renderShots();
-    const s = findShot(shotKey) || findShot('door-to-core') || shots[0];
+    // A home opens on its Orbit: the whole house from above, which reads on every screen. Door to Core spends its
+    // middle in doorways and stairwells, framed a metre from a wall, and is one tap away (and a link can ask for it).
+    const s = findShot(shotKey) || findShot(DEFAULT_SHOT) || findShot('door-to-core') || shots[0];
     if (!s) { showError('This home has no camera shots.'); return; }
     ready = true;
     if (flying) exitFly();
@@ -893,9 +994,17 @@ export function mountViewer(api: Api) {
 
   // ------------------------------------------------------------------ chrome: toast, idle fade, help, share, fullscreen
   let toastTimer = 0;
-  function toast(msg: string) {
+  function toast(msg: string, ms = 2200) {
     el.toast.textContent = msg; el.toast.classList.add('on');
-    clearTimeout(toastTimer); toastTimer = window.setTimeout(() => el.toast.classList.remove('on'), 2200);
+    clearTimeout(toastTimer); toastTimer = window.setTimeout(() => el.toast.classList.remove('on'), ms);
+  }
+  // the Core-wakes tick names itself for a moment: when the playhead reaches it, and on a touch screen when a
+  // shot starts (with a mouse, pointing at the bar does)
+  let markTimer = 0;
+  function sayMark(ms = 2600) {
+    if (el.mark.hidden) return;
+    el.mark.classList.add('say');
+    clearTimeout(markTimer); markTimer = window.setTimeout(() => el.mark.classList.remove('say'), ms);
   }
   // Controls fade while a shot plays and the input rests, as a video player's do: with a mouse, only once one
   // has been used on the page (a kiosk or a capture that touches nothing keeps them); on a touch screen, a little
@@ -1050,7 +1159,7 @@ export function mountViewer(api: Api) {
   });
   window.addEventListener('keyup', (e) => { keys.delete(e.key.toLowerCase()); });
   window.addEventListener('blur', () => keys.clear());
-  new ResizeObserver(() => { dirty = true; ghostFov = -1; }).observe(canvas);
+  new ResizeObserver(() => { dirty = true; ghostFov = -1; endPlaced = false; }).observe(canvas);
 
   // ------------------------------------------------------------------ boot
   (async () => {

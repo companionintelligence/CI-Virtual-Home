@@ -7,14 +7,16 @@
 //   gallery   30 cards, every thumbnail decoded, the static hero figures match the data, no link forces
 //             autoplay, card names carry no Sims jargon and are distinct, hovering a card warms the player (not
 //             room-creator.html itself), search / storeys / tag filters narrow and clear (and the tag counts follow
-//             the storeys filter), a card opens the player; the built pages' link previews are the site's, with
-//             absolute images; 1440 × 900 and 390 × 844
-//   player    for each --house: builds, lists its shots from the presets, plays (t advances), pauses (Space),
+//             the storeys filter), the footer credits every build by its own title, a card opens the player; the
+//             built pages' link previews are the site's, with absolute JPEG images; 1440 × 900 and 390 × 844
+//   player    for each --house: builds, opens on the Orbit, lists its shots from the presets, plays (t advances),
+//             pauses (Space),
 //             Space on a focused button presses that button, scrubs (a click on the scrubber lands there),
 //             switches shot (URL follows), switches the time of day (the page's lighting follows), shows the
 //             path (P), flies (F, W moves the camera, Q never takes it under the lot, a drag turns it, Esc puts it
 //             back on the shot; the free-camera bar is inert until then, and at 1280 px it clears the title; every
-//             shot chip shows from 768 px up), ends a shot on the end card, copies a share link — homes/<id>.html,
+//             shot chip shows from 768 px up), ends a shot on the end card, which does not cover the Core (at 390 ×
+//             844 and turned to 844 × 390 too), copies a share link — homes/<id>.html,
 //             whose preview tags name the home — that reopens at the same moment, and steps to the next home;
 //             1440 × 900 and 390 × 844 (touch, where
 //             the tools are in the More sheet and the seek bar is a 44 px target). The gallery and the player ask
@@ -22,7 +24,9 @@
 //   motion    with the system set to reduce motion, a home opened from the gallery (or with play=1) holds still
 //   failures  an id no home has: the error card at once, no spec request, no editor scene built behind it; a
 //             module that does not download (viewer.js, house-builder.js) and a browser with WebGL 1 only: a
-//             card that says so, with a way back, instead of an endless loader
+//             card that says so, with a way back, instead of an endless loader; the names module
+//             (home-names.js) not downloading: the gallery still lists the homes, and the player's tab never
+//             shows a spec's Sims title
 //   editor    room-creator.html without ?mode=view still shows the editor and never mounts the player
 //
 // Any console error, page error or failed request on any page fails the run (the failure cases allow exactly the
@@ -75,6 +79,28 @@ async function tapTool(page: any, act: string) {
 const setScrub = (page: any, v: number) => page.$eval('.vh-scrub input', (e: HTMLInputElement, v: number) => { e.value = String(v); e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
 const camPos = (page: any): Promise<number[]> => page.evaluate(() => { const c = (window as any).__houseDebug().camera; return [c.position.x, c.position.y, c.position.z]; });
 const dist = (a: number[], b: number[]) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+// how much of the Companion Core's box on the screen the end card covers (0…1; -1 when either is not there)
+const coreCover = (page: any): Promise<number> => page.evaluate(() => {
+  const d = (window as any).__houseDebug(), cam = d.camera, core = d.scene.getObjectByName('Companion Core (Hero)');
+  const end = document.querySelector('.vh-end') as HTMLElement;
+  if (!core || !end || end.hidden) return -1;
+  const cb = (document.getElementById('three-canvas') as HTMLCanvasElement).getBoundingClientRect();
+  let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
+  core.updateMatrixWorld(true);
+  core.traverse((m: any) => {
+    if (!m.isMesh || !m.geometry) return;
+    m.geometry.computeBoundingBox();
+    const bb = m.geometry.boundingBox;
+    for (const x of [bb.min.x, bb.max.x]) for (const y of [bb.min.y, bb.max.y]) for (const z of [bb.min.z, bb.max.z]) {
+      const v = new cam.position.constructor(x, y, z).applyMatrix4(m.matrixWorld).project(cam);
+      const px = cb.left + ((v.x + 1) / 2) * cb.width, py = cb.top + ((1 - v.y) / 2) * cb.height;
+      l = Math.min(l, px); r = Math.max(r, px); t = Math.min(t, py); b = Math.max(b, py);
+    }
+  });
+  l = Math.max(l, cb.left); r = Math.min(r, cb.right); t = Math.max(t, cb.top); b = Math.min(b, cb.bottom);
+  const e = end.getBoundingClientRect();
+  return (Math.max(0, Math.min(e.right, r) - Math.max(e.left, l)) * Math.max(0, Math.min(e.bottom, b) - Math.max(e.top, t))) / Math.max(1, (r - l) * (b - t));
+});
 
 // ------------------------------------------------------------------ gallery
 async function gallery(viewport: { width: number; height: number }, mobile: boolean, label: string) {
@@ -92,6 +118,8 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   ok(titles.length === 30 && !titles.some(t => /base\s*game|basegame|\bBG\b/i.test(t)) && new Set(titles).size === 30, `card names carry no Sims jargon and are all distinct (${titles.slice(0, 3).join(', ')}, …)`);
   const storeysLabels = await page.$$eval('#storeys button', (els: Element[]) => els.map(e => e.textContent));
   ok(storeysLabels.join('|') === 'Any|1|2|3+', `the storeys filter reads ${storeysLabels.join(' · ')}`);
+  const credits: string[] = await page.$$eval('#builds-list li', (els: Element[]) => els.map(e => e.textContent || ''));
+  ok(credits.length === 30 && credits.some(c => /after “Base Game Modern Home” by SimsWithNora/.test(c)), `the footer credits every build by its own title (${credits.find(c => /Base Game Modern Home”/.test(c)) || credits[0]})`);
   const hrefs: string[] = await page.$$eval('#grid .card a, #hero-play, #hero-media', (els: HTMLAnchorElement[]) => els.map(a => a.href));
   ok(hrefs.length === 32 && hrefs.every(h => !new URL(h).searchParams.has('play')), 'no gallery link forces autoplay (the player decides, and honours reduced motion)');
   // load every thumbnail (lazy ones too) and check each decoded
@@ -162,7 +190,11 @@ async function previews() {
   const gallery = head(await (await fetch(srv.url('index.html'))).text());
   const player = head(await (await fetch(srv.url('room-creator.html'))).text());
   const og = (h: string, p: string) => (h.match(new RegExp(`<meta property="${p}" content="([^"]*)"`)) || [])[1] || '';
-  ok(/^https?:\/\//.test(og(gallery, 'og:image')) && og(gallery, 'og:image').endsWith('portal/hero.webp') && /summary_large_image/.test(gallery), `the gallery previews with its hero (${og(gallery, 'og:image')})`);
+  ok(/^https?:\/\//.test(og(gallery, 'og:image')) && og(gallery, 'og:image').endsWith('portal/hero.jpg') && og(gallery, 'og:image:type') === 'image/jpeg' && /summary_large_image/.test(gallery), `the gallery previews with its hero, a JPEG (${og(gallery, 'og:image')})`);
+  ok(og(player, 'og:image').endsWith('portal/hero.jpg') && og(player, 'og:site_name') === og(gallery, 'og:site_name'), `the player previews with the same image and site name (${og(player, 'og:site_name')})`);
+  const jpeg = await fetch(srv.url('portal/hero.jpg'));
+  const bytes = new Uint8Array(await jpeg.arrayBuffer());
+  ok(jpeg.ok && bytes[0] === 0xff && bytes[1] === 0xd8, 'portal/hero.jpg is served, and is a JPEG');
   const staticHead = player.slice(0, player.indexOf('<script'));
   ok(!/Room Creator|SimsTree|Pascal/.test(staticHead) && /<title>Virtual homes/.test(staticHead) && /^https?:\/\//.test(og(player, 'og:image')), `room-creator.html's static head is the site's, not the editor's (${(staticHead.match(/<title>([^<]*)/) || [])[1]})`);
 }
@@ -181,6 +213,7 @@ async function player(id: string, viewport: { width: number; height: number }, m
   const chips = await page.$$eval('.vh-shots .vh-chip', (els: HTMLElement[]) => els.map(e => ({ key: e.dataset.shot, label: e.querySelector('span')!.textContent })));
   const presetShots = await page.evaluate(() => { const s = (window as any).__houseDebug().house.shots; return [...new Set(Object.values(s))].length; });
   ok(chips.length === presetShots && chips.length >= 4, `${chips.length} shots listed from the house's presets (${chips.map((c: any) => c.label).join(', ')})`);
+  ok(new URL(page.url()).searchParams.get('shot') === 'orbit' && (await page.getAttribute('.vh-shots .vh-chip[data-shot="orbit"]', 'aria-pressed')) === 'true', 'a link without shot= opens on the Orbit');
   const shownName = ((await page.textContent('.vh-name')) || '').trim();
   ok(!/base\s*game|basegame|\bBG\b/i.test(shownName) && (await page.title()) === `${shownName} · Virtual homes`, `the player names the home "${shownName}" (tab: ${await page.title()})`);
   const seekH = await page.$eval('.vh-scrub input', (e: HTMLElement) => e.getBoundingClientRect().height);
@@ -341,6 +374,18 @@ async function player(id: string, viewport: { width: number; height: number }, m
   await sleep(300);
   const endCard = await page.isVisible('.vh-end') && await page.isVisible('.vh-end [data-act="next"]') && await page.isVisible('.vh-end a[href^="https://ci.computer"]');
   ok(endCard, `the end of the shot offers ${(await page.$$eval('.vh-end button:not([hidden])', (bs: Element[]) => bs.map(b => (b.textContent || '').trim()))).join(', ')}`);
+  const cover = await coreCover(page);
+  ok(cover >= 0 && cover < 0.05, `the end card covers ${Math.round(cover * 100)} % of the Core`);
+  if (mobile) {
+    // the phone turned on its side: the card spans the dock just under the Core unless it moves off it
+    await page.setViewportSize({ width: viewport.height, height: viewport.width });
+    await sleep(700);
+    const coverL = await coreCover(page);
+    ok(coverL >= 0 && coverL < 0.05 && await page.isVisible('.vh-end [data-act="next"]'), `turned to ${viewport.height} × ${viewport.width}, the end card covers ${Math.round(coverL * 100)} % of the Core (${await page.getAttribute('.vh', 'data-end-side') || 'centred'})`);
+    await shot(page, `player-${id}-${label}-end-landscape`);
+    await page.setViewportSize(viewport);
+    await sleep(500);
+  }
   await setScrub(page, 500);
   await sleep(200);
   ok(!(await page.isVisible('.vh-end')), 'the end card goes when the shot is moved back');
@@ -358,7 +403,7 @@ async function player(id: string, viewport: { width: number; height: number }, m
       const name = (await page.textContent('.vh-name'))!.trim();
       const tag = (p: string) => (sharePage.match(new RegExp(`<meta property="${p}" content="([^"]*)"`)) || [])[1] || '';
       const unesc = (v: string) => v.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-      ok(unesc(tag('og:title')) === name && tag('og:image').endsWith(`portal/thumbs/${id}.webp`) && tag('og:description').length > 20 && !/Room Creator/.test(sharePage), `the share page previews as "${unesc(tag('og:title'))}" with its thumbnail`);
+      ok(unesc(tag('og:title')) === name && tag('og:image').endsWith(`portal/previews/${id}.jpg`) && tag('og:image:type') === 'image/jpeg' && tag('og:description').length > 20 && !/Room Creator/.test(sharePage), `the share page previews as "${unesc(tag('og:title'))}" with its JPEG preview`);
       const { page: p2, errors: e2, close: c2 } = await open(viewport, mobile);
       await p2.goto(link);
       await viewerReady(p2);
@@ -431,6 +476,26 @@ async function failureCases() {
     ok(!!card && state === 'failed' && (await page.isVisible('.vh-fail a[href="./index.html"]')) && (await page.isVisible('.vh-fail button')), `${file} not downloading: a card with Try again and See all homes (${state})`);
     ok(!/Room Creator|SimsTree/.test(await page.title()) && await page.isVisible('.vh-boot-back'), `the tab says "${await page.title()}", and a back arrow shows`);
     await shot(page, `failure-${file.replace('.js', '')}`);
+    await close();
+  }
+  {
+    // the portal's names not downloading: the gallery still lists the homes (it imports them when it runs, with a
+    // fallback), and the player, which cannot start without them, shows its card under the site's title rather
+    // than a spec's Sims one
+    const { page, close } = await open({ width: 1440, height: 900 });
+    await page.route('**/assets/home-names.js', (r: any) => r.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' }));
+    await page.goto(srv.url('index.html'));
+    const listed = await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 }).then(() => true).catch(() => false);
+    const cards = await page.$$eval('#grid .card:not(.skel)', (els: Element[]) => els.length);
+    const jargon = await page.$$eval('#grid .card h3', (els: Element[]) => els.filter(e => /base\s*game|basegame|\bBG\b/i.test(e.textContent || '')).length);
+    ok(listed && cards === 30 && jargon === 0, `home-names.js not downloading: the gallery still lists ${cards} homes (${jargon} with Sims jargon)`);
+    await shot(page, 'failure-names-gallery');
+    await page.goto(srv.url('room-creator.html?mode=view&house=cocoon'));
+    const card = await page.waitForSelector('.vh-fail', { timeout: 60000 }).catch(() => null);
+    await sleep(500);
+    const title = await page.title();
+    ok(!!card && !/base\s*game/i.test(title), `… and the player shows its card, its tab "${title}"`);
+    await shot(page, 'failure-names-player');
     await close();
   }
   {

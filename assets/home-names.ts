@@ -5,9 +5,10 @@
 // them are near twins ("Base Game Modern Home", "… Modern House", "… Modern House 1").
 //
 // displayName() is the one place that decides: a hand-picked name where the stripped title would be empty,
-// generic or a twin of another (read from the home's style), else the title with the Sims jargon taken out.
-// Used by the gallery (portal/gallery.js), the player (viewer.ts), room-creator.html's pre-mount loader and the
-// share pages portal:build writes, so a home has one name everywhere. The spec's own title is buildName().
+// generic, a twin of another or read as a typo (read from the home's style), else the title with the Sims jargon
+// taken out. Used by the gallery (portal/gallery.js), the player (viewer.ts), room-creator.html's pre-mount loader
+// and the share pages portal:build writes, so a home has one name everywhere. The spec's own title is buildName();
+// the gallery's footer lists every home against it, and a share page's description names it.
 
 export type NamedHome = { id: string; name?: string };
 
@@ -25,6 +26,7 @@ const NAMES: Record<string, string> = {
   'modernhouse1': 'Modern Studio House',    // cantilevered studio box and an A-frame fin
   'neweco': 'New Eco House',
   'onestory': 'Blue Dormer Cottage',        // "One-Story House" is a storey and a half
+  'palnknoll': 'Palm Knoll',                // "Paln Knoll of Ermosa" reads as a typo to a visitor; palms on a knoll
   'starter18k': 'Grey Starter Cottage',     // "Starter 18k 2/1": a build budget and a bed/bath count
 };
 

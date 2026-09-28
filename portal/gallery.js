@@ -3,7 +3,17 @@
 // opens the live player, room-creator.html?mode=view. No WebGL, no framework, relative URLs only (the site is
 // served under a sub-path on GitHub Pages). The filters live in the URL (?q=&storeys=&tag=) so a filtered view
 // can be linked. A home's name is assets/home-names.js's displayName (the Sims build's own title is the credit).
-import { displayName, buildName, buildCredit } from '../assets/home-names.js';
+//
+// The names are imported when the page runs, not statically: if that one file does not come (a partial deploy, a
+// dropped request), the gallery still lists the homes, under the spec's title with the Sims pack's name taken out
+// (most of what displayName does), instead of never running and leaving the placeholder cards up for good.
+const FALLBACK_NAMES = {
+  buildName: h => (h.name || h.id || '').trim(),
+  displayName: h => (h.name || '').replace(/\(?\b(base\s*game|basegame|bg)\b\)?/gi, ' ').replace(/\s{2,}/g, ' ').trim() || h.id,
+  buildCredit: () => '',
+};
+const namesReady = import('../assets/home-names.js').catch(err => { console.warn('gallery: the names did not load', err); return FALLBACK_NAMES; });
+let names = FALLBACK_NAMES;
 
 // The home the hero plays. scripts/build-thumbs.mts renders portal/hero.webp from the same house (--hero).
 const HERO = 'aurora';
@@ -109,7 +119,7 @@ function card(h, i) {
   if (h.areaSqm) facts.append(fact(`${nf.format(h.areaSqm)} m²`));
   // the builder's credit; its tooltip names the build the spec was written from, by its own title
   const credit = document.createElement('span'); credit.className = 'credit';
-  credit.title = [buildCredit(h), h.source].filter(Boolean).join(', ');
+  credit.title = [names.buildCredit(h), h.source].filter(Boolean).join(', ');
   if (h.author) { credit.append('by '); const b = document.createElement('b'); b.textContent = h.author; credit.append(b); }
   facts.append(credit);
   body.append(h3, style, facts);
@@ -175,6 +185,21 @@ function stats() {
   }
 }
 
+// The footer's credits: every home against the build it was written from, by that build's own title and its
+// builder. The cards carry only the portal's name and the builder (a title's tooltip is out of reach on a touch
+// screen and to most screen readers), so this is where a home is tied to the build it credits.
+function credits() {
+  const list = $('#builds-list');
+  if (!list) return;
+  list.replaceChildren(...homes.map(h => {
+    const li = document.createElement('li');
+    const b = document.createElement('b'); b.textContent = h.display;
+    li.append(b, ` after “${h.name}”${h.author ? ` by ${h.author}` : ''}`);
+    return li;
+  }));
+  $('#builds').hidden = !homes.length;
+}
+
 // The list did not load: say so where the homes would be, with a way to try again, and put the filters away
 // (they have nothing to filter)
 function failed(on) {
@@ -198,9 +223,10 @@ async function load() {
     return false;
   }
   failed(false);
-  homes = (index.houses || []).map(h => ({ ...h, name: buildName(h), display: displayName(h), tags: TAGS.filter(([, re]) => re.test(h.style || '')).map(([name]) => name) }));
+  homes = (index.houses || []).map(h => ({ ...h, name: names.buildName(h), display: names.displayName(h), tags: TAGS.filter(([, re]) => re.test(h.style || '')).map(([name]) => name) }));
   stats();
   renderTags();
+  credits();
   $('#grid').replaceChildren(...homes.map(card));
   $('#grid').setAttribute('aria-busy', 'false');
   apply();
@@ -245,6 +271,7 @@ function wire() {
 
 async function main() {
   readUrl();
+  names = await namesReady;
   $('#retry').addEventListener('click', async () => {
     const b = $('#retry');
     b.disabled = true; b.setAttribute('aria-busy', 'true');

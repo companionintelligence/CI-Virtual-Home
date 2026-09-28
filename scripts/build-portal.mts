@@ -5,7 +5,7 @@
 //   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
 //
 //   <out>/index.html                 the gallery (portal/gallery.css + gallery.js, portal/thumbs/, portal/hero.webp),
-//                                    its link-preview image and URL made absolute
+//                                    its link-preview image (portal/hero.jpg) and URL made absolute
 //   <out>/room-creator.html          the player (?mode=view: portal/viewer.css + assets/viewer.js) and the editor,
 //                                    plus one tag: <meta name="vh-share" content="homes/">, which tells the player
 //                                    the share pages below exist. Its static title and description are the site's
@@ -15,8 +15,9 @@
 //                                    description and thumbnail for link previews (Slack, iMessage, social cards
 //                                    never run the player's script, so room-creator.html's static title is all they
 //                                    would see), which forwards to room-creator.html?mode=view&house=<id> with the
-//                                    link's query. og:image and og:url are absolute, as unfurlers want: the site's
-//                                    address is --site-url, else $SITE_URL, else the live site
+//                                    link's query. Its image is portal/previews/<id>.jpg (1200 × 630 JPEG: LinkedIn
+//                                    and some others read no WebP). og:image and og:url are absolute, as unfurlers
+//                                    want: the site's address is --site-url, else $SITE_URL, else the live site
 //                                    (https://homes.ci.computer/); the GitHub Pages workflow passes its own
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
@@ -33,7 +34,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
-import { displayName } from '../assets/home-names.js';
+import { displayName, buildCredit } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
 const OUT = path.resolve(args.out || path.join(ROOT, 'dist'));
@@ -75,7 +76,7 @@ copy('index.html');
 copy('room-creator.html');
 
 // 3. portal: styles, script, the hero and the thumbnails
-for (const f of walk('portal', f => /\.(css|js|webp)$/.test(f))) copy(f);
+for (const f of walk('portal', f => /\.(css|js|webp|jpg)$/.test(f))) copy(f);
 
 // 4. the engine: compiled modules, three.js (whole vendored tree: modules plus LICENSE), fonts, brand
 for (const f of sources) copy(f.replace(/\.ts$/, '.js'));
@@ -89,7 +90,9 @@ copy(path.join('content', 'houses', 'index.json'));
 for (const h of index.houses || []) {
   copy(path.join('content', 'houses', `${h.id}.json`));
   if (!fs.existsSync(path.join(ROOT, 'portal', 'thumbs', `${h.id}.webp`))) problems.push(`no thumbnail for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
+  if (!fs.existsSync(path.join(ROOT, 'portal', 'previews', `${h.id}.jpg`))) problems.push(`no link-preview image for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
 }
+if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 
 // 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes, distinct builders, floor
@@ -113,6 +116,7 @@ fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 const esc = (v: unknown): string => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'] : '') || process.env.SITE_URL || 'https://homes.ci.computer/').replace(/\/?$/, '/');
 const SITE_TITLE = 'Virtual homes · Companion Intelligence';
+const SITE_NAME = 'Companion Intelligence';   // og:site_name on every page: the title says which part of it
 {
   const site = SITE;
   const shortStyle = (s?: string): string => (s || '').split(/[:;,(]| with | over | under /)[0].trim();
@@ -120,10 +124,13 @@ const SITE_TITLE = 'Virtual homes · Companion Intelligence';
   for (const h of index.houses || []) {
     if (!/^[a-z0-9-]+$/.test(h.id)) { problems.push(`house id ${JSON.stringify(h.id)} is not [a-z0-9-]: no share page`); continue; }
     const player = `../room-creator.html?mode=view&house=${h.id}`;
-    const image = new URL(`portal/thumbs/${h.id}.webp`, site).href;
+    const image = new URL(`portal/previews/${h.id}.jpg`, site).href;
     const style = shortStyle(h.style);
     const name = displayName(h);
-    const desc = `${style ? `${style}. ` : ''}${h.author ? `After a Sims 4 build by ${h.author}. ` : ''}Built live in 3D in your browser: fly its camera paths and change the hour.`;
+    // the credit names the build by its own title where the portal's name differs from it ("After the Sims 4
+    // build “Base Game Modern Home” by SimsWithNora"): the unfurl is somewhere a visitor can read it
+    const credit = buildCredit(h);
+    const desc = `${style ? `${style}. ` : ''}${credit ? `${credit}. ` : ''}Built live in 3D in your browser: fly its camera paths and change the hour.`;
     const page = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,13 +139,13 @@ const SITE_TITLE = 'Virtual homes · Companion Intelligence';
   <title>${esc(name)} · Virtual homes</title>
   <meta name="description" content="${esc(desc)}">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="${esc(SITE_TITLE)}">
+  <meta property="og:site_name" content="${esc(SITE_NAME)}">
   <meta property="og:title" content="${esc(name)}">
   <meta property="og:description" content="${esc(desc)}">
   <meta property="og:image" content="${esc(image)}">
-  <meta property="og:image:type" content="image/webp">
-  <meta property="og:image:width" content="640">
-  <meta property="og:image:height" content="360">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${esc(`An aerial view of ${name}`)}">
   <meta property="og:url" content="${esc(new URL(`homes/${h.id}.html`, site).href)}">
   <meta name="twitter:card" content="summary_large_image">
@@ -165,10 +172,10 @@ const SITE_TITLE = 'Virtual homes · Companion Intelligence';
 // bar: on the site it is the site's title, description and hero instead. The editor works the same; only its
 // tab title differs on the deployed site.
 {
-  const hero = new URL('portal/hero.webp', SITE).href;
+  const hero = new URL('portal/hero.jpg', SITE).href;
   const ix = path.join(OUT, 'index.html');
   let gallery = fs.readFileSync(ix, 'utf8');
-  const rel = '<meta property="og:image" content="./portal/hero.webp">';
+  const rel = '<meta property="og:image" content="./portal/hero.jpg">';
   if (!gallery.includes(rel)) problems.push('index.html: no relative og:image for the hero to make absolute');
   gallery = gallery.replace(rel, `<meta property="og:image" content="${esc(hero)}">\n  <meta property="og:url" content="${esc(SITE)}">`);
   fs.writeFileSync(ix, gallery);
@@ -179,13 +186,13 @@ const SITE_TITLE = 'Virtual homes · Companion Intelligence';
   const head = `<title>${esc(SITE_TITLE)}</title>
   <meta name="description" content="${desc}">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Companion Intelligence">
+  <meta property="og:site_name" content="${esc(SITE_NAME)}">
   <meta property="og:title" content="${esc(SITE_TITLE)}">
   <meta property="og:description" content="${desc}">
   <meta property="og:image" content="${esc(hero)}">
-  <meta property="og:image:type" content="image/webp">
-  <meta property="og:image:width" content="1600">
-  <meta property="og:image:height" content="900">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">`;
   const before = page;
   page = page.replace(/<title>[^<]*<\/title>\s*<meta name="description" content="[^"]*">/, () => head);
