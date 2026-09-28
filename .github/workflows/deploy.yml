@@ -153,7 +153,7 @@ jobs:
               if grep -q 'HTTP 404' "$err"; then
                 skip "there is no ${target} environment, or this run cannot read it (README → Deploying → Owner setup)."
               else
-                skip "could not read the ${target} environment's protection rules: $(head -c 200 "$err")"
+                skip "could not read the ${target} environment's protection rules: $(head -c 200 "$err" | tr '\n' ' ')"
               fi
             elif [ "$target" = production ]; then
               protected=$(printf '%s' "$envjson" | jq -r '.deployment_branch_policy.protected_branches // false')
