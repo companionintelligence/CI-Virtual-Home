@@ -96,6 +96,44 @@ test('facade dressing outside the footprint stays where authored and closes no r
 });
 
 // ---------------------------------------------------------------------------------------
+// Snapping partition ends
+// ---------------------------------------------------------------------------------------
+const axisAligned = w => Math.abs(w.start.x - w.end.x) < 1e-9 || Math.abs(w.start.z - w.end.z) < 1e-9;
+const ends = w => [[w.start.x, w.start.z], [w.end.x, w.end.z]].sort((p, q) => p[0] - q[0] || p[1] - q[1]);
+
+test('a partition parallel to a wall and 0.04 m off it stays put: no sideways snap, no fold, no skew', () => {
+  // inside the footprint, so not dressing (outside it, see the dressing test above): a straight run 4 cm off the
+  // N wall used to fold onto the wall and split it
+  const run = FloorplanGraph.fromFootprint([{ x: 0, z: 0, w: 8, d: 6 }], [{ from: [2, 0.04], to: [6, 0.04] }]);
+  assert.equal(run.rooms.length, 1);
+  near(run.rooms[0].area(), 8 * 6);
+  const strip = run.walls.filter(w => w.kind === 'partition');
+  assert.equal(strip.length, 1);
+  assert.deepEqual(ends(strip[0]), [[2, 0.04], [6, 0.04]], 'the partition keeps its authored line');
+  assert.ok(strip[0].orphan);
+  assert.equal(run.walls.filter(w => w.kind === 'exterior').length, 4, 'the N wall is not split under it');
+  // wrapping the NE corner 4 cm in: the corner end meets the other leg and stays; the free ends used to skew
+  // sideways onto the N and E walls, making both legs diagonal
+  const wrap = FloorplanGraph.fromFootprint([{ x: 0, z: 0, w: 8, d: 6 }], [{ from: [5, 0.04], to: [7.96, 0.04] }, { from: [7.96, 0.04], to: [7.96, 3] }]);
+  assert.ok(wrap.walls.every(axisAligned), 'every graph wall stays axis-aligned');
+  assert.deepEqual(wrap.walls.filter(w => w.kind === 'partition').map(ends), [[[5, 0.04], [7.96, 0.04]], [[7.96, 0.04], [7.96, 3]]]);
+  assert.equal(wrap.rooms.length, 1);
+  near(wrap.rooms[0].area(), 8 * 6);
+  assert.equal(wrap.walls.filter(w => w.kind === 'exterior').length, 4);
+});
+
+test('a partition end 0.04 m short of, or past, the wall it points into is extended or trimmed along its axis', () => {
+  for (const [z0, z1] of [[0.04, 5.96], [-0.04, 6.04]]) {
+    const g = FloorplanGraph.fromFootprint([{ x: 0, z: 0, w: 8, d: 6 }], [{ from: [4, z0], to: [4, z1], door: 3 }]);
+    assert.equal(g.rooms.length, 2, `${z0}..${z1}: the partition closes both rooms`);
+    for (const r of g.rooms) near(r.area(), 4 * 6);
+    const p = g.walls.find(w => w.kind === 'partition');
+    assert.deepEqual(ends(p), [[4, 0], [4, 6]]);
+    assert.ok(g.walls.every(axisAligned));
+  }
+});
+
+// ---------------------------------------------------------------------------------------
 // Mitred offsets
 // ---------------------------------------------------------------------------------------
 test('mitred corner offsets are symmetric about the corner (square room)', () => {
@@ -208,6 +246,7 @@ test('every HouseSpec level converts; rooms ≥ 1 and ≤ authored; every openin
       assert.ok(indoor.length >= 1, `${label}: no room detected`);
       assert.ok(indoor.length <= (lv.rooms || []).length, `${label}: more rooms than authored (${indoor.length} > ${(lv.rooms || []).length})`);
       for (const r of g.rooms) assert.ok(signedArea(r.corners) > 0, `${label}: room ${r.id} orientation`);
+      for (const w of g.walls) assert.ok(axisAligned(w), `${label}: wall ${w.id} is not axis-aligned`);
       const edges = perimeterEdges(lv.footprint);
       const expected = (lv.openings || []).filter(op => edgeForOpening(edges, op.side, op.at)).length
         + (lv.partitions || []).filter(p => p.door !== null && p.door !== undefined).length;
