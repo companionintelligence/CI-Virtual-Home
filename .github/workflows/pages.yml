@@ -50,11 +50,13 @@ jobs:
       - name: Build browser assets
         run: pnpm run build
 
-      - name: Assemble the site
-        run: pnpm run portal:build
-
       - name: Configure Pages
+        id: pages
         uses: actions/configure-pages@v5
+
+      # --site-url: the share pages' og:image and og:url must be absolute for link previews
+      - name: Assemble the site
+        run: pnpm run portal:build --site-url "${{ steps.pages.outputs.base_url }}/"
 
       - name: Upload the site
         uses: actions/upload-pages-artifact@v3

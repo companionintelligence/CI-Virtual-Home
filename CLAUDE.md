@@ -20,7 +20,7 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` | `pnpm run iso` |
 | `scenes/floorplans/` | `pnpm run floorplans` |
 | `test/goldens/<profile>/` | `pnpm run goldens:update` — only on purpose, see below |
-| `portal/thumbs/<id>.webp`, `portal/hero.webp` | `pnpm run portal:thumbs [--house <id>]` — after a change to how a house looks |
+| `portal/thumbs/<id>.webp`, `portal/hero.webp`, `portal/previews/<id>.jpg`, `portal/hero.jpg` | `pnpm run portal:thumbs [--house <id>]` — after a change to how a house looks |
 | `dist/` (gitignored) | `pnpm run portal:build` |
 
 Edit `assets/*.ts`, never the compiled `.js` beside it. `assets/vendor/` is third-party: do not edit it (the
@@ -40,7 +40,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   must leave `git status` clean.
 
 **The portal.** `index.html` (the gallery) and `room-creator.html?mode=view` (the player, `assets/viewer.ts`)
-are deployed to GitHub Pages under `/ci-virtual-home/`:
+are deployed to Cloudflare Pages at <https://homes.ci.computer/> and to GitHub Pages under `/ci-virtual-home/`:
 
 - Every URL in them must be relative — no leading `/`. `portal:build` fails on a root-relative one.
 - The player is additive: everything it needs from the page goes through the one object `room-creator.html`
@@ -49,19 +49,28 @@ are deployed to GitHub Pages under `/ci-virtual-home/`:
   `applySplineFrame`, never a copy of it.
 - The player may use the clock (nothing it draws is a product frame), but it must restore anything of the
   renderer's it changes for its own frame (it puts `shadowMap.autoUpdate` back after each one).
+- Until the player mounts, `room-creator.html`'s head script (view mode only) is the player: poster, loader and
+  the failure card. Anything that can stop the page before `mountViewer` must end on that card, never on an
+  endless loader.
+- `portal:build` writes more than copies: `dist/homes/<id>.html` share pages, one `<meta name="vh-share">` in
+  `dist/room-creator.html` that tells the player they exist, the site's title and preview tags in place of that
+  page's static (editor) head, and absolute preview-image URLs (`--site-url`, default `https://homes.ci.computer/`).
+- A home's name on the portal is `displayName` in `assets/home-names.ts`, never the spec's `name` directly (that is
+  the Sims build's title and stays the credit). Fix a name there, not in `content/houses/`.
 - `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
 
-**Verify before you push.** CI only builds, typechecks, validates and runs the floor-plan-graph tests. The
+**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and assembles
+the portal (`portal:build`'s link and staleness checks). The
 render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
-pnpm run check          # assets, specs, shots (90 / 0 errors), determinism, goldens (120 / 120)
+pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (150 / 150)
 pnpm run check:quick    # while iterating: assets + specs + shots
 ```
 
 A clean run has 0 shot errors and 0 scene errors (warnings are reported but do not fail — compare their count
-with the previous run by hand; the full list is in `test/qa/qa.json`), `deterministic`, and 120 goldens passing.
+with the previous run by hand; the full list is in `test/qa/qa.json`), `deterministic`, and 150 goldens passing.
 After a spec change also re-run `plans`, `iso` and `floorplans` and commit their output with the spec.
 
 **Goldens are re-blessed only on purpose.** A golden failure means the picture changed. If the change was not

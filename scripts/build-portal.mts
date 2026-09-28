@@ -1,11 +1,24 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Assembles the web portal for GitHub Pages: exactly the files the site loads, nothing else.
 //
-//   pnpm run build && pnpm run portal:build [--out dist]
+//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/]
 //   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
 //
-//   <out>/index.html                 the gallery (portal/gallery.css + gallery.js, portal/thumbs/, portal/hero.webp)
-//   <out>/room-creator.html          the player (?mode=view: portal/viewer.css + assets/viewer.js) and the editor
+//   <out>/index.html                 the gallery (portal/gallery.css + gallery.js, portal/thumbs/, portal/hero.webp),
+//                                    its link-preview image (portal/hero.jpg) and URL made absolute
+//   <out>/room-creator.html          the player (?mode=view: portal/viewer.css + assets/viewer.js) and the editor,
+//                                    plus one tag: <meta name="vh-share" content="homes/">, which tells the player
+//                                    the share pages below exist. Its static title and description are the site's
+//                                    (with preview tags), not the editor's: a player URL copied from the address bar
+//                                    unfurls as the site, never as the editor
+//   <out>/homes/<id>.html            what the player's share button hands out: a page with the home's own title,
+//                                    description and thumbnail for link previews (Slack, iMessage, social cards
+//                                    never run the player's script, so room-creator.html's static title is all they
+//                                    would see), which forwards to room-creator.html?mode=view&house=<id> with the
+//                                    link's query. Its image is portal/previews/<id>.jpg (1200 × 630 JPEG: LinkedIn
+//                                    and some others read no WebP). og:image and og:url are absolute, as unfurlers
+//                                    want: the site's address is --site-url, else $SITE_URL, else the live site
+//                                    (https://homes.ci.computer/); the GitHub Pages workflow passes its own
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
@@ -14,12 +27,14 @@
 // Everything the site references is relative, so the same tree works at / and under /ci-virtual-home/. No
 // goldens, scripts, scenes, videos or TypeScript sources go out. The build refuses to run on stale or missing
 // compiled assets (a .ts newer than its .js), and checks that every house in index.json has a spec and a
-// thumbnail and that nothing the HTML links is missing from the output.
+// thumbnail, that nothing the HTML links is missing from the output, and that the gallery's static hero figures
+// (what a crawler or a visitor without JavaScript reads) are the ones gallery.js computes from index.json.
 //
 // Only the paths it writes are replaced in <out>; anything else there (dist/models from export:core) is left.
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
+import { displayName, buildCredit } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
 const OUT = path.resolve(args.out || path.join(ROOT, 'dist'));
@@ -52,7 +67,7 @@ const stale = sources.filter(ts => { const js = path.join(ROOT, ts.replace(/\.ts
 if (stale.length) { console.error(`compiled assets are missing or older than their source (${stale.slice(0, 3).join(', ')}${stale.length > 3 ? ', …' : ''}): run pnpm run build first`); process.exit(2); }
 
 // 1. start from a clean copy of what this script owns
-const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', '.nojekyll'];
+const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '.nojekyll'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
 
@@ -61,7 +76,7 @@ copy('index.html');
 copy('room-creator.html');
 
 // 3. portal: styles, script, the hero and the thumbnails
-for (const f of walk('portal', f => /\.(css|js|webp)$/.test(f))) copy(f);
+for (const f of walk('portal', f => /\.(css|js|webp|jpg)$/.test(f))) copy(f);
 
 // 4. the engine: compiled modules, three.js (whole vendored tree: modules plus LICENSE), fonts, brand
 for (const f of sources) copy(f.replace(/\.ts$/, '.js'));
@@ -75,8 +90,120 @@ copy(path.join('content', 'houses', 'index.json'));
 for (const h of index.houses || []) {
   copy(path.join('content', 'houses', `${h.id}.json`));
   if (!fs.existsSync(path.join(ROOT, 'portal', 'thumbs', `${h.id}.webp`))) problems.push(`no thumbnail for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
+  if (!fs.existsSync(path.join(ROOT, 'portal', 'previews', `${h.id}.jpg`))) problems.push(`no link-preview image for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
 }
+if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
+
+// 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes, distinct builders, floor
+// area rounded to 10 m²), or a visitor sees them change as the page hydrates and a crawler keeps the wrong ones
+{
+  const houses: { author?: string; areaSqm?: number }[] = index.houses || [];
+  const want: Record<string, string> = {
+    homes: String(houses.length),
+    builders: String(new Set(houses.map(h => h.author).filter(Boolean)).size),
+    area: new Intl.NumberFormat('en').format(Math.round(houses.reduce((a, h) => a + (h.areaSqm || 0), 0) / 10) * 10),
+  };
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  for (const [k, v] of Object.entries(want)) {
+    const got = html.match(new RegExp(`data-stat="${k}">([^<]*)<`));
+    if (!got) problems.push(`index.html: no data-stat="${k}" figure`);
+    else if (got[1] !== v) problems.push(`index.html: the static ${k} figure is ${got[1]}, index.json says ${v}`);
+  }
+}
+
+// 5c. share pages: homes/<id>.html, one per home (see the header), and the tag that tells the player they exist
+const esc = (v: unknown): string => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'] : '') || process.env.SITE_URL || 'https://homes.ci.computer/').replace(/\/?$/, '/');
+const SITE_TITLE = 'Virtual homes · Companion Intelligence';
+const SITE_NAME = 'Companion Intelligence';   // og:site_name on every page: the title says which part of it
+{
+  const site = SITE;
+  const shortStyle = (s?: string): string => (s || '').split(/[:;,(]| with | over | under /)[0].trim();
+  fs.mkdirSync(path.join(OUT, 'homes'), { recursive: true });
+  for (const h of index.houses || []) {
+    if (!/^[a-z0-9-]+$/.test(h.id)) { problems.push(`house id ${JSON.stringify(h.id)} is not [a-z0-9-]: no share page`); continue; }
+    const player = `../room-creator.html?mode=view&house=${h.id}`;
+    const image = new URL(`portal/previews/${h.id}.jpg`, site).href;
+    const style = shortStyle(h.style);
+    const name = displayName(h);
+    // the credit names the build by its own title where the portal's name differs from it ("After the Sims 4
+    // build “Base Game Modern Home” by SimsWithNora"): the unfurl is somewhere a visitor can read it
+    const credit = buildCredit(h);
+    const desc = `${style ? `${style}. ` : ''}${credit ? `${credit}. ` : ''}Built live in 3D in your browser: fly its camera paths and change the hour.`;
+    const page = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${esc(name)} · Virtual homes</title>
+  <meta name="description" content="${esc(desc)}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="${esc(SITE_NAME)}">
+  <meta property="og:title" content="${esc(name)}">
+  <meta property="og:description" content="${esc(desc)}">
+  <meta property="og:image" content="${esc(image)}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${esc(`An aerial view of ${name}`)}">
+  <meta property="og:url" content="${esc(new URL(`homes/${h.id}.html`, site).href)}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../assets/brand/ci-logo-mark.svg" type="image/svg+xml">
+  <script>location.replace(${JSON.stringify(player)} + (location.search ? '&' + location.search.slice(1) : '') + location.hash);</script>
+</head>
+<body>
+  <p><a href="${esc(player)}">Open ${esc(name)} in 3D</a></p>
+</body>
+</html>
+`;
+    fs.writeFileSync(path.join(OUT, 'homes', `${h.id}.html`), page);
+    files++; bytes += page.length;
+  }
+  const rc = path.join(OUT, 'room-creator.html');
+  const text = fs.readFileSync(rc, 'utf8');
+  if (!text.includes('</head>')) problems.push('room-creator.html has no </head> for the share tag');
+  else fs.writeFileSync(rc, text.replace('</head>', '  <meta name="vh-share" content="homes/">\n</head>'));
+}
+
+// 5d. link previews for the site's own pages. The gallery's og:image is relative in the source (a checkout has no
+// address); here it becomes the site's, with og:url. room-creator.html's static head is the editor's (its title
+// and a description naming the editor), which is all an unfurler reads of a player URL copied from the address
+// bar: on the site it is the site's title, description and hero instead. The editor works the same; only its
+// tab title differs on the deployed site.
+{
+  const hero = new URL('portal/hero.jpg', SITE).href;
+  const ix = path.join(OUT, 'index.html');
+  let gallery = fs.readFileSync(ix, 'utf8');
+  const rel = '<meta property="og:image" content="./portal/hero.jpg">';
+  if (!gallery.includes(rel)) problems.push('index.html: no relative og:image for the hero to make absolute');
+  gallery = gallery.replace(rel, `<meta property="og:image" content="${esc(hero)}">\n  <meta property="og:url" content="${esc(SITE)}">`);
+  fs.writeFileSync(ix, gallery);
+
+  const rc = path.join(OUT, 'room-creator.html');
+  let page = fs.readFileSync(rc, 'utf8');
+  const desc = (gallery.match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
+  const head = `<title>${esc(SITE_TITLE)}</title>
+  <meta name="description" content="${desc}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="${esc(SITE_NAME)}">
+  <meta property="og:title" content="${esc(SITE_TITLE)}">
+  <meta property="og:description" content="${desc}">
+  <meta property="og:image" content="${esc(hero)}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">`;
+  const before = page;
+  page = page.replace(/<title>[^<]*<\/title>\s*<meta name="description" content="[^"]*">/, () => head);
+  if (page === before) problems.push('room-creator.html: its static <title> and description were not found to replace');
+  if (/Room Creator|SimsTree|Pascal Editor/.test(page.slice(0, page.indexOf('<script')))) problems.push('room-creator.html: the static head still names the editor');
+  // a module asked for before the import map makes a browser without multiple-import-map support drop the map
+  // (and three.js with it): only Chromium would still start
+  const map = page.indexOf('<script type="importmap">');
+  if (map < 0 || /\bimport\(|type="module"|rel="modulepreload"/.test(page.slice(0, map))) problems.push('room-creator.html: a module is loaded before the import map');
+  fs.writeFileSync(rc, page);
+}
 
 // 6. every relative URL the pages and stylesheets name must be in the output (a query or a fragment is fine)
 const refs = new Set<string>();
@@ -90,7 +217,7 @@ const scan = (fileRel: string, re: RegExp): void => {
     refs.add(path.normalize(path.join(path.dirname(fileRel), clean)));
   }
 };
-for (const p of ['index.html', 'room-creator.html']) scan(p, /(?:href|src)="([^"]+)"/g);
+for (const p of ['index.html', 'room-creator.html', ...(fs.existsSync(path.join(OUT, 'homes')) ? fs.readdirSync(path.join(OUT, 'homes')).map(f => path.join('homes', f)) : [])]) scan(p, /(?:href|src)="([^"]+)"/g);
 for (const p of ['index.html', 'room-creator.html']) scan(p, /from '(\.[^']+)'/g);
 for (const p of walk('portal', f => f.endsWith('.css'))) scan(p, /url\("?(\.[^")]+)"?\)/g);
 for (const r of refs) if (!fs.existsSync(path.join(OUT, r))) problems.push(`${r} is linked but not in ${rel(OUT)}`);

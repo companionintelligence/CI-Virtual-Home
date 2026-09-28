@@ -1,7 +1,8 @@
 # ci-virtual-home — the checks that need no GPU.
 # ============================================================================
 # Install, compile the three.js engine (assets/**/*.ts → .js), typecheck scripts/ and assets/, validate the 30
-# HouseSpecs, and run the pure-Node tests (floor-plan graph + wall compiler over every spec).
+# HouseSpecs, run the pure-Node tests (floor-plan graph + wall compiler over every spec), and assemble the Pages
+# site, whose build refuses a broken link, a missing thumbnail or stale compiled assets.
 #
 # The render gate — shot QA, determinism and the 120 golden frames — is deliberately NOT here: through a
 # software rasteriser it costs the better part of an hour of runner time per push, against a couple of minutes
@@ -53,3 +54,9 @@ jobs:
 
       - name: Floor-plan graph + wall compiler tests
         run: pnpm run test
+
+      # the Pages build's own gate — stale compiled assets, a spec or thumbnail missing for a listed home, a link to
+      # a file the site does not ship, a root-relative URL, hero figures that disagree with index.json — on every
+      # PR, not only on the push to main that deploys
+      - name: Assemble the portal (link and staleness checks)
+        run: pnpm run portal:build

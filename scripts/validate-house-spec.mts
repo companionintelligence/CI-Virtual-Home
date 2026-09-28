@@ -4,9 +4,9 @@
 //        (node --experimental-strip-types scripts/validate-house-spec.mts — any cwd; default: content/houses/*.json)
 //
 // --shots additionally builds each house in headless Chromium and runs the shot QA (render-house-shots.mts
-// --qa-only): the door-to-core / orbit / hero-reveal camera paths are sampled against the built geometry —
-// wall and floor clips, entering through a wall instead of the door, ending outside the house, Core out of
-// frame or occluded on the last frame. Shot errors fail the file like schema errors do, so CI can gate a spec
+// --qa-only): the door-to-core / orbit / hero-reveal / core-orbit camera paths are sampled against the built
+// geometry — wall and floor clips, entering through a wall instead of the door, ending outside the house, Core out
+// of frame or occluded on the last frame, and through a Core orbit the Core kept in frame and in sight. Shot errors fail the file like schema errors do, so CI can gate a spec
 // before anyone renders it. Needs Playwright's Chromium (see render-house-shots.mts); ~2 s per house × shot.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -25,8 +25,8 @@ const SITE_TYPES = ['pool', 'pond', 'hottub', 'deck', 'patio', 'driveway', 'turf
 import { PROPS } from '../assets/props/index.js';   // registry props are valid item types too
 const ITEM_TYPES = [...PROPS.keys(), 'sectional', 'club-chair', 'coffee-table', 'octagonal-table', 'dining-set', 'dining-table', 'kitchen-island', 'kitchen-cabinetry', 'media-credenza', 'wall-tv', 'fireplace', 'area-rug', 'circular-rug', 'concentric-rug', 'sun-lounger', 'bench', 'platform-bed', 'wardrobe', 'crib', 'ensuite', 'bookshelf', 'walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'core-shelf', 'speakers', 'halo-lamp', 'fiddle-leaf', 'monstera', 'bonsai', 'bamboo', 'cactus-group', 'telescope', 'soccer-goal', 'low-wall', 'column'];
 const STAIR_TYPES = ['timber', 'colonial', 'spiral'];
-// house-builder.js shotsFor(): the four generated shots, and the dressing a spec may put on one
-const SHOT_TYPES = ['door-to-core', 'orbit', 'hero-reveal', 'walkthrough'];
+// house-builder.js shotsFor(): the five generated shots, and the dressing a spec may put on one
+const SHOT_TYPES = ['door-to-core', 'orbit', 'hero-reveal', 'walkthrough', 'core-orbit'];
 const SHOT_WALLS = ['up', 'cutaway', 'down', 'sims'];
 const SHOT_ROOFS = ['on', 'off', 'auto'];
 
@@ -143,6 +143,9 @@ export function validate(spec, file = '<spec>') {
     const S = `shot ${sh.id || sh.type}`;
     if (!SHOT_TYPES.includes(sh.type)) { err(`${S}: type "${sh.type}" (${SHOT_TYPES.join(' | ')})`); continue; }
     if (sh.duration !== undefined && !(sh.duration >= 2 && sh.duration <= 60)) err(`${S}: duration ${sh.duration} (seconds, 2–60)`);
+    // door-to-core walks the house, climbs its stairs and orbits the Core: under 8 s the walk is a blur of whip
+    // pans (house-builder.ts lays its timing out for the pinned duration and raises the pan budget to fit)
+    else if (sh.type === 'door-to-core' && sh.duration !== undefined && sh.duration < 8) err(`${S}: duration ${sh.duration} (door-to-core needs at least 8 s)`);
     if (sh.walls !== undefined && !SHOT_WALLS.includes(sh.walls)) err(`${S}: walls "${sh.walls}" (${SHOT_WALLS.join(' | ')})`);
     if (sh.roof !== undefined && !SHOT_ROOFS.includes(sh.roof)) err(`${S}: roof "${sh.roof}" (${SHOT_ROOFS.join(' | ')})`);
     if (sh.enterT !== undefined && !(sh.enterT >= 0 && sh.enterT <= 1)) err(`${S}: enterT ${sh.enterT} (fraction of the shot, 0–1)`);
@@ -156,7 +159,7 @@ export function validate(spec, file = '<spec>') {
 if (process.argv[1] && import.meta.filename === path.resolve(process.argv[1])) {
   const argv = process.argv.slice(2);
   const flag = (name, dflt) => { const i = argv.indexOf(`--${name}`); if (i === -1) return null; const v = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv.splice(i, 2)[1] : (argv.splice(i, 1), dflt); return v; };
-  const shots = flag('shots', 'door-to-core,orbit,hero-reveal');
+  const shots = flag('shots', 'door-to-core,orbit,hero-reveal,core-orbit');
   const jobs = flag('jobs', '3') || '3';
   const files = argv.length ? argv
     // .plan.json beside a spec is build output (build-house-plan.mts), not a spec of its own. Listed relative to

@@ -7,21 +7,98 @@
   <meta name="description" content="Browser-based 3D architectural room creator, device staging, and marketing design studio powered by WebGL/WebGPU Three.js. Inspired by Pascal Editor.">
   <!-- ?mode=view is the portal's player: decided before the body parses, so the editor chrome never flashes.
        portal/viewer.css hides the editor and assets/viewer.js (mounted at the end of the module) plays the house.
-       Without it this block does nothing and the page is the editor, unchanged. -->
+       Until the player mounts, this block is all of it: the poster and the loader (with the home's name once
+       index.json is in, and a word when a slow connection makes it take a while), and a message with a way out
+       if the page cannot start (no WebGL 2, a module that did not download, an engine that threw). The player
+       uses the repo's own fonts (viewer.css), so it asks Google for nothing.
+       Without ?mode=view this block only writes the editor's Google Fonts links, and the page is the editor. -->
   <script>
     (function () {
       var q = new URLSearchParams(location.search), d = document.documentElement, id = q.get('house') || 'aurora';
-      if (q.get('mode') !== 'view') return;
+      if (q.get('mode') !== 'view') {
+        document.write('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+          + '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">');
+        return;
+      }
       d.dataset.mode = 'view';
-      try { var c = document.createElement('canvas'); if (!(c.getContext('webgl2') || c.getContext('webgl'))) d.dataset.viewer = 'no-webgl'; } catch (e) { d.dataset.viewer = 'no-webgl'; }
+      // the player's own title from the start (the static one above is the editor's), then the home's
+      document.title = 'Virtual homes · Companion Intelligence';
       if (/^[a-z0-9-]+$/.test(id)) d.style.setProperty('--vh-poster', 'url("' + new URL('./portal/thumbs/' + id + '.webp', location.href).href + '")');
       document.write('<link rel="stylesheet" href="./portal/viewer.css">');
+      // The list of homes, asked for now, beside three.js and the engine: the loader names the home long before
+      // the player mounts, and viewer.ts and the page's first build take this promise instead of fetching again.
+      // The name is the portal's (assets/home-names.js), which the script after the import map imports and hands
+      // to __vhNames: a module asked for before the import map would make a browser without multiple-import-map
+      // support drop the map, and three.js with it. If it did not download, the loader says "Loading" and the tab
+      // keeps the site's title: the spec's own name is the Sims build's, jargon and all, and not the portal's.
+      window.__vhIndex = fetch('./content/houses/index.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+      var cssString = function (v) { return '"' + String(v).replace(/["\\]/g, '\\$&') + '"'; };
+      window.__vhNames = function (names) { Promise.all([window.__vhIndex, names]).then(function (r) {
+        var j = r[0], n = r[1];
+        var h = j && (j.houses || []).filter(function (x) { return x.id === id; })[0];
+        if (h) {
+          var name = n && n.displayName(h);
+          if (name) d.style.setProperty('--vh-boot-name', cssString(name));
+          // the credit and the facts, as the player's loading card writes them (viewer.ts metaLine)
+          var meta = [];
+          if (h.author) meta.push('By ' + h.author);
+          if (h.storeys) meta.push(h.storeys + (h.storeys === 1 ? ' storey' : ' storeys'));
+          if (h.areaSqm) meta.push(h.areaSqm + ' m²');
+          if (meta.length) d.style.setProperty('--vh-boot-meta', cssString(meta.join(' · ')));
+          if (name && (!d.dataset.viewer || d.dataset.viewer === 'failed' || d.dataset.viewer === 'no-webgl')) document.title = name + ' · Virtual homes';
+        }
+        // an id the list does not have has no thumbnail either: drop the poster before the player's loader asks
+        // for it a second time (the first paint may already have asked once)
+        else if (j) d.style.removeProperty('--vh-poster');
+      }); };
+      // a way back to the gallery from the first paint on (the player's own back button takes over when it mounts)
+      (function back() {
+        if (!document.body) { setTimeout(back, 30); return; }
+        var a = document.createElement('a');
+        a.className = 'vh-boot-back'; a.href = './index.html'; a.setAttribute('aria-label', 'All homes'); a.title = 'All homes';
+        a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>';
+        document.body.appendChild(a);
+      })();
+      setTimeout(function () { if (!d.dataset.viewer) d.dataset.boot = 'slow'; }, 8000);
+      // Before the player mounts, a failure has nowhere else to show: this puts a card over the poster, with a way
+      // out. The page's module calls __vhBooted() when it has run to its end, so an error before that is the module
+      // stopping (nothing can be waiting on a timer yet) and one after it is some callback's, not ours to judge. A
+      // script that failed to download fires its error at the <script> element, which only a capturing listener
+      // on window sees.
+      var booted = false;
+      function card(state, title, msg, retry) {
+        if (d.dataset.viewer === 'no-webgl' || d.dataset.viewer === 'failed') return;
+        d.dataset.viewer = state;
+        var box = document.createElement('div');
+        box.className = 'vh-fail'; box.setAttribute('role', 'alert');
+        box.innerHTML = '<img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./index.html">See all homes</a></div>';
+        box.querySelector('h2').textContent = title;
+        box.querySelector('p').textContent = msg;
+        if (retry) box.querySelector('button').addEventListener('click', function () { location.reload(); });
+        (function put() { if (document.body) document.body.appendChild(box); else setTimeout(put, 30); })();
+      }
+      function fail(msg) { card('failed', 'This home could not be opened.', msg, true); }
+      window.__vhFail = fail;
+      window.__vhBooted = function () { booted = true; };
+      // three.js r169 draws with WebGL 2 only: a browser with just WebGL 1 would pass a looser test and then fail
+      var gl2 = false;
+      try {
+        var probe = document.createElement('canvas').getContext('webgl2'), lose = probe && probe.getExtension('WEBGL_lose_context');
+        gl2 = !!probe;
+        if (lose) lose.loseContext();   // hand the context back now rather than at the next GC
+      } catch (e) { /* no canvas at all */ }
+      if (!gl2) card('no-webgl', 'This browser cannot draw 3D.', 'WebGL 2 is off or missing. Try a recent Chrome, Edge, Firefox or Safari, with hardware acceleration on.', false);
+      addEventListener('error', function (e) {
+        if (d.dataset.viewer) return;   // mounted (the player shows its own errors), or already said
+        var t = e.target;
+        if (t && t.tagName === 'SCRIPT') fail('Part of the player did not download. Check the connection and try again.');
+        else if (t === window && !booted) fail(/webgl/i.test(e.message || '')
+          ? 'This browser could not start 3D (WebGL 2 would not open). Try a recent Chrome, Edge, Firefox or Safari, with hardware acceleration on.'
+          : 'The player stopped while starting. Try again, or pick another home.');
+      }, true);
     })();
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  
+
   <!-- Import Map for Three.js and Addons -->
   <script type="importmap">
   {
@@ -31,6 +108,9 @@
     }
   }
   </script>
+  <!-- ?mode=view only (the head script above defines __vhNames): the portal's names for the loader, imported after
+       the import map. In the editor this does nothing. -->
+  <script>if (window.__vhNames) window.__vhNames(import('./assets/home-names.js').catch(function () { return null; }));</script>
 
   <style>
     /* -------------------------------------------------------------------------------------------
@@ -1700,6 +1780,7 @@
     import { TransformControls } from 'three/addons/TransformControls.js';
     import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
     import { createHouseBuilder } from './assets/house-builder.js';
+    import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
     import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, sunDirection, createSkyBaker, installSkyFog, applyHouseGlow, GradeShader } from './assets/environment.js';
 
@@ -3080,7 +3161,10 @@
         const spineGeo = new THREE.BoxGeometry(0.18, 0.12, diagLen);
         const spine = new THREE.Mesh(spineGeo, steelMat);
         const inclineAngle = Math.atan2(totalHeight, run);
-        spine.rotation.x = inclineAngle;
+        // −: the spine climbs with the treads (+z up). It used to be +, which tilted it the other way — from the
+        // ceiling over the foot of the flight down to the floor under its top, straight across the climb, so every
+        // door-to-core that went upstairs flew the eye through a steel beam.
+        spine.rotation.x = -inclineAngle;
         spine.position.set(0, totalHeight / 2, run / 2);
         spine.castShadow = true;
         group.add(spine);
@@ -7006,7 +7090,7 @@
     window.__houseBuilderRef = houseBuilder; window.__THREE = THREE;   // catalog builder / QA hooks
     const houseSpecs = new Map();      // id → spec (cached fetches)
     let activeHouse = null;            // { spec, anchors, shots }
-    const HOUSE_SHOT_TYPES = ['door-to-core', 'orbit', 'hero-reveal', 'walkthrough'];
+    const HOUSE_SHOT_TYPES = ['door-to-core', 'orbit', 'hero-reveal', 'walkthrough', 'core-orbit'];
     // Hand-tuned cinematic tours (SplinePresets below) authored against these houses' coordinates.
     const HOUSE_TOURS = {
       seraphine: ['seraphine-grand-tour'], lakecabin: ['lake-cabin-flight'], mesamariposa: ['mesa-mariposa-flight'],
@@ -7015,7 +7099,10 @@
 
     async function fetchHouseSpec(id) {
       if (houseSpecs.has(id)) return houseSpecs.get(id);
-      const res = await fetch(`./content/houses/${encodeURIComponent(id)}.json`, { cache: 'no-store' });
+      // The editor always reads the spec on disk (it is where specs are edited); the portal's player goes through
+      // the HTTP cache, so the spec the gallery warmed on hover is the one it builds.
+      const viewMode = document.documentElement.dataset.mode === 'view';
+      const res = await fetch(`./content/houses/${encodeURIComponent(id)}.json`, { cache: viewMode ? 'default' : 'no-store' });
       if (!res.ok) throw new Error(`House spec "${id}" not found (${res.status})`);
       const spec = await res.json();
       houseSpecs.set(id, spec);
@@ -7044,7 +7131,7 @@
       selectObject(null);
       if (presetSelect && presetSelect.value !== `house:${id}`) presetSelect.value = `house:${id}`;
       document.querySelectorAll('#sims-quick-pills .pill-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.preset === `house:${id}`));
-      document.title = `${spec.name} · Isometric 3D Room Creator`;
+      if (!VIEW_MODE) document.title = `${spec.name} · Isometric 3D Room Creator`;   // (the player names the tab itself)
       // Ready signal for harnesses / the batch video renderer (data-house-ready="<id>")
       document.documentElement.dataset.houseReady = id;
       window.dispatchEvent(new CustomEvent('house:ready', { detail: { id, anchors: result.anchors, shots: Object.keys(shots) } }));
@@ -7109,7 +7196,7 @@
     }
 
     // Read URL parameters for initial preset & camera
-    //   ?preset=<hand-built preset>   ?house=<spec id>   ?shot=<door-to-core|orbit|hero-reveal|walkthrough>
+    //   ?preset=<hand-built preset>   ?house=<spec id>   ?shot=<door-to-core|orbit|hero-reveal|walkthrough|core-orbit>
     //   ?flythrough=1 (autoplay)      ?autorecord=1 (start the video recorder once the shot is loaded)
     //   ?res=1080&aspect=16:9 (recorder settings)
     const urlParams = new URLSearchParams(window.location.search);
@@ -7118,8 +7205,14 @@
     const houseParam = initialPreset.startsWith('house:') ? initialPreset.slice(6) : null;
 
     // Load preset on startup (spec-driven houses are async; the flythrough sync below awaits them)
-    const initialLoad = houseParam ? loadHouse(houseParam).catch(err => { console.error(err); loadPresetScene('pascal-garden-house'); }) : Promise.resolve(loadPresetScene(initialPreset));
-    populateHouseCatalog();
+    // The player builds nothing but the house it was asked for: it takes the head script's index.json (in long
+    // before this module runs), skips an id the index does not list, and on a failure leaves the scene empty for
+    // viewer.ts to say so, instead of building the editor's garden house behind the message. It has no use for the
+    // editor's scene-preset catalogue either.
+    const initialLoad = VIEW_MODE
+      ? Promise.resolve(window.__vhIndex).then(j => (j && !(j.houses || []).some(h => h.id === houseParam) ? null : loadHouse(houseParam))).catch(err => { console.warn('viewer: could not load', houseParam, err); return null; })
+      : houseParam ? loadHouse(houseParam).catch(err => { console.error(err); loadPresetScene('pascal-garden-house'); }) : Promise.resolve(loadPresetScene(initialPreset));
+    if (!VIEW_MODE) populateHouseCatalog();
 
     // -------------------------------------------------------------
     // Camera Switching & Controls
@@ -7814,7 +7907,7 @@
       let splineKey = 'garden-house-door-to-core';
       if (typeof sceneKey === 'string' && sceneKey.startsWith('house:')) {
         const id = sceneKey.slice(6);
-        // Not gated against HOUSE_SHOT_TYPES: that list is the 4 canonical shot names, and a spec can alias
+        // Not gated against HOUSE_SHOT_TYPES: that list is the 5 canonical shot names, and a spec can alias
         // one under its own id (shotsFor's `if (s.id && s.id !== s.type) shots[s.id] = sh`) — gating here
         // rejected exactly those aliases from a `?shot=` URL. The existence check on the next line already
         // guards a garbage or not-yet-built shot id, canonical or aliased alike.
@@ -8086,6 +8179,7 @@
     // Shot QA (scripts/render-house-shots.mts --qa, validate-house-spec.mts --shots). Samples the shot's
     // camera path against the built house and reports what a viewer would notice:
     //   error  wall-clip     eye inside a wall slab (walls are full height during a shot — the eye must use doorways)
+    //   error  stair-clip    eye inside a tread, spine or stringer of a flight of stairs (under it, or through its low end)
     //   error  floor-clip    eye below the floor it is over
     //   error  enters-through-wall   door-to-core: first entry into the footprint is > 1.2 m from the entry door
     //   error  ends-outside  a Core-framing shot ends with the eye outside the hero level's footprint
@@ -8093,6 +8187,20 @@
     //   warn   item-clip     eye inside a furniture item's box (bookshelf, glass, chair …)
     //   warn   wall-graze    eye within 0.3 m of a wall in the last quarter of the shot
     //   warn   core-small    final frame: Core spans < 10 % of the frame height
+    // A shot with an orbit round the Core (preset.orbit — door-to-core's finale, core-orbit), every sample from its t0:
+    //   error  orbit-core-out-of-frame   Core centre outside the middle 60 % of the frame
+    //   error  orbit-core-occluded       something between the eye and the Core's centre
+    //   error  orbit-clip                eye inside a furniture item's box
+    //   warn   orbit-short               the orbit sweeps less than 120° round the Core (door-to-core's finale: 60° —
+    //                                    it starts where the walk arrives rather than swing back, so 60–125° is by design)
+    //   warn   orbit-yaw-rate            the camera turns faster than 45°/s while it orbits
+    //   warn   orbit-swing-back          door-to-core: in the 2.5 s before the orbit the eye circles over 20° round
+    //                                    the Core against it, the Core in view (it then sweeps back over that arc)
+    //   error  pushin-core-occluded / pushin-core-out-of-frame   from the approach (orbit.tIn) to the orbit
+    // A shot with a path function (door-to-core, core-orbit), sampled at 60/s:
+    //   warn   look-whip     the view turns faster than 125°/s (yaw and pitch together) before any orbit — an error over 300°/s
+    //   error  timing-invalid            timing.times not strictly increasing from 0 to 1 (shot-path.ts ignores it)
+    //   warn   core-orbit-fallback       no free arc round the Core: core-orbit is a push-in on its front
     // Geometry is the scene as built (walls at their current mode height, cutaway roofs hidden), because
     // that is what gets recorded. Restores the camera afterwards.
     // ---------------------------------------------------------------------------------------
@@ -8144,6 +8252,12 @@
         // twenty-term regex over display names — it let anything a builder renamed straight through and caught
         // anything whose label happened to contain "arch".
         const PASSABLE = new Set(['ground', 'floor', 'structure', 'site', 'wall', 'roof', 'ceiling']);
+        // ... except a flight of stairs is climbed OVER, never walked under or through: its treads and spine, each
+        // tested in its own frame (a sloped spine's world box would swallow the climb above it)
+        const stairMeshes = [];
+        for (const o of placedItems) if (o.userData && o.userData.stair && shown(o)) { o.updateMatrixWorld(true); o.traverse(m => { if (m.isMesh && m.geometry && shown(m)) { m.geometry.computeBoundingBox(); stairMeshes.push({ o, wb: new THREE.Box3().setFromObject(m), inv: m.matrixWorld.clone().invert(), box: m.geometry.boundingBox }); } }); }
+        const stairLocal = new THREE.Vector3();
+        const inStair = p => stairMeshes.find(s => s.wb.containsPoint(p) && s.box.containsPoint(stairLocal.copy(p).applyMatrix4(s.inv)));
         const items = placedItems.filter(o => shown(o) && o !== core && !PASSABLE.has((o.userData || {}).role || 'item'))
           .map(o => ({ o, box: new THREE.Box3().setFromObject(o) })).filter(x => !x.box.isEmpty() && x.box.max.y - x.box.min.y > 0.25 && (x.box.max.x - x.box.min.x) < 8 && (x.box.max.z - x.box.min.z) < 8);
         const levels = spec.levels.map(l => ({ id: l.id, y: l.y, top: l.y + (l.height || 2.7), rects: l.footprint || [] }));
@@ -8151,11 +8265,30 @@
         const heroLevel = levels.find(l => l.id === spec.hero.level) || levels[0];
         const entryLevel = levels.find(l => l.id === (spec.entry && spec.entry.level)) || levels[0];
         const framesCore = shotType !== 'orbit';
+        // what stands between an eye and a point on the Core (null: nothing), among `among` (default: everything)
+        const occluder = (from, to, among = scene.children) => {
+          const dir = to.clone().sub(from); const dist = dir.length(); dir.normalize();
+          const rc = new THREE.Raycaster(from, dir, 0.05, dist - 0.02);
+          // Raycaster ignores visibility, so drop hits inside hidden groups (the full-height wall behind a cutaway)
+          const hits = rc.intersectObjects(among, true).filter(h => shown(h.object) && !waypointMarkers.includes(h.object) && h.object !== splineLineMesh && !isHelper(h.object));
+          const blocker = hits.find(h => { let o = h.object; while (o) { if (o === core) return false; o = o.parent; } return true; });
+          return blocker ? { blocker, dist } : null;
+        };
+        const chainOf = o => { const chain = []; for (; o && o !== scene; o = o.parent) chain.push(o.name || `${o.type}${o.geometry ? '<' + o.geometry.type + '>' : ''}${o.userData && o.userData.itemType ? '#' + o.userData.itemType : ''}`); return chain.reverse().join(' › '); };
+        // the orbit: the Core's centre as the final-frame test measures it, and the objects near enough to hide it
+        const orbit = preset.orbit && core ? preset.orbit : null;
+        const coreCentre = orbit ? new THREE.Box3().setFromObject(core).getCenter(new THREE.Vector3()) : null;
+        const nearCore = orbit ? scene.children.filter(o => { const bb = new THREE.Box3().setFromObject(o); return !bb.isEmpty() && bb.distanceToPoint(coreCentre) < orbit.radius + 1; }) : null;
+        const lookDir = new THREE.Vector3(), secs = preset.duration || animDuration;
+        let swept = 0, lastAng = null, lastYaw = null, lastT = 0, yawMax = 0, yawMaxAll = 0, orbitSamples = 0;
 
         const n = Math.max(24, Math.round((preset.duration || animDuration) * perSecond));
         let wasInside = null, entered = false;
-        for (let i = 0; i <= n; i++) {
-          const t = i / n;
+        // the regular samples, plus the orbit's first moment so its sweep is measured from where it starts
+        const ts = Array.from({ length: n + 1 }, (_, i) => i / n);
+        if (orbit && !ts.includes(orbit.t0)) { ts.push(orbit.t0); ts.sort((a, b) => a - b); }
+        let yawAt = 0;
+        for (const t of ts) {
           applySplineFrame(t);
           if (perFrameWalls) walls = collectWalls();
           const eye = persCamera.position;
@@ -8174,6 +8307,7 @@
             if (eye.y > lv.y - 0.3 && eye.y < lv.y + 0.05 && inRects(eye.x, eye.z, lv.rects) && !inVoid(lv, eye.x, eye.z) && !nearStair(eye.x, eye.z)) E('floor-clip', t, `eye passes through the ${lv.id} floor slab at (${eye.x.toFixed(1)}, ${eye.y.toFixed(1)}, ${eye.z.toFixed(1)})`, lv.id);
           }
           for (const { o, box: b } of items) if (b.containsPoint(eye)) { const nm = o.name || o.userData.itemType || 'item'; W('item-clip', t, `eye inside "${nm}" at (${eye.x.toFixed(1)}, ${eye.y.toFixed(1)}, ${eye.z.toFixed(1)})`, nm); break; }
+          { const st = inStair(eye); if (st) E('stair-clip', t, `eye inside "${st.o.name || 'stairs'}" at (${eye.x.toFixed(1)}, ${eye.y.toFixed(1)}, ${eye.z.toFixed(1)}) — a walk goes round a flight to its foot`, st.o.name || 'stairs'); }
           // door-to-core: the first outside→inside transition on the entry level must be at the door
           if (shotType === 'door-to-core' && !entered && anchors.entry) {
             const insideEntry = inRects(eye.x, eye.z, entryLevel.rects) && eye.y < entryLevel.top;
@@ -8184,6 +8318,76 @@
             }
             wasInside = insideEntry;
           }
+          // yaw rate of the look direction, sample to sample
+          persCamera.getWorldDirection(lookDir);
+          const yaw = Math.atan2(lookDir.x, lookDir.z);
+          if (lastYaw !== null) {
+            const d = Math.abs(Math.atan2(Math.sin(yaw - lastYaw), Math.cos(yaw - lastYaw))) * 180 / Math.PI / ((t - lastT) * secs);
+            if (d > yawMaxAll) { yawMaxAll = d; yawAt = t; }
+            if (orbit && lastT >= orbit.t0 - 1e-6) yawMax = Math.max(yawMax, d);
+          }
+          lastYaw = yaw; lastT = t;
+          if (orbit && t >= orbit.t0 - 1e-6) {
+            orbitSamples++;
+            persCamera.updateMatrixWorld();
+            const ndc = coreCentre.clone().project(persCamera);
+            if (ndc.z > 1 || Math.abs(ndc.x) > 0.6 || Math.abs(ndc.y) > 0.6) E('orbit-core-out-of-frame', t, `Core centre projects to (${ndc.x.toFixed(2)}, ${ndc.y.toFixed(2)}) — outside the middle 60 % of the frame`);
+            const oc = occluder(eye.clone(), coreCentre, nearCore);
+            if (oc) E('orbit-core-occluded', t, `${chainOf(oc.blocker.object)} is ${(oc.dist - oc.blocker.distance).toFixed(2)} m in front of the Core`, chainOf(oc.blocker.object));
+            for (const { o, box: b } of items) if (b.containsPoint(eye)) { const nm = o.name || o.userData.itemType || 'item'; E('orbit-clip', t, `eye inside "${nm}" while orbiting the Core`, nm); break; }
+            const ang = Math.atan2(eye.x - orbit.centre[0], eye.z - orbit.centre[2]);
+            if (lastAng !== null) swept += Math.atan2(Math.sin(ang - lastAng), Math.cos(ang - lastAng));
+            lastAng = ang;
+          }
+        }
+        // A shot with its own path function (preset.frameAt: door-to-core, core-orbit) is sampled again at 60/s,
+        // since the loop above steps over a whip pan and over a quick hook round the Core:
+        //   the look — how fast its direction turns (yaw and pitch together) before the orbit's t0 (the orbit
+        //   has its own 45°/s budget above); house-builder.ts times every leg for ≤ 110°/s
+        //   the swing — how far the eye travels round the Core AGAINST the orbit's direction in the 2.5 s before
+        //   it, while the Core is in frame and no wall stands between (circling one way and then orbiting back
+        //   over the same arc)
+        //   the push-in — from the approach (orbit.tIn) to t0 the Core is framed and nothing stands in front of it
+        let lookPeak = 0, lookAt = 0, swing = 0;
+        if (preset.frameAt && !preset.closed) {
+          const N = Math.max(60, Math.round(secs * 60)), end = orbit ? orbit.t0 : 1, winFrom = orbit ? orbit.t0 - 2.5 / secs : 2;
+          const cam = new THREE.PerspectiveCamera(42, 16 / 9, 0.05, 500), dir = new THREE.Vector3(), prevDir = new THREE.Vector3();
+          const walls = trackedWalls.filter(shown), orbitSign = Math.sign(swept) || 1;
+          let lastA = null, lastSeen = false;
+          for (let i = 0; i <= N; i++) {
+            const t = i / N; if (t > end + 1e-9) break;
+            const f = preset.frameAt(t, 16 / 9);
+            dir.subVectors(f.target, f.eye).normalize();
+            if (i) { const r = prevDir.angleTo(dir) * 180 / Math.PI * N / secs; if (r > lookPeak) { lookPeak = r; lookAt = t; } }
+            prevDir.copy(dir);
+            if (!orbit || t < winFrom) continue;
+            cam.fov = shotType === 'door-to-core' ? 46 - f.s * 6 : 42; cam.updateProjectionMatrix();
+            cam.position.copy(f.eye); cam.lookAt(f.target); cam.updateMatrixWorld();
+            const ndc = coreCentre.clone().project(cam);
+            const seen = ndc.z < 1 && Math.abs(ndc.x) < 1 && Math.abs(ndc.y) < 1 && !occluder(f.eye.clone(), coreCentre, walls);
+            const a = Math.atan2(f.eye.x - orbit.centre[0], f.eye.z - orbit.centre[2]);
+            if (lastA !== null && seen && lastSeen) swing += Math.max(0, -orbitSign * Math.atan2(Math.sin(a - lastA), Math.cos(a - lastA))) * 180 / Math.PI;
+            lastA = a; lastSeen = seen;
+            if (orbit.tIn !== undefined && t >= orbit.tIn && t < orbit.t0) {
+              if (ndc.z > 1 || Math.abs(ndc.x) > 0.85 || Math.abs(ndc.y) > 0.85) E('pushin-core-out-of-frame', t, `pushing in to the orbit, the Core centre projects to (${ndc.x.toFixed(2)}, ${ndc.y.toFixed(2)})`);
+              const oc = occluder(f.eye.clone(), coreCentre, nearCore);
+              if (oc) E('pushin-core-occluded', t, `pushing in to the orbit, ${chainOf(oc.blocker.object)} is ${(oc.dist - oc.blocker.distance).toFixed(2)} m in front of the Core`, chainOf(oc.blocker.object));
+              for (const { o, box: b } of items) if (b.containsPoint(f.eye)) { const nm = o.name || o.userData.itemType || 'item'; E('orbit-clip', t, `eye inside "${nm}" pushing in to the orbit`, nm); break; }
+            }
+          }
+          // (over 300°/s it is a smear, not a pan: a pinned duration far too short for the walk — an error)
+          if (lookPeak > 125) (lookPeak > 300 ? E : W)('look-whip', lookAt, `the view turns at up to ${lookPeak.toFixed(0)}°/s before the orbit — over ${lookPeak > 300 ? 300 : 125}°/s (house-builder.ts times each leg for 110°/s)`);
+          if (swing > 20) W('orbit-swing-back', orbit.t0, `the eye circles ${swing.toFixed(0)}° round the Core against the orbit in the 2.5 s before it, the Core in view — then the orbit sweeps back over that arc`);
+        }
+        if (preset.timing && !timingValid(preset)) E('timing-invalid', 0, `timing.times is not one strictly increasing time per waypoint from 0 to 1 (${JSON.stringify(preset.timing.times).slice(0, 120)})`);
+        if (shotType === 'core-orbit' && !orbit) W('core-orbit-fallback', 0, preset.note || 'no orbit round the Core');
+        let orbitStats = null;
+        if (orbit) {
+          const arc = Math.abs(swept) * 180 / Math.PI;
+          const arcWant = shotType === 'door-to-core' ? 60 : 120;
+          if (arc < arcWant - 0.5) W('orbit-short', orbit.t0, `the Core orbit sweeps ${arc.toFixed(0)}° (free run ${orbit.run[0]}° … ${orbit.run[1]}° at r ${orbit.radius} m) — under ${arcWant}°`);
+          if (yawMax > 45) W('orbit-yaw-rate', orbit.t0, `the camera turns at up to ${yawMax.toFixed(0)}°/s while it orbits the Core — over 45°/s`);
+          orbitStats = { arc: +arc.toFixed(1), yawMax: +yawMax.toFixed(1), samples: orbitSamples, radius: orbit.radius, from: orbit.from, to: orbit.to, t0: orbit.t0, power: preset.power ? preset.power.at : null };
         }
         // final frame
         applySplineFrame(1);
@@ -8204,16 +8408,12 @@
               for (const cx of [box.min.x, box.max.x]) for (const cy of [box.min.y, box.max.y]) for (const cz of [box.min.z, box.max.z]) ys.push(new THREE.Vector3(cx, cy, cz).project(persCamera).y);
               const span = (Math.max(...ys) - Math.min(...ys)) / 2;
               if (span < 0.10) W('core-small', 1, `Core spans ${(span * 100).toFixed(0)} % of the frame height`);
-              const dir = centre.clone().sub(eye); const dist = dir.length(); dir.normalize();
-              const rc = new THREE.Raycaster(eye, dir, 0.05, dist - 0.02);
-              // Raycaster ignores visibility, so drop hits inside hidden groups (the full-height wall behind a cutaway)
-              const hits = rc.intersectObjects(scene.children, true).filter(h => shown(h.object) && !waypointMarkers.includes(h.object) && h.object !== splineLineMesh && !isHelper(h.object));
-              const blocker = hits.find(h => { let o = h.object; while (o) { if (o === core) return false; o = o.parent; } return true; });
-              if (blocker) { const chain = []; for (let o = blocker.object; o && o !== scene; o = o.parent) chain.push(o.name || `${o.type}${o.geometry ? '<' + o.geometry.type + '>' : ''}${o.userData && o.userData.itemType ? '#' + o.userData.itemType : ''}`); E('core-occluded', 1, `${chain.reverse().join(' › ')} is ${(dist - blocker.distance).toFixed(2)} m in front of the Core (ray ${blocker.distance.toFixed(2)} m of ${dist.toFixed(2)} m)`); }
+              const oc = occluder(eye, centre);
+              if (oc) E('core-occluded', 1, `${chainOf(oc.blocker.object)} is ${(oc.dist - oc.blocker.distance).toFixed(2)} m in front of the Core (ray ${oc.blocker.distance.toFixed(2)} m of ${oc.dist.toFixed(2)} m)`);
             }
           }
         }
-        return { id: activeHouse.id, shot: shotType, samples: n + 1, errors, warnings, finalEye: [+eye.x.toFixed(2), +eye.y.toFixed(2), +eye.z.toFixed(2)] };
+        return { id: activeHouse.id, shot: shotType, samples: n + 1, errors, warnings, finalEye: [+eye.x.toFixed(2), +eye.y.toFixed(2), +eye.z.toFixed(2)], yawMax: +yawMaxAll.toFixed(1), yawAt: +yawAt.toFixed(3), look: preset.frameAt ? { peak: +lookPeak.toFixed(1), at: +lookAt.toFixed(3), swing: +swing.toFixed(1) } : null, orbit: orbitStats };
       } finally {
         isRecordingVideo = prevRec;
         endShotCutaway();
@@ -8468,9 +8668,12 @@
       const shotType = activeShot ? activeShot.type : '';
       driveCoresForShot(preset, clampedT);
       const isFlythrough = shotType === 'door-to-core' || shotType === 'sunset-timelapse';
-      const sampleT = isFlythrough ? easeInOutCubic(clampedT) : clampedT;
-      const eyePos = activeEyeSpline.getPointAt(sampleT);
-      const lookTarget = activeTargetSpline.getPointAt(sampleT);
+      // A house shot with its own timing (assets/shot-path.ts: per-waypoint time keys, the orbit's framing) is
+      // one pure function of t; sampleT is then its arc-length fraction, which the roof fade and the dolly read.
+      const fr = preset && preset.frameAt ? preset.frameAt(clampedT, persCamera.aspect) : null;
+      const sampleT = fr ? fr.s : isFlythrough ? easeInOutCubic(clampedT) : clampedT;
+      const eyePos = fr ? fr.eye : activeEyeSpline.getPointAt(sampleT);
+      const lookTarget = fr ? fr.target : activeTargetSpline.getPointAt(sampleT);
 
       // Switch to Perspective Camera for smooth cinematic flying
       if (activeCamera !== persCamera) {
@@ -8761,9 +8964,20 @@
           lighting: () => lightingAim.preset,
           setLighting: name => setLightingPreset(name),
           hideEditorHelpers() { gridHelper.visible = false; transformControls.detach(); },
-          render(hq) { if (hq) renderFrame(width, height); else renderer.render(scene, persCamera); },
+          // HQ goes through the recorder's composer at the canvas's own resolution — the CSS size times the pixel
+          // ratio the player has settled on — not the CSS size: renderFrame supersamples 2× only up to 1080p, so a
+          // large hi-DPI window would otherwise get a quarter of the pixels the plain path draws, upscaled. Capped
+          // at 4K's pixel count, past which the composer's half-float MSAA buffers cost more than they show.
+          render(hq) {
+            if (!hq) { renderer.render(scene, persCamera); return; }
+            const pr = renderer.getPixelRatio(), k = Math.min(1, Math.sqrt((3840 * 2160) / (width * pr * height * pr)));
+            renderFrame(Math.max(2, Math.round(width * pr * k)), Math.max(2, Math.round(height * pr * k)));
+          },
         });
-      }).catch(err => console.error('viewer failed to start', err));
+      }).catch(err => {
+        console.error('viewer failed to start', err);
+        window.__vhFail?.(/import|fetch/i.test(String(err && err.message)) ? 'Part of the player did not download. Check the connection and try again.' : 'The player stopped while starting. Try again, or pick another home.');
+      });
     }
 
     function animate() {
@@ -8807,6 +9021,7 @@
     }
 
     animate();
+    window.__vhBooted?.();   // ?mode=view: the module ran to its end (see the head script); the editor has no such hook
   </script>
 </body>
 </html>

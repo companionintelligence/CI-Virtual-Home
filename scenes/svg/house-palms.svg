@@ -57,21 +57,9 @@
 <polygon points="2366.8,954.1 2261.0,1015.2 2261.0,1010.2 2366.8,949.2" fill="#2a231d" stroke="#241e19" stroke-width="0.42"  />
 <polygon points="1974.0,849.5 2261.0,1015.2 2261.0,1010.2 1974.0,844.5" fill="#362d26" stroke="#241e19" stroke-width="0.42"  />
 <polygon points="2079.7,783.4 2366.8,949.2 2261.0,1010.2 1974.0,844.5" fill="#42372e" stroke="#241e19" stroke-width="0.42"  />
-<polygon points="1505.5,1462.0 1393.4,1526.7 1393.4,1526.7 1505.5,1462.0" fill="#58554f" stroke="#4c4944" stroke-width="0.42"  />
-<polygon points="1089.1,1351.1 1393.4,1526.7 1393.4,1526.7 1089.1,1351.1" fill="#716d65" stroke="#4c4944" stroke-width="0.42"  />
-<polygon points="1201.2,1286.3 1505.5,1462.0 1393.4,1526.7 1089.1,1351.1" fill="#8a857b" stroke="#4c4944" stroke-width="0.42"  />
-</g>
-<g data-item="bed">
 <polygon points="2379.1,957.7 2267.0,1022.4 2267.0,1022.4 2379.1,957.7" fill="#58554f" stroke="#4c4944" stroke-width="0.42"  />
 <polygon points="1962.7,846.7 2267.0,1022.4 2267.0,1022.4 1962.7,846.7" fill="#716d65" stroke="#4c4944" stroke-width="0.42"  />
 <polygon points="2074.8,782.0 2379.1,957.7 2267.0,1022.4 1962.7,846.7" fill="#8a857b" stroke="#4c4944" stroke-width="0.42"  />
-<circle cx="1230.5" cy="1328.5" r="71.78" fill="#818a58" stroke="#545a39" stroke-width="0.42" />
-<circle cx="1208.9664615384615" cy="1306.9664615384615" r="32.3" fill="#a0a782" opacity="0.5" />
-<polygon points="1492.6,1458.8 1386.9,1519.9 1386.9,1514.9 1492.6,1453.8" fill="#2a231d" stroke="#241e19" stroke-width="0.42"  />
-<polygon points="1099.8,1354.2 1386.9,1519.9 1386.9,1514.9 1099.8,1349.2" fill="#362d26" stroke="#241e19" stroke-width="0.42"  />
-<polygon points="1205.6,1288.1 1492.6,1453.8 1386.9,1514.9 1099.8,1349.2" fill="#42372e" stroke="#241e19" stroke-width="0.42"  />
-<circle cx="1322.4" cy="1398.7" r="173.86" fill="#42603a" stroke="#2b3e26" stroke-width="0.42" />
-<circle cx="1270.2409846153846" cy="1346.5409846153846" r="78.24" fill="#71886b" opacity="0.5" />
 </g>
 <g data-item="deck">
 <polygon points="2274.0,1037.6 2062.5,1159.8 2062.5,1157.3 2274.0,1035.1" fill="#6f5537" stroke="#5a4328" stroke-width="0.58"  />
@@ -111,6 +99,16 @@
 <line x1="2085.8" y1="1115.2" x2="1934.7" y2="1202.5" stroke="#8a7050" stroke-width="0.42" opacity="0.8" />
 <line x1="2093.5" y1="1119.7" x2="1942.4" y2="1207.0" stroke="#8a7050" stroke-width="0.42" opacity="0.8" />
 <line x1="2101.3" y1="1124.2" x2="1950.2" y2="1211.4" stroke="#8a7050" stroke-width="0.42" opacity="0.8" />
+</g>
+<g data-item="bed">
+<circle cx="2589.4" cy="1096.0" r="61.19" fill="#818a58" stroke="#545a39" stroke-width="0.42" />
+<circle cx="2571.044153846154" cy="1077.6441538461538" r="27.53" fill="#a0a782" opacity="0.5" />
+<polygon points="2744.4,1172.6 2689.5,1204.3 2689.5,1204.3 2744.4,1172.6" fill="#58554f" stroke="#4c4944" stroke-width="0.42"  />
+<polygon points="2490.4,1089.4 2689.5,1204.3 2689.5,1204.3 2490.4,1089.4" fill="#716d65" stroke="#4c4944" stroke-width="0.42"  />
+<polygon points="2545.3,1057.7 2744.4,1172.6 2689.5,1204.3 2490.4,1089.4" fill="#8a857b" stroke="#4c4944" stroke-width="0.42"  />
+<polygon points="2738.0,1171.0 2686.2,1200.9 2686.2,1195.9 2738.0,1166.0" fill="#2a231d" stroke="#241e19" stroke-width="0.42"  />
+<polygon points="2498.5,1092.5 2686.2,1200.9 2686.2,1195.9 2498.5,1087.5" fill="#362d26" stroke="#241e19" stroke-width="0.42"  />
+<polygon points="2550.3,1057.6 2738.0,1166.0 2686.2,1195.9 2498.5,1087.5" fill="#42372e" stroke="#241e19" stroke-width="0.42"  />
 </g>
 <g data-item="deck">
 <polygon points="2567.5,1207.1 2524.4,1232.0 2524.4,1229.5 2567.5,1204.6" fill="#6f5537" stroke="#5a4328" stroke-width="0.58"  />
@@ -274,6 +272,18 @@
 <line x1="2691.0" y1="1315.6" x2="2449.2" y2="1455.2" stroke="#8a7050" stroke-width="0.42" opacity="0.8" />
 <line x1="2698.8" y1="1320.1" x2="2457.0" y2="1459.7" stroke="#8a7050" stroke-width="0.42" opacity="0.8" />
 </g>
+<g data-item="bed">
+<circle cx="1278.0" cy="1382.9" r="155.07" fill="#6b7a47" stroke="#464f2e" stroke-width="0.42" />
+<circle cx="1231.4785846153845" cy="1336.3785846153846" r="69.78" fill="#909b75" opacity="0.5" />
+<circle cx="1287.4" cy="1388.4" r="138.9" fill="#42603a" stroke="#2b3e26" stroke-width="0.42" />
+<circle cx="1245.731107692308" cy="1346.731107692308" r="62.5" fill="#71886b" opacity="0.5" />
+<polygon points="1492.6,1458.8 1386.9,1519.9 1386.9,1514.9 1492.6,1453.8" fill="#2a231d" stroke="#241e19" stroke-width="0.42"  />
+<polygon points="1099.8,1354.2 1386.9,1519.9 1386.9,1514.9 1099.8,1349.2" fill="#362d26" stroke="#241e19" stroke-width="0.42"  />
+<polygon points="1205.6,1288.1 1492.6,1453.8 1386.9,1514.9 1099.8,1349.2" fill="#42372e" stroke="#241e19" stroke-width="0.42"  />
+<polygon points="1505.5,1462.0 1393.4,1526.7 1393.4,1526.7 1505.5,1462.0" fill="#58554f" stroke="#4c4944" stroke-width="0.42"  />
+<polygon points="1089.1,1351.1 1393.4,1526.7 1393.4,1526.7 1089.1,1351.1" fill="#716d65" stroke="#4c4944" stroke-width="0.42"  />
+<polygon points="1201.2,1286.3 1505.5,1462.0 1393.4,1526.7 1089.1,1351.1" fill="#8a857b" stroke="#4c4944" stroke-width="0.42"  />
+</g>
 <g data-item="path">
 <polygon points="2381.9,1443.9 1889.8,1728.0 1889.8,1725.5 2381.9,1441.4" fill="#64615a" stroke="#56534d" stroke-width="0.42"  />
 <polygon points="1812.1,1683.1 1889.8,1728.0 1889.8,1725.5 1812.1,1680.6" fill="#817c73" stroke="#56534d" stroke-width="0.42"  />
@@ -325,24 +335,16 @@
 <line x1="1541.8" y1="1588.8" x2="1369.2" y2="1688.5" stroke="#8a7050" stroke-width="0.42" opacity="0.8" />
 </g>
 <g data-item="bed">
-<polygon points="2744.4,1172.6 2689.5,1204.3 2689.5,1204.3 2744.4,1172.6" fill="#58554f" stroke="#4c4944" stroke-width="0.42"  />
-<polygon points="2490.4,1089.4 2689.5,1204.3 2689.5,1204.3 2490.4,1089.4" fill="#716d65" stroke="#4c4944" stroke-width="0.42"  />
-<polygon points="2545.3,1057.7 2744.4,1172.6 2689.5,1204.3 2490.4,1089.4" fill="#8a857b" stroke="#4c4944" stroke-width="0.42"  />
-<polygon points="1814.2,1704.3 1762.4,1734.2 1762.4,1729.2 1814.2,1699.3" fill="#2a231d" stroke="#241e19" stroke-width="0.42"  />
-<polygon points="1574.7,1625.8 1762.4,1734.2 1762.4,1729.2 1574.7,1620.8" fill="#362d26" stroke="#241e19" stroke-width="0.42"  />
-<polygon points="1626.5,1590.9 1814.2,1699.3 1762.4,1729.2 1574.7,1620.8" fill="#42372e" stroke="#241e19" stroke-width="0.42"  />
-<circle cx="1705.4" cy="1650.2" r="126.09" fill="#4a663b" stroke="#304226" stroke-width="0.42" />
-<circle cx="1667.5742461538462" cy="1612.3742461538461" r="56.74" fill="#778c6c" opacity="0.5" />
-</g>
-<g data-item="bed">
-<circle cx="2589.4" cy="1096.0" r="61.19" fill="#818a58" stroke="#545a39" stroke-width="0.42" />
-<circle cx="2571.044153846154" cy="1077.6441538461538" r="27.53" fill="#a0a782" opacity="0.5" />
-<polygon points="2738.0,1171.0 2686.2,1200.9 2686.2,1195.9 2738.0,1166.0" fill="#2a231d" stroke="#241e19" stroke-width="0.42"  />
-<polygon points="2498.5,1092.5 2686.2,1200.9 2686.2,1195.9 2498.5,1087.5" fill="#362d26" stroke="#241e19" stroke-width="0.42"  />
-<polygon points="2550.3,1057.6 2738.0,1166.0 2686.2,1195.9 2498.5,1087.5" fill="#42372e" stroke="#241e19" stroke-width="0.42"  />
+<circle cx="1671.1" cy="1615.7" r="17.52" fill="#6b7a47" stroke="#464f2e" stroke-width="0.42" />
+<circle cx="1665.843723076923" cy="1610.443723076923" r="7.88" fill="#909b75" opacity="0.5" />
 <polygon points="1820.6,1705.9 1765.7,1737.6 1765.7,1737.6 1820.6,1705.9" fill="#58554f" stroke="#4c4944" stroke-width="0.42"  />
 <polygon points="1566.6,1622.7 1765.7,1737.6 1765.7,1737.6 1566.6,1622.7" fill="#716d65" stroke="#4c4944" stroke-width="0.42"  />
 <polygon points="1621.5,1591.0 1820.6,1705.9 1765.7,1737.6 1566.6,1622.7" fill="#8a857b" stroke="#4c4944" stroke-width="0.42"  />
+<polygon points="1814.2,1704.3 1762.4,1734.2 1762.4,1729.2 1814.2,1699.3" fill="#2a231d" stroke="#241e19" stroke-width="0.42"  />
+<polygon points="1574.7,1625.8 1762.4,1734.2 1762.4,1729.2 1574.7,1620.8" fill="#362d26" stroke="#241e19" stroke-width="0.42"  />
+<polygon points="1626.5,1590.9 1814.2,1699.3 1762.4,1729.2 1574.7,1620.8" fill="#42372e" stroke="#241e19" stroke-width="0.42"  />
+<circle cx="1693.9" cy="1654.8" r="118.91" fill="#3a5731" stroke="#263920" stroke-width="0.42" />
+<circle cx="1658.2276000000002" cy="1619.1276" r="53.51" fill="#6b8164" opacity="0.5" />
 </g>
 <g data-item="grove">
 <polygon points="1956.7,659.6 1932.1,673.8 1932.1,596.3 1956.7,582.1" fill="#3a2f27"   />
