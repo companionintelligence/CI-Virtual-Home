@@ -551,6 +551,32 @@ export class FloorplanGraph {
         if (best) s[key] = [p[0] + dx * best, p[1] + dz * best];
       }
     }
+    // 1b. jogs: an end that still meets nothing but sits within `snap` of the end of a parallel partition carrying on
+    //     past it (cocoon L1's 1.05 m half-wall, 5 cm off the full-height partition it continues) is joined to that
+    //     end by a short wall square to both, so the run still closes its rooms without either leg skewing
+    const touches = (p, s) => segs.some(o => o !== s && closestPointOnSegment(p[0], p[1], o.a[0], o.a[1], o.b[0], o.b[1]).dist < CORNER_TOLERANCE);
+    for (const s of segs.filter(s => s.kind === 'partition' && !s.dressing)) {
+      for (const [key, other] of [['a', 'b'], ['b', 'a']]) {
+        const p = s[key], q = s[other];
+        const len = distance(q[0], q[1], p[0], p[1]);
+        if (len < EPS || touches(p, s)) continue;
+        const dx = (p[0] - q[0]) / len, dz = (p[1] - q[1]) / len;
+        let best = null;
+        for (const t of segs) {
+          if (t === s || t.kind !== 'partition' || t.dressing) continue;
+          for (const [rk, rk2] of [['a', 'b'], ['b', 'a']]) {
+            const r = t[rk], r2 = t[rk2];
+            const along = (r[0] - p[0]) * dx + (r[1] - p[1]) * dz, side = (r[0] - p[0]) * dz - (r[1] - p[1]) * dx;
+            const onward = (r2[0] - r[0]) * dx + (r2[1] - r[1]) * dz, twist = (r2[0] - r[0]) * dz - (r2[1] - r[1]) * dx;
+            const d = distance(p[0], p[1], r[0], r[1]);
+            if (d < snap && Math.abs(side) > EPS && onward > EPS && Math.abs(twist) < EPS && len + along > CORNER_TOLERANCE && (!best || d < best.d)) best = { t, r, along, d };
+          }
+        }
+        if (!best) continue;
+        s[key] = [p[0] + dx * best.along, p[1] + dz * best.along];             // square the jog: along the axis only
+        segs.push({ a: s[key], b: [...best.r], kind: 'partition', thickness: Math.min(s.thickness, best.t.thickness), height: Math.min(s.height, best.t.height) });
+      }
+    }
 
     // 2. split every segment at every endpoint / crossing that lies on it
     const cuts = segs.map(() => []);

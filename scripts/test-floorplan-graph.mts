@@ -133,6 +133,18 @@ test('a partition end 0.04 m short of, or past, the wall it points into is exten
   }
 });
 
+test('a half-wall a few cm off the partition it continues is joined by a square jog, not skewed onto it', () => {
+  // cocoon L1: a full-height partition at z 3 and a 1.05 m half-wall continuing it at z 3.05
+  const g = FloorplanGraph.fromFootprint([{ x: 0, z: 0, w: 8, d: 6 }], [{ from: [3, 3], to: [8, 3] }, { from: [0, 3.05], to: [3, 3.05], height: 1.05 }]);
+  assert.ok(g.walls.every(axisAligned));
+  assert.equal(g.rooms.length, 2, 'the run still divides the plan');
+  assert.deepEqual(g.rooms.map(r => +r.area().toFixed(3)).sort((a, b) => a - b), [23.85, 24.15]);
+  const jog = g.walls.find(w => w.kind === 'partition' && Math.abs(w.length() - 0.05) < 1e-9);
+  assert.ok(jog, 'a 5 cm jog joins the two ends');
+  assert.deepEqual(ends(jog), [[3, 3], [3, 3.05]]);
+  assert.equal(jog.height, 1.05, 'the jog is no taller than the lower leg');
+});
+
 // ---------------------------------------------------------------------------------------
 // Mitred offsets
 // ---------------------------------------------------------------------------------------
