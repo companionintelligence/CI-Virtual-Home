@@ -22,7 +22,6 @@
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
-//   <out>/.nojekyll                  Pages serves the tree as it is
 //
 // Everything the site references is relative, so the same tree works at / and under /ci-virtual-home/. No
 // goldens, scripts, scenes, videos or TypeScript sources go out. The build refuses to run on stale or missing
@@ -66,7 +65,7 @@ const sources = walk('assets', f => f.endsWith('.ts') && !f.endsWith('.d.ts') &&
 const stale = sources.filter(ts => { const js = path.join(ROOT, ts.replace(/\.ts$/, '.js')); return !fs.existsSync(js) || fs.statSync(js).mtimeMs < fs.statSync(path.join(ROOT, ts)).mtimeMs; });
 if (stale.length) { console.error(`compiled assets are missing or older than their source (${stale.slice(0, 3).join(', ')}${stale.length > 3 ? ', …' : ''}): run pnpm run build first`); process.exit(2); }
 
-// 1. start from a clean copy of what this script owns
+// 1. start from a clean copy of what this script owns (.nojekyll: what it wrote for GitHub Pages, now retired)
 const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '.nojekyll'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
@@ -93,7 +92,6 @@ for (const h of index.houses || []) {
   if (!fs.existsSync(path.join(ROOT, 'portal', 'previews', `${h.id}.jpg`))) problems.push(`no link-preview image for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
 }
 if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
-fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 
 // 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes, distinct builders, floor
 // area rounded to 10 m²), or a visitor sees them change as the page hydrates and a crawler keeps the wrong ones
