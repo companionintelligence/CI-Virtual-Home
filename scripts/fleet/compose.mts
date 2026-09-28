@@ -19,9 +19,10 @@ export const metrics: Metric[] = [
       }
       const rows = [...houses.entries()].map(([t, s]) => [t, s.size, count.get(t)] as [string, number, number]).sort((a, b) => b[1] - a[1] || b[2] - a[2]);
       const top = rows.slice(0, 12), inTwenty = rows.filter(r => r[1] >= 20).length;
+      const top12 = top.reduce((a, r) => a + r[2], 0);
       return {
-        value: `${inTwenty} types in 20 or more houses; the top 12 are ${top.reduce((a, r) => a + r[2], 0)} of ${items} items`, pass: null,
-        detail: `${rows.length} item types in use over ${items} room items (the hero desk set left out). The composer's target is measured against this baseline.`,
+        value: `${inTwenty} types in 20 or more houses; the top 12 are ${top12} of ${items} items`, measure: top12, pass: null,
+        detail: `${rows.length} item types in use over ${items} room items (the hero desk set left out). The composer's target is measured against the baseline (test/fleet/baseline.json, the hand-authored fleet at S0). Authored items only: once S3 composes rooms at build time, count the built rooms instead (house.plan — export them from assets/plan-export/compose.ts and run \`fleet-audit --built\`).`,
         table: { head: ['type', 'houses', 'items'], rows: top },
       };
     },

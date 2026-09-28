@@ -4,12 +4,15 @@
 // rocks, beds, hedges, paths, scatters, groves) as world boxes with shape and colour. generate_house_iso.py draws
 // from it. One key per stream (assets/plan-export/: site, kit, and arch / compose / shots once those streams
 // export anything). Run after editing specs or the site kit, before the isometrics:
-//   pnpm run plans [--house id[,id…]]      (node --experimental-strip-types scripts/build-house-plan.mts — any cwd)
+//   pnpm run plans [--house id[,id…]] [--out <dir>]      (node --experimental-strip-types scripts/build-house-plan.mts — any cwd)
+// --out writes the plans somewhere else (fleet-audit.mts --built: test/qa/plans), leaving the committed ones alone.
 import fs from 'node:fs'; import path from 'node:path'; import http from 'node:http';
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, x, i, arr) => { if (x.startsWith('--')) a.push([x.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : 'true']); return a; }, []));
 const ROOT = path.resolve(import.meta.dirname, '..');
 const HOUSES = path.join(ROOT, 'content', 'houses');
 const ids = args.house ? args.house.split(',') : JSON.parse(fs.readFileSync(path.join(HOUSES, 'index.json'), 'utf8')).houses.map(h => h.id);
+const OUT_DIR = args.out && args.out !== 'true' ? path.resolve(args.out) : HOUSES;
+fs.mkdirSync(OUT_DIR, { recursive: true });
 async function loadPlaywright() {
   try { return await import('playwright'); } catch {}
   const { pathToFileURL } = await import('node:url'); const os = await import('node:os');
@@ -35,8 +38,8 @@ for (const id of ids) {
   // assets/plan-export/ picks each stream's key off the anchors, in the page (its URL built at run time, so the
   // Node type-check does not try to resolve it from scripts/)
   const plan: Record<string, any> = await page.evaluate(async () => { const { planOf } = await import(new URL('assets/plan-export/index.js', location.href).href); return planOf(__houseDebug().house.anchors); });
-  fs.writeFileSync(path.join(HOUSES, `${id}.plan.json`), JSON.stringify({ id, generated: 'build-house-plan.mjs', ...plan }));
+  fs.writeFileSync(path.join(OUT_DIR, `${id}.plan.json`), JSON.stringify({ id, generated: 'build-house-plan.mjs', ...plan }));
   console.log(`${id}: ${(plan.site || []).length} site instances${Object.keys(plan).length > 2 ? ` (+ ${Object.keys(plan).filter(k => k !== 'site' && k !== 'kit').join(', ')})` : ''}`); n++;
 }
 await browser.close(); server.close();
-console.log(`${n} plans → ${HOUSES}`);
+console.log(`${n} plans → ${OUT_DIR}`);

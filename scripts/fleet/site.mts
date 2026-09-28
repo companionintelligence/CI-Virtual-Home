@@ -43,7 +43,7 @@ export const metrics: Metric[] = [
     compute(f) {
       const hits = f.houses.flatMap(h => (h.spec.site || []).filter(s => s.type === 'garden-beds' && Array.isArray(s.at) && inFront(h, s.at[0], s.at[1])).map(s => ({ id: h.id, at: s.at, count: s.count || 4 })));
       return {
-        value: `${hits.length} (${new Set(hits.map(h => h.id)).size} houses)`, pass: hits.length === 0,
+        value: `${hits.length} (${new Set(hits.map(h => h.id)).size} houses)`, measure: hits.length, pass: hits.length === 0,
         detail: '`garden-beds` (raised vegetable crates) between the entry facade and the street.',
         table: { head: ['house', 'at', 'crates'], rows: hits.map(h => [h.id, `[${h.at.join(', ')}]`, h.count]) },
       };
@@ -67,8 +67,8 @@ export const metrics: Metric[] = [
       }
       const share = all ? axis / all : 0;
       return {
-        value: `${(share * 100).toFixed(0)} % of ${all.toFixed(0)} m`, pass: all ? share <= 0.2 : null,
-        detail: 'Bed outlines (a polygon, or the rectangle at w × d) and path centre lines on the 30 real lots, by length; an edge within 1° of the x or z axis counts as axis-aligned.',
+        value: `${(share * 100).toFixed(0)} % of ${all.toFixed(0)} m`, measure: +share.toFixed(4), pass: all ? share <= 0.2 : null,
+        detail: 'Bed outlines (a polygon, or the rectangle at w × d) and path centre lines on the 30 real lots, by length; an edge within 1° of the x or z axis counts as axis-aligned. Authored geometry only: once S4 resolves `planting`, `smooth` and walks at build time, this should measure the built edges (house.plan — export them from assets/plan-export/site.ts and run `fleet-audit --built`).',
         table: { head: ['house', 'edge length (m)', 'axis-aligned'], rows: rows.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2])) },
       };
     },

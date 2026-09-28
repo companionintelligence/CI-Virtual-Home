@@ -13,7 +13,7 @@ export const metrics: Metric[] = [
       for (const h of f.houses) m.set(style(h), (m.get(style(h)) || 0) + 1);
       const rows = [...m.entries()].sort((a, b) => b[1] - a[1]), n = f.houses.length || 1;
       return {
-        value: `${rows[0][0]} on ${rows[0][1]} of ${f.houses.length}`, pass: rows[0][1] / n <= 0.25,
+        value: `${rows[0][0]} on ${rows[0][1]} of ${f.houses.length}`, measure: +(rows[0][1] / n).toFixed(4), pass: rows[0][1] / n <= 0.25,
         table: { head: ['establishing style', 'houses'], rows },
       };
     },

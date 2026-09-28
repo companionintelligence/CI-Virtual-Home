@@ -79,7 +79,7 @@ export const metrics: Metric[] = [
       const n = distinct(leaves.map(d => d.colour), f.deltaE).length;
       const other = ['cased', 'slider', 'garage', 'none'].map(k => [k, doors.filter(d => d.kind === k).length]).filter(([, c]) => c);
       return {
-        value: `${n} distinct leaf colours (${leaves.filter(d => d.colour === DEFAULT_LEAF).length} of ${leaves.length} leaves are the default teal)`, pass: n >= 20,
+        value: `${n} distinct leaf colours (${leaves.filter(d => d.colour === DEFAULT_LEAF).length} of ${leaves.length} leaves are the default teal)`, measure: n, pass: n >= 20,
         detail: `Entries without a leaf: ${other.map(([k, c]) => `${c} ${k}`).join(', ') || 'none'}.`,
         table: { head: ['leaf colour', 'houses', 'ids'], rows: [...byColour.entries()].sort((a, b) => b[1].length - a[1].length).map(([c, ids]) => [`\`${c}\`${c === DEFAULT_LEAF ? ' (default)' : ''}`, ids.length, ids.join(', ')]) },
       };
@@ -100,7 +100,7 @@ export const metrics: Metric[] = [
       for (const c of counts) for (const k of c.kinds) kinds.set(k, (kinds.get(k) || 0) + 1);
       const med = median(counts.map(c => c.n));
       return {
-        value: `median ${med} (${counts.filter(c => c.n >= 2).length} of ${counts.length} houses declare 2 or more)`, pass: med >= 2,
+        value: `median ${med} (${counts.filter(c => c.n >= 2).length} of ${counts.length} houses declare 2 or more)`, measure: med, pass: med >= 2,
         detail: 'Declared in the spec (palette.material, levels[].material, footprint[].material, facade[].material). Rendered today: one per house — kit.cladding() caches a single material.',
         table: { head: ['cladding', 'houses'], rows: [...kinds.entries()].sort((a, b) => b[1] - a[1]) },
       };
@@ -121,7 +121,7 @@ export const metrics: Metric[] = [
       const topP = presets[0] ? presets[0][1] / n : 0, topB = buckets[0] ? buckets[0][1] / n : 0;
       return {
         value: `top preset ${presets[0] ? presets[0][0] : '—'} ${(topP * 100).toFixed(0)} %, top sun bucket ${buckets[0] ? buckets[0][0] + '°' : '—'} ${(topB * 100).toFixed(0)} %`,
-        pass: topP <= 0.4 && topB <= 0.25,
+        measure: +Math.max(topP, topB).toFixed(4), pass: topP <= 0.4 && topB <= 0.25,
         detail: `${rows.filter(r => r.alias).length} specs name their preset by a legacy alias. The sun stands at the entry's bearing plus the preset's swing (environment.ts sunDirection), so houses whose entries face one way share one sun per preset.`,
         table: { head: ['preset', 'houses', 'share'], rows: presets.map(([p, c]) => [p, c, `${(c / n * 100).toFixed(0)} %`]).concat(buckets.map(([b, c]) => [`sun ${b}°–${+b + 15}°`, c, `${(c / n * 100).toFixed(0)} %`])) },
       };

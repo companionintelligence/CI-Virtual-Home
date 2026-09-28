@@ -3,7 +3,7 @@
 // failure — the numbers are for each stream's PR to quote against main's, not a gate.
 //
 //   node --experimental-strip-types scripts/perf-house.mts [--house aurora,mirage,vanilla | --all] [--runs 1]
-//        [--shot door-to-core,orbit,hero-reveal,core-orbit] [--out test/qa/perf.json]
+//        [--shot door-to-core,orbit,hero-reveal,core-orbit] [--out test/qa/perf.json] [--baseline]
 //
 // Budgets, per house, on this machine:
 //   build   ≤ 3 s     houseBuilder.build(spec) + shotsFor(spec, anchors): the main thread is blocked for all of it
@@ -16,7 +16,10 @@
 // fine here — nothing a frame depends on is timed or changed. The machine may be shared: a load average is printed
 // with the numbers, and a busy machine inflates them all.
 //
-// Writes test/qa/perf.json (gitignored) and, when one from an earlier run is there, prints the delta against it.
+// Writes test/qa/perf.json (gitignored) and prints each number's delta against the committed baseline,
+// test/perf/baseline.json (the reference machine's run at S0: its load and core count are recorded beside it), or,
+// without one, against the previous run. A stream PR quotes those deltas. --baseline writes this run as the
+// baseline — on the reference machine, at integration, not on a stream branch.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -112,13 +115,16 @@ for (const house of HOUSES) {
 await browser.close(); server.close();
 
 // ---- report
-const prev = fs.existsSync(OUT) ? (() => { try { return JSON.parse(fs.readFileSync(OUT, 'utf8')); } catch { return null; } })() : null;
+const BASELINE = path.join(ROOT, 'test', 'perf', 'baseline.json');
+const readJson = (f: string) => fs.existsSync(f) ? (() => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } })() : null;
+const baseline = args.baseline === 'true' ? null : readJson(BASELINE);
+const prev = baseline || readJson(OUT), prevName = baseline ? `the baseline (${path.relative(process.cwd(), BASELINE)}: load ${(baseline.load || []).join(' ')} on ${baseline.cores} cores)` : path.relative(process.cwd(), OUT);
 const prevOf = (h: string) => prev && (prev.results || []).find(r => r.house === h);
 const f0 = (v: number | null) => (v === null || v === undefined ? '—' : `${Math.round(v)}`);
 const delta = (v: number | null, p: number | null) => (v === null || p === null || p === undefined ? '' : ` (${v - p >= 0 ? '+' : ''}${Math.round(v - p)})`);
 const warnings = [];
 console.log(`perf — ${HOUSES.length} house(s) × ${RUNS} run(s), fastest shown, ms; load average ${load.join(' ')} on ${os.cpus().length} cores`);
-console.log(`budgets: build ≤ ${BUDGET.buildMs}, track ≤ ${BUDGET.trackMs} a shot, shot QA ≤ ${BUDGET.shotQAMs} a shot${prev ? `; (Δ) against ${path.relative(process.cwd(), OUT)} of ${prev.when}` : ''}`);
+console.log(`budgets: build ≤ ${BUDGET.buildMs}, track ≤ ${BUDGET.trackMs} a shot, shot QA ≤ ${BUDGET.shotQAMs} a shot${prev ? `; (Δ) against ${prevName} of ${prev.when}` : ''}`);
 for (const r of results) {
   if (r.error) { console.log(`  ${r.house.padEnd(18)} ERROR ${r.error}`); warnings.push(`${r.house}: ${r.error}`); continue; }
   const p = prevOf(r.house);
@@ -134,6 +140,8 @@ for (const r of results) {
 if (warnings.length) { console.log(`\n${warnings.length} over budget (report-only):`); for (const w of warnings) console.log(`  warn  ${w}`); }
 else console.log('\nall within budget');
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
-fs.writeFileSync(OUT, JSON.stringify({ when: new Date().toISOString(), load, cores: os.cpus().length, budget: BUDGET, shots: SHOTS, results }, null, 1) + '\n');
+const record = JSON.stringify({ when: new Date().toISOString(), load, cores: os.cpus().length, budget: BUDGET, shots: SHOTS, results }, null, 1) + '\n';
+fs.writeFileSync(OUT, record);
 console.log(`→ ${path.relative(process.cwd(), OUT)}`);
+if (args.baseline === 'true') { fs.mkdirSync(path.dirname(BASELINE), { recursive: true }); fs.writeFileSync(BASELINE, record); console.log(`→ ${path.relative(process.cwd(), BASELINE)} (the baseline)`); }
 process.exit(0);
