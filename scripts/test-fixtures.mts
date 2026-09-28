@@ -2,7 +2,7 @@
 // Fixture houses: the specs each stream proves its features on (plan §2.0 — streams never edit content/houses/),
 // rendered to stills with a frame-hash, outside the 150 goldens.
 //
-//   pnpm run fixtures [--fixture s0-seams,kit-doors] [--update] [--res 360] [--profile auto] [--no-qa]
+//   pnpm run fixtures [--fixture s0-seams,kit-doors] [--update] [--record <stream>] [--res 360] [--profile auto] [--no-qa]
 //   (node --experimental-strip-types scripts/test-fixtures.mts — any cwd)
 //
 // test/fixtures/houses/<id>.json is a HouseSpec like any other; name it after its stream ("kit-…", "arch-…",
@@ -14,8 +14,11 @@
 //   3. renders its stills through the video path (composer, GTAO, SMAA, 2× supersampling), 640 × 360 by default —
 //      door-to-core @0.55 and @1, orbit @0.55, hero-reveal @1, core-orbit @0.55 unless it lists its own — writes
 //      them to test/fixtures/out/<profile>/<id>/ (gitignored) to be LOOKED AT, and compares each frame's sha256
-//      with test/fixtures/hashes/<profile>.json. A new or changed fixture is blessed with --update, on purpose,
-//      like a golden; a hash that moved on a branch that did not mean to move it is a failure.
+//      with test/fixtures/hashes/<profile>/<id>.json — one file per fixture, so two streams' fixtures never share
+//      one. A stream blesses its OWN new or changed fixture with `--fixture <id> --update`, on purpose, like a
+//      golden. A frame of ANOTHER stream's fixture (the harness's s0-seams, say) that the branch is meant to move is
+//      declared in the golden ledger instead (scripts/golden-ledger.mts: test/goldens/expected-diffs/<stream>.json,
+//      its moved hash written by `--record <stream>`); any other hash that moved is a failure.
 //
 // An optional "fixture" block in the spec steers it: { "note": "what it shows", "frames": { "orbit": [0.55] },
 // "qa": false }. The builder ignores unknown top-level keys, so the block never reaches the render.
@@ -31,12 +34,16 @@ import http from 'node:http';
 import crypto from 'node:crypto';
 import { encodePNG } from './vendor/png.mjs';
 import { validate } from './validate-house-spec.mts';
+import { loadLedger, causes, streamName, streamFile, writeStreamLedger, ledgerDir } from './golden-ledger.mts';
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, x, i, arr) => { if (x.startsWith('--')) a.push([x.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : 'true']); return a; }, []));
 const ROOT = path.resolve(import.meta.dirname, '..');
 const FIXTURES = path.join(ROOT, 'test', 'fixtures', 'houses');
 const RES = args.res || '360';
 const UPDATE = args.update === 'true';
+const RECORD = args.record && args.record !== 'true' ? streamName(args.record + '.json') : null;   // --record s1
+if (args.record === 'true') { console.error('--record needs a stream: --record s1'); process.exit(2); }
+if (RECORD && UPDATE) { console.error('--record (a moved frame of another stream\'s fixture) and --update (bless your own) are separate runs'); process.exit(2); }
 const QA = args['no-qa'] !== 'true';
 const PROFILES = {
   'macos-metal': { platform: 'darwin', args: ['--use-angle=metal', '--ignore-gpu-blocklist', '--enable-gpu-rasterization'] },
@@ -44,7 +51,7 @@ const PROFILES = {
 };
 const PROFILE = args.profile && args.profile !== 'auto' ? args.profile : process.env.HOUSE_GOLDEN_PROFILE || Object.keys(PROFILES).find(k => PROFILES[k].platform === process.platform) || `${process.platform}-unknown`;
 if (!PROFILES[PROFILE]) { console.error(`unknown profile "${PROFILE}"`); process.exit(2); }
-const HASHES = path.join(ROOT, 'test', 'fixtures', 'hashes', `${PROFILE}.json`);
+const HASHES = path.join(ROOT, 'test', 'fixtures', 'hashes', PROFILE);   // <id>.json per fixture
 const OUT = path.join(ROOT, 'test', 'fixtures', 'out', PROFILE);
 const DEFAULT_FRAMES = { 'door-to-core': [0.55, 1], 'orbit': [0.55], 'hero-reveal': [1], 'core-orbit': [0.55] };
 
@@ -53,6 +60,10 @@ const ids = args.fixture ? args.fixture.split(',').filter(Boolean) : all;
 for (const id of ids) if (!all.includes(id)) { console.error(`no fixture ${id} in ${path.relative(process.cwd(), FIXTURES)}`); process.exit(2); }
 if (!ids.length) { console.log('no fixtures'); process.exit(0); }
 const real = new Set(fs.readdirSync(path.join(ROOT, 'content', 'houses')).filter(f => f.endsWith('.json')).map(f => f.replace(/\.json$/, '')));
+// the golden ledger's fixture frames (its golden frames are test-goldens.mts's to judge)
+const ledger = loadLedger(ROOT, k => real.has(k.split('/')[0]) || all.includes(k.split('/')[0]));
+if (ledger.problems.length) { console.error(`the golden ledger (${path.relative(process.cwd(), ledgerDir(ROOT))}):\n  ${ledger.problems.join('\n  ')}`); process.exit(2); }
+if (RECORD && !ledger.byStream.has(RECORD)) { console.error(`--record ${args.record}: no ${path.relative(process.cwd(), path.join(ledgerDir(ROOT), streamFile(RECORD) + '.json'))} — declare the frames it moves there first`); process.exit(2); }
 
 // ---- 1. validate
 let failed = 0;
@@ -129,8 +140,10 @@ const renderFrame = (page, shot, t) => page.evaluate(([shot, res, t]) => {
   return { w: info.w, h: info.h, b64: btoa(s) };
 }, [shot, RES, t]);
 
-const stored = fs.existsSync(HASHES) ? JSON.parse(fs.readFileSync(HASHES, 'utf8')) : {};
+const hashFile = id => path.join(HASHES, `${id}.json`);
+const stored = Object.assign({}, ...ids.map(id => fs.existsSync(hashFile(id)) ? JSON.parse(fs.readFileSync(hashFile(id), 'utf8')) : {}));
 const hashes = { ...stored };
+const recordedNow = {};   // key → hash, for --record
 const rows = [];
 const built = Object.keys(specs);
 try {
@@ -161,12 +174,22 @@ try {
       const hash = crypto.createHash('sha256').update(px).digest('hex').slice(0, 16);
       fs.mkdirSync(path.join(OUT, id), { recursive: true });
       fs.writeFileSync(path.join(OUT, id, `${shot}@${String(t).replace('.', '_')}.png`), encodePNG(px, fr.w, fr.h));
-      const was = stored[key];
-      const state = UPDATE ? (was === hash ? 'unchanged' : was ? 'updated' : 'added') : !was ? 'no hash' : was === hash ? 'pass' : 'changed';
+      const was = stored[key], declared = ledger.entries.get(key);
+      // a declared frame (the ledger): it must move, to exactly what a declaring stream recorded
+      let state = UPDATE ? (was === hash ? 'unchanged' : was ? 'updated' : 'added') : !was ? 'no hash' : was === hash ? 'pass' : 'changed';
+      if (!UPDATE && was && declared) {
+        const mine = RECORD && declared.find(e => e.stream === RECORD);
+        state = was === hash ? 'unmoved' : mine ? 'recorded' : declared.some(e => e.hash[PROFILE] === hash) ? 'expected'
+          : declared.some(e => e.hash[PROFILE]) ? 'elsewhere' : 'unrecorded';
+        if (state === 'recorded') recordedNow[key] = hash;
+      }
       if (UPDATE) hashes[key] = hash;
-      if (state === 'no hash' || state === 'changed') bad++;
+      if (['no hash', 'changed', 'unmoved', 'unrecorded', 'elsewhere'].includes(state)) bad++;
       rows.push({ key, hash, state });
-      console.log(`  ${state === 'pass' || state === 'unchanged' ? '✓' : UPDATE ? '~' : '✗'} ${key}  ${hash}  ${state}${state === 'changed' ? ` (was ${was})` : ''}`);
+      const why = state === 'changed' ? ` (was ${was})` : state === 'unmoved' ? ` — declared (${causes(declared)}), but it matches its hash`
+        : state === 'unrecorded' ? ` — declared (${causes(declared)}), its moved hash not recorded on ${PROFILE}: pnpm run fixtures --record ${streamFile(declared[0].stream)} --fixture ${id}`
+        : state === 'elsewhere' ? ` — declared (${causes(declared)}), but it moved to something other than what was recorded` : state === 'expected' || state === 'recorded' ? ` (${causes(declared)})` : '';
+      console.log(`  ${['pass', 'unchanged', 'expected', 'recorded'].includes(state) ? '✓' : UPDATE ? '~' : '✗'} ${key}  ${hash}  ${state}${why}`);
     }
     if (errs.length) { console.log(`  ERROR ${id}: page error — ${errs[0]}`); bad++; }
     console.log(`${bad ? '✗' : '✓'} ${id}${fx.note ? ` — ${fx.note}` : ''}`);
@@ -177,11 +200,20 @@ try {
   await browser.close(); server.close();
 }
 if (UPDATE) {
-  // only the fixtures that exist keep their hashes
-  const keep = Object.fromEntries(Object.entries(hashes).filter(([k]) => all.includes(k.split('/')[0])).sort(([a], [b]) => a.localeCompare(b)));
-  fs.mkdirSync(path.dirname(HASHES), { recursive: true });
-  fs.writeFileSync(HASHES, JSON.stringify(keep, null, 1) + '\n');
-  console.log(`→ ${path.relative(process.cwd(), HASHES)}`);
+  // each fixture run here gets its own file, holding exactly the frames it rendered
+  fs.mkdirSync(HASHES, { recursive: true });
+  for (const id of built) {
+    const mine = Object.fromEntries(rows.filter(r => r.key.startsWith(`${id}/`)).map(r => [r.key, r.hash]).sort(([a], [b]) => a.localeCompare(b)));
+    if (!Object.keys(mine).length) continue;
+    fs.writeFileSync(hashFile(id), JSON.stringify(mine, null, 1) + '\n');
+    console.log(`→ ${path.relative(process.cwd(), hashFile(id))}`);
+  }
+}
+if (RECORD && Object.keys(recordedNow).length) {
+  const data = { ...ledger.byStream.get(RECORD) };
+  for (const [k, h] of Object.entries(recordedNow)) data[k] = { ...data[k], hash: { ...(data[k].hash || {}), [PROFILE]: h } };
+  writeStreamLedger(ROOT, RECORD, data);
+  console.log(`→ ${Object.keys(recordedNow).length} moved hash(es) recorded for ${RECORD} in ${path.relative(process.cwd(), path.join(ledgerDir(ROOT), streamFile(RECORD) + '.json'))}`);
 }
 console.log(`\n${ids.length} fixture(s), ${rows.length} frames → ${path.relative(process.cwd(), OUT)}: ${failed ? `${failed} failed` : 'all pass'}`);
 if (!UPDATE && rows.some(r => r.state === 'no hash')) console.log('A fixture frame with no hash is not being checked: bless it with  pnpm run fixtures --update');

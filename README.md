@@ -51,7 +51,7 @@ root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `
 | `pnpm run shots` | Render product shots to `video/houses/` (`--house`, `--shot`, `--res 1080`, `--aspect 16:9`, `--poster-only`, `--qa-only`, `--jobs`). |
 | `pnpm run goldens` / `goldens:update` | Compare 150 frames with the committed baselines / re-bless them. |
 | `pnpm run frame-hash` | Two fresh browser contexts must render the same frames. |
-| `pnpm run fixtures` | Validate, QA and render the fixture houses in `test/fixtures/houses/` to stills (`test/fixtures/out/`, to look at) and compare their frame hashes (`--fixture`, `--update` to bless). |
+| `pnpm run fixtures` | Validate, QA and render the fixture houses in `test/fixtures/houses/` to stills (`test/fixtures/out/`, to look at) and compare their frame hashes (`--fixture`, `--update` to bless your own fixture, `--record <stream>` for another's frame your branch moves). |
 | `pnpm run perf` | Build, track and shot-QA timings against their budgets (3 s / 1 s / 0.5 s), report-only (`--house`, `--all`). |
 | `pnpm run fleet-audit` | The fleet sameness metrics (door colours, claddings, lighting, furniture repetition, planting …) → `test/qa/fleet-audit.md`. |
 | `pnpm run plans` | Rebuild `content/houses/<id>.plan.json` — the seeded site instances the isometric twin draws. |
@@ -81,7 +81,8 @@ floorplan-graph-demo.html  the Phase 2 floor-plan graph beside its compiled wall
 assets/                    the three.js engine, in TypeScript. house-builder.ts is the orchestrator; each part is a
                            module one stream owns: item-map + hero-build (kit), structure-build (architecture),
                            rooms-build (compose), site-build (site), shot-planner-v1 + shot-track (shot),
-                           visibility (the page's wall modes and roof fade). Beside them house-geometry,
+                           visibility (the page's wall modes and roof fade) and viewer (the portal's player) (ui),
+                           kit-build (the kit's spec → parameters, the palette and the light). Beside them house-geometry,
                            wall-compiler, floorplan-graph, roofs, fixtures, site, world, materials, textures,
                            environment, core-orbit, shot-path, plan-export
   spec/                    the HouseSpec as a TypeScript type: base.ts + one fragment per stream, merged in index.ts
@@ -100,8 +101,9 @@ scripts/                   the pipeline: build, validate, render, gate (.mts) an
 reference/                 HOUSE-SPEC.md (the schema), PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
                            HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review)
 test/goldens/macos-metal/  150 committed baseline frames (Git LFS) + PROFILE.json (the renderer that made them)
-test/goldens/expected-diffs.json  the golden ledger: frames a branch is declared to move (see How verification works)
-test/fixtures/houses/      fixture specs each stream proves its features on; hashes/<profile>.json their frame hashes
+test/goldens/expected-diffs/  the golden ledger: <stream>.json per stream, the frames it moves and why, and
+                           <stream>/<profile>/ what each golden moved to (see How verification works)
+test/fixtures/houses/      fixture specs each stream proves its features on; hashes/<profile>/<id>.json their frame hashes
 video/houses/index.html    browser for rendered shots; the renders beside it are gitignored
 ```
 
@@ -200,9 +202,13 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
    door-to-core and hero-reveal final frames, at 640 × 360 through the full composer) and compare them to `test/goldens/<profile>/` with pixelmatch plus a
    mean-absolute-difference bar, so both "something moved" and "everything shifted a little" fail. Skipped if
    determinism failed, because a baseline compared against a renderer that disagrees with itself is noise.
-   A branch whose change is meant to move frames lists each in the **golden ledger**,
-   `test/goldens/expected-diffs.json` (`{ "<house>/<shot>@<t>": { "cause", "stream" } }`): a listed frame that
-   moved passes as expected, one that did not move fails, and anything unlisted that moved fails as before.
+   A branch whose change is meant to move frames lists each in the **golden ledger**, its own stream's file
+   `test/goldens/expected-diffs/<stream>.json` (`{ "<house>/<shot>@<t>": { "cause" } }`, several streams may list
+   one frame), and records what each moved to with `pnpm run goldens --record <stream>` (the moved frame, in LFS
+   beside the ledger; a fixture frame's hash with `pnpm run fixtures --record <stream>`). A listed frame passes as
+   expected only when it matches what was recorded, within the same tolerance — so a later regression in it still
+   fails — and fails when it did not move, was never recorded, or moved elsewhere; anything unlisted that moved
+   fails as before. `scripts/golden-ledger.mts` has the contract.
 6. **tests** — every `scripts/test-*.mts`, found by glob; a script opts out or into `--quick` with an
    `@check-house` line in its header, and `@check-house advisory — <why>` lets one that is red on `main` too run
    and report without failing the gate until the fix that greens it lands (test-floorplan-graph, for now). Among

@@ -20,7 +20,7 @@
 //                                             clashes, planting
 //   3. determinism test-frame-hash.mts      — two runs of THIS tree must agree (door-to-core, then core-orbit)
 //   4. goldens    test-goldens.mts          — this tree must still agree with the tree we blessed, less the frames
-//                                             test/goldens/expected-diffs.json declares as moving (the ledger)
+//                                             test/goldens/expected-diffs/ declares as moving (the ledger)
 //   5. test:*     scripts/test-*.mts        — every test script, found by glob (plan Completeness C8), so a stream
 //                                             adds its test by adding the file, never by editing this one. A file
 //                                             steers itself with a directive in its first lines:

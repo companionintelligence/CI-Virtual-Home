@@ -78,9 +78,11 @@ its own branch). Each owns its modules (house-builder.ts's header lists them), i
 (`assets/spec/`), its validator plugin (`scripts/validate/`), its scene checks (`assets/scene-qa/`), its fleet
 metrics (`scripts/fleet/`) and its `plan.json` key (`assets/plan-export.ts`); stay in yours. Every new spec field is
 optional and a look-changing default applies only under `"defaults": 2` (`specDefaults()`). Streams never edit
-`content/houses/`: prove a feature on `test/fixtures/houses/<stream>-*.json` (`pnpm run fixtures`, `--update` to bless
-its hashes), and never re-bless goldens — list every frame the branch moves, with its cause, in
-`test/goldens/expected-diffs.json`. The integration re-blesses once and empties that ledger.
+`content/houses/`: prove a feature on `test/fixtures/houses/<stream>-*.json` (`pnpm run fixtures --fixture <id>
+--update` blesses your own), and never re-bless goldens — list every frame the branch moves, with its cause, in
+your stream's `test/goldens/expected-diffs/<stream>.json` and record what it moved to (`pnpm run goldens --record
+<stream>`, and `fixtures --record <stream>` for another stream's fixture). The integration re-blesses once and
+empties that ledger.
 
 **Goldens are re-blessed only on purpose.** A golden failure means the picture changed. If the change was not
 meant to alter the look, fix the code. If it was, run `pnpm run goldens:update`, look at the frames that moved

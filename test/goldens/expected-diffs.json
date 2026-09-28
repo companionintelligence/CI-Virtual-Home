@@ -1,3 +1,0 @@
-{
-  "$comment": "The golden ledger (scripts/test-goldens.mts): every golden frame a branch is meant to move, keyed \"<house>/<shot>@<t>\" (e.g. \"vanilla/door-to-core@1\"), each { \"cause\": \"what changed and why\", \"stream\": \"S1\" }. A listed frame that moves passes as expected; one that does not move fails; an unlisted frame that moves fails. Goldens are re-blessed once, at integration, and that commit empties this file."
-}
