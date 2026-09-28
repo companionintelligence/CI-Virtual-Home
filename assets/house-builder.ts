@@ -218,13 +218,15 @@ export function createHouseBuilder(deps) {
   // −0.79), so the lot slab (−0.06..0) z-fights them and a patio / driveway box (0.08 m) over the same
   // rect buries them. Those slabs therefore get a hole punched for every overlapping water body (a sunken
   // pool in a terrace). Ponds sit ON the ground (0..0.08) so only patio/driveway need a hole for them;
-  // decks are exempt on purpose — a `deck` over a `pond` is a dock.
+  // decks are exempt on purpose — a `deck` over a `pond` is a dock. `floor` is the lowest surface you can see
+  // of it: a pool's basin is a closed box, so that is its rim (its `y`); the turtle pool is open down to its
+  // mosaic, 0.79 m below the rim.
   const waterRect = s => {
     if (!['pool', 'turtle-pool', 'pond'].includes(s.type) || !Array.isArray(s.at)) return null;
     const rot90 = Math.round(((s.rot || 0) % 180) / 90) === 1;
     const w0 = s.w || (s.type === 'turtle-pool' ? 8 : s.type === 'pond' ? 4 : 6), d0 = s.d || (s.type === 'turtle-pool' ? 6 : s.type === 'pond' ? 3 : 4);
     const w = rot90 ? d0 : w0, d = rot90 ? w0 : d0;
-    return { x: s.at[0] - w / 2, z: s.at[1] - d / 2, w, d, ellipse: s.type === 'pond' };
+    return { x: s.at[0] - w / 2, z: s.at[1] - d / 2, w, d, ellipse: s.type === 'pond', floor: (s.y ?? 0) - (s.type === 'turtle-pool' ? 0.79 : 0) };
   };
   const overlaps = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.z < b.z + b.d && a.z + a.d > b.z;
   function slabWithHoles(rect, holes, color, h, y = 0, polys = []) {
@@ -355,13 +357,20 @@ export function createHouseBuilder(deps) {
     const gcol = kit.surfaceColor(lot.ground || 'lawn') ?? GROUND_COLORS[lot.ground] ?? GROUND_COLORS.lawn;
     const water = (spec.site || []).map(waterRect).filter(Boolean);
     const lotRect = { x: -lot.w / 2, z: -lot.d / 2, w: lot.w, d: lot.d };
-    const lotHoles = water.filter(r => !r.ellipse && overlaps(lotRect, r));
     // The ground storey's outline is punched out of the lawn (the pool mechanism): its floor slab's top face and
     // the lawn's were both at y = 0 and z-fought under the house. Courtyards inside that outline get their lawn back.
     const groundLoops = (spec.levels || []).filter(l => (l.y || 0) <= 0.001 && Array.isArray(l.footprint) && l.footprint.length).map(l => outlineLoops(perimeterEdges(l.footprint)));
     const lotPolys = groundLoops.flatMap(l => [l.outer, ...l.holes]).filter(l => l.length >= 4);
     const inPoly = (x, z, poly) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [xi, zi] = poly[i], [xj, zj] = poly[j]; if ((zi > z) !== (zj > z) && x < (xj - xi) * (z - zi) / (zj - zi) + xi) c = !c; } return c; };
     const courtyards = lotPolys.filter(l => lotPolys.some(o => o !== l && inPoly(l[0][0], l[0][1], o)));
+    // A water body is cut out of the lawn only where it sits IN the lawn. Not when it is raised clear of it (a pool
+    // on a roof terrace or a plinth: a hole there only opens the ground beneath it), and not under the house, whose
+    // outline is already a hole. A hole inside that one is garbage to earcut, which filled the house with lawn
+    // triangles at y = 0 that z-fought the floor slab. The patio round a raised pool still cuts it (groundSlab).
+    // every corner (nudged 1 cm in, off a flush wall) inside an odd number of loops: in the house, not a courtyard
+    const underHouse = ({ x, z, w, d }) => [[x + 0.01, z + 0.01], [x + w - 0.01, z + 0.01], [x + w - 0.01, z + d - 0.01], [x + 0.01, z + d - 0.01]]
+      .every(([px, pz]) => lotPolys.filter(p => inPoly(px, pz, p)).length % 2 === 1);
+    const lotHoles = water.filter(r => !r.ellipse && r.floor < 0.05 && overlaps(lotRect, r) && !underHouse(r));
     put(() => {
       const g = (lotHoles.length || lotPolys.length) ? slabWithHoles(lotRect, lotHoles, gmat, 0.06, 0, lotPolys) : slab(lot.w, lot.d, gmat, 0.06);
       for (const c of courtyards) {   // lawn inside an enclosed courtyard

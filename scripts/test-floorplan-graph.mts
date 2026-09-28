@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { FloorplanGraph, DEFAULT_WALL_THICKNESS, polygonContains, signedArea } from '../assets/floorplan-graph.js';
+import { FloorplanGraph, DEFAULT_WALL_THICKNESS, MIN_ROOM_WIDTH, meanWidth, polygonContains, round3, signedArea } from '../assets/floorplan-graph.js';
 import { perimeterEdges, edgeForOpening } from '../assets/house-geometry.js';
 import * as THREE from '../assets/vendor/three/three.module.min.js';
 import { createWallCompiler, applyCutaway, wallFaces, CUTAWAY_HEIGHT, DOWN_HEIGHT } from '../assets/wall-compiler.js';
@@ -58,6 +58,24 @@ test('island partition box → inner room wins roomAt()', () => {
   assert.equal(g.rooms.length, 2);
   assert.equal(g.roomAt(3.5, 3.5).name, 'Bath');
   assert.equal(g.roomAt(1, 1).name, 'Hall');
+});
+
+test('cycles narrower than a wall are slivers, not rooms; a 0.4 m store still is one', () => {
+  // cladding 4 cm outside the N and W walls, wrapping the corner: the free ends snap onto the walls and close a
+  // 4 cm pocket (aurora L2/L3)
+  const clad = FloorplanGraph.fromFootprint([{ x: 0, z: 0, w: 8, d: 6 }],
+    [{ from: [-0.04, -0.04], to: [3, -0.04] }, { from: [-0.04, -0.04], to: [-0.04, 4] }]);
+  assert.equal(clad.rooms.length, 1);
+  near(clad.rooms[0].area(), 8 * 6);
+  assert.ok(clad.walls.filter(w => w.kind === 'partition').every(w => w.orphan), 'the cladding bounds no room');
+  // a two-tone partition: two leaves 0.14 m apart (familyhouse-nora L1)
+  const pair = FloorplanGraph.fromFootprint([{ x: 0, z: 0, w: 8, d: 6 }], [{ from: [0, 3], to: [8, 3] }, { from: [0, 3.14], to: [8, 3.14] }]);
+  assert.deepEqual(pair.rooms.map(r => r.area()).sort((a, b) => a - b).map(round3), [22.88, 24]);
+  // the measure is a strip's width, half a square's side: payorote L1's 0.4 m trunk store (0.2) clears it
+  const store = FloorplanGraph.fromFootprint([{ x: 0, z: 0, w: 0.4, d: 0.4 }]);
+  assert.equal(store.rooms.length, 1);
+  near(meanWidth(store.rooms[0].corners), 0.2, 1e-9);
+  assert.ok(meanWidth(store.rooms[0].corners) >= MIN_ROOM_WIDTH);
 });
 
 test('facade dressing outside the footprint stays where authored and closes no room', () => {
