@@ -15,9 +15,11 @@
 // steady angular speed, and the walk before it slows into it rather than stopping.
 //
 // Where the eye LOOKS is waypoint k's target when the eye is at waypoint k, and in between the look direction
-// turns: its heading and pitch are PCHIP-interpolated along the eye's curve parameter (the heading unwrapped, so
-// a turn takes the short way round), not the target points — a target that swings from ahead of the eye to
-// behind it (the foot of a switchback stair) would otherwise pass over the eye's head and flip the camera.
+// turns: its heading and pitch are PCHIP-interpolated — against the shot's time when it carries `timing` (so a
+// turn is spread over exactly the seconds the timing gave it, however the eye's speed varies along the leg),
+// along the eye's curve parameter otherwise — the heading unwrapped, so a turn takes the short way round. Not the
+// target points: a target that swings from ahead of the eye to behind it (the foot of a switchback stair) would
+// otherwise pass over the eye's head and flip the camera.
 // Consecutive waypoints that share one target (an orbit round the Core) look exactly at it.
 //
 // `compose` frames the subject off-centre where the shot asks for it: { subject, ndcX, fov, weights } — weights
@@ -69,6 +71,13 @@ export function monotoneCubic(xs, ys, startScale = 1, endScale = 1) {
   };
 }
 
+// A shot's timing is usable: one time per eye waypoint, strictly increasing, from ≥ 0 to ≤ 1.
+export function timingValid(shot) {
+  const tm = shot && shot.timing, n = shot && shot.eyePoints ? shot.eyePoints.length : 0;
+  if (!tm || !Array.isArray(tm.times) || tm.times.length !== n) return false;
+  return tm.times.every((t, i) => Number.isFinite(t) && (i === 0 ? t >= 0 : t > tm.times[i - 1])) && tm.times[n - 1] <= 1;
+}
+
 export function createShotPath(THREE, shot) {
   const closed = !!shot.closed;
   const eye = new THREE.CatmullRomCurve3(shot.eyePoints, closed, 'centripetal');
@@ -77,8 +86,10 @@ export function createShotPath(THREE, shot) {
   const paired = shot.targetPoints.length === n;   // the target can share the eye's parameter only waypoint for waypoint
   const length = eye.getLength();
   const knots = knotArcLengths(eye, n, closed);
-  const tm = shot.timing || null;
-  const ease = tm && Array.isArray(tm.times) && tm.times.length === n
+  // (times that are not strictly increasing from ≥ 0 to ≤ 1 are ignored — timingValid says so, and the shot gate
+  // fails the shot on it)
+  const tm = timingValid(shot) ? shot.timing : null;
+  const ease = tm
     ? monotoneCubic(tm.times, knots.map(k => k / length), tm.startSpeed ?? 1, tm.endSpeed ?? 1)
     : (x => x);
   // the look direction at each waypoint: heading (unwrapped), pitch and distance to its target
@@ -90,12 +101,22 @@ export function createShotPath(THREE, shot) {
     if (k) yaw = heads[k - 1] + Math.atan2(Math.sin(yaw - heads[k - 1]), Math.cos(yaw - heads[k - 1]));
     heads.push(yaw); pitches.push(Math.atan2(dy, hz)); dists.push(Math.max(0.05, Math.hypot(dx, dz, dy))); idx.push(k);
   }
-  const headAt = paired ? monotoneCubic(idx, heads) : null, pitchAt = paired ? monotoneCubic(idx, pitches) : null;
+  // A timed shot turns its look against TIME, waypoint k's look at times[k]: against the curve parameter the turn
+  // bunched up wherever the eye slowed within a leg (a 166° turn given 1.5 s peaked at 298°/s), and the time a
+  // turn is given (house-builder.ts) is only honoured if the turn is spread over that time.
+  const timed = !!tm && !closed;
+  const keys = timed ? tm.times : idx;
+  const headAt = paired ? monotoneCubic(keys, heads) : null, pitchAt = paired ? monotoneCubic(keys, pitches) : null;
   const same = k => { const a = shot.targetPoints[k], b = shot.targetPoints[(k + 1) % n]; return a.distanceToSquared(b) < 1e-8; };
-  const lookAt = (u, e) => {
-    const p = u * segs, k = Math.min(Math.max(0, Math.floor(p)), segs - 1), f = p - k;
+  const lookAt = (u, e, tt) => {
+    let k, f, x;
+    if (timed) {
+      let lo = 0, hi = n - 1;
+      while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (keys[mid] <= tt) lo = mid; else hi = mid; }
+      k = lo; f = (tt - keys[k]) / (keys[k + 1] - keys[k]); x = tt;
+    } else { const p = u * segs; k = Math.min(Math.max(0, Math.floor(p)), segs - 1); f = p - k; x = p; }
     if (same(k)) return shot.targetPoints[k].clone();
-    const yaw = headAt(p), pitch = pitchAt(p), dist = dists[k] + (dists[(k + 1) % n] - dists[k]) * f;
+    const yaw = headAt(x), pitch = pitchAt(x), dist = dists[k] + (dists[(k + 1) % n] - dists[k]) * f;
     return new THREE.Vector3(e.x + Math.sin(yaw) * Math.cos(pitch) * dist, e.y + Math.sin(pitch) * dist, e.z + Math.cos(yaw) * Math.cos(pitch) * dist);
   };
   const c = shot.compose || null;
@@ -112,7 +133,7 @@ export function createShotPath(THREE, shot) {
       const s = Math.max(0, Math.min(1, ease(tt)));
       const u = eye.getUtoTmapping(s);
       const e = eye.getPoint(u);
-      const g = paired && !closed ? lookAt(u, e) : tgt.getPointAt(s);
+      const g = paired && !closed ? lookAt(u, e, tt) : tgt.getPointAt(s);
       const w = weightAt(u);
       if (c && w > 1e-4 && c.ndcX) {
         const vx = g.x - e.x, vz = g.z - e.z, dh = Math.hypot(vx, vz);

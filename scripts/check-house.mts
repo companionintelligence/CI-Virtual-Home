@@ -7,7 +7,7 @@
 //
 // Works from any cwd: every path resolves from this file's own location.
 //
-// Only the first two steps run in CI (.github/workflows/ci.yml). 120 frames through a software rasteriser
+// Only the first two steps run in CI (.github/workflows/ci.yml). 150 frames through a software rasteriser
 // cost the better part of an hour of GitHub Actions per push — measured, twice — and that is not what the
 // runner budget is for. On a machine with a GPU the same work is a couple of minutes, so it runs here, before
 // you push.
@@ -18,7 +18,7 @@
 //   2. shots      render-house-shots.mts    — camera paths through walls, floors, furniture, and the Core kept
 //                                             in frame through its orbits; and the scene gate: dressing,
 //                                             clashes, planting
-//   3. determinism test-frame-hash.mts      — two runs of THIS tree must agree
+//   3. determinism test-frame-hash.mts      — two runs of THIS tree must agree (door-to-core, then core-orbit)
 //   4. goldens    test-goldens.mts          — this tree must still agree with the tree we blessed
 //
 // The order is a dependency chain, not a preference: goldens compared against a renderer that is not
@@ -55,15 +55,18 @@ const steps: Step[] = [
   { key: 'specs', script: S('validate-house-spec.mts'), args: [] },
   { key: 'shots', script: S('render-house-shots.mts'), args: ['--qa-only', '--shot', 'door-to-core,orbit,hero-reveal,core-orbit', '--jobs', JOBS!, '--out', QA_OUT, ...houseArgs] },
   { key: 'determinism', script: S('test-frame-hash.mts'), args: ['--res', RES!, '--frames', '0,200,719', ...(HOUSE ? ['--house', HOUSE.split(',')[0]] : [])], quick: false },
-  { key: 'goldens', script: S('test-goldens.mts'), args: ['--res', RES!, '--jobs', JOBS!, ...(flag('update-goldens') ? ['--update'] : []), ...houseArgs], quick: false, needs: 'determinism' },
+  // the 8 s product orbit, stepped as random access too (its own path function, not door-to-core's)
+  { key: 'determinism:core-orbit', script: S('test-frame-hash.mts'), args: ['--res', RES!, '--shot', 'core-orbit', '--frames', '0,240,479', ...(HOUSE ? ['--house', HOUSE.split(',')[0]] : [])], quick: false },
+  { key: 'goldens', script: S('test-goldens.mts'), args: ['--res', RES!, '--jobs', JOBS!, ...(flag('update-goldens') ? ['--update'] : []), ...houseArgs], quick: false, needs: 'determinism,determinism:core-orbit' },
 ];
 
 type Result = Step & { state: 'pass' | 'fail' | 'skipped'; why?: string; code?: number | null; secs?: string };
 const results: Result[] = [];
 for (const step of steps) {
   if (flag('quick') && step.quick === false) { results.push({ ...step, state: 'skipped', why: '--quick' }); continue; }
-  if (step.needs && results.find(r => r.key === step.needs)?.state === 'fail') {
-    results.push({ ...step, state: 'skipped', why: `${step.needs} failed — a baseline compared against a renderer that disagrees with itself is noise` });
+  const failedNeed = (step.needs || '').split(',').find(n => n && results.find(r => r.key === n)?.state === 'fail');
+  if (failedNeed) {
+    results.push({ ...step, state: 'skipped', why: `${failedNeed} failed — a baseline compared against a renderer that disagrees with itself is noise` });
     continue;
   }
   console.log(`\n\x1b[1m── ${step.key} ──\x1b[0m ${step.script} ${step.args.join(' ')}`);
@@ -76,7 +79,7 @@ console.log('\n\x1b[1m── summary ──\x1b[0m');
 for (const r of results) {
   const mark = r.state === 'pass' ? '\x1b[32m✓\x1b[0m' : r.state === 'fail' ? '\x1b[31m✗\x1b[0m' : '\x1b[2m–\x1b[0m';
   const note = r.state === 'skipped' ? `skipped (${r.why})` : `${r.state}${r.code ? ` (exit ${r.code})` : ''} in ${r.secs}s`;
-  console.log(`  ${mark} ${r.key.padEnd(12)} ${note}`);
+  console.log(`  ${mark} ${r.key.padEnd(22)} ${note}`);
 }
 const failed = results.filter(r => r.state === 'fail');
 if (failed.length) console.log(`\n\x1b[31m${failed.length} of ${results.filter(r => r.state !== 'skipped').length} checks failed.\x1b[0m`);

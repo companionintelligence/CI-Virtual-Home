@@ -143,6 +143,9 @@ export function validate(spec, file = '<spec>') {
     const S = `shot ${sh.id || sh.type}`;
     if (!SHOT_TYPES.includes(sh.type)) { err(`${S}: type "${sh.type}" (${SHOT_TYPES.join(' | ')})`); continue; }
     if (sh.duration !== undefined && !(sh.duration >= 2 && sh.duration <= 60)) err(`${S}: duration ${sh.duration} (seconds, 2–60)`);
+    // door-to-core walks the house, climbs its stairs and orbits the Core: under 8 s the walk is a blur of whip
+    // pans (house-builder.ts lays its timing out for the pinned duration and raises the pan budget to fit)
+    else if (sh.type === 'door-to-core' && sh.duration !== undefined && sh.duration < 8) err(`${S}: duration ${sh.duration} (door-to-core needs at least 8 s)`);
     if (sh.walls !== undefined && !SHOT_WALLS.includes(sh.walls)) err(`${S}: walls "${sh.walls}" (${SHOT_WALLS.join(' | ')})`);
     if (sh.roof !== undefined && !SHOT_ROOFS.includes(sh.roof)) err(`${S}: roof "${sh.roof}" (${SHOT_ROOFS.join(' | ')})`);
     if (sh.enterT !== undefined && !(sh.enterT >= 0 && sh.enterT <= 1)) err(`${S}: enterT ${sh.enterT} (fraction of the shot, 0–1)`);

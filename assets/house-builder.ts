@@ -17,7 +17,7 @@ import { createWallCompiler } from './wall-compiler.js';
 import { buildRoofs } from './roofs.js';
 import { dressLevel } from './fixtures.js';
 import { createOrbitProbe, planOrbit, arcWaypoints, orbitPoint, sweepFrom } from './core-orbit.js';
-import { attachFrameAt, knotArcLengths } from './shot-path.js';
+import { attachFrameAt, knotArcLengths, monotoneCubic } from './shot-path.js';
 
 const DEG = Math.PI / 180;
 const hex = c => (typeof c === 'number' ? c : parseInt(String(c || '#ffffff').replace('#', ''), 16));
@@ -477,10 +477,15 @@ export function createHouseBuilder(deps) {
           : () => ProceduralArchitecture.createFloatingTimberStairs({ totalHeight: total, steps: Math.round(total / 0.2), width: st.w || 1.1, run: st.run || 3.36 });
         const s = put(fn, st.at[0], st.at[1], y, null, 'structure');
         s.rotation.y = (st.rot || 0) * DEG;
+        s.userData.stair = true;   // the shot gate's stair-clip test and door-to-core's clip repair look for it
         // top-of-stairs position: run along the ascent direction (rot 0 → +Z)
         const run = st.type === 'spiral' ? 0 : (st.run || 3.36);
         const dir = [Math.sin((st.rot || 0) * DEG), Math.cos((st.rot || 0) * DEG)];
-        anchors.stairs.push({ from: lv.id, to: st.to, bottom: [st.at[0], y, st.at[1]], top: [st.at[0] + dir[0] * run, y + total, st.at[1] + dir[1] * run], dir });
+        // plan: the flight's footprint on its own storey — somewhere a walk there must go round, not under
+        s.updateMatrixWorld(true);
+        const sb = new THREE.Box3().setFromObject(s);
+        anchors.stairs.push({ from: lv.id, to: st.to, bottom: [st.at[0], y, st.at[1]], top: [st.at[0] + dir[0] * run, y + total, st.at[1] + dir[1] * run], dir,
+          plan: { minX: sb.min.x, maxX: sb.max.x, minZ: sb.min.z, maxZ: sb.max.z } });
       }
 
       // balustrades
@@ -903,7 +908,11 @@ export function createHouseBuilder(deps) {
         if (Math.hypot(Math.max(bb.min.x - hero.x, 0, hero.x - bb.max.x), Math.max(bb.min.z - hero.z, 0, hero.z - bb.max.z)) > 1.6) continue;
         heroSolids.push({ minX: bb.min.x, maxX: bb.max.x, minZ: bb.min.z, maxZ: bb.max.z, top: bb.max.y, type: o.userData.itemType || o.name });
       }
-      const solidsOn = lv => ((anchors.solids || {})[lv.id] || []).concat(lv === heroLevel ? heroSolids : []);
+      // A flight of stairs stands on the storey it climbs from, and a walk there goes round it to its foot, never
+      // under it (lakecabin's route to the foot ran the length of its stair: the eye under the upper treads, then
+      // through the spine and treads where the flight comes down to eye height). The climb itself is not routed.
+      const stairSolidsOn = lv => (anchors.stairs || []).filter(st => st.from === lv.id && st.plan).map(st => ({ ...st.plan, top: lv.y + 3, type: 'stairs' }));
+      const solidsOn = lv => ((anchors.solids || {})[lv.id] || []).concat(lv === heroLevel ? heroSolids : [], stairSolidsOn(lv));
       // The walls as built, in plan, where they stand at eye height: the jambs of every doorway and the open leaf
       // hung in it (0.8 m of door standing out into the room, which the spec's partition lines know nothing
       // about). The walk keeps WALL_PAD off them; the clip repair below tests the eye against them in 3D.
@@ -912,16 +921,20 @@ export function createHouseBuilder(deps) {
       const wallBoxesOn = lv => wallMeshes.filter(bb => bb.max.y > lv.y + 0.9 && bb.min.y < lv.y + 2.0).map(bb => ({ minX: bb.min.x, maxX: bb.max.x, minZ: bb.min.z, maxZ: bb.max.z }));
       // Route a walk leg, easing off when the storey as furnished leaves no way through: the usual margins plus
       // 0.2 m off the built walls; then tighter margins; then squeezing between the pieces of furniture at eye
-      // height (a monitor on a desk included); then walls alone (the eye brushes through furniture — a warning —
-      // rather than through a wall, which is what "no route" used to mean: a straight line).
+      // height (a monitor on a desk included); then walls and stairs alone (the eye brushes through furniture — a
+      // warning — rather than through a wall, which is what "no route" used to mean: a straight line).
       const routeCache = new Map();
       const eyeItemsOn = lv => (anchors.placed || []).filter(o => o.userData && o.userData.role === 'item').map(o => new THREE.Box3().setFromObject(o))
         .filter(bb => !bb.isEmpty() && bb.max.y > lv.y + 1.0 && bb.min.y < lv.y + 1.9).map(bb => ({ minX: bb.min.x, maxX: bb.max.x, minZ: bb.min.z, maxZ: bb.max.z }));
-      const TIERS = [{ boxPad: 0.2 }, { wall: 0.3, part: 0.3, item: 0.15, boxPad: 0.15 }, { wall: 0.3, part: 0.3, item: 0.02, boxPad: 0.12, eyeItems: true }, { wall: 0.3, part: 0.3, boxPad: 0.12, bare: true }];
+      // (the last squeezes past an open door that stands across a corridor, 0.16 m off its edge and the wall
+      // beyond it: lakecabin's only way to its stair foot, which a wider margin reads as no way at all — and the
+      // straight line it fell back to went through the door)
+      const TIERS = [{ boxPad: 0.2 }, { wall: 0.3, part: 0.3, item: 0.15, boxPad: 0.15 }, { wall: 0.3, part: 0.3, item: 0.02, boxPad: 0.12, eyeItems: true }, { wall: 0.3, part: 0.3, boxPad: 0.12, bare: true },
+        { wall: 0.12, part: 0.12, boxPad: 0.07, bare: true }];
       const routeWalk = (lv, from, to) => {
         const boxes = wallBoxesOn(lv);
         for (const [i, tier] of TIERS.entries()) {
-          const solids = tier.bare ? [] : tier.eyeItems ? solidsOn(lv).concat(eyeItemsOn(lv)) : solidsOn(lv);
+          const solids = tier.bare ? stairSolidsOn(lv) : tier.eyeItems ? solidsOn(lv).concat(eyeItemsOn(lv)) : solidsOn(lv);
           const corners = routeOn(lv, solids, from, to, { ...tier, boxes, strict: true, cache: routeCache, key: `${lv.id}:${i}` });
           if (corners) return corners;
         }
@@ -931,10 +944,15 @@ export function createHouseBuilder(deps) {
       // beyond it, so the push-in spirals in), D metres out — somewhere the walk may stand, that sees the Core, and
       // whose push-in to the orbit is clear. Pushing in from across the Core to an orbit that starts behind it is
       // a whip pan, not a push-in, so the approach stands on the orbit's starting side; where nothing there works
-      // the orbit starts later (a shorter sweep, down to 100°), and only failing that is the approach anywhere.
+      // the orbit starts later (a shorter sweep, down to FIN_MIN), and only failing that is the approach anywhere.
       // The approach stands at eye height — under the ceiling of a low storey (an attic's 1.5 m) — and keeps off
       // what stands tall enough to meet the eye there; a bed's 1.1 m headboard it may look over.
       const yA = heroLevel.y + Math.min(1.42, (heroLevel.height || 2.8) - 0.35);
+      // the shortest finale sweep an approach may start (ORBIT_KIND.finale.sweep.aWant is the aim): a walk that comes
+      // straight at the Core's front (starter18k) is met by 45° from the front to a three-quarter, not by a push-in that
+      // hooks 15° one way for the orbit to sweep back
+      const FIN_MIN = 45;
+      let finChoice = null;    // how the chosen approach meets the orbit (reported in timing.stats)
       const blockedHero = fin ? blockedTest(heroLevel, solidsOn(heroLevel).filter(so => !(so.top < yA - 0.2))) : null;
       const approachCandidates = opt => {
         const out = [];
@@ -950,25 +968,75 @@ export function createHouseBuilder(deps) {
             if (clear) out.push({ opt, sw, from, d, D, p, S, relaxed, arc: sw.arc });
           }
         };
-        // the start moves round in 10° steps, the end's overshoot growing to keep the sweep near aWant
+        // the start moves round in 10° steps, the end's overshoot growing to keep the sweep near aWant — down to
+        // FIN_MIN°: a walk that arrives near the front is better met by a short orbit that carries on the way
+        // it was going than by a long one it has to double back round the Core for (chooseApproach weighs that)
         for (let from = opt.from; ; from += opt.dir * 10) {
           const sw = sweepFrom(fin.run, opt.dir, from, fin.sweep);
-          if (!sw || sw.arc < Math.min(100, opt.arc) - 1e-6) break;
+          if (!sw || sw.arc < Math.min(FIN_MIN, opt.arc) - 1e-6) break;
           tryAt(sw, [-10, 0, 15], false);
         }
         tryAt(opt, [30, 60, 90, 120], true);
         return out;
       };
+      // What the end of the walk does round the Core, for one candidate, measured on the curve the shot will fly
+      // (the centripetal Catmull-Rom through the route, the approach and the orbit's first points — it swings
+      // wide of a sharp corner, which is where a hook back round the Core comes from): `wrong`, the degrees its
+      // last WALK_TAIL metres and the push-in travel round the Core AGAINST the orbit's direction while the Core
+      // is in sight and within SWING_R (the eye circles one way, stops, and the orbit sweeps it back over the same
+      // arc; the walk through the next room, the Core behind a wall, is only a walk), and `near`, how close in plan
+      // those metres pass the Core (a walk that crosses the desk in front of it shows the dark front before the
+      // orbit brings it round).
+      const WALK_TAIL = 4.0, SWING_R = 4.5;
+      const wrapDeg = d => ((d + 540) % 360) - 180;
+      // the Core is in sight from (x, z) when the line to it crosses no partition outside its doorway and no
+      // outside wall (walls are full height during the shot)
+      const sightWalls = perimeterEdges(heroLevel.footprint || []).map(e => ({ a: e.a, b: e.b, door: null, doorW: 0 }))
+        .concat((heroLevel.partitions || []).map(pt => ({ a: pt.from, b: pt.to, door: pt.door ?? null, doorW: pt.doorW || 0.9 })));
+      const coreInSight = (x, z) => !sightWalls.some(({ a, b, door, doorW }) => {
+        const ex = b[0] - a[0], ez = b[1] - a[1], rx = hero.x - x, rz = hero.z - z, den = rx * ez - rz * ex;
+        if (Math.abs(den) < 1e-9) return false;
+        const t = ((a[0] - x) * ez - (a[1] - z) * ex) / den, u = ((a[0] - x) * rz - (a[1] - z) * rx) / den;
+        if (t <= 0.02 || t >= 0.98 || u < 0 || u > 1) return false;
+        return door === null || Math.abs(u * Math.hypot(ex, ez) - door) > doorW / 2 - 0.05;
+      });
+      const walkEnd = (start, corners, c, prefix = []) => {
+        const n1 = Math.max(1, Math.ceil(c.arc / 15));
+        const pts = [...prefix, V(start.x, prefix.length ? start.y : yA, start.z), ...corners.map(([x, z]) => V(x, yA, z)), V(c.p.x, yA, c.p.z), c.S.clone(),
+          orbitPoint(THREE, fin.centre, hero.fwd, fin.r, c.from + c.sw.dir * c.arc / n1, c.S.y)];
+        const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal'), segs = pts.length - 1, iP = segs - 2;
+        // samples every ~5 cm up to the orbit's start, with the distance walked to each
+        const samples = [];
+        let walked = 0, prev = null;
+        for (let k = 0; k < segs - 1; k++) {
+          const n = Math.max(2, Math.ceil(pts[k].distanceTo(pts[k + 1]) / 0.05));
+          for (let i = k ? 1 : 0; i <= n; i++) { const q = curve.getPoint((k + i / n) / segs); if (prev) walked += Math.hypot(q.x - prev.x, q.z - prev.z); samples.push({ q, walked, push: k === iP && i > 0 }); prev = q; }
+        }
+        const atP = samples.find(s => s.push)?.walked ?? walked, tail = samples.filter(s => s.walked >= atP - WALK_TAIL);
+        const near = Math.min(...tail.filter(s => !s.push).map(({ q }) => Math.hypot(q.x - hero.x, q.z - hero.z)));
+        let wrong = 0, last = null;
+        for (const { q } of tail) {
+          const a = heroAngle(q), seen = q.y > heroLevel.y + 0.6 && Math.hypot(q.x - hero.x, q.z - hero.z) < SWING_R && coreInSight(q.x, q.z);
+          if (last !== null && seen) wrong += Math.max(0, -c.sw.dir * wrapDeg(a - last));
+          last = a;
+        }
+        return { wrong, near, push: samples.filter(s => s.push).map(s => s.q) };
+      };
+      // The push-in as flown (the curve, not its chord) keeps the Core in sight and the eye clear, every 15 cm.
+      const pushClear = push => push.filter((_, i) => i % 3 === 2 || i === push.length - 1).every(q => orbitCtx.probe.free(q.x, q.y, q.z) && orbitCtx.probe.sees(q.x, q.y, q.z));
       // The orbit and the approach the walk from `start` should end at, chosen together over both directions
-      // round the Core: the longest sweep (every degree short of 120 counting half again), less 0.3 for every
-      // degree the route turns into the push-in (a route
+      // round the Core: the longest sweep (every degree short of 120 counting half again), less 3 for every
+      // degree past 8 the end of the walk travels round the Core against the orbit in sight of it (above — the
+      // one thing a long sweep must never cost), 0.3 for every degree the route turns into the push-in (a route
       // that doubles back is a whip pan) and 0.4 for every degree over 90 the push-in turns into the orbit (it
-      // hooks back on itself), 30 if its last straight leg is under 1.2 m (it zig-zags round the desk into it),
-      // 60 for an approach off the orbit's starting side, 0.15 per degree it stands off the start, 0.6 for every
-      // degree under 45 the orbit travels before the front comes round, 10 for an approach only 1.2 m out.
-      const chooseApproach = start => {
+      // hooks back on itself), 30 if its last straight leg is under 1.2 m and turns over 30° into the push-in
+      // (it zig-zags round the desk into it), 40 if the walk passes within 1.1 m of the Core, 60 for an approach
+      // off the orbit's starting side, 0.15 per degree it stands off the start (a push-in that spirals in the
+      // orbit's direction earns it back), 0.3 for every degree under 45 the orbit travels before the front comes
+      // round, 10 for an approach only 1.2 m out. The best whose push-in stays clear and in sight of the Core wins.
+      const chooseApproach = (start, prefix = []) => {
         if (!fin) return null;
-        let best = null;
+        const scored = [];
         for (const opt of fin.options) for (const c of approachCandidates(opt)) {
           const corners = routeWalk(heroLevel, start, c.p);
           const last = corners.length ? corners[corners.length - 1] : [start.x, start.z];
@@ -981,13 +1049,17 @@ export function createHouseBuilder(deps) {
           // the degrees the orbit travels before it reaches the Core's front: under 45 and the front is shown at
           // the start and the orbit turns away from it
           const lead = -c.from * c.sw.dir;
-          const score = Math.min(c.arc, 150) + 0.5 * Math.min(c.arc, 120) - 0.3 * turn - 0.4 * Math.max(0, entry - 90) - (leg < 1.2 ? 30 : 0) - (c.relaxed ? 60 : 0) - 0.15 * Math.abs(c.d)
-            - 0.6 * Math.max(0, 45 - lead) - (c.D < 1.4 ? 10 : 0);
-          if (!best || score > best.score) best = { ...c, score };
+          const { wrong, near, push } = walkEnd(start, corners, c, prefix);
+          const score = Math.min(c.arc, 150) + 0.5 * Math.min(c.arc, 120) - 3 * Math.max(0, wrong - 8) - 0.3 * turn - 0.4 * Math.max(0, entry - 90) - (leg < 1.2 && turn > 30 ? 30 : 0)
+            - (near < 1.1 ? 40 : 0) - (c.relaxed ? 60 : 0) - 0.15 * Math.abs(c.d) + 0.3 * Math.max(0, -c.d) - 0.3 * Math.max(0, 45 - lead) - (c.D < 1.4 ? 10 : 0);
+          scored.push({ ...c, score, wrong, near, push });
         }
+        scored.sort((a, b) => b.score - a.score);
+        const best = scored.find(c => pushClear(c.push)) || scored[0];
         if (!best) return null;
         const { sw } = best;
         fin = { ...fin, dir: sw.dir, from: sw.from, to: sw.to, arc: sw.arc, pts: arcWaypoints(THREE, fin.centre, hero.fwd, fin.r, sw.from, sw.to, fin.hs[0], fin.hs[1]) };
+        finChoice = { wrong: +best.wrong.toFixed(1), near: +best.near.toFixed(2), d: best.d, D: best.D };
         return best.p;
       };
       const fallbackApproach = () => clearPoint(V(dx + fx * 2.0, hero.y + (hero.surface === 'shelf' ? 0.5 : 0.9), dz + fz * 2.0), heroLevel, 0.5);   // 2 m in front of the hero
@@ -1014,8 +1086,26 @@ export function createHouseBuilder(deps) {
           const spiral = Math.hypot(tx - bx, tz - bz) < 0.1;
           // A spiral has no run: its "top" is its centre column. Climb beside it, on the side we leave toward.
           const u = spiral ? (() => { const d = [after.x - bx, after.z - bz], n = Math.hypot(d[0], d[1]) || 1; return [d[0] / n, d[1] / n]; })() : st.dir;
-          const foot = clearPoint(spiral ? V(bx - u[0] * 1.6, by + 1.5, bz - u[1] * 1.6) : V(bx - u[0] * 1.5, by + 1.5, bz - u[1] * 1.5), levelOf(st.from), 0.6);
-          walk(levelOf(st.from), eye[eye.length - 1], foot, V(tx, ty + 0.8, tz));   // door (or the last landing) → stair foot, through the rooms between
+          const lvFrom = levelOf(st.from);
+          const foot = clearPoint(spiral ? V(bx - u[0] * 1.6, by + 1.5, bz - u[1] * 1.6) : V(bx - u[0] * 1.5, by + 1.5, bz - u[1] * 1.5), lvFrom, 0.6);
+          // The walk goes round the flight to its foot, never under it (stairSolidsOn). A flight whose first step
+          // starts half a metre off a wall leaves nowhere to stand in line with it: the foot above clears back onto
+          // the first step, inside the flight's plan, where no route can reach it — and the walk used to fall back
+          // to a straight line, under the flight and through the partitions on the way. There it comes to the foot
+          // from the side of the first steps, as lakecabin's used to along its south wall, and turns onto the flight.
+          const pl = st.plan, M = 0.4;
+          if (pl && !spiral && foot.x > pl.minX - M && foot.x < pl.maxX + M && foot.z > pl.minZ - M && foot.z < pl.maxZ + M) {
+            const perp = [u[1], -u[0]], half = Math.abs(perp[0]) * (pl.maxX - pl.minX) / 2 + Math.abs(perp[1]) * (pl.maxZ - pl.minZ) / 2;
+            const off = (foot.x - (pl.minX + pl.maxX) / 2) * perp[0] + (foot.z - (pl.minZ + pl.maxZ) / 2) * perp[1];
+            const blocked = blockedTest(lvFrom, solidsOn(lvFrom), { boxes: wallBoxesOn(lvFrom), boxPad: 0.15, item: 0.2 });
+            const from = eye[eye.length - 1];
+            const sides = [1, -1].map(s => { const d = s * (half + 0.5) - off; return V(foot.x + perp[0] * d, lvFrom.y + 1.45, foot.z + perp[1] * d); })
+              .filter(p => !blocked(p.x, p.z))
+              .map(p => { const cs = routeWalk(lvFrom, from, p), pts = [[from.x, from.z], ...cs, [p.x, p.z]]; let L = 0; for (let j = 1; j < pts.length; j++) L += Math.hypot(pts[j][0] - pts[j - 1][0], pts[j][1] - pts[j - 1][1]); return { p, L }; })
+              .sort((a, b) => a.L - b.L);
+            if (sides.length) { const sp = sides[0].p; walk(lvFrom, from, sp, foot); walkPts.add(eye.length); eye.push(sp); tgt.push(foot.clone()); }
+            else walk(lvFrom, from, foot, V(tx, ty + 0.8, tz));
+          } else walk(lvFrom, eye[eye.length - 1], foot, V(tx, ty + 0.8, tz));   // door (or the last landing) → stair foot, through the rooms between
           eye.push(foot); tgt.push(V(tx, ty + 0.8, tz));
           // (spiral: a quarter-turn around the column at mid height, looking past it to the landing, so the
           // column is beside the lens rather than filling it)
@@ -1035,7 +1125,9 @@ export function createHouseBuilder(deps) {
           if (last) {
             // landing → desk approach through the upper rooms; a straight leg keeps the old blend point (toward
             // the approach, where the orbit has one: toward the hero it could stand past the approach — a hook)
-            approach = chooseApproach(landing) || fallbackApproach();
+            // (the climb comes before the landing: a flight that lands beside the Core has already carried the eye
+            // round it by the time the walk starts — lakecabin, modernhouse1, payorote)
+            approach = chooseApproach(landing, eye.slice(-3, -1)) || fallbackApproach();
             const aim = fin ? approach : after, to = [aim.x - landing.x, aim.z - landing.z], dist = Math.hypot(to[0], to[1]);
             if (!walk(levelOf(st.to), landing, approach, V(hero.x, hero.y + 0.3, hero.z)) && dist > 3.5) { eye.push(clearPoint(V(landing.x + to[0] / dist * 1.6, ty + 1.45, landing.z + to[1] / dist * 1.6), levelOf(st.to), 0.7)); tgt.push(after); }
           }
@@ -1072,7 +1164,7 @@ export function createHouseBuilder(deps) {
       // Clip repair. The waypoints keep off every wall, but the curve through them is a curve: where a routed
       // leg turns hard (into a doorway, at a stair foot) the centripetal Catmull-Rom swings a few centimetres
       // wide of its chord and can shave a jamb or a partition end. Walk the curve in 3 cm steps against the walls
-      // as built and the furniture (the QA gate's boxes: anything standing over 0.25 m) and, wherever it enters
+      // as built, the stairs and the furniture (the QA gate's boxes: anything standing over 0.25 m) and, wherever it enters
       // one, add a waypoint on the chord there — the curve then hugs the (clear) chord. A few passes; the
       // orbit, vetted by its own probe, is left alone.
       {
@@ -1080,7 +1172,15 @@ export function createHouseBuilder(deps) {
         const solidsNow = wallMeshes.concat((anchors.placed || []).filter(o => o.userData && o.userData.role === 'item').map(o => new THREE.Box3().setFromObject(o))
           .filter(bb => { if (bb.isEmpty()) return false; const sz = bb.getSize(new THREE.Vector3()); return sz.y > 0.25 && sz.x < 8 && sz.z < 8; }));
         solidsNow.forEach((bb, n) => { for (let i = Math.floor(bb.min.x); i <= Math.floor(bb.max.x); i++) for (let j = Math.floor(bb.min.z); j <= Math.floor(bb.max.z); j++) { const k = cellKey(i, j); if (!hash.has(k)) hash.set(k, []); hash.get(k).push(n); } });
-        const inWall = p => (hash.get(cellKey(Math.floor(p.x), Math.floor(p.z))) || []).some(n => solidsNow[n].containsPoint(p));
+        // and the stairs, tread by tread in each mesh's own frame (a sloped spine's world box would swallow the
+        // climb above it): the curve rounding a stair foot must not cut through the flight's low end
+        const stairMeshes = [], local = new THREE.Vector3();
+        for (const o of anchors.placed || []) if (o.userData && o.userData.stair) {
+          o.updateMatrixWorld(true);
+          o.traverse(m => { if (!m.isMesh || !m.geometry) return; m.geometry.computeBoundingBox(); stairMeshes.push({ wb: new THREE.Box3().setFromObject(m), inv: m.matrixWorld.clone().invert(), box: m.geometry.boundingBox }); });
+        }
+        const inStair = p => stairMeshes.some(s => s.wb.containsPoint(p) && s.box.containsPoint(local.copy(p).applyMatrix4(s.inv)));
+        const inWall = p => (hash.get(cellKey(Math.floor(p.x), Math.floor(p.z))) || []).some(n => solidsNow[n].containsPoint(p)) || inStair(p);
         for (let pass = 0; pass < 6; pass++) {
           const curve = new THREE.CatmullRomCurve3(eye, false, 'centripetal'), segs = eye.length - 1, fixes = [];
           for (let k = 1; k < segs; k++) {
@@ -1117,40 +1217,89 @@ export function createHouseBuilder(deps) {
           for (let j = k + 1; j <= iA; j++) { const d = p.distanceTo(eye[j]); if (d >= rem) { ahead = p.clone().lerp(eye[j], rem / d); break; } rem -= d; p = eye[j]; }
           tgt[k] = ahead ? V(ahead.x, ahead.y - 0.2, ahead.z) : subject.clone();
         });
-        // Timing (assets/shot-path.ts): the orbit gets a third of the shot at 25–40°/s (about 4 s: 30 % of a 14 s
-        // shot, the extra seconds going to the walk), the push-in a second or so, the travel the rest — the fly-in and the street approach at 2.2× and 1.5× the indoor pace, the
-        // doorway and the stairs a little under it — and the shot moves from its first frame. A leg over which
-        // the look swings round (the turn just inside a door, the foot of a stair) is given at least the time a
-        // TURN°/s pan takes, and the straight legs make it up.
+        // Timing (assets/shot-path.ts): the orbit gets about a third of the shot at 25–40°/s, the push-in a second
+        // or so, the travel the rest — the fly-in and the street approach at 2.2× and 1.5× the indoor pace, the
+        // doorway and the stairs a little under it — and the shot moves from its first frame. The look turns
+        // against time (shot-path.ts), and no leg may turn it faster than TURN°/s at any moment: a leg over which it
+        // swings round (the turn just inside a door, the U-turn at the foot of a switchback stair) is given the
+        // seconds that keep its PEAK rate — yaw and pitch together, as the monotone cubic through the waypoints'
+        // looks actually turns it — under TURN, and the straight legs make them up, at no more than VMAX. A shot
+        // too short for all of that (asymmetry's two switchbacks in 14 s, or a spec that pins 8 s) first runs its
+        // orbit at 40°/s, then raises the budget 10 % at a time, every turning leg alike, until it fits — a quicker
+        // pan everywhere rather than one whip, or a walk left no time (the times always strictly increase).
+        // validate-house-spec refuses a door-to-core under 8 s, and the gate warns over 125°/s (look-whip).
         const DUR = shot.duration;
         const knots = knotArcLengths(new THREE.CatmullRomCurve3(eye, false, 'centripetal'), eye.length);
         const len = k => Math.max(1e-3, knots[k + 1] - knots[k]);
-        const w = clamp(fin.arc / (clamp(4 / DUR, 0.3, 0.33) * DUR), 25, 40), fo = fin.arc / (w * DUR);
-        const fp = clamp(len(iA) / 1.2 / DUR, 0.05, 0.1), ft = 1 - fo - fp;
         const PACE = { fly: 2.2, street: 1.5, door: 0.8, stair: 0.85 };
         const cost = []; for (let k = 0; k < iA; k++) cost.push(len(k) / (PACE[kind[k + 1]] ?? 1));   // the segment arriving at eye[k + 1]
-        const TURN = 110, secs = ft * DUR, heads = [];
-        for (let k = 0; k <= iA; k++) { const h = Math.atan2(tgt[k].x - eye[k].x, tgt[k].z - eye[k].z); heads.push(k ? heads[k - 1] + Math.atan2(Math.sin(h - heads[k - 1]), Math.cos(h - heads[k - 1])) : h); }
-        const need = cost.map((_, k) => Math.abs(heads[k + 1] - heads[k]) / DEG / TURN);
-        const pinned = new Set<number>();
-        let tau = cost.slice();
-        for (let pass = 0; pass < 12; pass++) {
-          const pinnedSecs = [...pinned].reduce((a, k) => a + need[k], 0), freeCost = cost.reduce((a, c, k) => a + (pinned.has(k) ? 0 : c), 0);
-          if (pinnedSecs >= secs || freeCost <= 0) { const sum = need.reduce((a, c) => a + c, 0) || 1; tau = need.map(nd => secs * nd / sum); break; }
-          tau = cost.map((c, k) => (pinned.has(k) ? need[k] : (secs - pinnedSecs) * c / freeCost));
-          const more = tau.map((t, k) => (!pinned.has(k) && t < need[k] ? k : -1)).filter(k => k >= 0);
-          if (!more.length) break;
-          more.forEach(k => pinned.add(k));
+        const TURN = 110, VMAX = 9, m = fin.pts.length - 1;
+        // the shot's fractions at orbit rate w: the orbit, the push-in, the walk — which keeps at least half the
+        // shot (at 5 s the orbit and the push-in share 2.5 s and the orbit runs over 40°/s: the gate's orbit-yaw-rate)
+        const lay = w => {
+          let fo = fin.arc / (w * DUR), fp = clamp(len(iA) / 1.2 / DUR, 0.05, 0.1);
+          if (fo + fp > 0.5) { const sq = 0.5 / (fo + fp); fo *= sq; fp *= sq; }
+          return { w: fin.arc / (fo * DUR), fo, fp, ft: 1 - fo - fp };
+        };
+        // every waypoint's look, heading unwrapped (as shot-path.ts turns it) and pitch
+        const heads = [], pitches = [];
+        for (let k = 0; k < eye.length; k++) {
+          const dx = tgt[k].x - eye[k].x, dy = tgt[k].y - eye[k].y, dz = tgt[k].z - eye[k].z, h = Math.atan2(dx, dz);
+          heads.push(k ? heads[k - 1] + Math.atan2(Math.sin(h - heads[k - 1]), Math.cos(h - heads[k - 1])) : h); pitches.push(Math.atan2(dy, Math.hypot(dx, dz)));
         }
-        const times = [0];
-        for (let k = 0; k < iA; k++) times.push(times[k] + tau[k] / DUR);
-        times[iA] = ft;
-        const m = fin.pts.length - 1;
-        for (let i = 0; i <= m; i++) times.push(ft + fp + fo * i / m);
-        times[times.length - 1] = 1;
-        shot.timing = { times: times.map(t => +t.toFixed(5)), startSpeed: 0.5, endSpeed: 1, stats: { travel: +(knots[iA] - knots[0]).toFixed(1), indoorSpeed: +((knots[iA] - knots[lastDoor]) / ((ft - times[lastDoor]) * DUR)).toFixed(2), orbitDegPerSec: +w.toFixed(1), approachDeg: +heroAngle(approach).toFixed(0) } };
-        shot.compose = { subject, ndcX: -fin.dir * 0.26, fov: 40, weights: eye.map((_, k) => (k >= iA ? 1 : 0)) };
-        shot.orbit = orbitMeta(fin, ft + fp);
+        const layout = (tau, L) => {
+          const times = [0];
+          for (let k = 0; k < iA; k++) times.push(times[k] + tau[k] / DUR);
+          times[iA] = L.ft;
+          for (let i = 0; i <= m; i++) times.push(L.ft + L.fp + L.fo * i / m);
+          times[times.length - 1] = 1;
+          return times;
+        };
+        // the fastest the look turns over walk leg k (°/s), sampled along the cubics shot-path.ts builds
+        const peakRates = times => {
+          const hAt = monotoneCubic(times, heads), pAt = monotoneCubic(times, pitches);
+          return cost.map((_, k) => {
+            let peak = 0; const a = times[k], b = times[k + 1], N = 16;
+            for (let i = 0; i < N; i++) {
+              const t0 = a + (b - a) * i / N, t1 = a + (b - a) * (i + 1) / N, dt = (t1 - t0) * DUR;
+              const dh = hAt(t1) - hAt(t0), dp = pAt(t1) - pAt(t0), pm = (pAt(t1) + pAt(t0)) / 2;
+              peak = Math.max(peak, Math.hypot(dh * Math.cos(pm), dp) / DEG / dt);
+            }
+            return peak;
+          });
+        };
+        // the degrees each leg turns the look, × 1.5 (a turn between two held looks peaks at 1.5× its mean rate)
+        const turnDeg = cost.map((_, k) => 1.5 * Math.hypot((heads[k + 1] - heads[k]) * Math.cos((pitches[k] + pitches[k + 1]) / 2), pitches[k + 1] - pitches[k]) / DEG);
+        // the seconds per leg at budget R°/s, or null when they do not fit: start every turning leg at its mean
+        // rate, then pin each leg that still peaks over R at the seconds that scale its peak down to it, and lay the
+        // rest out by distance again
+        const solve = (L, R) => {
+          const secs = L.ft * DUR, need = turnDeg.map(d => d / R), pinned = new Set<number>();
+          let tau = cost.slice();
+          for (let pass = 0; pass < 24; pass++) {
+            const pinnedSecs = [...pinned].reduce((a, k) => a + need[k], 0), freeCost = cost.reduce((a, c, k) => a + (pinned.has(k) ? 0 : c), 0);
+            if (pinnedSecs + freeCost / VMAX > secs) return null;
+            tau = freeCost > 1e-9 ? cost.map((c, k) => (pinned.has(k) ? need[k] : (secs - pinnedSecs) * c / freeCost)) : need.map(nd => nd * secs / pinnedSecs);
+            const more = tau.map((t, k) => (!pinned.has(k) && t < need[k] ? k : -1)).filter(k => k >= 0);
+            if (more.length) { more.forEach(k => pinned.add(k)); continue; }
+            const peaks = peakRates(layout(tau, L));
+            const over = peaks.map((p, k) => (p > R * 1.02 ? k : -1)).filter(k => k >= 0);
+            if (!over.length) return tau;
+            for (const k of over) { need[k] = tau[k] * peaks[k] / R * 1.03; pinned.add(k); }
+          }
+          return tau;
+        };
+        let L = lay(clamp(fin.arc / (clamp(4 / DUR, 0.3, 0.33) * DUR), 25, 40)), R = TURN, tau = solve(L, R);
+        if (!tau && L.w < 40) { L = lay(40); tau = solve(L, R); }
+        while (!tau && R < 1000) { R *= 1.1; tau = solve(L, R); }
+        if (!tau) { const sc = cost.reduce((a, c) => a + c, 0) || 1; tau = cost.map(c => L.ft * DUR * c / sc); }
+        const { w, fo, fp, ft } = L;
+        const times = layout(tau, L);
+        shot.timing = { times: times.map(t => +t.toFixed(5)), startSpeed: 0.5, endSpeed: 1, stats: { travel: +(knots[iA] - knots[0]).toFixed(1), indoorSpeed: +((knots[iA] - knots[lastDoor]) / ((ft - times[lastDoor]) * DUR)).toFixed(2), orbitDegPerSec: +w.toFixed(1), lookBudgetDegPerSec: +R.toFixed(0), lookPeakDegPerSec: +Math.max(0, ...peakRates(times)).toFixed(0), approachDeg: +heroAngle(approach).toFixed(0), ...(finChoice ? { walkWrongDeg: finChoice.wrong, walkNear: finChoice.near } : {}) } };
+        // the Core is framed off-centre (the room it is heading into on the other side) from the orbit's first
+        // point: the turn that puts it there is made over the push-in, not on top of the last walk leg's
+        shot.compose = { subject, ndcX: -fin.dir * 0.26, fov: 40, weights: eye.map((_, k) => (k > iA ? 1 : 0)) };
+        shot.orbit = { ...orbitMeta(fin, ft + fp), tIn: +ft.toFixed(4) };
         // the Core wakes as its front comes round: the button is pressed when the eye is 55° off its face (at
         // once, if the orbit starts nearer than that), and no later than 1.8 s before the end, so the fan and
         // the screen are seen spinning up
@@ -1183,6 +1332,22 @@ export function createHouseBuilder(deps) {
           timing: { times: co.pts.map((_, i) => i / m), startSpeed: 0.3, endSpeed: 0.3 },
           compose: { subject, ndcX: -co.dir * 0.12, fov: 42 }, orbit: orbitMeta(co, 0) };
         shots['core-orbit'] = attachFrameAt(THREE, shot);
+      } else {
+        // Nothing round the Core is free at any radius (a desk in a corner, the Core a hand's width off both
+        // walls): a slow push-in on its front instead — door-to-core's close-up, from a little further out — so
+        // every house has the shot the gate, the goldens and the player ask for; `note` says why, and the gate
+        // warns (core-orbit-fallback) rather than failing on a shot that is not there.
+        clearanceMoves = [];
+        const fx = hero.fwd ? hero.fwd[0] : 0, fz = hero.fwd ? hero.fwd[1] : 1, sx = fz, sz = -fx;
+        const desk = hero.surface === 'desk', lift = hero.surface === 'shelf' ? 0.22 : 0.4;
+        const at = (d, s, h, margin) => clearPoint(V(hero.x + fx * d + sx * s, cY + h, hero.z + fz * d + sz * s), heroLevel, margin);
+        // (on a desk from over the back of the chair, which stands 1.05 m between the eye and the Core)
+        const eye = desk ? [at(1.9, 0.35, 0.85, 0.5), at(1.55, 0.2, 0.7, 0.4), at(1.2, 0.08, 0.55, 0.3)]
+          : [at(1.5, -0.45, lift + 0.22, 0.4), at(1.1, -0.34, lift + 0.1, 0.35), at(0.7, -0.24, lift, 0.3)];
+        const aim = V(hero.x, cY, hero.z);
+        shots['core-orbit'] = attachFrameAt(THREE, { type: 'core-orbit', dressing: { walls: 'up', roof: 'auto' }, name: `${spec.emoji || '🏠'} ${spec.name}: Companion Core Close-up`, duration: 8, closed: false,
+          eyePoints: eye, targetPoints: eye.map(() => aim.clone()), power: { at: -1 }, timing: { times: [0, 0.5, 1], startSpeed: 0.3, endSpeed: 0.3 }, clearance: clearanceMoves,
+          note: 'no free arc round the Core at any radius (walls or furniture within reach on every side): a slow push-in on its front instead of an orbit' });
       }
     }
     // --- hero reveal: descend from above onto the core — or, when there is a storey over the desk, pull in
