@@ -1098,7 +1098,11 @@ export function createHouseBuilder(deps) {
         }
       }
       const iA = kind.indexOf('approach'), lastDoor = kind.lastIndexOf('door');
-      const shot: Record<string, any> = { type: 'door-to-core', dressing: { walls: 'up', roof: 'auto' }, name: `${spec.emoji || '🏠'} ${spec.name}: Front Door → Companion Core`, duration: 12, closed: false, eyePoints: eye, targetPoints: tgt, clearance: clearanceMoves };
+      // 12 s, or what the spec pins (the timing below is in seconds, so it is laid out for the duration the shot
+      // will actually play at — the spec's override is applied after shotsFor has built every shot). A long walk
+      // (three storeys, 45 m of travel) is pinned at 14 s.
+      const pinnedDur = (spec.shots || []).filter(s => s && s.type === 'door-to-core' && s.duration).map(s => s.duration).pop();
+      const shot: Record<string, any> = { type: 'door-to-core', dressing: { walls: 'up', roof: 'auto' }, name: `${spec.emoji || '🏠'} ${spec.name}: Front Door → Companion Core`, duration: pinnedDur || 12, closed: false, eyePoints: eye, targetPoints: tgt, clearance: clearanceMoves };
       if (fin) {
         // push in to the orbit, then arc round the Core at a steady angular speed, ending on its front. The
         // target is the Core throughout; `compose` turns the view so the Core sits off-centre with the room it
@@ -1113,15 +1117,15 @@ export function createHouseBuilder(deps) {
           for (let j = k + 1; j <= iA; j++) { const d = p.distanceTo(eye[j]); if (d >= rem) { ahead = p.clone().lerp(eye[j], rem / d); break; } rem -= d; p = eye[j]; }
           tgt[k] = ahead ? V(ahead.x, ahead.y - 0.2, ahead.z) : subject.clone();
         });
-        // Timing (assets/shot-path.ts): the orbit gets a third of the shot at 25–40°/s, the push-in a second or
-        // so, the travel the rest — the fly-in and the street approach at 2.2× and 1.5× the indoor pace, the
+        // Timing (assets/shot-path.ts): the orbit gets a third of the shot at 25–40°/s (about 4 s: 30 % of a 14 s
+        // shot, the extra seconds going to the walk), the push-in a second or so, the travel the rest — the fly-in and the street approach at 2.2× and 1.5× the indoor pace, the
         // doorway and the stairs a little under it — and the shot moves from its first frame. A leg over which
         // the look swings round (the turn just inside a door, the foot of a stair) is given at least the time a
         // TURN°/s pan takes, and the straight legs make it up.
         const DUR = shot.duration;
         const knots = knotArcLengths(new THREE.CatmullRomCurve3(eye, false, 'centripetal'), eye.length);
         const len = k => Math.max(1e-3, knots[k + 1] - knots[k]);
-        const w = clamp(fin.arc / (0.33 * DUR), 25, 40), fo = fin.arc / (w * DUR);
+        const w = clamp(fin.arc / (clamp(4 / DUR, 0.3, 0.33) * DUR), 25, 40), fo = fin.arc / (w * DUR);
         const fp = clamp(len(iA) / 1.2 / DUR, 0.05, 0.1), ft = 1 - fo - fp;
         const PACE = { fly: 2.2, street: 1.5, door: 0.8, stair: 0.85 };
         const cost = []; for (let k = 0; k < iA; k++) cost.push(len(k) / (PACE[kind[k + 1]] ?? 1));   // the segment arriving at eye[k + 1]
