@@ -21,18 +21,43 @@
         return;
       }
       d.dataset.mode = 'view';
+      // the player's own title from the start (the static one above is the editor's), then the home's
+      document.title = 'Virtual homes · Companion Intelligence';
       if (/^[a-z0-9-]+$/.test(id)) d.style.setProperty('--vh-poster', 'url("' + new URL('./portal/thumbs/' + id + '.webp', location.href).href + '")');
       document.write('<link rel="stylesheet" href="./portal/viewer.css">');
       // The list of homes, asked for now, beside three.js and the engine: the loader names the home long before
       // the player mounts, and viewer.ts and the page's first build take this promise instead of fetching again.
+      // The name is the portal's (assets/home-names.js), which the script after the import map imports and hands
+      // to __vhNames: a module asked for before the import map would make a browser without multiple-import-map
+      // support drop the map, and three.js with it. A copy of it that did not download leaves the spec's name.
       window.__vhIndex = fetch('./content/houses/index.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
-      window.__vhIndex.then(function (j) {
+      var cssString = function (v) { return '"' + String(v).replace(/["\\]/g, '\\$&') + '"'; };
+      window.__vhNames = function (names) { Promise.all([window.__vhIndex, names]).then(function (r) {
+        var j = r[0], n = r[1];
         var h = j && (j.houses || []).filter(function (x) { return x.id === id; })[0];
-        if (h) d.style.setProperty('--vh-boot-name', '"' + String(h.name).replace(/["\\]/g, '\\$&') + '"');
+        if (h) {
+          var name = n ? n.displayName(h) : h.name;
+          d.style.setProperty('--vh-boot-name', cssString(name));
+          // the credit and the facts, as the player's loading card writes them (viewer.ts metaLine)
+          var meta = [];
+          if (h.author) meta.push('By ' + h.author);
+          if (h.storeys) meta.push(h.storeys + (h.storeys === 1 ? ' storey' : ' storeys'));
+          if (h.areaSqm) meta.push(h.areaSqm + ' m²');
+          if (meta.length) d.style.setProperty('--vh-boot-meta', cssString(meta.join(' · ')));
+          if (!d.dataset.viewer || d.dataset.viewer === 'failed' || d.dataset.viewer === 'no-webgl') document.title = name + ' · Virtual homes';
+        }
         // an id the list does not have has no thumbnail either: drop the poster before the player's loader asks
         // for it a second time (the first paint may already have asked once)
         else if (j) d.style.removeProperty('--vh-poster');
-      });
+      }); };
+      // a way back to the gallery from the first paint on (the player's own back button takes over when it mounts)
+      (function back() {
+        if (!document.body) { setTimeout(back, 30); return; }
+        var a = document.createElement('a');
+        a.className = 'vh-boot-back'; a.href = './index.html'; a.setAttribute('aria-label', 'All homes'); a.title = 'All homes';
+        a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>';
+        document.body.appendChild(a);
+      })();
       setTimeout(function () { if (!d.dataset.viewer) d.dataset.boot = 'slow'; }, 8000);
       // Before the player mounts, a failure has nowhere else to show: this puts a card over the poster, with a way
       // out. The page's module calls __vhBooted() when it has run to its end, so an error before that is the module
@@ -45,7 +70,7 @@
         d.dataset.viewer = state;
         var box = document.createElement('div');
         box.className = 'vh-fail'; box.setAttribute('role', 'alert');
-        box.innerHTML = '<h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./index.html">See all homes</a></div>';
+        box.innerHTML = '<img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./index.html">See all homes</a></div>';
         box.querySelector('h2').textContent = title;
         box.querySelector('p').textContent = msg;
         if (retry) box.querySelector('button').addEventListener('click', function () { location.reload(); });
@@ -82,6 +107,9 @@
     }
   }
   </script>
+  <!-- ?mode=view only (the head script above defines __vhNames): the portal's names for the loader, imported after
+       the import map. In the editor this does nothing. -->
+  <script>if (window.__vhNames) window.__vhNames(import('./assets/home-names.js').catch(function () { return null; }));</script>
 
   <style>
     /* -------------------------------------------------------------------------------------------
@@ -7102,7 +7130,7 @@
       selectObject(null);
       if (presetSelect && presetSelect.value !== `house:${id}`) presetSelect.value = `house:${id}`;
       document.querySelectorAll('#sims-quick-pills .pill-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.preset === `house:${id}`));
-      document.title = `${spec.name} · Isometric 3D Room Creator`;
+      if (!VIEW_MODE) document.title = `${spec.name} · Isometric 3D Room Creator`;   // (the player names the tab itself)
       // Ready signal for harnesses / the batch video renderer (data-house-ready="<id>")
       document.documentElement.dataset.houseReady = id;
       window.dispatchEvent(new CustomEvent('house:ready', { detail: { id, anchors: result.anchors, shots: Object.keys(shots) } }));

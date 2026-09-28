@@ -1,19 +1,23 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Assembles the web portal for GitHub Pages: exactly the files the site loads, nothing else.
 //
-//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://…/ci-virtual-home/]
+//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/]
 //   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
 //
-//   <out>/index.html                 the gallery (portal/gallery.css + gallery.js, portal/thumbs/, portal/hero.webp)
+//   <out>/index.html                 the gallery (portal/gallery.css + gallery.js, portal/thumbs/, portal/hero.webp),
+//                                    its link-preview image and URL made absolute
 //   <out>/room-creator.html          the player (?mode=view: portal/viewer.css + assets/viewer.js) and the editor,
 //                                    plus one tag: <meta name="vh-share" content="homes/">, which tells the player
-//                                    the share pages below exist
+//                                    the share pages below exist. Its static title and description are the site's
+//                                    (with preview tags), not the editor's: a player URL copied from the address bar
+//                                    unfurls as the site, never as the editor
 //   <out>/homes/<id>.html            what the player's share button hands out: a page with the home's own title,
 //                                    description and thumbnail for link previews (Slack, iMessage, social cards
 //                                    never run the player's script, so room-creator.html's static title is all they
 //                                    would see), which forwards to room-creator.html?mode=view&house=<id> with the
-//                                    link's query. --site-url makes og:image absolute, as unfurlers want; the
-//                                    Pages workflow passes the site's address
+//                                    link's query. og:image and og:url are absolute, as unfurlers want: the site's
+//                                    address is --site-url, else $SITE_URL, else the live site
+//                                    (https://homes.ci.computer/); the GitHub Pages workflow passes its own
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
@@ -29,6 +33,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
+import { displayName } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
 const OUT = path.resolve(args.out || path.join(ROOT, 'dist'));
@@ -105,39 +110,43 @@ fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 }
 
 // 5c. share pages: homes/<id>.html, one per home (see the header), and the tag that tells the player they exist
+const esc = (v: unknown): string => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'] : '') || process.env.SITE_URL || 'https://homes.ci.computer/').replace(/\/?$/, '/');
+const SITE_TITLE = 'Virtual homes · Companion Intelligence';
 {
-  const esc = (v: unknown): string => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  const site = args['site-url'] && args['site-url'] !== 'true' ? args['site-url'].replace(/\/?$/, '/') : '';
+  const site = SITE;
   const shortStyle = (s?: string): string => (s || '').split(/[:;,(]| with | over | under /)[0].trim();
   fs.mkdirSync(path.join(OUT, 'homes'), { recursive: true });
   for (const h of index.houses || []) {
     if (!/^[a-z0-9-]+$/.test(h.id)) { problems.push(`house id ${JSON.stringify(h.id)} is not [a-z0-9-]: no share page`); continue; }
     const player = `../room-creator.html?mode=view&house=${h.id}`;
-    const image = site ? new URL(`portal/thumbs/${h.id}.webp`, site).href : `../portal/thumbs/${h.id}.webp`;
+    const image = new URL(`portal/thumbs/${h.id}.webp`, site).href;
     const style = shortStyle(h.style);
+    const name = displayName(h);
     const desc = `${style ? `${style}. ` : ''}${h.author ? `After a Sims 4 build by ${h.author}. ` : ''}Built live in 3D in your browser: fly its camera paths and change the hour.`;
     const page = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${esc(h.name)} · Companion virtual homes</title>
+  <title>${esc(name)} · Virtual homes</title>
   <meta name="description" content="${esc(desc)}">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Companion virtual homes">
-  <meta property="og:title" content="${esc(h.name)}">
+  <meta property="og:site_name" content="${esc(SITE_TITLE)}">
+  <meta property="og:title" content="${esc(name)}">
   <meta property="og:description" content="${esc(desc)}">
   <meta property="og:image" content="${esc(image)}">
   <meta property="og:image:type" content="image/webp">
   <meta property="og:image:width" content="640">
   <meta property="og:image:height" content="360">
-  <meta property="og:image:alt" content="${esc(`An aerial view of ${h.name}`)}">${site ? `\n  <meta property="og:url" content="${esc(new URL(`homes/${h.id}.html`, site).href)}">` : ''}
+  <meta property="og:image:alt" content="${esc(`An aerial view of ${name}`)}">
+  <meta property="og:url" content="${esc(new URL(`homes/${h.id}.html`, site).href)}">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="../assets/brand/ci-logo-mark.svg" type="image/svg+xml">
   <script>location.replace(${JSON.stringify(player)} + (location.search ? '&' + location.search.slice(1) : '') + location.hash);</script>
 </head>
 <body>
-  <p><a href="${esc(player)}">Open ${esc(h.name)} in 3D</a></p>
+  <p><a href="${esc(player)}">Open ${esc(name)} in 3D</a></p>
 </body>
 </html>
 `;
@@ -148,6 +157,45 @@ fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
   const text = fs.readFileSync(rc, 'utf8');
   if (!text.includes('</head>')) problems.push('room-creator.html has no </head> for the share tag');
   else fs.writeFileSync(rc, text.replace('</head>', '  <meta name="vh-share" content="homes/">\n</head>'));
+}
+
+// 5d. link previews for the site's own pages. The gallery's og:image is relative in the source (a checkout has no
+// address); here it becomes the site's, with og:url. room-creator.html's static head is the editor's (its title
+// and a description naming the editor), which is all an unfurler reads of a player URL copied from the address
+// bar: on the site it is the site's title, description and hero instead. The editor works the same; only its
+// tab title differs on the deployed site.
+{
+  const hero = new URL('portal/hero.webp', SITE).href;
+  const ix = path.join(OUT, 'index.html');
+  let gallery = fs.readFileSync(ix, 'utf8');
+  const rel = '<meta property="og:image" content="./portal/hero.webp">';
+  if (!gallery.includes(rel)) problems.push('index.html: no relative og:image for the hero to make absolute');
+  gallery = gallery.replace(rel, `<meta property="og:image" content="${esc(hero)}">\n  <meta property="og:url" content="${esc(SITE)}">`);
+  fs.writeFileSync(ix, gallery);
+
+  const rc = path.join(OUT, 'room-creator.html');
+  let page = fs.readFileSync(rc, 'utf8');
+  const desc = (gallery.match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
+  const head = `<title>${esc(SITE_TITLE)}</title>
+  <meta name="description" content="${desc}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Companion Intelligence">
+  <meta property="og:title" content="${esc(SITE_TITLE)}">
+  <meta property="og:description" content="${desc}">
+  <meta property="og:image" content="${esc(hero)}">
+  <meta property="og:image:type" content="image/webp">
+  <meta property="og:image:width" content="1600">
+  <meta property="og:image:height" content="900">
+  <meta name="twitter:card" content="summary_large_image">`;
+  const before = page;
+  page = page.replace(/<title>[^<]*<\/title>\s*<meta name="description" content="[^"]*">/, () => head);
+  if (page === before) problems.push('room-creator.html: its static <title> and description were not found to replace');
+  if (/Room Creator|SimsTree|Pascal Editor/.test(page.slice(0, page.indexOf('<script')))) problems.push('room-creator.html: the static head still names the editor');
+  // a module asked for before the import map makes a browser without multiple-import-map support drop the map
+  // (and three.js with it): only Chromium would still start
+  const map = page.indexOf('<script type="importmap">');
+  if (map < 0 || /\bimport\(|type="module"|rel="modulepreload"/.test(page.slice(0, map))) problems.push('room-creator.html: a module is loaded before the import map');
+  fs.writeFileSync(rc, page);
 }
 
 // 6. every relative URL the pages and stylesheets name must be in the output (a query or a fragment is fine)

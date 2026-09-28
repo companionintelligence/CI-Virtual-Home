@@ -12,7 +12,7 @@ compiled from it:
 | **CAD floor plans** — one blueprint sheet per level, SVG + PNG, and a `floorplans.json` index | `scripts/generate_floor_plans.py` | `scenes/floorplans/` |
 | **Isometric cutaways** — landscape + portrait SVG and a pure-vector Lottie animation per house | `scripts/generate_house_iso.py` | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` |
 | **Product-shot videos** — frame-stepped, deterministic H.264 per house × shot, with posters | `scripts/render-house-shots.mts` (headless Chromium) | `video/houses/` (gitignored; browse with `video/houses/index.html`) |
-| **Web portal** — a gallery of the homes and a live player to fly their camera paths, for GitHub Pages | [`index.html`](index.html), `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://companionintelligence.github.io/ci-virtual-home/> |
+| **Web portal** — a gallery of the homes and a live player to fly their camera paths | [`index.html`](index.html), `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://homes.ci.computer/> (Cloudflare Pages) and <https://companionintelligence.github.io/ci-virtual-home/> |
 
 30 houses ship today, each a Sims 4 gallery build re-authored as a spec (see [THIRD_PARTY.md](THIRD_PARTY.md)
 for how they are credited).
@@ -112,6 +112,25 @@ full screen and prev/next. Keys: Space, ←/→ (Shift: 5 s), Home/End, 1–9, T
 (Space on a focused button presses that button). Everything under `?mode=view` is additive: without it the page
 is the editor, and every `__house*` hook behaves as before.
 
+A few things the player does that the editor does not:
+
+- **Names.** The portal calls a home by `displayName` ([`assets/home-names.ts`](assets/home-names.ts)): the spec's
+  title with the Sims gallery shorthand taken out ("Base Game", "BG", a build budget, "Fix"), or a hand-picked
+  name where that would leave a twin or nothing ("Base Game Modern House 1" → "Modern Studio House"). The gallery,
+  the player, the pre-mount loader and the share pages all use it; the spec's own title stays the credit, in the
+  tooltip beside the builder's name. The specs are not edited for it.
+- **Framing.** Shots are framed for 16:9. For a narrower window the player widens the field of view after
+  `applySplineFrame` has set the shot's own (`fitFov`: the geometric mean of keeping the vertical and keeping the
+  horizontal field, capped at 80°), so a phone held upright sees the house at the door and the Core with its desk
+  at the end. The eye path is untouched, and nothing a golden or a video renders goes through the player.
+- **The end of a shot** is a card over the dock: replay, another shot, the next home, and one line on what the
+  Companion Core is, linking to <https://ci.computer>. The title steps back while it shows.
+- **Phones** (and short landscape screens) get a compact dock: one scrolling row of shot and time-of-day chips,
+  then play, the seek bar, the time and a More button whose sheet holds speed, path, fly, best quality and full
+  screen. Every control is a 44 px target on a touch screen, and the controls fade a few seconds into playback
+  (a tap on the scene brings them back). Between 761 and 1011 px (a tablet held upright) the full dock puts the
+  time of day on a row of its own, so every shot's chip shows.
+
 Until the player's module has mounted, `room-creator.html`'s head script is the player: the house's poster, its
 name once `index.json` is in, a loader that says so when a slow connection makes it take a while, and a card with
 **Try again** and **See all homes** when the page cannot start (no WebGL 2, a module that did not download, an
@@ -120,9 +139,12 @@ player asks no third party for anything: its fonts, including the ones the scene
 own (`portal/viewer.css`); only the editor links Google Fonts.
 
 The share button hands out `homes/<id>.html`: `portal:build` writes one page per home with the home's own title,
-description and thumbnail as link-preview tags (an unfurler never runs the player, and `room-creator.html`'s static
-title is the editor's), and it forwards to the player with the link's query. A checkout served as it is has no such
-pages, and shares the player's own URL.
+description and thumbnail as link-preview tags (an unfurler never runs the player), and it forwards to the player
+with the link's query. A checkout served as it is has no such pages, and shares the player's own URL. The gallery
+carries preview tags too, and in `dist/` `room-creator.html`'s static title and description (the editor's, in the
+source) are replaced by the site's, so a player URL copied from the address bar never unfurls as the editor.
+Preview images must be absolute: `portal:build` takes the site's address from `--site-url`, else `$SITE_URL`, else
+the live site, `https://homes.ci.computer/`.
 
 Every URL in the site is relative, because Pages serves it at `/ci-virtual-home/`. `portal:build` copies only
 what the site loads into `dist/` (and refuses stale compiled assets, a missing spec or thumbnail, a link to a file it

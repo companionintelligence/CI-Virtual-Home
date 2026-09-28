@@ -5,15 +5,20 @@
 //        [--house aurora,lakecabin,mirage] [--shots test/portal] [--headed]
 //
 //   gallery   30 cards, every thumbnail decoded, the static hero figures match the data, no link forces
-//             autoplay, hovering a card warms the player (not room-creator.html itself), search / storeys / tag
-//             filters narrow and clear, a card opens the player; 1440 × 900 and 390 × 844
+//             autoplay, card names carry no Sims jargon and are distinct, hovering a card warms the player (not
+//             room-creator.html itself), search / storeys / tag filters narrow and clear (and the tag counts follow
+//             the storeys filter), a card opens the player; the built pages' link previews are the site's, with
+//             absolute images; 1440 × 900 and 390 × 844
 //   player    for each --house: builds, lists its shots from the presets, plays (t advances), pauses (Space),
 //             Space on a focused button presses that button, scrubs (a click on the scrubber lands there),
 //             switches shot (URL follows), switches the time of day (the page's lighting follows), shows the
 //             path (P), flies (F, W moves the camera, Q never takes it under the lot, a drag turns it, Esc puts it
-//             back on the shot), copies a share link — homes/<id>.html, whose preview tags name the home — that
-//             reopens at the same moment, and steps to the next home; 1440 × 900 and 390 × 844 (touch). The
-//             gallery and the player ask no third party for anything (no Google Fonts)
+//             back on the shot; the free-camera bar is inert until then, and at 1280 px it clears the title; every
+//             shot chip shows from 768 px up), ends a shot on the end card, copies a share link — homes/<id>.html,
+//             whose preview tags name the home — that reopens at the same moment, and steps to the next home;
+//             1440 × 900 and 390 × 844 (touch, where
+//             the tools are in the More sheet and the seek bar is a 44 px target). The gallery and the player ask
+//             no third party for anything (no Google Fonts)
 //   motion    with the system set to reduce motion, a home opened from the gallery (or with play=1) holds still
 //   failures  an id no home has: the error card at once, no spec request, no editor scene built behind it; a
 //             module that does not download (viewer.js, house-builder.js) and a browser with WebGL 1 only: a
@@ -62,6 +67,12 @@ async function open(viewport: { width: number; height: number }, mobile = false,
 const shot = async (page: any, name: string) => { await page.screenshot({ path: path.join(SHOTS, `${name}.png`) }); };
 const viewerReady = (page: any) => page.waitForFunction(() => document.documentElement.dataset.viewer === 'ready', null, { timeout: 90000 });
 const scrubT = (page: any): Promise<number> => page.$eval('.vh-scrub input', (e: HTMLInputElement) => Number(e.value) / 1000);
+// a tool on a phone lives in the More sheet: open it first (on a wider screen the tools are in the dock)
+async function tapTool(page: any, act: string) {
+  if (await page.isVisible('[data-act="more"]') && (await page.getAttribute('[data-act="more"]', 'aria-expanded')) !== 'true') { await page.tap('[data-act="more"]'); await sleep(300); }
+  await page.tap(`.vh-tools [data-act="${act}"]`);
+}
+const setScrub = (page: any, v: number) => page.$eval('.vh-scrub input', (e: HTMLInputElement, v: number) => { e.value = String(v); e.dispatchEvent(new Event('input', { bubbles: true })); e.dispatchEvent(new Event('change', { bubbles: true })); }, v);
 const camPos = (page: any): Promise<number[]> => page.evaluate(() => { const c = (window as any).__houseDebug().camera; return [c.position.x, c.position.y, c.position.z]; });
 const dist = (a: number[], b: number[]) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 
@@ -77,6 +88,10 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   ok(cards === 30, `${cards} cards`);
   const liveStats = await page.$$eval('[data-stat]', (els: Element[]) => els.map(e => e.textContent));
   ok(JSON.stringify(liveStats) === JSON.stringify(staticStats), `the static hero figures are the data's (${staticStats.join(' / ')})`);
+  const titles: string[] = await page.$$eval('#grid .card h3', (els: Element[]) => els.map(e => e.textContent || ''));
+  ok(titles.length === 30 && !titles.some(t => /base\s*game|basegame|\bBG\b/i.test(t)) && new Set(titles).size === 30, `card names carry no Sims jargon and are all distinct (${titles.slice(0, 3).join(', ')}, …)`);
+  const storeysLabels = await page.$$eval('#storeys button', (els: Element[]) => els.map(e => e.textContent));
+  ok(storeysLabels.join('|') === 'Any|1|2|3+', `the storeys filter reads ${storeysLabels.join(' · ')}`);
   const hrefs: string[] = await page.$$eval('#grid .card a, #hero-play, #hero-media', (els: HTMLAnchorElement[]) => els.map(a => a.href));
   ok(hrefs.length === 32 && hrefs.every(h => !new URL(h).searchParams.has('play')), 'no gallery link forces autoplay (the player decides, and honours reduced motion)');
   // load every thumbnail (lazy ones too) and check each decoded
@@ -104,9 +119,13 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   ok((await page.evaluate(() => location.search)).includes('q=brick'), 'the search is in the URL');
   await page.fill('#q', '');
   await sleep(250);   // the search input is debounced: let the cleared query land before the next filter
+  const tagCounts = () => page.$$eval('#tags .tag', (els: HTMLElement[]) => els.map(e => `${e.dataset.tag} ${e.querySelector('small')!.textContent}${(e as HTMLButtonElement).disabled ? ' off' : ''}`).join(', '));
+  const countsAll = await tagCounts();
   await page.click('#storeys button[data-storeys="1"]');
   const one = await visible();
   ok(one > 0 && one < 30, `1 storey narrows to ${one}`);
+  const countsOne = await tagCounts();
+  ok(countsOne !== countsAll, `the style tags count what the storeys filter leaves (${countsOne})`);
   await page.click('#storeys button[data-storeys=""]');
   const tag = await page.$('#tags .tag');
   if (tag) { await tag.click(); const n = await visible(); ok(n > 0 && n < 30, `a style tag narrows to ${n}`); await tag.click(); }
@@ -136,6 +155,18 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   await close();
 }
 
+// ------------------------------------------------------------------ link previews of the built pages
+async function previews() {
+  console.log('\nlink previews');
+  const head = (html: string) => html.slice(0, html.indexOf('</head>'));
+  const gallery = head(await (await fetch(srv.url('index.html'))).text());
+  const player = head(await (await fetch(srv.url('room-creator.html'))).text());
+  const og = (h: string, p: string) => (h.match(new RegExp(`<meta property="${p}" content="([^"]*)"`)) || [])[1] || '';
+  ok(/^https?:\/\//.test(og(gallery, 'og:image')) && og(gallery, 'og:image').endsWith('portal/hero.webp') && /summary_large_image/.test(gallery), `the gallery previews with its hero (${og(gallery, 'og:image')})`);
+  const staticHead = player.slice(0, player.indexOf('<script'));
+  ok(!/Room Creator|SimsTree|Pascal/.test(staticHead) && /<title>Virtual homes/.test(staticHead) && /^https?:\/\//.test(og(player, 'og:image')), `room-creator.html's static head is the site's, not the editor's (${(staticHead.match(/<title>([^<]*)/) || [])[1]})`);
+}
+
 // ------------------------------------------------------------------ player
 async function player(id: string, viewport: { width: number; height: number }, mobile: boolean, label: string, full: boolean) {
   console.log(`\nplayer ${id} ${label}`);
@@ -150,6 +181,11 @@ async function player(id: string, viewport: { width: number; height: number }, m
   const chips = await page.$$eval('.vh-shots .vh-chip', (els: HTMLElement[]) => els.map(e => ({ key: e.dataset.shot, label: e.querySelector('span')!.textContent })));
   const presetShots = await page.evaluate(() => { const s = (window as any).__houseDebug().house.shots; return [...new Set(Object.values(s))].length; });
   ok(chips.length === presetShots && chips.length >= 4, `${chips.length} shots listed from the house's presets (${chips.map((c: any) => c.label).join(', ')})`);
+  const shownName = ((await page.textContent('.vh-name')) || '').trim();
+  ok(!/base\s*game|basegame|\bBG\b/i.test(shownName) && (await page.title()) === `${shownName} · Virtual homes`, `the player names the home "${shownName}" (tab: ${await page.title()})`);
+  const seekH = await page.$eval('.vh-scrub input', (e: HTMLElement) => e.getBoundingClientRect().height);
+  ok(seekH >= (mobile ? 44 : 32), `the seek bar is a ${Math.round(seekH)} px target`);
+  ok(await page.$eval('.vh-flybar', (e: any) => e.inert && getComputedStyle(e).visibility === 'hidden'), 'the free-camera bar is inert and hidden until flying');
   // play: t advances. A loaded machine can spend most of the shot between "ready" and here (and a shot that has
   // run to its end has stopped), so start it again from the top first: every check below then has room either side
   await page.keyboard.press('Home');
@@ -209,7 +245,7 @@ async function player(id: string, viewport: { width: number; height: number }, m
   await sleep(200);
   ok((await page.evaluate(() => (window as any).__houseLighting.preset)) === 'golden', 'golden hour');
   // path
-  if (mobile) await page.tap('[data-act="path"]'); else await page.keyboard.press('p');
+  if (mobile) await tapTool(page, 'path'); else await page.keyboard.press('p');
   await sleep(250);
   ok(await page.evaluate(() => { const o = (window as any).__houseDebug().scene.getObjectByName('viewer: camera path'); return !!o && o.visible; }), 'the camera path is drawn in the scene');
   await page.click('.vh-shots .vh-chip[data-shot="door-to-core"]');
@@ -221,9 +257,33 @@ async function player(id: string, viewport: { width: number; height: number }, m
   await sleep(1400);
   await shot(page, `player-${id}-${label}-path`);
   // fly
-  if (mobile) await page.tap('[data-act="fly"]'); else await page.keyboard.press('f');
+  if (mobile) await tapTool(page, 'fly'); else await page.keyboard.press('f');
   await sleep(200);
-  ok((await page.getAttribute('.vh', 'data-fly')) === '1', 'fly mode on');
+  ok((await page.getAttribute('.vh', 'data-fly')) === '1' && (await page.$eval('.vh-flybar', (e: any) => !e.inert)), 'fly mode on');
+  if (!mobile && full) {
+    // the free-camera bar has its own row: at a common laptop width it clears the title and the actions
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await sleep(300);
+    const clear = await page.evaluate(() => {
+      const r = (s: string) => document.querySelector(s)!.getBoundingClientRect();
+      const fb = r('.vh-flybar'), hit = (b: DOMRect) => !(fb.right <= b.left || b.right <= fb.left || fb.bottom <= b.top || b.bottom <= fb.top);
+      return !hit(r('.vh-title')) && !hit(r('.vh-actions'));
+    });
+    ok(clear, 'at 1280 px the free-camera bar clears the title and the actions');
+    // the full dock's shot chips all show (none hidden past the row's fade) from 761 px up
+    const clipped: number[] = [];
+    for (const width of [768, 900, 1012, 1024]) {
+      await page.setViewportSize({ width, height: 900 });
+      await sleep(250);
+      if (await page.evaluate(() => {
+        const sh = document.querySelector('.vh-shots')!, box = sh.getBoundingClientRect(), pad = parseFloat(getComputedStyle(sh).paddingRight);
+        return sh.lastElementChild!.getBoundingClientRect().right > box.right - pad + 0.5;
+      })) clipped.push(width);
+    }
+    ok(!clipped.length, `every shot chip shows at 768, 900, 1012 and 1024 px${clipped.length ? ` (clipped at ${clipped.join(', ')})` : ''}`);
+    await page.setViewportSize(viewport);
+    await sleep(300);
+  }
   if (!mobile) {
     const p0 = await camPos(page);
     await page.keyboard.down('w'); await sleep(500); await page.keyboard.up('w');
@@ -274,6 +334,17 @@ async function player(id: string, viewport: { width: number; height: number }, m
   await sleep(300);
   const back = await camPos(page);
   ok((await page.getAttribute('.vh', 'data-fly')) === '0' && dist(back, ghostAt) < 1e-3, `Esc returns to the shot (camera ${dist(back, ghostAt).toFixed(4)} m from the shot's pose)`);
+  // the end of the shot: a card with a way on (the next home, another shot, what the Core is), not a dead end
+  await page.click('.vh-shots .vh-chip[data-shot="door-to-core"]');
+  if ((await page.getAttribute('.vh', 'data-playing')) === '1') await page.click('.vh-play');
+  await setScrub(page, 1000);
+  await sleep(300);
+  const endCard = await page.isVisible('.vh-end') && await page.isVisible('.vh-end [data-act="next"]') && await page.isVisible('.vh-end a[href^="https://ci.computer"]');
+  ok(endCard, `the end of the shot offers ${(await page.$$eval('.vh-end button:not([hidden])', (bs: Element[]) => bs.map(b => (b.textContent || '').trim()))).join(', ')}`);
+  await setScrub(page, 500);
+  await sleep(200);
+  ok(!(await page.isVisible('.vh-end')), 'the end card goes when the shot is moved back');
+  await shot(page, `player-${id}-${label}-back`);
   if (full) {
     // share: the copied link is the home's share page (its preview tags name the home: a link unfurler never runs
     // the player), and it reopens the player at the same moment
@@ -358,6 +429,7 @@ async function failureCases() {
     const card = await page.waitForSelector('.vh-fail', { timeout: 60000 }).catch(() => null);
     const state = await page.evaluate(() => document.documentElement.dataset.viewer);
     ok(!!card && state === 'failed' && (await page.isVisible('.vh-fail a[href="./index.html"]')) && (await page.isVisible('.vh-fail button')), `${file} not downloading: a card with Try again and See all homes (${state})`);
+    ok(!/Room Creator|SimsTree/.test(await page.title()) && await page.isVisible('.vh-boot-back'), `the tab says "${await page.title()}", and a back arrow shows`);
     await shot(page, `failure-${file.replace('.js', '')}`);
     await close();
   }
@@ -393,6 +465,7 @@ async function editor() {
 try {
   await gallery({ width: 1440, height: 900 }, false, '1440');
   await gallery({ width: 390, height: 844 }, true, '390');
+  await previews();
   for (const [i, id] of HOUSES.entries()) await player(id, { width: 1440, height: 900 }, false, '1440', i === 0);
   await player(HOUSES[0], { width: 390, height: 844 }, true, '390', false);
   await motion(HOUSES[0]);
