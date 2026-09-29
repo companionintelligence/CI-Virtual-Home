@@ -42,7 +42,9 @@ export function createSpecies(K) {
   const colorAll = (geo, [r, g, b]) => { const n = geo.attributes.position.count, c = new Float32Array(n * 3); for (let i = 0; i < n; i++) { c[i * 3] = r; c[i * 3 + 1] = g; c[i * 3 + 2] = b; } geo.setAttribute('color', new THREE.BufferAttribute(c, 3)); return geo; };
   // a shell of small clusters over a surface given by f(u, v) → point, clipped-looking (flat, dense, even)
   function clipped(r, surf, n, size, { dark = 0.55, core = null } = {}) {
-    const base = clusterGeo(r, { detail: 1, rough: 0.12, squash: 0.9 }), geos = [];
+    // (a clipped shape is a shell of small flat clusters: 20 triangles a cluster, more of them — 80 apiece cost ten
+    // thousand triangles a topiary ball, on a plant a metre across)
+    const base = clusterGeo(r, { detail: 0, rough: 0.12, squash: 0.9 }), geos = [];
     if (core) geos.push(tintGeo(core, 0.42));
     const e = new THREE.Euler();
     for (let i = 0; i < n; i++) {
@@ -166,13 +168,13 @@ export function createSpecies(K) {
     }
     if (kind === 'flower') {
       switch (name) {
-        case 'lavender': return flowerSpecies(r, 'lavender', { foliage: 0.55, flat: 0.62, heads: 26, lift: 0.45, leaf: LEAF.lavender, scale: 1.3 });
-        case 'spike': return flowerSpecies(r, 'spike', { foliage: 0.35, flat: 0.45, heads: 6, lift: 0.65, headKind: 'spike', scale: 1.8 });
+        case 'lavender': return flowerSpecies(r, 'lavender', { foliage: 0.55, flat: 0.62, heads: 14, lift: 0.45, leaf: LEAF.lavender, scale: 1.4 });
+        case 'spike': return flowerSpecies(r, 'spike', { foliage: 0.35, flat: 0.45, heads: 5, lift: 0.65, headKind: 'spike', scale: 1.8 });
         case 'allium': return flowerSpecies(r, 'allium', { foliage: 0.3, grass: true, heads: 3, lift: 0.7, headKind: 'allium', scale: 1.4 });
-        case 'rose': return flowerSpecies(r, 'rose', { foliage: 0.9, flat: 0.8, heads: 16, lift: 0.02, headKind: 'rose', scale: 1.1 });
+        case 'rose': return flowerSpecies(r, 'rose', { foliage: 0.9, flat: 0.8, heads: 11, lift: 0.02, headKind: 'rose', scale: 1.2 });
         case 'tulip': return flowerSpecies(r, 'tulip', { foliage: 0.45, flat: 0.45, heads: 7, lift: 0.5, scale: 1.1 });
-        case 'daisy': return flowerSpecies(r, 'daisy', { foliage: 0.8, flat: 0.5, heads: 12, lift: 0.08, scale: 1.1 });
-        default: return flowerSpecies(r, 'bloom', { foliage: 0.85, flat: 0.5, heads: 12, lift: 0.04, scale: 1.1 });
+        case 'daisy': return flowerSpecies(r, 'daisy', { foliage: 0.8, flat: 0.5, heads: 9, lift: 0.08, scale: 1.15 });
+        default: return flowerSpecies(r, 'bloom', { foliage: 0.85, flat: 0.5, heads: 9, lift: 0.04, scale: 1.15 });
       }
     }
     if (kind === 'shrub') {
@@ -185,10 +187,10 @@ export function createSpecies(K) {
           const fol = bushGeo(r, 0.3, { n: 8, size: 0.1, flat: 0.45, detail: 0 }), spots = topSpots(fol, r, 8, 0.6), u = unit(fol, spots);
           return { geo: u.geo, leaf: pick(r, [0x6f8a5e, 0x7a9468]), heads: { geo: headFlat(r), spots: u.spots, lift: 0.02, scale: 1 }, foliage: 0.9 };
         }
-        case 'boxwood': return { geo: unit(clipped(r, (u, v) => { const th = Math.acos(1 - 1.7 * u), ph = v * Math.PI * 2; return V(Math.sin(th) * Math.cos(ph), 0.5 + Math.cos(th) * 0.5, Math.sin(th) * Math.sin(ph)); }, 70, 0.2, { core: sphere(0.92, 0.5, 0.5) })).geo, leaf: pick(r, LEAF.box) };
-        case 'topiary-ball': return { geo: unit(clipped(r, (u, v) => { const th = Math.acos(1 - 1.85 * u), ph = v * Math.PI * 2; return V(Math.sin(th) * Math.cos(ph), 1 + Math.cos(th), Math.sin(th) * Math.sin(ph)); }, 110, 0.19, { core: sphere(0.95, 1, 1) })).geo, leaf: pick(r, LEAF.box) };
-        case 'topiary-cone': return { geo: unit(clipped(r, (u, v) => { const y = u * 2.6, rr = (1 - u) * 0.8 + 0.03, ph = v * Math.PI * 2; return V(Math.cos(ph) * rr, y + 0.05, Math.sin(ph) * rr); }, 120, 0.16, { core: cone(0.78, 2.6) })).geo, leaf: pick(r, LEAF.box) };
-        case 'columnar': return { geo: unit(clipped(r, (u, v) => { const y = u * 3, prof = u < 0.25 ? 0.75 + u : Math.pow(1 - (u - 0.25) / 0.75, 0.7) * 0.95 + 0.06, ph = v * Math.PI * 2; return V(Math.cos(ph) * prof * 0.5, y, Math.sin(ph) * prof * 0.5); }, 110, 0.16, { core: cone(0.45, 3) })).geo, leaf: pick(r, [0x2e4a34, 0x32503a]) };
+        case 'boxwood': return { geo: unit(clipped(r, (u, v) => { const th = Math.acos(1 - 1.7 * u), ph = v * Math.PI * 2; return V(Math.sin(th) * Math.cos(ph), 0.5 + Math.cos(th) * 0.5, Math.sin(th) * Math.sin(ph)); }, 60, 0.21, { core: sphere(0.92, 0.5, 0.5) })).geo, leaf: pick(r, LEAF.box) };
+        case 'topiary-ball': return { geo: unit(clipped(r, (u, v) => { const th = Math.acos(1 - 1.85 * u), ph = v * Math.PI * 2; return V(Math.sin(th) * Math.cos(ph), 1 + Math.cos(th), Math.sin(th) * Math.sin(ph)); }, 92, 0.2, { core: sphere(0.95, 1, 1) })).geo, leaf: pick(r, LEAF.box) };
+        case 'topiary-cone': return { geo: unit(clipped(r, (u, v) => { const y = u * 2.6, rr = (1 - u) * 0.8 + 0.03, ph = v * Math.PI * 2; return V(Math.cos(ph) * rr, y + 0.05, Math.sin(ph) * rr); }, 104, 0.17, { core: cone(0.78, 2.6) })).geo, leaf: pick(r, LEAF.box) };
+        case 'columnar': return { geo: unit(clipped(r, (u, v) => { const y = u * 3, prof = u < 0.25 ? 0.75 + u : Math.pow(1 - (u - 0.25) / 0.75, 0.7) * 0.95 + 0.06, ph = v * Math.PI * 2; return V(Math.cos(ph) * prof * 0.5, y, Math.sin(ph) * prof * 0.5); }, 104, 0.17, { core: cone(0.45, 3) })).geo, leaf: pick(r, [0x2e4a34, 0x32503a]) };
         case 'groundcover': return { geo: unit(bushGeo(r, 0.35, { n: 10, size: 0.1, flat: 0.42, detail: 0 })).geo, leaf: pick(r, [0x44633a, 0x4f6b3e, 0x3d5a36]) };
         case 'silver': return { geo: unit(bushGeo(r, 0.35, { n: 10, size: 0.1, flat: 0.5, detail: 0 })).geo, leaf: pick(r, LEAF.silver) };
         case 'rosemary': return { geo: unit(blades(r, { n: 40, len: 1, wide: 0.025, rise: [1.05, 1.45], arch: 0.1, seg: 4, tone: [0.7, 1.0] })).geo, leaf: pick(r, LEAF.rosemary), side: THREE.DoubleSide };
@@ -216,13 +218,13 @@ export function createSpecies(K) {
   // a hydrangea mophead: a ball of tiny florets
   function headBall(r, rad) {
     const parts = [];
-    for (let i = 0; i < 14; i++) { const u = r() * 2 - 1, a = r() * 6.28, s = Math.sqrt(1 - u * u), f = new THREE.IcosahedronGeometry(rad * 0.34, 0); f.translate(Math.cos(a) * s * rad * 0.75, Math.abs(u) * rad * 0.6, Math.sin(a) * s * rad * 0.75); parts.push(f); }
+    for (let i = 0; i < 10; i++) { const u = r() * 2 - 1, a = r() * 6.28, s = Math.sqrt(1 - u * u), f = new THREE.OctahedronGeometry(rad * 0.42, 0); f.translate(Math.cos(a) * s * rad * 0.75, Math.abs(u) * rad * 0.6, Math.sin(a) * s * rad * 0.75); parts.push(f); }
     return merged(parts);
   }
   // a flat sedum head: a low dome of tiny florets
   function headFlat(r) {
     const parts = [];
-    for (let i = 0; i < 9; i++) { const a = r() * 6.28, d = r() * 0.05, f = new THREE.IcosahedronGeometry(0.014, 0); f.translate(Math.cos(a) * d, 0.01 - d * 0.2, Math.sin(a) * d); parts.push(f); }
+    for (let i = 0; i < 7; i++) { const a = r() * 6.28, d = r() * 0.05, f = new THREE.OctahedronGeometry(0.018, 0); f.translate(Math.cos(a) * d, 0.01 - d * 0.2, Math.sin(a) * d); parts.push(f); }
     return merged(parts);
   }
   return { build };

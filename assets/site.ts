@@ -554,24 +554,25 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
   function flowerHead(kind, r) {
     const petals = [], centre = [];
     if (kind === 'lavender') {
-      for (let i = 0; i < 16; i++) { const t = i / 16, y = t * 0.16, a = i * 2.4 + r() * 0.5, rr = (1 - t) * 0.03 + 0.006; const f = new THREE.IcosahedronGeometry(0.016 * (1 - t * 0.4), 0); f.translate(Math.cos(a) * rr, y, Math.sin(a) * rr); petals.push(f); }
+      // (florets are octahedra — 8 triangles a floret; at a centimetre across an icosahedron's 20 read no better)
+      for (let i = 0; i < 12; i++) { const t = i / 12, y = t * 0.16, a = i * 2.4 + r() * 0.5, rr = (1 - t) * 0.03 + 0.006; const f = new THREE.OctahedronGeometry(0.02 * (1 - t * 0.4), 0); f.translate(Math.cos(a) * rr, y, Math.sin(a) * rr); petals.push(f); }
     } else if (kind === 'tulip') {
       for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + r() * 0.1, p = new THREE.ConeGeometry(0.04, 0.12, 4); p.translate(0, 0.06, 0); p.rotateZ(0.4); p.rotateY(-a); p.translate(Math.cos(a) * 0.025, 0, Math.sin(a) * 0.025); petals.push(p); }
     } else if (kind === 'daisy') {
       for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2 + r() * 0.08, p = new THREE.ConeGeometry(0.018, 0.075, 3); p.rotateZ(Math.PI / 2); p.translate(0.06, 0, 0); p.rotateY(-a); petals.push(p); }
-      const c = new THREE.IcosahedronGeometry(0.03, 1); c.scale(1, 0.55, 1); c.translate(0, 0.008, 0); centre.push(c);
+      const c = new THREE.IcosahedronGeometry(0.03, 0); c.scale(1, 0.55, 1); c.translate(0, 0.008, 0); centre.push(c);
     } else if (kind === 'spike') {
       // a delphinium / foxglove spike: florets up a long tapering head
-      for (let i = 0; i < 22; i++) { const t = i / 22, y = t * 0.34, a = i * 2.4 + r() * 0.5, rr = (1 - t) * 0.045 + 0.008; const f = new THREE.IcosahedronGeometry(0.02 * (1 - t * 0.5), 0); f.translate(Math.cos(a) * rr, y, Math.sin(a) * rr); petals.push(f); }
+      for (let i = 0; i < 16; i++) { const t = i / 16, y = t * 0.34, a = i * 2.4 + r() * 0.5, rr = (1 - t) * 0.045 + 0.008; const f = new THREE.OctahedronGeometry(0.026 * (1 - t * 0.5), 0); f.translate(Math.cos(a) * rr, y, Math.sin(a) * rr); petals.push(f); }
     } else if (kind === 'allium') {
       // a globe of florets
-      for (let i = 0; i < 26; i++) { const u = r() * 2 - 1, a = r() * Math.PI * 2, q = Math.sqrt(1 - u * u), f = new THREE.IcosahedronGeometry(0.014, 0); f.translate(Math.cos(a) * q * 0.055, 0.055 + u * 0.055, Math.sin(a) * q * 0.055); petals.push(f); }
+      for (let i = 0; i < 20; i++) { const u = r() * 2 - 1, a = r() * Math.PI * 2, q = Math.sqrt(1 - u * u), f = new THREE.OctahedronGeometry(0.018, 0); f.translate(Math.cos(a) * q * 0.055, 0.055 + u * 0.055, Math.sin(a) * q * 0.055); petals.push(f); }
     } else if (kind === 'rose') {
       // a cupped rose: a tight ball of petals, a ring of looser ones round it
-      const c = new THREE.IcosahedronGeometry(0.026, 1); c.scale(1, 0.85, 1); c.translate(0, 0.024, 0); petals.push(c);
-      for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + r() * 0.3, p = new THREE.IcosahedronGeometry(0.018, 0); p.scale(1, 0.6, 0.8); p.translate(Math.cos(a) * 0.028, 0.012, Math.sin(a) * 0.028); petals.push(p); }
+      const c = new THREE.IcosahedronGeometry(0.026, 0); c.scale(1, 0.85, 1); c.translate(0, 0.024, 0); petals.push(c);
+      for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + r() * 0.3, p = new THREE.OctahedronGeometry(0.02, 0); p.scale(1, 0.6, 0.8); p.translate(Math.cos(a) * 0.028, 0.012, Math.sin(a) * 0.028); petals.push(p); }
     } else {
-      for (let i = 0; i < 5; i++) { const a = r() * Math.PI * 2, d = r() * 0.03, b = new THREE.IcosahedronGeometry(0.035 + r() * 0.015, 0); b.translate(Math.cos(a) * d, r() * 0.03, Math.sin(a) * d); petals.push(b); }
+      for (let i = 0; i < 5; i++) { const a = r() * Math.PI * 2, d = r() * 0.03, b = new THREE.OctahedronGeometry(0.04 + r() * 0.018, 0); b.translate(Math.cos(a) * d, r() * 0.03, Math.sin(a) * d); petals.push(b); }
     }
     return { petals: merged(petals), centre: centre.length ? merged(centre) : null };
   }
@@ -851,7 +852,9 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
       // a mound's leaves reach a little past its planting radius (the planner spaces by r; crowns should touch)
       const k = /^shrub:(mound|spreading|groundcover|silver|hosta|sedum|boxwood|hydrangea)$|^flower:/.test(info.draw) ? 1.15 : 1;
       const inst = list.map(p => ({ x: p.x, y: p.y + lift - (S.rock ? p.h * 0.25 : 0.02), z: p.z, ry: p.rot, sx: p.r * k, sy: p.h * fol, sz: p.r * k, tint: p.tint }));
-      g.add(instanced(S.geo, mat, inst, `Plants (${sp})`, { iso: false }));
+      // (a plant under half a metre casts a shadow the size of itself: not worth a second pass over its triangles)
+      const casts = info.h[1] > 0.55;
+      const body = instanced(S.geo, mat, inst, `Plants (${sp})`, { iso: false }); body.castShadow = casts; g.add(body);
       const shape = sp === 'topiary-cone' || sp === 'columnar' ? 'cone' : 'blob';
       for (const p of list) iso.push({ part: sp, shape, color: css(S.leaf), box: [p.x - p.r, p.y + lift, p.z - p.r, p.x + p.r, p.y + lift + p.h * fol, p.z + p.r] });
       if (!S.heads) continue;
@@ -871,9 +874,9 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
       const hm = new THREE.InstancedMesh(H.geo, M(0xffffff, { roughness: 0.75, flatShading: true }), heads.length);
       heads.forEach((h, i) => { _e.set(h.rx, h.ry, h.rz); _q.setFromEuler(_e); hm.setMatrixAt(i, _m4.compose(_p.set(h.x, h.y, h.z), _q, _s.set(h.s, h.s, h.s))); hm.setColorAt(i, _c.setHex(h.c).multiplyScalar(h.t)); });
       hm.instanceMatrix.needsUpdate = true; if (hm.instanceColor) hm.instanceColor.needsUpdate = true;
-      hm.castShadow = true; hm.receiveShadow = true; hm.name = `Flower heads (${sp})`; hm.userData.iso = false; g.add(hm);
-      if (H.centre) g.add(instanced(H.centre, M(0xc99a3c, { roughness: 0.7 }), heads.map(h => ({ ...h, sx: h.s, sy: h.s, sz: h.s, tint: 1 })), `Flower centres (${sp})`, { iso: false }));
-      if (stems.length) { const stem = new THREE.CylinderGeometry(0.006, 0.01, 1, 4); stem.translate(0, 0.5, 0); g.add(instanced(stem, M(0x4f6a3c, { roughness: 0.9 }), stems, `Flower stems (${sp})`, { iso: false })); }
+      hm.castShadow = casts; hm.receiveShadow = true; hm.name = `Flower heads (${sp})`; hm.userData.iso = false; g.add(hm);
+      if (H.centre) { const c = instanced(H.centre, M(0xc99a3c, { roughness: 0.7 }), heads.map(h => ({ ...h, sx: h.s, sy: h.s, sz: h.s, tint: 1 })), `Flower centres (${sp})`, { iso: false }); c.castShadow = false; g.add(c); }
+      if (stems.length) { const stem = new THREE.CylinderGeometry(0.006, 0.01, 1, 4); stem.translate(0, 0.5, 0); const st = instanced(stem, M(0x4f6a3c, { roughness: 0.9 }), stems, `Flower stems (${sp})`, { iso: false }); st.castShadow = false; g.add(st); }
     }
     return iso;
   }
