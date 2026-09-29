@@ -21,9 +21,9 @@
   <!--
     The portal's gallery. Static and fast: it reads content/houses/index.json and shows the committed thumbnails
     in portal/thumbs/ (scripts/build-thumbs.mts); there is no WebGL on this page. A card opens the live player,
-    room-creator.html?mode=view (assets/viewer.ts). Every URL here is relative, because GitHub Pages serves the
-    site under a sub-path (/ci-virtual-home/). Fonts are the repo's own woff2, so this page makes no third-party
-    requests.
+    room-creator.html?mode=view (assets/viewer.ts). Every URL here is relative, so the site works at any host's
+    root and under a sub-path (portal:test serves it at /ci-virtual-home/). Fonts are the repo's own woff2, so
+    this page makes no third-party requests.
   -->
   <link rel="icon" href="./assets/brand/ci-logo-mark.svg" type="image/svg+xml">
   <link rel="preload" href="./assets/fonts/manrope-latin-var.woff2" as="font" type="font/woff2" crossorigin>

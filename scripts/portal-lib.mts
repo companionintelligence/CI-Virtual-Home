@@ -1,6 +1,6 @@
 // Shared by the portal scripts (build-thumbs.mts, build-portal.mts, test-portal.mts): the repo root, Playwright
-// resolution, a static server that can mount a directory under a sub-path (GitHub Pages serves the site at
-// /ci-virtual-home/, so the portal is tested there, not at /), and the Google Fonts stub every capture uses.
+// resolution, a static server that can mount a directory under a sub-path (the portal is tested at
+// /ci-virtual-home/, not at /, so a root-relative URL cannot pass), and the Google Fonts stub every capture uses.
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
@@ -45,7 +45,7 @@ export const FONT_FILES: Record<string, string> = { manrope: 'manrope-latin-var.
 
 export type Served = { port: number; origin: string; base: string; url: (p?: string) => string; close: () => Promise<void>; requests: string[] };
 
-// Serve `dir` at `base` (e.g. '/ci-virtual-home/'). Anything outside `base` is a 404, like Pages, so a URL that
+// Serve `dir` at `base` (e.g. '/ci-virtual-home/'). Anything outside `base` is a 404, so a URL that
 // escapes the sub-path (a leading-slash href) fails the test instead of quietly working. A directory serves its
 // index.html. /__fonts/<name> serves assets/fonts/ for the Google Fonts stub.
 export async function serve(dir: string, base = '/', listenPort = 0): Promise<Served> {
