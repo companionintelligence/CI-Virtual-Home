@@ -22,7 +22,7 @@
 //
 // Which vocabulary and rule belong to which stream (plan §2):
 //   S1 kit    heroSurfaces, heroDevices, heroPoses, openingTypes
-//   S2 arch   roofTypes, floors, stairTypes · rules 'stairs', 'raised-level'
+//   S2 arch   roofTypes, floors, stairTypes · rules 'stairs', 'raised-level', 'footprint-rects', 'partition-axis-aligned'
 //   S4 site   grounds (+ SITE_KIT_TYPES in assets/site.ts) · rule 'site-needs'
 //   S5 shot   shotTypes, shotWalls, shotRoofs · rule 'shot-duration'
 
@@ -45,12 +45,17 @@ export type VocabKey = typeof VOCAB_KEYS[number];
 export type Vocab = { readonly [K in VocabKey]: readonly string[] };
 
 /** The core rules a plugin may replace:
+ *   'footprint-rects'         each level's footprint is a non-empty array of rects; a level whose footprint is not is
+ *                             reported, and the core skips the rest of its geometry checks (openings, partitions,
+ *                             stairs, rooms). Replaced: not reported, the skip stays — the plugin checks its own kind
+ *                             of footprint (S2's polygon plans) and that level's geometry
+ *   'partition-axis-aligned'  a partition runs along X or Z. Replaced: not reported (S2's angled partitions)
  *   'stairs'         levels[].stairs is one object with a known `type` and an `at`
  *   'raised-level'   a storey above y 0 has stairs leading to it (a `stairs.to` naming it), voids over the
  *                    stairwell (warn), and no balustrade across the stair's step-off
  *   'site-needs'     each site type's geometry: fence / wall-low from+to, path / hedge a path, bed poly or at, else at
  *   'shot-duration'  shots[].duration is 2–60 s, and door-to-core's at least 8 s */
-export const RULES = ['stairs', 'raised-level', 'site-needs', 'shot-duration'] as const;
+export const RULES = ['footprint-rects', 'partition-axis-aligned', 'stairs', 'raised-level', 'site-needs', 'shot-duration'] as const;
 export type Rule = typeof RULES[number];
 
 export interface ValidateContext {

@@ -1,13 +1,16 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // One catalog for every consumer. Builds every item type — the page's ITEMS and the registry's props — alone in
 // headless Chromium, measures its box, and writes content/house-catalog.json:
-//   { types: { <type>: { footprint: [w, d], height, surface, source: 'page'|'registry', params, tags, iso } } }
+//   { types: { <type>: { footprint: [w, d], height, surface, source: 'page'|'registry', params, tags, iso, place? } } }
 // house-builder's obstacle rule, the validator and generate_house_iso.py read it,
-// so a prop's size is stated once (by its geometry) instead of copied by hand into six places.
+// so a prop's size is stated once (by its geometry) instead of copied by hand into six places. A registry prop's
+// params / tags / surface / iso / place are its definition's (assets/props/*.ts); a page type's are assets/item-meta.ts's
+// (item-map.ts's ITEM_PARAMS and SURFACE_ITEMS, S3's props/page-place.ts) — one shape either way.
 //   pnpm run catalog      (node --experimental-strip-types scripts/build-prop-catalog.mts — any cwd)
 import fs from 'node:fs'; import path from 'node:path'; import http from 'node:http';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const { PROPS } = await import(path.join(ROOT, 'assets', 'props', 'index.js'));
+const { pageItemDef } = await import(path.join(ROOT, 'assets', 'item-meta.js'));
 async function loadPlaywright() {
   try { return await import('playwright'); } catch {}
   const { pathToFileURL } = await import('node:url'); const os = await import('node:os');
@@ -42,8 +45,8 @@ await browser.close(); server.close();
 const types = {};
 for (const [t, m] of Object.entries(measured)) {
   if (m.error) { console.log(`✗ ${t}: ${m.error}`); continue; }
-  const [x0, y0, z0, x1, y1, z1] = m.box; const def = PROPS.get(t);
-  types[t] = { footprint: [+(x1 - x0).toFixed(2), +(z1 - z0).toFixed(2)], height: +(y1 - y0).toFixed(2), box: m.box, surface: !!(def && def.surface) || ['curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers'].includes(t), source: m.source, params: def ? def.params : [], tags: def ? def.tags : [], iso: def && def.iso ? def.iso : null };
+  const [x0, y0, z0, x1, y1, z1] = m.box; const def = m.source === 'registry' ? PROPS.get(t) : pageItemDef(t);
+  types[t] = { footprint: [+(x1 - x0).toFixed(2), +(z1 - z0).toFixed(2)], height: +(y1 - y0).toFixed(2), box: m.box, surface: !!(def && def.surface), source: m.source, params: def ? def.params : [], tags: def ? def.tags : [], iso: def && def.iso ? def.iso : null, ...(def && def.place ? { place: def.place } : {}) };
 }
 const out = path.join(ROOT, 'content', 'house-catalog.json');
 fs.writeFileSync(out, JSON.stringify({ generated: 'build-prop-catalog.mjs', types }, null, 1));

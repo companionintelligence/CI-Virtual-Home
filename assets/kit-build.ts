@@ -8,6 +8,8 @@
 //   kitAnchors(kit, spec)                    house-builder.ts   anchors.kit → <id>.plan.json's `kit`
 //   openingParams(op, height, isEntry, ctx)  structure-build.ts one opening → createParametricWall's opening
 //   noteOpening(ctx)                         structure-build.ts every opening as its wall places it (anchors.doors …)
+//   notePartition(ctx)                       structure-build.ts every partition as it is placed (its door leaf …)
+//   finishBuild(ctx)                         house-builder.ts   once, when everything is built, before the light
 //   wallCladding(kit, ctx)                   structure-build.ts a perimeter wall's exterior material
 //   partitionParams(p, ctx)                  structure-build.ts a partition's colours and its door unit
 //   ceilingMaterial(ctx)                     structure-build.ts an upper slab's underside, a top storey's ceiling
@@ -48,9 +50,20 @@ export function createKitBuild(bctx) {
     if (op.type === 'garage') return { type: 'door', width: op.w, height: op.h || 2.2, style: 'garage' };
     return { type: 'door', width: op.w, height: op.h || 2.1, style: op.style || 'entry', open: isEntry || op.open === true, entry: !!isEntry, leafColor: op.color ? hex(op.color) : undefined };
   }
-  // ctx: { spec, defaults, lv, anchors, op, param, side, y, isEntry } — called once per opening a perimeter wall
-  // places, after its wall is built. Records nothing yet (S1: anchors.doors / anchors.openings).
+  // ctx: { spec, defaults, lv, anchors, op, param, side, y, isEntry, wall, edge, centre, rotY } — called once per
+  // opening a perimeter wall places, after its wall is built, placed and turned. `wall` is that placed wall object (the
+  // hook reads a leaf group's userData.door off it, walking `wall`, and pushes anchors.doors / anchors.openings; it
+  // never re-derives the hinge geometry), `edge` the perimeter edge it stands on, `centre` its plan centre [x, z] and
+  // `rotY` its rotation.y. Records nothing yet (S1).
   function noteOpening(ctx) {}
+  // ctx: { spec, defaults, lv, anchors, p, wall, y, centre, len, alongX, doorOffset } — called once per partition,
+  // after its wall is placed and turned: `p` is the spec's partition, `wall` the object, `doorOffset` the doorway's
+  // local offset (null: none). Records nothing yet (S1: the door leaf on a partition, for anchors.doors).
+  function notePartition(ctx) {}
+  // ctx: { spec, defaults, anchors, kit, placed } — called once, after every level, the hero, the roofs and the site
+  // are built and before the light: the place for anything that needs the whole house (S1: the order of
+  // anchors.doors / anchors.openings, a scene-wide pass).
+  function finishBuild(ctx) {}
   // ctx: { spec, defaults, lv, edge } — the exterior material of one perimeter wall
   function wallCladding(kit, ctx?) {
     return kit.cladding();
@@ -80,6 +93,6 @@ export function createKitBuild(bctx) {
     });
   }
 
-  return { housePalette, houseKit, kitAnchors, openingParams, noteOpening, wallCladding, partitionParams, ceilingMaterial, themeItem, lightHouse, specDefaults };
+  return { housePalette, houseKit, kitAnchors, openingParams, noteOpening, notePartition, finishBuild, wallCladding, partitionParams, ceilingMaterial, themeItem, lightHouse, specDefaults };
 }
 export type KitBuild = ReturnType<typeof createKitBuild>;
