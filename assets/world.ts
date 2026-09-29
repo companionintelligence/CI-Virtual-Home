@@ -132,6 +132,13 @@ function createMesher() {
     quad(key, [x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1], c);
     quad(key, [x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1], c);
   }
+  // a board along a → b, its foot at ya at a and yb at b (a fence run on a slope is raked, not level), h tall, t thick
+  function raked(key: string, a: P2, b: P2, ya: number, yb: number, h: number, t: number) {
+    const dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz) || 1, nx = -dz / L * t / 2, nz = dx / L * t / 2;
+    const P = (p: P2, y: number, sgn: number): P3 => [p[0] + nx * sgn, y, p[1] + nz * sgn], c: P3 = [(a[0] + b[0]) / 2, (ya + yb) / 2 + h / 2, (a[1] + b[1]) / 2];
+    const A0 = P(a, ya, 1), A1 = P(a, ya, -1), B0 = P(b, yb, 1), B1 = P(b, yb, -1), A0t = P(a, ya + h, 1), A1t = P(a, ya + h, -1), B0t = P(b, yb + h, 1), B1t = P(b, yb + h, -1);
+    quad(key, A0, B0, B0t, A0t, c); quad(key, A1, B1, B1t, A1t, c); quad(key, A0t, B0t, B1t, A1t, c); quad(key, A0, A0t, A1t, A1, c); quad(key, B0, B0t, B1t, B1, c); quad(key, A0, B0, B1, A1, c);
+  }
   // a flat slab over a convex plan polygon, top at y1 (no bottom — it sits on the ground)
   function prism(key: string, poly: P2[], y0: number, y1: number) {
     const cx = poly.reduce((a, p) => a + p[0], 0) / poly.length, cz = poly.reduce((a, p) => a + p[1], 0) / poly.length, c: P3 = [cx, (y0 + y1) / 2, cz];
@@ -164,7 +171,7 @@ function createMesher() {
     g.computeBoundingSphere();
     return g;
   }
-  return { tri, quad, box, prism, geometry, keys: () => [...buckets.keys()], transform: (f: (p: P3) => P3) => { xf = f; }, reset: () => { xf = p => p; } };
+  return { tri, quad, box, prism, raked, geometry, keys: () => [...buckets.keys()], transform: (f: (p: P3) => P3) => { xf = f; }, reset: () => { xf = p => p; } };
 }
 
 // A soft round decal (tree blobs, lamp pools): white centre fading to nothing
@@ -271,12 +278,15 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
       const span3 = (c0: number, c1: number): [number, number, number, number] => sd === 'N' ? [-R, -hd - c1, R, -hd - c0] : sd === 'S' ? [-R, hd + c0, R, hd + c1] : sd === 'E' ? [hw + c0, -R, hw + c1, R] : [-hw - c1, -R, -hw - c0, R];
       const clipStreet = (r: Rect): Rect => (sd === side ? r : { ...r, z1: Math.min(r.z1, zLot - 0.5) });   // water beside the street stops at it
       // (the bank starts 2 cm off the lot line: the disc's hole for it must not share an edge with the lot's)
-      const [a0, b0, a1, b1] = span3(0.02, E), [c0, d0, c1, d1] = span3(E, E + width);
+      // (water on the street's own side lies across the street — the road runs along its bank: its strips start at the far
+      // side of the street's cross-section, not at the lot line, where the walk, the verge and the road are)
+      const off = sd === side && !noStreet ? zFar - zLot : 0;
+      const [a0, b0, a1, b1] = span3(0.02 + off, E + off), [c0, d0, c1, d1] = span3(E + off, E + width + off);
       const out = L(...({ S: [0, 1], N: [0, -1], E: [1, 0], W: [-1, 0] }[sd] as P2));
       waterSides.push({
         kind, edge, farBank, out, along: Math.abs(out[1]) > 0.5 ? 'x' : 'z',
         bank: clipStreet(localRect(a0, b0, a1, b1)), water: clipStreet(localRect(c0, d0, c1, d1)),
-        far: finite ? (() => { const [e0, f0, e1, f1] = span3(E + width, E + width + E); return clipStreet(localRect(e0, f0, e1, f1)); })() : null,
+        far: finite ? (() => { const [e0, f0, e1, f1] = span3(E + width + off, E + width + E + off); return clipStreet(localRect(e0, f0, e1, f1)); })() : null,
       });
     }
   }
@@ -288,6 +298,17 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   const hillPh = rngFor('hill')();
   const hillRise = (x: number, d: number) => { const k = Math.min(1, d / 58); return 24 * k * k * (3 - 2 * k) + 3 * Math.sin(x * 0.045 + hillPh * 6.28) * Math.min(1, d / 30); };
   const hillY = hillside ? (x: number, zz: number) => { const d = -LD / 2 - 5 - zz; return d <= 0 ? 0 : hillRise(x, d); } : (_x: number, _z: number) => 0;
+  // The hill's neighbours: each back-row house stands on a level PAD — cut into the slope behind it, filled in front — its ground
+  // blended back into the natural slope over PAD_RAMP m. `terrainY` is the ground there, pads and all (`hillY` alone is the slope
+  // as it would be): a house on the slope neither hovers over it nor sinks into it, and fences and trees follow it.
+  const PAD_RAMP = 4.5, pads: Array<{ r: Rect; y: number }> = [];
+  const smooth01 = (t: number) => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
+  const terrainY = (x: number, zz: number) => {
+    let y = hillY(x, zz); if (!pads.length) return y;
+    const fade = smooth01((-LD / 2 - 5 - zz) / 2);   // (the ground before the slope begins is level: pads fade out before it)
+    for (const p of pads) { const d = rectDist(x, zz, p.r), w = d <= 0 ? 1 : smooth01(1 - d / PAD_RAMP); y += (p.y - y) * w * fade; }
+    return y;
+  };
 
   const m = createMesher();
   // aprons: x range + which side; each cuts its sidewalk and curb
@@ -357,7 +378,7 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     const z0 = Math.min(-p.D / 2, g ? p.D / 2 - g.off - g.GD : Infinity) - eave;
     return { x0: x0 - eave, x1: x1 + eave, z0, z1 };
   };
-  type House = { p: Plan; ox: number; oz: number; facing: number; row: 'near' | 'far' | 'back'; rect: Rect };
+  type House = { p: Plan; ox: number; oz: number; facing: number; row: 'near' | 'far' | 'back'; rect: Rect; padY?: number };
   const houses: House[] = [];
   // facing +1: the front looks toward +z (the street, for the near row); −1: toward −z
   const worldRect = (e: Rect, ox: number, oz: number, facing: number): Rect => facing > 0
@@ -506,7 +527,7 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   }
   function neighbour(h: House, idx: number) {
     const { p, ox, oz, facing, row } = h, r = rngFor(`house:${idx}`);
-    const hy = hillY(ox, oz);   // (a hillside: the house stands on the hill)
+    const hy = h.padY ?? hillY(ox, oz);   // (a hillside: the house stands on its pad on the hill)
     const toWorld = (q: P3): P3 => [ox + facing * q[0], q[1] + hy, oz + facing * q[2]];
     const toWorldRect = (x0: number, z0: number, x1: number, z1: number): Rect => {
       const a = toWorld([x0, 0, z0]), b = toWorld([x1, 0, z1]);
@@ -619,6 +640,12 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     const wx = toStreet(doorU), wz0 = oz + facing * stoopZ;
     if (Math.abs(wx - (dx0 + dx1) / 2) > dwW / 2 + 1) m.prism('concrete', [[wx - 0.6, Math.min(wz0, lotLine)], [wx + 0.6, Math.min(wz0, lotLine)], [wx + 0.6, Math.max(wz0, lotLine)], [wx - 0.6, Math.max(wz0, lotLine)]], Y.ground, 0.045);
   }
+  // a hillside's back row: one pad each, at the mean height of the slope under the house
+  if (hillside) for (const h of houses) if (h.row === 'back') {
+    const r = h.rect; let sum = 0, n = 0;
+    for (let i = 0; i <= 4; i++) for (let j = 0; j <= 4; j++) { sum += hillY(r.x0 + (r.x1 - r.x0) * i / 4, r.z0 + (r.z1 - r.z0) * j / 4); n++; }
+    h.padY = sum / n; pads.push({ r: { x0: r.x0 - 0.6, x1: r.x1 + 0.6, z0: r.z0 - 0.6, z1: r.z1 + 0.6 }, y: h.padY });
+  }
   houses.forEach(neighbour);
 
   // ---- back-yard fences: each neighbour's garden in a U of 1.3 m greige board fence, from just forward of its back wall;
@@ -637,6 +664,13 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     const fence = (a: P2, b: P2) => {
       const len = Math.hypot(b[0] - a[0], b[1] - a[1]), alongX = Math.abs(b[1] - a[1]) < 1e-6, mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2;
       if (len < 0.5) return;
+      if (hillside) {
+        // on a slope a run is a row of raked bays between posts that stand on the ground (a level fence is cut into a wedge)
+        const n = Math.max(1, Math.round(len / 2.4)), at = (i: number): P2 => [a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n];
+        for (let i = 0; i < n; i++) { const p0 = at(i), p1 = at(i + 1), y0 = terrainY(p0[0], p0[1]), y1 = terrainY(p1[0], p1[1]); m.raked('fence', p0, p1, y0 + 0.08, y1 + 0.08, 1.16, 0.05); m.raked('fence', p0, p1, y0 + 1.235, y1 + 1.235, 0.05, 0.1); }
+        for (let i = 0; i <= n; i++) { const p = at(i); m.box('fence', p[0], 0.68 + terrainY(p[0], p[1]), p[1], 0.1, 1.36, 0.1); }
+        return;
+      }
       const fy = hillY(mx, mz);
       m.box('fence', mx, 0.66 + fy, mz, alongX ? len : 0.05, 1.16, alongX ? 0.05 : len);         // boards
       m.box('fence', mx, 1.26 + fy, mz, alongX ? len + 0.1 : 0.1, 0.05, alongX ? 0.1 : len + 0.1);  // cap rail
@@ -788,53 +822,84 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
 
   // ---- S4: water on the lot's sides — the water (below the lot), its floor, the banks down to it -----------------
   const WY = -0.28, FLOOR = -1.1;
-  function quadMesh(pts: P3[], mat: any, name: string) {
-    const g = new THREE.BufferGeometry(), [a, b, c, d] = pts;
-    g.setAttribute('position', new THREE.Float32BufferAttribute([...a, ...b, ...c, ...a, ...c, ...d], 3));
-    // wind it to face up
-    const p = g.attributes.position, ux = b[0] - a[0], uz = b[2] - a[2], vx = c[0] - a[0], vz = c[2] - a[2];
-    if (uz * vx - ux * vz < 0) { p.setXYZ(1, ...c); p.setXYZ(2, ...b); p.setXYZ(4, ...d); p.setXYZ(5, ...c); }
-    g.computeVertexNormals(); const o = new THREE.Mesh(g, mat); o.receiveShadow = true; o.name = name; return o;
-  }
+  // The water of every side is one surface, built from CELLS: the lot's sides' strips (each side's bank, its water and, for a
+  // river or canal, the far bank) cut along every edge of every one of them, so a cell lies wholly inside or outside each
+  // strip. A cell in any side's water is water; any other cell is ground whose height at each corner is the LOWEST of
+  // what the sides make of it (a bank slopes from the ground down to the water's edge, a quay is flat, a far bank rises
+  // again) — so where two sides meet (a canal round a corner, a lake on three sides) the banks join in a mitre, the quay of
+  // one never runs on across the water of the other, and a bank never stands in a river. One side alone builds the strips
+  // it always did.
   function buildWater(gm: any) {
     const wmat = (typeof water === 'function' && water('water')) || new THREE.MeshStandardMaterial({ color: 0x35535c, roughness: 0.08, metalness: 0.1 });
     const floorM = std(0x2a3a36, { roughness: 1 });
     const sand = (kit && typeof kit.surface === 'function' && kit.surface('desert')) || std(0xc5ae88, { roughness: 0.95 });
     const stone = (typeof water === 'function' && water('stone', 0x9d968a)) || std(0x9d968a, { roughness: 0.95 });
-    for (const w of waterSides) {
-      const r = w.water, all = [w.bank, w.water, w.far].filter(Boolean).reduce((a, b) => ({ x0: Math.min(a.x0, b.x0), x1: Math.max(a.x1, b.x1), z0: Math.min(a.z0, b.z0), z1: Math.max(a.z1, b.z1) }));
-      const pl = new THREE.Mesh(new THREE.PlaneGeometry(r.x1 - r.x0, r.z1 - r.z0), wmat); pl.rotation.x = -Math.PI / 2; pl.position.set((r.x0 + r.x1) / 2, WY, (r.z0 + r.z1) / 2); pl.receiveShadow = true; pl.name = `World · ${w.kind}`; root.add(pl);
-      const fl = new THREE.Mesh(new THREE.PlaneGeometry(all.x1 - all.x0, all.z1 - all.z0), floorM); fl.rotation.x = -Math.PI / 2; fl.position.set((all.x0 + all.x1) / 2, FLOOR, (all.z0 + all.z1) / 2); fl.name = 'World · water floor'; root.add(fl);
-      // a bank: the strip from an edge at ground height down to the water's edge below it
-      const slope = (b: Rect, fromNear: boolean, mat: any, name: string) => {
-        const o = w.out, alongX = w.along === 'x', hi = Y.ground, lo = WY - 0.06;
-        const nearEdge = (o[0] + o[1] > 0) === fromNear ? 0 : 1;   // which side of the strip is at ground height
-        const P = (u: number, t: number, y: number): P3 => alongX ? [u, y, t] : [t, y, u];
-        const [u0, u1] = alongX ? [b.x0, b.x1] : [b.z0, b.z1], [t0, t1] = alongX ? [b.z0, b.z1] : [b.x0, b.x1];
-        const y0 = nearEdge === 0 ? hi : lo, y1 = nearEdge === 0 ? lo : hi;
-        root.add(quadMesh([P(u0, t0, y0), P(u1, t0, y0), P(u1, t1, y1), P(u0, t1, y1)], mat, name));
-      };
-      if (w.edge === 'wall') {
-        // a quay: the bank strip stays at ground height and drops at a stone wall with a coping
-        const o = w.out, alongX = w.along === 'x', b = w.bank, edgeT = (o[0] + o[1] > 0) ? (alongX ? b.z1 : b.x1) : (alongX ? b.z0 : b.x0);
-        const [u0, u1] = alongX ? [b.x0, b.x1] : [b.z0, b.z1];
-        const P = (u: number, t: number, y: number): P3 => alongX ? [u, y, t] : [t, y, u];
-        root.add(quadMesh([P(u0, alongX ? b.z0 : b.x0, Y.ground), P(u1, alongX ? b.z0 : b.x0, Y.ground), P(u1, alongX ? b.z1 : b.x1, Y.ground), P(u0, alongX ? b.z1 : b.x1, Y.ground)], gm, 'World · quay'));
-        const face = new THREE.Mesh(new THREE.BoxGeometry(alongX ? u1 - u0 : 0.35, 1.1, alongX ? 0.35 : u1 - u0), stone); face.position.set(alongX ? (u0 + u1) / 2 : edgeT, Y.ground - 0.55 + 0.05, alongX ? edgeT : (u0 + u1) / 2); face.receiveShadow = true; face.name = 'World · quay wall'; root.add(face);
-        if (w.far) { const f = w.far, fe = (o[0] + o[1] > 0) ? (alongX ? f.z0 : f.x0) : (alongX ? f.z1 : f.x1); root.add(quadMesh([P(u0, alongX ? f.z0 : f.x0, Y.ground), P(u1, alongX ? f.z0 : f.x0, Y.ground), P(u1, alongX ? f.z1 : f.x1, Y.ground), P(u0, alongX ? f.z1 : f.x1, Y.ground)], gm, 'World · quay (far)')); const ff = face.clone(); ff.position.set(alongX ? (u0 + u1) / 2 : fe, face.position.y, alongX ? fe : (u0 + u1) / 2); root.add(ff); }
-      } else {
-        slope(w.bank, true, w.edge === 'beach' ? sand : gm, 'World · bank');
-        if (w.far) slope(w.far, false, w.edge === 'beach' ? sand : gm, 'World · far bank');
+    const HI = Y.ground, LO = WY - 0.06;
+    const inR = (r: Rect | null, x: number, zz: number) => !!r && x > r.x0 && x < r.x1 && zz > r.z0 && zz < r.z1;
+    // a side's strip height at a point in it: across the strip from the ground's edge (HI) to the water's (LO), or back up
+    // (the far bank), or flat (a quay); the strip's own two edges say which end is which
+    const strip = (w: WaterSide, b: Rect, fromNear: boolean, x: number, zz: number) => {
+      const alongX = w.along === 'x', o = w.out, nearEdge = (o[0] + o[1] > 0) === fromNear ? 0 : 1;
+      const [t0, t1] = alongX ? [b.z0, b.z1] : [b.x0, b.x1], t = alongX ? zz : x, y0 = nearEdge === 0 ? HI : LO, y1 = nearEdge === 0 ? LO : HI;
+      return y0 + (y1 - y0) * Math.max(0, Math.min(1, (t - t0) / (t1 - t0 || 1)));
+    };
+    const heightOf = (x: number, zz: number) => waterSides.reduce((h, w) => {
+      let y = HI;
+      if (inR(w.water, x, zz)) y = LO;
+      else if (w.edge !== 'wall') { if (inR(w.bank, x, zz)) y = strip(w, w.bank, true, x, zz); else if (w.far && inR(w.far, x, zz)) y = strip(w, w.far, false, x, zz); }
+      return Math.min(h, y);
+    }, HI);
+    const rects: Rect[] = waterSides.flatMap(w => [w.bank, w.water, w.far].filter(Boolean) as Rect[]);
+    const xs = [...new Set(rects.flatMap(r => [r.x0, r.x1]))].sort((a, b2) => a - b2), zs = [...new Set(rects.flatMap(r => [r.z0, r.z1]))].sort((a, b2) => a - b2);
+    type Buf = { pos: number[]; mat: any; name: string };
+    const bufs = new Map<string, Buf>();
+    const buf = (key: string, mat: any, name: string) => { let b2 = bufs.get(key); if (!b2) { b2 = { pos: [], mat, name }; bufs.set(key, b2); } return b2; };
+    const tri = (b2: Buf, A: P3, B: P3, C: P3) => { const ux = B[0] - A[0], uy = B[1] - A[1], uz = B[2] - A[2], vx = C[0] - A[0], vy = C[1] - A[1], vz = C[2] - A[2]; const ny = uz * vx - ux * vz; if (Math.abs(ny) < 1e-12 && Math.abs(uy * vz - uz * vy) < 1e-12 && Math.abs(ux * vy - uy * vx) < 1e-12) return; b2.pos.push(...A, ...(ny < 0 ? [...C, ...B] : [...B, ...C])); };
+    const walls: Array<{ alongX: boolean; c: number; u0: number; u1: number }> = [];
+    const EPS = 1e-4, isWet = (x: number, zz: number) => waterSides.some(w => inR(w.water, x, zz));
+    for (let i = 0; i + 1 < xs.length; i++) for (let j = 0; j + 1 < zs.length; j++) {
+      const x0 = xs[i], x1 = xs[i + 1], z0 = zs[j], z1 = zs[j + 1], cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+      if (!waterSides.some(w => inR(w.bank, cx, cz) || inR(w.water, cx, cz) || inR(w.far, cx, cz))) continue;
+      if (isWet(cx, cz)) { const b2 = buf('water', wmat, `World · ${waterSides[0].kind}`); const A: P3 = [x0, WY, z0], B: P3 = [x1, WY, z0], C: P3 = [x1, WY, z1], D: P3 = [x0, WY, z1]; tri(b2, A, B, C); tri(b2, A, C, D); continue; }
+      // the ground: heights at the four corners, taken just inside the cell
+      const ex = Math.min(EPS, (x1 - x0) / 4), ez = Math.min(EPS, (z1 - z0) / 4);
+      const hA = heightOf(x0 + ex, z0 + ez), hB = heightOf(x1 - ex, z0 + ez), hC = heightOf(x1 - ex, z1 - ez), hD = heightOf(x0 + ex, z1 - ez);
+      const owner = waterSides.find(w => inR(w.bank, cx, cz)) || waterSides.find(w => inR(w.far, cx, cz))!;
+      const quay = owner.edge === 'wall', b2 = quay ? buf('quay', gm, 'World · quay') : owner.edge === 'beach' ? buf('beach', sand, 'World · bank') : buf('bank', gm, 'World · bank');
+      const A: P3 = [x0, hA, z0], B: P3 = [x1, hB, z0], C: P3 = [x1, hC, z1], D: P3 = [x0, hD, z1];
+      if (Math.abs(hA - hC) >= Math.abs(hB - hD)) { tri(b2, A, B, C); tri(b2, A, C, D); } else { tri(b2, A, B, D); tri(b2, B, C, D); }
+      if (quay) {
+        // a wall where the quay meets water: on each edge of the cell whose far side is wet
+        const edges: Array<[boolean, number, number, number, number, number]> = [[true, z0, x0, x1, cx, z0 - 2 * EPS - 1e-3], [true, z1, x0, x1, cx, z1 + 2 * EPS + 1e-3], [false, x0, z0, z1, x0 - 2 * EPS - 1e-3, cz], [false, x1, z0, z1, x1 + 2 * EPS + 1e-3, cz]];
+        for (const [alongX, c, u0, u1, px, pz] of edges) if (isWet(px, pz)) walls.push({ alongX, c, u0, u1 });
       }
+    }
+    for (const b2 of bufs.values()) {
+      const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(b2.pos, 3)); g.computeVertexNormals();
+      const o = new THREE.Mesh(g, b2.mat); o.receiveShadow = true; o.name = b2.name; root.add(o);
+    }
+    // the quay walls: runs merged along their lines
+    walls.sort((a, b2) => (a.alongX === b2.alongX ? 0 : a.alongX ? -1 : 1) || a.c - b2.c || a.u0 - b2.u0);
+    const runs: typeof walls = [];
+    for (const wl of walls) { const last = runs[runs.length - 1]; if (last && last.alongX === wl.alongX && Math.abs(last.c - wl.c) < 1e-6 && wl.u0 <= last.u1 + 1e-6) last.u1 = Math.max(last.u1, wl.u1); else runs.push({ ...wl }); }
+    for (const wl of runs) {
+      const len = wl.u1 - wl.u0, face = new THREE.Mesh(new THREE.BoxGeometry(wl.alongX ? len : 0.35, 1.1, wl.alongX ? 0.35 : len), stone);
+      face.position.set(wl.alongX ? (wl.u0 + wl.u1) / 2 : wl.c, Y.ground - 0.55 + 0.05, wl.alongX ? wl.c : (wl.u0 + wl.u1) / 2); face.receiveShadow = true; face.name = 'World · quay wall'; root.add(face);
+    }
+    // the floor under every side's strips (seen through the water, and under the slopes)
+    for (const w of waterSides) {
+      const all = [w.bank, w.water, w.far].filter(Boolean).reduce((a, b2) => ({ x0: Math.min(a!.x0, b2!.x0), x1: Math.max(a!.x1, b2!.x1), z0: Math.min(a!.z0, b2!.z0), z1: Math.max(a!.z1, b2!.z1) })) as Rect;
+      const fl = new THREE.Mesh(new THREE.PlaneGeometry(all.x1 - all.x0, all.z1 - all.z0), floorM); fl.rotation.x = -Math.PI / 2; fl.position.set((all.x0 + all.x1) / 2, FLOOR, (all.z0 + all.z1) / 2); fl.name = 'World · water floor'; root.add(fl);
     }
   }
   // a hill behind the lot: a height field over the back of the disc, meeting the flat ground at its foot
   const backFar = waterSides.find(w => w.out[1] < -0.5 && w.far && w.farBank === 'hills');
   const hillFrom = hillside ? -LD / 2 - 5 : backFar ? backFar.far.z0 - 1 : null;
   function buildHill(gm: any) {
-    const H = (x: number, zz: number) => { const d = hillFrom - zz; return d <= 0 ? Y.ground : Y.ground + hillRise(x, d); };
-    const cell = 4, pos: number[] = [];
-    for (let x = -DISC; x < DISC; x += cell) for (let zz = hillFrom - cell; zz > -DISC - cell; zz -= cell) {
+    const H = (x: number, zz: number) => { const d = hillFrom - zz; return hillside ? Y.ground + terrainY(x, zz) : d <= 0 ? Y.ground : Y.ground + hillRise(x, d); };
+    const cell = hillside ? 2 : 4, pos: number[] = [];
+    // (from the foot itself: the first row of cells starts at the flat ground, not a cell's rise above it)
+    for (let x = -DISC; x < DISC; x += cell) for (let zz = hillFrom; zz > -DISC - cell; zz -= cell) {
       const c = [x + cell / 2, zz - cell / 2]; if (Math.hypot(c[0], c[1]) > DISC + 2) continue;
       const a: P3 = [x, H(x, zz), zz], b: P3 = [x + cell, H(x + cell, zz), zz], cc: P3 = [x + cell, H(x + cell, zz - cell), zz - cell], d: P3 = [x, H(x, zz - cell), zz - cell];
       pos.push(...a, ...b, ...cc, ...a, ...cc, ...d);
@@ -1005,7 +1070,7 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     const vr = rngFor('tree-shape');
     let ci = 0, si = 0;
     trees.forEach((t, i) => {
-      const hy = hillY(t.x, t.z);   // (0 unless the ground rises: a hillside)
+      const hy = terrainY(t.x, t.z);   // (0 unless the ground rises: a hillside)
       Q.setFromAxisAngle(up, vr() * Math.PI * 2);
       C.setHex(t.leaf).multiplyScalar(0.9 + vr() * 0.2);
       let rad;
