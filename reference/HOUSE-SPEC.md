@@ -290,7 +290,7 @@ leaves a wall it would stare at before it fills the frame (a path search over th
 is crossed through its middle, square to it. The orbit builds to 30°/s and eases to a third of that into the press. It routes on a distance-field nav grid
 (`shot-nav.ts`), takes stairs up and down (a spiral follows its treads as built; an L or U flight follows S2's `path`), opens
 shut door leaves ahead of the eye (`track.doors`, applied by the page through `visibility.shotPose`), and ends on an orbit
-round the Core — 90° wherever the room allows it (24 of the 30 houses; the other six rooms allow 65–85°) — before the press. A frame narrower than 16:9
+round the Core — 90° wherever the room allows it (25 of the 30 houses; the other five rooms allow 65–80°) — before the press. The finale's walk-in is chosen with its sharpest turn in mind (no U-turn the view cannot follow at its turn rate), and where an exact segment (a flight, the orbit, the power beat) meets a walked one the corner is rounded with a cubic Bézier on the walked side. A frame narrower than 16:9
 (the phone player, a square still) widens its lens where the Core is in it (`track.tanHReq`), just enough to keep the Core inside. `hero-reveal` lands on the same finale framing;
 `walkthrough` is routed on the nav grid.
 

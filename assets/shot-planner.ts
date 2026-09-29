@@ -46,8 +46,8 @@ export const routeCap = (_lengthM: number) => SPEED_CAP.route;
 export const DOOR_PLANE_CAP = 0.9;
 /** §3.5 yaw-rate caps, °/s. Two beats differ from the plan's table, on purpose (tried at the plan's values: the finale's walk-in cannot turn the view onto the Core
  *  in time — cocoon's Core leaves the frame, the view whips at 90°/s): roomReveal 25 (plan 20) and hero 30 (plan 15) — the eye is 1–2 m from a Core it circles at 22–30°/s,
- *  so the bearing to it turns that fast whatever the view does. `extStair` 30 has no plan value. QA holds every beat to these numbers (`beat-yaw`). */
-export const YAW_CAP: Record<Beat, number> = { establish: 12, extStair: 30, approach: 20, threshold: 30, reveal: 25, route: 45, stair: 60, descend: 60, roomReveal: 25, hero: 30, orbit: 45, power: 5 };
+ *  so the bearing to it turns that fast whatever the view does. `extStair` 30 has no plan value, and `stair` / `descend` are 55: the smoothed rate QA and the fleet target measure is yaw and pitch together over 0.1 s, and a 60 cap let it reach 62°/s on a stair landing (target ≤ 60). QA holds every beat to these numbers (`beat-yaw`). */
+export const YAW_CAP: Record<Beat, number> = { establish: 12, extStair: 30, approach: 20, threshold: 30, reveal: 25, route: 45, stair: 55, descend: 55, roomReveal: 25, hero: 30, orbit: 45, power: 5 };
 /** §3.5 pitch clamps, degrees */
 export const PITCH: Record<Beat, [number, number]> = { establish: EST_PITCH, extStair: [-15, 8], approach: [-15, 5], threshold: [-12, 8], reveal: [-12, 8], route: [-12, 8], stair: [-10, 18], descend: [-24, -4], roomReveal: [-18, 8], hero: [-40, 5], orbit: [-40, 5], power: [-40, 5] };
 /** the floors a beat never goes under (§3.4) and the windows QA holds it to */
