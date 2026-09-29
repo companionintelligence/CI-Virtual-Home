@@ -282,19 +282,22 @@ export function createWorldIndex(world: ShotWorld) {
     }
     return best;
   }
-  // slab test against an AABB; returns entry t (or exit, when inside) and the face normal
+  // slab test against an AABB: entry t (or 0 when the origin is inside) and the face normal's axis and sign, into `slabOut`
+  // (no allocation: the ray caster calls this thousands of times a plan)
+  const slabOut = { t: 0, ax: -1, sg: 0 };
   const slab = (ox: number, oy: number, oz: number, dx: number, dy: number, dz: number, b0: number, b1: number, b2: number, b3: number, b4: number, b5: number, tmax: number) => {
     let t0 = 0, t1 = tmax, nAx = -1, nSg = 0;
-    const o = [ox, oy, oz], d = [dx, dy, dz], lo = [b0, b1, b2], hi = [b3, b4, b5];
-    for (let a = 0; a < 3; a++) {
-      if (Math.abs(d[a]) < 1e-12) { if (o[a] < lo[a] || o[a] > hi[a]) return null; continue; }
-      let ta = (lo[a] - o[a]) / d[a], tb = (hi[a] - o[a]) / d[a], sg = -1;
-      if (ta > tb) { const s = ta; ta = tb; tb = s; sg = 1; }
-      if (ta > t0) { t0 = ta; nAx = a; nSg = sg; }
-      if (tb < t1) t1 = tb;
-      if (t0 > t1) return null;
-    }
-    return { t: t0, ax: nAx, sg: nSg };
+    // x
+    if (Math.abs(dx) < 1e-12) { if (ox < b0 || ox > b3) return null; }
+    else { let ta = (b0 - ox) / dx, tb = (b3 - ox) / dx, sg = -1; if (ta > tb) { const q = ta; ta = tb; tb = q; sg = 1; } if (ta > t0) { t0 = ta; nAx = 0; nSg = sg; } if (tb < t1) t1 = tb; if (t0 > t1) return null; }
+    // y
+    if (Math.abs(dy) < 1e-12) { if (oy < b1 || oy > b4) return null; }
+    else { let ta = (b1 - oy) / dy, tb = (b4 - oy) / dy, sg = -1; if (ta > tb) { const q = ta; ta = tb; tb = q; sg = 1; } if (ta > t0) { t0 = ta; nAx = 1; nSg = sg; } if (tb < t1) t1 = tb; if (t0 > t1) return null; }
+    // z
+    if (Math.abs(dz) < 1e-12) { if (oz < b2 || oz > b5) return null; }
+    else { let ta = (b2 - oz) / dz, tb = (b5 - oz) / dz, sg = -1; if (ta > tb) { const q = ta; ta = tb; tb = q; sg = 1; } if (ta > t0) { t0 = ta; nAx = 2; nSg = sg; } if (tb < t1) t1 = tb; if (t0 > t1) return null; }
+    slabOut.t = t0; slabOut.ax = nAx; slabOut.sg = nSg;
+    return slabOut;
   };
   /** the first solid a ray meets within tmax (d unit), among `mask` kinds; null for none */
   function raycast(ox: number, oy: number, oz: number, dx: number, dy: number, dz: number, tmax: number, mask: (k: number) => boolean, skip?: (i: number) => boolean): Hit | null {
@@ -319,10 +322,9 @@ export function createWorldIndex(world: ShotWorld) {
           } else {
             const o = world.obbs[-1 - id]; if (!mask(o.k)) continue;
             // into the OBB's frame
-            const px = ox - o.c[0], py = oy - o.c[1], pz = oz - o.c[2];
-            const lo = [0, 1, 2].map(a => px * o.ax[3 * a] + py * o.ax[3 * a + 1] + pz * o.ax[3 * a + 2]);
-            const ld = [0, 1, 2].map(a => dx * o.ax[3 * a] + dy * o.ax[3 * a + 1] + dz * o.ax[3 * a + 2]);
-            const r = slab(lo[0], lo[1], lo[2], ld[0], ld[1], ld[2], -o.h[0], -o.h[1], -o.h[2], o.h[0], o.h[1], o.h[2], best ? best.t : tmax);
+            const px = ox - o.c[0], py = oy - o.c[1], pz = oz - o.c[2], A = o.ax;
+            const r = slab(px * A[0] + py * A[1] + pz * A[2], px * A[3] + py * A[4] + pz * A[5], px * A[6] + py * A[7] + pz * A[8],
+              dx * A[0] + dy * A[1] + dz * A[2], dx * A[3] + dy * A[4] + dz * A[5], dx * A[6] + dy * A[7] + dz * A[8], -o.h[0], -o.h[1], -o.h[2], o.h[0], o.h[1], o.h[2], best ? best.t : tmax);
             if (r && (!best || r.t < best.t)) {
               const a = r.ax < 0 ? 1 : r.ax, sg = r.ax < 0 ? 1 : r.sg;
               best = { t: r.t, i: -1 - (-1 - id), k: o.k, n: o.n, nx: o.ax[3 * a] * sg, ny: o.ax[3 * a + 1] * sg, nz: o.ax[3 * a + 2] * sg, obb: true };

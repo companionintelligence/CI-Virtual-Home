@@ -70,9 +70,12 @@ export function createOrbitProbeW(world: ShotWorld, index: WorldIndex, probe: Pr
     }
     return null;
   }
+  // (memoised by the millimetre: the finale's candidates share most of their points)
+  const freeMemo = new Map<string, boolean>(), seesMemo = new Map<string, boolean>();
+  const keyOf = (x: number, y: number, z: number) => `${Math.round(x * 1000)},${Math.round(y * 1000)},${Math.round(z * 1000)}`;
   return {
-    free: (x: number, y: number, z: number) => blocker(x, y, z) === null,
-    sees: (x: number, y: number, z: number) => probe.coreSeen([x, y, z], hero.core) >= 0.95,
+    free: (x: number, y: number, z: number) => { const k = keyOf(x, y, z); let v = freeMemo.get(k); if (v === undefined) { v = blocker(x, y, z) === null; freeMemo.set(k, v); } return v; },
+    sees: (x: number, y: number, z: number) => { const k = keyOf(x, y, z); let v = seesMemo.get(k); if (v === undefined) { v = probe.coreSeen([x, y, z], hero.core) >= 0.95; seesMemo.set(k, v); } return v; },
     explain: (x: number, y: number, z: number) => blocker(x, y, z) || (probe.coreSeen([x, y, z], hero.core) < 0.95 ? 'the Core is hidden' : null),
   };
 }
@@ -80,7 +83,7 @@ export function createOrbitProbeW(world: ShotWorld, index: WorldIndex, probe: Pr
 // ---- establishing styles (§3.9) ------------------------------------------------------------------------------
 export const ESTABLISH_STYLES = ['axial', 'corner-left', 'corner-right', 'garden', 'dollhouse'] as const;
 export type EstablishStyle = typeof ESTABLISH_STYLES[number];
-export type Establish = { style: EstablishStyle | 'custom'; eye: V3; aim: V3; fov: number; bearing: number; score: number; fit: number; sky: number; occluded: number; roofOff: boolean; scores?: any };
+export type Establish = { style: EstablishStyle | 'custom'; eye: V3; aim: V3; fov: number; bearing: number; score: number; fit: number; sky: number; occluded: number; roofOff: boolean; scores?: any; alts?: Establish[] };
 
 /** Plan the establishing pose: `want` is shots[].establish ('auto', a style, or {bearing, height, dist}). */
 export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldIndex, want: any = 'auto', lim: { near?: [number, number]; maxPath?: number } = {}): Establish {
@@ -172,7 +175,10 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
     scores[s] = +total.toFixed(3);
     if (total > ps + 1e-9) { ps = total; pick = c; }
   }
-  return { ...pick!, scores };
+  // (every pose that scored, best first — the planner walks down it when the best one's move is blocked by the garden)
+  const alts = [...cands].map(c => ({ c, t: c.score + (aff[c.style] ?? 0) + 0.08 * (c.style === 'corner-left' ? -sideBias : c.style === 'corner-right' ? sideBias : 0) + 0.8 * jitter[ESTABLISH_STYLES.indexOf(c.style as any)] }))
+    .sort((a, b) => b.t - a.t).map(x => x.c);
+  return { ...pick!, scores, alts: [pick!, ...alts.filter(c => c !== pick)] };
 }
 
 // ---- the hero ring (§3.11) -------------------------------------------------------------------------------------

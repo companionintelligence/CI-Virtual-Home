@@ -26,14 +26,16 @@
 import { K, DEG, clamp, inRect, indoors, levelAt, mulberry32, fnv1a, wrapPi, createWorldIndex, type ShotWorld, type WLevel, type WStair, type WRoom } from './shot-world.js';
 import { createNav, roomInterest, CELL, type Nav } from './shot-nav.js';
 import { createProbe, camera, project, type V3, type Probe } from './shot-probe.js';
-import { chooseEstablish, createOrbitProbeW, heroRing, fovForCore, composeTarget, THREE_SHIM, ESTABLISH_STYLES, houseBox } from './framing.js';
+import { chooseEstablish, createOrbitProbeW, heroRing, fovForCore, composeTarget, THREE_SHIM, ESTABLISH_STYLES, houseBox, type Establish } from './framing.js';
 import { freeMap, frontRun, sweepFrom, ORBIT_STEP } from './core-orbit.js';
 
 export const FPS = 120;
 export const BEATS = ['establish', 'extStair', 'approach', 'threshold', 'reveal', 'route', 'stair', 'descend', 'roomReveal', 'hero', 'orbit', 'power'] as const;
 export type Beat = typeof BEATS[number];
 /** §3.4 cruise caps (m/s; stairs along the flight in plan); the orbit's is angular (°/s) */
-export const SPEED_CAP: Record<Beat, number> = { establish: 5.0, extStair: 1.2, approach: 2.5, threshold: 0.9, reveal: 0.8, route: 2.2, stair: 1.2, descend: 1.0, roomReveal: 0.9, hero: 0.6, orbit: 40, power: 0.1 };
+export const SPEED_CAP: Record<Beat, number> = { establish: 5.0, extStair: 1.2, approach: 2.5, threshold: 1.2, reveal: 0.8, route: 2.2, stair: 1.2, descend: 1.0, roomReveal: 0.9, hero: 0.9, orbit: 42, power: 0.1 };
+/** §3.4: the eye crosses the entry door's plane at no more than this (m/s) — the threshold beat's own cap is the wider zone's */
+export const DOOR_PLANE_CAP = 0.9;
 /** §3.5 yaw-rate caps, °/s (the orbit turns with its sweep) */
 export const YAW_CAP: Record<Beat, number> = { establish: 12, extStair: 30, approach: 20, threshold: 30, reveal: 25, route: 45, stair: 60, descend: 60, roomReveal: 25, hero: 30, orbit: 45, power: 5 };
 /** §3.5 pitch clamps, degrees */
@@ -44,6 +46,8 @@ export const BEAT_WINDOW: Partial<Record<Beat, [number, number]>> = { establish:
 export const OUTSIDE = new Set<Beat>(['establish', 'extStair', 'approach']);
 export const LENS = { exterior: 34, interior: 56, hero: 40, rate: 4 };
 export const AUTO_DURATION = { min: 12, max: 20 };
+/** §3.4 acceleration limits (m/s²): 1.5 inside, 3 outside — the planner keeps a little under so smoothing never crosses them */
+export const ACC_IN = 1.45, ACC_OUT = 2.9;
 
 export type Track = {
   version: 2; planner: 'v2'; type: string; id: string;
@@ -139,10 +143,25 @@ export type PlanOptions = {
   minDuration?: number;            // under the global switch, the spec's v1 duration is a floor, not a pin
   establish?: any; via?: string[]; beats?: Partial<Record<Beat, number>>; route?: 'auto' | 'scenic' | 'shortest';
   heroView?: any; fps?: number;
+  /** internal: what a retry changes (the establishing move's scale) */
+  tune?: { estScale?: number };
 };
 
 // =====================================================================================================================
+/** Plan door-to-core. An auto film is planned once, and once more with a smaller establishing move when the outside would
+ *  be over 30 % of it (an opening sized to the film it opens); the second plan is kept only if it is better. */
 export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
+  const r = planOnce(world, opts);
+  if (!r.ok || typeof opts.duration === 'number' || (opts.tune && opts.tune.estScale)) return r;
+  const o = r.track.plan.outside;
+  const D0 = Math.max(Math.ceil((r.track.plan.Tmin + 0.3) * 2 - 1e-6) / 2, opts.minDuration || 0, AUTO_DURATION.min);
+  if (!o || o.caps / D0 <= (o.hasExt ? 0.345 : 0.30)) return r;
+  const scale = Math.max(0.33, ((o.hasExt ? 0.345 : 0.30) * D0 - o.others) / Math.max(0.5, o.establish));
+  if (scale > 0.97) return r;
+  const r2 = planOnce(world, { ...opts, tune: { estScale: scale } });
+  return r2.ok && r2.track.duration <= r.track.duration ? r2 : r;
+}
+function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   const index = createWorldIndex(world), probe = createProbe(index), nav = createNav(world, index);
   const notes: string[] = [];
   const fail = (code: string, message: string) => ({ ok: false as const, code, message, notes });
@@ -162,23 +181,35 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
   const upright = hero.pose === 'upright';
   const r0 = (ORBIT_R[hero.surface] ?? 0.9) + (upright ? 0.2 : 0);
   const hMax = heroLv.y + heroLv.h - 0.32 - centre[1];
-  const hs: [number, number] = [Math.max(0.12, Math.min(0.45, hMax)), Math.max(0.1, Math.min(0.36, hMax - 0.04))];
+  // the orbit's eye height over the Core's top: 0.45 easing down to 0.36 (the default), or held at 0.45 / 0.5 where a chair
+  // back or a lamp stands in the way of the lower half (§3.11: 0.25–0.5 m over the top)
+  const HS_OPTIONS: Array<[number, number]> = [[0.45, 0.36], [0.45, 0.45], [0.5, 0.5], [0.4, 0.4]].map(([a, b]) => [Math.max(0.12, Math.min(a, hMax)), Math.max(0.1, Math.min(b, hMax - (a - b) - 0.0))] as [number, number]);
+  let hs: [number, number] = HS_OPTIONS[0];
   const sweepOpt = { aMax: 150, aWant: 135, over: [15, 45] };
-  type OrbitPlan = { r: number; run: any; options: any[] };
+  type OrbitPlan = { r: number; run: any; options: any[]; hs: [number, number] };
   let orbit: OrbitPlan | null = null;
   {
     let best: OrbitPlan | null = null, bs = -Infinity;
-    for (const r of [r0, r0 - 0.1, r0 + 0.1, r0 - 0.2, r0 + 0.2].filter(r => r >= 0.65 && r <= 1.6)) {
-      const free = freeMap(THREE_SHIM, orbitProbe, new THREE_SHIM.Vector3(...centre), hero.fwd, r, hs);
-      const run = frontRun(free); if (!run) continue;
+    // the nominal radius and height first, the others only while the sweep is short of 120° (each is 144 probes)
+    const RADII = [r0, r0 - 0.1, r0 + 0.1, r0 - 0.2, r0 + 0.2].filter(r => r >= 0.65 && r <= 1.6);
+    const combos: Array<[number, [number, number], number]> = [];
+    for (const r of RADII) combos.push([0, HS_OPTIONS[0], r]);
+    for (const [hi, hsx] of HS_OPTIONS.entries()) if (hi) for (const r of RADII) combos.push([hi, hsx, r]);
+    for (const [hi, hsx, r] of combos) {
+      if (best && Math.max(...best.options.map((o: any) => o.arc)) >= 120) break;
+      const free = freeMap(THREE_SHIM, orbitProbe, new THREE_SHIM.Vector3(...centre), hero.fwd, r, hsx);
+      const run0 = frontRun(free); if (!run0) continue;
+      // (5° in from where the free run ends: the final push-in and the eye's own size are not in the 5° probe)
+      const run = run0.full || run0.hi - run0.lo < 30 ? run0 : { ...run0, lo: run0.lo + 5, hi: run0.hi - 5 };
       const opts2 = (run.full || (run.lo <= 0 && run.hi >= 0) ? [-1, 1] : [Math.abs(run.lo) < Math.abs(run.hi) ? -1 : 1])
         .map(dir => sweepFrom(run, dir, run.full ? -dir * 180 : dir < 0 ? run.hi : run.lo, sweepOpt)).filter(Boolean);
       if (!opts2.length) continue;
       const arc = Math.max(...opts2.map(o => o.arc));
-      const score = Math.min(arc, 150) - 40 * Math.abs(r - r0);
-      if (score > bs + 1e-9) { bs = score; best = { r, run, options: opts2 }; }
+      const score = Math.min(arc, 150) - 40 * Math.abs(r - r0) - 12 * hi;
+      if (score > bs + 1e-9) { bs = score; best = { r, run, options: opts2, hs: hsx }; }
     }
     orbit = best;
+    if (orbit) hs = orbit.hs;
   }
   const orbitPt = (deg: number, y: number, r: number): V3 => { const a = deg * DEG, f = hero.fwd, s = [f[1], -f[0]]; return [centre[0] + r * (Math.cos(a) * f[0] + Math.sin(a) * s[0]), y, centre[2] + r * (Math.cos(a) * f[1] + Math.sin(a) * s[1])]; };
   const heroAngle = (x: number, z: number) => { const vx = x - centre[0], vz = z - centre[2], f = hero.fwd; return Math.atan2(vx * f[1] - vz * f[0], vx * f[0] + vz * f[1]) / DEG; };
@@ -227,7 +258,7 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
   const via = (opts.via || []).map(nm => { for (const lv of world.levels) for (const r of lv.rooms) if (r.name === nm || r.no === nm) return { lv, r }; notes.push(`via room "${nm}" not found`); return null; }).filter(Boolean) as Array<{ lv: WLevel; r: WRoom }>;
   const routeMode = opts.route || 'auto';
   // one storey's walk from a to b, through its forced rooms, with the detour (route choice) that pays for itself
-  const storeyWalk = (lv: WLevel, a: [number, number], b: [number, number], budgetM: number) => {
+  const storeyWalk = (lv: WLevel, a: [number, number], b: [number, number], budgetM: number, scenic = true) => {
     const forced = via.filter(v => v.lv.id === lv.id).map(v => nav.visitPoint(lv.id, v.r)).filter(Boolean) as Array<[number, number]>;
     const stops = [a, ...forced, b];
     const walk = (ps: Array<[number, number]>) => {
@@ -251,7 +282,7 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
     };
     const scoreOf = (w: { pts: Array<[number, number]>; len: number }) => { let s = 0; for (const r of visited(w.pts)) s += (interestOf.get(r)?.interest || 0); return s - (routeMode === 'scenic' ? 0.04 : 0.08) * w.len - 0.5 * Math.max(0, doorsOf(w.pts) - 3); };
     let best = base, bs = scoreOf(base);
-    if (routeMode !== 'shortest' && !forced.length) {
+    if (scenic && routeMode !== 'shortest' && !forced.length) {
       const already = visited(base.pts);
       const cands = lv.rooms.filter(r => !already.has(r) && (interestOf.get(r)?.interest || 0) >= 0.7).sort((x, y) => (interestOf.get(y)!.interest - interestOf.get(x)!.interest) || x.no.localeCompare(y.no)).slice(0, 4);
       for (const r of cands) {
@@ -266,70 +297,120 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
 
   // ---- 4. the finale's approach: chosen with the walk that reaches it -----------------------------------------
   const yA = heroLv.y + Math.min(1.42, heroLv.h - 0.35);
-  type Fin = { dir: number; from: number; to: number; arc: number; P: V3; S: V3; score: number; swing: number; walk: Array<[number, number]>; walkLen: number; rooms: string[] };
+  type Fin = { dir: number; from: number; to: number; arc: number; arcTotal: number; P: V3; S: V3; bez: V3[]; score: number; swing: number; circling: number; turning: number; face: number; walk: Array<[number, number]>; walkLen: number; rooms: string[] };
+  const smoothU = (u: number) => u * u * (3 - 2 * u);
+  /** the orbit checked every 1° along its own eye-height profile (the 5° free map can step over a chair back): the furthest
+   *  angle it is free and the Core in full view to, less 2° — the sweep's own end when all of it is, null when its start is not */
+  const verifyArc = (from: number, to: number, dir: number, r: number): number | null => {
+    const n = Math.max(1, Math.ceil(Math.abs(to - from)));
+    let last = from;
+    for (let k = 0; k <= n; k++) {
+      const u = k / n, deg = from + (to - from) * u, h = hs[0] + (hs[1] - hs[0]) * (0.5 - 0.5 * Math.cos(Math.PI * u)), p = orbitPt(deg, centre[1] + h, r);
+      if (!orbitProbe.free(p[0], p[1], p[2]) || !orbitProbe.sees(p[0], p[1], p[2])) return k === 0 ? null : (last - from) * dir > 2 ? last - dir * 2 : null;
+      last = deg;
+    }
+    return to;
+  };
+  /** the push-in: P → S as a curve that arrives ALONG the orbit (its tangent at S), leaving P the way the walk was going —
+   *  no kink where the orbit starts. Null when the curve is not clear (the caller falls back to the straight chord). */
+  const pushIn = (P: V3, S: V3, arrive: V3, dir: number, fromDeg: number): V3[] | null => {
+    const ch = Math.hypot(S[0] - P[0], S[2] - P[2]); if (ch < 0.3) return null;
+    const a0 = fromDeg * DEG, f = hero.fwd, sd = [f[1], -f[0]];
+    const tan = norm([dir * (-Math.sin(a0) * f[0] + Math.cos(a0) * sd[0]), 0, dir * (-Math.sin(a0) * f[1] + Math.cos(a0) * sd[1])]);
+    const h1 = 0.42 * ch, h2 = 0.42 * ch;
+    const c1: V3 = [P[0] + arrive[0] * h1, P[1], P[2] + arrive[2] * h1], c2: V3 = [S[0] - tan[0] * h2, S[1], S[2] - tan[2] * h2];
+    const n = Math.max(8, Math.ceil(ch / 0.05));
+    const out: V3[] = [];
+    for (let k = 0; k <= n; k++) { const u = k / n, w = 1 - u; out.push([w * w * w * P[0] + 3 * w * w * u * c1[0] + 3 * w * u * u * c2[0] + u * u * u * S[0], P[1] + (S[1] - P[1]) * smoothU(u), w * w * w * P[2] + 3 * w * w * u * c1[2] + 3 * w * u * u * c2[2] + u * u * u * S[2]]); }
+    for (let k = 1; k < out.length - 1; k++) { const q = out[k]; if (!orbitProbe.free(q[0], q[1], q[2]) || (k % 3 === 0 && !orbitProbe.sees(q[0], q[1], q[2]))) return null; }
+    return out;
+  };
+  let finaleCands: any[] = [], finaleAll: any[] = [], bestReachable = 0;
+  // swing (QA's orbit-swing-back): degrees the eye travels round the Core AGAINST the sweep over the last 4 m of the walk
+  // and the push-in, while the Core is in view — within 4.5 m of the eye and within ±40° of where the eye is heading
+  // (the walk through the next room, the Core behind a wall, is only a walk). `circling` is the same without the
+  // in-view condition, within 3.2 m: the eye going round the Core one way and the sweep bringing it back the other.
+  const swingOf = (pts: Array<[number, number]>, bez: V3[], dir: number) => {
+    const path2: Array<[number, number]> = [...pts, ...bez.slice(1).map(q => [q[0], q[2]] as [number, number])];
+    let swing = 0, circling = 0, accL = 0, turning = 0, prevHd: number | null = null;
+    for (let q = path2.length - 1; q > 0 && accL < 4.0 + polyLen(bez); q--) {
+      const a = path2[q - 1], b = path2[q], L = dist2(a, b); accL += L;
+      if (L < 1e-6) continue;
+      { const hd0 = Math.atan2(b[0] - a[0], b[1] - a[1]); if (prevHd !== null) turning += Math.abs(wrapPi(hd0 - prevHd)) / DEG; prevHd = hd0; }
+      const da = wrapPi((heroAngle(b[0], b[1]) - heroAngle(a[0], a[1])) * DEG) / DEG;
+      const hd = Math.atan2(b[0] - a[0], b[1] - a[1]), toCore = Math.atan2(centre[0] - a[0], centre[2] - a[1]), dC = Math.hypot(centre[0] - a[0], centre[2] - a[1]);
+      if (dC < 4.5 && Math.abs(wrapPi(toCore - hd)) < 40 * DEG) swing += Math.max(0, -dir * da);
+      if (dC < 3.2) circling += Math.max(0, -dir * da);
+    }
+    return { swing, circling, turning };
+  };
   const finaleFrom = (start: [number, number], budgetM: number): Fin | null => {
     if (!orbit) return null;
-    const cands: Fin[] = [];
+    const cands: Array<Pick<Fin, 'dir' | 'from' | 'to' | 'arc' | 'arcTotal' | 'P' | 'S'> & { Dd: number }> = [];
     const tried = new Set<string>();
+    const g = nav.grid(heroLv);
     for (const opt of orbit.options) {
       for (let from = opt.from; ; from += opt.dir * 10) {
-        const sw = sweepFrom(orbit.run, opt.dir, from, sweepOpt);
-        if (!sw || sw.arc < 45 - 1e-6) break;
-        for (const d of [-10, 0, 15, 30]) for (const Dd of [1.75, 1.5, 1.3]) {
-          if (Dd < orbit.r + 0.3) continue;
+        const sw0 = sweepFrom(orbit.run, opt.dir, from, sweepOpt);
+        if (!sw0 || sw0.arc < 45 - 1e-6) break;
+        const toV = verifyArc(sw0.from, sw0.to, sw0.dir, orbit.r);
+        if (toV === null) { if (Math.abs(from - opt.from) > 150) break; continue; }
+        const sw = { ...sw0, to: toV, arc: (toV - sw0.from) * sw0.dir };
+        if (sw.arc < 45 - 1e-6) { if (Math.abs(from - opt.from) > 150) break; continue; }
+        // P is where the walk ends: 0–70° BEHIND the sweep's start (before it, in the sweep's own direction), 1.5–2.1 m
+        // out — the push-in is a spiral in that carries on the way round (to the Core's front), never doubling back
+        for (const d of [-70, -55, -40, -25, -12, 0]) for (const Dd of [2.1, 1.8, 1.5, 1.25]) {
+          if (Dd < orbit.r + (Dd < 1.4 ? 0.35 : 0.45)) continue;
           const key = `${sw.dir}:${sw.from}:${d}:${Dd}`; if (tried.has(key)) continue; tried.add(key);
           const P = orbitPt(sw.from + sw.dir * d, yA, Dd);
           const S = orbitPt(sw.from, centre[1] + hs[0], orbit.r);
-          const g = nav.grid(heroLv);
           if (!nav.passableAt(g, P[0], P[2], 2) || !orbitProbe.free(P[0], P[1], P[2]) || !orbitProbe.sees(P[0], P[1], P[2])) continue;
           let clear = true; const nS = Math.ceil(len(sub(S, P)) / 0.08);
           for (let k = 1; k < nS && clear; k++) { const q = lerp3(P, S, k / nS); clear = orbitProbe.free(q[0], q[1], q[2]) && (k % 3 !== 0 || orbitProbe.sees(q[0], q[1], q[2])); }
           if (!clear) continue;
-          cands.push({ dir: sw.dir, from: sw.from, to: sw.to, arc: sw.arc, P, S, score: 0, swing: 0, walk: [], walkLen: 0, rooms: [] });
+          cands.push({ dir: sw.dir, from: sw.from, to: sw.to, arc: sw.arc, arcTotal: sw.arc - d, P, S, Dd });
         }
         if (Math.abs(from - opt.from) > 150) break;
       }
     }
-    // score each with the walk that reaches it (the walk's last 4 m and the push-in, circling the Core in frame
-    // against the orbit, cost the most; then how long the sweep is)
+    // score each with the walk that reaches it: the sweep first (its length: ≥ 90° pays, ≥ 120° pays more), then the swing
+    // (the eye circling the Core against the sweep in the 4.5 m before it, the Core in view: over 12° costs more than
+    // the arc it buys), the way the walk arrives (facing the Core), the walk's length
     const scored: Fin[] = [];
     const walks = new Map<string, any>();
-    // keep the work bounded: the longest sweeps first, at most 40 walks
-    cands.sort((x, y) => y.arc - x.arc || x.from - y.from || x.P[0] - y.P[0]);
-    for (const c of cands.slice(0, 40)) {
+    // keep the work bounded: the longest sweeps first, at most 90
+    cands.sort((x, y) => y.arcTotal - x.arcTotal || x.from - y.from || x.P[0] - y.P[0] || x.P[2] - y.P[2]);
+    for (const c of cands.slice(0, 90)) {
       const k = `${c.P[0].toFixed(2)},${c.P[2].toFixed(2)}`;
       let w = walks.get(k);
-      if (w === undefined) { w = storeyWalk(heroLv, start, [c.P[0], c.P[2]], budgetM); walks.set(k, w); }
+      if (w === undefined) { w = storeyWalk(heroLv, start, [c.P[0], c.P[2]], budgetM, false); walks.set(k, w); }
       if (!w) continue;
       const pts: Array<[number, number]> = w.pts;
-      // swing: degrees the eye travels round the Core against the orbit, the Core within 4.5 m and within ±40° of
-      // where the walk is heading (in frame), over the last 4 m
-      let swing = 0, acc = 0;
-      for (let q = pts.length - 1; q > 0 && acc < 4.5; q--) {
-        const a = pts[q - 1], b = pts[q], L = dist2(a, b); acc += L;
-        const nSub = Math.max(1, Math.ceil(L / 0.1));
-        for (let s = 0; s < nSub; s++) {
-          const p0: [number, number] = [a[0] + (b[0] - a[0]) * s / nSub, a[1] + (b[1] - a[1]) * s / nSub], p1: [number, number] = [a[0] + (b[0] - a[0]) * (s + 1) / nSub, a[1] + (b[1] - a[1]) * (s + 1) / nSub];
-          const hd = Math.atan2(b[0] - a[0], b[1] - a[1]), toCore = Math.atan2(centre[0] - p0[0], centre[2] - p0[1]);
-          const inFrame = Math.abs(wrapPi(toCore - hd)) < 40 * DEG && Math.hypot(centre[0] - p0[0], centre[2] - p0[1]) < 4.5;
-          if (!inFrame) continue;
-          const da = wrapPi((heroAngle(p1[0], p1[1]) - heroAngle(p0[0], p0[1])) * DEG) / DEG;
-          swing += Math.max(0, -c.dir * da);
-        }
-      }
-      // push-in heading against the orbit's tangent at its start
-      const pin = norm(sub(c.S, c.P)), a0 = c.from * DEG, f = hero.fwd, sd = [f[1], -f[0]];
-      const tan = norm([c.dir * (-Math.sin(a0) * f[0] + Math.cos(a0) * sd[0]), 0, c.dir * (-Math.sin(a0) * f[1] + Math.cos(a0) * sd[1])]);
-      const entry = Math.acos(clamp(pin[0] * tan[0] + pin[2] * tan[2], -1, 1)) / DEG;
       const last = pts.length > 1 ? pts[pts.length - 2] : start;
-      const legDir = norm([c.P[0] - last[0], 0, c.P[2] - last[1]]), turn = Math.acos(clamp(legDir[0] * pin[0] + legDir[2] * pin[2], -1, 1)) / DEG;
+      const arrive = norm([c.P[0] - last[0], 0, c.P[2] - last[1]]);
+      const bez = pushIn(c.P, c.S, arrive, c.dir, c.from) || [c.P, c.S];
+      const { swing, circling, turning } = swingOf(pts, bez, c.dir);
       // the walk should arrive facing the Core: the look can only turn to it at the push-in's pace
-      const toCore = norm([centre[0] - c.P[0], 0, centre[2] - c.P[2]]), face = Math.acos(clamp(legDir[0] * toCore[0] + legDir[2] * toCore[2], -1, 1)) / DEG;
-      const score = 1.4 * Math.min(c.arc, 150) + 0.6 * Math.min(c.arc, 120) + (c.arc >= 90 ? 25 : 0) + (c.arc >= 120 ? 15 : 0) - 3 * Math.max(0, swing - 8) - 0.25 * turn - 0.4 * Math.max(0, entry - 90) - 0.4 * w.len - 0.8 * Math.max(0, face - 50);
-      scored.push({ ...c, score, swing, walk: pts, walkLen: w.len, rooms: w.rooms });
+      const toCore = norm([centre[0] - c.P[0], 0, centre[2] - c.P[2]]), face = Math.acos(clamp(arrive[0] * toCore[0] + arrive[2] * toCore[2], -1, 1)) / DEG;
+      // (the sweep counts from where the eye starts round the Core: the spiral in and the orbit)
+      const score = 2.2 * Math.min(c.arc, 120) + 0.6 * Math.min(c.arcTotal - c.arc, 60) + (c.arc >= 90 ? 30 : 0) + (c.arc >= 120 ? 10 : 0) - 5 * Math.max(0, swing - 8) - 0.6 * Math.max(0, circling - 40) - 0.5 * w.len - 1.0 * Math.max(0, face - 40) - 0.35 * Math.max(0, turning - 100) - (c.Dd < 1.4 ? 10 : 0);
+      scored.push({ ...c, bez, score, swing, circling, turning, face, walk: pts, walkLen: w.len, rooms: w.rooms });
     }
     scored.sort((x, y) => y.score - x.score || x.from - y.from);
-    return scored[0] || null;
+    bestReachable = scored.filter(c => c.swing <= 14).reduce((m, c) => Math.max(m, c.arc), 0);
+    finaleAll = scored.map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), circ: +c.circling.toFixed(1), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0) }));
+    finaleCands = scored.slice(0, 8).map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0), score: +c.score.toFixed(0) }));
+    const top = scored[0];
+    if (!top) return null;
+    // the walk to the chosen approach again, this time through a room worth seeing on the way if one pays: kept when the
+    // way it arrives is no worse
+    const sc = storeyWalk(heroLv, start, [top.P[0], top.P[2]], budgetM, true);
+    if (sc && sc.len > top.walkLen + 0.3) {
+      const last2 = sc.pts.length > 1 ? sc.pts[sc.pts.length - 2] : start, arrive2 = norm([top.P[0] - last2[0], 0, top.P[2] - last2[1]]);
+      const bez2 = pushIn(top.P, top.S, arrive2, top.dir, top.from) || [top.P, top.S], sw2 = swingOf(sc.pts, bez2, top.dir);
+      if (sw2.swing <= Math.max(top.swing + 3, 10) && sw2.circling <= top.circling + 15) return { ...top, bez: bez2, swing: sw2.swing, circling: sw2.circling, turning: sw2.turning, walk: sc.pts, walkLen: sc.len, rooms: sc.rooms };
+    }
+    return top;
   };
 
   // ---- 5. assemble the walk: storey by storey, flight by flight -----------------------------------------------
@@ -435,14 +516,9 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
 
   // ---- 7. the finale's own segments: push-in, orbit, power ----------------------------------------------------
   const finaleSegs: Seg[] = [];
-  // the turn the look still has to make at the push-in (from the way the walk arrives to the Core): the hero beat is
-  // given the time to make it at ~30°/s, never less than its 0.8 s floor
-  let heroFloor = BEAT_FLOOR.hero || 0.8;
-  if (fin && fin.walk.length > 1) {
-    const a = fin.walk[fin.walk.length - 2], lastDir = norm([fin.P[0] - a[0], 0, fin.P[2] - a[1]]), toC = norm([centre[0] - fin.P[0], 0, centre[2] - fin.P[2]]);
-    const face = Math.acos(clamp(lastDir[0] * toC[0] + lastDir[2] * toC[2], -1, 1)) / DEG;
-    heroFloor = Math.max(heroFloor, face / 30 + 0.4);
-  }
+  // the hero beat (the push-in onto the orbit) keeps its 0.8 s floor: the look is on the Core before it starts (the
+  // roomReveal's subject is the Core, weighted in from 135° round), and the yaw limiter says where it is not (QA beat-yaw)
+  const heroFloor = BEAT_FLOOR.hero || 0.8;
   let orbitMeta: any = null, finalFov = LENS.hero, endPose: any = null;
   const compose = { ndcX: 0, ndcY: -0.2 };
   {
@@ -465,11 +541,13 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
       const want = rp.az, arcW = (want - fin.from) * fin.dir;
       if (want < lo || want > hi || Math.sign(want) !== fin.dir) continue;
       if (arcW < Math.min(fin.arc, 90) || arcW < fin.arc - 15 || arcW > Math.max(fin.arc, 150)) continue;
+      const wv = verifyArc(fin.from, want, fin.dir, r);
+      if (wv === null || Math.abs(wv - want) > 1e-6) continue;
       to = want; break;
     }
     const arc = (to - fin.from) * fin.dir;
     const S = orbitPt(fin.from, centre[1] + hs[0], r);
-    finaleSegs.push({ beat: 'hero', pts: [fin.P, S] });
+    finaleSegs.push({ beat: 'hero', pts: fin.bez });
     const orbitPts: V3[] = [];
     const nA = Math.max(8, Math.ceil(arc / 1));
     for (let k = 0; k <= nA; k++) { const u = k / nA, deg = fin.from + (to - fin.from) * u, h = hs[0] + (hs[1] - hs[0]) * (0.5 - 0.5 * Math.cos(Math.PI * u)); orbitPts.push(orbitPt(deg, centre[1] + h, r)); }
@@ -484,7 +562,7 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
     finaleSegs.push({ beat: 'power', pts: powerPts, exact: true });
     const endEye = powerPts[powerPts.length - 1];
     finalFov = fovForCore(endEye, centre, core);
-    orbitMeta = { r, from: fin.from, to, arc, chosenArc: fin.arc, bestArc: Math.max(...orbit.options.map((o: any) => o.arc)), dir: fin.dir, run: [orbit.run.lo, orbit.run.hi], full: orbit.run.full, swing: +fin.swing.toFixed(1), options: orbit.options.map((o: any) => ({ dir: o.dir, from: o.from, to: o.to, arc: o.arc })) };
+    orbitMeta = { r, hs, reachable: bestReachable, from: fin.from, to, arc, arcTotal: +(arc + (fin.arcTotal - fin.arc)).toFixed(0), chosenArc: fin.arc, bestArc: Math.max(...orbit.options.map((o: any) => o.arc)), dir: fin.dir, run: [orbit.run.lo, orbit.run.hi], full: orbit.run.full, swing: +fin.swing.toFixed(1), options: orbit.options.map((o: any) => ({ dir: o.dir, from: o.from, to: o.to, arc: o.arc })) };
     compose.ndcX = Math.abs(compose.ndcX) * -fin.dir;
     endPose = { az: to, r: r * 0.96 };
   } else if (!orbit) {
@@ -501,7 +579,9 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
   const walkL = innerLen('walk'), flightL = flightSegs.reduce((x, f) => x + polyLen(f.pts), 0);
   const tInEst = 1.35 + Math.min(1.3, walkL) / 0.75 + Math.max(0, walkL - 2.7) / 1.45 + 1.4 / 0.85 + flightL / 1.4
     + (orbitMeta ? polyLen(finaleSegs[0].pts) / 0.5 + orbitMeta.arc / 34 + 0.8 : 2) + 2.0;
-  const tTarget = typeof opts.duration === 'number' ? opts.duration : clamp(Math.max(tInEst + 3.6, opts.minDuration || 0), AUTO_DURATION.min, AUTO_DURATION.max);
+  // (the film's length as far as the outside is concerned: what was pinned, or the inside's time over the 73 % of it that is
+  // not outside)
+  const tTarget = typeof opts.duration === 'number' ? opts.duration : Math.max(tInEst / 0.73, opts.minDuration || 0, AUTO_DURATION.min);
   // exterior steps that climb to the door (an upper-storey entry): the approach walks up them
   let stepsSeg: V3[] | null = null;
   if (e.y > 0.9) for (const st of world.steps) {
@@ -518,59 +598,77 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
     for (let k = 0; k <= 20; k++) { const u = k / 20; pts.push([st.at[0] + up[0] * run * u + ox, st.y + rise * u + 1.55, st.at[1] + up[1] * run * u + oz]); }
     stepsSeg = [foot, ...pts];
     notes.push(`approach climbs the steps at [${st.at}] (${st.n} risers)`);
+    // planting round the foot of the flight (a stand of trees the steps climb out of): the climb starts where the eye is
+    // clear of it
+    { let k0 = 0; for (let k = stepsSeg.length - 1; k >= 0; k--) if (!outsideOk(stepsSeg[k])) { k0 = k + 1; break; }
+      if (k0 > 0 && k0 < stepsSeg.length - 3) { stepsSeg = stepsSeg.slice(k0); notes.push(`the climb starts ${k0} steps up: planting round its foot`); } }
     break;
   }
   const tSteps = stepsSeg ? polyLen(stepsSeg) / 1.5 : 0;
-  const tEst = clamp(0.28 * tTarget - 0.7 - 1.7 - tSteps, 1.2, 3.2);   // the outside's 28 %, less the approach (and any steps) and half the door
-  const maxPath = clamp(3.8 * tEst, 6, 13);
+  const tEst = clamp(0.27 * tTarget - 0.7 - 1.7 - tSteps, 1.2, 2.6);   // the outside's 27 %, less the approach (and any steps) and half the door
+  // (an auto film takes the establishing move the house needs to fit the frame, up to 15 m of it; a pinned one only what the
+  // outside's share of it can hold)
+  const maxPath = (typeof opts.duration === 'number' ? clamp(3.8 * tEst, 6, 13) : 15) * ((opts.tune && opts.tune.estScale) || 1);
   const nearA: [number, number] = stepsSeg ? [stepsSeg[0][0], stepsSeg[0][2]] : [P3[0] + n2[0] * 1.4, P3[2] + n2[1] * 1.4];
-  const est = chooseEstablish(world, probe, index, opts.establish ?? 'auto', { near: nearA, maxPath });
-  // the approach start: a site path's line into the door, or the establishing bearing's, 3 m past the door axis point
-  let A: V3;
-  const bearA = clamp(est.bearing * 0.55, -32, 32) * DEG, l2: [number, number] = [n2[1], -n2[0]];
-  const dirA: [number, number] = [n2[0] * Math.cos(bearA) + l2[0] * Math.sin(bearA), n2[1] * Math.cos(bearA) + l2[1] * Math.sin(bearA)];
-  let pathLed = false;
-  if (stepsSeg) A = stepsSeg[0];
-  else {
-    A = [P3[0] + dirA[0] * 1.4, Math.max(yDoor + 0.2, 1.8), P3[2] + dirA[1] * 1.4];
-    // a site path that reaches the door: follow its line out
-    for (const p of world.paths) {
-      const pts = p.pts, dEnd = (q: number[]) => Math.hypot(q[0] - (e.x + n2[0] * 1.5), q[1] - (e.z + n2[1] * 1.5));
-      const i0 = dEnd(pts[0]) <= dEnd(pts[pts.length - 1]) ? 0 : pts.length - 1;
-      if (dEnd(pts[i0]) > 2.6) continue;
-      const seq = i0 === 0 ? pts : pts.slice().reverse();
-      // the point on the path 5 m out from the door
-      let acc = 0, q: number[] | null = null;
-      for (let k = 1; k < seq.length; k++) { const l = Math.hypot(seq[k][0] - seq[k - 1][0], seq[k][1] - seq[k - 1][1]); if (acc + l >= 5.0) { const f = (5.0 - acc) / l; q = [seq[k - 1][0] + (seq[k][0] - seq[k - 1][0]) * f, seq[k - 1][1] + (seq[k][1] - seq[k - 1][1]) * f]; break; } acc += l; }
-      if (!q) continue;
-      const cand: V3 = [q[0], Math.max(yDoor + 0.2, 1.8), q[1]];
-      // only a path that comes in from the front half (not one that runs along the facade)
-      const along = ((cand[0] - e.x) * n2[0] + (cand[2] - e.z) * n2[1]);
-      if (along < 3.5) continue;
-      A = cand; pathLed = true; notes.push('approach follows the site path'); break;
+  const ests = chooseEstablish(world, probe, index, opts.establish ?? 'auto', { near: nearA, maxPath });
+  // one establishing pose, made into its path: the approach start it flies to (a site path's line into the door, or the
+  // pose's bearing's, 1 m past the door axis point 3 m out) and the move itself — a truck across and down onto it (a
+  // Bézier whose first tangent is lateral, so the shot moves from frame 0 without charging at the house), over or round
+  // whatever stands in it (a tree, a car): a crane rather than a truck, or a wider sweep
+  const attemptEstablish = (est: Establish) => {
+    const notesE: string[] = [];
+    let A: V3;
+    const bearA = clamp(est.bearing * 0.55, -32, 32) * DEG, l2: [number, number] = [n2[1], -n2[0]];
+    const dirA: [number, number] = [n2[0] * Math.cos(bearA) + l2[0] * Math.sin(bearA), n2[1] * Math.cos(bearA) + l2[1] * Math.sin(bearA)];
+    let pathLed = false;
+    if (stepsSeg) A = stepsSeg[0];
+    else {
+      A = [P3[0] + dirA[0] * 1.0, Math.max(yDoor + 0.2, 1.8), P3[2] + dirA[1] * 1.0];
+      // a site path that reaches the door: follow its line out
+      for (const p of world.paths) {
+        const pts = p.pts, dEnd = (q: number[]) => Math.hypot(q[0] - (e.x + n2[0] * 1.5), q[1] - (e.z + n2[1] * 1.5));
+        const i0 = dEnd(pts[0]) <= dEnd(pts[pts.length - 1]) ? 0 : pts.length - 1;
+        if (dEnd(pts[i0]) > 2.6) continue;
+        const seq = i0 === 0 ? pts : pts.slice().reverse();
+        // the point on the path 5 m out from the door
+        let acc = 0, q: number[] | null = null;
+        for (let k = 1; k < seq.length; k++) { const l = Math.hypot(seq[k][0] - seq[k - 1][0], seq[k][1] - seq[k - 1][1]); if (acc + l >= 5.0) { const f = (5.0 - acc) / l; q = [seq[k - 1][0] + (seq[k][0] - seq[k - 1][0]) * f, seq[k - 1][1] + (seq[k][1] - seq[k - 1][1]) * f]; break; } acc += l; }
+        if (!q) continue;
+        const cand: V3 = [q[0], Math.max(yDoor + 0.2, 1.8), q[1]];
+        // only a path that comes in from the front half (not one that runs along the facade)
+        const along = ((cand[0] - e.x) * n2[0] + (cand[2] - e.z) * n2[1]);
+        if (along < 3.5) continue;
+        A = cand; pathLed = true; notesE.push('approach follows the site path'); break;
+      }
     }
-  }
-  // establishing path: from the pose, a truck across and down onto the approach start (a Bézier whose first
-  // tangent is lateral, so the shot moves from frame 0 without charging at the house)
-  const E = est.eye;
-  const EA = sub(A, E), dEA = len(EA);
-  const lat = norm([-(est.aim[2] - E[2]), 0, est.aim[0] - E[0]]);
-  const latSign = Math.sign(((A[0] - E[0]) * lat[0] + (A[2] - E[2]) * lat[2])) || 1;
-  const buildOutside = (A0: V3): V3[] => {
-    const toA = norm(sub(A0, E));
-    const c1 = add(E, add(mul(lat, latSign * dEA * 0.28), mul(toA, dEA * 0.18)));
-    const endDir = stepsSeg ? norm(sub(stepsSeg[1], stepsSeg[0])) : norm(sub(P3, A0));
-    const c2 = sub(A0, mul(endDir, Math.min(4, dEA * 0.3)));
-    return bezier(E, [c1[0], E[1] - (E[1] - A0[1]) * 0.25, c1[2]], [c2[0], A0[1] + 0.6, c2[2]], A0, 60);
+    const E = est.eye;
+    const EA = sub(A, E), dEA = len(EA);
+    const lat = norm([-(est.aim[2] - E[2]), 0, est.aim[0] - E[0]]);
+    const latSign = Math.sign(((A[0] - E[0]) * lat[0] + (A[2] - E[2]) * lat[2])) || 1;
+    // `bulge` swings the move's middle sideways (metres, + toward the side it already leans to)
+    const buildOutside = (A0: V3, bulge = 0): V3[] => {
+      const toA = norm(sub(A0, E));
+      const c1 = add(E, add(mul(lat, latSign * (dEA * 0.28 + bulge)), mul(toA, dEA * 0.18)));
+      const endDir = stepsSeg ? norm(sub(stepsSeg[1], stepsSeg[0])) : norm(sub(P3, A0));
+      const c2 = sub(A0, mul(endDir, Math.min(4, dEA * 0.3)));
+      return bezier(E, [c1[0], E[1] - (E[1] - A0[1]) * 0.25, c1[2]], [c2[0], A0[1] + 0.6, c2[2]], A0, 60);
+    };
+    let establishPts = buildOutside(A), blocked = blockedOut(establishPts) >= 0;
+    if (blocked) {
+      search: for (const bulge of [0, 1.5, -1.5, 3, -3, 5]) for (const lift of [0, 1.2, 2.4, 3.6, 5]) {
+        if (!bulge && !lift) continue;
+        const base = buildOutside(A, bulge);
+        const pts = base.map((p, i) => { const u = i / (base.length - 1); return [p[0], p[1] + lift * Math.sin(Math.PI * Math.min(1, u * 1.15)), p[2]] as V3; });
+        if (blockedOut(pts) < 0) { establishPts = pts; blocked = false; notesE.push(`establishing move ${lift ? `lifted ${lift} m` : ''}${lift && bulge ? ' and ' : ''}${bulge ? `swung ${bulge} m wide` : ''} round the garden`); break search; }
+      }
+    }
+    return { est, A, pathLed, establishPts, blocked, notes: notesE };
   };
-  let establishPts = buildOutside(A);
-  if (blockedOut(establishPts) >= 0) {
-    // lift the middle of the move over whatever stands in it (a tree, a car): a crane rather than a truck
-    for (const lift of [1.2, 2.4, 3.6]) {
-      const pts = establishPts.map((p, i) => { const u = i / (establishPts.length - 1); return [p[0], p[1] + lift * Math.sin(Math.PI * Math.min(1, u * 1.15)), p[2]] as V3; });
-      if (blockedOut(pts) < 0) { establishPts = pts; notes.push(`establishing move lifted ${lift} m over the garden`); break; }
-    }
-  }
+  let chosenEst = attemptEstablish(ests);
+  if (chosenEst.blocked) for (const alt of ests.alts.slice(1, 10)) { const t = attemptEstablish(alt); if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose ${alt.style} (the first choice's move is blocked by the garden)`); break; } }
+  if (chosenEst.blocked) chosenEst.notes.push('establishing move blocked by the garden and no way round found');
+  const { est, A, pathLed, establishPts } = chosenEst;
+  notes.push(...chosenEst.notes);
   // approach: A → (the door axis, 3 m out) → 0.8 m out; routed round anything at eye height when a straight
   // run is blocked
   let approachPts: V3[];
@@ -608,7 +706,7 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
   const firstWalk = interior.findIndex(s => s.beat === 'route');
   if (firstWalk >= 0) {
     const s = interior[firstWalk], L = polyLen(s.pts);
-    if (L > 0.5) { const [h, t] = splitAt(s.pts, Math.min(1.3, L * (interior.length === 1 ? 0.35 : 0.6))); interior.splice(firstWalk, 1, { beat: 'reveal', pts: h, level: s.level }, ...(polyLen(t) > 0.05 ? [{ beat: 'route' as Beat, pts: t, level: s.level }] : [])); }
+    if (L > 0.5) { const [h, t] = splitAt(s.pts, Math.min(1.0, L * (interior.length === 1 ? 0.35 : 0.6))); interior.splice(firstWalk, 1, { beat: 'reveal', pts: h, level: s.level }, ...(polyLen(t) > 0.05 ? [{ beat: 'route' as Beat, pts: t, level: s.level }] : [])); }
     else s.beat = 'reveal';
   }
   const lastWalk = interior.length - 1 - [...interior].reverse().findIndex(s => s.beat === 'route' || s.beat === 'reveal');
@@ -617,7 +715,7 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
     // where the walk enters the Core's room
     let inside = L;
     if (coreRoom) { let acc = 0; for (let k = 1; k < s.pts.length; k++) { const l = len(sub(s.pts[k], s.pts[k - 1])); if (inRect(s.pts[k][0], s.pts[k][2], coreRoom.b, 0.05) && !inRect(s.pts[k - 1][0], s.pts[k - 1][2], coreRoom.b, 0.05)) inside = L - acc; acc += l; } }
-    const rr = clamp(Math.min(inside, 1.4), Math.min(0.8, L * 0.5), L);
+    const rr = clamp(Math.min(inside, 1.1), Math.min(0.8, L * 0.5), L);
     const [h, t] = splitAt(s.pts, L - rr);
     interior.splice(lastWalk, 1, ...(polyLen(h) > 0.05 ? [{ beat: 'route' as Beat, pts: h, level: s.level }] : []), { beat: 'roomReveal', pts: t, level: s.level });
   } else if (lastWalk >= 0 && lastWalk < interior.length && interior[lastWalk].beat === 'reveal' && polyLen(interior[lastWalk].pts) > 2.4) {
@@ -670,16 +768,17 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
   for (let i = 0; i < NP; i++) {
     const b = beatAt(i);
     let c = b === 'orbit' ? (orbit ? orbit.r : 0.9) * SPEED_CAP.orbit * DEG : SPEED_CAP[b];
-    if (b === 'stair' || b === 'descend') c = SPEED_CAP[b] * 1.35;   // along the flight (its run is ~74 % of its length)
-    cruise[i] = c * 0.92;
+    if (b === 'stair' || b === 'descend' || b === 'extStair') c = SPEED_CAP[b] * 1.35;   // along the flight (its run is ~74 % of its length)
+    cruise[i] = c * 0.97;
     // an interior doorway: ≤ 1.2 m/s within ±0.6 m of its plane
     for (const d of doorsAll) {
       if (Y[i] < d.y + 0.5 || Y[i] > d.y + 2.5) continue;
       const a = (X[i] - d.c[0]) * d.n[0] + (Z[i] - d.c[1]) * d.n[1], lat = Math.abs((X[i] - d.c[0]) * d.n[1] - (Z[i] - d.c[1]) * d.n[0]);
-      if (Math.abs(a) < 0.6 && lat < d.w / 2 + 0.3) local[i] = Math.min(local[i], 1.2 * 0.92);
+      if (Math.abs(a) < 0.6 && lat < d.w / 2 + 0.3) local[i] = Math.min(local[i], 1.2 * 0.95);
     }
-    // the entry door: ≤ 0.9 m/s across its plane (the threshold beat is capped at that already)
-    if (b === 'threshold') local[i] = Math.min(local[i], 0.9 * 0.92);
+    // the entry door: ≤ 0.9 m/s across its plane, rising to the beat's 1.2 by 0.6 m either side of it (D4: the jambs stay
+    // readable for a beat's length without the zone taking two seconds)
+    if (b === 'threshold') { const a = Math.abs((X[i] - e.x) * n2[0] + (Z[i] - e.z) * n2[1]); local[i] = Math.min(local[i], DOOR_PLANE_CAP * 0.95 + Math.max(0, a - 0.25) * 0.9); }
   }
   // curvature: v ≤ √(a_lat / κ), 1.2 m/s² inside and 2.5 outside (the look turns on its own solver, rate-limited)
   for (let i = 1; i < NP - 1; i++) {
@@ -697,38 +796,51 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
   const overrides = opts.beats || {};
   for (const [b, rs] of beatRanges) for (const [i0, i1] of rs) {
     const L = S[i1] - S[i0], floor = Math.max(b === 'hero' ? heroFloor : BEAT_FLOOR[b] || 0, overrides[b] || 0);
-    if (floor > 0 && L > 0.01) { const v = (L / floor) * 0.85; for (let i = i0; i <= i1; i++) local[i] = Math.min(local[i], v); }
+    // (+ 0.2 s: the speed smoothing moves a beat's ends in by about that)
+    if (floor > 0 && L > 0.01) { const v = (L / (floor + 0.2)) * 0.97; for (let i = i0; i <= i1; i++) local[i] = Math.min(local[i], v); }
   }
   // the first frame moves (≥ 0.5 m in the first second): an establishing move is already flying at 2.5 m/s; the
   // last frame is still moving
   const profile = (capArr: Float64Array) => {
     const v = new Float64Array(NP);
     v[0] = Math.min(capArr[0], OUTSIDE.has(beatAt(0)) ? 3.0 : 1.2);
-    for (let i = 1; i < NP; i++) { const a = OUTSIDE.has(beatAt(i)) ? 2.6 : 1.25, ds = S[i] - S[i - 1]; v[i] = Math.min(capArr[i], Math.sqrt(v[i - 1] * v[i - 1] + 2 * a * ds)); }
+    for (let i = 1; i < NP; i++) { const a = OUTSIDE.has(beatAt(i)) ? ACC_OUT : ACC_IN, ds = S[i] - S[i - 1]; v[i] = Math.min(capArr[i], Math.sqrt(v[i - 1] * v[i - 1] + 2 * a * ds)); }
     v[NP - 1] = Math.min(v[NP - 1], 0.04);
-    for (let i = NP - 2; i >= 0; i--) { const a = OUTSIDE.has(beatAt(i)) ? 2.6 : 1.25, ds = S[i + 1] - S[i]; v[i] = Math.min(v[i], Math.sqrt(v[i + 1] * v[i + 1] + 2 * a * ds)); }
+    for (let i = NP - 2; i >= 0; i--) { const a = OUTSIDE.has(beatAt(i)) ? ACC_OUT : ACC_IN, ds = S[i + 1] - S[i]; v[i] = Math.min(v[i], Math.sqrt(v[i + 1] * v[i + 1] + 2 * a * ds)); }
     for (let i = 0; i < NP; i++) v[i] = Math.max(v[i], 0.015);
     const T = new Float64Array(NP);
     for (let i = 1; i < NP; i++) T[i] = T[i - 1] + 2 * (S[i] - S[i - 1]) / (v[i] + v[i - 1]);
     return { v, T };
   };
-  // the duration solve (§3.4): the beats at their caps give the shortest film; auto takes that (12–18 s) and a
-  // pinned duration gets the surplus in the order establish → route → reveal → hero (establish only while the
-  // outside share stays ≤ 27 %), or, pinned too short, every speed scaled up alike
+  // the duration solve (§3.4). The beats at their caps give the shortest film that keeps every cap (Tmin). An auto film
+  // is that plus a breath, to the half second (never under 12 s, or the spec's own length under the global switch); a
+  // pinned one is what the spec says: longer than Tmin, the surplus goes to establish (only while the outside share
+  // stays ≤ 27 %), route, reveal, hero, then the rest — never to the door, the stairs or the power beat; shorter, the
+  // beats that are not protected (the door, the stairs, the push-in, the orbit, the power beat) run faster alike, down to
+  // 60 % of their time, then every beat alike, and QA names the caps that broke (beat-speed). Nothing is sped up past its
+  // cap to make a film fit: a walk that needs longer than the target is planned shorter instead (planDoorToCore's
+  // retries), or its auto film is longer.
   const mult = new Map<Beat, number>(BEATS.map(b => [b, 1]));
   const capWith = () => { const c = new Float64Array(NP); for (let i = 0; i < NP; i++) c[i] = Math.min(cruise[i] * mult.get(beatAt(i))!, local[i]); return c; };
   let prof = profile(capWith());
   const beatTimes = (T: Float64Array) => { const out = new Map<Beat, number>(); for (const [b, rs] of beatRanges) out.set(b, rs.reduce((a, [i0, i1]) => a + T[i1] - T[i0] + (i1 + 1 < NP ? (T[i1 + 1] - T[i1]) : 0), 0)); return out; };
   const Tmin = prof.T[NP - 1];
+  const capTimes = beatTimes(prof.T);
+  // (what limits the walk: the share of the route's length, and time, at each cap — for the audit)
+  const limitStats: Record<string, number> = {};
+  for (let i = 1; i < NP; i++) { const b = beatAt(i); if (b !== 'route') continue; const cru = cruise[i], lo = local[i], v = prof.v[i], ds = S[i] - S[i - 1]; const why = lo < cru - 1e-6 ? (v >= lo - 1e-3 ? 'local' : 'accel') : (v >= cru - 1e-3 ? 'cruise' : 'accel'); limitStats[why] = (limitStats[why] || 0) + ds / Math.max(0.05, v); }
+  for (const k of Object.keys(limitStats)) limitStats[k] = +limitStats[k].toFixed(2);
   let duration: number;
-  if (typeof opts.duration === 'number') duration = opts.duration;
-  else duration = clamp(Math.max(Tmin + 0.4, opts.minDuration || 0), AUTO_DURATION.min, AUTO_DURATION.max);
-  // (an auto film is a whole half-second long; a pinned one is what the spec says)
-  duration = typeof opts.duration === 'number' ? +duration.toFixed(2) : Math.ceil(duration * 2 - 1e-6) / 2;
-  if (Tmin < duration) {
+  // (the outside — establish, the steps, the approach, half the door — stays under 30 % of an auto film, 34.5 % with an
+  // exterior stair: a short walk behind a long approach makes the film longer, its interior slower, never the opening shorter)
+  const hasExt = beatRanges.has('extStair');
+  const outsideCaps = [...OUTSIDE].reduce((a, b) => a + (capTimes.get(b) || 0), 0) + (capTimes.get('threshold') || 0) / 2;
+  if (typeof opts.duration === 'number') duration = +opts.duration.toFixed(2);
+  else duration = Math.max(Math.ceil((Tmin + 0.3) * 2 - 1e-6) / 2, opts.minDuration || 0, AUTO_DURATION.min, Math.ceil(outsideCaps / (hasExt ? 0.345 : 0.30) * 2 - 1e-6) / 2);
+  if (Tmin < duration - 0.02) {
     // surplus: establish (only while the outside share stays ≤ 27 %), route, reveal, hero, then the rest
     const surplusOrder: Beat[] = ['establish', 'route', 'reveal', 'hero', 'roomReveal', 'orbit'];
-    const maxExtra: Partial<Record<Beat, number>> = { establish: 0.6, route: 3, reveal: 1.0, hero: 0.5, roomReveal: 0.8, orbit: 2.0 };
+    const maxExtra: Partial<Record<Beat, number>> = { establish: 0.8, route: 3, reveal: 1.0, hero: 0.5, roomReveal: 0.8, orbit: 1.0 };
     for (let it = 0; it < 8; it++) {
       const T = prof.T, now = T[NP - 1]; if (duration - now < 0.02) break;
       const bt = beatTimes(T);
@@ -737,7 +849,7 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
       for (const b of surplusOrder) {
         if (surplus <= 0.01 || !bt.has(b)) continue;
         let give = Math.min(surplus, maxExtra[b] || 0);
-        if (b === 'establish') give = Math.min(give, Math.max(0, 0.27 * duration - outsideNow));
+        if (b === 'establish') give = Math.min(give, Math.max(0, (hasExt ? 0.32 : 0.27) * duration - outsideNow));
         if (give <= 0.01) continue;
         const d0 = bt.get(b)!;
         mult.set(b, mult.get(b)! * d0 / (d0 + give));
@@ -747,40 +859,15 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
       prof = profile(capWith());
     }
   } else if (Tmin > duration + 0.02) {
-    // a deficit: the corridors go faster first (route up to 1.6×, establish and approach up to 1.25×) — never the
-    // door, the stairs or the finale
-    const order: Array<[Beat, number]> = [['route', 1.6], ['establish', 1.25], ['approach', 1.25], ['reveal', 1.2], ['roomReveal', 1.15]];
-    for (let it = 0; it < 8; it++) {
-      const T = prof.T, over = T[NP - 1] - duration; if (over < 0.02) break;
-      const bt = beatTimes(T);
-      let need = over;
-      for (const [b, mx] of order) {
-        if (need <= 0.01 || !bt.has(b)) continue;
-        const d0 = bt.get(b)!, m = mult.get(b)!, room = Math.max(0, d0 - d0 * m / mx);
-        const take = Math.min(need, room); if (take <= 0.005) continue;
-        mult.set(b, Math.min(mx, m * d0 / (d0 - take)));
-        need -= take;
-      }
-      prof = profile(capWith());
-    }
-  }
-  // what is still over comes out of the beats that are not protected (the threshold, the stairs, the push-in, the
-  // orbit and the power beat keep their time) — down to 60 % of their time; past that, every beat alike
-  {
     const T = prof.T, over = T[NP - 1] - duration;
-    if (over > 0.02) {
-      const PROTECT = new Set<Beat>(['threshold', 'stair', 'descend', 'hero', 'orbit', 'power']);
-      const bt = beatTimes(T);
-      const free = [...bt].filter(([b]) => !PROTECT.has(b)).reduce((a, [, v]) => a + v, 0);
-      let k = Math.max(0.5, (free - over) / Math.max(free, 1e-6));
-      // an auto film that still does not fit at half pace in the corridors grows (up to 26 s) rather than running
-      // the door, the stairs or the finale; a pinned one is scaled, every beat alike, below
-      if (typeof opts.duration !== 'number' && (free - over) / Math.max(free, 1e-6) < 0.5) { duration = Math.ceil(Math.min(26, T[NP - 1] - free * 0.5) * 2) / 2; notes.push(`auto duration stretched to ${duration} s: the walk needs ${Tmin.toFixed(1)} s at walking pace`); }
-      const Tn = new Float64Array(NP);
-      for (let i = 1; i < NP; i++) Tn[i] = Tn[i - 1] + (T[i] - T[i - 1]) * (PROTECT.has(beatAt(i)) ? 1 : k);
-      prof = { v: prof.v, T: Tn };
-      if (typeof opts.duration === 'number' && Tn[NP - 1] > duration + 0.05) notes.push(`the pinned ${duration} s is too short for the walk (${Tmin.toFixed(1)} s at walking pace): every beat runs faster`);
-    }
+    const PROTECT = new Set<Beat>(['threshold', 'stair', 'descend', 'hero', 'orbit', 'power']);
+    const bt = beatTimes(T);
+    const free = [...bt].filter(([b]) => !PROTECT.has(b)).reduce((a, [, v]) => a + v, 0);
+    const k = Math.max(0.6, (free - over) / Math.max(free, 1e-6));
+    const Tn = new Float64Array(NP);
+    for (let i = 1; i < NP; i++) Tn[i] = Tn[i - 1] + (T[i] - T[i - 1]) * (PROTECT.has(beatAt(i)) ? 1 : k);
+    prof = { v: prof.v, T: Tn };
+    notes.push(`the pinned ${duration} s is too short for the walk (${Tmin.toFixed(1)} s at its caps): the beats run faster than their caps`);
   }
   // the time map, smoothed: a 0.35 s Hann over the speed in time, re-integrated, then scaled onto the duration
   const Traw = prof.T, Tend = Traw[NP - 1];
@@ -835,7 +922,7 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
   const outRampEnd = Math.max(outRampStart + (LENS.interior - finalFov) / (LENS.rate * 0.95), tOrbit + 0.5);
   for (let i = 0; i < N; i++) {
     const t = i * dt;
-    const easeLin = (u: number) => u < 0.08 ? (u * u) / 0.16 : u > 0.92 ? 1 - ((1 - u) * (1 - u)) / 0.16 : u;   // linear with short eased ends
+    const easeLin = (u: number) => u < 0.08 ? (u * u) / (2 * 0.08 * 0.92) : u > 0.92 ? 1 - ((1 - u) * (1 - u)) / (2 * 0.08 * 0.92) : (u - 0.04) / 0.92;   // constant rate, its ends eased (C1)
     let f = fovExt + (LENS.interior - fovExt) * easeLin(ramp(t, tApproach, inRampEnd));
     f = f + (finalFov - f) * easeLin(ramp(t, outRampStart, outRampEnd));
     fov[i] = f;
@@ -901,6 +988,8 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
       case 'threshold': return { p: sightline, w: 0.7, kind: 'sightline' };
       case 'reveal': { const lv = levelIdAt(p) || Le.id; const r = nav.roomAt(lv, p[0], p[2]); return { p: focalOf(r, lv) || sightline, w: 0.6, kind: 'room' }; }
       case 'route': {
+        // inside the Core's room the Core is what the walk is going to
+        if (coreRoom && levelIdAt(p) === Lh.id && inRect(p[0], p[2], coreRoom.b, 0.05)) return { p: coreTarget, w: 0.65, kind: 'core+focal' };
         // the next room ahead: the room 2.5 m on along the path, if it differs from this one
         const lv = levelIdAt(p) || Le.id, here = nav.roomAt(lv, p[0], p[2]);
         let ahead: WRoom | null = null;
@@ -948,7 +1037,7 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
     // none at 100° (the camera never walks backwards to keep something in frame)
     { const c = (da[0] * dsj[0] + da[2] * dsj[2]) / ((Math.hypot(da[0], da[2]) * Math.hypot(dsj[0], dsj[2])) || 1);
       // (the Core, as the walk comes into its room, stays in the blend further round: it is where the film is going)
-      const [lo, hi] = s.kind === 'core+focal' ? [70, 135] : [40, 100];
+      const [lo, hi] = s.kind === 'core+focal' ? [55, 95] : [40, 100];
       ws *= clamp((c - Math.cos(hi * DEG)) / (Math.cos(lo * DEG) - Math.cos(hi * DEG)), 0, 1); }
     if (b === 'orbit' || b === 'power' || b === 'hero' || b === 'establish') ws = 1;
     const d = norm(add(mul(da, 1 - ws), mul(dsj, ws)));
@@ -1054,6 +1143,11 @@ export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
     lengths: Object.fromEntries([...beatRanges].map(([b, rs]) => [b, +rs.reduce((a, [i0, i1]) => a + S[i1] - S[i0], 0).toFixed(2)])),
   };
   track.metrics = { length: +total.toFixed(2), Tmin: +Tmin.toFixed(2), duration };
+  track.plan.outside = { share: +(outsideCaps / duration).toFixed(3), caps: +outsideCaps.toFixed(2), establish: +(capTimes.get('establish') || 0).toFixed(2), others: +(outsideCaps - (capTimes.get('establish') || 0)).toFixed(2), hasExt };
+  track.plan.routeLimit = limitStats;
+  track.plan.finaleCands = finaleCands;
+  track.plan.finaleAll = finaleAll;
+  track.plan.capBeatTimes = Object.fromEntries([...capTimes].map(([b, v]) => [b, +v.toFixed(2)]));
   track.plan.rawBeatTimes = Object.fromEntries([...beatTimes(Traw)].map(([b, v]) => [b, +v.toFixed(2)]));
   return { ok: true as const, track, world, notes };
 }

@@ -42,6 +42,7 @@ export type Door = { level: string; c: [number, number]; n: [number, number]; w:
 class Heap {
   f: number[] = []; h: number[] = []; id: number[] = [];
   get size() { return this.id.length; }
+  clear() { this.f.length = 0; this.h.length = 0; this.id.length = 0; }
   less(a: number, b: number) { return this.f[a] < this.f[b] || (this.f[a] === this.f[b] && (this.h[a] < this.h[b] || (this.h[a] === this.h[b] && this.id[a] < this.id[b]))); }
   swap(a: number, b: number) { for (const arr of [this.f, this.h, this.id]) { const t = arr[a]; arr[a] = arr[b]; arr[b] = t; } }
   push(f: number, h: number, id: number) {
@@ -180,8 +181,10 @@ export function createNav(world: ShotWorld, index: WorldIndex) {
     const s = nearestFree(g, a[0], a[1], t, snap), e = nearestFree(g, b[0], b[1], t, snap);
     if (!s || !e) return null;
     const W = g.W, start = s[1] * W + s[0], goal = e[1] * W + e[0];
-    const gs = new Float64Array(g.W * g.H).fill(Infinity), came = new Int32Array(g.W * g.H).fill(-1), closed = new Uint8Array(g.W * g.H);
-    const heap = new Heap();
+    // (one set of work buffers for the grid, reset on each search)
+    const bufs = ((g as any)._astar ||= { gs: new Float64Array(g.W * g.H), came: new Int32Array(g.W * g.H), closed: new Uint8Array(g.W * g.H), heap: new Heap() });
+    const gs: Float64Array = bufs.gs.fill(Infinity), came: Int32Array = bufs.came.fill(-1), closed: Uint8Array = bufs.closed.fill(0);
+    const heap: Heap = bufs.heap; heap.clear();
     const hOf = (c: number) => Math.hypot((c % W) - e[0], Math.floor(c / W) - e[1]);
     gs[start] = 0; heap.push(hOf(start), hOf(start), start);
     const N8 = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]];

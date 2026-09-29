@@ -244,7 +244,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     if (j > (out2 ? 20 : 10)) W('jerk', tOf(i), `${beat[i]}: jerk ${j.toFixed(0)} m/s³ (≤ ${out2 ? 20 : 10})`, beat[i]);
     const bt = beat[i];
     let cap = bt === 'orbit' ? null : SPEED_CAP[bt];
-    if (bt === 'stair' || bt === 'descend') cap = SPEED_CAP[bt] * 1.35;
+    if (bt === 'stair' || bt === 'descend' || bt === 'extStair') cap = SPEED_CAP[bt] * 1.35;
     if (cap !== null && speed[i] > cap * 1.1) W('beat-speed', tOf(i), `${bt}: ${speed[i].toFixed(2)} m/s (cap ${cap.toFixed(1)})`, bt);
     if (bt === 'orbit') { const r = Math.hypot(eye[i][0] - centre[0], eye[i][2] - centre[2]) || 1; const w2 = speed[i] / r / DEG; if (w2 > 45) W('orbit-yaw-rate', tOf(i), `the orbit turns at ${w2.toFixed(0)}°/s (≤ 45)`); }
   }
@@ -410,7 +410,9 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
       if (i > i0) { const a = Math.atan2(eye[i][0] - centre[0], eye[i][2] - centre[2]), b = Math.atan2(eye[i - 1][0] - centre[0], eye[i - 1][2] - centre[2]); swept += wrapPi(a - b); }
     }
     const arc = Math.abs(swept) / DEG; metrics.orbitArc = +arc.toFixed(1);
-    const best = track.plan && track.plan.orbit ? track.plan.orbit.bestArc : 0;
+    // (what the room allows: the longest sweep the planner found a swing-free way to arrive at — a walk that comes straight
+    // at the Core's front cannot start a long sweep without first circling it the other way)
+    const best = track.plan && track.plan.orbit ? (track.plan.orbit.reachable ?? track.plan.orbit.bestArc) : 0;
     if (arc < 90 - 0.5 && best >= 90) W('orbit-short', tOf(orbitSpan[0][0]), `the Core orbit sweeps ${arc.toFixed(0)}° where the room allows ${best}° (≥ 90)`);
     // swing: the 2.5 s before the orbit, the eye travelling round the Core against it with the Core in frame
     const i0 = orbitSpan[0][0], sg = Math.sign(swept) || 1;
