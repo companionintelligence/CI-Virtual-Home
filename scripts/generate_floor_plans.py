@@ -1501,7 +1501,7 @@ def render_level(spec, level, n, sh=None, view_mode="lot"):
     svg.append("</g>")
     svg.append('<g class="furniture">')
     for room in rooms:
-        for it in room.get("items", []) or []:
+        for it in list(room.get("items", []) or []) + composed_items(spec_id, level_id, room):
             svg.append(draw_item(sh, it, level_id, spec_id))
     svg.append("</g>")
 
@@ -1581,9 +1581,29 @@ def render_level(spec, level, n, sh=None, view_mode="lot"):
 # -----------------------------------------------------------------------------
 # floorplans.json entry for a spec
 # -----------------------------------------------------------------------------
-def room_items(room):
+_COMPOSED = {}
+
+
+def composed_items(spec_id, level_id, room):
+    """The items the composer (assets/room-composer.ts) furnishes a room with at build time — a room with a `program`
+    has none in the spec — from <id>.plan.json's `compose` key (assets/plan-export/compose.ts). [] for a house that
+    composes nothing (all 30 real specs today), or that has no plan.json."""
+    if spec_id not in _COMPOSED:
+        found = {}
+        pp = HOUSES_DIR / f"{spec_id}.plan.json"
+        if pp.exists():
+            try:
+                for r in ((json.loads(pp.read_text()).get("compose") or {}).get("rooms") or []):
+                    found[(r.get("level"), r.get("name"))] = r.get("items") or []
+            except Exception:
+                pass
+        _COMPOSED[spec_id] = found
+    return _COMPOSED[spec_id].get((level_id, room.get("name")), [])
+
+
+def room_items(room, extra=()):
     counts, order = {}, []
-    for it in room.get("items", []) or []:
+    for it in list(room.get("items", []) or []) + list(extra):
         name = pretty_item(it.get("type", "item"))
         if name not in counts:
             order.append(name)
@@ -1607,7 +1627,7 @@ def build_entry(spec):
             b = room.get("bounds") or {}
             area = round(float(b.get("w", 0)) * float(b.get("d", 0)), 1) if b else 0.0
             rooms.append({"no": str(room.get("no", "")), "name": str(room.get("name", "Room")),
-                          "area_sqm": area, "elev": elev, "items": room_items(room)})
+                          "area_sqm": area, "elev": elev, "items": room_items(room, composed_items(spec["id"], lv.get("id"), room))})
         out_levels.append({"level": n, "title": lv.get("name") or f"Level {n}", "sheet": lv.get("sheet") or f"A-10{n}",
                            "svg": f"{SVG_REL_DIR}/fp-{spec['id']}-l{n}.svg", "rooms": rooms})
     return {"id": spec["id"], "title": spec.get("name", spec["id"]), "author": spec.get("author", ""),

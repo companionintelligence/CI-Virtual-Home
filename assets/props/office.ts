@@ -346,3 +346,60 @@ registerProps({
     iso: [{ shape: 'box', box: [-0.45, 1.1, 0, 0.45, 1.7, 0.035], color: 'role:wood' }, { shape: 'box', box: [-0.42, 1.13, 0.02, 0.42, 1.67, 0.04], color: '#c8a170' }, { shape: 'box', box: [-0.2, 1.36, 0.04, -0.12, 1.44, 0.045], color: '#fde68a' }],
   },
 });
+
+// =================================================================================================================
+// Pass 4 (S3 compose): acoustic pianos — a grand for a salon or a library, an upright against a wall (mirage's
+// photo) — each with its bench, so a music corner is one item.
+// =================================================================================================================
+registerProps({
+  // Grand piano — the curved case on three legs, the lid propped open on the treble side, the keyboard and its bench
+  // at +z (the pianist sits facing −z, into the piano). Footprint 1.56 × 2.4 with the bench.
+  'grand-piano': {
+    footprint: [1.56, 2.4], height: 1.66, params: ['color'], tags: ['living', 'library', 'studio'],
+    create(it, { THREE, std, box, group, colors, hex }) {
+      const g = group('Grand Piano'), oz = -0.2;   // oz: every z below is shifted so the footprint is centred
+      const lacquer = std(it.color ? hex(it.color) : 0x141414, { roughness: 0.18, metalness: 0.1 });
+      const white = std(colors.linen, { roughness: 0.35 }), black = std(0x0b0b0c, { roughness: 0.4 }), brass = std(0xb08d57, { metalness: 0.8, roughness: 0.3 });
+      // the case outline in plan (x, z): the straight bass side at −x, the bentside curving in to the tail
+      const s = new THREE.Shape();
+      s.moveTo(-0.75, 0.75); s.lineTo(0.75, 0.75); s.lineTo(0.75, 0.25);
+      s.bezierCurveTo(0.75, -0.1, 0.25, -0.2, 0.05, -0.45); s.bezierCurveTo(-0.15, -0.72, -0.2, -1.0, -0.45, -1.0);
+      s.lineTo(-0.75, -0.95); s.lineTo(-0.75, 0.75);
+      const slab = (depth, mat) => { const geo = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: false, curveSegments: 16 }); geo.rotateX(Math.PI / 2); const m = new THREE.Mesh(geo, mat); m.castShadow = true; m.receiveShadow = true; return m; };
+      const body = slab(0.34, lacquer); body.position.set(0, 0.95, oz); g.add(body);   // rotateX(π/2) sends the depth down, from y 0.95
+      const lid = new THREE.Group(); lid.position.set(-0.75, 0.97, oz); lid.rotation.z = 0.5; g.add(lid);   // hinged along the bass side
+      const lidSlab = slab(0.02, lacquer); lidSlab.position.set(0.75, 0.02, 0); lid.add(lidSlab);
+      g.add(box(0.015, 0.02, 0.015, black, 0.6, 1.2, oz + 0.2));   // (the prop stick is hidden by the lid)
+      for (const [x, z] of [[-0.62, 0.62], [0.62, 0.62], [-0.4, -0.85]]) { g.add(box(0.1, 0.62, 0.1, lacquer, x, 0.31, z + oz)); g.add(box(0.06, 0.04, 0.06, brass, x, 0.02, z + oz)); }
+      g.add(box(1.46, 0.08, 0.24, lacquer, 0, 0.72, 0.87 + oz));                          // key bed
+      g.add(box(1.34, 0.02, 0.15, white, 0, 0.77, 0.91 + oz));                            // keys
+      for (let o = 0; o < 6; o++) { const x0 = -0.67 + o * 0.223, wk = 0.223 / 7; g.add(box(wk * 1.7, 0.014, 0.09, black, x0 + wk * 1.5, 0.786, 0.88 + oz)); g.add(box(wk * 2.7, 0.014, 0.09, black, x0 + wk * 5, 0.786, 0.88 + oz)); }
+      for (const sx of [-1, 1]) g.add(box(0.06, 0.1, 0.24, lacquer, sx * 0.7, 0.8, 0.87 + oz));   // cheek blocks
+      const desk = box(0.7, 0.26, 0.02, lacquer, 0, 1.08, 0.66 + oz); desk.rotation.x = -0.25; g.add(desk);   // music desk
+      g.add(box(0.8, 0.06, 0.34, lacquer, 0, 0.47, 1.21 + oz));                           // bench seat
+      g.add(box(0.76, 0.04, 0.3, std(0x2b2622, { roughness: 0.6 }), 0, 0.515, 1.21 + oz));
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) g.add(box(0.04, 0.44, 0.04, lacquer, sx * 0.36, 0.22, 1.21 + oz + sz * 0.13));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.78, 0.6, -1.2, 0.78, 0.95, 0.75], color: '#141414' }, { shape: 'box', box: [-0.4, 0, 0.83, 0.4, 0.53, 1.2], color: '#141414' }],
+  },
+  // Upright piano — a tall case against the wall (back at −z), the keyboard proud of it on two toe blocks, the bench
+  // in front. Footprint 1.5 × 1.13 with the bench.
+  'upright-piano': {
+    footprint: [1.5, 1.13], height: 1.25, params: ['color'], tags: ['living', 'library', 'studio', 'kids'],
+    create(it, { std, box, group, colors, hex }) {
+      const g = group('Upright Piano'), oz = -0.265;
+      const case_ = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.3 }), white = std(colors.linen, { roughness: 0.35 }), black = std(0x0b0b0c, { roughness: 0.4 });
+      g.add(box(1.5, 1.25, 0.3, case_, 0, 0.625, -0.15 + oz));                             // the case, back at z −0.3
+      g.add(box(1.5, 0.07, 0.27, case_, 0, 0.72, 0.135 + oz));                             // key bed
+      g.add(box(1.36, 0.02, 0.15, white, 0, 0.765, 0.19 + oz));
+      for (let o = 0; o < 6; o++) { const x0 = -0.68 + o * 0.227, wk = 0.227 / 7; g.add(box(wk * 1.7, 0.014, 0.09, black, x0 + wk * 1.5, 0.781, 0.16 + oz)); g.add(box(wk * 2.7, 0.014, 0.09, black, x0 + wk * 5, 0.781, 0.16 + oz)); }
+      for (const sx of [-1, 1]) { g.add(box(0.07, 0.68, 0.06, case_, sx * 0.68, 0.34, 0.24 + oz)); g.add(box(0.07, 0.06, 0.28, case_, sx * 0.68, 0.03, 0.14 + oz)); }   // legs and toe blocks
+      g.add(box(1.36, 0.36, 0.02, std(0x2b2622, { roughness: 0.5 }), 0, 1.0, 0.005 + oz));   // fall board / music rest panel
+      g.add(box(0.76, 0.06, 0.34, case_, 0, 0.47, 0.655 + oz));                             // bench
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) g.add(box(0.04, 0.44, 0.04, case_, sx * 0.34, 0.22, 0.655 + oz + sz * 0.13));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.75, 0, -0.565, 0.75, 1.25, -0.265], color: 'role:wood' }, { shape: 'box', box: [-0.38, 0, 0.22, 0.38, 0.5, 0.565], color: 'role:wood' }],
+  },
+});

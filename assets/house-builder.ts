@@ -25,9 +25,13 @@
 //                   arch-materials.ts, room-finish.ts (per-room floors, walls, ceilings), facade.ts (cladding zones,
 //                   bands, plinths, opening dressing, stoops), features.ts (porches, bays, balconies, fireplaces,
 //                   built-ins, partition styles); the page's stair, slab and wall builders
-//   S3 compose      rooms-build.ts (the rooms loop) and room-composer.ts, props/*.ts except lighting.ts and
-//                   outdoor.ts, props/page-place.ts (page items' placement), props/registry.ts,
-//                   scripts/build-prop-catalog.mts
+//   S3 compose      rooms-build.ts (the rooms loop) and the composer it calls: room-composer.ts (the solver and the
+//                   program sets), room-units.ts (the kitchen and bath packers), room-geo.ts (room geometry, lanes,
+//                   item sizes), room-programs.ts (the 26 programs), house-styles.ts (the style bundles),
+//                   layout-lint.ts (the layout lints); props/*.ts except lighting.ts and outdoor.ts, props/place-kit.ts
+//                   and props/placement.ts (every type's placement), props/page-place.ts (page items' placement),
+//                   props/patterns.ts (rug patterns and the art-motif library), props/registry.ts,
+//                   scripts/build-prop-catalog.mts, compose-house.mts
 //   S4 site         site-build.ts (the lot, the world, the site builders and the site loop), site.ts (the kit),
 //                   site-planting.ts (the planting generator), site-geom.ts (curves, offsets, Poisson discs),
 //                   site-species.ts (the plants' drawing), site-species-masks.ts (generated: what each species hides, and costs), site-structures.ts (stairs, rails, fences, walls),

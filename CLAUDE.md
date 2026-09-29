@@ -16,7 +16,7 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `assets/**/*.js` (gitignored) | `pnpm run build` |
 | `content/houses/<id>.plan.json` | `pnpm run plans` |
 | `content/houses/index.json` | `pnpm run index` |
-| `content/house-catalog.json` | `pnpm run catalog` |
+| `content/house-catalog.json`, `assets/props/measured.ts` | `pnpm run catalog` |
 | `assets/site-species-masks.ts` (what each planting species hides of the mulch, and its triangle cost) | `node --experimental-strip-types scripts/measure-species.mts --write` — after a change to a species' geometry (`assets/site-species.ts`, the flower heads and grass tuft in `assets/site.ts`), then `pnpm run build`; `scripts/test-site-species.mts` fails until it is done |
 | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` | `pnpm run iso` |
 | `scenes/floorplans/` | `pnpm run floorplans` |

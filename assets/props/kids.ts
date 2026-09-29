@@ -378,3 +378,59 @@ registerProps({
     iso: [{ shape: 'blob', box: [-0.13, 0, -0.11, 0.13, 0.27, 0.18], color: '#b45309' }, { shape: 'blob', box: [-0.1, 0.23, -0.1, 0.1, 0.45, 0.1], color: '#b45309' }],
   },
 });
+
+// =================================================================================================================
+// Pass 4 (S3 compose): nursery and kid's-room furniture the composer's bed-kid / nursery / playroom sets need — a
+// changing table, a nursing glider, and a kid's desk with its chair.
+// =================================================================================================================
+registerProps({
+  // Changing table — a low dresser with a padded changing tray on top and an open shelf under (nursery).
+  'changing-table': {
+    footprint: [0.9, 0.52], height: 1.0, params: ['color'], tags: ['kids', 'nursery'],
+    create(it, { std, box, group, colors, hex, mix }) {
+      const w = 0.9, d = 0.5, g = group('Changing Table'), body = it.color ? hex(it.color) : colors.linen;
+      const mat = std(body, { roughness: 0.55 }), wood = std(colors.wood, { roughness: 0.5 });
+      g.add(box(w, 0.85, d, mat, 0, 0.425, 0));
+      for (const y of [0.52, 0.74]) g.add(box(w - 0.06, 0.18, 0.02, std(mix(body, 0x000000, 0.06), { roughness: 0.5 }), 0, y, d / 2 + 0.01));   // drawers
+      g.add(box(w - 0.06, 0.02, d - 0.04, wood, 0, 0.16, 0.01));                                    // open bottom shelf
+      g.add(box(w + 0.02, 0.1, 0.03, wood, 0, 0.9, -d / 2 + 0.015));                                // tray rails
+      for (const s of [-1, 1]) g.add(box(0.03, 0.1, d, wood, s * (w / 2 - 0.005), 0.9, 0));
+      g.add(box(w - 0.1, 0.07, d - 0.08, std(colors.fabric2, { roughness: 0.95 }), 0, 0.885, 0.02));   // pad
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.45, 0, -0.25, 0.45, 0.85, 0.25], color: 'role:linen' }, { shape: 'box', box: [-0.45, 0.85, -0.25, 0.45, 0.95, 0.25], color: 'role:wood' }],
+  },
+  // Nursery glider — a padded rocking armchair on a glider base (nursery, a quiet bedroom corner).
+  'nursery-glider': {
+    footprint: [0.74, 0.86], height: 1.04, params: ['color'], tags: ['kids', 'nursery', 'bedroom'],
+    create(it, { std, box, group, colors, hex, mix }) {
+      const g = group('Nursery Glider'), base = it.color ? hex(it.color) : colors.fabric;
+      const fab = std(base, { roughness: 0.9 }), cushion = std(mix(base, 0xffffff, 0.12), { roughness: 0.92 }), metal = std(colors.metal, { metalness: 0.7, roughness: 0.35 });
+      for (const s of [-1, 1]) { g.add(box(0.05, 0.04, 0.78, metal, s * 0.3, 0.02, 0)); g.add(box(0.04, 0.14, 0.04, metal, s * 0.3, 0.1, 0)); }   // glider runners
+      g.add(box(0.74, 0.22, 0.78, fab, 0, 0.29, 0.03));
+      for (const s of [-1, 1]) g.add(box(0.14, 0.26, 0.7, fab, s * 0.3, 0.53, 0.06));             // arms
+      g.add(box(0.46, 0.12, 0.62, cushion, 0, 0.46, 0.08));
+      const back = box(0.74, 0.66, 0.16, fab, 0, 0.71, -0.33); back.rotation.x = -0.1; g.add(back);
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.37, 0.18, -0.36, 0.37, 0.66, 0.42], color: 'role:fabric' }, { shape: 'box', box: [-0.37, 0.38, -0.43, 0.37, 1.04, -0.25], color: 'role:fabric' }],
+  },
+  // Kid's desk — a small desk with a pencil shelf and its chair tucked in front (+z) (bed-kid, playroom).
+  'kids-desk': {
+    footprint: [0.9, 0.86], height: 0.72, params: ['color'], tags: ['kids', 'playroom'],
+    create(it, { THREE, std, box, group, colors, hex, rng }) {
+      const g = group("Kid's Desk"), top = std(it.color ? hex(it.color) : colors.linen, { roughness: 0.5 }), wood = std(colors.wood, { roughness: 0.5 });
+      const dz = -0.18;   // the desk's centre; its chair sits at +z
+      g.add(box(0.9, 0.03, 0.5, top, 0, 0.585, dz));
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) g.add(box(0.04, 0.57, 0.04, wood, sx * 0.42, 0.285, dz + sz * 0.22));
+      g.add(box(0.9, 0.12, 0.12, top, 0, 0.66, dz - 0.19));                                           // pencil shelf at the back
+      for (let i = 0; i < 3; i++) g.add(box(0.03, 0.1, 0.03, std(pickCandy(rng), { roughness: 0.6 }), -0.3 + i * 0.04, 0.77, dz - 0.19));
+      const seat = std(pickCandy(rng), { roughness: 0.55 });
+      g.add(box(0.34, 0.03, 0.3, seat, 0, 0.34, 0.28));
+      g.add(box(0.34, 0.24, 0.03, seat, 0, 0.5, 0.42));
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) g.add(box(0.03, 0.33, 0.03, wood, sx * 0.15, 0.165, 0.28 + sz * 0.13));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.45, 0.57, -0.43, 0.45, 0.72, 0.07], color: 'role:linen' }, { shape: 'box', box: [-0.17, 0, 0.13, 0.17, 0.62, 0.43], color: '#4a86e8' }],
+  },
+});
