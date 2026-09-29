@@ -335,6 +335,23 @@ def box(ctx, item, X, Y, Z, w, h, d, cols, stroke="none", sw=0.7, opacity=1.0, d
             item.shapes.append(("poly", pts, c, stroke, sw * ctx.lw, opacity))
 
 
+def rprism(ctx, item, cx, Y, cz, w, h, d, rot, cols, stroke="none", sw=0.6, opacity=1.0):
+    """Prism w x d in plan, centred on (cx, cz), turned `rot` degrees as the three.js builders turn an object (a local
+    (x, z) goes to (x cos + z sin, -x sin + z cos)), h tall from Y: the sides that face the camera (south and east
+    of it, blended by how far they turn) and the top. cols = (top, south face, east face). S4: a fence run at 30 degrees."""
+    a = math.radians(rot or 0); c, sn = math.cos(a), math.sin(a)
+    pts = [(cx + x * c + z * sn, cz - x * sn + z * c) for x, z in ((-w / 2, -d / 2), (w / 2, -d / 2), (w / 2, d / 2), (-w / 2, d / 2))]
+    P = ctx.P
+    for k in range(4):
+        (x0, z0), (x1, z1) = pts[k], pts[(k + 1) % 4]
+        ex, ez = x1 - x0, z1 - z0; ln = math.hypot(ex, ez) or 1.0
+        nx, nz = ez / ln, -ex / ln   # outward normal (the corners run clockwise seen from above)
+        if nx + nz <= 1e-6: continue   # faces away from the camera
+        t = max(0.0, min(1.0, nz / (nx + nz)))
+        add_poly(ctx, item, [P(x0, Y, z0), P(x1, Y, z1), P(x1, Y + h, z1), P(x0, Y + h, z0)], mix(cols[2], cols[1], t), stroke, sw, opacity)
+    add_poly(ctx, item, [P(x, Y + h, z) for x, z in pts], cols[0], stroke, sw, opacity)
+
+
 def cylinder(ctx, item, X, Y, Z, r, h, cols, n=20, stroke="none", sw=0.6, opacity=1.0, detail=False):
     """Vertical cylinder; visible side split into the south-facing (cols[1]) and east-facing (cols[2]) halves."""
     def arc(y, a0, a1, steps=8):
@@ -528,7 +545,13 @@ class HouseRenderer:
         instances = self.plan_instances(plan)
         by_site = {}
         for ins in instances: by_site.setdefault(ins.get("site"), []).append(ins)
+        # what the builder recorded as standing on the lot (plan.json's site.solids), by the item that made it: the
+        # fences, walls and props this twin has no drawing of its own for are drawn from these
+        self.plan_solids = {}
+        psite = (plan or {}).get("site")
+        for q in (psite.get("solids", []) if isinstance(psite, dict) else []): self.plan_solids.setdefault(q.get("site"), []).append(q)
         for i, s in enumerate(self.spec.get("site", [])):
+            self.cur_site = i
             t = s.get("type")
             # anything the builder described itself (a kit type, or an S4 item in a new form: a shaped pool, a
             # patio drawn round a polygon, a terrace) is drawn from what it built
@@ -542,17 +565,65 @@ class HouseRenderer:
                 continue
             fn = getattr(self, "site_" + t.replace("-", "_"), None)
             if fn is None:
-                self.skipped.append(f"site type '{t}'")
+                if not self.site_from_solids(s, i): self.skipped.append(f"site type '{t}'")
                 continue
-            fn(s)
+            # S4: an outline (`poly`) in place of `at`, w, d — a patio, a driveway, a pool — with no plan.json to draw it from
+            if "at" not in s and isinstance(s.get("poly"), list) and len(s["poly"]) >= 3 and self.site_poly_flat(s): continue
+            try:
+                fn(s)
+            except (KeyError, TypeError, ValueError, IndexError) as e:
+                # one item this twin cannot draw must not lose the whole scene: say so (the S4 fixtures test fails on this note)
+                self.skipped.append(f"site type '{t}' not drawn ({type(e).__name__}: {e})")
+
+    POLY_FILLS = {"patio": "#d9d6cc", "driveway": "#a8a8a4", "pool": "#5aa9d6", "pond": "#5aa9d6", "deck": "#a47c55", "bed": "#5b4636", "terrace": "#8fae7a", "turf": "#86c46a"}
+
+    def site_poly_flat(self, s):
+        """An item drawn round a `poly`, flat on the ground, when there is no plan.json to draw its built outline from."""
+        fill = self.POLY_FILLS.get(s.get("type"))
+        if not fill: return False
+        pts = [(p[0], p[1]) for p in s["poly"]]
+        y = s.get("y", 0.0) + (s.get("h", 0.12) if s.get("type") == "deck" else 0.02)
+        it = self.new((min(p[0] for p in pts), max(p[0] for p in pts), y, y, min(p[1] for p in pts), max(p[1] for p in pts)), prio=1, name=s.get("type"))
+        add_poly(self.ctx, it, [self.ctx.P(x, y, z) for x, z in pts], s.get("color") or fill, stroke=shade(s.get("color") or fill, -0.25), sw=0.8)
+        return True
+
+    SOLID_LOOKS = {"furniture": ("#a8a29e", 1.0), "structure": ("#d6d3d1", 1.0), "planter": ("#8b6b4a", 1.0), "car": ("#9ca3af", 1.0), "play": ("#c2410c", 1.0), "plant": ("#4d7c3f", 1.0)}
+
+    def site_from_solids(self, s, i):
+        """A site item this twin has no drawing of its own for (an outdoor prop, a cabana …): the boxes the builder recorded
+        for it (plan.json's site.solids) — its footprint and height, turned as built. False when there are none."""
+        got = False
+        for q in getattr(self, "plan_solids", {}).get(i, []):
+            look = self.SOLID_LOOKS.get(q.get("kind"))
+            if not look or q.get("yMax", 0) - q.get("yMin", 0) < 0.05: continue
+            w = q["w"] if q.get("w") is not None else 2 * q.get("r", 0.3); d = q["d"] if q.get("d") is not None else w
+            r = max(w, d) / 2 + 0.05
+            it = self.new((q["x"] - r, q["x"] + r, q["yMin"], q["yMax"], q["z"] - r, q["z"] + r), name=s.get("type"))
+            rprism(self.ctx, it, q["x"], q["yMin"], q["z"], w, q["yMax"] - q["yMin"], d, q.get("rot", 0), triplet(look[0], 0.12, 0.0, -0.2), stroke=shade(look[0], -0.4), sw=0.5)
+            got = True
+        return got
 
     def site_from_plan(self, s, instances):
         """Draw a site item from its resolved 3D instances: boxes as iso boxes, blobs/cones as shaded discs."""
         if not instances: return
+        if any(ins["shape"] == "poly" for ins in instances):
+            # S4: a generator's item (a planting, a pond, a terrace, a ribbon path) is flat outlines on the ground AND things
+            # standing on it (plants, rocks, a terrace's faces): the outlines paint with the ground, the rest in chunks of a
+            # few metres so the painter's sort keeps a plant in front of the bed behind it
+            self._draw_instances(s, [i for i in instances if i["shape"] == "poly"], 1)
+            cells = {}
+            for ins in instances:
+                if ins["shape"] != "poly": cells.setdefault((math.floor((ins["box"][0] + ins["box"][3]) / 8.0), math.floor((ins["box"][2] + ins["box"][5]) / 8.0)), []).append(ins)
+            for key in sorted(cells): self._draw_instances(s, cells[key], 2)
+            return
+        self._draw_instances(s, instances, 1 if s.get("type") in ("path", "bed", "planting", "terrace", "rill", "channel", "patio", "driveway", "pool") else 2)
+
+    def _draw_instances(self, s, instances, prio):
+        if not instances: return
         xs = [b for ins in instances for b in (ins["box"][0], ins["box"][3])]
         zs = [b for ins in instances for b in (ins["box"][2], ins["box"][5])]
         ys = [b for ins in instances for b in (ins["box"][1], ins["box"][4])]
-        it = self.new((min(xs), max(xs), min(ys), max(ys), min(zs), max(zs)), name=s.get("type"), prio=1 if s.get("type") in ("path", "bed", "planting", "terrace", "rill", "channel", "patio", "driveway", "pool") else 2)
+        it = self.new((min(xs), max(xs), min(ys), max(ys), min(zs), max(zs)), name=s.get("type"), prio=prio)
         # paint back-to-front within the item: flat outlines (beds, water, a terrace's plateau) first, then
         # farther (smaller x+z) first, then lower
         for ins in sorted(instances, key=lambda i: (0 if i["shape"] == "poly" else 1, (i["box"][0] + i["box"][3]) + (i["box"][2] + i["box"][5]), i["box"][1])):
@@ -661,7 +732,43 @@ class HouseRenderer:
         cylinder(self.ctx, it, x, 0, z, r, 0.75, ("#4b4f56", "#3a3d43", "#2a2c31"))
         add_poly(self.ctx, it, self.ctx.circle_pts(x, 0.76, z, r - 0.18, 20), "#7dd3fc", stroke="#38bdf8", sw=0.6)
 
+    FENCE_LOOKS = {"glass": (("#dbeafe", "#bfdbfe", "#93c5fd"), 0.4), "metal": (("#4b5563", "#374151", "#1f2937"), 1.0),
+                   "slat-h": (("#a47c55", "#8b6b4a", "#6f543a"), 1.0), "post-rail": (("#a47c55", "#8b6b4a", "#6f543a"), 1.0),
+                   "stone-wall": (("#c4bfb4", "#a8a29e", "#8b857c"), 1.0)}
+
+    def fence_runs(self, s, kind):
+        """[(x, z, length, thickness, rot, y0, y1)] for a fence or garden wall: the runs the builder laid out (plan.json's
+        site.solids: curves resolved, each run at its ground) when the plan has them, else straight along its path."""
+        sol = [q for q in getattr(self, "plan_solids", {}).get(getattr(self, "cur_site", None), []) if q.get("kind") == kind]
+        if sol:
+            return [(q["x"], q["z"], q["w"], q["d"], q.get("rot", 0), q.get("yMin", 0), q.get("yMax", q.get("yMin", 0) + 1.0)) for q in sol]
+        line = s["path"] if s.get("path") else [s["from"], s["to"]]
+        y0 = s.get("y", 0.0); h = s.get("h", 1.1 if kind == "fence" else 0.6); t = s.get("t", 0.25 if kind == "wall" else 0.1)
+        return [((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, math.hypot(b[0] - a[0], b[1] - a[1]), t, -math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])), y0, y0 + h)
+                for a, b in zip(line, line[1:]) if math.hypot(b[0] - a[0], b[1] - a[1]) > 1e-6]
+
+    def site_fence_runs(self, s, kind):
+        """S4: a fence or a garden wall as a run of turned prisms — any angle, a path (curved when smooth), a style, a colour, a y."""
+        style = s.get("style", "picket")
+        cols, op = self.FENCE_LOOKS.get(style, (("#f3f4f6", "#e5e7eb", "#cbd5e1"), 1.0)) if kind == "fence" else (None, 1.0)
+        if kind == "fence" and s.get("color"): cols = triplet(s["color"], 0.1, 0.0, -0.18)
+        if kind == "wall":
+            base = s.get("color") or {"stone": "#a8a29e", "brick": "#a4553f", "concrete": "#b3b3b3", "stucco": "#d6cfc0", "render": "#d6cfc0"}.get(s.get("surface"), mix(self.wall, "#9ca3af", 0.35))
+            cols = triplet(base, 0.18, 0.0, -0.2)
+        for (x, z, L, t, rot, y0, y1) in self.fence_runs(s, kind):
+            n = max(1, int(math.ceil(L / 3.0)))   # ≤ 3 m pieces, so the painter's sort stays compact
+            a = math.radians(rot); ux, uz = math.cos(a), -math.sin(a)   # the run's direction in plan
+            for k in range(n):
+                off = (k + 0.5) / n * L - L / 2
+                cx, cz, ll = x + ux * off, z + uz * off, L / n
+                r = max(ll, t) / 2 + 0.05
+                it = self.new((cx - r, cx + r, y0, y1, cz - r, cz + r), name=kind if kind == "wall" else "fence")
+                rprism(self.ctx, it, cx, y0, cz, ll, y1 - y0, t, rot, cols, stroke=shade(cols[1], -0.3), sw=0.5, opacity=op)
+
     def site_fence(self, s):
+        legacy = "from" in s and "to" in s and not s.get("path") and (abs(s["from"][0] - s["to"][0]) < 1e-6 or abs(s["from"][1] - s["to"][1]) < 1e-6) \
+            and s.get("style", "picket") in ("picket", "privacy") and not any(k in s for k in ("color", "y", "smooth"))
+        if not legacy: return self.site_fence_runs(s, "fence")
         (x0, z0), (x1, z1) = s["from"], s["to"]
         h = s.get("h", 1.1)
         it = self.new((min(x0, x1) - 0.05, max(x0, x1) + 0.05, 0, h, min(z0, z1) - 0.05, max(z0, z1) + 0.05), name="fence")
@@ -682,6 +789,9 @@ class HouseRenderer:
             k += 0.15
 
     def site_wall_low(self, s):
+        legacy = "from" in s and "to" in s and not s.get("path") and abs(s["from"][1] - s["to"][1]) < 1e-6 or "from" in s and "to" in s and not s.get("path") and abs(s["from"][0] - s["to"][0]) < 1e-6
+        if legacy and any(k in s for k in ("surface", "color", "cap", "y", "smooth", "t")): legacy = False
+        if not legacy: return self.site_fence_runs(s, "wall")
         (x0, z0), (x1, z1) = s["from"], s["to"]
         h = s.get("h", 0.6); t = 0.25
         xa, xb, za, zb = min(x0, x1), max(x0, x1), min(z0, z1), max(z0, z1)

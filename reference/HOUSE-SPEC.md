@@ -262,7 +262,7 @@ Room programs and the composer's inputs (`assets/spec/compose.ts`, `scripts/vali
 
 Planting generators, curves, hardscape, water, fences, structures, the lot and its world (`assets/spec/site.ts`,
 `scripts/validate/site.mts`, `assets/scene-qa/site.ts`; fixtures `test/fixtures/houses/s4-site-*.json`; metrics
-`scripts/test-site.mts`). Every field is optional: a lot that uses none builds exactly as before.
+`scripts/test-site.mts`, and `scripts/test-site-iso.mts`, which draws every fixture through the isometric twin). Every field is optional: a lot that uses none builds exactly as before.
 
 **The planting generator** — `{ "type": "planting", "kind", "along" | "poly" | "at", "depth", "layers", "mix",
 "density", "bloom", "side", "edge", "mulch", "seed" }` lays out beds and plants them back to front: a back layer
@@ -385,7 +385,8 @@ its floor (the terrace drops a centimetre under it).
 and their retaining faces — for the shot planner (S5). `anchors.siteEdges` — bed, planting and path outlines as
 built. Both, with the instances the isometric twin draws, go to `<id>.plan.json`'s `site` key (`{ instances, solids,
 edges }`). An item no builder built is recorded (`anchors.siteDropped`) and reported by the scene QA
-(`site-dropped`), never dropped silently.
+(`site-dropped`), never dropped silently. The isometric twin draws a fence or wall at any angle or along a path, and any prop it has no
+drawing of its own for, from those solids, and a ribbon path, a planting's beds, water and a terrace from their built outlines.
 
 **Lints** (`scripts/validate/site.mts`, warnings): `unknown-name` (a lot sidewalk or furniture too), `planting-ref`, `planting-empty` (a planting with no room to lay out anything), `front-crates` (vegetable crates in
 the front garden), `in-house`, `off-lot`, `buried-water`, `bed-on-slab`, `steep-stair`, `terrace-straddle`, `water-sides`. Scene QA:

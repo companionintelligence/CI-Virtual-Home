@@ -950,7 +950,9 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
   // ribbon cut into Voronoi cells round Poisson points, each shrunk by the joint). One mesh, a tint per stone.
   function stones(g, line, w, y, r, color, crazy, M) {
     const pos = [], col = [];
+    const outlines: number[][][] = [];
     const addStone = (poly, h, tone) => {
+      outlines.push(poly);
       const c = poly.reduce((a, p) => [a[0] + p[0] / poly.length, a[1] + p[1] / poly.length], [0, 0]);
       const top = y + h;
       for (let i = 0; i < poly.length; i++) {
@@ -991,6 +993,7 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); geo.computeVertexNormals();
     const m = new THREE.Mesh(geo, M(color, { roughness: 0.9, vertexColors: true, flatShading: true })); m.castShadow = false; m.receiveShadow = true; m.name = crazy ? 'Flagstones' : 'Stepping stones';
     g.add(m);
+    return outlines;   // (the isometric twin draws the stones of a stepping path from these)
   }
   // timber decking laid across the walk: boards square to the line, on two dark bearers
   function boards(g, line, w, y, color, r, M) {
@@ -1007,13 +1010,18 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
     const line = ctxFor().pathLine(s), w = s.w || 1.0, kind = PATH_SURFACES.includes(s.surface) ? s.surface : 'concrete', g = group(`Path (${kind})`), M = mats();
     if (line.length < 2) return g;
     const color = s.color ? hex(s.color) : null;
-    if (kind === 'stepping') stones(g, line, w, 0.0, r, color ?? 0x9d978c, false, M);
+    let iso: any[] | null = null;   // what the isometric twin draws (plan.json): the stones, or the ribbon's outline
+    const rnd = (poly: number[][]) => poly.map(p => [+p[0].toFixed(3), +p[1].toFixed(3)]);
+    if (kind === 'stepping') { const st = stones(g, line, w, 0.0, r, color ?? 0x9d978c, false, M); iso = st.map(poly => ({ part: 'stone', shape: 'poly', poly: rnd(poly), color: css(color ?? 0x9d978c), box: polyBox(poly, 0, 0.04) })); }
     else if (kind === 'flagstone') { g.add(ribbonMesh(line, w, 0, 0.018, surfaceMat('gravel', 0x8f887c), 'Joints')); stones(g, line, w, 0.015, r, color ?? 0xa39d92, true, M); }
     else if (kind === 'decking') boards(g, line, w, 0, color ?? 0x8a6a4a, r, M);
     else g.add(ribbonMesh(line, w, 0, kind === 'gravel' ? 0.03 : 0.05, surfaceMat(kind, color), 'Path surface'));
+    if (!iso) { const out = ribbon(line, w); iso = [{ part: 'path', shape: 'poly', poly: rnd(out), color: css(color ?? PATH_TWIN[kind] ?? 0xc8c8c4), box: polyBox(out, 0, kind === 'gravel' ? 0.03 : 0.05) }]; }
+    g.userData.isoParts = iso;
     g.userData.plan = { line, w };
     return g;
   }
+  const PATH_TWIN = { gravel: 0xc9b79c, flagstone: 0xa39d92, brick: 0xa5674f, concrete: 0xc8c8c4, decking: 0x8a6a4a, terracotta: 0xc2714f };
 
   // ---- water with a shore: an organic pond (`poly`, or `shape: 'organic'`) -----------------------------------------
   function pondOrganic(s, r) {
