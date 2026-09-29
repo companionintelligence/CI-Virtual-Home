@@ -262,7 +262,7 @@ Room programs and the composer's inputs (`assets/spec/compose.ts`, `scripts/vali
 
 Planting generators, curves, hardscape, water, fences, structures, the lot and its world (`assets/spec/site.ts`,
 `scripts/validate/site.mts`, `assets/scene-qa/site.ts`; fixtures `test/fixtures/houses/s4-site-*.json`; metrics
-`scripts/test-site.mts`, and `scripts/test-site-iso.mts`, which draws every fixture through the isometric twin). Every field is optional: a lot that uses none builds exactly as before.
+`scripts/test-site.mts`, `scripts/test-site-iso.mts`, which draws every fixture through the isometric twin, and `scripts/test-site-fuzz.mts`, which builds seeded random lots). Every field is optional: a lot that uses none builds exactly as before.
 
 **The planting generator** — `{ "type": "planting", "kind", "along" | "poly" | "at", "depth", "layers", "mix",
 "density", "bloom", "side", "edge", "mulch", "seed" }` lays out beds and plants them back to front: a back layer
