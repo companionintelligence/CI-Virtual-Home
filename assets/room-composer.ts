@@ -73,7 +73,7 @@ export interface Group {
   anneal?: boolean;
 }
 export interface HouseState {
-  usage: Map<string, number>; storey: Map<string, number>; palettes: string[]; styleOf: (room: any) => StyleBundle;
+  usage: Map<string, number>; storey: Map<string, number>; /** the rooms of each storey a type stands in (the layout lint's repetition rule counts rooms) */ roomsOn: Map<string, Set<any>>; palettes: string[]; styleOf: (room: any) => StyleBundle;
   /** the house's own picks per role: two types it leans to (seeded by the house, weighted by its style), so one house
    *  reads as one scheme and the next house reaches for others (the fleet's "each home looks very same") */
   prefer: Map<string, string[]>; /** every type any role of this house prefers: a type another role already prefers is favoured, so the roles that share types (rugs, runners and round rugs; the benches) settle on one */ prefAny: Set<string>; seed: string;
@@ -133,6 +133,10 @@ export class Composer {
     // the types the room's program allows, then those that also fit this particular call (its `fit` and `exclude`)
     const allowed = typesFor(role).filter(t => { const p = PLACEMENT[t]; return !p.programs.length || p.programs.includes(program); });
     let cands = allowed.filter(t => !exclude.includes(t) && (!fit || fit(t)));
+    // the layout lint's repetition rule (one type in more than two rooms of a storey, or more than five in a house) is the
+    // composer's own: a piece that would break it is left to the others, unless nothing else can fill the role
+    const capped = (t: string) => !REPEATS.has(PLACEMENT[t].group) && ((this.house.roomsOn.get(`${this.lv.id}:${t}`)?.size ?? 0) - (this.house.roomsOn.get(`${this.lv.id}:${t}`)?.has(this.room) ? 1 : 0) >= 2 || this.usageOf(t) >= 5);
+    { const rest = cands.filter(t => !capped(t)); if (rest.length) cands = rest; }
     // a group that could not be placed is made again with other pieces: what its last try picked is set aside
     if (this.avoid.size) { const rest = cands.filter(t => !this.avoid.has(t)); if (rest.length) cands = rest; }
     if (!cands.length) return null;
@@ -338,7 +342,10 @@ export class Composer {
     }
     return false;
   }
-  count(type: string, n: number) { this.house.usage.set(type, (this.house.usage.get(type) || 0) + n); const k = `${this.lv.id}:${type}`; this.house.storey.set(k, (this.house.storey.get(k) || 0) + n); }
+  count(type: string, n: number) {
+    this.house.usage.set(type, (this.house.usage.get(type) || 0) + n); const k = `${this.lv.id}:${type}`; this.house.storey.set(k, (this.house.storey.get(k) || 0) + n);
+    if (n > 0) (this.house.roomsOn.get(k) || this.house.roomsOn.set(k, new Set()).get(k)!).add(this.room);
+  }
   /** 400 seeded annealing steps over the movable groups' candidate poses; a move that closes a lane is undone */
   anneal(steps = 400) {
     const movable = this.groups.filter(g => g.movable && g.anneal && g.cands.length > 1);
@@ -841,7 +848,8 @@ function storageGroup(c: C, role: string, { name = role, dress = true, prefer = 
       if (pl && pl.top !== undefined && it.h < 1.2) {
         out.push(...dressTop(c, it, c.density >= 0.5 ? ['lamp', 'decor'] : ['decor']));
         const run = (c.geo.runs.find(r => r.side === sideOfRot(it.rot) && (alongX(r.side) ? it.cx : it.cz) >= r.a && (alongX(r.side) ? it.cx : it.cz) <= r.b));
-        if (run && c.rng() < 0.7) { const a = c.rng() < 0.35 && (role === 'dresser' || role === 'console') ? c.mount('round-mirror', run, alongX(run.side) ? it.cx : it.cz, mm(it.h + 0.6), { r: mm(Math.min(0.45, it.w * 0.3)) }) : artOver(c, it, run, {}); if (a) { a.opt = true; out.push(a); } }
+        if (run && c.rng() < 0.7) { const mt = c.rng() < 0.35 && (role === 'dresser' || role === 'console') ? c.pick('mirror') : null;
+          const a = mt ? c.mount(mt, run, alongX(run.side) ? it.cx : it.cz, mm(it.h + (mt === 'round-mirror' ? 0.6 : 0.7)), mt === 'round-mirror' ? { r: mm(Math.min(0.45, it.w * 0.3)) } : { w: mm(Math.min(0.8, Math.max(0.5, it.w * 0.5))), h: 1.1 }) : artOver(c, it, run, {}); if (a) { a.opt = true; out.push(a); } }
       }
       return out;
     },
@@ -1070,7 +1078,7 @@ const cache = new WeakMap<any, { byRoom: Map<any, ComposeResult> }>();
  */
 export function composeHouse(spec: any, opts: { program?: (room: any, lv: any) => string | null } = {}): Map<any, ComposeResult> {
   const hit = !opts.program && cache.get(spec); if (hit) return hit.byRoom;
-  const house: HouseState = { usage: new Map(), storey: new Map(), palettes: [], styleOf: room => styleOf(spec, room), prefer: new Map(), prefAny: new Set(), seed: String(spec.id) };
+  const house: HouseState = { usage: new Map(), storey: new Map(), roomsOn: new Map(), palettes: [], styleOf: room => styleOf(spec, room), prefer: new Map(), prefAny: new Set(), seed: String(spec.id) };
   const byRoom = new Map<any, ComposeResult>(), composed = new Map<any, any[]>();
   // every authored type counts as used, so the composer reaches for something else
   for (const lv of spec.levels || []) for (const r of lv.rooms || []) for (const it of r.items || []) { house.usage.set(it.type, (house.usage.get(it.type) || 0) + 1); const k = `${lv.id}:${it.type}`; house.storey.set(k, (house.storey.get(k) || 0) + 1); }

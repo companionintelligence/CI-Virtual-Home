@@ -114,7 +114,8 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
           if (!insideRoom(geo, front, 0, 2) && insideRoom(geo, back, 0, 2)) add('kitchen-backwards', `${it.type} at ${fmt(it.at)} faces the wall it should back onto`, lv, room);
         }
         // repetition counts
-        if (!REPEAT_EXEMPT_GROUPS.has(groupOf(it.type)) && !HERO_SET.has(it.type)) {
+        // (a wall of matched bookcases is one piece of furniture: the library's run of four is not four repeats)
+        if (!REPEAT_EXEMPT_GROUPS.has(groupOf(it.type)) && !HERO_SET.has(it.type) && !(PLACEMENT[it.type] && PLACEMENT[it.type].roles.includes('bookcase'))) {
           houseCount.set(it.type, (houseCount.get(it.type) || 0) + 1);
           (storeyRooms.get(it.type) || storeyRooms.set(it.type, new Set()).get(it.type)!).add(room.name);
         }

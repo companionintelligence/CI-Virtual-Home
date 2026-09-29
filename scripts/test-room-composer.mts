@@ -89,6 +89,23 @@ check(!counts.pierce, `${counts.pierce} items through a wall or out of their roo
 check(!counts['door-swing'], `${counts['door-swing']} door swings blocked`);
 check(!counts.lane, `lanes of 0.8 m in ${laneRooms - counts.lane} of ${laneRooms} rooms whose geometry allows one (${geometryBlocked} more are blocked by their own stairs, voids or pins, whatever is in them)`);
 
+// every lint over the composed fleet: the ones about the composer's own pieces are zero, the rest (the geometry's and the
+// hand-authored Core's: a stair with no run-in, an entry that faces a wall) are reported beside the authored baseline
+{
+  const own = ['overlap', 'wall-pierce', 'outside-room', 'door-swing', 'lane', 'mount-in-wall', 'surface-height', 'silent-param', 'kitchen-backwards', 'facing'];
+  const all: Record<string, number> = {};
+  for (const h of run1) {
+    const override = new Map<any, any[]>();
+    for (const lv of h.spec.levels || []) for (const r of lv.rooms || []) override.set(r, []);
+    for (const r of h.rooms) override.set(r.room, r.res.items);
+    for (const is of lintLayout(h.spec, { items: override })) all[is.code] = (all[is.code] || 0) + 1;
+  }
+  const bad = own.filter(k => all[k]);
+  check(!bad.length, `the composed fleet has none of the composer's own lints (${own.join(', ')})${bad.length ? ': ' + bad.map(k => `${k} ${all[k]}`).join(', ') : ''}`);
+  console.log(`  the rest, composed: ${Object.entries(all).filter(([k]) => !own.includes(k)).map(([k, v]) => `${k} ${v}`).join(' · ') || 'none'} (the geometry's, and the authored Core's: see the baseline below)`);
+  check((all.repetition || 0) <= 6, `repetition warnings on the composed fleet: ${all.repetition || 0} (target ≤ 6; the authored fleet has 78)`);
+}
+
 // what a room of each program cannot do without: the group the composer must have placed
 const ESSENTIAL: Record<string, string[]> = {
   living: ['lounge'], den: ['lounge'], media: ['lounge'], dining: ['dining'], kitchen: ['kitchen'], 'kitchen-dining': ['kitchen', 'dining'],
@@ -157,6 +174,38 @@ check(total > 0 && same / total <= 0.1, `by seed: ${total - same} of ${total} fu
   for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const inter = [...all[i]].filter(t => all[j].has(t)).length, uni = new Set([...all[i], ...all[j]]).size; dist += 1 - inter / uni; pairs++; }
   const mean = dist / pairs;
   check(mean >= 0.2, `by style: one house in each of the ${STYLE_KEYS.length} styles, two styles share on average ${((1 - mean) * 100).toFixed(0)} % of the types they use (target ≤ 80 %)`);
+}
+
+// ---- 4b. baking: compose-house.mts --write turns a composition into items, and a re-bake changes nothing
+console.log('── baking a composition (compose-house.mts --write)');
+{
+  const { spawnSync } = await import('node:child_process'), os = await import('node:os');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'compose-bake-')), a = path.join(dir, 'a.json'), b = path.join(dir, 'b.json');
+  const run = (...args: string[]) => spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'compose-house.mts'), ...args], { encoding: 'utf8' });
+  const src = path.join(ROOT, 'test', 'fixtures', 'houses', 's3-compose-house.json');
+  const r1 = run('--house', src, '--write', '--out', a), r2 = run('--house', a, '--rebake', '--write', '--out', b);
+  check(r1.status === 0 && r2.status === 0, `compose-house.mts --write and --rebake run (${r1.status}, ${r2.status})`);
+  if (r1.status === 0 && r2.status === 0) {
+    const baked = JSON.parse(fs.readFileSync(a, 'utf8')), again = JSON.parse(fs.readFileSync(b, 'utf8')), orig = JSON.parse(fs.readFileSync(src, 'utf8'));
+    const rs = (sp: any) => (sp.levels || []).flatMap((lv: any) => lv.rooms || []);
+    const composed = composeHouse(JSON.parse(JSON.stringify(orig)));
+    const oRooms = rs(orig);
+    // the baked items are the composer's, after the pins, with the room locked; composing the baked spec composes nothing
+    let same = true, pinsKept = true, locked = true;
+    rs(baked).forEach((room: any, i: number) => {
+      const mine = [...composed.entries()].find(([r]: any) => r.name === room.name);
+      const pins = (oRooms[i].items || []), made = room.items.filter((it: any) => it.src === 'compose@1');
+      if (mine && JSON.stringify(made) !== JSON.stringify((mine[1] as any).items)) same = false;
+      if (JSON.stringify(room.items.filter((it: any) => it.src !== 'compose@1')) !== JSON.stringify(pins)) pinsKept = false;
+      if (room.program && room.lock !== true) locked = false;
+    });
+    check(same, 'the baked items are exactly what the build composes (src compose@1)');
+    check(pinsKept, "the authored items (the pins) are kept, in order, beside them");
+    check(locked, 'every baked room is locked, so the build does not compose it a second time');
+    check(JSON.stringify(baked) === JSON.stringify(again), 're-baking a baked house changes nothing');
+    check(composeHouse(baked).size === 0, 'composing the baked house composes no room');
+  }
+  fs.rmSync(dir, { recursive: true, force: true });
 }
 
 // ---- 5. the catalog -------------------------------------------------------------------------------------------------------------
