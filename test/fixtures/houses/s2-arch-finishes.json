@@ -5,9 +5,9 @@
  "author": "ci-virtual-home",
  "source": "test fixture (plan S2 task 1): per-room floors, wall finishes and ceilings",
  "style": "Two-storey white stucco house; six ground-floor rooms, six floors; a double-height living room",
- "emoji": "🧪",
+ "emoji": "\ud83e\uddea",
  "fixture": {
-  "note": "rooms[].floor ×6 kinds, walls (wainscot, board-and-batten, tile, shiplap, painted-brick feature), ceilings (double, beams, timber, vault, tray), a raised platform"
+  "note": "rooms[].floor \u00d76 kinds, walls (wainscot, board-and-batten, tile, shiplap, painted-brick feature), ceilings (double, beams, timber, vault, tray), a raised platform"
  },
  "lot": {
   "w": 26,
@@ -434,10 +434,10 @@
    ],
    "voids": [
     {
-     "x": -7,
-     "z": -5,
-     "w": 7,
-     "d": 5.5
+     "x": -6.9,
+     "z": -4.9,
+     "w": 6.9,
+     "d": 5.4
     }
    ],
    "openings": [
