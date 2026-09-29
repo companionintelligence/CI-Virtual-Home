@@ -7562,6 +7562,7 @@
       animProgress = Math.max(0, Math.min(1, t));
       applySplineFrame(animProgress);
       announceTime();
+      writeTimeSoon();   // ?t= follows a jump too (a finding's link, Compare's open, Home / End)
     }
 
     // Review's shot cards: each of the home's shots, its authored length, its checks

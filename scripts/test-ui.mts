@@ -645,7 +645,9 @@ try {
     ok(cards.length === 2 && cards.every(k => k.w === 640) && cards[0].src !== cards[1].src, `two posters drawn at 640 × 360 and different (${cards.map(k => k.name).join(', ')})`);
     await shot(page, 'compare');
     const after = await state(page), q = await query(page);
-    ok(q.house === ONE && after.shot === before.shot && Math.abs(after.t - before.t) < 1e-3, `the editor's home is back at its shot and moment (${q.house}, ${after.shot}, ${after.t.toFixed(3)})`);
+    await sleep(450);
+    const q2 = await query(page);
+    ok(q.house === ONE && after.shot === before.shot && Math.abs(after.t - before.t) < 1e-3 && q2.shot === 'orbit' && Math.abs(Number(q2.t) - 0.3) < 1e-3, `the editor's home is back at its shot and moment, and the URL says so (${q.house}, ${after.shot}, ${after.t.toFixed(3)}; ?shot=${q2.shot}&t=${q2.t})`);
     await page.focus('#compare-grid .rc-compare-card');
     const firstId = await page.evaluate(() => (document.activeElement as HTMLElement).closest('[data-id]')!.getAttribute('data-id'));
     await page.keyboard.press('ArrowRight');
