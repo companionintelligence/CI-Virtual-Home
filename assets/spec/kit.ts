@@ -70,6 +70,8 @@ export interface KitPartition {
   doorStyle?: LeafKind | 'cased';
   /** which face the leaf parks on: 'out' (default, the partition's local +z) or 'in' */
   doorSwing?: 'in' | 'out';
+  /** a name for the doorway's leaf in anchors.doors (a pair's leaves are `<id>:L` and `<id>:R`) */
+  id?: string;
 }
 export interface KitStairs {}
 export interface KitBalustrade {}

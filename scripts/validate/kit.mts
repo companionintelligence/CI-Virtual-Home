@@ -9,8 +9,9 @@
 //   kit:silent-param     an item parameter its builder ignores (item-map.ts ITEM_PARAMS, the registry's params);
 //                        a `color` a page builder honours only under defaults 2 says so
 //   kit:style            an unknown style / enum value on an item (item-map.ts ITEM_ENUMS)
+//   kit:duplicate-id     the same openings[].id / partitions[].id on two doors (the second becomes "<id>~2")
 //   kit:wide-leaf        a door wider than 1.1 m without `leaf`: a leafless cased opening (defaults 2 hangs a pair
-//                        up to 1.8 m)
+//                        up to 1.8 m on a perimeter door; a partition doorway needs doorStyle for one)
 //   kit:fan-over-hero    the hero's room would hang a ceiling fan over the Core
 //   kit:no-top           an on-surface item (a monitor, a Core, a lamp) with nothing under it to stand on
 // What the core accepts is widened from here, never in validate-house-spec.mts: heroSurfaces gains the kit's
@@ -49,6 +50,14 @@ const check: Check = (spec, ctx) => {
   const warn = (message: string, code: string) => out.push({ level: 'warn', message, code });
   const d2 = specDefaults(spec) >= 2;
   const isColour = c => typeof c === 'string' && COLOUR.test(c);
+  // openings[].id and partitions[].id name a door for anchors.doors: a non-empty string, once (a pair's leaves add :L / :R)
+  const doorIds = new Map<string, string>();
+  const doorId = (id: any, where: string) => {
+    if (id === undefined) return;
+    if (typeof id !== 'string' || !id.trim()) return err(`${where}: id ${JSON.stringify(id)} (a non-empty string)`);
+    if (doorIds.has(id)) warn(`${where}: id "${id}" is also ${doorIds.get(id)} — the second door's id becomes "${id}~2"`, 'duplicate-id');
+    else doorIds.set(id, where);
+  };
 
   // ---- lighting
   const L = spec.lighting;
@@ -75,6 +84,7 @@ const check: Check = (spec, ctx) => {
     // ---- openings
     for (const op of lv.openings || []) {
       const O = `${LV} opening ${op.type}@${op.side}:${op.at}`;
+      doorId(op.id, O);
       if (op.leaf !== undefined && !LEAVES.includes(op.leaf)) err(`${O}: leaf "${op.leaf}" (${LEAVES.join(' | ')})`);
       if (op.transom !== undefined && !(typeof op.transom === 'number' && op.transom > 0.1 && op.transom < 1.5)) err(`${O}: transom ${JSON.stringify(op.transom)} (metres of glass over the door, 0.1–1.5)`);
       if (op.frame !== undefined && !isColour(op.frame)) err(`${O}: frame "${op.frame}" (#rrggbb)`);
@@ -89,10 +99,11 @@ const check: Check = (spec, ctx) => {
     // ---- partitions
     for (const pt of lv.partitions || []) {
       const P = `${LV} partition ${JSON.stringify(pt.from)}→${JSON.stringify(pt.to)}`;
+      doorId(pt.id, P);
       if (pt.doorColor !== undefined && !isColour(pt.doorColor)) err(`${P}: doorColor "${pt.doorColor}" (#rrggbb)`);
       if (pt.doorStyle !== undefined && ![...LEAVES, 'cased'].includes(pt.doorStyle)) err(`${P}: doorStyle "${pt.doorStyle}" (${[...LEAVES, 'cased'].join(' | ')})`);
       if (pt.doorSwing !== undefined && !['in', 'out'].includes(pt.doorSwing)) err(`${P}: doorSwing "${pt.doorSwing}" (in | out)`);
-      if (pt.door !== null && pt.door !== undefined && (pt.doorW || 0.9) > 1.1 && pt.doorStyle === undefined && !(d2 && pt.doorW <= 1.8) && pt.doorColor !== undefined) warn(`${P}: doorColor on a ${pt.doorW} m doorway, which has no leaf (set doorStyle)`, 'wide-leaf');
+      if (pt.door !== null && pt.door !== undefined && (pt.doorW || 0.9) > 1.1 && pt.doorStyle === undefined && pt.doorColor !== undefined) warn(`${P}: doorColor on a ${pt.doorW} m doorway, which is a cased opening with no leaf (set doorStyle: 'double' | 'french' | 'glazed' for one — a partition doorway keeps no leaf above 1.1 m, whatever the defaults)`, 'wide-leaf');
     }
     // ---- rooms: fixtures and items
     const catBox = t => CATALOG[t] && CATALOG[t].box;

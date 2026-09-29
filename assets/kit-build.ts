@@ -63,6 +63,7 @@ export function createKitBuild(bctx) {
   function openingParams(op, height, isEntry, ctx?) {
     const spec = (ctx && ctx.spec) || (current && current.spec) || {}, d2 = specDefaults(spec) >= 2;
     const extra: any = {};
+    if (op.id) extra.id = String(op.id);   // anchors.doors[].id (a pair's leaves are `<id>:L` and `<id>:R`)
     if (op.frame) extra.frameColor = hex(op.frame);
     if (op.grid) extra.grid = op.grid;
     if (op.head && op.head !== 'flat') extra.head = op.head;
@@ -124,9 +125,11 @@ export function createKitBuild(bctx) {
     const spec = ctx.spec || (current && current.spec) || {};
     const c = doorColour(spec, 'interior', { own: p.doorColor, wood: current && current.kit ? current.kit.colors.wood : undefined, palette: current ? current.palette : undefined });
     if (c) out.doorColor = hex(c);
+    // a doorway over 1.1 m stays a cased opening (an open-plan connection) unless the partition asks for leaves: the
+    // wide-pair rule of defaults 2 is for perimeter doors (openings[]), where a 1.2–1.8 m door is a pair
     if (p.doorStyle) out.doorLeaf = p.doorStyle === 'cased' ? 'none' : p.doorStyle;
-    else if (specDefaults(spec) >= 2 && (p.doorW || 0.9) > 1.1 && (p.doorW || 0.9) <= 1.8) out.doorLeaf = 'double';
     if (p.doorSwing) out.doorSwing = p.doorSwing;
+    if (p.id) out.doorId = String(p.id);   // anchors.doors[].id
     if (specDefaults(spec) >= 2) out.doorPark = 'flat';
     return out;
   }
@@ -147,6 +150,7 @@ export function createKitBuild(bctx) {
   // role takes the house's theme — the "white" sectional is white with the house's cushions, not slate.
   function themeItem(kit, o, it) {
     const skipHero = HERO_SET.has(it.type) || it.type === 'core-shelf';
+    if (it.color !== undefined) o.userData.explicitColor = hex(it.color);   // the author's colour (0xRRGGBB): fixtures.ts paints a lamp's varied head in it
     if (it.color === undefined || kit.defaults < 2 || skipHero) { kit.theme(o, { skip: skipHero || it.color !== undefined }); return; }
     const c = hex(it.color);
     o.traverse(m => {
@@ -182,6 +186,15 @@ export function createKitBuild(bctx) {
   // 'entry' | 'exterior' | 'interior', leaf, hinge: [x, z], y0, h, w, closedYaw, openYaw, swing, open } — yaw is the
   // world heading of the leaf's free edge from its hinge (0 = +z). Non-enumerable `pivot` is the object itself.
   function collectDoors(anchors, placed) {
+    // an authored openings[].id / partitions[].id names the door; a pair's two leaves share it, so they are `<id>:L`
+    // and `<id>:R`; an id an author gave twice is made unique (`<id>~2`); a door with none is `<kind>:<n>` in traversal order
+    const taken = new Map<string, number>();
+    const doorId = (d, kind: string, n: number): string => {
+      if (!d.id) return `${kind}:${n}`;
+      const base = d.leaf === 'double' || d.leaf === 'french' ? `${d.id}:${d.hinge === 'left' ? 'L' : 'R'}` : String(d.id);
+      const seen = taken.get(base) || 0; taken.set(base, seen + 1);
+      return seen ? `${base}~${seen + 1}` : base;
+    };
     const doors = [], P = new THREE.Vector3(), Q = new THREE.Vector3(), mm = v => Math.round(v * 1000) / 1000;
     const levelAt = y => { let best = null; for (const [id, l] of Object.entries(anchors.levels || {}) as any) if (y > (l as any).y - 0.3 && (!best || (l as any).y > anchors.levels[best].y)) best = id; return best; };
     for (const w of placed) {
@@ -201,7 +214,7 @@ export function createKitBuild(bctx) {
         const hinge = [mm(P.x), mm(P.z)], y0 = mm(P.y + d.y0);
         const unit = o.parent;   // pivot → the door unit, placed at its opening's offset along the wall
         const isEntry = kind === 'exterior' && !!(unit && (w.userData.config.openings || []).some(op => op.entry && Math.abs(op.offset - unit.position.x) < 1e-6));
-        const rec: any = { id: d.id || `${kind}:${doors.length}`, level: levelAt(P.y), kind: isEntry ? 'entry' : kind, leaf: d.leaf, hinge, y0, h: mm(d.h), w: mm(d.w), closedYaw: +yawOf(d.closedAngle).toFixed(1), openYaw: +yawOf(d.openAngle).toFixed(1), swing: d.swing, open: d.open };
+        const rec: any = { id: doorId(d, kind, doors.length), level: levelAt(P.y), kind: isEntry ? 'entry' : kind, leaf: d.leaf, hinge, y0, h: mm(d.h), w: mm(d.w), closedYaw: +yawOf(d.closedAngle).toFixed(1), openYaw: +yawOf(d.openAngle).toFixed(1), swing: d.swing, open: d.open };
         Object.defineProperty(rec, 'pivot', { value: o, enumerable: false });
         doors.push(rec);
       });
