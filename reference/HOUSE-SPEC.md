@@ -367,6 +367,14 @@ its floor (the terrace drops a centimetre under it).
   "width" (river 26, canal 11, a lake or the sea to the horizon), "farBank": "trees" | "houses" | "hills" | "none",
   "edge": "bank" | "wall" | "beach" }` — water below the lot on those sides. An item over it (a jetty) is not off the lot.
 - `lot.setback`: the neighbours' street line (m). `lot.ground` adds `meadow` and `gravel`.
+- `lot.sidewalk`: the walk beside the street — `concrete` (the default) | `brick` | `stone` | `flagstone` | `pavers` |
+  `gravel` | `slate` (a tint over the kit's concrete flags), `none`, or `{ "material", "color", "width" }` (a colour pins
+  the tint). A `rural` lot has none and a gravel shoulder in place of the curb unless you name one.
+- `lot.streetFurniture`: what stands along the near walk — `["bench", "hydrant", "bollard", "bike-rack"]`, or `"none"`. A
+  `city` lot has all four by default. Both are placed off every driveway apron, the camera paths and the lamps.
+- The contexts also change the ground: a `city` block is paved beyond its lot (the lot keeps its lawn), a `hillside`
+  rises 24 m over 58 m from 5 m behind the lot (the back row of houses and the trees stand up it), `rural` lots have
+  crop fields, hedgerows and a barn in the ring beyond the neighbours.
 - Under `defaults: 2` (and in any context but the plain suburb) the neighbours vary in palette and style.
 
 **What the builder records.** `anchors.siteSolids` — `{ kind, x, z, r | w, d, rot, yMin, yMax }` (and `poly` for a
@@ -376,7 +384,7 @@ built. Both, with the instances the isometric twin draws, go to `<id>.plan.json`
 edges }`). An item no builder built is recorded (`anchors.siteDropped`) and reported by the scene QA
 (`site-dropped`), never dropped silently.
 
-**Lints** (`scripts/validate/site.mts`, warnings): `unknown-name`, `planting-ref`, `front-crates` (vegetable crates in
+**Lints** (`scripts/validate/site.mts`, warnings): `unknown-name` (a lot sidewalk or furniture too), `planting-ref`, `front-crates` (vegetable crates in
 the front garden), `in-house`, `off-lot`, `buried-water`, `bed-on-slab`, `steep-stair`, `water-sides`. Scene QA:
 `site-dropped`, `site-in-house`, `site-buried`.
 

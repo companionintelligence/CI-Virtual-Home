@@ -87,6 +87,9 @@ const ROOFS2 = [0x25272b, 0x3a3d42, 0x5b3a2e, 0x8e5440, 0x2f3b33, 0x4a4540, 0x6b
 const CITY_WALLS = [0x8e5a48, 0x9a6a55, 0xb9b3a8, 0xd8d2c6, 0x6f7275, 0xe6e0d4, 0x7d4a3c, 0xa39d92];
 const DESERT_WALLS = [0xe3d3b8, 0xd9c4a3, 0xcdb592, 0xe8dcc6, 0xc9a98a, 0xf0e6d6];
 const CONTEXTS = ['suburb', 'city', 'forest', 'desert', 'waterfront', 'rural', 'hillside'];
+// lot.sidewalk: the paving's tint over the kit's concrete flags (a colour, or one of these), and lot.streetFurniture
+const SIDEWALK_TINT: Record<string, number | null> = { concrete: null, brick: 0xd7947c, stone: 0xc9bfa9, flagstone: 0xb8b0a0, pavers: 0xcfc6b6, gravel: 0xc7b99a, slate: 0x8b9298 };
+const FURNITURE = ['bench', 'hydrant', 'bollard', 'bike-rack'];
 
 const segDist = (x: number, z: number, a: P2, b: P2) => {
   const dx = b[0] - a[0], dz = b[1] - a[1], l2 = dx * dx + dz * dz || 1e-9;
@@ -232,9 +235,16 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   };
   // several specs already pave a full-width strip along their front lot line — that IS the sidewalk
   const specWalk = site.some(s => s.type === 'patio' && Array.isArray(s.at) && (() => { const r = siteRect(s); return r.x1 - r.x0 >= LW * 0.7 && r.z1 - r.z0 <= 3 && r.z1 >= zLot - 1; })());
+  // S4: the walk's paving (`lot.sidewalk`: a material or colour, `none`, or { material, color, width }); a rural road has
+  // no walk and no curb, a gravel shoulder instead
+  const swSpec: { material?: string; color?: string | number; width?: number } = typeof lot.sidewalk === 'string' ? { material: lot.sidewalk } : (lot.sidewalk && typeof lot.sidewalk === 'object' ? lot.sidewalk : {});
+  const walkW = swSpec.material === 'none' || (rural && swSpec.material === undefined && swSpec.color === undefined) ? 0 : (typeof swSpec.width === 'number' ? Math.max(0.6, Math.min(4, swSpec.width)) : WALK);
+  const swTint: number | null = swSpec.color !== undefined ? (typeof swSpec.color === 'string' ? parseInt(swSpec.color.replace('#', ''), 16) : swSpec.color) : swSpec.material !== undefined ? (SIDEWALK_TINT[swSpec.material] ?? null) : null;
+  const swKey = swTint === null || Number.isNaN(swTint) ? 'sidewalk' : `sidewalk:${swTint.toString(16)}`;
+  const shoulder = rural && walkW === 0, curbW = shoulder ? 0.9 : CURB;
   let z = zLot;
-  const nearWalk: P2 | null = specWalk ? null : [z, z += WALK];
-  const nearVerge: P2 = [z, z += VERGE], nearCurb: P2 = [z, z += CURB], road: P2 = [z, z += ROAD], farCurb: P2 = [z, z += CURB], farVerge: P2 = [z, z += VERGE], farWalk: P2 = [z, z += WALK];
+  const nearWalk: P2 | null = specWalk || walkW === 0 ? null : [z, z += walkW];
+  const nearVerge: P2 = [z, z += VERGE], nearCurb: P2 = [z, z += curbW], road: P2 = [z, z += ROAD], farCurb: P2 = [z, z += curbW], farVerge: P2 = [z, z += VERGE], farWalk: P2 | null = walkW === 0 ? null : [z, z += walkW];
   const zFar = z;   // the far lot line
   const streetBand = (zz: number, m = 0) => zz > zLot - m && zz < zFar + m;
   // a waterfront lot looks out over a lake behind it (in spec coordinates: everything past its back lot line)
@@ -268,9 +278,11 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   const wetAt = (x: number, zz: number, m = 0) => (lake ? rectDist(x, zz, lake) < m : false) || waterSides.some(w => rectDist(x, zz, w.water) < m || rectDist(x, zz, w.bank) < m);
   const wetRect = (r: Rect, m = 0) => waterSides.some(w => rrDist(r, w.water) < m || rrDist(r, w.bank) < m || (w.far ? rrDist(r, w.far) < m * 0.5 : false));
   const waterBehind = waterSides.some(w => w.out[1] < -0.5);
-  // a hillside: the ground rises behind the lot (local −z), 16 m over 70 m, with a slow roll along it
+  // a hillside: the ground rises behind the lot (local −z) from 5 m past its back line, 24 m over 58 m (the back row of
+  // houses stands several metres up it), with a slow roll along it — and the hills across a river the same
   const hillPh = rngFor('hill')();
-  const hillY = hillside ? (x: number, zz: number) => { const d = -LD / 2 - 8 - zz; if (d <= 0) return 0; const k = Math.min(1, d / 70); return 16 * k * k * (3 - 2 * k) + 2.5 * Math.sin(x * 0.045 + hillPh * 6.28) * Math.min(1, d / 40); } : (_x: number, _z: number) => 0;
+  const hillRise = (x: number, d: number) => { const k = Math.min(1, d / 58); return 24 * k * k * (3 - 2 * k) + 3 * Math.sin(x * 0.045 + hillPh * 6.28) * Math.min(1, d / 30); };
+  const hillY = hillside ? (x: number, zz: number) => { const d = -LD / 2 - 5 - zz; return d <= 0 ? 0 : hillRise(x, d); } : (_x: number, _z: number) => 0;
 
   const m = createMesher();
   // aprons: x range + which side; each cuts its sidewalk and curb
@@ -662,8 +674,8 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   if (!noStreet) strip('asphalt', [-STREET_X, STREET_X], road, Y.ground, Y.road);
   for (const near of noStreet ? [] : [true, false]) {
     const walk = near ? nearWalk : farWalk, curb = near ? nearCurb : farCurb, verge = near ? nearVerge : farVerge;
-    if (walk) for (const xs of runs(near, 0)) strip('sidewalk', xs, walk, Y.ground, Y.walk);
-    for (const xs of runs(near, 0.8)) strip('curb', xs, curb, Y.ground, Y.curb);
+    if (walk) for (const xs of runs(near, 0)) strip(swKey, xs, walk, Y.ground, Y.walk);
+    for (const xs of runs(near, 0.8)) strip(shoulder ? 'shoulder' : 'curb', xs, curb, Y.ground, shoulder ? Y.road : Y.curb);
     // aprons: straight across the walk, flaring across the verge to the curb cut
     for (const a of aprons.filter(q => q.near === near)) {
       const s = near ? 1 : -1, zA = near ? zLot : zFar, zV = near ? verge[0] : verge[1], zC = near ? curb[1] : curb[0];
@@ -694,6 +706,34 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     m.box('pole', l.x, 6.15, l.z + l.dir * 0.8, 0.08, 0.08, 1.7);
     m.box('pole', l.x, 6.08, l.z + l.dir * 1.65, 0.34, 0.14, 0.62);
     m.box('lens', l.x, 6.0, l.z + l.dir * 1.65, 0.26, 0.02, 0.5);
+  }
+
+  // ---- S4: street furniture — benches, hydrants, bollards, bike racks along the near walk (a city has them by default;
+  // `lot.streetFurniture` lists what a lot's street has, or "none") -------------------------------------------------
+  {
+    const want: string[] = Array.isArray(lot.streetFurniture) ? lot.streetFurniture.filter(k => FURNITURE.includes(k)) : lot.streetFurniture === 'none' ? [] : city ? ['bench', 'hydrant', 'bollard', 'bike-rack'] : [];
+    if (want.length && !noStreet) {
+      const fr = rngFor('furniture'), zz = nearWalk ? (nearWalk[0] + nearWalk[1]) / 2 : (nearVerge[0] + nearVerge[1]) / 2, zEdge = nearVerge[1] - 0.35;
+      const spots: number[] = [];
+      for (let x = -REACH + fr() * 10; x < REACH; x += 9 + fr() * 6) {
+        if (nearCorridor(x, zz, 3.5) || aprons.some(a => x > a.x0 - 1.4 && x < a.x1 + 1.4) || lamps.some(l => Math.abs(l.x - x) < 1.8)) continue;
+        spots.push(x);
+      }
+      spots.forEach((x, i) => {
+        const kind = want[i % want.length];
+        if (kind === 'bench') {
+          m.box('wood', x, 0.46, zz, 1.7, 0.06, 0.46); m.box('wood', x, 0.72, zz - 0.2, 1.7, 0.36, 0.05);
+          m.box('steel', x - 0.72, 0.22, zz, 0.06, 0.44, 0.4); m.box('steel', x + 0.72, 0.22, zz, 0.06, 0.44, 0.4);
+        } else if (kind === 'hydrant') {
+          m.box('hydrant', x, 0.36, zEdge, 0.26, 0.72, 0.26); m.box('hydrant', x, 0.78, zEdge, 0.32, 0.12, 0.32); m.box('hydrant', x, 0.44, zEdge, 0.44, 0.1, 0.1);
+        } else if (kind === 'bollard') {
+          for (let k = -1; k <= 1; k++) m.box('steel', x + k * 1.1, 0.45, zEdge, 0.16, 0.9, 0.16);
+        } else {
+          for (let k = 0; k < 4; k++) { m.box('steel', x - 0.6 + k * 0.4, 0.4, zz, 0.04, 0.8, 0.04); }
+          m.box('steel', x, 0.76, zz, 1.4, 0.04, 0.04);
+        }
+      });
+    }
   }
 
   // ---- trees ----------------------------------------------------------------------------------------------
@@ -785,9 +825,9 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   }
   // a hill behind the lot: a height field over the back of the disc, meeting the flat ground at its foot
   const backFar = waterSides.find(w => w.out[1] < -0.5 && w.far && w.farBank === 'hills');
-  const hillFrom = hillside ? -LD / 2 - 8 : backFar ? backFar.far.z0 - 1 : null;
+  const hillFrom = hillside ? -LD / 2 - 5 : backFar ? backFar.far.z0 - 1 : null;
   function buildHill(gm: any) {
-    const H = (x: number, zz: number) => { const d = hillFrom - zz; if (d <= 0) return Y.ground; const k = Math.min(1, d / 70); return Y.ground + 16 * k * k * (3 - 2 * k) + 2.5 * Math.sin(x * 0.045 + hillPh * 6.28) * Math.min(1, d / 40); };
+    const H = (x: number, zz: number) => { const d = hillFrom - zz; return d <= 0 ? Y.ground : Y.ground + hillRise(x, d); };
     const cell = 4, pos: number[] = [];
     for (let x = -DISC; x < DISC; x += cell) for (let zz = hillFrom - cell; zz > -DISC - cell; zz -= cell) {
       const c = [x + cell / 2, zz - cell / 2]; if (Math.hypot(c[0], c[1]) > DISC + 2) continue;
@@ -882,7 +922,9 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
       }
     }
     const geo = new THREE.ShapeGeometry(shape, 48); geo.rotateX(-Math.PI / 2);
-    const gm = ground && ground.isMaterial ? ground : groundMaterial || std(typeof ground === 'number' ? ground : 0x4d7c3a, { roughness: 0.95 });
+    // (a city block's ground beyond the lot is paved: the lot's own lawn stays its front garden)
+    const cityPaved = city && (lot.ground === undefined || lot.ground === 'lawn') && kit && typeof kit.surface === 'function';
+    const gm = cityPaved ? kit.surface('urban') : ground && ground.isMaterial ? ground : groundMaterial || std(typeof ground === 'number' ? ground : 0x4d7c3a, { roughness: 0.95 });
     const mesh = new THREE.Mesh(geo, gm);
     mesh.position.y = Y.ground; mesh.receiveShadow = true; mesh.name = 'World · ground'; root.add(mesh);
     if (waterSides.length) buildWater(gm);
@@ -903,7 +945,8 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     door: () => std(0x2f3438, { roughness: 0.6 }), garage: () => std(0xeceae5, { roughness: 0.6 }), groove: () => std(0xb9b6ae, { roughness: 0.8 }),
     glass, glassLit: glass,
     concrete: () => surface('concrete', 0xbdb9b1), driveway: () => surface('driveway', 0xb6b2aa), sidewalk: () => surface('sidewalk', 0xc2bfb8),
-    curb: () => surface('curb', 0xcfccc5), asphalt: () => surface('asphalt', 0x2d2f33),
+    curb: () => surface('curb', 0xcfccc5), asphalt: () => surface('asphalt', 0x2d2f33), shoulder: () => std(0xa79d88, { roughness: 1 }),
+    wood: () => std(0x8a6a4a, { roughness: 0.85 }), hydrant: () => std(0xb5382c, { roughness: 0.55 }), steel: () => std(0x8a9096, { roughness: 0.45, metalness: 0.6 }),
     pole: () => std(0x34373b, { roughness: 0.5, metalness: 0.5 }),
     lens: () => new THREE.MeshStandardMaterial({ color: 0xf5efe2, emissive: 0xffd9a8, emissiveIntensity: 1, roughness: 0.4 }),
   };
@@ -914,7 +957,10 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   for (const key of m.keys()) {
     const isRoof = key.startsWith('roof:'), isWall = key.startsWith('wall:');
     const geo = m.geometry(THREE, key, isRoof); if (!geo) continue;
-    const mat = isRoof ? roofMat(parseInt(key.slice(5), 16)) : isWall ? std(parseInt(key.slice(5), 16), { roughness: 0.9 }) : (mats[key] || (() => std(0xcccccc)))();
+    const isWalk = key.startsWith('sidewalk:'), isField = key.startsWith('field:');
+    // (a tinted sidewalk: the kit's concrete flags, its own copy, multiplied by the tint)
+    const walkMat = () => { const t = surface('sidewalk', 0xc2bfb8), c = t.clone ? t.clone() : t; if (c.color) c.color.setHex(parseInt(key.slice(9), 16)); return c; };
+    const mat = isRoof ? roofMat(parseInt(key.slice(5), 16)) : isWall ? std(parseInt(key.slice(5), 16), { roughness: 0.9 }) : isWalk ? walkMat() : isField ? std(parseInt(key.slice(6), 16), { roughness: 1 }) : (mats[key] || (() => std(0xcccccc)))();
     const mesh = new THREE.Mesh(geo, mat);
     mesh.name = `World · ${key}`; mesh.castShadow = false; mesh.receiveShadow = key !== 'lens' && key !== 'glass' && key !== 'glassLit';
     if (key === 'lens') { mesh.userData.fixture = 'street'; mat.userData.fixture = 'street'; }

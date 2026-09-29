@@ -191,6 +191,9 @@ export function createSiteBuild(bctx) {
     const w = rot90 ? d0 : w0, d = rot90 ? w0 : d0;
     return { x: s.at[0] - w / 2, z: s.at[1] - d / 2, w, d, ellipse: s.type === 'pond', floor: (s.y ?? 0) - (s.type === 'turtle-pool' ? 0.79 : 0) };
   };
+  // a slab, a deck or the lawn cut round water stands 1.5 cm clear of the pool's wall: a hole face on the wall's own
+  // plane z-fights it (tan deck boards showing through the tile)
+  const JOINT = 0.015;
   const overlaps = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.z < b.z + b.d && a.z + a.d > b.z;
   function slabWithHoles(rect, holes, color, h, y = 0, polys = []) {
     const g = group('Slab');
@@ -199,7 +202,7 @@ export function createSiteBuild(bctx) {
     for (const poly of polys) shape.holes.push(new THREE.Path(poly.map(p => new THREE.Vector2(p[0] - cx, p[1] - cz))));   // building outlines
     for (const hl of holes) {
       const path = new THREE.Path();
-      if (hl.poly) path.setFromPoints(hl.poly.map(p => new THREE.Vector2(p[0] - cx, p[1] - cz)));   // a shaped pool (S4)
+      if (hl.poly) path.setFromPoints(offsetLoop(hl.poly, JOINT).map(p => new THREE.Vector2(p[0] - cx, p[1] - cz)));   // a shaped pool (S4), 1.5 cm clear of its wall
       else if (hl.ellipse) path.absellipse(hl.x + hl.w / 2 - cx, hl.z + hl.d / 2 - cz, hl.w / 2 + 0.3, hl.d / 2 + 0.3, 0, Math.PI * 2, false);
       else path.setFromPoints([[hl.x - cx, hl.z - cz], [hl.x + hl.w - cx, hl.z - cz], [hl.x + hl.w - cx, hl.z + hl.d - cz], [hl.x - cx, hl.z + hl.d - cz]].map(p => new THREE.Vector2(p[0], p[1])));
       shape.holes.push(path);
@@ -470,7 +473,7 @@ export function createSiteBuild(bctx) {
     for (const r of water || []) {
       const rim = r.rim ?? r.floor ?? 0; if (rim > y + h + 0.02) continue;
       const poly = r.poly || (r.ellipse ? Array.from({ length: 32 }, (_, k) => { const a = k / 32 * Math.PI * 2; return [r.x + r.w / 2 + Math.cos(a) * (r.w / 2 + 0.3), r.z + r.d / 2 + Math.sin(a) * (r.d / 2 + 0.3)] as P2; }) : [[r.x, r.z], [r.x + r.w, r.z], [r.x + r.w, r.z + r.d], [r.x, r.z + r.d]] as P2[]);
-      if (poly.every(p => inPolyG(p[0], p[1], outline))) holes.push(poly);
+      if (poly.every(p => inPolyG(p[0], p[1], outline))) holes.push(r.ellipse ? poly : offsetLoop(poly, JOINT));
     }
     const g = group(s.type === 'patio' ? 'Patio' : 'Driveway');
     const shape = new THREE.Shape(outline.map(p => new THREE.Vector2(p[0], p[1])));
@@ -494,7 +497,7 @@ export function createSiteBuild(bctx) {
       const rim = r.rim ?? (r.floor !== undefined ? (r.floor + (r.poly ? 0 : 0)) : 0);
       if (rim > top + 0.02 || r.ellipse) continue;
       if (r.x + r.w <= mb.x0 + 0.01 || r.x >= mb.x1 - 0.01 || r.z + r.d <= mb.z0 + 0.01 || r.z >= mb.z1 - 0.01) continue;
-      const poly = r.poly || [[r.x, r.z], [r.x + r.w, r.z], [r.x + r.w, r.z + r.d], [r.x, r.z + r.d]];
+      const poly = offsetLoop(r.poly || [[r.x, r.z], [r.x + r.w, r.z], [r.x + r.w, r.z + r.d], [r.x, r.z + r.d]], JOINT);
       // into the deck's frame, clipped 2 cm inside its edges (a hole touching the outline is garbage to earcut)
       let local = turn(poly.map(p => [p[0] - s.at[0], p[1] - s.at[1]] as P2), -rot);
       for (const [nx, nz, c] of [[1, 0, w / 2 - 0.02], [-1, 0, w / 2 - 0.02], [0, 1, d / 2 - 0.02], [0, -1, d / 2 - 0.02]] as Array<[number, number, number]>) local = halfPlane(local, nx, nz, c);
@@ -591,7 +594,7 @@ export function createSiteBuild(bctx) {
       const w = waterOutline(o, oi, spec.id, ctx.groundAt);
       const outline = w ? (Math.abs(w.rim - s.y) < 0.06 ? w.poly : null)
         : (o.type === 'pool' || o.type === 'turtle-pool') && Array.isArray(o.at) && Math.abs((o.y ?? ctx.groundAt(o.at[0], o.at[1])) - s.y) < 0.06 ? rectPoly(o.at, o.w || (o.type === 'turtle-pool' ? 8 : 6), o.d || (o.type === 'turtle-pool' ? 6 : 4), o.rot || 0) : null;
-      if (outline && outline.every(p => inPolyG(p[0], p[1], poly)) && offsetLoop(outline, 0.02).every(p => inPolyG(p[0], p[1], poly))) holes.push(outline);
+      if (outline && outline.every(p => inPolyG(p[0], p[1], poly)) && offsetLoop(outline, 0.02).every(p => inPolyG(p[0], p[1], poly))) holes.push(offsetLoop(outline, JOINT));
     });
     const g = ST.terrace(poly, s.y, base, { edge, top, sink, skip, holes });
     g.name = `Terrace (${edge.kind || 'retaining'}, ${s.y} m)`;

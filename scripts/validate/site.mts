@@ -5,7 +5,7 @@
 // (planting, terrace, stair, climber, string-lights, rill) need their own. Those are errors, as the core's were:
 // a builder given no geometry builds nothing. Everything else is a lint and arrives as a warning (plan §2.0):
 //   unknown-name     a shrub form, flower kind, tree species, planting kind / mix, path surface, pool shape, fence,
-//                    rail or stair style, lot context / street / water the builders do not know (they fall back)
+//                    rail or stair style, lot context / street / water / sidewalk / furniture the builders do not know (they fall back)
 //   planting-ref     a planting `along` naming a path or terrace that is not there
 //   front-crates     `garden-beds` (raised vegetable crates) between the entry facade and the street
 //   in-house         a slab, a bed, a pool or a prop standing on the ground storey's footprint
@@ -27,6 +27,8 @@ const RAILS = ['glass', 'metal', 'timber', 'cable', 'colonial'];
 const STAIRS = ['stone', 'concrete', 'timber', 'steel'];
 const CONTEXTS = ['suburb', 'city', 'forest', 'desert', 'waterfront', 'rural', 'hillside'];
 const WATERS = ['lake', 'river', 'canal', 'sea'];
+const SIDEWALKS = ['concrete', 'brick', 'stone', 'flagstone', 'pavers', 'gravel', 'slate'];
+const FURNITURE = ['bench', 'hydrant', 'bollard', 'bike-rack'];
 const SIDES = ['S', 'N', 'E', 'W'];
 const TERRACE_EDGES = ['retaining', 'planted', 'rail', 'slope'];
 const isP = (p: unknown) => Array.isArray(p) && p.length >= 2 && typeof p[0] === 'number' && typeof p[1] === 'number';
@@ -100,6 +102,13 @@ const check: Check = (spec, ctx) => {
   }
   if (lot.context !== undefined) known(lot.context, CONTEXTS, 'lot.context', { type: 'lot' }, -1);
   if (lot.street !== undefined && !(SIDES.includes(lot.street) || lot.street === 'none')) warn(`lot.street "${lot.street}" is not S | N | E | W | none`, 'unknown-name');
+  if (lot.sidewalk !== undefined) {
+    const sw = typeof lot.sidewalk === 'string' ? { material: lot.sidewalk } : lot.sidewalk || {};
+    if (sw.material !== undefined && ![...SIDEWALKS, 'none'].includes(sw.material)) warn(`lot.sidewalk "${sw.material}" is not ${[...SIDEWALKS, 'none'].join(' | ')}`, 'unknown-name');
+  }
+  if (lot.streetFurniture !== undefined && lot.streetFurniture !== 'none') {
+    for (const k of Array.isArray(lot.streetFurniture) ? lot.streetFurniture : [lot.streetFurniture]) if (!FURNITURE.includes(k)) warn(`lot.streetFurniture "${k}" is not ${FURNITURE.join(' | ')}`, 'unknown-name');
+  }
   if (lot.water !== undefined) {
     const w = typeof lot.water === 'string' ? { kind: lot.water } : lot.water;
     if (w.kind !== undefined && !WATERS.includes(w.kind)) warn(`lot.water kind "${w.kind}" is not ${WATERS.join(' | ')}`, 'unknown-name');

@@ -20,6 +20,8 @@ export type RailStyle = 'glass' | 'metal' | 'timber' | 'cable' | 'colonial';
 export type WaterShape = 'rect' | 'lap' | 'kidney' | 'free' | 'round' | 'poly' | 'basin';
 export type LotContext = 'suburb' | 'city' | 'forest' | 'desert' | 'waterfront' | 'rural' | 'hillside';
 export type WaterKind = 'lake' | 'river' | 'canal' | 'sea';
+export type SidewalkMaterial = 'concrete' | 'brick' | 'stone' | 'flagstone' | 'pavers' | 'gravel' | 'slate';
+export type StreetFurniture = 'bench' | 'hydrant' | 'bollard' | 'bike-rack';
 /** a rail: `true` (metal), a style, or a style and colour */
 export type RailSpec = boolean | RailStyle | { style?: RailStyle; color?: Colour };
 /** a bed's edging: a true offset of its outline, `w` wide and `h` proud of the ground, or none */
@@ -62,6 +64,11 @@ export interface SiteLot {
     /** the lot's edge to it: a grass bank, a stone quay wall, a beach */
     edge?: 'bank' | 'wall' | 'beach';
   };
+  /** the walk beside the street: its paving (a tint over the kit's concrete flags), `none`, or { material, color, width };
+   *  a rural road has none unless you say so, a gravel shoulder instead of the curb */
+  sidewalk?: SidewalkMaterial | 'none' | { material?: SidewalkMaterial | 'none'; color?: Colour; width?: number };
+  /** what stands along the near walk: benches, hydrants, bollards, bike racks (a city block has all four; 'none' clears them) */
+  streetFurniture?: StreetFurniture[] | 'none';
 }
 export interface SitePalette {}
 export interface SiteLevel {}

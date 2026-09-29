@@ -61,14 +61,14 @@ const ROCKS = [0x7a766f, 0x8a847b, 0x6d6a65, 0x9a948a];
 const SPECIES = { round: 'broad', broad: 'broad', oval: 'oval', layered: 'layered', conical: 'conical', columnar: 'columnar', cypress: 'columnar', palm: 'palm', birch: 'birch',
   willow: 'willow', cherry: 'cherry', olive: 'olive', 'fan-palm': 'fan-palm', shade: 'shade', maple: 'layered' };
 const SPECIES_H = { palm: 6, columnar: 4.2, willow: 7, cherry: 5, olive: 4, 'fan-palm': 6, shade: 9 };
-const CHERRY = [0xd9a7b6, 0xe2b7c3, 0xcf98aa], OLIVE = [0x76855f, 0x7f8c66, 0x6f7d58], WILLOW = [0x5f7336, 0x66793a, 0x5a6e33];
+const CHERRY = [0xd9a7b6, 0xe2b7c3, 0xcf98aa], OLIVE = [0x76855f, 0x7f8c66, 0x6f7d58], WILLOW = [0x8c9f4a, 0x97a950, 0x839644];
 const DEFAULT_SPECIES = ['broad', 'broad', 'broad', 'oval', 'oval', 'conical', 'birch', 'layered'];
 const FLOWER_KINDS = ['daisy', 'tulip', 'lavender', 'bloom', 'bloom'];
 const PETAL = { daisy: [0xefeadb, 0xe8dcc0], tulip: [0xc46b7b, 0xd6a04b, 0xb45a4b, 0xd595a6], lavender: [0x8f7cb8, 0x9b88c0], bloom: BLOOM };
 
 // The site types build() below answers (its switch's cases): the validator reads this list, so a type added to
 // build() is added here too, or specs using it fail validation.
-export const SITE_KIT_TYPES: readonly string[] = ['tree', 'cypress', 'palm', 'shrub', 'planter', 'flowers', 'rock', 'bed', 'path', 'hedge', 'scatter', 'grove', 'planting', 'climber', 'string-lights', 'pergola'];
+export const SITE_KIT_TYPES: readonly string[] = ['tree', 'cypress', 'palm', 'shrub', 'planter', 'flowers', 'rock', 'bed', 'path', 'hedge', 'scatter', 'grove', 'planting', 'climber', 'string-lights', 'pond', 'pergola'];
 // the names each kit type accepts (the validator's site plugin warns on anything else)
 export const TREE_SPECIES: readonly string[] = ['round', 'broad', 'oval', 'layered', 'conical', 'columnar', 'cypress', 'palm', 'birch', 'willow', 'cherry', 'olive', 'fan-palm', 'shade', 'maple'];
 export const SHRUB_FORMS: readonly string[] = ['mound', 'boxwood', 'spreading', 'flowering', 'grass', 'hydrangea', 'fern', 'topiary-ball', 'topiary-cone', 'agave', 'yucca', 'columnar', 'rosemary', 'hosta', 'broadleaf', 'succulent', 'cactus', 'groundcover', 'silver', 'sedum'];
@@ -431,37 +431,38 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
     crown(g, r, lobes, foliage, { size: h * 0.04, gap: 1.25, core: 0, dark: 0.62, lift: 0.4 });
   }
 
-  // Weeping willow: a short trunk forking into arching limbs under a low dome of fine clusters, and a curtain of
-  // hundreds of thin, tapering strands hanging from the dome nearly to the ground (one InstancedMesh of strands,
-  // lighter where the light catches their tops).
+  // Weeping willow: a short trunk forking into arching limbs under a broad dome of fine clusters, and a skirt of
+  // hundreds of thin, tapering, light strands hung from the dome's shell — those from its rim nearly to the ground and
+  // ragged at the foot, those higher up shorter, so the whole reads as a bell (not a barrel); each strand leaves its
+  // branch heading outward and curves down (one InstancedMesh of strands, lighter at the foot).
   function willow(g, h, r, leaf, M) {
     const bark = M(0x4f4236, barkOpts), foliage = M(leaf, leafOpts), coreMat = M(darker(leaf, 0.45), coreOpts);
     const r0 = Math.max(0.14, h * 0.038), fork = V((r() - 0.5) * 0.3, h * 0.3, (r() - 0.5) * 0.3);
     addMesh(g, limbGeo(V(0, 0, 0), fork, r0 * 1.45, r0, 8), bark).name = 'Trunk';
-    const R = h * 0.5, top = h * 0.84, wood = [], lobes = [];
+    const R = h * 0.5, cy = h * 0.56, top = cy + R * 0.72, wood = [], lobes = [];
     const k = 5 + Math.floor(r() * 2), a0 = r() * Math.PI * 2;
     for (let i = 0; i < k; i++) {
-      const a = a0 + (i / k) * Math.PI * 2 + (r() - 0.5) * 0.5, mid = V(Math.cos(a) * R * 0.3, top * 0.95, Math.sin(a) * R * 0.3), tip = V(Math.cos(a) * R * 0.66, top - h * (0.05 + r() * 0.06), Math.sin(a) * R * 0.66);
+      const a = a0 + (i / k) * Math.PI * 2 + (r() - 0.5) * 0.5, mid = V(Math.cos(a) * R * 0.32, cy + R * 0.5, Math.sin(a) * R * 0.32), tip = V(Math.cos(a) * R * 0.78, cy + R * 0.16 + r() * R * 0.12, Math.sin(a) * R * 0.78);
       wood.push(limbGeo(fork, mid, r0 * 0.62, r0 * 0.38, 6), limbGeo(mid, tip, r0 * 0.36, r0 * 0.14, 5));
-      lobes.push({ c: tip.clone().setY(tip.y + R * 0.06), rx: R * 0.4, ry: R * 0.2, n: 34, inner: 0.35, floor: -0.35 });
+      lobes.push({ c: tip.clone().setY(tip.y + R * 0.1), rx: R * 0.36, ry: R * 0.2, n: 30, inner: 0.35, floor: -0.35 });
     }
-    lobes.push({ c: V(0, top + R * 0.12, 0), rx: R * 0.55, ry: R * 0.24, n: 50, inner: 0.35, floor: -0.3 });
+    lobes.push({ c: V(0, cy + R * 0.42, 0), rx: R * 0.62, ry: R * 0.3, n: 56, inner: 0.35, floor: -0.3 });
     woodMesh(g, wood, bark);
-    crown(g, r, lobes, foliage, { size: h * 0.028, sq: 0.8, core: 0.6, coreMat, dark: 0.5, lift: 0.4 });
-    // a strand: a narrow tapering ribbon, one metre long (scaled per strand), bowing out a little, darker at its foot
-    const seg = 6, pos = [], col = [];
+    crown(g, r, lobes, foliage, { size: h * 0.03, sq: 0.8, core: 0.6, coreMat, dark: 0.5, lift: 0.4 });
+    // a strand: a narrow tapering ribbon, one metre long (scaled per strand), swinging out then hanging, lighter at its foot
+    const seg = 6, pos = [], col = [], bow = t => 0.17 * (1 - (1 - t) * (1 - t) * (1 - t));
     for (let j = 0; j < seg; j++) {
-      const y0 = -j / seg, y1 = -(j + 1) / seg, w0 = 0.07 * (1 - j / seg * 0.7), w1 = 0.07 * (1 - (j + 1) / seg * 0.7), z0 = 0.05 * Math.sin(j / seg * Math.PI), z1 = 0.05 * Math.sin((j + 1) / seg * Math.PI);
-      pos.push(-w0, y0, z0, w0, y0, z0, w1, y1, z1, -w0, y0, z0, w1, y1, z1, -w1, y1, z1);
-      const c0 = 1 - 0.35 * j / seg, c1 = 1 - 0.35 * (j + 1) / seg; col.push(c0, c0, c0, c0, c0, c0, c1, c1, c1, c0, c0, c0, c1, c1, c1, c1, c1, c1);
+      const t0 = j / seg, t1 = (j + 1) / seg, w0 = 0.04 * (1 - t0 * 0.7), w1 = 0.04 * (1 - t1 * 0.7), z0 = bow(t0), z1 = bow(t1);
+      pos.push(-w0, -t0, z0, w0, -t0, z0, w1, -t1, z1, -w0, -t0, z0, w1, -t1, z1, -w1, -t1, z1);
+      const c0 = 0.82 + 0.26 * t0, c1 = 0.82 + 0.26 * t1; col.push(c0, c0, c0, c0, c0, c0, c1, c1, c1, c0, c0, c0, c1, c1, c1, c1, c1, c1);
     }
     const strand = new THREE.BufferGeometry(); strand.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); strand.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); strand.computeVertexNormals();
     const list = [];
-    for (let i = 0, n = 520; i < n; i++) {
-      // hung from the dome's outer, lower shell: further out, lower down
-      const a = r() * Math.PI * 2, q = 0.35 + 0.65 * Math.sqrt(r()), rr = R * (0.2 + 0.85 * q), y = top + R * 0.2 - q * q * R * 0.38 + (r() - 0.5) * 0.25;
-      const len = Math.max(0.5, (y - h * (0.06 + r() * 0.1)) * (q > 0.7 ? 0.95 + r() * 0.05 : 0.55 + r() * 0.35));
-      list.push({ x: Math.cos(a) * rr, y, z: Math.sin(a) * rr, ry: -a + Math.PI / 2 + (r() - 0.5) * 0.8, rx: (r() - 0.5) * 0.08, sx: 0.8 + r() * 0.7, sy: len, sz: 1, tint: 0.55 + 0.45 * r() });
+    for (let i = 0, n = 820; i < n; i++) {
+      // hung from the dome's shell: u = how far up it (0 the rim, 1 the crown), the rim's strands the longest
+      const a = r() * Math.PI * 2, u = Math.pow(r(), 1.25) * 0.88, rr = R * Math.sqrt(1 - u * u) * (0.94 + r() * 0.1), y = cy + R * 0.72 * u + (r() - 0.5) * 0.2;
+      const foot = h * (0.08 + u * 0.42 + r() * (0.22 - u * 0.12)), len = Math.max(0.5, y - foot);
+      list.push({ x: Math.cos(a) * rr, y, z: Math.sin(a) * rr, ry: Math.PI / 2 - a + (r() - 0.5) * 0.7, rx: (r() - 0.5) * 0.06, sx: 0.7 + r() * 0.7, sy: len, sz: len, tint: 0.72 + 0.34 * r() });
     }
     g.add(instanced(strand, M(leaf, { roughness: 0.9, flatShading: true, side: THREE.DoubleSide, vertexColors: true }), list, 'Willow strands', { isoShape: 'blob' }));
   }

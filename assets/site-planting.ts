@@ -217,9 +217,20 @@ function makeBand(base: P2[], into: P2[], depth: (s: number) => number, backAtBa
   const s = [0]; for (let i = 1; i < base.length; i++) s.push(s[i - 1] + dist(base[i - 1], base[i]));
   return { base, N: into, D: s.map(depth), s, backAtBase, wall };
 }
-/** split a band into beds wherever it is blocked; each run becomes its own band with rounded ends */
+/** split a band into beds wherever it is blocked; each run becomes its own band with rounded ends. Where only its far
+ *  side is blocked (a deck's corner, a pool's rim a metre off the wall) the bed keeps its columns and gets shallower
+ *  there — its edge ramps away from the obstacle at 40°, rather than the whole bed stopping short of it */
 function runsOf(b: Band, blocked: (p: P2) => boolean, minRun = 0.8): Band[] {
-  const ok = b.s.map((s, i) => { const D = b.D[i]; return ![0.12, D * 0.5, Math.max(0.12, D - 0.1)].some(t => blocked(at(b, s, t))); });
+  const lim = b.s.map((s, i) => {
+    const D = b.D[i];
+    if (blocked(at(b, s, 0.12))) return 0;
+    for (let t = 0.3; t < D + 0.19; t += 0.2) if (blocked(at(b, s, Math.min(t, D)))) return Math.max(0, t - 0.3);
+    return blocked(at(b, s, Math.max(0.12, D - 0.1))) ? Math.max(0, D - 0.4) : D;
+  });
+  // the ramp: no column is deeper than a neighbour's limit plus 0.8 m for each metre between them (a column with no
+  // room at all is a break between beds, not a limit)
+  const D2 = lim.map((l, i) => { let m = l; if (l > 0) for (let j = Math.max(0, i - 8); j <= Math.min(lim.length - 1, i + 8); j++) if (lim[j] > 0) m = Math.min(m, lim[j] + 0.8 * Math.abs(b.s[j] - b.s[i])); return m; });
+  const ok = D2.map(d => d >= 0.55);
   const out: Band[] = [];
   let i = 0;
   while (i < ok.length) {
@@ -230,7 +241,7 @@ function runsOf(b: Band, blocked: (p: P2) => boolean, minRun = 0.8): Band[] {
       const idx = Array.from({ length: j - i + 1 }, (_, k) => i + k), s0 = b.s[i];
       // rounded ends: the depth eases in over the first and last 0.7 m (a quarter-ellipse profile)
       const round = (s: number, D: number) => { const e = Math.min(s - s0, b.s[j] - s), k = clamp(e / Math.min(0.7, L / 2)); return D * Math.sqrt(1 - (1 - k) * (1 - k)) * 0.85 + D * 0.15 * k; };
-      out.push({ base: idx.map(k => b.base[k]), N: idx.map(k => b.N[k]), D: idx.map(k => round(b.s[k], b.D[k])), s: idx.map(k => b.s[k] - s0), backAtBase: b.backAtBase, wall: b.wall, edgeBuilt: b.edgeBuilt });
+      out.push({ base: idx.map(k => b.base[k]), N: idx.map(k => b.N[k]), D: idx.map(k => round(b.s[k], D2[k])), s: idx.map(k => b.s[k] - s0), backAtBase: b.backAtBase, wall: b.wall, edgeBuilt: b.edgeBuilt });
     }
     i = j + 1;
   }
@@ -284,7 +295,7 @@ function plantBand(C: Ctx, b: Band) {
         const s = off + q * pitch, D = depthAt(b, s), t = b.backAtBase ? (1 - frac) * D : frac * D;
         if (D < 0.35) continue;
         const [x, z] = toWorld([s, t]); if (C.blockedWorld([x, z])) continue;
-        const p = plant(C, sp, x, z, layer, b.wall, bloomOf);
+        const p = plant(C, sp, x, z, layer, true, bloomOf);
         if (p) placed.push({ x: s, z: t, r: p.r });
       }
     }
@@ -304,7 +315,7 @@ function plantBand(C: Ctx, b: Band) {
       const pts = poisson(rng, box, sp0, inside, { blockers: placed.map(p => ({ x: p.x, z: p.z, r: Math.max(p.r, rNew) * 0.95 })), seeds: Math.max(2, Math.round(L / 3)), grid: sp0 * 1.2 });
       for (const p of pts) {
         const v = clamp((drift[layer](p[0]) + 1) / 2 + (rng() - 0.5) * 0.2), sp = pickWeighted(list, v), [x, z] = toWorld(p);
-        const q = plant(C, sp, x, z, layer, b.wall, bloomOf);
+        const q = plant(C, sp, x, z, layer, true, bloomOf);
         if (q) placed.push({ x: p[0], z: p[1], r: q.r });
       }
     }
@@ -326,17 +337,17 @@ function plantBand(C: Ctx, b: Band) {
       if (!best || room > best.room) best = { s: s2, t, p, room };
     }
     if (!best) continue;
-    const q = plant(C, sp, best.p[0], best.p[1], layer, b.wall, bloomOf);
+    const q = plant(C, sp, best.p[0], best.p[1], layer, true, bloomOf);
     if (q) { q.h = Math.min(hi, Math.max(lo, (SPECIES[sp].h[0] + SPECIES[sp].h[1]) / 2)); placed.push({ x: best.s, z: best.t, r: q.r }); }
   }
   const fillSp = mix.fill, fr = (SPECIES[fillSp].r[0] + SPECIES[fillSp].r[1]) / 2 * 1.1;
   // a fill point goes wherever mulch shows: a little further than a crown's reach from every plant
   const blockers: Blocker[] = placed.map(p => ({ x: p.x, z: p.z, r: p.r + 0.05 }));
   const fill = poisson(rng, box, fr, (s, t) => { const D = depthAt(b, s); return t > 0.05 && t < D - 0.05 && !C.blockedWorld(toWorld([s, t])); }, { blockers, seeds: Math.max(2, Math.round(L / 2)), grid: fr * 0.7 });
-  for (const p of fill) { const [x, z] = toWorld(p); const q = plant(C, fillSp, x, z, 'front', b.wall, bloomOf); if (q) placed.push({ x: p[0], z: p[1], r: q.r }); }
+  for (const p of fill) { const [x, z] = toWorld(p); const q = plant(C, fillSp, x, z, 'front', true, bloomOf); if (q) placed.push({ x: p[0], z: p[1], r: q.r }); }
   // and once more, smaller, for the gaps a full-sized groundcover would not fit
   const fr2 = fr * 0.7, gaps = poisson(rng, box, fr2, (s, t) => { const D = depthAt(b, s); return t > 0.04 && t < D - 0.04 && !C.blockedWorld(toWorld([s, t])); }, { blockers: placed.map(p => ({ x: p.x, z: p.z, r: p.r + 0.02 })), seeds: 2, grid: fr2 * 0.7 });
-  for (const p of gaps) { const [x, z] = toWorld(p); const q = plant(C, fillSp, x, z, 'front', b.wall, bloomOf); if (q) { q.r *= 0.8; q.h *= 0.85; } }
+  for (const p of gaps) { const [x, z] = toWorld(p); const q = plant(C, fillSp, x, z, 'front', true, bloomOf); if (q) { q.r *= 0.8; q.h *= 0.85; } }
 }
 // ---- the kinds --------------------------------------------------------------------------------------------------
 function facadeBands(C: Ctx, sides: string[], depth: number): Band[] {

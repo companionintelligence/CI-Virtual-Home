@@ -24,8 +24,10 @@
 //   S3 compose      rooms-build.ts (the rooms loop) and room-composer.ts, props/*.ts except lighting.ts and
 //                   outdoor.ts, props/page-place.ts (page items' placement), props/registry.ts,
 //                   scripts/build-prop-catalog.mts
-//   S4 site         site-build.ts (the lot, the world, the site builders and the site loop), site.ts, world.ts,
-//                   props/outdoor.ts; the page's pool / fence / garden / cabana builders
+//   S4 site         site-build.ts (the lot, the world, the site builders and the site loop), site.ts (the kit),
+//                   site-planting.ts (the planting generator), site-geom.ts (curves, offsets, Poisson discs),
+//                   site-species.ts (the plants' drawing), site-structures.ts (stairs, rails, fences, walls),
+//                   world.ts, props/outdoor.ts; the page's pool / fence / garden / cabana builders
 //   S5 shot         shot-planner-v1.ts (shotsFor, routeOn, blockedTest, clearPoint), core-orbit.ts, shot-path.ts,
 //                   shot-track.ts (the baked track and the roof-fade rule)
 //   S6 ui           visibility.ts (wall modes, the shot's cutaway, shotHidden / shotPose), viewer.ts, home-names.ts,

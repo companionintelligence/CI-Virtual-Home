@@ -21,7 +21,11 @@
  "lot": {
   "w": 26,
   "d": 22,
-  "ground": "lawn"
+  "ground": "lawn",
+  "streetFurniture": [
+   "hydrant",
+   "bench"
+  ]
  },
  "palette": {
   "wall": "#eeeae3",
