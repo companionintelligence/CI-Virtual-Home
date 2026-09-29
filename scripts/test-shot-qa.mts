@@ -330,6 +330,15 @@ for (const code of codes) {
   }
 }
 
+// ---- frameAt is pure: the same frame whatever was asked before it (the page renders frames at random) ---------------------------------
+{
+  const t = bases[0].track, us = Array.from({ length: 240 }, (_, k) => ((k * 7919) % 1000) / 1000).concat([0, 1]);
+  const fwd = us.map(u => JSON.stringify(sampleTrack(t, u))), back = us.slice().reverse().map(u => JSON.stringify(sampleTrack(t, u))).reverse();
+  const wide = sampleTrack(t, 0.9, 16 / 9), tall = sampleTrack(t, 0.9, 9 / 16), again = sampleTrack(t, 0.9, 16 / 9);
+  say(fwd.every((x, i) => x === back[i]) && JSON.stringify(wide) === JSON.stringify(again), 'a track sampled in any order gives the same frames (frameAt is pure)');
+  say(JSON.stringify(wide.eye) === JSON.stringify(tall.eye) && wide.fov === tall.fov, 'the aspect changes only the composed target, never the eye or the lens');
+}
+
 // ---- a flight with S2's walking line (anchors.stairs[].path): the planner follows it, and QA is content ---------------------------------
 {
   const nw = JSON.parse(fs.readFileSync(path.join(WORLD_DIR, 'newcrest.world.json'), 'utf8')) as ShotWorld;   // (the Core is upstairs: the film climbs)

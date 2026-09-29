@@ -700,6 +700,9 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       if (wv === null || Math.abs(wv - want) > 1e-6) continue;
       to = want; break;
     }
+    // one degree more where the run allows it (unless hero.view names the end): the orbit beat's first sample comes a sample after `from`,
+    // so a sweep planned as 90° measures 89.9°
+    if (!(HV && typeof HV.azimuth === 'number')) { const t2 = to + fin.dir; if (t2 >= lo && t2 <= hi) { const wv2 = verifyArc(fin.from, t2, fin.dir, r); if (wv2 !== null && Math.abs(wv2 - t2) < 1e-6) to = t2; } }
     const arc = (to - fin.from) * fin.dir;
     const S = orbitPt(fin.from, centre[1] + hs[0], r);
     finaleSegs.push({ beat: 'hero', pts: fin.bez });

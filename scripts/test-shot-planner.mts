@@ -129,6 +129,25 @@ if (args['planner-only'] !== 'true' && parityN > 0 && real.length) {
       const got = await page.evaluate(() => { const t = (window as any).__houseShotTrack('door-to-core'); return { hash: t.hash, planner: t.planner, duration: t.duration, samples: t.samples }; });
       check(got.planner === 'v2' && got.hash === r.hash && got.duration === r.duration, `the page's door-to-core track for ${r.id} is the Node bake (${r.hash})`, `page: ${JSON.stringify(got)}\nnode: ${r.hash} ${r.duration} s`);
     }
+    // the doors channel through the page's pose hook (visibility.ts shotPose): a leaf pivot follows the track's channel, absolute per frame
+    // (frames out of order give the same angles: no frame depends on the one before) and goes back to where it was when the shot ends
+    const dr = await page.evaluate(() => {
+      const w = window as any, d = w.__houseDebug(), preset = d.presets[`house:${d.house.id}:door-to-core`], THREE = w.__THREE;
+      const pivot = new THREE.Object3D(); pivot.rotation.y = 0.25; d.scene.add(pivot);
+      d.house.anchors.doors = [{ id: 'test:door', pivot }];
+      const N = preset.track.samples, ch = new Float32Array(N); for (let i = 0; i < N; i++) ch[i] = i / (N - 1) * 1.5;
+      preset.track.doors = { 'test:door': ch };
+      const info = w.__houseRenderBegin({ shot: 'door-to-core', res: '270', fps: 10 });
+      const at = (u: number) => { w.__houseRenderFrames(Math.round(u * (info.frames - 1)), 1, 0.5); return pivot.rotation.y; };
+      const r = [at(0.5), at(0.2), at(0.5), at(1)];
+      w.__houseRenderEnd();
+      const back = pivot.rotation.y;
+      d.scene.remove(pivot); delete preset.track.doors['test:door']; d.house.anchors.doors = [];
+      return { r, back };
+    });
+    const near = (a: number, b: number) => Math.abs(a - b) < 0.02;
+    check(near(dr.r[0], 0.75) && near(dr.r[1], 0.3) && dr.r[0] === dr.r[2] && near(dr.r[3], 1.5), 'the page poses a door leaf from the track\'s doors channel, absolute per frame', JSON.stringify(dr));
+    check(near(dr.back, 0.25), 'the leaf goes back where it was when the shot ends', JSON.stringify(dr));
   } finally { await browser.close(); await srv.close(); }
 }
 if (args.out) { fs.mkdirSync(path.dirname(path.resolve(args.out)), { recursive: true }); fs.writeFileSync(path.resolve(args.out), JSON.stringify(rows.map(r => ({ id: r.id, duration: r.duration, hash: r.hash, metrics: r.metrics, plan: r.plan, errors: r.errors, warnings: r.warnings, findings: r.findings })), null, 1)); }
