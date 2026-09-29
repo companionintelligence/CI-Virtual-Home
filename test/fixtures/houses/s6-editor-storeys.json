@@ -7,7 +7,8 @@
   "style": "Three-storey rendered box with a set-back top floor, study and living below, office and bedroom above, a loft on top",
   "emoji": "🧪",
   "fixture": {
-    "note": "the editor (S6): three storeys (floor buttons L1-L3, the plan inset changing storey), golden light, a 12 s door-to-core"
+    "note": "the editor (S6): three storeys (floor buttons L1-L3, the plan inset changing storey), golden light, a 12 s door-to-core",
+    "frames": { "door-to-core": [0.55, 1], "orbit": [0.5], "hero-reveal": [1], "core-orbit": [0.55] }
   },
   "lot": {
     "w": 24,

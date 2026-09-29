@@ -6705,13 +6705,13 @@
     // Preset Scenes
     // -------------------------------------------------------------
     // The studio scenes: the editor's own hand-built rooms (no spec, no thumbnail), listed under the homes in the
-    // picker. Their keys stay what they were, but the garden house's (?preset=pascal-garden-house still opens it: LEGACY_SCENE_KEYS).
+    // picker. Their keys are plain names (the first ones, pascal-garden-house, sims-nordic and sims-kyoto, still open them: LEGACY_SCENE_KEYS).
     const STUDIO_SCENES = [
       { key: 'garden-house', name: 'Garden house', note: '12 × 8 m pavilion and a fenced garden' },
       { key: 'tokyo-penthouse-duplex', name: 'Penthouse duplex', note: 'Double-height void and a mezzanine studio' },
       { key: 'soho-loft-apartment', name: 'Industrial loft', note: 'Double height, steel and timber' },
-      { key: 'sims-nordic', name: 'Nordic compound', note: 'Light timber courtyard' },
-      { key: 'sims-kyoto', name: 'Machiya', note: 'Minimal timber townhouse' },
+      { key: 'nordic-compound', name: 'Nordic compound', note: 'Light timber courtyard' },
+      { key: 'machiya', name: 'Machiya', note: 'Minimal timber townhouse' },
       { key: 'companion-lab', name: 'Companion lab', note: 'A desk, the Core and a mini PC' },
       { key: 'solarpunk-lounge', name: 'Garden lounge', note: 'A sofa, a hearth and planting' },
     ];
@@ -6736,7 +6736,7 @@
       'sims-familyhome': 'familyhome',     'family-home': 'familyhome',
       'sims-modernhouse1': 'modernhouse1', 'modern-house-1': 'modernhouse1'
     };
-    const LEGACY_SCENE_KEYS = { 'pascal-garden-house': 'garden-house' };   // the studio garden house's first key (?preset=)
+    const LEGACY_SCENE_KEYS = { 'pascal-garden-house': 'garden-house', 'sims-nordic': 'nordic-compound', 'sims-kyoto': 'machiya' };   // the studio scenes' first keys (?preset=)
     const resolveSceneKey = key => LEGACY_HOUSE_PRESETS[key] ? `house:${LEGACY_HOUSE_PRESETS[key]}` : (LEGACY_SCENE_KEYS[key] || key);
 
     function loadPresetScene(name) {
@@ -7144,7 +7144,7 @@
         setGlobalWallMode('cutaway');
         selectObject(null);
 
-      } else if (name === 'sims-nordic') {
+      } else if (name === 'nordic-compound') {
         // =========================================================================
         // 6. NORDIC LIGHT COMPOUND (Copenhagen · Astrid)
         // =========================================================================
@@ -7175,7 +7175,7 @@
         setLightingPreset('studio-clean');
         selectObject(null);
 
-      } else if (name === 'sims-kyoto') {
+      } else if (name === 'machiya') {
         // =========================================================================
         // 7. MINIMALIST MACHIYA HAVEN (Kyoto · Kenji)
         // =========================================================================
