@@ -32,7 +32,7 @@ export interface KitLot {}
 export interface KitPalette {
   /** every hinged exterior leaf (the entry's too) unless the opening has its own `color` */
   door?: Colour;
-  /** 0..1: how far walls, roofs and the interior are pulled toward restraint (default 1: today's clamp) */
+  /** 0..1: how far walls, roofs and the interior are pulled toward restraint (default 1: today's clamp; 0.4 under `defaults: 2`) */
   restraint?: number;
   /** roles exempt from restraint (and a kept roof from the charcoal pull): the one committed hue that survives */
   keep?: KeepRole[];
@@ -60,7 +60,7 @@ export interface KitOpening {
   head?: 'flat' | 'arch' | 'segmental';
   /** which way an open leaf swings: 'out' (default; the entry swings 'in' under defaults 2) */
   swing?: 'in' | 'out';
-  /** a name for anchors.doors (S5 opens doors by it) */
+  /** a name for anchors.doors (S5 opens doors by it; a pair's two leaves are `<id>:L` and `<id>:R`) */
   id?: string;
 }
 export interface KitPartition {

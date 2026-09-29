@@ -259,7 +259,8 @@ applies only under `"defaults": 2`.
                                                           // degrees (0 north = −Z, 90 east, 180 south = the street)
 "palette": {
   "door": "#7a5236",            // every hinged exterior leaf, the entry's too, unless the opening has its own color
-  "restraint": 0.5,             // 0..1: how far wall / roof / interior are pulled toward restraint (1 = today's)
+  "restraint": 0.5,             // 0..1: how far wall / roof / interior are pulled toward restraint (1 = today's, the
+                                // default; under defaults 2 the default is 0.4: a cobalt keeps most of its saturation)
   "keep": ["wall", "accent"],   // roles exempt from restraint: wall | trim | accent | roof | door | interior
                                 // (a kept roof colour renders within ΔE 3 of itself: no charcoal pull either)
   "roofPull": false             // no roof pulled toward charcoal
@@ -269,18 +270,22 @@ applies only under `"defaults": 2`.
     { "type": "door", "w": 1.6, "leaf": "french", "transom": 0.45, "frame": "#3b3530", "grid": "vertical",
       "lantern": true, "head": "arch", "swing": "in", "id": "front" },
     // leaf: single | glazed | double | french | none — a pair hinges on both jambs (a door over 1.1 m without a
-    //   leaf is still a cased opening; under defaults 2 a 1.2–1.8 m door gets a pair)
+    //   leaf is still a cased opening; under defaults 2 a 1.2–1.8 m PERIMETER door gets a pair)
+    // id: the door's name in anchors.doors, for S5 ("front"; a pair's leaves are "front:L" and "front:R")
     // transom: metres of glass over the leaf. frame: the colour of window frames, a slider's frames, a transom.
     // grid: none | 2x2 | vertical | prairie muntins. lantern: a lantern each side (default: the entry and a garage).
     // head: flat | arch | segmental — the wall hole's top follows the arc (windows and doors), with an arched
     //   frame, fanlight and casing (S2 dresses it). swing: which way an open leaf parks.
     { "type": "garage", "w": 2.4, "color": "#4f6b52" },   // a garage's leaf, a slider's frame: `color` is honoured
   ],
-  "partitions": [{ "from": [0, 0], "to": [0, 4], "door": 2, "doorColor": "#6a4e33", "doorStyle": "glazed", "doorSwing": "in" }],
+  "partitions": [{ "from": [0, 0], "to": [0, 4], "door": 2, "doorColor": "#6a4e33", "doorStyle": "glazed", "doorSwing": "in",
+                  "id": "study" }],   // a partition doorway over 1.1 m is a cased opening (an open-plan connection) whatever
+                                      // the defaults; doorStyle "double" | "french" | "glazed" hangs leaves in it
   "rooms": [{ "name": "Den", "program": "den",                // S3's program decides the fixtures' room kind
     "fixtures": { "fan": false, "pendants": 2, "ceiling": "chandelier", "lamp": "globe" } }]
   // fixtures: fan true | false; pendants over the island / table (0 = none); ceiling flush (cans) | chandelier |
-  //   none; lamp: what the room's floor lamps become — drum | globe | cone | mushroom | tripod
+  //   none; lamp: the head every lamp in the room takes — drum | globe | cone | mushroom | tripod (the registry's floor,
+  //   arc, tripod and table lamps and the halo lamp; a lamp with its own `color` keeps its shade)
 }],
 "hero": { "surface": "island", "surfaceColor": "#e8e4dc", "desk": { "style": "oak", "color": "#…", "w": 1.6 },
           "monitor": "flat", "chair": { "kind": "task", "pose": "turned" }, "shelfWidth": 1.2, "upstairs": true }
@@ -334,7 +339,7 @@ applies only under `"defaults": 2`.
   `material.userData.finishFallback`. `anchors.doors[].id` is the authored `openings[].id` / `partitions[].id` (a
   pair's leaves `<id>:L` / `<id>:R`, a repeated id `<id>~2`), else `<kind>:<n>` in build order.
 - **Lints** (warnings): `kit:lighting-alias`, `kit:silent-param`, `kit:style`, `kit:wide-leaf`, `kit:fan-over-hero`,
-  `kit:no-top`; the Core policy (`hero.mts`, §4.6): `hero:one-core`, `hero:storey`, `hero:wall` (a desk or shelf ≤
+  `kit:no-top`, `kit:duplicate-id`; the Core policy (`hero.mts`, §4.6): `hero:one-core`, `hero:storey`, `hero:wall` (a desk or shelf ≤
   0.45 m off its wall), `hero:doorway`, `hero:approach` (2 m clear in front), `hero:contrast` (charcoal on walnut). A
   malformed S1 field is an error.
 
