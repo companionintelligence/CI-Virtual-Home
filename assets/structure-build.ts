@@ -7,13 +7,15 @@
 import { perimeterEdges, edgeForOpening, outlineLoops, unionBounds, rectCentre, inRect } from './house-geometry.js';
 import { FloorplanGraph } from './floorplan-graph.js';
 import { createWallCompiler } from './wall-compiler.js';
-import { buildRoofs } from './roofs.js';
+import { buildRoofs, planRoofModels, roofUnderAt } from './roofs.js';
 import { DEG, hex, mix } from './build-context.js';
 import { specDefaults } from './spec/index.js';
 import { levelStairs, stairPlan, createStairBuilder } from './stairs.js';
-import { slabOpenings, archEdges, edgeFor, rectOfEdge, edgeHeight, wallPieces, volumeSteps } from './arch-plan.js';
+import { slabOpenings, archEdges, edgeFor, rectOfEdge, edgeHeight, wallPieces, volumeSteps, doubleRoomsUnder, featureOpenings } from './arch-plan.js';
+import { createFacade, facadeWanted } from './facade.js';
 import { createArchMaterials } from './arch-materials.js';
 import { createFeatures } from './features.js';
+import { createRoomFinish, ownCeilingAt } from './room-finish.js';
 
 // kitb (kit-build.ts, S1) turns the spec's doors, colours and finishes into the parameters below; this module
 // keeps the geometry round each call.
@@ -21,6 +23,10 @@ export function createStructureBuild(bctx, { kitb }) {
   const { THREE, AssetFactory, ProceduralArchitecture, registerTrackedWall, registerRoof, registerCeiling, textures, useGraphWalls, std, group } = bctx;
   const stairBuilder = createStairBuilder({ THREE, ProceduralArchitecture, textures });
   const features = createFeatures(bctx);
+  const finish = createRoomFinish(bctx);
+  const facade = createFacade(bctx);
+  const kitOf = new WeakMap();   // spec → its kit, for the build steps the orchestrator calls without one (buildCeilings)
+  const anchorsOf = new WeakMap();   // spec → its anchors (placeRoofs has none)
   const FULL = [{ lo: 0, hi: 0, party: false }];   // a v1 wall: one piece, the storey's full height
 
   // ---- S2's wall helpers ----------------------------------------------------------------------------------------
@@ -100,6 +106,8 @@ export function createStructureBuild(bctx, { kitb }) {
     const floorTex = name => textures[name === 'oak' ? 'oak' : name] || kit.floorTexture(name) || textures.oak;
     const defaults = specDefaults(spec);
     let _am = null; const am = () => _am || (_am = createArchMaterials(THREE, kit));   // S2's materials, made only when asked for
+    kitOf.set(spec, kit); anchorsOf.set(spec, anchors);
+    anchors.arch ||= { rooms: [], features: [] };
     const y = lv.y || 0, H = lv.height || 2.8;
     const wallColor = hex(lv.wallColor || palette.wall), trimColor = hex(lv.trimColor || palette.trim);
     // interior paint: palette.interior / lv.interior, else the wall colour lifted toward off-white when the
@@ -152,7 +160,7 @@ export function createStructureBuild(bctx, { kitb }) {
       // piece, full height — the v1 wall, built by the v1 call.
       const wallEdges = archEdges(spec, lv, edges);
       const special = wallEdges !== edges || lv.knee !== undefined;
-      const ops = (lv.openings || []).map(op => ({ ...op, edge: edgeFor(wallEdges, op) })).filter(o => o.edge);
+      const ops = [...(lv.openings || []), ...featureOpenings(spec, lv)].map(op => ({ ...op, edge: edgeFor(wallEdges, op) })).filter(o => o.edge);
       for (const e of wallEdges) {
         const horiz = e.side === 'S' || e.side === 'N';
         const mid = horiz ? (e.a[0] + e.b[0]) / 2 : (e.a[1] + e.b[1]) / 2;
@@ -276,31 +284,119 @@ export function createStructureBuild(bctx, { kitb }) {
       const g = put(() => bl.style === 'colonial' ? ProceduralArchitecture.createColonialBalustrade(len, 0.95, y) : ProceduralArchitecture.createGlassBalustrade(len, 1.0, y), cx, cz, y, null, 'structure');
       if (!alongX) g.rotation.y = Math.PI / 2;
     }
+
+    // ---- S2: room finishes (room-finish.ts) — only for rooms that ask, or every room under defaults: 2
+    const gen2 = defaults >= 2;
+    if (gen2 || (lv.rooms || []).some(r => r.floor || r.floorOffset)) finish.floors({ spec, lv, y, put, am: am(), anchors, gen2 });
+    if ((lv.rooms || []).some(r => r.walls)) {
+      const ups = (spec.levels || []).filter(o => (o.y || 0) > y + 0.5);
+      const ceilingAt = (a, side, line) => { const horiz = side === 'N' || side === 'S', px = horiz ? a : line, pz = horiz ? line : a; const up = ups.filter(o => (o.footprint || []).some(r => inRect(px, pz, r, 0.05))).sort((p, q) => (p.y || 0) - (q.y || 0))[0]; return up ? (up.y || 0) - 0.185 : y + H - 0.02; };
+      finish.walls({ spec, lv, y, H, put, am: am(), anchors, ceilingAt });
+    }
+    const dbl = doubleRoomsUnder(spec, lv);
+    if (dbl.length) finish.galleryRails({ spec, lv, y, put, ProceduralArchitecture, doubleRooms: dbl });
+    // ---- S2: the storey's facade (facade.ts) and its features (features.ts: bays, balconies, fireplaces, built-ins)
+    const lowestY = Math.min(...(spec.levels || []).map(l => l.y || 0));
+    if (facadeWanted(spec, lv, lowestY)) facade.levelFacade({ spec, lv, y, H, palette, am: am(), put, anchors, lowestY });
+    if ((spec.features || []).some(f => f && f.type !== 'porch')) features.levelFeatures({ spec, lv, y, H, palette, kit, am: am(), put, anchors, kitb, interior, wallColor, trimColor, defaults });
     return { y, H };
   }
 
   function buildCeilings({ spec, put }) {
     const defaults = specDefaults(spec);
+    let models = null; const roofModels = () => models || (models = planRoofModels(spec));
     // ---- ceilings: wherever a storey has no storey above it. With the roofs on they are hidden under the
     // roof; once a shot fades the roofs out (eye under a ceiling) the storey would otherwise open to the sky.
     // Built from 0.25 m cells of the storey's footprint not covered by any higher storey — robust for every
     // footprint shape, and a thin DoubleSide sheet so it reads from below.
+    // S2: a vaulted or trayed room builds its own (its cells are left out), a volume with its own height `h` has its
+    // sheet at that height, and a knee-walled storey's ceiling follows the roof's underside down to the knee walls.
     for (const lv of spec.levels || []) {
       const y = lv.y || 0, H = lv.height || 2.8, above = (spec.levels || []).filter(o => (o.y || 0) > y + 0.5);
       if (!Array.isArray(lv.footprint) || !lv.footprint.length) continue;
+      const own = (lv.rooms || []).filter(r => r.bounds && r.ceiling && (r.ceiling.kind === 'vault' || r.ceiling.kind === 'tray'));
+      const s2 = lv.knee !== undefined || lv.footprint.some(r => r.h !== undefined) || own.length > 0;
       const b = unionBounds(lv.footprint), C = 0.25, quads = [];
       for (let x = b.minX; x < b.maxX - 1e-6; x += C) for (let z = b.minZ; z < b.maxZ - 1e-6; z += C) {
         const mx = x + C / 2, mz = z + C / 2;
         if (!lv.footprint.some(r => inRect(mx, mz, r, 0))) continue;
         if (above.some(o => (o.footprint || []).some(r => inRect(mx, mz, r, 0.05)))) continue;
+        if (s2 && own.some(r => inRect(mx, mz, r.bounds, -0.01))) continue;
         quads.push([x, z, Math.min(x + C, b.maxX), Math.min(z + C, b.maxZ)]);
       }
       if (!quads.length) continue;
-      const pos = new Float32Array(quads.length * 18); let k = 0;
-      for (const [x0, z0, x1, z1] of quads) for (const [px, pz] of [[x0, z0], [x1, z0], [x1, z1], [x0, z0], [x1, z1], [x0, z1]]) { pos[k++] = px; pos[k++] = 0; pos[k++] = pz; }
+      if (!s2) {
+        const pos = new Float32Array(quads.length * 18); let k = 0;
+        for (const [x0, z0, x1, z1] of quads) for (const [px, pz] of [[x0, z0], [x1, z0], [x1, z1], [x0, z0], [x1, z1], [x0, z1]]) { pos[k++] = px; pos[k++] = 0; pos[k++] = pz; }
+        const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.computeVertexNormals();
+        const ceil = put(() => { const g = group(`Ceiling (${lv.id})`, { category: 'Architecture' }); const m = new THREE.Mesh(geo, kitb.ceilingMaterial({ spec, defaults, lv, where: 'ceiling' })); m.receiveShadow = true; g.add(m); return g; }, 0, 0, y + H - 0.02);
+        if (typeof registerCeiling === 'function') registerCeiling(ceil, y + H - 0.02);
+        continue;
+      }
+      // S2: heights per vertex (absolute): a volume's own h, or under a knee-walled storey the roof's underside
+      const hAt = (px: number, pz: number) => {
+        const r = [...lv.footprint].reverse().find(q => q.h !== undefined && inRect(px, pz, q, 0.001));
+        const flat = y + (r ? r.h : H) - 0.02;
+        if (lv.knee === undefined) return flat;
+        const u = roofUnderAt(roofModels(), px, pz);
+        return u === null ? flat : Math.max(y + lv.knee - 0.02, Math.min(flat, u - 0.03));
+      };
+      const pos = new Float32Array(quads.length * 18); let k = 0, hi = -Infinity;
+      for (const [x0, z0, x1, z1] of quads) {
+        // a cell takes its centre's volume (no seam through a cell where two heights meet)
+        const hc = lv.knee === undefined ? hAt((x0 + x1) / 2, (z0 + z1) / 2) : null;
+        for (const [px, pz] of [[x0, z0], [x1, z0], [x1, z1], [x0, z0], [x1, z1], [x0, z1]]) { const h = hc ?? hAt(px, pz); hi = Math.max(hi, h); pos[k++] = px; pos[k++] = h; pos[k++] = pz; }
+      }
       const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.computeVertexNormals();
-      const ceil = put(() => { const g = group(`Ceiling (${lv.id})`, { category: 'Architecture' }); const m = new THREE.Mesh(geo, kitb.ceilingMaterial({ spec, defaults, lv, where: 'ceiling' })); m.receiveShadow = true; g.add(m); return g; }, 0, 0, y + H - 0.02);
-      if (typeof registerCeiling === 'function') registerCeiling(ceil, y + H - 0.02);
+      const ceil = put(() => { const g = group(`Ceiling (${lv.id})`, { category: 'Architecture' }); const m = new THREE.Mesh(geo, kitb.ceilingMaterial({ spec, defaults, lv, where: 'ceiling' })); m.receiveShadow = true; g.add(m); return g; }, 0, 0, 0);
+      if (typeof registerCeiling === 'function') registerCeiling(ceil, hi);
+    }
+    // ---- S2: each room's own ceiling (room-finish.ts): timber, beams, a vault or a tray, a painted colour
+    const kit = kitOf.get(spec);
+    for (const lv of spec.levels || []) {
+      const y = lv.y || 0, H = lv.height || 2.8;
+      for (const room of lv.rooms || []) {
+        const c = room.ceiling;
+        if (!c || !room.bounds || c.kind === 'double' || (c.kind === 'flat' && c.color === undefined) || !kit) continue;
+        const cx = room.bounds.x + room.bounds.w / 2, cz = room.bounds.z + room.bounds.d / 2;
+        const up = (spec.levels || []).filter(o => (o.y || 0) > y + 0.5 && (o.footprint || []).some(r => inRect(cx, cz, r, 0.05))).sort((p, q) => (p.y || 0) - (q.y || 0))[0];
+        const r = [...lv.footprint].reverse().find(q => q.h !== undefined && inRect(cx, cz, q, 0.001));
+        const at = up ? (up.y || 0) - 0.185 : y + (r ? r.h : H) - 0.02;
+        const cg = finish.ceiling({ spec, lv, room, y, H, at, top: !up, put, am: createArchMaterials(THREE, kit), roofUnder: (x, z) => roofUnderAt(roofModels(), x, z) });
+        // S1's fixtures hang from the flat ceiling (fixtures.ts knows nothing of vaults and trays yet): lift the room's
+        // fans and pendants, and the cans over it, onto the ceiling this room really has
+        if (cg && !up && (c.kind === 'vault' || c.kind === 'tray') && cg.userData.rise > 0) liftFixtures({ spec, lv, room, flat: at, rise: cg.userData.rise });
+      }
+    }
+  }
+
+  function liftFixtures({ spec, lv, room, flat, rise }) {
+    const anchors = anchorsOf.get(spec), placed = anchors && anchors.placed;
+    if (!placed) return;
+    const at = (x, z) => ownCeilingAt(room, flat, rise, x, z);
+    for (const o of placed) {
+      const u = o.userData || {};
+      if (u.role !== 'fixture') continue;
+      if (u.room === room.name) {   // a fan or a pendant cluster, placed at its room's centre: it hangs from the ceiling over it
+        const h = at(o.position.x, o.position.z);
+        if (h !== null) o.position.y += h - flat;
+      } else if (u.level === lv.id) {   // the storey's cans, one instanced set per ceiling height
+        o.traverse(m => {
+          if (!m.isInstancedMesh) return;
+          const M = new THREE.Matrix4(), p = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+          for (let i = 0; i < m.count; i++) {
+            m.getMatrixAt(i, M); M.decompose(p, q, sc);
+            const h = at(p.x + o.position.x, p.z + o.position.z);
+            if (h === null) continue;
+            // on a vault's slope the can tilts with it
+            const e = 0.05, dx = (at(p.x + o.position.x + e, p.z + o.position.z) ?? h) - (at(p.x + o.position.x - e, p.z + o.position.z) ?? h), dz = (at(p.x + o.position.x, p.z + o.position.z + e) ?? h) - (at(p.x + o.position.x, p.z + o.position.z - e) ?? h);
+            const n = new THREE.Vector3(-dx / (2 * e), 1, -dz / (2 * e)).normalize();
+            q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), n);
+            p.y += h - flat; M.compose(p, q, sc); m.setMatrixAt(i, M);
+          }
+          m.instanceMatrix.needsUpdate = true; m.computeBoundingBox(); m.computeBoundingSphere();
+        });
+      }
     }
   }
 
@@ -309,6 +405,11 @@ export function createStructureBuild(bctx, { kitb }) {
     for (const r of buildRoofs(spec, { THREE, kit, palette })) {
       const o = put(() => r.group, r.x, r.z, r.y);
       registerRoof(o);
+    }
+    // ---- S2: porches (their roofs), bay roofs and chimney stacks (features.ts)
+    if ((spec.features || []).length || (spec.levels || []).some(l => (l.rooms || []).some(r => (r.items || []).some(it => it.type === 'fireplace' && it.chimney)))) {
+      const anchors = anchorsOf.get(spec);
+      if (anchors) features.houseFeatures({ spec, kit, palette, put, anchors });
     }
   }
 

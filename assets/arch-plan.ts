@@ -72,17 +72,26 @@ export type OpeningFrame = {
   edge: any;
 };
 
-/** The perimeter edge an opening sits on: `line` picks between two same-side edges that both contain `at` */
+/** The perimeter edge an opening sits on: `edgeZ` picks between two same-side edges that both contain `at` */
 export function edgeFor(edges: any[], op: any) {
-  if (op.line === undefined) return edgeForOpening(edges, op.side, op.at);
+  if (op.edgeZ === undefined) return edgeForOpening(edges, op.side, op.at);
   const horiz = op.side === 'S' || op.side === 'N';
-  return edges.find(e => e.side === op.side && Math.abs((horiz ? e.a[1] : e.a[0]) - op.line) < 0.02 && (horiz ? op.at >= e.a[0] - 1e-6 && op.at <= e.b[0] + 1e-6 : op.at >= e.a[1] - 1e-6 && op.at <= e.b[1] + 1e-6)) || edgeForOpening(edges, op.side, op.at);
+  return edges.find(e => e.side === op.side && Math.abs((horiz ? e.a[1] : e.a[0]) - op.edgeZ) < 0.02 && (horiz ? op.at >= e.a[0] - 1e-6 && op.at <= e.b[0] + 1e-6 : op.at >= e.a[1] - 1e-6 && op.at <= e.b[1] + 1e-6)) || edgeForOpening(edges, op.side, op.at);
 }
 
-/** Every perimeter opening of a storey as a frame (heights over the storey's floor, the defaults kit-build.ts applies) */
-export function openingFrames(lv: any, edges = perimeterEdges(lv.footprint || [])): OpeningFrame[] {
+/** The openings S2's features cut in a storey's walls: a bay opens its host wall (a cased opening, no leaf) */
+export function featureOpenings(spec: any, lv: any) {
+  if (!spec || !Array.isArray(spec.features)) return [];
+  const H = lv.height || 2.8;
+  return spec.features.filter(f => f && f.type === 'bay' && f.w > 0.8 && (f.level ? f.level === lv.id : (spec.levels || [])[0] === lv))
+    .map(f => ({ side: f.side, at: f.at, type: 'door', w: Math.max(1.12, f.w - (f.form === 'canted' ? 0.2 : 0.3)), h: Math.min((f.h ?? H - 0.3) - 0.12, H - 0.15), style: 'cased', open: true, _feature: 'bay' }));
+}
+
+/** Every perimeter opening of a storey as a frame (heights over the storey's floor, the defaults kit-build.ts applies);
+ *  with `spec`, the openings its features cut too */
+export function openingFrames(lv: any, edges = perimeterEdges(lv.footprint || []), spec: any = null): OpeningFrame[] {
   const H = lv.height || 2.8, out: OpeningFrame[] = [];
-  (lv.openings || []).forEach((op, index) => {
+  [...(lv.openings || []), ...featureOpenings(spec, lv)].forEach((op, index) => {
     const e = edgeFor(edges, op); if (!e) return;
     const horiz = op.side === 'S' || op.side === 'N', line = horiz ? e.a[1] : e.a[0];
     const n = OUT[op.side], along: [number, number] = horiz ? [1, 0] : [0, 1];
@@ -218,33 +227,36 @@ function rectOfEdgeOther(B: any, e: any, at: number) {
 }
 
 /**
- * Per-rect heights: where two rects of one storey meet and one stands taller, the wall between them above the lower one
- * is outside wall (a tower over a wing). [{ side (the lower rect's side, the wall's outward face), a, b, lo, hi, rect (the
- * taller) }] — heights over the storey's floor.
+ * Per-rect heights: wherever a volume stands taller than the volume beside it (a tower over a wing, a tower rect laid over
+ * a lower one), the wall between them above the lower one is outside wall. The volume at a point is the LAST rect listed
+ * that holds it (as rectOfEdge reads it). [{ side (the wall's outward face: toward the lower volume), a, b, length, lo, hi,
+ * rect (the taller) }] — heights over the storey's floor, in 0.1 m-sampled runs merged along each side.
  */
 export function volumeSteps(lv: any, H: number) {
   const fp = lv.footprint || [];
   if (!fp.some(r => r.h !== undefined)) return [];
   const hOf = r => (r.h !== undefined ? r.h : lv.knee !== undefined ? lv.knee : H);
+  const volAt = (x: number, z: number) => { for (let i = fp.length - 1; i >= 0; i--) if (inR(x, z, fp[i], -1e-6)) return fp[i]; return null; };
   const out = [];
-  for (const A of fp) for (const B of fp) {
-    if (A === B || !(hOf(A) > hOf(B) + 0.05)) continue;
-    // A taller, B lower: shared boundary lines where B lies outside A's side
-    const segs: Array<[any, number, number, number]> = [];
-    if (Math.abs(B.x - (A.x + A.w)) < 1e-6) segs.push(['E', A.x + A.w, Math.max(A.z, B.z), Math.min(A.z + A.d, B.z + B.d)]);
-    if (Math.abs(B.x + B.w - A.x) < 1e-6) segs.push(['W', A.x, Math.max(A.z, B.z), Math.min(A.z + A.d, B.z + B.d)]);
-    if (Math.abs(B.z - (A.z + A.d)) < 1e-6) segs.push(['S', A.z + A.d, Math.max(A.x, B.x), Math.min(A.x + A.w, B.x + B.w)]);
-    if (Math.abs(B.z + B.d - A.z) < 1e-6) segs.push(['N', A.z, Math.max(A.x, B.x), Math.min(A.x + A.w, B.x + B.w)]);
-    for (const [side, line, s0, s1] of segs) {
-      if (s1 - s0 < 0.1) continue;
-      // not where another rect as tall as A continues the volume past the line
-      const horiz = side === 'S' || side === 'N', n = OUT[side], m = (s0 + s1) / 2;
-      const px = horiz ? m : line + n[0] * 0.05, pz = horiz ? line + n[1] * 0.05 : m;
-      if (fp.some(r => r !== B && inR(px, pz, r, -1e-6) && hOf(r) >= hOf(A) - 0.05)) continue;
-      out.push({ side, a: horiz ? [s0, line] : [line, s0], b: horiz ? [s1, line] : [line, s1], length: s1 - s0, lo: hOf(B), hi: hOf(A), rect: A });
+  for (const A of fp) {
+    for (const side of ['N', 'S', 'E', 'W'] as const) {
+      const horiz = side === 'S' || side === 'N', n = OUT[side];
+      const line = side === 'N' ? A.z : side === 'S' ? A.z + A.d : side === 'W' ? A.x : A.x + A.w;
+      const lo0 = horiz ? A.x : A.z, hi0 = horiz ? A.x + A.w : A.z + A.d;
+      let run = null;
+      const flush = () => { if (run && run.b - run.a > 0.09) out.push({ side, a: horiz ? [run.a, line] : [line, run.a], b: horiz ? [run.b, line] : [line, run.b], length: run.b - run.a, lo: run.lo, hi: run.hi, rect: A }); run = null; };
+      for (let u = lo0 + 0.05; u < hi0; u += 0.1) {
+        const inside = horiz ? volAt(u, line - n[1] * 0.02) : volAt(line - n[0] * 0.02, u);
+        const beyond = horiz ? volAt(u, line + n[1] * 0.02) : volAt(line + n[0] * 0.02, u);
+        const ok = inside === A && beyond && hOf(beyond) < hOf(A) - 0.05;
+        if (!ok) { flush(); continue; }
+        const lo = hOf(beyond), hi = hOf(A), a0 = Math.max(lo0, u - 0.05), b0 = Math.min(hi0, u + 0.05);
+        if (run && Math.abs(run.lo - lo) < 1e-6 && Math.abs(run.hi - hi) < 1e-6) run.b = b0; else { flush(); run = { a: a0, b: b0, lo, hi }; }
+      }
+      flush();
     }
   }
-  return out;
+  return out.map(st => ({ ...st, a: st.a.map(v => Math.round(v * 1000) / 1000), b: st.b.map(v => Math.round(v * 1000) / 1000), length: Math.round(st.length * 1000) / 1000 }));
 }
 
 // ---- porches -----------------------------------------------------------------------------------------------------------------
