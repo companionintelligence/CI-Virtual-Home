@@ -347,7 +347,8 @@ try {
       await p2.fill('#catalog-search-input', 'sofa');
       await sleep(150);
       const hits = await p2.$$eval('#catalog-items-list .catalog-item-card', (els: Element[]) => els.map(e => e.textContent!.trim()));
-      ok(hits.some(h => /sectional/i.test(h)) && hits.length <= 3, `the search finds across categories, the house catalog's props too ("sofa": ${hits.join(', ')})`);
+      ok(hits.some(h => /sectional/i.test(h)) && hits.length <= 12,   // a narrowed list, not the ~150-prop registry (S3's registry has eight sofa-named props; S6 wrote this at three)
+        `the search finds across categories, the house catalog's props too ("sofa": ${hits.join(', ')})`);
       await p2.fill('#catalog-search-input', 'zzz');
       await sleep(100);
       ok(await p2.isVisible('#catalog-empty'), 'the search says when nothing matches');
