@@ -29,7 +29,7 @@ async function loadPlaywright() {
 const PRESETS = ['day', 'golden', 'dusk'];
 // a bare patch of wall on the south facade (between openings), where the camera looks square at it
 const CASES = [
-  { key: 'white', fixture: 's1-kit-look', patch: [0.75, 1.5, 4.5], mod: (s: any) => { s.palette = { ...s.palette, keep: ['accent'] }; } },
+  { key: 'white', fixture: 's1-kit-look', patch: [0.75, 1.5, 4.5], mod: (s: any) => { s.palette = { ...s.palette, keep: ['accent'], restraint: 1 }; } },   // restraint pinned: the test measures the light, not defaults 2's palette (0.4), which leaves the fixture's warm white its own tint
   { key: 'cobalt', fixture: 's1-kit-cladding', patch: [0, 4.2, 4.0], mod: (_s: any) => {} },   // palette.keep: wall, roof, accent
 ];
 const specs = new Map<string, any>();

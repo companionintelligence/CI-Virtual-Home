@@ -25,7 +25,7 @@
 // __houseRenderFrames stays random access. Everything is seeded from the house id.
 import { mulberry32, fnv1a } from './materials.js';
 import { inRect } from './house-geometry.js';
-import { programKind, fanPlan, lampPlan } from './kit-rules.js';
+import { programKind, fanPlan, lampPlan, REGISTRY_LAMPS } from './kit-rules.js';
 import { heroFrame } from './hero-frame.js';
 
 export const LIGHT_CAP = 16;          // dynamic lights per house (one per room at most)
@@ -173,7 +173,7 @@ function toneHaloLamps(placed, s, THREE, lampOf) {
     const u = o.userData || {};
     if (u.itemType !== 'halo-lamp' || u.haloToned) continue;
     u.haloToned = true;
-    const kind = lampOf(u.room);
+    const kind = lampOf(o);
     const lights = [], rings = [];
     o.traverse(m => {
       if (m.isLight) lights.push(m);
@@ -200,26 +200,67 @@ function toneHaloLamps(placed, s, THREE, lampOf) {
 // The other lamp heads (kit-rules.ts LAMP_KINDS; rooms[].fixtures.lamp, or seeded per room under defaults 2), each
 // inside the drum's old box so nothing new meets the camera: an opal globe, a spun-metal cone and a mushroom
 // dome (both lit from inside, open underneath), and a tripod — a drum on three splayed legs round the old rod.
-function lampHead(THREE, s, kind: string, y0: number) {
+// `y0` is where the shade's centre was, `k` scales the head (a table lamp's is three quarters of a floor lamp's).
+// `tint` (0xRRGGBB): the colour the spec gave the lamp — its shade colour stays whatever shape the head takes, so the
+// globe's glass, the cone's and the dome's enamel and the drum's linen are painted in it.
+function tintedMats(s, THREE, tint: number) {
+  s.tints ||= new Map();
+  if (!s.tints.has(tint)) {
+    const paint = (m, extra: any = {}) => { const c = m.clone(); c.color.setHex(tint); Object.assign(c, extra); return c; };
+    s.tints.set(tint, { globe: paint(s.M.globe), shade: paint(s.M.shade, { metalness: 0.1, roughness: 0.6 }), drumShade: paint(s.M.drumShade) });
+  }
+  return s.tints.get(tint);
+}
+function lampHead(THREE, s, kind: string, y0: number, k = 1, tint?: number) {
   const g = new THREE.Group(); g.name = `Lamp Head (${kind})`;
   const lit = (m) => { m.userData.fixture = 'lamp'; return m; };
+  const M = tint === undefined ? s.M : { ...s.M, ...tintedMats(s, THREE, tint) };
   if (kind === 'globe') {
-    const b = new THREE.Mesh(new THREE.SphereGeometry(0.16, 28, 18), s.M.globe); b.position.y = y0; b.castShadow = true; g.add(lit(b));
+    const b = new THREE.Mesh(new THREE.SphereGeometry(0.16 * k, 28, 18), M.globe); b.position.y = y0; b.castShadow = true; g.add(lit(b));
   } else if (kind === 'cone' || kind === 'mushroom') {
-    const shell = kind === 'cone' ? new THREE.CylinderGeometry(0.05, 0.18, 0.26, 28, 1, true) : new THREE.SphereGeometry(0.19, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2);
-    const sh = new THREE.Mesh(shell, s.M.shade); sh.position.y = kind === 'cone' ? y0 : y0 - 0.12; sh.castShadow = true; g.add(sh);
-    const glow = new THREE.Mesh(new THREE.CircleGeometry(kind === 'cone' ? 0.17 : 0.18, 28).rotateX(Math.PI / 2), s.M.shadeGlow);
-    glow.position.y = kind === 'cone' ? y0 - 0.12 : y0 - 0.11; g.add(lit(glow));
+    const shell = kind === 'cone' ? new THREE.CylinderGeometry(0.05 * k, 0.18 * k, 0.26 * k, 28, 1, true) : new THREE.SphereGeometry(0.19 * k, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+    const sh = new THREE.Mesh(shell, M.shade); sh.position.y = kind === 'cone' ? y0 : y0 - 0.12 * k; sh.castShadow = true; g.add(sh);
+    const glow = new THREE.Mesh(new THREE.CircleGeometry((kind === 'cone' ? 0.17 : 0.18) * k, 28).rotateX(Math.PI / 2), M.shadeGlow);
+    glow.position.y = kind === 'cone' ? y0 - 0.12 * k : y0 - 0.11 * k; g.add(lit(glow));
   } else if (kind === 'tripod') {
-    const shade = new THREE.Mesh(s.G.drum, s.M.drumShade); shade.position.y = y0; shade.castShadow = true; g.add(lit(shade));
-    const foot = new THREE.Mesh(s.G.diffuser, s.M.diffuser); foot.position.y = y0 - 0.13; g.add(lit(foot));
-    for (let k = 0; k < 3; k++) {
-      const a = Math.PI / 2 + k * 2 * Math.PI / 3, A = new THREE.Vector3(0.17 * Math.cos(a), 0.02, 0.17 * Math.sin(a)), B = new THREE.Vector3(0.02 * Math.cos(a), y0 - 0.2, 0.02 * Math.sin(a));
-      const d = B.clone().sub(A), leg = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, d.length(), 8), s.M.lampStand);
+    const shade = new THREE.Mesh(s.G.drum, M.drumShade); shade.position.y = y0; shade.scale.setScalar(k); shade.castShadow = true; g.add(lit(shade));
+    const foot = new THREE.Mesh(s.G.diffuser, M.diffuser); foot.position.y = y0 - 0.13 * k; foot.scale.setScalar(k); g.add(lit(foot));
+    for (let n = 0; n < 3; n++) {
+      const a = Math.PI / 2 + n * 2 * Math.PI / 3, A = new THREE.Vector3(0.17 * k * Math.cos(a), 0.02, 0.17 * k * Math.sin(a)), B = new THREE.Vector3(0.02 * k * Math.cos(a), y0 - 0.2 * k, 0.02 * k * Math.sin(a));
+      const d = B.clone().sub(A), leg = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, d.length(), 8), M.lampStand);
       leg.position.copy(A).add(B).multiplyScalar(0.5); leg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); leg.castShadow = true; g.add(leg);
     }
   }
   return g;
+}
+
+// The lamps houses actually place — the registry's floor lamp, arc lamp, tripod lamp and table lamp (2 % of the
+// specs' lamps are the halo lamp above; 98 % are these) — take their room's kind too: rooms[].fixtures.lamp, or under
+// defaults 2 the seeded pick (kit-rules.ts lampPlan). Their heads are tagged userData.lampHead (assets/props/): the
+// swap removes the drum shade, its rims and its bulb and hangs the kind's head where the shade's centre was, painted
+// in the colour the spec gave the lamp (`color` on the item: the author's shade) when it gave one. A drum stays as it
+// is, and so does a tripod lamp asked for a tripod. Nothing is added: the lamps a room already has change their heads, so a composed room
+// (S3's program) is varied like any other.
+function varyRegistryLamps(placed, s, THREE, lampOf) {
+  for (const o of placed) {
+    const u = o.userData || {};
+    if (!REGISTRY_LAMPS.has(u.itemType) || u.lampVaried) continue;
+    u.lampVaried = true;
+    const asked = lampOf(o);
+    let kind: string = asked || 'drum';
+    const heads = []; let shade = null;
+    o.traverse(m => { if (m.isMesh && m.userData && m.userData.lampHead) { heads.push(m); if (m.userData.lampHead === 'shade') shade = m; } });
+    if (kind !== 'drum' && (!shade || (u.itemType === 'arc-floor-lamp' && kind === 'tripod'))) kind = 'drum';   // arc lamps hang their shade: no tripod
+    if (u.itemType === 'tripod-floor-lamp' && kind === 'tripod') kind = 'drum';   // already one
+    if (kind !== 'drum') {
+      const at = shade.parent, head = lampHead(THREE, s, kind, shade.position.y, u.itemType === 'table-lamp' ? 0.75 : 1, typeof u.explicitColor === 'number' ? u.explicitColor : undefined);
+      head.position.set(shade.position.x, 0, shade.position.z);
+      for (const m of heads) m.parent.remove(m);
+      at.add(head);
+      o.name = `${kind[0].toUpperCase() + kind.slice(1)} ${u.itemType === 'table-lamp' ? 'Table' : 'Floor'} Lamp`;
+    }
+    s.stats.lamps[kind] = (s.stats.lamps[kind] || 0) + 1;
+  }
 }
 
 // ---- builders (origin at the ceiling point; everything hangs into −y) -------------------------------------------
@@ -284,10 +325,22 @@ export function dressLevel(ctx) {
   tagWindowGlass(placed, s);
   // a room's lamp kind (by its name on this storey — the rooms loop tags each item with its room's name); a room
   // with a program (S3's composer dresses its own lamps: plan Completeness C9) keeps what it placed
-  const roomIndex = new Map((lv.rooms || []).map((r, ri) => [r.name, ri]));
-  const lampOf = (name: string) => { const ri = roomIndex.get(name); return ri === undefined ? null : s.lamps.get(`${lv.id}#${ri}`) || null; };
+  // Two rooms may share a name on a storey ("Bedroom", "Bedroom"): the lamp's own plan position then settles which.
+  const roomIndex = new Map<string, number[]>();
+  (lv.rooms || []).forEach((r, ri) => roomIndex.set(r.name, [...(roomIndex.get(r.name) || []), ri]));
+  const roomOfLamp = (o): number | undefined => {
+    const c = roomIndex.get(o.userData && o.userData.room); if (!c) return undefined;
+    if (c.length === 1) return c[0];
+    const inside = c.find(ri => { const b = lv.rooms[ri].bounds; return b && o.position.x >= b.x && o.position.x <= b.x + b.w && o.position.z >= b.z && o.position.z <= b.z + b.d; });
+    return inside ?? c[0];
+  };
+  const lampOf = (o) => { const ri = roomOfLamp(o); return ri === undefined ? null : s.lamps.get(`${lv.id}#${ri}`) || null; };
   const programmed = new Set((lv.rooms || []).filter(r => r.program).map(r => r.name));
-  toneHaloLamps(placed.filter(o => !(o.userData && programmed.has(o.userData.room) && o.position.y > y - 0.05 && o.position.y < y + H)), s, THREE, lampOf);
+  const onThisStorey = o => o.position.y > y - 0.05 && o.position.y < y + H;
+  // a composed room (S3's program) keeps the halo lamp it was authored — the composer dresses its own lamps — but its
+  // registry lamps take the room's kind like any room's
+  toneHaloLamps(placed.filter(o => onThisStorey(o) && !(o.userData && programmed.has(o.userData.room))), s, THREE, lampOf);
+  varyRegistryLamps(placed.filter(onThisStorey), s, THREE, lampOf);
 
   // the ceiling underside at (x, z): this storey's own ceiling, or the slab of a storey above (0.18 m thick,
   // ceiling sheet 5 mm under it). null over a stairwell void: nothing hangs in a stairwell.

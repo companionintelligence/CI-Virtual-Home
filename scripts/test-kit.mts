@@ -13,9 +13,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { restrainPalette, createMaterialKit, colourMath, FINISH_KINDS } from '../assets/materials.js';
-import { kitPalette, levelWall, doorColour, doorStyleOf, leafKindOf, lightingOf, sunBearingOf, swingForBearing, fanPlan, lampPlan, programKind, heroRoom, BASE_PALETTE, LAMP_KINDS } from '../assets/kit-rules.js';
+import { kitPalette, levelWall, doorColour, doorStyleOf, leafKindOf, lightingOf, sunBearingOf, swingForBearing, fanPlan, fanSpot, lampPlan, programKind, heroRoom, restraintOf, BASE_PALETTE, D2_RESTRAINT, LAMP_KINDS, LAMP_ITEMS } from '../assets/kit-rules.js';
 import { roomKind, fanEligible } from '../assets/fixtures.js';
 import { TIME_OF_DAY, lookOf, sunDirection } from '../assets/environment.js';
+import { validate } from './validate-house-spec.mts';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const HOUSES = path.join(ROOT, 'content', 'houses');
@@ -71,6 +72,28 @@ test('restraint 0..1 moves each role from its authored colour to today\'s restra
   assert.ok(sat(none.wall) > sat(half.wall) && sat(half.wall) > sat(full.wall), `${none.wall} > ${half.wall} > ${full.wall}`);
 });
 
+test('restraint under defaults 2 defaults to D2_RESTRAINT: a cobalt keeps most of its saturation without a keep line; an authored restraint wins', () => {
+  const sat = c => { const [r, g, b] = [hex(c) >> 16 & 255, hex(c) >> 8 & 255, hex(c) & 255]; return (Math.max(r, g, b) - Math.min(r, g, b)) / Math.max(1, Math.max(r, g, b)); };
+  const s1 = { id: 'x', palette: { wall: '#1a86e8', roof: '#c2410c', material: 'stucco' } };
+  assert.equal(restraintOf(s1), 1); assert.equal(restraintOf({ ...s1, defaults: 2 }), D2_RESTRAINT);
+  assert.equal(restraintOf({ ...s1, defaults: 2, palette: { ...s1.palette, restraint: 1 } }), 1, 'an authored restraint wins under defaults 2 too');
+  const p1 = kitPalette(s1), p2 = kitPalette({ ...s1, defaults: 2 }), pk = kitPalette({ ...s1, defaults: 2, palette: { ...s1.palette, keep: ['wall'] } });
+  assert.ok(sat(p2.wall) > sat(p1.wall) + 0.15, `${p1.wall} (${sat(p1.wall).toFixed(2)}) → ${p2.wall} (${sat(p2.wall).toFixed(2)})`);
+  assert.ok(sat(p2.wall) < sat(pk.wall), 'a neon wall is still tamed a little without keep');
+  assert.equal(pk.wall, '#1a86e8');
+  // the whole fleet under defaults 2: never less saturated than restraint 1 gives, and the houses that lost > 0.05 of their
+  // wall's saturation to it (12 of 30) get most of it back
+  let regained = 0;
+  for (const s of fleet) {
+    const at = (p: any) => sat(kitPalette({ ...s, defaults: 2, palette: { ...(s.palette || {}), ...p } }).wall);
+    const full = at({ restraint: 1 }), dflt = kitPalette({ ...s, defaults: 2 }).wall;
+    assert.ok(sat(dflt) >= full - 1e-9, s.id);
+    if (sat(dflt) - full > 0.05) regained++;
+  }
+  assert.ok(regained >= 8, `${regained} houses regain more than 0.05 of wall saturation`);
+  // and a defaults-1 house is untouched (today's palette, byte for byte: the first test)
+});
+
 test('palette.keep exempts named roles: a saturated cobalt survives, the others are still restrained', () => {
   const s = { id: 'k', palette: { wall: '#1f4fd1', roof: '#c2410c', accent: '#e11d48', interior: '#fde68a', keep: ['wall', 'accent'] } };
   const p = kitPalette(s);
@@ -96,6 +119,19 @@ test('levels[].material and wallColor: a storey\'s own cladding; wallColor alone
   assert.notEqual(kit.cladding({ kind: 'brick', color: '#9a4b3a' }), kit.cladding({ kind: 'brick', color: '#8a3b2a' }));
 });
 
+test('kit.wallColor is levelWall\'s rule for a colour that did not come through the palette (S2\'s zones); kit.claddingFor is kit.cladding', () => {
+  for (const spec of [{ id: 'w1', palette: { material: 'brick' } }, { id: 'w2', defaults: 2 }, { id: 'w3', defaults: 2, palette: { restraint: 0.7 } }, { id: 'w4', palette: { keep: ['wall'] } }]) {
+    const kit = kitFor({ ...spec, palette: { ...(spec as any).palette } });
+    const restraint = restraintOf(spec);
+    const k2 = createMaterialKit({ THREE: STUB, palette: kitPalette(spec), seed: spec.id, defaults: (spec as any).defaults === 2 ? 2 : 1, keep: ((spec as any).palette && (spec as any).palette.keep) || [], restraint } as any);
+    for (const kind of ['stucco', 'brick']) for (const c of ['#1f4fd1', '#c2410c', '#e6e2da']) {
+      const rule = levelWall({ ...spec, palette: { ...(spec as any).palette, material: kind } }, { material: kind, wallColor: c });
+      assert.equal(css(k2.wallColor(c, kind)), rule.color, `${spec.id} ${kind} ${c}`);
+    }
+    assert.equal(kit.claddingFor, kit.cladding);
+  }
+});
+
 test('roomKind: rooms[].program before the name (C2); the name as before without one', () => {
   assert.equal(roomKind({ name: 'Library & Bar' }), 'living');
   assert.equal(roomKind({ name: 'Library & Bar', program: 'library' }), 'work');
@@ -119,19 +155,6 @@ test('door colours: the opening\'s own, palette.door, then (defaults 2) timber o
   const leaf = doorColour(cottage, 'entry', { wood: 0x2e2622 });
   assert.ok(lum(hex(leaf)) >= 0.18, `a timber leaf never reads black (${leaf})`);
   assert.notEqual(leaf, '#0f766e');
-test('kit.wallColor is levelWall\'s rule for a colour that did not come through the palette (S2\'s zones); kit.claddingFor is kit.cladding', () => {
-  for (const spec of [{ id: 'w1', palette: { material: 'brick' } }, { id: 'w2', defaults: 2 }, { id: 'w3', defaults: 2, palette: { restraint: 0.7 } }, { id: 'w4', palette: { keep: ['wall'] } }]) {
-    const kit = kitFor({ ...spec, palette: { ...(spec as any).palette } });
-    const restraint = restraintOf(spec);
-    const k2 = createMaterialKit({ THREE: STUB, palette: kitPalette(spec), seed: spec.id, defaults: (spec as any).defaults === 2 ? 2 : 1, keep: ((spec as any).palette && (spec as any).palette.keep) || [], restraint } as any);
-    for (const kind of ['stucco', 'brick']) for (const c of ['#1f4fd1', '#c2410c', '#e6e2da']) {
-      const rule = levelWall({ ...spec, palette: { ...(spec as any).palette, material: kind } }, { material: kind, wallColor: c });
-      assert.equal(css(k2.wallColor(c, kind)), rule.color, `${spec.id} ${kind} ${c}`);
-    }
-    assert.equal(kit.claddingFor, kit.cladding);
-  }
-});
-
   assert.equal(doorColour(d2, 'interior'), css(colourMath.mix(hex(kitPalette(d2).wall), 0xffffff, 0.5)), 'a painted house hangs painted leaves');
   // over the 30 houses under defaults 2 no leaf is teal
   for (const s of fleet) { const c = doorColour({ ...s, defaults: 2 }, 'entry', { wood: kitFor(s).colors.wood }); assert.ok(c && c !== '#0f766e', s.id); }
@@ -178,6 +201,32 @@ test('fans: under defaults 2 at most 25 % of eligible rooms, never a kitchen, a 
   assert.equal(fanPlan({ ...s, defaults: 1, levels: s.levels.map(l => ({ ...l, rooms: l.rooms.map(r => ({ ...r, fixtures: undefined })) })) }, fanEligible).size, 0);
 });
 
+test('fans: a seeded winner is a room a fan can hang in — an authored pendant over the centre, or a chandelier, rules it out', () => {
+  const room = (items: any[] = [], fixtures?: any) => ({ name: 'Living Room', bounds: { x: 0, z: 0, w: 3.2, d: 3.2 }, items, ...(fixtures ? { fixtures } : {}) });
+  assert.equal(fanSpot(room()), true);
+  assert.equal(fanSpot(room([{ type: 'pendant-lamp', at: [1.6, 1.6] }])), false, 'a pendant at the centre of a small room: every spot within 1.17 m of it, or too near a wall');
+  assert.equal(fanSpot({ name: 'Big', bounds: { x: 0, z: 0, w: 5, d: 4 }, items: [{ type: 'pendant-lamp', at: [2.5, 2] }] }), true, 'a big room has a spot off-centre (fixtures.ts tries the centre and four spots along the long axis)');
+  assert.equal(fanSpot(room([{ type: 'ceiling-light', at: [0.4, 0.4] }])), true, 'a light in a corner leaves the centre free');
+  assert.equal(fanSpot(room([], { ceiling: 'chandelier' })), false);
+  assert.equal(fanSpot({ name: 'Box', bounds: { x: 0, z: 0, w: 1.6, d: 1.6 } }), false, 'no room for the blades');
+  const lv = (r: any) => ({ id: 'l1', rooms: [r], partitions: [{ from: [1.6, 0], to: [1.6, 3.2] }] });
+  assert.equal(fanSpot(room(), lv(room())), false, 'a partition through the middle');
+  // the plan never gives a fan to a room that cannot hang one: 8 living rooms, the first four with a pendant at the centre
+  const rooms = Array.from({ length: 8 }, (_, i) => ({ name: `Living ${i}`, bounds: { x: i * 6, z: 0, w: 3.2, d: 3.2 }, items: i < 4 ? [{ type: 'pendant-lamp', at: [i * 6 + 1.6, 1.6] }] : [] }));
+  const plan = fanPlan({ id: 'fanspot', defaults: 2, levels: [{ id: 'l1', rooms }] }, r => true);
+  rooms.forEach((r, i) => { if (i < 4) assert.equal(plan.get(`l1#${i}`), false, r.name); });
+  assert.equal([...plan.values()].filter(Boolean).length, 1, 'a quarter of the four rooms that can hang one');
+  // the fleet under defaults 2: a minority of the rooms that can hang a fan (a quarter, in expectation), not none — a house
+  // with fewer than four such rooms gets one with a seeded chance (n / 4), so small houses are not fanless by arithmetic
+  let spots = 0, fans = 0;
+  for (const h of fleet) {
+    const p = fanPlan({ ...h, defaults: 2 }, fanEligible);
+    (h.levels || []).forEach(l => (l.rooms || []).forEach((r, ri) => { if (fanEligible(r) && fanSpot(r, l)) spots++; if (p.get(`${l.id}#${ri}`) === true) fans++; }));
+  }
+  assert.ok(fans >= 3, `${fans} fans over ${spots} rooms that can hang one`);
+  assert.ok(fans <= Math.ceil(spots * 0.3), `${fans} fans over ${spots} rooms that can hang one`);
+});
+
 test('lamps: at least 3 kinds across a 10-room house under defaults 2; rooms[].fixtures.lamp wins; none under defaults 1', () => {
   const s = fixture('s1-kit-look');
   const plan = lampPlan(s), kinds = new Set([...plan.values()].filter(Boolean));
@@ -187,6 +236,35 @@ test('lamps: at least 3 kinds across a 10-room house under defaults 2; rooms[].f
   for (const k of kinds) assert.ok((LAMP_KINDS as readonly string[]).includes(k as string));
   s.levels.forEach(lv => lv.rooms.forEach((r, ri) => { if (r.fixtures && r.fixtures.lamp) assert.equal(plan.get(`${lv.id}#${ri}`), r.fixtures.lamp); }));
   assert.ok([...lampPlan({ ...s, defaults: 1, levels: s.levels.map(l => ({ ...l, rooms: l.rooms.map(r => ({ ...r, fixtures: undefined })) })) }).values()].every(v => v === null));
+});
+
+test('lamps: any five rooms that HAVE a lamp show all five heads; a room without a lamp spends none; a lamp-less room still gets its own pick', () => {
+  const lamp = (t: string) => ({ type: t, at: [1, 1] });
+  const types = ['floor-lamp', 'table-lamp', 'arc-floor-lamp', 'tripod-floor-lamp', 'halo-lamp'];
+  for (let seed = 0; seed < 25; seed++) {
+    // rooms alternate lamp / no lamp / no lamp: a plan that spent a kind per room would repeat one by the fifth lamp room
+    const rooms = Array.from({ length: 15 }, (_, i) => ({ name: `R${i}`, bounds: { x: 0, z: 0, w: 4, d: 4 }, items: i % 3 === 0 ? [lamp(types[(i / 3) % 5])] : [] }));
+    const plan = lampPlan({ id: `lampseed${seed}`, defaults: 2, levels: [{ id: 'l1', rooms }] });
+    const kinds = rooms.map((r, i) => r.items.length ? plan.get(`l1#${i}`) : null).filter(Boolean);
+    assert.equal(kinds.length, 5); assert.equal(new Set(kinds).size, 5, `seed ${seed}: ${kinds.join(', ')}`);
+    rooms.forEach((r, i) => { if (!r.items.length) assert.ok((LAMP_KINDS as readonly string[]).includes(plan.get(`l1#${i}`) as string), 'a room without a lamp still has a kind for S3\'s'); });
+  }
+  for (const t of types) assert.ok(LAMP_ITEMS.has(t), t);
+  // the same house twice: the same plan
+  const s = fixture('s1-kit-look');
+  assert.deepEqual([...lampPlan(s)], [...lampPlan(s)]);
+});
+
+test('validator: door ids are strings, once — a repeated one warns kit:duplicate-id; a partition doorway that wide with only a doorColor warns kit:wide-leaf', () => {
+  const base = fixture('s1-kit-look'); delete base.fixture;
+  const run = (mod: (s: any) => void) => { const s = JSON.parse(JSON.stringify(base)); mod(s); return validate(s, '<spec>'); };
+  assert.equal(run(() => {}).warnings.filter(w => /duplicate-id|door id/.test(w)).length, 0);
+  const dup = run(s => { s.levels[0].partitions.find(p => p.id === 'kitchen-pass').id = 'pass'; });
+  assert.ok(dup.warnings.some(w => /duplicate-id/.test(w)), dup.warnings.join('\n'));
+  const bad = run(s => { s.levels[0].openings.find(o => o.id === 'front').id = 7; });
+  assert.ok(bad.errors.some(e => /id 7/.test(e)), bad.errors.join('\n'));
+  const wide = run(s => { const p = s.levels[0].partitions.find(q => q.id === 'pass'); delete p.doorStyle; p.doorColor = '#6a4e33'; });
+  assert.ok(wide.warnings.some(w => /wide-leaf/.test(w)), wide.warnings.join('\n'));
 });
 
 test('light: defaults 1 keeps the preset\'s swing; sunBearing is a compass bearing; defaults 2 spreads the fleet\'s suns', () => {
@@ -226,6 +304,13 @@ test('finishes: every kit.finish kind builds a power-of-two texture set, determi
     const h = img => crypto.createHash('sha256').update(img.data).digest('hex');
     assert.equal(h(t1), h(t2), `${kind}: two kits, two different textures`);
   }
+  // wallpaper's 'grid', a checker's second colour, an unknown kind flagged
+  const g = k1.finish('wallpaper', { pattern: 'grid' }).params.map.image, st = k1.finish('wallpaper', { pattern: 'stripe' }).params.map.image, bt = k1.finish('wallpaper', { pattern: 'botanical' }).params.map.image;
+  const hh = img => crypto.createHash('sha256').update(img.data).digest('hex');
+  assert.notEqual(hh(g), hh(st)); assert.notEqual(hh(g), hh(bt));
+  assert.notEqual(hh(k1.finish('checker').params.map.image), hh(k1.finish('checker', { color2: '#7a1f1f' }).params.map.image), 'checker color2 reaches the texture');
+  assert.equal(k1.finish('not-a-finish').userData.finishFallback, 'not-a-finish');
+  assert.equal(k1.finish('paint').userData.finishFallback, undefined);
   // pattern and colour reach the texture
   const a = k1.finish('wallpaper', { pattern: 'dot' }).params.map.image, b = k1.finish('wallpaper', { pattern: 'stripe' }).params.map.image;
   assert.notEqual(crypto.createHash('sha256').update(a.data).digest('hex'), crypto.createHash('sha256').update(b.data).digest('hex'));
@@ -235,10 +320,3 @@ test('determinism: every rule twice over the fleet under defaults 2 gives the sa
   const run = () => fleet.map(s => { const d = { ...s, defaults: 2 }; return JSON.stringify([kitPalette(d), lightingOf(d), [...fanPlan(d, fanEligible)], [...lampPlan(d)], doorColour(d, 'entry', { wood: kitFor(d).colors.wood })]); });
   assert.deepEqual(run(), run());
 });
-  // wallpaper's 'grid', a checker's second colour, an unknown kind flagged
-  const g = k1.finish('wallpaper', { pattern: 'grid' }).params.map.image, st = k1.finish('wallpaper', { pattern: 'stripe' }).params.map.image, bt = k1.finish('wallpaper', { pattern: 'botanical' }).params.map.image;
-  const hh = img => crypto.createHash('sha256').update(img.data).digest('hex');
-  assert.notEqual(hh(g), hh(st)); assert.notEqual(hh(g), hh(bt));
-  assert.notEqual(hh(k1.finish('checker').params.map.image), hh(k1.finish('checker', { color2: '#7a1f1f' }).params.map.image), 'checker color2 reaches the texture');
-  assert.equal(k1.finish('not-a-finish').userData.finishFallback, 'not-a-finish');
-  assert.equal(k1.finish('paint').userData.finishFallback, undefined);

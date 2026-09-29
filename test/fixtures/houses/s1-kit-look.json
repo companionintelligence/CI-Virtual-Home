@@ -8,7 +8,7 @@
   "emoji": "\ud83c\udfe1",
   "defaults": 2,
   "fixture": {
-    "note": "defaults 2 on eleven rooms: a 1.4 m entry pair derived from timber that swings in and parks flat, pairs on the wide partition doorways, a storey clad in its own wallColor, fans in at most a quarter of the eligible rooms, five lamp kinds, a white sectional that keeps its colour while the rest is themed, a mantel fireplace, a six-seat table, glass-front uppers, a dining chandelier, the true-white dusk",
+    "note": "defaults 2 on eleven rooms: a 1.4 m entry pair derived from timber that swings in and parks flat, pairs where the wide partition doorways ask for them (doorStyle double), a storey clad in its own wallColor, fans in at most a quarter of the eligible rooms, five lamp heads on the registry's floor, arc, tripod and table lamps (and the halo lamp), a white sectional that keeps its colour while the rest is themed, a mantel fireplace, a six-seat table, glass-front uppers, a dining chandelier, the true-white dusk",
     "frames": {
       "door-to-core": [
         0.2,
@@ -64,7 +64,8 @@
           "type": "door",
           "w": 1.4,
           "h": 2.2,
-          "style": "entry"
+          "style": "entry",
+          "id": "front"
         },
         {
           "side": "S",
@@ -133,7 +134,9 @@
             4.5
           ],
           "door": 2.5,
-          "doorW": 1.4
+          "doorW": 1.4,
+          "doorStyle": "double",
+          "id": "pass"
         },
         {
           "from": [
@@ -181,7 +184,9 @@
             -0.5
           ],
           "door": 1.0,
-          "doorW": 1.6
+          "doorW": 1.6,
+          "doorStyle": "double",
+          "id": "kitchen-pass"
         }
       ],
       "stairs": {
@@ -219,6 +224,14 @@
                 -1.7,
                 0.1
               ]
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                -0.25,
+                3.2
+              ],
+              "y": 0.8
             }
           ]
         },
@@ -266,7 +279,7 @@
               "style": "mantel"
             },
             {
-              "type": "halo-lamp",
+              "type": "floor-lamp",
               "at": [
                 0.5,
                 4.1
@@ -300,9 +313,9 @@
               "w": 1.6
             },
             {
-              "type": "halo-lamp",
+              "type": "tripod-floor-lamp",
               "at": [
-                -2.4,
+                -3.4,
                 4.1
               ]
             },
@@ -369,7 +382,7 @@
               "chairs": 6
             },
             {
-              "type": "halo-lamp",
+              "type": "arc-floor-lamp",
               "at": [
                 0.4,
                 -4.1
@@ -589,7 +602,7 @@
               "rot": 180
             },
             {
-              "type": "halo-lamp",
+              "type": "floor-lamp",
               "at": [
                 -1.6,
                 0.9

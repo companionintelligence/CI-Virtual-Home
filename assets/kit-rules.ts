@@ -2,16 +2,18 @@
 // environment.ts), the validator (scripts/validate/kit.mts), the fleet audit (scripts/fleet/kit.mts) and the Node
 // test (scripts/test-kit.mts) all ask ONE place how a spec's palette, doors, light and fixtures come out.
 //
-//   kitPalette(spec)             the palette as the house is built: restraint (palette.restraint 0..1, default 1 =
-//                                today's clamp), palette.keep exempting named roles
+//   kitPalette(spec)             the palette as the house is built: restraint (palette.restraint 0..1; default 1 =
+//                                today's clamp under defaults 1, D2_RESTRAINT under defaults 2), palette.keep
+//                                exempting named roles
 //   levelWall(spec, lv)          one storey's cladding colour and kind (levels[].material / wallColor), or null
 //                                when the storey wears the house's own cladding
 //   doorColour(spec, role, ctx)  a hinged leaf's colour: the opening's own, palette.door, or (defaults 2) derived
 //                                from trim or timber by style — never teal
 //   lightingOf(spec)             { preset, alias, sunBearing, swing, look } — the preset, where the sun stands, and
 //                                the look generation (defaults 2: the seeded swing and the true-white look)
-//   fanPlan(spec) / lampKindOf   which rooms get a ceiling fan (defaults 2: a seeded minority) and which lamp a
-//                                room's lamps become
+//   fanPlan(spec) / lampPlan     which rooms get a ceiling fan (defaults 2: a seeded minority of the rooms one can
+//                                hang in) and which lamp head each room's lamps take (the registry's floor, arc,
+//                                tripod and table lamps, and the halo lamp)
 //   programKind(program)         S3's rooms[].program → the fixtures' room kind (plan Completeness C2)
 // Owner: S1 (kit). Everything is seeded with mulberry32(fnv1a(`${spec.id}:<purpose>`)).
 import { mulberry32, fnv1a, restrainPalette, colourMath } from './materials.js';
@@ -28,8 +30,14 @@ export type KeepRole = typeof KEEP_ROLES[number];
 export const BASE_PALETTE = { wall: '#f8fafc', trim: '#1e293b', roof: '#3f2a1d', accent: '#0f766e' };
 
 export const keepSet = (spec: any): Set<string> => new Set(Array.isArray(spec && spec.palette && spec.palette.keep) ? spec.palette.keep : []);
-/** palette.restraint clamped to 0..1 (default 1: today's restraint exactly) */
-export const restraintOf = (spec: any): number => { const r = spec && spec.palette && spec.palette.restraint; return typeof r === 'number' && Number.isFinite(r) ? Math.max(0, Math.min(1, r)) : 1; };
+/** how much of restrainPalette's clamp a house without palette.restraint gets under defaults 2 (defaults 1: all of it) */
+export const D2_RESTRAINT = 0.4;
+/** palette.restraint clamped to 0..1; default 1 (today's restraint exactly) under defaults 1, D2_RESTRAINT under defaults 2 —
+ *  a cobalt wall keeps most of its saturation without a `keep` line, and a neon one is still tamed */
+export const restraintOf = (spec: any): number => {
+  const r = spec && spec.palette && spec.palette.restraint;
+  return typeof r === 'number' && Number.isFinite(r) ? Math.max(0, Math.min(1, r)) : specDefaults(spec) >= 2 ? D2_RESTRAINT : 1;
+};
 
 // a colour between its authored value (restraint 0) and today's restrained one (restraint 1); integer channels
 const toward = (orig: string, restrained: string, r: number): string => r >= 1 ? restrained : r <= 0 ? css(hex(orig)) : css(mix(hex(orig), hex(restrained), r));
@@ -185,11 +193,38 @@ export function heroRoom(spec: any): { lv: any; room: any; ri: number } | null {
   return ri < 0 ? null : { lv, room: lv.rooms[ri], ri };
 }
 
+// what hangs from a ceiling and keeps a fan off its centre (fixtures.ts HUNG)
+const HUNG_ITEMS = new Set(['pendant-lamp', 'chandelier', 'ceiling-light']);
+/**
+ * Could a fan hang in this room at all, judging by the spec alone? Mirrors fixtures.ts's placement: its centre and
+ * four nearby spots along the long axis, each 0.87 m off the walls, at least 1.17 m from anything the room already
+ * hangs (`pendant-lamp`, `chandelier`, `ceiling-light` items; fixtures.ceiling 'chandelier') and 0.82 m off a
+ * partition. A seeded winner that cannot hang one would spend the room's share of fans on nothing.
+ */
+export function fanSpot(room: any, lv?: any): boolean {
+  const b = room && room.bounds; if (!b) return false;
+  const f = room.fixtures || {};
+  if (f.ceiling === 'chandelier') return false;
+  const hung = (room.items || []).filter(it => HUNG_ITEMS.has(it.type) && Array.isArray(it.at));
+  const walls = ((lv && lv.partitions) || []).filter(p => Array.isArray(p.from) && Array.isArray(p.to));
+  const R = 0.72, m = R + 0.15, alongX = b.w >= b.d, cx = b.x + b.w / 2, cz = b.z + b.d / 2;
+  const segDist = (px: number, pz: number, a: number[], c: number[]) => { const dx = c[0] - a[0], dz = c[1] - a[1], l2 = dx * dx + dz * dz || 1e-9, t = Math.max(0, Math.min(1, ((px - a[0]) * dx + (pz - a[1]) * dz) / l2)); return Math.hypot(px - (a[0] + t * dx), pz - (a[1] + t * dz)); };
+  return [0, -0.18, 0.18, -0.3, 0.3].some(k => {
+    const x = cx + (alongX ? k * b.w : 0), z = cz + (alongX ? 0 : k * b.d);
+    if (!(x > b.x + m && x < b.x + b.w - m && z > b.z + m && z < b.z + b.d - m)) return false;
+    if (hung.some(it => Math.hypot(it.at[0] - x, it.at[1] - z) < 0.45 + R)) return false;
+    return walls.every(w => segDist(x, z, w.from, w.to) > R + 0.1);
+  });
+}
+
 /**
  * Which rooms may hang a ceiling fan: key `${lv.id}#${ri}` → true (may) | false (never). A room absent from the
  * map follows the geometry alone (today's rule: fixtures.ts). rooms[].fixtures.fan wins either way. Under defaults 2
- * the eligible rooms (`eligible(room)`: a fan kind, big enough) are cut to a seeded minority — at most 25 %, never a
- * kitchen, a bath or the hero's room.
+ * the eligible rooms (`eligible(room)`: a fan kind, big enough — and a fan can hang there: fanSpot) are cut to a
+ * seeded minority, never a kitchen, a bath or the hero's room: a quarter of them, rounded down, and a house with
+ * fewer than four such rooms gets ONE with a seeded chance of a quarter of its rooms' worth (n / 4) — so the
+ * fleet's share stays a quarter, and no small house is fanless by arithmetic alone. rooms[].fixtures.fan: true is the
+ * lever for a fan the photo shows.
  */
 export function fanPlan(spec: any, eligible: (room: any) => boolean): Map<string, boolean> {
   const out = new Map<string, boolean>();
@@ -200,32 +235,41 @@ export function fanPlan(spec: any, eligible: (room: any) => boolean): Map<string
     if (f.fan === true || f.fan === false) { out.set(key, f.fan); return; }
     if (!d2) return;
     const isHero = !!hr && hr.lv === lv && hr.ri === ri;
-    if (isHero || !eligible(room)) { out.set(key, false); return; }
+    if (isHero || !eligible(room) || !fanSpot(room, lv)) { out.set(key, false); return; }
     cands.push({ key, score: mulberry32(fnv1a(`${spec.id}:fan:${key}`))() });
   }));
   if (d2) {
-    const n = Math.floor(cands.length * 0.25);
+    const n = cands.length >= 4 ? Math.floor(cands.length * 0.25) : cands.length && mulberry32(fnv1a(`${spec.id}:fans`))() < cands.length * 0.25 ? 1 : 0;
     const keep = new Set(cands.slice().sort((a, b) => a.score - b.score || (a.key < b.key ? -1 : 1)).slice(0, n).map(c => c.key));
     for (const c of cands) out.set(c.key, keep.has(c.key));
   }
   return out;
 }
 
+/** the items that are a lamp with a head to vary (fixtures.ts): the catalog's halo lamp, and the registry's lamps */
+export const REGISTRY_LAMPS: ReadonlySet<string> = new Set(['floor-lamp', 'arc-floor-lamp', 'tripod-floor-lamp', 'table-lamp']);
+export const LAMP_ITEMS: ReadonlySet<string> = new Set(['halo-lamp', ...REGISTRY_LAMPS]);
+
 /**
- * The lamp kind a room's floor lamps become: rooms[].fixtures.lamp, else under defaults 2 a seeded pick — rooms
- * walked in order through a seeded permutation of the five kinds, so any five rooms with lamps show all five and
- * three rooms three — else null (today's drum).
+ * The lamp kind a room's lamps become: rooms[].fixtures.lamp, else under defaults 2 a seeded pick, else null (today's
+ * drum). The rooms that HAVE a lamp in their items walk in order through a seeded permutation of the five kinds, so
+ * any five rooms with lamps show all five kinds and three rooms three (a room without a lamp does not spend a kind);
+ * a room with none listed (S3's composer will place them) gets its own seeded pick.
  */
 export function lampPlan(spec: any): Map<string, LampKind | null> {
   const out = new Map<string, LampKind | null>();
   const d2 = specDefaults(spec) >= 2;
-  const rng = mulberry32(fnv1a(`${(spec && spec.id) || 'house'}:lamps`));
+  const id = (spec && spec.id) || 'house';
+  const rng = mulberry32(fnv1a(`${id}:lamps`));
   const perm = [...LAMP_KINDS];
   for (let i = perm.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [perm[i], perm[j]] = [perm[j], perm[i]]; }
   let k = 0;
   (spec.levels || []).forEach(lv => (lv.rooms || []).forEach((room, ri) => {
-    const f = room.fixtures || {};
-    out.set(`${lv.id}#${ri}`, LAMP_KINDS.includes(f.lamp) ? f.lamp : d2 ? perm[k++ % perm.length] : null);
+    const key = `${lv.id}#${ri}`, f = room.fixtures || {};
+    let kind: LampKind | null = null;
+    if (LAMP_KINDS.includes(f.lamp)) kind = f.lamp;
+    else if (d2) kind = (room.items || []).some(it => LAMP_ITEMS.has(it.type)) ? perm[k++ % perm.length] : LAMP_KINDS[Math.floor(mulberry32(fnv1a(`${id}:lamps:${key}`))() * LAMP_KINDS.length)];
+    out.set(key, kind);
   }));
   return out;
 }
