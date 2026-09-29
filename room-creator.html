@@ -7490,7 +7490,7 @@
         for (const h of index.houses || []) homeIndex.set(h.id, h);
         gallery.setHomes((index.houses || []).map(h => ({
           id: h.id, name: displayName(h), credit: h.author ? `By ${h.author}` : '',
-          meta: [h.storeys ? `${h.storeys} storey${h.storeys === 1 ? '' : 's'}` : '', h.areaSqm ? `${h.areaSqm} m²` : ''].filter(Boolean).join(' · '),   // (no-break spaces: a number never parts from its unit)
+          meta: [h.storeys ? `${h.storeys}\u00a0storey${h.storeys === 1 ? '' : 's'}` : '', h.areaSqm ? `${h.areaSqm}\u00a0m²` : ''].filter(Boolean).join(' · '),   // (no-break spaces: a number never parts from its unit)
           thumb: `./portal/thumbs/${h.id}.webp`,
         })), STUDIO_SCENES);
         if (currentSceneKey) onScenePicker(currentSceneKey);

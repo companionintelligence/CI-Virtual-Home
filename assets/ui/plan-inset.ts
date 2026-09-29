@@ -132,6 +132,9 @@ export function createPlanInset(canvas: HTMLCanvasElement, { onSeek, onLevel }: 
     if (best >= 0) onSeek((best * track.dt) / track.duration);
   });
 
+  // painted in the tokens' colours: a change of the system's colour scheme repaints it
+  if (typeof matchMedia !== 'undefined') matchMedia('(prefers-color-scheme: light)').addEventListener?.('change', () => draw());
+
   return {
     setHouse(s: any, a: any) { spec = s; anchors = a; level = -1; draw(); },   // -1: the next setView names its storey
     setTrack(tr: InsetTrack | null) { track = tr; draw(); },
