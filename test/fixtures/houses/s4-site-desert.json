@@ -1,0 +1,453 @@
+{
+ "$schema": "house-spec/v1",
+ "id": "s4-site-desert",
+ "name": "S4 Desert Context Fixture",
+ "author": "ci-virtual-home",
+ "source": "test fixture (plan S4): lot.context desert on a gravel lot: a sparse road of stucco houses under hip and flat roofs, desert planting (agave, yucca, cactus) on light gravel mulch",
+ "style": "The S0 harness house (two-storey stucco box, charcoal gable) on an S4 lot",
+ "emoji": "🌿",
+ "fixture": {
+  "note": "lot.context desert on a gravel lot: a sparse road of stucco houses under hip and flat roofs, desert planting (agave, yucca, cactus) on light gravel mulch",
+  "frames": {
+   "door-to-core": [
+    0.05
+   ],
+   "orbit": [
+    0.3,
+    0.7
+   ]
+  }
+ },
+ "lot": {
+  "w": 28,
+  "d": 24,
+  "ground": "gravel",
+  "context": "desert"
+ },
+ "palette": {
+  "wall": "#e3d3b8",
+  "trim": "#5b4a3a",
+  "roof": "#8e5440",
+  "accent": "#5d7a6a",
+  "material": "stucco"
+ },
+ "lighting": "day",
+ "levels": [
+  {
+   "id": "l1",
+   "name": "Ground Floor",
+   "y": 0,
+   "height": 2.8,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -5,
+     "z": -4,
+     "w": 10,
+     "d": 8
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": 0.5,
+     "type": "door",
+     "w": 1.0,
+     "h": 2.1,
+     "style": "entry"
+    },
+    {
+     "side": "S",
+     "at": -3,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "S",
+     "at": 3,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "N",
+     "at": -3,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    },
+    {
+     "side": "N",
+     "at": 2.5,
+     "type": "slider",
+     "w": 2.0,
+     "h": 2.2
+    },
+    {
+     "side": "E",
+     "at": 1.2,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    },
+    {
+     "side": "W",
+     "at": 0,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    }
+   ],
+   "partitions": [
+    {
+     "from": [
+      -1.4,
+      -4
+     ],
+     "to": [
+      -1.4,
+      4
+     ],
+     "door": 5.6,
+     "doorW": 0.9
+    }
+   ],
+   "stairs": {
+    "type": "timber",
+    "at": [
+     0.2,
+     -3.25
+    ],
+    "rot": 90,
+    "to": "l2",
+    "w": 1.1
+   },
+   "rooms": [
+    {
+     "no": "01",
+     "name": "Living Room",
+     "bounds": {
+      "x": -1.4,
+      "z": -4,
+      "w": 6.4,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "sectional",
+       "at": [
+        2.2,
+        1.9
+       ],
+       "rot": 180
+      },
+      {
+       "type": "coffee-table",
+       "at": [
+        2.2,
+        0.5
+       ]
+      },
+      {
+       "type": "area-rug",
+       "at": [
+        2.2,
+        0.9
+       ]
+      },
+      {
+       "type": "fiddle-leaf",
+       "at": [
+        4.4,
+        3.4
+       ]
+      },
+      {
+       "type": "media-credenza",
+       "at": [
+        2.2,
+        -1.6
+       ],
+       "rot": 0
+      }
+     ]
+    },
+    {
+     "no": "02",
+     "name": "Study",
+     "bounds": {
+      "x": -5,
+      "z": -4,
+      "w": 3.6,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "bookshelf",
+       "at": [
+        -3.2,
+        -3.75
+       ]
+      },
+      {
+       "type": "club-chair",
+       "at": [
+        -3.2,
+        -1.6
+       ],
+       "rot": 180
+      },
+      {
+       "type": "monstera",
+       "at": [
+        -4.5,
+        3.4
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l2",
+   "name": "Upper Floor",
+   "y": 2.8,
+   "height": 2.7,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -5,
+     "z": -4,
+     "w": 10,
+     "d": 8
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": -3,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "S",
+     "at": 3,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "N",
+     "at": -2.5,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    },
+    {
+     "side": "E",
+     "at": 1.5,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    },
+    {
+     "side": "W",
+     "at": 0,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    }
+   ],
+   "partitions": [
+    {
+     "from": [
+      -0.2,
+      -4
+     ],
+     "to": [
+      -0.2,
+      4
+     ],
+     "door": 6.2,
+     "doorW": 0.9
+    }
+   ],
+   "voids": [
+    {
+     "x": 0.1,
+     "z": -3.9,
+     "w": 3.6,
+     "d": 1.3
+    }
+   ],
+   "rooms": [
+    {
+     "no": "03",
+     "name": "Office",
+     "bounds": {
+      "x": -0.2,
+      "z": -4,
+      "w": 5.2,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "bookshelf",
+       "at": [
+        4.75,
+        0.6
+       ],
+       "rot": 270
+      },
+      {
+       "type": "area-rug",
+       "at": [
+        2.4,
+        1.8
+       ]
+      },
+      {
+       "type": "monstera",
+       "at": [
+        0.4,
+        3.4
+       ]
+      }
+     ]
+    },
+    {
+     "no": "04",
+     "name": "Bedroom",
+     "bounds": {
+      "x": -5,
+      "z": -4,
+      "w": 4.8,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "platform-bed",
+       "at": [
+        -2.6,
+        -2.6
+       ]
+      },
+      {
+       "type": "area-rug",
+       "at": [
+        -2.6,
+        -1.4
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "over": {
+    "x": -5.4,
+    "z": -4.4,
+    "w": 10.8,
+    "d": 8.8
+   },
+   "y": 5.5,
+   "type": "gable",
+   "ridge": "x",
+   "pitch": 30,
+   "overhang": 0.4,
+   "color": "#3a3d42"
+  }
+ ],
+ "site": [
+  {
+   "type": "path",
+   "path": [
+    [
+     0.5,
+     4.3
+    ],
+    [
+     0.8,
+     7
+    ],
+    [
+     0.2,
+     10.5
+    ]
+   ],
+   "w": 1.2,
+   "smooth": true,
+   "surface": "concrete"
+  },
+  {
+   "type": "planting",
+   "kind": "foundation",
+   "along": "facade:S",
+   "mix": "desert"
+  },
+  {
+   "type": "planting",
+   "kind": "walk",
+   "along": "path:0",
+   "mix": "desert",
+   "depth": 0.8
+  },
+  {
+   "type": "planting",
+   "kind": "border",
+   "along": [
+    [
+     -12,
+     9
+    ],
+    [
+     -7,
+     10
+    ],
+    [
+     -3,
+     9.5
+    ]
+   ],
+   "mix": "desert"
+  },
+  {
+   "type": "tree",
+   "at": [
+    9,
+    8
+   ],
+   "species": "olive"
+  }
+ ],
+ "hero": {
+  "level": "l2",
+  "at": [
+   2.4,
+   3.5
+  ],
+  "rot": 180,
+  "device": "chalk",
+  "pose": "prone",
+  "surface": "desk"
+ },
+ "entry": {
+  "level": "l1",
+  "side": "S",
+  "at": 0.5
+ }
+}

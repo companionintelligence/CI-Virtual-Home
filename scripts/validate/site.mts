@@ -63,7 +63,7 @@ const check: Check = (spec, ctx) => {
     if (s.type === 'fence' || s.type === 'wall-low') { needs = 'from/to'; ok = !!(s.from && s.to) || isLine(s.path); }
     else if (s.type === 'path' || s.type === 'hedge' || s.type === 'string-lights') { needs = 'path'; ok = isLine(s.path); }
     else if (s.type === 'bed') { needs = 'poly or at'; ok = (Array.isArray(s.poly) && s.poly.length >= 3) || Array.isArray(s.at); }
-    else if (s.type === 'pool' || s.type === 'pond') { needs = 'at'; ok = Array.isArray(s.at) || isLine(s.poly, 3); }
+    else if (['pool', 'pond', 'patio', 'driveway'].includes(s.type)) { needs = 'at'; ok = Array.isArray(s.at) || isLine(s.poly, 3); }
     else if (s.type === 'planting') { needs = 'along, poly or at'; ok = s.along !== undefined || isLine(s.poly, 3) || isP(s.at); }
     else if (s.type === 'terrace') { needs = 'poly (or at) and y'; ok = (isLine(s.poly, 3) || isP(s.at)) && typeof s.y === 'number'; }
     else if (s.type === 'stair' || s.type === 'climber') { needs = 'from/to'; ok = isP(s.from) && isP(s.to); }

@@ -310,9 +310,13 @@ function plantBand(C: Ctx, b: Band) {
     }
   }
   // fill: groundcover wherever mulch still shows
-  // every layer present: a bed long enough for them gets at least one plant of each (a short run can starve one)
-  if (!mix.formal && L >= 1.2) for (const layer of ['back', 'mid', 'front']) {
-    const range = bands[layer]; if (!range || C.plants.some((p, k) => k >= startN && p.layer === layer)) continue;
+  // every height class present: a bed long enough gets at least one plant under 0.45 m, one to 1.1 m and one taller
+  // (a short run can starve a layer, and a plant shrunk before a wall can drop out of its class)
+  const CLASSES: Array<[string, number, number]> = [['back', 1.12, 9], ['mid', 0.46, 1.1], ['front', 0, 0.44]];
+  if (!mix.formal && L >= 1.2 && C.layers >= 3) for (const [layer, lo, hi] of CLASSES) {
+    const range = bands[layer]; if (!range || C.plants.some((p, k) => k >= startN && p.h >= lo && p.h <= hi)) continue;
+    const all: string[] = [...new Set([...mix[layer], ...mix.back, ...mix.mid, ...mix.front].map(([k]) => k))];
+    const sp = all.find(k => { const m = (SPECIES[k].h[0] + SPECIES[k].h[1]) / 2; return m >= lo && m <= hi; }) || all[0];
     let best = null;
     for (let s2 = 0.3; s2 < L - 0.3; s2 += 0.2) {
       const D = depthAt(b, s2); if (D < 0.4) continue;
@@ -321,15 +325,18 @@ function plantBand(C: Ctx, b: Band) {
       const room = placed.reduce((m, q) => Math.min(m, Math.hypot(q.x - s2, q.z - t) - q.r), Infinity);
       if (!best || room > best.room) best = { s: s2, t, p, room };
     }
-    // (the back layer's tallest species, the front's lowest: the one that makes the layer read)
-    const byH = mix[layer].map(([k]) => k).sort((u, v) => (SPECIES[v].h[0] - SPECIES[u].h[0]) * (layer === 'front' ? -1 : 1));
-    if (best) { const sp = layer === 'mid' ? pickWeighted(mix[layer], rng()) : byH[0], q = plant(C, sp, best.p[0], best.p[1], layer, b.wall, bloomOf); if (q) placed.push({ x: best.s, z: best.t, r: q.r }); }
+    if (!best) continue;
+    const q = plant(C, sp, best.p[0], best.p[1], layer, b.wall, bloomOf);
+    if (q) { q.h = Math.min(hi, Math.max(lo, (SPECIES[sp].h[0] + SPECIES[sp].h[1]) / 2)); placed.push({ x: best.s, z: best.t, r: q.r }); }
   }
   const fillSp = mix.fill, fr = (SPECIES[fillSp].r[0] + SPECIES[fillSp].r[1]) / 2 * 1.1;
   // a fill point goes wherever mulch shows: a little further than a crown's reach from every plant
   const blockers: Blocker[] = placed.map(p => ({ x: p.x, z: p.z, r: p.r + 0.05 }));
   const fill = poisson(rng, box, fr, (s, t) => { const D = depthAt(b, s); return t > 0.05 && t < D - 0.05 && !C.blockedWorld(toWorld([s, t])); }, { blockers, seeds: Math.max(2, Math.round(L / 2)), grid: fr * 0.7 });
-  for (const p of fill) { const [x, z] = toWorld(p); plant(C, fillSp, x, z, 'front', b.wall, bloomOf); }
+  for (const p of fill) { const [x, z] = toWorld(p); const q = plant(C, fillSp, x, z, 'front', b.wall, bloomOf); if (q) placed.push({ x: p[0], z: p[1], r: q.r }); }
+  // and once more, smaller, for the gaps a full-sized groundcover would not fit
+  const fr2 = fr * 0.7, gaps = poisson(rng, box, fr2, (s, t) => { const D = depthAt(b, s); return t > 0.04 && t < D - 0.04 && !C.blockedWorld(toWorld([s, t])); }, { blockers: placed.map(p => ({ x: p.x, z: p.z, r: p.r + 0.02 })), seeds: 2, grid: fr2 * 0.7 });
+  for (const p of gaps) { const [x, z] = toWorld(p); const q = plant(C, fillSp, x, z, 'front', b.wall, bloomOf); if (q) { q.r *= 0.8; q.h *= 0.85; } }
 }
 // ---- the kinds --------------------------------------------------------------------------------------------------
 function facadeBands(C: Ctx, sides: string[], depth: number): Band[] {
@@ -392,12 +399,14 @@ export function planPlanting(s: any, index: number, ctx: SiteContext): PlantingP
     let line: P2[] = [], w = 0, into = 'left';
     if (kind === 'walk') {
       const ref = typeof s.along === 'string' && s.along.startsWith('path:') ? ctx.lookup(s.along.slice(5), 'path') : null;
-      if (ref) { line = ctx.pathLine(ref.s); w = ref.s.w || 1.0; }
+      // (resampled: a straight path is two points, and a band needs a sample every 0.25 m along it — the samples lie on
+      // the path's own centre line, so the beds still meet its edge exactly)
+      if (ref) { line = resample(ctx.pathLine(ref.s), 0.25, false); w = ref.s.w || 1.0; }
       else if (Array.isArray(s.along)) { const t = tensionOf(s.smooth ?? true); line = t === null ? resample(s.along, 0.25) : smoothLine(s.along, t, 0.25); w = s.w || 1.0; }
     } else if (kind === 'terrace') {
       const ref = typeof s.along === 'string' && s.along.startsWith('terrace:') ? ctx.lookup(s.along.slice(8), 'terrace') : null;
       if (ref) { const poly = ctx.terracePoly(ref.s); line = resample([...poly, poly[0]], 0.25, false); }
-      else if (Array.isArray(s.along)) line = resample(s.along, 0.25, false);
+      else if (Array.isArray(s.along)) line = resample(s.along, 0.25, false);   // (a step's front edge, say: side says which way)
     } else if (Array.isArray(s.along)) {
       const t = tensionOf(s.smooth ?? true); line = t === null ? resample(s.along, 0.25) : smoothLine(s.along, t, 0.25);
     }
@@ -415,9 +424,10 @@ export function planPlanting(s: any, index: number, ctx: SiteContext): PlantingP
         // inside a terrace's outline, from its coping in: the trailing front at the edge, taller plants behind
         const ref = ctx.lookup(String(s.along).slice(8), 'terrace'), T = ref ? ctx.terracePoly(ref.s) : null;
         const b1 = mk(1, false, 0.3), b2 = mk(-1, false, 0.3);
-        // keep the side whose middle lies inside the terrace; its base runs along the coping (a built edge, like a wall)
+        // keep the side whose middle lies inside the terrace (or the side named, along a line); its base runs along the
+        // coping (a built edge, like a wall)
         const mid = (b: Band) => at(b, b.s[Math.floor(b.s.length / 2)] ?? 0, 0.5);
-        const kept = T && inPoly(...mid(b1), T) ? b1 : b2; kept.edgeBuilt = true;
+        const kept = T ? (inPoly(...mid(b1), T) ? b1 : b2) : (s.side === 'right' ? b2 : b1); kept.edgeBuilt = true;
         raw.push(kept);
       } else {
         if (side === 'left' || side === 'both') raw.push(mk(1, true, 0));
