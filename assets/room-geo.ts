@@ -7,8 +7,9 @@
 //                                     keep-outs (door swings, stair run-in and step-off, the hero's approach)
 //   Obb, obb(), overlap(), inside()   oriented rectangles in plan and their separating-axis test
 //   laneGrid(geo, blockers)           a 0.1 m occupancy grid with a clearance field: lanesOk / reach
-//   sizeOf(type, params)              an item's footprint box (registry props: their declared footprint and the params
-//                                     they honour; page builders: assets/props/placement.ts `size`)
+//   sizeOf(type, params)              an item's footprint box: the box its built geometry measures (assets/props/measured.ts,
+//                                     written with the catalog: the box at default params, and how it grows with w, d, l, r, h),
+//                                     else a registry prop's declared footprint or a page builder's declared `size`
 //
 // Coordinates are the spec's: metres, x east, z south; a room edge N is its min-z edge, S max-z, W min-x, E max-x.
 // Owner: S3 (compose).
@@ -16,6 +17,7 @@ import { perimeterEdges, edgeForOpening } from './house-geometry.js';
 import { PROPS } from './props/index.js';
 import { PLACEMENT } from './props/placement.js';
 import { pageItemDef } from './item-meta.js';
+import { MEASURED } from './props/measured.js';
 
 export type Side = 'N' | 'S' | 'W' | 'E';
 export const SIDES: Side[] = ['N', 'S', 'W', 'E'];
@@ -69,7 +71,38 @@ export const rectObb = (x0: number, z0: number, x1: number, z1: number): Obb => 
 export interface Size { w: number; d: number; h: number; ox: number; oz: number; y0: number }
 /** the spec keys a type honours: a registry prop's, or a page builder's (item-map.ts ITEM_PARAMS, through item-meta.ts) */
 export const paramsOf = (type: string): string[] => { const def = PROPS.get(type) || pageItemDef(type); return def ? def.params || [] : []; };
+const sizeMemo = new Map<string, Size | null>();
+/** an item's footprint box (memoised on the params that size it: the composer asks thousands of times a room; treat the result as read-only) */
 export function sizeOf(type: string, it: any = {}): Size | null {
+  // (the box at default params is by far the commonest ask: its key is the type)
+  const plain = it.w === undefined && it.d === undefined && it.l === undefined && it.r === undefined && it.h === undefined && it.shape === undefined;
+  const key = plain ? type : `${type}|${it.w ?? ''}|${it.d ?? ''}|${it.l ?? ''}|${it.r ?? ''}|${it.h ?? ''}|${it.shape ?? ''}`;
+  let hit = sizeMemo.get(key);
+  if (hit === undefined) { hit = sizeOfUncached(type, plain ? {} : it); sizeMemo.set(key, hit); }
+  return hit;
+}
+function sizeOfUncached(type: string, it: any): Size | null {
+  const m = MEASURED[type];
+  if (m) {
+    // the measured box, then each sizing param the item carries moves its edges along the line the catalog fitted: `w` may be the
+    // mattress and the headboard 0.24 m wider, `r` the pot and the leaves twice as far
+    let [x0, z0, x1, z1] = m.b, [y0, y1] = m.y;
+    const P: string[] = paramsOf(type), lo: Record<string, [number, number]> = { x: [x0, x1], y: [y0, y1], z: [z0, z1] };
+    const put = (ax: 'x' | 'y' | 'z', f: [number, number, string], v: number) => {
+      const [a, b] = lo[ax], e = f[0] * v + f[1];
+      lo[ax] = f[2] === 'min' ? [a, a + e] : f[2] === 'max' ? [b - e, b] : [(a + b) / 2 - e / 2, (a + b) / 2 + e / 2];
+    };
+    for (const k of ['w', 'd', 'l', 'r', 'h']) {
+      const v = it[k], f = m.fit && m.fit[k];
+      if (!f || !(v > 0) || !P.includes(k)) continue;
+      if (k === 'h' && PROPS.get(type)?.surface) continue;
+      for (const ax of ['x', 'y', 'z'] as const) if (f[ax]) put(ax, f[ax]!, v);
+    }
+    // a round patterned rug is as deep as it is wide
+    if (type === 'patterned-rug' && it.shape === 'round') { const [a, b] = lo.x, c = (lo.z[0] + lo.z[1]) / 2; lo.z = [c - (b - a) / 2, c + (b - a) / 2]; }
+    [x0, x1] = lo.x; [y0, y1] = lo.y; [z0, z1] = lo.z;
+    return { w: x1 - x0, d: z1 - z0, h: y1 - y0, ox: (x0 + x1) / 2, oz: (z0 + z1) / 2, y0 };
+  }
   const def = PROPS.get(type), pl = PLACEMENT[type];
   if (def) {
     let [w, d] = def.footprint, h = def.height;
@@ -95,7 +128,9 @@ export function sizeOf(type: string, it: any = {}): Size | null {
   return null;
 }
 /** wall-mounted items whose `y` is their CENTRE (the rest mount by their bottom edge) */
-export const CENTRE_MOUNT = new Set(['wall-art', 'gallery-wall', 'round-mirror', 'arch-mirror', 'triptych', 'framed-print', 'canvas-art', 'plate-set', 'wall-clock', 'wall-hanging', 'wall-tv', 'whiteboard', 'pin-board']);
+export const CENTRE_MOUNT = new Set(['wall-art', 'gallery-wall', 'round-mirror', 'arch-mirror', 'triptych', 'framed-print', 'canvas-art', 'plate-set', 'wall-clock', 'wall-tv', 'whiteboard', 'pin-board']);
+/** … and the ones whose `y` is their TOP (a hanging's rod is at the origin and the cloth falls below it) */
+export const TOP_MOUNT = new Set(['wall-hanging']);
 /** an authored item's plan box (the footprint centre after its offset, turned by rot) */
 export function itemObb(it: any): Obb | null {
   const s = sizeOf(it.type, it); if (!s || !Array.isArray(it.at)) return null;
@@ -121,6 +156,8 @@ export interface Geo {
 }
 const HALF = { ext: 0.08, part: 0.07 };
 const TOL = 0.25;
+/** a room whose bounds were drawn a little loose has its wall this far off its edge at most (see `adopt` in analyzeRoom) */
+const TOL_LOOSE = 0.55;
 
 function union(spans: Array<[number, number]>): Array<[number, number]> {
   const s = spans.filter(([a, b]) => b - a > 0.02).sort((p, q) => p[0] - q[0]); const out: Array<[number, number]> = [];
@@ -140,7 +177,7 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
   const lineOf: Record<Side, number> = { N: b.z, S: b.z + b.d, W: b.x, E: b.x + b.w };
   const spanOf = (s: Side): [number, number] => (alongX(s) ? [b.x, b.x + b.w] : [b.z, b.z + b.d]);
   const runs: Run[] = [], walled: any = { N: [], S: [], W: [], E: [] }, open: any[] = [], portals: Portal[] = [], windows: any[] = [];
-  const obstacles: Obb[] = [], keepouts: Obb[] = [], soft: Obb[] = [];
+  const obstacles: Obb[] = [], keepouts: Obb[] = [], soft: Obb[] = [], adopted = new Set<any>();
   const entry = spec.entry && spec.entry.level === lv.id ? spec.entry : null;
   for (const side of SIDES) {
     const [lo, hi] = spanOf(side), ln = lineOf[side];
@@ -151,11 +188,29 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
       if (bb - a > 0.05) segs.push({ kind: 'ext', line: el, a, b: bb });
     }
     const doorsHere: Array<{ a: number; b: number; w: number; kind: string; hinged: boolean; entry: boolean }> = [];
+    // a stretch of this side whose wall is drawn 0.25–0.55 m off the room's edge (bounds sketched a little loose) has no wall within
+    // reach: the nearest partition line that spans it is its wall (with anything within 0.06 m of that line) — else its doors would go
+    // unseen and a piece could be set in the doorway. Only where no wall or partition lies within 0.25 m of the edge.
+    let adopt: number | null = null;
+    {
+      const spans: Array<[number, number]> = segs.map(sg => [sg.a, sg.b]);
+      const loose: Array<{ pl: number; a: number; b: number; d: number }> = [];
+      for (const p of lv.partitions || []) {
+        if (!Array.isArray(p.from) || !Array.isArray(p.to) || (Math.abs(p.from[1] - p.to[1]) < 1e-6) !== alongX(side)) continue;
+        const px = alongX(side), pl = px ? p.from[1] : p.from[0], p0 = px ? Math.min(p.from[0], p.to[0]) : Math.min(p.from[1], p.to[1]), p1 = px ? Math.max(p.from[0], p.to[0]) : Math.max(p.from[1], p.to[1]);
+        const a = Math.max(lo, p0), bb = Math.min(hi, p1); if (bb - a <= 0.05) continue;
+        const d = Math.abs(pl - ln);
+        if (d <= TOL) spans.push([a, bb]); else if (d <= TOL_LOOSE) loose.push({ pl, a, b: bb, d });
+      }
+      const cover = union(spans), fresh = loose.filter(q => subtract([q.a, q.b], cover).reduce((t, [x, y]) => t + y - x, 0) > 0.3).sort((p, q) => p.d - q.d);
+      if (fresh.length) adopt = fresh[0].pl;
+    }
     for (const p of lv.partitions || []) {
       if (!Array.isArray(p.from) || !Array.isArray(p.to)) continue;
       const px = Math.abs(p.from[1] - p.to[1]) < 1e-6;   // runs along x
       if (px !== alongX(side)) continue;
-      const pl = px ? p.from[1] : p.from[0]; if (Math.abs(pl - ln) > TOL) continue;
+      const pl = px ? p.from[1] : p.from[0]; if (Math.abs(pl - ln) > TOL && !(adopt !== null && Math.abs(pl - adopt) < 0.06)) continue;
+      if (Math.abs(pl - ln) > TOL) adopted.add(p);
       const p0 = px ? Math.min(p.from[0], p.to[0]) : Math.min(p.from[1], p.to[1]), p1 = px ? Math.max(p.from[0], p.to[0]) : Math.max(p.from[1], p.to[1]);
       const a = Math.max(lo, p0), bb = Math.min(hi, p1); if (bb - a <= 0.05) continue;
       segs.push({ kind: 'part', line: pl, a, b: bb });
@@ -206,6 +261,7 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
   // partitions that cross the room's interior are solid lines, with their doorways
   for (const p of lv.partitions || []) {
     if (!Array.isArray(p.from) || !Array.isArray(p.to)) continue;
+    if (adopted.has(p)) continue;   // (this room's own wall, drawn loose)
     const px = Math.abs(p.from[1] - p.to[1]) < 1e-6, pl = px ? p.from[1] : p.from[0];
     const inside = px ? pl > b.z + TOL && pl < b.z + b.d - TOL : pl > b.x + TOL && pl < b.x + b.w - TOL; if (!inside) continue;
     const p0 = px ? Math.min(p.from[0], p.to[0]) : Math.min(p.from[1], p.to[1]), p1 = px ? Math.max(p.from[0], p.to[0]) : Math.max(p.from[1], p.to[1]);
@@ -234,6 +290,12 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
     keepouts.push(obb(tx + f.dir[0] * 0.8, tz + f.dir[1] * 0.8, f.w + 0.1, 1.6, f.rot));
   }
   for (const v of lv.voids || []) obstacles.push(rectObb(v.x, v.z, v.x + v.w, v.z + v.d));
+  // a room nested inside this one (its bounds within these, and a good deal smaller: a WC carved out of a bedroom, a bath out of a hall) is
+  // its own walled space: this room's furniture does not go in it (it furnishes itself), and its floor is not this room's to walk
+  for (const o of lv.rooms || []) {
+    const q = o && o.bounds; if (!q || q === b || o === room) continue;
+    if (q.x >= b.x - 0.05 && q.z >= b.z - 0.05 && q.x + q.w <= b.x + b.w + 0.05 && q.z + q.d <= b.z + b.d + 0.05 && q.w * q.d < 0.8 * b.w * b.d) obstacles.push(rectObb(q.x, q.z, q.x + q.w, q.z + q.d));
+  }
   // the hero: its surface is solid, and 2 m in front of it (the user side) stays clear (plan C9)
   let heroHere = false;
   if (spec.hero && spec.hero.level === lv.id && Array.isArray(spec.hero.at)) {
@@ -295,7 +357,8 @@ function baseGrid(geo: Geo): Base {
   let hit = baseCache.get(geo); if (hit) return hit;
   const b = geo.b, x0 = b.x - CELL, z0 = b.z - CELL, nx = Math.ceil(b.w / CELL) + 2, nz = Math.ceil(b.d / CELL) + 2, N = nx * nz;
   const blocked = new Uint8Array(N), near = new Uint8Array(N), inRoom = new Uint8Array(N), mid = new Float32Array(N);
-  const ps = geo.portals.filter(p => p.w >= 0.5), mx = b.x + b.w / 2, mz = b.z + b.d / 2;
+  // (an open span under 1.2 m is a gap beside a wall, not a way in: a door counts from 0.5 m)
+  const ps = geo.portals.filter(p => p.open ? p.w >= 1.2 : p.w >= 0.5), mx = b.x + b.w / 2, mz = b.z + b.d / 2;
   const seeds: number[][] = ps.map(() => []);
   for (let k = 0; k < nz; k++) for (let i = 0; i < nx; i++) {
     const x = x0 + (i + 0.5) * CELL, z = z0 + (k + 0.5) * CELL, n = k * nx + i;

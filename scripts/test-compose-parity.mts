@@ -5,7 +5,9 @@
 // `compose` key), and compares it, item for item, with assets/room-composer.js's composeHouse run on the same spec in
 // Node. It also checks the page's composition is the same on a second load, and that a fixture's composed rooms are
 // what test/fixtures/compose/<id>.json blessed (a hash per room, so a change to the composer shows up here as a room
-// that moved — bless on purpose with `--update`, like a golden).
+// that moved — bless on purpose with `--update`, like a golden). And that the composer's SIZES are true: every composed item is
+// built alone in the page with its own params, and the box it measures is the box sizeOf() gave the composer (within 0.04 m
+// a side) — a bed whose headboard is wider than its `w`, a plant whose leaves stand off its origin, would show here.
 //
 //   node --experimental-strip-types scripts/test-compose-parity.mts [--fixture a,b] [--update]
 //
@@ -63,10 +65,17 @@ const inPage = async (id: string) => {
     const plan = planOf(a).compose as any;
     // where the builder put the authored wall mounts and surface items of the untidy room (defaults 2 snaps them)
     const placed: any[] = []; (window as any).__houseDebug().scene.traverse((o: any) => { const u = o.userData; if (u && u.role === 'item' && u.room === 'Untidy Room') placed.push({ type: u.itemType, x: o.position.x, y: o.position.y, z: o.position.z }); });
-    return { placed, rooms: (a.compose || []).map((c: any) => ({ level: c.level, name: c.name, program: c.program, style: c.style, items: c.items })), plan: plan ? plan.rooms.length : 0 };
+    // every distinct composed item built alone, with its own params: its box in its own frame
+    const hb = (window as any).__houseBuilderRef, T = (window as any).__THREE, boxes: Record<string, number[]> = {}, pal = { wall: '#f1f5f9', trim: '#1e293b', accent: '#0f766e', material: 'stucco' };
+    for (const c of a.compose || []) for (const it of c.items) {
+      const { type, at, rot, src, y, ...params } = it, key = type + '|' + JSON.stringify(params); if (boxes[key]) continue;
+      try { const o = hb.buildProp(type, params, pal); o.updateMatrixWorld(true); const b = new T.Box3().setFromObject(o); boxes[key] = [b.min.x, b.min.z, b.max.x, b.max.z, b.min.y, b.max.y]; } catch { /* a type the builder cannot build alone */ }
+    }
+    const { composeStats } = await import(new URL('assets/room-composer.js', location.href).href);
+    return { placed, boxes, stats: { ...composeStats }, rooms: (a.compose || []).map((c: any) => ({ level: c.level, name: c.name, program: c.program, style: c.style, items: c.items })), plan: plan ? plan.rooms.length : 0 };
   });
   await ctx.close();
-  return out as { rooms: Array<{ level: string; name: string; program: string; style: string; items: any[] }>; plan: number; placed: Array<{ type: string; x: number; y: number; z: number }> };
+  return out as { rooms: Array<{ level: string; name: string; program: string; style: string; items: any[] }>; plan: number; placed: Array<{ type: string; x: number; y: number; z: number }>; boxes: Record<string, number[]>; stats: { hits: number; misses: number } };
 };
 try {
   for (const id of ids) {
@@ -89,6 +98,23 @@ try {
         void y;
       }
     }
+    // the sizes are true
+    {
+      const { sizeOf } = await import(pathToFileURL(path.join(ROOT, 'assets', 'room-geo.js')).href), { PROPS } = await import(pathToFileURL(path.join(ROOT, 'assets', 'props', 'index.js')).href), { PLACEMENT } = await import(pathToFileURL(path.join(ROOT, 'assets', 'props', 'placement.js')).href), off: string[] = []; let n = 0;
+      for (const [key, m] of Object.entries(pa.boxes)) {
+        const type = key.split('|')[0], params = JSON.parse(key.slice(type.length + 1)), sz = sizeOf(type, params); if (!sz) continue;
+        n++;
+        const want = [sz.ox - sz.w / 2, sz.oz - sz.d / 2, sz.ox + sz.w / 2, sz.oz + sz.d / 2];
+        // (a plant's leaves are seeded per item and lean a different way in each: its box is the widest reach, so what is measured
+        // must lie inside it; every other item's box is its own, edge for edge)
+        const foliage = PLACEMENT[type]?.group === 'plant' || PROPS.get(type)?.foliage;
+        const worst = foliage ? Math.max(want[0] - m[0], want[1] - m[1], m[2] - want[2], m[3] - want[3]) : Math.max(...want.map((v, i) => Math.abs(v - m[i])));
+        if (worst > (foliage ? 0.03 : 0.04)) off.push(`${type} ${JSON.stringify(params)}: sizeOf says x ${want[0].toFixed(2)}…${want[2].toFixed(2)} z ${want[1].toFixed(2)}…${want[3].toFixed(2)}, built ${m[0].toFixed(2)}…${m[2].toFixed(2)} z ${m[1].toFixed(2)}…${m[3].toFixed(2)}`);
+      }
+      if (off.length) { failed++; console.log(`✗ ${id}: ${off.length} of ${n} composed item shapes are not the size the composer had for them`); off.slice(0, 6).forEach(m => console.log(`    ${m}`)); }
+    }
+    // a build composes its house once (the cache follows the spec's content: a spec the build itself changed would compose again and again)
+    if (pa.stats.misses !== 1) failedPlan.push(`${id}: the page composed the house ${pa.stats.misses} times in one build (${pa.stats.hits} cache hits): the cache is missing`);
     if (pa.plan !== a.length) failedPlan.push(`${id}: <id>.plan.json's compose key has ${pa.plan} rooms, the builder composed ${a.length}`);
     const bad: string[] = [];
     if (a.length !== node.length) bad.push(`the page composed ${a.length} rooms, Node ${node.length}`);
