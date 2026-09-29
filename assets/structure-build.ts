@@ -201,7 +201,9 @@ export function createStructureBuild(bctx, { kitb }) {
             if (!w) w = band;
           }
         }
-        mine.forEach((op, i) => kitb.noteOpening({ spec, defaults, lv, anchors, op, param: openings[i], side: e.side, y, isEntry: isEntry(op) }));
+        // `wall` is the placed wall (turned, tracked): the hook reads the leaf groups off it, so it needs no second copy of the hinge geometry
+        mine.forEach((op, i) => kitb.noteOpening({ spec, defaults, lv, anchors, op, param: openings[i], side: e.side, y, isEntry: isEntry(op),
+          wall: w, edge: e, centre: [cx, cz], rotY: SIDE_ROT[e.side] }));
         for (const op of mine) if (isEntry(op)) {
           const out = { S: [0, 1], N: [0, -1], E: [1, 0], W: [-1, 0] }[op.side];
           // an entry slider opens on its local −x half (see createParametricWall): the door axis the shot
@@ -249,6 +251,7 @@ export function createStructureBuild(bctx, { kitb }) {
         }), cx, cz, y);
         if (!alongX) wall.rotation.y = Math.PI / 2;
         registerTrackedWall(wall, 'partition', ph, 0.85);
+        kitb.notePartition({ spec, defaults, lv, anchors, p, wall, y, centre: [cx, cz], len, alongX, doorOffset: door });
       });
     }
 

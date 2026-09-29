@@ -229,7 +229,15 @@ async function player(id: string, viewport: { width: number; height: number }, m
   if (!mobile) await page.mouse.move(viewport.width / 2, viewport.height / 3);
   await shot(page, `player-${id}-${label}-playing`);
   // pause
-  if (mobile) await page.tap('.vh-play'); else await page.keyboard.press('Space');
+  if (mobile) {
+    // a touch screen fades the controls IDLE_TOUCH_MS (4 s) into a shot, and a tap on the scene brings them back; a
+    // loaded machine spends longer than that on the screenshot above, and the play button is then, correctly,
+    // unreachable (the canvas takes the tap). Wake them the way a person would, then press it.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (await page.evaluate(() => document.querySelector('.vh')!.classList.contains('vh-idle'))) await page.touchscreen.tap(viewport.width / 2, viewport.height / 3);
+      try { await page.tap('.vh-play', { timeout: 4000 }); break; } catch (e) { if (attempt === 2) throw e; }
+    }
+  } else await page.keyboard.press('Space');
   await sleep(150);
   const c = await scrubT(page); await sleep(600); const d = await scrubT(page);
   ok(Math.abs(d - c) < 1e-6 && (await page.getAttribute('.vh', 'data-playing')) === '0', 'pause holds t');

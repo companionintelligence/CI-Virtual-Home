@@ -15,6 +15,8 @@
 //   porch-door       a porch post in a door's span
 //   feature-opening  a bay over a door, a porch roof across an upper window, a balcony's deck across a window
 // and checks the S2 fields' values (unknown kinds are errors, like the core's vocabularies).
+// (S0 also lets this plugin replace 'footprint-rects' and 'partition-axis-aligned' — polygon plans and angled partitions, which S2
+// has not built, so neither is replaced.)
 import type { Check, Extend, Rule } from './_types.mts';
 import { levelStairs, houseStairs, autoVoidsFor } from '../../assets/stairs.js';
 import { porchPosts as porchPostsAlong } from '../../assets/arch-plan.js';
