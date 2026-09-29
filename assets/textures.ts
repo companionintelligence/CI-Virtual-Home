@@ -672,10 +672,11 @@ const GEN: Record<string, (c: Ctx, o: any) => Gen> = {
       }
     };
   },
-  // wallpaper: one 0.52 m roll repeat — pattern 'stripe' (two widths), 'dot' (staggered spots) or 'botanical'
-  // (seeded sprigs: a stem and four leaves, one sprig a cell) in color2 over color
+  // wallpaper: one 0.52 m roll repeat — pattern 'stripe' (two widths), 'dot' (staggered spots), 'grid' (fine lines
+  // every 0.13 m) or 'botanical' (seeded sprigs: a stem and four leaves, one sprig a cell) in color2 over color; any
+  // other pattern is a stripe
   wallpaper: (c, o) => {
-    const pattern = o.pattern || 'stripe', pu = 0.52, pv = pattern === 'stripe' ? 0.52 : 0.52, W = 512, H = 512;
+    const pattern = ['dot', 'grid', 'botanical'].includes(o.pattern) ? o.pattern : 'stripe', pu = 0.52, pv = pattern === 'stripe' ? 0.52 : 0.52, W = 512, H = 512;
     const A = rgbOf(o.color ?? 0xeae4d8), base = rgbOf(o.color ?? 0xeae4d8);
     const B = rgbOf(o.color2 ?? (() => { const k = (A[0] + A[1] + A[2]) / 765; return k > 0.6 ? mixRgb(A, [70, 90, 80], 0.45) : mixRgb(A, [255, 255, 255], 0.45); })());
     const paper = c.fbm(32, 32, 2), sprigs: Array<[number, number, number, number]> = [];
@@ -695,6 +696,9 @@ const GEN: Record<string, (c: Ctx, o: any) => Gen> = {
           const g = 0.065, r = 0.011, row = Math.floor(t / g), off = (row % 2) * g / 2;
           const dx = wrapD(s - off - Math.round((s - off) / g) * g, pu), dy = t - (row + 0.5) * g;
           k = 1 - smooth(r - 0.0012, r + 0.0012, Math.hypot(dx, dy));
+        } else if (pattern === 'grid') {
+          const g = 0.13, w = 0.0055, fs = Math.abs(((s / g) % 1 + 1) % 1 - 0.5) * g, ft = Math.abs(((t / g) % 1 + 1) % 1 - 0.5) * g;
+          k = Math.max(1 - smooth(w - 0.0012, w + 0.0012, g / 2 - fs), 1 - smooth(w - 0.0012, w + 0.0012, g / 2 - ft));   // the lines fall on the cell edges
         } else {
           for (const [x, y, ang, L] of sprigs) {
             for (let q = 0; q < 4; q++) {

@@ -28,7 +28,7 @@ import { createMaterialKit } from './materials.js';
 import { hex } from './build-context.js';
 import { specDefaults } from './spec/index.js';
 import { HERO_SET } from './item-map.js';
-import { kitPalette, keepSet, levelWall, doorColour, leafKindOf, lightingOf } from './kit-rules.js';
+import { kitPalette, keepSet, levelWall, doorColour, leafKindOf, lightingOf, restraintOf } from './kit-rules.js';
 
 export function createKitBuild(bctx) {
   const { THREE, std, setLightingPreset } = bctx;
@@ -45,7 +45,7 @@ export function createKitBuild(bctx) {
   function houseKit(spec, palette) {
     const p = spec.palette || {};
     const kit = createMaterialKit({
-      THREE, palette, seed: spec.id, keep: [...keepSet(spec)], defaults: specDefaults(spec), roofPull: p.roofPull !== false,
+      THREE, palette, seed: spec.id, keep: [...keepSet(spec)], defaults: specDefaults(spec), roofPull: p.roofPull !== false, restraint: restraintOf(spec),
       roofColors: (spec.roofs || []).filter(r => r && r.color).map(r => hex(r.color)),
     });
     current = { spec, kit, palette };

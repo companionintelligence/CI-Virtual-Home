@@ -305,9 +305,13 @@ applies only under `"defaults": 2`.
   `color` ignores it — the validator's `kit:silent-param` says which).
 - **Under `"defaults": 2`:** hinged leaves are derived, never teal — the trim on a modern dark-trimmed house, else a
   timber leaf (the kit's seeded wood, never near-black); partition leaves the casing white or the timber; a 1.2–1.8 m
-  door gets a pair; the entry swings in and every open leaf parks flat along its wall (within 10° of it); no automatic
-  lanterns; a storey's `wallColor` clads it; ceiling fans in at most a quarter of the rooms that could take one, never
-  a kitchen, a bath or the hero's room; each room's floor lamps take one of five heads; seeded wood, fabric and cabinet
+  perimeter door gets a pair (a partition doorway that wide stays cased unless `doorStyle` asks for leaves); the entry swings in and every open leaf parks flat along its wall (within 10° of it); no automatic
+  lanterns; a storey's `wallColor` clads it; ceiling fans in at most a quarter of the rooms that could take one — a fan can
+  hang there: nothing authored hangs at its centre and the blades clear the walls — never a kitchen, a bath or the
+  hero's room (a quarter of them rounded down; a house with fewer than four such rooms gets one with a seeded chance
+  of n/4, so the fleet's share is a quarter and no small house is fanless by arithmetic; `rooms[].fixtures.fan: true`
+  puts one where the photo shows it); each room's lamps take one of five heads, the rooms that have a lamp walking a seeded permutation
+  so any five show all five; seeded wood, fabric and cabinet
   roles are lifted clear of black; a roof is pulled toward charcoal only when it has no colour of its own; each house
   gets its own seeded sun (18–70° either side of its entry), and the true-white look — the hour's light and sky
   bounce pulled toward white, a partial white balance, saturation held at 0.86 — so golden hour and dusk stop turning
@@ -318,8 +322,17 @@ applies only under `"defaults": 2`.
   `anchors.lighting`. **For other streams:** `kit.cladding({ kind, color })` (cached per pair), `kit.roofMaterial({
   finish, color })`, `kit.finish(kind, { color, pattern, scale, yBase })` — floors: oak, honey-oak, walnut, cherry,
   white-oak, grey-wash, herringbone, tile (pattern square | hex | checker), terracotta, pavers, concrete, carpet,
-  marble, terrazzo; walls: paint, painted-brick, wallpaper (stripe | dot | botanical), wainscot, board-and-batten,
-  brick, stone, timber — and `roomKind(room)` (`assets/fixtures.ts`).
+  marble, terrazzo; walls: paint, painted-brick, wallpaper (stripe | dot | grid | botanical), wainscot, board-and-batten,
+  brick, stone, timber — and `roomKind(room)` (`assets/fixtures.ts`). `kit.cladding({ kind, color })` builds the
+  colour EXACTLY as given (`kit.claddingFor` is the same function): a colour that would have come through the palette
+  — a storey's `wallColor`, a volume's or a facade zone's — goes through `kit.wallColor(color, kind)` first, the house's
+  wall rule (restraint, eased by `palette.restraint`, none under `keep: ['wall']`), so a zone painted cobalt renders as a
+  storey painted cobalt does. `kit.roofMaterial(type, color)` decides "authored" from `roofs[].color` alone: a roof
+  with a colour of its own that is not in `roofs[]` (a porch or bay roof) must call the object form,
+  `kit.roofMaterial({ finish, color })`, or it takes the charcoal pull under defaults 2. `kit.finish` also takes
+  `color2` (a checker's dark squares, a wallpaper's motif); an unknown kind is plain paint, flagged
+  `material.userData.finishFallback`. `anchors.doors[].id` is the authored `openings[].id` / `partitions[].id` (a
+  pair's leaves `<id>:L` / `<id>:R`, a repeated id `<id>~2`), else `<kind>:<n>` in build order.
 - **Lints** (warnings): `kit:lighting-alias`, `kit:silent-param`, `kit:style`, `kit:wide-leaf`, `kit:fan-over-hero`,
   `kit:no-top`; the Core policy (`hero.mts`, §4.6): `hero:one-core`, `hero:storey`, `hero:wall` (a desk or shelf ≤
   0.45 m off its wall), `hero:doorway`, `hero:approach` (2 m clear in front), `hero:contrast` (charcoal on walnut). A

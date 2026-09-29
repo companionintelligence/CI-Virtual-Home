@@ -119,6 +119,19 @@ test('door colours: the opening\'s own, palette.door, then (defaults 2) timber o
   const leaf = doorColour(cottage, 'entry', { wood: 0x2e2622 });
   assert.ok(lum(hex(leaf)) >= 0.18, `a timber leaf never reads black (${leaf})`);
   assert.notEqual(leaf, '#0f766e');
+test('kit.wallColor is levelWall\'s rule for a colour that did not come through the palette (S2\'s zones); kit.claddingFor is kit.cladding', () => {
+  for (const spec of [{ id: 'w1', palette: { material: 'brick' } }, { id: 'w2', defaults: 2 }, { id: 'w3', defaults: 2, palette: { restraint: 0.7 } }, { id: 'w4', palette: { keep: ['wall'] } }]) {
+    const kit = kitFor({ ...spec, palette: { ...(spec as any).palette } });
+    const restraint = restraintOf(spec);
+    const k2 = createMaterialKit({ THREE: STUB, palette: kitPalette(spec), seed: spec.id, defaults: (spec as any).defaults === 2 ? 2 : 1, keep: ((spec as any).palette && (spec as any).palette.keep) || [], restraint } as any);
+    for (const kind of ['stucco', 'brick']) for (const c of ['#1f4fd1', '#c2410c', '#e6e2da']) {
+      const rule = levelWall({ ...spec, palette: { ...(spec as any).palette, material: kind } }, { material: kind, wallColor: c });
+      assert.equal(css(k2.wallColor(c, kind)), rule.color, `${spec.id} ${kind} ${c}`);
+    }
+    assert.equal(kit.claddingFor, kit.cladding);
+  }
+});
+
   assert.equal(doorColour(d2, 'interior'), css(colourMath.mix(hex(kitPalette(d2).wall), 0xffffff, 0.5)), 'a painted house hangs painted leaves');
   // over the 30 houses under defaults 2 no leaf is teal
   for (const s of fleet) { const c = doorColour({ ...s, defaults: 2 }, 'entry', { wood: kitFor(s).colors.wood }); assert.ok(c && c !== '#0f766e', s.id); }
@@ -222,3 +235,10 @@ test('determinism: every rule twice over the fleet under defaults 2 gives the sa
   const run = () => fleet.map(s => { const d = { ...s, defaults: 2 }; return JSON.stringify([kitPalette(d), lightingOf(d), [...fanPlan(d, fanEligible)], [...lampPlan(d)], doorColour(d, 'entry', { wood: kitFor(d).colors.wood })]); });
   assert.deepEqual(run(), run());
 });
+  // wallpaper's 'grid', a checker's second colour, an unknown kind flagged
+  const g = k1.finish('wallpaper', { pattern: 'grid' }).params.map.image, st = k1.finish('wallpaper', { pattern: 'stripe' }).params.map.image, bt = k1.finish('wallpaper', { pattern: 'botanical' }).params.map.image;
+  const hh = img => crypto.createHash('sha256').update(img.data).digest('hex');
+  assert.notEqual(hh(g), hh(st)); assert.notEqual(hh(g), hh(bt));
+  assert.notEqual(hh(k1.finish('checker').params.map.image), hh(k1.finish('checker', { color2: '#7a1f1f' }).params.map.image), 'checker color2 reaches the texture');
+  assert.equal(k1.finish('not-a-finish').userData.finishFallback, 'not-a-finish');
+  assert.equal(k1.finish('paint').userData.finishFallback, undefined);
