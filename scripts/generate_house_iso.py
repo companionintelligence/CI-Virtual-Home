@@ -1204,12 +1204,12 @@ class HouseRenderer:
         return {}
 
     def arch_holes(self, lv):
-        """the slab openings an upper storey has: its own voids, a flight's autoVoid, the double-height rooms below"""
+        """the slab openings an upper storey has: its own voids, a flight's autoVoid, the double-height rooms below, a sunken room's pit"""
         holes = list(lv.get("voids", [])) if lv["y"] > 0 else []
         if lv["y"] > 0:
             for rec in self.arch.get("voids", []):
                 if rec.get("level") == lv["id"]:
-                    holes += list(rec.get("auto", [])) + [{k: v[k] for k in ("x", "z", "w", "d")} for v in rec.get("double", [])]
+                    holes += list(rec.get("auto", [])) + [{k: v[k] for k in ("x", "z", "w", "d")} for v in rec.get("double", []) + rec.get("pits", [])]
         return holes
 
     def edge_height(self, lv, e):
@@ -1407,13 +1407,14 @@ class HouseRenderer:
         if not ft.get("outside"):
             return
         cx, cz = ft["at"]; w, d = ft.get("w", 0.75), ft.get("d", 0.6)
+        shx, shz = ft.get("shoulder") or [w + 0.4, d + 0.1]   # the stack below the top storey's head, in plan x and z (an E or W wall's is long in z)
         vis_top = self.hero_y + (self.hero_level["height"] if self.hero_level else 2.8)
         top = min(ft.get("top", vis_top), vis_top)
         col = {"stone": "#a39d92", "stucco": "#e7e2d8", "metal": "#9aa1a8"}.get(ft.get("material", "brick"), ft.get("color") or "#8a4a38")
         if ft.get("color") and ft.get("material") not in ("stone", "stucco", "metal"):
             col = ft["color"]
-        it = self.new((cx - w / 2 - 0.2, cx + w / 2 + 0.2, 0, top, cz - d / 2 - 0.05, cz + d / 2 + 0.05), name="chimney")
-        box(self.ctx, it, cx - w / 2 - 0.2, 0, cz - d / 2 - 0.05, w + 0.4, min(top, vis_top - 0.6), d + 0.1, triplet(col, 0.08, 0.0, -0.2), stroke=shade(col, -0.4), sw=0.6)
+        it = self.new((cx - shx / 2, cx + shx / 2, 0, top, cz - shz / 2, cz + shz / 2), name="chimney")
+        box(self.ctx, it, cx - shx / 2, 0, cz - shz / 2, shx, min(top, vis_top - 0.6), shz, triplet(col, 0.08, 0.0, -0.2), stroke=shade(col, -0.4), sw=0.6)
 
     def arch_stoop(self, lv):
         st = self.arch.get("stoop")

@@ -11,7 +11,7 @@
 //   rooms     [{ level, name, bounds, finish: { floor, floorColor, floorY, floorOffset, walls, wallColor, feature, ceiling } }]
 //   volumes   [{ level, rect, h }] — footprint rects with their own height (towers, low wings)
 //   plinths   [{ level, h, foundation, material, color }]      stoop  { level, side, at, top, steps, landing, stairs }
-//   voids     [{ level, auto: [rect], double: [rect + room] }] — the slab openings beyond the storey's own `voids`
+//   voids     [{ level, auto: [rect], double: [rect + room], pits?: [rect + room] }] — the slab openings beyond the storey's own `voids`, as built (clipped to the outline)
 //
 // A house that uses none of them exports nothing (undefined leaves the key out, so today's plan files do not change).
 export const pick = (a: any): unknown => {

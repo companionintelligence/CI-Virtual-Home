@@ -70,6 +70,28 @@ function frameRect(o: V2, rot: number, a0: number, a1: number, b0: number, b1: n
   const P = (a: number, b: number): V2 => [r3(o[0] + l[0] * a + d[0] * b), r3(o[1] + l[1] * a + d[1] * b)];
   return [P(a0, b0), P(a1, b0), P(a1, b1), P(a0, b1)];
 }
+/**
+ * An oriented rectangle (frame: origin o, heading rot, across [a0, a1], along [b0, b1]) as plan rects: one rect when it is
+ * square to the axes (rot a multiple of 90°); else the 0.2 m cells whose centres lie in it, in runs along x — a stair at 45°
+ * has a staircase-edged opening, not its bounding box, which would swallow the floor the flight arrives on.
+ */
+function rotatedRects(o: V2, rot: number, a0: number, a1: number, b0: number, b1: number) {
+  const q = ((rot % 90) + 90) % 90;
+  if (q < 1e-6 || q > 90 - 1e-6) return [rectOfBox(boxOf(frameRect(o, rot, a0, a1, b0, b1)))];
+  const bb = boxOf(frameRect(o, rot, a0, a1, b0, b1)), C = 0.2, d = dirOf(rot), l = leftOf(rot);
+  const out: Array<{ x: number; z: number; w: number; d: number }> = [];
+  for (let z = Math.floor(bb.minZ / C) * C; z < bb.maxZ - 1e-9; z += C) {
+    let run: number | null = null;
+    const flush = (x1: number) => { if (run !== null) out.push({ x: r3(run), z: r3(z), w: r3(x1 - run), d: r3(C) }); run = null; };
+    for (let x = Math.floor(bb.minX / C) * C; x < bb.maxX + C - 1e-9; x += C) {
+      const px = x + C / 2 - o[0], pz = z + C / 2 - o[1], a = px * l[0] + pz * l[1], b = px * d[0] + pz * d[1];
+      const inside = a >= a0 && a <= a1 && b >= b0 && b <= b1;
+      if (inside && run === null) run = x; else if (!inside) flush(x);
+    }
+    flush(Math.floor(bb.maxX / C) * C + 2 * C);
+  }
+  return out;
+}
 const boxOf = (pts: V2[]) => ({ minX: Math.min(...pts.map(p => p[0])), maxX: Math.max(...pts.map(p => p[0])), minZ: Math.min(...pts.map(p => p[1])), maxZ: Math.max(...pts.map(p => p[1])) });
 const rectOfBox = (b: { minX: number; maxX: number; minZ: number; maxZ: number }) => ({ x: r3(b.minX), z: r3(b.minZ), w: r3(b.maxX - b.minX), d: r3(b.maxZ - b.minZ) });
 
@@ -146,14 +168,18 @@ export function stairPlan(st: any, lv: any, levelById: Record<string, any>, inde
   }
   const all = outline.flat(), box = boxOf(all);
   // headroom: every part of the stair whose tread is higher than (rise − slab − headroom) is under an opening in the
-  // storey above — each flight's upper part, and a landing that high
+  // storey above — each flight's upper part, and a landing that high. A walker stands on a tread, not on the ramp its
+  // corners make: the opening starts at the near edge of the first tread that is too high (a whole tread earlier than
+  // where the ramp reaches the limit, which left that tread with 1.8 m).
   const h0 = rise - SLAB - HEADROOM, voidRects = [];
   if (shape !== 'spiral') {
     for (const f of flights) {
       const top0 = f.y0 + f.rise;
       if (top0 <= h0) continue;
-      const b0 = f.y0 >= h0 ? 0 : (h0 - f.y0) / f.rise * f.run;
-      voidRects.push(rectOfBox(boxOf(frameRect(f.at, f.rot, -f.w / 2 - 0.05, f.w / 2 + 0.05, b0, f.run))));
+      const riseStep = f.rise / f.steps, going = f.run / f.steps;
+      const first = f.y0 + riseStep > h0 ? 0 : Math.min(f.steps - 1, Math.floor((h0 - f.y0) / riseStep + 1e-9));
+      const b0 = first * going;
+      voidRects.push(...rotatedRects(f.at, f.rot, -f.w / 2 - 0.05, f.w / 2 + 0.05, b0, f.run));
     }
     for (const ld of landings) if (ld.y > h0) voidRects.push({ x: r3(ld.x - 0.05), z: r3(ld.z - 0.05), w: r3(ld.w + 0.1), d: r3(ld.d + 0.1) });
   } else voidRects.push(rectOfBox({ minX: at[0] - 1.05, maxX: at[0] + 1.05, minZ: at[1] - 1.05, maxZ: at[1] + 1.05 }));
@@ -188,11 +214,11 @@ export function createStairBuilder({ THREE, ProceduralArchitecture, textures = {
 
   // A boxed flight: treads and risers between closed stringers, the spandrel under it panelled in — the stair of a
   // cottage or a hall, not a floating one.
-  function closedFlight({ totalHeight, steps, width, run, stringer, handrailSide = 'left' }) {
+  function closedFlight({ totalHeight, steps, width, run, stringer, handrailSide = 'left', tread = null }: any) {
     const g = new THREE.Group(); g.name = `Closed Stairs (${+totalHeight.toFixed(2)}m)`;
     g.userData = { category: 'Architecture', tags: 'stairs, closed' };
     const rh = totalHeight / steps, td = run / steps;
-    const treadMat = textures.oak ? new THREE.MeshStandardMaterial({ map: textures.oak, roughness: 0.4 }) : std(0x9c7f62, { roughness: 0.45 });
+    const treadMat = tread || (textures.oak ? new THREE.MeshStandardMaterial({ map: textures.oak, roughness: 0.4 }) : std(0x9c7f62, { roughness: 0.45 }));
     const paint = std(hexOf(stringer, 0xefe9df), { roughness: 0.55 });
     for (let i = 0; i < steps; i++) {
       const tread = new THREE.Mesh(new THREE.BoxGeometry(width + 0.03, 0.035, td + 0.03), treadMat);
@@ -223,7 +249,7 @@ export function createStairBuilder({ THREE, ProceduralArchitecture, textures = {
   }
 
   // one flight, as the page builds it (the v1 calls, unchanged, when the spec adds nothing)
-  function flightGroup(f: Flight, st: any, rail?: string) {
+  function flightGroup(f: Flight, st: any, rail?: string, mats: any = {}) {
     const extra: any = {};
     if (st.treadWood) extra.treadWood = st.treadWood;
     const hs = st.handrailSide || rail;
@@ -232,7 +258,7 @@ export function createStairBuilder({ THREE, ProceduralArchitecture, textures = {
       if (st.stringer !== undefined) g.traverse(o => { if (o.isMesh && o.geometry && o.geometry.parameters && o.geometry.parameters.width === 0.06 && o.geometry.parameters.height === 0.28) { o.material = o.material.clone(); o.material.color.setHex(hexOf(st.stringer, 0xf8fafc)); } });
       return g;
     }
-    if (f.style === 'closed') return closedFlight({ totalHeight: f.rise, steps: f.steps, width: f.w, run: f.run, stringer: st.stringer, handrailSide: hs || 'left' });
+    if (f.style === 'closed') return closedFlight({ totalHeight: f.rise, steps: f.steps, width: f.w, run: f.run, stringer: st.stringer, handrailSide: hs || 'left', tread: mats.tread });
     const g = ProceduralArchitecture.createFloatingTimberStairs({ totalHeight: f.rise, steps: f.steps, width: f.w, run: f.run, ...extra, ...(hs ? { handrailSide: hs } : {}) });
     if (st.stringer !== undefined) g.traverse(o => { if (o.isMesh && o.geometry && o.geometry.parameters && o.geometry.parameters.width === 0.18 && o.geometry.parameters.height === 0.12) { o.material = o.material.clone(); o.material.color.setHex(hexOf(st.stringer, 0x1e242b)); } });
     if (st.riser === 'closed') {   // riser boards between the floating treads
@@ -243,9 +269,9 @@ export function createStairBuilder({ THREE, ProceduralArchitecture, textures = {
   }
 
   /** The whole stair for plan `p` (stairPlan) in its own frame: place it at p.bottom, rotation.y = rot × DEG */
-  function build(p: StairPlan, st: any) {
+  function build(p: StairPlan, st: any, mats: any = {}) {
     if (p.shape === 'spiral') return ProceduralArchitecture.createSpiralStairs({ totalHeight: p.rise, steps: p.flights[0].steps });
-    if (p.shape === 'straight') return flightGroup(p.flights[0], st);
+    if (p.shape === 'straight') return flightGroup(p.flights[0], st, undefined, mats);
     // turning: flights and landing in the first flight's frame (+z climbing, +x its left)
     const g = new THREE.Group(); g.name = `${p.shape}-Stairs (${+p.rise.toFixed(2)}m)`;
     g.userData = { category: 'Architecture', tags: `stairs, ${p.shape}` };
@@ -253,8 +279,8 @@ export function createStairBuilder({ THREE, ProceduralArchitecture, textures = {
     // rails on the outside of the turn unless the spec says
     const outer = sgn > 0 ? 'left' : 'right';
     const [f1, f2] = p.flights;
-    g.add(flightGroup(f1, st, outer));
-    const f2g = flightGroup(f2, st, outer);
+    g.add(flightGroup(f1, st, outer, mats));
+    const f2g = flightGroup(f2, st, outer, mats);
     // f2's first step in the local frame: invert the plan transform (world = at + left·x + dir·z)
     const d = dirOf(rot), l = leftOf(rot), dx = f2.at[0] - p.bottom[0], dz = f2.at[1] - p.bottom[1];
     f2g.position.set(dx * l[0] + dz * l[1], f2.y0, dx * d[0] + dz * d[1]);
@@ -267,7 +293,7 @@ export function createStairBuilder({ THREE, ProceduralArchitecture, textures = {
     const cx = (ld.cx - p.bottom[0]) * l[0] + (ld.cz - p.bottom[1]) * l[1], cz = (ld.cx - p.bottom[0]) * d[0] + (ld.cz - p.bottom[1]) * d[1];
     const across = ld.across, along = ld.along, T = 0.12;
     const slabMat = f1.style === 'closed' || f1.style === 'colonial' ? std(hexOf(st.stringer, f1.style === 'colonial' ? 0xf8fafc : 0xefe9df), { roughness: 0.55 }) : std(0x1e242b, { metalness: 0.6, roughness: 0.35 });
-    const topMat = f1.style === 'colonial' ? std(0x451a03, { roughness: 0.3, metalness: 0.05 }) : textures.oak ? new THREE.MeshStandardMaterial({ map: textures.oak, roughness: 0.35 }) : std(0x9c7f62);
+    const topMat = f1.style === 'colonial' ? std(0x451a03, { roughness: 0.3, metalness: 0.05 }) : mats.tread || (textures.oak ? new THREE.MeshStandardMaterial({ map: textures.oak, roughness: 0.35 }) : std(0x9c7f62));
     const slab = new THREE.Mesh(new THREE.BoxGeometry(across, T, along), slabMat); slab.position.set(cx, ld.y - T / 2 - 0.03, cz); g.add(slab);
     const top = new THREE.Mesh(new THREE.BoxGeometry(across + 0.02, 0.035, along + 0.02), topMat); top.position.set(cx, ld.y - 0.0175, cz); g.add(top);
     if (f1.style === 'closed') {

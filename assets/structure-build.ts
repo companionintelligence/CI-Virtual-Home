@@ -11,7 +11,7 @@ import { buildRoofs, planRoofModels, roofUnderAt } from './roofs.js';
 import { DEG, hex, mix } from './build-context.js';
 import { specDefaults } from './spec/index.js';
 import { levelStairs, stairPlan, createStairBuilder, autoVoidsFor } from './stairs.js';
-import { slabOpenings, archEdges, edgeFor, rectOfEdge, edgeHeight, wallPieces, volumeSteps, doubleRoomsUnder, featureOpenings } from './arch-plan.js';
+import { slabOpenings, insideOutline, sunkRooms, pitRects, archEdges, edgeFor, rectOfEdge, edgeHeight, wallPieces, volumeSteps, doubleRoomsUnder, featureOpenings } from './arch-plan.js';
 import { createFacade, facadeWanted } from './facade.js';
 import { createArchMaterials } from './arch-materials.js';
 import { createFeatures } from './features.js';
@@ -261,7 +261,7 @@ export function createStructureBuild(bctx, { kitb }) {
     levelStairs(lv).forEach((st, index) => {
       const p = stairPlan(st, lv, levelById, index);
       if (!p) return;
-      const s = put(() => stairBuilder.build(p, st), st.at[0], st.at[1], y, null, 'structure');
+      const s = put(() => stairBuilder.build(p, st, { tread: st.treadWood ? am().floor({ kind: st.treadWood }) : null }), st.at[0], st.at[1], y, null, 'structure');
       s.rotation.y = (st.rot || 0) * DEG;
       s.userData.stair = true;   // the shot gate's stair-clip test and door-to-core's clip repair look for it
       const total = p.rise;
@@ -304,8 +304,10 @@ export function createStructureBuild(bctx, { kitb }) {
     const dbl = doubleRoomsUnder(spec, lv);
     if (dbl.length) finish.galleryRails({ spec, lv, y, put, ProceduralArchitecture, doubleRooms: dbl });
     // the openings this storey's slab has beyond its own `voids` (a flight's autoVoid, a double-height room below): the plan twins draw them
-    const autoV = autoVoidsFor(spec, lv.id);
-    if (autoV.length || dbl.length) (anchors.arch.voids ||= []).push({ level: lv.id, auto: autoV, double: dbl.map(d => ({ x: rnd(d.rect.x), z: rnd(d.rect.z), w: rnd(d.rect.w), d: rnd(d.rect.d), room: d.room.name })) });
+    // (as built: clipped to the slab's outline, arch-plan.ts insideOutline; a sunken room's pit is a hole too)
+    const autoV = insideOutline(lv, autoVoidsFor(spec, lv.id)).map(r => ({ x: rnd(r.x), z: rnd(r.z), w: rnd(r.w), d: rnd(r.d) }));
+    const pitV = sunkRooms(spec, lv).flatMap(r => pitRects(lv, r).map(q => ({ x: rnd(q.x), z: rnd(q.z), w: rnd(q.w), d: rnd(q.d), room: r.name })));
+    if (autoV.length || dbl.length || pitV.length) (anchors.arch.voids ||= []).push({ level: lv.id, auto: autoV, double: dbl.map(d => ({ x: rnd(d.rect.x), z: rnd(d.rect.z), w: rnd(d.rect.w), d: rnd(d.rect.d), room: d.room.name })), ...(pitV.length ? { pits: pitV } : {}) });
     // ---- S2: the storey's facade (facade.ts) and its features (features.ts: bays, balconies, fireplaces, built-ins)
     const lowestY = Math.min(...(spec.levels || []).map(l => l.y || 0));
     if (facadeWanted(spec, lv, lowestY)) facade.levelFacade({ spec, lv, y, H, palette, am: am(), put, anchors, lowestY });

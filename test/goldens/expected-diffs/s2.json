@@ -1,3 +1,6 @@
 {
-  "$comment": "S2 (architecture): the golden and fixture frames this stream moves, each { \"cause\" } (+ \"hash\" for a fixture frame) — scripts/golden-ledger.mts"
+  "$comment": "S2 (architecture): the golden and fixture frames this stream moves, each { \"cause\" } (+ \"hash\" for a fixture frame) \u2014 scripts/golden-ledger.mts",
+  "mesamariposa/orbit@0.55": {
+    "cause": "S2 review fix (slab holes): mesamariposa's l2 void runs along the storey's outline (x 3.4), and a hole on a slab's edge broke its triangulation \u2014 the stairwell came out under a solid slab. The hole is now built 2 cm inside the outline, so the stairwell is open (38 px, seen through the l2 window)"
+  }
 }

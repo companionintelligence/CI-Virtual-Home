@@ -1,13 +1,19 @@
 // Architecture plan geometry — THREE-free, shared by the builders (structure-build, facade, features, room-finish),
 // the validator (scripts/validate/arch.mts), the plan export (plan-export/arch.ts) and the Node harnesses.
 //
-//   slabOpenings(spec, lv)     the holes a storey's slab has: its voids, the voids its flights' autoVoid asks for, and
-//                              the double-height rooms under it — as loops of their union (null: v1's voids only)
+//   slabOpenings(spec, lv)     the holes a storey's slab has: its voids, the voids its flights' autoVoid asks for, the
+//                              double-height rooms under it and its sunken rooms' pits — as loops of their union (null: v1's
+//                              voids only, each wholly inside the outline)
+//   openingRects / slabHoles   the same holes as rects, clipped to the slab's outline (insideOutline): what the slab, the room
+//                              floors, the lints and the twins all read, so a floor is never laid across a stairwell
+//   insideOutline(lv, rects)   the parts of rects inside a storey's outline, a wall's half thickness in — a hole on a slab's edge,
+//                              or past it, corrupts the slab's triangulation
+//   porchPlan(spec, f)         a porch's deck, posts (out of doors, off the steps) and roof — eave, the pitch it really has, its top
 //   openingFrames(spec, lv)    every perimeter opening as a frame on its wall: centre, outward normal, width, sill, head
 //   splitEdges(lv, edges)      perimeter edges split where two volumes with their own cladding meet (per-rect cladding)
 //   rectOfEdge(lv, e)          the footprint rect a perimeter edge bounds
 //   doubleRoomsUnder(spec, lv) the double-height rooms on the storeys below that open into lv
-//   porchPosts(f)              where a porch's posts stand along its front
+//   porchPosts(f)              where a porch's posts stand along its front (before the doors and steps move them)
 //
 // Owner: S2 (architecture).
 import { perimeterEdges, outlineLoops, edgeForOpening } from './house-geometry.js';
@@ -43,18 +49,98 @@ export function rectLoops(rects: R[]): Array<Array<[number, number]>> {
   return [outer, ...holes].filter(l => l && l.length >= 3);
 }
 
-/**
- * A storey's slab openings: null when it has none but its own `voids` (v1 builds those as it always did); else the
- * loops of the union of its voids, its flights' autoVoid rects and the double-height rooms below it.
- */
-export function slabOpenings(spec: any, lv: any): Array<Array<[number, number]>> | null {
-  const auto = autoVoidsFor(spec, lv.id), dbl = doubleRoomsUnder(spec, lv).map(d => d.rect);
-  if (!auto.length && !dbl.length) return null;
-  const rects = [...(lv.voids || []), ...auto, ...dbl].filter(r => r && r.w > 0 && r.d > 0);
-  return rectLoops(rects);
+// ---- the holes of a slab: what is cut, clipped to the slab, and read alike by the slab, the floors and the lints ------------
+/** the parts of a rect outside a set of rects, as rects (each hole splits what is left into up to four) */
+export function subtractRects(r: R, holes: R[]): R[] {
+  let pieces: R[] = [r];
+  for (const h of holes) {
+    const next: R[] = [];
+    for (const p of pieces) {
+      if (!overlap(p, h)) { next.push(p); continue; }
+      const x0 = Math.max(p.x, h.x), x1 = Math.min(p.x + p.w, h.x + h.w), z0 = Math.max(p.z, h.z), z1 = Math.min(p.z + p.d, h.z + h.d);
+      if (h.x > p.x) next.push({ x: p.x, z: p.z, w: h.x - p.x, d: p.d });
+      if (h.x + h.w < p.x + p.w) next.push({ x: h.x + h.w, z: p.z, w: p.x + p.w - h.x - h.w, d: p.d });
+      if (h.z > p.z) next.push({ x: x0, z: p.z, w: x1 - x0, d: h.z - p.z });
+      if (h.z + h.d < p.z + p.d) next.push({ x: x0, z: h.z + h.d, w: x1 - x0, d: p.z + p.d - h.z - h.d });
+    }
+    pieces = next.filter(p => p.w > 0.01 && p.d > 0.01);
+  }
+  return pieces;
 }
 
-/** Every void of a storey, whatever made it (for anything that tests "is this point over a hole") */
+/**
+ * The parts of `rects` that lie inside a storey's outline, `inset` in from it (the wall's inner face): a hole that is not
+ * wholly inside the slab's outline corrupts the slab's triangulation (three's earcut fills the hole in, and its
+ * neighbours' too), so every hole S2 adds goes through here. A flight built against the wall, whose void reaches the
+ * footprint line, keeps a hole that stops at the wall's face; a hole outside the outline is dropped.
+ */
+export function insideOutline(lv: any, rects: R[], inset = WALL_HALF): R[] {
+  const fp = lv.footprint || [];
+  if (!fp.length || !rects.length) return [];
+  let pieces: R[] = [];
+  for (const r of rects) {
+    const seen: R[] = [];   // each footprint rect once (rects laid over one another share ground)
+    for (const f of fp) { const c = clipRect(r, f); if (c) pieces.push(...subtractRects(c, seen)); seen.push(f); }
+  }
+  for (const e of perimeterEdges(fp)) {
+    const horiz = e.side === 'S' || e.side === 'N', n = OUT[e.side], line = horiz ? e.a[1] : e.a[0];
+    const lo = horiz ? e.a[0] : e.a[1], hi = horiz ? e.b[0] : e.b[1];
+    // the band along the edge, from the line to `inset` inside it
+    const inner = line - (horiz ? n[1] : n[0]) * inset, b0 = Math.min(line, inner), b1 = Math.max(line, inner);
+    const strip: R = horiz ? { x: lo, z: b0, w: hi - lo, d: b1 - b0 } : { x: b0, z: lo, w: b1 - b0, d: hi - lo };
+    pieces = pieces.flatMap(p => subtractRects(p, [strip]));
+  }
+  return mergeRects(pieces.filter(p => p.w > 0.05 && p.d > 0.05));
+}
+/** neighbouring rects that share a whole side, joined (so a rect that was cut where two footprint rects meet comes back whole) */
+export function mergeRects(rs: R[]): R[] {
+  const out = rs.map(r => ({ ...r })), eq = (a: number, b: number) => Math.abs(a - b) < 1e-6;
+  for (let again = true; again;) {
+    again = false;
+    for (let i = 0; i < out.length && !again; i++) for (let j = i + 1; j < out.length && !again; j++) {
+      const a = out[i], b = out[j];
+      if (eq(a.x, b.x) && eq(a.w, b.w) && (eq(a.z + a.d, b.z) || eq(b.z + b.d, a.z))) { a.z = Math.min(a.z, b.z); a.d += b.d; out.splice(j, 1); again = true; }
+      else if (eq(a.z, b.z) && eq(a.d, b.d) && (eq(a.x + a.w, b.x) || eq(b.x + b.w, a.x))) { a.x = Math.min(a.x, b.x); a.w += b.w; out.splice(j, 1); again = true; }
+    }
+  }
+  return out;
+}
+
+/** The sunken rooms of a storey whose slab is opened over their pits: it stands over another storey (a raised ground floor
+ *  has a solid foundation under it), and the pit's floor is above grade */
+export const sunkRooms = (spec: any, lv: any) => (lv.rooms || []).filter(r => r.bounds && typeof r.floorOffset === 'number' && r.floorOffset < 0 && (lv.y || 0) + r.floorOffset >= -1e-6
+  && (spec.levels || []).some(o => (o.y || 0) < (lv.y || 0) - 0.5 && (o.footprint || []).some(f => inR(r.bounds.x + r.bounds.w / 2, r.bounds.z + r.bounds.d / 2, f, 0))));
+/** where a sunken room's pit is: its bounds inside the outline */
+export const pitRects = (lv: any, room: any): R[] => insideOutline(lv, [room.bounds]);
+
+/**
+ * A storey's slab openings: null when it has none but its own `voids` (v1 builds those as it always did); else the
+ * loops of the union of its voids, its flights' autoVoid rects, the double-height rooms below it and its sunken rooms —
+ * every one clipped to the slab's outline.
+ */
+export function slabOpenings(spec: any, lv: any): Array<Array<[number, number]>> | null {
+  const rects = openingRects(spec, lv);
+  return rects ? rectLoops(rects) : null;
+}
+/** slabOpenings' rects: null when v1's own voids are all there is, and each lies inside the outline */
+export function openingRects(spec: any, lv: any): R[] | null {
+  if (!((lv.y || 0) > 0.001)) return null;
+  const auto = autoVoidsFor(spec, lv.id), dbl = doubleRoomsUnder(spec, lv).map(d => d.rect), pits = sunkRooms(spec, lv);
+  // v1's voids are built as they are — unless one reaches the outline (a hole on the slab's edge, or past it, breaks the slab's
+  // triangulation: the stairwell of a stair against the east wall came out solid)
+  const v1 = (lv.voids || []).filter(r => r && r.w > 0 && r.d > 0), v1safe = v1.flatMap(v => insideOutline(lv, [v], 0.02));
+  const sameRect = (a: R, b: R) => Math.abs(a.x - b.x) < 1e-6 && Math.abs(a.z - b.z) < 1e-6 && Math.abs(a.w - b.w) < 1e-6 && Math.abs(a.d - b.d) < 1e-6;
+  const v1same = v1safe.length === v1.length && v1.every((v, k) => sameRect(v1safe[k], v));
+  if (!auto.length && !dbl.length && !pits.length && v1same) return null;
+  return [...v1safe, ...insideOutline(lv, [...auto, ...dbl].filter(r => r && r.w > 0 && r.d > 0)), ...pits.flatMap(r => pitRects(lv, r))];
+}
+
+/** Every hole of a storey's slab, whatever made it — what is built, for anything that tests "is this point over a hole" */
+export function slabHoles(spec: any, lv: any): R[] {
+  if (!((lv.y || 0) > 0.001)) return [];   // a ground slab is laid per rect, whole
+  return openingRects(spec, lv) || (lv.voids || []).filter(r => r && r.w > 0 && r.d > 0);
+}
+/** (the raw list, before it is clipped: the validator's) */
 export function allVoids(spec: any, lv: any): R[] {
   return [...(lv.voids || []), ...autoVoidsFor(spec, lv.id), ...doubleRoomsUnder(spec, lv).map(d => d.rect)];
 }
@@ -260,10 +346,81 @@ export function volumeSteps(lv: any, H: number) {
 }
 
 // ---- porches -----------------------------------------------------------------------------------------------------------------
+/** the storey a feature belongs to */
+export const featureLevel = (spec: any, f: any) => (spec.levels || []).find(l => l.id === (f.level || (spec.entry || {}).level)) || (spec.levels || [])[0];
+
+/** A feature's plan rect off a wall: the edge on `side` holding [from, to] (or `at` ± w/2), `depth` out of its face.
+ *  `inner`: from the wall's centre line (a roof's plan), else from its outer face (a deck's). */
+export function offWallRect(lv: any, side: string, a0: number, a1: number, depth: number, inner = false) {
+  const edges = perimeterEdges(lv.footprint || []);
+  const e = edgeFor(edges, { side, at: (a0 + a1) / 2 });
+  if (!e) return null;
+  const horiz = side === 'S' || side === 'N', line = horiz ? e.a[1] : e.a[0], n = OUT[side], s0 = inner ? 0 : WALL_HALF;
+  const b0 = line + (horiz ? n[1] : n[0]) * s0, b1 = line + (horiz ? n[1] : n[0]) * (WALL_HALF + depth);
+  const lo = Math.min(b0, b1), hi = Math.max(b0, b1);
+  return { rect: horiz ? { x: a0, z: lo, w: a1 - a0, d: hi - lo } : { x: lo, z: a0, w: hi - lo, d: a1 - a0 }, line, edge: e, horiz };
+}
+
 /** Where a porch's posts stand along its front (x for S/N, z for E/W): evenly, `posts.n` of them or every
  *  `posts.spacing` (2.4 m), 0.12 m in from each end */
 export function porchPosts(f: any): number[] {
   const len = f.to - f.from, p = f.posts || {};
   const n = p.n ? Math.max(2, p.n) : Math.max(2, Math.round(len / (p.spacing || 2.4)) + 1);
   return Array.from({ length: n }, (_, i) => Math.round((f.from + 0.12 + (len - 0.24) * i / (n - 1)) * 1000) / 1000);
+}
+
+const DEG = Math.PI / 180;
+/**
+ * Everything a porch's builder and the validator both need, THREE-free: its deck, where its posts stand (out of every
+ * doorway and off the steps), and its roof — the eave, the pitch the roof really has, the height it reaches. The roof
+ * leans on the wall just under the eave (0.25 m under a single storey's head; a two-storey house's: 0.25 m over it, on the wall above), falls
+ * to the posts, and keeps 2.3 m over the deck at its eave where it can: a shallower pitch (5° at least) buys that
+ * clearance, and a gable roof's ridge is held to the height a shed would lean on the wall at. `asked` is the pitch the
+ * spec wanted, `pitch` the one it got.
+ */
+export function porchPlan(spec: any, f: any) {
+  const lv = featureLevel(spec, f);
+  if (!lv || !(typeof f.from === 'number' && typeof f.to === 'number' && f.depth > 0)) return null;
+  const y = lv.y || 0, H = lv.height || 2.8;
+  const a0 = Math.min(f.from, f.to), a1 = Math.max(f.from, f.to), depth = f.depth;
+  const ow = offWallRect(lv, f.side, a0, a1, depth);
+  if (!ow) return null;
+  const horiz = ow.horiz, nn = horiz ? OUT[f.side][1] : OUT[f.side][0], line = ow.line;
+  const floorY = f.floorY ?? (y > 0.15 ? y : 0.12);
+  // the doors on this wall, and the steps
+  const doors = openingFrames(lv).filter(fr => fr.side === f.side && fr.kind !== 'window' && fr.kind !== 'glass' && Math.abs(fr.line - line) < 0.05).map(fr => [fr.op.at - fr.w / 2, fr.op.at + fr.w / 2]);
+  const entryHere = !!(spec.entry && spec.entry.level === lv.id && spec.entry.side === f.side && spec.entry.at > a0 && spec.entry.at < a1);
+  const stepsOn = f.steps !== false && floorY > 0.08;
+  const st = typeof f.steps === 'object' && f.steps ? f.steps : {};
+  const stepAt = st.at ?? (entryHere ? spec.entry.at : (a0 + a1) / 2), stepW = st.w ?? 1.5;
+  // posts: evenly along the front, then out of every doorway and off the steps
+  const size = (f.posts && f.posts.size) || (f.posts && f.posts.style === 'steel' ? 0.09 : 0.16);
+  const keepOut = [...doors.map(([p, q]) => [p - 0.15 - size / 2, q + 0.15 + size / 2]), ...(stepsOn ? [[stepAt - stepW / 2 - size / 2 - 0.05, stepAt + stepW / 2 + size / 2 + 0.05]] : [])];
+  const asked = porchPosts(f);
+  const posts = asked.map(p => {
+    const k = keepOut.find(([p0, p1]) => p > p0 && p < p1);
+    if (!k) return p;
+    const to = p - k[0] < k[1] - p ? k[0] : k[1];
+    return Math.min(a1 - 0.12, Math.max(a0 + 0.12, to));
+  }).filter((p, j, arr) => arr.findIndex(q => Math.abs(q - p) < 0.2) === j && !keepOut.some(([p0, p1]) => p > p0 + 0.01 && p < p1 - 0.01));
+  // the roof: its eave on the posts, rising to the wall
+  const roofType: string = f.roof ?? 'shed';
+  const two = (spec.levels || []).some(o => (o.y || 0) > y + H - 0.2 && (o.footprint || []).some(r => inR(horiz ? (a0 + a1) / 2 : line - nn * 0.3, horiz ? line - nn * 0.3 : (a0 + a1) / 2, r, 0)));
+  const yHigh = two ? y + H + 0.25 : y + H - 0.25;
+  const dflt = ({ shed: 12, hip: 22, gable: 32, flat: 0 } as Record<string, number>)[roofType] ?? 12;
+  const asked_pitch: number = f.pitch ?? dflt;
+  let pitch = asked_pitch;
+  const span = roofType === 'gable' ? (a1 - a0) / 2 : depth;
+  let eave = roofType === 'flat' ? yHigh - 0.15 : yHigh - span * Math.tan(pitch * DEG);
+  if (roofType !== 'flat' && roofType !== 'gable' && eave < floorY + 2.3) { pitch = Math.max(5, Math.atan2(yHigh - floorY - 2.3, span) / DEG); eave = yHigh - span * Math.tan(pitch * DEG); }
+  if (roofType === 'gable') {
+    eave = Math.max(floorY + 2.3, eave);
+    // a wide porch's ridge would climb past the wall it leans on: lower the pitch until it tops out where a shed's high edge is
+    if (eave + span * Math.tan(pitch * DEG) > yHigh + 0.02) pitch = Math.max(5, Math.atan2(yHigh - eave, span) / DEG);
+  }
+  const beamH = two ? 0.22 : 0.18, postTop = roofType === 'none' ? floorY + 2.4 : eave - beamH;
+  // the highest the roof (deck and its fascia) stands over the wall it leans on
+  const top = roofType === 'none' ? floorY + 2.4 : roofType === 'flat' ? eave + 0.3 : roofType === 'gable' ? eave + span * Math.tan(pitch * DEG) + 0.15 : yHigh + 0.15;
+  return { lv, y, H, a0, a1, depth, horiz, nn, line, ow, floorY, roofType, two, yHigh, asked: asked_pitch, pitch, span, eave, beamH, postTop, top, clear: +(postTop - floorY).toFixed(3),
+    posts, postsAsked: asked, size, doors, stepsOn, stepAt, stepW, entryHere };
 }

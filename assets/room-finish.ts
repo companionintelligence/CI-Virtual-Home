@@ -17,7 +17,7 @@
 // Everything is built only for a room that asks (or under `defaults: 2`), so a house without these fields is unchanged.
 // Owner: S2 (architecture).
 import { perimeterEdges } from './house-geometry.js';
-import { openingFrames, OUT, WALL_HALF, inR } from './arch-plan.js';
+import { openingFrames, OUT, WALL_HALF, inR, slabHoles, sunkRooms, pitRects, rectLoops, subtractRects } from './arch-plan.js';
 import { mulberry32, fnv1a } from './materials.js';
 import { roomKind } from './fixtures.js';
 
@@ -123,47 +123,64 @@ export function createRoomFinish(bctx) {
   };
 
   // ---- floors (and raised / sunken platforms) --------------------------------------------------------------------------
+  // A room's floor is an overlay on the storey's slab: its bounds inside the footprint, less every hole the slab has (its
+  // voids, a flight's autoVoid, the double-height rooms under it: arch-plan.ts slabHoles) — a floor laid across the
+  // stairwell would seal it. A sunken room's slab is opened over its pit (arch-plan.ts sunkRooms), and the pit has its own floor.
   function floors({ spec, lv, y, put, am, anchors, gen2 }) {
     const picks = roomFloors(spec, lv, gen2);
     const fp = lv.footprint || [];
+    const holes = slabHoles(spec, lv), pits = new Set(sunkRooms(spec, lv));
     (lv.rooms || []).forEach((room, i) => {
       const f = picks.get(room), off = room.floorOffset || 0;
       if (!f && !off) return;
       if (!room.bounds) return;
-      const parts = fp.map(r => clipRect(room.bounds, r)).filter(Boolean);
-      if (!parts.length) return;
+      const isPit = pits.has(room);
+      // each footprint rect once (rects laid over one another share ground), less the slab's holes; a pit's opening has its own floor
+      const seen: Rect[] = [], parts: Rect[] = [];
+      if (!isPit) for (const r of fp) { const c = clipRect(room.bounds, r); if (c) parts.push(...subtractRects(c, [...seen, ...holes])); seen.push(r); }
+      if (!parts.length && !isPit) return;
       const run = f && f.run ? f.run : room.bounds.w >= room.bounds.d ? 'x' : 'z';
       const mat = f ? am.floor(f, { rotation: run === 'x' ? Math.PI / 2 : 0 }) : null;
       const lift = 0.003 + i * 0.0004 + Math.max(0, off);   // a hair apart, so two rooms' overlays never share a plane
-      const g = put(() => {
-        const gg = group(`Room floor (${lv.id} · ${room.name}${f ? ' · ' + f.kind : ''})`, { category: 'Architecture', roomFinish: 'floor', room: room.name });
-        if (mat) for (const r of parts) gg.add(floorPanel(r, mat));
-        if (off > 0) {
-          // a platform: its riser faces round the bounds, in the storey's floor with a nosing
-          const edgeMat = am.paint(0xe9e4dc, { roughness: 0.6 });
-          for (const r of parts) {
-            const box = new THREE.Mesh(new THREE.BoxGeometry(r.w, off, r.d), [edgeMat, edgeMat, edgeMat, edgeMat, edgeMat, edgeMat]);
-            box.position.set(r.x + r.w / 2, -off / 2 - 0.001, r.z + r.d / 2); box.castShadow = true; box.receiveShadow = true; gg.add(box);
-            if (!mat) gg.add(floorPanel(r, am.floor({ kind: lv.floor && ['oak', 'herringbone', 'tile', 'marble', 'concrete', 'terrazzo', 'deck'].includes(lv.floor) ? lv.floor : 'oak' })));
+      if (parts.length) {
+        const g = put(() => {
+          const gg = group(`Room floor (${lv.id} · ${room.name}${f ? ' · ' + f.kind : ''})`, { category: 'Architecture', roomFinish: 'floor', room: room.name });
+          if (mat) for (const r of parts) gg.add(floorPanel(r, mat));
+          if (off > 0) {
+            // a platform: its riser faces round the bounds, in the storey's floor with a nosing
+            const edgeMat = am.paint(0xe9e4dc, { roughness: 0.6 });
+            for (const r of parts) {
+              const box = new THREE.Mesh(new THREE.BoxGeometry(r.w, off, r.d), [edgeMat, edgeMat, edgeMat, edgeMat, edgeMat, edgeMat]);
+              box.position.set(r.x + r.w / 2, -off / 2 - 0.001, r.z + r.d / 2); box.castShadow = true; box.receiveShadow = true; gg.add(box);
+              if (!mat) gg.add(floorPanel(r, am.floor({ kind: lv.floor && ['oak', 'herringbone', 'tile', 'marble', 'concrete', 'terrazzo', 'deck'].includes(lv.floor) ? lv.floor : 'oak' })));
+            }
           }
-        }
-        return gg;
-      }, 0, 0, y + lift, null, 'floor');
-      noteRoom(anchors, lv, room, { floor: f ? f.kind : undefined, floorColor: f ? f.color : undefined, floorY: +(y + Math.max(0, off) + (off < 0 ? off : 0)).toFixed(3), floorOffset: off || undefined });
-      g.userData.room = room.name;
+          return gg;
+        }, 0, 0, y + lift, null, 'floor');
+        g.userData.room = room.name;
+      }
+      noteRoom(anchors, lv, room, { floor: f ? f.kind : undefined, floorColor: f ? f.color : undefined, floorY: +(y + Math.max(0, off) + (isPit ? off : 0)).toFixed(3), floorOffset: off || undefined });
     });
-    // sunken rooms: a pit floor and its sides (the slab over the pit is opened by arch-plan.ts slabOpenings)
+    // sunken rooms: the slab is open over the pit — a floor (a slab of its own, so the room below sees a soffit), and the sides
+    // from the pit's floor up to the storey's floor, round the edge of the opening
     for (const room of lv.rooms || []) {
-      const off = room.floorOffset || 0;
-      if (!(off < 0) || !room.bounds || y + off < -1e-6) continue;
-      const f = picks.get(room), mat = f ? am.floor(f) : am.floor({ kind: 'oak' }), side = am.paint(0xe9e4dc, { roughness: 0.6 });
+      if (!pits.has(room)) continue;
+      const off = room.floorOffset, f = picks.get(room), mat = f ? am.floor(f, { rotation: room.bounds.w >= room.bounds.d ? Math.PI / 2 : 0 }) : am.floor({ kind: lv.floor && ['oak', 'herringbone', 'tile', 'marble', 'concrete', 'terrazzo'].includes(lv.floor) ? lv.floor : 'oak' });
+      const side = am.paint(0xe9e4dc, { roughness: 0.6 }), rects = pitRects(lv, room), T = 0.05, FT = 0.12;
       put(() => {
-        const gg = group(`Sunken floor (${lv.id} · ${room.name})`, { category: 'Architecture', roomFinish: 'pit' });
-        const b = room.bounds;
-        gg.add(floorPanel(b, mat));
-        const T = 0.18, depth = -off + T;
-        for (const [w, d, x, z] of [[b.w, 0.04, b.x + b.w / 2, b.z + 0.02], [b.w, 0.04, b.x + b.w / 2, b.z + b.d - 0.02], [0.04, b.d, b.x + 0.02, b.z + b.d / 2], [0.04, b.d, b.x + b.w - 0.02, b.z + b.d / 2]]) {
-          const m = new THREE.Mesh(new THREE.BoxGeometry(w, depth, d), side); m.position.set(x, depth / 2 - 0.001, z); m.receiveShadow = true; gg.add(m);
+        const gg = group(`Sunken floor (${lv.id} · ${room.name})`, { category: 'Architecture', roomFinish: 'pit', room: room.name });
+        for (const r of rects) {
+          gg.add(floorPanel(r, mat));
+          const slab = new THREE.Mesh(new THREE.BoxGeometry(r.w, FT, r.d), side); slab.position.set(r.x + r.w / 2, -FT / 2 - 0.002, r.z + r.d / 2); slab.receiveShadow = true; gg.add(slab);
+        }
+        // the sides run round the union's loops; the pit is on the left of every edge (the loops' winding: house-geometry.ts outlineLoops)
+        const H2 = -off + FT;
+        for (const loop of rectLoops(rects)) for (let k = 0; k < loop.length; k++) {
+          const a = loop[k], b = loop[(k + 1) % loop.length], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+          if (len < 0.02) continue;
+          const dx = (b[0] - a[0]) / len, dz = (b[1] - a[1]) / len, nx = dz, nz = -dx;
+          const m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(dx) > 0.5 ? len : T, H2 - 0.004, Math.abs(dx) > 0.5 ? T : len), side);
+          m.position.set((a[0] + b[0]) / 2 + nx * T / 2, H2 / 2 - FT - 0.002 + 0.002, (a[1] + b[1]) / 2 + nz * T / 2); m.castShadow = true; m.receiveShadow = true; gg.add(m);
         }
         return gg;
       }, 0, 0, y + off + 0.002, null, 'floor');

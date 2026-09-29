@@ -281,7 +281,7 @@ export interface PorchFeature {
   finish?: ArchRoof['finish'];
   posts?: { spacing?: number; n?: number; style?: 'square' | 'round' | 'turned' | 'tapered' | 'steel'; size?: number; color?: Colour };
   rail?: boolean | { style?: 'spindle' | 'glass' | 'metal' | 'timber'; color?: Colour; h?: number };
-  /** the deck's top (default the storey's y, or 0.3 m on a storey at grade) */
+  /** the deck's top (default the storey's y, or 0.12 m on a storey at grade) */
   floorY?: number;
   floorColor?: Colour;
   /** steps down to grade: where along the front (default opposite the entry door, else the middle) */
@@ -313,8 +313,12 @@ export interface BayFeature {
   w: number;
   depth: number;
   form?: 'box' | 'canted';
-  roof?: 'hip' | 'shed' | 'flat' | 'gable';
+  /** 'none': no roof of its own — a bay over another bay stands on its roof-less top */
+  roof?: 'hip' | 'shed' | 'flat' | 'gable' | 'none';
   roofColor?: Colour;
+  /** what it stands on: 'grade' a stone pier to the ground (the default on the lowest storey), 'oriel' a deep sill course in the wall's cladding
+   *  (the default above it — a bay over a lower bay stands on that bay's top), 'none' the bare floor */
+  skirt?: 'grade' | 'oriel' | 'none';
   /** its windows' sill and head over the floor */
   sill?: number;
   head?: number;

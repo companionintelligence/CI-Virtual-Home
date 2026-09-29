@@ -15,29 +15,38 @@ const HEADROOM = 1.9;   // metres over a tread the slab's underside must clear (
 registerSceneCheck('stair-headroom', ({ THREE, scene, house, placedItems }) => {
   const anchors = house && house.anchors;
   if (!anchors || !(anchors.stairs || []).length) return [];
-  const floors = placedItems.filter(o => o.userData && o.userData.role === 'floor' && !(o.userData.roomFinish));
+  // every floor there is: the slabs and the room floors laid on them (a room floor across the stairwell seals it as surely as the slab)
+  const floors = placedItems.filter(o => o.userData && o.userData.role === 'floor');
   if (!floors.length) return [];
   scene.updateMatrixWorld(true);
   const rc = new THREE.Raycaster(); rc.far = 2.2;
-  const up = new THREE.Vector3(0, 1, 0), issues = [];
+  const up = new THREE.Vector3(0, 1, 0), down = new THREE.Vector3(0, -1, 0), issues = [];
+  const shown = o => { for (let p = o; p; p = p.parent) if (p.visible === false) return false; return true; };
   for (const [i, st] of anchors.stairs.entries()) {
     // the walking line: the plan's (turning and arrayed flights) or the straight run's
     const pts = (st.path && st.path.length ? st.path : [st.bottom, st.top]) as number[][];
     if (st.shape === 'spiral' || st.type === 'spiral') continue;
+    const topY = st.top ? st.top[1] : pts[pts.length - 1][1];
     let bump = null;
     for (let k = 0; k < pts.length - 1 && !bump; k++) {
       const a = pts[k], b = pts[k + 1], len = Math.hypot(b[0] - a[0], b[2] - a[2]), n = Math.max(2, Math.ceil(len / 0.25));
       for (let s = 0; s <= n; s++) {
         const t = s / n, x = a[0] + (b[0] - a[0]) * t, z = a[2] + (b[2] - a[2]) * t, y = a[1] + (b[1] - a[1]) * t;
         // the last step is the upper floor itself
-        if (y > (st.top ? st.top[1] : y) - 0.05) continue;
-        rc.set(new THREE.Vector3(x, y + 0.05, z), up);
-        const hit = rc.intersectObjects(floors, true).find(h => h.object.visible !== false);
+        if (y > topY - 0.05) continue;
+        // from the tread up: a slab built over the climb (the ray meets its underside)
+        rc.far = 2.2; rc.set(new THREE.Vector3(x, y + 0.05, z), up);
+        const hit = rc.intersectObjects(floors, true).find(h => shown(h.object));
         // (a slab within a hand's breadth is the floor the flight arrives on, not one it climbs under)
         if (hit && hit.distance > 0.3 && hit.distance < HEADROOM) { bump = { x, y, z, d: hit.distance }; break; }
+        // from the storey above down: a floor laid over the climb — a room's overlay, which an upward ray passes through the back of
+        rc.far = 0.9; rc.set(new THREE.Vector3(x, topY + 0.5, z), down);
+        const ov = rc.intersectObjects(floors, true).find(h => shown(h.object) && Math.abs(h.point.y - topY) < 0.3);
+        // (its height over the tread, from where the upward ray starts: a floor 2 m up is where a slab should be, one under 1.9 m is a lid)
+        if (ov && ov.point.y - (y + 0.05) > 0.3 && ov.point.y - (y + 0.05) < HEADROOM) { bump = { x, y, z, d: ov.point.y - y }; break; }
       }
     }
-    if (bump) issues.push({ level: 'warn', message: `stair ${st.from}→${st.to}${st.index ? ` #${st.index}` : ''}: ${bump.d.toFixed(2)} m of headroom over the tread at (${bump.x.toFixed(2)}, ${bump.z.toFixed(2)}) — a slab is built over the climb (a void, or autoVoid: true)`, subject: `stairs:${st.from}:${i}` });
+    if (bump) issues.push({ level: 'warn', message: `stair ${st.from}→${st.to}${st.index ? ` #${st.index}` : ''}: ${bump.d.toFixed(2)} m of headroom over the tread at (${bump.x.toFixed(2)}, ${bump.z.toFixed(2)}) — a floor is built over the climb (a void, or autoVoid: true)`, subject: `stairs:${st.from}:${i}` });
   }
   return issues;
 });
@@ -46,7 +55,7 @@ registerSceneCheck('stair-step-off', ({ THREE, scene, house, placedItems }) => {
   const anchors = house && house.anchors;
   if (!anchors || !(anchors.stairs || []).length) return [];
   // floor: the storey's slab, or a deck or a platform of the site the flight arrives on
-  const floors = placedItems.filter(o => o.userData && (o.userData.role === 'floor' || o.userData.role === 'site') && !(o.userData.roomFinish));
+  const floors = placedItems.filter(o => o.userData && (o.userData.role === 'floor' || o.userData.role === 'site'));
   const blockers = placedItems.filter(o => o.userData && (o.userData.isWall || o.userData.partition || o.userData.role === 'structure') && !o.userData.stair && !o.userData.isRoof);
   scene.updateMatrixWorld(true);
   const rc = new THREE.Raycaster(), down = new THREE.Vector3(0, -1, 0), issues = [];
@@ -68,15 +77,18 @@ registerSceneCheck('stair-step-off', ({ THREE, scene, house, placedItems }) => {
   return issues;
 });
 
-registerSceneCheck('feature-detached', ({ THREE, scene, placedItems, trackedWalls }) => {
-  const parts = placedItems.filter(o => /^(Porch \(|Porch roof|Bay roof|Bay floor|balcony deck|Canopy)/.test(o.name || ''));
+registerSceneCheck('feature-detached', ({ THREE, scene, placedItems, trackedWalls, trackedRoofs }) => {
+  const parts = placedItems.filter(o => /^(Porch \(|Porch roof|Bay roof|Bay floor|balcony deck|loggia deck|terrace deck|Canopy)/.test(o.name || ''));
   if (!parts.length || !trackedWalls.length) return [];
   scene.updateMatrixWorld(true);
   const walls = trackedWalls.map(w => new THREE.Box3().setFromObject(w));
+  // a terrace is a deck on a roof of the house: the roof it stands on counts as touching
+  const roofs = (trackedRoofs || []).filter(r => !(r.name && /^terrace deck/.test(r.name))).map(r => new THREE.Box3().setFromObject(r));
   const issues = [];
   for (const p of parts) {
     const b = new THREE.Box3().setFromObject(p).expandByScalar(0.16);
-    if (!walls.some(w => w.intersectsBox(b))) issues.push({ level: 'warn', message: `"${p.name}" touches no wall — it floats off the house`, subject: p.name });
+    const terrace = /^terrace deck/.test(p.name || '');
+    if (!walls.some(w => w.intersectsBox(b)) && !(terrace && roofs.some(r => r.intersectsBox(b)))) issues.push({ level: 'warn', message: `"${p.name}" touches no wall${terrace ? ' or roof' : ''} — it floats off the house`, subject: p.name });
   }
   return issues;
 });

@@ -7,10 +7,12 @@
 //   balcony    { level, side, from, to, depth | rect, rail: glass|metal|timber|parapet|none } — a slab out of the wall with
 //              rails round its free edges;  terrace { level, rect } — a deck and rails on a lower roof (it fades with the
 //              roof);  loggia { level, rect, posts } — a recessed outdoor room under the storey above, floored and railed
-//   bay        { level, side, at, w, depth, form: box|canted, roof, sill, head, h } — the host wall opened, a floor, glazed
-//              walls (box, or canted at 45°), a ceiling and its own roof
+//   bay        { level, side, at, w, depth, form: box|canted, roof: hip|shed|flat|gable|none, skirt: grade|oriel|none, sill, head, h }
+//              — the host wall opened, a floor on a stone skirt to grade (lowest storey) or a sill course (higher: an oriel), glazed
+//              walls (box, or canted at 45°), a ceiling and its own roof (none: a bay over it stands on its top)
 //   fireplace  { level, at, rot, style: modern|mantel|stone|painted-brick|tv-breast, w, chimney, stack: outside|inside } —
-//              a chimney breast with its hearth, and the stack it needs: outside an exterior wall (shouldered, from grade)
+//              a chimney breast with its hearth, and the stack it needs: outside an exterior wall (shouldered, from grade; its
+//              width is along the wall, its depth out of it, on an E or W wall as on a S or N one)
 //              or up through the storeys above, always out through the roof over it. A fireplace room item with
 //              `chimney: true` gets the stack alone.
 //   builtin    { level, kind: bookcase-wall|niche|wine-wall|window-seat|media-wall, from, to, face, h, d, color }
@@ -19,7 +21,7 @@
 // Plan-geometry helpers (porch posts, …) are in arch-plan.ts so the validator and the plan twins place things the same way.
 // Owner: S2 (architecture).
 import { perimeterEdges } from './house-geometry.js';
-import { edgeFor, porchPosts, openingFrames, OUT, WALL_HALF, inR } from './arch-plan.js';
+import { edgeFor, porchPlan, featureLevel, offWallRect, OUT, WALL_HALF, inR } from './arch-plan.js';
 import { buildRoofs, planRoofModels, roofTopAt, roofUnderAt } from './roofs.js';
 import { mulberry32, fnv1a } from './materials.js';
 import { worldUV } from './textures.js';
@@ -32,20 +34,7 @@ const DEG = Math.PI / 180;
 const hexOf = (c: any, d: number) => (c === undefined || c === null ? d : typeof c === 'number' ? c : parseInt(String(c).replace('#', ''), 16));
 const r3 = (v: number) => Math.round(v * 1000) / 1000;
 
-/** the storey a feature belongs to */
-export const featureLevel = (spec: any, f: any) => (spec.levels || []).find(l => l.id === (f.level || (spec.entry || {}).level)) || (spec.levels || [])[0];
-
-/** A feature's plan rect off a wall: the edge on `side` holding [from, to] (or `at` ± w/2), `depth` out of its face.
- *  `inner`: from the wall's centre line (a roof's plan), else from its outer face (a deck's). */
-export function offWallRect(lv: any, side: string, a0: number, a1: number, depth: number, inner = false) {
-  const edges = perimeterEdges(lv.footprint || []);
-  const e = edgeFor(edges, { side, at: (a0 + a1) / 2 });
-  if (!e) return null;
-  const horiz = side === 'S' || side === 'N', line = horiz ? e.a[1] : e.a[0], n = OUT[side], s0 = inner ? 0 : WALL_HALF;
-  const b0 = line + (horiz ? n[1] : n[0]) * s0, b1 = line + (horiz ? n[1] : n[0]) * (WALL_HALF + depth);
-  const lo = Math.min(b0, b1), hi = Math.max(b0, b1);
-  return { rect: horiz ? { x: a0, z: lo, w: a1 - a0, d: hi - lo } : { x: lo, z: a0, w: hi - lo, d: a1 - a0 }, line, edge: e, horiz };
-}
+export { featureLevel, offWallRect };
 
 export function createFeatures(bctx) {
   const { THREE, ProceduralArchitecture, AssetFactory, registerTrackedWall, registerRoof, registerCeiling, group, std } = bctx;
@@ -202,6 +191,8 @@ export function createFeatures(bctx) {
     } else walls.push({ a: P(s0, 0), b: P(s0, depth), len: 0, openings: [] }, { a: P(s0, depth), b: P(s1, depth), len: 0, openings: [] }, { a: P(s1, depth), b: P(s1, 0), len: 0, openings: [] });
     for (const w of walls) { w.len = Math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]); w.openings = win(w.len - (canted ? 0 : 0.1)); }
     const clad = kitb.wallCladding(kit, { spec, defaults, lv, edge: ow.edge });
+    const lowestY = Math.min(...(spec.levels || []).map(l => l.y || 0));
+    const skirt: string = f.skirt ?? ((lv.y || 0) <= lowestY + 0.05 ? 'grade' : 'oriel');
     for (const w of walls) {
       const mx = (w.a[0] + w.b[0]) / 2, mz = (w.a[1] + w.b[1]) / 2;
       // the wall's local +z must face out of the bay: its outward normal is the plan normal pointing away from the host
@@ -223,9 +214,15 @@ export function createFeatures(bctx) {
     put(() => {
       const g = group(`Bay floor (${lv.id} ${f.side} ${f.at})`, { category: 'Architecture' });
       const top = new THREE.Mesh(new THREE.ShapeGeometry(shape), floorMat); top.rotation.x = Math.PI / 2; top.position.y = 0.001; top.receiveShadow = true; top.material.side = THREE.DoubleSide; g.add(top);
-      const skirtH = y > 0.05 ? y : 0.15;
-      const sk = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: skirtH, bevelEnabled: false }), am.cladding({ kind: (lv.plinth && lv.plinth.material) || 'stone', color: (lv.plinth && lv.plinth.color) || '#a39c90' }));
-      sk.rotation.x = Math.PI / 2; sk.position.y = -0.002; sk.castShadow = true; sk.receiveShadow = true; g.add(sk);
+      // under a bay: on the lowest storey a stone skirt down to grade; higher up (an oriel) a deep sill course in the wall's own
+      // cladding — a pier to the ground under a bay over open air would be a column, and one over a lower bay would
+      // fill its windows; `skirt: 'grade'` asks for the pier, `'none'` for the bare floor
+      const skirtH = skirt === 'grade' ? (y > 0.05 ? y : 0.15) : skirt === 'oriel' ? 0.3 : 0;
+      if (skirtH > 0) {
+        const skMat = skirt === 'grade' ? am.cladding({ kind: (lv.plinth && lv.plinth.material) || 'stone', color: (lv.plinth && lv.plinth.color) || '#a39c90' }) : (clad && clad.isMaterial ? clad : am.cladding({ kind: 'stucco', color: '#' + wallColor.toString(16).padStart(6, '0') }));
+        const sk = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: skirtH, bevelEnabled: false }), skMat);
+        sk.rotation.x = Math.PI / 2; sk.position.y = -0.002; sk.castShadow = true; sk.receiveShadow = true; g.add(sk);
+      }
       return g;
     }, 0, 0, y, null, 'floor');
     const ceil = put(() => {
@@ -234,7 +231,7 @@ export function createFeatures(bctx) {
       return g;
     }, 0, 0, y + h - 0.02, null, null);
     if (typeof registerCeiling === 'function') registerCeiling(ceil, y + h - 0.02);
-    anchors.arch.features.push({ type: 'bay', level: lv.id, side: f.side, at: f.at, w: f.w, depth, form: canted ? 'canted' : 'box', outline: outline.map(p => [r3(p[0]), r3(p[1])]), y: r3(y), h: r3(h), roof: f.roof || 'hip', roofColor: f.roofColor || undefined });
+    anchors.arch.features.push({ type: 'bay', level: lv.id, side: f.side, at: f.at, w: f.w, depth, form: canted ? 'canted' : 'box', skirt, outline: outline.map(p => [r3(p[0]), r3(p[1])]), y: r3(y), h: r3(h), roof: f.roof || 'hip', roofColor: f.roofColor || undefined });
   }
 
   function balcony({ spec, lv, f, i, y, H, am, put, anchors }) {
@@ -424,43 +421,17 @@ export function createFeatures(bctx) {
   }
 
   function porch({ spec, f, i, kit, palette, put, anchors }) {
-    const lv = featureLevel(spec, f), y = lv.y || 0, H = lv.height || 2.8;
-    const a0 = Math.min(f.from, f.to), a1 = Math.max(f.from, f.to), depth = f.depth;
-    const ow = offWallRect(lv, f.side, a0, a1, depth), owR = offWallRect(lv, f.side, a0, a1, depth, true);
-    if (!ow) return;
-    const R = ow.rect, horiz = ow.horiz, n = OUT[f.side], nn = horiz ? n[1] : n[0], line = ow.line;
-    const floorY = f.floorY ?? (y > 0.15 ? y : 0.12);
+    const plan = porchPlan(spec, f);
+    if (!plan) return;
+    const { lv, a0, a1, depth, horiz, nn, line, floorY, roofType, stepsOn, stepAt, stepW, size, posts, eave, pitch, beamH, postTop } = plan;
+    const ow = plan.ow, owR = offWallRect(lv, f.side, a0, a1, depth, true);
+    const R = ow.rect;
     const deckMat = kit.floor('deck', f.floorColor ? { color: hexOf(f.floorColor, 0) } : {});
     const skirtMat = std(0xd8d2c7, { roughness: 0.85 });
     const trim = hexOf(palette.trim, 0x2b2f33);
     const postCol = hexOf(f.posts && f.posts.color, 0xf2efe9), postMat = std(postCol, { roughness: 0.55 });
     const frontLine = line + nn * (WALL_HALF + depth);
     const W = (a: number, o: number) => (horiz ? [a, o] : [o, a]);   // (along, across) → plan
-    // where the doors are on this wall, and the steps
-    const doors = openingFrames(lv).filter(fr => fr.side === f.side && fr.kind !== 'window' && fr.kind !== 'glass' && Math.abs(fr.line - line) < 0.05).map(fr => [fr.op.at - fr.w / 2, fr.op.at + fr.w / 2]);
-    const entryHere = spec.entry && spec.entry.level === lv.id && spec.entry.side === f.side && spec.entry.at > a0 && spec.entry.at < a1;
-    const stepsOn = f.steps !== false && floorY > 0.08;
-    const st = typeof f.steps === 'object' ? f.steps : {};
-    const stepAt = st.at ?? (entryHere ? spec.entry.at : (a0 + a1) / 2), stepW = st.w ?? 1.5;
-    // posts: evenly along the front, then out of every doorway and off the steps
-    const size = (f.posts && f.posts.size) || (f.posts && f.posts.style === 'steel' ? 0.09 : 0.16);
-    const keepOut = [...doors.map(([p, q]) => [p - 0.15 - size / 2, q + 0.15 + size / 2]), ...(stepsOn ? [[stepAt - stepW / 2 - size / 2 - 0.05, stepAt + stepW / 2 + size / 2 + 0.05]] : [])];
-    const posts = porchPosts(f).map(p => {
-      const k = keepOut.find(([p0, p1]) => p > p0 && p < p1);
-      if (!k) return p;
-      const to = p - k[0] < k[1] - p ? k[0] : k[1];
-      return Math.min(a1 - 0.12, Math.max(a0 + 0.12, to));
-    }).filter((p, j, arr) => arr.findIndex(q => Math.abs(q - p) < 0.2) === j && !keepOut.some(([p0, p1]) => p > p0 + 0.01 && p < p1 - 0.01));
-    // the roof: its eave on the posts, rising to the wall
-    const roofType = f.roof ?? 'shed';
-    const two = (spec.levels || []).some(o => (o.y || 0) > y + H - 0.2 && (o.footprint || []).some(r => inR(horiz ? (a0 + a1) / 2 : line - nn * 0.3, horiz ? line - nn * 0.3 : (a0 + a1) / 2, r, 0)));
-    const yHigh = two ? y + H + 0.25 : y + H - 0.35;
-    let pitch = f.pitch ?? ({ shed: 12, hip: 22, gable: 32, flat: 0 }[roofType] ?? 12);
-    const span = roofType === 'gable' ? (a1 - a0) / 2 : depth;
-    let eave = roofType === 'flat' ? yHigh - 0.15 : yHigh - span * Math.tan(pitch * DEG);
-    if (roofType !== 'flat' && roofType !== 'gable' && eave < floorY + 2.3) { pitch = Math.max(5, Math.atan2(yHigh - floorY - 2.3, span) / DEG); eave = yHigh - span * Math.tan(pitch * DEG); }
-    if (roofType === 'gable') eave = Math.max(floorY + 2.3, eave);
-    const beamH = 0.22, postTop = roofType === 'none' ? floorY + 2.4 : eave - beamH;
     const g = put(() => {
       const gg = group(`Porch (${lv.id} ${f.side} ${a0}–${a1})`, { category: 'Architecture' });
       // the deck on its skirt
@@ -554,11 +525,15 @@ export function createFeatures(bctx) {
     // a fresh material per part: the part above the eave is registered as a roof, and the fade writes to its materials
     const matFor = () => c.material === 'stone' ? am.own(am.cladding({ kind: 'stone', color: c.color || '#a39d92' })) : c.material === 'stucco' ? am.own(am.cladding({ kind: 'stucco', color: c.color || palette.wall || '#e7e2d8' })) : brick();
     // plan: outside — against the wall's outer face, centred on the hearth; inside — behind the hearth, in the breast
+    // `w` is the stack's width along its wall, `d` its depth out of it: on a S or N wall that is x then z, on an E or W wall z then x
     const sw = c.w ?? (outside ? 0.9 : 0.75), sd = c.d ?? 0.6;
+    const alongX = outside ? (wall.side === 'S' || wall.side === 'N') : Math.abs(fwd[1]) >= Math.abs(fwd[0]);   // (inside: across the hearth's heading)
+    const ex = (a: number, o: number) => (alongX ? a : o), ez = (a: number, o: number) => (alongX ? o : a);   // (along, out) sizes → plan x, z
     let cx, cz;
-    if (outside) { const n = OUT[wall.side]; cx = at[0] - fwd[0] * wall.d + n[0] * (WALL_HALF + sd / 2) + (Math.abs(n[0]) > 0 ? 0 : 0); cz = at[1] - fwd[1] * wall.d + n[1] * (WALL_HALF + sd / 2); if (wall.side === 'S' || wall.side === 'N') cx = at[0]; else cz = at[1]; }
+    if (outside) { const n = OUT[wall.side]; cx = at[0] - fwd[0] * wall.d + n[0] * (WALL_HALF + sd / 2); cz = at[1] - fwd[1] * wall.d + n[1] * (WALL_HALF + sd / 2); if (alongX) cx = at[0]; else cz = at[1]; }
     else { cx = at[0] - fwd[0] * ((wall ? wall.d - wall.half : 0.2) - 0.25); cz = at[1] - fwd[1] * ((wall ? wall.d - wall.half : 0.2) - 0.25); }
-    const pts = [[cx - sw / 2, cz - sd / 2], [cx + sw / 2, cz - sd / 2], [cx - sw / 2, cz + sd / 2], [cx + sw / 2, cz + sd / 2], [cx, cz]];
+    const hx = ex(sw, sd) / 2, hz = ez(sw, sd) / 2;
+    const pts = [[cx - hx, cz - hz], [cx + hx, cz - hz], [cx - hx, cz + hz], [cx + hx, cz + hz], [cx, cz]];
     const tops = pts.map(([x, z]) => roofTopAt(models, x, z)).filter(v => v !== null);
     const topStorey = (spec.levels || []).reduce((m2, l) => (l.footprint || []).some(r => inR(cx, cz, r, outside ? 0.9 : 0.05)) ? Math.max(m2, (l.y || 0) + (l.height || 2.8)) : m2, y + H);
     const roofHi = tops.length ? Math.max(...tops) : topStorey + 0.25;
@@ -573,12 +548,12 @@ export function createFeatures(bctx) {
       if (outside && y0 < topStorey - 0.6 && y1 > topStorey - 0.6) {
         // a shouldered stack: wide below the top storey's head, the flue above
         const sh = topStorey - 0.6, wide = sw + 0.4;
-        box(gg, wide, sh - y0, sd + 0.1, cx, (y0 + sh) / 2, cz, mat); box(gg, sw, y1 - sh, sd, cx, (sh + y1) / 2, cz, mat);
-      } else box(gg, outside && y1 < topStorey - 0.6 ? sw + 0.4 : sw, y1 - y0, outside && y1 < topStorey - 0.6 ? sd + 0.1 : sd, cx, (y0 + y1) / 2, cz, mat);
+        box(gg, ex(wide, sd + 0.1), sh - y0, ez(wide, sd + 0.1), cx, (y0 + sh) / 2, cz, mat); box(gg, ex(sw, sd), y1 - sh, ez(sw, sd), cx, (sh + y1) / 2, cz, mat);
+      } else { const wide = outside && y1 < topStorey - 0.6; box(gg, ex(wide ? sw + 0.4 : sw, wide ? sd + 0.1 : sd), y1 - y0, ez(wide ? sw + 0.4 : sw, wide ? sd + 0.1 : sd), cx, (y0 + y1) / 2, cz, mat); }
       if (withCap) {
-        box(gg, sw + 0.06, 0.15, sd + 0.06, cx, y1 - 0.2, cz, mat);
-        if (c.cap === 'metal') { const cm = std(0x3a3d40, { roughness: 0.4, metalness: 0.7 }); box(gg, sw + 0.14, 0.04, sd + 0.14, cx, y1 + 0.24, cz, cm); for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box(gg, 0.03, 0.22, 0.03, cx + dx * (sw / 2 - 0.05), y1 + 0.11, cz + dz * (sd / 2 - 0.05), cm, false); }
-        else { box(gg, sw + 0.12, 0.08, sd + 0.12, cx, y1 + 0.04, cz, std(0x8d877f, { roughness: 0.9 })); if (c.cap !== 'stone') { const pot = std(0x7a4a3a, { roughness: 0.85 }); for (const [dx, dz] of [[0.14, -0.1], [-0.13, 0.1]]) { const f2 = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.095, 0.28, 10), pot); f2.position.set(cx + dx, y1 + 0.22, cz + dz); gg.add(f2); } } }
+        box(gg, ex(sw + 0.06, sd + 0.06), 0.15, ez(sw + 0.06, sd + 0.06), cx, y1 - 0.2, cz, mat);
+        if (c.cap === 'metal') { const cm = std(0x3a3d40, { roughness: 0.4, metalness: 0.7 }); box(gg, ex(sw + 0.14, sd + 0.14), 0.04, ez(sw + 0.14, sd + 0.14), cx, y1 + 0.24, cz, cm); for (const [dx, dz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) box(gg, 0.03, 0.22, 0.03, cx + dx * (hx - 0.05), y1 + 0.11, cz + dz * (hz - 0.05), cm, false); }
+        else { box(gg, ex(sw + 0.12, sd + 0.12), 0.08, ez(sw + 0.12, sd + 0.12), cx, y1 + 0.04, cz, std(0x8d877f, { roughness: 0.9 })); if (c.cap !== 'stone') { const pot = std(0x7a4a3a, { roughness: 0.85 }); for (const [dx, dz] of [[0.14, -0.1], [-0.13, 0.1]]) { const f2 = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.095, 0.28, 10), pot); f2.position.set(cx + (alongX ? dx : dz), y1 + 0.22, cz + (alongX ? dz : dx)); gg.add(f2); } } }
       }
       return gg;
     };
@@ -592,7 +567,8 @@ export function createFeatures(bctx) {
     }
     const above = put(() => build(outside ? split : Math.min(split, eaveY - 0.3), topY, `Chimney (${lv.id})`, true), 0, 0, 0, null, null);
     above.userData.isRoof = true; registerRoof(above);
-    anchors.arch.features.push({ type: 'chimney', level: lv.id, at: [r3(cx), r3(cz)], w: sw, d: sd, top: r3(topY), base: r3(outside ? 0 : y + H), outside: !!outside, material: c.material || 'brick', color: c.color, hearth: at });
+    // w, d: the flue's plan extents (x, z); shoulder: the stack's plan extents below the top storey's head
+    anchors.arch.features.push({ type: 'chimney', level: lv.id, at: [r3(cx), r3(cz)], w: r3(ex(sw, sd)), d: r3(ez(sw, sd)), shoulder: outside ? [r3(ex(sw + 0.4, sd + 0.1)), r3(ez(sw + 0.4, sd + 0.1))] : undefined, side: outside ? wall.side : undefined, top: r3(topY), base: r3(outside ? 0 : y + H), outside: !!outside, material: c.material || 'brick', color: c.color, hearth: at });
   }
   function worldMapped(m, set) {
     m.map = set.map; m.normalMap = set.normalMap; m.roughnessMap = set.roughnessMap; m.roughness = 1;

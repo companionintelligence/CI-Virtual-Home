@@ -945,11 +945,30 @@ export function buildRoofs(spec, deps) {
     function flat() {
       const p = rf.parapet ?? 0.35, H = 0.22;
       const w = o.x1 - o.x0, d = o.z1 - o.z0;
-      const slabGeo = new THREE.BoxGeometry(w, H, d);
-      const uv = slabGeo.attributes.uv, pos = slabGeo.attributes.position;
-      for (let i = 8; i < 12; i++) uv.setXY(i, pos.getX(i) + cx, pos.getZ(i) + cz);   // the membrane (box face 2) in world metres
-      const slab = new THREE.Mesh(slabGeo, [fasciaMat, fasciaMat, roofMat, soffitMat, fasciaMat, fasciaMat]);
-      slab.position.set(cx, H / 2, cz); add(slab).name = 'Roof slab';
+      // S2 clip: where a storey stands up through the roof's plan, the slab is cut round it (as the pitched deck is) — else the
+      // slab runs 0.22 m through that storey's rooms. The pieces are rects of the overhang rectangle.
+      const pieces: Rect[] = m.holes.length
+        ? subtractRects([[o.x0, o.z0], [o.x1, o.z0], [o.x1, o.z1], [o.x0, o.z1]], m.holes).map(poly => ({ x0: Math.min(...poly.map(q => q[0])), x1: Math.max(...poly.map(q => q[0])), z0: Math.min(...poly.map(q => q[1])), z1: Math.max(...poly.map(q => q[1])) })).filter(r => r.x1 - r.x0 > 0.02 && r.z1 - r.z0 > 0.02)
+        : [o];
+      for (const r of pieces) {
+        const pcx = (r.x0 + r.x1) / 2, pcz = (r.z0 + r.z1) / 2;
+        const slabGeo = new THREE.BoxGeometry(r.x1 - r.x0, H, r.z1 - r.z0);
+        const uv = slabGeo.attributes.uv, pos = slabGeo.attributes.position;
+        for (let i = 8; i < 12; i++) uv.setXY(i, pos.getX(i) + pcx, pos.getZ(i) + pcz);   // the membrane (box face 2) in world metres
+        const slab = new THREE.Mesh(slabGeo, [fasciaMat, fasciaMat, roofMat, soffitMat, fasciaMat, fasciaMat]);
+        slab.position.set(pcx, H / 2, pcz); add(slab).name = 'Roof slab';
+      }
+      // a parapet run is cut where a rising storey's wall stands across it
+      const cutRuns = (s: Side, lo: number, hi: number, line: number): Array<[number, number]> => {
+        let runs: Array<[number, number]> = [[lo, hi]];
+        for (const h of m.holes) {
+          const ax = along(s);   // the run's own axis: 0 = x
+          const acrossLo = ax === 0 ? h.z0 : h.x0, acrossHi = ax === 0 ? h.z1 : h.x1, a0 = ax === 0 ? h.x0 : h.z0, a1 = ax === 0 ? h.x1 : h.z1;
+          if (line < acrossLo - 0.25 || line > acrossHi + 0.25) continue;
+          runs = runs.flatMap(([r0, r1]) => (a1 <= r0 || a0 >= r1) ? [[r0, r1]] as Array<[number, number]> : [...(a0 > r0 ? [[r0, a0]] : []), ...(a1 < r1 ? [[a1, r1]] : [])] as Array<[number, number]>);
+        }
+        return runs.filter(([r0, r1]) => r1 - r0 > 0.1);
+      };
       if (p <= 0) return;
       const pm = cladding(wallColor);
       const coping = std(rf.trim ? hex(rf.trim) : mix(wallColor, 0xffffff, 0.55), { roughness: 0.7 });
@@ -957,13 +976,15 @@ export function buildRoofs(spec, deps) {
       for (const s of SIDES) {
         if (abut[s]) continue;
         const ax = along(s), [nx, nz] = OUT[s];
-        const len = ax === 0 ? w : d - (hasN ? 0.2 : 0) - (hasS ? 0.2 : 0);
-        const mid = ax === 0 ? cx : (o.z0 + (hasN ? 0.2 : 0) + o.z1 - (hasS ? 0.2 : 0)) / 2;
         const e = edgeOf(o, s) - (ax === 0 ? nz : nx) * 0.1;
-        const wall = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? len : 0.2, p, ax === 0 ? 0.2 : len), pm);
-        wall.position.set(ax === 0 ? mid : e, H + p / 2, ax === 0 ? e : mid); add(wall).name = 'Parapet';
-        const cp = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? len + 0.04 : 0.26, 0.035, ax === 0 ? 0.26 : len + 0.04), coping);
-        cp.position.set(ax === 0 ? mid : e + nx * 0.01, H + p + 0.0175, ax === 0 ? e + nz * 0.01 : mid); add(cp, false).name = 'Coping';
+        const lo = ax === 0 ? o.x0 : o.z0 + (hasN ? 0.2 : 0), hi = ax === 0 ? o.x1 : o.z1 - (hasS ? 0.2 : 0);
+        for (const [r0, r1] of cutRuns(s, lo, hi, edgeOf(o, s))) {
+          const len = r1 - r0, mid = (r0 + r1) / 2;
+          const wall = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? len : 0.2, p, ax === 0 ? 0.2 : len), pm);
+          wall.position.set(ax === 0 ? mid : e, H + p / 2, ax === 0 ? e : mid); add(wall).name = 'Parapet';
+          const cp = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? len + 0.04 : 0.26, 0.035, ax === 0 ? 0.26 : len + 0.04), coping);
+          cp.position.set(ax === 0 ? mid : e + nx * 0.01, H + p + 0.0175, ax === 0 ? e + nz * 0.01 : mid); add(cp, false).name = 'Coping';
+        }
       }
     }
   }
