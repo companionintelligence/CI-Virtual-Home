@@ -45,6 +45,17 @@ export function projectBox(c: Cam, b: Box6) {
   return { minX: x0, maxX: x1, minY: y0, maxY: y1 };
 }
 
+/** what stands behind the Core at the press, as the fleet audit classes it (plan §3.14: no class above 40 % of the houses) */
+export function bgClass(kind: number, name: string): string {
+  if (kind === K.monitor) return 'screen';
+  if (kind === K.glass || /window|curtain|glass|blind/i.test(name)) return 'window';
+  if (/fire|hearth|mantel|chimney|stove/i.test(name)) return 'fireplace';
+  if (/book|shelv|shelf|library/i.test(name)) return 'bookcase';
+  if (/plant|palm|tree|fern|ivy|monstera|fiddle|orchid|shrub|bamboo|cactus|succulent|flower|herb|hedge|foliage/i.test(name)) return 'greenery';
+  if (/art|frame|poster|painting|mirror|canvas|picture/i.test(name)) return 'art';
+  if (kind === K.wall) return 'wall';
+  return 'other';
+}
 // what a sight line is stopped by: every solid but glass (and, while the roof is on, the roofs)
 const SIGHT = (roofs: boolean) => (k: number) => k !== K.glass && k !== K.hull && k !== K.walk && (roofs || k !== K.roof);
 
@@ -126,6 +137,13 @@ export function createProbe(index: WorldIndex) {
     for (const p of pts) if (clear(eye, p, false, i => coreIdx.has(i))) ok++;
     return ok / pts.length;
   }
-  return { cast, clear, visibility, rayGrid, composition, coreSeen };
+  /** the class of what stands behind the Core seen from `eye` (bgClass): the first solid past its centre along the line from
+   *  the eye — not the Core, its surface, the hero set, the chair or a ceiling fixture — 'sky' for none */
+  function background(centre: V3, eye: V3) {
+    const d = norm(sub(centre, eye));
+    const hit = index.raycast(centre[0], centre[1], centre[2], d[0], d[1], d[2], 30, k => k !== K.hull && k !== K.core && k !== K.walk && k !== K.surface && k !== K.heroSet && k !== K.chair && k !== K.fixture, i => world.kinds[i] === K.core);
+    return hit ? bgClass(hit.k, hit.n) : 'sky';
+  }
+  return { cast, clear, visibility, rayGrid, composition, coreSeen, background };
 }
 export type Probe = ReturnType<typeof createProbe>;

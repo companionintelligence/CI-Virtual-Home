@@ -14,7 +14,7 @@ import { K, DEG, clamp, inRect, inFootprint, mulberry32, fnv1a, wrapPi, createWo
 import { createNav, roomInterest } from './shot-nav.js';
 import { createProbe, camera, project, type V3 } from './shot-probe.js';
 import { createOrbitProbeW, heroRing, fovForCore } from './framing.js';
-import { BEATS, FPS, YAW_CAP, hann, rateLimit, fillet, polyLen, sampleTrack, type Track, type Beat } from './shot-planner.js';
+import { BEATS, FPS, YAW_CAP, hann, rateLimit, fillet, polyLen, sampleTrack, trackHash, type Track, type Beat } from './shot-planner.js';
 
 const sub = (a: V3, b: V3): V3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const len = (a: V3) => Math.hypot(a[0], a[1], a[2]);
@@ -80,6 +80,7 @@ function finishTrack(type: string, world: ShotWorld, probe: any, duration: numbe
     track.events.settleT = pw.t0;
     track.events.pressT = +Math.min(duration - 1.4, Math.max(pw.t0 + 0.3, (first ?? pw.t0) + 1.5)).toFixed(4);
   }
+  track.hash = trackHash(track);
   return track;
 }
 

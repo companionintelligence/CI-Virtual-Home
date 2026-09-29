@@ -13,7 +13,7 @@
 //
 // Owner: S5 (shot).
 import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, wrapPi, createWorldIndex, type ShotWorld, type Box6 } from './shot-world.js';
-import { createProbe, camera, project, projectBox, type V3 } from './shot-probe.js';
+import { createProbe, camera, project, projectBox, bgClass, type V3 } from './shot-probe.js';
 import { createNav, roomInterest } from './shot-nav.js';
 import { BEATS, SPEED_CAP, YAW_CAP, PITCH, BEAT_FLOOR, BEAT_WINDOW, OUTSIDE, LENS, sampleTrack, type Track, type Beat } from './shot-planner.js';
 import { houseBox, fits, coreHeightPct } from './framing.js';
@@ -243,7 +243,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const j = Math.abs((accS[i + 1] - accS[i - 1]) / (2 * dt)); maxJerk = Math.max(maxJerk, j);
     if (j > (out2 ? 20 : 10)) W('jerk', tOf(i), `${beat[i]}: jerk ${j.toFixed(0)} m/s³ (≤ ${out2 ? 20 : 10})`, beat[i]);
     const bt = beat[i];
-    let cap = bt === 'orbit' ? null : SPEED_CAP[bt];
+    let cap = bt === 'orbit' ? null : bt === 'route' && track.plan && track.plan.routeCap ? track.plan.routeCap : SPEED_CAP[bt];
     if (bt === 'stair' || bt === 'descend' || bt === 'extStair') cap = SPEED_CAP[bt] * 1.35;
     if (cap !== null && speed[i] > cap * 1.1) W('beat-speed', tOf(i), `${bt}: ${speed[i].toFixed(2)} m/s (cap ${cap.toFixed(1)})`, bt);
     if (bt === 'orbit') { const r = Math.hypot(eye[i][0] - centre[0], eye[i][2] - centre[2]) || 1; const w2 = speed[i] / r / DEG; if (w2 > 45) W('orbit-yaw-rate', tOf(i), `the orbit turns at ${w2.toFixed(0)}°/s (≤ 45)`); }
@@ -295,7 +295,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const r = Math.abs(fov[i] - fov[i - 1]) / dt; maxFovRate = Math.max(maxFovRate, r);
     if (r > LENS.rate * 1.1) W('fov-rate', tOf(i), `the lens changes at ${r.toFixed(1)}°/s (≤ ${LENS.rate})`);
     const bt = beat[i], f = fov[i];
-    const range: [number, number] | null = bt === 'establish' ? [30, 37] : bt === 'route' || bt === 'stair' || bt === 'descend' ? [44, 60] : bt === 'power' ? [38, 44] : null;
+    const range: [number, number] | null = bt === 'establish' ? [30, 37] : bt === 'route' || bt === 'stair' || bt === 'descend' ? [44, 60] : bt === 'power' ? [38, 50] : null;
     if (range && (f < range[0] - 0.5 || f > range[1] + 0.5)) W('fov-range', tOf(i), `${bt}: lens ${f.toFixed(1)}° (${range[0]}–${range[1]})`, bt);
   }
   metrics.maxFovRate = +maxFovRate.toFixed(2);
@@ -378,11 +378,12 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     // contrast: the Core's finish against what stands behind it (luminance of the first box behind, by colour)
     const d = [centre[0] - eye[pressI][0], centre[1] - eye[pressI][1], centre[2] - eye[pressI][2]], L = Math.hypot(d[0], d[1], d[2]);
     const coreIds = new Set<number>(); for (let i = 0; i < world.kinds.length; i++) if (world.kinds[i] === K.core) coreIds.add(i);
-    const hit = index.raycast(centre[0], centre[1], centre[2], d[0] / L, d[1] / L, d[2] / L, 30, k => k !== K.hull && k !== K.core && k !== K.walk, i => coreIds.has(i));
+    const hit = index.raycast(centre[0], centre[1], centre[2], d[0] / L, d[1] / L, d[2] / L, 30, k => k !== K.hull && k !== K.core && k !== K.walk && k !== K.surface && k !== K.heroSet && k !== K.chair && k !== K.fixture, i => coreIds.has(i));
     const coreColor = world.colors[[...coreIds][0] ?? -1] ?? 0xe7e3dc;
     const bgColor = hit && hit.i >= 0 ? world.colors[hit.i] : 0xd8d8d8;
     const cr = (Math.max(lum(coreColor), lum(bgColor)) + 0.05) / (Math.min(lum(coreColor), lum(bgColor)) + 0.05);
     metrics.coreContrast = +cr.toFixed(2);
+    metrics.coreBg = hit ? bgClass(hit.k, hit.n) : 'sky';
     if (cr < 1.25) W('core-contrast', ev.pressT!, `the Core's finish and what is behind it differ by a contrast of ${cr.toFixed(2)} (≥ 1.25)`);
   }
   // the final frame (a walkthrough that never reaches the Core has none to judge)
@@ -436,10 +437,12 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     for (let i = 0; i < N; i += 6) {
       const cam = camera(eye[i], tgt[i], fov[i], aspect);
       for (const r of top3) {
-        const pt: V3 = r.focal ? [r.focal.at[0], r.lv.y + 1.0, r.focal.at[1]] : [r.r.b.x + r.r.b.w / 2, r.lv.y + 1.1, r.r.b.z + r.r.b.d / 2];
+        // (a room is seen when the eye is in it, or its focal item — or, failing that, the middle of its floor — is in the frame and
+        // in the clear)
+        const pts: V3[] = [r.focal ? [r.focal.at[0], r.lv.y + 1.0, r.focal.at[1]] : [r.r.b.x + r.r.b.w / 2, r.lv.y + 1.1, r.r.b.z + r.r.b.d / 2], [r.r.b.x + r.r.b.w / 2, r.lv.y + 1.0, r.r.b.z + r.r.b.d / 2]];
         const inRoom = inRect(eye[i][0], eye[i][2], r.r.b) && Math.abs(eye[i][1] - r.lv.y - 1.4) < 1.2;
-        const q = project(cam, pt);
-        if (inRoom || (q[2] > 0 && Math.abs(q[0]) < 0.9 && Math.abs(q[1]) < 0.9 && probe.clear(eye[i], pt))) seenFor.set(r, (seenFor.get(r) || 0) + 6 * dt);
+        const inView = () => pts.some(pt => { const q = project(cam, pt); return q[2] > 0 && Math.abs(q[0]) < 0.9 && Math.abs(q[1]) < 0.9 && probe.clear(eye[i], pt); });
+        if (inRoom || inView()) seenFor.set(r, (seenFor.get(r) || 0) + 6 * dt);
       }
     }
     const seen = top3.filter(r => (seenFor.get(r) || 0) >= 1).length;

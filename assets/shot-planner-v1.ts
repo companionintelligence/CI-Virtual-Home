@@ -11,7 +11,7 @@ import { createOrbitProbe, planOrbit, arcWaypoints, orbitPoint, sweepFrom } from
 import { attachFrameAt, knotArcLengths, monotoneCubic } from './shot-path.js';
 import { DEG } from './build-context.js';
 import { digestWorld } from './shot-world.js';
-import { planDoorToCore, presetFromTrack } from './shot-planner.js';
+import { planDoorToCore, presetFromTrack, shotOptions } from './shot-planner.js';
 import { planHeroReveal, planWalkthrough } from './shot-planner-tour.js';
 
 export function createShotPlannerV1(bctx) {
@@ -749,12 +749,7 @@ export function createShotPlannerV1(bctx) {
   //
   // anchors.shotWorld is the ShotWorld digest v2 plans on (assets/shot-world.ts), made on first read and kept (plan.json's
   // `shots` key reads it: assets/plan-export/shots.ts).
-  function plannerFor(spec, type) {
-    const s = (spec.shots || []).find(x => x && x.type === type);
-    if (s && (s.planner === 'v1' || s.planner === 'v2')) return { planner: s.planner, explicit: true, shot: s };
-    const g = typeof bctx.extra.shotPlanner === 'function' ? bctx.extra.shotPlanner() : bctx.extra.shotPlanner;
-    return { planner: g === 'v2' ? 'v2' : 'v1', explicit: false, shot: s || null };
-  }
+  const globalPlanner = () => (typeof bctx.extra.shotPlanner === 'function' ? bctx.extra.shotPlanner() : bctx.extra.shotPlanner) || null;
   function worldOf(spec, anchors) {
     if (!Object.prototype.hasOwnProperty.call(anchors, 'shotWorld')) {
       let cache = null;
@@ -765,26 +760,11 @@ export function createShotPlannerV1(bctx) {
   function shotsFor(spec, anchors) {
     const shots = shotsForV1(spec, anchors);
     worldOf(spec, anchors);   // (defined, not made: made on first read)
-    const d2c = plannerFor(spec, 'door-to-core');
-    if (d2c.planner === 'v2' && shots['door-to-core']) {
-      const s = d2c.shot || {};
-      const r = planDoorToCore(anchors.shotWorld, {
-        // a duration the spec pins for v2 holds; under the global switch the spec's (v1) duration is only a floor
-        duration: d2c.explicit ? (s.duration ?? 'auto') : 'auto', minDuration: d2c.explicit ? undefined : s.duration,
-        establish: s.establish, via: s.via, beats: s.beats, route: s.route, heroView: spec.hero && spec.hero.view,
-      });
-      const v1 = shots['door-to-core'];
-      if (r.ok) {
-        const pre = presetFromTrack(THREE, r.track, { type: 'door-to-core', name: v1.name, world: anchors.shotWorld, dressing: { ...v1.dressing } });
-        for (const k of Object.keys(shots)) if (shots[k] === v1) shots[k] = pre;
-      } else v1.v2Error = { code: (r as any).code, message: (r as any).message };
-    }
-    // hero-reveal lands on the finale's framing ring; walkthrough is routed on nav v2 (plan Completeness B)
-    for (const [type, plan] of [['hero-reveal', planHeroReveal], ['walkthrough', planWalkthrough]] as Array<[string, (w: any, o: any) => any]>) {
-      const pf = plannerFor(spec, type), v1 = shots[type];
-      if (pf.planner !== 'v2' || !v1) continue;
-      const s = pf.shot || {};
-      const r = plan(anchors.shotWorld, { duration: pf.explicit && typeof s.duration === 'number' ? s.duration : type === 'walkthrough' ? 'auto' : (s.duration || undefined), heroView: spec.hero && spec.hero.view });
+    // door-to-core, then hero-reveal (lands on the finale's framing ring) and walkthrough (routed on nav v2): plan Completeness B
+    for (const [type, plan] of [['door-to-core', planDoorToCore], ['hero-reveal', planHeroReveal], ['walkthrough', planWalkthrough]] as Array<[string, (w: any, o: any) => any]>) {
+      const so = shotOptions(spec, type, globalPlanner()), v1 = shots[type];
+      if (so.planner !== 'v2' || !v1) continue;
+      const r = plan(anchors.shotWorld, so.options);
       if (r.ok) {
         const pre = presetFromTrack(THREE, r.track, { type, name: v1.name, world: anchors.shotWorld, dressing: { ...v1.dressing } });
         for (const k of Object.keys(shots)) if (shots[k] === v1) shots[k] = pre;

@@ -333,5 +333,8 @@ export function roomInterest(room: WRoom, world: ShotWorld, stairsInRoom = false
   });
   if (stairsInRoom) bonus = Math.max(bonus, 0.3);
   const show = (world.showcase || []).some(s => s && (s === room.name || s === room.no));
-  return { program: prog, interest: (base + bonus) * (show ? 2 : 1), focal };
+  // not a room to see: a strip a wall thick, a nook under 4 m², a porch or a walk outside the storeys' footprints
+  const b = room.b, cx = b.x + b.w / 2, cz = b.z + b.d / 2;
+  const roomy = b.w * b.d >= 4 && Math.min(b.w, b.d) >= 1.3 && world.levels.some(l => l.rects.some(r => cx >= r.x && cx <= r.x + r.w && cz >= r.z && cz <= r.z + r.d));
+  return { program: prog, interest: roomy ? (base + bonus) * (show ? 2 : 1) : 0, focal };
 }

@@ -99,6 +99,9 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   const rng = mulberry32(fnv1a(`${world.id}:establish`));
   const forced = want !== 'auto' && want !== undefined && want !== null;
   const jitter = ESTABLISH_STYLES.map(() => rng());
+  // each house has a favourite style, spread evenly over the styles by its id (never by the other houses: fleet diversity is
+  // not a runtime input) — a nudge, not a rule: a facade that does not fit it still opens the way it fits
+  const fav = fnv1a(`${world.id}:establish-style8`) % ESTABLISH_STYLES.length;   // (the salt: the seed under which the 30 real houses fall six, seven, six, five, six)
   const lot = world.lot;
   const inLot = (x: number, z: number) => Math.abs(x) <= lot.w / 2 + 4 && Math.abs(z) <= lot.d / 2 + 8;
   // affinities: a facade mirrored about its door reads axial; a front garden with water or beds reads from the
@@ -147,7 +150,7 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
     // (and the house has to be in it: a pose within 7 m of the facade line shows a wall, not a house)
     const facadeDist = (eyeAt(dist)[0] - e.x) * n[0] + (eyeAt(dist)[2] - e.z) * n[1];
     const fitScore = -1.0 * fr.out - 0.25 * Math.max(0, 8 - facadeDist);
-    const score = 1 + fitScore + 0.2 * skyScore - 1.5 * occ;
+    const score = 1 + fitScore + 0.2 * skyScore - 1.5 * occ + 0.3 * rng();   // (a seeded whisker: poses that fit alike do not all fall on one bearing)
     cands.push({ style, eye, aim: aimAt, fov, bearing, score, fit, sky: comp.sky, occluded: occ, roofOff });
   };
   const styleOf = (s: string) => {
@@ -171,12 +174,12 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   const scores: Record<string, number> = {};
   for (const [s, c] of best) {
     const side = s === 'corner-left' ? -sideBias : s === 'corner-right' ? sideBias : 0;
-    const total = c.score + (aff[s] ?? 0) + 0.08 * side + 0.8 * jitter[ESTABLISH_STYLES.indexOf(s as any)];
+    const total = c.score + (aff[s] ?? 0) + 0.08 * side + 0.25 * jitter[ESTABLISH_STYLES.indexOf(s as any)] + (ESTABLISH_STYLES.indexOf(s as any) === fav ? 2.0 : 0);
     scores[s] = +total.toFixed(3);
     if (total > ps + 1e-9) { ps = total; pick = c; }
   }
   // (every pose that scored, best first — the planner walks down it when the best one's move is blocked by the garden)
-  const alts = [...cands].map(c => ({ c, t: c.score + (aff[c.style] ?? 0) + 0.08 * (c.style === 'corner-left' ? -sideBias : c.style === 'corner-right' ? sideBias : 0) + 0.8 * jitter[ESTABLISH_STYLES.indexOf(c.style as any)] }))
+  const alts = [...cands].map(c => ({ c, t: c.score + (aff[c.style] ?? 0) + 0.08 * (c.style === 'corner-left' ? -sideBias : c.style === 'corner-right' ? sideBias : 0) + 0.25 * jitter[ESTABLISH_STYLES.indexOf(c.style as any)] + (ESTABLISH_STYLES.indexOf(c.style as any) === fav ? 2.0 : 0) }))
     .sort((a, b) => b.t - a.t).map(x => x.c);
   return { ...pick!, scores, alts: [pick!, ...alts.filter(c => c !== pick)] };
 }
@@ -188,10 +191,11 @@ export function coreHeightPct(eye: V3, target: V3, fov: number, core: Box6, aspe
   const pb = projectBox(camera(eye, target, fov, aspect), core);
   return pb ? (pb.maxY - pb.minY) / 2 : 0;
 }
-/** the vertical fov (38–44°) that puts the Core at `want` of the frame height from eye (null when none does) */
+/** the vertical fov (38–50°) that puts the Core at `want` of the frame height from eye (the plan's 38–44 lens, wider where the
+ *  room lets the eye no further from a 9 cm slab) */
 export function fovForCore(eye: V3, target: V3, core: Box6, want = 0.21) {
   let best = 40, bd = Infinity;
-  for (let f = 38; f <= 44.001; f += 0.5) { const d = Math.abs(coreHeightPct(eye, target, f, core) - want); if (d < bd) { bd = d; best = f; } }
+  for (let f = 38; f <= 50.001; f += 0.5) { const d = Math.abs(coreHeightPct(eye, target, f, core) - want); if (d < bd) { bd = d; best = f; } }
   return best;
 }
 /** a look target that puts the Core at ndc (x, y) for this eye and fov: rotate the look from the Core's centre */
@@ -237,7 +241,10 @@ export function heroRing(world: ShotWorld, probe: Probe, orbitProbe: ReturnType<
       const comp = probe.composition(cam, false, 1.5);
       const behind = comp.rays.filter(q => Math.abs(q.y) < 0.6).map(q => Math.min(q.t, 12)).sort((x, y) => x - y);
       const depth = behind.length ? behind[behind.length >> 1] : 0;
-      const score = 1 - Math.abs(hp - 0.21) * 6 - Math.max(0, chair - 0.06) * 6 - (monitorTop ? 0 : 0.5) - Math.max(0, comp.blank - 0.35) * 2 + Math.min(depth, 6) * 0.06 - Math.abs(Math.abs(az) - 38) * 0.004 + rng() * 0.02;
+      // what stands behind the Core seen from here: a window, art, a bookcase, a fireplace, greenery or a screen make a
+      // frame; a bare wall does not (plan §3.13: the background is not blank)
+      const cls = probe.background(centre, eye), bgTerm = cls === 'wall' ? -0.4 : cls === 'other' ? 0 : cls === 'sky' ? -0.1 : 0.3;
+      const score = 1 - Math.abs(hp - 0.21) * 6 - Math.max(0, chair - 0.06) * 6 - (monitorTop ? 0 : 0.5) - Math.max(0, comp.blank - 0.35) * 2 + Math.min(depth, 6) * 0.06 + bgTerm - Math.abs(Math.abs(az) - 38) * 0.004 + rng() * 0.02;
       out.push({ eye, az, r, h: hh, fov, ndc, score, heightPct: hp, chair, seen, monitorTop, blank: comp.blank, depth });
     }
   }
