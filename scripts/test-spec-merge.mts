@@ -40,15 +40,15 @@ type Probe = {
 
 const probes: Probe[] = [
   {
-    name: 'a stream adds fields to room items and site items (the plan puts S1\'s style/chairs, S3\'s src, S4\'s planting here)',
+    name: 'a stream adds fields to room items and site items (the plan puts S1\'s style/chairs, S3\'s src, S4\'s planting here; S4 has its own, so the probe declares two nobody does)',
     edit: {
       kit: 'export interface KitRoomItem { style?: string; chairs?: number }',
       compose: 'export interface ComposeRoomItem { src?: "compose@1" }',
-      site: 'export interface SiteSiteItem { smooth?: boolean; kind?: string }',
+      site: 'export interface SiteSiteItem { probeSmooth?: boolean; probeKind?: string }',
     },
     code: `import type { RoomItem, SiteItem } from './spec/index.ts';
 const a: RoomItem = { type: 'fireplace', at: [1, 2], style: 'stone', chairs: 4, src: 'compose@1', anything: 1 };
-const b: SiteItem = { type: 'pool', at: [1, 2], w: 3, smooth: true, kind: 'oak', other: 'x' };
+const b: SiteItem = { type: 'pool', at: [1, 2], w: 3, probeSmooth: true, probeKind: 'oak', other: 'x' };
 const t: string = a.type; const at: [number, number] = a.at; const w: number = b.w;`,
     expect: [],
   },

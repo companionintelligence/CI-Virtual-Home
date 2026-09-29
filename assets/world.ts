@@ -1,7 +1,12 @@
 // World — the neighbourhood a HouseSpec's lot sits in, so a house stops being a plate floating in a void:
 //
 //   street     on the entry side: asphalt, curbs, a verge, sidewalks both sides, a driveway apron (and curb
-//              cut) wherever a driveway meets the street — the spec's own and every neighbour's
+//              cut) wherever a driveway meets the street — the spec's own and every neighbour's.
+//              S4: `lot.street` (its side, apart from the entry's), `lot.sidewalk` (a tint, or none), `lot.streetFurniture`
+//              (a city block's benches, hydrants, bollards, bike racks); a rural road has a gravel shoulder and no walk
+//   context    S4: `lot.context` — city (a paved block of narrow tall houses close to the walk, a skyline), forest, desert,
+//              rural (fields, hedgerows, a barn), hillside (the ground and the back row rise), waterfront; `lot.water`
+//              puts a lake, river, canal or the sea on up to three sides, with its far bank
 //   lamps      street lamps down both verges; the lens is tagged userData.fixture = 'street' (the lighting preset
 //              scales it by lampGain), and a warm pool on the ground under each follows `house:lighting`
 //   neighbours a block, not two houses in a park: the lots either side, a row across the street and a row behind,
@@ -25,6 +30,38 @@
 // and a caster straddling its edge throws a shadow cut off in a straight line — so every neighbour sits in a
 // soft contact shadow (a vertex-alpha skirt) and every tree on a blob decal instead.
 import { mulberry32, fnv1a } from './materials.js';
+import { defaultsAtLeast } from './spec/index.js';
+import { outlineLoops } from './house-geometry.js';
+
+// The exact outline of a union of axis-aligned rects ({ x, z, w, d }): cells between every distinct coordinate,
+// their exposed sides as edges, chained by outlineLoops (every loop; with a few rects none encloses another).
+function rectUnion(rects: Array<{ x: number; z: number; w: number; d: number }>) {
+  const xs = [...new Set(rects.flatMap(r => [r.x, r.x + r.w]))].sort((a, b) => a - b), zs = [...new Set(rects.flatMap(r => [r.z, r.z + r.d]))].sort((a, b) => a - b);
+  const inside = (i: number, k: number) => i >= 0 && k >= 0 && i < xs.length - 1 && k < zs.length - 1 && rects.some(r => (xs[i] + xs[i + 1]) / 2 > r.x && (xs[i] + xs[i + 1]) / 2 < r.x + r.w && (zs[k] + zs[k + 1]) / 2 > r.z && (zs[k] + zs[k + 1]) / 2 < r.z + r.d);
+  const edges = [];
+  for (let i = 0; i < xs.length - 1; i++) for (let k = 0; k < zs.length - 1; k++) {
+    if (!inside(i, k)) continue;
+    const x0 = xs[i], x1 = xs[i + 1], z0 = zs[k], z1 = zs[k + 1];
+    if (!inside(i, k + 1)) edges.push({ side: 'S', a: [x0, z1], b: [x1, z1] });
+    if (!inside(i, k - 1)) edges.push({ side: 'N', a: [x0, z0], b: [x1, z0] });
+    if (!inside(i + 1, k)) edges.push({ side: 'E', a: [x1, z0], b: [x1, z1] });
+    if (!inside(i - 1, k)) edges.push({ side: 'W', a: [x0, z0], b: [x0, z1] });
+  }
+  return outlineLoops(edges);
+}
+//
+// Pass 4 (S4) — the world stops being one white suburb, each change only when a spec asks for it:
+//   lot.street    'S' | 'N' | 'E' | 'W' | 'none' — the street's side, decoupled from the entry (a lake-side entry
+//                 with the street behind the house); 'none' builds no street at all
+//   lot.context   'suburb' | 'city' | 'forest' | 'desert' | 'waterfront' | 'rural' | 'hillside' — who the neighbours
+//                 are and what surrounds them: a city block of taller flat-roofed houses, woods, a sparse desert
+//                 road, fields and a barn, a hill rising behind the lot with the houses stepped up it
+//   lot.water     'lake' | 'river' | 'canal' | 'sea' | { kind, sides: ['N', …], width, farBank, edge } — water on any
+//                 side of the lot (a river `width` wide with trees, houses or hills on its far bank; a canal between
+//                 stone quays; a lake or the sea to the horizon), its edge a grass bank, a quay wall or a beach
+//   lot.setback   how far the neighbours stand back from the street (the house's own street line, say)
+//   defaults: 2   the suburb's houses vary in palette (whites, creams, sage, grey-blue, clay, brick, charcoal) and
+//                 style (gable, hip, flat-roofed modern), not white with near-black roofs
 
 type P2 = [number, number];
 type P3 = [number, number, number];
@@ -49,6 +86,15 @@ const WALLS = [0xf5f4f0, 0xf0eee8, 0xebe8e1, 0xf7f6f3, 0xe6e3dc, 0xeeece6, 0xf2f
 const ROOFS = [0x25272b, 0x2a2c30, 0x2f2e2f, 0x222428, 0x2c2b29];
 const LEAVES = [0x2d4a2b, 0x34512f, 0x3a5634, 0x2a4230, 0x40593a, 0x324b36, 0x455a3a];
 const DESERT_LEAVES = [0x6b7355, 0x7a7d5c, 0x5f6a4e, 0x8a8a66];
+// defaults: 2 and the contexts: houses in more than one colour, roofs in more than one material
+const WALLS2 = [0xf5f4f0, 0xefe9dc, 0xe6dcc6, 0xc9cfbf, 0xb9c4c9, 0xd8c4ae, 0x9a5a48, 0x8a8e8f, 0x3d4043, 0xd9d2c4, 0xa8b59d, 0xe9e1d3];
+const ROOFS2 = [0x25272b, 0x3a3d42, 0x5b3a2e, 0x8e5440, 0x2f3b33, 0x4a4540, 0x6b6e70];
+const CITY_WALLS = [0x8e5a48, 0x9a6a55, 0xb9b3a8, 0xd8d2c6, 0x6f7275, 0xe6e0d4, 0x7d4a3c, 0xa39d92];
+const DESERT_WALLS = [0xe3d3b8, 0xd9c4a3, 0xcdb592, 0xe8dcc6, 0xc9a98a, 0xf0e6d6];
+const CONTEXTS = ['suburb', 'city', 'forest', 'desert', 'waterfront', 'rural', 'hillside'];
+// lot.sidewalk: the paving's tint over the kit's concrete flags (a colour, or one of these), and lot.streetFurniture
+const SIDEWALK_TINT: Record<string, number | null> = { concrete: null, brick: 0xd7947c, stone: 0xc9bfa9, flagstone: 0xb8b0a0, pavers: 0xcfc6b6, gravel: 0xc7b99a, slate: 0x8b9298 };
+const FURNITURE = ['bench', 'hydrant', 'bollard', 'bike-rack'];
 
 const segDist = (x: number, z: number, a: P2, b: P2) => {
   const dx = b[0] - a[0], dz = b[1] - a[1], l2 = dx * dx + dz * dz || 1e-9;
@@ -86,6 +132,13 @@ function createMesher() {
     quad(key, [x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1], c);
     quad(key, [x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1], c);
   }
+  // a board along a → b, its foot at ya at a and yb at b (a fence run on a slope is raked, not level), h tall, t thick
+  function raked(key: string, a: P2, b: P2, ya: number, yb: number, h: number, t: number) {
+    const dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz) || 1, nx = -dz / L * t / 2, nz = dx / L * t / 2;
+    const P = (p: P2, y: number, sgn: number): P3 => [p[0] + nx * sgn, y, p[1] + nz * sgn], c: P3 = [(a[0] + b[0]) / 2, (ya + yb) / 2 + h / 2, (a[1] + b[1]) / 2];
+    const A0 = P(a, ya, 1), A1 = P(a, ya, -1), B0 = P(b, yb, 1), B1 = P(b, yb, -1), A0t = P(a, ya + h, 1), A1t = P(a, ya + h, -1), B0t = P(b, yb + h, 1), B1t = P(b, yb + h, -1);
+    quad(key, A0, B0, B0t, A0t, c); quad(key, A1, B1, B1t, A1t, c); quad(key, A0t, B0t, B1t, A1t, c); quad(key, A0, A0t, A1t, A1, c); quad(key, B0, B0t, B1t, B1, c); quad(key, A0, B0, B1, A1, c);
+  }
   // a flat slab over a convex plan polygon, top at y1 (no bottom — it sits on the ground)
   function prism(key: string, poly: P2[], y0: number, y1: number) {
     const cx = poly.reduce((a, p) => a + p[0], 0) / poly.length, cz = poly.reduce((a, p) => a + p[1], 0) / poly.length, c: P3 = [cx, (y0 + y1) / 2, cz];
@@ -118,7 +171,7 @@ function createMesher() {
     g.computeBoundingSphere();
     return g;
   }
-  return { tri, quad, box, prism, geometry, keys: () => [...buckets.keys()], transform: (f: (p: P3) => P3) => { xf = f; }, reset: () => { xf = p => p; } };
+  return { tri, quad, box, prism, raked, geometry, keys: () => [...buckets.keys()], transform: (f: (p: P3) => P3) => { xf = f; }, reset: () => { xf = p => p; } };
 }
 
 // A soft round decal (tree blobs, lamp pools): white centre fading to nothing
@@ -133,19 +186,25 @@ function radialTexture(THREE: any, stops: [number, number][]) {
 
 // `ground` is what the lot is made of — a material (a kit surface, shared so the two meet without a seam) or a
 // colour; `groundMaterial` is the older spelling of the same thing
-export function buildWorld({ THREE, spec, std, kit = null, ground = null, groundMaterial = null }: { THREE: any; spec: any; std: any; kit?: any; ground?: any; groundMaterial?: any }) {
+export function buildWorld({ THREE, spec, std, kit = null, ground = null, groundMaterial = null, water = null }: { THREE: any; spec: any; std: any; kit?: any; ground?: any; groundMaterial?: any; water?: any }) {
   const root = new THREE.Group();
   root.name = 'World (street · neighbours · tree line)';
   root.userData = { category: 'Site', world: true };
   if (typeof window !== 'undefined' && (window as any).__houseWorld === false) return root;   // QA kill-switch
 
-  const side = (spec.entry && spec.entry.side) || 'S';
+  const lot = spec.lot || { w: 30, d: 24, ground: 'lawn' };
+  const entrySide = (spec.entry && spec.entry.side) || 'S';
+  // the street's side: the entry's, unless lot.street says otherwise (S4)
+  const side = typeof lot.street === 'string' && TO_LOCAL[lot.street] ? lot.street : entrySide, noStreet = lot.street === 'none';
   const L = TO_LOCAL[side] || TO_LOCAL.S;
   root.rotation.y = ROT[side] || 0;
-  const lot = spec.lot || { w: 30, d: 24, ground: 'lawn' };
   const across = side === 'E' || side === 'W';
   const LW = across ? lot.d : lot.w, LD = across ? lot.w : lot.d;   // along the street, and back from it
-  const groundKind = lot.ground || 'lawn', desert = groundKind === 'desert', forest = groundKind === 'forest';
+  const context = CONTEXTS.includes(lot.context) ? lot.context : null, gen2 = defaultsAtLeast(spec, 2);
+  const groundKind = lot.ground || 'lawn', desert = groundKind === 'desert' || context === 'desert', forest = groundKind === 'forest' || context === 'forest';
+  const city = context === 'city', rural = context === 'rural', hillside = context === 'hillside';
+  // palette and style variety: under defaults 2, or in any context but the plain suburb
+  const varied = gen2 || (context !== null && context !== 'suburb');
   const rngFor = (key: string) => mulberry32(fnv1a(`${spec.id}:world:${key}`));
   const localRect = (x0: number, z0: number, x1: number, z1: number): Rect => {
     const pts = [L(x0, z0), L(x1, z0), L(x1, z1), L(x0, z1)];
@@ -170,8 +229,11 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   })();
   const [ex, ez] = entryAt;
   // door-to-core: establishing eye over the street, a point 6 m out, one 1.6 m out, the door — and the line the
-  // opener looks along to the house
-  const E0: P2 = [ex + span * 0.35, ez + span * 0.45 + 5], E1: P2 = [ex + 2, ez + 6], E2: P2 = [ex, ez + 1.6];
+  // opener looks along to the house. (A street on another side than the entry: the same points out from the
+  // entry's own face, turned into the street frame.)
+  const nE = side === entrySide ? null : L(...({ S: [0, 1], N: [0, -1], E: [1, 0], W: [-1, 0] }[entrySide] as P2));
+  const out = (t: number, n: number): P2 => (nE ? [ex + nE[1] * t + nE[0] * n, ez - nE[0] * t + nE[1] * n] : [ex + t, ez + n]);
+  const E0: P2 = nE ? out(span * 0.35, span * 0.45 + 5) : [ex + span * 0.35, ez + span * 0.45 + 5], E1: P2 = nE ? out(2, 6) : [ex + 2, ez + 6], E2: P2 = nE ? out(0, 1.6) : [ex, ez + 1.6];
   const corridor: [P2, P2][] = [[E0, E1], [E1, E2], [E2, [ex, ez]], [E0, [cx, cz]]];
   const nearCorridor = (x: number, z: number, m: number) => corridor.some(([a, b]) => segDist(x, z, a, b) < m);
   const inKeep = (x: number, z: number, m = 0) => Math.hypot(x - cx, z - cz) < keepR + m;
@@ -185,13 +247,68 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   };
   // several specs already pave a full-width strip along their front lot line — that IS the sidewalk
   const specWalk = site.some(s => s.type === 'patio' && Array.isArray(s.at) && (() => { const r = siteRect(s); return r.x1 - r.x0 >= LW * 0.7 && r.z1 - r.z0 <= 3 && r.z1 >= zLot - 1; })());
+  // S4: the walk's paving (`lot.sidewalk`: a material or colour, `none`, or { material, color, width }); a rural road has
+  // no walk and no curb, a gravel shoulder instead
+  const swSpec: { material?: string; color?: string | number; width?: number } = typeof lot.sidewalk === 'string' ? { material: lot.sidewalk } : (lot.sidewalk && typeof lot.sidewalk === 'object' ? lot.sidewalk : {});
+  const walkW = swSpec.material === 'none' || (rural && swSpec.material === undefined && swSpec.color === undefined) ? 0 : (typeof swSpec.width === 'number' ? Math.max(0.6, Math.min(4, swSpec.width)) : WALK);
+  const swTint: number | null = swSpec.color !== undefined ? (typeof swSpec.color === 'string' ? parseInt(swSpec.color.replace('#', ''), 16) : swSpec.color) : swSpec.material !== undefined ? (SIDEWALK_TINT[swSpec.material] ?? null) : null;
+  const swKey = swTint === null || Number.isNaN(swTint) ? 'sidewalk' : `sidewalk:${swTint.toString(16)}`;
+  const shoulder = rural && walkW === 0, curbW = shoulder ? 0.9 : CURB;
   let z = zLot;
-  const nearWalk: P2 | null = specWalk ? null : [z, z += WALK];
-  const nearVerge: P2 = [z, z += VERGE], nearCurb: P2 = [z, z += CURB], road: P2 = [z, z += ROAD], farCurb: P2 = [z, z += CURB], farVerge: P2 = [z, z += VERGE], farWalk: P2 = [z, z += WALK];
+  const nearWalk: P2 | null = specWalk || walkW === 0 ? null : [z, z += walkW];
+  const nearVerge: P2 = [z, z += VERGE], nearCurb: P2 = [z, z += curbW], road: P2 = [z, z += ROAD], farCurb: P2 = [z, z += curbW], farVerge: P2 = [z, z += VERGE], farWalk: P2 | null = walkW === 0 ? null : [z, z += walkW];
   const zFar = z;   // the far lot line
   const streetBand = (zz: number, m = 0) => zz > zLot - m && zz < zFar + m;
   // a waterfront lot looks out over a lake behind it (in spec coordinates: everything past its back lot line)
-  const lake = groundKind === 'waterfront' ? localRect(-100, -lot.d / 2 - 55, 100, -lot.d / 2) : null;
+  // S4: lot.water puts water on any side instead (a `waterfront` context with none: a lake behind)
+  const LWATER = lot.water !== undefined ? (typeof lot.water === 'string' ? { kind: lot.water } : lot.water) : context === 'waterfront' ? { kind: 'lake' } : null;
+  const lake = !LWATER && groundKind === 'waterfront' ? localRect(-100, -lot.d / 2 - 55, 100, -lot.d / 2) : null;
+  // each water side: its bank strip, the water and (a river, a canal) the far bank, as rects in the street frame
+  type WaterSide = { kind: string; edge: string; bank: Rect; water: Rect; far: Rect | null; farBank: string; out: P2; along: 'x' | 'z' };
+  const waterSides: WaterSide[] = [];
+  if (LWATER) {
+    const kind = ['lake', 'river', 'canal', 'sea'].includes(LWATER.kind) ? LWATER.kind : 'lake';
+    const sides: string[] = Array.isArray(LWATER.sides) && LWATER.sides.length ? LWATER.sides.filter(x => TO_LOCAL[x]) : ['N'];
+    const width = LWATER.width ?? (kind === 'river' ? 26 : kind === 'canal' ? 11 : DISC);
+    const E = kind === 'canal' ? 0.9 : 1.6, edge = LWATER.edge || (kind === 'canal' ? 'wall' : kind === 'sea' ? 'beach' : 'bank');
+    const farBank = LWATER.farBank || (kind === 'river' ? 'trees' : kind === 'canal' ? 'houses' : 'none');
+    const R = DISC + 20, hw = lot.w / 2, hd = lot.d / 2, finite = width < DISC;
+    for (const sd of sides) {
+      // in spec coordinates: [c0, c1] across (away from the lot), the full length along
+      const span3 = (c0: number, c1: number): [number, number, number, number] => sd === 'N' ? [-R, -hd - c1, R, -hd - c0] : sd === 'S' ? [-R, hd + c0, R, hd + c1] : sd === 'E' ? [hw + c0, -R, hw + c1, R] : [-hw - c1, -R, -hw - c0, R];
+      const clipStreet = (r: Rect): Rect => (sd === side ? r : { ...r, z1: Math.min(r.z1, zLot - 0.5) });   // water beside the street stops at it
+      // (the bank starts 2 cm off the lot line: the disc's hole for it must not share an edge with the lot's)
+      // (water on the street's own side lies across the street — the road runs along its bank: its strips start at the far
+      // side of the street's cross-section, not at the lot line, where the walk, the verge and the road are)
+      const off = sd === side && !noStreet ? zFar - zLot : 0;
+      const [a0, b0, a1, b1] = span3(0.02 + off, E + off), [c0, d0, c1, d1] = span3(E + off, E + width + off);
+      const out = L(...({ S: [0, 1], N: [0, -1], E: [1, 0], W: [-1, 0] }[sd] as P2));
+      waterSides.push({
+        kind, edge, farBank, out, along: Math.abs(out[1]) > 0.5 ? 'x' : 'z',
+        bank: clipStreet(localRect(a0, b0, a1, b1)), water: clipStreet(localRect(c0, d0, c1, d1)),
+        far: finite ? (() => { const [e0, f0, e1, f1] = span3(E + width + off, E + width + E + off); return clipStreet(localRect(e0, f0, e1, f1)); })() : null,
+      });
+    }
+  }
+  const wetAt = (x: number, zz: number, m = 0) => (lake ? rectDist(x, zz, lake) < m : false) || waterSides.some(w => rectDist(x, zz, w.water) < m || rectDist(x, zz, w.bank) < m);
+  const wetRect = (r: Rect, m = 0) => waterSides.some(w => rrDist(r, w.water) < m || rrDist(r, w.bank) < m || (w.far ? rrDist(r, w.far) < m * 0.5 : false));
+  const waterBehind = waterSides.some(w => w.out[1] < -0.5);
+  // a hillside: the ground rises behind the lot (local −z) from 5 m past its back line, 24 m over 58 m (the back row of
+  // houses stands several metres up it), with a slow roll along it — and the hills across a river the same
+  const hillPh = rngFor('hill')();
+  const hillRise = (x: number, d: number) => { const k = Math.min(1, d / 58); return 24 * k * k * (3 - 2 * k) + 3 * Math.sin(x * 0.045 + hillPh * 6.28) * Math.min(1, d / 30); };
+  const hillY = hillside ? (x: number, zz: number) => { const d = -LD / 2 - 5 - zz; return d <= 0 ? 0 : hillRise(x, d); } : (_x: number, _z: number) => 0;
+  // The hill's neighbours: each back-row house stands on a level PAD — cut into the slope behind it, filled in front — its ground
+  // blended back into the natural slope over PAD_RAMP m. `terrainY` is the ground there, pads and all (`hillY` alone is the slope
+  // as it would be): a house on the slope neither hovers over it nor sinks into it, and fences and trees follow it.
+  const PAD_RAMP = 4.5, pads: Array<{ r: Rect; y: number }> = [];
+  const smooth01 = (t: number) => { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); };
+  const terrainY = (x: number, zz: number) => {
+    let y = hillY(x, zz); if (!pads.length) return y;
+    const fade = smooth01((-LD / 2 - 5 - zz) / 2);   // (the ground before the slope begins is level: pads fade out before it)
+    for (const p of pads) { const d = rectDist(x, zz, p.r), w = d <= 0 ? 1 : smooth01(1 - d / PAD_RAMP); y += (p.y - y) * w * fade; }
+    return y;
+  };
 
   const m = createMesher();
   // aprons: x range + which side; each cuts its sidewalk and curb
@@ -214,7 +331,7 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   const nr = rngFor('neighbours');
   const pick = <T,>(r: () => number, arr: T[]): T => arr[Math.floor(r() * arr.length)];
   type Plan = {
-    W: number; D: number; H: number; storeys: number; roof: 'gable' | 'hip'; pitch: number;
+    W: number; D: number; H: number; storeys: number; roof: 'gable' | 'hip' | 'flat'; pitch: number;
     garage: { side: number; GW: number; GD: number; off: number } | null;
     wall: number; roof2: number; chimney: boolean; door: number; lit: number;
     porch: { w: number; d: number } | null; bay: { w: number; out: number } | null;
@@ -229,8 +346,17 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     // massing model read as a house from the air
     const porch = !desert && r() < 0.5 ? { w: 3.6 + r() * 2.6, d: 1.9 + r() * 0.5 } : null;
     const bay = roof === 'gable' && r() < 0.55 ? { w: 3.6 + r() * 1.2, out: 0.8 } : null;
-    return { W, D, H: storeys === 2 ? 5.9 : 3.1, storeys, roof, pitch, garage, wall: pick(r, WALLS), roof2: pick(r, ROOFS), chimney: !desert && r() < 0.4, door: r(), lit: r(), porch, bay };
+    const out: Plan = { W, D, H: storeys === 2 ? 5.9 : 3.1, storeys, roof, pitch, garage, wall: pick(r, varied ? (desert ? DESERT_WALLS : WALLS2) : WALLS), roof2: pick(r, varied ? (desert ? [0x8e5440, 0xa0634a, 0x6b4a3a, 0x5b3a2e] : ROOFS2) : ROOFS), chimney: !desert && r() < 0.4, door: r(), lit: r(), porch, bay };
+    // varied: some are flat-roofed moderns (drawn only when varied, so the plain suburb's stream is untouched)
+    if (varied && r() < (desert ? 0.35 : 0.22)) { out.roof = 'flat'; out.bay = null; out.chimney = false; }
+    return out;
   };
+  // a city house: two to four storeys on a narrow lot, flat-roofed or gabled, no garage, in brick, render or stone
+  const cityPlan = (r: () => number): Plan => {
+    const storeys = 2 + Math.floor(r() * 3), W = 7.5 + r() * 6, D = 10 + r() * 4, flat = r() < 0.6;
+    return { W, D, H: storeys * 2.95, storeys, roof: flat ? 'flat' : 'gable', pitch: (28 + r() * 12) * Math.PI / 180, garage: null, wall: pick(r, CITY_WALLS), roof2: pick(r, ROOFS2), chimney: !flat && r() < 0.5, door: r(), lit: r(), porch: null, bay: null };
+  };
+  const planFor = (r: () => number, big: boolean) => (city ? cityPlan(r) : plan(r, big));
   // where the door, the bay and the porch go on the front face (u along it, main volume centred on u = 0)
   const layout = (p: Plan) => {
     const g = p.garage, doorSide = g ? -g.side : (p.door < 0.5 ? -1 : 1);
@@ -252,23 +378,25 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     const z0 = Math.min(-p.D / 2, g ? p.D / 2 - g.off - g.GD : Infinity) - eave;
     return { x0: x0 - eave, x1: x1 + eave, z0, z1 };
   };
-  type House = { p: Plan; ox: number; oz: number; facing: number; row: 'near' | 'far' | 'back'; rect: Rect };
+  type House = { p: Plan; ox: number; oz: number; facing: number; row: 'near' | 'far' | 'back'; rect: Rect; padY?: number };
   const houses: House[] = [];
   // facing +1: the front looks toward +z (the street, for the near row); −1: toward −z
   const worldRect = (e: Rect, ox: number, oz: number, facing: number): Rect => facing > 0
     ? { x0: ox + e.x0, x1: ox + e.x1, z0: oz + e.z0, z1: oz + e.z1 }
     : { x0: ox - e.x1, x1: ox - e.x0, z0: oz - e.z1, z1: oz - e.z0 };
-  const fits = (r: Rect) => rectDist(cx, cz, r) >= keepR - 0.01 && houses.every(h => rrDist(h.rect, r) >= 4);
+  const fits = (r: Rect) => rectDist(cx, cz, r) >= keepR - 0.01 && houses.every(h => rrDist(h.rect, r) >= (city ? 1.2 : 4)) && !wetRect(r, 2);
   const add = (p: Plan, e: Rect, ox: number, oz: number, facing: number, row: House['row']) => { const rect = worldRect(e, ox, oz, facing); houses.push({ p, ox, oz, facing, row, rect }); return rect; };
   const xClear = (x0: number, x1: number) => cx < x0 ? x0 - cx : cx > x1 ? cx - x1 : 0;   // how far the house centre is outside [x0, x1]
 
   // same side of the street, left and right of the lot: set back like the house is, the nearest pushed out until the
   // orbit circle is clear of it, the next one a side yard further on
-  const perSide = desert || forest ? 1 : 2;
+  const perSide = city ? 5 : rural ? 1 : desert || forest ? 1 : 2;
   for (const dir of [-1, 1]) {
     let edge = LW / 2 + 3 + nr() * 3;
     for (let k = 0; k < perSide; k++) {
-      const p = plan(nr, span > 16), e = extent(p), setback = 5 + nr() * 3;
+      const p = planFor(nr, span > 16), e = extent(p), sb = 5 + nr() * 3;
+      // lot.setback lines the neighbours up with the house's own street line; a city stands close to the walk
+      const setback = typeof lot.setback === 'number' ? lot.setback + (sb - 6.5) * 0.15 : city ? 1.5 + (sb - 5) * 0.4 : rural ? sb + 6 : sb;
       const oz = zLot - setback - e.z1;
       const zr0 = oz + e.z0, zr1 = oz + e.z1, dz = cz > zr1 ? cz - zr1 : cz < zr0 ? zr0 - cz : 0;
       const clearX = Math.sqrt(Math.max(0, keepR * keepR - dz * dz));
@@ -278,16 +406,19 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
       const rect = worldRect(e, ox, oz, 1);
       if (!fits(rect)) break;
       add(p, e, ox, oz, 1, 'near');
-      edge = (dir > 0 ? rect.x1 : -rect.x0) + 3 + nr() * 4;
+      const gapR = nr();
+      const x1r = dir > 0 ? rect.x1 : -rect.x0;
+      edge = city ? x1r + 1.4 + gapR * 1.2 : rural ? x1r + 25 + gapR * 30 : x1r + 3 + gapR * 4;
     }
   }
   // across the street, facing it: a row of lots; the one opposite the house is set back further if the orbit needs
   // it, or left as open lawn when that would break the row by more than a few metres
   {
-    const density = desert ? 0.45 : forest ? 0.55 : 0.92;
+    const density = city ? 1 : rural ? 0.12 : desert ? 0.45 : forest ? 0.55 : 0.92;
     let x = cx - REACH + nr() * 8;
-    while (x < cx + REACH) {
-      const p = plan(nr, false), e = extent(p), setback = 5.5 + nr() * 3, keep = nr() < density, gap = 3.5 + nr() * 4;
+    while (x < cx + REACH && !noStreet) {
+      const p = planFor(nr, false), e = extent(p), sb = 5.5 + nr() * 3, keep = nr() < density, gr = nr();
+      const setback = city ? 1.5 + (sb - 5.5) * 0.4 : rural ? sb + 10 : sb, gap = city ? 1.4 + gr * 1.2 : 3.5 + gr * 4;
       const wx = e.x1 - e.x0, dx = xClear(x, x + wx);
       const front = zFar + setback, need = cz + Math.sqrt(Math.max(0, keepR * keepR - dx * dx));
       if (keep && need <= front + 5) {
@@ -299,11 +430,12 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   }
   // behind the lot, back to back with it (their fronts face a street we do not build): not behind a waterfront lot
   // (the lake is there) nor in a forest (the woods are)
-  if (groundKind !== 'waterfront' && !forest) {
-    const density = desert ? 0.4 : 0.85;
+  if ((LWATER ? !waterBehind : groundKind !== 'waterfront') && !forest && !rural) {
+    const density = city ? 1 : desert ? 0.4 : 0.85;
     let x = cx - REACH * 0.85 + nr() * 8;
     while (x < cx + REACH * 0.85) {
-      const p = plan(nr, span > 16), e = extent(p), yard = 8 + nr() * 5, keep = nr() < density, gap = 3.5 + nr() * 4;
+      const p = planFor(nr, span > 16), e = extent(p), yd = 8 + nr() * 5, keep = nr() < density, gr = nr();
+      const yard = city ? 3 + (yd - 8) * 0.4 : yd, gap = city ? 1.4 + gr * 1.2 : 3.5 + gr * 4;
       const wx = e.x1 - e.x0, dx = xClear(x, x + wx);
       const rear = -LD / 2 - yard, need = cz - Math.sqrt(Math.max(0, keepR * keepR - dx * dx));   // their back wall line, toward us
       if (keep && rear - need <= 8) {
@@ -373,21 +505,30 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   // fall-off is soft rather than linear); mitred at the corners so neighbouring sides never overlap
   const aoPos: number[] = [], aoA: number[] = [];
   const AO_W = 2.1, AO_IN = 0.46;
-  function skirt(r: Rect) {
+  function skirt(r: Rect, hy = 0) {
     const rings = [[0, AO_IN], [AO_W * 0.38, AO_IN * 0.4], [AO_W, 0]];
     const ring = (d: number): P2[] => [[r.x0 - d, r.z0 - d], [r.x1 + d, r.z0 - d], [r.x1 + d, r.z1 + d], [r.x0 - d, r.z1 + d]];
     for (let k = 0; k < 2; k++) {
       const a = ring(rings[k][0]), b = ring(rings[k + 1][0]), ia = rings[k][1], ib = rings[k + 1][1];
       for (let i = 0; i < 4; i++) {
         const j = (i + 1) % 4, v: [P2, number][] = [[a[i], ia], [a[j], ia], [b[j], ib], [a[i], ia], [b[j], ib], [b[i], ib]];
-        for (const [[x, zz], al] of v) { aoPos.push(x, Y.ao, zz); aoA.push(1, 1, 1, al); }
+        for (const [[x, zz], al] of v) { aoPos.push(x, Y.ao + hy, zz); aoA.push(1, 1, 1, al); }
       }
     }
   }
 
+  // a flat roof: a membrane slab inside a parapet in the trim colour; returns its top
+  function flatRoof(rk: string, x0: number, x1: number, z0: number, z1: number, eaveY: number) {
+    const t = 0.2, h = 0.45, xm = (x0 + x1) / 2, zm = (z0 + z1) / 2;
+    m.box(rk, xm, eaveY + 0.05, zm, x1 - x0 - 0.1, 0.1, z1 - z0 - 0.1);
+    m.box('trim', xm, eaveY + h / 2, z0 + t / 2, x1 - x0 + 0.04, h, t); m.box('trim', xm, eaveY + h / 2, z1 - t / 2, x1 - x0 + 0.04, h, t);
+    m.box('trim', x0 + t / 2, eaveY + h / 2, zm, t, h, z1 - z0); m.box('trim', x1 - t / 2, eaveY + h / 2, zm, t, h, z1 - z0);
+    return eaveY + h;
+  }
   function neighbour(h: House, idx: number) {
     const { p, ox, oz, facing, row } = h, r = rngFor(`house:${idx}`);
-    const toWorld = (q: P3): P3 => [ox + facing * q[0], q[1], oz + facing * q[2]];
+    const hy = h.padY ?? hillY(ox, oz);   // (a hillside: the house stands on its pad on the hill)
+    const toWorld = (q: P3): P3 => [ox + facing * q[0], q[1] + hy, oz + facing * q[2]];
     const toWorldRect = (x0: number, z0: number, x1: number, z1: number): Rect => {
       const a = toWorld([x0, 0, z0]), b = toWorld([x1, 0, z1]);
       return { x0: Math.min(a[0], b[0]), x1: Math.max(a[0], b[0]), z0: Math.min(a[2], b[2]), z1: Math.max(a[2], b[2]) };
@@ -397,19 +538,20 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     const W = p.W, D = p.D, H = p.H, lay = layout(p), { doorU, bayU } = lay;
     m.box(wk, 0, H / 2, 0, W, H, D);                                                  // main volume
     m.box('plinth', 0, 0.12, 0, W + 0.08, 0.28, D + 0.08);
-    skirt(toWorldRect(-W / 2, -D / 2, W / 2, D / 2));
+    skirt(toWorldRect(-W / 2, -D / 2, W / 2, D / 2), hy);
     const g = p.garage;
     let gx0 = 0, gx1 = 0, gz1 = 0, gz0 = 0; const GH = 2.95;
     if (g) {
       gx0 = g.side > 0 ? W / 2 : -W / 2 - g.GW; gx1 = gx0 + g.GW; gz1 = D / 2 - g.off; gz0 = gz1 - g.GD;
       m.box(wk, (gx0 + gx1) / 2, GH / 2, (gz0 + gz1) / 2, g.GW, GH, g.GD);
       m.box('plinth', (gx0 + gx1) / 2, 0.12, (gz0 + gz1) / 2, g.GW + 0.08, 0.28, g.GD + 0.08);
-      skirt(toWorldRect(gx0, gz0, gx1, gz1));
+      skirt(toWorldRect(gx0, gz0, gx1, gz1), hy);
     }
     // roofs: the main one along the street (gable) or hipped; the garage's gable end faces the street
-    const top = p.roof === 'hip' ? hipRoof(p, rk, -W / 2, W / 2, -D / 2, D / 2, H) : gableRoof(p, rk, wk, -W / 2, W / 2, -D / 2, D / 2, H, true);
+    const top = p.roof === 'flat' ? flatRoof(rk, -W / 2, W / 2, -D / 2, D / 2, H) : p.roof === 'hip' ? hipRoof(p, rk, -W / 2, W / 2, -D / 2, D / 2, H) : gableRoof(p, rk, wk, -W / 2, W / 2, -D / 2, D / 2, H, true);
     if (g) {
-      if (p.roof === 'hip') hipRoof({ ...p, pitch: p.pitch * 0.9 }, rk, gx0, gx1, gz0, gz1, GH);
+      if (p.roof === 'flat') flatRoof(rk, gx0, gx1, gz0, gz1, GH);
+      else if (p.roof === 'hip') hipRoof({ ...p, pitch: p.pitch * 0.9 }, rk, gx0, gx1, gz0, gz1, GH);
       else gableRoof(p, rk, wk, gz0, gz1, gx0, gx1, GH, false);
     }
     // a front-gable bay: a full-height bump with its own gable facing the street, its back buried in the main roof
@@ -419,7 +561,7 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
       m.box(wk, bayU, H / 2, D / 2 + b.out / 2, b.w, H, b.out + 0.02);
       m.box('plinth', bayU, 0.12, D / 2 + b.out / 2, b.w + 0.08, 0.28, b.out + 0.1);
       gableRoof(p, rk, wk, D / 2 - b.w / 2 - 0.25, bz1, bayU - b.w / 2, bayU + b.w / 2, H, false);
-      skirt(toWorldRect(bayU - b.w / 2, D / 2, bayU + b.w / 2, bz1));
+      skirt(toWorldRect(bayU - b.w / 2, D / 2, bayU + b.w / 2, bz1), hy);
     }
     if (p.chimney) { const chx = (r() - 0.5) * W * 0.5, chz = -D * 0.15; m.box('chimney', chx, (top + 0.6) / 2, chz, 0.7, top + 0.6, 0.9); }
 
@@ -498,6 +640,12 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     const wx = toStreet(doorU), wz0 = oz + facing * stoopZ;
     if (Math.abs(wx - (dx0 + dx1) / 2) > dwW / 2 + 1) m.prism('concrete', [[wx - 0.6, Math.min(wz0, lotLine)], [wx + 0.6, Math.min(wz0, lotLine)], [wx + 0.6, Math.max(wz0, lotLine)], [wx - 0.6, Math.max(wz0, lotLine)]], Y.ground, 0.045);
   }
+  // a hillside's back row: one pad each, at the mean height of the slope under the house
+  if (hillside) for (const h of houses) if (h.row === 'back') {
+    const r = h.rect; let sum = 0, n = 0;
+    for (let i = 0; i <= 4; i++) for (let j = 0; j <= 4; j++) { sum += hillY(r.x0 + (r.x1 - r.x0) * i / 4, r.z0 + (r.z1 - r.z0) * j / 4); n++; }
+    h.padY = sum / n; pads.push({ r: { x0: r.x0 - 0.6, x1: r.x1 + 0.6, z0: r.z0 - 0.6, z1: r.z1 + 0.6 }, y: h.padY });
+  }
   houses.forEach(neighbour);
 
   // ---- back-yard fences: each neighbour's garden in a U of 1.3 m greige board fence, from just forward of its back wall;
@@ -511,15 +659,23 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
       const r = segRect(a, b);
       return segDist(cx, cz, a, b) >= keepR && !corridor.some(([p, q]) => [a, b, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] as P2].some(([x, zz]) => segDist(x, zz, p, q) < 4))
         && houses.every(h => h === self || rrDist(r, h.rect) >= 1) && rrDist(r, lotR) >= 0.5 && !(r.z1 > zLot - 0.3 && r.z0 < zFar + 0.3)
-        && (!lake || rrDist(r, lake) >= 1) && Math.hypot((a[0] + b[0]) / 2, (a[1] + b[1]) / 2) < DISC - 12;
+        && (!lake || rrDist(r, lake) >= 1) && !wetRect(r, 1) && Math.hypot((a[0] + b[0]) / 2, (a[1] + b[1]) / 2) < DISC - 12;
     };
     const fence = (a: P2, b: P2) => {
       const len = Math.hypot(b[0] - a[0], b[1] - a[1]), alongX = Math.abs(b[1] - a[1]) < 1e-6, mx = (a[0] + b[0]) / 2, mz = (a[1] + b[1]) / 2;
       if (len < 0.5) return;
-      m.box('fence', mx, 0.66, mz, alongX ? len : 0.05, 1.16, alongX ? 0.05 : len);         // boards
-      m.box('fence', mx, 1.26, mz, alongX ? len + 0.1 : 0.1, 0.05, alongX ? 0.1 : len + 0.1);  // cap rail
+      if (hillside) {
+        // on a slope a run is a row of raked bays between posts that stand on the ground (a level fence is cut into a wedge)
+        const n = Math.max(1, Math.round(len / 2.4)), at = (i: number): P2 => [a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n];
+        for (let i = 0; i < n; i++) { const p0 = at(i), p1 = at(i + 1), y0 = terrainY(p0[0], p0[1]), y1 = terrainY(p1[0], p1[1]); m.raked('fence', p0, p1, y0 + 0.08, y1 + 0.08, 1.16, 0.05); m.raked('fence', p0, p1, y0 + 1.235, y1 + 1.235, 0.05, 0.1); }
+        for (let i = 0; i <= n; i++) { const p = at(i); m.box('fence', p[0], 0.68 + terrainY(p[0], p[1]), p[1], 0.1, 1.36, 0.1); }
+        return;
+      }
+      const fy = hillY(mx, mz);
+      m.box('fence', mx, 0.66 + fy, mz, alongX ? len : 0.05, 1.16, alongX ? 0.05 : len);         // boards
+      m.box('fence', mx, 1.26 + fy, mz, alongX ? len + 0.1 : 0.1, 0.05, alongX ? 0.1 : len + 0.1);  // cap rail
       const n = Math.max(1, Math.round(len / 2.4));
-      for (let i = 0; i <= n; i++) { const t = i / n; m.box('fence', a[0] + (b[0] - a[0]) * t, 0.68, a[1] + (b[1] - a[1]) * t, 0.1, 1.36, 0.1); }
+      for (let i = 0; i <= n; i++) { const t = i / n; m.box('fence', a[0] + (b[0] - a[0]) * t, 0.68 + fy, a[1] + (b[1] - a[1]) * t, 0.1, 1.36, 0.1); }
     };
     const shared = new Set<string>();
     for (const h of houses) {
@@ -554,11 +710,11 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     return out;
   };
   const strip = (key: string, xs: P2, zs: P2, y0: number, y1: number) => m.prism(key, [[xs[0], zs[0]], [xs[1], zs[0]], [xs[1], zs[1]], [xs[0], zs[1]]], y0, y1);
-  strip('asphalt', [-STREET_X, STREET_X], road, Y.ground, Y.road);
-  for (const near of [true, false]) {
+  if (!noStreet) strip('asphalt', [-STREET_X, STREET_X], road, Y.ground, Y.road);
+  for (const near of noStreet ? [] : [true, false]) {
     const walk = near ? nearWalk : farWalk, curb = near ? nearCurb : farCurb, verge = near ? nearVerge : farVerge;
-    if (walk) for (const xs of runs(near, 0)) strip('sidewalk', xs, walk, Y.ground, Y.walk);
-    for (const xs of runs(near, 0.8)) strip('curb', xs, curb, Y.ground, Y.curb);
+    if (walk) for (const xs of runs(near, 0)) strip(swKey, xs, walk, Y.ground, Y.walk);
+    for (const xs of runs(near, 0.8)) strip(shoulder ? 'shoulder' : 'curb', xs, curb, Y.ground, shoulder ? Y.road : Y.curb);
     // aprons: straight across the walk, flaring across the verge to the curb cut
     for (const a of aprons.filter(q => q.near === near)) {
       const s = near ? 1 : -1, zA = near ? zLot : zFar, zV = near ? verge[0] : verge[1], zC = near ? curb[1] : curb[0];
@@ -571,7 +727,7 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   const lr = rngFor('lamps');
   const lamps: { x: number; z: number; dir: number }[] = [];
   const lampOk = (x: number, zz: number) => !nearCorridor(x, zz, 4) && Math.abs(Math.hypot(x - cx, zz - cz) - orbitR) > 3.5 && !aprons.some(a => x > a.x0 - 1.5 && x < a.x1 + 1.5) && !lamps.some(l => Math.abs(l.x - x) < 14 && l.z === zz);
-  for (const [near, target] of [[true, ex - LW * (0.45 + lr() * 0.2)], [false, ex + LW * (0.3 + lr() * 0.3)]] as [boolean, number][]) {
+  for (const [near, target] of (noStreet ? [] : [[true, ex - LW * (0.45 + lr() * 0.2)], [false, ex + LW * (0.3 + lr() * 0.3)]]) as [boolean, number][]) {
     const zz = near ? (nearVerge[0] + nearVerge[1]) / 2 : (farVerge[0] + farVerge[1]) / 2;
     // the first near the house (as before), then every ~38 m each way until the fog
     const targets = [target]; for (let i = 1; i < 4; i++) targets.push(target - i * 38, target + i * 38);
@@ -591,6 +747,34 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     m.box('lens', l.x, 6.0, l.z + l.dir * 1.65, 0.26, 0.02, 0.5);
   }
 
+  // ---- S4: street furniture — benches, hydrants, bollards, bike racks along the near walk (a city has them by default;
+  // `lot.streetFurniture` lists what a lot's street has, or "none") -------------------------------------------------
+  {
+    const want: string[] = Array.isArray(lot.streetFurniture) ? lot.streetFurniture.filter(k => FURNITURE.includes(k)) : lot.streetFurniture === 'none' ? [] : city ? ['bench', 'hydrant', 'bollard', 'bike-rack'] : [];
+    if (want.length && !noStreet) {
+      const fr = rngFor('furniture'), zz = nearWalk ? (nearWalk[0] + nearWalk[1]) / 2 : (nearVerge[0] + nearVerge[1]) / 2, zEdge = nearVerge[1] - 0.35;
+      const spots: number[] = [];
+      for (let x = -REACH + fr() * 10; x < REACH; x += 9 + fr() * 6) {
+        if (nearCorridor(x, zz, 3.5) || aprons.some(a => x > a.x0 - 1.4 && x < a.x1 + 1.4) || lamps.some(l => Math.abs(l.x - x) < 1.8)) continue;
+        spots.push(x);
+      }
+      spots.forEach((x, i) => {
+        const kind = want[i % want.length];
+        if (kind === 'bench') {
+          m.box('wood', x, 0.46, zz, 1.7, 0.06, 0.46); m.box('wood', x, 0.72, zz - 0.2, 1.7, 0.36, 0.05);
+          m.box('steel', x - 0.72, 0.22, zz, 0.06, 0.44, 0.4); m.box('steel', x + 0.72, 0.22, zz, 0.06, 0.44, 0.4);
+        } else if (kind === 'hydrant') {
+          m.box('hydrant', x, 0.36, zEdge, 0.26, 0.72, 0.26); m.box('hydrant', x, 0.78, zEdge, 0.32, 0.12, 0.32); m.box('hydrant', x, 0.44, zEdge, 0.44, 0.1, 0.1);
+        } else if (kind === 'bollard') {
+          for (let k = -1; k <= 1; k++) m.box('steel', x + k * 1.1, 0.45, zEdge, 0.16, 0.9, 0.16);
+        } else {
+          for (let k = 0; k < 4; k++) { m.box('steel', x - 0.6 + k * 0.4, 0.4, zz, 0.04, 0.8, 0.04); }
+          m.box('steel', x, 0.76, zz, 1.4, 0.04, 0.04);
+        }
+      });
+    }
+  }
+
   // ---- trees ----------------------------------------------------------------------------------------------
   const tr = rngFor('trees');
   type Tree = { x: number; z: number; h: number; kind: 'round' | 'oval' | 'cone' | 'shrub'; leaf: number; floor?: number; low?: number };   // low: crown height × this (fuller, closer to the ground)
@@ -599,16 +783,17 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     if (Math.hypot(x, zz) > DISC - 8) return false;
     if (Math.abs(x) < LW / 2 + clear && Math.abs(zz) < LD / 2 + clear) return false;       // the lot
     if (inKeep(x, zz, clear)) return false;
-    if (streetBand(zz, 0.4)) return false;
+    if (!noStreet && streetBand(zz, 0.4)) return false;
     if (nearCorridor(x, zz, 5)) return false;
     if (lake && rectDist(x, zz, lake) < 1.5) return false;
+    if (waterSides.length && wetAt(x, zz, 1.5)) return false;
     if (houses.some(q => rectDist(x, zz, q.rect) < clear + 1.2)) return false;
     return true;
   };
   const crownR = (h: number) => 0.38 * h;   // the widest crown build() below gives a tree of height h
   const kindOf = (r: () => number): Tree['kind'] => { const q = r(); return forest ? (q < 0.55 ? 'cone' : q < 0.85 ? 'round' : 'oval') : desert ? (q < 0.8 ? 'round' : 'oval') : (q < 0.66 ? 'round' : q < 0.86 ? 'oval' : 'cone'); };
   // street trees along both verges, clear of lamps and the orbit ring
-  for (const near of [true, false]) {
+  for (const near of noStreet ? [] : [true, false]) {
     const zz = near ? (nearVerge[0] + nearVerge[1]) / 2 : (farVerge[0] + farVerge[1]) / 2;
     for (let x = -STREET_X + 6 + tr() * 6; x < STREET_X - 6; x += 11 + tr() * 5) {
       const skip = desert && tr() < 0.6, hh = 7 + tr() * 3, kind: Tree['kind'] = tr() < 0.8 ? 'round' : 'oval', leaf = pick(tr, leaves);
@@ -621,8 +806,8 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   // as woods rather than a stand of lollipops), on a jittered grid — rings around the house
   const rIn = Math.max(keepR + 5, Math.hypot(LW / 2, LD / 2) + 6);
   const bands = [
-    { r0: rIn, r1: rIn + 24, cell: 7, keep: forest ? 0.6 : desert ? 0.1 : 0.34, h: [6, 10], floor: 1.35, low: 1.12 },
-    { r0: Math.max(rIn + 26, 58), r1: Math.max(rIn + 64, 100), cell: 4.2, keep: forest ? 0.96 : desert ? 0.18 : 0.9, h: [9, 15], floor: 1.7, low: 1.3 },
+    { r0: rIn, r1: rIn + 24, cell: 7, keep: forest ? (context === 'forest' ? 0.85 : 0.6) : desert ? 0.1 : city ? 0.12 : rural ? 0.1 : 0.34, h: [6, 10], floor: 1.35, low: 1.12 },
+    { r0: Math.max(rIn + 26, 58), r1: Math.max(rIn + 64, 100), cell: 4.2, keep: forest ? 0.96 : desert ? 0.18 : city ? 0.1 : rural ? 0.35 : 0.9, h: [9, 15], floor: 1.7, low: 1.3 },
   ];
   for (const [bi, b] of bands.entries()) {
     const br = rngFor(`band:${bi}`);
@@ -635,16 +820,185 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     }
   }
 
+  // ---- S4: water on the lot's sides — the water (below the lot), its floor, the banks down to it -----------------
+  const WY = -0.28, FLOOR = -1.1;
+  // The water of every side is one surface, built from CELLS: the lot's sides' strips (each side's bank, its water and, for a
+  // river or canal, the far bank) cut along every edge of every one of them, so a cell lies wholly inside or outside each
+  // strip. A cell in any side's water is water; any other cell is ground whose height at each corner is the LOWEST of
+  // what the sides make of it (a bank slopes from the ground down to the water's edge, a quay is flat, a far bank rises
+  // again) — so where two sides meet (a canal round a corner, a lake on three sides) the banks join in a mitre, the quay of
+  // one never runs on across the water of the other, and a bank never stands in a river. One side alone builds the strips
+  // it always did.
+  function buildWater(gm: any) {
+    const wmat = (typeof water === 'function' && water('water')) || new THREE.MeshStandardMaterial({ color: 0x35535c, roughness: 0.08, metalness: 0.1 });
+    const floorM = std(0x2a3a36, { roughness: 1 });
+    const sand = (kit && typeof kit.surface === 'function' && kit.surface('desert')) || std(0xc5ae88, { roughness: 0.95 });
+    const stone = (typeof water === 'function' && water('stone', 0x9d968a)) || std(0x9d968a, { roughness: 0.95 });
+    const HI = Y.ground, LO = WY - 0.06;
+    const inR = (r: Rect | null, x: number, zz: number) => !!r && x > r.x0 && x < r.x1 && zz > r.z0 && zz < r.z1;
+    // a side's strip height at a point in it: across the strip from the ground's edge (HI) to the water's (LO), or back up
+    // (the far bank), or flat (a quay); the strip's own two edges say which end is which
+    const strip = (w: WaterSide, b: Rect, fromNear: boolean, x: number, zz: number) => {
+      const alongX = w.along === 'x', o = w.out, nearEdge = (o[0] + o[1] > 0) === fromNear ? 0 : 1;
+      const [t0, t1] = alongX ? [b.z0, b.z1] : [b.x0, b.x1], t = alongX ? zz : x, y0 = nearEdge === 0 ? HI : LO, y1 = nearEdge === 0 ? LO : HI;
+      return y0 + (y1 - y0) * Math.max(0, Math.min(1, (t - t0) / (t1 - t0 || 1)));
+    };
+    const heightOf = (x: number, zz: number) => waterSides.reduce((h, w) => {
+      let y = HI;
+      if (inR(w.water, x, zz)) y = LO;
+      else if (w.edge !== 'wall') { if (inR(w.bank, x, zz)) y = strip(w, w.bank, true, x, zz); else if (w.far && inR(w.far, x, zz)) y = strip(w, w.far, false, x, zz); }
+      return Math.min(h, y);
+    }, HI);
+    const rects: Rect[] = waterSides.flatMap(w => [w.bank, w.water, w.far].filter(Boolean) as Rect[]);
+    const xs = [...new Set(rects.flatMap(r => [r.x0, r.x1]))].sort((a, b2) => a - b2), zs = [...new Set(rects.flatMap(r => [r.z0, r.z1]))].sort((a, b2) => a - b2);
+    type Buf = { pos: number[]; mat: any; name: string };
+    const bufs = new Map<string, Buf>();
+    const buf = (key: string, mat: any, name: string) => { let b2 = bufs.get(key); if (!b2) { b2 = { pos: [], mat, name }; bufs.set(key, b2); } return b2; };
+    const tri = (b2: Buf, A: P3, B: P3, C: P3) => { const ux = B[0] - A[0], uy = B[1] - A[1], uz = B[2] - A[2], vx = C[0] - A[0], vy = C[1] - A[1], vz = C[2] - A[2]; const ny = uz * vx - ux * vz; if (Math.abs(ny) < 1e-12 && Math.abs(uy * vz - uz * vy) < 1e-12 && Math.abs(ux * vy - uy * vx) < 1e-12) return; b2.pos.push(...A, ...(ny < 0 ? [...C, ...B] : [...B, ...C])); };
+    const walls: Array<{ alongX: boolean; c: number; u0: number; u1: number }> = [];
+    const EPS = 1e-4, isWet = (x: number, zz: number) => waterSides.some(w => inR(w.water, x, zz));
+    for (let i = 0; i + 1 < xs.length; i++) for (let j = 0; j + 1 < zs.length; j++) {
+      const x0 = xs[i], x1 = xs[i + 1], z0 = zs[j], z1 = zs[j + 1], cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+      if (!waterSides.some(w => inR(w.bank, cx, cz) || inR(w.water, cx, cz) || inR(w.far, cx, cz))) continue;
+      if (isWet(cx, cz)) { const b2 = buf('water', wmat, `World · ${waterSides[0].kind}`); const A: P3 = [x0, WY, z0], B: P3 = [x1, WY, z0], C: P3 = [x1, WY, z1], D: P3 = [x0, WY, z1]; tri(b2, A, B, C); tri(b2, A, C, D); continue; }
+      // the ground: heights at the four corners, taken just inside the cell
+      const ex = Math.min(EPS, (x1 - x0) / 4), ez = Math.min(EPS, (z1 - z0) / 4);
+      const hA = heightOf(x0 + ex, z0 + ez), hB = heightOf(x1 - ex, z0 + ez), hC = heightOf(x1 - ex, z1 - ez), hD = heightOf(x0 + ex, z1 - ez);
+      const owner = waterSides.find(w => inR(w.bank, cx, cz)) || waterSides.find(w => inR(w.far, cx, cz))!;
+      const quay = owner.edge === 'wall', b2 = quay ? buf('quay', gm, 'World · quay') : owner.edge === 'beach' ? buf('beach', sand, 'World · bank') : buf('bank', gm, 'World · bank');
+      const A: P3 = [x0, hA, z0], B: P3 = [x1, hB, z0], C: P3 = [x1, hC, z1], D: P3 = [x0, hD, z1];
+      if (Math.abs(hA - hC) >= Math.abs(hB - hD)) { tri(b2, A, B, C); tri(b2, A, C, D); } else { tri(b2, A, B, D); tri(b2, B, C, D); }
+      if (quay) {
+        // a wall where the quay meets water: on each edge of the cell whose far side is wet
+        const edges: Array<[boolean, number, number, number, number, number]> = [[true, z0, x0, x1, cx, z0 - 2 * EPS - 1e-3], [true, z1, x0, x1, cx, z1 + 2 * EPS + 1e-3], [false, x0, z0, z1, x0 - 2 * EPS - 1e-3, cz], [false, x1, z0, z1, x1 + 2 * EPS + 1e-3, cz]];
+        for (const [alongX, c, u0, u1, px, pz] of edges) if (isWet(px, pz)) walls.push({ alongX, c, u0, u1 });
+      }
+    }
+    for (const b2 of bufs.values()) {
+      const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(b2.pos, 3)); g.computeVertexNormals();
+      const o = new THREE.Mesh(g, b2.mat); o.receiveShadow = true; o.name = b2.name; root.add(o);
+    }
+    // the quay walls: runs merged along their lines
+    walls.sort((a, b2) => (a.alongX === b2.alongX ? 0 : a.alongX ? -1 : 1) || a.c - b2.c || a.u0 - b2.u0);
+    const runs: typeof walls = [];
+    for (const wl of walls) { const last = runs[runs.length - 1]; if (last && last.alongX === wl.alongX && Math.abs(last.c - wl.c) < 1e-6 && wl.u0 <= last.u1 + 1e-6) last.u1 = Math.max(last.u1, wl.u1); else runs.push({ ...wl }); }
+    for (const wl of runs) {
+      const len = wl.u1 - wl.u0, face = new THREE.Mesh(new THREE.BoxGeometry(wl.alongX ? len : 0.35, 1.1, wl.alongX ? 0.35 : len), stone);
+      face.position.set(wl.alongX ? (wl.u0 + wl.u1) / 2 : wl.c, Y.ground - 0.55 + 0.05, wl.alongX ? wl.c : (wl.u0 + wl.u1) / 2); face.receiveShadow = true; face.name = 'World · quay wall'; root.add(face);
+    }
+    // the floor under every side's strips (seen through the water, and under the slopes)
+    for (const w of waterSides) {
+      const all = [w.bank, w.water, w.far].filter(Boolean).reduce((a, b2) => ({ x0: Math.min(a!.x0, b2!.x0), x1: Math.max(a!.x1, b2!.x1), z0: Math.min(a!.z0, b2!.z0), z1: Math.max(a!.z1, b2!.z1) })) as Rect;
+      const fl = new THREE.Mesh(new THREE.PlaneGeometry(all.x1 - all.x0, all.z1 - all.z0), floorM); fl.rotation.x = -Math.PI / 2; fl.position.set((all.x0 + all.x1) / 2, FLOOR, (all.z0 + all.z1) / 2); fl.name = 'World · water floor'; root.add(fl);
+    }
+  }
+  // a hill behind the lot: a height field over the back of the disc, meeting the flat ground at its foot
+  const backFar = waterSides.find(w => w.out[1] < -0.5 && w.far && w.farBank === 'hills');
+  const hillFrom = hillside ? -LD / 2 - 5 : backFar ? backFar.far.z0 - 1 : null;
+  function buildHill(gm: any) {
+    const H = (x: number, zz: number) => { const d = hillFrom - zz; return hillside ? Y.ground + terrainY(x, zz) : d <= 0 ? Y.ground : Y.ground + hillRise(x, d); };
+    const cell = hillside ? 2 : 4, pos: number[] = [];
+    // (from the foot itself: the first row of cells starts at the flat ground, not a cell's rise above it)
+    for (let x = -DISC; x < DISC; x += cell) for (let zz = hillFrom; zz > -DISC - cell; zz -= cell) {
+      const c = [x + cell / 2, zz - cell / 2]; if (Math.hypot(c[0], c[1]) > DISC + 2) continue;
+      const a: P3 = [x, H(x, zz), zz], b: P3 = [x + cell, H(x + cell, zz), zz], cc: P3 = [x + cell, H(x + cell, zz - cell), zz - cell], d: P3 = [x, H(x, zz - cell), zz - cell];
+      pos.push(...a, ...b, ...cc, ...a, ...cc, ...d);
+    }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    const p = g.attributes.position;
+    for (let t = 0; t < p.count; t += 3) { const ux = p.getX(t + 1) - p.getX(t), uz = p.getZ(t + 1) - p.getZ(t), vx = p.getX(t + 2) - p.getX(t), vz = p.getZ(t + 2) - p.getZ(t); if (uz * vx - ux * vz < 0) { const x = p.getX(t + 1), y = p.getY(t + 1), z2 = p.getZ(t + 1); p.setXYZ(t + 1, p.getX(t + 2), p.getY(t + 2), p.getZ(t + 2)); p.setXYZ(t + 2, x, y, z2); } }
+    g.computeVertexNormals();
+    const o = new THREE.Mesh(g, gm); o.receiveShadow = true; o.name = 'World · hill'; root.add(o);
+  }
+
+  // ---- S4: the far bank of a river or canal (trees, or a row of houses facing the water), fields, a skyline ------
+  const xr = rngFor('context');
+  for (const w of waterSides) {
+    if (!w.far) continue;
+    // the line of the far bank, and outward from it
+    const fr = w.far, outward = w.out, alongX = w.along === 'x';
+    const lineAt = outward[0] + outward[1] > 0 ? (alongX ? fr.z1 : fr.x1) : (alongX ? fr.z0 : fr.x0), sgn = outward[0] + outward[1] > 0 ? 1 : -1;
+    if (w.farBank === 'trees') {
+      for (let u = -110; u <= 110; u += 3.2 + xr() * 2.4) for (const k of [0, 1, 2]) {
+        const c = lineAt + sgn * (3 + k * 5 + xr() * 4), x = alongX ? u + (xr() - 0.5) * 2 : c, zz = alongX ? c : u + (xr() - 0.5) * 2, hh = 8 + xr() * 7;
+        if (Math.hypot(x, zz) > DISC - 8 || xr() < 0.15 || wetAt(x, zz, 1) || (!noStreet && streetBand(zz, 0.4))) continue;
+        trees.push({ x, z: zz, h: hh, kind: forest || xr() < 0.25 ? 'cone' : xr() < 0.7 ? 'round' : 'oval', leaf: pick(xr, leaves), floor: 1.5, low: 1.2 });
+      }
+    } else if (w.farBank === 'houses' && alongX) {
+      // a row facing the water, fronts toward the lot
+      let u = -REACH + xr() * 6;
+      while (u < REACH) {
+        const p = planFor(xr, false), e = extent(p), wx = e.x1 - e.x0, facing = sgn > 0 ? -1 : 1;
+        const front = lineAt + sgn * (4 + xr() * 3), oz = facing < 0 ? front + e.z1 : front - e.z1, ox = facing < 0 ? u + e.x1 : u - e.x0;
+        const rect = worldRect(e, ox, oz, facing);
+        if (Math.hypot((rect.x0 + rect.x1) / 2, (rect.z0 + rect.z1) / 2) < DISC - 25 && !wetRect(rect, 1) && houses.every(h => rrDist(h.rect, rect) >= 3)) { houses.push({ p, ox, oz, facing, row: 'back', rect }); neighbour(houses[houses.length - 1], houses.length - 1); }
+        u += wx + (city ? 1.4 : 4 + xr() * 5);
+      }
+    }
+  }
+  if (rural) {
+    // fields in the ring beyond the neighbours: crop patches, a hedgerow along some field edges, a barn or two
+    const FIELD = [0xa8995a, 0x6f8a44, 0x96825a, 0x5f7a3c, 0x7d6448, 0xb3a567];
+    const cell = 40, R0 = Math.max(keepR + 3, Math.hypot(LW / 2, LD / 2) + 6);
+    let barns = 0;
+    for (let gx = -DISC; gx < DISC; gx += cell) for (let gz = -DISC; gz < DISC; gz += cell) {
+      const x0 = gx + 1.5 + xr() * 2, x1 = gx + cell - 1.5 - xr() * 2, z0 = gz + 1.5 + xr() * 2, z1 = gz + cell - 1.5 - xr() * 2, c = [(x0 + x1) / 2, (z0 + z1) / 2];
+      const r = { x0, x1, z0, z1 };
+      if (Math.hypot(c[0], c[1]) > DISC - 20 || rectDist(cx, cz, r) < R0 || (!noStreet && r.z1 > zLot - 2 && r.z0 < zFar + 2) || houses.some(h => rrDist(h.rect, r) < 3) || wetRect(r, 2)) continue;
+      m.prism(`field:${pick(xr, FIELD).toString(16)}`, [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], Y.ground, 0.004);
+      for (const [a, b] of [[[x0, z0], [x1, z0]], [[x0, z0], [x0, z1]]] as [P2, P2][]) {
+        if (xr() < 0.5) continue;
+        const L2 = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        for (let t = 0; t < L2; t += 2.6 + xr() * 1.5) { const x = a[0] + (b[0] - a[0]) * t / L2, zz = a[1] + (b[1] - a[1]) * t / L2; if (treeOk(x, zz, 1)) trees.push({ x, z: zz, h: xr() < 0.12 ? 9 + xr() * 4 : 1.2 + xr() * 0.8, kind: 'shrub', leaf: pick(xr, leaves) }); }
+      }
+      if (barns < 2 && xr() < 0.08 && Math.hypot(c[0], c[1]) < 110) {
+        barns++;
+        const bw = 16 + xr() * 6, bd = 10 + xr() * 3, bh = 5 + xr() * 2, bp = { W: bw, D: bd, H: bh, storeys: 1, roof: 'gable', pitch: 38 * Math.PI / 180, garage: null, wall: 0x7d4a3c, roof2: 0x4a4540, chimney: false, door: 0.5, lit: 1, porch: null, bay: null } as Plan;
+        m.transform(q => [c[0] + q[0], q[1], c[1] + q[2]]);
+        m.box(wallKey(0x7d4a3c), 0, bh / 2, 0, bw, bh, bd); gableRoof(bp, roofKey(0x4a4540), wallKey(0x7d4a3c), -bw / 2, bw / 2, -bd / 2, bd / 2, bh, true);
+        m.reset();
+        skirt({ x0: c[0] - bw / 2, x1: c[0] + bw / 2, z0: c[1] - bd / 2, z1: c[1] + bd / 2 });
+      }
+    }
+  }
+  if (city) {
+    // a skyline beyond the block: taller flat-roofed buildings in the far ring
+    for (let a = xr() * 0.3; a < Math.PI * 2; a += 0.14 + xr() * 0.12) {
+      const d = 72 + xr() * 50, x = cx + Math.cos(a) * d, zz = cz + Math.sin(a) * d, bw = 12 + xr() * 14, bd = 12 + xr() * 12, bh = 12 + xr() * 30, col = pick(xr, CITY_WALLS);
+      const r = { x0: x - bw / 2, x1: x + bw / 2, z0: zz - bd / 2, z1: zz + bd / 2 };
+      if (Math.hypot(x, zz) > DISC - 15 || (!noStreet && r.z1 > zLot - 2 && r.z0 < zFar + 2) || houses.some(h => rrDist(h.rect, r) < 4) || nearCorridor(x, zz, 8) || wetRect(r, 2)) continue;
+      m.box(wallKey(col), x, bh / 2, zz, bw, bh, bd);
+      m.box('trim', x, bh + 0.3, zz, bw + 0.1, 0.6, bd + 0.1);
+    }
+  }
+
   // ---- ground to the horizon, the lot punched out; a lake behind a waterfront lot ------------------------
   {
     const shape = new THREE.Shape(); shape.absarc(0, 0, DISC, 0, Math.PI * 2, false);
     // ShapeGeometry lies in XY and is turned flat below, which maps shape y onto −z
     const hole = new THREE.Path([[-LW / 2, -LD / 2], [-LW / 2, LD / 2], [LW / 2, LD / 2], [LW / 2, -LD / 2]].map(([x, zz]) => new THREE.Vector2(x, -zz)));
     shape.holes.push(hole);
+    // S4: water sides are cut out of the disc too — their union, traced on a 2 m grid and kept inside the disc
+    if (waterSides.length) {
+      const rects = waterSides.map(w => { const r = [w.bank, w.water, w.far].filter(Boolean).reduce((a, b) => ({ x0: Math.min(a.x0, b.x0), x1: Math.max(a.x1, b.x1), z0: Math.min(a.z0, b.z0), z1: Math.max(a.z1, b.z1) })); const C = DISC + 4; return { x: Math.max(r.x0, -C), z: Math.max(r.z0, -C), w: Math.min(r.x1, C) - Math.max(r.x0, -C), d: Math.min(r.z1, C) - Math.max(r.z0, -C) }; });
+      const U = rectUnion(rects);
+      for (const loop of [U.outer, ...U.holes].filter(l => l.length >= 4)) {
+        const pts: P2[] = [];
+        for (let i = 0; i < loop.length; i++) {
+          const a = loop[i], b = loop[(i + 1) % loop.length], n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 4));
+          for (let k = 0; k < n; k++) { let x = a[0] + (b[0] - a[0]) * k / n, zz = a[1] + (b[1] - a[1]) * k / n; const rr = Math.hypot(x, zz); if (rr > DISC - 0.5) { x *= (DISC - 0.5) / rr; zz *= (DISC - 0.5) / rr; } pts.push([x, zz]); }
+        }
+        shape.holes.push(new THREE.Path(pts.map(([x, zz]) => new THREE.Vector2(x, -zz))));
+      }
+    }
     const geo = new THREE.ShapeGeometry(shape, 48); geo.rotateX(-Math.PI / 2);
-    const gm = ground && ground.isMaterial ? ground : groundMaterial || std(typeof ground === 'number' ? ground : 0x4d7c3a, { roughness: 0.95 });
+    // (a city block's ground beyond the lot is paved: the lot's own lawn stays its front garden)
+    const cityPaved = city && (lot.ground === undefined || lot.ground === 'lawn') && kit && typeof kit.surface === 'function';
+    const gm = cityPaved ? kit.surface('urban') : ground && ground.isMaterial ? ground : groundMaterial || std(typeof ground === 'number' ? ground : 0x4d7c3a, { roughness: 0.95 });
     const mesh = new THREE.Mesh(geo, gm);
     mesh.position.y = Y.ground; mesh.receiveShadow = true; mesh.name = 'World · ground'; root.add(mesh);
+    if (waterSides.length) buildWater(gm);
+    if (hillFrom !== null) buildHill(gm);
     if (lake) {
       const lk = new THREE.Mesh(new THREE.PlaneGeometry(lake.x1 - lake.x0, lake.z1 - lake.z0), new THREE.MeshStandardMaterial({ color: 0x35535c, roughness: 0.08, metalness: 0.1 }));
       lk.rotation.x = -Math.PI / 2; lk.position.set((lake.x0 + lake.x1) / 2, Y.lake, (lake.z0 + lake.z1) / 2); lk.receiveShadow = true; lk.name = 'World · lake'; root.add(lk);
@@ -661,7 +1015,8 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     door: () => std(0x2f3438, { roughness: 0.6 }), garage: () => std(0xeceae5, { roughness: 0.6 }), groove: () => std(0xb9b6ae, { roughness: 0.8 }),
     glass, glassLit: glass,
     concrete: () => surface('concrete', 0xbdb9b1), driveway: () => surface('driveway', 0xb6b2aa), sidewalk: () => surface('sidewalk', 0xc2bfb8),
-    curb: () => surface('curb', 0xcfccc5), asphalt: () => surface('asphalt', 0x2d2f33),
+    curb: () => surface('curb', 0xcfccc5), asphalt: () => surface('asphalt', 0x2d2f33), shoulder: () => std(0xa79d88, { roughness: 1 }),
+    wood: () => std(0x8a6a4a, { roughness: 0.85 }), hydrant: () => std(0xb5382c, { roughness: 0.55 }), steel: () => std(0x8a9096, { roughness: 0.45, metalness: 0.6 }),
     pole: () => std(0x34373b, { roughness: 0.5, metalness: 0.5 }),
     lens: () => new THREE.MeshStandardMaterial({ color: 0xf5efe2, emissive: 0xffd9a8, emissiveIntensity: 1, roughness: 0.4 }),
   };
@@ -672,7 +1027,10 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   for (const key of m.keys()) {
     const isRoof = key.startsWith('roof:'), isWall = key.startsWith('wall:');
     const geo = m.geometry(THREE, key, isRoof); if (!geo) continue;
-    const mat = isRoof ? roofMat(parseInt(key.slice(5), 16)) : isWall ? std(parseInt(key.slice(5), 16), { roughness: 0.9 }) : (mats[key] || (() => std(0xcccccc)))();
+    const isWalk = key.startsWith('sidewalk:'), isField = key.startsWith('field:');
+    // (a tinted sidewalk: the kit's concrete flags, its own copy, multiplied by the tint)
+    const walkMat = () => { const t = surface('sidewalk', 0xc2bfb8), c = t.clone ? t.clone() : t; if (c.color) c.color.setHex(parseInt(key.slice(9), 16)); return c; };
+    const mat = isRoof ? roofMat(parseInt(key.slice(5), 16)) : isWall ? std(parseInt(key.slice(5), 16), { roughness: 0.9 }) : isWalk ? walkMat() : isField ? std(parseInt(key.slice(6), 16), { roughness: 1 }) : (mats[key] || (() => std(0xcccccc)))();
     const mesh = new THREE.Mesh(geo, mat);
     mesh.name = `World · ${key}`; mesh.castShadow = false; mesh.receiveShadow = key !== 'lens' && key !== 'glass' && key !== 'glassLit';
     if (key === 'lens') { mesh.userData.fixture = 'street'; mat.userData.fixture = 'street'; }
@@ -712,14 +1070,15 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
     const vr = rngFor('tree-shape');
     let ci = 0, si = 0;
     trees.forEach((t, i) => {
+      const hy = terrainY(t.x, t.z);   // (0 unless the ground rises: a hillside)
       Q.setFromAxisAngle(up, vr() * Math.PI * 2);
       C.setHex(t.leaf).multiplyScalar(0.9 + vr() * 0.2);
       let rad;
       if (t.kind === 'cone') {
         // a conifer: three stacked tiers from just above the ground, each a touch lighter, a stub of trunk under them
         rad = t.h * (0.2 + vr() * 0.05);
-        TIERS.forEach(([b, hf, rf], k) => { spires.setMatrixAt(si, M.compose(T.set(t.x, t.h * b, t.z), Q, S.set(rad * rf, t.h * hf, rad * rf))); spires.setColorAt(si++, C2.copy(C).multiplyScalar(1 + 0.05 * k)); });
-        trunks.setMatrixAt(i, M.compose(T.set(t.x, 0, t.z), Q, S.set(0.16, t.h * 0.1, 0.16)));
+        TIERS.forEach(([b, hf, rf], k) => { spires.setMatrixAt(si, M.compose(T.set(t.x, t.h * b + hy, t.z), Q, S.set(rad * rf, t.h * hf, rad * rf))); spires.setColorAt(si++, C2.copy(C).multiplyScalar(1 + 0.05 * k)); });
+        trunks.setMatrixAt(i, M.compose(T.set(t.x, hy, t.z), Q, S.set(0.16, t.h * 0.1, 0.16)));
       } else {
         // a broadleaf (or a shrub): a full crown low on a short trunk — a core with satellites round it, the upper ones a
         // touch lighter and the lower ones darker, so it reads as a leafy mass and not as a ball on a stick; the tree
@@ -727,17 +1086,17 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
         const shrub = t.kind === 'shrub';
         rad = shrub ? t.h : t.h * (t.kind === 'oval' ? 0.24 : 0.32) * (0.9 + vr() * 0.2);
         const sy = (t.kind === 'oval' ? 1.5 : shrub ? 0.8 : 0.9 + vr() * 0.14) * (t.low || 1), cyy = shrub ? rad * sy * 0.85 : t.h - rad * sy;
-        crowns.setMatrixAt(ci, M.compose(T.set(t.x, cyy, t.z), Q, S.set(rad, rad * sy, rad))); crowns.setColorAt(ci++, C);
+        crowns.setMatrixAt(ci, M.compose(T.set(t.x, cyy + hy, t.z), Q, S.set(rad, rad * sy, rad))); crowns.setColorAt(ci++, C);
         const n = shrub ? 2 : 4, a0 = vr() * Math.PI * 2;
         for (let k = 0; k < n; k++) {
           const a = a0 + k * Math.PI * 2 / n + (vr() - 0.5) * 0.6, upper = k % 2 === 0, lift = upper ? 0.3 : -0.2;
           const off = rad * (0.5 + vr() * 0.14), r2 = rad * (0.56 + vr() * 0.16);
-          crowns.setMatrixAt(ci, M.compose(T.set(t.x + Math.cos(a) * off, cyy + rad * sy * lift, t.z + Math.sin(a) * off), Q, S.set(r2, r2 * sy, r2)));
+          crowns.setMatrixAt(ci, M.compose(T.set(t.x + Math.cos(a) * off, cyy + rad * sy * lift + hy, t.z + Math.sin(a) * off), Q, S.set(r2, r2 * sy, r2)));
           crowns.setColorAt(ci++, C2.copy(C).multiplyScalar(upper ? 1.08 : 0.92));
         }
-        trunks.setMatrixAt(i, M.compose(T.set(t.x, 0, t.z), Q, shrub ? S.set(0.001, 0.001, 0.001) : S.set(0.16 + t.h * 0.012, cyy, 0.16 + t.h * 0.012)));
+        trunks.setMatrixAt(i, M.compose(T.set(t.x, hy, t.z), Q, shrub ? S.set(0.001, 0.001, 0.001) : S.set(0.16 + t.h * 0.012, cyy, 0.16 + t.h * 0.012)));
       }
-      shadows.setMatrixAt(i, M.compose(T.set(t.x, Y.decal, t.z), Q, S.set(rad * (t.floor || 1.35), 1, rad * (t.floor || 1.35))));
+      shadows.setMatrixAt(i, M.compose(T.set(t.x, Y.decal + hy, t.z), Q, S.set(rad * (t.floor || 1.35), 1, rad * (t.floor || 1.35))));
     });
     for (const x of [crowns, spires, trunks, shadows]) { x.instanceMatrix.needsUpdate = true; if (x.instanceColor) x.instanceColor.needsUpdate = true; x.computeBoundingSphere(); root.add(x); }
     if (!shadowTex) shadows.visible = false;
@@ -766,7 +1125,7 @@ export function buildWorld({ THREE, spec, std, kit = null, ground = null, ground
   // (houses: each neighbour's row and footprint in the street frame, eaves included — for QA framing)
   const r1 = (v: number) => Math.round(v * 10) / 10;
   root.userData.worldInfo = {
-    street: { side, zLot, road, zFar, specWalk }, neighbours: houses.length, trees: trees.length, lamps: lamps.length, orbitR, keepR,
+    street: { side, zLot, road, zFar, specWalk, none: noStreet }, context: context || 'suburb', water: waterSides.map(w => ({ kind: w.kind, edge: w.edge, farBank: w.farBank })), neighbours: houses.length, trees: trees.length, lamps: lamps.length, orbitR, keepR,
     houses: houses.map(h => ({ row: h.row, x0: r1(h.rect.x0), x1: r1(h.rect.x1), z0: r1(h.rect.z0), z1: r1(h.rect.z1), porch: !!h.p.porch, bay: !!h.p.bay })),
   };
   return root;

@@ -41,7 +41,7 @@ function gardenChair(ctx, frameMat, slatMat, cushionMat) {
   return c;
 }
 
-registerProps({
+const OUTDOOR = {
   // ---------------------------------------------------------------------------------------------------------------
   // Patio set — a round pedestal table with four slatted chairs pulled up to it. r: the table-top radius; the
   // chairs add 0.54 m all round.
@@ -578,4 +578,7 @@ registerProps({
       { shape: 'cyl', box: [-0.45, 2.18, -0.45, 0.45, 2.24, 0.45], color: '#b4b4b8' },
     ],
   },
-});
+};
+registerProps(OUTDOOR);
+// every outdoor prop is also a site item (site-build.ts: `{ "type": "bbq-grill", "at": [x, z], "rot" }` in spec.site)
+export const OUTDOOR_TYPES: readonly string[] = Object.keys(OUTDOOR);

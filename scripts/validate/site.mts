@@ -1,8 +1,280 @@
-// Validator plugin — owned by S4 (site). See _types.mts for the contract. Starts empty (plan S0); the stream adds its
-// lints here, as warnings until the layout pass promotes them (plan §2.0).
-// What the core accepts is widened from here too, never in validate-house-spec.mts: `export const extend = { … }`
-// and `export const replaces = [ … ]` (_types.mts). This stream's: grounds (site types: SITE_KIT_TYPES in assets/site.ts); rule 'site-needs'.
-import type { Check } from './_types.mts';
+// Validator plugin — owned by S4 (site). See _types.mts for the contract.
+//
+// It widens what the core accepts (the grounds `meadow` and `gravel`) and takes over the core's 'site-needs' rule:
+// the geometry each site type needs, now that fences run along a `path`, pools can be a `poly`, and the new types
+// (planting, terrace, stair, climber, string-lights, rill) need their own. Those are errors, as the core's were:
+// a builder given no geometry builds nothing. Everything else is a lint and arrives as a warning (plan §2.0):
+//   unknown-name     a shrub form, flower kind, tree species, planting kind / mix, path surface, pool shape, fence,
+//                    rail or stair style, lot context / street / water / sidewalk / furniture the builders do not know (they fall back)
+//   planting-ref     a planting `along` naming a path or terrace that is not there
+//   planting-empty   a planting that lays out no bed (or no plant): its band is blocked all along
+//   front-crates     `garden-beds` (raised vegetable crates) between the entry facade and the street
+//   in-house         a slab, a bed, a pool or a prop standing on the ground storey's footprint
+//   off-lot          an item standing outside the lot — its centre, or any point of a path, hedge, fence, wall or polyline
+//                    the planting follows (a bed or a plant never crosses the lot line: the generator clips them)
+//   buried-water     water a patio, deck or terrace covers (its rim under the slab's top)
+//   bed-on-slab      a bed or planting laid over a patio, driveway or deck
+//   bed-overlap      two beds (or a bed and a planting's) that share ground: two slabs of soil, two sets of plants
+//   straight-edge    a path or a bed with 8 m or more of straight run along an axis: a garden path bends (waypoints and
+//                    `smooth`, or `meander` for a two-point path), or it is paving and wants `patio` / `driveway`
+//   planting-heavy   a planting of more than 800 000 triangles: it draws slowly on a phone
+//   sunken-terrace   handled as an error in 'site-needs': a terrace is raised (`y` > 0)
+//   steps-lost       `steps` on a terraced lot that climb nothing (the ground does not rise within 8 m of them)
+//   stair-end        an exterior `stair` whose top ends where nothing stands at that height
+//   steep-stair      an exterior stair steeper than 0.19 m risers on 0.25 m treads
+//   terrace-straddle a slab, a deck, a pool, a bed, a path or a structure with no `y` of its own that spans a
+//                    terrace's edge: it stands at one height (the ground at its centre), so part of it sinks or floats
+//   water-sides      lot.water on all four sides (an island lot is not built)
+import type { Check, Issue, Extend, Rule } from './_types.mts';
+import { SHRUB_FORMS, FLOWER_KINDS_ALL, TREE_SPECIES, PATH_SURFACES } from '../../assets/site.js';
+import { PLANTING_KINDS, MIXES, SPECIES, WATER_SHAPES, isShapedWater, waterOutline, createSiteContext, planPlanting, plantingTriangles } from '../../assets/site-planting.js';
+import { rectPoly, inPoly, polyArea, bbox, centroid, tensionOf, smoothLoop, axisAlignedRuns, segmentsOf, turn } from '../../assets/site-geom.js';
 
-const check: Check = (spec, ctx) => [];
+export const extend: Extend = { grounds: ['meadow', 'gravel'] };
+export const replaces: Rule[] = ['site-needs'];
+
+const FENCES = ['picket', 'privacy', 'slat-h', 'post-rail', 'metal', 'glass', 'stone-wall'];
+const RAILS = ['glass', 'metal', 'timber', 'cable', 'colonial'];
+const STAIRS = ['stone', 'concrete', 'timber', 'steel'];
+const CONTEXTS = ['suburb', 'city', 'forest', 'desert', 'waterfront', 'rural', 'hillside'];
+const WATERS = ['lake', 'river', 'canal', 'sea'];
+const SIDEWALKS = ['concrete', 'brick', 'stone', 'flagstone', 'pavers', 'gravel', 'slate'];
+const FURNITURE = ['bench', 'hydrant', 'bollard', 'bike-rack'];
+const SIDES = ['S', 'N', 'E', 'W'];
+const TERRACE_EDGES = ['retaining', 'planted', 'rail', 'slope'];
+const isP = (p: unknown) => Array.isArray(p) && p.length >= 2 && typeof p[0] === 'number' && typeof p[1] === 'number';
+const isLine = (l: unknown, n = 2) => Array.isArray(l) && l.length >= n && l.every(isP);
+
+// the plan footprint of an item as the builders lay it out (a rect turned by rot, or its own polygon)
+const DEFAULT_WD: Record<string, [number, number]> = { patio: [4, 3], driveway: [4, 3], deck: [4, 3], pool: [6, 4], 'turtle-pool': [8, 6], pond: [4, 3], 'garden-beds': [3, 2], greenhouse: [3.6, 2.4], turf: [6, 4], bed: [2, 1] };
+function footprintOf(s: any, i: number, id: string) {
+  if (isShapedWater(s)) { const w = waterOutline(s, i, id); return w ? w.poly : null; }
+  if (Array.isArray(s.poly) && s.poly.length >= 3) return s.poly;
+  if (!isP(s.at)) return null;
+  const wd = DEFAULT_WD[s.type]; if (!wd) return null;
+  return rectPoly(s.at, s.w || wd[0], s.d || wd[1], s.rot || 0);
+}
+// the share of polygon a covered by polygon b, sampled on a 0.2 m grid
+function covered(a: number[][], b: number[][]) {
+  const bb = bbox(a as any); let n = 0, k = 0;
+  for (let x = bb.x0 + 0.1; x < bb.x1; x += 0.2) for (let z = bb.z0 + 0.1; z < bb.z1; z += 0.2) if (inPoly(x, z, a as any)) { n++; if (inPoly(x, z, b as any)) k++; }
+  return n ? k / n : 0;
+}
+
+const check: Check = (spec, ctx) => {
+  const out: Issue[] = [];
+  const err = (message: string, code?: string) => out.push({ level: 'error', message, code });
+  const warn = (message: string, code: string) => out.push({ level: 'warn', message, code });
+  const site: any[] = spec.site || [];
+  const lot = spec.lot || {};
+  const S = (s: any, i: number) => `site[${i}] ${s.type}`;
+  let planCtx: ReturnType<typeof createSiteContext> | null = null;
+  const plantingBeds: Array<{ i: number; poly: number[][] }> = [];
+
+  // ---- 'site-needs' (replaced): each type's geometry — the core's findings for the old forms, word for word
+  for (const [i, s] of site.entries()) {
+    if (!ctx.siteTypes.includes(s.type)) continue;   // the core reports an unknown type
+    let needs: string, ok: boolean;
+    if (s.type === 'fence' || s.type === 'wall-low') { needs = 'from/to'; ok = !!(s.from && s.to) || isLine(s.path); }
+    else if (s.type === 'path' || s.type === 'hedge' || s.type === 'string-lights') { needs = 'path'; ok = isLine(s.path); }
+    else if (s.type === 'bed') { needs = 'poly or at'; ok = (Array.isArray(s.poly) && s.poly.length >= 3) || Array.isArray(s.at); }
+    else if (['pool', 'pond', 'patio', 'driveway'].includes(s.type)) { needs = 'at'; ok = Array.isArray(s.at) || isLine(s.poly, 3); }
+    else if (s.type === 'planting') { needs = 'along, poly or at'; ok = s.along !== undefined || isLine(s.poly, 3) || isP(s.at); }
+    else if (s.type === 'terrace') { needs = 'poly (or at) and a y above the ground (a terrace is raised: a sunken court is not built)'; ok = (isLine(s.poly, 3) || isP(s.at)) && typeof s.y === 'number' && s.y > 0.02; }
+    else if (s.type === 'stair' || s.type === 'climber') { needs = 'from/to'; ok = isP(s.from) && isP(s.to); }
+    else { needs = 'at'; ok = Array.isArray(s.at); }
+    if (!ok) err(`site ${s.type}: needs ${needs}`);
+  }
+
+  // ---- names the builders do not know (they fall back to a default)
+  const known = (v: unknown, list: readonly string[], what: string, s: any, i: number) => { if (v !== undefined && !(typeof v === 'string' && list.includes(v))) warn(`${S(s, i)}: ${what} "${v}" is not one of ${list.join(' | ')} — built as the default`, 'unknown-name'); };
+  for (const [i, s] of site.entries()) {
+    if (s.type === 'shrub') known(s.form, SHRUB_FORMS, 'form', s, i);
+    if (s.type === 'flowers') known(s.kind, FLOWER_KINDS_ALL, 'kind', s, i);
+    if (s.type === 'tree') known(s.species, TREE_SPECIES, 'species', s, i);
+    if (s.type === 'grove' || s.type === 'scatter') for (const sp of Array.isArray(s.species) ? s.species : s.species !== undefined ? [s.species] : []) if (s.type === 'grove') known(sp, TREE_SPECIES, 'species', s, i);
+    if (s.type === 'path') known(s.surface, PATH_SURFACES, 'surface', s, i);
+    if (s.type === 'fence') known(s.style, FENCES, 'style', s, i);
+    if (s.type === 'stair') { known(s.style, STAIRS, 'style', s, i); if (typeof s.rail === 'string') known(s.rail, RAILS, 'rail', s, i); }
+    if (s.type === 'deck') { known(s.railStyle, RAILS, 'railStyle', s, i); if (s.rails && typeof s.rails === 'object' && !Array.isArray(s.rails)) known(s.rails.style, RAILS, 'rails.style', s, i); for (const sd of Array.isArray(s.rails) ? s.rails : []) known(sd, SIDES, 'rails side', s, i); }
+    if (s.type === 'pool') known(s.shape, WATER_SHAPES, 'shape', s, i);
+    if (s.type === 'terrace') { const k = typeof s.edge === 'string' ? s.edge : s.edge && s.edge.kind; known(k, TERRACE_EDGES, 'edge', s, i); }
+    if (s.type === 'planting') {
+      known(s.kind, PLANTING_KINDS, 'kind', s, i);
+      if (typeof s.mix === 'string') known(s.mix, Object.keys(MIXES), 'mix', s, i);
+      else if (s.mix && typeof s.mix === 'object') for (const k of s.mix.kinds || []) known(k, Object.keys(SPECIES), 'mix species', s, i);
+      if (typeof s.along === 'string') {
+        const [what, ref] = s.along.split(':');
+        if (what === 'facade') { for (const sd of (ref || '').split(',')) if (sd !== 'all' && !SIDES.includes(sd.trim().toUpperCase())) warn(`${S(s, i)}: along "${s.along}" — a facade is S, N, E, W, a list of them or all`, 'planting-ref'); }
+        else if (what === 'path' || what === 'terrace') {
+          const n = Number(ref), hit = Number.isInteger(n) ? site[n] && site[n].type === what : site.some(o => o.type === what && o.id === ref);
+          if (!hit) warn(`${S(s, i)}: along "${s.along}" names no ${what} (a site index or an id)`, 'planting-ref');
+        } else warn(`${S(s, i)}: along "${s.along}" — facade:<sides>, path:<index or id>, terrace:<index or id>, or a polyline`, 'planting-ref');
+      }
+      // what it lays out: a band every column of which is blocked (a wall, a step, another item) plants nothing
+      try {
+        planCtx ||= createSiteContext(spec);
+        const plan = planPlanting(s, i, planCtx);
+        if ((s.kind === 'meadow' || s.kind === 'grove') ? plan.plants.length + plan.trees.length === 0 : plan.beds.length === 0) warn(`${S(s, i)}: lays out nothing — there is no room for a bed along it (a wall, a step or another item is in the way)`, 'planting-empty');
+        for (const b of plan.beds) plantingBeds.push({ i, poly: b.poly });
+        const tris = plantingTriangles(plan);
+        if (tris > 800_000) warn(`${S(s, i)}: ${plan.plants.length + plan.trees.length} plants, about ${Math.round(tris / 1000)}k triangles — heavy for a phone (a lower \`density\`, a shorter run or fewer layers lightens it)`, 'planting-heavy');
+      } catch { /* a malformed planting is reported above */ }
+    }
+  }
+  if (lot.context !== undefined) known(lot.context, CONTEXTS, 'lot.context', { type: 'lot' }, -1);
+  if (lot.street !== undefined && !(SIDES.includes(lot.street) || lot.street === 'none')) warn(`lot.street "${lot.street}" is not S | N | E | W | none`, 'unknown-name');
+  if (lot.sidewalk !== undefined) {
+    const sw = typeof lot.sidewalk === 'string' ? { material: lot.sidewalk } : lot.sidewalk || {};
+    if (sw.material !== undefined && ![...SIDEWALKS, 'none'].includes(sw.material)) warn(`lot.sidewalk "${sw.material}" is not ${[...SIDEWALKS, 'none'].join(' | ')}`, 'unknown-name');
+  }
+  if (lot.streetFurniture !== undefined && lot.streetFurniture !== 'none') {
+    for (const k of Array.isArray(lot.streetFurniture) ? lot.streetFurniture : [lot.streetFurniture]) if (!FURNITURE.includes(k)) warn(`lot.streetFurniture "${k}" is not ${FURNITURE.join(' | ')}`, 'unknown-name');
+  }
+  if (lot.water !== undefined) {
+    const w = typeof lot.water === 'string' ? { kind: lot.water } : lot.water;
+    if (w.kind !== undefined && !WATERS.includes(w.kind)) warn(`lot.water kind "${w.kind}" is not ${WATERS.join(' | ')}`, 'unknown-name');
+    if (Array.isArray(w.sides) && w.sides.length >= 4) warn('lot.water on all four sides: an island lot is not built (the water stops at three)', 'water-sides');
+  }
+
+  // ---- the front garden: vegetable crates between the entry facade and the street
+  const ground = (spec.levels || []).filter(l => (l.y || 0) <= 0.001).flatMap(l => l.footprint || []);
+  if (ground.length) {
+    const b = { x0: Math.min(...ground.map(r => r.x)), x1: Math.max(...ground.map(r => r.x + r.w)), z0: Math.min(...ground.map(r => r.z)), z1: Math.max(...ground.map(r => r.z + r.d)) };
+    const side = (spec.entry || {}).side || 'S';
+    const front = (x: number, z: number) => side === 'S' ? z > b.z1 : side === 'N' ? z < b.z0 : side === 'E' ? x > b.x1 : x < b.x0;
+    for (const [i, s] of site.entries()) if (s.type === 'garden-beds' && isP(s.at) && front(s.at[0], s.at[1])) warn(`${S(s, i)}: vegetable crates in the front garden — a bed or a planting reads as a garden there`, 'front-crates');
+  }
+
+  // ---- standing in the house, or off the lot
+  const inHouse = (x: number, z: number) => ground.some(r => x > r.x + 0.05 && x < r.x + r.w - 0.05 && z > r.z + 0.05 && z < r.z + r.d - 0.05);
+  // (a car in the garage belongs there; a stilted deck round a post stands mostly outside it)
+  const SLABS = new Set(['patio', 'driveway', 'deck', 'bed', 'pool', 'turtle-pool', 'pond', 'hottub', 'garden-beds', 'greenhouse', 'gazebo', 'turf', 'loungers', 'firepit']);
+  const groundPolys = ground.map(r => [[r.x, r.z], [r.x + r.w, r.z], [r.x + r.w, r.z + r.d], [r.x, r.z + r.d]]);
+  for (const [i, s] of site.entries()) {
+    if (!(SLABS.has(s.type) || isShapedWater(s)) || (s.y ?? 0) > 0.3) continue;   // a roof terrace's deck or pool is above the house
+    const fp = footprintOf(s, i, spec.id || '');
+    if (fp) {
+      const k = groundPolys.reduce((a, g) => a + covered(fp, g), 0);
+      if (k > 0.5) { const c = centroid(fp); warn(`${S(s, i)} at (${c[0].toFixed(1)}, ${c[1].toFixed(1)}): ${Math.round(Math.min(1, k) * 100)} % of it stands on the ground storey's footprint`, 'in-house'); }
+    } else if (isP(s.at) && inHouse(s.at[0], s.at[1])) warn(`${S(s, i)} at (${s.at[0]}, ${s.at[1]}) stands on the ground storey's footprint`, 'in-house');
+  }
+  // (a jetty or a boathouse over the lot's water is meant to be off it)
+  const water = lot.water === undefined ? null : typeof lot.water === 'string' ? { kind: lot.water } : lot.water;
+  const wetSides: string[] = water ? (Array.isArray(water.sides) && water.sides.length ? water.sides : ['N']) : [];
+  const overWater = (x: number, z: number) => wetSides.some(sd => sd === 'N' ? z < -lot.d / 2 : sd === 'S' ? z > lot.d / 2 : sd === 'E' ? x > lot.w / 2 : x < -lot.w / 2);
+  if (lot.w > 0 && lot.d > 0) for (const [i, s] of site.entries()) {
+    const p = isP(s.at) ? s.at : Array.isArray(s.poly) && s.poly.length ? centroid(s.poly) : null;
+    if (p && (Math.abs(p[0]) > lot.w / 2 + 0.5 || Math.abs(p[1]) > lot.d / 2 + 0.5) && !overWater(p[0], p[1])) warn(`${S(s, i)} at (${p[0]}, ${p[1]}) is off the ${lot.w} × ${lot.d} m lot`, 'off-lot');
+    // a line of points (a path, a hedge, a fence, a wall, the polyline a planting follows) leaves the lot at any of them,
+    // whatever its middle does — its beds and plants are clipped at the line (the sidewalk starts there)
+    const line: number[][] | null = ['path', 'hedge', 'fence', 'wall-low', 'planting'].includes(s.type) ? (isLine(s.path) ? s.path : Array.isArray(s.along) && isLine(s.along) ? s.along : isP(s.from) && isP(s.to) ? [s.from, s.to] : null) : null;
+    const out = line && line.find(q => (Math.abs(q[0]) > lot.w / 2 + 0.5 || Math.abs(q[1]) > lot.d / 2 + 0.5) && !overWater(q[0], q[1]));
+    if (out) warn(`${S(s, i)} runs off the ${lot.w} × ${lot.d} m lot, to (${out[0]}, ${out[1]})`, 'off-lot');
+  }
+
+  // ---- water under a slab; a bed laid over one
+  const slabs = site.map((s, i) => ({ s, i, fp: ['patio', 'driveway', 'deck'].includes(s.type) ? footprintOf(s, i, spec.id || '') : null, top: (s.y ?? 0) + (s.type === 'deck' ? s.h || 0.12 : s.type === 'patio' ? 0.08 : 0.06) })).filter(x => x.fp);
+  const sctx = createSiteContext(spec);
+  for (const [i, s] of site.entries()) {
+    if (!['pool', 'turtle-pool', 'rill', 'channel'].includes(s.type)) continue;
+    const fp = footprintOf(s, i, spec.id || ''); if (!fp) continue;
+    const rim = isShapedWater(s) ? (waterOutline(s, i, spec.id || '', sctx.groundAt) || { rim: 0 }).rim : (s.y ?? 0);
+    for (const sl of slabs) {
+      // decks and patios cut water they cover (site-build.ts); the old slab pool under a raised deck still disappears
+      if (sl.top <= rim + 0.02 || sl.i === i) continue;
+      const k = covered(fp, sl.fp);
+      if (k > 0.5 && sl.s.type === 'deck' && (sl.s.h || 0.12) > 0.35) warn(`${S(s, i)}: ${Math.round(k * 100)} % of it is under the raised deck site[${sl.i}]`, 'buried-water');
+    }
+    for (const [j, t] of site.entries()) if (t.type === 'terrace' && typeof t.y === 'number' && t.y > rim + 0.05) { const k = covered(fp, sctx.terracePoly(t)); if (k > 0.5) warn(`${S(s, i)}: ${Math.round(k * 100)} % of it lies inside terrace site[${j}], ${(t.y - rim).toFixed(2)} m above its rim`, 'buried-water'); }
+  }
+  for (const [i, s] of site.entries()) {
+    if (s.type !== 'bed' || !(Array.isArray(s.poly) || isP(s.at))) continue;
+    const fp = Array.isArray(s.poly) ? s.poly : rectPoly(s.at, s.w || 2, s.d || 1, 0);
+    if (polyArea(fp) < 0.05) continue;
+    // (a bed set up on a slab on purpose — its `y` at the slab's top — is a planter; the ground under a stilted deck is open)
+    for (const sl of slabs) {
+      if (sl.s.type === 'deck' && (sl.s.h || 0.12) > 0.35) continue;
+      const k = covered(fp, sl.fp);
+      if (k > 0.5 && (s.y ?? 0) < sl.top - 0.02) { warn(`${S(s, i)}: ${Math.round(k * 100)} % of it is laid over the ${sl.s.type} site[${sl.i}]`, 'bed-on-slab'); break; }
+    }
+  }
+
+  // ---- two beds on the same ground: two slabs of soil, two sets of plants (a bed and a planting's bed, or two beds)
+  {
+    const beds: Array<{ i: number; what: string; poly: number[][] }> = [];
+    for (const [i, s] of site.entries()) {
+      if (s.type !== 'bed' || !(Array.isArray(s.poly) || isP(s.at))) continue;
+      const p0 = Array.isArray(s.poly) ? s.poly : rectPoly(s.at, s.w || 2, s.d || 1, 0), t = tensionOf(s.smooth);
+      beds.push({ i, what: 'bed', poly: t === null ? p0 : smoothLoop(p0 as any, t, 0.25) });
+    }
+    for (const b of plantingBeds) beds.push({ i: b.i, what: 'planting', poly: b.poly });
+    const seen = new Set<string>();
+    for (let a = 0; a < beds.length; a++) for (let b = a + 1; b < beds.length; b++) {
+      const A = beds[a], B = beds[b]; if (A.i === B.i) continue;
+      const ba = bbox(A.poly as any), bb = bbox(B.poly as any);
+      if (ba.x1 < bb.x0 || bb.x1 < ba.x0 || ba.z1 < bb.z0 || bb.z1 < ba.z0) continue;
+      const k = covered(A.poly, B.poly) * polyArea(A.poly as any);
+      const key = `${Math.min(A.i, B.i)}:${Math.max(A.i, B.i)}`;
+      if (k > 0.3 && !seen.has(key)) { seen.add(key); warn(`site[${A.i}] ${A.what} and site[${B.i}] ${B.what} share ${k.toFixed(1)} m² of ground: two slabs of soil and two sets of plants there (trim or move one)`, 'bed-overlap'); }
+    }
+  }
+
+  // ---- straight paths and beds: a garden path bends
+  for (const [i, s] of site.entries()) {
+    let pts: number[][] | null = null, closed = false;
+    if (s.type === 'path' && isLine(s.path) && !(s.y > 0.3)) pts = s.smooth !== undefined || s.meander !== undefined ? sctx.pathLine(s) : s.path;
+    else if (s.type === 'bed' && Array.isArray(s.poly) && s.poly.length >= 3) { pts = s.poly; closed = true; const t = tensionOf(s.smooth); if (t !== null) pts = smoothLoop(s.poly, t, 0.25); }
+    if (!pts) continue;
+    const r = axisAlignedRuns(pts as any, closed, null, { chord: 1.5, tol: 3 });
+    if (r.axis >= 8) warn(`${S(s, i)}: ${r.axis.toFixed(0)} m of it runs straight along an axis — ${s.type === 'path' ? 'a garden path bends: give it `meander: 0.5` (or waypoints and `smooth`), or make it a `patio` / `driveway` if it is paving' : 'give the bed more points and `smooth`'}`, 'straight-edge');
+  }
+
+  // ---- an exterior stair must end where something stands at its height
+  {
+    const surfaces: Array<{ poly: number[][]; y: number; tol: number }> = [];
+    for (const l of spec.levels || []) for (const r of l.footprint || []) surfaces.push({ poly: rectPoly([r.x + r.w / 2, r.z + r.d / 2], r.w + 0.4, r.d + 0.4, 0), y: l.y || 0, tol: 0.35 });
+    for (const t of site) {
+      if (t.type === 'terrace' && typeof t.y === 'number') surfaces.push({ poly: sctx.terracePoly(t), y: t.y, tol: 0.25 });
+      else if (t.type === 'deck' && isP(t.at)) surfaces.push({ poly: rectPoly(t.at, t.w || 4, t.d || 3, t.rot || 0), y: (t.y ?? 0) + (t.h || 0.12), tol: 0.25 });
+      else if ((t.type === 'patio' || t.type === 'porch') && isP(t.at)) surfaces.push({ poly: rectPoly(t.at, t.w || 4, t.d || (t.type === 'porch' ? 2.5 : 3), t.rot || 0), y: (t.y ?? 0) + (t.type === 'patio' ? 0.08 : 0.15), tol: 0.3 });
+    }
+    for (const [i, s] of site.entries()) {
+      if (s.type !== 'stair' || !isP(s.from) || !isP(s.to)) continue;
+      const y0 = s.from[2] ?? sctx.groundAt(s.from[0], s.from[1]), y1 = s.to[2] ?? sctx.groundAt(s.to[0], s.to[1]);
+      const hi = y1 >= y0 ? s.to : s.from, yh = Math.max(y0, y1);
+      const near = (q: number[], poly: number[][]) => inPoly(q[0], q[1], poly as any) || poly.some((p, k) => { const b = poly[(k + 1) % poly.length], dx = b[0] - p[0], dz = b[1] - p[1], l2 = dx * dx + dz * dz || 1e-9, u = Math.max(0, Math.min(1, ((q[0] - p[0]) * dx + (q[1] - p[1]) * dz) / l2)); return Math.hypot(q[0] - (p[0] + dx * u), q[1] - (p[1] + dz * u)) < 0.6; });
+      if (yh > 0.3 && !surfaces.some(f => Math.abs(f.y - yh) <= f.tol && near(hi, f.poly))) warn(`${S(s, i)}: its top ends at (${hi[0]}, ${hi[1]}) at ${yh.toFixed(2)} m, where no deck, terrace, porch or storey stands at that height (0.6 m round it)`, 'stair-end');
+    }
+  }
+
+  // ---- an item across a terrace's edge (A3): the ground follows a terrace, but a slab, a bed or a structure stands at
+  // one height, the ground at its centre. (Fences, walls, hedges, plantings, scatters, groves and single plants follow it
+  // piece by piece; steps and stairs are meant to climb it.)
+  if (site.some(t => t.type === 'terrace' && typeof t.y === 'number')) {
+    const ONE_HEIGHT = new Set(['patio', 'driveway', 'deck', 'pool', 'turtle-pool', 'pond', 'hottub', 'bed', 'path', 'gazebo', 'greenhouse', 'cabana', 'pergola', 'garden-beds', 'firepit', 'loungers', 'turf']);
+    for (const [i, s] of site.entries()) {
+      if (!ONE_HEIGHT.has(s.type) || s.y !== undefined) continue;
+      let pts: number[][] | null = null;
+      if (s.type === 'path' && isLine(s.path)) pts = s.path.flatMap((p: number[], k: number) => k ? [[(p[0] + s.path[k - 1][0]) / 2, (p[1] + s.path[k - 1][1]) / 2], p] : [p]);
+      else if (s.type === 'gazebo' && isP(s.at)) pts = rectPoly(s.at, 2 * (s.r || 2), 2 * (s.r || 2), 0);
+      else if ((s.type === 'pergola' || s.type === 'cabana') && isP(s.at)) pts = rectPoly(s.at, s.w || 4, s.d || 3, s.rot || 0);
+      else pts = footprintOf(s, i, spec.id || '');
+      if (!pts || pts.length < 3 && s.type !== 'path') continue;
+      const c = centroid(pts as any), samples = [...pts, ...pts.map((p, k) => [(p[0] + pts![(k + 1) % pts!.length][0]) / 2, (p[1] + pts![(k + 1) % pts!.length][1]) / 2]), c];
+      const hs = samples.map(p => sctx.groundAt(p[0], p[1])), lo = Math.min(...hs), hi = Math.max(...hs);
+      if (hi - lo > 0.15) warn(`${S(s, i)}: spans a terrace's edge (the ground under it runs ${lo.toFixed(2)}–${hi.toFixed(2)} m) but stands at one height — give it a y, or place it wholly on or off the terrace`, 'terrace-straddle');
+    }
+  }
+
+  // ---- exterior stairs no one could climb
+  for (const [i, s] of site.entries()) {
+    if (s.type !== 'stair' || !isP(s.from) || !isP(s.to)) continue;
+    const y0 = s.from[2] ?? sctx.groundAt(s.from[0], s.from[1]), y1 = s.to[2] ?? sctx.groundAt(s.to[0], s.to[1]);
+    const H = Math.abs(y1 - y0), D = Math.hypot(s.to[0] - s.from[0], s.to[1] - s.from[1]), n = Math.max(2, Math.ceil(H / 0.18)), split = s.landing !== false && n > 16;
+    const tread = (split ? D - 1 : D) / n;
+    if (tread < 0.25) warn(`${S(s, i)}: ${n} risers of ${(H / n).toFixed(2)} m on ${tread.toFixed(2)} m treads over ${D.toFixed(1)} m — too steep (lengthen it to ${(n * 0.28 + (split ? 1 : 0)).toFixed(1)} m)`, 'steep-stair');
+  }
+  return out;
+};
 export default check;
