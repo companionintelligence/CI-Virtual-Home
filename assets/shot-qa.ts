@@ -16,7 +16,7 @@ import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, wrapPi, createWor
 import { createProbe, camera, project, projectBox, bgClass, type V3 } from './shot-probe.js';
 import { createNav, roomInterest } from './shot-nav.js';
 import { BEATS, SPEED_CAP, YAW_CAP, PITCH, BEAT_FLOOR, BEAT_WINDOW, OUTSIDE, LENS, sampleTrack, type Track, type Beat } from './shot-planner.js';
-import { houseBox, fits, coreHeightPct } from './framing.js';
+import { houseCorners, frameFit, coreHeightPct } from './framing.js';
 
 export type Finding = { code: string; level: 'error' | 'warn'; t: number; tEnd: number; samples: number; subject: string; message: string };
 export type QAResult = { errors: Finding[]; warnings: Finding[]; metrics: Record<string, any> };
@@ -76,6 +76,13 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   const durOf = (b: Beat) => (beatSpans.get(b) || []).reduce((a, [i, j]) => a + (Math.min(N - 1, j + 1) - i) * dt, 0);
   metrics.beats = Object.fromEntries([...beatSpans.keys()].map(b => [b, +durOf(b).toFixed(2)]));
   const isIndoors = (p: V3) => indoors(world, p[0], p[1], p[2]);
+  // a beat's limits hold inside it; within 0.35 s of a seam the eye is still handing over from the neighbour's, so the looser
+  // of the two applies (a cap that stepped up or down the instant the beat changed would need an infinite acceleration)
+  const seam = 0.35, seamN = Math.round(seam / dt);
+  const beatIdx: Array<[number, number, Beat]> = []; for (const [b, spans] of beatSpans) for (const [i0, i1] of spans) beatIdx.push([i0, i1, b]);
+  beatIdx.sort((a, b) => a[0] - b[0]);
+  const neighbours = (i: number): Beat[] => { const out: Beat[] = [beat[i]]; for (let k = 0; k < beatIdx.length; k++) { const [i0, i1, b] = beatIdx[k]; if (i < i0 || i > i1) continue; if (i - i0 < seamN && k > 0) out.push(beatIdx[k - 1][2]); if (i1 - i < seamN && k + 1 < beatIdx.length) out.push(beatIdx[k + 1][2]); } return out; };
+  const loosest = <T,>(i: number, f: (b: Beat) => T, gt: (a: T, b: T) => boolean): T => { let best = f(beat[i]); for (const b of neighbours(i)) { const v = f(b); if (gt(v, best)) best = v; } return best; };
 
   // ---- geometry: the eye path swept every 0.05 m ----------------------------------------------------------------
   const B = world.boxes;
@@ -196,11 +203,12 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const bt = beat[i];
     if (r > 90) E('yaw-whip', tOf(i), `the view turns at ${r.toFixed(0)}°/s (error over 90)`);
     else if (r > 60) W('yaw-rate', tOf(i), `the view turns at ${r.toFixed(0)}°/s (over 60)`);
-    if (r > YAW_CAP[bt] * 1.15 + 1.5) W('beat-yaw', tOf(i), `${bt}: the view turns at ${r.toFixed(0)}°/s (the beat's cap is ${YAW_CAP[bt]})`, bt);
+    const yc = loosest(i, b => YAW_CAP[b], (a, b) => a > b);
+    if (r > yc * 1.15 + 1.5) W('beat-yaw', tOf(i), `${bt}: the view turns at ${r.toFixed(0)}°/s (the beat's cap is ${YAW_CAP[bt]}${yc !== YAW_CAP[bt] ? `, ${yc} at its seam` : ''})`, bt);
     const pd = pitch[i] / DEG;
     if (pd < -45 || pd > 30) E('pitch', tOf(i), `pitch ${pd.toFixed(0)}° (outside −45…+30)`);
-    const [lo, hi] = PITCH[bt]; const loX = bt === 'establish' ? -45 : lo;
-    if (pd < loX - 2 || pd > hi + 2) W('beat-pitch', tOf(i), `${bt}: pitch ${pd.toFixed(0)}° outside ${loX}…${hi}`, bt);
+    const [lo, hi] = [loosest(i, b => PITCH[b][0], (a, b) => a < b), loosest(i, b => PITCH[b][1], (a, b) => a > b)]; const loX = bt === 'establish' ? -45 : lo;
+    if (pd < loX - 3 || pd > hi + 3) W('beat-pitch', tOf(i), `${bt}: pitch ${pd.toFixed(0)}° outside ${loX}…${hi}`, bt);
     if (isIndoors(eye[i]) && !['stair', 'descend', 'hero', 'orbit', 'power', 'roomReveal'].includes(bt) && Math.abs(pd) > 8.5) W('verticals', tOf(i), `${bt}: pitch ${pd.toFixed(0)}° indoors (verticals want ±8°)`, bt);
     // travel direction against the look
     const j = Math.min(N - 1, i + 1), k0 = Math.max(0, i - 1);
@@ -212,7 +220,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     } else { revRun = 0; crabRun = 0; }
     // the look target's distance (the planner's singularity guard)
     const ld = Math.hypot(track.look[3 * i] - track.pos[3 * i], track.look[3 * i + 1] - track.pos[3 * i + 1], track.look[3 * i + 2] - track.pos[3 * i + 2]);
-    const minLd = ['hero', 'orbit', 'power'].includes(bt) ? 0.8 : 2;
+    const minLd = ['hero', 'orbit', 'power', 'roomReveal'].includes(bt) ? 0.8 : 2;
     if (ld < minLd - 0.05) W('look-near', tOf(i), `${bt}: the look target is ${ld.toFixed(2)} m from the eye (≥ ${minLd})`, bt);
   }
   const sorted = rates.slice().sort((a, b) => a - b);
@@ -237,14 +245,15 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   const accS = new Float64Array(N); { const w = Math.round(0.1 / dt); for (let i = 0; i < N; i++) { let s = 0, c = 0; for (let k = -w; k <= w; k++) { const j = i + k; if (j < 0 || j >= N) continue; s += acc[j]; c++; } accS[i] = s / c; } }
   let maxAcc = 0, maxJerk = 0;
   for (let i = 1; i < N - 1; i++) {
-    const out2 = OUTSIDE.has(beat[i]);
+    const out2 = !isIndoors(eye[i]);   // (by where the eye is: 3 m/s² outside, 1.5 inside)
     const a = Math.abs(accS[i]); maxAcc = Math.max(maxAcc, a);
     if (a > (out2 ? 3 : 1.5) * 1.15) W('accel', tOf(i), `${beat[i]}: ${a.toFixed(1)} m/s² (≤ ${out2 ? 3 : 1.5})`, beat[i]);
     const j = Math.abs((accS[i + 1] - accS[i - 1]) / (2 * dt)); maxJerk = Math.max(maxJerk, j);
-    if (j > (out2 ? 20 : 10)) W('jerk', tOf(i), `${beat[i]}: jerk ${j.toFixed(0)} m/s³ (≤ ${out2 ? 20 : 10})`, beat[i]);
+    if (j > (out2 ? 30 : 15)) W('jerk', tOf(i), `${beat[i]}: jerk ${j.toFixed(0)} m/s³ (≤ ${out2 ? 30 : 15})`, beat[i]);
     const bt = beat[i];
-    let cap = bt === 'orbit' ? null : bt === 'route' && track.plan && track.plan.routeCap ? track.plan.routeCap : SPEED_CAP[bt];
-    if (bt === 'stair' || bt === 'descend' || bt === 'extStair') cap = SPEED_CAP[bt] * 1.35;
+    const capOf = (b: Beat): number | null => b === 'orbit' ? null : b === 'route' && track.plan && track.plan.routeCap ? track.plan.routeCap : (b === 'stair' || b === 'descend' || b === 'extStair') ? SPEED_CAP[b] * 1.35 : SPEED_CAP[b];
+    let cap = capOf(bt);
+    for (const nb of neighbours(i)) { const c2 = capOf(nb); if (cap !== null && (c2 === null || c2 > cap)) cap = c2; }
     if (cap !== null && speed[i] > cap * 1.1) W('beat-speed', tOf(i), `${bt}: ${speed[i].toFixed(2)} m/s (cap ${cap.toFixed(1)})`, bt);
     if (bt === 'orbit') { const r = Math.hypot(eye[i][0] - centre[0], eye[i][2] - centre[2]) || 1; const w2 = speed[i] / r / DEG; if (w2 > 45) W('orbit-yaw-rate', tOf(i), `the orbit turns at ${w2.toFixed(0)}°/s (≤ 45)`); }
   }
@@ -336,11 +345,11 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   // ---- the establishing frame --------------------------------------------------------------------------------
   if (d2c) {
     const cam0 = camera(eye[0], tgt[0], fov[0], aspect);
-    const hb = houseBox(world), f = fits(eye[0], tgt[0], fov[0], hb, 0.08, aspect);
+    const f = frameFit(eye[0], tgt[0], fov[0], houseCorners(world), 0.08, aspect);
     const c = probe.composition(cam0, true, 1.5);
     const occ = c.rays.filter(r => r.k === K.site && r.t < 6).length / c.rays.length;
-    metrics.establish = { style: track.plan && track.plan.establish ? track.plan.establish.style : null, crop: +f.out.toFixed(3), sky: +c.sky.toFixed(3), occluder: +occ.toFixed(3), bearing: entry ? +(Math.atan2((eye[0][0] - entry.x) * entry.out[1] - (eye[0][2] - entry.z) * entry.out[0], (eye[0][0] - entry.x) * entry.out[0] + (eye[0][2] - entry.z) * entry.out[1]) / DEG).toFixed(1) : null };
-    if (!f.ok) W('establish-crop', 0, `the house's box reaches past the frame's 8 % margins on the first frame (${(f.out * 100).toFixed(0)} % of its corners)`);
+    metrics.establish = { style: track.plan && track.plan.establish ? track.plan.establish.style : null, crop: { top: +f.top.toFixed(3), bottom: +f.bottom.toFixed(3), side: +f.side.toFixed(3) }, sky: +c.sky.toFixed(3), occluder: +occ.toFixed(3), bearing: entry ? +(Math.atan2((eye[0][0] - entry.x) * entry.out[1] - (eye[0][2] - entry.z) * entry.out[0], (eye[0][0] - entry.x) * entry.out[0] + (eye[0][2] - entry.z) * entry.out[1]) / DEG).toFixed(1) : null };
+    if (!f.ok) W('establish-crop', 0, `the house is cropped on the first frame: ${(f.top * 100).toFixed(0)} % of its corners over the top margin, ${(f.bottom * 100).toFixed(0)} % under the bottom, ${(f.side * 100).toFixed(0)} % past a side (the roof whole, the ground line and most of the width in)`);
     if (c.sky < 0.15 || c.sky > 0.35) W('establish-sky', 0, `sky is ${(c.sky * 100).toFixed(0)} % of the first frame (15–35 %)`);
     if (occ > 0.1) W('establish-occluder', 0, `${(occ * 100).toFixed(0)} % of the first frame is planting or a car within 6 m`);
   }

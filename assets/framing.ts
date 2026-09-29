@@ -27,17 +27,40 @@ export function houseBox(world: ShotWorld): Box6 {
   let x0 = Infinity, z0 = Infinity, x1 = -Infinity, z1 = -Infinity, top = 0;
   for (const l of world.levels) for (const r of l.rects) { x0 = Math.min(x0, r.x); z0 = Math.min(z0, r.z); x1 = Math.max(x1, r.x + r.w); z1 = Math.max(z1, r.z + r.d); top = Math.max(top, l.y + l.h); }
   let roofTop = top;
-  for (const o of world.obbs) if (o.k === K.roof) { const ey = Math.abs(o.ax[1]) * o.h[0] + Math.abs(o.ax[4]) * o.h[1] + Math.abs(o.ax[7]) * o.h[2]; roofTop = Math.max(roofTop, o.c[1] + ey); }
+  for (const o of world.obbs) if (o.k === K.roof && [...o.h].sort((a, b) => b - a).slice(0, 2).reduce((a, b) => a * b, 1) >= 0.6) { const ey = Math.abs(o.ax[1]) * o.h[0] + Math.abs(o.ax[4]) * o.h[1] + Math.abs(o.ax[7]) * o.h[2]; roofTop = Math.max(roofTop, o.c[1] + ey); }
   if (roofTop <= top + 0.05) roofTop = top + 1.2;
   return [x0, 0, z0, x1, Math.min(roofTop, top + 6), z1];
 }
 const corners = (b: Box6): V3[] => { const out: V3[] = []; for (const x of [b[0], b[3]]) for (const y of [b[1], b[4]]) for (const z of [b[2], b[5]]) out.push([x, y, z]); return out; };
+/** what must be in the establishing frame: the corners of every storey's footprint rects, at the ground and at the top of
+ *  the walls, and of every roof plane (a box round the whole house would count empty corners of an L or a spread plan) */
+export function houseCorners(world: ShotWorld): V3[] {
+  const out: V3[] = [], seen = new Set<string>();
+  const push = (x: number, y: number, z: number) => { const k = `${Math.round(x * 4)},${Math.round(y * 4)},${Math.round(z * 4)}`; if (!seen.has(k)) { seen.add(k); out.push([x, y, z]); } };
+  for (const l of world.levels) for (const r of l.rects) for (const [x, z] of [[r.x, r.z], [r.x + r.w, r.z], [r.x, r.z + r.d], [r.x + r.w, r.z + r.d]]) { push(x, l.y > 0.05 ? l.y : 0, z); push(x, l.y + l.h, z); }
+  // (roof planes of any size: not a chimney, a finial, a dormer's cheek — half-extents' two largest multiply to under 0.6 m²)
+  for (const o of world.obbs) if (o.k === K.roof && [...o.h].sort((a, b) => b - a).slice(0, 2).reduce((a, b) => a * b, 1) >= 0.6) for (const sx of [-1, 1]) for (const sy of [-1, 1]) for (const sz of [-1, 1]) push(o.c[0] + sx * o.h[0] * o.ax[0] + sy * o.h[1] * o.ax[3] + sz * o.h[2] * o.ax[6], o.c[1] + sx * o.h[0] * o.ax[1] + sy * o.h[1] * o.ax[4] + sz * o.h[2] * o.ax[7], o.c[2] + sx * o.h[0] * o.ax[2] + sy * o.h[1] * o.ax[5] + sz * o.h[2] * o.ax[8]);
+  return out;
+}
 /** heroCameraPose's fit: does every corner of b project inside the frame less `margin` (a share of the half-frame)? */
-export function fits(eye: V3, target: V3, fov: number, b: Box6, margin = 0.08, aspect = 16 / 9) {
+export function fits(eye: V3, target: V3, fov: number, b: Box6 | V3[], margin = 0.08, aspect = 16 / 9) {
   const c = camera(eye, target, fov, aspect);
   let worst = 0, out = 0;
-  for (const p of corners(b)) { const q = project(c, p); const w = q[2] > 0 ? Math.max(Math.abs(q[0]), Math.abs(q[1])) : 9; worst = Math.max(worst, w); if (w > 1 - margin) out++; }
-  return { ok: worst <= 1 - margin, worst: Math.min(worst, 9), out: out / 8 };
+  const pts = Array.isArray(b[0]) ? (b as V3[]) : corners(b as Box6);
+  for (const p of pts) { const q = project(c, p); const w = q[2] > 0 ? Math.max(Math.abs(q[0]), Math.abs(q[1])) : 9; worst = Math.max(worst, w); if (w > 1 - margin) out++; }
+  return { ok: worst <= 1 - margin, worst: Math.min(worst, 9), out: out / pts.length };
+}
+
+/** How the house sits in an establishing frame: the shares of its corners (footprints and roof planes) above the top margin,
+ *  under the bottom one and past a side; `ok` when the roof is (a tenth of its corners may clip the top), the ground line is (a third may fall
+ *  below) and half the width is — a house wider than the frame at 15 m of establishing move is cropped at the sides,
+ *  never at the roof. */
+export function frameFit(eye: V3, target: V3, fov: number, pts: V3[], margin = 0.08, aspect = 16 / 9) {
+  const c = camera(eye, target, fov, aspect), lim = 1 - margin;
+  let top = 0, bottom = 0, side = 0;
+  for (const p of pts) { const q = project(c, p); if (!(q[2] > 0)) { top++; continue; } if (q[1] > lim) top++; if (q[1] < -lim) bottom++; if (Math.abs(q[0]) > lim) side++; }
+  const n = pts.length || 1, t = top / n, b = bottom / n, sd = side / n;
+  return { top: t, bottom: b, side: sd, ok: t <= 0.1 && b <= 0.35 && sd <= 0.5, cost: 2 * t + b + 0.6 * sd };
 }
 
 // ---- the Core orbit's probe, on the world (core-orbit.ts's createOrbitProbe, ported) ----------------------------
@@ -90,7 +113,7 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   // (a dollhouse needs height, and height is path: under ~9 m of establishing move it is not offered)
   const e = world.entry!;
   const n: [number, number] = e.out, l: [number, number] = [n[1], -n[0]];   // l: the house's right as the street sees it
-  const hb = houseBox(world), top = hb[4];
+  const hb = houseBox(world), top = hb[4], hc = houseCorners(world);
   const cx = (hb[0] + hb[3]) / 2, cz = (hb[2] + hb[5]) / 2;
   // the facade's centre: the middle of the house across the street, at its front face, 45 % of the way up
   const front = Math.max(...corners(hb).map(p => (p[0] - e.x) * n[0] + (p[2] - e.z) * n[1]));
@@ -127,7 +150,7 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
     if (!distHint) {
       // the nearest distance at which the house fits with 8 % margins (heroCameraPose's fit), pulled in as far as the
       // time allows: a big house is cropped rather than flown at from across the street
-      for (dist = 5; dist < 16; dist += 0.5) if (fits(eyeAt(dist), aimAt, fov, hb, 0.08).ok) break;
+      for (dist = 5; dist < 16; dist += 0.5) if (frameFit(eyeAt(dist), aimAt, fov, hc, 0.08).ok) break;
       // never nearer the house than the approach start (the establishing move comes in toward the door; one that starts
       // between the house and the approach flies backwards)
       // (measured from the aim, in plan: an eye nearer the aim than the approach start moves away from what it looks at)
@@ -136,7 +159,7 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
       if (lim.maxPath) { while (dist > 3 && pathLen(dist) > lim.maxPath && axial(dist - 0.25) >= minAxial) dist -= 0.25; if (pathLen(dist) > lim.maxPath + 3 && !forced) return; }
       while (dist < 16 && axial(dist) < minAxial) dist += 0.25;
     }
-    const fr = fits(eyeAt(dist), aimAt, fov, hb, 0.08), fit = fr.worst;
+    const fr = frameFit(eyeAt(dist), aimAt, fov, hc, 0.08), fit = fr.cost;
     const eye: V3 = [aimAt[0] + dir[0] * dist, height, aimAt[2] + dir[1] * dist];
     if (!inLot(eye[0], eye[2])) return;
     // clear where it stands, and what it sees: sky 15–35 %, nothing standing in the near foreground
@@ -144,13 +167,13 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
     const cam = camera(eye, aimAt, fov);
     const comp = probe.composition(cam, !roofOff, 1.5);
     const occ = comp.rays.filter(r => r.k === K.site && r.t < 6).length / comp.rays.length;
-    const skyScore = comp.sky >= 0.15 && comp.sky <= 0.35 ? 0 : -Math.min(1, Math.abs(comp.sky - 0.25) * 3);
+    const skyScore = comp.sky >= 0.15 && comp.sky <= 0.35 ? 0 : -Math.min(1, Math.abs(comp.sky - 0.25) * 3);   // (and the house has to be in it: the score below)
     // a crop costs little (the time budget forces one on a big house, whatever the style); the sky and a clear
     // foreground cost more
     // (and the house has to be in it: a pose within 7 m of the facade line shows a wall, not a house)
     const facadeDist = (eyeAt(dist)[0] - e.x) * n[0] + (eyeAt(dist)[2] - e.z) * n[1];
-    const fitScore = -1.0 * fr.out - 0.25 * Math.max(0, 8 - facadeDist);
-    const score = 1 + fitScore + 0.2 * skyScore - 1.5 * occ + 0.3 * rng();   // (a seeded whisker: poses that fit alike do not all fall on one bearing)
+    const fitScore = -1.0 * fr.cost - 0.25 * Math.max(0, 8 - facadeDist);
+    const score = 1 + fitScore + 0.35 * skyScore - 1.5 * occ + 0.3 * rng();   // (a seeded whisker: poses that fit alike do not all fall on one bearing)
     cands.push({ style, eye, aim: aimAt, fov, bearing, score, fit, sky: comp.sky, occluded: occ, roofOff });
   };
   const styleOf = (s: string) => {

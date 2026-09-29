@@ -332,7 +332,11 @@ export function roomInterest(room: WRoom, world: ShotWorld, stairsInRoom = false
     if (rank < focalRank) { focalRank = rank; focal = { at: [it.at[0], it.at[1]], kind: f.kind, type: it.type }; bonus = Math.max(bonus, f.bonus); }
   });
   if (stairsInRoom) bonus = Math.max(bonus, 0.3);
-  const show = (world.showcase || []).some(s => s && (s === room.name || s === room.no));
+  // (a showcase entry is a room's name or number, or the type of an item in it: the room doubles, and the item is its focal)
+  const sc = (world.showcase || []).filter(Boolean);
+  const showItem = room.items.find(it => sc.includes(it.type));
+  const show = sc.some(s => s === room.name || s === room.no) || !!showItem;
+  if (showItem) focal = { at: [showItem.at[0], showItem.at[1]], kind: 'showcase', type: showItem.type };
   // not a room to see: a strip a wall thick, a nook under 4 m², a porch or a walk outside the storeys' footprints
   const b = room.b, cx = b.x + b.w / 2, cz = b.z + b.d / 2;
   const roomy = b.w * b.d >= 4 && Math.min(b.w, b.d) >= 1.3 && world.levels.some(l => l.rects.some(r => cx >= r.x && cx <= r.x + r.w && cz >= r.z && cz <= r.z + r.d));
