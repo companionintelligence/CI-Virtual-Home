@@ -11,6 +11,30 @@ const esc = (s: string) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<
 const svg = (name: string) => `<svg class="i" aria-hidden="true" focusable="false"><use href="#i-${name}"/></svg>`;
 const norm = (s: string) => String(s || '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '');
 
+/** Arrow keys through a grid of cards: ← → one card, ↑ ↓ one row (measured from the cards' positions, so any column count),
+ *  Home / End the first and last. Up from the first row hands the focus to `above`. */
+export function bindGridKeys(root: HTMLElement, cardSelector: string, above?: () => void) {
+  root.addEventListener('keydown', e => {
+    const el = document.activeElement as HTMLElement | null;
+    if (!el || !el.matches(cardSelector) || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
+    const cards = Array.from(root.querySelectorAll(cardSelector)) as HTMLElement[];
+    const i = cards.indexOf(el);
+    let j = i;
+    if (e.key === 'ArrowLeft') j = i - 1;
+    else if (e.key === 'ArrowRight') j = i + 1;
+    else if (e.key === 'Home') j = 0;
+    else if (e.key === 'End') j = cards.length - 1;
+    else {
+      const r = el.getBoundingClientRect(), dir = e.key === 'ArrowDown' ? 1 : -1;
+      const rows = cards.map(c => c.getBoundingClientRect()).map((b, k) => ({ k, dy: (b.top - r.top) * dir, dx: Math.abs(b.left - r.left) })).filter(o => o.dy > 4);
+      if (!rows.length) { if (dir < 0 && above) { e.preventDefault(); above(); } return; }
+      const nextRow = Math.min(...rows.map(o => o.dy));
+      j = rows.filter(o => Math.abs(o.dy - nextRow) < 4).sort((a, b) => a.dx - b.dx)[0].k;
+    }
+    if (j >= 0 && j < cards.length) { e.preventDefault(); cards[j].focus(); cards[j].scrollIntoView({ block: 'nearest' }); }
+  });
+}
+
 export function createGallery(dialog: HTMLDialogElement, { onPick }: { onPick: (key: string) => void }) {
   dialog.classList.add('rc-dialog', 'rc-gallery');
   dialog.setAttribute('aria-labelledby', 'gallery-title');
@@ -60,26 +84,7 @@ export function createGallery(dialog: HTMLDialogElement, { onPick }: { onPick: (
   search.addEventListener('keydown', e => {
     if (e.key === 'ArrowDown' || (e.key === 'Enter' && search.value)) { const first = dialog.querySelector('.rc-home-card') as HTMLElement | null; if (first) { e.preventDefault(); if (e.key === 'Enter') first.click(); else first.focus(); } }
   });
-  // arrow keys through the grid: ← → one card, ↑ ↓ one row (measured from the cards' positions, so any column count)
-  dialog.addEventListener('keydown', e => {
-    const el = document.activeElement as HTMLElement | null;
-    if (!el || !el.classList.contains('rc-home-card') || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
-    const cards = [...dialog.querySelectorAll('.rc-home-card')] as HTMLElement[];
-    const i = cards.indexOf(el);
-    let j = i;
-    if (e.key === 'ArrowLeft') j = i - 1;
-    else if (e.key === 'ArrowRight') j = i + 1;
-    else if (e.key === 'Home') j = 0;
-    else if (e.key === 'End') j = cards.length - 1;
-    else {
-      const r = el.getBoundingClientRect(), dir = e.key === 'ArrowDown' ? 1 : -1;
-      const rows = cards.map(c => c.getBoundingClientRect()).map((b, k) => ({ k, dy: (b.top - r.top) * dir, dx: Math.abs(b.left - r.left) })).filter(o => o.dy > 4);
-      if (!rows.length) { if (dir < 0) { e.preventDefault(); search.focus(); } return; }
-      const nextRow = Math.min(...rows.map(o => o.dy));
-      j = rows.filter(o => Math.abs(o.dy - nextRow) < 4).sort((a, b) => a.dx - b.dx)[0].k;
-    }
-    if (j >= 0 && j < cards.length) { e.preventDefault(); cards[j].focus(); cards[j].scrollIntoView({ block: 'nearest' }); }
-  });
+  bindGridKeys(dialog, '.rc-home-card', () => search.focus());
 
   return {
     setHomes(h: GalleryHome[], s: GalleryScene[]) { homes = h; scenes = s; render(); },

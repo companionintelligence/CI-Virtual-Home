@@ -8,6 +8,8 @@
 // home, shot, moment and light, so reopening the dialog costs nothing, and a changed control only re-renders what changed.
 // The module owns the dialog and the order of work; drawing a frame, building a home and saving a file are the page's.
 
+import { bindGridKeys } from './gallery.js';
+
 export type CompareHome = { id: string; name: string; credit?: string };
 export type CompareOpts = { shot: string; t: number; lighting: string };
 export type CompareHooks = {
@@ -157,6 +159,7 @@ export function createCompare(dialog: HTMLDialogElement, hooks: CompareHooks) {
     hooks.toast(`Saved the sheet of ${shown.length} homes.`);
   }
 
+  bindGridKeys(grid, '.rc-compare-card', () => runBtn.focus());
   const relayout = () => { if (!running) layout(); };
   shotSel.addEventListener('change', relayout);
   lightSel.addEventListener('change', relayout);

@@ -646,6 +646,11 @@ try {
     await shot(page, 'compare');
     const after = await state(page), q = await query(page);
     ok(q.house === ONE && after.shot === before.shot && Math.abs(after.t - before.t) < 1e-3, `the editor's home is back at its shot and moment (${q.house}, ${after.shot}, ${after.t.toFixed(3)})`);
+    await page.focus('#compare-grid .rc-compare-card');
+    const firstId = await page.evaluate(() => (document.activeElement as HTMLElement).closest('[data-id]')!.getAttribute('data-id'));
+    await page.keyboard.press('ArrowRight');
+    const nextId = await page.evaluate(() => (document.activeElement as HTMLElement).closest('[data-id]')?.getAttribute('data-id'));
+    ok(!!nextId && nextId !== firstId, `the arrow keys move through the grid (${firstId} → ${nextId})`);
     const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 30000 }), page.click('#compare-sheet')]);
     const file = path.join(SHOTS, 'compare-sheet.png'); await dl.saveAs(file);
     const png = decodePNG(fs.readFileSync(file));
