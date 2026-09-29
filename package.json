@@ -37,6 +37,7 @@
     "portal:thumbs": "node --experimental-strip-types scripts/build-thumbs.mts",
     "portal:build": "node --experimental-strip-types scripts/build-portal.mts",
     "portal:test": "node --experimental-strip-types scripts/test-portal.mts",
+    "ui:test": "node --experimental-strip-types scripts/test-ui.mts",
     "portal:preview": "node --experimental-strip-types scripts/build-portal.mts --serve",
     "serve": "python3 -m http.server 8080"
   },

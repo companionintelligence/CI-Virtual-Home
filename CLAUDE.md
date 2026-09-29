@@ -74,6 +74,23 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   the Sims build's title and stays the credit). Fix a name there, not in `content/houses/`.
 - `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
 
+**The editor.** `room-creator.html` without `?mode=view` (README: The editor) is the review and render tool, on the CI canon:
+
+- The chrome uses the canon's tokens (`var(--…)`), never a literal hex below the two token blocks; Manrope and JetBrains Mono
+  only; the lucide sprite for icons (no emoji); toasts, never `alert()` / `confirm()` / `prompt()`. Never hand-edit the token blocks.
+- Nothing the chrome draws may reach a frame: the path, the plan inset, the safe frame and the reference photo are DOM or 2D
+  canvases over the WebGL canvas. A still and a film go through `__houseRenderBegin` / `__houseRenderFrames` / the composer
+  (`assets/ui/recorder.ts` hashes each frame's pixels before encoding; the file is checked by PSNR, frame count and duration).
+- A home's own parts are locked (`userData.generated`); what the person adds is theirs and is undoable.
+- `clearScene` ends the shot's dressing (`endShotCutaway`): a shot's dressing belongs to the home it dressed, and a second home
+  must be dressed by its own shot (the checks, Compare's posters and the player's Next home all go through `loadHouse`).
+- While a film or a still renders (`recording`, `headlessRender`) the page does not respond to keys or a resize: `syncViewportSize`
+  returns early and `openScene` refuses. A new control that opens a dialog or rebuilds the home must respect that.
+- Below 1100 px the sidebars are `<div role="complementary">` drawers, not `<aside>`: an open one becomes `role="dialog"`
+  (an `<aside>` may not). Closed, they are `visibility: hidden` (no tab stops, no ghost panel); the scrim is a sibling of
+  `<main>` because `<main>` goes inert while a drawer is open.
+- `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
+
 **Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and assembles
 the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
 passes those goes live on its own. The render gate needs a GPU and runs here:

@@ -35,8 +35,9 @@ pnpm run serve                     # http://localhost:8080/room-creator.html?hou
 
 `room-creator.html` is plain ES modules with an importmap — no bundler — so any static server over the repo
 root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `shot=door-to-core|orbit|hero-reveal|walkthrough|core-orbit`,
-`flythrough=1`, `lighting=day|golden|dusk|night`, `res`, `aspect`, `planner=v2` (the spline planner v2 for every door-to-core, hero-reveal and walkthrough; v1 otherwise). Its "Hub" link opens the portal's gallery,
-`./index.html`; `mode=view` turns the page into the portal's player (see [The web portal](#the-web-portal)).
+`t=<0…1>` (the moment in the shot), `lighting=day|golden|dusk|night`, `mode=review|edit`, `flythrough=1`, `res`, `aspect`, `planner=v2` (the spline planner v2 for every door-to-core, hero-reveal and walkthrough; v1 otherwise); the
+editor writes the first five as you change them, so a URL is a view (see [The editor](#the-editor)). Its "All homes" link opens
+the portal's gallery, `./index.html`; `mode=view` turns the page into the portal's player (see [The web portal](#the-web-portal)).
 
 ## Commands
 
@@ -69,7 +70,8 @@ root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `
 | `pnpm run portal:thumbs` | Render the gallery's thumbnails → `portal/thumbs/<id>.webp` and `portal/hero.webp`, and the link-preview JPEGs → `portal/previews/<id>.jpg` and `portal/hero.jpg` (`--house`, `--hero`, `--hero-tod`, `--max-kb`). Needs a GPU; commit the output. |
 | `pnpm run portal:build` | Assemble the site in `dist/` — only what it loads — and check its links. Needs `build`. |
 | `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
-| `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`). |
+| `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
+| `pnpm run ui:test` | Drive the editor end to end (layout at four sizes in both schemes, contrast, the top bar, the checks, the timeline, the tree, the catalog, Compare, stills at 4K, a recorded MP4 checked with ffprobe and by PSNR) — `--only <sections>`, `--shots <dir>`. Needs a GPU and ffmpeg. |
 
 Every script resolves the repo from its own location, so they run from any directory. After editing a spec:
 `validate` → `plans` → `iso` → `floorplans` → `check`, and commit the regenerated files with the spec.
@@ -96,6 +98,8 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
   vendor/three/            three.js r169 + addons, vendored (one local patch; see THIRD_PARTY.md)
   fonts/                   Manrope + JetBrains Mono woff2 the capture scripts serve instead of Google Fonts
   brand/                   the CI mark the page shows
+  ui/                      the editor's modules: recorder + mp4-mux + webm-mux (Record), timeline, plan-inset, path-overlay,
+                           gallery, compare, qa, toast, undo, url-state, format (S6, the editor)
   viewer.ts                the portal's player: shots, scrubber, time of day, path, fly (room-creator ?mode=view)
 content/houses/            <id>.json — the 30 HouseSpecs (source); <id>.plan.json and index.json — derived
 content/house-catalog.json every item type's measured footprint, height and iso parts (derived)
@@ -111,6 +115,61 @@ test/goldens/expected-diffs/  the golden ledger: <stream>.json per stream, the f
 test/fixtures/houses/      fixture specs each stream proves its features on; hashes/<profile>/<id>.json their frame hashes
 video/houses/index.html    browser for rendered shots; the renders beside it are gitignored
 ```
+
+## The editor
+
+`room-creator.html` (without `?mode=view`) is the review and render tool: a home is built from its spec, its camera
+shots are played and checked, and stills and films come out of it. It is on the CI design canon (Manrope and JetBrains
+Mono, the generated tokens, lucide icons, toasts — never `alert()`), and it has two modes, `?mode=review|edit`:
+**Review** is the viewport with the shot cards, the checks and the time of day; **Edit** adds the catalog, the transform
+tools, the selection and the scene tree (Edit leads with the selection and its material). Below 1100 px the sidebars are
+drawers: a closed one is off the page, an open one is a dialog (the view and the top bar inert behind it, a close button, Esc,
+focus back to its toggle). On a phone the transport is a bottom sheet, and every control is a 44 px target on touch.
+
+- **Homes.** The picker (G) is a grid of the homes' thumbnails with a search and the arrow keys; `?house=&shot=&t=&lighting=&mode=`
+  follows every change and a reload restores it. **Compare** (C, or the picker's button) draws every home at the same shot,
+  moment and light through the film's renderer, as a grid you can save as one PNG sheet — the direct answer to "each home
+  looks the same". It rebuilds each home in turn and puts yours back.
+- **The film.** The timeline under the transport shows the shot's beats (or, until planner v2, its v1 phases, hatched), event
+  ticks (in the door, on the stairs, the Core's button), the checks' findings as markers, and the camera's speed and turn.
+  Space plays; ← → step a frame (Shift: a second); Home / End; L loops, B loops the beat the playhead is in. The plan inset (M)
+  follows the camera up the storeys (a studio scene has no plan, so the button is off there); the camera path (P) is drawn over
+  the view and can never reach a render. Speed is the solid line and Turn the dashed one. The single-letter shortcuts (G, C, P,
+  M, F, L, B, I, O, T, W, E, R) can be switched off in the inspector's Keyboard section (WCAG 2.1.4); Space, the arrows, Esc and
+  the Ctrl / Cmd chords stay.
+- **Checks.** After a home builds, the scene checks and every gated shot's checks run in idle time: the badge counts errors
+  (heat, its one use in the UI, on a stop-sign glyph) and warnings (the canon's warning colour, on a triangle), the list jumps the
+  timeline to each finding. They wait while a shot plays or a film renders and start over when it stops. `?qa=1` runs them in a
+  page a harness drives (they are off under `navigator.webdriver`, so a gate is not slowed by them).
+- **Framing.** Iso / Orbit / Plan and Fit use the lot-fit maths of `houseContactSheet`; a safe frame shows what a 16:9, 9:16
+  or 1:1 film of the view takes in; **Preview** shows the live view through the film's renderer; **Photo** lays a local image
+  over the view (opacity, a wipe from the left) to match a home against the photo it was read from — an object URL, never
+  saved, never in a render.
+- **Walls and floors.** Cutaway / Down / Up, and one floor button a storey (split at the home's own level heights). A storey
+  view keeps the lot and the world and never shows a roof; a shot never sees the filter, and taking the camera back re-applies it.
+- **Stills.** Through the film's composer at an exact size: the short side is the size you pick, the long side is capped at 3840
+  (4K portrait is 2160 × 3840); a transparent cutout drops the ground, the world and the sky. Named
+  `<home>-still-<light>-<size>-<yyyymmdd-hhmmss>.png`.
+- **Record.** The shot is stepped frame by frame through the offline renderer (`__houseRenderBegin` / `__houseRenderFrames`,
+  the path the goldens use) at its own duration and a chosen frame rate, and encoded with WebCodecs: H.264 in an MP4 where the
+  browser can, VP9 in a WebM where it cannot. `assets/ui/mp4-mux.ts` and `webm-mux.ts` are the writers (first-party: no muxer
+  is vendored). Each frame's raw pixels are hashed before encoding, so a test can prove the film is the frames
+  `__houseRenderFrames` draws even though H.264 is lossy; the file is checked by PSNR (≥ 40 dB), frame count and duration
+  (`scripts/test-ui.mts`, `scripts/test-ui-units.mts`). A 12 s film at 30 fps is 12.000 s and 360 frames. While it renders the
+  page is inert to the person: no key opens a dialog or rebuilds the home, and a window resize does not change the size the frames
+  are drawn at (the disturbed film is the same frames, `test-ui.mts`). A film's size is even (21:9 is 1280 × 548, not 549), and the
+  bit rate the dialog names is what is asked for, "up to": a calm shot at a small size fills less of it.
+- **Editing.** A home's own parts (built from its spec) are locked: Backspace and the bin do nothing, and a toast says where to
+  change them. What you add from the catalog (the four tabs, and **Props**: the 154 registry props of `house-catalog.json`) lands
+  where the view's centre ray meets the floor (three metres ahead of the eye through a level shot's lens, and always on the lot);
+  a prop whose placement metadata says `against: 'wall'` (S3's `place`) is set against the nearest outside wall, facing in. Undo
+  and redo (Ctrl or Cmd Z, with Shift) cover adding, deleting, duplicating, moving and re-finishing. Opening another home rebuilds
+  it from its spec, so what you added goes; the picker says so in a toast. The scene is a tree — storey, room, part — with a
+  search, and one tab stop.
+
+Every `__house*` hook the gates and the portal use is unchanged; the editor adds none but `houseContactSheet`'s
+`__houseRenderFrames(from, count, null)` (draw without encoding a JPEG) and a studio scene's shot key for `__houseRenderBegin`.
+`pnpm run ui:test` is the acceptance for all of it.
 
 ## The web portal
 
