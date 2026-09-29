@@ -33,7 +33,8 @@ registerSceneCheck('stair-headroom', ({ THREE, scene, house, placedItems }) => {
         if (y > (st.top ? st.top[1] : y) - 0.05) continue;
         rc.set(new THREE.Vector3(x, y + 0.05, z), up);
         const hit = rc.intersectObjects(floors, true).find(h => h.object.visible !== false);
-        if (hit && hit.distance < HEADROOM) { bump = { x, y, z, d: hit.distance }; break; }
+        // (a slab within a hand's breadth is the floor the flight arrives on, not one it climbs under)
+        if (hit && hit.distance > 0.3 && hit.distance < HEADROOM) { bump = { x, y, z, d: hit.distance }; break; }
       }
     }
     if (bump) issues.push({ level: 'warn', message: `stair ${st.from}→${st.to}${st.index ? ` #${st.index}` : ''}: ${bump.d.toFixed(2)} m of headroom over the tread at (${bump.x.toFixed(2)}, ${bump.z.toFixed(2)}) — a slab is built over the climb (a void, or autoVoid: true)`, subject: `stairs:${st.from}:${i}` });
