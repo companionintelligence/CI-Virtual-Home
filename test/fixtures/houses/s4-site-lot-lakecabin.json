@@ -1948,14 +1948,12 @@
    "type": "planting",
    "kind": "foundation",
    "along": "facade:S",
-   "mix": "woodland",
    "depth": 1.5
   },
   {
    "type": "planting",
    "kind": "walk",
    "along": "path:lake-path",
-   "mix": "woodland",
    "depth": 1.1
   },
   {
@@ -1964,27 +1962,30 @@
    "along": [
     [
      -11,
-     -11.9
+     -11.2
     ],
     [
-     -5,
-     -12.3
+     -7,
+     -12.9
     ],
     [
-     0,
-     -12.35
+     -2,
+     -11.6
     ],
     [
-     5,
-     -12.3
+     3,
+     -12.9
+    ],
+    [
+     7,
+     -11.7
     ],
     [
      11,
-     -11.8
+     -12.6
     ]
    ],
    "side": "left",
-   "mix": "woodland",
    "depth": 0.9
   }
  ],

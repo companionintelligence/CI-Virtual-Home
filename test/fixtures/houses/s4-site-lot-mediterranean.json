@@ -3187,94 +3187,70 @@
    "h": 6.4
   },
   {
-   "type": "path",
-   "path": [
-    [
-     -9.0,
-     -6.25
-    ],
-    [
-     10.4,
-     -6.25
-    ]
+   "type": "patio",
+   "at": [
+    0.7,
+    -6.25
    ],
-   "w": 2.9,
-   "color": "#9c5a3c"
+   "w": 19.4,
+   "d": 2.9,
+   "color": "#9c5a3c",
+   "surface": "terracotta"
   },
   {
-   "type": "path",
-   "path": [
-    [
-     -7.5,
-     -4.8
-    ],
-    [
-     -7.5,
-     -1.05
-    ]
+   "type": "patio",
+   "at": [
+    -7.5,
+    -2.925
    ],
    "w": 3.0,
-   "color": "#9c5a3c"
+   "d": 3.75,
+   "color": "#9c5a3c",
+   "surface": "terracotta"
   },
   {
-   "type": "path",
-   "path": [
-    [
-     8.2,
-     -4.8
-    ],
-    [
-     8.2,
-     -1.05
-    ]
+   "type": "patio",
+   "at": [
+    8.2,
+    -2.925
    ],
    "w": 4.4,
-   "color": "#9c5a3c"
+   "d": 3.75,
+   "color": "#9c5a3c",
+   "surface": "terracotta"
   },
   {
-   "type": "path",
-   "path": [
-    [
-     -6.75,
-     -12.7
-    ],
-    [
-     -6.75,
-     -7.7
-    ]
+   "type": "patio",
+   "at": [
+    -6.75,
+    -10.2
    ],
    "w": 4.5,
-   "color": "#9c5a3c"
+   "d": 5.0,
+   "color": "#9c5a3c",
+   "surface": "terracotta"
   },
   {
-   "type": "path",
-   "path": [
-    [
-     7.95,
-     -12.7
-    ],
-    [
-     7.95,
-     -7.7
-    ]
+   "type": "patio",
+   "at": [
+    7.95,
+    -10.2
    ],
    "w": 4.9,
-   "color": "#9c5a3c"
+   "d": 5.0,
+   "color": "#9c5a3c",
+   "surface": "terracotta"
   },
   {
-   "type": "path",
-   "path": [
-    [
-     -9.0,
-     -13.5
-    ],
-    [
-     10.4,
-     -13.5
-    ]
+   "type": "patio",
+   "at": [
+    0.7,
+    -13.5
    ],
-   "w": 1.6,
-   "color": "#9c5a3c"
+   "w": 19.4,
+   "d": 1.6,
+   "color": "#9c5a3c",
+   "surface": "terracotta"
   },
   {
    "type": "turtle-pool",
@@ -3505,62 +3481,6 @@
     "shrub",
     "rock"
    ]
-  },
-  {
-   "type": "bed",
-   "poly": [
-    [
-     11.4,
-     1.2
-    ],
-    [
-     15.9,
-     0.6
-    ],
-    [
-     16.1,
-     4.4
-    ],
-    [
-     13.6,
-     5.3
-    ],
-    [
-     11.6,
-     4.2
-    ]
-   ],
-   "plants": "shrubs",
-   "density": 2.2,
-   "y": -0.07
-  },
-  {
-   "type": "bed",
-   "poly": [
-    [
-     -11.3,
-     3.0
-    ],
-    [
-     -14.8,
-     2.4
-    ],
-    [
-     -16.0,
-     4.8
-    ],
-    [
-     -13.4,
-     5.9
-    ],
-    [
-     -11.5,
-     5.2
-    ]
-   ],
-   "plants": "grass",
-   "density": 2.4,
-   "y": -0.07
   },
   {
    "type": "planting",

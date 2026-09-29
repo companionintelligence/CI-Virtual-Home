@@ -397,14 +397,12 @@
   {
    "type": "planting",
    "kind": "foundation",
-   "along": "facade:S",
-   "mix": "desert"
+   "along": "facade:S"
   },
   {
    "type": "planting",
    "kind": "walk",
    "along": "path:0",
-   "mix": "desert",
    "depth": 0.8
   },
   {
@@ -423,8 +421,7 @@
      -3,
      9.5
     ]
-   ],
-   "mix": "desert"
+   ]
   },
   {
    "type": "tree",

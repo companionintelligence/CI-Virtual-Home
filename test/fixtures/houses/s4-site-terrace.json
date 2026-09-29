@@ -503,8 +503,7 @@
   {
    "type": "planting",
    "kind": "foundation",
-   "along": "facade:S",
-   "mix": "mediterranean"
+   "along": "facade:S"
   },
   {
    "type": "tree",
@@ -555,13 +554,13 @@
   {
    "type": "stair",
    "from": [
-    9.2,
-    5.2,
+    7.0,
+    6.0,
     0
    ],
    "to": [
-    9.2,
-    0.5,
+    7.0,
+    0.9,
     2.8
    ],
    "w": 1.1,

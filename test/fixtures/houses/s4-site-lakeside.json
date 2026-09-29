@@ -496,8 +496,7 @@
   {
    "type": "planting",
    "kind": "foundation",
-   "along": "facade:S",
-   "mix": "woodland"
+   "along": "facade:S"
   },
   {
    "type": "driveway",
@@ -516,12 +515,21 @@
      -4.3
     ],
     [
+     1.4,
+     -7.0
+    ],
+    [
+     -0.6,
+     -10.2
+    ],
+    [
      0.5,
      -14
     ]
    ],
    "w": 1.2,
-   "surface": "concrete"
+   "surface": "concrete",
+   "smooth": true
   }
  ],
  "hero": {
