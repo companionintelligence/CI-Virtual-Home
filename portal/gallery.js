@@ -1,7 +1,7 @@
 // The portal's gallery (index.html): lists content/houses/index.json as cards with the committed thumbnails
 // (portal/thumbs/<id>.webp, scripts/build-thumbs.mts), with search, a storeys filter and style tags. A card
 // opens the live player, room-creator.html?mode=view. No WebGL, no framework, relative URLs only (the site is
-// served under a sub-path on GitHub Pages). The filters live in the URL (?q=&storeys=&tag=) so a filtered view
+// served under a sub-path by portal:test). The filters live in the URL (?q=&storeys=&tag=) so a filtered view
 // can be linked. A home's name is assets/home-names.js's displayName (the Sims build's own title is the credit).
 //
 // The names are imported when the page runs, not statically: if that one file does not come (a partial deploy, a
