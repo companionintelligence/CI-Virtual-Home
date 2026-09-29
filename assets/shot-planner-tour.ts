@@ -16,7 +16,7 @@ import { createNav, roomInterest } from './shot-nav.js';
 import { planDoors } from './shot-doors.js';
 import { createProbe, camera, project, type V3 } from './shot-probe.js';
 import { createOrbitProbeW, heroRing, fovForCore } from './framing.js';
-import { BEATS, FPS, YAW_CAP, hann, rateLimit, fillet, polyLen, sampleTrack, trackHash, coreTanH, planDoorToCore, type Track, type Beat } from './shot-planner.js';
+import { BEATS, FPS, YAW_CAP, PITCH, hann, rateLimit, fillet, polyLen, sampleTrack, trackHash, coreTanH, planDoorToCore, type Track, type Beat } from './shot-planner.js';
 
 const sub = (a: V3, b: V3): V3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const len = (a: V3) => Math.hypot(a[0], a[1], a[2]);
@@ -67,7 +67,12 @@ function finishTrack(type: string, world: ShotWorld, probe: any, duration: numbe
   const desired = new Float32Array(2 * N); for (let i = 0; i < N; i++) { desired[2 * i] = yaw[i]; desired[2 * i + 1] = pitch[i]; }
   const capY = new Float64Array(N), capP = new Float64Array(N);
   for (let i = 0; i < N; i++) { const b = BEATS[beatOf[i]]; capY[i] = YAW_CAP[b] * DEG * 0.9 * dt; capP[i] = (YAW_CAP[b] * 0.5 + 3) * DEG * dt; }
+  // the pitch held to the beat's range (§3.5), the limits smoothed across the seam so the view never steps
+  const pLo = new Float64Array(N), pHi = new Float64Array(N); for (let i = 0; i < N; i++) { const b = BEATS[beatOf[i]]; pLo[i] = PITCH[b][0] * DEG; pHi[i] = PITCH[b][1] * DEG; }
+  const pLoS = hann(pLo, Math.round(0.3 * FPS)), pHiS = hann(pHi, Math.round(0.3 * FPS));
+  for (let i = 0; i < N; i++) pitch[i] = Math.max(pLoS[i], Math.min(pHiS[i], pitch[i]));
   const yl = hann(rateLimit(yaw, capY), Math.round(0.125 * FPS)), pl = hann(rateLimit(pitch, capP), Math.round(0.125 * FPS)), dl = hann(dist, Math.round(0.25 * FPS));
+  for (let i = 0; i < N; i++) pl[i] = Math.max(pLoS[i], Math.min(pHiS[i], pl[i]));
   const look = new Float32Array(3 * N), fov = new Float32Array(N), roofAlpha = new Float32Array(N), composeW = new Float32Array(N);
   for (let i = 0; i < N; i++) {
     const c = Math.cos(pl[i]);
@@ -133,15 +138,15 @@ export function planHeroReveal(world: ShotWorld, opts: { duration?: number; hero
   }
   // the power beat: a push of 3 % of the eye–Core distance
   const toC = sub(centre, end), dEnd = len(toC), finalEye: V3 = [end[0] + toC[0] * 0.03, end[1] + toC[1] * 0.03, end[2] + toC[2] * 0.03];
-  const Lmove = polyLen(move), split = Lmove * 0.7;
-  const dz = densify([{ beat: 'reveal', pts: move }]);
+  const Lmove = polyLen(move), split = Lmove * 0.5;
+  const dz = densify([{ beat: 'roomReveal', pts: move }]);
   const duration = opts.duration || 8, N = Math.round(duration * FPS) + 1, dt = duration / (N - 1);
   const tMove = duration - 1.8;
   const pos = new Float32Array(3 * N), beatOf = new Uint8Array(N);
   for (let i = 0; i < N; i++) {
     const t = i * dt;
     let p: V3, b: Beat;
-    if (t <= tMove) { const s = trapezoid(t, tMove) * dz.total; p = dz.at(s).p; b = s < split ? 'reveal' : 'hero'; }
+    if (t <= tMove) { const s = trapezoid(t, tMove) * dz.total; p = dz.at(s).p; b = s < split ? 'roomReveal' : 'hero'; }
     else { const w = (t - tMove) / (duration - tMove); p = lerp3(end, finalEye, w); b = 'power'; }
     pos[3 * i] = p[0]; pos[3 * i + 1] = p[1]; pos[3 * i + 2] = p[2]; beatOf[i] = BEATS.indexOf(b);
   }

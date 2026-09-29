@@ -18,7 +18,7 @@ import { firstCrossing, leafOpen, DOOR_DONE_S } from './shot-doors.js';
 import { createProbe, camera, project, projectBox, bgClass, type V3 } from './shot-probe.js';
 import { createNav, roomInterest } from './shot-nav.js';
 import { BEATS, SPEED_CAP, YAW_CAP, PITCH, BEAT_FLOOR, BEAT_WINDOW, OUTSIDE, LENS, sampleTrack, type Track, type Beat } from './shot-planner.js';
-import { houseCorners, frameFit, coreHeightPct, lumOf } from './framing.js';
+import { houseCorners, frameFit, wholeFit, coreHeightPct, lumOf } from './framing.js';
 
 export type Finding = { code: string; level: 'error' | 'warn'; t: number; tEnd: number; samples: number; subject: string; message: string };
 export type QAResult = { errors: Finding[]; warnings: Finding[]; metrics: Record<string, any> };
@@ -194,6 +194,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   const outside = out / N, ext = beatSpans.has('extStair');
   metrics.outsideShare = +outside.toFixed(3);
   if (!d2c) { /* inside shots: no outside share to hold */ }
+  // (§3.3 makes the cap 35 % with an exterior stair, 30 % without; the error sits 5 points over the cap in both — 40 and 35 — where §3.14's table names only the 35)
   else if (outside > (ext ? 0.40 : 0.35)) E('outside-share', 0, `${(outside * 100).toFixed(0)} % of the film is outside (error over ${ext ? 40 : 35} %)`);
   else if (outside > (ext ? 0.35 : 0.30)) W('outside-share-high', 0, `${(outside * 100).toFixed(0)} % of the film is outside (target ≤ ${ext ? 35 : 30} %)`);
 
@@ -417,7 +418,8 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const c = probe.composition(cam0, true, 1.5);
     const occ = c.rays.filter(r => r.k === K.site && r.t < 6).length / c.rays.length;
     metrics.establish = { style: track.plan && track.plan.establish ? track.plan.establish.style : null, crop: { top: +f.top.toFixed(3), bottom: +f.bottom.toFixed(3), side: +f.side.toFixed(3) }, sky: +c.sky.toFixed(3), occluder: +occ.toFixed(3), bearing: entry ? +(Math.atan2((eye[0][0] - entry.x) * entry.out[1] - (eye[0][2] - entry.z) * entry.out[0], (eye[0][0] - entry.x) * entry.out[0] + (eye[0][2] - entry.z) * entry.out[1]) / DEG).toFixed(1) : null };
-    if (!f.ok) W('establish-crop', 0, `the house is cropped on the first frame: ${(f.top * 100).toFixed(0)} % of its corners over the top margin, ${(f.bottom * 100).toFixed(0)} % under the bottom, ${(f.side * 100).toFixed(0)} % past a side (the roof whole, the ground line and most of the width in)`);
+    // (§3.9: the footprint and the roof inside the frame with 8 % margins — a stray eave or dormer, 3 % of the corners, and the ground line within 15 % of the bottom margin)
+    if (!wholeFit(eye[0], tgt[0], fov[0], houseCorners(world), aspect)) W('establish-crop', 0, `the house is cropped on the first frame: ${(f.top * 100).toFixed(0)} % of its corners over the top margin, ${(f.bottom * 100).toFixed(0)} % under the bottom, ${(f.side * 100).toFixed(0)} % past a side (all of it in, with 8 % margins: at most 3 % over the top or a side)`);
     if (c.sky > 0.45 || (c.sky < 0.02 && f.top > 0.05)) W('establish-sky', 0, `sky is ${(c.sky * 100).toFixed(0)} % of the first frame${c.sky > 0.45 ? ' (over 45 %: the house is a small thing under a sky)' : ' with the roof running off the top'}`);
     if (occ > 0.1) W('establish-occluder', 0, `${(occ * 100).toFixed(0)} % of the first frame is planting or a car within 6 m`);
   }

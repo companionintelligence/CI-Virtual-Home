@@ -178,7 +178,10 @@ const INJECT: Record<string, Injector> = {
     const want = Math.round((ext ? 0.375 : 0.325) * c.N) - out; if (want <= 0) return null;
     const i = c.midRoute(0.3); for (let k = 0; k < want; k++) setEye(t, i + k, outsidePoint(w)); return { track: t, world: w, window: [0, 0] }; },
   'blank-frame': c => { const f = c.faceWall(); if (!f) return null; const { t, w } = mk(c), i = c.midRoute(1.0); for (let k = 0; k < 96; k++) { setEye(t, i + k, f.eye(0.5)); setLook(t, i + k, f.at); } return { track: t, world: w, window: win(c, i, i + 96) }; },
-  'foreground-occluder': (c, v) => INJECT['blank-frame'](c, v),
+  // a plant the eye stands 0.15 m from, filling the frame (a wall is the blank-frame and near-blank checks' business)
+  'foreground-occluder': c => { const { t, w } = mk(c), i = c.midRoute(1.0), e0 = eyeAt(t, i), d0 = norm(sub(lookAt(t, i), e0)), ctr = add(e0, mul(d0, 0.55));
+    for (let k = 0; k < 96; k++) { setEye(t, i + k, e0); setLook(t, i + k, add(e0, mul(d0, 3))); }
+    addBox(w, [ctr[0] - 0.4, ctr[1] - 0.6, ctr[2] - 0.4, ctr[0] + 0.4, ctr[1] + 0.6, ctr[2] + 0.4], K.item, 'plant'); return { track: t, world: w, window: win(c, i, i + 96) }; },
   'near-blank': c => { const f = c.faceWall(); if (!f) return null; const { t, w } = mk(c), i = c.midRoute(1.2); for (let k = 0; k < 120; k++) { setEye(t, i + k, f.eye(1.7)); setLook(t, i + k, f.at); } return { track: t, world: w, window: win(c, i, i + 120) }; },
   'graze': c => { const f = c.faceWall(); if (!f) return null; const { t, w } = mk(c), i = c.midRoute(0.6); for (let k = 0; k < 36; k++) { setEye(t, i + k, f.eye(0.15)); setLook(t, i + k, f.at); } return { track: t, world: w, window: win(c, i, i + 36) }; },
   'dead-air': c => { const { t, w } = mk(c), i = c.midRoute(1.4), e = eyeAt(t, i), l = lookAt(t, i); for (let k = 0; k < 170; k++) { setEye(t, i + k, e); setLook(t, i + k, l); } return { track: t, world: w, window: win(c, i, i + 170) }; },
@@ -379,7 +382,10 @@ if (!only) {
   const fwd = us.map(u => JSON.stringify(sampleTrack(t, u))), back = us.slice().reverse().map(u => JSON.stringify(sampleTrack(t, u))).reverse();
   const wide = sampleTrack(t, 0.9, 16 / 9), tall = sampleTrack(t, 0.9, 9 / 16), again = sampleTrack(t, 0.9, 16 / 9);
   say(fwd.every((x, i) => x === back[i]) && JSON.stringify(wide) === JSON.stringify(again), 'a track sampled in any order gives the same frames (frameAt is pure)');
-  say(JSON.stringify(wide.eye) === JSON.stringify(tall.eye) && wide.fov === tall.fov, 'the aspect changes only the composed target, never the eye or the lens');
+  // (the aspect changes the composed target and, in a frame narrower than 16:9 where the Core is in it, the lens — track.tanHReq — never the eye; a wide frame keeps the baked lens)
+  say(JSON.stringify(wide.eye) === JSON.stringify(tall.eye) && tall.fov >= wide.fov - 1e-9, 'the aspect changes the composed target and a narrow frame\'s lens, never the eye or a wide frame\'s lens');
+  { const t2 = bases[1].track, fin = sampleTrack(t2, 1, 16 / 9), finT = sampleTrack(t2, 1, 9 / 16), early = sampleTrack(t2, 0.1, 9 / 16), earlyW = sampleTrack(t2, 0.1, 16 / 9);
+    say(finT.fov > fin.fov + 3 && early.fov === earlyW.fov, `a portrait frame widens its lens where the Core is in it (${fin.fov.toFixed(1)}° → ${finT.fov.toFixed(1)}° on the last frame) and keeps it where it is not`); }
 }
 
 // ---- a flight with S2's walking line (anchors.stairs[].path): the planner follows it, and QA is content ---------------------------------

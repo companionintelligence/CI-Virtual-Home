@@ -1,32 +1,32 @@
 {
- "hash": "18b71274:3061:25.5",
- "duration": 25.5,
+ "hash": "adcad1f5:3601:30",
+ "duration": 30,
  "beats": {
-  "establish": 2.05,
-  "approach": 2.41,
-  "threshold": 1.39,
-  "reveal": 1.31,
-  "route": 11.52,
-  "roomReveal": 1.26,
-  "hero": 1.62,
-  "orbit": 1.88,
-  "power": 2.07
+  "establish": 4.21,
+  "approach": 2.36,
+  "threshold": 1.32,
+  "reveal": 1.28,
+  "route": 12.19,
+  "roomReveal": 1.35,
+  "hero": 1.75,
+  "orbit": 3.43,
+  "power": 2.1
  },
  "metrics": {
-  "outsideShare": 0.199,
+  "outsideShare": 0.24,
   "doorSpeed": 0.85,
-  "maxYawRate": 40.2,
-  "lookErrorMedian": 0.2,
-  "coreLOS": 8.43,
-  "finalCoreHeight": 0.232,
+  "maxYawRate": 45.3,
+  "lookErrorMedian": 0.3,
+  "coreLOS": 10.65,
+  "finalCoreHeight": 0.22,
   "finalCoreNDC": [
    -0.125,
    -0.338
   ],
-  "orbitArc": 65.9,
+  "orbitArc": 66,
   "topRoomsSeen": 2,
   "errors": 0,
-  "warnings": 8
+  "warnings": 2
  },
- "establish": "garden"
+ "establish": "corner-right"
 }

@@ -1638,14 +1638,20 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
 export function coreTanH(track: Track, world: ShotWorld): Float32Array {
   const N = track.samples, out = new Float32Array(N), hero = world.hero; if (!hero) return out;
   const core = hero.core, REF = 16 / 9;
+  // (only in the finale — the walk into the Core's room, the push-in, the orbit, the press — where the Core is the subject; from outside, or through a wall, it is in
+  // the frame by chance and the lens is the walk's; the need comes in over the first 0.6 s of the roomReveal)
+  const FIN = new Set([BEATS.indexOf('roomReveal'), BEATS.indexOf('hero'), BEATS.indexOf('orbit'), BEATS.indexOf('power')]);
+  let iFin = -1; for (let i = 0; i < N; i++) if (FIN.has(track.beat[i])) { iFin = i; break; }
   for (let i = 0; i < N; i++) {
+    if (iFin < 0 || i < iFin || !FIN.has(track.beat[i])) continue;
     const f = sampleTrack(track, i / (N - 1), REF), cam = camera(f.eye, f.target, f.fov, REF), pb = projectBox(cam, core);
     if (!pb) continue;
     // (the need fades in as the box comes into the 16:9 frame — from 2.2 to 1.4 of its half-width — so the lens never steps when the Core enters it)
     const reach = Math.max(-pb.minX, pb.maxX, -pb.minY, pb.maxY), fade = Math.max(0, Math.min(1, (2.2 - reach) / 0.8));
     if (fade <= 0) continue;
     const half = (pb.maxX - pb.minX) / 2, cx = Math.abs((pb.maxX + pb.minX) / 2), tv = Math.tan(f.fov * DEG / 2);
-    out[i] = fade * fade * (3 - 2 * fade) * half * tv * REF / Math.max(0.25, 0.7 - cx);
+    const ramp = Math.min(1, (i - iFin) * track.dt / 0.6);
+    out[i] = ramp * ramp * (3 - 2 * ramp) * fade * fade * (3 - 2 * fade) * half * tv * REF / Math.max(0.25, 0.7 - cx);
   }
   return hann(out.length ? Float64Array.from(out) : new Float64Array(0), Math.round(0.2 * FPS)).reduce((a, v, i) => { a[i] = v; return a; }, out);
 }
