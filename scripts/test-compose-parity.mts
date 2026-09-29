@@ -61,10 +61,12 @@ const inPage = async (id: string) => {
     const a = (window as any).__houseDebug().house.anchors;
     const { planOf } = await import(new URL('assets/plan-export/index.js', location.href).href);
     const plan = planOf(a).compose as any;
-    return { rooms: (a.compose || []).map((c: any) => ({ level: c.level, name: c.name, program: c.program, style: c.style, items: c.items })), plan: plan ? plan.rooms.length : 0 };
+    // where the builder put the authored wall mounts and surface items of the untidy room (defaults 2 snaps them)
+    const placed: any[] = []; (window as any).__houseDebug().scene.traverse((o: any) => { const u = o.userData; if (u && u.role === 'item' && u.room === 'Untidy Room') placed.push({ type: u.itemType, x: o.position.x, y: o.position.y, z: o.position.z }); });
+    return { placed, rooms: (a.compose || []).map((c: any) => ({ level: c.level, name: c.name, program: c.program, style: c.style, items: c.items })), plan: plan ? plan.rooms.length : 0 };
   });
   await ctx.close();
-  return out as { rooms: Array<{ level: string; name: string; program: string; style: string; items: any[] }>; plan: number };
+  return out as { rooms: Array<{ level: string; name: string; program: string; style: string; items: any[] }>; plan: number; placed: Array<{ type: string; x: number; y: number; z: number }> };
 };
 try {
   for (const id of ids) {
@@ -72,6 +74,21 @@ try {
     const node: Array<{ level: string; name: string; items: any[] }> = [];
     for (const lv of spec.levels || []) for (const room of lv.rooms || []) if (nodeRes.has(room)) node.push({ level: lv.id, name: room.name, items: nodeRes.get(room).items });
     const pa = await inPage(id), pb = await inPage(id), a = pa.rooms, b = pb.rooms;
+    // defaults 2 in the builder: the wall mount comes out of the wall, the lamp and vase stand on their tops (the helpers'
+    // own answer, snapWallMount / stackOnSurface, is what the page must have done)
+    if (id === 's3-compose-tidy') {
+      const { analyzeRoom } = await import(pathToFileURL(path.join(ROOT, 'assets', 'room-geo.js')).href), { snapWallMount, stackOnSurface } = await import(pathToFileURL(path.join(ROOT, 'assets', 'room-composer.js')).href);
+      const lv = specs[id].levels[0], room = lv.rooms.find((r: any) => r.name === 'Untidy Room'), geo = analyzeRoom(specs[id], lv, room);
+      const want = (it: any) => { const m = snapWallMount(it, geo) || it; return stackOnSurface(m, room.items) || m; };
+      for (const it of room.items) {
+        const w = want(it), got = pa.placed.filter(p => p.type === it.type).find(p => Math.abs(p.x - it.at[0]) < 0.02);
+        const y = w.y ?? (it.y ?? 0);
+        if (!got) { failedPlan.push(`${id}: the ${it.type} at ${it.at} was not built`); continue; }
+        if (Math.abs(got.z - w.at[1]) > 0.006) failedPlan.push(`${id}: the ${it.type} at ${it.at} stands at z ${got.z.toFixed(3)}, the helper says ${w.at[1]}`);
+        if (['table-lamp', 'vase', 'candle-set'].includes(it.type) && Math.abs(got.y - (w.y ?? 0.77)) > 0.006) failedPlan.push(`${id}: the ${it.type} at ${it.at} is at y ${got.y.toFixed(3)}, the helper says ${w.y ?? 0.77}`);
+        void y;
+      }
+    }
     if (pa.plan !== a.length) failedPlan.push(`${id}: <id>.plan.json's compose key has ${pa.plan} rooms, the builder composed ${a.length}`);
     const bad: string[] = [];
     if (a.length !== node.length) bad.push(`the page composed ${a.length} rooms, Node ${node.length}`);

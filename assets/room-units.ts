@@ -105,7 +105,8 @@ function packLeg(lg: Leg, fixed: Array<{ type: string; w: number; t: number; par
 }
 
 export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { dining?: boolean; diningGroup: (r: any) => Group | null }): Array<(attempt?: number) => Group | null> {
-  const plan = c.room.kitchen || {};
+  // rooms[].focus { type: 'island' } asks for an island when the kitchen plan does not say
+  const plan = c.room.focus && c.room.focus.type === 'island' && !(c.room.kitchen && (c.room.kitchen.island !== undefined || c.room.kitchen.peninsula)) ? { ...(c.room.kitchen || {}), island: true } : c.room.kitchen || {};
   const cab = plan.color || null, top = plan.top || (c.rng() < 0.6 ? c.style.finish.kitchenTop : undefined);
   const glassUppers = plan.glassUppers ?? (c.style.tags.some(t => ['farmhouse', 'scandi', 'cottage'].includes(t)) && c.rng() < 0.35);
   const ceiling = c.lv.height || 2.7;

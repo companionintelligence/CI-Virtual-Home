@@ -208,6 +208,31 @@ console.log('── baking a composition (compose-house.mts --write)');
   fs.rmSync(dir, { recursive: true, force: true });
 }
 
+// ---- 4c. the exported helpers: lanes(), snapWallMount(), stackOnSurface(), and the focus fields
+console.log('── the helpers and the focus fields');
+{
+  const { lanes, snapWallMount, stackOnSurface } = M, { analyzeRoom } = M.geo;
+  const tidy = JSON.parse(fs.readFileSync(path.join(ROOT, 'test', 'fixtures', 'houses', 's3-compose-tidy.json'), 'utf8')), lv = tidy.levels[0];
+  const untidy = lv.rooms.find((r: any) => r.name === 'Untidy Room'), geo = analyzeRoom(tidy, lv, untidy);
+  const art = untidy.items.find((i: any) => i.type === 'wall-art'), snapped = snapWallMount(art, geo);
+  check(!!snapped && Math.abs(snapped.at[1] - (-5.95 + 0.003 + 0.02)) < 0.06 && snapped.at[1] > art.at[1], `snapWallMount moves a wall-art authored inside the wall out to its face (z ${art.at[1]} → ${snapped && snapped.at[1]})`);
+  check(snapWallMount(snapped, geo) === null, 'snapWallMount leaves a mount that is already on the face alone');
+  const lamp = untidy.items.find((i: any) => i.type === 'table-lamp' && i.at[0] < 0), nightLamp = untidy.items.find((i: any) => i.type === 'table-lamp' && i.at[0] > 0);
+  const onConsole = stackOnSurface(lamp, untidy.items), onNight = stackOnSurface(nightLamp, untidy.items);
+  check(!!onConsole && Math.abs(onConsole.y - 0.8) < 0.011, `stackOnSurface lifts a lamp authored at the 0.77 m desk default onto the console's 0.8 m top (y ${onConsole && onConsole.y})`);
+  check(!!onNight && Math.abs(onNight.y - 0.55) < 0.011, `… and lowers one onto a nightstand's 0.55 m top (y ${onNight && onNight.y})`);
+  const hall = tidy.levels[0].rooms.find((r: any) => r.name === 'Hall'), corridors = lanes(tidy, lv, hall);
+  check(corridors.length > 0 && corridors.every((c: any) => c.rects.length && c.rects.every((o: any) => Math.min(o.hw, o.hd) * 2 >= 0.85)), `lanes() gives the hall's door-to-door corridors, each 0.9 m wide (${corridors.length} of them)`);
+  // the focus fields: the bed's head on the wall the author names, an island when the focus says so
+  const res = composeHouse(JSON.parse(JSON.stringify(tidy)));
+  const named = (n: string) => { for (const [room, r] of res as Map<any, any>) if (room.name === n) return { room, r }; return null; };
+  const bedE = named('Bedroom, head on the E wall'), bedS = named('Bedroom, head on the N wall'), kit = named('Kitchen, island asked for by focus');
+  const headOn = (x: any, side: 'E' | 'S') => { const bed = x.r.items.find((i: any) => /bed/.test(i.type)), b = x.room.bounds; return side === 'E' ? bed.at[0] > b.x + b.w - 1.5 : bed.at[1] > b.z + b.d - 1.5; };
+  check(!!bedE && headOn(bedE, 'E'), 'focus { type: bed, wall: E } puts the headboard on the east wall');
+  check(!!bedS && headOn(bedS, 'S'), 'focus { type: bed, wall: S } puts the headboard on the south wall');
+  check(!!kit && kit.r.items.some((i: any) => i.type === 'breakfast-bar'), 'focus { type: island } gives the kitchen an island');
+}
+
 // ---- 5. the catalog -------------------------------------------------------------------------------------------------------------
 console.log('── the catalog and the style bundles');
 const catPath = path.join(ROOT, 'content', 'house-catalog.json');

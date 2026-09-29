@@ -270,10 +270,11 @@ kept exactly, that the composer arranges round. Every field below is optional.
     "no": "01", "name": "Living Room", "bounds": { … },
     "program": "living",      // THE room-type field (26 values, below). S1's fixtures dress the room by it
     "focus": { "type": "fireplace", "wall": "W", "at": 1.5 },
-                              // what the seating faces: fireplace | tv | window | art | island | bed | view; wall N|S|E|W
-                              // (N = the room's min-z edge, S max-z, W min-x, E max-x); at = a number along that wall
-                              // or a point [x, z]. Default: a fireplace or TV already pinned in the room, else the
-                              // longest solid wall, else the glass for a view
+                              // what the room is arranged round: fireplace | tv | window | art | view (a lounge's seating
+                              // faces it); bed (a bedroom's headboard goes on `wall`, at `at` along it); island (a kitchen
+                              // gets an island). wall N|S|E|W (N = the room's min-z edge, S max-z, W min-x, E max-x); at =
+                              // a number along that wall, or a point [x, z]. Default: a fireplace or TV already pinned in
+                              // the room, else the longest solid wall, else the glass for a view
     "density": 0.65,          // 0 the program's essentials … 1 every optional piece that fits; default 0.5
     "style": "cottage",       // this room's style (default styleKey)
     "palette": { "fabric": "#d8d2c4", "wood": "#5a4636", "accent": "#7a8f86" },
@@ -362,7 +363,8 @@ and items — for the isometric twin and `fleet-audit --built`.
 a library round the Core, a dining room, a primary bedroom, a bath with a freestanding tub, a kid's room, a nursery, a
 study), `s3-compose-kitchens` (every layout and worktop), `s3-compose-baths` (every tub, vanity and shower),
 `s3-compose-styles` (one living room in each of the nine styles, and one style in two seeds), `s3-compose-props` (every new
-sofa, sectional, table, rug pattern and art motif, authored by hand).
+sofa, sectional, table, rug pattern and art motif, authored by hand), `s3-compose-tidy` (`defaults: 2`: a wall mount authored inside
+its wall, a lamp at the desk default, `focus.bed` and `focus.island`).
 
 ### Site (S4)
 

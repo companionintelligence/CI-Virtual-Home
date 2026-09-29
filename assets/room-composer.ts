@@ -799,6 +799,9 @@ function bedGroup(c: C, attempt = 0): Group | null {
       const bed = items[0];
       let v = 0;
       const head = p.mode === 'head' ? (p.run as Run) : (p.head as Run);
+      // rooms[].focus { type: 'bed', wall, at }: the author's wall for the headboard, and where along it
+      const f = c.room.focus;
+      if (f && f.type === 'bed' && f.wall) { v += head.side === f.wall ? 4 : -1; if (typeof f.at === 'number' && head.side === f.wall) v -= Math.abs((alongX(head.side) ? bed.cx : bed.cz) - f.at) * 0.6; }
       if (main) { if (head.side === main.side) v -= 2.5; else if (head.side === OPPOSITE[main.side]) v += 0.8; else v += 0.4; }
       for (const w of head.windows) { const t0 = (alongX(head.side) ? bed.cx : bed.cz) - S.w / 2, t1 = t0 + S.w; if (w.b > t0 && w.a < t1) v -= 1.5; }
       if (p.mode === 'head') v -= offCentre(p.run, p.t) * 0.6; else v += double ? -1.5 : 0.3;   // a double against a wall only when nothing else fits

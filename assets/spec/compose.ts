@@ -32,7 +32,8 @@ export interface RoomFocus {
   type: 'fireplace' | 'tv' | 'window' | 'art' | 'island' | 'bed' | 'view';
   /** the room's wall it is on (N = the room's min-z edge, S its max-z edge, W min-x, E max-x); default: the
    *  composer's pick (a fireplace or TV item already pinned in the room, else the longest solid wall facing the
-   *  room's main door, else the wall with the most glass for 'window' / 'view') */
+   *  room's main door, else the wall with the most glass for 'window' / 'view'). For 'bed' it is the wall the
+   *  headboard goes on; 'island' asks a kitchen for an island (its wall is unused). */
   wall?: Side;
   /** where along that wall (world x for N/S, world z for E/W), or a point [x, z]; default its middle */
   at?: number | Vec2;
