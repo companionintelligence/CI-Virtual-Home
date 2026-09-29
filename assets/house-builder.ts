@@ -8,16 +8,32 @@
 // one asset library, one wall-mode system and one exporter.
 //
 // This file is the orchestrator (plan S0 "seams"): it owns the ORDER things are built in and nothing else, and
-// is frozen. Each part lives in its own module, owned by one stream:
-//   build-context.ts   the page's dependencies and the shared helpers (std, box, group, hex, mix)      S0
-//   kit-build.ts       palette and kit, and the spec → parameters every other module asks it for:     S1 kit
-//                      doors and windows, partition doors, cladding, ceilings, theming, lighting
-//   item-map.ts        spec item type → AssetFactory builder, DESK_TOP, the on-surface and hero sets   S1 kit
-//   hero-build.ts      the Companion Core, its surface and its cables                                  S1 kit
-//   structure-build.ts slabs, walls, openings, partitions, stairs, balustrades, ceilings, roofs         S2 arch
-//   rooms-build.ts     the rooms loop                                                                  S3 compose
-//   site-build.ts      the lot, the world, the site builders and the site loop                         S4 site
-//   shot-planner-v1.ts shotsFor, routeOn, blockedTest, clearPoint (+ core-orbit.ts, shot-path.ts)      S5 shot
+// is frozen. Each part lives in its own module, owned by one stream — the whole list, so a stream knows its files:
+//
+//   S0  build-context.ts, item-meta.ts, hero-frame.ts (shared), house-builder.ts, spec/index.ts + spec/base.ts,
+//       scene-qa/registry.ts, plan-export/index.ts, the validator's core (scripts/validate-house-spec.mts) and the
+//       fixture, golden-ledger, fleet and perf harnesses
+//   S1 kit          kit-build.ts (palette and kit, and the spec → parameters every other module asks it for: doors and
+//                   windows, partition doors, cladding, ceilings, theming, lighting), item-map.ts (spec item type →
+//                   AssetFactory builder, ITEM_PARAMS, DESK_TOP, the on-surface and hero sets), hero-build.ts and
+//                   hero-frame.ts, materials.ts, textures.ts, fixtures.ts, environment.ts, props/lighting.ts;
+//                   the room-creator.html door / window / furniture builders (its OWNER banners)
+//   S2 architecture structure-build.ts (slabs, walls, openings, partitions, stairs, balustrades, ceilings, roofs),
+//                   roofs.ts, wall-compiler.ts, floorplan-graph.ts, house-geometry.ts; the page's stair, slab and
+//                   wall builders
+//   S3 compose      rooms-build.ts (the rooms loop) and room-composer.ts, props/*.ts except lighting.ts and
+//                   outdoor.ts, props/page-place.ts (page items' placement), props/registry.ts,
+//                   scripts/build-prop-catalog.mts
+//   S4 site         site-build.ts (the lot, the world, the site builders and the site loop), site.ts, world.ts,
+//                   props/outdoor.ts; the page's pool / fence / garden / cabana builders
+//   S5 shot         shot-planner-v1.ts (shotsFor, routeOn, blockedTest, clearPoint), core-orbit.ts, shot-path.ts,
+//                   shot-track.ts (the baked track and the roof-fade rule)
+//   S6 ui           visibility.ts (wall modes, the shot's cutaway, shotHidden / shotPose), viewer.ts, home-names.ts,
+//                   the page's editor UI and overlays
+// Every stream also owns its spec fragment (spec/<stream>.ts), validator plugin (scripts/validate/<stream>.mts),
+// scene checks (scene-qa/<stream>.ts), fleet metrics (scripts/fleet/<stream>.mts) and plan.json key
+// (plan-export/<stream>.ts). room-creator.html's shared builders alternate between streams: read its OWNER banners.
+//
 // The order below is load-bearing: scene objects, materials and seeded streams are created in it, and a frame
 // depends on all three (object and material ids break ties in three.js's render sort). Do not reorder.
 
@@ -90,6 +106,8 @@ export function createHouseBuilder(deps) {
     // ---- site (site-build.ts)
     site.buildSite({ spec, kit, siteKit, put, anchors, water });
 
+    // ---- the whole house is built: S1's end-of-build hook (kit-build.ts), then the light
+    kitb.finishBuild({ spec, defaults: kitb.specDefaults(spec), anchors, kit, placed });
     // ---- the light: the spec's preset, the sun aimed from the entry's bearing (kit-build.ts)
     kitb.lightHouse({ spec, anchors });
     return { anchors, placed, graphs };

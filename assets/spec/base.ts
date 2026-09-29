@@ -7,8 +7,10 @@
 // redeclares it, wider, in its own fragment: index.ts lets the fragment's replace this one, and fails the
 // compile if it narrows instead.
 //
-// Loose on purpose where the builders are: item and site entries carry builder-specific parameters, so they
-// keep an index signature.
+// Loose on purpose where the builders are: item and site entries carry builder-specific parameters, so the
+// COMPOSED RoomItem and SiteItem (index.ts) keep an index signature. It is added there, never here: an index
+// signature on the base would make `Omit<BaseItem, …>` and `keyof BaseItem` collapse to `string`, losing every named
+// field's type and blinding the widen-only check to them.
 
 export type Vec2 = [number, number];
 /** `x, z` is the min (west, north) corner; `w` spans +X, `d` spans +Z. Metres. */
@@ -85,7 +87,6 @@ export interface BaseItem {
   h?: number;
   r?: number;
   color?: Colour;
-  [param: string]: unknown;
 }
 
 export interface BaseRoom {
@@ -146,7 +147,6 @@ export interface BaseSiteItem {
   to?: Vec2;
   path?: Vec2[];
   poly?: Vec2[];
-  [param: string]: unknown;
 }
 
 export interface BaseHero {

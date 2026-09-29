@@ -1,11 +1,11 @@
 // Visibility — what the editor and a shot show of a house: the wall modes (up / cutaway / down, and the Sims rule
 // that cuts per wall, per frame), the roof and ceiling registries and the shot's roof fade, the floor-layer filter,
-// the shotHidden() hook, and the isometric camera's placement.
+// the shotHidden() and shotPose() hooks, and the isometric camera's placement.
 //
 // Moved out of room-creator.html (plan S0, Completeness C4): the page creates one with createVisibility(deps) and
 // destructures the same names it used to declare, so every caller is unchanged. Owner: S6 (ui). S5 owns the
 // decisions a shot makes and this module applies: the roof's opacity frame by frame (shot-track.ts shotRoofAlpha,
-// shotEnterS) and what a shot hides (shotHidden()). S2 tags roles on what it builds (a role set before
+// shotEnterS), what a shot hides (shotHidden()) and what it moves (shotPose()). S2 tags roles on what it builds (a role set before
 // registerTrackedWall is kept — a 'finish' liner registers for the cutaway and stays a liner) and registers roofs
 // through registerRoof.
 //
@@ -210,11 +210,15 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
   //                 | 'down' | 'sims' (per wall, per frame, above)
   // dressing.roof:  'on' | 'off' | 'auto' (fades out over the 5 % of the shot before the eye goes indoors) — the
   //                 opacity is S5's rule, shot-track.ts shotRoofAlpha
-  function applyShotCutaway(preset, sampleT, eye, target) {
-    // put back what the last frame's shotHidden() hooks hid BEFORE this frame's dressing decides anything: the
-    // roofs and ceilings below are placed objects too, and restoring after them would hand a ceiling the last
-    // frame's visibility, not this one's (frame i would depend on frame i − 1)
+  // `sampleT` is the path's arc-length fraction (what the v1 roof rule reads); `clock` is the shot's own time —
+  // { t: 0..1 through the shot, seconds } — which a rule keyed on the film's clock (the roof fade from events.enterT,
+  // doors opening ahead of the eye) reads instead. The stills' callers pass none: a still is t 0.
+  function applyShotCutaway(preset, sampleT, eye, target, clock = { t: 0, seconds: 0 }) {
+    // put back what the last frame's shotHidden() hooks hid, and what its shotPose() hooks moved, BEFORE this
+    // frame's dressing decides anything: the roofs and ceilings below are placed objects too, and restoring after
+    // them would hand a ceiling the last frame's visibility, not this one's (frame i would depend on frame i − 1)
     restoreShotHidden();
+    restoreShotPose();
     const d = (preset && preset.dressing) || { walls: 'up', roof: 'auto' };
     if (!shotCutaway) shotCutaway = { savedMode: wallMode(), walls: null };
     if (d.walls === 'sims') {
@@ -224,12 +228,15 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
       for (const w of trackedWalls) applyWallModeToMesh(w, d.walls === 'cutaway' || d.walls === 'down' ? d.walls : 'up');
       shotCutaway.walls = d.walls;
     }
-    setRoofOpacity(shotRoofAlpha({ preset, s: sampleT, enter: () => shotEnterT(preset) }));
+    setRoofOpacity(shotRoofAlpha({ preset, s: sampleT, t: clock.t, seconds: clock.seconds, enter: () => shotEnterT(preset) }));
     for (const c of trackedCeilings) c.obj.visible = !eye || eye.y < c.y - 0.1;
-    applyShotHidden({ preset, s: sampleT, eye, target });
+    const frame = { preset, s: sampleT, t: clock.t, seconds: clock.seconds, eye, target };
+    applyShotHidden(frame);
+    applyShotPose(frame);
   }
   function endShotCutaway() {
     restoreShotHidden();
+    restoreShotPose(); posed.clear();
     if (!shotCutaway) return;
     const mode = shotCutaway.savedMode; shotCutaway = null;
     setRoofOpacity(1);
@@ -274,7 +281,8 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
 
   // ---- shotHidden(): what a shot hides, frame by frame (plan Completeness C4 — the hook is S5's) --------------
   // shotHidden(fn) registers fn(obj, frame) → true to hide a placed object for this frame of a shot, where frame is
-  // { preset, s, eye, target } (s: the path's sample fraction, as the roof fade reads it). It returns a function
+  // { preset, s, t, seconds, eye, target } (s: the path's sample fraction, as the roof fade reads it; t and seconds:
+  // the shot's own clock, 0..1 and seconds — `frame` everywhere below). It returns a function
   // that unregisters it. Every frame first puts back what the last frame hid (applyShotCutaway's first step, before
   // its dressing sets the roofs' and ceilings' visibility), then dresses, then asks the hooks afresh — so frame i
   // never depends on frame i − 1 (__houseRenderFrames is random access); endShotCutaway puts everything back.
@@ -294,10 +302,35 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
     for (const obj of placedItems) if (obj && obj.visible && shotHiddenHooks.some(fn => fn(obj, frame))) { shotHiddenNow.push({ obj, visible: obj.visible }); obj.visible = false; }
   }
 
+  // ---- shotPose(): what a shot MOVES, frame by frame (door leaves opening ahead of the eye: plan §3.2 `doors`) ----
+  // shotPose(fn) registers fn(frame, touch), run every frame after the dressing and shotHidden(). fn sets ABSOLUTE
+  // transforms (a door leaf's rotation.y from the track's doors channel at frame.seconds — never "a bit more than last
+  // frame") on the objects it wants moved, calling touch(obj) first on each, which snapshots its position, rotation
+  // and scale once per shot and returns it. Every frame first puts every touched object back to its snapshot
+  // (applyShotCutaway's first step), so frame i never depends on frame i − 1 (__houseRenderFrames is random access),
+  // and endShotCutaway puts them back and forgets them: the editor never keeps a door a shot opened. Visibility stays
+  // shotHidden()'s. It returns a function that unregisters fn. With nothing registered it does nothing at all.
+  const shotPoseHooks = [];
+  const posed = new Map();   // obj → its transform before the shot moved it
+  function shotPose(fn) {
+    shotPoseHooks.push(fn);
+    return () => { const i = shotPoseHooks.indexOf(fn); if (i !== -1) shotPoseHooks.splice(i, 1); };
+  }
+  function touchPosed(obj) {
+    if (!posed.has(obj)) posed.set(obj, { p: [obj.position.x, obj.position.y, obj.position.z], r: [obj.rotation.x, obj.rotation.y, obj.rotation.z], s: [obj.scale.x, obj.scale.y, obj.scale.z] });
+    return obj;
+  }
+  function restoreShotPose() {
+    for (const [obj, o] of posed) { obj.position.set(...o.p); obj.rotation.set(...o.r); obj.scale.set(...o.s); }
+  }
+  function applyShotPose(frame) {   // after restoreShotPose() and this frame's dressing
+    for (const fn of shotPoseHooks) fn(frame, touchPosed);
+  }
+
   return {
     trackedWalls, trackedRoofs, trackedCeilings,
     registerTrackedWall, autoRegisterWall, registerCeiling, registerRoof, applyWallModeToMesh,
     houseInside, simsCut, shotEnterT, setRoofOpacity, applyShotCutaway, endShotCutaway,
-    setGlobalWallMode, setGlobalLayerVisibility, shotHidden,
+    setGlobalWallMode, setGlobalLayerVisibility, shotHidden, shotPose,
   };
 }
