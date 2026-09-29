@@ -19,6 +19,15 @@ export const worldFile = (id: string) => path.join(WORLDS, `${id}.world.json`);
 export const fixtureIds = () => fs.existsSync(FIXTURES) ? fs.readdirSync(FIXTURES).filter(f => f.endsWith('.json')).map(f => f.replace(/\.json$/, '')).sort() : [];
 export const specFile = (id: string) => fs.existsSync(path.join(FIXTURES, `${id}.json`)) ? path.join(FIXTURES, `${id}.json`) : path.join(ROOT, 'content', 'houses', `${id}.json`);
 
+/** a fixture is served in place of content/houses/<id>.json, as test-fixtures.mts does */
+export async function routeFixtures(page: any): Promise<void> {
+  await page.route(/\/content\/houses\/[^/]+\.json(\?.*)?$/, (route: any) => {
+    const id = new URL(route.request().url()).pathname.split('/').pop()!.replace(/\.json$/, '');
+    if (fs.existsSync(path.join(FIXTURES, `${id}.json`))) route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync(path.join(FIXTURES, `${id}.json`), 'utf8') });
+    else route.continue();
+  });
+}
+
 function newestSource(): number {
   let m = fs.statSync(path.join(ROOT, 'room-creator.html')).mtimeMs;
   const walk = (dir: string) => { for (const f of fs.readdirSync(dir, { withFileTypes: true })) { const p = path.join(dir, f.name); if (f.isDirectory()) { if (f.name !== 'vendor' && f.name !== 'fonts') walk(p); } else if (f.name.endsWith('.ts')) m = Math.max(m, fs.statSync(p).mtimeMs); } };
@@ -45,12 +54,7 @@ export async function ensureWorlds(ids: string[], { rebuild = false, log = true,
       const page = await (await browser.newContext({ viewport: { width: 1200, height: 700 } })).newPage();
       page.on('pageerror', (e: Error) => console.error('  page error:', e.message));
       await stubGoogleFonts(page, srv.origin);
-      // a fixture is served in place of content/houses/<id>.json, as test-fixtures.mts does
-      await page.route(/\/content\/houses\/[^/]+\.json(\?.*)?$/, (route: any) => {
-        const id = new URL(route.request().url()).pathname.split('/').pop()!.replace(/\.json$/, '');
-        if (fs.existsSync(path.join(FIXTURES, `${id}.json`))) route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync(path.join(FIXTURES, `${id}.json`), 'utf8') });
-        else route.continue();
-      });
+      await routeFixtures(page);
       for (const id of todo) {
         if (log) console.log(`  world ${id} …`);
         await page.goto(srv.url(`room-creator.html?house=${id}`), { waitUntil: 'domcontentloaded', timeout: 120000 });

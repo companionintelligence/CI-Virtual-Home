@@ -565,15 +565,62 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
         flightPts.push([botOut[0], eyeY(lvTo), botOut[1]]);
       }
     } else {
-      // a spiral: a helix round the column at the void's radius less 0.3 m (§3.8), 300° over the climb
+      // a spiral: a helix round the column at the void's radius less 0.3 m (§3.8), 300° over the climb. The eye steps onto it from
+      // clear floor outside the stair's own footprint (the nav keeps that blocked) on the side it comes from, and steps off it to
+      // clear floor on the other storey, outside the void it climbs through
       const c = st.bottom; const vd = (world.levels.find(l => l.id === st.to)?.voids || []).find(v => inRect(c[0], c[2], v, 0.5));
       const R = Math.max(0.55, Math.min(1.1, vd ? Math.min(vd.w, vd.d) / 2 - 0.3 : 0.8));
-      const rise = st.top[1] - st.bottom[1], sweep = 300 * DEG, N = 30;
-      const a0 = Math.atan2(cur[0] - c[0], cur[1] - c[2]);
-      const pt = (u: number): V3 => [c[0] + Math.sin(a0 + sweep * u) * R, c[1] + rise * u + 1.5, c[2] + Math.cos(a0 + sweep * u) * R];
+      const rise = st.top[1] - st.bottom[1], N = 30;
+      // the helix follows the treads as built (their first angle and how far they turn), else 300° from the side the eye comes from
+      const rOut = Math.max(st.plan.maxX - st.plan.minX, st.plan.maxZ - st.plan.minZ) / 2 + 0.55;
+      const at = (a: number, r: number): [number, number] => [c[0] + Math.sin(a) * r, c[2] + Math.cos(a) * r];
+      const aCur = Math.atan2(cur[0] - c[0], cur[1] - c[2]);
+      const sweep = st.spin ? st.spin.sweep : 300 * DEG;
+      const aB = st.spin ? st.spin.a0 : fl.up ? aCur : aCur - sweep;   // the helix's angle at its foot
+      const ang = (u: number) => aB + sweep * u;
+      const pt = (u: number): V3 => [c[0] + Math.sin(ang(u)) * R, c[1] + rise * u + 1.5, c[2] + Math.cos(ang(u)) * R];
+      // the treads overhead: on the lower floor the eye (1.6 m up) passes under treads for the first turn, so it only ever walks
+      // round the column through the sector behind the first tread (where the treads' next turn is still a storey up) — never through
+      // the angles the treads wind over, where a tread stands at eye height
+      const sigma = -Math.sign(sweep) || 1, freeDa = [0, 25, 50, 75, 100, -25, -50, -75].map(d => d * sigma), sideDa = [0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180];
+      const lvExit = nav.levelOf(fl.up ? st.to : st.from), gx = nav.grid(lvExit), aEnd = fl.up ? ang(1) : ang(0);
+      const wallBetween2 = (a: [number, number], b: [number, number], y: number) => { const L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (L < 1e-3) return false; return !!index.raycast(a[0], y, a[1], (b[0] - a[0]) / L, 0, (b[1] - a[1]) / L, L, k => k === K.wall || k === K.glass || k === K.rail); };
+      // the step-off: the first of the angles round the end of the helix whose point, out past the void (upper) or the stair's footprint (lower), is clear floor
+      const stepOff = (): [number, number] => {
+        for (const da of fl.up ? sideDa : [...freeDa, ...sideDa]) for (let r = fl.up ? R + 0.45 : rOut; r < 4.5; r += 0.15) {
+          const q = at(aEnd + da * DEG, r);
+          if (fl.up && lvExit.voids.some(v => inRect(q[0], q[1], v, 0.4))) continue;
+          if (nav.passableAt(gx, q[0], q[1], 1) && !wallBetween2(at(aEnd + da * DEG, R), q, eyeY(lvExit))) return q;
+        }
+        return at(aEnd, rOut);
+      };
+      // the step-on: clear floor outside the stair's footprint, at the first tread's side (up: through the free sector) or the top's (down)
+      const gFrom = nav.grid(lvFrom), aOn = fl.up ? ang(0) : ang(1), rOn = fl.up ? rOut : Math.max(rOut, (vd ? Math.hypot(vd.w, vd.d) / 2 : 1.4) + 0.3);
+      // (and the way in to the helix's radius from it is not through a wall: a stair may stand in an alcove one door wide)
+      const yFrom = eyeY(lvFrom), wallBetween = (a: [number, number], b: [number, number], y: number) => { const L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (L < 1e-3) return false; const h = index.raycast(a[0], y, a[1], (b[0] - a[0]) / L, 0, (b[1] - a[1]) / L, L, k => k === K.wall || k === K.glass || k === K.rail); return !!h; };
+      const onAt = (() => {
+        for (const da of fl.up ? [...freeDa, ...sideDa] : sideDa) { const q = at(aOn + da * DEG, rOn); if (nav.passableAt(gFrom, q[0], q[1], 1) && !(!fl.up && lvFrom.voids.some(v => inRect(q[0], q[1], v, 0.3))) && !wallBetween(q, at(aOn + da * DEG, R), yFrom)) return q; }
+        return at(aOn, rOn);
+      })();
+      const foot: [number, number] = onAt;
+      const off = stepOff();
+      // the walk round the column between the foot and the helix (or the helix and the step-off) at floor height, at the helix radius: an arc
+      // (a tread stands at eye height where the treads' height over the floor is about 1.6 m: the way round that avoids those angles)
+      const hazard = (a: number) => { const rel = wrapPi(a - ang(0)), t = rel / sweep; return t >= -0.02 && t <= 1.02 && Math.abs(rise * clamp(t, 0, 1) - 1.6) < 0.3; };
+      // (in to the helix's radius first, then round it: a partition may stand a metre from the column, and the helix's radius keeps clear of it)
+      const aroundTo = (a1: number, a2: number, y: number): V3[] => {
+        const d1 = wrapPi(a2 - a1), d2 = d1 - (Math.sign(d1) || 1) * 2 * Math.PI;
+        const bad = (d: number) => { for (let k = 0; k <= 40; k++) if (hazard(a1 + d * k / 40)) return true; return false; };
+        const d = !bad(d1) ? d1 : !bad(d2) ? d2 : d1, n = Math.max(1, Math.ceil(Math.abs(d) / (18 * DEG))), out: V3[] = [];
+        for (let k = 0; k <= n; k++) { const q = at(a1 + d * k / n, R); out.push([q[0], y, q[1]]); }
+        return out;
+      };
       const seq: V3[] = []; for (let k = 0; k <= N; k++) seq.push(pt(fl.up ? k / N : 1 - k / N));
-      entryPt = [seq[0][0], seq[0][2]]; exitPt = [seq[N][0], seq[N][2]];
-      flightPts = seq;
+      entryPt = foot; exitPt = off;
+      const aFoot = Math.atan2(foot[0] - c[0], foot[1] - c[2]), aOff = Math.atan2(off[0] - c[0], off[1] - c[2]);
+      flightPts = fl.up
+        ? [[foot[0], eyeY(lvFrom), foot[1]], ...aroundTo(aFoot, ang(0), eyeY(lvFrom)), ...seq, [off[0], eyeY(lvTo), off[1]]]
+        : [[foot[0], eyeY(lvFrom), foot[1]], ...seq, ...aroundTo(ang(0), aOff, eyeY(lvTo)), [off[0], eyeY(lvTo), off[1]]];
     }
     // the walk to the flight on this storey
     const w = storeyWalk(curLv, cur, entryPt, fi === 0 ? budget : budget * 0.5);
@@ -590,7 +637,8 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   else {
     // no orbit (nothing round the Core free at any radius): walk to the ring's best viewpoint and hold there
     notes.push('no free arc round the Core: the finale is a push-in to the hero ring');
-    const ring = heroRing(world, probe, orbitProbe);
+    // (hero.view names its eye: the push-in goes there when it can)
+    const ring = heroRing(world, probe, orbitProbe, HV ? { view: typeof HV.azimuth === 'number' ? HV : undefined, radii: typeof HV.dist === 'number' ? [HV.dist] : undefined, heights: typeof HV.height === 'number' ? [HV.height] : undefined } : {});
     const P = ring.length ? ring[0].eye : [centre[0] + hero.fwd[0] * 1.6, yA, centre[2] + hero.fwd[1] * 1.6] as V3;
     const back: V3 = [P[0] + (P[0] - centre[0]) * 0.8, yA, P[2] + (P[2] - centre[2]) * 0.8];
     const w = storeyWalk(Lh, cur, [back[0], back[2]], budget);
@@ -669,10 +717,12 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     orbitMeta = { r, hs, reachable: bestReachable, pushIn: fin.bez.length > 2 ? 'curve' : 'chord', from: fin.from, to, arc, arcTotal: +(arc + (fin.arcTotal - fin.arc)).toFixed(0), chosenArc: fin.arc, bestArc: Math.max(...orbit.options.map((o: any) => o.arc)), dir: fin.dir, run: [orbit.run.lo, orbit.run.hi], full: orbit.run.full, swing: +Math.max(fin.swing, fin.circling).toFixed(1), options: orbit.options.map((o: any) => ({ dir: o.dir, from: o.from, to: o.to, arc: o.arc })) };
     compose.ndcX = Math.abs(compose.ndcX) * -fin.dir;
     endPose = { az: to, r: r * 0.96 };
-  } else if (!orbit) {
+  } else {
+    // (no orbit to arrive on — none free round the Core, or no way onto one from the walk: the push-in to the hero ring)
     const P = (finalWalk as any).P as V3, back = walkPts.length ? walkPts[walkPts.length - 1].p : P;
     finaleSegs.push({ beat: 'hero', pts: [back, lerp3(back, P, 0.85)] });
     finaleSegs.push({ beat: 'power', pts: [lerp3(back, P, 0.85), P], exact: true });
+    notes.push(`push-in from [${back.map(v => v.toFixed(2))}] to [${P.map(v => v.toFixed(2))}]`);
     finalFov = fovForCore(P, centre, core);
     compose.ndcX = heroAngle(P[0], P[2]) > 0 ? -1 / 3 : 1 / 3;
   }
@@ -786,6 +836,17 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   };
   let chosenEst = attemptEstablish(ests);
   if (chosenEst.blocked) for (const alt of ests.alts.slice(1, 10)) { const t = attemptEstablish(alt); if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose ${alt.style} (the first choice's move is blocked by the garden)`); break; } }
+  // last resort: the same view from nearer — the pose's own eye drawn in along its line to the approach start, and lifted a little,
+  // until the move down to the door is clear of the garden
+  if (chosenEst.blocked) {
+    const A0 = chosenEst.A, E0 = ests.eye, dirOut = norm(sub(E0, A0)), D0 = len(sub(E0, A0));
+    search2: for (const f of [0.8, 0.65, 0.5, 0.38]) for (const h of [0, 1.5, 3]) {
+      const q: V3 = [A0[0] + dirOut[0] * D0 * f, E0[1] + h - (E0[1] - A0[1]) * (1 - f) * 0.3, A0[2] + dirOut[2] * D0 * f];
+      if (!outsideOk(q)) continue;
+      const t = attemptEstablish({ ...ests, eye: q });
+      if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose drawn in to ${(f * 100).toFixed(0)} % of its distance (the garden is in the way of the full move)`); break search2; }
+    }
+  }
   if (chosenEst.blocked) chosenEst.notes.push('establishing move blocked by the garden and no way round found');
   const { est, A, pathLed, establishPts } = chosenEst;
   notes.push(...chosenEst.notes);
@@ -881,6 +942,30 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       }
     }
   }
+  // clearance: the walk keeps 0.22 m off walls and furniture (rounding a corner, the smoothing above cuts it; a partition's end
+  // clipped by centimetres is a wall the eye is inside). A point nearer than that is pushed out along the way the distance grows,
+  // and the path is rounded again — a few sweeps; doorways and the finale (whose lines are exact) are not touched.
+  {
+    const walk = new Set<number>([BEATS.indexOf('route'), BEATS.indexOf('reveal'), BEATS.indexOf('roomReveal')]);
+    const exactB = new Set(all.filter(s => s.exact).map(s => BEATS.indexOf(s.beat)));
+    const solid = (k: number) => k === K.wall || k === K.glass || k === K.rail || k === K.hull || k === K.item || k === K.fixture;
+    const near = (i: number) => { for (let k = -4; k <= 4; k++) { const j = i + k; if (j >= 0 && j < NP && exactB.has(Bt[j])) return true; } return false; };
+    const dAt = (x: number, z: number, y: number) => index.planDistance(x, z, y - 0.25, y + 0.25, solid, 0.5);
+    for (let pass = 0; pass < 6; pass++) {
+      let moved = 0;
+      for (let i = 0; i < NP; i++) {
+        if (!walk.has(Bt[i]) || near(i)) continue;
+        const d = dAt(X[i], Z[i], Y[i]);
+        if (d >= 0.22 || d <= 0) continue;
+        const e = 0.05, gx = dAt(X[i] + e, Z[i], Y[i]) - dAt(X[i] - e, Z[i], Y[i]), gz = dAt(X[i], Z[i] + e, Y[i]) - dAt(X[i], Z[i] - e, Y[i]), gl = Math.hypot(gx, gz);
+        if (gl < 1e-6) continue;
+        const push = (0.22 - d) * 0.7;
+        X[i] += gx / gl * push; Z[i] += gz / gl * push; moved++;
+      }
+      if (!moved) break;
+      for (const arr of [X, Z]) { const src = arr.slice(); for (let i = 0; i < NP; i++) { if (!walk.has(Bt[i]) || near(i)) continue; let sm = 0, ws = 0; for (let k = -3; k <= 3; k++) { const j = i + k; if (j < 0 || j >= NP || (exactB.has(Bt[j]) && Bt[j] !== Bt[i])) continue; const w = 0.5 + 0.5 * Math.cos(Math.PI * k / 4); sm += src[j] * w; ws += w; } arr[i] = sm / ws; } }
+    }
+  }
   // arc length
   const S = new Float64Array(NP);
   for (let i = 1; i < NP; i++) S[i] = S[i - 1] + Math.hypot(X[i] - X[i - 1], Y[i] - Y[i - 1], Z[i] - Z[i - 1]);
@@ -921,6 +1006,16 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     if (kappa < 1e-3) continue;
     const b = beatAt(i); if (b === 'orbit' || b === 'power') continue;
     local[i] = Math.min(local[i], Math.sqrt((OUTSIDE.has(b) ? 3.0 : 1.5) / kappa));
+  }
+  // the Core in view while the eye goes round it: the direction to it turns at (the eye's speed across it) / (its distance), and the
+  // look cannot turn faster than the beat's yaw cap, so the walk goes round it no faster than the look can follow with room to spare (half the cap)
+  for (let i = 0; i < NP; i++) {
+    const b = beatAt(i); if (b !== 'hero' && b !== 'roomReveal') continue;
+    const j0 = Math.max(0, i - 6), j1 = Math.min(NP - 1, i + 6), tx = X[j1] - X[j0], tz = Z[j1] - Z[j0], tl = Math.hypot(tx, tz);
+    const rx = centre[0] - X[i], rz = centre[2] - Z[i], r = Math.hypot(rx, rz);
+    if (tl < 1e-6 || r < 0.05) continue;
+    const across = Math.abs(tx * rz - tz * rx) / (tl * r);   // the share of the speed that is across the line of sight
+    local[i] = Math.min(local[i], 0.5 * YAW_CAP[b] * DEG * r / Math.max(0.3, across));
   }
   // beat floors (§3.4): a beat that would be over too fast is capped at the speed that fills its floor
   const beatRanges = new Map<Beat, Array<[number, number]>>();
@@ -1156,6 +1251,20 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       case 'threshold': return { p: sightline, w: 0.7, kind: 'sightline' };
       case 'reveal': { const lv = levelIdAt(p) || Le.id; const g = glanceAt(i, lv); if (g) return { p: g.p, w: 0.6, kind: 'glance' }; const r = nav.roomAt(lv, p[0], p[2]); return { p: focalOf(r, lv) || sightline, w: 0.6, kind: 'room' }; }
       case 'route': {
+        // the flight of stairs the walk is about to take (the next 2.2 s): the look goes to it — its steps rising, the way down —
+        // rather than to the wall a walk that turns into it faces until the last step
+        { let fb: Beat | null = null, fp: V3 | null = null;
+          for (let k = i; k < Math.min(N, i + Math.round(2.2 * FPS)); k += 6) { const bk = BEATS[beatOf[k]]; if (bk === 'stair' || bk === 'descend') { fb = bk; fp = eyeAt(k); break; } }
+          if (fb && fp) {
+            let st2: WStair | null = null, bd2 = Infinity;
+            for (const f of flights) { const c0 = f.st.path ? f.st.path[0] : f.st.bottom, d0 = Math.hypot(fp[0] - c0[0], fp[2] - c0[2]); if (d0 < bd2) { bd2 = d0; st2 = f.st; } }
+            if (st2 && bd2 < 3.5) {
+              const dF = st2.dir0 || st2.dir, up2 = fb === 'stair';
+              const tgt: V3 = st2.spiral ? [st2.bottom[0], st2.bottom[1] + (up2 ? 1.6 : 1.0), st2.bottom[2]]
+                : up2 ? [st2.bottom[0] + dF[0] * 2.0, st2.bottom[1] + 1.9, st2.bottom[2] + dF[1] * 2.0] : [st2.top[0] - st2.dir[0] * 1.6, st2.top[1] + 0.2, st2.top[2] - st2.dir[1] * 1.6];
+              return { p: tgt, w: 0.8, kind: 'flight' };
+            }
+          } }
         // inside the Core's room the Core is what the walk is going to
         if (coreRoom && levelIdAt(p) === Lh.id && inRect(p[0], p[2], coreRoom.b, 0.05)) return { p: coreTarget, w: 0.65, kind: 'core+focal' };
         // the room worth seeing in front of the eye, else the next room ahead: the room 2.5 m on along the path
@@ -1171,6 +1280,9 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
         for (const f of flights) { const a = f.st.bottom, b2 = f.st.top, dx = b2[0] - a[0], dz = b2[2] - a[2], l2 = dx * dx + dz * dz || 1e-9, u = clamp(((p[0] - a[0]) * dx + (p[2] - a[2]) * dz) / l2, 0, 1), d = Math.hypot(p[0] - a[0] - dx * u, p[2] - a[2] - dz * u) + Math.abs(p[1] - (a[1] + (b2[1] - a[1]) * u) - 1.5) * 0.5; if (d < bd) { bd = d; st = f.st; } }
         if (!st) return { p: coreTarget, w: 0, kind: 'none' };
         const up = b === 'stair';
+        // a spiral climbs inside a well one door wide: the walls are a hand's breadth away whichever way the eye faces along the
+        // floor, so the look goes on round the helix where it is going, up (or down) the treads and the column
+        if (st.spiral) { const q = eyeAt(Math.min(N - 1, i + Math.round(1.1 * FPS))); return { p: [q[0], q[1] + (up ? 0.9 : -0.5), q[2]], w: 0.9, kind: 'helix ahead' }; }
         const tgt: V3 = up ? [st.top[0] + st.dir[0] * 2.5, st.top[1] + 1.4, st.top[2] + st.dir[1] * 2.5] : [st.bottom[0] - st.dir[0] * 2.5, st.bottom[1] + 1.0, st.bottom[2] - st.dir[1] * 2.5];
         return { p: tgt, w: 0.4, kind: up ? 'landing' : 'foot' };
       }

@@ -38,6 +38,9 @@ export type WStair = {
   /** S2's walking line for a flight that turns (an L, a U) or is one of several: [x, y (world), z] from the first step to the last;
    *  `dir` is then the heading off the top and `dir0` the heading of the first flight (S2's anchors.stairs, Completeness A2) */
   path?: Array<[number, number, number]>; dir0?: [number, number]; shape?: string;
+  /** a spiral's treads as built: the angle of the first tread round the column (atan2(dx, dz), radians), and how far the treads turn to the
+   *  last one (signed: + is the direction of increasing angle) — the helix the eye climbs follows them */
+  spin?: { a0: number; sweep: number };
 };
 export type WObb = { c: [number, number, number]; h: [number, number, number]; ax: [number, number, number, number, number, number, number, number, number]; k: number; n: string };
 /** a hinged leaf the shot can swing (anchors.doors from S1's kit-build.ts collectDoors): the hinge in plan, the leaf's heading
@@ -211,6 +214,17 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
       ...(Array.isArray(s.path) && s.path.length >= 2 && !spiral ? { path: s.path.map((q: number[]) => [mm(q[0]), mm(q[1]), mm(q[2])] as [number, number, number]) } : {}),
       ...(Array.isArray(s.dir0) ? { dir0: [mm(s.dir0[0]), mm(s.dir0[1])] as [number, number] } : {}), ...(s.shape ? { shape: String(s.shape) } : {}) };
   });
+  // a spiral's treads are thin slabs round its column: their angles and heights say which way it winds and how far
+  for (const st of stairs) {
+    if (!st.spiral) continue;
+    const cx = st.bottom[0], cz = st.bottom[2];
+    const treads = obbs.filter(o => o.k === K.stair && o.h[1] < 0.06 && Math.max(o.h[0], o.h[2]) > 0.25 && Math.hypot(o.c[0] - cx, o.c[2] - cz) > 0.15 && Math.hypot(o.c[0] - cx, o.c[2] - cz) < 1.6 && o.c[1] > st.bottom[1] - 0.05 && o.c[1] < st.top[1] + 0.3)
+      .sort((a, b) => a.c[1] - b.c[1]);
+    if (treads.length < 6) continue;
+    let a = Math.atan2(treads[0].c[0] - cx, treads[0].c[2] - cz); const a0 = a; let sweep = 0;
+    for (const t of treads.slice(1)) { const b = Math.atan2(t.c[0] - cx, t.c[2] - cz); sweep += Math.atan2(Math.sin(b - a), Math.cos(b - a)); a = b; }
+    st.spin = { a0: mm(a0), sweep: mm(sweep) };
+  }
   const e = anchors.entry;
   const hero: WHero | null = heroA && coreBox ? {
     x: mm(heroA.x), y: mm(heroA.y), z: mm(heroA.z), level: heroA.level, fwd: [mm(heroA.fwd[0]), mm(heroA.fwd[1])], surface: heroA.surface || 'desk', pose: heroA.pose || 'prone',

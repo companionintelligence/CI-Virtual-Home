@@ -133,8 +133,8 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
       if (d < 0.25) W('graze', t, `eye ${d.toFixed(2)} m from a solid at ${tag(p)}`, 'graze');
     }
     // the hero surface and the monitor
-    if (hero.surfaceBox) { const s = hero.surfaceBox; if (p[0] > s[0] && p[0] < s[3] && p[2] > s[2] && p[2] < s[5] && p[1] < s[4] + 1.6) E('hero-surface', t, `eye over the hero ${hero.surface} at ${tag(p)}`, hero.surface); }
-    if (hero.monitor) { const m = hero.monitor, d = Math.hypot(Math.max(m[0] - p[0], 0, p[0] - m[3]), Math.max(m[2] - p[2], 0, p[2] - m[5])); if (d < 0.5 && p[1] < m[4] + 0.6) E('monitor-near', t, `eye ${d.toFixed(2)} m from the monitor`, 'monitor'); }
+    if (hero.surfaceBox) { const s = hero.surfaceBox; if (p[0] > s[0] && p[0] < s[3] && p[2] > s[2] && p[2] < s[5] && p[1] < s[4] + 1.6 && p[1] > s[1] - 0.4) E('hero-surface', t, `eye over the hero ${hero.surface} at ${tag(p)}`, hero.surface); }
+    if (hero.monitor) { const m = hero.monitor, d = Math.hypot(Math.max(m[0] - p[0], 0, p[0] - m[3]), Math.max(m[2] - p[2], 0, p[2] - m[5])); if (d < 0.5 && p[1] < m[4] + 0.6 && p[1] > m[1] - 0.6) E('monitor-near', t, `eye ${d.toFixed(2)} m from the monitor`, 'monitor'); }
   });
   function isNearCoreItem(id: number) {
     // an item digested mesh by mesh near the Core has a hull; its mesh boxes are for sight lines, the hull is the clip
@@ -218,7 +218,10 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const v: V3 = [eye[j][0] - eye[k0][0], eye[j][1] - eye[k0][1], eye[j][2] - eye[k0][2]], vl = Math.hypot(v[0], v[2]);
     if (speed[i] > 0.3 && vl > 1e-6) {
       const c = (v[0] * dir[i][0] + v[2] * dir[i][2]) / (vl * (Math.hypot(dir[i][0], dir[i][2]) || 1));
-      if (c < -0.2) { revRun += dt; if (revRun > 0.5) E('reverse', tOf(i), `the camera travels against its look for ${revRun.toFixed(1)} s`); } else revRun = 0;
+      // (going round the Core with the look on it is not going backwards: the walk into its room and the finale circle it)
+      const tc: V3 = [centre[0] - eye[i][0], centre[1] - eye[i][1], centre[2] - eye[i][2]], tcl = Math.hypot(tc[0], tc[1], tc[2]) || 1;
+      const onCore = tcl < 4 && (tc[0] * dir[i][0] + tc[1] * dir[i][1] + tc[2] * dir[i][2]) / tcl > Math.cos(40 * DEG);
+      if (c < -0.2 && !onCore) { revRun += dt; if (revRun > 0.5) E('reverse', tOf(i), `the camera travels against its look for ${revRun.toFixed(1)} s`); } else revRun = 0;
       if (!['orbit', 'power', 'hero', 'establish'].includes(bt) && c < Math.cos(60 * DEG)) { crabRun += dt; if (crabRun > 0.5) W('crab', tOf(i), `${bt}: the look is over 60° off the direction of travel for ${crabRun.toFixed(1)} s`, bt); } else crabRun = 0;
     } else { revRun = 0; crabRun = 0; }
     // the look target's distance (the planner's singularity guard)

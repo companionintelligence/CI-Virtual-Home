@@ -3,7 +3,7 @@
 // and planner v2 side by side.
 //
 //   node --experimental-strip-types scripts/camera-audit.mts [--house a,b | all] [--planner v1,v2] [--frames 12] [--res 270]
-//        [--out test/qa/camera-audit] [--no-render] [--stale-ok] [--rebuild-worlds]
+//        [--out test/qa/camera-audit] [--no-render] [--stale-ok] [--rebuild-worlds] [--fixtures]
 //
 // For each house × planner it writes <out>/<planner>/<id>.strip.jpg — a CONTACT STRIP: twelve frames of the film in order (each
 // captioned with its time and beat) beside the house's plan(s), the eye's path drawn in the colour of its beat, a tick a second,
@@ -20,13 +20,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, houseIds, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
-import { ensureWorlds, specFile } from './shot-worlds.mts';
+import { ensureWorlds, specFile, fixtureIds, routeFixtures } from './shot-worlds.mts';
 import { planDoorToCore, shotOptions, sampleTrack, BEATS } from '../assets/shot-planner.js';
 import { qaTrack } from '../assets/shot-qa.js';
 import { fleetChecks, trackMetrics, type FleetRow } from '../assets/shot-fleet.js';
 
 const args = parseArgs(process.argv.slice(2));
-const ids = !args.house || args.house === 'all' ? houseIds() : args.house.split(',');
+const ids = [...(!args.house || args.house === 'all' ? houseIds() : args.house.split(',')), ...(args.fixtures === 'true' ? fixtureIds().filter(f => f.startsWith('s5-shot-')) : [])];
 const planners = (args.planner || 'v1,v2').split(',').filter(p => p === 'v1' || p === 'v2');
 const KEEP = Math.max(4, parseInt(args.frames || '12', 10)), RES = args.res || '270', FPS = 10;
 const OUT = args.out ? path.resolve(args.out) : path.join(ROOT, 'test', 'qa', 'camera-audit');
@@ -131,7 +131,7 @@ if (render || planners.includes('v1')) {
         const key = `${planner}/${id}`;
         const page = await (await browser.newContext({ viewport: { width: 1600, height: 900 } })).newPage();
         page.on('pageerror', (e: Error) => console.error(`  page error ${key}:`, e.message));
-        await stubGoogleFonts(page, srv.origin);
+        await stubGoogleFonts(page, srv.origin); await routeFixtures(page);
         try {
           await page.goto(srv.url(`room-creator.html?house=${id}&planner=${planner}`), { waitUntil: 'domcontentloaded', timeout: 120000 });
           await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, id, { timeout: 120000 });
