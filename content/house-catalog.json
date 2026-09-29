@@ -37,7 +37,9 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "color"
+   ],
    "tags": [],
    "iso": null
   },
@@ -57,7 +59,10 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
    "iso": null
   },
@@ -97,7 +102,10 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
    "iso": null
   },
@@ -117,7 +125,10 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
    "iso": null
   },
@@ -137,7 +148,11 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
    "tags": [],
    "iso": null
   },
@@ -157,7 +172,10 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
    "iso": null
   },
@@ -177,7 +195,10 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
    "iso": null
   },
@@ -197,7 +218,10 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h"
+   ],
    "tags": [],
    "iso": null
   },
@@ -237,7 +261,11 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
    "tags": [],
    "iso": null
   },
@@ -257,7 +285,10 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "r",
+    "color"
+   ],
    "tags": [],
    "iso": null
   },
@@ -277,7 +308,9 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "r"
+   ],
    "tags": [],
    "iso": null
   },
@@ -317,7 +350,11 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h",
+    "d"
+   ],
    "tags": [],
    "iso": null
   },
@@ -337,7 +374,11 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
    "tags": [],
    "iso": null
   },
@@ -357,7 +398,11 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h",
+    "d"
+   ],
    "tags": [],
    "iso": null
   },
@@ -377,7 +422,9 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "color"
+   ],
    "tags": [],
    "iso": null
   },
@@ -397,7 +444,10 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
    "iso": null
   },
@@ -417,7 +467,11 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h",
+    "d"
+   ],
    "tags": [],
    "iso": null
   },
@@ -497,7 +551,9 @@
    ],
    "surface": true,
    "source": "page",
-   "params": [],
+   "params": [
+    "pose"
+   ],
    "tags": [],
    "iso": null
   },
@@ -517,7 +573,9 @@
    ],
    "surface": true,
    "source": "page",
-   "params": [],
+   "params": [
+    "pose"
+   ],
    "tags": [],
    "iso": null
   },
@@ -537,7 +595,12 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h",
+    "finish",
+    "pose"
+   ],
    "tags": [],
    "iso": null
   },
@@ -757,7 +820,10 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h"
+   ],
    "tags": [],
    "iso": null
   },
@@ -777,7 +843,13 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "h",
+    "r",
+    "size",
+    "style",
+    "color"
+   ],
    "tags": [],
    "iso": null
   },

@@ -275,8 +275,12 @@ removed. Nothing depends on GitHub Pages, so it can be switched off in the repos
    fails as before. `scripts/golden-ledger.mts` has the contract.
 6. **tests** — every `scripts/test-*.mts`, found by glob; a script opts out or into `--quick` with an
    `@check-house` line in its header, and `@check-house advisory — <why>` lets one that is red on `main` too run
-   and report without failing the gate until the fix that greens it lands (test-floorplan-graph, for now). Among
-   them `test-fixtures.mts`, the fixture houses' QA and frame hashes.
+   and report without failing the gate until the fix that greens it lands (none is advisory today; delete the
+   directive with the fix, so a real regression fails again). Among them `test-fixtures.mts`, the fixture houses' QA
+   and frame hashes, and the seams' own tests, each a second or two and in `--quick`: `test-spec-types.mts` (every
+   spec against `HouseSpec`), `test-spec-merge.mts` (the fragment merge rule), `test-validate-plugins.mts` (a
+   plugin's `extend` and `replaces`), `test-builder-seams.mts` (what the catalog and the validator read off the
+   builders) and `test-visibility.mts` (the wall roles, the shot's clock and its `shotHidden` / `shotPose` hooks).
 7. **perf** — build ≤ 3 s, `__houseShotTrack` ≤ 1 s and shot QA ≤ 0.5 s a shot on aurora, mirage and vanilla:
    report-only, it never fails the gate.
 

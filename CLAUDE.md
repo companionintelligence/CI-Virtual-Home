@@ -84,7 +84,8 @@ with the previous run by hand; the full list is in `test/qa/qa.json`), `determin
 After a spec change also re-run `plans`, `iso` and `floorplans` and commit their output with the spec.
 
 **Pass 4 works in streams** (S0 seams, then S1 kit, S2 architecture, S3 compose, S4 site, S5 shot, S6 ui, each on
-its own branch). Each owns its modules (house-builder.ts's header lists them), its HouseSpec fragment
+its own branch). Each owns its modules (house-builder.ts's header lists them all; room-creator.html's shared
+builders are marked by `// ---- OWNER … ----` banners, since their runs alternate), its HouseSpec fragment
 (`assets/spec/`), its validator plugin (`scripts/validate/`), its scene checks (`assets/scene-qa/`), its fleet
 metrics (`scripts/fleet/`) and its `plan.json` key (`assets/plan-export/<stream>.ts`); stay in yours. The shared
 files have a seam for each stream instead of a hunk: widen a base spec field by redeclaring it in your fragment
