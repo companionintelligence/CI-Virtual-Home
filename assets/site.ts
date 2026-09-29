@@ -488,19 +488,24 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
     const lean = (r() - 0.5) * 0.08, T = V(lean * h, h, lean * h * 0.5);
     const trunk = addMesh(g, limbGeo(V(0, 0, 0), T, 0.2, 0.16, 9), M(0x6f604e, barkOpts)); trunk.name = 'Trunk'; trunk.userData.isoShape = 'cyl';
     const pos = [], col = [];
-    const n = 16 + Math.floor(r() * 6);
+    const tri = (a, b2, c, k0, k1, k2) => { pos.push(a.x, a.y, a.z, b2.x, b2.y, b2.z, c.x, c.y, c.z); col.push(k0, k0, k0, k1, k1, k1, k2, k2, k2); };
+    const n = 19 + Math.floor(r() * 6);
     for (let f = 0; f < n; f++) {
-      const phi = f * 2.39996 + r() * 0.3, el = 0.1 + r() * 1.1 - (f / n) * 0.9, L = h * (0.16 + r() * 0.05), R = h * (0.11 + r() * 0.03);
+      const phi = f * 2.39996 + r() * 0.3, el = 0.15 + r() * 1.05 - (f / n) * 0.95, L = h * (0.13 + r() * 0.05), R = h * (0.17 + r() * 0.04);
       const d = V(Math.cos(phi) * Math.cos(el), Math.sin(el), Math.sin(phi) * Math.cos(el)), stalkEnd = V().copy(T).addScaledVector(d, L);
       const side = V().crossVectors(d, UP).normalize(), up = V().crossVectors(side, d).normalize();
-      // the stalk as two thin triangles, then the fan: blades radiating over ~200° round the stalk's end
+      // the stalk as two thin triangles, then the fan: a filled half-disc of blades (each a pointed tip between two
+      // notches) spread over ~200° about the stalk's end, drooping a little toward the edges
       pos.push(T.x, T.y, T.z, stalkEnd.x, stalkEnd.y, stalkEnd.z, stalkEnd.x + side.x * 0.03, stalkEnd.y, stalkEnd.z + side.z * 0.03); col.push(0.6, 0.6, 0.55, 0.6, 0.6, 0.55, 0.6, 0.6, 0.55);
-      const blades = 18, tone = 0.8 + r() * 0.2;
+      const blades = 11, tone = 0.8 + r() * 0.2;
+      const dir = t => V().addScaledVector(d, Math.cos(t)).addScaledVector(side, Math.sin(t)).addScaledVector(up, -0.28 * Math.sin(t) * Math.sin(t));
       for (let b = 0; b < blades; b++) {
         const t0 = -1.75 + 3.5 * b / blades, t1 = -1.75 + 3.5 * (b + 1) / blades, tm = (t0 + t1) / 2;
-        const dir = t => V().addScaledVector(d, Math.cos(t)).addScaledVector(side, Math.sin(t)).addScaledVector(up, -0.15 * Math.abs(Math.sin(t)));
-        const a = V().copy(stalkEnd).addScaledVector(dir(t0), R * 0.12), c = V().copy(stalkEnd).addScaledVector(dir(t1), R * 0.12), tip = V().copy(stalkEnd).addScaledVector(dir(tm), R).addScaledVector(up, (b % 2 ? 0.04 : -0.04) * R);
-        pos.push(a.x, a.y, a.z, tip.x, tip.y, tip.z, c.x, c.y, c.z); const k = tone * (b % 2 ? 0.92 : 1.02); col.push(k, k, k, k * 1.05, k * 1.05, k * 1.05, k, k, k);
+        const a = V().copy(stalkEnd).addScaledVector(dir(t0), R * 0.1), c = V().copy(stalkEnd).addScaledVector(dir(t1), R * 0.1);
+        const n0 = V().copy(stalkEnd).addScaledVector(dir(t0), R * 0.8), n1 = V().copy(stalkEnd).addScaledVector(dir(t1), R * 0.8);
+        const tip = V().copy(stalkEnd).addScaledVector(dir(tm), R).addScaledVector(up, (b % 2 ? 0.05 : -0.05) * R);
+        const k = tone * (b % 2 ? 0.9 : 1.04);
+        tri(a, n0, tip, k * 0.85, k, k * 1.08); tri(a, tip, n1, k * 0.85, k * 1.08, k); tri(a, n1, c, k * 0.85, k, k * 0.85);
       }
     }
     const fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); fg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); fg.computeVertexNormals();
