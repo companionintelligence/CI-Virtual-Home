@@ -299,7 +299,9 @@ export function createSiteBuild(bctx) {
     // every corner (nudged 1 cm in, off a flush wall) inside an odd number of loops: in the house, not a courtyard
     const underHouse = ({ x, z, w, d }) => [[x + 0.01, z + 0.01], [x + w - 0.01, z + 0.01], [x + w - 0.01, z + d - 0.01], [x + 0.01, z + d - 0.01]]
       .every(([px, pz]) => lotPolys.filter(p => inPoly(px, pz, p)).length % 2 === 1);
-    const lotHoles = water.filter(r => !r.ellipse && r.floor < 0.05 && (r.poly ? r.rim < 0.05 : true) && overlaps(lotRect, r) && !underHouse(r));
+    // (a shaped pool raised on a plinth or set a step up still digs into the ground when its floor is below it — its tile
+    // floor and walls would otherwise be a lawn under the water)
+    const lotHoles = water.filter(r => !r.ellipse && r.floor < 0.05 && overlaps(lotRect, r) && !underHouse(r));
     put(() => {
       const g = (lotHoles.length || lotPolys.length) ? slabWithHoles(lotRect, lotHoles, gmat, 0.06, 0, lotPolys) : slab(lot.w, lot.d, gmat, 0.06);
       for (const c of courtyards) {   // lawn inside an enclosed courtyard
@@ -423,9 +425,18 @@ export function createSiteBuild(bctx) {
         const tt = tensionOf(s.smooth), raw = Array.isArray(s.path) ? s.path : [s.from, s.to];
         const line = tt === null ? raw : smoothLine(raw, tt, 1.2);
         const g = group(s.type === 'fence' ? `Fence (${s.style || 'picket'})` : `Garden wall (${s.surface || 'stucco'})`); g.userData.category = 'Site';
+        // a bend of the polyline is closed by running each of its two runs past the vertex by (t / 2)·tan(θ / 2), θ the turn
+        // (a right angle: half the thickness, the notch on the outer corner); a smoothed line's small turns add almost nothing
+        const thick = s.type === 'fence' ? ({ 'stone-wall': 0.45, privacy: 0.1, 'post-rail': 0.12, picket: 0.05 }[s.style || 'picket'] ?? 0.06) : s.t || 0.25;
+        const joint = (k: number) => {
+          if (k <= 0 || k >= line.length - 1) return 0;
+          const p = line[k - 1], q = line[k], r = line[k + 1], a1 = Math.atan2(q[1] - p[1], q[0] - p[0]), a2 = Math.atan2(r[1] - q[1], r[0] - q[0]);
+          let d = Math.abs(a2 - a1); d = d > Math.PI ? 2 * Math.PI - d : d;
+          return d < 0.02 || d > 2.6 ? 0 : (thick / 2) * Math.tan(d / 2);
+        };
         for (let k = 0; k < line.length - 1; k++) {
-          const a = line[k], b = line[k + 1], y = s.y ?? groundAt((a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
-          solids.push(...(s.type === 'fence' ? ST.fenceRun(g, a, b, { style: s.style || 'picket', h: s.h ?? null, color: s.color ?? null, y }) : ST.wallRun(g, a, b, { h: s.h || 0.6, t: s.t || 0.25, surface: s.surface || 'stucco', color: s.color ?? null, cap: s.cap ?? null, y })));
+          const a = line[k], b = line[k + 1], y = s.y ?? groundAt((a[0] + b[0]) / 2, (a[1] + b[1]) / 2), extA = joint(k), extB = joint(k + 1);
+          solids.push(...(s.type === 'fence' ? ST.fenceRun(g, a, b, { style: s.style || 'picket', h: s.h ?? null, color: s.color ?? null, y, extA, extB }) : ST.wallRun(g, a, b, { h: s.h || 0.6, t: s.t || 0.25, surface: s.surface || 'stucco', color: s.color ?? null, cap: s.cap ?? null, y, extA, extB })));
         }
         const o = put(() => g, 0, 0, 0, null, 'site');
         if (s.color === undefined && s.type === 'fence' && (s.style || 'picket') !== 'stone-wall') kit.mute(o);
@@ -451,7 +462,7 @@ export function createSiteBuild(bctx) {
       }
       if ((s.type === 'patio' || s.type === 'driveway') && (s.poly !== undefined || s.surface !== undefined || s.color !== undefined || s.smooth !== undefined)) { buildSlab(s, si, { put, water, groundAt }); return; }
       if (s.type === 'deck' && newDeck(s, water)) { buildDeck(s, si, { put, water, solids, groundAt }); return; }
-      if (s.type === 'steps' && newSteps(s, terraced)) { buildSteps(s, si, { put, solids, groundAt }); return; }
+      if (s.type === 'steps' && newSteps(s, terraced, groundAt)) { buildSteps(s, si, { put, solids, groundAt }); return; }
       const fn = SITE[s.type];
       if (!fn) { (anchors.siteDropped ||= []).push({ site: si, type: s.type }); return; }   // never silently: the scene QA reports it
       const o = put(() => fn(s, water), s.at[0], s.at[1], s.y ?? groundAt(s.at[0], s.at[1]), null, 'site');
@@ -460,7 +471,17 @@ export function createSiteBuild(bctx) {
       if (s.type !== 'car' && s.color === undefined) kit.mute(o);   // restrained palette: no orange porch decks, no cyan basins
       o.userData.category = 'Site';
       if (s.type === 'cypress' || s.type === 'palm') treeSolids(o, solids);
-      else if (STRUCTURE_SOLIDS[s.type]) { const b = solidBox(STRUCTURE_SOLIDS[s.type], o); if (b) { if (s.rot) { b.w = r3(s.w || b.w); b.d = r3(s.d || b.d); b.rot = s.rot; b.x = r3(s.at[0]); b.z = r3(s.at[1]); } solids.push(b); } }
+      else if (STRUCTURE_SOLIDS[s.type]) {
+        // the item's box in its own frame (unturned), then turned with it: the box round the turned mesh is not the item's
+        // width and depth (a car turned 90° is 4.2 long in z, and the box round it says 4.2 in x)
+        const ry = o.rotation.y; o.rotation.y = 0;
+        const b = solidBox(STRUCTURE_SOLIDS[s.type], o);
+        o.rotation.y = ry;
+        if (b) {
+          if (s.rot) { const [c] = turn([[b.x - s.at[0], b.z - s.at[1]]], s.rot); b.x = r3(s.at[0] + c[0]); b.z = r3(s.at[1] + c[1]); b.rot = s.rot; }
+          solids.push(b);
+        }
+      }
     };
     // every solid a site item records names it (`site`: its index in spec.site), for whoever has to find the item behind one
     site.forEach((s, si) => { const n0 = solids.length; buildItem(s, si); for (let k = n0; k < solids.length; k++) solids[k].site = si; });
@@ -525,20 +546,26 @@ export function createSiteBuild(bctx) {
     solids.push({ kind: 'deck', x: r3(s.at[0]), z: r3(s.at[1]), w, d, rot: s.rot || 0, yMin: r3(y + h - t - postsDown), yMax: r3(y + h) });
   }
   // ---- steps (S4): `h` (the rise; the count follows at ~0.17 m risers), `d` (the run), a rail, a style; and on a
-  // terraced lot a flight with no `h` climbs to the terrace its top reaches ----------------------------------------
-  const newSteps = (s, terraced) => s.h !== undefined || s.d !== undefined || s.rail !== undefined || s.style !== undefined || s.color !== undefined || terraced;
+  // terraced lot a flight with no `h` climbs to the terrace its top reaches --------------------------------------------
+  // (where the ground rises in front of a flight: the run to where it steps up, and how far. Null when it does not within 8 m)
+  const stepsRise = (s, groundAt) => {
+    const rot = s.rot || 0, [dir] = turn([[0, -1]], rot), at = s.at, base = s.y ?? groundAt(at[0] - dir[0] * 0.4, at[1] - dir[1] * 0.4), g0 = groundAt(at[0], at[1]);
+    for (let k = 1; k <= 160; k++) { const q = k * 0.05, gy = groundAt(at[0] + dir[0] * q, at[1] + dir[1] * q); if (gy > g0 + 0.05) return { D: q, h: gy - base, base, dir }; }
+    return null;
+  };
+  // a terraced lot turns a plain `steps { n }` into a climbing flight only where the ground does rise in front of it; every other
+  // flight there is the old one, its `n` honoured
+  const newSteps = (s, terraced, groundAt) => s.h !== undefined || s.d !== undefined || s.rail !== undefined || s.style !== undefined || s.color !== undefined || (terraced && stepsRise(s, groundAt) !== null);
   function buildSteps(s, si, { put, solids, groundAt }) {
     const rot = s.rot || 0, [dir] = turn([[0, -1]], rot), at = s.at;
     const base = s.y ?? groundAt(at[0] - dir[0] * 0.4, at[1] - dir[1] * 0.4);
-    let h = s.h, run = s.d;
+    let h = s.h, run = s.d, n = 0;
     if (h === undefined) {
-      // march up the flight's line to where the ground steps up (a terrace's edge)
-      let D = 0; const g0 = groundAt(at[0], at[1]);
-      for (let k = 1; k <= 160; k++) { const q = k * 0.05, gy = groundAt(at[0] + dir[0] * q, at[1] + dir[1] * q); if (gy > g0 + 0.05) { D = q; h = gy - base; break; } }
-      if (h === undefined) { h = (s.n || 3) * 0.16; run = run ?? (s.n || 3) * 0.32; }
-      else run = run ?? Math.max(D + 0.16, Math.round(h / 0.17) * 0.28);
-    }
-    const n = s.n && s.h === undefined && s.d === undefined && run === undefined ? s.n : Math.max(1, Math.round(h / 0.17));
+      // march up the flight's line to where the ground steps up (a terrace's edge): its rise, and the run to it
+      const rise = stepsRise(s, groundAt);
+      if (rise) { h = rise.h; n = s.n ?? Math.max(1, Math.round(h / 0.17)); run = run ?? Math.max(rise.D + 0.16, n * 0.28); }
+      else { h = (s.n || 3) * 0.16; run = run ?? (s.n || 3) * 0.32; n = s.n || 3; }
+    } else n = s.n ?? Math.max(1, Math.round(h / 0.17));
     const tread = (run ?? n * 0.32) / n;
     const m = siteMat(s.style === 'timber' ? 'decking' : s.style === 'brick' ? 'brick' : s.style === 'stone' ? 'stone' : 'steps', s.color ?? null) || std(s.color !== undefined ? hex(s.color) : 0x9ca3af);
     const g = ST.flight(s.w || 1.6, h, n, tread, m, { rails: s.rail ? { style: typeof s.rail === 'string' ? s.rail : s.rail.style || 'metal', color: typeof s.rail === 'object' ? s.rail.color : null } : null });
@@ -581,36 +608,61 @@ export function createSiteBuild(bctx) {
   // ---- terraces (A3) --------------------------------------------------------------------------------------------------
   function buildTerrace(s, si, { spec, ctx, put, solids, kit }) {
     const poly = ctx.terracePoly(s); if (poly.length < 3 || typeof s.y !== 'number') return;
-    const c = centroid(poly), terraces = (spec.site || []).filter(o => o !== s && o.type === 'terrace' && typeof o.y === 'number' && o.y < s.y);
-    // the ground it stands on: the highest lower terrace under its middle, else the lot
-    const base = terraces.reduce((y, o) => (o.y > y && inPolyG(c[0], c[1], ctx.terracePoly(o)) ? o.y : y), 0);
+    if (!(s.y > 0.02)) { (anchors0.siteDropped ||= []).push({ site: si, type: 'terrace' }); return; }   // (a sunken court is not built: the validator refuses it)
+    const lower = (spec.site || []).filter(o => o !== s && o.type === 'terrace' && typeof o.y === 'number' && o.y < s.y);
+    // the ground it stands on at a point: the highest lower terrace under it, else the lot. One terrace can stand partly on
+    // another and partly on the ground, so this is asked corner by corner
+    const baseAt = (p: P2) => lower.reduce((y, o) => (o.y > y && inPolyG(p[0], p[1], ctx.terracePoly(o)) ? o.y : y), 0);
     const lot = spec.lot || {}, gname = { desert: 'desert', forest: 'litter', urban: 'concrete', meadow: 'meadow', gravel: 'gravel' }[lot.ground] || 'lawn';
     const top = siteMat(s.surface === 'decking' ? 'decking' : s.surface || gname, s.color ?? null) || std(0x4e6a3a);
     // a storey standing on it at its height: the plateau drops a centimetre so the floor slab wins
     const sink = (spec.levels || []).some(l => Math.abs((l.y || 0) - s.y) < 0.03 && (l.footprint || []).some(r => inPolyG(r.x + r.w / 2, r.z + r.d / 2, poly))) ? 0.01 : 0;
-    // edges along a storey that stands on (or against) it are the house's wall: no retaining face, rail or bank there
-    const houseRects = (spec.levels || []).filter(l => (l.y || 0) <= s.y + 0.05).flatMap(l => l.footprint || []);
-    const skip = (a, b) => { const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; return houseRects.some(r => m[0] > r.x - 0.25 && m[0] < r.x + r.w + 0.25 && m[1] > r.z - 0.25 && m[1] < r.z + r.d + 0.25); };
+    // edges along a storey that stands on (or against) it are the house's wall: no retaining face, rail or bank there. Judged
+    // piece by piece — an edge that runs along the house for part of its length has its rail and bank for the rest
+    const houseRects = (spec.levels || []).filter(l => (l.y || 0) <= s.y + 0.05).flatMap(l => (l.footprint || []).map(r => ({ x0: r.x - 0.25, x1: r.x + r.w + 0.25, z0: r.z - 0.25, z1: r.z + r.d + 0.25 })));
+    const atHouse = (p: P2) => houseRects.some(r => p[0] > r.x0 && p[0] < r.x1 && p[1] > r.z0 && p[1] < r.z1);
+    const pieces = (a: P2, b: P2): Array<[number, number]> => {
+      // the fractions of a → b outside every house rect (each clipped by slab: Liang–Barsky), pieces under 0.2 m dropped
+      let cuts: Array<[number, number]> = [];
+      for (const r of houseRects) {
+        let t0 = 0, t1 = 1; const dx = b[0] - a[0], dz = b[1] - a[1];
+        for (const [pp, qq] of [[-dx, a[0] - r.x0], [dx, r.x1 - a[0]], [-dz, a[1] - r.z0], [dz, r.z1 - a[1]]] as Array<[number, number]>) {
+          if (Math.abs(pp) < 1e-12) { if (qq < 0) { t0 = 1; t1 = 0; break; } continue; }
+          const t = qq / pp; if (pp < 0) t0 = Math.max(t0, t); else t1 = Math.min(t1, t);
+        }
+        if (t0 < t1) cuts.push([t0, t1]);
+      }
+      cuts.sort((p, q) => p[0] - q[0]);
+      const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1, keep: Array<[number, number]> = []; let at = 0;
+      for (const [c0, c1] of cuts) { if (c0 > at) keep.push([at, c0]); at = Math.max(at, c1); }
+      if (at < 1) keep.push([at, 1]);
+      return keep.filter(([t0, t1]) => (t1 - t0) * L >= 0.2);
+    };
     const edge = typeof s.edge === 'object' && s.edge ? s.edge : { kind: typeof s.edge === 'string' ? s.edge : 'retaining' };
-    // the water dug into it: shaped water whose rim is its top, and old slab pools set at its height (2 cm inside it)
+    // the water dug into it: shaped water whose rim is at or above its top and whose floor is below it, and old slab pools set
+    // at its height (2 cm inside it)
     const holes = [];
     (spec.site || []).forEach((o, oi) => {
       const w = waterOutline(o, oi, spec.id, ctx.groundAt);
-      const outline = w ? (Math.abs(w.rim - s.y) < 0.06 ? w.poly : null)
+      const outline = w ? (s.y > w.rim - w.depth + 0.05 && s.y <= w.rim + 0.06 ? w.poly : null)
         : (o.type === 'pool' || o.type === 'turtle-pool') && Array.isArray(o.at) && Math.abs((o.y ?? ctx.groundAt(o.at[0], o.at[1])) - s.y) < 0.06 ? rectPoly(o.at, o.w || (o.type === 'turtle-pool' ? 8 : 6), o.d || (o.type === 'turtle-pool' ? 6 : 4), o.rot || 0) : null;
       if (outline && outline.every(p => inPolyG(p[0], p[1], poly)) && offsetLoop(outline, 0.02).every(p => inPolyG(p[0], p[1], poly))) holes.push(offsetLoop(outline, JOINT));
     });
-    const g = ST.terrace(poly, s.y, base, { edge, top, sink, skip, holes });
+    const g = ST.terrace(poly, s.y, baseAt, { edge, top, sink, pieces, holes });
+    const base = g.userData.base, baseV = g.userData.baseV;
     g.name = `Terrace (${edge.kind || 'retaining'}, ${s.y} m)`;
     if (edge.kind === 'planted' && g.userData.bank) {
       // plant the bank: groundcover, low shrubs and grasses across the slope, their heights following it
       const rng = siteKitNow.rngFor(s, si), outer = g.userData.bank.outer, ring = resample([...poly, poly[0]], 0.55, false), oring = resample([...outer, outer[0]], 0.55 * lengthOf([...outer, outer[0]]) / lengthOf([...poly, poly[0]]), false);
       const n = Math.min(ring.length, oring.length), plants = [], mixList = edge.mix === 'desert' ? ['succulent', 'agave', 'grass'] : ['groundcover', 'spreading', 'grass', 'lavender', 'groundcover'];
+      // (the ground under the bank at a point of the ring: interpolated from the corners' — the lowest of them, for the top of the slope)
+      const lowAt = (k: number) => { let m = Infinity, bi = 0; for (let i = 0; i < poly.length; i++) { const d = (ring[k][0] - poly[i][0]) ** 2 + (ring[k][1] - poly[i][1]) ** 2; if (d < m) { m = d; bi = i; } } return baseV ? baseV[bi] : base; };
       for (let k = 0; k < n; k++) {
-        if (skip(ring[k], ring[(k + 1) % n])) continue;
+        if (atHouse([(ring[k][0] + ring[(k + 1) % n][0]) / 2, (ring[k][1] + ring[(k + 1) % n][1]) / 2])) continue;
+        const lo = lowAt(k);
         for (let q = 0; q < 2; q++) {
           const f = 0.15 + rng() * 0.7, x = ring[k][0] + (oring[k][0] - ring[k][0]) * f, z = ring[k][1] + (oring[k][1] - ring[k][1]) * f, sp = mixList[Math.floor(rng() * mixList.length)];
-          plants.push({ sp, x, z, y: s.y - (s.y - base) * f - 0.05, h: sp === 'spreading' ? 0.8 : 0.4 + rng() * 0.3, r: sp === 'spreading' ? 0.6 : 0.32 + rng() * 0.1, rot: rng() * 6.28, tint: 0.9 + rng() * 0.2, bloom: 0x8f7cb8, layer: 'front' });
+          plants.push({ sp, x, z, y: s.y - (s.y - lo) * f - 0.05, h: sp === 'spreading' ? 0.8 : 0.4 + rng() * 0.3, r: sp === 'spreading' ? 0.6 : 0.32 + rng() * 0.1, rot: rng() * 6.28, tint: 0.9 + rng() * 0.2, bloom: 0x8f7cb8, layer: 'front' });
         }
       }
       siteKitNow.drawPlants(g, plants, rng, (c2, o2) => std(c2, o2), 0);

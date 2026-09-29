@@ -85,11 +85,14 @@ export function createSiteStructures({ THREE, std, box, group, ProceduralArchite
   // ---- fences -------------------------------------------------------------------------------------------------
   const FENCE_STYLES = ['picket', 'privacy', 'slat-h', 'post-rail', 'metal', 'glass', 'stone-wall'];
   // one straight run from a to b ([x, z]) at y, in a style; returns its solids
-  function fenceRun(g, a, b, { style = 'picket', h = null, color = null, y = 0 } = {}) {
-    const L = dist(a, b); if (L < 0.05) return [];
+  function fenceRun(g, a, b, { style = 'picket', h = null, color = null, y = 0, extA = 0, extB = 0 } = {}) {
+    const L0 = dist(a, b); if (L0 < 0.05) return [];
+    // (`extA`, `extB`: the run reaches this far past its end, to close the bend it makes with the next — the outer corner of
+    // a polyline is otherwise notched by half the thickness)
+    const L = L0 + extA + extB, sh = (extB - extA) / 2, ux = (b[0] - a[0]) / L0, uz = (b[1] - a[1]) / L0;
     const st = FENCE_STYLES.includes(style) ? style : 'picket';
     const H = h ?? (st === 'privacy' ? 1.8 : st === 'slat-h' ? 1.6 : st === 'stone-wall' ? 0.9 : st === 'metal' ? 1.2 : st === 'glass' ? 1.1 : st === 'post-rail' ? 1.1 : 1.0);
-    const run = new THREE.Group(); run.name = `Fence (${st}, ${L.toFixed(1)}m)`;
+    const run = new THREE.Group(); run.name = `Fence (${st}, ${L0.toFixed(1)}m)`;
     const c = color != null ? hex(color) : { picket: 0xf8fafc, privacy: 0x8a6a4e, 'slat-h': 0x7a5a40, 'post-rail': 0x6b5440, metal: 0x24262a, glass: 0x2b2d30, 'stone-wall': 0x9d968a }[st];
     const m = st === 'stone-wall' ? (mat('stone', c) || std(c, { roughness: 0.95 })) : std(c, { roughness: st === 'metal' || st === 'glass' ? 0.45 : 0.8, metalness: st === 'metal' || st === 'glass' ? 0.45 : 0 });
     // built along local +x from −L/2 to L/2, then turned onto a → b
@@ -125,36 +128,43 @@ export function createSiteStructures({ THREE, std, box, group, ProceduralArchite
       const cap = std(0x8a8479, { roughness: 1, flatShading: true });
       for (let x = -L / 2; x < L / 2 - 0.05;) { const w = Math.min(L / 2 - x, 0.35 + ((x * 7.13) % 0.2 + 0.2) * 0.5); run.add(box(w - 0.02, 0.1, T + 0.06, cap, x + w / 2, H - 0.05, 0)); x += w; }
     }
-    run.position.set((a[0] + b[0]) / 2, y, (a[1] + b[1]) / 2); run.rotation.y = -Math.atan2(b[1] - a[1], b[0] - a[0]);
+    run.position.set((a[0] + b[0]) / 2 + ux * sh, y, (a[1] + b[1]) / 2 + uz * sh); run.rotation.y = -Math.atan2(b[1] - a[1], b[0] - a[0]);
     g.add(run);
-    return [{ kind: st === 'stone-wall' ? 'wall' : 'fence', x: +((a[0] + b[0]) / 2).toFixed(3), z: +((a[1] + b[1]) / 2).toFixed(3), w: +L.toFixed(3), d: st === 'stone-wall' ? 0.45 : 0.1, rot: +(Math.atan2(b[1] - a[1], b[0] - a[0]) * -180 / Math.PI).toFixed(2), yMin: y, yMax: +(y + H).toFixed(3) }];
+    return [{ kind: st === 'stone-wall' ? 'wall' : 'fence', x: +((a[0] + b[0]) / 2 + ux * sh).toFixed(3), z: +((a[1] + b[1]) / 2 + uz * sh).toFixed(3), w: +L.toFixed(3), d: st === 'stone-wall' ? 0.45 : 0.1, rot: +(Math.atan2(b[1] - a[1], b[0] - a[0]) * -180 / Math.PI).toFixed(2), yMin: y, yMax: +(y + H).toFixed(3) }];
   }
   // a low garden wall run in a surface (stone, brick, stucco, concrete, render) with a coping
-  function wallRun(g, a, b, { h = 0.6, t = 0.25, surface = 'stucco', color = null, cap = null, y = 0 } = {}) {
-    const L = dist(a, b); if (L < 0.05) return [];
-    const run = new THREE.Group(); run.name = `Garden wall (${surface}, ${L.toFixed(1)}m)`;
+  function wallRun(g, a, b, { h = 0.6, t = 0.25, surface = 'stucco', color = null, cap = null, y = 0, extA = 0, extB = 0 } = {}) {
+    const L0 = dist(a, b); if (L0 < 0.05) return [];
+    const L = L0 + extA + extB, sh = (extB - extA) / 2, ux = (b[0] - a[0]) / L0, uz = (b[1] - a[1]) / L0;
+    const run = new THREE.Group(); run.name = `Garden wall (${surface}, ${L0.toFixed(1)}m)`;
     const c = color != null ? hex(color) : { stone: 0x9d968a, brick: 0x8e5a48, stucco: 0xe8e4dc, render: 0xe8e4dc, concrete: 0xa5a4a0 }[surface] ?? 0xe8e4dc;
     const m = (surface === 'stone' || surface === 'brick' || surface === 'stucco' || surface === 'concrete') && mat(surface, c) || std(c, { roughness: 0.9 });
     const body = new THREE.Mesh(new THREE.BoxGeometry(L, h, t), m); body.position.y = h / 2; body.castShadow = true; body.receiveShadow = true; run.add(body);
     run.add(box(L + 0.06, 0.05, t + 0.06, std(cap != null ? hex(cap) : 0xd8d3c8, { roughness: 0.8 }), 0, h + 0.025, 0));
-    run.position.set((a[0] + b[0]) / 2, y, (a[1] + b[1]) / 2); run.rotation.y = -Math.atan2(b[1] - a[1], b[0] - a[0]);
+    run.position.set((a[0] + b[0]) / 2 + ux * sh, y, (a[1] + b[1]) / 2 + uz * sh); run.rotation.y = -Math.atan2(b[1] - a[1], b[0] - a[0]);
     g.add(run);
-    return [{ kind: 'wall', x: +((a[0] + b[0]) / 2).toFixed(3), z: +((a[1] + b[1]) / 2).toFixed(3), w: +L.toFixed(3), d: t, rot: +(Math.atan2(b[1] - a[1], b[0] - a[0]) * -180 / Math.PI).toFixed(2), yMin: y, yMax: +(y + h + 0.05).toFixed(3) }];
+    return [{ kind: 'wall', x: +((a[0] + b[0]) / 2 + ux * sh).toFixed(3), z: +((a[1] + b[1]) / 2 + uz * sh).toFixed(3), w: +L.toFixed(3), d: t, rot: +(Math.atan2(b[1] - a[1], b[0] - a[0]) * -180 / Math.PI).toFixed(2), yMin: y, yMax: +(y + h + 0.05).toFixed(3) }];
   }
 
   // ---- terraces (A3) -----------------------------------------------------------------------------------------------
-  // `poly` raised to `y` over `base` (the ground it stands on). edge.kind:
+  // `poly` raised to `y` over the ground it stands on. edge.kind:
   //   retaining  vertical faces in edge.material / edge.color, a coping round the top (the default)
-  //   rail       the same with a rail round it (edge.rail: a style, edge.railColor), except along `skip` edges
+  //   rail       the same with a rail round it (edge.rail: a style, edge.railColor), except along the house
   //   slope      a grass bank falling outward at 1:1.6 instead of a wall
   //   planted    the same bank, planted (site-build.ts plants it through the kit)
   // `top` is the terrace's surface material; `sink` drops it a centimetre where a storey's floor stands at y.
-  function terrace(poly0: P2[], y: number, base: number, { edge = {} as any, top, sink = 0, skip = (a: P2, b: P2) => false, holes = [] as P2[][] } = {} as any) {
-    const g = group('Terrace'), poly = ccw(poly0), kind = edge.kind || 'retaining', H = y - base, solids = [];
+  // `baseAt(p)` is the ground just outside the outline at p (0, or the top of a lower terrace it stands over: one
+  // terrace can stand partly on another, partly on the lot), `pieces(a, b)` the parts of an outline edge that are NOT the
+  // house's own wall — [t0, t1] fractions along a → b — which get their rail, bank and retaining solid.
+  function terrace(poly0: P2[], y: number, baseAt: (p: P2) => number, { edge = {} as any, top, sink = 0, pieces = (a: P2, b: P2) => [[0, 1]] as Array<[number, number]>, holes = [] as P2[][] } = {} as any) {
+    const g = group('Terrace'), poly = ccw(poly0), kind = edge.kind || 'retaining', solids = [];
     const wallM = mat(edge.material || 'stone', edge.color != null ? hex(edge.color) : null) || std(edge.color != null ? hex(edge.color) : 0x9d968a, { roughness: 0.95 });
     const yt = y - sink;
     const bank = kind === 'slope' || kind === 'planted';
-    // the plateau: a prism from the base (sunk 2 cm) to its top; caps in `top`, sides in the wall (a bank hides them)
+    // the ground under each corner (just outside the outline), and under the whole plateau: its lowest
+    const out1 = offsetLoop(poly, 0.15), baseV = poly.map((_, i) => Math.min(baseAt(out1[i]), y)), base = Math.min(...baseV);
+    // the plateau: a prism from the lowest ground under it (sunk 2 cm) to its top; caps in `top`, sides in the wall (a bank
+    // hides them). Where it stands over a lower terrace the part below that terrace's top is inside it, out of sight.
     {
       const shape = new THREE.Shape(poly.map(p => new THREE.Vector2(p[0], p[1])));
       // water dug into the terrace (a pool with its rim at the terrace's top) is cut out of it, as the lawn is cut
@@ -162,15 +172,20 @@ export function createSiteStructures({ THREE, std, box, group, ProceduralArchite
       const geo = new THREE.ExtrudeGeometry(shape, { depth: Math.max(0.02, yt - base + 0.02), bevelEnabled: false, curveSegments: 4 }); geo.rotateX(Math.PI / 2);
       const m = new THREE.Mesh(geo, [top, bank ? top : wallM]); m.position.y = yt; m.receiveShadow = true; m.castShadow = true; m.name = 'Terrace plateau'; g.add(m);
     }
-    const segs = segmentsOf(poly, true);
+    const n = poly.length, lerp2 = (a: P2, b: P2, t: number): P2 => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    let run = 0;
     if (bank) {
-      // a bank outward from every edge (not along the house), falling to the base at 1:1.6
-      const run = Math.max(0.3, H * 1.6), outer = offsetLoop(poly, run), s = soup();
-      for (let i = 0; i < poly.length; i++) {
-        const j = (i + 1) % poly.length; if (skip(poly[i], poly[j])) continue;
-        const a = [poly[i][0], yt, poly[i][1]], b = [poly[j][0], yt, poly[j][1]], c = [outer[j][0], base - 0.02, outer[j][1]], d = [outer[i][0], base - 0.02, outer[i][1]];
-        s.quad(a, b, c, d, [outer[i][0] - poly[i][0], 1, outer[i][1] - poly[i][1]]);
-        // the corner fan between this edge's outer end and the next edge's (convex corners)
+      // a bank outward from every edge (not along the house), falling to the ground under it at 1:1.6
+      const N = poly.map((p, i) => [(out1[i][0] - p[0]) / 0.15, (out1[i][1] - p[1]) / 0.15] as P2);   // (the mitred outward normal at each corner)
+      const reach = (i: number) => Math.max(0.3, (y - baseV[i]) * 1.6), outer = poly.map((p, i) => [p[0] + N[i][0] * reach(i), p[1] + N[i][1] * reach(i)] as P2), s = soup();
+      run = Math.max(...poly.map((_, i) => reach(i)));
+      for (let i = 0; i < n; i++) {
+        const j = (i + 1) % n;
+        for (const [t0, t1] of pieces(poly[i], poly[j])) {
+          const p0 = lerp2(poly[i], poly[j], t0), p1 = lerp2(poly[i], poly[j], t1), o0 = lerp2(outer[i], outer[j], t0), o1 = lerp2(outer[i], outer[j], t1);
+          const b0 = baseV[i] + (baseV[j] - baseV[i]) * t0, b1 = baseV[i] + (baseV[j] - baseV[i]) * t1;
+          s.quad([p0[0], yt, p0[1]], [p1[0], yt, p1[1]], [o1[0], b1 - 0.02, o1[1]], [o0[0], b0 - 0.02, o0[1]], [N[i][0], 1, N[i][1]]);
+        }
       }
       if (!s.empty()) g.add(s.mesh(top, 'Terrace bank'));
       g.userData.bank = { outer, run };
@@ -180,10 +195,20 @@ export function createSiteStructures({ THREE, std, box, group, ProceduralArchite
       const shape = new THREE.Shape(ccw(cope).map(p => new THREE.Vector2(p[0], p[1]))); shape.holes.push(new THREE.Path(ccw(offsetLoop(poly, -0.25)).reverse().map(p => new THREE.Vector2(p[0], p[1]))));
       const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.06, bevelEnabled: false, curveSegments: 4 }); geo.rotateX(Math.PI / 2);
       const cmesh = new THREE.Mesh(geo, cm); cmesh.position.y = yt + 0.05; cmesh.castShadow = true; cmesh.receiveShadow = true; cmesh.name = 'Coping'; g.add(cmesh);
-      if (kind === 'rail') for (const [a, b] of segs) if (!skip(a, b)) rail(g, [a[0], yt + 0.05, a[1]], [b[0], yt + 0.05, b[1]], { h: 1.0, style: edge.rail || 'glass', color: edge.railColor ?? null });
+      if (kind === 'rail') for (let i = 0; i < n; i++) { const j = (i + 1) % n; for (const [t0, t1] of pieces(poly[i], poly[j])) { const a = lerp2(poly[i], poly[j], t0), b = lerp2(poly[i], poly[j], t1); rail(g, [a[0], yt + 0.05, a[1]], [b[0], yt + 0.05, b[1]], { h: 1.0, style: edge.rail || 'glass', color: edge.railColor ?? null }); } }
     }
-    for (const [a, b] of segs) if (!skip(a, b)) solids.push({ kind: 'retaining', x: +((a[0] + b[0]) / 2).toFixed(3), z: +((a[1] + b[1]) / 2).toFixed(3), w: +dist(a, b).toFixed(3), d: 0.3, rot: +(Math.atan2(b[1] - a[1], b[0] - a[0]) * -180 / Math.PI).toFixed(2), yMin: base, yMax: y });
-    g.userData.solids = [{ kind: 'terrace', poly: poly.map(p => [+p[0].toFixed(3), +p[1].toFixed(3)]), yMin: base, yMax: y }, ...solids];
+    // a retaining wall stands only where the terrace has one: not along the house, not where the ground is a bank
+    if (!bank) for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n;
+      for (const [t0, t1] of pieces(poly[i], poly[j])) {
+        const a = lerp2(poly[i], poly[j], t0), b = lerp2(poly[i], poly[j], t1), b0 = Math.min(baseV[i], baseV[j]);
+        solids.push({ kind: 'retaining', x: +((a[0] + b[0]) / 2).toFixed(3), z: +((a[1] + b[1]) / 2).toFixed(3), w: +dist(a, b).toFixed(3), d: 0.3, rot: +(Math.atan2(b[1] - a[1], b[0] - a[0]) * -180 / Math.PI).toFixed(2), yMin: b0, yMax: y });
+      }
+    }
+    // the plateau: its outline and box (a bank falls off it by `bank` m: not solid, but the ground there is not level either)
+    const bb = bbox(poly);
+    g.userData.solids = [{ kind: 'terrace', poly: poly.map(p => [+p[0].toFixed(3), +p[1].toFixed(3)]), x: +((bb.x0 + bb.x1) / 2).toFixed(3), z: +((bb.z0 + bb.z1) / 2).toFixed(3), w: +(bb.x1 - bb.x0).toFixed(3), d: +(bb.z1 - bb.z0).toFixed(3), rot: 0, yMin: base, yMax: y, ...(bank ? { bank: +run.toFixed(2) } : {}) }, ...solids];
+    g.userData.base = base; g.userData.baseV = baseV;
     return g;
   }
 
@@ -192,9 +217,14 @@ export function createSiteStructures({ THREE, std, box, group, ProceduralArchite
   // ground, in `m`; optional rails both sides
   function flight(w: number, h: number, n: number, tread: number, m, { rails = null, open = false, stringer = null } = {} as any) {
     const g = group('Steps'), riser = h / n;
+    // (the top tread stands 8 mm under the surface the flight runs into — a terrace, a deck, a landing, the floor of a
+    // door: a flight built longer than the gap to it would otherwise put its last treads coplanar with that surface, and
+    // the two materials z-fight; hidden 8 mm down, an overrun is simply covered)
+    const SINK = 0.008;
     for (let i = 0; i < n; i++) {
-      if (open) g.add(box(w, 0.05, tread + 0.03, m, 0, (i + 1) * riser - 0.025, -(i * tread) - tread / 2 + 0.16));
-      else g.add(box(w, riser * (i + 1), tread, m, 0, riser * (i + 1) / 2, -(i * tread) - tread / 2 + 0.16));
+      const top = (i + 1) * riser - (i === n - 1 ? SINK : 0);
+      if (open) g.add(box(w, 0.05, tread + 0.03, m, 0, top - 0.025, -(i * tread) - tread / 2 + 0.16));
+      else g.add(box(w, top, tread, m, 0, top / 2, -(i * tread) - tread / 2 + 0.16));
     }
     if (open && stringer) for (const sx of [-w / 2 - 0.03, w / 2 + 0.03]) g.add(beam([sx, 0, 0.16], [sx, h, 0.16 - n * tread], 0.06, 0.22, stringer));
     if (rails) for (const sx of [-w / 2 + 0.03, w / 2 - 0.03]) rail(g, [sx, riser, 0.16 - tread / 2], [sx, h, 0.16 - n * tread + tread / 2], { h: 0.95, style: rails.style, color: rails.color });

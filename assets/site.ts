@@ -1013,12 +1013,17 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
     const line = ctxFor().pathLine(s), w = s.w || 1.0, kind = PATH_SURFACES.includes(s.surface) ? s.surface : 'concrete', g = group(`Path (${kind})`), M = mats();
     if (line.length < 2) return g;
     const color = s.color ? hex(s.color) : null;
+    // Two paths that cross (a junction, two walks from one door) would draw their surfaces at the same height and fight where
+    // they overlap: each path stands 4 mm higher than the one before it in the spec (a millimetre is under the depth
+    // buffer's resolution at 50 m; 4 mm is over it), up to 2 cm, so the later path is the one on top.
+    const sites: any[] = (spec && spec.site) || [], mine = sites.indexOf(s), rank = mine < 0 ? 0 : sites.slice(0, mine).filter(o => o && o.type === 'path' && (o.smooth !== undefined || o.surface !== undefined || gen2)).length;
+    const bias = Math.min(rank, 5) * 0.004;
     let iso: any[] | null = null;   // what the isometric twin draws (plan.json): the stones, or the ribbon's outline
     const rnd = (poly: number[][]) => poly.map(p => [+p[0].toFixed(3), +p[1].toFixed(3)]);
-    if (kind === 'stepping') { const st = stones(g, line, w, 0.0, r, color ?? 0x9d978c, false, M); iso = st.map(poly => ({ part: 'stone', shape: 'poly', poly: rnd(poly), color: css(color ?? 0x9d978c), box: polyBox(poly, 0, 0.04) })); }
-    else if (kind === 'flagstone') { g.add(ribbonMesh(line, w, 0, 0.018, surfaceMat('gravel', 0x8f887c), 'Joints')); stones(g, line, w, 0.015, r, color ?? 0xa39d92, true, M); }
-    else if (kind === 'decking') boards(g, line, w, 0, color ?? 0x8a6a4a, r, M);
-    else g.add(ribbonMesh(line, w, 0, kind === 'gravel' ? 0.03 : 0.05, surfaceMat(kind, color), 'Path surface'));
+    if (kind === 'stepping') { const st = stones(g, line, w, bias, r, color ?? 0x9d978c, false, M); iso = st.map(poly => ({ part: 'stone', shape: 'poly', poly: rnd(poly), color: css(color ?? 0x9d978c), box: polyBox(poly, 0, 0.04) })); }
+    else if (kind === 'flagstone') { g.add(ribbonMesh(line, w, 0, 0.018 + bias, surfaceMat('gravel', 0x8f887c), 'Joints')); stones(g, line, w, 0.015 + bias, r, color ?? 0xa39d92, true, M); }
+    else if (kind === 'decking') boards(g, line, w, bias, color ?? 0x8a6a4a, r, M);
+    else g.add(ribbonMesh(line, w, 0, (kind === 'gravel' ? 0.03 : 0.05) + bias, surfaceMat(kind, color), 'Path surface'));
     if (!iso) { const out = ribbon(line, w); iso = [{ part: 'path', shape: 'poly', poly: rnd(out), color: css(color ?? PATH_TWIN[kind] ?? 0xc8c8c4), box: polyBox(out, 0, kind === 'gravel' ? 0.03 : 0.05) }]; }
     g.userData.isoParts = iso;
     g.userData.plan = { line, w };
