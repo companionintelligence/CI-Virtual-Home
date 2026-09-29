@@ -147,6 +147,8 @@ export type PlanOptions = {
   minDuration?: number;            // under the global switch, the spec's v1 duration is a floor, not a pin
   establish?: any; via?: string[]; beats?: Partial<Record<Beat, number>>; route?: 'auto' | 'scenic' | 'shortest';
   heroView?: any; fps?: number;
+  /** a walkthrough: the film starts inside the door (no establishing move, approach or threshold) and passes through `via` */
+  inside?: boolean;
   /** internal: what a retry changes (the establishing move's scale) */
   tune?: { estScale?: number };
 };
@@ -175,6 +177,7 @@ export function shotOptions(spec: any, type: string, globalPlanner: string | nul
  *  be over 30 % of it (an opening sized to the film it opens); the second plan is kept only if it is better. */
 export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
   const r = planOnce(world, opts);
+  if (opts.inside) return r;
   if (!r.ok || typeof opts.duration === 'number' || (opts.tune && opts.tune.estScale)) return r;
   const o = r.track.plan.outside;
   const D0 = Math.max(Math.ceil((r.track.plan.Tmin + 0.3) * 2 - 1e-6) / 2, opts.minDuration || 0, AUTO_DURATION.min);
@@ -509,7 +512,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   const pushWalk = (pts: Array<[number, number]>, lv: WLevel, beat: Beat) => { for (const q of pts) walkPts.push({ p: [q[0], eyeY(lv), q[1]], beat, level: lv.id }); };
   const flightSegs: Seg[] = [];
   const routeRooms: string[] = [];
-  const budget = 9;   // metres a detour may add, at most
+  const budget = opts.inside ? 16 : 9;   // metres a detour may add, at most (a tour goes further out of its way)
   for (const [fi, fl] of flights.entries()) {
     const st = fl.st, lvFrom = nav.levelOf(fl.up ? st.from : st.to), lvTo = nav.levelOf(fl.up ? st.to : st.from);
     // climb: from the foot (1.2 m back on the flight's axis) up the centreline to the landing 0.8 m past the top.
@@ -736,146 +739,154 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   // (the film's length as far as the outside is concerned: what was pinned, or the inside's time over the 73 % of it that is
   // not outside)
   const tTarget = typeof opts.duration === 'number' ? opts.duration : Math.max(tInEst / 0.73, opts.minDuration || 0, AUTO_DURATION.min);
-  // exterior steps that climb to the door (an upper-storey entry): the approach walks up them
-  let stepsSeg: V3[] | null = null;
-  if (e.y > 0.9) for (const st of world.steps) {
-    const a = st.rot * DEG, up: [number, number] = [-Math.sin(a), -Math.cos(a)], run = (st.n - 1) * 0.32, rise = st.n * 0.16;
-    const top: V3 = [st.at[0] + up[0] * run, st.y + rise, st.at[1] + up[1] * run];
-    if (Math.abs(top[1] - e.y) > 0.6 || dist2([top[0], top[2]], [P3[0], P3[2]]) > 3.2) continue;
-    // the eye climbs off the steps' centre toward whichever side is clearer (steps against a facade: away from it)
-    const side: [number, number] = [up[1], -up[0]], mid: [number, number] = [st.at[0] + up[0] * run / 2, st.at[1] + up[1] * run / 2];
-    const clr = (sg: number) => index.planDistance(mid[0] + side[0] * sg * 0.5, mid[1] + side[1] * sg * 0.5, st.y + rise / 2 + 1.2, st.y + rise / 2 + 1.9, k => k === K.wall || k === K.glass, 2);
-    const shift = clamp(st.w / 2 - 0.35, 0, 0.35) * (clr(1) >= clr(-1) ? 1 : -1);
-    const ox = side[0] * shift, oz = side[1] * shift;
-    const foot: V3 = [st.at[0] - up[0] * 1.2 + ox, st.y + 1.6, st.at[1] - up[1] * 1.2 + oz];
-    const pts: V3[] = [];
-    for (let k = 0; k <= 20; k++) { const u = k / 20; pts.push([st.at[0] + up[0] * run * u + ox, st.y + rise * u + 1.55, st.at[1] + up[1] * run * u + oz]); }
-    stepsSeg = [foot, ...pts];
-    notes.push(`approach climbs the steps at [${st.at}] (${st.n} risers)`);
-    // planting round the foot of the flight (a stand of trees the steps climb out of): the climb starts where the eye is
-    // clear of it
-    { let k0 = 0; for (let k = stepsSeg.length - 1; k >= 0; k--) if (!outsideOk(stepsSeg[k])) { k0 = k + 1; break; }
-      if (k0 > 0 && k0 < stepsSeg.length - 3) { stepsSeg = stepsSeg.slice(k0); notes.push(`the climb starts ${k0} steps up: planting round its foot`); } }
-    break;
-  }
-  const tSteps = stepsSeg ? polyLen(stepsSeg) / 1.5 : 0;
-  const tEst = clamp(0.27 * tTarget - 0.7 - 1.7 - tSteps, 1.2, 2.6);   // the outside's 27 %, less the approach (and any steps) and half the door
-  // (an auto film takes the establishing move the house needs to fit the frame, up to 15 m of it; a pinned one only what the
-  // outside's share of it can hold)
-  const maxPath = (typeof opts.duration === 'number' ? clamp(3.8 * tEst, 6, 13) : 15) * ((opts.tune && opts.tune.estScale) || 1);
-  const nearA: [number, number] = stepsSeg ? [stepsSeg[0][0], stepsSeg[0][2]] : [P3[0] + n2[0] * 1.4, P3[2] + n2[1] * 1.4];
-  const ests = chooseEstablish(world, probe, index, opts.establish ?? 'auto', { near: nearA, maxPath });
-  // one establishing pose, made into its path: the approach start it flies to (a site path's line into the door, or the
-  // pose's bearing's, 1 m past the door axis point 3 m out) and the move itself — a truck across and down onto it (a
-  // Bézier whose first tangent is lateral, so the shot moves from frame 0 without charging at the house), over or round
-  // whatever stands in it (a tree, a car): a crane rather than a truck, or a wider sweep
-  const attemptEstablish = (est: Establish) => {
-    const notesE: string[] = [];
-    let A: V3;
-    const bearA = clamp(est.bearing * 0.55, -32, 32) * DEG, l2: [number, number] = [n2[1], -n2[0]];
-    const dirA: [number, number] = [n2[0] * Math.cos(bearA) + l2[0] * Math.sin(bearA), n2[1] * Math.cos(bearA) + l2[1] * Math.sin(bearA)];
-    let pathLed = false;
-    if (stepsSeg) A = stepsSeg[0];
-    else {
-      A = [P3[0] + dirA[0] * 1.0, Math.max(yDoor + 0.2, 1.8), P3[2] + dirA[1] * 1.0];
-      // a site path that reaches the door: follow its line out
-      for (const p of world.paths) {
-        const pts = p.pts, dEnd = (q: number[]) => Math.hypot(q[0] - (e.x + n2[0] * 1.5), q[1] - (e.z + n2[1] * 1.5));
-        const i0 = dEnd(pts[0]) <= dEnd(pts[pts.length - 1]) ? 0 : pts.length - 1;
-        if (dEnd(pts[i0]) > 2.6) continue;
-        const seq = i0 === 0 ? pts : pts.slice().reverse();
-        // the point on the path 4.2 m out from the door
-        let acc = 0, q: number[] | null = null;
-        for (let k = 1; k < seq.length; k++) { const l = Math.hypot(seq[k][0] - seq[k - 1][0], seq[k][1] - seq[k - 1][1]); if (acc + l >= 4.2) { const f = (4.2 - acc) / l; q = [seq[k - 1][0] + (seq[k][0] - seq[k - 1][0]) * f, seq[k - 1][1] + (seq[k][1] - seq[k - 1][1]) * f]; break; } acc += l; }
-        if (!q) continue;
-        const cand: V3 = [q[0], Math.max(yDoor + 0.2, 1.8), q[1]];
-        // only a path that comes in from the front half (not one that runs along the facade)
-        const along = ((cand[0] - e.x) * n2[0] + (cand[2] - e.z) * n2[1]);
-        if (along < 3.3) continue;
-        // (only where the walk in from there is clear: a path that winds through planting is the street's, not the camera's)
-        const c1: V3 = add(cand, mul(norm(sub(P3, cand)), Math.min(1.6, len(sub(P3, cand)) * 0.4))), c2: V3 = [P3[0] + n2[0] * 1.4, P3[1], P3[2] + n2[1] * 1.4];
-        if (blockedOut(bezier(cand, c1, c2, P3, 24)) >= 0) continue;
-        A = cand; pathLed = true; notesE.push('approach follows the site path'); break;
-      }
+  // (a walkthrough starts inside the door: no establishing move, no approach, no threshold)
+  let stepsSeg: V3[] | null = null, est!: Establish, A!: V3, pathLed = false, establishPts: V3[] = [], approachPts: V3[] = [];
+  if (opts.inside) {
+    est = { style: 'axial', eye: I0, aim: centre, fov: LENS.interior, bearing: 0, score: 0, fit: 0, sky: 0, occluded: 0, roofOff: false } as Establish;
+    A = I0; approachPts = [P08];
+  } else {
+    // exterior steps that climb to the door (an upper-storey entry): the approach walks up them
+    if (e.y > 0.9) for (const st of world.steps) {
+      const a = st.rot * DEG, up: [number, number] = [-Math.sin(a), -Math.cos(a)], run = (st.n - 1) * 0.32, rise = st.n * 0.16;
+      const top: V3 = [st.at[0] + up[0] * run, st.y + rise, st.at[1] + up[1] * run];
+      if (Math.abs(top[1] - e.y) > 0.6 || dist2([top[0], top[2]], [P3[0], P3[2]]) > 3.2) continue;
+      // the eye climbs off the steps' centre toward whichever side is clearer (steps against a facade: away from it)
+      const side: [number, number] = [up[1], -up[0]], mid: [number, number] = [st.at[0] + up[0] * run / 2, st.at[1] + up[1] * run / 2];
+      const clr = (sg: number) => index.planDistance(mid[0] + side[0] * sg * 0.5, mid[1] + side[1] * sg * 0.5, st.y + rise / 2 + 1.2, st.y + rise / 2 + 1.9, k => k === K.wall || k === K.glass, 2);
+      const shift = clamp(st.w / 2 - 0.35, 0, 0.35) * (clr(1) >= clr(-1) ? 1 : -1);
+      const ox = side[0] * shift, oz = side[1] * shift;
+      const foot: V3 = [st.at[0] - up[0] * 1.2 + ox, st.y + 1.6, st.at[1] - up[1] * 1.2 + oz];
+      const pts: V3[] = [];
+      for (let k = 0; k <= 20; k++) { const u = k / 20; pts.push([st.at[0] + up[0] * run * u + ox, st.y + rise * u + 1.55, st.at[1] + up[1] * run * u + oz]); }
+      stepsSeg = [foot, ...pts];
+      notes.push(`approach climbs the steps at [${st.at}] (${st.n} risers)`);
+      // planting round the foot of the flight (a stand of trees the steps climb out of): the climb starts where the eye is
+      // clear of it
+      { let k0 = 0; for (let k = stepsSeg.length - 1; k >= 0; k--) if (!outsideOk(stepsSeg[k])) { k0 = k + 1; break; }
+        if (k0 > 0 && k0 < stepsSeg.length - 3) { stepsSeg = stepsSeg.slice(k0); notes.push(`the climb starts ${k0} steps up: planting round its foot`); } }
+      break;
     }
-    const E = est.eye;
-    const EA = sub(A, E), dEA = len(EA);
-    const lat = norm([-(est.aim[2] - E[2]), 0, est.aim[0] - E[0]]);
-    const latSign = Math.sign(((A[0] - E[0]) * lat[0] + (A[2] - E[2]) * lat[2])) || 1;
-    // `bulge` swings the move's middle sideways (metres, + toward the side it already leans to)
-    const buildOutside = (A0: V3, bulge = 0): V3[] => {
-      const toA = norm(sub(A0, E));
-      const c1 = add(E, add(mul(lat, latSign * (dEA * 0.28 + bulge)), mul(toA, dEA * 0.18)));
-      const endDir = stepsSeg ? norm(sub(stepsSeg[1], stepsSeg[0])) : norm(sub(P3, A0));
-      const c2 = sub(A0, mul(endDir, Math.min(4, dEA * 0.3)));
-      return bezier(E, [c1[0], E[1] - (E[1] - A0[1]) * 0.25, c1[2]], [c2[0], A0[1] + 0.6, c2[2]], A0, 60);
+    const tSteps = stepsSeg ? polyLen(stepsSeg) / 1.5 : 0;
+    const tEst = clamp(0.27 * tTarget - 0.7 - 1.7 - tSteps, 1.2, 2.6);   // the outside's 27 %, less the approach (and any steps) and half the door
+    // (an auto film takes the establishing move the house needs to fit the frame, up to 15 m of it; a pinned one only what the
+    // outside's share of it can hold)
+    const maxPath = (typeof opts.duration === 'number' ? clamp(3.8 * tEst, 6, 13) : 15) * ((opts.tune && opts.tune.estScale) || 1);
+    const nearA: [number, number] = stepsSeg ? [stepsSeg[0][0], stepsSeg[0][2]] : [P3[0] + n2[0] * 1.4, P3[2] + n2[1] * 1.4];
+    const ests = chooseEstablish(world, probe, index, opts.establish ?? 'auto', { near: nearA, maxPath });
+    // one establishing pose, made into its path: the approach start it flies to (a site path's line into the door, or the
+    // pose's bearing's, 1 m past the door axis point 3 m out) and the move itself — a truck across and down onto it (a
+    // Bézier whose first tangent is lateral, so the shot moves from frame 0 without charging at the house), over or round
+    // whatever stands in it (a tree, a car): a crane rather than a truck, or a wider sweep
+    const attemptEstablish = (est: Establish) => {
+      const notesE: string[] = [];
+      let A: V3;
+      const bearA = clamp(est.bearing * 0.55, -32, 32) * DEG, l2: [number, number] = [n2[1], -n2[0]];
+      const dirA: [number, number] = [n2[0] * Math.cos(bearA) + l2[0] * Math.sin(bearA), n2[1] * Math.cos(bearA) + l2[1] * Math.sin(bearA)];
+      let pathLed = false;
+      if (stepsSeg) A = stepsSeg[0];
+      else {
+        A = [P3[0] + dirA[0] * 1.0, Math.max(yDoor + 0.2, 1.8), P3[2] + dirA[1] * 1.0];
+        // a site path that reaches the door: follow its line out
+        for (const p of world.paths) {
+          const pts = p.pts, dEnd = (q: number[]) => Math.hypot(q[0] - (e.x + n2[0] * 1.5), q[1] - (e.z + n2[1] * 1.5));
+          const i0 = dEnd(pts[0]) <= dEnd(pts[pts.length - 1]) ? 0 : pts.length - 1;
+          if (dEnd(pts[i0]) > 2.6) continue;
+          const seq = i0 === 0 ? pts : pts.slice().reverse();
+          // the point on the path 4.2 m out from the door
+          let acc = 0, q: number[] | null = null;
+          for (let k = 1; k < seq.length; k++) { const l = Math.hypot(seq[k][0] - seq[k - 1][0], seq[k][1] - seq[k - 1][1]); if (acc + l >= 4.2) { const f = (4.2 - acc) / l; q = [seq[k - 1][0] + (seq[k][0] - seq[k - 1][0]) * f, seq[k - 1][1] + (seq[k][1] - seq[k - 1][1]) * f]; break; } acc += l; }
+          if (!q) continue;
+          const cand: V3 = [q[0], Math.max(yDoor + 0.2, 1.8), q[1]];
+          // only a path that comes in from the front half (not one that runs along the facade)
+          const along = ((cand[0] - e.x) * n2[0] + (cand[2] - e.z) * n2[1]);
+          if (along < 3.3) continue;
+          // (only where the walk in from there is clear: a path that winds through planting is the street's, not the camera's)
+          const c1: V3 = add(cand, mul(norm(sub(P3, cand)), Math.min(1.6, len(sub(P3, cand)) * 0.4))), c2: V3 = [P3[0] + n2[0] * 1.4, P3[1], P3[2] + n2[1] * 1.4];
+          if (blockedOut(bezier(cand, c1, c2, P3, 24)) >= 0) continue;
+          A = cand; pathLed = true; notesE.push('approach follows the site path'); break;
+        }
+      }
+      const E = est.eye;
+      const EA = sub(A, E), dEA = len(EA);
+      const lat = norm([-(est.aim[2] - E[2]), 0, est.aim[0] - E[0]]);
+      const latSign = Math.sign(((A[0] - E[0]) * lat[0] + (A[2] - E[2]) * lat[2])) || 1;
+      // `bulge` swings the move's middle sideways (metres, + toward the side it already leans to)
+      const buildOutside = (A0: V3, bulge = 0): V3[] => {
+        const toA = norm(sub(A0, E));
+        const c1 = add(E, add(mul(lat, latSign * (dEA * 0.28 + bulge)), mul(toA, dEA * 0.18)));
+        const endDir = stepsSeg ? norm(sub(stepsSeg[1], stepsSeg[0])) : norm(sub(P3, A0));
+        const c2 = sub(A0, mul(endDir, Math.min(4, dEA * 0.3)));
+        return bezier(E, [c1[0], E[1] - (E[1] - A0[1]) * 0.25, c1[2]], [c2[0], A0[1] + 0.6, c2[2]], A0, 60);
+      };
+      // (the move must not fly at a wall: on the way in, the frame it looks out on — the aim sliding to the door — is never one
+      // wall within 1.5 m over more than half of it)
+      const facing = (pts: V3[]) => { for (let k = 0; k < pts.length; k += 3) { const u = k / (pts.length - 1), w = clamp((u - 0.3) / 0.65, 0, 1), tgt = lerp3(est.aim, [e.x, e.y + 1.3, e.z], 0.7 * w * w * (3 - 2 * w)); if (probe.composition(camera(pts[k], tgt, est.fov), true, 1.5).blank >= 0.5) return true; } return false; };
+      let establishPts = buildOutside(A), blocked = blockedOut(establishPts) >= 0 || facing(establishPts);
+      if (blocked) {
+        search: for (const bulge of [0, 1.5, -1.5, 3, -3, 5]) for (const lift of [0, 1.2, 2.4, 3.6, 5]) {
+          if (!bulge && !lift) continue;
+          const base = buildOutside(A, bulge);
+          const pts = base.map((p, i) => { const u = i / (base.length - 1); return [p[0], p[1] + lift * Math.sin(Math.PI * Math.min(1, u * 1.15)), p[2]] as V3; });
+          if (blockedOut(pts) < 0 && !facing(pts)) { establishPts = pts; blocked = false; notesE.push(`establishing move ${lift ? `lifted ${lift} m` : ''}${lift && bulge ? ' and ' : ''}${bulge ? `swung ${bulge} m wide` : ''} round the garden`); break search; }
+        }
+      }
+      // and the move goes toward the house, not away from it with the eye still on it (a pull-back is QA's `reverse`)
+      { let back = 0, tot = 0;
+        for (let k = 1; k < establishPts.length; k++) { const a = establishPts[k - 1], b = establishPts[k], vx = b[0] - a[0], vz = b[2] - a[2], L = Math.hypot(vx, vz), ax = est.aim[0] - a[0], az = est.aim[2] - a[2], al = Math.hypot(ax, az); if (L < 1e-6 || al < 1e-6) continue; tot += L; if ((vx * ax + vz * az) / (L * al) < -0.15) back += L; }
+        if (tot > 0 && back / tot > 0.25) { blocked = true; notesE.push('the establishing move would pull away from the house'); } }
+      // the look has to turn from the aim to what the move lands on (the door, the top of the steps) at the establishing yaw
+      // limit: a pose that asks for more than 60° of it in the move's time is another pose's business
+      { const next: V3 = stepsSeg ? [stepsSeg[stepsSeg.length - 1][0], 0, stepsSeg[stepsSeg.length - 1][2]] : [e.x, 0, e.z];
+        const aim0: V3 = stepsSeg ? lerp3(est.aim, [next[0], est.aim[1], next[2]], 0.8) : est.aim;
+        const y0 = Math.atan2(aim0[0] - E[0], aim0[2] - E[2]), y1 = Math.atan2(next[0] - A[0], next[2] - A[2]);
+        if (Math.abs(wrapPi(y1 - y0)) > 60 * DEG) { blocked = true; notesE.push('the look would have to turn more than 60° in the establishing move'); } }
+      return { est, A, pathLed, establishPts, blocked, notes: notesE };
     };
-    // (the move must not fly at a wall: on the way in, the frame it looks out on — the aim sliding to the door — is never one
-    // wall within 1.5 m over more than half of it)
-    const facing = (pts: V3[]) => { for (let k = 0; k < pts.length; k += 3) { const u = k / (pts.length - 1), w = clamp((u - 0.3) / 0.65, 0, 1), tgt = lerp3(est.aim, [e.x, e.y + 1.3, e.z], 0.7 * w * w * (3 - 2 * w)); if (probe.composition(camera(pts[k], tgt, est.fov), true, 1.5).blank >= 0.5) return true; } return false; };
-    let establishPts = buildOutside(A), blocked = blockedOut(establishPts) >= 0 || facing(establishPts);
-    if (blocked) {
-      search: for (const bulge of [0, 1.5, -1.5, 3, -3, 5]) for (const lift of [0, 1.2, 2.4, 3.6, 5]) {
-        if (!bulge && !lift) continue;
-        const base = buildOutside(A, bulge);
-        const pts = base.map((p, i) => { const u = i / (base.length - 1); return [p[0], p[1] + lift * Math.sin(Math.PI * Math.min(1, u * 1.15)), p[2]] as V3; });
-        if (blockedOut(pts) < 0 && !facing(pts)) { establishPts = pts; blocked = false; notesE.push(`establishing move ${lift ? `lifted ${lift} m` : ''}${lift && bulge ? ' and ' : ''}${bulge ? `swung ${bulge} m wide` : ''} round the garden`); break search; }
+    let chosenEst = attemptEstablish(ests);
+    if (chosenEst.blocked) for (const alt of ests.alts.slice(1, 10)) { const t = attemptEstablish(alt); if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose ${alt.style} (the first choice's move is blocked by the garden)`); break; } }
+    // last resort: the same view from nearer — the pose's own eye drawn in along its line to the approach start, and lifted a little,
+    // until the move down to the door is clear of the garden
+    if (chosenEst.blocked) {
+      const A0 = chosenEst.A, E0 = ests.eye, dirOut = norm(sub(E0, A0)), D0 = len(sub(E0, A0));
+      search2: for (const f of [0.8, 0.65, 0.5, 0.38]) for (const h of [0, 1.5, 3]) {
+        const q: V3 = [A0[0] + dirOut[0] * D0 * f, E0[1] + h - (E0[1] - A0[1]) * (1 - f) * 0.3, A0[2] + dirOut[2] * D0 * f];
+        if (!outsideOk(q)) continue;
+        const t = attemptEstablish({ ...ests, eye: q });
+        if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose drawn in to ${(f * 100).toFixed(0)} % of its distance (the garden is in the way of the full move)`); break search2; }
       }
     }
-    // and the move goes toward the house, not away from it with the eye still on it (a pull-back is QA's `reverse`)
-    { let back = 0, tot = 0;
-      for (let k = 1; k < establishPts.length; k++) { const a = establishPts[k - 1], b = establishPts[k], vx = b[0] - a[0], vz = b[2] - a[2], L = Math.hypot(vx, vz), ax = est.aim[0] - a[0], az = est.aim[2] - a[2], al = Math.hypot(ax, az); if (L < 1e-6 || al < 1e-6) continue; tot += L; if ((vx * ax + vz * az) / (L * al) < -0.15) back += L; }
-      if (tot > 0 && back / tot > 0.25) { blocked = true; notesE.push('the establishing move would pull away from the house'); } }
-    // the look has to turn from the aim to what the move lands on (the door, the top of the steps) at the establishing yaw
-    // limit: a pose that asks for more than 60° of it in the move's time is another pose's business
-    { const next: V3 = stepsSeg ? [stepsSeg[stepsSeg.length - 1][0], 0, stepsSeg[stepsSeg.length - 1][2]] : [e.x, 0, e.z];
-      const aim0: V3 = stepsSeg ? lerp3(est.aim, [next[0], est.aim[1], next[2]], 0.8) : est.aim;
-      const y0 = Math.atan2(aim0[0] - E[0], aim0[2] - E[2]), y1 = Math.atan2(next[0] - A[0], next[2] - A[2]);
-      if (Math.abs(wrapPi(y1 - y0)) > 60 * DEG) { blocked = true; notesE.push('the look would have to turn more than 60° in the establishing move'); } }
-    return { est, A, pathLed, establishPts, blocked, notes: notesE };
-  };
-  let chosenEst = attemptEstablish(ests);
-  if (chosenEst.blocked) for (const alt of ests.alts.slice(1, 10)) { const t = attemptEstablish(alt); if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose ${alt.style} (the first choice's move is blocked by the garden)`); break; } }
-  // last resort: the same view from nearer — the pose's own eye drawn in along its line to the approach start, and lifted a little,
-  // until the move down to the door is clear of the garden
-  if (chosenEst.blocked) {
-    const A0 = chosenEst.A, E0 = ests.eye, dirOut = norm(sub(E0, A0)), D0 = len(sub(E0, A0));
-    search2: for (const f of [0.8, 0.65, 0.5, 0.38]) for (const h of [0, 1.5, 3]) {
-      const q: V3 = [A0[0] + dirOut[0] * D0 * f, E0[1] + h - (E0[1] - A0[1]) * (1 - f) * 0.3, A0[2] + dirOut[2] * D0 * f];
-      if (!outsideOk(q)) continue;
-      const t = attemptEstablish({ ...ests, eye: q });
-      if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose drawn in to ${(f * 100).toFixed(0)} % of its distance (the garden is in the way of the full move)`); break search2; }
+    if (chosenEst.blocked) chosenEst.notes.push('establishing move blocked by the garden and no way round found');
+    ({ est, A, pathLed, establishPts } = chosenEst);
+    notes.push(...chosenEst.notes);
+    // approach: A → (the door axis, 3 m out) → 0.8 m out; routed round anything at eye height when a straight
+    // run is blocked
+    // (the steps' top may be nearer the door than the axis point 3 m out: then the walk goes on from the top, never back)
+    const axial = (p: V3) => (p[0] - e.x) * n2[0] + (p[2] - e.z) * n2[1];
+    if (stepsSeg) approachPts = [...stepsSeg.slice(1), ...(axial(stepsSeg[stepsSeg.length - 1]) > axial(P3) + 0.3 ? [P3] : []), P08].filter((p, i, arr) => i === 0 || len(sub(p, arr[i - 1])) > 0.05);
+    else {
+      const c1: V3 = add(A, mul(norm(sub(P3, A)), Math.min(1.6, len(sub(P3, A)) * 0.4)));
+      const c2: V3 = [P3[0] + n2[0] * 1.4, P3[1], P3[2] + n2[1] * 1.4];
+      approachPts = [...bezier(A, c1, c2, P3, 24), P08];
+      if (blockedOut(approachPts) >= 0) {
+        const g = nav.grid(null, 0);
+        const r = nav.leg(g, [A[0], A[2]], [P3[0], P3[2]], { snap: 1.0 });
+        if (r) { const ys = (k: number) => A[1] + (P3[1] - A[1]) * (k / (r.pts.length - 1)); approachPts = [...r.pts.map((q, k) => [q[0], ys(k), q[1]] as V3), P08]; notes.push('approach routed round the garden'); }
+        else notes.push('approach blocked and unroutable');
+      }
     }
-  }
-  if (chosenEst.blocked) chosenEst.notes.push('establishing move blocked by the garden and no way round found');
-  const { est, A, pathLed, establishPts } = chosenEst;
-  notes.push(...chosenEst.notes);
-  // approach: A → (the door axis, 3 m out) → 0.8 m out; routed round anything at eye height when a straight
-  // run is blocked
-  let approachPts: V3[];
-  // (the steps' top may be nearer the door than the axis point 3 m out: then the walk goes on from the top, never back)
-  const axial = (p: V3) => (p[0] - e.x) * n2[0] + (p[2] - e.z) * n2[1];
-  if (stepsSeg) approachPts = [...stepsSeg.slice(1), ...(axial(stepsSeg[stepsSeg.length - 1]) > axial(P3) + 0.3 ? [P3] : []), P08].filter((p, i, arr) => i === 0 || len(sub(p, arr[i - 1])) > 0.05);
-  else {
-    const c1: V3 = add(A, mul(norm(sub(P3, A)), Math.min(1.6, len(sub(P3, A)) * 0.4)));
-    const c2: V3 = [P3[0] + n2[0] * 1.4, P3[1], P3[2] + n2[1] * 1.4];
-    approachPts = [...bezier(A, c1, c2, P3, 24), P08];
-    if (blockedOut(approachPts) >= 0) {
-      const g = nav.grid(null, 0);
-      const r = nav.leg(g, [A[0], A[2]], [P3[0], P3[2]], { snap: 1.0 });
-      if (r) { const ys = (k: number) => A[1] + (P3[1] - A[1]) * (k / (r.pts.length - 1)); approachPts = [...r.pts.map((q, k) => [q[0], ys(k), q[1]] as V3), P08]; notes.push('approach routed round the garden'); }
-      else notes.push('approach blocked and unroutable');
-    }
-  }
 
+
+  }
 
   // ---- 8. the whole path, beat by beat -------------------------------------------------------------------------
   const outsideBeat: Beat = stepsSeg ? 'extStair' : 'approach';
   const all: Seg[] = [];
-  all.push({ beat: 'establish', pts: establishPts });
-  if (stepsSeg) all.push({ beat: 'extStair', pts: [A, ...approachPts.slice(0, -2)] });
-  all.push({ beat: 'approach', pts: stepsSeg ? approachPts.slice(-3) : approachPts });
-  all.push({ beat: 'threshold', pts: [P08, [e.x, yDoor - 0.02, e.z], I0] });
+  if (!opts.inside) {
+    all.push({ beat: 'establish', pts: establishPts });
+    if (stepsSeg) all.push({ beat: 'extStair', pts: [A, ...approachPts.slice(0, -2)] });
+    all.push({ beat: 'approach', pts: stepsSeg ? approachPts.slice(-3) : approachPts });
+    all.push({ beat: 'threshold', pts: [P08, [e.x, yDoor - 0.02, e.z], I0] });
+  }
   // the interior pieces with the flights between them
   const interior: Seg[] = [];
   for (const p of pieces) {
@@ -1168,7 +1179,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   const estEnd = tOf('establish', true) || 1.5;
   for (let i = 0; i < N; i++) {
     const t = i * dt;
-    let a = 1;
+    let a = opts.inside ? 0 : 1;
     if (est.roofOff) a = smooth(ramp(t, estEnd - 0.7, estEnd + 0.1));
     if (enterT !== null && t >= enterT) a = Math.min(a, 1 - smooth(ramp(t, enterT, enterT + 0.35)));
     roofAlpha[i] = a;
@@ -1401,7 +1412,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
 
   // ---- 13. events: the press, when the Core has been seen 1.5 s and the camera has settled (§3.12) ---------------
   const track: Track = {
-    version: 2, planner: 'v2', type: 'door-to-core', id: world.id, duration, fps: FPS, samples: N, dt,
+    version: 2, planner: 'v2', type: opts.inside ? 'walkthrough' : 'door-to-core', id: world.id, duration, fps: FPS, samples: N, dt,
     pos, look, fov, roofAlpha, composeW, compose, beat: beatOf, beats,
     events: { enterT, stairT: beats.filter(b => b.name === 'stair' || b.name === 'descend').map(b => b.t0), pressT: null, settleT: tPower, doneT: duration, firstCoreT: null },
     doors: planDoors(world, pos, N, dt), metrics: {}, plan: {}, desired,

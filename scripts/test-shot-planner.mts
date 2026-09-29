@@ -25,6 +25,7 @@ import { ensureWorlds, fixtureIds, specFile } from './shot-worlds.mts';
 import { planDoorToCore, shotOptions, trackHash } from '../assets/shot-planner.js';
 import { qaTrack } from '../assets/shot-qa.js';
 import { fleetChecks, type FleetRow } from '../assets/shot-fleet.js';
+import { planHeroReveal, planWalkthrough } from '../assets/shot-planner-tour.js';
 
 const args = parseArgs(process.argv.slice(2));
 const ids = args.house ? args.house.split(',') : houseIds();
@@ -59,6 +60,25 @@ check(identical, 'two plans of the same world are byte-identical (hash and plan)
 const real = rows.filter(r => ids.includes(r.id)), fix = rows.filter(r => !ids.includes(r.id));
 for (const r of rows) for (const e of r.findings.errors) console.log(`  ERROR ${r.id} t=${e.t}${e.tEnd > e.t ? '–' + e.tEnd : ''} ${e.code}: ${e.message}`);
 check(!rows.some(r => r.errors), `QA v2: 0 errors on ${rows.length} track${rows.length === 1 ? '' : 's'}`, rows.filter(r => r.errors).map(r => `${r.id}: ${r.findings.errors.map((e: any) => e.code).join(', ')}`).join('\n'));
+
+// ---- 2b. hero-reveal and walkthrough (planner v2's other two shots): planned twice, identical, and QA v2 has no error on either
+{
+  const bad2: string[] = [], nondet2: string[] = []; let n2 = 0, cpu2 = 0;
+  for (const id of [...ids, ...fixtures]) {
+    const world = worlds.get(id), spec = specOf(id);
+    for (const [type, plan] of [['hero-reveal', (o: any) => planHeroReveal(world, o)], ['walkthrough', (o: any) => planWalkthrough(world, o)]] as Array<[string, (o: any) => any]>) {
+      const so = shotOptions(spec, type, 'v2'), t0 = cpuMs(), a = plan({ duration: so.options.duration, heroView: so.options.heroView, via: (so.shot && so.shot.via) || undefined });
+      cpu2 += cpuMs() - t0; n2++;
+      if (!a.ok) { bad2.push(`${id}/${type}: ${a.code} — ${a.message}`); continue; }
+      const b = plan({ duration: so.options.duration, heroView: so.options.heroView, via: (so.shot && so.shot.via) || undefined });
+      if (!b.ok || trackHash(a.track) !== trackHash(b.track)) nondet2.push(`${id}/${type}`);
+      const qa = qaTrack(a.track, world);
+      for (const e of qa.errors) bad2.push(`${id}/${type} t=${e.t} ${e.code}: ${e.message}`);
+    }
+  }
+  check(!nondet2.length, `hero-reveal and walkthrough: two plans of the same world are byte-identical (${n2} films)`, nondet2.join(', '));
+  check(!bad2.length, `hero-reveal and walkthrough: 0 QA v2 errors on ${n2} films (${(cpu2 / n2).toFixed(0)} ms of CPU to plan one)`, bad2.join('\n'));
+}
 
 // ---- 3. the fleet
 if (real.length === ids.length && ids.length >= 10) {

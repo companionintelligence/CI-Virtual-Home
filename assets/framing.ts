@@ -125,7 +125,7 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   const jitter = ESTABLISH_STYLES.map(() => rng());
   // each house has a favourite style, spread evenly over the styles by its id (never by the other houses: fleet diversity is
   // not a runtime input) — a nudge, not a rule: a facade that does not fit it still opens the way it fits
-  const fav = fnv1a(`${world.id}:establish-style8`) % ESTABLISH_STYLES.length;   // (the salt: the seed under which the 30 real houses fall six, seven, six, five, six)
+  const fav = fnv1a(`${world.id}:establish-style53`) % ESTABLISH_STYLES.length;   // (the salt: the seed under which the 30 real houses fall seven, seven, seven, six, three)
   const lot = world.lot;
   const inLot = (x: number, z: number) => Math.abs(x) <= lot.w / 2 + 4 && Math.abs(z) <= lot.d / 2 + 8;
   // affinities: a facade mirrored about its door reads axial; a front garden with water or beds reads from the
