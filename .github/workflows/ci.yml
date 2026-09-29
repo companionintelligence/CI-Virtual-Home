@@ -1,14 +1,18 @@
 # ci-virtual-home — the checks that need no GPU.
 # ============================================================================
 # Install, compile the three.js engine (assets/**/*.ts → .js), typecheck scripts/ and assets/, validate the 30
-# HouseSpecs, run the pure-Node tests (floor-plan graph + wall compiler over every spec), and assemble the Pages
-# site, whose build refuses a broken link, a missing thumbnail or stale compiled assets.
+# HouseSpecs, run the pure-Node tests (floor-plan graph + wall compiler over every spec), and assemble the portal
+# site, whose build refuses a broken link, a missing thumbnail or stale compiled assets. That site is kept as an
+# artifact: deploy.yml publishes it to Cloudflare Pages once this workflow has passed, and never builds or runs
+# anything from the repository itself.
 #
 # The render gate — shot QA, determinism and the 120 golden frames — is deliberately NOT here: through a
 # software rasteriser it costs the better part of an hour of runner time per push, against a couple of minutes
 # on a GPU. Run `pnpm run check` locally before pushing (see README.md → How verification works). The goldens
 # are Git LFS objects and this job does not fetch them.
 # ============================================================================
+# deploy.yml finds this workflow by its name: renaming it stops deploys. Every action is pinned to a commit, because
+# what this job builds is what production serves.
 name: ci
 
 on:
@@ -29,13 +33,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup pnpm (version from package.json → packageManager)
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: pnpm
@@ -55,8 +59,24 @@ jobs:
       - name: Floor-plan graph + wall compiler tests
         run: pnpm run test
 
-      # the Pages build's own gate — stale compiled assets, a spec or thumbnail missing for a listed home, a link to
-      # a file the site does not ship, a root-relative URL, hero figures that disagree with index.json — on every
-      # PR, not only on the push to main that deploys
+      # the portal build's own gate — stale compiled assets, a spec or thumbnail missing for a listed home, a link to
+      # a file the site does not ship, a root-relative URL, hero figures that disagree with index.json — on every PR,
+      # not only on the push to main. It also assembles the site deploy.yml publishes. A pull request's is assembled
+      # for its own preview address (the same one deploy.yml uses: pr-<number>.ci-virtual-home.pages.dev), so its link
+      # previews name the preview; every other run takes build-portal.mts's default, the live site.
       - name: Assemble the portal (link and staleness checks)
+        env:
+          SITE_URL: ${{ github.event_name == 'pull_request' && format('https://pr-{0}.ci-virtual-home.pages.dev/', github.event.pull_request.number) || '' }}
         run: pnpm run portal:build
+
+      # Kept for deploy.yml, which runs after this workflow and treats it as files to upload, never as anything to run.
+      # A fork's pull request is never published, so it keeps nothing. overwrite: a re-run of this job replaces it.
+      - name: Keep the site for deploy.yml
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: site
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+          overwrite: true

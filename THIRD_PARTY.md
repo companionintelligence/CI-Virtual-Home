@@ -52,7 +52,7 @@ Their licence texts are reproduced at the end of this file.
   from those builds or from The Sims are in this repository — the reference photos they were read from are
   third-party images and are deliberately not committed.
 
-The web portal (`pnpm run portal:build` → GitHub Pages) redistributes three.js with its `LICENSE`, and the two
+The web portal (`pnpm run portal:build` → Cloudflare Pages) redistributes three.js with its `LICENSE`, and the two
 fonts with theirs (`assets/fonts/LICENSE-*.txt` are copied beside the woff2), which is what MIT and OFL-1.1 ask.
 The gallery (`index.html`) and the player's stylesheet load them from `assets/fonts/`; `room-creator.html` itself
 still links the Google Fonts stylesheet below, in the player as in the editor.
@@ -73,9 +73,11 @@ still links the Google Fonts stylesheet below, in the player as in the editor.
 | [`typescript`](https://www.typescriptlang.org) | ^5 | Apache-2.0 |
 | [`@types/node`](https://github.com/DefinitelyTyped/DefinitelyTyped) | ^22 | MIT |
 
-The Pages workflow (`.github/workflows/pages.yml`) runs GitHub's own `actions/checkout`, `actions/setup-node`,
-`actions/configure-pages`, `actions/upload-pages-artifact` and `actions/deploy-pages` (MIT) and
-`pnpm/action-setup` (MIT); none of their code is in the site.
+The workflows (`.github/workflows/ci.yml`, `deploy.yml`) run GitHub's own `actions/checkout`, `actions/setup-node`,
+`actions/upload-artifact` and `actions/download-artifact` (MIT) and `pnpm/action-setup` (MIT), each pinned to a
+commit. To upload the portal, `deploy.yml` installs Cloudflare's [`wrangler`](https://github.com/cloudflare/workers-sdk)
+4.143.0 (MIT OR Apache-2.0) with `npm install --ignore-scripts` into a temporary directory and runs it from another,
+empty one. None of these is a dependency of the repository, and none of their code is in the site.
 
 External tools the scripts call but this repository does not include: **ffmpeg** (`render-house-shots.mts`,
 `prop-sheet.mts`; LGPL-2.1+/GPL depending on build), **rsvg-convert** from librsvg (`generate_floor_plans.py`,
