@@ -90,6 +90,8 @@ export function createHouseBuilder(deps) {
     // ---- site (site-build.ts)
     site.buildSite({ spec, kit, siteKit, put, anchors, water });
 
+    // ---- the whole house is built: S1's end-of-build hook (kit-build.ts), then the light
+    kitb.finishBuild({ spec, defaults: kitb.specDefaults(spec), anchors, kit, placed });
     // ---- the light: the spec's preset, the sun aimed from the entry's bearing (kit-build.ts)
     kitb.lightHouse({ spec, anchors });
     return { anchors, placed, graphs };

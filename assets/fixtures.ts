@@ -217,7 +217,7 @@ function pendant(THREE, s, style, drop, r) {
 
 // ---- dressLevel ------------------------------------------------------------------------------------------------
 export function dressLevel(ctx) {
-  const { THREE, spec, lv, y, H, put, placed, registerCeiling } = ctx;
+  const { THREE, spec, lv, y, H, put, placed, anchors, registerCeiling } = ctx;
   const cans: Array<{ p: Pt; ceil: number }> = [];   // the storey's recessed cans, built after the rooms
   const s = stateFor(ctx);
   tagWindowGlass(placed, s);
@@ -239,9 +239,10 @@ export function dressLevel(ctx) {
   // on the hero's storey, the hero-reveal's line of approach (it drops in front of the hero from above)
   const DEG = Math.PI / 180;
   const keepOut: Array<{ a: Pt; b: Pt; r: number }> = [];
-  if (lv.stairs && Array.isArray(lv.stairs.at)) {
-    const st = lv.stairs, run = st.type === 'spiral' ? 0 : (st.run || 3.36), d = [Math.sin((st.rot || 0) * DEG), Math.cos((st.rot || 0) * DEG)];
-    keepOut.push({ a: { x: st.at[0], z: st.at[1] }, b: { x: st.at[0] + d[0] * run, z: st.at[1] + d[1] * run }, r: 1.5 });
+  // (read off anchors.stairs, which structure-build.ts fills for every flight up from this storey, not off the spec's
+  // levels[].stairs: S2 widens that field to an array, and this reader must not care what shape it comes in)
+  for (const st of (anchors && anchors.stairs || []).filter(s => s.from === lv.id)) {
+    keepOut.push({ a: { x: st.bottom[0], z: st.bottom[2] }, b: { x: st.top[0], z: st.top[2] }, r: 1.5 });
   }
   if (spec.hero && spec.hero.level === lv.id && Array.isArray(spec.hero.at)) {
     const rot = ((spec.hero.rot || 0) + 180) * DEG, f = [-Math.sin(rot), -Math.cos(rot)], [hx, hz] = spec.hero.at;
