@@ -141,7 +141,7 @@ export const PLACEMENT: Record<string, Place> = {
   'wall-sconce': def('art', ['sconce'], ['foyer', 'hall', ...BEDS, 'living', ...BATHS, 'dining'], [], { mountY: 1.5, colorRole: 'linen' }),
   'desk-lamp': def('lamp', ['desk-lamp'], [...WORK, ...BEDS], [], { onSurface: true, surfaces: ['desk', 'storage'] }),
   'lantern': def('lamp', ['lantern'], ['outdoor', 'sunroom', 'living', ...BATHS, 'foyer'], ['mediterranean', 'tropical', 'cottage'], { against: 'free' }),
-  'string-lights': def('lighting', ['string-lights'], ['outdoor', 'bed-kid', 'playroom'], [], { hangs: 'wall' }),
+  'string-lights': def('lighting', ['string-lights'], ['outdoor', 'bed-kid', 'playroom'], [], { hangs: 'ceiling' }),
   'candle-set': def('decor', ['surface-decor'], [...LIVING, ...DINING, 'bed-primary', ...BATHS], [], { surfaces: ON }),
   'neon-sign': def('art', ['art-neon'], ['bed-kid', 'playroom', 'bar', 'studio', 'media'], ['industrial', 'modern'], { mountY: 1.6 }),
   // soft.ts
@@ -157,24 +157,24 @@ export const PLACEMENT: Record<string, Place> = {
   'fruit-bowl': def('decor', ['surface-decor-kitchen'], [...KITCHENS, ...DINING], [], { surfaces: ['table', 'fitted'], colorRole: 'wood' }),
   'plant-stand': def('plant', ['plant-floor'], [...LIVING, 'foyer', 'hall', 'bed-primary', 'dining', 'sunroom'], ['mid-century', 'scandi', 'modern', 'cottage']),
   'runner-rug': def('rug', ['runner'], ['hall', 'foyer', ...KITCHENS, 'bed-primary', 'bed-guest', 'laundry'], []),
-  'patterned-rug': def('rug', ['rug', 'rug-round', 'play-rug'], [...LIVING, ...BEDS, ...DINING, ...KIDS, 'study'], []),
+  'patterned-rug': def('rug', ['rug', 'rug-round', 'play-rug', 'runner'], [...LIVING, ...BEDS, ...DINING, ...KIDS, 'study', 'hall', 'foyer'], []),
   'gallery-wall': def('art', ['art-large'], ['living', 'den', 'bed-primary', 'bed-guest', 'hall', 'dining', 'study'], ['modern', 'scandi', 'farmhouse', 'mid-century', 'industrial'], { colorRole: 'fabric2' }),
   // plants.ts
-  'snake-plant': def('plant', ['plant-floor', 'plant-small'], [...LIVING, ...BEDS, ...BATHS, 'foyer', 'hall'], []),
+  'snake-plant': def('plant', ['plant-small'], [...LIVING, ...BEDS, ...BATHS, 'foyer', 'hall'], []),
   'indoor-palm': def('plant', ['plant-floor', 'plant-tall'], [...LIVING, 'dining', 'foyer', 'sunroom'], ['tropical', 'modern', 'mediterranean']),
   'ficus-tree': def('plant', ['plant-floor', 'plant-tall'], [...LIVING, 'dining', 'foyer', 'bed-primary'], ['scandi', 'modern', 'farmhouse', 'cottage']),
   'olive-tree-pot': def('plant', ['plant-floor', 'plant-tall'], [...LIVING, 'dining', 'foyer', 'sunroom'], ['mediterranean', 'farmhouse', 'modern']),
   'tall-cactus': def('plant', ['plant-floor'], ['living', 'study', 'foyer', 'sunroom'], ['mediterranean', 'modern', 'industrial']),
-  'pampas-vase': def('plant', ['plant-floor', 'plant-small'], [...LIVING, 'dining', 'bed-primary', 'foyer'], ['scandi', 'tropical', 'mediterranean', 'cottage']),
+  'pampas-vase': def('plant', ['plant-small'], [...LIVING, 'dining', 'bed-primary', 'foyer'], ['scandi', 'tropical', 'mediterranean', 'cottage']),
   'hanging-plant': def('plant', ['plant-hanging'], [...LIVING, ...KITCHENS, ...BATHS, 'bed-primary', 'sunroom', 'greenhouse'], [], { hangs: 'ceiling', against: 'window' }),
   'herb-pots': def('plant', ['plant-surface-kitchen'], KITCHENS, [], { onSurface: true, surfaces: ['fitted'] }),
   'orchid': def('plant', ['plant-surface'], [...LIVING, ...BATHS, 'bed-primary', 'dining', 'study'], [], { onSurface: true, surfaces: ON }),
-  'succulent-tray': def('plant', ['plant-surface'], [...WORK, 'living', ...KITCHENS, ...BEDS], [], { onSurface: true, surfaces: ON }),
-  'trailing-ivy': def('plant', ['plant-surface'], [...LIVING, ...WORK, ...BEDS, ...KITCHENS], [], { onSurface: true, surfaces: ON }),
+  'succulent-tray': def('plant', ['plant-surface', 'plant-surface-kitchen'], [...WORK, 'living', ...KITCHENS, ...BEDS], [], { onSurface: true, surfaces: ON }),
+  'trailing-ivy': def('plant', ['plant-surface', 'plant-surface-kitchen'], [...LIVING, ...WORK, ...BEDS, ...KITCHENS], [], { onSurface: true, surfaces: ON }),
   'fern': def('plant', ['plant-surface'], [...BATHS, ...BEDS, 'living'], [], { onSurface: true, surfaces: ON }),
   'bird-of-paradise': def('plant', ['plant-floor', 'plant-tall'], [...LIVING, 'dining', 'foyer', 'sunroom'], ['tropical', 'modern', 'mid-century']),
   'rubber-plant': def('plant', ['plant-floor'], [...LIVING, ...BEDS, 'foyer', 'study'], ['modern', 'industrial', 'scandi', 'mid-century']),
-  'zz-plant': def('plant', ['plant-floor', 'plant-small'], [...LIVING, ...BEDS, ...BATHS, 'foyer', 'hall'], []),
+  'zz-plant': def('plant', ['plant-small'], [...LIVING, ...BEDS, ...BATHS, 'foyer', 'hall'], []),
   'dracaena': def('plant', ['plant-floor', 'plant-tall'], [...LIVING, 'dining', 'foyer', 'study'], ['modern', 'scandi', 'tropical']),
   // kids.ts
   'toy-box': def('kids', ['toy-storage'], KIDS, [], { clear: C(0.6) }),
@@ -233,7 +233,67 @@ export const PLACEMENT: Record<string, Place> = {
   'yoga-mat': def('gym', ['mat'], ['gym', 'sunroom', 'bed-primary'], [], { colorRole: 'accent', clear: C(0.2, 0.3) }),
   'workbench': def('storage', ['workbench'], ['garage', 'laundry', 'studio'], [], { clear: C(0.9), colorRole: 'wood' }),
   'potting-bench': def('storage', ['potting'], ['greenhouse', 'sunroom'], [], { clear: C(0.8), colorRole: 'wood' }),
+  // ---- the second round of variants (plan S3: real alternatives for the types every house repeated) -------------------
+  // table-lamp alternatives (decor.ts)
+  'ginger-lamp': def('lamp', ['table-lamp'], [...LIVING, ...BEDS, 'foyer', 'hall'], [...TRAD, 'mediterranean'], { onSurface: true, surfaces: ON, pairsWith: ['nightstand', 'side-table', 'console'] }),
+  'column-lamp': def('lamp', ['table-lamp'], [...LIVING, ...BEDS, 'foyer', 'hall'], ['traditional', 'mid-century', 'craftsman', 'mediterranean'], { onSurface: true, surfaces: ON, pairsWith: ['nightstand', 'side-table', 'console'] }),
+  'globe-lamp': def('lamp', ['table-lamp'], [...LIVING, ...BEDS, 'foyer'], ['modern', 'scandi', 'industrial'], { onSurface: true, surfaces: ON, pairsWith: ['nightstand', 'side-table'] }),
+  'mushroom-lamp': def('lamp', ['table-lamp'], [...LIVING, ...BEDS], ['mid-century', 'modern', 'industrial'], { onSurface: true, surfaces: ON, pairsWith: ['nightstand', 'side-table'] }),
+  'tripod-table-lamp': def('lamp', ['table-lamp'], [...LIVING, ...BEDS], ['scandi', 'mid-century', 'cottage', 'tropical'], { onSurface: true, surfaces: ON, pairsWith: ['nightstand', 'side-table', 'console'] }),
+  // small things on a surface (soft.ts)
+  'ceramic-bowl': def('decor', ['surface-decor', 'surface-decor-kitchen'], [...LIVING, ...DINING, ...KITCHENS, 'foyer', 'hall'], ['mediterranean', 'cottage', 'farmhouse', 'scandi', 'tropical'], { surfaces: ['table', 'storage', 'fitted'] }),
+  'sculpture': def('decor', ['surface-decor'], [...LIVING, 'foyer', 'hall', 'study'], ['modern', 'industrial', 'mid-century', 'scandi'], { surfaces: ON, colorRole: 'fabric2' }),
+  'candelabra': def('decor', ['surface-decor'], [...LIVING, ...DINING, 'foyer', 'hall', 'bed-primary'], [...TRAD, 'mediterranean'], { surfaces: ON, colorRole: 'linen' }),
+  'flower-jug': def('decor', ['surface-decor', 'surface-decor-kitchen'], [...LIVING, ...DINING, ...KITCHENS, ...BEDS], ['cottage', 'farmhouse', 'tropical', 'craftsman'], { surfaces: ['table', 'storage', 'fitted'] }),
+  'terrarium': def('decor', ['surface-decor'], [...LIVING, ...KITCHENS, 'study'], ['modern', 'scandi', 'industrial'], { surfaces: ON, colorRole: 'metal' }),
+  'table-clock': def('decor', ['surface-decor'], [...LIVING, 'study', 'bed-primary', 'hall'], [...TRAD, 'mid-century'], { surfaces: ON, colorRole: 'wood' }),
+  'desk-globe': def('decor', ['surface-decor'], ['study', 'library', 'living', 'den'], ['craftsman', 'traditional', 'mediterranean', 'industrial'], { surfaces: ON }),
+  // more art
+  'arch-mirror': def('art', ['mirror'], ['foyer', 'hall', ...BEDS, ...BATHS, 'living'], ['modern', 'scandi', 'mid-century', 'mediterranean', 'tropical'], { mountY: 1.5, colorRole: 'metal', pairsWith: ['console', 'vanity'] }),
+  'triptych': def('art', ['art-wide'], [...LIVING, ...BEDS, ...DINING, 'hall'], ['modern', 'scandi', 'mid-century', 'tropical', 'mediterranean'], { mountY: 1.5, colorRole: 'wood', pairsWith: ['sofa', 'bed', 'console', 'sideboard'] }),
+  // more rugs
+  'shag-rug': def('rug', ['rug'], [...LIVING, ...BEDS, 'study'], ['modern', 'scandi', 'mid-century'], { colorRole: 'rug' }),
+  'flatweave-rug': def('rug', ['rug', 'runner'], [...LIVING, ...BEDS, ...DINING, 'hall', ...KITCHENS], ['farmhouse', 'tropical', 'industrial', 'craftsman', 'cottage'], { colorRole: 'rug' }),
+  'hide-rug': def('rug', ['rug'], ['living', 'den', 'study', 'library', 'bed-primary', 'media'], ['industrial', 'mid-century', 'tropical', 'modern'], { colorRole: 'rug' }),
+  'bath-rug': def('rug', ['bath-mat'], BATHS, ['modern', 'scandi', 'tropical', 'cottage'], { colorRole: 'rug' }),
+  // more houseplants (plants.ts)
+  'peace-lily': def('plant', ['plant-small'], [...LIVING, ...BEDS, ...BATHS, 'foyer'], ['modern', 'scandi', 'cottage', 'tropical']),
+  'aloe-pot': def('plant', ['plant-surface', 'plant-surface-kitchen'], [...LIVING, ...KITCHENS, ...BEDS, ...BATHS, 'study'], ['mediterranean', 'modern', 'industrial'], { onSurface: true, surfaces: [...ON, 'fitted', 'bath'] }),
+  'ponytail-palm': def('plant', ['plant-floor', 'plant-tall'], [...LIVING, 'foyer', 'sunroom', 'dining'], ['tropical', 'mid-century', 'mediterranean', 'modern']),
+  'jade-plant': def('plant', ['plant-surface', 'plant-surface-kitchen'], [...LIVING, ...KITCHENS, 'bed-primary', 'study'], ['cottage', 'farmhouse', 'scandi', 'traditional'], { onSurface: true, surfaces: [...ON, 'fitted'] }),
+  'calathea': def('plant', ['plant-small'], [...LIVING, ...BEDS, ...BATHS, 'foyer'], ['tropical', 'cottage', 'mid-century', 'craftsman']),
+  // more case goods (storage.ts, bathroom.ts)
+  'chest-of-drawers': def('storage', ['dresser'], [...BEDS, 'hall'], ['cottage', 'farmhouse', 'traditional', 'scandi', 'craftsman'], { top: 1.15 }),
+  'lowboy-dresser': def('storage', ['dresser'], [...BEDS, 'living', 'hall'], ['mid-century', 'scandi', 'modern', 'industrial'], { colorRole: 'wood', top: 0.72 }),
+  'demilune-console': def('storage', ['console'], ['foyer', 'hall', 'living', 'dining', 'bed-primary'], ['traditional', 'mediterranean', 'cottage', 'mid-century'], { clear: C(0.6), colorRole: 'wood', top: 0.82 }),
+  'sofa-table': def('storage', ['console', 'sofa-table'], ['living', 'hall', 'foyer', 'study', 'den'], ['modern', 'scandi', 'craftsman', 'farmhouse'], { clear: C(0.5), colorRole: 'wood', top: 0.78 }),
+  'towel-ladder': def('bath', ['towel-rail'], BATHS, ['farmhouse', 'cottage', 'tropical', 'scandi', 'craftsman'], { against: 'wall', clear: C(0.3, 0.1), colorRole: 'wood' }),
+  // nightstands, side tables, more art, the bath runner (tables.ts, soft.ts)
+  'drum-nightstand': def('storage', ['nightstand'], BEDS, ['mid-century', 'modern', 'tropical', 'mediterranean'], { clear: C(0.3), colorRole: 'cabinet', top: 0.56 }),
+  'bedside-cabinet': def('storage', ['nightstand'], BEDS, ['scandi', 'cottage', 'farmhouse', 'craftsman', 'traditional'], { clear: C(0.3), top: 0.62 }),
+  'drum-table': def('table', ['side-table', 'nightstand'], [...LIVING, ...BEDS], ['modern', 'mid-century', 'tropical', 'industrial'], { against: 'free', clear: C(0.1, 0.05, 0.05), top: 0.52 }),
+  'c-table': def('table', ['side-table'], [...LIVING, 'bed-primary'], ['modern', 'industrial', 'scandi'], { against: 'free', clear: C(0.1, 0.05, 0.05), top: 0.6 }),
+  'framed-print': def('art', ['art'], [...LIVING, ...BEDS, ...DINING, 'hall', 'foyer', 'studio'], ['cottage', 'farmhouse', 'scandi', 'craftsman', 'traditional'], { mountY: 1.5, colorRole: 'metal', pairsWith: ['sofa', 'bed', 'console'] }),
+  'canvas-art': def('art', ['art'], [...LIVING, ...BEDS, ...DINING, 'study', 'studio'], ['modern', 'industrial', 'mid-century'], { mountY: 1.5, colorRole: 'fabric2', pairsWith: ['sofa', 'bed', 'console'] }),
+  'plate-set': def('art', ['art', 'art-large'], [...DINING, ...KITCHENS, 'living', 'hall'], ['farmhouse', 'cottage', 'mediterranean', 'craftsman'], { mountY: 1.5, colorRole: 'linen' }),
+  'bath-runner': def('rug', ['bath-mat'], ['bath', 'ensuite'], ['modern', 'scandi', 'cottage', 'mediterranean', 'tropical'], { colorRole: 'rug' }),
+  'play-rug': def('rug', ['play-rug'], [...KIDS, 'living', 'den'], [], { colorRole: 'rug' }),
+  // counter stools (seating.ts) and counter appliances (kitchen.ts)
+  'wood-stool': def('chair', ['stool'], [...KITCHENS, 'bar', ...DINING], ['farmhouse', 'cottage', 'craftsman', 'scandi'], { clear: C(0.2, 0.05), colorRole: 'wood' }),
+  'saddle-stool': def('chair', ['stool'], [...KITCHENS, 'bar', ...DINING], ['modern', 'industrial', 'mid-century'], { clear: C(0.2, 0.05), colorRole: 'fabric2' }),
+  'toaster': def('decor', ['counter-appliance'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  'kettle': def('decor', ['counter-appliance'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  // sectionals by size: the modular (compact), the L (standard, l-sectional above) and the U (large room)
+  'u-sectional': def('seating', ['sofa-l', 'sofa-u'], ['living', 'den', 'media'], ['modern', 'industrial', 'mid-century', 'tropical'], { faces: 'focus' }),
+  'modular-sectional': def('seating', ['sofa-l'], ['living', 'den', 'media', 'study'], ['mid-century', 'scandi', 'modern', 'tropical'], { faces: 'focus' }),
 };
+
+// A floor plant stands wherever people live: which rooms have the light and the size for one is the composer's business
+// (its clearances and windows), not a list per plant, and a bedroom that could only take three of the fourteen kinds
+// would put the same three in every house.
+for (const p of Object.values(PLACEMENT)) {
+  if (p.group === 'plant' && p.programs.length && p.roles.some(r => r === 'plant-floor' || r === 'plant-tall' || r === 'plant-small')) p.programs = [...new Set([...p.programs, ...LIVING, ...BEDS, 'dining', 'foyer', 'hall'])];
+}
 
 /** the placement of a type, or null when the table does not know it */
 export const placeOf = (type: string): Place | null => PLACEMENT[type] || null;

@@ -394,4 +394,57 @@ registerProps({
     },
     iso: [{ shape: 'box', box: [-0.5, 0.02, -0.3, 0.5, 0.46, 0.3], color: 'role:wood' }],
   },
+
+  // ---- more nightstands and side tables (plan S3: the fleet's 98 nightstands were one type) --------------------------------------
+  // Drum nightstand — a round drum on a plinth, one door with a leather pull (mid-century, modern, tropical, mediterranean).
+  'drum-nightstand': {
+    footprint: [0.42, 0.42], height: 0.56, params: ['color'], tags: ['bedroom', 'guest', 'living'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const g = group('Drum Nightstand'), body = it.color ? hex(it.color) : colors.cabinet;
+      g.add(cyl(THREE, 0.17, 0.17, 0.04, std(mix(body, 0x000000, 0.4), { roughness: 0.6 }), 0, 0.02, 0, 28));   // plinth
+      g.add(cyl(THREE, 0.2, 0.2, 0.47, std(body, { roughness: 0.55 }), 0, 0.275, 0, 32));                       // the drum
+      g.add(cyl(THREE, 0.215, 0.215, 0.03, std(colors.wood, { roughness: 0.45 }), 0, 0.545, 0, 32));            // top
+      g.add(box(0.004, 0.36, 0.006, std(mix(body, 0x000000, 0.25), { roughness: 0.6 }), 0, 0.28, 0.2));          // door seam
+      g.add(box(0.014, 0.1, 0.014, std(colors.metal, { metalness: 0.7, roughness: 0.4 }), 0.05, 0.3, 0.208));    // pull
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.21, 0, -0.21, 0.21, 0.56, 0.21], color: 'role:cabinet' }],
+  },
+  // Bedside cabinet — a narrow cabinet on tapered legs: a drawer over a door (scandi, cottage, farmhouse, craftsman).
+  'bedside-cabinet': {
+    footprint: [0.44, 0.38], height: 0.62, params: ['color'], tags: ['bedroom', 'guest', 'kids'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const g = group('Bedside Cabinet'), body = it.color ? hex(it.color) : colors.cabinet, w = 0.44, d = 0.38;
+      const cab = std(body, { roughness: 0.6 }), front = std(mix(body, 0xffffff, 0.08), { roughness: 0.55 }), wood = std(colors.wood, { roughness: 0.45 }), knob = std(colors.metal, { metalness: 0.7, roughness: 0.4 });
+      g.add(box(w, 0.4, d, cab, 0, 0.38, 0));
+      g.add(box(w + 0.02, 0.025, d + 0.02, wood, 0, 0.5875, 0));
+      g.add(box(w - 0.05, 0.14, 0.015, front, 0, 0.5, d / 2 + 0.0075)); g.add(box(w - 0.05, 0.2, 0.015, front, 0, 0.29, d / 2 + 0.0075));
+      for (const y of [0.5, 0.35]) { const k = cyl(THREE, 0.012, 0.012, 0.02, knob, 0.12 * (y > 0.4 ? 0 : 1), y, d / 2 + 0.025, 10); k.rotation.x = Math.PI / 2; g.add(k); }
+      for (const [x, z] of corners(w, d, 0.05)) g.add(cyl(THREE, 0.014, 0.022, 0.18, wood, x, 0.09, z, 8));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.22, 0.18, -0.19, 0.22, 0.6, 0.19], color: 'role:cabinet' }, { shape: 'box', box: [-0.2, 0, -0.17, 0.2, 0.18, 0.17], color: 'role:wood' }],
+  },
+  // Drum side table — a round pedestal side table with a disc foot (modern, mid-century, tropical, industrial).
+  'drum-table': {
+    footprint: [0.46, 0.46], height: 0.52, params: ['color'], tags: ['living', 'bedroom'],
+    create(it, { THREE, std, group, colors, hex }) {
+      const g = group('Drum Table'), col = it.color ? hex(it.color) : colors.wood;
+      g.add(cyl(THREE, 0.2, 0.22, 0.03, std(colors.metal, { metalness: 0.7, roughness: 0.4 }), 0, 0.015, 0, 28));
+      g.add(cyl(THREE, 0.16, 0.16, 0.45, std(col, { roughness: 0.5 }), 0, 0.255, 0, 28));
+      g.add(cyl(THREE, 0.23, 0.23, 0.035, std(col, { roughness: 0.45 }), 0, 0.5, 0, 32));
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.23, 0, -0.23, 0.23, 0.52, 0.23], color: 'role:wood' }],
+  },
+  // C table — a C-shaped side table whose base slides under a sofa or bed, the top overhanging it (modern, industrial, scandi).
+  'c-table': {
+    footprint: [0.5, 0.4], height: 0.6, params: ['color'], tags: ['living', 'bedroom', 'study'],
+    create(it, { THREE, std, box, group, colors, hex }) {
+      const g = group('C Table'), metal = std(it.color ? hex(it.color) : colors.metal, { metalness: 0.7, roughness: 0.35 }), wood = std(colors.wood, { roughness: 0.45 });
+      g.add(box(0.46, 0.02, 0.34, metal, 0.02, 0.01, 0)); g.add(box(0.03, 0.56, 0.03, metal, -0.2, 0.3, 0)); g.add(box(0.44, 0.03, 0.4, wood, 0.03, 0.585, 0));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.22, 0.56, -0.2, 0.25, 0.6, 0.2], color: 'role:wood' }, { shape: 'box', box: [-0.22, 0, -0.17, 0.25, 0.03, 0.17], color: 'role:metal' }],
+  },
 });

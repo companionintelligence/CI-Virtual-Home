@@ -406,4 +406,82 @@ registerProps({
     },
     iso: [{ shape: 'box', box: [-0.4, 0, -0.225, 0.4, 0.8, 0.225], color: 'role:metal' }],
   },
+
+  // ---- more case goods (plan S3: the fleet's dressers and consoles were one type each) --------------------------------------------
+  // Chest of drawers — a tall five-drawer chest on bracket feet (cottage, farmhouse, traditional, scandi).
+  'chest-of-drawers': {
+    footprint: [0.8, 0.48], height: 1.15, params: ['w', 'd', 'h', 'color'], tags: ['bedroom', 'nursery', 'kids', 'hall'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 0.8, d = it.d || 0.48, h = it.h || 1.15, g = group('Chest of Drawers');
+      const body = it.color ? hex(it.color) : colors.cabinet, bodyMat = std(body, { roughness: 0.55 }), woodMat = std(colors.wood, { roughness: 0.5 });
+      const foot = 0.08, topT = 0.03, carcH = h - foot - topT;
+      g.add(box(w, carcH, d, bodyMat, 0, foot + carcH / 2, 0));
+      g.add(box(w + 0.03, topT, d + 0.02, woodMat, 0, h - topT / 2, 0.01));
+      for (const [sx, sz] of CORNERS) g.add(box(0.06, foot, 0.06, woodMat, sx * (w / 2 - 0.04), foot / 2, sz * (d / 2 - 0.04)));
+      const rows = 5, gap = 0.02, fh = (carcH - gap * (rows + 1)) / rows, frontMat = std(relief(mix, body), { roughness: 0.55 }), knob = std(contrast(body), { metalness: 0.7, roughness: 0.3 });
+      for (let r = 0; r < rows; r++) {
+        const y = foot + gap + fh / 2 + r * (fh + gap);
+        g.add(box(w - 2 * gap, fh, 0.018, frontMat, 0, y, d / 2 + 0.009));
+        for (const s of [-1, 1]) { const k = cyl(THREE, 0.012, 0.012, 0.02, knob, s * w * 0.22, y, d / 2 + 0.028, 10); k.rotation.x = Math.PI / 2; g.add(k); }
+      }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.4, 0.08, -0.24, 0.4, 1.12, 0.24], color: 'role:cabinet' }, { shape: 'box', box: [-0.415, 1.12, -0.24, 0.415, 1.15, 0.25], color: 'role:wood' }],
+  },
+  // Lowboy dresser — a long low chest on splayed tapered legs, six drawers with round pulls (mid-century, scandi, modern).
+  'lowboy-dresser': {
+    footprint: [1.6, 0.46], height: 0.72, params: ['w', 'd', 'h', 'color'], tags: ['bedroom', 'living', 'hall'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 1.6, d = it.d || 0.46, h = it.h || 0.72, g = group('Lowboy Dresser');
+      const body = it.color ? hex(it.color) : colors.wood, woodMat = std(body, { roughness: 0.5 });
+      const legH = 0.2, carcH = h - legH;
+      g.add(box(w, carcH, d, woodMat, 0, legH + carcH / 2, 0));
+      const cols = 3, rows = 2, gap = 0.02, fw = (w - gap * (cols + 1)) / cols, fh = (carcH - gap * (rows + 1)) / rows;
+      const front = std(mix(body, colors.cabinet, 0.25), { roughness: 0.5 }), pull = std(colors.metal, { metalness: 0.75, roughness: 0.3 });
+      for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+        const x = -w / 2 + gap + fw / 2 + c * (fw + gap), y = legH + gap + fh / 2 + r * (fh + gap);
+        g.add(box(fw, fh, 0.018, front, x, y, d / 2 + 0.009));
+        const k = cyl(THREE, 0.016, 0.016, 0.014, pull, x, y, d / 2 + 0.024, 14); k.rotation.x = Math.PI / 2; g.add(k);
+      }
+      for (const [sx, sz] of CORNERS) {
+        const leg = cyl(THREE, 0.014, 0.024, legH, woodMat, sx * (w / 2 - 0.1), legH / 2, sz * (d / 2 - 0.07), 10);
+        leg.rotation.z = -sx * 0.1; leg.rotation.x = sz * 0.1; g.add(leg);
+      }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.8, 0.2, -0.23, 0.8, 0.72, 0.23], color: 'role:wood' }, { shape: 'box', box: [-0.75, 0, -0.2, -0.7, 0.2, -0.15], color: 'role:wood' }, { shape: 'box', box: [0.7, 0, -0.2, 0.75, 0.2, -0.15], color: 'role:wood' }],
+  },
+  // Demilune console — a half-round top on three tapered legs, its flat edge to the wall (foyer, hall, dining, living).
+  'demilune-console': {
+    footprint: [1.0, 0.42], height: 0.82, params: ['w', 'color'], tags: ['hall', 'entry', 'living', 'dining'],
+    create(it, { THREE, std, box, group, colors, hex }) {
+      const w = it.w || 1.0, d = 0.42, g = group('Demilune Console'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.45 });
+      // the top: a half disc, radius w/2 across and d deep (the round edge toward +z), flat edge on the back line
+      const top = new THREE.Mesh(new THREE.CylinderGeometry(w / 2, w / 2, 0.03, 32, 1, false, -Math.PI / 2, Math.PI), wood);
+      top.scale.z = d / (w / 2); top.position.set(0, 0.805, -d / 2); top.castShadow = true; top.receiveShadow = true; g.add(top);
+      g.add(box(w - 0.06, 0.07, 0.03, wood, 0, 0.75, -d / 2 + 0.03));                                        // apron along the wall
+      for (const [x, z] of [[-w / 2 + 0.07, -d / 2 + 0.05], [w / 2 - 0.07, -d / 2 + 0.05], [0, d / 2 - 0.07]]) g.add(cyl(THREE, 0.014, 0.024, 0.79, wood, x, 0.395, z, 10));
+      const shelf = new THREE.Mesh(new THREE.CylinderGeometry(w * 0.3, w * 0.3, 0.015, 24, 1, false, -Math.PI / 2, Math.PI), wood);
+      shelf.scale.z = (d * 0.7) / (w * 0.3); shelf.position.set(0, 0.22, -d / 2 + 0.02); g.add(shelf);
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.5, 0.78, -0.21, 0.5, 0.82, 0.21], color: 'role:wood' }, { shape: 'box', box: [-0.46, 0, -0.18, -0.42, 0.78, -0.14], color: 'role:wood' }, { shape: 'box', box: [0.42, 0, -0.18, 0.46, 0.78, -0.14], color: 'role:wood' }],
+  },
+  // Sofa table — a long narrow table with a lower shelf on turned legs and a drawer (behind a sofa, in a hall).
+  'sofa-table': {
+    footprint: [1.4, 0.36], height: 0.78, params: ['w', 'd', 'color'], tags: ['living', 'hall', 'entry', 'study'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 1.4, d = it.d || 0.36, g = group('Sofa Table'), body = it.color ? hex(it.color) : colors.wood, wood = std(body, { roughness: 0.5 });
+      g.add(box(w, 0.035, d, wood, 0, 0.7625, 0));
+      g.add(box(w - 0.12, 0.1, d - 0.06, std(mix(body, colors.cabinet, 0.2), { roughness: 0.5 }), 0, 0.68, 0));            // the drawer box
+      g.add(box(0.16, 0.035, 0.012, std(colors.metal, { metalness: 0.7, roughness: 0.3 }), 0, 0.68, d / 2 - 0.02));
+      g.add(box(w - 0.1, 0.02, d - 0.05, wood, 0, 0.2, 0));                                                              // the lower shelf
+      for (const [sx, sz] of CORNERS) {
+        const x = sx * (w / 2 - 0.05), z = sz * (d / 2 - 0.05);
+        g.add(cyl(THREE, 0.016, 0.02, 0.73, wood, x, 0.365, z, 10)); g.add(ball(THREE, 0.024, wood, x, 0.45, z));
+      }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.7, 0.68, -0.18, 0.7, 0.78, 0.18], color: 'role:wood' }, { shape: 'box', box: [-0.66, 0.19, -0.16, 0.66, 0.21, 0.16], color: 'role:wood' }],
+  },
 });

@@ -14,7 +14,7 @@
 //
 // Owner: S3 (compose).
 import { PLACEMENT } from './props/placement.js';
-import { INWARD, OPPOSITE, ROT_OF_WALL, alongX, mm, obb, turn, aabb, type Run, type Side } from './room-geo.js';
+import { INWARD, OPPOSITE, ROT_OF_WALL, alongX, mm, obb, turn, aabb, paramsOf, type Run, type Side } from './room-geo.js';
 import { wallGroup, cornerGroup, type Composer, type CItem, type Group, type Pose } from './room-composer.js';
 
 const DEPTH = 0.64;        // a base unit's depth off the wall (0.62, and a hair)
@@ -179,8 +179,8 @@ export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { di
         for (const it of out) if (it.layer === 'body' && it.type !== 'corner-run') { const [dx, dz] = turn(0, it.d / 2 + 0.45, it.rot); it.access = [[it.cx + dx, it.cz + dz]]; }
         // a little life on the counters
         const counters = out.filter(it => it.type === 'counter-run');
-        if (counters.length) { const k0 = counters[0]; out.push(c.on(c.rng() < 0.5 ? 'coffee-maker' : 'microwave', k0, -k0.w / 2 + 0.3, -0.05)); }
-        if (counters.length > 1) out.push(c.on('herb-pots', counters[counters.length - 1], 0, -0.15));
+        if (counters.length) { const k0 = counters[0], t = c.pick('counter-appliance'); if (t) out.push(c.on(t, k0, -k0.w / 2 + 0.3, -0.05)); }
+        if (counters.length > 1) { const t = c.pick('plant-surface-kitchen'); if (t) out.push(c.on(t, counters[counters.length - 1], 0, -0.15)); }
         return out;
       },
       score: (p, items) => {
@@ -218,9 +218,9 @@ export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { di
         const cx = alongX(run.side) ? p.t : run.face + nx * off, cz = alongX(run.side) ? run.face + nz * off : p.t;
         const isl = c.item('breakfast-bar', cx, cz, rot, fitted('breakfast-bar', { w: iw, d: id }));
         isl.clear = [];   // its aisles are the legs' front clearances and the stools'
-        const out = [isl], n = Math.max(2, Math.floor((iw - 0.2) / 0.6));
-        for (let i = 0; i < n; i++) { const [dx, dz] = turn(-iw / 2 + iw / n * (i + 0.5), id / 2 + 0.12, rot); const s = c.item('bar-stool', cx + dx, cz + dz, rot + 180, {}); s.opt = true; out.push(s); }
-        out.push(c.on('fruit-bowl', isl, iw * 0.25, -0.1));
+        const out = [isl], n = Math.max(2, Math.floor((iw - 0.2) / 0.6)), stool = c.pick('stool') || 'bar-stool';
+        for (let i = 0; i < n; i++) { const [dx, dz] = turn(-iw / 2 + iw / n * (i + 0.5), id / 2 + 0.12, rot); const s = c.item(stool, cx + dx, cz + dz, rot + 180, {}); s.opt = true; out.push(s); }
+        { const t = c.pick('surface-decor-kitchen'); if (t) out.push(c.on(t, isl, iw * 0.25, -0.1)); }
         const [ax, az] = turn(0, id / 2 + 0.75, rot); isl.access = [[cx + ax, cz + az]];
         return out;
       },
@@ -294,8 +294,11 @@ export function bathGroups(c: Composer): Array<() => Group | null> {
   list.push(() => {
     const near = c.placed.find(i => !i.pin && (i.type === 'shower-cubicle' || i.type === 'bathtub' || PLACEMENT[i.type]?.roles.includes('tub-free'))) || c.placed.find(i => !i.pin && PLACEMENT[i.type]?.roles.some(r => r.startsWith('vanity')));
     if (!near) return null;
-    const [dx, dz] = turn(0, near.d / 2 + 0.32, near.rot);
-    return { name: 'mat', gid: 0, movable: false, cands: [{ key: 'm' }], build: () => [c.item('bath-mat', near.cx + dx, near.cz + dz, near.rot, { w: mm(Math.min(0.8, near.w)), d: 0.5 })], score: () => 0 };
+    const mat = c.pick('bath-mat') || 'bath-mat', round = paramsOf(mat).includes('r'), runner = mat === 'bath-runner';
+    const mp = round ? { r: mm(Math.min(0.35, near.w / 2)) } : runner ? { w: mm(Math.min(0.55, near.w)), d: 1.2 } : { w: mm(Math.min(0.8, near.w)), d: 0.5 }, MS = c.size(mat, mp);
+    // its near edge 0.05 m off the fitting's front
+    const [rx, rz] = turn(0, near.d / 2 + 0.05 + MS.d / 2, near.rot);
+    return { name: 'mat', gid: 0, movable: false, cands: [{ key: 'm' }], build: () => [c.item(mat, near.cx + rx, near.cz + rz, near.rot, mp)], score: () => 0 };
   });
   if (c.density >= 0.45 && area >= 4.5) list.push(() => { const t = c.pick('plant-small'); return t ? cornerGroup(c, 'plant', t) : null; });
   if (c.density >= 0.5 && area >= 5.5 && P !== 'powder') list.push(() => cornerGroup(c, 'hamper', c.pick('hamper') || 'laundry-basket'));

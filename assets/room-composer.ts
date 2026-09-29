@@ -74,8 +74,16 @@ export interface HouseState {
   usage: Map<string, number>; storey: Map<string, number>; palettes: string[]; styleOf: (room: any) => StyleBundle;
   /** the house's own picks per role: two types it leans to (seeded by the house, weighted by its style), so one house
    *  reads as one scheme and the next house reaches for others (the fleet's "each home looks very same") */
-  prefer: Map<string, string[]>; seed: string;
+  prefer: Map<string, string[]>; /** every type any role of this house prefers: a type another role already prefers is favoured, so the roles that share types (rugs, runners and round rugs; the benches) settle on one */ prefAny: Set<string>; seed: string;
 }
+
+/** how many types a house prefers per role (default one): the roles a house furnishes with several kinds at once */
+const PREFER_N: Record<string, number> = { armchair: 2, 'plant-floor': 4, 'plant-tall': 2, 'plant-surface': 2, 'surface-decor': 3, 'floor-lamp': 2 };
+/** the groups whose pieces come as matched sets and repeat freely (the layout lint's repetition rule exempts the same) */
+const REPEATS = new Set(['rug', 'lamp', 'fitted', 'appliance', 'lighting', 'chair', 'bath', 'hero', 'structure', 'decor', 'textile']);
+
+/** how much a house takes to a type, 0..1: a stable hash of (house, type), the same in every room and every role */
+const affinity = (seed: string, type: string): number => (fnv1a(`${seed}:likes:${type}`) >>> 0) / 4294967296;
 
 // role → the types that can fill it, sorted (built once)
 const ROLE_TYPES = new Map<string, string[]>();
@@ -113,30 +121,41 @@ export class Composer {
   // ---- sizes, types, colours
   size(type: string, params: any = {}) { return sizeOf(type, params) || { w: 0.5, d: 0.5, h: 0.5, ox: 0, oz: 0, y0: 0 }; }
   usageOf(type: string) { return this.house.usage.get(type) || 0; }
-  /** a type for a role: style match × repetition × fit, then a seeded weighted pick (stable order) */
+  /** a type for a role: style match × the house's own picks × repetition × fit, then a seeded weighted pick (stable order) */
   pick(role: string, { program = this.program, fit = null as ((t: string) => boolean) | null, exclude = [] as string[], weights = {} as Record<string, number> } = {}): string | null {
     const tags = this.style.tags, key = this.style.key;
-    const cands = typesFor(role).filter(t => {
-      const p = PLACEMENT[t]; if (exclude.includes(t)) return false;
-      if (p.programs.length && !p.programs.includes(program)) return false;
-      return !fit || fit(t);
-    });
+    // the types the room's program allows, then those that also fit this particular call (its `fit` and `exclude`)
+    const allowed = typesFor(role).filter(t => { const p = PLACEMENT[t]; return !p.programs.length || p.programs.includes(program); });
+    const cands = allowed.filter(t => !exclude.includes(t) && (!fit || fit(t)));
     if (!cands.length) return null;
-    const styleW = (t: string) => { const st = PLACEMENT[t].styles; return !st.length ? 1 : st.includes(key) ? 3 : st.some(s => tags.includes(s)) ? 1.6 : 0.25; };
-    // the house's two preferred types for this role, drawn once from a stream of their own (so they do not depend on
-    // the order rooms ask), then leaned on ×4
-    let pref = this.house.prefer.get(role);
+    const styleW = (t: string) => { const st = PLACEMENT[t].styles; return !st.length ? 0.7 : st.includes(key) ? 3 : st.some(s => tags.includes(s)) ? 1.6 : 0.35; };
+    // the house's own picks for this role — one lamp, one dresser, a couple of plants: a house reads as one scheme and
+    // the next house reaches for others (the fleet's "each home looks very same"). Drawn once per (role, kind of room,
+    // room seed) from the types the room's program allows, on a stream of its own (so they do not depend on the order
+    // rooms ask), weighted by the style and by what the house already prefers for another role; then the only picks.
+    const pk = `${role}:${program}:${this.room.seed ?? ''}`;
+    let pref = this.house.prefer.get(pk);
     if (!pref) {
-      const all = typesFor(role), r = mulberry32(fnv1a(`${this.house.seed}:prefer:${role}`)); pref = [];
-      for (let k = 0; k < 2 && pref.length < all.length; k++) {
-        const pool = all.filter(t => !pref!.includes(t)), ws = pool.map(styleW), sum = ws.reduce((a, b) => a + b, 0); let x = r() * sum;
-        for (let i = 0; i < pool.length; i++) { x -= ws[i]; if (x <= 0) { pref.push(pool[i]); break; } }
+      const r = mulberry32(fnv1a(`${this.house.seed}:prefer:${pk}`)); pref = [];
+      // one type where the role has up to five to choose from, two up to ten, three beyond (armchairs and plants: a room
+      // holds a mix), so no type is in more than about half the houses
+      const n = PREFER_N[role] ?? (allowed.length <= 5 ? 1 : allowed.length <= 10 ? 2 : 3);
+      for (let k = 0; k < n && pref.length < allowed.length; k++) {
+        const pool = allowed.filter(t => !pref!.includes(t)), ws = pool.map(t => styleW(t) * (this.house.prefAny.has(t) ? 20 : 1)), sum = ws.reduce((a, b) => a + b, 0); let x = r() * sum;
+        for (let i = 0; i < pool.length; i++) { x -= ws[i]; if (x <= 0) { pref.push(pool[i]); this.house.prefAny.add(pool[i]); break; } }
       }
-      this.house.prefer.set(role, pref);
+      this.house.prefer.set(pk, pref);
     }
+    const ownOnly = cands.some(t => pref!.includes(t));   // (a `fit` that rules them all out leaves the room its own choice)
     const w = cands.map(t => {
-      const used = this.usageOf(t), onStorey = this.house.storey.get(`${this.lv.id}:${t}`) || 0;
-      return styleW(t) * (pref!.includes(t) ? 4 : 1) * Math.pow(0.6, used) * Math.pow(0.5, onStorey) * (weights[t] ?? 1);
+      // a piece the lint counts (repetition: more than 2 rooms of a storey, more than 5 in a house) fades with use;
+      // rugs, lamps, decor, textiles, fitted units and chairs are matched sets, and repeat freely
+      const repeats = REPEATS.has(PLACEMENT[t].group), used = this.usageOf(t), onStorey = this.house.storey.get(`${this.lv.id}:${t}`) || 0;
+      const fade = repeats ? 1 : Math.pow(0.6, used) * Math.pow(0.5, onStorey);
+      // no pick of the house's is possible here (the call's `fit` rules them out): lean on the types the house likes best
+      // — a stable, house-wide ranking of every type — rather than on chance
+      const own = pref!.includes(t) ? 1 : ownOnly ? 0.02 : (this.house.prefAny.has(t) ? 20 : 1) * (0.03 + affinity(this.house.seed, t) ** 3);
+      return styleW(t) * own * fade * (weights[t] ?? 1);
     });
     const sum = w.reduce((a, b) => a + b, 0); let r = this.rng() * sum;
     for (let i = 0; i < cands.length; i++) { r -= w[i]; if (r <= 0) return cands[i]; }
@@ -425,31 +444,33 @@ export function cornerGroup(c: C, name: string, type: string, params: any = {}, 
 function artOver(c: C, base: CItem, run: Run, { big = false, motif = '' } = {}): CItem | null {
   const t = alongX(run.side) ? base.cx : base.cz;
   const wide = big && base.w >= 1.6 && c.rng() < 0.55;
-  const type = wide ? 'gallery-wall' : (motif ? 'wall-art' : c.pick('art') || 'wall-art');
-  const w = mm(Math.min(wide ? 1.8 : 1.2, Math.max(0.5, base.w * (wide ? 0.75 : 0.55))));
-  const h = mm(wide ? Math.min(1.0, w * 0.55) : Math.min(0.9, w * (0.6 + c.rng() * 0.35)));
+  // a wide piece gets a gallery wall or a triptych (the style's pick), a narrow one a single picture or a hanging
+  const type = wide ? (c.pick('art-wide') && c.rng() < 0.4 ? c.pick('art-wide')! : c.pick('art-large') || 'gallery-wall') : (motif ? c.pick('art', { fit: t => paramsOf(t).includes('motif') }) || 'wall-art' : c.pick('art') || 'wall-art');
+  const tri = type === 'triptych';
+  const w = mm(Math.min(wide ? (tri ? 1.9 : 1.8) : 1.2, Math.max(0.5, base.w * (wide ? 0.75 : 0.55))));
+  const h = mm(wide ? Math.min(tri ? 0.75 : 1.0, w * (tri ? 0.42 : 0.55)) : Math.min(0.9, w * (0.6 + c.rng() * 0.35)));
   const y = mm(Math.max(1.45, base.h + 0.2 + h / 2));
   if (y + h / 2 > (c.lv.height || 2.7) - 0.15) return null;
   const pool = c.style.art, m = motif || pool[Math.floor(c.rng() * pool.length)];
-  const params: any = type === 'wall-art' ? { w, h, motif: m } : type === 'gallery-wall' ? { w, h, motifs: pool.join(',') } : { w: mm(Math.min(w, 0.9)) };
+  const params: any = ['wall-art', 'framed-print', 'canvas-art'].includes(type) ? { w, h, motif: m } : type === 'gallery-wall' ? { w, h, motifs: pool.join(',') } : tri || type === 'plate-set' ? { w, h } : { w: mm(Math.min(w, 0.9)) };
   const it = c.mount(type, run, t, y, params); it.opt = true; return it;
 }
 /** a floor rug: a patterned rug in the style's pattern, or the page's area rug */
 function rug(c: C, cx: number, cz: number, w: number, d: number, rot: number, { round = false, pattern = '' } = {}): CItem {
   const pats = c.style.rugs, pat = pattern || pats[Math.floor(c.rng() * pats.length)];
   // the house's rug family: a patterned rug in its style's pattern, or the plain area / circular / concentric rugs
-  const type = pattern ? 'patterned-rug' : (round ? c.pick('rug-round') : c.pick('rug')) || 'patterned-rug';
+  const type = pattern === 'play' ? c.pick('play-rug') || 'patterned-rug' : pattern ? 'patterned-rug' : (round ? c.pick('rug-round') : c.pick('rug')) || 'patterned-rug';
   let p: any;
   if (type === 'patterned-rug') p = round ? { w: mm(w), shape: 'round', pattern: pat } : { w: mm(w), d: mm(d), pattern: pat };
-  else if (type === 'area-rug') p = { w: mm(w), d: mm(d) };
-  else p = { r: mm(Math.min(w, d) / 2) };
+  else if (paramsOf(type).includes('r')) p = { r: mm(Math.min(w, d) / 2) };
+  else p = { w: mm(w), d: mm(d) };   // area, shag, flatweave and hide rugs are all w × d
   const it = c.item(type, cx, cz, rot, p); it.opt = true; return it;
 }
 /** a lamp or a small thing on a surface item */
 function dressTop(c: C, base: CItem, kinds: string[], lx = 0): CItem[] {
   const out: CItem[] = [];
   for (const k of kinds) {
-    const t = k === 'lamp' ? 'table-lamp' : k === 'plant' ? c.pick('plant-surface') : k === 'decor' ? c.pick('surface-decor') : k;
+    const t = k === 'lamp' ? (c.pick('table-lamp') || 'table-lamp') : k === 'plant' ? c.pick('plant-surface') : k === 'decor' ? c.pick('surface-decor') : k;
     if (!t) continue;
     const s = c.size(t);
     if (s.w > base.w - 0.05) continue;
@@ -541,23 +562,27 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
   const face = (() => { const r = c.runAt(fc.side, fc.t); return r ? r.face : (fc.side === 'N' ? g.b.z : fc.side === 'S' ? g.b.z + g.b.d : fc.side === 'W' ? g.b.x : g.b.x + g.b.w); })();
   const width = lat[1] - lat[0];
   const roomy = depth >= 4.2 && width >= 4.2 && g.area >= 22;
-  let sofa = roomy && big && c.rng() < 0.45 ? c.pick('sofa-l') : null;
-  if (sofa === 'sectional') sofa = 'l-sectional';
+  // a sectional by the room's size: the modular (compact), the L, and in a big room the U (the page's plain `sectional`
+  // builder is left to hand-authored rooms: it has no size or hand)
+  const uRoom = width >= 5.4 && depth >= 5.2 && g.area >= 30;
+  let sofa = roomy && big && c.rng() < 0.5 ? c.pick('sofa-l', { fit: t => t !== 'sectional' && (t !== 'u-sectional' || uRoom) }) : null;
   if (!sofa) sofa = c.pick('sofa', { fit: t => (c.size(t).w <= width - 0.8) });
   if (!sofa) return null;
   const sw = Math.min(sofa === 'loveseat' ? (width >= 3.4 ? 2.0 : 1.6) : c.size(sofa).w, width - 1.0);
   const sParams: any = paramsOf(sofa).includes('w') ? { w: mm(sw) } : {};
-  if (sofa === 'l-sectional') { sParams.w = mm(Math.min(3.0, width - 1.2)); sParams.l = mm(Math.min(1.9, depth - 2.6)); sParams.hand = c.rng() < 0.5 ? 'left' : 'right'; }
+  const isU = sofa === 'u-sectional', isL = PLACEMENT[sofa].roles.includes('sofa-l') && !isU;
+  if (isL || isU) { sParams.w = mm(Math.min(isU ? 3.8 : 3.0, width - 1.2)); sParams.l = mm(Math.min(isU ? 2.0 : 1.9, depth - 2.6)); if (isL) sParams.hand = c.rng() < 0.5 ? 'left' : 'right'; }
   const S = c.size(sofa, sParams);
   const ct = c.pick('coffee-table', { fit: t => c.size(t).w <= S.w - 0.3 }) || 'coffee-table';
   const ctP: any = ct === 'coffee-table' ? { w: mm(Math.min(1.3, S.w * 0.55)), d: 0.6 } : ct === 'ottoman' ? { w: 0.9, d: 0.6 } : {};
   const CT = c.size(ct, ctP);
-  const nChairs = c.density < 0.3 ? 0 : width >= S.w + 2.4 ? (c.density >= 0.6 ? 2 : 1 + (c.rng() < 0.5 ? 1 : 0)) : width >= S.w + 1.3 ? 1 : 0;
+  const nChairs = c.density < 0.3 || isU ? 0 : width >= S.w + 2.4 ? (c.density >= 0.6 ? 2 : 1 + (c.rng() < 0.5 ? 1 : 0)) : width >= S.w + 1.3 ? 1 : 0;
   const chair = nChairs ? c.pick('armchair') : null;
   const turnToward = fc.type === 'fireplace' || fc.type === 'art' ? 1 : -1;
   const chairSides = nChairs === 2 ? [-1, 1] : nChairs === 1 ? [c.rng() < 0.5 ? -1 : 1] : [];
   const facingRot = ROT_OF_WALL[OPPOSITE[fc.side]], lx = turn(1, 0, facingRot), latSign = Math.sign(alongX(fc.side) ? lx[0] : lx[1]) || 1;
-  const chaiseLat = sofa === 'l-sectional' ? (sParams.hand === 'right' ? -1 : 1) * latSign : 0;   // the world lateral side the chaise is on
+  const chaiseLat = isL ? (sParams.hand === 'right' ? -1 : 1) * latSign : 0;   // the world lateral side the chaise is on
+  const chaiseSides = isU ? [-1, 1] : chaiseLat ? [chaiseLat] : [];                // (a U has one at each end)
   const oppFace = (() => { const r = c.runAt(OPPOSITE[fc.side]); return r ? Math.abs(r.face - face) : Infinity; })();   // chairs turn to the sofa (conversation) or to the focus (a screen, a view)
   const lampOn = c.density >= 0.3;
   const Ds: number[] = []; for (let D = 1.6; D <= 3.4 + 1e-6; D += 0.1) Ds.push(mm(D));
@@ -580,14 +605,14 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
       const sofaIt = c.item(sofa, sx, sz, facing, sParams); out.push(sofaIt);
       const frontN = p.D;   // the sofa's front edge, measured from the focus wall's face
       const ctN = frontN - 0.45 - CT.d / 2;
-      if (ctN - CT.d / 2 > 0.6) { const [x, z] = at(ctN, p.o - chaiseLat * 0.35); const ci = c.item(ct, x, z, facing, ctP); ci.opt = sofa === 'l-sectional'; out.push(ci); }
+      if (ctN - CT.d / 2 > 0.6) { const [x, z] = at(ctN, p.o - chaiseLat * 0.35); const ci = c.item(ct, x, z, facing, ctP); ci.opt = isL || isU; out.push(ci); }
       // the rug: under the sofa's front legs, out past the table
       const rd = Math.max(1.6, Math.min(3.0, frontN - 0.3 + 0.35)), rw = Math.max(2.0, Math.min(S.w + 0.6, width - 0.6));
       const [rx, rz] = at(frontN + 0.35 - rd / 2, p.o), r = rug(c, rx, rz, alongX(fc.side) ? rw : rd, alongX(fc.side) ? rd : rw, 0);
       out.push(r);
       // chairs flanking the table, turned 35–45° toward the sofa (a hearth, art) or the focus (a screen, a view)
       if (chair) for (const s2 of chairSides) {
-        if (s2 === chaiseLat) continue;
+        if (chaiseSides.includes(s2)) continue;
         const CH = c.size(chair), L = p.o + s2 * (Math.max(CT.w, S.w * 0.6) / 2 + 0.35 + CH.w / 2), N = Math.max(0.9, ctN);
         const [x, z] = at(N, L);
         const inw: [number, number] = alongX(fc.side) ? [-s2, 0] : [0, -s2], ang = (35 + c.rng() * 10) * DEG, tw = turnToward > 0 ? 1 : -1;
@@ -596,7 +621,7 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
       }
       // side tables and their lamps at the sofa's ends (not at a chaise)
       for (const s2 of [-1, 1]) {
-        if (s2 === chaiseLat) continue;
+        if (chaiseSides.includes(s2)) continue;
         const st = c.density >= 0.35 || s2 < 0 ? (c.pick('side-table') || 'side-table') : null; if (!st) continue;
         const ST = c.size(st), [x, z] = at(p.D + S.d - ST.d / 2 - 0.05, p.o + s2 * (S.w / 2 + 0.06 + ST.w / 2));
         const si = c.item(st, x, z, facing); si.opt = true; out.push(si);
@@ -657,7 +682,7 @@ function diningGroup(c: C, region: { x0: number; z0: number; x1: number; z1: num
         if (hung === 'chandelier' || isRound || L < 1.8) { const hl = c.item(hung, p.x, p.z, rot, hung === 'chandelier' ? { w: mm(Math.min(0.9, L * 0.45)), drop: 0.8 } : { drop: 0.85 }, { layer: 'ceiling', opt: true }); out.push(hl); }
         else for (const s of [-1, 1]) { const [dx, dz] = turn(s * L / 4, 0, rot); out.push(c.item('pendant-lamp', p.x + dx, p.z + dz, rot, { drop: 0.85 }, { layer: 'ceiling', opt: true })); }
       }
-      out.push(c.on(c.rng() < 0.5 ? 'vase' : 'fruit-bowl', t, 0, 0));
+      { const dt = c.pick(c.rng() < 0.5 ? 'surface-decor' : 'surface-decor-kitchen'); if (dt) out.push(c.on(dt, t, 0, 0)); }
       return out;
     },
     score: (p, items) => {
@@ -716,7 +741,7 @@ function bedGroup(c: C, attempt = 0): Group | null {
         const [dx, dz] = turn(s * (S.w / 2 + 0.04 + NS.w / 2), -S.d / 2 + NS.d / 2 + 0.02, bed.rot);
         const n1 = c.item(ns, bed.cx + dx, bed.cz + dz, bed.rot); n1.opt = true; out.push(n1);
         if (sconces) { const tt = alongX(headRun.side) ? n1.cx : n1.cz; const sc = c.mount('wall-sconce', headRun, tt, 1.2); sc.opt = true; out.push(sc); }
-        else out.push(c.on(kid ? (c.rng() < 0.5 ? 'desk-lamp' : 'table-lamp') : 'table-lamp', n1, 0, -0.03));
+        else out.push(c.on(kid && c.rng() < 0.5 ? 'desk-lamp' : (c.pick('table-lamp') || 'table-lamp'), n1, 0, -0.03));
         if (!double) break;
       }
       // art over the bed; a kid's room gets a story picture
@@ -757,8 +782,8 @@ function deskGroup(c: C, { kid = false } = {}): Group | null {
     build: p => {
       const d = c.onWall(type, p.run, p.t, params), out = [d];
       if (chair) { const [dx, dz] = turn(0, S.d / 2 + 0.18, d.rot); const ch = c.item(chair, d.cx + dx, d.cz + dz, mm(d.rot + 180)); out.push(ch); d.access = [[d.cx + dx * 2.2, d.cz + dz * 2.2]]; }
-      out.push(c.on(kid ? 'desk-lamp' : (c.rng() < 0.6 ? 'desk-lamp' : 'table-lamp'), d, S.w / 2 - 0.2, -0.1));
-      if (!kid) out.push(c.on(c.rng() < 0.5 ? 'laptop' : 'book-stack', d, -0.1, 0));
+      out.push(c.on(kid || c.rng() < 0.6 ? 'desk-lamp' : (c.pick('table-lamp') || 'table-lamp'), d, S.w / 2 - 0.2, -0.1));
+      if (!kid) out.push(c.on(c.rng() < 0.5 ? 'laptop' : (c.pick('surface-decor') || 'book-stack'), d, -0.1, 0));
       const a = c.rng() < 0.5 ? artOver(c, d, p.run, {}) : null; if (a) out.push(a);
       return out;
     },
@@ -817,7 +842,7 @@ function readingCorner(c: C): Group | null {
 /** a run of 2–4 matching tall bookcases side by side on one wall, the library's wall of books (never in front of a
  *  window: a bookcase is tall) */
 function bookcaseRun(c: C, most = 4): Group | null {
-  const tall = c.style.tags.some(t => ['modern', 'industrial', 'scandi'].includes(t)) && c.rng() < 0.4 ? 'open-shelving' : 'bookshelf';
+  const tall = c.pick('bookcase', { fit: t => c.size(t).h >= 1.6 }) || 'bookshelf';
   const unit = c.size(tall), cands: Pose[] = [];
   for (let n = most; n >= 2; n--) for (const p of c.wallPoses(unit.w * n + 0.02 * (n - 1))) cands.push({ ...p, key: `${n}:${p.key}`, n });
   return {
@@ -830,6 +855,7 @@ function bookcaseRun(c: C, most = 4): Group | null {
 function runnerGroup(c: C): Group | null {
   const g = c.geo, along = g.b.w >= g.b.d, L = (along ? g.b.w : g.b.d) - 0.8, wid = Math.min(1.0, (along ? g.b.d : g.b.w) - 0.6);
   if (L < 1.2 || wid < 0.6) return null;
+  const type = c.pick('runner') || 'runner-rug';
   const [mx, mz] = c.mid(), cands: Pose[] = [];
   // runners of a few lengths slid along the hall and a little across it, so a stair or a pinned console can be avoided
   for (const len of [3.0, 2.4, 1.8, 1.4]) {
@@ -838,7 +864,7 @@ function runnerGroup(c: C): Group | null {
   }
   return {
     name: 'runner', gid: 0, movable: false, cands,
-    build: p => [c.item('runner-rug', along ? mx + p.o : mx + p.q, along ? mz + p.q : mz + p.o, along ? 90 : 0, { w: mm(wid), d: mm(p.len) })],
+    build: p => [c.item(type, along ? mx + p.o : mx + p.q, along ? mz + p.q : mz + p.o, along ? 90 : 0, type === 'patterned-rug' ? { w: mm(wid), d: mm(p.len), pattern: ['stripe', 'kilim', 'border', 'check'].find(n => c.style.rugs.includes(n)) || 'stripe' } : { w: mm(wid), d: mm(p.len) })],
     score: p => p.len - Math.abs(p.o) * 0.3 - Math.abs(p.q),
   };
 }
@@ -903,7 +929,7 @@ function program(c: C): Array<(attempt: number) => Group | null> {
     case 'bath': case 'ensuite': case 'powder': return bathGroups(c);
     case 'foyer': return [() => storageGroup(c, 'console', { prefer: (p) => (c.mainPortal() && p.run.side !== c.mainPortal()!.side ? 0.5 : 0) }), () => runnerGroup(c), () => (g.area >= 4 ? storageGroup(c, c.rng() < 0.5 ? 'bench' : 'coat-rack', { dress: false }) : null), () => (d >= 0.4 ? plantGroup(c) : null)];
     case 'hall': return [() => runnerGroup(c), () => (Math.min(g.b.w, g.b.d) >= 1.7 ? storageGroup(c, 'console') : null), () => (d >= 0.5 && Math.min(g.b.w, g.b.d) >= 1.5 ? plantGroup(c, 'plant-small') : null)];
-    case 'laundry': return [() => wallGroup(c, 'washer', 'washing-machine', {}), () => wallGroup(c, 'dryer', 'dryer', {}), () => storageGroup(c, 'tall-storage', { dress: false }), () => cornerGroup(c, 'hamper', 'laundry-basket'), () => storageGroup(c, 'hooks', { dress: false })];
+    case 'laundry': return [() => wallGroup(c, 'washer', 'washing-machine', {}), () => wallGroup(c, 'dryer', 'dryer', {}), () => storageGroup(c, 'tall-storage', { dress: false }), () => cornerGroup(c, 'hamper', c.pick('hamper') || 'laundry-basket'), () => storageGroup(c, 'hooks', { dress: false })];
     case 'garage': return [() => wallGroup(c, 'workbench', 'workbench', {}), () => storageGroup(c, 'shelving', { dress: false }), () => cornerGroup(c, 'bike', 'bicycle')];
     case 'gym': return [() => freeGroup(c, 'exercise-bike'), () => freeGroup(c, 'weight-bench'), () => freeGroup(c, 'yoga-mat'), () => plantGroup(c)];
     case 'bar': return [() => storageGroup(c, c.rng() < 0.5 ? 'bar-cart' : 'wine', { dress: false }), () => freeGroup(c, 'bar-table'), () => storageGroup(c, 'sideboard'), () => plantGroup(c)];
@@ -999,7 +1025,7 @@ const cache = new WeakMap<any, { byRoom: Map<any, ComposeResult> }>();
  */
 export function composeHouse(spec: any, opts: { program?: (room: any, lv: any) => string | null } = {}): Map<any, ComposeResult> {
   const hit = !opts.program && cache.get(spec); if (hit) return hit.byRoom;
-  const house: HouseState = { usage: new Map(), storey: new Map(), palettes: [], styleOf: room => styleOf(spec, room), prefer: new Map(), seed: String(spec.id) };
+  const house: HouseState = { usage: new Map(), storey: new Map(), palettes: [], styleOf: room => styleOf(spec, room), prefer: new Map(), prefAny: new Set(), seed: String(spec.id) };
   const byRoom = new Map<any, ComposeResult>(), composed = new Map<any, any[]>();
   // every authored type counts as used, so the composer reaches for something else
   for (const lv of spec.levels || []) for (const r of lv.rooms || []) for (const it of r.items || []) { house.usage.set(it.type, (house.usage.get(it.type) || 0) + 1); const k = `${lv.id}:${it.type}`; house.storey.set(k, (house.storey.get(k) || 0) + 1); }
@@ -1010,6 +1036,8 @@ export function composeHouse(spec: any, opts: { program?: (room: any, lv: any) =
     const res = composeRoom(spec, lv, r, house, composed);
     byRoom.set(room, res); composed.set(room, res.items);
   });
+  // the house-wide state (its preferred types per role, its usage counts), for the tools and tests to look at
+  Object.defineProperty(byRoom, 'house', { value: house });
   if (!opts.program) cache.set(spec, { byRoom });
   return byRoom;
 }

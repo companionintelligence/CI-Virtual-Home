@@ -13,8 +13,8 @@
 //
 // Owner: S3 (compose).
 
-export const RUG_PATTERNS = ['solid', 'border', 'stripe', 'check', 'diamond', 'kilim', 'medallion', 'dots', 'abstract', 'play'] as const;
-export const ART_MOTIFS = ['abstract', 'geometric', 'line', 'landscape', 'botanical', 'seascape', 'sunset', 'sunburst', 'map', 'animal', 'story-moon', 'story-whale', 'story-balloon'] as const;
+export const RUG_PATTERNS = ['solid', 'border', 'stripe', 'check', 'diamond', 'kilim', 'medallion', 'dots', 'abstract', 'play', 'shag', 'jute', 'flatweave', 'hide'] as const;
+export const ART_MOTIFS = ['abstract', 'geometric', 'line', 'landscape', 'botanical', 'seascape', 'sunset', 'sunburst', 'map', 'animal', 'story-moon', 'story-whale', 'story-balloon', 'mountains', 'floral', 'arches', 'colourfield', 'skyline', 'lemons'] as const;
 
 type RGB = [number, number, number];
 const rgb = (c: number): RGB => [(c >> 16) & 255, (c >> 8) & 255, c & 255];
@@ -30,6 +30,13 @@ const inTri = (u: number, v: number, a: number[], b: number[], c: number[]) => {
   return !((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0));
 };
 const segDist = (u: number, v: number, x0: number, y0: number, x1: number, y1: number) => { const dx = x1 - x0, dy = y1 - y0, l = dx * dx + dy * dy || 1e-9, t = Math.max(0, Math.min(1, ((u - x0) * dx + (v - y0) * dy) / l)); return Math.hypot(u - x0 - dx * t, v - y0 - dy * t); };
+
+// smooth value noise over the integer lattice (the cowhide's patches)
+const vnoise = (x: number, y: number, seed = 0) => {
+  const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, sx = fx * fx * (3 - 2 * fx), sy = fy * fy * (3 - 2 * fy);
+  const a = hash(xi, yi, seed), b = hash(xi + 1, yi, seed), c = hash(xi, yi + 1, seed), d = hash(xi + 1, yi + 1, seed);
+  return a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy;
+};
 
 type Painter = (u: number, v: number, a: number) => RGB;   // a: the piece's aspect (w / d or w / h)
 
@@ -81,6 +88,27 @@ function rugPainter(name: string, [base, c1, c2, c3]: RGB[]): Painter {
       const cx = Math.floor((x - a * 0.35) / 0.14), cy = Math.floor((v - 0.35) / 0.14);
       if (cx >= 0 && cx < 2 && cy >= 0 && cy < 3) return [c1, c2, c3][(cx + cy) % 3];
       return base;
+    };
+    case 'shag': return (u, v, a) => {   // a deep pile: fine speckle in two tones
+      const h = hash(Math.floor(u * a * 48), Math.floor(v * 48), 11);
+      return h < 0.18 ? shade(base, -0.14) : h > 0.86 ? shade(base, 0.12) : h > 0.7 ? lerp(base, c1, 0.12) : base;
+    };
+    case 'jute': return (u, v, a) => {   // a chunky basket weave: blocks of strands, alternately across and along
+      const x = u * a * 12, y = v * 12, i = Math.floor(x), j = Math.floor(y), fx = frac(x), fy = frac(y), across = (i + j) % 2 === 0;
+      const t = across ? fy : fx, ridge = 1 - Math.abs(t * 4 % 1 - 0.5) * 0.5;   // four strands a block
+      const gap = Math.min(fx, fy, 1 - fx, 1 - fy) < 0.04;
+      return gap ? shade(base, -0.4) : shade(base, (ridge - 0.85) * 0.5 + (across ? 0.03 : -0.03));
+    };
+    case 'flatweave': return (u, v, a) => {   // a flat-woven dhurrie: fine warp and weft, a banded border and two centre bands
+      const e = Math.min(u * a, (1 - u) * a, v, 1 - v);
+      if (e < 0.05) return c1; if (e > 0.06 && e < 0.075) return c2;
+      if (Math.abs(v - 0.5) < 0.05 && e > 0.1) return c2; if (Math.abs(v - 0.5) > 0.09 && Math.abs(v - 0.5) < 0.1 && e > 0.1) return c1;
+      const warp = frac(u * a * 40) < 0.5 ? 0.03 : -0.03, weft = frac(v * 40) < 0.5 ? 0.02 : -0.02;
+      return shade(base, warp + weft);
+    };
+    case 'hide': return (u, v, a) => {   // a cowhide: cream with big dark patches
+      const n = vnoise(u * a * 3.2 + 4, v * 3.2 + 9, 5) * 0.65 + vnoise(u * a * 7, v * 7, 6) * 0.35;
+      return n > 0.6 ? shade(c3, -0.62) : n > 0.57 ? shade(c3, -0.3) : shade(base, 0.08);
     };
     default: return () => base;   // solid
   }
@@ -164,6 +192,45 @@ function artPainter(name: string, [bg, c1, c2, c3]: RGB[]): Painter {
       if (Math.abs(u - 0.5) < 0.05 && v > 0.52 && v < 0.6) return shade(c2, -0.4);
       if ((Math.abs(u - 0.43 - (v - 0.45) * 0.3) < 0.006 || Math.abs(u - 0.57 + (v - 0.45) * 0.3) < 0.006) && v > 0.45 && v < 0.53) return shade(c2, -0.4);
       return shade(c3, 0.55);
+    };
+    case 'mountains': return (u, v) => {   // three ranges under a sun, hazing toward the sky
+      const ridge = (k: number, f: number, o: number) => 0.42 + k * 0.12 + 0.09 * Math.sin(u * f + o) + 0.04 * Math.sin(u * f * 2.3 + o * 1.7);
+      if (v > ridge(2, 5, 4)) return shade(c1, -0.25);
+      if (v > ridge(1, 6, 2)) return shade(c1, -0.05);
+      if (v > ridge(0, 7, 0)) return shade(c1, 0.25);
+      if (Math.hypot(u - 0.7, v - 0.22) < 0.08) return shade(c2, 0.5);
+      return sky(v);
+    };
+    case 'floral': return (u, v, a) => {   // one big bloom on its stem
+      const x = (u - 0.5) * a, y = v - 0.4, r = Math.hypot(x, y) / 0.3, t = Math.atan2(y, x);
+      if (r < 0.28) return shade(c2, -0.1);
+      if (r < 0.55 + 0.4 * Math.abs(Math.cos(2.5 * t))) return c1;
+      if (Math.abs(u - 0.5) < 0.012 && v > 0.55) return shade(c3, -0.3);
+      if (inEllipse(u, v, 0.4, 0.78, 0.09, 0.035) || inEllipse(u, v, 0.6, 0.68, 0.09, 0.035)) return shade(c3, -0.1);
+      return bg;
+    };
+    case 'arches': return (u, v, a) => {   // nested arches in warm colours (a boho pair)
+      const x = (u - 0.5) * a, y = v;
+      const inArch = (w: number) => y < 0.9 && (y >= 0.48 ? Math.abs(x) < w : Math.hypot(x, 0.48 - y) < w);
+      if (inArch(0.34)) return inArch(0.25) ? (inArch(0.16) ? c3 : c2) : c1;
+      return bg;
+    };
+    case 'colourfield': return (u, v) => {   // two soft rectangles of colour on a ground
+      const soft = (x: number, y: number, x0: number, y0: number, x1: number, y1: number) => x > x0 && x < x1 && y > y0 && y < y1;
+      if (soft(u, v, 0.1, 0.1, 0.9, 0.46)) return c1;
+      if (soft(u, v, 0.1, 0.52, 0.9, 0.9)) return c2;
+      return bg;
+    };
+    case 'skyline': return (u, v) => {   // a city skyline, windows lit
+      const i = Math.floor(u * 9), top = 0.3 + hash(i, 3, 2) * 0.4;
+      if (v > top && frac(u * 9) > 0.08) { const win = frac(u * 9 * 4) > 0.3 && frac((v - top) * 12) > 0.4; return win ? [246, 226, 150] : shade(c1, -0.35 + hash(i, 5, 1) * 0.25); }
+      return sky(v);
+    };
+    case 'lemons': return (u, v) => {   // a still life: lemons and a leaf on a ledge
+      if (v > 0.72) return shade(c2, -0.1);
+      if (inEllipse(u, v, 0.4, 0.62, 0.12, 0.09) || inEllipse(u, v, 0.58, 0.64, 0.11, 0.085)) return [232, 200, 70];
+      if (inEllipse(u, v, 0.5, 0.5, 0.06, 0.02) && u > 0.45) return shade(c3, -0.2);
+      return bg;
     };
     default: return (u, v, a) => {   // abstract: overlapping discs and a bar
       const x = u * a;

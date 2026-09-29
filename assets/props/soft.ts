@@ -346,5 +346,288 @@ registerProps({
     },
     iso: [{ shape: 'box', box: [-0.8, 1.05, 0, 0.8, 1.95, 0.04], color: 'role:metal' }],
   },
+
+  // ---- more of the small things on a surface (plan S3: the fleet's 84 vases were one type) ---------------------------------
+  // Ceramic bowl — a wide low bowl, glazed in the accent (or it.color), empty.
+  'ceramic-bowl': {
+    footprint: [0.32, 0.32], height: 0.1, surface: true, params: ['color', 'r'], tags: ['living', 'dining', 'kitchen', 'hall'],
+    create(it, { THREE, std, group, colors, hex }) {
+      const r = it.r || 0.16, k = r / 0.16, g = group('Ceramic Bowl'), V = (x, y) => new THREE.Vector2(x * k, y);
+      const glaze = std(it.color ? hex(it.color) : colors.accent, { roughness: 0.3, side: THREE.DoubleSide });
+      const m = new THREE.Mesh(new THREE.LatheGeometry([V(0, 0), V(0.07, 0), V(0.1, 0.03), V(0.15, 0.08), V(0.16, 0.1), V(0.15, 0.1), V(0.14, 0.09), V(0.09, 0.045), V(0, 0.04)], 28), glaze);
+      m.castShadow = true; m.receiveShadow = true; g.add(m); return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.16, 0, -0.16, 0.16, 0.1, 0.16], color: 'role:accent' }],
+  },
+  // Sculpture — a stack of three pebbles, or a ring on a plinth, in stone tones (modern, industrial, mid-century).
+  'sculpture': {
+    footprint: [0.22, 0.22], height: 0.36, surface: true, params: ['color'], tags: ['living', 'study', 'hall', 'office'],
+    create(it, { THREE, std, box, group, colors, hex, mix, rng }) {
+      const g = group('Sculpture'), stone = it.color ? hex(it.color) : mix(colors.fabric2, 0xffffff, 0.25), dark = mix(colors.wood, 0x000000, 0.2);
+      g.add(box(0.16, 0.03, 0.16, std(dark, { roughness: 0.5 }), 0, 0.015, 0));
+      if (rng() < 0.5) {
+        for (const [r, y, sx, x] of [[0.08, 0.1, 1.15, 0], [0.06, 0.2, 1, 0.012], [0.04, 0.27, 0.9, -0.006]] as number[][]) {
+          const m = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 10), std(stone, { roughness: 0.75 })); m.scale.set(sx, 0.78, 1); m.position.set(x, y, 0); m.castShadow = true; g.add(m);
+        }
+      } else {
+        const m = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.022, 10, 26), std(colors.metal, { metalness: 0.8, roughness: 0.3 })); m.position.set(0, 0.145, 0); m.castShadow = true; g.add(m);
+        g.add(box(0.03, 0.09, 0.03, std(dark, { roughness: 0.5 }), 0, 0.075, 0));
+      }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.08, 0, -0.08, 0.08, 0.03, 0.08], color: 'role:wood' }, { shape: 'blob', box: [-0.09, 0.03, -0.09, 0.09, 0.32, 0.09], color: 'role:fabric2' }],
+  },
+  // Candelabra — a brass stem with three arms and tapers (traditional, mediterranean, cottage).
+  'candelabra': {
+    footprint: [0.32, 0.1], height: 0.36, surface: true, params: ['color'], tags: ['living', 'dining', 'hall'],
+    create(it, { THREE, std, group, colors, hex }) {
+      const g = group('Candelabra'), brass = std(colors.metal, { metalness: 0.8, roughness: 0.3 }), wax = std(it.color ? hex(it.color) : colors.linen, { roughness: 0.85 });
+      const disc = (rt, rb, h, mat, x, y, z) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, 14), mat); m.position.set(x, y, z); m.castShadow = true; g.add(m); };
+      disc(0.05, 0.06, 0.02, brass, 0, 0.01, 0); disc(0.012, 0.018, 0.16, brass, 0, 0.1, 0);
+      for (const s of [-1, 0, 1]) {
+        const x = s * 0.13, top = s ? 0.19 : 0.25, h = s ? 0.15 : 0.2;
+        if (s) { const a = new THREE.Vector3(0, 0.12, 0), b = new THREE.Vector3(x, top - 0.02, 0), d = b.clone().sub(a); const m = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, d.length(), 6), brass); m.position.copy(a).add(b).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); g.add(m); }
+        disc(0.02, 0.014, 0.015, brass, x, top - 0.01, 0); disc(0.011, 0.011, h, wax, x, top + h / 2 - 0.005, 0);
+      }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.15, 0, -0.05, 0.15, 0.3, 0.05], color: 'role:metal' }],
+  },
+  // Flower jug — an enamelled jug with wildflowers (cottage, farmhouse, tropical).
+  'flower-jug': {
+    footprint: [0.26, 0.2], height: 0.42, surface: true, params: ['color', 'h'], tags: ['living', 'dining', 'kitchen', 'bedroom'],
+    create(it, { THREE, std, group, colors, hex, rng }) {
+      const g = group('Flower Jug'), V = (x, y) => new THREE.Vector2(x, y);
+      const enamel = std(it.color ? hex(it.color) : colors.accent, { roughness: 0.35 });
+      const jug = new THREE.Mesh(new THREE.LatheGeometry([V(0, 0), V(0.06, 0), V(0.085, 0.05), V(0.09, 0.1), V(0.07, 0.16), V(0.06, 0.2), V(0.075, 0.22)], 18), enamel); jug.castShadow = true; g.add(jug);
+      const handle = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.008, 6, 14, Math.PI), enamel); handle.rotation.z = -Math.PI / 2; handle.position.set(0.085, 0.12, 0); g.add(handle);
+      const stem = std(0x4d7c3a, { roughness: 0.9 }), leaf = std(pick(rng, GREENS), { roughness: 0.8, flatShading: true });
+      const PETALS = [0xf9a8d4, 0xfde68a, 0xffffff, 0xc4b5fd, 0xfdba74];
+      const n = 5 + Math.floor(rng() * 3), a0 = rng() * Math.PI * 2;
+      for (let i = 0; i < n; i++) {
+        const a = a0 + i * 2.4, lean = 0.1 + rng() * 0.32, len = 0.14 + rng() * 0.1, sx = Math.sin(a) * lean, sz = Math.cos(a) * lean;
+        const s = group('Stem'); s.position.set(0, 0.2, 0); s.rotation.set(sz, 0, -sx); g.add(s);
+        s.add(strut(THREE, [0, 0, 0], [0, len, 0], 0.003, stem, 5));
+        const hd = new THREE.Mesh(new THREE.SphereGeometry(0.026 + rng() * 0.012, 8, 6), std(pick(rng, PETALS), { roughness: 0.7, flatShading: true })); hd.position.y = len; hd.scale.y = 0.7; hd.castShadow = true; s.add(hd);
+        const lf = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 4), leaf); lf.scale.set(0.5, 0.15, 1.6); lf.position.y = len * 0.45; lf.rotation.y = a; s.add(lf);
+      }
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.09, 0, -0.09, 0.09, 0.22, 0.09], color: 'role:accent' }, { shape: 'blob', box: [-0.15, 0.22, -0.15, 0.15, 0.4, 0.15], color: '#f9a8d4' }],
+  },
+  // Terrarium — a glazed geometric case round three succulents on pebbles (modern, scandi, industrial).
+  'terrarium': {
+    footprint: [0.24, 0.24], height: 0.3, surface: true, params: ['color'], tags: ['living', 'study', 'kitchen', 'office'],
+    create(it, { THREE, std, box, group, colors, hex, rng }) {
+      const g = group('Terrarium'), frame = std(it.color ? hex(it.color) : colors.metal, { metalness: 0.7, roughness: 0.35 });
+      const glass = std(0xdbeafe, { transparent: true, opacity: 0.16, roughness: 0.05, metalness: 0 });
+      const s = 0.2, h = 0.24;
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) g.add(box(0.008, h, 0.008, frame, sx * s / 2, h / 2 + 0.02, sz * s / 2));
+      for (const y of [0.02, h + 0.02]) for (const [w, d, x, z] of [[s, 0.008, 0, -s / 2], [s, 0.008, 0, s / 2], [0.008, s, -s / 2, 0], [0.008, s, s / 2, 0]] as number[][]) g.add(box(w, 0.008, d, frame, x, y, z));
+      const panes = box(s, h, s, glass, 0, h / 2 + 0.02, 0, false); panes.receiveShadow = false; g.add(panes);
+      g.add(box(s - 0.01, 0.03, s - 0.01, std(0xd6d3d1, { roughness: 1 }), 0, 0.035, 0));
+      const leaf = std(pick(rng, [0x6a994e, 0x7fa66a, 0x588157]), { roughness: 0.6, flatShading: true });
+      for (const [x, z, r] of [[-0.04, -0.03, 0.045], [0.045, 0.02, 0.038], [-0.02, 0.05, 0.03]] as number[][]) {
+        const m = new THREE.Mesh(new THREE.IcosahedronGeometry(r, 1), leaf); m.scale.y = 0.8; m.position.set(x, 0.05 + r * 0.7, z); m.castShadow = true; g.add(m);
+      }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.1, 0, -0.1, 0.1, 0.26, 0.1], color: '#dbeafe' }, { shape: 'blob', box: [-0.08, 0.04, -0.08, 0.08, 0.13, 0.08], color: '#6a994e' }],
+  },
+  // Table clock — an arched wooden mantel clock, a white dial and brass hands.
+  'table-clock': {
+    footprint: [0.2, 0.09], height: 0.26, surface: true, params: ['color'], tags: ['living', 'study', 'bedroom', 'hall'],
+    create(it, { THREE, std, box, group, colors, hex }) {
+      const g = group('Table Clock'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.45 });
+      g.add(box(0.2, 0.015, 0.09, wood, 0, 0.0075, 0));
+      g.add(box(0.17, 0.13, 0.08, wood, 0, 0.08, 0));
+      const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.08, 20, 1, false, Math.PI / 2, Math.PI), wood); cap.rotation.x = Math.PI / 2; cap.position.set(0, 0.145, 0); cap.castShadow = true; g.add(cap);
+      const dial = new THREE.Mesh(new THREE.CylinderGeometry(0.068, 0.068, 0.006, 24), std(0xf1efe8, { roughness: 0.6 })); dial.rotation.x = Math.PI / 2; dial.position.set(0, 0.145, 0.041); g.add(dial);
+      const hand = std(colors.metal, { metalness: 0.6, roughness: 0.4 });
+      g.add(box(0.005, 0.05, 0.004, hand, 0, 0.17, 0.046)); const h2 = box(0.004, 0.035, 0.004, hand, 0.014, 0.14, 0.046); h2.rotation.z = -1.0; g.add(h2);
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.1, 0, -0.045, 0.1, 0.16, 0.045], color: 'role:wood' }, { shape: 'cyl', box: [-0.085, 0.08, -0.04, 0.085, 0.23, 0.04], color: 'role:wood' }],
+  },
+  // Desk globe — a globe tilted in a brass meridian ring on a round foot (study, library, traditional).
+  'desk-globe': {
+    footprint: [0.3, 0.3], height: 0.38, surface: true, params: ['color'], tags: ['study', 'living', 'office'],
+    create(it, { THREE, std, group, colors, hex }) {
+      const g = group('Desk Globe'), brass = std(colors.metal, { metalness: 0.8, roughness: 0.3 });
+      const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.085, 0.025, 20), std(colors.wood, { roughness: 0.5 })); foot.position.y = 0.0125; g.add(foot);
+      const axis = group('Tilted'); axis.position.set(0, 0.2, 0); axis.rotation.z = 0.41; g.add(axis);
+      const ocean = std(it.color ? hex(it.color) : 0x3f6f8f, { roughness: 0.5 }), land = std(0xb9a878, { roughness: 0.7 });
+      axis.add(new THREE.Mesh(new THREE.SphereGeometry(0.13, 24, 16), ocean));
+      for (const [ps, pl, ts, tl] of [[0.3, 1.5, 0.9, 0.9], [2.4, 1.3, 0.5, 1.0], [4.2, 1.6, 1.3, 0.8]]) { const c = new THREE.Mesh(new THREE.SphereGeometry(0.1315, 12, 8, ps, pl, ts, tl), land); axis.add(c); }
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.145, 0.006, 6, 30), brass); ring.rotation.y = Math.PI / 2; axis.add(ring);
+      for (const s of [-1, 1]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.02, 8), brass); p.position.y = s * 0.15; axis.add(p); }
+      const post = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.18, 8), brass); post.position.set(0.02, 0.1, 0); post.rotation.z = -0.1; g.add(post);
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.085, 0, -0.085, 0.085, 0.03, 0.085], color: 'role:wood' }, { shape: 'blob', box: [-0.14, 0.07, -0.14, 0.14, 0.34, 0.14], color: '#3f6f8f' }],
+  },
+
+  // ---- more art (the motif library is in patterns.ts) ---------------------------------------------------------------------
+  // Arch mirror — a tall arched wall mirror in a slim frame (bedroom, hall, bath). w × h, `y` the centre's mount height.
+  'arch-mirror': {
+    footprint: [0.7, 0.05], height: 1.3, params: ['w', 'h', 'y', 'color'], tags: ['hall', 'bedroom', 'bathroom', 'living'],
+    create(it, { THREE, std, group, colors, hex }) {
+      const w = it.w || 0.7, h = it.h || 1.3, cy = it.y !== undefined ? 0 : 1.5, g = group('Arch Mirror');
+      const shapeOf = (ww: number, hh: number) => { const sh = new THREE.Shape(), r = ww / 2, yb = -hh / 2, yc = hh / 2 - r; sh.moveTo(-r, yb); sh.lineTo(r, yb); sh.lineTo(r, yc); sh.absarc(0, yc, r, 0, Math.PI, false); sh.lineTo(-r, yb); return sh; };
+      const frame = new THREE.Mesh(new THREE.ExtrudeGeometry(shapeOf(w, h), { depth: 0.035, bevelEnabled: false, curveSegments: 20 }), std(it.color ? hex(it.color) : colors.metal, { metalness: 0.6, roughness: 0.4 }));
+      frame.position.set(0, cy, 0); frame.castShadow = true; g.add(frame);
+      const glass = new THREE.Mesh(new THREE.ExtrudeGeometry(shapeOf(w - 0.05, h - 0.05), { depth: 0.006, bevelEnabled: false, curveSegments: 20 }), std(0xd4e4f0, { metalness: 1, roughness: 0.04 }));
+      glass.position.set(0, cy, 0.036); g.add(glass);
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.35, 0.85, 0, 0.35, 2.15, 0.04], color: 'role:metal' }, { shape: 'box', box: [-0.31, 0.89, 0.03, 0.31, 2.1, 0.045], color: '#dbeafe' }],
+  },
+  // Triptych — three tall canvases hung as one, each its own motif (living, bedroom, dining). w is the whole width.
+  'triptych': {
+    footprint: [1.5, 0.04], height: 0.7, params: ['w', 'h', 'y', 'motif', 'frame'], tags: ['living', 'bedroom', 'dining', 'hall'],
+    create(it, { THREE, std, box, group, colors, hex, mix, rng }) {
+      const W = it.w || 1.5, H = it.h || 0.7, cy = it.y !== undefined ? 0 : 1.5, g = group('Triptych');
+      const gap = 0.03, pw = (W - 2 * gap) / 3, frame = std(it.frame ? hex(it.frame) : colors.wood, { roughness: 0.5 });
+      const bg = mix(colors.fabric2, 0xffffff, 0.62);
+      const start = Math.floor(rng() * ART_MOTIFS.length), same = typeof it.motif === 'string' && ART_MOTIFS.includes(it.motif);
+      for (let i = 0; i < 3; i++) {
+        const x = -W / 2 + pw / 2 + i * (pw + gap), motif = same ? it.motif : ART_MOTIFS[(start + i * 3) % ART_MOTIFS.length];
+        g.add(box(pw, H, 0.035, frame, x, cy, 0.0175));
+        g.add(box(pw - 0.04, H - 0.04, 0.01, std(0xffffff, { roughness: 0.9, map: motifTexture(THREE, motif, [bg, colors.accent, colors.fabric, colors.fabric2], { w: pw - 0.04, h: H - 0.04 }) }), x, cy, 0.038));
+      }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.75, 1.15, 0, 0.75, 1.85, 0.04], color: 'role:wood' }],
+  },
+
+  // ---- more rugs (patterned-rug takes the pattern; these have shapes and piles of their own) ---------------------------------
+  // Shag rug — a deep pile, a soft rounded edge (modern, scandi, mid-century). w × d.
+  'shag-rug': {
+    footprint: [2.4, 1.7], height: 0.04, params: ['w', 'd', 'color'], tags: ['living', 'bedroom', 'kids'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 2.4, d = it.d || 1.7, g = group('Shag Rug');
+      const ground = it.color ? hex(it.color) : mix(colors.linen, colors.rug, 0.25);
+      const mat = std(0xffffff, { roughness: 1, map: patternTexture(THREE, 'shag', [ground, mix(ground, 0xffffff, 0.3), colors.accent, colors.fabric2], { w, d }) });
+      g.add(box(w, 0.034, d, mat, 0, 0.017, 0, false));
+      g.add(box(w - 0.06, 0.012, d - 0.06, mat, 0, 0.038, 0, false));   // the pile stands proud of a tapered edge
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-1.2, 0, -0.85, 1.2, 0.04, 0.85], color: 'role:rug' }],
+  },
+  // Flatweave rug — a dhurrie: banded border, two centre bands, tassels at both ends (farmhouse, tropical, industrial). w × d.
+  'flatweave-rug': {
+    footprint: [2.4, 1.78], height: 0.012, params: ['w', 'd', 'color'], tags: ['living', 'bedroom', 'hall', 'kitchen'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 2.4, d = it.d || 1.6, g = group('Flatweave Rug');
+      const ground = it.color ? hex(it.color) : mix(colors.linen, colors.rug, 0.4);
+      const mat = std(0xffffff, { roughness: 1, map: patternTexture(THREE, 'flatweave', [ground, colors.rug, colors.accent, colors.fabric2], { w, d }) });
+      g.add(box(w, 0.012, d, mat, 0, 0.006, 0, false));
+      const tassel = std(colors.linen, { roughness: 1 });
+      for (const s of [-1, 1]) g.add(box(w * 0.98, 0.006, 0.09, tassel, 0, 0.003, s * (d / 2 + 0.045), false));   // the tassels, as one strip an end
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-1.2, 0, -0.8, 1.2, 0.013, 0.8], color: 'role:rug' }],
+  },
+  // Hide rug — a cowhide: an irregular outline, cream with dark patches (industrial, mid-century, tropical). w × d.
+  'hide-rug': {
+    footprint: [1.6, 2.0], height: 0.014, params: ['w', 'd', 'color'], tags: ['living', 'bedroom', 'study'],
+    create(it, { THREE, std, group, colors, hex, mix, rng }) {
+      const w = it.w || 1.6, d = it.d || 2.0, g = group('Hide Rug'), n = 44;
+      const ground = it.color ? hex(it.color) : mix(colors.linen, 0xf3ead8, 0.6);
+      // the outline: an ellipse, its radius wobbling, two hind and two fore "legs" pulling it out at the corners
+      const pts = [], ph = rng() * 6;
+      for (let i = 0; i < n; i++) {
+        const t = i / n * Math.PI * 2, lobe = 0.14 * Math.max(0, Math.cos(2 * t - Math.PI / 2)) * Math.max(0, Math.abs(Math.sin(t)) > 0.3 ? 1 : 0.3);
+        const r = 0.5 * (1 + 0.06 * Math.sin(3 * t + ph) + 0.04 * Math.sin(7 * t + ph * 2) + lobe * 0.4) / 1.06;
+        pts.push(new THREE.Vector2(Math.cos(t) * r, Math.sin(t) * r));
+      }
+      const shape = new THREE.Shape(pts), geo = new THREE.ShapeGeometry(shape, 1), uv = geo.attributes.uv, pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) { uv.setXY(i, pos.getX(i) + 0.5, pos.getY(i) + 0.5); pos.setXYZ(i, pos.getX(i) * w, pos.getY(i) * d, 0); }
+      geo.rotateX(-Math.PI / 2); geo.computeVertexNormals();
+      const map = patternTexture(THREE, 'hide', [ground, colors.rug, colors.accent, colors.wood], { w, d });
+      const m = new THREE.Mesh(geo, std(0xffffff, { roughness: 0.9, map })); m.position.y = 0.012; m.receiveShadow = true; g.add(m);
+      return g;
+    },
+    iso: [{ shape: 'blob', box: [-0.8, 0, -1, 0.8, 0.014, 1], color: 'role:rug' }],
+  },
+  // Bath rug — a small round shag rug (the bath mat's alternative). r is its radius.
+  'bath-rug': {
+    footprint: [0.7, 0.7], height: 0.03, params: ['r', 'color'], tags: ['bathroom'],
+    create(it, { THREE, std, group, colors, hex, mix }) {
+      const r = it.r || 0.35, g = group('Bath Rug');
+      const ground = it.color ? hex(it.color) : mix(colors.linen, colors.accent, 0.25);
+      const mat = std(0xffffff, { roughness: 1, map: patternTexture(THREE, 'shag', [ground, mix(ground, 0xffffff, 0.3), colors.accent, colors.fabric2], { w: 2 * r, d: 2 * r }) });
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.028, 32), mat); m.position.y = 0.014; m.receiveShadow = true; g.add(m); return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.35, 0, -0.35, 0.35, 0.03, 0.35], color: 'role:rug' }],
+  },
+
+  // Framed print — a small picture in a thin frame with a wide white mount (cottage, farmhouse, scandi, craftsman).
+  'framed-print': {
+    footprint: [0.6, 0.04], height: 0.8, params: ['w', 'h', 'y', 'motif', 'frame'], tags: ['living', 'bedroom', 'hall', 'study', 'dining'],
+    create(it, { THREE, std, box, group, colors, hex, mix, rng }) {
+      const w = it.w || 0.6, h = it.h || 0.8, cy = it.y !== undefined ? 0 : 1.5, g = group('Framed Print');
+      const bar = 0.02, mount = 0.07, frame = std(it.frame ? hex(it.frame) : colors.metal, { roughness: 0.45, metalness: 0.3 });
+      g.add(box(w, h, 0.03, frame, 0, cy, 0.015));
+      g.add(box(w - 2 * bar, h - 2 * bar, 0.01, std(0xf3f1ea, { roughness: 0.95 }), 0, cy, 0.031));
+      const pw = w - 2 * (bar + mount), ph = h - 2 * (bar + mount), motif = typeof it.motif === 'string' && ART_MOTIFS.includes(it.motif) ? it.motif : ART_MOTIFS[Math.floor(rng() * ART_MOTIFS.length)];
+      g.add(box(pw, ph, 0.006, std(0xffffff, { roughness: 0.9, map: motifTexture(THREE, motif, [mix(colors.fabric2, 0xffffff, 0.62), colors.accent, colors.fabric, colors.fabric2], { w: pw, h: ph }) }), 0, cy, 0.038));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.3, 1.1, 0, 0.3, 1.9, 0.04], color: 'role:metal' }],
+  },
+  // Canvas art — a frameless gallery-wrapped canvas, deep on the wall (modern, industrial, mid-century). w × h.
+  'canvas-art': {
+    footprint: [0.9, 0.05], height: 0.6, params: ['w', 'h', 'y', 'motif'], tags: ['living', 'bedroom', 'study', 'dining'],
+    create(it, { THREE, std, box, group, colors, hex, mix, rng }) {
+      const w = it.w || 0.9, h = it.h || 0.6, cy = it.y !== undefined ? 0 : 1.5, g = group('Canvas Art');
+      const motif = typeof it.motif === 'string' && ART_MOTIFS.includes(it.motif) ? it.motif : ART_MOTIFS[Math.floor(rng() * ART_MOTIFS.length)];
+      const map = motifTexture(THREE, motif, [mix(colors.fabric2, 0xffffff, 0.55), colors.accent, colors.fabric, colors.fabric2], { w, h });
+      g.add(box(w, h, 0.04, std(mix(colors.fabric2, 0xffffff, 0.5), { roughness: 0.95 }), 0, cy, 0.02));      // the wrapped edge
+      g.add(box(w - 0.004, h - 0.004, 0.004, std(0xffffff, { roughness: 0.9, map }), 0, cy, 0.042));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.45, 1.2, 0, 0.45, 1.8, 0.045], color: 'role:fabric2' }],
+  },
+  // Plate set — a cluster of decorative plates on the wall (farmhouse, cottage, mediterranean, craftsman). w × h is the cluster.
+  'plate-set': {
+    footprint: [0.9, 0.04], height: 0.8, params: ['w', 'h', 'y', 'color'], tags: ['dining', 'kitchen', 'living', 'hall'],
+    create(it, { THREE, std, group, colors, hex, mix, rng }) {
+      const w = it.w || 0.9, h = it.h || 0.8, cy = it.y !== undefined ? 0 : 1.5, g = group('Plate Set');
+      const tones = [it.color ? hex(it.color) : colors.linen, colors.accent, mix(colors.fabric2, 0xffffff, 0.4), colors.wood];
+      // a big plate and five round it, on a loose ring
+      const rings = [[0, 0, 0.16], [-0.3, 0.06, 0.1], [0.28, 0.1, 0.11], [-0.14, -0.28, 0.09], [0.16, -0.27, 0.1], [0.02, 0.29, 0.085]];
+      for (const [x, y, r] of rings) {
+        const R = r * Math.min(w / 0.9, h / 0.8) * 1.0, px = x * w / 0.9, py = y * h / 0.8, tone = tones[Math.floor(rng() * tones.length)];
+        g.add(disc(THREE, R, 0.02, std(tone, { roughness: 0.3 }), px, cy + py, 0.01));
+        g.add(disc(THREE, R * 0.62, 0.006, std(mix(tone, 0x000000, 0.12), { roughness: 0.35 }), px, cy + py, 0.022));
+      }
+      return g;
+    },
+    iso: [{ shape: 'blob', box: [-0.45, 1.1, 0, 0.45, 1.9, 0.03], color: 'role:linen' }],
+  },
+  // Bath runner — a long shag runner along a double vanity or a tub (the bath mat's alternative). w × d.
+  'bath-runner': {
+    footprint: [0.55, 1.3], height: 0.03, params: ['w', 'd', 'color'], tags: ['bathroom'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 0.55, d = it.d || 1.3, g = group('Bath Runner');
+      const ground = it.color ? hex(it.color) : mix(colors.linen, colors.rug, 0.3);
+      const mat = std(0xffffff, { roughness: 1, map: patternTexture(THREE, 'shag', [ground, mix(ground, 0xffffff, 0.3), colors.accent, colors.fabric2], { w, d }) });
+      g.add(box(w, 0.028, d, mat, 0, 0.014, 0, false)); return g;
+    },
+    iso: [{ shape: 'box', box: [-0.275, 0, -0.65, 0.275, 0.03, 0.65], color: 'role:rug' }],
+  },
+
+  // Play rug — a kid's road-and-hopscotch rug with a soft rounded border (kids' rooms, playrooms). w × d.
+  'play-rug': {
+    footprint: [2.0, 1.4], height: 0.02, params: ['w', 'd', 'color'], tags: ['kids', 'living'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 2.0, d = it.d || 1.4, g = group('Play Rug');
+      const ground = it.color ? hex(it.color) : mix(colors.linen, colors.rug, 0.35);
+      g.add(box(w, 0.012, d, std(0xffffff, { roughness: 1, map: patternTexture(THREE, 'play', [ground, colors.rug, colors.accent, colors.fabric2], { w, d }) }), 0, 0.006, 0, false));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-1, 0, -0.7, 1, 0.013, 0.7], color: 'role:rug' }],
+  },
 });
 export { RUG_PATTERNS, ART_MOTIFS };

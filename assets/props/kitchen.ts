@@ -366,4 +366,35 @@ registerProps({
     },
     iso: [{ shape: 'box', box: [-0.31, 0, -0.31, 0.31, 0.86, 0.31], color: 'role:cabinet' }, { shape: 'box', box: [-0.31, 0.86, -0.31, 0.31, 0.9, 0.31], color: '#f1f5f9' }],
   },
+
+  // ---- two more counter appliances (plan S3: every kitchen had the same coffee maker or microwave) -----------------------------
+  // Toaster — a two-slot steel toaster with a lever and a browning dial.
+  'toaster': {
+    footprint: [0.3, 0.17], height: 0.2, surface: true, params: ['color', 'finish'], tags: ['kitchen'],
+    create(it, ctx) {
+      const { THREE, std, box, group, colors } = ctx;
+      const g = group('Toaster'), f = it.color || it.finish ? faceOf(it, ctx) : { color: STEEL, extra: { roughness: 0.3, metalness: 0.85 } };
+      g.add(box(0.3, 0.17, 0.16, std(f.color, f.extra), 0, 0.105, 0)); g.add(box(0.3, 0.02, 0.16, std(PLINTH, { roughness: 0.5 }), 0, 0.01, 0));
+      for (const x of [-0.07, 0.07]) g.add(box(0.1, 0.006, 0.012, std(0x141414, { roughness: 0.9 }), x, 0.192, 0));
+      g.add(box(0.02, 0.008, 0.03, std(KNOB, { metalness: 0.5, roughness: 0.4 }), 0.13, 0.12, 0.085));      // the lever
+      g.add(knob(THREE, 0.014, 0.012, std(KNOB, { metalness: 0.6, roughness: 0.35 }), -0.12, 0.13, 0.08));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.15, 0, -0.08, 0.15, 0.19, 0.08], color: '#cbd5e1' }],
+  },
+  // Kettle — a steel electric kettle on its base, a black handle and a spout.
+  'kettle': {
+    footprint: [0.24, 0.2], height: 0.26, surface: true, params: ['color', 'finish'], tags: ['kitchen'],
+    create(it, ctx) {
+      const { THREE, std, box, group } = ctx;
+      const g = group('Kettle'), f = it.color || it.finish ? faceOf(it, ctx) : { color: STEEL, extra: { roughness: 0.28, metalness: 0.85 } };
+      g.add(cyl(THREE, 0.1, 0.1, 0.02, std(PLINTH, { roughness: 0.5 }), 0, 0.01, 0, 22));
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.095, 0.2, 22), std(f.color, f.extra)); body.position.y = 0.12; body.castShadow = true; g.add(body);
+      g.add(cyl(THREE, 0.045, 0.07, 0.03, std(f.color, f.extra), 0, 0.235, 0, 22));
+      const handle = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.008, 6, 14, Math.PI), std(0x141414, { roughness: 0.6 })); handle.rotation.set(0, 0, 0); handle.position.set(-0.075, 0.15, 0); handle.rotation.z = Math.PI / 2; g.add(handle);
+      const spout = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.022, 0.07, 8), std(f.color, f.extra)); spout.position.set(0.09, 0.19, 0); spout.rotation.z = -1.0; g.add(spout);
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.1, 0, -0.1, 0.1, 0.24, 0.1], color: '#cbd5e1' }],
+  },
 });

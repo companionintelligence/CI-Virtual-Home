@@ -95,7 +95,7 @@ export function sizeOf(type: string, it: any = {}): Size | null {
   return null;
 }
 /** wall-mounted items whose `y` is their CENTRE (the rest mount by their bottom edge) */
-export const CENTRE_MOUNT = new Set(['wall-art', 'gallery-wall', 'round-mirror', 'wall-clock', 'wall-hanging', 'wall-tv', 'whiteboard', 'pin-board']);
+export const CENTRE_MOUNT = new Set(['wall-art', 'gallery-wall', 'round-mirror', 'arch-mirror', 'triptych', 'framed-print', 'canvas-art', 'plate-set', 'wall-clock', 'wall-hanging', 'wall-tv', 'whiteboard', 'pin-board']);
 /** an authored item's plan box (the footprint centre after its offset, turned by rot) */
 export function itemObb(it: any): Obb | null {
   const s = sizeOf(it.type, it); if (!s || !Array.isArray(it.at)) return null;

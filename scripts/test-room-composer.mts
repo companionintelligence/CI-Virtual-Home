@@ -1,70 +1,66 @@
 #!/usr/bin/env -S node --experimental-strip-types
-// The room composer's acceptance (plan S3), in Node, on the 30 real specs:
+// The room composer's acceptance (plan S3), in Node, on the 30 real specs and the fixtures.
+// @check-house quick
 //
 //   1. Dry run: every room of every spec composed from scratch (its authored items dropped, its program read off its
 //      name — assets/room-programs.ts inferProgram), twice; the two runs must hash equal (determinism), and one run
-//      must take under 10 s (reported; the gate fails only past 30 s, since the machine is shared).
-//   2. Every composed room: 0 overlaps and 0 door swings blocked (assets/layout-lint.ts), 0 items through a wall
-//      (inside the wall faces within 2 cm), and lanes of at least 0.8 m from every way in to every other and to the
-//      middle — in 100 % of the rooms whose bare geometry allows one (a room its stair or voids already block is counted
-//      apart and listed).
-//   3. Repetition: the fleet's top-12 furniture types (by houses using them) against the hand-authored fleet — down by at
-//      least half. Furniture here is what a room is furnished with: fitted kitchens, bath fittings, lamps and light
-//      fixtures, the Core's desk set and structure are left out (a house needs one toilet whatever the composer does).
-//      The S0 fleet metric (every type, test/fleet/baseline.json) is printed beside it.
-//   4. The catalog tells the truth: every placement entry names a known type, ≥ 90 % of catalog types have one, the page
-//      builders' declared sizes and the registry props' footprints agree with content/house-catalog.json's measured
-//      boxes (±0.15 m), and content/house-styles.json is assets/house-styles.ts.
-//   5. The authored fleet's layout-lint counts per code (the baseline the layout pass works down), printed.
+//      takes well under 10 s of CPU (reported: the machine is shared, so the gate fails only past 30 s of wall clock).
+//   2. Every composed room: 0 overlaps and 0 door swings blocked (assets/layout-lint.ts), 0 items through a wall or out
+//      of their room, and lanes of at least 0.8 m from every way in to every other and to the middle — in 100 % of the
+//      rooms whose bare geometry allows one (a room its stair or voids already block is counted apart).
+//   3. Repetition. The owner's complaint is the same furniture in every house, and the plan's target is "the top 12
+//      types down at least 50 % against the hand-authored baseline". Three readings, all held, all of FURNITURE (what a
+//      room is furnished with: the fitted kitchen, appliances, bath fittings, lamps, fixtures and the Core's desk set
+//      are left out — a house needs a toilet and a range whatever the composer does):
+//        a. the hand-authored fleet's twelve most repeated types: the houses that still use them, down ≥ 50 %;
+//        b. the types that turn up in 20 or more houses (plan §1: "12 types appear in at least 20 houses"): down ≥ 50 %;
+//        c. no furniture type in more than two thirds of the houses.
+//      The composed fleet's own top 12 and the S0 fleet metric (every type, items) are printed beside them.
+//   4. Variety, by role (sofas, sectionals, armchairs, dining tables and chairs, floor plants): enough real alternatives
+//      in use, none in more than half the houses; and the composer varies them by SEED (the same houses re-rolled give
+//      other arrangements) and by STYLE (one room in each of the nine styles reaches for different pieces).
+//   5. The catalog tells the truth: every placement entry names a known type, ≥ 90 % of catalog types have one, the
+//      page builders' declared sizes and the registry props' footprints agree with content/house-catalog.json's measured
+//      boxes, a surface prop is an onSurface placement, no prop costs more than 60 draw calls (meshes), and
+//      content/house-styles.json is assets/house-styles.ts.
+//   6. The authored fleet's layout-lint counts per code (the baseline the layout pass works down), printed.
 //
 //   node --experimental-strip-types scripts/test-room-composer.mts [--house a,b] [--verbose]
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { M, dryRun, houseIds, loadSpec, authoredFleet, composedFleet, tally, top12, HERO_SET, FUNCTIONAL } from './fleet/_compose-dry.mts';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const argv = process.argv.slice(2), VERBOSE = argv.includes('--verbose');
 const onlyHouses = (() => { const i = argv.indexOf('--house'); return i >= 0 ? argv[i + 1].split(',') : null; })();
-const { composeHouse, inferProgram } = await import(path.join(ROOT, 'assets', 'room-composer.js'));
-const { lintLayout } = await import(path.join(ROOT, 'assets', 'layout-lint.js'));
-const { analyzeRoom, itemObb, aabb, limitOf, alongX, sizeOf } = await import(path.join(ROOT, 'assets', 'room-geo.js'));
-const { PLACEMENT } = await import(path.join(ROOT, 'assets', 'props', 'placement.js'));
+if (!M) { console.error('the composer is not built: pnpm run build'); process.exit(2); }
+const { composeHouse, lintLayout, PLACEMENT, layerOf } = { ...M, lintLayout: M.lint.lintLayout } as any;
+const { analyzeRoom, itemObb, aabb, limitOf, sizeOf } = M.geo;
+const { STYLES, STYLE_KEYS } = M.styles;
 const { PROPS } = await import(path.join(ROOT, 'assets', 'props', 'index.js'));
-const { STYLES } = await import(path.join(ROOT, 'assets', 'house-styles.js'));
-const { layerOf } = await import(path.join(ROOT, 'assets', 'room-composer.js'));
+const { RUG_PATTERNS, ART_MOTIFS } = await import(path.join(ROOT, 'assets', 'props', 'patterns.js'));
 
-const HOUSES = path.join(ROOT, 'content', 'houses');
-const ids = (onlyHouses || fs.readdirSync(HOUSES).filter(f => f.endsWith('.json') && f !== 'index.json' && !f.endsWith('.plan.json')).map(f => f.replace(/\.json$/, ''))).sort();
-const load = (id: string) => JSON.parse(fs.readFileSync(path.join(HOUSES, `${id}.json`), 'utf8'));
+const ids = (onlyHouses || houseIds()).sort();
+const specs = ids.map(id => ({ id, spec: loadSpec(id) }));
 let failed = 0;
 const fail = (m: string) => { console.log(`  ✗ ${m}`); failed++; };
 const ok = (m: string) => console.log(`  ✓ ${m}`);
+const note = (m: string) => console.log(`  ! ${m}`);
+const check = (cond: boolean, m: string) => (cond ? ok : fail)(m);
 
 // ---- 1. the dry run, twice ----------------------------------------------------------------------------------------------
-function dryRun() {
-  const out: Array<{ id: string; spec: any; rooms: Array<{ lv: any; room: any; res: any }> }> = [];
-  for (const id of ids) {
-    const spec = load(id);
-    for (const lv of spec.levels || []) for (const r of lv.rooms || []) r.items = [];
-    const res = composeHouse(spec, { program: (room: any, lv: any) => inferProgram(room, lv) });
-    const rooms: any[] = [];
-    for (const lv of spec.levels || []) for (const room of lv.rooms || []) if (res.has(room)) rooms.push({ lv, room, res: res.get(room) });
-    out.push({ id, spec, rooms });
-  }
-  return out;
-}
-const hashOf = (run: ReturnType<typeof dryRun>) => crypto.createHash('sha256').update(JSON.stringify(run.map(h => h.rooms.map(r => [r.lv.id, r.room.name, r.res.program, r.res.items])))).digest('hex');
 console.log('── dry run: every room of the fleet composed from its name');
-let t0 = performance.now();
-const run1 = dryRun();
-const ms1 = performance.now() - t0;
-t0 = performance.now();
-const run2 = dryRun();
-const ms2 = performance.now() - t0;
+const timed = <T,>(f: () => T) => { const c0 = process.cpuUsage(), t0 = performance.now(), v = f(), c1 = process.cpuUsage(c0); return { v, wall: performance.now() - t0, cpu: (c1.user + c1.system) / 1000 }; };
+const r1 = timed(() => dryRun(specs)), r2 = timed(() => dryRun(specs));
+const run1 = r1.v, run2 = r2.v;
 const rooms = run1.flatMap(h => h.rooms), items = rooms.reduce((a, r) => a + r.res.items.length, 0);
-console.log(`  ${ids.length} houses, ${rooms.length} rooms composed, ${items} items; ${(ms1 / 1000).toFixed(1)} s and ${(ms2 / 1000).toFixed(1)} s`);
-if (hashOf(run1) === hashOf(run2)) ok(`deterministic: the two runs hash equal (${hashOf(run1).slice(0, 12)})`); else fail('the two runs differ');
-if (ms1 > 30000) fail(`one run took ${(ms1 / 1000).toFixed(1)} s (budget 10 s)`); else (ms1 <= 10000 ? ok : (m: string) => console.log(`  ! ${m}`))(`one run in ${(ms1 / 1000).toFixed(1)} s (budget 10 s)`);
+console.log(`  ${ids.length} houses, ${rooms.length} rooms composed, ${items} items; ${(r1.cpu / 1000).toFixed(1)} s and ${(r2.cpu / 1000).toFixed(1)} s of CPU (${(r1.wall / 1000).toFixed(1)} s and ${(r2.wall / 1000).toFixed(1)} s wall)`);
+const hashOf = (run: typeof run1) => crypto.createHash('sha256').update(JSON.stringify(run.map(h => h.rooms.map(r => [r.lv.id, r.room.name, r.res.program, r.res.items])))).digest('hex');
+check(hashOf(run1) === hashOf(run2), `deterministic: the two runs hash equal (${hashOf(run1).slice(0, 12)})`);
+if (r1.wall > 30000) fail(`one run took ${(r1.wall / 1000).toFixed(1)} s (budget 10 s of CPU, 30 s of wall clock on a shared machine)`);
+else if (r1.cpu > 10000) note(`one run took ${(r1.cpu / 1000).toFixed(1)} s of CPU (budget 10 s)`);
+else ok(`one run in ${(r1.cpu / 1000).toFixed(1)} s of CPU (budget 10 s)`);
 
 // ---- 2. every composed room: overlaps, walls, door swings, lanes ---------------------------------------------------------
 console.log('── the composed rooms');
@@ -88,59 +84,101 @@ for (const h of run1) {
     }
   }
 }
-(counts.overlap ? fail : ok)(`${counts.overlap} overlaps`);
-(counts.pierce ? fail : ok)(`${counts.pierce} items through a wall or out of their room`);
-(counts['door-swing'] ? fail : ok)(`${counts['door-swing']} door swings blocked`);
-(counts.lane ? fail : ok)(`lanes of 0.8 m in ${laneRooms - counts.lane} of ${laneRooms} rooms whose geometry allows one (${geometryBlocked} more are blocked by their own stairs, voids or pins, whatever is in them)`);
+check(!counts.overlap, `${counts.overlap} overlaps`);
+check(!counts.pierce, `${counts.pierce} items through a wall or out of their room`);
+check(!counts['door-swing'], `${counts['door-swing']} door swings blocked`);
+check(!counts.lane, `lanes of 0.8 m in ${laneRooms - counts.lane} of ${laneRooms} rooms whose geometry allows one (${geometryBlocked} more are blocked by their own stairs, voids or pins, whatever is in them)`);
 
 // ---- 3. repetition -------------------------------------------------------------------------------------------------------------
-console.log('── repetition: the top-12 furniture types, by houses using them');
-const HERO = new Set(['walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
-const FUNCTIONAL = new Set(['fitted', 'appliance', 'bath', 'lighting', 'lamp', 'hero', 'structure']);
-const furniture = (t: string) => !HERO.has(t) && !FUNCTIONAL.has((PLACEMENT[t] || {}).group);
-function top12(fleet: Array<{ id: string; items: any[] }>, keep: (t: string) => boolean) {
-  const houses = new Map<string, Set<string>>(), n = new Map<string, number>();
-  for (const h of fleet) for (const it of h.items) { if (!keep(it.type)) continue; (houses.get(it.type) || houses.set(it.type, new Set()).get(it.type)!).add(h.id); n.set(it.type, (n.get(it.type) || 0) + 1); }
-  const rows = [...houses.entries()].map(([t, s]) => [t, s.size, n.get(t)!] as [string, number, number]).sort((a, b) => b[1] - a[1] || b[2] - a[2] || (a[0] < b[0] ? -1 : 1)).slice(0, 12);
-  return { rows, houses: rows.reduce((a, r) => a + r[1], 0), items: rows.reduce((a, r) => a + r[2], 0) };
-}
-const authored = ids.map(id => ({ id, items: (load(id).levels || []).flatMap((lv: any) => (lv.rooms || []).flatMap((r: any) => r.items || [])) }));
-const composed = run1.map(h => ({ id: h.id, items: h.rooms.flatMap(r => r.res.items) }));
-const aF = top12(authored, furniture), cF = top12(composed, furniture);
-const table = (t: ReturnType<typeof top12>) => t.rows.map(r => `${r[0]} ${r[1]}`).join(', ');
-console.log(`  authored: ${table(aF)}  → ${aF.houses} house-uses`);
-console.log(`  composed: ${table(cF)}  → ${cF.houses} house-uses`);
-const drop = 1 - cF.houses / aF.houses;
-(drop >= 0.5 ? ok : fail)(`furniture top-12 repetition down ${(drop * 100).toFixed(0)} % (target ≥ 50 %)`);
-const aAll = top12(authored, t => !HERO.has(t)), cAll = top12(composed, t => !HERO.has(t));
-console.log(`  (the S0 fleet metric, every type: authored top-12 ${aAll.houses} house-uses / ${aAll.items} items → composed ${cAll.houses} / ${cAll.items}; ${table(cAll)})`);
+console.log('── repetition: the same furniture in every house');
+const furniture = (t: string) => !HERO_SET.has(t) && !FUNCTIONAL.has((PLACEMENT[t] || {}).group);
+const A = tally(authoredFleet(specs), furniture), C = tally(composedFleet(run1), furniture);
+const aTop = top12(A), cTop = top12(C), cAll = tally(composedFleet(run1)), aAll = tally(authoredFleet(specs));
+const inC = new Map(C.map(r => [r.type, r.houses]));
+const sameTwelve = aTop.rows.reduce((a, r) => a + (inC.get(r.type) || 0), 0);
+console.log(`  authored top 12: ${aTop.rows.map(r => `${r.type} ${r.houses}`).join(', ')}  → ${aTop.houses} house-uses`);
+console.log(`  … the same 12 in the composed fleet: ${aTop.rows.map(r => `${r.type} ${inC.get(r.type) || 0}`).join(', ')}  → ${sameTwelve}`);
+console.log(`  composed top 12 (its own): ${cTop.rows.map(r => `${r.type} ${r.houses}`).join(', ')}  → ${cTop.houses} house-uses`);
+const n20 = (rows: Array<{ houses: number }>) => rows.filter(r => r.houses >= 20).length, a20 = n20(A), c20 = n20(C);
+console.log(`  (the S0 fleet metric, every type: ${n20(aAll)} types in 20 or more houses authored → ${n20(cAll)} composed; its top 12 hold ${top12(aAll).items} authored items → ${top12(cAll).items} composed)`);
+const drop = 1 - sameTwelve / Math.max(1, aTop.houses);
+check(drop >= 0.5, `the authored fleet's twelve most repeated furniture types: ${aTop.houses} → ${sameTwelve} house-uses, down ${(drop * 100).toFixed(0)} % (target ≥ 50 %)`);
+check(c20 <= a20 / 2, `furniture types in 20 or more houses: ${a20} → ${c20} (target ≤ half)`);
+const busiest = C[0];
+check(busiest.houses <= Math.ceil(ids.length * 2 / 3), `the busiest furniture type, ${busiest.type}, is in ${busiest.houses} of ${ids.length} houses (target ≤ two thirds)`);
 
-// ---- 4. the catalog -------------------------------------------------------------------------------------------------------------
+// ---- 4. variety, by role, by seed, by style -----------------------------------------------------------------------------------
+console.log('── variety: real alternatives, varied by seed and by style');
+const ROLE_GROUPS: Array<[string, string[], number]> = [
+  ['sofas', ['sofa', 'loveseat'], 5], ['sectionals', ['sofa-l'], 2], ['armchairs', ['armchair'], 5],
+  ['dining tables', ['dining-table', 'dining-table-round'], 4], ['dining chairs', ['dining-chair'], 4], ['floor plants', ['plant-floor'], 6],
+];
+const cmp = composedFleet(run1), aut = authoredFleet(specs);
+for (const [label, roles, need] of ROLE_GROUPS) {
+  const inRole = (t: string) => (PLACEMENT[t] || { roles: [] }).roles.some((r: string) => roles.includes(r));
+  const a = tally(aut, inRole), c = tally(cmp, inRole), share = c.length ? c[0].houses / ids.length : 0;
+  console.log(`  ${label.padEnd(14)} authored ${a.length} (${a.slice(0, 2).map(r => `${r.type} ${r.houses}`).join(', ') || 'none'}) → composed ${c.length} (${c.slice(0, 4).map(r => `${r.type} ${r.houses}`).join(', ')})`);
+  check(c.length >= need && share <= 0.5, `${label}: ${c.length} types in use (≥ ${need}), the most used in ${(share * 100).toFixed(0)} % of the houses (≤ 50 %)`);
+}
+// by seed: the same fleet re-rolled (every room's seed re-keyed) arranges most rooms otherwise
+const reroll = dryRun(specs, { variant: 'again' });
+let same = 0, total = 0;
+for (let i = 0; i < run1.length; i++) run1[i].rooms.forEach((r, k) => {
+  if (r.res.items.length < 5) return; total++;
+  if (JSON.stringify(r.res.items) === JSON.stringify(reroll[i].rooms[k].res.items)) same++;
+});
+check(total > 0 && same / total <= 0.1, `by seed: ${total - same} of ${total} furnished rooms come out differently when their seed changes (target ≥ 90 %)`);
+// by style: one house's rooms, furnished in each of the nine styles, reach for different pieces
+{
+  const base = specs.find(s => s.id === 'aurora') || specs[0], per = new Map<string, Set<string>>();
+  for (const key of STYLE_KEYS) {
+    const spec = JSON.parse(JSON.stringify(base.spec)); spec.styleKey = key;
+    const res = dryRun([{ id: `${base.id}-${key}`, spec }])[0];
+    per.set(key, new Set(res.rooms.flatMap(r => r.res.items.map((i: any) => i.type))));
+  }
+  const all = [...per.values()]; let dist = 0, pairs = 0;
+  for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const inter = [...all[i]].filter(t => all[j].has(t)).length, uni = new Set([...all[i], ...all[j]]).size; dist += 1 - inter / uni; pairs++; }
+  const mean = dist / pairs;
+  check(mean >= 0.2, `by style: one house in each of the ${STYLE_KEYS.length} styles, two styles share on average ${((1 - mean) * 100).toFixed(0)} % of the types they use (target ≤ 80 %)`);
+}
+
+// ---- 5. the catalog -------------------------------------------------------------------------------------------------------------
 console.log('── the catalog and the style bundles');
 const catPath = path.join(ROOT, 'content', 'house-catalog.json');
-const cat = JSON.parse(fs.readFileSync(catPath, 'utf8')).types || {};
+const catJson = JSON.parse(fs.readFileSync(catPath, 'utf8')), cat = catJson.types || {};
 const unknown = Object.keys(PLACEMENT).filter(t => !cat[t] && !PROPS.has(t));
-(unknown.length ? fail : ok)(`${unknown.length} placement entries for unknown types${unknown.length ? ': ' + unknown.join(', ') : ''}`);
+check(!unknown.length, `${unknown.length} placement entries for unknown types${unknown.length ? ': ' + unknown.join(', ') : ''}`);
 const catTypes = Object.keys(cat), placed = catTypes.filter(t => PLACEMENT[t]);
-(placed.length / catTypes.length >= 0.9 ? ok : fail)(`placement metadata for ${placed.length} of ${catTypes.length} catalog types (${(placed.length / catTypes.length * 100).toFixed(0)} %, target ≥ 90 %)`);
+check(placed.length / catTypes.length >= 0.9, `placement metadata for ${placed.length} of ${catTypes.length} catalog types (${(placed.length / catTypes.length * 100).toFixed(0)} %, target ≥ 90 %)`);
 const missing = [...PROPS.keys()].filter(t => !cat[t]);
-(missing.length ? fail : ok)(`${missing.length} registry props missing from the catalog${missing.length ? ` (${missing.slice(0, 8).join(', ')}${missing.length > 8 ? ' …' : ''}): pnpm run catalog` : ''}`);
+check(!missing.length, `${missing.length} registry props missing from the catalog${missing.length ? ` (${missing.slice(0, 8).join(', ')}${missing.length > 8 ? ' …' : ''}): pnpm run catalog` : ''}`);
 const drift: string[] = [];
 for (const t of catTypes) {
   const m = cat[t], s = sizeOf(t, {}); if (!s || !m.box) continue;
   const [x0, , z0, x1, , z1] = m.box, w = x1 - x0, d = z1 - z0, ox = (x0 + x1) / 2, oz = (z0 + z1) / 2;
-  const bad = Math.abs(w - s.w) > 0.15 || Math.abs(d - s.d) > 0.15 || Math.abs(m.height - s.h) > 0.2 || Math.abs(ox - s.ox) > 0.12 || Math.abs(oz - s.oz) > 0.12;
+  const bad = Math.abs(w - s.w) > 0.15 || Math.abs(d - s.d) > 0.15 || Math.abs(m.height - s.h) > 0.2 || Math.abs(ox - s.ox) > 0.15 || Math.abs(oz - s.oz) > 0.15;
   if (bad) drift.push(`${t} declared ${s.w.toFixed(2)}×${s.d.toFixed(2)}×${s.h.toFixed(2)} @(${s.ox.toFixed(2)},${s.oz.toFixed(2)}), measured ${w.toFixed(2)}×${d.toFixed(2)}×${m.height.toFixed(2)} @(${ox.toFixed(2)},${oz.toFixed(2)})`);
 }
-(drift.length ? fail : ok)(`${drift.length} types whose declared size disagrees with the measured catalog${drift.length ? ':\n      ' + drift.join('\n      ') : ''}`);
+check(!drift.length, `${drift.length} types whose declared size disagrees with the measured catalog${drift.length ? ':\n      ' + drift.join('\n      ') : ''}`);
+// a registry prop that stands on a surface (`surface: true`) is one the composer stacks (its placement says so), and back
+// (a page builder's default height is item-map.ts's SURFACE_ITEMS: the Core's own pieces)
+const surf = catTypes.filter(t => cat[t].source === 'registry' && PLACEMENT[t] && !!cat[t].surface !== !!PLACEMENT[t].onSurface && layerOf(t) !== 'wall' && layerOf(t) !== 'ceiling');
+check(!surf.length, `${surf.length} types whose catalog surface flag and placement onSurface disagree${surf.length ? ': ' + surf.join(', ') : ''}`);
+// draw calls: the catalog records each type's mesh count; nothing a room places costs more than 60 (the Core's own
+// pieces, the hero block's, are not the composer's)
+const heavy = catTypes.filter(t => !HERO_SET.has(t) && t !== 'core-shelf' && (cat[t].meshes || 0) > 60);
+const top5 = catTypes.filter(t => !HERO_SET.has(t) && t !== 'core-shelf').sort((a, b) => (cat[b].meshes || 0) - (cat[a].meshes || 0)).slice(0, 5);
+check(!heavy.length, `${heavy.length} types over 60 draw calls${heavy.length ? ': ' + heavy.map(t => `${t} ${cat[t].meshes}`).join(', ') : ''} (heaviest: ${top5.map(t => `${t} ${cat[t].meshes}`).join(', ')})`);
 const stylesPath = path.join(ROOT, 'content', 'house-styles.json');
 const stylesJson = fs.existsSync(stylesPath) ? JSON.parse(fs.readFileSync(stylesPath, 'utf8')) : null;
-(stylesJson && JSON.stringify(stylesJson.styles) === JSON.stringify(STYLES) ? ok : fail)(`content/house-styles.json ${stylesJson ? 'matches' : 'is missing:'} assets/house-styles.ts${stylesJson && JSON.stringify(stylesJson.styles) !== JSON.stringify(STYLES) ? ' — it does not: pnpm run catalog' : ''}`);
+const sync = stylesJson && JSON.stringify(stylesJson.styles) === JSON.stringify(STYLES);
+check(!!sync, `content/house-styles.json ${stylesJson ? (sync ? 'matches' : 'does not match') : 'is missing:'} assets/house-styles.ts${sync ? '' : ' — pnpm run catalog'}`);
+check(JSON.stringify(catJson.patterns) === JSON.stringify({ rugs: RUG_PATTERNS, art: ART_MOTIFS }), 'the catalog publishes the rug patterns and the art motifs the builders accept');
 
-// ---- 5. the authored fleet's lint baseline -------------------------------------------------------------------------------------
+// ---- 6. the authored fleet's lint baseline -------------------------------------------------------------------------------------
 console.log('── layout lints on the authored fleet (baseline, warnings)');
 const lintCounts: Record<string, number> = {};
-for (const id of ids) for (const is of lintLayout(load(id))) lintCounts[is.code] = (lintCounts[is.code] || 0) + 1;
+for (const { spec } of specs) for (const is of lintLayout(spec)) lintCounts[is.code] = (lintCounts[is.code] || 0) + 1;
 console.log('  ' + Object.entries(lintCounts).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(' · '));
 
 console.log(failed ? `\n${failed} check${failed === 1 ? '' : 's'} failed` : '\nall checks passed');

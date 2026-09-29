@@ -84,7 +84,9 @@ export function inferProgram(room: any, level?: any): Program | null {
     const plain = (r: any) => { const n = String(r.name || ''); const h = NAMES.find(([, re]) => re.test(n)); return BED.test(n) && (!h || (h[0] === 'bed-guest' && !/guest/i.test(n))); };
     const beds = ((level && level.rooms) || []).filter(plain);
     const biggest = beds.reduce((a: any, r: any) => (!a || area(r) > area(a) ? r : a), null);
-    return !level || biggest === room ? 'bed-primary' : 'bed-guest';
+    // a storey that already names its primary ("Primary Bedroom", "Master Suite") makes every plain bedroom a guest room
+    const named = ((level && level.rooms) || []).some((r: any) => { const h = NAMES.find(([, re]) => re.test(String(r.name || ''))); return !!h && h[0] === 'bed-primary'; });
+    return !level || (biggest === room && !named) ? 'bed-primary' : 'bed-guest';
   }
   return null;
 }

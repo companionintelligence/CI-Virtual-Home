@@ -476,4 +476,25 @@ registerProps({
     },
     iso: [{ shape: 'box', box: [-0.75, 0.1, -0.26, 0.75, 0.85, 0.245], color: 'role:cabinet' }, { shape: 'box', box: [-0.75, 0.85, -0.26, 0.75, 0.89, 0.26], color: 'role:linen' }, { shape: 'box', box: [-0.7, 1.16, -0.26, 0.7, 1.9, -0.24], color: '#dbe4ee' }],
   },
+
+  // Towel ladder — a floor-standing ladder rack leaning on the wall, a towel over one rung and another over a lower one
+  // (the towel rail's alternative: farmhouse, cottage, tropical, scandi). Its back is at z = −d/2 at the top.
+  'towel-ladder': {
+    footprint: [0.55, 0.32], height: 1.6, params: ['color'], tags: ['bathroom'],
+    create(it, { THREE, std, box, group, colors, hex, rng }) {
+      const w = 0.5, g = group('Towel Ladder'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.55 });
+      const V = (x, y, z) => new THREE.Vector3(x, y, z), top = V(0, 1.6, -0.15), foot = V(0, 0.02, 0.15), d = top.clone().sub(foot), L = d.length();
+      const lean = Math.atan2(0.3, 1.58);
+      for (const s of [-1, 1]) {
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, L, 10), wood);
+        m.position.set(s * w / 2, 0.81, 0); m.rotation.x = lean; m.castShadow = true; g.add(m);
+      }
+      const rung = (t, mat = wood) => { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, w, 10), mat); r.rotation.z = Math.PI / 2; r.position.set(0, 0.02 + 1.58 * t, 0.15 - 0.3 * t); r.castShadow = true; g.add(r); };
+      for (const t of [0.12, 0.3, 0.48, 0.66, 0.84, 0.97]) rung(t);
+      const towel = std(towelColor(colors, rng), { roughness: 0.95 });
+      for (const [t, len] of [[0.66, 0.55], [0.3, 0.45]]) { const y = 0.02 + 1.58 * t, z = 0.15 - 0.3 * t; g.add(box(w * 0.8, len, 0.02, towel, 0, y - len / 2 + 0.03, z + 0.03)); g.add(box(w * 0.8, len * 0.85, 0.02, towel, 0, y - len * 0.85 / 2 + 0.03, z - 0.03)); g.add(box(w * 0.8, 0.02, 0.09, towel, 0, y + 0.03, z)); }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.25, 0, -0.15, 0.25, 1.6, 0.15], color: 'role:wood' }],
+  },
 });

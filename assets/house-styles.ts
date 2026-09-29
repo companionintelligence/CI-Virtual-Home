@@ -91,23 +91,27 @@ export const STYLES: Record<string, StyleBundle> = {
 };
 export const STYLE_KEYS = Object.keys(STYLES);
 
-// free-text style → key: the specs describe themselves ("Single-storey brick cottage …", "desert villa …"). The
-// first rule that matches wins, so the specific words come first.
-const WORDS: Array<[string, RegExp]> = [
-  ['mid-century', /mid-?century|\bmcm\b|atomic|eichler|sixties/i],
-  ['craftsman', /craftsman|bungalow|arts[- ]and[- ]crafts|prairie|tudor|mission/i],
-  ['tropical', /tropical|treehouse|bali|jungle|beach|palm/i],
-  ['mediterranean', /mediterranean|spanish|villa|terracotta|tuscan|adobe|desert|mesa|hacienda/i],
-  ['farmhouse', /farmhouse|barn|rustic|country|colonial|cape cod|queen anne|homestead|ranch/i],
-  ['cottage', /cottage|cabin|storybook|english|shingle|lake|gable/i],
-  ['industrial', /industrial|warehouse|loft|brutal|concrete|steel/i],
-  ['scandi', /scandi|nordic|scandinavian|hygge|minimal|white/i],
-  ['modern', /modern|contemporary|glass|cube|flat/i],
+// free-text style → key: the specs describe themselves ("Single-storey brick cottage …", "desert villa …"). Each style
+// scores the words it finds (a strong word counts 3, a weak one 1) and the highest score wins, ties going to the
+// earlier style here; nothing scoring at all is null. An architectural word (gable, hip) says nothing about furniture.
+const WORDS: Array<[string, Array<[RegExp, number]>]> = [
+  ['mid-century', [[/mid-?century|\bmcm\b|atomic|eichler|sixties|split-level|raised ranch/i, 3], [/\branch\b|caramel|walnut|teak|retro/i, 1]]],
+  ['craftsman', [[/craftsman|bungalow|arts[- ]and[- ]crafts|prairie|tudor|mission/i, 3], [/timber-frame|stone chimney|exposed beam/i, 1]]],
+  ['tropical', [[/tropical|treehouse|bali|jungle|beach|palm/i, 3], [/\beco\b|stilt|lantern|lagoon|atrium|planted|thatch|bamboo/i, 1]]],
+  ['mediterranean', [[/mediterranean|spanish|tuscan|adobe|hacienda|terracotta/i, 3], [/villa|stucco|desert|mesa|arch(?:ed|es)?\b|pavilion|courtyard/i, 1]]],
+  ['farmhouse', [[/farmhouse|barn|homestead|cape cod|queen anne|colonial/i, 3], [/rustic|country|clapboard|traditional|family|lap-siding|dormer/i, 1]]],
+  ['cottage', [[/cottage|storybook|english|cabin/i, 3], [/lake|shingle|board-and-batten|gable|porch|garden/i, 0.5]]],
+  ['industrial', [[/industrial|warehouse|brutal|\bloft\b/i, 3], [/concrete|steel|corrugated|black-framed|exposed/i, 1]]],
+  ['scandi', [[/scandi|nordic|scandinavian|hygge/i, 3], [/minimal|white-oak|pale timber|birch/i, 1]]],
+  ['modern', [[/modern|contemporary/i, 3], [/glass|cube|flat|floating|cantilever|curtain-wall|sleek|slab|box/i, 1]]],
 ];
 export function styleFromText(text: unknown): string | null {
-  const s = String(text || '');
-  for (const [k, re] of WORDS) if (re.test(s)) return k;
-  return null;
+  const s = String(text || ''); let best: string | null = null, top = 0;
+  for (const [key, rules] of WORDS) {
+    let sc = 0; for (const [re, w] of rules) if (re.test(s)) sc += w;
+    if (sc > top) { top = sc; best = key; }
+  }
+  return best;
 }
 
 /** the style a room is furnished in */
