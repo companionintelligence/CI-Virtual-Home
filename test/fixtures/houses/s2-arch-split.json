@@ -3,9 +3,9 @@
  "id": "s2-arch-split",
  "name": "S2 Split-Level Fixture",
  "author": "ci-virtual-home",
- "source": "test fixture (Completeness A2, plan S2 sections): a split level — garage at grade, living half a storey up, bedrooms over the garage — joined by half-flights; a tower with its own height; knee walls",
+ "source": "test fixture (Completeness A2, plan S2 sections): a split level \u2014 garage at grade, living half a storey up, bedrooms over the garage \u2014 joined by half-flights; a tower with its own height; knee walls",
  "style": "Split-level: stucco living wing on a stone plinth, garage with a knee-walled bedroom storey over it, a tall corner tower",
- "emoji": "🧪",
+ "emoji": "\ud83e\uddea",
  "fixture": {
   "note": "levels[].split (shared-wall bands), two half-flights (1.2 m and 1.4 m) up through the shared wall, levels[].plinth foundation, entry.stoop, footprint[i].h tower with roof clip, levels[].knee with a ceiling under the roof"
  },
@@ -242,7 +242,7 @@
   {
    "id": "l3",
    "name": "Bedrooms",
-   "y": 2.6,
+   "y": 2.85,
    "height": 2.6,
    "floor": "oak",
    "split": true,
@@ -332,7 +332,7 @@
     "w": 6.6,
     "d": 6.8
    },
-   "y": 4.5,
+   "y": 4.75,
    "type": "gable",
    "ridge": "x",
    "pitch": 38,
