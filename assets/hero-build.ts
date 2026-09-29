@@ -132,7 +132,7 @@ export function createHeroBuild(bctx, { DESK_TOP }: any = {}) {
     dev.updateMatrixWorld(true);
     const cb = dev.userData.core && typeof dev.userData.core.box === 'function' ? dev.userData.core.box() : new THREE.Box3().setFromObject(dev);
     const mm = v => Math.round(v * 1000) / 1000;
-    anchors.hero.coreBox = { minX: mm(cb.min.x), minY: mm(cb.min.y), minZ: mm(cb.min.z), maxX: mm(cb.max.x), maxY: mm(cb.max.y), maxZ: mm(cb.max.z) };
+    anchors.hero.coreBox = [mm(cb.min.x), mm(cb.min.y), mm(cb.min.z), mm(cb.max.x), mm(cb.max.y), mm(cb.max.z)];   // [minX, minY, minZ, maxX, maxY, maxZ]: S5's Box6
     anchors.hero.surfaceTop = mm(y + dy);
     if (surfaceType) anchors.hero.surfaceType = surfaceType;
     // the piece under the Core, for the scene QA's hero-float (not serialised)

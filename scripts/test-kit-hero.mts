@@ -79,29 +79,29 @@ try {
         // the Core's centre in the island's own frame, against its faucet (0.45, 0.15) and cooktop (x −0.75…−0.05, z ±0.24)
         s.updateMatrixWorld(true);
         const inv = new T.Matrix4().copy(s.matrixWorld).invert();
-        const b = h.coreBox, c = new T.Vector3((b.minX + b.maxX) / 2, b.minY, (b.minZ + b.maxZ) / 2).applyMatrix4(inv);
+        const b = h.coreBox, c = new T.Vector3((b[0] + b[3]) / 2, b[1], (b[2] + b[5]) / 2).applyMatrix4(inv);
         const hw = 0.116, hd = 0.1025;   // the Core's half footprint, aligned with the island's axes
         const rectGap = (x0, x1, z0, z1) => Math.hypot(Math.max(0, x0 - (c.x + hw), (c.x - hw) - x1), Math.max(0, z0 - (c.z + hd), (c.z - hd) - z1));
         out.faucet = rectGap(0.435, 0.465, 0.135, 0.165);
         out.cooktop = rectGap(-0.75, -0.05, -0.24, 0.24);
         const centre = new T.Vector3(); s.getWorldPosition(centre);
-        out.userSide = ((b.minX + b.maxX) / 2 - centre.x) * h.fwd[0] + ((b.minZ + b.maxZ) / 2 - centre.z) * h.fwd[1];
+        out.userSide = ((b[0] + b[3]) / 2 - centre.x) * h.fwd[0] + ((b[2] + b[5]) / 2 - centre.z) * h.fwd[1];
         let stools = 0; s.traverse(m => { if (m.isMesh && m.geometry && m.geometry.parameters && m.geometry.parameters.radiusTop === 0.18) stools++; });
         out.stools = stools;
       }
       return out;
     });
-    const tol = c.tol ?? 0.005, gap = r.coreBox.minY - r.top;
+    const tol = c.tol ?? 0.005, gap = r.coreBox[1] - r.top;
     const bad: string[] = [];
     if (errs.length) bad.push(`page errors: ${errs.join(' | ')}`);
-    if (Math.abs(gap) > tol) bad.push(`coreBox.minY ${r.coreBox.minY} vs top ${r.top} (${(gap * 1000).toFixed(1)} mm)`);
+    if (Math.abs(gap) > tol) bad.push(`coreBox minY ${r.coreBox[1]} vs top ${r.top} (${(gap * 1000).toFixed(1)} mm)`);
     if (r.floatIssues.length) bad.push(`hero-float: ${r.floatIssues.join('; ')}`);
     if (r.faucet !== undefined && r.faucet < 0.35 - 1e-6) bad.push(`${r.faucet.toFixed(3)} m from the faucet (≥ 0.35)`);
     if (r.cooktop !== undefined && r.cooktop < 0.35 - 1e-6) bad.push(`${r.cooktop.toFixed(3)} m from the cooktop (≥ 0.35)`);
     if (r.userSide !== undefined && r.userSide <= 0) bad.push(`on the far side of the island (${r.userSide.toFixed(3)} m along the user's direction)`);
     if (r.stools) bad.push(`the island brought ${r.stools} stools into a room that has its own`);
     const extra = r.faucet !== undefined ? `, faucet ${r.faucet.toFixed(2)} m, cooktop ${r.cooktop.toFixed(2)} m, user side +${r.userSide.toFixed(2)} m` : '';
-    console.log(`${bad.length ? '✗' : '✓'} ${c.name.padEnd(16)} ${String(r.type).padEnd(15)} top ${r.top.toFixed(3)}  Core ${r.coreBox.minY.toFixed(3)} (${(gap * 1000).toFixed(1)} mm)${extra}${bad.length ? '\n    ' + bad.join('\n    ') : ''}`);
+    console.log(`${bad.length ? '✗' : '✓'} ${c.name.padEnd(16)} ${String(r.type).padEnd(15)} top ${r.top.toFixed(3)}  Core ${r.coreBox[1].toFixed(3)} (${(gap * 1000).toFixed(1)} mm)${extra}${bad.length ? '\n    ' + bad.join('\n    ') : ''}`);
     if (bad.length) failed++;
     await page.context().close();
   }

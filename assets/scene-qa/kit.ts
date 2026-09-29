@@ -1,7 +1,7 @@
 // Scene QA checks — owned by S1 (kit). Registered with registerSceneCheck(code, ctx => issues); see registry.ts.
 //
 //   hero-float    the Companion Core stands ON its surface: rays cast down at its box's corners and centre find the
-//                 top under it, and the box's floor (anchors.hero.coreBox.minY) must meet it within 5 mm — the
+//                 top under it, and the box's floor (anchors.hero.coreBox[1], its minY) must meet it within 5 mm — the
 //                 credenza used to float it 0.165 m and the island sank it 2 cm. Error over 5 mm of air or nothing
 //                 under its centre; warn when sunk more than 5 mm into the top.
 //   leaf-in-lane  an open door leaf stays out of every doorway's lane (the doorway's width, 0.9 m out on both
@@ -14,7 +14,7 @@ import { registerSceneCheck } from './registry.js';
 registerSceneCheck('hero-float', ({ THREE, house, placedItems }) => {
   const h = house && house.anchors && house.anchors.hero;
   if (!h || !h.coreBox) return [];
-  const b = h.coreBox, dev = h.device;
+  const [minX, minY, minZ, maxX, maxY, maxZ] = h.coreBox as number[], b = { minX, minY, minZ, maxX, maxY, maxZ }, dev = h.device;
   const skip = new Set<any>();
   if (dev) dev.traverse(o => skip.add(o));
   const targets = placedItems.filter(o => o !== dev && !(o.userData && (o.userData.isCable || o.userData.fixtures || o.userData.role === 'fixture')));

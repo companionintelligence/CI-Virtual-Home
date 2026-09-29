@@ -289,9 +289,11 @@ applies only under `"defaults": 2`.
 - **Hero surfaces.** `surface`: `desk` | `shelf` | `credenza` | `island` | `console` | `counter` | `none`, or any type
   in `assets/item-map.ts` SURFACE_TYPES (sideboard, dresser, writing-desk …). A piece backs onto the wall `rot` names,
   its front to the room; the Core stands on its real top (a ray cast finds it: the credenza's 0.605 m, the island's
-  0.94 m, past a turntable, a bowl, a faucet or a cooktop — on the island at the user-side end, ≥ 0.35 m from both at
-  any rotation). The island's stone is `surfaceColor` or a seeded stone, and it brings no stools into a room that has
-  its own. `anchors.hero.coreBox` is the device's exact box (never its desk-glow decal); the scene QA's `hero-float`
+  0.94 m, the console's 0.80 m, the counter's 0.90 m, past a turntable, a bowl, a faucet or a cooktop — on the island
+  at the user-side end, ≥ 0.35 m from both at any rotation). Read the top off `anchors.hero.surfaceTop`, never the
+  catalog's `height` of the piece: that is its full height (the counter run's 0.96 m includes its upstand, 60 mm above
+  the worktop the Core stands on). The island's stone is `surfaceColor` or a seeded stone, and it brings no stools into a room that has
+  its own. `anchors.hero.coreBox` is the device's exact box `[minX, minY, minZ, maxX, maxY, maxZ]` in metres (never its desk-glow decal); the scene QA's `hero-float`
   fails a Core more than 5 mm above its top. `desk` (style walnut | oak | white | black, `color`, `w`), `monitor`
   (curved | flat | none) and `chair` (`kind` task | lounge | none, `pose` turned | tucked — S5 reads the pose) dress a
   desk hero.

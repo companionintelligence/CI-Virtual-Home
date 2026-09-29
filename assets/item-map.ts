@@ -68,6 +68,8 @@ export const ITEM_ENUMS: Record<string, Record<string, readonly (string | number
 
 // The types a Companion Core can stand on (hero.surface names one, or an alias below), each with a flat top the
 // hero block finds by casting down onto the built piece — so the Core's y is the piece's real top, whatever it is.
+// (The registry's `height` of a piece is its FULL height — counter-run's 0.96 m includes the upstand, 60 mm over the 0.90 m
+// worktop the Core stands on — so read the top off anchors.hero.surfaceTop, not off the catalog.)
 export const SURFACE_TYPES: readonly string[] = [
   'walnut-desk', 'media-credenza', 'kitchen-island', 'kitchen-cabinetry', 'dining-table', 'coffee-table',
   'console-table', 'counter-run', 'sideboard', 'dresser', 'side-table', 'nightstand', 'writing-desk', 'farmhouse-table',
