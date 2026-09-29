@@ -295,3 +295,103 @@ registerProps({
     ],
   },
 });
+
+// =================================================================================================================
+// Pass 4 (S3 compose): dining and coffee tables beside the farmhouse table — the only sized dining table the fleet
+// had — so the composer can match a table to the style (trestle, glass, pedestal, oval) and vary it by seed.
+// =================================================================================================================
+const glassTopMat = std => std(0xcfe3e8, { roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.38 });
+
+registerProps({
+  // Trestle table — a thick plank top on two trestle ends (post, foot, cleat) tied by a stretcher (farmhouse,
+  // craftsman, mediterranean). w × d; chairs are separate items.
+  'trestle-table': {
+    footprint: [2.0, 0.9], height: 0.76, params: ['w', 'd', 'color'], tags: ['dining', 'kitchen'],
+    create(it, { std, box, group, colors, hex }) {
+      const w = it.w || 2.0, d = it.d || 0.9, g = group('Trestle Table'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.55 });
+      g.add(box(w, 0.055, d, wood, 0, 0.7325, 0));
+      for (const s of [-1, 1]) {
+        const x = s * (w / 2 - 0.3);
+        g.add(box(0.1, 0.61, 0.12, wood, x, 0.395, 0));          // post
+        g.add(box(0.1, 0.07, d - 0.1, wood, x, 0.035, 0));       // foot
+        g.add(box(0.08, 0.06, d - 0.16, wood, x, 0.675, 0));     // cleat under the top
+      }
+      g.add(box(w - 0.6, 0.08, 0.06, wood, 0, 0.3, 0));          // stretcher
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-1, 0.705, -0.45, 1, 0.76, 0.45], color: 'role:wood' }, { shape: 'box', box: [-0.75, 0, -0.4, -0.65, 0.7, 0.4], color: 'role:wood' }, { shape: 'box', box: [0.65, 0, -0.4, 0.75, 0.7, 0.4], color: 'role:wood' }],
+  },
+  // Glass dining table — a clear glass top on two blackened-steel sled frames (modern, industrial).
+  'glass-dining-table': {
+    footprint: [1.8, 0.9], height: 0.75, params: ['w', 'd', 'color'], tags: ['dining'],
+    create(it, { std, box, group, colors, hex }) {
+      const w = it.w || 1.8, d = it.d || 0.9, g = group('Glass Dining Table');
+      const metal = std(it.color ? hex(it.color) : colors.metal, { metalness: 0.8, roughness: 0.3 });
+      const top = box(w, 0.012, d, glassTopMat(std), 0, 0.744, 0, false); top.receiveShadow = false; g.add(top);
+      for (const s of [-1, 1]) {
+        const x = s * (w / 2 - 0.2);
+        g.add(box(0.04, 0.04, d - 0.08, metal, x, 0.718, 0));                     // top rail
+        g.add(box(0.04, 0.04, d - 0.08, metal, x, 0.02, 0));                      // floor rail
+        for (const z of [-1, 1]) g.add(box(0.04, 0.66, 0.04, metal, x, 0.37, z * (d / 2 - 0.06)));
+      }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.9, 0.738, -0.45, 0.9, 0.75, 0.45], color: '#cfe3e8' }, { shape: 'box', box: [-0.72, 0, -0.41, -0.68, 0.74, 0.41], color: 'role:metal' }, { shape: 'box', box: [0.68, 0, -0.41, 0.72, 0.74, 0.41], color: 'role:metal' }],
+  },
+  // Pedestal dining table — a round top on one turned column spreading into four feet (scandi, cottage, a breakfast
+  // corner). r: top radius (0.6 seats four, 0.75 six).
+  'pedestal-dining-table': {
+    footprint: [1.2, 1.2], height: 0.76, params: ['r', 'color'], tags: ['dining', 'kitchen'],
+    create(it, { THREE, std, box, group, colors, hex }) {
+      const r = it.r || 0.6, g = group('Pedestal Dining Table'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.5 });
+      g.add(cyl(THREE, r, r, 0.045, wood, 0, 0.7375, 0, 48));
+      const profile = [[0.0, 0.1], [0.14, 0.1], [0.11, 0.2], [0.07, 0.32], [0.085, 0.5], [0.06, 0.64], [0.1, 0.715], [0.0, 0.715]].map(([x, y]) => new THREE.Vector2(x, y));
+      const col = new THREE.Mesh(new THREE.LatheGeometry(profile, 20), wood); col.castShadow = true; g.add(col);
+      for (let k = 0; k < 4; k++) { const f = box(Math.min(0.9, r * 1.4), 0.06, 0.09, wood, 0, 0.05, 0); f.position.set(Math.cos(k * Math.PI / 2 + Math.PI / 4) * r * 0.33, 0.05, Math.sin(k * Math.PI / 2 + Math.PI / 4) * r * 0.33); f.rotation.y = -(k * Math.PI / 2 + Math.PI / 4); g.add(f); }
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.6, 0.715, -0.6, 0.6, 0.76, 0.6], color: 'role:wood' }, { shape: 'cyl', box: [-0.1, 0, -0.1, 0.1, 0.715, 0.1], color: 'role:wood' }],
+  },
+  // Oval dining table — an oval top on four splayed tapered legs (mid-century, scandi, modern). w × d.
+  'oval-dining-table': {
+    footprint: [2.0, 1.0], height: 0.75, params: ['w', 'd', 'color'], tags: ['dining'],
+    create(it, { THREE, std, box, group, colors, hex }) {
+      const w = it.w || 2.0, d = it.d || 1.0, g = group('Oval Dining Table'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.45 });
+      const top = cyl(THREE, 0.5, 0.5, 0.04, wood, 0, 0.73, 0, 48); top.scale.set(w, 1, d); g.add(top);
+      const apron = cyl(THREE, 0.5, 0.5, 0.06, wood, 0, 0.68, 0, 48); apron.scale.set(w - 0.2, 1, d - 0.2); g.add(apron);
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.016, 0.7, 10), wood);
+        leg.position.set(sx * (w / 2 - 0.34), 0.35, sz * (d / 2 - 0.18)); leg.rotation.set(-sz * 0.1, 0, sx * 0.1); leg.castShadow = true; g.add(leg);
+      }
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-1, 0.71, -0.5, 1, 0.75, 0.5], color: 'role:wood' }],
+  },
+  // Round coffee table — a round top over a lower shelf on three legs (scandi, mid-century, cottage). r.
+  'round-coffee-table': {
+    footprint: [0.9, 0.9], height: 0.42, params: ['r', 'color'], tags: ['living', 'den'],
+    create(it, { THREE, std, group, colors, hex }) {
+      const r = it.r || 0.45, g = group('Round Coffee Table'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.45 });
+      g.add(cyl(THREE, r, r, 0.035, wood, 0, 0.4025, 0, 40));
+      g.add(cyl(THREE, r * 0.78, r * 0.78, 0.025, wood, 0, 0.12, 0, 36));
+      for (let k = 0; k < 3; k++) { const a = k * Math.PI * 2 / 3 + Math.PI / 2; g.add(cyl(THREE, 0.022, 0.018, 0.385, wood, Math.cos(a) * r * 0.72, 0.1925, Math.sin(a) * r * 0.72, 10)); }
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.45, 0.385, -0.45, 0.45, 0.42, 0.45], color: 'role:wood' }, { shape: 'cyl', box: [-0.35, 0.1, -0.35, 0.35, 0.13, 0.35], color: 'role:wood' }],
+  },
+  // Trunk coffee table — a steamer trunk with iron straps and corners (farmhouse, industrial, craftsman). w.
+  'trunk-coffee-table': {
+    footprint: [1.0, 0.6], height: 0.46, params: ['w', 'color'], tags: ['living', 'den', 'bedroom'],
+    create(it, { std, box, group, colors, hex, mix }) {
+      const w = it.w || 1.0, d = 0.6, g = group('Trunk Coffee Table'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.6 });
+      const iron = std(colors.metal, { metalness: 0.7, roughness: 0.45 });
+      g.add(box(w, 0.4, d, wood, 0, 0.22, 0));
+      g.add(box(w + 0.01, 0.06, d + 0.01, std(mix(it.color ? hex(it.color) : colors.wood, 0x000000, 0.2), { roughness: 0.6 }), 0, 0.43, 0));   // lid
+      for (const s of [-1, 1]) g.add(box(0.05, 0.47, d + 0.02, iron, s * w * 0.28, 0.235, 0));   // straps
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) g.add(box(0.04, 0.04, 0.04, iron, sx * (w / 2 - 0.015), 0.04, sz * (d / 2 - 0.015)));   // corner caps
+      g.add(box(0.12, 0.05, 0.02, iron, 0, 0.36, d / 2 + 0.01));   // hasp
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.5, 0.02, -0.3, 0.5, 0.46, 0.3], color: 'role:wood' }],
+  },
+});

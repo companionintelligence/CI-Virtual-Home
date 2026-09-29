@@ -4,6 +4,7 @@
 // colors.fabric (seeded), timber from colors.wood; `color` tints the prop's signature soft surface — the duvet
 // on a bed, the headboard on the headboard-bed, the cloth on the hammock, the cushion on the daybed and pet-bed.
 import { registerProps } from './registry.js';
+import { patternTexture } from './patterns.js';
 
 const CORNERS = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
 
@@ -387,6 +388,101 @@ registerProps({
     iso: [
       { shape: 'blob', box: [-0.35, 0, -0.275, 0.35, 0.2, 0.275], color: 'role:fabric2' },
       { shape: 'box', box: [-0.27, 0.06, -0.19, 0.27, 0.09, 0.2], color: 'role:linen' },
+    ],
+  },
+});
+
+// =================================================================================================================
+// Pass 4 (S3 compose): two more grown-up beds (a sleigh bed, a tall upholstered bed) and a kid's house-frame bed, so
+// the bedrooms of one house can differ in bed as well as in linen. `quilt` (a pattern from assets/props/patterns.ts:
+// check, stripe, dots, diamond, kilim, border …) paints the duvet as a patterned textile.
+// =================================================================================================================
+// bedding() with the duvet painted by a pattern when the item names one
+function beddingQuilt(g, ctx, it, o) {
+  const before = g.children.length, duvet = o.duvet;
+  const top = bedding(g, ctx, o);
+  if (it.quilt) {
+    const { THREE, std, colors } = ctx;
+    const map = patternTexture(THREE, String(it.quilt), [duvet, colors.linen, colors.accent, colors.fabric2], { w: o.w, d: o.d * 0.6 });
+    const mat = std(0xffffff, { roughness: 0.85, map });
+    for (const m of g.children.slice(before)) if (m.material && m.material.color && m.material.color.getHex() === (duvet & 0xffffff) && !m.material.map) m.material = mat;
+  }
+  return top;
+}
+
+registerProps({
+  // Sleigh bed — a scrolled headboard and a lower scrolled footboard in timber, the rails between them
+  // (craftsman, farmhouse, traditional primaries). color is the duvet.
+  'sleigh-bed': {
+    footprint: [1.76, 2.3], height: 1.12, params: ['w', 'd', 'color', 'quilt'], tags: ['bedroom', 'master', 'guest'],
+    create(it, ctx) {
+      const { THREE, std, box, group, colors } = ctx;
+      const w = it.w || 1.6, d = it.d || 2.3, g = group('Sleigh Bed'), wood = std(colors.wood, { roughness: 0.45 });
+      const scroll = (y0, h, z, dir) => {   // a board curling outward at its top: a slab and a half-cylinder roll
+        g.add(box(w + 0.16, h, 0.06, wood, 0, y0 + h / 2, z));
+        const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, w + 0.16, 16, 1, false, 0, Math.PI), wood);
+        roll.rotation.z = Math.PI / 2; roll.rotation.x = dir > 0 ? 0 : Math.PI; roll.position.set(0, y0 + h, z + dir * 0.03); roll.castShadow = true; g.add(roll);
+      };
+      scroll(0, 1.05, -d / 2 + 0.03, -1);
+      scroll(0, 0.62, d / 2 - 0.03, 1);
+      for (const s of [-1, 1]) g.add(box(0.06, 0.22, d - 0.12, wood, s * (w / 2 + 0.02), 0.3, 0));   // side rails
+      g.add(box(w, 0.08, d - 0.12, std(colors.wood, { roughness: 0.7 }), 0, 0.3, 0));                     // deck
+      beddingQuilt(g, ctx, it, { w: w - 0.04, d: d - 0.24, y: 0.34, duvet: duvetColor(it, ctx), pillows: 2 });
+      return g;
+    },
+    iso: [
+      { shape: 'box', box: [-0.88, 0, -1.15, 0.88, 1.12, -1.09], color: 'role:wood' },
+      { shape: 'box', box: [-0.88, 0, 1.09, 0.88, 0.69, 1.15], color: 'role:wood' },
+      { shape: 'box', box: [-0.78, 0.34, -1.03, 0.78, 0.6, 1.03], color: 'role:linen' },
+    ],
+  },
+  // Upholstered bed — a tall wingback headboard with a stitched border, an upholstered frame on slim legs
+  // (modern, mid-century, scandi primaries). color is the upholstery; the duvet is seeded.
+  'upholstered-bed': {
+    footprint: [1.84, 2.18], height: 1.35, params: ['w', 'd', 'color', 'quilt'], tags: ['bedroom', 'master', 'guest'],
+    create(it, ctx) {
+      const { std, box, group, colors, hex, mix, rng } = ctx;
+      const w = it.w || 1.6, d = it.d || 2.1, g = group('Upholstered Bed');
+      const up = it.color ? hex(it.color) : colors.fabric2, fab = std(up, { roughness: 0.9 }), seam = std(mix(up, 0x000000, 0.18), { roughness: 0.9 });
+      const hw = w + 0.24, hz = -d / 2 + 0.04;
+      g.add(box(hw, 1.25, 0.1, fab, 0, 0.1 + 0.625, hz));                                  // headboard
+      g.add(box(hw - 0.12, 1.13, 0.012, seam, 0, 0.1 + 0.625, hz + 0.056));                 // its stitched panel
+      g.add(box(hw - 0.16, 1.09, 0.02, fab, 0, 0.1 + 0.625, hz + 0.066));
+      for (const s of [-1, 1]) g.add(box(0.12, 1.2, 0.3, fab, s * (hw / 2 - 0.06), 0.1 + 0.6, hz + 0.1));   // wings
+      legs(g, ctx, { w: w - 0.1, d: d - 0.2, h: 0.1, size: 0.04, mat: std(colors.wood, { roughness: 0.5 }) });
+      g.add(box(w + 0.04, 0.26, d - 0.1, fab, 0, 0.23, 0.05));
+      const duvet = rng() < 0.5 ? colors.linen : mix(colors.accent, colors.linen, 0.45);
+      beddingQuilt(g, ctx, it, { w: w - 0.06, d: d - 0.22, y: 0.36, z: 0.06, duvet: it.quilt ? colors.accent : duvet, pillows: 2 });
+      return g;
+    },
+    iso: [
+      { shape: 'box', box: [-0.92, 0.1, -1.05, 0.92, 1.35, -0.95], color: 'role:fabric2' },
+      { shape: 'box', box: [-0.82, 0.1, -1.0, 0.82, 0.36, 1.09], color: 'role:fabric2' },
+      { shape: 'box', box: [-0.77, 0.36, -0.95, 0.77, 0.62, 1.05], color: 'role:linen' },
+    ],
+  },
+  // House bed — a kid's single bed under a timber house frame (two gable posts and a ridge), low to the floor
+  // (scandi, modern kids' rooms). color is the duvet; quilt paints it.
+  'house-bed': {
+    footprint: [1.02, 2.08], height: 1.6, params: ['w', 'd', 'color', 'quilt'], tags: ['kids', 'bedroom'],
+    create(it, ctx) {
+      const { std, box, group, colors } = ctx;
+      const w = it.w || 0.96, d = it.d || 2.0, g = group('House Bed'), wood = std(colors.wood, { roughness: 0.5 });
+      const t = 0.045, H = 1.6;
+      g.add(box(w, 0.1, d, wood, 0, 0.12, 0));
+      for (const s of [-1, 1]) g.add(box(t, 0.14, d, wood, s * (w / 2 - t / 2), 0.13, 0));
+      for (const z of [-d / 2 + t / 2, d / 2 - t / 2]) {
+        for (const s of [-1, 1]) g.add(box(t, 1.1, t, wood, s * (w / 2 - t / 2), 0.55, z));   // posts
+        for (const s of [-1, 1]) { const r = box(t, Math.hypot(w / 2, H - 1.1) + 0.03, t, wood, s * w / 4, (1.1 + H) / 2, z); r.rotation.z = s * Math.atan2(w / 2, H - 1.1); g.add(r); }   // rafters
+      }
+      g.add(box(t, t, d, wood, 0, H - t / 2, 0));                                                    // ridge
+      beddingQuilt(g, ctx, it, { w: w - 0.1, d: d - 0.1, y: 0.17, duvet: duvetColor(it, ctx), pillows: 1, thick: 0.16 });
+      return g;
+    },
+    iso: [
+      { shape: 'box', box: [-0.48, 0.07, -1.0, 0.48, 0.5, 1.0], color: 'role:linen' },
+      { shape: 'box', box: [-0.5, 0, -1.0, -0.45, 1.6, 1.0], color: 'role:wood' },
+      { shape: 'box', box: [0.45, 0, -1.0, 0.5, 1.6, 1.0], color: 'role:wood' },
     ],
   },
 });

@@ -345,3 +345,65 @@ registerProps({
     iso: [{ shape: 'box', box: [-0.5, 0, -0.2, 0.5, 0.45, 0.2], color: 'role:wood' }, { shape: 'box', box: [-0.48, 0.45, -0.18, 0.48, 0.5, 0.18], color: 'role:fabric' }],
   },
 });
+
+// =================================================================================================================
+// Pass 4 (S3 compose): an armoire for bedrooms without a fitted wardrobe, a bedside table that is not the one
+// nightstand every bedroom had, and a bar cart.
+// =================================================================================================================
+registerProps({
+  // Armoire — a tall two-door wardrobe with a crown cornice, a drawer across the foot and bracket feet
+  // (farmhouse, cottage, craftsman, mediterranean bedrooms). w, h, color.
+  'armoire': {
+    footprint: [1.1, 0.6], height: 2.1, params: ['w', 'h', 'color'], tags: ['bedroom', 'hall'],
+    create(it, { std, box, group, colors, hex, mix }) {
+      const w = it.w || 1.1, d = 0.58, h = it.h || 2.1, g = group('Armoire');
+      const body = it.color ? hex(it.color) : colors.wood, bodyMat = std(body, { roughness: 0.55 }), front = std(relief(mix, body), { roughness: 0.5 });
+      const handle = std(contrast(body), { metalness: 0.6, roughness: 0.35 });
+      for (const [sx, sz] of CORNERS) g.add(box(0.08, 0.1, 0.08, bodyMat, sx * (w / 2 - 0.05), 0.05, sz * (d / 2 - 0.05)));   // bracket feet
+      g.add(box(w, h - 0.18, d, bodyMat, 0, 0.1 + (h - 0.18) / 2, 0));
+      g.add(box(w + 0.06, 0.08, d + 0.04, bodyMat, 0, h - 0.04, 0.01));                             // cornice
+      g.add(box(w - 0.08, 0.2, 0.02, front, 0, 0.23, d / 2 + 0.01));                               // foot drawer
+      g.add(box(0.14, 0.02, 0.02, handle, 0, 0.23, d / 2 + 0.03));
+      const dh = h - 0.18 - 0.3;
+      for (const s of [-1, 1]) {
+        g.add(box(w / 2 - 0.06, dh, 0.02, front, s * (w / 4 - 0.005), 0.36 + dh / 2, d / 2 + 0.01));   // doors
+        g.add(box(w / 2 - 0.16, dh - 0.16, 0.012, std(mix(body, 0x000000, 0.12), { roughness: 0.55 }), s * (w / 4 - 0.005), 0.36 + dh / 2, d / 2 + 0.024));   // panels
+        g.add(box(0.016, 0.16, 0.02, handle, s * 0.05, 0.36 + dh / 2, d / 2 + 0.04));
+      }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.55, 0, -0.3, 0.55, 2.1, 0.3], color: 'role:wood' }],
+  },
+  // Bedside table — an open box with one drawer on splayed legs (mid-century, scandi, modern). color.
+  'bedside-table': {
+    footprint: [0.45, 0.38], height: 0.56, params: ['color'], tags: ['bedroom', 'guest'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = 0.45, d = 0.38, g = group('Bedside Table'), body = it.color ? hex(it.color) : colors.wood;
+      const mat = std(body, { roughness: 0.5 });
+      for (const [sx, sz] of CORNERS) { const l = cyl(THREE, 0.018, 0.012, 0.26, mat, sx * (w / 2 - 0.05), 0.13, sz * (d / 2 - 0.05), 8); l.rotation.set(-sz * 0.1, 0, sx * 0.1); g.add(l); }
+      g.add(box(w, 0.02, d, mat, 0, 0.27, 0));                                 // bottom
+      g.add(box(w, 0.02, d, mat, 0, 0.55, 0));                                 // top
+      for (const s of [-1, 1]) g.add(box(0.02, 0.28, d, mat, s * (w / 2 - 0.01), 0.41, 0));
+      g.add(box(w - 0.04, 0.12, 0.02, std(relief(mix, body), { roughness: 0.5 }), 0, 0.47, d / 2 - 0.01));   // drawer
+      g.add(box(0.06, 0.012, 0.015, std(contrast(body), { metalness: 0.6, roughness: 0.35 }), 0, 0.47, d / 2 + 0.005));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.225, 0.26, -0.19, 0.225, 0.56, 0.19], color: 'role:wood' }],
+  },
+  // Bar cart — two brass-edged trays on a slim frame with wheels, bottles and glasses on top (bar, living, dining).
+  'bar-cart': {
+    footprint: [0.8, 0.45], height: 0.95, params: ['color'], tags: ['bar', 'living', 'dining'],
+    create(it, { THREE, std, box, group, colors, hex, rng }) {
+      const w = 0.8, d = 0.45, g = group('Bar Cart'), frame = std(it.color ? hex(it.color) : colors.metal, { metalness: 0.85, roughness: 0.3 });
+      const tray = std(colors.wood, { roughness: 0.4 });
+      for (const [sx, sz] of CORNERS) g.add(box(0.02, 0.8, 0.02, frame, sx * (w / 2 - 0.02), 0.44, sz * (d / 2 - 0.02)));
+      for (const y of [0.22, 0.76]) { g.add(box(w - 0.02, 0.015, d - 0.02, tray, 0, y, 0)); g.add(box(w, 0.03, 0.01, frame, 0, y + 0.02, d / 2 - 0.01)); g.add(box(w, 0.03, 0.01, frame, 0, y + 0.02, -d / 2 + 0.01)); }
+      const handle = cyl(THREE, 0.012, 0.012, d, frame, w / 2 + 0.04, 0.86, 0, 8); handle.rotation.x = Math.PI / 2; g.add(handle);
+      for (const [sx, sz] of [[-1, -1], [-1, 1]]) { const wh = cyl(THREE, 0.04, 0.04, 0.02, frame, sx * (w / 2 - 0.02), 0.04, sz * (d / 2 - 0.02), 14); wh.rotation.z = Math.PI / 2; g.add(wh); }
+      for (let i = 0; i < 3; i++) { const c = pick(rng, GLASS); g.add(cyl(THREE, 0.035, 0.035, 0.24, std(c, { roughness: 0.2, metalness: 0.2 }), -0.25 + i * 0.1, 0.9, -0.08, 12)); g.add(cyl(THREE, 0.012, 0.012, 0.06, std(c, { roughness: 0.2 }), -0.25 + i * 0.1, 1.05, -0.08, 8)); }
+      for (let i = 0; i < 2; i++) g.add(cyl(THREE, 0.03, 0.025, 0.09, std(0xe2e8f0, { roughness: 0.1, metalness: 0.3, transparent: true, opacity: 0.6 }), 0.15 + i * 0.1, 0.815, 0.08, 12));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.4, 0, -0.225, 0.4, 0.8, 0.225], color: 'role:metal' }],
+  },
+});

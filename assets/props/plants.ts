@@ -345,3 +345,82 @@ registerProps({
   },
 }, { foliage: true });   // a leaf's bounding box is not its shape: the scene QA skips these
 
+
+// =================================================================================================================
+// Pass 4 (S3 compose): four more floor plants, so a house's plants differ from room to room and from the next
+// house (snake-plant stood in 29 of 30).
+// =================================================================================================================
+registerProps({
+  // Bird of paradise — tall paddle leaves on long stalks fanning up out of a wide pot (tropical, modern).
+  'bird-of-paradise': {
+    footprint: [0.9, 0.9], height: 1.7, params: ['color', 'h'], tags: ['living', 'dining', 'entry', 'sunroom'],
+    create(it, ctx) {
+      const { std, group, colors, hex, rng } = ctx, K = kit(ctx);
+      const g = group('Bird of Paradise'), rim = K.pot(g, 0.22, 0.18, 0.4, std(potColor(it, colors, rng, hex), { roughness: 0.6 }));
+      const s = ((it.h || 1.7) - rim) / (1.7 - rim), stalk = std(STEM, { roughness: 0.8 });
+      const greens = [K.leafMat(0x2d6a4f), K.leafMat(0x386641), K.leafMat(0x40916c)];
+      for (let i = 0; i < 7; i++) {
+        const a = i * 2.399 + jit(rng, 0.25), t = 0.12 + rng() * 0.28, L = (0.55 + rng() * 0.3) * s;
+        const tip = [Math.sin(a) * Math.sin(t) * L, rim + Math.cos(t) * L, Math.cos(a) * Math.sin(t) * L];
+        K.strut(g, [0, rim - 0.02, 0], tip, 0.012, stalk, 5);
+        K.leaf(g, 0.2, 0.52 * s, 0.02, greens[i % 3], tip[0], tip[1], tip[2], a, t + 0.15);
+      }
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.22, 0, -0.22, 0.22, 0.4, 0.22], color: 'role:accent' }, { shape: 'blob', box: [-0.45, 0.4, -0.45, 0.45, 1.7, 0.45], color: '#386641' }],
+  },
+  // Rubber plant — a straight cane with glossy dark oval leaves held out all the way up (modern, industrial).
+  'rubber-plant': {
+    footprint: [0.7, 0.7], height: 1.5, params: ['color', 'h'], tags: ['living', 'office', 'bedroom', 'entry'],
+    create(it, ctx) {
+      const { std, group, colors, hex, rng } = ctx, K = kit(ctx);
+      const g = group('Rubber Plant'), rim = K.pot(g, 0.17, 0.14, 0.34, std(potColor(it, colors, rng, hex), { roughness: 0.6 }));
+      const H = it.h || 1.5, top = H - 0.08, leafMat = std(0x1f3d2b, { roughness: 0.35, flatShading: true });
+      K.strut(g, [0, rim - 0.02, 0], [0.02, top, 0], 0.016, std(BARK, { roughness: 0.8 }), 6);
+      const n = 11;
+      for (let i = 0; i < n; i++) {
+        const u = i / (n - 1), y = rim + 0.1 + u * (top - rim - 0.1), a = i * 2.2 + jit(rng, 0.3);
+        K.leaf(g, 0.13, 0.26 - u * 0.06, 0.012, leafMat, Math.sin(a) * 0.02, y, Math.cos(a) * 0.02, a, 1.1 - u * 0.5);
+      }
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.17, 0, -0.17, 0.17, 0.34, 0.17], color: 'role:accent' }, { shape: 'blob', box: [-0.33, 0.4, -0.33, 0.33, 1.5, 0.33], color: '#1f3d2b' }],
+  },
+  // ZZ plant — arching stems of small glossy paired leaflets from a low pot (every style, low light: halls, baths).
+  'zz-plant': {
+    footprint: [0.6, 0.6], height: 0.85, params: ['color', 'h'], tags: ['living', 'bedroom', 'office', 'bathroom', 'entry'],
+    create(it, ctx) {
+      const { std, group, colors, hex, rng } = ctx, K = kit(ctx);
+      const g = group('ZZ Plant'), rim = K.pot(g, 0.15, 0.13, 0.26, std(potColor(it, colors, rng, hex), { roughness: 0.6 }));
+      const H = it.h || 0.85, mat = std(0x2d5a3a, { roughness: 0.3, flatShading: true });
+      for (let i = 0; i < 7; i++) {
+        const a = i * 2.399 + jit(rng, 0.3), t = 0.1 + rng() * 0.35, L = (H - rim) * (0.75 + rng() * 0.25);
+        const fr = K.frond(g, 0.02, L, 0.012, mat, 0, rim - 0.01, 0, a, t, 0.35);
+        const pts = fr.userData.pts;
+        for (let k = 2; k < pts.length; k += 1) for (const s of [-1, 1]) {
+          const [x, y, z] = pts[k];
+          K.leaf(g, 0.045, 0.08, 0.01, mat, x, y, z, a + s * 1.3, 1.1);
+        }
+      }
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.15, 0, -0.15, 0.15, 0.26, 0.15], color: 'role:accent' }, { shape: 'blob', box: [-0.3, 0.26, -0.3, 0.3, 0.85, 0.3], color: '#2d5a3a' }],
+  },
+  // Dracaena — two or three bare canes of different heights each topped by a tuft of strappy leaves (modern,
+  // scandi, tropical).
+  'dracaena': {
+    footprint: [0.8, 0.8], height: 1.8, params: ['color', 'h'], tags: ['living', 'office', 'entry', 'dining'],
+    create(it, ctx) {
+      const { std, group, colors, hex, rng } = ctx, K = kit(ctx);
+      const g = group('Dracaena'), rim = K.pot(g, 0.18, 0.15, 0.38, std(potColor(it, colors, rng, hex), { roughness: 0.6 }));
+      const H = it.h || 1.8, cane = std(0x8b7355, { roughness: 0.85 }), leaves = [K.leafMat(0x4f772d), K.leafMat(0x6a994e)];
+      [1, 0.78, 0.6].forEach((f, i) => {
+        const a = i * 2.1 + jit(rng, 0.3), top = [Math.sin(a) * 0.1, rim + (H - rim - 0.3) * f, Math.cos(a) * 0.1];
+        K.strut(g, [Math.sin(a) * 0.04, rim - 0.02, Math.cos(a) * 0.04], top, 0.02, cane, 6);
+        for (let k = 0; k < 9; k++) K.blade(g, 0.022, 0.34 + rng() * 0.08, leaves[k % 2], top[0], top[1], top[2], k * 0.7 + jit(rng, 0.2), 0.5 + rng() * 0.9, 0.2);
+      });
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.18, 0, -0.18, 0.18, 0.38, 0.18], color: 'role:accent' }, { shape: 'blob', box: [-0.4, 1.0, -0.4, 0.4, 1.8, 0.4], color: '#4f772d' }],
+  },
+});

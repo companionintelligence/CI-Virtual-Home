@@ -21,6 +21,9 @@ const stoneMat = std => std(STONE, { roughness: 0.25, metalness: 0.05 });
 const chromeMat = std => std(CHROME, { metalness: 0.95, roughness: 0.12 });
 const glassMat = std => std(GLASS, { roughness: 0.15, metalness: 0.5 });
 const plinthMat = std => std(PLINTH, { roughness: 0.85 });
+// the worktop: `top` names a material; without one it is today's pale stone, exactly (pass 4 S3: countertop material)
+const TOPS = { marble: [0xeceae4, { roughness: 0.18, metalness: 0.02 }], butcher: [0xa0724a, { roughness: 0.55 }], concrete: [0x9c9b97, { roughness: 0.8 }], quartz: [0x2b2b2e, { roughness: 0.2, metalness: 0.08 }], terrazzo: [0xe3ddd2, { roughness: 0.3 }] };
+const topMat = (std, it) => { const t = it && TOPS[it.top]; return t ? std(t[0], { ...t[1] }) : stoneMat(std); };
 const handleMatOf = ({ std, colors }) => std(colors.metal, { metalness: 0.7, roughness: 0.3 });
 
 const cyl = (THREE, rt, rb, h, mat, x = 0, y = 0, z = 0, seg = 16) => {
@@ -62,14 +65,14 @@ function fronts(ctx, g, { x0, w, y0, h, zf, n = 1, rows = 1, mat, handleMat, gap
 
 // A base unit: recessed plinth, dark carcass, optional stone worktop at `top` and an upstand along the back.
 // Fronts go on afterwards with fronts() at the returned zf. Returns the materials and the front plane.
-function baseUnit(ctx, g, { w, d, top = 0.9, color, worktop = true, upstand = false }) {
+function baseUnit(ctx, g, { w, d, top = 0.9, color, worktop = true, upstand = false, surface = null }) {
   const { std, box, mix } = ctx;
   const dark = std(mix(color, 0x000000, 0.45), { roughness: 0.75 }), front = std(color, { roughness: 0.55 }), handle = handleMatOf(ctx);
   const ph = 0.1, ch = top - 0.04 - ph;
   g.add(box(w - 0.02, ph, d - 0.07, plinthMat(std), 0, ph / 2, -0.035));                 // plinth, toe-kick recessed at the front
   g.add(box(w, ch, d - 0.02, dark, 0, ph + ch / 2, -0.01));                                 // carcass, front face at d/2 − 0.02
-  if (worktop) g.add(box(w, 0.04, d, stoneMat(std), 0, top - 0.02, 0));
-  if (upstand) g.add(box(w, 0.06, 0.02, stoneMat(std), 0, top + 0.03, -d / 2 + 0.01));
+  if (worktop) g.add(box(w, 0.04, d, surface ? surface() : stoneMat(std), 0, top - 0.02, 0));
+  if (upstand) g.add(box(w, 0.06, 0.02, surface ? surface() : stoneMat(std), 0, top + 0.03, -d / 2 + 0.01));
   return { dark, front, handle, zf: d / 2 - 0.02, y0: ph, h: ch };
 }
 
@@ -139,14 +142,14 @@ registerProps({
 
   // ---- sink run: a base run with a steel basin let into the worktop, a gooseneck tap behind it, an upstand at the back
   'sink-run': {
-    footprint: [1.8, 0.62], height: 1.2, params: ['w', 'd', 'color'], tags: ['kitchen', 'laundry'],
+    footprint: [1.8, 0.62], height: 1.2, params: ['w', 'd', 'color', 'top'], tags: ['kitchen', 'laundry'],
     create(it, ctx) {
       const { THREE, std, box, group, colors, hex } = ctx;
       const w = it.w || 1.8, d = it.d || 0.62, g = group('Sink Run'), color = it.color ? hex(it.color) : colors.cabinet;
-      const u = baseUnit(ctx, g, { w, d, color, worktop: false, upstand: true });
+      const u = baseUnit(ctx, g, { w, d, color, worktop: false, upstand: true, surface: it.top ? () => topMat(std, it) : null });
       fronts(ctx, g, { x0: -w / 2, w, y0: u.y0, h: u.h, zf: u.zf, n: Math.max(2, Math.round(w / 0.45)), mat: u.front, handleMat: u.handle });
       // the worktop in four pieces around the cut-out
-      const stone = stoneMat(std), bw = Math.min(0.56, w * 0.4), bd = d * 0.62, bz = 0.02, ty = 0.88, sideW = (w - bw) / 2;
+      const stone = topMat(std, it), bw = Math.min(0.56, w * 0.4), bd = d * 0.62, bz = 0.02, ty = 0.88, sideW = (w - bw) / 2;
       g.add(box(sideW, 0.04, d, stone, -(bw + sideW) / 2, ty, 0)); g.add(box(sideW, 0.04, d, stone, (bw + sideW) / 2, ty, 0));
       const backD = bz - bd / 2 + d / 2, frontD = d / 2 - (bz + bd / 2);
       g.add(box(bw, 0.04, backD, stone, 0, ty, -d / 2 + backD / 2)); g.add(box(bw, 0.04, frontD, stone, 0, ty, d / 2 - frontD / 2));
@@ -167,11 +170,11 @@ registerProps({
 
   // ---- counter run: the plain filler between appliances — doors, with one unit (seeded) a stack of three drawers
   'counter-run': {
-    footprint: [1.8, 0.6], height: 0.96, params: ['w', 'd', 'color'], tags: ['kitchen', 'laundry'],
+    footprint: [1.8, 0.6], height: 0.96, params: ['w', 'd', 'color', 'top'], tags: ['kitchen', 'laundry'],
     create(it, ctx) {
       const { group, colors, hex, rng } = ctx;
       const w = it.w || 1.8, d = it.d || 0.6, g = group('Counter Run'), color = it.color ? hex(it.color) : colors.cabinet;
-      const u = baseUnit(ctx, g, { w, d, color, upstand: true });
+      const u = baseUnit(ctx, g, { w, d, color, upstand: true, surface: it.top ? () => topMat(ctx.std, it) : null });
       const n = Math.max(1, Math.round(w / 0.5)), uw = w / n, drawerAt = n > 1 ? Math.floor(rng() * n) : -1;
       for (let i = 0; i < n; i++) {
         const x0 = -w / 2 + i * uw;
@@ -200,12 +203,27 @@ registerProps({
 
   // ---- upper cabinets (wall-mounted): a run of wall units, bar handles along the bottom edges
   'upper-cabinets': {
-    footprint: [1.2, 0.35], height: 0.7, params: ['w', 'd', 'h', 'y', 'color'], tags: ['kitchen', 'laundry'],
+    footprint: [1.2, 0.35], height: 0.7, params: ['w', 'd', 'h', 'y', 'color', 'glass'], tags: ['kitchen', 'laundry'],
     create(it, ctx) {
       const { std, box, group, mix, colors, hex } = ctx;
       const w = it.w || 1.2, d = it.d || 0.35, h = it.h || 0.7, y0 = it.y !== undefined ? 0 : 1.4, g = group('Upper Cabinets');
       const color = it.color ? hex(it.color) : colors.cabinet;
       g.add(box(w, h, d - 0.02, std(mix(color, 0x000000, 0.45), { roughness: 0.75 }), 0, y0 + h / 2, (d - 0.02) / 2));     // carcass, back at z = 0
+      if (it.glass) {   // glass-fronted (pass 4 S3): a pale lit interior, two shelves of crockery, framed glass doors
+        const n = Math.max(1, Math.round(w / 0.4)), pw = w / n, zf = d - 0.02, frame = std(color, { roughness: 0.55 });
+        g.add(box(w - 0.04, h - 0.04, 0.01, std(mix(color, 0xffffff, 0.55), { roughness: 0.8 }), 0, y0 + h / 2, zf - 0.02));
+        for (const f of [1 / 3, 2 / 3]) g.add(box(w - 0.04, 0.015, d - 0.06, std(mix(color, 0xffffff, 0.45), { roughness: 0.7 }), 0, y0 + h * f, zf / 2));
+        const crock = std(colors.linen, { roughness: 0.3 });
+        for (let i = 0; i < n * 2; i++) for (const f of [1 / 3, 2 / 3]) g.add(box(pw * 0.3, 0.1, 0.1, crock, -w / 2 + (i + 0.5) * pw / 2, y0 + h * f + 0.06, zf / 2));
+        for (let i = 0; i < n; i++) {
+          const x = -w / 2 + (i + 0.5) * pw, fw = pw - 0.014, bar = 0.035;
+          for (const yy of [y0 + bar / 2 + 0.007, y0 + h - bar / 2 - 0.007]) g.add(box(fw, bar, 0.02, frame, x, yy, zf + 0.01));
+          for (const xx of [x - fw / 2 + bar / 2, x + fw / 2 - bar / 2]) g.add(box(bar, h - 0.014, 0.02, frame, xx, y0 + h / 2, zf + 0.01));
+          g.add(box(fw - 2 * bar, h - 0.014 - 2 * bar, 0.006, std(0xd9e6ea, { roughness: 0.05, metalness: 0.1, transparent: true, opacity: 0.3 }), x, y0 + h / 2, zf + 0.012));
+          g.add(box(0.014, 0.1, 0.02, handleMatOf(ctx), x + (i % 2 ? -1 : 1) * (fw / 2 - bar - 0.02), y0 + 0.12, zf + 0.03));
+        }
+        return g;
+      }
       fronts(ctx, g, { x0: -w / 2, w, y0, h, zf: d - 0.02, n: Math.max(1, Math.round(w / 0.4)), mat: std(color, { roughness: 0.55 }), handleMat: handleMatOf(ctx), handle: 'hb' });
       return g;
     },
@@ -232,11 +250,11 @@ registerProps({
   // ---- breakfast bar: a base run between two stone waterfall ends, the worktop overhanging toward +z for stools;
   //      the doors face the kitchen at −z
   'breakfast-bar': {
-    footprint: [1.8, 0.75], height: 0.9, params: ['w', 'd', 'color'], tags: ['kitchen', 'dining'],
+    footprint: [1.8, 0.75], height: 0.9, params: ['w', 'd', 'color', 'top'], tags: ['kitchen', 'dining'],
     create(it, ctx) {
       const { std, box, group, mix, colors, hex } = ctx;
       const w = it.w || 1.8, d = it.d || 0.75, g = group('Breakfast Bar'), color = it.color ? hex(it.color) : colors.cabinet;
-      const stone = stoneMat(std), dark = std(mix(color, 0x000000, 0.45), { roughness: 0.75 }), front = std(color, { roughness: 0.55 }), handle = handleMatOf(ctx);
+      const stone = topMat(std, it), dark = std(mix(color, 0x000000, 0.45), { roughness: 0.75 }), front = std(color, { roughness: 0.55 }), handle = handleMatOf(ctx);
       const bd = Math.min(0.5, d * 0.62), zc = -d / 2 + bd / 2, bw = w - 0.08;      // base depth and centre; the rest overhangs toward +z
       g.add(box(bw - 0.02, 0.1, bd - 0.06, plinthMat(std), 0, 0.05, zc + 0.03));
       g.add(box(bw, 0.76, bd - 0.02, dark, 0, 0.48, zc + 0.01));                                   // carcass 0.1 … 0.86, back face at −d/2 + 0.02
@@ -325,5 +343,27 @@ registerProps({
       return g;
     },
     iso: [{ shape: 'box', box: [-0.12, 0, -0.18, 0.12, 0.34, 0.06], color: '#27272a' }, { shape: 'box', box: [-0.1, 0, 0.06, 0.1, 0.03, 0.18], color: '#cbd5e1' }],
+  },
+});
+
+// =================================================================================================================
+// Pass 4 (S3 compose): the corner of an L or U run (assets/room-units.ts packs runs round it), so a fitted kitchen
+// turns a corner in one piece instead of two runs overlapping.
+// =================================================================================================================
+registerProps({
+  // Corner run — a blind-corner base unit, one worktop square filling the corner. hand 'left': the walls are behind
+  // (−z) and to its left (−x), a door on the +z face; 'right': the side wall is at +x. top and color as counter-run.
+  'corner-run': {
+    footprint: [0.62, 0.62], height: 0.96, params: ['w', 'hand', 'color', 'top'], tags: ['kitchen', 'laundry'],
+    create(it, ctx) {
+      const { std, box, group, colors, hex } = ctx;
+      const w = it.w || 0.62, g = group(`Corner Run (${it.hand === 'right' ? 'right' : 'left'})`), color = it.color ? hex(it.color) : colors.cabinet;
+      const side = it.hand === 'right' ? 1 : -1;
+      const u = baseUnit(ctx, g, { w, d: w, color, upstand: true, surface: it.top ? () => topMat(std, it) : null });
+      g.add(box(0.02, 0.06, w, it.top ? topMat(std, it) : stoneMat(std), side * (w / 2 - 0.01), 0.93, 0));   // the upstand on the side wall
+      fronts(ctx, g, { x0: -w / 2 + (side < 0 ? 0.02 : 0), w: w - 0.02, y0: u.y0, h: u.h, zf: u.zf, mat: u.front, handleMat: u.handle, handle: 'v' });
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.31, 0, -0.31, 0.31, 0.86, 0.31], color: 'role:cabinet' }, { shape: 'box', box: [-0.31, 0.86, -0.31, 0.31, 0.9, 0.31], color: '#f1f5f9' }],
   },
 });

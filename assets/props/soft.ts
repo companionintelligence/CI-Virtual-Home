@@ -15,6 +15,7 @@
 //     material kit's theme() reads as a role key (0x1e293b is `cabinet`, so the clock's darks are 0x1f2937 and its
 //     rim is the kit's metal). Variation is ctx.rng(), seeded per item.
 import { registerProps } from './registry.js';
+import { patternTexture, motifTexture, RUG_PATTERNS, ART_MOTIFS } from './patterns.js';
 
 const pick = (rng, arr) => arr[Math.floor(rng() * arr.length)];
 const jit = (rng, a) => (rng() - 0.5) * 2 * a;   // ±a
@@ -76,16 +77,23 @@ registerProps({
 
   // ---- on the walls ------------------------------------------------------------------------------------------
   'wall-art': {
-    footprint: [0.8, 0.05], height: 0.6, params: ['w', 'h', 'y', 'color', 'motif'], tags: ['living', 'bedroom', 'office', 'dining', 'hall'],
+    footprint: [0.8, 0.05], height: 0.6, params: ['w', 'h', 'y', 'color', 'motif', 'frame'], tags: ['living', 'bedroom', 'office', 'dining', 'hall'],
     create(it, { THREE, std, box, group, colors, hex, mix, rng }) {
       const w = it.w || 0.8, h = it.h || 0.6, cy = it.y !== undefined ? 0 : 1.5, g = group('Wall Art');
-      const bar = 0.035, depth = 0.04, frame = std(colors.wood, { roughness: 0.5 });
+      const bar = 0.035, depth = 0.04, frame = std(it.frame ? hex(it.frame) : colors.wood, { roughness: 0.5 });
       g.add(box(w, bar, depth, frame, 0, cy + h / 2 - bar / 2, depth / 2));
       g.add(box(w, bar, depth, frame, 0, cy - h / 2 + bar / 2, depth / 2));
       g.add(box(bar, h - 2 * bar, depth, frame, -w / 2 + bar / 2, cy, depth / 2));
       g.add(box(bar, h - 2 * bar, depth, frame, w / 2 - bar / 2, cy, depth / 2));
       // the canvas: a pale tint of the second fabric (or it.color) with one of three flat compositions on it
       const cw = w - 2 * bar, ch = h - 2 * bar, bg = it.color ? hex(it.color) : mix(colors.fabric2, 0xffffff, 0.62);
+      // a named motif (the motif library, assets/props/patterns.ts: 'landscape', 'botanical', 'story-moon' …) is a
+      // painted canvas, one textured mesh; a numbered one (0 sun, 1 peaks, 2 arch — every spec before pass 4) keeps
+      // its flat shapes exactly
+      if (typeof it.motif === 'string' && Number.isNaN(Number(it.motif))) {
+        g.add(box(cw, ch, 0.02, std(0xffffff, { roughness: 0.9, map: motifTexture(THREE, it.motif, [bg, colors.accent, colors.fabric, colors.fabric2], { w: cw, h: ch }) }), 0, cy, 0.015));
+        return g;
+      }
       g.add(box(cw, ch, 0.02, std(bg, { roughness: 0.9 }), 0, cy, 0.015));
       const m1 = std(colors.accent, { roughness: 0.85 }), m2 = std(colors.fabric, { roughness: 0.85 }), z = 0.028, s = Math.min(cw, ch);
       const motif = it.motif !== undefined ? Number(it.motif) % 3 : Math.floor(rng() * 3);   // 0 sun, 1 peaks, 2 arch
@@ -283,3 +291,60 @@ registerProps({
     iso: [{ shape: 'box', box: [-0.4, 0, -1.25, 0.4, 0.013, 1.25], color: 'role:rug' }],
   },
 });
+
+// =================================================================================================================
+// Pass 4 (S3 compose): patterned rugs and a gallery wall, both painted by assets/props/patterns.ts (the rug
+// patterns and the art-motif library), so a room's textiles and art vary by style and seed instead of repeating one
+// runner and one sun-over-horizon print.
+// =================================================================================================================
+registerProps({
+  // Patterned rug — pattern: solid | border | stripe | check | diamond | kilim | medallion | dots | abstract | play
+  // (a kid's road rug); shape 'round' makes it a disc of diameter w. color is the ground; the figure takes the
+  // house's rug, accent and fabric colours. One textured mesh (plus two fringes on a rectangle).
+  'patterned-rug': {
+    footprint: [2.0, 1.4], height: 0.02, params: ['w', 'd', 'pattern', 'shape', 'color'], tags: ['living', 'bedroom', 'dining', 'kids', 'study'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const round = it.shape === 'round', w = it.w || 2.0, d = round ? w : (it.d || 1.4), g = group(`Patterned Rug (${it.pattern || 'solid'})`);
+      const ground = it.color ? hex(it.color) : mix(colors.linen, colors.rug, 0.35);
+      const map = patternTexture(THREE, String(it.pattern || 'solid'), [ground, colors.rug, colors.accent, colors.fabric2], { w, d });
+      const mat = std(0xffffff, { roughness: 1, map });
+      if (round) { const m = new THREE.Mesh(new THREE.CylinderGeometry(w / 2, w / 2, 0.012, 48), mat); m.position.y = 0.006; m.receiveShadow = true; g.add(m); return g; }
+      g.add(box(w, 0.012, d, mat, 0, 0.006, 0, false));
+      const fringe = std(colors.linen, { roughness: 1 });
+      for (const s of [-1, 1]) g.add(box(w * 0.96, 0.008, 0.05, fringe, 0, 0.004, s * (d / 2 + 0.025), false));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-1, 0, -0.7, 1, 0.013, 0.7], color: 'role:rug' }],
+  },
+  // Gallery wall — three to five framed pieces hung as one cluster over a sofa, a bed or a console: w × h is the
+  // cluster's extent, motifs a list (or a comma string) from the motif library, frame their colour. Wall-mounted
+  // like wall-art: back at z = 0, `y` the cluster's centre height (default 1.5 above the floor origin).
+  'gallery-wall': {
+    footprint: [1.6, 0.04], height: 0.9, params: ['w', 'h', 'y', 'motifs', 'frame', 'color'], tags: ['living', 'bedroom', 'hall', 'dining', 'study'],
+    create(it, { THREE, std, box, group, colors, hex, mix, rng }) {
+      const W = it.w || 1.6, H = it.h || 0.9, cy = it.y !== undefined ? 0 : 1.5, g = group('Gallery Wall');
+      const list = Array.isArray(it.motifs) ? it.motifs.map(String) : typeof it.motifs === 'string' ? it.motifs.split(',').map(x => x.trim()).filter(Boolean) : [];
+      const pool = list.length ? list : ['botanical', 'line', 'abstract', 'landscape', 'geometric'];
+      const frame = std(it.frame ? hex(it.frame) : colors.metal, { roughness: 0.45 });
+      const bg = it.color ? hex(it.color) : mix(colors.fabric2, 0xffffff, 0.7);
+      // a layout of frames on a 12 × 8 grid of the cluster (x0, y0, x1, y1), picked by the rng: a big piece and two or
+      // three small ones round it, all on shared edges the way a hung gallery lines up
+      const LAYOUTS = [
+        [[0, 0, 7, 8], [7.5, 0, 12, 3.8], [7.5, 4.2, 12, 8]],
+        [[0, 1, 3.6, 7], [4, 0, 8, 8], [8.4, 1, 12, 4.4], [8.4, 4.8, 12, 7]],
+        [[0, 0, 5.6, 3.8], [0, 4.2, 5.6, 8], [6, 0, 12, 8]],
+        [[0, 2, 3.4, 6], [3.8, 0, 8.2, 3.8], [3.8, 4.2, 8.2, 8], [8.6, 2, 12, 6]],
+      ];
+      const lay = LAYOUTS[Math.floor(rng() * LAYOUTS.length)];
+      lay.forEach(([x0, y0, x1, y1], i) => {
+        const fw = (x1 - x0) / 12 * W, fh = (y1 - y0) / 8 * H, fx = -W / 2 + (x0 + x1) / 24 * W, fy = cy + H / 2 - (y0 + y1) / 16 * H;
+        g.add(box(fw, fh, 0.03, frame, fx, fy, 0.015));
+        const motif = pool[(i + Math.floor(rng() * pool.length)) % pool.length];
+        g.add(box(fw - 0.05, fh - 0.05, 0.01, std(0xffffff, { roughness: 0.9, map: motifTexture(THREE, motif, [bg, colors.accent, colors.fabric, colors.fabric2], { w: fw - 0.05, h: fh - 0.05 }) }), fx, fy, 0.033));
+      });
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.8, 1.05, 0, 0.8, 1.95, 0.04], color: 'role:metal' }],
+  },
+});
+export { RUG_PATTERNS, ART_MOTIFS };
