@@ -13,6 +13,8 @@
 //   layers         height classes in each bed of a three-layer planting: under 0.45 m, to 1.1 m, over — target 3
 //   in the house   no plant whose crown reaches into the ground storey (it must stop at its walls)
 //   determinism    every planting laid out twice is the same, number for number
+//   variety        a bed of 20 plants or more (not a formal mix) holds at least 4 species, and another `seed` lays it out
+//                  differently (the same outline, other plants in other places)
 //   facade cover  a foundation planting's beds over the facade it names, outside the metre kept clear each side of a
 //                 door — target ≥ 80 % (sampled every 0.1 m, 0.4 m out from the wall)
 // Exit 0 when every target holds; 1 otherwise (2: nothing to measure, or the compiled assets are missing).
@@ -33,7 +35,7 @@ const files: string[] = args.house
   : fs.readdirSync(FIX).filter(f => /^s4-site-.+\.json$/.test(f)).sort().map(f => path.join(FIX, f));
 if (!files.length) { console.error('no S4 fixtures (test/fixtures/houses/s4-site-*.json)'); process.exit(2); }
 
-const T = { axis: 0.2, bare: 0.1, classes: 3, facade: 0.8 };
+const T = { axis: 0.2, bare: 0.1, classes: 3, facade: 0.8, species: 4 };
 // the share of the named facade (the ground storey's perimeter on those sides, less each door's leaf and a metre each side)
 // that a bed of the planting covers, 0.4 m out from the wall
 function facadeCover(spec: any, s: any, plan: any, ctx: any, index: number): number | null {
@@ -82,13 +84,15 @@ for (const file of files) {
     const bare = a.beds.some(bd => bd.soil) ? P.bareShare(a, ctx) : null;
     const classes = P.heightClasses(a);
     // a crown into the house: a plant whose reach passes the wall line (the walls stand 0.12 m proud of the footprint)
+    const species = new Set([...a.plants, ...a.trees].map((p: any) => p.sp)).size, other = P.planPlanting({ ...s, seed: 'another' }, i, ctx);
+    const okSeed = hash(other) !== hash(a);
     const facade = s.kind === 'foundation' ? facadeCover(spec, s, a, ctx, i) : null;
     const clash = a.plants.filter(p => ctx.houseGap(p.x, p.z) - 0.12 < p.r - 1e-6).length;
     houseClash += clash;
     const formal = a.mix === 'formal', layered = (s.layers ?? 3) >= 3 && a.beds.length > 0;
-    const okFacade = facade === null || facade >= T.facade, okBare = bare === null || formal || bare <= T.bare, okClasses = !layered || formal || classes.every(c => c >= T.classes), okDet = same, okClash = clash === 0;
-    if (!(okBare && okClasses && okDet && okClash && okFacade)) fails++;
-    rows.push({ i, kind: s.kind || 'border', mix: a.mix, beds: a.beds.length, plants: a.plants.length + a.trees.length, bare, classes, clash, facade, hash: hash(a), ok: okBare && okClasses && okDet && okClash && okFacade });
+    const okVariety = a.plants.length + a.trees.length < 20 || a.mix === 'formal' || species >= T.species, okFacade = facade === null || facade >= T.facade, okBare = bare === null || formal || bare <= T.bare, okClasses = !layered || formal || classes.every(c => c >= T.classes), okDet = same, okClash = clash === 0;
+    if (!(okBare && okClasses && okDet && okClash && okFacade && okVariety && okSeed)) fails++;
+    rows.push({ i, kind: s.kind || 'border', mix: a.mix, beds: a.beds.length, plants: a.plants.length + a.trees.length, bare, classes, clash, facade, species, seed: okSeed, hash: hash(a), ok: okBare && okClasses && okDet && okClash && okFacade && okVariety && okSeed });
   }
   const ax = G.axisAligned(segs);
   allAxis += ax.axis; allLen += ax.total;
@@ -100,7 +104,7 @@ if (args.json === 'true') console.log(JSON.stringify({ share, report }, null, 1)
 else {
   for (const r of report) {
     console.log(`${r.rows.every(x => x.ok) ? '✓' : '✗'} ${r.id}: edges ${r.len.toFixed(1)} m, ${(r.axis * 100).toFixed(0)} % axis-aligned`);
-    for (const x of r.rows) console.log(`    ${x.ok ? '✓' : '✗'} site[${x.i}] planting ${x.kind} · ${x.mix}: ${x.beds} beds, ${x.plants} plants, bare mulch ${x.bare === null ? '—' : (x.bare * 100).toFixed(1) + ' %'}${x.mix === 'formal' ? ' (formal: not judged)' : ''}, height classes ${x.classes.length ? x.classes.join('/') : '—'}${x.facade === null ? '' : `, facade ${(x.facade * 100).toFixed(0)} % covered`}${x.clash ? `, ${x.clash} reaching into the house` : ''}  [${x.hash}]`);
+    for (const x of r.rows) console.log(`    ${x.ok ? '✓' : '✗'} site[${x.i}] planting ${x.kind} · ${x.mix}: ${x.beds} beds, ${x.plants} plants, bare mulch ${x.bare === null ? '—' : (x.bare * 100).toFixed(1) + ' %'}${x.mix === 'formal' ? ' (formal: not judged)' : ''}, height classes ${x.classes.length ? x.classes.join('/') : '—'}${x.facade === null ? '' : `, facade ${(x.facade * 100).toFixed(0)} % covered`}, ${x.species} species${x.seed ? '' : ', the same under another seed'}${x.clash ? `, ${x.clash} reaching into the house` : ''}  [${x.hash}]`);
   }
   console.log(`\n${share <= T.axis ? '✓' : '✗'} axis-aligned bed, planting and path edges over ${report.length} lot(s): ${(share * 100).toFixed(1)} % of ${allLen.toFixed(0)} m (target ≤ ${T.axis * 100} %)`);
   console.log(fails ? `${fails} failed` : 'all targets hold');

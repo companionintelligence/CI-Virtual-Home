@@ -7,6 +7,7 @@
 //   site-in-house  a trunk, a post, a fence, a wall or a hedge standing inside the ground storey's footprint —
 //                  a tree growing through the living room reads as a clash in every interior frame
 //   site-buried    water under a deck or a terrace that stands above its rim (the water cannot be seen)
+//   site-sunk      a tree's foot buried in a terrace it stands in (the ground did not follow the terrace under it)
 import { registerSceneCheck } from './registry.js';
 
 const SOLID_IN_HOUSE = new Set(['trunk', 'post', 'fence', 'wall', 'hedge', 'retaining', 'stair']);
@@ -36,6 +37,24 @@ registerSceneCheck('site-buried', ({ house }) => {
       const ov = Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0)) * Math.max(0, Math.min(a.z1, b.z1) - Math.max(a.z0, b.z0));
       if (ov / area > 0.5) out.push({ level: 'warn' as const, message: `water at (${w.x.toFixed(1)}, ${w.z.toFixed(1)}) is ${Math.round(ov / area * 100)} % under a deck standing above its rim`, subject: 'water' });
     }
+  }
+  return out;
+});
+
+// what a solid covers in plan: a rotated box (w × d, `rot` degrees as the builders turn them), a circle (r) or a polygon
+const covers = (s: any, x: number, z: number, m = 0): boolean => {
+  if (s.poly) { let c = false; const P = s.poly; for (let i = 0, j = P.length - 1; i < P.length; j = i++) if ((P[i][1] > z) !== (P[j][1] > z) && x < (P[j][0] - P[i][0]) * (z - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0]) c = !c; return c; }
+  if (s.r !== undefined && s.w === undefined) return Math.hypot(x - s.x, z - s.z) <= s.r + m;
+  if (s.w === undefined) return false;
+  const a = (s.rot || 0) * Math.PI / 180, dx = x - s.x, dz = z - s.z, lx = dx * Math.cos(a) - dz * Math.sin(a), lz = dx * Math.sin(a) + dz * Math.cos(a);
+  return Math.abs(lx) <= s.w / 2 + m && Math.abs(lz) <= s.d / 2 + m;
+};
+
+registerSceneCheck('site-sunk', ({ house }) => {
+  const solids = house.anchors.siteSolids || [], out = [];
+  for (const t of solids.filter(s => s.kind === 'trunk')) {
+    const over = solids.filter(s => s.kind === 'terrace' && covers(s, t.x, t.z) && s.yMax > t.yMin + 0.3).sort((a, b) => b.yMax - a.yMax)[0];
+    if (over) out.push({ level: 'warn' as const, message: `a trunk at (${t.x.toFixed(1)}, ${t.z.toFixed(1)}) is buried ${(over.yMax - t.yMin).toFixed(1)} m in a terrace`, subject: 'trunk' });
   }
   return out;
 });

@@ -224,13 +224,13 @@ function runsOf(b: Band, blocked: (p: P2) => boolean, minRun = 0.8): Band[] {
   const lim = b.s.map((s, i) => {
     const D = b.D[i];
     if (blocked(at(b, s, 0.12))) return 0;
-    for (let t = 0.3; t < D + 0.19; t += 0.2) if (blocked(at(b, s, Math.min(t, D)))) return Math.max(0, t - 0.3);
-    return blocked(at(b, s, Math.max(0.12, D - 0.1))) ? Math.max(0, D - 0.4) : D;
+    for (let t = 0.22; t <= D + 1e-9; t += 0.1) if (blocked(at(b, s, t))) return Math.max(0, t - 0.15);
+    return blocked(at(b, s, D)) ? Math.max(0, D - 0.15) : D;
   });
   // the ramp: no column is deeper than a neighbour's limit plus 0.8 m for each metre between them (a column with no
   // room at all is a break between beds, not a limit)
   const D2 = lim.map((l, i) => { let m = l; if (l > 0) for (let j = Math.max(0, i - 8); j <= Math.min(lim.length - 1, i + 8); j++) if (lim[j] > 0) m = Math.min(m, lim[j] + 0.8 * Math.abs(b.s[j] - b.s[i])); return m; });
-  const ok = D2.map(d => d >= 0.55);
+  const ok = D2.map((d, i) => d >= Math.min(0.45, b.D[i] * 0.85));
   const out: Band[] = [];
   let i = 0;
   while (i < ok.length) {

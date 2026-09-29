@@ -7,6 +7,7 @@
 //   unknown-name     a shrub form, flower kind, tree species, planting kind / mix, path surface, pool shape, fence,
 //                    rail or stair style, lot context / street / water / sidewalk / furniture the builders do not know (they fall back)
 //   planting-ref     a planting `along` naming a path or terrace that is not there
+//   planting-empty   a planting that lays out no bed (or no plant): its band is blocked all along
 //   front-crates     `garden-beds` (raised vegetable crates) between the entry facade and the street
 //   in-house         a slab, a bed, a pool or a prop standing on the ground storey's footprint
 //   off-lot          an item standing outside the lot
@@ -16,7 +17,7 @@
 //   water-sides      lot.water on all four sides (an island lot is not built)
 import type { Check, Issue, Extend, Rule } from './_types.mts';
 import { SHRUB_FORMS, FLOWER_KINDS_ALL, TREE_SPECIES, PATH_SURFACES } from '../../assets/site.js';
-import { PLANTING_KINDS, MIXES, SPECIES, WATER_SHAPES, isShapedWater, waterOutline, createSiteContext } from '../../assets/site-planting.js';
+import { PLANTING_KINDS, MIXES, SPECIES, WATER_SHAPES, isShapedWater, waterOutline, createSiteContext, planPlanting } from '../../assets/site-planting.js';
 import { rectPoly, inPoly, polyArea, bbox, centroid } from '../../assets/site-geom.js';
 
 export const extend: Extend = { grounds: ['meadow', 'gravel'] };
@@ -57,6 +58,7 @@ const check: Check = (spec, ctx) => {
   const site: any[] = spec.site || [];
   const lot = spec.lot || {};
   const S = (s: any, i: number) => `site[${i}] ${s.type}`;
+  let planCtx: ReturnType<typeof createSiteContext> | null = null;
 
   // ---- 'site-needs' (replaced): each type's geometry — the core's findings for the old forms, word for word
   for (const [i, s] of site.entries()) {
@@ -98,6 +100,12 @@ const check: Check = (spec, ctx) => {
           if (!hit) warn(`${S(s, i)}: along "${s.along}" names no ${what} (a site index or an id)`, 'planting-ref');
         } else warn(`${S(s, i)}: along "${s.along}" — facade:<sides>, path:<index or id>, terrace:<index or id>, or a polyline`, 'planting-ref');
       }
+      // what it lays out: a band every column of which is blocked (a wall, a step, another item) plants nothing
+      try {
+        planCtx ||= createSiteContext(spec);
+        const plan = planPlanting(s, i, planCtx);
+        if ((s.kind === 'meadow' || s.kind === 'grove') ? plan.plants.length + plan.trees.length === 0 : plan.beds.length === 0) warn(`${S(s, i)}: lays out nothing — there is no room for a bed along it (a wall, a step or another item is in the way)`, 'planting-empty');
+      } catch { /* a malformed planting is reported above */ }
     }
   }
   if (lot.context !== undefined) known(lot.context, CONTEXTS, 'lot.context', { type: 'lot' }, -1);

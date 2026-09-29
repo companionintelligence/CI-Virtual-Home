@@ -1,7 +1,12 @@
 // World — the neighbourhood a HouseSpec's lot sits in, so a house stops being a plate floating in a void:
 //
 //   street     on the entry side: asphalt, curbs, a verge, sidewalks both sides, a driveway apron (and curb
-//              cut) wherever a driveway meets the street — the spec's own and every neighbour's
+//              cut) wherever a driveway meets the street — the spec's own and every neighbour's.
+//              S4: `lot.street` (its side, apart from the entry's), `lot.sidewalk` (a tint, or none), `lot.streetFurniture`
+//              (a city block's benches, hydrants, bollards, bike racks); a rural road has a gravel shoulder and no walk
+//   context    S4: `lot.context` — city (a paved block of narrow tall houses close to the walk, a skyline), forest, desert,
+//              rural (fields, hedgerows, a barn), hillside (the ground and the back row rise), waterfront; `lot.water`
+//              puts a lake, river, canal or the sea on up to three sides, with its far bank
 //   lamps      street lamps down both verges; the lens is tagged userData.fixture = 'street' (the lighting preset
 //              scales it by lampGain), and a warm pool on the ground under each follows `house:lighting`
 //   neighbours a block, not two houses in a park: the lots either side, a row across the street and a row behind,
