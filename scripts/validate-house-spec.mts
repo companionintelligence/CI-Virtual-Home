@@ -30,11 +30,13 @@ import { PROPS } from '../assets/props/index.js';   // registry props are valid 
 import { createItemMap } from '../assets/item-map.js';
 import { createSiteBuild, SITE_LOOP_TYPES } from '../assets/site-build.js';
 import { SITE_KIT_TYPES } from '../assets/site.js';
+import { probeContext } from './probe-context.mts';
 import { VOCAB_KEYS, RULES } from './validate/_types.mts';
 import type { Vocab, VocabKey, Rule } from './validate/_types.mts';
 
 // The vocabulary the checks below test against, before the plugins extend it. Item and site types come off the
-// builders themselves (their factories only define closures, so an empty context is enough to list their keys).
+// builders themselves: their factories are called with a probe context (probe-context.mts) whose every property is a
+// callable stand-in, so they may build at factory scope and their keys are still listable.
 const BASE_VOCAB: Vocab = {
   sides: ['S', 'N', 'E', 'W'],
   openingTypes: ['door', 'window', 'slider', 'glass', 'garage'],
@@ -43,9 +45,9 @@ const BASE_VOCAB: Vocab = {
   grounds: ['lawn', 'desert', 'forest', 'urban', 'waterfront'],
   // site-build.ts's page builders, the ones its site loop builds itself (fence, wall-low), and assets/site.ts's
   // seeded kit (planting, beds, hedges, paths)
-  siteTypes: [...Object.keys(createSiteBuild({}).SITE), ...SITE_LOOP_TYPES, ...SITE_KIT_TYPES],
+  siteTypes: [...Object.keys(createSiteBuild(probeContext()).SITE), ...SITE_LOOP_TYPES, ...SITE_KIT_TYPES],
   // the prop registry, then item-map.ts's page builders
-  itemTypes: [...PROPS.keys(), ...Object.keys(createItemMap({}).ITEMS)],
+  itemTypes: [...PROPS.keys(), ...Object.keys(createItemMap(probeContext()).ITEMS)],
   stairTypes: ['timber', 'colonial', 'spiral'],
   // shot-planner-v1.ts shotsFor(): the five generated shots, and the dressing a spec may put on one
   shotTypes: ['door-to-core', 'orbit', 'hero-reveal', 'walkthrough', 'core-orbit'],
