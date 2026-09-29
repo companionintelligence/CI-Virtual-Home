@@ -27,7 +27,7 @@ import { PLACEMENT } from './props/placement.js';
 import { STYLES, styleOf, type StyleBundle } from './house-styles.js';
 import { BEDROOMS, isComposed, inferProgram } from './room-programs.js';
 import {
-  analyzeRoom, laneGrid, lanesOk, sizeOf, itemObb, obb, overlap, aabb, insideRoom, rectObb, turn, rotToward, mm,
+  analyzeRoom, laneGrid, lanesOk, sizeOf, paramsOf, itemObb, obb, overlap, aabb, insideRoom, rectObb, turn, rotToward, mm,
   INWARD, ROT_OF_WALL, OPPOSITE, SIDES, alongX, CENTRE_MOUNT, DEG,
   type Geo, type Obb, type Run, type Side, type Portal,
 } from './room-geo.js';
@@ -145,7 +145,7 @@ export class Composer {
   /** the colour a room's palette gives an item of this type (null: the house kit themes it) */
   colourFor(type: string): string | null {
     if (!this.palette) return null;
-    const role = PLACEMENT[type] && PLACEMENT[type].colorRole, P: string[] = (PROPS.get(type) || {}).params || (PLACEMENT[type] && PLACEMENT[type].params) || [];
+    const role = PLACEMENT[type] && PLACEMENT[type].colorRole, P = paramsOf(type);
     if (!role || !P.includes('color')) return null;
     if (role === 'fabric' || role === 'fabric2' || role === 'linen') return this.palette.fabric || null;
     if (role === 'wood') return this.palette.wood || null;
@@ -546,7 +546,7 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
   if (!sofa) sofa = c.pick('sofa', { fit: t => (c.size(t).w <= width - 0.8) });
   if (!sofa) return null;
   const sw = Math.min(sofa === 'loveseat' ? (width >= 3.4 ? 2.0 : 1.6) : c.size(sofa).w, width - 1.0);
-  const sParams: any = PROPS.get(sofa)?.params.includes('w') ? { w: mm(sw) } : {};
+  const sParams: any = paramsOf(sofa).includes('w') ? { w: mm(sw) } : {};
   if (sofa === 'l-sectional') { sParams.w = mm(Math.min(3.0, width - 1.2)); sParams.l = mm(Math.min(1.9, depth - 2.6)); sParams.hand = c.rng() < 0.5 ? 'left' : 'right'; }
   const S = c.size(sofa, sParams);
   const ct = c.pick('coffee-table', { fit: t => c.size(t).w <= S.w - 0.3 }) || 'coffee-table';
@@ -674,7 +674,7 @@ function bedGroup(c: C, attempt = 0): Group | null {
   const g = c.geo, prog = c.program, kid = prog === 'bed-kid', nursery = prog === 'nursery';
   const role = nursery ? 'crib' : kid ? (c.rng() < 0.18 && g.area < 10 ? 'bed-bunk' : c.rng() < 0.15 ? 'bed-loft' : 'bed-single') : 'bed';
   const type = c.pick(role) || (kid ? 'single-bed' : 'headboard-bed');
-  const P: string[] = PROPS.get(type)?.params || PLACEMENT[type]?.params || [];
+  const P = paramsOf(type);
   const minDim = Math.min(g.b.w, g.b.d);
   const bw0 = kid || nursery ? undefined : prog === 'bed-primary' ? (minDim >= 3.9 ? 1.8 : 1.6) : (minDim >= 3.4 ? 1.5 : 1.4);
   const bw = bw0 === undefined ? undefined : Math.max(1.2, bw0 - attempt * 0.2);   // a retry is a narrower bed
@@ -729,7 +729,7 @@ function bedGroup(c: C, attempt = 0): Group | null {
       }
       if (prog === 'bed-primary' && c.density >= 0.35) {
         const bt = c.pick('bed-bench', { fit: t => c.size(t).w <= S.w }) ;
-        if (bt) { const BP: any = PROPS.get(bt)?.params.includes('w') ? { w: mm(Math.min(S.w - 0.2, 1.4)) } : {}; const B = c.size(bt, BP), [dx, dz] = turn(0, S.d / 2 + 0.05 + B.d / 2, bed.rot); const bi = c.item(bt, bed.cx + dx, bed.cz + dz, bed.rot, BP); bi.opt = true; bi.clear = []; out.push(bi); }
+        if (bt) { const BP: any = paramsOf(bt).includes('w') ? { w: mm(Math.min(S.w - 0.2, 1.4)) } : {}; const B = c.size(bt, BP), [dx, dz] = turn(0, S.d / 2 + 0.05 + B.d / 2, bed.rot); const bi = c.item(bt, bed.cx + dx, bed.cz + dz, bed.rot, BP); bi.opt = true; bi.clear = []; out.push(bi); }
       }
       return out;
     },
@@ -776,7 +776,7 @@ function deskGroup(c: C, { kid = false } = {}): Group | null {
 // ---- simple wall pieces ---------------------------------------------------------------------------------------------
 function storageGroup(c: C, role: string, { name = role, dress = true, prefer = null as ((p: Pose, it: CItem) => number) | null, params = {} as any } = {}): Group | null {
   const type = c.pick(role); if (!type) return null;
-  const pr = { ...params }; const P: string[] = PROPS.get(type)?.params || PLACEMENT[type]?.params || [];
+  const pr = { ...params }; const P = paramsOf(type);
   for (const k of Object.keys(pr)) if (!P.includes(k)) delete pr[k];
   return wallGroup(c, name, type, pr, {
     score: (p, it) => (prefer ? prefer(p, it) : 0) - offCentre(p.run, p.t) * 0.1,

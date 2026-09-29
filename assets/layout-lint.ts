@@ -28,8 +28,9 @@
 import { PROPS } from './props/index.js';
 import { PLACEMENT } from './props/placement.js';
 import { perimeterEdges, edgeForOpening, inRect } from './house-geometry.js';
+import { pageItemDef } from './item-meta.js';
 import {
-  analyzeRoom, sizeOf, itemObb, overlap, aabb, insideRoom, limitOf, laneGrid, lanesOk, obb, rectObb, turn, containsPt,
+  analyzeRoom, sizeOf, paramsOf, itemObb, overlap, aabb, insideRoom, limitOf, laneGrid, lanesOk, obb, rectObb, turn, containsPt,
   INWARD, alongX, SIDES, DEG, CELL, type Geo, type Obb,
 } from './room-geo.js';
 import { composeHouse, layerOf, snapWallMount, stackOnSurface } from './room-composer.js';
@@ -95,7 +96,7 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
           if (overlap(sq, o) > 0.05) add('door-swing', `${it.type} at ${fmt(it.at)} stands in the swing of the ${p.kind} on the ${p.side} wall`, lv, room);
         }
         // silent parameters
-        const P: string[] = (PROPS.get(it.type) || {}).params || (PLACEMENT[it.type] && PLACEMENT[it.type].params) || null;
+        const P: string[] | null = PROPS.has(it.type) || pageItemDef(it.type) ? paramsOf(it.type) : null;
         if (P) for (const k of Object.keys(it)) if (!UNIVERSAL.has(k) && !P.includes(k) && !(k === 'y')) add('silent-param', `${it.type} at ${fmt(it.at)}: "${k}" is ignored by its builder`, lv, room);
         // mounts inside the wall, surface items floating or sunk
         if (layer === 'wall' && snapWallMount(it, geo)) add('mount-in-wall', `${it.type} at ${fmt(it.at)} is set inside the wall`, lv, room);

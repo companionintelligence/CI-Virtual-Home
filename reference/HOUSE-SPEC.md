@@ -230,11 +230,15 @@ its fragment under `assets/spec/`, its lints in its plugin under `scripts/valida
 - **Types.** A field is declared in the stream's fragment. To widen one this document already defines (another
   enum value, a string that may also be an object — `lighting`, `hero.surface`, `lot.ground`, `levels[].stairs` as
   an array), redeclare it there, wider: `assets/spec/index.ts` lets a fragment's field replace the base's and fails
-  the compile if it narrows. `scripts/test-spec-types.mts` type-checks the 30 specs and every fixture against
-  `HouseSpec`, so a fixture that uses a field no fragment declares fails the gate.
+  the compile if it narrows; two fragments declaring one field (whatever the types) fail it too.
+  `scripts/test-spec-types.mts` type-checks the 30 specs and every fixture against `HouseSpec`, so a fixture that
+  uses a field no fragment declares fails the gate — in every part of the spec **but room items and site items**:
+  they take builder-specific parameters (`style`, `chairs`, `n`, `form` …), so an undeclared one passes untyped; a
+  field a fragment declares is typed and checked like any other, so declare yours. `scripts/test-spec-merge.mts`
+  tests the merge rule itself (what a fragment may add, widen and not narrow).
 - **Validation.** The validator's core never changes for a stream. Its plugin `extend`s a vocabulary the core checks
   against (a new roof type, floor, ground, hero surface, shot type) and `replaces` a core rule whose meaning it
-  changes (`stairs`, `raised-level`, `site-needs`, `shot-duration`); item and site types are read off the builders,
+  changes (`footprint-rects`, `partition-axis-aligned`, `stairs`, `raised-level`, `site-needs`, `shot-duration`); item and site types are read off the builders,
   so a new builder is a valid type at once. The contract is `scripts/validate/_types.mts`.
 
 ### Kit (S1)

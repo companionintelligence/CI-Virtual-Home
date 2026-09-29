@@ -15,6 +15,7 @@
 import { perimeterEdges, edgeForOpening } from './house-geometry.js';
 import { PROPS } from './props/index.js';
 import { PLACEMENT } from './props/placement.js';
+import { pageItemDef } from './item-meta.js';
 
 export type Side = 'N' | 'S' | 'W' | 'E';
 export const SIDES: Side[] = ['N', 'S', 'W', 'E'];
@@ -66,6 +67,8 @@ export const rectObb = (x0: number, z0: number, x1: number, z1: number): Obb => 
 
 // ---- item sizes ----------------------------------------------------------------------------------------------------
 export interface Size { w: number; d: number; h: number; ox: number; oz: number; y0: number }
+/** the spec keys a type honours: a registry prop's, or a page builder's (item-map.ts ITEM_PARAMS, through item-meta.ts) */
+export const paramsOf = (type: string): string[] => { const def = PROPS.get(type) || pageItemDef(type); return def ? def.params || [] : []; };
 export function sizeOf(type: string, it: any = {}): Size | null {
   const def = PROPS.get(type), pl = PLACEMENT[type];
   if (def) {
@@ -81,7 +84,7 @@ export function sizeOf(type: string, it: any = {}): Size | null {
     return { w, d, h, ox: 0, oz: pl && pl.hangs === 'wall' ? d / 2 : 0, y0: 0 };
   }
   if (pl && pl.size) {
-    const s = pl.size, P = pl.params || [];
+    const s = pl.size, P = paramsOf(type);
     let w = s.w, d = s.d, h = s.h;
     if (P.includes('w') && it.w > 0) w = it.w;
     if (P.includes('d') && it.d > 0) d = it.d;

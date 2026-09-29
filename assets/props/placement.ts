@@ -1,139 +1,20 @@
-// Placement metadata — how every catalog type (the page's AssetFactory builders in item-map.ts and every registry
-// prop) stands in a room: what it backs onto, the clear floor it needs round it, what it faces, what it pairs with,
-// which room programs and furniture styles it suits, and which composer ROLE it can fill (sofa, armchair,
-// dining-table …). The composer (assets/room-composer.ts) picks a type for a role from these; the layout lints
-// (scripts/validate/layout.mts) read clearances and wall mounts from them; build-prop-catalog.mts publishes them in
-// content/house-catalog.json as each type's `place` (plan S3 "catalog metadata").
+// Placement metadata — how every catalog type stands in a room: what it backs onto, the clear floor it needs round it,
+// what it faces, what it pairs with, which room programs and furniture styles it suits, and which composer ROLE it can
+// fill (sofa, armchair, dining-table …). The composer (assets/room-composer.ts) picks a type for a role from this; the
+// layout lints (scripts/validate/layout.mts) read clearances and wall mounts from it; build-prop-catalog.mts publishes
+// it in content/house-catalog.json as each type's `place` (plan S3 "catalog metadata").
 //
-// THREE-free and dependency-free. The page builders' SIZE and honoured PARAMS are declared here too (`size`,
-// `params`), because the composer needs them in Node and the catalog's measurement of a page builder is only its
-// default: test-room-composer.mts fails when a declared size drifts from the catalog's measured box, so this table
-// cannot silently disagree with the geometry. S1 owns the page builders: when it widens one's params (plan S1
-// "page furniture"), the `params` here follow.
+// The vocabulary is props/place-kit.ts's. This file holds every REGISTRY prop's entry; the page builders' are
+// props/page-place.ts (the seam assets/item-meta.ts reads), merged in below, so PLACEMENT is the whole table.
 //
-//   against   'wall' (its back to a wall) | 'free' (anywhere; seating may float) | 'corner' | 'window' | 'center'
-//   clear     { front, side, back } metres of clear floor the item needs (front = toward +z at rot 0)
-//   faces     'room' | 'wall' | 'focus' (seating: the room's focal wall)
-//   group     the kind of thing (seating, chair, table, bed, storage, desk, lamp, rug, plant, art, fitted, appliance,
-//             bath, kids, music, gym, decor, textile, lighting, outdoor, hero, structure)
-//   hangs     'wall' | 'ceiling' | null;  mountY: its default mount (art: centre height; cabinets: bottom edge)
-//   onSurface sits on another item (a lamp on a nightstand); `top` is the height of the surface an item offers
-//   surfaces  for an onSurface item, the groups it may stand on
-//   programs  the room programs it suits ([] any); styles: the style tags it suits ([] any)
-//   pairsWith types or roles it goes with;  roles: the composer roles it can fill
-//   colorRole the kit role its `color` param paints, or null when it takes no colour
-//   tucks     a chair or stool whose seat may slide under a table, desk or counter (the lints allow the overlap)
-//
-// Owner: S3 (compose).
-
-export interface Place {
-  against: 'wall' | 'free' | 'corner' | 'window' | 'center';
-  clear: { front: number; side: number; back: number };
-  faces: 'room' | 'wall' | 'focus';
-  group: string;
-  hangs: 'wall' | 'ceiling' | null;
-  mountY?: number;
-  onSurface: boolean;
-  top?: number;
-  surfaces: string[];
-  programs: string[];
-  styles: string[];
-  pairsWith: string[];
-  roles: string[];
-  colorRole: string | null;
-  tucks?: boolean;
-  /** page builders only: the declared box (footprint w × d, height h, the box centre's offset ox / oz from the
-   *  origin, and its floor y0) and the parameters the builder honours */
-  size?: { w: number; d: number; h: number; ox?: number; oz?: number; y0?: number };
-  params?: string[];
-}
-
-type Over = Partial<Place>;
-const C = (front: number, side = 0.05, back = 0) => ({ front, side, back });
-// group defaults: what a thing of each kind usually needs
-const BASE: Record<string, Over> = {
-  seating: { against: 'free', clear: C(0.45, 0.1), faces: 'focus', colorRole: 'fabric' },
-  chair: { against: 'free', clear: C(0.3, 0.05), faces: 'room', colorRole: 'fabric', tucks: true },
-  table: { against: 'center', clear: C(0.45, 0.45, 0.45), faces: 'room', colorRole: 'wood' },
-  bed: { against: 'wall', clear: C(0.6, 0.6), faces: 'room', colorRole: 'fabric' },
-  storage: { against: 'wall', clear: C(0.7), faces: 'room', colorRole: 'cabinet' },
-  desk: { against: 'wall', clear: C(0.9), faces: 'room', colorRole: 'wood' },
-  lamp: { against: 'corner', clear: C(0.1, 0.05), faces: 'room', colorRole: 'linen' },
-  rug: { against: 'center', clear: C(0, 0, 0), faces: 'room', colorRole: 'rug' },
-  plant: { against: 'corner', clear: C(0.1, 0.05), faces: 'room', colorRole: 'accent' },
-  art: { against: 'wall', clear: C(0, 0, 0), faces: 'room', hangs: 'wall', mountY: 1.5, colorRole: 'fabric2' },
-  fitted: { against: 'wall', clear: C(1.0, 0), faces: 'room', colorRole: 'cabinet' },
-  appliance: { against: 'wall', clear: C(1.0, 0), faces: 'room', colorRole: null },
-  bath: { against: 'wall', clear: C(0.6, 0.1), faces: 'room', colorRole: 'linen' },
-  kids: { against: 'wall', clear: C(0.6), faces: 'room', colorRole: 'accent' },
-  music: { against: 'wall', clear: C(0.6), faces: 'room', colorRole: 'wood' },
-  gym: { against: 'free', clear: C(0.6, 0.3), faces: 'room', colorRole: 'metal' },
-  decor: { against: 'free', clear: C(0), faces: 'room', onSurface: true, colorRole: 'accent' },
-  textile: { against: 'free', clear: C(0), faces: 'room', colorRole: 'fabric2' },
-  lighting: { against: 'center', clear: C(0, 0, 0), faces: 'room', hangs: 'ceiling', colorRole: 'metal' },
-  outdoor: { against: 'free', clear: C(0.6, 0.3), faces: 'room', colorRole: 'fabric' },
-  hero: { against: 'wall', clear: C(1.2), faces: 'room', colorRole: null },
-  structure: { against: 'free', clear: C(0, 0, 0), faces: 'room', colorRole: null },
-};
-function def(group: string, roles: string[], programs: string[], styles: string[] = [], over: Over = {}): Place {
-  return {
-    against: 'free', clear: C(0.3), faces: 'room', hangs: null, onSurface: false, surfaces: [], pairsWith: [], colorRole: null,
-    ...BASE[group], group, roles, programs, styles, ...over,
-  } as Place;
-}
-const LIVING = ['living', 'den', 'media', 'library', 'sunroom', 'study'];
-const BEDS = ['bed-primary', 'bed-guest', 'bed-kid', 'nursery'];
-const KIDS = ['bed-kid', 'nursery', 'playroom'];
-const BATHS = ['bath', 'ensuite', 'powder'];
-const KITCHENS = ['kitchen', 'kitchen-dining'];
-const DINING = ['dining', 'kitchen-dining'];
-const WORK = ['study', 'library', 'studio'];
-const TRAD = ['farmhouse', 'cottage', 'craftsman', 'traditional'];
-const MODERN = ['modern', 'scandi', 'mid-century', 'industrial'];
-const WARM = ['mediterranean', 'tropical'];
-const ON = ['table', 'storage', 'desk'];
+// THREE-free and dependency-free. Owner: S3 (compose).
+import { def, C, LIVING, BEDS, KIDS, BATHS, KITCHENS, DINING, WORK, TRAD, MODERN, WARM, ON } from './place-kit.js';
+import type { Place } from './place-kit.js';
+import { PAGE_PLACE } from './page-place.js';
+export type { Place } from './place-kit.js';
 
 export const PLACEMENT: Record<string, Place> = {
-  // ---- the page's AssetFactory builders (item-map.ts) ----------------------------------------------------------
-  'sectional': def('seating', ['sofa-l'], LIVING, MODERN, { size: { w: 2.4, d: 1.8, h: 0.76, oz: 0.4 }, params: [], colorRole: null }),
-  'club-chair': def('seating', ['armchair'], LIVING, ['modern', 'industrial', 'craftsman'], { size: { w: 0.82, d: 0.68, h: 0.9 }, params: ['color'] }),
-  'coffee-table': def('table', ['coffee-table'], LIVING, MODERN, { against: 'free', clear: C(0.3, 0.3, 0.3), size: { w: 1.2, d: 0.6, h: 0.4 }, params: ['w', 'd'], colorRole: null, top: 0.4 }),
-  'octagonal-table': def('table', ['coffee-table'], LIVING, WARM, { against: 'free', clear: C(0.3, 0.3, 0.3), size: { w: 1.36, d: 1.36, h: 0.6 }, params: [], colorRole: null, top: 0.6 }),
-  'dining-set': def('table', ['dining-set'], DINING, [], { clear: C(0.6, 0.6, 0.6), size: { w: 2, d: 2.09, h: 0.99 }, params: ['w', 'd'], colorRole: null }),
-  'dining-table': def('table', ['dining-set'], DINING, [], { clear: C(0.6, 0.6, 0.6), size: { w: 2.1, d: 2.04, h: 0.83 }, params: ['w', 'd'], colorRole: null }),
-  'kitchen-island': def('fitted', ['island'], KITCHENS, [], { against: 'center', clear: C(1.0, 0.9, 1.0), size: { w: 2.4, d: 1.36, h: 1.18, oz: 0.23 }, params: ['w', 'd', 'color'], top: 0.92 }),
-  'kitchen-cabinetry': def('fitted', ['kitchen-run'], KITCHENS, [], { size: { w: 3.64, d: 0.69, h: 1.67 }, params: ['w', 'd'], colorRole: null, top: 0.9 }),
-  'media-credenza': def('storage', ['media', 'credenza'], LIVING, MODERN, { clear: C(0.5), size: { w: 1.8, d: 0.45, h: 0.72 }, params: ['w', 'd'], colorRole: null, top: 0.72 }),
-  'wall-tv': def('art', ['tv'], LIVING, [], { mountY: 1.3, size: { w: 1.6, d: 0.05, h: 0.9, y0: -0.45 }, params: ['w', 'h'], colorRole: null }),
-  'fireplace': def('storage', ['fireplace'], ['living', 'den', 'library', 'bed-primary'], [], { clear: C(1.0, 0.3), size: { w: 1.6, d: 0.36, h: 0.65, y0: 0.225 }, params: [], colorRole: null }),
-  'area-rug': def('rug', ['rug'], [...LIVING, ...BEDS, ...DINING], MODERN, { size: { w: 3.2, d: 2.2, h: 0.02 }, params: ['w', 'd', 'color'] }),
-  'circular-rug': def('rug', ['rug-round'], [...LIVING, ...BEDS, ...KIDS, ...DINING], [], { size: { w: 4, d: 4, h: 0.01 }, params: ['r', 'color'] }),
-  'concentric-rug': def('rug', ['rug-round'], [...LIVING, ...DINING], MODERN, { size: { w: 3.2, d: 3.2, h: 0.02 }, params: ['r'], colorRole: null }),
-  'sun-lounger': def('outdoor', ['lounger'], ['outdoor', 'sunroom'], [], { size: { w: 0.7, d: 1.9, h: 0.48, y0: 0.1 }, params: [], colorRole: null }),
-  'bench': def('seating', ['bench', 'bed-bench'], ['foyer', 'hall', ...BEDS, ...DINING], MODERN, { clear: C(0.3), faces: 'room', size: { w: 1.8, d: 0.5, h: 0.48 }, params: ['w', 'h', 'd'], colorRole: null }),
-  'platform-bed': def('bed', ['bed'], ['bed-primary', 'bed-guest'], MODERN, { size: { w: 3.18, d: 2.3, h: 1.1 }, params: ['w', 'd', 'color'] }),
-  'wardrobe': def('storage', ['wardrobe'], BEDS, MODERN, { clear: C(0.9), size: { w: 2.2, d: 0.64, h: 2.5, oz: 0.019 }, params: ['w', 'h', 'd'], colorRole: null }),
-  'crib': def('bed', ['crib'], ['nursery'], [], { clear: C(0.6, 0.3), size: { w: 1.3, d: 0.75, h: 0.97 }, params: ['color'] }),
-  'ensuite': def('bath', ['bath-pod'], BATHS, [], { clear: C(0.9), size: { w: 2.4, d: 2, h: 2.11 }, params: ['w', 'd'], colorRole: null }),
-  'bookshelf': def('storage', ['bookcase'], [...WORK, 'living', 'den', 'bed-guest', 'hall'], [], { size: { w: 1.18, d: 0.35, h: 2 }, params: ['w', 'h', 'd'], colorRole: null }),
-  'walnut-desk': def('hero', ['hero-desk'], WORK, [], { size: { w: 1.8, d: 0.85, h: 0.77 }, params: [] }),
-  'task-chair': def('hero', ['desk-chair'], WORK, [], { tucks: true, size: { w: 0.53, d: 0.55, h: 0.98, oz: 0.005, y0: 0.065 }, params: [] }),
-  'curved-monitor': def('hero', [], WORK, [], { onSurface: true, surfaces: ['desk'], size: { w: 1.05, d: 0.32, h: 0.81, oz: 0.05 }, params: [] }),
-  'chalk-tower': def('hero', [], [], [], { onSurface: true, surfaces: ON, size: { w: 0.26, d: 0.31, h: 0.09, ox: -0.012, oz: -0.052 }, params: ['pose'] }),
-  'charcoal-tower': def('hero', [], [], [], { onSurface: true, surfaces: ON, size: { w: 0.26, d: 0.31, h: 0.09, ox: -0.012, oz: -0.052 }, params: ['pose'] }),
-  'core-shelf': def('hero', [], [], [], { hangs: 'wall', size: { w: 0.9, d: 0.34, h: 0.26, oz: 0.169, y0: 0.745 }, params: ['finish', 'pose', 'h', 'w'] }),
-  'strix-mini': def('hero', [], [], [], { onSurface: true, surfaces: ON, size: { w: 0.24, d: 0.24, h: 0.09 }, params: [] }),
-  'speakers': def('hero', [], [], [], { onSurface: true, surfaces: ON, size: { w: 1.48, d: 0.22, h: 0.28, oz: 0.012 }, params: [] }),
-  'halo-lamp': def('lamp', ['legacy-lamp'], [...LIVING, ...BEDS], MODERN, { size: { w: 0.4, d: 0.4, h: 1.71 }, params: [], colorRole: null }),
-  'fiddle-leaf': def('plant', ['plant-floor'], [...LIVING, 'dining', 'foyer'], [], { size: { w: 1.32, d: 1.26, h: 2.44, ox: 0.026 }, params: [], colorRole: null }),
-  'monstera': def('plant', ['plant-floor'], [...LIVING, 'dining', 'foyer', 'bed-primary'], ['modern', 'tropical', 'mid-century', 'scandi'], { size: { w: 1.01, d: 1.17, h: 1.31 }, params: [], colorRole: null }),
-  'bonsai': def('plant', ['plant-surface'], [...WORK, 'living'], [], { onSurface: true, surfaces: ON, size: { w: 0.57, d: 0.48, h: 0.5, ox: 0.044 }, params: [], colorRole: null }),
-  'bamboo': def('plant', ['plant-screen'], ['sunroom', 'greenhouse', 'outdoor'], ['modern', 'tropical'], { against: 'wall', size: { w: 1.6, d: 0.4, h: 2.8 }, params: [], colorRole: null }),
-  'cactus-group': def('plant', ['plant-floor'], ['sunroom', 'greenhouse', 'living'], ['mediterranean', 'modern'], { size: { w: 1.67, d: 1.27, h: 2.3, ox: -0.115, oz: 0.115, y0: -0.1 }, params: [], colorRole: null }),
-  'telescope': def('decor', ['curio'], ['study', 'library', 'living'], [], { onSurface: false, against: 'window', clear: C(0.3, 0.2), size: { w: 0.69, d: 1.09, h: 1.69, ox: 0.108, oz: -0.02 }, params: [], colorRole: null }),
-  'soccer-goal': def('outdoor', ['play-outdoor'], ['outdoor'], [], { size: { w: 1.86, d: 1.22, h: 1.13, oz: 0.01 }, params: [], colorRole: null }),
-  'low-wall': def('structure', [], [], [], { size: { w: 3.04, d: 0.2, h: 0.89 }, params: ['w', 'h'] }),
-  'column': def('structure', [], [], [], { size: { w: 0.4, d: 0.4, h: 2.62 }, params: ['h', 'r', 'size', 'style', 'color'] }),
+  ...PAGE_PLACE,
 
   // ---- registry props (assets/props/*.ts) ------------------------------------------------------------------------
   // decor.ts
