@@ -21,7 +21,7 @@ registerProps({
       const g = group('Table Lamp');
       const base = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 0.03, 16), std(colors.metal, { metalness: 0.7, roughness: 0.35 })); base.position.y = 0.015; g.add(base);
       const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.28, 8), std(colors.metal, { metalness: 0.7, roughness: 0.35 })); stem.position.y = 0.17; g.add(stem);
-      const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.15, 0.2, 18, 1, true), std(it.color ? hex(it.color) : colors.linen, { side: THREE.DoubleSide, roughness: 0.9, emissive: 0xfff1d6, emissiveIntensity: 0.25 })); shade.position.y = 0.4; g.add(shade);
+      const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.15, 0.2, 18, 1, true), std(it.color ? hex(it.color) : colors.linen, { side: THREE.DoubleSide, roughness: 0.9, emissive: 0xfff1d6, emissiveIntensity: 0.25 })); shade.position.y = 0.4; shade.userData.lampHead = 'shade'; g.add(shade);   // lampHead: fixtures.ts may swap the shade for another lamp kind
       return g;
     },
     iso: [{ shape: 'cyl', box: [-0.15, 0.3, -0.15, 0.15, 0.5, 0.15], color: 'role:linen' }],

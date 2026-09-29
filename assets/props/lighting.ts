@@ -43,12 +43,16 @@ const shadeMat = (THREE, std, color, extra = {}) => std(color, { side: THREE.Dou
 // the default fabric shade: the linen role warmed a touch, so a lit drum reads as cloth rather than paper
 const linenShade = (mix, colors) => mix(colors.linen, 0xfde68a, 0.12);
 // an open drum shade with a top cap and slim metal rims top and bottom (the rims give a white drum an edge)
+// Every part of a lamp's head (the shade, its rims, the bulb) is tagged userData.lampHead — the shade itself 'shade' —
+// so fixtures.ts can swap the head for another kind (rooms[].fixtures.lamp, or a seeded pick under `defaults: 2`: a
+// globe, a cone, a mushroom dome, a tripod) on the floor, arc, tripod and table lamps houses actually place.
+const headOf = (m, what: true | 'shade' = true) => { m.userData.lampHead = what; return m; };
 const drum = (THREE, std, g, r, h, y, z, shade, metal, seg = 24) => {
-  g.add(cyl(THREE, r, r, h, shade, 0, y, z, seg, true));
-  g.add(cyl(THREE, r, r, 0.01, shade, 0, y + h / 2 - 0.005, z, seg));
+  g.add(headOf(cyl(THREE, r, r, h, shade, 0, y, z, seg, true), 'shade'));
+  g.add(headOf(cyl(THREE, r, r, 0.01, shade, 0, y + h / 2 - 0.005, z, seg)));
   const rim = metalMat(std, metal, { side: THREE.DoubleSide });
-  g.add(cyl(THREE, r + 0.004, r + 0.004, 0.012, rim, 0, y + h / 2 - 0.006, z, seg, true));
-  g.add(cyl(THREE, r + 0.004, r + 0.004, 0.012, rim, 0, y - h / 2 + 0.006, z, seg, true));
+  g.add(headOf(cyl(THREE, r + 0.004, r + 0.004, 0.012, rim, 0, y + h / 2 - 0.006, z, seg, true)));
+  g.add(headOf(cyl(THREE, r + 0.004, r + 0.004, 0.012, rim, 0, y - h / 2 + 0.006, z, seg, true)));
 };
 const metalMat = (std, color, extra = {}) => std(color, { metalness: 0.75, roughness: 0.35, ...extra });
 const bulbMat = std => std(0xfff4dc, { emissive: 0xffe2a8, emissiveIntensity: 0.9, roughness: 0.4 });
@@ -88,7 +92,7 @@ registerProps(switchedByGain({
       g.add(cyl(THREE, 0.13, 0.15, 0.025, metal, 0, 0.0125, 0, 20));
       g.add(cyl(THREE, 0.012, 0.012, h - 0.3 - 0.025, metal, 0, (h - 0.3 + 0.025) / 2, 0, 8));
       drum(THREE, std, g, 0.2, 0.3, h - 0.15, 0, shadeMat(THREE, std, it.color ? hex(it.color) : linenShade(mix, colors)), colors.metal);
-      g.add(ball(THREE, 0.035, bulbMat(std), 0, h - 0.2, 0, 10));
+      g.add(headOf(ball(THREE, 0.035, bulbMat(std), 0, h - 0.2, 0, 10)));
       return g;
     },
     iso: [
@@ -110,7 +114,7 @@ registerProps(switchedByGain({
       g.add(tube(THREE, arc, 0.016, metal, 28, 8));
       g.add(cyl(THREE, 0.006, 0.006, 0.09, std(CABLE), 0, 1.92, tz, 6));
       drum(THREE, std, g, 0.22, 0.22, 1.77, tz, shadeMat(THREE, std, it.color ? hex(it.color) : linenShade(mix, colors)), colors.metal);
-      g.add(ball(THREE, 0.035, bulbMat(std), 0, 1.74, tz, 10));
+      g.add(headOf(ball(THREE, 0.035, bulbMat(std), 0, 1.74, tz, 10)));
       return g;
     },
     iso: [
@@ -134,7 +138,7 @@ registerProps(switchedByGain({
       g.add(cyl(THREE, 0.05, 0.05, 0.08, metal, 0, 1.2, 0, 14));
       g.add(cyl(THREE, 0.012, 0.012, 0.12, metal, 0, 1.29, 0, 8));
       drum(THREE, std, g, 0.24, 0.3, 1.49, 0, shadeMat(THREE, std, it.color ? hex(it.color) : linenShade(mix, colors)), colors.metal);
-      g.add(ball(THREE, 0.035, bulbMat(std), 0, 1.44, 0, 10));
+      g.add(headOf(ball(THREE, 0.035, bulbMat(std), 0, 1.44, 0, 10)));
       return g;
     },
     iso: [

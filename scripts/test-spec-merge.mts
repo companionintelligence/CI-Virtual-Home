@@ -19,6 +19,15 @@ const TSC = path.join(ROOT, 'node_modules', 'typescript', 'bin', 'tsc');
 if (!fs.existsSync(TSC)) { console.error('no node_modules/typescript — pnpm install first'); process.exit(2); }
 const OPTIONS = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets', 'tsconfig.json'), 'utf8')).compilerOptions;
 
+/** `src` without its `export interface <name> { … }` (the braces matched, so a stream's filled-in fragment goes too) */
+function dropInterface(src: string, name: string): string {
+  const at = src.search(new RegExp(`export interface ${name}\\b[^{]*\\{`));
+  if (at < 0) return src;
+  let i = src.indexOf('{', at), depth = 0;
+  for (; i < src.length; i++) { if (src[i] === '{') depth++; else if (src[i] === '}' && --depth === 0) { i++; break; } }
+  return src.slice(0, at) + src.slice(src[i] === '\n' ? i + 1 : i);
+}
+
 type Probe = {
   name: string;
   /** appended to assets/spec/<file>.ts, keyed by the fragment's short name */
@@ -108,11 +117,11 @@ for (const p of probes) {
     for (const f of fs.readdirSync(SPEC)) if (f.endsWith('.ts')) fs.copyFileSync(path.join(SPEC, f), path.join(dir, 'spec', f));
     for (const [frag, text] of Object.entries(p.edit ?? {})) {
       const file = path.join(dir, 'spec', `${frag}.ts`);
-      // a fragment's interface is empty (`export interface KitRoomItem {}`): the probe's declaration replaces it, and
-      // any import it needs goes to the top
+      // a fragment's interface is empty (`export interface KitRoomItem {}`) until its stream fills it in: the probe's
+      // declaration replaces it whole, whatever it holds by now, and any import it needs goes to the top
       let src = fs.readFileSync(file, 'utf8');
       const imports = text.split('\n').filter(l => l.startsWith('import ')), body = text.split('\n').filter(l => !l.startsWith('import ')).join('\n');
-      for (const m of body.matchAll(/export interface (\w+)/g)) src = src.replace(new RegExp(`export interface ${m[1]} \\{\\}\\n?`), '');
+      for (const m of body.matchAll(/export interface (\w+)/g)) src = dropInterface(src, m[1]);
       fs.writeFileSync(file, imports.join('\n') + '\n' + src + '\n' + body + '\n');
     }
     const files = ['spec/index.ts'];

@@ -2263,6 +2263,46 @@
           for (const sd of [-1, 1]) faceBoard(unit, cw, top, sd * (w / 2 + cw / 2), top / 2, face, proud, mat);
           if (room >= headH + 0.01) faceBoard(unit, w + 2 * cw, headH, 0, top + headH / 2, face, proud, mat);
         };
+        // ---- the kit's door and window family (plan S1: assets/kit-build.ts openingParams says what each opening
+        // wants; an opening that asks for none of it is built exactly as before)
+        // Arched and segmental heads (op.head, plan Completeness B): the hole's top follows a circular arc rising
+        // `rise` over the opening's rectangle — a half-circle for 'arch', a flat segment (0.18 of the span) for
+        // 'segmental' — so the wall above is a shape, not a box.
+        const headRise = (w, top, kind) => { if (kind !== 'arch' && kind !== 'segmental') return 0; const want = kind === 'arch' ? w / 2 : w * 0.18; return Math.max(0, Math.min(want, height - top - 0.08)); };
+        const arcOf = (w, rise) => { const R = (w * w / 4 + rise * rise) / (2 * rise); return { R, cy: rise - R, a0: Math.atan2(R - rise, w / 2) }; };   // circle centre (0, top + cy)
+        const cutAt = (cy, r) => Math.asin(Math.max(-1, Math.min(1, -cy / r)));   // where radius r meets the springing line
+        // the wall over an arched hole: its outer half-thickness wears the cladding on its face, its inner half the
+        // paint; the arc's underside (the reveal) is paint
+        const archedLintel = (grp, cx, w, top, rise) => {
+          const { R, cy, a0 } = arcOf(w, rise);
+          const sh = new THREE.Shape(); sh.moveTo(-w / 2, top); sh.absarc(0, top + cy, R, Math.PI - a0, a0, true); sh.lineTo(w / 2, height); sh.lineTo(-w / 2, height); sh.closePath();
+          const geo = new THREE.ExtrudeGeometry(sh, { depth: hz, bevelEnabled: false, curveSegments: 24 });
+          for (const [z, face] of [[0, exterior ? (config.cladding || wallPaint) : wallPaint], [-hz, wallPaint]]) {
+            const m = new THREE.Mesh(geo, [face, wallPaint]); m.position.set(cx, 0, z); m.castShadow = true; m.receiveShadow = true; grp.add(m);
+          }
+        };
+        // a flat bar bent along the hole's arc (span w, rise over baseY), from `inner` inside the arc to `outer`
+        // outside it: a frame's head (inner = the frame), an arched casing or stone arch (outer); `depth` along z
+        const arcBar = (unit, w, baseY, rise, inner, outer, depth, mat, z) => {
+          const { R, cy } = arcOf(w, rise), c = baseY + cy, ro = R + outer, ri = R - inner, ao = cutAt(cy, ro), ai = cutAt(cy, ri);
+          const sh = new THREE.Shape(); sh.absarc(0, c, ro, ao, Math.PI - ao, false); sh.absarc(0, c, ri, Math.PI - ai, ai, true); sh.closePath();
+          const m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth, bevelEnabled: false, curveSegments: 24 }), mat);
+          m.position.z = z - depth / 2; m.castShadow = true; m.receiveShadow = true; unit.add(m); return m;
+        };
+        // the glass under the arc, `inset` inside it (a fanlight, the top of an arched window)
+        const arcGlass = (unit, w, baseY, rise, inset, z, mat) => {
+          const { R, cy } = arcOf(w, rise), r = R - inset, a = cutAt(cy, r);
+          const sh = new THREE.Shape(); sh.moveTo(-r * Math.cos(a), baseY); sh.absarc(0, baseY + cy, r, Math.PI - a, a, true); sh.closePath();
+          const g = new THREE.Mesh(new THREE.ShapeGeometry(sh, 24), mat); g.position.z = z; g.userData.windowGlow = true; unit.add(g); return g;
+        };
+        // muntins (op.grid): '2x2' one bar each way, 'vertical' bars at ~0.3 m, 'prairie' a border 0.1 m in, 'none'
+        const gridBars = (unit, w, h, y0, z, mat, grid) => {
+          const bar = (bw, bh, x, y) => { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.03), mat); m.position.set(x, y, z); unit.add(m); };
+          if (grid === '2x2') { bar(0.025, h, 0, y0 + h / 2); bar(w, 0.025, 0, y0 + h / 2); }
+          else if (grid === 'vertical') { const n = Math.max(2, Math.round(w / 0.3)); for (let i = 1; i < n; i++) bar(0.022, h, -w / 2 + w * i / n, y0 + h / 2); }
+          else if (grid === 'prairie') { const k = Math.min(0.1, w / 5, h / 5); for (const sx of [-1, 1]) bar(0.022, h, sx * (w / 2 - k), y0 + h / 2); for (const sy of [0, 1]) bar(w, 0.022, 0, y0 + (sy ? h - k : k)); }
+        };
+        const frameMatFor = op => op.frameColor !== undefined ? new THREE.MeshStandardMaterial({ color: op.frameColor, roughness: 0.4 }) : trimMat;
         // clear float glass: a faint grey-green, not the sky-blue film that read as a UI tint over every window
         const glassMat = new THREE.MeshPhysicalMaterial({
           color: 0xcdd8d6,
@@ -2353,9 +2393,10 @@
             pApron.position.set(op.offset, 0.075, 0);
             baseboardGroup.add(pApron);
 
-            // 2. Top lintel header above window
-            const lintelH = height - winTop;
-            if (lintelH > 0.02) {
+            // 2. Top lintel header above window (an arched or segmental head: the wall above follows the arc)
+            const lintelH = height - winTop, wRise = headRise(op.width, winTop, op.head);
+            if (wRise > 0) archedLintel(fullGroup, op.offset, op.width, winTop, wRise);
+            else if (lintelH > 0.02) {
               const lintel = new THREE.Mesh(new THREE.BoxGeometry(op.width, lintelH, thickness), wallMat);
               lintel.position.set(op.offset, winTop + lintelH / 2, 0);
               lintel.castShadow = true;
@@ -2368,19 +2409,22 @@
             const winUnit = new THREE.Group();
             winUnit.name = `Window (${op.width}m × ${winH}m)`;
             winUnit.position.set(op.offset, sillY, 0);
-            const w = op.width, FR = 0.05, FD = 0.07, room = height - winTop;
+            const w = op.width, FR = 0.05, FD = 0.07, room = wRise > 0 ? 0 : height - winTop;
             const tall = winH > 1.8, glazedWall = sillY < 0.3 && tall;   // floor-to-ceiling glass: no casing, no stool
             const fz = exterior ? hz - 0.035 - FD / 2 : 0;
-            const bar = (bw, bh, x, y, d = FD) => { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, d), trimMat); m.position.set(x, y, fz); winUnit.add(m); return m; };
-            bar(w, FR, 0, FR / 2); bar(w, FR, 0, winH - FR / 2);
-            bar(FR, winH - 2 * FR, -w / 2 + FR / 2, winH / 2); bar(FR, winH - 2 * FR, w / 2 - FR / 2, winH / 2);
-            if (tall) { const n = Math.max(1, Math.round(w / 1.3)); for (let i = 1; i < n; i++) bar(0.04, winH - 2 * FR, -w / 2 + (w * i) / n, winH / 2, FD * 0.8); }
+            const frMat = frameMatFor(op);
+            const bar = (bw, bh, x, y, d = FD) => { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, d), frMat); m.position.set(x, y, fz); winUnit.add(m); return m; };
+            bar(w, FR, 0, FR / 2); if (wRise > 0) arcBar(winUnit, w, winH, wRise, FR, 0, FD, frMat, fz); else bar(w, FR, 0, winH - FR / 2);
+            bar(FR, winH - (wRise > 0 ? 1 : 2) * FR, -w / 2 + FR / 2, (winH + (wRise > 0 ? FR : 0)) / 2); bar(FR, winH - (wRise > 0 ? 1 : 2) * FR, w / 2 - FR / 2, (winH + (wRise > 0 ? FR : 0)) / 2);
+            if (op.grid) gridBars(winUnit, w - 2 * FR, winH - 2 * FR, FR, fz, frMat, op.grid);
+            else if (tall) { const n = Math.max(1, Math.round(w / 1.3)); for (let i = 1; i < n; i++) bar(0.04, winH - 2 * FR, -w / 2 + (w * i) / n, winH / 2, FD * 0.8); }
             else { if (w > 0.8) bar(0.03, winH - 2 * FR, 0, winH / 2, 0.04); if (winH > 0.9) bar(w - 2 * FR, 0.03, 0, winH / 2, 0.04); }
 
-            const glass = new THREE.Mesh(new THREE.PlaneGeometry(w - 2 * FR, winH - 2 * FR), glassMat);
-            glass.position.set(0, winH / 2, fz);
+            const glass = new THREE.Mesh(new THREE.PlaneGeometry(w - 2 * FR, winH - (wRise > 0 ? 1 : 2) * FR), glassMat);
+            glass.position.set(0, (winH + (wRise > 0 ? FR : 0)) / 2, fz);
             glass.userData.windowGlow = true;
             winUnit.add(glass);
+            if (wRise > 0) arcGlass(winUnit, w, winH, wRise, FR, fz, glassMat);
 
             if (!glazedWall) {
               if (exterior) {   // the stool rides 8 mm proud of the apron's top so the two never share a plane
@@ -2396,6 +2440,7 @@
                   const m = new THREE.Mesh(new THREE.BoxGeometry(sw, th, front - back), extTrimMat);
                   m.position.set(0, 0.01 - th / 2, (front + back) / 2); m.castShadow = true; m.receiveShadow = true; winUnit.add(m);
                 };
+                if (wRise > 0) arcBar(winUnit, w, winH, wRise, 0, extStyle === 'masonry' ? 0.14 : 0.08, 0.03, extTrimMat, hz + 0.015);   // an arched casing / a stone arch
                 if (extStyle === 'casing') {
                   casing(winUnit, w, winH, 1, 0.075, 0.025, extTrimMat, room, 0.1);
                   if (room > 0.14) { const drip = new THREE.Mesh(new THREE.BoxGeometry(w + 0.19, 0.022, 0.05), extTrimMat); drip.position.set(0, winH + 0.111, hz + 0.025); drip.castShadow = true; winUnit.add(drip); }
@@ -2414,12 +2459,16 @@
 
           } else if (op.type === 'door') {
             const doorH = op.height !== undefined ? op.height : 2.10;
+            // a transom (op.transom, metres of glass over the leaf) and an arched / segmental head over both
+            const tr = op.transom > 0.1 ? Math.min(op.transom, height - doorH - 0.12) : 0, top = doorH + Math.max(0, tr);
+            const dRise = headRise(op.width, top, op.head);
 
             // Top lintel header above door
-            const lintelH = height - doorH;
-            if (lintelH > 0.02) {
+            const lintelH = height - top;
+            if (dRise > 0) archedLintel(fullGroup, op.offset, op.width, top, dRise);
+            else if (lintelH > 0.02) {
               const lintel = new THREE.Mesh(new THREE.BoxGeometry(op.width, lintelH, thickness), wallMat);
-              lintel.position.set(op.offset, doorH + lintelH / 2, 0);
+              lintel.position.set(op.offset, top + lintelH / 2, 0);
               lintel.castShadow = true;
               lintel.receiveShadow = true;
               fullGroup.add(lintel);
@@ -2447,17 +2496,31 @@
 
             // Outer jambs & casing header (the baseboard white; a garage keeps the trim colour)
             const jambMat = op.style === 'garage' ? trimMat : intTrimMat;
-            const jLeft = new THREE.Mesh(new THREE.BoxGeometry(0.05, doorH, thickness + 0.02), jambMat);
-            jLeft.position.set(-op.width / 2 + 0.025, doorH / 2, 0);
+            const jLeft = new THREE.Mesh(new THREE.BoxGeometry(0.05, top, thickness + 0.02), jambMat);
+            jLeft.position.set(-op.width / 2 + 0.025, top / 2, 0);
             doorUnit.add(jLeft);
 
-            const jRight = new THREE.Mesh(new THREE.BoxGeometry(0.05, doorH, thickness + 0.02), jambMat);
-            jRight.position.set(op.width / 2 - 0.025, doorH / 2, 0);
+            const jRight = new THREE.Mesh(new THREE.BoxGeometry(0.05, top, thickness + 0.02), jambMat);
+            jRight.position.set(op.width / 2 - 0.025, top / 2, 0);
             doorUnit.add(jRight);
 
-            const jTop = new THREE.Mesh(new THREE.BoxGeometry(op.width, 0.05, thickness + 0.02), jambMat);
-            jTop.position.set(0, doorH - 0.025, 0);
-            doorUnit.add(jTop);
+            if (dRise > 0) arcBar(doorUnit, op.width, top, dRise, 0.05, 0, thickness + 0.02, jambMat, 0);   // the head jamb follows the arch
+            else {
+              const jTop = new THREE.Mesh(new THREE.BoxGeometry(op.width, 0.05, thickness + 0.02), jambMat);
+              jTop.position.set(0, top - 0.025, 0);
+              doorUnit.add(jTop);
+            }
+            // the transom: a frame bar over the leaf (the door head) and glass up to the head jamb; a fanlight in the arch
+            const dFrame = frameMatFor(op);
+            if (tr > 0) {
+              const head = new THREE.Mesh(new THREE.BoxGeometry(op.width - 0.1, 0.06, 0.07), dFrame); head.position.set(0, doorH + 0.03, 0); doorUnit.add(head);
+              const tg = new THREE.Mesh(new THREE.PlaneGeometry(op.width - 0.1, tr - 0.08), glassMat); tg.position.set(0, doorH + 0.06 + (tr - 0.08) / 2, 0); tg.userData.windowGlow = true; doorUnit.add(tg);
+              if (op.grid) gridBars(doorUnit, op.width - 0.1, tr - 0.08, doorH + 0.06, 0, dFrame, op.grid === '2x2' ? 'vertical' : op.grid);
+            }
+            if (dRise > 0) {
+              if (tr <= 0) { const head = new THREE.Mesh(new THREE.BoxGeometry(op.width - 0.1, 0.06, 0.07), dFrame); head.position.set(0, top - 0.03, 0); doorUnit.add(head); }
+              arcGlass(doorUnit, op.width, top, dRise, 0.05, 0, glassMat);
+            }
 
             if (op.style === 'garage') {
               // Sectional garage door: closed panelled leaf with horizontal grooves + handle
@@ -2498,7 +2561,7 @@
               // so every slider read as an opaque trim-coloured board from outside.
               (op.open ? [panelW / 2, panelW / 2] : [-panelW / 2, panelW / 2]).forEach((px, pIdx) => {
                 const pz = pIdx === 0 ? -0.015 : 0.015, pH = doorH - 0.06, py = pH / 2 + 0.025, ST = 0.05, TR = 0.06, BR = 0.09;
-                const bar = (bw, bh, bx, by) => { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.04), trimMat); m.position.set(bx, by, pz); doorUnit.add(m); };
+                const bar = (bw, bh, bx, by) => { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.04), op.frameColor !== undefined ? dFrame : trimMat); m.position.set(bx, by, pz); doorUnit.add(m); };
                 bar(ST, pH, px - panelW / 2 + ST / 2, py); bar(ST, pH, px + panelW / 2 - ST / 2, py);
                 bar(panelW - 2 * ST, TR, px, 0.025 + pH - TR / 2); bar(panelW - 2 * ST, BR, px, 0.025 + BR / 2);
 
@@ -2506,16 +2569,17 @@
                 sGlass.position.set(px, 0.025 + BR + (pH - TR - BR) / 2, pz);
                 sGlass.userData.windowGlow = true;
                 doorUnit.add(sGlass);
+                if (op.grid) gridBars(doorUnit, panelW - 2 * ST, pH - TR - BR, 0.025 + BR, pz + (pIdx === 0 ? -0.021 : 0.021), dFrame, op.grid);
 
                 // Vertical pull handle
                 const pHandle = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.35, 0.04), trimMat);
                 pHandle.position.set(px + (pIdx === 0 ? panelW / 2 - 0.04 : -panelW / 2 + 0.04), 1.05, (pIdx === 0 ? -0.035 : 0.035));
                 doorUnit.add(pHandle);
               });
-            } else if (op.width > 1.1) {
+            } else if ((op.width > 1.1 && !op.leaf) || op.leaf === 'none') {
               // a cased opening / archway: no leaf — a 1.5–2 m leaf swung into the room blocked the doorway it
-              // belonged to (and the camera's way through it)
-            } else {
+              // belonged to (and the camera's way through it). op.leaf 'double' / 'french' hangs a pair instead.
+            } else if (!op.leaf) {
               // Standard paneled door leaf with realistic hinge pivot
               const leafMat = new THREE.MeshStandardMaterial({ color: op.leafColor || 0x0f766e, roughness: 0.5 });
               const leafW = op.width - 0.10;
@@ -2537,27 +2601,75 @@
               doorPivot.add(handle);
 
               // An open door lies almost flat against the wall on its hinge side (88°): the leaf then never
-              // stands in the doorway or the room, and the eye passes the jamb by 0.25 m
-              if (op.open || op.style === 'entry' || op.style === 'open') {
-                doorPivot.rotation.y = -Math.PI * 88 / 180;
+              // stands in the doorway or the room, and the eye passes the jamb by 0.25 m. op.swing 'in' turns it
+              // the other way (an entry into the house: kit-build.ts, defaults 2).
+              // op.park 'flat' (defaults 2): the hinge moves to the wall's face on the swing side and the leaf folds
+              // back 172°, flat along the wall (within 10° of its plane), out of the room
+              const flat = op.park === 'flat', ang = (op.swing === 'in' ? 1 : -1) * Math.PI * (flat ? 172 : 88) / 180;
+              if (flat) doorPivot.position.z = (op.swing === 'in' ? -1 : 1) * (hz + 0.03);
+              const open = op.open || op.style === 'entry' || op.style === 'open';
+              if (open) {
+                doorPivot.rotation.y = ang;
+              }
+              doorPivot.userData.door = { id: op.id || null, leaf: 'single', hinge: 'left', w: leafW, h: leafH, y0: 0.025, closedAngle: 0, openAngle: ang, open: !!open, swing: op.swing === 'in' ? 'in' : 'out' };
+            } else {
+              // The kit's leaves (op.leaf): 'single' a panelled leaf, 'glazed' a framed glass leaf, 'double' a pair of
+              // panelled leaves, 'french' a pair of glazed ones — hinged on both jambs, parked flat to the wall
+              // (88°) on the op.swing side, each with its handle on the meeting stile.
+              const pair = op.leaf === 'double' || op.leaf === 'french', glazed = op.leaf === 'glazed' || op.leaf === 'french';
+              const leafMat = new THREE.MeshStandardMaterial({ color: op.leafColor || 0x0f766e, roughness: 0.5 });
+              const W = op.width - 0.10, leafW = pair ? W / 2 - 0.004 : W, leafH = doorH - 0.06;
+              const open = op.open || op.style === 'entry' || op.style === 'open';
+              for (const hinge of pair ? ['left', 'right'] : ['left']) {
+                const sgn = hinge === 'left' ? 1 : -1;   // the leaf runs from its hinge toward +x (left) or −x (right)
+                const flat = op.park === 'flat';
+                const pivot = new THREE.Group(); pivot.position.set(-sgn * W / 2, 0, flat ? (op.swing === 'in' ? -1 : 1) * (hz + 0.03) : 0); doorUnit.add(pivot);
+                const leafGrp = new THREE.Group(); pivot.add(leafGrp);
+                if (glazed) {
+                  const ST = 0.09, RT = 0.1, RB = 0.22;   // stiles, top rail, bottom rail
+                  const piece = (bw, bh, x, y) => { const m = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, 0.045), leafMat); m.position.set(sgn * x, y, 0); m.castShadow = true; leafGrp.add(m); };
+                  piece(ST, leafH, ST / 2, 0.025 + leafH / 2); piece(ST, leafH, leafW - ST / 2, 0.025 + leafH / 2);
+                  piece(leafW - 2 * ST, RT, leafW / 2, 0.025 + leafH - RT / 2); piece(leafW - 2 * ST, RB, leafW / 2, 0.025 + RB / 2);
+                  const gw = leafW - 2 * ST, gh = leafH - RT - RB;
+                  const g = new THREE.Mesh(new THREE.PlaneGeometry(gw, gh), glassMat); g.position.set(sgn * leafW / 2, 0.025 + RB + gh / 2, 0); g.userData.windowGlow = true; leafGrp.add(g);
+                  const lites = new THREE.Group(); lites.position.x = sgn * leafW / 2; leafGrp.add(lites);
+                  gridBars(lites, gw, gh, 0.025 + RB, 0, leafMat, op.grid || (op.leaf === 'french' ? 'vertical' : 'none'));
+                } else {
+                  const leaf = new THREE.Mesh(new THREE.BoxGeometry(leafW, leafH, 0.045), leafMat);
+                  leaf.position.set(sgn * leafW / 2, 0.025 + leafH / 2, 0); leaf.castShadow = true; leafGrp.add(leaf);
+                  // two raised panels a leaf, a shade proud of it, both faces
+                  const panelMat = new THREE.MeshStandardMaterial({ color: new THREE.Color(op.leafColor || 0x0f766e).lerp(new THREE.Color(0xffffff), 0.06), roughness: 0.55 });
+                  for (const f of [-1, 1]) for (const [py, ph] of [[0.025 + leafH * 0.62, leafH * 0.42], [0.025 + leafH * 0.2, leafH * 0.28]]) {
+                    const pm = new THREE.Mesh(new THREE.BoxGeometry(leafW - 0.2, ph, 0.012), panelMat); pm.position.set(sgn * leafW / 2, py, f * 0.026); leafGrp.add(pm);
+                  }
+                }
+                const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.12), brassMat);
+                handle.rotation.z = Math.PI / 2; handle.position.set(sgn * (leafW - 0.08), 1.05, 0.038); leafGrp.add(handle);
+                // a left leaf swings out (+z) at −88°, a right one at +88°; 'in' mirrors both
+                const ang = (op.swing === 'in' ? 1 : -1) * sgn * Math.PI * (flat ? 172 : 88) / 180;
+                if (open) pivot.rotation.y = ang;
+                pivot.userData.door = { id: op.id || null, leaf: op.leaf, hinge, w: leafW, h: leafH, y0: 0.025, closedAngle: 0, openAngle: ang, open: !!open, swing: op.swing === 'in' ? 'in' : 'out' };
               }
             }
 
             // Surrounds: the baseboard white indoors (both faces of a partition); outdoors the cladding's trim, a
             // projecting head over the entry, and lanterns by the entry and the garage. All of it sits on the wall
             // faces outside the opening — the doorway the camera walks through stays clear.
-            const dRoom = height - doorH;
-            if (op.style !== 'garage') for (const face of exterior ? [-1] : [-1, 1]) casing(doorUnit, op.width, doorH, face, 0.075, 0.018, intTrimMat, dRoom, 0.09);
+            const dRoom = dRise > 0 ? 0 : height - top;
+            if (op.style !== 'garage') for (const face of exterior ? [-1] : [-1, 1]) casing(doorUnit, op.width, top, face, 0.075, 0.018, intTrimMat, dRoom, 0.09);
             if (exterior) {
               const cw = extStyle === 'masonry' ? 0 : extStyle === 'band' ? 0.12 : 0.1;
-              if (extStyle === 'masonry') { if (dRoom > 0.22) faceBoard(doorUnit, op.width + 0.3, 0.2, 0, doorH + 0.1, 1, 0.03, extTrimMat, true); }
-              else casing(doorUnit, op.width, doorH, 1, cw, extStyle === 'band' ? 0.025 : 0.03, extTrimMat, dRoom, 0.12);
-              const headTop = doorH + (extStyle === 'masonry' ? 0.2 : 0.12);
-              if (op.entry && height - headTop > 0.08) {
+              if (dRise > 0) arcBar(doorUnit, op.width, top, dRise, 0, extStyle === 'masonry' ? 0.16 : cw, 0.03, extTrimMat, hz + 0.015);   // an arched casing / a stone arch
+              if (extStyle === 'masonry') { if (dRoom > 0.22) faceBoard(doorUnit, op.width + 0.3, 0.2, 0, top + 0.1, 1, 0.03, extTrimMat, true); }
+              else casing(doorUnit, op.width, top, 1, cw, extStyle === 'band' ? 0.025 : 0.03, extTrimMat, dRoom, 0.12);
+              const headTop = top + (extStyle === 'masonry' ? 0.2 : 0.12);
+              if (op.entry && dRise <= 0 && height - headTop > 0.08) {
                 const crown = new THREE.Mesh(new THREE.BoxGeometry(op.width + 2 * cw + 0.14, 0.05, 0.08), extTrimMat);
                 crown.position.set(0, headTop + 0.025, hz + 0.04); crown.castShadow = true; crown.receiveShadow = true; doorUnit.add(crown);
               }
-              if (op.entry || op.style === 'garage') {
+              // lanterns: op.lantern true / false decides; left out, the entry and a garage get them (today's rule —
+              // kit-build.ts sends false under defaults 2 unless the spec asks)
+              if (op.lantern === true || (op.lantern !== false && (op.entry || op.style === 'garage'))) {
                 // latch side first (a hinged leaf hangs on −x); a pair by a garage or a wide entry
                 const both = op.style === 'garage' || op.width >= 1.4;
                 const clear = x => x > -length / 2 + 0.25 && x < length / 2 - 0.25 && sortedOpenings.every(o => o === op || x < o.offset - o.width / 2 - 0.3 || x > o.offset + o.width / 2 + 0.3);
@@ -3307,6 +3419,9 @@
       },
 
       // 8. Architectural Interior Partition Wall
+      // doorColor: the leaf's colour (default teal: kit-build.ts partitionParams derives one under defaults 2);
+      // doorLeaf: 'single' | 'glazed' | 'double' | 'french' | 'none' (kit-rules.ts leafKindOf — unset keeps today's
+      // rule, a leaf up to 1.1 m and a cased opening above); doorSwing 'in' hangs it on the partition's other face
       createInteriorPartitionWall({
         length = 4,
         height = 2.7,
@@ -3316,7 +3431,12 @@
         baseboardColor = 0xe2e8f0,
         doorOffset = null,
         doorWidth = 0.9,
-        doorHeight = 2.1
+        doorHeight = 2.1,
+        doorColor = undefined,
+        doorLeaf = undefined,
+        doorSwing = undefined,
+        doorPark = undefined,
+        doorId = undefined
       } = {}) {
         const openings = [];
         if (doorOffset !== null) {
@@ -3326,7 +3446,12 @@
             width: doorWidth,
             height: doorHeight,
             style: 'cased',
-            open: true
+            open: true,
+            ...(doorColor !== undefined ? { leafColor: doorColor } : {}),
+            ...(doorLeaf !== undefined ? { leaf: doorLeaf } : {}),
+            ...(doorSwing !== undefined ? { swing: doorSwing } : {}),
+            ...(doorPark !== undefined ? { park: doorPark } : {}),
+            ...(doorId !== undefined ? { id: doorId } : {})
           });
         }
         return ProceduralArchitecture.createParametricWall({
@@ -3543,6 +3668,9 @@
         let fanAngle = 0, power = 1;
         const core = {
           finish, pose, W, H, D,
+          // the device's exact world box — the chassis alone, never the desk-glow decal (plan Completeness C6: S5's
+          // QA frames this, and hero-float measures it against the surface under it)
+          box() { body.updateMatrixWorld(true); return new THREE.Box3().setFromObject(body); },
           // where cables attach, in world space once the group is placed: the PSU inlet and the lower DisplayPort
           anchors() { body.updateMatrixWorld(true); return { inlet: body.localToWorld(new THREE.Vector3(bayX, 0.004 + 0.020, -D / 2)), io: body.localToWorld(new THREE.Vector3(mm(116.1), by0 + 0.0031, -D / 2)), back: body.localToWorld(new THREE.Vector3(0, 0, -1)).sub(body.localToWorld(new THREE.Vector3(0, 0, 0))).normalize() }; },
           setPower(p, pressed = false) { power = Math.max(0, Math.min(1, p)); led.material.emissiveIntensity = 3.2 * power; hubRing.material.emissiveIntensity = 1.6 * power; spill.material.opacity = 0.42 * power; button.position.z = frontZ + 0.0015 - (pressed ? 0.0012 : 0); },
@@ -3677,17 +3805,20 @@
         // concave side, so mirror the texture horizontally or the text reads backwards from the seat.
         screenTex.wrapS = THREE.RepeatWrapping;
         screenTex.repeat.x = -1;
+        // a matte panel (roughness 0.55, little environment): a gloss screen ghosted the room's reflections over the UI
         const screenMat = new THREE.MeshStandardMaterial({
           map: screenTex,
           emissive: 0xffffff,
           emissiveMap: screenTex,
           emissiveIntensity: 0.85,
-          roughness: 0.1,
+          roughness: 0.55,
+          envMapIntensity: 0.15,
           side: THREE.DoubleSide
         });
         group.userData.screen = timeline;   // driven by the shot (driveCoresForShot) or the live clock
         const screen = new THREE.Mesh(screenGeo, screenMat);
         screen.position.set(0, 0.58, -1.55);
+        screen.receiveShadow = false;
         group.add(screen);
 
         // Monitor back chassis
@@ -3697,13 +3828,18 @@
         frame.position.set(0, 0.58, -1.56);
         group.add(frame);
 
-        // Articulating Stand
+        // Articulating Stand. The pole stands BEHIND the chassis (the back shell's crown is at z +0.06; the pole at
+        // +0.11), a short neck carrying the panel — at z +0.05 it ran up through the middle of the screen.
         const poleGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.52);
         const standMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.2 });
         const pole = new THREE.Mesh(poleGeo, standMat);
-        pole.position.set(0, 0.32, 0.05);
+        pole.position.set(0, 0.32, 0.11);
         pole.castShadow = true;
         group.add(pole);
+        const neck = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.05, 0.05), standMat);
+        neck.position.set(0, 0.56, 0.085);
+        neck.castShadow = true;
+        group.add(neck);
 
         const baseGeo = new THREE.CylinderGeometry(0.14, 0.16, 0.015, 24);
         const base = new THREE.Mesh(baseGeo, standMat);
@@ -3711,6 +3847,24 @@
         base.receiveShadow = true;
         group.add(base);
 
+        return group;
+      },
+
+      // 4b. A flat 27" monitor (hero.monitor 'flat'): same timeline UI, a slim bezel, a pole behind it
+      createFlatMonitor() {
+        const group = new THREE.Group();
+        group.name = "27\" Flat Monitor";
+        group.userData = { category: "Devices", tags: "display, screen" };
+        const timeline = createScreenTimeline(); const tex = timeline.texture;
+        const screenMat = new THREE.MeshStandardMaterial({ map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.85, roughness: 0.55, envMapIntensity: 0.15 });
+        group.userData.screen = timeline;
+        const bezelMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, roughness: 0.35 });
+        const panel = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.38, 0.03), bezelMat); panel.position.set(0, 0.5, 0.02); panel.castShadow = true; group.add(panel);
+        const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.61, 0.345), screenMat); screen.position.set(0, 0.5, 0.0045); screen.rotation.y = Math.PI; group.add(screen);   // faces −z, the chair's side
+        const standMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.2 });
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.4), standMat); pole.position.set(0, 0.2, 0.07); pole.castShadow = true; group.add(pole);
+        const neck = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.04, 0.04), standMat); neck.position.set(0, 0.45, 0.05); group.add(neck);
+        const base = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.012, 0.18), standMat); base.position.set(0, 0.006, 0.06); base.receiveShadow = true; group.add(base);
         return group;
       },
 
@@ -3960,18 +4114,22 @@
       },
 
       // 11. Modern Linen 3-Piece Sectional
-      createModularSectional() {
+      // { w (default 2.4), handed: 'left' | 'right' — the chaise's side } (item-map.ts ITEM_PARAMS); userData.colorParam
+      // marks the material a spec's `color` paints (kit-build.ts themeItem, defaults 2)
+      createModularSectional({ w = 2.4, handed = 'left' } = {}) {
         const group = new THREE.Group();
         group.name = "Modern Linen Sectional Sofa";
         group.userData = { category: "Furniture", tags: "living, seating, sofa" };
+        const k = w / 2.4, hs = handed === 'right' ? 1 : -1;
 
         const sofaMat = new THREE.MeshStandardMaterial({
           color: 0x334155,
           roughness: 0.8
         });
+        sofaMat.userData.colorParam = true;
 
         // Main seat base
-        const baseGeo = new THREE.BoxGeometry(2.4, 0.32, 1.0);
+        const baseGeo = new THREE.BoxGeometry(2.4 * k, 0.32, 1.0);
         const base = new THREE.Mesh(baseGeo, sofaMat);
         base.position.set(0, 0.16, 0);
         base.castShadow = true;
@@ -3980,12 +4138,12 @@
         // Chaise extension
         const chaiseGeo = new THREE.BoxGeometry(0.9, 0.32, 0.8);
         const chaise = new THREE.Mesh(chaiseGeo, sofaMat);
-        chaise.position.set(-0.75, 0.16, 0.9);
+        chaise.position.set(hs * (k === 1 ? 0.75 : 1.2 * k - 0.45), 0.16, 0.9);
         chaise.castShadow = true;
         group.add(chaise);
 
         // Backrest
-        const backGeo = new THREE.BoxGeometry(2.4, 0.44, 0.22);
+        const backGeo = new THREE.BoxGeometry(2.4 * k, 0.44, 0.22);
         const back = new THREE.Mesh(backGeo, sofaMat);
         back.position.set(0, 0.54, -0.39);
         back.castShadow = true;
@@ -3993,16 +4151,17 @@
 
         // Cushions
         const cushionMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.75 });
+        cushionMat.userData.colorParam = true;
         [-0.7, 0.0, 0.7].forEach(cx => {
-          const c = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.12, 0.72), cushionMat);
-          c.position.set(cx, 0.38, 0.05);
+          const c = new THREE.Mesh(new THREE.BoxGeometry(0.68 * k, 0.12, 0.72), cushionMat);
+          c.position.set(cx * k, 0.38, 0.05);
           group.add(c);
         });
 
         // Accent Throw Pillows
         const pillowMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.6 });
         const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.32, 0.12), pillowMat);
-        p1.position.set(0.95, 0.48, -0.22);
+        p1.position.set(-hs * 0.95 * k, 0.48, -0.22);
         p1.rotation.set(-0.2, -0.4, 0.1);
         group.add(p1);
 
@@ -4010,17 +4169,19 @@
       },
 
       // 12. Solid Walnut Executive Desk
-      createWalnutDesk() {
+      // opts (hero.desk): { w (default 1.8), style: 'walnut' | 'oak' | 'white' | 'black', color (the top's) }
+      createWalnutDesk({ w = 1.8, style = 'walnut', color = undefined } = {}) {
         const group = new THREE.Group();
-        group.name = "Solid Walnut Executive Desk";
-        group.userData = { category: "Furniture", tags: "office, desk, wood" };
+        group.name = style === 'walnut' ? "Solid Walnut Executive Desk" : `Desk (${style})`;
+        group.userData = { category: "Furniture", tags: "office, desk, wood", surfaceTop: 0.77 };
 
         // Desktop
-        const topGeo = new THREE.BoxGeometry(1.8, 0.06, 0.85);
+        const topGeo = new THREE.BoxGeometry(w, 0.06, 0.85);
         const topMat = new THREE.MeshStandardMaterial({
-          color: 0x452818,
-          roughness: 0.35,
-          metalness: 0.1
+          // a painted top is matte and a shade under paper white: under a room's own light it would read as a lamp
+          color: color !== undefined ? color : ({ walnut: 0x452818, oak: 0xa88b69, white: 0xd4d0c9, black: 0x1f1f21 })[style] ?? 0x452818,
+          roughness: style === 'walnut' && color === undefined ? 0.35 : 0.55,
+          metalness: style === 'walnut' && color === undefined ? 0.1 : 0.02
         });
         const top = new THREE.Mesh(topGeo, topMat);
         top.position.y = 0.74;
@@ -4030,7 +4191,8 @@
 
         // Steel legs
         const legMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.3 });
-        [ [-0.82, -0.36], [-0.82, 0.36], [0.82, -0.36], [0.82, 0.36] ].forEach(([lx, lz]) => {
+        const lxx = w === 1.8 ? 0.82 : w / 2 - 0.08;
+        [ [-lxx, -0.36], [-lxx, 0.36], [lxx, -0.36], [lxx, 0.36] ].forEach(([lx, lz]) => {
           const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.71, 16), legMat);
           leg.position.set(lx, 0.355, lz);
           leg.castShadow = true;
@@ -4075,13 +4237,41 @@
       },
 
       // 14. Modern Floating Fireplace
-      createFireplace() {
+      // opts: { style: 'modern' (default, the floating box) | 'mantel' (a painted surround and shelf) | 'stone' (a
+      // rubble chimney breast to 2.4 m) | 'painted-brick' (a white brick breast) | 'tv-breast' (a plaster breast with a
+      // screen over the fire), w } — every style keeps the modern one's firebox and embers, so it lights the same
+      createFireplace({ style = 'modern', w = null } = {}) {
         const group = new THREE.Group();
-        group.name = "Modern Floating Fireplace";
-        group.userData = { category: "Furniture", tags: "living, fireplace, hearth" };
+        group.name = style === 'modern' ? "Modern Floating Fireplace" : `Fireplace (${style})`;
+        group.userData = { category: "Furniture", tags: "living, fireplace, hearth", style };
+        if (style !== 'modern') {
+          const W = w || (style === 'mantel' ? 1.6 : 1.9), deep = style === 'mantel' ? 0.3 : 0.45;
+          const breastMat = new THREE.MeshStandardMaterial({ color: style === 'stone' ? 0x9c948a : style === 'painted-brick' ? 0xeeeae3 : style === 'tv-breast' ? 0xe8e4dc : 0xefece6, roughness: style === 'stone' ? 0.95 : 0.8 });
+          breastMat.userData.colorParam = true;
+          const H = style === 'mantel' ? 1.15 : 2.4;
+          const add = (bw, bh, bd, x, y, z, m) => { const o = new THREE.Mesh(new THREE.BoxGeometry(bw, bh, bd), m); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; group.add(o); return o; };
+          // the surround round a 0.9 × 0.7 opening, with a dark firebox behind it
+          add(W, H - 0.8, deep, 0, 0.8 + (H - 0.8) / 2, 0, breastMat);
+          add((W - 0.9) / 2, 0.8, deep, -(W + 0.9) / 4, 0.4, 0, breastMat);
+          add((W - 0.9) / 2, 0.8, deep, (W + 0.9) / 4, 0.4, 0, breastMat);
+          add(0.9, 0.7, 0.05, 0, 0.45, -deep / 2 + 0.03, new THREE.MeshBasicMaterial({ color: 0x0b0b0c }));
+          add(W + 0.3, 0.05, deep + 0.35, 0, 0.025, 0.17, new THREE.MeshStandardMaterial({ color: style === 'stone' ? 0x7d766d : 0x4a4745, roughness: 0.7 }));   // hearth
+          if (style === 'mantel') add(W + 0.2, 0.06, deep + 0.12, 0, H + 0.03, 0.06, new THREE.MeshStandardMaterial({ color: 0x6b4a2b, roughness: 0.5 }));
+          if (style === 'stone') for (let i = 0; i < 26; i++) {   // proud stones on the face, on a fixed lattice
+            const r = i % 5, c = Math.floor(i / 5), x = -W / 2 + 0.18 + ((c * 0.37 + r * 0.13) % (W - 0.36)), y = 0.95 + r * 0.28 + (c % 2) * 0.1;
+            if (y > H - 0.1 || (Math.abs(x) < 0.5 && y < 0.8)) continue;
+            add(0.3, 0.18, 0.03, x, y, deep / 2 + 0.012, new THREE.MeshStandardMaterial({ color: [0x8f877c, 0xa39b90, 0x7f786f][i % 3], roughness: 0.95 }));
+          }
+          if (style === 'painted-brick') for (let r = 0; r < 18; r++) add(W, 0.008, 0.004, 0, 0.9 + r * 0.083, deep / 2 + 0.002, new THREE.MeshStandardMaterial({ color: 0xd6d1c8, roughness: 0.9 }));   // the mortar courses
+          if (style === 'tv-breast') { add(1.3, 0.74, 0.04, 0, 1.55, deep / 2 + 0.02, new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3 })); add(1.26, 0.7, 0.002, 0, 1.55, deep / 2 + 0.041, new THREE.MeshBasicMaterial({ color: 0x1e293b })); }
+          const ember = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.04, 0.18), new THREE.MeshStandardMaterial({ color: 0xf97316, emissive: 0xf97316, emissiveIntensity: 2.8 }));
+          ember.position.set(0, 0.12, -deep / 2 + 0.14); group.add(ember);
+          return group;
+        }
 
         const frameGeo = new THREE.BoxGeometry(1.6, 0.65, 0.35);
         const frameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.4, metalness: 0.6 });
+        frameMat.userData.colorParam = true;
         const frame = new THREE.Mesh(frameGeo, frameMat);
         frame.position.y = 0.55;
         frame.castShadow = true;
@@ -4236,12 +4426,15 @@
 
       // ---- OWNER S1 (kit): createKitchenIsland … createSunLounger (7 builders) ----
       // 19. Monolithic Kitchen Island with Waterfall Stone & Induction Cooktop
-      createKitchenIsland(w = 2.4, d = 0.9, stoneColor = 0xf1f5f9) {
+      // opts: { stools (default true), faucet (true), cooktop (true) } — the hero island leaves its stools off when the
+      // room has its own (hero-build.ts). The top is at 0.94 m (userData.surfaceTop).
+      createKitchenIsland(w = 2.4, d = 0.9, stoneColor = 0xf1f5f9, { stools = true, faucet: withFaucet = true, cooktop: withCooktop = true } = {}) {
         const group = new THREE.Group();
         group.name = `Kitchen Island (${w}m × ${d}m)`;
-        group.userData = { category: "Interiors", tags: "kitchen, island, dining" };
+        group.userData = { category: "Interiors", tags: "kitchen, island, dining", surfaceTop: 0.94 };
 
         const stoneMat = new THREE.MeshStandardMaterial({ color: stoneColor, roughness: 0.25, metalness: 0.05 });
+        stoneMat.userData.colorParam = true;
         const cabinetMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.6 });
 
         // Countertop
@@ -4269,6 +4462,7 @@
         group.add(cab);
 
         // Induction Cooktop Glass
+        if (withCooktop) {
         const cookGeo = new THREE.BoxGeometry(0.7, 0.01, 0.48);
         const cookMat = new THREE.MeshStandardMaterial({ color: 0x09090b, roughness: 0.1, metalness: 0.9 });
         const cooktop = new THREE.Mesh(cookGeo, cookMat);
@@ -4282,17 +4476,20 @@
           ring.position.set(rx, 0.952, rz);
           group.add(ring);
         });
+        }
 
         // Chrome Goose Neck Faucet
+        if (withFaucet) {
         const faucetMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.95, roughness: 0.1 });
         const faucet = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.24, 12), faucetMat);
         faucet.position.set(0.45, 1.06, 0.15);
         group.add(faucet);
+        }
 
         // 2 High Barstools
         const stoolMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.5 });
         const stoolWood = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.4 });
-        [-0.45, 0.45].forEach(sx => {
+        (stools ? [-0.45, 0.45] : []).forEach(sx => {
           const seat = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.04, 16), stoolWood);
           seat.position.set(sx, 0.65, d / 2 + 0.28);
           seat.castShadow = true;
@@ -4374,12 +4571,14 @@
       },
 
       // 21. Architectural Dining Table with Mid-Century Chairs
-      createDiningTable(w = 2.1, d = 1.0) {
+      // opts: { chairs: 0 | 2 | 4 (default) | 6 | 8 } — pairs along the long sides, then one at each end
+      createDiningTable(w = 2.1, d = 1.0, { chairs = 4 } = {}) {
         const group = new THREE.Group();
         group.name = `Architectural Dining Table (${w}m)`;
         group.userData = { category: "Interiors", tags: "dining, table, furniture" };
 
         const topMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.35 });
+        topMat.userData.colorParam = true;
         const legMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.3 });
 
         // Table top
@@ -4397,8 +4596,19 @@
           group.add(leg);
         });
 
-        // 4 Mid-century Dining Chairs
+        // Mid-century Dining Chairs (4 by default: two a long side)
         const chairSeatMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.7 });
+        const nc = Math.max(0, Math.min(8, Math.round(chairs / 2) * 2)), perSide = Math.min(3, nc / 2), ends = Math.max(0, nc - 2 * perSide);
+        const along = perSide === 2 ? [-0.55, 0.55] : perSide === 1 ? [0] : perSide === 3 ? [-0.7, 0, 0.7].map(x => x * Math.min(1, (w - 0.3) / 1.8)) : [];
+        const seat = (x, z, ry) => {
+          const chair = new THREE.Group();
+          const st = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.04, 0.40), chairSeatMat); st.position.y = 0.45; chair.add(st);
+          const bk = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.38, 0.04), chairSeatMat); bk.position.set(0, 0.64, -0.18); chair.add(bk);
+          const lg = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.44, 8), legMat); lg.position.set(0, 0.22, 0); chair.add(lg);
+          chair.position.set(x, 0, z); chair.rotation.y = ry; group.add(chair);
+        };
+        for (let e = 0; e < ends; e++) seat((e ? 1 : -1) * (w / 2 + 0.32), 0, (e ? -1 : 1) * Math.PI / 2);
+        if (perSide !== 2) { for (const x of along) { seat(x, -d / 2 - 0.32, 0); seat(x, d / 2 + 0.32, Math.PI); } return group; }
         [-0.55, 0.55].forEach(cx => {
           [ -d / 2 - 0.32, d / 2 + 0.32 ].forEach((cz, i) => {
             const chair = new THREE.Group();
@@ -4431,6 +4641,7 @@
         group.userData = { category: "Interiors", tags: "living, table, lounge" };
 
         const stoneMat = new THREE.MeshStandardMaterial({ color: 0xd6d3d1, roughness: 0.4 });
+        stoneMat.userData.colorParam = true;
         const legMat = new THREE.MeshStandardMaterial({ color: 0x1c1917, roughness: 0.5 });
 
         const top = new THREE.Mesh(new THREE.BoxGeometry(w, 0.04, d), stoneMat);
@@ -4456,6 +4667,7 @@
         group.userData = { category: "Architecture", tags: "wall, divider, cutaway" };
 
         const wallMat = new THREE.MeshStandardMaterial({ color: wallColor, roughness: 0.7 });
+        wallMat.userData.colorParam = true;
         const capMat = new THREE.MeshStandardMaterial({ color: capColor, roughness: 0.4 });
 
         const wall = new THREE.Mesh(new THREE.BoxGeometry(length, height, 0.16), wallMat);
@@ -4474,12 +4686,15 @@
       },
 
       // 24. Low Media Credenza with Vinyl Turntable
-      createMediaCredenza(w = 1.8, d = 0.45) {
+      // opts: { turntable (default true) }. The top is at 0.605 m (userData.surfaceTop); the turntable stands on its
+      // −x half, so a Core goes on the +x half (hero-build.ts).
+      createMediaCredenza(w = 1.8, d = 0.45, { turntable = true } = {}) {
         const group = new THREE.Group();
         group.name = "Walnut Media Credenza & Turntable";
-        group.userData = { category: "Interiors", tags: "audio, vinyl, media, storage" };
+        group.userData = { category: "Interiors", tags: "audio, vinyl, media, storage", surfaceTop: 0.605 };
 
         const woodMat = new THREE.MeshStandardMaterial({ color: 0x452818, roughness: 0.4 });
+        woodMat.userData.colorParam = true;
         const metalMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8 });
 
         const body = new THREE.Mesh(new THREE.BoxGeometry(w, 0.45, d), woodMat);
@@ -4496,6 +4711,7 @@
         });
 
         // Vinyl Turntable Base & Platter
+        if (!turntable) return group;
         const ttBase = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.05, 0.36), metalMat);
         ttBase.position.set(-w / 2 + 0.4, 0.63, 0);
         group.add(ttBase);
@@ -4687,6 +4903,7 @@
 
         const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.3 });
         const shelfMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.5 });
+        shelfMat.userData.colorParam = true;
         const bookMat1 = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 });
         const bookMat2 = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.5 });
         const bookMat3 = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.5 });
@@ -4939,13 +5156,16 @@
       },
 
       // 36. Back-Wall Kitchen Cabinetry with Induction Cooktop & Sink
-      createKitchenCabinetry(length = 3.6, height = 0.9, depth = 0.65) {
+      // opts: { counter: the worktop's colour (default quartz white), uppers: 'shelf' (default, the open shelf) |
+      // 'solid' | 'glass' | 'none', sink / cooktop (default true) }; the colour param paints the cabinet fronts.
+      createKitchenCabinetry(length = 3.6, height = 0.9, depth = 0.65, { counter = 0xf8fafc, uppers = 'shelf', sink: withSink = true, cooktop: withCooktop = true } = {}) {
         const group = new THREE.Group();
         group.name = `Kitchen Cabinetry (${length}m)`;
-        group.userData = { category: "Interiors", tags: "kitchen, counter, cabinetry, cooking" };
+        group.userData = { category: "Interiors", tags: "kitchen, counter, cabinetry, cooking", surfaceTop: height };
 
         const cabMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.6 }); // matte charcoal
-        const quartzMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 });
+        cabMat.userData.colorParam = true;
+        const quartzMat = new THREE.MeshStandardMaterial({ color: counter, roughness: 0.25 });
         const blackMetal = new THREE.MeshStandardMaterial({ color: 0x18181b, metalness: 0.9, roughness: 0.2 });
 
         // Base Cabinet Unit
@@ -4967,6 +5187,7 @@
         group.add(splash);
 
         // Integrated Sink & Faucet (Left side)
+        if (withSink) {
         const sink = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.02, 0.42), blackMetal);
         sink.position.set(-length / 3, height + 0.005, 0.05);
         group.add(sink);
@@ -4974,16 +5195,41 @@
         const faucet = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.28, 12), blackMetal);
         faucet.position.set(-length / 3, height + 0.14, -depth / 2 + 0.18);
         group.add(faucet);
+        }
 
         // Induction Cooktop (Right side)
+        if (withCooktop) {
         const cooktop = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.015, 0.48), blackMetal);
         cooktop.position.set(length / 3, height + 0.005, 0.05);
         group.add(cooktop);
+        }
 
         // Floating Upper Open Shelf
+        if (uppers === 'shelf') {
         const shelf = new THREE.Mesh(new THREE.BoxGeometry(length, 0.04, 0.32), new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.5 }));
         shelf.position.set(0, height + 0.75, -depth / 2 + 0.16);
         group.add(shelf);
+        } else if (uppers === 'solid' || uppers === 'glass') {
+          // wall cabinets from 0.55 m over the worktop to 1.3 m: a carcass in the cabinet colour, doors every 0.6 m —
+          // solid, or framed glass with a lit interior shelf line
+          const uy = height + 0.55, uh = 0.75, ud = 0.34, uz = -depth / 2 + ud / 2;
+          const carcass = new THREE.Mesh(new THREE.BoxGeometry(length, uh, ud), cabMat); carcass.position.set(0, uy + uh / 2, uz); carcass.castShadow = true; group.add(carcass);
+          const n = Math.max(1, Math.round(length / 0.6)), dw = length / n;
+          const glass = new THREE.MeshPhysicalMaterial({ color: 0xcdd8d6, transparent: true, opacity: 0.35, roughness: 0.08, transmission: 0.85, ior: 1.52 });
+          const inside = new THREE.MeshStandardMaterial({ color: 0xe9e4da, roughness: 0.8 });
+          for (let i = 0; i < n; i++) {
+            const x = -length / 2 + dw * (i + 0.5);
+            if (uppers === 'glass') {
+              const back = new THREE.Mesh(new THREE.BoxGeometry(dw - 0.04, uh - 0.04, 0.01), inside); back.position.set(x, uy + uh / 2, uz + ud / 2 - 0.05); group.add(back);
+              for (const [fw, fh, fx, fy] of [[0.04, uh - 0.02, x - dw / 2 + 0.03, uy + uh / 2], [0.04, uh - 0.02, x + dw / 2 - 0.03, uy + uh / 2], [dw - 0.02, 0.04, x, uy + 0.02], [dw - 0.02, 0.04, x, uy + uh - 0.02]]) {
+                const f = new THREE.Mesh(new THREE.BoxGeometry(fw, fh, 0.02), cabMat); f.position.set(fx, fy, uz + ud / 2 + 0.01); group.add(f);
+              }
+              const g = new THREE.Mesh(new THREE.PlaneGeometry(dw - 0.1, uh - 0.1), glass); g.position.set(x, uy + uh / 2, uz + ud / 2 + 0.012); group.add(g);
+            } else {
+              const door = new THREE.Mesh(new THREE.BoxGeometry(dw - 0.012, uh - 0.012, 0.02), cabMat); door.position.set(x, uy + uh / 2, uz + ud / 2 + 0.01); group.add(door);
+            }
+          }
+        }
 
         return group;
       },
@@ -5083,6 +5329,7 @@
 
         const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 }); // slate frame
         const doorMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4 });
+        doorMat.userData.colorParam = true;
         const handleMat = new THREE.MeshStandardMaterial({ color: 0xc5e8dc, metalness: 0.8, roughness: 0.2 });
 
         const box = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), frameMat);
@@ -5770,6 +6017,7 @@
         group.name = `Outdoor Bench (${w}m)`;
         group.userData = { category: "Architecture", tags: "bench, seating, outdoor" };
         const woodMat = new THREE.MeshStandardMaterial({ color: 0x475569, roughness: 0.6 });
+        woodMat.userData.colorParam = true;
         const legMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.2 });
 
         const seat = new THREE.Mesh(new THREE.BoxGeometry(w, 0.06, d), woodMat);
@@ -5792,6 +6040,7 @@
         group.name = `Wall TV (${w}m × ${h}m)`;
         group.userData = { category: "Interiors", tags: "tv, screen, wall, entertainment" };
         const frameMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.3 });
+        frameMat.userData.colorParam = true;
         const screenMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
 
         const frame = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.05), frameMat);

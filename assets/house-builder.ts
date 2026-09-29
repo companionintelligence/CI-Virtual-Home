@@ -14,7 +14,8 @@
 //       scene-qa/registry.ts, plan-export/index.ts, the validator's core (scripts/validate-house-spec.mts) and the
 //       fixture, golden-ledger, fleet and perf harnesses
 //   S1 kit          kit-build.ts (palette and kit, and the spec → parameters every other module asks it for: doors and
-//                   windows, partition doors, cladding, ceilings, theming, lighting), item-map.ts (spec item type →
+//                   windows, partition doors, cladding, ceilings, theming, lighting), kit-rules.ts (the pure rules
+//                   behind them: restraint and keep, door colours, the sun, fans and lamps), item-map.ts (spec item type →
 //                   AssetFactory builder, ITEM_PARAMS, DESK_TOP, the on-surface and hero sets), hero-build.ts and
 //                   hero-frame.ts, materials.ts, textures.ts, fixtures.ts, environment.ts, props/lighting.ts;
 //                   the room-creator.html door / window / furniture builders (its OWNER banners)
