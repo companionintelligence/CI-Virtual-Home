@@ -403,7 +403,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
 
   // ---- 4. the finale's approach: chosen with the walk that reaches it -----------------------------------------
   const yA = heroLv.y + Math.min(1.42, heroLv.h - 0.35);
-  type Fin = { dir: number; from: number; to: number; arc: number; arcTotal: number; P: V3; S: V3; bez: V3[]; score: number; swing: number; circling: number; turning: number; face: number; walk: Array<[number, number]>; walkLen: number; rooms: string[] };
+  type Fin = { dir: number; from: number; to: number; arc: number; arcTotal: number; P: V3; S: V3; bez: V3[]; score: number; swing: number; circling: number; turning: number; sharp: number; face: number; walk: Array<[number, number]>; walkLen: number; rooms: string[] };
   const smoothU = (u: number) => u * u * (3 - 2 * u);
   /** the orbit checked every 1° along its own eye-height profile (the 5° free map can step over a chair back): the furthest
    *  angle it is free and the Core in full view to, less 2° — the sweep's own end when all of it is, null when its start is not */
@@ -458,7 +458,12 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       if (dC < 4.5 && Math.abs(wrapPi(toCore - hd)) < 40 * DEG) swing += Math.max(0, -dir * da);
       if (dC < 3.2) circling += Math.max(0, -dir * da);   // (the eye looks at the Core from there: QA's measure)
     }
-    return { swing, circling, turning };
+    // the sharpest turn the eye makes inside 1.2 m of walking, over the whole approach (the last 8 m): a tight U-turn cannot be looked round at the view's turn rate
+    let sharp = 0;
+    { const cum: number[] = [0]; for (let q = 1; q < path2.length; q++) cum.push(cum[q - 1] + dist2(path2[q], path2[q - 1]));
+      const total = cum[cum.length - 1], hd = (q: number) => Math.atan2(path2[q + 1][0] - path2[q][0], path2[q + 1][1] - path2[q][1]);
+      for (let q = 0; q < path2.length - 2; q++) { if (total - cum[q] > 8) continue; let turn = 0; for (let m = q + 1; m < path2.length - 1 && cum[m] - cum[q] < 1.2; m++) { turn += wrapPi(hd(m) - hd(m - 1)); sharp = Math.max(sharp, Math.abs(turn) / DEG); } } }
+    return { swing, circling, turning, sharp };
   };
   const finaleFrom = (start: [number, number], budgetM: number): Fin | null => {
     if (!orbit) return null;
@@ -526,18 +531,18 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       const last = pts.length > 1 ? pts[pts.length - 2] : start;
       const arrive = norm([c.P[0] - last[0], 0, c.P[2] - last[1]]);
       const bez = pushIn(c.P, c.S, arrive, c.dir, c.from) || [c.P, c.S];
-      const { swing, circling, turning } = swingOf(pts, bez, c.dir);
+      const { swing, circling, turning, sharp } = swingOf(pts, bez, c.dir);
       // the walk should arrive facing the Core: the look can only turn to it at the push-in's pace
       const toCore = norm([centre[0] - c.P[0], 0, centre[2] - c.P[2]]), face = Math.acos(clamp(arrive[0] * toCore[0] + arrive[2] * toCore[2], -1, 1)) / DEG;
       // (the sweep counts from where the eye starts round the Core: the spiral in and the orbit)
-      const score = 3.0 * Math.min(c.arc, 120) + 0.6 * Math.min(c.arcTotal - c.arc, 60) + (c.arc >= 90 ? 70 : 0) + (c.arc >= 120 ? 10 : 0) - 4 * Math.max(0, swing - 10) - (swing > 20 ? 60 : 0) - 2 * Math.max(0, circling - 20) - 0.5 * w.len - 1.0 * Math.max(0, face - 40) - 0.7 * Math.max(0, turning - 150) - (c.Dd < 1.4 ? 10 : 0);
-      scored.push({ ...c, bez, score, swing, circling, turning, face, walk: pts, walkLen: w.len, rooms: w.rooms });
+      const score = 3.0 * Math.min(c.arc, 120) + 0.6 * Math.min(c.arcTotal - c.arc, 60) + (c.arc >= 90 ? 70 : 0) + (c.arc >= 120 ? 10 : 0) - 4 * Math.max(0, swing - 10) - (swing > 20 ? 60 : 0) - 2 * Math.max(0, circling - 20) - 0.5 * w.len - 1.0 * Math.max(0, face - 40) - 0.7 * Math.max(0, turning - 150) - 0.5 * Math.max(0, turning - 220) - 1.6 * Math.max(0, sharp - 100) - (c.Dd < 1.4 ? 10 : 0);
+      scored.push({ ...c, bez, score, swing, circling, turning, sharp, face, walk: pts, walkLen: w.len, rooms: w.rooms });
       }
     }
     scored.sort((x, y) => y.score - x.score || x.from - y.from);
     bestReachable = scored.filter(c => c.swing <= 20).reduce((m, c) => Math.max(m, c.arc), 0);
-    finaleAll = scored.map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), circ: +c.circling.toFixed(1), turn: +c.turning.toFixed(0), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0), score: +c.score.toFixed(0) }));
-    finaleCands = scored.slice(0, 8).map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), turn: +c.turning.toFixed(0), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0), score: +c.score.toFixed(0) }));
+    finaleAll = scored.map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), circ: +c.circling.toFixed(1), turn: +c.turning.toFixed(0), sharp: +c.sharp.toFixed(0), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0), score: +c.score.toFixed(0) }));
+    finaleCands = scored.slice(0, 8).map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), turn: +c.turning.toFixed(0), sharp: +c.sharp.toFixed(0), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0), score: +c.score.toFixed(0) }));
     const top = scored[0];
     if (!top) return null;
     // the walk to the chosen approach again, this time through a room worth seeing on the way if one pays: kept when the
@@ -546,7 +551,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     if (sc && sc.len > top.walkLen + 0.3) {
       const last2 = sc.pts.length > 1 ? sc.pts[sc.pts.length - 2] : start, arrive2 = norm([top.P[0] - last2[0], 0, top.P[2] - last2[1]]);
       const bez2 = pushIn(top.P, top.S, arrive2, top.dir, top.from) || [top.P, top.S], sw2 = swingOf(sc.pts, bez2, top.dir);
-      if (sw2.swing <= Math.max(top.swing + 3, 10) && sw2.circling <= top.circling + 15) return { ...top, bez: bez2, swing: sw2.swing, circling: sw2.circling, turning: sw2.turning, walk: sc.pts, walkLen: sc.len, rooms: sc.rooms };
+      if (sw2.swing <= Math.max(top.swing + 3, 10) && sw2.circling <= top.circling + 15 && sw2.sharp <= Math.max(top.sharp + 15, 100)) return { ...top, bez: bez2, swing: sw2.swing, circling: sw2.circling, turning: sw2.turning, sharp: sw2.sharp, walk: sc.pts, walkLen: sc.len, rooms: sc.rooms };
     }
     return top;
   };
@@ -984,6 +989,35 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   }
   all.push(...interior, ...finaleSegs);
 
+  // ---- 8b. the joints between an exact segment (a flight, the orbit, the power beat) and a walked one: a corner there is rounded with a cubic Bézier on the
+  //          walked side — it leaves the exact end where it is and arrives along its tangent. (At a walking pace a 30° kink in one 8 ms sample is a speed dip in
+  //          the record and a jerk of 20 m/s³; the orbit's sweep and a flight's treads stay exactly as they were.)
+  {
+    const tangentAt = (pts: V3[], fromEnd: boolean, reach = 0.15): V3 => {
+      let acc = 0, a = fromEnd ? pts[pts.length - 1] : pts[0];
+      for (let k = 1; k < pts.length; k++) { const q = fromEnd ? pts[pts.length - 1 - k] : pts[k]; acc = len(sub(q, a)); if (acc >= reach || k === pts.length - 1) return norm(fromEnd ? sub(a, q) : sub(q, a)); }
+      return [0, 0, 1];
+    };
+    for (let k = 0; k + 1 < all.length; k++) {
+      const A = all[k], B = all[k + 1];
+      if (!!A.exact === !!B.exact) continue;
+      const lenA = polyLen(A.pts), lenB = polyLen(B.pts);
+      const tA = tangentAt(A.pts, true), tB = tangentAt(B.pts, false);
+      const cosT = clamp(tA[0] * tB[0] + tA[1] * tB[1] + tA[2] * tB[2], -1, 1);
+      if (Math.acos(cosT) < 3 * DEG) continue;
+      if (B.exact) {
+        const L = Math.min(0.4, 0.4 * lenA); if (L < 0.08) continue;
+        const [head, tail] = splitAt(A.pts, lenA - L), q1 = head[head.length - 1], q = B.pts[0], d = tangentAt(tail, false), kk = L / 3;
+        const arc = bezier(q1, add(q1, mul(d, kk)), sub(q, mul(tB, kk)), q, 14);
+        A.pts = [...head.slice(0, -1), ...arc];
+      } else {
+        const L = Math.min(0.4, 0.4 * lenB); if (L < 0.08) continue;
+        const q = A.pts[A.pts.length - 1], [head, tail] = splitAt(B.pts, L), q2 = head[head.length - 1], d = tangentAt(tail, false), kk = L / 3;
+        const arc = bezier(q, add(q, mul(tA, kk)), sub(q2, mul(d, kk)), q2, 14);
+        B.pts = [...arc, ...tail.slice(1)];
+      }
+    }
+  }
   // ---- 9. one polyline, resampled every 2 cm, with a beat and a speed cap per sample --------------------------
   const STEP = 0.02;
   const X: number[] = [], Y: number[] = [], Z: number[] = [], Bt: number[] = [];
