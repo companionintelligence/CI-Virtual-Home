@@ -23,6 +23,15 @@
 //   picker    the home picker searches, opens a home by keyboard, and the title and the URL follow
 //   modes     Review hides the catalog and the tools and shows the shot cards; Edit brings them back
 //   drawers   768 × 1024: the inspector is a drawer over the viewport
+//   topbar    from 360 to 1440 px, Edit and Review: no two pieces of the top bar overlap, none is cut off or spills
+//   a11y      1280 × 800, dark and light, Edit and Review: every text meets WCAG AA contrast against what is really
+//             drawn behind it (sampled off a screenshot with the glyphs hidden), every control is at least 24 px,
+//             the scene outliner is one tab stop; the dialogs' buttons are whole on a phone
+//   outliner  the scene is a tree (storeys, rooms, parts) that searches, opens to the selection and takes the arrow keys
+//   props     the house catalog is the fifth tab and part of every search; a prop with wall metadata sets against a wall
+//   photo     a reference photo lays over the view, wipes, and never reaches a rendered frame
+//   compare   every home at one shot: posters draw through the film's renderer, differ, the editor's home comes back
+//             at its shot and moment, and the sheet saves
 //   still     4K 16:9 is 3840 × 2160 and 4K 9:16 is 2160 × 3840 (the PNGs as downloaded); a transparent cutout has
 //             an alpha channel; the viewport is its own size again after
 //   record    a 12 s door-to-core at 30 fps: 360 frames, 12.00 s (ffprobe), each sampled frame hashing the same as
@@ -84,6 +93,12 @@ if (want('gates')) {
   const emojiUi = uiFiles.filter(f => EMOJI.test(noComments(code(f))));
   ok(!emojiUi.length, `no emoji in assets/ui/${emojiUi.length ? ': ' + emojiUi.map(f => path.basename(f)).join(', ') : ''}`);
   ok(!/Room Creator|SimsTree|Pascal/i.test(page.slice(0, page.indexOf('<script'))) && !/>[^<]*(Pascal|SimsTree)[^<]*</.test(body), 'no Pascal or SimsTree in the head, the title or the chrome');
+  // the shot gallery (video/houses/index.html) keeps the same canon: tokens, no emoji, no Room Creator
+  const gal = fs.readFileSync(path.join(ROOT, 'video', 'houses', 'index.html'), 'utf8');
+  const galStyle = gal.slice(gal.indexOf('<style>'), gal.indexOf('</style>')), galTokens = galStyle.indexOf('*, *::before');
+  const galHex = noComments(galStyle.slice(galTokens)).match(/#[0-9a-fA-F]{3,8}\b/g) || [];
+  const galText = noComments(gal.slice(gal.indexOf('<body>')));
+  ok(galTokens > 0 && !galHex.length && !EMOJI.test(galText) && !/Room Creator/.test(galText) && !/Plus Jakarta/.test(gal), `the shot gallery: no literal hex below its tokens, no emoji, no Room Creator, no Plus Jakarta Sans${galHex.length ? ' (' + galHex.slice(0, 3).join(' ') + ')' : ''}`);
 }
 
 // ------------------------------------------------------------------ the browser
@@ -165,7 +180,7 @@ try {
   }
 
   // ---------------------------------------------------------------- the editor at 1280 × 800
-  const needMain = ['hooks', 'qa', 'transport', 'overlays', 'url', 'walls', 'catalog', 'edit', 'picker', 'modes'].some(want);
+  const needMain = ['hooks', 'qa', 'transport', 'overlays', 'url', 'walls', 'catalog', 'outliner', 'props', 'photo', 'edit', 'picker', 'modes'].some(want);
   if (needMain) {
     console.log(`\neditor 1280 × 800 (${TWO}, ?qa=1)`);
     let c = await open(`?house=${TWO}&qa=1`);
@@ -326,7 +341,7 @@ try {
       await p2.fill('#catalog-search-input', 'sofa');
       await sleep(150);
       const hits = await p2.$$eval('#catalog-items-list .catalog-item-card', (els: Element[]) => els.map(e => e.textContent!.trim()));
-      ok(hits.length === 1 && /sectional/i.test(hits[0]), `the search finds across categories ("sofa": ${hits.join(', ')})`);
+      ok(hits.some(h => /sectional/i.test(h)) && hits.length <= 3, `the search finds across categories, the house catalog's props too ("sofa": ${hits.join(', ')})`);
       await p2.fill('#catalog-search-input', 'zzz');
       await sleep(100);
       ok(await p2.isVisible('#catalog-empty'), 'the search says when nothing matches');
@@ -340,6 +355,80 @@ try {
       const home = await p2.evaluate(() => [(window as any).__houseLighting.preset, (window as any).__houseDebug().house.spec.lighting]);
       ok(home[0] === home[1] && Array.isArray(sun), `"Own" puts the home's own time of day back (${home[0]}); the sun turns (${sun.map((v: number) => v.toFixed(2)).join(', ')})`);
       await p2.fill('#slider-sun-bearing', '0'); await p2.dispatchEvent('#slider-sun-bearing', 'input');
+    }
+
+    if (want('outliner')) {
+      await p2.click('#btn-mode-edit').catch(() => {});
+      await p2.fill('#outliner-search', ''); await sleep(150);
+      const groups: string[] = await p2.$$eval('#scene-outliner-box [role="treeitem"][aria-level="1"]', (els: Element[]) => els.map(e => (e.textContent || '').trim().replace(/\s+/g, ' ')));
+      ok(groups.length >= 3 && groups.some(g => /Ground/i.test(g)) && groups.some(g => /Lot and world/.test(g)), `the scene is a tree of storeys: ${groups.join(' · ')}`);
+      ok((await p2.$$eval('#scene-outliner-box [tabindex="0"]', (els: Element[]) => els.length)) === 1, 'the tree is one tab stop (roving focus), not one for every part');
+      await p2.fill('#outliner-search', 'sofa'); await sleep(200);
+      const rows: string[] = await p2.$$eval('#scene-outliner-box .outliner-item', (els: Element[]) => els.map(e => (e.textContent || '').trim()));
+      ok(rows.length === 1 && /sectional/i.test(rows[0]) && (await p2.$$eval('#scene-outliner-box [aria-expanded="true"]', (els: Element[]) => els.length)) >= 2, `the search narrows the tree and opens what it finds (${rows.join(', ')})`);
+      await p2.fill('#outliner-search', ''); await sleep(150);
+      // a part picked in the scene shows in the tree, its groups opened
+      await p2.evaluate(() => { const u = (window as any).__houseUi; u.select(u.placed().find((o: any) => o.userData.generated && o.userData.room && o.userData.role === 'item')); });
+      await sleep(300);
+      const sel = await p2.$$eval('#scene-outliner-box .outliner-item[aria-selected="true"]', (els: Element[]) => els.length);
+      ok(sel === 1, 'a part picked in the scene is selected in the tree, its room opened');
+      // keys: ← closes a group, → opens it, ↓ moves on, Enter selects; none of it steps the film or plays it
+      await p2.evaluate(() => (window as any).__houseUi.select(null)); await sleep(200);
+      const t0 = (await state(p2)).t;
+      await p2.focus('#scene-outliner-box [data-key="L0"]');
+      await p2.keyboard.press('ArrowLeft'); await sleep(100);
+      const closed = await p2.getAttribute('#scene-outliner-box [data-key="L0"]', 'aria-expanded');
+      await p2.keyboard.press('ArrowRight'); await sleep(100);
+      const opened = await p2.getAttribute('#scene-outliner-box [data-key="L0"]', 'aria-expanded');
+      await p2.keyboard.press('ArrowDown'); await p2.keyboard.press('ArrowDown'); await p2.keyboard.press('ArrowRight');
+      await sleep(100);
+      const row = await p2.evaluate(() => (document.activeElement as HTMLElement)?.getAttribute('role'));
+      ok(closed === 'false' && opened === 'true' && row === 'treeitem', `← closes a group, → opens it, ↓ moves on (${closed}, ${opened}, ${row})`);
+      await p2.keyboard.press('Enter'); await p2.keyboard.press('Space');
+      await sleep(150);
+      const after = await state(p2);
+      ok(Math.abs(after.t - t0) < 1e-9 && !after.playing, 'the tree\'s keys stay in the tree: they do not step or play the film');
+      await p2.evaluate(() => (window as any).__houseUi.select(null));
+    }
+
+    if (want('props')) {
+      if (!(await p2.isVisible('#catalog-search-input'))) await p2.click('#tab-devices');
+      await p2.click('#tab-props');
+      await p2.waitForFunction(() => document.querySelectorAll('#catalog-items-list .catalog-item-card').length > 100, null, { timeout: 20000 });
+      const n = await p2.$$eval('#catalog-items-list .catalog-item-card', (els: Element[]) => els.length);
+      ok(n >= 150, `the house catalog is the fifth tab (${n} props)`);
+      await p2.fill('#catalog-search-input', 'lamp'); await sleep(200);
+      const heads: string[] = await p2.$$eval('#catalog-items-list .catalog-group-h', (els: Element[]) => els.map(e => e.textContent || ''));
+      ok(heads.includes('Props') && heads.includes('Devices'), `a search reads the props too (${heads.join(', ')})`);
+      await p2.fill('#catalog-search-input', 'wingback'); await sleep(200);
+      const n0 = await p2.evaluate(() => (window as any).__houseUi.placed().length);
+      await p2.click('#catalog-items-list .catalog-item-card >> nth=0'); await sleep(250);
+      const added = await p2.evaluate(() => { const u = (window as any).__houseUi, o = u.selected(); return { n: u.placed().length, name: o && o.name, gen: o && o.userData.generated }; });
+      ok(added.n === n0 + 1 && /wingback/i.test(added.name) && !added.gen, `a prop from the house catalog is placed and is the person's own (${added.name})`);
+      await p2.keyboard.press('ControlOrMeta+z');
+      // a prop whose metadata says it stands against a wall is set against the nearest outside wall, facing in
+      const snap = await p2.evaluate(() => { const u = (window as any).__houseUi; return { n: u.wallSnap({ x: 0.2, z: -2.6 }, 0, [1.0, 0.8]), e: u.wallSnap({ x: 3.7, z: 0.3 }, 0, [1.0, 0.6]), far: u.wallSnap({ x: 0, z: 0 }, 0, [1, 1]) }; });
+      ok(snap.n && Math.abs(snap.n.z - (-3.88 + 0.4)) < 0.06 && Math.abs(snap.n.rotY) < 1e-6 && Math.abs(snap.n.x - 0.2) < 1e-6, `against the north wall: back to it, facing south (z ${snap.n && snap.n.z.toFixed(2)}, turn ${snap.n && snap.n.rotY.toFixed(2)})`);
+      ok(snap.e && Math.abs(snap.e.x - (4.88 - 0.3)) < 0.06 && Math.abs(snap.e.rotY + Math.PI / 2) < 1e-6, `against the east wall: facing west (x ${snap.e && snap.e.x.toFixed(2)}, turn ${snap.e && snap.e.rotY.toFixed(2)})`);
+      ok(snap.far === null, 'mid-room, nothing to set it against');
+      await p2.fill('#catalog-search-input', '');
+    }
+
+    if (want('photo')) {
+      const frameHash = () => p2.evaluate(async () => { const w = window as any; const info = w.__houseRenderBegin({ shot: 'door-to-core', res: '360', fps: 30 }); await w.__houseComposerWarm({ res: '360' }); w.__houseRenderFrames(60, 1, null); const gl = w.__houseDebug().renderer.getContext(); const px = new Uint8Array(info.w * info.h * 4); gl.readPixels(0, 0, info.w, info.h, gl.RGBA, gl.UNSIGNED_BYTE, px); w.__houseRenderEnd(); const d = await crypto.subtle.digest('SHA-256', px); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16); });
+      const off = await frameHash();
+      await p2.setInputFiles('#ref-file', path.join(ROOT, 'portal', 'previews', 'aurora.jpg'));
+      await p2.waitForFunction(() => { const i = document.getElementById('ref-img') as HTMLImageElement; return i.complete && i.naturalWidth > 0; }, null, { timeout: 10000 });
+      const vis = await p2.evaluate(() => ({ overlay: !(document.getElementById('ref-overlay') as HTMLElement).hidden, panel: !(document.getElementById('ref-panel') as HTMLElement).hidden, pressed: document.getElementById('btn-ref-photo')!.getAttribute('aria-pressed'), src: (document.getElementById('ref-img') as HTMLImageElement).src.slice(0, 5) }));
+      ok(vis.overlay && vis.panel && vis.pressed === 'true' && vis.src === 'blob:', 'a photo chosen from a file lies over the view, as a local object URL (never saved)');
+      await p2.evaluate(() => { const i = document.getElementById('ref-wipe') as HTMLInputElement; i.value = '40'; i.dispatchEvent(new Event('input')); });
+      const clip = await p2.evaluate(() => getComputedStyle(document.getElementById('ref-img')!).clipPath);
+      ok(/inset\(0(px)? (\d+(\.\d+)?px|\d+%) 0(px)? 0(px)?\)/.test(clip), `the wipe clips it from the right (${clip})`);
+      const on = await frameHash();
+      ok(on === off, `a rendered frame is the same with the photo on (${on} = ${off})`);
+      await shot(p2, 'photo-overlay');
+      await p2.click('#ref-remove');
+      ok(await p2.evaluate(() => (document.getElementById('ref-overlay') as HTMLElement).hidden && !(document.getElementById('ref-img') as HTMLImageElement).getAttribute('src')), 'Remove takes it away');
     }
 
     if (want('edit')) {
@@ -423,6 +512,149 @@ try {
     await c.close();
   }
 
+  // ---------------------------------------------------------------- the top bar, at every width
+  if (want('topbar')) {
+    console.log('\ntopbar');
+    const c = await open(`?house=${ONE}`, { width: 1280, height: 800 });
+    const { page } = c;
+    const bad: string[] = [];
+    for (const mode of ['edit', 'review']) for (const w of [360, 390, 430, 520, 600, 640, 700, 768, 820, 900, 1000, 1100, 1280, 1440]) {
+      await page.setViewportSize({ width: w, height: 800 });
+      await page.evaluate((m: string) => (window as any).__houseUi.setUiMode(m), mode);
+      await sleep(200);
+      const r = await page.evaluate(() => {
+        const hdr = document.querySelector('header')!;
+        const kids = Array.from(hdr.querySelectorAll(':scope > *')).filter(e => { const b = e.getBoundingClientRect(), cs = getComputedStyle(e); return b.width > 0 && b.height > 0 && cs.display !== 'none' && !e.classList.contains('topbar-spacer'); });
+        const name = (e: Element) => (e as HTMLElement).id || String((e as HTMLElement).className).split(' ')[0];
+        const rects = kids.map(e => ({ n: name(e), b: e.getBoundingClientRect() }));
+        const over: string[] = [];
+        for (let i = 0; i < rects.length; i++) for (let j = i + 1; j < rects.length; j++) { const a = rects[i].b, b = rects[j].b; if (Math.min(a.right, b.right) - Math.max(a.left, b.left) > 1 && Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 1) over.push(`${rects[i].n}×${rects[j].n}`); }
+        return { over, cut: rects.filter(x => x.b.right > innerWidth + 0.5 || x.b.left < -0.5).map(x => x.n), spill: kids.filter(e => e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflow !== 'hidden').map(name), sw: hdr.scrollWidth - hdr.clientWidth };
+      });
+      if (r.over.length || r.cut.length || r.spill.length || r.sw > 0) bad.push(`${mode} ${w}: ${JSON.stringify(r)}`);
+    }
+    ok(bad.length === 0, `the top bar never overlaps, is cut off or spills, from 360 to 1440 px in Edit and Review${bad.length ? ': ' + bad.slice(0, 3).join(' | ') : ''}`);
+    noErrors(c, '(top bar)');
+    await c.close();
+  }
+
+  // ---------------------------------------------------------------- accessibility: contrast, targets, the phone's dialogs
+  if (want('a11y')) {
+    // The contrast of every text against what is really behind it: hide every glyph, screenshot, and sample the pixels
+    // under each text box; the ratio is the text's colour (with its own alpha and its ancestors' opacity) over the worst
+    // sampled background. What is covered by a dialog, a drawer or its scrim is not on screen and is skipped.
+    const lum = (r: number, g: number, b: number) => { const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+    const failing = async (page: any) => {
+      const els = await page.evaluate(() => {
+        const out: any[] = [];
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        let n: Node | null;
+        while ((n = walker.nextNode())) {
+          const t = (n.textContent || '').trim(); if (!t) continue;
+          const el = n.parentElement!;
+          if (!el || el.closest('.rc-sr, script, style, [hidden], option, [inert]')) continue;
+          let hidden = false, op = 1;
+          for (let a: Element | null = el; a; a = a.parentElement) { const cs = getComputedStyle(a); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) { hidden = true; break; } op *= +cs.opacity; }
+          if (hidden) continue;
+          const range = document.createRange(); range.selectNodeContents(n); const r = range.getBoundingClientRect();
+          if (r.width < 1 || r.height < 1 || r.bottom < 0 || r.right < 0 || r.left > innerWidth || r.top > innerHeight) continue;
+          const cx = r.left + r.width / 2, cy = r.top + r.height / 2, top = document.elementFromPoint(cx, cy);
+          if (!top || !(el.contains(top) || top.contains(el))) continue;
+          // scrolled out of a panel that clips it: not on screen
+          let clipped = false;
+          for (let a = el.parentElement; a && a !== document.body && !clipped; a = a.parentElement) {
+            const s = getComputedStyle(a);
+            if (s.overflowX === 'visible' && s.overflowY === 'visible') continue;
+            const ar = a.getBoundingClientRect();
+            if (cx < ar.left || cx > ar.right || cy < ar.top || cy > ar.bottom) clipped = true;
+          }
+          if (clipped) continue;
+          const cs = getComputedStyle(el);
+          out.push({ t: t.slice(0, 32), x: r.left, y: r.top, w: r.width, h: r.height, color: cs.color, size: parseFloat(cs.fontSize), weight: +cs.fontWeight || 400, op, disabled: !!el.closest(':disabled, [disabled], [aria-disabled="true"]') });
+        }
+        return out;
+      });
+      const style = await page.addStyleTag({ content: '*{color:transparent !important;text-shadow:none !important;-webkit-text-fill-color:transparent !important;caret-color:transparent !important}' });
+      const png = decodePNG(await page.screenshot());
+      await style.evaluate((e: HTMLElement) => e.remove());
+      const parse = (c: string) => { const m = c.match(/rgba?\(([^)]+)\)/)!; const p = m[1].split(/[ ,\/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
+      const bad: string[] = [];
+      for (const e of els) {
+        if (e.disabled) continue;   // WCAG exempts an inactive control
+        const [r, g, b, a0] = parse(e.color), a = a0 * e.op;
+        const x0 = Math.max(0, Math.floor(e.x)), y0 = Math.max(0, Math.floor(e.y)), x1 = Math.min(png.width - 1, Math.ceil(e.x + e.w)), y1 = Math.min(png.height - 1, Math.ceil(e.y + e.h));
+        let worst = 99;
+        for (let y = y0; y <= y1; y += Math.max(1, Math.floor((y1 - y0) / 4))) for (let x = x0; x <= x1; x += Math.max(1, Math.floor((x1 - x0) / 12))) {
+          const i = (y * png.width + x) * 4, br = png.data[i], bg = png.data[i + 1], bb = png.data[i + 2];
+          const l1 = lum(r * a + br * (1 - a), g * a + bg * (1 - a), b * a + bb * (1 - a)), l2 = lum(br, bg, bb);
+          worst = Math.min(worst, (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05));
+        }
+        const large = e.size >= 24 || (e.size >= 18.66 && e.weight >= 700);
+        if (worst < (large ? 3 : 4.5)) bad.push(`"${e.t}" ${worst.toFixed(2)}`);
+      }
+      return { bad, n: els.length };
+    };
+    for (const scheme of ['dark', 'light'] as const) {
+      console.log(`\na11y 1280 × 800 ${scheme}`);
+      const c = await open(`?house=${TWO}`, { width: 1280, height: 800 }, scheme);
+      const { page } = c;
+      for (const mode of ['edit', 'review']) {
+        await page.evaluate((m: string) => (window as any).__houseUi.setUiMode(m), mode);
+        await sleep(300);
+        const r = await failing(page);
+        ok(r.bad.length === 0, `${mode}: ${r.n} texts all meet WCAG AA contrast against what is drawn behind them${r.bad.length ? ': ' + r.bad.slice(0, 6).join(' | ') : ''}`);
+        const small = await page.evaluate(() => Array.from(document.querySelectorAll('button, a[href], input:not([type=hidden]), select, [role="tab"], [role="treeitem"]')).filter(e => { const el = e as HTMLElement; if (getComputedStyle(el).visibility === 'hidden') return false; const r = el.getBoundingClientRect(); if (r.width < 1 || r.height < 1 || r.right < 0 || r.bottom < 0 || r.left > innerWidth || r.top > innerHeight) return false; if (el.closest('[hidden], [inert], .rc-sr') || /rc-tl-mark/.test(String(el.className))) return false; return r.width < 23.5 || r.height < 23.5; }).map(e => `${(e as HTMLElement).id || (e as HTMLElement).className} ${Math.round(e.getBoundingClientRect().width)}×${Math.round(e.getBoundingClientRect().height)}`));
+        ok(small.length === 0, `${mode}: every control is at least 24 × 24 px (WCAG 2.5.8)${small.length ? ': ' + small.slice(0, 5).join(', ') : ''}`);
+      }
+      const tabs = await page.$$eval('#scene-outliner-box [role="treeitem"]', (els: Element[]) => els.filter(e => (e as HTMLElement).tabIndex >= 0).length);
+      ok(tabs <= 1, `the scene outliner is ${tabs} tab stop`);
+      noErrors(c, `(a11y ${scheme})`);
+      await c.close();
+    }
+    // the dialogs' own buttons are whole on a phone (the top bar's icon-only rule once squashed them)
+    console.log('\na11y 390 × 844: the dialogs');
+    const c = await open(`?house=${ONE}`, { width: 390, height: 844 });
+    for (const [open_, dlg, primary] of [['#btn-open-export', '#export-dialog', '#btn-confirm-download-png'], ['#btn-open-video-export', '#video-dialog', '#btn-start-record-video']]) {
+      await c.page.click(open_);
+      await sleep(400);
+      const m = await c.page.evaluate(([d, p]: string[]) => { const b = document.querySelector(p) as HTMLElement, r = b.getBoundingClientRect(), dr = (document.querySelector(d) as HTMLElement).getBoundingClientRect(); return { w: r.width, sw: b.scrollWidth, cw: b.clientWidth, inside: r.left >= dr.left - 1 && r.right <= dr.right + 1, text: (b.textContent || '').trim() }; }, [dlg, primary]);
+      ok(m.sw <= m.cw + 1 && m.inside && m.w > 90, `${dlg}: "${m.text}" is whole on a phone (${Math.round(m.w)} px)`);
+      await c.page.keyboard.press('Escape'); await sleep(200);
+    }
+    // a still's preview is a picture once it is drawn, and a spinner before, never a broken-image caption
+    await c.page.click('#btn-open-export');
+    await c.page.waitForFunction(() => { const i = document.getElementById('export-preview-img') as HTMLImageElement; return !i.hidden && i.complete && i.naturalWidth > 0; }, null, { timeout: 60000 });
+    ok(await c.page.evaluate(() => (document.getElementById('export-preview-wait') as HTMLElement).hidden), 'the still\'s preview replaces its "drawing" note when it is there');
+    noErrors(c, '(a11y phone)');
+    await c.close();
+  }
+
+  // ---------------------------------------------------------------- compare homes
+  if (want('compare')) {
+    console.log('\ncompare');
+    const c = await open(`?house=${ONE}&shot=orbit&t=0.3`, { width: 1280, height: 800 });
+    const { page } = c;
+    const before = await state(page);
+    await page.click('#btn-house-picker');
+    await page.click('#gallery-compare');
+    await sleep(300);
+    ok(await page.isVisible('#compare-dialog') && (await page.$$eval('#compare-grid .rc-compare-card', (els: Element[]) => els.length)) === 30, 'the picker opens Compare homes: 30 homes, none drawn yet');
+    ok((await page.inputValue('#compare-shot')) === 'orbit' && Math.abs(Number(await page.inputValue('#compare-t')) - 30) <= 1, 'it starts from the shot and the moment on screen');
+    await page.evaluate(() => (window as any).__houseUi.compare.run(['aurora', 'mirage']));
+    const cards = await page.$$eval('#compare-grid .rc-compare-card', (els: HTMLElement[]) => els.filter(e => e.dataset.state === 'done').map(e => ({ name: e.querySelector('.rc-home-name')!.textContent, w: (e.querySelector('img') as HTMLImageElement).naturalWidth, src: (e.querySelector('img') as HTMLImageElement).src.slice(-60) })));
+    ok(cards.length === 2 && cards.every(k => k.w === 640) && cards[0].src !== cards[1].src, `two posters drawn at 640 × 360 and different (${cards.map(k => k.name).join(', ')})`);
+    await shot(page, 'compare');
+    const after = await state(page), q = await query(page);
+    ok(q.house === ONE && after.shot === before.shot && Math.abs(after.t - before.t) < 1e-3, `the editor's home is back at its shot and moment (${q.house}, ${after.shot}, ${after.t.toFixed(3)})`);
+    const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 30000 }), page.click('#compare-sheet')]);
+    const file = path.join(SHOTS, 'compare-sheet.png'); await dl.saveAs(file);
+    const png = decodePNG(fs.readFileSync(file));
+    ok(png.width > 1000 && png.height > 250 && /^homes-orbit-.*at-30-.*\.png$/.test(dl.suggestedFilename()), `the sheet saves as one PNG (${png.width} × ${png.height}, ${dl.suggestedFilename()})`);
+    await page.keyboard.press('Escape'); await sleep(200);
+    noErrors(c, '(compare)');
+    await c.close();
+  }
+
   // ---------------------------------------------------------------- still export
   if (want('still')) {
     console.log('\nstill');
@@ -455,6 +687,27 @@ try {
   // ---------------------------------------------------------------- record
   if (want('record')) {
     console.log('\nrecord');
+    {
+      // Cancel: a film stopped part-way leaves the page as it found it, and nothing downloads
+      const c = await open(`?house=${ONE}`, { width: 1280, height: 800 });
+      const { page } = c;
+      let downloaded = 0; page.on('download', () => { downloaded++; });
+      const before = await page.evaluate(() => { const r = (window as any).__houseDebug().renderer; return [r.domElement.clientWidth, r.domElement.clientHeight]; });
+      await page.click('#btn-open-video-export');
+      await page.selectOption('#video-res-select', '720');
+      await page.selectOption('#video-fps-select', '30');
+      await page.click('#btn-start-record-video');
+      await page.waitForSelector('.rc-toast-progress .rc-toast-btn', { timeout: 60000 });
+      await page.waitForFunction(() => /Frame \d+ of/.test(document.querySelector('.rc-toast-detail')?.textContent || ''), null, { timeout: 60000 });
+      await page.click('.rc-toast-progress .rc-toast-btn');
+      await page.waitForFunction(() => /cancelled/i.test(document.getElementById('toasts')!.textContent || ''), null, { timeout: 30000 });
+      await page.waitForFunction(() => !(document.getElementById('workspace') as any).inert, null, { timeout: 10000 });
+      await sleep(400);
+      const after = await page.evaluate(() => { const r = (window as any).__houseDebug().renderer; return { size: [r.domElement.clientWidth, r.domElement.clientHeight], recording: (window as any).__houseUi.state().recording, bar: !!document.querySelector('.rc-toast-progress') }; });
+      ok(downloaded === 0 && !after.bar && !after.recording && after.size[0] === before[0] && after.size[1] === before[1], `Cancel stops the film: no file, no progress note, the page is not locked and the viewport is ${after.size.join(' × ')} again`);
+      noErrors(c, '(record cancel)');
+      await c.close();
+    }
     const has = (b: string) => spawnSync(b, ['-version'], { stdio: 'ignore' }).status === 0;
     if (!has('ffmpeg') || !has('ffprobe')) ok(false, 'ffmpeg and ffprobe are installed (the recording is checked with them)');
     else {

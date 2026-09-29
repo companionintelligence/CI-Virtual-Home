@@ -748,7 +748,7 @@
     .angle-btn:hover { color: var(--foreground); background: var(--rc-hover); }
 
     /* the safe frame (16:9, 9:16, 1:1): the page outside the frame dims */
-    .safe-frame { position: absolute; inset: 0; pointer-events: none; z-index: 4; display: grid; place-items: center; }
+    .safe-frame { position: absolute; inset: 0; pointer-events: none; z-index: 6;   /* over the camera path (5) and the photo (3): its label must read */ display: grid; place-items: center; }
     .safe-frame-box {
       position: relative;
       max-width: 100%;
@@ -767,6 +767,20 @@
       border-radius: var(--radius-sm);
     }
 
+    /* a reference photo over the view: it never reaches a render (the canvas is drawn underneath) or the disk */
+    .ref-overlay { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+    .ref-overlay img { width: 100%; height: 100%; object-fit: contain; display: block; opacity: var(--ref-opacity, 0.6); clip-path: inset(0 calc(100% - var(--ref-wipe, 100%)) 0 0); }
+    .ref-divider { position: absolute; top: 0; bottom: 0; left: var(--ref-wipe, 100%); width: 2px; margin-left: -1px; background: var(--foreground); box-shadow: 0 0 0 1px var(--rc-rail); opacity: 0.85; }
+    .ref-overlay[data-full] .ref-divider { display: none; }
+    .ref-panel {
+      position: absolute; z-index: 26; right: var(--rc-gap); top: calc(var(--rc-gap) + var(--rc-pill-h) + 8px);
+      display: grid; grid-template-columns: auto 96px auto 96px auto auto; align-items: center; gap: 6px 8px;
+      padding: 6px 8px 6px 12px; background: var(--rc-float); border: 1px solid var(--rc-float-ring); border-radius: var(--radius-xl); box-shadow: var(--rc-float-shadow);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); font-size: 12px; color: var(--muted-foreground);
+    }
+    .ref-panel input[type="range"] { width: 100%; }
+    .ref-panel .outliner-btn { color: var(--foreground); }
+    #viewport-box[data-drop] { outline: 2px dashed var(--ring); outline-offset: -6px; }
     /* the plan inset: bottom left, above the transport */
     .plan-inset {
       position: absolute;
@@ -1201,6 +1215,27 @@
     .rc-home-name { font-size: 13px; font-weight: 600; }
     .rc-home-meta { font-size: 11px; color: var(--muted-foreground); }
 
+    /* compare homes: a bar of controls over a grid of posters */
+    dialog.rc-compare { width: min(1180px, calc(100vw - 32px)); height: min(860px, calc(100dvh - 32px)); }
+    .rc-gallery-compare { flex: none; }
+    .rc-compare-bar { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 10px 16px; padding: 12px 20px; border-bottom: 1px solid var(--rc-hairline); }
+    .rc-compare-bar[data-busy] .rc-compare-f { opacity: 0.55; }
+    .rc-compare-f { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .rc-compare-f > span:first-child { font-size: 12px; font-weight: 600; color: var(--muted-foreground); }
+    .rc-compare-f select.select-ctrl { min-width: 150px; }
+    .rc-compare-range { display: flex; align-items: center; gap: 10px; height: var(--rc-hit); }
+    .rc-compare-range input { width: 150px; }
+    .rc-compare-range output { font-family: var(--rc-font-mono); font-size: 11px; color: var(--foreground); min-width: 38px; }
+    .rc-compare-spacer { flex: 1 1 auto; }
+    .rc-compare-note { padding: 8px 20px 0; font-size: 12px; color: var(--muted-foreground); min-height: 26px; }
+    .rc-compare-body { padding: 8px 20px 20px; overflow-y: auto; min-height: 0; flex: 1 1 auto; }
+    .rc-compare-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .rc-compare-poster { display: block; aspect-ratio: 16 / 9; border-radius: var(--radius-md); background: var(--rc-tile); overflow: hidden; margin-bottom: 4px; }
+    .rc-compare-poster img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rc-compare-wait { display: grid; place-items: center; width: 100%; height: 100%; font-size: 11px; color: var(--muted-foreground); }
+    .rc-compare-card[data-state="pending"] .rc-compare-poster { opacity: 0.7; }
+    .rc-compare-bar[data-busy] ~ .rc-compare-body .rc-compare-card { cursor: progress; }
+
     /* ---------------- Toasts ---------------- */
     .rc-toasts {
       position: fixed;
@@ -1344,6 +1379,7 @@
       .anim-time-display { min-width: 0; margin-left: auto; }
       .rc-tl-legend { display: none; }
       .plan-inset { width: 200px; height: 168px; }
+      .ref-panel { left: 8px; right: 8px; top: auto; bottom: calc(var(--rc-dock-h, 128px) + 16px); grid-template-columns: auto 1fr auto 1fr auto auto; }
       .rc-dialog-body.two-col { grid-template-columns: 1fr; }
       .rc-toasts { left: 8px; right: 8px; bottom: 8px; max-width: none; align-items: stretch; }
     }
@@ -1357,6 +1393,8 @@
       .rc-tl-mark { width: 24px; height: 24px; margin-left: -12px; }
       .rc-tl-mark::before { content: ""; position: absolute; inset: -10px; }   /* a 44 px hit area round a 24 px marker */
       .rc-tl-marks { height: 24px; }
+      .rc-tl-scrub { height: 44px; }
+      .rc-tl { gap: 0; }
       .rc-tl-head { top: 24px; }
       .swatch { width: 36px; height: 36px; }
     }
@@ -1407,6 +1445,7 @@
       <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></symbol>
       <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
       <symbol id="i-magnet" viewBox="0 0 24 24"><path d="m6 15-4-4 6.75-6.77a7.79 7.79 0 0 1 11 11L13 22l-4-4 6.39-6.36a2.14 2.14 0 0 0-3-3L6 15"/><path d="m5 8 4 4"/><path d="m12 15 4 4"/></symbol>
+      <symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
       <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
       <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
       <symbol id="i-video" viewBox="0 0 24 24"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
@@ -1521,6 +1560,7 @@
         <button type="button" role="tab" class="catalog-tab" id="tab-plants" data-tab="plants" aria-selected="false" aria-controls="catalog-items-list" tabindex="-1" title="Plants"><svg class="i" aria-hidden="true"><use href="#i-plants"/></svg><span>Plants</span></button>
         <button type="button" role="tab" class="catalog-tab" id="tab-interiors" data-tab="interiors" aria-selected="false" aria-controls="catalog-items-list" tabindex="-1" title="Furniture"><svg class="i" aria-hidden="true"><use href="#i-furniture"/></svg><span>Furniture</span></button>
         <button type="button" role="tab" class="catalog-tab" id="tab-architecture" data-tab="architecture" aria-selected="false" aria-controls="catalog-items-list" tabindex="-1" title="Slabs, walls and outdoor builds"><svg class="i" aria-hidden="true"><use href="#i-build"/></svg><span>Build</span></button>
+        <button type="button" role="tab" class="catalog-tab" id="tab-props" data-tab="props" aria-selected="false" aria-controls="catalog-items-list" tabindex="-1" title="Every prop a home's spec can place (the house catalog)"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg><span>Props</span></button>
       </div>
 
       <div class="catalog-panel" id="catalog-panel">
@@ -1539,6 +1579,15 @@
       <!-- the camera path, drawn over the scene (never in it: a render cannot see it) -->
       <canvas id="path-overlay" class="rc-overlay rc-chrome" aria-hidden="true" hidden></canvas>
       <div class="safe-frame rc-chrome" id="safe-frame" hidden aria-hidden="true"><div class="safe-frame-box" id="safe-frame-box"><span class="safe-frame-label" id="safe-frame-label"></span></div></div>
+      <!-- a reference photo laid over the view (never in a render, never saved): a local file, wiped from the left -->
+      <div class="ref-overlay rc-chrome" id="ref-overlay" hidden aria-hidden="true"><img id="ref-img" alt=""><span class="ref-divider" id="ref-divider"></span></div>
+      <div class="ref-panel rc-chrome" id="ref-panel" hidden role="group" aria-label="Reference photo">
+        <label for="ref-opacity">Opacity</label><input type="range" id="ref-opacity" min="10" max="100" step="5" value="60">
+        <label for="ref-wipe">Wipe</label><input type="range" id="ref-wipe" min="0" max="100" step="1" value="100">
+        <button type="button" class="outliner-btn" id="ref-change">Change</button>
+        <button type="button" class="outliner-btn" id="ref-remove" aria-label="Remove the reference photo" title="Remove the photo"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
+      </div>
+      <input type="file" id="ref-file" accept="image/*" hidden>
 
       <!-- Floating toolbars: camera (left) · transform (centre, Edit) · walls + floors (right) -->
       <div class="viewport-overlay-top">
@@ -1621,6 +1670,7 @@
               </select>
               <svg class="i chev" aria-hidden="true"><use href="#i-chevron"/></svg>
             </label>
+            <button type="button" class="anim-btn" id="btn-ref-photo" aria-pressed="false" aria-controls="ref-panel" title="Lay a photo over the view to match it against: drop one on the view or choose a file. It is never saved."><svg class="i" aria-hidden="true"><use href="#i-image"/></svg><span class="lbl">Photo</span></button>
             <button type="button" class="anim-btn" id="btn-render-preview" aria-pressed="false" title="Render preview: the live view through the film's renderer (ambient occlusion, antialiasing, grade)"><svg class="i" aria-hidden="true"><use href="#i-preview"/></svg><span class="lbl">Preview</span></button>
             <button type="button" class="anim-btn rc-edit-only" id="btn-add-waypoint" title="Add the current view to the custom path" hidden><svg class="i" aria-hidden="true"><use href="#i-waypoint"/></svg><span class="lbl">Waypoint</span></button>
           </div>
@@ -1715,6 +1765,8 @@
 
   <!-- The home picker (assets/ui/gallery.ts fills it) -->
   <dialog id="gallery-dialog" class="rc-chrome"></dialog>
+  <!-- Every home at the same shot (assets/ui/compare.ts fills it) -->
+  <dialog id="compare-dialog" class="rc-chrome"></dialog>
 
   <!-- A still -->
   <dialog id="export-dialog" class="rc-dialog rc-chrome" aria-labelledby="export-title">
@@ -1852,6 +1904,7 @@
     import { createPlanInset } from './assets/ui/plan-inset.js';
     import { createPathOverlay } from './assets/ui/path-overlay.js';
     import { createGallery } from './assets/ui/gallery.js';
+    import { createCompare } from './assets/ui/compare.js';
     import { readUiState, writeUiState } from './assets/ui/url-state.js';
     import { SHOT_HINTS, shotLabel, exportSize, downloadName, fmtClock, v1Phases } from './assets/ui/format.js';
 
@@ -2294,7 +2347,7 @@
         group.name = `Parametric Wall (${length}m · ${orientation.toUpperCase()})`;
         group.userData = {
           category: "Architecture",
-          tags: "wall, parametric, structure, pascal",
+          tags: "wall, parametric, structure",
           isWall: true,
           parametric: true,
           config: { ...config }
@@ -2933,27 +2986,27 @@
         return group;
       },
 
-      // ---- OWNER S6 (ui): createSimsPlumbob (1 builder) — the editor's demo preset's crystal, not a house part ----
-      // Floating Glowing Sims Plumbob Crystal
-      createSimsPlumbob() {
+      // ---- OWNER S6 (ui): createCrystalMarker (1 builder) — the editor's demo preset's crystal, not a house part ----
+      // Floating glowing crystal (the atrium's marker in the studio scenes)
+      createCrystalMarker() {
         const group = new THREE.Group();
-        group.name = "Sims Plumbob Crystal";
-        group.userData = { category: "Interiors", tags: "sims, plumbob, icon, aura" };
+        group.name = "Floating crystal";
+        group.userData = { category: "Interiors", tags: "crystal, marker, icon, aura" };
 
         // Dual pyramid / octahedron diamond
-        const plumbGeo = new THREE.OctahedronGeometry(0.24, 0);
-        plumbGeo.scale(1, 2.2, 1); // Elongated emerald diamond
+        const crystalGeo = new THREE.OctahedronGeometry(0.24, 0);
+        crystalGeo.scale(1, 2.2, 1); // Elongated emerald diamond
 
-        const plumbMat = new THREE.MeshStandardMaterial({
+        const crystalMat = new THREE.MeshStandardMaterial({
           color: 0x10b981,
           emissive: 0x10b981,
           emissiveIntensity: 2.5,
           roughness: 0.1,
           metalness: 0.1
         });
-        const plumbob = new THREE.Mesh(plumbGeo, plumbMat);
-        plumbob.position.y = 2.4;
-        group.add(plumbob);
+        const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+        crystal.position.y = 2.4;
+        group.add(crystal);
 
         // Soft green point light illuminating the room
         const pLight = new THREE.PointLight(0x10b981, 1.2, 5);
@@ -2962,9 +3015,9 @@
 
         // Animation hook in userData
         group.userData.animate = (time) => {
-          plumbob.rotation.y = time * 1.5;
-          plumbob.position.y = 2.4 + Math.sin(time * 2.5) * 0.08;
-          pLight.position.y = plumbob.position.y;
+          crystal.rotation.y = time * 1.5;
+          crystal.position.y = 2.4 + Math.sin(time * 2.5) * 0.08;
+          pLight.position.y = crystal.position.y;
         };
 
         return group;
@@ -5983,7 +6036,7 @@
         { id: 'colonnade-porch', name: 'Colonnade porch', badge: '6 m, columns', icon: 'landmark', tags: 'porch deck columns outdoor', create: () => AssetFactory.createColonnadePorch(6, 2.5) }
       ]
     };
-    const CATALOG_TABS = { devices: 'Devices', plants: 'Plants', interiors: 'Furniture', architecture: 'Build' };
+    const CATALOG_TABS = { devices: 'Devices', plants: 'Plants', interiors: 'Furniture', architecture: 'Build', props: 'Props' };
 
     // -------------------------------------------------------------
     // Item Placement & Scene Management
@@ -6527,6 +6580,53 @@
     const catalogAside = document.getElementById('catalog');
     let currentTab = 'devices';
 
+    // The house catalog (content/house-catalog.json: every prop a spec can place, 154 of them the registry's) is the
+    // fifth tab and part of every search (plan §6 P2 19). It is read on first use. A prop is built as a home builds it —
+    // its own kit, themed by the home's palette — and lands where the view's centre ray meets the floor; a prop whose
+    // placement metadata says `against: 'wall'` (S3's `place`, on the registry def or PAGE_PLACE) is set against the
+    // nearest outside wall of the storey, facing into the room.
+    let propCatalogState = 'idle';   // idle | loading | ready | failed
+    const humanize = t => t.replace(/-/g, ' ').replace(/^./, c => c.toUpperCase());
+    async function loadPropCatalog() {
+      if (propCatalogState !== 'idle') return;
+      propCatalogState = 'loading';
+      try {
+        const res = await fetch('./content/house-catalog.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const types = (await res.json()).types || {};
+        catalogData.props = Object.entries(types).filter(([, v]) => v.source === 'registry').sort(([a], [b]) => a.localeCompare(b)).map(([type, v]) => ({
+          id: type, name: humanize(type), icon: 'box', footprint: v.footprint,
+          badge: `${(v.footprint || []).map(n => +n.toFixed(2)).join(' × ')} m · ${v.height} m high`,
+          tags: `${(v.tags || []).join(' ')} ${v.surface ? 'on a surface' : ''} ${type}`,
+          create: () => { const o = houseBuilder.buildProp(type, {}, (activeHouse && activeHouse.spec.palette) || {}, activeHouse ? activeHouse.id : 'editor'); if (o && !o.name) o.name = humanize(type); return o; },
+          propType: type,
+        }));
+        propCatalogState = 'ready';
+      } catch (e) { console.warn('The house catalog is unavailable:', e); propCatalogState = 'failed'; }
+      renderCatalog();
+    }
+    // the nearest outside wall of the drop's storey within reach, and the pose that puts an item's back to it
+    const WALL_OUT_DIR = { south: [0, 1], north: [0, -1], east: [1, 0], west: [-1, 0] };   // a wall's outward normal on the plan (x, z)
+    function wallSnap(p, y, footprint) {
+      const d = (footprint && footprint[1]) || 0.5, w = (footprint && footprint[0]) || 0.5;
+      let best = null;
+      for (const wall of trackedWalls) {
+        const o = wall.userData && wall.userData.orientation, n = WALL_OUT_DIR[o];
+        if (!n || !wall.visible) continue;
+        const b = new THREE.Box3().setFromObject(wall);
+        if (y < b.min.y - 0.05 || y > b.max.y - 0.5) continue;
+        // the inside face: the wall's box edge on the side away from the outward normal
+        const face = n[0] ? (n[0] > 0 ? b.min.x : b.max.x) : (n[1] > 0 ? b.min.z : b.max.z);
+        const gap = n[0] ? (p.x - face) * -n[0] : (p.z - face) * -n[1];   // > 0: p is inside the wall
+        const along = n[0] ? p.z : p.x, lo = (n[0] ? b.min.z : b.min.x) + w / 2, hi = (n[0] ? b.max.z : b.max.x) - w / 2;
+        if (gap < -0.3 || gap > 1.5 || lo > hi) continue;
+        if (!best || gap < best.gap) best = { gap: Math.abs(gap), n, face, a: Math.min(hi, Math.max(lo, along)) };
+      }
+      if (!best) return null;
+      const [nx, nz] = best.n, x = nx ? best.face - nx * d / 2 : best.a, z = nz ? best.face - nz * d / 2 : best.a;
+      return { x, z, rotY: Math.atan2(-nx, -nz) };   // the front (+z at rot 0) turns to face inward
+    }
+
     function catalogCard(item) {
       const card = document.createElement('button');
       card.type = 'button';
@@ -6540,6 +6640,7 @@
     function renderCatalog() {
       const q = catalogSearch.value.trim().toLowerCase();
       const out = [];
+      if ((q || currentTab === 'props') && propCatalogState === 'idle') loadPropCatalog();
       if (q) {
         for (const [tab, items] of Object.entries(catalogData)) {
           const hits = items.filter(it => `${it.name} ${it.badge} ${it.tags || ''} ${it.id}`.toLowerCase().includes(q));
@@ -6548,6 +6649,7 @@
           out.push(...hits.map(catalogCard));
         }
       } else out.push(...(catalogData[currentTab] || []).map(catalogCard));
+      if (!q && currentTab === 'props' && propCatalogState !== 'ready') { const m = document.createElement('p'); m.className = 'catalog-group-h'; m.textContent = propCatalogState === 'failed' ? 'The house catalog could not be read.' : 'Reading the house catalog…'; out.push(m); }
       catalogList.replaceChildren(...out);
       catalogEmpty.hidden = out.length > 0;
       catalogList.setAttribute('aria-labelledby', `tab-${currentTab}`);
@@ -6588,7 +6690,10 @@
     function userAdd(item) {
       const p = dropPoint();
       const lv = activeHouse && currentLayerFilter !== 'all' ? (activeHouse.spec.levels || [])[currentLayerFilter] : null;
-      const obj = addItemToScene(item.create, +p.x.toFixed(3), +p.z.toFixed(3), lv ? (lv.y || 0) : null);
+      const place = item.propType ? (houseBuilder.PROPS.get(item.propType) || {}).place : item.place;   // S3's placement metadata, read when it is needed
+      const snap = place && place.against === 'wall' ? wallSnap(p, lv ? (lv.y || 0) : 0, item.footprint) : null;
+      const obj = addItemToScene(item.create, +(snap ? snap.x : p.x).toFixed(3), +(snap ? snap.z : p.z).toFixed(3), lv ? (lv.y || 0) : null);
+      if (snap) { obj.rotation.y = snap.rotY; showInspectorDetails(obj); }
       undo.push({ label: `add ${item.name}`, undo: () => { detachObject(obj); updateOutliner(); updateHUD(); }, redo: () => { attachObject(obj); selectObject(obj); updateOutliner(); updateHUD(); }, drop: () => { if (!obj.parent) disposeObject(obj); } });
     }
 
@@ -6598,9 +6703,9 @@
     // Preset Scenes
     // -------------------------------------------------------------
     // The studio scenes: the editor's own hand-built rooms (no spec, no thumbnail), listed under the homes in the
-    // picker. Their keys stay what they were (?preset=pascal-garden-house still opens the garden house).
+    // picker. Their keys stay what they were, but the garden house's (?preset=pascal-garden-house still opens it: LEGACY_SCENE_KEYS).
     const STUDIO_SCENES = [
-      { key: 'pascal-garden-house', name: 'Garden house', note: '12 × 8 m pavilion and a fenced garden' },
+      { key: 'garden-house', name: 'Garden house', note: '12 × 8 m pavilion and a fenced garden' },
       { key: 'tokyo-penthouse-duplex', name: 'Penthouse duplex', note: 'Double-height void and a mezzanine studio' },
       { key: 'soho-loft-apartment', name: 'Industrial loft', note: 'Double height, steel and timber' },
       { key: 'sims-nordic', name: 'Nordic compound', note: 'Light timber courtyard' },
@@ -6629,7 +6734,8 @@
       'sims-familyhome': 'familyhome',     'family-home': 'familyhome',
       'sims-modernhouse1': 'modernhouse1', 'modern-house-1': 'modernhouse1'
     };
-    const resolveSceneKey = key => LEGACY_HOUSE_PRESETS[key] ? `house:${LEGACY_HOUSE_PRESETS[key]}` : key;
+    const LEGACY_SCENE_KEYS = { 'pascal-garden-house': 'garden-house' };   // the studio garden house's first key (?preset=)
+    const resolveSceneKey = key => LEGACY_HOUSE_PRESETS[key] ? `house:${LEGACY_HOUSE_PRESETS[key]}` : (LEGACY_SCENE_KEYS[key] || key);
 
     function loadPresetScene(name) {
       if (LEGACY_HOUSE_PRESETS[name]) return loadHouse(LEGACY_HOUSE_PRESETS[name]).then(() => syncFlythroughWithScene(resolveSceneKey(name)));
@@ -6654,7 +6760,7 @@
 
       currentSceneKey = name;
 
-      if (name === 'pascal-garden-house') {
+      if (name === 'garden-house') {
         // =========================================================================
         // PASCAL GARDEN HOUSE (Casa del Sol Modern Single-Story Pavilion)
         // 12m × 8m Pavilion + 12m × 6m Fenced Back Garden
@@ -6860,8 +6966,8 @@
         fplace.rotation.y = -Math.PI / 2;
         addItemToScene(AssetFactory.createFiddleLeafFig, 6.2, 4.2);
 
-        // Sims Plumbob Crystal floating in the double-height atrium
-        addItemToScene(ProceduralArchitecture.createSimsPlumbob, 1.0, 2.6);
+        // the crystal floating in the double-height atrium
+        addItemToScene(ProceduralArchitecture.createCrystalMarker, 1.0, 2.6);
 
         // Architectural Floating Timber & Glass Staircase along West Wall
         // Starts at z = 3.86m (front lounge), ascends NORTHWARDS, landing flush on Mezzanine at z = 0.50m @ y = 2.8m
@@ -7189,13 +7295,15 @@
     // SplinePresets entries keyed "house:<id>:<shot>" (so the existing spline UI + recorder work unchanged).
     // In the editor it first names the home over the viewport (the build blocks the page for a second or two, so the
     // overlay is painted before it starts), and the transport is off until the home is in (Completeness J).
-    async function loadHouse(id) {
-      if (!VIEW_MODE) showBuilding(id);
+    // `quiet`: build it for a poster (Compare homes) and say nothing about it: no overlay, no URL, no checks, no ready signal.
+    async function loadHouse(id, { quiet = false } = {}) {
+      const chrome = !VIEW_MODE && !quiet;
+      if (chrome) showBuilding(id);
       let spec;
       try {
         spec = await fetchHouseSpec(id);
-        if (!VIEW_MODE) { showBuilding(id, spec); await nextPaint(); }
-      } catch (err) { if (!VIEW_MODE) hideBuilding(); throw err; }
+        if (chrome) { showBuilding(id, spec); await nextPaint(); }
+      } catch (err) { if (chrome) hideBuilding(); throw err; }
       try {
         clearScene();
         setLightingPreset(spec.lighting, {});   // the hour first, so builders reading window.__houseLighting / scene.userData.horizon see this house's; the build re-aims it
@@ -7215,6 +7323,7 @@
         populateHouseShotOptions(id, shots);
         setGlobalWallMode(currentWallMode);
         selectObject(null);
+        if (quiet) return activeHouse;
         if (!VIEW_MODE) onSceneShown(`house:${id}`);   // (the player names the tab itself)
         await sceneChecksLoaded;
         // Ready signal for harnesses / the batch video renderer (data-house-ready="<id>")
@@ -7222,7 +7331,7 @@
         window.dispatchEvent(new CustomEvent('house:ready', { detail: { id, anchors: result.anchors, shots: Object.keys(shots) } }));
         return activeHouse;
       } finally {
-        if (!VIEW_MODE) hideBuilding();
+        if (chrome) hideBuilding();
       }
     }
     // one painted frame (or 80 ms, where a background tab paints nothing), so an overlay shows before a blocking build
@@ -7241,7 +7350,7 @@
     // hand-tuned tours; a studio scene gets its own tour and the generic ones, and the custom path. Plain names;
     // the authored length is shown read-only beside it (no more re-timing a shot to 5/10/15/20 s).
     const STUDIO_SHOTS = {
-      'pascal-garden-house': ['garden-house-door-to-core', 'garden-house-tour'],
+      'garden-house': ['garden-house-door-to-core', 'garden-house-tour'],
       'tokyo-penthouse-duplex': ['tokyo-penthouse-door-to-core'],
       'soho-loft-apartment': ['soho-loft-door-to-core'],
     };
@@ -7291,6 +7400,48 @@
       }
     }
     document.getElementById('btn-house-picker').addEventListener('click', () => gallery.open(currentSceneKey));
+
+    // Compare homes (plan §6 P2 13): every home at the current shot, moment and light, as one grid of posters. Each poster
+    // is a frame drawn through the film's own renderer (a quiet build of the home, then __houseRenderFrames at 640 × 360);
+    // the editor's own home is rebuilt and put back at the same shot and moment when the set is done or stopped.
+    const COMPARE_SHOTS = ['door-to-core', 'orbit', 'hero-reveal', 'core-orbit'];
+    const compare = VIEW_MODE ? null : createCompare(document.getElementById('compare-dialog'), {
+      homes: () => [...homeIndex.values()].map(h => ({ id: h.id, name: displayName(h), credit: h.author ? `By ${h.author}` : '' })),
+      shots: COMPARE_SHOTS.map(id => [id, shotLabel(id)]),
+      lightings: [['auto', "Each home's own"], ...Object.entries(TIME_OF_DAY).map(([k, p]) => [k, p.label.replace(/\s*\(.*\)$/, '')])],
+      poster: async (id, { shot, t, lighting }) => {
+        await loadHouse(id, { quiet: true });
+        setLightingPreset(lighting === 'auto' ? homeLighting() : lighting);
+        const key = `house:${id}:${shot}`;
+        if (!SplinePresets[key]) return null;
+        const info = window.__houseRenderBegin({ shot: key, res: '360', aspect: '16:9', fps: 30 });
+        try {
+          await warmComposer(info.w, info.h);
+          const [jpeg] = window.__houseRenderFrames(Math.max(0, Math.min(info.frames - 1, Math.round(t * (info.frames - 1)))), 1, 0.9);
+          return `data:image/jpeg;base64,${jpeg}`;
+        } finally { window.__houseRenderEnd(); }
+      },
+      restore: async () => {
+        const back = compareBack;
+        if (!back) return;
+        await openScene(back.scene);
+        if (back.shot && SplinePresets[back.shot]) jumpTo(back.shot, back.t);
+      },
+      open: (id, { shot, t }) => { openScene(`house:${id}`).then(() => { const key = `house:${id}:${shot}`; if (SplinePresets[key]) jumpTo(key, t); }); },
+      edits: () => activeHouse ? placedItems.filter(o => !isGenerated(o)).length : 0,
+      save: (blob, name) => download(blob, name),
+      fileName: ({ shot, t, lighting }) => downloadName({ house: 'homes', shot, tod: lighting === 'auto' ? null : lighting, date: new Date(), ext: 'png', extra: `at-${Math.round(t * 100)}` }),
+      toast: (m, kind = 'info') => toasts.show(m, { kind }),
+    });
+    let compareBack = null;   // where the editor was when a set began: { scene, shot, t }
+    function openCompare() {
+      if (!compare) return;
+      pause();
+      compareBack = { scene: currentSceneKey, shot: activeShot ? activeShot.key : null, t: animProgress };
+      const type = activeShot && activeShot.key.startsWith('house:') ? shotType(activeShot.key) : null;
+      compare.open({ shot: COMPARE_SHOTS.includes(type) ? type : 'door-to-core', t: animProgress > 0.02 ? animProgress : 0.55, lighting: uiLighting });
+    }
+    galleryDialog.addEventListener('click', e => { if (e.target.closest && e.target.closest('#gallery-compare')) { galleryDialog.close(); openCompare(); } });
 
     // Everything the chrome says about the scene on show: the tab title, the picker, the URL, the floors, the light,
     // the checks, the plan inset and the Review cards. The editor only (the player names and lights itself).
@@ -7623,7 +7774,7 @@
       if (k === 'Delete' || k === 'Backspace') { if (selectedObject) { e.preventDefault(); deleteObject(selectedObject); } return; }
       const acts = {
         p: () => btnToggleSplinePath.click(), m: () => document.getElementById('btn-toggle-plan').click(), f: () => document.getElementById('btn-reset-view').click(),
-        g: () => document.getElementById('btn-house-picker').click(), l: () => btnLoopToggle.click(), b: () => document.getElementById('btn-loop-beat').click(),
+        g: () => document.getElementById('btn-house-picker').click(), c: () => openCompare(), l: () => btnLoopToggle.click(), b: () => document.getElementById('btn-loop-beat').click(),
         i: () => btnCamIso.click(), o: () => btnCamOrbit.click(), t: () => btnCamTop.click(),
         ...(uiMode === 'edit' ? { w: () => setGizmoMode('translate', btnModeTranslate), e: () => setGizmoMode('rotate', btnModeRotate), r: () => setGizmoMode('scale', btnModeScale) } : {}),
       };
@@ -9184,6 +9335,38 @@
       btnRenderPreview.classList.toggle('active', renderPreview);
       btnRenderPreview.setAttribute('aria-pressed', String(renderPreview));
     });
+    // a reference photo (plan §6 P2 13): a local file, dropped on the view or chosen, laid over it at some opacity and wiped
+    // from the left, to match a home's view against the photo it was read from. An object URL only: it is never written
+    // anywhere, never in a render (the canvas is drawn underneath it), never committed — the owner's photos are third-party.
+    const refOverlay = document.getElementById('ref-overlay'), refImg = document.getElementById('ref-img'), refPanel = document.getElementById('ref-panel');
+    const refFile = document.getElementById('ref-file'), btnRefPhoto = document.getElementById('btn-ref-photo');
+    const refOpacity = document.getElementById('ref-opacity'), refWipe = document.getElementById('ref-wipe');
+    let refUrl = null;
+    function refApply() {
+      refOverlay.style.setProperty('--ref-opacity', String(Number(refOpacity.value) / 100));
+      refOverlay.style.setProperty('--ref-wipe', `${refWipe.value}%`);
+      refOverlay.toggleAttribute('data-full', Number(refWipe.value) >= 100);
+    }
+    function refShow(on) {
+      refOverlay.hidden = refPanel.hidden = !on;
+      btnRefPhoto.classList.toggle('active', on); btnRefPhoto.setAttribute('aria-pressed', String(on));
+    }
+    function refSet(file) {
+      if (!file || !/^image\//.test(file.type)) { toasts.show('That is not an image. Drop a photo (JPEG, PNG or WebP).', { kind: 'error' }); return; }
+      if (refUrl) URL.revokeObjectURL(refUrl);
+      refUrl = URL.createObjectURL(file);
+      refImg.src = refUrl; refImg.alt = `Reference photo: ${file.name}`;
+      refApply(); refShow(true); layoutOverlays();
+    }
+    function refRemove() { if (refUrl) URL.revokeObjectURL(refUrl); refUrl = null; refImg.removeAttribute('src'); refShow(false); }
+    btnRefPhoto.addEventListener('click', () => { if (!refUrl) refFile.click(); else refShow(refOverlay.hidden); });
+    refFile.addEventListener('change', () => { if (refFile.files && refFile.files[0]) refSet(refFile.files[0]); refFile.value = ''; });
+    document.getElementById('ref-change').addEventListener('click', () => refFile.click());
+    document.getElementById('ref-remove').addEventListener('click', refRemove);
+    refOpacity.addEventListener('input', refApply); refWipe.addEventListener('input', refApply);
+    viewportBox.addEventListener('dragover', e => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); viewportBox.dataset.drop = '1'; } });
+    viewportBox.addEventListener('dragleave', () => { delete viewportBox.dataset.drop; });
+    viewportBox.addEventListener('drop', e => { delete viewportBox.dataset.drop; const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) { e.preventDefault(); refSet(f); } });
     // the custom path (studio scenes): the current view as its next waypoint
     btnAddWaypoint.addEventListener('click', () => {
       if (!SplinePresets['custom'].eyePoints) SplinePresets['custom'].eyePoints = [];
@@ -9376,7 +9559,7 @@
     }
     // for scripts/test-ui.mts: the editor's two outputs, driven as the buttons drive them
     window.__houseUi = {
-      startRecording, exportStill, setUiMode, openScene, runQA, timeline, planInset, pathOverlay, undo,
+      startRecording, exportStill, setUiMode, openScene, runQA, timeline, planInset, pathOverlay, undo, compare, openCompare, wallSnap,
       qa: () => ({ report: qaReport, issues: qaIssues() }),
       select: obj => selectObject(obj), placed: () => placedItems, selected: () => selectedObject,
       state: () => ({ t: animProgress, playing: isAnimPlaying, shot: activeShot && activeShot.key, duration: animDuration, mode: uiMode, lighting: lightingAim.preset, uiLighting, layer: currentLayerFilter, wallMode: currentWallMode, plan: planView, recording, scene: currentSceneKey }),

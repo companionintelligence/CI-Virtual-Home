@@ -18,6 +18,7 @@ export function createGallery(dialog: HTMLDialogElement, { onPick }: { onPick: (
     <form method="dialog" class="rc-dialog-head">
       <h2 id="gallery-title">Choose a home</h2>
       <label class="rc-search">${svg('search')}<input type="search" id="gallery-search" placeholder="Search homes, builders, styles" aria-label="Search homes" autocomplete="off" spellcheck="false"></label>
+      <button type="button" class="btn-ctrl btn-outline rc-gallery-compare" id="gallery-compare" title="Every home at the same shot, side by side (C)">${svg('grid')}<span class="lbl">Compare</span></button>
       <button class="rc-icon-btn" value="close" aria-label="Close" title="Close (Esc)">${svg('x')}</button>
     </form>
     <div class="rc-gallery-body">

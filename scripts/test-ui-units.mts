@@ -19,6 +19,7 @@ import { readUiState, stateSearch } from '../assets/ui/url-state.js';
 import { collectIssues, qaCounts } from '../assets/ui/qa.js';
 import { createUndo } from '../assets/ui/undo.js';
 import { storeyOf, levelAt } from '../assets/ui/plan-inset.js';
+import { posterKey, sheetLayout } from '../assets/ui/compare.js';
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-ui-'));
 const has = (bin: string) => spawnSync(bin, ['-version'], { stdio: 'ignore' }).status === 0;
@@ -197,6 +198,23 @@ test('the plan inset\'s storey: by height over the house, the entry\'s outside i
   assert.equal(storeyOf(spec, [0, 1.5, 0]), 0);
   assert.equal(storeyOf(spec, [0, 9, 12]), 0, 'an establishing shot high over the lawn is at the entry');
   assert.equal(levelAt(spec.levels, 2.6), 1);
+});
+
+test('compare: a poster is cached by home, shot, moment and light — and by nothing else', () => {
+  const o = { shot: 'orbit', t: 0.55, lighting: 'auto' };
+  assert.equal(posterKey('aurora', o), posterKey('aurora', { ...o, t: 0.5500001 }), 'a moment is rounded to a thousandth');
+  for (const other of [posterKey('mirage', o), posterKey('aurora', { ...o, shot: 'hero-reveal' }), posterKey('aurora', { ...o, t: 0.56 }), posterKey('aurora', { ...o, lighting: 'dusk' })]) assert.notEqual(other, posterKey('aurora', o));
+});
+
+test('compare: the sheet is a grid of cells with a caption band, and every cell is inside it', () => {
+  const L = sheetLayout(30, 5, 384, 216, 34, 14);
+  assert.equal(L.w, 14 + 5 * (384 + 14));
+  assert.equal(L.h, 14 + 6 * (216 + 34 + 14));
+  const last = L.cell(29);
+  assert.ok(last.x + 384 <= L.w - 14 + 1e-9 && last.y + 216 + 34 <= L.h - 14 + 1e-9, 'the last cell and its caption end inside the margin');
+  assert.deepEqual(L.cell(0), { x: 14, y: 14 });
+  assert.deepEqual(L.cell(7), { x: 14 + 2 * 398, y: 14 + 264 });
+  assert.equal(sheetLayout(2, 3, 384, 216, 34, 14).h, 14 + 264, 'two posters are one row');
 });
 
 test.after(() => fs.rmSync(TMP, { recursive: true, force: true }));
