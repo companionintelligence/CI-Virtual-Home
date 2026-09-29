@@ -53,7 +53,10 @@ const covers = (s: any, x: number, z: number, m = 0): boolean => {
 registerSceneCheck('site-sunk', ({ house }) => {
   const solids = house.anchors.siteSolids || [], out = [];
   for (const t of solids.filter(s => s.kind === 'trunk')) {
-    const over = solids.filter(s => s.kind === 'terrace' && covers(s, t.x, t.z) && s.yMax > t.yMin + 0.3).sort((a, b) => b.yMax - a.yMax)[0];
+    // (a trunk standing on a terrace's very edge, its lean taking its middle across the line the ground steps at, is not sunk:
+    // it must be a trunk's width or more inside)
+    const inside = (s: any) => [[0, 0], [0.35, 0], [-0.35, 0], [0, 0.35], [0, -0.35]].every(([dx, dz]) => covers(s, t.x + dx, t.z + dz));
+    const over = solids.filter(s => s.kind === 'terrace' && inside(s) && s.yMax > t.yMin + 0.3).sort((a, b) => b.yMax - a.yMax)[0];
     if (over) out.push({ level: 'warn' as const, message: `a trunk at (${t.x.toFixed(1)}, ${t.z.toFixed(1)}) is buried ${(over.yMax - t.yMin).toFixed(1)} m in a terrace`, subject: 'trunk' });
   }
   return out;

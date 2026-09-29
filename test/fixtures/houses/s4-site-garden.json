@@ -7,7 +7,7 @@
  "style": "The S0 harness house (two-storey stucco box, charcoal gable) on an S4 lot",
  "emoji": "🌿",
  "fixture": {
-  "note": "a serpentine gravel walk with beds both sides and no lawn gap, cottage foundation planting in three layers along the south facade, a meadow drift, a woodland grove, a modern border, a stepping-stone path, an organic pond, an open pergola with wisteria over outdoor dining, and specimen species (agave, hydrangea, willow, olive, lavender, topiary cones)",
+  "note": "a serpentine gravel walk with beds both sides and no lawn gap, cottage foundation planting in three layers along the south facade, a meadow drift, a woodland grove, a modern border, a stepping-stone path, an organic pond, an open pergola with wisteria over outdoor dining, and specimen species (agave, hydrangea, willow, olive, lavender, topiary cones), a picket fence and a stone garden wall along the west line",
   "frames": {
    "door-to-core": [
     0.05,
@@ -61,7 +61,7 @@
      "side": "S",
      "at": 0.5,
      "type": "door",
-     "w": 1.0,
+     "w": 1,
      "h": 2.1,
      "style": "entry"
     },
@@ -93,7 +93,7 @@
      "side": "N",
      "at": 2.5,
      "type": "slider",
-     "w": 2.0,
+     "w": 2,
      "h": 2.2
     },
     {
@@ -702,6 +702,37 @@
    ],
    "h": 2.5,
    "posts": false
+  },
+  {
+   "type": "fence",
+   "style": "picket",
+   "path": [
+    [
+     -15,
+     -4
+    ],
+    [
+     -15,
+     4
+    ]
+   ],
+   "color": "#f4f1e8"
+  },
+  {
+   "type": "wall-low",
+   "path": [
+    [
+     -15,
+     4.6
+    ],
+    [
+     -15,
+     11
+    ]
+   ],
+   "surface": "stone",
+   "h": 1.1,
+   "cap": "#cfc7b6"
   }
  ],
  "hero": {

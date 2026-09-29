@@ -327,7 +327,10 @@ marginal tufts and lily pads. A pool with none of these is the old slab pool, un
 
 **Terrain (A3).** `{ "type": "terrace", "poly" (or at, w, d, rot), "y", "edge", "surface", "smooth", "id" }` raises
 the ground over its outline to `y`. The ground follows it: a tree, a shrub, a bed, a planting, a patio, a prop or a
-pool on it stands on it unless it gives its own `y`, and a terrace inside another stands on that one. `edge`:
+pool on it stands on it unless it gives its own `y`, and a terrace inside another stands on that one. What is made of many
+pieces follows piece by piece — each plant of a planting, scatter or grove, each run of a hedge, fence or wall stands on the
+ground at its own spot — but a slab, a deck, a pool, a bed, a path or a structure stands at one height (the ground at its
+centre), so one that spans a terrace's edge is linted (`terrace-straddle`): give it a `y`, or place it wholly on or off. `edge`:
 `retaining` (vertical faces in `material` — stone, stucco, brick, concrete, timber — and `color`, under a coping,
 the default), `rail` (the same with a rail round it: `rail` a style, `railColor`), `planted` (a bank falling
 outward at 1:1.6, planted; `mix: "desert"` for succulents), `slope` (a grass bank). An edge along the house has no
@@ -377,16 +380,16 @@ its floor (the terrace drops a centimetre under it).
   crop fields, hedgerows and a barn in the ring beyond the neighbours.
 - Under `defaults: 2` (and in any context but the plain suburb) the neighbours vary in palette and style.
 
-**What the builder records.** `anchors.siteSolids` — `{ kind, x, z, r | w, d, rot, yMin, yMax }` (and `poly` for a
-terrace or shaped water): trunks and crowns, posts, fences, walls, hedges, structures, water, decks, stairs, terraces
+**What the builder records.** `anchors.siteSolids` — `{ kind, x, z, r | w, d, rot, yMin, yMax, site }` (`site`: the item's index in
+`spec.site`; and `poly` for a terrace or shaped water): trunks and crowns, posts, fences, walls, hedges, structures, water, decks, stairs, terraces
 and their retaining faces — for the shot planner (S5). `anchors.siteEdges` — bed, planting and path outlines as
 built. Both, with the instances the isometric twin draws, go to `<id>.plan.json`'s `site` key (`{ instances, solids,
 edges }`). An item no builder built is recorded (`anchors.siteDropped`) and reported by the scene QA
 (`site-dropped`), never dropped silently.
 
-**Lints** (`scripts/validate/site.mts`, warnings): `unknown-name` (a lot sidewalk or furniture too), `planting-ref`, `front-crates` (vegetable crates in
-the front garden), `in-house`, `off-lot`, `buried-water`, `bed-on-slab`, `steep-stair`, `water-sides`. Scene QA:
-`site-dropped`, `site-in-house`, `site-buried`.
+**Lints** (`scripts/validate/site.mts`, warnings): `unknown-name` (a lot sidewalk or furniture too), `planting-ref`, `planting-empty` (a planting with no room to lay out anything), `front-crates` (vegetable crates in
+the front garden), `in-house`, `off-lot`, `buried-water`, `bed-on-slab`, `steep-stair`, `terrace-straddle`, `water-sides`. Scene QA:
+`site-dropped`, `site-in-house`, `site-buried`, `site-sunk` (a trunk buried in a terrace).
 
 ### Shots (S5)
 

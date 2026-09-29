@@ -14,6 +14,8 @@
 //   buried-water     water a patio, deck or terrace covers (its rim under the slab's top)
 //   bed-on-slab      a bed or planting laid over a patio, driveway or deck
 //   steep-stair      an exterior stair steeper than 0.19 m risers on 0.25 m treads
+//   terrace-straddle a slab, a deck, a pool, a bed, a path or a structure with no `y` of its own that spans a
+//                    terrace's edge: it stands at one height (the ground at its centre), so part of it sinks or floats
 //   water-sides      lot.water on all four sides (an island lot is not built)
 import type { Check, Issue, Extend, Rule } from './_types.mts';
 import { SHRUB_FORMS, FLOWER_KINDS_ALL, TREE_SPECIES, PATH_SURFACES } from '../../assets/site.js';
@@ -178,6 +180,25 @@ const check: Check = (spec, ctx) => {
       if (sl.s.type === 'deck' && (sl.s.h || 0.12) > 0.35) continue;
       const k = covered(fp, sl.fp);
       if (k > 0.5 && (s.y ?? 0) < sl.top - 0.02) { warn(`${S(s, i)}: ${Math.round(k * 100)} % of it is laid over the ${sl.s.type} site[${sl.i}]`, 'bed-on-slab'); break; }
+    }
+  }
+
+  // ---- an item across a terrace's edge (A3): the ground follows a terrace, but a slab, a bed or a structure stands at
+  // one height, the ground at its centre. (Fences, walls, hedges, plantings, scatters, groves and single plants follow it
+  // piece by piece; steps and stairs are meant to climb it.)
+  if (site.some(t => t.type === 'terrace' && typeof t.y === 'number')) {
+    const ONE_HEIGHT = new Set(['patio', 'driveway', 'deck', 'pool', 'turtle-pool', 'pond', 'hottub', 'bed', 'path', 'gazebo', 'greenhouse', 'cabana', 'pergola', 'garden-beds', 'firepit', 'loungers', 'turf']);
+    for (const [i, s] of site.entries()) {
+      if (!ONE_HEIGHT.has(s.type) || s.y !== undefined) continue;
+      let pts: number[][] | null = null;
+      if (s.type === 'path' && isLine(s.path)) pts = s.path.flatMap((p: number[], k: number) => k ? [[(p[0] + s.path[k - 1][0]) / 2, (p[1] + s.path[k - 1][1]) / 2], p] : [p]);
+      else if (s.type === 'gazebo' && isP(s.at)) pts = rectPoly(s.at, 2 * (s.r || 2), 2 * (s.r || 2), 0);
+      else if ((s.type === 'pergola' || s.type === 'cabana') && isP(s.at)) pts = rectPoly(s.at, s.w || 4, s.d || 3, s.rot || 0);
+      else pts = footprintOf(s, i, spec.id || '');
+      if (!pts || pts.length < 3 && s.type !== 'path') continue;
+      const c = centroid(pts as any), samples = [...pts, ...pts.map((p, k) => [(p[0] + pts![(k + 1) % pts!.length][0]) / 2, (p[1] + pts![(k + 1) % pts!.length][1]) / 2]), c];
+      const hs = samples.map(p => sctx.groundAt(p[0], p[1])), lo = Math.min(...hs), hi = Math.max(...hs);
+      if (hi - lo > 0.15) warn(`${S(s, i)}: spans a terrace's edge (the ground under it runs ${lo.toFixed(2)}–${hi.toFixed(2)} m) but stands at one height — give it a y, or place it wholly on or off the terrace`, 'terrace-straddle');
     }
   }
 

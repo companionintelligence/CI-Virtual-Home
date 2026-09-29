@@ -812,7 +812,7 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
         col[k * 3] = shade; col[k * 3 + 1] = shade; col[k * 3 + 2] = shade * 0.97;
       }
       geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.computeVertexNormals();
-      const seg = new THREE.Mesh(geo, foliage); seg.position.set(cx, 0, cz); seg.rotation.y = rot; seg.castShadow = true; seg.receiveShadow = true; g.add(seg);
+      const seg = new THREE.Mesh(geo, foliage); seg.position.set(cx, s.y === undefined ? ctxFor().groundAt(cx, cz) : 0, cz); seg.rotation.y = rot; seg.castShadow = true; seg.receiveShadow = true; g.add(seg);   // (each run stands on the ground at its own middle: a hedge along a terrace)
       // the leaf skin, in the run's own frame (a child of the box, so it inherits position and turn)
       const step = 0.2, cl = [], j = () => (r() - 0.5) * step * 0.7;
       // each cluster is pressed flat along the face it sits on (z on the sides, y on top) — clipped, not wild
@@ -1137,6 +1137,14 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
     return g;
   }
 
+  // On a terrace (A3) each item of a scatter or a grove stands on the ground at its own spot: site-build.ts lifts the
+  // group by the ground at its centre, so an item is set off by what the ground there differs by (nothing on a flat lot,
+  // nor on a group with a `y` of its own). The group turns by `rot` about its centre.
+  const followGround = (s, x, z) => {
+    if (s.y !== undefined || !Array.isArray(s.at)) return 0;
+    const c = ctxFor(), a = (s.rot || 0) * Math.PI / 180;
+    return c.groundAt(s.at[0] + x * Math.cos(a) + z * Math.sin(a), s.at[1] - x * Math.sin(a) + z * Math.cos(a)) - c.groundAt(s.at[0], s.at[1]);
+  };
   function scatter(s, r) {
     const R = s.r || 2, n = s.n || 6, species = s.species || ['shrub', 'rock', 'flowers'], g = group('Scatter');
     if (s.layout === 'poisson' || gen2) {
@@ -1146,21 +1154,21 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
       for (const [x, z] of pts) {
         const sp2 = pick(r, species);
         const o = sp2 === 'rock' ? rock({ r: 0.25 + r() * 0.3 }, r) : sp2 === 'flowers' ? flowers({ r: 0.3 + r() * 0.25 }, r) : sp2 === 'tree' ? tree({ h: 3 + r() * 2 }, r) : shrub({ r: 0.3 + r() * 0.4 }, r);
-        o.position.set(x, 0, z); g.add(o);
+        o.position.set(x, followGround(s, x, z), z); g.add(o);
       }
       return g;
     }
     for (let i = 0; i < n; i++) {
       const a = r() * Math.PI * 2, d = Math.sqrt(r()) * R, sp = pick(r, species);
       const o = sp === 'rock' ? rock({ r: 0.25 + r() * 0.3 }, r) : sp === 'flowers' ? flowers({ r: 0.3 + r() * 0.25 }, r) : sp === 'tree' ? tree({ h: 3 + r() * 2 }, r) : shrub({ r: 0.3 + r() * 0.4 }, r);
-      o.position.set(Math.cos(a) * d, 0, Math.sin(a) * d); g.add(o);
+      o.position.set(Math.cos(a) * d, followGround(s, Math.cos(a) * d, Math.sin(a) * d), Math.sin(a) * d); g.add(o);
     }
     return g;
   }
   function grove(s, r) {
     const R = s.r || 3, n = s.n || 4, g = group('Grove');
     const species = s.species || pick(r, ['broad', 'oval', 'layered', 'birch']);
-    for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + r() * 1.2, d = R * (0.3 + r() * 0.7); const t = tree({ h: (s.h || 5) * (0.75 + r() * 0.5), species: typeof species === 'string' ? species : pick(r, species) }, r); t.position.set(Math.cos(a) * d, 0, Math.sin(a) * d); g.add(t); }
+    for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2 + r() * 1.2, d = R * (0.3 + r() * 0.7); const t = tree({ h: (s.h || 5) * (0.75 + r() * 0.5), species: typeof species === 'string' ? species : pick(r, species) }, r); t.position.set(Math.cos(a) * d, followGround(s, Math.cos(a) * d, Math.sin(a) * d), Math.sin(a) * d); g.add(t); }
     return g;
   }
 

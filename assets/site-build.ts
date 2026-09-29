@@ -360,14 +360,14 @@ export function createSiteBuild(bctx) {
     const solids = anchors.siteSolids = [], edges = anchors.siteEdges = [];
     const rep = s => (Array.isArray(s.at) ? s.at : Array.isArray(s.poly) && s.poly.length ? centroid(s.poly) : Array.isArray(s.path) && s.path.length ? s.path[Math.floor(s.path.length / 2)] : Array.isArray(s.from) ? s.from : [0, 0]);
     const rot3 = (pts, rotDeg) => turn(pts, rotDeg);
-    site.forEach((s, si) => {
+    const buildItem = (s, si) => {
       // the site kit's types (tree, shrub, flowers, rock, bed, path, hedge, scatter, grove, planting …) — seeded per item
       const own = siteKit.build(s, si);
       if (own) {
         const anchored = siteKit.anchored(s.type, s);
         // an anchored item carries its world coordinates (a planting its plants' own heights); a bed, path or hedge on a
         // terrace is lifted onto it
-        const lift = s.y ?? (anchored ? (['bed', 'path', 'hedge', 'pond'].includes(s.type) ? groundAt(...(rep(s) as [number, number])) : 0) : groundAt(s.at[0], s.at[1]));
+        const lift = s.y ?? (anchored ? (['bed', 'path', 'pond'].includes(s.type) ? groundAt(...(rep(s) as [number, number])) : 0) : groundAt(s.at[0], s.at[1]));   // (a hedge's runs follow the ground each their own way — the kit sets their heights)
         const o = put(() => own, anchored ? 0 : s.at[0], anchored ? 0 : s.at[1], lift, null, 'site');
         if (!anchored) o.rotation.y = (s.rot || 0) * DEG + o.rotation.y;
         o.userData.category = 'Site'; o.userData.siteType = s.type;
@@ -395,7 +395,7 @@ export function createSiteBuild(bctx) {
         if (s.type === 'shrub' || s.type === 'cypress') { const b = solidBox('plant', o); if (b && b.yMax - b.yMin > 1.1 && s.type === 'shrub') solids.push(b); }
         if (s.type === 'hedge') {
           const tt = tensionOf(s.smooth), pts = tt === null ? s.path || [] : smoothLine(s.path || [], tt, 0.9), w = s.w || 0.6, h = s.h || 1.0;
-          for (let k = 0; k < pts.length - 1; k++) { const [ax, az] = pts[k], [bx, bz] = pts[k + 1], L = Math.hypot(bx - ax, bz - az); if (L < 1e-6) continue; solids.push({ kind: 'hedge', x: r3((ax + bx) / 2), z: r3((az + bz) / 2), w: r3(L + w * 0.6), d: w, rot: r3(-Math.atan2(bz - az, bx - ax) * 180 / Math.PI), yMin: r3(lift), yMax: r3(lift + h) }); }
+          for (let k = 0; k < pts.length - 1; k++) { const [ax, az] = pts[k], [bx, bz] = pts[k + 1], L = Math.hypot(bx - ax, bz - az); if (L < 1e-6) continue; solids.push({ kind: 'hedge', x: r3((ax + bx) / 2), z: r3((az + bz) / 2), w: r3(L + w * 0.6), d: w, rot: r3(-Math.atan2(bz - az, bx - ax) * 180 / Math.PI), yMin: r3(s.y ?? groundAt((ax + bx) / 2, (az + bz) / 2)), yMax: r3((s.y ?? groundAt((ax + bx) / 2, (az + bz) / 2)) + h) }); }
         }
         if (s.type === 'planting' && o.userData.plan) for (const b of o.userData.plan.beds) edges.push({ site: si, type: 'planting', closed: true, pts: b.poly.map(p => [r3(p[0]), r3(p[1])]), wall: b.wall });
         if (s.type === 'planting') o.traverse(m => { if (m.isInstancedMesh && /^Plants/.test(m.name)) { /* tall plants in a bed: kind 'plant' */ const tmp = new THREE.Matrix4(), pos = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3(); for (let k = 0; k < m.count; k++) { m.getMatrixAt(k, tmp); tmp.decompose(pos, q, sc); if (sc.y > 1.1) solids.push({ kind: 'plant', x: r3(pos.x), z: r3(pos.z), r: r3(sc.x), yMin: r3(pos.y), yMax: r3(pos.y + sc.y) }); } } });
@@ -459,7 +459,9 @@ export function createSiteBuild(bctx) {
       o.userData.category = 'Site';
       if (s.type === 'cypress' || s.type === 'palm') treeSolids(o, solids);
       else if (STRUCTURE_SOLIDS[s.type]) { const b = solidBox(STRUCTURE_SOLIDS[s.type], o); if (b) { if (s.rot) { b.w = r3(s.w || b.w); b.d = r3(s.d || b.d); b.rot = s.rot; b.x = r3(s.at[0]); b.z = r3(s.at[1]); } solids.push(b); } }
-    });
+    };
+    // every solid a site item records names it (`site`: its index in spec.site), for whoever has to find the item behind one
+    site.forEach((s, si) => { const n0 = solids.length; buildItem(s, si); for (let k = n0; k < solids.length; k++) solids[k].site = si; });
   }
 
   // ---- patios and driveways (S4): any outline (`poly`, curved when `smooth`), a surface and a colour, cut round water -
