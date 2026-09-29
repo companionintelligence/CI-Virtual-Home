@@ -107,8 +107,8 @@ export function createProbe(index: WorldIndex) {
   }
   /** a frame's composition from its ray grid: the largest share of rays on one plane within `near` metres, the share
    *  of sky, the share of the frame a foreground occluder (anything within 0.8 m of the lens) covers */
-  function composition(c: Cam, roofs = false, near = 1.5) {
-    const g = rayGrid(c, roofs);
+  function composition(c: Cam, roofs = false, near = 1.5, far = 60) {
+    const g = rayGrid(c, roofs, far);
     const byPlane = new Map<string, number>();
     let sky = 0, fore = 0, ground = 0;
     for (const r of g) {
@@ -119,7 +119,9 @@ export function createProbe(index: WorldIndex) {
     }
     let blank = 0; for (const v of byPlane.values()) blank = Math.max(blank, v);
     const nearWall = (d: number) => g.filter(r => r.t <= d && (r.k === K.wall || r.k === 0 || r.k === K.rail)).length / g.length;
-    return { blank: blank / g.length, near2: nearWall(2), sky: sky / g.length, ground: ground / g.length, fore: fore / g.length, rays: g };
+    // the largest share of the rays that fall on one plane (a wall, a floor, a ceiling) within d metres
+    const share = (d: number) => { const by = new Map<string, number>(); let m = 0; for (const r of g) if (r.t <= d && (r.k === K.wall || r.k === 0 || r.k === K.rail)) { const v = (by.get(r.key) || 0) + 1; by.set(r.key, v); if (v > m) m = v; } return m / g.length; };
+    return { blank: blank / g.length, near2: nearWall(2), sky: sky / g.length, ground: ground / g.length, fore: fore / g.length, rays: g, share };
   }
   /** the share of the Core (a 3 × 3 grid over its box's faces toward the eye, and its centre) seen from eye */
   function coreSeen(eye: V3, core: Box6) {
@@ -145,6 +147,12 @@ export function createProbe(index: WorldIndex) {
     const hit = index.raycast(centre[0], centre[1], centre[2], d[0], d[1], d[2], 30, k => k !== K.hull && k !== K.core && k !== K.walk && k !== K.surface && k !== K.heroSet && k !== K.chair && k !== K.fixture, i => world.kinds[i] === K.core);
     return hit ? bgClass(hit.k, hit.n) : 'sky';
   }
-  return { cast, clear, visibility, rayGrid, composition, coreSeen, background };
+  /** the colour (0xRRGGBB) of what stands behind the Core seen from `eye`, as background() finds it — null for sky */
+  function backgroundColor(centre: V3, eye: V3): number | null {
+    const d = norm(sub(centre, eye));
+    const hit = index.raycast(centre[0], centre[1], centre[2], d[0], d[1], d[2], 30, k => k !== K.hull && k !== K.core && k !== K.walk && k !== K.surface && k !== K.heroSet && k !== K.chair && k !== K.fixture, i => world.kinds[i] === K.core);
+    return hit && hit.i >= 0 ? world.colors[hit.i] : null;
+  }
+  return { cast, clear, visibility, rayGrid, composition, coreSeen, background, backgroundColor };
 }
 export type Probe = ReturnType<typeof createProbe>;

@@ -244,6 +244,11 @@ const INJECT: Record<string, Injector> = {
   'orbit-core-occluded': c => { const sp = spans(c.track, 'orbit'); if (!sp.length) return null; const { t, w } = mk(c), [i0, i1] = sp[0], m = (i0 + i1) >> 1, e = eyeAt(t, m), h = w.hero!, ctr: V3 = [(h.core[0] + h.core[3]) / 2, (h.core[1] + h.core[4]) / 2, (h.core[2] + h.core[5]) / 2], d = sub(ctr, e), L = Math.hypot(d[0], d[1], d[2]), p = add(e, mul(d, 0.4)), r = 0.2 * L;
     addBox(w, [p[0] - r, p[1] - r, p[2] - r, p[0] + r, p[1] + r, p[2] + r], K.wall, 'panel'); return { track: t, world: w, window: win(c, m - 6, m + 6) }; },
   'orbit-yaw-rate': c => { const sp = spans(c.track, 'orbit'); if (!sp.length) return null; const { t, w } = mk(c), [i0, i1] = sp[0], m = (i0 + i1) >> 1; burst(t, m, 30, 6); return { track: t, world: w, window: win(c, m - 30, m + 30) }; },
+  // the raw look: a one-sample step in the look (a clamp letting go at a beat seam): 2.6° is 156°/s at 60 Hz, 6° is a snap
+  'look-whip': c => { const { t, w } = mk(c), i = c.midRoute(1.0); for (let k = i; k < c.N; k++) turnLook(t, k, 2.6 * DEG); return { track: t, world: w, window: win(c, i - 2, i + 2) }; },
+  'look-snap': c => { const { t, w } = mk(c), i = c.midRoute(1.0); for (let k = i; k < c.N; k++) turnLook(t, k, 6 * DEG); return { track: t, world: w, window: win(c, i - 2, i + 2) }; },
+  // the finale's frame filled by one wall within 1.5 m (the Core's own desk is the subject of it, a wall is not)
+  'finale-blank': c => { const sp = spans(c.track, 'orbit'); const f = c.faceWall(); if (!sp.length || !f) return null; const { t, w } = mk(c), [i0, i1] = sp[0], m = (i0 + i1) >> 1; for (let k = 0; k < 96; k++) { setEye(t, m + k, f.eye(0.5)); setLook(t, m + k, f.at); } return { track: t, world: w, window: win(c, m, m + 96) }; },
   // the two below need a door leaf in the world: see the leaf tests
   'door-leaf': () => null,
 };
@@ -283,6 +288,44 @@ for (const code of codes) {
     }
   }
   if (!done) { skipped.push(code); say(false, lastFail || `${code}: no base could take the injection (${notes.join('; ')})`); }
+}
+
+// ---- the holes an independent review found in the checks, each closed: the fault that slipped through is injected and must be caught --------------------
+if (!only) {
+  const b0 = bases[0], b1 = bases[1];
+  const errOf = (t: Track, w: ShotWorld, code: string, level: 'errors' | 'warnings' = 'errors') => (qaTrack(t, w) as any)[level].filter((f: any) => f.code === code);
+  const inject = (b: Base, f: (t: Track, w: ShotWorld) => void) => { const t = cloneTrack(b.track), w = cloneWorld(b.world); f(t, w); return { t, w }; };
+  const routeMid = (b: Base) => { const r = spans(b.track, 'route').sort((x, y) => (y[1] - y[0]) - (x[1] - x[0]))[0] || [Math.round(b.track.samples * 0.4), Math.round(b.track.samples * 0.6)]; return (r[0] + r[1]) >> 1; };
+  // the ceiling error on the top storey: a one-storey house has nothing above it to open its ceiling (it never fired there)
+  { const top = b0.world.levels.slice().sort((a, b) => b.y - a.y)[0], mid = routeMid(b0), dt = b0.track.dt;
+    let p: V3 | null = null; for (const r of top.rects) for (let x = r.x + 0.5; x < r.x + r.w && !p; x += 0.5) for (let z = r.z + 0.5; z < r.z + r.d && !p; z += 0.5) if (inFootprint(top.rects, x, z, 0.3)) p = [x, top.y + top.h - 0.1, z];
+    const { t, w } = inject(b0, (t) => { for (let k = 0; k < 20; k++) setEye(t, mid + k, p!); });
+    const hit = errOf(t, w, 'ceiling');
+    say(hit.length > 0 && hit.some((f: any) => f.t <= (mid + 20) * dt + 0.3 && f.tEnd >= mid * dt - 0.3), 'ceiling (error) is caught on the top storey of a one-storey house', `errors: ${qaTrack(t, w).errors.map(f => f.code).join(', ')}`); }
+  // the view snapping 14° in 0.1 s is a whip pan, not a comfortable turn (the 0.2 s window it was averaged over made 70°/s of it)
+  { const mid = routeMid(b1), { t, w } = inject(b1, (t) => { for (let k = mid; k < t.samples; k++) turnLook(t, k, 14 * DEG * clamp((k - mid) / 12, 0, 1)); });
+    say(errOf(t, w, 'yaw-whip').length > 0, 'yaw-whip (error) is caught for 14° in 0.1 s (over 90°/s in a 0.1 s window)'); }
+  // a lens that is wrong for the beat, whatever the beat (only the establish, route, stair and power beats had a range)
+  for (const beat of ['approach', 'threshold', 'reveal', 'roomReveal', 'hero', 'orbit']) {
+    const sp = spans(b1.track, beat); if (!sp.length) continue;
+    const { t, w } = inject(b1, (t) => { const [i0, i1] = sp[0], m = (i0 + i1) >> 1; for (let k = Math.max(i0, m - 12); k <= Math.min(i1, m + 12); k++) t.fov[k] = 22; });
+    say(errOf(t, w, 'fov-range', 'warnings').some((f: any) => f.subject === beat), `fov-range (warning) is caught for a 22° lens in the ${beat} beat`);
+  }
+  // an eye backing straight away from the Core with its look on it (the moonwalk the circling exemption used to hide)
+  for (const b of [b0, b1]) {
+    const sp = spans(b.track, 'hero'), h = b.world.hero!; if (!sp.length) continue;
+    const ctr: V3 = [(h.core[0] + h.core[3]) / 2, (h.core[1] + h.core[4]) / 2, (h.core[2] + h.core[5]) / 2], i0 = sp[0][0], dt = b.track.dt;
+    const { t, w } = inject(b, (t) => { const e0 = eyeAt(t, i0), away = norm([e0[0] - ctr[0], 0, e0[2] - ctr[2]]); for (let k = 0; k < 150; k++) { const e: V3 = add(e0, mul(away, 0.6 * k * dt)); setEye(t, i0 + k, e); setLook(t, i0 + k, ctr); } });
+    say(errOf(t, w, 'reverse').length > 0, `reverse (error) is caught for a 0.6 m/s retreat from the Core with the look on it (${b.id})`);
+  }
+  // an establishing look pitched up at the house past the establishing range (the check allowed −45°)
+  { const { t, w } = inject(b1, (t) => { for (let k = 0; k < 40; k++) turnLook(t, k, 0, 40 * DEG); });
+    say(errOf(t, w, 'beat-pitch', 'warnings').some((f: any) => f.subject === 'establish'), 'beat-pitch (warning) is caught for an establishing look tilted up 40° from its own'); }
+  // a portrait viewer (the planned still export, the phone player): the same track must hold its press frame and its finale
+  for (const b of bases) for (const asp of [9 / 16, 3 / 4, 1, 21 / 9]) {
+    const q = qaTrack(b.track, b.world, { aspect: asp }), bad = q.errors.filter(e => e.code === 'press-frame' || e.code === 'blank-frame' || e.code === 'orbit-core-out-of-frame');
+    say(bad.length === 0, `${b.id} at ${asp === 9 / 16 ? '9:16' : asp === 3 / 4 ? '3:4' : asp === 1 ? '1:1' : '21:9'}: the press frame and the orbit hold`, bad.map(e => `${e.code}@${e.t}`).join(', '));
+  }
 }
 
 // ---- door leaves: opened ahead of the eye by the planner, and QA holds them to it ---------------------------------------------

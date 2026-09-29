@@ -64,6 +64,13 @@ export function frameFit(eye: V3, target: V3, fov: number, pts: V3[], margin = 0
   return { top: t, bottom: b, side: sd, ok: t <= 0.1 && b <= 0.35 && sd <= 0.6, cost: 2 * t + b + 0.6 * sd };
 }
 
+/** the house whole in the frame (plan §3.9): the roof and the sides inside the 8 % margins (a stray dormer or eave: 3 % of the corners),
+ *  the ground line within 15 % of the bottom margin — the first frame of the film shows the house and its garden, never a corner of it */
+export function wholeFit(eye: V3, target: V3, fov: number, pts: V3[], aspect = 16 / 9) {
+  const f = frameFit(eye, target, fov, pts, 0.08, aspect);
+  return f.top <= 0.03 && f.side <= 0.03 && f.bottom <= 0.15;
+}
+
 // ---- the Core orbit's probe, on the world (core-orbit.ts's createOrbitProbe, ported) ----------------------------
 const WALL = 0.3, ITEM = 0.08, LOOM = 0.22, STRUCT = 0.1, CEILING = 0.3;
 export function createOrbitProbeW(world: ShotWorld, index: WorldIndex, probe: Probe, level: WLevel) {
@@ -110,8 +117,18 @@ export type EstablishStyle = typeof ESTABLISH_STYLES[number];
 export type Establish = { style: EstablishStyle | 'custom'; eye: V3; aim: V3; fov: number; bearing: number; score: number; fit: number; sky: number; occluded: number; roofOff: boolean; scores?: any; alts?: Establish[] };
 
 /** Plan the establishing pose: `want` is shots[].establish ('auto', a style, or {bearing, height, dist}). */
-const EST_LENSES = [34, 40, 46];
-export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldIndex, want: any = 'auto', lim: { near?: [number, number]; maxPath?: number } = {}): Establish {
+const EST_LENSES = [46, 49, 42];
+/** the establishing look's pitch range, degrees (§3.5: the look never tilts up at the house, or far down at it, unless it is a dollhouse) */
+export const EST_PITCH: [number, number] = [-28, -4];
+/** the point the eye looks at when it wants `aim` but its pitch is held to [lo, hi]° (what the look solver will do on frame 0) */
+export function pitchHeld(eye: V3, aim: V3, lo: number, hi: number): V3 {
+  const dx = aim[0] - eye[0], dy = aim[1] - eye[1], dz = aim[2] - eye[2], dh = Math.hypot(dx, dz), d = Math.hypot(dx, dy, dz);
+  const pitch = Math.atan2(dy, dh) / DEG, p = Math.max(lo, Math.min(hi, pitch));
+  if (p === pitch) return aim;
+  const c = Math.cos(p * DEG), yaw = Math.atan2(dx, dz);
+  return [eye[0] + Math.sin(yaw) * c * d, eye[1] + Math.sin(p * DEG) * d, eye[2] + Math.cos(yaw) * c * d];
+}
+export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldIndex, want: any = 'auto', lim: { near?: [number, number]; maxPath?: number; openTo?: V3; relax?: boolean } = {}): Establish {
   // (a dollhouse needs height, and height is path: under ~9 m of establishing move it is not offered)
   const e = world.entry!;
   const n: [number, number] = e.out, l: [number, number] = [n[1], -n[0]];   // l: the house's right as the street sees it
@@ -143,32 +160,44 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   // (the favourite style's nudge is for a pose that fits: one that crops the roof off earns none of it)
   const favNudge = (c: Establish) => 2.0 * clamp(1 - c.fit / 0.55, 0, 1);
   const cands: Establish[] = [];
+  // pass 1 (`strict`): a pose that shows the whole house — the nearest distance at which it fits with 8 % margins, if the move from
+  // there to the approach start is within `lim.maxPath`; pass 2 (only when no pose of pass 1 exists): the nearest fit pulled in as
+  // far as the time allows, cropped
+  let strictPass = !lim.relax;   // (`relax`: the poses that crop the house, when none of the whole-house poses has a move the garden lets through)
   const tryPose = (style: any, bearing: number, height: number, fov: number, roofOff: boolean, aimAt: V3 = aim, distHint = 0) => {
     const b = bearing * DEG, dir: [number, number] = [n[0] * Math.cos(b) + l[0] * Math.sin(b), n[1] * Math.cos(b) + l[1] * Math.sin(b)];
-    // the nearest distance at which the house fits with 8 % margins, up to 12 m out: the establishing move has ~2 s to
-    // reach the door, so a big house is cropped rather than flown at from across the street
     let dist = distHint || 0;
     const eyeAt = (d: number): V3 => [aimAt[0] + dir[0] * d, height, aimAt[2] + dir[1] * d];
+    // (the look's pitch is held to the establishing range: a pose that would have to tilt up at the house is judged as it will be flown)
+    // (and with steps to climb the look opens 80 % of the way to their top: the yaw limit of the establishing beat could not turn it further in
+    // the time the move has — the pose is judged looking there)
+    const aimFlown: V3 = lim.openTo ? [aimAt[0] + (lim.openTo[0] - aimAt[0]) * 0.8, aimAt[1] + (lim.openTo[1] - aimAt[1]) * 0.8, aimAt[2] + (lim.openTo[2] - aimAt[2]) * 0.8] : aimAt;
+    const held = (q: V3) => pitchHeld(q, aimFlown, roofOff ? -40 : EST_PITCH[0], EST_PITCH[1]);
     // the establishing move's length to the approach start (lim.near, at 1.8 m): what the outside's time allows
     const pathLen = (d: number) => { const q = eyeAt(d); return lim.near ? 1.12 * Math.hypot(q[0] - lim.near[0], q[1] - 1.8, q[2] - lim.near[1]) : 0; };
+    // (measured from the aim, in plan: an eye nearer the aim than the approach start moves away from what it looks at)
+    const axial = (d: number) => { const q = eyeAt(d); return Math.hypot(q[0] - aimAt[0], q[2] - aimAt[2]); };
+    const minAxial = lim.near ? Math.hypot(lim.near[0] - aimAt[0], lim.near[1] - aimAt[2]) + 1.5 : -Infinity;
     if (!distHint) {
-      // the nearest distance at which the house fits with 8 % margins (heroCameraPose's fit), pulled in as far as the
-      // time allows: a big house is cropped rather than flown at from across the street
-      for (dist = 5; dist < 16; dist += 0.5) if (frameFit(eyeAt(dist), aimAt, fov, hc, 0.08).ok) break;
-      // never nearer the house than the approach start (the establishing move comes in toward the door; one that starts
-      // between the house and the approach flies backwards)
-      // (measured from the aim, in plan: an eye nearer the aim than the approach start moves away from what it looks at)
-      const axial = (d: number) => { const q = eyeAt(d); return Math.hypot(q[0] - aimAt[0], q[2] - aimAt[2]); };
-      const minAxial = lim.near ? Math.hypot(lim.near[0] - aimAt[0], lim.near[1] - aimAt[2]) + 1.5 : -Infinity;
-      if (lim.maxPath) { while (dist > 3 && pathLen(dist) > lim.maxPath && axial(dist - 0.25) >= minAxial) dist -= 0.25; if (pathLen(dist) > lim.maxPath + 3 && !forced) return; }
-      while (dist < 16 && axial(dist) < minAxial) dist += 0.25;
+      if (strictPass) {
+        let ok = false;
+        for (dist = 6; dist <= 30; dist += 0.5) {
+          if (lim.maxPath && pathLen(dist) > lim.maxPath) break;
+          if (axial(dist) >= minAxial && wholeFit(eyeAt(dist), held(eyeAt(dist)), fov, hc)) { ok = true; break; }
+        }
+        if (!ok) return;
+      } else {
+        for (dist = 5; dist < 16; dist += 0.5) if (frameFit(eyeAt(dist), held(eyeAt(dist)), fov, hc, 0.08).ok) break;
+        if (lim.maxPath) { while (dist > 3 && pathLen(dist) > lim.maxPath && axial(dist - 0.25) >= minAxial) dist -= 0.25; if (pathLen(dist) > lim.maxPath + 3 && !forced) return; }
+        while (dist < 16 && axial(dist) < minAxial) dist += 0.25;
+      }
     }
-    const fr = frameFit(eyeAt(dist), aimAt, fov, hc, 0.08), fit = fr.cost;
+    const fr = frameFit(eyeAt(dist), held(eyeAt(dist)), fov, hc, 0.08), fit = fr.cost;
     const eye: V3 = [aimAt[0] + dir[0] * dist, height, aimAt[2] + dir[1] * dist];
     if (!inLot(eye[0], eye[2])) return;
     // clear where it stands, and what it sees: sky 15–35 %, nothing standing in the near foreground
     if (index.pointHits(eye[0], eye[1], eye[2], k => (k === K.site || k === K.roof || k === K.wall) ? 0.4 : false).length) return;
-    const cam = camera(eye, aimAt, fov);
+    const cam = camera(eye, held(eye), fov);
     const comp = probe.composition(cam, !roofOff, 1.5);
     const occ = comp.rays.filter(r => r.k === K.site && r.t < 6).length / comp.rays.length;
     const skyScore = comp.sky >= 0.15 && comp.sky <= 0.35 ? 0 : -Math.min(1, Math.abs(comp.sky - 0.25) * 3);   // (and the house has to be in it: the score below)
@@ -180,13 +209,14 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
     const score = 1 + fitScore + 0.35 * skyScore - 1.5 * occ + 0.3 * rng();   // (a seeded whisker: poses that fit alike do not all fall on one bearing)
     cands.push({ style, eye, aim: aimAt, fov, bearing, score, fit, sky: comp.sky, occluded: occ, roofOff });
   };
-  // (the lens: 34° is the plan's exterior lens; a wider one — up to 46° — fits the house from nearer, which is what the time
-  // outside can afford: a wide house is whole in the frame rather than cropped at the door. A pose on a wider lens pays for it.)
+  // (the lens: §3.5's exterior lens is 32° (30–35), which fits a 20 m house from 24–38 m away — a move of 6–8 s. The frame
+  // holds the whole house at 46–49° from 10–17 m, 2.5–3.5 s of move, and the lens is already most of the way to the interior's 56°:
+  // QA's establishing range is 30–49°.)
   const styleOf = (s: string) => {
     if (s === 'axial') for (const fv of EST_LENSES) for (const h of [3.0, 4.0, 5.0]) tryPose('axial', 0, Math.max(h, top * 0.55), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]);
     if (s === 'corner-left' || s === 'corner-right') { const sg = s === 'corner-right' ? 1 : -1; for (const fv of EST_LENSES) for (const bb of [26, 34, 42]) for (const h of [3.6, 4.6, 5.8]) tryPose(s, sg * bb, Math.max(h, top * 0.65), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]); }
-    if (s === 'garden') for (const fv of [...EST_LENSES, 50]) for (const sg of [1, -1]) for (const bb of [18, 28]) for (const h of [2.2, 3.0]) tryPose('garden', sg * bb, h, fv + 1, false, [aim[0], Math.max(2.2, top * 0.5), aim[2]]);
-    if (s === 'dollhouse') for (const fv of [36, 42, 48]) for (const sg of [1, -1]) for (const h of [6, 7.5]) tryPose('dollhouse', sg * 30, Math.max(h, top + 2.2), fv, true, [cx * 0.5 + aim[0] * 0.5, 0.8, cz * 0.5 + aim[2] * 0.5]);
+    if (s === 'garden') for (const fv of EST_LENSES) for (const sg of [1, -1]) for (const bb of [18, 28]) for (const h of [3.0, 4.0, 5.0]) tryPose('garden', sg * bb, h, fv, false, [aim[0], Math.max(2.2, top * 0.5), aim[2]]);
+    if (s === 'dollhouse') for (const fv of [42, 46, 49]) for (const sg of [1, -1]) for (const h of [6, 7.5]) tryPose('dollhouse', sg * 30, Math.max(h, top + 2.2), fv, true, [cx * 0.5 + aim[0] * 0.5, 0.8, cz * 0.5 + aim[2] * 0.5]);
   };
   if (want && typeof want === 'object') {
     tryPose('custom', want.bearing ?? 30, want.height ?? 6, 34, false, aim, want.dist || 0);
@@ -194,6 +224,7 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   }
   const styles = typeof want === 'string' && (ESTABLISH_STYLES as readonly string[]).includes(want) ? [want] : [...ESTABLISH_STYLES];
   for (const s of styles) styleOf(s);
+  if (!cands.length) { strictPass = false; for (const s of styles) styleOf(s); }
   if (!cands.length) { styleOf('corner-right'); styleOf('corner-left'); }
   if (!cands.length) tryPose('axial', 0, 6, 34, false, aim, 12);
   // each style's best pose, then the styles against each other: the pose, the house's affinity, a seeded preference
@@ -213,6 +244,8 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   return { ...pick!, scores, alts: [pick!, ...alts.filter(c => c !== pick)] };
 }
 
+/** relative luminance of a 0xRRGGBB colour */
+export const lumOf = (c: number) => { const f = (v: number) => v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); return 0.2126 * f(((c >> 16) & 255) / 255) + 0.7152 * f(((c >> 8) & 255) / 255) + 0.0722 * f((c & 255) / 255); };
 // ---- the hero ring (§3.11) -------------------------------------------------------------------------------------
 export type RingPose = { eye: V3; az: number; r: number; h: number; fov: number; ndc: [number, number]; score: number; heightPct: number; chair: number; seen: number; monitorTop: boolean; blank: number; depth: number };
 /** The Core's projected height as a share of the frame height, from eye looking at target with vertical fov. */
@@ -247,6 +280,7 @@ export function heroRing(world: ShotWorld, probe: Probe, orbitProbe: ReturnType<
   for (let a = 15; a <= 65; a += 5) azs.push(a, -a);
   const rng = mulberry32(fnv1a(`${world.id}:hero-ring`));
   const out: RingPose[] = [];
+  const coreIdx = world.kinds.indexOf(K.core), coreColor = coreIdx >= 0 ? world.colors[coreIdx] : 0xe7e3dc;
   const view = opts.view;
   for (const az of view ? [view.azimuth] : azs) {
     if (opts.only && !opts.only(az)) continue;
@@ -273,7 +307,9 @@ export function heroRing(world: ShotWorld, probe: Probe, orbitProbe: ReturnType<
       // what stands behind the Core seen from here: a window, art, a bookcase, a fireplace, greenery or a screen make a
       // frame; a bare wall does not (plan §3.13: the background is not blank)
       const cls = probe.background(centre, eye), bgTerm = cls === 'wall' ? -0.4 : cls === 'other' ? 0 : cls === 'sky' ? -0.1 : 0.3;
-      const score = 1 - Math.abs(hp - 0.21) * 6 - Math.max(0, chair - 0.06) * 6 - (monitorTop ? 0 : 0.5) - Math.max(0, comp.blank - 0.35) * 2 + Math.min(depth, 6) * 0.06 + bgTerm - Math.abs(Math.abs(az) - 38) * 0.004 + rng() * 0.02;
+      // the Core's finish against what is behind it (QA's core-contrast: a luminance ratio of at least 1.25)
+      const bgc = probe.backgroundColor(centre, eye), cr = (Math.max(lumOf(coreColor), lumOf(bgc ?? 0xd8d8d8)) + 0.05) / (Math.min(lumOf(coreColor), lumOf(bgc ?? 0xd8d8d8)) + 0.05);
+      const score = 1 - 1.5 * Math.max(0, 1.3 - cr) - Math.abs(hp - 0.21) * 6 - Math.max(0, chair - 0.06) * 6 - (monitorTop ? 0 : 0.5) - Math.max(0, comp.blank - 0.35) * 2 + Math.min(depth, 6) * 0.06 + bgTerm - Math.abs(Math.abs(az) - 38) * 0.004 + rng() * 0.02;
       out.push({ eye, az, r, h: hh, fov, ndc, score, heightPct: hp, chair, seen, monitorTop, blank: comp.blank, depth });
     }
   }

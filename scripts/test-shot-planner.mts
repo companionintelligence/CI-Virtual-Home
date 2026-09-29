@@ -139,7 +139,7 @@ if (args['planner-only'] !== 'true' && (parityN > 0 || rows.length)) {
           const so = shotOptions(spec, type, 'v2'), nodeHash = type === 'door-to-core' ? r.hash : tourHash.get(`${r.id}/${type}`);
           const opt = type === 'door-to-core' ? so.options : { duration: so.options.duration, heroView: so.options.heroView, via: (so.shot && so.shot.via) || undefined };
           const got = await page.evaluate(async ({ world, options, type }: any) => {
-            const m = await import('/assets/shot-planner.js'), t = await import('/assets/shot-planner-tour.js');
+            const base = '/assets/', m = await import(base + 'shot-planner.js'), t = await import(base + 'shot-planner-tour.js');
             const p = type === 'door-to-core' ? m.planDoorToCore(world, options) : type === 'hero-reveal' ? t.planHeroReveal(world, options) : t.planWalkthrough(world, options);
             return p.ok ? m.trackHash(p.track) : 'FAIL';
           }, { world, options: opt, type });

@@ -20,6 +20,7 @@ const pct = (n: number, of: number) => `${n} of ${of}`;
 export function fleetChecks(rows: FleetRow[]): FleetCheck[] {
   const N = rows.length, out: FleetCheck[] = [];
   const M = (r: FleetRow, k: string) => r.metrics[k];
+  const LE = (r: FleetRow) => Math.max(M(r, 'lookErrorMedian') ?? 0, M(r, 'subjectErrorMedian') ?? 0);
   const list = (bad: FleetRow[], f: (r: FleetRow) => string) => bad.map(r => `${r.id} ${f(r)}`).join('; ');
   const add = (c: FleetCheck) => out.push(c);
 
@@ -30,9 +31,9 @@ export function fleetChecks(rows: FleetRow[]): FleetCheck[] {
   { const bad = rows.filter(r => !(M(r, 'doorSpeed') <= 0.9 + 1e-9));
     add({ id: 'door-speed', title: 'Speed across the entry door', target: '≤ 0.9 m/s', value: `max ${Math.max(...rows.map(r => M(r, 'doorSpeed') ?? 0)).toFixed(2)} m/s`, pass: !bad.length, detail: list(bad, r => `${M(r, 'doorSpeed')} m/s`) }); }
   { const bad = rows.filter(r => !(M(r, 'maxYawRate') <= 60 + 1e-9));
-    add({ id: 'yaw', title: 'Smoothed view rate (0.2 s)', target: '≤ 60°/s', value: `max ${Math.max(...rows.map(r => M(r, 'maxYawRate'))).toFixed(0)}°/s, median ${med(rows.map(r => M(r, 'maxYawRate'))).toFixed(0)}`, pass: !bad.length, detail: list(bad, r => `${M(r, 'maxYawRate')}°/s`) }); }
-  { const bad = rows.filter(r => !(M(r, 'lookErrorMedian') <= 10)), worse = rows.filter(r => !(M(r, 'lookErrorMedian') <= 15));
-    add({ id: 'look-error', title: 'Look error against the beat subject (median of the film)', target: '≤ 10° in ≥ 90 % of the houses, none over 15°', value: `worst house ${Math.max(...rows.map(r => M(r, 'lookErrorMedian'))).toFixed(1)}°, median ${med(rows.map(r => M(r, 'lookErrorMedian'))).toFixed(1)}°, ${pct(N - bad.length, N)} within 10°`, pass: !worse.length && bad.length <= Math.floor(0.1 * N), detail: list(bad, r => `${M(r, 'lookErrorMedian')}°`) }); }
+    add({ id: 'yaw', title: 'Smoothed view rate (0.1 s)', target: '≤ 60°/s', value: `max ${Math.max(...rows.map(r => M(r, 'maxYawRate'))).toFixed(0)}°/s, median ${med(rows.map(r => M(r, 'maxYawRate'))).toFixed(0)}`, pass: !bad.length, detail: list(bad, r => `${M(r, 'maxYawRate')}°/s`) }); }
+  { const bad = rows.filter(r => !(LE(r) <= 10)), worse = rows.filter(r => !(LE(r) <= 15));
+    add({ id: 'look-error', title: 'Look error (median of the film: against the wanted look, and against the door and the Core where a beat has them)', target: '≤ 10° in ≥ 90 % of the houses, none over 15°', value: `worst house ${Math.max(...rows.map(LE)).toFixed(1)}°, median ${med(rows.map(LE)).toFixed(1)}°, ${pct(N - bad.length, N)} within 10°`, pass: !worse.length && bad.length <= Math.floor(0.1 * N), detail: list(bad, r => `${LE(r)}°`) }); }
   { const bad = rows.filter(r => !(M(r, 'coreLOS') >= 1.5 && M(r, 'pressSpeed') <= 0.3));
     add({ id: 'press', title: 'The press', target: '≥ 1.5 s of the Core in sight before it, the camera ≤ 0.3 m/s', value: `${pct(N - bad.length, N)}; min LOS ${Math.min(...rows.map(r => M(r, 'coreLOS'))).toFixed(1)} s, max speed ${Math.max(...rows.map(r => M(r, 'pressSpeed'))).toFixed(2)} m/s`, pass: !bad.length, detail: list(bad, r => `LOS ${M(r, 'coreLOS')} s, ${M(r, 'pressSpeed')} m/s`) }); }
   { const ok = rows.filter(r => M(r, 'topRoomsSeen') >= 2);

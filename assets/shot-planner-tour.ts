@@ -66,7 +66,7 @@ function finishTrack(type: string, world: ShotWorld, probe: any, duration: numbe
   for (let i = 0; i < N; i++) { const l = Math.hypot(sx[i], sy[i], sz[i]) || 1; yaw[i] = Math.atan2(sx[i] / l, sz[i] / l); pitch[i] = Math.atan2(sy[i] / l, Math.hypot(sx[i], sz[i]) / l); if (i) yaw[i] = yaw[i - 1] + wrapPi(yaw[i] - yaw[i - 1]); }
   const desired = new Float32Array(2 * N); for (let i = 0; i < N; i++) { desired[2 * i] = yaw[i]; desired[2 * i + 1] = pitch[i]; }
   const capY = new Float64Array(N), capP = new Float64Array(N);
-  for (let i = 0; i < N; i++) { const b = BEATS[beatOf[i]]; capY[i] = YAW_CAP[b] * DEG * 0.9 * dt; capP[i] = (YAW_CAP[b] * 0.7 + 4) * DEG * dt; }
+  for (let i = 0; i < N; i++) { const b = BEATS[beatOf[i]]; capY[i] = YAW_CAP[b] * DEG * 0.9 * dt; capP[i] = (YAW_CAP[b] * 0.5 + 3) * DEG * dt; }
   const yl = hann(rateLimit(yaw, capY), Math.round(0.125 * FPS)), pl = hann(rateLimit(pitch, capP), Math.round(0.125 * FPS)), dl = hann(dist, Math.round(0.25 * FPS));
   const look = new Float32Array(3 * N), fov = new Float32Array(N), roofAlpha = new Float32Array(N), composeW = new Float32Array(N);
   for (let i = 0; i < N; i++) {
