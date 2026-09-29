@@ -18,7 +18,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Check, Issue } from './_types.mts';
-import { ITEM_PARAMS, ITEM_ENUMS, HERO_SURFACES, SURFACE_TYPES, HERO_SET } from '../../assets/item-map.js';
+import { ITEM_PARAM_GEN, ITEM_ENUMS, HERO_SURFACES, SURFACE_TYPES, HERO_SET } from '../../assets/item-map.js';
 import { TIME_OF_DAY, LIGHTING_ALIASES } from '../../assets/environment.js';
 import { KEEP_ROLES, LAMP_KINDS, heroRoom, presetAuthored } from '../../assets/kit-rules.js';
 import { fanEligible, roomKind } from '../../assets/fixtures.js';
@@ -114,7 +114,7 @@ const check: Check = (spec, ctx) => {
         const I = `${R} item ${it.type}`;
         // the hero desk set at hero.at is the hero block's, not built from the item (rooms-build.ts)
         if (heroHere && HERO_SET.has(it.type) && Array.isArray(it.at) && Math.hypot(it.at[0] - spec.hero.at[0], it.at[1] - spec.hero.at[1]) < 1.3) continue;
-        const page = ITEM_PARAMS[it.type], prop = ctx.props.get(it.type);
+        const page = ITEM_PARAM_GEN[it.type], prop = ctx.props.get(it.type);
         const honoured = page ? page : prop ? Object.fromEntries((prop.params || []).map(k => [k, 1])) : null;
         if (honoured) for (const k of Object.keys(it)) {
           if (COMMON.has(k)) continue;

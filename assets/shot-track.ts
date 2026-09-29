@@ -3,8 +3,10 @@
 //
 //   { version: 2, planner, duration, fps, samples, dt,
 //     s, pos, look, fov, roofAlpha,          // one entry (pos, look: three) per sample, sample i at i·dt seconds
+//     doors: { <door id>: Float32Array },     // a leaf's angle per sample (rad); v1 has none. Applied through
+//                                             // visibility.ts shotPose(), from anchors.doors' ids
 //     beats: [{ name, t0, t1, subject }],     // seconds
-//     events: { enterT, stairT: [], pressT, settleT },   // seconds (null where the shot has none)
+//     events: { enterT, stairT: [], pressT, settleT, doneT },   // seconds (null where the shot has none)
 //     metrics: { … } }
 //
 // Until S5's planner v2 lands, trackFromV1 samples a v1 shot exactly the way room-creator.html's applySplineFrame
@@ -36,8 +38,10 @@ export type ShotTrack = {
   look: Float32Array;
   fov: Float32Array;
   roofAlpha: Float32Array;
+  /** door id (anchors.doors) → the leaf's angle at each sample, radians; empty until S5 plans door openings */
+  doors: Record<string, Float32Array>;
   beats: Array<{ name: string; t0: number; t1: number; subject: [number, number, number] | null }>;
-  events: { enterT: number | null; stairT: number[]; pressT: number | null; settleT: number | null };
+  events: { enterT: number | null; stairT: number[]; pressT: number | null; settleT: number | null; doneT: number | null };
   metrics: Record<string, number | null>;
 };
 
@@ -54,10 +58,12 @@ export function shotEnterS(curve: { getPointAt: (s: number) => any } | null, hou
   if (curve && houseInside) for (let i = 0; i <= 240; i++) { const s = i / 240; if (houseInside(curve.getPointAt(s))) return s; }
   return Infinity;
 }
-/** The roofs' opacity on one frame of a shot. frame: { preset, s (the path's sample fraction), enter () → the
- *  enter fraction (asked only when the mode is 'auto': the page caches it on the preset) }. 'auto' fades over the
- *  5 % of the path before the eye goes under a ceiling, on a squared ease, and stays off. */
-export function shotRoofAlpha(frame: { preset: any; s: number; enter: () => number }): number {
+/** The roofs' opacity on one frame of a shot. frame: { preset, s (the path's sample fraction), t (0..1 through the
+ *  shot), seconds (the shot's clock), enter () → the enter fraction (asked only when the mode is 'auto': the page
+ *  caches it on the preset) }. 'auto' fades over the 5 % of the path before the eye goes under a ceiling, on a
+ *  squared ease, and stays off — v1 reads only `s`; planner v2's rule (fade from events.enterT over 0.35 s) reads
+ *  `seconds`, which is why the frame carries it. */
+export function shotRoofAlpha(frame: { preset: any; s: number; enter: () => number; t?: number; seconds?: number }): number {
   const roof = shotRoofMode(frame.preset && frame.preset.dressing);
   if (roof === 'off') return 0;
   if (roof !== 'auto') return 1;
@@ -105,8 +111,9 @@ export function trackFromV1(THREE, preset, { type = '', duration = 10, fps = 120
   return {
     version: 2, planner: 'v1', type, duration, fps, samples: n, dt,
     s: S, pos, look, fov, roofAlpha,
+    doors: {},
     beats: [],
-    events: { enterT: enterT === null ? null : r3(enterT), stairT: [], pressT: pw && pw.at >= 0 ? r3(pw.at * duration) : null, settleT: null },
+    events: { enterT: enterT === null ? null : r3(enterT), stairT: [], pressT: pw && pw.at >= 0 ? r3(pw.at * duration) : null, settleT: null, doneT: null },
     metrics: {
       length: r3(length), maxSpeed: r3(maxSpeed), firstSecondTravel: r3(firstSecond),
       maxYawRate: r3(maxYawRate), outsideShare: houseInside ? r3(outside / n) : null,

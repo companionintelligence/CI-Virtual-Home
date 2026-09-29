@@ -20,6 +20,7 @@ import { DEG, hex } from './build-context.js';
 import { PROPS } from './props/index.js';
 import { SURFACE_ALIASES, createItemMap } from './item-map.js';
 import { mulberry32, fnv1a } from './materials.js';
+import { heroFrame } from './hero-frame.js';
 
 // a Core's footprint half-extents (232 × 205 mm prone; 90 × 205 upright)
 const CORE_HALF = { prone: [0.116, 0.1025], upright: [0.045, 0.1025] };
@@ -52,11 +53,9 @@ export function createHeroBuild(bctx, { DESK_TOP }: any = {}) {
     // specs place their desks: `at` hugs a wall and rot names that wall). The asset library's
     // desk/monitor face -Z at rotation 0 with the chair north, so the assets turn 180° from the spec
     // heading; `fwd` — where the user sits and the camera approaches from — then points into the room.
-    const rot = ((spec.hero.rot || 0) + 180) * DEG;
-    const fwd = [-Math.sin(rot), -Math.cos(rot)];
-    const surfaceName = spec.hero.surface || 'desk';
-    const surface = surfaceName;   // (anchors keep the spec's word; SURFACE_ALIASES maps it to a type below)
-    const side = [fwd[1], -fwd[0]]; // to the right of the desk
+    // (hero-frame.ts: the same numbers, for what runs before the hero is built)
+    const { rot, fwd, side, surface } = heroFrame(spec.hero);   // side: to the right of the desk
+    const surfaceName = surface;   // (anchors keep the spec's word; SURFACE_ALIASES maps it to a type below)
     // hero.device: chalk | charcoal (the Companion Core, 232 × 205 × 90 mm) | strix (the AMD reference mini PC).
     // hero.pose: prone (default — as marketed and drawn in the campaign) | upright (stood on its side).
     const pose = spec.hero.pose === 'upright' ? 'upright' : 'prone';

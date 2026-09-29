@@ -3,6 +3,11 @@
 // the site kit (assets/site.ts) and records their resolved instances (anchors.siteInstances → <id>.plan.json).
 //
 // Seam module (plan S0): moved verbatim out of house-builder.ts. Owner: S4 (site).
+//
+// The validator lists the site types by calling createSiteBuild with a PROBE context (scripts/probe-context.mts: every
+// property of it is a callable stand-in), so the factory may build at factory scope, but nothing it needs at import
+// time may come from the real page; scripts/test-builder-seams.mts checks SITE_KIT_TYPES (site.ts) against the kit's
+// build() cases.
 import { perimeterEdges, outlineLoops, rectCentre } from './house-geometry.js';
 import { createSiteKit } from './site.js';
 import { buildWorld } from './world.js';

@@ -1,9 +1,19 @@
 // The item map — spec item `type` → the page's AssetFactory builder (plus DESK_TOP and the on-surface set the
 // rooms loop and the hero read). Registry props (assets/props/) are looked up after this map, by the rooms loop.
 //
-// Seam module (plan S0): moved verbatim out of house-builder.ts. Owner: S1 (kit). The page builders' honoured
-// parameters are published to the catalog from here (ITEM_PARAMS: S3's build-prop-catalog.mts reads it), and the
-// types a Core can stand on (SURFACE_TYPES: hero.surface, the validator's heroSurfaces).
+// Seam module (plan S0): moved out of house-builder.ts. Owner: S1 (kit).
+//
+// What the page builders honour is published from here, at module scope where Node can read it without building
+// anything: ITEM_PARAMS (the spec keys each builder reads: the same `params` a registry prop lists) and
+// SURFACE_ITEMS (the types that stand on a desk). assets/item-meta.ts turns them into the catalog's entry for a page
+// type, and scripts/build-prop-catalog.mts writes it — S3's placement metadata for page types sits beside it
+// (assets/props/page-place.ts). scripts/test-builder-seams.mts fails when a builder reads a key that is not listed
+// here, so a new parameter is published the day it is honoured. Also here: ITEM_PARAM_GEN (which keys need
+// defaults 2), ITEM_ENUMS and the types a Core can stand on (SURFACE_TYPES: hero.surface, the validator's heroSurfaces).
+//
+// The validator lists the item types by calling createItemMap with a PROBE context (scripts/probe-context.mts: every
+// property of it is a callable stand-in), so the factory may build anything at factory scope but must not depend on
+// what it returns.
 import { hex } from './build-context.js';
 
 // What each page builder honours, param → the defaults generation from which it does. 1: honoured whatever the spec
@@ -11,7 +21,7 @@ import { hex } from './build-context.js';
 // the whole item: the "white" sectional that rendered slate), which kit-build.ts themeItem now paints on the part
 // the builder marks (material.userData.colorParam) while the item's other roles take the house's theme. Every item
 // also takes `type`, `at`, `rot` and `y`. scripts/validate/kit.mts warns on anything else (a silent parameter).
-export const ITEM_PARAMS: Record<string, Record<string, 1 | 2>> = {
+export const ITEM_PARAM_GEN: Record<string, Record<string, 1 | 2>> = {
   'sectional': { w: 1, handed: 1, color: 2 },
   'club-chair': { color: 1 },
   'coffee-table': { w: 1, d: 1, color: 2 },
@@ -40,6 +50,12 @@ export const ITEM_PARAMS: Record<string, Record<string, 1 | 2>> = {
   'low-wall': { w: 1, h: 1, color: 2 },
   'column': { h: 1, r: 1, size: 1, style: 1, color: 1 },
 };
+/** The spec keys each page builder honours (`at`, `rot` and `y` are the rooms loop's, for every type): what the catalog
+ *  publishes as the type's `params` (assets/item-meta.ts), one entry per ITEMS type, `[]` when it takes none. */
+export const ITEM_PARAMS: Readonly<Record<string, readonly string[]>> = Object.fromEntries(Object.entries(ITEM_PARAM_GEN).map(([t, ps]) => [t, Object.keys(ps)]));
+/** The types that stand ON a desk, credenza or island: they sit at DESK_TOP unless given a `y` (the catalog's `surface`
+ *  for a page type; ON_SURFACE below is this as a Set) */
+export const SURFACE_ITEMS: readonly string[] = ['curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers'];
 /** the style / enum values a page builder takes (scripts/validate/kit.mts: unknown style values) */
 export const ITEM_ENUMS: Record<string, Record<string, readonly (string | number)[]>> = {
   'fireplace': { style: ['modern', 'mantel', 'stone', 'painted-brick', 'tv-breast'] },
@@ -129,7 +145,7 @@ export function createItemMap(bctx) {
     })
   };
   const DESK_TOP = 0.77; // items that sit on a desk / credenza
-  const ON_SURFACE = new Set(['curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
+  const ON_SURFACE = new Set(SURFACE_ITEMS);
 
   return { ITEMS, DESK_TOP, ON_SURFACE };
 }

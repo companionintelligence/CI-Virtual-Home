@@ -8,13 +8,15 @@
 //   kitAnchors(kit, spec)                    house-builder.ts   anchors.kit → <id>.plan.json's `kit`
 //   openingParams(op, height, isEntry, ctx)  structure-build.ts one opening → createParametricWall's opening
 //   noteOpening(ctx)                         structure-build.ts every opening as its wall places it (anchors.openings)
+//   notePartition(ctx)                       structure-build.ts every partition as it is placed (its door leaf …)
+//   finishBuild(ctx)                         house-builder.ts   once, when everything is built, before the light:
+//                                                               anchors.doors
 //   wallCladding(kit, ctx)                   structure-build.ts a perimeter wall's exterior material
 //   partitionParams(p, ctx)                  structure-build.ts a partition's colours and its door unit
 //   ceilingMaterial(ctx)                     structure-build.ts an upper slab's underside, a top storey's ceiling
 //   themeItem(kit, o, it)                    rooms-build.ts     a room item takes the house's role colours
 //   lightHouse({ spec, anchors })            house-builder.ts   the preset and the sun's aim (the page's
 //                                                               setLightingPreset: environment.ts createLighting);
-//                                                               and, the build being done, anchors.doors
 // Every ctx carries `spec`, and `defaults` (specDefaults(spec)): a look-changing default applies only under 2.
 // The rules themselves (restraint, keep, door colours, the sun, fans and lamps) are kit-rules.ts's, pure and shared
 // with the validator, the fleet audit and scripts/test-kit.mts.
@@ -83,9 +85,11 @@ export function createKitBuild(bctx) {
     if (d2) extra.park = 'flat';
     return { type: 'door', width: op.w, height: op.h || 2.1, style: op.style || 'entry', open: isEntry || op.open === true, entry: !!isEntry, leafColor: leafC ? hex(leafC) : undefined, ...extra };
   }
-  // ctx: { spec, defaults, lv, anchors, op, param, side, y, isEntry } — called once per opening a perimeter wall
-  // places, after its wall is built: anchors.openings[] = { level, side, centre: [x, y, z], normal: [x, z], w, h, sill,
-  // type, entry } in world metres, for S2's facade dressing and S5's door funnels.
+  // ctx: { spec, defaults, lv, anchors, op, param, side, y, isEntry, wall, edge, centre, rotY } — called once per
+  // opening a perimeter wall places, after its wall is built, placed and turned (`wall` the placed object, `edge` the
+  // perimeter edge, `centre` its plan centre, `rotY` its rotation.y): anchors.openings[] = { level, side, centre:
+  // [x, y, z], normal: [x, z], w, h, sill, type, entry } in world metres, for S2's facade dressing and S5's door
+  // funnels. The leaves themselves are read off the finished scene by finishBuild.
   function noteOpening(ctx) {
     const { lv, anchors, op, param, side, y, isEntry } = ctx;
     if (!anchors || !op || !op.edge) return;
@@ -100,6 +104,13 @@ export function createKitBuild(bctx) {
   }
   // ctx: { spec, defaults, lv, edge } — the exterior material of one perimeter wall: the storey's own cladding
   // (levels[].material; under defaults 2 also levels[].wallColor), else the house's
+  // ctx: { spec, defaults, lv, anchors, p, wall, y, centre, len, alongX, doorOffset } — called once per partition, after
+  // its wall is placed and turned. Its leaf carries userData.door like a perimeter one, and finishBuild collects it
+  // with the rest, so there is nothing to record here.
+  function notePartition(ctx) {}
+  // ctx: { spec, defaults, anchors, kit, placed } — called once, after every level, the hero, the roofs and the site
+  // are built and before the light: anchors.doors, from the leaves' own userData.door.
+  function finishBuild(ctx) { collectDoors(ctx.anchors, ctx.placed); }
   function wallCladding(kit, ctx?) {
     const own = ctx && ctx.spec ? levelWall(ctx.spec, ctx.lv, current && current.spec === ctx.spec ? current.palette : undefined) : null;
     return own ? kit.cladding(own) : kit.cladding();
@@ -164,15 +175,14 @@ export function createKitBuild(bctx) {
       swing: d2 ? L.swing : null, bearing: L.sunBearing, look: L.look,
     });
     anchors.lighting = { preset: L.preset, sunBearing: L.sunBearing, swing: d2 ? L.swing : null, look: L.look };
-    collectDoors(anchors);
   }
 
   // ---- anchors.doors: every hinged leaf the build hung (the page tags each pivot userData.door), in world terms,
   // for S5 to open doors and add them to its nav, and for the scene QA's leaf-in-lane. { id, level, kind:
   // 'entry' | 'exterior' | 'interior', leaf, hinge: [x, z], y0, h, w, closedYaw, openYaw, swing, open } — yaw is the
   // world heading of the leaf's free edge from its hinge (0 = +z). Non-enumerable `pivot` is the object itself.
-  function collectDoors(anchors) {
-    const placed = anchors.placed || [], doors = [], P = new THREE.Vector3(), Q = new THREE.Vector3(), mm = v => Math.round(v * 1000) / 1000;
+  function collectDoors(anchors, placed) {
+    const doors = [], P = new THREE.Vector3(), Q = new THREE.Vector3(), mm = v => Math.round(v * 1000) / 1000;
     const levelAt = y => { let best = null; for (const [id, l] of Object.entries(anchors.levels || {}) as any) if (y > (l as any).y - 0.3 && (!best || (l as any).y > anchors.levels[best].y)) best = id; return best; };
     for (const w of placed) {
       if (!w.userData || !w.userData.isWall) continue;
@@ -199,7 +209,7 @@ export function createKitBuild(bctx) {
     anchors.doors = doors;
   }
 
-  return { housePalette, houseKit, kitAnchors, openingParams, noteOpening, wallCladding, partitionParams, ceilingMaterial, themeItem, lightHouse, specDefaults };
+  return { housePalette, houseKit, kitAnchors, openingParams, noteOpening, notePartition, finishBuild, wallCladding, partitionParams, ceilingMaterial, themeItem, lightHouse, specDefaults };
 
   // Indirect light without hue (the ceiling fix above): three's physical lighting gathers the ambient, hemisphere
   // and light-probe irradiance in `irradiance` and the environment's in `iblIrradiance` / `radiance`; each is
