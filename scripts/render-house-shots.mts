@@ -4,7 +4,7 @@
 //   pnpm run shots [--house <id>[,<id>…]] [--shot door-to-core,orbit,core-orbit,…]
 //        [--res 1080] [--aspect 16:9] [--fps 60] [--out video/houses] [--jobs 1]
 //   (node --experimental-strip-types scripts/render-house-shots.mts — any cwd; --out is relative to the cwd)
-//        [--poster-only] [--skip-existing] [--qa-only] [--no-gate] [--software]
+//        [--poster-only] [--skip-existing] [--qa-only] [--no-gate] [--software] [--planner v2]
 //
 // For every house × shot it opens room-creator.html?house=<id>&shot=<type> in headless Chromium (Playwright)
 // and drives the page's own scene:
@@ -45,6 +45,8 @@ const RES = args.res || '1080';
 const ASPECT = args.aspect || '16:9';
 const FPS = parseInt(args.fps || '60', 10);
 const JOBS = Math.max(1, parseInt(args.jobs || '1', 10));
+// --planner v2 plans every house's door-to-core / hero-reveal / walkthrough on spline planner v2 (S5); v1 otherwise (a spec's shots[].planner wins)
+const PLANNER = args.planner && args.planner !== 'true' ? `&planner=${encodeURIComponent(args.planner)}` : '';
 const SHOTS = (args.shot || 'door-to-core,orbit,core-orbit').split(',').map(s => s.trim()).filter(Boolean);
 const index = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/houses/index.json'), 'utf8'));
 const HOUSES = args.house ? args.house.split(',') : index.houses.map(h => h.id);
@@ -115,7 +117,7 @@ const have = f => fs.existsSync(f) && fs.statSync(f).size > 0;
 
 async function openHouse(page, id, shot) {
   // domcontentloaded, not load: room-creator links Google Fonts, and `load` would block on that fetch.
-  await page.goto(`http://localhost:${port}/room-creator.html?house=${id}&shot=${shot}&res=${RES}&aspect=${ASPECT}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto(`http://localhost:${port}/room-creator.html?house=${id}&shot=${shot}&res=${RES}&aspect=${ASPECT}${PLANNER}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.waitForFunction(h => document.documentElement.dataset.houseReady === h, id, { timeout: 60000 });
   // SMAAPass decodes its area/search lookups asynchronously, so the first frame through a fresh composer is
   // measurably wrong (~220 px, max channel delta 246 at 640×360 — see room-creator.html's own comment on

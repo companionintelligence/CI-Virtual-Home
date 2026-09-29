@@ -1,0 +1,32 @@
+{
+ "hash": "8f52563d:2341:19.5",
+ "duration": 19.5,
+ "beats": {
+  "establish": 2.82,
+  "approach": 1.94,
+  "threshold": 1.31,
+  "reveal": 1.32,
+  "route": 1.36,
+  "roomReveal": 1.38,
+  "hero": 1.58,
+  "orbit": 5.58,
+  "power": 2.19
+ },
+ "metrics": {
+  "outsideShare": 0.276,
+  "doorSpeed": 0.85,
+  "maxYawRate": 46.7,
+  "lookErrorMedian": 0,
+  "coreLOS": 9.7,
+  "finalCoreHeight": 0.217,
+  "finalCoreNDC": [
+   -0.151,
+   -0.341
+  ],
+  "orbitArc": 106,
+  "topRoomsSeen": 2,
+  "errors": 0,
+  "warnings": 4
+ },
+ "establish": "garden"
+}

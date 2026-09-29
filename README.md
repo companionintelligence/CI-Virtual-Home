@@ -35,7 +35,7 @@ pnpm run serve                     # http://localhost:8080/room-creator.html?hou
 
 `room-creator.html` is plain ES modules with an importmap — no bundler — so any static server over the repo
 root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `shot=door-to-core|orbit|hero-reveal|walkthrough|core-orbit`,
-`flythrough=1`, `lighting=day|golden|dusk|night`, `res`, `aspect`. Its "Hub" link opens the portal's gallery,
+`flythrough=1`, `lighting=day|golden|dusk|night`, `res`, `aspect`, `planner=v2` (the spline planner v2 for every door-to-core, hero-reveal and walkthrough; v1 otherwise). Its "Hub" link opens the portal's gallery,
 `./index.html`; `mode=view` turns the page into the portal's player (see [The web portal](#the-web-portal)).
 
 ## Commands
@@ -54,6 +54,9 @@ root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `
 | `pnpm run test:twins` | The Python twins (`generate_floor_plans.py`, `generate_house_iso.py`) on the 30 houses and every fixture: they must run, reproduce the committed sheets, isometrics and Lotties byte for byte on the 30, and draw what S2's fixtures show (porches, bays, L/U stairs, floor patterns …) from `<id>.plan.json`'s `arch` key. `check` runs it; ~2 min, needs a GPU for the fixtures' plans. |
 | `pnpm run fixtures` | Validate, QA and render the fixture houses in `test/fixtures/houses/` to stills (`test/fixtures/out/`, to look at) and compare their frame hashes (`--fixture`, `--update` to bless your own fixture, `--record <stream>` for another's frame your branch moves). |
 | `pnpm run perf` | Build, track and shot-QA timings against their budgets (3 s / 1 s / 0.5 s), report-only, with each number's Δ against the committed `test/perf/baseline.json` (`--house`, `--all`, `--baseline` to rewrite it at integration). |
+| `pnpm run shot-planner` | Spline planner v2 on all 30 houses (`assets/shot-planner.ts`): planned twice byte-identical, QA v2, the fleet camera targets, the page's track hash equal to Node's (`--parity`), the planning and QA budgets. Worlds come from `test/qa/shot-worlds/` (built in the page once, `--rebuild-worlds` / `--stale-ok`); `--update` records `test/shots/<id>.track.json`. |
+| `pnpm run shot-qa` | A fault injected for every QA v2 code, and for every fleet check, on two frozen worlds (`test/shots/worlds/`): each must be caught. No browser. |
+| `pnpm run camera-audit` | A contact strip per house and planner (twelve frames, the plan with the path by beat), the camera metrics of v1 and v2 side by side → `test/qa/camera-audit/index.html` (`--house`, `--planner v1,v2`, `--fixtures`). |
 | `pnpm run fleet-audit` | The fleet sameness metrics (door colours, claddings, lighting, furniture repetition, planting …) → `test/qa/fleet-audit.md`, beside the committed baseline `test/fleet/baseline.json`. `--built` measures what this tree's builders generate (plans rebuilt into `test/qa/plans/`); `--baseline` rewrites the baseline (integration only). |
 | `pnpm run plans` | Rebuild `content/houses/<id>.plan.json` — the seeded site instances the isometric twin draws. |
 | `pnpm run iso` | Rebuild the isometric SVGs, Lotties and `scenes/manifest.json` (`--only <id>`, `--png`). |
@@ -82,7 +85,7 @@ portal/                    the portal's styles and script, thumbs/<id>.webp and 
 floorplan-graph-demo.html  the Phase 2 floor-plan graph beside its compiled walls
 assets/                    the three.js engine, in TypeScript. house-builder.ts is the orchestrator; each part is a
                            module one stream owns: item-map + hero-build (kit), structure-build (architecture),
-                           rooms-build (compose), site-build (site), shot-planner-v1 + shot-track (shot),
+                           rooms-build (compose), site-build (site), shot-planner-v1 + shot-track + shot-planner (v2) + shot-qa + shot-world/nav/probe/doors (shot),
                            visibility (the page's wall modes and roof fade) and viewer (the portal's player) (ui),
                            kit-build (the kit's spec → parameters, the palette and the light). Beside them house-geometry,
                            wall-compiler, floorplan-graph, roofs, fixtures, site, world, materials, textures,

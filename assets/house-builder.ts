@@ -37,7 +37,12 @@
 //                   site-species.ts (the plants' drawing), site-species-masks.ts (generated: what each species hides, and costs), site-structures.ts (stairs, rails, fences, walls),
 //                   world.ts, props/outdoor.ts; the page's pool / fence / garden / cabana builders
 //   S5 shot         shot-planner-v1.ts (shotsFor, routeOn, blockedTest, clearPoint), core-orbit.ts, shot-path.ts,
-//                   shot-track.ts (the baked track and the roof-fade rule)
+//                   shot-track.ts (the baked track and the roof-fade rule); planner v2 (behind ?planner=v2 /
+//                   shots[].planner): shot-world.ts (the world it plans on), shot-probe.ts, shot-nav.ts,
+//                   framing.ts (the establishing pose, the hero ring), shot-planner.ts and shot-planner-tour.ts
+//                   (the baked track: door-to-core, hero-reveal, walkthrough), shot-doors.ts (leaves opened ahead of
+//                   the eye), shot-qa.ts and shot-fleet.ts (QA v2 and the fleet's camera checks), detmath.ts (the
+//                   planner's Math, the same last bit in Node and in the browser)
 //   S6 ui           visibility.ts (wall modes, the shot's cutaway, shotHidden / shotPose), viewer.ts, home-names.ts,
 //                   the page's editor UI and overlays
 // Every stream also owns its spec fragment (spec/<stream>.ts), validator plugin (scripts/validate/<stream>.mts),

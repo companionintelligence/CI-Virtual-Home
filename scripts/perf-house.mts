@@ -3,7 +3,9 @@
 // failure — the numbers are for each stream's PR to quote against main's, not a gate.
 //
 //   node --experimental-strip-types scripts/perf-house.mts [--house aurora,mirage,vanilla | --all] [--runs 1]
-//        [--shot door-to-core,orbit,hero-reveal,core-orbit] [--out test/qa/perf.json] [--baseline]
+//        [--shot door-to-core,orbit,hero-reveal,core-orbit] [--out test/qa/perf.json] [--baseline] [--planner v2]
+//   --planner v2 plans door-to-core, hero-reveal and walkthrough on spline planner v2 (S5): the planning is inside `build` (shotsFor),
+//   its QA is `shotQA`; the budgets are the same. Never combine with --baseline (the baseline is the v1 fleet).
 //
 // Budgets, per house, on this machine:
 //   build   ≤ 3 s     houseBuilder.build(spec) + shotsFor(spec, anchors): the main thread is blocked for all of it
@@ -32,8 +34,10 @@ const ALL = fs.readdirSync(HOUSES_DIR).filter(f => f.endsWith('.json') && f !== 
 const HOUSES = args.all === 'true' ? ALL : (args.house || 'aurora,mirage,vanilla').split(',').filter(Boolean);
 const SHOTS = (args.shot || 'door-to-core,orbit,hero-reveal,core-orbit').split(',').filter(Boolean);
 const RUNS = Math.max(1, parseInt(args.runs || '1', 10));
+const PLANNER = args.planner && args.planner !== 'true' ? `&planner=${encodeURIComponent(args.planner)}` : '';
+if (PLANNER && args.baseline === 'true') { console.error('--baseline records the v1 fleet: drop --planner'); process.exit(2); }
 const OUT = args.out ? path.resolve(args.out) : path.join(ROOT, 'test', 'qa', 'perf.json');
-export const BUDGET = { buildMs: 3000, trackMs: 1000, shotQAMs: 500 };
+export const BUDGET = { buildMs: 3000, trackMs: 1000, shotQAMs: 500, shotsForMs: 1500 };   // (shotsForMs: under --planner v2, the planning of the three films inside `build` — reported apart, because `track` below only reads what it made)
 
 async function loadPlaywright() {
   try { return await import('playwright'); } catch {}
@@ -85,7 +89,7 @@ for (const house of HOUSES) {
     await page.addInitScript(INIT);
     const t0 = Date.now();
     try {
-      await page.goto(`http://localhost:${port}/room-creator.html?house=${house}`, { waitUntil: 'domcontentloaded', timeout: 180000 });
+      await page.goto(`http://localhost:${port}/room-creator.html?house=${house}${PLANNER}`, { waitUntil: 'domcontentloaded', timeout: 180000 });
       await page.waitForFunction(h => document.documentElement.dataset.houseReady === h, house, { timeout: 180000 });
       const loadMs = Date.now() - t0;
       const m = await page.evaluate(shots => {
@@ -124,12 +128,14 @@ const f0 = (v: number | null) => (v === null || v === undefined ? '—' : `${Mat
 const delta = (v: number | null, p: number | null) => (v === null || p === null || p === undefined ? '' : ` (${v - p >= 0 ? '+' : ''}${Math.round(v - p)})`);
 const warnings = [];
 console.log(`perf — ${HOUSES.length} house(s) × ${RUNS} run(s), fastest shown, ms; load average ${load.join(' ')} on ${os.cpus().length} cores`);
-console.log(`budgets: build ≤ ${BUDGET.buildMs}, track ≤ ${BUDGET.trackMs} a shot, shot QA ≤ ${BUDGET.shotQAMs} a shot${prev ? `; (Δ) against ${prevName} of ${prev.when}` : ''}`);
+console.log(`budgets: build ≤ ${BUDGET.buildMs}, track ≤ ${BUDGET.trackMs} a shot, shot QA ≤ ${BUDGET.shotQAMs} a shot${PLANNER ? `, planning the three v2 films (the shots part of build) ≤ ${BUDGET.shotsForMs}` : ''}${prev ? `; (Δ) against ${prevName} of ${prev.when}` : ''}`);
+if (PLANNER) console.log('(under --planner v2 the planner runs inside build, in shotsFor: `track` reads the film it made, so the cost of a film is the shots figure; a loaded machine inflates both)');
 for (const r of results) {
   if (r.error) { console.log(`  ${r.house.padEnd(18)} ERROR ${r.error}`); warnings.push(`${r.house}: ${r.error}`); continue; }
   const p = prevOf(r.house);
   const parts = [`load ${f0(r.loadMs)}${delta(r.loadMs, p && p.loadMs)}`, `build ${f0(r.buildMs)}${delta(r.buildMs, p && p.buildMs)} (${f0(r.builderMs)} + shots ${f0(r.shotsForMs)})`];
   if (r.buildMs > BUDGET.buildMs) warnings.push(`${r.house}: build ${Math.round(r.buildMs)} ms > ${BUDGET.buildMs}`);
+  if (PLANNER && r.shotsForMs > BUDGET.shotsForMs) warnings.push(`${r.house}: planning the films (shots in build) ${Math.round(r.shotsForMs)} ms > ${BUDGET.shotsForMs}`);
   for (const s of SHOTS) {
     parts.push(`${s} track ${f0(r.trackMs[s])}${delta(r.trackMs[s], p && p.trackMs && p.trackMs[s])} qa ${f0(r.shotQAMs[s])}${delta(r.shotQAMs[s], p && p.shotQAMs && p.shotQAMs[s])}`);
     if (r.trackMs[s] > BUDGET.trackMs) warnings.push(`${r.house}/${s}: track ${Math.round(r.trackMs[s])} ms > ${BUDGET.trackMs}`);
