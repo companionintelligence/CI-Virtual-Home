@@ -272,7 +272,8 @@ export function poisson(rng: () => number, box: { x0: number; z0: number; x1: nu
 }
 
 // ---- metrics --------------------------------------------------------------------------------------------------
-/** of a set of segments, the length within `tol` degrees of the x or z axis, and the total */
+/** of a set of segments, the length within `tol` degrees of the x or z axis, and the total — segment by segment, so a
+ *  curve resampled every 0.25 m reads a wobble of a centimetre as "not axis-aligned"; `axisAlignedRuns` is the honest one */
 export function axisAligned(segs: Array<[P2, P2]>, tol = 1) {
   let axis = 0, total = 0;
   for (const [p, q] of segs) {
@@ -281,6 +282,43 @@ export function axisAligned(segs: Array<[P2, P2]>, tol = 1) {
     const deg = Math.atan2(Math.abs(dz), Math.abs(dx)) * 180 / Math.PI;
     total += len; if (deg < tol || deg > 90 - tol) axis += len;
   }
+  return { axis, total };
+}
+/**
+ * The length of a polyline that runs straight along an axis, judged as an eye judges it: over CHORDS of `chord` metres
+ * (1.5), not over the 0.25 m samples a curve is resampled to. A bed edge that wobbles by a centimetre between samples
+ * is straight to the eye and "not axis-aligned" segment by segment; a chord within `tol` degrees (3) of the x or z axis
+ * is an axis-aligned length whatever its samples do — if it is also straight (a chord under 99 % of the arc it spans has more
+ * than about 9 cm of sag in 1.5 m: a curve, though its ends line up). `skip[i]` leaves segment i out (a bed's edge against the house is
+ * straight because the wall is); the polyline is judged in runs between skipped segments.
+ */
+export function axisAlignedRuns(pts: P2[], closed: boolean, skip: boolean[] | null = null, { chord = 1.5, tol = 3 } = {}) {
+  const n = pts.length, m = closed ? n : n - 1;
+  let axis = 0, total = 0;
+  const judge = (run: P2[]) => {
+    if (run.length < 2) return;
+    const L = lengthOf(run); if (L < 1e-6) return;
+    const k = Math.max(1, Math.round(L / chord)), at = (t: number): P2 => {
+      let acc = 0;
+      for (let i = 0; i + 1 < run.length; i++) { const d = dist(run[i], run[i + 1]); if (acc + d >= t - 1e-9 || i + 2 === run.length) { const u = d ? clamp((t - acc) / d) : 0; return [lerp(run[i][0], run[i + 1][0], u), lerp(run[i][1], run[i + 1][1], u)]; } acc += d; }
+      return run[run.length - 1];
+    };
+    for (let c = 0; c < k; c++) {
+      const a = at(L * c / k), b = at(L * (c + 1) / k), dx = b[0] - a[0], dz = b[1] - a[1], len = Math.hypot(dx, dz), arc = L / k;
+      total += arc;
+      if (len < 1e-6) continue;
+      const deg = Math.atan2(Math.abs(dz), Math.abs(dx)) * 180 / Math.PI;
+      if ((deg < tol || deg > 90 - tol) && len > arc * 0.99) axis += arc;
+    }
+  };
+  let run: P2[] = [];
+  for (let i = 0; i < m; i++) {
+    const a = pts[i], b = pts[(i + 1) % n];
+    if (skip && skip[i]) { judge(run); run = []; continue; }
+    if (!run.length) run.push(a);
+    run.push(b);
+  }
+  judge(run);
   return { axis, total };
 }
 export const segmentsOf = (pts: P2[], closed: boolean): Array<[P2, P2]> => pts.map((p, i) => [p, pts[(i + 1) % pts.length]] as [P2, P2]).slice(0, closed ? pts.length : Math.max(0, pts.length - 1));

@@ -400,7 +400,9 @@ export function createSiteBuild(bctx) {
         if (s.type === 'planting' && o.userData.plan) for (const b of o.userData.plan.beds) edges.push({ site: si, type: 'planting', closed: true, pts: b.poly.map(p => [r3(p[0]), r3(p[1])]), wall: b.wall });
         if (s.type === 'planting') o.traverse(m => { if (m.isInstancedMesh && /^Plants/.test(m.name)) { /* tall plants in a bed: kind 'plant' */ const tmp = new THREE.Matrix4(), pos = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3(); for (let k = 0; k < m.count; k++) { m.getMatrixAt(k, tmp); tmp.decompose(pos, q, sc); if (sc.y > 1.1) solids.push({ kind: 'plant', x: r3(pos.x), z: r3(pos.z), r: r3(sc.x), yMin: r3(pos.y), yMax: r3(pos.y + sc.y) }); } } });
         if (s.type === 'bed') { const t = tensionOf(s.smooth), p0 = s.poly || [[s.at[0] - s.w / 2, s.at[1] - s.d / 2], [s.at[0] + s.w / 2, s.at[1] - s.d / 2], [s.at[0] + s.w / 2, s.at[1] + s.d / 2], [s.at[0] - s.w / 2, s.at[1] + s.d / 2]]; edges.push({ site: si, type: 'bed', closed: true, pts: (t === null ? p0 : ctx.terracePoly({ poly: p0, smooth: s.smooth })).map(p => [r3(p[0]), r3(p[1])]) }); }
-        if (s.type === 'path') edges.push({ site: si, type: 'path', closed: false, pts: ctx.pathLine(s).map(p => [r3(p[0]), r3(p[1])]) });
+        // (a `path` raised off the ground — a timber line on a facade, at its own `y` — is a trim, not a garden path: the
+        // fleet's axis-aligned metric leaves it out)
+        if (s.type === 'path' && !(s.y > 0.3)) edges.push({ site: si, type: 'path', closed: false, pts: ctx.pathLine(s).map(p => [r3(p[0]), r3(p[1])]) });
         localSolids(o, solids);
         return;
       }
