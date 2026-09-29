@@ -1,5 +1,5 @@
 #!/usr/bin/env -S node --experimental-strip-types
-// Assembles the web portal for GitHub Pages: exactly the files the site loads, nothing else.
+// Assembles the web portal for Cloudflare Pages: exactly the files the site loads, nothing else.
 //
 //   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/]
 //   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
@@ -18,11 +18,10 @@
 //                                    link's query. Its image is portal/previews/<id>.jpg (1200 × 630 JPEG: LinkedIn
 //                                    and some others read no WebP). og:image and og:url are absolute, as unfurlers
 //                                    want: the site's address is --site-url, else $SITE_URL, else the live site
-//                                    (https://homes.ci.computer/); the GitHub Pages workflow passes its own
+//                                    (https://homes.ci.computer/); deploy.yml passes the preview's own
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
-//   <out>/.nojekyll                  Pages serves the tree as it is
 //
 // Everything the site references is relative, so the same tree works at / and under /ci-virtual-home/. No
 // goldens, scripts, scenes, videos or TypeScript sources go out. The build refuses to run on stale or missing
@@ -66,7 +65,7 @@ const sources = walk('assets', f => f.endsWith('.ts') && !f.endsWith('.d.ts') &&
 const stale = sources.filter(ts => { const js = path.join(ROOT, ts.replace(/\.ts$/, '.js')); return !fs.existsSync(js) || fs.statSync(js).mtimeMs < fs.statSync(path.join(ROOT, ts)).mtimeMs; });
 if (stale.length) { console.error(`compiled assets are missing or older than their source (${stale.slice(0, 3).join(', ')}${stale.length > 3 ? ', …' : ''}): run pnpm run build first`); process.exit(2); }
 
-// 1. start from a clean copy of what this script owns
+// 1. start from a clean copy of what this script owns (.nojekyll: what it wrote for GitHub Pages, now retired)
 const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '.nojekyll'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
@@ -93,7 +92,6 @@ for (const h of index.houses || []) {
   if (!fs.existsSync(path.join(ROOT, 'portal', 'previews', `${h.id}.jpg`))) problems.push(`no link-preview image for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
 }
 if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
-fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 
 // 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes, distinct builders, floor
 // area rounded to 10 m²), or a visitor sees them change as the page hydrates and a crawler keeps the wrong ones
@@ -231,7 +229,7 @@ for (const p of ['index.html', 'room-creator.html', ...walk('portal', f => /\.(c
 if (problems.length) { console.error(problems.map(p => `  ✗ ${p}`).join('\n')); process.exit(1); }
 console.log(`portal: ${files} files, ${(bytes / 1024 / 1024).toFixed(1)} MB → ${rel(OUT)}/`);
 
-// --serve: preview the tree the way Pages will serve it, under the repository's sub-path
+// --serve: preview the tree under a sub-path, which proves every URL in it is relative
 if (args.serve === 'true') {
   const srv = await serve(OUT, '/ci-virtual-home/', Number(args.port || 8081));
   console.log(`preview: ${srv.url()}  (Ctrl-C to stop)`);
