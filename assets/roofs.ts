@@ -881,32 +881,54 @@ export function buildRoofs(spec, deps) {
       const tr = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? span : 0.06, 0.05, ax === 0 ? 0.06 : span), frame);
       tr.position.copy(at((lo + hi) / 2, 0.025, WALL_HALF + 0.01)); add(tr, false);
     }
-    // a planted roof's extras: seeded tufts on the deck, and trailing growth over the eaves
+    // a planted roof's extras: seeded clumps and blooms on the deck, and trailing growth over the eaves. Instanced (a clump is a
+    // flattened low-poly blob in one of a few tones, a bloom a small sphere over it), so a whole roof is three draw calls.
     function plantedExtras() {
       const r = mulberry32(fnv1a(`${spec.id || 'house'}:planted:${(spec.roofs || []).indexOf(rf)}`));
-      const tuftMat = std(rf.planted === 'sedum' ? 0x7a6e46 : 0x6d8a4c, { roughness: 0.95 }), bloom = std(0xd9c46a, { roughness: 0.9 });
-      const n = Math.min(160, Math.round((o.x1 - o.x0) * (o.z1 - o.z0) * (rf.planted === 'meadow' ? 2.2 : 1.2)));
+      const meadow = rf.planted === 'meadow';
+      const blob = new THREE.IcosahedronGeometry(1, 0);
+      const leafMat = () => new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, flatShading: true });
+      const tint = (mesh, i, c) => mesh.setColorAt(i, new THREE.Color(c));
+      const M = new THREE.Object3D();
+      // clumps over the deck
+      const tones = meadow ? [0x5b7a41, 0x6d8a4c, 0x7f9a55, 0x4d6a38] : [0x767b4b, 0x878c58, 0x6b7244, 0x948b58];
+      const n = Math.min(360, Math.round((o.x1 - o.x0) * (o.z1 - o.z0) * (meadow ? 4 : 3)));
+      const clumps = new THREE.InstancedMesh(blob, leafMat(), n), bloomSpots = [];
       for (let i = 0; i < n; i++) {
-        const x = o.x0 + 0.25 + r() * (o.x1 - o.x0 - 0.5), z = o.z0 + 0.25 + r() * (o.z1 - o.z0 - 0.5), hh = rf.planted === 'meadow' ? 0.12 + r() * 0.2 : 0.05 + r() * 0.05;
-        const base = type === 'flat' ? 0.22 : under(x, z) + T;
-        const tuft = new THREE.Mesh(new THREE.ConeGeometry(0.06 + r() * 0.05, hh, 5), r() < 0.12 && rf.planted === 'meadow' ? bloom : tuftMat);
-        tuft.position.set(x, base + hh / 2 - 0.01, z); tuft.rotation.y = r() * Math.PI; add(tuft, false);
+        const x = o.x0 + 0.2 + r() * (o.x1 - o.x0 - 0.4), z = o.z0 + 0.2 + r() * (o.z1 - o.z0 - 0.4);
+        const sz = (meadow ? 0.08 + r() * 0.12 : 0.07 + r() * 0.08), base = type === 'flat' ? 0.22 : under(x, z) + T, sy = sz * (meadow ? 0.8 : 0.42);
+        M.position.set(x, base + sy * 0.6, z); M.scale.set(sz * (1 + r() * 0.5), sy, sz * (1 + r() * 0.5)); M.rotation.set(0, r() * Math.PI, 0); M.updateMatrix();
+        clumps.setMatrixAt(i, M.matrix); tint(clumps, i, tones[Math.floor(r() * tones.length)]);
+        if (r() < (meadow ? 0.34 : 0.1)) bloomSpots.push([x, base + sy * 1.5, z]);
       }
-      // trailing growth: short green curtains hanging off the drip edges
-      const vine = std(0x55713d, { roughness: 0.95, side: THREE.DoubleSide });
+      clumps.instanceMatrix.needsUpdate = true; if (clumps.instanceColor) clumps.instanceColor.needsUpdate = true;
+      add(clumps, false).name = 'Planting';
+      if (bloomSpots.length) {
+        const blooms = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), leafMat(), bloomSpots.length), cols = meadow ? [0xf2d45b, 0xffffff, 0xf3a6c0, 0xb59ae0] : [0xe0a1b5, 0xf0e2a0];
+        bloomSpots.forEach(([x, y, z], i) => { const bs = 0.03 + r() * 0.025; M.position.set(x, y, z); M.scale.set(bs, bs, bs); M.rotation.set(0, 0, 0); M.updateMatrix(); blooms.setMatrixAt(i, M.matrix); tint(blooms, i, cols[Math.floor(r() * cols.length)]); });
+        blooms.instanceMatrix.needsUpdate = true; if (blooms.instanceColor) blooms.instanceColor.needsUpdate = true;
+        add(blooms, false).name = 'Blooms';
+      }
+      // trailing growth: strands of leaf blobs hanging off the drip edges, uneven in length
+      const strands = [];
       for (const s of SIDES) {
         if (abut[s] || (type !== 'flat' && !faces.includes(s))) continue;
         const [nx, nz] = OUT[s], ax = along(s), e0 = edgeOf(o, s), lo = ax === 0 ? o.x0 : o.z0, hi = ax === 0 ? o.x1 : o.z1;
         const hEdge = type === 'flat' ? 0.1 : plane(s, ax === 0 ? (lo + hi) / 2 : e0, ax === 0 ? e0 : (lo + hi) / 2);
-        for (let k = 0; k < Math.round((hi - lo) / 0.25); k++) {
-          if (r() < 0.55) continue;
-          // a strand of trailing growth: a thin stem and a leafy tip, uneven lengths
-          const u = lo + 0.15 + r() * (hi - lo - 0.3), len = 0.15 + r() * 0.55;
-          const st = new THREE.Mesh(new THREE.BoxGeometry(0.03, len, 0.03), vine);
-          st.position.set(ax === 0 ? u : e0 + nx * 0.05, hEdge - len / 2 + 0.06, ax === 0 ? e0 + nz * 0.05 : u); st.rotation[ax === 0 ? 'z' : 'x'] = (r() - 0.5) * 0.25; add(st, false);
-          const tip = new THREE.Mesh(new THREE.SphereGeometry(0.05 + r() * 0.04, 6, 4), tuftMat);
-          tip.position.set(ax === 0 ? u : e0 + nx * 0.06, hEdge - len + 0.06, ax === 0 ? e0 + nz * 0.06 : u); add(tip, false);
+        for (let k = 0; k < Math.round((hi - lo) / 0.2); k++) {
+          if (r() < 0.45) continue;
+          const u = lo + 0.12 + r() * (hi - lo - 0.24), len = 0.18 + r() * 0.6, count = Math.max(2, Math.round(len / 0.1));
+          for (let j = 0; j < count; j++) {
+            const t = j / (count - 1), sw = (r() - 0.5) * 0.05, bs = 0.07 - t * 0.035 + r() * 0.015;
+            strands.push([ax === 0 ? u + sw : e0 + nx * (0.07 + r() * 0.03), hEdge + 0.05 - t * len, ax === 0 ? e0 + nz * (0.07 + r() * 0.03) : u + sw, bs, t]);
+          }
         }
+      }
+      if (strands.length) {
+        const vine = new THREE.InstancedMesh(blob, leafMat(), strands.length), vt = [0x4f6b3a, 0x5f7d43, 0x6d8a4c];
+        strands.forEach(([x, y, z, bs, t], i) => { M.position.set(x, y, z); M.scale.set(bs, bs * 1.2, bs); M.rotation.set(0, r() * Math.PI, 0); M.updateMatrix(); vine.setMatrixAt(i, M.matrix); tint(vine, i, vt[Math.floor(r() * vt.length)]); });
+        vine.instanceMatrix.needsUpdate = true; if (vine.instanceColor) vine.instanceColor.needsUpdate = true;
+        add(vine, false).name = 'Trailing growth';
       }
     }
     // metre UVs on a box by its face normals, so a tiling texture keeps its scale on any size of face

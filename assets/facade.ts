@@ -20,6 +20,7 @@ import { openingFrames, OUT, WALL_HALF, inR } from './arch-plan.js';
 import { mulberry32, fnv1a } from './materials.js';
 
 const SIDE_ROT = { S: 0, N: Math.PI, E: Math.PI / 2, W: -Math.PI / 2 };
+const SIDE_ORI = { S: 'south', N: 'north', E: 'east', W: 'west' };
 const hexOf = (c: any, d: number) => (c === undefined || c === null ? d : typeof c === 'number' ? c : parseInt(String(c).replace('#', ''), 16));
 export const facadeOf = (spec: any) => (Array.isArray(spec.facade) ? { zones: spec.facade, bands: [] } : { zones: (spec.facade || {}).zones || [], bands: (spec.facade || {}).bands || [] });
 /** does this storey need the facade module at all? */
@@ -31,7 +32,7 @@ export function facadeWanted(spec: any, lv: any, lowestY: number) {
 }
 
 export function createFacade(bctx) {
-  const { THREE, group, registerRoof } = bctx;
+  const { THREE, group, registerRoof, registerTrackedWall } = bctx;
   const fresh = (c: number, extra: any = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.7, ...extra });   // canopies: own materials (the roof fade writes to them)
 
   // panels on a wall's outer face over [a0, a1] × [y0, y1] (along, height over the storey floor), round the holes. The
@@ -93,13 +94,19 @@ export function createFacade(bctx) {
       }, 0, 0, y, null, 'structure');
     }
 
+    // Cladding, bands and opening dressing hang on a wall, so each is registered with that wall's side and folds away with it
+    // when the cutaway lowers the wall (collapsed heights: a lowered wall shows its own cladding, not a shutter in mid-air)
+    const onWall = (o: any, side: string) => { if (typeof registerTrackedWall === 'function') registerTrackedWall(o, SIDE_ORI[side], H, 0.02, 0.02); return o; };
+    const SIDES = ['S', 'N', 'E', 'W'];
+
     // ---- cladding zones on this storey
     const zones = fac.zones.filter(z => z.level === undefined || z.level === lv.id);
-    if (zones.length) put(() => {
-      const gg = group(`Facade zones (${lv.id})`, { category: 'Architecture' });
+    if (zones.length) for (const side of SIDES) {
+      const gg = group(`Facade zones (${lv.id} ${side})`, { category: 'Architecture' });
       for (const z of zones) {
         const mat = am.cladding({ kind: z.material || 'stucco', color: z.color || palette.wall || '#f1f5f9' });
         for (const e of edges) {
+          if (e.side !== side) continue;
           const horiz = e.side === 'S' || e.side === 'N', n = horiz ? OUT[e.side][1] : OUT[e.side][0], line = horiz ? e.a[1] : e.a[0];
           let lo = horiz ? e.a[0] : e.a[1], hi = horiz ? e.b[0] : e.b[1];
           if (z.rect) {
@@ -117,25 +124,26 @@ export function createFacade(bctx) {
           facePanels(gg, { horiz, face: line + n * WALL_HALF, n, a0: lo - (fullLo && outerEnd(lv, e, 0) ? ext : 0), a1: hi + (fullHi && outerEnd(lv, e, 1) ? ext : 0), y0: z.yFrom ?? 0, y1: Math.min(H, z.yTo ?? H), holes: holesOn(e), mat });
         }
       }
-      return gg;
-    }, 0, 0, y, null, 'structure');
+      if (gg.children.length) onWall(put(() => gg, 0, 0, y, null, 'structure'), side);
+    }
 
     // ---- string courses crossing this storey
     const bands = fac.bands.filter(b => b.y >= y - 1e-6 && b.y < y + H - 0.05);
-    if (bands.length) put(() => {
-      const gg = group(`Facade bands (${lv.id})`, { category: 'Architecture' });
+    if (bands.length) for (const side of SIDES) {
+      const gg = group(`Facade bands (${lv.id} ${side})`, { category: 'Architecture' });
       for (const b of bands) {
+        if (b.sides && !b.sides.includes(side)) continue;
         const mat = b.material ? am.cladding({ kind: b.material, color: b.color || palette.trim || '#e7e2d8' }) : am.paint(b.color || palette.trim || '#e7e2d8', { roughness: 0.75 });
         const proud = b.proud ?? 0.035, hb = b.h ?? 0.18, y0 = b.y - y;
         for (const e of edges) {
-          if (b.sides && !b.sides.includes(e.side)) continue;
+          if (e.side !== side) continue;
           const horiz = e.side === 'S' || e.side === 'N', n = horiz ? OUT[e.side][1] : OUT[e.side][0], line = horiz ? e.a[1] : e.a[0];
           const ext = proud + 0.004;
           facePanels(gg, { horiz, face: line + n * WALL_HALF, n, a0: (horiz ? e.a[0] : e.a[1]) - (outerEnd(lv, e, 0) ? ext : 0), a1: (horiz ? e.b[0] : e.b[1]) + (outerEnd(lv, e, 1) ? ext : 0), y0, y1: Math.min(H, y0 + hb), holes: holesOn(e), mat, proud, off: 0.004 });
         }
       }
-      return gg;
-    }, 0, 0, y, null, 'structure');
+      if (gg.children.length) onWall(put(() => gg, 0, 0, y, null, 'structure'), side);
+    }
 
     // ---- opening dressing
     for (const f of frames) {
@@ -143,6 +151,7 @@ export function createFacade(bctx) {
       if (!(op.shutters || op.box || (op.head && op.head !== 'flat') || op.surround || op.blinds || op.canopy)) continue;
       const u = put(() => dressOpening({ spec, lv, f, palette, am }), f.cx, f.cz, y, null, 'structure');
       u.rotation.y = SIDE_ROT[f.side];
+      onWall(u, f.side);
       if (op.canopy) {
         const c = put(() => canopy({ f, op, palette }), f.cx, f.cz, y, null, null);
         c.rotation.y = SIDE_ROT[f.side];
