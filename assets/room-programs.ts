@@ -28,8 +28,8 @@ const KIND: Record<Program, string> = {
   'bed-primary': 'bed', 'bed-kid': 'bed', 'bed-guest': 'bed', nursery: 'bed',
   bath: 'bath', ensuite: 'bath', powder: 'bath',
   study: 'work', library: 'work', studio: 'work',
-  den: 'living', media: 'living', playroom: 'living', sunroom: 'living', greenhouse: 'living', bar: 'living',
-  foyer: 'hall', hall: 'hall', laundry: 'service', gym: 'service', garage: 'service', outdoor: 'service',
+  den: 'living', media: 'living', playroom: 'living', sunroom: 'living', bar: 'living',
+  foyer: 'hall', hall: 'hall', laundry: 'service', gym: 'service', garage: 'service', greenhouse: 'service', outdoor: 'outdoor',   // (S1's kit-rules.ts PROGRAM_KIND is the same table: its fixtures follow it)
 };
 export const programKind = (p: string): string | null => (isProgram(p) ? KIND[p] : null);
 

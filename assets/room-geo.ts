@@ -247,12 +247,20 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
     if (surf === 'desk') obstacles.push(obb(hx + fwd[0] * 0.8, hz + fwd[1] * 0.8, 0.6, 0.6, h.rot || 0));
     heroHere = hx > b.x - 0.3 && hx < b.x + b.w + 0.3 && hz > b.z - 0.3 && hz < b.z + b.d + 0.3;
   }
-  // S2's features (coded against its contract: features[] with a level and a from → to run, or an at): built-ins,
-  // fireplaces and bays are solid until S2 merges and publishes them as anchors
+  // S2's features (assets/spec/arch.ts): a built-in stands against the wall line from → to on its `face` side ('left' seen
+  // walking from → to, the default, or 'right'), `d` deep (0.4 default); a fireplace is a hearth at `at`, `w` wide, facing
+  // `rot`. Both are solid floor the composer pins round.
   for (const f of spec.features || []) {
     if (!f || (f.level && f.level !== lv.id)) continue;
-    if (Array.isArray(f.from) && Array.isArray(f.to)) { const dep = f.depth || 0.4, px = Math.abs(f.from[1] - f.to[1]) < 1e-6; obstacles.push(px ? rectObb(Math.min(f.from[0], f.to[0]), f.from[1] - dep / 2, Math.max(f.from[0], f.to[0]), f.from[1] + dep / 2) : rectObb(f.from[0] - dep / 2, Math.min(f.from[1], f.to[1]), f.from[0] + dep / 2, Math.max(f.from[1], f.to[1]))); }
-    else if (Array.isArray(f.at) && f.type === 'fireplace') obstacles.push(obb(f.at[0], f.at[1], f.w || 1.6, f.d || 0.5, f.rot || 0));
+    if (Array.isArray(f.from) && Array.isArray(f.to)) {
+      const dep = f.d ?? f.depth ?? 0.4, dx = f.to[0] - f.from[0], dz = f.to[1] - f.from[1], L = Math.hypot(dx, dz) || 1;
+      const side = f.face === 'right' ? -1 : 1, nx = side * dz / L, nz = -side * dx / L;   // the left normal of from → to: (dz, −dx)/L
+      const mx = (f.from[0] + f.to[0]) / 2 + nx * dep / 2, mz = (f.from[1] + f.to[1]) / 2 + nz * dep / 2;
+      obstacles.push(Math.abs(dz) < 1e-6 ? obb(mx, mz, Math.abs(dx), dep, 0) : Math.abs(dx) < 1e-6 ? obb(mx, mz, dep, Math.abs(dz), 0) : obb(mx, mz, L, dep, -Math.atan2(dz, dx) / DEG));
+    } else if (Array.isArray(f.at) && f.type === 'fireplace') {
+      const rot = f.rot || 0, [fx, fz] = turn(0, 0.25, rot);   // the hearth's back is on the wall it stands at: its box reaches 0.5 m into the room
+      obstacles.push(obb(f.at[0] + fx, f.at[1] + fz, f.w || 1.6, 0.5, rot));
+    }
   }
   return { spec, lv, room, b, runs, walled, open, portals, windows, obstacles, keepouts, soft, heroHere, area: b.w * b.d };
 }
