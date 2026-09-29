@@ -1,0 +1,411 @@
+# ci-virtual-home — the web portal on Cloudflare Pages.
+# ============================================================================
+# Publishes the site that ci.yml assembles (scripts/build-portal.mts: the gallery, the player, the compiled engine,
+# the specs and the committed thumbnails — nothing else) to the Cloudflare Pages project `ci-virtual-home`:
+#
+#   ci passed on a push to main                     → production  https://homes.ci.computer/
+#   (or a manual run on main, when ci passed on its head)           (and https://ci-virtual-home.pages.dev/)
+#   ci passed on a pull request from a branch of    → preview     https://pr-<number>.ci-virtual-home.pages.dev/
+#   this repository
+#
+# THE TOKEN. Cloudflare's "Pages · Edit" permission cannot be limited to one project: the token can publish to, or
+# delete, every Pages project on the account, the public website and the docs among them. So it is never a
+# repository secret (a workflow on any branch can read one of those). It lives in two GitHub environments,
+# production and preview, each limited to deployment from main, and only the upload job names one.
+#
+# ONE FILE REACHES IT: this one, as it is on main. A workflow_run always runs the copy on the default branch; a manual
+# run on any other branch skips itself; and a workflow on any other branch that names either environment is refused by
+# the environment's branch rule. Code from a branch is never run here. A pull request is built by ci.yml in its own
+# run, which holds no secret, and reaches this workflow as an artifact: files to upload, not anything to run.
+#
+# So whoever can put a change to this file on main can read the token, and main's protection is the whole guard: main
+# must require pull requests with a code owner's review (.github/CODEOWNERS covers .github/), and plan does not deploy
+# until it does. GitHub Team offers no required reviewers on a private repository, so a preview waits for no approval.
+# Anyone who can open a pull request from a branch of this repository publishes static files at pr-<number>, and
+# nothing else: Pages Workers are stripped, and the branch name never reaches Wrangler.
+#
+# THE JOBS. plan decides and holds no secret. It fails the run if the token is readable as a repository or organisation
+# secret, and skips (with a notice, never a failure) when main is unprotected, an environment is missing or not limited
+# to main, ci did not pass, or the commit is no longer the head of main (or of its pull request), so re-running an old
+# run never publishes an old tree. upload holds the token and runs nothing from the repository: no checkout and no
+# repository script. It asks once more whether the commit is still current (a retry of failed jobs keeps plan's
+# answer), fetches the artifact, installs a pinned Wrangler in a step that has no token (and runs no install scripts),
+# and runs it in the one step that does. announce puts the preview's link on the pull request as a status. Setup:
+# README → Deploying. Every action is pinned to a commit.
+#
+# ci.yml is matched by its `name:` (ci); renaming that workflow stops deploys. GitHub Pages is retired for this
+# repository: its github.io address redirects to the organisation's old custom domain, which serves nothing.
+# ============================================================================
+name: deploy
+
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Production runs queue (a newer one waits for the upload in flight rather than cancelling it); a newer ci pass on a
+# pull request replaces its preview still uploading. Every other run (a ci failure, a fork's pull request, a run for any
+# branch but main, a manual run elsewhere) gets a group of its own, so it can never displace a production run waiting in
+# the queue.
+concurrency:
+  group: >-
+    deploy-${{ (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.pull_requests[0].number) && format('pr-{0}', github.event.workflow_run.pull_requests[0].number)
+    || (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.conclusion == 'success') && 'production'
+    || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') && 'production'
+    || format('run-{0}', github.run_id) }}
+  cancel-in-progress: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request' }}
+
+env:
+  PAGES_PROJECT: ci-virtual-home
+  PAGES_SUBDOMAIN: ci-virtual-home.pages.dev
+  PAGES_ACCOUNT_ID: 9a6ef2dbcd138eac121647f567a985d8
+  PRODUCTION_URL: https://homes.ci.computer/
+  WRANGLER_VERSION: 4.143.0
+
+jobs:
+  plan:
+    name: plan the deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read # the environments' branch rules, and ci's runs and artifacts
+      pull-requests: read # is the pull request still open, and is this commit still its head
+    outputs:
+      deploy: ${{ steps.plan.outputs.deploy }}
+      target: ${{ steps.plan.outputs.target }}
+      branch: ${{ steps.plan.outputs.branch }}
+      site-url: ${{ steps.plan.outputs.site-url }}
+      sha: ${{ steps.plan.outputs.sha }}
+      run-id: ${{ steps.plan.outputs.run-id }}
+      subject: ${{ steps.plan.outputs.subject }}
+    steps:
+      # Only whether a repository-level token exists crosses into this step, never a token. Every value from the
+      # event goes in through env, never spliced into the script.
+      - name: Decide what to deploy, or why not
+        id: plan
+        env:
+          REPO_LEVEL_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_EVENT: ${{ github.event.workflow_run.event }}
+          RUN_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          RUN_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_ACTOR: ${{ github.event.workflow_run.actor.login }}
+          RUN_PR: ${{ github.event.workflow_run.pull_requests[0].number }}
+          RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          if [ "$REPO_LEVEL_TOKEN" = true ]; then
+            echo "::error title=CLOUDFLARE_API_TOKEN is readable by every branch::It is a repository or organisation secret, which any branch's workflow can read, and the token can publish to or delete every Pages project on the Cloudflare account. Delete it there and add it to the production and preview environments instead: README → Deploying."
+            exit 1
+          fi
+
+          deploy=true
+          reason=''
+          skip() { if [ "$deploy" = true ]; then deploy=false; reason=$1; fi; }
+          target=production; branch=main; sha=''; run_id=''; subject=''
+          err="$RUNNER_TEMP/gh-api.err"
+
+          # What the event asks for. Whatever it is, ci must have passed on this repository's own commit.
+          case "$EVENT" in
+            workflow_run)
+              sha=$RUN_SHA; run_id=$RUN_ID
+              if [ "$RUN_REPO" != "$REPO" ]; then
+                skip "ci ran for ${RUN_REPO}, not for this repository."
+              elif [ "$RUN_EVENT" = push ] && [ "$RUN_BRANCH" = main ]; then
+                target=production; branch=main
+              elif [ "$RUN_EVENT" = pull_request ]; then
+                target=preview
+                if [ -z "$RUN_PR" ]; then
+                  skip "GitHub did not link ci's run on ${RUN_BRANCH} to a pull request."
+                else
+                  branch="pr-${RUN_PR}"
+                fi
+                if [ "$RUN_ACTOR" = 'dependabot[bot]' ]; then skip "Dependabot's pull requests get no preview."; fi
+              else
+                skip "ci ran for a ${RUN_EVENT} on ${RUN_BRANCH}, not a push to main or a pull request from this repository."
+              fi
+              if [ "$RUN_CONCLUSION" != success ]; then
+                skip "ci did not pass on ${sha} (${RUN_CONCLUSION}: ${RUN_URL}), so ${target} stays on the last commit that did."
+              fi
+              ;;
+            *)
+              # a manual run: main's own head, once ci has passed on it
+              sha=$SHA
+              if [ "$REF" != refs/heads/main ]; then
+                skip "a manual run publishes main only; choose main in Run workflow."
+              elif ! run_id=$(gh api "repos/${REPO}/actions/workflows/ci.yml/runs?head_sha=${SHA}&event=push&status=success&per_page=1" --jq '.workflow_runs[0].id // empty'); then
+                skip "could not look up ci.yml's runs for ${SHA}, the head of main."
+              elif [ -z "$run_id" ]; then
+                skip "ci.yml has not passed on ${SHA}, the head of main."
+              fi
+              ;;
+          esac
+
+          # The token's guard. Both environments must be limited to deployment from main alone. "Protected branches
+          # only" is not that: GitHub lets every branch deploy while the repository has no protected branch.
+          check_environment() {
+            local name=$1 envjson counts
+            if ! envjson=$(gh api "repos/${REPO}/environments/${name}" 2>"$err"); then
+              if grep -q 'HTTP 404' "$err"; then
+                skip "there is no ${name} environment, or this run cannot read it (README → Deploying → Owner setup)."
+              else
+                skip "could not read the ${name} environment: $(head -c 200 "$err" | tr '\n' ' ')"
+              fi
+              return 0
+            fi
+            if [ "$(printf '%s' "$envjson" | jq -r '.deployment_branch_policy.custom_branch_policies // false')" != true ]; then
+              skip "the ${name} environment does not limit its deployment branches to a list: set Deployment branches and tags to Selected branches and tags, main alone."
+              return 0
+            fi
+            if ! counts=$(gh api "repos/${REPO}/environments/${name}/deployment-branch-policies" \
+              --jq '"\(.branch_policies | length) \([.branch_policies[] | select(.name == "main" and (.type // "branch") == "branch")] | length)"' 2>"$err"); then
+              skip "could not read the ${name} environment's deployment branches."
+            elif [ "$counts" != '1 1' ]; then
+              skip "the ${name} environment's deployment branches must be the branch main alone (found: ${counts% *} rule(s), ${counts#* } of them main)."
+            fi
+          }
+
+          # Whoever can push to main can change this file and read the token, so main must take changes through a pull
+          # request with a code owner's review. A ruleset's rules are readable here; classic branch protection shows a
+          # token without admin rights only that a rule exists, not what it says.
+          check_main() {
+            local rules protected
+            if rules=$(gh api "repos/${REPO}/rules/branches/main" --jq 'length as $n | ([.[] | select(.type == "pull_request")] | length) as $pr | ([.[] | select(.type == "pull_request" and .parameters.require_code_owner_review == true)] | length) as $co | "\($n) \($pr) \($co)"' 2>"$err") \
+              && [ "${rules%% *}" != 0 ]; then
+              set -- $rules
+              if [ "$2" = 0 ]; then
+                skip "main's ruleset does not require pull requests, so anyone with write access can push a change to this workflow straight to main (README → Deploying → Owner setup)."
+              elif [ "$3" = 0 ]; then
+                skip "main's ruleset does not require a code owner's review, so any one collaborator's approval can put a change to this workflow on main (README → Deploying → Owner setup)."
+              fi
+              return 0
+            fi
+            if ! protected=$(gh api "repos/${REPO}/branches/main" --jq '.protected' 2>"$err"); then
+              skip "could not read main's branch protection: $(head -c 200 "$err" | tr '\n' ' ')"
+            elif [ "$protected" != true ]; then
+              skip "main is not protected, so anyone with write access can push a change to this workflow straight to main and read the Cloudflare token (README → Deploying → Owner setup)."
+            fi
+          }
+
+          # The commit must still be what it was made for: the head of main, or of its open pull request. A re-run of
+          # an older run, or a run that lost the race to a newer push, must not put an older tree over a newer one.
+          check_current() {
+            local main_sha pr state head_sha head_repo
+            if [ "$target" = production ]; then
+              if ! main_sha=$(gh api "repos/${REPO}/git/ref/heads/main" --jq '.object.sha' 2>"$err"); then
+                skip "could not read the head of main: $(head -c 200 "$err" | tr '\n' ' ')"
+              elif [ "$main_sha" != "$sha" ]; then
+                skip "main has moved on to ${main_sha:0:7}, past ${sha:0:7}; the ci run on ${main_sha:0:7} deploys it (re-run that one if it was cancelled)."
+              fi
+            else
+              if ! pr=$(gh api "repos/${REPO}/pulls/${RUN_PR}" --jq '"\(.state) \(.head.sha) \(.head.repo.full_name // "-")"' 2>"$err"); then
+                skip "could not read pull request #${RUN_PR}: $(head -c 200 "$err" | tr '\n' ' ')"
+                return 0
+              fi
+              read -r state head_sha head_repo <<< "$pr"
+              if [ "$state" != open ]; then
+                skip "pull request #${RUN_PR} is ${state}."
+              elif [ "$head_repo" != "$REPO" ]; then
+                skip "pull request #${RUN_PR} is not from a branch of this repository (head repository: ${head_repo/#-/none})."
+              elif [ "$head_sha" != "$sha" ]; then
+                skip "pull request #${RUN_PR} has moved on to ${head_sha:0:7}, past ${sha:0:7}; the ci run on ${head_sha:0:7} previews it."
+              fi
+            fi
+          }
+
+          # ci keeps the site as an artifact for 14 days
+          check_artifact() {
+            local n
+            if ! n=$(gh api "repos/${REPO}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name == "site" and .expired == false)] | length' 2>"$err"); then
+              skip "could not look up the site artifact of ci run ${run_id}: $(head -c 200 "$err" | tr '\n' ' ')"
+            elif [ "$n" = 0 ]; then
+              skip "ci run ${run_id} has no site artifact (it expired, or ci never assembled one); re-run ci on ${sha:0:7} to build it again, and that run deploys it."
+            fi
+          }
+
+          if [ "$deploy" = true ]; then check_environment "$target"; fi
+          if [ "$deploy" = true ]; then check_main; fi
+          if [ "$deploy" = true ]; then check_current; fi
+          if [ "$deploy" = true ]; then check_artifact; fi
+          if [ "$deploy" = true ]; then
+            # the deployment's label; a failed lookup only leaves it blank
+            subject=$(gh api "repos/${REPO}/commits/${sha}" --jq '.commit.message' 2>/dev/null | head -n 1 | tr -d '\r' | cut -c1-200) || subject=''
+          fi
+
+          if [ "$target" = production ]; then site_url="$PRODUCTION_URL"; else site_url="https://${branch}.${PAGES_SUBDOMAIN}/"; fi
+          {
+            echo "deploy=$deploy"
+            echo "target=$target"
+            echo "branch=$branch"
+            echo "site-url=$site_url"
+            echo "sha=$sha"
+            echo "run-id=$run_id"
+            echo "subject=$subject"
+          } >> "$GITHUB_OUTPUT"
+          if [ "$deploy" = true ]; then
+            echo "Deploying ${sha} (ci run ${run_id}) to the ${target} site: Pages branch ${branch} → ${site_url}"
+          else
+            echo "::notice title=Cloudflare Pages deploy skipped::Not deploying the ${target} site: ${reason}"
+            printf '### Cloudflare Pages deploy skipped\n\nNot deploying the %s site: %s\n' "$target" "$reason" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  upload:
+    name: upload to Cloudflare Pages
+    needs: plan
+    if: needs.plan.outputs.deploy == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # the run's own token reads ci's artifact, and the head of main or of the pull request, and nothing else
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    environment:
+      name: ${{ needs.plan.outputs.target }}
+      url: ${{ steps.upload.outputs.site }}
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+    outputs:
+      deployed: ${{ steps.upload.outcome == 'success' }}
+    steps:
+      # plan's answer is fixed for the run, and "Re-run failed jobs" keeps it, so the two things that can change after it
+      # are checked again here: that this environment holds the token, and that the commit is still the head of main (or
+      # of its pull request), so a retry hours later never puts an old tree over a newer one.
+      - name: Check that this run should still publish
+        id: gate
+        env:
+          HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TARGET: ${{ needs.plan.outputs.target }}
+          BRANCH: ${{ needs.plan.outputs.branch }}
+          SHA: ${{ needs.plan.outputs.sha }}
+        run: |
+          reason=''
+          if [ "$HAS_TOKEN" != true ]; then
+            reason="the ${TARGET} environment has no CLOUDFLARE_API_TOKEN secret (README → Deploying → Owner setup)."
+          else
+            if [ "$TARGET" = production ]; then
+              endpoint="repos/${REPO}/git/ref/heads/main"; field='.object.sha'
+            else
+              endpoint="repos/${REPO}/pulls/${BRANCH#pr-}"; field='.head.sha'
+            fi
+            if ! now=$(gh api "$endpoint" --jq "$field" 2>/dev/null); then
+              reason="could not check whether ${SHA:0:7} is still the head of ${BRANCH}."
+            elif [ "$now" != "$SHA" ]; then
+              reason="${SHA:0:7} is no longer the head of ${BRANCH}; the ci run on ${now:0:7} deploys that one."
+            fi
+          fi
+          if [ -z "$reason" ]; then echo 'ready=true' >> "$GITHUB_OUTPUT"; exit 0; fi
+          echo 'ready=false' >> "$GITHUB_OUTPUT"
+          echo "::notice title=Cloudflare Pages deploy skipped::Not deploying the ${TARGET} site: ${reason}"
+          printf '### Cloudflare Pages deploy skipped\n\nNot deploying the %s site: %s\n' "$TARGET" "$reason" >> "$GITHUB_STEP_SUMMARY"
+
+      # The site ci.yml assembled on the commit plan named: for a pull request that is ci's run on the PR, whose code
+      # ran there with no secret, and here it is only files.
+      - name: Fetch the site
+        if: steps.gate.outputs.ready == 'true'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: site
+          path: ${{ runner.temp }}/pages/site
+          run-id: ${{ needs.plan.outputs.run-id }}
+          github-token: ${{ github.token }}
+
+      # A Pages Worker in a pull request's files would run its code on the project. A preview is static files.
+      - name: Keep only static files
+        if: steps.gate.outputs.ready == 'true'
+        working-directory: ${{ runner.temp }}/pages
+        run: rm -rf site/_worker.js site/_routes.json site/functions
+
+      - name: Setup Node (Wrangler needs 22)
+        if: steps.gate.outputs.ready == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      # No token in this step's environment, and no install scripts (esbuild's and workerd's are for Wrangler's local
+      # dev server, which `pages deploy` never starts). Wrangler pins its direct dependencies; the rest resolve when
+      # this runs. The step below runs it from a directory with no package.json, no Wrangler config and no git for it to
+      # find.
+      - name: Install Wrangler
+        if: steps.gate.outputs.ready == 'true'
+        run: npm install --prefix "$RUNNER_TEMP/wrangler" --ignore-scripts --no-audit --no-fund "wrangler@${WRANGLER_VERSION}"
+
+      # --branch main is the project's production branch; any other branch is a preview under that alias. The
+      # branch, commit and message come from plan, never from the artifact.
+      - name: Upload
+        id: upload
+        if: steps.gate.outputs.ready == 'true'
+        working-directory: ${{ runner.temp }}/pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID || env.PAGES_ACCOUNT_ID }}
+          WRANGLER_OUTPUT_FILE_PATH: ${{ runner.temp }}/wrangler-output.json
+          BRANCH: ${{ needs.plan.outputs.branch }}
+          SHA: ${{ needs.plan.outputs.sha }}
+          SUBJECT: ${{ needs.plan.outputs.subject }}
+          SITE_URL: ${{ needs.plan.outputs.site-url }}
+        run: |
+          "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler" pages deploy site --project-name="$PAGES_PROJECT" \
+            --branch="$BRANCH" --commit-hash="$SHA" --commit-message="$SUBJECT"
+          detail() { jq -r --arg k "$1" 'select(.type == "pages-deploy-detailed") | .[$k] // empty' "$WRANGLER_OUTPUT_FILE_PATH" | tail -n 1; }
+          {
+            echo "site=$SITE_URL"
+            echo "deployment-url=$(detail url)"
+            echo "alias-url=$(detail alias)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Report the addresses
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          TARGET: ${{ needs.plan.outputs.target }}
+          SITE_URL: ${{ needs.plan.outputs.site-url }}
+          DEPLOYMENT_URL: ${{ steps.upload.outputs.deployment-url }}
+          ALIAS_URL: ${{ steps.upload.outputs.alias-url }}
+          SHA: ${{ needs.plan.outputs.sha }}
+        run: |
+          {
+            echo "### Cloudflare Pages: ${TARGET}"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Site | ${SITE_URL} |"
+            if [ -n "$ALIAS_URL" ] && [ "${ALIAS_URL%/}" != "${SITE_URL%/}" ]; then echo "| Branch alias | ${ALIAS_URL} |"; fi
+            echo "| This deployment | ${DEPLOYMENT_URL:-in the upload log} |"
+            echo "| Commit | ${SHA} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=Deployed to Cloudflare Pages (${TARGET})::${SITE_URL}"
+
+  # A workflow_run's deployment is not attached to the pull request, so the preview's address goes on it as a commit
+  # status, which its checks list. No secret and no environment: the token is not in this job.
+  announce:
+    name: link the preview on the pull request
+    needs: [plan, upload]
+    if: needs.plan.outputs.target == 'preview' && needs.upload.outputs.deployed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      statuses: write
+    steps:
+      - name: Set the commit status
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ needs.plan.outputs.sha }}
+          SITE_URL: ${{ needs.plan.outputs.site-url }}
+        run: |
+          gh api "repos/${REPO}/statuses/${SHA}" --method POST \
+            -f state=success -f context='preview' -f description='Preview on Cloudflare Pages' -f target_url="$SITE_URL"

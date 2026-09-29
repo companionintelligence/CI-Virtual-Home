@@ -1,0 +1,3 @@
+# Whoever can put a change to a workflow on main can read the Cloudflare Pages token (README → Deploying), so main's
+# ruleset requires the code owner's review of anything under .github/.
+/.github/ @mrhegemon
