@@ -8307,7 +8307,7 @@
         // and to fly over the site; what it must not end up inside is a piece of furniture. That used to be a
         // twenty-term regex over display names — it let anything a builder renamed straight through and caught
         // anything whose label happened to contain "arch".
-        const PASSABLE = new Set(['ground', 'floor', 'structure', 'site', 'wall', 'roof', 'ceiling']);
+        const PASSABLE = new Set(['ground', 'floor', 'structure', 'site', 'wall', 'roof', 'ceiling', 'finish']);   // 'finish': S2's wall liners, tracked walls the wall-clip test already measures solid by solid
         // ... except a flight of stairs is climbed OVER, never walked under or through: its treads and spine, each
         // tested in its own frame (a sloped spine's world box would swallow the climb above it)
         const stairMeshes = [];

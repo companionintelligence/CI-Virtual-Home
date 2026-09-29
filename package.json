@@ -19,6 +19,7 @@
     "goldens": "node --experimental-strip-types scripts/test-goldens.mts",
     "goldens:update": "node --experimental-strip-types scripts/test-goldens.mts --update",
     "frame-hash": "node --experimental-strip-types scripts/test-frame-hash.mts",
+    "test:twins": "node --experimental-strip-types scripts/test-twins.mts",
     "fixtures": "node --experimental-strip-types scripts/test-fixtures.mts",
     "perf": "node --experimental-strip-types scripts/perf-house.mts",
     "fleet-audit": "node --experimental-strip-types scripts/fleet-audit.mts",

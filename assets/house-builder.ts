@@ -20,8 +20,11 @@
 //                   hero-frame.ts, materials.ts, textures.ts, fixtures.ts, environment.ts, props/lighting.ts;
 //                   the room-creator.html door / window / furniture builders (its OWNER banners)
 //   S2 architecture structure-build.ts (slabs, walls, openings, partitions, stairs, balustrades, ceilings, roofs),
-//                   roofs.ts, wall-compiler.ts, floorplan-graph.ts, house-geometry.ts; the page's stair, slab and
-//                   wall builders
+//                   roofs.ts, wall-compiler.ts, floorplan-graph.ts, house-geometry.ts, stairs.ts (a storey's flights: plan
+//                   geometry and the builder), arch-plan.ts (plan geometry shared with the validator and the twins),
+//                   arch-materials.ts, room-finish.ts (per-room floors, walls, ceilings), facade.ts (cladding zones,
+//                   bands, plinths, opening dressing, stoops), features.ts (porches, bays, balconies, fireplaces,
+//                   built-ins, partition styles); the page's stair, slab and wall builders
 //   S3 compose      rooms-build.ts (the rooms loop) and room-composer.ts, props/*.ts except lighting.ts and
 //                   outdoor.ts, props/page-place.ts (page items' placement), props/registry.ts,
 //                   scripts/build-prop-catalog.mts

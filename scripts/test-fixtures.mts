@@ -24,7 +24,9 @@
 // "qa": false }. The builder ignores unknown top-level keys, so the block never reaches the render.
 //
 // Frames are hashed raw (RGBA off the GL context, no JPEG). A cold browser's first context renders a hair
-// differently (scripts/test-frame-hash.mts), so a throwaway context renders one frame before any is kept.
+// differently (scripts/test-frame-hash.mts), so a throwaway context renders one frame of THE SAME fixture before its frames are
+// kept — each fixture warms its own shaders, so its hashes do not depend on which fixtures ran before it (a fixture whose
+// materials the previous one had not compiled differed by one pixel, one level, and only when it ran second).
 //
 // Exit: 0 all pass · 1 a fixture failed validation, QA or its hash, or has no hash · 2 a harness error
 import fs from 'node:fs';
@@ -147,11 +149,11 @@ const recordedNow = {};   // key → hash, for --record
 const rows = [];
 const built = Object.keys(specs);
 try {
-  // the throwaway context: one frame through a cold GPU process, never kept
-  if (built.length) { const w = await openHouse(built[0]); await renderFrame(w.page, 'orbit', 0.55); await w.ctx.close(); }
   for (const id of built) {
     const spec = specs[id], fx = spec.fixture || {};
     const frames = fx.frames || DEFAULT_FRAMES;
+    // the throwaway context: one frame of this very fixture through a cold pipeline, never kept
+    try { const w = await openHouse(id); await renderFrame(w.page, 'orbit', 0.55); await w.ctx.close(); } catch { /* the load below reports it */ }
     let h;
     try { h = await openHouse(id); } catch (e) { console.log(`✗ ${id}  load: ${e.message.split('\n')[0]}`); failed++; continue; }
     const { page, ctx, errs } = h;

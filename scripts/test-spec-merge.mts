@@ -117,9 +117,11 @@ for (const p of probes) {
     for (const f of fs.readdirSync(SPEC)) if (f.endsWith('.ts')) fs.copyFileSync(path.join(SPEC, f), path.join(dir, 'spec', f));
     for (const [frag, text] of Object.entries(p.edit ?? {})) {
       const file = path.join(dir, 'spec', `${frag}.ts`);
-      // a fragment's interface is empty (`export interface KitRoomItem {}`) until its stream fills it in: the probe's
-      // declaration replaces it whole, whatever it holds by now, and any import it needs goes to the top
-      let src = fs.readFileSync(file, 'utf8');
+      // a fragment's interface is empty (`export interface KitRoomItem {}`): the probe's declaration replaces it, and
+      // any import it needs goes to the top
+      // (a stream that has shipped its fragment has filled these interfaces in: the probe starts from the same fragment
+      // with every interface emptied again, so it keeps testing the merge rules, not one stream's fields)
+      let src = [...fs.readFileSync(file, 'utf8').matchAll(/^export interface (\w+)/gm)].map(m => `export interface ${m[1]} {}`).join('\n') + '\n';
       const imports = text.split('\n').filter(l => l.startsWith('import ')), body = text.split('\n').filter(l => !l.startsWith('import ')).join('\n');
       for (const m of body.matchAll(/export interface (\w+)/g)) src = dropInterface(src, m[1]);
       fs.writeFileSync(file, imports.join('\n') + '\n' + src + '\n' + body + '\n');
