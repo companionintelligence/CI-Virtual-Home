@@ -23,6 +23,7 @@
 // Math.random or per-frame state. The track is a pure function of (world, options).
 //
 // Owner: S5 (shot).
+import { planDoors } from './shot-doors.js';
 import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, mulberry32, fnv1a, wrapPi, createWorldIndex, type ShotWorld, type WLevel, type WStair, type WRoom } from './shot-world.js';
 import { createNav, roomInterest, CELL, type Nav } from './shot-nav.js';
 import { createProbe, camera, project, type V3, type Probe } from './shot-probe.js';
@@ -1281,7 +1282,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     version: 2, planner: 'v2', type: 'door-to-core', id: world.id, duration, fps: FPS, samples: N, dt,
     pos, look, fov, roofAlpha, composeW, compose, beat: beatOf, beats,
     events: { enterT, stairT: beats.filter(b => b.name === 'stair' || b.name === 'descend').map(b => b.t0), pressT: null, settleT: tPower, doneT: duration, firstCoreT: null },
-    doors: {}, metrics: {}, plan: {}, desired,
+    doors: planDoors(world, pos, N, dt), metrics: {}, plan: {}, desired,
   };
   // first moment from which the Core stays in frame and seen
   let firstCore: number | null = null;
@@ -1347,7 +1348,8 @@ export function sampleTrack(track: Track, t: number, aspect = 16 / 9) {
 /** a stable hash of a track's arrays (FNV-1a over the float bytes) — the harness compares Node's with the page's */
 export function trackHash(track: Track) {
   let h = 0x811c9dc5;
-  for (const arr of [track.pos, track.look, track.fov, track.roofAlpha, track.composeW]) {
+  const doorIds = Object.keys(track.doors || {}).sort();
+  for (const arr of [track.pos, track.look, track.fov, track.roofAlpha, track.composeW, ...doorIds.map(id => track.doors[id])]) {
     const b = new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
     for (let i = 0; i < b.length; i++) { h ^= b[i]; h = Math.imul(h, 0x01000193); }
   }

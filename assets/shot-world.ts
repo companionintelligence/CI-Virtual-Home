@@ -35,6 +35,13 @@ export type WRoom = { no: string; name: string; program: string | null; b: Rect;
 export type WLevel = { id: string; y: number; h: number; rects: Rect[]; voids: Rect[]; parts: WPart[]; rooms: WRoom[]; openings: any[] };
 export type WStair = { from: string; to: string; type: string; bottom: [number, number, number]; top: [number, number, number]; dir: [number, number]; plan: { minX: number; maxX: number; minZ: number; maxZ: number }; spiral: boolean; w: number };
 export type WObb = { c: [number, number, number]; h: [number, number, number]; ax: [number, number, number, number, number, number, number, number, number]; k: number; n: string };
+/** a hinged leaf the shot can swing (anchors.doors from S1's kit-build.ts collectDoors): the hinge in plan, the leaf's heading
+ *  (degrees, 0 = +z, of its free edge from the hinge) closed and open, and the pivot's own rotation.y at each (radians) —
+ *  what the track's `doors` channel is written in */
+export type WDoor = {
+  id: string; level: string | null; kind: string; leaf: string; hinge: [number, number]; y0: number; h: number; w: number;
+  closedYaw: number; openYaw: number; closedAngle: number | null; openAngle: number | null; swing: string | null; open: boolean;
+};
 export type WHero = {
   x: number; y: number; z: number; level: string; fwd: [number, number]; surface: string; pose: string; centre: [number, number, number];
   core: Box6; surfaceBox: Box6 | null; monitor: Box6 | null; chair: Box6 | null; deskX: number; deskZ: number; chairPose: string | null;
@@ -52,6 +59,8 @@ export type ShotWorld = {
   paths: Array<{ pts: Array<[number, number]>; w: number }>;
   steps: Array<{ at: [number, number]; rot: number; n: number; w: number; y: number }>;
   showcase: string[];
+  /** the leaves that can be swung (absent when the house has no door anchors) */
+  doors?: WDoor[];
 };
 
 // ---- helpers shared by the S5 modules (THREE-free) -------------------------------------------------------------
@@ -63,6 +72,12 @@ export function fnv1a(str: string) { let h = 0x811c9dc5; for (let i = 0; i < str
 export function mulberry32(seed: number) { let a = seed >>> 0; return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 export const inRect = (x: number, z: number, r: Rect, tol = 0) => x >= r.x - tol && x <= r.x + r.w + tol && z >= r.z - tol && z <= r.z + r.d + tol;
 export const wrapPi = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+/** a door's leaf in plan: the hinge, the free edge (closed, or at `yawDeg`), and the leaf's unit direction — a heading in
+ *  degrees is 0 at +z, turning toward +x */
+export function leafSegment(d: { hinge: [number, number]; w: number; closedYaw: number }, yawDeg: number = d.closedYaw): { a: [number, number]; b: [number, number]; dir: [number, number] } {
+  const dir: [number, number] = [Math.sin(yawDeg * Math.PI / 180), Math.cos(yawDeg * Math.PI / 180)];
+  return { a: d.hinge, b: [d.hinge[0] + dir[0] * d.w, d.hinge[1] + dir[1] * d.w], dir };
+}
 /** is (x, z) inside the union of `rects` shrunk by `margin` (rects that share an edge count as one: a point on the
  *  shared edge is inside) — each corner of the margin square inside some rect */
 export const inFootprint = (rects: Rect[], x: number, z: number, margin = 0) => {
@@ -116,6 +131,10 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
     for (const k of [...cells.keys()].sort()) fn(cells.get(k));
   };
   const meshes = (o: any, fn: (m: any) => void) => o.traverse((m: any) => { if (m.isMesh && m.geometry) fn(m); });
+  // a door leaf the shot can swing (a pivot carrying userData.door) is not a wall: the track opens it ahead of the eye, so the
+  // world the planner routes and sees through has the doorway clear
+  const posable = new Set<any>((anchors.doors || []).filter((d: any) => d && d.pivot).map((d: any) => d.pivot));
+  const inLeaf = (m: any) => { for (let q = m; q; q = q.parent) if (posable.has(q)) return true; return false; };
   let coreBox: Box6 | null = null, surfaceBox: Box6 | null = null, monitorBox: Box6 | null = null, chairBox: Box6 | null = null;
   const b6 = (b: any): Box6 => [mm(b.min.x), mm(b.min.y), mm(b.min.z), mm(b.max.x), mm(b.max.y), mm(b.max.z)];
 
@@ -128,7 +147,7 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
     o.updateMatrixWorld(true);
     try {
       if (role === 'wall') {
-        meshes(ud.fullGroup || o, m => meshBoxes(m, b => push(b, isGlass(m) ? K.glass : K.wall, o.name || 'wall', colorOf(m))));
+        meshes(ud.fullGroup || o, m => { if (posable.size && inLeaf(m)) return; meshBoxes(m, b => push(b, isGlass(m) ? K.glass : K.wall, o.name || 'wall', colorOf(m))); });
       } else if (role === 'structure') {
         if (ud.stair) meshes(o, m => { pushObb(m, K.stair, o.name || 'stairs'); });
         else meshes(o, m => meshBoxes(m, b => { if (b.max.y - b.min.y > 0.1) push(b, isGlass(m) ? K.glass : K.rail, o.name || 'structure', colorOf(m)); }));
@@ -193,6 +212,12 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
     chairPose: (spec.hero && spec.hero.chair && typeof spec.hero.chair === 'object' ? spec.hero.chair.pose : null) || null,
   } : null;
   const b = anchors.bounds || { minX: -6, maxX: 6, minZ: -4, maxZ: 4 };
+  const doors: WDoor[] = (anchors.doors || []).filter((d: any) => d && Array.isArray(d.hinge)).map((d: any) => {
+    const ud = d.pivot && d.pivot.userData && d.pivot.userData.door;
+    return { id: String(d.id), level: d.level ?? null, kind: d.kind || 'interior', leaf: d.leaf || 'single', hinge: [mm(d.hinge[0]), mm(d.hinge[1])], y0: mm(d.y0 || 0), h: mm(d.h || 2.05), w: mm(d.w || 0.9),
+      closedYaw: +(+d.closedYaw || 0).toFixed(1), openYaw: +(+d.openYaw || 0).toFixed(1), closedAngle: ud && typeof ud.closedAngle === 'number' ? mm(ud.closedAngle) : null, openAngle: ud && typeof ud.openAngle === 'number' ? mm(ud.openAngle) : null,
+      swing: d.swing || null, open: !!d.open };
+  });
   return {
     v: 1, id: spec.id,
     lot: { w: (spec.lot || {}).w || 30, d: (spec.lot || {}).d || 24 },
@@ -203,6 +228,7 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
     paths: (spec.site || []).filter((s: any) => s.type === 'path' && Array.isArray(s.path) && s.path.length >= 2).map((s: any) => ({ pts: s.path.map((p: any) => [p[0], p[1]]), w: s.w || 1.2 })),
     steps: (spec.site || []).filter((s: any) => s.type === 'steps' && Array.isArray(s.at)).map((s: any) => ({ at: [s.at[0], s.at[1]], rot: s.rot || 0, n: s.n || 3, w: s.w || 1.6, y: s.y || 0 })),
     showcase: Array.isArray(spec.showcase) ? spec.showcase.slice() : [],
+    ...(doors.length ? { doors } : {}),
   };
 }
 

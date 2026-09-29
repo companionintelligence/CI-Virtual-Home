@@ -1783,6 +1783,7 @@
     import { createVisibility, ISO_VIEW, placeIsoCamera } from './assets/visibility.js';
     import { trackFromV1, trackView } from './assets/shot-track.js';
     import { qaTrack } from './assets/shot-qa.js';
+    import { doorAngleAt } from './assets/shot-doors.js';
     import { registerSceneCheck, runSceneChecks } from './assets/scene-qa/registry.js';   // the registry; the streams' checks load below (sceneChecksLoaded)
     import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
@@ -7739,6 +7740,14 @@
     // The world planner v2 plans on (assets/shot-world.ts): the built house as boxes, the storeys, the entry, the Core
     // and the stairs — what scripts/test-shot-planner.mts bakes the same track from in Node.
     window.__houseShotWorld = () => { if (!activeHouse) throw new Error('no house loaded'); return activeHouse.anchors.shotWorld; };
+    // Door leaves that open ahead of the eye: a planner-v2 track carries `doors[<anchors.doors id>]`, the leaf pivot's rotation.y per
+    // sample (assets/shot-doors.ts); visibility.ts runs this every frame after putting back what the last one posed, so a random-access
+    // frame never depends on another and the editor never keeps a door a shot opened.
+    visibility.shotPose((frame, touch) => {
+      const tr = frame.preset && frame.preset.track;
+      if (!tr || !tr.doors || !activeHouse) return;
+      for (const d of activeHouse.anchors.doors || []) { const ch = tr.doors[d.id]; if (ch && d.pivot) touch(d.pivot).rotation.y = doorAngleAt(ch, frame.s); }
+    });
     // headless QA hook (render-house-shots.mts / frame checks): the loaded house's spec + anchors, the scene and camera
     window.__houseDebug = () => ({ house: activeHouse, scene, camera: activeCamera, presets: SplinePresets, renderer });
     // Prop sheet (scripts/prop-sheet.mts): each type built alone on a neutral floor, shot from the front-right

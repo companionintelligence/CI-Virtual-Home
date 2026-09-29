@@ -12,7 +12,8 @@
 // reported. `metrics` carries the numbers the fleet targets (camera-audit.mts) read.
 //
 // Owner: S5 (shot).
-import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, wrapPi, createWorldIndex, type ShotWorld, type Box6 } from './shot-world.js';
+import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, wrapPi, createWorldIndex, leafSegment, type ShotWorld, type Box6 } from './shot-world.js';
+import { firstCrossing, leafOpen, DOOR_DONE_S } from './shot-doors.js';
 import { createProbe, camera, project, projectBox, bgClass, type V3 } from './shot-probe.js';
 import { createNav, roomInterest } from './shot-nav.js';
 import { BEATS, SPEED_CAP, YAW_CAP, PITCH, BEAT_FLOOR, BEAT_WINDOW, OUTSIDE, LENS, sampleTrack, type Track, type Beat } from './shot-planner.js';
@@ -29,7 +30,7 @@ export const QA_CODES: Record<string, 'error' | 'warn'> = {
   'yaw-whip': 'error', 'pitch': 'error', 'door-speed': 'error', 'reverse': 'error', 'hero-surface': 'error', 'monitor-near': 'error',
   'outside-share': 'error', 'blank-frame': 'error', 'dead-air': 'error', 'beat-floor': 'error', 'roof-timing': 'error', 'door-closed': 'error',
   'via-missed': 'error', 'attic-route': 'error', 'orbit-core-out-of-frame': 'error', 'orbit-core-occluded': 'error',
-  'yaw-rate': 'warn', 'beat-yaw': 'warn', 'outside-share-high': 'warn', 'first-second': 'warn', 'last-second': 'warn', 'floor-proximity': 'warn',
+  'door-leaf': 'warn', 'yaw-rate': 'warn', 'beat-yaw': 'warn', 'outside-share-high': 'warn', 'first-second': 'warn', 'last-second': 'warn', 'floor-proximity': 'warn',
   'look-error': 'warn', 'core-height': 'warn', 'core-narrow': 'warn', 'core-thirds': 'warn', 'chair-share': 'warn', 'top-rooms': 'warn',
   'stair-short': 'warn', 'fov-rate': 'warn', 'fov-range': 'warn', 'near-blank': 'warn', 'beat-window': 'warn', 'beat-speed': 'warn',
   'doorway-speed': 'warn', 'accel': 'warn', 'jerk': 'warn', 'crab': 'warn', 'beat-pitch': 'warn', 'verticals': 'warn', 'look-near': 'warn',
@@ -116,13 +117,15 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
       if (l.y <= 0.05) { if (p[1] < l.y + 0.05) E('floor-clip', t, `eye ${(p[1] - l.y).toFixed(2)} m above the ${l.id} floor`, l.id); continue; }
       if (p[1] > l.y - 0.3 && p[1] < l.y + 0.05 && !l.voids.some(v => inRect(p[0], p[2], v, 0.1))) E('floor-clip', t, `eye passes through the ${l.id} floor slab at ${tag(p)}`, l.id);
     }
-    // the ceiling: 0.2 m under it, where no void above opens the room up
-    const lv = levelAt(world, p[0], p[1], p[2]);
-    if (lv && inFootprint(lv.rects, p[0], p[2], 0.05) && p[1] > lv.y + lv.h - 0.2 && p[1] < lv.y + lv.h + 0.3) {
+    // the ceiling: 0.2 m under it, where an upper storey's floor closes the room over it and no void opens it up (a storey at
+    // y = the one below's ceiling hides the lower storey from levelAt above y − 0.25, so each storey is asked, not the nearest)
+    for (const lv of world.levels) {
+      if (!(p[1] > lv.y + lv.h - 0.2 && p[1] < lv.y + lv.h + 0.3) || !inFootprint(lv.rects, p[0], p[2], 0.05)) continue;
       const above = world.levels.find(l => l.y > lv.y + 0.5 && l.y < lv.y + lv.h + 0.6);
       const open = !above || !above.rects.some(r => inRect(p[0], p[2], r)) || above.voids.some(v => inRect(p[0], p[2], v, 0.1));
       if (!open) E('ceiling', t, `eye ${(lv.y + lv.h - p[1]).toFixed(2)} m under the ${lv.id} ceiling`, lv.id);
     }
+    const lv = levelAt(world, p[0], p[1], p[2]);
     // clearance at eye height (indoors, off the stairs): walls and furniture in plan
     if (inside && beat[i] !== 'stair' && beat[i] !== 'descend' && beat[i] !== 'orbit' && beat[i] !== 'power' && beat[i] !== 'hero' && lv) {
       const d = index.planDistance(p[0], p[2], p[1] - 0.25, p[1] + 0.25, k => k === K.wall || k === K.glass || k === K.rail || k === K.hull || k === K.item || k === K.fixture, 0.5);
@@ -287,6 +290,24 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     }
   }
   metrics.doorways = doorsCrossed.length;
+
+  // ---- door leaves: shut in the house, opened by the track ahead of the eye, and never swung into it ----------------------
+  for (const d of world.doors || []) {
+    if (d.open || d.closedAngle === null || d.openAngle === null) continue;
+    const ic = firstCrossing(d, track.pos, N); if (ic < 0) continue;
+    metrics.doorLeaves = (metrics.doorLeaves || 0) + 1;
+    const ch = track.doors && track.doors[d.id];
+    const openAt = (i: number) => ch ? leafOpen(d, ch[Math.max(0, Math.min(N - 1, i))]) : 0;
+    const early = openAt(ic - Math.round(DOOR_DONE_S / 2 / dt));
+    if (early < 0.9) E('door-closed', tOf(ic), `the door "${d.id}" is ${(early * 100).toFixed(0)} % open when the eye reaches it${ch ? '' : ' (the track has no channel for it)'}`, `door ${d.id}`);
+    for (let i = 0; i <= Math.min(N - 1, ic + Math.round(2 / dt)); i += 3) {
+      const yawDeg = d.closedYaw + (d.openYaw - d.closedYaw) * openAt(i), seg = leafSegment(d, yawDeg), p = eye[i];
+      if (p[1] < d.y0 - 0.3 || p[1] > d.y0 + d.h + 0.3) continue;
+      const vx = seg.b[0] - seg.a[0], vz = seg.b[1] - seg.a[1], u = clamp(((p[0] - seg.a[0]) * vx + (p[2] - seg.a[1]) * vz) / (vx * vx + vz * vz || 1), 0, 1);
+      const dd = Math.hypot(p[0] - (seg.a[0] + vx * u), p[2] - (seg.a[1] + vz * u));
+      if (dd < 0.25) W('door-leaf', tOf(i), `the leaf of door "${d.id}" is ${dd.toFixed(2)} m from the eye as it swings (≥ 0.25)`, `door ${d.id}`);
+    }
+  }
 
   // ---- beats: floors, windows ---------------------------------------------------------------------------
   for (const [b, spans] of beatSpans) {

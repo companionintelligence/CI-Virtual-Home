@@ -12,6 +12,7 @@
 // THREE-free and deterministic, like the rest of planner v2. Owner: S5 (shot).
 import { K, DEG, clamp, inRect, inFootprint, mulberry32, fnv1a, wrapPi, createWorldIndex, type ShotWorld, type WLevel, type WRoom } from './shot-world.js';
 import { createNav, roomInterest } from './shot-nav.js';
+import { planDoors } from './shot-doors.js';
 import { createProbe, camera, project, type V3 } from './shot-probe.js';
 import { createOrbitProbeW, heroRing, fovForCore } from './framing.js';
 import { BEATS, FPS, YAW_CAP, hann, rateLimit, fillet, polyLen, sampleTrack, trackHash, type Track, type Beat } from './shot-planner.js';
@@ -66,7 +67,7 @@ function finishTrack(type: string, world: ShotWorld, probe: any, duration: numbe
   }
   const beats: Track['beats'] = [];
   for (let i = 0; i < N;) { let j = i; while (j + 1 < N && beatOf[j + 1] === beatOf[i]) j++; beats.push({ name: BEATS[beatOf[i]], t0: +(i * dt).toFixed(4), t1: +((j + 1 < N ? j + 1 : j) * dt).toFixed(4), subject: null }); i = j + 1; }
-  const track: Track = { version: 2, planner: 'v2', type, id: world.id, duration, fps: FPS, samples: N, dt, pos, look, fov, roofAlpha, composeW, compose, beat: beatOf, beats, events: { enterT: null, stairT: [], pressT: null, settleT: null, doneT: duration, firstCoreT: null }, doors: {}, metrics: {}, plan, desired };
+  const track: Track = { version: 2, planner: 'v2', type, id: world.id, duration, fps: FPS, samples: N, dt, pos, look, fov, roofAlpha, composeW, compose, beat: beatOf, beats, events: { enterT: null, stairT: [], pressT: null, settleT: null, doneT: duration, firstCoreT: null }, doors: planDoors(world, pos, N, dt), metrics: {}, plan, desired };
   // the press: once the Core has been in frame and in sight for 1.5 s, and the power beat has begun
   const pw = beats.find(b => b.name === 'power');
   if (pw) {

@@ -8,7 +8,7 @@
 // the committed plans' `shots` key (assets/plan-export/shots.ts) carries the same JSON for whoever regenerates them.
 //
 //   import { ensureWorlds } from './shot-worlds.mts'; const worlds = await ensureWorlds(ids);
-//   node --experimental-strip-types scripts/shot-worlds.mts [--house a,b] [--rebuild] [--fixtures]
+//   node --experimental-strip-types scripts/shot-worlds.mts [--house a,b] [--rebuild] [--stale-ok] [--fixtures]
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts, parseArgs, houseIds } from './portal-lib.mts';
@@ -33,8 +33,9 @@ export function isFresh(id: string): boolean {
 export function readWorld(id: string): any { return JSON.parse(fs.readFileSync(worldFile(id), 'utf8')); }
 
 /** Make the worlds of `ids` that are missing or stale (all of them with `rebuild`) in one browser; returns id → world. */
-export async function ensureWorlds(ids: string[], { rebuild = false, log = true }: { rebuild?: boolean; log?: boolean } = {}): Promise<Map<string, any>> {
-  const todo = ids.filter(id => rebuild || !isFresh(id));
+export async function ensureWorlds(ids: string[], { rebuild = false, log = true, staleOk = false }: { rebuild?: boolean; log?: boolean; staleOk?: boolean } = {}): Promise<Map<string, any>> {
+  // staleOk: a world file that exists is used as it is (planner work that does not change what the digest reads)
+  const todo = ids.filter(id => rebuild || (staleOk ? !fs.existsSync(worldFile(id)) : !isFresh(id)));
   if (todo.length) {
     fs.mkdirSync(WORLDS, { recursive: true });
     const srv = await serve(ROOT, '/');
@@ -66,6 +67,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const args = parseArgs(process.argv.slice(2));
   const ids = args.house ? args.house.split(',') : [...houseIds(), ...(args.fixtures === 'true' ? fixtureIds() : [])];
   const t = Date.now();
-  const w = await ensureWorlds(ids, { rebuild: args.rebuild === 'true' });
+  const w = await ensureWorlds(ids, { rebuild: args.rebuild === 'true', staleOk: args['stale-ok'] === 'true' });
   console.log(`${w.size} worlds in ${path.relative(process.cwd(), WORLDS)} (${((Date.now() - t) / 1000).toFixed(0)} s)`);
 }

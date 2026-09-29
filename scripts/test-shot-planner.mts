@@ -13,7 +13,7 @@
 //      only failing when the machine is not loaded — a busy machine inflates CPU time too).
 //
 //   node --experimental-strip-types scripts/test-shot-planner.mts [--house a,b] [--fixtures] [--update] [--parity 2|0|all]
-//        [--rebuild-worlds] [--planner-only] [--out test/qa/shot-planner.json]
+//        [--rebuild-worlds] [--stale-ok] [--planner-only] [--out test/qa/shot-planner.json]
 //   --update writes test/shots/<id>.track.json: the track's hash and metrics, which the next run compares (a drift is
 //   reported, never a failure: the layout pass and the other streams change the houses the worlds are made of).
 // Needs `pnpm run build`. Exit 0 all pass · 1 a check failed · 2 harness error.
@@ -34,7 +34,7 @@ const cpuMs = () => { const u = process.cpuUsage(); return (u.user + u.system) /
 let bad = 0;
 const check = (ok: boolean, what: string, detail = '') => { console.log(`${ok ? '✓' : '✗'} ${what}${ok || !detail ? '' : `\n    ${detail.split('\n').join('\n    ')}`}`); if (!ok) bad++; };
 
-const worlds = await ensureWorlds([...ids, ...fixtures], { rebuild: args['rebuild-worlds'] === 'true' });
+const worlds = await ensureWorlds([...ids, ...fixtures], { rebuild: args['rebuild-worlds'] === 'true', staleOk: args['stale-ok'] === 'true' });
 const specOf = (id: string) => JSON.parse(fs.readFileSync(specFile(id), 'utf8'));
 
 // ---- 1 + 2. plan (twice), QA
