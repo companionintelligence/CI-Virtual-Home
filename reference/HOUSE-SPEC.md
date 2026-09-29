@@ -260,8 +260,13 @@ Every flight climbs from its own storey to `to`, so a half-storey up takes a hal
 `colonial`, `spiral`, `closed` (a boxed flight) and the turning `L` (quarter turn on a landing) and `U` (half turn, the second
 flight running back beside the first); `L`/`U` take `style` (`timber`|`colonial`|`closed`), `turn` (`left`|`right`, seen
 climbing), `landing` (depth along the first flight), `split` (L: the share of risers in the first flight), `gap` (U), `run2`.
-Any flight takes `treadWood`, `riser` (`open`|`closed`), `stringer` (colour), `handrailSide` and `autoVoid: true`, which cuts
-the void the climb needs in the storey above from the flight itself (`voids[]` need not list it).
+Any flight takes `treadWood` (timber and closed flights, and the landing of a turning stair; a colonial flight keeps its mahogany
+treads), `riser` (`open`|`closed`), `stringer` (colour), `handrailSide` and `autoVoid: true`, which cuts the void the climb needs in
+the storey above from the flight itself (`voids[]` need not list it): from the near edge of the first tread whose headroom is under
+2 m, the flight's width plus 5 cm a side, to the top — trimmed to the storey's outline (a stair built against a wall keeps a hole that
+stops at the wall's face), and a flight at 45° gets a staircase-edged hole, not its bounding box. A hole on the edge of a slab, or past
+it, corrupts the slab, so every hole the builder cuts is clipped; the validator warns (`void-outline`) about a `voids[]` entry that
+reaches the outline.
 
 **Room finishes.** `rooms[].floor` is a kind or `{ kind, color?, pattern?, scale?, run? }` (`oak`, `honey-oak`, `walnut`,
 `herringbone`, `tile`, `hex-tile`, `checker`, `terracotta`, `stone`, `carpet`, `marble`, `terrazzo`, `deck` …); it is an overlay on
@@ -270,8 +275,12 @@ inner faces of the walls round the room (`paint`, `plaster`, `painted-brick`, `b
 `shiplap`, `timber`, `tile` …), tagged role `finish` so the cutaway lifts them with the wall; `feature` gives one side (or one
 `partitions[]` index) its own finish. `rooms[].ceiling` is always an object — `{ kind: 'flat'|'timber'|'beams'|'vault'|'tray'|'double',
 color?, rise?, ridge?, rail? }`; `double` makes the room double height (the storey above opens over it and rails the gallery).
-`rooms[].floorOffset` raises (+) or sinks (−) the floor over the room's bounds. Under `defaults: 2` a room with no floor gets a
-seeded one for its program (kitchen and bath tile, living rooms warm wood, bedrooms wood or carpet) that its neighbours do not share.
+`rooms[].floorOffset` raises (+) a platform over the room's bounds, or sinks (−) a pit: the storey's slab is opened over the pit and the
+pit has its own floor and sides (it needs a storey under it and its floor above grade — else the room stays flat, and the validator says
+so). A room's items keep the storey's floor height: give the items in a raised or sunken room `y: floorOffset`. A room's floor is laid
+over its bounds inside the footprint, **less every hole of the slab** (`voids`, a flight's `autoVoid`, the room below when it is double
+height, a pit) — a floor never seals a stairwell. Under `defaults: 2` a room with no floor gets a seeded one for its program (kitchen
+and bath tile, living rooms warm wood, bedrooms wood or carpet) that its neighbours do not share.
 
 **Sections.** `footprint[i].h` gives a volume its own wall height (a tower, a low wing); `footprint[i].material` / `.color` its own
 cladding. `levels[].knee` stops the perimeter walls at a knee height (the roof's underside is the ceiling above). `levels[].split:
@@ -297,7 +306,8 @@ unless asked for), `ends` (per side: `gable`, `hip`, `open` — the roof and rak
 taller wall), `gableGlass` (sides glazed instead of clad), `gableCladding`, `pitches` (per face, degrees — a saltbox's steep short
 face and long shallow one), `sweep` (faces that run on down over a lower wing with no raised heel: a catslide), `skylights`,
 `planted` (`meadow` | `sedum` — a green roof with seeded planting and trailing growth over the eaves), `clip` (cut the roof where a
-taller storey rises through it and trim eaves against parapets; on under `defaults: 2`), `dormers[].style` (`gable`, `shed`,
+taller storey rises through it — pitched deck and flat slab alike — and trim eaves against parapets; on under `defaults: 2`; the storey
+it cuts round then needs a roof of its own, or it stands open to the sky: `roof-open-sky`), `dormers[].style` (`gable`, `shed`,
 `flat`, `eyebrow`, `glazed`) and `.side`, `type: 'pent'` (a shed along a wall), and a `chimney` of `{ at, w, d, h, material:
 'brick'|'stone'|'stucco'|'metal', color, cap: 'stone'|'pots'|'metal' }` on any roof, flat ones included (`h` is how far it stands over
 the highest roof point it rises through).
@@ -306,12 +316,20 @@ the highest roof point it rises through).
 (default the entry's):
 - `porch` — `{ side, from, to, depth, roof: 'shed'|'hip'|'gable'|'flat'|'none', pitch?, roofColor?, finish?, posts: { spacing|n, style:
   'square'|'round'|'turned'|'tapered'|'steel', size, color }, rail, floorY, steps, ceiling }`. The roof is built by `roofs.ts` (eaves,
-  fascia, gutters) and abuts the house wall; posts are kept out of every doorway on the wall and off the steps.
+  fascia, gutters) and abuts the house wall; posts are kept out of every doorway on the wall and off the steps. `floorY` is the deck's top
+  (default the storey's y, or 0.12 m at grade). The roof leans on the wall just under the eave and falls to the posts, keeping 2.3 m over
+  the deck at its eave where it can: a shallower pitch (5° at least) buys that clearance, and a gable's ridge is held to the height a shed
+  would lean on the wall at — so on a single storey with a raised deck the roof comes out low (the validator says `porch-pitch` when the
+  built pitch is not the one asked, `porch-clearance` under 2 m of post).
 - `balcony` / `terrace` / `loggia` — `{ level, side, from, to, depth }` or `{ level, rect }`, `rail: 'glass'|'metal'|'timber'|'parapet'|
-  'none'`. A balcony is a slab out of the wall; a terrace is a deck on the roof below (it fades with the roofs); a loggia is recessed
-  under the storey above (`posts` along its open side).
-- `bay` — `{ level, side, at, w, depth, form: 'box'|'canted', roof, sill, head, h }`: the host wall is opened over the bay, which has a
-  floor, glazed walls (canted at 45° for `canted`), a ceiling and its own roof.
+  'none'`. A balcony is a slab out of the wall; a terrace is a deck on the roof below (it fades with the roofs); a loggia is a recessed
+  floored, railed outdoor room (`posts` along its open side) under the storey above, or — with no storey above — under the eave of its
+  own storey (posts run to the wall top), so a loggia under a gable end needs no second storey.
+- `bay` — `{ level, side, at, w, depth, form: 'box'|'canted', roof: 'hip'|'shed'|'flat'|'gable'|'none', skirt: 'grade'|'oriel'|'none', sill,
+  head, h }`: the host wall is opened over the bay, which has a floor, glazed walls (canted at 45° for `canted`), a ceiling and its own
+  roof. It stands on a stone skirt to grade on the lowest storey; higher up (`oriel`) on a 0.3 m sill course in the wall's cladding, so
+  a bay over a bay stands on the lower one's top when that has `roof: 'none'` (else the lower roof runs into the upper wall: `feature-wall`).
+  The bay must lie on one wall of its storey (`feature-wall` error past its ends).
 - `fireplace` — `{ level, at, rot, style: 'modern'|'mantel'|'stone'|'painted-brick'|'tv-breast', w, chimney, stack: 'outside'|'inside' }`:
   a breast and hearth in the room and the stack it needs — outside an exterior wall it backs onto (shouldered, from grade), or up
   through the storeys above — always out through the roof over it. A `fireplace` room item with `chimney: true` (or a chimney
@@ -328,9 +346,16 @@ work, alongside). Under `defaults: 2` a top storey's solid partitions meet the c
 room floors, stoop and towers from it (`pnpm run test:twins`).
 
 **Lints** (`scripts/validate/arch.mts`; warnings until the layout pass): `stair-void` (the storey above is solid where a flight needs
-its headroom), `stair-step-off` (0.3 m past the top step is a void, outside the slab, or a wall), `roof-storey` (a roof slices through
-a taller storey's walls), `roof-y` (its eave meets no storey top under it), `chimney-hearth`, `porch-door`, `feature-opening`. Errors:
-an unknown kind in any S2 field, a flight with no `at`, a `to` that is not a higher storey, an `edgeZ` that names no edge.
+its headroom), `stair-step-off` (0.3 m past the top step is a void, outside the slab, or a wall), `stair-route` (an L/U stair on the way to
+the Core's storey, which the v1 shot planner flies straight through), `void-outline` (a `voids[]` rect reaches the slab's outline),
+`roof-storey` (a roof slices through a taller storey's walls — pitched or flat), `roof-open-sky` (a clipped roof leaves that storey with
+none), `roof-y` (its eave meets no storey top under it), `chimney-hearth`, `porch-door` (posts leave more than 4.5 m unsupported),
+`porch-pitch`, `porch-clearance`, `feature-opening` (a porch roof — its true top — across an upper window or its box, a bay over a door,
+a balcony's deck over a window), `feature-wall` (a porch or bay past the end of its wall, stacked bays), `room-feature` (a
+`walls.feature` side with no wall to line, a sunken room with nothing under it). Errors: an unknown kind or a value out of range in
+any S2 field (porch `roof`/`posts.style`/`rail.style`/`pitch`/`steps.at`, bay `h`/`sill`/`head`, stair `w`/`run`/`landing`, colours), a
+flight with no `at`, a `to` that is not a higher storey, an `edgeZ` that names no edge, and a feature that stands on nothing (a porch, bay or
+balcony with no wall holding it, a fireplace or built-in outside its storey's footprint, a terrace or loggia rect nowhere near the house).
 
 ### Rooms & composition (S3)
 

@@ -12,14 +12,23 @@
 //   roof-storey      a roof whose plan runs into a taller storey's walls (the roof slices through it)
 //   roof-y           a roof's eave height meets no storey top under it (a gap or an overlap at the wall head)
 //   chimney-hearth   a roof chimney that stands over no fireplace (and a fireplace feature under no roof)
-//   porch-door       a porch post in a door's span
-//   feature-opening  a bay over a door, a porch roof across an upper window, a balcony's deck across a window
+//   porch-door       a porch's built posts leave more than 4.5 m between two supports (the builder moves them out of doors and off the steps)
+//   porch-pitch      a porch roof's pitch is not the one the spec asked for (its eave has to clear the deck)
+//   porch-clearance  a porch's posts stand under 2 m over its deck
+//   feature-opening  a bay over a door, a porch roof (its true top) across an upper window or its box, a balcony's deck across a window
+//   feature-wall     a porch or bay that runs past the end of its wall; two bays stacked with a roof between them
+//   roof-open-sky    a roof cut for a storey that rises through it (clip) leaves that storey with no roof of its own
+//   void-outline     a void that reaches or crosses its storey's outline (the slab is built with it trimmed to the wall's face)
+//   room-feature     a room's `walls.feature` on a side with no wall to line; a sunken room with no storey under it
+//   stair-route      an L or U stair on the way to the storey the Core stands on, for the v1 shot planner
 // and checks the S2 fields' values (unknown kinds are errors, like the core's vocabularies).
 // (S0 also lets this plugin replace 'footprint-rects' and 'partition-axis-aligned' — polygon plans and angled partitions, which S2
 // has not built, so neither is replaced.)
 import type { Check, Extend, Rule } from './_types.mts';
 import { levelStairs, houseStairs, autoVoidsFor } from '../../assets/stairs.js';
-import { porchPosts as porchPostsAlong } from '../../assets/arch-plan.js';
+import { porchPlan, offWallRect, insideOutline, sunkRooms } from '../../assets/arch-plan.js';
+import { roomWalls } from '../../assets/room-finish.js';
+import { specDefaults } from '../../assets/spec/index.js';
 
 export const extend: Extend = { stairTypes: ['closed', 'L', 'U'], roofTypes: ['pent'] };
 export const replaces: Rule[] = ['stairs', 'raised-level'];
@@ -68,6 +77,11 @@ const check: Check = (spec, ctx) => {
       oneOf(st.riser, ['open', 'closed'], `${S}.riser`);
       oneOf(st.handrailSide, ['left', 'right', 'both', 'none'], `${S}.handrailSide`);
       colour(st.stringer, `${S}.stringer`);
+      oneOf(st.treadWood, FLOOR_KINDS, `${S}.treadWood`);
+      const num = (k: string, lo: number, hi: number) => { if (st[k] !== undefined && !(typeof st[k] === 'number' && st[k] >= lo && st[k] <= hi)) err(`${S}.${k} ${JSON.stringify(st[k])} (metres, ${lo} – ${hi})`, 'vocab'); };
+      num('w', 0.4, 3); num('run', 0.3, 20); num('run2', 0.3, 20); num('landing', 0.6, 4); num('gap', 0, 1);
+      if (st.split !== undefined && !(typeof st.split === 'number' && st.split > 0.1 && st.split < 0.9)) err(`${S}.split ${JSON.stringify(st.split)} (0.1 – 0.9: the share of the risers below the landing)`, 'vocab');
+      if (st.treadWood !== undefined && st.type === 'colonial') warn(`${S}: treadWood does not reach a colonial flight (its treads are mahogany) — timber, closed and the landings of a turning stair take it`, 'stair-tread');
     });
     if (arr && !levelStairs(lv).length) err(`${L}: stairs is an empty array`);
   }
@@ -96,6 +110,21 @@ const check: Check = (spec, ctx) => {
         if (across < 0.45 && along > lo - w && along < hi + w) err(`level ${lv.id}: balustrade ${JSON.stringify(bl.from)}→${JSON.stringify(bl.to)} crosses the stair step-off at (${tx.toFixed(2)}, ${tz.toFixed(2)})`);
       }
     }
+  }
+
+  // ---- voids that reach the slab's outline: a hole on the edge of a slab, or past it, breaks its triangulation ----------------------
+  for (const lv of levels) {
+    if (!((lv.y || 0) > 0.001)) continue;
+    for (const v of lv.voids || []) {
+      if (!(v && v.w > 0 && v.d > 0)) continue;
+      const kept = insideOutline(lv, [v], 0.02), area = kept.reduce((a, r) => a + r.w * r.d, 0);
+      if (area < v.w * v.d - 0.01) warn(`level ${lv.id}: the void [${v.x}, ${v.z}, ${v.w} × ${v.d}] reaches or crosses the storey's outline (${fmt(100 * (1 - area / (v.w * v.d)))} % of it lies outside the slab) — built trimmed to the wall's face, but a hole on the edge of a slab is a drawing error`, 'void-outline');
+    }
+  }
+  // ---- an L or U stair on the way to the storey the Core stands on: the v1 shot planner flies a straight line from its first step to its last
+  if (spec.hero && spec.entry && byId[spec.hero.level] && byId[spec.entry.level] && (byId[spec.hero.level].y || 0) > (byId[spec.entry.level].y || 0) + 0.5) {
+    const turning = flights.filter(f => (f.plan.shape === 'L' || f.plan.shape === 'U') && f.plan.to === spec.hero.level);
+    if (turning.length) warn(`the Core stands on ${spec.hero.level}, reached by the ${turning[0].plan.shape}-stair at [${turning[0].plan.bottom}]: the v1 shot planner flies a straight line from that flight's first step to its last, through its landing (shot QA stair-clip) — the walk follows anchors.stairs[].path once the v2 planner lands`, 'stair-route');
   }
 
   // ---- stair-void and stair-step-off ----------------------------------------------------------------------------------
@@ -187,12 +216,25 @@ const check: Check = (spec, ctx) => {
       const near = under.map(l => topOf(l)).filter(t => Math.abs(t - rf.y) > 0.05 && Math.abs(t - rf.y) < 0.8);
       if (near.length) warn(`${R}: its eave matches no storey top under it (the walls stop at ${near.map(fmt).join(', ')}; storey tops: ${tops.join(', ')}) — a gap or an overlap at the wall head`, 'roof-y');
     }
-    // a taller storey inside the roof's plan (not just against one of its sides): the roof runs through its walls
+    // a taller storey inside the roof's plan (not just against one of its sides): the roof runs through its walls — or, with
+    // clip (roofs[].clip, or defaults: 2), is cut round them and leaves that storey to its own roof
+    const clipOn = rf.clip === true || (rf.clip === undefined && specDefaults(spec) >= 2);
     for (const l of levels) {
       if (l === cap || !((l.y || 0) < rf.y + 0.05 && topOf(l) > rf.y + 0.3)) continue;
       for (const r of l.footprint || []) {
         const ix = Math.min(O.x + O.w, r.x + r.w) - Math.max(O.x, r.x), iz = Math.min(O.z + O.d, r.z + r.d) - Math.max(O.z, r.z);
-        if (ix > 0.6 && iz > 0.6 && pitched && !rf.clip) warn(`${R}: level ${l.id} (rect x ${r.x}, z ${r.z}, ${r.w} × ${r.d}) rises through it (${fmt(ix)} × ${fmt(iz)} m inside the roof's plan) — the roof slices its walls (roofs[].clip: true, or defaults: 2)`, 'roof-storey');
+        if (!(ix > 0.6 && iz > 0.6)) continue;
+        if (!clipOn) { warn(`${R}: level ${l.id} (rect x ${r.x}, z ${r.z}, ${r.w} × ${r.d}) rises through it (${fmt(ix)} × ${fmt(iz)} m inside the roof's plan) — the ${pitched ? 'roof slices' : 'slab runs through'} its ${pitched ? 'walls' : 'rooms'} (roofs[].clip: true, or defaults: 2)`, 'roof-storey'); continue; }
+        // clipped: the storey needs a roof of its own over that rect, or a storey above it — or it stands open to the sky. The
+        // part of the hole (the rect inside this roof's plan) that no other roof at that storey's top, and no storey above, covers:
+        const top = (l.y || 0) + (r.h !== undefined ? r.h : l.knee !== undefined ? l.knee : (l.height || 2.8));
+        const hole = { x0: Math.max(O.x, r.x), x1: Math.min(O.x + O.w, r.x + r.w), z0: Math.max(O.z, r.z), z1: Math.min(O.z + O.d, r.z + r.d) };
+        const cappers = (spec.roofs || []).filter(o => o !== rf && o.over && typeof o.y === 'number' && o.y > rf.y + 0.05 && Math.abs(o.y - top) < 0.9).map(o => o.over);
+        const above = levels.filter(u => u !== l && (u.y || 0) >= (l.y || 0) + 0.5).flatMap(u => u.footprint || []);
+        let open = 0;
+        for (let x = hole.x0 + 0.25; x < hole.x1; x += 0.5) for (let z = hole.z0 + 0.25; z < hole.z1; z += 0.5)
+          if (!cappers.some(q => inRect(x, z, q, 0.05)) && !above.some(q => inRect(x, z, q, 0.05))) open += 0.25;
+        if (open > 3) warn(`${R}: cut round level ${l.id} (rect x ${r.x}, z ${r.z}, ${r.w} × ${r.d}), ${fmt(open)} m² of which has no roof over it — the rooms stand open to the sky from above (a roof at y ${fmt(top)} over it, or roofs[].clip: false)`, 'roof-open-sky');
       }
     }
   });
@@ -210,38 +252,68 @@ const check: Check = (spec, ctx) => {
 
   // ---- features ----------------------------------------------------------------------------------------------------------
   const opsOn = (lv, side) => (lv && lv.openings || []).filter(o => o.side === side);
+  const PORCH_ROOFS = ['shed', 'hip', 'gable', 'flat', 'none'], POST_STYLES = ['square', 'round', 'turned', 'tapered', 'steel'], PORCH_RAILS = ['spindle', 'glass', 'metal', 'timber'];
+  const nearFootprint = (r: any, tol: number) => levels.some(l => (l.footprint || []).some(q => r.x < q.x + q.w + tol && r.x + r.w > q.x - tol && r.z < q.z + q.d + tol && r.z + r.d > q.z - tol));
+  const inFootprint = (lv: any, p: number[]) => (lv && lv.footprint || []).some(q => inRect(p[0], p[1], q, 0.05));
+  const numIn = (v: any, lo: number, hi: number, what: string, unit = 'metres') => { if (v !== undefined && !(typeof v === 'number' && Number.isFinite(v) && v >= lo && v <= hi)) err(`${what} ${JSON.stringify(v)} (${unit}, ${lo} – ${hi})`, 'vocab'); };
+  const bays = (spec.features || []).map((f, i) => ({ f, i })).filter(({ f }) => f && f.type === 'bay' && f.w > 0);
   (spec.features || []).forEach((f, i) => {
     const F = `features[${i}] (${f.type})`;
-    if (!FEATURE_TYPES.includes(f.type)) { err(`${F}: type "${f.type}" (${FEATURE_TYPES.join(' | ')})`, 'vocab'); return; }
+    if (!f || !FEATURE_TYPES.includes(f.type)) { err(`${F}: type "${f && f.type}" (${FEATURE_TYPES.join(' | ')})`, 'vocab'); return; }
     const lv = byId[f.level || (f.type === 'porch' ? (spec.entry || {}).level : undefined)] || (f.type === 'porch' ? levels[0] : null);
     if (f.level !== undefined && !byId[f.level]) { err(`${F}: level "${f.level}" is not a level`, 'feature'); return; }
     if (['porch', 'bay'].includes(f.type) || (f.type === 'balcony' && !f.rect)) oneOf(f.side, SIDES, `${F}: side`);
     if (f.type === 'porch') {
       if (!(typeof f.from === 'number' && typeof f.to === 'number' && f.to > f.from && f.depth > 0)) { err(`${F}: needs from < to and depth > 0`, 'feature'); return; }
-      const posts = porchPostsAlong(f);
-      for (const op of opsOn(lv, f.side)) {
-        if (!['door', 'slider', 'garage'].includes(op.type)) continue;
-        const hit = posts.find(p => Math.abs(p - op.at) < (op.w || 1) / 2 + 0.15);
-        if (hit !== undefined) warn(`${F}: a post at ${fmt(hit)} stands in the ${op.type} at ${op.at} (w ${op.w}) — posts.spacing / n, or move the porch`, 'porch-door');
-      }
-      // an upper storey's window behind the porch roof
+      oneOf(f.roof, PORCH_ROOFS, `${F}: roof`); oneOf(f.finish, ROOF_FINISH, `${F}: finish`);
+      colour(f.roofColor, `${F}: roofColor`); colour(f.floorColor, `${F}: floorColor`); colour(f.ceiling, `${F}: ceiling`);
+      numIn(f.pitch, 1, 75, `${F}: pitch`, 'degrees'); numIn(f.floorY, 0, 4, `${F}: floorY`); numIn(f.depth, 0.5, 8, `${F}: depth`);
+      if (f.posts !== undefined && (typeof f.posts !== 'object' || f.posts === null)) err(`${F}: posts must be an object ({ n | spacing, style, size, color })`, 'vocab');
+      else if (f.posts) { oneOf(f.posts.style, POST_STYLES, `${F}: posts.style`); colour(f.posts.color, `${F}: posts.color`); numIn(f.posts.size, 0.05, 0.6, `${F}: posts.size`); numIn(f.posts.spacing, 0.5, 8, `${F}: posts.spacing`); if (f.posts.n !== undefined && !(Number.isInteger(f.posts.n) && f.posts.n >= 2 && f.posts.n <= 30)) err(`${F}: posts.n ${JSON.stringify(f.posts.n)} (a whole number, 2 – 30)`, 'vocab'); }
+      if (f.rail !== undefined && typeof f.rail !== 'boolean') { if (typeof f.rail !== 'object' || f.rail === null) err(`${F}: rail (true | false | { style, color, h })`, 'vocab'); else { oneOf(f.rail.style, PORCH_RAILS, `${F}: rail.style`); colour(f.rail.color, `${F}: rail.color`); numIn(f.rail.h, 0.3, 1.5, `${F}: rail.h`); } }
+      if (f.steps !== undefined && typeof f.steps !== 'boolean') { if (typeof f.steps !== 'object' || f.steps === null) err(`${F}: steps (true | false | { at, w })`, 'vocab'); else { numIn(f.steps.at, f.from, f.to, `${F}: steps.at`, 'along the wall, inside the porch'); numIn(f.steps.w, 0.6, 6, `${F}: steps.w`); } }
+      const plan = porchPlan(spec, f);
+      if (!plan) { err(`${F}: no wall of ${lv && lv.id} on side ${f.side} holds [${f.from}, ${f.to}] — a porch stands against a wall`, 'feature'); return; }
+      const past = Math.max(plan.ow.edge ? (plan.horiz ? plan.ow.edge.a[0] : plan.ow.edge.a[1]) - f.from : 0, f.to - (plan.horiz ? plan.ow.edge.b[0] : plan.ow.edge.b[1]));
+      if (past > f.depth + 0.3) warn(`${F}: runs ${fmt(past)} m past the end of its wall — it hangs off the corner`, 'feature-wall');
+      // posts: the builder keeps them out of the doorways and off the steps; this reports what is left
+      const stand = [plan.a0, ...plan.posts, plan.a1].sort((p, q) => p - q);
+      const gap = Math.max(...stand.slice(1).map((v, k) => v - stand[k]));
+      if (f.roof !== 'none' && (plan.posts.length < 2 || gap > 4.5)) warn(`${F}: its ${plan.posts.length} posts leave a ${fmt(gap)} m span with nothing under the header (posts kept out of the doors and off the steps: ${plan.postsAsked.length} asked) — posts.n / spacing, or a narrower porch`, 'porch-door');
+      if (f.roof !== 'none' && f.roof !== 'flat' && f.pitch !== undefined && Math.abs(plan.pitch - plan.asked) > 0.5) warn(`${F}: the roof is built at ${fmt(plan.pitch)}°, not the ${fmt(plan.asked)}° asked — its eave must clear the deck by 2.3 m under a wall ${fmt(plan.yHigh - plan.y)} m up (a lower floorY, or a taller storey, gives a steeper roof)`, 'porch-pitch');
+      if (f.roof !== 'none' && plan.clear < 2.0) warn(`${F}: its posts stand ${fmt(plan.clear)} m over the deck (eave ${fmt(plan.eave)} m, header ${fmt(plan.beamH)} m) — under 2 m of clear height at the front (a lower floorY)`, 'porch-clearance');
+      // an upper storey's window (or its box) behind the porch roof: the roof's true top, not a guess
       const up = levels.filter(l => (l.y || 0) > (lv.y || 0) + 0.5);
-      const roofTop = (lv.y || 0) + (lv.height || 2.8) + (f.roof && f.roof !== 'flat' && f.roof !== 'none' ? 0.4 : 0.15);
       for (const l of up) for (const op of opsOn(l, f.side)) {
-        const sill = (l.y || 0) + (op.type === 'window' ? (op.sill ?? 0.9) : 0);
-        if (op.at > f.from && op.at < f.to && sill < roofTop) warn(`${F}: its roof rises to ~${fmt(roofTop)} m, across ${l.id}'s ${op.type} at ${op.at} (sill ${fmt(sill)} m)`, 'feature-opening');
+        const sill = (l.y || 0) + (op.type === 'window' ? (op.sill ?? 0.9) : 0), low = sill - (op.box ? 0.25 : 0);
+        if (op.at > f.from && op.at < f.to && low < plan.top) warn(`${F}: its roof rises to ${fmt(plan.top)} m, across ${l.id}'s ${op.type}${op.box ? ' box' : ''} at ${op.at} (${op.box ? 'box' : 'sill'} ${fmt(low)} m)`, 'feature-opening');
       }
     }
     if (f.type === 'bay') {
       if (!(f.w > 0 && f.depth > 0 && typeof f.at === 'number')) { err(`${F}: needs at, w > 0 and depth > 0`, 'feature'); return; }
-      oneOf(f.form, ['box', 'canted'], `${F}: form`); oneOf(f.roof, ['hip', 'shed', 'flat', 'gable'], `${F}: roof`);
+      oneOf(f.form, ['box', 'canted'], `${F}: form`); oneOf(f.roof, ['hip', 'shed', 'flat', 'gable', 'none'], `${F}: roof`); oneOf(f.skirt, ['grade', 'oriel', 'none'], `${F}: skirt`); colour(f.roofColor, `${F}: roofColor`);
+      const H = (lv && lv.height) || 2.8;
+      numIn(f.h, 1.5, H, `${F}: h`, "metres, up to the storey's height"); numIn(f.sill, 0, 1.6, `${F}: sill`); numIn(f.head, 0.6, H, `${F}: head`); numIn(f.depth, 0.2, 3, `${F}: depth`);
+      if (f.sill !== undefined && f.head !== undefined && f.head < f.sill + 0.3) err(`${F}: head ${f.head} is under its sill ${f.sill} + 0.3`, 'vocab');
+      const ow = offWallRect(lv, f.side, f.at - f.w / 2, f.at + f.w / 2, f.depth, true);
+      if (!ow) err(`${F}: no wall of ${lv.id} on side ${f.side} holds x/z ${f.at} — a bay opens off a wall`, 'feature');
+      else {
+        const lo = ow.horiz ? ow.edge.a[0] : ow.edge.a[1], hi = ow.horiz ? ow.edge.b[0] : ow.edge.b[1];
+        if (f.at - f.w / 2 < lo - 0.05 || f.at + f.w / 2 > hi + 0.05) err(`${F}: spans ${fmt(f.at - f.w / 2)} – ${fmt(f.at + f.w / 2)}, past the ends of its wall (${fmt(lo)} – ${fmt(hi)}) — it hangs off the corner and its opening runs off the wall`, 'feature-wall');
+      }
       for (const op of opsOn(lv, f.side)) if (op.type !== 'window' && Math.abs(op.at - f.at) < (op.w + f.w) / 2) warn(`${F}: the bay's span covers the ${op.type} at ${op.at} — a bay opens off a room, not over a door`, 'feature-opening');
+      // one bay over another: the lower one's roof would run into the upper one's wall
+      for (const o of bays) if (o.i !== i && o.f.side === f.side && o.f.level !== f.level && byId[o.f.level] && (byId[o.f.level].y || 0) < (lv.y || 0) && Math.abs(o.f.at - f.at) < (o.f.w + f.w) / 2 && (o.f.roof || 'hip') !== 'none')
+        warn(`${F}: stands over features[${o.i}] (${o.f.level}), whose ${o.f.roof || 'hip'} roof runs into its wall — give the lower bay roof: 'none'`, 'feature-wall');
     }
     if (f.type === 'balcony' || f.type === 'terrace' || f.type === 'loggia') {
-      oneOf(f.rail, ['glass', 'metal', 'timber', 'parapet', 'none'], `${F}: rail`);
+      oneOf(f.rail, ['glass', 'metal', 'timber', 'parapet', 'none'], `${F}: rail`); colour(f.railColor, `${F}: railColor`); colour(f.floorColor, `${F}: floorColor`);
       if (f.type !== 'balcony' && !f.rect) err(`${F}: a ${f.type} needs its plan rect`, 'feature');
       if (f.type === 'balcony' && !f.rect && !(f.depth > 0)) err(`${F}: a balcony needs depth > 0 (or a rect)`, 'feature');
-      if (f.type === 'balcony' && !f.rect) {
+      if (f.rect && !(f.rect.w > 0 && f.rect.d > 0)) err(`${F}: rect needs w > 0 and d > 0`, 'feature');
+      else if (f.rect && !nearFootprint(f.rect, 1.0)) err(`${F}: its rect [${f.rect.x}, ${f.rect.z}, ${f.rect.w} × ${f.rect.d}] is nowhere near the house — a ${f.type} stands against a wall or on a roof of it`, 'feature');
+      if (f.type === 'balcony' && !f.rect && lv && f.side) {
+        if (!offWallRect(lv, f.side, f.from ?? 0, f.to ?? 1, f.depth || 1.2)) err(`${F}: no wall of ${lv.id} on side ${f.side} — a balcony is a slab out of a wall`, 'feature');
         const below = levels.filter(l => (l.y || 0) < (lv.y || 0) - 0.5);
         for (const l of below) for (const op of opsOn(l, f.side)) {
           const head = (l.y || 0) + (op.type === 'window' ? (op.sill ?? 0.9) + (op.h || 1.2) : (op.h || 2.1));
@@ -251,13 +323,16 @@ const check: Check = (spec, ctx) => {
     }
     if (f.type === 'fireplace') {
       if (!Array.isArray(f.at)) err(`${F}: needs at`, 'feature');
+      else if (lv && !inFootprint(lv, f.at)) err(`${F}: at [${f.at}] is outside ${lv.id}'s footprint — the hearth stands in a room`, 'feature');
       oneOf(f.style, ['modern', 'mantel', 'stone', 'painted-brick', 'tv-breast'], `${F}: style`);
       oneOf(f.stack, ['outside', 'inside'], `${F}: stack`);
-      if (f.chimney && typeof f.chimney === 'object') { oneOf(f.chimney.material, ['brick', 'stone', 'stucco', 'metal'], `${F}: chimney.material`); oneOf(f.chimney.cap, ['stone', 'pots', 'metal'], `${F}: chimney.cap`); }
+      if (f.chimney && typeof f.chimney === 'object') { oneOf(f.chimney.material, ['brick', 'stone', 'stucco', 'metal'], `${F}: chimney.material`); oneOf(f.chimney.cap, ['stone', 'pots', 'metal'], `${F}: chimney.cap`); colour(f.chimney.color, `${F}: chimney.color`); }
     }
     if (f.type === 'builtin') {
       oneOf(f.kind, ['bookcase-wall', 'niche', 'wine-wall', 'window-seat', 'media-wall'], `${F}: kind`);
       if (!Array.isArray(f.from) || !Array.isArray(f.to)) err(`${F}: needs from and to`, 'feature');
+      else if (lv && !(inFootprint(lv, f.from) && inFootprint(lv, f.to))) err(`${F}: from [${f.from}] to [${f.to}] is outside ${lv.id}'s footprint — a built-in stands in a room`, 'feature');
+      colour(f.color, `${F}: color`);
     }
   });
 
@@ -307,7 +382,17 @@ const check: Check = (spec, ctx) => {
       if (room.walls) {
         oneOf(room.walls.kind, WALL_KINDS, `${R}: walls.kind`); colour(room.walls.color, `${R}: walls.color`);
         const ft = room.walls.feature;
-        if (ft) { oneOf(ft.kind, WALL_KINDS, `${R}: walls.feature.kind`); colour(ft.color, `${R}: walls.feature.color`); if (ft.side === undefined && ft.partition === undefined) err(`${R}: walls.feature needs a side or a partition`, 'vocab'); if (ft.side !== undefined) oneOf(ft.side, SIDES, `${R}: walls.feature.side`); }
+        if (ft) {
+          oneOf(ft.kind, WALL_KINDS, `${R}: walls.feature.kind`); colour(ft.color, `${R}: walls.feature.color`);
+          if (ft.side === undefined && ft.partition === undefined) err(`${R}: walls.feature needs a side or a partition`, 'vocab');
+          if (ft.side !== undefined) oneOf(ft.side, SIDES, `${R}: walls.feature.side`);
+          // a feature wall is lined only where the room has a wall: an exterior wall or a solid partition on that side of its bounds
+          if (room.bounds && (ft.side === undefined || SIDES.includes(ft.side))) {
+            const ws = roomWalls(lv, room, spec).filter(w => w.style === undefined || w.style === 'solid');
+            const on = ws.filter(w => (ft.side === undefined || w.side === ft.side) && (ft.partition === undefined || (w.kind === 'partition' && w.index === ft.partition)));
+            if (!on.length) warn(`${R}: walls.feature (${ft.side !== undefined ? 'side ' + ft.side : ''}${ft.partition !== undefined ? ' partition ' + ft.partition : ''}) has no wall to line — that side of the room's bounds is open, a post screen or a half wall, or the bounds are not against a wall (the room's bounds side, not its position)`, 'room-feature');
+          }
+        }
       }
       if (room.ceiling) {
         oneOf(room.ceiling.kind, CEILING_KINDS, `${R}: ceiling.kind`);
@@ -316,6 +401,8 @@ const check: Check = (spec, ctx) => {
         if (room.ceiling.kind === 'double' && !above.length) warn(`${R}: a double-height ceiling opens the storey above, and there is none over it`, 'ceiling');
       }
       if (room.floorOffset !== undefined && !(Math.abs(room.floorOffset) <= 1.2)) err(`${R}: floorOffset ${room.floorOffset} (metres, −1.2 … 1.2)`, 'vocab');
+      // a sunken room opens the slab over its pit: it needs a storey under it and its pit above grade
+      if (typeof room.floorOffset === 'number' && room.floorOffset < 0 && room.bounds && !sunkRooms(spec, lv).includes(room)) warn(`${R}: floorOffset ${room.floorOffset} is not built sunken — a pit needs the storey standing over another storey (a ground floor has nothing to sink into) and its floor above grade; the room stays flat`, 'room-feature');
     }
   }
   const fac = Array.isArray(spec.facade) ? { zones: spec.facade } : spec.facade || {};
