@@ -62,7 +62,7 @@ root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `
 | `pnpm run prop-sheet` | Contact sheet of props, measured against their declared sizes (`--types`, `--module`, `--all`). |
 | `pnpm run export:core` | The Companion Core as glTF (`--finish`, `--pose`) → `dist/models/`. |
 | `pnpm run portal:thumbs` | Render the gallery's thumbnails → `portal/thumbs/<id>.webp` and `portal/hero.webp`, and the link-preview JPEGs → `portal/previews/<id>.jpg` and `portal/hero.jpg` (`--house`, `--hero`, `--hero-tod`, `--max-kb`). Needs a GPU; commit the output. |
-| `pnpm run portal:build` | Assemble the Pages site in `dist/` — only what it loads — and check its links. Needs `build`. |
+| `pnpm run portal:build` | Assemble the site in `dist/` — only what it loads — and check its links. Needs `build`. |
 | `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
 | `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`). |
 
@@ -186,49 +186,64 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
 
 The site is the Cloudflare Pages project `ci-virtual-home`, a direct-upload project (Cloudflare does not watch
 the repository), served at <https://homes.ci.computer/> and <https://ci-virtual-home.pages.dev/>.
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) builds the site (`pnpm install`, `build`,
-`portal:build --site-url …`) and uploads it with a pinned Wrangler:
+[`ci.yml`](.github/workflows/ci.yml) assembles the site on every push and pull request (`pnpm install`, `build`,
+`portal:build`) and keeps it as an artifact; [`deploy.yml`](.github/workflows/deploy.yml) uploads that artifact with a
+pinned Wrangler once `ci` has passed. Nothing in `deploy.yml` builds, installs or runs repository code.
 
 | When | Where it goes |
 |---|---|
-| `ci` passes on a push to `main` (or **Run workflow** on `main`, which checks that `ci` passed on its head) | Production: <https://homes.ci.computer/> |
-| A pull request from a branch of this repository, once someone approves it | A preview at `https://pr-<number>.ci-virtual-home.pages.dev/`, replaced on every approved push to the PR. The PR's deployment and the run's summary link it. |
-| **Run workflow** on any other branch, once someone approves it | A preview under the branch's name, slugged (`clau/p4-s1` → `https://clau-p4-s1.ci-virtual-home.pages.dev/`). |
+| `ci` passes on a push to `main` (or **Run workflow** on `main`, which needs `ci` to have passed on its head) | Production: <https://homes.ci.computer/> |
+| `ci` passes on a pull request from a branch of this repository | A preview at `https://pr-<number>.ci-virtual-home.pages.dev/`, replaced on every push to the PR. The PR gets a `preview` status linking it, and the run's summary lists the addresses. |
 
-Production waits for [`ci.yml`](.github/workflows/ci.yml) (build, typecheck, validate, tests, `portal:build`), so a
-red `main` does not go live; it stays on the last commit that passed. A preview's link previews point at the preview
-itself, never at production. The preview is built from the PR's head commit, and the deployment is labelled with it.
+A red `main` does not go live; it stays on the last commit that passed. A preview is the pull request as `ci` checked
+it out (merged with `main`; a PR that conflicts with `main` gets no `ci` run, so no preview), labelled with the PR's
+head commit, and its link previews point at the preview, never at production. A run only ever publishes the current
+head of `main`, or of its open pull request: re-running an old run, or one that lost the race to a newer push, skips
+with a notice instead of putting an older tree over a newer one. Pull requests from forks, and Dependabot's, get no
+preview, and **Run workflow** on any branch but `main` does nothing.
 
 **What the token can do.** Cloudflare's **Pages · Edit** permission cannot be limited to one project: the token can
 publish to, or delete, every Pages project on the account, and this account holds seven today, among them the
-public website and the docs. So the workflow never lets a branch near it. The upload job is the only one that holds the
-token; it checks out nothing and installs nothing from the repository, and it runs in a GitHub *environment*:
-production only for `main`, and only from the copy of `deploy.yml` on `main`; previews only after a reviewer
-approves the run (a preview runs the branch's own workflow and code, so approve only a change you have read). To
-take the rest of the account out of reach entirely, move the project to a Cloudflare account of its own.
+public website and the docs. So exactly one file may reach it: `deploy.yml`, as it is on `main`. A `workflow_run`
+always runs the copy on the default branch; the token lives in two GitHub *environments*, `production` and `preview`,
+each limited to deployment from `main`, so a workflow on any other branch that names one is refused; and code from a
+branch (a pull request's) only ever runs in `ci.yml`'s own run, which has no secret, and arrives as an artifact that
+the upload job treats as files (it strips Pages Workers) and never runs. To take the rest of the account out of reach
+entirely, move the project to a Cloudflare account of its own.
+
+That makes **`main`'s protection the whole guard**: anyone who can put a change to `deploy.yml` on `main` can read the
+token, and seven collaborators besides the owner can push to this repository. So `main` must take changes only through
+a pull request that a code owner reviews (step 1 below; [`.github/CODEOWNERS`](.github/CODEOWNERS) makes the owner the
+code owner of `.github/`), and `deploy.yml` does not deploy until it does.
 
 **Owner setup, once.**
 
-1. Create an account API token (dash.cloudflare.com → Manage Account → **Account API Tokens** → Create Token; it
+1. Protect `main`. Repository Settings → Rules → Rulesets → New branch ruleset, targeting the default branch: restrict
+   deletions, block force pushes, and require a pull request before merging with **1 approval, Require review from Code
+   Owners** and *Require approval of the most recent reviewable push*; add **Repository admin** to the bypass list, for
+   pull requests only, so the owner can still merge their own. (Classic branch protection with the same options also
+   passes, though the workflow can tell only that some rule exists, not what it says.)
+2. Create an account API token (dash.cloudflare.com → Manage Account → **Account API Tokens** → Create Token; it
    needs a Super Administrator), with the one permission **Account · Cloudflare Pages · Edit** on the account that
    holds the project. An account token outlives any one person's membership; a My Profile token does not.
-2. In the repository's Settings → Environments, create **`production`**: Deployment branches and tags → Selected
-   branches and tags → `main` only. Add the token to it as the environment secret `CLOUDFLARE_API_TOKEN`.
-3. For previews (optional), create **`preview`**: Required reviewers → the people who may publish a preview (tick
-   *Prevent self-review*). Add the same secret to it.
+3. In Settings → Environments, create **`production`** and **`preview`**. Give each: Deployment branches and tags →
+   Selected branches and tags → `main` alone (not *Protected branches only*, which lets every branch deploy while none
+   is protected), and the environment secret `CLOUDFLARE_API_TOKEN` holding the token. No required reviewers: GitHub
+   offers those on a private repository only on Enterprise plans, and the design does not need them.
 4. Never add the token as a repository or organisation secret: every branch's workflows can read those, and the
    workflow fails if it finds one.
 
-Until an environment exists, is protected as above and holds the secret, deploys to it are skipped with a notice,
-never failed, so `main` stays green. With no `preview` environment there are no previews at all. The account ID is
-set in the workflow (`PAGES_ACCOUNT_ID`); a `CLOUDFLARE_ACCOUNT_ID` repository variable overrides it. Pull requests
-from forks, and Dependabot's, get no preview.
+Until `main` is protected and an environment exists, is limited to `main` and holds the secret, deploys to it are
+skipped with a notice, never failed, so `main` stays green. The account ID is set in the workflow
+(`PAGES_ACCOUNT_ID`); a `CLOUDFLARE_ACCOUNT_ID` repository variable overrides it. The deploy for a commit is skipped
+too when `ci`'s artifact has expired (after 14 days): re-run `ci` on that commit and that run deploys it.
 
-Previews are public: anyone with a `pr-<n>` address, or the address of one deployment, can open the unmerged tree,
-and PR numbers are easy to guess. Nothing removes a closed PR's preview. If that matters, turn on Cloudflare Access
-for the project's preview deployments in its Pages settings, and delete old deployments in the dashboard.
+Previews are public, and nobody approves them: anyone who can open a pull request from a branch of this repository
+publishes static files at `pr-<number>`, and PR numbers are easy to guess. Nothing removes a closed PR's preview. If that
+matters, turn on Cloudflare Access for the project's preview deployments in its Pages settings, and delete old
+deployments in the dashboard.
 
-**By hand** — only when the workflow cannot, since it skips `ci` and both environments. From a clean clone of
+**By hand** — only when the workflow cannot, since it skips `ci` and every guard above. From a clean clone of
 `main`, with Wrangler logged in to that account (`pnpm dlx wrangler@4.143.0 login`). `portal:build` leaves files it
 does not own in `dist/` (`export:core`'s models, for one), so start from an empty `dist/`:
 
@@ -240,7 +255,7 @@ pnpm dlx wrangler@4.143.0 pages deploy dist --project-name=ci-virtual-home --bra
 
 Any other `--branch` is a preview; build it with that preview's own `--site-url`
 (`https://<branch>.ci-virtual-home.pages.dev/`), or its link previews point at production. Wrangler is deliberately
-not a devDependency: the workflow runs it from an empty directory, so a normal `pnpm install` does not pull it in.
+not a devDependency: the workflow installs it in the upload job alone, so a normal `pnpm install` does not pull it in.
 
 **GitHub Pages is retired** for this repository. Its github.io address redirects to the organisation's old custom
 domain (store.ci.computer), which serves nothing, so the former `pages.yml` deployed to nowhere and has been

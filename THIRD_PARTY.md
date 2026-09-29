@@ -73,10 +73,10 @@ still links the Google Fonts stylesheet below, in the player as in the editor.
 | [`@types/node`](https://github.com/DefinitelyTyped/DefinitelyTyped) | ^22 | MIT |
 
 The workflows (`.github/workflows/ci.yml`, `deploy.yml`) run GitHub's own `actions/checkout`, `actions/setup-node`,
-`actions/upload-artifact` and `actions/download-artifact` (MIT) and `pnpm/action-setup` (MIT); `deploy.yml` pins
-each to a commit. To upload the portal it runs Cloudflare's [`wrangler`](https://github.com/cloudflare/workers-sdk)
-4.143.0 (MIT OR Apache-2.0) with `npx`, from an empty directory. None of these is a dependency of the repository,
-and none of their code is in the site.
+`actions/upload-artifact` and `actions/download-artifact` (MIT) and `pnpm/action-setup` (MIT), each pinned to a
+commit. To upload the portal, `deploy.yml` installs Cloudflare's [`wrangler`](https://github.com/cloudflare/workers-sdk)
+4.143.0 (MIT OR Apache-2.0) with `npm install --ignore-scripts` into a temporary directory and runs it from another,
+empty one. None of these is a dependency of the repository, and none of their code is in the site.
 
 External tools the scripts call but this repository does not include: **ffmpeg** (`render-house-shots.mts`,
 `prop-sheet.mts`; LGPL-2.1+/GPL depending on build), **rsvg-convert** from librsvg (`generate_floor_plans.py`,

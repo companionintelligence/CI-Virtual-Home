@@ -18,7 +18,7 @@
 //                                    link's query. Its image is portal/previews/<id>.jpg (1200 × 630 JPEG: LinkedIn
 //                                    and some others read no WebP). og:image and og:url are absolute, as unfurlers
 //                                    want: the site's address is --site-url, else $SITE_URL, else the live site
-//                                    (https://homes.ci.computer/); deploy.yml passes the preview's own
+//                                    (https://homes.ci.computer/); ci.yml passes a pull request's preview address
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
@@ -65,7 +65,8 @@ const sources = walk('assets', f => f.endsWith('.ts') && !f.endsWith('.d.ts') &&
 const stale = sources.filter(ts => { const js = path.join(ROOT, ts.replace(/\.ts$/, '.js')); return !fs.existsSync(js) || fs.statSync(js).mtimeMs < fs.statSync(path.join(ROOT, ts)).mtimeMs; });
 if (stale.length) { console.error(`compiled assets are missing or older than their source (${stale.slice(0, 3).join(', ')}${stale.length > 3 ? ', …' : ''}): run pnpm run build first`); process.exit(2); }
 
-// 1. start from a clean copy of what this script owns (.nojekyll: what it wrote for GitHub Pages, now retired)
+// 1. start from a clean copy of what this script owns (.nojekyll: an older build wrote it for GitHub Pages; now it is only
+//    cleared out of a dist/ that still has one)
 const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '.nojekyll'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
