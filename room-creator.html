@@ -1782,7 +1782,7 @@
     import { createHouseBuilder } from './assets/house-builder.js';
     import { createVisibility, ISO_VIEW, placeIsoCamera } from './assets/visibility.js';
     import { trackFromV1 } from './assets/shot-track.js';
-    import { registerSceneCheck, runSceneChecks } from './assets/scene-qa/index.js';
+    import { registerSceneCheck, runSceneChecks } from './assets/scene-qa/registry.js';   // the registry; the streams' checks load below (sceneChecksLoaded)
     import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
     import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, createSkyBaker, installSkyFog, GradeShader, createLighting } from './assets/environment.js';
@@ -6890,6 +6890,7 @@
       if (presetSelect && presetSelect.value !== `house:${id}`) presetSelect.value = `house:${id}`;
       document.querySelectorAll('#sims-quick-pills .pill-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.preset === `house:${id}`));
       if (!VIEW_MODE) document.title = `${spec.name} · Isometric 3D Room Creator`;   // (the player names the tab itself)
+      await sceneChecksLoaded;
       // Ready signal for harnesses / the batch video renderer (data-house-ready="<id>")
       document.documentElement.dataset.houseReady = id;
       window.dispatchEvent(new CustomEvent('house:ready', { detail: { id, anchors: result.anchors, shots: Object.keys(shots) } }));
@@ -6959,6 +6960,11 @@
     //   ?res=1080&aspect=16:9 (recorder settings)
     const urlParams = new URLSearchParams(window.location.search);
     const VIEW_MODE = urlParams.get('mode') === 'view';   // the portal's player (assets/viewer.ts): always a spec house
+    // The streams' scene checks (assets/scene-qa/index.ts imports one module each) are for the gates and the editor.
+    // The player never runs the scene QA, so it never loads them: once the streams fill their modules that is every
+    // check's code on the public page's cold load (five requests already, for empty files). loadHouse awaits this
+    // before it says the house is ready, so a gate that waits for that signal finds every check registered.
+    const sceneChecksLoaded = VIEW_MODE ? Promise.resolve() : import('./assets/scene-qa/index.js');
     const initialPreset = resolveSceneKey(urlParams.get('house') ? `house:${urlParams.get('house')}` : VIEW_MODE ? 'house:aurora' : (urlParams.get('preset') || 'pascal-garden-house'));
     const houseParam = initialPreset.startsWith('house:') ? initialPreset.slice(6) : null;
 
