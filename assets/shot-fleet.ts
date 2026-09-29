@@ -5,6 +5,7 @@
 // scripts/fleet/shots.mts (fleet-audit) all read the same numbers.
 //
 // Owner: S5 (shot).
+import { Math } from './detmath.js';
 import { K, DEG, clamp, inFootprint, indoors, wrapPi, createWorldIndex, type ShotWorld } from './shot-world.js';
 import { createNav } from './shot-nav.js';
 import { camera, project, projectBox, type V3 } from './shot-probe.js';

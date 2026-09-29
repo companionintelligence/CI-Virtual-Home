@@ -23,6 +23,7 @@
 // Math.random or per-frame state. The track is a pure function of (world, options).
 //
 // Owner: S5 (shot).
+import { Math } from './detmath.js';
 import { planDoors } from './shot-doors.js';
 import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, mulberry32, fnv1a, wrapPi, createWorldIndex, type ShotWorld, type WLevel, type WStair, type WRoom } from './shot-world.js';
 import { createNav, roomInterest, CELL, type Nav } from './shot-nav.js';
@@ -1481,14 +1482,25 @@ export function sampleTrack(track: Track, t: number, aspect = 16 / 9) {
   return { eye, target, fov, roofAlpha, s: clamp(t, 0, 1), beat: BEATS[track.beat[f < 0.5 ? i : i + 1]] };
 }
 
-/** a stable hash of a track's arrays (FNV-1a over the float bytes) — the harness compares Node's with the page's */
+/** a stable hash of a track: FNV-1a over the bytes of everything that decides the film — the arrays (eye, look, lens, roof,
+ *  the Core's compose weight, every door channel, the wanted look, the beat of each sample), the compose target, the events
+ *  (the press drives the Core's LED and fan, the entry the roof fade) and the beat list with its subjects. The harness compares
+ *  Node's with the page's; a difference in any of these is a different film, so all of them are in it. */
 export function trackHash(track: Track) {
   let h = 0x811c9dc5;
+  const feed = (b: Uint8Array) => { for (let i = 0; i < b.length; i++) { h ^= b[i]; h = Math.imul(h, 0x01000193); } };
+  const one = new Float64Array(1), oneB = new Uint8Array(one.buffer);
+  const num = (x: number | null | undefined) => { one[0] = x === null || x === undefined ? -1e300 : x; feed(oneB); };
+  const str = (t: string) => { for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i) & 255; h = Math.imul(h, 0x01000193); } h ^= 0xff; h = Math.imul(h, 0x01000193); };
+  const arr = (a: ArrayBufferView | undefined) => { if (a) feed(new Uint8Array(a.buffer, a.byteOffset, a.byteLength)); else num(null); };
   const doorIds = Object.keys(track.doors || {}).sort();
-  for (const arr of [track.pos, track.look, track.fov, track.roofAlpha, track.composeW, ...doorIds.map(id => track.doors[id])]) {
-    const b = new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
-    for (let i = 0; i < b.length; i++) { h ^= b[i]; h = Math.imul(h, 0x01000193); }
-  }
+  for (const a of [track.pos, track.look, track.fov, track.roofAlpha, track.composeW, track.beat, track.desired, ...doorIds.map(id => track.doors[id])]) arr(a);
+  for (const id of doorIds) str(id);
+  num(track.compose ? track.compose.ndcX : null); num(track.compose ? track.compose.ndcY : null);
+  const ev = track.events;
+  for (const x of [ev.enterT, ev.pressT, ev.settleT, ev.doneT, ev.firstCoreT]) num(x);
+  for (const x of ev.stairT) num(x); num(ev.stairT.length);
+  for (const b of track.beats) { str(b.name); num(b.t0); num(b.t1); if (b.subject) for (const x of b.subject) num(x); else num(null); }
   return (h >>> 0).toString(16).padStart(8, '0') + ':' + track.samples + ':' + track.duration;
 }
 

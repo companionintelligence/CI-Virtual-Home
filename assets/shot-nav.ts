@@ -14,6 +14,7 @@
 //   route-or-fail: a leg with no way through is null, never a straight line through a wall.
 //
 // Owner: S5 (shot).
+import { Math } from './detmath.js';
 import { K, inRect, inFootprint, type ShotWorld, type WLevel, type WRoom, type WorldIndex, type Rect } from './shot-world.js';
 
 export const CELL = 0.2;

@@ -7,8 +7,10 @@
 //   3. the fleet targets of plan §3.14 / the S5 acceptance (assets/shot-fleet.ts): outside share, travel in the first
 //      second, speed across the door, view rate, look error, the press, the rooms seen, the Core's height and place in the
 //      last frame, the establishing styles and bearings, the finale orbit;
-//   4. the page bakes the same track: with --parity (the default for two houses) __houseShotTrack's hash in the page,
-//      under ?planner=v2, equals the Node bake's — the Node harness IS the page's planner;
+//   4. the page bakes the same track: (a) every world × door-to-core, hero-reveal and walkthrough is planned in Node and in
+//      Chromium's JS engine and the whole track's hash agrees (assets/detmath.ts makes the engines' last bits agree);
+//      (b) with --parity (the default for two houses) __houseShotTrack's hash in the page, under ?planner=v2, equals the
+//      Node bake's — the Node harness IS the page's planner;
 //   5. the budgets (plan Completeness A4): planning all 30 within 15 s of CPU, QA v2 within 0.5 s a shot (reported;
 //      only failing when the machine is not loaded — a busy machine inflates CPU time too).
 //
@@ -61,6 +63,7 @@ const real = rows.filter(r => ids.includes(r.id)), fix = rows.filter(r => !ids.i
 for (const r of rows) for (const e of r.findings.errors) console.log(`  ERROR ${r.id} t=${e.t}${e.tEnd > e.t ? '–' + e.tEnd : ''} ${e.code}: ${e.message}`);
 check(!rows.some(r => r.errors), `QA v2: 0 errors on ${rows.length} track${rows.length === 1 ? '' : 's'}`, rows.filter(r => r.errors).map(r => `${r.id}: ${r.findings.errors.map((e: any) => e.code).join(', ')}`).join('\n'));
 
+const tourHash = new Map<string, string>();
 // ---- 2b. hero-reveal and walkthrough (planner v2's other two shots): planned twice, identical, and QA v2 has no error on either
 {
   const bad2: string[] = [], nondet2: string[] = []; let n2 = 0, cpu2 = 0;
@@ -72,6 +75,7 @@ check(!rows.some(r => r.errors), `QA v2: 0 errors on ${rows.length} track${rows.
       if (!a.ok) { bad2.push(`${id}/${type}: ${a.code} — ${a.message}`); continue; }
       const b = plan({ duration: so.options.duration, heroView: so.options.heroView, via: (so.shot && so.shot.via) || undefined });
       if (!b.ok || trackHash(a.track) !== trackHash(b.track)) nondet2.push(`${id}/${type}`);
+      tourHash.set(`${id}/${type}`, trackHash(a.track));
       const qa = qaTrack(a.track, world);
       for (const e of qa.errors) bad2.push(`${id}/${type} t=${e.t} ${e.code}: ${e.message}`);
     }
@@ -116,38 +120,65 @@ check(!slowQA.length || loaded, 'QA v2 within 0.5 s a shot', slowQA.map(r => `${
 
 // ---- 4. the page bakes the same track
 const parityN = args.parity === 'all' ? real.length : args.parity !== undefined ? parseInt(args.parity, 10) : 2;
-if (args['planner-only'] !== 'true' && parityN > 0 && real.length) {
-  const pick = real.filter((_, i) => i % Math.max(1, Math.floor(real.length / parityN)) === 0).slice(0, parityN);
+if (args['planner-only'] !== 'true' && (parityN > 0 || rows.length)) {
+  const pick = parityN > 0 ? real.filter((_, i) => i % Math.max(1, Math.floor(real.length / parityN)) === 0).slice(0, parityN) : [];
   const srv = await serve(ROOT, '/'), pw = await loadPlaywright();
   const browser = await pw.chromium.launch({ headless: true, args: LAUNCH_ARGS });
   try {
-    const page = await (await browser.newContext({ viewport: { width: 1200, height: 700 } })).newPage();
-    await stubGoogleFonts(page, srv.origin);
-    for (const r of pick) {
-      await page.goto(srv.url(`room-creator.html?house=${r.id}&planner=v2`), { waitUntil: 'domcontentloaded', timeout: 120000 });
-      await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, r.id, { timeout: 120000 });
-      const got = await page.evaluate(() => { const t = (window as any).__houseShotTrack('door-to-core'); return { hash: t.hash, planner: t.planner, duration: t.duration, samples: t.samples }; });
-      check(got.planner === 'v2' && got.hash === r.hash && got.duration === r.duration, `the page's door-to-core track for ${r.id} is the Node bake (${r.hash})`, `page: ${JSON.stringify(got)}\nnode: ${r.hash} ${r.duration} s`);
+    // 4a. the engines: the same worlds planned in this Node and in Chromium's JS engine (the modules imported by a bare page:
+    // no house is built), all three shots on every house and fixture. The ECMAScript spec lets an engine's sin, cos, atan2 …
+    // differ from another's in the last bit, and a last-bit difference flips a probe: assets/detmath.ts is what makes the two
+    // agree, and this is what proves it — the whole track's hash (eye, look, lens, roofs, doors, compose, events, beats).
+    {
+      const page = await (await browser.newContext()).newPage();
+      await page.goto(srv.url('index.html'), { waitUntil: 'domcontentloaded', timeout: 120000 });
+      const diff: string[] = []; let n = 0;
+      for (const r of rows) {
+        const world = worlds.get(r.id), spec = specOf(r.id);
+        for (const type of ['door-to-core', 'hero-reveal', 'walkthrough']) {
+          const so = shotOptions(spec, type, 'v2'), nodeHash = type === 'door-to-core' ? r.hash : tourHash.get(`${r.id}/${type}`);
+          const opt = type === 'door-to-core' ? so.options : { duration: so.options.duration, heroView: so.options.heroView, via: (so.shot && so.shot.via) || undefined };
+          const got = await page.evaluate(async ({ world, options, type }: any) => {
+            const m = await import('/assets/shot-planner.js'), t = await import('/assets/shot-planner-tour.js');
+            const p = type === 'door-to-core' ? m.planDoorToCore(world, options) : type === 'hero-reveal' ? t.planHeroReveal(world, options) : t.planWalkthrough(world, options);
+            return p.ok ? m.trackHash(p.track) : 'FAIL';
+          }, { world, options: opt, type });
+          n++; if (got !== nodeHash) diff.push(`${r.id}/${type}: node ${nodeHash} · browser engine ${got}`);
+        }
+      }
+      check(!diff.length, `Node and the browser's JS engine bake the same track for every shot (${n} bakes: ${rows.length} worlds × door-to-core, hero-reveal, walkthrough)`, diff.join('\n'));
+      await page.close();
     }
-    // the doors channel through the page's pose hook (visibility.ts shotPose): a leaf pivot follows the track's channel, absolute per frame
-    // (frames out of order give the same angles: no frame depends on the one before) and goes back to where it was when the shot ends
-    const dr = await page.evaluate(() => {
-      const w = window as any, d = w.__houseDebug(), preset = d.presets[`house:${d.house.id}:door-to-core`], THREE = w.__THREE;
-      const pivot = new THREE.Object3D(); pivot.rotation.y = 0.25; d.scene.add(pivot);
-      d.house.anchors.doors = [{ id: 'test:door', pivot }];
-      const N = preset.track.samples, ch = new Float32Array(N); for (let i = 0; i < N; i++) ch[i] = i / (N - 1) * 1.5;
-      preset.track.doors = { 'test:door': ch };
-      const info = w.__houseRenderBegin({ shot: 'door-to-core', res: '270', fps: 10 });
-      const at = (u: number) => { w.__houseRenderFrames(Math.round(u * (info.frames - 1)), 1, 0.5); return pivot.rotation.y; };
-      const r = [at(0.5), at(0.2), at(0.5), at(1)];
-      w.__houseRenderEnd();
-      const back = pivot.rotation.y;
-      d.scene.remove(pivot); delete preset.track.doors['test:door']; d.house.anchors.doors = [];
-      return { r, back };
-    });
-    const near = (a: number, b: number) => Math.abs(a - b) < 0.02;
-    check(near(dr.r[0], 0.75) && near(dr.r[1], 0.3) && dr.r[0] === dr.r[2] && near(dr.r[3], 1.5), 'the page poses a door leaf from the track\'s doors channel, absolute per frame', JSON.stringify(dr));
-    check(near(dr.back, 0.25), 'the leaf goes back where it was when the shot ends', JSON.stringify(dr));
+    // 4b. the page builds the house, and its own track is the Node bake (the world the page digests is the file the harness reads)
+    if (pick.length) {
+      const page = await (await browser.newContext({ viewport: { width: 1200, height: 700 } })).newPage();
+      await stubGoogleFonts(page, srv.origin);
+      for (const r of pick) {
+        await page.goto(srv.url(`room-creator.html?house=${r.id}&planner=v2`), { waitUntil: 'domcontentloaded', timeout: 120000 });
+        await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, r.id, { timeout: 120000 });
+        const got = await page.evaluate(() => { const t = (window as any).__houseShotTrack('door-to-core'); return { hash: t.hash, planner: t.planner, duration: t.duration, samples: t.samples }; });
+        check(got.planner === 'v2' && got.hash === r.hash && got.duration === r.duration, `the page's door-to-core track for ${r.id} is the Node bake (${r.hash})`, `page: ${JSON.stringify(got)}\nnode: ${r.hash} ${r.duration} s`);
+      }
+      // the doors channel through the page's pose hook (visibility.ts shotPose): a leaf pivot follows the track's channel, absolute per frame
+      // (frames out of order give the same angles: no frame depends on the one before) and goes back to where it was when the shot ends
+      const dr = await page.evaluate(() => {
+        const w = window as any, d = w.__houseDebug(), preset = d.presets[`house:${d.house.id}:door-to-core`], THREE = w.__THREE;
+        const pivot = new THREE.Object3D(); pivot.rotation.y = 0.25; d.scene.add(pivot);
+        d.house.anchors.doors = [{ id: 'test:door', pivot }];
+        const N = preset.track.samples, ch = new Float32Array(N); for (let i = 0; i < N; i++) ch[i] = i / (N - 1) * 1.5;
+        preset.track.doors = { 'test:door': ch };
+        const info = w.__houseRenderBegin({ shot: 'door-to-core', res: '270', fps: 10 });
+        const at = (u: number) => { w.__houseRenderFrames(Math.round(u * (info.frames - 1)), 1, 0.5); return pivot.rotation.y; };
+        const r = [at(0.5), at(0.2), at(0.5), at(1)];
+        w.__houseRenderEnd();
+        const back = pivot.rotation.y;
+        d.scene.remove(pivot); delete preset.track.doors['test:door']; d.house.anchors.doors = [];
+        return { r, back };
+      });
+      const near = (a: number, b: number) => Math.abs(a - b) < 0.02;
+      check(near(dr.r[0], 0.75) && near(dr.r[1], 0.3) && dr.r[0] === dr.r[2] && near(dr.r[3], 1.5), 'the page poses a door leaf from the track\'s doors channel, absolute per frame', JSON.stringify(dr));
+      check(near(dr.back, 0.25), 'the leaf goes back where it was when the shot ends', JSON.stringify(dr));
+    }
   } finally { await browser.close(); await srv.close(); }
 }
 if (args.out) { fs.mkdirSync(path.dirname(path.resolve(args.out)), { recursive: true }); fs.writeFileSync(path.resolve(args.out), JSON.stringify(rows.map(r => ({ id: r.id, duration: r.duration, hash: r.hash, metrics: r.metrics, plan: r.plan, errors: r.errors, warnings: r.warnings, findings: r.findings })), null, 1)); }

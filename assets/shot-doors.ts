@@ -10,6 +10,7 @@
 // the leaf covers.
 //
 // Owner: S5 (shot).
+import { Math } from './detmath.js';
 import { clamp, leafSegment, type ShotWorld, type WDoor } from './shot-world.js';
 
 export const DOOR_OPEN_S = 0.7;

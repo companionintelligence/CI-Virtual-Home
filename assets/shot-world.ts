@@ -20,6 +20,7 @@
 //
 // Owner: S5 (shot). Also the box index and ray caster every S5 module shares (createWorldIndex).
 
+import { Math } from './detmath.js';
 export type Box6 = [number, number, number, number, number, number];
 export const K = {
   wall: 1, glass: 2, item: 3, fixture: 4, stair: 5, rail: 6, site: 7, walk: 8, roof: 9,
@@ -122,7 +123,7 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
   };
   const core = placed.find(o => o.userData && o.userData.role === 'hero') || null;
   const heroA = anchors.hero;
-  const nearCore = (b: any) => !!core && !!heroA && Math.max(b.min.x - heroA.x, 0, heroA.x - b.max.x) ** 2 + Math.max(b.min.z - heroA.z, 0, heroA.z - b.max.z) ** 2 < CORE_NEAR * CORE_NEAR;
+  const nearCore = (b: any) => { if (!core || !heroA) return false; const dx = Math.max(b.min.x - heroA.x, 0, heroA.x - b.max.x), dz = Math.max(b.min.z - heroA.z, 0, heroA.z - b.max.z); return dx * dx + dz * dz < CORE_NEAR * CORE_NEAR; };
   // every mesh's world box — an InstancedMesh (a bed's plants, a crown's leaf clusters) as its instances' boxes,
   // merged per 0.6 m cell (one box over a whole bed would reach through the wall it is planted against)
   const _m = new THREE.Matrix4(), _b = new THREE.Box3();

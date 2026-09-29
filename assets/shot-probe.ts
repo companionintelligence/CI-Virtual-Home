@@ -6,6 +6,7 @@
 // baked in Node is the page's.
 //
 // Owner: S5 (shot). THREE-free.
+import { Math } from './detmath.js';
 import { K, rayPlanes, indoors, type WorldIndex, type ShotWorld, type Box6 } from './shot-world.js';
 
 export type V3 = [number, number, number];

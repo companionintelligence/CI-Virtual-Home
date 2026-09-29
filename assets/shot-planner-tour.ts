@@ -10,6 +10,7 @@
 //                 Core is on that storey
 //
 // THREE-free and deterministic, like the rest of planner v2. Owner: S5 (shot).
+import { Math } from './detmath.js';
 import { K, DEG, clamp, inRect, inFootprint, mulberry32, fnv1a, wrapPi, createWorldIndex, type ShotWorld, type WLevel, type WRoom } from './shot-world.js';
 import { createNav, roomInterest } from './shot-nav.js';
 import { planDoors } from './shot-doors.js';

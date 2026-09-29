@@ -7,6 +7,7 @@
 // establishing shot (the footprint and roof inside the frame with 8 % margins) and the ring's framing.
 //
 // Owner: S5 (shot). THREE-free.
+import { Math } from './detmath.js';
 import { K, DEG, clamp, inRect, inFootprint, levelAt, mulberry32, fnv1a, type ShotWorld, type WorldIndex, type Box6, type WLevel } from './shot-world.js';
 import { camera, project, projectBox, type V3, type Probe } from './shot-probe.js';
 import { perimeterEdges } from './house-geometry.js';

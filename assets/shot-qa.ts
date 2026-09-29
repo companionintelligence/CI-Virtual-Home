@@ -12,6 +12,7 @@
 // reported. `metrics` carries the numbers the fleet targets (camera-audit.mts) read.
 //
 // Owner: S5 (shot).
+import { Math } from './detmath.js';
 import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, wrapPi, createWorldIndex, leafSegment, type ShotWorld, type Box6 } from './shot-world.js';
 import { firstCrossing, leafOpen, DOOR_DONE_S } from './shot-doors.js';
 import { createProbe, camera, project, projectBox, bgClass, type V3 } from './shot-probe.js';
@@ -39,7 +40,7 @@ export const QA_CODES: Record<string, 'error' | 'warn'> = {
   'orbit-swing-back': 'warn', 'orbit-yaw-rate': 'warn',
 };
 
-const lum = (c: number) => { const r = ((c >> 16) & 255) / 255, g = ((c >> 8) & 255) / 255, b = (c & 255) / 255; const f = (v: number) => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+const lum = (c: number) => { const r = ((c >> 16) & 255) / 255, g = ((c >> 8) & 255) / 255, b = (c & 255) / 255; const f = (v: number) => v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
 
 export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; aspect?: number } = {}): QAResult {
   const index = createWorldIndex(world), probe = createProbe(index), nav = createNav(world, index);
