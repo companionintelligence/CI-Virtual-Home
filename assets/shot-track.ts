@@ -17,7 +17,9 @@
 //
 // Also S5's roof rule — when the roofs fade during a shot (shotRoofMode, shotEnterS, shotRoofAlpha below). The
 // page's visibility.ts (S6) applies it to the scene every frame and trackFromV1 bakes it into roofAlpha, so the
-// two can never disagree; planner v2 changes the rule here (plan §3.2: fade from events.enterT over 0.35 s).
+// two can never disagree; a planner-v2 shot carries its own baked roof channel (plan §3.2: opaque outside, faded
+// from events.enterT over 0.35 s), which shotRoofAlpha samples. trackView (below) is what __houseShotTrack hands out
+// for a v2 shot: the baked track itself, in the same shape as trackFromV1's.
 
 const DEG = Math.PI / 180;
 // room-creator.html's easeInOutCubic: door-to-core without timing plays under it
@@ -58,6 +60,10 @@ export function shotEnterS(curve: { getPointAt: (s: number) => any } | null, hou
  *  enter fraction (asked only when the mode is 'auto': the page caches it on the preset) }. 'auto' fades over the
  *  5 % of the path before the eye goes under a ceiling, on a squared ease, and stays off. */
 export function shotRoofAlpha(frame: { preset: any; s: number; enter: () => number }): number {
+  // planner v2 bakes the roof into its track (plan §3.2: opaque outside, faded over 0.35 s from the door; a dollhouse
+  // opener lifts it first), sampled at the shot's time fraction — a v2 shot's frameAt reports s = t
+  const tr = frame.preset && frame.preset.track;
+  if (tr && tr.roofAlpha && shotRoofMode(frame.preset.dressing) === 'auto') { const u = Math.max(0, Math.min(1, frame.s)) * (tr.samples - 1), i = Math.min(tr.samples - 2, Math.floor(u)); return tr.roofAlpha[i] + (tr.roofAlpha[i + 1] - tr.roofAlpha[i]) * (u - i); }
   const roof = shotRoofMode(frame.preset && frame.preset.dressing);
   if (roof === 'off') return 0;
   if (roof !== 'auto') return 1;
@@ -112,4 +118,13 @@ export function trackFromV1(THREE, preset, { type = '', duration = 10, fps = 120
       maxYawRate: r3(maxYawRate), outsideShare: houseInside ? r3(outside / n) : null,
     },
   };
+}
+
+/** A planner-v2 shot's baked track in __houseShotTrack's shape (assets/shot-planner.ts bakes it): the same arrays,
+ *  resampled to `fps` when asked for another rate, and its beats, events and metrics as the planner left them. */
+export function trackView(track: any, { fps = 120 } = {}): ShotTrack & Record<string, any> {
+  if (fps === track.fps) return { ...track, s: Float32Array.from({ length: track.samples }, (_, i) => i / (track.samples - 1)) };
+  const n = Math.max(2, Math.round(track.duration * fps) + 1), dt = track.duration / (n - 1);
+  const pick = (arr: Float32Array, k: number) => { const out = new Float32Array(k * n); for (let i = 0; i < n; i++) { const u = (i / (n - 1)) * (track.samples - 1), a = Math.min(track.samples - 2, Math.floor(u)), f = u - a; for (let c = 0; c < k; c++) out[k * i + c] = arr[k * a + c] + (arr[k * (a + 1) + c] - arr[k * a + c]) * f; } return out; };
+  return { ...track, fps, samples: n, dt, s: Float32Array.from({ length: n }, (_, i) => i / (n - 1)), pos: pick(track.pos, 3), look: pick(track.look, 3), fov: pick(track.fov, 1), roofAlpha: pick(track.roofAlpha, 1), composeW: pick(track.composeW, 1) };
 }

@@ -1781,7 +1781,8 @@
     import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
     import { createHouseBuilder } from './assets/house-builder.js';
     import { createVisibility, ISO_VIEW, placeIsoCamera } from './assets/visibility.js';
-    import { trackFromV1 } from './assets/shot-track.js';
+    import { trackFromV1, trackView } from './assets/shot-track.js';
+    import { qaTrack } from './assets/shot-qa.js';
     import { registerSceneCheck, runSceneChecks } from './assets/scene-qa/index.js';
     import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
@@ -6819,6 +6820,9 @@
     // S3 (compose):
     // S4 (site):
     // S5 (shot):
+    // the global planner switch: ?planner=v2 (or window.__houseShotPlanner = 'v2' before the house loads) plans every
+    // house's door-to-core on the spline planner v2; a spec's shots[].planner overrides it per shot; v1 otherwise
+    houseBuilderDeps.shotPlanner = () => urlParams.get('planner') || window.__houseShotPlanner || null;
     // S6 (ui):
     const houseBuilder = createHouseBuilder(houseBuilderDeps);
     window.__houseBuilderRef = houseBuilder; window.__THREE = THREE;   // catalog builder / QA hooks
@@ -7690,8 +7694,12 @@
       const preset = key ? SplinePresets[key] : shot;
       if (!preset || !preset.eyePoints) throw new Error(`unknown shot ${key || shot}`);
       const type = preset.type || (key ? key.split(':').pop() : '');
+      if (preset.track) return trackView(preset.track, { fps });   // planner v2: the baked track itself
       return trackFromV1(THREE, preset, { type, duration: preset.duration || animDuration, fps, aspect, houseInside });
     };
+    // The world planner v2 plans on (assets/shot-world.ts): the built house as boxes, the storeys, the entry, the Core
+    // and the stairs — what scripts/test-shot-planner.mts bakes the same track from in Node.
+    window.__houseShotWorld = () => { if (!activeHouse) throw new Error('no house loaded'); return activeHouse.anchors.shotWorld; };
     // headless QA hook (render-house-shots.mts / frame checks): the loaded house's spec + anchors, the scene and camera
     window.__houseDebug = () => ({ house: activeHouse, scene, camera: activeCamera, presets: SplinePresets, renderer });
     // Prop sheet (scripts/prop-sheet.mts): each type built alone on a neutral floor, shot from the front-right
@@ -7979,7 +7987,16 @@
       if (!preset) throw new Error(`unknown shot ${key}`);
       const shotType = key.split(':').pop();
       const spec = activeHouse.spec, anchors = activeHouse.anchors;
+      // planner v2: QA v2 (assets/shot-qa.ts) on the baked track against the world it was planned on — the same
+      // function the Node harness runs
+      if (preset.track && preset.world) {
+        const sh = (spec.shots || []).find(x => x && x.type === preset.type) || {};
+        const q = qaTrack(preset.track, preset.world, { via: sh.via });
+        return { id: activeHouse.id, shot: shotType, planner: 'v2', samples: preset.track.samples, errors: q.errors, warnings: q.warnings, metrics: q.metrics, plan: preset.track.plan, finalEye: [...preset.track.pos.slice(-3)].map(v => +v.toFixed(2)), orbit: q.metrics.orbitArc !== undefined ? { arc: q.metrics.orbitArc } : null };
+      }
       const errors = [], warnings = [];
+      // a v2 shot that could not be planned fell back to v1: its reason is a v2 error
+      if (preset.v2Error) errors.push({ code: preset.v2Error.code, t: 0, tEnd: 0, samples: 1, subject: 'planner v2', message: `planner v2 fell back to v1: ${preset.v2Error.message}` });
       // consecutive samples with the same code + subject collapse into one finding with a t range
       const push = (list, code, t, subject, m) => { const last = list[list.length - 1]; if (last && last.code === code && last.subject === subject && t - last.tEnd < 0.1) { last.tEnd = +t.toFixed(3); last.samples++; return; } list.push({ code, t: +t.toFixed(3), tEnd: +t.toFixed(3), samples: 1, subject, message: m }); };
       const E = (code, t, m, subject = '') => push(errors, code, t, subject, m), W = (code, t, m, subject = '') => push(warnings, code, t, subject, m);
@@ -8459,8 +8476,11 @@
       orbitControls.target.copy(lookTarget);
       if (activeHouse && preset && preset.dressing) applyShotCutaway(preset, sampleT, eyePos, lookTarget);
 
-      // Dynamic Dolly Zoom: subtly narrow FOV towards the core target for cinematic hero framing
-      if (shotType === 'door-to-core') {
+      // Dynamic Dolly Zoom: subtly narrow FOV towards the core target for cinematic hero framing. A planner-v2 shot
+      // carries its lens in its track (exterior → interior → the Core's, at ≤ 4°/s).
+      if (fr && fr.fov) {
+        if (Math.abs(persCamera.fov - fr.fov) > 0.001) { persCamera.fov = fr.fov; persCamera.updateProjectionMatrix(); }
+      } else if (shotType === 'door-to-core') {
         const targetFov = 46 - sampleT * 6; // 46° down to 40°: the last frame holds the Core and the screen behind it
         if (Math.abs(persCamera.fov - targetFov) > 0.01) {
           persCamera.fov = targetFov;

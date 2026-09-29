@@ -10,8 +10,12 @@ import { perimeterEdges, unionBounds, rectCentre, inRect } from './house-geometr
 import { createOrbitProbe, planOrbit, arcWaypoints, orbitPoint, sweepFrom } from './core-orbit.js';
 import { attachFrameAt, knotArcLengths, monotoneCubic } from './shot-path.js';
 import { DEG } from './build-context.js';
+import { digestWorld } from './shot-world.js';
+import { planDoorToCore, presetFromTrack } from './shot-planner.js';
+import { planHeroReveal, planWalkthrough } from './shot-planner-tour.js';
 
-export function createShotPlannerV1({ THREE }) {
+export function createShotPlannerV1(bctx) {
+  const { THREE } = bctx;
   // ---------------------------------------------------------------------------------------
   // Camera splines derived from anchors (SplinePresets format: eyePoints/targetPoints)
   // ---------------------------------------------------------------------------------------
@@ -157,7 +161,7 @@ export function createShotPlannerV1({ THREE }) {
     return corners.map(([i, j]) => [b.minX + i * CELL, b.minZ + j * CELL]);
   }
 
-  function shotsFor(spec, anchors) {
+  function shotsForV1(spec, anchors) {
     const b = anchors.bounds || { minX: -6, maxX: 6, minZ: -4, maxZ: 4 };
     const cx = (b.minX + b.maxX) / 2, cz = (b.minZ + b.maxZ) / 2;
     const span = Math.max(b.maxX - b.minX, b.maxZ - b.minZ);
@@ -737,5 +741,57 @@ export function createShotPlannerV1({ THREE }) {
     return shots;
   }
 
-  return { shotsFor, clearPoint, blockedTest, routeOn };
+  // ---------------------------------------------------------------------------------------
+  // Planner v2 (assets/shot-planner.ts), behind a switch: a spec's shots[].planner ('v1' | 'v2') for that shot, else the
+  // page's global switch (room-creator.html's S5 slot: ?planner=v2 or window.__houseShotPlanner), else v1 — the
+  // default on this branch, so every golden stays v1's. The v1 shots are built either way (v1 is what a v2 shot falls
+  // back to, with the reason on the preset as v2Error, which the QA gate reports).
+  //
+  // anchors.shotWorld is the ShotWorld digest v2 plans on (assets/shot-world.ts), made on first read and kept (plan.json's
+  // `shots` key reads it: assets/plan-export/shots.ts).
+  function plannerFor(spec, type) {
+    const s = (spec.shots || []).find(x => x && x.type === type);
+    if (s && (s.planner === 'v1' || s.planner === 'v2')) return { planner: s.planner, explicit: true, shot: s };
+    const g = typeof bctx.extra.shotPlanner === 'function' ? bctx.extra.shotPlanner() : bctx.extra.shotPlanner;
+    return { planner: g === 'v2' ? 'v2' : 'v1', explicit: false, shot: s || null };
+  }
+  function worldOf(spec, anchors) {
+    if (!Object.prototype.hasOwnProperty.call(anchors, 'shotWorld')) {
+      let cache = null;
+      Object.defineProperty(anchors, 'shotWorld', { configurable: true, enumerable: false, get: () => (cache ||= digestWorld(THREE, spec, anchors, anchors.placed || [])) });
+    }
+    return anchors.shotWorld;
+  }
+  function shotsFor(spec, anchors) {
+    const shots = shotsForV1(spec, anchors);
+    worldOf(spec, anchors);   // (defined, not made: made on first read)
+    const d2c = plannerFor(spec, 'door-to-core');
+    if (d2c.planner === 'v2' && shots['door-to-core']) {
+      const s = d2c.shot || {};
+      const r = planDoorToCore(anchors.shotWorld, {
+        // a duration the spec pins for v2 holds; under the global switch the spec's (v1) duration is only a floor
+        duration: d2c.explicit ? (s.duration ?? 'auto') : 'auto', minDuration: d2c.explicit ? undefined : s.duration,
+        establish: s.establish, via: s.via, beats: s.beats, route: s.route, heroView: spec.hero && spec.hero.view,
+      });
+      const v1 = shots['door-to-core'];
+      if (r.ok) {
+        const pre = presetFromTrack(THREE, r.track, { type: 'door-to-core', name: v1.name, world: anchors.shotWorld, dressing: { ...v1.dressing } });
+        for (const k of Object.keys(shots)) if (shots[k] === v1) shots[k] = pre;
+      } else v1.v2Error = { code: (r as any).code, message: (r as any).message };
+    }
+    // hero-reveal lands on the finale's framing ring; walkthrough is routed on nav v2 (plan Completeness B)
+    for (const [type, plan] of [['hero-reveal', planHeroReveal], ['walkthrough', planWalkthrough]] as Array<[string, (w: any, o: any) => any]>) {
+      const pf = plannerFor(spec, type), v1 = shots[type];
+      if (pf.planner !== 'v2' || !v1) continue;
+      const s = pf.shot || {};
+      const r = plan(anchors.shotWorld, { duration: pf.explicit && typeof s.duration === 'number' ? s.duration : type === 'walkthrough' ? 'auto' : (s.duration || undefined), heroView: spec.hero && spec.hero.view });
+      if (r.ok) {
+        const pre = presetFromTrack(THREE, r.track, { type, name: v1.name, world: anchors.shotWorld, dressing: { ...v1.dressing } });
+        for (const k of Object.keys(shots)) if (shots[k] === v1) shots[k] = pre;
+      } else v1.v2Error = { code: r.code, message: r.message };
+    }
+    return shots;
+  }
+
+  return { shotsFor, shotsForV1, clearPoint, blockedTest, routeOn };
 }
