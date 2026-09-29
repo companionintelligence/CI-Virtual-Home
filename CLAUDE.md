@@ -67,6 +67,13 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/> and to GitHub P
   canvases over the WebGL canvas. A still and a film go through `__houseRenderBegin` / `__houseRenderFrames` / the composer
   (`assets/ui/recorder.ts` hashes each frame's pixels before encoding; the file is checked by PSNR, frame count and duration).
 - A home's own parts are locked (`userData.generated`); what the person adds is theirs and is undoable.
+- `clearScene` ends the shot's dressing (`endShotCutaway`): a shot's dressing belongs to the home it dressed, and a second home
+  must be dressed by its own shot (the checks, Compare's posters and the player's Next home all go through `loadHouse`).
+- While a film or a still renders (`recording`, `headlessRender`) the page does not respond to keys or a resize: `syncViewportSize`
+  returns early and `openScene` refuses. A new control that opens a dialog or rebuilds the home must respect that.
+- Below 1100 px the sidebars are `<div role="complementary">` drawers, not `<aside>`: an open one becomes `role="dialog"`
+  (an `<aside>` may not). Closed, they are `visibility: hidden` (no tab stops, no ghost panel); the scrim is a sibling of
+  `<main>` because `<main>` goes inert while a drawer is open.
 - `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
 
 **Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and assembles
