@@ -1379,6 +1379,8 @@
       .anim-time-display { min-width: 0; margin-left: auto; }
       .rc-tl-legend { display: none; }
       .plan-inset { width: 200px; height: 168px; }
+      .rc-compare-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .rc-compare-body, .rc-compare-bar, .rc-compare-note { padding-left: 12px; padding-right: 12px; }
       .ref-panel { left: 8px; right: 8px; top: auto; bottom: calc(var(--rc-dock-h, 128px) + 16px); grid-template-columns: auto 1fr auto 1fr auto auto; }
       .rc-dialog-body.two-col { grid-template-columns: 1fr; }
       .rc-toasts { left: 8px; right: 8px; bottom: 8px; max-width: none; align-items: stretch; }
@@ -1566,7 +1568,7 @@
       <div class="catalog-panel" id="catalog-panel">
         <div class="catalog-search">
           <svg class="i" aria-hidden="true"><use href="#i-search"/></svg>
-          <input type="search" id="catalog-search-input" placeholder="Search the catalog" aria-label="Search the catalog" aria-controls="catalog-items-list" autocomplete="off" spellcheck="false">
+          <input type="search" id="catalog-search-input" title="Search the catalog (every tab, and the house props)" placeholder="Search the catalog" aria-label="Search the catalog" aria-controls="catalog-items-list" autocomplete="off" spellcheck="false">
         </div>
         <div class="catalog-items-container" id="catalog-items-list" role="tabpanel" aria-labelledby="tab-devices"></div>
         <p class="catalog-empty" id="catalog-empty" hidden>Nothing in the catalog matches that.</p>
@@ -1582,9 +1584,9 @@
       <!-- a reference photo laid over the view (never in a render, never saved): a local file, wiped from the left -->
       <div class="ref-overlay rc-chrome" id="ref-overlay" hidden aria-hidden="true"><img id="ref-img" alt=""><span class="ref-divider" id="ref-divider"></span></div>
       <div class="ref-panel rc-chrome" id="ref-panel" hidden role="group" aria-label="Reference photo">
-        <label for="ref-opacity">Opacity</label><input type="range" id="ref-opacity" min="10" max="100" step="5" value="60">
-        <label for="ref-wipe">Wipe</label><input type="range" id="ref-wipe" min="0" max="100" step="1" value="100">
-        <button type="button" class="outliner-btn" id="ref-change">Change</button>
+        <label for="ref-opacity">Opacity</label><input type="range" id="ref-opacity" title="How much of the photo shows through" min="10" max="100" step="5" value="60">
+        <label for="ref-wipe">Wipe</label><input type="range" id="ref-wipe" title="Wipe the photo away from the right: 100 % shows all of it" min="0" max="100" step="1" value="100">
+        <button type="button" class="outliner-btn" id="ref-change" title="Choose another photo">Change</button>
         <button type="button" class="outliner-btn" id="ref-remove" aria-label="Remove the reference photo" title="Remove the photo"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
       </div>
       <input type="file" id="ref-file" accept="image/*" hidden>
@@ -1652,7 +1654,7 @@
         <div class="anim-dock-header">
           <label class="select-wrap shot-select" title="Shot">
             <svg class="i" aria-hidden="true"><use href="#i-clapper"/></svg>
-            <select class="select-ctrl" id="spline-preset-select" aria-label="Shot"></select>
+            <select class="select-ctrl" id="spline-preset-select" title="The shot to play (this home's own)" aria-label="Shot"></select>
             <svg class="i chev" aria-hidden="true"><use href="#i-chevron"/></svg>
           </label>
           <span class="shot-meta" id="shot-meta" title="The shot's authored length (read-only)"></span>
@@ -1662,7 +1664,7 @@
             <button type="button" class="anim-btn" id="btn-toggle-plan" aria-pressed="false" title="The plan inset: the route, the camera and its view (M)"><svg class="i" aria-hidden="true"><use href="#i-plan"/></svg><span class="lbl">Plan</span></button>
             <label class="select-wrap select-frame" title="Safe frame">
               <svg class="i" aria-hidden="true"><use href="#i-frame"/></svg>
-              <select class="select-ctrl" id="safe-frame-select" aria-label="Safe frame">
+              <select class="select-ctrl" id="safe-frame-select" title="Show what a 16:9, 9:16 or 1:1 film of this view takes in" aria-label="Safe frame">
                 <option value="">Frame off</option>
                 <option value="16:9">16:9</option>
                 <option value="9:16">9:16</option>
@@ -1712,7 +1714,7 @@
         <div class="seg tod-seg" id="tod-seg" role="group" aria-label="Time of day"></div>
         <div class="prop-slider-row">
           <label for="slider-sun-bearing">Sun turn</label>
-          <input type="range" id="slider-sun-bearing" min="-180" max="180" step="5" value="0" aria-describedby="sun-readout">
+          <input type="range" id="slider-sun-bearing" title="Turn the sun round the home from where the time of day puts it" min="-180" max="180" step="5" value="0" aria-describedby="sun-readout">
           <output class="slider-val" id="val-sun-bearing" for="slider-sun-bearing">0°</output>
         </div>
         <p class="inspector-note" id="sun-readout"></p>
@@ -1737,17 +1739,17 @@
         <div class="color-swatches" id="color-swatch-picker" role="group" aria-labelledby="swatch-label"></div>
         <div class="prop-slider-row">
           <label for="slider-roughness">Roughness</label>
-          <input type="range" id="slider-roughness" min="0" max="1" step="0.05" value="0.3">
+          <input type="range" id="slider-roughness" title="How matte the selection is" min="0" max="1" step="0.05" value="0.3">
           <output class="slider-val" id="val-roughness" for="slider-roughness">0.30</output>
         </div>
         <div class="prop-slider-row">
           <label for="slider-metalness">Metalness</label>
-          <input type="range" id="slider-metalness" min="0" max="1" step="0.05" value="0.2">
+          <input type="range" id="slider-metalness" title="How metallic the selection is" min="0" max="1" step="0.05" value="0.2">
           <output class="slider-val" id="val-metalness" for="slider-metalness">0.20</output>
         </div>
         <div class="prop-slider-row">
           <label for="slider-emissive">Glow</label>
-          <input type="range" id="slider-emissive" min="0" max="3" step="0.1" value="0">
+          <input type="range" id="slider-emissive" title="How much the selection glows" min="0" max="3" step="0.1" value="0">
           <output class="slider-val" id="val-emissive" for="slider-emissive">0.0</output>
         </div>
       </section>
@@ -1757,7 +1759,7 @@
           <span id="scene-h">Scene</span>
           <button type="button" class="outliner-btn" id="btn-clear-scene" title="Remove everything you added">Clear added</button>
         </h2>
-        <div class="outliner-search"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="outliner-search" placeholder="Search the scene" aria-label="Search the scene" aria-controls="scene-outliner-box" autocomplete="off" spellcheck="false"></div>
+        <div class="outliner-search"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="outliner-search" title="Search the scene by name, room or kind" placeholder="Search the scene" aria-label="Search the scene" aria-controls="scene-outliner-box" autocomplete="off" spellcheck="false"></div>
         <div class="outliner-list" id="scene-outliner-box" role="tree" aria-labelledby="scene-h" aria-multiselectable="false"></div>
       </section>
     </aside>
@@ -1783,15 +1785,15 @@
         <div class="export-opt-group">
           <span class="export-opt-label" id="export-aspect-label">Aspect</span>
           <div class="seg" id="export-aspect-seg" role="radiogroup" aria-labelledby="export-aspect-label">
-            <button type="button" class="seg-btn" role="radio" data-aspect="16:9" aria-checked="true">16:9</button>
-            <button type="button" class="seg-btn" role="radio" data-aspect="9:16" aria-checked="false" tabindex="-1">9:16</button>
-            <button type="button" class="seg-btn" role="radio" data-aspect="1:1" aria-checked="false" tabindex="-1">1:1</button>
-            <button type="button" class="seg-btn" role="radio" data-aspect="4:3" aria-checked="false" tabindex="-1">4:3</button>
+            <button type="button" class="seg-btn" role="radio" title="A wide film or still" data-aspect="16:9" aria-checked="true">16:9</button>
+            <button type="button" class="seg-btn" role="radio" title="A tall one, for a phone" data-aspect="9:16" aria-checked="false" tabindex="-1">9:16</button>
+            <button type="button" class="seg-btn" role="radio" title="A square" data-aspect="1:1" aria-checked="false" tabindex="-1">1:1</button>
+            <button type="button" class="seg-btn" role="radio" title="A four by three" data-aspect="4:3" aria-checked="false" tabindex="-1">4:3</button>
           </div>
         </div>
         <div class="export-opt-group">
           <label class="export-opt-label" for="export-res-select">Size</label>
-          <select class="select-ctrl" id="export-res-select">
+          <select class="select-ctrl" id="export-res-select" title="The short side of the still; the long side is capped at 3840">
             <option value="1080">1080p</option>
             <option value="1440">1440p</option>
             <option value="2160" selected>4K</option>
@@ -1799,7 +1801,7 @@
         </div>
         <div class="export-opt-group">
           <label class="export-opt-label" for="export-bg-select">Background</label>
-          <select class="select-ctrl" id="export-bg-select">
+          <select class="select-ctrl" id="export-bg-select" title="What is behind the home in the still">
             <option value="scene" selected>The scene's own sky</option>
             <option value="transparent">Transparent cutout (no ground, world or sky)</option>
             <option value="studio-dark">Studio, dark</option>
@@ -1808,13 +1810,13 @@
         </div>
         <p class="export-summary" id="export-summary" aria-live="polite"></p>
         <div class="export-opt-group">
-          <button type="button" class="btn-ctrl btn-outline" id="btn-download-json"><svg class="i" aria-hidden="true"><use href="#i-file-json"/></svg><span id="download-json-label">Download HouseSpec</span></button>
+          <button type="button" class="btn-ctrl btn-outline" id="btn-download-json" title="Save the spec this home is built from"><svg class="i" aria-hidden="true"><use href="#i-file-json"/></svg><span id="download-json-label">Download HouseSpec</span></button>
         </div>
       </div>
     </div>
     <div class="rc-dialog-foot">
-      <button type="button" class="btn-ctrl" id="btn-cancel-export">Cancel</button>
-      <button type="button" class="btn-export" id="btn-confirm-download-png"><svg class="i" aria-hidden="true"><use href="#i-download"/></svg><span id="download-png-label">Download PNG</span></button>
+      <button type="button" class="btn-ctrl" id="btn-cancel-export" title="Close without saving">Cancel</button>
+      <button type="button" class="btn-export" id="btn-confirm-download-png" title="Draw the still at this size and save it"><svg class="i" aria-hidden="true"><use href="#i-download"/></svg><span id="download-png-label">Download PNG</span></button>
     </div>
   </dialog>
 
@@ -1835,11 +1837,11 @@
       <div class="export-options">
         <div class="export-opt-group">
           <label class="export-opt-label" for="video-spline-preset-sync">Shot</label>
-          <select class="select-ctrl" id="video-spline-preset-sync"></select>
+          <select class="select-ctrl" id="video-spline-preset-sync" title="The shot to record"></select>
         </div>
         <div class="export-opt-group">
           <label class="export-opt-label" for="video-res-select">Size</label>
-          <select class="select-ctrl" id="video-res-select">
+          <select class="select-ctrl" id="video-res-select" title="The short side of the film">
             <option value="720">720p</option>
             <option value="1080" selected>1080p</option>
             <option value="1440">1440p</option>
@@ -1848,7 +1850,7 @@
         </div>
         <div class="export-opt-group">
           <label class="export-opt-label" for="video-aspect-select">Aspect</label>
-          <select class="select-ctrl" id="video-aspect-select">
+          <select class="select-ctrl" id="video-aspect-select" title="The film's shape">
             <option value="16:9" selected>16:9, landscape</option>
             <option value="9:16">9:16, portrait</option>
             <option value="1:1">1:1, square</option>
@@ -1857,7 +1859,7 @@
         </div>
         <div class="export-opt-group">
           <label class="export-opt-label" for="video-fps-select">Frame rate</label>
-          <select class="select-ctrl" id="video-fps-select">
+          <select class="select-ctrl" id="video-fps-select" title="Frames a second: every frame is drawn, so the length is the shot's own">
             <option value="30">30 fps</option>
             <option value="60" selected>60 fps</option>
           </select>
@@ -1867,9 +1869,9 @@
       </div>
     </div>
     <div class="rc-dialog-foot">
-      <button type="button" class="btn-ctrl" id="btn-cancel-video-modal">Close</button>
-      <a id="btn-download-video-file" class="btn-ctrl btn-outline" hidden><svg class="i" aria-hidden="true"><use href="#i-download"/></svg><span id="download-video-label">Download the last film</span></a>
-      <button type="button" class="btn-export" id="btn-start-record-video"><svg class="i" aria-hidden="true"><use href="#i-video"/></svg>Record</button>
+      <button type="button" class="btn-ctrl" id="btn-cancel-video-modal" title="Close (a film being recorded goes on; Cancel is in its note)">Close</button>
+      <a id="btn-download-video-file" title="Save the last film" class="btn-ctrl btn-outline" hidden><svg class="i" aria-hidden="true"><use href="#i-download"/></svg><span id="download-video-label">Download the last film</span></a>
+      <button type="button" class="btn-export" id="btn-start-record-video" title="Step the shot through the film's renderer and save it as a video"><svg class="i" aria-hidden="true"><use href="#i-video"/></svg>Record</button>
     </div>
   </dialog>
 
@@ -7281,6 +7283,7 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const VIEW_MODE = urlParams.get('mode') === 'view';   // the portal's player (assets/viewer.ts): always a spec house
+    const PREFER_CODEC = urlParams.get('codec') === 'vp9' ? 'vp9' : 'h264';   // ?codec=vp9: record a WebM (the fallback where H.264 cannot be encoded)
     const DEFAULT_HOUSE = 'aurora';                         // what the editor opens with neither ?house= nor ?preset=
     // The streams' scene checks (assets/scene-qa/index.ts imports one module each) are for the gates and the editor.
     // The player never runs the scene QA, so it never loads them: once the streams fill their modules that is every
@@ -7585,7 +7588,7 @@
     //   ?house=<spec id>   ?preset=<studio scene>   ?shot=<door-to-core|orbit|hero-reveal|walkthrough|core-orbit>
     //   ?t=<0…1>  ?lighting=<day|golden|dusk|night>  ?mode=review|edit  (assets/ui/url-state.ts: all five round-trip)
     //   ?flythrough=1 (autoplay)      ?autorecord=1 (start the video recorder once the shot is loaded)
-    //   ?res=1080&aspect=16:9 (recorder settings)   ?qa=1 (run the checks in a page a harness drives)
+    //   ?res=1080&aspect=16:9 (recorder settings)   ?codec=vp9 (record a WebM, not an MP4)   ?qa=1 (run the checks in a page a harness drives)
     // With neither ?house= nor ?preset= the editor opens a home (Completeness J), not the studio garden house.
     const initialPreset = resolveSceneKey(urlParams.get('house') ? `house:${urlParams.get('house')}` : VIEW_MODE ? 'house:aurora' : (urlParams.get('preset') || `house:${DEFAULT_HOUSE}`));
     const houseParam = initialPreset.startsWith('house:') ? initialPreset.slice(6) : null;
@@ -9485,7 +9488,7 @@
     async function updateVideoSummary() {
       const p = recordingPlan(), run = ++summaryRun, out = document.getElementById('video-summary');
       out.textContent = `${p.w} × ${p.h} · ${p.fps} fps · ${p.duration.toFixed(2)} s · ${p.frames} frames · checking the encoder…`;
-      const codec = await pickCodec(p.w, p.h, p.fps);
+      const codec = await pickCodec(p.w, p.h, p.fps, PREFER_CODEC);
       if (run !== summaryRun) return;
       out.textContent = `${p.w} × ${p.h} · ${p.fps} fps · ${p.duration.toFixed(2)} s · ${p.frames} frames · ${codec ? `${codec.label} (${codec.codec}), about ${Math.round(bitrateFor(p.w, p.h, p.fps) / 1e6)} Mb/s` : 'this browser has no video encoder for this size'}`;
       btnStartRecordVideo.disabled = !codec;
@@ -9528,7 +9531,7 @@
           end: () => window.__houseRenderEnd(),
           canvas, gl: renderer.getContext(),
         }, {
-          signal: ac.signal,
+          signal: ac.signal, prefer: PREFER_CODEC,
           onStart: info => note.update(0, `${info.w} × ${info.h} · ${info.fps} fps · ${info.frames} frames · ${info.codec.label}`),
           onProgress: (d, n) => note.update(d / n, `Frame ${d} of ${n} · ${((performance.now() - t0) / 1000).toFixed(0)} s`),
         });

@@ -711,58 +711,67 @@ try {
     const has = (b: string) => spawnSync(b, ['-version'], { stdio: 'ignore' }).status === 0;
     if (!has('ffmpeg') || !has('ffprobe')) ok(false, 'ffmpeg and ffprobe are installed (the recording is checked with them)');
     else {
-      const c = await open(`?house=${ONE}`, { width: 1280, height: 800 });
-      const { page } = c;
-      await page.click('#btn-open-video-export');
-      await page.selectOption('#video-spline-preset-sync', `house:${ONE}:door-to-core`);
-      await page.selectOption('#video-res-select', '720');
-      await page.selectOption('#video-aspect-select', '16:9');
-      await page.selectOption('#video-fps-select', '30');
-      await page.waitForFunction(() => /frames · H\.264|frames · VP9/.test(document.getElementById('video-summary')!.textContent!), null, { timeout: 20000 });
-      const summary = await page.textContent('#video-summary');
-      ok(/^1280 × 720 · 30 fps · 12\.00 s · 360 frames · H\.264 in MP4/.test(summary), `the dialog says what comes out: ${summary}`);
-      await shot(page, 'record-dialog');
-      const t0 = Date.now();
-      const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 900000 }), page.click('#btn-start-record-video')]);
-      const file = path.join(os.tmpdir(), `vh-ui-${process.pid}.mp4`);
-      await dl.saveAs(file);
-      const rec = await page.evaluate(() => { const r = (window as any).__lastRecording; return { name: r.name, frames: r.frames, fps: r.fps, duration: r.duration, kind: r.kind, codec: r.codec, hashes: r.frameHashes, w: r.width, h: r.height }; });
-      console.log(`    recorded in ${((Date.now() - t0) / 1000).toFixed(0)} s: ${rec.name} (${rec.codec})`);
-      ok(rec.kind === 'h264' && /\.mp4$/.test(rec.name) && !/:/.test(rec.name), `H.264 in an MP4 named ${rec.name}`);
-      const probe = JSON.parse(spawnSync('ffprobe', ['-v', 'error', '-count_frames', '-show_streams', '-show_format', '-of', 'json', file], { encoding: 'utf8' }).stdout);
-      const v = probe.streams[0];
-      ok(v.codec_name === 'h264' && Number(v.nb_read_frames) === 360 && v.width === 1280 && v.height === 720, `ffprobe: ${v.codec_name}, ${v.nb_read_frames} frames, ${v.width} × ${v.height}`);
-      ok(Math.abs(Number(probe.format.duration) - 12) <= 1 / 30 + 1e-6, `ffprobe: ${probe.format.duration} s (12.00 ± 1 frame)`);
-      // the frames as __houseRenderFrames draws them, raw off the GL context
-      const idx = [0, 90, 180, 270, 359];
-      const raw: Array<{ i: number; b64: string }> = await page.evaluate(async (ids: number[]) => {
-        const w = window as any, out: any[] = [];
-        const info = w.__houseRenderBegin({ shot: 'door-to-core', res: '720', aspect: '16:9', fps: 30 });
-        await w.__houseComposerWarm({ res: '720', aspect: '16:9' });
-        const gl = w.__houseDebug().renderer.getContext(), px = new Uint8Array(info.w * info.h * 4);
-        for (const i of ids) {
-          w.__houseRenderFrames(i, 1, null);
-          gl.readPixels(0, 0, info.w, info.h, gl.RGBA, gl.UNSIGNED_BYTE, px);
-          let s = ''; for (let k = 0; k < px.length; k += 8192) s += String.fromCharCode.apply(null, px.subarray(k, k + 8192) as any);
-          out.push({ i, b64: btoa(s) });
+      // a 12 s door-to-core through the film's renderer, encoded and saved, then checked from the file: the codec, the frame
+      // count, the duration, and (frames sampled) the hash of what __houseRenderFrames drew before encoding and the PSNR of what
+      // the file decodes to. H.264 in an MP4 is the default; ?codec=vp9 is the WebM the editor falls back to where H.264
+      // cannot be encoded.
+      const recordCheck = async (o: { query: string; res: string; fps: number; W: number; H: number; kind: 'h264' | 'vp9'; ext: string; codecName: string; label: RegExp; ids: number[]; shotName?: string }) => {
+        const frames = o.fps * 12;
+        const c = await open(`?house=${ONE}${o.query}`, { width: 1280, height: 800 });
+        const { page } = c;
+        await page.click('#btn-open-video-export');
+        await page.selectOption('#video-spline-preset-sync', `house:${ONE}:door-to-core`);
+        await page.selectOption('#video-res-select', o.res);
+        await page.selectOption('#video-aspect-select', '16:9');
+        await page.selectOption('#video-fps-select', String(o.fps));
+        await page.waitForFunction(() => /frames · H\.264|frames · VP9/.test(document.getElementById('video-summary')!.textContent!), null, { timeout: 20000 });
+        const summary = await page.textContent('#video-summary');
+        ok(new RegExp(`^${o.W} × ${o.H} · ${o.fps} fps · 12\\.00 s · ${frames} frames · `).test(summary) && o.label.test(summary), `the dialog says what comes out: ${summary}`);
+        if (o.kind === 'h264') await shot(page, 'record-dialog');
+        const t0 = Date.now();
+        const [dl] = await Promise.all([page.waitForEvent('download', { timeout: 900000 }), page.click('#btn-start-record-video')]);
+        const file = path.join(os.tmpdir(), `vh-ui-${process.pid}.${o.ext}`);
+        await dl.saveAs(file);
+        const rec = await page.evaluate(() => { const r = (window as any).__lastRecording; return { name: r.name, frames: r.frames, fps: r.fps, duration: r.duration, kind: r.kind, codec: r.codec, hashes: r.frameHashes, w: r.width, h: r.height }; });
+        console.log(`    recorded in ${((Date.now() - t0) / 1000).toFixed(0)} s: ${rec.name} (${rec.codec})`);
+        ok(rec.kind === o.kind && new RegExp(`\\.${o.ext}$`).test(rec.name) && !/:/.test(rec.name), `${o.kind === 'h264' ? 'H.264 in an MP4' : 'VP9 in a WebM'} named ${rec.name}`);
+        const probe = JSON.parse(spawnSync('ffprobe', ['-v', 'error', '-count_frames', '-show_streams', '-show_format', '-of', 'json', file], { encoding: 'utf8' }).stdout);
+        const v = probe.streams[0];
+        ok(v.codec_name === o.codecName && Number(v.nb_read_frames) === frames && v.width === o.W && v.height === o.H, `ffprobe: ${v.codec_name}, ${v.nb_read_frames} frames, ${v.width} × ${v.height}`);
+        // (a WebM's container duration is its last frame's end; an MP4's is the edit list: both are 12 s to a frame)
+        ok(Math.abs(Number(probe.format.duration) - 12) <= 1 / o.fps + 1e-6, `ffprobe: ${probe.format.duration} s (12.00 ± 1 frame)`);
+        // the frames as __houseRenderFrames draws them, raw off the GL context
+        const raw: Array<{ i: number; b64: string }> = await page.evaluate(async ([ids, res, fps]: [number[], string, number]) => {
+          const w = window as any, out: any[] = [];
+          const info = w.__houseRenderBegin({ shot: 'door-to-core', res, aspect: '16:9', fps });
+          await w.__houseComposerWarm({ res, aspect: '16:9' });
+          const gl = w.__houseDebug().renderer.getContext(), px = new Uint8Array(info.w * info.h * 4);
+          for (const i of ids) {
+            w.__houseRenderFrames(i, 1, null);
+            gl.readPixels(0, 0, info.w, info.h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+            let s = ''; for (let k = 0; k < px.length; k += 8192) s += String.fromCharCode.apply(null, px.subarray(k, k + 8192) as any);
+            out.push({ i, b64: btoa(s) });
+          }
+          w.__houseRenderEnd();
+          return out;
+        }, [o.ids, o.res, o.fps] as [number[], string, number]);
+        const { W, H } = o;
+        const decode = (i: number) => spawnSync('ffmpeg', ['-v', 'error', '-i', file, '-vf', `select=eq(n\\,${i}),scale=in_color_matrix=auto:in_range=auto,format=rgba`, '-frames:v', '1', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'], { maxBuffer: 64 << 20 }).stdout as Buffer;
+        for (const { i, b64 } of raw) {
+          const px = Buffer.from(b64, 'base64');
+          const hash = crypto.createHash('sha256').update(px).digest('hex').slice(0, 16);
+          const dec = decode(i);
+          let se = 0, n = 0;
+          for (let y = 0; y < H; y++) { const src = (H - 1 - y) * W * 4, dst = y * W * 4; for (let x = 0; x < W * 4; x += 4) for (let k = 0; k < 3; k++) { const d = px[src + x + k] - dec[dst + x + k]; se += d * d; n++; } }
+          const psnr = 10 * Math.log10(255 * 255 / (se / n));
+          ok(hash === rec.hashes[i] && dec.length === W * H * 4 && psnr >= 40, `frame ${i}: hashed before encoding as __houseRenderFrames draws it (${hash}), decodes at ${psnr.toFixed(1)} dB`);
         }
-        w.__houseRenderEnd();
-        return out;
-      }, idx);
-      const W = 1280, H = 720;
-      const decode = (i: number) => spawnSync('ffmpeg', ['-v', 'error', '-i', file, '-vf', `select=eq(n\\,${i}),scale=in_color_matrix=auto:in_range=auto,format=rgba`, '-frames:v', '1', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'], { maxBuffer: 64 << 20 }).stdout as Buffer;
-      for (const { i, b64 } of raw) {
-        const px = Buffer.from(b64, 'base64');
-        const hash = crypto.createHash('sha256').update(px).digest('hex').slice(0, 16);
-        const dec = decode(i);
-        let se = 0, n = 0;
-        for (let y = 0; y < H; y++) { const src = (H - 1 - y) * W * 4, dst = y * W * 4; for (let x = 0; x < W * 4; x += 4) for (let k = 0; k < 3; k++) { const d = px[src + x + k] - dec[dst + x + k]; se += d * d; n++; } }
-        const psnr = 10 * Math.log10(255 * 255 / (se / n));
-        ok(hash === rec.hashes[i] && dec.length === W * H * 4 && psnr >= 40, `frame ${i}: hashed before encoding as __houseRenderFrames draws it (${hash}), decodes at ${psnr.toFixed(1)} dB`);
-      }
-      fs.rmSync(file, { force: true });
-      noErrors(c, '(record)');
-      await c.close();
+        fs.rmSync(file, { force: true });
+        noErrors(c, `(record ${o.kind})`);
+        await c.close();
+      };
+      await recordCheck({ query: '', res: '720', fps: 30, W: 1280, H: 720, kind: 'h264', ext: 'mp4', codecName: 'h264', label: /H\.264 in MP4/, ids: [0, 90, 180, 270, 359] });
+      await recordCheck({ query: '&codec=vp9', res: '720', fps: 30, W: 1280, H: 720, kind: 'vp9', ext: 'webm', codecName: 'vp9', label: /VP9 in WebM/, ids: [0, 90, 180, 270, 359] });
     }
   }
 } catch (err) {

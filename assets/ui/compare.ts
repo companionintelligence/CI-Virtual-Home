@@ -169,9 +169,9 @@ export function createCompare(dialog: HTMLDialogElement, hooks: CompareHooks) {
 
   return {
     open(from: { shot?: string; t?: number; lighting?: string } = {}) {
-      if (from.shot && [...shotSel.options].some(o => o.value === from.shot)) shotSel.value = from.shot;
+      if (from.shot && Array.from(shotSel.options).some(o => o.value === from.shot)) shotSel.value = from.shot;
       if (typeof from.t === 'number') { tRange.value = String(Math.round(Math.max(0, Math.min(1, from.t)) * 100)); tOut.textContent = `${tRange.value} %`; }
-      if (from.lighting && [...lightSel.options].some(o => o.value === from.lighting)) lightSel.value = from.lighting;
+      if (from.lighting && Array.from(lightSel.options).some(o => o.value === from.lighting)) lightSel.value = from.lighting;
       layout();
       dialog.showModal();
       runBtn.focus();

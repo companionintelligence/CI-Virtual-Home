@@ -59,6 +59,16 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/> and to GitHub P
   the Sims build's title and stays the credit). Fix a name there, not in `content/houses/`.
 - `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
 
+**The editor.** `room-creator.html` without `?mode=view` (README: The editor) is the review and render tool, on the CI canon:
+
+- The chrome uses the canon's tokens (`var(--…)`), never a literal hex below the two token blocks; Manrope and JetBrains Mono
+  only; the lucide sprite for icons (no emoji); toasts, never `alert()` / `confirm()` / `prompt()`. Never hand-edit the token blocks.
+- Nothing the chrome draws may reach a frame: the path, the plan inset, the safe frame and the reference photo are DOM or 2D
+  canvases over the WebGL canvas. A still and a film go through `__houseRenderBegin` / `__houseRenderFrames` / the composer
+  (`assets/ui/recorder.ts` hashes each frame's pixels before encoding; the file is checked by PSNR, frame count and duration).
+- A home's own parts are locked (`userData.generated`); what the person adds is theirs and is undoable.
+- `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
+
 **Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and assembles
 the portal (`portal:build`'s link and staleness checks). The
 render gate needs a GPU and runs here:
