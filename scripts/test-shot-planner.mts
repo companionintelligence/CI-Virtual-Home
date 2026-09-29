@@ -25,7 +25,7 @@ import path from 'node:path';
 import { ROOT, houseIds, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
 import { ensureWorlds, fixtureIds, specFile } from './shot-worlds.mts';
 import { planDoorToCore, shotOptions, trackHash } from '../assets/shot-planner.js';
-import { qaTrack } from '../assets/shot-qa.js';
+import { qaTrack, qaAspects } from '../assets/shot-qa.js';
 import { fleetChecks, type FleetRow } from '../assets/shot-fleet.js';
 import { planHeroReveal, planWalkthrough } from '../assets/shot-planner-tour.js';
 
@@ -42,7 +42,7 @@ const specOf = (id: string) => JSON.parse(fs.readFileSync(specFile(id), 'utf8'))
 
 // ---- 1 + 2. plan (twice), QA
 type Row = FleetRow & { hash: string; planMs: number; qaMs: number; notes: string[]; findings: any };
-const rows: Row[] = [];
+const rows: Row[] = [], aspectErrors: string[] = [];
 let planCpu = 0, identical = true; const drift: string[] = [], nondet: string[] = [], failed: string[] = [];
 for (const id of [...ids, ...fixtures]) {
   const world = worlds.get(id), spec = specOf(id);
@@ -55,12 +55,14 @@ for (const id of [...ids, ...fixtures]) {
   const b = planDoorToCore(world, so.options);
   if (!b.ok || trackHash(a.track) !== trackHash(b.track) || JSON.stringify(a.track.plan) !== JSON.stringify(b.track.plan)) { identical = false; nondet.push(id); }
   const t1 = cpuMs(); const qa = qaTrack(a.track, world, { via: (so.shot && so.shot.via) || undefined }); const qaMs = cpuMs() - t1;
+  const asp = qaAspects(a.track, world, { via: (so.shot && so.shot.via) || undefined }); aspectErrors.push(...asp.map(e => `${id} t=${e.t} ${e.code}: ${e.message}`));
   rows.push({ id, duration: a.track.duration, metrics: qa.metrics, plan: a.track.plan, errors: qa.errors.length, warnings: qa.warnings.length, hash: trackHash(a.track), planMs, qaMs, notes: a.notes, findings: { errors: qa.errors, warnings: qa.warnings } });
 }
 check(!failed.length, `every house plans (${ids.length + fixtures.length})`, failed.join('\n'));
 check(identical, 'two plans of the same world are byte-identical (hash and plan)', nondet.join(', '));
 const real = rows.filter(r => ids.includes(r.id)), fix = rows.filter(r => !ids.includes(r.id));
 for (const r of rows) for (const e of r.findings.errors) console.log(`  ERROR ${r.id} t=${e.t}${e.tEnd > e.t ? '–' + e.tEnd : ''} ${e.code}: ${e.message}`);
+check(!aspectErrors.length, `QA v2's frame checks hold at 9:16, 3:4, 1:1 and 21:9 (the press, the orbit, a blank wall): 0 errors on ${rows.length} track${rows.length === 1 ? '' : 's'}`, aspectErrors.join('\n'));
 check(!rows.some(r => r.errors), `QA v2: 0 errors on ${rows.length} track${rows.length === 1 ? '' : 's'}`, rows.filter(r => r.errors).map(r => `${r.id}: ${r.findings.errors.map((e: any) => e.code).join(', ')}`).join('\n'));
 
 const tourHash = new Map<string, string>();
@@ -159,6 +161,9 @@ if (args['planner-only'] !== 'true' && (parityN > 0 || rows.length)) {
         const got = await page.evaluate(() => { const t = (window as any).__houseShotTrack('door-to-core'); return { hash: t.hash, planner: t.planner, duration: t.duration, samples: t.samples }; });
         check(got.planner === 'v2' && got.hash === r.hash && got.duration === r.duration, `the page's door-to-core track for ${r.id} is the Node bake (${r.hash})`, `page: ${JSON.stringify(got)}\nnode: ${r.hash} ${r.duration} s`);
       }
+      // anchors.nav (the S5 contract, for S6's plan inset): the grid of each storey and the route of the shot
+      const nv = await page.evaluate(() => { const a = (window as any).__houseDebug().house.anchors, n = a.nav; if (!n) return null; const g = n.grid(n.levels[0].id), r = n.route('door-to-core'); return { cell: n.cell, levels: n.levels.length, w: g.w, h: g.h, free: g.free.length, clearance: g.clearance.length, walkable: Array.from(g.free as Uint8Array).reduce((x: number, v: number) => x + v, 0), route: r ? r.length : 0 }; });
+      check(!!nv && nv.free === nv.w * nv.h && nv.clearance === nv.w * nv.h && nv.walkable > 20 && nv.route > 20, 'anchors.nav gives the grid of a storey (free, clearance) and the route the shot flies', JSON.stringify(nv));
       // the doors channel through the page's pose hook (visibility.ts shotPose): a leaf pivot follows the track's channel, absolute per frame
       // (frames out of order give the same angles: no frame depends on the one before) and goes back to where it was when the shot ends
       const dr = await page.evaluate(() => {

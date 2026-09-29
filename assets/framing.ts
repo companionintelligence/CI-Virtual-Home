@@ -117,8 +117,11 @@ export type EstablishStyle = typeof ESTABLISH_STYLES[number];
 export type Establish = { style: EstablishStyle | 'custom'; eye: V3; aim: V3; fov: number; bearing: number; score: number; fit: number; sky: number; occluded: number; roofOff: boolean; scores?: any; alts?: Establish[] };
 
 /** Plan the establishing pose: `want` is shots[].establish ('auto', a style, or {bearing, height, dist}). */
+/** the seed under which the houses' favourite styles fall out evenly — scripts/fit-establish-salt.mts searches it, and it is searched again whenever the worlds or
+ *  the framing change (fleet diversity is not a runtime input: it would couple houses together; a house's own `shots[].establish` is what the layout pass sets) */
+export const ESTABLISH_SALT = 'establish-style53';
 const EST_LENSES = [46, 49, 42];
-/** the establishing look's pitch range, degrees (§3.5: the look never tilts up at the house, or far down at it, unless it is a dollhouse) */
+/** the establishing look's pitch range, degrees (§3.5: the look never tilts up at the house, or far down at it, unless it is a dollhouse: the high three-quarter aerial) */
 export const EST_PITCH: [number, number] = [-28, -4];
 /** the point the eye looks at when it wants `aim` but its pitch is held to [lo, hi]° (what the look solver will do on frame 0) */
 export function pitchHeld(eye: V3, aim: V3, lo: number, hi: number): V3 {
@@ -128,7 +131,7 @@ export function pitchHeld(eye: V3, aim: V3, lo: number, hi: number): V3 {
   const c = Math.cos(p * DEG), yaw = Math.atan2(dx, dz);
   return [eye[0] + Math.sin(yaw) * c * d, eye[1] + Math.sin(p * DEG) * d, eye[2] + Math.cos(yaw) * c * d];
 }
-export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldIndex, want: any = 'auto', lim: { near?: [number, number]; maxPath?: number; openTo?: V3; relax?: boolean } = {}): Establish {
+export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldIndex, want: any = 'auto', lim: { near?: [number, number]; maxPath?: number; openTo?: V3; relax?: boolean; salt?: string } = {}): Establish {
   // (a dollhouse needs height, and height is path: under ~9 m of establishing move it is not offered)
   const e = world.entry!;
   const n: [number, number] = e.out, l: [number, number] = [n[1], -n[0]];   // l: the house's right as the street sees it
@@ -143,7 +146,7 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   const jitter = ESTABLISH_STYLES.map(() => rng());
   // each house has a favourite style, spread evenly over the styles by its id (never by the other houses: fleet diversity is
   // not a runtime input) — a nudge, not a rule: a facade that does not fit it still opens the way it fits
-  const fav = fnv1a(`${world.id}:establish-style53`) % ESTABLISH_STYLES.length;   // (the salt: the seed under which the 30 real houses fall seven, seven, seven, six, three)
+  const fav = fnv1a(`${world.id}:${lim.salt || ESTABLISH_SALT}`) % ESTABLISH_STYLES.length;   // (the salt: the seed under which the 30 real houses fall seven, seven, seven, six, three)
   const lot = world.lot;
   const inLot = (x: number, z: number) => Math.abs(x) <= lot.w / 2 + 4 && Math.abs(z) <= lot.d / 2 + 8;
   // affinities: a facade mirrored about its door reads axial; a front garden with water or beds reads from the
@@ -172,7 +175,7 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
     // (and with steps to climb the look opens 80 % of the way to their top: the yaw limit of the establishing beat could not turn it further in
     // the time the move has — the pose is judged looking there)
     const aimFlown: V3 = lim.openTo ? [aimAt[0] + (lim.openTo[0] - aimAt[0]) * 0.8, aimAt[1] + (lim.openTo[1] - aimAt[1]) * 0.8, aimAt[2] + (lim.openTo[2] - aimAt[2]) * 0.8] : aimAt;
-    const held = (q: V3) => pitchHeld(q, aimFlown, roofOff ? -40 : EST_PITCH[0], EST_PITCH[1]);
+    const held = (q: V3) => pitchHeld(q, aimFlown, style === 'dollhouse' ? -40 : EST_PITCH[0], EST_PITCH[1]);
     // the establishing move's length to the approach start (lim.near, at 1.8 m): what the outside's time allows
     const pathLen = (d: number) => { const q = eyeAt(d); return lim.near ? 1.12 * Math.hypot(q[0] - lim.near[0], q[1] - 1.8, q[2] - lim.near[1]) : 0; };
     // (measured from the aim, in plan: an eye nearer the aim than the approach start moves away from what it looks at)
@@ -216,7 +219,7 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
     if (s === 'axial') for (const fv of EST_LENSES) for (const h of [3.0, 4.0, 5.0]) tryPose('axial', 0, Math.max(h, top * 0.55), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]);
     if (s === 'corner-left' || s === 'corner-right') { const sg = s === 'corner-right' ? 1 : -1; for (const fv of EST_LENSES) for (const bb of [26, 34, 42]) for (const h of [3.6, 4.6, 5.8]) tryPose(s, sg * bb, Math.max(h, top * 0.65), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]); }
     if (s === 'garden') for (const fv of EST_LENSES) for (const sg of [1, -1]) for (const bb of [18, 28]) for (const h of [3.0, 4.0, 5.0]) tryPose('garden', sg * bb, h, fv, false, [aim[0], Math.max(2.2, top * 0.5), aim[2]]);
-    if (s === 'dollhouse') for (const fv of [42, 46, 49]) for (const sg of [1, -1]) for (const h of [6, 7.5]) tryPose('dollhouse', sg * 30, Math.max(h, top + 2.2), fv, true, [cx * 0.5 + aim[0] * 0.5, 0.8, cz * 0.5 + aim[2] * 0.5]);
+    if (s === 'dollhouse') for (const fv of [42, 46, 49]) for (const sg of [1, -1]) for (const h of [6, 7.5]) tryPose('dollhouse', sg * 30, Math.max(h, top + 2.2), fv, false, [cx * 0.5 + aim[0] * 0.5, 0.8, cz * 0.5 + aim[2] * 0.5]);
   };
   if (want && typeof want === 'object') {
     tryPose('custom', want.bearing ?? 30, want.height ?? 6, 34, false, aim, want.dist || 0);
@@ -253,11 +256,11 @@ export function coreHeightPct(eye: V3, target: V3, fov: number, core: Box6, aspe
   const pb = projectBox(camera(eye, target, fov, aspect), core);
   return pb ? (pb.maxY - pb.minY) / 2 : 0;
 }
-/** the vertical fov (38–50°) that puts the Core at `want` of the frame height from eye (the plan's 38–44 lens, wider where the
+/** the vertical fov (38–52°) that puts the Core at `want` of the frame height from eye (the plan's 38–44 lens, wider where the
  *  room lets the eye no further from a 9 cm slab) */
 export function fovForCore(eye: V3, target: V3, core: Box6, want = 0.21) {
   let best = 40, bd = Infinity;
-  for (let f = 38; f <= 50.001; f += 0.5) { const d = Math.abs(coreHeightPct(eye, target, f, core) - want); if (d < bd) { bd = d; best = f; } }
+  for (let f = 38; f <= 52.001; f += 0.5) { const d = Math.abs(coreHeightPct(eye, target, f, core) - want); if (d < bd) { bd = d; best = f; } }
   return best;
 }
 /** a look target that puts the Core at ndc (x, y) for this eye and fov: rotate the look from the Core's centre */

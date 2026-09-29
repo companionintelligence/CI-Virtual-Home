@@ -15,7 +15,7 @@
 //
 // Owner: S5 (shot).
 import { Math } from './detmath.js';
-import { K, inRect, inFootprint, type ShotWorld, type WLevel, type WRoom, type WorldIndex, type Rect } from './shot-world.js';
+import { K, inRect, inFootprint, createWorldIndex, type ShotWorld, type WLevel, type WRoom, type WorldIndex, type Rect } from './shot-world.js';
 
 export const CELL = 0.2;
 const WALL_KINDS = new Set<number>([K.wall, K.glass, K.rail]);
@@ -287,6 +287,25 @@ export function createNav(world: ShotWorld, index: WorldIndex) {
   return { grid: buildGrid, levelOf, leg, clearance, doorsOn, roomAt, visitPoint, segClear, cellOf, passableAt: (g: Grid, x: number, z: number, ti = 0) => { const [i, j] = cellOf(g, x, z); return inside(g, i, j) && passable(g, j * g.W + i, TIERS[ti]); } };
 }
 export type Nav = ReturnType<typeof createNav>;
+
+/** anchors.nav (the S5 contract: the grid and the route, for S6's plan inset): the walkable grid of each storey as the planner reads it — `free` (1 where the eye may
+ *  stand) and `clearance` (centimetres to the nearest wall or furniture, capped at 150) per 0.2 m cell, row by row from (x0, z0) — and the polyline a shot flies,
+ *  sampled every 0.25 s. Made on first read; nothing is stored. */
+export function navAnchor(world: ShotWorld, routeOf: (type: string) => Array<[number, number, number]> | null) {
+  let nav: Nav | null = null;
+  const navOf = () => nav ||= createNav(world, createWorldIndex(world));
+  return {
+    cell: CELL,
+    levels: world.levels.map(l => ({ id: l.id, y: l.y, h: l.h })),
+    grid(levelId: string) {
+      const n = navOf(), g = n.grid(n.levelOf(levelId));
+      const clearance = new Uint8Array(g.W * g.H);
+      for (let c = 0; c < clearance.length; c++) clearance[c] = g.free[c] ? Math.min(150, Math.round(Math.min(g.dW[c], g.dI[c] + 0.1) * 100)) : 0;
+      return { x0: g.x0, z0: g.z0, w: g.W, h: g.H, cell: CELL, y: g.y, free: g.free, clearance };
+    },
+    route: (type = 'door-to-core') => routeOf(type),
+  };
+}
 
 // ---- rooms: what a room is, and how much it is worth seeing (plan §3.7) -----------------------------------------
 /** the program a room plays: rooms[].program (S3) when the spec gives one, else read off its name */

@@ -49,7 +49,7 @@ export const QA_CODES: Record<string, 'error' | 'warn'> = {
 
 const lum = lumOf;
 
-export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; aspect?: number } = {}): QAResult {
+export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; aspect?: number; frameOnly?: boolean } = {}): QAResult {
   const index = createWorldIndex(world), probe = createProbe(index), nav = createNav(world, index);
   const errors: Finding[] = [], warnings: Finding[] = [];
   // consecutive samples with one code and subject collapse into one finding with a t range
@@ -108,7 +108,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     fn(eye[N - 1], T, N - 1);
   };
   const tag = (x: V3) => `(${x[0].toFixed(1)}, ${x[1].toFixed(1)}, ${x[2].toFixed(1)})`;
-  sweep((p, t, i) => {
+  if (!opts.frameOnly) sweep((p, t, i) => {
     const w = index.pointHits(p[0], p[1], p[2], CLIP_WALL); if (w.length) { const n = w[0] >= 0 ? world.names[w[0]] : 'wall'; E('wall-clip', t, `eye inside wall "${n}" at ${tag(p)}`, n); }
     const it = index.pointHits(p[0], p[1], p[2], CLIP_ITEM).concat(index.pointHits(p[0], p[1], p[2], CLIP_ITEM_FAR).filter(id => id >= 0 && !isNearCoreItem(id)));
     if (it.length) { const n = world.names[it[0]] || 'item'; E('item-clip', t, `eye inside "${n}" at ${tag(p)}`, n); }
@@ -381,7 +381,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const finale = ['hero', 'orbit', 'power'].includes(beat[i]), indoor = isIndoors(eye[i]);
     // (the finale's background is a wall by the Core's own desk: a warning there, an error anywhere else)
     const b15 = c.share(1.5), b3 = c.share(3);
-    if (b15 >= 0.6) { blankRun += step * dt; blankMax = Math.max(blankMax, blankRun); if (blankRun > 0.3) { if (finale) W('finale-blank', tOf(i), `${(b15 * 100).toFixed(0)} % of the finale's frame is one plane within 1.5 m for ${blankRun.toFixed(1)} s`); else E('blank-frame', tOf(i), `${(b15 * 100).toFixed(0)} % of the frame is one wall within 1.5 m for ${blankRun.toFixed(1)} s`); } } else blankRun = 0;
+    if (b15 >= 0.6) { blankRun += step * dt; blankMax = Math.max(blankMax, blankRun); if (blankRun > 0.3) { if (finale) W('finale-blank', tOf(i), `${(b15 * 100).toFixed(0)} % of the finale's frame is one plane within 1.5 m for ${blankRun.toFixed(1)} s`); else if (aspect < 1.5) W('near-blank', tOf(i), `${(b15 * 100).toFixed(0)} % of a ${aspect.toFixed(2)}:1 frame is one wall within 1.5 m for ${blankRun.toFixed(1)} s`); else E('blank-frame', tOf(i), `${(b15 * 100).toFixed(0)} % of the frame is one wall within 1.5 m for ${blankRun.toFixed(1)} s`); } } else blankRun = 0;
     // (§3.10: never aim at a wall closer than 2.5 m — a plane over 40 % of the frame within 3 m, inside, outside the finale)
     if (b3 >= 0.4 && !finale && indoor) { nearRun += step * dt; nearMax = Math.max(nearMax, nearRun); if (nearRun > 0.5) W('near-blank', tOf(i), `${(b3 * 100).toFixed(0)} % of the frame is one wall within 3 m for ${nearRun.toFixed(1)} s`); } else nearRun = 0;
     // (the Core's own desk, its monitor and the set it stands on are the subject of the finale, not something in the way of it: a chair back, a plant,
@@ -548,4 +548,14 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   }
   metrics.errors = errors.length; metrics.warnings = warnings.length;
   return { errors, warnings, metrics };
+}
+
+/** the errors that depend on the shape of the frame (a portrait phone, a square still, a wide screen): the Core in the frame at the press, the orbit keeping it
+ *  in the middle, a blank wall — QA's frame checks run again at each aspect, on the track's own narrow-frame lens (Track.tanHReq); the rest of QA does not depend on it */
+export const ASPECT_CODES = new Set(['press-frame', 'blank-frame', 'orbit-core-out-of-frame', 'core-occluded', 'late-core']);
+export const ASPECTS: Array<[string, number]> = [['9:16', 9 / 16], ['3:4', 3 / 4], ['1:1', 1], ['21:9', 21 / 9]];
+export function qaAspects(track: Track, world: ShotWorld, opts: { via?: string[]; aspects?: Array<[string, number]> } = {}): Finding[] {
+  const out: Finding[] = [];
+  for (const [name, a] of opts.aspects || ASPECTS) for (const e of qaTrack(track, world, { via: opts.via, aspect: a, frameOnly: true }).errors) if (ASPECT_CODES.has(e.code)) out.push({ ...e, subject: `${e.subject ? e.subject + ' ' : ''}@${name}`, message: `[${name}] ${e.message}` });
+  return out;
 }

@@ -13,6 +13,7 @@ import { DEG } from './build-context.js';
 import { digestWorld } from './shot-world.js';
 import { planDoorToCore, presetFromTrack, shotOptions } from './shot-planner.js';
 import { planHeroReveal, planWalkthrough } from './shot-planner-tour.js';
+import { navAnchor } from './shot-nav.js';
 
 export function createShotPlannerV1(bctx) {
   const { THREE } = bctx;
@@ -760,6 +761,11 @@ export function createShotPlannerV1(bctx) {
   function shotsFor(spec, anchors) {
     const shots = shotsForV1(spec, anchors);
     worldOf(spec, anchors);   // (defined, not made: made on first read)
+    // anchors.nav: the grid the planner walks on and the route a shot flies (S6's plan inset), made on first read
+    if (!Object.prototype.hasOwnProperty.call(anchors, 'nav')) {
+      let cache = null;
+      Object.defineProperty(anchors, 'nav', { configurable: true, enumerable: false, get: () => (cache ||= navAnchor(anchors.shotWorld, type => { const p = shots[type]; return p && p.eyePoints ? p.eyePoints.map(v => [v.x, v.y, v.z]) : null; })) });
+    }
     // door-to-core, then hero-reveal (lands on the finale's framing ring) and walkthrough (routed on nav v2): plan Completeness B
     for (const [type, plan] of [['door-to-core', planDoorToCore], ['hero-reveal', planHeroReveal], ['walkthrough', planWalkthrough]] as Array<[string, (w: any, o: any) => any]>) {
       const so = shotOptions(spec, type, globalPlanner()), v1 = shots[type];

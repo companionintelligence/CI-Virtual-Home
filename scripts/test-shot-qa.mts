@@ -43,7 +43,7 @@ for (const id of ['cutestarter', 'familyhome']) {
 
 // ---- track surgery ------------------------------------------------------------------------------------------------
 const cloneTrack = (t: Track): Track => ({
-  ...t, pos: t.pos.slice(), look: t.look.slice(), fov: t.fov.slice(), roofAlpha: t.roofAlpha.slice(), composeW: t.composeW.slice(), beat: t.beat.slice(),
+  ...t, pos: t.pos.slice(), look: t.look.slice(), fov: t.fov.slice(), roofAlpha: t.roofAlpha.slice(), composeW: t.composeW.slice(), tanHReq: t.tanHReq ? t.tanHReq.slice() : undefined, beat: t.beat.slice(),
   events: { ...t.events, stairT: t.events.stairT.slice() }, plan: JSON.parse(JSON.stringify(t.plan)), desired: t.desired ? t.desired.slice() : undefined,
   doors: Object.fromEntries(Object.entries(t.doors || {}).map(([k, v]) => [k, v.slice()])), beats: t.beats.map(b => ({ ...b })),
 });

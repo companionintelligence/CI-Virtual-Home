@@ -27,20 +27,26 @@ import { Math } from './detmath.js';
 import { planDoors } from './shot-doors.js';
 import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, mulberry32, fnv1a, wrapPi, createWorldIndex, type ShotWorld, type WLevel, type WStair, type WRoom } from './shot-world.js';
 import { createNav, roomInterest, CELL, type Nav } from './shot-nav.js';
-import { createProbe, camera, project, type V3, type Probe } from './shot-probe.js';
+import { createProbe, camera, project, projectBox, type V3, type Probe } from './shot-probe.js';
 import { chooseEstablish, EST_PITCH, createOrbitProbeW, heroRing, fovForCore, coreHeightPct, composeTarget, THREE_SHIM, ESTABLISH_STYLES, houseBox, type Establish } from './framing.js';
 import { freeMap, frontRun, sweepFrom, ORBIT_STEP } from './core-orbit.js';
 
 export const FPS = 120;
 export const BEATS = ['establish', 'extStair', 'approach', 'threshold', 'reveal', 'route', 'stair', 'descend', 'roomReveal', 'hero', 'orbit', 'power'] as const;
 export type Beat = typeof BEATS[number];
-/** §3.4 cruise caps (m/s; stairs along the flight in plan); the orbit's is angular (°/s) */
+/** §3.4 cruise caps, m/s (a flight's is along it, in plan). Each is the plan's, except where noted: `threshold` 1.2 is the beat's cap away from the door plane (the plane itself
+ *  is held to DOOR_PLANE_CAP); `descend` has no plan value (a flight down is walked at 1.0, a little under a flight up); `extStair` is the plan's climb; and `orbit`
+ *  is angular, °/s — the orbit is a beat the plan predates (it walks the eye round the Core 90° or more, the v1 orbit did it at about 27°/s) and the plan's hero
+ *  0.4 m/s is its opening pace. The interior route's cap is the plan's 2.2 m/s: walking pace is 1.4, and what limits a walk is its doorways, its corners and the
+ *  rooms it slows for, never a cap it reaches. */
 export const SPEED_CAP: Record<Beat, number> = { establish: 5.0, extStair: 1.2, approach: 2.5, threshold: 1.2, reveal: 0.8, route: 2.2, stair: 1.2, descend: 1.0, roomReveal: 0.9, hero: 0.4, orbit: 30, power: 0.1 };
-/** §3.4's route cap (2.2 m/s) rises with the walk — a long corridor is not the point of the film: 2.2 up to 8 m of route, 2.7 from 16 m */
-export const routeCap = (lengthM: number) => clamp(2.2 + 0.0625 * (lengthM - 8), 2.2, 2.7);
+/** the route beat's cruise cap (§3.4: 2.2 m/s), by the walk's length in metres */
+export const routeCap = (_lengthM: number) => SPEED_CAP.route;
 /** §3.4: the eye crosses the entry door's plane at no more than this (m/s) — the threshold beat's own cap is the wider zone's */
 export const DOOR_PLANE_CAP = 0.9;
-/** §3.5 yaw-rate caps, °/s (the orbit turns with its sweep) */
+/** §3.5 yaw-rate caps, °/s. Two beats differ from the plan's table, on purpose (tried at the plan's values: the finale's walk-in cannot turn the view onto the Core
+ *  in time — cocoon's Core leaves the frame, the view whips at 90°/s): roomReveal 25 (plan 20) and hero 30 (plan 15) — the eye is 1–2 m from a Core it circles at 22–30°/s,
+ *  so the bearing to it turns that fast whatever the view does. `extStair` 30 has no plan value. QA holds every beat to these numbers (`beat-yaw`). */
 export const YAW_CAP: Record<Beat, number> = { establish: 12, extStair: 30, approach: 20, threshold: 30, reveal: 25, route: 45, stair: 60, descend: 60, roomReveal: 25, hero: 30, orbit: 45, power: 5 };
 /** §3.5 pitch clamps, degrees */
 export const PITCH: Record<Beat, [number, number]> = { establish: EST_PITCH, extStair: [-15, 8], approach: [-15, 5], threshold: [-12, 8], reveal: [-12, 8], route: [-12, 8], stair: [-10, 18], descend: [-24, -4], roomReveal: [-18, 8], hero: [-40, 5], orbit: [-40, 5], power: [-40, 5] };
@@ -57,6 +63,8 @@ export type Track = {
   version: 2; planner: 'v2'; type: string; id: string;
   duration: number; fps: number; samples: number; dt: number;
   pos: Float32Array; look: Float32Array; fov: Float32Array; roofAlpha: Float32Array; composeW: Float32Array;
+  /** what a frame narrower than 16:9 needs of its lens so the Core's box stays inside it (coreTanH): the horizontal half-tangent at 16:9 scale, 0 where the Core is out of view */
+  tanHReq?: Float32Array;
   compose: { ndcX: number; ndcY: number } | null;
   beat: Uint8Array;                        // the beat of each sample, as an index into BEATS
   beats: Array<{ name: Beat; t0: number; t1: number; subject: V3 | null }>;
@@ -125,7 +133,7 @@ export function fillet(pts: V3[], rMax = 1.4, ok?: (p: V3) => boolean, okLoose?:
       for (let k = 0; k <= n; k++) { const s = k / n; arc.push(add(add(mul(p1, (1 - s) * (1 - s)), mul(v, 2 * s * (1 - s))), mul(p2, s * s))); }
       if (!ok || arc.every(tries < 4 || !okLoose ? ok : okLoose)) { out.push(...arc); break; }
       t *= 0.6;
-      if (tries === 5) { out.push(v); if ((globalThis as any).__DBG) console.log('fillet failed at', v.map(q => +q.toFixed(2)), 'phi', +(phi / DEG).toFixed(0), 'La', +La.toFixed(2), 'Lb', +Lb.toFixed(2)); }
+      if (tries === 5) out.push(v);
     }
   }
   out.push(pts[pts.length - 1]);
@@ -154,6 +162,8 @@ export type PlanOptions = {
   inside?: boolean;
   /** internal: what a retry changes (the establishing move's scale) */
   tune?: { estScale?: number };
+  /** the seed of the houses' favourite establishing styles (framing.ts ESTABLISH_SALT) — only scripts/fit-establish-salt.mts passes another */
+  salt?: string;
 };
 
 // =====================================================================================================================
@@ -199,6 +209,8 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   // (the radius the finale ends at puts the Core at ~21 % of the frame at a 44–48° lens: 1.05 m, where the room lets it)
   const ORBIT_R: Record<string, number> = { desk: 1.05, credenza: 1.1, island: 1.2, shelf: 0.95, none: 1.0 };
   const upright = hero.pose === 'upright';
+  // (an upright Core is 23 cm tall and 15 wide: at 21–24 % of the frame's height it is 8 % of its width — QA's core-narrow wants 10 — so it is framed a little larger, 23–27 %)
+  const CORE_H = upright ? 0.235 : 0.21, CORE_HMAX = upright ? 0.27 : 0.24;
   // hero.view (plan §3.16) overrides the search: the finale's distance and height, and the azimuth it ends at
   const HV = opts.heroView && typeof opts.heroView === 'object' ? opts.heroView : null;
   const r0 = HV && typeof HV.dist === 'number' ? clamp(HV.dist, 0.6, 2) : (ORBIT_R[hero.surface] ?? 0.9) + (upright ? 0.2 : 0);
@@ -218,7 +230,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     // front, 4 % closer for the push-in, at most 24 % — an upright Core, 23 cm tall, wants more room than a slab)
     const heightAt = (r: number, hsx: [number, number]) => coreHeightPct(orbitPtAt(35, centre[1] + hsx[1] - 0.01, r * 0.96), centre, 50, core);
     const RADII_ALL = (HV && typeof HV.dist === 'number' ? [r0] : [r0, r0 - 0.1, r0 + 0.1, r0 - 0.2, r0 + 0.2, r0 + 0.3, r0 + 0.4, r0 + 0.5]).filter(r => r >= 0.6 && r <= 2);
-    const okRadii = HV && typeof HV.dist === 'number' ? RADII_ALL : RADII_ALL.filter(r => heightAt(r, HS_OPTIONS[0]) <= 0.24);
+    const okRadii = HV && typeof HV.dist === 'number' ? RADII_ALL : RADII_ALL.filter(r => heightAt(r, HS_OPTIONS[0]) <= CORE_HMAX);
     const RADII = (okRadii.length ? okRadii : RADII_ALL.slice().sort((a, b) => heightAt(b, HS_OPTIONS[0]) - heightAt(a, HS_OPTIONS[0])).slice(0, 1).concat(RADII_ALL.slice(0, 3))).slice(0, 5);
     const combos: Array<[number, [number, number], number]> = [];
     for (const r of RADII) combos.push([0, HS_OPTIONS[0], r]);
@@ -237,7 +249,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       const arc = Math.max(...opts2.map(o => o.arc));
       // (the Core's share of the frame from where the orbit ends — 35° past its front, at the finale's widest lens: over the
       // 25 % the plan holds it to, the orbit is too close to frame it, however long its arc)
-      const score = Math.min(arc, 150) - 40 * Math.abs(r - r0) - 12 * hi - 500 * Math.max(0, heightAt(r, hsx) - 0.24);
+      const score = Math.min(arc, 150) - 40 * Math.abs(r - r0) - 12 * hi - 500 * Math.max(0, heightAt(r, hsx) - CORE_HMAX);
       if (score > bs + 1e-9) { bs = score; best = { r, run, options: opts2, hs: hsx }; }
     }
     orbit = best;
@@ -378,10 +390,9 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       const cands = lv.rooms.filter(r => !already.has(r) && ((interestOf.get(r)?.interest || 0) >= 0.7 || topSet.has(r))).sort((x, y) => ((topSet.has(y) ? 1 : 0) - (topSet.has(x) ? 1 : 0)) || (interestOf.get(y)!.interest - interestOf.get(x)!.interest) || x.no.localeCompare(y.no)).slice(0, 5);
       for (const r of cands) {
         const vp = nav.visitPoint(lv.id, r); if (!vp) continue;
-        const w = walk([a, vp, b]); if ((globalThis as any).__DBG) console.log('cand', lv.id, r.name, w ? `extra ${(w.len - base.len).toFixed(1)} budget ${Math.min(budgetM, 0.9 * base.len + 3).toFixed(1)} rev ${reverses(w.pts)}` : 'no walk');
+        const w = walk([a, vp, b]);
         if (!w || w.len - base.len > Math.min(budgetM, 0.9 * base.len + 3) || reverses(w.pts)) continue;
         const s = scoreOf(w);
-        if ((globalThis as any).__DBG) console.log('detour', lv.id, r.name, 'len', w.len.toFixed(1), 'base', base.len.toFixed(1), 'score', s.toFixed(2), 'vs', bs.toFixed(2), 'top', topSet.has(r));
         if (s > bs + 1e-9) { bs = s; best = w; }
       }
     }
@@ -680,7 +691,6 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     if (!w) return fail('route-failed', `no way to the Core on ${Lh.id}`);
     finalWalk = { pts: w.pts, rooms: w.rooms, ring: ring[0] || null, P };
   }
-  if ((globalThis as any).__DBG) console.log('finalWalk', JSON.stringify(finalWalk.pts.slice(-6).map((q: any) => q.map((v: number) => +v.toFixed(2)))), 'P', fin && JSON.stringify(fin.P.map(v => +v.toFixed(2))), 'S', fin && JSON.stringify(fin.S.map(v => +v.toFixed(2))));
   pushWalk(finalWalk.pts, curLv, 'route'); routeRooms.push(...finalWalk.rooms);
 
   // ---- 6. split the interior walk into its beats: reveal (the first 2 m in), route, roomReveal (into the Core's
@@ -696,9 +706,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   pieces.push({ pts: curPiece, level: pieceLv });
   // fillet each walked piece, keeping 0.25 m of clearance on the storey's grid
   const okOn = (lvId: string, c = 0.22) => { const g = nav.grid(nav.levelOf(lvId)); return (p: V3) => nav.clearance(g, p[0], p[2]) >= c; };
-  if ((globalThis as any).__DBG) for (const p of pieces) if ('pts' in p) console.log('piece', p.level, JSON.stringify(p.pts.map(q => [+q[0].toFixed(2), +q[2].toFixed(2)])));
   for (const p of pieces) if ('pts' in p && p.pts.length > 2) p.pts = fillet(p.pts, 1.2, okOn(p.level), okOn(p.level, 0.12));
-  if ((globalThis as any).__DBG) for (const p of pieces) if ('pts' in p) console.log('filleted', p.level, p.pts.length, JSON.stringify(p.pts.filter((_, i) => i % 6 === 0).map(q => [+q[0].toFixed(2), +q[2].toFixed(2)])));
 
   // ---- 7. the finale's own segments: push-in, orbit, power ----------------------------------------------------
   const finaleSegs: Seg[] = [];
@@ -756,7 +764,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     if (!okPw(powerPts)) powerPts = powerAt(0, 0.02, 0.02);
     finaleSegs.push({ beat: 'power', pts: powerPts, exact: true });
     const endEye = powerPts[powerPts.length - 1];
-    finalFov = fovForCore(endEye, centre, core);
+    finalFov = fovForCore(endEye, centre, core, CORE_H);
     orbitMeta = { r, hs, reachable: bestReachable, pushIn: fin.bez.length > 2 ? 'curve' : 'chord', from: fin.from, to, arc, arcTotal: +(arc + (fin.arcTotal - fin.arc)).toFixed(0), chosenArc: fin.arc, bestArc: Math.max(...orbit.options.map((o: any) => o.arc)), dir: fin.dir, run: [orbit.run.lo, orbit.run.hi], full: orbit.run.full, swing: +Math.max(fin.swing, fin.circling).toFixed(1), options: orbit.options.map((o: any) => ({ dir: o.dir, from: o.from, to: o.to, arc: o.arc })) };
     compose.ndcX = Math.abs(compose.ndcX) * -fin.dir;
     // the monitor's top edge stays in the last frame (QA's monitor-cut): the Core lower in the frame, down to −0.5 (where it stands on a vertical thirds
@@ -776,7 +784,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     finaleSegs.push({ beat: 'hero', pts: [back, lerp3(back, P, 0.85)] });
     finaleSegs.push({ beat: 'power', pts: [lerp3(back, P, 0.85), P], exact: true });
     notes.push(`push-in from [${back.map(v => v.toFixed(2))}] to [${P.map(v => v.toFixed(2))}]`);
-    finalFov = fovForCore(P, centre, core);
+    finalFov = fovForCore(P, centre, core, CORE_H);
     compose.ndcX = heroAngle(P[0], P[2]) > 0 ? -1 / 3 : 1 / 3;
   }
 
@@ -822,7 +830,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     // outside's share of it can hold)
     const maxPath = (typeof opts.duration === 'number' ? clamp(3.8 * tEst, 6, 13) : 20) * ((opts.tune && opts.tune.estScale) || 1);
     const nearA: [number, number] = stepsSeg ? [stepsSeg[0][0], stepsSeg[0][2]] : [P3[0] + n2[0] * 1.4, P3[2] + n2[1] * 1.4];
-    const ests = chooseEstablish(world, probe, index, opts.establish ?? 'auto', { near: nearA, maxPath, openTo: stepsSeg ? [stepsSeg[stepsSeg.length - 1][0], stepsSeg[stepsSeg.length - 1][1] - 0.3, stepsSeg[stepsSeg.length - 1][2]] : undefined });
+    const ests = chooseEstablish(world, probe, index, opts.establish ?? 'auto', { near: nearA, maxPath, openTo: stepsSeg ? [stepsSeg[stepsSeg.length - 1][0], stepsSeg[stepsSeg.length - 1][1] - 0.3, stepsSeg[stepsSeg.length - 1][2]] : undefined, salt: opts.salt });
     // one establishing pose, made into its path: the approach start it flies to (a site path's line into the door, or the
     // pose's bearing's, 1 m past the door axis point 3 m out) and the move itself — a truck across and down onto it (a
     // Bézier whose first tangent is lateral, so the shot moves from frame 0 without charging at the house), over or round
@@ -872,7 +880,6 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       // wall within 1.5 m over more than half of it)
       const facing = (pts: V3[]) => { for (let k = 0; k < pts.length; k += 3) { const u = k / (pts.length - 1), w = clamp((u - 0.3) / 0.65, 0, 1), tgt = lerp3(est.aim, [e.x, e.y + 1.3, e.z], 0.7 * w * w * (3 - 2 * w)); if (probe.composition(camera(pts[k], tgt, est.fov), true, 1.5).blank >= 0.5) return true; } return false; };
       let establishPts = buildOutside(A), blocked = blockedOut(establishPts) >= 0 || facing(establishPts);
-      if ((globalThis as any).__DBG) { const bi = blockedOut(establishPts); console.log('attempt', est.style, 'eye', est.eye.map(v => +v.toFixed(1)), 'A', A.map(v => +v.toFixed(1)), 'blocked at', bi, bi >= 0 ? establishPts[bi].map(v => +v.toFixed(1)) : '', 'facing', facing(establishPts)); }
       if (blocked) {
         search: for (const bulge of [0, 1.5, -1.5, 3, -3, 5]) for (const lift of [0, 1.2, 2.4, 3.6, 5, 7]) {
           if (!bulge && !lift) continue;
@@ -898,7 +905,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     // (no whole-house pose has a clear move: the cropped ones — the house nearer, less of it in the frame — are tried)
     let relaxed: Establish | null = null;
     if (chosenEst.blocked) {
-      relaxed = chooseEstablish(world, probe, index, opts.establish ?? 'auto', { near: nearA, maxPath, openTo: stepsSeg ? [stepsSeg[stepsSeg.length - 1][0], stepsSeg[stepsSeg.length - 1][1] - 0.3, stepsSeg[stepsSeg.length - 1][2]] : undefined, relax: true });
+      relaxed = chooseEstablish(world, probe, index, opts.establish ?? 'auto', { near: nearA, maxPath, openTo: stepsSeg ? [stepsSeg[stepsSeg.length - 1][0], stepsSeg[stepsSeg.length - 1][1] - 0.3, stepsSeg[stepsSeg.length - 1][2]] : undefined, relax: true, salt: opts.salt });
       for (const alt of (relaxed.alts || [relaxed]).slice(0, 14)) { const t = attemptEstablish(alt); if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose ${alt.style}, the house cropped: no pose that shows all of it has a move the garden lets through`); break; } }
     }
     // last resort: the same view from nearer — the pose's own eye (the whole-house pose's, then the cropped one's) drawn in along its line to the
@@ -990,8 +997,6 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     if (si === all.length - 1) pushPt(pts[pts.length - 1], b);
   }
   let NP = X.length;
-  const dbgCorner = (label: string) => { if (!(globalThis as any).__DBG) return; let best = 0, at = 0; for (let i = 10; i < NP - 10; i++) { const a = Math.atan2(X[i] - X[i - 10], Z[i] - Z[i - 10]), b = Math.atan2(X[i + 10] - X[i], Z[i + 10] - Z[i]); const t = Math.abs(wrapPi(b - a)) / DEG; if (t > best) { best = t; at = i; } } console.log('corner', label, best.toFixed(0), 'deg at', X[at].toFixed(2), Z[at].toFixed(2)); };
-  dbgCorner('resampled');
   // smooth the joints: a light moving average over the non-exact samples (±0.3 m), which rounds every kink the
   // fillets left at segment boundaries without moving the exact arcs
   {
@@ -1014,8 +1019,6 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       }
     }
   }
-  dbgCorner('joints smoothed');
-  dbgCorner('funnels');
   // clearance: the walk keeps 0.27 m off walls and furniture (rounding a corner, the smoothing above cuts it; a partition's end
   // clipped by centimetres is a wall the eye is inside). A point nearer than that is pushed out along the way the distance grows,
   // and the path is rounded again — a few sweeps; doorways and the finale (whose lines are exact) are not touched.
@@ -1041,7 +1044,6 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       for (const arr of [X, Z]) { const src = arr.slice(); for (let i = 0; i < NP; i++) { if (!walk.has(Bt[i]) || near(i)) continue; let sm = 0, ws = 0; for (let k = -10; k <= 10; k++) { const j = i + k; if (j < 0 || j >= NP || (exactB.has(Bt[j]) && Bt[j] !== Bt[i])) continue; const w = 0.5 + 0.5 * Math.cos(Math.PI * k / 11); sm += src[j] * w; ws += w; } arr[i] = sm / ws; } }
     }
   }
-  dbgCorner('clearance');
   // a last light rounding of the walk (±8 cm: the fillets, the funnels and the clearance pushes leave millimetre kinks that are a jerk of 20 m/s³ at a
   // walking pace); the exact arcs, the flights and their neighbours stay where they are
   {
@@ -1049,7 +1051,6 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     const keep = (i: number) => { for (let k = -4; k <= 4; k++) { const j = i + k; if (j < 0 || j >= NP || !walkB2.has(Bt[j])) return true; } return false; };
     for (const arr of [X, Z]) { const src = arr.slice(); for (let i = 0; i < NP; i++) { if (keep(i)) continue; let sm = 0, ws = 0; for (let k = -4; k <= 4; k++) { const w = 0.5 + 0.5 * Math.cos(Math.PI * k / 5); sm += src[i + k] * w; ws += w; } arr[i] = sm / ws; } }
   }
-  dbgCorner('final');
   // arc length
   const S = new Float64Array(NP);
   for (let i = 1; i < NP; i++) S[i] = S[i - 1] + Math.hypot(X[i] - X[i - 1], Y[i] - Y[i - 1], Z[i] - Z[i - 1]);
@@ -1247,7 +1248,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     f = f + (finalFov - f) * easeLin(ramp(t, outRampStart, outRampEnd));
     fov[i] = f;
   }
-  // the roof: opaque outside (a dollhouse opener starts with it off and brings it back as it comes down), fading
+  // the roof: opaque outside, fading
   // over 0.35 s from the moment the eye crosses the door (§3.2)
   let enterT: number | null = null;
   for (let i = 1; i < N; i++) {
@@ -1316,7 +1317,6 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     glanceHold = best ? { room: best.room, v: best.v } : null;
     if (best) glanceTime.set(best.room, (glanceTime.get(best.room) || 0) + 12 / FPS);
     const out = best ? { p: best.p, room: best.room } : null;
-    if ((globalThis as any).__DBG) console.log('glance', (i / FPS).toFixed(1), lvId, best ? `${best.room.name} v${best.v.toFixed(2)}` : '-', 'hd', (hd / DEG).toFixed(0), 'here', here && here.name);
     glanceMemo.set(key, out);
     return out;
   };
@@ -1590,11 +1590,29 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   track.plan.finaleAll = finaleAll;
   track.plan.capBeatTimes = Object.fromEntries([...capTimes].map(([b, v]) => [b, +v.toFixed(2)]));
   track.plan.rawBeatTimes = Object.fromEntries([...beatTimes(Traw)].map(([b, v]) => [b, +v.toFixed(2)]));
+  track.tanHReq = coreTanH(track, world);
   track.hash = trackHash(track);
   return { ok: true as const, track, world, notes };
 }
 
 // ---- sampling: the page's applySplineFrame and QA read the track through this ---------------------------------------
+/** The lens a narrow frame needs (see Track.tanHReq): for each sample where the Core's box is in the 16:9 frame, the horizontal half-tangent at which the
+ *  box, with its composed offset, reaches 0.92 of the half-frame — the frame's 8 % margin. Baked once; sampleTrack reads it for aspects under 16:9. */
+export function coreTanH(track: Track, world: ShotWorld): Float32Array {
+  const N = track.samples, out = new Float32Array(N), hero = world.hero; if (!hero) return out;
+  const core = hero.core, REF = 16 / 9;
+  for (let i = 0; i < N; i++) {
+    const f = sampleTrack(track, i / (N - 1), REF), cam = camera(f.eye, f.target, f.fov, REF), pb = projectBox(cam, core);
+    if (!pb) continue;
+    // (the need fades in as the box comes into the 16:9 frame — from 2.2 to 1.4 of its half-width — so the lens never steps when the Core enters it)
+    const reach = Math.max(-pb.minX, pb.maxX, -pb.minY, pb.maxY), fade = Math.max(0, Math.min(1, (2.2 - reach) / 0.8));
+    if (fade <= 0) continue;
+    const half = (pb.maxX - pb.minX) / 2, cx = Math.abs((pb.maxX + pb.minX) / 2), tv = Math.tan(f.fov * DEG / 2);
+    out[i] = fade * fade * (3 - 2 * fade) * half * tv * REF / Math.max(0.25, 0.7 - cx);
+  }
+  return hann(out.length ? Float64Array.from(out) : new Float64Array(0), Math.round(0.2 * FPS)).reduce((a, v, i) => { a[i] = v; return a; }, out);
+}
+
 /** frame at shot fraction t (0…1) for an aspect: { eye, target, fov, roofAlpha, s: t, beat } — cubic Hermite on
  *  position and look, monotone on fov and roofAlpha; the Core's composition applied for this aspect */
 export function sampleTrack(track: Track, t: number, aspect = 16 / 9) {
@@ -1608,7 +1626,11 @@ export function sampleTrack(track: Track, t: number, aspect = 16 / 9) {
   const lin = (arr: Float32Array) => arr[i] + (arr[i + 1] - arr[i]) * f;
   const eye: V3 = [herm(track.pos, i, 0), herm(track.pos, i, 1), herm(track.pos, i, 2)];
   let target: V3 = [herm(track.look, i, 0), herm(track.look, i, 1), herm(track.look, i, 2)];
-  const fov = lin(track.fov), roofAlpha = lin(track.roofAlpha), w = lin(track.composeW);
+  let fov = lin(track.fov);
+  const roofAlpha = lin(track.roofAlpha), w = lin(track.composeW);
+  // a frame narrower than 16:9 (a portrait phone, a square still) widens its lens where the Core is in it, just enough for the Core's box to stay inside
+  // with its margin (the orbit holds the Core in the middle 70 %): the horizontal reach is what a narrow frame is short of
+  if (track.tanHReq && aspect < 16 / 9 - 1e-6) { const req = lin(track.tanHReq); if (req > 0) { const tv0 = Math.tan(fov * DEG / 2), tv1 = Math.max(tv0, req / aspect); fov = 2 * Math.atan(tv1) / DEG; } }
   if (track.compose && w > 1e-4) {
     const c = track.compose, dx = target[0] - eye[0], dy = target[1] - eye[1], dz = target[2] - eye[2], dh = Math.hypot(dx, dz), d = Math.hypot(dx, dy, dz);
     const yaw = Math.atan2(dx, dz), pitch = Math.atan2(dy, dh), tv = Math.tan(fov * DEG / 2);
@@ -1630,7 +1652,7 @@ export function trackHash(track: Track) {
   const str = (t: string) => { for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i) & 255; h = Math.imul(h, 0x01000193); } h ^= 0xff; h = Math.imul(h, 0x01000193); };
   const arr = (a: ArrayBufferView | undefined) => { if (a) feed(new Uint8Array(a.buffer, a.byteOffset, a.byteLength)); else num(null); };
   const doorIds = Object.keys(track.doors || {}).sort();
-  for (const a of [track.pos, track.look, track.fov, track.roofAlpha, track.composeW, track.beat, track.desired, ...doorIds.map(id => track.doors[id])]) arr(a);
+  for (const a of [track.pos, track.look, track.fov, track.roofAlpha, track.composeW, track.beat, track.desired, track.tanHReq, ...doorIds.map(id => track.doors[id])]) arr(a);
   for (const id of doorIds) str(id);
   num(track.compose ? track.compose.ndcX : null); num(track.compose ? track.compose.ndcY : null);
   const ev = track.events;
@@ -1654,7 +1676,7 @@ export function presetFromTrack(THREE: any, track: Track, meta: { type: string; 
   const preset: any = {
     type: meta.type, planner: 'v2', dressing: meta.dressing || { walls: 'up', roof: 'auto' }, name: meta.name, duration: T, closed: false,
     eyePoints, targetPoints, track, beats: track.beats, events: ev,
-    power: ev.pressT === null ? { at: -1 } : { at: +(ev.pressT / T).toFixed(5), ramp: 0.08 },
+    power: ev.pressT === null ? { at: -1 } : { at: +(ev.pressT / T).toFixed(5), ramp: +Math.max(0.02, Math.min(0.08, (T - ev.pressT) / T - 0.005)).toFixed(5) },   // (the LED and the fan finish spinning up before the last frame: never longer than what is left of the film)
     enterT: ev.enterT === null ? Infinity : +(ev.enterT / T).toFixed(5),
     orbit: o ? { t0: +(((track.beats.find(b => b.name === 'orbit') || { t0: 0 }).t0) / T).toFixed(4), t1: 1, radius: o.r, from: o.from, to: o.to, arc: o.arc, dir: o.dir, run: o.run } : null,
   };

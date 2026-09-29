@@ -1782,7 +1782,7 @@
     import { createHouseBuilder } from './assets/house-builder.js';
     import { createVisibility, ISO_VIEW, placeIsoCamera } from './assets/visibility.js';
     import { trackFromV1, trackView } from './assets/shot-track.js';
-    import { qaTrack } from './assets/shot-qa.js';
+    import { qaTrack, qaAspects } from './assets/shot-qa.js';
     import { doorAngleAt } from './assets/shot-doors.js';
     import { registerSceneCheck, runSceneChecks } from './assets/scene-qa/registry.js';   // the registry; the streams' checks load below (sceneChecksLoaded)
     import { timingValid } from './assets/shot-path.js';
@@ -8040,6 +8040,8 @@
       if (preset.track && preset.world) {
         const sh = (spec.shots || []).find(x => x && x.type === preset.type) || {};
         const q = qaTrack(preset.track, preset.world, { via: sh.via });
+        // the phone player and the square still play this track too: the frame checks that depend on the aspect (the press, the orbit, a blank wall) run at 9:16, 3:4, 1:1 and 21:9
+        if (preset.type === 'door-to-core') q.errors.push(...qaAspects(preset.track, preset.world, { via: sh.via }));
         return { id: activeHouse.id, shot: shotType, planner: 'v2', samples: preset.track.samples, errors: q.errors, warnings: q.warnings, metrics: q.metrics, plan: preset.track.plan, finalEye: [...preset.track.pos.slice(-3)].map(v => +v.toFixed(2)), orbit: q.metrics.orbitArc !== undefined ? { arc: q.metrics.orbitArc } : null };
       }
       const errors = [], warnings = [];
