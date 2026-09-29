@@ -18,6 +18,7 @@ export const DEFAULT_WALL_HEIGHT = 2.8;
 export const DEFAULT_DOOR_HEIGHT = 2.05;
 export const CORNER_TOLERANCE = 0.02;            // metres: corners closer than this are one corner
 export const SNAP_TOLERANCE = 0.06;              // metres: partition ends this close to a wall snap onto it
+export const MIN_ROOM_WIDTH = DEFAULT_WALL_THICKNESS;   // metres: a cycle narrower than a wall is a sliver, not a room
 
 // ---------------------------------------------------------------------------------------
 // 2D helpers (blueprint3d core/utils.ts, minus the jQuery)
@@ -48,6 +49,15 @@ export function signedArea(points) {
 }
 /** blueprint3d's isClockwise: true when the loop is not the room orientation. */
 export const isClockwise = points => signedArea(points) <= 0;
+/** 2·area / perimeter: a strip's width, half a square's side; 0 for a loop that doubles back on itself. */
+export function meanWidth(points) {
+  let perimeter = 0;
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i], q = points[(i + 1) % points.length];
+    perimeter += Math.hypot(q.x - p.x, q.z - p.z);
+  }
+  return perimeter < EPS ? 0 : 2 * Math.abs(signedArea(points)) / perimeter;
+}
 
 export function closestPointOnSegment(px, pz, ax, az, bx, bz) {
   const dx = bx - ax, dz = bz - az, l2 = dx * dx + dz * dz;
@@ -66,6 +76,26 @@ export function segmentCrossing(a0, a1, b0, b1) {
   const e = 1e-6;
   if (t <= e || t >= 1 - e || u <= e || u >= 1 - e) return null;
   return { t, u };
+}
+
+/**
+ * Signed distance along the unit axis (dx,dz) from p to where the line through p meets segment a→b: positive
+ * ahead of p, negative behind it; null when the line misses the segment. A collinear segment is met at p when
+ * it covers p, else at its nearer end.
+ */
+export function axisHit(p, dx, dz, a, b) {
+  const ex = b[0] - a[0], ez = b[1] - a[1], qx = a[0] - p[0], qz = a[1] - p[1];
+  const len = Math.hypot(ex, ez), den = dx * ez - dz * ex;
+  if (len < EPS) return null;
+  if (Math.abs(den) < EPS * len) {                                   // parallel
+    if (Math.abs(qx * dz - qz * dx) > EPS) return null;              // … and off the line
+    const ua = qx * dx + qz * dz, ub = (b[0] - p[0]) * dx + (b[1] - p[1]) * dz;
+    if (Math.min(ua, ub) <= 0 && Math.max(ua, ub) >= 0) return 0;
+    return Math.abs(ua) < Math.abs(ub) ? ua : ub;
+  }
+  const v = (qx * dz - qz * dx) / den;                               // fraction along a→b
+  if (v < -EPS || v > 1 + EPS) return null;
+  return (qx * ez - qz * ex) / den;
 }
 
 /** Ray-casting point-in-polygon for [[x,z], …] loops. */
@@ -396,6 +426,10 @@ export class FloorplanGraph {
   /**
    * blueprint3d Floorplan.findRooms: for every (corner, adjacent) pair walk the graph always taking
    * the tightest turn; de-duplicate the cycles and drop the clockwise ones (the outer face).
+   * Not in blueprint3d: cycles narrower than a wall (MIN_ROOM_WIDTH) are dropped too. They are gaps
+   * inside the wall solids, not floor: the two leaves of a two-tone partition (familyhouse-nora L1).
+   * Façade dressing outside the footprint (aurora's cladding) no longer closes one, since fromFootprint
+   * doesn't snap it, but the width rule would still catch a pocket drawn some other way.
    */
   static findRooms(corners) {
     const theta = (prev, cur, next) => angle2pi(prev.x - cur.x, prev.z - cur.z, next.x - cur.x, next.z - cur.z);
@@ -440,7 +474,7 @@ export class FloorplanGraph {
 
     const loops = [];
     for (const first of corners) for (const second of first.adjacentCorners()) loops.push(_findTightestCycle(first, second));
-    return _removeDuplicateRooms(loops).filter(loop => loop.length >= 3 && !isClockwise(loop));
+    return _removeDuplicateRooms(loops).filter(loop => loop.length >= 3 && !isClockwise(loop) && meanWidth(loop) >= MIN_ROOM_WIDTH);
   }
 
   // -------------------------------------------------------------------------------------
@@ -490,20 +524,57 @@ export class FloorplanGraph {
       for (let i = 0; i < loop.length; i++) segs.push({ a: [...loop[i]], b: [...loop[(i + 1) % loop.length]], kind: 'exterior', thickness, height });
     }
     for (const p of partitions || []) {
-      segs.push({ a: [...p.from], b: [...p.to], kind: 'partition', thickness: p.thickness || partitionThickness, height: p.height || partitionHeight, partition: p });
+      // a partition standing outside the footprint is facade dressing (a coloured frame or fin a few cm
+      // off the exterior wall, e.g. aurora's), not a room divider
+      const dressing = !rects.some(rc => inRect((p.from[0] + p.to[0]) / 2, (p.from[1] + p.to[1]) / 2, rc));
+      segs.push({ a: [...p.from], b: [...p.to], kind: 'partition', thickness: p.thickness || partitionThickness, height: p.height || partitionHeight, partition: p, dressing });
     }
 
-    // 1. snap partition ends onto any segment within `snap` (authored coordinates vs the 0.1 m raster outline)
+    // 1. snap partition ends onto a segment within `snap` (authored coordinates vs the 0.1 m raster outline). An end
+    //    only moves along its partition's own axis, extended or trimmed to meet a segment it points into, never
+    //    sideways: an axis-aligned partition stays axis-aligned, and one laid parallel to a wall or partition a few cm
+    //    off it stays where it is authored instead of folding onto it or skewing into it. Dressing neither snaps nor
+    //    takes a snap: it stays exactly where it is authored.
     for (const s of segs) {
-      if (s.kind !== 'partition') continue;
-      for (const key of ['a', 'b']) {
-        const p = s[key]; let best = null;
+      if (s.kind !== 'partition' || s.dressing) continue;
+      for (const [key, other] of [['a', 'b'], ['b', 'a']]) {
+        const p = s[key], q = s[other];
+        const len = distance(q[0], q[1], p[0], p[1]);
+        if (len < EPS) continue;
+        const dx = (p[0] - q[0]) / len, dz = (p[1] - q[1]) / len;       // unit axis, out through this end
+        let best = null;
         for (const o of segs) {
-          if (o === s) continue;
-          const c = closestPointOnSegment(p[0], p[1], o.a[0], o.a[1], o.b[0], o.b[1]);
-          if (c.dist < snap && (!best || c.dist < best.dist)) best = c;
+          if (o === s || o.dressing) continue;
+          const u = axisHit(p, dx, dz, o.a, o.b);
+          if (u !== null && Math.abs(u) < snap && len + u > CORNER_TOLERANCE && (best === null || Math.abs(u) < Math.abs(best))) best = u;
         }
-        if (best) s[key] = [best.x, best.z];
+        if (best) s[key] = [p[0] + dx * best, p[1] + dz * best];
+      }
+    }
+    // 1b. jogs: an end that still meets nothing but sits within `snap` of the end of a parallel partition carrying on
+    //     past it (cocoon L1's 1.05 m half-wall, 5 cm off the full-height partition it continues) is joined to that
+    //     end by a short wall square to both, so the run still closes its rooms without either leg skewing
+    const touches = (p, s) => segs.some(o => o !== s && closestPointOnSegment(p[0], p[1], o.a[0], o.a[1], o.b[0], o.b[1]).dist < CORNER_TOLERANCE);
+    for (const s of segs.filter(s => s.kind === 'partition' && !s.dressing)) {
+      for (const [key, other] of [['a', 'b'], ['b', 'a']]) {
+        const p = s[key], q = s[other];
+        const len = distance(q[0], q[1], p[0], p[1]);
+        if (len < EPS || touches(p, s)) continue;
+        const dx = (p[0] - q[0]) / len, dz = (p[1] - q[1]) / len;
+        let best = null;
+        for (const t of segs) {
+          if (t === s || t.kind !== 'partition' || t.dressing) continue;
+          for (const [rk, rk2] of [['a', 'b'], ['b', 'a']]) {
+            const r = t[rk], r2 = t[rk2];
+            const along = (r[0] - p[0]) * dx + (r[1] - p[1]) * dz, side = (r[0] - p[0]) * dz - (r[1] - p[1]) * dx;
+            const onward = (r2[0] - r[0]) * dx + (r2[1] - r[1]) * dz, twist = (r2[0] - r[0]) * dz - (r2[1] - r[1]) * dx;
+            const d = distance(p[0], p[1], r[0], r[1]);
+            if (d < snap && Math.abs(side) > EPS && onward > EPS && Math.abs(twist) < EPS && len + along > CORNER_TOLERANCE && (!best || d < best.d)) best = { t, r, along, d };
+          }
+        }
+        if (!best) continue;
+        s[key] = [p[0] + dx * best.along, p[1] + dz * best.along];             // square the jog: along the axis only
+        segs.push({ a: s[key], b: [...best.r], kind: 'partition', thickness: Math.min(s.thickness, best.t.thickness), height: Math.min(s.height, best.t.height) });
       }
     }
 
