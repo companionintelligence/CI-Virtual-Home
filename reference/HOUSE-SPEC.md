@@ -245,7 +245,9 @@ its fragment under `assets/spec/`, its lints in its plugin under `scripts/valida
 
 Doors, palette restraint, per-level cladding, room fixtures, hero surfaces and lighting (`assets/spec/kit.ts`,
 `scripts/validate/kit.mts` and `hero.mts`; the rules are `assets/kit-rules.ts`; fixtures
-`test/fixtures/houses/s1-kit-*.json`; tests `scripts/test-kit.mts`, `scripts/test-kit-hero.mts`).
+`test/fixtures/houses/s1-kit-*.json`; tests `scripts/test-kit.mts` (the rules, in Node), `scripts/test-kit-hero.mts` (the
+Core on every hero surface), `scripts/test-kit-look.mts` (a white and a cobalt wall under day, golden and dusk, look 1
+against look 2, read off the still) and `scripts/test-kit-program.mts` (`rooms[].program` and the fixtures)).
 
 **Two fleet fixes** apply to every house: the curved monitor's pole stands behind its chassis and its screen is
 matte (no pole through the UI, no ghosted room), and ceilings are a neutral white lit without the hour's ground
