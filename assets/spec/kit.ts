@@ -56,8 +56,10 @@ export interface KitOpening {
   grid?: 'none' | '2x2' | 'vertical' | 'prairie';
   /** a lantern each side (the entry and a garage get them by default; none under defaults 2 unless true) */
   lantern?: boolean;
-  /** the hole's head: flat (default), a half-circle 'arch', or a flat 'segmental' arc */
-  head?: 'flat' | 'arch' | 'segmental';
+  /** the head: flat (default), and for the hole itself a half-circle 'arch' or a flat 'segmental' arc (S1); 'pediment' |
+   *  'keystone' | 'crown' are S2's facade dressing over a hole that stays rectangular (assets/facade.ts). One field, one
+   *  declaration: it lives here (integration of S1 and S2) because the hole is S1's */
+  head?: 'flat' | 'arch' | 'segmental' | 'pediment' | 'keystone' | 'crown';
   /** which way an open leaf swings: 'out' (default; the entry swings 'in' under defaults 2) */
   swing?: 'in' | 'out';
   /** a name for anchors.doors (S5 opens doors by it; a pair's two leaves are `<id>:L` and `<id>:R`) */

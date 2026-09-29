@@ -150,8 +150,8 @@ export interface ArchOpening {
   edgeZ?: number;
   shutters?: Shutters | boolean;
   box?: WindowBox | boolean;
-  /** the head's dressing: an arched or segmental trim, a pediment, a keystone, a crown (the hole stays rectangular: S1) */
-  head?: 'flat' | 'arch' | 'segmental' | 'pediment' | 'keystone' | 'crown';
+  // `head` (flat | arch | segmental | pediment | keystone | crown) is declared once, in assets/spec/kit.ts: S1 shapes the
+  // hole for the first three, and this stream's facade.ts dresses the head for all six (a fragment cannot redeclare it)
   surround?: Surround;
   /** an interior roller blind, lowered this far (0–1 of the window) */
   blinds?: { color?: Colour; drop?: number };
