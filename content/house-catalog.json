@@ -18,7 +18,11 @@
    "meshes": 7,
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "handed",
+    "color"
+   ],
    "tags": [],
    "iso": null,
    "place": {
@@ -127,7 +131,8 @@
    "source": "page",
    "params": [
     "w",
-    "d"
+    "d",
+    "color"
    ],
    "tags": [],
    "iso": null,
@@ -283,7 +288,9 @@
    "source": "page",
    "params": [
     "w",
-    "d"
+    "d",
+    "chairs",
+    "color"
    ],
    "tags": [],
    "iso": null,
@@ -331,7 +338,8 @@
    "params": [
     "w",
     "d",
-    "color"
+    "color",
+    "stools"
    ],
    "tags": [],
    "iso": null,
@@ -379,7 +387,13 @@
    "source": "page",
    "params": [
     "w",
-    "d"
+    "d",
+    "h",
+    "counter",
+    "uppers",
+    "sink",
+    "cooktop",
+    "color"
    ],
    "tags": [],
    "iso": null,
@@ -427,7 +441,9 @@
    "source": "page",
    "params": [
     "w",
-    "d"
+    "d",
+    "turntable",
+    "color"
    ],
    "tags": [],
    "iso": null,
@@ -485,7 +501,8 @@
    "source": "page",
    "params": [
     "w",
-    "h"
+    "h",
+    "color"
    ],
    "tags": [],
    "iso": null,
@@ -535,7 +552,11 @@
    "meshes": 3,
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "style",
+    "w",
+    "color"
+   ],
    "tags": [],
    "iso": null,
    "place": {
@@ -808,7 +829,8 @@
    "params": [
     "w",
     "h",
-    "d"
+    "d",
+    "color"
    ],
    "tags": [],
    "iso": null,
@@ -921,7 +943,8 @@
    "params": [
     "w",
     "h",
-    "d"
+    "d",
+    "color"
    ],
    "tags": [],
    "iso": null,
@@ -1069,7 +1092,8 @@
    "params": [
     "w",
     "h",
-    "d"
+    "d",
+    "color"
    ],
    "tags": [],
    "iso": null,
@@ -1207,7 +1231,7 @@
     0.81,
     0.21
    ],
-   "meshes": 4,
+   "meshes": 5,
    "surface": true,
    "source": "page",
    "params": [],
@@ -1346,10 +1370,10 @@
    "surface": false,
    "source": "page",
    "params": [
-    "w",
-    "h",
     "finish",
-    "pose"
+    "pose",
+    "h",
+    "w"
    ],
    "tags": [],
    "iso": null,
@@ -1894,7 +1918,8 @@
    "source": "page",
    "params": [
     "w",
-    "h"
+    "h",
+    "color"
    ],
    "tags": [],
    "iso": null,
