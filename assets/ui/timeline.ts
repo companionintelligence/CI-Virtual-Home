@@ -103,7 +103,7 @@ export function createTimeline(root: HTMLElement, { onSeek }: { onSeek: (t: numb
     for (const s of ev.stairT || []) if (typeof s === 'number') add('rc-tl-event', s / duration, `${EVENT_NAMES.stairT} at ${secs(s)}`, EVENT_ICONS.stairT, () => onSeek(s / duration));
     for (const i of issues) add(`rc-tl-qa rc-tl-qa-${i.level}`, i.t, `${i.level === 'error' ? 'Error' : 'Warning'} ${i.code} at ${secs(i.t * duration)}: ${i.message}`, i.level === 'error' ? 'alert' : 'info', () => onSeek(i.t));
   }
-  function place() { head.style.left = `${(t * 100).toFixed(3)}%`; }
+  function place() { head.style.left = `${(t * 100).toFixed(3)}%`; input.style.setProperty('--tl-p', t.toFixed(4)); }
   function redraw() { drawBands(); drawSpark(); place(); }
 
   input.addEventListener('input', () => onSeek(Number(input.value) / Number(input.max)));

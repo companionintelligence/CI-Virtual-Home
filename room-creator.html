@@ -861,7 +861,7 @@
     .prop-slider-row:last-child { margin-bottom: 0; }
     .prop-slider-row > label, .prop-slider-row > span { font-size: 12px; color: var(--muted-foreground); }
     .prop-slider-row .slider-val { font-family: var(--rc-font-mono); font-size: 11px; text-align: right; color: var(--foreground); }
-    input[type="range"] { accent-color: var(--primary); height: 16px; min-width: 0; cursor: pointer; }
+    input[type="range"] { accent-color: var(--primary); height: 24px; min-width: 0; cursor: pointer; }   /* 24 px: WCAG 2.5.8's target size, round a 16 px thumb */
     input[type="range"]:disabled { cursor: not-allowed; opacity: 0.45; }
 
     /* colour swatches (the material's palette): real buttons, the chosen one ringed */
@@ -928,6 +928,23 @@
     .outliner-btn:hover:not(:disabled) { color: var(--foreground); background: var(--rc-hover); }
     .outliner-btn svg.i { width: 15px; height: 15px; }
     .outliner-more { font-size: 12px; color: var(--muted-foreground); padding: 8px; }
+    /* the tree: a level, then a room (or a kind of part), then the parts. Focus roves: one tab stop, arrow keys inside. */
+    .outliner-search { position: relative; margin-bottom: 8px; color: var(--muted-foreground); }
+    .outliner-search svg.i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; pointer-events: none; }
+    .outliner-search input { width: 100%; height: var(--rc-hit); background: var(--rc-field); border: 1px solid var(--rc-hairline-strong); color: var(--foreground); padding: 0 10px 0 30px; border-radius: var(--radius-md); font-size: 12px; outline: none; }
+    .outliner-search input::placeholder { color: var(--muted-foreground); opacity: 0.85; }
+    .outliner-search input:focus-visible { border-color: var(--ring); outline: 2px solid var(--ring); outline-offset: 1px; }
+    .outliner-group { display: flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 8px; border-radius: var(--radius-md); font-size: 12px; font-weight: 600; color: var(--foreground); cursor: pointer; }
+    .outliner-group:hover { background: var(--rc-hover); }
+    .outliner-group > svg.i { width: 14px; height: 14px; color: var(--muted-foreground); transition: transform 0.12s ease; }
+    .outliner-group[aria-expanded="false"] > svg.i { transform: rotate(-90deg); }
+    .outliner-group .outliner-gname { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .outliner-count { font-family: var(--rc-font-mono); font-size: 11px; font-weight: 500; color: var(--muted-foreground); }
+    .outliner-group[data-depth="2"] { font-weight: 500; color: var(--muted-foreground); padding-left: 20px; }
+    .outliner-item[data-depth="2"] { padding-left: 24px; }
+    .outliner-item[data-depth="3"] { padding-left: 38px; }
+    .outliner-item { cursor: pointer; }
+    .outliner-item:focus-visible, .outliner-group:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
 
     /* shot cards (Review) */
     .shot-cards { display: flex; flex-direction: column; gap: 6px; }
@@ -1077,7 +1094,14 @@
     .rc-tl-qa-error { color: var(--rc-error); }
     .rc-tl-qa-warn { color: var(--rc-warn); }
     .rc-tl-bands { display: block; width: 100%; height: 14px; border-radius: 4px; }
-    .rc-tl-scrub { display: block; width: 100%; margin: 0; }
+    /* the scrubber: its thumb is drawn here (16 px, in every engine), so the thumb's centre sits at t of the bands above it
+       (the input reaches 8 px past each end, which is the thumb's half width); --tl-p (0…1, set by timeline.ts) fills the track */
+    .rc-tl-scrub { -webkit-appearance: none; appearance: none; background: transparent; display: block; width: calc(100% + 16px); margin: 0 -8px; height: 24px; }
+    .rc-tl-scrub::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: linear-gradient(to right, var(--primary) calc(8px + var(--tl-p, 0) * (100% - 16px)), var(--rc-tile-hover) 0); }
+    .rc-tl-scrub::-moz-range-track { height: 4px; border-radius: 999px; background: linear-gradient(to right, var(--primary) calc(8px + var(--tl-p, 0) * (100% - 16px)), var(--rc-tile-hover) 0); }
+    .rc-tl-scrub::-webkit-slider-thumb { -webkit-appearance: none; box-sizing: border-box; width: 16px; height: 16px; margin-top: -6px; border-radius: 50%; background: var(--primary); border: 3px solid var(--background); box-shadow: 0 0 0 1px var(--rc-hairline-strong); }
+    .rc-tl-scrub::-moz-range-thumb { box-sizing: border-box; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); border: 3px solid var(--background); box-shadow: 0 0 0 1px var(--rc-hairline-strong); }
+    .rc-tl-scrub:focus-visible { outline-offset: 0; border-radius: 12px; }
     .rc-tl-spark { display: block; width: 100%; height: 16px; }
     .rc-tl-head { position: absolute; top: 16px; bottom: 0; width: 1px; margin-left: -0.5px; background: var(--foreground); opacity: 0.55; pointer-events: none; }
     .rc-tl-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--muted-foreground); padding-left: 118px; }
@@ -1280,6 +1304,14 @@
       .viewport-hud-angles { display: none; }
       .rc-tl-legend { padding-left: 0; }
     }
+    /* tablets: Still and Record fold to their icons and the picker drops its caption, so the bar never overlaps itself */
+    @media (max-width: 899px) {
+      header .btn-export .lbl, header #btn-open-export .lbl { display: none; }
+      header .btn-export, header #btn-open-export { padding: 0; width: var(--rc-hit); justify-content: center; }
+      .house-picker-label, .house-picker-thumb { display: none; }
+      .house-picker { flex: 0 1 240px; min-width: 96px; padding-left: 12px; }
+      #qa-badge-text, .topbar-sep { display: none; }
+    }
     /* phones: a compact top bar and the transport as a bottom sheet */
     @media (max-width: 699px) {
       /* two rows: the home and its checks; then the mode and the outputs */
@@ -1293,14 +1325,16 @@
       .topbar-spacer { order: 11; }
       .btn-link { order: 12; }
       #btn-open-export { order: 13; }
-      .btn-export { order: 14; }
-      .btn-export .lbl, #btn-open-export .lbl { display: none; }
-      .btn-export, #btn-open-export { padding: 0; width: var(--rc-hit); justify-content: center; }
+      header .btn-export { order: 14; }
+      header .btn-export .lbl, header #btn-open-export .lbl { display: none; }
+      header .btn-export, header #btn-open-export { padding: 0; width: var(--rc-hit); justify-content: center; }
       #btn-undo, #btn-redo, .topbar-sep { display: none !important; }
       .house-picker-thumb { display: none; }
       .house-picker-label { display: none; }
       .viewport-hud-top, .transform-gizmo-hud { display: none; }
       .viewport-overlay-top { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; pointer-events: auto; }
+      /* more tools past the right edge (set from layoutOverlays): the bar fades out there, and scrolls */
+      .viewport-overlay-top[data-more="end"] { -webkit-mask-image: linear-gradient(to right, black calc(100% - 40px), transparent); mask-image: linear-gradient(to right, black calc(100% - 40px), transparent); }
       .animation-timeline-dock { left: 0; right: 0; bottom: 0; transform: none; width: 100%; border-radius: var(--radius-xl) var(--radius-xl) 0 0; border-bottom: 0; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); }
       .anim-dock-actions .lbl { display: none; }
       .shot-select { flex: 1 1 auto; width: auto; }
@@ -1673,7 +1707,8 @@
           <span id="scene-h">Scene</span>
           <button type="button" class="outliner-btn" id="btn-clear-scene" title="Remove everything you added">Clear added</button>
         </h2>
-        <div class="outliner-list" id="scene-outliner-box" role="list" aria-labelledby="scene-h"></div>
+        <div class="outliner-search"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="outliner-search" placeholder="Search the scene" aria-label="Search the scene" aria-controls="scene-outliner-box" autocomplete="off" spellcheck="false"></div>
+        <div class="outliner-list" id="scene-outliner-box" role="tree" aria-labelledby="scene-h" aria-multiselectable="false"></div>
       </section>
     </aside>
   </div>
@@ -1689,7 +1724,8 @@
     </form>
     <div class="rc-dialog-body two-col">
       <div class="export-preview-box" id="export-preview-box">
-        <img id="export-preview-img" alt="Preview of the still">
+        <img id="export-preview-img" alt="Preview of the still" hidden>
+        <div class="video-placeholder" id="export-preview-wait" role="status"><svg class="i rc-spin" aria-hidden="true"><use href="#i-loader"/></svg><span id="export-preview-wait-text">Drawing the preview</span></div>
       </div>
       <div class="export-options">
         <div class="export-opt-group">
@@ -6191,44 +6227,132 @@
       detailsContainer.innerHTML = '<p class="inspector-note">Nothing selected. Click something in the scene, or pick from the catalog.</p>';
     }
 
-    // The scene outliner: a name to select, an eye to hide, a bin to delete (a home's own parts carry a lock instead).
-    // A built home has hundreds of parts; the list shows the first 400 and says how many more there are.
+    // The scene outliner (plan §6 P2 15): a tree — a storey, then a room (or a kind of part), then the parts — with a
+    // search. A home built from its spec is hundreds of parts; a closed group is not drawn at all. Focus roves (one tab
+    // stop; arrows move, ← → close and open, Enter selects, H hides), and a rebuild keeps the selection and the focus.
+    // A part has a name to select, an eye to hide, a bin to delete (a home's own parts carry a lock instead).
     const OUTLINER_MAX = 400;
-    let outlinerTimer = 0;
+    const outlinerSearch = document.getElementById('outliner-search');
+    const outlinerOpen = new Set(), outlinerShut = new Set();   // the groups the user opened / closed, by key
+    const OUTLINER_KIND = { wall: 'Walls', floor: 'Floors and structure', structure: 'Floors and structure', roof: 'Roofs and ceilings', ceiling: 'Roofs and ceilings', hero: 'Companion Core', item: 'Fittings' };
+    const levelLabel = i => { const lv = activeHouse && activeHouse.spec.levels && activeHouse.spec.levels[i]; return (lv && (lv.name || lv.id)) || (!activeHouse && ['Ground floor', 'Upper floor'][i]) || `Level ${i + 1}`; };
+    let outlinerTimer = 0, outlinerSel = null;
     function updateOutliner() {
       if (outlinerTimer) return;   // coalesce: many changes in one task, one rebuild
       outlinerTimer = requestAnimationFrame(() => { outlinerTimer = 0; renderOutliner(); });
       if (document.hidden) { cancelAnimationFrame(outlinerTimer); outlinerTimer = 0; renderOutliner(); }
     }
+    // the parts as a tree: [{ key, label, objs, subs: [{ key, label, objs }] }], what you added first, the lot last
+    function outlinerTree(needle) {
+      const tops = new Map();
+      const top = (key, label, order) => tops.get(key) || (tops.set(key, { key, label, order, subs: new Map(), objs: [] }), tops.get(key));
+      for (const obj of placedItems) {
+        const ud = obj.userData || {};
+        if (needle && !`${obj.name} ${ud.room || ''} ${ud.itemType || ''} ${ud.role || ''}`.toLowerCase().includes(needle)) continue;
+        if (activeHouse && !isGenerated(obj)) { top('yours', 'Yours', -2).objs.push(obj); continue; }
+        const li = visibility.levelOf(obj);
+        if (li < 0) { top('lot', 'Lot and world', 1000).objs.push(obj); continue; }
+        const t = top(`L${li}`, levelLabel(li), li), sub = ud.room || OUTLINER_KIND[ud.role] || 'Fittings', sk = `${t.key}:${sub}`;
+        (t.subs.get(sk) || (t.subs.set(sk, { key: sk, label: sub, objs: [] }), t.subs.get(sk))).objs.push(obj);
+      }
+      return [...tops.values()].sort((a, b) => a.order - b.order).map(t => ({ ...t, subs: [...t.subs.values()] }));
+    }
+    function toggleOutlinerGroup(key, open) {
+      if (open) { outlinerOpen.delete(key); outlinerShut.add(key); } else { outlinerShut.delete(key); outlinerOpen.add(key); }
+      renderOutliner();
+    }
     function renderOutliner() {
-      const rows = [];
-      const list = placedItems.slice(0, OUTLINER_MAX);
-      for (const obj of list) {
-        const row = document.createElement('div');
-        row.className = `outliner-item${selectedObject === obj ? ' selected' : ''}`;
-        row.setAttribute('role', 'listitem');
-        const hidden = !!(obj.userData && obj.userData.userHidden);
-        row.dataset.hidden = String(hidden);
-        const locked = isGenerated(obj);
-        row.innerHTML = `<button type="button" class="outliner-name" title="${esc(obj.name)}">${esc(obj.name)}</button>
+      const needle = outlinerSearch.value.trim().toLowerCase();
+      const focusKey = outlinerBox.contains(document.activeElement) ? (document.activeElement.closest('[data-key]') || {}).dataset?.key : null;
+      const tree = outlinerTree(needle);
+      const changed = selectedObject !== outlinerSel;
+      if (changed) {   // a new selection: open the groups it is in, so it is on screen
+        outlinerSel = selectedObject;
+        if (selectedObject) for (const t of tree) for (const s of t.subs) if (s.objs.includes(selectedObject)) { for (const k of [t.key, s.key]) { outlinerShut.delete(k); outlinerOpen.add(k); } }
+      }
+      const isOpen = (key, dflt) => !!needle || (outlinerShut.has(key) ? false : outlinerOpen.has(key) ? true : dflt);
+      let left = OUTLINER_MAX, total = 0;
+      const head = (key, label, count, depth, open) => {
+        const h = document.createElement('div');
+        h.className = 'outliner-group'; h.setAttribute('role', 'treeitem'); h.setAttribute('aria-level', String(depth)); h.setAttribute('aria-expanded', String(open));
+        h.dataset.key = key; h.dataset.depth = String(depth); h.tabIndex = -1;
+        h.innerHTML = `${icon('chevron')}<span class="outliner-gname">${esc(label)}</span><span class="outliner-count">${count}</span>`;
+        h.addEventListener('click', () => toggleOutlinerGroup(key, open));
+        return h;
+      };
+      const row = (obj, depth) => {
+        total++;
+        if (left <= 0) return null;
+        left--;
+        const el = document.createElement('div');
+        const selected = selectedObject === obj, hidden = !!(obj.userData && obj.userData.userHidden), locked = isGenerated(obj);
+        el.className = `outliner-item${selected ? ' selected' : ''}`;
+        el.setAttribute('role', 'treeitem'); el.setAttribute('aria-level', String(depth)); el.setAttribute('aria-selected', String(selected));
+        el.dataset.key = `o:${obj.uuid}`; el.dataset.depth = String(depth); el.dataset.hidden = String(hidden); el.tabIndex = -1;
+        el.innerHTML = `<span class="outliner-name" title="${esc(obj.name)}">${esc(obj.name)}</span>
           <div class="outliner-actions">
-            <button type="button" class="outliner-btn btn-vis" aria-pressed="${hidden}" aria-label="${hidden ? 'Show' : 'Hide'} ${esc(obj.name)}" title="${hidden ? 'Show' : 'Hide'}">${icon(hidden ? 'eye-off' : 'eye')}</button>
-            ${locked ? `<span class="outliner-btn" title="Part of the home (from its spec)" aria-label="Locked: part of the home">${icon('lock')}</span>` : `<button type="button" class="outliner-btn btn-del" aria-label="Delete ${esc(obj.name)}" title="Delete">${icon('trash')}</button>`}
+            <button type="button" class="outliner-btn btn-vis" tabindex="-1" aria-pressed="${hidden}" aria-label="${hidden ? 'Show' : 'Hide'} ${esc(obj.name)}" title="${hidden ? 'Show' : 'Hide'} (H)">${icon(hidden ? 'eye-off' : 'eye')}</button>
+            ${locked ? `<span class="outliner-btn" title="Part of the home (from its spec)" aria-label="Locked: part of the home">${icon('lock')}</span>` : `<button type="button" class="outliner-btn btn-del" tabindex="-1" aria-label="Delete ${esc(obj.name)}" title="Delete">${icon('trash')}</button>`}
           </div>`;
-        row.querySelector('.outliner-name').addEventListener('click', () => selectObject(obj));
-        row.querySelector('.btn-vis').addEventListener('click', e => {
+        el.addEventListener('click', () => selectObject(obj));
+        el.querySelector('.btn-vis').addEventListener('click', e => {
           e.stopPropagation();
           const ud = obj.userData || (obj.userData = {});
           ud.userHidden = !ud.userHidden;
           obj.visible = !ud.userHidden && !ud.layerHidden;
           renderOutliner();
         });
-        row.querySelector('.btn-del')?.addEventListener('click', e => { e.stopPropagation(); deleteObject(obj); });
-        rows.push(row);
+        el.querySelector('.btn-del')?.addEventListener('click', e => { e.stopPropagation(); deleteObject(obj); });
+        return el;
+      };
+      const out = [];
+      for (const t of tree) {
+        const count = t.objs.length + t.subs.reduce((n, s) => n + s.objs.length, 0), open = isOpen(t.key, true);
+        out.push(head(t.key, t.label, count, 1, open));
+        if (!open) { total += count; continue; }
+        const g = document.createElement('div'); g.setAttribute('role', 'group');
+        for (const obj of t.objs) { const r = row(obj, 2); if (r) g.append(r); }
+        for (const s of t.subs) {
+          const sOpen = isOpen(s.key, false);
+          g.append(head(s.key, s.label, s.objs.length, 2, sOpen));
+          if (!sOpen) { total += s.objs.length; continue; }
+          const sg = document.createElement('div'); sg.setAttribute('role', 'group');
+          for (const obj of s.objs) { const r = row(obj, 3); if (r) sg.append(r); }
+          g.append(sg);
+        }
+        out.push(g);
       }
-      if (placedItems.length > OUTLINER_MAX) { const more = document.createElement('p'); more.className = 'outliner-more'; more.textContent = `and ${placedItems.length - OUTLINER_MAX} more`; rows.push(more); }
-      outlinerBox.replaceChildren(...rows);
+      if (total > OUTLINER_MAX) { const more = document.createElement('p'); more.className = 'outliner-more'; more.textContent = `and ${total - OUTLINER_MAX} more: search to narrow the list`; out.push(more); }
+      if (!tree.length) { const none = document.createElement('p'); none.className = 'outliner-more'; none.textContent = needle ? 'No part matches that.' : 'Nothing in the scene.'; out.push(none); }
+      outlinerBox.replaceChildren(...out);
+      // roving focus: one tab stop, on what had the focus, else the selection, else the first row
+      const items = [...outlinerBox.querySelectorAll('[role="treeitem"]')];
+      const target = (focusKey && items.find(e => e.dataset.key === focusKey)) || outlinerBox.querySelector('.outliner-item.selected') || items[0];
+      items.forEach(e => { e.tabIndex = e === target ? 0 : -1; });
+      if (focusKey && target && target.dataset.key === focusKey) target.focus({ preventScroll: true });
+      if (changed) { const sel = outlinerBox.querySelector('.outliner-item.selected'); if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: 'nearest' }); }
     }
+    outlinerSearch.addEventListener('input', () => renderOutliner());
+    outlinerSearch.addEventListener('keydown', e => { if (e.key === 'Escape' && outlinerSearch.value) { e.stopPropagation(); outlinerSearch.value = ''; renderOutliner(); } });
+    outlinerBox.addEventListener('keydown', e => {
+      const el = e.target.closest && e.target.closest('[role="treeitem"]');
+      if (!el || e.target !== el) return;
+      const items = [...outlinerBox.querySelectorAll('[role="treeitem"]')], i = items.indexOf(el), isGroup = el.classList.contains('outliner-group');
+      const go = j => { const n = items[Math.max(0, Math.min(items.length - 1, j))]; if (n) { items.forEach(x => { x.tabIndex = x === n ? 0 : -1; }); n.focus(); } };
+      const eat = () => { e.preventDefault(); e.stopPropagation(); };   // the page's own keys (← → step the film, Space plays) stay out of the tree
+      if (e.key === 'ArrowDown') { eat(); go(i + 1); }
+      else if (e.key === 'ArrowUp') { eat(); go(i - 1); }
+      else if (e.key === 'Home') { eat(); go(0); }
+      else if (e.key === 'End') { eat(); go(items.length - 1); }
+      else if (e.key === 'ArrowRight') { eat(); if (isGroup && el.getAttribute('aria-expanded') === 'false') toggleOutlinerGroup(el.dataset.key, false); else go(i + 1); }
+      else if (e.key === 'ArrowLeft') {
+        eat();
+        if (isGroup && el.getAttribute('aria-expanded') === 'true') toggleOutlinerGroup(el.dataset.key, true);
+        else { const lv = +el.getAttribute('aria-level'); for (let j = i - 1; j >= 0; j--) if (items[j].classList.contains('outliner-group') && +items[j].getAttribute('aria-level') < lv) { go(j); break; } }
+      }
+      else if (e.key === 'Enter' || e.key === ' ') { eat(); el.click(); }
+      else if ((e.key === 'h' || e.key === 'H') && !isGroup && !e.metaKey && !e.ctrlKey) { eat(); const b = el.querySelector('.btn-vis'); if (b) b.click(); }
+    });
 
     // The HUD says what drives the camera: a shot (and where in it), or the editor's own camera.
     function updateHUD() {
@@ -7193,6 +7317,7 @@
         if (id) writeUiState({ house: id }); else { const q = new URLSearchParams(location.search); q.delete('house'); q.set('preset', key); history.replaceState(history.state, '', `${location.pathname}?${q}${location.hash}`); }
       }
       buildFloorButtons();
+      layoutOverlays();
       if (id) applyUiLighting();
       document.getElementById('download-json-label').textContent = id ? 'Download HouseSpec' : 'Download scene JSON';
       planInset.setHouse(activeHouse ? activeHouse.spec : null, activeHouse ? activeHouse.anchors : null);
@@ -7576,6 +7701,7 @@
     const btnOpenExport = document.getElementById('btn-open-export');
     const btnDownloadPNG = document.getElementById('btn-confirm-download-png');
     const exportPreviewImg = document.getElementById('export-preview-img');
+    const exportPreviewWait = document.getElementById('export-preview-wait');
     const exportResSelect = document.getElementById('export-res-select');
     const exportBgSelect = document.getElementById('export-bg-select');
     const btnDownloadJSON = document.getElementById('btn-download-json');
@@ -7611,10 +7737,13 @@
     async function generateExportPreview() {
       if (!exportDialog.open) return;
       const { w, h } = exportSize(360, exportAspect);
-      const blob = await renderStill({ w, h, bg: exportBgSelect.value });
+      let blob;
+      try { blob = await renderStill({ w, h, bg: exportBgSelect.value }); }
+      catch (err) { exportPreviewImg.hidden = true; exportPreviewWait.hidden = false; exportPreviewWait.querySelector('svg').classList.remove('rc-spin'); document.getElementById('export-preview-wait-text').textContent = 'The preview could not be drawn.'; return; }
       if (lastPreviewUrl) URL.revokeObjectURL(lastPreviewUrl);
       lastPreviewUrl = URL.createObjectURL(blob);
       exportPreviewImg.src = lastPreviewUrl;
+      exportPreviewImg.hidden = false; exportPreviewWait.hidden = true;
       document.getElementById('export-preview-box').style.aspectRatio = `${w} / ${h}`;
     }
     function readRGBA(w, h) { const gl = renderer.getContext(), px = new Uint8Array(w * h * 4); gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px); return px; }
@@ -9078,7 +9207,12 @@
       }
       pathOverlay.draw(activeCamera);
       if (!planInsetEl.hidden) planInset.draw();
+      syncToolbarFade();
     }
+    // the toolbars over the view scroll sideways on a phone: say so when there is more past the edge
+    const overlayTop = document.querySelector('.viewport-overlay-top');
+    function syncToolbarFade() { overlayTop.dataset.more = overlayTop.scrollWidth - overlayTop.clientWidth - overlayTop.scrollLeft > 6 ? 'end' : ''; }
+    overlayTop.addEventListener('scroll', syncToolbarFade, { passive: true });
     if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => layoutOverlays()).observe(animDock);
 
     // -------------------------------------------------------------
