@@ -2201,7 +2201,12 @@
     // =========================================================================
     // PARAMETRIC ARCHITECTURE ENGINE (Pascal garden-house.ts & Sims Standards)
     // =========================================================================
+    // Ownership (pass 4, plan S0): the builders below alternate between streams, so each run of one stream's builders
+    // opens with an `// ---- OWNER … ----` banner. Edit your own runs; a new builder goes at the END of your own run
+    // (or in your own module: assets/site-build.ts, item-map.ts, structure-build.ts), never in the middle of another's.
+    // Ownership is by builder, not by line; find it by name.
     const ProceduralArchitecture = {
+      // ---- OWNER S2 (architecture) + S1 (kit): createParametricWall (1 builder) — the wall shell, cladding and corners are S2's; the door and window units its openings loop builds are S1's ----
       // Parametric Wall Generator with Any Openings (Doors & Windows), Watertight Piers,
       // Wall Aprons Under Windows, Lintel Headers, Baseboards, Sills, and Sims Cutaways
       createParametricWall(config = {}) {
@@ -2617,6 +2622,7 @@
         return group;
       },
 
+      // ---- OWNER S1 (kit): createWallWithOpening … createArchitecturalWindow (3 builders: the wall-with-opening wrapper, the standalone door and window) ----
       // Backwards-compatible Wall with Opening (calls createParametricWall)
       createWallWithOpening(length, height, openingX, openingW, openingH, isDoor = false, thickness = 0.16, wallColor = 0xf8fafc) {
         return ProceduralArchitecture.createParametricWall({
@@ -2735,6 +2741,7 @@
         return group;
       },
 
+      // ---- OWNER S4 (site): createPrivacyFence, createProceduralGardenTerrain (2 builders) ----
       // Privacy Garden Fence Segment with Vertical Cedar Pickets, Posts, and Top Rail
       createPrivacyFence(length = 6, height = 1.8, postSpacing = 2.0) {
         const group = new THREE.Group();
@@ -2857,6 +2864,7 @@
         return group;
       },
 
+      // ---- OWNER S6 (ui): createSimsPlumbob (1 builder) — the editor's demo preset's crystal, not a house part ----
       // Floating Glowing Sims Plumbob Crystal
       createSimsPlumbob() {
         const group = new THREE.Group();
@@ -2893,6 +2901,7 @@
         return group;
       },
 
+      // ---- OWNER S2 (architecture): createFloatingTimberStairs … createUpperFloorSlab (6 builders) ----
       // -------------------------------------------------------------
       // 1. Floating Architectural Timber & Glass Staircase (Straight Run)
       createFloatingTimberStairs({ steps = 14, totalHeight = 2.8, width = 1.1, run = 3.36, treadWood = 'oak', handrailSide = 'right' } = {}) {
@@ -3258,6 +3267,7 @@
         return group;
       },
 
+      // ---- OWNER S1 (kit): createStructuralColumn, createInteriorPartitionWall (2 builders) ----
       // 7. Structural Architectural Support Column (Pillar)
       createStructuralColumn({ height = 2.8, radius = 0.14, size = null, style = 'modern', color = 0x1e293b } = {}) {
         const group = new THREE.Group();
@@ -3333,6 +3343,7 @@
     };
 
     const AssetFactory = {
+      // ---- OWNER S1 (kit): createCompanionCore … createFireplace (17 builders) ----
       // 1. Companion Core Chalk Tower
       // 1–2. Companion Core — the 4.3 L slab, drawn to the chassis spec (CI-Common reference/CHASSIS-INTERIOR.md a.1):
       //   232 × 205 × 90 mm · SPCC steel shell, powder-coated · MESH front, sides and top · 120 mm nine-blade
@@ -4097,6 +4108,7 @@
         return group;
       },
 
+      // ---- OWNER S2 (architecture): createFloorSlab … createGlassCurtainWall (3 builders) ----
       // 15. Architectural Floor Slab (Herringbone Oak)
       createFloorSlab(w = 6, d = 6, type = 'oak', texture = null) {   // texture: a kit floor (tile, deck) the page does not draw
         const group = new THREE.Group();
@@ -4192,6 +4204,7 @@
         return group;
       },
 
+      // ---- OWNER S4 (site): createPoolSlab (1 builder) ----
       // 18. Luxury Pool Water Slab
       createPoolSlab(w = 4, d = 3) {
         const group = new THREE.Group();
@@ -4221,6 +4234,7 @@
         return group;
       },
 
+      // ---- OWNER S1 (kit): createKitchenIsland … createSunLounger (7 builders) ----
       // 19. Monolithic Kitchen Island with Waterfall Stone & Induction Cooktop
       createKitchenIsland(w = 2.4, d = 0.9, stoneColor = 0xf1f5f9) {
         const group = new THREE.Group();
@@ -4529,6 +4543,7 @@
         return group;
       },
 
+      // ---- OWNER S4 (site): createTurfPitch, createColonnadePorch (2 builders) ----
       // 26. Miniature Sports Turf Pitch (Grass Court)
       createTurfPitch(w = 6, d = 4) {
         const group = new THREE.Group();
@@ -4588,6 +4603,7 @@
         return group;
       },
 
+      // ---- OWNER S1 (kit): createCircularRug … createSoccerGoal (4 builders) ----
       // 28. Circular Decorative Rug (Villa Mesa Mariposa)
       createCircularRug(r = 2.0, color = 0x475569) {
         const group = new THREE.Group();
@@ -4739,6 +4755,7 @@
         return group;
       },
 
+      // ---- OWNER S4 (site): createSportsCar … createCabanaLounge (3 builders) ----
       // 32. Luxury Sports Coupe (Driveway Asset)
       createSportsCar(bodyColor = 0xf8fafc) {
         const group = new THREE.Group();
@@ -4840,6 +4857,7 @@
         return group;
       },
 
+      // ---- OWNER S1 (kit): createBathroomEnsuite … createWardrobeCloset (5 builders) ----
       // 35. Luxury Bathroom Ensuite (Floating Vanity, Toilet & Walk-In Glass Shower)
       createBathroomEnsuite(w = 2.4, d = 2.0) {
         const group = new THREE.Group();
@@ -5091,6 +5109,7 @@
         return group;
       },
 
+      // ---- OWNER S4 (site): createTurtleMosaicPool, createFirePitLounge (2 builders) ----
       // 40. Custom Sea Turtle Mosaic Swimming Pool (Villa Mesa Mariposa)
       createTurtleMosaicPool(w = 8, d = 6) {
         const group = new THREE.Group();
@@ -5271,6 +5290,7 @@
         return group;
       },
 
+      // ---- OWNER S1 (kit): createOctagonalLatticeCoffeeTable (1 builder) ----
       // 42. Octagonal White Lattice Coffee Table (Family Home)
       createOctagonalLatticeCoffeeTable() {
         const group = new THREE.Group();
@@ -5333,6 +5353,7 @@
         return group;
       },
 
+      // ---- OWNER S4 (site): createWaterfrontGazebo … createPlaygroundMonkeyBars (4 builders) ----
       // 43. Romantic Waterfront Octagonal White Gazebo with Boardwalk
       createWaterfrontGazebo(radius = 2.2, height = 3.2) {
         const group = new THREE.Group();
@@ -5580,6 +5601,7 @@
         return group;
       },
 
+      // ---- OWNER S1 (kit): createTelescope … createConcentricRug (3 builders) ----
       // 47. Astronomical Telescope on Tripod (Lake Cabin Dock)
       createTelescope() {
         const group = new THREE.Group();
@@ -5717,6 +5739,7 @@
         return group;
       },
 
+      // ---- OWNER S4 (site): createCypressTree (1 builder) ----
       // 50. Columnar Italian Cypress / Cedar Tree (Suburban Family Home)
       createCypressTree(h = 4.2) {
         const group = new THREE.Group();
@@ -5740,6 +5763,7 @@
         return group;
       },
 
+      // ---- OWNER S1 (kit): createBench … createClubChair (3 builders) ----
       // 51. Modern Architectural Outdoor Bench
       createBench(w = 1.8, h = 0.45, d = 0.5) {
         const group = new THREE.Group();

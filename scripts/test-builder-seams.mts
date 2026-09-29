@@ -83,5 +83,13 @@ check(!!f0 && near(f0.fwd, [0, 1]) && near(f0.side, [1, 0]) && f0.surface === 'd
 check(!!f90 && near(f90.fwd, [1, 0]) && near(f90.side, [0, -1]) && f90.surface === 'island', 'heroFrame: rot 90 backs onto the west wall (the user sits east)');
 check(heroFrame(null) === null && heroFrame(undefined) === null, 'heroFrame: null for a spec with no hero');
 
+// ---- ownership is written down --------------------------------------------------------------------------------
+// house-builder.ts's header is the list of who owns which module (CLAUDE.md sends a stream there); a module it does
+// not name has no owner on paper, which is how two streams end up editing one file
+const header = fs.readFileSync(path.join(ROOT, 'assets', 'house-builder.ts'), 'utf8').split('\nimport ')[0];
+const modules = fs.readdirSync(path.join(ROOT, 'assets')).filter(f => f.endsWith('.ts') && f !== 'house-builder.ts');
+const unnamed = modules.filter(f => !header.includes(f));
+check(!unnamed.length, `house-builder.ts's header names all ${modules.length} assets/*.ts modules`, `not named: ${unnamed.join(', ')}`);
+
 console.log(`${bad ? '✗' : '✓'} builder seams: ${bad} wrong`);
 process.exit(bad ? 1 : 0);
