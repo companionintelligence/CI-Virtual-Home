@@ -78,8 +78,10 @@ const check: Check = (spec, ctx) => {
     // the lowest storey standing above grade is a raised ground floor (a plinth, a stoop): nothing climbs to it
     if (!mine.length && lv.y > lowestY + 1e-6) err(`level ${lv.id} (y=${lv.y}) has no stairs leading to it`);
     const auto = autoVoidsFor(spec, lv.id);
-    // (v1's words, uncoded, so the report of a v1 spec reads as it did)
-    if (lv.y > lowestY + 1e-6 && !(lv.voids || []).length && !auto.length) out.push({ level: 'warn', message: `level ${lv.id}: no voids over the stairwell` });
+    // (v1's words, uncoded, so the report of a v1 spec reads as it did) — unless no flight to it climbs under its slab: an
+    // exterior flight, or a half-flight up from a split level beside it, needs no hole in it
+    const under = mine.some(f => f.plan.shape === 'spiral' || f.plan.flights.some(fl => [0.25, 0.5, 0.75].some(t => { const d = [Math.sin(fl.rot * Math.PI / 180), Math.cos(fl.rot * Math.PI / 180)]; return (lv.footprint || []).some(r => inRect(fl.at[0] + d[0] * fl.run * t, fl.at[1] + d[1] * fl.run * t, r, -0.05)); })));
+    if (lv.y > lowestY + 1e-6 && !(lv.voids || []).length && !auto.length && (under || !mine.length)) out.push({ level: 'warn', message: `level ${lv.id}: no voids over the stairwell` });
     // a balustrade across a flight's step-off fences the landing (the builder's stair top is its last step)
     for (const f of mine) {
       if (f.plan.shape === 'spiral') continue;
@@ -107,7 +109,9 @@ const check: Check = (spec, ctx) => {
       let first = null, last = null;
       for (const f of p.flights) for (let k = 0; k <= 20; k++) {
         const t = k / 20, h = f.y0 + f.rise * t;
-        if (h <= h0 + 0.05) continue;
+        // under the slab with less than the headroom — not yet up at it (a half-flight arriving beside a split level
+        // ends on the upper floor, not under it)
+        if (h <= h0 + 0.05 || h >= p.rise - 0.2) continue;
         const d = [Math.sin(f.rot * Math.PI / 180), Math.cos(f.rot * Math.PI / 180)];
         const x = f.at[0] + d[0] * f.run * t, z = f.at[1] + d[1] * f.run * t;
         if (solid(x, z, 0.1)) { first ||= [x, z]; last = [x, z]; }
@@ -154,7 +158,8 @@ const check: Check = (spec, ctx) => {
   }
 
   // ---- roofs --------------------------------------------------------------------------------------------------------------
-  const tops = [...new Set(levels.map(l => +((l.y || 0) + (l.height || 2.8)).toFixed(2)))];
+  const topOf = (l: any) => (l.y || 0) + (l.knee !== undefined ? l.knee : (l.height || 2.8));   // a knee-walled storey's walls stop at the knee
+  const tops = [...new Set(levels.flatMap(l => [topOf(l), ...(l.footprint || []).filter(r => r.h !== undefined).map(r => (l.y || 0) + r.h)]).map(t => +t.toFixed(2)))];
   (spec.roofs || []).forEach((rf, i) => {
     const R = `roof ${i} (${rf.type} at y ${rf.y})`;
     oneOf(rf.finish, ROOF_FINISH, `${R}: finish`);
@@ -172,17 +177,17 @@ const check: Check = (spec, ctx) => {
     if (!rf.over || typeof rf.y !== 'number') return;
     const O = rf.over;
     // the storey this roof caps (its top is the eave) and the storeys that rise past the eave
-    const cap = levels.find(l => Math.abs((l.y || 0) + (l.height || 2.8) - rf.y) < 0.05);
+    const cap = levels.find(l => Math.abs(topOf(l) - rf.y) < 0.05) || levels.find(l => (l.footprint || []).some(r => r.h !== undefined && Math.abs((l.y || 0) + r.h - rf.y) < 0.05));
     const pitched = rf.type !== 'flat';
     if (!cap) {
       // what stands under it: a roof over walls whose top is near, but not at, its eave
       const under = levels.filter(l => (l.footprint || []).some(r => r.x < O.x + O.w - 0.3 && r.x + r.w > O.x + 0.3 && r.z < O.z + O.d - 0.3 && r.z + r.d > O.z + 0.3));
-      const near = under.map(l => (l.y || 0) + (l.height || 2.8)).filter(t => Math.abs(t - rf.y) > 0.05 && Math.abs(t - rf.y) < 0.8);
+      const near = under.map(l => topOf(l)).filter(t => Math.abs(t - rf.y) > 0.05 && Math.abs(t - rf.y) < 0.8);
       if (near.length) warn(`${R}: its eave matches no storey top under it (the walls stop at ${near.map(fmt).join(', ')}; storey tops: ${tops.join(', ')}) — a gap or an overlap at the wall head`, 'roof-y');
     }
     // a taller storey inside the roof's plan (not just against one of its sides): the roof runs through its walls
     for (const l of levels) {
-      if (l === cap || !((l.y || 0) < rf.y + 0.05 && (l.y || 0) + (l.height || 2.8) > rf.y + 0.3)) continue;
+      if (l === cap || !((l.y || 0) < rf.y + 0.05 && topOf(l) > rf.y + 0.3)) continue;
       for (const r of l.footprint || []) {
         const ix = Math.min(O.x + O.w, r.x + r.w) - Math.max(O.x, r.x), iz = Math.min(O.z + O.d, r.z + r.d) - Math.max(O.z, r.z);
         if (ix > 0.6 && iz > 0.6 && pitched && !rf.clip) warn(`${R}: level ${l.id} (rect x ${r.x}, z ${r.z}, ${r.w} × ${r.d}) rises through it (${fmt(ix)} × ${fmt(iz)} m inside the roof's plan) — the roof slices its walls (roofs[].clip: true, or defaults: 2)`, 'roof-storey');
@@ -270,10 +275,20 @@ const check: Check = (spec, ctx) => {
       if (op.surround) oneOf(op.surround.kind, SURROUNDS, `${O}: surround.kind`);
       if (op.canopy) oneOf(op.canopy.kind, CANOPIES, `${O}: canopy.kind`);
       if (op.shutters && typeof op.shutters === 'object') { oneOf(op.shutters.style, ['panel', 'louvre', 'board'], `${O}: shutters.style`); colour(op.shutters.color, `${O}: shutters.color`); }
-      if (op.line !== undefined) {
+      if (op.edgeZ !== undefined) {
+        // the core skips its overlap test for these; do it here, against openings on the same edge only
         const horiz = op.side === 'S' || op.side === 'N';
-        const hit = edges.find(e => e.side === op.side && Math.abs((horiz ? e.a[1] : e.a[0]) - op.line) < 0.02 && (horiz ? op.at >= e.a[0] && op.at <= e.b[0] : op.at >= e.a[1] && op.at <= e.b[1]));
-        if (!hit) err(`${O}: line ${op.line} names no ${op.side} edge containing at=${op.at}`, 'opening-line');
+        const hit = edges.find(e => e.side === op.side && Math.abs((horiz ? e.a[1] : e.a[0]) - op.edgeZ) < 0.02 && (horiz ? op.at >= e.a[0] && op.at <= e.b[0] : op.at >= e.a[1] && op.at <= e.b[1]));
+        if (!hit) err(`${O}: edgeZ ${op.edgeZ} names no ${op.side} edge containing at=${op.at}`, 'opening-edge');
+        else {
+          const lo = horiz ? hit.a[0] : hit.a[1], hi = horiz ? hit.b[0] : hit.b[1];
+          if (op.at - op.w / 2 < lo + 0.15 || op.at + op.w / 2 > hi - 0.15) err(`${O}: opening (w=${op.w}) runs past its edge [${lo}, ${hi}]`, 'opening-edge');
+          for (const o2 of lv.openings || []) {
+            if (o2 === op || o2.side !== op.side) continue;
+            const e2 = o2.edgeZ !== undefined ? edges.find(e => e.side === o2.side && Math.abs((horiz ? e.a[1] : e.a[0]) - o2.edgeZ) < 0.02) : ctx.perimeterEdges(lv.footprint).find(e => e.side === o2.side && (horiz ? o2.at >= e.a[0] - 1e-6 && o2.at <= e.b[0] + 1e-6 : o2.at >= e.a[1] - 1e-6 && o2.at <= e.b[1] + 1e-6));
+            if (e2 && Math.abs((horiz ? e2.a[1] : e2.a[0]) - op.edgeZ) < 0.02 && Math.abs(o2.at - op.at) < (o2.w + op.w) / 2 + 0.1 && lv.openings.indexOf(o2) > lv.openings.indexOf(op)) err(`${O}: overlaps ${o2.type}@${o2.at} on its edge`, 'opening-edge');
+          }
+        }
       }
     }
     (lv.partitions || []).forEach((p, i) => {

@@ -1,0 +1,398 @@
+{
+ "$schema": "house-spec/v1",
+ "id": "s2-arch-split",
+ "name": "S2 Split-Level Fixture",
+ "author": "ci-virtual-home",
+ "source": "test fixture (Completeness A2, plan S2 sections): a split level — garage at grade, living half a storey up, bedrooms over the garage — joined by half-flights; a tower with its own height; knee walls",
+ "style": "Split-level: stucco living wing on a stone plinth, garage with a knee-walled bedroom storey over it, a tall corner tower",
+ "emoji": "🧪",
+ "fixture": {
+  "note": "levels[].split (shared-wall bands), two half-flights (1.2 m and 1.4 m) up through the shared wall, levels[].plinth foundation, entry.stoop, footprint[i].h tower with roof clip, levels[].knee with a ceiling under the roof"
+ },
+ "lot": {
+  "w": 30,
+  "d": 22,
+  "ground": "lawn"
+ },
+ "palette": {
+  "wall": "#e9e4da",
+  "trim": "#2f3336",
+  "roof": "#3a3d42",
+  "accent": "#6b7f73",
+  "material": "stucco",
+  "interior": "#f2efe9"
+ },
+ "lighting": "day",
+ "levels": [
+  {
+   "id": "l1",
+   "name": "Garage",
+   "y": 0,
+   "height": 2.4,
+   "floor": "concrete",
+   "footprint": [
+    {
+     "x": 0,
+     "z": -3,
+     "w": 6,
+     "d": 6
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": 3.2,
+     "type": "garage",
+     "w": 2.8,
+     "h": 2.1
+    },
+    {
+     "side": "W",
+     "at": 1.5,
+     "type": "door",
+     "w": 1.0,
+     "h": 2.3,
+     "style": "cased"
+    },
+    {
+     "side": "W",
+     "at": -1.5,
+     "type": "door",
+     "w": 1.2,
+     "h": 2.3,
+     "style": "cased"
+    },
+    {
+     "side": "E",
+     "at": 0,
+     "type": "window",
+     "w": 1.2,
+     "h": 0.9,
+     "sill": 1.2
+    }
+   ],
+   "stairs": {
+    "type": "closed",
+    "at": [
+     1.3,
+     1.5
+    ],
+    "rot": 270,
+    "run": 1.44,
+    "w": 0.95,
+    "to": "l2"
+   },
+   "rooms": [
+    {
+     "no": "01",
+     "name": "Garage",
+     "bounds": {
+      "x": 0,
+      "z": -3,
+      "w": 6,
+      "d": 6
+     },
+     "items": []
+    }
+   ]
+  },
+  {
+   "id": "l2",
+   "name": "Living",
+   "y": 1.2,
+   "height": 2.8,
+   "floor": "oak",
+   "split": true,
+   "plinth": {
+    "material": "stone",
+    "color": "#a39c90"
+   },
+   "footprint": [
+    {
+     "x": -8,
+     "z": -4,
+     "w": 8,
+     "d": 8
+    },
+    {
+     "x": -8,
+     "z": -4,
+     "w": 3,
+     "d": 3,
+     "h": 4.4,
+     "material": "stone",
+     "color": "#9f988c"
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": -4.0,
+     "type": "door",
+     "w": 1.0,
+     "h": 2.1,
+     "style": "entry"
+    },
+    {
+     "side": "S",
+     "at": -1.8,
+     "type": "window",
+     "w": 1.6,
+     "h": 1.5,
+     "sill": 0.7
+    },
+    {
+     "side": "S",
+     "at": -6.6,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.5,
+     "sill": 0.7
+    },
+    {
+     "side": "N",
+     "at": -3,
+     "type": "window",
+     "w": 1.6,
+     "h": 1.4,
+     "sill": 0.8
+    },
+    {
+     "side": "W",
+     "at": -2.5,
+     "type": "window",
+     "w": 0.8,
+     "h": 2.2,
+     "sill": 0.6
+    },
+    {
+     "side": "W",
+     "at": 1.8,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.4,
+     "sill": 0.8
+    },
+    {
+     "side": "E",
+     "at": 1.5,
+     "type": "door",
+     "w": 1.0,
+     "h": 2.3,
+     "style": "cased"
+    },
+    {
+     "side": "E",
+     "at": -1.5,
+     "type": "door",
+     "w": 1.2,
+     "h": 2.7,
+     "style": "cased"
+    }
+   ],
+   "stairs": {
+    "type": "timber",
+    "at": [
+     -1.4,
+     -1.5
+    ],
+    "rot": 90,
+    "run": 1.68,
+    "w": 1.0,
+    "to": "l3",
+    "autoVoid": true
+   },
+   "rooms": [
+    {
+     "no": "11",
+     "name": "Living Room",
+     "bounds": {
+      "x": -8,
+      "z": -4,
+      "w": 8,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "sectional",
+       "at": [
+        -4.6,
+        1.2
+       ],
+       "rot": 180
+      },
+      {
+       "type": "coffee-table",
+       "at": [
+        -4.6,
+        0.1
+       ]
+      },
+      {
+       "type": "area-rug",
+       "at": [
+        -4.6,
+        0.4
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l3",
+   "name": "Bedrooms",
+   "y": 2.6,
+   "height": 2.6,
+   "floor": "oak",
+   "split": true,
+   "knee": 1.9,
+   "footprint": [
+    {
+     "x": 0,
+     "z": -3,
+     "w": 6,
+     "d": 6
+    }
+   ],
+   "openings": [
+    {
+     "side": "W",
+     "at": -1.5,
+     "type": "door",
+     "w": 1.2,
+     "h": 2.1,
+     "style": "cased"
+    },
+    {
+     "side": "E",
+     "at": 0,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.0,
+     "sill": 0.7
+    },
+    {
+     "side": "S",
+     "at": 3.0,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.0,
+     "sill": 0.7
+    }
+   ],
+   "rooms": [
+    {
+     "no": "21",
+     "name": "Study",
+     "bounds": {
+      "x": 0,
+      "z": -3,
+      "w": 6,
+      "d": 6
+     },
+     "items": []
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "over": {
+    "x": -8.4,
+    "z": -4.4,
+    "w": 8.4,
+    "d": 8.8
+   },
+   "y": 4.0,
+   "type": "shed",
+   "high": "E",
+   "pitch": 8,
+   "overhang": 0.4,
+   "clip": true,
+   "color": "#3a3d42"
+  },
+  {
+   "over": {
+    "x": -8.0,
+    "z": -4.0,
+    "w": 3.0,
+    "d": 3.0
+   },
+   "y": 5.6,
+   "type": "flat",
+   "parapet": 0.35,
+   "trim": "#e9e4da",
+   "color": "#6f7378"
+  },
+  {
+   "over": {
+    "x": -0.3,
+    "z": -3.4,
+    "w": 6.6,
+    "d": 6.8
+   },
+   "y": 4.5,
+   "type": "gable",
+   "ridge": "x",
+   "pitch": 38,
+   "overhang": 0.4,
+   "gableWindow": false,
+   "color": "#3a3d42"
+  }
+ ],
+ "site": [
+  {
+   "type": "driveway",
+   "at": [
+    3.2,
+    6.0
+   ],
+   "w": 3.2,
+   "d": 6
+  },
+  {
+   "type": "path",
+   "path": [
+    [
+     -4,
+     5.8
+    ],
+    [
+     -4,
+     10.5
+    ]
+   ],
+   "w": 1.3
+  },
+  {
+   "type": "tree",
+   "at": [
+    -11,
+    6
+   ],
+   "h": 6
+  }
+ ],
+ "hero": {
+  "level": "l3",
+  "at": [
+   3.0,
+   -2.55
+  ],
+  "rot": 0,
+  "device": "chalk",
+  "surface": "desk"
+ },
+ "entry": {
+  "level": "l2",
+  "side": "S",
+  "at": -4.0,
+  "stoop": {
+   "depth": 1.4,
+   "w": 2.0,
+   "rail": "metal",
+   "material": "stone"
+  }
+ }
+}

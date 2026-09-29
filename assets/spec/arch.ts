@@ -145,8 +145,9 @@ export interface Canopy {
   supports?: 'brackets' | 'posts' | 'none';
 }
 export interface ArchOpening {
-  /** where two perimeter edges on `side` both contain `at`: the edge's line (z for S/N, x for E/W) */
-  line?: number;
+  /** where two perimeter edges on `side` both contain `at`: which one, by its line — z for an S/N wall, x for an E/W
+   *  one (the name is the one the v1 validator already skips its overlap test for) */
+  edgeZ?: number;
   shutters?: Shutters | boolean;
   box?: WindowBox | boolean;
   /** the head's dressing: an arched or segmental trim, a pediment, a keystone, a crown (the hole stays rectangular: S1) */
