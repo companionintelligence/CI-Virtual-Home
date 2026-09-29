@@ -45,6 +45,8 @@ export interface CItem {
   box: Obb; clear: Obb[]; walk: Obb[];     // the body, and floor it needs kept free (its front; a bed's sides)
   gid: number; opt?: boolean; base?: CItem; tucks?: boolean; access?: Array<[number, number]>;
   pin?: boolean; obstacle?: boolean;
+  /** a run unit whose front is a peninsula's bar (assets/room-units.ts): no aisle in front of it */
+  peninsulaEnd?: boolean;
 }
 export const layerOf = (type: string): Layer => {
   const pl = PLACEMENT[type], def = PROPS.get(type);
@@ -85,6 +87,9 @@ const REPEATS = new Set(['rug', 'lamp', 'fitted', 'appliance', 'lighting', 'chai
 /** how much a house takes to a type, 0..1: a stable hash of (house, type), the same in every room and every role */
 const affinity = (seed: string, type: string): number => (fnv1a(`${seed}:likes:${type}`) >>> 0) / 4294967296;
 
+/** the programs whose furniture takes a named style's colours (bedrooms always do, from their own palettes) */
+const LIVED_IN = new Set(['living', 'den', 'media', 'dining', 'kitchen-dining', 'study', 'library', 'sunroom', 'foyer']);
+
 // role → the types that can fill it, sorted (built once)
 const ROLE_TYPES = new Map<string, string[]>();
 function typesFor(role: string): string[] {
@@ -116,6 +121,7 @@ export class Composer {
     this.laneW = this.baseLaneW;
     // what the room's own geometry (stairs, voids, pins) already fails, at that width: a placement may not add to it
     this.baseFailed = new Set(lanesOk(this.geo, laneGrid(this.geo, this.blockers()), this.laneW).failed);
+    if (this.laneW > 0.8) for (const f of lanesOk(this.geo, laneGrid(this.geo, this.blockers()), 0.8).failed) this.baseFailed.add(f);
   }
 
   // ---- sizes, types, colours
@@ -126,7 +132,9 @@ export class Composer {
     const tags = this.style.tags, key = this.style.key;
     // the types the room's program allows, then those that also fit this particular call (its `fit` and `exclude`)
     const allowed = typesFor(role).filter(t => { const p = PLACEMENT[t]; return !p.programs.length || p.programs.includes(program); });
-    const cands = allowed.filter(t => !exclude.includes(t) && (!fit || fit(t)));
+    let cands = allowed.filter(t => !exclude.includes(t) && (!fit || fit(t)));
+    // a group that could not be placed is made again with other pieces: what its last try picked is set aside
+    if (this.avoid.size) { const rest = cands.filter(t => !this.avoid.has(t)); if (rest.length) cands = rest; }
     if (!cands.length) return null;
     const styleW = (t: string) => { const st = PLACEMENT[t].styles; return !st.length ? 0.7 : st.includes(key) ? 3 : st.some(s => tags.includes(s)) ? 1.6 : 0.35; };
     // the house's own picks for this role — one lamp, one dresser, a couple of plants: a house reads as one scheme and
@@ -141,7 +149,7 @@ export class Composer {
       // holds a mix), so no type is in more than about half the houses
       const n = PREFER_N[role] ?? (allowed.length <= 5 ? 1 : allowed.length <= 10 ? 2 : 3);
       for (let k = 0; k < n && pref.length < allowed.length; k++) {
-        const pool = allowed.filter(t => !pref!.includes(t)), ws = pool.map(t => styleW(t) * (this.house.prefAny.has(t) ? 20 : 1)), sum = ws.reduce((a, b) => a + b, 0); let x = r() * sum;
+        const pool = allowed.filter(t => !pref!.includes(t)), ws = pool.map(t => styleW(t) * (this.house.prefAny.has(t) ? 12 : 1)), sum = ws.reduce((a, b) => a + b, 0); let x = r() * sum;
         for (let i = 0; i < pool.length; i++) { x -= ws[i]; if (x <= 0) { pref.push(pool[i]); this.house.prefAny.add(pool[i]); break; } }
       }
       this.house.prefer.set(pk, pref);
@@ -154,12 +162,13 @@ export class Composer {
       const fade = repeats ? 1 : Math.pow(0.6, used) * Math.pow(0.5, onStorey);
       // no pick of the house's is possible here (the call's `fit` rules them out): lean on the types the house likes best
       // — a stable, house-wide ranking of every type — rather than on chance
-      const own = pref!.includes(t) ? 1 : ownOnly ? 0.02 : (this.house.prefAny.has(t) ? 20 : 1) * (0.03 + affinity(this.house.seed, t) ** 3);
+      const own = pref!.includes(t) ? 1 : ownOnly ? 0.02 : (this.house.prefAny.has(t) ? 12 : 1) * (0.03 + affinity(this.house.seed, t) ** 3);
       return styleW(t) * own * fade * (weights[t] ?? 1);
     });
-    const sum = w.reduce((a, b) => a + b, 0); let r = this.rng() * sum;
-    for (let i = 0; i < cands.length; i++) { r -= w[i]; if (r <= 0) return cands[i]; }
-    return cands[cands.length - 1];
+    const sum = w.reduce((a, b) => a + b, 0); let r = this.rng() * sum, got = cands[cands.length - 1];
+    for (let i = 0; i < cands.length; i++) { r -= w[i]; if (r <= 0) { got = cands[i]; break; } }
+    this.pickLog.push(got);
+    return got;
   }
   /** the colour a room's palette gives an item of this type (null: the house kit themes it) */
   colourFor(type: string): string | null {
@@ -209,19 +218,22 @@ export class Composer {
     const g = this.geo, no = (why: string) => { this.why = `${it.type}: ${why}`; return false; };
     if (it.layer === 'ceiling' || it.layer === 'surface') return true;
     if (it.layer !== 'wall' && !insideRoom(g, it.box, 0.012)) return no('outside the room');
-    for (const c of it.clear) if (!insideRoom(g, c, 0.05, 1.5)) return no('its clearance leaves the room');
-    for (const c of it.walk) if (!insideRoom(g, c, 0.05, 1.5)) return no('its walkway leaves the room');
+    // (a piece placed on looser terms may have its aisle run out through the room's open side or a door: a WC has to)
+    if (!this.relaxed) {
+      for (const c of it.clear) if (!insideRoom(g, c, 0.05, 1.5)) return no('its clearance leaves the room');
+      for (const c of it.walk) if (!insideRoom(g, c, 0.05, 1.5)) return no('its walkway leaves the room');
+    }
     const solid = it.layer === 'body' && it.h > 0.12, grp = PLACEMENT[it.type]?.group;
     if (solid) {
       for (const o of g.obstacles) if (overlap(it.box, o) > 0.005) return no('on an obstacle');
-      for (const o of g.keepouts) if (overlap(it.box, o) > 0.005) return no('in a keep-out');
+      for (const o of g.keepouts) if (overlap(it.box, o) > 0.005 && !(this.relaxed && g.soft.includes(o))) return no('in a keep-out');
       // a plant or a lamp by the glass is fine; a bed under a window is the bed group's penalty, not a veto (plan S3:
       // "not under a window unless unavoidable")
-      if (grp !== 'plant' && grp !== 'lamp' && grp !== 'bed' && !this.clearOfWindows(it)) return no('in front of a window');
+      if (grp !== 'plant' && grp !== 'lamp' && grp !== 'bed' && !(this.relaxed && (grp === 'appliance' || grp === 'fitted')) && !this.clearOfWindows(it)) return no('in front of a window');
     }
     if (it.layer === 'floor') { for (const o of g.obstacles) if (overlap(it.box, o) > 0.05) return no('rug on an obstacle'); }
     if (it.layer === 'wall' && !this.clearOfWindows(it)) return no('hung over a window');
-    for (const c of [...it.clear, ...it.walk]) { for (const o of g.obstacles) if (overlap(c, o) > 0.02) return no('clearance on an obstacle'); }
+    if (!this.relaxed) for (const c of [...it.clear, ...it.walk]) { for (const o of g.obstacles) if (overlap(c, o) > 0.02) return no('clearance on an obstacle'); }
     const others = [...this.placed, ...mine];
     for (const o of others) {
       if (o === it) continue;
@@ -232,6 +244,14 @@ export class Composer {
   }
   why = '';
   whys: Record<string, Record<string, number>> = {};
+  /** what pick() returned since the group in hand was started, and the types set aside after a failed try of it */
+  pickLog: string[] = []; avoid = new Set<string>();
+  /** which try of the group in hand this is (0 first): a later try is a smaller, plainer version of it */
+  attempt = 0;
+  /** how much smaller a group built on this try is (0 on the first two, then 12 % a try) */
+  get shrink() { return this.attempt >= 2 ? (this.attempt - 1) * 0.12 : 0; }
+  /** a group that has failed twice is placed on looser terms: its aisles may lie across an obstacle, a fridge may stand in front of a glass wall */
+  get relaxed() { return this.attempt >= 2; }
   compatible(a: CItem, b: CItem, same: boolean): boolean {
     if (a.layer === 'ceiling' || b.layer === 'ceiling' || a.layer === 'surface' || b.layer === 'surface') return true;
     if (a.layer === 'floor' || b.layer === 'floor') {
@@ -275,8 +295,12 @@ export class Composer {
   access(extra: CItem[] = []) { return [...this.placed, ...extra].flatMap(it => (it.pin ? [] : it.access || [])); }
   baseFailed = new Set<string>();
   lanes(W = this.laneW, extra: CItem[] = []) {
-    const r = lanesOk(this.geo, laneGrid(this.geo, this.blockers(extra)), W, this.access(extra));
-    if (W === this.laneW && this.baseFailed.size) { r.failed = r.failed.filter(f => !this.baseFailed.has(f)); r.ok = !r.failed.length; }
+    const grid = laneGrid(this.geo, this.blockers(extra)), acc = this.access(extra);
+    const r = lanesOk(this.geo, grid, W, acc);
+    // the lint holds every room to 0.8 m whatever the composer aims for: a wider aim must pass at 0.8 too
+    if (W > 0.8) for (const f of lanesOk(this.geo, grid, 0.8, acc).failed) if (!r.failed.includes(f)) r.failed.push(f);
+    if (W === this.laneW && this.baseFailed.size) r.failed = r.failed.filter(f => !this.baseFailed.has(f));
+    r.ok = !r.failed.length;
     return r;
   }
 
@@ -565,10 +589,10 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
   // a sectional by the room's size: the modular (compact), the L, and in a big room the U (the page's plain `sectional`
   // builder is left to hand-authored rooms: it has no size or hand)
   const uRoom = width >= 5.4 && depth >= 5.2 && g.area >= 30;
-  let sofa = roomy && big && c.rng() < 0.5 ? c.pick('sofa-l', { fit: t => t !== 'sectional' && (t !== 'u-sectional' || uRoom) }) : null;
+  let sofa = roomy && big && c.attempt === 0 && c.rng() < 0.5 ? c.pick('sofa-l', { fit: t => t !== 'sectional' && (t !== 'u-sectional' || uRoom) }) : null;
   if (!sofa) sofa = c.pick('sofa', { fit: t => (c.size(t).w <= width - 0.8) });
   if (!sofa) return null;
-  const sw = Math.min(sofa === 'loveseat' ? (width >= 3.4 ? 2.0 : 1.6) : c.size(sofa).w, width - 1.0);
+  const sw = mm(Math.min(sofa === 'loveseat' ? (width >= 3.4 ? 2.0 : 1.6) : c.size(sofa).w, width - 1.0) * (1 - c.shrink));
   const sParams: any = paramsOf(sofa).includes('w') ? { w: mm(sw) } : {};
   const isU = sofa === 'u-sectional', isL = PLACEMENT[sofa].roles.includes('sofa-l') && !isU;
   if (isL || isU) { sParams.w = mm(Math.min(isU ? 3.8 : 3.0, width - 1.2)); sParams.l = mm(Math.min(isU ? 2.0 : 1.9, depth - 2.6)); if (isL) sParams.hand = c.rng() < 0.5 ? 'left' : 'right'; }
@@ -586,6 +610,9 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
   const oppFace = (() => { const r = c.runAt(OPPOSITE[fc.side]); return r ? Math.abs(r.face - face) : Infinity; })();   // chairs turn to the sofa (conversation) or to the focus (a screen, a view)
   const lampOn = c.density >= 0.3;
   const Ds: number[] = []; for (let D = 1.6; D <= 3.4 + 1e-6; D += 0.1) Ds.push(mm(D));
+  // how far from the focus the sofa likes to stand and how far off its middle: a room's own taste, so two rooms of one
+  // size do not come out as one
+  const dT = 2.3 + c.rng() * 0.9, oT = (c.rng() - 0.5) * 0.9;
   const cands: Pose[] = [];
   const oLo = lat[0] + S.w / 2 + 0.05 - fc.t, oHi = lat[1] - S.w / 2 - 0.05 - fc.t;
   for (const D of Ds) for (let o = Math.ceil(oLo * 10) / 10; o <= oHi + 1e-6; o += 0.1) {
@@ -632,7 +659,7 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
       return out;
     },
     score: (p, items) => {
-      let v = -Math.abs(p.D - 2.7) * 1.2 - Math.abs(p.o) * 0.8 - (p.D < 2.2 ? 0.8 : 0);
+      let v = -Math.abs(p.D - dT) * 1.2 - Math.abs(p.o - oT) * 0.8 - (p.D < 2.2 ? 0.8 : 0);
       const backGap = depth - (p.D + S.d);
       if (backGap < 0.12) v += 0.5; else if (backGap < 0.85) v -= 1.2;
       v += items.filter(i => PLACEMENT[i.type]?.group === 'seating').length * 0.25 + items.length * 0.05;
@@ -651,14 +678,17 @@ function diningGroup(c: C, region: { x0: number; z0: number; x1: number; z1: num
   const isRound = PLACEMENT[type].roles.includes('dining-table-round') && (type === 'round-dining-table' || type === 'pedestal-dining-table');
   const chair = c.pick('dining-chair') || 'dining-chair';
   let tp: any, L: number, Wd: number;
-  if (isRound) { const r = mm(Math.max(0.5, Math.min(0.75, (short - 2.4) / 2 + 0.5))); tp = { r }; L = Wd = 2 * r; }
-  else { L = mm(Math.max(1.2, Math.min(2.6, Math.round((long - 2.5) * 10) / 10))); Wd = mm(Math.max(0.8, Math.min(1.0, short - 2.4))); tp = { w: L, d: Wd }; }
+  // a retry (the room is tight) is a smaller table
+  const k = 1 - c.shrink;
+  if (isRound) { const r = mm(Math.max(0.45, Math.min(0.75, (short - 2.4) / 2 + 0.5) * k)); tp = { r }; L = Wd = 2 * r; }
+  else { L = mm(Math.max(1.1, Math.min(2.6, Math.round((long - 2.5) * 10) / 10) * k)); Wd = mm(Math.max(0.7, Math.min(1.0, short - 2.4) * k)); tp = { w: L, d: Wd }; }
   const colour = c.colourFor(type); if (colour) tp.color = colour;
   const rot = isRound ? 0 : (along ? 0 : 90);
   const perSide = isRound ? 0 : Math.max(1, Math.min(4, Math.floor((L - 0.1) / 0.62))), ends = !isRound && long - L >= 2 * 1.3 && L >= 1.5;
   const nRound = isRound ? (L >= 1.3 ? 6 : L >= 1.1 ? 4 : 3) : 0;
   const main = c.mainPortal();
-  const cands = c.floorPoses(0.1, 0.9).filter(p => p.x >= R.x0 + 0.9 && p.x <= R.x1 - 0.9 && p.z >= R.z0 + 0.9 && p.z <= R.z1 - 0.9);
+  const mg = 0.9 - c.shrink * 0.8;
+  const cands = c.floorPoses(0.1, mg).filter(p => p.x >= R.x0 + mg && p.x <= R.x1 - mg && p.z >= R.z0 + mg && p.z <= R.z1 - mg);
   const hung = c.style.tags.some(t => ['farmhouse', 'cottage', 'mediterranean', 'craftsman', 'traditional'].includes(t)) && c.rng() < 0.6 ? 'chandelier' : 'pendant-lamp';
   return {
     name: 'dining', gid: 0, movable: true, anneal: true, cands,
@@ -675,7 +705,7 @@ function diningGroup(c: C, region: { x0: number; z0: number; x1: number; z1: num
         if (ends) { const e1 = chairAt(-(L / 2 + 0.22), 0, mm(rot + 90)), e2 = chairAt(L / 2 + 0.22, 0, mm(rot + 270)); e1.opt = e2.opt = true; out.push(e1, e2); }
       }
       // 0.6 m behind every chair, to pull it out (the plan's 0.9 where the room allows: the score)
-      for (const ch of out.slice(1)) { const [bx, bz] = turn(0, -(0.25 + 0.3), ch.rot); ch.walk.push(obb(ch.cx + bx, ch.cz + bz, 0.5, 0.6, ch.rot)); }
+      { const back = 0.6 - c.shrink * 1.2; for (const ch of out.slice(1)) { const [bx, bz] = turn(0, -(0.25 + back / 2), ch.rot); ch.walk.push(obb(ch.cx + bx, ch.cz + bz, 0.5, back, ch.rot)); } }
       if (c.density >= 0.35) out.push(rug(c, p.x, p.z, isRound ? L + 1.4 : L + 1.3, isRound ? L + 1.4 : Wd + 1.4, rot, { round: isRound && c.rng() < 0.6 }));
       // light over the table (fixtures.ts leaves a table that has one alone)
       if ((c.lv.height || 2.7) >= 2.5) {
@@ -877,10 +907,13 @@ function program(c: C): Array<(attempt: number) => Group | null> {
   const plants = (n: number) => Array.from({ length: n }, () => () => plantGroup(c));
   switch (P) {
     case 'living': case 'den': case 'media': {
-      const prefer = P === 'media' || P === 'den' ? 'tv' : g.windows.some(w => w.type !== 'window' && w.b - w.a >= 2) ? 'view' : c.rng() < 0.55 ? 'tv' : 'art';
+      // what the seating faces: a screen in a den or media room; else the glass when the room is mostly glass; else by style —
+      // a hearth (or a picture wall) in the traditional styles, a screen or a picture wall in the modern ones
+      const trad = c.style.tags.some(t => ['farmhouse', 'cottage', 'craftsman', 'mediterranean', 'traditional'].includes(t));
+      const prefer = P === 'media' || P === 'den' ? 'tv' : g.windows.some(w => w.type !== 'window' && w.b - w.a >= 2) ? 'view' : trad ? (c.rng() < 0.6 ? 'fireplace' : 'art') : c.rng() < 0.6 ? 'tv' : 'art';
       const foci = chooseFoci(c, prefer);
       const list: Array<(attempt: number) => Group | null> = [];
-      if (foci.length) list.push(k => (foci[k] ? loungeGroup(c, foci[k]) : null));
+      if (foci.length) list.push(k => { const f = foci[k % 2] || foci[0]; return f ? loungeGroup(c, f) : null; });
       if (P === 'living' && g.area >= 28 && d >= 0.55 && c.rng() < 0.35) list.push(() => { const t = c.style.tags.some(s => ['modern', 'industrial'].includes(s)) ? 'grand-piano' : (c.rng() < 0.5 ? 'grand-piano' : 'upright-piano'); return t === 'grand-piano' ? freeGroup(c, t) : wallGroup(c, 'piano', t, {}); });
       if (d >= 0.4) list.push(() => storageGroup(c, 'bookcase', { dress: false }));
       if (d >= 0.65 && big) list.push(() => storageGroup(c, P === 'living' ? 'sideboard' : 'bookcase'));
@@ -894,7 +927,7 @@ function program(c: C): Array<(attempt: number) => Group | null> {
       const n = Math.max(2, Math.min(4, Math.floor(g.runs.reduce((a, r) => a + r.b - r.a, 0) / 4)));
       const list: Array<(attempt: number) => Group | null> = Array.from({ length: n }, () => (k: number) => bookcaseRun(c, Math.max(2, 4 - k)));
       list.unshift(() => readingCorner(c));
-      if (foci.length && g.area >= 14) list.unshift(k => (foci[k] ? loungeGroup(c, foci[k], { big: false }) : null));
+      if (foci.length && g.area >= 14) list.unshift(k => { const f = foci[k % 2] || foci[0]; return f ? loungeGroup(c, f, { big: false }) : null; });
       if (d >= 0.5) list.push(() => deskGroup(c));
       list.push(() => floorLampGroup(c), ...plants(1));
       return list;
@@ -937,7 +970,7 @@ function program(c: C): Array<(attempt: number) => Group | null> {
       const list: Array<(attempt: number) => Group | null> = [];
       if (P === 'greenhouse') list.push(() => wallGroup(c, 'potting', 'potting-bench', {}));
       list.push(() => readingCorner(c), () => (g.area >= 10 ? readingCorner(c) : null), ...plants(P === 'greenhouse' ? 4 : 3));
-      if (P === 'sunroom' && g.area >= 12) list.push(k => { const fc = chooseFoci(c, 'view')[k]; return fc ? loungeGroup(c, fc, { big: false }) : null; });
+      if (P === 'sunroom' && g.area >= 12) list.push(k => { const fs = chooseFoci(c, 'view'), fc = fs[k % 2] || fs[0]; return fc ? loungeGroup(c, fc, { big: false }) : null; });
       return list;
     }
     case 'outdoor': return g.area >= 5 ? [() => freeGroup(c, c.rng() < 0.5 ? 'patio-set' : 'outdoor-sofa'), () => (g.area >= 9 ? freeGroup(c, 'fire-bowl') : null)] : [];
@@ -994,19 +1027,31 @@ export function composeRoom(spec: any, lv: any, room: any, house: HouseState, co
     const accent = c.style.accent[Math.floor(c.rng() * c.style.accent.length)];
     c.palette = { fabric, accent };
     house.palettes.push(fabric);
+  } else if (!c.palette && (room.style || spec.styleKey) && LIVED_IN.has(c.program)) {
+    // an author who names a style gets its colours: the lived-in rooms take a fabric, a wood and an accent from the
+    // style's palette (a house with no style named keeps the kit's scheme, harmonised with its own palette)
+    const free = c.style.fabric.filter(f => !house.palettes.includes(f)), pool = free.length ? free : c.style.fabric;
+    const pick = (a: string[]) => a[Math.floor(c.rng() * a.length)];
+    const fabric = pick(pool);
+    c.palette = { fabric, wood: pick(c.style.wood), accent: pick(c.style.accent) };
+    house.palettes.push(fabric);
   }
   const dropped: string[] = [];
   for (const make of program(c)) {
-    // a group that cannot be placed is made again (its type is a seeded pick: the next may fit; a lounge tries its next
-    // focus wall), twice at most
+    // a group that cannot be placed is made again (a lounge tries its next focus wall, and every piece its last try
+    // picked is set aside, so the next try reaches for others rather than the house's favourite again), twice at most
     let name = '';
-    for (let attempt = 0; attempt < 3; attempt++) {
+    c.avoid = new Set();
+    for (let attempt = 0; attempt < 4; attempt++) {
+      c.attempt = attempt; c.pickLog = [];
       const g = make(attempt); if (!g) { name = name && attempt ? name : ''; break; }
       name = g.name;
       if (g.cands.length && c.place(g)) { name = ''; break; }
+      for (const t of c.pickLog) c.avoid.add(t);
     }
     if (name) dropped.push(name);
   }
+  c.avoid = new Set(); c.attempt = 0;
   c.anneal(400);
   // the report: the lanes at the room's width (0.9 m where it has 3 m to give, else 0.8) and anything its geometry
   // alone already blocks (a stair across a landing), which no composition can open

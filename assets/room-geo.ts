@@ -115,6 +115,7 @@ export interface Geo {
   portals: Portal[]; windows: Array<Win & { side: Side; line: number }>;
   obstacles: Obb[];            // solid things on the floor that are not items (stairs, voids, partitions, the hero)
   keepouts: Obb[];             // floor that must stay clear of furniture (door swings, stair run-in, hero approach)
+  soft: Obb[];                 // the keep-outs a piece placed on looser terms may cross (the hero's approach: the camera routes round furniture)
   heroHere: boolean;
   area: number;
 }
@@ -139,7 +140,7 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
   const lineOf: Record<Side, number> = { N: b.z, S: b.z + b.d, W: b.x, E: b.x + b.w };
   const spanOf = (s: Side): [number, number] => (alongX(s) ? [b.x, b.x + b.w] : [b.z, b.z + b.d]);
   const runs: Run[] = [], walled: any = { N: [], S: [], W: [], E: [] }, open: any[] = [], portals: Portal[] = [], windows: any[] = [];
-  const obstacles: Obb[] = [], keepouts: Obb[] = [];
+  const obstacles: Obb[] = [], keepouts: Obb[] = [], soft: Obb[] = [];
   const entry = spec.entry && spec.entry.level === lv.id ? spec.entry : null;
   for (const side of SIDES) {
     const [lo, hi] = spanOf(side), ln = lineOf[side];
@@ -241,7 +242,8 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
     const back = surf === 'shelf' ? -0.4 + 0.13 : 0, cx = hx + fwd[0] * back, cz = hz + fwd[1] * back;
     obstacles.push(obb(cx, cz, dims[0], dims[1], h.rot || 0));
     const reach = surf === 'desk' ? 0.75 : 0.35;   // the task chair sits at 0.8 in front of the desk
-    keepouts.push(obb(cx + fwd[0] * (dims[1] / 2 + reach + 0.2 + 1.0), cz + fwd[1] * (dims[1] / 2 + reach + 0.2 + 1.0), 1.4, 2.0 + reach * 0.5, h.rot || 0));
+    const approach = obb(cx + fwd[0] * (dims[1] / 2 + reach + 0.2 + 1.0), cz + fwd[1] * (dims[1] / 2 + reach + 0.2 + 1.0), 1.4, 2.0 + reach * 0.5, h.rot || 0);
+    keepouts.push(approach); soft.push(approach);
     if (surf === 'desk') obstacles.push(obb(hx + fwd[0] * 0.8, hz + fwd[1] * 0.8, 0.6, 0.6, h.rot || 0));
     heroHere = hx > b.x - 0.3 && hx < b.x + b.w + 0.3 && hz > b.z - 0.3 && hz < b.z + b.d + 0.3;
   }
@@ -252,7 +254,7 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
     if (Array.isArray(f.from) && Array.isArray(f.to)) { const dep = f.depth || 0.4, px = Math.abs(f.from[1] - f.to[1]) < 1e-6; obstacles.push(px ? rectObb(Math.min(f.from[0], f.to[0]), f.from[1] - dep / 2, Math.max(f.from[0], f.to[0]), f.from[1] + dep / 2) : rectObb(f.from[0] - dep / 2, Math.min(f.from[1], f.to[1]), f.from[0] + dep / 2, Math.max(f.from[1], f.to[1]))); }
     else if (Array.isArray(f.at) && f.type === 'fireplace') obstacles.push(obb(f.at[0], f.at[1], f.w || 1.6, f.d || 0.5, f.rot || 0));
   }
-  return { spec, lv, room, b, runs, walled, open, portals, windows, obstacles, keepouts, heroHere, area: b.w * b.d };
+  return { spec, lv, room, b, runs, walled, open, portals, windows, obstacles, keepouts, soft, heroHere, area: b.w * b.d };
 }
 function ptOn(side: Side, line: number, t: number) { return alongX(side) ? { x: t, z: line } : { x: line, z: t }; }
 

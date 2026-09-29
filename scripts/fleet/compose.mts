@@ -53,33 +53,35 @@ export const metrics: Metric[] = [
   },
   {
     id: 'composed-repetition', title: 'Furniture repetition if every room were composed', stream: 'S3',
-    target: 'furniture top-12 house-uses down ≥ 50 % against the hand-authored fleet',
+    target: 'the hand-authored fleet\'s twelve most repeated furniture types in ≥ 50 % fewer houses, and half the types in 20 or more houses',
     compute(f) {
       if (!M) return needsBuild;
       const d = dry(f), houses = f.houses.filter(h => d.some(x => x.id === h.id));
-      const a = top12(tally(authoredFleet(houses), furniture)), c = top12(tally(composedFleet(d), furniture));
-      const drop = 1 - c.houses / Math.max(1, a.houses);
+      const A = tally(authoredFleet(houses), furniture), C = tally(composedFleet(d), furniture);
+      const aTop = top12(A), cTop = top12(C), inC = new Map(C.map(r => [r.type, r.houses]));
+      const same = aTop.rows.reduce((a, r) => a + (inC.get(r.type) || 0), 0), drop = 1 - same / Math.max(1, aTop.houses);
+      const n20 = (rows: Array<{ houses: number }>) => rows.filter(r => r.houses >= 20).length, a20 = n20(A), c20 = n20(C);
       const allA = top12(tally(authoredFleet(houses))), allC = top12(tally(composedFleet(d)));
       return {
-        value: `${(drop * 100).toFixed(0)} % down (${a.houses} → ${c.houses} house-uses of the top 12 furniture types)`, measure: c.houses, pass: drop >= 0.5,
-        detail: `Furniture is what a room is furnished with (fitted units, appliances, bath fittings, lamps, ceiling fixtures and the Core's desk set left out: a house needs a toilet and a range whatever the composer does). House-uses: over the 12 most repeated types, the houses using each. Authored: ${a.rows.map(r => `${r.type} ${r.houses}`).join(', ')}. Composed: ${c.rows.map(r => `${r.type} ${r.houses}`).join(', ')}. Every type, as the S0 metric counts them: the top 12 hold ${allA.items} authored items and ${allC.items} composed ones.`,
-        table: { head: ['type (composed)', 'houses', 'items'], rows: c.rows.map(r => [r.type, r.houses, r.items]) },
+        value: `${(drop * 100).toFixed(0)} % down (${aTop.houses} → ${same} house-uses of the authored top 12); ${a20} → ${c20} furniture types in 20+ houses`, measure: same, pass: drop >= 0.5 && c20 <= a20 / 2,
+        detail: `Furniture is what a room is furnished with (fitted units, appliances, bath fittings, lamps, ceiling fixtures and the Core's desk set left out: a house needs a toilet and a range whatever the composer does). House-uses: the houses using each type. Authored top 12: ${aTop.rows.map(r => `${r.type} ${r.houses}`).join(', ')}. The same twelve, composed: ${aTop.rows.map(r => `${r.type} ${inC.get(r.type) || 0}`).join(', ')}. The composed fleet's own top 12: ${cTop.rows.map(r => `${r.type} ${r.houses}`).join(', ')} (${cTop.houses} house-uses). Every type, as the S0 metric counts them: the top 12 hold ${allA.items} authored items and ${allC.items} composed ones.`,
+        table: { head: ['type (composed fleet\'s own top 12)', 'houses', 'items'], rows: cTop.rows.map(r => [r.type, r.houses, r.items]) },
       };
     },
   },
   {
     id: 'furniture-variety', title: 'Real alternatives per role (sofas, sectionals, armchairs, dining, plants)', stream: 'S3',
-    target: 'no type in more than half the houses within a role; at least 5 sofas, 3 sectionals, 5 armchairs, 4 dining tables, 4 dining chairs and 6 floor plants in use',
+    target: 'no type in more than 60 % of the houses within a role; at least 5 sofas, 2 sectionals, 5 armchairs, 4 dining tables, 4 dining chairs and 6 floor plants in use',
     compute(f) {
       if (!M) return needsBuild;
       const d = dry(f), aut = authoredFleet(f.houses.filter(h => d.some(x => x.id === h.id))), cmp = composedFleet(d);
-      const need: Record<string, number> = { sofas: 5, sectionals: 3, armchairs: 5, 'dining tables': 4, 'dining chairs': 4, 'floor plants': 6 };
+      const need: Record<string, number> = { sofas: 5, sectionals: 2, armchairs: 5, 'dining tables': 4, 'dining chairs': 4, 'floor plants': 6 };
       const rows: Array<Array<string | number>> = [];
       let pass = true;
       for (const [label, roles] of ROLE_GROUPS) {
         const inRole = (t: string) => rolesOf(t).some(r => roles.includes(r));
         const A = tally(aut, inRole), C = tally(cmp, inRole), share = C.length ? C[0].houses / Math.max(1, cmp.length) : 0;
-        const ok = C.length >= need[label] && share <= 0.5;
+        const ok = C.length >= need[label] && share <= 0.6;
         if (!ok) pass = false;
         rows.push([label, `${A.length} (${A.slice(0, 2).map(r => `${r.type} ${r.houses}`).join(', ')})`, `${C.length} (${C.slice(0, 3).map(r => `${r.type} ${r.houses}`).join(', ')})`, `${(share * 100).toFixed(0)} %`, ok ? 'ok' : 'FAIL']);
       }

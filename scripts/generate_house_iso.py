@@ -1163,11 +1163,26 @@ class HouseRenderer:
             add_line(self.ctx, it, tip, (tip[0], tip[1] - 0.9 * self.ctx.s), "#334155", sw=1.0, detail=True)
 
     # -- rooms & furniture --
+    # ---- composed rooms (plan S3): a room with a `program` is furnished at build time (assets/room-composer.ts), so its
+    # items are not in the spec; <id>.plan.json's `compose` key (assets/plan-export/compose.ts) carries them, and the twin
+    # draws them beside the authored ones. Absent for a house that composes nothing (all 30 real specs today).
+    def composed_items(self, lv, room):
+        if not hasattr(self, "_compose"):
+            self._compose = {}
+            pp = HOUSES_DIR / f"{self.spec.get('id')}.plan.json"
+            if pp.exists():
+                try:
+                    for r in ((json.loads(pp.read_text()).get("compose") or {}).get("rooms") or []):
+                        self._compose[(r.get("level"), r.get("name"))] = r.get("items") or []
+                except Exception:
+                    pass
+        return self._compose.get((lv["id"], room.get("name")), [])
+
     def draw_rooms(self, lv):
         hero = self.spec.get("hero", {})
         hero_here = hero.get("level") == lv["id"]
         for room in lv.get("rooms", []):
-            for it_ in room.get("items", []):
+            for it_ in list(room.get("items", [])) + self.composed_items(lv, room):
                 t = it_.get("type")
                 if hero_here and hero.get("surface", "desk") == "desk" and t in ("walnut-desk", "task-chair", "curved-monitor", "chalk-tower", "charcoal-tower", "strix-mini", "speakers"):
                     if math.hypot(it_["at"][0] - hero["at"][0], it_["at"][1] - hero["at"][1]) < 1.3:

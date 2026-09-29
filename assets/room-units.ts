@@ -14,9 +14,12 @@
 //
 // Owner: S3 (compose).
 import { PLACEMENT } from './props/placement.js';
-import { INWARD, OPPOSITE, ROT_OF_WALL, alongX, mm, obb, turn, aabb, paramsOf, type Run, type Side } from './room-geo.js';
+import { INWARD, OPPOSITE, ROT_OF_WALL, alongX, mm, obb, turn, aabb, paramsOf, rotToward, type Run, type Side } from './room-geo.js';
 import { wallGroup, cornerGroup, type Composer, type CItem, type Group, type Pose } from './room-composer.js';
 
+const GAP = 0.015;         // an item's back off the wall face
+const PEN = 1.15;          // a run that carries a peninsula stops this short of its wall: the bar's stools and a lane past them
+const PEN_D = 0.95;        // the peninsula bar's depth
 const DEPTH = 0.64;        // a base unit's depth off the wall (0.62, and a hair)
 const AISLE = 1.05;        // the working aisle in front of a run (1.0–1.2)
 const TRAD = ['farmhouse', 'cottage', 'craftsman', 'traditional', 'mediterranean'];
@@ -101,7 +104,7 @@ function packLeg(lg: Leg, fixed: Array<{ type: string; w: number; t: number; par
   return filled;
 }
 
-export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { dining?: boolean; diningGroup: (r: any) => Group | null }): Array<() => Group | null> {
+export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { dining?: boolean; diningGroup: (r: any) => Group | null }): Array<(attempt?: number) => Group | null> {
   const plan = c.room.kitchen || {};
   const cab = plan.color || null, top = plan.top || (c.rng() < 0.6 ? c.style.finish.kitchenTop : undefined);
   const glassUppers = plan.glassUppers ?? (c.style.tags.some(t => ['farmhouse', 'scandi', 'cottage'].includes(t)) && c.rng() < 0.35);
@@ -113,13 +116,27 @@ export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { di
     if (!ls.length) return null;
     // each layout in its variants: which leg takes the sink, the range and the fridge, and which end the fridge takes
     const cands: Pose[] = [];
+    // a peninsula plan: the layout's runs are also tried with one open end held back, so a bar can come off it
+    const wantPen = !!plan.peninsula && !plan.island;
+    const variants: Array<{ l: Layout; pe: { li: number; end: number } | null }> = [];
     for (const l of ls) {
+      if (!wantPen) { variants.push({ l, pe: null }); continue; }
+      l.legs.forEach((lg, li) => {
+        for (const end of [0, 1]) {
+          if (end ? lg.corner1 : lg.corner0) continue;
+          const s0 = end ? lg.s0 : Math.max(lg.s0, lg.run.a + PEN), s1 = end ? Math.min(lg.s1, lg.run.b - PEN) : lg.s1;
+          if (s1 - s0 < 1.6) continue;
+          variants.push({ l: { ...l, key: `${l.key}:pe${li}${end}`, legs: l.legs.map((g, i) => (i === li ? { ...g, s0, s1 } : g)) }, pe: { li, end } });
+        }
+      });
+    }
+    for (const { l, pe } of variants) {
       const n = l.legs.length;
       for (let si = 0; si < n; si++) for (let ri = 0; ri < n; ri++) for (let fi = 0; fi < n; fi++) for (const fe of [0, 1]) {
         if (n > 1 && ri === si && l.legs.length > 1 && fi !== si && fi !== ri) continue;
         if (n === 3 && (si === ri || ri === fi || si === fi)) continue;
         if (n === 2 && si === ri) continue;
-        cands.push({ key: `${l.key}:s${si}r${ri}f${fi}e${fe}`, l, si, ri, fi, fe });
+        cands.push({ key: `${l.key}:s${si}r${ri}f${fi}e${fe}`, l, si, ri, fi, fe, pe });
       }
     }
     return {
@@ -136,6 +153,9 @@ export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { di
         const w = winOf(sinkLeg), sw = compact ? 0.8 : mm(Math.max(1.0, Math.min(1.6, legLen(sinkLeg) * 0.35)));
         const st = w ? (w.a + w.b) / 2 : (sinkLeg.s0 + sinkLeg.s1) / 2;
         plans.get(sinkLeg)!.push({ type: 'sink-run', w: sw, t: st, params: fitted('sink-run', { w: sw }) });
+        // a peninsula's bar hangs off the run's last 0.95 m: a plain cabinet is fixed there, so the sink, range and fridge
+        // are packed round it
+        if (p.pe) { const pl = L.legs[p.pe.li]; plans.get(pl)!.push({ type: 'counter-run', w: PEN_D, t: p.pe.end ? pl.s1 - PEN_D / 2 : pl.s0 + PEN_D / 2, params: fitted('counter-run', { w: PEN_D }) }); }
         // the dishwasher beside the sink, toward the corner (or the leg's start)
         const dwSide = sinkLeg.corner1 ? 1 : -1;
         if (!compact && legLen(sinkLeg) >= sw + 1.2) plans.get(sinkLeg)!.push({ type: 'dishwasher', w: 0.6, t: st + dwSide * (sw / 2 + 0.3) });
@@ -146,7 +166,7 @@ export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { di
         // the fridge at a run END (never a corner end, never in front of a window), a pantry beside it when there is room
         const fw = compact ? 0.6 : 0.9, fEnd = p.fe;
         if (fEnd ? fridgeLeg.corner1 : fridgeLeg.corner0) return null;
-        if (fridgeLeg.run.windows.some(win => fEnd ? win.b > fridgeLeg.s1 - fw - 0.05 : win.a < fridgeLeg.s0 + fw + 0.05)) return null;
+        if (c.attempt < 1 && fridgeLeg.run.windows.some(win => fEnd ? win.b > fridgeLeg.s1 - fw - 0.05 : win.a < fridgeLeg.s0 + fw + 0.05)) return null;
         const ft = fEnd ? fridgeLeg.s1 - fw / 2 : fridgeLeg.s0 + fw / 2;
         plans.get(fridgeLeg)!.push({ type: 'fridge', w: fw, t: ft, tall: true, params: { ...(compact ? { w: 0.6 } : {}), ...(c.rng() < 0.3 ? { finish: 'cabinet' } : {}) } });
         if (c.density >= 0.55 && legLen(fridgeLeg) >= 3.6) plans.get(fridgeLeg)!.push({ type: 'pantry', w: 0.6, t: ft + (fEnd ? -(fw / 2 + 0.3) : fw / 2 + 0.3), tall: true, params: fitted('pantry', { w: 0.6 }) });
@@ -159,6 +179,8 @@ export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { di
           for (const u of packed.get(lg)!) {
             const params = u.type === 'counter-run' ? fitted('counter-run', { w: u.w }) : u.params || {};
             const it = c.onWall(u.type, lg.run, u.t, params); it.access = []; out.push(it);
+            // under the peninsula's bar the run's front is the bar: no aisle to keep there
+            if (p.pe && lg === L.legs[p.pe.li] && Math.abs(u.t - (p.pe.end ? lg.s1 : lg.s0)) < PEN_D / 2 + u.w / 2) { it.clear = []; it.peninsulaEnd = true; }
             if (u.tall || u.type === 'fridge') continue;
             if (ceiling < 2.35) continue;
             const t0 = u.t - u.w / 2, t1 = u.t + u.w / 2;
@@ -176,7 +198,7 @@ export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { di
           out.push(c.item('corner-run', cx, cz, rot, fitted('corner-run', { hand: lx > 0 ? 'left' : 'right' })));
         }
         // the working aisle in front of every leg must stay free (it is the unit's front clearance) and reachable
-        for (const it of out) if (it.layer === 'body' && it.type !== 'corner-run') { const [dx, dz] = turn(0, it.d / 2 + 0.45, it.rot); it.access = [[it.cx + dx, it.cz + dz]]; }
+        for (const it of out) if (it.layer === 'body' && it.type !== 'corner-run' && !it.peninsulaEnd) { const [dx, dz] = turn(0, it.d / 2 + 0.45, it.rot); it.access = [[it.cx + dx, it.cz + dz]]; }
         // a little life on the counters
         const counters = out.filter(it => it.type === 'counter-run');
         if (counters.length) { const k0 = counters[0], t = c.pick('counter-appliance'); if (t) out.push(c.on(t, k0, -k0.w / 2 + 0.3, -0.05)); }
@@ -218,7 +240,7 @@ export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { di
         const cx = alongX(run.side) ? p.t : run.face + nx * off, cz = alongX(run.side) ? run.face + nz * off : p.t;
         const isl = c.item('breakfast-bar', cx, cz, rot, fitted('breakfast-bar', { w: iw, d: id }));
         isl.clear = [];   // its aisles are the legs' front clearances and the stools'
-        const out = [isl], n = Math.max(2, Math.floor((iw - 0.2) / 0.6)), stool = c.pick('stool') || 'bar-stool';
+        const out = [isl], n = Math.max(2, Math.floor((iw - 0.2) / 0.6));
         for (let i = 0; i < n; i++) { const [dx, dz] = turn(-iw / 2 + iw / n * (i + 0.5), id / 2 + 0.12, rot); const s = c.item(stool, cx + dx, cz + dz, rot + 180, {}); s.opt = true; out.push(s); }
         { const t = c.pick('surface-decor-kitchen'); if (t) out.push(c.on(t, isl, iw * 0.25, -0.1)); }
         const [ax, az] = turn(0, id / 2 + 0.75, rot); isl.access = [[cx + ax, cz + az]];
@@ -227,7 +249,38 @@ export function kitchenGroups(c: Composer, { dining = false, diningGroup }: { di
       score: p => -Math.abs(p.t - mid) * 0.5,
     };
   };
-  const list: Array<() => Group | null> = [kitchen, island];
+  // a peninsula: a counter bar off the open end of a run, projecting from the wall into the room, its stools on the
+  // side away from the run
+  const peninsula = (): Group | null => {
+    const k = c.groups.find(g => g.name === 'kitchen'); if (!k || !k.items) return null;
+    const legs: Leg[] = k.pose!.l.legs, cands: Pose[] = [], id = PEN_D;
+    // (only off an end with floor beyond it along the wall: a run that ends at a corner or the room's edge has none)
+    const pe = k.pose!.pe;
+    legs.forEach((lg, li) => { for (const end of [0, 1]) { if (end ? lg.corner1 : lg.corner0) continue; if (pe && (pe.li !== li || pe.end !== end)) continue; if ((end ? lg.run.b - lg.s1 : lg.s0 - lg.run.a) < PEN - 0.05) continue; for (const len of [2.0, 1.6, 1.3]) cands.push({ key: `p${li}:${end}:${len}`, li, end, len }); } });
+    if (!cands.length) return null;
+    return {
+      name: 'peninsula', gid: 0, movable: true, anneal: true, cands,
+      build: p => {
+        const lg: Leg = legs[p.li], run = lg.run, [nx, nz] = INWARD[run.side], along = alongX(run.side), sgn = p.end ? 1 : -1;
+        // the bar hangs off the run's last 0.95 m, from the run's front face out into the room, its stools on the far side
+        const onLeg = k.items!.filter(it => it.layer === 'body' && it.rot === ROT_OF_WALL[run.side]);
+        const deepest = Math.max(DEPTH, ...onLeg.map(it => Math.abs((along ? it.cz : it.cx) - run.face) + it.d / 2));
+        const bt = (p.end ? lg.s1 : lg.s0) - sgn * (id / 2), off = deepest + 0.01 + p.len / 2;
+        const cx = along ? bt : run.face + nx * off, cz = along ? run.face + nz * off : bt;
+        const rot = rotToward(along ? sgn : 0, along ? 0 : sgn);   // its seating side faces along the run, away from it
+        const bar = c.item('breakfast-bar', cx, cz, rot, fitted('breakfast-bar', { w: mm(p.len), d: id })); bar.clear = [];
+        const out = [bar], n = Math.max(2, Math.floor((p.len - 0.2) / 0.6));
+        for (let i = 0; i < n; i++) { const [dx, dz] = turn(-p.len / 2 + p.len / n * (i + 0.5), id / 2 + 0.12, rot); const st = c.item(stool, cx + dx, cz + dz, rot + 180, {}); st.opt = true; out.push(st); }
+        { const t = c.pick('surface-decor-kitchen'); if (t) out.push(c.on(t, bar, p.len * 0.25, -0.1)); }
+        const [ax, az] = turn(0, id / 2 + 0.75, rot); bar.access = [[cx + ax, cz + az]];
+        return out;
+      },
+      score: p => p.len * 0.3 - (legs[p.li].run.windows.length ? 0.2 : 0),
+    };
+  };
+  const stool = c.pick('stool') || 'bar-stool';
+  // (a peninsula the room has no end for is an island: better a bar than none)
+  const list: Array<(attempt?: number) => Group | null> = plan.peninsula && !plan.island ? [kitchen, (attempt = 0) => (attempt === 0 ? peninsula() || island() : island())] : [kitchen, island];
   if (dining) list.push(() => {
     // the dining table in whatever part of the room the kitchen leaves: the biggest rectangle past its aisle
     const kit = c.placed.filter(it => !it.pin && (PLACEMENT[it.type]?.group === 'fitted' || PLACEMENT[it.type]?.group === 'appliance' || it.type === 'bar-stool') && it.layer === 'body');
@@ -252,16 +305,17 @@ export function bathGroups(c: Composer): Array<() => Group | null> {
   const notDoorWall = (p: Pose) => (main && p.run && p.run.side === main.side ? -1 : 0);
   const list: Array<() => Group | null> = [];
   list.push(() => {
+    // (a room that would not take the first sink is given the pedestal one, half the width)
+    const type = c.attempt >= 1 && vanity !== 'double' ? 'pedestal-sink' : vanity === 'double' ? 'double-vanity' : vanity === 'pedestal' ? 'pedestal-sink' : (c.pick('vanity', { fit: t => t !== 'pedestal-sink' }) || 'vanity-sink');
+    const g = wallGroup(c, 'vanity', type, {}, { score: (p, it) => notDoorWall(p) * 1.5 - (p.run.windows.length ? 0.4 : 0) });
+    const b0 = g.build; g.build = p => { const items = b0(p); const it = items[0], [dx, dz] = turn(0, it.d / 2 + 0.35, it.rot); it.access = [[it.cx + dx, it.cz + dz]]; return items; };
+    return g;
+  });
+  list.push(() => {
     // against a side wall (its centre 0.4 m off it) where it can be, away from the door's wall
     const g = wallGroup(c, 'toilet', 'toilet', {}, { score: p => -Math.min(1, Math.abs(Math.min(p.t - p.run.a, p.run.b - p.t) - 0.42)) + (main && p.run.side === main.side ? -0.3 : 0) });
     const b0 = g.build;
     g.build = p => { const items = b0(p); const it = items[0]; for (const s of [-1, 1]) { const [dx, dz] = turn(s * (it.w / 2 + 0.1), 0, it.rot); it.walk.push(obb(it.cx + dx, it.cz + dz, 0.2, it.d, it.rot)); } const [fx, fz] = turn(0, it.d / 2 + 0.3, it.rot); it.access = [[it.cx + fx, it.cz + fz]]; return items; };
-    return g;
-  });
-  list.push(() => {
-    const type = vanity === 'double' ? 'double-vanity' : vanity === 'pedestal' ? 'pedestal-sink' : (c.pick('vanity', { fit: t => t !== 'pedestal-sink' }) || 'vanity-sink');
-    const g = wallGroup(c, 'vanity', type, {}, { score: (p, it) => notDoorWall(p) * 1.5 - (p.run.windows.length ? 0.4 : 0) });
-    const b0 = g.build; g.build = p => { const items = b0(p); const it = items[0], [dx, dz] = turn(0, it.d / 2 + 0.35, it.rot); it.access = [[it.cx + dx, it.cz + dz]]; return items; };
     return g;
   });
   if (tub === 'free') list.push(() => {

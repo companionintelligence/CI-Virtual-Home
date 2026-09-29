@@ -253,8 +253,116 @@ partition styles, stairs and sections (`assets/spec/arch.ts`, `scripts/validate/
 
 ### Rooms & composition (S3)
 
-Room programs and the composer's inputs (`assets/spec/compose.ts`, `scripts/validate/layout.mts`, run with
-`pnpm run validate --layout`). Nothing yet.
+Room programs, the composer that furnishes them, the new furniture, and the layout lints (`assets/spec/compose.ts`;
+`scripts/validate/compose.mts` checks the fields, `scripts/validate/layout.mts` holds the lints and runs under
+`pnpm run validate --layout`). Proved on `test/fixtures/houses/s3-compose-*.json`.
+
+**Opt-in.** A room without `program` is never composed: it renders its authored `items` exactly, as before. A room with
+one is furnished by `assets/room-composer.ts` (THREE-free, so it runs in Node too), and its authored items are **pins**,
+kept exactly, that the composer arranges round. Every field below is optional.
+
+```jsonc
+{
+  "styleKey": "farmhouse",    // the house's furniture style: modern | farmhouse | cottage | mediterranean | mid-century |
+                              // industrial | scandi | tropical | craftsman. Default: read off the free-text `style`
+                              // ("Mid-century desert villa" → mid-century), else modern
+  "levels": [ { "rooms": [ {
+    "no": "01", "name": "Living Room", "bounds": { … },
+    "program": "living",      // THE room-type field (26 values, below). S1's fixtures dress the room by it
+    "focus": { "type": "fireplace", "wall": "W", "at": 1.5 },
+                              // what the seating faces: fireplace | tv | window | art | island | bed | view; wall N|S|E|W
+                              // (N = the room's min-z edge, S max-z, W min-x, E max-x); at = a number along that wall
+                              // or a point [x, z]. Default: a fireplace or TV already pinned in the room, else the
+                              // longest solid wall, else the glass for a view
+    "density": 0.65,          // 0 the program's essentials … 1 every optional piece that fits; default 0.5
+    "style": "cottage",       // this room's style (default styleKey)
+    "palette": { "fabric": "#d8d2c4", "wood": "#5a4636", "accent": "#7a8f86" },
+                              // the room's own colours. Bedrooms get a seeded one from their style when they have none,
+                              // distinct from the house's other bedrooms
+    "seed": "b",              // re-rolls the composition: the same program, another arrangement
+    "kitchen": { "layout": "L", "island": true, "peninsula": false, "sinkWall": "N", "windowOverSink": true,
+                 "top": "marble", "glassUppers": true, "color": "#e9e6df" },
+                              // L | U | galley | single; island true or {w, d}; a peninsula (a bar off the open end of a
+                              // run, else an island); worktop stone | marble | butcher | concrete | quartz | terrazzo;
+                              // glass-fronted wall cabinets; cabinet colour
+    "bath": { "tub": "free", "shower": true, "vanity": "double" },
+                              // tub free (a clawfoot or a soaking tub by style) | built-in | none; shower true or {w, d};
+                              // vanity single | double | pedestal
+    "lock": true,             // composition baked into `items` and hand-tuned: do not compose again
+    "items": [ … ]            // pins
+  } ] } ]
+}
+```
+
+**Programs.** `living kitchen dining kitchen-dining bed-primary bed-kid bed-guest nursery bath ensuite powder study
+library den media playroom sunroom greenhouse foyer hall laundry studio bar gym garage outdoor`.
+
+| Program | What the composer places | Clearances it keeps |
+|---|---|---|
+| living, den, media | a lounge round the focus: sofa (or an L, a modular or, in a big room, a U sectional) 1.6–3.4 m from the focus wall, coffee table, a rug under the front legs, 1–2 armchairs at 30–45°, side tables with lamps, art over the sofa; bookcase, floor lamp, plants; a piano in a big living room | sofa to table 0.45 m, lanes 0.9 m |
+| kitchen | single, galley, L or U runs with a sink under a window, the dishwasher beside it, a range and a fridge at a run end, wall cabinets and a hood, a corner unit, an island or peninsula with stools, counter things | aisles 1.05 m |
+| dining | table on a chosen axis with chairs to seat count, a rug, a pendant or chandelier, a sideboard | 0.6 m behind every chair |
+| bed-* | headboard on the wall facing or beside the door, nightstands with lamps, dresser, bench, wardrobe, art over the bed, a rug under the lower two-thirds; a kid's room gets a single, bunk or loft bed, toy storage, a desk, a play rug and a story picture | 0.6 m each side of the bed |
+| nursery | crib, changing table, glider, dresser, toys, a patterned rug, a moon picture | as bed-* |
+| bath, ensuite, powder | vanity, toilet 0.2 m from its side, tub (clawfoot or soaking, or built-in) or shower, towel rail or ladder, mat, mirror | 0.6 m in front of each fixture |
+| study, library, studio | desk with chair and lamp against a wall, runs of tall bookcases, a reading corner, a rug | — |
+| foyer, hall | console or bench, a runner, a plant | 1.2 m lane |
+| sunroom, greenhouse | plants in clusters, a potting bench, a reading corner | — |
+| laundry, garage, gym, bar, outdoor | the working set for each | — |
+
+**Determinism.** Each room is seeded by `mulberry32(fnv1a("<spec id>:<room no>:compose"))` (`:<room seed>` appended when it
+has one): fixed candidate grids (0.1 m), stable sorts, mm rounding, 400 fixed annealing steps, no clock and no
+`Math.random`. Two runs, in Node or in the page, give the same items. **A house picks its own**: for each role (lamp,
+dresser, rug …) it prefers a type, drawn by its style, and reaches for the others only when the room rules that one out, so
+one house reads as one scheme and the next house reaches for another. A group that cannot be placed is made again with
+other pieces, then smaller and on looser terms (its aisle may cross an obstacle), so a small room still gets its lounge, its
+table, its sink; what a room is too small for is dropped, never squeezed through a wall.
+
+**Output.** The composer's items carry `src: "compose@1"`. `node --experimental-strip-types scripts/compose-house.mts
+--house <id | path> [--infer [--replace]] [--rooms a,b] [--style k] [--seed s] [--density n] [--write [--out f]] [--lint]`
+reports a house's composition, and `--write` bakes it into the room's `items` and sets `lock: true`: the room is then
+hand-tunable, and `--rebake` redoes it (an item without `src` is yours and stays). `--infer` reads a program off a
+room's name (the dry run), `--replace` drops the hand-typed items first (a copy to look at).
+
+**Helpers** (`assets/room-composer.ts`). `lanes(spec, level, room)` returns the room's door-to-door circulation corridors
+(0.9 m, plan rectangles: S5's soft nav bias). `snapWallMount(item, geo)` moves a wall-mounted item authored inside the
+wall out to its face, and `stackOnSurface(item, items)` puts a surface item (a lamp, a vase) on the top of what stands under
+it instead of the desk default (0.77 m); the builder applies both to authored items under `"defaults": 2`, and the lints
+report them either way.
+
+**New furniture** (`content/house-catalog.json` lists every type's measured footprint, height, draw calls (`meshes`),
+honoured params and `place`ment: what it backs onto, the clear floor it needs, what it faces, its programs and styles).
+
+| Family | Types (params beyond `w` `d` `color`) |
+|---|---|
+| Sofas | `sofa` `slipcover-sofa` `chesterfield-sofa` `mid-century-sofa` `tuxedo-sofa` (`w`, `d`); `loveseat` |
+| Sectionals, by size | `modular-sectional` (compact, low), `l-sectional` (standard), `u-sectional` (big room): `w` the run, `l` the chaise's reach, `hand` `"left"` \| `"right"` — the chaise's side, as you sit facing +z (not on the U) |
+| Armchairs, chairs | `mission-armchair` `barrel-chair` `slipper-chair` `lounge-chair` `rattan-armchair` `nursery-glider`; `windsor-chair` `bentwood-chair` `ladderback-chair` `shell-chair`; stools `wood-stool` `saddle-stool` |
+| Tables | dining `trestle-table` `glass-dining-table` `oval-dining-table` (`w`, `d`), `pedestal-dining-table` (`r`); `round-coffee-table` (`r`) `trunk-coffee-table`; side `drum-table` `c-table`; consoles `demilune-console` `sofa-table` |
+| Beds, storage | `sleigh-bed` `upholstered-bed` `house-bed` (`quilt` a rug pattern); `armoire` `chest-of-drawers` `lowboy-dresser` `drum-nightstand` `bedside-cabinet` `bedside-table` `bar-cart` `workbench` `potting-bench` |
+| Bath | `clawfoot-tub` `soaking-tub` (freestanding), `pedestal-sink`, `double-vanity`, `towel-ladder`, `bath-rug` `bath-runner` |
+| Kitchen | `corner-run` (`hand`), worktop `top` on `counter-run` `sink-run` `breakfast-bar` `corner-run`: `stone` (default) `marble` `butcher` `concrete` `quartz` `terrazzo`; `glass: true` on `upper-cabinets`; `toaster` `kettle` |
+| Music, gym, kids | `grand-piano` `upright-piano`; `exercise-bike` `weight-bench` `yoga-mat`; `changing-table` `kids-desk` |
+| Rugs | `patterned-rug` (`pattern`: `solid border stripe check diamond kilim medallion dots abstract play shag jute flatweave hide`; `shape: "round"`); `shag-rug` `flatweave-rug` `hide-rug` `play-rug` |
+| Art | `wall-art` and `framed-print` `canvas-art` `triptych` (`motif`: `abstract geometric line landscape botanical seascape sunset sunburst map animal story-moon story-whale story-balloon mountains floral arches colourfield skyline lemons`; `frame` colour), `gallery-wall` (`motifs`), `plate-set`, `arch-mirror` |
+| Lamps, decor | table lamps `ginger-lamp` `column-lamp` `globe-lamp` `mushroom-lamp` `tripod-table-lamp`; `ceramic-bowl` `sculpture` `candelabra` `flower-jug` `terrarium` `table-clock` `desk-globe` |
+| Plants | `bird-of-paradise` `rubber-plant` `zz-plant` `dracaena` `peace-lily` `aloe-pot` `ponytail-palm` `jade-plant` `calathea` |
+
+**Layout lints** (`pnpm run validate --layout`, and `scripts/test-room-composer.mts` prints the fleet's counts): warnings
+until the layout pass promotes them. `overlap`, `wall-pierce`, `outside-room`, `door-swing` (a leaf's arc), `lane` (0.8 m from
+every way in to every other and to the middle), `core-walk` (the walk from the entry to the Core narrows under 1.2 m,
+doorways excepted), `stair-run-in` (under 1.6 m clear at a flight's foot or head), `facing` (seating that faces a wall or
+turns its back on the focus), `silent-param`, `mount-in-wall`, `surface-height`, `repetition` (one type in more than two
+rooms of a storey or more than five in a house; rugs, lamps, decor, fitted units and chairs excepted), `kitchen-backwards`,
+`foyer` (the entry opens onto a wall closer than 2.5 m, or sees no feature within 6 m), `empty-half` (a room of 12 m² or more
+with every piece in one half). `<id>.plan.json` carries a `compose` key — each composed room's level, name, program, style
+and items — for the isometric twin and `fleet-audit --built`.
+
+**Fixtures**: `s3-compose-house` (six program rooms with pins: a living room round a fireplace, an L kitchen with island,
+a library round the Core, a dining room, a primary bedroom, a bath with a freestanding tub, a kid's room, a nursery, a
+study), `s3-compose-kitchens` (every layout and worktop), `s3-compose-baths` (every tub, vanity and shower),
+`s3-compose-styles` (one living room in each of the nine styles, and one style in two seeds), `s3-compose-props` (every new
+sofa, sectional, table, rug pattern and art motif, authored by hand).
 
 ### Site (S4)
 

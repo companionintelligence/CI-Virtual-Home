@@ -44,7 +44,7 @@ const NAMES: Array<[Program, RegExp]> = [
   ['sunroom', /sun ?room|sun lounge|solarium|conservatory|garden room|winter garden/i],
   ['outdoor', /terrace|patio|\bdeck\b|porch|balcony|stoop|yard|garden|veranda|loggia|courtyard|chimney|pergola|\bpool\b|roof top|rooftop|carport|arcade/i],
   ['garage', /garage|workshop/i],
-  ['laundry', /laundry|utility|mudroom|boot room/i],
+  ['laundry', /laundry|utility|mudroom|boot room|pantry|scullery|larder/i],
   ['gym', /\bgym\b|fitness|yoga/i],
   ['powder', /powder|\bwc\b|cloak|half bath/i],
   ['ensuite', /ensuite|en-suite|en suite|master bath|primary bath|main bath/i],
@@ -62,7 +62,7 @@ const NAMES: Array<[Program, RegExp]> = [
   ['study', /study|office|\bdesk\b|work ?room|den office|home office/i],
   ['kitchen-dining', /kitchen.*(dining|breakfast|eat)|(dining|breakfast).*kitchen|eat-in/i],
   ['living', /(living|lounge|family|great).*dining|dining.*(living|lounge)/i],   // a living-dining room: its seating
-  ['kitchen', /kitchen|galley|pantry|scullery/i],
+  ['kitchen', /kitchen|galley/i],
   ['dining', /dining|breakfast/i],
   ['den', /\bden\b|snug|games|rec room|family room/i],
   ['living', /living|great room|lounge|salon|sitting|parlou?r|drawing|family|hearth/i],
