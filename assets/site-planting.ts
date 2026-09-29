@@ -95,7 +95,7 @@ export const MIXES: Record<string, Mix> = {
                    front: [['silver', 2], ['sedum', 2], ['groundcover', 1]], fill: [['silver', 2], ['lavender', 2], ['sedum', 2], ['groundcover', 1]], bare: 0.05, trees: [['olive', 3], ['cypress', 1]], density: 1, mulch: 0xb9ad98 },
   desert:        { back: [['yucca', 2], ['cactus', 1], ['grass-tall', 1]], mid: [['agave', 3], ['grass', 1]],
                    front: [['succulent', 1], ['rock', 1], ['sedum', 1]], fill: [['succulent', 1], ['sedum', 2], ['rock', 1]], bare: 0.35, trees: [['olive', 1], ['fan-palm', 1]], density: 1, mulch: 0xc2b39a, bloom: [0xd6a04b, 0xc46b4b] },
-  woodland:      { back: [['hydrangea', 1], ['shrub', 2], ['broadleaf', 0.5]], mid: [['fern', 4], ['spreading', 1]],
+  woodland:      { back: [['hydrangea', 2], ['shrub', 2], ['columnar', 1], ['broadleaf', 0.3]], mid: [['fern', 3], ['spreading', 1], ['grass', 1]],
                    front: [['groundcover', 2], ['hosta', 2], ['daisy', 1]], fill: [['groundcover', 2], ['hosta', 2], ['daisy', 1], ['fern', 1]], bare: 0.05, trees: [['birch', 2], ['maple', 2], ['conical', 1]], density: 1, mulch: 0x3a3028, bloom: [...BLOOM_WHITE, ...BLOOM_BLUE] },
   tropical:      { back: [['broadleaf', 3], ['yucca', 1], ['grass-tall', 1]], mid: [['fern', 2], ['agave', 1], ['grass', 1]],
                    front: [['groundcover', 2], ['bloom', 1], ['hosta', 1]], fill: [['groundcover', 2], ['bloom', 2], ['fern', 1], ['hosta', 1]], bare: 0.05, trees: [['fan-palm', 3], ['broad', 1]], density: 1, mulch: 0x3a3028, bloom: [0xd65a4b, 0xe0a13c, 0xc44b7b] },
@@ -189,7 +189,15 @@ export function createSiteContext(spec: any): SiteContext {
   const pathLine = (s: any): P2[] => {
     if (lineCache.has(s)) return lineCache.get(s)!;
     const raw = (s.path || []) as P2[], t = tensionOf(s.smooth);
-    const out = t === null ? raw.map(p => [p[0], p[1]] as P2) : smoothLine(raw, t, 0.25);
+    let out = t === null ? raw.map(p => [p[0], p[1]] as P2) : smoothLine(raw, t, 0.25);
+    // `meander`: a straight (or gently bent) path swayed into S-curves that far either side of its line — a two-point path has
+    // nothing for `smooth` to bend; its ends stay where they are, its sway is seeded by its own points
+    if (typeof s.meander === 'number' && s.meander > 0 && raw.length >= 2) {
+      const dense = resample(out, 0.25, false), N = lineNormals(dense, false, 1.0), L = lengthOf(dense);
+      const k = Math.max(1, Math.round(L / 8)), sign = (fnv1a(JSON.stringify(raw)) & 1) ? 1 : -1;
+      let acc = 0;
+      out = dense.map((p, i) => { if (i) acc += dist(dense[i - 1], p); const u = acc / (L || 1), off = sign * s.meander * Math.sin(Math.PI * u) * Math.sin(2 * Math.PI * k * u); return [p[0] + N[i][0] * off, p[1] + N[i][1] * off] as P2; });
+    }
     lineCache.set(s, out); return out;
   };
   const terracePoly = (s: any): P2[] => {
@@ -484,7 +492,8 @@ export function planPlanting(s: any, index: number, ctx: SiteContext): PlantingP
     const layerOf = (sp: string) => { const h = (SPECIES[sp].h[0] + SPECIES[sp].h[1]) / 2; return h >= 1.1 ? 'back' : h >= 0.55 ? 'mid' : 'front'; };
     const L = (name: string): Layer => { const l = kinds.map((k, i) => [k, w[i] ?? 1] as [string, number]).filter(([k]) => layerOf(k) === name); return l.length ? l : kinds.map((k, i) => [k, w[i] ?? 1] as [string, number]); };
     // its gaps are filled with the low, leafy kinds it names (never a rock or a grass: they cover little), else groundcover
-    const fill: Layer = kinds.map((k, i) => [k, w[i] ?? 1] as [string, number]).filter(([k]) => k !== 'rock' && coverOf(k) >= 0.4 && (SPECIES[k].h[0] + SPECIES[k].h[1]) / 2 <= 1.0);
+    // (weights softened to their roots there: the layers plant what the weights ask; the gaps are not another vote for the favourite)
+    const fill: Layer = kinds.map((k, i) => [k, Math.sqrt(w[i] ?? 1)] as [string, number]).filter(([k]) => k !== 'rock' && coverOf(k) >= 0.4 && (SPECIES[k].h[0] + SPECIES[k].h[1]) / 2 <= 1.0);
     mix = kinds.length ? { ...MIXES.cottage, back: L('back'), mid: L('mid'), front: L('front'), fill: fill.length ? fill : MIXES.cottage.fill } : MIXES.cottage;
   }
   // the outline and the plants have a stream each: another `seed` lays the same beds out with other plants

@@ -27,6 +27,7 @@
 //   facade cover   a foundation planting's beds over the facade it names, outside the metre kept clear each side of a
 //                  door — target ≥ 80 % (sampled every 0.1 m, 0.4 m out from the wall)
 //   triangles      a planting's plants cost under 900 000 triangles (assets/site-species-masks.ts, measured per species)
+//   species        (over every fixture) every planting species is planted, or stands as a tree, shrub or flower, in some fixture
 // Exit 0 when every target holds; 1 otherwise (2: nothing to measure, or the compiled assets are missing).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -87,10 +88,16 @@ let fails = 0;
     [curve < 0.25, `a sine (0.4 m over 3.4 m) reads ${(curve * 100).toFixed(0)} % axis-aligned (must read under 25)`],
     [diag === 0, `a 45° line reads ${(diag * 100).toFixed(0)} % axis-aligned (must read 0)`],
   ];
+  // `meander` bends a two-point path (which `smooth` cannot): its ends stay, and it reads as a curve
+  const mctx = P.createSiteContext({ id: 'measure', levels: [], site: [] }), mp = { type: 'path', path: [[0, 0], [0, 12]], w: 1.2, meander: 0.5 }, ml = mctx.pathLine(mp);
+  const mshare = share(ml.map((q: number[]) => [q[1], q[0]] as [number, number]));
+  checks.push([Math.hypot(ml[0][0], ml[0][1]) < 1e-6 && Math.hypot(ml[ml.length - 1][0], ml[ml.length - 1][1] - 12) < 1e-6, 'a meandering path does not keep its ends']);
+  checks.push([mshare < 0.35 && Math.max(...ml.map((q: number[]) => Math.abs(q[0]))) > 0.3, `a two-point path with meander 0.5 reads ${(mshare * 100).toFixed(0)} % axis-aligned (must read under 35)`]);
   for (const [ok, msg] of checks) if (!ok) { fails++; console.log(`✗ measure: ${msg}`); }
 }
 const totals = { all: { axis: 0, len: 0 }, real: { axis: 0, len: 0 } };
 const report: any[] = [];
+const used = new Set<string>();   // every species some fixture shows
 for (const file of files) {
   const spec = JSON.parse(fs.readFileSync(file, 'utf8')), ctx = P.createSiteContext(spec), site = spec.site || [];
   const rows: any[] = [];
@@ -103,8 +110,12 @@ for (const file of files) {
       const t = G.tensionOf(s.smooth); edge(t === null ? p0 : G.smoothLoop(p0, t, 0.25), true, null);
     }
     if (s.type === 'path' && Array.isArray(s.path) && !(s.y > 0.3)) edge(ctx.pathLine(s), false, null);   // (a raised `path` is a trim on a facade, not a garden path)
+    if (s.type === 'tree' && s.species) used.add(s.species === 'round' ? 'broad' : s.species);
+    if (s.type === 'shrub' && s.form) used.add(s.form);
+    if (s.type === 'flowers' && s.kind) used.add(s.kind);
     if (s.type !== 'planting') continue;
     const a = P.planPlanting(s, i, ctx), b = P.planPlanting(s, i, ctx);
+    for (const p of [...a.plants, ...a.trees]) used.add(p.sp);
     const same = hash(a) === hash(b);
     for (const bd of a.beds) edge(bd.poly, true, bd.wall);
     const bare = a.beds.some((bd: any) => bd.soil) ? P.bareShare(a, ctx, 0.05, i) : null;
@@ -142,6 +153,8 @@ for (const file of files) {
 const share = totals.all.len ? totals.all.axis / totals.all.len : 0, realShare = totals.real.len ? totals.real.axis / totals.real.len : null;
 if (share > T.axis) fails++;
 if (realShare !== null && realShare > T.axis) fails++;
+const unused = args.house ? [] : Object.keys(P.SPECIES).filter(k => !used.has(k));
+if (unused.length) fails++;
 if (args.json === 'true') console.log(JSON.stringify({ share, realShare, report }, null, 1));
 else {
   for (const r of report) {
@@ -150,6 +163,7 @@ else {
   }
   console.log(`\n${share <= T.axis ? '✓' : '✗'} axis-aligned bed, planting and path edges over ${report.length} lot(s): ${(share * 100).toFixed(1)} % of ${totals.all.len.toFixed(0)} m (target ≤ ${T.axis * 100} %)`);
   if (realShare !== null) console.log(`${realShare <= T.axis ? '✓' : '✗'}   … over the lots built on real houses alone: ${(realShare * 100).toFixed(1)} % of ${totals.real.len.toFixed(0)} m (target ≤ ${T.axis * 100} %)`);
+  if (unused.length) console.log(`✗ species no fixture shows: ${unused.join(', ')}`);
   console.log(fails ? `${fails} failed` : 'all targets hold');
 }
 process.exit(fails ? 1 : 0);

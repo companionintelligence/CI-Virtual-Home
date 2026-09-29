@@ -551,28 +551,34 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
   }
   // flower heads (plugin-trees flower-geometry, MIT): daisy ring, tulip cup, lavender spike; plus a plain bloom
   // cluster. One geometry per material (petals, centre), around a local origin at the top of the stem.
-  function flowerHead(kind, r) {
+  // `lean` (the planting species') builds them cheaper: florets are octahedra — 8 triangles a floret, where an icosahedron's 20
+  // read no better at a centimetre across — and fewer of them. The legacy beds and flower clumps (no `lean`) draw exactly
+  // what they always did, down to the order their rng is drawn in.
+  function flowerHead(kind, r, lean = false) {
     const petals = [], centre = [];
+    const floret = (rad, detail = 0) => (lean ? new THREE.OctahedronGeometry(rad * 1.25, 0) : new THREE.IcosahedronGeometry(rad, detail));
     if (kind === 'lavender') {
-      // (florets are octahedra — 8 triangles a floret; at a centimetre across an icosahedron's 20 read no better)
-      for (let i = 0; i < 12; i++) { const t = i / 12, y = t * 0.16, a = i * 2.4 + r() * 0.5, rr = (1 - t) * 0.03 + 0.006; const f = new THREE.OctahedronGeometry(0.02 * (1 - t * 0.4), 0); f.translate(Math.cos(a) * rr, y, Math.sin(a) * rr); petals.push(f); }
+      const n = lean ? 12 : 16;
+      for (let i = 0; i < n; i++) { const t = i / n, y = t * 0.16, a = i * 2.4 + r() * 0.5, rr = (1 - t) * 0.03 + 0.006; const f = floret(0.016 * (1 - t * 0.4)); f.translate(Math.cos(a) * rr, y, Math.sin(a) * rr); petals.push(f); }
     } else if (kind === 'tulip') {
       for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + r() * 0.1, p = new THREE.ConeGeometry(0.04, 0.12, 4); p.translate(0, 0.06, 0); p.rotateZ(0.4); p.rotateY(-a); p.translate(Math.cos(a) * 0.025, 0, Math.sin(a) * 0.025); petals.push(p); }
     } else if (kind === 'daisy') {
       for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2 + r() * 0.08, p = new THREE.ConeGeometry(0.018, 0.075, 3); p.rotateZ(Math.PI / 2); p.translate(0.06, 0, 0); p.rotateY(-a); petals.push(p); }
-      const c = new THREE.IcosahedronGeometry(0.03, 0); c.scale(1, 0.55, 1); c.translate(0, 0.008, 0); centre.push(c);
+      const c = new THREE.IcosahedronGeometry(0.03, lean ? 0 : 1); c.scale(1, 0.55, 1); c.translate(0, 0.008, 0); centre.push(c);
     } else if (kind === 'spike') {
       // a delphinium / foxglove spike: florets up a long tapering head
-      for (let i = 0; i < 16; i++) { const t = i / 16, y = t * 0.34, a = i * 2.4 + r() * 0.5, rr = (1 - t) * 0.045 + 0.008; const f = new THREE.OctahedronGeometry(0.026 * (1 - t * 0.5), 0); f.translate(Math.cos(a) * rr, y, Math.sin(a) * rr); petals.push(f); }
+      const n = lean ? 16 : 22;
+      for (let i = 0; i < n; i++) { const t = i / n, y = t * 0.34, a = i * 2.4 + r() * 0.5, rr = (1 - t) * 0.045 + 0.008; const f = floret(0.02 * (1 - t * 0.5)); f.translate(Math.cos(a) * rr, y, Math.sin(a) * rr); petals.push(f); }
     } else if (kind === 'allium') {
       // a globe of florets
-      for (let i = 0; i < 20; i++) { const u = r() * 2 - 1, a = r() * Math.PI * 2, q = Math.sqrt(1 - u * u), f = new THREE.OctahedronGeometry(0.018, 0); f.translate(Math.cos(a) * q * 0.055, 0.055 + u * 0.055, Math.sin(a) * q * 0.055); petals.push(f); }
+      const n = lean ? 20 : 26;
+      for (let i = 0; i < n; i++) { const u = r() * 2 - 1, a = r() * Math.PI * 2, q = Math.sqrt(1 - u * u), f = floret(lean ? 0.0145 : 0.014); f.translate(Math.cos(a) * q * 0.055, 0.055 + u * 0.055, Math.sin(a) * q * 0.055); petals.push(f); }
     } else if (kind === 'rose') {
       // a cupped rose: a tight ball of petals, a ring of looser ones round it
-      const c = new THREE.IcosahedronGeometry(0.026, 0); c.scale(1, 0.85, 1); c.translate(0, 0.024, 0); petals.push(c);
-      for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + r() * 0.3, p = new THREE.OctahedronGeometry(0.02, 0); p.scale(1, 0.6, 0.8); p.translate(Math.cos(a) * 0.028, 0.012, Math.sin(a) * 0.028); petals.push(p); }
+      const c = new THREE.IcosahedronGeometry(0.026, lean ? 0 : 1); c.scale(1, 0.85, 1); c.translate(0, 0.024, 0); petals.push(c);
+      for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2 + r() * 0.3, p = floret(0.018); p.scale(1, 0.6, 0.8); p.translate(Math.cos(a) * 0.028, 0.012, Math.sin(a) * 0.028); petals.push(p); }
     } else {
-      for (let i = 0; i < 5; i++) { const a = r() * Math.PI * 2, d = r() * 0.03, b = new THREE.OctahedronGeometry(0.04 + r() * 0.018, 0); b.translate(Math.cos(a) * d, r() * 0.03, Math.sin(a) * d); petals.push(b); }
+      for (let i = 0; i < 5; i++) { const a = r() * Math.PI * 2, d = r() * 0.03, b = floret(0.035 + r() * 0.015); b.translate(Math.cos(a) * d, r() * 0.03, Math.sin(a) * d); petals.push(b); }
     }
     return { petals: merged(petals), centre: centre.length ? merged(centre) : null };
   }
@@ -778,7 +784,7 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
   }
   function pathStrip(s, r) {
     // `smooth` or `surface` (and every path under `defaults: 2`): a ribbon along the curved centre line, in a surface
-    if (s.smooth !== undefined || s.surface !== undefined || gen2) return surfacedPath(s, r);
+    if (s.smooth !== undefined || s.surface !== undefined || s.meander !== undefined || gen2) return surfacedPath(s, r);
     const pts = s.path || [], w = s.w || 1.0, color = s.color ? hex(s.color) : 0xd6d3d1, g = group('Path');
     const mat = std(color, { roughness: 0.95 });
     for (let i = 0; i < pts.length - 1; i++) {
@@ -827,7 +833,7 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
     return g;
   }
   // ---- the planting generator's plants (assets/site-planting.ts plans them, assets/site-species.ts shapes them) ----
-  const SP = createSpecies({ THREE, V, clusterGeo, bushGeo, merged, grassTuft, flowerHead, shadeFacets, limbGeo });
+  const SP = createSpecies({ THREE, V, clusterGeo, bushGeo, merged, grassTuft, flowerHead: (kind, r) => flowerHead(kind, r, true), shadeFacets, limbGeo });
   const css = c => '#' + (c >>> 0).toString(16).padStart(6, '0');
   // Plants of one item, one InstancedMesh per species (and one per species for its flower heads, centres and stems).
   // `lift`: what they stand on above their ground (a bed's soil). Returns the per-plant boxes the isometric twin draws
@@ -1016,7 +1022,7 @@ export function createSiteKit({ THREE, seed = 'house', std, mix, keepOut = [], s
     // Two paths that cross (a junction, two walks from one door) would draw their surfaces at the same height and fight where
     // they overlap: each path stands 4 mm higher than the one before it in the spec (a millimetre is under the depth
     // buffer's resolution at 50 m; 4 mm is over it), up to 2 cm, so the later path is the one on top.
-    const sites: any[] = (spec && spec.site) || [], mine = sites.indexOf(s), rank = mine < 0 ? 0 : sites.slice(0, mine).filter(o => o && o.type === 'path' && (o.smooth !== undefined || o.surface !== undefined || gen2)).length;
+    const sites: any[] = (spec && spec.site) || [], mine = sites.indexOf(s), rank = mine < 0 ? 0 : sites.slice(0, mine).filter(o => o && o.type === 'path' && (o.smooth !== undefined || o.surface !== undefined || o.meander !== undefined || gen2)).length;
     const bias = Math.min(rank, 5) * 0.004;
     let iso: any[] | null = null;   // what the isometric twin draws (plan.json): the stones, or the ribbon's outline
     const rnd = (poly: number[][]) => poly.map(p => [+p[0].toFixed(3), +p[1].toFixed(3)]);

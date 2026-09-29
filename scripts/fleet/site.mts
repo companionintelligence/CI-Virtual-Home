@@ -1,7 +1,7 @@
 // Fleet metrics — owned by S4 (site): "the planting is very rectangular and repetitive", in numbers. See _types.mts.
 import type { Metric, House } from './_types.mts';
-import { axisAlignedRuns } from '../../assets/site-geom.js';
-import { mixNameOf } from '../../assets/site-planting.js';
+import { axisAlignedRuns, tensionOf, smoothLoop } from '../../assets/site-geom.js';
+import { mixNameOf, createSiteContext } from '../../assets/site-planting.js';
 
 // the ground storey's plan bounds (the house the front garden is in front of)
 function houseBounds(h: House) {
@@ -22,11 +22,11 @@ type Edge = { site: number; type: string; pts: number[][]; closed: boolean; wall
 function edgesOf(h: House): { list: Edge[]; built: boolean } {
   const plan = h.plan && h.plan.site && !Array.isArray(h.plan.site) && Array.isArray(h.plan.site.edges) ? h.plan.site.edges : null;
   if (plan) return { built: true, list: plan.map((e: any) => ({ site: e.site, type: e.type, pts: e.pts, closed: !!e.closed, wall: e.wall || null })) };
-  const list: Edge[] = [];
+  const list: Edge[] = [], ctx = createSiteContext(h.spec);
   (h.spec.site || []).forEach((s: any, i: number) => {
-    if (s.type === 'bed' && Array.isArray(s.poly) && s.poly.length >= 3) list.push({ site: i, type: 'bed', pts: s.poly, closed: true, wall: null });
+    if (s.type === 'bed' && Array.isArray(s.poly) && s.poly.length >= 3) { const t = tensionOf(s.smooth); list.push({ site: i, type: 'bed', pts: t === null ? s.poly : smoothLoop(s.poly, t, 0.25), closed: true, wall: null }); }
     else if (s.type === 'bed' && Array.isArray(s.at)) { const w = s.w || 2, d = s.d || 1, [x, z] = s.at; list.push({ site: i, type: 'bed', pts: [[x - w / 2, z - d / 2], [x + w / 2, z - d / 2], [x + w / 2, z + d / 2], [x - w / 2, z + d / 2]], closed: true, wall: null }); }
-    else if (s.type === 'path' && Array.isArray(s.path) && s.path.length >= 2 && !(s.y > 0.3)) list.push({ site: i, type: 'path', pts: s.path, closed: false, wall: null });
+    else if (s.type === 'path' && Array.isArray(s.path) && s.path.length >= 2 && !(s.y > 0.3)) list.push({ site: i, type: 'path', pts: ctx.pathLine(s), closed: false, wall: null });
   });
   return { built: false, list };
 }
@@ -77,7 +77,7 @@ export const metrics: Metric[] = [
       const share = all ? axis / all : 0;
       return {
         value: `${(share * 100).toFixed(0)} % of ${all.toFixed(0)} m`, measure: +share.toFixed(4), pass: all ? share <= 0.2 : null,
-        detail: `Bed outlines and path centre lines on the real lots, by length. Judged as an eye judges it — over 1.5 m chords, not the 0.25 m samples a curve is resampled to: a chord within 3° of the x or z axis that is also straight (under 9 cm of sag) is axis-aligned, so a wobble of a centimetre between samples does not hide a straight edge. ${built ? `Measured as built on ${built} of ${f.houses.length} houses (their plan's site.edges: curves resolved, plantings laid out, a bed's edge against the house left out)` : 'As authored (run `fleet-audit --built` to measure the edges the builder resolves)'}. The last column names the straight items to give waypoints and \`smooth\` (a two-point path cannot bend without waypoints).`,
+        detail: `Bed outlines and path centre lines on the real lots, by length. Judged as an eye judges it — over 1.5 m chords, not the 0.25 m samples a curve is resampled to: a chord within 3° of the x or z axis that is also straight (under 9 cm of sag) is axis-aligned, so a wobble of a centimetre between samples does not hide a straight edge. ${built ? `Measured as built on ${built} of ${f.houses.length} houses (their plan's site.edges: curves resolved, plantings laid out, a bed's edge against the house left out)` : 'As authored (run `fleet-audit --built` to measure the edges the builder resolves)'}. The last column names the straight items to bend: a \`meander\` (a sway in metres) or waypoints with \`smooth\`.`,
         table: { head: ['house', 'edge length (m)', 'axis-aligned', 'the straightest items'], rows: rows.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2])) },
       };
     },

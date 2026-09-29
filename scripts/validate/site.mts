@@ -16,7 +16,7 @@
 //   bed-on-slab      a bed or planting laid over a patio, driveway or deck
 //   bed-overlap      two beds (or a bed and a planting's) that share ground: two slabs of soil, two sets of plants
 //   straight-edge    a path or a bed with 8 m or more of straight run along an axis: a garden path bends (waypoints and
-//                    `smooth`; a two-point path cannot bend), or it is paving and wants `patio` / `driveway`
+//                    `smooth`, or `meander` for a two-point path), or it is paving and wants `patio` / `driveway`
 //   planting-heavy   a planting of more than 800 000 triangles: it draws slowly on a phone
 //   sunken-terrace   handled as an error in 'site-needs': a terrace is raised (`y` > 0)
 //   steps-lost       `steps` on a terraced lot that climb nothing (the ground does not rise within 8 m of them)
@@ -176,7 +176,6 @@ const check: Check = (spec, ctx) => {
   // ---- water under a slab; a bed laid over one
   const slabs = site.map((s, i) => ({ s, i, fp: ['patio', 'driveway', 'deck'].includes(s.type) ? footprintOf(s, i, spec.id || '') : null, top: (s.y ?? 0) + (s.type === 'deck' ? s.h || 0.12 : s.type === 'patio' ? 0.08 : 0.06) })).filter(x => x.fp);
   const sctx = createSiteContext(spec);
-  const sctx0 = () => sctx;
   for (const [i, s] of site.entries()) {
     if (!['pool', 'turtle-pool', 'rill', 'channel'].includes(s.type)) continue;
     const fp = footprintOf(s, i, spec.id || ''); if (!fp) continue;
@@ -224,26 +223,25 @@ const check: Check = (spec, ctx) => {
   // ---- straight paths and beds: a garden path bends
   for (const [i, s] of site.entries()) {
     let pts: number[][] | null = null, closed = false;
-    if (s.type === 'path' && isLine(s.path) && !(s.y > 0.3)) pts = s.smooth !== undefined ? sctx0().pathLine(s) : s.path;
+    if (s.type === 'path' && isLine(s.path) && !(s.y > 0.3)) pts = s.smooth !== undefined || s.meander !== undefined ? sctx.pathLine(s) : s.path;
     else if (s.type === 'bed' && Array.isArray(s.poly) && s.poly.length >= 3) { pts = s.poly; closed = true; const t = tensionOf(s.smooth); if (t !== null) pts = smoothLoop(s.poly, t, 0.25); }
     if (!pts) continue;
     const r = axisAlignedRuns(pts as any, closed, null, { chord: 1.5, tol: 3 });
-    if (r.axis >= 8) warn(`${S(s, i)}: ${r.axis.toFixed(0)} m of it runs straight along an axis — ${s.type === 'path' ? 'a garden path bends: give it waypoints and `smooth` (a two-point path cannot bend), or make it a `patio` / `driveway` if it is paving' : 'give the bed more points and `smooth`'}`, 'straight-edge');
+    if (r.axis >= 8) warn(`${S(s, i)}: ${r.axis.toFixed(0)} m of it runs straight along an axis — ${s.type === 'path' ? 'a garden path bends: give it `meander: 0.5` (or waypoints and `smooth`), or make it a `patio` / `driveway` if it is paving' : 'give the bed more points and `smooth`'}`, 'straight-edge');
   }
 
   // ---- an exterior stair must end where something stands at its height
   {
     const surfaces: Array<{ poly: number[][]; y: number; tol: number }> = [];
     for (const l of spec.levels || []) for (const r of l.footprint || []) surfaces.push({ poly: rectPoly([r.x + r.w / 2, r.z + r.d / 2], r.w + 0.4, r.d + 0.4, 0), y: l.y || 0, tol: 0.35 });
-    for (const [j, t] of site.entries()) {
-      if (t.type === 'terrace' && typeof t.y === 'number') surfaces.push({ poly: sctx0().terracePoly(t), y: t.y, tol: 0.25 });
+    for (const t of site) {
+      if (t.type === 'terrace' && typeof t.y === 'number') surfaces.push({ poly: sctx.terracePoly(t), y: t.y, tol: 0.25 });
       else if (t.type === 'deck' && isP(t.at)) surfaces.push({ poly: rectPoly(t.at, t.w || 4, t.d || 3, t.rot || 0), y: (t.y ?? 0) + (t.h || 0.12), tol: 0.25 });
       else if ((t.type === 'patio' || t.type === 'porch') && isP(t.at)) surfaces.push({ poly: rectPoly(t.at, t.w || 4, t.d || (t.type === 'porch' ? 2.5 : 3), t.rot || 0), y: (t.y ?? 0) + (t.type === 'patio' ? 0.08 : 0.15), tol: 0.3 });
-      void j;
     }
     for (const [i, s] of site.entries()) {
       if (s.type !== 'stair' || !isP(s.from) || !isP(s.to)) continue;
-      const y0 = s.from[2] ?? sctx0().groundAt(s.from[0], s.from[1]), y1 = s.to[2] ?? sctx0().groundAt(s.to[0], s.to[1]);
+      const y0 = s.from[2] ?? sctx.groundAt(s.from[0], s.from[1]), y1 = s.to[2] ?? sctx.groundAt(s.to[0], s.to[1]);
       const hi = y1 >= y0 ? s.to : s.from, yh = Math.max(y0, y1);
       const near = (q: number[], poly: number[][]) => inPoly(q[0], q[1], poly as any) || poly.some((p, k) => { const b = poly[(k + 1) % poly.length], dx = b[0] - p[0], dz = b[1] - p[1], l2 = dx * dx + dz * dz || 1e-9, u = Math.max(0, Math.min(1, ((q[0] - p[0]) * dx + (q[1] - p[1]) * dz) / l2)); return Math.hypot(q[0] - (p[0] + dx * u), q[1] - (p[1] + dz * u)) < 0.6; });
       if (yh > 0.3 && !surfaces.some(f => Math.abs(f.y - yh) <= f.tol && near(hi, f.poly))) warn(`${S(s, i)}: its top ends at (${hi[0]}, ${hi[1]}) at ${yh.toFixed(2)} m, where no deck, terrace, porch or storey stands at that height (0.6 m round it)`, 'stair-end');

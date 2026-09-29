@@ -55,7 +55,7 @@ function generate(seed: number) {
     () => ({ type: 'flowers', at: at(), kind: P(['lavender', 'daisy', 'tulip', 'allium', 'rose', 'bloom']), r: R2(U(0.3, 1.2)), color: maybe(0.4, col) }),
     () => ({ type: 'rock', at: at(), r: R2(U(0.2, 1.2)) }),
     () => r() < 0.5 ? ({ type: 'bed', poly: poly(), smooth: maybe(0.5, () => true), edge: maybe(0.4, () => P<any>([{ color: col(), h: 0.06, w: 0.1 }, 'none'])) }) : ({ type: 'bed', at: at(), w: R2(U(1, 6)), d: R2(U(0.6, 3)), rot: maybe(0.3, () => I(0, 359)) }),
-    () => ({ type: 'path', path: pts(I(2, 6)), w: R2(U(0.6, 2.2)), smooth: maybe(0.5, () => true), surface: maybe(0.7, () => P(['gravel', 'flagstone', 'stepping', 'brick', 'concrete', 'decking', 'terracotta'])), color: maybe(0.3, col) }),
+    () => ({ type: 'path', path: pts(I(2, 6)), w: R2(U(0.6, 2.2)), smooth: maybe(0.5, () => true), meander: maybe(0.25, () => R2(U(0.2, 1.2))), surface: maybe(0.7, () => P(['gravel', 'flagstone', 'stepping', 'brick', 'concrete', 'decking', 'terracotta'])), color: maybe(0.3, col) }),
     () => ({ type: 'hedge', path: pts(I(2, 5)), h: R2(U(0.6, 2.4)), smooth: maybe(0.4, () => true) }),
     () => ({ type: 'scatter', at: at(), w: R2(U(3, 10)), d: R2(U(3, 8)), n: I(3, 25), species: [P(['shrub', 'flowers', 'rock', 'tree']), P(['shrub', 'flowers', 'rock'])], layout: maybe(0.5, () => 'poisson') }),
     () => ({ type: 'grove', at: at(), r: R2(U(2, 6)), n: I(3, 14), species: P(SPECIES) }),

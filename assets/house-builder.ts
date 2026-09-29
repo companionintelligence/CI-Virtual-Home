@@ -26,7 +26,7 @@
 //                   scripts/build-prop-catalog.mts
 //   S4 site         site-build.ts (the lot, the world, the site builders and the site loop), site.ts (the kit),
 //                   site-planting.ts (the planting generator), site-geom.ts (curves, offsets, Poisson discs),
-//                   site-species.ts (the plants' drawing), site-structures.ts (stairs, rails, fences, walls),
+//                   site-species.ts (the plants' drawing), site-species-masks.ts (generated: what each species hides, and costs), site-structures.ts (stairs, rails, fences, walls),
 //                   world.ts, props/outdoor.ts; the page's pool / fence / garden / cabana builders
 //   S5 shot         shot-planner-v1.ts (shotsFor, routeOn, blockedTest, clearPoint), core-orbit.ts, shot-path.ts,
 //                   shot-track.ts (the baked track and the roof-fade rule)

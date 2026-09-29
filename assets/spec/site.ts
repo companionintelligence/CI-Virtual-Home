@@ -92,6 +92,9 @@ export interface SiteSiteItem {
   /** bed.poly, path.path, hedge.path, fence / wall-low path, terrace.poly, pool.poly, planting outlines: a centripetal
    *  Catmull-Rom through the points (true), or with a tension 0–0.95 (0 = full curve) */
   smooth?: boolean | number;
+  /** path: sway a straight or gently bent path into S-curves this far (m) either side of its line, seeded, its ends fixed —
+   *  the one-word way to bend a two-point path, which `smooth` cannot (0.4–0.8 reads as a garden path) */
+  meander?: number;
   /** path: its paving; terrace: its top (default the lot's own ground); wall-low: its facing */
   surface?: PathSurface | 'lawn' | 'meadow' | 'patio' | 'stone' | 'brick' | 'stucco' | 'render' | 'concrete' | 'timber';
   /** bed / planting: its edging; terrace: its edge */

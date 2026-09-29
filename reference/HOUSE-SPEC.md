@@ -322,7 +322,9 @@ of `color`, which pins the bloom.
 **Curves and surfaces.** `smooth: true` (or a tension 0–0.95) runs a centripetal Catmull-Rom through the points of a
 `bed.poly`, `path.path`, `hedge.path`, a fence's or `wall-low`'s `path`, a `terrace.poly`, a `pool.poly`, a patio's
 `poly`, resampled every 0.25 m. `path.surface`: `gravel` | `flagstone` (crazy paving) | `stepping` (stepping
-stones) | `brick` | `decking` (boards across the walk) | `terracotta` | `concrete`, with `color`. A path with
+stones) | `brick` | `decking` (boards across the walk) | `terracotta` | `concrete`, with `color`. `smooth` cannot bend a
+two-point path (a curve needs points to run through): `meander: 0.5` sways a straight or gently bent path into S-curves that far
+either side of its line, its ends fixed, seeded by its own points. A path with
 `smooth` or `surface` is a ribbon along its line. `bed.edge`: `{ "color", "h", "w" }` or `"none"` — a kerb as a true
 offset of the outline (a smoothed bed, and every bed under `defaults: 2`, gets one). `scatter.layout: "poisson"`
 spaces its items evenly at random. `patio` and `driveway` take `poly`, `smooth`, `surface` (concrete, gravel, brick,
@@ -413,7 +415,7 @@ drawing of its own for, from those solids, and a ribbon path, a planting's beds,
 
 **Lints** (`scripts/validate/site.mts`, warnings): `unknown-name` (a lot sidewalk or furniture too), `planting-ref`, `planting-empty` (a planting with no room to lay out anything), `planting-heavy` (over 800 000 triangles), `front-crates` (vegetable crates in
 the front garden), `in-house`, `off-lot` (its centre, or any point of a path, hedge, fence or polyline), `buried-water`, `bed-on-slab`, `bed-overlap` (two beds
-on the same ground), `straight-edge` (8 m of a path or bed running straight along an axis: a garden path bends — waypoints and `smooth`), `steep-stair`,
+on the same ground), `straight-edge` (8 m of a path or bed running straight along an axis: a garden path bends — `meander`, or waypoints and `smooth`), `steep-stair`,
 `stair-end` (an exterior stair whose top ends where nothing stands at its height), `terrace-straddle`, `water-sides`. Scene QA:
 `site-dropped`, `site-in-house`, `site-buried`, `site-sunk` (a trunk buried in a terrace).
 
