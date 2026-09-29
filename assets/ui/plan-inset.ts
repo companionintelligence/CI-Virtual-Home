@@ -50,7 +50,11 @@ export function createPlanInset(canvas: HTMLCanvasElement, { onSeek, onLevel }: 
     const g = canvas.getContext('2d')!;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.clearRect(0, 0, r.width, r.height);
-    if (!spec) return;
+    if (!spec) {   // a studio scene has no spec: no storeys to draw (the page turns the button off; this is what a scripted call sees)
+      g.fillStyle = css('--muted-foreground'); g.font = `500 12px ${css('--font-sans') || 'sans-serif'}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('A studio scene has no plan', r.width / 2, r.height / 2); g.textAlign = 'start';
+      return;
+    }
     fit(r.width, r.height);
     const fg = css('--foreground'), muted = css('--muted-foreground'), hair = css('--rc-hairline-strong'), route = css('--chart-2'), core = css('--chart-1');
     const levels = spec.levels || [];
@@ -76,7 +80,11 @@ export function createPlanInset(canvas: HTMLCanvasElement, { onSeek, onLevel }: 
         g.strokeStyle = hair; g.beginPath(); rect(g, b); g.stroke();
         const label = room.name || '';
         g.font = `500 11px ${css('--font-sans') || 'sans-serif'}`;
-        if (g.measureText(label).width + 6 < b.w * view.s && b.d * view.s > 16) { g.fillStyle = muted; g.textBaseline = 'top'; g.fillText(label, X(b.x) + 3, Z(b.z) + 3); }
+        const tw = g.measureText(label).width;
+        if (tw + 12 < b.w * view.s && b.d * view.s > 22) {   // the name sits on a chip, in from the corner, clear of the walls
+          g.fillStyle = css('--rc-float'); g.beginPath(); g.roundRect(X(b.x) + 4, Z(b.z) + 4, tw + 8, 15, 3); g.fill();
+          g.fillStyle = muted; g.textBaseline = 'top'; g.fillText(label, X(b.x) + 8, Z(b.z) + 6);
+        }
       }
       g.strokeStyle = muted; g.lineWidth = 1.5;
       for (const p of lv.partitions || []) { g.beginPath(); g.moveTo(X(p.from[0]), Z(p.from[1])); g.lineTo(X(p.to[0]), Z(p.to[1])); g.stroke(); }
@@ -132,7 +140,7 @@ export function createPlanInset(canvas: HTMLCanvasElement, { onSeek, onLevel }: 
       t = v; eye = e; look = l;
       hfov = Math.atan(Math.tan((fovDeg * Math.PI) / 360) * aspect);
       const lvIdx = spec && e ? storeyOf(spec, e) : 0;
-      if (lvIdx !== level) { level = lvIdx; onLevel?.((spec.levels[level] || {}).name || `Level ${level + 1}`); }
+      if (lvIdx !== level) { level = lvIdx; onLevel?.(spec ? (((spec.levels || [])[level] || {}).name || `Level ${level + 1}`) : ''); }
       draw();
     },
     get level() { return Math.max(0, level); },

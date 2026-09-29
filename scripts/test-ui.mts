@@ -22,7 +22,8 @@
 //             undo and redo
 //   picker    the home picker searches, opens a home by keyboard, and the title and the URL follow
 //   modes     Review hides the catalog and the tools and shows the shot cards; Edit brings them back
-//   drawers   768 × 1024: the inspector is a drawer over the viewport
+//   robust    Play during the automatic checks; the Plan button in a studio scene; the single-key shortcuts switch
+//   drawers   768 × 1024 and 390 × 844: a drawer is a dialog (inert behind it, Tab inside, Esc, focus back) and a closed one leaves nothing
 //   topbar    from 360 to 1440 px, Edit and Review: no two pieces of the top bar overlap, none is cut off or spills
 //   a11y      1280 × 800, dark and light, Edit and Review: every text meets WCAG AA contrast against what is really
 //             drawn behind it (sampled off a screenshot with the glyphs hidden), every control is at least 24 px,
@@ -93,6 +94,8 @@ if (want('gates')) {
   const emojiUi = uiFiles.filter(f => EMOJI.test(noComments(code(f))));
   ok(!emojiUi.length, `no emoji in assets/ui/${emojiUi.length ? ': ' + emojiUi.map(f => path.basename(f)).join(', ') : ''}`);
   ok(!/Room Creator|SimsTree|Pascal/i.test(page.slice(0, page.indexOf('<script'))) && !/>[^<]*(Pascal|SimsTree)[^<]*</.test(body), 'no Pascal or SimsTree in the head, the title or the chrome');
+  // heat is the QA error's alone, and chart-4 is the warning's hue in the light set: the timeline's bands never use chart-4 or chart-5
+  ok(!/--chart-[45]/.test(noComments(code(path.join(uiDir, 'timeline.ts')))), 'the timeline never colours a band or a line with chart-4 or chart-5 (heat is the QA error\'s alone)');
   // the shot gallery (video/houses/index.html) keeps the same canon: tokens, no emoji, no Room Creator
   const gal = fs.readFileSync(path.join(ROOT, 'video', 'houses', 'index.html'), 'utf8');
   const galStyle = gal.slice(gal.indexOf('<style>'), gal.indexOf('</style>')), galTokens = galStyle.indexOf('*, *::before');
@@ -158,10 +161,10 @@ try {
         }
         if (w === 1280 && scheme === 'dark') {
           // the chrome's own text, once built: no emoji anywhere in it
-          const text = await c.page.evaluate(() => ['header.creator-topbar', 'aside.catalog-sidebar', 'aside.inspector-sidebar', '#animation-dock', '.viewport-overlay-top'].map(s => (document.querySelector(s) as HTMLElement)?.innerText || '').join('\n') + Array.from(document.querySelectorAll('select option')).map(o => o.textContent).join('\n'));
+          const text = await c.page.evaluate(() => ['header.creator-topbar', 'div.catalog-sidebar', 'div.inspector-sidebar', '#animation-dock', '.viewport-overlay-top'].map(s => (document.querySelector(s) as HTMLElement)?.innerText || '').join('\n') + Array.from(document.querySelectorAll('select option')).map(o => o.textContent).join('\n'));
           ok(!EMOJI.test(text), 'no emoji in the chrome once a home is built');
           // labels at least 10.6 px (the canon's floor), controls named
-          const small = await c.page.evaluate(() => Array.from(document.querySelectorAll('header *, aside *, #animation-dock *, .viewport-overlay-top *, .viewport-hud-angles *')).filter(e => { const el = e as HTMLElement; return el.offsetParent && el.childNodes.length && Array.from(el.childNodes).some(n => n.nodeType === 3 && n.textContent!.trim()) && parseFloat(getComputedStyle(el).fontSize) < 10.6; }).map(e => `${(e as HTMLElement).className || e.tagName}: ${getComputedStyle(e).fontSize}`));
+          const small = await c.page.evaluate(() => Array.from(document.querySelectorAll('header *, .catalog-sidebar *, .inspector-sidebar *, #animation-dock *, .viewport-overlay-top *, .viewport-hud-angles *')).filter(e => { const el = e as HTMLElement; return el.offsetParent && el.childNodes.length && Array.from(el.childNodes).some(n => n.nodeType === 3 && n.textContent!.trim()) && parseFloat(getComputedStyle(el).fontSize) < 10.6; }).map(e => `${(e as HTMLElement).className || e.tagName}: ${getComputedStyle(e).fontSize}`));
           ok(!small.length, `every label at least 10.6 px${small.length ? ': ' + small.slice(0, 4).join(' | ') : ''}`);
           const unnamed = await c.page.evaluate(() => Array.from(document.querySelectorAll('button, input, select, [role="tab"]')).filter(e => { const el = e as HTMLElement; if (!el.offsetParent) return false; const name = el.getAttribute('aria-label') || el.getAttribute('aria-labelledby') || (el as HTMLInputElement).labels?.length || el.textContent!.trim() || el.title; return !name; }).map(e => (e as HTMLElement).id || (e as HTMLElement).className));
           ok(!unnamed.length, `every control has a name${unnamed.length ? ': ' + unnamed.slice(0, 5).join(', ') : ''}`);
@@ -172,6 +175,9 @@ try {
           // (the timeline's markers are 24 px dots, spread along the bar; their hit area is 44 px: .rc-tl-mark::before)
           const targets = await c.page.evaluate(() => Array.from(document.querySelectorAll('header button, header a, #animation-dock button, #animation-dock select')).filter(e => (e as HTMLElement).offsetParent && !e.classList.contains('rc-tl-mark')).filter(e => { const r = e.getBoundingClientRect(); return r.height < 43.5 || r.width < 43.5; }).map(e => `${e.id || e.className} ${Math.round(e.getBoundingClientRect().width)}×${Math.round(e.getBoundingClientRect().height)}`));
           ok(targets.length === 0, `touch targets at least 44 px on a phone${targets.length ? ': ' + targets.join(', ') : ''}`);
+          // sliders, swatches, dialog close buttons, the tree's rows and the picker follow the same rule (a bare class once lost to `input[type=range]`)
+          const coarse = await c.page.evaluate(() => { const px = (e: Element) => parseFloat(getComputedStyle(e).height); const small = (sel: string, min: number) => Array.from(document.querySelectorAll(sel)).filter(e => px(e) < min - 0.5).map(e => `${sel} ${px(e)}`); return { coarse: matchMedia('(pointer: coarse)').matches, bad: [...small('input[type="range"]', 44), ...small('.swatch', 44), ...small('.rc-icon-btn', 44), ...small('.house-picker', 44), ...small('.qa-badge', 44), ...small('.tod-seg .seg-btn', 44)] }; });
+          ok(coarse.coarse && coarse.bad.length === 0, `every slider, swatch, close button, the picker, the checks badge and the time-of-day segments are 44 px on touch${coarse.bad.length ? ': ' + coarse.bad.slice(0, 4).join(', ') : ''}`);
         }
         noErrors(c, `(${w} × ${h} ${scheme})`);
         await c.close();
@@ -475,7 +481,8 @@ try {
     }
 
     if (want('picker')) {
-      await p2.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+      await p2.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); if (!(window as any).__houseUi.placed().some((o: any) => !o.userData.generated)) (document.querySelector('#catalog-items-list .catalog-item-card') as HTMLElement).click(); });   // something of the person's own, to be told about
+      const own = await p2.evaluate(() => (window as any).__houseUi.placed().filter((o: any) => !o.userData.generated).length);
       await p2.keyboard.press('g');
       await sleep(300);
       ok(await p2.isVisible('#gallery-dialog'), 'G opens the home picker');
@@ -491,25 +498,134 @@ try {
       await sleep(500);
       const q = await query(p2);
       ok(q.house === 'mirage' && /Mirage/.test(await p2.title()) && /Mirage/.test(await p2.textContent('#house-picker-name')), `the keyboard opens a home; the URL (${q.house}), the title and the picker follow`);
+      // a home is rebuilt from its spec: what was added to the last one goes, and the picker says so
+      const said = (await p2.textContent('#toasts')) || '';
+      ok(own > 0 && new RegExp(`The ${own} things? you added (was|were) not kept`).test(said), `picking a home says what it drops ("${said.replace(/\s+/g, ' ').trim().slice(0, 90)}")`);
+      // and the home it opens is dressed by its own shot from the first frame: no wall left cut down by the last home's shot
+      const dressed = await p2.evaluate(() => { const v = (window as any).__houseVisibility, w = v.trackedWalls.filter((x: any) => x.userData.cutawayGroup); return { walls: w.length, cutDown: w.filter((x: any) => x.userData.cutawayGroup.visible && !x.userData.fullGroup.visible).length, qa: (window as any).__houseSceneQA().errors.filter((e: any) => e.code === 'dressing-walls').length }; });
+      ok(dressed.walls > 0 && dressed.cutDown === 0 && dressed.qa === 0, `a second home is dressed by its own shot: ${dressed.walls} walls, ${dressed.cutDown} cut down, ${dressed.qa} dressing-walls findings`);
+      // an item added while a level shot's lens is the view lands in front of the eye and on the lot, not where a flat ray meets the floor
+      const drops: Array<{ t: number; x: number; z: number; lot: { w: number; d: number } }> = [];
+      for (const t of [0.4, 0.7]) {
+        await p2.evaluate((t: number) => { const i = (window as any).__houseUi.timeline.input; i.value = String(Math.round(t * +i.max)); i.dispatchEvent(new Event('input')); }, t);
+        await p2.evaluate(() => (document.querySelector('#catalog-items-list .catalog-item-card') as HTMLElement).click());
+        drops.push(await p2.evaluate((t: number) => { const o = (window as any).__houseUi.selected(); return { t, x: o.position.x, z: o.position.z, lot: (window as any).__houseDebug().house.spec.lot }; }, t));
+      }
+      ok(drops.every(d => Math.abs(d.x) <= d.lot.w / 2 && Math.abs(d.z) <= d.lot.d / 2), `an item added from a shot's camera lands on the lot (${drops.map(d => `t ${d.t}: ${d.x.toFixed(1)}, ${d.z.toFixed(1)} of ${d.lot.w} × ${d.lot.d}`).join('; ')})`);
     }
     noErrors(c, 'in the editor');
     await c.close();
   }
 
-  // ---------------------------------------------------------------- drawers at 768
+  // ---------------------------------------------------------------- small things the person does early and late
+  if (want('robust')) {
+    console.log('\nrobust');
+    {
+      // Play pressed while the automatic checks are still running: they wait for the shot to stop, and then finish
+      const c = await open(`?house=${ONE}&qa=1`);
+      const { page } = c;
+      await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+      await page.keyboard.press('Space');
+      await sleep(1200);
+      const mid = await page.evaluate(() => ({ playing: (window as any).__houseUi.state().playing, badge: document.getElementById('btn-qa')!.dataset.state, list: document.getElementById('qa-list')!.textContent!.trim() }));
+      await page.keyboard.press('Space');
+      await page.waitForFunction(() => ['pass', 'warn', 'error'].includes(document.getElementById('btn-qa')!.dataset.state!), null, { timeout: 60000 });
+      ok(mid.playing, `Play during the checks: the shot plays, and the checks (${mid.badge}: "${mid.list.slice(0, 40)}") finish once it stops (${await page.evaluate(() => document.getElementById('btn-qa')!.dataset.state)}) instead of staying on "Checking"`);
+      noErrors(c, '(checks and Play)');
+      await c.close();
+    }
+    {
+      // A studio scene has no HouseSpec: no plan to draw, so the Plan button is off there and nothing throws
+      const c = await open('?preset=garden-house');
+      const { page } = c;
+      const r = await page.evaluate(() => { const b = document.getElementById('btn-toggle-plan') as HTMLButtonElement; let threw = ''; try { const u = (window as any).__houseUi; u.planInset.setView(0.2, [0, 1.6, 3], [0, 1.2, 0], 42, 16 / 9); u.planInset.draw(); } catch (e: any) { threw = e.message; } return { disabled: b.disabled, title: b.title, threw, hidden: (document.getElementById('plan-inset') as HTMLElement).hidden }; });
+      await page.keyboard.press('m'); await sleep(200);
+      ok(r.disabled && r.hidden && !r.threw && (await page.evaluate(() => (document.getElementById('plan-inset') as HTMLElement).hidden)), `a studio scene: the Plan button is off ("${r.title}"), M does nothing, and the inset takes no home without throwing${r.threw ? ' (' + r.threw + ')' : ''}`);
+      noErrors(c, '(studio scene)');
+      await c.close();
+    }
+    {
+      // the single-letter shortcuts can be turned off (WCAG 2.1.4); Space, the arrows and the chords stay
+      const c = await open(`?house=${ONE}`);
+      const { page } = c;
+      await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+      await page.keyboard.press('g'); await sleep(250);
+      const on = await page.isVisible('#gallery-dialog');
+      await page.keyboard.press('Escape'); await sleep(200);
+      await page.evaluate(() => { const b = document.getElementById('keys-single') as HTMLInputElement; b.click(); });
+      await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+      await page.keyboard.press('g'); await page.keyboard.press('c'); await page.keyboard.press('i'); await sleep(250);
+      const off = await page.evaluate(() => ({ dialogs: document.querySelectorAll('dialog[open]').length, iso: document.getElementById('btn-cam-iso')!.getAttribute('aria-pressed'), stored: (() => { try { return localStorage.getItem('vh-single-keys'); } catch { return 'blocked'; } })() }));
+      await page.keyboard.press('Space'); await sleep(300);
+      const playing = (await state(page)).playing;
+      await page.keyboard.press('Space');
+      await page.keyboard.press('ArrowRight');
+      const stepped = (await state(page)).t > 0;
+      ok(on && off.dialogs === 0 && (off.stored === 'off' || off.stored === 'blocked') && playing && stepped, `single-key shortcuts: G opens the picker; switched off, G, C and I do nothing (${off.dialogs} dialogs), Space and the arrows still work`);
+      await page.evaluate(() => { const b = document.getElementById('keys-single') as HTMLInputElement; b.click(); });
+      await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+      await page.keyboard.press('g'); await sleep(250);
+      ok(await page.isVisible('#gallery-dialog'), 'and back on, G opens the picker again');
+      noErrors(c, '(shortcuts)');
+      await c.close();
+    }
+  }
+
+  // ---------------------------------------------------------------- drawers at 768 and 390
   if (want('drawers')) {
-    console.log('\ndrawers 768 × 1024');
-    const c = await open(`?house=${ONE}`, { width: 768, height: 1024 });
-    await c.page.click('#btn-toggle-inspector');
-    await sleep(350);
-    const d = await c.page.evaluate(() => { const r = document.getElementById('inspector')!.getBoundingClientRect(); return { open: document.getElementById('inspector')!.dataset.drawer, x: r.right, iw: innerWidth, scrim: !!(document.getElementById('drawer-scrim') as HTMLElement).offsetParent }; });
-    ok(d.open === 'open' && Math.abs(d.x - d.iw) < 1 && d.scrim, 'the inspector opens as a drawer over the viewport');
-    await shot(c.page, 'drawers-768-inspector');
-    await c.page.click('#drawer-scrim', { position: { x: 20, y: 400 } });
-    await sleep(300);
-    ok(!(await c.page.getAttribute('#inspector', 'data-drawer')), 'the scrim closes it');
-    noErrors(c, '(drawers)');
-    await c.close();
+    for (const [w, h] of [[768, 1024], [390, 844]] as Array<[number, number]>) {
+      console.log(`\ndrawers ${w} × ${h}`);
+      const c = await open(`?house=${ONE}`, { width: w, height: h });
+      const { page } = c;
+      // a closed drawer is off the page: hidden to the keyboard and to a screen reader, and its catalog panel is not left where the flyout put it
+      const closed = () => page.evaluate(() => ['catalog', 'inspector'].map(id => { const a = document.getElementById(id)!; const panel = a.querySelector('.catalog-panel') as HTMLElement | null; return { id, vis: getComputedStyle(a).visibility, panel: panel ? getComputedStyle(panel).display : null, focusable: Array.from(a.querySelectorAll('button, input, select, [tabindex]')).filter(e => (e as HTMLElement).getClientRects().length && getComputedStyle(e).visibility !== 'hidden').length }; }));
+      const cl0 = await closed();
+      ok(cl0.every((d: any) => d.vis === 'hidden' && d.focusable === 0) && cl0[0].panel === 'none', `both drawers start off the page: hidden, nothing in them to tab to, the catalog's panel not shown (${JSON.stringify(cl0.map((d: any) => [d.id, d.vis, d.focusable]))})`);
+      // Tab through the whole page: no stop is outside the window (focus in a hidden drawer scrolled the workspace sideways)
+      await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+      const stops: Array<{ id: string; off: boolean }> = [];
+      for (let i = 0; i < 80; i++) { await page.keyboard.press('Tab'); stops.push(await page.evaluate(() => { const e = document.activeElement as HTMLElement; if (!e || e === document.body) return { id: '', off: false }; const r = e.getBoundingClientRect(); return { id: e.id || e.className.toString().slice(0, 24), off: r.right < 1 || r.left > innerWidth - 1 || r.bottom < 1 || r.top > innerHeight - 1 }; })); }
+      ok(stops.filter(s => s.id).length > 30 && stops.every(s => !s.off) && (await page.evaluate(() => (document.getElementById('workspace') as HTMLElement).scrollLeft)) === 0, `Tab through the page: ${stops.filter(s => s.id).length} stops, none off-screen, the workspace never scrolled (${stops.filter(s => s.off).map(s => s.id).join(', ')})`);
+      await page.evaluate(() => (document.activeElement as HTMLElement)?.blur());
+
+      // the inspector: a dialog over the page
+      await page.click('#btn-toggle-inspector');
+      await sleep(350);
+      const d = await page.evaluate(() => { const a = document.getElementById('inspector')!, r = a.getBoundingClientRect(), sc = document.getElementById('drawer-scrim') as HTMLElement; return { open: a.dataset.drawer, x: r.right, iw: innerWidth, scrim: getComputedStyle(sc).display !== 'none', role: a.getAttribute('role'), modal: a.getAttribute('aria-modal'), mainInert: (document.getElementById('viewport-box') as HTMLElement).inert, topInert: (document.querySelector('header.creator-topbar') as HTMLElement).inert, focusIn: a.contains(document.activeElement), expanded: document.getElementById('btn-toggle-inspector')!.getAttribute('aria-expanded') }; });
+      ok(d.open === 'open' && Math.abs(d.x - d.iw) < 1 && d.scrim, `the inspector opens as a drawer over the viewport (${w} px)`);
+      ok(d.role === 'dialog' && d.modal === 'true' && d.mainInert && d.topInert && d.focusIn && d.expanded === 'true', `an open drawer is a dialog: aria-modal, the view and the top bar inert behind it, focus inside (${d.role}, ${d.modal}, inert ${d.mainInert}/${d.topInert})`);
+      await shot(page, `drawers-${w}-inspector`);
+      // Tab stays inside it
+      const inside: boolean[] = [];
+      for (let i = 0; i < 40; i++) { await page.keyboard.press('Tab'); inside.push(await page.evaluate(() => { const e = document.activeElement as HTMLElement; return !e || e === document.body || !!document.getElementById('inspector')!.contains(e); })); }
+      ok(inside.every(Boolean), 'Tab stays inside an open drawer (none of 40 stops reached the view behind it)');
+      // Esc closes it on the first press, from anywhere in it, and focus goes back to the toggle
+      await page.keyboard.press('Escape');
+      await sleep(300);
+      const after = await page.evaluate(() => ({ open: document.getElementById('inspector')!.dataset.drawer || null, active: document.activeElement && (document.activeElement as HTMLElement).id, mainInert: (document.getElementById('viewport-box') as HTMLElement).inert, role: document.getElementById('inspector')!.getAttribute('role'), shotStill: (window as any).__houseVisibility.shotDressing() }));
+      ok(!after.open && after.active === 'btn-toggle-inspector' && !after.mainInert && after.role === 'complementary', `Esc closes the drawer on the first press and focus goes back to its toggle (${after.active})`);
+      ok(after.shotStill, 'and it did not take the camera back from the shot');
+      // the close button and the scrim
+      await page.click('#btn-toggle-inspector'); await sleep(300);
+      await page.click('[data-drawer-close="inspector"]'); await sleep(300);
+      ok(!(await page.getAttribute('#inspector', 'data-drawer')), 'the drawer\'s own close button closes it');
+      await page.click('#btn-toggle-inspector'); await sleep(300);
+      await page.click('#drawer-scrim', { position: { x: 20, y: 400 } });
+      await sleep(300);
+      ok(!(await page.getAttribute('#inspector', 'data-drawer')), 'the scrim closes it');
+
+      // the catalog: opens, and closed leaves nothing behind (the flyout's panel used to stay put over the view)
+      await page.click('#btn-toggle-catalog'); await sleep(350);
+      const panel = await page.evaluate(() => { const p = document.querySelector('#catalog .catalog-panel') as HTMLElement, r = p.getBoundingClientRect(); return { display: getComputedStyle(p).display, x: r.x, w: r.width }; });
+      ok(panel.display === 'flex' && panel.x >= 0 && panel.w > 200, `the catalog opens with its panel (${Math.round(panel.w)} px wide)`);
+      await shot(page, `drawers-${w}-catalog`);
+      await page.keyboard.press('Escape'); await sleep(350);
+      const cl1 = await closed();
+      ok(cl1[0].vis === 'hidden' && cl1[0].panel === 'none' && cl1[0].focusable === 0, `closed again, the catalog leaves nothing over the view (panel ${cl1[0].panel}, drawer ${cl1[0].vis})`);
+      await shot(page, `drawers-${w}-closed`);
+      noErrors(c, `(drawers ${w})`);
+      await c.close();
+    }
   }
 
   // ---------------------------------------------------------------- the top bar, at every width
@@ -608,6 +724,27 @@ try {
       }
       const tabs = await page.$$eval('#scene-outliner-box [role="treeitem"]', (els: Element[]) => els.filter(e => (e as HTMLElement).tabIndex >= 0).length);
       ok(tabs <= 1, `the scene outliner is ${tabs} tab stop`);
+      // the timeline's two lines: 3:1 against the dock and against each other, and the QA's warning colour reads as a warning
+      const cols = await page.evaluate(() => { const rs = getComputedStyle(document.documentElement), px = (v: string) => { const cv = document.createElement('canvas'); cv.width = cv.height = 1; const g = cv.getContext('2d')!; const s = document.createElement('span'); s.style.color = v; document.body.appendChild(s); g.fillStyle = getComputedStyle(s).color; s.remove(); g.fillRect(0, 0, 1, 1); const d = g.getImageData(0, 0, 1, 1).data; return `rgb(${d[0]}, ${d[1]}, ${d[2]})`; }; return { speed: px(rs.getPropertyValue('--rc-spark-speed')), turn: px(rs.getPropertyValue('--rc-spark-turn')), warn: px(rs.getPropertyValue('--rc-warn')), warning: px(rs.getPropertyValue('--warning')), dock: (() => { const cv = document.createElement('canvas'); cv.width = cv.height = 1; const g = cv.getContext('2d')!; g.fillStyle = px(rs.getPropertyValue('--background')); g.fillRect(0, 0, 1, 1); g.fillStyle = getComputedStyle(document.getElementById('animation-dock')!).backgroundColor; g.fillRect(0, 0, 1, 1); const d = g.getImageData(0, 0, 1, 1).data; return `rgb(${d[0]}, ${d[1]}, ${d[2]})`; })() }; });
+      const rgb = (c: string) => (c.match(/[\d.]+/g) || []).slice(0, 3).map(Number) as [number, number, number];
+      const ratio = (a: string, b: string) => { const l1 = lum(...rgb(a)), l2 = lum(...rgb(b)); return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05); };
+      ok(ratio(cols.speed, cols.dock) >= 3 && ratio(cols.turn, cols.dock) >= 3 && ratio(cols.speed, cols.turn) >= 3, `the Speed and Turn lines are 3:1 against the dock and each other (${ratio(cols.speed, cols.dock).toFixed(1)}, ${ratio(cols.turn, cols.dock).toFixed(1)}, ${ratio(cols.speed, cols.turn).toFixed(1)}), and the legend tells them apart by dash as well`);
+      ok(cols.warn === cols.warning, `QA warnings use the canon's warning colour (${cols.warn})`);
+      // focus you can see, and what a screen reader hears
+      await page.evaluate(() => (window as any).__houseUi.setUiMode('edit'));   // (the loop above ends in Review, where the material section is not there)
+      await sleep(300);
+      const a11y = await page.evaluate(async () => {
+        const u = (window as any).__houseUi; u.select(u.placed().find((o: any) => o.userData.generated && o.userData.role === 'item'));
+        await new Promise(r => setTimeout(r, 200));
+        return { live: document.getElementById('anim-time-readout')!.getAttribute('aria-live'), region: document.getElementById('toasts')!.getAttribute('role'), label: document.getElementById('toasts')!.getAttribute('aria-label'), h1: Array.from(document.querySelectorAll('h1')).map(h => h.textContent), h1Landmark: !!document.querySelector('header h1'), swatches: document.querySelectorAll('.swatch').length };
+      });
+      ok(a11y.live === 'off' && a11y.region === 'region' && a11y.label === 'Notifications' && a11y.h1.length === 1 && a11y.h1Landmark, `the time readout is not a live region, the toasts are a named region, the page has one heading (${JSON.stringify(a11y.h1)})`);
+      await page.keyboard.press('Tab');   // keyboard modality: the focus ring shows
+      await page.evaluate(() => (document.querySelector('#color-swatch-picker .swatch') as HTMLElement).focus());
+      await sleep(300);   // (the ring's colour eases in over 150 ms)
+      const ring = await page.evaluate(() => { const sw = document.querySelector('#color-swatch-picker .swatch') as HTMLElement; const b = getComputedStyle(sw, '::before'); return { w: b.outlineWidth, c: b.outlineColor, s: b.outlineStyle, focusVisible: sw.matches(':focus-visible') }; });
+      ok(ring.focusVisible && ring.s === 'solid' && ring.w === '2px' && !/rgba\(0, 0, 0, 0\)|transparent/.test(ring.c), `a focused colour swatch has a visible ring (${ring.s} ${ring.w} ${ring.c})`);
+      await page.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); (window as any).__houseUi.select(null); });
       noErrors(c, `(a11y ${scheme})`);
       await c.close();
     }
@@ -713,6 +850,39 @@ try {
       const after = await page.evaluate(() => { const r = (window as any).__houseDebug().renderer; return { size: [r.domElement.clientWidth, r.domElement.clientHeight], recording: (window as any).__houseUi.state().recording, bar: !!document.querySelector('.rc-toast-progress') }; });
       ok(downloaded === 0 && !after.bar && !after.recording && after.size[0] === before[0] && after.size[1] === before[1], `Cancel stops the film: no file, no progress note, the page is not locked and the viewport is ${after.size.join(' × ')} again`);
       noErrors(c, '(record cancel)');
+      await c.close();
+    }
+    {
+      // A film is not disturbed by the person: keys that would open a dialog or rebuild the home do nothing while it renders,
+      // and a window resize does not change the size it is drawn at. Three short films (640 × 360) on one page — a warm-up,
+      // one left alone, one with the keyboard and the window worked at — and the disturbed one is the same 360 frames.
+      const c = await open(`?house=${ONE}`, { width: 1280, height: 800 });
+      const { page } = c;
+      const film = async (disturb: boolean) => {
+        await page.evaluate(() => { const set = (id: string, v: string, label?: string) => { const e = document.getElementById(id) as HTMLSelectElement; if (label && !Array.from(e.options).some(o => o.value === v)) e.add(new Option(label, v)); e.value = v; }; set('video-res-select', '360', '360p'); set('video-fps-select', '30'); set('video-aspect-select', '16:9'); set('video-spline-preset-sync', `house:${(window as any).__houseUi.state().scene.slice(6)}:door-to-core`); (window as any).__film = (window as any).__houseUi.startRecording(); });
+        const seen: any = {};
+        if (disturb) {
+          await page.waitForFunction(() => /Frame \d+ of/.test(document.querySelector('.rc-toast-detail')?.textContent || ''), null, { timeout: 60000 });
+          await sleep(800);
+          for (const k of ['g', 'c', 'i', 't', 'f', 'p', 'm', 'l', 'b', 'Escape']) { await page.keyboard.press(k); await sleep(60); }
+          seen.dialogs = await page.evaluate(() => Array.from(document.querySelectorAll('dialog[open]')).map(d => d.id));
+          await page.setViewportSize({ width: 1000, height: 640 }); await sleep(400);
+          Object.assign(seen, await page.evaluate(() => ({ canvas: [(document.getElementById('three-canvas') as HTMLCanvasElement).width, (document.getElementById('three-canvas') as HTMLCanvasElement).height], scene: (window as any).__houseUi.state().scene, recording: (window as any).__houseUi.state().recording })));
+        }
+        const rec = await page.evaluate(async () => { const r = await (window as any).__film; return { hashes: r.frameHashes as string[], frames: r.frames, w: r.width, h: r.height }; });
+        await page.waitForFunction(() => !document.querySelector('.rc-toast-progress'), null, { timeout: 30000 });
+        return { rec, seen };
+      };
+      await film(false);
+      const calm = await film(false);
+      const busy = await film(true);
+      const differ = calm.rec.hashes.filter((h, i) => h !== busy.rec.hashes[i]).length;
+      ok(busy.seen.dialogs.length === 0 && busy.seen.scene === `house:${ONE}` && busy.seen.recording, `keys pressed during a film (G, C, I, T, F, P, M, L, B, Esc) open nothing and leave the home as it is (dialogs ${JSON.stringify(busy.seen.dialogs)}, ${busy.seen.scene})`);
+      ok(busy.seen.canvas[0] === 640 && busy.seen.canvas[1] === 360 && busy.rec.w === 640 && busy.rec.h === 360 && busy.rec.frames === 360, `a window resize mid-film leaves the canvas at the film's size (${busy.seen.canvas.join(' × ')}) and the film at ${busy.rec.frames} frames of ${busy.rec.w} × ${busy.rec.h}`);
+      ok(differ === 0, `the disturbed film is the same 360 frames as the one left alone (${differ} differ)`);
+      const fit = await page.evaluate(() => { const c = document.getElementById('three-canvas') as HTMLCanvasElement, v = document.getElementById('viewport-box') as HTMLElement; return [c.clientWidth === v.clientWidth, c.clientHeight === v.clientHeight, Math.abs((window as any).__houseDebug().camera.aspect - v.clientWidth / v.clientHeight) < 1e-6]; });
+      ok(fit.every(Boolean), 'and the viewport takes the window\'s new size when the film is done');
+      noErrors(c, '(record disturbed)');
       await c.close();
     }
     const has = (b: string) => spawnSync(b, ['-version'], { stdio: 'ignore' }).status === 0;

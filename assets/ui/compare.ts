@@ -129,9 +129,13 @@ export function createCompare(dialog: HTMLDialogElement, hooks: CompareHooks) {
         n++;
       }
     } finally {
+      // the controls stay off until the person's own home is back (rebuilding it takes seconds, and a click meanwhile would
+      // start a second set over it): nothing is left to stop, and the note says what is happening
+      stopBtn.hidden = true;
+      note.textContent = 'Putting your home back…';
+      try { await hooks.restore(); } catch (e) { console.error(e); hooks.toast(`Your home could not be put back: ${(e as Error).message}`, 'error'); }
       running = null;
       setBusy(false);
-      try { await hooks.restore(); } catch (e) { console.error(e); hooks.toast(`Your home could not be put back: ${(e as Error).message}`, 'error'); }
       layout();
       if (failed) hooks.toast(`${failed} home${failed === 1 ? '' : 's'} could not be drawn. See the console.`, 'error');
       else if (ac.signal.aborted) note.textContent = `Stopped after ${n}. ${note.textContent}`;

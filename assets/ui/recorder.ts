@@ -51,9 +51,13 @@ export function avcCodecFor(w: number, h: number, fps: number): string[] {
   const fs = Math.ceil(w / 16) * Math.ceil(h / 16), mbps = fs * fps;
   return AVC_LEVELS.filter(([, maxMbps, maxFs]) => mbps <= maxMbps && fs <= maxFs).map(([lv]) => `avc1.6400${lv}`);
 }
-/** Bits a second for a film: ~0.25 bit a pixel a frame, never under 20 Mb/s — high enough that every frame, the
+/** Bits a second to ask for a film: ~0.25 bit a pixel a frame, never under 20 Mb/s — high enough that every frame, the
  *  first keyframe too (a rate controller starts cautious), decodes within 40 dB PSNR of what was rendered
- *  (scripts/test-ui.mts checks it). 1080p60 is ~31 Mb/s, 4K60 is capped at 80. */
+ *  (scripts/test-ui.mts checks it). 1080p60 is ~31 Mb/s, 4K60 is capped at 80. It is a target, not a promise of size: a
+ *  calm shot at a small size fills less of it (VP9 in particular stops spending once a frame is that close to the
+ *  original: measured 9 to 14 Mb/s for 20 asked, at 44 dB and up), so the dialog says "up to".
+ *  A film's size must be even (4:2:0 chroma, and H.264 takes no other): the page rounds 21:9's height to it. The same
+ *  VP9 film measured 34 to 37 dB at 1280 × 549 and 44 to 47 dB at 1280 × 548. */
 export function bitrateFor(w: number, h: number, fps: number): number {
   return Math.round(Math.max(20e6, Math.min(80e6, w * h * fps * 0.25)));
 }

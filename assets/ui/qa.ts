@@ -44,7 +44,7 @@ export function renderQaList(el: HTMLElement, issues: QaIssue[], { label, durati
     const secs = i.shot && i.t !== null ? i.t * duration(i.shot) : null;
     const when = secs !== null ? `${secs.toFixed(1)} s` : '';
     const text = `<span class="qa-code">${esc(i.code)}</span><span class="qa-where">${esc(where)}${when ? ' · ' + when : ''}</span><span class="qa-msg">${esc(i.message)}</span>`;
-    const icon = svg(i.level === 'error' ? 'alert' : 'info');
+    const icon = svg(i.level === 'error' ? 'octagon-alert' : 'alert');   // a stop sign for an error, a triangle for a warning: never the (i) of a note
     if (i.shot && i.t !== null) {
       const b = document.createElement('button');
       b.type = 'button'; b.className = 'qa-jump';

@@ -1,6 +1,8 @@
 // Toasts (plan §6 P2 16: toasts, never a browser alert or confirm dialog). One region in the corner of the window, announced to
 // screen readers (the region is aria-live polite; an error toast is role="alert"). A toast can carry one action (Undo, Download …)
-// and a progress toast a bar and Cancel — the Record button's (plan §6 P0 1).
+// and a progress toast a bar and Cancel — the Record button's (plan §6 P0 1). A film's progress line changes on every frame,
+// so it is aria-hidden (a reader would queue hundreds of announcements); the bar's value and a short note at each quarter carry
+// the progress instead.
 //
 // Icons are the page's lucide sprite (<use href="#i-…">). Styles: room-creator.html, .rc-toast*.
 
@@ -12,11 +14,12 @@ export type ProgressHandle = ToastHandle & {
   done: (message: string, opts?: { kind?: ToastKind; action?: ToastAction; timeout?: number }) => void;
 };
 
-const ICON: Record<ToastKind, string> = { info: 'info', success: 'check', error: 'alert' };
+const ICON: Record<ToastKind, string> = { info: 'info', success: 'check', error: 'octagon-alert' };
 const svg = (name: string) => `<svg class="i" aria-hidden="true" focusable="false"><use href="#i-${name}"/></svg>`;
 
 export function createToasts(root: HTMLElement) {
   root.classList.add('rc-toasts');
+  root.setAttribute('role', 'region');   // (an aria-label needs a role to sit on)
   root.setAttribute('aria-label', 'Notifications');
   root.setAttribute('aria-live', 'polite');   // a new toast is announced; an error toast interrupts (role="alert")
 
@@ -75,7 +78,12 @@ export function createToasts(root: HTMLElement) {
     el.querySelector('.rc-toast-body')!.appendChild(bar);
     const detail = document.createElement('p');
     detail.className = 'rc-toast-detail';
+    detail.setAttribute('aria-hidden', 'true');   // rewritten every frame: not for the live region
     el.querySelector('.rc-toast-body')!.appendChild(detail);
+    const milestone = document.createElement('p');
+    milestone.className = 'rc-sr';
+    el.querySelector('.rc-toast-body')!.appendChild(milestone);
+    let lastQuarter = 0;
     const close = () => el.remove();
     let cancel: HTMLButtonElement | null = null;
     if (onCancel) cancel = addAction(el, { label: 'Cancel', onClick: onCancel }, close, false);
@@ -86,6 +94,8 @@ export function createToasts(root: HTMLElement) {
         const pct = Math.round(Math.max(0, Math.min(1, fraction)) * 100);
         (bar.firstElementChild as HTMLElement).style.width = `${pct}%`;
         if (pct !== lastPct) { bar.setAttribute('aria-valuenow', String(pct)); lastPct = pct; }
+        const quarter = Math.floor(pct / 25);
+        if (quarter > lastQuarter && quarter < 4) { lastQuarter = quarter; milestone.textContent = `${text}: ${quarter * 25} percent`; }
         if (t !== undefined) detail.textContent = t;
       },
       done(message: string, { kind = 'success' as ToastKind, action = null as ToastAction | null, timeout = 12000 } = {}) {
