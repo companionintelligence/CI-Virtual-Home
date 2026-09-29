@@ -238,7 +238,7 @@ its fragment under `assets/spec/`, its lints in its plugin under `scripts/valida
   tests the merge rule itself (what a fragment may add, widen and not narrow).
 - **Validation.** The validator's core never changes for a stream. Its plugin `extend`s a vocabulary the core checks
   against (a new roof type, floor, ground, hero surface, shot type) and `replaces` a core rule whose meaning it
-  changes (`stairs`, `raised-level`, `site-needs`, `shot-duration`); item and site types are read off the builders,
+  changes (`footprint-rects`, `partition-axis-aligned`, `stairs`, `raised-level`, `site-needs`, `shot-duration`); item and site types are read off the builders,
   so a new builder is a valid type at once. The contract is `scripts/validate/_types.mts`.
 
 ### Kit (S1)
