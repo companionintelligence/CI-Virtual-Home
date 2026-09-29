@@ -41,7 +41,7 @@ export interface RoomFocus {
 
 export interface KitchenPlan {
   /** the fitted run: single wall, galley (two facing walls), L (two walls meeting), U (three) */
-  layout: 'L' | 'U' | 'galley' | 'single';
+  layout?: 'L' | 'U' | 'galley' | 'single';
   /** an island (true: sized to the room; or its w × d, metres) */
   island?: boolean | { w: number; d: number };
   /** a peninsula off the end of the run instead of an island */

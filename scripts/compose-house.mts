@@ -7,8 +7,12 @@
 //     --house <id>      a real house (content/houses/<id>.json), a fixture (test/fixtures/houses/<id>.json) or a path
 //     --infer           also compose the rooms that have no `program`, reading it off the room's name (the dry run:
 //                       "what would the composer make of this house?"); rooms whose name says nothing are left alone
-//     --replace         with --infer: drop every authored item of a room first (the hand-typed filler swapped for a
-//                       composition on a copy); without it authored items are pins and stay exactly
+//     --replace         with --infer: drop the authored filler of a room first (the hand-typed loveseat, wingback and bed swapped
+//                       for a composition, on a copy) — but keep what the composer arranges ROUND: a hearth and a wall TV, and
+//                       the Core's own pieces (--keep adds types, --keep none drops even those); without it authored items are
+//                       pins and stay exactly, and a piece that fills a role (a toilet, a bed, a sofa, a table, a run) means the
+//                       composer adds no second one
+//     --keep a,b|none   with --replace: the item types to keep (default fireplace,wall-tv)
 //     --rooms a,b       only these rooms (by name or no)
 //     --style <key>     furnish every composed room in this style (modern, farmhouse, cottage, mediterranean,
 //                       mid-century, industrial, scandi, tropical, craftsman) instead of the house's
@@ -43,6 +47,7 @@ const { composeHouse } = await import(path.join(ROOT, 'assets', 'room-composer.j
 const { inferProgram, isProgram, isComposed, PROGRAMS } = await import(path.join(ROOT, 'assets', 'room-programs.js'));
 const { STYLE_KEYS } = await import(path.join(ROOT, 'assets', 'house-styles.js'));
 const { lintLayout } = await import(path.join(ROOT, 'assets', 'layout-lint.js'));
+const { PLACEMENT } = await import(path.join(ROOT, 'assets', 'props', 'placement.js'));
 const SRC = 'compose@1';
 
 const only = opt('rooms') ? new Set(opt('rooms')!.split(',').map(s => s.trim())) : null;
@@ -51,6 +56,9 @@ const seed = opt('seed'), density = opt('density') !== null ? Number(opt('densit
 if (density !== null && !(density >= 0 && density <= 1)) { console.error('--density is 0..1'); process.exit(2); }
 const INFER = flag('infer'), REPLACE = flag('replace'), REBAKE = flag('rebake'), WRITE = flag('write');
 if (REPLACE && !INFER) { console.error('--replace goes with --infer'); process.exit(2); }
+// what --replace keeps: the focal pieces the composer arranges round, and the hero set / structure (the Core's own pieces)
+const KEEP = new Set(opt('keep') === 'none' ? [] : (opt('keep') || 'fireplace,wall-tv').split(',').map(t => t.trim()));
+const keepsPiece = (it: any) => KEEP.has(it.type) || (opt('keep') !== 'none' && ['hero', 'structure'].includes((PLACEMENT[it.type] || {}).group));
 
 // ---- prepare the copy: which rooms compose, and as what
 const picked: Array<{ lv: any; room: any; inferred: boolean }> = [];
@@ -66,7 +74,7 @@ for (const lv of spec.levels || []) for (const room of lv.rooms || []) {
     room.program = p; inferred = true;
   }
   if (room.lock) continue;   // a baked room stays baked
-  if (INFER && REPLACE && inferred) room.items = [];
+  if (INFER && REPLACE && inferred) room.items = items.filter(keepsPiece);
   if (style) room.style = style;
   if (seed !== null) room.seed = room.seed !== undefined ? `${room.seed}:${seed}` : seed;
   if (density !== null) room.density = density;

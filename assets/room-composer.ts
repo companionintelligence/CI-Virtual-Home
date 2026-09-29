@@ -20,6 +20,13 @@
 // Everything is seeded by mulberry32(fnv1a(`${spec.id}:${room.no}:compose`)), sorted stably and rounded to mm; no
 // clock, no Math.random. Output items carry `src: 'compose@1'`.
 //
+// What a room must have (its ANCHORS, assets/layout-lint.ts) is protected: a group whose maker is named (`named(label, …)`) and that no
+// try can stand is reported (`missing`), the room is composed again with it first (a tiny WC that takes the sink's wall first has none
+// left for the toilet), a wet room's essentials are then solved together (`placeJoint`), and a bath whose tub will not stand gets a
+// shower. Authored items that fill a role (a pinned toilet, bed, sofa, table, run) are the room's own: no second one is composed.
+// Sizes are the catalog's measured boxes (assets/props/measured.ts); items are written and read back at mm, so the composer's boxes
+// are the lint's and the page's.
+//
 // Owner: S3 (compose). Kitchen and bath packers: room-units.ts.
 import { mulberry32, fnv1a } from './materials.js';
 import { PROPS } from './props/index.js';
@@ -28,10 +35,10 @@ import { STYLES, styleOf, type StyleBundle } from './house-styles.js';
 import { BEDROOMS, isComposed, inferProgram } from './room-programs.js';
 import {
   analyzeRoom, laneGrid, lanesOk, sizeOf, paramsOf, itemObb, obb, overlap, aabb, insideRoom, rectObb, turn, rotToward, mm,
-  INWARD, ROT_OF_WALL, OPPOSITE, SIDES, alongX, CENTRE_MOUNT, DEG,
+  INWARD, ROT_OF_WALL, OPPOSITE, SIDES, alongX, CENTRE_MOUNT, TOP_MOUNT, DEG,
   type Geo, type Obb, type Run, type Side, type Portal,
 } from './room-geo.js';
-import { kitchenGroups, bathGroups } from './room-units.js';
+import { kitchenGroups, bathGroups, freeRects } from './room-units.js';
 
 export const SRC = 'compose@1';
 const GAP = 0.015;   // an item's back off the wall face
@@ -45,6 +52,8 @@ export interface CItem {
   box: Obb; clear: Obb[]; walk: Obb[];     // the body, and floor it needs kept free (its front; a bed's sides)
   gid: number; opt?: boolean; base?: CItem; tucks?: boolean; access?: Array<[number, number]>;
   pin?: boolean; obstacle?: boolean;
+  /** a pin authored in THIS room (an overlapping room's pins only stand in the way; these also fill roles) */
+  own?: boolean;
   /** a run unit whose front is a peninsula's bar (assets/room-units.ts): no aisle in front of it */
   peninsulaEnd?: boolean;
 }
@@ -58,7 +67,7 @@ export const layerOf = (type: string): Layer => {
 };
 /** vertical extent [y0, y1] of an item in the room (floor = 0) */
 export function vRange(it: CItem): [number, number] {
-  if (it.layer === 'wall') { const y0 = CENTRE_MOUNT.has(it.type) ? it.y - it.h / 2 : it.y; return [y0, y0 + it.h]; }
+  if (it.layer === 'wall') { const y0 = CENTRE_MOUNT.has(it.type) ? it.y - it.h / 2 : TOP_MOUNT.has(it.type) ? it.y - it.h : it.y; return [y0, y0 + it.h]; }
   if (it.layer === 'surface') return [it.y, it.y + it.h];
   if (it.layer === 'ceiling') return [2, 3];
   return [0, it.h];
@@ -71,6 +80,11 @@ export interface Group {
   pose?: Pose; items?: CItem[]; value?: number; gid: number; movable: boolean; required?: boolean;
   /** the annealer moves it (the anchors whose score has a shape: seating, dining, beds, desks, free pieces) */
   anneal?: boolean;
+  /** how much seeded noise is added to a candidate's score (0.05 default): a group with several equally good plans — a kitchen's
+   *  run, a bed's wall — takes more, so re-rolling the seed changes the plan and not only the pieces */
+  jitter?: number;
+  /** a candidate whose items fail it is not used (the filler groups: only in the empty half) */
+  accept?: (items: CItem[]) => boolean;
 }
 export interface HouseState {
   usage: Map<string, number>; storey: Map<string, number>; /** the rooms of each storey a type stands in (the layout lint's repetition rule counts rooms) */ roomsOn: Map<string, Set<any>>; palettes: string[]; styleOf: (room: any) => StyleBundle;
@@ -120,19 +134,30 @@ export class Composer {
     for (const w of [want, 0.8, 0.7, 0.6, 0.5]) if (w <= want && this.lanes(w).ok) { this.baseLaneW = w; break; }
     this.laneW = this.baseLaneW;
     // what the room's own geometry (stairs, voids, pins) already fails, at that width: a placement may not add to it
+    this.hasOthers = others.some(it => it.pin && !it.own);
+    this.bareFailed = new Set(lanesOk(this.geo, laneGrid(this.geo, this.geo.obstacles), 0.8).failed);
     this.baseFailed = new Set(lanesOk(this.geo, laneGrid(this.geo, this.blockers()), this.laneW).failed);
-    if (this.laneW > 0.8) for (const f of lanesOk(this.geo, laneGrid(this.geo, this.blockers()), 0.8).failed) this.baseFailed.add(f);
+    // (and at 0.8 m whatever the aim: the lint holds every room to 0.8 m, less what its own walls, stairs and pins already fail)
+    if (this.laneW !== 0.8) for (const f of lanesOk(this.geo, laneGrid(this.geo, this.blockers()), 0.8).failed) this.baseFailed.add(f);
   }
+
+  /** does this room's own authored furniture already fill a role? A pinned sofa is the room's seating, a pinned toilet its
+   *  toilet: the composer adds none beside it (plan S3: authored items are pins; a pin that fills a role is not doubled) */
+  ownHas(...roles: string[]): boolean { return this.placed.some(it => it.pin && it.own && (PLACEMENT[it.type]?.roles || []).some(r => roles.includes(r))); }
+  ownCount(...roles: string[]): number { return this.placed.filter(it => it.pin && it.own && (PLACEMENT[it.type]?.roles || []).some(r => roles.includes(r))).length; }
 
   // ---- sizes, types, colours
   size(type: string, params: any = {}) { return sizeOf(type, params) || { w: 0.5, d: 0.5, h: 0.5, ox: 0, oz: 0, y0: 0 }; }
   usageOf(type: string) { return this.house.usage.get(type) || 0; }
   /** a type for a role: style match × the house's own picks × repetition × fit, then a seeded weighted pick (stable order) */
-  pick(role: string, { program = this.program, fit = null as ((t: string) => boolean) | null, exclude = [] as string[], weights = {} as Record<string, number> } = {}): string | null {
+  pick(role: string, { program = this.program, fit = null as ((t: string) => boolean) | null, exclude = [] as string[], weights = {} as Record<string, number>, onto = null as CItem | null } = {}): string | null {
     const tags = this.style.tags, key = this.style.key;
     // the types the room's program allows, then those that also fit this particular call (its `fit` and `exclude`)
     const allowed = typesFor(role).filter(t => { const p = PLACEMENT[t]; return !p.programs.length || p.programs.includes(program); });
     let cands = allowed.filter(t => !exclude.includes(t) && (!fit || fit(t)));
+    // a piece that stands on another only stands on what its placement says it may (`surfaces`: a lamp on a nightstand, a table, a desk; a
+    // kettle on a counter, not on a bath)
+    if (onto) { const grp = PLACEMENT[onto.type]?.group; const on = cands.filter(t => !PLACEMENT[t].surfaces.length || PLACEMENT[t].surfaces.includes(grp)); if (on.length) cands = on; }
     // the layout lint's repetition rule (one type in more than two rooms of a storey, or more than five in a house) is the
     // composer's own: a piece that would break it is left to the others, unless nothing else can fill the role
     const capped = (t: string) => !REPEATS.has(PLACEMENT[t].group) && ((this.house.roomsOn.get(`${this.lv.id}:${t}`)?.size ?? 0) - (this.house.roomsOn.get(`${this.lv.id}:${t}`)?.has(this.room) ? 1 : 0) >= 2 || this.usageOf(t) >= 5);
@@ -140,12 +165,15 @@ export class Composer {
     // a group that could not be placed is made again with other pieces: what its last try picked is set aside
     if (this.avoid.size) { const rest = cands.filter(t => !this.avoid.has(t)); if (rest.length) cands = rest; }
     if (!cands.length) return null;
+    // a piece that goes with what the room already holds (a lamp with its nightstand, a picture with the sofa: its `pairsWith`) is favoured
+    const roomRoles = this.rolesHere();
+    const pairW = (t: string) => { const pw = PLACEMENT[t].pairsWith; return pw.length && pw.some(r => roomRoles.has(r)) ? 1.6 : 1; };
     const styleW = (t: string) => { const st = PLACEMENT[t].styles; return !st.length ? 0.7 : st.includes(key) ? 3 : st.some(s => tags.includes(s)) ? 1.6 : 0.35; };
     // the house's own picks for this role — one lamp, one dresser, a couple of plants: a house reads as one scheme and
-    // the next house reaches for others (the fleet's "each home looks very same"). Drawn once per (role, kind of room,
-    // room seed) from the types the room's program allows, on a stream of its own (so they do not depend on the order
-    // rooms ask), weighted by the style and by what the house already prefers for another role; then the only picks.
-    const pk = `${role}:${program}:${this.room.seed ?? ''}`;
+    // the next house reaches for others (the fleet's "each home looks very same"). Drawn once per (role, room seed) — a house has
+    // one rug family and one bookcase, not one per kind of room — from the types the first room to ask allows, on a stream of its
+    // own (so they do not depend on the order rooms ask), weighted by the style and by what the house already prefers for another role.
+    const pk = `${role}:${this.room.seed ?? ''}`;
     let pref = this.house.prefer.get(pk);
     if (!pref) {
       const r = mulberry32(fnv1a(`${this.house.seed}:prefer:${pk}`)); pref = [];
@@ -167,7 +195,7 @@ export class Composer {
       // no pick of the house's is possible here (the call's `fit` rules them out): lean on the types the house likes best
       // — a stable, house-wide ranking of every type — rather than on chance
       const own = pref!.includes(t) ? 1 : ownOnly ? 0.02 : (this.house.prefAny.has(t) ? 12 : 1) * (0.03 + affinity(this.house.seed, t) ** 3);
-      return styleW(t) * own * fade * (weights[t] ?? 1);
+      return styleW(t) * own * fade * pairW(t) * (weights[t] ?? 1);
     });
     const sum = w.reduce((a, b) => a + b, 0); let r = this.rng() * sum, got = cands[cands.length - 1];
     for (let i = 0; i < cands.length; i++) { r -= w[i]; if (r <= 0) { got = cands[i]; break; } }
@@ -189,9 +217,12 @@ export class Composer {
   /** an item whose footprint box is centred at (cx, cz) */
   item(type: string, cx: number, cz: number, rot: number, params: any = {}, extra: Partial<CItem> = {}): CItem {
     const s = this.size(type, params), layer = extra.layer || layerOf(type), pl = PLACEMENT[type];
+    // the item as it will be written and read back: its origin (`at`) to the millimetre and its rot to 0.001°, and the box that follows from
+    // them — what the composer tests a lane against is then the very box the lint and the page compute, cell for cell
+    rot = mm(rot); { const [ox, oz] = turn(s.ox, s.oz, rot); cx = mm(cx - ox) + ox; cz = mm(cz - oz) + oz; }
     const colour = params.color === undefined ? this.colourFor(type) : params.color;
     const p = { ...params }; if (colour) p.color = colour; else delete p.color;
-    const it: CItem = { type, rot: mm(rot), params: p, cx, cz, w: s.w, d: s.d, h: s.h, ox: s.ox, oz: s.oz, layer, y: 0, box: obb(cx, cz, s.w, s.d, rot), clear: [], walk: [], gid: 0, tucks: !!(pl && pl.tucks), ...extra };
+    const it: CItem = { type, rot, params: p, cx, cz, w: s.w, d: s.d, h: s.h, ox: s.ox, oz: s.oz, layer, y: 0, box: obb(cx, cz, s.w, s.d, rot), clear: [], walk: [], gid: 0, tucks: !!(pl && pl.tucks), ...extra };
     if (pl && layer === 'body' && (pl.clear.front > 0 || pl.clear.side > 0)) {
       const cf = pl.clear.front, [fx, fz] = turn(0, s.d / 2 + cf / 2, rot);
       if (cf > 0) it.clear.push(obb(cx + fx, cz + fz, s.w + 2 * pl.clear.side, cf, rot));
@@ -206,7 +237,10 @@ export class Composer {
   }
   /** a wall-mounted item on a run at t, mounted at y (its centre or bottom as the prop reads it) */
   mount(type: string, run: Run, t: number, y: number, params: any = {}): CItem {
-    const it = this.onWall(type, run, t, params, -GAP + 0.003, { layer: 'wall' }); it.y = y; it.params.y = mm(y); return it;
+    const it = this.onWall(type, run, t, params, -GAP + 0.003, { layer: 'wall' });
+    // (a hanging is mounted by its rod, at the top: the height asked for is where its middle should be)
+    if (TOP_MOUNT.has(type)) y += it.h / 2;
+    it.y = y; it.params.y = mm(y); return it;
   }
   /** a surface item on top of a base item, at the base's local (lx, lz) */
   on(type: string, base: CItem, lx = 0, lz = 0, params: any = {}, rot = base.rot): CItem {
@@ -230,7 +264,9 @@ export class Composer {
     const solid = it.layer === 'body' && it.h > 0.12, grp = PLACEMENT[it.type]?.group;
     if (solid) {
       for (const o of g.obstacles) if (overlap(it.box, o) > 0.005) return no('on an obstacle');
-      for (const o of g.keepouts) if (overlap(it.box, o) > 0.005 && !(this.relaxed && g.soft.includes(o))) return no('in a keep-out');
+      // (on looser terms a required piece may stand in the hero's approach — the camera routes round furniture — but what merely dresses
+      // the group may not: the sofa goes there, its side table does not)
+      for (const o of g.keepouts) if (overlap(it.box, o) > 0.005 && !(this.relaxed && !it.opt && g.soft.includes(o))) return no('in a keep-out');
       // a plant or a lamp by the glass is fine; a bed under a window is the bed group's penalty, not a veto (plan S3:
       // "not under a window unless unavoidable")
       if (grp !== 'plant' && grp !== 'lamp' && grp !== 'bed' && !(this.relaxed && (grp === 'appliance' || grp === 'fitted')) && !this.clearOfWindows(it)) return no('in front of a window');
@@ -301,12 +337,23 @@ export class Composer {
   lanes(W = this.laneW, extra: CItem[] = []) {
     const grid = laneGrid(this.geo, this.blockers(extra)), acc = this.access(extra);
     const r = lanesOk(this.geo, grid, W, acc);
-    // the lint holds every room to 0.8 m whatever the composer aims for: a wider aim must pass at 0.8 too
-    if (W > 0.8) for (const f of lanesOk(this.geo, grid, 0.8, acc).failed) if (!r.failed.includes(f)) r.failed.push(f);
+    // the lint holds every room to 0.8 m whatever the composer aims for: a wider aim must pass at 0.8 too, and a narrower one (a
+    // room whose stairs leave one pair of doors 0.5 m) may not close any other pair
+    if (W !== 0.8) for (const f of lanesOk(this.geo, grid, 0.8, acc).failed) if (!r.failed.includes(f) && !this.baseFailed.has(f)) r.failed.push(f);
     if (W === this.laneW && this.baseFailed.size) r.failed = r.failed.filter(f => !this.baseFailed.has(f));
+    // … and as the lint sees the room: this room's own pieces alone (a neighbour's furniture across an open side is real, and the
+    // walk must still be found round it above, but the lint counts only what the room holds), against the bare room at 0.8 m
+    if (this.hasOthers) {
+      const own = [...this.placed, ...extra].filter(it => !(it.pin && !it.own) && it.layer === 'body' && it.h > 0.12).map(it => it.box);
+      for (const f of lanesOk(this.geo, laneGrid(this.geo, [...this.geo.obstacles, ...own]), 0.8).failed) if (!r.failed.includes(f) && !this.bareFailed.has(f)) r.failed.push(f);
+    }
     r.ok = !r.failed.length;
     return r;
   }
+  /** what the bare room (its walls, stairs and voids alone) fails at 0.8 m: the lint's own baseline */
+  bareFailed = new Set<string>();
+  /** does the room stand beside another's furniture (pinned or composed items of an overlapping room)? */
+  hasOthers = false;
 
   // ---- groups
   /** build a group at a pose and keep what fits: every required item must, an optional one is dropped (and whatever
@@ -327,8 +374,8 @@ export class Composer {
     g.gid = this.nextGid++;
     const scored: Array<{ p: Pose; items: CItem[]; v: number }> = [];
     for (const p of g.cands) {
-      const items = this.realise(g, p); if (!items) continue;
-      scored.push({ p, items, v: g.score(p, items) + this.rng() * 0.05 });
+      const items = this.realise(g, p); if (!items || (g.accept && !g.accept(items))) continue;
+      scored.push({ p, items, v: g.score(p, items) - this.softPenalty(items) + this.rng() * (g.jitter ?? 0.05) });
     }
     scored.sort((a, b) => b.v - a.v || (a.p.key < b.p.key ? -1 : 1));
     // the best dozen first, then a spread through the rest (a lane check is the costly part: 40 at most)
@@ -341,6 +388,92 @@ export class Composer {
       return true;
     }
     return false;
+  }
+  /**
+   * Place several essential groups TOGETHER. Each slot is the makers that can fill one piece the room cannot do without (the
+   * bathing: a tub, else a shower). Every candidate of every maker that fits on its own is collected (the makers' first three
+   * tries, the best few dozen each), then a depth-first search, best candidates first and the most constrained slot first, picks
+   * one per slot that stand together and keep the lanes open — as many slots as it can. A greedy pass leaves a tiny room's toilet
+   * no wall because the sink took it; this finds the arrangement that has all three. Returns the labels it could not stand.
+   */
+  placeJoint(slots: Array<{ label: string; makers: Make[] }>): string[] {
+    type Opt = { g: Group; p: Pose; items: CItem[]; v: number };
+    const table: Array<{ label: string; opts: Opt[] }> = [];
+    for (const slot of slots) {
+      const opts: Opt[] = [];
+      for (const mk of slot.makers) {
+        if (mk.unless && mk.unless()) continue;
+        const mine: Opt[] = [];
+        for (const attempt of [0, 1, 2]) {
+          this.attempt = attempt; this.pickLog = [];
+          const g = mk(attempt); if (!g) continue;
+          g.gid = this.nextGid++;
+          for (const p of g.cands) { const items = this.realise(g, p); if (items) mine.push({ g, p, items, v: g.score(p, items) + this.rng() * 0.05 }); }
+        }
+        mine.sort((a, b) => b.v - a.v || (a.p.key < b.p.key ? -1 : 1));
+        // (the best few dozen that differ: candidates a grid step apart along one wall are one choice, and a search over twenty-five of
+        // them never tries the other wall)
+        const seen = new Set<string>(), keep: Opt[] = [];
+        for (const o of mine) {
+          const it = o.items[0], k = `${it.rot}:${Math.round(it.cx / 0.3)}:${Math.round(it.cz / 0.3)}:${it.type}`;
+          if (seen.has(k)) continue; seen.add(k); keep.push(o); if (keep.length >= 40) break;
+        }
+        opts.push(...keep);
+      }
+      opts.sort((a, b) => b.v - a.v || (a.p.key < b.p.key ? -1 : 1));
+      table.push({ label: slot.label, opts });
+    }
+    this.attempt = 0;
+    const order = table.map((_, i) => i).sort((a, b) => table[a].opts.length - table[b].opts.length || a - b);
+    let best: Array<Opt | null> = [], bestFilled = -1, bestValue = -1, nodes = 0, total = 0;
+    for (const t of table) total += WEIGHT[t.label] ?? 1;
+    const chosen: Array<Opt | null> = order.map(() => null);
+    const compatibleWith = (o: Opt, upto: number) => {
+      for (let j = 0; j < upto; j++) { const q = chosen[j]; if (!q) continue; for (const a of o.items) for (const b of q.items) if (!this.compatible(a, b, false)) return false; }
+      return true;
+    };
+    const dfs = (i: number, filled: number, value: number): boolean => {
+      if (nodes++ > 30000) return true;
+      if (i === order.length) {
+        if (value > bestValue) {
+          const all = chosen.flatMap(o => (o ? o.items : []));
+          if (this.lanes(this.laneW, all).ok) { bestFilled = filled; bestValue = value; best = chosen.slice(); }
+        }
+        return bestValue >= total - 1e-9;   // every slot stands: done
+      }
+      for (const o of table[order[i]].opts) {
+        if (!compatibleWith(o, i)) continue;
+        chosen[i] = o;
+        if (dfs(i + 1, filled + 1, value + (WEIGHT[table[order[i]].label] ?? 1))) return true;
+      }
+      chosen[i] = null;
+      return dfs(i + 1, filled, value);   // (or the room goes without this one: the more that matters, the better)
+    };
+    dfs(0, 0, 0); void bestFilled;
+    const missing: string[] = [];
+    order.forEach((slotIdx, k) => {
+      const o = best[k];
+      if (!o) { missing.push(table[slotIdx].label); return; }
+      o.g.pose = o.p; o.g.items = o.items; o.g.value = o.v; this.placed.push(...o.items); this.groups.push(o.g);
+      for (const it of o.items) this.count(it.type, 1);
+    });
+    return missing;
+  }
+  /** the roles of everything placed in the room (cached until something is placed or taken away) */
+  private rolesCache: { n: number; last: CItem | undefined; set: Set<string> } | null = null;
+  rolesHere(): Set<string> {
+    const n = this.placed.length, last = this.placed[n - 1], c = this.rolesCache;
+    if (c && c.n === n && c.last === last) return c.set;
+    const set = new Set<string>(); for (const it of this.placed) for (const r of PLACEMENT[it.type]?.roles || []) set.add(r);
+    this.rolesCache = { n, last, set }; return set;
+  }
+  /** a piece on looser terms may stand in the hero's approach (the camera routes round furniture): the deeper, the worse, so the
+   *  least intrusive arrangement wins */
+  softPenalty(items: CItem[]): number {
+    if (!this.geo.soft.length) return 0;
+    let v = 0;
+    for (const it of items) if (it.layer === 'body' && it.h > 0.12) for (const o of this.geo.soft) v += overlap(it.box, o) * 4;
+    return v;
   }
   count(type: string, n: number) {
     this.house.usage.set(type, (this.house.usage.get(type) || 0) + n); const k = `${this.lv.id}:${type}`; this.house.storey.set(k, (this.house.storey.get(k) || 0) + n);
@@ -357,7 +490,7 @@ export class Composer {
       const items = this.realise(g, p);
       const T = 0.06 * (1 - k / steps) + 0.005;
       if (items) {
-        const v = g.score(p, items), dv = v - g.value!;
+        const v = g.score(p, items) - this.softPenalty(items), dv = v - g.value!;
         // a move that changes nothing is not worth a lane check; a worse one is taken with the Metropolis odds
         if (Math.abs(dv) > 1e-6 && (dv > 0 || u < Math.exp(dv / T)) && this.lanes(this.laneW, items).ok) {
           for (const it of old) this.count(it.type, -1); for (const it of items) this.count(it.type, 1);
@@ -455,7 +588,7 @@ const nearEnd = (r: Run, t: number, len: number) => Math.min(t - len / 2 - r.a, 
 export function wallGroup(c: C, name: string, type: string, params: any, { score = (p: Pose, it: CItem): number => 0, dress = (it: CItem): CItem[] => [], movable = true, min = 0 }: { score?: (p: Pose, it: CItem) => number; dress?: (it: CItem) => CItem[]; movable?: boolean; min?: number } = {}): Group {
   const s = c.size(type, params);
   return {
-    name, gid: 0, movable, cands: c.wallPoses(s.w, { min }),
+    name, gid: 0, movable, cands: c.wallPoses(s.w, { min }), jitter: 0.3,
     build: p => { const it = layerOf(type) === 'wall' ? c.mount(type, p.run, p.t, PLACEMENT[type]?.mountY ?? 1.5, params) : c.onWall(type, p.run, p.t, params); return [it, ...dress(it)]; },
     score: (p, items) => score(p, items[0]) + central(c, items[0].cx, items[0].cz, 0.15),
   };
@@ -501,7 +634,7 @@ function rug(c: C, cx: number, cz: number, w: number, d: number, rot: number, { 
 function dressTop(c: C, base: CItem, kinds: string[], lx = 0): CItem[] {
   const out: CItem[] = [];
   for (const k of kinds) {
-    const t = k === 'lamp' ? (c.pick('table-lamp') || 'table-lamp') : k === 'plant' ? c.pick('plant-surface') : k === 'decor' ? c.pick('surface-decor') : k;
+    const t = k === 'lamp' ? (c.pick('table-lamp', { onto: base }) || 'table-lamp') : k === 'plant' ? c.pick('plant-surface', { onto: base }) : k === 'decor' ? c.pick('surface-decor', { onto: base }) : k;
     if (!t) continue;
     const s = c.size(t);
     if (s.w > base.w - 0.05) continue;
@@ -519,12 +652,14 @@ function chooseFoci(c: C, prefer: string): Focus[] {
   const pinTypes = new Set(['fireplace', 'wall-tv', 'media-credenza', 'tv-stand']);
   const pin = c.placed.find(it => it.pin && pinTypes.has(it.type) && c.inRoom(it)) || null;
   const sideOfPin = (it: CItem): Side => { const [fx, fz] = turn(0, 1, it.rot); return Math.abs(fx) > Math.abs(fz) ? (fx > 0 ? 'W' : 'E') : (fz > 0 ? 'N' : 'S'); };
+  // the author's wall, else the hearth or screen already pinned, comes first — and the room's own best walls after it, so a wall
+  // the author named that cannot take a lounge (an open side, a wall with a door in it) does not leave the room without one
+  const first: Focus[] = [];
   if (f && f.wall) {
     const t = typeof f.at === 'number' ? f.at : Array.isArray(f.at) ? (alongX(f.wall) ? f.at[0] : f.at[1]) : null;
     const run = c.runAt(f.wall, t ?? undefined);
-    return [{ side: f.wall, t: t ?? (run ? (run.a + run.b) / 2 : (alongX(f.wall) ? g.b.x + g.b.w / 2 : g.b.z + g.b.d / 2)), type: f.type || prefer, pin }];
-  }
-  if (pin) { const s = sideOfPin(pin); return [{ side: s, t: alongX(s) ? pin.cx : pin.cz, type: pin.type === 'fireplace' ? 'fireplace' : 'tv', pin }]; }
+    first.push({ side: f.wall, t: t ?? (run ? (run.a + run.b) / 2 : (alongX(f.wall) ? g.b.x + g.b.w / 2 : g.b.z + g.b.d / 2)), type: f.type || prefer, pin });
+  } else if (pin) { const s = sideOfPin(pin); first.push({ side: s, t: alongX(s) ? pin.cx : pin.cz, type: pin.type === 'fireplace' ? 'fireplace' : 'tv', pin }); }
   const main = c.mainPortal(), out: Array<Focus & { v: number }> = [];
   for (const s of SIDES) {
     const glass = c.glassLen(s), depth = c.depthFrom(s);
@@ -543,7 +678,18 @@ function chooseFoci(c: C, prefer: string): Focus[] {
       out.push({ side: s, t, type, pin: null, v });
     }
   }
-  return out.sort((a, b) => b.v - a.v || (a.side < b.side ? -1 : 1));
+  out.sort((a, b) => b.v - a.v || (a.side < b.side ? -1 : 1));
+  // an open-plan room has no wall worth a hearth or a screen (a side too shallow, a run too short, all glass or all open):
+  // the seating then faces a side anyway — the glass where there is some, else the open floor beyond (a view), the deepest
+  // side first and one with a wall at the sofa's back before one without. A room whose walls are all taken still gets a lounge.
+  const seen = new Set(out.map(o => o.side)), tail: Array<Focus & { v: number }> = [];
+  for (const s of SIDES) {
+    if (seen.has(s)) continue;
+    const depth = c.depthFrom(s); if (depth < 2.2) continue;
+    const back = c.wallLen(OPPOSITE[s]), glass = c.glassLen(s), run = c.runAt(s);
+    tail.push({ side: s, t: run ? (run.a + run.b) / 2 : (alongX(s) ? g.b.x + g.b.w / 2 : g.b.z + g.b.d / 2), type: f && f.type ? f.type : c.program === 'den' || c.program === 'media' ? 'tv' : 'view', pin: null, v: -10 + depth * 0.3 + Math.min(back, 4) * 0.2 + glass * 0.1 });
+  }
+  return [...first, ...[...out, ...tail.sort((a, b) => b.v - a.v || (a.side < b.side ? -1 : 1))].filter(o => !first.some(x => x.side === o.side)).map(({ v, ...o }) => o)];
 }
 function chooseFocus(c: C, prefer: string): Focus | null { return chooseFoci(c, prefer)[0] || null; }
 
@@ -556,7 +702,9 @@ function loungeGroup(c: C, fc: Focus, opts: { big?: boolean } = {}): Group | nul
     foc.gid = -1;
     const poses = foc.cands.slice().sort((a, b) => foc.score(b, []) - foc.score(a, []));
     for (const p of poses) { const items = c.realise(foc, p); if (items) { fixed = items; break; } }
-    if (!fixed.length) return null;
+    // (a wall that cannot take its hearth or screen is left for the next wall; from the fourth try the seating alone faces it: a
+    // room is furnished before it is staged)
+    if (!fixed.length && c.attempt < 3 && fc.type !== 'view' && fc.type !== 'open') return null;
   }
   c.focus = { side: fc.side, t: fc.t, type: fc.type };
   return { ...seat, name: 'lounge', build: p => { const items = seat.build(p); return items ? [...fixed.map(it => ({ ...it, box: it.box, clear: it.clear.slice(), walk: [] })), ...items] : null; } };
@@ -566,7 +714,7 @@ function loungeGroup(c: C, fc: Focus, opts: { big?: boolean } = {}): Group | nul
 function focusGroup(c: C, fc: { side: Side; t: number; type: string }): Group | null {
   const run = c.runAt(fc.side, fc.t); if (!run) return null;
   const T = fc.type;
-  if (T === 'view' || T === 'window' || T === 'island' || T === 'bed') return null;
+  if (T === 'view' || T === 'window' || T === 'island' || T === 'bed' || T === 'open') return null;
   let base: string, params: any = {};
   if (T === 'fireplace') base = 'fireplace';
   else if (T === 'tv') { base = c.pick('media') || 'media-credenza'; if (base === 'tv-stand') params = { w: 1.6 }; }
@@ -597,7 +745,8 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
   // builder is left to hand-authored rooms: it has no size or hand)
   const uRoom = width >= 5.4 && depth >= 5.2 && g.area >= 30;
   let sofa = roomy && big && c.attempt === 0 && c.rng() < 0.5 ? c.pick('sofa-l', { fit: t => t !== 'sectional' && (t !== 'u-sectional' || uRoom) }) : null;
-  if (!sofa) sofa = c.pick('sofa', { fit: t => (c.size(t).w <= width - 0.8) });
+  // (a sofa that takes a `w` is drawn to the room's width: a narrow room has a small one)
+  if (!sofa) sofa = c.pick('sofa', { fit: t => (paramsOf(t).includes('w') ? width >= 1.9 : c.size(t).w <= width - 0.8) });
   if (!sofa) return null;
   const sw = mm(Math.min(sofa === 'loveseat' ? (width >= 3.4 ? 2.0 : 1.6) : c.size(sofa).w, width - 1.0) * (1 - c.shrink));
   const sParams: any = paramsOf(sofa).includes('w') ? { w: mm(sw) } : {};
@@ -616,7 +765,7 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
   const chaiseSides = isU ? [-1, 1] : chaiseLat ? [chaiseLat] : [];                // (a U has one at each end)
   const oppFace = (() => { const r = c.runAt(OPPOSITE[fc.side]); return r ? Math.abs(r.face - face) : Infinity; })();   // chairs turn to the sofa (conversation) or to the focus (a screen, a view)
   const lampOn = c.density >= 0.3;
-  const Ds: number[] = []; for (let D = 1.6; D <= 3.4 + 1e-6; D += 0.1) Ds.push(mm(D));
+  const Ds: number[] = []; for (let D = depth < 3.6 ? 1.2 : 1.6; D <= 3.4 + 1e-6; D += 0.1) Ds.push(mm(D));
   // how far from the focus the sofa likes to stand and how far off its middle: a room's own taste, so two rooms of one
   // size do not come out as one
   const dT = 2.3 + c.rng() * 0.9, oT = (c.rng() - 0.5) * 0.9;
@@ -670,6 +819,7 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
       const backGap = depth - (p.D + S.d);
       if (backGap < 0.12) v += 0.5; else if (backGap < 0.85) v -= 1.2;
       v += items.filter(i => PLACEMENT[i.type]?.group === 'seating').length * 0.25 + items.length * 0.05;
+      if (!items.some(i => i.type === ct)) v -= 1.5;   // a sofa with no table before it stands too close to the focus
       return v;
     },
   };
@@ -719,7 +869,7 @@ function diningGroup(c: C, region: { x0: number; z0: number; x1: number; z1: num
         if (hung === 'chandelier' || isRound || L < 1.8) { const hl = c.item(hung, p.x, p.z, rot, hung === 'chandelier' ? { w: mm(Math.min(0.9, L * 0.45)), drop: 0.8 } : { drop: 0.85 }, { layer: 'ceiling', opt: true }); out.push(hl); }
         else for (const s of [-1, 1]) { const [dx, dz] = turn(s * L / 4, 0, rot); out.push(c.item('pendant-lamp', p.x + dx, p.z + dz, rot, { drop: 0.85 }, { layer: 'ceiling', opt: true })); }
       }
-      { const dt = c.pick(c.rng() < 0.5 ? 'surface-decor' : 'surface-decor-kitchen'); if (dt) out.push(c.on(dt, t, 0, 0)); }
+      { const dt = c.pick(c.rng() < 0.5 ? 'surface-decor' : 'surface-decor-kitchen', { onto: t }); if (dt) out.push(c.on(dt, t, 0, 0)); }
       return out;
     },
     score: (p, items) => {
@@ -735,13 +885,16 @@ function diningGroup(c: C, region: { x0: number; z0: number; x1: number; z1: num
 function bedGroup(c: C, attempt = 0): Group | null {
   const g = c.geo, prog = c.program, kid = prog === 'bed-kid', nursery = prog === 'nursery';
   const role = nursery ? 'crib' : kid ? (c.rng() < 0.18 && g.area < 10 ? 'bed-bunk' : c.rng() < 0.15 ? 'bed-loft' : 'bed-single') : 'bed';
-  const type = c.pick(role) || (kid ? 'single-bed' : 'headboard-bed');
-  const P = paramsOf(type);
-  const minDim = Math.min(g.b.w, g.b.d);
+  const minDim = Math.min(g.b.w, g.b.d), maxDim = Math.max(g.b.w, g.b.d);
   const bw0 = kid || nursery ? undefined : prog === 'bed-primary' ? (minDim >= 3.9 ? 1.8 : 1.6) : (minDim >= 3.4 ? 1.5 : 1.4);
-  const bw = bw0 === undefined ? undefined : Math.max(1.2, bw0 - attempt * 0.2);   // a retry is a narrower bed
-  const params: any = {};
-  if (bw && P.includes('w') && type !== 'platform-bed') params.w = bw;
+  const bw = bw0 === undefined ? undefined : Math.max(1.2, bw0 - attempt * 0.2);   // a retry is a narrower bed (`w` is the mattress; the frame is wider)
+  const paramsFor = (t: string) => { const q: any = {}; if (bw && paramsOf(t).includes('w') && t !== 'platform-bed') q.w = bw; return q; };
+  // a bed whose frame (its measured box, the headboard's wings and all) leaves a side to walk in this room: a 2.8 m room takes the
+  // slim frames, a 4 m one any
+  const roomFor = (t: string) => { const S = c.size(t, paramsFor(t)); return S.w + 0.6 <= minDim + 0.01 && S.d + 0.6 <= maxDim + 0.01; };
+  const type = c.pick(role, { fit: roomFor }) || c.pick(role) || (kid ? 'single-bed' : 'headboard-bed');
+  const P = paramsOf(type);
+  const params: any = paramsFor(type);
   if (P.includes('quilt') && c.rng() < 0.45) params.quilt = c.style.rugs[Math.floor(c.rng() * c.style.rugs.length)] === 'solid' ? 'check' : c.style.rugs[Math.floor(c.rng() * c.style.rugs.length)];
   const S = c.size(type, params);
   const double = S.w >= 1.3;
@@ -753,7 +906,7 @@ function bedGroup(c: C, attempt = 0): Group | null {
   const NS = ns ? c.size(ns) : null;
   const sconces = double && c.style.tags.some(t => ['modern', 'scandi', 'mid-century'].includes(t)) && c.rng() < 0.35;
   return {
-    name: 'bed', gid: 0, movable: true, anneal: true, cands,
+    name: 'bed', gid: 0, movable: true, anneal: true, cands, jitter: 0.8,
     build: p => {
       let bed: CItem, headRun: Run, t: number, sideSign = 0;
       if (p.mode === 'head') { headRun = p.run; t = p.t; bed = c.onWall(type, headRun, t, params); }
@@ -765,9 +918,14 @@ function bedGroup(c: C, attempt = 0): Group | null {
         const [lx] = turn(ax, az, -rot); sideSign = lx > 0 ? 1 : -1;   // the side the wall is on, in the bed's frame
       }
       const out = [bed];
-      // walkways: 0.6 m beside the bed (both sides of a double; the open side of a single), past the nightstands
-      for (const s of [-1, 1]) {
-        if (sideSign && s === sideSign) continue;
+      // walkways: 0.6 m beside the bed (both sides of a double; the open side of a single), past the nightstands; on the last tries
+      // a double in a tight room keeps one side to walk in, the one toward the room's middle
+      let walkSides = [-1, 1].filter(s => !(sideSign && s === sideSign));
+      if (c.relaxed && double && walkSides.length > 1) {
+        const [mx, mz] = c.mid(), at = (s: number) => { const [ax2, az2] = turn(s * (S.w / 2 + 0.3), 0.3, bed.rot); return Math.hypot(bed.cx + ax2 - mx, bed.cz + az2 - mz); };
+        walkSides = [walkSides.sort((a, b) => at(a) - at(b))[0]];
+      }
+      for (const s of walkSides) {
         const [dx, dz] = turn(s * (S.w / 2 + 0.3), 0.25, bed.rot); bed.walk.push(obb(bed.cx + dx, bed.cz + dz, 0.6, S.d - 0.5, bed.rot));
         const [ax2, az2] = turn(s * (S.w / 2 + 0.3), 0.3, bed.rot); (bed.access ||= []).push([bed.cx + ax2, bed.cz + az2]);
         if (!double) break;
@@ -778,7 +936,7 @@ function bedGroup(c: C, attempt = 0): Group | null {
         const [dx, dz] = turn(s * (S.w / 2 + 0.04 + NS.w / 2), -S.d / 2 + NS.d / 2 + 0.02, bed.rot);
         const n1 = c.item(ns, bed.cx + dx, bed.cz + dz, bed.rot); n1.opt = true; out.push(n1);
         if (sconces) { const tt = alongX(headRun.side) ? n1.cx : n1.cz; const sc = c.mount('wall-sconce', headRun, tt, 1.2); sc.opt = true; out.push(sc); }
-        else out.push(c.on(kid && c.rng() < 0.5 ? 'desk-lamp' : (c.pick('table-lamp') || 'table-lamp'), n1, 0, -0.03));
+        else out.push(c.on(kid && c.rng() < 0.5 ? 'desk-lamp' : (c.pick('table-lamp', { onto: n1 }) || 'table-lamp'), n1, 0, -0.03));
         if (!double) break;
       }
       // art over the bed; a kid's room gets a story picture
@@ -822,8 +980,8 @@ function deskGroup(c: C, { kid = false } = {}): Group | null {
     build: p => {
       const d = c.onWall(type, p.run, p.t, params), out = [d];
       if (chair) { const [dx, dz] = turn(0, S.d / 2 + 0.18, d.rot); const ch = c.item(chair, d.cx + dx, d.cz + dz, mm(d.rot + 180)); out.push(ch); d.access = [[d.cx + dx * 2.2, d.cz + dz * 2.2]]; }
-      out.push(c.on(kid || c.rng() < 0.6 ? 'desk-lamp' : (c.pick('table-lamp') || 'table-lamp'), d, S.w / 2 - 0.2, -0.1));
-      if (!kid) out.push(c.on(c.rng() < 0.5 ? 'laptop' : (c.pick('surface-decor') || 'book-stack'), d, -0.1, 0));
+      out.push(c.on(kid || c.rng() < 0.6 ? 'desk-lamp' : (c.pick('table-lamp', { onto: d }) || 'table-lamp'), d, S.w / 2 - 0.2, -0.1));
+      if (!kid) out.push(c.on(c.rng() < 0.5 ? 'laptop' : (c.pick('surface-decor', { onto: d }) || 'book-stack'), d, -0.1, 0));
       const a = c.rng() < 0.5 ? artOver(c, d, p.run, {}) : null; if (a) out.push(a);
       return out;
     },
@@ -913,9 +1071,24 @@ function runnerGroup(c: C): Group | null {
 // ================================================================================================================
 // Programs
 // ================================================================================================================
-function program(c: C): Array<(attempt: number) => Group | null> {
+/** a group's maker: called with the try number (0 first). `label` names the group in the room's report when no try makes or
+ *  places it (`dropped`); `tries` is how many tries it gets (4 by default) */
+export type Make = ((attempt: number) => Group | null) & { label?: string; tries?: number; unless?: () => boolean };
+/** how much a room misses an essential (when a pass must leave one out, it leaves the least important): a toilet, a bed, a lounge, the
+ *  kitchen before the sink beside it or a plant; the bathing before the vanity */
+const WEIGHT: Record<string, number> = { toilet: 3, kitchen: 3, bed: 3, lounge: 3, bathing: 2.5, dining: 2, desk: 2, bookcases: 2, vanity: 1.5, washer: 1.5, dryer: 1, shelves: 1 };
+const weightOf = (labels: string[]) => labels.reduce((a, l) => a + (WEIGHT[l] ?? 1), 0);
+export function named(label: string, f: (attempt: number) => Group | null, tries = 4, unless?: () => boolean): Make { return Object.assign(f, { label, tries, unless }); }
+function program(c: C): Make[] {
   const P = c.program, d = c.density, g = c.geo, big = g.area >= 14;
-  const plants = (n: number) => Array.from({ length: n }, () => () => plantGroup(c));
+  const plants = (n: number): Make[] => Array.from({ length: n }, () => () => plantGroup(c));
+  // what the room's own authored furniture already is (a pinned sofa is the room's seating: no second one is composed)
+  const has = (...roles: string[]) => c.ownHas(...roles);
+  // (the Core's own desk is the desk of a room the hero desk stands in; a hero on a shelf or a credenza leaves the room its desk)
+  // (not every house runs a runner down its halls: a third have bare boards, or the runner is in every house)
+  const runnerHouse = affinity(c.house.seed, 'hall-runner') < 0.65;
+  const heroDesk = g.heroHere && (c.spec.hero.surface || 'desk') === 'desk';
+  const SOFA = ['sofa', 'sofa-l', 'loveseat'], BED = ['bed', 'bed-single', 'bed-bunk', 'bed-loft', 'crib'];
   switch (P) {
     case 'living': case 'den': case 'media': {
       // what the seating faces: a screen in a den or media room; else the glass when the room is mostly glass; else by style —
@@ -923,10 +1096,13 @@ function program(c: C): Array<(attempt: number) => Group | null> {
       const trad = c.style.tags.some(t => ['farmhouse', 'cottage', 'craftsman', 'mediterranean', 'traditional'].includes(t));
       const prefer = P === 'media' || P === 'den' ? 'tv' : g.windows.some(w => w.type !== 'window' && w.b - w.a >= 2) ? 'view' : trad ? (c.rng() < 0.6 ? 'fireplace' : 'art') : c.rng() < 0.6 ? 'tv' : 'art';
       const foci = chooseFoci(c, prefer);
-      const list: Array<(attempt: number) => Group | null> = [];
-      if (foci.length) list.push(k => { const f = foci[k % 2] || foci[0]; return f ? loungeGroup(c, f) : null; });
-      if (P === 'living' && g.area >= 28 && d >= 0.55 && c.rng() < 0.35) list.push(() => { const t = c.style.tags.some(s => ['modern', 'industrial'].includes(s)) ? 'grand-piano' : (c.rng() < 0.5 ? 'grand-piano' : 'upright-piano'); return t === 'grand-piano' ? freeGroup(c, t) : wallGroup(c, 'piano', t, {}); });
-      if (d >= 0.4) list.push(() => storageGroup(c, 'bookcase', { dress: false }));
+      const list: Make[] = [];
+      // (each try turns to the next wall, then the first again on looser terms: chooseFoci ends with the room's open sides)
+      if (foci.length && !has(...SOFA)) list.push(named('lounge', k => { const f = foci[k % Math.min(3, foci.length)]; return f ? loungeGroup(c, f) : null; }, 6));
+      // a room that is named for two things ("Living & Dining") is both: the second zone takes the biggest floor the first left
+      if (P === 'living' && /dining|breakfast|eat/i.test(String(c.room.name || '')) && g.area >= 22 && !has('dining-table', 'dining-table-round')) list.push(named('dining', k => { const rects = freeRects(c, 2.2, 3); return rects.length ? diningGroup(c, rects[k % rects.length]) : null; }, 6));
+      if (P === 'living' && g.area >= 28 && d >= 0.55 && !has('piano') && c.rng() < 0.35) list.push(() => { const t = c.style.tags.some(s => ['modern', 'industrial'].includes(s)) ? 'grand-piano' : (c.rng() < 0.5 ? 'grand-piano' : 'upright-piano'); return t === 'grand-piano' ? freeGroup(c, t) : wallGroup(c, 'piano', t, {}); });
+      if (d >= 0.4 && c.ownCount('bookcase') < 2) list.push(() => storageGroup(c, 'bookcase', { dress: false }));
       if (d >= 0.65 && big) list.push(() => storageGroup(c, P === 'living' ? 'sideboard' : 'bookcase'));
       list.push(() => floorLampGroup(c), ...plants(d >= 0.6 ? 2 : 1));
       if (P === 'den' && d >= 0.5) list.push(() => readingCorner(c));
@@ -934,17 +1110,21 @@ function program(c: C): Array<(attempt: number) => Group | null> {
     }
     case 'library': {
       const foci = chooseFoci(c, 'art');
-      // the walls of books: runs of matching tall bookcases, on the longest free walls first
+      // the walls of books: runs of matching tall bookcases, on the longest free walls first, before anything else takes the wall
+      const shelved = c.ownCount('bookcase');
       const n = Math.max(2, Math.min(4, Math.floor(g.runs.reduce((a, r) => a + r.b - r.a, 0) / 4)));
-      const list: Array<(attempt: number) => Group | null> = Array.from({ length: n }, () => (k: number) => bookcaseRun(c, Math.max(2, 4 - k)));
-      list.unshift(() => readingCorner(c));
-      if (foci.length && g.area >= 14) list.unshift(k => { const f = foci[k % 2] || foci[0]; return f ? loungeGroup(c, f, { big: false }) : null; });
-      if (d >= 0.5) list.push(() => deskGroup(c));
+      const list: Make[] = shelved >= 2 ? [] : Array.from({ length: n }, (_, i) => named(i < 2 ? 'bookcases' : 'shelves', (k: number) => bookcaseRun(c, Math.max(2, 4 - k))));
+      // (a lounge only where the books are already up: it takes what the shelves leave)
+      list.push(() => readingCorner(c));
+      if (foci.length && g.area >= 14 && !has(...SOFA)) list.push(k => { const f = foci[k % Math.min(3, foci.length)]; return f ? loungeGroup(c, f, { big: false }) : null; });
+      if (d >= 0.5 && !has('desk') && !heroDesk) list.push(() => deskGroup(c));
       list.push(() => floorLampGroup(c), ...plants(1));
       return list;
     }
     case 'study': case 'studio': {
-      const list: Array<(attempt: number) => Group | null> = [() => deskGroup(c), () => storageGroup(c, 'bookcase', { dress: false })];
+      const list: Make[] = [];
+      if (!has('desk') && !heroDesk) list.push(named('desk', () => deskGroup(c)));
+      list.push(() => storageGroup(c, 'bookcase', { dress: false }));
       if (P === 'studio') list.push(() => cornerGroup(c, 'easel', 'easel'), () => storageGroup(c, 'shelving', { dress: false }));
       if (g.area >= 9) list.push(() => readingCorner(c));
       if (d >= 0.5 && g.area >= 12) list.push(() => storageGroup(c, 'bookcase', { dress: false }));
@@ -953,40 +1133,93 @@ function program(c: C): Array<(attempt: number) => Group | null> {
       return list;
     }
     case 'dining': {
-      const list: Array<(attempt: number) => Group | null> = [() => diningGroup(c), () => storageGroup(c, 'sideboard')];
+      const list: Make[] = [];
+      if (!has('dining-table', 'dining-table-round')) list.push(named('dining', () => diningGroup(c)));
+      list.push(() => storageGroup(c, 'sideboard'));
       if (d >= 0.55) list.push(...plants(1));
       if (d >= 0.7 && big) list.push(() => storageGroup(c, 'wine'));
       return list;
     }
-    case 'kitchen': case 'kitchen-dining': return [...kitchenGroups(c, { dining: P === 'kitchen-dining', diningGroup: (r: any) => diningGroup(c, r) }), ...(d >= 0.6 ? plants(1) : [])];
+    case 'kitchen': case 'kitchen-dining': {
+      const list: Make[] = [...kitchenGroups(c, { dining: P === 'kitchen-dining', diningGroup: (r: any) => diningGroup(c, r) })];
+      // "Family Room & Kitchenette": a kitchen that is also a family room has its seating in the floor the kitchen left
+      if (P === 'kitchen' && /family|living|lounge|great/i.test(String(c.room.name || '')) && g.area >= 20 && !has(...SOFA)) {
+        const foci = chooseFoci(c, 'tv');
+        if (foci.length) list.push(named('lounge', k => { const f = foci[k % Math.min(3, foci.length)]; return f ? loungeGroup(c, f, { big: false }) : null; }, 6));
+      }
+      return [...list, ...(d >= 0.6 ? plants(1) : [])];
+    }
     case 'bed-primary': case 'bed-guest': {
-      const list: Array<(attempt: number) => Group | null> = [k => bedGroup(c, k), () => storageGroup(c, 'dresser', { prefer: (p, it) => (c.groups[0] && c.groups[0].items && Math.abs(((c.groups[0].items[0].rot - it.rot) % 360 + 360) % 360 - 180) < 1 ? 1 : 0) })];
-      if (g.area >= 11 && !c.placed.some(i => i.pin && ['wardrobe', 'armoire'].includes(i.type))) list.push(() => storageGroup(c, 'wardrobe', { dress: false }));
+      const list: Make[] = [];
+      if (!has(...BED)) list.push(named('bed', k => bedGroup(c, k)));
+      if (!has('dresser')) list.push(() => storageGroup(c, 'dresser', { prefer: (p, it) => (c.groups[0] && c.groups[0].items && Math.abs(((c.groups[0].items[0].rot - it.rot) % 360 + 360) % 360 - 180) < 1 ? 1 : 0) }));
+      if (g.area >= 11 && !has('wardrobe')) list.push(() => storageGroup(c, 'wardrobe', { dress: false }));
       if (P === 'bed-primary' && g.area >= 14 && d >= 0.45) list.push(() => readingCorner(c));
-      if (P === 'bed-guest' && d >= 0.6) list.push(() => deskGroup(c));
+      if (P === 'bed-guest' && d >= 0.6 && !has('desk')) list.push(() => deskGroup(c));
       list.push(...plants(d >= 0.5 ? 1 : 0));
       return list;
     }
-    case 'bed-kid': return [() => bedGroup(c), () => storageGroup(c, 'toy-storage', { dress: false }), () => (g.area >= 9 ? deskGroup(c, { kid: true }) : null), () => cornerGroup(c, 'play', c.pick('play') || 'play-tent'), () => (d >= 0.5 ? cornerGroup(c, 'floor-seat', c.pick('floor-seat') || 'beanbag') : null), () => (d >= 0.4 ? storageGroup(c, 'dresser') : null)];
-    case 'nursery': return [() => bedGroup(c), () => storageGroup(c, 'changing', { dress: false }), () => { const t = 'nursery-glider'; return cornerGroup(c, 'glider', t, {}, { angled: true }); }, () => storageGroup(c, 'dresser'), () => storageGroup(c, 'toy-storage', { dress: false }), () => { const [mx, mz] = c.mid(); return { name: 'rug', gid: 0, movable: false, cands: [{ key: 'm' }], build: () => [rug(c, mx, mz, Math.min(2.0, g.b.w - 1.2), Math.min(1.5, g.b.d - 1.2), 0, { pattern: c.rng() < 0.5 ? 'dots' : 'check' })], score: () => 0 }; }];
+    case 'bed-kid': return [...(has(...BED) ? [] : [named('bed', k => bedGroup(c, k))]), () => storageGroup(c, 'toy-storage', { dress: false }), () => (g.area >= 9 && !has('desk', 'desk-kid') ? deskGroup(c, { kid: true }) : null), () => cornerGroup(c, 'play', c.pick('play') || 'play-tent'), () => (d >= 0.5 ? cornerGroup(c, 'floor-seat', c.pick('floor-seat') || 'beanbag') : null), () => (d >= 0.4 && !has('dresser') ? storageGroup(c, 'dresser') : null)];
+    case 'nursery': return [...(has(...BED) ? [] : [named('bed', k => bedGroup(c, k))]), () => storageGroup(c, 'changing', { dress: false }), () => { const t = 'nursery-glider'; return cornerGroup(c, 'glider', t, {}, { angled: true }); }, () => storageGroup(c, 'dresser'), () => storageGroup(c, 'toy-storage', { dress: false }), () => { const [mx, mz] = c.mid(); return { name: 'rug', gid: 0, movable: false, cands: [{ key: 'm' }], build: () => [rug(c, mx, mz, Math.min(2.0, g.b.w - 1.2), Math.min(1.5, g.b.d - 1.2), 0, { pattern: c.rng() < 0.5 ? 'dots' : 'check' })], score: () => 0 }; }];
     case 'playroom': return [() => { const [mx, mz] = c.mid(); return { name: 'rug', gid: 0, movable: false, cands: [{ key: 'm' }], build: () => [rug(c, mx, mz, Math.min(2.6, g.b.w - 1.0), Math.min(2.0, g.b.d - 1.0), 0, { pattern: 'play' })], score: () => 0 }; }, () => storageGroup(c, 'toy-storage', { dress: false }), () => storageGroup(c, 'toy-storage', { dress: false }), () => cornerGroup(c, 'play', c.pick('play') || 'play-tent'), () => freeGroup(c, 'kids-table'), () => cornerGroup(c, 'floor-seat', c.pick('floor-seat') || 'beanbag'), () => cornerGroup(c, 'easel', 'easel')];
     case 'bath': case 'ensuite': case 'powder': return bathGroups(c);
-    case 'foyer': return [() => storageGroup(c, 'console', { prefer: (p) => (c.mainPortal() && p.run.side !== c.mainPortal()!.side ? 0.5 : 0) }), () => runnerGroup(c), () => (g.area >= 4 ? storageGroup(c, c.rng() < 0.5 ? 'bench' : 'coat-rack', { dress: false }) : null), () => (d >= 0.4 ? plantGroup(c) : null)];
-    case 'hall': return [() => runnerGroup(c), () => (Math.min(g.b.w, g.b.d) >= 1.7 ? storageGroup(c, 'console') : null), () => (d >= 0.5 && Math.min(g.b.w, g.b.d) >= 1.5 ? plantGroup(c, 'plant-small') : null)];
-    case 'laundry': return [() => wallGroup(c, 'washer', 'washing-machine', {}), () => wallGroup(c, 'dryer', 'dryer', {}), () => storageGroup(c, 'tall-storage', { dress: false }), () => cornerGroup(c, 'hamper', c.pick('hamper') || 'laundry-basket'), () => storageGroup(c, 'hooks', { dress: false })];
+    case 'foyer': return [() => (c.ownHas('console', 'sofa-table') ? null : storageGroup(c, 'console', { prefer: (p) => (c.mainPortal() && p.run.side !== c.mainPortal()!.side ? 0.5 : 0) })), () => (runnerHouse ? runnerGroup(c) : null), () => (g.area >= 4 && !has('bench', 'coat-rack') ? storageGroup(c, c.rng() < 0.5 ? 'bench' : 'coat-rack', { dress: false }) : null), () => (d >= 0.4 ? plantGroup(c) : null)];
+    case 'hall': return [() => (runnerHouse ? runnerGroup(c) : null), () => (Math.min(g.b.w, g.b.d) >= 1.7 && !has('console') ? storageGroup(c, 'console') : null), () => (d >= 0.5 && Math.min(g.b.w, g.b.d) >= 1.5 ? plantGroup(c, 'plant-small') : null)];
+    case 'laundry': {
+      // the pair side by side first; a wall that cannot take both gets them apart
+      const paired = () => c.groups.some(g => g.name === 'laundry');
+      return [...(has('washer') || has('dryer') ? [] : [() => laundryPair(c)]), ...(has('washer') ? [] : [named('washer', () => wallGroup(c, 'washer', 'washing-machine', {}), 4, paired)]), ...(has('dryer') ? [] : [named('dryer', () => wallGroup(c, 'dryer', 'dryer', {}), 4, paired)]), () => storageGroup(c, 'tall-storage', { dress: false }), () => cornerGroup(c, 'hamper', c.pick('hamper') || 'laundry-basket'), () => storageGroup(c, 'hooks', { dress: false })];
+    }
     case 'garage': return [() => wallGroup(c, 'workbench', 'workbench', {}), () => storageGroup(c, 'shelving', { dress: false }), () => cornerGroup(c, 'bike', 'bicycle')];
     case 'gym': return [() => freeGroup(c, 'exercise-bike'), () => freeGroup(c, 'weight-bench'), () => freeGroup(c, 'yoga-mat'), () => plantGroup(c)];
     case 'bar': return [() => storageGroup(c, c.rng() < 0.5 ? 'bar-cart' : 'wine', { dress: false }), () => freeGroup(c, 'bar-table'), () => storageGroup(c, 'sideboard'), () => plantGroup(c)];
     case 'sunroom': case 'greenhouse': {
-      const list: Array<(attempt: number) => Group | null> = [];
+      const list: Make[] = [];
       if (P === 'greenhouse') list.push(() => wallGroup(c, 'potting', 'potting-bench', {}));
       list.push(() => readingCorner(c), () => (g.area >= 10 ? readingCorner(c) : null), ...plants(P === 'greenhouse' ? 4 : 3));
-      if (P === 'sunroom' && g.area >= 12) list.push(k => { const fs = chooseFoci(c, 'view'), fc = fs[k % 2] || fs[0]; return fc ? loungeGroup(c, fc, { big: false }) : null; });
+      if (P === 'sunroom' && g.area >= 12 && !has(...SOFA)) list.push(k => { const fs = chooseFoci(c, 'view'), fc = fs[k % Math.min(3, fs.length || 1)]; return fc ? loungeGroup(c, fc, { big: false }) : null; });
       return list;
     }
     case 'outdoor': return g.area >= 5 ? [() => freeGroup(c, c.rng() < 0.5 ? 'patio-set' : 'outdoor-sofa'), () => (g.area >= 9 ? freeGroup(c, 'fire-bowl') : null)] : [];
     default: return [];
   }
+}
+/** the empty half of a room of 12 m² or more whose every solid piece stands in the other (as a test of an item), else null */
+function emptyHalf(c: C): ((it: CItem) => boolean) | null {
+  const g = c.geo; if (g.area < 12 || ['outdoor', 'garage'].includes(c.program)) return null;
+  const along = g.b.w >= g.b.d, mid = along ? g.b.x + g.b.w / 2 : g.b.z + g.b.d / 2;
+  const solid = c.placed.filter(it => it.layer === 'body' && it.h > 0.12 && c.inRoom(it));
+  const at = (it: CItem) => (along ? it.cx : it.cz);
+  const lo = solid.filter(it => at(it) < mid).length, hi = solid.length - lo;
+  if (lo === 0 && hi >= 3) return it => at(it) < mid;
+  if (hi === 0 && lo >= 3) return it => at(it) >= mid;
+  return null;
+}
+/** what a room can use to fill a bare half, best first (each made by the program's own groups) */
+function fillers(c: C): Array<() => Group | null> {
+  const P = c.program, g = c.geo, list: Array<() => Group | null> = [];
+  const lounge = ['living', 'den', 'media', 'library', 'sunroom'].includes(P), bed = c.program.startsWith('bed-');
+  if ((lounge || bed) && g.area >= 14) list.push(() => readingCorner(c));
+  if (lounge) list.push(() => storageGroup(c, P === 'library' ? 'bookcase' : 'sideboard'));
+  if (bed) list.push(() => storageGroup(c, 'dresser'), () => deskGroup(c));
+  if (P === 'dining') list.push(() => storageGroup(c, 'sideboard'));
+  // a kitchen with a bare half has room for a table to eat at: the biggest empty floor
+  if (P === 'kitchen' && g.area >= 16 && !c.groups.some(x => x.name === 'dining')) list.push(() => { const r = freeRects(c, 2.2, 1); return r.length ? diningGroup(c, r[0]) : null; });
+  if (P === 'foyer' || P === 'hall') list.push(() => storageGroup(c, 'console'), () => storageGroup(c, 'bench', { dress: false }));
+  list.push(() => floorLampGroup(c), () => plantGroup(c), () => plantGroup(c));
+  return list;
+}
+/** the washer and the dryer side by side on one wall (0.02 m between): a laundry's pair, not two unrelated appliances */
+function laundryPair(c: C): Group | null {
+  const W = c.size('washing-machine'), D = c.size('dryer'), len = W.w + D.w + 0.02;
+  return {
+    name: 'laundry', gid: 0, movable: true, anneal: true, cands: c.wallPoses(len),
+    build: p => {
+      const wt = p.t - len / 2 + W.w / 2, dt = p.t + len / 2 - D.w / 2;
+      return [c.onWall('washing-machine', p.run, wt, {}), c.onWall('dryer', p.run, dt, {})];
+    },
+    score: (p) => -offCentre(p.run, p.t) * 0.2 - (p.run.windows.length ? 0.5 : 0),
+  };
 }
 /** a free-standing piece somewhere on the floor (a piano, a kids' table, gym kit) */
 function freeGroup(c: C, type: string): Group | null {
@@ -1001,7 +1234,24 @@ function freeGroup(c: C, type: string): Group | null {
 // ================================================================================================================
 // Rooms and houses
 // ================================================================================================================
-export interface ComposeResult { items: any[]; program: string; style: string; laneWidth: number; lanes: ReturnType<typeof lanesOk>; groups: string[]; dropped: string[]; why?: Record<string, string[]>; focus?: any; geometry?: string[] }
+/** A swatch nudged a little in hue, saturation and lightness by the room's seed. A style's palette is five fabrics and three
+ *  accents; a fleet whose bedrooms all drew from them repeated the same 52 colours. The nudge keeps a swatch's character and gives
+ *  every room its own. */
+export function nudge(hex: string, r: () => number): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex); if (!m) return hex;
+  const n = parseInt(m[1], 16), red = ((n >> 16) & 255) / 255, grn = ((n >> 8) & 255) / 255, blu = (n & 255) / 255;
+  const mx = Math.max(red, grn, blu), mn = Math.min(red, grn, blu), dd = mx - mn;
+  let h = 0, sat = 0; const l0 = (mx + mn) / 2;
+  if (dd > 1e-9) { sat = l0 > 0.5 ? dd / (2 - mx - mn) : dd / (mx + mn); h = 60 * (mx === red ? (grn - blu) / dd + (grn < blu ? 6 : 0) : mx === grn ? (blu - red) / dd + 2 : (red - grn) / dd + 4); }
+  h = (h + (r() - 0.5) * 18 + 360) % 360 / 360;
+  sat = Math.max(0, Math.min(1, sat * (0.9 + r() * 0.2)));
+  const l = Math.max(0.12, Math.min(0.92, l0 + (r() - 0.5) * 0.09));
+  const q = l < 0.5 ? l * (1 + sat) : l + sat - l * sat, p = 2 * l - q;
+  const hue = (t: number) => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
+  const out = sat < 1e-9 ? [l, l, l] : [hue(h + 1 / 3), hue(h), hue(h - 1 / 3)];
+  return '#' + out.map(v => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, '0')).join('');
+}
+export interface ComposeResult { items: any[]; program: string; style: string; laneWidth: number; lanes: ReturnType<typeof lanesOk>; groups: string[]; dropped: string[]; /** the labelled essentials (a lounge, a bed, a toilet…) that no try could stand: the room is without them */ missing: string[]; why?: Record<string, string[]>; focus?: any; geometry?: string[] }
 const roomKey = (lv: any, ri: number) => `${lv.id}#${ri}`;
 export const seedKeyOf = (spec: any, room: any) => `${spec.id}:${room.no ?? room.name}:compose${room.seed !== undefined ? ':' + room.seed : ''}`;
 
@@ -1018,7 +1268,7 @@ function pinsFor(spec: any, lv: any, room: any, composed: Map<any, any[]>): CIte
       if (heroHere && HERO.has(it.type) && Array.isArray(it.at) && Math.hypot(it.at[0] - spec.hero.at[0], it.at[1] - spec.hero.at[1]) < 1.3) continue;
       const o = itemObb(it); if (!o) continue;
       const s = sizeOf(it.type, it)!, layer = layerOf(it.type);
-      const ci: CItem = { type: it.type, rot: it.rot || 0, params: {}, cx: o.cx, cz: o.cz, w: s.w, d: s.d, h: s.h, ox: s.ox, oz: s.oz, layer, y: it.y ?? 0, box: o, clear: [], walk: [], gid: 0, pin: true, tucks: !!PLACEMENT[it.type]?.tucks };
+      const ci: CItem = { type: it.type, rot: it.rot || 0, params: {}, cx: o.cx, cz: o.cz, w: s.w, d: s.d, h: s.h, ox: s.ox, oz: s.oz, layer, y: it.y ?? 0, box: o, clear: [], walk: [], gid: 0, pin: true, own: r === room || r.bounds === room.bounds, tucks: !!PLACEMENT[it.type]?.tucks };
       if (layer === 'wall' && it.y === undefined) ci.y = PLACEMENT[it.type]?.mountY ?? 1.5;
       out.push(ci);
     }
@@ -1026,7 +1276,32 @@ function pinsFor(spec: any, lv: any, room: any, composed: Map<any, any[]>): CIte
   return out;
 }
 
+// the house-wide state a room's composition changes (usage counts, the bedroom palettes, the house's picks): kept aside so a
+// room whose first pass could not stand an essential piece can be made again, the piece first, from the same beginning
+/** the programs whose essentials can be solved together when the one-by-one passes leave one out */
+const JOINT = new Set(['bath', 'ensuite', 'powder']);
+const snapshotHouse = (h: HouseState) => ({ usage: new Map(h.usage), storey: new Map(h.storey), roomsOn: new Map([...h.roomsOn].map(([k, v]) => [k, new Set(v)] as [string, Set<any>])), palettes: h.palettes.slice(), prefer: new Map([...h.prefer].map(([k, v]) => [k, v.slice()] as [string, string[]])), prefAny: new Set(h.prefAny) });
+function restoreHouse(h: HouseState, s: ReturnType<typeof snapshotHouse>) { h.usage = s.usage; h.storey = s.storey; h.roomsOn = s.roomsOn; h.palettes = s.palettes; h.prefer = s.prefer; h.prefAny = s.prefAny; }
+
+/** Compose one room. When a labelled essential (a lounge, a bed, a toilet, the bathing…) cannot be stood, the room is composed
+ *  again with that group first — the first group in a tight room takes the best of the floor, and a WC that takes the sink's
+ *  wall first has none left for the toilet — and the better of the passes is kept. */
 export function composeRoom(spec: any, lv: any, room: any, house: HouseState, composed: Map<any, any[]>): ComposeResult {
+  const start = snapshotHouse(house);
+  let best = composeRoomOnce(spec, lv, room, house, composed, []);
+  if (!best.missing.length) return best;
+  let bestState = snapshotHouse(house), priority: string[] = best.missing.slice();
+  for (let pass = 0; pass < 3 && best.missing.length; pass++) {
+    restoreHouse(house, start);
+    // (the last pass, for a wet room, solves its essentials together)
+    const r = composeRoomOnce(spec, lv, room, house, composed, priority, pass === 2 && JOINT.has(room.program));
+    if (weightOf(r.missing) < weightOf(best.missing) - 1e-9 || (Math.abs(weightOf(r.missing) - weightOf(best.missing)) < 1e-9 && r.items.length > best.items.length)) { best = r; bestState = snapshotHouse(house); }
+    priority = [...new Set([...priority, ...r.missing])];
+  }
+  restoreHouse(house, bestState);
+  return best;
+}
+function composeRoomOnce(spec: any, lv: any, room: any, house: HouseState, composed: Map<any, any[]>, priority: string[], joint = false): ComposeResult {
   const c = new Composer(spec, lv, room, pinsFor(spec, lv, room, composed), house, seedKeyOf(spec, room));
   // a bedroom gets a palette of its own when it has none: its style's fabrics and accents, distinct from the house's
   // other bedrooms (a kid's room from the brighter nursery set)
@@ -1034,8 +1309,8 @@ export function composeRoom(spec: any, lv: any, room: any, house: HouseState, co
     const kids = ['#b7c9a8', '#a9c1d9', '#e3b8b0', '#e8d8a0', '#c3b5d6', '#a8d5c9'];
     const fabrics = c.program === 'bed-kid' || c.program === 'nursery' ? kids : c.style.fabric;
     const free = fabrics.filter(f => !house.palettes.includes(f)), pool = free.length ? free : fabrics;
-    const fabric = pool[Math.floor(c.rng() * pool.length)];
-    const accent = c.style.accent[Math.floor(c.rng() * c.style.accent.length)];
+    const fabric = nudge(pool[Math.floor(c.rng() * pool.length)], c.rng);
+    const accent = nudge(c.style.accent[Math.floor(c.rng() * c.style.accent.length)], c.rng);
     c.palette = { fabric, accent };
     house.palettes.push(fabric);
   } else if (!c.palette && (room.style || spec.styleKey) && LIVED_IN.has(c.program)) {
@@ -1043,26 +1318,61 @@ export function composeRoom(spec: any, lv: any, room: any, house: HouseState, co
     // style's palette (a house with no style named keeps the kit's scheme, harmonised with its own palette)
     const free = c.style.fabric.filter(f => !house.palettes.includes(f)), pool = free.length ? free : c.style.fabric;
     const pick = (a: string[]) => a[Math.floor(c.rng() * a.length)];
-    const fabric = pick(pool);
-    c.palette = { fabric, wood: pick(c.style.wood), accent: pick(c.style.accent) };
+    const fabric = nudge(pick(pool), c.rng);
+    c.palette = { fabric, wood: nudge(pick(c.style.wood), c.rng), accent: nudge(pick(c.style.accent), c.rng) };
     house.palettes.push(fabric);
   }
-  const dropped: string[] = [];
-  for (const make of program(c)) {
+  const dropped: string[] = [], placedLabels = new Set<string>();
+  let makers = program(c);
+  const labelled = new Set(makers.filter(m => m.label).map(m => m.label!));
+  // the joint pass (a last resort for a tight wet room): its labelled essentials are solved together, the rest follow one by one
+  if (joint) {
+    const labels = [...new Set(makers.filter(m => m.label).map(m => m.label!))];
+    const missing0 = c.placeJoint(labels.map(label => ({ label, makers: makers.filter(m => m.label === label) })));
+    for (const label of labels) if (missing0.includes(label)) { dropped.push(label); (c.whys[label] ||= {})['no arrangement of the essentials stands together'] = 1; } else placedLabels.add(label);
+    makers = makers.filter(m => !m.label);
+  }
+  if (priority.length) makers.sort((x, y) => (priority.includes(x.label || '') ? 0 : 1) - (priority.includes(y.label || '') ? 0 : 1));
+  for (const make of makers) {
+    if (make.unless && make.unless()) continue;
     // a group that cannot be placed is made again (a lounge tries its next focus wall, and every piece its last try
-    // picked is set aside, so the next try reaches for others rather than the house's favourite again), twice at most
-    let name = '';
+    // picked is set aside, so the next try reaches for others rather than the house's favourite again), a few times at most.
+    // A try that makes nothing is not the end either: the lounge's first wall may have no room for a sofa and the next may.
+    let name = '', placed = false;
     c.avoid = new Set();
-    for (let attempt = 0; attempt < 4; attempt++) {
+    for (let attempt = 0; attempt < (make.tries ?? 4) && !placed; attempt++) {
       c.attempt = attempt; c.pickLog = [];
-      const g = make(attempt); if (!g) { name = name && attempt ? name : ''; break; }
+      const g = make(attempt); if (!g) continue;
       name = g.name;
-      if (g.cands.length && c.place(g)) { name = ''; break; }
+      if (g.cands.length && c.place(g)) { placed = true; break; }
       for (const t of c.pickLog) c.avoid.add(t);
     }
-    if (name) dropped.push(name);
+    // (a group named by its maker that no try made, or made but could not stand, is reported: the room is without it)
+    if (placed && make.label) placedLabels.add(make.label);
+    if (!placed && make.label && name && name !== make.label && c.whys[name]) { const w = (c.whys[make.label] ||= {}); for (const [k, v] of Object.entries(c.whys[name])) w[`${name}: ${k}`] = (w[`${name}: ${k}`] || 0) + v; }
+    if (!placed && (name || make.label)) { const n = make.label || name; if (!dropped.includes(n)) dropped.push(n); if (!name && make.label) (c.whys[n] ||= {})['nothing to place it against'] = 1; }
   }
+  // a label one group could not stand and a later one did (the bathing: a tub, else a shower) is not missing
+  const missing = dropped.filter(n => labelled.has(n) && !placedLabels.has(n));
   c.avoid = new Set(); c.attempt = 0;
+  // a room of 12 m² or more whose every piece stands in one half (the `empty-half` lint, plan H: "no furniture islands with empty
+  // halves") is given what its program can use in the other half: a reading corner, a sideboard or shelves, a lamp, plants
+  const half = emptyHalf(c);
+  if (half) {
+    let added = 0;
+    for (const make of fillers(c)) {
+      if (added >= 2) break;
+      c.avoid = new Set();
+      for (let attempt = 0; attempt < 2; attempt++) {
+        c.attempt = attempt; c.pickLog = [];
+        const g = make(); if (!g) break;
+        g.accept = items => half(items[0]);
+        if (g.cands.length && c.place(g)) { added++; break; }
+        for (const t of c.pickLog) c.avoid.add(t);
+      }
+    }
+    c.avoid = new Set(); c.attempt = 0;
+  }
   c.anneal(400);
   // the report: the lanes at the room's width (0.9 m where it has 3 m to give, else 0.8) and anything its geometry
   // alone already blocks (a stair across a landing), which no composition can open
@@ -1070,17 +1380,24 @@ export function composeRoom(spec: any, lv: any, room: any, house: HouseState, co
   const geometry = lanes.failed.filter(f => c.baseFailed.has(f));
   lanes.failed = lanes.failed.filter(f => !c.baseFailed.has(f)); lanes.ok = !lanes.failed.length;
   const why = Object.fromEntries(dropped.map(n => [n, Object.entries(c.whys[n] || {}).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, v]) => `${k} ×${v}`)]));
-  return { items: c.output(), program: c.program, style: c.style.key, laneWidth: c.laneW, lanes, geometry, groups: c.groups.map(g => g.name), dropped, why, focus: c.focus };
+  return { items: c.output(), program: c.program, style: c.style.key, laneWidth: c.laneW, lanes, geometry, groups: c.groups.map(g => g.name), dropped: dropped.filter(n => !placedLabels.has(n)), missing, why, focus: c.focus };
 }
 
-const cache = new WeakMap<any, { byRoom: Map<any, ComposeResult> }>();
+// Cached per spec object AND its content: an editor that changes a room's style, program or items in place and rebuilds gets the
+// new composition, not the old one composed round the old pins (the signature is a hash of everything a composition reads)
+const cache = new WeakMap<any, { sig: number; byRoom: Map<any, ComposeResult> }>();
+/** how often composeHouse served the cache and how often it composed (the tests read it: a build must compose a house once) */
+export const composeStats = { hits: 0, misses: 0 };
+const signature = (spec: any): number => fnv1a(JSON.stringify([spec.id, spec.styleKey, spec.hero, spec.entry, spec.features, spec.defaults, spec.levels]));
 /**
  * Compose every room of a house that has a program (and is not locked), in build order: levels, then rooms. Returns
- * room → result. Cached per spec object, so the page's builder, the lints and plan-export see the same composition.
+ * room → result. Cached per spec object (and its content: an edit in place is a new composition), so the page's builder, the lints and
+ * plan-export see the same composition.
  * `opts.program(room, lv)` overrides which rooms are composed and as what (the dry run infers programs by name).
  */
 export function composeHouse(spec: any, opts: { program?: (room: any, lv: any) => string | null } = {}): Map<any, ComposeResult> {
-  const hit = !opts.program && cache.get(spec); if (hit) return hit.byRoom;
+  const sig = opts.program ? 0 : signature(spec), hit = !opts.program && cache.get(spec); if (hit && hit.sig === sig) { composeStats.hits++; return hit.byRoom; }
+  if (!opts.program) composeStats.misses++;
   const house: HouseState = { usage: new Map(), storey: new Map(), roomsOn: new Map(), palettes: [], styleOf: room => styleOf(spec, room), prefer: new Map(), prefAny: new Set(), seed: String(spec.id) };
   const byRoom = new Map<any, ComposeResult>(), composed = new Map<any, any[]>();
   // every authored type counts as used, so the composer reaches for something else
@@ -1094,7 +1411,7 @@ export function composeHouse(spec: any, opts: { program?: (room: any, lv: any) =
   });
   // the house-wide state (its preferred types per role, its usage counts), for the tools and tests to look at
   Object.defineProperty(byRoom, 'house', { value: house });
-  if (!opts.program) cache.set(spec, { byRoom });
+  if (!opts.program) cache.set(spec, { sig, byRoom });
   return byRoom;
 }
 /** the composed items of one room ([] for a room that is not composed) */
@@ -1109,7 +1426,7 @@ export function composedItems(spec: any, room: any): any[] {
 /** the door-to-door circulation corridors of a room: Manhattan routes 0.9 m wide between every pair of its ways in
  *  (and to its middle when it has one way in), as plan rectangles — S5's soft nav bias */
 export function lanes(spec: any, lv: any, room: any): Array<{ from: string; to: string; rects: Obb[] }> {
-  const geo = analyzeRoom(spec, lv, room), ps = geo.portals.filter(p => p.w >= 0.5), out: Array<{ from: string; to: string; rects: Obb[] }> = [];
+  const geo = analyzeRoom(spec, lv, room), ps = geo.portals.filter(p => (p.open ? p.w >= 1.2 : p.w >= 0.5)), out: Array<{ from: string; to: string; rects: Obb[] }> = [];
   const inner = (p: Portal): [number, number] => { const [nx, nz] = INWARD[p.side]; return [p.x + nx * 0.5, p.z + nz * 0.5]; };
   const route = (a: [number, number], b: [number, number]) => { const w = 0.9; return [rectObb(Math.min(a[0], b[0]) - w / 2, a[1] - w / 2, Math.max(a[0], b[0]) + w / 2, a[1] + w / 2), rectObb(b[0] - w / 2, Math.min(a[1], b[1]) - w / 2, b[0] + w / 2, Math.max(a[1], b[1]) + w / 2)]; };
   for (let i = 0; i < ps.length; i++) for (let j = i + 1; j < ps.length; j++) out.push({ from: `${ps[i].kind}@${ps[i].side}`, to: `${ps[j].kind}@${ps[j].side}`, rects: route(inner(ps[i]), inner(ps[j])) });

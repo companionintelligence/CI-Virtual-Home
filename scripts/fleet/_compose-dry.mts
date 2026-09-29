@@ -35,7 +35,8 @@ export function dryRun(specs: Array<{ id: string; spec: any }>, { variant = '' a
   const out: DryHouse[] = [];
   for (const { id, spec } of specs) {
     const s = JSON.parse(JSON.stringify(spec));
-    for (const lv of s.levels || []) for (const r of lv.rooms || []) { r.items = []; if (variant) r.seed = variant; }
+    // (the copy carries the programs it was composed as, so the layout lints — `missing-anchor` reads room.program — see them)
+    for (const lv of s.levels || []) for (const r of lv.rooms || []) { r.items = []; if (variant) r.seed = variant; const p = r.bounds ? inferProgram(r, lv) : null; if (p) r.program = p; }
     const res = composeHouse(s, { program: (room: any, lv: any) => inferProgram(room, lv) });
     const rooms: DryRoom[] = [];
     for (const lv of s.levels || []) for (const room of lv.rooms || []) if (res.has(room)) rooms.push({ lv, room, res: res.get(room) });

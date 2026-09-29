@@ -7,7 +7,19 @@
   "style": "Single-storey block of eight bathrooms in a cottage style",
   "emoji": "🧪",
   "fixture": {
-    "note": "the bath packer: clawfoot and soaking tubs, a built-in tub, showers, single, double and pedestal vanities, powder rooms"
+    "note": "the bath packer: clawfoot and soaking tubs, a built-in tub, showers, single, double and pedestal vanities, powder rooms",
+    "frames": {
+      "door-to-core": [
+        0.55,
+        1
+      ],
+      "hero-reveal": [
+        1
+      ],
+      "core-orbit": [
+        0.55
+      ]
+    }
   },
   "lot": {
     "w": 31.2,

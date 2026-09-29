@@ -53,7 +53,7 @@ const check: Check = spec => {
       const k = room.kitchen;
       if (!k || typeof k !== 'object') err(`${at}: kitchen is { layout, island, peninsula, sinkWall, windowOverSink, top, glassUppers, color }`, 'kitchen');
       else {
-        if (!oneOf(k.layout, KITCHEN_LAYOUTS)) err(`${at}: kitchen.layout must be one of ${KITCHEN_LAYOUTS.join(', ')}`, 'kitchen');
+        if (k.layout !== undefined && !oneOf(k.layout, KITCHEN_LAYOUTS)) err(`${at}: kitchen.layout must be one of ${KITCHEN_LAYOUTS.join(', ')}`, 'kitchen');
         if (k.island !== undefined && !size(k.island)) err(`${at}: kitchen.island is true, false or { w, d }`, 'kitchen');
         if (k.sinkWall !== undefined && !oneOf(k.sinkWall, SIDES)) err(`${at}: kitchen.sinkWall "${k.sinkWall}" is not N, S, E or W`, 'kitchen');
         if (k.top !== undefined && !oneOf(k.top, TOPS)) err(`${at}: kitchen.top "${k.top}" is not one of ${TOPS.join(', ')}`, 'kitchen');

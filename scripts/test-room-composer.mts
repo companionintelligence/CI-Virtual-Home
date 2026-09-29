@@ -24,6 +24,10 @@
 //      boxes, a surface prop is an onSurface placement, no prop costs more than 60 draw calls (meshes), and
 //      content/house-styles.json is assets/house-styles.ts.
 //   6. The authored fleet's layout-lint counts per code (the baseline the layout pass works down), printed.
+//   Also: the essentials (assets/layout-lint.ts ANCHORS, read off the ITEMS by role, so a group that was never built or that
+//   returned nothing is counted, not passed) and that every room without one says so (`missing`); authored pieces count as
+//   filling a role (pins kept: no second toilet, bed, sofa, table or kitchen beside an authored one); and that a re-rolled
+//   seed changes the plan of a kitchen or a bed, not only its pieces.
 //
 //   node --experimental-strip-types scripts/test-room-composer.mts [--house a,b] [--verbose]
 import fs from 'node:fs';
@@ -36,6 +40,8 @@ const argv = process.argv.slice(2), VERBOSE = argv.includes('--verbose');
 const onlyHouses = (() => { const i = argv.indexOf('--house'); return i >= 0 ? argv[i + 1].split(',') : null; })();
 if (!M) { console.error('the composer is not built: pnpm run build'); process.exit(2); }
 const { composeHouse, lintLayout, PLACEMENT, layerOf } = { ...M, lintLayout: M.lint.lintLayout } as any;
+const { ANCHORS, missingAnchors } = M.lint;
+const { inferProgram } = M.programs;
 const { analyzeRoom, itemObb, aabb, limitOf, sizeOf } = M.geo;
 const { STYLES, STYLE_KEYS } = M.styles;
 const { PROPS } = await import(path.join(ROOT, 'assets', 'props', 'index.js'));
@@ -92,7 +98,7 @@ check(!counts.lane, `lanes of 0.8 m in ${laneRooms - counts.lane} of ${laneRooms
 // every lint over the composed fleet: the ones about the composer's own pieces are zero, the rest (the geometry's and the
 // hand-authored Core's: a stair with no run-in, an entry that faces a wall) are reported beside the authored baseline
 {
-  const own = ['overlap', 'wall-pierce', 'outside-room', 'door-swing', 'lane', 'mount-in-wall', 'surface-height', 'silent-param', 'kitchen-backwards', 'facing'];
+  const own = ['overlap', 'wall-pierce', 'outside-room', 'door-swing', 'lane', 'mount-in-wall', 'surface-height', 'surface-kind', 'silent-param', 'kitchen-backwards', 'facing'];
   const all: Record<string, number> = {};
   for (const h of run1) {
     const override = new Map<any, any[]>();
@@ -104,23 +110,56 @@ check(!counts.lane, `lanes of 0.8 m in ${laneRooms - counts.lane} of ${laneRooms
   check(!bad.length, `the composed fleet has none of the composer's own lints (${own.join(', ')})${bad.length ? ': ' + bad.map(k => `${k} ${all[k]}`).join(', ') : ''}`);
   console.log(`  the rest, composed: ${Object.entries(all).filter(([k]) => !own.includes(k)).map(([k, v]) => `${k} ${v}`).join(' · ') || 'none'} (the geometry's, and the authored Core's: see the baseline below)`);
   check((all.repetition || 0) <= 6, `repetition warnings on the composed fleet: ${all.repetition || 0} (target ≤ 6; the authored fleet has 78)`);
+  check((all['empty-half'] || 0) <= 5, `rooms of 12 m² or more with an empty half, composed: ${all['empty-half'] || 0} (target ≤ 5; a composed room fills its bare half where a piece will stand there — a kitchen that has no 2.2 m of floor left for a table does not)`);
 }
 
-// what a room of each program cannot do without: the group the composer must have placed
-const ESSENTIAL: Record<string, string[]> = {
-  living: ['lounge'], den: ['lounge'], media: ['lounge'], dining: ['dining'], kitchen: ['kitchen'], 'kitchen-dining': ['kitchen', 'dining'],
-  'bed-primary': ['bed'], 'bed-guest': ['bed'], 'bed-kid': ['bed'], nursery: ['bed'], bath: ['toilet', 'vanity'], ensuite: ['toilet', 'vanity'], powder: ['toilet', 'vanity'],
-};
+// what a room of each program cannot do without (assets/layout-lint.ts ANCHORS): read off the ITEMS by role — not off the composer's own
+// report, which never sees a group that was never built or that returned nothing — and a room without one must SAY so (`missing`)
 {
-  let need = 0, lacking = 0; const misses: string[] = [];
+  let need = 0, lacking = 0, silent = 0; const misses: string[] = [];
   for (const h of run1) for (const r of h.rooms) {
-    const ess = ESSENTIAL[r.res.program]; if (!ess) continue;
+    if (!ANCHORS[r.res.program]) continue;
+    const geo = analyzeRoom(h.spec, r.lv, r.room);
+    if (geo.area < 3) continue;   // (a 1 m² "kitchen" on a terrace is not a room)
     need++;
-    const gone = ess.filter(n => r.res.dropped.includes(n));
-    if (gone.length) { lacking++; misses.push(`${h.id} "${r.room.name}" (${r.res.program}): no ${gone.join(', ')}`); }
+    const gone = missingAnchors(r.res.program, r.res.items, { heroDesk: geo.heroHere && (h.spec.hero.surface || 'desk') === 'desk' });
+    if (!gone.length) continue;
+    lacking++;
+    if (!r.res.missing.length) silent++;
+    misses.push(`${h.id} "${r.room.name}" (${r.res.program}, ${r.room.bounds.w}×${r.room.bounds.d}): no ${gone.join(', no ')}${r.res.missing.length ? '' : '  [NOT REPORTED]'}`);
   }
-  for (const m of misses.slice(0, VERBOSE ? 99 : 6)) console.log(`    ${m}`);
-  check(need > 0 && lacking / need <= 0.03, `every room's essentials placed (lounge, dining table, kitchen run, bed, toilet and sink): ${need - lacking} of ${need} rooms (target ≥ 97 %; the rest are rooms too small for what they are named)`);
+  for (const m of misses.slice(0, VERBOSE ? 99 : 12)) console.log(`    ${m}`);
+  check(need > 0 && lacking / need <= 0.03, `every room's essentials stand (${Object.keys(ANCHORS).length} programs: seating, sink and range, dining table and chairs, bed, toilet, sink and tub or shower, bookcases, desk, washer and dryer): ${need - lacking} of ${need} rooms (target ≥ 97 %; the rest are baths and kitchenettes with no floor for them)`);
+  check(!silent, `every room that lacks one says so (its result's \`missing\`, and the missing-anchor lint): ${silent} rooms lack one silently`);
+}
+
+// a washer and a dryer are a pair: side by side on one wall (within 0.9 m, the same way round), wherever a wall holds both
+{
+  let both = 0, paired = 0;
+  for (const h of run1) for (const r of h.rooms) if (r.res.program === 'laundry') {
+    const w = r.res.items.find((i: any) => i.type === 'washing-machine'), d = r.res.items.find((i: any) => i.type === 'dryer');
+    if (w && d) { both++; if (Math.hypot(w.at[0] - d.at[0], w.at[1] - d.at[1]) < 0.9 && (w.rot || 0) === (d.rot || 0)) paired++; }
+  }
+  check(both > 0 && paired / both >= 0.8, `washers and dryers side by side: ${paired} of ${both} laundries (target ≥ 80 %)`);
+}
+
+// authored pieces count as filling a role: a room with a program and authored furniture (pins) is not given a second toilet, bed,
+// sofa, dining table or kitchen beside the one the author placed (the layout pass adds `program` to real, furnished rooms)
+console.log('── authored pieces fill their roles');
+{
+  const ONE: Array<[string, string[]]> = [['toilet', ['toilet']], ['bed', ['bed']], ['sofa', ['sofa', 'sofa-l', 'loveseat']], ['dining table', ['dining-table', 'dining-table-round']], ['sink run', ['sink-run']], ['range', ['range']], ['fridge', ['fridge']], ['shower or tub', ['shower', 'tub-free', 'tub-built-in']], ['vanity', ['vanity', 'vanity-double']]];
+  const has = (its: any[], roles: string[]) => its.some(i => (PLACEMENT[i.type]?.roles || []).some((r: string) => roles.includes(r)));
+  let rooms = 0, dups = 0; const shown: string[] = [];
+  for (const { id, spec } of specs) {
+    const copy = JSON.parse(JSON.stringify(spec));
+    const res = composeHouse(copy, { program: (room: any, lv: any) => room.bounds ? inferProgram(room, lv) : null });
+    for (const lv of copy.levels || []) for (const room of lv.rooms || []) {
+      const r = res.get(room); if (!r) continue; rooms++;
+      for (const [name, roles] of ONE) if (has(room.items || [], roles) && has(r.items, roles)) { dups++; if (shown.length < 8) shown.push(`${id} "${room.name}" (${r.program}): composed a ${name} beside the authored one`); }
+    }
+  }
+  for (const m of shown) console.log(`    ${m}`);
+  check(dups === 0, `${rooms} real rooms composed round their authored items: ${dups} doubled roles (a toilet, bed, sofa, dining table, kitchen run, vanity or shower beside an authored one)`);
 }
 
 // ---- 3. repetition -------------------------------------------------------------------------------------------------------------
@@ -138,6 +177,8 @@ console.log(`  (the S0 fleet metric, every type: ${n20(aAll)} types in 20 or mor
 const drop = 1 - sameTwelve / Math.max(1, aTop.houses);
 check(drop >= 0.5, `the authored fleet's twelve most repeated furniture types: ${aTop.houses} → ${sameTwelve} house-uses, down ${(drop * 100).toFixed(0)} % (target ≥ 50 %)`);
 check(c20 <= a20 / 2, `furniture types in 20 or more houses: ${a20} → ${c20} (target ≤ half)`);
+// (the harder reading: variety that only MOVES — the same twelve types replaced by twelve others just as common — would not show above)
+check(cTop.houses <= 0.7 * aTop.houses, `the composed fleet's own twelve most repeated furniture types: ${cTop.houses} house-uses against the authored fleet's ${aTop.houses}, down ${((1 - cTop.houses / aTop.houses) * 100).toFixed(0)} % (target ≥ 30 %)`);
 const busiest = C[0];
 check(busiest.houses <= Math.ceil(ids.length * 3 / 4), `the busiest furniture type, ${busiest.type}, is in ${busiest.houses} of ${ids.length} houses (target ≤ three quarters)`);
 
@@ -162,6 +203,22 @@ for (let i = 0; i < run1.length; i++) run1[i].rooms.forEach((r, k) => {
   if (JSON.stringify(r.res.items) === JSON.stringify(reroll[i].rooms[k].res.items)) same++;
 });
 check(total > 0 && same / total <= 0.1, `by seed: ${total - same} of ${total} furnished rooms come out differently when their seed changes (target ≥ 90 %)`);
+// … and structurally: the PLAN of a kitchen (which walls carry the run, where the island stands) or of a bed (its wall, its side)
+// changes with the seed wherever the room has more than one arrangement (a kitchen whose doors and windows leave one wall for a run has
+// one plan) — a hash of the items changes when one lamp does, so it cannot say
+{
+  const sub = specs.filter((_, i) => i % 4 === 0), runs = ['', 'b', 'c', 'd', 'e'].map(v => dryRun(sub, { variant: v }));
+  const KIT = new Set(['sink-run', 'range', 'fridge', 'breakfast-bar', 'corner-run']);
+  const planOf = (r: any, kind: string) => r.res.items.filter((i: any) => (kind === 'kitchen' ? KIT.has(i.type) : (PLACEMENT[i.type]?.roles || []).some((q: string) => ['bed', 'bed-single', 'bed-bunk', 'bed-loft', 'crib'].includes(q)))).map((i: any) => `${i.type}@${Math.round(i.at[0] * 2)},${Math.round(i.at[1] * 2)}:${i.rot || 0}`).sort().join('|');
+  for (const [kind, progs, want] of [['kitchen', ['kitchen', 'kitchen-dining'], 0.3], ['bed', ['bed-primary', 'bed-guest', 'bed-kid'], 0.5]] as Array<[string, string[], number]>) {
+    let n = 0, varied = 0;
+    for (let h = 0; h < sub.length; h++) runs[0][h].rooms.forEach((r0, k) => {
+      if (!progs.includes(r0.res.program) || !planOf(r0, kind)) return;
+      n++; const plans = new Set(runs.map(run => planOf(run[h].rooms[k], kind))); if (plans.size > 1) varied++;
+    });
+    check(n > 0 && varied / n >= want, `by seed, the plan of a ${kind}: ${varied} of ${n} rooms are laid out differently under one of ${runs.length} seeds (target ≥ ${Math.round(want * 100)} %)`);
+  }
+}
 // by style: one house's rooms, furnished in each of the nine styles, reach for different pieces
 {
   const base = specs.find(s => s.id === 'aurora') || specs[0], per = new Map<string, Set<string>>();
@@ -226,11 +283,25 @@ console.log('── the helpers and the focus fields');
   // the focus fields: the bed's head on the wall the author names, an island when the focus says so
   const res = composeHouse(JSON.parse(JSON.stringify(tidy)));
   const named = (n: string) => { for (const [room, r] of res as Map<any, any>) if (room.name === n) return { room, r }; return null; };
-  const bedE = named('Bedroom, head on the E wall'), bedS = named('Bedroom, head on the N wall'), kit = named('Kitchen, island asked for by focus');
+  const bedE = named('Bedroom, head on the E wall'), bedS = named('Bedroom, head on the S wall'), kit = named('Kitchen, island asked for by focus');
   const headOn = (x: any, side: 'E' | 'S') => { const bed = x.r.items.find((i: any) => /bed/.test(i.type)), b = x.room.bounds; return side === 'E' ? bed.at[0] > b.x + b.w - 1.5 : bed.at[1] > b.z + b.d - 1.5; };
   check(!!bedE && headOn(bedE, 'E'), 'focus { type: bed, wall: E } puts the headboard on the east wall');
   check(!!bedS && headOn(bedS, 'S'), 'focus { type: bed, wall: S } puts the headboard on the south wall');
   check(!!kit && kit.r.items.some((i: any) => i.type === 'breakfast-bar'), 'focus { type: island } gives the kitchen an island');
+  // an edit in place is a new composition (an editor mutates the spec it holds and rebuilds), and the same as a fresh copy's
+  {
+    const spec = JSON.parse(JSON.stringify(tidy)), before = composeHouse(spec), room = spec.levels[0].rooms.find((r: any) => r.name === 'Bedroom, head on the E wall');
+    const one = JSON.stringify(before.get(room).items);
+    room.style = 'industrial'; room.items = [{ type: 'mid-century-sofa', at: [room.bounds.x + 1.2, room.bounds.z + 1.0] }];
+    const after = composeHouse(spec), fresh = composeHouse(JSON.parse(JSON.stringify(spec))), roomB = [...fresh.keys()].find((r: any) => r.name === room.name);
+    check(after !== before && JSON.stringify(after.get(room).items) === JSON.stringify(fresh.get(roomB).items) && JSON.stringify(after.get(room).items) !== one, 'composeHouse follows an edit in place: the same as a fresh copy of the edited spec, not the old composition');
+  }
+  // a wall drawn 0.3–0.5 m off its room's edge is still that room's wall, and its doors are seen (a piece was set in a doorway)
+  for (const [id, roomName] of [['bgfamily', 'Bathroom'], ['starter18k', 'Family Bedroom']] as Array<[string, string]>) {
+    const sp = loadSpec(id); let saw = false;
+    for (const l of sp.levels) for (const r of l.rooms || []) if (r.name === roomName) saw = analyzeRoom(sp, l, r).portals.some((p: any) => !p.open && p.side === 'W');
+    check(saw, `${id} "${roomName}": the doorway in its loosely drawn west wall is a door to the room`);
+  }
 }
 
 // ---- 5. the catalog -------------------------------------------------------------------------------------------------------------
@@ -243,14 +314,22 @@ const catTypes = Object.keys(cat), placed = catTypes.filter(t => PLACEMENT[t]);
 check(placed.length / catTypes.length >= 0.9, `placement metadata for ${placed.length} of ${catTypes.length} catalog types (${(placed.length / catTypes.length * 100).toFixed(0)} %, target ≥ 90 %)`);
 const missing = [...PROPS.keys()].filter(t => !cat[t]);
 check(!missing.length, `${missing.length} registry props missing from the catalog${missing.length ? ` (${missing.slice(0, 8).join(', ')}${missing.length > 8 ? ' …' : ''}): pnpm run catalog` : ''}`);
-const drift: string[] = [];
-for (const t of catTypes) {
-  const m = cat[t], s = sizeOf(t, {}); if (!s || !m.box) continue;
-  const [x0, , z0, x1, , z1] = m.box, w = x1 - x0, d = z1 - z0, ox = (x0 + x1) / 2, oz = (z0 + z1) / 2;
-  const bad = Math.abs(w - s.w) > 0.15 || Math.abs(d - s.d) > 0.15 || Math.abs(m.height - s.h) > 0.2 || Math.abs(ox - s.ox) > 0.15 || Math.abs(oz - s.oz) > 0.15;
-  if (bad) drift.push(`${t} declared ${s.w.toFixed(2)}×${s.d.toFixed(2)}×${s.h.toFixed(2)} @(${s.ox.toFixed(2)},${s.oz.toFixed(2)}), measured ${w.toFixed(2)}×${d.toFixed(2)}×${m.height.toFixed(2)} @(${ox.toFixed(2)},${oz.toFixed(2)})`);
+// the composer's sizes are the catalog's measured boxes (assets/props/measured.ts is written with the catalog: pnpm run catalog): every
+// type has one, and it is the box the catalog measured. (That the geometry still builds to that box is test-compose-parity.mts's, in the
+// page: every composed item of the fixtures is built alone with its own params and measured against sizeOf.)
+{
+  const { MEASURED } = await import(path.join(ROOT, 'assets', 'props', 'measured.js'));
+  // (a plant's is the widest reach either side, about its origin: it holds the box the catalog measured)
+  const gone = catTypes.filter(t => !MEASURED[t]), stale = catTypes.filter(t => MEASURED[t] && cat[t].box && [0, 2, 3, 5].some((k, i) => (PLACEMENT[t]?.group === 'plant' ? (i < 2 ? cat[t].box[k] < MEASURED[t].b[i] - 0.002 : cat[t].box[k] > MEASURED[t].b[i] + 0.002) : Math.abs(cat[t].box[k] - MEASURED[t].b[i]) > 0.002))), extra = Object.keys(MEASURED).filter(t => !cat[t]);
+  check(!gone.length && !stale.length && !extra.length, `assets/props/measured.ts is the catalog's boxes (${gone.length} types missing, ${stale.length} stale, ${extra.length} not in the catalog${gone.length + stale.length + extra.length ? ' — pnpm run catalog' : ''})`);
+  // what sizeOf makes of a bed at a width the catalog never built it at: the headboard's wings stay outside the mattress
+  const bed = sizeOf('upholstered-bed', { w: 1.4 }), bedDefault = sizeOf('upholstered-bed', {});
+  check(!!bed && !!bedDefault && bed.w > 1.4 + 0.1 && Math.abs((bed.w - 1.4) - (bedDefault.w - 1.6)) < 0.02, `sizeOf keeps a frame's overhang when \`w\` is given: an upholstered bed of \`w\` 1.4 is ${bed && bed.w.toFixed(2)} m wide (the frame adds ${bed && (bed.w - 1.4).toFixed(2)} m, as at its default)`);
+  // declared footprints (a registry prop's `footprint`, a page builder's `size`) are only the fallback now: how far they are from the truth is reported
+  const off: string[] = [];
+  for (const t of catTypes) { const m = cat[t], d = PROPS.get(t); if (!d || !m.box) continue; const w = m.box[3] - m.box[0], dd = m.box[5] - m.box[2]; if (Math.abs(w - d.footprint[0]) > 0.05 || Math.abs(dd - d.footprint[1]) > 0.05) off.push(t); }
+  if (off.length) note(`${off.length} registry props declare a footprint more than 0.05 m off their measured box (the composer reads the measured one; the declared is the fallback for a type added before the next \`pnpm run catalog\`)`);
 }
-check(!drift.length, `${drift.length} types whose declared size disagrees with the measured catalog${drift.length ? ':\n      ' + drift.join('\n      ') : ''}`);
 // a registry prop that stands on a surface (`surface: true`) is one the composer stacks (its placement says so), and back
 // (a page builder's default height is item-map.ts's SURFACE_ITEMS: the Core's own pieces)
 const surf = catTypes.filter(t => cat[t].source === 'registry' && PLACEMENT[t] && !!cat[t].surface !== !!PLACEMENT[t].onSurface && layerOf(t) !== 'wall' && layerOf(t) !== 'ceiling');

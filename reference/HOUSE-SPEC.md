@@ -259,7 +259,12 @@ Room programs, the composer that furnishes them, the new furniture, and the layo
 
 **Opt-in.** A room without `program` is never composed: it renders its authored `items` exactly, as before. A room with
 one is furnished by `assets/room-composer.ts` (THREE-free, so it runs in Node too), and its authored items are **pins**,
-kept exactly, that the composer arranges round. Every field below is optional.
+kept exactly, that the composer arranges round. **A pin that fills a role counts as filling it**: a room with a pinned sofa
+is given no lounge, one with a pinned toilet no second toilet, one with a pinned bed no bed, a pinned dining table no table,
+a pinned run, range or fridge no fitted kitchen, a pinned tub or shower no bathing (the rest of the program — bookcases,
+lamps, plants, a rug — still fills in round them). To swap a real room's hand-typed filler for a composition, delete the
+filler first (`compose-house.mts --infer --replace` does it on a copy, and keeps the hearth and the TV). Every field below is
+optional.
 
 ```jsonc
 {
@@ -300,12 +305,12 @@ library den media playroom sunroom greenhouse foyer hall laundry studio bar gym 
 
 | Program | What the composer places | Clearances it keeps |
 |---|---|---|
-| living, den, media | a lounge round the focus: sofa (or an L, a modular or, in a big room, a U sectional) 1.6–3.4 m from the focus wall, coffee table, a rug under the front legs, 1–2 armchairs at 30–45°, side tables with lamps, art over the sofa; bookcase, floor lamp, plants; a piano in a big living room | sofa to table 0.45 m, lanes 0.9 m |
-| kitchen | single, galley, L or U runs with a sink under a window, the dishwasher beside it, a range and a fridge at a run end, wall cabinets and a hood, a corner unit, an island or peninsula with stools, counter things | aisles 1.05 m |
+| living, den, media | a lounge round the focus: sofa (or an L, a modular or, in a big room, a U sectional) 1.2–3.4 m from the focus wall, coffee table, a rug under the front legs, 1–2 armchairs at 30–45°, side tables with lamps, art over the sofa; bookcase, floor lamp, plants; a piano in a big living room. An open plan with no wall worth a hearth or a screen faces the glass or the open floor beyond; a room named "Living & Dining" (22 m² or more) also gets its table in the biggest floor the lounge left | sofa to table 0.45 m, lanes 0.9 m |
+| kitchen | single, galley, L or U runs with a sink under a window, the dishwasher beside it, a range and a fridge at a run end, wall cabinets and a hood, a corner unit, an island or peninsula with stools, counter things. A room with no wall to put them on (a glass wall, an open plan) gets a free-standing line across the floor, 0.9 m to walk behind it; a kitchenette that cannot hold all three gives up the fridge, not the kitchen. In a kitchen-dining room the table goes in the biggest floor the run leaves, before the island | aisles 1.05 m |
 | dining | table on a chosen axis with chairs to seat count, a rug, a pendant or chandelier, a sideboard | 0.6 m behind every chair |
 | bed-* | headboard on the wall facing or beside the door, nightstands with lamps, dresser, bench, wardrobe, art over the bed, a rug under the lower two-thirds; a kid's room gets a single, bunk or loft bed, toy storage, a desk, a play rug and a story picture | 0.6 m each side of the bed |
 | nursery | crib, changing table, glider, dresser, toys, a patterned rug, a moon picture | as bed-* |
-| bath, ensuite, powder | vanity, toilet 0.2 m from its side, tub (clawfoot or soaking, or built-in) or shower, towel rail or ladder, mat, mirror | 0.6 m in front of each fixture |
+| bath, ensuite, powder | vanity, toilet 0.2 m from its side, tub (clawfoot or soaking, or built-in) or shower (a tub that will not stand gives way to a shower: no bath is left with nothing to wash in), towel rail or ladder, mat, mirror | 0.6 m in front of each fixture |
 | study, library, studio | desk with chair and lamp against a wall, runs of tall bookcases, a reading corner, a rug | — |
 | foyer, hall | console or bench, a runner, a plant | 1.2 m lane |
 | sunroom, greenhouse | plants in clusters, a potting bench, a reading corner | — |
@@ -317,13 +322,22 @@ has one): fixed candidate grids (0.1 m), stable sorts, mm rounding, 400 fixed an
 dresser, rug …) it prefers a type, drawn by its style, and reaches for the others only when the room rules that one out, so
 one house reads as one scheme and the next house reaches for another. A group that cannot be placed is made again with
 other pieces, then smaller and on looser terms (its aisle may cross an obstacle), so a small room still gets its lounge, its
-table, its sink; what a room is too small for is dropped, never squeezed through a wall.
+table, its sink; what a room is too small for is dropped, never squeezed through a wall. A room that could not stand one of
+its essentials (a lounge, a bed, a toilet, the bathing, a kitchen, a dining table…) is composed again with that piece first,
+and a tight wet room's fixtures are then solved together; if it still cannot, the result names what is `missing` and the
+`missing-anchor` lint says so — an unfurnished room is never passed as furnished. **Sizes are the built geometry's own**:
+`assets/props/measured.ts` (written by `pnpm run catalog` with the catalog) holds every type's measured box and how it grows
+with `w`, `d`, `l`, `r` and `h` — a bed's headboard is wider than its `w`, a plant's leaves stand off its pot — and
+`scripts/test-compose-parity.mts` builds every composed item in the page and fails when its box is not the composer's.
+The composition is cached per spec *content*, so an edit in place is a new composition; house-wide state (a house's picks,
+its bedroom palettes) is shared between its rooms, so adding furniture to one room can re-roll another unless it is `lock`ed.
 
 **Output.** The composer's items carry `src: "compose@1"`. `node --experimental-strip-types scripts/compose-house.mts
 --house <id | path> [--infer [--replace]] [--rooms a,b] [--style k] [--seed s] [--density n] [--write [--out f]] [--lint]`
 reports a house's composition, and `--write` bakes it into the room's `items` and sets `lock: true`: the room is then
 hand-tunable, and `--rebake` redoes it (an item without `src` is yours and stays). `--infer` reads a program off a
-room's name (the dry run), `--replace` drops the hand-typed items first (a copy to look at).
+room's name (the dry run), `--replace` drops the hand-typed filler first (a copy to look at) but keeps the hearth and the
+wall TV the composer arranges round (`--keep a,b` names other types to keep, `--keep none` drops even those).
 
 **Helpers** (`assets/room-composer.ts`). `lanes(spec, level, room)` returns the room's door-to-door circulation corridors
 (0.9 m, plan rectangles: S5's soft nav bias). `snapWallMount(item, geo)` moves a wall-mounted item authored inside the
@@ -356,13 +370,15 @@ doorways excepted), `stair-run-in` (under 1.6 m clear at a flight's foot or head
 turns its back on the focus), `silent-param`, `mount-in-wall`, `surface-height`, `repetition` (one type in more than two
 rooms of a storey or more than five in a house; rugs, lamps, decor, fitted units and chairs excepted), `kitchen-backwards`,
 `foyer` (the entry opens onto a wall closer than 2.5 m, or sees no feature within 6 m), `empty-half` (a room of 12 m² or more
-with every piece in one half). `<id>.plan.json` carries a `compose` key — each composed room's level, name, program, style
+with every piece in one half), `missing-anchor` (a room with a `program` that lacks what the program cannot do without: seating,
+a bed, a toilet, sink and range, a dining table and its chairs, bathing, bookcases, a desk, a washer and dryer — the table
+`ANCHORS` in `assets/layout-lint.ts`), `surface-kind` (an item standing on another its placement does not allow). `<id>.plan.json` carries a `compose` key — each composed room's level, name, program, style
 and items — for the isometric twin and `fleet-audit --built`.
 
 **Fixtures**: `s3-compose-house` (six program rooms with pins: a living room round a fireplace, an L kitchen with island,
 a library round the Core, a dining room, a primary bedroom, a bath with a freestanding tub, a kid's room, a nursery, a
-study), `s3-compose-kitchens` (every layout and worktop), `s3-compose-baths` (every tub, vanity and shower),
-`s3-compose-styles` (one living room in each of the nine styles, and one style in two seeds), `s3-compose-props` (every new
+study), `s3-compose-kitchens` (every layout and worktop, and a room whose south wall is glass), `s3-compose-baths` (every tub, vanity and shower),
+`s3-compose-styles` (one living room in each of the nine styles, and one style in two seeds — the second a living-dining room), `s3-compose-props` (every new
 sofa, sectional, table, rug pattern and art motif, authored by hand), `s3-compose-tidy` (`defaults: 2`: a wall mount authored inside
 its wall, a lamp at the desk default, `focus.bed` and `focus.island`).
 

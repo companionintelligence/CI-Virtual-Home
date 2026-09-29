@@ -16,7 +16,7 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `assets/**/*.js` (gitignored) | `pnpm run build` |
 | `content/houses/<id>.plan.json` | `pnpm run plans` |
 | `content/houses/index.json` | `pnpm run index` |
-| `content/house-catalog.json` | `pnpm run catalog` |
+| `content/house-catalog.json`, `assets/props/measured.ts` | `pnpm run catalog` |
 | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` | `pnpm run iso` |
 | `scenes/floorplans/` | `pnpm run floorplans` |
 | `test/goldens/<profile>/` | `pnpm run goldens:update` — only on purpose, see below |

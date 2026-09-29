@@ -57,7 +57,7 @@ root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `
 | `pnpm run plans` | Rebuild `content/houses/<id>.plan.json` — the seeded site instances the isometric twin draws. |
 | `pnpm run iso` | Rebuild the isometric SVGs, Lotties and `scenes/manifest.json` (`--only <id>`, `--png`). |
 | `pnpm run floorplans` | Rebuild the CAD sheets and `floorplans.json` (`--only <id>`, `--no-png`, `--fit lot`). |
-| `pnpm run catalog` | Measure every prop type in the browser → `content/house-catalog.json` (footprint, height, draw calls, params, placement) and write `content/house-styles.json`. |
+| `pnpm run catalog` | Measure every prop type in the browser → `content/house-catalog.json` (footprint, height, draw calls, params, placement), `assets/props/measured.ts` (the boxes the composer sizes with, and how they grow with `w` `d` `l` `r` `h`) and `content/house-styles.json`. |
 | `node --experimental-strip-types scripts/compose-house.mts --house <id>` | Compose a house's rooms from their `program`s in Node and report them (`--infer`, `--replace`, `--style`, `--seed`, `--lint`), or bake a composition into a spec (`--write`). |
 | `pnpm run index` | Validate every spec and rebuild `content/houses/index.json` (the page's house list). |
 | `pnpm run prop-sheet` | Contact sheet of props, measured against their declared sizes (`--types`, `--module`, `--all`). |
@@ -218,9 +218,10 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
    spec against `HouseSpec`), `test-spec-merge.mts` (the fragment merge rule), `test-validate-plugins.mts` (a
    plugin's `extend` and `replaces`), `test-builder-seams.mts` (what the catalog and the validator read off the
    builders) and `test-visibility.mts` (the wall roles, the shot's clock and its `shotHidden` / `shotPose` hooks);
-   `test-room-composer.mts` (the room composer on the 30 specs in a dry run: overlaps, lanes, repetition, variety, the
-   catalog) and `test-compose-parity.mts` (the page and Node compose the S3 fixtures alike, and as blessed in
-   `test/fixtures/compose/`).
+   `test-room-composer.mts` (the room composer on the 30 specs in a dry run: overlaps, lanes, essentials by role, authored
+   pieces filling their roles, repetition, variety by seed and style, the catalog) and `test-compose-parity.mts` (the page
+   and Node compose the S3 fixtures alike, as blessed in `test/fixtures/compose/`, and every composed item builds to the
+   box the composer had for it).
 7. **perf** — build ≤ 3 s, `__houseShotTrack` ≤ 1 s and shot QA ≤ 0.5 s a shot on aurora, mirage and vanilla:
    report-only, it never fails the gate.
 

@@ -23,6 +23,11 @@
 //                    island) within 6 m (plan H: §4.3's foyer rule)
 //   empty-half       a room of 12 m² or more with every piece in one half and nothing in the other (plan H: "no furniture
 //                    islands with empty halves")
+//   missing-anchor   a room with a `program` that lacks what the program cannot do without (a living room's seating, a bed, a
+//                    toilet, a kitchen's sink and range, a dining table and its chairs, the bathing …: ANCHORS below), so an
+//                    unfurnished composed room is a warning and never passes as furnished. Rooms under 3 m² are left out
+//   surface-kind     an item standing on another that its placement does not allow (`surfaces`: a lamp on a nightstand, a kettle
+//                    on a counter)
 //
 // Owner: S3 (compose).
 import { PROPS } from './props/index.js';
@@ -34,7 +39,37 @@ import {
   INWARD, alongX, SIDES, DEG, CELL, type Geo, type Obb,
 } from './room-geo.js';
 import { composeHouse, layerOf, snapWallMount, stackOnSurface } from './room-composer.js';
-import { isComposed } from './room-programs.js';
+import { isComposed, isProgram } from './room-programs.js';
+
+/** What a room of each program cannot do without: each anchor is satisfied by `n` items (default 1) with any of the roles
+ *  (assets/props/placement.ts). The composer's essentials (its `missing`), the `missing-anchor` lint and the composer's
+ *  acceptance test all read this one table. A hero desk in a study counts as its desk. */
+export const ANCHORS: Record<string, Array<{ name: string; roles: string[]; n?: number }>> = {
+  living: [{ name: 'seating', roles: ['sofa', 'sofa-l', 'loveseat', 'daybed'] }],
+  den: [{ name: 'seating', roles: ['sofa', 'sofa-l', 'loveseat', 'daybed'] }],
+  media: [{ name: 'seating', roles: ['sofa', 'sofa-l', 'loveseat', 'daybed'] }],
+  kitchen: [{ name: 'sink', roles: ['sink-run'] }, { name: 'range', roles: ['range'] }],
+  'kitchen-dining': [{ name: 'sink', roles: ['sink-run'] }, { name: 'range', roles: ['range'] }, { name: 'dining table', roles: ['dining-table', 'dining-table-round'] }, { name: 'dining chairs', roles: ['dining-chair'], n: 2 }],
+  dining: [{ name: 'dining table', roles: ['dining-table', 'dining-table-round'] }, { name: 'dining chairs', roles: ['dining-chair'], n: 2 }],
+  'bed-primary': [{ name: 'bed', roles: ['bed'] }], 'bed-guest': [{ name: 'bed', roles: ['bed'] }],
+  'bed-kid': [{ name: 'bed', roles: ['bed', 'bed-single', 'bed-bunk', 'bed-loft'] }], nursery: [{ name: 'crib', roles: ['crib'] }],
+  bath: [{ name: 'toilet', roles: ['toilet'] }, { name: 'sink', roles: ['vanity', 'vanity-double'] }, { name: 'tub or shower', roles: ['tub-free', 'tub-built-in', 'shower'] }],
+  ensuite: [{ name: 'toilet', roles: ['toilet'] }, { name: 'sink', roles: ['vanity', 'vanity-double'] }, { name: 'tub or shower', roles: ['tub-free', 'tub-built-in', 'shower'] }],
+  powder: [{ name: 'toilet', roles: ['toilet'] }, { name: 'sink', roles: ['vanity', 'vanity-double'] }],
+  library: [{ name: 'bookcases', roles: ['bookcase'], n: 2 }],
+  study: [{ name: 'desk', roles: ['desk'] }],
+  laundry: [{ name: 'washer', roles: ['washer'] }, { name: 'dryer', roles: ['dryer'] }],
+};
+/** the anchors of a room's program that its items do not have (names). `heroDesk`: the Core's desk stands in the room */
+export function missingAnchors(program: string, items: any[], { heroDesk = false } = {}): string[] {
+  const out: string[] = [];
+  for (const a of ANCHORS[program] || []) {
+    if (a.name === 'desk' && heroDesk) continue;
+    const n = items.filter(it => (PLACEMENT[it.type]?.roles || []).some(r => a.roles.includes(r))).length;
+    if (n < (a.n ?? 1)) out.push(a.name);
+  }
+  return out;
+}
 
 export interface LayoutIssue { code: string; level: 'warn' | 'error'; message: string; room?: string; level_id?: string }
 
@@ -42,6 +77,14 @@ const UNIVERSAL = new Set(['type', 'at', 'rot', 'y', 'src', 'note', 'label', 'id
 const REPEAT_EXEMPT_GROUPS = new Set(['rug', 'lamp', 'fitted', 'appliance', 'lighting', 'chair', 'bath', 'hero', 'structure', 'decor', 'textile']);
 const HERO_SET = new Set(['walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
 const solidOf = (it: any) => { const l = layerOf(it.type); if (l !== 'body') return false; const s = sizeOf(it.type, it); return !!s && s.h > 0.12; };
+/** the body item a surface item stands on (the one under its point that offers the highest top) */
+function supportOf(it: any, items: any[]): any | null {
+  if (!Array.isArray(it.at)) return null;
+  const under = items.filter(o => o !== it && layerOf(o.type) === 'body').map(o => ({ o, box: itemObb(o) })).filter(u => u.box && overlap(obb(it.at[0], it.at[1], 0.05, 0.05), u.box!) > 0);
+  if (!under.length) return null;
+  const topOf = (o: any) => { const pl = PLACEMENT[o.type], s = sizeOf(o.type, o); return pl && pl.top !== undefined ? pl.top : s ? s.h : 0; };
+  return under.sort((a, b) => topOf(b.o) - topOf(a.o))[0].o;
+}
 const groupOf = (t: string) => (PLACEMENT[t] && PLACEMENT[t].group) || '';
 const r1 = (v: number) => v.toFixed(1), fmt = (p: number[]) => `(${r1(p[0])}, ${r1(p[1])})`;
 
@@ -100,9 +143,13 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
         if (P) for (const k of Object.keys(it)) if (!UNIVERSAL.has(k) && !P.includes(k) && !(k === 'y')) add('silent-param', `${it.type} at ${fmt(it.at)}: "${k}" is ignored by its builder`, lv, room);
         // mounts inside the wall, surface items floating or sunk
         if (layer === 'wall' && snapWallMount(it, geo)) add('mount-in-wall', `${it.type} at ${fmt(it.at)} is set inside the wall`, lv, room);
+        if (layer === 'surface') {
+          const pl = PLACEMENT[it.type], top = pl && pl.surfaces.length ? supportOf(it, items) : null;
+          if (top && !pl.surfaces.includes(groupOf(top.type))) add('surface-kind', `${it.type} at ${fmt(it.at)} stands on a ${top.type}, which its placement does not allow (${pl.surfaces.join(', ')})`, lv, room);
+        }
         if (layer === 'surface' && stackOnSurface(it, items)) add('surface-height', `${it.type} at ${fmt(it.at)} (y ${it.y ?? 'default 0.77'}) is not on the top of what stands under it`, lv, room);
         // facing: seating that looks at a wall
-        if (solid && groupOf(it.type) === 'seating' && !PLACEMENT[it.type].roles.some(r => ['bench', 'bed-bench', 'ottoman', 'pouf', 'floor-seat', 'dining-bench'].includes(r))) {
+        if (solid && PLACEMENT[it.type] && PLACEMENT[it.type].faces === 'focus' && !PLACEMENT[it.type].roles.some(r => ['bench', 'bed-bench', 'ottoman', 'pouf', 'floor-seat', 'dining-bench', 'hammock'].includes(r))) {
           const [fx, fz] = turn(0, 1, it.rot || 0), s = sizeOf(it.type, it)!;
           const probe = obb(o.cx + fx * (s.d / 2 + 0.25), o.cz + fz * (s.d / 2 + 0.25), Math.max(0.2, s.w - 0.3), 0.5, it.rot || 0);
           if (!insideRoom(geo, probe, 0, 2)) add('facing', `${it.type} at ${fmt(it.at)} faces a wall ${0.5} m away`, lv, room);
@@ -127,6 +174,11 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
         const rep = lanesOk(geo, laneGrid(geo, blockers), 0.8);
         const extra = rep.failed.filter(f => !bare.failed.includes(f));
         for (const f of extra) add('lane', f, lv, room);
+      }
+      // a room with a program that lacks what the program cannot do without
+      if (isProgram(room.program) && geo.area >= 3 && !outdoor) {
+        const lacks = missingAnchors(room.program, items, { heroDesk: geo.heroHere && (spec.hero.surface || 'desk') === 'desk' });
+        if (lacks.length) add('missing-anchor', `${room.program} has no ${lacks.join(', no ')}`, lv, room);
       }
       // a furniture island with an empty half
       if (geo.area >= 12) {
