@@ -115,10 +115,11 @@ else if (drift.length) console.log(`\n(${drift.length} track hash${drift.length 
 
 // ---- 5. budgets
 const load = os.loadavg()[0], cores = os.cpus().length, loaded = load > cores * 0.75;
-const slowQA = rows.filter(r => r.qaMs > 500);
 console.log(`\nplanning ${real.length} houses: ${(planCpu / 1000).toFixed(1)} s of CPU (budget 15 s); QA v2 ${Math.max(...rows.map(r => r.qaMs)).toFixed(0)} ms at worst (budget 500); load average ${load.toFixed(1)} on ${cores} cores`);
-check(planCpu <= 15000 || loaded, `planning all the houses in Node within 15 s of CPU${planCpu > 15000 ? ' (over, but the machine is loaded — not counted)' : ''}`);
-check(!slowQA.length || loaded, 'QA v2 within 0.5 s a shot', slowQA.map(r => `${r.id} ${r.qaMs.toFixed(0)} ms`).join(', '));
+// (a loaded machine inflates CPU time too — cache and scheduling — so the budgets get 60 % more there, and are never waived)
+const slack = loaded ? 1.6 : 1, slowQA2 = rows.filter(r => r.qaMs > 500 * slack);
+check(planCpu <= 15000 * slack, `planning all the houses in Node within 15 s of CPU${loaded ? ` (${(15 * slack).toFixed(0)} s: the machine is loaded)` : ''}`);
+check(!slowQA2.length, `QA v2 within 0.5 s a shot${loaded ? ` (${(0.5 * slack).toFixed(1)} s: the machine is loaded)` : ''}`, slowQA2.map(r => `${r.id} ${r.qaMs.toFixed(0)} ms`).join(', '));
 
 // ---- 4. the page bakes the same track
 const parityN = args.parity === 'all' ? real.length : args.parity !== undefined ? parseInt(args.parity, 10) : 2;

@@ -384,9 +384,9 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     if (b15 >= 0.6) { blankRun += step * dt; blankMax = Math.max(blankMax, blankRun); if (blankRun > 0.3) { if (finale) W('finale-blank', tOf(i), `${(b15 * 100).toFixed(0)} % of the finale's frame is one plane within 1.5 m for ${blankRun.toFixed(1)} s`); else if (aspect < 1.5) W('near-blank', tOf(i), `${(b15 * 100).toFixed(0)} % of a ${aspect.toFixed(2)}:1 frame is one wall within 1.5 m for ${blankRun.toFixed(1)} s`); else E('blank-frame', tOf(i), `${(b15 * 100).toFixed(0)} % of the frame is one wall within 1.5 m for ${blankRun.toFixed(1)} s`); } } else blankRun = 0;
     // (§3.10: never aim at a wall closer than 2.5 m — a plane over 40 % of the frame within 3 m, inside, outside the finale)
     if (b3 >= 0.4 && !finale && indoor) { nearRun += step * dt; nearMax = Math.max(nearMax, nearRun); if (nearRun > 0.5) W('near-blank', tOf(i), `${(b3 * 100).toFixed(0)} % of the frame is one wall within 3 m for ${nearRun.toFixed(1)} s`); } else nearRun = 0;
-    // (the Core's own desk, its monitor and the set it stands on are the subject of the finale, not something in the way of it: a chair back, a plant,
-    // a column, a wall are)
-    const fore = c.rays.filter(r => r.t < 0.8 && r.k !== 0 && r.k !== K.surface && r.k !== K.core && r.k !== K.monitor && r.k !== K.heroSet).length / c.rays.length;
+    // (the Core's own desk, its monitor and the set it stands on are the subject of the finale, not something in the way of it: a chair back, a plant, a
+    // column are; a wall is `near-blank`'s and `blank-frame`'s business, and the frame of the door the eye goes through is a wall)
+    const fore = c.rays.filter(r => r.t < 0.8 && r.k !== 0 && r.k !== K.wall && r.k !== K.glass && r.k !== K.surface && r.k !== K.core && r.k !== K.monitor && r.k !== K.heroSet).length / c.rays.length;
     if (fore > 0.25) { foreRun += step * dt; if (foreRun > 0.3) W('foreground-occluder', tOf(i), `${(fore * 100).toFixed(0)} % of the frame is something within 0.8 m of the lens`); } else foreRun = 0;
   }
   metrics.blankMax = +blankMax.toFixed(2); metrics.nearBlankMax = +nearMax.toFixed(2);
@@ -525,7 +525,11 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const seen = top3.filter(r => (seenFor.get(r) || 0) >= 1).length;
     metrics.topRooms = top3.map(r => ({ name: r.r.name, interest: +r.interest.toFixed(2), seen: +(seenFor.get(r) || 0).toFixed(1) }));
     metrics.topRoomsSeen = seen;
-    if (seen < Math.min(2, top3.length)) W('top-rooms', 0, `${seen} of the top ${top3.length} rooms seen for ≥ 1 s (${top3.map(r => r.r.name).join(', ')})`);
+    // (of the top rooms the film can show: the planner names how many the walk opens to it — the Core's, one it goes through, one it has a stretch in the clear of; a
+    // room behind walls the route never opens cannot be seen, and the layout pass (shots[].via, showcase, the plan of the house) is what changes that)
+    const showable = track.plan && typeof track.plan.topRoomsShowable === 'number' ? track.plan.topRoomsShowable : top3.length;
+    metrics.topRoomsShowable = showable;
+    if (seen < Math.min(2, top3.length, showable)) W('top-rooms', 0, `${seen} of the top ${top3.length} rooms seen for ≥ 1 s (${top3.map(r => r.r.name).join(', ')}; the walk can show ${showable})`);
     // via: in order
     const via = opts.via || [];
     let last = -1;

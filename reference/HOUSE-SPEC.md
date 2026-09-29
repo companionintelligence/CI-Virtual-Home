@@ -274,8 +274,8 @@ says why (`v2Error`).
 
 | Field | Meaning |
 |---|---|
-| `shots[].duration` | seconds, or `"auto"` (the walk at its speed caps plus a breath; the base's number stays a floor on v1 and a minimum on v2 when a number) |
-| `shots[].establish` | the opening move: `"auto"`, a style (`axial`, `corner-left`, `corner-right`, `garden`, `dollhouse`), or `{ bearing, height, dist }` (degrees off the door's axis, eye height, metres from the facade; 0 or absent: as far as the frame needs) |
+| `shots[].duration` | seconds, or `"auto"` (the walk at its speed caps plus a breath, and long enough that the opening is at most 30 % of it; the base's number stays a floor on v1 and a minimum on v2 when a number). An auto film is as long as its walk needs — about 20 s for a small one-storey house, 25–30 s for a two-storey one, 40 s for a three-storey one: §3.0's 12 s cannot hold together with the plan's own numbers (0.85 m/s across the door, a whole-house opening, an orbit of 90° or more at 30°/s at most, a walk at walking pace) |
+| `shots[].establish` | the opening move: `"auto"`, a style (`axial`, `corner-left`, `corner-right`, `garden`, `dollhouse`), or `{ bearing, height, dist }` (degrees off the door's axis, eye height, metres from the facade; 0 or absent: as far as the frame needs). The film opens on the whole house and its garden (42–49° lens, the roof and the sides inside the frame with an 8 % margin, up to 20 m from the door); `dollhouse` is a high three-quarter aerial, roofs on |
 | `shots[].via` | rooms (name or number) the route passes through, in order (QA `via-missed` if it does not) |
 | `shots[].beats` | seconds a beat is held to at least, by beat name (`reveal`, `roomReveal`, `hero`, `power` …) |
 | `shots[].route` | `"auto"` \| `"scenic"` (detours up to 9 m to rooms worth seeing) \| `"shortest"` |
@@ -284,20 +284,25 @@ says why (`v2Error`).
 
 **The film** is one baked track (`assets/shot-planner.ts`, 120 Hz: eye, look, lens, roof fade, doors) of beats —
 `establish, extStair, approach, threshold, reveal, route, stair, descend, roomReveal, hero, orbit, power` — each with a speed
-cap (walking pace through doors: ≤ 0.9 m/s across the entry plane, ≤ 1.2 in doorways), a yaw cap and a pitch clamp; the
-duration is solved from the caps, never by slowing a beat to fill the film. It routes on a distance-field nav grid
+cap (walking pace through doors: ≤ 0.9 m/s across the entry plane, ≤ 1.2 in doorways, the interior route at most 2.2), a yaw cap and a pitch clamp (the
+limits are smoothed across beat seams, so the view never snaps); the duration is solved from the caps, never by slowing a beat to fill the film. The look
+leaves a wall it would stare at before it fills the frame (a path search over the yaw), and never turns more than 55° off the way the eye is going. A doorway
+is crossed through its middle, square to it. The orbit builds to 30°/s and eases to a third of that into the press. It routes on a distance-field nav grid
 (`shot-nav.ts`), takes stairs up and down (a spiral follows its treads as built; an L or U flight follows S2's `path`), opens
 shut door leaves ahead of the eye (`track.doors`, applied by the page through `visibility.shotPose`), and ends on an orbit
-round the Core — 90° wherever the room allows it — before the press. `hero-reveal` lands on the same finale framing;
+round the Core — 90° wherever the room allows it (24 of the 30 houses; the other six rooms allow 65–85°) — before the press. A frame narrower than 16:9
+(the phone player, a square still) widens its lens where the Core is in it (`track.tanHReq`), just enough to keep the Core inside. `hero-reveal` lands on the same finale framing;
 `walkthrough` is routed on the nav grid.
 
 **Checking it.** `node --experimental-strip-types scripts/test-shot-planner.mts` (all 30 houses planned twice, byte-identical;
 QA v2; the fleet targets; the page's track hash equal to Node's with `--parity`), `test-shot-qa.mts` (a fault injected for
 every QA code), `camera-audit.mts` (a contact strip per house and planner, v1 beside v2), `pnpm run fleet-audit --built`
 (the camera metrics in the fleet report). QA v2 (`assets/shot-qa.ts`) reports every code in `QA_CODES` with its level; the
-world it and the planner read is `plan.json`'s `shots.world` (`assets/shot-world.ts`), so Node bakes the track the page bakes.
-The recorded track hashes (`test/shots/<id>.track.json`) and the establishing salt (`fnv1a(id + ':establish-style53')` in
-`framing.ts`) are re-recorded whenever the worlds or the planner change: at integration.
+world it and the planner read is `plan.json`'s `shots.world` (`assets/shot-world.ts`), so Node bakes the track the page bakes: the planner and QA use
+`assets/detmath.ts` (sin, cos, atan2 … built from + − × ÷ and sqrt) instead of `Math`'s, because two engines' last bits differ and a last bit flips a probe;
+`test-shot-planner.mts` plans every world's three films in Node and in Chromium's engine and compares the whole track's hash. The recorded track hashes
+(`test/shots/<id>.track.json`) and the establishing salt (`ESTABLISH_SALT` in `framing.ts`, fitted by `scripts/fit-establish-salt.mts`) are re-recorded whenever the
+worlds or the planner change: at integration. `anchors.nav` (the storeys' walkable grid and the route a shot flies) is for the plan inset.
 
 ## Authoring rules
 

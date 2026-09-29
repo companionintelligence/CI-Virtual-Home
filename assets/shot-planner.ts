@@ -55,7 +55,9 @@ export const BEAT_FLOOR: Partial<Record<Beat, number>> = { threshold: 0.8, stair
 export const BEAT_WINDOW: Partial<Record<Beat, [number, number]>> = { establish: [1.2, 5.0], approach: [0.8, 5.5], threshold: [0.8, 2.4], reveal: [0.4, 3.5], roomReveal: [0.4, 3.5], hero: [0.8, 3.4], orbit: [2.0, 6.5], power: [1.8, 3.4] };
 export const OUTSIDE = new Set<Beat>(['establish', 'extStair', 'approach']);
 export const LENS = { exterior: 34, interior: 56, hero: 40, rate: 4 };
-export const AUTO_DURATION = { min: 12, max: 20 };
+/** an auto film is never under 12 s (§3.0) and has no ceiling: it is as long as its walk needs at the caps — about 20 s for a small one-storey house, 25–30 for a two-storey one, 40 for
+ *  three storeys (§3.0's 12 s cannot hold with the plan's own numbers: 0.85 m/s across the door, a whole-house opening, an orbit of 90° or more at 30°/s at most) */
+export const AUTO_DURATION = { min: 12 };
 /** §3.4 acceleration limits (m/s²): 1.5 inside, 3 outside — the planner keeps a little under so smoothing never crosses them */
 export const ACC_IN = 1.45, ACC_OUT = 2.9;
 
@@ -154,7 +156,7 @@ function splitAt(pts: V3[], s: number): [V3[], V3[]] {
 export const bezier = (p0: V3, p1: V3, p2: V3, p3: V3, n: number): V3[] => { const out: V3[] = []; for (let k = 0; k <= n; k++) { const t = k / n, u = 1 - t; out.push([u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0], u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1], u * u * u * p0[2] + 3 * u * u * t * p1[2] + 3 * u * t * t * p2[2] + t * t * t * p3[2]]); } return out; };
 
 export type PlanOptions = {
-  duration?: number | 'auto';      // the shot's length: a number pins it; 'auto' solves it from the route (12–18 s)
+  duration?: number | 'auto';      // the shot's length: a number pins it; 'auto' solves it from the route (never under 12 s; about 20–40 s in practice: AUTO_DURATION)
   minDuration?: number;            // under the global switch, the spec's v1 duration is a floor, not a pin
   establish?: any; via?: string[]; beats?: Partial<Record<Beat, number>>; route?: 'auto' | 'scenic' | 'shortest';
   heroView?: any; fps?: number;
@@ -209,8 +211,8 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   // (the radius the finale ends at puts the Core at ~21 % of the frame at a 44–48° lens: 1.05 m, where the room lets it)
   const ORBIT_R: Record<string, number> = { desk: 1.05, credenza: 1.1, island: 1.2, shelf: 0.95, none: 1.0 };
   const upright = hero.pose === 'upright';
-  // (an upright Core is 23 cm tall and 15 wide: at 21–24 % of the frame's height it is 8 % of its width — QA's core-narrow wants 10 — so it is framed a little larger, 23–27 %)
-  const CORE_H = upright ? 0.235 : 0.21, CORE_HMAX = upright ? 0.27 : 0.24;
+  // (an upright Core is 23 cm tall and 15 wide: at 21–24 % of the frame's height it is 8 % of its width — QA's core-narrow wants 10 — so it is framed a little larger, 22–26 %)
+  const CORE_H = upright ? 0.22 : 0.205, CORE_HMAX = upright ? 0.26 : 0.24;
   // hero.view (plan §3.16) overrides the search: the finale's distance and height, and the azimuth it ends at
   const HV = opts.heroView && typeof opts.heroView === 'object' ? opts.heroView : null;
   const r0 = HV && typeof HV.dist === 'number' ? clamp(HV.dist, 0.6, 2) : (ORBIT_R[hero.surface] ?? 0.9) + (upright ? 0.2 : 0);
@@ -359,7 +361,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       const hd = (k: number) => Math.atan2(pts[k + 1][0] - pts[k][0], pts[k + 1][1] - pts[k][1]);
       for (let k = 0; k < pts.length - 1; k++) {
         let turn = 0;
-        for (let m = k + 1; m < pts.length - 1 && cum[m] - cum[k + 1] < 4; m++) { turn += wrapPi(hd(m) - hd(m - 1)); if (Math.abs(turn) > 110 * DEG) return true; }
+        for (let m = k + 1; m < pts.length - 1 && cum[m] - cum[k + 1] < 3; m++) { turn += wrapPi(hd(m) - hd(m - 1)); if (Math.abs(turn) > 135 * DEG) return true; }
       }
       return false;
     };
@@ -1320,6 +1322,40 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     glanceMemo.set(key, out);
     return out;
   };
+  // the rooms worth seeing (QA's top three) that the walk does not go through: each is looked at once, for about 1.4 s, at the best moment of the walk — the
+  // longest stretch where its focal item is in the clear, indoors on its storey, within 9 m and within 100° of the way the eye is going (what a walk past an
+  // open door or through an open plan shows). A room the eye spends 1.3 s in needs no look; one the walk never has in the clear gets none.
+  const mustLook: Array<V3 | null> = new Array(N).fill(null);
+  const showable = new Set<WRoom>();   // (the top rooms the film can show: the Core's, one the eye is in, one that has a stretch in the clear)
+  {
+    if (coreRoom && topSet.has(coreRoom)) showable.add(coreRoom);
+    const rooms = [...topSet].filter(r => r !== coreRoom).sort((x, y) => (interestOf.get(x)!.interest - interestOf.get(y)!.interest) || x.no.localeCompare(y.no));
+    for (const r of rooms) {
+      const lv = Le.rooms.includes(r) ? Le : Lh;
+      let inside = 0; for (let i = 0; i < N; i += 6) if (inRect(pos[3 * i], pos[3 * i + 2], r.b, 0) && Math.abs(pos[3 * i + 1] - lv.y - 1.4) < 1.2) inside += 6 * dt;
+      if (inside >= 1.3) { showable.add(r); continue; }
+      const it = interestOf.get(r)!, fp: V3 = it.focal ? [it.focal.at[0], lv.y + 1.0, it.focal.at[1]] : [r.b.x + r.b.w / 2, lv.y + 1.1, r.b.z + r.b.d / 2];
+      const ok = new Uint8Array(N);
+      for (let i = 0; i < N; i += 6) {
+        const b = BEATS[beatOf[i]]; if (b !== 'reveal' && b !== 'route' && b !== 'roomReveal' && b !== 'threshold') continue;
+        const p = eyeAt(i); if (levelIdAt(p) !== lv.id) continue;
+        const d = Math.hypot(fp[0] - p[0], fp[2] - p[2]); if (d > 9 || d < 1.0) continue;
+        const q = eyeAt(Math.min(N - 1, i + 60)), hx = q[0] - p[0], hz = q[2] - p[2], toF = Math.atan2(fp[0] - p[0], fp[2] - p[2]);
+        if (Math.abs(wrapPi(toF - (Math.hypot(hx, hz) > 0.3 ? Math.atan2(hx, hz) : toF))) > 100 * DEG) continue;
+        if (!probe.clear(p, fp)) continue;
+        for (let k = i; k < Math.min(N, i + 6); k++) ok[k] = 1;
+      }
+      let a0 = 0, bestA = 0, bestB = 0;
+      for (let i = 0; i <= N; i++) {
+        if (i < N && ok[i]) { if (!a0 && (i === 0 || !ok[i - 1])) a0 = i || 1; continue; }
+        if (a0) { const a = a0 === 1 && ok[0] ? 0 : a0, len = i - a; if (len > bestB - bestA) { bestA = a; bestB = i; } a0 = 0; }
+      }
+      if ((bestB - bestA) * dt < 0.9) continue;
+      const mid = (bestA + bestB) >> 1, half = Math.min(Math.round(0.75 * FPS), (bestB - bestA) >> 1);
+      for (let k = mid - half; k < mid + half; k++) mustLook[k] = fp;
+      showable.add(r);
+    }
+  }
   const subjectAt = (i: number): { p: V3; w: number; kind: string } => {
     const b = BEATS[beatOf[i]], p = eyeAt(i);
     switch (b) {
@@ -1382,7 +1418,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   // visibility of each sample's subject, every 0.1 s (the Core's with its own test)
   const vis = new Float64Array(N);
   const subj: Array<{ p: V3; w: number; kind: string }> = new Array(N);
-  for (let i = 0; i < N; i++) subj[i] = subjectAt(i);
+  for (let i = 0; i < N; i++) subj[i] = mustLook[i] ? { p: mustLook[i]!, w: 0.9, kind: 'must-see' } : subjectAt(i);
   for (let i = 0; i < N; i += 12) {
     const s = subj[i], p = eyeAt(i);
     const roofs = OUTSIDE.has(BEATS[beatOf[i]]);
@@ -1407,7 +1443,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     // none at 100° (the camera never walks backwards to keep something in frame)
     { const c = (da[0] * dsj[0] + da[2] * dsj[2]) / ((Math.hypot(da[0], da[2]) * Math.hypot(dsj[0], dsj[2])) || 1);
       // (the Core, as the walk comes into its room, stays in the blend further round: it is where the film is going)
-      const [lo, hi] = s.kind === 'core+focal' ? [55, 95] : [40, 100];
+      const [lo, hi] = s.kind === 'core+focal' ? [55, 95] : s.kind === 'must-see' ? [80, 120] : [40, 100];
       ws *= clamp((c - Math.cos(hi * DEG)) / (Math.cos(lo * DEG) - Math.cos(hi * DEG)), 0, 1); }
     if (b === 'orbit' || b === 'power' || b === 'hero' || b === 'establish') ws = 1;
     const d = norm(add(mul(da, 1 - ws), mul(dsj, ws)));
@@ -1479,11 +1515,11 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       }
     }
   }
-  // the view never turns more than 55° off the way the eye is going (over the next 0.4 s) while it walks: a look further round is a walk against it
+  // the view never turns more than 65° off the way the eye is going (over the next 0.4 s) while it walks: a look further round is a walk against it
   // (QA's crab over 60°, `reverse` past 101°) — the glance at a room, the flight ahead and the Core are looked at as far round as that, and the eye's
   // own turn brings them the rest of the way
   {
-    const CRAB = 55 * DEG, LEAD = Math.round(0.4 * FPS);
+    const CRAB = 65 * DEG, LEAD = Math.round(0.4 * FPS);
     for (let i = 0; i < N; i++) {
       const b = BEATS[beatOf[i]]; if (b === 'establish' || b === 'hero' || b === 'orbit' || b === 'power') continue;
       const cap = b === 'stair' || b === 'descend' ? 75 * DEG : CRAB;   // (a flight that turns at its landing: the look is on the way off it, a little further round)
@@ -1585,6 +1621,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   track.metrics = { length: +total.toFixed(2), Tmin: +Tmin.toFixed(2), duration };
   track.plan.outside = { share: +(outsideCaps / duration).toFixed(3), caps: +outsideCaps.toFixed(2), establish: +(capTimes.get('establish') || 0).toFixed(2), others: +(outsideCaps - (capTimes.get('establish') || 0)).toFixed(2), hasExt };
   track.plan.routeLimit = limitStats;
+  track.plan.topRoomsShowable = showable.size; track.plan.topRooms = [...topSet].map(r => r.name);
   track.plan.routeCap = +ROUTE_CAP.toFixed(2);
   track.plan.finaleCands = finaleCands;
   track.plan.finaleAll = finaleAll;
