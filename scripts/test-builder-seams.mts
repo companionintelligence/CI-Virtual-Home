@@ -13,6 +13,7 @@ import { SITE_KIT_TYPES } from '../assets/site.js';
 import { pageItemDef } from '../assets/item-meta.js';
 import { PAGE_PLACE } from '../assets/props/page-place.js';
 import { PROPS } from '../assets/props/index.js';
+import { heroFrame } from '../assets/hero-frame.js';
 import { probeContext } from './probe-context.mts';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -73,6 +74,14 @@ const from = src.indexOf('function build(s, index)'), body = src.slice(from, src
 const cases = [...body.matchAll(/^\s+case '([\w-]+)':/gm)].map(m => m[1]);
 check(from > 0 && cases.length > 0 && JSON.stringify([...cases].sort()) === JSON.stringify([...SITE_KIT_TYPES].sort()), 'SITE_KIT_TYPES is the case list of the site kit\'s build()',
   `switch: ${cases.join(', ')}\nlist:   ${SITE_KIT_TYPES.join(', ')}`);
+
+// ---- the hero's frame, readable before the hero is built ---------------------------------------------------------
+// rot 0: the desk backs onto the north wall (-Z) and the user sits south of it; rot 90 backs onto the west wall
+const near = (a: number[], b: number[]) => a.every((v, i) => Math.abs(v - b[i]) < 1e-9);
+const f0 = heroFrame({ level: 'l1', at: [3, 4] }), f90 = heroFrame({ level: 'l1', at: [3, 4], rot: 90, surface: 'island' });
+check(!!f0 && near(f0.fwd, [0, 1]) && near(f0.side, [1, 0]) && f0.surface === 'desk' && near(f0.at, [3, 4]), 'heroFrame: rot 0 seats the user south (+Z), the desk backs onto the north wall');
+check(!!f90 && near(f90.fwd, [1, 0]) && near(f90.side, [0, -1]) && f90.surface === 'island', 'heroFrame: rot 90 backs onto the west wall (the user sits east)');
+check(heroFrame(null) === null && heroFrame(undefined) === null, 'heroFrame: null for a spec with no hero');
 
 console.log(`${bad ? '✗' : '✓'} builder seams: ${bad} wrong`);
 process.exit(bad ? 1 : 0);

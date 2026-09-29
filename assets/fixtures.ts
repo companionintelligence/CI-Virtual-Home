@@ -25,6 +25,7 @@
 // __houseRenderFrames stays random access. Everything is seeded from the house id.
 import { mulberry32, fnv1a } from './materials.js';
 import { inRect } from './house-geometry.js';
+import { heroFrame } from './hero-frame.js';
 
 export const LIGHT_CAP = 16;          // dynamic lights per house (one per room at most)
 const DAY_GAIN = 0.035;               // lamp gain when no environment has announced one (a daylight preset's)
@@ -245,7 +246,7 @@ export function dressLevel(ctx) {
     keepOut.push({ a: { x: st.bottom[0], z: st.bottom[2] }, b: { x: st.top[0], z: st.top[2] }, r: 1.5 });
   }
   if (spec.hero && spec.hero.level === lv.id && Array.isArray(spec.hero.at)) {
-    const rot = ((spec.hero.rot || 0) + 180) * DEG, f = [-Math.sin(rot), -Math.cos(rot)], [hx, hz] = spec.hero.at;
+    const { fwd: f, at: [hx, hz] } = heroFrame(spec.hero);
     keepOut.push({ a: { x: hx + f[0] * 0.9, z: hz + f[1] * 0.9 }, b: { x: hx + f[0] * 9, z: hz + f[1] * 9 }, r: 0.8 });
   }
   const clearOf = (p: Pt, reach: number) => keepOut.every(k => segDist(p, k.a, k.b) > k.r + reach);

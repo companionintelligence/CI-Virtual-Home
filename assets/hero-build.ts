@@ -2,7 +2,7 @@
 // Writes anchors.hero, which the shot planner frames.
 //
 // Seam module (plan S0): moved verbatim out of house-builder.ts. Owner: S1 (kit).
-import { DEG } from './build-context.js';
+import { heroFrame } from './hero-frame.js';
 
 export function createHeroBuild(bctx, { DESK_TOP }) {
   const { THREE, AssetFactory, std, group } = bctx;
@@ -17,10 +17,8 @@ export function createHeroBuild(bctx, { DESK_TOP }) {
       // specs place their desks: `at` hugs a wall and rot names that wall). The asset library's
       // desk/monitor face -Z at rotation 0 with the chair north, so the assets turn 180° from the spec
       // heading; `fwd` — where the user sits and the camera approaches from — then points into the room.
-      const rot = ((spec.hero.rot || 0) + 180) * DEG;
-      const fwd = [-Math.sin(rot), -Math.cos(rot)];
-      const surface = spec.hero.surface || 'desk';
-      const side = [fwd[1], -fwd[0]]; // to the right of the desk
+      // (hero-frame.ts: the same numbers, for what runs before the hero is built)
+      const { rot, fwd, side, surface } = heroFrame(spec.hero);   // side: to the right of the desk
       // hero.device: chalk | charcoal (the Companion Core, 232 × 205 × 90 mm) | strix (the AMD reference mini PC).
       // hero.pose: prone (default — as marketed and drawn in the campaign) | upright (stood on its side).
       const pose = spec.hero.pose === 'upright' ? 'upright' : 'prone';
