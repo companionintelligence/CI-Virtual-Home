@@ -427,6 +427,8 @@ try {
       await p2.waitForFunction(() => { const i = document.getElementById('ref-img') as HTMLImageElement; return i.complete && i.naturalWidth > 0; }, null, { timeout: 10000 });
       const vis = await p2.evaluate(() => ({ overlay: !(document.getElementById('ref-overlay') as HTMLElement).hidden, panel: !(document.getElementById('ref-panel') as HTMLElement).hidden, pressed: document.getElementById('btn-ref-photo')!.getAttribute('aria-pressed'), src: (document.getElementById('ref-img') as HTMLImageElement).src.slice(0, 5) }));
       ok(vis.overlay && vis.panel && vis.pressed === 'true' && vis.src === 'blob:', 'a photo chosen from a file lies over the view, as a local object URL (never saved)');
+      const lay = await p2.evaluate(() => { const cs = getComputedStyle(document.getElementById('ref-overlay')!), r = document.getElementById('ref-overlay')!.getBoundingClientRect(), v = document.getElementById('viewport-box')!.getBoundingClientRect(); return { pos: cs.position, events: cs.pointerEvents, over: Math.abs(r.width - v.width) < 1 && Math.abs(r.height - v.height) < 1 }; });
+      ok(lay.pos === 'absolute' && lay.events === 'none' && lay.over, `it covers the view and lets every click through (${lay.pos}, pointer-events ${lay.events})`);
       await p2.evaluate(() => { const i = document.getElementById('ref-wipe') as HTMLInputElement; i.value = '40'; i.dispatchEvent(new Event('input')); });
       const clip = await p2.evaluate(() => getComputedStyle(document.getElementById('ref-img')!).clipPath);
       ok(/inset\(0(px)? (\d+(\.\d+)?px|\d+%) 0(px)? 0(px)?\)/.test(clip), `the wipe clips it from the right (${clip})`);
