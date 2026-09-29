@@ -197,7 +197,10 @@ export function createRoomFinish(bctx) {
     const lowerMat = kind === 'wainscot' ? am.wall('paint', lower ?? '#e9e4da') : null;
     const band = kind === 'wainscot' ? (bandH || 0.95) : 0;
     const railMat = am.paint(kind === 'wainscot' ? (lower ?? '#e9e4da') : (paintColor ?? '#f1eee8'), { roughness: 0.55 });
-    const T = 0.006;
+    // a liner is a 6 mm skin on the wall face, built 9 cm deep into the wall behind it: the scene check that finds furniture
+    // buried in a wall measures against every tracked wall's solids, and a bare skin would call a cabinet standing flush
+    // against the plaster "proud of the far face" of a wall that is 16 cm thick
+    const T = 0.006, EMB = 0.09, back = -EMB / 2;
     const g = put(() => {
       const gg = group(`Wall finish (${lv.id} · ${room.name} · ${w.side}${w.kind === 'partition' ? ' partition' : ''} · ${kind})`, { category: 'Architecture', role: 'finish', roomFinish: 'wall', room: room.name });
       gg.userData.role = 'finish';
@@ -214,8 +217,8 @@ export function createRoomFinish(bctx) {
           let yy = b0;
           for (const [c0, c1] of [...cut, [b1, b1]]) {
             if (c0 - yy > 0.005) {
-              const m = new THREE.Mesh(new THREE.BoxGeometry(horiz ? a1 - a0 : T, c0 - yy, horiz ? T : a1 - a0), mat);
-              m.position.set(horiz ? am2 : face, (yy + c0) / 2, horiz ? face : am2); m.receiveShadow = true; gg.add(m);
+              const m = new THREE.Mesh(new THREE.BoxGeometry(horiz ? a1 - a0 : T + EMB, c0 - yy, horiz ? T + EMB : a1 - a0), mat);
+              m.position.set(horiz ? am2 : face + into[0] * back, (yy + c0) / 2, horiz ? face + into[1] * back : am2); m.receiveShadow = true; gg.add(m);
             }
             yy = Math.max(yy, c1);
           }

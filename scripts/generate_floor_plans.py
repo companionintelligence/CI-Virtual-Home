@@ -28,6 +28,11 @@ Usage:
   python3 scripts/generate_floor_plans.py --no-png        # skip rsvg-convert
   python3 scripts/generate_floor_plans.py --fit lot       # always fit the whole lot (auto = lot when
                                                           #   legible, else zoom to building + site)
+  python3 scripts/generate_floor_plans.py --specs DIR --out DIR   # specs (and their <id>.plan.json) from DIR, sheets to DIR
+                                                          #   (scripts/test-twins.mts proves the twin on the fixtures)
+
+The `arch` key of <id>.plan.json (assets/plan-export/arch.ts: what the three.js builder resolved) carries what the twin
+cannot derive — L/U flights, porches, bays, balconies, chimney stacks, the stoop — so run `pnpm run plans` before this.
 """
 
 import argparse

@@ -4,7 +4,7 @@
 //   stair-headroom   walk every flight's line and cast up from each tread: the built slab overhead must be at least the
 //                    headroom (2 m less the slab's own bevel) above it — the built-geometry twin of validate/arch.mts stair-void,
 //                    which reads the plan: this one sees what was actually built (a void that was never cut, a liner, a beam)
-//   stair-step-off   0.3 m past a flight's top step there must be floor (the storey above's slab, within a step of the top),
+//   stair-step-off   0.3 m past a flight's top step there must be floor (the storey above's slab or a site deck, within a step of the top),
 //                    and nothing standing between the last step and it (a partition, a balustrade)
 //   feature-detached a porch, bay, balcony or terrace part must touch the house's wall (or its roof for a terrace) — a deck or a
 //                    roof left floating off the wall reads as a gap in every shot
@@ -44,7 +44,8 @@ registerSceneCheck('stair-headroom', ({ THREE, scene, house, placedItems }) => {
 registerSceneCheck('stair-step-off', ({ THREE, scene, house, placedItems }) => {
   const anchors = house && house.anchors;
   if (!anchors || !(anchors.stairs || []).length) return [];
-  const floors = placedItems.filter(o => o.userData && o.userData.role === 'floor' && !(o.userData.roomFinish));
+  // floor: the storey's slab, or a deck or a platform of the site the flight arrives on
+  const floors = placedItems.filter(o => o.userData && (o.userData.role === 'floor' || o.userData.role === 'site') && !(o.userData.roomFinish));
   const blockers = placedItems.filter(o => o.userData && (o.userData.isWall || o.userData.partition || o.userData.role === 'structure') && !o.userData.stair && !o.userData.isRoof);
   scene.updateMatrixWorld(true);
   const rc = new THREE.Raycaster(), down = new THREE.Vector3(0, -1, 0), issues = [];

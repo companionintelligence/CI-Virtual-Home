@@ -15,6 +15,10 @@ import { worldUV } from './textures.js';
 const hexOf = (c: any, d: number) => (c === undefined || c === null ? d : typeof c === 'number' ? c : parseInt(String(c).replace('#', ''), 16));
 const caches = new WeakMap<object, Map<string, any>>();
 
+// the finish kinds S1's kit.finish (materials.ts FINISHES) makes; any other kind this module builds itself
+const KIT_FLOORS = new Set(['oak', 'honey-oak', 'walnut', 'cherry', 'white-oak', 'grey-wash', 'herringbone', 'tile', 'hex-tile', 'checker', 'terracotta', 'pavers', 'concrete', 'carpet', 'marble', 'terrazzo']);
+const KIT_WALLS = new Set(['paint', 'painted-brick', 'wallpaper', 'brick', 'stone', 'timber']);
+
 export function createArchMaterials(THREE: any, kit: any) {
   let cache = caches.get(kit);
   if (!cache) { cache = new Map(); caches.set(kit, cache); }
@@ -53,7 +57,7 @@ export function createArchMaterials(THREE: any, kit: any) {
   function floor(f: any, { rotation = 0 }: any = {}) {
     const spec = typeof f === 'string' ? { kind: f } : f || {};
     const kind = spec.kind || 'oak';
-    if (kit && typeof kit.finish === 'function') { const m = kit.finish(kind, { color: spec.color, pattern: spec.pattern, scale: spec.scale, rotation }); if (m) return m; }
+    if (kit && typeof kit.finish === 'function' && KIT_FLOORS.has(kind)) { const m = kit.finish(kind, { color: spec.color, pattern: spec.pattern, scale: spec.scale, rotation }); if (m) return m; }
     const c = spec.color !== undefined ? hexOf(spec.color, 0) : undefined;
     return once(`floor:${kind}:${c}:${spec.scale}:${rotation.toFixed(3)}`, () => {
       if (kind in OAK) return kit.floor('oak', { rotation, ...((c ?? OAK[kind]) != null ? { color: c ?? OAK[kind] } : {}) });
@@ -76,7 +80,7 @@ export function createArchMaterials(THREE: any, kit: any) {
   // board-and-batten are paint plus geometry: room-finish.ts)
   function wall(kind = 'paint', color?: any) {
     const c = hexOf(color, 0xf1eee8);
-    if (kit && typeof kit.finish === 'function') { const m = kit.finish(kind, { color: c, surface: 'wall' }); if (m) return m; }
+    if (kit && typeof kit.finish === 'function' && KIT_WALLS.has(kind)) { const m = kit.finish(kind, { color: c }); if (m) return m; }
     return once(`wall:${kind}:${c}`, () => {
       if (kind === 'painted-brick') { const set = setOf('brick', { color: c }); return set ? pbr(set, { mode: 'auto' }) : plain(c); }
       if (kind === 'brick') { const set = setOf('brick', { color: color !== undefined ? c : 0x9a5a44 }); return set ? pbr(set, { mode: 'auto' }) : plain(c); }

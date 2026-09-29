@@ -24,6 +24,11 @@ and generate_isometric_scenes.py lottie helpers (path/fill/stroke/group/layer/kf
 Usage:
     pnpm run iso [--only <id>] [--png] [--png-dir DIR]
     python3 scripts/generate_house_iso.py [--only <id>] [--png] [--png-dir DIR]     (any cwd — paths resolve from this file)
+    python3 scripts/generate_house_iso.py --specs DIR --out DIR    specs (and their <id>.plan.json) from DIR, scenes under DIR
+                                                                   (scripts/test-twins.mts proves the twin on the fixtures)
+
+What the three.js builder resolved beyond the spec — the flights that turn or come in arrays, porches, bays, decks, chimney
+stacks, the stoop, a raised storey's foundation — comes from <id>.plan.json's `arch` key (assets/plan-export/arch.ts).
 
 Every path here is relative to the repo root; scenes/manifest.json's entries are too, so a page at the root
 (a sibling of room-creator.html) can use them as they are.
@@ -460,6 +465,7 @@ class HouseRenderer:
         self.hidden_levels = [l for l in self.levels if l["y"] > self.hero_y + EPS]
         self.skipped = []          # things we could not render faithfully (reported)
         self.arch = self._load_arch()   # S2: the builder's resolved architecture (plan.json `arch` key; {} when none)
+        self._floor_items = {}
         self.hero_screen = None    # projected core position for the lottie layers
         self.core_item = None
         self.plumbob_item = None
@@ -926,6 +932,7 @@ class HouseRenderer:
             it.shapes.append(("poly", pts, base, "none", 0, 1.0))
         d_attr = " ".join(d_parts)
         clip_id = f"fp_{self.sid}_{lv['id']}"
+        self._floor_items[lv["id"]] = (it, clip_id)   # S2's room floors are painted into this item, clipped to the slab (holes stay holes)
         it.svg.append(f'<path d="{d_attr}" fill="{base}" fill-rule="evenodd" stroke="{shade(base, -0.35)}" stroke-width="{round(1.0 * self.ctx.lw, 2)}"/>')
         it.svg.append(f'<defs><clipPath id="{clip_id}"><path d="{d_attr}" clip-rule="evenodd"/></clipPath></defs>')
         it.svg.append(f'<g clip-path="url(#{clip_id})">')
@@ -1233,7 +1240,15 @@ class HouseRenderer:
     }
 
     def draw_room_floors(self, lv):
+        """each room's floor kind over the storey's slab: painted into the slab's own item (so it stays under whatever stands
+        on it and the slab's holes stay holes), clipped to the slab, tone and lines from ROOM_FLOOR"""
         y = lv["y"]
+        floor = self._floor_items.get(lv["id"])
+        if floor is None:
+            return
+        it, clip_id = floor
+        P = self.ctx.P
+        yy = y + 0.004
         for room in lv.get("rooms", []):
             b = room.get("bounds")
             fl = room.get("floor")
@@ -1245,14 +1260,12 @@ class HouseRenderer:
             if not kind or not isinstance(b, dict) or not all(k in b for k in ("x", "z", "w", "d")):
                 continue
             base, line_c, spacing, mode = self.ROOM_FLOOR.get(kind) or FLOOR_STYLES.get(kind) or FLOOR_STYLES["oak"]
+            it.svg.append(f'<g clip-path="url(#{clip_id})">')
             for r in lv["footprint"]:
                 x0, x1 = max(b["x"], r["x"]), min(b["x"] + b["w"], r["x"] + r["w"])
                 z0, z1 = max(b["z"], r["z"]), min(b["z"] + b["d"], r["z"] + r["d"])
                 if x1 - x0 < 0.05 or z1 - z0 < 0.05:
                     continue
-                it = self.new((x0, x1, y, y + 0.006, z0, z1), prio=1, name=f"room-floor-{kind}")
-                P = self.ctx.P
-                yy = y + 0.006
                 add_poly(self.ctx, it, [P(x0, yy, z0), P(x1, yy, z0), P(x1, yy, z1), P(x0, yy, z1)], base, stroke=shade(base, -0.2), sw=0.5)
                 if mode in ("x", "grid") and spacing:
                     g = z0 + spacing
@@ -1262,6 +1275,7 @@ class HouseRenderer:
                     g = x0 + spacing
                     while g < x1 - 1e-6:
                         add_line(self.ctx, it, P(g, yy + 0.002, z0), P(g, yy + 0.002, z1), line_c, sw=0.5, opacity=0.8, detail=True); g += spacing
+            it.svg.append("</g>")
 
     def arch_foundation(self, lv):
         """a storey standing above grade with nothing under it: its foundation, in the plinth's stone"""
