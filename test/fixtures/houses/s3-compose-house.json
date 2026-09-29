@@ -8,7 +8,19 @@
   "styleKey": "farmhouse",
   "emoji": "🧪",
   "fixture": {
-    "note": "plan S3 acceptance: a living room with a fireplace focus (one pinned plant), an L kitchen with an island (marble top, glass uppers), a library round the Core (one pinned armchair), a dining room, and upstairs a primary bedroom, a bath with a freestanding tub, a kid's room, a nursery and a study — every room composed from its program"
+    "note": "plan S3 acceptance: a living room with a fireplace focus (one pinned plant), an L kitchen with an island (marble top, glass uppers), a library round the Core (one pinned armchair), a dining room, and upstairs a primary bedroom, a bath with a freestanding tub, a kid's room, a nursery and a study — every room composed from its program",
+    "frames": {
+      "door-to-core": [
+        0.55,
+        1
+      ],
+      "hero-reveal": [
+        1
+      ],
+      "core-orbit": [
+        0.55
+      ]
+    }
   },
   "lot": {
     "w": 26,

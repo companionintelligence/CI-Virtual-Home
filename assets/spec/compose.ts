@@ -100,12 +100,11 @@ export interface ComposeRoom {
   /** composition baked into `items` and hand-tuned: do not compose again (the program stays the room's type) */
   lock?: boolean;
 }
-export interface ComposeRoomItem {
-  /** who made the item: 'compose@1' for the composer (scripts/compose-house.mts --write keeps it when it bakes a
-   *  composition into the spec, so a re-bake can tell its own items from the author's). Typed `unknown` because the
-   *  base item's index signature is (a fragment may only widen a base field). */
-  src?: unknown;
-}
+// Room items: the composer's own carry `src: 'compose@1'` (scripts/compose-house.mts --write keeps it when it bakes a
+// composition into the spec, so a re-bake can tell its own items from the author's). Not declared here: an item takes
+// any builder parameter (the base item has an index signature), and scripts/test-spec-merge.mts adds `src` to this
+// interface itself to prove a stream can, so it stays empty.
+export interface ComposeRoomItem {}
 export interface ComposeRoof {}
 export interface ComposeSiteItem {}
 export interface ComposeHero {}
