@@ -30,6 +30,10 @@ const CASES: Array<{ name: string; hero: any; tol?: number }> = [
   ...[0, 90, 180, 270].map(rot => ({ name: `island@${rot}`, hero: { surface: 'island', at: [1.8, 0.2], rot } })),
   { name: 'console', hero: { surface: 'console', at: [2.6, -2.725], rot: 0 } },
   { name: 'counter', hero: { surface: 'counter', at: [2.6, -2.59], rot: 0 } },
+  // any registry type with a top: the Core stands on it wherever its top is (hero.surface names the type)
+  { name: 'sideboard', hero: { surface: 'sideboard', at: [2.6, -2.7], rot: 0 } },
+  { name: 'writing-desk', hero: { surface: 'writing-desk', at: [2.6, -2.65], rot: 0 } },
+  { name: 'dresser', hero: { surface: 'dresser', at: [2.6, -2.7], rot: 0 } },
   { name: 'desk (default)', hero: { surface: 'desk', at: [2.6, -2.55], rot: 0 }, tol: 0.005 },
   { name: 'shelf (default)', hero: { surface: 'shelf', at: [2.6, -2.55], rot: 0 }, tol: 0.005 },
 ];

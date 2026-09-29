@@ -133,7 +133,7 @@ export const lightingName = (n?: any): string => {
 // from repainting the house: golden hour and dusk turned white walls pink and a cobalt wall grey. It
 //   - pulls the light colours (sun, hemisphere, fill) and the environment's sky part-way to the grey of the same
 //     luma, so a white wall in the shade is lit by something near white;
-//   - white-balances the frame part-way toward the key light, as a photographer would at golden hour;
+//   - white-balances the frame most of the way toward neutral, as a photographer would at golden hour;
 //   - holds the grade's saturation at 0.86 or above, so a signature colour (palette.keep) survives dusk (dusk's own
 //     0.72 is what greyed a blue wall; 0.86 keeps a lawn from reading as green paint).
 // The backdrop sky and the fog keep the preset's own colours. Pure data again: lookOf(p, 2) is a new preset.
@@ -155,12 +155,13 @@ export function lookOf(p: Preset, look: Look = 1): Preset & { envSky?: [string, 
     grade: { ...p.grade, saturation: Math.max(p.grade.saturation, 0.86) },
   };
   // white balance: what a white wall facing the sun reads under this light (sRGB-ish linear weights), corrected
-  // half-way toward neutral and normalised to luma 1, so exposure is untouched
+  // three-quarters of the way toward neutral (the exponent 0.75 below) and normalised to luma 1, so exposure is untouched;
+  // scripts/test-kit-look.mts measures the result on a white and a cobalt wall
   const lin = (c: string) => { const n = hexOf(c); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => (v / 255) ** 2.2); };
   const sun = lin(q.sun.color), hs = lin(q.hemi.sky), hg = lin(q.hemi.ground);
   const W = [0, 1, 2].map(k => sun[k] * q.sun.intensity * 0.5 + hs[k] * q.hemi.intensity * 0.5 + hg[k] * q.hemi.intensity * 0.2);
   const Y = 0.2126 * W[0] + 0.7152 * W[1] + 0.0722 * W[2];
-  const bal = W.map(w => Math.pow(Y / Math.max(w, 1e-6), 0.5));
+  const bal = W.map(w => Math.pow(Y / Math.max(w, 1e-6), 0.75));
   const bY = 0.2126 * bal[0] + 0.7152 * bal[1] + 0.0722 * bal[2];
   q.balance = bal.map(v => +(v / bY).toFixed(4)) as [number, number, number];
   return q;
