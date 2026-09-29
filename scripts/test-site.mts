@@ -6,17 +6,27 @@
 //   node --experimental-strip-types scripts/test-site.mts [--house id,…] [--json]      (any cwd; run `pnpm run build` first)
 //
 // For every S4 fixture (test/fixtures/houses/s4-site-*.json), or the houses named:
-//   axis-aligned   the share of bed, planting and path edges (by length) within 1° of the x or z axis, as built (curves
-//                  resolved; a bed's straight edge against the house left out) — target ≤ 20 % over the fixtures
-//   bare mulch     each planting's share of its beds no crown covers (the drip strip along a wall not counted) —
-//                  target ≤ 10 % a planting (a formal mix's gravel between its clipped shapes is its design)
-//   layers         height classes in each bed of a three-layer planting: under 0.45 m, to 1.1 m, over — target 3
+//   axis-aligned   the share of bed, planting and path edges (by length) that runs straight along the x or z axis, as
+//                  an eye judges it — 1.5 m chords within 3° of an axis that are also straight (assets/site-geom.ts
+//                  axisAlignedRuns; not 1° between the 0.25 m samples a curve is resampled to, which a centimetre of
+//                  wobble beats) — target ≤ 20 % over ALL the fixtures AND over the six lots built on real houses
+//                  (`s4-site-lot-*`) alone: the real layouts are the ones that matter, and the synthetic region lots
+//                  must not carry them
+//   bare mulch     each planting's share of its beds that no plant hides, seen from above — each plant hides its
+//                  measured silhouette (assets/site-species-masks.ts), not the disc of its crown: a grass tuft hides
+//                  5 % of its disc — target ≤ 10 %, or the mix's own (a formal bed shows gravel, a desert bed sand:
+//                  its `bare` + 6.5 points); the drip strip along a wall and the 0.16 m along the lot line not counted
+//   layers         height classes in each bed of a three-layer planting: under 0.45 m, to 1.1 m, over — target 3 — and
+//                  in a bed 4 m long or more at least 0.3 plants over 1.1 m and 0.3 to 1.1 m for every metre of its run
+//                  (a token plant of each height is not a layered bed)
 //   in the house   no plant whose crown reaches into the ground storey (it must stop at its walls)
+//   on the lot     no plant or bed reaches past the lot line (the pavement starts there)
 //   determinism    every planting laid out twice is the same, number for number
-//   variety        a bed of 20 plants or more (not a formal mix) holds at least 4 species, and another `seed` lays it out
-//                  differently (the same outline, other plants in other places)
-//   facade cover  a foundation planting's beds over the facade it names, outside the metre kept clear each side of a
-//                 door — target ≥ 80 % (sampled every 0.1 m, 0.4 m out from the wall)
+//   variety        a bed of 20 plants or more (not a formal mix) holds at least 4 species, no one of them over 45 % of
+//                  the plants (30 or more of them), and another `seed` lays the SAME outline out with other plants
+//   facade cover   a foundation planting's beds over the facade it names, outside the metre kept clear each side of a
+//                  door — target ≥ 80 % (sampled every 0.1 m, 0.4 m out from the wall)
+//   triangles      a planting's plants cost under 900 000 triangles (assets/site-species-masks.ts, measured per species)
 // Exit 0 when every target holds; 1 otherwise (2: nothing to measure, or the compiled assets are missing).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -35,7 +45,7 @@ const files: string[] = args.house
   : fs.readdirSync(FIX).filter(f => /^s4-site-.+\.json$/.test(f)).sort().map(f => path.join(FIX, f));
 if (!files.length) { console.error('no S4 fixtures (test/fixtures/houses/s4-site-*.json)'); process.exit(2); }
 
-const T = { axis: 0.2, bare: 0.1, classes: 3, facade: 0.8, species: 4 };
+const T = { axis: 0.2, bare: 0.1, bareSlack: 0.065, classes: 3, tallPerM: 0.3, midPerM: 0.3, facade: 0.8, species: 4, top: 0.45, tris: 900_000 };
 // the share of the named facade (the ground storey's perimeter on those sides, less each door's leaf and a metre each side)
 // that a bed of the planting covers, 0.4 m out from the wall
 function facadeCover(spec: any, s: any, plan: any, ctx: any, index: number): number | null {
@@ -64,49 +74,82 @@ function facadeCover(spec: any, s: any, plan: any, ctx: any, index: number): num
   }
   return total ? cov / total : null;
 }
-let fails = 0, allAxis = 0, allLen = 0;
-const report = [];
+const hash = (x: unknown) => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex').slice(0, 12);
+let fails = 0;
+// ---- the axis-aligned measure itself: a centimetre of wobble does not hide a straight edge, a curve is not one
+{
+  const line = (f: (x: number) => number, dx = 0.25) => Array.from({ length: Math.round(12 / dx) + 1 }, (_, i) => [i * dx, f(i * dx)] as [number, number]);
+  const share = (pts: Array<[number, number]>) => { const r = G.axisAlignedRuns(pts, false); return r.axis / r.total; };
+  const wobble = share(line(x => 0.015 * Math.sin(x * 17.3))), fine = (() => { const r = G.axisAligned(G.segmentsOf(line(x => 0.015 * Math.sin(x * 17.3)), false), 1); return r.axis / r.total; })();
+  const curve = share(line(x => 0.4 * Math.sin(x * 2 * Math.PI / 3.4))), diag = share(line(x => x));
+  const checks: Array<[boolean, string]> = [
+    [wobble > 0.95, `a 12 m straight edge with a centimetre of wobble reads ${(wobble * 100).toFixed(0)} % axis-aligned (must read 100: the 1° per-segment measure reads ${(fine * 100).toFixed(0)} %)`],
+    [curve < 0.25, `a sine (0.4 m over 3.4 m) reads ${(curve * 100).toFixed(0)} % axis-aligned (must read under 25)`],
+    [diag === 0, `a 45° line reads ${(diag * 100).toFixed(0)} % axis-aligned (must read 0)`],
+  ];
+  for (const [ok, msg] of checks) if (!ok) { fails++; console.log(`✗ measure: ${msg}`); }
+}
+const totals = { all: { axis: 0, len: 0 }, real: { axis: 0, len: 0 } };
+const report: any[] = [];
 for (const file of files) {
   const spec = JSON.parse(fs.readFileSync(file, 'utf8')), ctx = P.createSiteContext(spec), site = spec.site || [];
-  const segs: Array<[number[], number[]]> = [], rows = [];
-  let houseClash = 0;
+  const rows: any[] = [];
+  const axis = { axis: 0, total: 0 };
+  const edge = (pts: number[][], closed: boolean, wall: boolean[] | null) => { const r = G.axisAlignedRuns(pts, closed, wall); axis.axis += r.axis; axis.total += r.total; };
+  let houseClash = 0, lotOver = 0;
   for (const [i, s] of site.entries()) {
     if (s.type === 'bed' && (Array.isArray(s.poly) || Array.isArray(s.at))) {
       const p0 = s.poly || [[s.at[0] - (s.w || 2) / 2, s.at[1] - (s.d || 1) / 2], [s.at[0] + (s.w || 2) / 2, s.at[1] - (s.d || 1) / 2], [s.at[0] + (s.w || 2) / 2, s.at[1] + (s.d || 1) / 2], [s.at[0] - (s.w || 2) / 2, s.at[1] + (s.d || 1) / 2]];
-      const t = G.tensionOf(s.smooth); segs.push(...G.segmentsOf(t === null ? p0 : G.smoothLoop(p0, t, 0.25), true));
+      const t = G.tensionOf(s.smooth); edge(t === null ? p0 : G.smoothLoop(p0, t, 0.25), true, null);
     }
-    if (s.type === 'path' && Array.isArray(s.path)) segs.push(...G.segmentsOf(ctx.pathLine(s), false));
+    if (s.type === 'path' && Array.isArray(s.path) && !(s.y > 0.3)) edge(ctx.pathLine(s), false, null);   // (a raised `path` is a trim on a facade, not a garden path)
     if (s.type !== 'planting') continue;
     const a = P.planPlanting(s, i, ctx), b = P.planPlanting(s, i, ctx);
-    const hash = (x: unknown) => crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex').slice(0, 12);
     const same = hash(a) === hash(b);
-    segs.push(...P.bedSegments(a));
-    const bare = a.beds.some(bd => bd.soil) ? P.bareShare(a, ctx) : null;
-    const classes = P.heightClasses(a);
-    // a crown into the house: a plant whose reach passes the wall line (the walls stand 0.12 m proud of the footprint)
-    const species = new Set([...a.plants, ...a.trees].map((p: any) => p.sp)).size, other = P.planPlanting({ ...s, seed: 'another' }, i, ctx);
-    const okSeed = hash(other) !== hash(a);
+    for (const bd of a.beds) edge(bd.poly, true, bd.wall);
+    const bare = a.beds.some((bd: any) => bd.soil) ? P.bareShare(a, ctx, 0.05, i) : null;
+    const classes = P.heightClasses(a), density = P.layerDensity(a);
+    const species = new Set([...a.plants, ...a.trees].map((p: any) => p.sp)).size, all = a.plants.length + a.trees.length;
+    // another seed: the same beds, other plants
+    const other = P.planPlanting({ ...s, seed: 'another' }, i, ctx);
+    const okSeed = hash(other) !== hash(a) && hash(other.beds) === hash(a.beds);
     const facade = s.kind === 'foundation' ? facadeCover(spec, s, a, ctx, i) : null;
-    const clash = a.plants.filter(p => ctx.houseGap(p.x, p.z) - 0.12 < p.r - 1e-6).length;
+    // a crown into the house: a plant whose reach passes the wall line (the walls stand 0.12 m proud of the footprint)
+    const clash = a.plants.filter((p: any) => ctx.houseGap(p.x, p.z) - 0.12 < p.r - 1e-6).length;
     houseClash += clash;
+    // past the lot line: a plant's crown, a bed's corner (2 cm of rounding allowed)
+    const over = a.plants.filter((p: any) => ctx.lotRoom(p.x, p.z) < p.r - 1e-3).length + a.beds.reduce((n: number, bd: any) => n + bd.poly.filter((q: number[]) => ctx.lotRoom(q[0], q[1]) < -0.02).length, 0);
+    lotOver += over;
     const formal = a.mix === 'formal', layered = (s.layers ?? 3) >= 3 && a.beds.length > 0;
-    const okVariety = a.plants.length + a.trees.length < 20 || a.mix === 'formal' || species >= T.species, okFacade = facade === null || facade >= T.facade, okBare = bare === null || formal || bare <= T.bare, okClasses = !layered || formal || classes.every(c => c >= T.classes), okDet = same, okClash = clash === 0;
-    if (!(okBare && okClasses && okDet && okClash && okFacade && okVariety && okSeed)) fails++;
-    rows.push({ i, kind: s.kind || 'border', mix: a.mix, beds: a.beds.length, plants: a.plants.length + a.trees.length, bare, classes, clash, facade, species, seed: okSeed, hash: hash(a), ok: okBare && okClasses && okDet && okClash && okFacade && okVariety && okSeed });
+    const counts = new Map<string, number>(); for (const p of [...a.plants, ...a.trees]) counts.set(p.sp, (counts.get(p.sp) || 0) + 1);
+    const topShare = all ? Math.max(0, ...counts.values()) / all : 0;
+    const tris = P.plantingTriangles(a);
+    const okVariety = all < 20 || formal || species >= T.species, okTop = all < 30 || formal || topShare <= T.top;
+    const okFacade = facade === null || facade >= T.facade, okBare = bare === null || bare <= Math.max(T.bare, a.bareTarget + T.bareSlack);
+    const okClasses = !layered || formal || classes.every((c: number) => c >= T.classes);
+    const okLayers = !layered || formal || density.every((d: any) => d.run < 4 || (d.tall / d.run >= T.tallPerM && d.mid / d.run >= T.midPerM));
+    const okDet = same, okClash = clash === 0, okLot = over === 0, okTris = tris <= T.tris;
+    const ok = okBare && okClasses && okLayers && okDet && okClash && okFacade && okVariety && okTop && okSeed && okLot && okTris;
+    if (!ok) fails++;
+    const why = [!okBare && 'bare', !okClasses && 'classes', !okLayers && 'layers', !okDet && 'nondeterministic', !okClash && 'in the house', !okFacade && 'facade', !okVariety && 'variety', !okTop && 'one species', !okSeed && 'seed', !okLot && 'off the lot', !okTris && 'triangles'].filter(Boolean).join(', ');
+    rows.push({ i, kind: s.kind || 'border', mix: a.mix, beds: a.beds.length, plants: all, bare, classes, layers: density.filter((d: any) => d.run >= 4).map((d: any) => `${(d.tall / d.run).toFixed(1)}/${(d.mid / d.run).toFixed(1)}`).join(' '), top: `${[...counts.entries()].sort((x, y) => y[1] - x[1])[0]?.[0] ?? '—'} ${(topShare * 100).toFixed(0)} %`, clash, over, facade, species, seed: okSeed, tris, hash: hash(a), ok, why });
   }
-  const ax = G.axisAligned(segs);
-  allAxis += ax.axis; allLen += ax.total;
-  report.push({ id: spec.id, axis: ax.total ? ax.axis / ax.total : 0, len: ax.total, rows, houseClash });
+  const isLot = /s4-site-lot-/.test(path.basename(file));
+  totals.all.axis += axis.axis; totals.all.len += axis.total;
+  if (isLot) { totals.real.axis += axis.axis; totals.real.len += axis.total; }
+  report.push({ id: spec.id, axis: axis.total ? axis.axis / axis.total : 0, len: axis.total, rows, houseClash, lotOver });
 }
-const share = allLen ? allAxis / allLen : 0;
+const share = totals.all.len ? totals.all.axis / totals.all.len : 0, realShare = totals.real.len ? totals.real.axis / totals.real.len : null;
 if (share > T.axis) fails++;
-if (args.json === 'true') console.log(JSON.stringify({ share, report }, null, 1));
+if (realShare !== null && realShare > T.axis) fails++;
+if (args.json === 'true') console.log(JSON.stringify({ share, realShare, report }, null, 1));
 else {
   for (const r of report) {
-    console.log(`${r.rows.every(x => x.ok) ? '✓' : '✗'} ${r.id}: edges ${r.len.toFixed(1)} m, ${(r.axis * 100).toFixed(0)} % axis-aligned`);
-    for (const x of r.rows) console.log(`    ${x.ok ? '✓' : '✗'} site[${x.i}] planting ${x.kind} · ${x.mix}: ${x.beds} beds, ${x.plants} plants, bare mulch ${x.bare === null ? '—' : (x.bare * 100).toFixed(1) + ' %'}${x.mix === 'formal' ? ' (formal: not judged)' : ''}, height classes ${x.classes.length ? x.classes.join('/') : '—'}${x.facade === null ? '' : `, facade ${(x.facade * 100).toFixed(0)} % covered`}, ${x.species} species${x.seed ? '' : ', the same under another seed'}${x.clash ? `, ${x.clash} reaching into the house` : ''}  [${x.hash}]`);
+    console.log(`${r.rows.every((x: any) => x.ok) ? '✓' : '✗'} ${r.id}: edges ${r.len.toFixed(1)} m, ${(r.axis * 100).toFixed(0)} % axis-aligned`);
+    for (const x of r.rows) console.log(`    ${x.ok ? '✓' : '✗'} site[${x.i}] planting ${x.kind} · ${x.mix}: ${x.beds} beds, ${x.plants} plants (${(x.tris / 1000).toFixed(0)}k tris), bare mulch ${x.bare === null ? '—' : (x.bare * 100).toFixed(1) + ' %'}${x.mix === 'formal' ? ' (formal: gravel is the design)' : ''}, height classes ${x.classes.length ? x.classes.join('/') : '—'}${x.layers ? ` (tall/mid per m ${x.layers})` : ''}${x.facade === null ? '' : `, facade ${(x.facade * 100).toFixed(0)} % covered`}, ${x.species} species (${x.top})${x.seed ? '' : ', the seed changes the beds or nothing'}${x.clash ? `, ${x.clash} reaching into the house` : ''}${x.over ? `, ${x.over} past the lot line` : ''}  [${x.hash}]${x.ok ? '' : `  ← ${x.why}`}`);
   }
-  console.log(`\n${share <= T.axis ? '✓' : '✗'} axis-aligned bed, planting and path edges over ${report.length} lot(s): ${(share * 100).toFixed(1)} % of ${allLen.toFixed(0)} m (target ≤ ${T.axis * 100} %)`);
+  console.log(`\n${share <= T.axis ? '✓' : '✗'} axis-aligned bed, planting and path edges over ${report.length} lot(s): ${(share * 100).toFixed(1)} % of ${totals.all.len.toFixed(0)} m (target ≤ ${T.axis * 100} %)`);
+  if (realShare !== null) console.log(`${realShare <= T.axis ? '✓' : '✗'}   … over the lots built on real houses alone: ${(realShare * 100).toFixed(1)} % of ${totals.real.len.toFixed(0)} m (target ≤ ${T.axis * 100} %)`);
   console.log(fails ? `${fails} failed` : 'all targets hold');
 }
 process.exit(fails ? 1 : 0);
