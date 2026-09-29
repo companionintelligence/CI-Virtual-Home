@@ -11,8 +11,8 @@
 //      Chromium's JS engine and the whole track's hash agrees (assets/detmath.ts makes the engines' last bits agree);
 //      (b) with --parity (the default for two houses) __houseShotTrack's hash in the page, under ?planner=v2, equals the
 //      Node bake's — the Node harness IS the page's planner;
-//   5. the budgets (plan Completeness A4): planning all 30 within 15 s of CPU, QA v2 within 0.5 s a shot (reported;
-//      only failing when the machine is not loaded — a busy machine inflates CPU time too).
+//   5. the budgets (plan Completeness A4): planning all 30 within 15 s of CPU, QA v2 within 0.5 s a shot (a loaded
+//      machine — load average over 0.75 per core — inflates CPU time too, so both budgets get 60 % more there; they are never waived).
 //
 //   node --experimental-strip-types scripts/test-shot-planner.mts [--house a,b] [--fixtures] [--update] [--parity 2|0|all]
 //        [--rebuild-worlds] [--stale-ok] [--planner-only] [--out test/qa/shot-planner.json]
