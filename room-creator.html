@@ -7588,15 +7588,24 @@
     let isLooping = true;
     let showSplinePath = false;
 
+    // ---- The shot's duration selector (owner: S6 ui — plan Completeness C5 item 11). A house shot brings its own
+    // duration; animDuration follows it, and so does the selector when it has an option for it (a duration it has none
+    // for still plays as authored). S5 decides the duration (planner v2's 'auto' resolves before this is asked), S6 how
+    // the selector shows it. Moved out of buildSplineFromPreset (S5's) verbatim, so the two streams' edits are
+    // different hunks.
+    function syncShotDuration(preset, presetKey) {
+      if (preset.duration && presetKey.startsWith('house:')) {
+        animDuration = preset.duration;
+        if (animDurationSelect && [...animDurationSelect.options].some(o => parseInt(o.value, 10) === preset.duration)) animDurationSelect.value = String(preset.duration);
+      }
+    }
+
     function buildSplineFromPreset(presetKey) {
       const preset = SplinePresets[presetKey] || SplinePresets['orbit-360'];
       // A house shot carries its own type; an aliased id ("house:mirage:front-door") points at the same
       // object, so it keeps it. Everything else is its own type.
       activeShot = { key: presetKey, preset, type: preset.type || (presetKey.startsWith('house:') ? presetKey.split(':').pop() : presetKey) };
-      if (preset.duration && presetKey.startsWith('house:')) {
-        animDuration = preset.duration;
-        if (animDurationSelect && [...animDurationSelect.options].some(o => parseInt(o.value, 10) === preset.duration)) animDurationSelect.value = String(preset.duration);
-      }
+      syncShotDuration(preset, presetKey);
 
       // centripetal: a uniform Catmull-Rom with tension 0.5 overshoots the control polygon at every sharp turn
       // (into the wall beside a doorway, through a partition at a routed corner); the centripetal form stays
@@ -8457,7 +8466,7 @@
       persCamera.position.copy(eyePos);
       persCamera.lookAt(lookTarget);
       orbitControls.target.copy(lookTarget);
-      if (activeHouse && preset && preset.dressing) applyShotCutaway(preset, sampleT, eyePos, lookTarget);
+      if (activeHouse && preset && preset.dressing) applyShotCutaway(preset, sampleT, eyePos, lookTarget, { t: clampedT, seconds: clampedT * ((preset && preset.duration) || animDuration) });
 
       // Dynamic Dolly Zoom: subtly narrow FOV towards the core target for cinematic hero framing
       if (shotType === 'door-to-core') {
