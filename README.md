@@ -211,8 +211,10 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
    fails as before. `scripts/golden-ledger.mts` has the contract.
 6. **tests** — every `scripts/test-*.mts`, found by glob; a script opts out or into `--quick` with an
    `@check-house` line in its header, and `@check-house advisory — <why>` lets one that is red on `main` too run
-   and report without failing the gate until the fix that greens it lands (test-floorplan-graph, for now). Among
-   them `test-fixtures.mts`, the fixture houses' QA and frame hashes.
+   and report without failing the gate until the fix that greens it lands (none is advisory today; delete the
+   directive with the fix, so a real regression fails again). Among them `test-fixtures.mts`, the fixture houses' QA
+   and frame hashes, `test-spec-types.mts`, every spec against `HouseSpec`, and `test-spec-merge.mts`, the fragment
+   merge rule itself.
 7. **perf** — build ≤ 3 s, `__houseShotTrack` ≤ 1 s and shot QA ≤ 0.5 s a shot on aurora, mirage and vanilla:
    report-only, it never fails the gate.
 

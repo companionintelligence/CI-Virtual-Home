@@ -13,8 +13,13 @@
 //     REPLACES the base's: that is how a stream widens one (`lighting: string` → `string | {preset, sunBearing}`,
 //     `stairs: Stairs` → `Stairs | Stairs[]`) without editing base.ts. It may only widen: `OnlyWidens` below fails
 //     the compile, naming the field, when every value the base allows is not still allowed.
-//   - A field two fragments both declare is a compile error (TS2320, "cannot simultaneously extend"), whatever
-//     the types (plan Completeness C1–C3): the two streams settle it, one of them owns it.
+//   - A field two fragments both declare is a compile error whatever the types (plan Completeness C1–C3): the two
+//     streams settle it, one of them owns it. Different types fail as TS2320 ("cannot simultaneously extend");
+//     the SAME type is legal TypeScript, so `OnlyOne` below fails it instead, naming the field
+//     (`Type '"chair"' does not satisfy the constraint 'never'`; the line says which part).
+//   - Room items and site items also take builder-specific parameters no fragment declares (an index signature,
+//     added here to RoomItem and SiteItem): a field a fragment DECLARES is typed and checked like any other;
+//     an undeclared one is accepted, untyped. Declare yours anyway: the fragment is the list of what the builders honour.
 // A fragment that needs a composed type (Stairs, Room, Opening …) imports it from here: `import type { Stairs } from
 // './index.js'` (type-only, so the cycle is fine).
 //
@@ -40,6 +45,13 @@ type Narrowed<Base, F> = { [K in keyof Base & keyof F]-?: [Base[K]] extends [F[K
 /** compiles only when T is never: `Type '"surface"' does not satisfy the constraint 'never'` names the field */
 type OnlyWidens<T extends never> = T;
 type Narrowed5<Base, A, B, C, D, E> = Narrowed<Base, A> | Narrowed<Base, B> | Narrowed<Base, C> | Narrowed<Base, D> | Narrowed<Base, E>;
+/** the fields two of the five fragments both declare (never, when each field has one owner) */
+type Overlap5<A, B, C, D, E> =
+  | (keyof A & keyof B) | (keyof A & keyof C) | (keyof A & keyof D) | (keyof A & keyof E)
+  | (keyof B & keyof C) | (keyof B & keyof D) | (keyof B & keyof E)
+  | (keyof C & keyof D) | (keyof C & keyof E) | (keyof D & keyof E);
+/** compiles only when T is never: a field two fragments both declare fails here, naming it */
+type OnlyOne<T extends never> = T;
 
 // ---- flat parts ----------------------------------------------------------------------------------------------
 type LotF = Declared<KitLot, ArchLot, ComposeLot, SiteLot, ShotsLot>;
@@ -58,12 +70,18 @@ export interface Stairs extends Omit<BaseStairs, StairsF>, KitStairs, ArchStairs
 type BalustradeF = Declared<KitBalustrade, ArchBalustrade, ComposeBalustrade, SiteBalustrade, ShotsBalustrade>;
 export interface Balustrade extends Omit<BaseBalustrade, BalustradeF>, KitBalustrade, ArchBalustrade, ComposeBalustrade, SiteBalustrade, ShotsBalustrade {}
 type RoomItemF = Declared<KitRoomItem, ArchRoomItem, ComposeRoomItem, SiteRoomItem, ShotsRoomItem>;
-export interface RoomItem extends Omit<BaseItem, RoomItemF>, KitRoomItem, ArchRoomItem, ComposeRoomItem, SiteRoomItem, ShotsRoomItem {}
+export interface RoomItem extends Omit<BaseItem, RoomItemF>, KitRoomItem, ArchRoomItem, ComposeRoomItem, SiteRoomItem, ShotsRoomItem {
+  /** the page builder's own parameters (`style`, `chairs`, `n` …): loose on purpose, see the header */
+  [param: string]: unknown;
+}
 export type Item = RoomItem;
 type RoofF = Declared<KitRoof, ArchRoof, ComposeRoof, SiteRoof, ShotsRoof>;
 export interface Roof extends Omit<BaseRoof, RoofF>, KitRoof, ArchRoof, ComposeRoof, SiteRoof, ShotsRoof {}
 type SiteItemF = Declared<KitSiteItem, ArchSiteItem, ComposeSiteItem, SiteSiteItem, ShotsSiteItem>;
-export interface SiteItem extends Omit<BaseSiteItem, SiteItemF>, KitSiteItem, ArchSiteItem, ComposeSiteItem, SiteSiteItem, ShotsSiteItem {}
+export interface SiteItem extends Omit<BaseSiteItem, SiteItemF>, KitSiteItem, ArchSiteItem, ComposeSiteItem, SiteSiteItem, ShotsSiteItem {
+  /** the site builder's own parameters: loose on purpose, see the header */
+  [param: string]: unknown;
+}
 type HeroF = Declared<KitHero, ArchHero, ComposeHero, SiteHero, ShotsHero>;
 export interface Hero extends Omit<BaseHero, HeroF>, KitHero, ArchHero, ComposeHero, SiteHero, ShotsHero {}
 type EntryF = Declared<KitEntry, ArchEntry, ComposeEntry, SiteEntry, ShotsEntry>;
@@ -119,6 +137,26 @@ export type _WidensOnly = [
   OnlyWidens<Narrowed5<Omit<BaseRoom, keyof RoomParts> & RoomParts, KitRoom, ArchRoom, ComposeRoom, SiteRoom, ShotsRoom>>,
   OnlyWidens<Narrowed5<Omit<BaseLevel, keyof LevelParts> & LevelParts, KitLevel, ArchLevel, ComposeLevel, SiteLevel, ShotsLevel>>,
   OnlyWidens<Narrowed5<Omit<BaseHouseSpec, keyof HouseParts> & HouseParts, KitSpec, ArchSpec, ComposeSpec, SiteSpec, ShotsSpec>>,
+];
+
+// ---- one owner a field: each line fails the compile, naming the field, if two fragments declare it ----------------
+export type _OneOwner = [
+  OnlyOne<Overlap5<KitLot, ArchLot, ComposeLot, SiteLot, ShotsLot>>,
+  OnlyOne<Overlap5<KitPalette, ArchPalette, ComposePalette, SitePalette, ShotsPalette>>,
+  OnlyOne<Overlap5<KitFootprintRect, ArchFootprintRect, ComposeFootprintRect, SiteFootprintRect, ShotsFootprintRect>>,
+  OnlyOne<Overlap5<KitOpening, ArchOpening, ComposeOpening, SiteOpening, ShotsOpening>>,
+  OnlyOne<Overlap5<KitPartition, ArchPartition, ComposePartition, SitePartition, ShotsPartition>>,
+  OnlyOne<Overlap5<KitStairs, ArchStairs, ComposeStairs, SiteStairs, ShotsStairs>>,
+  OnlyOne<Overlap5<KitBalustrade, ArchBalustrade, ComposeBalustrade, SiteBalustrade, ShotsBalustrade>>,
+  OnlyOne<Overlap5<KitRoomItem, ArchRoomItem, ComposeRoomItem, SiteRoomItem, ShotsRoomItem>>,
+  OnlyOne<Overlap5<KitRoof, ArchRoof, ComposeRoof, SiteRoof, ShotsRoof>>,
+  OnlyOne<Overlap5<KitSiteItem, ArchSiteItem, ComposeSiteItem, SiteSiteItem, ShotsSiteItem>>,
+  OnlyOne<Overlap5<KitHero, ArchHero, ComposeHero, SiteHero, ShotsHero>>,
+  OnlyOne<Overlap5<KitEntry, ArchEntry, ComposeEntry, SiteEntry, ShotsEntry>>,
+  OnlyOne<Overlap5<KitShot, ArchShot, ComposeShot, SiteShot, ShotsShot>>,
+  OnlyOne<Overlap5<KitRoom, ArchRoom, ComposeRoom, SiteRoom, ShotsRoom>>,
+  OnlyOne<Overlap5<KitLevel, ArchLevel, ComposeLevel, SiteLevel, ShotsLevel>>,
+  OnlyOne<Overlap5<KitSpec, ArchSpec, ComposeSpec, SiteSpec, ShotsSpec>>,
 ];
 
 // ---- the look switch (plan §2.0) -----------------------------------------------------------------------------
