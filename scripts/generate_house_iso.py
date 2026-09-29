@@ -459,6 +459,7 @@ class HouseRenderer:
         self.visible_levels = [l for l in self.levels if l["y"] <= self.hero_y + EPS]
         self.hidden_levels = [l for l in self.levels if l["y"] > self.hero_y + EPS]
         self.skipped = []          # things we could not render faithfully (reported)
+        self.arch = self._load_arch()   # S2: the builder's resolved architecture (plan.json `arch` key; {} when none)
         self.hero_screen = None    # projected core position for the lottie layers
         self.core_item = None
         self.plumbob_item = None
@@ -878,8 +879,12 @@ class HouseRenderer:
         y, h = lv["y"], lv["height"]
         rects = lv["footprint"]
         holes = lv.get("voids", []) if y > 0 else []
+        if self.arch:
+            holes = self.arch_holes(lv)
         edges = perimeter_edges(rects)
         self.draw_floor(lv, rects, holes)
+        if self.arch or any(r_.get("floor") for r_ in lv.get("rooms", [])):
+            self.draw_room_floors(lv)
         for e in edges:
             if e["side"] in ("N", "W"):
                 self.draw_full_wall(lv, e)
@@ -892,6 +897,7 @@ class HouseRenderer:
         if lv.get("stairs"):
             self.draw_stairs(lv)
         self.draw_rooms(lv)
+        self.draw_arch(lv)
 
     def draw_floor(self, lv, rects, holes):
         y = lv["y"]
@@ -950,6 +956,8 @@ class HouseRenderer:
     # -- perimeter walls --
     def draw_full_wall(self, lv, e):
         y, h = lv["y"], lv["height"]
+        if any("h" in r_ for r_ in lv["footprint"]):
+            h = self.edge_height(lv, e)
         cols = self.wall_cols(lv)
         trim = self.level_trim(lv)
         (ax, az), (bx, bz) = e["a"], e["b"]
@@ -965,6 +973,7 @@ class HouseRenderer:
             if op.get("side") != e["side"]: continue
             lo, hi = (ax, bx) if e["side"] == "N" else (az, bz)
             if not (lo - 1e-6 <= op["at"] <= hi + 1e-6): continue
+            if not self.edge_carries(e, op): continue
             self.draw_opening_face(it, lv, e, op)
 
     def draw_opening_face(self, it, lv, e, op):
@@ -1013,7 +1022,7 @@ class HouseRenderer:
         (ax, az), (bx, bz) = e["a"], e["b"]
         horiz = e["side"] == "S"
         lo, hi = (ax, bx) if horiz else (az, bz)
-        ops = sorted([o for o in lv.get("openings", []) if o.get("side") == e["side"] and lo - 1e-6 <= o["at"] <= hi + 1e-6], key=lambda o: o["at"])
+        ops = sorted([o for o in lv.get("openings", []) if o.get("side") == e["side"] and lo - 1e-6 <= o["at"] <= hi + 1e-6 and self.edge_carries(e, o)], key=lambda o: o["at"])
         spans, cur = [], lo
         for o in ops:
             s0, s1 = max(lo, o["at"] - o.get("w", 1.0) / 2), min(hi, o["at"] + o.get("w", 1.0) / 2)
@@ -1109,7 +1118,18 @@ class HouseRenderer:
 
     # -- stairs --
     def draw_stairs(self, lv):
-        st = lv["stairs"]
+        raw = lv["stairs"]
+        if isinstance(raw, list) or raw.get("type", "timber") not in ("timber", "colonial", "spiral"):
+            # S2: an array of flights, or an L, U or closed one — drawn from the builder's plan
+            for idx, st in enumerate(raw if isinstance(raw, list) else [raw]):
+                if isinstance(st, dict) and isinstance(st.get("at"), list):
+                    if st.get("type") == "spiral":
+                        to = self.level_by_id.get(st.get("to"))
+                        self.draw_spiral_stairs(st["at"][0], st["at"][1], lv["y"], (to["y"] - lv["y"]) if to else 2.8, st.get("rot", 0))
+                    else:
+                        self.draw_arch_stairs(lv, st, idx, isinstance(raw, list))
+            return
+        st = raw
         to = self.level_by_id.get(st.get("to"))
         total = (to["y"] - lv["y"]) if to else 2.8
         x, z = st["at"]
@@ -1162,6 +1182,286 @@ class HouseRenderer:
             tip = pts[2]
             add_line(self.ctx, it, tip, (tip[0], tip[1] - 0.9 * self.ctx.s), "#334155", sw=1.0, detail=True)
 
+    # ---- S2 (architecture): what the builder resolved beyond walls and rooms, from <id>.plan.json's `arch` key — flights that
+    # turn or come in arrays, room floors, a foundation under a raised storey, per-volume heights, and the new volumes: porches,
+    # bays, balconies, terraces, loggias, chimney stacks, a stoop. The cutaway draws no roofs, so the roofs of a porch or a bay
+    # are left to the 3D; posts and rails are drawn low, so they do not hide the rooms behind them. A spec with none of these
+    # fields draws exactly as before.
+    def _load_arch(self):
+        pp = HOUSES_DIR / f"{self.spec.get('id')}.plan.json"
+        if pp.exists():
+            try:
+                return (json.loads(pp.read_text(encoding="utf-8")) or {}).get("arch") or {}
+            except Exception:  # noqa: BLE001
+                return {}
+        return {}
+
+    def arch_holes(self, lv):
+        """the slab openings an upper storey has: its own voids, a flight's autoVoid, the double-height rooms below"""
+        holes = list(lv.get("voids", [])) if lv["y"] > 0 else []
+        if lv["y"] > 0:
+            for rec in self.arch.get("voids", []):
+                if rec.get("level") == lv["id"]:
+                    holes += list(rec.get("auto", [])) + [{k: v[k] for k in ("x", "z", "w", "d")} for v in rec.get("double", [])]
+        return holes
+
+    def edge_height(self, lv, e):
+        """a perimeter wall's height: its volume's own `h` (a tower, a low wing), else the storey's"""
+        rects = [r for r in lv["footprint"] if "h" in r]
+        if not rects:
+            return lv["height"]
+        (ax, az), (bx, bz) = e["a"], e["b"]
+        mx, mz = (ax + bx) / 2, (az + bz) / 2
+        n = {"N": (0, 1), "S": (0, -1), "E": (-1, 0), "W": (1, 0)}[e["side"]]   # a step inside the wall
+        px, pz = mx + n[0] * 0.05, mz + n[1] * 0.05
+        hit = [r for r in lv["footprint"] if in_rect(px, pz, r, -1e-6)]
+        return hit[-1].get("h", lv["height"]) if hit else lv["height"]
+
+    def edge_carries(self, e, op):
+        """does this perimeter edge hold this opening (`edgeZ` picks between two same-side edges that both contain `at`)"""
+        line = op.get("edgeZ")
+        if line is None:
+            return True
+        return abs((e["a"][1] if e["side"] in ("S", "N") else e["a"][0]) - line) < 0.02
+
+    ROOM_FLOOR = {  # kind → base, line colour, line spacing (m), mode
+        "honey-oak": ("#d9a866", "#bd8c4f", 0.25, "x"), "walnut": ("#8a6a4c", "#6f5238", 0.25, "x"), "cherry": ("#b56a4b", "#985238", 0.25, "x"),
+        "white-oak": ("#e6d5b8", "#cdb994", 0.25, "x"), "grey-wash": ("#c4c0b6", "#aaa69c", 0.25, "x"), "herringbone": ("#c9a77a", "#a8875a", 0.4, "grid"),
+        "chevron": ("#c9a77a", "#a8875a", 0.4, "grid"), "hex-tile": ("#e3e6e5", "#c3c9c8", 0.35, "grid"), "checker": ("#e9e7e2", "#3b3f45", 0.6, "grid"),
+        "terracotta": ("#c98a63", "#a86d49", 0.45, "grid"), "stone": ("#b9b3a6", "#9d978a", 0.7, "grid"), "pavers": ("#b7ada0", "#9a9084", 0.5, "grid"),
+        "slate": ("#7a8189", "#636a71", 0.6, "grid"), "carpet": ("#cfc4b4", "#bcb1a1", 0.0, "speckle"), "marble": ("#f1f0ec", "#dcdad2", 0.9, "grid"),
+    }
+
+    def draw_room_floors(self, lv):
+        y = lv["y"]
+        for room in lv.get("rooms", []):
+            b = room.get("bounds")
+            fl = room.get("floor")
+            kind = fl if isinstance(fl, str) else (fl or {}).get("kind") if isinstance(fl, dict) else None
+            if not kind:
+                for r in self.arch.get("rooms", []):
+                    if r.get("level") == lv["id"] and r.get("name") == room.get("name"):
+                        kind = (r.get("finish") or {}).get("floor")
+            if not kind or not isinstance(b, dict) or not all(k in b for k in ("x", "z", "w", "d")):
+                continue
+            base, line_c, spacing, mode = self.ROOM_FLOOR.get(kind) or FLOOR_STYLES.get(kind) or FLOOR_STYLES["oak"]
+            for r in lv["footprint"]:
+                x0, x1 = max(b["x"], r["x"]), min(b["x"] + b["w"], r["x"] + r["w"])
+                z0, z1 = max(b["z"], r["z"]), min(b["z"] + b["d"], r["z"] + r["d"])
+                if x1 - x0 < 0.05 or z1 - z0 < 0.05:
+                    continue
+                it = self.new((x0, x1, y, y + 0.006, z0, z1), prio=1, name=f"room-floor-{kind}")
+                P = self.ctx.P
+                yy = y + 0.006
+                add_poly(self.ctx, it, [P(x0, yy, z0), P(x1, yy, z0), P(x1, yy, z1), P(x0, yy, z1)], base, stroke=shade(base, -0.2), sw=0.5)
+                if mode in ("x", "grid") and spacing:
+                    g = z0 + spacing
+                    while g < z1 - 1e-6:
+                        add_line(self.ctx, it, P(x0, yy + 0.002, g), P(x1, yy + 0.002, g), line_c, sw=0.5, opacity=0.8, detail=True); g += spacing
+                if mode == "grid" and spacing:
+                    g = x0 + spacing
+                    while g < x1 - 1e-6:
+                        add_line(self.ctx, it, P(g, yy + 0.002, z0), P(g, yy + 0.002, z1), line_c, sw=0.5, opacity=0.8, detail=True); g += spacing
+
+    def arch_foundation(self, lv):
+        """a storey standing above grade with nothing under it: its foundation, in the plinth's stone"""
+        y = lv["y"]
+        if y <= 0.05:
+            return
+        for pl in self.arch.get("plinths", []):
+            if pl.get("level") != lv["id"] or not pl.get("foundation"):
+                continue
+            below = [o for o in self.levels if o["y"] < y - 0.3]
+            for r in lv["footprint"]:
+                if any(in_rect(r["x"] + r["w"] / 2, r["z"] + r["d"] / 2, q, -0.01) for q in (rr for o in below for rr in o["footprint"])):
+                    continue
+                it = self.new((r["x"], r["x"] + r["w"], 0, y - SLAB_T, r["z"], r["z"] + r["d"]), name="foundation")
+                box(self.ctx, it, r["x"], 0, r["z"], r["w"], y - SLAB_T, r["d"], triplet(pl.get("color", "#a39c90"), 0.1, 0.0, -0.2), stroke=shade(pl.get("color", "#a39c90"), -0.35), sw=0.6)
+
+    def _steps_rect(self, r, side, at, w, n, run):
+        L = n * run
+        if side == "S": return (at - w / 2, r["z"] + r["d"], w, L)
+        if side == "N": return (at - w / 2, r["z"] - L, w, L)
+        if side == "E": return (r["x"] + r["w"], at - w / 2, L, w)
+        return (r["x"] - L, at - w / 2, L, w)
+
+    def _steps(self, it, r, side, at, w, n, run, top, cols):
+        """n − 1 steps stepping down from a deck `top` high to grade, out of side `side`"""
+        rise = top / max(1, n)
+        sx, sz, sw_, sd = self._steps_rect(r, side, at, w, n, run)
+        for k in range(1, n):
+            hh = top - rise * k
+            if hh < 0.02:
+                break
+            if side == "S": X, Z, bw, bd = sx, sz + run * (k - 1), sw_, run
+            elif side == "N": X, Z, bw, bd = sx, sz + sd - run * k, sw_, run
+            elif side == "E": X, Z, bw, bd = sx + run * (k - 1), sz, run, sd
+            else: X, Z, bw, bd = sx + sw_ - run * k, sz, run, sd
+            box(self.ctx, it, X, 0, Z, bw, hh, bd, cols, stroke=shade(cols[2], -0.25), sw=0.5)
+
+    DECK_COLS = ("#b08f66", "#8e6f4c", "#6f5537")
+
+    def arch_porch(self, lv, ft):
+        r, fy, side = ft["rect"], ft["floorY"], ft["side"]
+        it = self.new((r["x"] - 0.1, r["x"] + r["w"] + 0.1, 0, fy + 1.2, r["z"] - 0.1, r["z"] + r["d"] + 0.1), name="porch")
+        box(self.ctx, it, r["x"], 0, r["z"], r["w"], fy, r["d"], self.DECK_COLS, stroke="#5a4328", sw=0.6)
+        st = ft.get("steps")
+        if st:
+            self._steps(it, r, side, st["at"], st["w"], st.get("n", 3), st.get("run", 0.3), fy, self.DECK_COLS)
+        size = ft.get("postSize", 0.16)
+        pc = triplet(mix(self.wall, "#ffffff", 0.5), 0.08, 0.0, -0.15)
+        ph = max(0.3, min(1.25, ft.get("eave", fy + 2.6) - fy - 0.22))
+        for px, pz in ft.get("posts", []):
+            box(self.ctx, it, px - size / 2, fy, pz - size / 2, size, ph, size, pc, stroke=shade(self.wall, -0.3), sw=0.5)
+        # rails along the deck's open edges (not the wall side), with a gap at the steps
+        rail = ft.get("rail")
+        if rail:
+            style = "glass" if rail == "glass" else "timber" if rail in ("timber", "metal") else "colonial"
+            x0, z0, x1, z1 = r["x"], r["z"], r["x"] + r["w"], r["z"] + r["d"]
+            edges = {"S": ((x0, z1), (x1, z1)), "N": ((x0, z0), (x1, z0)), "E": ((x1, z0), (x1, z1)), "W": ((x0, z0), (x0, z1))}
+            wall_side = {"S": "N", "N": "S", "E": "W", "W": "E"}[side]
+            for s_, (a, b) in edges.items():
+                if s_ == wall_side:
+                    continue
+                if s_ == side and st:
+                    horiz = s_ in ("S", "N")
+                    lo, hi = (a[0], b[0]) if horiz else (a[1], b[1])
+                    g0, g1 = max(lo, st["at"] - st["w"] / 2), min(hi, st["at"] + st["w"] / 2)
+                    segs = []
+                    if g0 - lo > 0.2: segs.append((lo, g0))
+                    if hi - g1 > 0.2: segs.append((g1, hi))
+                    for u0, u1 in segs:
+                        pa, pb = ((u0, a[1]), (u1, a[1])) if horiz else ((a[0], u0), (a[0], u1))
+                        self.draw_balustrade({"from": pa, "to": pb, "style": style}, fy, it)
+                else:
+                    self.draw_balustrade({"from": a, "to": b, "style": style}, fy, it)
+
+    def arch_bay(self, lv, ft):
+        pts = ft["outline"]
+        y, h = ft["y"], ft["h"]
+        xs = [p[0] for p in pts]; zs = [p[1] for p in pts]
+        it = self.new((min(xs), max(xs), y - SLAB_T, y + h, min(zs), max(zs)), name="bay")
+        P = self.ctx.P
+        cols = self.cut_cols(lv)
+        # the floor and its skirt down to grade
+        add_poly(self.ctx, it, [P(px, y, pz) for px, pz in pts], mix(FLOOR_STYLES.get(lv.get("floor", "oak"), FLOOR_STYLES["oak"])[0], "#ffffff", 0.05), stroke="#88623b", sw=0.6)
+        cx, cz = sum(xs) / len(xs), sum(zs) / len(zs)
+        for i in range(len(pts)):
+            a, b = pts[i], pts[(i + 1) % len(pts)]
+            if i == 0 or math.hypot(b[0] - a[0], b[1] - a[1]) < 0.15:
+                continue                       # the host wall's opening, and the corner returns
+            ex, ez = b[0] - a[0], b[1] - a[1]
+            nx, nz = ez, -ex
+            if (a[0] - cx) * nx + (a[1] - cz) * nz < 0:
+                nx, nz = -nx, -nz               # outward
+            norm = math.hypot(nx, nz) or 1.0
+            nx, nz = nx / norm, nz / norm
+            facing_cam = nx > 0.05 or nz > 0.05
+            hh = min(CUT_H, h) if facing_cam else h
+            face = cols[1] if abs(nz) >= abs(nx) else cols[2]
+            add_poly(self.ctx, it, [P(a[0], y, a[1]), P(b[0], y, b[1]), P(b[0], y + hh, b[1]), P(a[0], y + hh, a[1])], face, stroke=shade(face, -0.3), sw=0.6)
+            if facing_cam and hh < h:
+                add_poly(self.ctx, it, [P(a[0], y + hh * 0.35, a[1]), P(b[0], y + hh * 0.35, b[1]), P(b[0], y + hh * 0.8, b[1]), P(a[0], y + hh * 0.8, a[1])], "#bfe4f7", stroke="none", sw=0.4, opacity=0.5, detail=True)
+        # the skirt on the visible (S and E) faces
+        if y > 0.05:
+            for i in range(len(pts)):
+                a, b = pts[i], pts[(i + 1) % len(pts)]
+                if i == 0:
+                    continue
+                if max(a[1], b[1]) >= max(zs) - 1e-6 or max(a[0], b[0]) >= max(xs) - 1e-6:
+                    add_poly(self.ctx, it, [P(a[0], 0, a[1]), P(b[0], 0, b[1]), P(b[0], y, b[1]), P(a[0], y, a[1])], "#a39c90", stroke="#857f73", sw=0.5)
+
+    def arch_deck(self, lv, ft):
+        """balcony, terrace, loggia: a slab at the storey's floor (or on the roof under a terrace), its rails, a loggia's posts"""
+        r, y, t = ft["rect"], ft["y"], ft["type"]
+        it = self.new((r["x"], r["x"] + r["w"], y - 0.2, y + 1.0, r["z"], r["z"] + r["d"]), name=t)
+        thick = 0.06 if t == "terrace" else 0.2
+        box(self.ctx, it, r["x"], y - thick, r["z"], r["w"], thick, r["d"], self.DECK_COLS if t != "balcony" else ("#d9d4cb", "#c4bfb5", "#a8a399"), stroke="#5a4328", sw=0.6)
+        style = {"glass": "glass", "metal": "timber", "timber": "timber", "parapet": "colonial"}.get(ft.get("rail"), "glass")
+        if ft.get("rail") != "none":
+            for a, b in ft.get("rails", []):
+                self.draw_balustrade({"from": a, "to": b, "style": style}, y, it)
+        if t == "loggia" and ft.get("posts"):
+            for a, b in ft.get("rails", []):
+                for k in range(int(ft["posts"]) + 1):
+                    u = k / max(1, int(ft["posts"]))
+                    px, pz = a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u
+                    box(self.ctx, it, px - 0.1, y, pz - 0.1, 0.2, 1.2, 0.2, ("#f2efe9", "#e2ded6", "#c8c3ba"), stroke="#a8a399", sw=0.5)
+
+    def arch_chimney(self, lv, ft):
+        """an outside stack, from grade up as far as the cutaway shows"""
+        if not ft.get("outside"):
+            return
+        cx, cz = ft["at"]; w, d = ft.get("w", 0.75), ft.get("d", 0.6)
+        vis_top = self.hero_y + (self.hero_level["height"] if self.hero_level else 2.8)
+        top = min(ft.get("top", vis_top), vis_top)
+        col = {"stone": "#a39d92", "stucco": "#e7e2d8", "metal": "#9aa1a8"}.get(ft.get("material", "brick"), ft.get("color") or "#8a4a38")
+        if ft.get("color") and ft.get("material") not in ("stone", "stucco", "metal"):
+            col = ft["color"]
+        it = self.new((cx - w / 2 - 0.2, cx + w / 2 + 0.2, 0, top, cz - d / 2 - 0.05, cz + d / 2 + 0.05), name="chimney")
+        box(self.ctx, it, cx - w / 2 - 0.2, 0, cz - d / 2 - 0.05, w + 0.4, min(top, vis_top - 0.6), d + 0.1, triplet(col, 0.08, 0.0, -0.2), stroke=shade(col, -0.4), sw=0.6)
+
+    def arch_stoop(self, lv):
+        st = self.arch.get("stoop")
+        if not st or st.get("level") != lv["id"]:
+            return
+        L, S = st["landing"], st.get("stairs")
+        cols = ("#cfc9bc", "#b4ada1", "#978f83")
+        it = self.new((L["x"], L["x"] + L["w"], 0, st["top"] + 0.9, L["z"], L["z"] + L["d"]), name="stoop")
+        box(self.ctx, it, L["x"], 0, L["z"], L["w"], st["top"], L["d"], cols, stroke="#857f73", sw=0.6)
+        if S and st.get("steps", 0) > 0:
+            horiz = st["side"] in ("S", "N")
+            n, run = st["steps"], st.get("run", 0.3)
+            side = st["side"]
+            r_ = {"x": L["x"], "z": L["z"], "w": L["w"], "d": L["d"]}
+            at = L["x"] + L["w"] / 2 if horiz else L["z"] + L["d"] / 2
+            self._steps(it, r_, side, at, (L["w"] if horiz else L["d"]) - 0.1, n, run, st["top"], cols)
+
+    def draw_arch(self, lv):
+        """everything S2 adds to a storey that draw_level did not draw itself"""
+        if not self.arch:
+            return
+        self.arch_foundation(lv)
+        for ft in self.arch.get("features", []):
+            if ft.get("level") != lv["id"]:
+                continue
+            t = ft.get("type")
+            if t == "porch": self.arch_porch(lv, ft)
+            elif t == "bay": self.arch_bay(lv, ft)
+            elif t in ("balcony", "terrace", "loggia"): self.arch_deck(lv, ft)
+            elif t == "chimney": self.arch_chimney(lv, ft)
+        self.arch_stoop(lv)
+
+    def draw_arch_stairs(self, lv, st, idx, is_list):
+        """a flight from its plan (arch.stairs): each flight as a straight run, the landing as a slab"""
+        plan = None
+        for rec in self.arch.get("stairs", []):
+            if rec.get("from") == lv["id"] and rec.get("index") == idx:
+                plan = rec
+                break
+        to = self.level_by_id.get(st.get("to"))
+        total = (to["y"] - lv["y"]) if to else 2.8
+        typ = st.get("type", "timber")
+        if plan is None:
+            # no plan: a straight flight from the spec (a turning one needs plan.json)
+            if typ in ("L", "U"):
+                self.skipped.append(f"{typ} stair (no plan.json arch key: run scripts/build-house-plan.mts)")
+            x, z = st["at"]
+            style = st.get("style", "timber") if typ in ("L", "U") else typ
+            width = st.get("w", 1.2 if style == "colonial" else 1.1)
+            n = max(2, int(round(total / 0.2)))
+            cols = ("#f5f2eb", "#ffffff", "#6b3a2a") if style == "colonial" else ("#efe9df", "#d8d2c6", "#b9b2a4") if style == "closed" else ("#d8be9b", "#a88b68", "#88623b")
+            self.draw_straight_stairs(x, z, lv["y"], st.get("rot", 0), width, st.get("run", STAIR_RUN), total, n, cols, "stairs")
+            return
+        for fl in plan.get("flights", []):
+            style = fl.get("style", "timber")
+            cols = ("#f5f2eb", "#ffffff", "#6b3a2a") if style == "colonial" else ("#efe9df", "#d8d2c6", "#b9b2a4") if style == "closed" else ("#d8be9b", "#a88b68", "#88623b")
+            x, z = fl["at"]
+            self.draw_straight_stairs(x, z, fl["y0"], fl["rot"], fl["w"], fl["run"], fl["rise"], fl["steps"], cols, "stairs")
+        for ld in plan.get("landings", []):
+            it = self.new((ld["x"], ld["x"] + ld["w"], ld["y"] - 0.15, ld["y"], ld["z"], ld["z"] + ld["d"]), name="landing")
+            box(self.ctx, it, ld["x"], ld["y"] - 0.15, ld["z"], ld["w"], 0.15, ld["d"], ("#d8be9b", "#a88b68", "#88623b"), stroke="#5a4328", sw=0.6)
+
     # -- rooms & furniture --
     def draw_rooms(self, lv):
         hero = self.spec.get("hero", {})
@@ -1188,7 +1488,7 @@ class HouseRenderer:
     _catalog = None
     def item_from_catalog(self, it_, y):
         if HouseRenderer._catalog is None:
-            cp = HOUSES_DIR.parent / "house-catalog.json"
+            cp = ROOT / "content" / "house-catalog.json"
             try: HouseRenderer._catalog = json.loads(cp.read_text()).get("types", {}) if cp.exists() else {}
             except Exception: HouseRenderer._catalog = {}
         entry = HouseRenderer._catalog.get(it_.get("type"))
@@ -2002,12 +2302,23 @@ def load_specs(only=None):
 
 
 def main(argv=None):
+    global HOUSES_DIR, SCENES_DIR, SVG_DIR, LOTTIE_DIR, RENDERS_DIR, MANIFEST_PATH
     ap = argparse.ArgumentParser(description="HouseSpec v1 → Sims-style isometric cutaway SVG + Lottie")
+    ap.add_argument("--specs", metavar="DIR", help="read the specs (and their <id>.plan.json) from DIR instead of content/houses "
+                                                     "(scripts/test-twins.mts proves the twins on test/fixtures/houses this way)")
+    ap.add_argument("--out", metavar="DIR", help="write svg/, lottie-scenes/, renders/ and manifest.json under DIR instead of scenes/")
     ap.add_argument("--only", help="render a single house id")
     ap.add_argument("--png", action="store_true", help="also rasterise PNG previews with rsvg-convert")
     ap.add_argument("--png-dir", default=str(RENDERS_DIR), help="where --png previews go (default scenes/renders)")
     ap.add_argument("--no-manifest", action="store_true", help="do not touch scenes/manifest.json")
     args = ap.parse_args(argv)
+    if args.specs:
+        HOUSES_DIR = Path(args.specs).resolve()
+    if args.out:
+        SCENES_DIR = Path(args.out).resolve()
+        SVG_DIR, LOTTIE_DIR, RENDERS_DIR, MANIFEST_PATH = SCENES_DIR / "svg", SCENES_DIR / "lottie-scenes", SCENES_DIR / "renders", SCENES_DIR / "manifest.json"
+        if args.png_dir == str(ROOT / "scenes" / "renders"):
+            args.png_dir = str(RENDERS_DIR)
 
     specs = load_specs(args.only)
     if not specs:

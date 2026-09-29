@@ -81,6 +81,7 @@ export function createFacade(bctx) {
       }
       // the base course above the floor (a plinth at grade, or one taller than the foundation)
       const h = pl.h ?? (y > 0.05 ? 0 : 0.45);
+      (anchors.arch.plinths ||= []).push({ level: lv.id, h: Math.round(h * 1000) / 1000, foundation: y > 0.05, material: pl.material || 'stone', color: pl.color || '#a39c90' });
       if (h > 0.02) put(() => {
         const gg = group(`Plinth course (${lv.id})`, { category: 'Architecture' });
         for (const e of edges) {
@@ -153,7 +154,14 @@ export function createFacade(bctx) {
     // ---- the entry's stoop
     if (spec.entry && spec.entry.stoop && spec.entry.level === lv.id) {
       const ef = frames.find(f => f.side === spec.entry.side && Math.abs(f.op.at - spec.entry.at) < 1e-6);
-      if (ef) { const s = put(() => stoop({ spec, lv, y, f: ef, am }), ef.cx, ef.cz, 0, null, 'structure'); s.rotation.y = SIDE_ROT[ef.side]; }
+      if (ef) {
+        const s = put(() => stoop({ spec, lv, y, f: ef, am }), ef.cx, ef.cz, 0, null, 'structure'); s.rotation.y = SIDE_ROT[ef.side];
+        // the landing and its steps in plan (the plan twins draw them): a rect out of the door's wall face, and the run of steps beyond it
+        const st = spec.entry.stoop, depth = st.depth ?? 1.2, w = st.w ?? ef.w + 0.9, top = Math.max(0.12, y), n = st.steps ?? Math.max(0, Math.round(top / 0.17) - 0), run = 0.3;
+        const horiz = ef.side === 'S' || ef.side === 'N', nrm = ef.out, r3 = (v: number) => Math.round(v * 1000) / 1000;
+        const box = (d0: number, d1: number) => horiz ? { x: r3(ef.cx - w / 2), z: r3(Math.min(ef.cz + nrm[1] * d0, ef.cz + nrm[1] * d1)), w: r3(w), d: r3(Math.abs(d1 - d0)) } : { x: r3(Math.min(ef.cx + nrm[0] * d0, ef.cx + nrm[0] * d1)), z: r3(ef.cz - w / 2), w: r3(Math.abs(d1 - d0)), d: r3(w) };
+        anchors.arch.stoop = { level: lv.id, side: ef.side, at: spec.entry.at, top: r3(top), steps: n, run, rail: st.rail || false, landing: box(0, depth), stairs: n > 0 ? box(depth, depth + n * run) : null };
+      }
     }
   }
 

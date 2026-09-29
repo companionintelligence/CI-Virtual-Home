@@ -103,6 +103,16 @@ export function ownCeilingAt(room: any, flat: number, rise: number, x: number, z
   return null;
 }
 
+/** anchors.arch.rooms: one record per finished room — { level, name, bounds, finish: { floor, floorColor, floorY, floorOffset, walls,
+ *  wallColor, feature, ceiling } } — merged from whichever of floors(), walls() and the ceilings noted it first */
+export function noteRoom(anchors: any, lv: any, room: any, patch: Record<string, unknown>) {
+  const list = (anchors.arch.rooms ||= []);
+  let rec = list.find(r => r.level === lv.id && r.name === room.name);
+  if (!rec) { rec = { level: lv.id, name: room.name, bounds: room.bounds, finish: {} }; list.push(rec); }
+  for (const [k, v] of Object.entries(patch)) if (v !== undefined && v !== null) rec.finish[k] = v;
+  return rec;
+}
+
 export function createRoomFinish(bctx) {
   const { THREE, registerTrackedWall, registerCeiling, group } = bctx;
 
@@ -139,7 +149,7 @@ export function createRoomFinish(bctx) {
         }
         return gg;
       }, 0, 0, y + lift, null, 'floor');
-      (anchors.arch.rooms ||= []).push({ level: lv.id, name: room.name, floor: f ? f.kind : null, floorY: +(y + Math.max(0, off) + (off < 0 ? off : 0)).toFixed(3), bounds: room.bounds });
+      noteRoom(anchors, lv, room, { floor: f ? f.kind : undefined, floorColor: f ? f.color : undefined, floorY: +(y + Math.max(0, off) + (off < 0 ? off : 0)).toFixed(3), floorOffset: off || undefined });
       g.userData.room = room.name;
     });
     // sunken rooms: a pit floor and its sides (the slab over the pit is opened by arch-plan.ts slabOpenings)
@@ -174,7 +184,7 @@ export function createRoomFinish(bctx) {
         const top = Math.min(w.kind === 'partition' ? (w.height || H - 0.1) : H, ceilingAt ? ceilingAt((w.a0 + w.a1) / 2, w.side, w.line) - y : H) - 0.012;
         linerFor({ lv, y, room, w, kind, color, lower: spec2.lower, bandH: spec2.h, top, put, am });
       }
-      (anchors.arch.rooms ||= []).push({ level: lv.id, name: room.name, walls: spec2.kind || 'paint', feature: spec2.feature ? (spec2.feature.kind || spec2.kind) : null });
+      noteRoom(anchors, lv, room, { walls: spec2.kind || 'paint', wallColor: spec2.color, feature: spec2.feature ? (spec2.feature.kind || spec2.kind || 'paint') : undefined });
     });
   }
   // one wall's liner: panels on its face round the openings, from above the baseboard to under the ceiling

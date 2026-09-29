@@ -220,15 +220,22 @@ def union_area(rects, cell=0.1):
     return len(rasterise(rects, cell)[4]) * cell * cell
 
 
-def find_edge(edges, side, at):
+def find_edge(edges, side, at, line=None):
+    """the perimeter edge on `side` holding `at`; `line` (an opening's `edgeZ`: z for S/N, x for E/W) picks between
+    two same-side edges that both hold it"""
     horiz = side in ("S", "N")
+    first = None
     for e in edges:
         if e["side"] != side:
             continue
         lo, hi = (e["a"][0], e["b"][0]) if horiz else (e["a"][1], e["b"][1])
         if lo - 1e-6 <= at <= hi + 1e-6:
-            return e
-    return None
+            if line is None:
+                return e
+            if abs((e["a"][1] if horiz else e["a"][0]) - line) < 0.02:
+                return e
+            first = first or e
+    return first
 
 
 def footprint_bbox(rects):
@@ -583,7 +590,7 @@ SIDE_IN = {"S": (0, -1), "N": (0, 1), "E": (-1, 0), "W": (1, 0)}   # page-space 
 def draw_perimeter_opening(sh, edges, op, level_id, spec_id):
     side, at, typ = op.get("side"), op.get("at", 0), op.get("type", "window")
     W = float(op.get("w", 1.0))
-    e = find_edge(edges, side, at)
+    e = find_edge(edges, side, at, op.get("edgeZ"))
     if e is None:
         _unrendered.add(f"{spec_id}/{level_id}: opening {typ}@{side}:{at} has no perimeter edge on that side")
         return ""
@@ -923,6 +930,488 @@ def place_room_labels(labels):
 
 
 # -----------------------------------------------------------------------------
+# S2 (architecture): what the plan draws beyond walls, doors and furniture — room finishes, flights that turn or come
+# in arrays, styled partitions and partitions with several doorways, porches, bays, balconies, terraces, loggias, chimney
+# stacks, a stoop, towers, double-height rooms. The resolved geometry comes from <id>.plan.json's `arch` key (the
+# three.js builder wrote it: assets/plan-export/arch.ts); a spec with none of these fields draws exactly as before.
+# -----------------------------------------------------------------------------
+_arch_cache = {}
+
+
+def load_arch(spec_id):
+    """the plan.json `arch` key of a spec ({} when there is none)"""
+    if spec_id not in _arch_cache:
+        arch = {}
+        p = HOUSES_DIR / f"{spec_id}.plan.json"
+        if p.exists():
+            try:
+                arch = (json.loads(p.read_text(encoding="utf-8")) or {}).get("arch") or {}
+            except (json.JSONDecodeError, OSError):
+                arch = {}
+        _arch_cache[spec_id] = arch
+    return _arch_cache[spec_id]
+
+
+# room floor kind → the sheet's pattern (the first four exist in svg_header; the rest are added to the sheet when used)
+FLOOR_KIND_PATTERN = {
+    "oak": "woodParquet", "honey-oak": "woodParquet", "walnut": "woodParquet", "cherry": "woodParquet",
+    "white-oak": "woodParquet", "grey-wash": "woodParquet", "herringbone": "herringbonePlan", "chevron": "herringbonePlan",
+    "tile": "stoneTile", "hex-tile": "hexTilePlan", "checker": "checkerPlan", "terracotta": "stoneTile", "stone": "stoneTile",
+    "pavers": "stoneTile", "slate": "stoneTile", "concrete": "stoneTile", "marble": "stoneTile", "terrazzo": "stoneTile",
+    "phthalo-terrazzo": "stoneTile", "charcoal-terrazzo": "stoneTile", "carpet": "carpetPlan", "deck": "deckBoards",
+}
+EXTRA_PATTERNS = {
+    "herringbonePlan": ('<pattern id="herringbonePlan" width="40" height="40" patternUnits="userSpaceOnUse">'
+                        '<rect width="40" height="40" fill="#0d2433"/>'
+                        '<path d="M0 10 L20 0 L40 10 M0 20 L20 10 L40 20 M0 30 L20 20 L40 30 M0 40 L20 30 L40 40" fill="none" '
+                        'stroke="rgba(114, 221, 212, 0.2)" stroke-width="0.9"/></pattern>'),
+    "hexTilePlan": ('<pattern id="hexTilePlan" width="24" height="41.57" patternUnits="userSpaceOnUse">'
+                    '<rect width="24" height="41.57" fill="#0a1e2c"/>'
+                    '<path d="M12 0 L24 6.93 L24 20.78 L12 27.71 L0 20.78 L0 6.93 Z M12 27.71 L12 41.57 M0 20.78 L-12 27.71 M24 20.78 L36 27.71" '
+                    'fill="none" stroke="rgba(255, 255, 255, 0.11)" stroke-width="0.8"/></pattern>'),
+    "checkerPlan": ('<pattern id="checkerPlan" width="40" height="40" patternUnits="userSpaceOnUse">'
+                    '<rect width="40" height="40" fill="#0a1e2c"/><rect width="20" height="20" fill="rgba(255, 255, 255, 0.09)"/>'
+                    '<rect x="20" y="20" width="20" height="20" fill="rgba(255, 255, 255, 0.09)"/></pattern>'),
+    "carpetPlan": ('<pattern id="carpetPlan" width="8" height="8" patternUnits="userSpaceOnUse">'
+                   '<rect width="8" height="8" fill="#0c2231"/><circle cx="2" cy="2" r="0.7" fill="rgba(114, 221, 212, 0.26)"/>'
+                   '<circle cx="6" cy="6" r="0.7" fill="rgba(114, 221, 212, 0.26)"/></pattern>'),
+}
+
+
+def _rect_ok(b):
+    return isinstance(b, dict) and all(k in b for k in ("x", "z", "w", "d"))
+
+
+def _clip_rect(a, b):
+    x0, x1 = max(a["x"], b["x"]), min(a["x"] + a["w"], b["x"] + b["w"])
+    z0, z1 = max(a["z"], b["z"]), min(a["z"] + a["d"], b["z"] + b["d"])
+    return {"x": x0, "z": z0, "w": x1 - x0, "d": z1 - z0} if x1 - x0 > 0.02 and z1 - z0 > 0.02 else None
+
+
+def room_finish_of(arch, level_id, room):
+    for r in arch.get("rooms", []) or []:
+        if r.get("level") == level_id and r.get("name") == room.get("name"):
+            return r.get("finish") or {}
+    return {}
+
+
+def room_floor_kind(arch, level_id, room):
+    """the floor kind a room draws: its own `floor` (a name or {kind}), else what the builder resolved for it (defaults: 2)"""
+    fl = room.get("floor")
+    kind = fl if isinstance(fl, str) else (fl or {}).get("kind") if isinstance(fl, dict) else None
+    return kind or room_finish_of(arch, level_id, room).get("floor")
+
+
+def draw_room_floors(sh, level, rects, arch, level_id):
+    """per-room floor patterns over the slab fill, clipped to the room's bounds within the footprint; returns (svg, patterns used)"""
+    used, out = set(), []
+    for room in level.get("rooms", []) or []:
+        b = room.get("bounds")
+        kind = room_floor_kind(arch, level_id, room)
+        if not kind or not _rect_ok(b):
+            continue
+        pat = FLOOR_KIND_PATTERN.get(kind, "stoneTile")
+        used.add(pat)
+        for r in rects:
+            c = _clip_rect(b, r)
+            if c:
+                x, yy, w, h = sh.rect(c)
+                out.append(f'<rect class="room-floor room-floor-{esc(kind)}" x="{f(x)}" y="{f(yy)}" width="{f(w)}" height="{f(h)}" fill="url(#{pat})"/>')
+    if not out:
+        return "", used
+    return '<g class="room-floors">' + "".join(out) + "</g>", used
+
+
+def draw_room_marks(sh, level, arch, level_id):
+    """double-height rooms and floor offsets: a dotted outline and a caption in the room"""
+    out = []
+    for room in level.get("rooms", []) or []:
+        b = room.get("bounds")
+        if not _rect_ok(b):
+            continue
+        c = room.get("ceiling") if isinstance(room.get("ceiling"), dict) else {}
+        kind = c.get("kind") or room_finish_of(arch, level_id, room).get("ceiling")
+        off = room.get("floorOffset") or room_finish_of(arch, level_id, room).get("floorOffset") or 0
+        caps = []
+        if kind == "double":
+            caps.append("DOUBLE HEIGHT")
+        if off:
+            caps.append(f"{'PLATFORM' if off > 0 else 'SUNKEN'} {off:+.2f} m")
+        if not caps:
+            continue
+        x, yy, w, h = sh.rect(b)
+        out.append(f'<g class="room-mark"><rect x="{f(x + 3)}" y="{f(yy + 3)}" width="{f(w - 6)}" height="{f(h - 6)}" fill="none" stroke="{C_AMBER}" stroke-width="1" stroke-dasharray="1,5" opacity="0.7"/>'
+                   + svg_text(x + 9, yy + 15, " · ".join(caps), size=8.5, fill=C_AMBER, weight=700, anchor="start") + "</g>")
+    return "".join(out)
+
+
+def draw_slab_openings(sh, level_id, arch):
+    """the storey's slab openings beyond its own `voids`: a flight's autoVoid, the room below when it is double height"""
+    out = []
+    for rec in arch.get("voids", []) or []:
+        if rec.get("level") != level_id:
+            continue
+        for v in rec.get("auto", []) or []:
+            out.append(draw_void(sh, v))
+        for v in rec.get("double", []) or []:
+            out.append(draw_void(sh, v))
+            x, yy, w, h = sh.rect(v)
+            out.append(svg_text(x + w / 2, yy + 12, "OPEN TO BELOW", size=8, fill=C_GOLD, weight=700))
+    return "".join(out)
+
+
+# ---- stairs: a storey's flights as a list, L, U and closed ------------------------------------------------------------------
+V1_STAIRS = ("timber", "colonial", "spiral")
+
+
+def level_stair_list(level):
+    st = level.get("stairs")
+    if not st:
+        return []
+    return [x for x in (st if isinstance(st, list) else [st]) if isinstance(x, dict)]
+
+
+def _flight_svg(sh, fl, dash, going_down, label_extra=""):
+    """one flight from its plan (at, rot, w, run, steps): outline, treads, an arrow up (or down) the run"""
+    at, rot, w, run, steps = fl["at"], float(fl.get("rot", 0) or 0), float(fl["w"]), float(fl["run"]), max(2, int(fl.get("steps", 14)))
+    a = math.radians(rot)
+    fr = Frame(sh.pt(float(at[0]), float(at[1])), (math.cos(a), -math.sin(a)), (math.sin(a), math.cos(a)), sh.s)
+    out = [f'<polygon points="{fr.poly([(-w / 2, 0), (w / 2, 0), (w / 2, run), (-w / 2, run)])}" fill="rgba(20, 52, 77, 0.45)" stroke="{C_LINE}" stroke-width="1.4"{dash}/>']
+    for i in range(1, steps):
+        v = run * i / steps
+        out.append(fr.line(-w / 2, v, w / 2, v, width=0.8, opacity=0.8))
+    return "".join(out), fr
+
+
+def _arrow(fr, a0, a1, label):
+    out = [fr.line(0, a0, 0, a1, stroke=C_AMBER, width=1.6)]
+    sgn = 1 if a1 > a0 else -1
+    out.append(f'<polygon points="{fr.poly([(0, a1 + sgn * 0.3), (-0.16, a1), (0.16, a1)])}" fill="{C_AMBER}"/>')
+    lx, ly = fr.pt(0, a0 - sgn * 0.15)
+    out.append(svg_text(lx, ly + 3.5, label, size=9.5, fill=C_AMBER, weight=800))
+    return "".join(out)
+
+
+def draw_flight_run(sh, plan, dash, going_down, typ, level_id):
+    """a stair from its resolved plan (plan.json arch.stairs): every flight and the landing, and the arrow along its walking line"""
+    op = 0.7 if going_down else 1.0
+    out = [f'<g class="stairs stairs-{esc(typ)} {"stairs-dn" if going_down else "stairs-up"} stairs-{esc(plan.get("shape", "straight"))}" opacity="{op}">']
+    flights = plan.get("flights", [])
+    outline = plan.get("outline", [])
+    # the landing (an L or U stair's second outline polygon) under the treads
+    if plan.get("landings") and len(outline) >= 3:
+        out.append(f'<polygon class="stair-landing" points="{_poly_pts(sh, outline[1])}" fill="rgba(20, 52, 77, 0.6)" stroke="{C_LINE}" stroke-width="1.4"{dash}/>')
+    for fl in flights:
+        svg, _ = _flight_svg(sh, fl, dash, going_down)
+        out.append(svg)
+    # the walking line: a polyline first step → last, with an arrowhead at the end that leads on
+    path = plan.get("path", [])
+    pts = [sh.pt(p[0], p[2]) for p in path]
+    if going_down:
+        pts = pts[::-1]
+    if len(pts) >= 2:
+        out.append('<polyline points="' + " ".join(f"{f(x)},{f(y)}" for x, y in pts) + f'" fill="none" stroke="{C_AMBER}" stroke-width="1.6"/>')
+        (x0, y0), (x1, y1) = pts[-2], pts[-1]
+        ang = math.atan2(y1 - y0, x1 - x0)
+        hl = 8.0
+        tip = (x1 + math.cos(ang) * hl * 0.6, y1 + math.sin(ang) * hl * 0.6)
+        l = (x1 - math.cos(ang) * hl * 0.4 + math.sin(ang) * hl * 0.5, y1 - math.sin(ang) * hl * 0.4 - math.cos(ang) * hl * 0.5)
+        r = (x1 - math.cos(ang) * hl * 0.4 - math.sin(ang) * hl * 0.5, y1 - math.sin(ang) * hl * 0.4 + math.cos(ang) * hl * 0.5)
+        out.append(f'<polygon points="{f(tip[0])},{f(tip[1])} {f(l[0])},{f(l[1])} {f(r[0])},{f(r[1])}" fill="{C_AMBER}"/>')
+        out.append(svg_text(pts[0][0], pts[0][1] + 3.5, "DN" if going_down else "UP", size=9.5, fill=C_AMBER, weight=800))
+    out.append("</g>")
+    return "\n".join(out)
+
+
+def draw_level_stairs(sh, level, level_id, spec, arch, going_down=False, only_to=None):
+    """every flight on a storey (or, going_down, the flights of the storeys below that arrive on it); a lone timber,
+    colonial or spiral flight is v1's drawing, everything else comes from its plan"""
+    out = []
+    levels = spec.get("levels", []) or []
+    by_id = {l.get("id"): l for l in levels}
+    src = [level] if not going_down else [o for o in levels if o is not level]
+    for lv in src:
+        raw = lv.get("stairs")
+        for idx, st in enumerate(level_stair_list(lv)):
+            if going_down and st.get("to") != level_id:
+                continue
+            typ = st.get("type", "timber")
+            if not isinstance(raw, list) and typ in V1_STAIRS:
+                out.append(draw_stairs(sh, st, level_id, spec.get("id", "house"), going_down=going_down))
+                continue
+            plan = None
+            for rec in arch.get("stairs", []) or []:
+                if rec.get("from") == lv.get("id") and rec.get("index") == idx:
+                    plan = rec
+                    break
+            dash = ' stroke-dasharray="4,3"' if going_down else ""
+            if plan and plan.get("flights"):
+                out.append(draw_flight_run(sh, plan, dash, going_down, typ, level_id))
+                continue
+            # no plan: a straight flight from the spec; a turning one cannot be drawn without it
+            at = st.get("at")
+            if not (isinstance(at, list) and len(at) >= 2):
+                _unrendered.add(f"{spec.get('id', 'house')}/{level_id}: stairs without at")
+                continue
+            if typ in ("L", "U"):
+                _unrendered.add(f"{spec.get('id', 'house')}/{level_id}: {typ} stair needs {spec.get('id')}.plan.json (pnpm run plans) — drawn as its first flight")
+            to = by_id.get(st.get("to"), {})
+            rise = float(to.get("y", 0) or 0) - float(lv.get("y", 0) or 0) if to else 2.8
+            style = st.get("style", "timber") if typ in ("L", "U") else typ
+            w = float(st.get("w") or (1.2 if style == "colonial" else 1.1))
+            run = float(st.get("run") or STAIR_DIMS["timber"][1])
+            steps = max(2, int(round(rise / 0.2)))
+            svg, fr = _flight_svg(sh, {"at": at, "rot": st.get("rot", 0), "w": w, "run": run, "steps": steps}, dash, going_down)
+            op = 0.7 if going_down else 1.0
+            a0, a1 = (run - 0.35, 0.45) if going_down else (0.35, run - 0.45)
+            out.append(f'<g class="stairs stairs-{esc(typ)} {"stairs-dn" if going_down else "stairs-up"}" opacity="{op}">{svg}'
+                       + _arrow(fr, a0, a1, "DN" if going_down else "UP") + "</g>")
+    return "\n".join(out)
+
+
+# ---- partitions: styles and several doorways ----------------------------------------------------------------------------------
+def partition_doors(p):
+    """[(centre distance from `from`, width)] — `door`/`doorW` and every `doors[]` entry, in order along the wall"""
+    doors = []
+    if p.get("door") is not None and float(p.get("doorW", 0.9)) > 0:
+        doors.append((float(p["door"]), float(p.get("doorW", 0.9))))
+    for d in p.get("doors", []) or []:
+        if isinstance(d, dict) and d.get("at") is not None:
+            doors.append((float(d["at"]), float(d.get("w", p.get("doorW", 0.9)))))
+    return sorted(doors)
+
+
+def draw_partitions_s2(sh, partitions, level_id, spec_id):
+    """partitions with a style (half, posts, slats, glass, arch, bookcase) or several doorways; solid single-door partitions
+    are draw_partitions' own"""
+    t = sh.int_t()
+    out = []
+    solid_segs, swings = [], []
+    for p in partitions:
+        fr_, to_ = p.get("from"), p.get("to")
+        if not (isinstance(fr_, list) and isinstance(to_, list) and len(fr_) >= 2 and len(to_) >= 2):
+            _unrendered.add(f"{spec_id}/{level_id}: partition without from/to")
+            continue
+        dx, dz = to_[0] - fr_[0], to_[1] - fr_[1]
+        L = math.hypot(dx, dz)
+        if L < 1e-6:
+            continue
+        ux, uz = dx / L, dz / L
+        style = p.get("style") or "solid"
+        doors = partition_doors(p)
+        # the wall's spans between doorways
+        cuts, pos = [], 0.0
+        half_cap = t / 2 / sh.s
+        for c, w in doors:
+            d0, d1 = max(0.0, c - w / 2), min(L, c + w / 2)
+            if d0 - pos > 0.02:
+                cuts.append((pos, d0))
+            pos = max(pos, d1)
+        if L - pos > 0.02:
+            cuts.append((pos, L))
+        pt = lambda d: (fr_[0] + ux * d, fr_[1] + uz * d)
+        for a, b in cuts:
+            A, B = sh.pt(*pt(a)), sh.pt(*pt(b))
+            if style in ("solid", "arch"):
+                pa = pt(a + (half_cap if a > 0 else 0)); pb = pt(b - (half_cap if b < L else 0))
+                solid_segs.append((*sh.pt(*pa), *sh.pt(*pb)))
+            elif style == "half":
+                out.append(svg_line(*A, *B, stroke=C_INT, width=t * 0.55, cap="butt"))
+                out.append(svg_line(*A, *B, stroke=C_INT_FILL, width=max(1.5, t * 0.3), cap="butt"))
+            elif style == "glass":
+                nx, ny = -uz, ux
+                for k in (-1, 1):
+                    out.append(svg_line(A[0] + nx * k * 1.6, A[1] + ny * k * 1.6, B[0] + nx * k * 1.6, B[1] + ny * k * 1.6, stroke=C_LINE, width=1.0, opacity=0.9))
+                out.append(svg_line(*A, *B, stroke="rgba(114, 221, 212, 0.2)", width=t * 0.5))
+            elif style in ("posts", "slats"):
+                step = 0.6 if style == "posts" else 0.14
+                n = max(1, int((b - a) / step))
+                for i in range(n + 1):
+                    px, py = sh.pt(*pt(a + (b - a) * i / n))
+                    if style == "posts":
+                        out.append(f'<rect x="{f(px - 2.5)}" y="{f(py - 2.5)}" width="5" height="5" fill="{C_INT_FILL}" stroke="{C_INT}" stroke-width="1"/>')
+                    else:
+                        nx, ny = -uz, ux
+                        out.append(svg_line(px - nx * t * 0.4, py - ny * t * 0.4, px + nx * t * 0.4, py + ny * t * 0.4, stroke=C_INT, width=1.0))
+                out.append(svg_line(*A, *B, stroke=C_INT, width=0.8, opacity=0.6))
+            elif style == "bookcase":
+                out.append(svg_line(*A, *B, stroke=C_GOLD, width=t * 1.7, cap="butt", opacity=0.55))
+                out.append(svg_line(*A, *B, stroke=C_INT_FILL, width=t * 1.1, cap="butt"))
+                out.append(svg_line(*A, *B, stroke=C_GOLD, width=0.8, opacity=0.9, dash="2,3"))
+            else:
+                _unrendered.add(f"{spec_id}/{level_id}: partition style '{style}' — drawn as a solid wall")
+                solid_segs.append((*A, *B))
+        # doorways: a swing (hinged leaf) for a leaf door; an archway / opening draws the jambs and, for `arch`, a round head
+        for c, w in doors:
+            d0, d1 = max(0.0, c - w / 2), min(L, c + w / 2)
+            hinge = sh.pt(*pt(d0))
+            fr = Frame(hinge, (ux, uz), (-uz, ux), sh.s)
+            if style in ("arch", "glass", "half") or (style in ("posts", "slats", "bookcase")):
+                # no leaf: the jambs and the arch's threshold arc
+                for u in (0, d1 - d0):
+                    out.append(fr.line(u, 0, u, 0, dv0=-t / 2, dv1=t / 2, stroke=C_INT, width=1.6))
+                if style == "arch":
+                    r = (d1 - d0) / 2 * sh.s
+                    a = sh.pt(*pt(d0)); b = sh.pt(*pt(d1))
+                    out.append(f'<path d="M {f(a[0])} {f(a[1])} A {f(r)} {f(r)} 0 0 {fr.sweep(0)} {f(b[0])} {f(b[1])}" fill="none" stroke="{C_INT}" stroke-dasharray="2,3" stroke-width="1"/>')
+            else:
+                swings.append(draw_door_swing(fr, d1 - d0, t))
+    if solid_segs:
+        out.insert(0, draw_wall_runs(solid_segs, t, exterior=False))
+    out.extend(swings)
+    return "\n".join(out)
+
+
+# ---- features from the builder's plan ---------------------------------------------------------------------------------------
+def _poly_pts(sh, pts):
+    return " ".join(f"{f(x)},{f(y)}" for x, y in (sh.pt(px, pz) for px, pz in pts))
+
+
+def _rect_pts(r):
+    return [(r["x"], r["z"]), (r["x"] + r["w"], r["z"]), (r["x"] + r["w"], r["z"] + r["d"]), (r["x"], r["z"] + r["d"])]
+
+
+def _steps_rect(rect, side, at, w, n, run):
+    """the run of steps beyond a deck's front edge (side = the way out), centred on `at`"""
+    L = n * run
+    if side == "S":
+        return {"x": at - w / 2, "z": rect["z"] + rect["d"], "w": w, "d": L}
+    if side == "N":
+        return {"x": at - w / 2, "z": rect["z"] - L, "w": w, "d": L}
+    if side == "E":
+        return {"x": rect["x"] + rect["w"], "z": at - w / 2, "w": L, "d": w}
+    return {"x": rect["x"] - L, "z": at - w / 2, "w": L, "d": w}
+
+
+def _steps_lines(sh, r, side, n):
+    out = []
+    for i in range(1, n):
+        k = i / n
+        if side in ("S", "N"):
+            z = r["z"] + (k if side == "S" else 1 - k) * r["d"]
+            out.append(svg_line(*sh.pt(r["x"], z), *sh.pt(r["x"] + r["w"], z), width=0.8, opacity=0.8))
+        else:
+            x = r["x"] + (k if side == "E" else 1 - k) * r["w"]
+            out.append(svg_line(*sh.pt(x, r["z"]), *sh.pt(x, r["z"] + r["d"]), width=0.8, opacity=0.8))
+    return "".join(out)
+
+
+RAIL_STROKE = {"glass": C_LINE, "metal": C_WHITE, "spindle": C_GOLD, "colonial": C_GOLD, "timber": C_GOLD, "parapet": C_LINE}
+
+
+def draw_arch_features(sh, level_id, arch):
+    """porches, bays, balconies, terraces, loggias, fireplaces, built-ins and chimney stacks on this storey's sheet"""
+    out = []
+    for ft in arch.get("features", []) or []:
+        if ft.get("level") != level_id:
+            continue
+        t = ft.get("type")
+        g = [f'<g class="arch-feature arch-{esc(t)}">']
+        if t == "porch" and _rect_ok(ft.get("rect")):
+            r = ft["rect"]
+            g.append(f'<polygon points="{_poly_pts(sh, _rect_pts(r))}" fill="url(#deckBoards)" fill-opacity="0.4" stroke="{C_LINE}" stroke-width="1.2" stroke-dasharray="6,4"/>')
+            st = ft.get("steps")
+            if st:
+                sr = _steps_rect(r, ft["side"], st["at"], st["w"], st["n"], st.get("run", 0.3))
+                g.append(f'<polygon points="{_poly_pts(sh, _rect_pts(sr))}" fill="rgba(20, 52, 77, 0.45)" stroke="{C_LINE}" stroke-width="1.1"/>')
+                g.append(_steps_lines(sh, sr, ft["side"], st["n"]))
+            ro = ft.get("roofOver")
+            if _rect_ok(ro):
+                g.append(f'<polygon points="{_poly_pts(sh, _rect_pts(ro))}" fill="none" stroke="{C_MUTED}" stroke-width="0.9" stroke-dasharray="10,3,2,3" opacity="0.7"/>')
+            for px, pz in ft.get("posts", []) or []:
+                sx, sy = sh.pt(px, pz)
+                rr = max(2.5, float(ft.get("postSize", 0.16)) / 2 * sh.s)
+                g.append(f'<circle cx="{f(sx)}" cy="{f(sy)}" r="{f(rr)}" fill="#081c2d" stroke="{C_LINE}" stroke-width="1.2"/>')
+            cx, cy = sh.pt(r["x"] + r["w"] / 2, r["z"] + r["d"] / 2)
+            g.append(svg_text(cx, cy + 3.5, "PORCH" + (f" · {ft['roof'].upper()} ROOF" if ft.get("roof") not in (None, "none") else ""), size=8.5, fill=C_MUTED, weight=700))
+        elif t == "bay" and ft.get("outline"):
+            g.append(f'<polygon points="{_poly_pts(sh, ft["outline"])}" fill="rgba(20, 52, 77, 0.35)" stroke="{C_LINE}" stroke-width="{f(max(3.0, sh.ext_t() * 0.4))}" stroke-linejoin="miter"/>')
+            xs = [p[0] for p in ft["outline"]]; zs = [p[1] for p in ft["outline"]]
+            cx, cy = sh.pt((min(xs) + max(xs)) / 2, (min(zs) + max(zs)) / 2)
+            g.append(svg_text(cx, cy + 3, f"{ft.get('form', 'box').upper()} BAY", size=7.5, fill=C_MUTED, weight=700))
+        elif t in ("balcony", "terrace", "loggia") and _rect_ok(ft.get("rect")):
+            r = ft["rect"]
+            g.append(f'<polygon points="{_poly_pts(sh, _rect_pts(r))}" fill="url(#deckBoards)" fill-opacity="0.35" stroke="{C_LINE}" stroke-width="1.1" stroke-dasharray="6,4"/>')
+            col = RAIL_STROKE.get(ft.get("rail"), C_LINE)
+            for a, b in ft.get("rails", []) or []:
+                g.append(svg_line(*sh.pt(*a), *sh.pt(*b), stroke=col, width=2.4, cap="round", opacity=0.95))
+                g.append(svg_line(*sh.pt(*a), *sh.pt(*b), stroke=C_WHITE, width=0.6, cap="round", opacity=0.55))
+            if t == "loggia" and ft.get("posts"):
+                for a, b in ft.get("rails", []) or []:
+                    for k in range(int(ft["posts"]) + 1):
+                        u = k / max(1, int(ft["posts"]))
+                        sx, sy = sh.pt(a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u)
+                        g.append(f'<rect x="{f(sx - 2.5)}" y="{f(sy - 2.5)}" width="5" height="5" fill="#081c2d" stroke="{C_LINE}" stroke-width="1"/>')
+            cx, cy = sh.pt(r["x"] + r["w"] / 2, r["z"] + r["d"] / 2)
+            g.append(svg_text(cx, cy + 3.5, t.upper(), size=8.5, fill=C_MUTED, weight=700))
+        elif t == "chimney":
+            w, d = float(ft.get("w", 0.75)), float(ft.get("d", 0.6))
+            cx, cz = ft["at"]
+            r = {"x": cx - w / 2, "z": cz - d / 2, "w": w, "d": d}
+            dash = "" if ft.get("outside") else ' stroke-dasharray="3,3"'
+            g.append(f'<polygon points="{_poly_pts(sh, _rect_pts(r))}" fill="rgba(200, 157, 85, 0.18)" stroke="{C_GOLD}" stroke-width="1.4"{dash}/>')
+            a, b, c2, d2 = (sh.pt(*p) for p in _rect_pts(r))
+            g.append(svg_line(*a, *c2, stroke=C_GOLD, width=0.9, opacity=0.8) + svg_line(*b, *d2, stroke=C_GOLD, width=0.9, opacity=0.8))
+            sx, sy = sh.pt(cx, cz)
+            g.append(svg_text(sx, sy - max(6.0, d / 2 * sh.s) - 3, "FLUE", size=7.5, fill=C_GOLD, weight=700))
+        elif t == "fireplace":
+            w = float(ft.get("w", 1.8)); rot = float(ft.get("rot", 0) or 0)
+            bx, bz = ft.get("back") or ft["at"]
+            g.append(item_rect_svg(sh, ft["at"][0], ft["at"][1], w + 0.3, 0.55, rot, cls="hearth", fill="rgba(200, 157, 85, 0.16)", stroke=C_GOLD, width=1.1))
+            g.append(item_rect_svg(sh, bx, bz, w, 0.42, rot, cls="breast", fill="rgba(20, 52, 77, 0.6)", stroke=C_LINE, width=1.2))
+            sx, sy = sh.pt(ft["at"][0], ft["at"][1])
+            g.append(svg_text(sx, sy + 3, "FIRE", size=7.5, fill=C_GOLD, weight=700))
+        elif t == "builtin":
+            fr_, to_ = ft.get("from"), ft.get("to")
+            if isinstance(fr_, list) and isinstance(to_, list):
+                dx, dz = to_[0] - fr_[0], to_[1] - fr_[1]
+                L = math.hypot(dx, dz)
+                if L > 0.3:
+                    ux, uz = dx / L, dz / L
+                    nx, nz = (uz, -ux) if ft.get("face", "left") == "left" else (-uz, ux)
+                    dep = float(ft.get("d", 0.38)); off = 0.1
+                    q = [(fr_[0] + nx * off, fr_[1] + nz * off), (to_[0] + nx * off, to_[1] + nz * off), (to_[0] + nx * (off + dep), to_[1] + nz * (off + dep)), (fr_[0] + nx * (off + dep), fr_[1] + nz * (off + dep))]
+                    g.append(f'<polygon points="{_poly_pts(sh, q)}" fill="rgba(200, 157, 85, 0.14)" stroke="{C_GOLD}" stroke-width="1"/>')
+                    n = max(2, int(L / 0.6))
+                    for i in range(1, n):
+                        u = i / n
+                        a = (q[0][0] + (q[1][0] - q[0][0]) * u, q[0][1] + (q[1][1] - q[0][1]) * u)
+                        b = (q[3][0] + (q[2][0] - q[3][0]) * u, q[3][1] + (q[2][1] - q[3][1]) * u)
+                        g.append(svg_line(*sh.pt(*a), *sh.pt(*b), stroke=C_GOLD, width=0.6, opacity=0.7))
+        else:
+            continue
+        g.append("</g>")
+        out.append("".join(g))
+    return "\n".join(out)
+
+
+def draw_arch_stoop(sh, level_id, arch):
+    st = arch.get("stoop")
+    if not st or st.get("level") != level_id or not _rect_ok(st.get("landing")):
+        return ""
+    out = ['<g class="arch-stoop">']
+    out.append(f'<polygon points="{_poly_pts(sh, _rect_pts(st["landing"]))}" fill="url(#stoneTile)" stroke="{C_LINE}" stroke-width="1.2"/>')
+    if _rect_ok(st.get("stairs")):
+        out.append(f'<polygon points="{_poly_pts(sh, _rect_pts(st["stairs"]))}" fill="rgba(20, 52, 77, 0.45)" stroke="{C_LINE}" stroke-width="1.1"/>')
+        out.append(_steps_lines(sh, st["stairs"], st["side"], max(2, int(st.get("steps", 3)))))
+    lx, ly = sh.pt(st["landing"]["x"] + st["landing"]["w"] / 2, st["landing"]["z"] + st["landing"]["d"] / 2)
+    out.append(svg_text(lx, ly + 3, "STOOP", size=7.5, fill=C_MUTED, weight=700))
+    out.append("</g>")
+    return "".join(out)
+
+
+def draw_volume_marks(sh, level_id, arch):
+    out = []
+    for v in arch.get("volumes", []) or []:
+        if v.get("level") != level_id or not _rect_ok(v.get("rect")):
+            continue
+        x, yy, w, h = sh.rect(v["rect"])
+        out.append(f'<g class="arch-volume"><rect x="{f(x)}" y="{f(yy)}" width="{f(w)}" height="{f(h)}" fill="none" stroke="{C_GOLD}" stroke-width="1" stroke-dasharray="2,3" opacity="0.8"/>'
+                   + svg_text(x + 5, yy + h - 6, f"H {v['h']:g} m", size=8, fill=C_GOLD, weight=700, anchor="start") + "</g>")
+    return "".join(out)
+
+
+# -----------------------------------------------------------------------------
 # level sheet
 # -----------------------------------------------------------------------------
 def render_level(spec, level, n, sh=None, view_mode="lot"):
@@ -978,10 +1467,22 @@ def render_level(spec, level, n, sh=None, view_mode="lot"):
         svg.append(f'<rect x="{f(x)}" y="{f(yy)}" width="{f(w)}" height="{f(h)}" fill="url(#{pat})"/>')
     svg.append("</g>")
 
+    # S2: the builder's resolved architecture (plan.json `arch`) — per-room floors over the slab fill
+    arch = load_arch(spec_id)
+    room_floors_svg, used_pats = draw_room_floors(sh, level, rects, arch, level_id)
+    if room_floors_svg:
+        extra_defs = "".join(EXTRA_PATTERNS[p_] for p_ in sorted(used_pats) if p_ in EXTRA_PATTERNS)
+        if extra_defs:
+            svg.append("<defs>" + extra_defs + "</defs>")
+        svg.append(room_floors_svg)
+
     # voids (slab cut-outs)
     for v in level.get("voids", []) or []:
         if all(k in v for k in ("x", "z", "w", "d")):
             svg.append(draw_void(sh, v))
+    slab_svg = draw_slab_openings(sh, level_id, arch)
+    if slab_svg:
+        svg.append(slab_svg)
 
     # room zoning outlines (faint) + furniture
     rooms = level.get("rooms", []) or []
@@ -999,20 +1500,38 @@ def render_level(spec, level, n, sh=None, view_mode="lot"):
             svg.append(draw_item(sh, it, level_id, spec_id))
     svg.append("</g>")
 
-    # stairs: UP on this level; DN where a lower level's stairs arrive here
-    if level.get("stairs"):
-        svg.append(draw_stairs(sh, level["stairs"], level_id, spec_id, going_down=False))
-    for other in spec.get("levels", []) or []:
-        st = other.get("stairs")
-        if other is not level and isinstance(st, dict) and st.get("to") == level_id:
-            svg.append(draw_stairs(sh, st, level_id, spec_id, going_down=True))
+    # S2: room marks, features (porch, bay, balcony, terrace, loggia, chimney, fireplace, built-ins), the stoop, towers
+    for extra_svg in (draw_room_marks(sh, level, arch, level_id), draw_arch_features(sh, level_id, arch),
+                      draw_arch_stoop(sh, level_id, arch), draw_volume_marks(sh, level_id, arch)):
+        if extra_svg:
+            svg.append(extra_svg)
+
+    # stairs: UP on this level; DN where a lower level's stairs arrive here. A lone timber, colonial or spiral flight per
+    # storey is v1's drawing; a list, L, U or closed flights (S2) are drawn from their plan
+    levels_ = spec.get("levels", []) or []
+    if any(isinstance(l_.get("stairs"), list) or (isinstance(l_.get("stairs"), dict) and l_["stairs"].get("type", "timber") not in V1_STAIRS) for l_ in levels_):
+        svg.append(draw_level_stairs(sh, level, level_id, spec, arch, going_down=False))
+        svg.append(draw_level_stairs(sh, level, level_id, spec, arch, going_down=True))
+    else:
+        if level.get("stairs"):
+            svg.append(draw_stairs(sh, level["stairs"], level_id, spec_id, going_down=False))
+        for other in spec.get("levels", []) or []:
+            st = other.get("stairs")
+            if other is not level and isinstance(st, dict) and st.get("to") == level_id:
+                svg.append(draw_stairs(sh, st, level_id, spec_id, going_down=True))
 
     # balustrades
     for b in level.get("balustrades", []) or []:
         svg.append(draw_balustrade(sh, b))
 
-    # interior partitions (with door gaps + swings)
-    svg.append(draw_partitions(sh, level.get("partitions", []) or [], level_id, spec_id))
+    # interior partitions (with door gaps + swings); S2's styled partitions and partitions with several doorways are drawn apart
+    parts_ = level.get("partitions", []) or []
+    fancy = [p_ for p_ in parts_ if isinstance(p_, dict) and ((p_.get("style") or "solid") != "solid" or p_.get("doors"))]
+    if fancy:
+        svg.append(draw_partitions(sh, [p_ for p_ in parts_ if p_ not in fancy], level_id, spec_id))
+        svg.append(draw_partitions_s2(sh, fancy, level_id, spec_id))
+    else:
+        svg.append(draw_partitions(sh, parts_, level_id, spec_id))
 
     # perimeter walls from the footprint union, then openings cut into them
     t_ext = sh.ext_t()
@@ -1143,13 +1662,21 @@ def export_png(svg_path, png_path):
 
 
 def main(argv=None):
+    global HOUSES_DIR, FLOORPLAN_DIR
     ap = argparse.ArgumentParser(description="HouseSpec v1 → CAD blueprint floor-plan sheets + floorplans.json")
+    ap.add_argument("--specs", metavar="DIR", help="read the specs (and their <id>.plan.json) from DIR instead of content/houses "
+                                                     "(scripts/test-twins.mts proves the twins on test/fixtures/houses this way)")
+    ap.add_argument("--out", metavar="DIR", help="write the sheets and floorplans.json to DIR instead of scenes/floorplans")
     ap.add_argument("--only", metavar="ID", help="render sheets for this spec id only (floorplans.json still lists every spec)")
     ap.add_argument("--dry-run", action="store_true", help="report what would be generated; write nothing")
     ap.add_argument("--no-png", action="store_true", help="skip PNG export (rsvg-convert)")
     ap.add_argument("--fit", choices=("auto", "lot", "content"), default="auto",
                     help="sheet framing: lot = whole lot; content = building + site outlines; auto = lot while ≥%g px/m else content" % MIN_LEGIBLE_SCALE)
     args = ap.parse_args(argv)
+    if args.specs:
+        HOUSES_DIR = Path(args.specs).resolve()
+    if args.out:
+        FLOORPLAN_DIR = Path(args.out).resolve()
 
     specs = load_specs()
     if not specs:

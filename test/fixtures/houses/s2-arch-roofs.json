@@ -5,7 +5,7 @@
  "author": "ci-virtual-home",
  "source": "test fixture (plan S2 task 4, Completeness B): roof finishes, per-end hips, glazed and open gables, saltbox pitches, a catslide, a planted roof, skylights, dormer styles, chimneys on any roof, a tower cut through a roof",
  "style": "Four small volumes, each roof a different piece of the vocabulary",
- "emoji": "🧪",
+ "emoji": "\ud83e\uddea",
  "fixture": {
   "note": "catslide (sweep + per-face pitch), saltbox with a hipped end and a glazed gable, tower through a clipped roof (per-rect h), planted meadow flat roof with a flue, open gable with seam roofing and no gutters, shed and eyebrow dormers, skylights, slate/shake/seam finishes, trim and soffit colours"
  },
@@ -74,27 +74,30 @@
    "openings": [
     {
      "side": "S",
-     "at": -8.5,
+     "at": -4.5,
      "type": "door",
-     "w": 1.0,
+     "w": 1,
      "h": 2.1,
-     "style": "entry"
+     "style": "entry",
+     "edgeZ": 3
     },
     {
      "side": "S",
-     "at": -5.2,
+     "at": -8.0,
      "type": "window",
      "w": 1.6,
      "h": 1.4,
-     "sill": 0.8
+     "sill": 0.8,
+     "edgeZ": 3
     },
     {
      "side": "S",
-     "at": -10.0,
+     "at": -10.2,
      "type": "window",
      "w": 0.8,
      "h": 1.4,
-     "sill": 0.8
+     "sill": 0.8,
+     "edgeZ": 3
     },
     {
      "side": "E",
@@ -109,7 +112,7 @@
      "side": "S",
      "at": 2.5,
      "type": "door",
-     "w": 1.0,
+     "w": 1,
      "h": 2.1
     },
     {
@@ -133,7 +136,7 @@
      "side": "N",
      "at": 6.5,
      "type": "window",
-     "w": 1.0,
+     "w": 1,
      "h": 1.3,
      "sill": 0.9
     },
@@ -162,7 +165,7 @@
     ],
     "rot": 180,
     "to": "l2",
-    "w": 1.0,
+    "w": 1,
     "autoVoid": true
    },
    "rooms": [
@@ -326,7 +329,7 @@
    "skylights": [
     {
      "at": [
-      2.0,
+      2,
       -2.2
      ],
      "w": 0.8,
@@ -377,7 +380,7 @@
    "trim": "#5b4636",
    "chimney": {
     "at": [
-     -7.0,
+     -7,
      7.4
     ],
     "material": "metal",
@@ -406,7 +409,7 @@
    "trim": "#2b2f33",
    "dormers": [
     {
-     "at": 3.0,
+     "at": 3,
      "w": 1.8,
      "style": "eyebrow",
      "side": "S"
@@ -419,12 +422,12 @@
    "type": "path",
    "path": [
     [
-     -8.5,
+     -4.5,
      3.2
     ],
     [
-     -8.5,
-     5.8
+     -4.5,
+     13
     ]
    ],
    "w": 1.2
@@ -441,8 +444,8 @@
  "hero": {
   "level": "l1",
   "at": [
-   2.5,
-   -3.6
+   -6,
+   -3.4
   ],
   "rot": 0,
   "device": "chalk",
@@ -451,6 +454,6 @@
  "entry": {
   "level": "l1",
   "side": "S",
-  "at": -8.5
+  "at": -4.5
  }
 }

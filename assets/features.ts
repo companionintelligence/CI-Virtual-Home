@@ -234,7 +234,7 @@ export function createFeatures(bctx) {
       return g;
     }, 0, 0, y + h - 0.02, null, null);
     if (typeof registerCeiling === 'function') registerCeiling(ceil, y + h - 0.02);
-    anchors.arch.features.push({ type: 'bay', level: lv.id, side: f.side, at: f.at, w: f.w, depth, form: canted ? 'canted' : 'box', outline: outline.map(p => [r3(p[0]), r3(p[1])]), y: r3(y), h: r3(h) });
+    anchors.arch.features.push({ type: 'bay', level: lv.id, side: f.side, at: f.at, w: f.w, depth, form: canted ? 'canted' : 'box', outline: outline.map(p => [r3(p[0]), r3(p[1])]), y: r3(y), h: r3(h), roof: f.roof || 'hip', roofColor: f.roofColor || undefined });
   }
 
   function balcony({ spec, lv, f, i, y, H, am, put, anchors }) {
@@ -287,7 +287,7 @@ export function createFeatures(bctx) {
         const g = put(() => { const gg = group('Loggia post', { category: 'Architecture' }); box(gg, 0.2, ph, 0.2, 0, ph / 2, 0, post); return gg; }, x, z, y, null, 'structure');
       }
     }
-    anchors.arch.features.push({ type: f.type, level: lv.id, rect: { x: r3(R.x), z: r3(R.z), w: r3(R.w), d: r3(R.d) }, y: r3(deckY), rails: open.map(([a, b]) => [a.map(r3), b.map(r3)]) });
+    anchors.arch.features.push({ type: f.type, level: lv.id, side: f.side, rect: { x: r3(R.x), z: r3(R.z), w: r3(R.w), d: r3(R.d) }, y: r3(deckY), rail: style, rails: open.map(([a, b]) => [a.map(r3), b.map(r3)]), posts: f.type === 'loggia' && f.posts ? f.posts : undefined });
   }
 
   // ---- fireplaces: the breast and hearth in the room (the stack is built with the roofs: houseFeatures) --------------------
@@ -342,7 +342,7 @@ export function createFeatures(bctx) {
     g.updateMatrixWorld(true);
     const bb = new THREE.Box3().setFromObject(g);
     (anchors.solids[lv.id] ||= []).push({ minX: bb.min.x, maxX: bb.max.x, minZ: bb.min.z, maxZ: bb.max.z, top: bb.max.y, type: 'fireplace-breast' });
-    anchors.arch.features.push({ type: 'fireplace', level: lv.id, at: f.at, rot, style, back: [r3(bx), r3(bz)], wall: wall ? (wall.exterior ? `exterior ${wall.side}` : 'partition') : 'none' });
+    anchors.arch.features.push({ type: 'fireplace', level: lv.id, at: f.at, rot, style, w, back: [r3(bx), r3(bz)], wall: wall ? (wall.exterior ? `exterior ${wall.side}` : 'partition') : 'none' });
   }
 
   // ---- built-ins -------------------------------------------------------------------------------------------------------
@@ -510,9 +510,11 @@ export function createFeatures(bctx) {
       for (const a of [a0 + 0.1, a1 - 0.1]) placeRail(put, railStyle, W(a, line + nn * (WALL_HALF + 0.05)), W(a, fl - nn * size / 2), floorY, rh, rc);
     }
     // the roof
+    let roofOver = null;
     if (roofType !== 'none' && owR) {
       const oh = 0.28, Rr = owR.rect, wallSide = OPP[f.side];
       const over = { x: Rr.x - (horiz ? oh : (nn > 0 ? 0 : oh)), z: Rr.z - (horiz ? (nn > 0 ? 0 : oh) : oh), w: Rr.w + (horiz ? 2 * oh : oh), d: Rr.d + (horiz ? oh : 2 * oh) };
+      roofOver = { x: r3(over.x), z: r3(over.z), w: r3(over.w), d: r3(over.d) };
       const roof: any = { over, y: eave, overhang: oh, pitch, color: f.roofColor || palette.roof, gableWindow: false, ends: { [wallSide]: 'abut' } };
       if (f.finish) roof.finish = f.finish;
       if (f.ceiling) roof.soffit = f.ceiling;
@@ -522,7 +524,8 @@ export function createFeatures(bctx) {
       else Object.assign(roof, { type: 'shed', high: wallSide });
       featureRoof({ spec, id: `porch${i}`, rect: Rr, eave, roof, kit, palette, put, name: `Porch roof (${f.side})` });
     }
-    anchors.arch.features.push({ type: 'porch', level: lv.id, side: f.side, rect: { x: r3(R.x), z: r3(R.z), w: r3(R.w), d: r3(R.d) }, floorY: r3(floorY), posts: posts.map(p => W(p, frontLine - nn * (size / 2 + 0.06)).map(r3)), roof: roofType, eave: r3(eave), steps: stepsOn ? { at: r3(stepAt), w: stepW } : null });
+    anchors.arch.features.push({ type: 'porch', level: lv.id, side: f.side, rect: { x: r3(R.x), z: r3(R.z), w: r3(R.w), d: r3(R.d) }, floorY: r3(floorY), posts: posts.map(p => W(p, frontLine - nn * (size / 2 + 0.06)).map(r3)), postSize: r3(size),
+      roof: roofType, eave: r3(eave), pitch: roofType === 'flat' ? 0 : r3(pitch), roofOver, roofColor: f.roofColor || palette.roof, rail: railStyle === 'none' ? null : railStyle, steps: stepsOn ? { at: r3(stepAt), w: stepW, n: Math.max(1, Math.round(floorY / 0.17)), run: 0.3 } : null });
   }
 
   function bayRoof({ spec, f, i, kit, palette, put }) {
@@ -589,7 +592,7 @@ export function createFeatures(bctx) {
     }
     const above = put(() => build(outside ? split : Math.min(split, eaveY - 0.3), topY, `Chimney (${lv.id})`, true), 0, 0, 0, null, null);
     above.userData.isRoof = true; registerRoof(above);
-    anchors.arch.features.push({ type: 'chimney', level: lv.id, at: [r3(cx), r3(cz)], w: sw, d: sd, top: r3(topY), outside: !!outside, hearth: at });
+    anchors.arch.features.push({ type: 'chimney', level: lv.id, at: [r3(cx), r3(cz)], w: sw, d: sd, top: r3(topY), base: r3(outside ? 0 : y + H), outside: !!outside, material: c.material || 'brick', color: c.color, hearth: at });
   }
   function worldMapped(m, set) {
     m.map = set.map; m.normalMap = set.normalMap; m.roughnessMap = set.roughnessMap; m.roughness = 1;

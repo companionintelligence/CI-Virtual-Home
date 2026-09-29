@@ -10,12 +10,12 @@ import { createWallCompiler } from './wall-compiler.js';
 import { buildRoofs, planRoofModels, roofUnderAt } from './roofs.js';
 import { DEG, hex, mix } from './build-context.js';
 import { specDefaults } from './spec/index.js';
-import { levelStairs, stairPlan, createStairBuilder } from './stairs.js';
+import { levelStairs, stairPlan, createStairBuilder, autoVoidsFor } from './stairs.js';
 import { slabOpenings, archEdges, edgeFor, rectOfEdge, edgeHeight, wallPieces, volumeSteps, doubleRoomsUnder, featureOpenings } from './arch-plan.js';
 import { createFacade, facadeWanted } from './facade.js';
 import { createArchMaterials } from './arch-materials.js';
 import { createFeatures } from './features.js';
-import { createRoomFinish, ownCeilingAt } from './room-finish.js';
+import { createRoomFinish, ownCeilingAt, noteRoom } from './room-finish.js';
 
 // kitb (kit-build.ts, S1) turns the spec's doors, colours and finishes into the parameters below; this module
 // keeps the geometry round each call.
@@ -28,6 +28,7 @@ export function createStructureBuild(bctx, { kitb }) {
   const kitOf = new WeakMap();   // spec → its kit, for the build steps the orchestrator calls without one (buildCeilings)
   const anchorsOf = new WeakMap();   // spec → its anchors (placeRoofs has none)
   const FULL = [{ lo: 0, hi: 0, party: false }];   // a v1 wall: one piece, the storey's full height
+  const rnd = (v: number) => Math.round(v * 1000) / 1000;
 
   // ---- S2's wall helpers ----------------------------------------------------------------------------------------
   // a lower wall (a knee wall, a low volume): its openings stop under its head
@@ -107,7 +108,9 @@ export function createStructureBuild(bctx, { kitb }) {
     const defaults = specDefaults(spec);
     let _am = null; const am = () => _am || (_am = createArchMaterials(THREE, kit));   // S2's materials, made only when asked for
     kitOf.set(spec, kit); anchorsOf.set(spec, anchors);
-    anchors.arch ||= { rooms: [], features: [] };
+    // S2's export (arch key of <id>.plan.json; plan Exported API): anchors.features (also anchors.arch.features), anchors.arch.rooms
+    // (finishes), .volumes, .plinths, .stoop; the flights are on anchors.stairs
+    if (!anchors.arch) { anchors.arch = { rooms: [], features: [] }; anchors.features = anchors.arch.features; }
     const y = lv.y || 0, H = lv.height || 2.8;
     const wallColor = hex(lv.wallColor || palette.wall), trimColor = hex(lv.trimColor || palette.trim);
     // interior paint: palette.interior / lv.interior, else the wall colour lifted toward off-white when the
@@ -117,6 +120,7 @@ export function createStructureBuild(bctx, { kitb }) {
     const edges = perimeterEdges(lv.footprint);
     const b = unionBounds(lv.footprint);
     anchors.levels[lv.id] = { y, height: H, bounds: b, centre: [(b.minX + b.maxX) / 2, (b.minZ + b.maxZ) / 2] };
+    for (const r of lv.footprint || []) if (r.h !== undefined) (anchors.arch.volumes ||= []).push({ level: lv.id, rect: { x: r.x, z: r.z, w: r.w, d: r.d }, h: r.h, material: r.material, color: r.color });
     anchors.bounds = anchors.bounds ? {
       minX: Math.min(anchors.bounds.minX, b.minX), maxX: Math.max(anchors.bounds.maxX, b.maxX),
       minZ: Math.min(anchors.bounds.minZ, b.minZ), maxZ: Math.max(anchors.bounds.maxZ, b.maxZ)
@@ -272,7 +276,8 @@ export function createStructureBuild(bctx, { kitb }) {
         // S2's own (Completeness A2, for S5's routing and S6's plan inset): what the flight is, its first heading, the
         // walking line first step to last (world, y absolute), landings, outline, the void it needs, its step-off
         ...(p.shape !== 'straight' || index > 0 || Array.isArray(lv.stairs) ? { type: p.type, shape: p.shape, index, dir0: p.dir0, w: p.w,
-          path: p.path.map(([px, py, pz]) => [px, y + py, pz]), landings: p.landings.map(l => ({ ...l, y: y + l.y })),
+          flights: p.flights.map(fl => ({ at: fl.at, rot: ((fl.rot % 360) + 360) % 360, run: rnd(fl.run), rise: rnd(fl.rise), steps: fl.steps, w: fl.w, y0: rnd(y + fl.y0), style: fl.style })),
+          path: p.path.map(([px, py, pz]) => [px, rnd(y + py), pz]), landings: p.landings.map(l => ({ ...l, y: rnd(y + l.y) })),
           outline: p.outline, voidRects: p.voidRects, stepOff: p.stepOff } : {}) });
     });
 
@@ -295,6 +300,9 @@ export function createStructureBuild(bctx, { kitb }) {
     }
     const dbl = doubleRoomsUnder(spec, lv);
     if (dbl.length) finish.galleryRails({ spec, lv, y, put, ProceduralArchitecture, doubleRooms: dbl });
+    // the openings this storey's slab has beyond its own `voids` (a flight's autoVoid, a double-height room below): the plan twins draw them
+    const autoV = autoVoidsFor(spec, lv.id);
+    if (autoV.length || dbl.length) (anchors.arch.voids ||= []).push({ level: lv.id, auto: autoV, double: dbl.map(d => ({ x: rnd(d.rect.x), z: rnd(d.rect.z), w: rnd(d.rect.w), d: rnd(d.rect.d), room: d.room.name })) });
     // ---- S2: the storey's facade (facade.ts) and its features (features.ts: bays, balconies, fireplaces, built-ins)
     const lowestY = Math.min(...(spec.levels || []).map(l => l.y || 0));
     if (facadeWanted(spec, lv, lowestY)) facade.levelFacade({ spec, lv, y, H, palette, am: am(), put, anchors, lowestY });
@@ -357,6 +365,7 @@ export function createStructureBuild(bctx, { kitb }) {
       const y = lv.y || 0, H = lv.height || 2.8;
       for (const room of lv.rooms || []) {
         const c = room.ceiling;
+        if (c && room.bounds && anchorsOf.get(spec)) noteRoom(anchorsOf.get(spec), lv, room, { ceiling: c.kind, ceilingColor: c.color });
         if (!c || !room.bounds || c.kind === 'double' || (c.kind === 'flat' && c.color === undefined) || !kit) continue;
         const cx = room.bounds.x + room.bounds.w / 2, cz = room.bounds.z + room.bounds.d / 2;
         const up = (spec.levels || []).filter(o => (o.y || 0) > y + 0.5 && (o.footprint || []).some(r => inRect(cx, cz, r, 0.05))).sort((p, q) => (p.y || 0) - (q.y || 0))[0];

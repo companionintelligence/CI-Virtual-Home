@@ -760,7 +760,10 @@ export function buildRoofs(spec, deps) {
       const lo = alongX ? W.x0 : W.z0, hi = alongX ? W.x1 : W.z1;
       const pos = Math.min(hi - dw / 2 - 0.3, Math.max(lo + dw / 2 + 0.3, d.at ?? (lo + hi) / 2));
       const half = (alongX ? W.z1 - W.z0 : W.x1 - W.x0) / 2, tf = m.tS[face];
-      const front = half * 0.3, baseY = front * tf + heel[face] + T, ridgeTop = alongX ? under(pos, (W.z0 + W.z1) / 2) + T : under((W.x0 + W.x1) / 2, pos) + T;
+      // the ridge over the dormer: the highest the roof's underside gets across its slope (a saltbox's ridge is off centre)
+      let ridge = -Infinity;
+      for (let k = 0; k <= 8; k++) { const t = k / 8, h2 = alongX ? under(pos, W.z0 + (W.z1 - W.z0) * t) : under(W.x0 + (W.x1 - W.x0) * t, pos); if (h2 > ridge) ridge = h2; }
+      const front = half * 0.3, baseY = front * tf + heel[face] + T, ridgeTop = ridge + T;
       const pitchD = (style === 'shed' ? 14 : style === 'flat' ? 2 : 40) * DEG, capRise = style === 'gable' || style === 'glazed' ? (dw / 2 + 0.12) * Math.tan(pitchD) : style === 'eyebrow' ? 0.18 : 0.12;
       const dh = Math.min(style === 'eyebrow' ? 0.8 : 1.25, ridgeTop - baseY - capRise - 0.12);
       if (dh < (style === 'eyebrow' ? 0.45 : 0.65)) return;
