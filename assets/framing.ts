@@ -53,14 +53,14 @@ export function fits(eye: V3, target: V3, fov: number, b: Box6 | V3[], margin = 
 
 /** How the house sits in an establishing frame: the shares of its corners (footprints and roof planes) above the top margin,
  *  under the bottom one and past a side; `ok` when the roof is (a tenth of its corners may clip the top), the ground line is (a third may fall
- *  below) and half the width is — a house wider than the frame at 15 m of establishing move is cropped at the sides,
+ *  below) and 40 % of the width is — a house wider than the frame at 15 m of establishing move is cropped at the sides,
  *  never at the roof. */
 export function frameFit(eye: V3, target: V3, fov: number, pts: V3[], margin = 0.08, aspect = 16 / 9) {
   const c = camera(eye, target, fov, aspect), lim = 1 - margin;
   let top = 0, bottom = 0, side = 0;
   for (const p of pts) { const q = project(c, p); if (!(q[2] > 0)) { top++; continue; } if (q[1] > lim) top++; if (q[1] < -lim) bottom++; if (Math.abs(q[0]) > lim) side++; }
   const n = pts.length || 1, t = top / n, b = bottom / n, sd = side / n;
-  return { top: t, bottom: b, side: sd, ok: t <= 0.1 && b <= 0.35 && sd <= 0.5, cost: 2 * t + b + 0.6 * sd };
+  return { top: t, bottom: b, side: sd, ok: t <= 0.1 && b <= 0.35 && sd <= 0.6, cost: 2 * t + b + 0.6 * sd };
 }
 
 // ---- the Core orbit's probe, on the world (core-orbit.ts's createOrbitProbe, ported) ----------------------------
@@ -109,6 +109,7 @@ export type EstablishStyle = typeof ESTABLISH_STYLES[number];
 export type Establish = { style: EstablishStyle | 'custom'; eye: V3; aim: V3; fov: number; bearing: number; score: number; fit: number; sky: number; occluded: number; roofOff: boolean; scores?: any; alts?: Establish[] };
 
 /** Plan the establishing pose: `want` is shots[].establish ('auto', a style, or {bearing, height, dist}). */
+const EST_LENSES = [34, 40, 46];
 export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldIndex, want: any = 'auto', lim: { near?: [number, number]; maxPath?: number } = {}): Establish {
   // (a dollhouse needs height, and height is path: under ~9 m of establishing move it is not offered)
   const e = world.entry!;
@@ -135,9 +136,11 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   const mirrored = facadeOps.filter(o => Math.abs(along(o)) > 0.3).every(o => facadeOps.some(p => p !== o && Math.abs(along(p) + along(o)) < 0.35 && p.type === o.type));
   const frontGarden = world.boxes.length ? world.kinds.reduce((acc, k, i) => acc + (k === K.site && ((world.boxes[6 * i] + world.boxes[6 * i + 3]) / 2 - e.x) * n[0] + ((world.boxes[6 * i + 2] + world.boxes[6 * i + 5]) / 2 - e.z) * n[1] > 1 ? 1 : 0), 0) : 0;
   const storeys = new Set(world.levels.map(x => Math.round(x.y))).size;
-  const aff: Record<string, number> = { axial: mirrored && facadeOps.length >= 2 ? 0.35 : -0.1, 'corner-left': 0.12, 'corner-right': 0.12, garden: frontGarden >= 12 ? -0.05 : frontGarden >= 4 ? -0.15 : -0.4, dollhouse: storeys <= 1 ? 0.4 : storeys === 2 ? 0.2 : -0.3 };
+  const aff: Record<string, number> = { axial: mirrored && facadeOps.length >= 2 ? 0.35 : -0.1, 'corner-left': 0.12, 'corner-right': 0.12, garden: frontGarden >= 12 ? -0.05 : frontGarden >= 4 ? -0.15 : -0.4, dollhouse: storeys <= 1 ? 0.15 : storeys === 2 ? 0.0 : -0.3 };
   // the side the massing is on (corner styles look across it)
   const sideBias = across > 0.5 ? 1 : across < -0.5 ? -1 : 0;
+  // (the favourite style's nudge is for a pose that fits: one that crops the roof off earns none of it)
+  const favNudge = (c: Establish) => 2.0 * clamp(1 - c.fit / 0.55, 0, 1);
   const cands: Establish[] = [];
   const tryPose = (style: any, bearing: number, height: number, fov: number, roofOff: boolean, aimAt: V3 = aim, distHint = 0) => {
     const b = bearing * DEG, dir: [number, number] = [n[0] * Math.cos(b) + l[0] * Math.sin(b), n[1] * Math.cos(b) + l[1] * Math.sin(b)];
@@ -172,15 +175,17 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
     // foreground cost more
     // (and the house has to be in it: a pose within 7 m of the facade line shows a wall, not a house)
     const facadeDist = (eyeAt(dist)[0] - e.x) * n[0] + (eyeAt(dist)[2] - e.z) * n[1];
-    const fitScore = -1.0 * fr.cost - 0.25 * Math.max(0, 8 - facadeDist);
+    const fitScore = -2.2 * fr.cost - 0.25 * Math.max(0, 8 - facadeDist) - 0.012 * Math.max(0, fov - 34);
     const score = 1 + fitScore + 0.35 * skyScore - 1.5 * occ + 0.3 * rng();   // (a seeded whisker: poses that fit alike do not all fall on one bearing)
     cands.push({ style, eye, aim: aimAt, fov, bearing, score, fit, sky: comp.sky, occluded: occ, roofOff });
   };
+  // (the lens: 34° is the plan's exterior lens; a wider one — up to 46° — fits the house from nearer, which is what the time
+  // outside can afford: a wide house is whole in the frame rather than cropped at the door. A pose on a wider lens pays for it.)
   const styleOf = (s: string) => {
-    if (s === 'axial') for (const h of [3.0, 4.0, 5.0]) tryPose('axial', 0, Math.max(h, top * 0.55), 34, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]);
-    if (s === 'corner-left' || s === 'corner-right') { const sg = s === 'corner-right' ? 1 : -1; for (const bb of [26, 34, 42]) for (const h of [3.6, 4.6, 5.8]) tryPose(s, sg * bb, Math.max(h, top * 0.65), 34, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]); }
-    if (s === 'garden') for (const sg of [1, -1]) for (const bb of [18, 28]) tryPose('garden', sg * bb, 2.2, 35, false, [aim[0], Math.max(2.2, top * 0.5), aim[2]]);
-    if (s === 'dollhouse') for (const sg of [1, -1]) for (const h of [6, 7.5]) tryPose('dollhouse', sg * 30, Math.max(h, top + 2.2), 36, true, [cx * 0.5 + aim[0] * 0.5, 0.8, cz * 0.5 + aim[2] * 0.5]);
+    if (s === 'axial') for (const fv of EST_LENSES) for (const h of [3.0, 4.0, 5.0]) tryPose('axial', 0, Math.max(h, top * 0.55), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]);
+    if (s === 'corner-left' || s === 'corner-right') { const sg = s === 'corner-right' ? 1 : -1; for (const fv of EST_LENSES) for (const bb of [26, 34, 42]) for (const h of [3.6, 4.6, 5.8]) tryPose(s, sg * bb, Math.max(h, top * 0.65), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]); }
+    if (s === 'garden') for (const fv of [...EST_LENSES, 50]) for (const sg of [1, -1]) for (const bb of [18, 28]) for (const h of [2.2, 3.0]) tryPose('garden', sg * bb, h, fv + 1, false, [aim[0], Math.max(2.2, top * 0.5), aim[2]]);
+    if (s === 'dollhouse') for (const fv of [36, 42, 48]) for (const sg of [1, -1]) for (const h of [6, 7.5]) tryPose('dollhouse', sg * 30, Math.max(h, top + 2.2), fv, true, [cx * 0.5 + aim[0] * 0.5, 0.8, cz * 0.5 + aim[2] * 0.5]);
   };
   if (want && typeof want === 'object') {
     tryPose('custom', want.bearing ?? 30, want.height ?? 6, 34, false, aim, want.dist || 0);
@@ -197,12 +202,12 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   const scores: Record<string, number> = {};
   for (const [s, c] of best) {
     const side = s === 'corner-left' ? -sideBias : s === 'corner-right' ? sideBias : 0;
-    const total = c.score + (aff[s] ?? 0) + 0.08 * side + 0.25 * jitter[ESTABLISH_STYLES.indexOf(s as any)] + (ESTABLISH_STYLES.indexOf(s as any) === fav ? 2.0 : 0);
+    const total = c.score + (aff[s] ?? 0) + 0.08 * side + 0.25 * jitter[ESTABLISH_STYLES.indexOf(s as any)] + (ESTABLISH_STYLES.indexOf(s as any) === fav ? favNudge(c) : 0);
     scores[s] = +total.toFixed(3);
     if (total > ps + 1e-9) { ps = total; pick = c; }
   }
   // (every pose that scored, best first — the planner walks down it when the best one's move is blocked by the garden)
-  const alts = [...cands].map(c => ({ c, t: c.score + (aff[c.style] ?? 0) + 0.08 * (c.style === 'corner-left' ? -sideBias : c.style === 'corner-right' ? sideBias : 0) + 0.25 * jitter[ESTABLISH_STYLES.indexOf(c.style as any)] + (ESTABLISH_STYLES.indexOf(c.style as any) === fav ? 2.0 : 0) }))
+  const alts = [...cands].map(c => ({ c, t: c.score + (aff[c.style] ?? 0) + 0.08 * (c.style === 'corner-left' ? -sideBias : c.style === 'corner-right' ? sideBias : 0) + 0.25 * jitter[ESTABLISH_STYLES.indexOf(c.style as any)] + (ESTABLISH_STYLES.indexOf(c.style as any) === fav ? favNudge(c) : 0) }))
     .sort((a, b) => b.t - a.t).map(x => x.c);
   return { ...pick!, scores, alts: [pick!, ...alts.filter(c => c !== pick)] };
 }

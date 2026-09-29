@@ -3,7 +3,9 @@
 // failure — the numbers are for each stream's PR to quote against main's, not a gate.
 //
 //   node --experimental-strip-types scripts/perf-house.mts [--house aurora,mirage,vanilla | --all] [--runs 1]
-//        [--shot door-to-core,orbit,hero-reveal,core-orbit] [--out test/qa/perf.json] [--baseline]
+//        [--shot door-to-core,orbit,hero-reveal,core-orbit] [--out test/qa/perf.json] [--baseline] [--planner v2]
+//   --planner v2 plans door-to-core, hero-reveal and walkthrough on spline planner v2 (S5): the planning is inside `build` (shotsFor),
+//   its QA is `shotQA`; the budgets are the same. Never combine with --baseline (the baseline is the v1 fleet).
 //
 // Budgets, per house, on this machine:
 //   build   ≤ 3 s     houseBuilder.build(spec) + shotsFor(spec, anchors): the main thread is blocked for all of it
@@ -32,6 +34,8 @@ const ALL = fs.readdirSync(HOUSES_DIR).filter(f => f.endsWith('.json') && f !== 
 const HOUSES = args.all === 'true' ? ALL : (args.house || 'aurora,mirage,vanilla').split(',').filter(Boolean);
 const SHOTS = (args.shot || 'door-to-core,orbit,hero-reveal,core-orbit').split(',').filter(Boolean);
 const RUNS = Math.max(1, parseInt(args.runs || '1', 10));
+const PLANNER = args.planner && args.planner !== 'true' ? `&planner=${encodeURIComponent(args.planner)}` : '';
+if (PLANNER && args.baseline === 'true') { console.error('--baseline records the v1 fleet: drop --planner'); process.exit(2); }
 const OUT = args.out ? path.resolve(args.out) : path.join(ROOT, 'test', 'qa', 'perf.json');
 export const BUDGET = { buildMs: 3000, trackMs: 1000, shotQAMs: 500 };
 
@@ -85,7 +89,7 @@ for (const house of HOUSES) {
     await page.addInitScript(INIT);
     const t0 = Date.now();
     try {
-      await page.goto(`http://localhost:${port}/room-creator.html?house=${house}`, { waitUntil: 'domcontentloaded', timeout: 180000 });
+      await page.goto(`http://localhost:${port}/room-creator.html?house=${house}${PLANNER}`, { waitUntil: 'domcontentloaded', timeout: 180000 });
       await page.waitForFunction(h => document.documentElement.dataset.houseReady === h, house, { timeout: 180000 });
       const loadMs = Date.now() - t0;
       const m = await page.evaluate(shots => {

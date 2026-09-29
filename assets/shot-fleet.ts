@@ -5,6 +5,9 @@
 // scripts/fleet/shots.mts (fleet-audit) all read the same numbers.
 //
 // Owner: S5 (shot).
+import { K, DEG, clamp, inFootprint, indoors, wrapPi, createWorldIndex, type ShotWorld } from './shot-world.js';
+import { createNav } from './shot-nav.js';
+import { camera, project, projectBox, type V3 } from './shot-probe.js';
 
 export type FleetRow = { id: string; duration: number; metrics: Record<string, any>; plan: Record<string, any>; errors: number; warnings: number };
 export type FleetCheck = { id: string; title: string; target: string; value: string; pass: boolean; advisory?: boolean; detail?: string; rows?: Array<Array<string | number>> };
@@ -52,4 +55,81 @@ export function fleetChecks(rows: FleetRow[]): FleetCheck[] {
   { const bad = rows.filter(r => r.errors > 0);
     add({ id: 'qa-errors', title: 'QA v2 errors', target: '0 on all 30 houses', value: `${rows.reduce((a, r) => a + r.errors, 0)} in ${pct(bad.length, N)} houses`, pass: !bad.length, detail: list(bad, r => `${r.errors}`) }); }
   return out;
+}
+
+/** The same numbers off ANY baked track — planner v1's (assets/shot-track.ts trackFromV1) as much as v2's — measured one way, so the
+ *  camera audit can put the two side by side: how much of the film is outside, how far it moves in the first second, how fast it
+ *  crosses the entry door and the doorways, how fast the view turns (smoothed over 0.2 s, and the raw 1/12 s step v1's pan was
+ *  judged by), dead air, how far the look lags the walk, the finale's orbit round the Core (the longest one-way sweep ending at the
+ *  last frame) and the Core's height in the last frame. Reads only pos, look, fov (optional), samples, dt. */
+export function trackMetrics(track: { pos: ArrayLike<number>; look: ArrayLike<number>; fov?: ArrayLike<number>; samples: number; dt: number }, world: ShotWorld, aspect = 16 / 9, finalTarget?: V3) {
+  const N = track.samples, dt = track.dt, T = (N - 1) * dt;
+  const eye = (i: number): V3 => [track.pos[3 * i], track.pos[3 * i + 1], track.pos[3 * i + 2]], look = (i: number): V3 => [track.look[3 * i], track.look[3 * i + 1], track.look[3 * i + 2]];
+  const yaw = new Float64Array(N), pitch = new Float64Array(N), speed = new Float64Array(N);
+  for (let i = 0; i < N; i++) {
+    const e = eye(i), l = look(i), d = [l[0] - e[0], l[1] - e[1], l[2] - e[2]], L = Math.hypot(d[0], d[1], d[2]) || 1;
+    yaw[i] = Math.atan2(d[0], d[2]); pitch[i] = Math.asin(clamp(d[1] / L, -1, 1)); if (i) yaw[i] = yaw[i - 1] + wrapPi(yaw[i] - yaw[i - 1]);
+    const a = Math.max(0, i - 1), b = Math.min(N - 1, i + 1), ea = eye(a), eb = eye(b);
+    speed[i] = Math.hypot(eb[0] - ea[0], eb[1] - ea[1], eb[2] - ea[2]) / ((b - a) * dt);
+  }
+  const rate = (i: number, half: number) => { const a = Math.max(0, i - half), b = Math.min(N - 1, i + half); return Math.hypot((yaw[b] - yaw[a]) * Math.cos(pitch[i]), pitch[b] - pitch[a]) / ((b - a) * dt) / DEG; };
+  const h02 = Math.max(1, Math.round(0.1 / dt)), h12 = Math.max(1, Math.round(1 / 24 / dt));
+  let yawPeak = 0, yawPeakRaw = 0; const sm: number[] = [];
+  for (let i = 0; i < N; i++) { const r = rate(i, h02); sm.push(r); yawPeak = Math.max(yawPeak, r); yawPeakRaw = Math.max(yawPeakRaw, rate(i, h12)); }
+  let whips = 0; { let run = false; for (const r of sm) { if (r > 90) { if (!run) whips++; run = true; } else if (r < 60) run = false; } }
+  const travel = (i0: number, i1: number) => { let L = 0; for (let i = i0 + 1; i <= i1; i++) { const a = eye(i - 1), b = eye(i); L += Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]); } return L; };
+  const n1 = Math.min(N - 1, Math.round(1 / dt));
+  let out = 0; for (let i = 0; i < N; i++) { const e = eye(i); if (!indoors(world, e[0], e[1], e[2])) out++; }
+  // the entry door plane, and the interior doorways
+  let doorSpeed: number | null = null; const en = world.entry;
+  if (en) for (let i = 1; i < N && doorSpeed === null; i++) {
+    const p = eye(i), q = eye(i - 1), a0 = (q[0] - en.x) * en.out[0] + (q[2] - en.z) * en.out[1], a1 = (p[0] - en.x) * en.out[0] + (p[2] - en.z) * en.out[1];
+    if (a0 > 0 && a1 <= 0 && Math.hypot(p[0] - en.x, p[2] - en.z) < 1.5) doorSpeed = speed[i];
+  }
+  const index = createWorldIndex(world), nav = createNav(world, index); let doorwayMax = 0, doorways = 0;
+  for (const l of world.levels) for (const d of nav.doorsOn(l.id)) for (let i = 1; i < N; i++) {
+    const p = eye(i), q = eye(i - 1); if (p[1] < l.y + 0.4 || p[1] > l.y + 2.6) continue;
+    const a0 = (q[0] - d.c[0]) * d.n[0] + (q[2] - d.c[1]) * d.n[1], a1 = (p[0] - d.c[0]) * d.n[0] + (p[2] - d.c[1]) * d.n[1];
+    if (a0 * a1 < 0 && Math.abs((p[0] - d.c[0]) * d.n[1] - (p[2] - d.c[1]) * d.n[0]) < d.w / 2 + 0.1) { doorways++; doorwayMax = Math.max(doorwayMax, speed[i]); }
+  }
+  // dead air: the least the view changes in any 1 s (the turn plus what the eye's travel does to a subject 3 m away)
+  // (the last 2.5 s are the press: the camera settles by design)
+  let minView = Infinity, deadAir = 0; const w1 = Math.round(1 / dt), tail = Math.round(2.5 / dt);
+  for (let i = 0; i + w1 < N - tail; i += 6) {
+    const dir = (k: number): V3 => { const e = eye(k), l = look(k), d = [l[0] - e[0], l[1] - e[1], l[2] - e[2]], L = Math.hypot(d[0], d[1], d[2]) || 1; return [d[0] / L, d[1] / L, d[2] / L]; };
+    const a = dir(i), b = dir(i + w1), turn = Math.acos(clamp(a[0] * b[0] + a[1] * b[1] + a[2] * b[2], -1, 1)) / DEG, v = turn + Math.atan2(travel(i, i + w1), 3) / DEG;
+    minView = Math.min(minView, v); if (v < 3) deadAir += 6 * dt;
+  }
+  // the look against the walk: how far off the direction of travel the view points while the eye moves
+  const lag: number[] = []; let crab = 0, moving = 0;
+  for (let i = 1; i < N - 1; i++) {
+    if (speed[i] < 0.3) continue;
+    const a = eye(i - 1), b = eye(i + 1), v = [b[0] - a[0], b[2] - a[2]], vl = Math.hypot(v[0], v[1]); if (vl < 1e-6) continue;
+    const c = (v[0] * Math.sin(yaw[i]) + v[1] * Math.cos(yaw[i])) / vl, ang = Math.acos(clamp(c, -1, 1)) / DEG; lag.push(ang); moving++; if (ang > 60) crab++;
+  }
+  lag.sort((x, y) => x - y);
+  const h = world.hero, core = h ? h.core : null, ctr: V3 | null = core ? [(core[0] + core[3]) / 2, (core[1] + core[4]) / 2, (core[2] + core[5]) / 2] : null;
+  // the finale's orbit: from the last frame back, the azimuth round the Core keeps growing one way (turning back more than 8° ends it)
+  let orbitArc = 0;
+  if (ctr) {
+    const az = (i: number) => { const e = eye(i); return Math.atan2(e[0] - ctr[0], e[2] - ctr[2]); };
+    let acc = 0, best = 0, prev = az(N - 1), sg = 0;
+    for (let i = N - 2; i >= 0; i--) {
+      const a = az(i), dA = wrapPi(a - prev); prev = a;
+      if (Math.hypot(eye(i)[0] - ctr[0], eye(i)[2] - ctr[2]) > 8) break;
+      if (!sg && Math.abs(dA) > 1e-4) sg = Math.sign(dA);
+      acc += sg * dA; best = Math.max(best, acc); if (acc < best - 8 * DEG) break;
+    }
+    orbitArc = best / DEG;
+  }
+  let coreHeight: number | null = null, coreNDC: [number, number] | null = null;
+  if (core && ctr) { const fov = track.fov ? track.fov[N - 1] : 45, cam = camera(eye(N - 1), finalTarget || look(N - 1), fov, aspect), pb = projectBox(cam, core), pc = project(cam, ctr); coreHeight = pb ? (pb.maxY - pb.minY) / 2 : 0; coreNDC = [pc[0], pc[1]]; }
+  return {
+    duration: +T.toFixed(2), outsideShare: +(out / N).toFixed(3), firstSecond: +travel(0, n1).toFixed(2), lastSecond: +travel(N - 1 - n1, N - 1).toFixed(2),
+    doorSpeed: doorSpeed === null ? null : +doorSpeed.toFixed(2), doorwayMax: +doorwayMax.toFixed(2), doorways,
+    yawPeak: +yawPeak.toFixed(0), yawPeakRaw: +yawPeakRaw.toFixed(0), whips, yawMedian: +sm.slice().sort((a, b) => a - b)[sm.length >> 1].toFixed(0),
+    minViewChange: Number.isFinite(minView) ? +minView.toFixed(1) : null, deadAirS: +deadAir.toFixed(1),
+    lookLagMedian: lag.length ? +lag[lag.length >> 1].toFixed(0) : 0, crabPct: moving ? +(100 * crab / moving).toFixed(0) : 0,
+    orbitArc: +orbitArc.toFixed(0), finalCoreHeight: coreHeight === null ? null : +coreHeight.toFixed(3), finalCoreNDC: coreNDC ? [+coreNDC[0].toFixed(3), +coreNDC[1].toFixed(3)] as [number, number] : null,
+  };
 }

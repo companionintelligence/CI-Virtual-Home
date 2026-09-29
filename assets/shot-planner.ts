@@ -518,29 +518,39 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     const spiral = st.spiral;
     let entryPt: [number, number], exitPt: [number, number], flightPts: V3[] = [];
     if (!spiral) {
-      const bottom = st.bottom, top = st.top;
-      const footUp: [number, number] = [bottom[0] - dir[0] * 1.2, bottom[2] - dir[1] * 1.2], landUp: [number, number] = [top[0] + dir[0] * 0.8, top[2] + dir[1] * 0.8];
-      const rise = top[1] - bottom[1], run = Math.hypot(top[0] - bottom[0], top[2] - bottom[2]);
+      // the walking line: S2's `path` for a flight that turns (an L on a landing, a U), else the straight line first step → last
+      const line: Array<[number, number, number]> = st.path && st.path.length >= 2 ? st.path : [st.bottom, st.top];
+      const bottom = line[0], top = line[line.length - 1], dir0 = st.dir0 || dir;
+      const footUp: [number, number] = [bottom[0] - dir0[0] * 1.2, bottom[2] - dir0[1] * 1.2], landUp: [number, number] = [top[0] + dir[0] * 0.8, top[2] + dir[1] * 0.8];
+      const rise = top[1] - bottom[1];
+      // the line resampled evenly along its length in plan (a landing is flat: the eye keeps its height over it)
+      const cum: number[] = [0]; for (let k = 1; k < line.length; k++) cum.push(cum[k - 1] + Math.hypot(line[k][0] - line[k - 1][0], line[k][2] - line[k - 1][2]));
+      const run = cum[cum.length - 1] || 1e-6;
+      const lineAt = (u: number): V3 => {
+        const d = clamp(u, 0, 1) * run; let k = 1; while (k < line.length - 1 && cum[k] < d) k++;
+        const f = cum[k] > cum[k - 1] ? clamp((d - cum[k - 1]) / (cum[k] - cum[k - 1]), 0, 1) : 0;
+        return [line[k - 1][0] + (line[k][0] - line[k - 1][0]) * f, line[k - 1][1] + (line[k][1] - line[k - 1][1]) * f, line[k - 1][2] + (line[k][2] - line[k - 1][2]) * f];
+      };
       // the eye over the tread at u of the run, `off` above it — but under the upper storey's slab (where there is no
       // void over the flight) never higher than 0.35 m under that slab: it crouches under the slab's edge and rises
       // once the void opens overhead (§3.8)
       const upper = world.levels.find(l => l.id === st.to)!;
-      const NU = 48;
+      const NU = st.path ? Math.max(48, Math.ceil(run / 0.09)) : 48;
       const us = Array.from({ length: NU + 1 }, (_, k) => k / NU);
-      const xz = (u: number): [number, number] => [bottom[0] + dir[0] * run * u, bottom[2] + dir[1] * run * u];
+      const xz = (u: number): [number, number] => { const q = lineAt(u); return [q[0], q[2]]; };
       const underSlab = (u: number) => { const [x, z] = xz(u); return upper.rects.some(r => inRect(x, z, r, 0.1)) && !upper.voids.some(v => inRect(x, z, v, -0.12)); };
-      const ys = us.map(u => bottom[1] + rise * u + (fl.up ? 1.55 : 1.6));
+      const ys = us.map(u => lineAt(u)[1] + (fl.up ? 1.55 : 1.6));
       // the slab is [upper.y − 0.3, upper.y]: where the flight runs under it, the eye stays out of that band — under it
       // while the tread is low enough to stand under it, over it (the landing's floor) once the tread nears the top
       for (let k = 0; k <= NU; k++) {
         if (!underSlab(us[k]) || ys[k] <= upper.y - 0.38 || ys[k] >= upper.y + 0.12) continue;
-        const tread = bottom[1] + rise * us[k];
+        const tread = lineAt(us[k])[1];
         ys[k] = tread + 1.1 <= upper.y - 0.38 ? upper.y - 0.38 : Math.max(ys[k], upper.y + 0.12);
       }
       // (a step in that profile is ramped over the run on the free side of it: never more than 1.2 m of height per
       // metre of run beyond the flight's own slope)
       for (let k = 1; k <= NU; k++) if (!underSlab(us[k])) ys[k] = Math.min(ys[k], ys[k - 1] + 1.2 * run / NU + rise / NU);
-      const along = (u: number): V3 => { const k = Math.round(u * NU); const [x, z] = xz(u); return [x, ys[k], z]; };
+      const along = (u: number): V3 => { const k = Math.round(u * NU); const [x, z] = xz(k / NU); return [x, ys[k], z]; };
       const N = NU;
       if (fl.up) {
         entryPt = footUp; exitPt = landUp;
@@ -548,7 +558,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
         for (let k = 0; k <= N; k++) flightPts.push(along(k / N));
         flightPts.push([landUp[0], eyeY(lvTo), landUp[1]]);
       } else {
-        const topBack: [number, number] = [top[0] + dir[0] * 1.1, top[2] + dir[1] * 1.1], botOut: [number, number] = [bottom[0] - dir[0] * 0.9, bottom[2] - dir[1] * 0.9];
+        const topBack: [number, number] = [top[0] + dir[0] * 1.1, top[2] + dir[1] * 1.1], botOut: [number, number] = [bottom[0] - dir0[0] * 0.9, bottom[2] - dir0[1] * 0.9];
         entryPt = topBack; exitPt = botOut;
         flightPts = [[topBack[0], eyeY(lvFrom), topBack[1]]];
         for (let k = N; k >= 0; k--) flightPts.push(along(k / N));

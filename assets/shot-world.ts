@@ -33,7 +33,12 @@ export type Rect = { x: number; z: number; w: number; d: number };
 export type WPart = { a: [number, number]; b: [number, number]; door: number | null; doorW: number; h: number };
 export type WRoom = { no: string; name: string; program: string | null; b: Rect; items: Array<{ type: string; at: [number, number]; rot: number }> };
 export type WLevel = { id: string; y: number; h: number; rects: Rect[]; voids: Rect[]; parts: WPart[]; rooms: WRoom[]; openings: any[] };
-export type WStair = { from: string; to: string; type: string; bottom: [number, number, number]; top: [number, number, number]; dir: [number, number]; plan: { minX: number; maxX: number; minZ: number; maxZ: number }; spiral: boolean; w: number };
+export type WStair = {
+  from: string; to: string; type: string; bottom: [number, number, number]; top: [number, number, number]; dir: [number, number]; plan: { minX: number; maxX: number; minZ: number; maxZ: number }; spiral: boolean; w: number;
+  /** S2's walking line for a flight that turns (an L, a U) or is one of several: [x, y (world), z] from the first step to the last;
+   *  `dir` is then the heading off the top and `dir0` the heading of the first flight (S2's anchors.stairs, Completeness A2) */
+  path?: Array<[number, number, number]>; dir0?: [number, number]; shape?: string;
+};
 export type WObb = { c: [number, number, number]; h: [number, number, number]; ax: [number, number, number, number, number, number, number, number, number]; k: number; n: string };
 /** a hinged leaf the shot can swing (anchors.doors from S1's kit-build.ts collectDoors): the hinge in plan, the leaf's heading
  *  (degrees, 0 = +z, of its free edge from the hinge) closed and open, and the pivot's own rotation.y at each (radians) —
@@ -202,7 +207,9 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
     const st = lv.stairs || {};
     const spiral = Math.hypot(s.top[0] - s.bottom[0], s.top[2] - s.bottom[2]) < 0.1;
     return { from: s.from, to: s.to, type: st.type || (spiral ? 'spiral' : 'timber'), bottom: s.bottom.map(mm), top: s.top.map(mm), dir: [mm(s.dir[0]), mm(s.dir[1])],
-      plan: s.plan ? { minX: mm(s.plan.minX), maxX: mm(s.plan.maxX), minZ: mm(s.plan.minZ), maxZ: mm(s.plan.maxZ) } : null, spiral, w: st.w || (st.type === 'colonial' ? 1.2 : 1.1) };
+      plan: s.plan ? { minX: mm(s.plan.minX), maxX: mm(s.plan.maxX), minZ: mm(s.plan.minZ), maxZ: mm(s.plan.maxZ) } : null, spiral, w: st.w || (st.type === 'colonial' ? 1.2 : 1.1),
+      ...(Array.isArray(s.path) && s.path.length >= 2 && !spiral ? { path: s.path.map((q: number[]) => [mm(q[0]), mm(q[1]), mm(q[2])] as [number, number, number]) } : {}),
+      ...(Array.isArray(s.dir0) ? { dir0: [mm(s.dir0[0]), mm(s.dir0[1])] as [number, number] } : {}), ...(s.shape ? { shape: String(s.shape) } : {}) };
   });
   const e = anchors.entry;
   const hero: WHero | null = heroA && coreBox ? {

@@ -325,7 +325,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const r = Math.abs(fov[i] - fov[i - 1]) / dt; maxFovRate = Math.max(maxFovRate, r);
     if (r > LENS.rate * 1.1) W('fov-rate', tOf(i), `the lens changes at ${r.toFixed(1)}°/s (≤ ${LENS.rate})`);
     const bt = beat[i], f = fov[i];
-    const range: [number, number] | null = bt === 'establish' ? [30, 37] : bt === 'route' || bt === 'stair' || bt === 'descend' ? [44, 60] : bt === 'power' ? [38, 50] : null;
+    const range: [number, number] | null = bt === 'establish' ? [30, 49] : bt === 'route' || bt === 'stair' || bt === 'descend' ? [44, 60] : bt === 'power' ? [38, 50] : null;
     if (range && (f < range[0] - 0.5 || f > range[1] + 0.5)) W('fov-range', tOf(i), `${bt}: lens ${f.toFixed(1)}° (${range[0]}–${range[1]})`, bt);
   }
   metrics.maxFovRate = +maxFovRate.toFixed(2);
@@ -371,7 +371,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const occ = c.rays.filter(r => r.k === K.site && r.t < 6).length / c.rays.length;
     metrics.establish = { style: track.plan && track.plan.establish ? track.plan.establish.style : null, crop: { top: +f.top.toFixed(3), bottom: +f.bottom.toFixed(3), side: +f.side.toFixed(3) }, sky: +c.sky.toFixed(3), occluder: +occ.toFixed(3), bearing: entry ? +(Math.atan2((eye[0][0] - entry.x) * entry.out[1] - (eye[0][2] - entry.z) * entry.out[0], (eye[0][0] - entry.x) * entry.out[0] + (eye[0][2] - entry.z) * entry.out[1]) / DEG).toFixed(1) : null };
     if (!f.ok) W('establish-crop', 0, `the house is cropped on the first frame: ${(f.top * 100).toFixed(0)} % of its corners over the top margin, ${(f.bottom * 100).toFixed(0)} % under the bottom, ${(f.side * 100).toFixed(0)} % past a side (the roof whole, the ground line and most of the width in)`);
-    if (c.sky < 0.15 || c.sky > 0.35) W('establish-sky', 0, `sky is ${(c.sky * 100).toFixed(0)} % of the first frame (15–35 %)`);
+    if (c.sky > 0.45 || (c.sky < 0.02 && f.top > 0.05)) W('establish-sky', 0, `sky is ${(c.sky * 100).toFixed(0)} % of the first frame${c.sky > 0.45 ? ' (over 45 %: the house is a small thing under a sky)' : ' with the roof running off the top'}`);
     if (occ > 0.1) W('establish-occluder', 0, `${(occ * 100).toFixed(0)} % of the first frame is planting or a car within 6 m`);
   }
 

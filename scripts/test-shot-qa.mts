@@ -330,6 +330,34 @@ for (const code of codes) {
   }
 }
 
+// ---- a flight with S2's walking line (anchors.stairs[].path): the planner follows it, and QA is content ---------------------------------
+{
+  const nw = JSON.parse(fs.readFileSync(path.join(WORLD_DIR, 'newcrest.world.json'), 'utf8')) as ShotWorld;   // (the Core is upstairs: the film climbs)
+  const base = { world: nw }, st0 = nw.stairs.find(s => s.from === nw.entry!.level && !s.spiral);
+  if (!st0) say(false, 'newcrest has a straight flight from its entry storey to give a walking line');
+  else {
+    // the straight flight's own line with a jog of 0.25 m across its middle third (inside the flight's width) and a flat pause there:
+    // enough of a bend to leave the straight-line code path
+    const a = st0.bottom, b = st0.top, d = st0.dir, side: [number, number] = [-d[1], d[0]], n = 12, pts: Array<[number, number, number]> = [];
+    for (let k = 0; k <= n; k++) { const u = k / n, j = 0.25 * Math.sin(Math.PI * Math.min(1, Math.max(0, (u - 0.33) / 0.34))) ** 2; pts.push([a[0] + (b[0] - a[0]) * u + side[0] * j, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u + side[1] * j]); }
+    const w = { ...base.world, stairs: base.world.stairs.map(s => s === st0 ? { ...s, path: pts, dir0: st0.dir, shape: 'L' } : s) } as ShotWorld;
+    const r = planDoorToCore(w, { duration: 'auto' });
+    if (!r.ok) say(false, 'the planner plans a flight with a walking line', (r as any).message);
+    else {
+      const q = qaTrack(r.track, w);
+      say(q.errors.length === 0, 'a flight with a walking line plans with no QA error', q.errors.map(e => `${e.code} @${e.t}: ${e.message}`).join('\n'));
+      // the eye on the flight follows the line: within 0.15 m of it in plan at every sample of the stair beat
+      const sb = BEATS.indexOf('stair'); let worst = 0, n = 0;
+      for (let i = 0; i < r.track.samples; i++) if (r.track.beat[i] === sb) {
+        const p = eyeAt(r.track, i); let best = 1e9, interior = false;
+        for (let k = 0; k < pts.length - 1; k++) { const vx = pts[k + 1][0] - pts[k][0], vz = pts[k + 1][2] - pts[k][2], uu = ((p[0] - pts[k][0]) * vx + (p[2] - pts[k][2]) * vz) / (vx * vx + vz * vz || 1), u = clamp(uu, 0, 1), dd = Math.hypot(p[0] - pts[k][0] - vx * u, p[2] - pts[k][2] - vz * u); if (dd < best) { best = dd; interior = (k > 0 || uu > 0) && (k < pts.length - 2 || uu < 1); } }
+        if (interior) { worst = Math.max(worst, best); n++; }
+      }
+      say(n > 100 && worst < 0.2, `the eye keeps to the walking line on the flight (${n} samples, worst ${worst.toFixed(2)} m off)`);
+    }
+  }
+}
+
 // ---- the fleet checks: good rows pass, and each spoiled row fails ---------------------------------------------------------------
 {
   const styles = ['axial', 'garden', 'corner-right', 'dollhouse', 'corner-left'], bgs = ['art', 'wall', 'window', 'bookcase', 'other'];
