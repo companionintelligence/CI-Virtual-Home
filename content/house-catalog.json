@@ -19,7 +19,39 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "seating",
+    "roles": [
+     "sofa-l"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "club-chair": {
    "footprint": [
@@ -37,9 +69,42 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "color"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "armchair"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "industrial",
+     "craftsman"
+    ]
+   }
   },
   "coffee-table": {
    "footprint": [
@@ -57,9 +122,45 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.3,
+     "back": 0.3
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "table",
+    "roles": [
+     "coffee-table"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ],
+    "top": 0.4
+   }
   },
   "octagonal-table": {
    "footprint": [
@@ -79,7 +180,38 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.3,
+     "back": 0.3
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "table",
+    "roles": [
+     "coffee-table"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "mediterranean",
+     "tropical"
+    ],
+    "top": 0.6
+   }
   },
   "dining-set": {
    "footprint": [
@@ -97,9 +229,35 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0.6
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "table",
+    "roles": [
+     "dining-set"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
   },
   "dining-table": {
    "footprint": [
@@ -117,9 +275,35 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0.6
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "table",
+    "roles": [
+     "dining-set"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
   },
   "kitchen-island": {
    "footprint": [
@@ -137,9 +321,37 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 1,
+     "side": 0.9,
+     "back": 1
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "fitted",
+    "roles": [
+     "island"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": [],
+    "top": 0.92
+   }
   },
   "kitchen-cabinetry": {
    "footprint": [
@@ -157,9 +369,36 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "fitted",
+    "roles": [
+     "kitchen-run"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": [],
+    "top": 0.9
+   }
   },
   "media-credenza": {
    "footprint": [
@@ -177,9 +416,46 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.5,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "storage",
+    "roles": [
+     "media",
+     "credenza"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ],
+    "top": 0.72
+   }
   },
   "wall-tv": {
    "footprint": [
@@ -197,9 +473,40 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "mountY": 1.3,
+    "group": "art",
+    "roles": [
+     "tv"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": []
+   }
   },
   "fireplace": {
    "footprint": [
@@ -219,7 +526,32 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "storage",
+    "roles": [
+     "fireplace"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "library",
+     "bed-primary"
+    ],
+    "styles": []
+   }
   },
   "area-rug": {
    "footprint": [
@@ -237,9 +569,51 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "rug",
+    "group": "rug",
+    "roles": [
+     "rug"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "circular-rug": {
    "footprint": [
@@ -257,9 +631,48 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "r",
+    "color"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "rug",
+    "group": "rug",
+    "roles": [
+     "rug-round"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "bed-kid",
+     "nursery",
+     "playroom",
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
   },
   "concentric-rug": {
    "footprint": [
@@ -277,9 +690,45 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "r"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "rug",
+    "roles": [
+     "rug-round"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "sun-lounger": {
    "footprint": [
@@ -299,7 +748,30 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "outdoor",
+    "roles": [
+     "lounger"
+    ],
+    "programs": [
+     "outdoor",
+     "sunroom"
+    ],
+    "styles": []
+   }
   },
   "bench": {
    "footprint": [
@@ -317,9 +789,48 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h",
+    "d"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "seating",
+    "roles": [
+     "bench",
+     "bed-bench"
+    ],
+    "programs": [
+     "foyer",
+     "hall",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "platform-bed": {
    "footprint": [
@@ -337,9 +848,41 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "bed",
+    "roles": [
+     "bed"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "wardrobe": {
    "footprint": [
@@ -357,9 +900,43 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h",
+    "d"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.9,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "storage",
+    "roles": [
+     "wardrobe"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "crib": {
    "footprint": [
@@ -377,9 +954,33 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "color"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "bed",
+    "roles": [
+     "crib"
+    ],
+    "programs": [
+     "nursery"
+    ],
+    "styles": []
+   }
   },
   "ensuite": {
    "footprint": [
@@ -397,9 +998,36 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "d"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.9,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "bath",
+    "roles": [
+     "bath-pod"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": []
+   }
   },
   "bookshelf": {
    "footprint": [
@@ -417,9 +1045,41 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h",
+    "d"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "storage",
+    "roles": [
+     "bookcase"
+    ],
+    "programs": [
+     "study",
+     "library",
+     "studio",
+     "living",
+     "den",
+     "bed-guest",
+     "hall"
+    ],
+    "styles": []
+   }
   },
   "walnut-desk": {
    "footprint": [
@@ -439,7 +1099,31 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "hero",
+    "roles": [
+     "hero-desk"
+    ],
+    "programs": [
+     "study",
+     "library",
+     "studio"
+    ],
+    "styles": []
+   }
   },
   "task-chair": {
    "footprint": [
@@ -459,7 +1143,32 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "hero",
+    "roles": [
+     "desk-chair"
+    ],
+    "programs": [
+     "study",
+     "library",
+     "studio"
+    ],
+    "styles": [],
+    "tucks": true
+   }
   },
   "curved-monitor": {
    "footprint": [
@@ -479,7 +1188,31 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "hero",
+    "roles": [],
+    "programs": [
+     "study",
+     "library",
+     "studio"
+    ],
+    "styles": []
+   }
   },
   "chalk-tower": {
    "footprint": [
@@ -497,9 +1230,33 @@
    ],
    "surface": true,
    "source": "page",
-   "params": [],
+   "params": [
+    "pose"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "hero",
+    "roles": [],
+    "programs": [],
+    "styles": []
+   }
   },
   "charcoal-tower": {
    "footprint": [
@@ -517,9 +1274,33 @@
    ],
    "surface": true,
    "source": "page",
-   "params": [],
+   "params": [
+    "pose"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "hero",
+    "roles": [],
+    "programs": [],
+    "styles": []
+   }
   },
   "core-shelf": {
    "footprint": [
@@ -537,9 +1318,32 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "finish",
+    "pose",
+    "h",
+    "w"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "hero",
+    "roles": [],
+    "programs": [],
+    "styles": []
+   }
   },
   "strix-mini": {
    "footprint": [
@@ -559,7 +1363,29 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "hero",
+    "roles": [],
+    "programs": [],
+    "styles": []
+   }
   },
   "speakers": {
    "footprint": [
@@ -579,7 +1405,29 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "hero",
+    "roles": [],
+    "programs": [],
+    "styles": []
+   }
   },
   "halo-lamp": {
    "footprint": [
@@ -599,7 +1447,43 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "lamp",
+    "roles": [
+     "legacy-lamp"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "fiddle-leaf": {
    "footprint": [
@@ -619,7 +1503,36 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "plant",
+    "roles": [
+     "plant-floor"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "foyer"
+    ],
+    "styles": []
+   }
   },
   "monstera": {
    "footprint": [
@@ -639,7 +1552,42 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "plant",
+    "roles": [
+     "plant-floor"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "foyer",
+     "bed-primary"
+    ],
+    "styles": [
+     "modern",
+     "tropical",
+     "mid-century",
+     "scandi"
+    ]
+   }
   },
   "bonsai": {
    "footprint": [
@@ -659,7 +1607,36 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "plant",
+    "roles": [
+     "plant-surface"
+    ],
+    "programs": [
+     "study",
+     "library",
+     "studio",
+     "living"
+    ],
+    "styles": []
+   }
   },
   "bamboo": {
    "footprint": [
@@ -679,7 +1656,34 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "plant",
+    "roles": [
+     "plant-screen"
+    ],
+    "programs": [
+     "sunroom",
+     "greenhouse",
+     "outdoor"
+    ],
+    "styles": [
+     "modern",
+     "tropical"
+    ]
+   }
   },
   "cactus-group": {
    "footprint": [
@@ -699,7 +1703,34 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "plant",
+    "roles": [
+     "plant-floor"
+    ],
+    "programs": [
+     "sunroom",
+     "greenhouse",
+     "living"
+    ],
+    "styles": [
+     "mediterranean",
+     "modern"
+    ]
+   }
   },
   "telescope": {
    "footprint": [
@@ -719,7 +1750,31 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "window",
+    "clear": {
+     "front": 0.3,
+     "side": 0.2,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "curio"
+    ],
+    "programs": [
+     "study",
+     "library",
+     "living"
+    ],
+    "styles": []
+   }
   },
   "soccer-goal": {
    "footprint": [
@@ -739,7 +1794,29 @@
    "source": "page",
    "params": [],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "outdoor",
+    "roles": [
+     "play-outdoor"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "low-wall": {
    "footprint": [
@@ -757,9 +1834,30 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "w",
+    "h"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "structure",
+    "roles": [],
+    "programs": [],
+    "styles": []
+   }
   },
   "column": {
    "footprint": [
@@ -777,9 +1875,33 @@
    ],
    "surface": false,
    "source": "page",
-   "params": [],
+   "params": [
+    "h",
+    "r",
+    "size",
+    "style",
+    "color"
+   ],
    "tags": [],
-   "iso": null
+   "iso": null,
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "structure",
+    "roles": [],
+    "programs": [],
+    "styles": []
+   }
   },
   "side-table": {
    "footprint": [
@@ -818,7 +1940,45 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0.05
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "side-table",
+     "nightstand"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ],
+    "top": 0.55
+   }
   },
   "table-lamp": {
    "footprint": [
@@ -857,7 +2017,48 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [
+     "nightstand",
+     "side-table",
+     "console"
+    ],
+    "colorRole": "linen",
+    "group": "lamp",
+    "roles": [
+     "table-lamp"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
   },
   "floor-cushion": {
    "footprint": [
@@ -895,7 +2096,34 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "textile",
+    "roles": [
+     "floor-seat"
+    ],
+    "programs": [
+     "living",
+     "playroom",
+     "bed-kid"
+    ],
+    "styles": [
+     "mediterranean",
+     "tropical"
+    ]
+   }
   },
   "loveseat": {
    "footprint": [
@@ -972,7 +2200,40 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [
+     "coffee-table",
+     "armchair",
+     "rug"
+    ],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "sofa",
+     "loveseat"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary"
+    ],
+    "styles": []
+   }
   },
   "wingback-armchair": {
    "footprint": [
@@ -1023,7 +2284,44 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [
+     "floor-lamp",
+     "side-table"
+    ],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "armchair",
+     "reading-chair"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "craftsman",
+     "traditional"
+    ]
+   }
   },
   "chaise-lounge": {
    "footprint": [
@@ -1085,7 +2383,36 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "chaise"
+    ],
+    "programs": [
+     "living",
+     "bed-primary",
+     "sunroom",
+     "library"
+    ],
+    "styles": [
+     "cottage",
+     "mid-century",
+     "modern"
+    ]
+   }
   },
   "ottoman": {
    "footprint": [
@@ -1125,7 +2452,41 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.2,
+     "side": 0.1,
+     "back": 0.2
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "ottoman",
+     "coffee-table",
+     "bed-bench"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": [],
+    "top": 0.42
+   }
   },
   "pouf": {
    "footprint": [
@@ -1164,7 +2525,43 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.1,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "pouf"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-kid",
+     "nursery",
+     "playroom",
+     "bed-primary"
+    ],
+    "styles": [
+     "scandi",
+     "tropical",
+     "mediterranean",
+     "modern"
+    ]
+   }
   },
   "bar-stool": {
    "footprint": [
@@ -1239,7 +2636,32 @@
      ],
      "color": "role:fabric2"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric2",
+    "tucks": true,
+    "group": "chair",
+    "roles": [
+     "stool"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "bar"
+    ],
+    "styles": []
+   }
   },
   "dining-chair": {
    "footprint": [
@@ -1315,7 +2737,35 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [
+     "dining-table"
+    ],
+    "colorRole": "fabric",
+    "tucks": true,
+    "group": "chair",
+    "roles": [
+     "dining-chair",
+     "desk-chair"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "study"
+    ],
+    "styles": []
+   }
   },
   "rocking-chair": {
    "footprint": [
@@ -1391,7 +2841,36 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "armchair",
+     "reading-chair"
+    ],
+    "programs": [
+     "living",
+     "nursery",
+     "bed-kid",
+     "sunroom"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage"
+    ]
+   }
   },
   "cushioned-bench": {
    "footprint": [
@@ -1468,7 +2947,43 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "bed-bench",
+     "bench",
+     "dining-bench"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "foyer",
+     "hall",
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "scandi",
+     "modern"
+    ]
+   }
   },
   "papasan-chair": {
    "footprint": [
@@ -1519,7 +3034,34 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "armchair"
+    ],
+    "programs": [
+     "living",
+     "bed-kid",
+     "sunroom",
+     "playroom"
+    ],
+    "styles": [
+     "tropical"
+    ]
+   }
   },
   "bean-bag": {
    "footprint": [
@@ -1557,7 +3099,33 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.2,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "floor-seat"
+    ],
+    "programs": [
+     "bed-kid",
+     "nursery",
+     "playroom",
+     "media",
+     "den"
+    ],
+    "styles": []
+   }
   },
   "vanity-stool": {
    "footprint": [
@@ -1619,7 +3187,1431 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "tucks": true,
+    "group": "chair",
+    "roles": [
+     "vanity-stool"
+    ],
+    "programs": [
+     "bed-primary",
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": []
+   }
+  },
+  "sofa": {
+   "footprint": [
+    2.2,
+    0.95
+   ],
+   "height": 0.88,
+   "box": [
+    -1.1,
+    0,
+    -0.475,
+    1.1,
+    0.884,
+    0.475
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "den",
+    "media"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -1.1,
+      0.1,
+      -0.475,
+      1.1,
+      0.44,
+      0.475
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1.1,
+      0.32,
+      -0.475,
+      1.1,
+      0.82,
+      -0.27499999999999997
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1.1,
+      0.32,
+      -0.475,
+      -0.9400000000000001,
+      0.64,
+      0.475
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.9400000000000001,
+      0.32,
+      -0.475,
+      1.1,
+      0.64,
+      0.475
+     ],
+     "color": "role:fabric"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [
+     "coffee-table",
+     "armchair",
+     "rug"
+    ],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "sofa"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "scandi"
+    ]
+   }
+  },
+  "slipcover-sofa": {
+   "footprint": [
+    2.13,
+    0.96
+   ],
+   "height": 0.9,
+   "box": [
+    -1.067,
+    0.015,
+    -0.48,
+    1.067,
+    0.916,
+    0.48
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "den"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -1.05,
+      0.1,
+      -0.475,
+      1.05,
+      0.44,
+      0.475
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1.05,
+      0.32,
+      -0.475,
+      1.05,
+      0.86,
+      -0.27499999999999997
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1.05,
+      0.32,
+      -0.475,
+      -0.8300000000000001,
+      0.64,
+      0.475
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.8300000000000001,
+      0.32,
+      -0.475,
+      1.05,
+      0.64,
+      0.475
+     ],
+     "color": "role:fabric"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "sofa"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "tropical"
+    ]
+   }
+  },
+  "chesterfield-sofa": {
+   "footprint": [
+    2.23,
+    0.92
+   ],
+   "height": 0.84,
+   "box": [
+    -1.117,
+    -0.005,
+    -0.46,
+    1.117,
+    0.836,
+    0.46
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "library",
+    "den"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -1.12,
+      0.1,
+      -0.48,
+      1.12,
+      0.44,
+      0.48
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1.12,
+      0.32,
+      -0.48,
+      1.12,
+      0.77,
+      -0.27999999999999997
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1.12,
+      0.32,
+      -0.48,
+      -0.8800000000000001,
+      0.64,
+      0.48
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.8800000000000001,
+      0.32,
+      -0.48,
+      1.12,
+      0.64,
+      0.48
+     ],
+     "color": "role:fabric"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "sofa"
+    ],
+    "programs": [
+     "living",
+     "library",
+     "den",
+     "study"
+    ],
+    "styles": [
+     "craftsman",
+     "industrial",
+     "traditional"
+    ]
+   }
+  },
+  "mid-century-sofa": {
+   "footprint": [
+    2,
+    0.85
+   ],
+   "height": 0.83,
+   "box": [
+    -1,
+    -0.005,
+    -0.425,
+    1,
+    0.825,
+    0.425
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "den",
+    "study"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -1,
+      0.1,
+      -0.425,
+      1,
+      0.44,
+      0.425
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1,
+      0.32,
+      -0.425,
+      1,
+      0.78,
+      -0.285
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1,
+      0.32,
+      -0.425,
+      -0.9299999999999999,
+      0.64,
+      0.425
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.9299999999999999,
+      0.32,
+      -0.425,
+      1,
+      0.64,
+      0.425
+     ],
+     "color": "role:fabric"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "sofa"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "mid-century",
+     "scandi",
+     "modern"
+    ]
+   }
+  },
+  "tuxedo-sofa": {
+   "footprint": [
+    2.2,
+    0.9
+   ],
+   "height": 0.79,
+   "box": [
+    -1.1,
+    0,
+    -0.45,
+    1.1,
+    0.788,
+    0.45
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "den",
+    "media"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -1.1,
+      0.1,
+      -0.45,
+      1.1,
+      0.44,
+      0.45
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1.1,
+      0.32,
+      -0.45,
+      1.1,
+      0.72,
+      -0.25
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1.1,
+      0.32,
+      -0.45,
+      -0.9400000000000001,
+      0.64,
+      0.45
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.9400000000000001,
+      0.32,
+      -0.45,
+      1.1,
+      0.64,
+      0.45
+     ],
+     "color": "role:fabric"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "sofa"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "industrial",
+     "mediterranean"
+    ]
+   }
+  },
+  "l-sectional": {
+   "footprint": [
+    2.8,
+    1.7
+   ],
+   "height": 0.91,
+   "box": [
+    -1.4,
+    0,
+    -0.85,
+    1.4,
+    0.907,
+    0.85
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "l",
+    "d",
+    "hand",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "den",
+    "media"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -1.4,
+      0.1,
+      -0.85,
+      1.4,
+      0.46,
+      0.1
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.45,
+      0.1,
+      0.1,
+      1.4,
+      0.46,
+      0.85
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -1.4,
+      0.32,
+      -0.85,
+      1.4,
+      0.82,
+      -0.65
+     ],
+     "color": "role:fabric"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "sofa-l"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "industrial",
+     "mid-century"
+    ]
+   }
+  },
+  "mission-armchair": {
+   "footprint": [
+    0.83,
+    0.88
+   ],
+   "height": 0.95,
+   "box": [
+    -0.415,
+    0,
+    -0.42,
+    0.415,
+    0.95,
+    0.46
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "living",
+    "library",
+    "study",
+    "den"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.39,
+      0,
+      -0.42,
+      0.39,
+      0.65,
+      0.44
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.34,
+      0.36,
+      -0.36,
+      0.34,
+      0.48,
+      0.36
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.39,
+      0.3,
+      -0.42,
+      0.39,
+      0.95,
+      -0.37
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "armchair",
+     "reading-chair"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "craftsman",
+     "farmhouse",
+     "mediterranean"
+    ]
+   }
+  },
+  "barrel-chair": {
+   "footprint": [
+    0.78,
+    0.76
+   ],
+   "height": 0.76,
+   "box": [
+    -0.39,
+    0,
+    -0.39,
+    0.39,
+    0.76,
+    0.37
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "living",
+    "bedroom",
+    "study"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.39,
+      0,
+      -0.39,
+      0.39,
+      0.46,
+      0.39
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.39,
+      0.46,
+      -0.39,
+      0.39,
+      0.76,
+      -0.1
+     ],
+     "color": "role:fabric"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "armchair"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary"
+    ],
+    "styles": [
+     "modern",
+     "mid-century",
+     "industrial"
+    ]
+   }
+  },
+  "slipper-chair": {
+   "footprint": [
+    0.62,
+    0.79
+   ],
+   "height": 0.88,
+   "box": [
+    -0.31,
+    -0.004,
+    -0.432,
+    0.31,
+    0.875,
+    0.36
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "living",
+    "bedroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.31,
+      0.15,
+      -0.36,
+      0.31,
+      0.43,
+      0.36
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.31,
+      0.35,
+      -0.37,
+      0.31,
+      0.88,
+      -0.2
+     ],
+     "color": "role:fabric"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "armchair",
+     "bedroom-chair"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest"
+    ],
+    "styles": [
+     "cottage",
+     "scandi",
+     "modern"
+    ]
+   }
+  },
+  "lounge-chair": {
+   "footprint": [
+    0.76,
+    0.78
+   ],
+   "height": 0.84,
+   "box": [
+    -0.38,
+    0.015,
+    -0.422,
+    0.38,
+    0.856,
+    0.359
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "living",
+    "library",
+    "study",
+    "bedroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.36,
+      0.28,
+      -0.3,
+      0.36,
+      0.46,
+      0.4
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.36,
+      0.34,
+      -0.43,
+      0.36,
+      0.86,
+      -0.2
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "armchair",
+     "reading-chair"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary"
+    ],
+    "styles": [
+     "mid-century",
+     "modern",
+     "scandi",
+     "industrial"
+    ]
+   }
+  },
+  "rattan-armchair": {
+   "footprint": [
+    0.76,
+    0.72
+   ],
+   "height": 0.7,
+   "box": [
+    -0.379,
+    0,
+    -0.38,
+    0.379,
+    0.7,
+    0.34
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "living",
+    "sunroom",
+    "bedroom"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.4,
+      0,
+      -0.4,
+      0.4,
+      0.76,
+      0.4
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.28,
+      0.2,
+      -0.21,
+      0.28,
+      0.3,
+      0.29
+     ],
+     "color": "role:linen"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "seating",
+    "roles": [
+     "armchair",
+     "bedroom-chair"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest"
+    ],
+    "styles": [
+     "tropical",
+     "mediterranean",
+     "cottage"
+    ]
+   }
+  },
+  "windsor-chair": {
+   "footprint": [
+    0.51,
+    0.53
+   ],
+   "height": 0.95,
+   "box": [
+    -0.24,
+    -0.002,
+    -0.297,
+    0.272,
+    0.952,
+    0.23
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "dining",
+    "kitchen",
+    "study"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.23,
+      0,
+      -0.21,
+      0.23,
+      0.48,
+      0.23
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.22,
+      0.48,
+      -0.25,
+      0.22,
+      0.96,
+      -0.1
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "tucks": true,
+    "group": "chair",
+    "roles": [
+     "dining-chair",
+     "desk-chair"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "study"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "craftsman"
+    ]
+   }
+  },
+  "bentwood-chair": {
+   "footprint": [
+    0.42,
+    0.47
+   ],
+   "height": 0.9,
+   "box": [
+    -0.21,
+    -0.001,
+    -0.247,
+    0.21,
+    0.9,
+    0.22
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "dining",
+    "kitchen",
+    "study"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.21,
+      0.42,
+      -0.2,
+      0.21,
+      0.47,
+      0.22
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.19,
+      0.47,
+      -0.25,
+      0.19,
+      0.88,
+      -0.17
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "tucks": true,
+    "group": "chair",
+    "roles": [
+     "dining-chair",
+     "desk-chair"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "study",
+     "bar"
+    ],
+    "styles": [
+     "scandi",
+     "cottage",
+     "mediterranean",
+     "mid-century"
+    ]
+   }
+  },
+  "ladderback-chair": {
+   "footprint": [
+    0.46,
+    0.46
+   ],
+   "height": 1.02,
+   "box": [
+    -0.23,
+    0,
+    -0.23,
+    0.23,
+    1.02,
+    0.23
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "dining",
+    "kitchen",
+    "bedroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.23,
+      0.43,
+      -0.23,
+      0.23,
+      0.47,
+      0.23
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.23,
+      0,
+      -0.23,
+      0.23,
+      1.02,
+      -0.19
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "tucks": true,
+    "group": "chair",
+    "roles": [
+     "dining-chair"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "bed-guest"
+    ],
+    "styles": [
+     "farmhouse",
+     "mediterranean",
+     "craftsman"
+    ]
+   }
+  },
+  "shell-chair": {
+   "footprint": [
+    0.48,
+    0.45
+   ],
+   "height": 0.79,
+   "box": [
+    -0.242,
+    -0.001,
+    -0.223,
+    0.242,
+    0.786,
+    0.23
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "dining",
+    "kitchen",
+    "study",
+    "office"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.22,
+      0.42,
+      -0.17,
+      0.22,
+      0.46,
+      0.23
+     ],
+     "color": "role:fabric2"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.24,
+      0.44,
+      -0.24,
+      0.24,
+      0.8,
+      -0.1
+     ],
+     "color": "role:fabric2"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric2",
+    "tucks": true,
+    "group": "chair",
+    "roles": [
+     "dining-chair",
+     "desk-chair"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "study",
+     "studio"
+    ],
+    "styles": [
+     "mid-century",
+     "modern",
+     "scandi",
+     "industrial"
+    ]
+   }
   },
   "round-dining-table": {
    "footprint": [
@@ -1671,7 +4663,32 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.9,
+     "side": 0.9,
+     "back": 0.9
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "dining-table",
+     "dining-table-round"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [],
+    "top": 0.75
+   }
   },
   "console-table": {
    "footprint": [
@@ -1724,7 +4741,34 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "console"
+    ],
+    "programs": [
+     "foyer",
+     "hall",
+     "living",
+     "dining",
+     "bed-primary"
+    ],
+    "styles": [],
+    "top": 0.8
+   }
   },
   "nightstand": {
    "footprint": [
@@ -1775,7 +4819,38 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "storage",
+    "roles": [
+     "nightstand"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "craftsman",
+     "traditional"
+    ],
+    "top": 0.55
+   }
   },
   "nesting-tables": {
    "footprint": [
@@ -1837,7 +4912,40 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0.05
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "side-table"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary"
+    ],
+    "styles": [
+     "modern",
+     "mid-century",
+     "scandi"
+    ],
+    "top": 0.5
+   }
   },
   "writing-desk": {
    "footprint": [
@@ -1904,7 +5012,35 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.9,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "desk",
+    "roles": [
+     "desk"
+    ],
+    "programs": [
+     "study",
+     "library",
+     "studio",
+     "bed-guest",
+     "bed-kid",
+     "bed-primary"
+    ],
+    "styles": [],
+    "top": 0.75
+   }
   },
   "vanity-desk": {
    "footprint": [
@@ -1966,7 +5102,29 @@
      ],
      "color": "#dbe7ee"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "desk",
+    "roles": [
+     "vanity"
+    ],
+    "programs": [
+     "bed-primary"
+    ],
+    "styles": []
+   }
   },
   "farmhouse-table": {
    "footprint": [
@@ -2030,7 +5188,35 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.9,
+     "side": 0.9,
+     "back": 0.9
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "dining-table"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "craftsman"
+    ],
+    "top": 0.76
+   }
   },
   "bar-table": {
    "footprint": [
@@ -2084,7 +5270,35 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.5,
+     "side": 0.5,
+     "back": 0.5
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "bar-table"
+    ],
+    "programs": [
+     "bar",
+     "kitchen",
+     "kitchen-dining",
+     "living"
+    ],
+    "styles": [
+     "industrial",
+     "modern"
+    ]
+   }
   },
   "outdoor-table": {
    "footprint": [
@@ -2149,7 +5363,29 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "outdoor",
+    "roles": [
+     "dining-table-outdoor"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "kids-table": {
    "footprint": [
@@ -2188,7 +5424,31 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.4,
+     "side": 0.4,
+     "back": 0.4
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "kids",
+    "roles": [
+     "kids-table"
+    ],
+    "programs": [
+     "bed-kid",
+     "nursery",
+     "playroom"
+    ],
+    "styles": []
+   }
   },
   "bistro-table": {
    "footprint": [
@@ -2241,7 +5501,526 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0.6
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "dining-table-small"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "outdoor",
+     "sunroom",
+     "bar"
+    ],
+    "styles": [
+     "mediterranean",
+     "cottage",
+     "industrial"
+    ]
+   }
+  },
+  "trestle-table": {
+   "footprint": [
+    2,
+    0.9
+   ],
+   "height": 0.76,
+   "box": [
+    -1,
+    0,
+    -0.45,
+    1,
+    0.76,
+    0.45
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "dining",
+    "kitchen"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -1,
+      0.705,
+      -0.45,
+      1,
+      0.76,
+      0.45
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.75,
+      0,
+      -0.4,
+      -0.65,
+      0.7,
+      0.4
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.65,
+      0,
+      -0.4,
+      0.75,
+      0.7,
+      0.4
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.9,
+     "side": 0.9,
+     "back": 0.9
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "dining-table"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [
+     "farmhouse",
+     "craftsman",
+     "mediterranean",
+     "industrial"
+    ],
+    "top": 0.76
+   }
+  },
+  "glass-dining-table": {
+   "footprint": [
+    1.8,
+    0.9
+   ],
+   "height": 0.75,
+   "box": [
+    -0.9,
+    0,
+    -0.45,
+    0.9,
+    0.75,
+    0.45
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "dining"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.9,
+      0.738,
+      -0.45,
+      0.9,
+      0.75,
+      0.45
+     ],
+     "color": "#cfe3e8"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.72,
+      0,
+      -0.41,
+      -0.68,
+      0.74,
+      0.41
+     ],
+     "color": "role:metal"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.68,
+      0,
+      -0.41,
+      0.72,
+      0.74,
+      0.41
+     ],
+     "color": "role:metal"
+    }
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.9,
+     "side": 0.9,
+     "back": 0.9
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "group": "table",
+    "roles": [
+     "dining-table"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [
+     "modern",
+     "industrial"
+    ],
+    "top": 0.75
+   }
+  },
+  "pedestal-dining-table": {
+   "footprint": [
+    1.2,
+    1.2
+   ],
+   "height": 0.74,
+   "box": [
+    -0.6,
+    0.02,
+    -0.6,
+    0.6,
+    0.76,
+    0.6
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "r",
+    "color"
+   ],
+   "tags": [
+    "dining",
+    "kitchen"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.6,
+      0.715,
+      -0.6,
+      0.6,
+      0.76,
+      0.6
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "cyl",
+     "box": [
+      -0.1,
+      0,
+      -0.1,
+      0.1,
+      0.715,
+      0.1
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.9,
+     "side": 0.9,
+     "back": 0.9
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "dining-table",
+     "dining-table-round"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [
+     "scandi",
+     "cottage",
+     "farmhouse",
+     "traditional"
+    ],
+    "top": 0.76
+   }
+  },
+  "oval-dining-table": {
+   "footprint": [
+    2,
+    1
+   ],
+   "height": 0.75,
+   "box": [
+    -1,
+    -0.002,
+    -0.5,
+    1,
+    0.75,
+    0.5
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "dining"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -1,
+      0.71,
+      -0.5,
+      1,
+      0.75,
+      0.5
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.9,
+     "side": 0.9,
+     "back": 0.9
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "dining-table"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": [
+     "mid-century",
+     "scandi",
+     "modern"
+    ],
+    "top": 0.75
+   }
+  },
+  "round-coffee-table": {
+   "footprint": [
+    0.9,
+    0.9
+   ],
+   "height": 0.42,
+   "box": [
+    -0.45,
+    0,
+    -0.45,
+    0.45,
+    0.42,
+    0.45
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "r",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "den"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.45,
+      0.385,
+      -0.45,
+      0.45,
+      0.42,
+      0.45
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "cyl",
+     "box": [
+      -0.35,
+      0.1,
+      -0.35,
+      0.35,
+      0.13,
+      0.35
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.3,
+     "back": 0.3
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "coffee-table"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study"
+    ],
+    "styles": [
+     "scandi",
+     "mid-century",
+     "cottage",
+     "tropical"
+    ],
+    "top": 0.42
+   }
+  },
+  "trunk-coffee-table": {
+   "footprint": [
+    1.01,
+    0.63
+   ],
+   "height": 0.47,
+   "box": [
+    -0.505,
+    0,
+    -0.31,
+    0.505,
+    0.47,
+    0.32
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "den",
+    "bedroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.5,
+      0.02,
+      -0.3,
+      0.5,
+      0.46,
+      0.3
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.3,
+     "back": 0.3
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "table",
+    "roles": [
+     "coffee-table",
+     "bed-bench"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary"
+    ],
+    "styles": [
+     "farmhouse",
+     "industrial",
+     "craftsman"
+    ],
+    "top": 0.46
+   }
   },
   "dresser": {
    "footprint": [
@@ -2295,7 +6074,33 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "storage",
+    "roles": [
+     "dresser"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": [],
+    "top": 0.85
+   }
   },
   "tall-cabinet": {
    "footprint": [
@@ -2339,7 +6144,46 @@
      ],
      "color": "role:cabinet"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.8,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "storage",
+    "roles": [
+     "tall-storage",
+     "linen"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "hall",
+     "bath",
+     "ensuite",
+     "powder",
+     "laundry",
+     "kitchen",
+     "kitchen-dining",
+     "garage"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "sideboard": {
    "footprint": [
@@ -2394,7 +6238,35 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "sideboard",
+     "credenza"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "living",
+     "hall",
+     "foyer"
+    ],
+    "styles": [],
+    "top": 0.95
+   }
   },
   "open-shelving": {
    "footprint": [
@@ -2438,7 +6310,48 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "bookcase",
+     "shelving"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "study",
+     "library",
+     "studio",
+     "bed-guest",
+     "bed-kid",
+     "hall",
+     "laundry",
+     "garage",
+     "greenhouse"
+    ],
+    "styles": [
+     "modern",
+     "industrial",
+     "scandi"
+    ]
+   }
   },
   "cube-storage": {
    "footprint": [
@@ -2484,7 +6397,38 @@
      ],
      "color": "role:cabinet"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "toy-storage",
+     "shelving"
+    ],
+    "programs": [
+     "bed-kid",
+     "nursery",
+     "playroom",
+     "living",
+     "study",
+     "hall"
+    ],
+    "styles": [
+     "scandi",
+     "modern"
+    ]
+   }
   },
   "shoe-rack": {
    "footprint": [
@@ -2523,7 +6467,31 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.5,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "shoe-rack"
+    ],
+    "programs": [
+     "foyer",
+     "hall",
+     "laundry"
+    ],
+    "styles": []
+   }
   },
   "coat-rack": {
    "footprint": [
@@ -2586,7 +6554,30 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.4,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "coat-rack"
+    ],
+    "programs": [
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
   },
   "ladder-shelf": {
    "footprint": [
@@ -2640,7 +6631,47 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.5,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "bookcase",
+     "shelving"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "study",
+     "library",
+     "studio",
+     "bed-guest",
+     "hall",
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": [
+     "scandi",
+     "modern",
+     "farmhouse"
+    ]
+   }
   },
   "wine-rack": {
    "footprint": [
@@ -2680,7 +6711,32 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "wine"
+    ],
+    "programs": [
+     "bar",
+     "kitchen",
+     "kitchen-dining",
+     "dining"
+    ],
+    "styles": []
+   }
   },
   "chest": {
    "footprint": [
@@ -2734,7 +6790,42 @@
      ],
      "color": "role:fabric2"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.4,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "bed-bench",
+     "toy-storage",
+     "chest"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "living",
+     "hall"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "craftsman",
+     "traditional"
+    ],
+    "top": 0.56
+   }
   },
   "wall-hooks": {
    "footprint": [
@@ -2777,7 +6868,36 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "mountY": 1.6,
+    "group": "art",
+    "roles": [
+     "hooks"
+    ],
+    "programs": [
+     "foyer",
+     "hall",
+     "bath",
+     "ensuite",
+     "powder",
+     "laundry",
+     "bed-kid"
+    ],
+    "styles": []
+   }
   },
   "laundry-hamper": {
    "footprint": [
@@ -2816,7 +6936,36 @@
      ],
      "color": "#c4a072"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "hamper"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "bath",
+     "ensuite",
+     "powder",
+     "laundry"
+    ],
+    "styles": []
+   }
   },
   "storage-bench": {
    "footprint": [
@@ -2868,7 +7017,243 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.4,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "seating",
+    "roles": [
+     "bench",
+     "bed-bench"
+    ],
+    "programs": [
+     "foyer",
+     "hall",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "playroom"
+    ],
+    "styles": []
+   }
+  },
+  "armoire": {
+   "footprint": [
+    1.16,
+    0.64
+   ],
+   "height": 2.1,
+   "box": [
+    -0.58,
+    0,
+    -0.3,
+    0.58,
+    2.1,
+    0.34
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "h",
+    "color"
+   ],
+   "tags": [
+    "bedroom",
+    "hall"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.55,
+      0,
+      -0.3,
+      0.55,
+      2.1,
+      0.3
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.9,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "wardrobe"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "craftsman",
+     "mediterranean",
+     "traditional"
+    ]
+   }
+  },
+  "bedside-table": {
+   "footprint": [
+    0.45,
+    0.39
+   ],
+   "height": 0.56,
+   "box": [
+    -0.225,
+    -0.002,
+    -0.19,
+    0.225,
+    0.56,
+    0.202
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "bedroom",
+    "guest"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.225,
+      0.26,
+      -0.19,
+      0.225,
+      0.56,
+      0.19
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "nightstand"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": [
+     "mid-century",
+     "scandi",
+     "modern"
+    ],
+    "top": 0.56
+   }
+  },
+  "bar-cart": {
+   "footprint": [
+    0.85,
+    0.49
+   ],
+   "height": 1.08,
+   "box": [
+    -0.4,
+    0.001,
+    -0.245,
+    0.452,
+    1.08,
+    0.245
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "bar",
+    "living",
+    "dining"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.4,
+      0,
+      -0.225,
+      0.4,
+      0.8,
+      0.225
+     ],
+     "color": "role:metal"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.4,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "group": "storage",
+    "roles": [
+     "bar-cart"
+    ],
+    "programs": [
+     "bar",
+     "living",
+     "dining",
+     "den"
+    ],
+    "styles": [
+     "mid-century",
+     "modern",
+     "industrial"
+    ]
+   }
   },
   "single-bed": {
    "footprint": [
@@ -2945,7 +7330,30 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "bed",
+    "roles": [
+     "bed-single"
+    ],
+    "programs": [
+     "bed-kid",
+     "bed-guest"
+    ],
+    "styles": []
+   }
   },
   "bunk-bed": {
    "footprint": [
@@ -3022,7 +7430,29 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "bed",
+    "roles": [
+     "bed-bunk"
+    ],
+    "programs": [
+     "bed-kid"
+    ],
+    "styles": []
+   }
   },
   "daybed": {
    "footprint": [
@@ -3100,7 +7530,37 @@
      ],
      "color": "role:fabric2"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "daybed",
+     "sofa"
+    ],
+    "programs": [
+     "living",
+     "sunroom",
+     "study",
+     "bed-guest"
+    ],
+    "styles": [
+     "cottage",
+     "tropical",
+     "scandi"
+    ]
+   }
   },
   "four-poster-bed": {
    "footprint": [
@@ -3178,7 +7638,36 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "bed",
+    "roles": [
+     "bed"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest"
+    ],
+    "styles": [
+     "farmhouse",
+     "craftsman",
+     "cottage",
+     "mediterranean",
+     "traditional"
+    ]
+   }
   },
   "canopy-bed": {
    "footprint": [
@@ -3256,7 +7745,34 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "bed",
+    "roles": [
+     "bed"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest"
+    ],
+    "styles": [
+     "tropical",
+     "mediterranean",
+     "cottage"
+    ]
+   }
   },
   "mattress-on-floor": {
    "footprint": [
@@ -3310,7 +7826,33 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "bed",
+    "roles": [
+     "bed-low"
+    ],
+    "programs": [
+     "bed-guest",
+     "studio"
+    ],
+    "styles": [
+     "industrial",
+     "scandi"
+    ]
+   }
   },
   "toddler-bed": {
    "footprint": [
@@ -3386,7 +7928,30 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "bed",
+    "roles": [
+     "bed-toddler"
+    ],
+    "programs": [
+     "nursery",
+     "bed-kid"
+    ],
+    "styles": []
+   }
   },
   "headboard-bed": {
    "footprint": [
@@ -3465,7 +8030,30 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "bed",
+    "roles": [
+     "bed"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest"
+    ],
+    "styles": []
+   }
   },
   "hammock-indoor": {
    "footprint": [
@@ -3542,7 +8130,33 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "hammock"
+    ],
+    "programs": [
+     "sunroom",
+     "living",
+     "bed-kid"
+    ],
+    "styles": [
+     "tropical"
+    ]
+   }
   },
   "loft-bed": {
    "footprint": [
@@ -3619,7 +8233,34 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "bed",
+    "roles": [
+     "bed-loft"
+    ],
+    "programs": [
+     "bed-kid",
+     "studio"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "industrial"
+    ]
+   }
   },
   "pet-bed": {
    "footprint": [
@@ -3673,7 +8314,311 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "textile",
+    "roles": [
+     "pet"
+    ],
+    "programs": [
+     "living",
+     "bed-primary",
+     "kitchen",
+     "kitchen-dining",
+     "laundry",
+     "foyer"
+    ],
+    "styles": []
+   }
+  },
+  "sleigh-bed": {
+   "footprint": [
+    1.76,
+    2.44
+   ],
+   "height": 1.05,
+   "box": [
+    -0.88,
+    0,
+    -1.22,
+    0.88,
+    1.05,
+    1.22
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color",
+    "quilt"
+   ],
+   "tags": [
+    "bedroom",
+    "master",
+    "guest"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.88,
+      0,
+      -1.15,
+      0.88,
+      1.12,
+      -1.09
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.88,
+      0,
+      1.09,
+      0.88,
+      0.69,
+      1.15
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.78,
+      0.34,
+      -1.03,
+      0.78,
+      0.6,
+      1.03
+     ],
+     "color": "role:linen"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "bed",
+    "roles": [
+     "bed"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest"
+    ],
+    "styles": [
+     "craftsman",
+     "farmhouse",
+     "traditional"
+    ]
+   }
+  },
+  "upholstered-bed": {
+   "footprint": [
+    1.84,
+    2.11
+   ],
+   "height": 1.35,
+   "box": [
+    -0.92,
+    0,
+    -1.06,
+    0.92,
+    1.35,
+    1.05
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color",
+    "quilt"
+   ],
+   "tags": [
+    "bedroom",
+    "master",
+    "guest"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.92,
+      0.1,
+      -1.05,
+      0.92,
+      1.35,
+      -0.95
+     ],
+     "color": "role:fabric2"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.82,
+      0.1,
+      -1,
+      0.82,
+      0.36,
+      1.09
+     ],
+     "color": "role:fabric2"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.77,
+      0.36,
+      -0.95,
+      0.77,
+      0.62,
+      1.05
+     ],
+     "color": "role:linen"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric2",
+    "group": "bed",
+    "roles": [
+     "bed"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest"
+    ],
+    "styles": [
+     "modern",
+     "mid-century",
+     "scandi",
+     "industrial"
+    ]
+   }
+  },
+  "house-bed": {
+   "footprint": [
+    1.01,
+    2
+   ],
+   "height": 1.63,
+   "box": [
+    -0.507,
+    0,
+    -1,
+    0.507,
+    1.626,
+    1
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color",
+    "quilt"
+   ],
+   "tags": [
+    "kids",
+    "bedroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.48,
+      0.07,
+      -1,
+      0.48,
+      0.5,
+      1
+     ],
+     "color": "role:linen"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.5,
+      0,
+      -1,
+      -0.45,
+      1.6,
+      1
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      0.45,
+      0,
+      -1,
+      0.5,
+      1.6,
+      1
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.6,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "bed",
+    "roles": [
+     "bed-single"
+    ],
+    "programs": [
+     "bed-kid"
+    ],
+    "styles": [
+     "scandi",
+     "modern"
+    ]
+   }
   },
   "fridge": {
    "footprint": [
@@ -3714,7 +8659,32 @@
      ],
      "color": "#cbd5e1"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "group": "appliance",
+    "roles": [
+     "fridge"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "bar",
+     "garage"
+    ],
+    "styles": []
+   }
   },
   "range": {
    "footprint": [
@@ -3766,7 +8736,31 @@
      ],
      "color": "#111827"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "appliance",
+    "roles": [
+     "range"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": [],
+    "top": 0.92
+   }
   },
   "range-hood": {
    "footprint": [
@@ -3820,7 +8814,31 @@
      ],
      "color": "#cbd5e1"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "appliance",
+    "roles": [
+     "hood"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": [],
+    "mountY": 1.5
+   }
   },
   "sink-run": {
    "footprint": [
@@ -3841,7 +8859,8 @@
    "params": [
     "w",
     "d",
-    "color"
+    "color",
+    "top"
    ],
    "tags": [
     "kitchen",
@@ -3884,7 +8903,33 @@
      ],
      "color": "#cbd5e1"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "fitted",
+    "roles": [
+     "sink-run"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "laundry",
+     "bar"
+    ],
+    "styles": [],
+    "top": 0.9
+   }
   },
   "counter-run": {
    "footprint": [
@@ -3905,7 +8950,8 @@
    "params": [
     "w",
     "d",
-    "color"
+    "color",
+    "top"
    ],
    "tags": [
     "kitchen",
@@ -3936,7 +8982,33 @@
      ],
      "color": "#f1f5f9"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "fitted",
+    "roles": [
+     "counter-run"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "laundry",
+     "bar"
+    ],
+    "styles": [],
+    "top": 0.9
+   }
   },
   "dishwasher": {
    "footprint": [
@@ -3988,7 +9060,31 @@
      ],
      "color": "#f1f5f9"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 1,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "appliance",
+    "roles": [
+     "dishwasher"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": [],
+    "top": 0.9
+   }
   },
   "upper-cabinets": {
    "footprint": [
@@ -4011,7 +9107,8 @@
     "d",
     "h",
     "y",
-    "color"
+    "color",
+    "glass"
    ],
    "tags": [
     "kitchen",
@@ -4030,7 +9127,33 @@
      ],
      "color": "role:cabinet"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "fitted",
+    "roles": [
+     "uppers"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "laundry",
+     "bar"
+    ],
+    "styles": [],
+    "mountY": 1.45
+   }
   },
   "pantry": {
    "footprint": [
@@ -4071,7 +9194,32 @@
      ],
      "color": "role:cabinet"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.9,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "fitted",
+    "roles": [
+     "pantry",
+     "tall-storage"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "laundry"
+    ],
+    "styles": []
+   }
   },
   "breakfast-bar": {
    "footprint": [
@@ -4092,7 +9240,8 @@
    "params": [
     "w",
     "d",
-    "color"
+    "color",
+    "top"
    ],
    "tags": [
     "kitchen",
@@ -4147,7 +9296,34 @@
      ],
      "color": "#f1f5f9"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0.9,
+     "side": 0.3,
+     "back": 1
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "fitted",
+    "roles": [
+     "island",
+     "peninsula"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "dining",
+     "bar"
+    ],
+    "styles": [],
+    "top": 0.9
+   }
   },
   "kitchen-cart": {
    "footprint": [
@@ -4271,7 +9447,36 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "cart"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "dining"
+    ],
+    "styles": [
+     "farmhouse",
+     "industrial",
+     "scandi"
+    ],
+    "top": 0.9
+   }
   },
   "microwave": {
    "footprint": [
@@ -4311,7 +9516,33 @@
      ],
      "color": "#cbd5e1"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "counter-appliance"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "study"
+    ],
+    "styles": []
+   }
   },
   "coffee-maker": {
    "footprint": [
@@ -4362,7 +9593,111 @@
      ],
      "color": "#cbd5e1"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "counter-appliance"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "study"
+    ],
+    "styles": []
+   }
+  },
+  "corner-run": {
+   "footprint": [
+    0.62,
+    0.64
+   ],
+   "height": 0.96,
+   "box": [
+    -0.31,
+    0,
+    -0.31,
+    0.31,
+    0.96,
+    0.332
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "hand",
+    "color",
+    "top"
+   ],
+   "tags": [
+    "kitchen",
+    "laundry"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.31,
+      0,
+      -0.31,
+      0.31,
+      0.86,
+      0.31
+     ],
+     "color": "role:cabinet"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.31,
+      0.86,
+      -0.31,
+      0.31,
+      0.9,
+      0.31
+     ],
+     "color": "#f1f5f9"
+    }
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 1,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "fitted",
+    "roles": [
+     "corner-run"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "laundry"
+    ],
+    "styles": [],
+    "top": 0.9
+   }
   },
   "bathtub": {
    "footprint": [
@@ -4413,7 +9748,30 @@
      ],
      "color": "#aab4c3"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "bath",
+    "roles": [
+     "tub-built-in"
+    ],
+    "programs": [
+     "bath",
+     "ensuite"
+    ],
+    "styles": []
+   }
   },
   "shower-cubicle": {
    "footprint": [
@@ -4488,7 +9846,30 @@
      ],
      "color": "#c9e6ea"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "bath",
+    "roles": [
+     "shower"
+    ],
+    "programs": [
+     "bath",
+     "ensuite"
+    ],
+    "styles": []
+   }
   },
   "vanity-sink": {
    "footprint": [
@@ -4563,7 +9944,36 @@
      ],
      "color": "#dbe4ee"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "bath",
+    "roles": [
+     "vanity"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "toilet": {
    "footprint": [
@@ -4636,7 +10046,31 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.2,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "bath",
+    "roles": [
+     "toilet"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": []
+   }
   },
   "towel-rail": {
    "footprint": [
@@ -4687,7 +10121,32 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "mountY": 1,
+    "group": "art",
+    "roles": [
+     "towel-rail"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": []
+   }
   },
   "bath-mat": {
    "footprint": [
@@ -4726,7 +10185,31 @@
      ],
      "color": "role:rug"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "rug",
+    "group": "rug",
+    "roles": [
+     "bath-mat"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": []
+   }
   },
   "mirror-cabinet": {
    "footprint": [
@@ -4778,7 +10261,37 @@
      ],
      "color": "#dbe4ee"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "mountY": 1.45,
+    "group": "art",
+    "roles": [
+     "bath-mirror"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "washing-machine": {
    "footprint": [
@@ -4841,7 +10354,33 @@
      ],
      "color": "#2a3140"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.8,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "appliance",
+    "roles": [
+     "washer"
+    ],
+    "programs": [
+     "laundry",
+     "bath",
+     "garage",
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
   },
   "dryer": {
    "footprint": [
@@ -4905,7 +10444,31 @@
      ],
      "color": "#cbd5e1"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.8,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "appliance",
+    "roles": [
+     "dryer"
+    ],
+    "programs": [
+     "laundry",
+     "bath",
+     "garage"
+    ],
+    "styles": []
+   }
   },
   "laundry-basket": {
    "footprint": [
@@ -4956,7 +10519,36 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "hamper"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "laundry"
+    ],
+    "styles": []
+   }
   },
   "heated-towel-rail": {
    "footprint": [
@@ -5008,7 +10600,36 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "mountY": 0.4,
+    "group": "art",
+    "roles": [
+     "towel-rail"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "industrial"
+    ]
+   }
   },
   "soap-set": {
    "footprint": [
@@ -5058,7 +10679,36 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "bath",
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "decor",
+    "roles": [
+     "bath-decor"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder",
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
   },
   "linen-tower": {
    "footprint": [
@@ -5122,7 +10772,341 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "storage",
+    "roles": [
+     "linen"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "laundry"
+    ],
+    "styles": []
+   }
+  },
+  "clawfoot-tub": {
+   "footprint": [
+    1.65,
+    0.76
+   ],
+   "height": 0.92,
+   "box": [
+    -0.825,
+    0,
+    -0.379,
+    0.825,
+    0.921,
+    0.379
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "color"
+   ],
+   "tags": [
+    "bathroom"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.85,
+      0.1,
+      -0.39,
+      0.85,
+      0.71,
+      0.39
+     ],
+     "color": "role:linen"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.7,
+     "side": 0.3,
+     "back": 0.2
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "bath",
+    "roles": [
+     "tub-free"
+    ],
+    "programs": [
+     "bath",
+     "ensuite"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "craftsman",
+     "traditional",
+     "mediterranean"
+    ]
+   }
+  },
+  "soaking-tub": {
+   "footprint": [
+    1.62,
+    0.85
+   ],
+   "height": 0.95,
+   "box": [
+    -0.811,
+    0,
+    -0.423,
+    0.811,
+    0.951,
+    0.423
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "color"
+   ],
+   "tags": [
+    "bathroom"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.8,
+      0,
+      -0.4,
+      0.8,
+      0.58,
+      0.4
+     ],
+     "color": "role:linen"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.7,
+     "side": 0.3,
+     "back": 0.2
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "bath",
+    "roles": [
+     "tub-free"
+    ],
+    "programs": [
+     "bath",
+     "ensuite"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "mid-century",
+     "industrial",
+     "tropical"
+    ]
+   }
+  },
+  "pedestal-sink": {
+   "footprint": [
+    0.56,
+    0.45
+   ],
+   "height": 1.74,
+   "box": [
+    -0.28,
+    0,
+    -0.23,
+    0.28,
+    1.74,
+    0.22
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "bathroom"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.13,
+      0,
+      -0.18,
+      0.13,
+      0.74,
+      0.08
+     ],
+     "color": "role:linen"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.28,
+      0.74,
+      -0.22,
+      0.28,
+      0.86,
+      0.22
+     ],
+     "color": "role:linen"
+    },
+    {
+     "shape": "blob",
+     "box": [
+      -0.24,
+      1.26,
+      -0.23,
+      0.24,
+      1.74,
+      -0.21
+     ],
+     "color": "#dbe4ee"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "bath",
+    "roles": [
+     "vanity"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": [
+     "cottage",
+     "farmhouse",
+     "craftsman",
+     "traditional",
+     "mediterranean"
+    ]
+   }
+  },
+  "double-vanity": {
+   "footprint": [
+    1.5,
+    0.52
+   ],
+   "height": 1.9,
+   "box": [
+    -0.75,
+    0,
+    -0.26,
+    0.75,
+    1.9,
+    0.263
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "color"
+   ],
+   "tags": [
+    "bathroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.75,
+      0.1,
+      -0.26,
+      0.75,
+      0.85,
+      0.245
+     ],
+     "color": "role:cabinet"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.75,
+      0.85,
+      -0.26,
+      0.75,
+      0.89,
+      0.26
+     ],
+     "color": "role:linen"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.7,
+      1.16,
+      -0.26,
+      0.7,
+      1.9,
+      -0.24
+     ],
+     "color": "#dbe4ee"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.8,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "bath",
+    "roles": [
+     "vanity-double"
+    ],
+    "programs": [
+     "ensuite",
+     "bath"
+    ],
+    "styles": []
+   }
   },
   "floor-lamp": {
    "footprint": [
@@ -5175,7 +11159,40 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "lamp",
+    "roles": [
+     "floor-lamp"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
   },
   "arc-floor-lamp": {
    "footprint": [
@@ -5250,7 +11267,38 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.2,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "lamp",
+    "roles": [
+     "floor-lamp",
+     "arc-lamp"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "tripod-floor-lamp": {
    "footprint": [
@@ -5337,7 +11385,41 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "lamp",
+    "roles": [
+     "floor-lamp"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest"
+    ],
+    "styles": [
+     "mid-century",
+     "scandi",
+     "industrial",
+     "modern"
+    ]
+   }
   },
   "pendant-lamp": {
    "footprint": [
@@ -5393,7 +11475,37 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "ceiling",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "group": "lighting",
+    "roles": [
+     "pendant"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "dining",
+     "kitchen-dining",
+     "living",
+     "hall",
+     "foyer",
+     "bed-primary",
+     "bar"
+    ],
+    "styles": []
+   }
   },
   "chandelier": {
    "footprint": [
@@ -5448,7 +11560,39 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "ceiling",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "group": "lighting",
+    "roles": [
+     "chandelier"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "living",
+     "foyer",
+     "bed-primary"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "mediterranean",
+     "craftsman",
+     "traditional"
+    ]
+   }
   },
   "ceiling-light": {
    "footprint": [
@@ -5492,7 +11636,27 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "ceiling",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "group": "lighting",
+    "roles": [
+     "ceiling-light"
+    ],
+    "programs": [],
+    "styles": []
+   }
   },
   "wall-sconce": {
    "footprint": [
@@ -5546,7 +11710,40 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "mountY": 1.5,
+    "group": "art",
+    "roles": [
+     "sconce"
+    ],
+    "programs": [
+     "foyer",
+     "hall",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "living",
+     "bath",
+     "ensuite",
+     "powder",
+     "dining"
+    ],
+    "styles": []
+   }
   },
   "desk-lamp": {
    "footprint": [
@@ -5609,7 +11806,38 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "desk",
+     "storage"
+    ],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "lamp",
+    "roles": [
+     "desk-lamp"
+    ],
+    "programs": [
+     "study",
+     "library",
+     "studio",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
   },
   "lantern": {
    "footprint": [
@@ -5664,7 +11892,39 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "lamp",
+    "roles": [
+     "lantern"
+    ],
+    "programs": [
+     "outdoor",
+     "sunroom",
+     "living",
+     "bath",
+     "ensuite",
+     "powder",
+     "foyer"
+    ],
+    "styles": [
+     "mediterranean",
+     "tropical",
+     "cottage"
+    ]
+   }
   },
   "string-lights": {
    "footprint": [
@@ -5730,7 +11990,31 @@
      ],
      "color": "#fde68a"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "group": "lighting",
+    "roles": [
+     "string-lights"
+    ],
+    "programs": [
+     "outdoor",
+     "bed-kid",
+     "playroom"
+    ],
+    "styles": []
+   }
   },
   "candle-set": {
    "footprint": [
@@ -5806,7 +12090,44 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "decor",
+    "roles": [
+     "surface-decor"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "kitchen-dining",
+     "bed-primary",
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": []
+   }
   },
   "neon-sign": {
    "footprint": [
@@ -5862,7 +12183,37 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric2",
+    "mountY": 1.6,
+    "group": "art",
+    "roles": [
+     "art-neon"
+    ],
+    "programs": [
+     "bed-kid",
+     "playroom",
+     "bar",
+     "studio",
+     "media"
+    ],
+    "styles": [
+     "industrial",
+     "modern"
+    ]
+   }
   },
   "throw-blanket": {
    "footprint": [
@@ -5928,7 +12279,38 @@
      ],
      "color": "role:fabric2"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric2",
+    "group": "textile",
+    "roles": [
+     "throw"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
   },
   "cushion-set": {
    "footprint": [
@@ -5993,7 +12375,38 @@
      ],
      "color": "role:fabric2"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric2",
+    "group": "textile",
+    "roles": [
+     "cushions"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
   },
   "wall-art": {
    "footprint": [
@@ -6016,7 +12429,8 @@
     "h",
     "y",
     "color",
-    "motif"
+    "motif",
+    "frame"
    ],
    "tags": [
     "living",
@@ -6062,7 +12476,49 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [
+     "sofa",
+     "bed",
+     "console",
+     "sideboard"
+    ],
+    "colorRole": "fabric2",
+    "mountY": 1.5,
+    "group": "art",
+    "roles": [
+     "art"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "dining",
+     "kitchen-dining",
+     "hall",
+     "foyer",
+     "studio"
+    ],
+    "styles": []
+   }
   },
   "round-mirror": {
    "footprint": [
@@ -6115,7 +12571,42 @@
      ],
      "color": "#dbeafe"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [
+     "console",
+     "vanity"
+    ],
+    "colorRole": null,
+    "mountY": 1.55,
+    "group": "art",
+    "roles": [
+     "mirror"
+    ],
+    "programs": [
+     "foyer",
+     "hall",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "bath",
+     "ensuite",
+     "powder",
+     "living"
+    ],
+    "styles": []
+   }
   },
   "wall-clock": {
    "footprint": [
@@ -6170,7 +12661,39 @@
      ],
      "color": "#f8fafc"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "mountY": 1.9,
+    "group": "art",
+    "roles": [
+     "clock"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "study",
+     "living",
+     "hall",
+     "bed-kid"
+    ],
+    "styles": [
+     "farmhouse",
+     "industrial",
+     "mid-century"
+    ]
+   }
   },
   "curtains": {
    "footprint": [
@@ -6237,7 +12760,40 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "window",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric2",
+    "group": "textile",
+    "roles": [
+     "curtains"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
   },
   "wall-hanging": {
    "footprint": [
@@ -6303,7 +12859,42 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric2",
+    "mountY": 1.6,
+    "group": "art",
+    "roles": [
+     "art",
+     "art-textile"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "living",
+     "hall",
+     "studio"
+    ],
+    "styles": [
+     "tropical",
+     "mediterranean",
+     "cottage",
+     "scandi"
+    ]
+   }
   },
   "vase": {
    "footprint": [
@@ -6357,7 +12948,46 @@
      ],
      "color": "#3f7f45"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "decor",
+    "roles": [
+     "surface-decor"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "kitchen-dining",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
   },
   "book-stack": {
    "footprint": [
@@ -6422,7 +13052,45 @@
      ],
      "color": "#e7e5e4"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "decor",
+    "roles": [
+     "surface-decor"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "study",
+     "library",
+     "studio",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
   },
   "fruit-bowl": {
    "footprint": [
@@ -6472,7 +13140,35 @@
      ],
      "color": "#f97316"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "decor",
+    "roles": [
+     "surface-decor-kitchen"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining",
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
   },
   "plant-stand": {
    "footprint": [
@@ -6538,7 +13234,44 @@
      ],
      "color": "#3f7f45"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "foyer",
+     "hall",
+     "bed-primary",
+     "dining",
+     "sunroom"
+    ],
+    "styles": [
+     "mid-century",
+     "scandi",
+     "modern",
+     "cottage"
+    ]
+   }
   },
   "runner-rug": {
    "footprint": [
@@ -6579,7 +13312,200 @@
      ],
      "color": "role:rug"
     }
-   ]
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "rug",
+    "group": "rug",
+    "roles": [
+     "runner"
+    ],
+    "programs": [
+     "hall",
+     "foyer",
+     "kitchen",
+     "kitchen-dining",
+     "bed-primary",
+     "bed-guest",
+     "laundry"
+    ],
+    "styles": []
+   }
+  },
+  "patterned-rug": {
+   "footprint": [
+    2,
+    1.5
+   ],
+   "height": 0.01,
+   "box": [
+    -1,
+    0,
+    -0.75,
+    1,
+    0.012,
+    0.75
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "pattern",
+    "shape",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "bedroom",
+    "dining",
+    "kids",
+    "study"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -1,
+      0,
+      -0.7,
+      1,
+      0.013,
+      0.7
+     ],
+     "color": "role:rug"
+    }
+   ],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "rug",
+    "group": "rug",
+    "roles": [
+     "rug",
+     "rug-round",
+     "play-rug"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "dining",
+     "kitchen-dining",
+     "bed-kid",
+     "nursery",
+     "playroom",
+     "study"
+    ],
+    "styles": []
+   }
+  },
+  "gallery-wall": {
+   "footprint": [
+    1.6,
+    0.04
+   ],
+   "height": 0.9,
+   "box": [
+    -0.8,
+    1.05,
+    0,
+    0.8,
+    1.95,
+    0.038
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "h",
+    "y",
+    "motifs",
+    "frame",
+    "color"
+   ],
+   "tags": [
+    "living",
+    "bedroom",
+    "hall",
+    "dining",
+    "study"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.8,
+      1.05,
+      0,
+      0.8,
+      1.95,
+      0.04
+     ],
+     "color": "role:metal"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric2",
+    "mountY": 1.5,
+    "group": "art",
+    "roles": [
+     "art-large"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "bed-primary",
+     "bed-guest",
+     "hall",
+     "dining",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "farmhouse",
+     "mid-century",
+     "industrial"
+    ]
+   }
   },
   "snake-plant": {
    "footprint": [
@@ -6633,7 +13559,44 @@
      ],
      "color": "#2d6a4f"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor",
+     "plant-small"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "bath",
+     "ensuite",
+     "powder",
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
   },
   "indoor-palm": {
    "footprint": [
@@ -6698,7 +13661,42 @@
      ],
      "color": "#40916c"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor",
+     "plant-tall"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "foyer",
+     "sunroom"
+    ],
+    "styles": [
+     "tropical",
+     "modern",
+     "mediterranean"
+    ]
+   }
   },
   "ficus-tree": {
    "footprint": [
@@ -6763,7 +13761,43 @@
      ],
      "color": "#386641"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor",
+     "plant-tall"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "foyer",
+     "bed-primary"
+    ],
+    "styles": [
+     "scandi",
+     "modern",
+     "farmhouse",
+     "cottage"
+    ]
+   }
   },
   "olive-tree-pot": {
    "footprint": [
@@ -6828,7 +13862,42 @@
      ],
      "color": "#8a9a7b"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor",
+     "plant-tall"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "foyer",
+     "sunroom"
+    ],
+    "styles": [
+     "mediterranean",
+     "farmhouse",
+     "modern"
+    ]
+   }
   },
   "tall-cactus": {
    "footprint": [
@@ -6892,7 +13961,36 @@
      ],
      "color": "#3f7d4a"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor"
+    ],
+    "programs": [
+     "living",
+     "study",
+     "foyer",
+     "sunroom"
+    ],
+    "styles": [
+     "mediterranean",
+     "modern",
+     "industrial"
+    ]
+   }
   },
   "pampas-vase": {
    "footprint": [
@@ -6945,7 +14043,43 @@
      ],
      "color": "#e8d9c0"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor",
+     "plant-small"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "bed-primary",
+     "foyer"
+    ],
+    "styles": [
+     "scandi",
+     "tropical",
+     "mediterranean",
+     "cottage"
+    ]
+   }
   },
   "hanging-plant": {
    "footprint": [
@@ -7010,7 +14144,42 @@
      ],
      "color": "#4f772d"
     }
-   ]
+   ],
+   "place": {
+    "against": "window",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "ceiling",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-hanging"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "kitchen",
+     "kitchen-dining",
+     "bath",
+     "ensuite",
+     "powder",
+     "bed-primary",
+     "sunroom",
+     "greenhouse"
+    ],
+    "styles": []
+   }
   },
   "herb-pots": {
    "footprint": [
@@ -7083,7 +14252,32 @@
      ],
      "color": "#6a994e"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-surface-kitchen"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
   },
   "orchid": {
    "footprint": [
@@ -7148,7 +14342,44 @@
      ],
      "color": "#f4c2d7"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-surface"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bath",
+     "ensuite",
+     "powder",
+     "bed-primary",
+     "dining",
+     "study"
+    ],
+    "styles": []
+   }
   },
   "succulent-tray": {
    "footprint": [
@@ -7200,7 +14431,42 @@
      ],
      "color": "#6a994e"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-surface"
+    ],
+    "programs": [
+     "study",
+     "library",
+     "studio",
+     "living",
+     "kitchen",
+     "kitchen-dining",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
   },
   "trailing-ivy": {
    "footprint": [
@@ -7264,7 +14530,47 @@
      ],
      "color": "#6a994e"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-surface"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "study",
+     "library",
+     "studio",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
   },
   "fern": {
    "footprint": [
@@ -7315,7 +14621,398 @@
      ],
      "color": "#4f772d"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-surface"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "living"
+    ],
+    "styles": []
+   }
+  },
+  "bird-of-paradise": {
+   "footprint": [
+    0.88,
+    0.79
+   ],
+   "height": 1.7,
+   "box": [
+    -0.316,
+    0,
+    -0.401,
+    0.568,
+    1.702,
+    0.393
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color",
+    "h"
+   ],
+   "tags": [
+    "living",
+    "dining",
+    "entry",
+    "sunroom"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.22,
+      0,
+      -0.22,
+      0.22,
+      0.4,
+      0.22
+     ],
+     "color": "role:accent"
+    },
+    {
+     "shape": "blob",
+     "box": [
+      -0.45,
+      0.4,
+      -0.45,
+      0.45,
+      1.7,
+      0.45
+     ],
+     "color": "#386641"
+    }
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor",
+     "plant-tall"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "foyer",
+     "sunroom"
+    ],
+    "styles": [
+     "tropical",
+     "modern",
+     "mid-century"
+    ]
+   }
+  },
+  "rubber-plant": {
+   "footprint": [
+    0.45,
+    0.49
+   ],
+   "height": 1.59,
+   "box": [
+    -0.24,
+    0,
+    -0.224,
+    0.211,
+    1.588,
+    0.262
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color",
+    "h"
+   ],
+   "tags": [
+    "living",
+    "office",
+    "bedroom",
+    "entry"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.17,
+      0,
+      -0.17,
+      0.17,
+      0.34,
+      0.17
+     ],
+     "color": "role:accent"
+    },
+    {
+     "shape": "blob",
+     "box": [
+      -0.33,
+      0.4,
+      -0.33,
+      0.33,
+      1.5,
+      0.33
+     ],
+     "color": "#1f3d2b"
+    }
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "foyer",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "industrial",
+     "scandi",
+     "mid-century"
+    ]
+   }
+  },
+  "zz-plant": {
+   "footprint": [
+    0.6,
+    0.49
+   ],
+   "height": 0.78,
+   "box": [
+    -0.223,
+    0,
+    -0.219,
+    0.376,
+    0.782,
+    0.269
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color",
+    "h"
+   ],
+   "tags": [
+    "living",
+    "bedroom",
+    "office",
+    "bathroom",
+    "entry"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.15,
+      0,
+      -0.15,
+      0.15,
+      0.26,
+      0.15
+     ],
+     "color": "role:accent"
+    },
+    {
+     "shape": "blob",
+     "box": [
+      -0.3,
+      0.26,
+      -0.3,
+      0.3,
+      0.85,
+      0.3
+     ],
+     "color": "#2d5a3a"
+    }
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor",
+     "plant-small"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "bath",
+     "ensuite",
+     "powder",
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
+  },
+  "dracaena": {
+   "footprint": [
+    0.89,
+    0.75
+   ],
+   "height": 1.79,
+   "box": [
+    -0.468,
+    0,
+    -0.379,
+    0.425,
+    1.795,
+    0.372
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color",
+    "h"
+   ],
+   "tags": [
+    "living",
+    "office",
+    "entry",
+    "dining"
+   ],
+   "iso": [
+    {
+     "shape": "cyl",
+     "box": [
+      -0.18,
+      0,
+      -0.18,
+      0.18,
+      0.38,
+      0.18
+     ],
+     "color": "role:accent"
+    },
+    {
+     "shape": "blob",
+     "box": [
+      -0.4,
+      1,
+      -0.4,
+      0.4,
+      1.8,
+      0.4
+     ],
+     "color": "#4f772d"
+    }
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "plant",
+    "roles": [
+     "plant-floor",
+     "plant-tall"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "foyer",
+     "study"
+    ],
+    "styles": [
+     "modern",
+     "scandi",
+     "tropical"
+    ]
+   }
   },
   "toy-box": {
    "footprint": [
@@ -7369,7 +15066,31 @@
      ],
      "color": "#f2a93b"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "kids",
+    "roles": [
+     "toy-storage"
+    ],
+    "programs": [
+     "bed-kid",
+     "nursery",
+     "playroom"
+    ],
+    "styles": []
+   }
   },
   "play-kitchen": {
    "footprint": [
@@ -7421,7 +15142,30 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "kids",
+    "roles": [
+     "play"
+    ],
+    "programs": [
+     "playroom",
+     "bed-kid"
+    ],
+    "styles": []
+   }
   },
   "easel": {
    "footprint": [
@@ -7483,7 +15227,32 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.2,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "kids",
+    "roles": [
+     "play",
+     "easel"
+    ],
+    "programs": [
+     "playroom",
+     "bed-kid",
+     "studio"
+    ],
+    "styles": []
+   }
   },
   "rocking-horse": {
    "footprint": [
@@ -7545,7 +15314,36 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.2,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "kids",
+    "roles": [
+     "play"
+    ],
+    "programs": [
+     "nursery",
+     "bed-kid",
+     "playroom"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "craftsman",
+     "traditional"
+    ]
+   }
   },
   "low-bookshelf": {
    "footprint": [
@@ -7597,7 +15395,33 @@
      ],
      "color": "#f08a3e"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "kids",
+    "roles": [
+     "toy-storage",
+     "bookcase-low"
+    ],
+    "programs": [
+     "bed-kid",
+     "nursery",
+     "playroom",
+     "living"
+    ],
+    "styles": []
+   }
   },
   "beanbag": {
    "footprint": [
@@ -7636,7 +15460,33 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.2,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "focus",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "floor-seat"
+    ],
+    "programs": [
+     "bed-kid",
+     "nursery",
+     "playroom",
+     "den",
+     "media"
+    ],
+    "styles": []
+   }
   },
   "play-tent": {
    "footprint": [
@@ -7687,7 +15537,34 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.5,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "kids",
+    "roles": [
+     "play"
+    ],
+    "programs": [
+     "bed-kid",
+     "playroom"
+    ],
+    "styles": [
+     "scandi",
+     "modern",
+     "cottage"
+    ]
+   }
   },
   "drum-kit": {
    "footprint": [
@@ -7762,7 +15639,33 @@
      ],
      "color": "role:fabric2"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.6,
+     "side": 0.2,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "music",
+    "roles": [
+     "instrument"
+    ],
+    "programs": [
+     "playroom",
+     "bed-kid",
+     "studio",
+     "garage",
+     "den"
+    ],
+    "styles": []
+   }
   },
   "guitar-stand": {
    "footprint": [
@@ -7826,7 +15729,33 @@
      ],
      "color": "#2a201a"
     }
-   ]
+   ],
+   "place": {
+    "against": "corner",
+    "clear": {
+     "front": 0.3,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "music",
+    "roles": [
+     "instrument-small"
+    ],
+    "programs": [
+     "bed-kid",
+     "studio",
+     "living",
+     "den",
+     "study"
+    ],
+    "styles": []
+   }
   },
   "gaming-chair": {
    "footprint": [
@@ -7889,7 +15818,35 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "tucks": true,
+    "group": "chair",
+    "roles": [
+     "desk-chair"
+    ],
+    "programs": [
+     "bed-kid",
+     "den",
+     "media",
+     "study"
+    ],
+    "styles": [
+     "modern"
+    ]
+   }
   },
   "building-blocks": {
    "footprint": [
@@ -7942,7 +15899,31 @@
      ],
      "color": "#4a86e8"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "kids",
+    "roles": [
+     "toys"
+    ],
+    "programs": [
+     "bed-kid",
+     "nursery",
+     "playroom"
+    ],
+    "styles": []
+   }
   },
   "height-chart": {
    "footprint": [
@@ -7981,7 +15962,33 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "mountY": 1,
+    "group": "art",
+    "roles": [
+     "kids-wall"
+    ],
+    "programs": [
+     "bed-kid",
+     "playroom",
+     "nursery",
+     "hall"
+    ],
+    "styles": []
+   }
   },
   "teddy-bear": {
    "footprint": [
@@ -8032,7 +16039,251 @@
      ],
      "color": "#b45309"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "kids",
+    "roles": [
+     "toys"
+    ],
+    "programs": [
+     "nursery",
+     "bed-kid"
+    ],
+    "styles": []
+   }
+  },
+  "changing-table": {
+   "footprint": [
+    0.92,
+    0.52
+   ],
+   "height": 0.95,
+   "box": [
+    -0.46,
+    0,
+    -0.25,
+    0.46,
+    0.95,
+    0.27
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "kids",
+    "nursery"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.45,
+      0,
+      -0.25,
+      0.45,
+      0.85,
+      0.25
+     ],
+     "color": "role:linen"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.45,
+      0.85,
+      -0.25,
+      0.45,
+      0.95,
+      0.25
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "kids",
+    "roles": [
+     "changing"
+    ],
+    "programs": [
+     "nursery"
+    ],
+    "styles": [],
+    "top": 0.95
+   }
+  },
+  "nursery-glider": {
+   "footprint": [
+    0.74,
+    0.86
+   ],
+   "height": 1.05,
+   "box": [
+    -0.37,
+    0,
+    -0.443,
+    0.37,
+    1.046,
+    0.42
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "kids",
+    "nursery",
+    "bedroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.37,
+      0.18,
+      -0.36,
+      0.37,
+      0.66,
+      0.42
+     ],
+     "color": "role:fabric"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.37,
+      0.38,
+      -0.43,
+      0.37,
+      1.04,
+      -0.25
+     ],
+     "color": "role:fabric"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.45,
+     "side": 0.1,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "seating",
+    "roles": [
+     "armchair",
+     "glider"
+    ],
+    "programs": [
+     "nursery",
+     "bed-primary"
+    ],
+    "styles": []
+   }
+  },
+  "kids-desk": {
+   "footprint": [
+    0.9,
+    0.86
+   ],
+   "height": 0.82,
+   "box": [
+    -0.45,
+    0,
+    -0.43,
+    0.45,
+    0.82,
+    0.435
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "kids",
+    "playroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.45,
+      0.57,
+      -0.43,
+      0.45,
+      0.72,
+      0.07
+     ],
+     "color": "role:linen"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.17,
+      0,
+      0.13,
+      0.17,
+      0.62,
+      0.43
+     ],
+     "color": "#4a86e8"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "linen",
+    "group": "kids",
+    "roles": [
+     "desk-kid"
+    ],
+    "programs": [
+     "bed-kid",
+     "playroom"
+    ],
+    "styles": []
+   }
   },
   "filing-cabinet": {
    "footprint": [
@@ -8098,7 +16349,34 @@
      ],
      "color": "#94a3b8"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "cabinet",
+    "group": "storage",
+    "roles": [
+     "filing"
+    ],
+    "programs": [
+     "study",
+     "studio",
+     "library"
+    ],
+    "styles": [
+     "industrial",
+     "modern"
+    ]
+   }
   },
   "printer": {
    "footprint": [
@@ -8172,7 +16450,32 @@
      ],
      "color": "#e2e8f0"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "desk",
+     "storage"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "office-kit"
+    ],
+    "programs": [
+     "study"
+    ],
+    "styles": []
+   }
   },
   "standing-desk": {
    "footprint": [
@@ -8249,7 +16552,34 @@
      ],
      "color": "#111827"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.9,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "desk",
+    "roles": [
+     "desk"
+    ],
+    "programs": [
+     "study",
+     "studio"
+    ],
+    "styles": [
+     "modern",
+     "industrial",
+     "scandi"
+    ]
+   }
   },
   "whiteboard": {
    "footprint": [
@@ -8315,7 +16645,35 @@
      ],
      "color": "#94a3b8"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "mountY": 1.2,
+    "group": "art",
+    "roles": [
+     "board"
+    ],
+    "programs": [
+     "study",
+     "studio",
+     "playroom"
+    ],
+    "styles": [
+     "modern",
+     "industrial"
+    ]
+   }
   },
   "server-rack": {
    "footprint": [
@@ -8379,7 +16737,33 @@
      ],
      "color": "#22c55e"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "storage",
+    "roles": [
+     "server"
+    ],
+    "programs": [
+     "study",
+     "garage"
+    ],
+    "styles": [
+     "industrial",
+     "modern"
+    ]
+   }
   },
   "dual-monitor-arm": {
    "footprint": [
@@ -8441,7 +16825,31 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "office-kit"
+    ],
+    "programs": [
+     "study"
+    ],
+    "styles": []
+   }
   },
   "keyboard-piano": {
    "footprint": [
@@ -8518,7 +16926,38 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.7,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "music",
+    "roles": [
+     "instrument",
+     "piano"
+    ],
+    "programs": [
+     "studio",
+     "living",
+     "bed-kid",
+     "study",
+     "playroom"
+    ],
+    "styles": [
+     "modern",
+     "industrial",
+     "scandi"
+    ]
+   }
   },
   "record-player": {
    "footprint": [
@@ -8570,7 +17009,39 @@
      ],
      "color": "#0b0f19"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "storage"
+    ],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "decor",
+    "roles": [
+     "surface-decor"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "studio",
+     "study",
+     "bed-primary"
+    ],
+    "styles": [
+     "mid-century",
+     "industrial",
+     "scandi"
+    ]
+   }
   },
   "tv-stand": {
    "footprint": [
@@ -8649,7 +17120,36 @@
      ],
      "color": "#111827"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "media"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "bed-kid",
+     "bed-guest"
+    ],
+    "styles": [
+     "modern",
+     "scandi"
+    ]
+   }
   },
   "projector": {
    "footprint": [
@@ -8700,7 +17200,34 @@
      ],
      "color": "#111827"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "av"
+    ],
+    "programs": [
+     "media",
+     "den"
+    ],
+    "styles": []
+   }
   },
   "laptop": {
    "footprint": [
@@ -8752,7 +17279,39 @@
      ],
      "color": "#111827"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "desk",
+     "table"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "office-kit"
+    ],
+    "programs": [
+     "study",
+     "library",
+     "studio",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "living"
+    ],
+    "styles": []
+   }
   },
   "pin-board": {
    "footprint": [
@@ -8819,7 +17378,193 @@
      ],
      "color": "#fde68a"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "mountY": 1.4,
+    "group": "art",
+    "roles": [
+     "board"
+    ],
+    "programs": [
+     "study",
+     "studio",
+     "bed-kid",
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "grand-piano": {
+   "footprint": [
+    1.51,
+    2.38
+   ],
+   "height": 1.71,
+   "box": [
+    -0.76,
+    0,
+    -1.2,
+    0.75,
+    1.707,
+    1.18
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "living",
+    "library",
+    "studio"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.78,
+      0.6,
+      -1.2,
+      0.78,
+      0.95,
+      0.75
+     ],
+     "color": "#141414"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.4,
+      0,
+      0.83,
+      0.4,
+      0.53,
+      1.2
+     ],
+     "color": "#141414"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.4,
+     "back": 0.4
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "music",
+    "roles": [
+     "piano-grand"
+    ],
+    "programs": [
+     "living",
+     "library",
+     "studio"
+    ],
+    "styles": []
+   }
+  },
+  "upright-piano": {
+   "footprint": [
+    1.5,
+    1.13
+   ],
+   "height": 1.25,
+   "box": [
+    -0.75,
+    0,
+    -0.565,
+    0.75,
+    1.25,
+    0.56
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "living",
+    "library",
+    "studio",
+    "kids"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.75,
+      0,
+      -0.565,
+      0.75,
+      1.25,
+      -0.265
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.38,
+      0,
+      0.22,
+      0.38,
+      0.5,
+      0.565
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "music",
+    "roles": [
+     "piano"
+    ],
+    "programs": [
+     "living",
+     "library",
+     "studio",
+     "den",
+     "playroom"
+    ],
+    "styles": [
+     "farmhouse",
+     "cottage",
+     "craftsman",
+     "traditional",
+     "mediterranean"
+    ]
+   }
   },
   "patio-set": {
    "footprint": [
@@ -8909,7 +17654,29 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "outdoor-dining"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "lounger-set": {
    "footprint": [
@@ -8986,7 +17753,29 @@
      ],
      "color": "role:linen"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "lounger"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "hammock": {
    "footprint": [
@@ -9049,7 +17838,29 @@
      ],
      "color": "role:fabric2"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "hammock"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "bbq-grill": {
    "footprint": [
@@ -9113,7 +17924,29 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "grill"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "fire-bowl": {
    "footprint": [
@@ -9165,7 +17998,29 @@
      ],
      "color": "#f97316"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "outdoor",
+    "roles": [
+     "fire"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "outdoor-sofa": {
    "footprint": [
@@ -9232,7 +18087,30 @@
      ],
      "color": "role:fabric"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "outdoor-seat"
+    ],
+    "programs": [
+     "outdoor",
+     "sunroom"
+    ],
+    "styles": []
+   }
   },
   "umbrella-table": {
    "footprint": [
@@ -9285,7 +18163,29 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "outdoor-dining"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "bird-bath": {
    "footprint": [
@@ -9335,7 +18235,29 @@
      ],
      "color": "#b8b2a7"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "garden"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "mailbox": {
    "footprint": [
@@ -9387,7 +18309,29 @@
      ],
      "color": "role:cabinet"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "garden"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "bicycle": {
    "footprint": [
@@ -9452,7 +18396,31 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "vehicle"
+    ],
+    "programs": [
+     "outdoor",
+     "garage",
+     "foyer"
+    ],
+    "styles": []
+   }
   },
   "swing-set": {
    "footprint": [
@@ -9540,7 +18508,29 @@
      ],
      "color": "role:accent"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "play-outdoor"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "sandbox": {
    "footprint": [
@@ -9592,7 +18582,29 @@
      ],
      "color": "#e8d5a6"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "play-outdoor"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "trampoline": {
    "footprint": [
@@ -9656,7 +18668,29 @@
      ],
      "color": "role:metal"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "outdoor",
+    "roles": [
+     "play-outdoor"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "dog-house": {
    "footprint": [
@@ -9709,7 +18743,29 @@
      ],
      "color": "role:roof"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "pet"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "wheelbarrow": {
    "footprint": [
@@ -9759,7 +18815,30 @@
      ],
      "color": "#1c1917"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "garden"
+    ],
+    "programs": [
+     "outdoor",
+     "garage"
+    ],
+    "styles": []
+   }
   },
   "garden-fountain": {
    "footprint": [
@@ -9823,7 +18902,29 @@
      ],
      "color": "#b8b2a7"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "garden"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "picnic-table": {
    "footprint": [
@@ -9887,7 +18988,29 @@
      ],
      "color": "role:wood"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "outdoor-dining"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
   },
   "patio-heater": {
    "footprint": [
@@ -9939,7 +19062,408 @@
      ],
      "color": "#b4b4b8"
     }
-   ]
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "fabric",
+    "group": "outdoor",
+    "roles": [
+     "heater"
+    ],
+    "programs": [
+     "outdoor"
+    ],
+    "styles": []
+   }
+  },
+  "exercise-bike": {
+   "footprint": [
+    0.56,
+    1.01
+   ],
+   "height": 1.13,
+   "box": [
+    -0.28,
+    0,
+    -0.49,
+    0.28,
+    1.13,
+    0.52
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "gym",
+    "garage",
+    "bedroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.28,
+      0,
+      -0.55,
+      0.28,
+      1.1,
+      0.55
+     ],
+     "color": "role:metal"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "group": "gym",
+    "roles": [
+     "cardio"
+    ],
+    "programs": [
+     "gym",
+     "garage",
+     "bed-guest"
+    ],
+    "styles": []
+   }
+  },
+  "weight-bench": {
+   "footprint": [
+    1.3,
+    1.4
+   ],
+   "height": 1.2,
+   "box": [
+    -0.65,
+    0,
+    -0.75,
+    0.65,
+    1.2,
+    0.65
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "gym",
+    "garage"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.15,
+      0,
+      -0.45,
+      0.15,
+      0.48,
+      0.65
+     ],
+     "color": "#2b2622"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.65,
+      0,
+      -0.55,
+      0.65,
+      1.2,
+      -0.45
+     ],
+     "color": "role:metal"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.6,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "metal",
+    "group": "gym",
+    "roles": [
+     "weights"
+    ],
+    "programs": [
+     "gym",
+     "garage"
+    ],
+    "styles": []
+   }
+  },
+  "yoga-mat": {
+   "footprint": [
+    0.61,
+    1.83
+   ],
+   "height": 0.09,
+   "box": [
+    -0.305,
+    0,
+    -0.915,
+    0.305,
+    0.086,
+    0.915
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "color"
+   ],
+   "tags": [
+    "gym",
+    "bedroom",
+    "sunroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.31,
+      0,
+      -0.915,
+      0.31,
+      0.01,
+      0.915
+     ],
+     "color": "role:accent"
+    }
+   ],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.2,
+     "side": 0.3,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "accent",
+    "group": "gym",
+    "roles": [
+     "mat"
+    ],
+    "programs": [
+     "gym",
+     "sunroom",
+     "bed-primary"
+    ],
+    "styles": []
+   }
+  },
+  "workbench": {
+   "footprint": [
+    1.8,
+    0.7
+   ],
+   "height": 1.9,
+   "box": [
+    -0.9,
+    0,
+    -0.35,
+    0.9,
+    1.895,
+    0.35
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "color"
+   ],
+   "tags": [
+    "garage",
+    "laundry",
+    "studio"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.9,
+      0,
+      -0.35,
+      0.9,
+      0.93,
+      0.35
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.9,
+      0.93,
+      -0.35,
+      0.9,
+      1.9,
+      -0.33
+     ],
+     "color": "#c8b08a"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.9,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "workbench"
+    ],
+    "programs": [
+     "garage",
+     "laundry",
+     "studio"
+    ],
+    "styles": []
+   }
+  },
+  "potting-bench": {
+   "footprint": [
+    1.2,
+    0.49
+   ],
+   "height": 1.44,
+   "box": [
+    -0.6,
+    0,
+    -0.25,
+    0.6,
+    1.44,
+    0.245
+   ],
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "color"
+   ],
+   "tags": [
+    "greenhouse",
+    "sunroom",
+    "garden"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.6,
+      0,
+      -0.25,
+      0.6,
+      0.9,
+      0.25
+     ],
+     "color": "role:wood"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.6,
+      0.9,
+      -0.25,
+      0.6,
+      1.35,
+      -0.2
+     ],
+     "color": "role:wood"
+    }
+   ],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.8,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": "wood",
+    "group": "storage",
+    "roles": [
+     "potting"
+    ],
+    "programs": [
+     "greenhouse",
+     "sunroom"
+    ],
+    "styles": []
+   }
   }
+ },
+ "patterns": {
+  "rugs": [
+   "solid",
+   "border",
+   "stripe",
+   "check",
+   "diamond",
+   "kilim",
+   "medallion",
+   "dots",
+   "abstract",
+   "play"
+  ],
+  "art": [
+   "abstract",
+   "geometric",
+   "line",
+   "landscape",
+   "botanical",
+   "seascape",
+   "sunset",
+   "sunburst",
+   "map",
+   "animal",
+   "story-moon",
+   "story-whale",
+   "story-balloon"
+  ]
  }
 }
