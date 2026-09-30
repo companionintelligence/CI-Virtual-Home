@@ -36,6 +36,7 @@
 // applySplineFrame has set the shot's own. The eye path is the shot's; only how much of it the lens takes in
 // changes, so a phone sees the house at the door and the Core with its desk at the end.
 import { displayName, buildCredit } from './home-names.js';
+import { createGlassSwap } from './viewer-glass.js';
 
 type Api = {
   THREE: any; scene: any; renderer: any; canvas: HTMLCanvasElement; camera: any; controls: any;
@@ -134,6 +135,8 @@ export function mountViewer(api: Api) {
   const { THREE, camera, controls, canvas } = api;
   const html = document.documentElement;
   const params = new URLSearchParams(location.search);
+  // ?no=glass,adapt kills a live-only performance feature for A/B timing (each one falls back to what the player did before it)
+  const no = new Set((params.get('no') || '').split(',').filter(Boolean));
   const coarse = matchMedia('(pointer: coarse)').matches;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   api.hideEditorHelpers();
@@ -270,6 +273,9 @@ export function mountViewer(api: Api) {
   let flying = false;
   let showPath = false, pathTouched = false;
   let hq = false;
+  // The plain path draws its panes without the transmission pass (viewer-glass.ts); Best quality and anything drawn
+  // through the page's __houseRender* hooks get the transmissive glass back.
+  const glass = createGlassSwap(THREE, api.scene, !no.has('glass'));
   let tod: string | null = null;   // the viewer's choice; null = the house's own hour
   let ready = false;
   let dirty = true;          // something changed: draw a frame even while paused
@@ -631,6 +637,7 @@ export function mountViewer(api: Api) {
   function setTod(key: string) {
     tod = key;
     api.setLighting(key);
+    glass.sync();   // the window glow's twins are cloned from the panes as they are now
     dirty = true;
     syncChips(); syncUrl();
   }
@@ -653,11 +660,13 @@ export function mountViewer(api: Api) {
     el.hq.classList.toggle('on', on); el.hq.setAttribute('aria-pressed', String(on));
     if (on && !hqWarm) {
       el.hq.classList.add('busy'); el.hq.setAttribute('aria-busy', 'true');
-      requestAnimationFrame(() => requestAnimationFrame(() => { if (el.hq.getAttribute('aria-pressed') !== 'true') { hqDone(); return; } hq = true; hqFirst = true; dirty = true; }));
+      // the transmissive glass comes back with the composer: its programs compile in the same held frame
+      requestAnimationFrame(() => requestAnimationFrame(() => { if (el.hq.getAttribute('aria-pressed') !== 'true') { hqDone(); return; } glass.restore(); hq = true; hqFirst = true; dirty = true; }));
       return;
     }
     hq = on;
-    if (on) toast('Best quality is on. Playback may be slower.');
+    if (on) { glass.restore(); toast('Best quality is on. Playback may be slower.'); }
+    else glass.apply();   // (the swap is a program change, so it happens here and not per frame)
     dirty = true;
   }
   function hqDone() {
@@ -815,13 +824,22 @@ export function mountViewer(api: Api) {
   }
 
   // ------------------------------------------------------------------ the frame
-  // Resolution follows the device: while the view moves, the frame rate is averaged over ~1.5 s, and a device
-  // that cannot hold ~28 fps steps its pixel ratio down (2 → 1.5 → 1.25 → 1). A step that does not buy at least
-  // 15 % more frames is undone and adaptation stops: a house is thousands of draw calls, and where the CPU is
-  // what limits the frame rate, fewer pixels would only make the picture softer. It never steps back up, so
-  // the picture does not pump. window.__houseViewer reports what it settled on.
+  // Resolution follows the device: while the view moves, the presented frame rate (the rAF deltas, so the display's
+  // own rate is its ceiling) is averaged over a window of ADAPT.window seconds and at least ADAPT.frames frames, and
+  // a device below ADAPT.low fps steps its pixel ratio down (2 → 1.5 → 1.25 → 1). A 60 Hz screen at 40 fps stutters,
+  // so the threshold sits well above 30. A step that does not buy at least ADAPT.gain more frames is undone and the
+  // downward adaptation stops: a house is thousands of draw calls, and where the CPU is what limits the frame rate,
+  // fewer pixels would only make the picture softer. Once, after ADAPT.upAfter seconds of at least ADAPT.upFps
+  // (a brief hitch, such as the first window's shader compiles, does not lock the picture low), it steps back up to
+  // the ratio it left, as one more trial: if that ratio cannot hold ADAPT.low it goes down again and stays. Never
+  // below 1. ?no=adapt restores the first controller (1.5 s, 28 fps, 15 %, never up).
+  // window.__houseViewer reports what it settled on.
+  const ADAPT = no.has('adapt')
+    ? { window: 1.5, frames: 0, low: 28, gain: 1.15, upAfter: Infinity, upFps: 58 }
+    : { window: 0.75, frames: 30, low: 42, gain: 1.10, upAfter: 6, upFps: 58 };
   const renderer = api.renderer;
   let pixelRatio = renderer.getPixelRatio(), perfTime = 0, perfFrames = 0, trial: { fps: number; pr: number } | null = null, settled = false;
+  let stepped: number | null = null, upSpent = 0, upTrial: number | null = null, upDone = false;   // the ratio left by the accepted step down; seconds at ≥ upFps; the ratio being tried again
   const stats = { fps: 0, pixelRatio, settled };
   (window as any).__houseViewer = stats;
   function setPixelRatio(pr: number) {
@@ -832,18 +850,31 @@ export function mountViewer(api: Api) {
   }
   function adapt(delta: number) {
     perfTime += delta; perfFrames++;
-    if (perfTime < 1.5) return;
-    const fps = perfFrames / perfTime;
+    if (perfTime < ADAPT.window || perfFrames < ADAPT.frames) return;
+    const fps = perfFrames / perfTime, span = perfTime;
     stats.fps = Math.round(fps);
     perfTime = 0; perfFrames = 0;
-    if (settled) return;
+    if (upTrial !== null) {   // the step back up: keep it if it still holds, else go down again for good
+      if (fps < ADAPT.low) setPixelRatio(upTrial);
+      upTrial = null; upDone = true; settled = stats.settled = true;
+      return;
+    }
+    if (settled) {
+      // settled below where it started: a long enough run at full speed earns one look at the ratio it gave up
+      if (stepped !== null && !upDone && ADAPT.upAfter < Infinity) {
+        upSpent = fps >= ADAPT.upFps ? upSpent + span : 0;
+        if (upSpent >= ADAPT.upAfter) { const pr = pixelRatio; setPixelRatio(stepped); upTrial = pr; upSpent = 0; }
+      }
+      return;
+    }
     if (trial) {
-      if (fps < trial.fps * 1.15) { setPixelRatio(trial.pr); settled = stats.settled = true; }
+      if (fps < trial.fps * ADAPT.gain) { setPixelRatio(trial.pr); settled = stats.settled = true; }
+      else stepped = trial.pr;   // kept (the next window may step again if it is still short)
       trial = null;
-    } else if (fps < 28 && pixelRatio > 1) {
+    } else if (fps < ADAPT.low && pixelRatio > 1) {
       trial = { fps, pr: pixelRatio };
       setPixelRatio(pixelRatio > 1.5 ? 1.5 : pixelRatio > 1.25 ? 1.25 : 1);
-    } else if (fps >= 28) settled = stats.settled = true;
+    } else if (fps >= ADAPT.low) settled = stats.settled = true;
   }
   // While the view moves, the sun's shadow map is redrawn every third frame rather than every frame (nothing in
   // a house moves but the camera, the roof's fade and the Core's fan); a still frame always redraws it. The
@@ -957,6 +988,7 @@ export function mountViewer(api: Api) {
     el.meta.title = buildCredit(own);
     document.title = `${name} · Virtual homes`;
     if (tod) api.setLighting(tod);   // a building resets the hour to the spec's; keep the viewer's choice
+    if (!hq) glass.apply();          // before the first frame of this house, so the transmission programs never compile in the plain path
     shots = listShots();
     renderShots();
     // A home opens on its Orbit: the whole house from above, which reads on every screen. Door to Core spends its
@@ -1192,5 +1224,11 @@ export function mountViewer(api: Api) {
     poke();
   })().catch(err => { console.error('viewer:', err); showError('Something went wrong while opening this home.'); });
 
-  return { frame };
+  // The page's __houseRenderBegin / __houseRenderEnd call these: a film or a still drawn through those hooks is a
+  // product frame, and gets the transmissive glass the goldens have (the plain path's swap is for the live view only).
+  // After, the plain path takes its swap back unless Best quality is on.
+  function beforeExternalRender() { glass.restore(); }
+  function afterExternalRender() { if (!hq) glass.apply(); }
+
+  return { frame, beforeExternalRender, afterExternalRender };
 }

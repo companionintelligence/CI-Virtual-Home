@@ -8926,6 +8926,7 @@
       const key = studio || (shot && shot.startsWith('house:')) ? shot : `house:${activeHouse.id}:${shot || 'door-to-core'}`;
       if (!SplinePresets[key]) throw new Error(`unknown shot ${key}`);
       if (headlessRender) window.__houseRenderEnd();
+      viewer?.beforeExternalRender();   // the player draws its glass without the transmission pass; a film or still through these hooks gets the real thing
       splineSelect.value = key; if (videoSplineSync) videoSplineSync.value = key;
       buildSplineFromPreset(key);
       const { w, h } = recordSize(res, aspect);
@@ -9120,6 +9121,7 @@
     window.__houseRenderEnd = function () {
       if (!headlessRender) return;
       const r = headlessRender; headlessRender = null;
+      viewer?.afterExternalRender();
       isRecordingVideo = false;
       endShotCutaway();
       if (splineLineMesh) splineLineMesh.visible = r.helpers.spline;
