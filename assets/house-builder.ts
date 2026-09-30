@@ -45,6 +45,7 @@
 //                   planner's Math, the same last bit in Node and in the browser)
 //   S6 ui           visibility.ts (wall modes, the shot's cutaway, shotHidden / shotPose), viewer.ts, home-names.ts,
 //                   the page's editor UI and overlays
+//                   light-guard.ts (the live player's cheap spot and point lights; installed only under ?mode=view)
 // Every stream also owns its spec fragment (spec/<stream>.ts), validator plugin (scripts/validate/<stream>.mts),
 // scene checks (scene-qa/<stream>.ts), fleet metrics (scripts/fleet/<stream>.mts) and plan.json key
 // (plan-export/<stream>.ts). room-creator.html's shared builders alternate between streams: read its OWNER banners.
