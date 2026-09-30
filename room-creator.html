@@ -9599,10 +9599,11 @@
       // Dynamic Dolly Zoom: subtly narrow FOV towards the core target for cinematic hero framing. A planner-v2 shot
       // carries its lens in its track (exterior → interior → the Core's, at ≤ 4°/s).
       if (fr && fr.fov) {
-        if (Math.abs(persCamera.fov - fr.fov) > 0.001) { persCamera.fov = fr.fov; persCamera.updateProjectionMatrix(); }
+        if (persCamera.fov !== fr.fov) { persCamera.fov = fr.fov; persCamera.updateProjectionMatrix(); }
       } else if (shotType === 'door-to-core') {
         const targetFov = 46 - sampleT * 6; // 46° down to 40°: the last frame holds the Core and the screen behind it
-        if (Math.abs(persCamera.fov - targetFov) > 0.01) {
+        // (exactly, every frame: a tolerance here let a frame keep its neighbour's lens, so a frame was not a function of its index)
+        if (persCamera.fov !== targetFov) {
           persCamera.fov = targetFov;
           persCamera.updateProjectionMatrix();
         }
