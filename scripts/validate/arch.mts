@@ -124,7 +124,10 @@ const check: Check = (spec, ctx) => {
   // ---- an L or U stair on the way to the storey the Core stands on: the v1 shot planner flies a straight line from its first step to its last
   if (spec.hero && spec.entry && byId[spec.hero.level] && byId[spec.entry.level] && (byId[spec.hero.level].y || 0) > (byId[spec.entry.level].y || 0) + 0.5) {
     const turning = flights.filter(f => (f.plan.shape === 'L' || f.plan.shape === 'U') && f.plan.to === spec.hero.level);
-    if (turning.length) warn(`the Core stands on ${spec.hero.level}, reached by the ${turning[0].plan.shape}-stair at [${turning[0].plan.bottom}]: the v1 shot planner flies a straight line from that flight's first step to its last, through its landing (shot QA stair-clip) — the walk follows anchors.stairs[].path once the v2 planner lands`, 'stair-route');
+    // planner v2 follows anchors.stairs[].path; only a stair-walking shot that is not pinned to it (shots[].planner: 'v2') can fall to v1
+    const walkers = (spec.shots || []).filter(sh => sh && (sh.type === 'door-to-core' || sh.type === 'walkthrough'));
+    const allV2 = walkers.length > 0 && walkers.every(sh => sh.planner === 'v2');
+    if (turning.length && !allV2) warn(`the Core stands on ${spec.hero.level}, reached by the ${turning[0].plan.shape}-stair at [${turning[0].plan.bottom}]: the v1 shot planner flies a straight line from that flight's first step to its last, through its landing (shot QA stair-clip) — pin the walking shots to "planner": "v2", which follows anchors.stairs[].path, or keep the stair straight`, 'stair-route');
   }
 
   // ---- stair-void and stair-step-off ----------------------------------------------------------------------------------
