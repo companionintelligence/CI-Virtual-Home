@@ -7671,7 +7671,11 @@
           endBatch();
         }
         const shots = houseBuilder.shotsFor(spec, result.anchors);
-        for (const [shotId, shot] of Object.entries(shots)) SplinePresets[`house:${id}:${shotId}`] = shot;
+        for (const [shotId, shot] of Object.entries(shots)) {
+          // a preset's length is a number, whatever a spec said ('auto' belongs to planner v2): the cards, timeline and recorder do arithmetic on it
+          if (!(typeof shot.duration === 'number' && Number.isFinite(shot.duration) && shot.duration > 0)) shot.duration = animDuration;
+          SplinePresets[`house:${id}:${shotId}`] = shot;
+        }
         activeHouse = { id, spec, anchors: result.anchors, shots };
         populateHouseShotOptions(id, shots);
         setGlobalWallMode(currentWallMode);
