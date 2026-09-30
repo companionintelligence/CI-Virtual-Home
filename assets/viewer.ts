@@ -36,6 +36,7 @@
 // applySplineFrame has set the shot's own. The eye path is the shot's; only how much of it the lens takes in
 // changes, so a phone sees the house at the door and the Core with its desk at the end.
 import { displayName, buildCredit } from './home-names.js';
+import { bakeStatic, restoreStatic } from './viewer-batch.js';
 
 type Api = {
   THREE: any; scene: any; renderer: any; canvas: HTMLCanvasElement; camera: any; controls: any;
@@ -941,8 +942,31 @@ export function mountViewer(api: Api) {
     el.errorMsg.textContent = message;
     root.dataset.state = 'error';
   }
+  // Static batching (assets/viewer-batch.ts): once per house build, before the first frame it is drawn, the static opaque
+  // meshes inside each toggle unit become a few merged meshes, so a weak CPU issues a fifth of the draw calls. Player only:
+  // the recorder, the goldens and the editor never call it. ?no=batch skips it; a throw leaves the house as built.
+  let batchedHouse: any = null;
+  function batchHouse(h: any) {
+    if (h === batchedHouse) return;   // (the failed-load path calls onHouse again with the house already on screen)
+    batchedHouse = h;
+    const stat = (window as any).__houseViewer;
+    if (String(params.get('no') || '').split(',').includes('batch')) { stat.batch = null; return; }
+    const bake = () => {
+      const t0 = performance.now();   // the player's clock, for the report only: nothing drawn depends on it
+      const r = bakeStatic(api.THREE, api.scene);
+      r.ms = Math.round((performance.now() - t0) * 10) / 10;
+      stat.batch = r;
+    };
+    try { bake(); } catch (err) {
+      console.warn('viewer: static batching failed, the home is drawn as built', err);
+      restoreStatic(); stat.batch = null;
+    }
+    // for the bench and the pixel check: flip the merged meshes in and out on the page that is open (A/B on one GPU state)
+    stat.batchOn = (on: boolean) => { if (on && !stat.batch) bake(); else if (!on && stat.batch) { restoreStatic(); stat.batch = null; } dirty = true; return !!stat.batch; };
+  }
   function onHouse({ shotKey = null as string | null, at = 0, play = true } = {}) {
     const h = api.house();
+    batchHouse(h);
     houseId = h.id;
     const e = houseEntry(h.id);
     // the portal's name for the home (home-names.ts); the build's own title is in the tooltip, with the credit
