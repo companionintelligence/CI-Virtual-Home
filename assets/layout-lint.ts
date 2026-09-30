@@ -37,9 +37,10 @@ import { pageItemDef } from './item-meta.js';
 import { HERO_SET } from './item-map.js';
 import {
   analyzeRoom, sizeOf, paramsOf, itemObb, overlap, aabb, insideRoom, limitOf, laneGrid, lanesOk, obb, rectObb, turn, containsPt,
-  INWARD, alongX, SIDES, DEG, CELL, type Geo, type Obb,
+  INWARD, alongX, SIDES, DEG, CELL, stairSolids, type Geo, type Obb,
 } from './room-geo.js';
 import { composeHouse, layerOf, snapWallMount, stackOnSurface } from './room-composer.js';
+import { houseStairs, levelStairs } from './stairs.js';
 import { isComposed, isProgram } from './room-programs.js';
 
 /** What a room of each program cannot do without: each anchor is satisfied by `n` items (default 1) with any of the roles
@@ -200,14 +201,22 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
 // ---- stairs: 1.6 m clear at the foot and at the head ------------------------------------------------------------------
 function stairRunIn(spec: any, all: Map<any, any[]>): string[] {
   const out: string[] = [];
-  for (const lv of spec.levels || []) {
-    const st = lv.stairs; if (!st || !Array.isArray(st.at) || st.type === 'spiral') continue;
-    const run = st.run || 3.36, w = st.w || 1.1, a = (st.rot || 0) * DEG, d = [Math.sin(a), Math.cos(a)];
-    const top = levelById(spec, st.to);
-    for (const [where, L, cx, cz] of [['foot', lv, st.at[0] - d[0] * 0.8, st.at[1] - d[1] * 0.8], ['head', top, st.at[0] + d[0] * (run + 0.8), st.at[1] + d[1] * (run + 0.8)]] as Array<[string, any, number, number]>) {
+  // every flight: its foot (1.6 m behind its first step) and the head (1.6 m past its last, on the storey it climbs to). A single straight
+  // flight keeps its own numbers; an L, a U or one of an array runs on stairs.ts's plan (the heading off the top is the last flight's)
+  for (const { lv, st, plan } of houseStairs(spec)) {
+    if (plan.shape === 'spiral') continue;
+    const turning = Array.isArray(lv.stairs) || plan.shape === 'L' || plan.shape === 'U';
+    const run = st.run || 3.36, w = turning ? plan.w : st.w || 1.1;
+    const f0 = plan.flights[0], fl = plan.flights[plan.flights.length - 1];
+    const a = (turning ? f0.rot : st.rot || 0) * DEG, d = [Math.sin(a), Math.cos(a)], top = levelById(spec, st.to);
+    const at = plan.bottom, headD = turning ? plan.dir : d, headAt = turning ? plan.top : [at[0] + d[0] * run, at[1] + d[1] * run], headRot = turning ? fl.rot : st.rot || 0;
+    for (const [where, L, cx, cz, rot, ox, oz, dx, dz] of [
+      ['foot', lv, at[0] - d[0] * 0.8, at[1] - d[1] * 0.8, turning ? f0.rot : st.rot || 0, at[0], at[1], -d[0], -d[1]],
+      ['head', top, headAt[0] + headD[0] * 0.8, headAt[1] + headD[1] * 0.8, headRot, headAt[0], headAt[1], headD[0], headD[1]],
+    ] as Array<[string, any, number, number, number, number, number, number, number]>) {
       if (!L) continue;
-      const zone = obb(cx, cz, w, 1.6, st.rot || 0);
-      const inFoot = [0.2, 0.8, 1.4].every(f => (L.footprint || []).some((r: any) => inRect(st.at[0] + (where === 'foot' ? -d[0] * f : d[0] * (run + f)), st.at[1] + (where === 'foot' ? -d[1] * f : d[1] * (run + f)), r, 0)));
+      const zone = obb(cx, cz, w, 1.6, rot);
+      const inFoot = [0.2, 0.8, 1.4].every(f => (L.footprint || []).some((r: any) => inRect(ox + dx * f, oz + dz * f, r, 0)));
       if (!inFoot) { out.push(`level ${L.id}: the flight to ${st.to} has less than 1.6 m of floor at its ${where} (it runs into the outside wall)`); continue; }
       for (const room of L.rooms || []) for (const it of all.get(room) || []) {
         if (!solidOf(it)) continue; const o = itemObb(it); if (!o) continue;
@@ -247,7 +256,7 @@ function foyerRule(spec: any): string[] {
   if (wall < 2.5) out.push(`the entry opens onto a wall ${wall.toFixed(1)} m in (the canon's foyer keeps 2.5 m clear)`);
   // a feature in sight: a flight, glass, a hearth or an island within 6 m, within 35° of the entry axis
   const seen = (x: number, z: number) => { const dx = x - x0, dz = z - z0, dd = Math.hypot(dx, dz); if (dd > 6 || dd < 0.5) return false; return (dx * n[0] + dz * n[1]) / dd > Math.cos(35 * DEG); };
-  let feature = !!(lv.stairs && Array.isArray(lv.stairs.at) && seen(lv.stairs.at[0], lv.stairs.at[1]));
+  let feature = levelStairs(lv).some((st: any) => Array.isArray(st.at) && seen(st.at[0], st.at[1]));
   for (const op of lv.openings || []) if (!feature && (op.type === 'glass' || op.type === 'slider') && op !== undefined) { const ed = edgeForOpening(edges, op.side, op.at); if (ed) feature = seen(alongX(op.side) ? op.at : ed.a[0], alongX(op.side) ? ed.a[1] : op.at); }
   for (const r of lv.rooms || []) for (const it of r.items || []) if (!feature && Array.isArray(it.at) && ['fireplace', 'kitchen-island', 'breakfast-bar', 'grand-piano'].includes(it.type)) feature = seen(it.at[0], it.at[1]);
   if (!feature) out.push('nothing to see from the entry: no stair, glass, hearth or island within 6 m of its axis (±35°)');
@@ -267,10 +276,14 @@ export function coreWalk(spec: any, all: Map<any, any[]>): string | null {
   const fwd = [Math.sin((h.rot || 0) * DEG), Math.cos((h.rot || 0) * DEG)], core: [number, number] = [h.at[0] + fwd[0] * 1.3, h.at[1] + fwd[1] * 1.3];
   if (elv === hlv) legs.push({ lv: elv, from: door, to: core });
   else {
-    const st = (elv.stairs && elv.stairs.to === hlv.id) ? elv.stairs : null; if (!st || !Array.isArray(st.at)) return null;
+    const st = levelStairs(elv).find((q: any) => q.to === hlv.id && Array.isArray(q.at)); if (!st) return null;
     const a = (st.rot || 0) * DEG, d = [Math.sin(a), Math.cos(a)], run = st.run || 3.36;
+    // (an L or a U, or one of an array: the foot is the first step's, the head the last flight's top and its own heading — stairs.ts's plan)
+    const plan = houseStairs(spec).find(q => q.st === st);
+    const turning = !!plan && (Array.isArray(elv.stairs) || plan.plan.shape === 'L' || plan.plan.shape === 'U');
+    const head: [number, number] = turning ? [plan!.plan.top[0] + plan!.plan.dir[0] * 0.6, plan!.plan.top[1] + plan!.plan.dir[1] * 0.6] : [st.at[0] + d[0] * (run + 0.6), st.at[1] + d[1] * (run + 0.6)];
     legs.push({ lv: elv, from: door, to: [st.at[0] - d[0] * 0.6, st.at[1] - d[1] * 0.6] });
-    legs.push({ lv: hlv, from: [st.at[0] + d[0] * (run + 0.6), st.at[1] + d[1] * (run + 0.6)], to: core });
+    legs.push({ lv: hlv, from: head, to: core });
   }
   let worst: { w: number; at: [number, number]; lv: string } | null = null;
   for (const L of legs) {
@@ -299,7 +312,7 @@ function widest(spec: any, lv: any, from: [number, number], to: [number, number]
     for (const [a, b] of segs) if (b - a > 0.02) mark(px ? rectObb(a, ln - 0.07, b, ln + 0.07) : rectObb(ln - 0.07, a, ln + 0.07, b));
     if (dc !== null) mark(px ? obb(dc, ln, 2 * dw + 1.2, 1.4, 0) : obb(ln, dc, 1.4, 2 * dw + 1.2, 0), 1, doorway);
   }
-  if (lv.stairs && Array.isArray(lv.stairs.at)) { const st = lv.stairs, run = st.type === 'spiral' ? 0 : (st.run || 3.36), a = (st.rot || 0) * DEG; mark(st.type === 'spiral' ? obb(st.at[0], st.at[1], 1.9, 1.9, 0) : obb(st.at[0] + Math.sin(a) * run / 2, st.at[1] + Math.cos(a) * run / 2, (st.w || 1.1) + 0.1, run, st.rot || 0)); }
+  { const sg = stairSolids(spec, lv); for (const o of [...sg.obstacles, ...sg.holes]) mark(o); }
   for (const v of lv.voids || []) mark(rectObb(v.x, v.z, v.x + v.w, v.z + v.d));
   for (const r of lv.rooms || []) for (const it of all.get(r) || []) if (solidOf(it)) { const o = itemObb(it); if (o) mark(o); }
   if (spec.hero && spec.hero.level === lv.id) { const hh = spec.hero, surf = hh.surface || 'desk', dims = surf === 'shelf' ? [0.9, 0.3] : surf === 'credenza' ? [1.8, 0.45] : surf === 'island' ? [2.4, 1.0] : [1.8, 0.85]; mark(obb(hh.at[0], hh.at[1], dims[0], dims[1], hh.rot || 0)); }

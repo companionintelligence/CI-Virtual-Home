@@ -18,6 +18,9 @@ import { PROPS } from './props/index.js';
 import { PLACEMENT } from './props/placement.js';
 import { pageItemDef } from './item-meta.js';
 import { MEASURED } from './props/measured.js';
+import { houseStairs, levelStairs } from './stairs.js';
+import { featureOpenings, doubleRoomsUnder } from './arch-plan.js';
+import { leafKindOf } from './kit-rules.js';
 
 export type Side = 'N' | 'S' | 'W' | 'E';
 export const SIDES: Side[] = ['N', 'S', 'W', 'E'];
@@ -141,7 +144,7 @@ export function itemObb(it: any): Obb | null {
 // ---- the room ------------------------------------------------------------------------------------------------------
 export interface Win { a: number; b: number; sill: number; h: number; type: string }
 export interface Run { side: Side; kind: 'ext' | 'part'; line: number; face: number; a: number; b: number; windows: Win[]; doors: Array<{ a: number; b: number }> }
-export interface Portal { side: Side; kind: string; x: number; z: number; w: number; a: number; b: number; hinged: boolean; open: boolean; entry: boolean }
+export interface Portal { side: Side; kind: string; x: number; z: number; w: number; a: number; b: number; hinged: boolean; /** a pair of leaves (S1's double / french): each sweeps half the width */ pair?: boolean; open: boolean; entry: boolean }
 export interface Geo {
   spec: any; lv: any; room: any; b: { x: number; z: number; w: number; d: number };
   runs: Run[];                 // wall segments along the room's edges (doors cut out)
@@ -170,6 +173,63 @@ function subtract(span: [number, number], cuts: Array<[number, number]>): Array<
   return parts;
 }
 
+/**
+ * What a storey's stairs put on its floor (spec-only: the composer and the lints run before anything is built):
+ *   obstacles  the footprints of the flights that start here (a straight or spiral flight, the flights and landing of an L or a U,
+ *              every flight of a `stairs` array) — solid
+ *   keepouts   1.6 m clear at the foot of each flight and 1.6 m of step-off past the head of each flight arriving from below
+ *   holes      the openings the arriving flights cut in this slab (`autoVoid`), which are floor no piece may stand on
+ * A single straight or spiral flight keeps the numbers it always had; S2's array and turning flights come from stairs.ts's plans.
+ */
+export function stairSolids(spec: any, lv: any): { obstacles: Obb[]; keepouts: Obb[]; holes: Obb[] } {
+  const obstacles: Obb[] = [], keepouts: Obb[] = [], holes: Obb[] = [];
+  const flight = (st: any) => {
+    const run = st.type === 'spiral' ? 0 : (st.run || 3.36), w = st.w || (st.type === 'colonial' ? 1.2 : 1.1), a = (st.rot || 0) * DEG, dir: [number, number] = [Math.sin(a), Math.cos(a)];
+    return { run, w, dir, at: st.at as [number, number], rot: st.rot || 0 };
+  };
+  const turning = (l: any, st: any) => Array.isArray(l.stairs) || st.type === 'L' || st.type === 'U';
+  // (the one flight a storey has always had)
+  if (lv.stairs && !Array.isArray(lv.stairs) && Array.isArray(lv.stairs.at) && !turning(lv, lv.stairs)) {
+    const f = flight(lv.stairs);
+    if (lv.stairs.type === 'spiral') obstacles.push(obb(f.at[0], f.at[1], 1.9, 1.9, 0));
+    else {
+      obstacles.push(obb(f.at[0] + f.dir[0] * f.run / 2, f.at[1] + f.dir[1] * f.run / 2, f.w + 0.1, f.run, f.rot));
+      keepouts.push(obb(f.at[0] - f.dir[0] * 0.8, f.at[1] - f.dir[1] * 0.8, f.w + 0.1, 1.6, f.rot));
+    }
+  }
+  for (const other of spec.levels || []) {
+    if (!other.stairs || Array.isArray(other.stairs) || other.stairs.to !== lv.id || !Array.isArray(other.stairs.at) || other.stairs.type === 'spiral' || turning(other, other.stairs)) continue;
+    const f = flight(other.stairs), tx = f.at[0] + f.dir[0] * f.run, tz = f.at[1] + f.dir[1] * f.run;
+    keepouts.push(obb(tx + f.dir[0] * 0.8, tz + f.dir[1] * 0.8, f.w + 0.1, 1.6, f.rot));
+  }
+  // S2's: an array of flights, an L or a U — read from the plans (stairs.ts), which are what gets built
+  if ((spec.levels || []).some((l: any) => Array.isArray(l.stairs) || levelStairs(l).some((st: any) => st.type === 'L' || st.type === 'U' || st.autoVoid))) {
+    for (const { lv: from, st, plan } of houseStairs(spec)) {
+      const modern = turning(from, st);
+      if (plan.from === lv.id && modern) {
+        if (plan.shape === 'spiral') obstacles.push(obb(plan.bottom[0], plan.bottom[1], 1.9, 1.9, 0));
+        else {
+          for (const f of plan.flights) {
+            const a = f.rot * DEG, d: [number, number] = [Math.sin(a), Math.cos(a)];
+            obstacles.push(obb(f.at[0] + d[0] * f.run / 2, f.at[1] + d[1] * f.run / 2, f.w + 0.1, f.run, f.rot));
+          }
+          for (const ld of plan.landings) obstacles.push(rectObb(ld.x, ld.z, ld.x + ld.w, ld.z + ld.d));
+          const f0 = plan.flights[0], a0 = f0.rot * DEG;
+          keepouts.push(obb(f0.at[0] - Math.sin(a0) * 0.8, f0.at[1] - Math.cos(a0) * 0.8, f0.w + 0.1, 1.6, f0.rot));
+        }
+      }
+      if (plan.to === lv.id) {
+        if (modern && plan.shape !== 'spiral') {
+          const last = plan.flights[plan.flights.length - 1];
+          keepouts.push(obb(plan.top[0] + plan.dir[0] * 0.8, plan.top[1] + plan.dir[1] * 0.8, last.w + 0.1, 1.6, last.rot));
+        }
+        if (st.autoVoid) for (const r of plan.voidRects) holes.push(rectObb(r.x, r.z, r.x + r.w, r.z + r.d));
+      }
+    }
+  }
+  return { obstacles, keepouts, holes };
+}
+
 const edgeCache = new WeakMap<any, any[]>();
 export function analyzeRoom(spec: any, lv: any, room: any): Geo {
   let edges = edgeCache.get(lv.footprint); if (!edges) { edges = perimeterEdges(lv.footprint); edgeCache.set(lv.footprint, edges); }
@@ -179,6 +239,8 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
   const runs: Run[] = [], walled: any = { N: [], S: [], W: [], E: [] }, open: any[] = [], portals: Portal[] = [], windows: any[] = [];
   const obstacles: Obb[] = [], keepouts: Obb[] = [], soft: Obb[] = [], adopted = new Set<any>();
   const entry = spec.entry && spec.entry.level === lv.id ? spec.entry : null;
+  // a bay opens its host wall (S2, arch-plan.ts featureOpenings): full-height glass, so nothing tall stands in front of it
+  const bayOpenings = featureOpenings(spec, lv).map((o: any) => ({ side: o.side, at: o.at, w: o.w, type: 'window', sill: 0, h: o.h }));
   for (const side of SIDES) {
     const [lo, hi] = spanOf(side), ln = lineOf[side];
     const segs: Array<{ kind: 'ext' | 'part'; line: number; a: number; b: number }> = [];
@@ -187,7 +249,7 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
       const a = Math.max(lo, alongX(side) ? e.a[0] : e.a[1]), bb = Math.min(hi, alongX(side) ? e.b[0] : e.b[1]);
       if (bb - a > 0.05) segs.push({ kind: 'ext', line: el, a, b: bb });
     }
-    const doorsHere: Array<{ a: number; b: number; w: number; kind: string; hinged: boolean; entry: boolean }> = [];
+    const doorsHere: Array<{ a: number; b: number; w: number; kind: string; hinged: boolean; pair?: boolean; entry: boolean }> = [];
     // a stretch of this side whose wall is drawn 0.25–0.55 m off the room's edge (bounds sketched a little loose) has no wall within
     // reach: the nearest partition line that spans it is its wall (with anything within 0.06 m of that line) — else its doors would go
     // unseen and a piece could be set in the doorway. Only where no wall or partition lies within 0.25 m of the edge.
@@ -216,22 +278,26 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
       segs.push({ kind: 'part', line: pl, a, b: bb });
       if (p.door !== null && p.door !== undefined) {
         const dir = px ? Math.sign(p.to[0] - p.from[0]) || 1 : Math.sign(p.to[1] - p.from[1]) || 1, c = (px ? p.from[0] : p.from[1]) + dir * p.door, w = p.doorW || 0.9;
-        if (c + w / 2 > lo + 0.05 && c - w / 2 < hi - 0.05) doorsHere.push({ a: c - w / 2, b: c + w / 2, w, kind: 'doorway', hinged: w <= 1.1, entry: false });
+        if (c + w / 2 > lo + 0.05 && c - w / 2 < hi - 0.05) doorsHere.push({ a: c - w / 2, b: c + w / 2, w, kind: 'doorway', hinged: w <= 1.1, pair: w > 1.1 && (p.doorStyle === 'double' || p.doorStyle === 'french'), entry: false });
       }
     }
-    for (const op of lv.openings || []) {
+    for (const op of [...(lv.openings || []), ...bayOpenings]) {
       if (op.side !== side) continue;
       const e = edgeForOpening(edges, op.side, op.at); if (!e) continue;
       const el = alongX(side) ? e.a[1] : e.a[0]; if (Math.abs(el - ln) > TOL || op.at < lo - 0.05 || op.at > hi + 0.05) continue;
       const a = op.at - op.w / 2, bb = op.at + op.w / 2;
       const isEntry = !!entry && entry.side === op.side && Math.abs(entry.at - op.at) < 1e-6;
-      if (op.type === 'door' || op.type === 'slider' || op.type === 'garage') doorsHere.push({ a, b: bb, w: op.w, kind: op.type, hinged: op.type === 'door' && op.w <= 1.1 && op.style !== 'cased', entry: isEntry });
+      if (op.type === 'door' || op.type === 'slider' || op.type === 'garage') {
+        // S1's leaves: a pair (double, french — or the wide-door rule of defaults 2) sweeps half its width a side; a door that swings out sweeps the outside
+        const out = op.swing === 'out' && op.type === 'door', leaves = op.type === 'door' && op.style !== 'cased' && !out ? leafKindOf(spec, op) : 'none';
+        doorsHere.push({ a, b: bb, w: op.w, kind: op.type, hinged: op.type === 'door' && op.w <= 1.1 && op.style !== 'cased' && !out, pair: op.w > 1.1 && (leaves === 'double' || leaves === 'french'), entry: isEntry });
+      }
       if (op.type === 'window' || op.type === 'glass' || op.type === 'slider') windows.push({ side, line: el, a, b: bb, sill: op.type === 'window' ? (op.sill ?? 0.9) : 0.05, h: op.h || (op.type === 'window' ? 1.2 : 2.2), type: op.type });
     }
     const cover = union(segs.map(s => [s.a, s.b] as [number, number]));
     walled[side] = cover;
     for (const [a, bb] of subtract([lo, hi], cover)) if (bb - a >= 0.3) { open.push({ side, a, b: bb }); portals.push({ side, kind: 'open', ...ptOn(side, ln, (a + bb) / 2), w: bb - a, a, b: bb, hinged: false, open: true, entry: false }); }
-    for (const d of doorsHere) portals.push({ side, kind: d.kind, ...ptOn(side, ln, (d.a + d.b) / 2), w: d.w, a: d.a, b: d.b, hinged: d.hinged, open: false, entry: d.entry });
+    for (const d of doorsHere) portals.push({ side, kind: d.kind, ...ptOn(side, ln, (d.a + d.b) / 2), w: d.w, a: d.a, b: d.b, hinged: d.hinged, ...(d.pair ? { pair: true } : {}), open: false, entry: d.entry });
     // runs: each wall segment less its doors
     for (const s of segs.sort((p, q) => p.a - q.a || (p.kind === 'ext' ? -1 : 1))) {
       const cuts = doorsHere.map(d => [d.a - 0.05, d.b + 0.05] as [number, number]);
@@ -254,7 +320,7 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
   // door swings (a hinged leaf ≤ 1.1 m sweeps a square on the room side) and an approach strip in front of every door
   for (const p of portals) {
     if (p.open) continue;
-    const [nx, nz] = INWARD[p.side], depth = p.hinged ? Math.max(0.8, p.w) : 0.6;
+    const [nx, nz] = INWARD[p.side], depth = p.hinged ? Math.max(0.8, p.w) : p.pair ? Math.max(0.6, p.w / 2 + 0.05) : 0.6;
     const cx = p.x + nx * depth / 2, cz = p.z + nz * depth / 2;
     keepouts.push(alongX(p.side) ? obb(cx, cz, p.w + 0.1, depth, 0) : obb(cx, cz, depth, p.w + 0.1, 0));
   }
@@ -270,26 +336,14 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
     if (p.door !== null && p.door !== undefined) { const dir = px ? Math.sign(p.to[0] - p.from[0]) || 1 : Math.sign(p.to[1] - p.from[1]) || 1, c = (px ? p.from[0] : p.from[1]) + dir * p.door, w = p.doorW || 0.9; cuts.push([c - w / 2, c + w / 2]); }
     for (const [s0, s1] of subtract([a, bb], cuts)) obstacles.push(px ? rectObb(s0, pl - 0.07, s1, pl + 0.07) : rectObb(pl - 0.07, s0, pl + 0.07, s1));
   }
-  // stairs: this storey's flight (its footprint, and 1.6 m of run-in clear at its foot) and the flight arriving from
-  // below (1.6 m of step-off clear at its head) — plan H: the canon's 1.6 m, not the old lint's 1.2
-  const flight = (st: any, y: number) => {
-    const run = st.type === 'spiral' ? 0 : (st.run || 3.36), w = st.w || (st.type === 'colonial' ? 1.2 : 1.1), a = (st.rot || 0) * DEG, dir: [number, number] = [Math.sin(a), Math.cos(a)];
-    return { run, w, dir, at: st.at as [number, number], rot: st.rot || 0 };
-  };
-  if (lv.stairs && Array.isArray(lv.stairs.at)) {
-    const f = flight(lv.stairs, lv.y);
-    if (lv.stairs.type === 'spiral') obstacles.push(obb(f.at[0], f.at[1], 1.9, 1.9, 0));
-    else {
-      obstacles.push(obb(f.at[0] + f.dir[0] * f.run / 2, f.at[1] + f.dir[1] * f.run / 2, f.w + 0.1, f.run, f.rot));
-      keepouts.push(obb(f.at[0] - f.dir[0] * 0.8, f.at[1] - f.dir[1] * 0.8, f.w + 0.1, 1.6, f.rot));
-    }
-  }
-  for (const other of spec.levels || []) {
-    if (!other.stairs || other.stairs.to !== lv.id || !Array.isArray(other.stairs.at) || other.stairs.type === 'spiral') continue;
-    const f = flight(other.stairs, other.y), tx = f.at[0] + f.dir[0] * f.run, tz = f.at[1] + f.dir[1] * f.run;
-    keepouts.push(obb(tx + f.dir[0] * 0.8, tz + f.dir[1] * 0.8, f.w + 0.1, 1.6, f.rot));
-  }
+  // stairs: this storey's flights (their footprints, and 1.6 m of run-in clear at the foot) and the flights arriving from below
+  // (1.6 m of step-off clear at the head, and the opening they need in this slab) — plan H: the canon's 1.6 m, not the old lint's 1.2
+  const stairGeo = stairSolids(spec, lv);
+  obstacles.push(...stairGeo.obstacles); keepouts.push(...stairGeo.keepouts);
   for (const v of lv.voids || []) obstacles.push(rectObb(v.x, v.z, v.x + v.w, v.z + v.d));
+  // the holes S2 cuts in this slab itself: an autoVoid flight's opening and the well of a double-height room below
+  obstacles.push(...stairGeo.holes);
+  for (const d of doubleRoomsUnder(spec, lv)) obstacles.push(rectObb(d.rect.x, d.rect.z, d.rect.x + d.rect.w, d.rect.z + d.rect.d));
   // a room nested inside this one (its bounds within these, and a good deal smaller: a WC carved out of a bedroom, a bath out of a hall) is
   // its own walled space: this room's furniture does not go in it (it furnishes itself), and its floor is not this room's to walk
   for (const o of lv.rooms || []) {

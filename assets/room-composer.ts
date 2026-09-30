@@ -865,7 +865,9 @@ function diningGroup(c: C, region: { x0: number; z0: number; x1: number; z1: num
       { const back = 0.6 - c.shrink * 1.2; for (const ch of out.slice(1)) { const [bx, bz] = turn(0, -(0.25 + back / 2), ch.rot); ch.walk.push(obb(ch.cx + bx, ch.cz + bz, 0.5, back, ch.rot)); } }
       if (c.density >= 0.35) out.push(rug(c, p.x, p.z, isRound ? L + 1.4 : L + 1.3, isRound ? L + 1.4 : Wd + 1.4, rot, { round: isRound && c.rng() < 0.6 }));
       // light over the table (fixtures.ts leaves a table that has one alone)
-      if ((c.lv.height || 2.7) >= 2.5) {
+      // (a room whose author says what hangs — a chandelier, pendants, or nothing — gets that from fixtures.ts, not a second light from here)
+      const fxs = c.room.fixtures || {}, authoredHang = fxs.ceiling === 'chandelier' || fxs.ceiling === 'none' || typeof fxs.pendants === 'number';
+      if ((c.lv.height || 2.7) >= 2.5 && !authoredHang) {
         if (hung === 'chandelier' || isRound || L < 1.8) { const hl = c.item(hung, p.x, p.z, rot, hung === 'chandelier' ? { w: mm(Math.min(0.9, L * 0.45)), drop: 0.8 } : { drop: 0.85 }, { layer: 'ceiling', opt: true }); out.push(hl); }
         else for (const s of [-1, 1]) { const [dx, dz] = turn(s * L / 4, 0, rot); out.push(c.item('pendant-lamp', p.x + dx, p.z + dz, rot, { drop: 0.85 }, { layer: 'ceiling', opt: true })); }
       }
@@ -1272,6 +1274,18 @@ function pinsFor(spec: any, lv: any, room: any, composed: Map<any, any[]>): CIte
       if (layer === 'wall' && it.y === undefined) ci.y = PLACEMENT[it.type]?.mountY ?? 1.5;
       out.push(ci);
     }
+  }
+  // S2's fireplace features (spec.features[]): a hearth built into this room's wall is the room's own — the lounge faces it and the
+  // composer adds no second one. It stands as a pinned fireplace item (its box on the room side of the wall it backs onto).
+  for (const f of spec.features || []) {
+    if (!f || f.type !== 'fireplace' || !Array.isArray(f.at) || (f.level ? f.level !== lv.id : lv !== (spec.levels || [])[0])) continue;
+    // (it stands on the wall line, which two rooms may share: the room is the one whose floor is in front of it)
+    const rot = f.rot || 0, [px, pz] = turn(0, 0.5, rot);
+    if (!(f.at[0] + px > b.x && f.at[0] + px < b.x + b.w && f.at[1] + pz > b.z && f.at[1] + pz < b.z + b.d)) continue;
+    const [fx, fz] = turn(0, 0.25, rot), it = { type: 'fireplace', at: [mm(f.at[0] + fx), mm(f.at[1] + fz)], rot, ...(typeof f.w === 'number' ? { w: f.w } : {}) };
+    const o = itemObb(it); if (!o) continue;
+    const s = sizeOf(it.type, it)!;
+    out.push({ type: it.type, rot, params: {}, cx: o.cx, cz: o.cz, w: s.w, d: s.d, h: s.h, ox: s.ox, oz: s.oz, layer: layerOf(it.type), y: 0, box: o, clear: [], walk: [], gid: 0, pin: true, own: true, tucks: false });
   }
   return out;
 }
