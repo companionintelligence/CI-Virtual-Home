@@ -537,7 +537,7 @@ export function createShotPlannerV1(bctx) {
       // 12 s, or what the spec pins (the timing below is in seconds, so it is laid out for the duration the shot
       // will actually play at — the spec's override is applied after shotsFor has built every shot). A long walk
       // (three storeys, 45 m of travel) is pinned at 14 s.
-      const pinnedDur = (spec.shots || []).filter(s => s && s.type === 'door-to-core' && s.duration).map(s => s.duration).pop();
+      const pinnedDur = (spec.shots || []).filter(s => s && s.type === 'door-to-core' && typeof s.duration === 'number' && s.duration > 0).map(s => s.duration).pop();   // 'auto' is planner v2's: a v1 shot (or a v2 shot that fell back) keeps the number
       const shot: Record<string, any> = { type: 'door-to-core', dressing: { walls: 'up', roof: 'auto' }, name: `${spec.emoji || '🏠'} ${spec.name}: Front Door → Companion Core`, duration: pinnedDur || 12, closed: false, eyePoints: eye, targetPoints: tgt, clearance: clearanceMoves };
       if (fin) {
         // push in to the orbit, then arc round the Core at a steady angular speed, ending on its front. The
@@ -733,7 +733,7 @@ export function createShotPlannerV1(bctx) {
     // thing anyone could ask was whether the preset KEY contained "door-to-core".
     for (const s of spec.shots || []) {
       const sh = shots[s.type]; if (!sh) continue;
-      sh.duration = s.duration || sh.duration;
+      if (typeof s.duration === 'number' && s.duration > 0) sh.duration = s.duration;   // never the string 'auto': a v2 shot that falls back to v1 keeps v1's own length
       if (s.walls) sh.dressing.walls = s.walls;
       if (s.roof) sh.dressing.roof = s.roof;
       if (s.enterT !== undefined) sh.enterT = s.enterT;
