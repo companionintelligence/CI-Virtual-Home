@@ -3,11 +3,13 @@
 //
 //   pnpm run check [--house aurora,mirage] [--jobs 2] [--res 360] [--update-goldens]
 //   pnpm run check:quick                                   # assets + specs + shots + the quick tests
+//   pnpm run test:node                                     # only the quick tests: pure Node, no GPU, no browser (CI runs this)
 //   node --experimental-strip-types scripts/check-house.mts [--quick] [--house …] [--jobs 2] [--res 360] [--update-goldens]
 //
 // Works from any cwd: every path resolves from this file's own location.
 //
-// Only the first two steps run in CI (.github/workflows/ci.yml). 150 frames through a software rasteriser
+// CI (.github/workflows/ci.yml) runs build, typecheck, validate, the floor-plan-graph test, `test:node` (the quick tests below,
+// which need no GPU) and the portal build — steps 0 and 1 and the quick part of 5. 150 frames through a software rasteriser
 // cost the better part of an hour of GitHub Actions per push — measured, twice — and that is not what the
 // runner budget is for. On a machine with a GPU the same work is a couple of minutes, so it runs here, before
 // you push.
@@ -35,7 +37,8 @@
 //
 // The order is a dependency chain, not a preference: goldens compared against a renderer that is not
 // deterministic are noise, so a failed determinism check skips them rather than reporting a hundred lies.
-// --quick stops after the shot gate, which is the fast pair worth running while you are still editing.
+// --quick skips determinism, goldens, the slow tests and perf: the fast loop while you are still editing (assets, specs, shots and the
+// quick tests). --node runs only the quick tests, none of which start a browser.
 //
 // Exit 0 only when everything that ran passed. Child steps run under --experimental-strip-types too, since
 // they are .mts files themselves and Node (as of this repo's minimum, 22.15) does not strip types by default.
@@ -52,6 +55,7 @@ if (!fs.existsSync(path.join(ROOT, 'room-creator.html'))) { console.error(`no ro
 const S = (n: string): string => path.relative(process.cwd(), path.join(ROOT, 'scripts', n)) || n;
 
 const HOUSE = val('house', null), JOBS = val('jobs', '2');
+const NODE_ONLY = flag('node');   // the quick test scripts only: what CI can run without a GPU
 const houseArgs = HOUSE ? ['--house', HOUSE] : [];
 const QA_OUT = path.join(ROOT, 'test', 'qa');
 // One resolution, passed explicitly to both steps below. test-goldens.mts's own default happens to be '360'
@@ -85,6 +89,7 @@ type Result = Step & { state: 'pass' | 'fail' | 'warn' | 'skipped'; why?: string
 const results: Result[] = [];
 for (const step of steps) {
   if (flag('quick') && step.quick === false) { results.push({ ...step, state: 'skipped', why: '--quick' }); continue; }
+  if (NODE_ONLY && !(step.key.startsWith('test:') && step.quick !== false)) { results.push({ ...step, state: 'skipped', why: '--node: the quick tests only' }); continue; }
   const failedNeed = (step.needs || '').split(',').find(n => n && results.find(r => r.key === n)?.state === 'fail');
   if (failedNeed) {
     results.push({ ...step, state: 'skipped', why: `${failedNeed} failed — a baseline compared against a renderer that disagrees with itself is noise` });

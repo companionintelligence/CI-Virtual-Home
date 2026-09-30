@@ -16,6 +16,7 @@
     "test": "node --experimental-strip-types --test scripts/test-floorplan-graph.mts",
     "check": "node --experimental-strip-types scripts/check-house.mts",
     "check:quick": "node --experimental-strip-types scripts/check-house.mts --quick",
+    "test:node": "node --experimental-strip-types scripts/check-house.mts --node",
     "goldens": "node --experimental-strip-types scripts/test-goldens.mts",
     "goldens:update": "node --experimental-strip-types scripts/test-goldens.mts --update",
     "frame-hash": "node --experimental-strip-types scripts/test-frame-hash.mts",
