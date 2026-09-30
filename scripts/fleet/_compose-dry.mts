@@ -45,8 +45,9 @@ export function dryRun(specs: Array<{ id: string; spec: any }>, { variant = '' a
   return out;
 }
 
-/** the hero desk set is placed by the hero block, not furnished */
-export const HERO_SET = new Set(['walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
+/** the hero desk set is placed by the hero block, not furnished. It lives once, in assets/item-map.ts; the built module is
+ *  loaded below, and when the assets are not built the dry run has no composer either. */
+export const HERO_SET: ReadonlySet<string> = M ? (await load('assets/item-map.js')).HERO_SET : new Set<string>();
 /** what counts as FURNITURE in the repetition target: what a room is furnished with. Fitted kitchens, appliances, bath
  *  fittings, lamps, ceiling fixtures and the Core's desk set are left out (a house needs a toilet and a range whatever
  *  the composer does). */

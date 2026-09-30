@@ -34,6 +34,7 @@ import { PROPS } from './props/index.js';
 import { PLACEMENT } from './props/placement.js';
 import { perimeterEdges, edgeForOpening, inRect } from './house-geometry.js';
 import { pageItemDef } from './item-meta.js';
+import { HERO_SET } from './item-map.js';
 import {
   analyzeRoom, sizeOf, paramsOf, itemObb, overlap, aabb, insideRoom, limitOf, laneGrid, lanesOk, obb, rectObb, turn, containsPt,
   INWARD, alongX, SIDES, DEG, CELL, type Geo, type Obb,
@@ -75,7 +76,6 @@ export interface LayoutIssue { code: string; level: 'warn' | 'error'; message: s
 
 const UNIVERSAL = new Set(['type', 'at', 'rot', 'y', 'src', 'note', 'label', 'id', 'name', 'hero']);
 const REPEAT_EXEMPT_GROUPS = new Set(['rug', 'lamp', 'fitted', 'appliance', 'lighting', 'chair', 'bath', 'hero', 'structure', 'decor', 'textile']);
-const HERO_SET = new Set(['walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
 const solidOf = (it: any) => { const l = layerOf(it.type); if (l !== 'body') return false; const s = sizeOf(it.type, it); return !!s && s.h > 0.12; };
 /** the body item a surface item stands on (the one under its point that offers the highest top) */
 function supportOf(it: any, items: any[]): any | null {
