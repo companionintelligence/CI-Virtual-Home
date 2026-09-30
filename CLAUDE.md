@@ -91,14 +91,14 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   `<main>` because `<main>` goes inert while a drawer is open.
 - `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
 
-**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and assembles
-the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
+**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and the 15 quick
+Node tests (`pnpm run test:node`) and assembles the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
 passes those goes live on its own. The render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
 pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (150 / 150)
-pnpm run check:quick    # while iterating: assets + specs + shots
+pnpm run check:quick    # while iterating: assets + specs + shots + the 15 quick tests
 ```
 
 A clean run has 0 shot errors and 0 scene errors (warnings are reported but do not fail — compare their count

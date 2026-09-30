@@ -47,8 +47,9 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run typecheck` | `tsc` over `scripts/` (Node) and over `assets/` (browser). |
 | `pnpm run validate` | All 30 specs against the schema, the prop catalog and the registry, then every `scripts/validate/*.mts` plugin. `--shots` adds the headless camera-path QA; `--layout` the layout lints. |
 | `pnpm run test` | `scripts/test-floorplan-graph.mts` under `node --test` — the floor-plan graph, mitres, and the wall compiler over every spec. Needs `build`. |
-| `pnpm run check` | **The gate** — every check below, in order. `--house a,b`, `--jobs N`, `--res`, `--update-goldens`, `--no-perf`. |
-| `pnpm run check:quick` | assets + specs + shots, and the test scripts marked `@check-house quick` (the floor-plan graph): the fast loop while editing. |
+| `pnpm run check` | **The gate** — every check below, in order (`pnpm run typecheck` is separate). `--house a,b`, `--jobs N`, `--res`, `--update-goldens`, `--no-perf`. |
+| `pnpm run check:quick` | assets + specs + shots, and the 15 test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site …): the fast loop while editing. |
+| `pnpm run test:node` | Only those 15 quick tests: pure Node, no browser, no GPU (a few minutes). CI runs it. |
 | `pnpm run shots` | Render product shots to `video/houses/` (`--house`, `--shot`, `--res 1080`, `--aspect 16:9`, `--poster-only`, `--qa-only`, `--jobs`). |
 | `pnpm run goldens` / `goldens:update` | Compare 150 frames with the committed baselines / re-bless them. |
 | `pnpm run frame-hash` | Two fresh browser contexts must render the same frames. |
@@ -327,7 +328,7 @@ removed. Nothing depends on GitHub Pages, so it can be switched off in the repos
 
 ## How verification works
 
-`pnpm run check` runs these checks, the first five each depending on the one before:
+`pnpm run check` runs these checks in order; only the goldens depend on an earlier one (they are skipped when a determinism check fails):
 
 1. **assets** — compile `assets/**/*.ts`.
 2. **specs** — validate the 30 HouseSpecs.
@@ -356,7 +357,8 @@ removed. Nothing depends on GitHub Pages, so it can be switched off in the repos
    `@check-house` line in its header, and `@check-house advisory — <why>` lets one that is red on `main` too run
    and report without failing the gate until the fix that greens it lands (none is advisory today; delete the
    directive with the fix, so a real regression fails again). Among them `test-fixtures.mts`, the fixture houses' QA
-   and frame hashes, and the seams' own tests, each a second or two and in `--quick`: `test-spec-types.mts` (every
+   and frame hashes (all 51 fixtures, including `integration-all` and `integration-all-upstairs`, the all-streams smoke tests that use
+   one of everything each stream added; ~13 minutes under load, not in `--quick`), and the seams' own tests, each a second or two and in `--quick`: `test-spec-types.mts` (every
    spec against `HouseSpec`), `test-spec-merge.mts` (the fragment merge rule), `test-validate-plugins.mts` (a
    plugin's `extend` and `replaces`), `test-builder-seams.mts` (what the catalog and the validator read off the
    builders) and `test-visibility.mts` (the wall roles, the shot's clock and its `shotHidden` / `shotPose` hooks);
@@ -373,7 +375,7 @@ reviewed frame by frame, committed with that change. Failing runs leave `*.actua
 `test/diff/`.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs what needs no GPU: install, build, typecheck,
-spec validation and the floor-plan-graph tests. 150 frames through a software rasteriser would cost the better
+spec validation, the floor-plan-graph tests, `pnpm run test:node` (the 15 quick test scripts) and the portal build. 150 frames through a software rasteriser would cost the better
 part of an hour of runner time per push, so the render gate runs locally before you push, as it did in
 CI-Common.
 

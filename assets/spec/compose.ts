@@ -1,6 +1,6 @@
 // HouseSpec fragment for S3 (compose): the fields this stream adds, one interface per part of
 // the spec; assets/spec/index.ts merges every fragment into HouseSpec. Every field is OPTIONAL (plan §2.0: a house
-// that uses none of them renders exactly as it does today). Owned by S3: edit only this file.
+// that uses none of them keeps today's look, apart from the fixes declared in test/goldens/expected-diffs/). Owned by S3: edit only this file.
 //
 // To WIDEN a field base.ts declares (one more enum value, a string that may also be an object), redeclare it here
 // with the wider type — index.ts lets this fragment's field replace the base's and fails the compile if it narrows

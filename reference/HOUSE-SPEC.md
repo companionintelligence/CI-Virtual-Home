@@ -15,7 +15,8 @@ render gate (see the README).
 The spec is also a TypeScript type: `assets/spec/index.ts` (`HouseSpec`), merged from `base.ts` — this document's
 fields as the builder honours them today — and one fragment per stream of pass 4 (`kit.ts`, `arch.ts`,
 `compose.ts`, `site.ts`, `shots.ts`), which add the fields documented under [Pass-4 fields](#pass-4-fields) below.
-Every new field is optional: a spec that uses none of them renders exactly as it does today.
+Every new field is optional: a spec that uses none of them keeps today's look, apart from the fixes declared in
+`test/goldens/expected-diffs/` (neutral ceilings and the monitor's pole, S1; slab holes, S2).
 
 ## Coordinate system
 
@@ -93,7 +94,7 @@ any value but 1 or 2.
   ],
   "stairs":  { "type": "timber", "at": [3, 0], "rot": 180, "to": "l2", "w": 1.1, "run": 3.36 },
                      // timber | colonial | spiral ; at = bottom step; rot = ascent direction (0 = ascends toward +Z);
-                     // w width (timber 1.1, colonial 1.2), run plan length (3.36; a spiral has none). One flight a level
+                     // w width (timber 1.1, colonial 1.2), run plan length (3.36; a spiral has none). One flight a level, or an array of flights (see Architecture (S2) → Stairs)
   "voids":   [ { "x": 2.4, "z": -1.8, "w": 1.2, "d": 3.6 } ],              // slab cut-outs; only meaningful when y > 0
   "balustrades": [ { "from": [x,z], "to": [x,z], "style": "glass" } ],      // glass | colonial ; for mezzanine edges
   "rooms": [
@@ -422,7 +423,7 @@ the highest roof point it rises through).
   would lean on the wall at — so on a single storey with a raised deck the roof comes out low (the validator says `porch-pitch` when the
   built pitch is not the one asked, `porch-clearance` under 2 m of post).
 - `balcony` / `terrace` / `loggia` — `{ level, side, from, to, depth }` or `{ level, rect }`, `rail: 'glass'|'metal'|'timber'|'parapet'|
-  'none'`. A balcony is a slab out of the wall; a terrace is a deck on the roof below (it fades with the roofs); a loggia is a recessed
+  'none'`, `floorColor` (the deck's colour; a porch takes it too). A balcony is a slab out of the wall; a terrace is a deck on the roof below (it fades with the roofs); a loggia is a recessed
   floored, railed outdoor room (`posts` along its open side) under the storey above, or — with no storey above — under the eave of its
   own storey (posts run to the wall top), so a loggia under a gable end needs no second storey.
 - `bay` — `{ level, side, at, w, depth, form: 'box'|'canted', roof: 'hip'|'shed'|'flat'|'gable'|'none', skirt: 'grade'|'oriel'|'none', sill,
@@ -665,7 +666,7 @@ terracotta, stone) and `color`, and are cut round the water inside them.
 its `y` (else the ground under it), a `coping: { "w", "material", "color" }` round it (false: none). The lawn, a
 patio, a deck or a terrace over it is cut round its outline. `basin` is a formal reflecting basin (dark, 0.45 m):
 `island: { "w", "d", "h", "plants": "topiary-ball" | "lavender" | "tree" | …, "color" }` and `fountains: n` jets
-along its long axis. `rill` (0.45 m) and `channel` (1.2 m) are narrow runs of water: `at`, `w`, `d` (its length),
+along its long axis (`jetH`: jet height in metres, default 0.9). `rill` (0.45 m) and `channel` (1.2 m) are narrow runs of water: `at`, `w`, `d` (its length),
 `rot`. A `pond` with a `poly` (or `shape: "organic"`) has a noise shore, seeded rocks of varied size and count,
 marginal tufts and lily pads. A pool with none of these is the old slab pool, unchanged.
 
