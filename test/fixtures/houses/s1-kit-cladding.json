@@ -1,0 +1,74 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "s1-kit-cladding",
+  "name": "S1 Kit — claddings, palette and light",
+  "author": "ci-virtual-home",
+  "source": "test fixture (plan S1): three storeys in three claddings, a saturated cobalt kept by palette.keep, a roof colour kept exactly, the golden sun at a set bearing",
+  "style": "Three-storey townhouse: a brick base, cobalt siding, a timber top storey; a red standing-seam roof",
+  "emoji": "🧱",
+  "fixture": {
+    "note": "levels[].material + wallColor (brick, cobalt siding kept by palette.keep, timber); roofs[].color kept exactly (keep 'roof'); lighting { preset: golden, sunBearing: 225 }",
+    "frames": { "door-to-core": [0.1, 0.55, 1], "orbit": [0.55], "hero-reveal": [1] }
+  },
+  "lot": { "w": 22, "d": 22, "ground": "lawn" },
+  "palette": { "wall": "#e9e4da", "trim": "#2f3336", "roof": "#8e3b2f", "accent": "#b5651d", "material": "stucco", "keep": ["wall", "roof", "accent"] },
+  "lighting": { "preset": "golden", "sunBearing": 225 },
+  "levels": [
+    {
+      "id": "l1", "name": "Ground Floor", "y": 0, "height": 2.8, "floor": "oak", "material": "brick", "wallColor": "#9a4b3a",
+      "footprint": [ { "x": -4, "z": -4, "w": 8, "d": 8 } ],
+      "openings": [
+        { "side": "S", "at": 0.6, "type": "door", "w": 1.0, "h": 2.1, "style": "entry", "color": "#2f3336" },
+        { "side": "S", "at": -2.4, "type": "window", "w": 1.3, "h": 1.3, "sill": 0.9 },
+        { "side": "N", "at": 1.5, "type": "slider", "w": 1.8, "h": 2.2 },
+        { "side": "E", "at": 1, "type": "window", "w": 1.2, "h": 1.2, "sill": 0.9 },
+        { "side": "W", "at": 1, "type": "window", "w": 1.2, "h": 1.2, "sill": 0.9 }
+      ],
+      "partitions": [ { "from": [-1.2, -4], "to": [-1.2, 4], "door": 5.8, "doorW": 0.9 } ],
+      "stairs": { "type": "timber", "at": [0.2, -3.25], "rot": 90, "to": "l2", "w": 1.0 },
+      "rooms": [
+        { "no": "01", "name": "Living Room", "bounds": { "x": -1.2, "z": -4, "w": 5.2, "d": 8 },
+          "items": [ { "type": "sectional", "at": [1.4, 2.4], "rot": 180 }, { "type": "coffee-table", "at": [1.4, 1.0] }, { "type": "fiddle-leaf", "at": [3.4, 3.4] } ] },
+        { "no": "02", "name": "Study", "bounds": { "x": -4, "z": -4, "w": 2.8, "d": 8 },
+          "items": [ { "type": "bookshelf", "at": [-2.6, 3.7], "rot": 180 } ] }
+      ]
+    },
+    {
+      "id": "l2", "name": "Middle Floor", "y": 2.8, "height": 2.7, "floor": "oak", "material": "siding", "wallColor": "#1f4fd1",
+      "footprint": [ { "x": -4, "z": -4, "w": 8, "d": 8 } ],
+      "openings": [
+        { "side": "S", "at": -1.8, "type": "window", "w": 1.3, "h": 1.3, "sill": 0.9 },
+        { "side": "S", "at": 1.8, "type": "window", "w": 1.3, "h": 1.3, "sill": 0.9 },
+        { "side": "E", "at": 1, "type": "window", "w": 1.2, "h": 1.2, "sill": 0.9 },
+        { "side": "W", "at": 1, "type": "window", "w": 1.2, "h": 1.2, "sill": 0.9 }
+      ],
+      "voids": [ { "x": 0.1, "z": -3.9, "w": 3.6, "d": 1.3 } ],
+      "stairs": { "type": "timber", "at": [3.6, -1.9], "rot": 270, "to": "l3", "w": 1.0 },
+      "rooms": [
+        { "no": "03", "name": "Bedroom", "bounds": { "x": -4, "z": -4, "w": 8, "d": 8 },
+          "items": [ { "type": "platform-bed", "at": [-1.6, 1.6], "rot": 180 }, { "type": "area-rug", "at": [-1.6, 0.8] } ] }
+      ]
+    },
+    {
+      "id": "l3", "name": "Top Floor", "y": 5.5, "height": 2.6, "floor": "oak", "material": "timber", "wallColor": "#8a6a4a",
+      "footprint": [ { "x": -4, "z": -4, "w": 8, "d": 8 } ],
+      "openings": [
+        { "side": "S", "at": 0, "type": "window", "w": 2.4, "h": 1.5, "sill": 0.6 },
+        { "side": "E", "at": 1, "type": "window", "w": 1.2, "h": 1.2, "sill": 0.9 }
+      ],
+      "voids": [ { "x": 0.0, "z": -2.5, "w": 3.9, "d": 1.3 } ],
+      "rooms": [
+        { "no": "04", "name": "Loft", "bounds": { "x": -4, "z": -4, "w": 8, "d": 8 },
+          "items": [ { "type": "area-rug", "at": [-1.5, 1.5] }, { "type": "monstera", "at": [-3.4, 3.4] } ] }
+      ]
+    }
+  ],
+  "roofs": [ { "over": { "x": -4.4, "z": -4.4, "w": 8.8, "d": 8.8 }, "y": 8.1, "type": "gable", "ridge": "x", "pitch": 34, "overhang": 0.4, "color": "#8e3b2f" } ],
+  "site": [
+    { "type": "path", "path": [[0.6, 4.2], [0.6, 10]], "w": 1.2 },
+    { "type": "tree", "at": [-7.5, 5.5], "h": 6 },
+    { "type": "shrub", "at": [-2.2, 4.8] }
+  ],
+  "hero": { "level": "l1", "at": [-2.6, -3.55], "rot": 0, "device": "chalk", "pose": "prone", "surface": "desk", "desk": { "style": "oak" }, "monitor": "flat", "chair": { "kind": "task", "pose": "turned" } },
+  "entry": { "level": "l1", "side": "S", "at": 0.6 }
+}

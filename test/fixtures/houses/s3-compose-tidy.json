@@ -1,0 +1,451 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "s3-compose-tidy",
+  "name": "S3 Tidy Fixture",
+  "author": "ci-virtual-home",
+  "source": "test fixture (plan S3): defaults 2: a wall mount authored inside its wall comes out to the face, a lamp or vase authored at the 0.77 m desk default sits on the top of what it stands on; focus.bed picks the headboard wall and focus.island asks for an island",
+  "style": "Single-storey block: an untidy room and two rooms with a said-so",
+  "emoji": "🧪",
+  "fixture": {
+    "note": "defaults 2: a wall mount authored inside its wall comes out to the face, a lamp or vase authored at the 0.77 m desk default sits on the top of what it stands on; focus.bed picks the headboard wall and focus.island asks for an island"
+  },
+  "lot": {
+    "w": 31.0,
+    "d": 24,
+    "ground": "lawn"
+  },
+  "palette": {
+    "wall": "#eeebe4",
+    "trim": "#2c2f33",
+    "roof": "#3a3d42",
+    "accent": "#6d8a74",
+    "material": "siding"
+  },
+  "lighting": "day",
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Ground Floor",
+      "y": 0,
+      "height": 2.8,
+      "floor": "oak",
+      "footprint": [
+        {
+          "x": -9.5,
+          "z": -6,
+          "w": 19.0,
+          "d": 12
+        }
+      ],
+      "openings": [
+        {
+          "side": "N",
+          "at": -7.3,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": -0.1,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 7.2,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": -6.8,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 2.7,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "W",
+          "at": 0,
+          "type": "door",
+          "w": 1.0,
+          "h": 2.1,
+          "style": "entry"
+        },
+        {
+          "side": "W",
+          "at": -3.5,
+          "type": "window",
+          "w": 1.0,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "E",
+          "at": -3.0,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "E",
+          "at": 3.0,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.3,
+          "sill": 0.9
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -9.5,
+            -1
+          ],
+          "to": [
+            -5.1,
+            -1
+          ],
+          "door": 2.2,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -5.1,
+            -1
+          ],
+          "to": [
+            4.9,
+            -1
+          ],
+          "door": 5.0,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -5.1,
+            -6
+          ],
+          "to": [
+            -5.1,
+            -1
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            4.9,
+            -1
+          ],
+          "to": [
+            9.5,
+            -1
+          ],
+          "door": 2.3,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            4.9,
+            -6
+          ],
+          "to": [
+            4.9,
+            -1
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            -9.5,
+            1
+          ],
+          "to": [
+            -4.1,
+            1
+          ],
+          "door": 2.7,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -4.1,
+            1
+          ],
+          "to": [
+            9.5,
+            1
+          ],
+          "door": 6.8,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -4.1,
+            1
+          ],
+          "to": [
+            -4.1,
+            6
+          ],
+          "door": null
+        }
+      ],
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Study",
+          "bounds": {
+            "x": -9.5,
+            "z": -6,
+            "w": 4.4,
+            "d": 5
+          },
+          "program": "study",
+          "items": []
+        },
+        {
+          "no": "02",
+          "name": "Untidy Room",
+          "bounds": {
+            "x": -5.1,
+            "z": -6,
+            "w": 10.0,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "wall-art",
+              "at": [
+                -5.0,
+                -6.0
+              ],
+              "w": 1.0,
+              "h": 0.7,
+              "motif": "landscape",
+              "y": 1.7
+            },
+            {
+              "type": "round-mirror",
+              "at": [
+                -3.4,
+                -5.97
+              ],
+              "r": 0.35,
+              "y": 1.6
+            },
+            {
+              "type": "console-table",
+              "at": [
+                -1.8,
+                -5.6
+              ]
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                -2.1,
+                -5.6
+              ]
+            },
+            {
+              "type": "vase",
+              "at": [
+                -1.4,
+                -5.6
+              ]
+            },
+            {
+              "type": "sideboard",
+              "at": [
+                0.6,
+                -5.55
+              ]
+            },
+            {
+              "type": "vase",
+              "at": [
+                0.6,
+                -5.55
+              ]
+            },
+            {
+              "type": "candle-set",
+              "at": [
+                0.2,
+                -5.55
+              ]
+            },
+            {
+              "type": "nightstand",
+              "at": [
+                2.6,
+                -5.6
+              ]
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                2.6,
+                -5.6
+              ]
+            }
+          ]
+        },
+        {
+          "no": "03",
+          "name": "Bedroom, head on the E wall",
+          "bounds": {
+            "x": 4.9,
+            "z": -6,
+            "w": 4.6,
+            "d": 5
+          },
+          "program": "bed-primary",
+          "focus": {
+            "type": "bed",
+            "wall": "E"
+          },
+          "items": []
+        },
+        {
+          "no": "04",
+          "name": "Kitchen, island asked for by focus",
+          "bounds": {
+            "x": -9.5,
+            "z": 1,
+            "w": 5.4,
+            "d": 5
+          },
+          "program": "kitchen",
+          "focus": {
+            "type": "island"
+          },
+          "style": "modern",
+          "items": []
+        },
+        {
+          "no": "05",
+          "name": "Bedroom, head on the S wall",
+          "bounds": {
+            "x": -4.1,
+            "z": 1,
+            "w": 13.6,
+            "d": 5
+          },
+          "program": "bed-guest",
+          "focus": {
+            "type": "bed",
+            "wall": "S"
+          },
+          "items": []
+        },
+        {
+          "no": "06",
+          "name": "Hall",
+          "bounds": {
+            "x": -9.5,
+            "z": -1,
+            "w": 19.0,
+            "d": 2
+          },
+          "program": "hall",
+          "items": []
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -9.5,
+        "z": -6,
+        "w": 19.0,
+        "d": 12
+      },
+      "y": 2.8,
+      "type": "gable",
+      "ridge": "x",
+      "pitch": 24,
+      "overhang": 0.4,
+      "color": "#3a3d42"
+    }
+  ],
+  "site": [
+    {
+      "type": "path",
+      "path": [
+        [
+          -9.7,
+          0
+        ],
+        [
+          -14.5,
+          0
+        ]
+      ],
+      "w": 1.2
+    },
+    {
+      "type": "tree",
+      "at": [
+        -13.5,
+        7
+      ],
+      "h": 6
+    },
+    {
+      "type": "tree",
+      "at": [
+        12.5,
+        -8
+      ],
+      "h": 6.5
+    }
+  ],
+  "entry": {
+    "level": "l1",
+    "side": "W",
+    "at": 0
+  },
+  "shots": [
+    {
+      "id": "door-to-core",
+      "type": "door-to-core",
+      "duration": 14
+    },
+    {
+      "id": "orbit",
+      "type": "orbit",
+      "duration": 10
+    }
+  ],
+  "styleKey": "modern",
+  "hero": {
+    "level": "l1",
+    "at": [
+      -7.3,
+      -5.5
+    ],
+    "rot": 0,
+    "device": "chalk",
+    "pose": "prone",
+    "surface": "desk"
+  },
+  "defaults": 2
+}

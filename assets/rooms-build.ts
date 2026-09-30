@@ -1,10 +1,25 @@
 // The rooms loop — every room item of one storey placed, turned, tagged and themed, and the tall ones recorded
 // as routing solids (anchors.solids) for the shot planner.
 //
+// Composed rooms (plan S3): a room with a `program` (and not `lock`ed) gets the composer's furniture set
+// (assets/room-composer.ts composeHouse — THREE-free, seeded, cached per spec) after its authored items, which are
+// kept exactly as pins. A room without a program takes the loop exactly as before. Under `defaults: 2`, authored
+// wall-mounted items set inside their wall move out to its face and surface items authored at the desk default sit
+// on whatever they stand on (snapWallMount / stackOnSurface).
+// anchors.compose records every composed room for <id>.plan.json (assets/plan-export/compose.ts).
+//
 // Seam module (plan S0): moved verbatim out of house-builder.ts. Owner: S3 (compose).
 import { PROPS } from './props/index.js';
 import { DEG, hex, mix } from './build-context.js';
 import { HERO_SET } from './item-map.js';
+import { composeHouse, snapWallMount, stackOnSurface, SRC } from './room-composer.js';
+import { isComposed } from './room-programs.js';
+import { analyzeRoom } from './room-geo.js';
+import { sunkRooms } from './arch-plan.js';
+import { defaultsAtLeast } from './spec/index.js';
+
+/** the offset of a composed item's room floor over the storey's (see buildRooms) */
+const ON_FLOOR = Symbol('onFloor');
 
 export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
   const { THREE, AssetFactory, std, box, group } = bctx;
@@ -30,12 +45,30 @@ export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
     // The page's own plant builders (the registry marks its plants foliage itself): a splayed leaf's box
     // covers far more than the leaf, so the scene QA's box tests would call every plant near a wall a clash.
     const PAGE_FOLIAGE = new Set(['fiddle-leaf', 'monstera', 'bonsai', 'bamboo', 'cactus-group']);
+    const tidy = defaultsAtLeast(spec, 2);
+    const sunk = new Set(sunkRooms(spec, lv));
     for (const room of lv.rooms || []) {
-      for (const it of room.items || []) {
+      let items = room.items || [];
+      // a composed piece stands on the room's own floor: a raised platform or a sunken pit (rooms[].floorOffset, S2) moves it with the floor —
+      // the composer lays a room out in the storey's frame. (Authored items carry their own y.) Carried on the item as a symbol so the
+      // tidy pass's copies keep it.
+      const floorOff = typeof room.floorOffset === 'number' && (room.floorOffset > 0 || sunk.has(room)) ? room.floorOffset : 0;
+      if (isComposed(room)) {
+        const res = composeHouse(spec).get(room);
+        if (res) {
+          items = [...items, ...res.items.map(it => (floorOff ? { ...it, [ON_FLOOR]: floorOff } : it))];
+          (anchors.compose ||= []).push({ level: lv.id, room: room.no ?? room.name, name: room.name, program: res.program, style: res.style, items: res.items });
+        }
+      }
+      if (tidy) {
+        const geo = analyzeRoom(spec, lv, room);
+        items = items.map(it => { if (it.src === SRC) return it; const a = snapWallMount(it, geo) || it; return stackOnSurface(a, items) || a; });
+      }
+      for (const it of items) {
         if (heroHere && HERO_SET.has(it.type) && Math.hypot(it.at[0] - spec.hero.at[0], it.at[1] - spec.hero.at[1]) < 1.3) continue;
         const prop = PROPS.get(it.type);
         const fn = ITEMS[it.type] || (prop && (p => prop.create(p, propCtx(it, H)))); if (!fn) continue;
-        const yy = y + ((ON_SURFACE.has(it.type) || (prop && prop.surface)) ? (it.y ?? DESK_TOP) : (it.y ?? (prop && prop.mountY) ?? 0));   // mountY: a wall-mounted prop's default height
+        const yy = y + (it[ON_FLOOR] || 0) + ((ON_SURFACE.has(it.type) || (prop && prop.surface)) ? (it.y ?? DESK_TOP) : (it.y ?? (prop && prop.mountY) ?? 0));   // mountY: a wall-mounted prop's default height
         const o = put(() => fn(it, { H, y, palette }), it.at[0], it.at[1], yy, null, 'item');
         o.rotation.y = (it.rot || 0) * DEG;   // core-shelf: rot is the wall heading, the plank extends the other way
         o.userData.room = room.name;

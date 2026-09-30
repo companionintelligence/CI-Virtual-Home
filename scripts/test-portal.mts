@@ -30,6 +30,9 @@
 //             (home-names.js) not downloading: the gallery still lists the homes, and the player's tab never
 //             shows a spec's Sims title
 //   editor    room-creator.html without ?mode=view still shows the editor and never mounts the player
+//   webkit    Safari's engine, when Playwright's WebKit for the pinned version is installed: the gallery, the player
+//             (plays, pauses, scrubs) and the editor (builds a home, hooks there), with no console error. Skipped with
+//             a line saying so when it is not (pnpm exec playwright install webkit); required with --webkit
 //
 // Any console error, page error or failed request on any page fails the run (the failure cases allow exactly the
 // ones they cause). Screenshots land in --shots (gitignored test/portal/ by default) so a person can look at what
@@ -537,6 +540,62 @@ async function editor() {
   await close();
 }
 
+// ------------------------------------------------------------------ WebKit
+// The portal is public, and Safari is where WebGL, touch and video differ most from Chromium. Playwright's WebKit must
+// be the revision the pinned Playwright expects (another revision does not start), so this runs when that build is
+// installed, says so and moves on when it is not, and fails on a missing build only when asked for with --webkit.
+// Chromium's clipboard permissions do not exist there; the flags for Chromium's GPU do not either.
+async function webkit() {
+  console.log('\nwebkit');
+  const wanted = args.webkit === 'true';
+  const skip = (why: string) => { if (wanted) ok(false, `WebKit: ${why}`); else console.log(`  skipped: ${why}`); };
+  let exe = '';
+  try { exe = pw.webkit.executablePath(); } catch { /* this Playwright has no WebKit */ }
+  if (!exe || !fs.existsSync(exe)) { skip('Playwright\'s WebKit is not installed for this version (pnpm exec playwright install webkit)'); return; }
+  let b: any;
+  try { b = await pw.webkit.launch({ headless: args.headed !== 'true', timeout: 60000 }); } catch (e) { skip(`it would not start (${String((e as Error).message).split('\n')[0]})`); return; }
+  const wk = { permissions: [] as string[] };
+  try {
+    {
+      const { page, errors, close } = await open({ width: 1440, height: 900 }, false, wk, b);
+      await page.goto(srv.url('index.html'));
+      await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 30000 });
+      const cards = await page.$$eval('#grid .card', (els: Element[]) => els.length);
+      ok(cards === 30, `WebKit gallery: ${cards} cards`);
+      await shot(page, 'webkit-gallery');
+      ok(errors.length === 0, `WebKit gallery: no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
+      await close();
+    }
+    {
+      const { page, errors, close } = await open({ width: 1440, height: 900 }, false, wk, b);
+      await page.goto(srv.url(`room-creator.html?mode=view&house=${HOUSES[0]}&shot=orbit`));
+      await viewerReady(page);
+      await page.mouse.move(700, 300);
+      await page.click('.vh-play');
+      const a = await scrubT(page); await sleep(900); const c = await scrubT(page);
+      ok(c > a, `WebKit player: plays (t ${a.toFixed(3)} → ${c.toFixed(3)})`);
+      await page.click('.vh-play'); await sleep(200);
+      const p1 = await scrubT(page); await sleep(500); const p2 = await scrubT(page);
+      ok(Math.abs(p2 - p1) < 1e-6, 'WebKit player: pauses and holds');
+      await shot(page, 'webkit-player');
+      ok(errors.length === 0, `WebKit player: no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
+      await close();
+    }
+    {
+      const { page, errors, close } = await open({ width: 1440, height: 900 }, false, wk, b);
+      await page.goto(srv.url('room-creator.html?house=aurora'));
+      await page.waitForFunction(() => document.documentElement.dataset.houseReady === 'aurora', null, { timeout: 120000 });
+      await sleep(500);
+      ok(await page.isVisible('.creator-topbar') && await page.evaluate(() => typeof (window as any).__houseRenderFrames === 'function'), 'WebKit editor: builds a home, chrome and hooks are there');
+      const enc = await page.evaluate(() => typeof (window as any).VideoEncoder);
+      console.log(`  (WebCodecs VideoEncoder in this WebKit: ${enc})`);
+      await shot(page, 'webkit-editor');
+      ok(errors.length === 0, `WebKit editor: no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
+      await close();
+    }
+  } finally { await b.close(); }
+}
+
 try {
   await gallery({ width: 1440, height: 900 }, false, '1440');
   await gallery({ width: 390, height: 844 }, true, '390');
@@ -546,6 +605,7 @@ try {
   await motion(HOUSES[0]);
   await failureCases();
   await editor();
+  await webkit();
 } catch (err) {
   failures++;
   console.error(`\n\x1b[31m${(err as Error).stack || err}\x1b[0m`);

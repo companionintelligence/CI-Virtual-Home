@@ -11,6 +11,13 @@
 //
 // The page keeps the state other regions read — currentWallMode, currentLayerFilter, FLOOR2_THRESHOLD, activeShot,
 // activeHouse, activeEyeSpline, placedItems — and hands this module accessors to it.
+//
+// Visibility sync (plan §6 P1 9): the floor filter is one button a storey, split at the home's own level heights
+// (not a fixed 1.8 m); a storey view shows that storey and the ones below it, and keeps the lot and the world (roles
+// 'ground' and 'site'); the roofs and ceilings follow the wall mode AND the floor filter (a storey view never shows a
+// roof), so pressing a floor button in Cutaway no longer puts the roofs back; and a shot never sees the filter: the
+// first frame a shot dresses puts back what the filter hid, and endShotCutaway re-applies it. The filter only ever
+// hides what it can show again (userData.layerHidden): it never shows something a builder or the user hid.
 
 // The true isometric view: yaw 45°, pitch atan(1 / √2) ≈ 35.264°, 35 m out, looking at (0, 1.2, 0).
 export const ISO_VIEW = {
@@ -30,7 +37,7 @@ export function placeIsoCamera(orthoCamera, angleYaw = Math.PI / 4) {
 
 import { shotEnterS, shotRoofAlpha } from './shot-track.js';
 
-export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMode, setWallMode, setLayerFilter, house, eyeSpline }) {
+export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMode, setWallMode, setLayerFilter, layerFilter = () => 'all', house, eyeSpline }) {
   const trackedWalls = [];
 
   function registerTrackedWall(mesh, orientation, fullH = 2.7, cutawayH = 0.85, downH = 0.15) {
@@ -220,7 +227,7 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
     restoreShotHidden();
     restoreShotPose();
     const d = (preset && preset.dressing) || { walls: 'up', roof: 'auto' };
-    if (!shotCutaway) shotCutaway = { savedMode: wallMode(), walls: null };
+    if (!shotCutaway) { shotCutaway = { savedMode: wallMode(), walls: null }; liftLayerFilter(); }
     if (d.walls === 'sims') {
       for (const w of trackedWalls) applyWallModeToMesh(w, simsCut(w, eye, target) ? 'cut' : 'keep');
       shotCutaway.walls = 'sims';
@@ -241,43 +248,61 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
     const mode = shotCutaway.savedMode; shotCutaway = null;
     setRoofOpacity(1);
     setGlobalWallMode(mode);
+    applyLayerFilter();
   }
+  /** is a shot dressing the scene right now (the editor's own wall mode and floor filter set aside)? */
+  const shotDressing = () => !!shotCutaway;
 
+  const pressed = (sel: string, on: (b: HTMLElement) => boolean) => document.querySelectorAll(sel).forEach((b: any) => { const v = on(b); b.classList.toggle('active', v); b.setAttribute('aria-pressed', String(v)); });
   function setGlobalWallMode(mode) {
     setWallMode(mode);
-    document.querySelectorAll('#wall-cutaway-ctrl-group .btn-ctrl').forEach(b => b.classList.remove('active'));
-    const activeBtn = document.getElementById(`btn-wall-${mode}`);
-    if (activeBtn) activeBtn.classList.add('active');
+    pressed('#wall-cutaway-ctrl-group .btn-ctrl', b => b.id === `btn-wall-${mode}`);
 
     trackedWalls.forEach(w => applyWallModeToMesh(w, mode));
-    trackedRoofs.forEach(r => { r.visible = (mode === 'up'); });
-    trackedCeilings.forEach(c => { c.obj.visible = (mode === 'up'); });
+    // a storey view never shows a roof or a ceiling (they would hide the storey from above)
+    const over = mode === 'up' && layerFilter() === 'all';
+    trackedRoofs.forEach(r => { r.visible = over; });
+    trackedCeilings.forEach(c => { c.obj.visible = over; });
   }
 
-  // =========================================================================
-  // FLOOR LAYER VISIBILITY
-  // Toggle between all floors, ground floor only (L1), or upper floor only (L2)
-  // Items at y >= FLOOR2_THRESHOLD are considered upper floor furniture.
-  // =========================================================================
+  // ---- the floor filter ---------------------------------------------------------------------------------------
+  // layer: 'all', or a storey's index into the home's levels (0 = the lowest); the legacy 'floor1' / 'floor2' mean 0
+  // and 1. A storey view shows that storey and those below it, and the lot and the world. Without a home (a studio
+  // scene) the storeys are split at FLOOR2_THRESHOLD.
+  function levelOf(obj): number {
+    const role = obj.userData && obj.userData.role;
+    if (role === 'ground' || role === 'site') return -1;
+    const y = obj.position.y;
+    const h = house(), levels = h && h.spec && h.spec.levels;
+    if (!levels || !levels.length) return y < FLOOR2_THRESHOLD ? 0 : 1;
+    let lv = 0;
+    for (let i = 0; i < levels.length; i++) if (y >= (levels[i].y || 0) - 0.05) lv = i;
+    return lv;
+  }
+  const normLayer = (layer): 'all' | number => layer === 'floor1' ? 0 : layer === 'floor2' ? 1 : layer === 'all' || layer === undefined || layer === null ? 'all' : Number(layer);
+  function applyLayerFilter() {
+    if (shotCutaway) return;   // a shot sees every storey; endShotCutaway re-applies the filter
+    const layer = normLayer(layerFilter());
+    for (const obj of placedItems) {
+      if (!obj || !obj.userData || obj.userData.isRoof || obj.userData.isCeiling) continue;
+      const show = layer === 'all' || levelOf(obj) <= layer;
+      if (!show && obj.visible) { obj.visible = false; obj.userData.layerHidden = true; }
+      else if (show && obj.userData.layerHidden) { obj.visible = true; delete obj.userData.layerHidden; }
+    }
+    setGlobalWallMode(wallMode());   // the roofs and ceilings: the wall mode and the filter together
+  }
+  /** a shot's first frame: put back what the filter hid (the film sees every storey) */
+  function liftLayerFilter() {
+    for (const obj of placedItems) if (obj && obj.userData && obj.userData.layerHidden) { obj.visible = true; delete obj.userData.layerHidden; }
+  }
   function setGlobalLayerVisibility(layer) {
-    setLayerFilter(layer);
-    document.querySelectorAll('#floor-layer-ctrl-group .btn-ctrl').forEach(b => b.classList.remove('active'));
-    const activeBtn = document.getElementById(`btn-layer-${layer}`);
-    if (activeBtn) activeBtn.classList.add('active');
-
-    placedItems.forEach(obj => {
-      if (!obj) return;
-      if (layer === 'all') {
-        obj.visible = true;
-      } else if (layer === 'floor1') {
-        // Show items on/near the ground floor (y < FLOOR2_THRESHOLD)
-        obj.visible = obj.position.y < FLOOR2_THRESHOLD;
-      } else if (layer === 'floor2') {
-        // Show only upper-floor items (y >= FLOOR2_THRESHOLD)
-        obj.visible = obj.position.y >= FLOOR2_THRESHOLD;
-      }
-    });
+    const l = normLayer(layer);
+    setLayerFilter(l);
+    pressed('#floor-layer-ctrl-group .btn-ctrl', b => (b.dataset.layer ?? 'all') === String(l));
+    applyLayerFilter();
   }
+  /** is this object hidden by the floor filter (not by a builder, a shot or the user)? */
+  const layerHidden = obj => !!(obj && obj.userData && obj.userData.layerHidden);
 
   // ---- shotHidden(): what a shot hides, frame by frame (plan Completeness C4 — the hook is S5's) --------------
   // shotHidden(fn) registers fn(obj, frame) → true to hide a placed object for this frame of a shot, where frame is
@@ -330,7 +355,7 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
   return {
     trackedWalls, trackedRoofs, trackedCeilings,
     registerTrackedWall, autoRegisterWall, registerCeiling, registerRoof, applyWallModeToMesh,
-    houseInside, simsCut, shotEnterT, setRoofOpacity, applyShotCutaway, endShotCutaway,
-    setGlobalWallMode, setGlobalLayerVisibility, shotHidden, shotPose,
+    houseInside, simsCut, shotEnterT, setRoofOpacity, applyShotCutaway, endShotCutaway, shotDressing,
+    setGlobalWallMode, setGlobalLayerVisibility, applyLayerFilter, levelOf, layerHidden, shotHidden, shotPose,
   };
 }

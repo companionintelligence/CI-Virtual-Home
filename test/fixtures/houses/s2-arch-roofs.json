@@ -1,0 +1,459 @@
+{
+ "$schema": "house-spec/v1",
+ "id": "s2-arch-roofs",
+ "name": "S2 Roof Vocabulary Fixture",
+ "author": "ci-virtual-home",
+ "source": "test fixture (plan S2 task 4, Completeness B): roof finishes, per-end hips, glazed and open gables, saltbox pitches, a catslide, a planted roof, skylights, dormer styles, chimneys on any roof, a tower cut through a roof",
+ "style": "Four small volumes, each roof a different piece of the vocabulary",
+ "emoji": "\ud83e\uddea",
+ "fixture": {
+  "note": "catslide (sweep + per-face pitch), saltbox with a hipped end and a glazed gable, tower through a clipped roof (per-rect h), planted meadow flat roof with a flue, open gable with seam roofing and no gutters, shed and eyebrow dormers, skylights, slate/shake/seam finishes, trim and soffit colours"
+ },
+ "lot": {
+  "w": 34,
+  "d": 26,
+  "ground": "lawn"
+ },
+ "palette": {
+  "wall": "#eae5dc",
+  "trim": "#2b2f33",
+  "roof": "#3a3d42",
+  "accent": "#5d7a6a",
+  "material": "siding",
+  "interior": "#f2efe9"
+ },
+ "lighting": "day",
+ "levels": [
+  {
+   "id": "l1",
+   "name": "Ground Floor",
+   "y": 0,
+   "height": 2.8,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -11,
+     "z": -4,
+     "w": 8,
+     "d": 7
+    },
+    {
+     "x": 0,
+     "z": -4,
+     "w": 5,
+     "d": 7
+    },
+    {
+     "x": 5,
+     "z": -2,
+     "w": 3,
+     "d": 5
+    },
+    {
+     "x": 5,
+     "z": -4,
+     "w": 3,
+     "d": 2,
+     "h": 5.4,
+     "material": "stone",
+     "color": "#b3ab9e"
+    },
+    {
+     "x": -11,
+     "z": 6,
+     "w": 5,
+     "d": 3.5
+    },
+    {
+     "x": 1,
+     "z": 6,
+     "w": 6,
+     "d": 3.5
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": -4.5,
+     "type": "door",
+     "w": 1,
+     "h": 2.1,
+     "style": "entry",
+     "edgeZ": 3
+    },
+    {
+     "side": "S",
+     "at": -8.0,
+     "type": "window",
+     "w": 1.6,
+     "h": 1.4,
+     "sill": 0.8,
+     "edgeZ": 3
+    },
+    {
+     "side": "S",
+     "at": -10.2,
+     "type": "window",
+     "w": 0.8,
+     "h": 1.4,
+     "sill": 0.8,
+     "edgeZ": 3
+    },
+    {
+     "side": "E",
+     "at": -0.5,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9,
+     "edgeZ": -3
+    },
+    {
+     "side": "S",
+     "at": 2.5,
+     "type": "door",
+     "w": 1,
+     "h": 2.1
+    },
+    {
+     "side": "S",
+     "at": 6.5,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "W",
+     "at": -0.5,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9,
+     "edgeZ": 0
+    },
+    {
+     "side": "N",
+     "at": 6.5,
+     "type": "window",
+     "w": 1,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "S",
+     "at": -9.3,
+     "type": "door",
+     "w": 0.9,
+     "h": 2.1,
+     "edgeZ": 9.5
+    },
+    {
+     "side": "S",
+     "at": 4,
+     "type": "glass",
+     "w": 4.2,
+     "h": 2.5,
+     "edgeZ": 9.5
+    }
+   ],
+   "stairs": {
+    "type": "timber",
+    "at": [
+     -10.3,
+     2.3
+    ],
+    "rot": 180,
+    "to": "l2",
+    "w": 1,
+    "autoVoid": true
+   },
+   "rooms": [
+    {
+     "no": "01",
+     "name": "Living Room",
+     "bounds": {
+      "x": -11,
+      "z": -4,
+      "w": 8,
+      "d": 7
+     },
+     "items": [
+      {
+       "type": "sectional",
+       "at": [
+        -6.5,
+        -1.5
+       ],
+       "rot": 180
+      }
+     ]
+    },
+    {
+     "no": "02",
+     "name": "Studio",
+     "bounds": {
+      "x": 0,
+      "z": -4,
+      "w": 8,
+      "d": 7
+     },
+     "items": []
+    },
+    {
+     "no": "03",
+     "name": "Garden Room",
+     "bounds": {
+      "x": -11,
+      "z": 6,
+      "w": 5,
+      "d": 3.5
+     },
+     "items": []
+    },
+    {
+     "no": "04",
+     "name": "Workshop",
+     "bounds": {
+      "x": 1,
+      "z": 6,
+      "w": 6,
+      "d": 3.5
+     },
+     "items": []
+    }
+   ]
+  },
+  {
+   "id": "l2",
+   "name": "Upper Floor",
+   "y": 2.8,
+   "height": 2.6,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -11,
+     "z": -4,
+     "w": 5,
+     "d": 7
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": -8.5,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.8
+    },
+    {
+     "side": "N",
+     "at": -8.5,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.8
+    }
+   ],
+   "rooms": [
+    {
+     "no": "11",
+     "name": "Loft Bedroom",
+     "bounds": {
+      "x": -11,
+      "z": -4,
+      "w": 5,
+      "d": 7
+     },
+     "items": []
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "over": {
+    "x": -11.4,
+    "z": -4.4,
+    "w": 8.7,
+    "d": 7.8
+   },
+   "y": 5.4,
+   "type": "gable",
+   "ridge": "z",
+   "pitch": 30,
+   "pitches": {
+    "E": 40.9
+   },
+   "sweep": [
+    "E"
+   ],
+   "overhang": 0.4,
+   "finish": "slate",
+   "gableWindow": false,
+   "chimney": {
+    "at": [
+     -10.2,
+     -1.8
+    ],
+    "material": "stone",
+    "cap": "metal",
+    "w": 0.9,
+    "d": 0.7
+   }
+  },
+  {
+   "over": {
+    "x": -0.4,
+    "z": -4.4,
+    "w": 8.8,
+    "d": 7.8
+   },
+   "y": 2.8,
+   "type": "gable",
+   "ridge": "x",
+   "pitches": {
+    "S": 45,
+    "N": 25
+   },
+   "overhang": 0.4,
+   "ends": {
+    "E": "hip"
+   },
+   "gableGlass": [
+    "W"
+   ],
+   "finish": "shake",
+   "clip": true,
+   "skylights": [
+    {
+     "at": [
+      2,
+      -2.2
+     ],
+     "w": 0.8,
+     "d": 1.1
+    },
+    {
+     "at": [
+      3.6,
+      -2.2
+     ],
+     "w": 0.8,
+     "d": 1.1
+    }
+   ],
+   "dormers": [
+    {
+     "at": 2.5,
+     "w": 1.6,
+     "style": "shed",
+     "side": "S"
+    }
+   ]
+  },
+  {
+   "over": {
+    "x": 5,
+    "z": -4,
+    "w": 3,
+    "d": 2
+   },
+   "y": 5.4,
+   "type": "flat",
+   "parapet": 0.3,
+   "trim": "#f2efe9",
+   "color": "#6f7378"
+  },
+  {
+   "over": {
+    "x": -11.1,
+    "z": 5.9,
+    "w": 5.2,
+    "d": 3.7
+   },
+   "y": 2.8,
+   "type": "flat",
+   "parapet": 0.12,
+   "planted": "meadow",
+   "trim": "#5b4636",
+   "chimney": {
+    "at": [
+     -7,
+     7.4
+    ],
+    "material": "metal",
+    "h": 1.1
+   }
+  },
+  {
+   "over": {
+    "x": 0.7,
+    "z": 5.7,
+    "w": 6.6,
+    "d": 4.1
+   },
+   "y": 2.8,
+   "type": "gable",
+   "ridge": "x",
+   "pitch": 26,
+   "overhang": 0.3,
+   "ends": {
+    "E": "open"
+   },
+   "finish": "seam",
+   "color": "#5a6b73",
+   "gutters": false,
+   "soffit": "#8a6b4e",
+   "trim": "#2b2f33",
+   "dormers": [
+    {
+     "at": 3,
+     "w": 1.8,
+     "style": "eyebrow",
+     "side": "S"
+    }
+   ]
+  }
+ ],
+ "site": [
+  {
+   "type": "path",
+   "path": [
+    [
+     -4.5,
+     3.2
+    ],
+    [
+     -4.5,
+     13
+    ]
+   ],
+   "w": 1.2
+  },
+  {
+   "type": "tree",
+   "at": [
+    12,
+    7
+   ],
+   "h": 6
+  }
+ ],
+ "hero": {
+  "level": "l1",
+  "at": [
+   -6,
+   -3.4
+  ],
+  "rot": 0,
+  "device": "chalk",
+  "surface": "desk"
+ },
+ "entry": {
+  "level": "l1",
+  "side": "S",
+  "at": -4.5
+ }
+}

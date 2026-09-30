@@ -1,12 +1,12 @@
 {
- "when": "2026-09-28T20:52:43.264Z",
+ "when": "2026-09-30T01:00:30.332Z",
  "houses": 30,
- "built": false,
+ "built": true,
  "results": {
   "roof-finishes": {
    "value": "membrane 21 · shingle 19 · seam 15 · glass 6 · tile 1 (21 houses with two or more)",
    "pass": null,
-   "detail": "Houses per finish (a house counts once per finish it uses): today the finish follows the roof type (gable and hip → shingle, shed → standing seam, terracotta → clay tile, flat → membrane).",
+   "detail": "Houses per finish (a house counts once per finish it uses): roofs[].finish, else the form (gable and hip → shingle, shed and pent → standing seam, terracotta → clay tile, flat → membrane).",
    "table": {
     "head": [
      "finish",
@@ -42,11 +42,43 @@
     ]
    }
   },
+  "roof-composition": {
+   "value": "0 of 30 houses use roof vocabulary beyond the form",
+   "measure": 0,
+   "pass": null,
+   "detail": "Roofs with per-end forms, per-face pitches, sweeps, glazed or open gables, planted surfaces, skylights, dormer styles, coloured trim or soffit, gable cladding, chimney material or cap (S2 fields).",
+   "table": {
+    "head": [
+     "field",
+     "houses"
+    ],
+    "rows": []
+   }
+  },
+  "room-finishes": {
+   "value": "0 % of rooms name a floor, 0 % a wall finish, 0 % a ceiling; median 0 floor kinds a house",
+   "measure": 0,
+   "pass": null,
+   "detail": "490 rooms across 30 houses. Under defaults: 2 (0 houses today) a room with none gets a seeded program-appropriate floor, so this counts what the specs say, not what builds; fleet-audit --built reads the resolved finishes from plan.json's arch.rooms."
+  },
+  "facade-vocabulary": {
+   "value": "0 of 30 houses use S2 facade vocabulary; median 0 kinds a house",
+   "measure": 0,
+   "pass": null,
+   "detail": "Kinds a house says it has: porch, bay, balcony, terrace, loggia, fireplace, built-ins, facade zones, per-volume cladding, plinth, stoop, shutters, window boxes, surrounds, canopies, towers, turning stairs, double-height rooms.",
+   "table": {
+    "head": [
+     "kind",
+     "houses"
+    ],
+    "rows": []
+   }
+  },
   "furniture-repetition": {
    "value": "46 types in 20 or more houses; the top 12 are 985 of 4052 items",
    "measure": 985,
    "pass": null,
-   "detail": "164 item types in use over 4052 room items (the hero desk set left out). The composer's target is measured against the baseline (test/fleet/baseline.json, the hand-authored fleet at S0). Authored items only: once S3 composes rooms at build time, count the built rooms instead (house.plan — export them from assets/plan-export/compose.ts and run `fleet-audit --built`).",
+   "detail": "164 item types in use over 4052 room items (the hero desk set left out), 0 of them composed at build time (plan.compose; none in the 30 real specs, which carry no program). Measured against the baseline (test/fleet/baseline.json, the hand-authored fleet at S0). The dry run — every room composed — is the next metric.",
    "table": {
     "head": [
      "type",
@@ -117,10 +149,143 @@
     ]
    }
   },
+  "composed-repetition": {
+   "value": "62 % down (343 → 131 house-uses of the authored top 12); 31 → 2 furniture types in 20+ houses",
+   "measure": 131,
+   "pass": true,
+   "detail": "Furniture is what a room is furnished with (fitted units, appliances, bath fittings, lamps, ceiling fixtures and the Core's desk set left out: a house needs a toilet and a range whatever the composer does). House-uses: the houses using each type. Authored top 12: wall-art 30, runner-rug 30, loveseat 30, snake-plant 29, vase 29, bath-mat 29, wingback-armchair 29, nightstand 28, dresser 28, dining-chair 27, side-table 27, console-table 27. The same twelve, composed: wall-art 13, runner-rug 16, loveseat 0, snake-plant 22, vase 14, bath-mat 10, wingback-armchair 8, nightstand 11, dresser 9, dining-chair 8, side-table 12, console-table 8. The composed fleet's own top 12: framed-print 22, snake-plant 22, ceramic-bowl 19, open-shelving 18, ladder-shelf 18, candelabra 18, plant-stand 17, chest-of-drawers 17, armoire 17, flatweave-rug 16, runner-rug 16, coat-rack 16 (216 house-uses). Every type, as the S0 metric counts them: the top 12 hold 985 authored items and 463 composed ones.",
+   "table": {
+    "head": [
+     "type (composed fleet's own top 12)",
+     "houses",
+     "items"
+    ],
+    "rows": [
+     [
+      "framed-print",
+      22,
+      38
+     ],
+     [
+      "snake-plant",
+      22,
+      35
+     ],
+     [
+      "ceramic-bowl",
+      19,
+      42
+     ],
+     [
+      "open-shelving",
+      18,
+      43
+     ],
+     [
+      "ladder-shelf",
+      18,
+      36
+     ],
+     [
+      "candelabra",
+      18,
+      35
+     ],
+     [
+      "plant-stand",
+      17,
+      29
+     ],
+     [
+      "chest-of-drawers",
+      17,
+      28
+     ],
+     [
+      "armoire",
+      17,
+      22
+     ],
+     [
+      "flatweave-rug",
+      16,
+      43
+     ],
+     [
+      "runner-rug",
+      16,
+      40
+     ],
+     [
+      "coat-rack",
+      16,
+      17
+     ]
+    ]
+   }
+  },
+  "furniture-variety": {
+   "value": "sofas 2 → 6 · sectionals 0 → 3 · armchairs 4 → 8 · dining tables 2 → 6 · dining chairs 1 → 5 · floor plants 6 → 12",
+   "pass": true,
+   "detail": "Types in use across the 30 houses, per composer role: the hand-authored fleet, then the dry run (every room composed from its name). The share is the most-used type's houses over the 30.",
+   "table": {
+    "head": [
+     "role",
+     "authored types (top)",
+     "composed types (top)",
+     "top share",
+     ""
+    ],
+    "rows": [
+     [
+      "sofas",
+      "2 (loveseat 30, daybed 6)",
+      "6 (tuxedo-sofa 6, sofa 6, slipcover-sofa 5)",
+      "20 %",
+      "ok"
+     ],
+     [
+      "sectionals",
+      "0 ()",
+      "3 (modular-sectional 8, l-sectional 1, u-sectional 1)",
+      "27 %",
+      "ok"
+     ],
+     [
+      "armchairs",
+      "4 (wingback-armchair 29, rocking-chair 15)",
+      "8 (lounge-chair 12, wingback-armchair 8, mission-armchair 7)",
+      "40 %",
+      "ok"
+     ],
+     [
+      "dining tables",
+      "2 (farmhouse-table 25, round-dining-table 10)",
+      "6 (farmhouse-table 9, pedestal-dining-table 7, trestle-table 5)",
+      "30 %",
+      "ok"
+     ],
+     [
+      "dining chairs",
+      "1 (dining-chair 27)",
+      "5 (bentwood-chair 9, dining-chair 8, ladderback-chair 7)",
+      "30 %",
+      "ok"
+     ],
+     [
+      "floor plants",
+      "6 (ficus-tree 24, olive-tree-pot 23)",
+      "12 (plant-stand 17, tall-cactus 11, ponytail-palm 11)",
+      "57 %",
+      "ok"
+     ]
+    ]
+   }
+  },
   "palette-spread": {
    "value": "wall 25 distinct · trim 16 distinct · roof 16 distinct · door 12 distinct",
    "pass": null,
-   "detail": "Pairwise CIEDE2000 across the houses. Wall: the palette after restraint (materials.ts restrainPalette). Roof: the largest roof, its own colour or the per-type default, after roofMaterial's restraint and charcoal pull. Door: the entry leaf (teal when the spec gives none; cased openings and sliders have no leaf).",
+   "detail": "Pairwise CIEDE2000 across the houses. Wall: the palette as built (kit-rules.ts kitPalette: restraint, palette.keep). Roof: the largest roof, its own colour or the per-type default, after roofMaterial's restraint and charcoal pull (keep, roofPull, defaults 2). Door: the entry leaf (its colour, palette.door, the defaults-2 timber-or-trim rule, else teal; cased openings and sliders have no leaf).",
    "table": {
     "head": [
      "role",
@@ -245,7 +410,7 @@
    "value": "median 1 (0 of 30 houses declare 2 or more)",
    "measure": 1,
    "pass": false,
-   "detail": "Declared in the spec (palette.material, levels[].material, footprint[].material, facade[].material). Rendered today: one per house — kit.cladding() caches a single material.",
+   "detail": "Rendered (kind, colour) claddings a house: the house's own, each storey's own (levels[].material; levels[].wallColor under defaults 2), and S2's footprint[] / facade[] zones as they land.",
    "table": {
     "head": [
      "cladding",
@@ -276,10 +441,10 @@
    }
   },
   "lighting-share": {
-   "value": "top preset day 73 %, top sun bucket 315° 73 %",
+   "value": "top preset day 73 %, top sun bucket 210° 73 %",
    "measure": 0.7333,
    "pass": false,
-   "detail": "0 specs name their preset by a legacy alias. The sun stands at the entry's bearing plus the preset's swing (environment.ts sunDirection), so houses whose entries face one way share one sun per preset.",
+   "detail": "0 specs name their preset by a legacy alias. Sun bearings are compass degrees (0 north). Without lighting.sunBearing the sun stands at the entry's bearing plus the preset's swing, so houses whose entries face one way share one sun per preset — unless defaults 2 gives each its seeded swing.",
    "table": {
     "head": [
      "preset",
@@ -303,19 +468,183 @@
       "7 %"
      ],
      [
-      "sun 315°–330°",
+      "sun 210°–225°",
       22,
       "73 %"
      ],
      [
-      "sun 300°–315°",
+      "sun 225°–240°",
       6,
       "20 %"
      ],
      [
-      "sun 285°–300°",
+      "sun 240°–255°",
       2,
       "7 %"
+     ]
+    ]
+   }
+  },
+  "fan-share": {
+   "value": "20 of 119 eligible rooms (17 %)",
+   "measure": 0.1681,
+   "pass": true,
+   "table": {
+    "head": [
+     "house",
+     "eligible rooms",
+     "fans"
+    ],
+    "rows": [
+     [
+      "asymmetry",
+      4,
+      0
+     ],
+     [
+      "aurora",
+      5,
+      0
+     ],
+     [
+      "bgfamily",
+      6,
+      0
+     ],
+     [
+      "bghouse-olcia",
+      3,
+      0
+     ],
+     [
+      "cocoon",
+      5,
+      0
+     ],
+     [
+      "cutestarter",
+      3,
+      0
+     ],
+     [
+      "epiphany",
+      5,
+      3
+     ],
+     [
+      "familyhome",
+      3,
+      1
+     ],
+     [
+      "familyhouse-nora",
+      4,
+      1
+     ],
+     [
+      "flowerycottage",
+      3,
+      1
+     ],
+     [
+      "gardennook",
+      3,
+      1
+     ],
+     [
+      "lakecabin",
+      4,
+      0
+     ],
+     [
+      "mediterranean",
+      6,
+      3
+     ],
+     [
+      "mesamariposa",
+      4,
+      0
+     ],
+     [
+      "mirage",
+      5,
+      1
+     ],
+     [
+      "modernhome-nora",
+      4,
+      0
+     ],
+     [
+      "modernhouse-nora",
+      0,
+      0
+     ],
+     [
+      "modernhouse1",
+      4,
+      0
+     ],
+     [
+      "newcrest",
+      3,
+      2
+     ],
+     [
+      "neweco",
+      3,
+      0
+     ],
+     [
+      "onestory",
+      4,
+      1
+     ],
+     [
+      "palms",
+      4,
+      1
+     ],
+     [
+      "palnknoll",
+      4,
+      4
+     ],
+     [
+      "payorote",
+      3,
+      0
+     ],
+     [
+      "riverbend",
+      7,
+      1
+     ],
+     [
+      "seraphine",
+      8,
+      0
+     ],
+     [
+      "starter18k",
+      3,
+      0
+     ],
+     [
+      "sunnyhome",
+      2,
+      0
+     ],
+     [
+      "valleyview",
+      3,
+      0
+     ],
+     [
+      "vanilla",
+      4,
+      0
      ]
     ]
    }
@@ -336,6 +665,132 @@
      ]
     ]
    }
+  },
+  "camera-outside-share": {
+   "value": "median 27 %, 30 of 30 in target",
+   "pass": true,
+   "detail": "≤ 30 % (≤ 35 % with an exterior-stair entry)"
+  },
+  "camera-first-second": {
+   "value": "min 2.27 m",
+   "pass": true,
+   "detail": "≥ 0.5 m"
+  },
+  "camera-door-speed": {
+   "value": "max 0.85 m/s",
+   "pass": true,
+   "detail": "≤ 0.9 m/s"
+  },
+  "camera-yaw": {
+   "value": "max 58°/s, median 43",
+   "pass": true,
+   "detail": "≤ 60°/s"
+  },
+  "camera-look-error": {
+   "value": "worst house 8.0°, median 0.2°, 30 of 30 within 10°",
+   "pass": true,
+   "detail": "≤ 10° in ≥ 90 % of the houses, none over 15°"
+  },
+  "camera-press": {
+   "value": "30 of 30; min LOS 6.9 s, max speed 0.10 m/s",
+   "pass": true,
+   "detail": "≥ 1.5 s of the Core in sight before it, the camera ≤ 0.3 m/s"
+  },
+  "camera-top-rooms": {
+   "value": "30 of 30 (24 of 30 with two or more, whatever the walk opens)",
+   "pass": true,
+   "detail": "in ≥ 25 of 30 houses"
+  },
+  "camera-core-height": {
+   "value": "27 of 30; median 23 %",
+   "pass": true,
+   "detail": "18–25 % of the frame, in ≥ 27 of 30 houses — bghouse-olcia 25 %; modernhouse-nora 25 %; payorote 26 %"
+  },
+  "camera-final-positions": {
+   "value": "20 of 30",
+   "pass": true,
+   "detail": "≥ 20 across the 30 houses"
+  },
+  "camera-establish-style": {
+   "value": "garden 7, corner-left 7, corner-right 7, axial 6, dollhouse 3",
+   "pass": true,
+   "detail": "no style on more than 25 % of houses",
+   "table": {
+    "head": [
+     "",
+     "houses"
+    ],
+    "rows": [
+     [
+      "garden",
+      7
+     ],
+     [
+      "corner-left",
+      7
+     ],
+     [
+      "corner-right",
+      7
+     ],
+     [
+      "axial",
+      6
+     ],
+     [
+      "dollhouse",
+      3
+     ]
+    ]
+   }
+  },
+  "camera-establish-bearing": {
+   "value": "-45…-30° 8, 0…15° 6, 15…30° 6, 30…45° 4, -30…-15° 3",
+   "pass": null,
+   "detail": "no bucket on more than 25 % of houses (advisory)"
+  },
+  "camera-finale-background": {
+   "value": "art 13, wall 10, other 4, window 2, bookcase 1",
+   "pass": null,
+   "detail": "no class above 40 % of the houses (advisory)",
+   "table": {
+    "head": [
+     "",
+     "houses"
+    ],
+    "rows": [
+     [
+      "art",
+      13
+     ],
+     [
+      "wall",
+      10
+     ],
+     [
+      "other",
+      4
+     ],
+     [
+      "window",
+      2
+     ],
+     [
+      "bookcase",
+      1
+     ]
+    ]
+   }
+  },
+  "camera-orbit-arc": {
+   "value": "25 of 25 of the houses that can reach 90° do; median 101°; under 60°: 0",
+   "pass": true,
+   "detail": "≥ 90° wherever the room allows it; none under 60° where it allows more — flowerycottage 75° (room 85°); mesamariposa 65° (room 75°); neweco 75° (room 85°); valleyview 80° (room 80°); vanilla 66° (room 75°)"
+  },
+  "camera-qa-errors": {
+   "value": "0 in 0 of 30 houses",
+   "pass": true,
+   "detail": "0 on all 30 houses"
   },
   "planting-types": {
    "value": "bed 30/30 · shrub 29/30 · tree 29/30 · flowers 27/30 · planter 23/30",
@@ -431,174 +886,205 @@
    }
   },
   "axis-aligned-edges": {
-   "value": "49 % of 3320 m",
-   "measure": 0.4898,
+   "value": "41 % of 3203 m",
+   "measure": 0.4074,
    "pass": false,
-   "detail": "Bed outlines (a polygon, or the rectangle at w × d) and path centre lines on the 30 real lots, by length; an edge within 1° of the x or z axis counts as axis-aligned. Authored geometry only: once S4 resolves `planting`, `smooth` and walks at build time, this should measure the built edges (house.plan — export them from assets/plan-export/site.ts and run `fleet-audit --built`).",
+   "detail": "Bed outlines and path centre lines on the real lots, by length. Judged as an eye judges it — over 1.5 m chords, not the 0.25 m samples a curve is resampled to: a chord within 3° of the x or z axis that is also straight (under 9 cm of sag) is axis-aligned, so a wobble of a centimetre between samples does not hide a straight edge. Measured as built on 30 of 30 houses (their plan's site.edges: curves resolved, plantings laid out, a bed's edge against the house left out). The last column names the straight items to bend: a `meander` (a sway in metres) or waypoints with `smooth`.",
    "table": {
     "head": [
      "house",
      "edge length (m)",
-     "axis-aligned"
+     "axis-aligned",
+     "the straightest items"
     ],
     "rows": [
      [
+      "modernhouse-nora",
+      "196.1",
+      "76 %",
+      "site[0] path 30 m, site[42] bed 9 m, site[43] path 8 m, site[44] path 8 m"
+     ],
+     [
       "modernhome-nora",
-      "144.5",
-      "86 %"
+      "69.6",
+      "75 %",
+      "site[28] bed 11 m, site[44] bed 6 m, site[0] path 6 m, site[1] path 6 m"
      ],
      [
       "seraphine",
       "166.2",
-      "86 %"
-     ],
-     [
-      "modernhouse-nora",
-      "221.9",
-      "84 %"
-     ],
-     [
-      "modernhouse1",
-      "77.4",
-      "84 %"
-     ],
-     [
-      "mesamariposa",
-      "88.1",
-      "73 %"
+      "69 %",
+      "site[11] bed 30 m, site[10] bed 27 m, site[14] bed 24 m, site[13] bed 18 m"
      ],
      [
       "aurora",
       "123.7",
-      "66 %"
+      "65 %",
+      "site[38] bed 33 m, site[4] path 12 m, site[8] path 9 m, site[5] path 8 m"
      ],
      [
-      "vanilla",
-      "300.6",
-      "66 %"
+      "modernhouse1",
+      "77.4",
+      "64 %",
+      "site[30] bed 10 m, site[42] bed 10 m, site[3] path 8 m, site[5] path 8 m"
      ],
      [
-      "mediterranean",
-      "132.5",
-      "56 %"
-     ],
-     [
-      "palms",
-      "63.3",
-      "53 %"
-     ],
-     [
-      "bgfamily",
-      "30.5",
-      "49 %"
-     ],
-     [
-      "familyhome",
-      "87.4",
-      "48 %"
-     ],
-     [
-      "epiphany",
-      "61.1",
-      "47 %"
-     ],
-     [
-      "lakecabin",
-      "188.5",
-      "47 %"
-     ],
-     [
-      "onestory",
-      "180.6",
-      "46 %"
-     ],
-     [
-      "riverbend",
-      "33.8",
-      "45 %"
-     ],
-     [
-      "bghouse-olcia",
-      "95.8",
-      "44 %"
-     ],
-     [
-      "neweco",
-      "148.2",
-      "43 %"
+      "mesamariposa",
+      "88.1",
+      "63 %",
+      "site[47] path 18 m, site[31] path 15 m, site[0] path 7 m, site[1] path 4 m"
      ],
      [
       "mirage",
       "38.7",
-      "41 %"
+      "57 %",
+      "site[27] bed 13 m, site[8] path 9 m"
+     ],
+     [
+      "mediterranean",
+      "132.5",
+      "54 %",
+      "site[52] path 19 m, site[57] path 19 m, site[7] path 7 m, site[55] path 5 m"
+     ],
+     [
+      "epiphany",
+      "61.1",
+      "51 %",
+      "site[0] path 17 m, site[3] bed 9 m, site[1] path 6 m"
+     ],
+     [
+      "vanilla",
+      "300.6",
+      "46 %",
+      "site[14] bed 23 m, site[5] bed 18 m, site[4] bed 15 m, site[1] bed 13 m"
+     ],
+     [
+      "bgfamily",
+      "30.5",
+      "44 %",
+      "site[43] bed 6 m, site[2] path 5 m"
+     ],
+     [
+      "lakecabin",
+      "188.5",
+      "44 %",
+      "site[5] bed 18 m, site[6] bed 15 m, site[53] bed 12 m, site[55] bed 11 m"
+     ],
+     [
+      "palms",
+      "63.3",
+      "41 %",
+      "site[23] path 11 m, site[2] bed 4 m, site[38] bed 4 m"
+     ],
+     [
+      "bghouse-olcia",
+      "95.8",
+      "38 %",
+      "site[49] bed 18 m, site[26] bed 6 m"
      ],
      [
       "flowerycottage",
       "133.8",
-      "40 %"
+      "37 %",
+      "site[5] bed 8 m, site[0] path 7 m, site[4] bed 6 m, site[10] bed 6 m"
      ],
      [
-      "cocoon",
-      "60.0",
-      "37 %"
+      "familyhome",
+      "87.4",
+      "34 %",
+      "site[24] bed 8 m, site[25] bed 6 m, site[23] bed 6 m, site[7] path 5 m"
+     ],
+     [
+      "neweco",
+      "148.2",
+      "32 %",
+      "site[10] bed 11 m, site[9] path 6 m, site[7] path 6 m, site[11] bed 6 m"
      ],
      [
       "palnknoll",
       "169.9",
-      "33 %"
+      "32 %",
+      "site[47] bed 17 m, site[40] bed 9 m, site[43] bed 7 m, site[30] bed 7 m"
      ],
      [
-      "sunnyhome",
-      "75.4",
-      "30 %"
+      "cocoon",
+      "60.0",
+      "30 %",
+      "site[0] path 9 m, site[5] bed 4 m"
+     ],
+     [
+      "riverbend",
+      "33.8",
+      "30 %",
+      "site[12] bed 7 m"
      ],
      [
       "starter18k",
       "73.5",
-      "26 %"
+      "29 %",
+      "site[39] bed 5 m, site[35] bed 5 m, site[18] bed 4 m"
      ],
      [
-      "cutestarter",
-      "58.4",
-      "22 %"
+      "onestory",
+      "180.6",
+      "28 %",
+      "site[3] bed 9 m, site[5] bed 9 m, site[7] bed 9 m, site[4] path 8 m"
      ],
      [
-      "gardennook",
-      "199.2",
-      "21 %"
-     ],
-     [
-      "asymmetry",
-      "112.0",
-      "16 %"
+      "sunnyhome",
+      "75.4",
+      "24 %",
+      "site[19] bed 7 m, site[20] bed 4 m"
      ],
      [
       "payorote",
       "26.3",
-      "10 %"
+      "21 %",
+      ""
      ],
      [
-      "familyhouse-nora",
-      "169.7",
-      "7 %"
+      "gardennook",
+      "182.8",
+      "19 %",
+      "site[32] bed 15 m, site[7] bed 6 m, site[28] bed 6 m, site[8] bed 4 m"
      ],
      [
       "newcrest",
       "51.9",
-      "0 %"
+      "18 %",
+      "site[1] bed 6 m"
+     ],
+     [
+      "asymmetry",
+      "112.0",
+      "15 %",
+      ""
+     ],
+     [
+      "cutestarter",
+      "58.4",
+      "14 %",
+      ""
+     ],
+     [
+      "familyhouse-nora",
+      "169.7",
+      "7 %",
+      ""
      ],
      [
       "valleyview",
       "7.2",
-      "0 %"
+      "0 %",
+      ""
      ]
     ]
    }
   },
   "mix-context": {
-   "value": "top mix (none) 30/30, top context (suburb: the default) 30/30",
-   "pass": null,
-   "detail": "S4's `planting.mix` and `lot.context` — not authored yet on any house, so every lot is the same suburb.",
+   "value": "top mix (no planting) 30/30, top context (suburb: the default) 30/30",
+   "pass": false,
+   "detail": "The mix each house is planted in (named by its `planting.mix`, else implied by its lot context — a desert lot is planted as a desert) and its `lot.context`. A house with several plantings counts once for each mix it uses; a house with none is \"(no planting)\", which is a mix that says nothing.",
    "table": {
     "head": [
      "mix / context",
@@ -606,12 +1092,208 @@
     ],
     "rows": [
      [
-      "mix: (none)",
+      "mix: (no planting)",
       30
      ],
      [
       "context: (suburb: the default)",
       30
+     ]
+    ]
+   }
+  },
+  "world-variety": {
+   "value": "0/30 (0 %)",
+   "measure": 0,
+   "pass": false,
+   "detail": "Houses whose world is not the default white-and-black suburb: `defaults: 2`, a `lot.context` other than the suburb, or `lot.water`. Neighbours are near-white with near-black roofs on every lot that opts into none of these (assets/world.ts).",
+   "table": {
+    "head": [
+     "house",
+     "context",
+     "defaults",
+     "water"
+    ],
+    "rows": [
+     [
+      "asymmetry",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "aurora",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "bgfamily",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "bghouse-olcia",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "cocoon",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "cutestarter",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "epiphany",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "familyhome",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "familyhouse-nora",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "flowerycottage",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "gardennook",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "lakecabin",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "mediterranean",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "mesamariposa",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "mirage",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "modernhome-nora",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "modernhouse-nora",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "modernhouse1",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "newcrest",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "neweco",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "onestory",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "palms",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "palnknoll",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "payorote",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "riverbend",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "seraphine",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "starter18k",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "sunnyhome",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "valleyview",
+      "(suburb)",
+      1,
+      "no"
+     ],
+     [
+      "vanilla",
+      "(suburb)",
+      1,
+      "no"
      ]
     ]
    }

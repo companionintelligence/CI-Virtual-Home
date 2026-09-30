@@ -61,8 +61,8 @@ html[data-mode="view"] {
 
 /* ---------------- the editor, put away ---------------- */
 html[data-mode="view"] header.creator-topbar,
-html[data-mode="view"] aside.catalog-sidebar,
-html[data-mode="view"] aside.inspector-sidebar,
+html[data-mode="view"] div.catalog-sidebar,
+html[data-mode="view"] div.inspector-sidebar,
 html[data-mode="view"] .viewport-overlay-top,
 html[data-mode="view"] .viewport-hud-angles,
 html[data-mode="view"] #animation-dock,

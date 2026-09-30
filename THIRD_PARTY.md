@@ -60,8 +60,9 @@ still links the Google Fonts stylesheet below, in the player as in the editor.
 ## Loaded at runtime (not in the repository)
 
 - **Google Fonts** — `room-creator.html` (and so the portal's player), `floorplan-graph-demo.html` and `video/houses/index.html` link the
-  Manrope, Plus Jakarta Sans and JetBrains Mono stylesheets from `fonts.googleapis.com` (all OFL-1.1). The
-  capture scripts intercept that request and serve `assets/fonts/` instead (Plus Jakarta Sans → Manrope).
+  Manrope and JetBrains Mono stylesheets from `fonts.googleapis.com` (both OFL-1.1; the canon's two families — the editor
+  no longer asks for Plus Jakarta Sans). The capture scripts intercept that request and serve `assets/fonts/` instead (they
+  still map the retired Plus Jakarta Sans name to Manrope, so an older page resolves).
 
 ## Build and test tooling (devDependencies, not shipped)
 

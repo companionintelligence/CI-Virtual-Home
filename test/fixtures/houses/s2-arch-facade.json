@@ -1,0 +1,419 @@
+{
+ "$schema": "house-spec/v1",
+ "id": "s2-arch-facade",
+ "name": "S2 Facade Fixture",
+ "author": "ci-virtual-home",
+ "source": "test fixture (plan S2 tasks 3, 5, 6): per-volume cladding, facade zones and bands, plinth and stoop, opening dressing",
+ "style": "Two-storey brick house on a stone plinth, siding upper storey, dark timber wing; dressed windows",
+ "emoji": "🧪",
+ "fixture": {
+  "note": "footprint[i].material, facade zones + a string course, levels[0].plinth (raised ground floor) + entry.stoop, shutters (louvre, panel, board), window boxes, heads (pediment, keystone, crown, arch, segmental), surrounds (stone, casing, brick-soldier, box-reveal), blinds, canopies (gable, awning, flat), gableCladding"
+ },
+ "lot": {
+  "w": 28,
+  "d": 22,
+  "ground": "lawn"
+ },
+ "palette": {
+  "wall": "#b86f55",
+  "trim": "#f1ede4",
+  "roof": "#3b3f45",
+  "accent": "#35524a",
+  "material": "brick",
+  "interior": "#f2efe9"
+ },
+ "lighting": "day",
+ "levels": [
+  {
+   "id": "l1",
+   "name": "Raised Ground Floor",
+   "y": 0.6,
+   "height": 2.8,
+   "floor": "oak",
+   "plinth": {
+    "material": "stone",
+    "color": "#a39c90"
+   },
+   "footprint": [
+    {
+     "x": -6,
+     "z": -4,
+     "w": 10,
+     "d": 8
+    },
+    {
+     "x": 4,
+     "z": -2,
+     "w": 4,
+     "d": 6,
+     "material": "timber",
+     "color": "#4a3b30"
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": -1,
+     "type": "door",
+     "w": 1.0,
+     "h": 2.2,
+     "style": "entry",
+     "surround": {
+      "kind": "casing",
+      "color": "#f1ede4",
+      "w": 0.12
+     },
+     "canopy": {
+      "kind": "gable",
+      "depth": 1.0,
+      "color": "#3b3f45"
+     }
+    },
+    {
+     "side": "S",
+     "at": -4.2,
+     "type": "window",
+     "w": 1.3,
+     "h": 1.5,
+     "sill": 0.8,
+     "shutters": {
+      "style": "louvre",
+      "color": "#35524a"
+     },
+     "surround": {
+      "kind": "stone"
+     },
+     "head": "keystone"
+    },
+    {
+     "side": "S",
+     "at": 2.2,
+     "type": "window",
+     "w": 1.3,
+     "h": 1.5,
+     "sill": 0.8,
+     "shutters": {
+      "style": "louvre",
+      "color": "#35524a"
+     },
+     "surround": {
+      "kind": "stone"
+     },
+     "head": "keystone"
+    },
+    {
+     "side": "S",
+     "at": 6.0,
+     "type": "door",
+     "w": 0.95,
+     "h": 2.1,
+     "canopy": {
+      "kind": "awning",
+      "depth": 0.8,
+      "color": "#7c5a3a"
+     }
+    },
+    {
+     "side": "E",
+     "at": 1.0,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.4,
+     "sill": 0.9,
+     "surround": {
+      "kind": "box-reveal",
+      "color": "#2b2f33"
+     }
+    },
+    {
+     "side": "W",
+     "at": 0,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.5,
+     "sill": 0.9,
+     "head": "arch",
+     "surround": {
+      "kind": "casing",
+      "color": "#f1ede4"
+     }
+    },
+    {
+     "side": "N",
+     "at": -3,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9,
+     "surround": {
+      "kind": "brick-soldier"
+     },
+     "blinds": {
+      "color": "#e3dccd",
+      "drop": 0.45
+     }
+    },
+    {
+     "side": "N",
+     "at": 2,
+     "type": "door",
+     "w": 0.9,
+     "h": 2.1,
+     "canopy": {
+      "kind": "flat",
+      "depth": 0.8,
+      "supports": "brackets"
+     }
+    }
+   ],
+   "stairs": {
+    "type": "timber",
+    "at": [
+     -5.3,
+     3.4
+    ],
+    "rot": 180,
+    "to": "l2",
+    "w": 1.0,
+    "autoVoid": true
+   },
+   "rooms": [
+    {
+     "no": "01",
+     "name": "Living Room",
+     "bounds": {
+      "x": -6,
+      "z": -4,
+      "w": 10,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "sectional",
+       "at": [
+        -3,
+        0.6
+       ]
+      },
+      {
+       "type": "coffee-table",
+       "at": [
+        -3,
+        -0.6
+       ]
+      }
+     ]
+    },
+    {
+     "no": "02",
+     "name": "Study",
+     "bounds": {
+      "x": 4,
+      "z": -2,
+      "w": 4,
+      "d": 6
+     },
+     "items": []
+    }
+   ]
+  },
+  {
+   "id": "l2",
+   "name": "Upper Floor",
+   "y": 3.4,
+   "height": 2.7,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -6,
+     "z": -4,
+     "w": 10,
+     "d": 8
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": -4.2,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.3,
+     "sill": 0.8,
+     "shutters": {
+      "style": "panel",
+      "color": "#35524a"
+     },
+     "box": {
+      "plants": "trailing"
+     },
+     "head": "crown"
+    },
+    {
+     "side": "S",
+     "at": -1,
+     "type": "window",
+     "w": 0.9,
+     "h": 1.3,
+     "sill": 0.8,
+     "head": "pediment",
+     "surround": {
+      "kind": "casing"
+     }
+    },
+    {
+     "side": "S",
+     "at": 2.2,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.3,
+     "sill": 0.8,
+     "shutters": {
+      "style": "board",
+      "color": "#6b4a36"
+     },
+     "box": {
+      "plants": "flowers",
+      "bloom": "#d1495b"
+     },
+     "head": "segmental"
+    },
+    {
+     "side": "N",
+     "at": -1,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.2,
+     "sill": 0.9
+    }
+   ],
+   "rooms": [
+    {
+     "no": "11",
+     "name": "Bedroom",
+     "bounds": {
+      "x": -6,
+      "z": -4,
+      "w": 10,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "platform-bed",
+       "at": [
+        -1,
+        -2.6
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "facade": {
+  "zones": [
+   {
+    "level": "l2",
+    "material": "siding",
+    "color": "#e7e2d6"
+   }
+  ],
+  "bands": [
+   {
+    "y": 3.35,
+    "h": 0.2,
+    "material": "stone",
+    "color": "#cfc8bb",
+    "proud": 0.04
+   }
+  ]
+ },
+ "roofs": [
+  {
+   "over": {
+    "x": -6.4,
+    "z": -4.4,
+    "w": 10.8,
+    "d": 8.8
+   },
+   "y": 6.1,
+   "type": "gable",
+   "ridge": "x",
+   "pitch": 36,
+   "overhang": 0.4,
+   "color": "#3b3f45",
+   "gableWindow": "louvre",
+   "gableCladding": {
+    "material": "board-and-batten",
+    "color": "#3f3a35"
+   },
+   "trim": "#f1ede4"
+  },
+  {
+   "over": {
+    "x": 4.0,
+    "z": -2.3,
+    "w": 4.3,
+    "d": 6.6
+   },
+   "y": 3.4,
+   "type": "shed",
+   "high": "W",
+   "pitch": 12,
+   "overhang": 0.3,
+   "finish": "seam",
+   "color": "#3b3f45"
+  }
+ ],
+ "site": [
+  {
+   "type": "path",
+   "path": [
+    [
+     -1,
+     6.2
+    ],
+    [
+     -1,
+     11
+    ]
+   ],
+   "w": 1.4
+  },
+  {
+   "type": "tree",
+   "at": [
+    -10,
+    6.5
+   ],
+   "h": 6
+  },
+  {
+   "type": "shrub",
+   "at": [
+    3.5,
+    5.6
+   ]
+  }
+ ],
+ "entry": {
+  "level": "l1",
+  "side": "S",
+  "at": -1,
+  "stoop": {
+   "depth": 1.3,
+   "w": 2.0,
+   "rail": "metal",
+   "material": "stone"
+  }
+ },
+ "hero": {
+  "level": "l1",
+  "at": [
+   6.0,
+   -1.6
+  ],
+  "rot": 0,
+  "device": "charcoal",
+  "surface": "desk"
+ }
+}

@@ -1,0 +1,344 @@
+{
+ "$schema": "house-spec/v1",
+ "id": "s2-arch-stairs",
+ "name": "S2 Stairs Fixture",
+ "author": "ci-virtual-home",
+ "source": "test fixture (plan S2): levels[].stairs as an array \u2014 an L, a U and a closed flight, each cutting its own void",
+ "style": "Two-storey stucco box, hip roof; three stairs in the hall",
+ "emoji": "\ud83e\uddea",
+ "fixture": {
+  "note": "stairs array: L (timber, turning right), U (colonial, turning left), closed straight flight; autoVoid on all three"
+ },
+ "lot": {
+  "w": 26,
+  "d": 22,
+  "ground": "lawn"
+ },
+ "palette": {
+  "wall": "#ece7df",
+  "trim": "#2f3236",
+  "roof": "#3b3f45",
+  "accent": "#6b7f73",
+  "material": "stucco",
+  "interior": "#f1eee8"
+ },
+ "lighting": "day",
+ "levels": [
+  {
+   "id": "l1",
+   "name": "Ground Floor",
+   "y": 0,
+   "height": 2.8,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -7,
+     "z": -5,
+     "w": 14,
+     "d": 10
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": 0,
+     "type": "door",
+     "w": 1.0,
+     "h": 2.1,
+     "style": "entry"
+    },
+    {
+     "side": "S",
+     "at": -4,
+     "type": "window",
+     "w": 1.6,
+     "h": 1.4,
+     "sill": 0.8
+    },
+    {
+     "side": "S",
+     "at": 4.2,
+     "type": "window",
+     "w": 1.6,
+     "h": 1.4,
+     "sill": 0.8
+    },
+    {
+     "side": "N",
+     "at": -2,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "E",
+     "at": -3.4,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "W",
+     "at": -2.5,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.3,
+     "sill": 0.9
+    }
+   ],
+   "stairs": [
+    {
+     "type": "L",
+     "style": "timber",
+     "at": [
+      -5.5,
+      3.5
+     ],
+     "rot": 180,
+     "turn": "right",
+     "w": 1.0,
+     "to": "l2",
+     "autoVoid": true
+    },
+    {
+     "type": "U",
+     "style": "colonial",
+     "at": [
+      3.0,
+      3.2
+     ],
+     "rot": 180,
+     "turn": "left",
+     "w": 1.1,
+     "to": "l2",
+     "autoVoid": true
+    },
+    {
+     "type": "closed",
+     "at": [
+      6.2,
+      -1.5
+     ],
+     "rot": 0,
+     "w": 0.9,
+     "to": "l2",
+     "autoVoid": true,
+     "stringer": "#e8e2d8"
+    }
+   ],
+   "rooms": [
+    {
+     "no": "01",
+     "name": "Stair Hall",
+     "bounds": {
+      "x": -7,
+      "z": -1.5,
+      "w": 14,
+      "d": 6.5
+     },
+     "items": [
+      {
+       "type": "bench",
+       "at": [
+        -1.2,
+        4.55
+       ],
+       "rot": 180
+      },
+      {
+       "type": "monstera",
+       "at": [
+        0.9,
+        4.5
+       ]
+      }
+     ]
+    },
+    {
+     "no": "02",
+     "name": "Study",
+     "bounds": {
+      "x": -7,
+      "z": -5,
+      "w": 14,
+      "d": 3.5
+     },
+     "items": [
+      {
+       "type": "bookshelf",
+       "at": [
+        -4.5,
+        -4.75
+       ]
+      },
+      {
+       "type": "club-chair",
+       "at": [
+        -2.5,
+        -3.3
+       ],
+       "rot": 200
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l2",
+   "name": "Upper Floor",
+   "y": 2.8,
+   "height": 2.8,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -7,
+     "z": -5,
+     "w": 14,
+     "d": 10
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": -4,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "S",
+     "at": 4,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "N",
+     "at": 0,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "E",
+     "at": 0,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.3,
+     "sill": 0.9
+    }
+   ],
+   "balustrades": [
+    {
+     "from": [
+      -6.05,
+      0.77
+     ],
+     "to": [
+      -3.32,
+      0.77
+     ],
+     "style": "glass"
+    },
+    {
+     "from": [
+      1.25,
+      0.37
+     ],
+     "to": [
+      3.6,
+      0.37
+     ],
+     "style": "colonial"
+    }
+   ],
+   "rooms": [
+    {
+     "no": "11",
+     "name": "Landing",
+     "bounds": {
+      "x": -7,
+      "z": -5,
+      "w": 14,
+      "d": 10
+     },
+     "items": [
+      {
+       "type": "area-rug",
+       "at": [
+        0,
+        -2.5
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "over": {
+    "x": -7.4,
+    "z": -5.4,
+    "w": 14.8,
+    "d": 10.8
+   },
+   "y": 5.6,
+   "type": "hip",
+   "pitch": 24,
+   "overhang": 0.4,
+   "color": "#3b3f45"
+  }
+ ],
+ "site": [
+  {
+   "type": "path",
+   "path": [
+    [
+     0,
+     5.2
+    ],
+    [
+     0,
+     10.5
+    ]
+   ],
+   "w": 1.4
+  },
+  {
+   "type": "tree",
+   "at": [
+    -9.5,
+    6.5
+   ],
+   "h": 6
+  },
+  {
+   "type": "shrub",
+   "at": [
+    3.2,
+    6.1
+   ]
+  }
+ ],
+ "hero": {
+  "level": "l1",
+  "at": [
+   4.6,
+   -4.35
+  ],
+  "rot": 0,
+  "device": "chalk",
+  "surface": "desk"
+ },
+ "entry": {
+  "level": "l1",
+  "side": "S",
+  "at": 0
+ }
+}

@@ -1,0 +1,587 @@
+{
+ "$schema": "house-spec/v1",
+ "id": "s2-arch-porch",
+ "name": "S2 Features Fixture",
+ "author": "ci-virtual-home",
+ "source": "test fixture (plan S2 tasks 7–12): porch v2, bays, balcony, terrace, loggia, fireplaces and chimneys, built-ins, partition styles",
+ "style": "White farmhouse on a brick plinth: hip-roofed porch, bays, a balcony and a roof terrace",
+ "emoji": "🧪",
+ "fixture": {
+  "note": "porch (hip roof, turned posts clear of a 1.6 m door, spindle rails, steps), box + canted bays, balcony, terrace on the flat roof, loggia under l2, an outside chimney stack and one through the storeys, built-ins, glass/slat/half/arch/bookcase partitions, several doorways in one partition"
+ },
+ "lot": {
+  "w": 30,
+  "d": 24,
+  "ground": "lawn"
+ },
+ "palette": {
+  "wall": "#f1eee7",
+  "trim": "#2f3336",
+  "roof": "#3a3d42",
+  "accent": "#4f6b5c",
+  "material": "siding",
+  "interior": "#f2efe9"
+ },
+ "lighting": "day",
+ "levels": [
+  {
+   "id": "l1",
+   "name": "Ground Floor",
+   "y": 0.45,
+   "height": 2.8,
+   "floor": "oak",
+   "plinth": {
+    "material": "brick",
+    "color": "#9a5a44"
+   },
+   "footprint": [
+    {
+     "x": -4.5,
+     "z": -4,
+     "w": 11.5,
+     "d": 8
+    },
+    {
+     "x": -7,
+     "z": -4,
+     "w": 2.5,
+     "d": 5.5
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": 0,
+     "type": "door",
+     "w": 1.6,
+     "h": 2.2,
+     "style": "cased"
+    },
+    {
+     "side": "S",
+     "at": 2.7,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.5,
+     "sill": 0.7
+    },
+    {
+     "side": "S",
+     "at": 4.0,
+     "type": "window",
+     "w": 1.0,
+     "h": 1.4,
+     "sill": 0.8
+    },
+    {
+     "side": "S",
+     "at": -5.75,
+     "type": "door",
+     "w": 0.9,
+     "h": 2.1,
+     "edgeZ": 1.5
+    },
+    {
+     "side": "N",
+     "at": -2.0,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "N",
+     "at": 2.5,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "E",
+     "at": -3.2,
+     "type": "window",
+     "w": 1.0,
+     "h": 1.3,
+     "sill": 0.9
+    }
+   ],
+   "partitions": [
+    {
+     "from": [
+      -4.5,
+      -0.5
+     ],
+     "to": [
+      3,
+      -0.5
+     ],
+     "doors": [
+      {
+       "at": 1.4,
+       "w": 0.9
+      },
+      {
+       "at": 5.2,
+       "w": 1.4
+      }
+     ],
+     "door": null
+    },
+    {
+     "from": [
+      3,
+      -4
+     ],
+     "to": [
+      3,
+      4
+     ],
+     "style": "glass",
+     "door": 5.6,
+     "doorW": 1.0
+    },
+    {
+     "from": [
+      -1.5,
+      -0.5
+     ],
+     "to": [
+      -1.5,
+      4
+     ],
+     "style": "slats",
+     "door": 2.8,
+     "doorW": 1.1
+    }
+   ],
+   "stairs": {
+    "type": "U",
+    "style": "closed",
+    "at": [
+     -3.5,
+     -1.2
+    ],
+    "rot": 180,
+    "turn": "right",
+    "w": 0.95,
+    "to": "l2",
+    "autoVoid": true
+   },
+   "rooms": [
+    {
+     "no": "01",
+     "name": "Living Room",
+     "bounds": {
+      "x": -7,
+      "z": -4,
+      "w": 10,
+      "d": 3.5
+     },
+     "items": [
+      {
+       "type": "sectional",
+       "at": [
+        0.9,
+        -1.4
+       ],
+       "rot": 180
+      },
+      {
+       "type": "coffee-table",
+       "at": [
+        0.9,
+        -2.6
+       ]
+      }
+     ]
+    },
+    {
+     "no": "02",
+     "name": "Kitchen",
+     "bounds": {
+      "x": 3,
+      "z": -4,
+      "w": 4,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "kitchen-cabinetry",
+       "at": [
+        5.0,
+        -3.65
+       ]
+      },
+      {
+       "type": "fireplace",
+       "at": [
+        5.4,
+        3.7
+       ],
+       "rot": 180,
+       "chimney": {
+        "material": "stone",
+        "cap": "stone"
+       }
+      }
+     ]
+    },
+    {
+     "no": "03",
+     "name": "Hall",
+     "bounds": {
+      "x": -1.5,
+      "z": -0.5,
+      "w": 4.5,
+      "d": 4.5
+     },
+     "items": []
+    },
+    {
+     "no": "04",
+     "name": "Library",
+     "bounds": {
+      "x": -4.5,
+      "z": -0.5,
+      "w": 3,
+      "d": 4.5
+     },
+     "items": []
+    }
+   ]
+  },
+  {
+   "id": "l2",
+   "name": "Upper Floor",
+   "y": 3.25,
+   "height": 2.6,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -7,
+     "z": -4,
+     "w": 10,
+     "d": 8
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": -3.0,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.3,
+     "sill": 0.8
+    },
+    {
+     "side": "S",
+     "at": 1.2,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.3,
+     "sill": 0.8
+    },
+    {
+     "side": "N",
+     "at": 0.3,
+     "type": "door",
+     "w": 0.9,
+     "h": 2.1
+    },
+    {
+     "side": "N",
+     "at": -4.0,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.3,
+     "sill": 0.8
+    },
+    {
+     "side": "E",
+     "at": -2.0,
+     "type": "door",
+     "w": 0.9,
+     "h": 2.1
+    },
+    {
+     "side": "W",
+     "at": 2.0,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.3,
+     "sill": 0.8
+    }
+   ],
+   "partitions": [
+    {
+     "from": [
+      -7,
+      0
+     ],
+     "to": [
+      -1,
+      0
+     ],
+     "style": "half",
+     "door": null,
+     "height": 1.1
+    },
+    {
+     "from": [
+      -1,
+      -4
+     ],
+     "to": [
+      -1,
+      4
+     ],
+     "style": "arch",
+     "door": 5.5,
+     "doorW": 1.3
+    }
+   ],
+   "rooms": [
+    {
+     "no": "11",
+     "name": "Bedroom",
+     "bounds": {
+      "x": -1,
+      "z": -4,
+      "w": 4,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "platform-bed",
+       "at": [
+        1.5,
+        -2.6
+       ]
+      }
+     ]
+    },
+    {
+     "no": "12",
+     "name": "Sitting Room",
+     "bounds": {
+      "x": -7,
+      "z": -4,
+      "w": 6,
+      "d": 8
+     },
+     "items": []
+    }
+   ]
+  }
+ ],
+ "features": [
+  {
+   "type": "porch",
+   "side": "S",
+   "from": -3.8,
+   "to": 3.8,
+   "depth": 2.3,
+   "roof": "hip",
+   "posts": {
+    "style": "turned",
+    "color": "#f2efe9",
+    "spacing": 2.6
+   },
+   "rail": {
+    "style": "spindle"
+   },
+   "roofColor": "#3a3d42",
+   "ceiling": "#d9cdb8"
+  },
+  {
+   "type": "bay",
+   "level": "l1",
+   "side": "W",
+   "at": -2.3,
+   "w": 2.2,
+   "depth": 0.8,
+   "form": "box",
+   "roof": "hip"
+  },
+  {
+   "type": "bay",
+   "level": "l1",
+   "side": "E",
+   "at": -1.2,
+   "w": 2.6,
+   "depth": 0.9,
+   "form": "canted",
+   "roof": "hip"
+  },
+  {
+   "type": "balcony",
+   "level": "l2",
+   "side": "N",
+   "from": -1.4,
+   "to": 2.0,
+   "depth": 1.3,
+   "rail": "metal"
+  },
+  {
+   "type": "terrace",
+   "level": "l2",
+   "rect": {
+    "x": 3.1,
+    "z": -3.9,
+    "w": 3.8,
+    "d": 7.8
+   },
+   "rail": "glass"
+  },
+  {
+   "type": "loggia",
+   "level": "l1",
+   "rect": {
+    "x": -7,
+    "z": 1.5,
+    "w": 2.5,
+    "d": 2.5
+   },
+   "rail": "timber",
+   "posts": 1
+  },
+  {
+   "type": "fireplace",
+   "level": "l1",
+   "at": [
+    -5.6,
+    -3.6
+   ],
+   "rot": 0,
+   "style": "mantel",
+   "w": 1.8,
+   "chimney": {
+    "material": "brick",
+    "color": "#8f4d3a",
+    "cap": "pots"
+   }
+  },
+  {
+   "type": "builtin",
+   "level": "l1",
+   "kind": "bookcase-wall",
+   "from": [
+    -4.5,
+    4
+   ],
+   "to": [
+    -1.6,
+    4
+   ],
+   "face": "left"
+  },
+  {
+   "type": "builtin",
+   "level": "l2",
+   "kind": "window-seat",
+   "from": [
+    0.3,
+    4
+   ],
+   "to": [
+    2.1,
+    4
+   ],
+   "face": "left",
+   "h": 0.45
+  },
+  {
+   "type": "builtin",
+   "level": "l2",
+   "kind": "media-wall",
+   "from": [
+    -7,
+    -3.8
+   ],
+   "to": [
+    -7,
+    -0.3
+   ],
+   "face": "left"
+  }
+ ],
+ "roofs": [
+  {
+   "over": {
+    "x": -7.4,
+    "z": -4.4,
+    "w": 10.8,
+    "d": 8.8
+   },
+   "y": 5.85,
+   "type": "gable",
+   "ridge": "x",
+   "pitch": 38,
+   "overhang": 0.4,
+   "color": "#3a3d42",
+   "gableWindow": false
+  },
+  {
+   "over": {
+    "x": 3.0,
+    "z": -4.1,
+    "w": 4.1,
+    "d": 8.2
+   },
+   "y": 3.25,
+   "type": "flat",
+   "parapet": 0.05,
+   "overhang": 0.1,
+   "trim": "#f2efe9",
+   "color": "#6f7378"
+  }
+ ],
+ "site": [
+  {
+   "type": "path",
+   "path": [
+    [
+     0,
+     7.2
+    ],
+    [
+     0,
+     11
+    ]
+   ],
+   "w": 1.6
+  },
+  {
+   "type": "tree",
+   "at": [
+    -11,
+    6
+   ],
+   "h": 7
+  },
+  {
+   "type": "tree",
+   "at": [
+    11,
+    -6
+   ],
+   "h": 6
+  }
+ ],
+ "hero": {
+  "level": "l1",
+  "at": [
+   6.55,
+   2.2
+  ],
+  "rot": 270,
+  "device": "chalk",
+  "surface": "desk"
+ },
+ "entry": {
+  "level": "l1",
+  "side": "S",
+  "at": 0
+ }
+}

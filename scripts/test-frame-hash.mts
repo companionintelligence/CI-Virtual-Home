@@ -6,7 +6,7 @@
 // a frame passes when no pixel differs by more than --tol (8/255) and fewer than --ratio (0.01 %) differ at
 // all — GPU rasterisation is allowed a few one-level wobbles, content is not.
 //   pnpm run frame-hash [--house aurora] [--shot door-to-core] [--frames 0,330,719]
-//        [--res 720] [--tol 8] [--ratio 0.0001] [--profile auto] [--cold]
+//        [--res 720] [--tol 8] [--ratio 0.0001] [--profile auto] [--cold] [--planner v2]
 //   (node --experimental-strip-types scripts/test-frame-hash.mts — any cwd)
 // Exit 0 when every frame agrees, 1 otherwise.
 //
@@ -16,6 +16,8 @@
 import fs from 'node:fs'; import path from 'node:path'; import http from 'node:http'; import crypto from 'node:crypto';
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, x, i, arr) => { if (x.startsWith('--')) a.push([x.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : 'true']); return a; }, []));
 const HOUSE = args.house || 'aurora', SHOT = args.shot || 'door-to-core', RES = args.res || '720';
+// --planner v2 forces spline planner v2 (S5) on the page, so the determinism of its frames is proved as v1's are
+const PLANNER = args.planner && args.planner !== 'true' ? `&planner=${encodeURIComponent(args.planner)}` : '';
 const FRAMES = (args.frames || '0,330,719').split(',').map(Number);
 const TOL = Number(args.tol || 8), RATIO = Number(args.ratio || 0.0001);
 // Same table as scripts/test-goldens.mts — keep them in step.
@@ -73,7 +75,7 @@ async function run() {
   const page = await ctx.newPage();
   await page.route('https://fonts.googleapis.com/**', r => r.fulfill({ status: 200, contentType: 'text/css', body: fontCss(port) }));
   await page.route('https://fonts.gstatic.com/**', r => r.abort());
-  await page.goto(`http://localhost:${port}/room-creator.html?house=${HOUSE}&shot=${SHOT}`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`http://localhost:${port}/room-creator.html?house=${HOUSE}&shot=${SHOT}${PLANNER}`, { waitUntil: 'domcontentloaded' });
   await page.waitForFunction(h => document.documentElement.dataset.houseReady === h, HOUSE);
   const missing = await page.evaluate(async () => {
     const want = ['Manrope', 'Plus Jakarta Sans', 'JetBrains Mono'];
@@ -107,7 +109,7 @@ FRAMES.forEach((f, i) => {
   for (let k = 0; k < A.length; k += 4) { const d = Math.max(Math.abs(A[k] - B[k]), Math.abs(A[k + 1] - B[k + 1]), Math.abs(A[k + 2] - B[k + 2])); if (d) { n++; if (d > maxd) maxd = d; } }
   const ratio = n / (A.length / 4), pass = maxd <= TOL && ratio <= RATIO; if (!pass) ok = false;
   const hash = crypto.createHash('sha256').update(A).digest('hex').slice(0, 12);
-  console.log(`${pass ? '✓' : '✗'} ${HOUSE}/${SHOT} frame ${f}  ${hash}  ${n === 0 ? 'identical' : `${n} px differ (max Δ${maxd}, ${(ratio * 100).toFixed(4)} %)`}`);
+  console.log(`${pass ? '✓' : '✗'} ${HOUSE}/${SHOT}${PLANNER ? ` (planner ${args.planner})` : ''} frame ${f}  ${hash}  ${n === 0 ? 'identical' : `${n} px differ (max Δ${maxd}, ${(ratio * 100).toFixed(4)} %)`}`);
 });
 console.log(ok ? `deterministic (${PROFILE})` : `NOT deterministic (${PROFILE})`);
 process.exit(ok ? 0 : 1);

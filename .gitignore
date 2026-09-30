@@ -29,8 +29,9 @@ test/diff/
 test/qa/
 test/goldens.*.json
 
-# Screenshots from the portal's end-to-end check (scripts/test-portal.mts)
+# Screenshots from the portal's end-to-end check (scripts/test-portal.mts) and the editor's (scripts/test-ui.mts)
 test/portal/
+test/ui/
 
 # Fixture stills (scripts/test-fixtures.mts) — rendered to be looked at; their hashes are committed, under
 # test/fixtures/hashes/<profile>.json

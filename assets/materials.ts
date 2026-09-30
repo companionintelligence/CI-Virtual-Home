@@ -108,39 +108,93 @@ const ROOF_KIND = {
   'asphalt-shingle': 'asphalt-shingle', 'standing-seam': 'standing-seam', 'clay-tile': 'clay-tile', membrane: 'membrane'
 };
 const ROOF_COLOR = { 'asphalt-shingle': 0x2f2e2c, 'standing-seam': 0x3a3d40, 'clay-tile': 0xa8634a, membrane: 0x6f7378 };
+// roof finishes (S2's roofs[].finish) → roofing sets
+Object.assign(ROOF_KIND, { seam: 'standing-seam', slate: 'asphalt-shingle', shake: 'asphalt-shingle' });
+// room finishes (kit.finish, plan S1) → texture set + options. Floors: the oaks, herringbone, tile (square, hex,
+// checker), terracotta, stone pavers, concrete, carpet, marble, terrazzo. Walls: paint, painted brick, wallpaper
+// (stripe, dot, grid, botanical), wainscot, board and batten, and the exposed claddings.
+export const FINISHES: Record<string, [string, any]> = {
+  oak: ['oak', {}], 'honey-oak': ['oak', { color: 0xb38d5e }], walnut: ['oak', { color: 0x6a4b35 }], cherry: ['oak', { color: 0x8f553e }],
+  'white-oak': ['oak', { color: 0xc4b596 }], 'grey-wash': ['oak', { color: 0xa39f96 }],
+  herringbone: ['herringbone', {}], tile: ['tile', { size: 0.3 }], 'square-tile': ['tile', { size: 0.3 }], 'hex-tile': ['hextile', {}], 'checker-tile': ['checker', {}], checker: ['checker', {}],
+  terracotta: ['terracotta', {}], pavers: ['pavers', {}], 'stone-pavers': ['pavers', {}], concrete: ['concrete', {}], carpet: ['carpet', {}],
+  marble: ['marble', {}], terrazzo: ['terrazzo', {}],
+  paint: ['paint', {}], 'painted-brick': ['paintedbrick', {}], wallpaper: ['wallpaper', {}], wainscot: ['wainscot', {}], 'board-and-batten': ['battens', {}],
+  brick: ['brick', { color: 0xa0573f }], stone: ['stone', { color: 0xb3aa9b }], timber: ['timber', { color: 0x9c7f62, pow2: true }],
+};
+export const FINISH_KINDS = Object.keys(FINISHES);
 
-export function createMaterialKit({ THREE, palette = {}, seed = 'house' }: { THREE: any; palette?: any; seed?: string } = {} as any) {
+// The kit's options past the palette (kit-build.ts houseKit passes them from the spec; the prop sheet and the
+// catalog pass none, which is today's kit):
+//   keep       palette.keep's roles: 'accent' keeps the accent role unrestrained, 'roof' a roof colour exactly (no
+//              restraint, no charcoal pull)
+//   defaults   specDefaults(spec): under 2 the seeded wood, fabric and cabinet roles are lifted to luma ≥ 0.12 (no
+//              accidental black or navy), and a roof is pulled toward charcoal only when it has no colour of its own
+//   roofPull   palette.roofPull: false turns the charcoal pull off for every roof
+//   roofColors the spec's explicit roofs[].color values (0xRRGGBB), which is how roofMaterial(type, color) — the
+//              call roofs.ts makes with a colour whether authored or its type's default — tells the two apart
+//   restraint  the house's palette restraint (kit-rules.ts restraintOf: palette.restraint, else 1, or D2_RESTRAINT under
+//              defaults 2): what kit.wallColor() applies to a wall colour that did not come through the palette
+export function createMaterialKit({ THREE, palette = {}, seed = 'house', keep = [], defaults = 1, roofPull = true, roofColors = [], restraint = 1 }: { THREE: any; palette?: any; seed?: string; keep?: string[]; defaults?: number; roofPull?: boolean; roofColors?: number[]; restraint?: number } = {} as any) {
   const rng = mulberry32(fnv1a(String(seed)));
   const pick = arr => arr[Math.floor(rng() * arr.length)];
+  const keeps = new Set(keep || []), d2 = defaults >= 2;
+  const lift = c => { if (!d2) return c; let x = c; for (let k = 0; k < 12 && lum(x) < 0.12; k++) x = mix(x, 0xffffff, 0.12); return x; };
   const wall = hex(palette.wall || '#f1f5f9'), trim = hex(palette.trim || '#1e293b'), accent = hex(palette.accent || '#0f766e'), roof = hex(palette.roof || '#334155');
   // fabric: half the time the accent (muted), else a curated pick; the second fabric always differs from the first
   const accentMuted = restrain(mix(accent, 0x6b7280, 0.45), 0.2, 0.3);
-  const fabric = rng() < 0.5 ? accentMuted : pick(FABRICS);
+  const fabric = lift(rng() < 0.5 ? accentMuted : pick(FABRICS));
   let fabric2 = pick(FABRICS); if (fabric2 === fabric) fabric2 = mix(fabric, 0xffffff, 0.35);
-  const wood = pick(WOODS);
-  const cabinet = pick(CABINETS);
+  fabric2 = lift(fabric2);
+  const wood = lift(pick(WOODS));
+  const cabinet = lift(pick(CABINETS));
   const rug = mix(restrain(accent, 0.2, 0.3), 0x7a746c, 0.55);
-  const colors = { wall, trim, accent: restrain(accent, 0.18, 0.2), roof, fabric, fabric2, wood, cabinet, rug, linen: 0xf2efe9, metal: 0x2b2f33 };
+  const colors = { wall, trim, accent: keeps.has('accent') ? accent : restrain(accent, 0.18, 0.2), roof, fabric, fabric2, wood, cabinet, rug, linen: 0xf2efe9, metal: 0x2b2f33 };
 
   // ---- textures: one library per house, seeded by its id; sets are cached per (kind, options)
   const lib = createTextureLibrary({ THREE, rngFor: key => mulberry32(fnv1a(`${seed}:${key}`)) });
   const oakTone = OAK_TONES[Math.floor(mulberry32(fnv1a(`${seed}:oak-tone`))() * OAK_TONES.length)];
   // a fresh material per call (roof fades and wall modes act per material), textures shared
-  function pbr(set, { mode = 'auto', rotation = 0, macro = 0, ...extra }: any = {}) {
+  function pbr(set, { mode = 'auto', rotation = 0, macro = 0, scale = 1, offset = [0, 0], ...extra }: any = {}) {
     const mat = new THREE.MeshStandardMaterial({
       color: 0xffffff, map: set.map, normalMap: set.normalMap, roughnessMap: set.roughnessMap, roughness: 1, metalness: set.metalness,
       normalScale: new THREE.Vector2(set.normalScale, set.normalScale), ...extra
     });
-    worldUV(THREE, mat, { period: set.period, mode, rotation, macro, macroMean: set.mean });
+    worldUV(THREE, mat, { period: scale === 1 ? set.period : set.period.map(p => p * scale), mode, rotation, macro, macroMean: set.mean, ...(offset[0] || offset[1] ? { offset } : {}) });
     mat.userData.surface = set.kind;
     return mat;
   }
 
   // ---- cladding: a seeded PBR set per kind, tinted by the wall colour, mapped in world units on each face's
   // own plane (so piers and lintels of any size share one continuous surface, and a cut wall never stretches)
+  // kit.cladding() is the house's own (palette.material in palette.wall); kit.cladding({ kind, color }) is one
+  // cached per (kind, colour) — a storey's own (levels[].material / wallColor), S2's volumes and facade zones. A pair
+  // that IS the house's gets the house's material, so a storey that names the house's own cladding is not a seam.
   const CLAD = new Set(['brick', 'siding', 'stucco', 'stone', 'timber', 'corrugated']);
   let claddingMat = null;
-  function cladding(kind = palette.material || 'stucco') {
+  const claddings = new Map();
+  // kit.cladding({ kind, color }) builds the colour EXACTLY as given. A colour that would have come through the palette
+  // (a storey's wallColor, a volume's or facade zone's colour) takes the house's wall rule first, kit.wallColor(): the
+  // clamp restrainPalette gives palette.wall, eased by the house's restraint, or none when palette.keep names 'wall' —
+  // so a zone coloured cobalt renders as a storey coloured cobalt does. → 0xRRGGBB
+  function wallColor(c, kind = 'stucco') {
+    const orig = hex(c);
+    if (keeps.has('wall')) return orig;
+    const rs = kind === 'brick' ? restrain(orig, 0.3, 0.35) : restrain(orig, 0.18, 0.2);
+    return restraint >= 1 ? rs : restraint <= 0 ? orig : mix(orig, rs, restraint);
+  }
+  const houseKind = () => (CLAD.has(palette.material) ? palette.material : 'stucco');
+  function cladding(opts: any = palette.material || 'stucco') {
+    if (opts && typeof opts === 'object') {
+      const kind = CLAD.has(opts.kind) ? opts.kind : houseKind(), c = opts.color != null ? hex(opts.color) : wall;
+      if (kind === houseKind() && c === wall) return cladding();
+      const key = `${kind}:${c}`;
+      if (claddings.has(key)) return claddings.get(key);
+      const mat = pbr(lib.set(kind, { color: c }), { mode: 'auto' });
+      mat.userData.cladding = kind;
+      claddings.set(key, mat); return mat;
+    }
+    let kind = opts;
     if (claddingMat) return claddingMat;
     if (!CLAD.has(kind)) kind = 'stucco';
     const mat = pbr(lib.set(kind, { color: wall }), { mode: 'auto' });
@@ -170,20 +224,55 @@ export function createMaterialKit({ THREE, palette = {}, seed = 'house' }: { THR
   // its own). `type` is a HOUSE-SPEC roof type (gable, hip → asphalt shingle; shed → standing seam; terracotta
   // → clay tile; flat → membrane) or a finish name. Mapped along each roof plane: courses run level with the
   // eave on gables, hips and sheds alike. `extra` is merged into the material (e.g. { side: THREE.DoubleSide }).
-  function roofMaterial(type = 'gable', color = null, extra: any = {}) {
+  // kit.roofMaterial({ finish, color, extra }) — S2's form: `finish` a roof finish (shingle, seam, tile, slate,
+  // shake, membrane) or a roof type, `color` the roof's OWN colour or nothing. Under defaults 2 the charcoal pull
+  // applies only to a roof with no colour of its own; palette.roofPull: false and palette.keep 'roof' turn it off.
+  const explicitRoofs = new Set((roofColors || []).map(c => hex(c)));
+  function roofMaterial(type: any = 'gable', color = null, extra: any = {}) {
+    let own = color != null && explicitRoofs.has(hex(color));   // the positional call: authored, or its type's default?
+    if (type && typeof type === 'object') { ({ finish: type = 'gable', color = null, extra = {} } = type); own = color != null; }
     if (type === 'aframe-glass' || type === 'glass') return null;
     const kind = ROOF_KIND[type] || 'asphalt-shingle';
     const c0 = hex(color ?? ROOF_COLOR[kind]);
+    const kept = keeps.has('roof') && own;
+    const pull = !kept && roofPull !== false && !(d2 && own);
     // fired clay, not traffic cone. Dark shingle, seam and membrane roofs lean to a neutral charcoal: a warm
     // brown #3f2a1d under a golden sun reads as milk chocolate, the same roof pulled toward #282b31 reads as the
     // near-black roofs of Pascal's streets. The target is a hair cool, so a golden key light lands it on
     // charcoal rather than brown. Light roofs (a white membrane, a pale metal) keep their colour.
     const dark = lum(c0) < 0.35;
-    const c = kind === 'clay-tile' ? mix(restrain(c0, 0.22, 0.25), 0x3a3531, 0.12)
-      : kind === 'membrane' ? (dark ? mix(restrain(c0, 0.12, 0.3), 0x34363a, 0.4) : restrain(c0, 0.15, 0.3))
-      : dark ? mix(restrain(c0, 0.12, 0.3), kind === 'standing-seam' ? 0x31353b : 0x282b31, 0.42) : restrain(c0, 0.2, 0.35);
-    const mat = pbr(lib.set(kind, { color: c }), { mode: 'slope', ...extra });
+    const c = kept ? c0
+      : kind === 'clay-tile' ? (pull ? mix(restrain(c0, 0.22, 0.25), 0x3a3531, 0.12) : restrain(c0, 0.22, 0.25))
+      : kind === 'membrane' ? (dark && pull ? mix(restrain(c0, 0.12, 0.3), 0x34363a, 0.4) : restrain(c0, 0.15, 0.3))
+      : dark && pull ? mix(restrain(c0, 0.12, 0.3), kind === 'standing-seam' ? 0x31353b : 0x282b31, 0.42) : restrain(c0, 0.2, 0.35);
+    // a kept colour is the roof's colour as it renders: the set's courses and joints darken its mean, so the base
+    // is lifted by the ratio once (the generators are linear in their base colour) — within ΔE 3 of what was asked
+    let set = lib.set(kind, { color: c });
+    if (kept) {
+      const m = toRgb(set.meanHex), t = toRgb(c);
+      const c2 = fromRgb(t.map((v, k) => v * (v / Math.max(1, m[k]))) as [number, number, number]);
+      if (c2 !== c) set = lib.set(kind, { color: c2 });
+    }
+    const mat = pbr(set, { mode: 'slope', ...extra });
     mat.userData.roofKind = kind;
+    return mat;
+  }
+
+  // ---- room finishes: kit.finish(kind, { color, pattern, scale, yBase, rotation }) → a floor or wall material
+  // (S2's rooms[].floor / rooms[].walls); `color2` is a checker's dark squares and a wallpaper's motif. A fresh material a call, its maps shared per (kind, options) and seeded by
+  // the house. `scale` multiplies the pattern's size; `yBase` puts a wainscot's rail at its height above that floor.
+  function finish(kind = 'paint', { color = null, color2 = null, pattern = null, scale = 1, yBase = 0, rotation = 0, h = null, ...extra }: any = {}) {
+    const found = FINISHES[kind === 'tile' && pattern && FINISHES[`${pattern}-tile`] ? `${pattern}-tile` : kind];
+    const [gen, o0] = found || FINISHES.paint;
+    const o: any = { ...o0 };
+    if (color != null) o.color = hex(color);
+    if (color2 != null && (gen === 'checker' || gen === 'wallpaper')) o.color2 = hex(color2);   // the checker's dark squares, the paper's motif
+    if (pattern && gen === 'wallpaper') o.pattern = pattern;
+    if (h != null && gen === 'wainscot') o.h = h;
+    if (gen === 'oak' && o.color == null) o.color = oakTone;
+    const set = lib.set(gen, o);
+    const mat = pbr(set, { mode: 'auto', scale, rotation: rotation || (gen === 'herringbone' ? Math.PI / 4 : 0), offset: gen === 'wainscot' ? [0, -yBase] : [0, 0], ...extra });
+    if (!found) mat.userData.finishFallback = kind;   // an unknown kind is plain paint: the flag says so (FINISH_KINDS lists the known ones)
     return mat;
   }
 
@@ -237,12 +326,14 @@ export function createMaterialKit({ THREE, palette = {}, seed = 'house' }: { THR
     });
     return obj;
   }
+  // theme(obj, { skip }): a material flagged userData.explicit (a colour the spec gave the item: kit-build.ts
+  // themeItem under defaults 2) keeps it; every other role is themed as usual
   function theme(obj, { skip = false } = {}) {
     if (skip) return obj;
     obj.traverse(m => {
       if (!m.isMesh) return;
       for (const mat of (Array.isArray(m.material) ? m.material : [m.material])) {
-        if (!mat || !mat.color || seen.has(mat) || mat.map) continue;
+        if (!mat || !mat.color || seen.has(mat) || mat.map || mat.userData.explicit) continue;
         seen.add(mat);
         const role = ROLE_OF.get(mat.color.getHex());
         if (!role) { if (!mat.transparent) muteMat(mat); continue; }
@@ -254,5 +345,5 @@ export function createMaterialKit({ THREE, palette = {}, seed = 'house' }: { THR
   }
 
   const itemRng = key => mulberry32(fnv1a(`${seed}:item:${key}`));   // a stream per prop instance
-  return { rng, itemRng, colors, cladding, floor, surface, surfaceColor, roofMaterial, water, floorTexture, theme, mute, textures: lib, css: c => css(c) };
+  return { rng, itemRng, colors, cladding, claddingFor: cladding, wallColor, floor, surface, surfaceColor, roofMaterial, finish, water, floorTexture, theme, mute, textures: lib, css: c => css(c), defaults, keep: [...keeps] };
 }

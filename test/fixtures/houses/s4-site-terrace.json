@@ -1,0 +1,667 @@
+{
+ "$schema": "house-spec/v1",
+ "id": "s4-site-terrace",
+ "name": "S4 Terrace Fixture",
+ "author": "ci-virtual-home",
+ "source": "test fixture (plan S4): terraced ground on a hillside: a rear terrace 0.9 m up behind stone retaining walls with a glass rail, reached by steps that find their own height; an upper terrace 1.8 m up with a pool dug into it and mediterranean planting along its edge; a planted bank; a steel stair with glass rails to a balcony deck; a tree and beds that stand on the terraces",
+ "style": "The S0 harness house (two-storey stucco box, charcoal gable) on an S4 lot",
+ "emoji": "🌿",
+ "fixture": {
+  "note": "terraced ground on a hillside: a rear terrace 0.9 m up behind stone retaining walls with a glass rail, reached by steps that find their own height; an upper terrace 1.8 m up with a pool dug into it and mediterranean planting along its edge; a planted bank; a steel stair with glass rails to a balcony deck; a tree and beds that stand on the terraces; a clipped hedge along the upper terrace whose runs each stand on it, and a timber screen at the terrace's own height (a fence with a y)",
+  "frames": {
+   "door-to-core": [
+    0.05,
+    0.55
+   ],
+   "orbit": [
+    0.25,
+    0.55,
+    0.85
+   ],
+   "hero-reveal": [
+    1
+   ]
+  }
+ },
+ "lot": {
+  "w": 34,
+  "d": 32,
+  "ground": "lawn",
+  "context": "hillside"
+ },
+ "palette": {
+  "wall": "#eeeae3",
+  "trim": "#2b2f33",
+  "roof": "#3a3d42",
+  "accent": "#5d7a6a",
+  "material": "stucco"
+ },
+ "lighting": "day",
+ "levels": [
+  {
+   "id": "l1",
+   "name": "Ground Floor",
+   "y": 0,
+   "height": 2.8,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -5,
+     "z": -4,
+     "w": 10,
+     "d": 8
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": 0.5,
+     "type": "door",
+     "w": 1,
+     "h": 2.1,
+     "style": "entry"
+    },
+    {
+     "side": "S",
+     "at": -3,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "S",
+     "at": 3,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "N",
+     "at": -3,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    },
+    {
+     "side": "N",
+     "at": 2.5,
+     "type": "slider",
+     "w": 2,
+     "h": 2.2
+    },
+    {
+     "side": "E",
+     "at": 1.2,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    },
+    {
+     "side": "W",
+     "at": 0,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    }
+   ],
+   "partitions": [
+    {
+     "from": [
+      -1.4,
+      -4
+     ],
+     "to": [
+      -1.4,
+      4
+     ],
+     "door": 5.6,
+     "doorW": 0.9
+    }
+   ],
+   "stairs": {
+    "type": "timber",
+    "at": [
+     0.2,
+     -3.25
+    ],
+    "rot": 90,
+    "to": "l2",
+    "w": 1.1
+   },
+   "rooms": [
+    {
+     "no": "01",
+     "name": "Living Room",
+     "bounds": {
+      "x": -1.4,
+      "z": -4,
+      "w": 6.4,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "sectional",
+       "at": [
+        2.2,
+        1.9
+       ],
+       "rot": 180
+      },
+      {
+       "type": "coffee-table",
+       "at": [
+        2.2,
+        0.5
+       ]
+      },
+      {
+       "type": "area-rug",
+       "at": [
+        2.2,
+        0.9
+       ]
+      },
+      {
+       "type": "fiddle-leaf",
+       "at": [
+        4.4,
+        3.4
+       ]
+      },
+      {
+       "type": "media-credenza",
+       "at": [
+        2.2,
+        -1.6
+       ],
+       "rot": 0
+      }
+     ]
+    },
+    {
+     "no": "02",
+     "name": "Study",
+     "bounds": {
+      "x": -5,
+      "z": -4,
+      "w": 3.6,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "bookshelf",
+       "at": [
+        -3.2,
+        -3.75
+       ]
+      },
+      {
+       "type": "club-chair",
+       "at": [
+        -3.2,
+        -1.6
+       ],
+       "rot": 180
+      },
+      {
+       "type": "monstera",
+       "at": [
+        -4.5,
+        3.4
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "l2",
+   "name": "Upper Floor",
+   "y": 2.8,
+   "height": 2.7,
+   "floor": "oak",
+   "footprint": [
+    {
+     "x": -5,
+     "z": -4,
+     "w": 10,
+     "d": 8
+    }
+   ],
+   "openings": [
+    {
+     "side": "S",
+     "at": -3,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "S",
+     "at": 3,
+     "type": "window",
+     "w": 1.4,
+     "h": 1.3,
+     "sill": 0.9
+    },
+    {
+     "side": "N",
+     "at": -2.5,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    },
+    {
+     "side": "E",
+     "at": 1.5,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    },
+    {
+     "side": "W",
+     "at": 0,
+     "type": "window",
+     "w": 1.2,
+     "h": 1.2,
+     "sill": 0.9
+    }
+   ],
+   "partitions": [
+    {
+     "from": [
+      -0.2,
+      -4
+     ],
+     "to": [
+      -0.2,
+      4
+     ],
+     "door": 6.2,
+     "doorW": 0.9
+    }
+   ],
+   "voids": [
+    {
+     "x": 0.1,
+     "z": -3.9,
+     "w": 3.6,
+     "d": 1.3
+    }
+   ],
+   "rooms": [
+    {
+     "no": "03",
+     "name": "Office",
+     "bounds": {
+      "x": -0.2,
+      "z": -4,
+      "w": 5.2,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "bookshelf",
+       "at": [
+        4.75,
+        0.6
+       ],
+       "rot": 270
+      },
+      {
+       "type": "area-rug",
+       "at": [
+        2.4,
+        1.8
+       ]
+      },
+      {
+       "type": "monstera",
+       "at": [
+        0.4,
+        3.4
+       ]
+      }
+     ]
+    },
+    {
+     "no": "04",
+     "name": "Bedroom",
+     "bounds": {
+      "x": -5,
+      "z": -4,
+      "w": 4.8,
+      "d": 8
+     },
+     "items": [
+      {
+       "type": "platform-bed",
+       "at": [
+        -2.6,
+        -2.6
+       ]
+      },
+      {
+       "type": "area-rug",
+       "at": [
+        -2.6,
+        -1.4
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "roofs": [
+  {
+   "over": {
+    "x": -5.4,
+    "z": -4.4,
+    "w": 10.8,
+    "d": 8.8
+   },
+   "y": 5.5,
+   "type": "gable",
+   "ridge": "x",
+   "pitch": 30,
+   "overhang": 0.4,
+   "color": "#3a3d42"
+  }
+ ],
+ "site": [
+  {
+   "type": "terrace",
+   "id": "lower",
+   "poly": [
+    [
+     -14,
+     -7
+    ],
+    [
+     9,
+     -7
+    ],
+    [
+     10,
+     -15
+    ],
+    [
+     -14,
+     -15
+    ]
+   ],
+   "y": 0.9,
+   "edge": {
+    "kind": "rail",
+    "material": "stone",
+    "color": "#a39a8c",
+    "rail": "glass"
+   }
+  },
+  {
+   "type": "terrace",
+   "id": "upper",
+   "poly": [
+    [
+     -13,
+     -10.5
+    ],
+    [
+     -2,
+     -10.5
+    ],
+    [
+     -1,
+     -15
+    ],
+    [
+     -13,
+     -15
+    ]
+   ],
+   "y": 1.8,
+   "edge": {
+    "kind": "retaining",
+    "material": "stone",
+    "color": "#9d968a"
+   }
+  },
+  {
+   "type": "steps",
+   "at": [
+    2.5,
+    -6.4
+   ],
+   "w": 1.6
+  },
+  {
+   "type": "steps",
+   "at": [
+    -4.5,
+    -9.9
+   ],
+   "w": 1.4
+  },
+  {
+   "type": "terrace",
+   "poly": [
+    [
+     11,
+     2
+    ],
+    [
+     16,
+     2.5
+    ],
+    [
+     16,
+     12
+    ],
+    [
+     12,
+     12
+    ],
+    [
+     10.5,
+     7
+    ]
+   ],
+   "y": 0.6,
+   "edge": "planted",
+   "smooth": 0.3
+  },
+  {
+   "type": "pool",
+   "shape": "rect",
+   "at": [
+    -8.5,
+    -12.8
+   ],
+   "w": 6,
+   "d": 2.8,
+   "coping": {
+    "w": 0.35,
+    "color": "#d9d4c8"
+   }
+  },
+  {
+   "type": "planting",
+   "kind": "terrace",
+   "along": "terrace:lower",
+   "mix": "mediterranean",
+   "depth": 0.9
+  },
+  {
+   "type": "planting",
+   "kind": "foundation",
+   "along": "facade:S"
+  },
+  {
+   "type": "tree",
+   "at": [
+    5,
+    -12
+   ],
+   "species": "olive",
+   "h": 4
+  },
+  {
+   "type": "tree",
+   "at": [
+    13.5,
+    9
+   ],
+   "species": "cypress",
+   "h": 5
+  },
+  {
+   "type": "shrub",
+   "at": [
+    7.5,
+    -9.5
+   ],
+   "form": "agave",
+   "r": 0.6
+  },
+  {
+   "type": "deck",
+   "at": [
+    6.8,
+    -1
+   ],
+   "w": 3.2,
+   "d": 3.6,
+   "h": 0.18,
+   "y": 2.62,
+   "posts": false,
+   "rails": {
+    "sides": [
+     "N",
+     "E"
+    ],
+    "style": "glass"
+   }
+  },
+  {
+   "type": "stair",
+   "from": [
+    7.0,
+    6.0,
+    0
+   ],
+   "to": [
+    7.0,
+    0.9,
+    2.8
+   ],
+   "w": 1.1,
+   "style": "steel",
+   "rail": "glass"
+  },
+  {
+   "type": "path",
+   "path": [
+    [
+     0.5,
+     4.3
+    ],
+    [
+     0.5,
+     8
+    ],
+    [
+     2.5,
+     11
+    ],
+    [
+     2,
+     16
+    ]
+   ],
+   "w": 1.2,
+   "smooth": true,
+   "surface": "flagstone"
+  },
+  {
+   "type": "patio",
+   "at": [
+    -3,
+    -12.5
+   ],
+   "w": 3.5,
+   "d": 3,
+   "y": 1.8
+  },
+  {
+   "type": "patio-set",
+   "at": [
+    -3,
+    -12.5
+   ],
+   "y": 1.8
+  },
+  {
+   "type": "hedge",
+   "path": [
+    [
+     -12.4,
+     -14.6
+    ],
+    [
+     -8,
+     -14.9
+    ],
+    [
+     -4,
+     -14.7
+    ],
+    [
+     -1.6,
+     -14.6
+    ]
+   ],
+   "h": 1.7,
+   "smooth": true
+  },
+  {
+   "type": "fence",
+   "style": "slat-h",
+   "from": [
+    -12.8,
+    -11
+   ],
+   "to": [
+    -6.5,
+    -11
+   ],
+   "h": 1.1,
+   "y": 1.8,
+   "color": "#7a5b3f"
+  }
+ ],
+ "hero": {
+  "level": "l2",
+  "at": [
+   2.4,
+   3.5
+  ],
+  "rot": 180,
+  "device": "chalk",
+  "pose": "prone",
+  "surface": "desk"
+ },
+ "entry": {
+  "level": "l1",
+  "side": "S",
+  "at": 0.5
+ }
+}

@@ -33,6 +33,8 @@
 // the roof fade writes opacity, so a shared wall or neighbour material would dissolve with it.
 
 import { mulberry32, fnv1a } from './materials.js';
+import { specDefaults } from './spec/index.js';
+import { createArchMaterials } from './arch-materials.js';
 
 type Rect = { x0: number; x1: number; z0: number; z1: number };
 type Side = 'N' | 'S' | 'E' | 'W';
@@ -71,6 +73,41 @@ const GUTTER: P2[] = [
   [0, 0], [0, -G], [0.72 * GW, -G], [0.86 * GW, -0.62 * G], [0.94 * GW, -0.3 * G], [GW, -0.08 * G], [GW, 0],
   [GW - GT, 0], [GW - GT, -0.08 * G], [0.94 * GW - GT, -0.3 * G], [0.86 * GW - GT, -0.62 * G], [0.72 * GW - GT * 0.6, -G + GT], [GT, -G + GT], [GT, 0],
 ];
+// S2 roofs[].finish → the kit's roofing (materials.ts ROOF_KIND by type name); slate and shake use the shingle set in
+// their own tones until the kit grows those textures (S1)
+const FINISH_KIND = { shingle: 'gable', seam: 'shed', tile: 'terracotta', membrane: 'flat', slate: 'gable', shake: 'gable' };
+const FINISH_COLOR = { slate: 0x4b5058, shake: 0x6e5a47 };
+// S2 features a downspout keeps off (porch decks, bays, balconies) as plan rects [x0, z0, x1, z1]
+function featureRects(spec): number[][] {
+  const out = [];
+  for (const f of spec.features || []) {
+    if (!f) continue;
+    if (f.rect) { out.push([f.rect.x, f.rect.z, f.rect.x + f.rect.w, f.rect.z + f.rect.d]); continue; }
+    if (!['porch', 'bay', 'balcony'].includes(f.type) || !f.side) continue;
+    const lv = (spec.levels || []).find(l => l.id === (f.level || (spec.entry || {}).level)) || (spec.levels || [])[0];
+    if (!lv) continue;
+    const rs = lv.footprint || [], horiz = f.side === 'S' || f.side === 'N';
+    const line = f.side === 'S' ? Math.max(...rs.map(r => r.z + r.d)) : f.side === 'N' ? Math.min(...rs.map(r => r.z)) : f.side === 'E' ? Math.max(...rs.map(r => r.x + r.w)) : Math.min(...rs.map(r => r.x));
+    const a0 = f.type === 'bay' ? f.at - f.w / 2 : f.from ?? -99, a1 = f.type === 'bay' ? f.at + f.w / 2 : f.to ?? 99, dep = (f.depth || 1.2) + 0.1, n = OUT[f.side as Side];
+    const b0 = line, b1 = line + (horiz ? n[1] : n[0]) * dep;
+    out.push(horiz ? [a0, Math.min(b0, b1), a1, Math.max(b0, b1)] : [Math.min(b0, b1), a0, Math.max(b0, b1), a1]);
+  }
+  return out;
+}
+// the parts of a convex polygon outside a set of rects, as convex pieces
+function subtractRects(poly: P2[], holes: Rect[]): P2[][] {
+  let pieces = [poly];
+  for (const h of holes) {
+    const next = [];
+    for (const p of pieces) {
+      next.push(clip(p, q => q[0] - h.x0), clip(p, q => h.x1 - q[0]));
+      const mid = clip(clip(p, q => h.x0 - q[0]), q => q[0] - h.x1);
+      next.push(clip(mid, q => q[1] - h.z0), clip(mid, q => h.z1 - q[1]));
+    }
+    pieces = next.filter(p => p.length >= 3 && Math.abs(p.reduce((a, q, i) => { const r = p[(i + 1) % p.length]; return a + q[0] * r[1] - r[0] * q[1]; }, 0)) > 1e-4);
+  }
+  return pieces;
+}
 const LEADER = [0.075, 0.055];   // rectangular leader: along the wall × out from it
 const WALL_HALF = 0.08;          // createParametricWall's 0.16 m walls sit centred on the footprint edge
 const STANDOFF = 0.02;
@@ -81,9 +118,124 @@ const RAKE = 0.3;                // most a gable's rake overhangs its end wall
 const KEEP_OUT = { porch: [6, 2.5], pergola: [4, 3], greenhouse: [3.6, 2.4], pool: [6, 4], 'turtle-pool': [8, 6], pond: [4, 3], hottub: [2.2, 2.2], gazebo: [4.4, 4.4] };
 const GROUND_COVER = { deck: 0.12, patio: 0.08, driveway: 0.06 };
 
+// The THREE-free plan of every roof of a spec: its wall rectangle, overhangs, faces and the height functions (under: the
+// deck's underside over the eave elevation; topAt: the deck's top, absolute). S2's chimney stacks, knee-wall ceilings
+// and lints read these too.
+export function planRoofModels(spec) { return (spec.roofs || []).map(rf => planRoofModel(spec, rf)); }
+/** the highest roof top over (x, z), or null where no roof covers it */
+export function roofTopAt(models, x, z) { let h = null; for (const m of models) if (inRect(x, z, m.o)) { const t = m.topAt(x, z); if (h === null || t > h) h = t; } return h; }
+/** the lowest roof underside over (x, z) (absolute), or null */
+export function roofUnderAt(models, x, z) { let h = null; for (const m of models) if (inRect(x, z, m.o)) { const u = m.y + (m.type === 'flat' ? 0 : m.under(x, z)); if (h === null || u < h) h = u; } return h; }
+
+function planRoofModel(spec, rf) {
+  const levels = spec.levels || [];
+  // S2: a pent roof is a shed along a wall; `ends`, `pitches`, `sweep` and `clip` change the form only when given
+  const type = rf.type === 'pent' ? 'shed' : (rf.type || 'gable');
+  const ends = rf.ends || {};
+  const clip = rf.clip === true || (rf.clip === undefined && specDefaults(spec) >= 2);
+  const y = rf.y ?? 2.8;
+  const over = rf.over;
+  const oh = rf.overhang ?? 0;
+  const O: Rect = { x0: over.x, x1: over.x + over.w, z0: over.z, z1: over.z + over.d };
+  // the wall rectangle: the storey this roof caps (its top is the eave elevation), clipped to `over`
+  // (S2: a knee-walled storey's walls stop at its knee — that is the eave its roof sits on)
+  const lv = levels.find(l => Math.abs((l.y || 0) + (l.knee !== undefined ? l.knee : (l.height || 2.8)) - y) < 0.05);
+  const W: Rect = { ...O };
+  if (lv) {
+    const rs = (lv.footprint || []).filter(r => r.x < O.x1 && r.x + r.w > O.x0 && r.z < O.z1 && r.z + r.d > O.z0);
+    if (rs.length) {
+      W.x0 = Math.max(O.x0, Math.min(...rs.map(r => r.x))); W.x1 = Math.min(O.x1, Math.max(...rs.map(r => r.x + r.w)));
+      W.z0 = Math.max(O.z0, Math.min(...rs.map(r => r.z))); W.z1 = Math.min(O.z1, Math.max(...rs.map(r => r.z + r.d)));
+    }
+  }
+  // A side abuts when a storey whose walls rise past this eave stands just beyond it (a wing roof against the
+  // upper floor, a lean-to against the house): no overhang there, and a roof that reaches into that storey
+  // stops at its wall. (S2: a volume of any storey with its own height `h` rises too — a tower over its wing.)
+  const rising = levels.filter(l => l !== lv && (l.y || 0) < y + 0.05 && (l.y || 0) + (l.knee !== undefined ? l.knee : (l.height || 2.8)) > y + 0.05).flatMap(l => l.footprint || [])
+    .concat(levels.flatMap(l => (l.footprint || []).filter(r => r.h !== undefined && (l.y || 0) < y + 0.05 && (l.y || 0) + r.h > y + 0.05)));
+  const abut: Record<Side, boolean> = { N: false, S: false, E: false, W: false };
+  for (const s of SIDES) {
+    const [nx, nz] = OUT[s], ax = along(s);
+    if (ends[s] === 'abut') { abut[s] = true; continue; }
+    const hits = [0.1, 0.3, 0.5, 0.7, 0.9].map(f => {
+      const x = ax === 0 ? W.x0 + (W.x1 - W.x0) * f : edgeOf(W, s) + nx * 0.05, z = ax === 0 ? edgeOf(W, s) + nz * 0.05 : W.z0 + (W.z1 - W.z0) * f;
+      return rising.find(r => inR(x, z, r));
+    });
+    if (!hits.some(Boolean)) continue;
+    abut[s] = true;
+    if (hits.every(Boolean)) {
+      if (s === 'E') W.x1 = Math.max(W.x0 + 1, Math.min(W.x1, ...hits.map(r => r.x)));
+      if (s === 'W') W.x0 = Math.min(W.x1 - 1, Math.max(W.x0, ...hits.map(r => r.x + r.w)));
+      if (s === 'S') W.z1 = Math.max(W.z0 + 1, Math.min(W.z1, ...hits.map(r => r.z)));
+      if (s === 'N') W.z0 = Math.min(W.z1 - 1, Math.max(W.z0, ...hits.map(r => r.z + r.d)));
+    }
+  }
+  // S2 clip: an eave that would run into a neighbouring flat roof's parapet stops at the wall instead
+  if (clip) for (const s of SIDES) {
+    if (abut[s] || type === 'flat') continue;
+    const [nx, nz] = OUT[s], ax = along(s), e = edgeOf(W, s);
+    const px = ax === 0 ? (W.x0 + W.x1) / 2 : e + nx * 0.25, pz = ax === 0 ? e + nz * 0.25 : (W.z0 + W.z1) / 2;
+    const probe = (x: number, z: number) => (spec.roofs || []).some(o => o !== rf && o.type === 'flat' && (o.parapet ?? 0.35) > 0 && o.over && Math.abs((o.y ?? 2.8) - y) < 1.2 && inR(x, z, o.over));
+    if ([0.25, 0.5, 0.75].some(f => probe(ax === 0 ? W.x0 + (W.x1 - W.x0) * f : px, ax === 0 ? pz : W.z0 + (W.z1 - W.z0) * f))) abut[s] = true;
+  }
+  const builtIn = (s: Side) => Math.max(0, s === 'N' ? W.z0 - O.z0 : s === 'S' ? O.z1 - W.z1 : s === 'E' ? O.x1 - W.x1 : W.x0 - O.x0);
+  const hip = type === 'hip' || type === 'terracotta';
+  const ridgeX = (rf.ridge || 'x') === 'x';
+  const high: Side = rf.high || 'N';
+  const low: Side = ({ N: 'S', S: 'N', E: 'W', W: 'E' } as Record<Side, Side>)[high];
+  const endSides: Side[] = ridgeX ? ['E', 'W'] : ['N', 'S'];
+  let faces: Side[] = type === 'flat' ? [] : hip ? ['S', 'N', 'E', 'W'] : type === 'shed' ? [low] : ridgeX ? ['S', 'N'] : ['E', 'W'];
+  // S2 ends: a gable roof hipped at one end, a hip roof with a gable (or open) end, a side that abuts
+  if (type === 'gable') faces = faces.concat(endSides.filter(s => ends[s] === 'hip'));
+  if (hip) faces = faces.filter(s => !['gable', 'open', 'abut'].includes(ends[s]));
+  // `over` is the footprint plus the overhang already (HOUSE-SPEC: "usually a footprint rect + overhang"), so a
+  // side reaches whichever is larger, never their sum — the sum hung 0.8–1 m eaves on every house. Only an
+  // `over` carried well past the walls (a roof run out over a porch or a carport) keeps its whole reach.
+  const reach = (s: Side) => { const b = builtIn(s); return b > oh + 0.15 ? b : Math.max(b, oh); };
+  const ov: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 };
+  for (const s of SIDES) ov[s] = abut[s] ? 0 : reach(s);
+  // rakes stay tight: a gable end reads as a crisp outline, not as a second eave
+  let rakes: Side[] = type === 'flat' || hip ? [] : type === 'shed' ? SIDES.filter(s => s !== low && s !== high) : ridgeX ? ['E', 'W'] : ['N', 'S'];
+  if (type === 'gable') rakes = rakes.filter(s => ends[s] !== 'hip');
+  if (hip) rakes = SIDES.filter(s => ends[s] === 'gable' || ends[s] === 'open');
+  for (const s of rakes) if (!abut[s] && builtIn(s) <= oh + 0.15) ov[s] = Math.min(ov[s], RAKE);
+  if (hip) {   // a hip's eaves run level all round only when every free side overhangs the same amount
+    const free = SIDES.filter(s => !abut[s] && !rakes.includes(s));
+    const u = free.length ? Math.min(...free.map(s => ov[s])) : 0;
+    for (const s of free) ov[s] = u;
+  }
+  const o: Rect = { x0: W.x0 - ov.W, x1: W.x1 + ov.E, z0: W.z0 - ov.N, z1: W.z1 + ov.S };
+  const pitchDeg = rf.pitch || (hip ? 28 : type === 'shed' ? 14 : 32);
+  const pitch = pitchDeg * DEG, t = Math.tan(pitch);
+  // S2 pitches: per-face (a saltbox's steep front and long shallow back); every face keeps `t` otherwise
+  const tS: Record<Side, number> = { N: t, S: t, E: t, W: t };
+  if (rf.pitches) for (const s of SIDES) if (typeof rf.pitches[s] === 'number') tS[s] = Math.tan(rf.pitches[s] * DEG);
+  // The drip edge hangs below the wall top by overhang × tan(pitch), but never more than DROP: past that a
+  // deep eave on a steep roof swallows the upper-floor windows. The rest is a raised heel — the plane crosses
+  // the wall line that far above the wall top, and a frieze in the wall's cladding closes the gap. (S2 sweep: a
+  // catslide face runs on down over its wing, no heel.)
+  const sweep = new Set<Side>(rf.sweep || []);
+  const drop: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 }, heel: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 };
+  for (const s of SIDES) { drop[s] = sweep.has(s) ? ov[s] * tS[s] : Math.min(ov[s] * tS[s], DROP); heel[s] = ov[s] * tS[s] - drop[s]; }
+  // height of a face's underside above the eave elevation: `heel` on its own wall line, rising inward
+  const plane = (s: Side, x: number, z: number) => (s === 'S' ? W.z1 - z : s === 'N' ? z - W.z0 : s === 'E' ? W.x1 - x : x - W.x0) * tS[s] + heel[s];
+  const under = (x: number, z: number) => (faces.length ? Math.min(...faces.map(s => plane(s, x, z))) : 0);
+  const T = type === 'flat' ? 0.22 : type === 'aframe-glass' ? 0.06 : 0.14 / Math.cos(pitch);   // vertical deck thickness
+  const topAt = (x: number, z: number) => y + (type === 'flat' ? 0.22 : under(Math.min(o.x1, Math.max(o.x0, x)), Math.min(o.z1, Math.max(o.z0, z))) + T);
+  // S2 clip: where a storey stands up through the roof's plan (not just against a side), the deck is cut round it
+  const holes: Rect[] = !clip ? [] : rising.map(r => ({ x0: Math.max(o.x0, r.x), x1: Math.min(o.x1, r.x + r.w), z0: Math.max(o.z0, r.z), z1: Math.min(o.z1, r.z + r.d) }))
+    .filter(h => h.x1 - h.x0 > 0.3 && h.z1 - h.z0 > 0.3);
+  return { rf, type, y, lv, W, o, ov, abut, pitch, t, tS, T, faces, plane, under, topAt, hip, ridgeX, high, low, heel, ends, rakes, holes, clip };
+}
+
+
 export function buildRoofs(spec, deps) {
   const { THREE, kit = null, palette = {} } = deps;
   const levels = spec.levels || [];
+  const d2 = specDefaults(spec) >= 2;
+  let _am = null; const am = () => _am || (_am = createArchMaterials(THREE, kit));   // S2 materials, only when a field asks
+  // S2 features a downspout must not run through (porches, bays, balconies): plan rects, [x0, z0, x1, z1]
+  const featureKeep = featureRects(spec);
   const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
   const UP = V3(0, 1, 0);
   const basis = (ex, ey, ez) => new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(ex, ey, ez));
@@ -94,9 +246,21 @@ export function buildRoofs(spec, deps) {
   const trim = hex(palette.trim || '#1e293b');
   // wall-coloured pieces of the roof (gable ends, dormers, parapets, clerestories) wear the house's cladding
   let claddingCopy = null;
-  const cladding = wallColor => {
+  const houseCladding = wallColor => {
     if (kit && typeof kit.cladding === 'function') return claddingCopy || (claddingCopy = own(kit.cladding()));
     return std(wallColor, { roughness: 0.85 });
+  };
+  // the footprint rect (any storey) with its own cladding whose walls this roof caps: under its wall rect, topping out at
+  // its eave (a volume's own `h`, or its storey's top)
+  const volumeUnder = m => {
+    const cx = (m.W.x0 + m.W.x1) / 2, cz = (m.W.z0 + m.W.z1) / 2;
+    for (const l of levels) for (const r of [...(l.footprint || [])].reverse()) {
+      if (r.material === undefined && r.color === undefined) continue;
+      if (!inR(cx, cz, r, 0.01)) continue;
+      const top = (l.y || 0) + (r.h !== undefined ? r.h : l.knee !== undefined ? l.knee : (l.height || 2.8));
+      if (Math.abs(top - m.y) < 0.06) return r;
+    }
+    return null;
   };
 
   // Chimney brick: a running bond on a seeded canvas (0.9 × 0.75 m tile: four 225 mm bricks, ten 75 mm
@@ -121,81 +285,30 @@ export function buildRoofs(spec, deps) {
     return (brickMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.92 }));
   };
 
+  const hexOr = (c, d) => (c === undefined || c === null ? d : hex(c));
+  // S2 planted roofs: a meadow or sedum surface from the kit's lawn set (a fresh material: the roof fade writes to it)
+  const plantedMaterial = kind => {
+    const set = am().setOf('lawn', kind === 'sedum' ? { color: 0x74784a, dry: 0x8a6e4e, deep: 0x5a6a3a } : { color: 0x587244, dry: 0x7c7f4e, deep: 0x3f5a33 });
+    return set ? am().pbr(set, { mode: 'auto', macro: 0.25 }) : std(kind === 'sedum' ? 0x74784a : 0x587244, { roughness: 0.95 });
+  };
+  // a chimney in the spec's colour: the running bond again, re-seeded for that colour
+  const bricks = new Map();
+  const colouredBrick = (base: number) => {
+    if (bricks.has(base)) return bricks.get(base);
+    if (typeof document === 'undefined') { const m0 = std(base, { roughness: 0.92 }); bricks.set(base, m0); return m0; }
+    const cv = document.createElement('canvas'); cv.width = 256; cv.height = 256; const g2 = cv.getContext('2d');
+    const r = mulberry32(fnv1a(`${spec.id || 'house'}:chimney-brick:${base}`));
+    const css = (v: number) => `#${v.toString(16).padStart(6, '0')}`;
+    g2.fillStyle = css(mix(base, 0xd6d3d1, 0.55)); g2.fillRect(0, 0, 256, 256);
+    for (let row = 0; row < 10; row++) for (let col = -1; col < 5; col++) { const j = (r() - 0.5) * 0.3; g2.fillStyle = css(mix(base, j > 0 ? 0xffffff : 0x000000, Math.abs(j))); g2.fillRect(col * 64 + (row % 2 ? 32 : 0) + 1.5, row * 25.6 + 1.5, 61, 22.6); }
+    const tex = new THREE.CanvasTexture(cv); tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.colorSpace = THREE.SRGBColorSpace; tex.repeat.set(1 / 0.9, 1 / 0.75); tex.anisotropy = 4;
+    const m0 = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.92 }); bricks.set(base, m0); return m0;
+  };
+
   // plan every roof first: a downspout lands on a lower roof, so each roof needs the others' surfaces
-  const models = (spec.roofs || []).map(planRoof);
+  const models = planRoofModels(spec);
   const spouts: P2[] = [];   // plan positions already taken (two roofs meeting at a corner share one pipe)
   return models.map(buildRoof);
-
-  function planRoof(rf) {
-    const type = rf.type || 'gable';
-    const y = rf.y ?? 2.8;
-    const over = rf.over;
-    const oh = rf.overhang ?? 0;
-    const O: Rect = { x0: over.x, x1: over.x + over.w, z0: over.z, z1: over.z + over.d };
-    // the wall rectangle: the storey this roof caps (its top is the eave elevation), clipped to `over`
-    const lv = levels.find(l => Math.abs((l.y || 0) + (l.height || 2.8) - y) < 0.05);
-    const W: Rect = { ...O };
-    if (lv) {
-      const rs = (lv.footprint || []).filter(r => r.x < O.x1 && r.x + r.w > O.x0 && r.z < O.z1 && r.z + r.d > O.z0);
-      if (rs.length) {
-        W.x0 = Math.max(O.x0, Math.min(...rs.map(r => r.x))); W.x1 = Math.min(O.x1, Math.max(...rs.map(r => r.x + r.w)));
-        W.z0 = Math.max(O.z0, Math.min(...rs.map(r => r.z))); W.z1 = Math.min(O.z1, Math.max(...rs.map(r => r.z + r.d)));
-      }
-    }
-    // A side abuts when a storey whose walls rise past this eave stands just beyond it (a wing roof against the
-    // upper floor, a lean-to against the house): no overhang there, and a roof that reaches into that storey
-    // stops at its wall.
-    const rising = levels.filter(l => l !== lv && (l.y || 0) < y + 0.05 && (l.y || 0) + (l.height || 2.8) > y + 0.05).flatMap(l => l.footprint || []);
-    const abut: Record<Side, boolean> = { N: false, S: false, E: false, W: false };
-    for (const s of SIDES) {
-      const [nx, nz] = OUT[s], ax = along(s);
-      const hits = [0.1, 0.3, 0.5, 0.7, 0.9].map(f => {
-        const x = ax === 0 ? W.x0 + (W.x1 - W.x0) * f : edgeOf(W, s) + nx * 0.05, z = ax === 0 ? edgeOf(W, s) + nz * 0.05 : W.z0 + (W.z1 - W.z0) * f;
-        return rising.find(r => inR(x, z, r));
-      });
-      if (!hits.some(Boolean)) continue;
-      abut[s] = true;
-      if (hits.every(Boolean)) {
-        if (s === 'E') W.x1 = Math.max(W.x0 + 1, Math.min(W.x1, ...hits.map(r => r.x)));
-        if (s === 'W') W.x0 = Math.min(W.x1 - 1, Math.max(W.x0, ...hits.map(r => r.x + r.w)));
-        if (s === 'S') W.z1 = Math.max(W.z0 + 1, Math.min(W.z1, ...hits.map(r => r.z)));
-        if (s === 'N') W.z0 = Math.min(W.z1 - 1, Math.max(W.z0, ...hits.map(r => r.z + r.d)));
-      }
-    }
-    const builtIn = (s: Side) => Math.max(0, s === 'N' ? W.z0 - O.z0 : s === 'S' ? O.z1 - W.z1 : s === 'E' ? O.x1 - W.x1 : W.x0 - O.x0);
-    const hip = type === 'hip' || type === 'terracotta';
-    const ridgeX = (rf.ridge || 'x') === 'x';
-    const high: Side = rf.high || 'N';
-    const low: Side = ({ N: 'S', S: 'N', E: 'W', W: 'E' } as Record<Side, Side>)[high];
-    const faces: Side[] = type === 'flat' ? [] : hip ? ['S', 'N', 'E', 'W'] : type === 'shed' ? [low] : ridgeX ? ['S', 'N'] : ['E', 'W'];
-    // `over` is the footprint plus the overhang already (HOUSE-SPEC: "usually a footprint rect + overhang"), so a
-    // side reaches whichever is larger, never their sum — the sum hung 0.8–1 m eaves on every house. Only an
-    // `over` carried well past the walls (a roof run out over a porch or a carport) keeps its whole reach.
-    const reach = (s: Side) => { const b = builtIn(s); return b > oh + 0.15 ? b : Math.max(b, oh); };
-    const ov: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 };
-    for (const s of SIDES) ov[s] = abut[s] ? 0 : reach(s);
-    // rakes stay tight: a gable end reads as a crisp outline, not as a second eave
-    const rakes: Side[] = type === 'flat' || hip ? [] : type === 'shed' ? SIDES.filter(s => s !== low && s !== high) : ridgeX ? ['E', 'W'] : ['N', 'S'];
-    for (const s of rakes) if (!abut[s] && builtIn(s) <= oh + 0.15) ov[s] = Math.min(ov[s], RAKE);
-    if (hip) {   // a hip's eaves run level all round only when every free side overhangs the same amount
-      const free = SIDES.filter(s => !abut[s]);
-      const u = free.length ? Math.min(...free.map(s => ov[s])) : 0;
-      for (const s of free) ov[s] = u;
-    }
-    const o: Rect = { x0: W.x0 - ov.W, x1: W.x1 + ov.E, z0: W.z0 - ov.N, z1: W.z1 + ov.S };
-    const pitch = (rf.pitch || (hip ? 28 : type === 'shed' ? 14 : 32)) * DEG, t = Math.tan(pitch);
-    // The drip edge hangs below the wall top by overhang × tan(pitch), but never more than DROP: past that a
-    // deep eave on a steep roof swallows the upper-floor windows. The rest is a raised heel — the plane crosses
-    // the wall line that far above the wall top, and a frieze in the wall's cladding closes the gap.
-    const drop: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 }, heel: Record<Side, number> = { N: 0, S: 0, E: 0, W: 0 };
-    for (const s of SIDES) { drop[s] = Math.min(ov[s] * t, DROP); heel[s] = ov[s] * t - drop[s]; }
-    // height of a face's underside above the eave elevation: `heel` on its own wall line, rising inward
-    const plane = (s: Side, x: number, z: number) => (s === 'S' ? W.z1 - z : s === 'N' ? z - W.z0 : s === 'E' ? W.x1 - x : x - W.x0) * t + heel[s];
-    const under = (x: number, z: number) => (faces.length ? Math.min(...faces.map(s => plane(s, x, z))) : 0);
-    const T = type === 'flat' ? 0.22 : type === 'aframe-glass' ? 0.06 : 0.14 / Math.cos(pitch);   // vertical deck thickness
-    const topAt = (x: number, z: number) => y + (type === 'flat' ? 0.22 : under(Math.min(o.x1, Math.max(o.x0, x)), Math.min(o.z1, Math.max(o.z0, z))) + T);
-    return { rf, type, y, lv, W, o, ov, abut, pitch, t, T, faces, plane, under, topAt, hip, ridgeX, high, low, heel };
-  }
 
   function buildRoof(m) {
     const { rf, type, W, o, ov, abut, t, T, faces, plane, under, heel } = m;
@@ -207,10 +320,17 @@ export function buildRoofs(spec, deps) {
     const add = (mesh, shadow = true) => { mesh.castShadow = shadow; mesh.receiveShadow = true; g.add(mesh); return mesh; };
 
     const isGlass = type === 'aframe-glass';
-    const color = hex(rf.color || (ROOF_DEFAULT as any)[type] || 0x3f2a1d);
-    const kitRoof = !isGlass && kit && typeof kit.roofMaterial === 'function' ? kit.roofMaterial(type, color) : null;
-    const roofMat = isGlass ? glass() : kitRoof ? own(kitRoof) : std(color, type === 'shed' ? { roughness: 0.6, metalness: 0.15 } : { roughness: 0.85 });
+    // S2 finish: the roofing independent of the form; `color` honoured, else (with a finish, or under defaults: 2)
+    // the palette's roof colour
+    const kindKey = rf.finish ? (FINISH_KIND[rf.finish] || type) : type;
+    const color = hex(rf.color || (rf.finish && FINISH_COLOR[rf.finish]) || ((rf.finish || d2) && palette.roof) || (ROOF_DEFAULT as any)[type] || 0x3f2a1d);
+    const kitRoof = !isGlass && kit && typeof kit.roofMaterial === 'function' ? kit.roofMaterial(kindKey, color) : null;
+    const roofMat = isGlass ? glass() : rf.planted ? plantedMaterial(rf.planted) : kitRoof ? own(kitRoof) : std(color, type === 'shed' ? { roughness: 0.6, metalness: 0.15 } : { roughness: 0.85 });
     const wallColor = hex((m.lv && m.lv.wallColor) || palette.wall || '#f8fafc');
+    // S2: a roof that caps a volume with its own cladding (footprint[i].material / .color) wears that volume's cladding
+    // on its gable ends, parapets, friezes and dormers — not the house's
+    const vol = volumeUnder(m);
+    const cladding = vol ? (() => { let c = null; return () => c || (c = am().own(am().cladding({ kind: vol.material || palette.material || 'stucco', color: vol.color || palette.wall || '#f1f5f9' }))); })() : houseCladding;
     // The eaves — fascia, rake boards, soffit, gutters, leaders — are painted trim, the white outline every
     // pitched roof in Pascal's frames wears. A light house with dark CHROMATIC trim (brown on stucco, navy on
     // clapboard) paints them its own wall colour lifted, as a boxed eave usually is; dark trim on a dark house,
@@ -219,13 +339,15 @@ export function buildRoofs(spec, deps) {
     const lum = (c: number) => (0.2126 * ((c >> 16) & 255) + 0.7152 * ((c >> 8) & 255) + 0.0722 * (c & 255)) / 255;
     const spread = (c: number) => { const ch = [(c >> 16) & 255, (c >> 8) & 255, c & 255]; return Math.max(...ch) - Math.min(...ch); };
     const paintEave = type !== 'flat' && lum(trim) < 0.5 && lum(wallColor) > 0.55 && spread(trim) > 14;
-    const edge = isGlass ? 0x0f172a : paintEave ? mix(wallColor, 0xffffff, 0.62) : trim;
+    const edge = rf.trim ? hex(rf.trim) : isGlass ? 0x0f172a : paintEave ? mix(wallColor, 0xffffff, 0.62) : trim;
     const fasciaMat = std(edge, { roughness: 0.6 });
-    const soffitMat = std(isGlass ? 0x0f172a : mix(edge, 0xffffff, 0.2), { roughness: 0.85 });
+    const soffitMat = std(rf.soffit ? hex(rf.soffit) : isGlass ? 0x0f172a : mix(edge, 0xffffff, 0.2), { roughness: 0.85 });
     const gutterMat = std(edge, { roughness: 0.45, metalness: 0.15 });
     // Ridge and hip caps are the roof's own material a shade darker (a cap course of the same shingle or tile),
     // not a painted line: a 30 % darker stripe outlined every hip like a cartoon.
     const clay = type === 'terracotta' || (kitRoof && kitRoof.userData && kitRoof.userData.roofKind === 'clay-tile');
+    // gutters: on by default; S2 `gutters: false`, and under defaults: 2 none on clay tile
+    const wantGutters = rf.gutters ?? !(d2 && clay);
     const capMat = isGlass ? std(0x0f172a, { roughness: 0.8 }) : (() => {
       const c = kitRoof ? own(kitRoof) : std(color, { roughness: 0.85 });
       c.color = c.color.clone().multiplyScalar(clay ? 0.9 : 0.8);
@@ -235,15 +357,24 @@ export function buildRoofs(spec, deps) {
     // cladding or the empty roof void seen through a tint
     const darkGlass = () => new THREE.MeshStandardMaterial({ color: 0x1d242b, roughness: 0.14, metalness: 0.5, envMapIntensity: 1.2 });
 
-    if (type === 'flat') { flat(); return { group: outer, x: cx, z: cz, y: m.y }; }
+    if (type === 'flat') {
+      flat();
+      // S2: a chimney on a flat roof (v1 never built one: only when the chimney says more than `at`, or defaults: 2)
+      if (rf.chimney && (d2 || Object.keys(rf.chimney).some(k => k !== 'at'))) chimney(rf.chimney);
+      if (rf.skylights) for (const sk of rf.skylights) skylight(sk);
+      if (rf.planted) plantedExtras();
+      return { group: outer, x: cx, z: cz, y: m.y };
+    }
 
     // ---- the deck: each face's region is the overhang rectangle cut down to where that face is the lowest
     const rect: P2[] = [[o.x0, o.z0], [o.x1, o.z0], [o.x1, o.z1], [o.x0, o.z1]];
-    const regions = faces.map(s => {
+    let regions = faces.map(s => {
       let poly = rect;
       for (const q of faces) if (q !== s) poly = clip(poly, p => plane(s, p[0], p[1]) - plane(q, p[0], p[1]));
       return { s, poly };
     }).filter(r => r.poly.length >= 3);
+    // S2 clip: a storey standing up through the roof's plan cuts the deck (convex pieces round each hole)
+    if (m.holes.length) regions = regions.flatMap(r => subtractRects(r.poly, m.holes).map(poly => ({ s: r.s, poly })));
     const top: number[] = [], topUV: number[] = [], bot: number[] = [], rim: number[] = [];
     const tri = (arr: number[], a, b, c, wantUp: boolean) => {   // wound so its normal points up (or down)
       const n = new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a));
@@ -258,11 +389,12 @@ export function buildRoofs(spec, deps) {
     const boundary = [];   // { s, a, b, face }: drip edges
     const shared = [];     // { a, b, f, q }: ridges and hips
     const sinP = Math.sin(m.pitch);
+    const sinOf = (s: Side) => (m.tS[s] === t ? sinP : Math.sin(Math.atan(m.tS[s])));
     for (const { s, poly } of regions) {
       const lift = (p: P2, dy = 0) => V3(p[0], plane(s, p[0], p[1]) + dy, p[1]);
       for (let i = 1; i < poly.length - 1; i++) {
         const tr = tri(top, lift(poly[0], T), lift(poly[i], T), lift(poly[i + 1], T), true);
-        for (const v of tr) topUV.push(along(s) === 0 ? v.x : v.z, (v.y - T - heel[s]) / sinP);   // metres: u along the eave, v up the slope from the wall line
+        for (const v of tr) topUV.push(along(s) === 0 ? v.x : v.z, (v.y - T - heel[s]) / sinOf(s));   // metres: u along the eave, v up the slope from the wall line
         if (!isGlass) tri(bot, lift(poly[0]), lift(poly[i]), lift(poly[i + 1]), false);
       }
       for (let i = 0; i < poly.length; i++) {
@@ -318,7 +450,7 @@ export function buildRoofs(spec, deps) {
     }
 
     // ---- ridge and hip caps
-    const faceNormal = (s: Side) => { const [nx, nz] = OUT[s]; return V3(nx * t, 1, nz * t).normalize(); };
+    const faceNormal = (s: Side) => { const [nx, nz] = OUT[s], ts = m.tS[s]; return V3(nx * ts, 1, nz * ts).normalize(); };
     for (const e of shared) {
       const pa = V3(e.a[0], plane(e.f, e.a[0], e.a[1]) + T, e.a[1]), pb = V3(e.b[0], plane(e.f, e.b[0], e.b[1]) + T, e.b[1]);
       const ex = new THREE.Vector3().subVectors(pb, pa); const len = ex.length(); if (len < 0.05) continue; ex.normalize();
@@ -353,7 +485,7 @@ export function buildRoofs(spec, deps) {
 
     // ---- gutters on every eave (a face's drip edge on its own side), downspouts from their ends
     const gutters = [];
-    if (!isGlass) for (const e of boundary) {
+    if (!isGlass && wantGutters) for (const e of boundary) {
       if (e.s !== e.face || abut[e.s]) continue;
       const h = plane(e.face, e.a[0], e.a[1]);
       if (Math.abs(h - plane(e.face, e.b[0], e.b[1])) > 1e-5) continue;
@@ -373,7 +505,7 @@ export function buildRoofs(spec, deps) {
 
     // ---- frieze: the wall carried up to the underside wherever a raised heel lifts the roof off the wall top
     for (const s of faces) {
-      const rise = heel[s] - WALL_HALF * t;   // the underside's height over the wall's outer face
+      const rise = heel[s] - WALL_HALF * m.tS[s];   // the underside's height over the wall's outer face
       if (abut[s] || rise < 0.02 || isGlass) continue;
       const ax = along(s), [nx, nz] = OUT[s], c = edgeOf(W, s) + (ax === 0 ? nz : nx) * (WALL_HALF - 0.01);
       const lo = ax === 0 ? W.x0 : W.z0, hi = ax === 0 ? W.x1 : W.z1, len = hi - lo + 2 * WALL_HALF;
@@ -383,25 +515,36 @@ export function buildRoofs(spec, deps) {
     }
 
     // ---- gable ends (a shed's ends and clerestory) in the wall's cladding, on the end wall line
-    const endMat = isGlass ? glass() : cladding(wallColor);
+    const endMat = isGlass ? glass() : rf.gableCladding ? am().own(am().cladding({ kind: rf.gableCladding.material || palette.material || 'stucco', color: rf.gableCladding.color || wallColor })) : cladding(wallColor);
+    const glassEnds = new Set<Side>(rf.gableGlass || []);
+    let prismMat = endMat;
     const prism = (pts: P2[], ex, origin, depth: number) => {   // pts in (along ex, up), extruded along ex × up, centred on origin
       const shape = new THREE.Shape(pts.map(([u, v]) => new THREE.Vector2(u, v)));
-      const p = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, steps: 1, curveSegments: 1 }), endMat);
+      const p = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, steps: 1, curveSegments: 1 }), prismMat);
       const ez = new THREE.Vector3().crossVectors(ex, UP);
       p.quaternion.copy(basis(ex, UP, ez));
       p.position.copy(origin).addScaledVector(ez, -depth / 2);
       return p;
     };
     const wallT = 2 * WALL_HALF;
-    if (type === 'gable' || isGlass) {
+    const gableEnded = type === 'gable' || isGlass || (m.hip && SIDES.some(s => m.ends[s] === 'gable'));
+    if (gableEnded) {
       for (const s of (m.ridgeX ? ['W', 'E'] : ['N', 'S']) as Side[]) {
         if (abut[s]) continue;
+        // S2 ends: a hipped or open end has no end wall; a hip roof builds only its gable ends
+        if (m.ends[s] === 'hip' || m.ends[s] === 'open' || (m.hip && m.ends[s] !== 'gable')) continue;
         const c = edgeOf(W, s);
         const [sLo, sHi]: Side[] = m.ridgeX ? ['N', 'S'] : ['W', 'E'];
         const lo = m.ridgeX ? W.z0 : W.x0, hi = m.ridgeX ? W.z1 : W.x1;
-        const ridge = (lo + hi) / 2 + (heel[sHi] - heel[sLo]) / (2 * t), R = (ridge - lo) * t + heel[sLo];
-        add(prism([[lo, 0], [hi, 0], [hi, heel[sHi]], [ridge, R], [lo, heel[sLo]]], m.ridgeX ? V3(0, 0, 1) : V3(1, 0, 0), m.ridgeX ? V3(c, 0, 0) : V3(0, 0, c), wallT)).name = 'Gable end';
-        if (!isGlass) atticLight(s, c, ridge, R);
+        const tLo = m.tS[sLo], tHi = m.tS[sHi];
+        const ridge = tLo === tHi ? (lo + hi) / 2 + (heel[sHi] - heel[sLo]) / (2 * t) : (hi * tHi + heel[sHi] - heel[sLo] + lo * tLo) / (tLo + tHi);
+        const R = (ridge - lo) * tLo + heel[sLo];
+        prismMat = glassEnds.has(s) ? glass() : endMat;
+        add(prism([[lo, 0], [hi, 0], [hi, heel[sHi]], [ridge, R], [lo, heel[sLo]]], m.ridgeX ? V3(0, 0, 1) : V3(1, 0, 0), m.ridgeX ? V3(c, 0, 0) : V3(0, 0, c), wallT)).name = glassEnds.has(s) ? 'Glazed gable end' : 'Gable end';
+        prismMat = endMat;
+        if (glassEnds.has(s)) glazingBars(s, c, lo, hi, ridge, R, sLo, sHi);
+        // the automatic attic window: S2 gableWindow false (and, under defaults: 2, unless asked for) leaves it out
+        else if (!isGlass && rf.gableWindow !== false && !(d2 && rf.gableWindow === undefined)) atticLight(s, c, ridge, R);
       }
     } else if (type === 'shed') {
       const lowLine = edgeOf(W, m.low), highLine = edgeOf(W, m.high), H = Math.abs(highLine - lowLine) * t + heel[m.low], h0 = heel[m.low];
@@ -413,6 +556,32 @@ export function buildRoofs(spec, deps) {
         if (s === m.high || s === m.low || abut[s] || H <= 0.05) continue;
         const c = edgeOf(W, s), ax = along(s);
         add(prism([[lowLine, 0], [highLine, 0], [highLine, H], [lowLine, h0]], ax === 0 ? V3(1, 0, 0) : V3(0, 0, 1), ax === 0 ? V3(0, 0, c) : V3(c, 0, 0), wallT)).name = 'Shed end';
+      }
+    }
+
+    // ---- S2 catslide: where a face sweeps on down over a lower wing, the wing's end walls are carried up to the roof
+    // (a triangle of the end's cladding between the wing's wall head and the swept face)
+    for (const sw of (rf.sweep || []) as Side[]) {
+      if (!faces.includes(sw) || isGlass) continue;
+      const axS = along(sw), lineW = edgeOf(W, sw), [snx, snz] = OUT[sw];
+      for (const end of (axS === 0 ? ['W', 'E'] : ['N', 'S']) as Side[]) {
+        if (abut[end]) continue;
+        const c = edgeOf(W, end), [enx, enz] = OUT[end];
+        // the lower storey under the swept strip, just inside this end's line
+        const probe = (u: number): [number, number] => (axS === 0 ? [c - enx * 0.05, u] : [u, c - enz * 0.05]);
+        const lows = levels.filter(l => (l.y || 0) + (l.height || 2.8) < m.y - 0.3);
+        let far = lineW, base = null;
+        for (let k = 1; k <= 60; k++) {
+          const u = lineW + (axS === 0 ? snz : snx) * k * 0.1, [px, pz] = probe(u);
+          const hit = lows.find(l => (l.footprint || []).some(r => inR(px, pz, r)));
+          if (!hit) break;
+          far = u; base = Math.max(base ?? -Infinity, (hit.y || 0) + (hit.height || 2.8) - m.y);
+        }
+        if (base === null || Math.abs(far - lineW) < 0.2) continue;
+        const hAt = (u: number) => (axS === 0 ? plane(sw, 0, u) : plane(sw, u, 0));
+        const lo = Math.min(lineW, far), hi = Math.max(lineW, far);
+        const pts: P2[] = [[lo, base], [hi, base], [hi, Math.max(base, hAt(hi))], [lo, Math.max(base, hAt(lo))]];
+        add(prism(pts, axS === 0 ? V3(0, 0, 1) : V3(1, 0, 0), axS === 0 ? V3(c, 0, 0) : V3(0, 0, c), wallT)).name = 'Catslide end';
       }
     }
 
@@ -433,6 +602,8 @@ export function buildRoofs(spec, deps) {
 
     if (!isGlass) for (const d of rf.dormers || []) dormer(d);
     if (rf.chimney) chimney(rf.chimney);
+    if (rf.skylights) for (const sk of rf.skylights) skylight(sk);
+    if (rf.planted) plantedExtras();
     return { group: outer, x: cx, z: cz, y: m.y };
 
     // -------------------------------------------------------------------------------------------------------
@@ -467,6 +638,7 @@ export function buildRoofs(spec, deps) {
         if (other === m || other.y >= m.y - 0.3 || !inRect(P[0], P[1], other.o, 0.05)) continue;
         const h = other.topAt(P[0], P[1]); if (h > land) { land = h; onRoof = true; }
       }
+      if (featureKeep.some(([x0, z0, x1, z1]) => P[0] > x0 - 0.25 && P[0] < x1 + 0.25 && P[1] > z0 - 0.25 && P[1] < z1 + 0.25)) return null;
       for (const st of spec.site || []) {
         if (!Array.isArray(st.at)) continue;
         const keep = KEEP_OUT[st.type], cover = GROUND_COVER[st.type];
@@ -555,7 +727,7 @@ export function buildRoofs(spec, deps) {
       const ceiling = (hw: number) => R - (hw + 0.09) * t - 0.3;
       const bottom = Math.max(0.45, R * 0.3);
       let ww = Math.min(0.8, Math.max(0.52, R * 0.26)), top = Math.min(bottom + Math.min(1.05, R * 0.36), ceiling(ww / 2) - 0.1);
-      if (top - bottom >= 0.6) {
+      if (top - bottom >= 0.6 && rf.gableWindow !== 'louvre') {
         const wh = top - bottom, yc = (top + bottom) / 2;
         const gl = new THREE.Mesh(new THREE.PlaneGeometry(ww, wh), darkGlass()); gl.position.set(0, yc, 0.004); gl.receiveShadow = true; grp.add(gl);
         for (const sd of [-1, 1]) part(0.08, wh + 0.02, 0.03, sd * (ww / 2 + 0.04), yc, 0.015, fasciaMat);
@@ -577,36 +749,59 @@ export function buildRoofs(spec, deps) {
       g.add(grp);
     }
 
-    // a dormer on the front slope (+z for a ridge along x, +x for a ridge along z), at `at` along the ridge
+    // a dormer on the front slope (+z for a ridge along x, +x for a ridge along z), at `at` along the ridge — or, S2,
+    // on the slope `side` names; styles gable (v1), shed, flat, glazed (a glass front), eyebrow (a low arched hood)
     function dormer(d) {
-      const face: Side = m.ridgeX ? 'S' : 'E';
+      const face: Side = d.side || (m.ridgeX ? 'S' : 'E');
       if (!faces.includes(face)) return;
+      const style = d.style || 'gable';
       const dw = d.w || 1.4;
-      const lo = m.ridgeX ? W.x0 : W.z0, hi = m.ridgeX ? W.x1 : W.z1;
+      const alongX = face === 'S' || face === 'N';
+      const lo = alongX ? W.x0 : W.z0, hi = alongX ? W.x1 : W.z1;
       const pos = Math.min(hi - dw / 2 - 0.3, Math.max(lo + dw / 2 + 0.3, d.at ?? (lo + hi) / 2));
-      const half = (m.ridgeX ? W.z1 - W.z0 : W.x1 - W.x0) / 2;
-      const front = half * 0.3, baseY = front * t + heel[face] + T, ridgeTop = m.ridgeX ? under(pos, (W.z0 + W.z1) / 2) + T : under((W.x0 + W.x1) / 2, pos) + T;
-      const pitchD = 40 * DEG, capRise = (dw / 2 + 0.12) * Math.tan(pitchD);
-      const dh = Math.min(1.25, ridgeTop - baseY - capRise - 0.12);
-      if (dh < 0.65) return;
-      const depth = Math.min(half - front + 0.2, dh / t + 0.1);
-      const dg = new THREE.Group(); dg.name = 'Dormer';
-      if (m.ridgeX) dg.position.set(pos, baseY, W.z1 - front); else { dg.position.set(W.x1 - front, baseY, pos); dg.rotation.y = Math.PI / 2; }
+      const half = (alongX ? W.z1 - W.z0 : W.x1 - W.x0) / 2, tf = m.tS[face];
+      // the ridge over the dormer: the highest the roof's underside gets across its slope (a saltbox's ridge is off centre)
+      let ridge = -Infinity;
+      for (let k = 0; k <= 8; k++) { const t = k / 8, h2 = alongX ? under(pos, W.z0 + (W.z1 - W.z0) * t) : under(W.x0 + (W.x1 - W.x0) * t, pos); if (h2 > ridge) ridge = h2; }
+      const front = half * 0.3, baseY = front * tf + heel[face] + T, ridgeTop = ridge + T;
+      const pitchD = (style === 'shed' ? 14 : style === 'flat' ? 2 : 40) * DEG, capRise = style === 'gable' || style === 'glazed' ? (dw / 2 + 0.12) * Math.tan(pitchD) : style === 'eyebrow' ? 0.18 : 0.12;
+      const dh = Math.min(style === 'eyebrow' ? 0.8 : 1.25, ridgeTop - baseY - capRise - 0.12);
+      if (dh < (style === 'eyebrow' ? 0.45 : 0.65)) return;
+      const depth = Math.min(half - front + 0.2, dh / tf + 0.1);
+      const dg = new THREE.Group(); dg.name = `Dormer${style !== 'gable' ? ` (${style})` : ''}`;
+      const e = edgeOf(W, face), n = OUT[face];
+      if (face === 'S' && !d.side) dg.position.set(pos, baseY, W.z1 - front);
+      else if (face === 'E' && !d.side) { dg.position.set(W.x1 - front, baseY, pos); dg.rotation.y = Math.PI / 2; }
+      else { dg.position.set(alongX ? pos : e - n[0] * front, baseY, alongX ? e - n[1] * front : pos); dg.rotation.y = { S: 0, N: Math.PI, E: Math.PI / 2, W: -Math.PI / 2 }[face]; }
       const cl = cladding(wallColor);
       const body = new THREE.Mesh(new THREE.BoxGeometry(dw, dh + 0.25, depth), cl); body.position.set(0, (dh - 0.25) / 2, -depth / 2); dg.add(body);
-      const tri2 = new THREE.Shape([new THREE.Vector2(-dw / 2, 0), new THREE.Vector2(dw / 2, 0), new THREE.Vector2(0, capRise - 0.03)]);
-      const gab = new THREE.Mesh(new THREE.ExtrudeGeometry(tri2, { depth, bevelEnabled: false }), cl); gab.position.set(0, dh, -depth); dg.add(gab);
-      const slope = (dw / 2 + 0.12) / Math.cos(pitchD);
-      for (const sgn of [-1, 1]) {   // hinged at the dormer's ridge, each slab running down to its own side
-        const sl = new THREE.Mesh(new THREE.BoxGeometry(slope, 0.07, depth + 0.18), roofMat);
-        sl.geometry.translate(sgn * slope / 2, 0.035, 0);
-        sl.position.set(0, dh + capRise - 0.03, -depth / 2 + 0.09);
-        sl.rotation.z = -sgn * pitchD;
-        dg.add(sl);
-        const fb = new THREE.Mesh(new THREE.BoxGeometry(slope, 0.06, 0.03), fasciaMat);   // rake board on the front
-        fb.geometry.translate(sgn * slope / 2, 0, 0); fb.position.set(0, dh + capRise - 0.05, 0.19); fb.rotation.z = sl.rotation.z; dg.add(fb);
+      if (style === 'gable' || style === 'glazed') {
+        const tri2 = new THREE.Shape([new THREE.Vector2(-dw / 2, 0), new THREE.Vector2(dw / 2, 0), new THREE.Vector2(0, capRise - 0.03)]);
+        const gab = new THREE.Mesh(new THREE.ExtrudeGeometry(tri2, { depth, bevelEnabled: false }), style === 'glazed' ? glass() : cl); gab.position.set(0, dh, -depth); dg.add(gab);
+        const slope = (dw / 2 + 0.12) / Math.cos(pitchD);
+        for (const sgn of [-1, 1]) {   // hinged at the dormer's ridge, each slab running down to its own side
+          const sl = new THREE.Mesh(new THREE.BoxGeometry(slope, 0.07, depth + 0.18), roofMat);
+          sl.geometry.translate(sgn * slope / 2, 0.035, 0);
+          sl.position.set(0, dh + capRise - 0.03, -depth / 2 + 0.09);
+          sl.rotation.z = -sgn * pitchD;
+          dg.add(sl);
+          const fb = new THREE.Mesh(new THREE.BoxGeometry(slope, 0.06, 0.03), fasciaMat);   // rake board on the front
+          fb.geometry.translate(sgn * slope / 2, 0, 0); fb.position.set(0, dh + capRise - 0.05, 0.19); fb.rotation.z = sl.rotation.z; dg.add(fb);
+        }
+      } else if (style === 'shed' || style === 'flat') {
+        // one slab from the main roof down to the dormer's front, a fascia on its front edge
+        const len = (depth + 0.25) / Math.cos(pitchD);
+        const sl = new THREE.Mesh(new THREE.BoxGeometry(dw + 0.24, 0.08, len), roofMat);
+        sl.position.set(0, dh + capRise / 2 + 0.02, -depth / 2 + 0.1); sl.rotation.x = -pitchD; dg.add(sl);
+        const fb = new THREE.Mesh(new THREE.BoxGeometry(dw + 0.26, 0.12, 0.03), fasciaMat); fb.position.set(0, dh + 0.02, 0.24); dg.add(fb);
+      } else {
+        // eyebrow: a low segmental hood over a wide low window
+        const r = (dw * dw / 4 + capRise * capRise) / (2 * capRise), th = 2 * Math.asin(dw / 2 / r);
+        const hood = new THREE.Mesh(new THREE.CylinderGeometry(r, r, depth + 0.2, 24, 1, true, -th / 2, th), roofMat);
+        hood.rotation.x = Math.PI / 2; hood.rotation.y = 0; hood.position.set(0, dh - (r - capRise), -depth / 2 + 0.1);
+        const hm = own(roofMat); hm.side = THREE.DoubleSide; hood.material = hm; dg.add(hood);
       }
-      const wwin = Math.max(0.5, dw - 0.55), hwin = Math.min(0.9, dh * 0.62), wy = dh * 0.45;
+      const wwin = style === 'glazed' ? dw - 0.16 : Math.max(0.5, dw - 0.55), hwin = style === 'glazed' ? dh * 0.9 : Math.min(0.9, dh * 0.62), wy = style === 'glazed' ? dh * 0.5 : dh * 0.45;
       const gl = new THREE.Mesh(new THREE.PlaneGeometry(wwin, hwin), darkGlass()); gl.position.set(0, wy, 0.005); gl.userData.windowGlow = true; dg.add(gl);
       const cas = (w2, h2, x, yy) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w2, h2, 0.03), fasciaMat); b.position.set(x, yy, 0.015); dg.add(b); };
       cas(0.07, hwin, -wwin / 2 - 0.035, wy); cas(0.07, hwin, wwin / 2 + 0.035, wy); cas(wwin + 0.14, 0.08, 0, wy + hwin / 2 + 0.04); cas(0.03, hwin, 0, wy);
@@ -616,27 +811,124 @@ export function buildRoofs(spec, deps) {
     }
 
     function chimney(c) {
-      const S = 0.7;
+      // v1: a 0.7 m brick stack with a crown and two pots. S2: w × d, `h` over the highest roof point it rises
+      // through, brick | stone | stucco | metal (a flue pipe), a colour, and a stone, pots or metal cap.
+      const S = c.w || 0.7, D = c.d || S;
       let x, z;
       if (Array.isArray(c.at)) { x = c.at[0]; z = c.at[1]; }
       else if (m.hip) { x = (W.x0 + W.x1) / 2 + (W.x1 - W.x0) * 0.2; z = (W.z0 + W.z1) / 2; }
       else { x = (W.x0 + W.x1) / 2; z = (W.z0 + W.z1) / 2; }
-      x = Math.min(o.x1 - S, Math.max(o.x0 + S, x)); z = Math.min(o.z1 - S, Math.max(o.z0 + S, z));
-      const corners = [[x - S / 2, z - S / 2], [x + S / 2, z - S / 2], [x - S / 2, z + S / 2], [x + S / 2, z + S / 2]].map(([u, v]) => under(u, v) + T);
-      const peak = under((W.x0 + W.x1) / 2, (W.z0 + W.z1) / 2) + T;
+      x = Math.min(o.x1 - S, Math.max(o.x0 + S, x)); z = Math.min(o.z1 - D, Math.max(o.z0 + D, z));
+      const corners = [[x - S / 2, z - D / 2], [x + S / 2, z - D / 2], [x - S / 2, z + D / 2], [x + S / 2, z + D / 2]].map(([u, v]) => type === 'flat' ? 0.22 : under(u, v) + T);
+      const peak = type === 'flat' ? 0.22 : under((W.x0 + W.x1) / 2, (W.z0 + W.z1) / 2) + T;
       const hiC = Math.max(...corners);
-      const topY = Math.max(hiC + 0.9, Math.min(peak + 0.45, hiC + 1.8));
+      const topY = c.h !== undefined ? hiC + c.h : type === 'flat' ? hiC + (rf.parapet ?? 0.35) + 0.9 : Math.max(hiC + 0.9, Math.min(peak + 0.45, hiC + 1.8));
       const base = Math.min(...corners) - 0.3;
-      const brick = brickMaterial();
-      const stackGeo = worldUV(new THREE.BoxGeometry(S, topY - base, S), x, (topY + base) / 2, z);
-      const stack = new THREE.Mesh(stackGeo, brick);
+      if (c.material === 'metal') {   // a stainless flue: a pipe, a storm collar and a cone cap
+        const steel = std(hexOr(c.color, 0x9aa1a8), { roughness: 0.35, metalness: 0.8 });
+        const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, topY - base, 16), steel); pipe.position.set(x, (topY + base) / 2, z); add(pipe).name = 'Chimney';
+        const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.08, 16), steel); collar.position.set(x, hiC + 0.05, z); add(collar);
+        const cone = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.14, 16), steel); cone.position.set(x, topY + 0.15, z); add(cone);
+        return;
+      }
+      const mat = c.material === 'stone' || c.material === 'stucco' ? am().own(am().cladding({ kind: c.material, color: c.color || (c.material === 'stone' ? '#a39d92' : palette.wall || '#e7e2d8') }))
+        : c.color ? colouredBrick(hexOr(c.color, 0x8a4a38)) : brickMaterial();
+      const stackGeo = worldUV(new THREE.BoxGeometry(S, topY - base, D), x, (topY + base) / 2, z);
+      const stack = new THREE.Mesh(stackGeo, mat);
       stack.position.set(x, (topY + base) / 2, z); add(stack).name = 'Chimney';
       // a corbelled band two courses under the crown, a stone crown, two clay flue pots
-      const band = new THREE.Mesh(worldUV(new THREE.BoxGeometry(S + 0.06, 0.15, S + 0.06), x, topY - 0.2, z), brick); band.position.set(x, topY - 0.2, z); add(band);
-      const crown = new THREE.Mesh(new THREE.BoxGeometry(S + 0.12, 0.08, S + 0.12), std(0x8d877f, { roughness: 0.9 })); crown.position.set(x, topY + 0.04, z); add(crown);
+      const band = new THREE.Mesh(worldUV(new THREE.BoxGeometry(S + 0.06, 0.15, D + 0.06), x, topY - 0.2, z), mat); band.position.set(x, topY - 0.2, z); add(band);
+      if (c.cap === 'metal') {
+        const cap = std(0x3a3d40, { roughness: 0.4, metalness: 0.7 });
+        for (const [dx, dz] of [[-S / 2 + 0.05, -D / 2 + 0.05], [S / 2 - 0.05, -D / 2 + 0.05], [-S / 2 + 0.05, D / 2 - 0.05], [S / 2 - 0.05, D / 2 - 0.05]]) { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.22, 0.03), cap); leg.position.set(x + dx, topY + 0.11, z + dz); add(leg, false); }
+        const lid = new THREE.Mesh(new THREE.BoxGeometry(S + 0.14, 0.04, D + 0.14), cap); lid.position.set(x, topY + 0.24, z); add(lid);
+        return;
+      }
+      const crown = new THREE.Mesh(new THREE.BoxGeometry(S + 0.12, 0.08, D + 0.12), std(0x8d877f, { roughness: 0.9 })); crown.position.set(x, topY + 0.04, z); add(crown);
+      if (c.cap === 'stone') return;
       const pot = std(0x7a4a3a, { roughness: 0.85 });
       for (const [dx, dz] of [[0.14, -0.12], [-0.13, 0.1]]) {
-        const f = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.095, 0.28, 10), pot); f.position.set(x + dx, topY + 0.22, z + dz); add(f, false);
+        const f = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.095, 0.28, 10), pot); f.position.set(x + (S === 0.7 ? dx : dx * S / 0.7), topY + 0.22, z + (D === 0.7 ? dz : dz * D / 0.7)); add(f, false);
+      }
+    }
+    // a skylight on the face under it (or on a flat roof's slab): a dark glass panel in a curb, lying on the slope
+    function skylight(sk) {
+      if (!Array.isArray(sk.at)) return;
+      const w = sk.w || 0.8, d = sk.d || 1.1, [x, z] = sk.at;
+      const face = faces.length ? faces.reduce((a, b2) => plane(a, x, z) <= plane(b2, x, z) ? a : b2) : null;
+      const n = face ? faceNormal(face) : V3(0, 1, 0);
+      const ex = face ? (along(face) === 0 ? V3(1, 0, 0) : V3(0, 0, 1)) : V3(1, 0, 0);
+      const ez = new THREE.Vector3().crossVectors(ex, n);
+      const sg = new THREE.Group(); sg.name = 'Skylight';
+      sg.quaternion.copy(basis(ex, n, ez));
+      sg.position.set(x, (face ? under(x, z) + T : 0.22) + 0.01, z);
+      const curb = std(hexOr(rf.trim, 0x2b2f33), { roughness: 0.5 });
+      for (const [bw, bd, bx, bz] of [[w + 0.1, 0.06, 0, -d / 2], [w + 0.1, 0.06, 0, d / 2], [0.06, d, -w / 2, 0], [0.06, d, w / 2, 0]]) { const b2 = new THREE.Mesh(new THREE.BoxGeometry(bw, 0.1, bd), curb); b2.position.set(bx, 0.05, bz); b2.castShadow = true; sg.add(b2); }
+      const gl = new THREE.Mesh(new THREE.BoxGeometry(w - 0.02, 0.02, d - 0.02), darkGlass()); gl.position.set(0, 0.09, 0); gl.userData.windowGlow = true; sg.add(gl);
+      g.add(sg);
+    }
+    // glazing bars over a glazed gable end: a mullion every ~1 m and a transom at the eave line
+    function glazingBars(s: Side, c: number, lo: number, hi: number, ridge: number, R: number, sLo: Side, sHi: Side) {
+      const [nx, nz] = OUT[s], ax = along(s), frame = std(hexOr(rf.trim, 0x23272b), { roughness: 0.5, metalness: 0.3 });
+      const span = hi - lo, n = Math.max(2, Math.round(span / 1.0));
+      const at = (u: number, v: number, off: number) => (ax === 0 ? V3(u, v, c + nz * off) : V3(c + nx * off, v, u));
+      for (let i = 0; i <= n; i++) {
+        const u = lo + span * i / n, top = u <= ridge ? (u - lo) * m.tS[sLo] + heel[sLo] : (hi - u) * m.tS[sHi] + heel[sHi];
+        if (top < 0.05) continue;
+        const b2 = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? 0.05 : 0.06, top, ax === 0 ? 0.06 : 0.05), frame);
+        b2.position.copy(at(u, top / 2, WALL_HALF + 0.01)); add(b2, false);
+      }
+      const tr = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? span : 0.06, 0.05, ax === 0 ? 0.06 : span), frame);
+      tr.position.copy(at((lo + hi) / 2, 0.025, WALL_HALF + 0.01)); add(tr, false);
+    }
+    // a planted roof's extras: seeded clumps and blooms on the deck, and trailing growth over the eaves. Instanced (a clump is a
+    // flattened low-poly blob in one of a few tones, a bloom a small sphere over it), so a whole roof is three draw calls.
+    function plantedExtras() {
+      const r = mulberry32(fnv1a(`${spec.id || 'house'}:planted:${(spec.roofs || []).indexOf(rf)}`));
+      const meadow = rf.planted === 'meadow';
+      const blob = new THREE.IcosahedronGeometry(1, 0);
+      const leafMat = () => new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, flatShading: true });
+      const tint = (mesh, i, c) => mesh.setColorAt(i, new THREE.Color(c));
+      const M = new THREE.Object3D();
+      // clumps over the deck
+      const tones = meadow ? [0x5b7a41, 0x6d8a4c, 0x7f9a55, 0x4d6a38] : [0x767b4b, 0x878c58, 0x6b7244, 0x948b58];
+      const n = Math.min(360, Math.round((o.x1 - o.x0) * (o.z1 - o.z0) * (meadow ? 4 : 3)));
+      const clumps = new THREE.InstancedMesh(blob, leafMat(), n), bloomSpots = [];
+      for (let i = 0; i < n; i++) {
+        const x = o.x0 + 0.2 + r() * (o.x1 - o.x0 - 0.4), z = o.z0 + 0.2 + r() * (o.z1 - o.z0 - 0.4);
+        const sz = (meadow ? 0.08 + r() * 0.12 : 0.07 + r() * 0.08), base = type === 'flat' ? 0.22 : under(x, z) + T, sy = sz * (meadow ? 0.8 : 0.42);
+        M.position.set(x, base + sy * 0.6, z); M.scale.set(sz * (1 + r() * 0.5), sy, sz * (1 + r() * 0.5)); M.rotation.set(0, r() * Math.PI, 0); M.updateMatrix();
+        clumps.setMatrixAt(i, M.matrix); tint(clumps, i, tones[Math.floor(r() * tones.length)]);
+        if (r() < (meadow ? 0.34 : 0.1)) bloomSpots.push([x, base + sy * 1.5, z]);
+      }
+      clumps.instanceMatrix.needsUpdate = true; if (clumps.instanceColor) clumps.instanceColor.needsUpdate = true;
+      add(clumps, false).name = 'Planting';
+      if (bloomSpots.length) {
+        const blooms = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), leafMat(), bloomSpots.length), cols = meadow ? [0xf2d45b, 0xffffff, 0xf3a6c0, 0xb59ae0] : [0xe0a1b5, 0xf0e2a0];
+        bloomSpots.forEach(([x, y, z], i) => { const bs = 0.03 + r() * 0.025; M.position.set(x, y, z); M.scale.set(bs, bs, bs); M.rotation.set(0, 0, 0); M.updateMatrix(); blooms.setMatrixAt(i, M.matrix); tint(blooms, i, cols[Math.floor(r() * cols.length)]); });
+        blooms.instanceMatrix.needsUpdate = true; if (blooms.instanceColor) blooms.instanceColor.needsUpdate = true;
+        add(blooms, false).name = 'Blooms';
+      }
+      // trailing growth: strands of leaf blobs hanging off the drip edges, uneven in length
+      const strands = [];
+      for (const s of SIDES) {
+        if (abut[s] || (type !== 'flat' && !faces.includes(s))) continue;
+        const [nx, nz] = OUT[s], ax = along(s), e0 = edgeOf(o, s), lo = ax === 0 ? o.x0 : o.z0, hi = ax === 0 ? o.x1 : o.z1;
+        const hEdge = type === 'flat' ? 0.1 : plane(s, ax === 0 ? (lo + hi) / 2 : e0, ax === 0 ? e0 : (lo + hi) / 2);
+        for (let k = 0; k < Math.round((hi - lo) / 0.2); k++) {
+          if (r() < 0.45) continue;
+          const u = lo + 0.12 + r() * (hi - lo - 0.24), len = 0.18 + r() * 0.6, count = Math.max(2, Math.round(len / 0.1));
+          for (let j = 0; j < count; j++) {
+            const t = j / (count - 1), sw = (r() - 0.5) * 0.05, bs = 0.07 - t * 0.035 + r() * 0.015;
+            strands.push([ax === 0 ? u + sw : e0 + nx * (0.07 + r() * 0.03), hEdge + 0.05 - t * len, ax === 0 ? e0 + nz * (0.07 + r() * 0.03) : u + sw, bs, t]);
+          }
+        }
+      }
+      if (strands.length) {
+        const vine = new THREE.InstancedMesh(blob, leafMat(), strands.length), vt = [0x4f6b3a, 0x5f7d43, 0x6d8a4c];
+        strands.forEach(([x, y, z, bs, t], i) => { M.position.set(x, y, z); M.scale.set(bs, bs * 1.2, bs); M.rotation.set(0, r() * Math.PI, 0); M.updateMatrix(); vine.setMatrixAt(i, M.matrix); tint(vine, i, vt[Math.floor(r() * vt.length)]); });
+        vine.instanceMatrix.needsUpdate = true; if (vine.instanceColor) vine.instanceColor.needsUpdate = true;
+        add(vine, false).name = 'Trailing growth';
       }
     }
     // metre UVs on a box by its face normals, so a tiling texture keeps its scale on any size of face
@@ -653,25 +945,46 @@ export function buildRoofs(spec, deps) {
     function flat() {
       const p = rf.parapet ?? 0.35, H = 0.22;
       const w = o.x1 - o.x0, d = o.z1 - o.z0;
-      const slabGeo = new THREE.BoxGeometry(w, H, d);
-      const uv = slabGeo.attributes.uv, pos = slabGeo.attributes.position;
-      for (let i = 8; i < 12; i++) uv.setXY(i, pos.getX(i) + cx, pos.getZ(i) + cz);   // the membrane (box face 2) in world metres
-      const slab = new THREE.Mesh(slabGeo, [fasciaMat, fasciaMat, roofMat, soffitMat, fasciaMat, fasciaMat]);
-      slab.position.set(cx, H / 2, cz); add(slab).name = 'Roof slab';
+      // S2 clip: where a storey stands up through the roof's plan, the slab is cut round it (as the pitched deck is) — else the
+      // slab runs 0.22 m through that storey's rooms. The pieces are rects of the overhang rectangle.
+      const pieces: Rect[] = m.holes.length
+        ? subtractRects([[o.x0, o.z0], [o.x1, o.z0], [o.x1, o.z1], [o.x0, o.z1]], m.holes).map(poly => ({ x0: Math.min(...poly.map(q => q[0])), x1: Math.max(...poly.map(q => q[0])), z0: Math.min(...poly.map(q => q[1])), z1: Math.max(...poly.map(q => q[1])) })).filter(r => r.x1 - r.x0 > 0.02 && r.z1 - r.z0 > 0.02)
+        : [o];
+      for (const r of pieces) {
+        const pcx = (r.x0 + r.x1) / 2, pcz = (r.z0 + r.z1) / 2;
+        const slabGeo = new THREE.BoxGeometry(r.x1 - r.x0, H, r.z1 - r.z0);
+        const uv = slabGeo.attributes.uv, pos = slabGeo.attributes.position;
+        for (let i = 8; i < 12; i++) uv.setXY(i, pos.getX(i) + pcx, pos.getZ(i) + pcz);   // the membrane (box face 2) in world metres
+        const slab = new THREE.Mesh(slabGeo, [fasciaMat, fasciaMat, roofMat, soffitMat, fasciaMat, fasciaMat]);
+        slab.position.set(pcx, H / 2, pcz); add(slab).name = 'Roof slab';
+      }
+      // a parapet run is cut where a rising storey's wall stands across it
+      const cutRuns = (s: Side, lo: number, hi: number, line: number): Array<[number, number]> => {
+        let runs: Array<[number, number]> = [[lo, hi]];
+        for (const h of m.holes) {
+          const ax = along(s);   // the run's own axis: 0 = x
+          const acrossLo = ax === 0 ? h.z0 : h.x0, acrossHi = ax === 0 ? h.z1 : h.x1, a0 = ax === 0 ? h.x0 : h.z0, a1 = ax === 0 ? h.x1 : h.z1;
+          if (line < acrossLo - 0.25 || line > acrossHi + 0.25) continue;
+          runs = runs.flatMap(([r0, r1]) => (a1 <= r0 || a0 >= r1) ? [[r0, r1]] as Array<[number, number]> : [...(a0 > r0 ? [[r0, a0]] : []), ...(a1 < r1 ? [[a1, r1]] : [])] as Array<[number, number]>);
+        }
+        return runs.filter(([r0, r1]) => r1 - r0 > 0.1);
+      };
       if (p <= 0) return;
       const pm = cladding(wallColor);
-      const coping = std(mix(wallColor, 0xffffff, 0.55), { roughness: 0.7 });
+      const coping = std(rf.trim ? hex(rf.trim) : mix(wallColor, 0xffffff, 0.55), { roughness: 0.7 });
       const hasN = !abut.N, hasS = !abut.S;
       for (const s of SIDES) {
         if (abut[s]) continue;
         const ax = along(s), [nx, nz] = OUT[s];
-        const len = ax === 0 ? w : d - (hasN ? 0.2 : 0) - (hasS ? 0.2 : 0);
-        const mid = ax === 0 ? cx : (o.z0 + (hasN ? 0.2 : 0) + o.z1 - (hasS ? 0.2 : 0)) / 2;
         const e = edgeOf(o, s) - (ax === 0 ? nz : nx) * 0.1;
-        const wall = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? len : 0.2, p, ax === 0 ? 0.2 : len), pm);
-        wall.position.set(ax === 0 ? mid : e, H + p / 2, ax === 0 ? e : mid); add(wall).name = 'Parapet';
-        const cp = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? len + 0.04 : 0.26, 0.035, ax === 0 ? 0.26 : len + 0.04), coping);
-        cp.position.set(ax === 0 ? mid : e + nx * 0.01, H + p + 0.0175, ax === 0 ? e + nz * 0.01 : mid); add(cp, false).name = 'Coping';
+        const lo = ax === 0 ? o.x0 : o.z0 + (hasN ? 0.2 : 0), hi = ax === 0 ? o.x1 : o.z1 - (hasS ? 0.2 : 0);
+        for (const [r0, r1] of cutRuns(s, lo, hi, edgeOf(o, s))) {
+          const len = r1 - r0, mid = (r0 + r1) / 2;
+          const wall = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? len : 0.2, p, ax === 0 ? 0.2 : len), pm);
+          wall.position.set(ax === 0 ? mid : e, H + p / 2, ax === 0 ? e : mid); add(wall).name = 'Parapet';
+          const cp = new THREE.Mesh(new THREE.BoxGeometry(ax === 0 ? len + 0.04 : 0.26, 0.035, ax === 0 ? 0.26 : len + 0.04), coping);
+          cp.position.set(ax === 0 ? mid : e + nx * 0.01, H + p + 0.0175, ax === 0 ? e + nz * 0.01 : mid); add(cp, false).name = 'Coping';
+        }
       }
     }
   }

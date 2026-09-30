@@ -16,7 +16,8 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `assets/**/*.js` (gitignored) | `pnpm run build` |
 | `content/houses/<id>.plan.json` | `pnpm run plans` |
 | `content/houses/index.json` | `pnpm run index` |
-| `content/house-catalog.json` | `pnpm run catalog` |
+| `content/house-catalog.json`, `assets/props/measured.ts` | `pnpm run catalog` |
+| `assets/site-species-masks.ts` (what each planting species hides of the mulch, and its triangle cost) | `node --experimental-strip-types scripts/measure-species.mts --write` — after a change to a species' geometry (`assets/site-species.ts`, the flower heads and grass tuft in `assets/site.ts`), then `pnpm run build`; `scripts/test-site-species.mts` fails until it is done |
 | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` | `pnpm run iso` |
 | `scenes/floorplans/` | `pnpm run floorplans` |
 | `test/goldens/<profile>/` | `pnpm run goldens:update` — only on purpose, see below |
@@ -73,14 +74,31 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   the Sims build's title and stays the credit). Fix a name there, not in `content/houses/`.
 - `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
 
-**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and assembles
-the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
+**The editor.** `room-creator.html` without `?mode=view` (README: The editor) is the review and render tool, on the CI canon:
+
+- The chrome uses the canon's tokens (`var(--…)`), never a literal hex below the two token blocks; Manrope and JetBrains Mono
+  only; the lucide sprite for icons (no emoji); toasts, never `alert()` / `confirm()` / `prompt()`. Never hand-edit the token blocks.
+- Nothing the chrome draws may reach a frame: the path, the plan inset, the safe frame and the reference photo are DOM or 2D
+  canvases over the WebGL canvas. A still and a film go through `__houseRenderBegin` / `__houseRenderFrames` / the composer
+  (`assets/ui/recorder.ts` hashes each frame's pixels before encoding; the file is checked by PSNR, frame count and duration).
+- A home's own parts are locked (`userData.generated`); what the person adds is theirs and is undoable.
+- `clearScene` ends the shot's dressing (`endShotCutaway`): a shot's dressing belongs to the home it dressed, and a second home
+  must be dressed by its own shot (the checks, Compare's posters and the player's Next home all go through `loadHouse`).
+- While a film or a still renders (`recording`, `headlessRender`) the page does not respond to keys or a resize: `syncViewportSize`
+  returns early and `openScene` refuses. A new control that opens a dialog or rebuilds the home must respect that.
+- Below 1100 px the sidebars are `<div role="complementary">` drawers, not `<aside>`: an open one becomes `role="dialog"`
+  (an `<aside>` may not). Closed, they are `visibility: hidden` (no tab stops, no ghost panel); the scrim is a sibling of
+  `<main>` because `<main>` goes inert while a drawer is open.
+- `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
+
+**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and the 15 quick
+Node tests (`pnpm run test:node`) and assembles the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
 passes those goes live on its own. The render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
 pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (150 / 150)
-pnpm run check:quick    # while iterating: assets + specs + shots
+pnpm run check:quick    # while iterating: assets + specs + shots + the 15 quick tests
 ```
 
 A clean run has 0 shot errors and 0 scene errors (warnings are reported but do not fail — compare their count

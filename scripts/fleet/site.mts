@@ -1,5 +1,7 @@
 // Fleet metrics — owned by S4 (site): "the planting is very rectangular and repetitive", in numbers. See _types.mts.
 import type { Metric, House } from './_types.mts';
+import { axisAlignedRuns, tensionOf, smoothLoop } from '../../assets/site-geom.js';
+import { mixNameOf, createSiteContext } from '../../assets/site-planting.js';
 
 // the ground storey's plan bounds (the house the front garden is in front of)
 function houseBounds(h: House) {
@@ -13,13 +15,20 @@ function inFront(h: House, x: number, z: number) {
   if (!b) return false;
   return side === 'S' ? z > b.maxZ : side === 'N' ? z < b.minZ : side === 'E' ? x > b.maxX : x < b.minX;
 }
-// the edges of a bed or a path, as segments
-function edges(s: any): Array<[number[], number[]]> {
-  const segs = (pts: number[][], closed: boolean) => pts.map((p, i) => [p, pts[(i + 1) % pts.length]] as [number[], number[]]).slice(0, closed ? pts.length : pts.length - 1);
-  if (s.type === 'bed' && Array.isArray(s.poly) && s.poly.length >= 3) return segs(s.poly, true);
-  if (s.type === 'bed' && Array.isArray(s.at)) { const w = s.w || 2, d = s.d || 1, [x, z] = s.at; return segs([[x - w / 2, z - d / 2], [x + w / 2, z - d / 2], [x + w / 2, z + d / 2], [x - w / 2, z + d / 2]], true); }
-  if (s.type === 'path' && Array.isArray(s.path) && s.path.length >= 2) return segs(s.path, false);
-  return [];
+// the edges of the beds and paths a house draws — as built when its plan carries them (fleet-audit --built: curves resolved,
+// plantings' beds laid out, a bed's straight edge against the house marked `wall` and left out), else as authored. A path
+// raised off the ground (a `y` over 0.3 m: a timber line on a facade) is a trim, not a garden path.
+type Edge = { site: number; type: string; pts: number[][]; closed: boolean; wall: boolean[] | null };
+function edgesOf(h: House): { list: Edge[]; built: boolean } {
+  const plan = h.plan && h.plan.site && !Array.isArray(h.plan.site) && Array.isArray(h.plan.site.edges) ? h.plan.site.edges : null;
+  if (plan) return { built: true, list: plan.map((e: any) => ({ site: e.site, type: e.type, pts: e.pts, closed: !!e.closed, wall: e.wall || null })) };
+  const list: Edge[] = [], ctx = createSiteContext(h.spec);
+  (h.spec.site || []).forEach((s: any, i: number) => {
+    if (s.type === 'bed' && Array.isArray(s.poly) && s.poly.length >= 3) { const t = tensionOf(s.smooth); list.push({ site: i, type: 'bed', pts: t === null ? s.poly : smoothLoop(s.poly, t, 0.25), closed: true, wall: null }); }
+    else if (s.type === 'bed' && Array.isArray(s.at)) { const w = s.w || 2, d = s.d || 1, [x, z] = s.at; list.push({ site: i, type: 'bed', pts: [[x - w / 2, z - d / 2], [x + w / 2, z - d / 2], [x + w / 2, z + d / 2], [x - w / 2, z + d / 2]], closed: true, wall: null }); }
+    else if (s.type === 'path' && Array.isArray(s.path) && s.path.length >= 2 && !(s.y > 0.3)) list.push({ site: i, type: 'path', pts: ctx.pathLine(s), closed: false, wall: null });
+  });
+  return { built: false, list };
 }
 
 export const metrics: Metric[] = [
@@ -53,33 +62,35 @@ export const metrics: Metric[] = [
     id: 'axis-aligned-edges', title: 'Axis-aligned bed and path edges', stream: 'S4', target: '≤ 20 % of their length',
     compute(f) {
       const rows = [];
-      let all = 0, axis = 0;
+      let all = 0, axis = 0, built = 0;
       for (const h of f.houses) {
-        let a = 0, t = 0;
-        for (const s of h.spec.site || []) for (const [p, q] of edges(s)) {
-          const dx = q[0] - p[0], dz = q[1] - p[1], len = Math.hypot(dx, dz);
-          if (len < 1e-6) continue;
-          const deg = Math.atan2(Math.abs(dz), Math.abs(dx)) * 180 / Math.PI;   // 0 along x, 90 along z
-          t += len; if (deg < 1 || deg > 89) a += len;
+        const { list, built: b } = edgesOf(h); if (b) built++;
+        let a = 0, t = 0; const worst: Array<[number, string]> = [];
+        for (const e of list) {
+          const r = axisAlignedRuns(e.pts as any, e.closed, e.wall, { chord: 1.5, tol: 3 });
+          a += r.axis; t += r.total;
+          if (r.axis >= 4) worst.push([r.axis, `site[${e.site}] ${e.type} ${r.axis.toFixed(0)} m`]);
         }
         all += t; axis += a;
-        if (t > 0) rows.push([h.id, t.toFixed(1), `${(a / t * 100).toFixed(0)} %`]);
+        if (t > 0) rows.push([h.id, t.toFixed(1), `${(a / t * 100).toFixed(0)} %`, worst.sort((x, y) => y[0] - x[0]).slice(0, 4).map(x => x[1]).join(', ')]);
       }
       const share = all ? axis / all : 0;
       return {
         value: `${(share * 100).toFixed(0)} % of ${all.toFixed(0)} m`, measure: +share.toFixed(4), pass: all ? share <= 0.2 : null,
-        detail: 'Bed outlines (a polygon, or the rectangle at w × d) and path centre lines on the 30 real lots, by length; an edge within 1° of the x or z axis counts as axis-aligned. Authored geometry only: once S4 resolves `planting`, `smooth` and walks at build time, this should measure the built edges (house.plan — export them from assets/plan-export/site.ts and run `fleet-audit --built`).',
-        table: { head: ['house', 'edge length (m)', 'axis-aligned'], rows: rows.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2])) },
+        detail: `Bed outlines and path centre lines on the real lots, by length. Judged as an eye judges it — over 1.5 m chords, not the 0.25 m samples a curve is resampled to: a chord within 3° of the x or z axis that is also straight (under 9 cm of sag) is axis-aligned, so a wobble of a centimetre between samples does not hide a straight edge. ${built ? `Measured as built on ${built} of ${f.houses.length} houses (their plan's site.edges: curves resolved, plantings laid out, a bed's edge against the house left out)` : 'As authored (run `fleet-audit --built` to measure the edges the builder resolves)'}. The last column names the straight items to bend: a \`meander\` (a sway in metres) or waypoints with \`smooth\`.`,
+        table: { head: ['house', 'edge length (m)', 'axis-aligned', 'the straightest items'], rows: rows.sort((a, b) => parseFloat(b[2]) - parseFloat(a[2])) },
       };
     },
   },
   {
     id: 'mix-context', title: 'Planting mix and lot context', stream: 'S4', target: 'no mix and no context on more than 25 % of houses',
     compute(f) {
+      // the mix a house is planted with is the one the generator plants: the one a planting names, else the one its lot's
+      // context and kind imply (mixNameOf) — a house with a foundation planting and no `mix` is planted, in some mix
       const mixes = new Map<string, number>(), ctx = new Map<string, number>();
       for (const h of f.houses) {
-        const ms = new Set((h.spec.site || []).filter(s => s.type === 'planting' && s.mix).map(s => (typeof s.mix === 'string' ? s.mix : 'custom')));
-        for (const m of ms.size ? ms : ['(none)']) mixes.set(m as string, (mixes.get(m as string) || 0) + 1);
+        const ms = new Set((h.spec.site || []).filter(s => s.type === 'planting').map(s => mixNameOf(s, h.spec.lot)));
+        for (const m of ms.size ? ms : ['(no planting)']) mixes.set(m as string, (mixes.get(m as string) || 0) + 1);
         const c = (h.spec.lot || {}).context || '(suburb: the default)';
         ctx.set(c, (ctx.get(c) || 0) + 1);
       }
@@ -87,9 +98,23 @@ export const metrics: Metric[] = [
       const tm = top(mixes), tc = top(ctx);
       return {
         value: `top mix ${tm[0]} ${tm[1]}/${f.houses.length}, top context ${tc[0]} ${tc[1]}/${f.houses.length}`,
-        pass: tm[0] === '(none)' ? null : tm[1] / n <= 0.25 && tc[1] / n <= 0.25,
-        detail: 'S4\'s `planting.mix` and `lot.context` — not authored yet on any house, so every lot is the same suburb.',
+        pass: tm[1] / n <= 0.25 && tc[1] / n <= 0.25,
+        detail: 'The mix each house is planted in (named by its `planting.mix`, else implied by its lot context — a desert lot is planted as a desert) and its `lot.context`. A house with several plantings counts once for each mix it uses; a house with none is "(no planting)", which is a mix that says nothing.',
         table: { head: ['mix / context', 'houses'], rows: [...[...mixes.entries()].map(([k, v]) => [`mix: ${k}`, v]), ...[...ctx.entries()].map(([k, v]) => [`context: ${k}`, v])] },
+      };
+    },
+  },
+  {
+    id: 'world-variety', title: 'A varied world round the lot', stream: 'S4', target: 'at least 75 % of houses',
+    compute(f) {
+      // the neighbours, the street and the tree line come from world.ts: the plain white-and-black suburb unless the spec
+      // opts into the varied one — `defaults: 2` (style- and palette-varied neighbours) or a `lot.context` that is not the suburb
+      const varied = f.houses.filter(h => (Number((h.spec || {}).defaults) || 0) >= 2 || (['city', 'forest', 'desert', 'waterfront', 'rural', 'hillside'].includes((h.spec.lot || {}).context)) || !!(h.spec.lot || {}).water);
+      const share = f.houses.length ? varied.length / f.houses.length : 0;
+      return {
+        value: `${varied.length}/${f.houses.length} (${(share * 100).toFixed(0)} %)`, measure: +share.toFixed(4), pass: f.houses.length ? share >= 0.75 : null,
+        detail: 'Houses whose world is not the default white-and-black suburb: `defaults: 2`, a `lot.context` other than the suburb, or `lot.water`. Neighbours are near-white with near-black roofs on every lot that opts into none of these (assets/world.ts).',
+        table: { head: ['house', 'context', 'defaults', 'water'], rows: f.houses.filter(h => !varied.includes(h)).map(h => [h.id, (h.spec.lot || {}).context || '(suburb)', Number((h.spec || {}).defaults) || 1, 'no']) },
       };
     },
   },

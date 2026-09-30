@@ -10,8 +10,13 @@ import { perimeterEdges, unionBounds, rectCentre, inRect } from './house-geometr
 import { createOrbitProbe, planOrbit, arcWaypoints, orbitPoint, sweepFrom } from './core-orbit.js';
 import { attachFrameAt, knotArcLengths, monotoneCubic } from './shot-path.js';
 import { DEG } from './build-context.js';
+import { digestWorld } from './shot-world.js';
+import { planDoorToCore, presetFromTrack, shotOptions } from './shot-planner.js';
+import { planHeroReveal, planWalkthrough } from './shot-planner-tour.js';
+import { navAnchor } from './shot-nav.js';
 
-export function createShotPlannerV1({ THREE }) {
+export function createShotPlannerV1(bctx) {
+  const { THREE } = bctx;
   // ---------------------------------------------------------------------------------------
   // Camera splines derived from anchors (SplinePresets format: eyePoints/targetPoints)
   // ---------------------------------------------------------------------------------------
@@ -157,7 +162,7 @@ export function createShotPlannerV1({ THREE }) {
     return corners.map(([i, j]) => [b.minX + i * CELL, b.minZ + j * CELL]);
   }
 
-  function shotsFor(spec, anchors) {
+  function shotsForV1(spec, anchors) {
     const b = anchors.bounds || { minX: -6, maxX: 6, minZ: -4, maxZ: 4 };
     const cx = (b.minX + b.maxX) / 2, cz = (b.minZ + b.maxZ) / 2;
     const span = Math.max(b.maxX - b.minX, b.maxZ - b.minZ);
@@ -532,7 +537,7 @@ export function createShotPlannerV1({ THREE }) {
       // 12 s, or what the spec pins (the timing below is in seconds, so it is laid out for the duration the shot
       // will actually play at — the spec's override is applied after shotsFor has built every shot). A long walk
       // (three storeys, 45 m of travel) is pinned at 14 s.
-      const pinnedDur = (spec.shots || []).filter(s => s && s.type === 'door-to-core' && s.duration).map(s => s.duration).pop();
+      const pinnedDur = (spec.shots || []).filter(s => s && s.type === 'door-to-core' && typeof s.duration === 'number' && s.duration > 0).map(s => s.duration).pop();   // 'auto' is planner v2's: a v1 shot (or a v2 shot that fell back) keeps the number
       const shot: Record<string, any> = { type: 'door-to-core', dressing: { walls: 'up', roof: 'auto' }, name: `${spec.emoji || '🏠'} ${spec.name}: Front Door → Companion Core`, duration: pinnedDur || 12, closed: false, eyePoints: eye, targetPoints: tgt, clearance: clearanceMoves };
       if (fin) {
         // push in to the orbit, then arc round the Core at a steady angular speed, ending on its front. The
@@ -728,7 +733,7 @@ export function createShotPlannerV1({ THREE }) {
     // thing anyone could ask was whether the preset KEY contained "door-to-core".
     for (const s of spec.shots || []) {
       const sh = shots[s.type]; if (!sh) continue;
-      sh.duration = s.duration || sh.duration;
+      if (typeof s.duration === 'number' && s.duration > 0) sh.duration = s.duration;   // never the string 'auto': a v2 shot that falls back to v1 keeps v1's own length
       if (s.walls) sh.dressing.walls = s.walls;
       if (s.roof) sh.dressing.roof = s.roof;
       if (s.enterT !== undefined) sh.enterT = s.enterT;
@@ -737,5 +742,42 @@ export function createShotPlannerV1({ THREE }) {
     return shots;
   }
 
-  return { shotsFor, clearPoint, blockedTest, routeOn };
+  // ---------------------------------------------------------------------------------------
+  // Planner v2 (assets/shot-planner.ts), behind a switch: a spec's shots[].planner ('v1' | 'v2') for that shot, else the
+  // page's global switch (room-creator.html's S5 slot: ?planner=v2 or window.__houseShotPlanner), else v1 — the
+  // default on this branch, so every golden stays v1's. The v1 shots are built either way (v1 is what a v2 shot falls
+  // back to, with the reason on the preset as v2Error, which the QA gate reports).
+  //
+  // anchors.shotWorld is the ShotWorld digest v2 plans on (assets/shot-world.ts), made on first read and kept (plan.json's
+  // `shots` key reads it: assets/plan-export/shots.ts).
+  const globalPlanner = () => (typeof bctx.extra.shotPlanner === 'function' ? bctx.extra.shotPlanner() : bctx.extra.shotPlanner) || null;
+  function worldOf(spec, anchors) {
+    if (!Object.prototype.hasOwnProperty.call(anchors, 'shotWorld')) {
+      let cache = null;
+      Object.defineProperty(anchors, 'shotWorld', { configurable: true, enumerable: false, get: () => (cache ||= digestWorld(THREE, spec, anchors, anchors.placed || [])) });
+    }
+    return anchors.shotWorld;
+  }
+  function shotsFor(spec, anchors) {
+    const shots = shotsForV1(spec, anchors);
+    worldOf(spec, anchors);   // (defined, not made: made on first read)
+    // anchors.nav: the grid the planner walks on and the route a shot flies (S6's plan inset), made on first read
+    if (!Object.prototype.hasOwnProperty.call(anchors, 'nav')) {
+      let cache = null;
+      Object.defineProperty(anchors, 'nav', { configurable: true, enumerable: false, get: () => (cache ||= navAnchor(anchors.shotWorld, type => { const p = shots[type]; return p && p.eyePoints ? p.eyePoints.map(v => [v.x, v.y, v.z]) : null; })) });
+    }
+    // door-to-core, then hero-reveal (lands on the finale's framing ring) and walkthrough (routed on nav v2): plan Completeness B
+    for (const [type, plan] of [['door-to-core', planDoorToCore], ['hero-reveal', planHeroReveal], ['walkthrough', planWalkthrough]] as Array<[string, (w: any, o: any) => any]>) {
+      const so = shotOptions(spec, type, globalPlanner()), v1 = shots[type];
+      if (so.planner !== 'v2' || !v1) continue;
+      const r = plan(anchors.shotWorld, so.options);
+      if (r.ok) {
+        const pre = presetFromTrack(THREE, r.track, { type, name: v1.name, world: anchors.shotWorld, dressing: { ...v1.dressing } });
+        for (const k of Object.keys(shots)) if (shots[k] === v1) shots[k] = pre;
+      } else v1.v2Error = { code: r.code, message: r.message };
+    }
+    return shots;
+  }
+
+  return { shotsFor, shotsForV1, clearPoint, blockedTest, routeOn };
 }

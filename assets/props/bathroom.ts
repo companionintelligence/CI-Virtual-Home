@@ -382,3 +382,119 @@ registerProps({
     ],
   },
 });
+
+// =================================================================================================================
+// Pass 4 (S3 compose): the freestanding tubs a spa bath is built round (clawfoot for the traditional styles, a
+// modern soaking tub), a pedestal sink for small traditional baths and powder rooms, and a double vanity.
+// =================================================================================================================
+// an open freestanding tub: an elliptical wall (outside `outer`, inside enamel), a floor inside it, water at `water`,
+// and a rolled rim (a tube round the ellipse) — the pieces a solid oval would hide
+function openTub({ THREE, std }, { rx, rz, y0, y1, taper, outer, inner, water, rim = 0.03 }) {
+  const g = new THREE.Group(), h = y1 - y0;
+  const wall = (mat, s, side) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(1, taper, h, 40, 1, true), side === THREE.BackSide ? std(mat.color.getHex(), { roughness: mat.roughness, side }) : mat); m.scale.set(rx * s, 1, rz * s); m.position.y = y0 + h / 2; m.castShadow = true; m.receiveShadow = true; return m; };
+  g.add(wall(outer, 1, THREE.FrontSide));
+  g.add(wall(inner, 0.94, THREE.BackSide));
+  const floor = oval(THREE, rx * 0.94 * taper, rz * 0.94 * taper, 0.02, inner, 0, y0 + 0.08, 0, 1, 32); g.add(floor);
+  g.add(oval(THREE, rx * 0.9, rz * 0.9, 0.01, std(0xcfe0e6, { roughness: 0.06, metalness: 0.1, transparent: true, opacity: 0.7 }), 0, water, 0, 1, 36));
+  const pts = []; for (let i = 0; i < 64; i++) { const a = i / 64 * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(a) * rx * 0.97, y1, Math.sin(a) * rz * 0.97)); }
+  const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 64, rim, 8, true), inner); tube.castShadow = true; g.add(tube);
+  return g;
+}
+
+registerProps({
+  // Clawfoot tub — a rolled-rim tub on four ball-and-claw feet, a standpipe tap at the +x end. Long axis along x;
+  // color paints the outside of the shell (the inside stays enamel white).
+  'clawfoot-tub': {
+    footprint: [1.7, 0.78], height: 0.92, params: ['w', 'color'], tags: ['bathroom'],
+    create(it, ctx) {
+      const { THREE, std, group, colors, hex } = ctx;
+      const w = it.w || 1.7, g = group('Clawfoot Tub'), rx = w / 2 - 0.03, rz = 0.36;
+      const metal = chrome(std, colors.metal);
+      g.add(openTub(ctx, { rx, rz, y0: 0.17, y1: 0.68, taper: 0.82, outer: std(it.color ? hex(it.color) : colors.linen, { roughness: 0.3 }), inner: ceramic(std, colors.linen), water: 0.56 }));
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { const f = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), metal); f.position.set(sx * (rx - 0.22), 0.05, sz * (rz - 0.1)); f.castShadow = true; g.add(f); g.add(cyl(THREE, 0.025, 0.035, 0.14, metal, sx * (rx - 0.22), 0.14, sz * (rz - 0.1), 10)); }
+      g.add(cyl(THREE, 0.014, 0.014, 0.24, metal, rx - 0.05, 0.8, 0, 10));
+      g.add(bar(THREE, 0.012, 0.14, metal, rx - 0.11, 0.91, 0, 'x'));
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.85, 0.1, -0.39, 0.85, 0.71, 0.39], color: 'role:linen' }],
+  },
+  // Soaking tub — a modern freestanding oval tub, thick-walled, a floor-standing filler at its +x front corner
+  // (modern, scandi, spa baths). Long axis along x.
+  'soaking-tub': {
+    footprint: [1.65, 0.8], height: 0.95, params: ['w', 'color'], tags: ['bathroom'],
+    create(it, ctx) {
+      const { THREE, std, group, colors, hex } = ctx;
+      const w = it.w || 1.6, g = group('Soaking Tub'), rx = w / 2, rz = 0.4;
+      const shell = ceramic(std, it.color ? hex(it.color) : colors.linen), metal = chrome(std, colors.metal);
+      g.add(openTub(ctx, { rx, rz, y0: 0, y1: 0.58, taper: 0.9, outer: shell, inner: ceramic(std, colors.linen), water: 0.46, rim: 0.035 }));
+      g.add(cyl(THREE, 0.02, 0.02, 0.95, metal, rx - 0.02, 0.475, rz - 0.04, 10));
+      g.add(bar(THREE, 0.012, 0.16, metal, rx - 0.08, 0.94, rz - 0.04, 'x'));
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.8, 0, -0.4, 0.8, 0.58, 0.4], color: 'role:linen' }],
+  },
+  // Pedestal sink — a basin on a flared column, the tap behind, a mirror above (cottage, farmhouse, powder rooms).
+  'pedestal-sink': {
+    footprint: [0.56, 0.46], height: 1.8, params: ['color'], tags: ['bathroom'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const g = group('Pedestal Sink'), por = ceramic(std, it.color ? hex(it.color) : colors.linen), metal = chrome(std, colors.metal), bz = -0.23;
+      const profile = [[0.0, 0.0], [0.13, 0.0], [0.1, 0.06], [0.075, 0.3], [0.08, 0.62], [0.12, 0.72], [0.0, 0.72]].map(([x, y]) => new THREE.Vector2(x, y));
+      const col = new THREE.Mesh(new THREE.LatheGeometry(profile, 20), por); col.position.z = -0.05; col.castShadow = true; g.add(col);
+      g.add(box(0.56, 0.12, 0.44, por, 0, 0.8, 0));                                                  // basin block
+      g.add(oval(THREE, 0.2, 0.14, 0.012, std(mix(colors.linen, 0x334155, 0.2), { roughness: 0.3 }), 0, 0.862, 0.03));
+      g.add(cyl(THREE, 0.012, 0.012, 0.14, metal, 0, 0.93, bz + 0.07, 10));
+      g.add(bar(THREE, 0.009, 0.12, metal, 0, 0.99, bz + 0.13, 'z'));
+      g.add(disc(THREE, 0.24, 0.02, std(colors.metal, { metalness: 0.7, roughness: 0.35 }), 0, 1.5, bz + 0.01, 32));   // round mirror
+      g.add(disc(THREE, 0.22, 0.012, mirrorMat(std), 0, 1.5, bz + 0.022, 32));
+      return g;
+    },
+    iso: [{ shape: 'cyl', box: [-0.13, 0, -0.18, 0.13, 0.74, 0.08], color: 'role:linen' }, { shape: 'box', box: [-0.28, 0.74, -0.22, 0.28, 0.86, 0.22], color: 'role:linen' }, { shape: 'blob', box: [-0.24, 1.26, -0.23, 0.24, 1.74, -0.21], color: '#dbe4ee' }],
+  },
+  // Double vanity — a wide cabinet with two basins, two taps and one long mirror (primary ensuites). w, color.
+  'double-vanity': {
+    footprint: [1.5, 0.52], height: 1.9, params: ['w', 'color'], tags: ['bathroom'],
+    create(it, { THREE, std, box, group, colors, hex, mix }) {
+      const w = it.w || 1.5, d = 0.52, g = group('Double Vanity');
+      const cab = it.color ? hex(it.color) : colors.cabinet, cabMat = std(cab, { roughness: 0.55 }), front = std(mix(cab, 0xffffff, 0.08), { roughness: 0.5 });
+      const stone = std(colors.linen, { roughness: 0.25 }), metal = chrome(std, colors.metal), bz = -d / 2;
+      g.add(box(w - 0.08, 0.1, d - 0.1, std(mix(cab, 0x000000, 0.35), { roughness: 0.6 }), 0, 0.05, -0.03));
+      g.add(box(w, 0.75, d - 0.03, cabMat, 0, 0.475, -0.015));
+      for (const s of [-1, 1]) for (const y of [0.295, 0.665]) {
+        g.add(box(w / 2 - 0.03, 0.35, 0.02, front, s * w / 4, y, d / 2 - 0.02));
+        g.add(box(0.2, 0.012, 0.014, metal, s * w / 4, y + 0.11, d / 2 - 0.004));
+      }
+      g.add(box(w, 0.04, d, stone, 0, 0.87, 0));
+      for (const s of [-1, 1]) {
+        const x = s * w / 4;
+        g.add(oval(THREE, 0.2, 0.15, 0.11, ceramic(std, colors.linen), x, 0.945, 0.02, 0.85, 28));
+        g.add(cyl(THREE, 0.012, 0.012, 0.3, metal, x, 1.04, bz + 0.08, 12));
+        g.add(bar(THREE, 0.01, 0.2, metal, x, 1.19, bz + 0.18, 'z'));
+      }
+      g.add(box(w * 0.9 + 0.04, 0.74, 0.015, cabMat, 0, 1.53, bz + 0.0075));
+      g.add(box(w * 0.9, 0.7, 0.012, mirrorMat(std), 0, 1.53, bz + 0.021));
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.75, 0.1, -0.26, 0.75, 0.85, 0.245], color: 'role:cabinet' }, { shape: 'box', box: [-0.75, 0.85, -0.26, 0.75, 0.89, 0.26], color: 'role:linen' }, { shape: 'box', box: [-0.7, 1.16, -0.26, 0.7, 1.9, -0.24], color: '#dbe4ee' }],
+  },
+
+  // Towel ladder — a floor-standing ladder rack leaning on the wall, a towel over one rung and another over a lower one
+  // (the towel rail's alternative: farmhouse, cottage, tropical, scandi). Its back is at z = −d/2 at the top.
+  'towel-ladder': {
+    footprint: [0.55, 0.32], height: 1.6, params: ['color'], tags: ['bathroom'],
+    create(it, { THREE, std, box, group, colors, hex, rng }) {
+      const w = 0.5, g = group('Towel Ladder'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.55 });
+      const V = (x, y, z) => new THREE.Vector3(x, y, z), top = V(0, 1.6, -0.15), foot = V(0, 0.02, 0.15), d = top.clone().sub(foot), L = d.length();
+      const lean = Math.atan2(0.3, 1.58);
+      for (const s of [-1, 1]) {
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, L, 10), wood);
+        m.position.set(s * w / 2, 0.81, 0); m.rotation.x = lean; m.castShadow = true; g.add(m);
+      }
+      const rung = (t, mat = wood) => { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, w, 10), mat); r.rotation.z = Math.PI / 2; r.position.set(0, 0.02 + 1.58 * t, 0.15 - 0.3 * t); r.castShadow = true; g.add(r); };
+      for (const t of [0.12, 0.3, 0.48, 0.66, 0.84, 0.97]) rung(t);
+      const towel = std(towelColor(colors, rng), { roughness: 0.95 });
+      for (const [t, len] of [[0.66, 0.55], [0.3, 0.45]]) { const y = 0.02 + 1.58 * t, z = 0.15 - 0.3 * t; g.add(box(w * 0.8, len, 0.02, towel, 0, y - len / 2 + 0.03, z + 0.03)); g.add(box(w * 0.8, len * 0.85, 0.02, towel, 0, y - len * 0.85 / 2 + 0.03, z - 0.03)); g.add(box(w * 0.8, 0.02, 0.09, towel, 0, y + 0.03, z)); }
+      return g;
+    },
+    iso: [{ shape: 'box', box: [-0.25, 0, -0.15, 0.25, 1.6, 0.15], color: 'role:wood' }],
+  },
+});

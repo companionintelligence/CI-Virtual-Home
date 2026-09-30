@@ -1,0 +1,640 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "s3-compose-styles",
+  "name": "S3 Styles Fixture",
+  "author": "ci-virtual-home",
+  "source": "test fixture (plan S3): one living room furnished in each of the nine house styles, and one style three ways (seeds)",
+  "style": "Single-storey row of living rooms, one in each furniture style",
+  "emoji": "🧪",
+  "fixture": {
+    "note": "one living room furnished in each of the nine house styles, and one style three ways (seeds)"
+  },
+  "lot": {
+    "w": 41.4,
+    "d": 24,
+    "ground": "lawn"
+  },
+  "palette": {
+    "wall": "#eeebe4",
+    "trim": "#2c2f33",
+    "roof": "#3a3d42",
+    "accent": "#6d8a74",
+    "material": "siding"
+  },
+  "lighting": "day",
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Ground Floor",
+      "y": 0,
+      "height": 2.8,
+      "floor": "oak",
+      "footprint": [
+        {
+          "x": -14.7,
+          "z": -6,
+          "w": 29.4,
+          "d": 12
+        }
+      ],
+      "openings": [
+        {
+          "side": "N",
+          "at": -12.5,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": -7.8,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": -2.8,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 2.2,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 7.2,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 12.2,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": -12.2,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": -7.2,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": -2.2,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 2.8,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 10.0,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "W",
+          "at": 0,
+          "type": "door",
+          "w": 1.0,
+          "h": 2.1,
+          "style": "entry"
+        },
+        {
+          "side": "W",
+          "at": -3.5,
+          "type": "window",
+          "w": 1.0,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "E",
+          "at": -3.0,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "E",
+          "at": 3.0,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.3,
+          "sill": 0.9
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -14.7,
+            -1
+          ],
+          "to": [
+            -10.3,
+            -1
+          ],
+          "door": 2.2,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -10.3,
+            -1
+          ],
+          "to": [
+            -5.3,
+            -1
+          ],
+          "door": 2.5,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -10.3,
+            -6
+          ],
+          "to": [
+            -10.3,
+            -1
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            -5.3,
+            -1
+          ],
+          "to": [
+            -0.3,
+            -1
+          ],
+          "door": 2.5,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -5.3,
+            -6
+          ],
+          "to": [
+            -5.3,
+            -1
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            -0.3,
+            -1
+          ],
+          "to": [
+            4.7,
+            -1
+          ],
+          "door": 2.5,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -0.3,
+            -6
+          ],
+          "to": [
+            -0.3,
+            -1
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            4.7,
+            -1
+          ],
+          "to": [
+            9.7,
+            -1
+          ],
+          "door": 2.5,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            4.7,
+            -6
+          ],
+          "to": [
+            4.7,
+            -1
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            9.7,
+            -1
+          ],
+          "to": [
+            14.7,
+            -1
+          ],
+          "door": 2.5,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            9.7,
+            -6
+          ],
+          "to": [
+            9.7,
+            -1
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            -14.7,
+            1
+          ],
+          "to": [
+            -9.7,
+            1
+          ],
+          "door": 2.5,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -9.7,
+            1
+          ],
+          "to": [
+            -4.7,
+            1
+          ],
+          "door": 2.5,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -9.7,
+            1
+          ],
+          "to": [
+            -9.7,
+            6
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            -4.7,
+            1
+          ],
+          "to": [
+            0.3,
+            1
+          ],
+          "door": 2.5,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            -4.7,
+            1
+          ],
+          "to": [
+            -4.7,
+            6
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            0.3,
+            1
+          ],
+          "to": [
+            5.3,
+            1
+          ],
+          "door": 2.5,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            0.3,
+            1
+          ],
+          "to": [
+            0.3,
+            6
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            5.3,
+            1
+          ],
+          "to": [
+            14.7,
+            1
+          ],
+          "door": 4.7,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            5.3,
+            1
+          ],
+          "to": [
+            5.3,
+            6
+          ],
+          "door": null
+        }
+      ],
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Study",
+          "bounds": {
+            "x": -14.7,
+            "z": -6,
+            "w": 4.4,
+            "d": 5
+          },
+          "program": "study",
+          "items": []
+        },
+        {
+          "no": "02",
+          "name": "Modern",
+          "bounds": {
+            "x": -10.3,
+            "z": -6,
+            "w": 5.0,
+            "d": 5
+          },
+          "program": "living",
+          "style": "modern",
+          "density": 0.6,
+          "items": []
+        },
+        {
+          "no": "03",
+          "name": "Farmhouse",
+          "bounds": {
+            "x": -5.3,
+            "z": -6,
+            "w": 5.0,
+            "d": 5
+          },
+          "program": "living",
+          "style": "farmhouse",
+          "density": 0.6,
+          "items": []
+        },
+        {
+          "no": "04",
+          "name": "Cottage",
+          "bounds": {
+            "x": -0.3,
+            "z": -6,
+            "w": 5.0,
+            "d": 5
+          },
+          "program": "living",
+          "style": "cottage",
+          "density": 0.6,
+          "items": []
+        },
+        {
+          "no": "05",
+          "name": "Mediterranean",
+          "bounds": {
+            "x": 4.7,
+            "z": -6,
+            "w": 5.0,
+            "d": 5
+          },
+          "program": "living",
+          "style": "mediterranean",
+          "density": 0.6,
+          "items": []
+        },
+        {
+          "no": "06",
+          "name": "Mid-century",
+          "bounds": {
+            "x": 9.7,
+            "z": -6,
+            "w": 5.0,
+            "d": 5
+          },
+          "program": "living",
+          "style": "mid-century",
+          "density": 0.6,
+          "items": []
+        },
+        {
+          "no": "07",
+          "name": "Industrial",
+          "bounds": {
+            "x": -14.7,
+            "z": 1,
+            "w": 5.0,
+            "d": 5
+          },
+          "program": "living",
+          "style": "industrial",
+          "density": 0.6,
+          "items": []
+        },
+        {
+          "no": "08",
+          "name": "Scandi",
+          "bounds": {
+            "x": -9.7,
+            "z": 1,
+            "w": 5.0,
+            "d": 5
+          },
+          "program": "living",
+          "style": "scandi",
+          "density": 0.6,
+          "items": []
+        },
+        {
+          "no": "09",
+          "name": "Tropical",
+          "bounds": {
+            "x": -4.7,
+            "z": 1,
+            "w": 5.0,
+            "d": 5
+          },
+          "program": "living",
+          "style": "tropical",
+          "density": 0.6,
+          "items": []
+        },
+        {
+          "no": "10",
+          "name": "Craftsman",
+          "bounds": {
+            "x": 0.3,
+            "z": 1,
+            "w": 5.0,
+            "d": 5
+          },
+          "program": "living",
+          "style": "craftsman",
+          "density": 0.6,
+          "items": []
+        },
+        {
+          "no": "11",
+          "name": "Living & Dining, craftsman, seed b",
+          "bounds": {
+            "x": 5.3,
+            "z": 1,
+            "w": 9.4,
+            "d": 5
+          },
+          "program": "living",
+          "style": "craftsman",
+          "density": 0.6,
+          "seed": "b",
+          "items": []
+        },
+        {
+          "no": "12",
+          "name": "Hall",
+          "bounds": {
+            "x": -14.7,
+            "z": -1,
+            "w": 29.4,
+            "d": 2
+          },
+          "program": "hall",
+          "items": []
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -14.7,
+        "z": -6,
+        "w": 29.4,
+        "d": 12
+      },
+      "y": 2.8,
+      "type": "gable",
+      "ridge": "x",
+      "pitch": 24,
+      "overhang": 0.4,
+      "color": "#3a3d42"
+    }
+  ],
+  "site": [
+    {
+      "type": "path",
+      "path": [
+        [
+          -14.899999999999999,
+          0
+        ],
+        [
+          -19.7,
+          0
+        ]
+      ],
+      "w": 1.2
+    },
+    {
+      "type": "tree",
+      "at": [
+        -18.7,
+        7
+      ],
+      "h": 6
+    },
+    {
+      "type": "tree",
+      "at": [
+        17.7,
+        -8
+      ],
+      "h": 6.5
+    }
+  ],
+  "entry": {
+    "level": "l1",
+    "side": "W",
+    "at": 0
+  },
+  "shots": [
+    {
+      "id": "door-to-core",
+      "type": "door-to-core",
+      "duration": 14
+    },
+    {
+      "id": "orbit",
+      "type": "orbit",
+      "duration": 10
+    }
+  ],
+  "hero": {
+    "level": "l1",
+    "at": [
+      -12.5,
+      -5.5
+    ],
+    "rot": 0,
+    "device": "chalk",
+    "pose": "prone",
+    "surface": "desk"
+  }
+}

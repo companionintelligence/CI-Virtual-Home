@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>House shots — Companion Core</title>
+  <title>Virtual home shots · Companion Intelligence</title>
   <!--
-    Browser for the headless product-shot renders of the 30 HouseSpec houses.
+    Browser for the headless product-shot renders of the 30 virtual homes (the HouseSpec houses). Each card opens its home in
+    the editor (../../room-creator.html); the portal (../../index.html) is the public gallery.
 
     Static: reads ./manifest.json (written by scripts/render-house-shots.mts, `pnpm run shots`) and
     ../../content/houses/index.json (author credits) — nothing else. Serve the repo root over http
@@ -21,11 +22,13 @@
     :root {
       --radius: 0.625rem;
       --background: #f3faf7; --foreground: #0a222e;
-      --card: #f0f9f5; --card-foreground: #0a222e;
+      --card: #f0f9f5; --card-foreground: #0a222e; --destructive: #da302f; --chart-4: #855500;
       --primary: #0a6358; --primary-foreground: #f0fdf4;
       --secondary: #e8f2ec; --muted: #e8f2ec; --muted-foreground: #3a524b;
       --accent: #edf6f0; --border: #dfece6; --ring: #0a6358;
       --shadow-md: 0 1px 3px rgba(4, 22, 32, 0.05), 0 6px 18px -6px rgba(10, 99, 88, 0.07);
+      --media: #0a222e;   /* the letterbox behind a render, and what is drawn over it: the same in both themes */
+      --on-media: #f0fdf4;
       --gradient-aurora: radial-gradient(1200px circle at 50% -20%, rgba(232, 242, 236, 0.65), transparent 52%),
         radial-gradient(900px circle at 80% 0%, rgba(10, 99, 88, 0.04), transparent 45%);
       --font-sans: "Manrope", system-ui, sans-serif;
@@ -35,11 +38,13 @@
     }
     .dark {
       --background: #041620; --foreground: #e8f2f4;
-      --card: #0c323c; --card-foreground: #e8f2f4;
+      --card: #0c323c; --card-foreground: #e8f2f4; --destructive: #ef7070; --chart-4: #70a6af;
       --primary: #c5e8dc; --primary-foreground: #041620;
       --secondary: #073038; --muted: #073038; --muted-foreground: #a3babf;
       --accent: #0a2e38; --border: #073038; --ring: #c5e8dc;
       --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.24), 0 6px 18px -8px rgba(0, 0, 0, 0.32);
+      --media: #021018;
+      --on-media: #f0fdf4;
       --gradient-aurora: radial-gradient(1200px circle at 50% -20%, rgba(200, 230, 217, 0.08), transparent 55%);
       color-scheme: dark;
     }
@@ -72,6 +77,7 @@
     .seg button { border: 0; background: transparent; padding: 7px 11px; cursor: pointer; font-weight: 500; font-size: 13px; }
     .seg button + button { border-left: 1px solid var(--border); }
     .seg button[aria-pressed=true] { background: var(--primary); color: var(--primary-foreground); }
+    a.btn { text-decoration: none; color: inherit; display: inline-flex; align-items: center; }
     .btn { border: 1px solid var(--border); background: var(--card); border-radius: calc(var(--radius) - 2px); padding: 7px 11px; cursor: pointer; font-weight: 500; font-size: 13px; }
     .btn:hover, .seg button:not([aria-pressed=true]):hover { background: var(--accent); }
 
@@ -82,32 +88,31 @@
 
     .card { background: var(--card); color: var(--card-foreground); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; display: flex; flex-direction: column; }
     .card.missing { opacity: .6; }
-    .media { position: relative; aspect-ratio: 16 / 9; background: #0a222e; overflow: hidden; }
+    .media { position: relative; aspect-ratio: 16 / 9; background: var(--media); overflow: hidden; }
     .media.portrait { aspect-ratio: 9 / 16; max-height: 560px; margin: 0 auto; }
-    .media img, .media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; background: #0a222e; }
+    .media img, .media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; background: var(--media); }
     .media .play {
       position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; cursor: pointer; padding: 0;
-      display: grid; place-items: center; color: #f0fdf4;
+      display: grid; place-items: center; color: var(--on-media);
     }
     .media .play::before {
-      content: ""; width: 64px; height: 64px; border-radius: 50%; background: rgba(4, 22, 32, .62);
-      box-shadow: 0 0 0 2px rgba(240, 253, 244, .55); transition: transform .12s ease, background .12s ease;
+      content: ""; width: 64px; height: 64px; border-radius: 50%; background: color-mix(in srgb, var(--media) 82%, transparent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--on-media) 70%, transparent); transition: transform .12s ease, background .12s ease;
     }
     .media .play::after {
       content: ""; position: absolute; width: 0; height: 0; margin-left: 5px;
-      border-left: 20px solid #f0fdf4; border-top: 12px solid transparent; border-bottom: 12px solid transparent;
+      border-left: 20px solid var(--on-media); border-top: 12px solid transparent; border-bottom: 12px solid transparent;
     }
-    .media .play:hover::before { transform: scale(1.06); background: rgba(10, 99, 88, .85); }
-    .media .badge { position: absolute; left: 10px; top: 10px; background: rgba(4, 22, 32, .7); color: #f0fdf4; font-size: 11px; padding: 3px 7px; border-radius: 4px; pointer-events: none; }
-    .media .qa { position: absolute; right: 10px; top: 10px; font-size: 11px; padding: 3px 7px; border-radius: 4px; pointer-events: auto; cursor: help; color: #f0fdf4; }
-    .media .qa.warn { background: rgba(120, 72, 0, .8); }
-    .media .qa.err { background: rgba(140, 20, 20, .85); }
+    .media .play:hover::before { transform: scale(1.06); background: color-mix(in srgb, var(--primary) 85%, transparent); }
+    .media .badge { position: absolute; left: 10px; top: 10px; background: color-mix(in srgb, var(--media) 80%, transparent); color: var(--on-media); font-size: 11px; padding: 3px 7px; border-radius: 4px; pointer-events: none; }
+    .media .qa { position: absolute; right: 10px; top: 10px; font-size: 11px; padding: 3px 7px; border-radius: 4px; pointer-events: auto; cursor: help; color: var(--foreground); background: var(--muted); }
+    .media .qa.warn { box-shadow: inset 0 0 0 1px var(--chart-4); }
+    .media .qa.err { box-shadow: inset 0 0 0 1px var(--destructive); }
     .media .nope { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted-foreground); background: var(--muted); font-size: 13px; }
 
     .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
     .title { display: flex; align-items: baseline; gap: 8px; }
     .title h2 { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.3; }
-    .title .emoji { font-size: 18px; line-height: 1; }
     .credit { color: var(--muted-foreground); font-size: 12.5px; }
     .credit b { color: var(--foreground); font-weight: 600; }
     .style { color: var(--muted-foreground); font-size: 12.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -133,7 +138,9 @@
     <div class="controls">
       <input id="q" type="search" placeholder="Filter by house, author, style…" aria-label="Filter houses">
       <div class="seg" id="shot-filter" role="group" aria-label="Default shot"></div>
-      <button class="btn" id="theme" type="button" aria-label="Toggle theme">◐ Theme</button>
+      <a class="btn" href="../../index.html" title="The public gallery">All homes</a>
+      <a class="btn" href="../../room-creator.html" title="The editor: build, review and export">Editor</a>
+      <button class="btn" id="theme" type="button" aria-label="Switch between the light and dark theme">Theme</button>
     </div>
   </header>
   <main>
@@ -190,6 +197,9 @@
         const indexed = new Set();
         for (const h of idx.houses || []) { houses.push(h); indexed.add(h.id); }
         for (const id of byHouse.keys()) if (!indexed.has(id)) houses.push({ id, name: id, author: null });
+        // a home is called what the portal calls it (assets/home-names.ts), not by the Sims build's own title, which stays the credit
+        const names = await import('../../assets/home-names.js').catch(() => null);
+        for (const h of houses) h.title = names ? names.displayName(h) : (h.name || h.id);
 
         const params = new URLSearchParams(location.search);
         defaultShot = shotTypes.includes(params.get('shot')) ? params.get('shot') : shotTypes[0];
@@ -225,15 +235,15 @@
         const shots = byHouse.get(h.id) || new Map();
         const el = document.createElement('article');
         el.className = 'card' + (shots.size ? '' : ' missing');
-        el.dataset.search = [h.id, h.name, h.author, h.style, h.source].filter(Boolean).join(' ').toLowerCase();
+        el.dataset.search = [h.id, h.title, h.name, h.author, h.style, h.source].filter(Boolean).join(' ').toLowerCase();
 
         const media = document.createElement('div');
         media.className = 'media' + ((manifest.aspect || '16:9') === '9:16' ? ' portrait' : '');
         const body = document.createElement('div'); body.className = 'body';
 
         const title = document.createElement('div'); title.className = 'title';
-        title.innerHTML = `<span class="emoji" aria-hidden="true">${h.emoji || '🏠'}</span><h2></h2>`;
-        title.querySelector('h2').textContent = h.name || h.id;
+        title.innerHTML = `<h2></h2>`;
+        title.querySelector('h2').textContent = h.title || h.name || h.id; if (h.name && h.name !== h.title) title.querySelector('h2').title = `The build's own title: ${h.name}`;
 
         const credit = document.createElement('div'); credit.className = 'credit';
         const bits = [];
@@ -249,7 +259,7 @@
         const row = document.createElement('div'); row.className = 'row';
         const picker = document.createElement('div'); picker.className = 'shots'; picker.setAttribute('role', 'group'); picker.setAttribute('aria-label', 'Shot');
         const links = document.createElement('div'); links.className = 'links';
-        const open = document.createElement('a'); open.textContent = 'Room Creator ↗'; open.target = '_blank'; open.rel = 'noopener';
+        const open = document.createElement('a'); open.textContent = 'Open in the editor'; open.target = '_blank'; open.rel = 'noopener';
         const dlMp4 = document.createElement('a'); dlMp4.className = 'dl'; dlMp4.textContent = 'MP4';
         const dlWebm = document.createElement('a'); dlWebm.className = 'dl'; dlWebm.textContent = 'WebM';
         links.append(open, dlMp4, dlWebm);
@@ -272,7 +282,7 @@
           const errs = (s.qa && s.qa.errors) || [], warns = (s.qa && s.qa.warnings) || [];
           if (!errs.length && !warns.length) return frag;
           const b = document.createElement('span'); b.className = 'qa mono ' + (errs.length ? 'err' : 'warn');
-          b.textContent = errs.length ? `✗ ${errs.length} qa` : `⚠ ${warns.length} qa`;
+          b.textContent = errs.length ? `${errs.length} error${errs.length === 1 ? '' : 's'}` : `${warns.length} warning${warns.length === 1 ? '' : 's'}`;
           b.title = [...errs.map(e => `ERROR t=${e.t}${e.tEnd > e.t ? '–' + e.tEnd : ''} ${e.code}: ${e.message}`), ...warns.map(w => `warn t=${w.t}${w.tEnd > w.t ? '–' + w.tEnd : ''} ${w.code}: ${w.message}`)].join('\n');
           frag.append(b); return frag;
         }
@@ -282,9 +292,9 @@
           const s = shots.get(shot);
           if (!s) { media.innerHTML = '<div class="nope">not rendered yet</div>'; return; }
           if (s.error && !s.mp4) { media.innerHTML = `<div class="nope">not rendered — ${s.error.replace(/</g, '&lt;')}</div>`; media.append(qaBadge(s)); return; }
-          const img = document.createElement('img'); img.src = s.poster + bust; img.alt = `${h.name || h.id} — ${shot} poster`; img.loading = 'lazy'; img.decoding = 'async';
+          const img = document.createElement('img'); img.src = s.poster + bust; img.alt = `${h.title || h.name || h.id} — ${shot} poster`; img.loading = 'lazy'; img.decoding = 'async';
           const badge = document.createElement('span'); badge.className = 'badge mono'; badge.textContent = shot;
-          const play = document.createElement('button'); play.className = 'play'; play.type = 'button'; play.setAttribute('aria-label', `Play ${shot} for ${h.name || h.id}`);
+          const play = document.createElement('button'); play.className = 'play'; play.type = 'button'; play.setAttribute('aria-label', `Play ${shot} for ${h.title || h.name || h.id}`);
           play.addEventListener('click', playVideo);
           media.append(img, badge, play, qaBadge(s));
         }

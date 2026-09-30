@@ -35,3 +35,4 @@ import './plants.js';
 import './kids.js';
 import './office.js';
 import './outdoor.js';
+import './hobby.js';
