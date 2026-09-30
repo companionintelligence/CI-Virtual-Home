@@ -267,7 +267,7 @@ applies only under `"defaults": 2`.
                                 // (a kept roof colour renders within ΔE 3 of itself: no charcoal pull either)
   "roofPull": false             // no roof pulled toward charcoal
 },
-"levels": [{ "material": "brick", "wallColor": "#9a4b3a",   // this storey's own cladding, in its own colour
+"levels": [{ "material": "brick", "wallColor": "#9a4b3a",   // this storey's own cladding (one of the six palette kinds: stucco | siding | brick | stone | timber | corrugated), in its own colour
   "openings": [
     { "type": "door", "w": 1.6, "leaf": "french", "transom": 0.45, "frame": "#3b3530", "grid": "vertical",
       "lantern": true, "head": "arch", "swing": "in", "id": "front" },
@@ -382,7 +382,8 @@ height, a pit) — a floor never seals a stairwell. Under `defaults: 2` a room w
 and bath tile, living rooms warm wood, bedrooms wood or carpet) that its neighbours do not share.
 
 **Sections.** `footprint[i].h` gives a volume its own wall height (a tower, a low wing); `footprint[i].material` / `.color` its own
-cladding. `levels[].knee` stops the perimeter walls at a knee height (the roof's underside is the ceiling above). `levels[].split:
+cladding (these, the facade zones and `gableCladding` take nine kinds — the six palette kinds plus `board-and-batten`, `concrete` and
+`shingle`; a whole storey's `levels[].material` is the palette six, so use a volume or a facade zone for the other three). `levels[].knee` stops the perimeter walls at a knee height (the roof's underside is the ceiling above). `levels[].split:
 true` marks a split-level storey: where it stands beside another storey (a half-level up or down) the storey listed first builds
 the shared wall over its own height and this one only the rest; bands with rooms on both sides are party walls (paint both faces).
 `levels[].plinth` is `{ h?, material?, color?, proud? }`: a base course round the walls, and — on a storey above grade with nothing

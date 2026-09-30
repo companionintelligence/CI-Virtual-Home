@@ -80,7 +80,7 @@ const check: Check = (spec, ctx) => {
 
   for (const lv of spec.levels || []) {
     const LV = `level ${lv.id}`;
-    if (lv.material !== undefined && !CLAD.includes(lv.material)) err(`${LV}: material "${lv.material}" (${CLAD.join(' | ')})`);
+    if (lv.material !== undefined && !CLAD.includes(lv.material)) err(`${LV}: material "${lv.material}" (${CLAD.join(' | ')}; board-and-batten, concrete and shingle are for footprint[].material and facade zones, not a whole storey)`);
     // ---- openings
     for (const op of lv.openings || []) {
       const O = `${LV} opening ${op.type}@${op.side}:${op.at}`;
