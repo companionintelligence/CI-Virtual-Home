@@ -21,6 +21,7 @@ import { MEASURED } from './props/measured.js';
 import { houseStairs, levelStairs } from './stairs.js';
 import { featureOpenings, doubleRoomsUnder } from './arch-plan.js';
 import { leafKindOf } from './kit-rules.js';
+import { specDefaults } from './spec/index.js';
 
 export type Side = 'N' | 'S' | 'W' | 'E';
 export const SIDES: Side[] = ['N', 'S', 'W', 'E'];
@@ -241,6 +242,7 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
   const entry = spec.entry && spec.entry.level === lv.id ? spec.entry : null;
   // a bay opens its host wall (S2, arch-plan.ts featureOpenings): full-height glass, so nothing tall stands in front of it
   const bayOpenings = featureOpenings(spec, lv).map((o: any) => ({ side: o.side, at: o.at, w: o.w, type: 'window', sill: 0, h: o.h }));
+  const parkStrips: Array<{ side: Side; line: number; c: number; w: number; park: number }> = [];
   for (const side of SIDES) {
     const [lo, hi] = spanOf(side), ln = lineOf[side];
     const segs: Array<{ kind: 'ext' | 'part'; line: number; a: number; b: number }> = [];
@@ -278,20 +280,25 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
       segs.push({ kind: 'part', line: pl, a, b: bb });
       if (p.door !== null && p.door !== undefined) {
         const dir = px ? Math.sign(p.to[0] - p.from[0]) || 1 : Math.sign(p.to[1] - p.from[1]) || 1, c = (px ? p.from[0] : p.from[1]) + dir * p.door, w = p.doorW || 0.9;
-        if (c + w / 2 > lo + 0.05 && c - w / 2 < hi - 0.05) doorsHere.push({ a: c - w / 2, b: c + w / 2, w, kind: 'doorway', hinged: w <= 1.1, pair: w > 1.1 && (p.doorStyle === 'double' || p.doorStyle === 'french'), entry: false });
+        const pair = w > 1.1 && (p.doorStyle === 'double' || p.doorStyle === 'french');
+        const park = p.doorStyle !== 'cased' && p.doorStyle !== 'none' && (p.doorStyle || (w <= 1.1 && specDefaults(spec) >= 2)) ? (pair ? w / 2 : w) : 0;
+        if (c + w / 2 > lo + 0.05 && c - w / 2 < hi - 0.05) doorsHere.push({ a: c - w / 2, b: c + w / 2, w, kind: 'doorway', hinged: w <= 1.1, pair, entry: false });
+        parkStrips.push({ side, line: pl, c, w, park });
       }
     }
     for (const op of [...(lv.openings || []), ...bayOpenings]) {
       if (op.side !== side) continue;
       const e = edgeForOpening(edges, op.side, op.at); if (!e) continue;
-      const el = alongX(side) ? e.a[1] : e.a[0]; if (Math.abs(el - ln) > TOL || op.at < lo - 0.05 || op.at > hi + 0.05) continue;
+      const el = alongX(side) ? e.a[1] : e.a[0]; if (Math.abs(el - ln) > TOL) continue;
       const a = op.at - op.w / 2, bb = op.at + op.w / 2;
       const isEntry = !!entry && entry.side === op.side && Math.abs(entry.at - op.at) < 1e-6;
-      if (op.type === 'door' || op.type === 'slider' || op.type === 'garage') {
-        // S1's leaves: a pair (double, french — or the wide-door rule of defaults 2) sweeps half its width a side; a door that swings out sweeps the outside
-        const out = op.swing === 'out' && op.type === 'door', leaves = op.type === 'door' && op.style !== 'cased' && !out ? leafKindOf(spec, op) : 'none';
-        doorsHere.push({ a, b: bb, w: op.w, kind: op.type, hinged: op.type === 'door' && op.w <= 1.1 && op.style !== 'cased' && !out, pair: op.w > 1.1 && (leaves === 'double' || leaves === 'french'), entry: isEntry });
-      }
+      // S1's leaves: a pair (double, french — or the wide-door rule of defaults 2) sweeps half its width a side; a door that swings out sweeps the outside
+      const out = op.swing === 'out' && op.type === 'door', leaves = op.type === 'door' && op.style !== 'cased' && !out ? leafKindOf(spec, op) : 'none';
+      const pair = op.w > 1.1 && (leaves === 'double' || leaves === 'french');
+      // (a leaf parks flat against the wall beside its door, which may reach into the next room along it)
+      if (op.type === 'door') parkStrips.push({ side, line: el, c: op.at, w: op.w, park: leaves !== 'none' && (op.leaf || specDefaults(spec) >= 2) ? (pair ? op.w / 2 : op.w) : 0 });
+      if (op.at < lo - 0.05 || op.at > hi + 0.05) continue;
+      if (op.type === 'door' || op.type === 'slider' || op.type === 'garage') doorsHere.push({ a, b: bb, w: op.w, kind: op.type, hinged: op.type === 'door' && op.w <= 1.1 && op.style !== 'cased' && !out, pair, entry: isEntry });
       if (op.type === 'window' || op.type === 'glass' || op.type === 'slider') windows.push({ side, line: el, a, b: bb, sill: op.type === 'window' ? (op.sill ?? 0.9) : 0.05, h: op.h || (op.type === 'window' ? 1.2 : 2.2), type: op.type });
     }
     const cover = union(segs.map(s => [s.a, s.b] as [number, number]));
@@ -323,6 +330,17 @@ export function analyzeRoom(spec: any, lv: any, room: any): Geo {
     const [nx, nz] = INWARD[p.side], depth = p.hinged ? Math.max(0.8, p.w) : p.pair ? Math.max(0.6, p.w / 2 + 0.05) : 0.6;
     const cx = p.x + nx * depth / 2, cz = p.z + nz * depth / 2;
     keepouts.push(alongX(p.side) ? obb(cx, cz, p.w + 0.1, depth, 0) : obb(cx, cz, depth, p.w + 0.1, 0));
+  }
+  // an open leaf is parked flat against the wall beside its door (S1's kit-build): 0.25 m of floor along it, each side of the jambs, as far as it reaches into this room
+  for (const q of parkStrips) {
+    if (!(q.park > 0)) continue;
+    const [nx, nz] = INWARD[q.side], [lo, hi] = spanOf(q.side);
+    for (const sg of [-1, 1]) {
+      const t0 = sg < 0 ? q.c - q.w / 2 - q.park : q.c + q.w / 2, t1 = t0 + q.park, a0 = Math.max(t0, lo), a1 = Math.min(t1, hi);
+      if (a1 - a0 < 0.05) continue;
+      const m = (a0 + a1) / 2, len = a1 - a0;
+      keepouts.push(alongX(q.side) ? obb(m, q.line + nz * 0.12, len, 0.25, 0) : obb(q.line + nx * 0.12, m, 0.25, len, 0));
+    }
   }
   // partitions that cross the room's interior are solid lines, with their doorways
   for (const p of lv.partitions || []) {
