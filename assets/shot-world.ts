@@ -21,6 +21,8 @@
 // Owner: S5 (shot). Also the box index and ray caster every S5 module shares (createWorldIndex).
 
 import { Math } from './detmath.js';
+import { insideOutline, doubleRoomsUnder } from './arch-plan.js';
+import { autoVoidsFor } from './stairs.js';
 export type Box6 = [number, number, number, number, number, number];
 export const K = {
   wall: 1, glass: 2, item: 3, fixture: 4, stair: 5, rail: 6, site: 7, walk: 8, roof: 9,
@@ -201,7 +203,8 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
   // the storeys, rooms and stairs from the spec and the anchors
   const levels: WLevel[] = (spec.levels || []).map((l: any) => ({
     id: l.id, y: l.y || 0, h: l.height || 2.8, rects: (l.footprint || []).map((r: any) => ({ x: r.x, z: r.z, w: r.w, d: r.d })),
-    voids: (l.voids || []).map((r: any) => ({ x: r.x, z: r.z, w: r.w, d: r.d })),
+    // every hole the slab has: its own voids, then what S2 cuts on its own (a flight's autoVoid, the room below a double-height one), clipped to the outline as built
+    voids: [...(l.voids || []), ...((l.y || 0) > 0.001 ? insideOutline(l, [...autoVoidsFor(spec, l.id), ...doubleRoomsUnder(spec, l).map((d: any) => d.rect)].filter((r: any) => r && r.w > 0 && r.d > 0)).map((r: any) => ({ x: mm(r.x), z: mm(r.z), w: mm(r.w), d: mm(r.d) })) : [])].map((r: any) => ({ x: r.x, z: r.z, w: r.w, d: r.d })),
     parts: (l.partitions || []).map((p: any) => ({ a: [p.from[0], p.from[1]], b: [p.to[0], p.to[1]], door: p.door === undefined ? null : p.door, doorW: p.doorW || 0.9, h: p.height || (l.height || 2.8) - 0.1 })),
     rooms: (l.rooms || []).map((r: any) => ({ no: String(r.no ?? ''), name: r.name || '', program: r.program || null, b: r.bounds, items: (r.items || []).filter((it: any) => Array.isArray(it.at)).map((it: any) => ({ type: it.type, at: [it.at[0], it.at[1]], rot: it.rot || 0 })) })),
     openings: (l.openings || []).map((o: any) => ({ side: o.side, at: o.at, type: o.type, w: o.w, h: o.h, sill: o.sill, style: o.style })),
