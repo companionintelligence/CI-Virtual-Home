@@ -1,0 +1,39 @@
+{
+  "v": 1,
+  "$comment": "Voice registry. Authored stories reference registry KEYS only, never an engine voice name, so a voice can be swapped (for example when American voices are approved) by editing this file and re-running the voice tool; textSha is unchanged but the voice differs, so the lock goes stale and only that voice's clips are re-recorded. Owner of this file after the contract commit: voiceover-tool (speeds and notes); keys are a contract.",
+  "engine": {
+    "name": "kokoro",
+    "model": "hexgrad/Kokoro-82M",
+    "modelRevision": "f3ff3571791e39611d31c381e3a41a3af07b4987",
+    "licence": "Apache-2.0 (model weights, kokoro 0.9.4, misaki 0.9.4)",
+    "run": "local, CPU, seed 0, HF_HUB_OFFLINE=1; reuse the CI-Common venv at ~/.cache/ci-video-kit/kokoro. No cloud TTS, no API key.",
+    "fallbacks": "Piper is not used (its live engine is GPL-3.0 and per-voice licences vary). macOS say is a last resort only and must be labelled in the lock."
+  },
+  "rules": [
+    "Never voice a child. Children appear in the third person, read by the narrator.",
+    "Narrator: one voice per family (casting.json narrator). Third person, present tense.",
+    "Agent lines (beat.say): the companion's voice, a different key from the narrator and from the other companions in the same family.",
+    "Every voice is synthetic and disclosed (disclosure synthetic-voice). No voice imitates a real person."
+  ],
+  "voices": {
+    "v-warm-f":        { "kokoro": "bf_emma",     "sex": "f", "f0Hz": 178, "grade": "B-", "speed": 0.94, "accent": "en-GB", "status": "ready",   "narratorFor": 6, "agentFits": ["warm", "gentle", "calm", "patient"] },
+    "v-clear-f":       { "kokoro": "bf_isabella", "sex": "f", "f0Hz": 190, "grade": "C",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 6, "agentFits": ["precise", "brisk", "organised", "clear"] },
+    "v-bright-f":      { "kokoro": "bf_lily",     "sex": "f", "f0Hz": 181, "grade": "D",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 2, "agentFits": ["cheerful", "playful", "curious"] },
+    "v-young-f":       { "kokoro": "bf_alice",    "sex": "f", "f0Hz": 207, "grade": "D",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 2, "agentFits": ["quick", "wry", "bright"] },
+    "v-steady-m":      { "kokoro": "bm_george",   "sex": "m", "f0Hz": 140, "grade": "C",  "speed": 0.94, "accent": "en-GB", "status": "ready",   "narratorFor": 5, "agentFits": ["steady", "patient", "practical"] },
+    "v-storyteller-m": { "kokoro": "bm_fable",    "sex": "m", "f0Hz": 124, "grade": "C",  "speed": 0.93, "accent": "en-GB", "status": "ready",   "narratorFor": 4, "agentFits": ["gentle", "old-fashioned", "thoughtful"] },
+    "v-deep-m":        { "kokoro": "bm_lewis",    "sex": "m", "f0Hz": 92,  "grade": "D+", "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 3, "agentFits": ["dry", "calm", "wry"] },
+    "v-light-m":       { "kokoro": "bm_daniel",   "sex": "m", "f0Hz": 125, "grade": "D",  "speed": 0.95, "accent": "en-GB", "status": "ready",   "narratorFor": 2, "agentFits": ["curious", "gentle", "bright"] }
+  },
+  "pending": {
+    "$comment": "Needs the owner to approve a download of small .pt voice files (about 0.5 MB each) from huggingface.co/hexgrad/Kokoro-82M/voices. Not usable until approved. With them the fleet gains American accents and better-graded voices; the mapping then moves by editing `kokoro` above.",
+    "voices": ["af_heart (A)", "af_bella (A-)", "af_nicole (B-)", "am_fenrir (C+)", "am_michael (C+)", "am_puck (C+)"]
+  },
+  "encoding": {
+    "trimLeadMs": 80,
+    "loudness": "per clip -16 LUFS integrated, limiter at -3 dBTP before AAC; post-decode gate: true peak <= -1.0 dBTP and |dI| <= 0.7 LU",
+    "codec": "AAC-LC 32 kbps mono 24 kHz in .m4a, -fflags +bitexact, no metadata (plays on every browser including iOS Safari)",
+    "fileName": "<beatId>[.say].<hash10>.m4a where hash10 = first 10 hex of sha256(file bytes); stored at content/families/<slug>/audio/",
+    "budget": "about 4.4 KB per second of speech; at most 700 KB of audio per family"
+  }
+}
