@@ -23,6 +23,8 @@ const smooth = (a: number, b: number, x: number) => { const t = clamp((x - a) / 
 export const rgbOf = (c: any): RGB => { const n = typeof c === 'string' ? parseInt(c.replace('#', ''), 16) : (c ?? 0); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
 const mixRgb = (a: RGB, b: RGB, t: number): RGB => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 const put = (o: Px, c: RGB, k = 1) => { o.r = c[0] * k; o.g = c[1] * k; o.b = c[2] * k; };
+// sRGB byte → linear light, for the mean in linear light that raster() reports (assets/media-registry.ts tints a swapped map by it)
+const LIN8 = new Float32Array(256).map((_, i) => { const x = i / 255; return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; });
 const wrapD = (d: number, p: number) => { d = ((d % p) + p) % p; return d > p / 2 ? p - d : d; };   // distance on a circle of length p
 
 // integer hash → [0, 1): per-board / per-tile / per-granule randomness that is a pure function of indices
@@ -59,7 +61,7 @@ function raster(gen: Gen) {
   const { W, H } = gen, [pu, pv] = gen.period;
   const alb = new Uint8Array(W * H * 4), rgh = new Uint8Array(W * H * 4), nrm = new Uint8Array(W * H * 4), hgt = new Float32Array(W * H);
   const o: Px = { r: 0, g: 0, b: 0, h: 0, ro: 0.5 };
-  let lumSum = 0, rSum = 0, gSum = 0, bSum = 0;
+  let lumSum = 0, rSum = 0, gSum = 0, bSum = 0, lrSum = 0, lgSum = 0, lbSum = 0;
   for (let y = 0; y < H; y++) {
     const v = (y + 0.5) / H, t = v * pv;
     for (let x = 0; x < W; x++) {
@@ -68,7 +70,7 @@ function raster(gen: Gen) {
       const i = y * W + x, j = i * 4;
       const r = clamp(Math.round(o.r), 0, 255), g = clamp(Math.round(o.g), 0, 255), b = clamp(Math.round(o.b), 0, 255);
       alb[j] = r; alb[j + 1] = g; alb[j + 2] = b; alb[j + 3] = 255;
-      lumSum += (r + g + b) / 765; rSum += r; gSum += g; bSum += b;
+      lumSum += (r + g + b) / 765; rSum += r; gSum += g; bSum += b; lrSum += LIN8[r]; lgSum += LIN8[g]; lbSum += LIN8[b];
       hgt[i] = o.h;
       const ro = clamp(Math.round(o.ro * 255), 0, 255); rgh[j] = ro; rgh[j + 1] = ro; rgh[j + 2] = ro; rgh[j + 3] = 255;
     }
@@ -85,7 +87,7 @@ function raster(gen: Gen) {
     }
   }
   const N = W * H, meanHex = (Math.round(rSum / N) << 16) | (Math.round(gSum / N) << 8) | Math.round(bSum / N);
-  return { alb, rgh, nrm, mean: lumSum / N, meanHex };
+  return { alb, rgh, nrm, mean: lumSum / N, meanHex, meanLin: [lrSum / N, lgSum / N, lbSum / N] as RGB };
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -769,12 +771,13 @@ export function createTextureLibrary({ THREE, rngFor }: { THREE: any; rngFor: (k
     const rng = rngFor('tex:' + key);
     const ctx: Ctx = { rng, hash: hasher(Math.floor(rng() * 4294967296) >>> 0), fbm: (fx, fy, oct, gain) => fbm(rng, fx, fy, oct, gain) };
     const gen = GEN[kind](ctx, opts);
-    const { alb, rgh, nrm, mean, meanHex } = raster(gen);
+    const { alb, rgh, nrm, mean, meanHex, meanLin } = raster(gen);
     const out = {
       kind, period: gen.period, normalScale: gen.normalScale ?? 1, metalness: gen.metalness ?? 0, mean, meanHex,
       map: tex(alb, gen.W, gen.H, true), normalMap: tex(nrm, gen.W, gen.H, false), roughnessMap: tex(rgh, gen.W, gen.H, false)
     };
-    for (const k of ['map', 'normalMap', 'roughnessMap']) { out[k].name = `${kind}.${k}`; out[k].userData.period = gen.period; }
+    // (userData only: the live player's detail textures read these to swap a set for a photographed one and keep its colour)
+    for (const k of ['map', 'normalMap', 'roughnessMap']) { out[k].name = `${kind}.${k}`; out[k].userData.period = gen.period; out[k].userData.kind = kind; out[k].userData.meanLin = meanLin; out[k].userData.exterior = !!opts.exterior; }
     cache.set(key, out);
     return out;
   }
@@ -874,5 +877,8 @@ export function worldUV(THREE: any, mat: any, opts: any = {}) {
   mat.customProgramCacheKey = () => `wuv${modeId}${macro > 0 ? 'm' : ''}`;
   mat.clone = function () { return worldUV(THREE, new this.constructor().copy(this), opts); };
   mat.userData.worldUV = { period: [...period], mode, rotation };
+  // the live uniforms, for assets/media-registry.ts (it changes a swapped map's period). Not enumerable: userData is copied
+  // by JSON (Material.copy) and written out by exporters, and neither must see a Vector2 nor change.
+  Object.defineProperty(mat.userData.worldUV, 'uniforms', { value: uniforms, enumerable: false });
   return mat;
 }
