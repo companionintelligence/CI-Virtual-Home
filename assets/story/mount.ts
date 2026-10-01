@@ -14,7 +14,11 @@ import { presetFromStory, type RuntimeStory } from './runtime.js';
 import { Director, type Control } from './director.js';
 
 type Shipped = RuntimeStory & { css?: string };
+// The address as the page was opened. The player rewrites the address bar as soon as it has a shot (it keeps its own parameters and drops
+// ours), so the beat a shared link asks for is read here, when this module is first evaluated, which is at boot.
+const BOOT_QUERY = new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
 let current: { slug: string; director: Director } | null = null;
+let opened = false;                                         // the first tour of this page view reads the boot address; a later one (next family) starts at its beginning
 let manifestP: Promise<any> | null = null;
 
 const siteUrl = (rel: string): string => new URL(rel, location.href).href;
@@ -72,8 +76,8 @@ export async function prepare(api: any, house: any): Promise<void> {
     const index = await Promise.resolve((window as any).__vhIndex).then((j: any) => (j && j.houses) || [], () => []);
     void whenReady(root).then(() => {
       if (current && current.slug === slug) return;
-      const director = new Director({ api, stats, root, rs, control, slug, reduced: matchMedia('(prefers-reduced-motion: reduce)').matches, hasNext: index.length > 1, audioBase: '' });
-      current = { slug, director };
+      const director = new Director({ api, stats, root, rs, control, slug, reduced: matchMedia('(prefers-reduced-motion: reduce)').matches, hasNext: index.length > 1, query: !opened && BOOT_QUERY.get('family') === slug ? BOOT_QUERY : new URLSearchParams(), audioBase: '' });
+      current = { slug, director }; opened = true;
       (window as any).__houseStory = director.api();
     });
   } catch (err) {

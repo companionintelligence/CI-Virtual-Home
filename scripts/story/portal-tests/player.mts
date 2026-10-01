@@ -99,7 +99,7 @@ export default async function player(ctx: TestCtx): Promise<void> {
     return out;
   };
   /** the 44 px rule, for the controls the tour makes (touch) */
-  const SMALL_TARGETS = (scopeSel: string, min: number) => {
+  const SMALL_TARGETS = ([scopeSel, min]: [string, number]) => {
     const out: string[] = [];
     for (const e of Array.from(document.querySelectorAll(`${scopeSel} button, ${scopeSel} a[href], ${scopeSel} summary`))) {
       const r = e.getBoundingClientRect(), cs = getComputedStyle(e);
@@ -297,20 +297,20 @@ export default async function player(ctx: TestCtx): Promise<void> {
     const noScroll = await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1);
     const fits = await page.$eval('.st-start-card', (e: HTMLElement) => { const r = e.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth + 0.5; });
     ok(noScroll && fits, 'and it fits the window with no sideways scroll');
-    if (mobile) { const small = await page.evaluate(SMALL_TARGETS, '.st-start', 44); ok(small.length === 0, `its buttons are 44 px targets${small.length ? ': ' + small.join(', ') : ''}`); }
+    if (mobile) { const small = await page.evaluate(SMALL_TARGETS, ['.st-start', 44] as [string, number]); ok(small.length === 0, `its buttons are 44 px targets${small.length ? ': ' + small.join(', ') : ''}`); }
     await ctx.shot(page, `tour-start-${SLUG}-${label}`);
     await startSilent(page);
     await page.evaluate(() => (window as any).__houseStory.measureEnd()); await sleep(500);
     issues = await page.evaluate(AUDIT, '.st-end');
     ok(issues.length === 0, `the end card: no serious or critical finding${issues.length ? ': ' + issues.join(' | ') : ''}`);
-    if (mobile) { const small = await page.evaluate(SMALL_TARGETS, '.st-end', 44); ok(small.length === 0, `its buttons are 44 px targets${small.length ? ': ' + small.join(', ') : ''}`); }
+    if (mobile) { const small = await page.evaluate(SMALL_TARGETS, ['.st-end', 44] as [string, number]); ok(small.length === 0, `its buttons are 44 px targets${small.length ? ': ' + small.join(', ') : ''}`); }
     await ctx.shot(page, `tour-end-${SLUG}-${label}`);
     // the chapters panel, with the same rules
     await page.evaluate(() => (window as any).__houseStory.goBeat(3)); await sleep(500);
     await page.click('.st-btn-chapters'); await sleep(400);
     issues = await page.evaluate(AUDIT, '.st-chapters');
     ok(issues.length === 0, `the chapters panel: no serious or critical finding${issues.length ? ': ' + issues.join(' | ') : ''}`);
-    if (mobile) { const small = await page.evaluate(SMALL_TARGETS, '.st-chapters', 44); ok(small.length === 0, `its controls are 44 px targets${small.length ? ': ' + small.join(', ') : ''}`); }
+    if (mobile) { const small = await page.evaluate(SMALL_TARGETS, ['.st-chapters', 44] as [string, number]); ok(small.length === 0, `its controls are 44 px targets${small.length ? ': ' + small.join(', ') : ''}`); }
     await ctx.shot(page, `tour-chapters-${SLUG}-${label}`);
     ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
     await close();

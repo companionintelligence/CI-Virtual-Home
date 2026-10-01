@@ -16,7 +16,6 @@ import type { RuntimeStory, RuntimeBeat } from './runtime.js';
 import { beatIndexAt } from './runtime.js';
 import { trackFrameAt } from './track.js';
 import { focusRect, placePopup, placeEndCard, leaderTo, inter, PHONE_MAX_WIDTH, type Rect } from './place.js';
-import { camera as probeCamera, projectBox } from '../shot-probe.js';
 import { Narrator } from './audio.js';
 import { BeatCard, StartCard, EndCard, el, type StartChoice } from './popup.js';
 import { Chapters } from './chapters.js';
@@ -31,8 +30,11 @@ export type Control = {
 export type Env = {
   api: any; stats: any; root: HTMLElement; rs: RuntimeStory; control: Control; slug: string;
   reduced: boolean; hasNext: boolean; audioBase: string;
+  /** the address the page was opened with (its ?beat=), when this is the first tour of the page view */
+  query?: URLSearchParams;
 };
 
+type Subject = { box: number[]; focus: number[] | null };
 const DRIFT_S = 0.12;           // the picture follows the voice when they are further apart than this
 const FADE_MS = 250;
 const END_EPS = 0.9995;
@@ -66,10 +68,11 @@ export class Director {
   private stepMode: boolean;
   private stepClock = 0;          // reduced motion: seconds into the tour as the current beat's narration has it
   private stepSpeaking = false;
+  private stepBeat = -1;         // reduced motion: the beat the person stepped to
   private endMode = false;
   private place_: { rect: Rect; mode: 'card' | 'sheet'; subject: Rect | null; ok: boolean; overlapFocus: number } | null = null;
   private placedFor = '';
-  private subjectBox: number[] | null = null;
+  private subject: Subject | null = null;
   private lastPlaying = false;
   private audioPaused = false;
   private pendingClip = '';
@@ -119,7 +122,7 @@ export class Director {
     labelCanvas(env.api.canvas, rs.family.surname);
 
     // where a shared link points: ?beat=<id|n>, else ?t= (the player seeks to it itself; the card names the moment)
-    const q = new URLSearchParams(location.search);
+    const q = env.query || new URLSearchParams();
     let at = beatFromQuery(q, rs.beats);
     if (at < 0 && Number(env.stats.t) > 0.001) at = beatIndexAt(rs.beats, env.stats.t * this.T);
     this.initial = at;
@@ -251,6 +254,7 @@ export class Director {
     this.narrator?.stop(); this.pendingClip = '';
     this.live.reset();
     if (this.stepMode) {
+      this.stepBeat = i;
       if (this.flying) this.env.control.exitFly();
       this.crossfade(() => this.env.control.seek(b.rest / this.T));
       this.stepClock = b.speechAt; this.stepSpeaking = this.soundOn && !silentStart ? true : this.soundOn;
@@ -288,7 +292,7 @@ export class Director {
     this.end.show(false); this.endMode = false;
     this.narrator?.stop();
     this.env.control.seek(0);
-    this.beat = -1;
+    this.beat = -1; this.stepBeat = -1;
     if (this.stepMode) this.goBeat(0); else this.env.control.setPlaying(true);
   }
   private speakBeat(): void {
@@ -378,12 +382,22 @@ export class Director {
     if (this.chapters.isOpen) add(this.chapters.el);
     return out;
   }
-  private subjectOf(b: RuntimeBeat): number[] {
-    // A subject is the thing a beat is about. A room, a lawn or a street is too big to keep a card off, so for those it is the
-    // part of it the camera aims at (about 1.8 m round the aim point).
-    const bx = b.frame.box, f = b.frame.focus;
-    if (Math.max(bx[3] - bx[0], bx[5] - bx[2]) > 3.2 || bx[4] - bx[1] > 3.2) return [f[0] - 0.9, f[1] - 0.8, f[2] - 0.9, f[0] + 0.9, f[1] + 0.9, f[2] + 0.9];
-    return bx;
+  /**
+   * What a beat is about, as a box and the point the camera aims at. The card keeps off the box's picture; but a room, a lawn or a street is
+   * too big to keep a card off, and a box the camera stands beside fills the whole window, so for those the subject is the pin zone: a
+   * square round the aim point (about a quarter of the short side of the window), which is where the eye is sent.
+   */
+  private specOf(b: RuntimeBeat): Subject { return { box: b.frame.box, focus: b.frame.focus }; }
+  private subjectIn(cam: { eye: [number, number, number]; target: [number, number, number]; fov: number }, sp: Subject, w: number, h: number): Rect | null {
+    const bx = sp.box, f = sp.focus;
+    const wide = Math.max(bx[3] - bx[0], bx[5] - bx[2]) > 3.2 || bx[4] - bx[1] > 3.2;
+    if (!wide) { const r = focusRect(cam.eye, cam.target, cam.fov, bx as any, w, h); if (r && (!f || r.w * r.h < 0.45 * w * h)) return r; if (!f) return r; }
+    if (!f) return focusRect(cam.eye, cam.target, cam.fov, bx as any, w, h);
+    const p = focusRect(cam.eye, cam.target, cam.fov, [f[0] - 0.03, f[1] - 0.03, f[2] - 0.03, f[0] + 0.03, f[1] + 0.03, f[2] + 0.03] as any, w, h);
+    if (!p) return null;
+    const side = 0.24 * Math.min(w, h), cx = p.x + p.w / 2, cy = p.y + p.h / 2;
+    const x0 = Math.max(0, cx - side / 2), y0 = Math.max(0, cy - side / 2), x1 = Math.min(w, cx + side / 2), y1 = Math.min(h, cy + side / 2);
+    return x1 > x0 && y1 > y0 ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : null;
   }
   /** Solve the card for the current beat against the beat's rest pose. Once per beat (and again when the window or the panels change). */
   private replace(): void {
@@ -394,8 +408,8 @@ export class Director {
     if (key === this.placedFor) return;
     this.placedFor = key;
     const aspect = o.w / o.h, fr = trackFrameAt(this.rs.track, b.rest, aspect);
-    const sub = this.subjectOf(b); this.subjectBox = sub;
-    const focus = focusRect(fr.eye, fr.target, fr.fov, sub as any, o.w, o.h);
+    const sub = this.specOf(b); this.subject = sub;
+    const focus = this.subjectIn(fr, sub, o.w, o.h);
     const coreBox = this.rs.track.core;
     const core = coreBox && (b.chapter === this.rs.chapters[0].id) ? focusRect(fr.eye, fr.target, fr.fov, coreBox, o.w, o.h) : null;
     const phone = o.w <= PHONE_MAX_WIDTH;
@@ -443,16 +457,12 @@ export class Director {
   }
 
   /** the subject's rectangle through the camera as it is right now (px, relative to the player), or null when it is behind it */
-  private liveSubject(box: number[] | null = this.subjectBox): Rect | null {
-    const sub = box; if (!sub) return null;
+  private liveSubject(sp: Subject | null = this.subject): Rect | null {
+    if (!sp) return null;
     const a = this.env.api, cam = a.camera, o = this.rect();
     const eye: [number, number, number] = [cam.position.x, cam.position.y, cam.position.z];
     const d = cam.getWorldDirection(new a.THREE.Vector3());
-    const pb = projectBox(probeCamera(eye, [eye[0] + d.x, eye[1] + d.y, eye[2] + d.z], cam.fov, o.w / o.h), sub as any);
-    if (!pb) return null;
-    const x0 = (pb.minX + 1) / 2 * o.w, x1 = (pb.maxX + 1) / 2 * o.w, y0 = (1 - pb.maxY) / 2 * o.h, y1 = (1 - pb.minY) / 2 * o.h;
-    const r = { x: Math.max(0, x0), y: Math.max(0, y0), w: Math.min(o.w, x1) - Math.max(0, x0), h: Math.min(o.h, y1) - Math.max(0, y0) };
-    return r.w > 0 && r.h > 0 ? r : null;
+    return this.subjectIn({ eye, target: [eye[0] + d.x, eye[1] + d.y, eye[2] + d.z], fov: cam.fov }, sp, o.w, o.h);
   }
 
   // ------------------------------------------------------------------ a beat begins
@@ -489,7 +499,9 @@ export class Director {
 
     const t = this.t, ended = !flying && !playing && t >= END_EPS && (!this.stepMode || this.endMode);
     if (ended !== this.endMode && !this.stepMode) this.endMode = ended;
-    let bi = this.stepMode && this.beat >= 0 && !this.scrubbed() ? this.beat : beatIndexAt(rs.beats, this.playerClock);
+    let bi: number;
+    if (this.stepMode && this.stepBeat >= 0 && !this.scrubbed()) bi = this.stepBeat;          // stepping: the beat a person asked for
+    else { bi = beatIndexAt(rs.beats, this.playerClock); if (this.stepMode) this.stepBeat = bi; }   // playing, or a drag of the timeline: wherever the player is
     if (this.endMode) bi = rs.beats.length - 1;
     if (bi !== this.beat) this.enterBeat(bi);
 
@@ -634,7 +646,7 @@ export class Director {
         self.finish();
         for (let k = 0; k < 6; k++) await new Promise(r => requestAnimationFrame(r));
         const card = self.end.el.getBoundingClientRect(), o = self.rect();
-        const core = self.liveSubject(self.rs.track.core as any);
+        const core = self.liveSubject({ box: self.rs.track.core as any, focus: null });
         const c: Rect = { x: card.left - o.x, y: card.top - o.y, w: card.width, h: card.height };
         const x = Math.max(0, Math.min(c.x + c.w, core ? core.x + core.w : 0) - Math.max(c.x, core ? core.x : 0)), y = Math.max(0, Math.min(c.y + c.h, core ? core.y + core.h : 0) - Math.max(c.y, core ? core.y : 0));
         return { visible: self.end.visible, card: c, core, vw: o.w, vh: o.h, overlapCore: core ? (x * y) / Math.max(1, core.w * core.h) : 0, bars: self.barRects().reduce((a, r) => a + Math.max(0, Math.min(c.x + c.w, r.x + r.w) - Math.max(c.x, r.x)) * Math.max(0, Math.min(c.y + c.h, r.y + r.h) - Math.max(c.y, r.y)), 0) };
