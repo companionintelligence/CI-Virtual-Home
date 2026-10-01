@@ -1960,6 +1960,7 @@
     import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
     import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, createSkyBaker, installSkyFog, GradeShader, createLighting } from './assets/environment.js';
+    import { installLightGuard } from './assets/light-guard.js';
     // the editor's own UI (S6): assets/ui/*.ts
     import { displayName, buildCredit } from './assets/home-names.js';
     import { recordFrames, pickCodec, bitrateFor } from './assets/ui/recorder.js';
@@ -2129,6 +2130,11 @@
     // persCamera's far plane (160 m), so the ground is fully hazed before it is clipped and meets the backdrop,
     // baked with the same function, without a seam.
     const skyFog = installSkyFog(THREE);
+    // Live player only: skip the BRDF of spot and point lights a fragment is outside of (assets/light-guard.ts). It has
+    // to be in before the first program compiles, and it reads the URL itself — urlParams is declared far below.
+    // Without ?mode=view the editor, recorder, goldens and thumbs never see it. ?no=lightguard is the A/B switch.
+    const lightGuardOn = (() => { const q = new URLSearchParams(location.search); return q.get('mode') === 'view' && !q.getAll('no').join(',').split(',').includes('lightguard'); })();
+    if (lightGuardOn) installLightGuard(THREE);
     scene.fog = new THREE.Fog(0xdae5e4, 60, 155);
 
     // Fill: a cool, soft, shadowless light from the side opposite the sun. It used to be a cyan "studio rim";
@@ -2141,6 +2147,9 @@
     // Fireplace / warm amber interior point light
     const flamePointLight = new THREE.PointLight(0xf97316, 0, 8);
     flamePointLight.position.set(0, 1.2, 0);
+    // The editor's fireplace glow is 0 in every house, but as a light it still costs a loop iteration in every
+    // fragment shader. The player hides it now, before the first compile, so the light count never changes later.
+    if (lightGuardOn) flamePointLight.visible = false;
     scene.add(flamePointLight);
 
     // Floor Grid Helper (Architectural meter markings)
