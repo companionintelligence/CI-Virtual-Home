@@ -70,6 +70,7 @@ async function tree(name: 'dist' | 'root'): Promise<Tree> {
 
 async function fakeTree(o: FakeOpts = {}): Promise<Tree> {
   if (!fs.existsSync(path.join(DIST, 'room-creator.html'))) throw new Fail(`no ${DIST}/room-creator.html: run pnpm run build && pnpm run portal:build`);
+  if (treeHasXr(DIST)) throw new Skip('dist/ already has the real assets/xr/: a fake module cannot be layered on it (the fake variants are the harness\'s check of T-LAZY before the real module exists)');
   const dir = makeFakeXrTree(DIST, o); temps.push(dir);
   const srv = await serve(dir, SUBPATH); extra.push(srv);
   return { dir, base: SUBPATH, srv, hasXr: treeHasXr(dir), name: 'dist' };
