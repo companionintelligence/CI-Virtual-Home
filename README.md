@@ -513,8 +513,8 @@ placed item, scaled to the box the hidden procedural pieces measured; a fit off 
 procedural prop alone.
 
 *Tiers and loading.* `prefetch(houseId)` starts the downloads when the house id is known (concurrency 4, one promise per file, an `AbortController`
-per house so a switch cancels the old house's). `install()` waits at most 1.4 s: later textures swap in when they arrive; models that are late are
-skipped for this load. Tier 1: 512 px albedo, normal and roughness for the sets the house shows (biggest surfaces first), at most 8 props, at most
+per house so a switch cancels the old house's). `install()` waits at most 1.4 s: later textures swap in when they arrive, and models that are late are
+placed when they do (the static batch is undone around it and made again once, 250 ms after the last arrival). Tier 1: 512 px albedo, normal and roughness for the sets the house shows (biggest surfaces first), at most 8 props, at most
 1.5 MB per house. Tier 2: also the 1k albedo of the four biggest surfaces (loaded after the 512 ones, no program change, so no hitch beyond one
 upload), every prop, at most 3 MB. Tier 0 downloads nothing. Decoding uses `createImageBitmap` (off the main thread); each texture is uploaded with
 `renderer.initTexture` before it is drawn with.

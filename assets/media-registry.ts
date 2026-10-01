@@ -22,7 +22,7 @@
 //
 // NOTHING BLOCKS THE FIRST FRAME. prefetch(houseId) starts the downloads when the house id is known (concurrency 4, one
 // Map of promises, an AbortController per house so a switch cancels the old house's); install() waits at most
-// INSTALL_WAIT_MS for them: textures that arrive later swap in when they do, props are skipped for this load.
+// INSTALL_WAIT_MS for them: textures that arrive later swap in when they do, and so do props (placed with the batch undone and redone once, a beat after the last model).
 //
 // COST. Eager: this file's compiled size plus media-assets.js (a few KB each). Per house, lazily: tier 1 at most
 // TIER_BUDGET[1] bytes (512 px albedo, 512 normal, 512 roughness for each set, at most 8 props); tier 2 at most
@@ -215,7 +215,8 @@ export async function install(ctx: any): Promise<Handle | null> {
   const bigAlbedo = (id: string) => { let p = big.get(id); if (!p) { p = toTexture((MEDIA_ASSETS[id] as MediaTexture).files.albedo1k.file, true); big.set(id, p); } return p; };
 
   // ---- props: which objects, which models, within the tier's count and bytes
-  const propPlan: { obj: any; type: string; model: MediaModel }[] = [];
+  type PlanItem = { obj: any; type: string; model: MediaModel };
+  const propPlan: PlanItem[] = [];
   const modelIds = new Set<string>();
   {
     let n = 0, tris = 0;
@@ -269,22 +270,36 @@ export async function install(ctx: any): Promise<Handle | null> {
   // ---- wait (bounded) for what the first frame can have
   const ready = new Set<string>();   // texture set ids whose maps are decoded
   const modelsReady = new Map<string, any>();
+  let applied = false, disposed = false;
+  // A model that arrives after apply() (a cold load, a slow link) is placed when it does: the batch is undone around it
+  // (ctx.withUnbatched, as for any pre-batch feature that arrives late) and made again, once, a beat after the last arrival.
+  let lateTimer = 0;
+  function lateProps(): void {
+    if (!applied || disposed || lateTimer) return;
+    lateTimer = window.setTimeout(() => {
+      lateTimer = 0;
+      if (!applied || disposed || s.ac.signal.aborted) return;
+      try { ctx.withUnbatched(() => buildProps()); } catch (e) { console.warn('realism: assets could not place a late prop', e); }
+      ctx.markDirty();
+    }, 250);
+  }
   const settle = (p: Promise<any>, f: (v: any) => void) => p.then(f, () => {});
   const all: Promise<any>[] = [];
   for (const id of useTex) all.push(settle(texSet(id), () => ready.add(id)));
-  for (const id of modelIds) all.push(settle(loadModel(id), v => modelsReady.set(id, v)));
+  for (const id of modelIds) all.push(settle(loadModel(id), v => { modelsReady.set(id, v); lateProps(); }));
   let timer = 0;
   await Promise.race([Promise.all(all), new Promise<void>(r => { timer = window.setTimeout(r, INSTALL_WAIT_MS); })]);
   window.clearTimeout(timer);
   if (s.ac.signal.aborted) return null;
 
   // ---- the handle
-  let applied = false, disposed = false;
   const swaps: TexSwap[] = [];
   const swapped = new Map<any, TexSwap>();
   const props: PropSwap[] = [];
   const upgraded = new Set<string>();   // set ids on their 1k albedo
-  let propsBuilt = false;
+  const propsDone = new Set<PlanItem>();   // plan entries decided (placed, or off the fit and left procedural)
+  const perRoom = new Map<string, { sz: number; w: any }[]>();
+  let propTris = 0;
   const setsDone = new Set<string>();
 
   const wuv = (m: any) => m.userData.worldUV.uniforms;
@@ -367,14 +382,14 @@ export async function install(ctx: any): Promise<Handle | null> {
     }
     return out;
   }
+  /** place every planned prop whose models have arrived and that is not decided yet; safe to call again when more models arrive */
   function buildProps(): void {
-    if (propsBuilt) return;
-    propsBuilt = true;
-    let tris = 0;
-    const perRoom = new Map<string, { sz: number; w: any }[]>();
+    const touched = new Set<string>();
     for (const pl of propPlan) {
+      if (propsDone.has(pl)) continue;
       const ids = pl.type === 'fruit-bowl' ? ['bowl', 'lemon', 'apple'] : [pl.model.id];
-      if (!ids.every(id => modelsReady.has(id))) continue;   // the models are late: this prop stays procedural for this load
+      if (!ids.every(id => modelsReady.has(id))) continue;   // the models are late: a later call (when they arrive) places it
+      propsDone.add(pl);
       const spec: ModelFit = pl.model.fit || {};
       const obj = pl.obj;
       obj.updateMatrixWorld(true);
@@ -390,17 +405,18 @@ export async function install(ctx: any): Promise<Handle | null> {
       else placed = placeModel(wrapper, modelsReady.get(pl.model.id), pl.model, spec, pb);
       if (!placed) continue;
       const tr = ids.reduce((a, id) => a + (MEDIA_ASSETS[id] as MediaModel).tris, 0);
-      if (tris + tr > MAX_TRIS) continue;
-      tris += tr;
+      if (propTris + tr > MAX_TRIS) continue;
+      propTris += tr;
       for (const k of hide) { k.visible = false; k.userData.__procedural = true; }
       obj.add(wrapper);
       props.push({ obj, wrapper, hidden: hide, ids });
       const room = String(obj.userData.room || '');
       const arr = perRoom.get(room) || []; arr.push({ sz: pb.getSize(new THREE.Vector3()).length(), w: wrapper }); perRoom.set(room, arr);
+      touched.add(room);
       wrapper.traverse((c: any) => { if (c.isMesh) { c.castShadow = false; c.receiveShadow = true; } });
     }
     // only the three largest props of a room cast a shadow (the shadow pass pays for every triangle that casts)
-    for (const arr of perRoom.values()) { arr.sort((a, b) => b.sz - a.sz); for (const x of arr.slice(0, 3)) x.w.traverse((c: any) => { if (c.isMesh) c.castShadow = true; }); }
+    for (const room of touched) { const arr = perRoom.get(room)!; arr.sort((a, b) => b.sz - a.sz); arr.forEach((x, k) => x.w.traverse((c: any) => { if (c.isMesh) c.castShadow = k < 3; })); }
   }
   /** put a model in `wrapper`, scaled and placed to the box `pb` the procedural pieces measured (local space of the item); false = off the fit */
   function placeModel(wrapper: any, src: any, m: MediaModel, spec: ModelFit, pb: any): boolean {
@@ -463,7 +479,7 @@ export async function install(ctx: any): Promise<Handle | null> {
   }
   function removeProps(): void {
     for (const p of props) { p.obj.remove(p.wrapper); for (const k of p.hidden) { k.visible = true; delete k.userData.__procedural; } }
-    props.length = 0; propsBuilt = false;
+    props.length = 0; propsDone.clear(); perRoom.clear(); propTris = 0;
   }
 
   const handle: Handle = {
@@ -479,6 +495,7 @@ export async function install(ctx: any): Promise<Handle | null> {
     restore() {
       if (!applied) return;
       applied = false;
+      window.clearTimeout(lateTimer); lateTimer = 0;
       removeProps();
       for (const r of swaps) unswapMaterial(r);
       swaps.length = 0; swapped.clear(); setsDone.clear(); upgraded.clear();
@@ -486,7 +503,7 @@ export async function install(ctx: any): Promise<Handle | null> {
     setTier(t: number) { if (!applied) return; if (t >= 2) void promote(); else void demote(); },
     sync() { /* the swapped materials are the builders' own objects: the batch keeps them (worldUV materials keep their identity) */ },
     dispose() {
-      disposed = true;
+      disposed = true; window.clearTimeout(lateTimer);
       handle.restore();
       for (const x of made) { try { x.dispose(); } catch { /* gone */ } }
       for (const t of made) if (t && t.image && typeof t.image.close === 'function') { try { t.image.close(); } catch { /* ditto */ } }
