@@ -49,7 +49,7 @@ export type Loaded = {
   stories: Story[];
   casting: Record<string, CastingFamily>;
   claims: any;
-  catalog: Record<string, { id: string; name: string; description?: string; replaces?: string[]; kind?: string }>;
+  catalog: Record<string, { id: string; name: string; description?: string; replaces?: string[]; kind?: string; storeUrl?: string; inLiveStore?: boolean; storySafe?: string }>;
   dir: string;
 };
 

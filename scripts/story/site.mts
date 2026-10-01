@@ -55,14 +55,9 @@ export const PROD_HOST = 'homes.ci.computer';
  */
 export function stripLeakyComments(text: string, needle: RegExp): string {
   const has = (s: string): boolean => needle.test(s);
-  let out = text.replace(/\/\*[\s\S]*?\*\//g, m => (has(m) ? '' : m)).replace(/<!--[\s\S]*?-->/g, m => (has(m) ? '' : m));
-  out = out.split('\n').map(line => {
-    if (!has(line)) return line;
-    if (/^\s*\/\//.test(line)) return null;
-    const m = /^(.*?[;,{}()\]]\s*)\/\/(?!\/).*$/.exec(line);   // a code line with a trailing comment (a "//" inside a string has a quote before it)
-    return m && !/['"`][^'"`]*$/.test(m[1]) && !has(m[1]) ? m[1].trimEnd() : line;
-  }).filter((l): l is string => l !== null).join('\n');
-  return out;
+  // (only comments that open a line: a "/*" or "<!--" inside a string or a regular expression is code)
+  const out = text.replace(/^[ \t]*\/\*[\s\S]*?\*\//gm, m => (has(m) ? '' : m)).replace(/^[ \t]*<!--[\s\S]*?-->/gm, m => (has(m) ? '' : m));
+  return out.split('\n').filter(line => !(has(line) && /^\s*\/\/(?!\/)/.test(line))).join('\n');
 }
 export type BuildArgs = Record<string, string>;
 export type SiteResult = { files: number; bytes: number; partial: boolean; noindex: boolean; families: number };

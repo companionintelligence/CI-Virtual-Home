@@ -85,7 +85,7 @@ export function footer(rel: string, claims: any, opts: { scripted?: boolean } = 
   </footer>`;
 }
 
-const head = (o: { title: string; desc: string; canonical: string; image: string; imageAlt: string; rel: string; noindex: boolean; ld: object; css: string[]; type?: string }): string => `<meta charset="utf-8">
+const head = (o: { title: string; ogTitle?: string; desc: string; canonical: string; image: string; imageAlt: string; rel: string; noindex: boolean; ld: object; css: string[]; type?: string }): string => `<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${esc(o.title)}</title>
   <meta name="description" content="${esc(o.desc)}">
@@ -93,7 +93,7 @@ const head = (o: { title: string; desc: string; canonical: string; image: string
   <link rel="canonical" href="${esc(o.canonical)}">
   <meta property="og:type" content="${o.type || 'website'}">
   <meta property="og:site_name" content="${SITE_NAME}">
-  <meta property="og:title" content="${esc(o.title)}">
+  <meta property="og:title" content="${esc(o.ogTitle || o.title)}">
   <meta property="og:description" content="${esc(o.desc)}">
   <meta property="og:url" content="${esc(o.canonical)}">
   <meta property="og:image" content="${esc(o.image)}">
@@ -185,7 +185,7 @@ export function familyPage(c: FamilyPageCtx): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-  ${head({ title, desc, canonical: url, image: c.og, imageAlt: `The ${s.family.surname} family home in 3D. ${FICTIONAL_LINE}`, rel: '../', noindex: c.noindex, ld, css: ['site.css', 'family.css'] })}
+  ${head({ title, ogTitle: card.title, desc, canonical: url, image: c.og, imageAlt: `The ${s.family.surname} family home in 3D. ${FICTIONAL_LINE}`, rel: '../', noindex: c.noindex, ld, css: ['site.css', 'family.css'] })}
   <script>
     // A shared moment (?t= ?shot= ?tod= ?play= ?beat=) goes straight to the tour; the plain page needs no script at all.
     (function () {

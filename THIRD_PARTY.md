@@ -83,6 +83,26 @@ External tools the scripts call but this repository does not include: **ffmpeg**
 `prop-sheet.mts`; LGPL-2.1+/GPL depending on build), **rsvg-convert** from librsvg (`generate_floor_plans.py`,
 `generate_house_iso.py --png`; LGPL-2.1+), and **Python 3** (standard library only).
 
+## Story site: landing
+
+The public site (`pnpm run portal:build` → `dist/`, see README → The public site) adds this to what it ships. Nothing here is
+loaded from a third party at run time: the site makes no third-party request.
+
+| Component | Version | Licence | Where | Licence text |
+|---|---|---|---|---|
+| [Archivo Black](https://github.com/Omnibus-Type/ArchivoBlack) — Latin subset, via CI-Common `styles/fonts/files/archivo-black-latin.woff2` (the canon's display face: the landing's headline, kickers and big numerals only) | as in CI-Common | OFL-1.1 — © 2017 The Archivo Black Project Authors | [`portal/fonts/archivo-black.woff2`](portal/fonts/archivo-black.woff2); shipped as `portal/fonts/archivo-black.<hash10>.woff2` | [`portal/fonts/LICENSE-Archivo-Black.txt`](portal/fonts/LICENSE-Archivo-Black.txt) (shipped beside the font) |
+| Manrope and Lucide icon path data (a few more symbols: menu, sliders, film, search) | as in the table above | OFL-1.1 · ISC | `assets/fonts/`, inlined in `index.html` and `scripts/story/pages.mts` | as above |
+| The first-run drawings and the monogram discs | first-party | — | `scripts/story/pages.mts` (inline SVG) | — |
+
+The pictures on the site (thumbnails, posters, link previews, the hero) are renders of our own HouseSpecs; the link previews
+are drawn by `scripts/story/build-og.mts` over them. No photograph, portrait, logo of a third-party app or app screenshot is used:
+third-party apps are named in text only.
+
+**Considered and not used.** [axe-core](https://github.com/dequelabs/axe-core) (the accessibility checker) is **MPL-2.0**, which
+is outside the licence list this repository takes (MIT, BSD, ISC, Apache-2.0, CC0), so `pnpm run portal:test` carries its own
+audit (`AUDIT` in `scripts/test-portal.mts`: names, landmarks, headings, labels, ids, contrast). If the owner approves MPL-2.0 for a
+test-only devDependency, it can be added beside it.
+
 ## Licence texts for adapted source
 
 ### furnishup/blueprint3d

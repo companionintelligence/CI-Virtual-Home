@@ -45,6 +45,7 @@
         window.__vhWant = null;
         window.__vhIndex = fetch('./story/manifest.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (m) {
           if (!m) return null;
+          var lg = !q.get('family') && q.get('house') ? fetch(m.legacy).then(function (r) { return r.json(); }).catch(function () { return null; }) : null;   // (beside the list, not after it)
           return fetch(m.families).then(function (r) { return r.json(); }).then(function (list) {
             var houses = list.families.map(function (c) { specs[c.slug] = m.byFamily[c.slug] && m.byFamily[c.slug].spec; return { id: c.slug, title: c.title, address: c.address, thumb: c.thumb }; });
             var fam = q.get('family'), old = q.get('house');
@@ -63,8 +64,8 @@
             if (!(window.crypto && crypto.subtle)) return done(null);
             return crypto.subtle.digest('SHA-256', new TextEncoder().encode(old)).then(function (b) {
               var key = Array.prototype.map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('').slice(0, 12);
-              return fetch(m.legacy).then(function (r) { return r.json(); }).then(function (map) {
-                var slug = map[key] || null;
+              return lg.then(function (map) {
+                var slug = (map && map[key]) || null;
                 if (slug) { var n = new URLSearchParams(location.search); n.delete('house'); n.set('family', slug); try { history.replaceState(null, '', '?' + n.toString() + location.hash); } catch (e) { /* sandboxed */ } }
                 return done(slug);
               });
