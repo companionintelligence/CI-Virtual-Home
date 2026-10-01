@@ -75,3 +75,40 @@ export async function expectFail(what: string, re: RegExp, fn: () => Promise<unk
   }
   throw new Fail(`NEGATIVE CONTROL FAILED: "${what}" passed, the check cannot fail`);
 }
+
+// ------------------------------------------------------------------------------------------------------------ offline determinism
+import fs from 'node:fs';
+import path from 'node:path';
+import { ROOT, sha, type P } from './lib.mts';
+
+export const OFFLINE_BASELINE = path.join(import.meta.dirname, 'offline-baseline.json');
+export const OFFLINE_SHOT = 'door-to-core', OFFLINE_RES = '360', OFFLINE_FPS = 60;
+
+/**
+ * Frame 0 of a shot, drawn the way the goldens draw it (scripts/test-goldens.mts: fonts loaded, composer warmed at supersample 2,
+ * __houseRenderBegin / __houseRenderFrames through the film's composer, raw RGBA read back off the GL context). Returns the sha256 of
+ * the pixels. `p` must be an EDITOR page (no ?mode=view): the offline hooks do not exist in the player.
+ */
+export async function renderFrame0(p: P): Promise<{ sha: string; w: number; h: number }> {
+  await p.page.evaluate(async () => {
+    const want = ['Manrope', 'Plus Jakarta Sans', 'JetBrains Mono'];
+    await Promise.all(want.map(f => document.fonts.load(`16px "${f}"`).catch(() => {})));
+    await document.fonts.ready;
+  });
+  await p.page.evaluate((r: string) => { (window as any).__houseSupersample = 2; return (window as any).__houseComposerWarm({ res: r }); }, OFFLINE_RES);
+  const o = await p.page.evaluate(([shot, res, fps]: [string, string, number]) => {
+    const info = (window as any).__houseRenderBegin({ shot, res, fps });
+    (window as any).__houseRenderFrames(0, 1, 1.0);
+    const gl = (window as any).__houseDebug().renderer.getContext();
+    const px = new Uint8Array(info.w * info.h * 4);
+    gl.readPixels(0, 0, info.w, info.h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    (window as any).__houseRenderEnd();
+    let s = ''; for (let k = 0; k < px.length; k += 8192) s += String.fromCharCode.apply(null, px.subarray(k, k + 8192) as any);
+    return { w: info.w, h: info.h, b64: btoa(s) };
+  }, [OFFLINE_SHOT, OFFLINE_RES, OFFLINE_FPS] as [string, string, number]);
+  return { sha: sha(Buffer.from(o.b64, 'base64')), w: o.w, h: o.h };
+}
+
+export function machineKey(browserVersion: string): string { return `${process.platform}|chromium ${browserVersion}`; }
+export function readBaseline(): any { try { return JSON.parse(fs.readFileSync(OFFLINE_BASELINE, 'utf8')); } catch { return { note: '', frames: {} }; } }
+export const goldenProfile = () => (fs.readdirSync(path.join(ROOT, 'test', 'goldens')).find(d => d !== 'expected-diffs' && fs.existsSync(path.join(ROOT, 'test', 'goldens', d, 'PROFILE.json'))) || 'unknown');

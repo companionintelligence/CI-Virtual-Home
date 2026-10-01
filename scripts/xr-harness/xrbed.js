@@ -45,13 +45,20 @@ window.__bed = (function () {
       const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 0, -3)]), new THREE.LineBasicMaterial({ color: 0xffffff })); line.name = 'ray'; c.add(line);
       const mk = (name) => (e) => { B.events.push({ n: name, i, t: performance.now(), src: e.data ? e.data.handedness + '/' + e.data.targetRayMode : null }); };
       c.addEventListener('connected', (e) => { c.userData.src = e.data; B.events.push({ n: 'connected', i, h: e.data.handedness, m: e.data.targetRayMode }); });
-      c.addEventListener('disconnected', () => { c.userData.src = null; B.events.push({ n: 'disconnected', i }); if (B.state.down && B.downBy === i) { B.state.down = null; B.cancelled = (B.cancelled || 0) + 1; draw(); } });
-      c.addEventListener('selectstart', (e) => { mk('selectstart')(e); const h = B.hit(c); if (h) { B.state.down = h.id; B.downBy = i; draw(); B.buzz(c, 0.3, 30); } });
-      c.addEventListener('selectend', (e) => { mk('selectend')(e); if (B.state.down) { B.state.down = null; draw(); } });
-      // a press that was cancelled (source lost / system overlay) must not count as a select
-      c.addEventListener('select', (e) => { mk('select')(e); if (B.hidden) return; const h = B.hit(c); if (h) { B.state.last = h.id; B.state.count++; B.pressed.push(h.id); draw(); } });
+      // a press is ARMED at selectstart on a button, COUNTED at selectend if it was not cancelled and the ray is still on that button
+      // (not at `select`: IWER fires select before selectstart). Losing the source, a hidden session, or a session end cancels it.
+      c.addEventListener('disconnected', () => { c.userData.src = null; B.events.push({ n: 'disconnected', i }); if (B.state.down && B.downBy === i) B.cancel('source-lost'); });
+      c.addEventListener('selectstart', (e) => { mk('selectstart')(e); const h = B.hit(c); if (h && !B.hidden) { B.state.down = h.id; B.downBy = i; draw(); B.buzz(c, 0.3, 30); } });
+      c.addEventListener('selectend', (e) => {
+        mk('selectend')(e); const armed = B.state.down; if (!armed || B.downBy !== i) return;
+        const h = B.hit(c); B.state.down = null;
+        if (h && h.id === armed && !B.hidden) { B.state.last = armed; B.state.count++; B.pressed.push(armed); } else { B.cancelled = (B.cancelled || 0) + 1; }
+        draw();
+      });
+      c.addEventListener('select', mk('select'));
       return c;
     });
+    B.cancel = (why) => { if (B.state.down) { B.state.down = null; B.cancelled = (B.cancelled || 0) + 1; B.events.push({ n: 'cancel', why }); draw(); } };
     B.ray = new THREE.Raycaster(); const m4 = new THREE.Matrix4();
     B.hitPanel = (c) => {               // where the controller's ray meets the panel, whatever the source type
       m4.identity().extractRotation(c.matrixWorld); B.ray.ray.origin.setFromMatrixPosition(c.matrixWorld); B.ray.ray.direction.set(0, 0, -1).applyMatrix4(m4);
@@ -60,10 +67,11 @@ window.__bed = (function () {
     };
     B.hit = (c) => (c.userData.src ? B.hitPanel(c) : null);   // only a connected source can press
     B.buzz = (c, intensity, ms) => { try { const g = c.userData.src && c.userData.src.gamepad; const a = g && (g.hapticActuators && g.hapticActuators[0]); if (a && a.pulse) { a.pulse(intensity, ms); B.haptics++; } else if (g && g.vibrationActuator) { g.vibrationActuator.playEffect('dual-rumble', { duration: ms, strongMagnitude: intensity, weakMagnitude: intensity }); B.haptics++; } } catch (e) { B.hapticErr = String(e); } };
+    B.cleaned = false;
     renderer.xr.enabled = true;
     const sess = B.session = await navigator.xr.requestSession(mode, { optionalFeatures: features });
-    sess.addEventListener('end', () => B.events.push({ n: 'session-end' }));
-    sess.addEventListener('visibilitychange', () => { B.hidden = sess.visibilityState === 'hidden'; if (B.hidden && B.state.down) { B.state.down = null; B.cancelled = (B.cancelled || 0) + 1; draw(); } });
+    sess.addEventListener('end', () => { B.events.push({ n: 'session-end' }); B.cancel('session-end'); B.cleanup(); });   // the system can end a session too: clean up either way
+    sess.addEventListener('visibilitychange', () => { B.hidden = sess.visibilityState === 'hidden'; if (B.hidden) B.cancel('hidden'); });
     await renderer.xr.setSession(sess);
     // page rAF is paused during a headset session: emulate that, but let IWER's own device frame through
     // (a headset browser holds the page's rAF callbacks and runs them again when the session ends, so the bed queues them and replays them in stop())
@@ -130,15 +138,18 @@ window.__bed = (function () {
   };
 
   B.stop = async function () {
-    const { renderer, scene, camera } = B; const s = B.session;
-    await s.end(); await new Promise(r => setTimeout(r, 200));
+    const s = B.session; if (s && !B.cleaned) { await s.end().catch(() => {}); await new Promise(r => setTimeout(r, 200)); } B.cleanup();
+    return { presenting: B.renderer.xr.isPresenting, camParentIsScene: B.camera.parent === B.scene };
+  };
+  B.cleanup = function () {
+    if (B.cleaned || !B.renderer) return; B.cleaned = true;
+    const { renderer, scene, camera } = B;
     renderer.xr.setAnimationLoop(null); renderer.xr.enabled = B.savedXr; if (B.realRaf) { window.requestAnimationFrame = B.realRaf; for (const cb of B.pending.splice(0)) window.requestAnimationFrame(cb); }
     B.rig.remove(camera); if (B.savedParent) B.savedParent.add(camera); camera.position.copy(B.savedPos); camera.quaternion.copy(B.savedQuat);
     // three's WebXRManager overwrites fov/near/far/aspect/projection and never restores them: the bed does (window.__bedNoCamRestore = true is the negative control)
     if (!window.__bedNoCamRestore) { const c = B.savedCam; camera.fov = c.fov; camera.near = c.near; camera.far = c.far; camera.zoom = c.zoom; camera.aspect = c.aspect; camera.updateProjectionMatrix(); }
     B.rig.removeFromParent(); B.panel.geometry.dispose(); B.panel.material.dispose(); B.tex.dispose();
     for (const c of B.ctrl) { c.traverse(o => { if (o.geometry) o.geometry.dispose(); if (o.material) o.material.dispose(); }); c.removeFromParent(); } if (B.fade) { B.camera.remove(B.fade); B.fade.geometry.dispose(); B.fade.material.dispose(); B.fade = null; }
-    return { presenting: renderer.xr.isPresenting, camParentIsScene: camera.parent === scene };
   };
   return B;
 })();
