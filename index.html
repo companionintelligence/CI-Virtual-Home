@@ -3,39 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Virtual homes · Companion Intelligence</title>
-  <meta name="description" content="Thirty homes, each built live in your browser from one spec file. Fly the camera paths, change the hour, walk in to the Companion Core.">
-  <!-- link previews: scripts/build-portal.mts makes og:image and og:url absolute for the deployed site -->
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Companion Intelligence">
-  <meta property="og:title" content="Virtual homes · Companion Intelligence">
-  <meta property="og:description" content="Thirty homes, each built live in your browser from one spec file. Fly the camera paths, change the hour, walk in to the Companion Core.">
-  <meta property="og:image" content="./portal/hero.jpg">
-  <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser.">
-  <meta name="twitter:card" content="summary_large_image">
+  <title>Uncloud your life with Companion Core home servers</title>
+  <meta name="description" content="Thirty fictional families, real software. Walk through their homes and see how a Companion Core keeps your apps, agents and memory off the cloud.">
   <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
   <!--
-    The portal's gallery. Static and fast: it reads content/houses/index.json and shows the committed thumbnails
-    in portal/thumbs/ (scripts/build-thumbs.mts); there is no WebGL on this page. A card opens the live player,
-    room-creator.html?mode=view (assets/viewer.ts). Every URL here is relative, so the site works at any host's
-    root and under a sub-path (portal:test serves it at /ci-virtual-home/). Fonts are the repo's own woff2, so
-    this page makes no third-party requests.
+    The landing of the Companion Core site: thirty fictional families, each with a page and a tour of their home in 3D.
+    This file is a TEMPLATE. scripts/story/site.mts (pnpm run portal:build) writes dist/index.html from it, filling every
+    "@marker" in a comment below, and the @-words in the hero, from content/families/*.json, content/story/claims.json and
+    the hashed files it ships: the canonical address, the link previews, the family list's hashed URL, the chrome every
+    page shares, the first-run steps, six stories from the families' own files and the disclosures. Open dist/
+    (pnpm run portal:preview), not this file.
+    Static and fast: no WebGL on this page; portal/gallery.js lists story/families.<hash>.json as cards. Every URL is
+    relative, so the site works at any host's root and under a sub-path (portal:test serves it at /ci-virtual-home/).
+    Fonts are the repo's own woff2, so this page makes no third-party requests.
   -->
+  <meta name="vh-families" content="@families-url">
+  <!-- @head -->
   <link rel="icon" href="./assets/brand/ci-logo-mark.svg" type="image/svg+xml">
   <link rel="preload" href="./assets/fonts/manrope-latin-var.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="./content/houses/index.json" as="fetch" crossorigin>
+  <link rel="stylesheet" href="./portal/site.css">
   <link rel="stylesheet" href="./portal/gallery.css">
-  <!-- gallery.js imports the portal's names when it runs, and lists the homes without them if they fail to come -->
-  <link rel="modulepreload" href="./assets/home-names.js">
-  <noscript><style>.skel { display: none; }</style></noscript>
+  <script type="module" src="./portal/site.js"></script>
   <script type="module" src="./portal/gallery.js"></script>
 </head>
-<body>
-  <!-- Icons: Lucide (lucide-react 0.469.0, ISC; see THIRD_PARTY.md). Use as <svg class="i"><use href="#i-name"/></svg>. -->
+<body class="page-landing">
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <defs>
       <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
@@ -44,103 +36,163 @@
       <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
       <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
       <symbol id="i-out" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+      <symbol id="i-next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
       <symbol id="i-retry" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></symbol>
+      <symbol id="i-sliders" viewBox="0 0 24 24"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></symbol>
     </defs>
   </svg>
 
-  <a class="skip" href="#homes">Skip to the homes</a>
+  <!-- @header -->
 
-  <header class="site-head">
-    <a class="brand" href="./index.html" aria-label="Virtual homes, home">
-      <img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28">
-      <span class="brand-text"><b>Virtual homes</b><span>Companion Intelligence</span></span>
-    </a>
-    <nav class="site-nav" aria-label="Site">
-      <a href="#homes">Homes</a>
-      <a href="https://ci.computer" rel="noopener">Companion Core<svg class="i i-out" aria-hidden="true"><use href="#i-out"/></svg></a>
-    </nav>
-  </header>
-
-  <main>
+  <main id="main">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="eyebrow">Live 3D, in your browser</p>
-        <h1 id="hero-title">Walk into thirty homes.</h1>
-        <p class="lede">Your browser builds each home from one spec file: walls, rooms, furniture, garden and light.<span class="lede-more"> Pick a home, fly its camera paths, change the hour.</span></p>
-        <p class="core-line"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg><span>The small computer on every desk is a <b>Companion Core</b>: your own AI, apps and memory, running at home. <a href="https://ci.computer" rel="noopener">What is Companion Core?</a></span></p>
+        <p class="eyebrow">Thirty fictional families. Real software.</p>
+        <h1 id="hero-title">Uncloud your life with Companion Core home servers</h1>
+        <p class="lede">Companion Core is a 4.3 litre computer that holds large local models in unified memory, runs your apps and your agents, and answers only to the person in the room.</p>
+        <p class="lede-more">Walk through thirty homes and see what changes when your photos, passwords, cameras and AI stop living on someone else's servers.</p>
         <div class="hero-cta">
-          <a class="btn btn-primary" id="hero-play" href="./room-creator.html?mode=view&amp;house=aurora"><svg class="i i-fill"><use href="#i-play"/></svg><span>Watch <span data-hero-name>Aurora</span></span></a>
-          <a class="btn btn-ghost hero-browse" href="#homes"><span>Browse the homes</span><svg class="i"><use href="#i-down"/></svg></a>
+          <a class="btn btn-primary" href="#families"><span>Start with a family</span><svg class="i" aria-hidden="true"><use href="#i-down"/></svg></a>
+          <a class="btn btn-ghost" href="#start"><span>How it starts</span></a>
         </div>
+        <ul class="proof-chips" aria-label="Facts about Companion Core">
+          <li>No usage data is collected from your machine.</li>
+          <li>19 dB at idle</li>
+          <li>Companion OS is in beta</li>
+        </ul>
         <dl class="stats" aria-label="The collection">
-          <div><dt>Homes</dt><dd data-stat="homes">30</dd></div>
-          <div><dt>Builders credited</dt><dd data-stat="builders">12</dd></div>
-          <div><dt>Square metres of floor</dt><dd data-stat="area">7,680</dd></div>
+          <div><dt>Families</dt><dd data-stat="families">30</dd></div>
+          <div><dt>People</dt><dd data-stat="people">0</dd></div>
+          <div><dt>Stories</dt><dd data-stat="stories">0</dd></div>
         </dl>
       </div>
-      <a class="hero-media" id="hero-media" href="./room-creator.html?mode=view&amp;house=aurora" aria-label="Play Aurora in 3D">
-        <img src="./portal/hero.webp" alt="An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser." width="1600" height="900" fetchpriority="high">
-        <span class="hero-badge"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg>Interactive 3D</span>
-        <span class="hero-play" aria-hidden="true"><svg class="i i-fill"><use href="#i-play"/></svg></span>
-      </a>
+      <figure class="hero-media">
+        <a id="hero-media" href="./family/@hero-slug" aria-label="@hero-title, a fictional family. Open their page">
+          <img src="@hero-src" alt="@hero-alt" width="1600" height="900" fetchpriority="high">
+          <span class="hero-badge"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg>Interactive 3D tour</span>
+          <span class="hero-play" aria-hidden="true"><svg class="i i-fill"><use href="#i-play"/></svg></span>
+        </a>
+        <figcaption><span>@hero-title. Fictional family. Real software.</span><a class="hero-tour" id="hero-play" href="./room-creator.html?mode=view&amp;family=@hero-slug">Take the tour<svg class="i" aria-hidden="true"><use href="#i-next"/></svg></a></figcaption>
+      </figure>
     </section>
 
-    <section class="homes" id="homes" aria-labelledby="homes-title">
-      <div class="homes-head">
-        <h2 id="homes-title">All homes <span class="count" aria-live="polite"></span></h2>
-        <div class="filters" id="filters">
-          <label class="search">
-            <svg class="i"><use href="#i-search"/></svg>
-            <input type="search" id="q" placeholder="Search name, style or builder" aria-label="Search homes" autocomplete="off" spellcheck="false">
-            <kbd aria-hidden="true">/</kbd>
-          </label>
-          <div class="seg" role="group" aria-label="Storeys" id="storeys">
-            <span class="seg-label" aria-hidden="true">Storeys</span>
-            <button type="button" data-storeys="" aria-pressed="true" aria-label="Any number of storeys">Any</button>
-            <button type="button" data-storeys="1" aria-pressed="false" aria-label="1 storey">1</button>
-            <button type="button" data-storeys="2" aria-pressed="false" aria-label="2 storeys">2</button>
-            <button type="button" data-storeys="3" aria-pressed="false" aria-label="3 or more storeys">3+</button>
-          </div>
+    <section class="band" id="start" aria-labelledby="start-title">
+      <div class="wrap">
+        <p class="kicker">First run</p>
+        <h2 id="start-title">Plug in, join its Wi-Fi, run.</h2>
+        <ol class="steps">
+          <!-- @steps -->
+        </ol>
+        <div class="beta-block">
+          <p><b>Companion OS is in beta.</b> It is running on units in the field today. Some of what we want it to do is not built yet. We will tell you which is which in the updates rather than in the marketing.</p>
+          <p>Installing apps uses the internet.</p>
         </div>
       </div>
-      <div class="tags" role="group" aria-label="Style" id="tags"></div>
-      <!-- placeholder cards until index.json is in: the grid holds its place, so nothing jumps -->
+    </section>
+
+    <section class="wrap families" id="families" aria-labelledby="families-title">
+      <div class="families-head">
+        <h2 id="families-title">Meet the families.</h2>
+        <p class="count" id="count" aria-live="polite"></p>
+      </div>
+      <div class="filter-bar" id="filters">
+        <label class="search">
+          <svg class="i" aria-hidden="true"><use href="#i-search"/></svg>
+          <input type="search" id="q" placeholder="Search a family, a room or an app" aria-label="Search a family, a room or an app" autocomplete="off" spellcheck="false">
+          <kbd aria-hidden="true">/</kbd>
+        </label>
+        <button type="button" class="btn btn-ghost btn-sm filters-open" id="filters-open" aria-haspopup="dialog"><svg class="i" aria-hidden="true"><use href="#i-sliders"/></svg><span>Filters</span><small id="filters-n"></small></button>
+        <div class="filter-panel" id="filter-panel">
+        <!-- @filters -->
+        </div>
+        <button type="button" class="link-btn" id="clear-top" hidden>Clear filters</button>
+      </div>
+      <dialog class="sheet" id="sheet" aria-labelledby="sheet-title">
+        <div class="sheet-head"><h3 id="sheet-title">Filters</h3><button type="button" class="icon-btn" id="sheet-close" aria-label="Close filters"><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+        <div class="sheet-body" id="sheet-body"></div>
+        <div class="sheet-foot"><button type="button" class="btn btn-ghost btn-sm" id="sheet-clear">Clear</button><button type="button" class="btn btn-primary btn-sm" id="sheet-done">Show families</button></div>
+      </dialog>
+      <!-- placeholder cards until the family list is in: the grid holds its place, so nothing jumps -->
       <ul class="grid" id="grid" aria-busy="true">
-        <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
-        <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
-        <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
         <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
         <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
         <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
       </ul>
       <div class="empty" id="empty" hidden>
-        <p><b>No homes match.</b> Try fewer words, or clear the filters.</p>
+        <p><b>No family matches.</b> Try fewer words, or clear the filters.</p>
         <button type="button" class="btn btn-ghost" id="clear">Clear filters</button>
       </div>
       <div class="empty" id="failed" role="alert" hidden>
-        <p><b>The list of homes did not load.</b> Check the connection and try again.</p>
-        <button type="button" class="btn btn-primary" id="retry"><svg class="i"><use href="#i-retry"/></svg><span>Try again</span></button>
+        <p><b>The list of families did not load.</b> Check the connection and try again.</p>
+        <button type="button" class="btn btn-primary" id="retry"><svg class="i" aria-hidden="true"><use href="#i-retry"/></svg><span>Try again</span></button>
       </div>
-      <noscript><p class="empty">The gallery needs JavaScript to list the homes.</p></noscript>
+      <!-- @noscript -->
+    </section>
+
+    <section class="band band-quiet" id="rooms" aria-labelledby="rooms-title">
+      <div class="wrap">
+        <p class="kicker">All around the house</p>
+        <h2 id="rooms-title">A story in every room.</h2>
+        <ul class="stories">
+          <!-- @rooms -->
+        </ul>
+      </div>
+    </section>
+
+    <section class="wrap local" id="local" aria-labelledby="local-title">
+      <h2 id="local-title">What local means here.</h2>
+      <ul class="proof">
+        <li><b>Local by default.</b><span>Inference, memory and agents run on your hardware.</span></li>
+        <li><b>No usage data is collected from your machine.</b></li>
+        <li><b>Agents work for you.</b><span>They operate on your local memory by default and work only on your behalf.</span></li>
+        <li><b>Full-disk encryption supported.</b><span>Your keys.</span></li>
+        <li><b>Opt-in imports.</b><span>Nothing is connected by default, and each import is revocable.</span></li>
+        <li><b>Your memory is not a hostage.</b><span>If you stop subscribing, functionality freezes where it is. Nothing is deleted.</span></li>
+      </ul>
+    </section>
+
+    <section class="band band-quiet" id="hub" aria-labelledby="hub-title">
+      <div class="wrap hub">
+        <div>
+          <p class="kicker">Companion Hub</p>
+          <h2 id="hub-title">Apps come from the Companion Hub.</h2>
+          <p class="hub-lede">300+ apps and agents available in the Companion Hub store. Each family in these stories runs apps from it, and each app takes the place of a cloud service.</p>
+          <p><a class="btn btn-ghost" href="https://hub.ci.computer/store?category=alternatives" rel="noopener"><span>Browse Alternatives in the Companion Hub store</span><svg class="i" aria-hidden="true"><use href="#i-out"/></svg></a></p>
+        </div>
+        <table class="swap">
+          <caption class="sr">Cloud services and the apps that take their place at home</caption>
+          <thead><tr><th scope="col">Instead of</th><th scope="col">Run at home</th></tr></thead>
+          <tbody>
+            <tr><td>Google Photos, iCloud Photos</td><td>Immich, PhotoPrism</td></tr>
+            <tr><td>Google Home, Alexa, HomeKit</td><td>Home Assistant</td></tr>
+            <tr><td>Ring, Nest Cam</td><td>Frigate</td></tr>
+            <tr><td>LastPass, 1Password</td><td>Vaultwarden</td></tr>
+            <tr><td>Google Drive, Dropbox</td><td>Nextcloud</td></tr>
+            <tr><td>Slack, Discord</td><td>Mattermost, Element</td></tr>
+            <tr><td>Zoom</td><td>Jitsi Meet</td></tr>
+            <tr><td>ChatGPT, Claude</td><td>Open WebUI, OpenClaw</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="wrap disclosures" id="disclosures" aria-labelledby="disclosures-title">
+      <h2 id="disclosures-title">What is real and what is not.</h2>
+      <ul class="plain">
+          <!-- @disclosures -->
+      </ul>
+    </section>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="wrap">
+        <h2 id="closing-title">UnCloud your life.</h2>
+        <p>Your photos, passwords, cameras and agents can live in your house, on a Core you can see.</p>
+        <p class="closing-cta"><a class="btn btn-heat" href="https://ci.computer/core" rel="noopener">See Companion Core</a><a class="btn btn-ghost-ink" href="https://hub.ci.computer/store" rel="noopener">Browse the Companion Hub store</a></p>
+      </div>
     </section>
   </main>
 
-  <footer class="site-foot">
-    <div class="foot-grid">
-      <div>
-        <p class="foot-brand"><img src="./assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>Companion Intelligence</b></p>
-        <p>Every frame is drawn on your device, with three.js and WebGL. Nothing is streamed: your browser builds each home from its spec.</p>
-      </div>
-      <div>
-        <p><b>Credits</b></p>
-        <p>Each home is a HouseSpec written by hand from a Sims 4 gallery build, and each card names its builder. No files, textures or screenshots from those builds or from The Sims are used.</p>
-        <details class="builds" id="builds" hidden>
-          <summary>The builds, by their own titles</summary>
-          <ul id="builds-list"></ul>
-        </details>
-      </div>
-    </div>
-    <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence. <a href="https://ci.computer">ci.computer</a></p>
-  </footer>
+  <!-- @footer -->
 </body>
 </html>

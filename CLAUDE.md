@@ -40,8 +40,9 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 - The Python generators are deterministic too (`random.Random(spec id)`); re-running one on an unchanged tree
   must leave `git status` clean.
 
-**The portal.** `index.html` (the gallery) and `room-creator.html?mode=view` (the player, `assets/viewer.ts`)
-are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
+**The public site.** Thirty fictional families, not thirty houses: `index.html` (the landing, a template that
+`scripts/story/site.mts` fills), `family/<slug>` (a static page per family) and `room-creator.html?mode=view&family=<slug>`
+(the player, `assets/viewer.ts`) are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 
 - `.github/workflows/ci.yml` assembles the site and keeps it as an artifact; `.github/workflows/deploy.yml` publishes
   that artifact — `main` to production once `ci` passes on it, a same-repo PR to
@@ -67,11 +68,25 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 - Until the player mounts, `room-creator.html`'s head script (view mode only) is the player: poster, loader and
   the failure card. Anything that can stop the page before `mountViewer` must end on that card, never on an
   endless loader.
-- `portal:build` writes more than copies: `dist/homes/<id>.html` share pages, one `<meta name="vh-share">` in
-  `dist/room-creator.html` that tells the player they exist, the site's title and preview tags in place of that
-  page's static (editor) head, and absolute preview-image URLs (`--site-url`, default `https://homes.ci.computer/`).
-- A home's name on the portal is `displayName` in `assets/home-names.ts`, never the spec's `name` directly (that is
-  the Sims build's title and stays the credit). Fix a name there, not in `content/houses/`.
+- **No home, builder or house id is ever public.** The public name of a home is its family's slug (`^[a-z]+(-[a-z]+){0,2}$`,
+  from `content/story/casting.json`) and its family title ("The Okafor family", from `content/families/<slug>.json`); nothing
+  on the site, in a URL or in a file name may carry the internal id, a spec's `name`, the builder or a Sims reference.
+  `scripts/story/check-leaks.mts` (run by `portal:test`) scans every built file and file name for them. The specs ship as
+  `content/homes/<slug>.<hash10>.json` with `name`, `author`, `source`, `emoji` and `$schema` removed (their `id` stays, as
+  the geometry is seeded from it); `assets/home-names.ts` stays for the editor and is replaced by a stub in `dist/`; the
+  only edits to `assets/viewer.ts` about identity go through `assets/site/identity.ts`. Provenance lives in
+  THIRD_PARTY.md and the specs, nowhere on the site. Do not edit `content/houses/`.
+- `portal:build` writes more than copies (`scripts/story/site.mts`): the sanitised specs, the family pages, `credits.html`,
+  the family list, the legacy-link map, `story/manifest.json`, `_redirects`, `sitemap.xml`, `robots.txt`, the player's
+  public head (`window.__VH_PUBLIC=1`; the editor page is not served there), absolute preview-image URLs (`--site-url`,
+  default `https://homes.ci.computer/`) and an allowlist check. A production build needs all thirty families; any other
+  address or `--allow-partial` builds what exists with `noindex`. Every shipped picture, data file, clip and film carries a
+  content hash in its name (`<name>.<hash10>.<ext>`), except `story/manifest.json`. Other packages add files through
+  `scripts/story/ship/*.mts` and tests through `scripts/story/portal-tests/*.mts` (types in `scripts/story/hooks.ts`); they
+  never edit `build-portal.mts` or `test-portal.mts`.
+- Copy on the site follows the Uncloud voice (CI-Common `uncloud-voice`): no em or en dashes, sentence case, no price or
+  performance number that is not on the fact sheet, "Fictional family. Real software." wherever a family is, Companion OS
+  is in beta. `scripts/story/check-copy.mts` lints the built pages against `content/story/claims.json`.
 - The engine's modules are not fingerprinted by file name, so `portal:build` names each one by a content hash in the page's
   import map (and `?v=` on the `<script>`/`<link>` tags), and `portal/_headers` asks every file to revalidate. Never give an
   un-hashed file a long cache time or load a module around the build's rewriting: after a deploy a returning visitor would
