@@ -37,10 +37,6 @@ export function mountTouch(ctx: { api: any; root: HTMLElement; toast(m: string, 
   areas.className = 'vh-touch-areas'; areas.hidden = true; areas.setAttribute('aria-hidden', 'true');
   areas.innerHTML = '<span>Hold to walk</span><span>Drag to look</span>';
   root.append(stick, areas);
-  // the fly bar's how-to says what this scheme does (viewer.ts's template still has OrbitControls' words; the copy is set from here)
-  const hint = root.querySelector<HTMLElement>('.vh-flybar-hint.vh-show-coarse');
-  if (hint) hint.textContent = 'Drag to look. Hold the left side to walk. Tap the floor to go there.';
-
   const place = (x: number, y: number, dx = 0, dy = 0) => {
     const r = root.getBoundingClientRect();
     stick.style.transform = `translate(${x - r.left}px, ${y - r.top}px)`;

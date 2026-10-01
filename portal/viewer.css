@@ -773,5 +773,5 @@ html[data-mode="view"] .vh-scrub input {
 .vh-tool .vh-gyro-short { display: none; }
 @media (min-width: 761px) and (min-height: 501px) { .vh-tool .vh-gyro-long { display: none; } .vh-tool .vh-gyro-short { display: inline; } }
 /* touch targets: the pills and chips draw small and are 44 px high (above); the scrub thumb's reach is the 44 px input */
-@media (pointer: coarse) { .vh-iconbtn { min-width: 44px; min-height: 44px; } .vh-help-head .vh-iconbtn { width: 44px; height: 44px; } }
+@media (pointer: coarse) { .vh-chip-tod { min-width: 44px; justify-content: center; } .vh-iconbtn { min-width: 44px; min-height: 44px; } .vh-help-head .vh-iconbtn { width: 44px; height: 44px; } }
 @media (prefers-reduced-motion: reduce) { .vh-touch-areas { animation: none; } }

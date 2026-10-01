@@ -53,6 +53,9 @@ export function mountPlatform(c: TierCtx): Platform {
   const mark = () => { html.dataset.tier = profile.tier; html.dataset.form = profile.form; };
   mark();
   onPlatformChange(mark);
+  // the free camera's how-to for a touch screen (viewer.ts's template still has OrbitControls' words); set now, since the toast that says it comes
+  // with the first fly, before the touch module has loaded
+  if (profile.can.touchFly) { const h = c.root.querySelector<HTMLElement>('.vh-flybar-hint.vh-show-coarse'); if (h) h.textContent = 'Drag to look. Hold the left side to walk. Tap the floor to go there.'; }
   if (!profile.overrides.noXr) probeXr().catch(() => {});
 
   // ---- the start pixel ratio: through the renderer, before viewer.ts's ADAPT reads it
