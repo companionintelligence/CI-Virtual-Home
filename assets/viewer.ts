@@ -1,6 +1,6 @@
 // The portal's player: room-creator.html?mode=view.
 //
-//   room-creator.html?mode=view&house=<id>[&shot=<shot>][&t=<0…1>][&tod=day|golden|dusk|night][&play=1|0]
+//   room-creator.html?mode=view&family=<slug>[&shot=<shot>][&t=<0…1>][&tod=day|golden|dusk|night][&play=1|0]
 //
 // A link without shot opens on the house's Orbit. A link without t plays the shot from the start; one with t opens
 // paused there. play=1 or play=0 says so outright, except that nothing starts moving by itself for a visitor whose
@@ -35,7 +35,7 @@
 // (fitFov: halfway, in log terms, between keeping the vertical and keeping the horizontal field), after the page's
 // applySplineFrame has set the shot's own. The eye path is the shot's; only how much of it the lens takes in
 // changes, so a phone sees the house at the door and the Core with its desk at the end.
-import { displayName, buildCredit } from './home-names.js';
+import * as who from './site/identity.js';   // who a home is on screen: its title, address, link and errors (no credits)
 import { createGlassSwap } from './viewer-glass.js';
 import { bakeStatic, restoreStatic } from './viewer-batch.js';
 
@@ -56,7 +56,7 @@ type Api = {
   render: (hq: boolean) => void;
 };
 
-type IndexEntry = { id: string; name: string; author?: string; style?: string; storeys?: number; areaSqm?: number; source?: string };
+type IndexEntry = who.Entry;
 type Shot = { key: string; type: string; preset: any; label: string };
 
 const ICONS: Record<string, string> = {
@@ -159,21 +159,21 @@ export function mountViewer(api: Api) {
       </div>
       <div class="vh-error" hidden>
         ${icon('alert')}
-        <h2>We could not open this home.</h2>
-        <p class="vh-error-msg">Check the link, or pick a home from the gallery.</p>
-        <a class="vh-btn vh-btn-primary" href="./index.html">See all homes</a>
+        <h2>We could not open this tour.</h2>
+        <p class="vh-error-msg">Check the link, or pick a family from the list.</p>
+        <a class="vh-btn vh-btn-primary" href="${who.LIST_HREF}">See all families</a>
       </div>
     </div>
 
     <header class="vh-top">
-      <a class="vh-iconbtn vh-back" href="./index.html" aria-label="All homes" title="All homes">${icon('back')}</a>
+      <a class="vh-iconbtn vh-back" href="${who.LIST_HREF}" aria-label="All families" title="All families">${icon('back')}</a>
       <div class="vh-title">
         <h1 class="vh-name">&nbsp;</h1>
         <p class="vh-meta"></p>
       </div>
       <div class="vh-actions">
-        <button class="vh-iconbtn" data-act="prev" aria-label="Previous home" title="Previous home  [">${icon('prev')}</button>
-        <button class="vh-iconbtn" data-act="next" aria-label="Next home" title="Next home  ]">${icon('next')}</button>
+        <button class="vh-iconbtn" data-act="prev" aria-label="Previous family" title="Previous family  [">${icon('prev')}</button>
+        <button class="vh-iconbtn" data-act="next" aria-label="Next family" title="Next family  ]">${icon('next')}</button>
         <span class="vh-sep" aria-hidden="true"></span>
         <button class="vh-iconbtn" data-act="share" aria-label="Copy a link to this moment" title="Copy a link to this moment">${icon('link')}</button>
         <button class="vh-iconbtn vh-hide-compact" data-act="fullscreen" aria-label="Full screen" title="Full screen  Shift F">${icon('maximize', 'vh-i-max')}${icon('minimize', 'vh-i-min')}</button>
@@ -197,7 +197,7 @@ export function mountViewer(api: Api) {
         <div class="vh-end-actions">
           <button class="vh-end-btn" data-act="replay">${icon('replay')}<span>Replay</span></button>
           <button class="vh-end-btn" data-act="try-shot">${icon('play', 'vh-i-play')}<span class="vh-try-label"></span></button>
-          <button class="vh-end-btn vh-end-primary" data-act="next">Next home${icon('next')}</button>
+          <button class="vh-end-btn vh-end-primary" data-act="next">Next family${icon('next')}</button>
         </div>
       </div>
       <div class="vh-row vh-row-chips">
@@ -239,7 +239,7 @@ export function mountViewer(api: Api) {
         <dt><kbd>O</kbd></dt><dd>Overview of the whole path</dd>
         <dt><kbd>C</kbd></dt><dd>Cutaway: open the house while flying</dd>
         <dt><kbd>Esc</kbd></dt><dd>Back to the shot</dd>
-        <dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Previous or next home</dd>
+        <dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Previous or next family</dd>
         <dt><kbd>Shift</kbd> <kbd>F</kbd></dt><dd>Full screen</dd>
       </dl>
       <p class="vh-help-legend"><span class="vh-help-tick" aria-hidden="true"></span>The orange tick on the timeline is where the Companion Core wakes.</p>
@@ -409,13 +409,6 @@ export function mountViewer(api: Api) {
   // ------------------------------------------------------------------ helpers over the page
   const shotDuration = (): number => (shot && shot.preset.duration) || 10;
   const houseEntry = (id: string): IndexEntry | undefined => index.find(h => h.id === id);
-  function metaParts(e: { author?: string; storeys?: number; areaSqm?: number }): [string, string] {
-    const facts: string[] = [];
-    if (e.storeys) facts.push(`${e.storeys} ${e.storeys === 1 ? 'storey' : 'storeys'}`);
-    if (e.areaSqm) facts.push(`${e.areaSqm} m²`);
-    return [e.author ? `By ${e.author}` : '', facts.join(' · ')];
-  }
-  const metaLine = (e: { author?: string; storeys?: number; areaSqm?: number }): string => metaParts(e).filter(Boolean).join(' · ');
   function listShots(): Shot[] {
     const h = api.house(); if (!h) return [];
     const seen = new Set<any>(), out: Shot[] = [];
@@ -436,25 +429,16 @@ export function mountViewer(api: Api) {
   // ------------------------------------------------------------------ URL
   function url(withT: boolean): string {
     const q = new URLSearchParams();
-    q.set('mode', 'view'); q.set('house', houseId);
+    q.set('mode', 'view'); who.setId(q, houseId);
     if (shot) q.set('shot', shot.key);
     if (withT) q.set('t', t.toFixed(3));
     q.set('tod', tod || api.lighting());
     return `${location.pathname}?${q.toString()}`;
   }
   const syncUrl = () => { try { history.replaceState(null, '', url(false)); } catch { /* sandboxed */ } };
-  // What the share button hands out. Deployed, that is homes/<id>.html: scripts/build-portal.mts writes one page
-  // per home carrying the home's own title, description and thumbnail for link previews (which never run this
-  // script, so they would otherwise show the editor's title), and it forwards here with the query. It marks the
-  // built room-creator.html with <meta name="vh-share" content="homes/">; a checkout served as it is has no such
-  // pages, and shares this page's own URL.
-  const sharePages = (document.querySelector('meta[name="vh-share"]') as HTMLMetaElement | null)?.content || '';
-  function shareUrl(): string {
-    if (!sharePages || !/^[a-z0-9-]+\/$/.test(sharePages)) return new URL(url(true), location.href).href;
-    const q = new URLSearchParams(new URL(url(true), location.href).search);
-    q.delete('mode'); q.delete('house');
-    return new URL(`./${sharePages}${encodeURIComponent(houseId)}.html?${q.toString()}`, location.href).href;
-  }
+  // What the share button hands out: the family's own page on the public site (static, with its title, description and
+  // picture for link previews, which never run this script; it forwards here with the query), this page's address in a checkout.
+  const shareUrl = (): string => who.shareUrl(houseId, url(true));
 
   // ------------------------------------------------------------------ building the chips
   function renderShots() {
@@ -957,11 +941,11 @@ export function mountViewer(api: Api) {
   // ------------------------------------------------------------------ loading a house
   function showLoading(id: string) {
     const e = houseEntry(id);
-    el.loadingName.textContent = e ? displayName(e) : 'Loading';
-    el.loadingMeta.textContent = e ? metaLine(e) : '';
+    el.loadingName.textContent = who.title(e);
+    el.loadingMeta.textContent = who.metaLine(e);
     // the poster: the head script set it on <html> for the first home (the root inherits it); a home the index
     // lists gets its own here, and an id it does not list asks for no picture at all
-    if (e) root.style.setProperty('--vh-poster', `url("${new URL(`./portal/thumbs/${encodeURIComponent(id)}.webp`, location.href).href}")`);
+    if (e && who.poster(e)) root.style.setProperty('--vh-poster', `url("${who.poster(e)}")`);
     el.error.hidden = true; el.loadingCard.hidden = false;
     el.end.hidden = true; shownEndCard = false; root.dataset.endcard = '0';
     setMore(false);
@@ -1028,17 +1012,13 @@ export function mountViewer(api: Api) {
     batchHouse(h);
     houseId = h.id;
     const e = houseEntry(h.id);
-    // the portal's name for the home (home-names.ts); the build's own title is in the tooltip, with the credit
-    const own = { id: h.id, name: h.spec.name || (e && e.name) || h.id, author: h.spec.author || (e && e.author) };
-    const name = displayName(own);
+    const name = who.title(e || { id: h.id });
     el.name.textContent = name;
-    // the credit, then the facts (which a phone's narrow bar drops)
-    const [by, facts] = metaParts({ author: own.author, storeys: (e && e.storeys) || (h.spec.levels || []).length, areaSqm: h.spec.areaSqm || (e && e.areaSqm) });
-    const factsEl = document.createElement('span'); factsEl.className = 'vh-meta-facts'; factsEl.textContent = by && facts ? ` · ${facts}` : facts;
-    el.meta.replaceChildren(by, factsEl);
-    el.name.title = [h.spec.style, buildCredit(own)].filter(Boolean).join('\n');
-    el.meta.title = buildCredit(own);
-    document.title = `${name} · Virtual homes`;
+    // the address (a phone's narrow bar drops it), then the disclosure, which stays
+    const [place, note] = who.metaParts(e || { id: h.id });
+    const placeEl = document.createElement('span'); placeEl.className = 'vh-meta-facts'; placeEl.textContent = place && note ? `${place} · ` : place;
+    el.meta.replaceChildren(placeEl, note);
+    document.title = who.pageTitle(name);
     if (tod) api.setLighting(tod);   // a building resets the hour to the spec's; keep the viewer's choice
     if (!hq) glass.apply();          // before the first frame of this house, so the transmission programs never compile in the plain path
     shots = listShots();
@@ -1046,7 +1026,7 @@ export function mountViewer(api: Api) {
     // A home opens on its Orbit: the whole house from above, which reads on every screen. Door to Core spends its
     // middle in doorways and stairwells, framed a metre from a wall, and is one tap away (and a link can ask for it).
     const s = findShot(shotKey) || findShot(DEFAULT_SHOT) || findShot('door-to-core') || shots[0];
-    if (!s) { showError('This home has no camera shots.'); return; }
+    if (!s) { showError(who.errors.noShots); return; }
     await precompile(s, at);
     if (token !== loadToken) return;   // another home was asked for meanwhile: its own onHouse takes over
     ready = true;
@@ -1073,8 +1053,8 @@ export function mountViewer(api: Api) {
     } catch (err) {
       if (token !== loadToken) return;
       console.warn('viewer: could not load', id, err);
-      if (api.house()) { ready = true; root.dataset.state = 'ready'; toast('That home could not be opened.'); await onHouse({ shotKey: keepType, play: false }); }
-      else showError('That home could not be opened. Pick another from the gallery.');
+      if (api.house()) { ready = true; root.dataset.state = 'ready'; toast(who.errors.stillOk); await onHouse({ shotKey: keepType, play: false }); }
+      else showError(who.errors.notOpened);
       return;
     }
     if (token !== loadToken) return;
@@ -1257,20 +1237,20 @@ export function mountViewer(api: Api) {
 
   // ------------------------------------------------------------------ boot
   (async () => {
-    const want = params.get('house') || 'aurora';
-    showLoading(want);
+    showLoading('');
     await indexReady;
-    // an id the index does not list fails now, without waiting on a build that will not come (room-creator.html
-    // skips it too) and without a poster request for a thumbnail that does not exist
-    if (index.length && !houseEntry(want)) {
+    // an address the index does not list fails now, without waiting on a build that will not come (room-creator.html
+    // skips it too) and without a poster request for a thumbnail that does not exist. The error never repeats the address.
+    const want = who.wantId(params);
+    if (!want || (index.length && !houseEntry(want))) {
       html.style.removeProperty('--vh-poster');
-      showError(`There is no home called “${want}”. Pick one from the gallery.`);
+      showError(!index.length && who.isPublic() ? who.errors.notLoaded : who.errors.unknown);
       return;
     }
-    showLoading(want);   // again, now with the name and the credit
+    showLoading(want);   // again, now with the name and the address
     await api.ready;
     const h = api.house();
-    if (!h) { showError(houseEntry(want) ? 'This home did not load. Check the connection and try again.' : `There is no home called “${want}”. Pick one from the gallery.`); return; }
+    if (!h) { showError(houseEntry(want) ? who.errors.notLoaded : who.errors.unknown); return; }
     const tq = params.get('t');
     const at = tq !== null && Number.isFinite(Number(tq)) ? clamp01(Number(tq)) : 0;
     const pq = params.get('play');
@@ -1279,7 +1259,7 @@ export function mountViewer(api: Api) {
     if (tq2 && api.TIME_OF_DAY[api.lightingName(tq2)]) tod = api.lightingName(tq2);
     await onHouse({ shotKey: params.get('shot'), at, play });
     poke();
-  })().catch(err => { console.error('viewer:', err); showError('Something went wrong while opening this home.'); });
+  })().catch(err => { console.error('viewer:', err); showError(who.errors.broke); });
 
   // The page's __houseRenderBegin / __houseRenderEnd call these: a film or a still drawn through those hooks is a
   // product frame, and gets the transmissive glass the goldens have (the plain path's swap is for the live view only).
