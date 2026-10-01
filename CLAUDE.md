@@ -22,6 +22,8 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `scenes/floorplans/` | `pnpm run floorplans` |
 | `test/goldens/<profile>/` | `pnpm run goldens:update` — only on purpose, see below |
 | `portal/thumbs/<id>.webp`, `portal/hero.webp`, `portal/previews/<id>.jpg`, `portal/hero.jpg` | `pnpm run portal:thumbs [--house <id>]` — after a change to how a house looks |
+| `content/ao/<id>.<sha8>.bin`, `content/ao/manifest.json` (the baked ambient-occlusion volumes) | `pnpm run ao` — after a change to a house's geometry; `portal:build` fails on an unlisted, missing or mis-hashed file |
+| `assets/media/**` (the CC0 textures and props, content-hashed names), `assets/media-assets.ts` | `pnpm run prep:assets` |
 | `dist/` (gitignored) | `pnpm run portal:build` |
 
 Edit `assets/*.ts`, never the compiled `.js` beside it. `assets/vendor/` is third-party: do not edit it (the
@@ -64,6 +66,14 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   `applySplineFrame`, never a copy of it.
 - The player may use the clock (nothing it draws is a product frame), but it must restore anything of the
   renderer's it changes for its own frame (it puts `shadowMap.autoUpdate` back after each one).
+- The live-player realism effects (`assets/realism*.ts` and the `viewer-*.ts` they load; README → Live realism) are
+  view-mode only: installed after the house is built, undone by each handle's `restore()` before any `__house*` hook runs
+  (`viewer.beforeExternalRender`), and killable with `?no=<key>` / `?no=realism`. Only `assets/realism.ts` and
+  `assets/viewer.ts` know the list; a feature never edits `viewer.ts`. A product frame must come out identical to the
+  tree without them: `pnpm run test:live` and the goldens say so.
+- A new binary under `assets/media/` or `content/ao/` needs a content-hashed name (`…-<first 8 hex of its sha256>.<ext>`)
+  and a line in its manifest: the import map fingerprints modules only, and a stale binary under a stable name against
+  new code is an outage (README → Deploying → Caching). `portal:build` refuses anything else in those directories.
 - Until the player mounts, `room-creator.html`'s head script (view mode only) is the player: poster, loader and
   the failure card. Anything that can stop the page before `mountViewer` must end on that card, never on an
   endless loader.
@@ -138,8 +148,11 @@ Never re-bless to make a red gate green, and never on a machine whose profile di
   or config files. Looking at it is fine.
 - MIT code from `pascalorg/*` (editor, plugin-trees, …) and other permissive sources may be adapted: say so
   in a comment at the point of use and add a row (and the licence text) to THIRD_PARTY.md in the same commit.
-- Never commit the owner's reference photos (the Sims 4 screenshots specs are read from) or any other
-  third-party image, texture or model. Textures here are generated procedurally (`assets/textures.ts`).
+- The owner's reference photos (the Sims 4 screenshots specs are read from), and any third-party image, texture or model,
+  are never committed — except CC0 or public-domain assets that were verified at the source (the licence page URL and the
+  authors) and recorded in THIRD_PARTY.md with their files and any modification. Binary assets must have content-hashed
+  names. Everything else stays procedural (`assets/textures.ts`). Not usable at all: CC-BY-NC, "free for personal use",
+  unknown or paid assets, LYGIA (non-commercial) and Grassworks (commercial) code, and anything from Pascal's `/next` demo.
 - This repo is proprietary: no open-source licence file. New dependencies go in THIRD_PARTY.md.
 
 ## Practicalities

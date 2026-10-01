@@ -29,9 +29,12 @@
 //             card that says so, with a way back, instead of an endless loader; the names module
 //             (home-names.js) not downloading: the gallery still lists the homes, and the player's tab never
 //             shows a spec's Sims title
-//   caching   dist/_headers revalidates every file (max-age=0, must-revalidate), and the pages name every module and
-//             stylesheet by a hash of its content (import map + ?v=): the player pulls each module by its hash, and with
-//             every un-hashed module URL poisoned (an old build in the browser's cache) it still starts
+//   caching   dist/_headers revalidates every file (max-age=0, must-revalidate) except the content-hashed binaries
+//             (assets/media, content/ao: a year, immutable, below /* and detaching its header), and the pages name every
+//             module and stylesheet by a hash of its content (import map + ?v=): the player pulls each module by its
+//             hash, and with every un-hashed module URL poisoned (an old build in the browser's cache) it still starts
+//   binary assets   dist ships exactly the files the manifests list; every assets/media and content/ao URL the player
+//             asks for, in one home per tier (?q=0|1|2), is listed, 200, of the right type and hashed; ?no=assets,ao makes none
 //   editor    room-creator.html without ?mode=view still shows the editor and never mounts the player
 //   webkit    Safari's engine, when Playwright's WebKit for the pinned version is installed: the gallery, the player
 //             (plays, pauses, scrubs) and the editor (builds a home, hooks there), with no console error. Skipped with
@@ -44,6 +47,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
+import { checkBinaryAssets } from './portal-assets.mts';
 
 const args = parseArgs(process.argv.slice(2));
 const DIR = path.resolve(args.dir || path.join(ROOT, 'dist'));
@@ -222,10 +226,26 @@ async function caching() {
   const file = path.join(DIR, '_headers');
   ok(fs.existsSync(file), 'dist/_headers is there (Cloudflare Pages reads it from the site root)');
   if (fs.existsSync(file)) {
-    const lines = fs.readFileSync(file, 'utf8').split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
-    const rules = lines.filter(l => !/^\s/.test(l)), values = lines.filter(l => /^\s+cache-control\s*:/i.test(l)).map(l => l.split(':').slice(1).join(':').trim());
-    ok(rules.includes('/*'), 'a rule for every path (/*)');
-    ok(values.length > 0 && values.every(v => /(^|[ ,])max-age=0([ ,]|$)/.test(v) && /must-revalidate/.test(v)), `every Cache-Control rule is max-age=0, must-revalidate (${values.join(' | ') || 'none'})`);
+    // Cloudflare's _headers: a rule line, then its indented header lines (`! Name` detaches what an earlier rule set)
+    const blocks: { rule: string; lines: string[] }[] = [];
+    for (const l of fs.readFileSync(file, 'utf8').split('\n')) {
+      if (!l.trim() || l.trim().startsWith('#')) continue;
+      if (/^\s/.test(l)) blocks[blocks.length - 1]?.lines.push(l.trim()); else blocks.push({ rule: l.trim(), lines: [] });
+    }
+    const cc = (b: { lines: string[] }): string => b.lines.filter(x => /^cache-control\s*:/i.test(x)).map(x => x.split(':').slice(1).join(':').trim()).join(' | ');
+    const revalidates = (v: string): boolean => /(^|[ ,])max-age=0([ ,]|$)/.test(v) && /must-revalidate/.test(v);
+    const idx = (r: string): number => blocks.findIndex(b => b.rule === r);
+    ok(idx('/*') === 0, 'a rule for every path (/*), first');
+    const IMMUTABLE = ['/assets/media/*', '/content/ao/*'];
+    ok(blocks.filter(b => !IMMUTABLE.includes(b.rule)).every(b => revalidates(cc(b))), `every other Cache-Control rule is max-age=0, must-revalidate (${blocks.filter(b => !IMMUTABLE.includes(b.rule)).map(cc).join(' | ') || 'none'})`);
+    // the content-hashed binaries: a year, immutable; below /* (Cloudflare joins the values of a header set by two rules, so the
+    // rule detaches /*'s first, which only works after it)
+    for (const r of IMMUTABLE) {
+      const b = blocks[idx(r)];
+      ok(!!b && idx(r) > idx('/*') && /max-age=31536000/.test(cc(b)) && /immutable/.test(cc(b)) && b.lines[0] === '! Cache-Control', `${r}: immutable for a year, detaching /*'s Cache-Control first`);
+    }
+    const man = blocks[idx('/content/ao/manifest.json')];
+    ok(!!man && idx('/content/ao/manifest.json') > idx('/content/ao/*') && revalidates(cc(man)), 'content/ao/manifest.json (not named by its content) is revalidated, below the rule that would make it immutable');
   }
 
   const hash = (rel: string): string => crypto.createHash('sha256').update(fs.readFileSync(path.join(DIR, rel))).digest('hex').slice(0, 10);
@@ -262,6 +282,54 @@ async function caching() {
     await page.goto(srv.url('room-creator.html?mode=view&house=aurora'));
     const state = await viewerReady(page).then(() => 'ready').catch(() => 'not ready');
     ok(state === 'ready' && poisoned === 0 && errors.length === 0, `with every un-hashed module URL poisoned, the player still starts and never asks for one (${state}, ${poisoned} asked${errors.length ? ': ' + errors[0] : ''})`);
+    await close();
+  }
+}
+
+// ------------------------------------------------------------------ binary assets
+// What the player fetches from assets/media/ and content/ao/ (the CC0 textures and props, the baked occlusion volumes): each
+// URL must be a file a manifest lists, answer 200 with its type, carry its content hash, and only come with its feature on.
+// One home per tier (?q=0|1|2); ?no=assets,ao must make no such request at all. With no such files in the tree yet this
+// proves the plumbing and asks for nothing.
+const BIN_TYPES: Record<string, RegExp> = { webp: /^image\/webp$/, png: /^image\/png$/, jpg: /^image\/jpeg$/, ktx2: /^image\/ktx2$/, glb: /^model\/gltf-binary$/, bin: /^application\/octet-stream$/, json: /^application\/json/, hdr: /^image\/vnd\.radiance$|^application\/octet-stream$/ };
+async function binaries() {
+  console.log('\nbinary assets');
+  const listed = new Set(checkBinaryAssets(ROOT).ship);
+  const walkDist = (d: string): string[] => { const p = path.join(DIR, d); return fs.existsSync(p) ? fs.readdirSync(p).flatMap(n => { const r = `${d}/${n}`; return fs.statSync(path.join(DIR, r)).isDirectory() ? walkDist(r) : [r]; }) : []; };
+  const shipped = ['assets/media', 'content/ao'].flatMap(walkDist);
+  ok(shipped.length === listed.size && shipped.every(f => listed.has(f)), `dist ships exactly the ${listed.size} listed binary file${listed.size === 1 ? '' : 's'}${shipped.length === listed.size ? '' : ` (dist has ${shipped.length}: ${shipped.filter(f => !listed.has(f)).slice(0, 3).join(', ')})`}`);
+  const media = (u: string): boolean => /\/(assets\/media|content\/ao)\//.test(new URL(u).pathname);
+  const bad: string[] = [];
+  let seen = 0;
+  const homes = [['aurora', 0], ['lakecabin', 1], ['mirage', 2]] as const;
+  for (const [id, tier] of homes) {
+    const { page, errors, requests, close } = await open({ width: 1280, height: 800 });
+    const resp: { url: string; status: number; type: string }[] = [];
+    page.on('response', (r: any) => { if (media(r.url())) resp.push({ url: r.url(), status: r.status(), type: r.headers()['content-type'] || '' }); });
+    await page.goto(srv.url(`room-creator.html?mode=view&house=${id}&q=${tier}`));
+    await viewerReady(page);
+    await sleep(1500);   // (a feature's downloads start after the first frame)
+    for (const r of resp) {
+      seen++;
+      const rel = decodeURIComponent(new URL(r.url).pathname).slice(BASE.length);
+      const ext = rel.split('.').pop() || '';
+      if (!(listed.has(rel) || rel === 'content/ao/manifest.json')) bad.push(`${rel}: not in a manifest`);
+      else if (r.status !== 200) bad.push(`${rel}: ${r.status}`);
+      else if (!BIN_TYPES[ext] || !BIN_TYPES[ext].test(r.type)) bad.push(`${rel}: content-type ${r.type || 'none'}`);
+      else if (rel !== 'content/ao/manifest.json' && !/[-.][0-9a-f]{8}\.[a-z0-9]+$/.test(rel)) bad.push(`${rel}: no content hash`);
+    }
+    ok(errors.length === 0, `${id} at ?q=${tier}: no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
+    await close();
+    void requests;
+  }
+  ok(bad.length === 0, `every media / ao URL the player asked for, in one home per tier (${seen} requests), is listed, 200, of the right type and hashed${bad.length ? `: ${bad.slice(0, 4).join('; ')}` : ''}`);
+  {
+    const { page, requests, close } = await open({ width: 1280, height: 800 });
+    await page.goto(srv.url('room-creator.html?mode=view&house=aurora&q=2&no=assets,ao'));
+    await viewerReady(page);
+    await sleep(1500);
+    const asked = requests.filter(media);
+    ok(asked.length === 0, `?no=assets,ao makes no media or ao request${asked.length ? ` (${asked.slice(0, 3).join(', ')})` : ''}`);
     await close();
   }
 }
@@ -663,6 +731,7 @@ try {
   await gallery({ width: 390, height: 844 }, true, '390');
   await previews();
   await caching();
+  await binaries();
   for (const [i, id] of HOUSES.entries()) await player(id, { width: 1440, height: 900 }, false, '1440', i === 0);
   await player(HOUSES[0], { width: 390, height: 844 }, true, '390', false);
   await motion(HOUSES[0]);
