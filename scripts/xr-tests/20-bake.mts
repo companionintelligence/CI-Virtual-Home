@@ -83,11 +83,30 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
     let h = 2166136261; for (let i = 0; i < px.length; i++) { h ^= px[i]; h = Math.imul(h, 16777619) >>> 0; }
     return { calls, tris, hash: h };
   };
+  // ---- pictures (--shots): one eye of the headset at four headings, drawn by the 2D player and by the bake. Looking is part of the test:
+  // a count that fits says nothing about whether the cheap picture is still the house.
+  const pics: Record<string, string> = {};
+  const view = (tag: string, yaw: number) => {
+    const W = 672, H = 704;
+    const t = new THREE.WebGLRenderTarget(W, H, { samples: 0, colorSpace: r.outputColorSpace });
+    const c = new THREE.PerspectiveCamera(96, W / H, camera.near || 0.1, camera.far || 160);
+    c.position.set(head[0], head[1], head[2]); c.rotation.set(0, yaw, 0, 'YXZ'); c.updateMatrixWorld(true);
+    const prt = r.getRenderTarget(); r.setRenderTarget(t); r.render(scene, c);
+    const px = new Uint8Array(W * H * 4); r.readRenderTargetPixels(t, 0, 0, W, H, px); r.setRenderTarget(prt); t.dispose();
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const id = new ImageData(W, H);
+    for (let y = 0; y < H; y++) id.data.set(px.subarray((H - 1 - y) * W * 4, (H - y) * W * 4), y * W * 4);
+    cv.getContext('2d')!.putImageData(id, 0, 0);
+    pics[tag] = cv.toDataURL('image/png');
+  };
+  if (opts.shots) for (let k = 0; k < 4; k++) view(`2d-h${k}`, k * Math.PI / 2);
+  // (before the baseline: drawing the four headings uploads what each one sees for the first time, and that is not the bake's leak)
   frame(); frame();                                    // settle: programs, the shadow map, anything lazy
   const base = snapshot(), baseFrame = frame();
   const mem0 = { g: r.info.memory.geometries, t: r.info.memory.textures }, prog0 = r.info.programs.length;
   const visibleMeshes0: any[] = []; scene.traverseVisible((o: any) => { if (o.isMesh) visibleMeshes0.push(o); });
   notes.base = { meshes: visibleMeshes0.length, calls: baseFrame.calls, tris: baseFrame.tris };
+
 
   // ---- apply (gen2), then what the representation must be
   const bake = createBake(host);
@@ -133,6 +152,7 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
   notes.lights = { total: det.lightsTotal, punctual: det.lightsPunctual, on: punctualOn, directional: dirOn };
   check(!!sun && sun.shadow.mapSize.x === gen2.sunShadow.size && sun.shadow.mapSize.y === gen2.sunShadow.size, `the sun's shadow map is ${sun && sun.shadow.mapSize.x}, the gen2 tier says ${gen2.sunShadow.size}`);
   check(r.shadowMap.autoUpdate === false, 'the sun\'s shadow map is still auto-updating in the static tier');
+  if (opts.shots) for (let k = 0; k < 4; k++) view(`xr-gen2-h${k}`, k * Math.PI / 2);
   // shaders were warmed: a stereo frame at the head compiles no program
   const stereo = (x: number, z: number, yaw = 0) => {
     const mk = (s: number) => { const c = new THREE.PerspectiveCamera(96, 1, 0.1, 160); c.position.set(x, head[1], z); c.rotation.set(0, yaw, 0, 'YXZ'); c.updateMatrixWorld(true); c.translateX(s * 0.032); c.updateMatrixWorld(true); c.viewport = new THREE.Vector4(s < 0 ? 0 : 32, 0, 32, 32); return c; };
@@ -220,6 +240,16 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
     check(!diff(base, snapshot()), 'tethered: the scene is different after restore: ' + diff(base, snapshot()));
   }
 
+  // ---- ?xrbake-site=all on a standalone tier: the lot's planting comes back (the A/B for the first headset run), and restore is still exact
+  {
+    const bakeAll = createBake({ ...host, params: new URLSearchParams('xrbake-site=all') });
+    const ra = await bakeAll.apply(gen2, head);
+    notes.siteAll = { perEyeAvg: +bakeAll.detail().sweep.avgPerEye.toFixed(1), perEyeWorst: bakeAll.detail().sweep.worstPerEye, mergedMeshes: ra.mergedMeshes, tris: ra.tris, over: ra.overBudget };
+    check(ra.mergedMeshes > rep.mergedMeshes, `?xrbake-site=all merged ${ra.mergedMeshes} meshes, the default merged ${rep.mergedMeshes}`);
+    bakeAll.restore();
+    check(!diff(base, snapshot()), '?xrbake-site=all: the scene is different after restore: ' + diff(base, snapshot()));
+  }
+
   // ---- failure paths
   {
     // apply() throws after it has committed (a budget with no sunShadow): the house is as built
@@ -245,7 +275,7 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
   const fin = frame();
   check(fin.hash === baseFrame.hash, 'the final 2D frame differs from the one before the first bake');
   rt.dispose();
-  return { checks, notes };
+  return { checks, notes, pics };
 };
 
 // ------------------------------------------------------------------------------------------------------------------ the two ways to run it
@@ -253,6 +283,8 @@ async function runDirect() {
   const { loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts, parseArgs } = await import(path.join(ROOT, 'scripts', 'portal-lib.mts'));
   const args = parseArgs(process.argv.slice(2));
   const houses: string[] = (args.houses || 'cutestarter,aurora').split(',');
+  const shotsDir: string | null = args.shots ? path.resolve(String(args.shots)) : null;
+  if (shotsDir) fs.mkdirSync(shotsDir, { recursive: true });
   const srv = await serve(ROOT, '/'), pw = await loadPlaywright();
   const browser = await pw.chromium.launch({ headless: true, args: LAUNCH_ARGS });
   let failed = 0;
@@ -263,7 +295,8 @@ async function runDirect() {
     page.on('pageerror', (e: any) => errors.push(String(e.message || e))); page.on('console', (m: any) => { if (m.type() === 'error') errors.push(m.text().slice(0, 200)); });
     await page.goto(`${srv.url('room-creator.html')}?mode=view&house=${house}&shot=door-to-core&play=0&t=0.55`, { waitUntil: 'domcontentloaded', timeout: 240000 });
     await page.waitForFunction(() => (document.documentElement as any).dataset.viewer === 'ready', null, { timeout: 240000 });
-    const res = await page.evaluate(IN_PAGE, { shots: false });
+    const res = await page.evaluate(IN_PAGE, { shots: !!shotsDir });
+    if (shotsDir) for (const [tag, url] of Object.entries(res.pics || {})) fs.writeFileSync(path.join(shotsDir, `${house}-${tag}.png`), Buffer.from(String(url).split(',')[1], 'base64'));
     const bad = res.checks.filter((c: any) => !c.ok);
     failed += bad.length + errors.length;
     console.log(`${house.padEnd(14)} ${res.checks.length - bad.length}/${res.checks.length} checks   ${JSON.stringify(res.notes)}`);

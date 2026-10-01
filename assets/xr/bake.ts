@@ -236,7 +236,10 @@ export function createBake(host: XrHost): XrBakeImpl {
     const lim = limitsOf(budget);
     levels = xrLevels();
     scene.updateMatrixWorld(true);
-    const opts: BakeOptions = { site: budget.foveation ? 'ground' : 'all', cellM: Number(host.params.get('xrbake-cell')) || 9, textureCapPx: budget.textureCapPx, levels };
+    // (the standalone tiers draw the lot's ground only: the planted site is most of what a window looks onto, and the first headset run decides
+    //  whether the budget has room for it; ?xrbake-site=all puts it back for that A/B, ?xrbake-site=ground takes it away on the other tiers)
+    const siteParam = host.params.get('xrbake-site');
+    const opts: BakeOptions = { site: siteParam === 'all' || siteParam === 'ground' ? siteParam : budget.foveation ? 'ground' : 'all', cellM: Number(host.params.get('xrbake-cell')) || 9, textureCapPx: budget.textureCapPx, levels };
 
     try {
       // ---- plan + merge: nothing in the scene changes until the commit below, so a throw here leaves the house exactly as it was
