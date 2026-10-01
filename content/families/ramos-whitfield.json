@@ -302,6 +302,7 @@
       },
       "camera": {
         "framing": "medium",
+        "from": "left",
         "side": "left"
       },
       "popup": {
@@ -336,6 +337,7 @@
       },
       "camera": {
         "framing": "close",
+        "from": "right",
         "side": "right"
       },
       "popup": {
@@ -365,6 +367,7 @@
       },
       "camera": {
         "framing": "medium",
+        "from": "front",
         "side": "auto"
       },
       "popup": {
@@ -393,7 +396,8 @@
         "role": "core"
       },
       "camera": {
-        "framing": "close",
+        "framing": "wide",
+        "from": "above",
         "side": "left"
       },
       "popup": {
