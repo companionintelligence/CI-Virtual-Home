@@ -41,7 +41,7 @@ export async function buildSheet(env: EngineEnv, reg: VoiceRegistry, lex: Lexico
         const file = r.ok ? hashName(`${k}.${l.id}`, r.bytes) : '';
         if (r.ok) fs.writeFileSync(path.join(out, file), r.bytes);
         report.push({ voice: k, kokoro: v.kokoro, line: l.id, ok: r.ok, why: r.why, file, durationMs: r.durationMs, loudness: r.loudness, f0Hz: res.clips[key].f0Hz ?? null, registryF0Hz: v.f0Hz ?? null });
-        cells.push(`<td><div class="line">${esc(l.label)}</div>${r.ok ? `<audio controls preload="none" src="${file}"></audio><div class="meta">${(r.durationMs / 1000).toFixed(1)} s, ${r.loudness.I.toFixed(1)} LUFS, ${r.loudness.TP.toFixed(1)} dBTP, F0 about ${res.clips[key].f0Hz ?? '?'} Hz</div>` : `<div class="bad">failed a gate: ${esc(r.why.join('; '))}</div>`}</td>`);
+        cells.push(`<td><div class="line">${esc(l.label)}</div>${r.ok ? `<audio controls preload="metadata" src="${file}"></audio><div class="meta">${(r.durationMs / 1000).toFixed(1)} s, ${r.loudness.I.toFixed(1)} LUFS, ${r.loudness.TP.toFixed(1)} dBTP, F0 about ${res.clips[key].f0Hz ?? '?'} Hz</div>` : `<div class="bad">failed a gate: ${esc(r.why.join('; '))}</div>`}</td>`);
       }
       rows.push(`<tr><th scope="row"><b>${esc(k)}</b><div class="meta">Kokoro ${esc(v.kokoro)}, ${v.sex === 'f' ? 'female' : 'male'}, about ${v.f0Hz} Hz<br>model card grade ${esc(String(v.grade))}, speed ${v.speed}<br>narrator for ${v.narratorFor} families<br>fits an agent who is ${esc((v.agentFits ?? []).join(', '))}</div></th>${cells.join('')}</tr>`);
     }
