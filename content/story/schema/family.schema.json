@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://homes.ci.computer/schema/family-v1.json",
+  "title": "Family story v1 (authored source: content/families/<slug>.json)",
+  "description": "FINAL contract. Authored by humans and agents; everything generated (voice clips, poses, timeline, track) lives in <slug>.voice.json and <slug>.bake.json, never here. Only the JSON Schema keywords listed in STORY-BIBLE section 12 are used, so a zero-dependency checker can enforce this file. Rules a schema cannot say (word counts, dashes, banned phrases, app and anchor existence, disclosures, cross-field and cross-family rules) are enforced by scripts/validate-stories.mts. Enumerations are mirrored as constants in assets/story/types.ts and a test keeps the two equal.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "slug", "house", "fictional", "family", "members", "chapters", "beats", "closing"],
+  "properties": {
+    "schema": { "const": "family/v1" },
+    "slug": { "type": "string", "pattern": "^[a-z]+(-[a-z]+){0,2}$", "maxLength": 32, "description": "Public URL slug (/family/<slug>), from the fictional surname(s). Must equal the casting.json slug for this house. Never derived from the house id." },
+    "house": { "type": "string", "pattern": "^[a-z0-9-]+$", "maxLength": 32, "description": "INTERNAL HouseSpec id (content/houses/<id>.json). Build-time only. It never appears in a URL, a file name, a title, an og tag, alt text or any displayed string." },
+    "fictional": { "const": true },
+    "family": { "$ref": "#/$defs/family" },
+    "members": { "type": "array", "minItems": 2, "maxItems": 6, "items": { "$ref": "#/$defs/member" } },
+    "chapters": { "type": "array", "minItems": 7, "maxItems": 10, "items": { "$ref": "#/$defs/chapter" } },
+    "beats": { "type": "array", "minItems": 22, "maxItems": 30, "items": { "$ref": "#/$defs/beat" } },
+    "closing": { "$ref": "#/$defs/closing" },
+    "notes": { "type": "array", "maxItems": 8, "items": { "type": "string", "maxLength": 240 }, "description": "Build-only notes for reviewers and the owner (for example 'beat X needs owner sign-off'). Never shipped, never displayed." }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,31}$" },
+    "appId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,40}$", "description": "A Companion Hub store id from content/story/catalog-apps.json (r-catalog: live store AND manifest on main). Unknown ids fail." },
+    "voiceKey": { "enum": ["v-warm-f", "v-clear-f", "v-bright-f", "v-young-f", "v-steady-m", "v-storyteller-m", "v-deep-m", "v-light-m"], "description": "Key of content/story/voices.json. Never an engine voice name." },
+    "household": { "enum": ["solo-or-couple", "young-family", "older-kids", "grandparents"] },
+    "category": { "enum": ["setup", "home", "food", "iot", "productivity", "money", "privacy", "kids", "media", "creative", "small-business"], "description": "The beat's topic. The landing page topic chips are these minus 'setup'. home = household logistics (planner, inventory, paperwork); iot = devices on the home network; media = photos, music, film, books; kids = children's learning and play; small-business = running a business or self-employed work." },
+    "segment": { "enum": ["consumer", "small-business"] },
+    "roomRole": { "enum": ["entry", "living", "kitchen", "dining", "office", "bedroom", "kids", "garage", "laundry", "bath", "garden", "patio", "street"] },
+    "roleId": { "enum": ["street", "front-door", "core", "room", "couch", "tv", "fireplace", "bookshelf", "fridge", "range", "kitchen-island", "counter", "dining-table", "desk", "bed", "crib", "toys", "music", "laundry", "bicycle", "easel", "telescope", "patio-seat", "garden", "driveway", "pool", "deck"], "description": "Semantic anchor roles (content/story/roles.json). Closed set." },
+    "family": {
+      "type": "object", "additionalProperties": false,
+      "required": ["surname", "tagline", "household", "business", "story", "address", "narrator"],
+      "properties": {
+        "surname": { "type": "string", "pattern": "^[A-Z][A-Za-z'’]+(-[A-Z][A-Za-z'’]+)?$", "maxLength": 32, "description": "Fictional surname, one or two parts. Shown as 'The <surname> family'." },
+        "tagline": { "type": "string", "minLength": 20, "maxLength": 80, "description": "One sentence, sentence case, no dashes, ends with a full stop, no price, no guarantee. Shown on the card and in the share title." },
+        "household": { "$ref": "#/$defs/household" },
+        "business": { "type": "boolean", "description": "True when someone in the household runs a business or is self-employed from home. Drives the small-business beat quota." },
+        "story": { "type": "string", "minLength": 80, "maxLength": 320, "description": "Two to three short sentences that open the family page. Third person. Who they are and what they do. Never a testimonial: no quote, no 'says', no result claim." },
+        "address": {
+          "type": "object", "additionalProperties": false, "required": ["line", "place"],
+          "properties": {
+            "line": { "type": "string", "pattern": "^[0-9]{1,3} [A-Z][A-Za-z' ]{3,30}$", "description": "House number and an INVENTED street, for example '14 Larkfield Lane'. No ZIP, no postal code, no region." },
+            "place": { "type": "string", "pattern": "^[A-Z][A-Za-z' ]{3,30}$", "description": "An INVENTED town or neighbourhood. Not a real place. Unique across the fleet." }
+          }
+        },
+        "narrator": { "$ref": "#/$defs/voiceKey" }
+      }
+    },
+    "companion": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "runtime", "job", "personality", "voice", "memory", "limits"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[A-Z][a-z]{2,13}$", "description": "The name the member gave their agent. A story device, not a product setting. Unique across the fleet." },
+        "runtime": { "enum": ["Hermes", "OpenClaw"], "description": "Hermes = messaging gateway (text it); OpenClaw = browser automation and tool use. First-party store ids ci-hermes and ci-openclaw." },
+        "job": { "type": "string", "minLength": 20, "maxLength": 90, "description": "One sentence naming tasks the listed apps can really do. Third person, present tense." },
+        "personality": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "string", "pattern": "^[a-z]{3,14}$" }, "description": "Three plain words. They colour the caption tone, never a capability." },
+        "voice": { "$ref": "#/$defs/voiceKey", "description": "The agent's voice for beat.say lines. Different from the narrator and from every other companion in the family." },
+        "memory": { "type": "boolean", "description": "True when this member has connected Companion Memory (beta) to the agent, opt-in. If any member has it, the first mention of Companion Memory in the file reads 'Companion Memory (beta)'." },
+        "limits": { "type": "string", "minLength": 12, "maxLength": 80, "description": "What it will not do alone, for example 'Drafts only. Dad sends every message.'" }
+      }
+    },
+    "member": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "name", "age", "role", "colour"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "pattern": "^[A-Z][a-zA-Z'’]{1,19}$" },
+        "age": { "type": "integer", "minimum": 0, "maximum": 99 },
+        "role": { "enum": ["parent", "partner", "adult-child", "teen", "child", "baby", "grandparent", "housemate", "visitor"] },
+        "work": { "type": "string", "maxLength": 60, "description": "Occupation or school, a short noun phrase: 'bakery owner', 'secondary-school teacher', 'second grade'. Not a medical, legal or financial qualification claim." },
+        "colour": { "enum": ["chart-1", "chart-2", "chart-3", "chart-4", "chart-5"], "description": "CI-Common chart token for the monogram disc. Distinct within a family where possible. Never a hex." },
+        "companion": { "$ref": "#/$defs/companion", "description": "Optional. At least one member has one; at most three do. Members under 13 never have one; babies and visitors never do." }
+      }
+    },
+    "chapter": {
+      "type": "object", "additionalProperties": false, "required": ["id", "kind", "title"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["ftue", "room", "outside", "outro"] },
+        "room": { "$ref": "#/$defs/roomRole", "description": "Required for kind room and outside." },
+        "title": { "type": "string", "minLength": 3, "maxLength": 28, "description": "Sentence case. 'The kitchen', 'Out in the garden'." }
+      }
+    },
+    "anchorLeaf": {
+      "type": "object", "additionalProperties": false, "required": ["role"],
+      "properties": { "role": { "$ref": "#/$defs/roleId" }, "room": { "$ref": "#/$defs/roomRole" }, "nth": { "type": "integer", "minimum": 0, "maximum": 5 } }
+    },
+    "anchor": {
+      "type": "object", "additionalProperties": false, "required": ["role"],
+      "properties": {
+        "role": { "$ref": "#/$defs/roleId" },
+        "room": { "$ref": "#/$defs/roomRole", "description": "Narrow to this room when the house has several instances." },
+        "nth": { "type": "integer", "minimum": 0, "maximum": 5, "description": "Which instance, in the resolver's stable order." },
+        "fallback": { "type": "array", "maxItems": 3, "items": { "$ref": "#/$defs/anchorLeaf" }, "description": "Tried in order when the role is missing in this house. Required for every role that is not in roles.json universal. The validator FAILS when neither the role nor a fallback resolves in the beat's house." }
+      }
+    },
+    "camera": {
+      "type": "object", "additionalProperties": false,
+      "description": "Semantic hints only. The pose solver still picks a collision-free eye with a clear sight line.",
+      "properties": {
+        "framing": { "enum": ["wide", "medium", "close"] },
+        "from": { "enum": ["front", "left", "right", "behind", "above"] },
+        "side": { "enum": ["left", "right", "auto"], "description": "Which third of the frame the anchor sits on; the popup takes the other." },
+        "eye": { "enum": ["standing", "seated", "low", "aerial"] }
+      }
+    },
+    "popup": {
+      "type": "object", "additionalProperties": false, "required": ["title", "body"],
+      "properties": {
+        "kind": { "enum": ["card", "phone"], "description": "'phone' draws a stylised phone with the `phone` rows. Never a screenshot, never an SSID, a password or a pairing code." },
+        "title": { "type": "string", "minLength": 3, "maxLength": 48, "description": "At most 6 words (validator counts). Sentence case. A complete thought, not a label." },
+        "body": { "type": "string", "minLength": 30, "maxLength": 260, "description": "At most 30 words (validator counts), each sentence at most 20 words, no digits except inside an app name. THIS TEXT IS THE NARRATION: the voice tool reads it word for word and the caption shows it. Third person, present tense." },
+        "chips": { "type": "array", "maxItems": 3, "items": { "type": "string", "maxLength": 28 }, "description": "The app name, then 'replaces <X>' where X is one of the app's catalog `replaces` names. Nothing else." },
+        "note": { "type": "string", "maxLength": 90, "description": "A required disclosure line for this beat, see STORY-BIBLE section 8 (ftue-pick carries 'Installing apps uses the internet.')." },
+        "phone": {
+          "type": "object", "additionalProperties": false, "required": ["header", "rows"],
+          "properties": {
+            "header": { "type": "string", "maxLength": 24 },
+            "rows": { "type": "array", "minItems": 1, "maxItems": 4, "items": { "type": "string", "maxLength": 44 } }
+          }
+        }
+      }
+    },
+    "say": {
+      "type": "object", "additionalProperties": false, "required": ["speaker", "text"],
+      "properties": {
+        "speaker": { "$ref": "#/$defs/id", "description": "A member id whose companion speaks. Must have a companion." },
+        "text": { "type": "string", "minLength": 8, "maxLength": 110, "description": "At most 16 words, first person, one or two short sentences. SCRIPTED: no claim about what the agent is or knows, no product fact, no number. Shown in the popup as a quote labelled 'Scripted'. At most 6 beats per family have one." }
+      }
+    },
+    "beat": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "chapter", "category", "segment", "anchor", "popup"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "chapter": { "$ref": "#/$defs/id" },
+        "member": { "$ref": "#/$defs/id", "description": "Whose life this beat is about. Omit for household beats (FTUE, outro)." },
+        "agent": { "$ref": "#/$defs/id", "description": "A member id whose companion acts in this beat. Requires `approval`." },
+        "approval": { "$ref": "#/$defs/id", "description": "The member who reads, decides or sends. Every beat with an `agent` has one: an agent prepares, a person approves." },
+        "category": { "$ref": "#/$defs/category" },
+        "segment": { "$ref": "#/$defs/segment" },
+        "app": {
+          "type": "object", "additionalProperties": false, "required": ["id", "replaces"],
+          "properties": {
+            "id": { "$ref": "#/$defs/appId" },
+            "replaces": { "type": "array", "maxItems": 3, "items": { "type": "string", "maxLength": 32 }, "description": "A subset of the catalog `replaces` of this app (empty for first-party apps and for apps that replace nothing)." }
+          }
+        },
+        "with": { "type": "array", "maxItems": 4, "items": { "$ref": "#/$defs/appId" }, "description": "Other store apps named in this beat's text. Every Hub app named in a beat must be `app.id` or listed here. Companion Memory, Hermes and OpenClaw are exempt (the first-party trio)." },
+        "capability": { "type": "string", "minLength": 10, "maxLength": 100, "description": "The ONE thing the app does in this scene, in the words of its catalog description. Build-only audit trail (never shipped). The validator warns when it shares no word with the app's catalog description." },
+        "anchor": { "$ref": "#/$defs/anchor" },
+        "camera": { "$ref": "#/$defs/camera" },
+        "popup": { "$ref": "#/$defs/popup" },
+        "say": { "$ref": "#/$defs/say" },
+        "emphasis": { "type": "object", "additionalProperties": false, "properties": { "ring": { "type": "boolean" }, "wake": { "type": "boolean", "description": "FTUE plug-in beat only: the Core's LED, fan and screen wake." } } },
+        "film": { "type": "boolean", "description": "In the film (see STORY-BIBLE section 7 for the film quota)." },
+        "minSeconds": { "type": "number", "minimum": 3, "maximum": 20, "description": "Reading floor. The beat lasts max(voice + 0.6 s, popup read time, minSeconds)." }
+      }
+    },
+    "closing": {
+      "type": "object", "additionalProperties": false, "required": ["body", "cta"],
+      "properties": {
+        "body": { "type": "string", "minLength": 30, "maxLength": 220, "description": "At most 30 words. Second person to the viewer. Names Companion Core and one concrete thing the family now does at home. The sign-off 'UnCloud your life.' and the beta line are added by the site and the film from claims.json; never type them here." },
+        "cta": {
+          "type": "object", "additionalProperties": false, "required": ["label", "url"],
+          "properties": { "label": { "type": "string", "maxLength": 28 }, "url": { "const": "https://ci.computer/core" } }
+        }
+      }
+    }
+  }
+}

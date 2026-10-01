@@ -1,0 +1,6349 @@
+{
+ "v": 1,
+ "generated": "2026-10-01",
+ "base": "03edd3b",
+ "note": "Casting for the 30 fictional families. Slugs, households, narrators and signature apps are the showrunner's decisions. Names, ages and members in `members` are SUGGESTIONS from the home analysis; the writer chooses the people (heritage is never tied to the architecture or to the occupation). `roles` counts how many matching items/zones the house has (0 = missing: give the beat a fallback). `house` is internal and never appears on a public surface.",
+ "households": {
+  "solo-or-couple": "Solo, couple, no children at home",
+  "young-family": "Young family (children under 13)",
+  "older-kids": "Teens or adult children at home",
+  "grandparents": "Grandparents and grandchildren"
+ },
+ "families": [
+  {
+   "slug": "lindqvist-abara",
+   "house": "asymmetry",
+   "household": "grandparents",
+   "business": true,
+   "narrator": "v-storyteller-m",
+   "tenure": "owner",
+   "storeys": 4,
+   "areaSqm": 411,
+   "homeStyle": "Four stepped tiers on a lake lot: a garage podium, a raised main floor reached up an exterior stair between stepped planters, a plunge-pool terrace on the podium roof, dark timber bays, corner balconies and two offset penthouse boxes, all under thin dark flat roofs",
+   "lotGround": "waterfront",
+   "household_text": "Empty nesters in their 60s who host their grandchildren on holidays",
+   "members": [
+    {
+     "role": "partner",
+     "age": "64",
+     "work": "semi-retired civil engineer, still takes two consulting clients"
+    },
+    {
+     "role": "partner",
+     "age": "62",
+     "work": "ceramicist; sells at two craft fairs a year"
+    },
+    {
+     "role": "visiting grandchildren",
+     "age": "9 and 13",
+     "work": "school"
+    }
+   ],
+   "businessText": "small consulting plus craft sales",
+   "categoryHints": [
+    "photos and media",
+    "files and backup",
+    "smart home",
+    "music",
+    "family messaging"
+   ],
+   "care": "Keep the grandchildren's photos and school notes as the privacy stakes, not fear.",
+   "ftueExtra": "The front door is on the second level, up an exterior stair between planters; the Core is on a wall shelf in the Living room.",
+   "signatureApps": [
+    "immich",
+    "navidrome",
+    "nextcloud",
+    "kimai",
+    "pairdrop"
+   ],
+   "coreSpot": {
+    "room": "Living",
+    "level": "l2",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": true
+   },
+   "coreWalk": {
+    "metres": 11.9,
+    "roomsPassed": [
+     "Entry",
+     "Entry Passage",
+     "Living"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 1
+   },
+   "rooms": [
+    {
+     "name": "Lower Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 20.7
+    },
+    {
+     "name": "Bar Lounge",
+     "level": "l1",
+     "kinds": [
+      "living",
+      "lounge"
+     ],
+     "areaSqm": 23.92
+    },
+    {
+     "name": "Garage",
+     "level": "l1",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 30.16
+    },
+    {
+     "name": "Wine Cellar",
+     "level": "l1",
+     "kinds": [
+      "lounge"
+     ],
+     "areaSqm": 26.1
+    },
+    {
+     "name": "Laundry",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 25.2
+    },
+    {
+     "name": "Entry",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 3.6
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 10.81
+    },
+    {
+     "name": "Kitchen",
+     "level": "l2",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 17.1
+    },
+    {
+     "name": "Dining",
+     "level": "l2",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 16.65
+    },
+    {
+     "name": "Entry Passage",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 31.8
+    },
+    {
+     "name": "Living",
+     "level": "l2",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 20.9
+    },
+    {
+     "name": "Green Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 13.2
+    },
+    {
+     "name": "Upper Landing",
+     "level": "l3",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 14.62
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l3",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 30.96
+    },
+    {
+     "name": "Upper Stair Hall",
+     "level": "l3",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 9.9
+    },
+    {
+     "name": "Primary Bath",
+     "level": "l3",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 15.48
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l3",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 26.88
+    },
+    {
+     "name": "Loft Bedroom",
+     "level": "l4",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 24.51
+    },
+    {
+     "name": "Loft Ensuite",
+     "level": "l4",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 14.84
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 1,
+    "fireplace": 0,
+    "bookshelf": 5,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 5,
+    "dining-table": 3,
+    "desk": 1,
+    "bed": 3,
+    "crib": 0,
+    "toys": 0,
+    "music": 1,
+    "laundry": 2,
+    "bicycle": 1,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 0,
+    "garden": 6,
+    "driveway": 0,
+    "pool": 1,
+    "deck": 3
+   },
+   "homeFlags": [],
+   "anchorsToUse": [
+    "record-player/loft-bedroom/1",
+    "bicycle/garage/1",
+    "tv-stand/living/1",
+    "breakfast-bar/kitchen/1",
+    "zone/hottub/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "vance-takahashi",
+   "house": "aurora",
+   "household": "solo-or-couple",
+   "business": true,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "storeys": 3,
+   "areaSqm": 340,
+   "homeStyle": "Layered white modern villa: picture-frame boxes with charcoal and taupe infill, a floating roof slab over two dark pavilions, a carport terrace, a front balcony and a pool forecourt on a canal",
+   "lotGround": "waterfront",
+   "household_text": "Couple, early 40s, no children; both work from home",
+   "members": [
+    {
+     "role": "partner",
+     "age": "42",
+     "work": "freelance photographer (portraits and small-business shoots); upstairs study is the editing room"
+    },
+    {
+     "role": "partner",
+     "age": "40",
+     "work": "operations consultant; ground-floor study is her office"
+    }
+   ],
+   "businessText": "photography studio of one",
+   "categoryHints": [
+    "photos and media",
+    "files and client delivery",
+    "productivity",
+    "smart home",
+    "food"
+   ],
+   "care": "Client photos are other people's faces: say they stay on the Core, no legal claims.",
+   "signatureApps": [
+    "immich",
+    "twenty",
+    "paperless",
+    "home-assistant",
+    "kitchenowl"
+   ],
+   "coreSpot": {
+    "room": "Study",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 5.42,
+    "roomsPassed": [
+     "Foyer",
+     "Dining",
+     "Study"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 35.72
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 29.92
+    },
+    {
+     "name": "Foyer",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 8.64
+    },
+    {
+     "name": "Study",
+     "level": "l1",
+     "kinds": [
+      "office"
+     ],
+     "areaSqm": 19.04
+    },
+    {
+     "name": "Living",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 56.76
+    },
+    {
+     "name": "Laundry & Mudroom",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 21.32
+    },
+    {
+     "name": "Guest Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 11.44
+    },
+    {
+     "name": "Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 31.2
+    },
+    {
+     "name": "Study",
+     "level": "l2",
+     "kinds": [
+      "office"
+     ],
+     "areaSqm": 17.16
+    },
+    {
+     "name": "Shower Room",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 11.96
+    },
+    {
+     "name": "Dressing Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 14.72
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 19.32
+    },
+    {
+     "name": "Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 17.48
+    }
+   ],
+   "roles": {
+    "couch": 4,
+    "tv": 1,
+    "fireplace": 0,
+    "bookshelf": 3,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 4,
+    "dining-table": 1,
+    "desk": 4,
+    "bed": 1,
+    "crib": 0,
+    "toys": 0,
+    "music": 0,
+    "laundry": 2,
+    "bicycle": 0,
+    "easel": 1,
+    "telescope": 0,
+    "patio-seat": 3,
+    "garden": 2,
+    "driveway": 1,
+    "pool": 1,
+    "deck": 2
+   },
+   "homeFlags": [],
+   "anchorsToUse": [
+    "core",
+    "breakfast-bar/kitchen/1",
+    "tv-stand/living/1",
+    "zone/pool/1",
+    "zone/patio/1"
+   ],
+   "eyelessAnchors": [
+    "zone/roof-terrace/1"
+   ]
+  },
+  {
+   "slug": "nowak-pillai",
+   "house": "bgfamily",
+   "household": "young-family",
+   "business": true,
+   "narrator": "v-warm-f",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 243,
+   "homeStyle": "Stepped white-render cottage: a tall narrow porch gable, a low 1.5-storey centre gable and a smaller stone-bay gable under a full-width dark side-gabled roof, a glazed side lounge under a glass gable, picket-fenced hydrangea front, lap pool behind a white privacy fence",
+   "lotGround": "lawn",
+   "household_text": "Young family: two parents, a toddler and a baby",
+   "members": [
+    {
+     "role": "parent",
+     "age": "35",
+     "work": "runs a small tutoring practice from the Front Study (maths and reading, ages 8 to 14)"
+    },
+    {
+     "role": "parent",
+     "age": "37",
+     "work": "project manager, hybrid"
+    },
+    {
+     "role": "child",
+     "age": "3",
+     "work": "toddler"
+    },
+    {
+     "role": "child",
+     "age": "7 months",
+     "work": "baby"
+    }
+   ],
+   "businessText": "tutoring",
+   "categoryHints": [
+    "family photos",
+    "documents and school forms",
+    "tutoring files and scheduling",
+    "recipes",
+    "kids privacy"
+   ],
+   "care": "Students are minors: the tutoring story is about where their work lives, not about their data being safe by law. Students are minors: show where lesson files live, never student names, never a safety claim.",
+   "signatureApps": [
+    "immich",
+    "yuvomi",
+    "excalidraw",
+    "nextcloud",
+    "audiobookshelf"
+   ],
+   "coreSpot": {
+    "room": "Study",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 9.01,
+    "roomsPassed": [
+     "Living Room",
+     "Study"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Sunroom Lounge",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 27
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 28.05
+    },
+    {
+     "name": "Picture Window Bay",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 6.3
+    },
+    {
+     "name": "Family Corner",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 7.8
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 10.2
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 16.25
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 6.3
+    },
+    {
+     "name": "Laundry",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 8.4
+    },
+    {
+     "name": "Bathroom",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 11.84
+    },
+    {
+     "name": "Study",
+     "level": "l1",
+     "kinds": [
+      "office"
+     ],
+     "areaSqm": 18.7
+    },
+    {
+     "name": "Family Bathroom",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 8.75
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 15.05
+    },
+    {
+     "name": "Nursery",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 9.45
+    },
+    {
+     "name": "Kids Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 8.75
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 5.25
+    },
+    {
+     "name": "Front Study",
+     "level": "l2",
+     "kinds": [
+      "office"
+     ],
+     "areaSqm": 12.25
+    },
+    {
+     "name": "Upper Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 42.5
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 5,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 0,
+    "counter": 6,
+    "dining-table": 1,
+    "desk": 3,
+    "bed": 3,
+    "crib": 1,
+    "toys": 4,
+    "music": 1,
+    "laundry": 2,
+    "bicycle": 0,
+    "easel": 1,
+    "telescope": 0,
+    "patio-seat": 3,
+    "garden": 2,
+    "driveway": 1,
+    "pool": 1,
+    "deck": 2
+   },
+   "homeFlags": [
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "crib/kids-room/1",
+    "single-bed/nursery/1",
+    "guitar-stand/primary-bedroom/1",
+    "fireplace/dining/1",
+    "zone/pool/1",
+    "patio-set/outside/1"
+   ],
+   "eyelessAnchors": [
+    "room/stair-hall"
+   ]
+  },
+  {
+   "slug": "dufresne",
+   "house": "bghouse-olcia",
+   "household": "older-kids",
+   "business": true,
+   "narrator": "v-steady-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 230,
+   "homeStyle": "Raised periwinkle lap-siding house over a garage storey: a projecting front-gabled garage wing with a pent roof, the front door recessed beside it up a long white-railed exterior stair, stepped cross gables and a big dormer, brick chimney, Italian cypress, arborvitae and birch",
+   "lotGround": "lawn",
+   "household_text": "Mother and adult son who run a bicycle and e-bike repair shop out of the garage",
+   "members": [
+    {
+     "role": "parent",
+     "age": "56",
+     "work": "shop owner, books and customers"
+    },
+    {
+     "role": "adult child",
+     "age": "26",
+     "work": "mechanic"
+    }
+   ],
+   "businessText": "bicycle and e-bike repair",
+   "categoryHints": [
+    "small business (customers, invoices, parts)",
+    "files",
+    "smart home",
+    "food"
+   ],
+   "care": "Repair jobs and customer phone numbers are the data; keep it a shop story, not a security claim.",
+   "ftueExtra": "The front door is up a long exterior stair; the Core is on a shelf in the upstairs Study.",
+   "signatureApps": [
+    "espocrm",
+    "akaunting",
+    "homebox",
+    "home-assistant",
+    "frigate"
+   ],
+   "coreSpot": {
+    "room": "Study",
+    "level": "l2",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": true
+   },
+   "coreWalk": {
+    "metres": 7.03,
+    "roomsPassed": [
+     "Entry Hall",
+     "Study"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 2
+   },
+   "rooms": [
+    {
+     "name": "Garage",
+     "level": "l1",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 36
+    },
+    {
+     "name": "Lower Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 15
+    },
+    {
+     "name": "Bedroom Hall",
+     "level": "l1",
+     "kinds": [
+      "other"
+     ],
+     "areaSqm": 5
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 30.25
+    },
+    {
+     "name": "Laundry",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 8.75
+    },
+    {
+     "name": "Lower Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 8
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 12
+    },
+    {
+     "name": "Entry Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 15
+    },
+    {
+     "name": "Living & Dining",
+     "level": "l2",
+     "kinds": [
+      "dining",
+      "living"
+     ],
+     "areaSqm": 52
+    },
+    {
+     "name": "Kitchen",
+     "level": "l2",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 28
+    },
+    {
+     "name": "Hall Bath",
+     "level": "l2",
+     "kinds": [
+      "circulation",
+      "bath"
+     ],
+     "areaSqm": 8
+    },
+    {
+     "name": "Study",
+     "level": "l2",
+     "kinds": [
+      "office"
+     ],
+     "areaSqm": 12
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 4,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 7,
+    "dining-table": 1,
+    "desk": 2,
+    "bed": 2,
+    "crib": 0,
+    "toys": 0,
+    "music": 0,
+    "laundry": 2,
+    "bicycle": 1,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 0,
+    "garden": 4,
+    "driveway": 1,
+    "pool": 0,
+    "deck": 2
+   },
+   "homeFlags": [],
+   "anchorsToUse": [
+    "bicycle/garage/1",
+    "wall-tv/living-and-dining/1",
+    "breakfast-bar/kitchen/1",
+    "zone/drive/1"
+   ],
+   "eyelessAnchors": [
+    "zone/garden/2"
+   ]
+  },
+  {
+   "slug": "oyelaran-brandt",
+   "house": "cocoon",
+   "household": "young-family",
+   "business": true,
+   "narrator": "v-warm-f",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 263,
+   "homeStyle": "Two-storey teal-siding colonial, hipped roof with a big front cross gable and a nested bay gable, forward garage and inset-porch entry gables, low hipped east wing; warm taupe fireside interior; enclosed stone pool terrace",
+   "lotGround": "lawn",
+   "household_text": "Family of four with a dog; one parent keeps books for local businesses from the Den",
+   "members": [
+    {
+     "role": "parent",
+     "age": "41",
+     "work": "freelance bookkeeper for eight small clients, in the Den"
+    },
+    {
+     "role": "parent",
+     "age": "43",
+     "work": "secondary-school teacher"
+    },
+    {
+     "role": "child",
+     "age": "10",
+     "work": "school, bunk bed"
+    },
+    {
+     "role": "child",
+     "age": "7",
+     "work": "school, sandbox and swing"
+    },
+    {
+     "role": "pet",
+     "age": "5",
+     "work": "the dog, bed in the Reading Corner"
+    }
+   ],
+   "businessText": "bookkeeping",
+   "categoryHints": [
+    "documents",
+    "money and receipts",
+    "family calendar",
+    "photos",
+    "food"
+   ],
+   "care": "Client ledgers: say the files stay on the Core, never imply it makes the practice compliant with anything.",
+   "signatureApps": [
+    "paperless",
+    "firefly-iii",
+    "baikal",
+    "immich",
+    "pi-hole"
+   ],
+   "coreSpot": {
+    "room": "Living Room",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 4.4,
+    "roomsPassed": [
+     "Foyer",
+     "Living Room"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 21.6
+    },
+    {
+     "name": "Reading Corner",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 7.2
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 17.64
+    },
+    {
+     "name": "Dining Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 21.84
+    },
+    {
+     "name": "Den",
+     "level": "l1",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 15.18
+    },
+    {
+     "name": "Foyer",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 7.28
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 6.48
+    },
+    {
+     "name": "Powder Room",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 4.76
+    },
+    {
+     "name": "Garage",
+     "level": "l1",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 39.2
+    },
+    {
+     "name": "Mudroom & Laundry",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 9.24
+    },
+    {
+     "name": "Family Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 25.2
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 15.96
+    },
+    {
+     "name": "Ensuite",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 7.68
+    },
+    {
+     "name": "Walk-in Closet",
+     "level": "l2",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 5.76
+    },
+    {
+     "name": "Gallery Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 16.56
+    },
+    {
+     "name": "Hall Bath",
+     "level": "l2",
+     "kinds": [
+      "circulation",
+      "bath"
+     ],
+     "areaSqm": 10.2
+    },
+    {
+     "name": "Kids Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 11.52
+    },
+    {
+     "name": "Kids Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 16.32
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 5,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 2,
+    "dining-table": 1,
+    "desk": 2,
+    "bed": 3,
+    "crib": 0,
+    "toys": 4,
+    "music": 0,
+    "laundry": 2,
+    "bicycle": 1,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 2,
+    "garden": 3,
+    "driveway": 0,
+    "pool": 2,
+    "deck": 2
+   },
+   "homeFlags": [],
+   "anchorsToUse": [
+    "core",
+    "tv-stand/family-room/1",
+    "bunk-bed/kids-room/1",
+    "pet-bed/reading-corner/1",
+    "bbq-grill/outside/1",
+    "breakfast-bar/kitchen/1"
+   ],
+   "eyelessAnchors": [
+    "room/walk-in-closet",
+    "zone/tree/1"
+   ]
+  },
+  {
+   "slug": "castellanos",
+   "house": "cutestarter",
+   "household": "young-family",
+   "business": true,
+   "narrator": "v-bright-f",
+   "tenure": "renter",
+   "storeys": 1,
+   "areaSqm": 77,
+   "homeStyle": "Slate-blue clapboard Cape Cod: steep brown side gable with two dormers and an end chimney, a gabled entry bay, white-railed porches either side, a lower bath wing",
+   "lotGround": "lawn",
+   "household_text": "Single parent and a five-year-old renting a starter cottage",
+   "members": [
+    {
+     "role": "parent",
+     "age": "34",
+     "work": "freelance illustrator and children's-book translator"
+    },
+    {
+     "role": "child",
+     "age": "5",
+     "work": "kindergarten"
+    }
+   ],
+   "businessText": "freelance illustration and translation",
+   "categoryHints": [
+    "freelance files",
+    "photos",
+    "recipes",
+    "kids privacy",
+    "subscriptions and budgets"
+   ],
+   "care": "Do not make money worry the story; make small space and a plug the story. Do not make money worry the story; make the small space and a plug the story. The tenant owns nothing of the house: the Core is theirs.",
+   "ftueExtra": "Renter angle: the Core plugs in and unplugs, nothing is built into the walls. In 77 m2 the shelf is part of the living room, so the whole FTUE happens in one room.",
+   "signatureApps": [
+    "libretranslate",
+    "inkscape",
+    "nextcloud",
+    "kitchenowl",
+    "audiobookshelf"
+   ],
+   "coreSpot": {
+    "room": "Living Room",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 2.51,
+    "roomsPassed": [
+     "Living Room"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 7.84
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 24.36
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 8.4
+    },
+    {
+     "name": "Kids Corner",
+     "level": "l1",
+     "kinds": [
+      "play"
+     ],
+     "areaSqm": 12.6
+    },
+    {
+     "name": "Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 11.76
+    },
+    {
+     "name": "Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 5.04
+    },
+    {
+     "name": "Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 5.32
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "tv": 1,
+    "fireplace": 0,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 1,
+    "kitchen-island": 0,
+    "counter": 3,
+    "dining-table": 1,
+    "desk": 0,
+    "bed": 1,
+    "crib": 0,
+    "toys": 1,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 0,
+    "garden": 3,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 1
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "bedroom-only",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    },
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    },
+    {
+     "no": "desk",
+     "status": "core-shelf-only",
+     "say": "The only desk is the shelf the Core stands on: office beats use the nearest desk-like surface or the couch group; do not invent a desk."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "loveseat/living-room/1",
+    "farmhouse-table/dining/1",
+    "toy-box/kids-corner/1",
+    "zone/garden/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "whitlock-mensah",
+   "house": "epiphany",
+   "household": "solo-or-couple",
+   "business": true,
+   "narrator": "v-deep-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 327,
+   "homeStyle": "1.5-storey oxblood-brick house under one steep bronze roof that steps down west to a lower wing and the garage; a two-storey black-framed glazed slot, a black glazed entry pair in the east bay, a gravel forecourt with a rock-edged sweep bed",
+   "lotGround": "lawn",
+   "household_text": "Couple in their 40s who run a landscape design-and-build business; one teaches violin on the side",
+   "members": [
+    {
+     "role": "partner",
+     "age": "46",
+     "work": "landscaper and owner, jobs run from the Den"
+    },
+    {
+     "role": "partner",
+     "age": "44",
+     "work": "violin teacher; students come in the evening and the lounge doubles as the practice room"
+    },
+    {
+     "role": "crew",
+     "age": "mixed",
+     "work": "two seasonal workers who come to the garage at 7"
+    }
+   ],
+   "businessText": "landscape design and build",
+   "categoryHints": [
+    "small business (jobs, quotes, photos)",
+    "files",
+    "music",
+    "food"
+   ],
+   "care": "Job-site photos and client addresses; jobs and quotes are the story.",
+   "ftueExtra": "Tell it as a walk through the whole ground floor, from the Foyer to the Den.",
+   "signatureApps": [
+    "twenty",
+    "planka",
+    "kimai",
+    "baikal",
+    "audiomass"
+   ],
+   "coreSpot": {
+    "room": "Den",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 16.12,
+    "roomsPassed": [
+     "Foyer",
+     "Stair Hall",
+     "Dining Room",
+     "Kitchen",
+     "Den"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 3
+   },
+   "rooms": [
+    {
+     "name": "Foyer",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 20.16
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 26.88
+    },
+    {
+     "name": "Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 3.07
+    },
+    {
+     "name": "Dining Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 31.36
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 29.16
+    },
+    {
+     "name": "Den",
+     "level": "l1",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 21.6
+    },
+    {
+     "name": "Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 24.84
+    },
+    {
+     "name": "Lounge",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 38
+    },
+    {
+     "name": "Garage",
+     "level": "l1",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 40.96
+    },
+    {
+     "name": "Link Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 5.76
+    },
+    {
+     "name": "Landing Gallery",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 32.48
+    },
+    {
+     "name": "Bedroom Two",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 24.64
+    },
+    {
+     "name": "Primary Suite",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 20.16
+    },
+    {
+     "name": "Glass Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 11.44
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "tv": 1,
+    "fireplace": 0,
+    "bookshelf": 0,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 4,
+    "dining-table": 1,
+    "desk": 2,
+    "bed": 3,
+    "crib": 0,
+    "toys": 0,
+    "music": 1,
+    "laundry": 2,
+    "bicycle": 2,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 0,
+    "garden": 3,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 1
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "bedroom-only",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "bicycle/garage/1",
+    "record-player/lounge/1",
+    "kitchen-island/kitchen/1",
+    "zone/deck/1",
+    "zone/garden/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "eriksen-bautista",
+   "house": "familyhome",
+   "household": "young-family",
+   "business": true,
+   "narrator": "v-light-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 179,
+   "homeStyle": "Two-storey sage-yellow lap-siding family home: hipped roof with two overlapping street gables, one-storey gabled west wing, gabled entry portico and picket-railed wrap veranda, warm cream living room with a garden bay, and a backyard homestead (lily pond gazebo, greenhouse, raised beds, monkey bars)",
+   "lotGround": "lawn",
+   "household_text": "Homesteading family of five with a plant and seed nursery in the back yard",
+   "members": [
+    {
+     "role": "parent",
+     "age": "36",
+     "work": "runs the online seed and seedling shop from the greenhouse"
+    },
+    {
+     "role": "parent",
+     "age": "38",
+     "work": "electrician, on call"
+    },
+    {
+     "role": "child",
+     "age": "8",
+     "work": "school; single bed in the Kids' Bedroom, easel in the playroom"
+    },
+    {
+     "role": "child",
+     "age": "2",
+     "work": "crib in the Nursery"
+    },
+    {
+     "role": "child",
+     "age": "6 months",
+     "work": "second crib"
+    }
+   ],
+   "businessText": "seed and seedling nursery",
+   "categoryHints": [
+    "small business (shop, orders, newsletter)",
+    "garden and food",
+    "photos",
+    "kids privacy"
+   ],
+   "care": "No TV in the scene: write it as a choice, not a gap. There is no TV: a choice, not a gap. Use the playroom and the nursery.",
+   "signatureApps": [
+    "hortusfox",
+    "grist",
+    "listmonk",
+    "yuvomi",
+    "vikunja"
+   ],
+   "coreSpot": {
+    "room": "Living Bay",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 8.37,
+    "roomsPassed": [
+     "Entry & Stair Hall",
+     "Living Room"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Entry & Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 13.5
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 20
+    },
+    {
+     "name": "Living Bay",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 2.52
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 16
+    },
+    {
+     "name": "Dining Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 19.6
+    },
+    {
+     "name": "Playroom",
+     "level": "l1",
+     "kinds": [
+      "play"
+     ],
+     "areaSqm": 20.7
+    },
+    {
+     "name": "Mudroom",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 5
+    },
+    {
+     "name": "Powder Room",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 4
+    },
+    {
+     "name": "Kids' Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 10.32
+    },
+    {
+     "name": "Nursery",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 10.08
+    },
+    {
+     "name": "Family Bathroom",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 6.76
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 15.34
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 25.2
+    },
+    {
+     "name": "Primary Ensuite",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 10.4
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 0,
+    "fireplace": 0,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 0,
+    "counter": 2,
+    "dining-table": 3,
+    "desk": 1,
+    "bed": 2,
+    "crib": 2,
+    "toys": 6,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 2,
+    "telescope": 0,
+    "patio-seat": 1,
+    "garden": 4,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 3
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    },
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "easel/playroom/1",
+    "crib/nursery/1",
+    "umbrella-table/outside/1",
+    "zone/gazebo/1",
+    "zone/pond/1",
+    "zone/garden/1"
+   ],
+   "eyelessAnchors": [
+    "room/powder-room",
+    "zone/garden/3",
+    "zone/porch/1",
+    "zone/trees/1"
+   ]
+  },
+  {
+   "slug": "kowalczyk-ferreira",
+   "house": "familyhouse-nora",
+   "household": "older-kids",
+   "business": true,
+   "narrator": "v-deep-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 348,
+   "homeStyle": "Mid-century raised ranch: tuck-under garage between fieldstone piers under a balcony room, the main floor a storey up behind a long loggia, pale ashlar under a tall west shed and a low east gable with brown fascias, a switchback stoop through terraced planters, stepping stones across a cottage garden",
+   "lotGround": "lawn",
+   "household_text": "Family of five on a mid-century raised ranch; one parent restores furniture in the workshop",
+   "members": [
+    {
+     "role": "parent",
+     "age": "47",
+     "work": "furniture restorer, workshop on the lower level"
+    },
+    {
+     "role": "parent",
+     "age": "45",
+     "work": "dental office manager, hybrid"
+    },
+    {
+     "role": "teen",
+     "age": "16",
+     "work": "drummer, practises in the Den"
+    },
+    {
+     "role": "child",
+     "age": "12",
+     "work": "school, bike"
+    },
+    {
+     "role": "child",
+     "age": "8",
+     "work": "school; shares a kids bedroom"
+    }
+   ],
+   "businessText": "furniture restoration",
+   "categoryHints": [
+    "small business (commissions, photos of pieces)",
+    "music",
+    "photos",
+    "family calendar",
+    "files"
+   ],
+   "care": "Keep the teen's drumming recordings as his own.",
+   "ftueExtra": "The front door is on the upper level, a switchback stoop up through terraced planters; the Core is on a shelf in the shared Kitchen & Dining.",
+   "signatureApps": [
+    "photoprism",
+    "twenty",
+    "audiomass",
+    "yuvomi",
+    "stirling-pdf"
+   ],
+   "coreSpot": {
+    "room": "Kitchen & Dining",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "upright"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": true
+   },
+   "coreWalk": {
+    "metres": 10.06,
+    "roomsPassed": [
+     "Foyer",
+     "Living Room",
+     "Kitchen & Dining"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 1
+   },
+   "rooms": [
+    {
+     "name": "Garage",
+     "level": "l0",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 46.8
+    },
+    {
+     "name": "Laundry",
+     "level": "l0",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 26.4
+    },
+    {
+     "name": "Workshop",
+     "level": "l0",
+     "kinds": [
+      "workshop"
+     ],
+     "areaSqm": 20.4
+    },
+    {
+     "name": "Den",
+     "level": "l0",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 60
+    },
+    {
+     "name": "Storage",
+     "level": "l0",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 36
+    },
+    {
+     "name": "Foyer",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 6.24
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 23.76
+    },
+    {
+     "name": "Reading Nook",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 2.6
+    },
+    {
+     "name": "Kitchen & Dining",
+     "level": "l1",
+     "kinds": [
+      "kitchen",
+      "dining"
+     ],
+     "areaSqm": 33.9
+    },
+    {
+     "name": "Pantry",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 4.81
+    },
+    {
+     "name": "Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 12.6
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 30.24
+    },
+    {
+     "name": "Walk-in Closet",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 2.7
+    },
+    {
+     "name": "Ensuite",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 7.7
+    },
+    {
+     "name": "Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 6.16
+    },
+    {
+     "name": "Kids Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 20.16
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 1,
+    "fireplace": 0,
+    "bookshelf": 4,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 0,
+    "counter": 5,
+    "dining-table": 1,
+    "desk": 1,
+    "bed": 3,
+    "crib": 0,
+    "toys": 2,
+    "music": 2,
+    "laundry": 2,
+    "bicycle": 2,
+    "easel": 1,
+    "telescope": 0,
+    "patio-seat": 1,
+    "garden": 4,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 4
+   },
+   "homeFlags": [
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    }
+   ],
+   "anchorsToUse": [
+    "easel/workshop/1",
+    "drum-kit/den/1",
+    "keyboard-piano/living-room/1",
+    "tv-stand/den/1",
+    "bicycle/garage/1",
+    "core"
+   ],
+   "eyelessAnchors": [
+    "lot/front"
+   ]
+  },
+  {
+   "slug": "ashworth",
+   "house": "flowerycottage",
+   "household": "grandparents",
+   "business": true,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "storeys": 1,
+   "areaSqm": 150,
+   "homeStyle": "Single-storey lakeside cottage: a cluster of blue-green board-and-batten cross-gables under olive shingle, a flat meadow-roofed glass sunroom, a creek and jetty in a dense cottage garden",
+   "lotGround": "waterfront",
+   "household_text": "Woman in her 70s living alone, a painter who sells prints; her grandchildren come for summer days",
+   "members": [
+    {
+     "role": "solo",
+     "age": "73",
+     "work": "painter and printmaker; a 36 m2 glass sunroom is the studio"
+    },
+    {
+     "role": "visiting grandchildren",
+     "age": "8 and 11",
+     "work": "day visits, the jetty and the creek (the model has no bedroom: they do not stay overnight in any scene)"
+    }
+   ],
+   "businessText": "print and card sales",
+   "categoryHints": [
+    "photos",
+    "reading",
+    "small shop (prints)",
+    "smart home",
+    "family messaging"
+   ],
+   "care": "Capable, curious and independent; do not write age as frailty. Do not stage a bedroom: there is none. There is no bedroom in the model: no night scene, grandchildren visit by day. Do not write age as frailty.",
+   "signatureApps": [
+    "librephotos",
+    "akaunting",
+    "koodo-reader",
+    "home-assistant",
+    "inkscape"
+   ],
+   "coreSpot": {
+    "room": "Study",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 11.01,
+    "roomsPassed": [
+     "Entry",
+     "Living Room",
+     "Study"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Garage",
+     "level": "l1",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 3
+    },
+    {
+     "name": "Entry",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 9.92
+    },
+    {
+     "name": "Bathroom",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 6
+    },
+    {
+     "name": "Sunroom",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 36
+    },
+    {
+     "name": "Dining Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 11.48
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 12.6
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 16.1
+    },
+    {
+     "name": "Study",
+     "level": "l1",
+     "kinds": [
+      "office"
+     ],
+     "areaSqm": 22
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 2,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 0,
+    "counter": 3,
+    "dining-table": 1,
+    "desk": 1,
+    "bed": 0,
+    "crib": 0,
+    "toys": 0,
+    "music": 0,
+    "laundry": 2,
+    "bicycle": 0,
+    "easel": 1,
+    "telescope": 0,
+    "patio-seat": 2,
+    "garden": 3,
+    "driveway": 0,
+    "pool": 1,
+    "deck": 0
+   },
+   "homeFlags": [
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    }
+   ],
+   "anchorsToUse": [
+    "easel/sunroom/1",
+    "fireplace/study/1",
+    "tv-stand/living-room/1",
+    "zone/garden/1",
+    "zone/pond/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "nakamura-oduya",
+   "house": "gardennook",
+   "household": "young-family",
+   "business": true,
+   "narrator": "v-warm-f",
+   "tenure": "owner",
+   "storeys": 1,
+   "areaSqm": 136,
+   "homeStyle": "Single-storey powder-blue painted-brick cottage: a clay swoop skillion rising west to a white outrigger post meets a front-facing clay gable in a V; white-columned porch, recessed kitchen loggia, glass garden nook; gravel S-curve between flower-packed beds, rear deck and round plunge tub",
+   "lotGround": "lawn",
+   "household_text": "Young couple with a baby who grow cut flowers for the farmers market",
+   "members": [
+    {
+     "role": "partner",
+     "age": "31",
+     "work": "flower grower, sells at two markets and by subscription"
+    },
+    {
+     "role": "partner",
+     "age": "33",
+     "work": "graphic designer, remote, in the Garden Nook"
+    },
+    {
+     "role": "child",
+     "age": "10 months",
+     "work": "baby; crib in the nursery bedroom"
+    }
+   ],
+   "businessText": "cut-flower farm",
+   "categoryHints": [
+    "small business (orders, newsletter)",
+    "photos",
+    "garden and food",
+    "kids privacy"
+   ],
+   "care": "No TV: lean into the fireplace and the garden. There is no TV: lean on the fireplace and the garden.",
+   "signatureApps": [
+    "hortusfox",
+    "listmonk",
+    "penpot",
+    "nocodb",
+    "baikal"
+   ],
+   "coreSpot": {
+    "room": "Living Room",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 9.96,
+    "roomsPassed": [
+     "Entry",
+     "Dining",
+     "Living Room"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Entry",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 15.4
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 14.35
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 21
+    },
+    {
+     "name": "Garden Nook",
+     "level": "l1",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 4.5
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 27
+    },
+    {
+     "name": "Bathroom",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 8.1
+    },
+    {
+     "name": "Playroom",
+     "level": "l1",
+     "kinds": [
+      "play"
+     ],
+     "areaSqm": 19.8
+    },
+    {
+     "name": "Bedroom & Nursery",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 24.8
+    }
+   ],
+   "roles": {
+    "couch": 1,
+    "tv": 0,
+    "fireplace": 1,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 0,
+    "counter": 2,
+    "dining-table": 1,
+    "desk": 0,
+    "bed": 1,
+    "crib": 1,
+    "toys": 4,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 2,
+    "garden": 4,
+    "driveway": 0,
+    "pool": 1,
+    "deck": 3
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    },
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    },
+    {
+     "no": "desk",
+     "status": "core-shelf-only",
+     "say": "The only desk is the shelf the Core stands on: office beats use the nearest desk-like surface or the couch group; do not invent a desk."
+    }
+   ],
+   "anchorsToUse": [
+    "crib/bedroom-and-nursery/1",
+    "fireplace/living-room/1",
+    "bbq-grill/outside/1",
+    "zone/garden/1",
+    "zone/deck/1",
+    "zone/hottub/1",
+    "core"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "ibarra-holm",
+   "house": "lakecabin",
+   "household": "young-family",
+   "business": true,
+   "narrator": "v-light-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 219,
+   "homeStyle": "Stepped lake house standing in the water: a greige gable block with a glazed prow, a long catslide over a set-back upper floor with a stone chimney, a single-storey flat-roofed kitchen wing with a clerestory and a glass corner, a planted bank and a dark deck with a telescope over the pond",
+   "lotGround": "waterfront",
+   "household_text": "Couple in their 30s expecting a second child; one works remotely in software, one illustrates wildlife",
+   "members": [
+    {
+     "role": "partner",
+     "age": "36",
+     "work": "software developer, remote, Core desk in the Study"
+    },
+    {
+     "role": "partner",
+     "age": "34",
+     "work": "wildlife illustrator, easel in the Study, telescope on the lake deck"
+    },
+    {
+     "role": "child",
+     "age": "2",
+     "work": "toddler, crib in the Nursery"
+    },
+    {
+     "role": "child",
+     "age": "due in spring",
+     "work": "second baby, not yet in any scene"
+    }
+   ],
+   "businessText": "illustration",
+   "categoryHints": [
+    "remote work",
+    "photos",
+    "family planning calendar",
+    "smart home",
+    "food"
+   ],
+   "care": "Pregnancy is a family fact, not a health claim.",
+   "ftueExtra": "The longest detour of the 30: tell it as the walk down the Lake Passage and Lake Hall to the Study, not as a straight line.",
+   "signatureApps": [
+    "open-webui",
+    "memos",
+    "inkscape",
+    "super-productivity",
+    "jellyfin"
+   ],
+   "coreSpot": {
+    "room": "Study",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 16.93,
+    "roomsPassed": [
+     "Living Nook",
+     "Lake Passage",
+     "Lake Hall",
+     "Study"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 4
+   },
+   "rooms": [
+    {
+     "name": "Living Nook",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 16
+    },
+    {
+     "name": "Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 3.24
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 21.08
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 28.56
+    },
+    {
+     "name": "Lake Passage",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 13
+    },
+    {
+     "name": "Lake Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 22
+    },
+    {
+     "name": "Study",
+     "level": "l1",
+     "kinds": [
+      "office"
+     ],
+     "areaSqm": 19.25
+    },
+    {
+     "name": "Master Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 41.25
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 16.2
+    },
+    {
+     "name": "Stair Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 11.52
+    },
+    {
+     "name": "Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 7.68
+    },
+    {
+     "name": "Nursery",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 24.78
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 1,
+    "fireplace": 0,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 1,
+    "kitchen-island": 1,
+    "counter": 2,
+    "dining-table": 1,
+    "desk": 0,
+    "bed": 1,
+    "crib": 1,
+    "toys": 2,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 1,
+    "telescope": 1,
+    "patio-seat": 0,
+    "garden": 6,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 1
+   },
+   "homeFlags": [],
+   "anchorsToUse": [
+    "core",
+    "easel/study/1",
+    "telescope/outside/1",
+    "crib/nursery/1",
+    "breakfast-bar/kitchen/1",
+    "tv-stand/living-nook/1"
+   ],
+   "eyelessAnchors": [
+    "zone/trees/1"
+   ]
+  },
+  {
+   "slug": "karimi-santos",
+   "house": "mediterranean",
+   "household": "grandparents",
+   "business": true,
+   "narrator": "v-storyteller-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 390,
+   "homeStyle": "Symmetrical warm-white stucco villa: a two-storey centre with pavilion hips over box bays and a recessed arched entry under an iron balcony, single-storey hipped wings, dark timber posts and geranium window boxes, a walled cypress forecourt with a tiered fountain, three rear arches onto a mosaic pool terrace with a pergola",
+   "lotGround": "lawn",
+   "household_text": "Three generations who own a neighbourhood restaurant; the back office is at home",
+   "members": [
+    {
+     "role": "grandparent",
+     "age": "71",
+     "work": "retired founder, still cooks Sunday dinner; sleeps in the ground-floor Guest Bedroom"
+    },
+    {
+     "role": "parent",
+     "age": "47",
+     "work": "restaurant owner and chef"
+    },
+    {
+     "role": "parent",
+     "age": "45",
+     "work": "runs the books and the staff rota from the Games Den"
+    },
+    {
+     "role": "teen",
+     "age": "17",
+     "work": "plays the piano in the Stair Hall"
+    }
+   ],
+   "businessText": "restaurant back office",
+   "categoryHints": [
+    "small business (rota, suppliers, menus)",
+    "recipes and food",
+    "files",
+    "family messaging",
+    "music"
+   ],
+   "care": "Heritage is the writers' choice and is not implied by the house style.",
+   "signatureApps": [
+    "mealie",
+    "grocy",
+    "planka",
+    "akaunting",
+    "paperless"
+   ],
+   "coreSpot": {
+    "room": "Salon",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 11.29,
+    "roomsPassed": [
+     "Stair Hall",
+     "Dining Room",
+     "Salon"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 34.96
+    },
+    {
+     "name": "TV Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 20.24
+    },
+    {
+     "name": "Dining Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 23.8
+    },
+    {
+     "name": "Salon",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 31.28
+    },
+    {
+     "name": "Games Den",
+     "level": "l1",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 21.06
+    },
+    {
+     "name": "Breakfast Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 21.06
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 43.2
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 30.6
+    },
+    {
+     "name": "Guest Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 12.6
+    },
+    {
+     "name": "Upper Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 50.92
+    },
+    {
+     "name": "Front Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 29.48
+    },
+    {
+     "name": "Primary Suite",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 50.4
+    },
+    {
+     "name": "Primary Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 21.6
+    }
+   ],
+   "roles": {
+    "couch": 5,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 0,
+    "counter": 6,
+    "dining-table": 3,
+    "desk": 1,
+    "bed": 3,
+    "crib": 0,
+    "toys": 0,
+    "music": 1,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 4,
+    "garden": 5,
+    "driveway": 0,
+    "pool": 1,
+    "deck": 1
+   },
+   "homeFlags": [
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "tv-stand/tv-room/1",
+    "keyboard-piano/stair-hall/1",
+    "fireplace/games-den/1",
+    "outdoor-table/outside/1",
+    "zone/pool/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "delgado-park",
+   "house": "mesamariposa",
+   "household": "older-kids",
+   "business": true,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 280,
+   "homeStyle": "Mid-century desert villa: split dark shed roofs with rust fascias over caramel stucco, a glass-roofed conservatory dining room on the street corner, a glazed tower, a recessed entry with a slab canopy, one-bay garage; a walled resort garden round a turtle-mosaic pool",
+   "lotGround": "desert",
+   "household_text": "Family of four where one parent is a mobile large-animal veterinarian",
+   "members": [
+    {
+     "role": "parent",
+     "age": "42",
+     "work": "mobile large-animal vet; the garage is the supply store"
+    },
+    {
+     "role": "parent",
+     "age": "40",
+     "work": "high-school art teacher"
+    },
+    {
+     "role": "child",
+     "age": "13",
+     "work": "school"
+    },
+    {
+     "role": "child",
+     "age": "9",
+     "work": "school; the Kids Room"
+    }
+   ],
+   "businessText": "veterinary practice (animals, not people)",
+   "categoryHints": [
+    "small business (appointments, records for animals)",
+    "photos",
+    "home automation",
+    "food",
+    "family messaging"
+   ],
+   "care": "Animal records only; no medical claims about people. Animals only. No medical claim about people.",
+   "signatureApps": [
+    "baserow",
+    "baikal",
+    "homebox",
+    "kiwix",
+    "tldraw"
+   ],
+   "coreSpot": {
+    "room": "Living Room",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 13.62,
+    "roomsPassed": [
+     "Entry Hall",
+     "Kitchen",
+     "Living Room"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 1
+   },
+   "rooms": [
+    {
+     "name": "Conservatory Dining",
+     "level": "l1",
+     "kinds": [
+      "dining",
+      "living"
+     ],
+     "areaSqm": 24.75
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 30.25
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 19.8
+    },
+    {
+     "name": "Entry Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 21.6
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 16.8
+    },
+    {
+     "name": "Garage",
+     "level": "l1",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 33.8
+    },
+    {
+     "name": "Breakfast Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 33.8
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 20.9
+    },
+    {
+     "name": "Primary Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 9.35
+    },
+    {
+     "name": "Upper Passage",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 6.48
+    },
+    {
+     "name": "Family Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 7.92
+    },
+    {
+     "name": "Kids' Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 16.2
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 24
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 14.4
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 0,
+    "fireplace": 2,
+    "bookshelf": 2,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 0,
+    "counter": 4,
+    "dining-table": 2,
+    "desk": 0,
+    "bed": 3,
+    "crib": 0,
+    "toys": 2,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 1,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 5,
+    "garden": 2,
+    "driveway": 0,
+    "pool": 1,
+    "deck": 4
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    },
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    },
+    {
+     "no": "desk",
+     "status": "core-shelf-only",
+     "say": "The only desk is the shelf the Core stands on: office beats use the nearest desk-like surface or the couch group; do not invent a desk."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "bicycle/garage/1",
+    "fireplace/conservatory-dining/1",
+    "umbrella-table/outside/1",
+    "zone/firepit/1",
+    "zone/pool/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "chowdhury-osei",
+   "house": "mirage",
+   "household": "older-kids",
+   "business": true,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "storeys": 4,
+   "areaSqm": 586,
+   "homeStyle": "Terraced hillside modern: a fieldstone plinth lifts the main floor, loggia and pool terrace a storey above a jungle bank and lily pond; a glass stair tower, a cantilevered bedroom floor on walnut floor bands and a setback clerestory crown it",
+   "lotGround": "waterfront",
+   "household_text": "Couple in their 50s who run an architecture and interior design studio from the Den; their adult daughter lives in the second bedroom and works in the studio",
+   "members": [
+    {
+     "role": "partner",
+     "age": "52",
+     "work": "architect, runs the studio"
+    },
+    {
+     "role": "partner",
+     "age": "50",
+     "work": "interior designer, runs the studio"
+    },
+    {
+     "role": "adult child",
+     "age": "24",
+     "work": "junior designer; Bedroom Two; telescope hobby in the Reading Loft"
+    }
+   ],
+   "businessText": "architecture and interior design studio",
+   "categoryHints": [
+    "small business (projects, drawings, client files)",
+    "photos and memories",
+    "music",
+    "family messaging",
+    "smart home"
+   ],
+   "care": "Keep it a family and a studio, not a luxury ad; the stairs are the story. Do not add a grandparent: there is no ground-floor bedroom. The walk is the story (four storeys, the Core is in the kitchen on another level). Do not add a grandparent: there is no ground-floor bedroom.",
+   "ftueExtra": "The only Core on a different level from the front door: the walk is up a flight, which is itself a good beat (carry the box up the stair tower).",
+   "signatureApps": [
+    "nextcloud",
+    "drawio",
+    "bookstack",
+    "stirling-pdf",
+    "navidrome"
+   ],
+   "coreSpot": {
+    "room": "Kitchen",
+    "level": "l2",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 24.73,
+    "roomsPassed": [
+     "Entry Lobby",
+     "Stair Hall",
+     "Stair Tower",
+     "Living Salon",
+     "Kitchen"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 6
+   },
+   "rooms": [
+    {
+     "name": "Entry Lobby",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 27
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 31.5
+    },
+    {
+     "name": "Storage & Laundry",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 42
+    },
+    {
+     "name": "Den",
+     "level": "l2",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 39
+    },
+    {
+     "name": "Stair Tower",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 18
+    },
+    {
+     "name": "Living Salon",
+     "level": "l2",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 44
+    },
+    {
+     "name": "Kitchen",
+     "level": "l2",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 44
+    },
+    {
+     "name": "Stair Landing",
+     "level": "l3",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 12.25
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l3",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 13.75
+    },
+    {
+     "name": "Bedroom Two",
+     "level": "l3",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 27.5
+    },
+    {
+     "name": "Family Bath",
+     "level": "l3",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 7
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l3",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 41.25
+    },
+    {
+     "name": "Primary Bath",
+     "level": "l3",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 19.25
+    },
+    {
+     "name": "Stair Tower",
+     "level": "l3",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 18
+    },
+    {
+     "name": "Reading Loft",
+     "level": "l4",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 40.5
+    }
+   ],
+   "roles": {
+    "couch": 4,
+    "tv": 0,
+    "fireplace": 0,
+    "bookshelf": 4,
+    "fridge": 0,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 4,
+    "dining-table": 2,
+    "desk": 0,
+    "bed": 2,
+    "crib": 0,
+    "toys": 0,
+    "music": 2,
+    "laundry": 2,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 1,
+    "patio-seat": 3,
+    "garden": 1,
+    "driveway": 0,
+    "pool": 1,
+    "deck": 6
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    },
+    {
+     "no": "desk",
+     "status": "core-shelf-only",
+     "say": "The only desk is the shelf the Core stands on: office beats use the nearest desk-like surface or the couch group; do not invent a desk."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "keyboard-piano/living-salon/1",
+    "record-player/den/1",
+    "kitchen-island/kitchen/1",
+    "telescope/reading-loft/1",
+    "zone/pool/1",
+    "zone/pond/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "aguirre-lund",
+   "house": "modernhome-nora",
+   "household": "young-family",
+   "business": true,
+   "narrator": "v-warm-f",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 216,
+   "homeStyle": "Layered blue-and-white modern: a white-framed upper box with a recessed glass-railed loggia, a charcoal portal round the glazed stair, blue-grey concrete below, and a rear roof terrace with a plunge pool over the bedroom; walnut-and-leather living room behind west glass onto a slatted pergola patio",
+   "lotGround": "lawn",
+   "household_text": "Homeschooling family of four where both parents work from home",
+   "members": [
+    {
+     "role": "parent",
+     "age": "39",
+     "work": "former teacher, now leads the homeschool days and writes a curriculum newsletter"
+    },
+    {
+     "role": "parent",
+     "age": "41",
+     "work": "remote product manager"
+    },
+    {
+     "role": "child",
+     "age": "11",
+     "work": "bunk bed, upstairs desk"
+    },
+    {
+     "role": "child",
+     "age": "8",
+     "work": "bunk bed, upstairs desk"
+    }
+   ],
+   "businessText": "curriculum newsletter",
+   "categoryHints": [
+    "learning at home",
+    "documents and schedules",
+    "photos",
+    "kids privacy",
+    "food"
+   ],
+   "care": "Children's learning is private; no claims about educational outcomes. No claim about educational outcomes. Children appear in everyday moments only.",
+   "signatureApps": [
+    "kiwix",
+    "habitica",
+    "listmonk",
+    "joplin",
+    "yuvomi"
+   ],
+   "coreSpot": {
+    "room": "Living Room",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 12.5,
+    "roomsPassed": [
+     "Entry & Stair Hall",
+     "Kitchen & Dining",
+     "Living Room"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 1
+   },
+   "rooms": [
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 51.15
+    },
+    {
+     "name": "Kitchen & Dining",
+     "level": "l1",
+     "kinds": [
+      "kitchen",
+      "dining"
+     ],
+     "areaSqm": 23.5
+    },
+    {
+     "name": "Garage & Utility",
+     "level": "l1",
+     "kinds": [
+      "utility",
+      "garage"
+     ],
+     "areaSqm": 15
+    },
+    {
+     "name": "Entry & Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 33
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 16
+    },
+    {
+     "name": "Dressing Room",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 6.9
+    },
+    {
+     "name": "Ensuite",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 4.6
+    },
+    {
+     "name": "Kids' Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 11.6
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 11.2
+    },
+    {
+     "name": "Guest Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 11.18
+    },
+    {
+     "name": "Family Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 9.62
+    },
+    {
+     "name": "Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 22.55
+    }
+   ],
+   "roles": {
+    "couch": 5,
+    "tv": 0,
+    "fireplace": 0,
+    "bookshelf": 2,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 0,
+    "counter": 3,
+    "dining-table": 1,
+    "desk": 3,
+    "bed": 3,
+    "crib": 0,
+    "toys": 1,
+    "music": 0,
+    "laundry": 2,
+    "bicycle": 1,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 3,
+    "garden": 5,
+    "driveway": 0,
+    "pool": 1,
+    "deck": 3
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    },
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    },
+    {
+     "no": "garden",
+     "status": "none",
+     "say": "No garden zone of 10 m2 or more: use the nearest planted bed, planter or deck (roles garden, deck) and say \"the planters\" or \"the deck\"."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "bunk-bed/kids-room/1",
+    "bbq-grill/outside/1",
+    "bicycle/garage-and-utility/1",
+    "zone/garden/1",
+    "zone/pool/1"
+   ],
+   "eyelessAnchors": [
+    "room/ensuite"
+   ]
+  },
+  {
+   "slug": "okonkwo-reid",
+   "house": "modernhouse-nora",
+   "household": "solo-or-couple",
+   "business": true,
+   "narrator": "v-deep-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 174,
+   "homeStyle": "Two near-equal modern volumes under opposed dark sheds: a one-storey west wing falling west over a fin-framed recessed porch, and a two-storey east block falling east with its upper storey set back behind a planted white band; blue-grey siding, walnut pilasters, a charcoal forecourt and a reflecting basin in front, a timber pool deck wrapping the back",
+   "lotGround": "lawn",
+   "household_text": "Couple, no children, one produces a podcast and one is a data analyst",
+   "members": [
+    {
+     "role": "partner",
+     "age": "35",
+     "work": "podcast producer; guitar on the landing"
+    },
+    {
+     "role": "partner",
+     "age": "37",
+     "work": "data analyst, remote"
+    }
+   ],
+   "businessText": "podcast production",
+   "categoryHints": [
+    "media production files",
+    "remote work",
+    "smart home",
+    "music",
+    "food"
+   ],
+   "care": "Interview recordings belong to guests: say they stay on the Core.",
+   "signatureApps": [
+    "audiomass",
+    "whisper-webui",
+    "nextcloud",
+    "metabase",
+    "home-assistant"
+   ],
+   "coreSpot": {
+    "room": "Desk Hall",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "upright"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 6.01,
+    "roomsPassed": [
+     "Entry",
+     "Desk Hall"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 6.44
+    },
+    {
+     "name": "Entry",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 7.13
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 7.28
+    },
+    {
+     "name": "Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 8.32
+    },
+    {
+     "name": "Back Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 9.88
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 19.13
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 18.38
+    },
+    {
+     "name": "Desk Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation",
+      "office"
+     ],
+     "areaSqm": 37.5
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 16.32
+    },
+    {
+     "name": "Stair Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 27.2
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 1,
+    "fireplace": 0,
+    "bookshelf": 3,
+    "fridge": 1,
+    "range": 1,
+    "kitchen-island": 2,
+    "counter": 1,
+    "dining-table": 1,
+    "desk": 0,
+    "bed": 1,
+    "crib": 0,
+    "toys": 0,
+    "music": 1,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 1,
+    "garden": 4,
+    "driveway": 0,
+    "pool": 2,
+    "deck": 2
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "hall-only",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "guitar-stand/stair-landing/1",
+    "breakfast-bar/outside/1",
+    "bbq-grill/outside/1",
+    "tv-stand/stair-hall/1"
+   ],
+   "eyelessAnchors": [
+    "room/dining"
+   ]
+  },
+  {
+   "slug": "tran-mcallister",
+   "house": "modernhouse1",
+   "household": "young-family",
+   "business": false,
+   "narrator": "v-steady-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 219,
+   "homeStyle": "Two-storey modern: a dark-timber flat-roofed box under a floating two-band lid, carried on white and striped piers, stands forward of a white, steep street gable with a projecting open rake; a stair slot window, a glazed entry pair, a two-pane bay; gravel forecourt, deck with a rill and ball shrubs, a basin by the drive",
+   "lotGround": "lawn",
+   "household_text": "Family of three where the parents work different shifts and love to cook",
+   "members": [
+    {
+     "role": "parent",
+     "age": "38",
+     "work": "hospital nurse on rotating shifts"
+    },
+    {
+     "role": "parent",
+     "age": "40",
+     "work": "primary-school teacher"
+    },
+    {
+     "role": "child",
+     "age": "6",
+     "work": "school; Kids Room upstairs"
+    }
+   ],
+   "businessText": null,
+   "categoryHints": [
+    "family calendar and shifts",
+    "recipes and meal planning",
+    "photos",
+    "kids privacy",
+    "documents"
+   ],
+   "care": "Shift work is a scheduling story; no health claims. Shift work is a scheduling story. No health claim, no workplace named.",
+   "signatureApps": [
+    "yuvomi",
+    "baikal",
+    "kitchenowl",
+    "mealie",
+    "vaultwarden"
+   ],
+   "coreSpot": {
+    "room": "Library Lounge",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 6.13,
+    "roomsPassed": [
+     "Library Lounge"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Library Lounge",
+     "level": "l1",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 39.15
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 5.85
+    },
+    {
+     "name": "Rear Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 10.15
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 24.85
+    },
+    {
+     "name": "Dining Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 32.5
+    },
+    {
+     "name": "Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 18.33
+    },
+    {
+     "name": "Family Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 9.02
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 4.92
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 21.73
+    },
+    {
+     "name": "Kids Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 20.67
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 23.5
+    },
+    {
+     "name": "Dressing",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 4.5
+    },
+    {
+     "name": "Primary Ensuite",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 4.5
+    }
+   ],
+   "roles": {
+    "couch": 1,
+    "tv": 0,
+    "fireplace": 0,
+    "bookshelf": 4,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 4,
+    "dining-table": 1,
+    "desk": 1,
+    "bed": 3,
+    "crib": 0,
+    "toys": 1,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 0,
+    "garden": 3,
+    "driveway": 0,
+    "pool": 3,
+    "deck": 4
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "breakfast-bar/kitchen/1",
+    "single-bed/kids-room/1",
+    "zone/deck/1",
+    "zone/pool/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "papadakis-roy",
+   "house": "newcrest",
+   "household": "young-family",
+   "business": true,
+   "narrator": "v-warm-f",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 266,
+   "homeStyle": "Tall narrow steep-gable lake house: white stucco and black trim, a street-level garden floor under a raised front terrace, main floor up an exterior stair, low west wing",
+   "lotGround": "waterfront",
+   "household_text": "Couple and a baby who live downstairs and bake upstairs",
+   "members": [
+    {
+     "role": "parent",
+     "age": "37",
+     "work": "home baker selling sourdough and pastries by pre-order from the 56 m2 upstairs kitchen"
+    },
+    {
+     "role": "parent",
+     "age": "39",
+     "work": "logistics coordinator, remote"
+    },
+    {
+     "role": "child",
+     "age": "8 months",
+     "work": "baby; crib in the Nursery on the garden floor"
+    }
+   ],
+   "businessText": "home bakery (pre-order)",
+   "categoryHints": [
+    "small business (orders, recipes, customers)",
+    "food",
+    "photos",
+    "family messaging",
+    "documents"
+   ],
+   "care": "Cottage-food rules differ by place; say nothing about licences. The Core is in the upstairs kitchen, one flight up from the door. Say nothing about food licences or regulations.",
+   "ftueExtra": "The Core stands in the big upstairs kitchen, one flight up from the garden-floor door: carry the box up the stair.",
+   "signatureApps": [
+    "mealie",
+    "nocodb",
+    "akaunting",
+    "listmonk",
+    "immich"
+   ],
+   "coreSpot": {
+    "room": "Kitchen",
+    "level": "l2",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 14.57,
+    "roomsPassed": [
+     "Family Room & Kitchenette",
+     "Dining",
+     "Living Room",
+     "Kitchen"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 6
+   },
+   "rooms": [
+    {
+     "name": "Family Room & Kitchenette",
+     "level": "l1",
+     "kinds": [
+      "kitchen",
+      "living"
+     ],
+     "areaSqm": 54
+    },
+    {
+     "name": "Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 9.72
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 22.68
+    },
+    {
+     "name": "Dining Alcove",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 9.24
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 23.32
+    },
+    {
+     "name": "Nursery",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 16.28
+    },
+    {
+     "name": "Dressing & Laundry",
+     "level": "l1",
+     "kinds": [
+      "bedroom",
+      "utility"
+     ],
+     "areaSqm": 14
+    },
+    {
+     "name": "Living Room",
+     "level": "l2",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 23.78
+    },
+    {
+     "name": "Kitchen",
+     "level": "l2",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 55.8
+    },
+    {
+     "name": "Dining Nook",
+     "level": "l2",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 29.2
+    },
+    {
+     "name": "Entry Vestibule",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 4.68
+    },
+    {
+     "name": "Powder Room",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 4.14
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 0,
+    "kitchen-island": 1,
+    "counter": 4,
+    "dining-table": 2,
+    "desk": 2,
+    "bed": 1,
+    "crib": 1,
+    "toys": 3,
+    "music": 0,
+    "laundry": 2,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 0,
+    "garden": 2,
+    "driveway": 0,
+    "pool": 1,
+    "deck": 3
+   },
+   "homeFlags": [],
+   "anchorsToUse": [
+    "core",
+    "kitchen-island/kitchen/1",
+    "crib/nursery/1",
+    "fireplace/living-room/1",
+    "tv-stand/family-room-and-kitchenette/1"
+   ],
+   "eyelessAnchors": [
+    "room/powder-room"
+   ]
+  },
+  {
+   "slug": "vasquez-nilsen",
+   "house": "neweco",
+   "household": "older-kids",
+   "business": true,
+   "narrator": "v-steady-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 306,
+   "homeStyle": "Two-storey eco-modern: a sage tower pushing through the eave of a rust-shingle side gable, pale-blue boarded upper storey under a glass A-frame prism, a one-storey glass sunroom with banded window-walls, a deep gabled garage with a dormer, broad timber entry steps in tropical beds",
+   "lotGround": "lawn",
+   "household_text": "Eco-minded family of three with a teen who builds things",
+   "members": [
+    {
+     "role": "parent",
+     "age": "43",
+     "work": "science teacher"
+    },
+    {
+     "role": "parent",
+     "age": "44",
+     "work": "solar installer, self-employed, quotes from the Dining Room"
+    },
+    {
+     "role": "teen",
+     "age": "15",
+     "work": "robotics club, bicycle commuter"
+    }
+   ],
+   "businessText": "solar installation quotes",
+   "categoryHints": [
+    "smart home and energy",
+    "small business (quotes)",
+    "photos",
+    "kids privacy"
+   ],
+   "care": "Energy readouts are the claim: describe only what Home Assistant really reads. Describe only what Home Assistant really reads on the home network. No energy figures, no savings, no solar claims.",
+   "signatureApps": [
+    "home-assistant",
+    "docuseal",
+    "akaunting",
+    "blockbench",
+    "pi-hole"
+   ],
+   "coreSpot": {
+    "room": "Sunroom Lounge",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 9.39,
+    "roomsPassed": [
+     "Entry & Stair Hall",
+     "Sunroom Lounge"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 1
+   },
+   "rooms": [
+    {
+     "name": "Entry & Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 49
+    },
+    {
+     "name": "Garage",
+     "level": "l1",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 44
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 35
+    },
+    {
+     "name": "Dining Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 33
+    },
+    {
+     "name": "Sunroom Lounge",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 33
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 25
+    },
+    {
+     "name": "Hall Bath",
+     "level": "l2",
+     "kinds": [
+      "circulation",
+      "bath"
+     ],
+     "areaSqm": 10
+    },
+    {
+     "name": "Primary Bath & Dressing",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 27.5
+    },
+    {
+     "name": "Bedroom 2",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 21
+    },
+    {
+     "name": "Upper Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 28
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "tv": 0,
+    "fireplace": 0,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 3,
+    "dining-table": 3,
+    "desk": 2,
+    "bed": 2,
+    "crib": 0,
+    "toys": 0,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 1,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 0,
+    "garden": 5,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 2
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "bicycle/garage/1",
+    "breakfast-bar/kitchen/1",
+    "zone/garden/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "bellamy-nwosu",
+   "house": "onestory",
+   "household": "grandparents",
+   "business": false,
+   "narrator": "v-storyteller-m",
+   "tenure": "owner",
+   "storeys": 1,
+   "areaSqm": 149,
+   "homeStyle": "One-storey cornflower-blue cottage: steep terracotta side gable, wide front cross gable, gabled dormer, gabled entry vestibule, west brick chimney, cottage foundation beds, rear L with a railed dining deck over an oval pool",
+   "lotGround": "lawn",
+   "household_text": "Retired couple in their 70s; one uses a mobility scooter",
+   "members": [
+    {
+     "role": "partner",
+     "age": "74",
+     "work": "retired machinist, amateur radio"
+    },
+    {
+     "role": "partner",
+     "age": "72",
+     "work": "retired librarian, quilts"
+    },
+    {
+     "role": "visiting grandchild",
+     "age": "15",
+     "work": "weekends"
+    }
+   ],
+   "businessText": null,
+   "categoryHints": [
+    "photos and memories",
+    "reading",
+    "family messaging",
+    "smart home",
+    "files"
+   ],
+   "care": "Competent and curious; mobility is a fact, not a plot.",
+   "signatureApps": [
+    "koodo-reader",
+    "audiobookshelf",
+    "immich",
+    "vaultwarden",
+    "kiwix"
+   ],
+   "coreSpot": {
+    "room": "Living Room",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 10.77,
+    "roomsPassed": [
+     "Vestibule",
+     "Entry Hall",
+     "Living Room"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 1
+   },
+   "rooms": [
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 31.5
+    },
+    {
+     "name": "Fireside Nook",
+     "level": "l1",
+     "kinds": [
+      "dining",
+      "living"
+     ],
+     "areaSqm": 14
+    },
+    {
+     "name": "Bay Window",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 4.4
+    },
+    {
+     "name": "Entry Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 14.4
+    },
+    {
+     "name": "Vestibule",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 4.8
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 18.2
+    },
+    {
+     "name": "Dining Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 20
+    },
+    {
+     "name": "Bathroom",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 9.8
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 21.6
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 10.5
+    }
+   ],
+   "roles": {
+    "couch": 1,
+    "tv": 0,
+    "fireplace": 1,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 4,
+    "dining-table": 1,
+    "desk": 1,
+    "bed": 2,
+    "crib": 0,
+    "toys": 0,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 1,
+    "garden": 2,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 1
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "fireplace/fireside-nook/1",
+    "bbq-grill/outside/1",
+    "breakfast-bar/kitchen/1"
+   ],
+   "eyelessAnchors": [
+    "room/bay-window"
+   ]
+  },
+  {
+   "slug": "ferrante-oyelowo",
+   "house": "palms",
+   "household": "solo-or-couple",
+   "business": true,
+   "narrator": "v-bright-f",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 182,
+   "homeStyle": "Desert-modern: blue-grey fieldstone base with a black-framed portal onto a planted atrium, a two-storey stone and glass block showing its floating stair, stepped brown standing-seam sheds, a resort back yard with terraces, pool, spa gazebo and palms",
+   "lotGround": "lawn",
+   "household_text": "Piano teacher in her 50s living alone, teaches in the Living Room and online",
+   "members": [
+    {
+     "role": "solo",
+     "age": "54",
+     "work": "piano teacher, 24 students, in person and online"
+    },
+    {
+     "role": "visiting adult child",
+     "age": "26",
+     "work": "guest bedroom"
+    }
+   ],
+   "businessText": "piano teaching",
+   "categoryHints": [
+    "small business (students, scheduling)",
+    "music",
+    "photos",
+    "smart home",
+    "files"
+   ],
+   "care": "Students include children: keep names out.",
+   "signatureApps": [
+    "baikal",
+    "nextcloud",
+    "stirling-pdf",
+    "navidrome",
+    "docuseal"
+   ],
+   "coreSpot": {
+    "room": "Stair Study",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 8.6,
+    "roomsPassed": [
+     "Entry Atrium",
+     "Galley Kitchen",
+     "Stair Study"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 2
+   },
+   "rooms": [
+    {
+     "name": "Stair Study",
+     "level": "l1",
+     "kinds": [
+      "circulation",
+      "office"
+     ],
+     "areaSqm": 23.76
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 24.64
+    },
+    {
+     "name": "Entry Atrium",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 20.24
+    },
+    {
+     "name": "Galley Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 18.86
+    },
+    {
+     "name": "Laundry",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 10.32
+    },
+    {
+     "name": "Mudroom",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 10.08
+    },
+    {
+     "name": "Cloak Lobby",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 4.68
+    },
+    {
+     "name": "Powder Room",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 5.04
+    },
+    {
+     "name": "Gallery Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 22.88
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 16.72
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 15.12
+    },
+    {
+     "name": "Primary Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 9.24
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 2,
+    "fridge": 1,
+    "range": 0,
+    "kitchen-island": 1,
+    "counter": 2,
+    "dining-table": 1,
+    "desk": 0,
+    "bed": 2,
+    "crib": 0,
+    "toys": 0,
+    "music": 1,
+    "laundry": 2,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 3,
+    "garden": 3,
+    "driveway": 0,
+    "pool": 2,
+    "deck": 3
+   },
+   "homeFlags": [
+    {
+     "no": "dining-table",
+     "status": "none",
+     "say": "No dining table: use the counter or the couch for the family-meal beat."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "keyboard-piano/living-room/1",
+    "tv-stand/living-room/1",
+    "kitchen-island/galley-kitchen/1",
+    "zone/pool/1",
+    "zone/hottub/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "adeyemi-castro",
+   "house": "palnknoll",
+   "household": "young-family",
+   "business": false,
+   "narrator": "v-steady-m",
+   "tenure": "owner",
+   "storeys": 3,
+   "areaSqm": 297,
+   "homeStyle": "Split-level white modern on a knoll: a projecting glazed tower between a lower entry block and a shed-roofed garage wing, thin charcoal slab roofs, two flights of stone steps to a parapet-walled entry, a raised terrace and cascading pools in curved tropical beds",
+   "lotGround": "waterfront",
+   "household_text": "Two dads and two children, 6 and 9",
+   "members": [
+    {
+     "role": "parent",
+     "age": "42",
+     "work": "civil-service planner"
+    },
+    {
+     "role": "parent",
+     "age": "44",
+     "work": "pilot on a regional airline, away some nights"
+    },
+    {
+     "role": "child",
+     "age": "9",
+     "work": "piano in the Living Room"
+    },
+    {
+     "role": "child",
+     "age": "6",
+     "work": "school"
+    }
+   ],
+   "businessText": null,
+   "categoryHints": [
+    "family calendar and travel",
+    "photos",
+    "kids privacy",
+    "food",
+    "smart home"
+   ],
+   "care": "A family like any other; the kids' data is the stake, not the family shape.",
+   "signatureApps": [
+    "homehub",
+    "navidrome",
+    "airtrail",
+    "pi-hole",
+    "mealie"
+   ],
+   "coreSpot": {
+    "room": "Living Room",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": true
+   },
+   "coreWalk": {
+    "metres": 10.97,
+    "roomsPassed": [
+     "Foyer",
+     "Dining",
+     "Living Room"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 1
+   },
+   "rooms": [
+    {
+     "name": "Garage",
+     "level": "l0",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 40.8
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 50.4
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 17.08
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 36.48
+    },
+    {
+     "name": "Foyer",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 19.76
+    },
+    {
+     "name": "Powder Room",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 4.2
+    },
+    {
+     "name": "Primary Suite",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 22.5
+    },
+    {
+     "name": "Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 27.9
+    },
+    {
+     "name": "Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 18.36
+    },
+    {
+     "name": "Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 27.84
+    },
+    {
+     "name": "Bathroom",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 10.44
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 20.88
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 0,
+    "fireplace": 0,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 4,
+    "dining-table": 1,
+    "desk": 1,
+    "bed": 4,
+    "crib": 0,
+    "toys": 0,
+    "music": 1,
+    "laundry": 0,
+    "bicycle": 1,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 3,
+    "garden": 5,
+    "driveway": 1,
+    "pool": 1,
+    "deck": 2
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "keyboard-piano/living-room/1",
+    "breakfast-bar/kitchen/1",
+    "bbq-grill/outside/1",
+    "zone/pool/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "keane",
+   "house": "payorote",
+   "household": "solo-or-couple",
+   "business": true,
+   "narrator": "v-young-f",
+   "tenure": "renter",
+   "storeys": 3,
+   "areaSqm": 75,
+   "homeStyle": "Treehouse: dark-timber pods on a stilted deck wrapped round a giant lantern-hung host tree, a ladder up from a wildflower meadow, a crow's nest and a canopy pod above, a lake behind",
+   "lotGround": "waterfront",
+   "household_text": "Solo remote technical writer, 30s, renting a treehouse on a lake from the landowner",
+   "members": [
+    {
+     "role": "solo",
+     "age": "33",
+     "work": "technical writer, remote, Core desk in the Sleeping Nook"
+    },
+    {
+     "role": "friends",
+     "age": "30s",
+     "work": "weekend visitors"
+    }
+   ],
+   "businessText": "freelance technical writing",
+   "categoryHints": [
+    "remote work",
+    "files",
+    "reading",
+    "smart home",
+    "off-grid habits"
+   ],
+   "care": "The smallest and strangest; a delightful but not a utopia, keep internet claims out. Treehouse on stilts. Keep internet claims out; say nothing about being off the grid.",
+   "ftueExtra": "The front door is on the middle level of the treehouse; the Core sits at the desk in the Sleeping Nook & Study, so the family office is also where they sleep.",
+   "signatureApps": [
+    "docmost",
+    "logseq",
+    "vaultwarden",
+    "wanderer",
+    "open-webui"
+   ],
+   "coreSpot": {
+    "room": "Sleeping Nook & Study",
+    "level": "l2",
+    "surface": "desk",
+    "pose": "upright"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": true
+   },
+   "coreWalk": {
+    "metres": 5.24,
+    "roomsPassed": [
+     "Living Room",
+     "Sleeping Nook & Study"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 5
+   },
+   "rooms": [
+    {
+     "name": "Living Room",
+     "level": "l2",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 16.8
+    },
+    {
+     "name": "Sleeping Nook & Study",
+     "level": "l2",
+     "kinds": [
+      "bedroom",
+      "office"
+     ],
+     "areaSqm": 14.4
+    },
+    {
+     "name": "Kitchen",
+     "level": "l2",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 12.8
+    },
+    {
+     "name": "Canopy Bath",
+     "level": "l3",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 5.32
+    },
+    {
+     "name": "Dressing Loft",
+     "level": "l3",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 9.2
+    },
+    {
+     "name": "Tree Bedroom",
+     "level": "l3",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 12.6
+    }
+   ],
+   "roles": {
+    "couch": 1,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 1,
+    "fridge": 0,
+    "range": 0,
+    "kitchen-island": 0,
+    "counter": 2,
+    "dining-table": 0,
+    "desk": 1,
+    "bed": 2,
+    "crib": 0,
+    "toys": 0,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 2,
+    "garden": 1,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 4
+   },
+   "homeFlags": [
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "wall-tv/living-room/1",
+    "fireplace/living-room/1",
+    "zone/deck/1"
+   ],
+   "eyelessAnchors": [
+    "room/canopy-bath",
+    "zone/deck/1"
+   ]
+  },
+  {
+   "slug": "mbeki-fontaine",
+   "house": "riverbend",
+   "household": "older-kids",
+   "business": true,
+   "narrator": "v-storyteller-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 502,
+   "homeStyle": "Two-storey two-tone brick family traditional on a riverside lot: one long side-gabled ridge with a single dormer, three wall gables across the front (brick over the garage, a tall brick centre gable, a whitewashed gable over a recessed glazed entry), a pent roof over the garage, a bay under its own hip, a lower hipped east wing with the hearth chimney; a rock-edged stream and topiary cones in front, a lily pond and willow on the west lawn, the river behind",
+   "lotGround": "waterfront",
+   "household_text": "Blended family of seven with a dog; every hour is scheduled",
+   "members": [
+    {
+     "role": "parent",
+     "age": "44",
+     "work": "contractor, runs a small building company"
+    },
+    {
+     "role": "parent",
+     "age": "42",
+     "work": "pharmacy technician, part-time"
+    },
+    {
+     "role": "teen",
+     "age": "16",
+     "work": "driving lessons"
+    },
+    {
+     "role": "teen",
+     "age": "14",
+     "work": "swim team"
+    },
+    {
+     "role": "child",
+     "age": "9",
+     "work": "school"
+    },
+    {
+     "role": "child",
+     "age": "10 months",
+     "work": "nursery crib"
+    },
+    {
+     "role": "pet",
+     "age": "6",
+     "work": "the dog, bed in the mudroom"
+    }
+   ],
+   "businessText": "small building company (paperwork at home)",
+   "categoryHints": [
+    "family calendar",
+    "documents",
+    "photos",
+    "small business (job files)",
+    "food"
+   ],
+   "care": "The busiest household; keep the tone calm.",
+   "signatureApps": [
+    "paperless",
+    "lubelogger",
+    "yuvomi",
+    "immich",
+    "frigate"
+   ],
+   "coreSpot": {
+    "room": "Family Room",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 12.81,
+    "roomsPassed": [
+     "Foyer & Stair Hall",
+     "Family Room"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Two-Car Garage",
+     "level": "l1",
+     "kinds": [
+      "garage"
+     ],
+     "areaSqm": 53.2
+    },
+    {
+     "name": "Mudroom & Laundry",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 23.8
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 20.24
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 23.76
+    },
+    {
+     "name": "Formal Living",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 39.6
+    },
+    {
+     "name": "Bay Window",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 4.8
+    },
+    {
+     "name": "Foyer & Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 28.38
+    },
+    {
+     "name": "Family Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 60
+    },
+    {
+     "name": "Primary Suite",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 50.4
+    },
+    {
+     "name": "Primary Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 26.6
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 10.53
+    },
+    {
+     "name": "Family Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 12.16
+    },
+    {
+     "name": "Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 19.84
+    },
+    {
+     "name": "East Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 11.4
+    },
+    {
+     "name": "Bedroom Two",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 35.1
+    },
+    {
+     "name": "Nursery",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 15.77
+    },
+    {
+     "name": "Bedroom Three",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 30
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 30
+    }
+   ],
+   "roles": {
+    "couch": 5,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 6,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 2,
+    "dining-table": 1,
+    "desk": 1,
+    "bed": 5,
+    "crib": 1,
+    "toys": 3,
+    "music": 0,
+    "laundry": 2,
+    "bicycle": 1,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 2,
+    "garden": 1,
+    "driveway": 1,
+    "pool": 0,
+    "deck": 2
+   },
+   "homeFlags": [
+    {
+     "no": "garden",
+     "status": "none",
+     "say": "No garden zone of 10 m2 or more: use the nearest planted bed, planter or deck (roles garden, deck) and say \"the planters\" or \"the deck\"."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "tv-stand/family-room/1",
+    "pet-bed/mudroom-and-laundry/1",
+    "crib/nursery/1",
+    "bbq-grill/outside/1",
+    "bicycle/two-car-garage/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "lacroix-adebayo",
+   "house": "seraphine",
+   "household": "older-kids",
+   "business": true,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 336,
+   "homeStyle": "Queen Anne brick farmhouse: a cascade of front gables over a dark shingle roof with twin chimneys and dormers, white-columned front porch, book-lined open ground floor, lakeside pool garden",
+   "lotGround": "waterfront",
+   "household_text": "Writers who run a small independent press and bookshop from the ground floor",
+   "members": [
+    {
+     "role": "parent",
+     "age": "49",
+     "work": "author and publisher"
+    },
+    {
+     "role": "parent",
+     "age": "47",
+     "work": "editor and shop manager"
+    },
+    {
+     "role": "child",
+     "age": "13",
+     "work": "chess club"
+    },
+    {
+     "role": "child",
+     "age": "10",
+     "work": "in the Girl's Room"
+    },
+    {
+     "role": "child",
+     "age": "1",
+     "work": "the Nursery"
+    }
+   ],
+   "businessText": "independent press and bookshop",
+   "categoryHints": [
+    "small business (catalogue, orders, newsletter)",
+    "reading",
+    "files",
+    "music",
+    "family messaging"
+   ],
+   "care": "Manuscripts are the privacy story.",
+   "signatureApps": [
+    "collabora-online",
+    "listmonk",
+    "akaunting",
+    "koodo-reader",
+    "bookstack"
+   ],
+   "coreSpot": {
+    "room": "Library",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 15.4,
+    "roomsPassed": [
+     "Entry Hall",
+     "Chess Hall",
+     "Living Room",
+     "Library"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 2
+   },
+   "rooms": [
+    {
+     "name": "Entry Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 22.1
+    },
+    {
+     "name": "Master Suite",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 37.52
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 26.98
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 15.96
+    },
+    {
+     "name": "Chess Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation",
+      "lounge"
+     ],
+     "areaSqm": 29.61
+    },
+    {
+     "name": "Window Bay",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 9.6
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 23.52
+    },
+    {
+     "name": "Library",
+     "level": "l1",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 17.63
+    },
+    {
+     "name": "Dark Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 17.2
+    },
+    {
+     "name": "Dark Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 4.18
+    },
+    {
+     "name": "Guest Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 16.66
+    },
+    {
+     "name": "Family Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 12.22
+    },
+    {
+     "name": "Girl's Room",
+     "level": "l2",
+     "kinds": [
+      "other"
+     ],
+     "areaSqm": 14.76
+    },
+    {
+     "name": "Boy's Room",
+     "level": "l2",
+     "kinds": [
+      "other"
+     ],
+     "areaSqm": 12.71
+    },
+    {
+     "name": "Nursery",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 13.78
+    },
+    {
+     "name": "Landing Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 43.86
+    }
+   ],
+   "roles": {
+    "couch": 5,
+    "tv": 2,
+    "fireplace": 0,
+    "bookshelf": 8,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 3,
+    "dining-table": 2,
+    "desk": 6,
+    "bed": 5,
+    "crib": 0,
+    "toys": 2,
+    "music": 1,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 1,
+    "patio-seat": 3,
+    "garden": 5,
+    "driveway": 1,
+    "pool": 1,
+    "deck": 7
+   },
+   "homeFlags": [],
+   "anchorsToUse": [
+    "core",
+    "keyboard-piano/library/1",
+    "telescope/master-suite/1",
+    "tv-stand/living-room/1",
+    "breakfast-bar/kitchen/1"
+   ],
+   "eyelessAnchors": [
+    "room/dark-bath"
+   ]
+  },
+  {
+   "slug": "ramos-whitfield",
+   "house": "starter18k",
+   "household": "young-family",
+   "business": false,
+   "narrator": "v-warm-f",
+   "tenure": "owner",
+   "storeys": 1,
+   "areaSqm": 115,
+   "homeStyle": "Single-storey brick cottage: steep brown side gable with two dormers and a west-end chimney, twin front-gabled glass wings flanking a recessed glazed entry, open walnut living-dining-kitchen, one long family bedroom with a kids' corner, covered back porch and a privacy-fenced yard",
+   "lotGround": "lawn",
+   "household_text": "First-time buyers with two young children in a starter cottage",
+   "members": [
+    {
+     "role": "parent",
+     "age": "30",
+     "work": "delivery logistics, shifts"
+    },
+    {
+     "role": "parent",
+     "age": "29",
+     "work": "part-time bookkeeper"
+    },
+    {
+     "role": "child",
+     "age": "5",
+     "work": "loft bed in the Family Bedroom"
+    },
+    {
+     "role": "child",
+     "age": "3",
+     "work": "kids corner"
+    }
+   ],
+   "businessText": null,
+   "categoryHints": [
+    "subscriptions and budgets",
+    "photos",
+    "kids privacy",
+    "family calendar",
+    "recipes"
+   ],
+   "care": "Budget is real; never promise savings. Budget is real; never promise savings. The Core is in the family bedroom: tell it as the family office corner.",
+   "ftueExtra": "This is the one house whose Core stands in a bedroom: tell it as the family office corner and say so on screen, not as a hidden server in a bedroom.",
+   "signatureApps": [
+    "wallos",
+    "firefly-iii",
+    "yuvomi",
+    "nextcloud",
+    "mealie"
+   ],
+   "coreSpot": {
+    "room": "Family Bedroom",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 10.25,
+    "roomsPassed": [
+     "Entry Vestibule",
+     "Family Bedroom"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 4
+   },
+   "rooms": [
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 24.75
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 25
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 7
+    },
+    {
+     "name": "Entry Vestibule",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 7.7
+    },
+    {
+     "name": "Bathroom",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 7.5
+    },
+    {
+     "name": "Family Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 28.35
+    },
+    {
+     "name": "Kids Corner",
+     "level": "l1",
+     "kinds": [
+      "play"
+     ],
+     "areaSqm": 14.8
+    }
+   ],
+   "roles": {
+    "couch": 1,
+    "tv": 1,
+    "fireplace": 0,
+    "bookshelf": 0,
+    "fridge": 1,
+    "range": 1,
+    "kitchen-island": 0,
+    "counter": 5,
+    "dining-table": 1,
+    "desk": 0,
+    "bed": 2,
+    "crib": 0,
+    "toys": 2,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 2,
+    "garden": 3,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 3
+   },
+   "homeFlags": [
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "loft-bed/family-bedroom/1",
+    "tv-stand/living-room/1",
+    "picnic-table/outside/1",
+    "zone/garden/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "yilmaz-hartmann",
+   "house": "sunnyhome",
+   "household": "solo-or-couple",
+   "business": true,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 201,
+   "homeStyle": "Modern barn cluster: a brick-and-glass lounge gable and a taller two-storey curtain-wall gable under black roofs, a set-back timber entry wing, cypresses, a round plunge pool below a dining deck",
+   "lotGround": "lawn",
+   "household_text": "Couple in their 30s who run a two-person web and brand design studio from the loft",
+   "members": [
+    {
+     "role": "partner",
+     "age": "34",
+     "work": "brand designer"
+    },
+    {
+     "role": "partner",
+     "age": "36",
+     "work": "web developer"
+    }
+   ],
+   "businessText": "web and brand design studio",
+   "categoryHints": [
+    "small business (clients, design files)",
+    "files",
+    "food and hosting",
+    "smart home"
+   ],
+   "care": "Client files and brand assets: say they live on the Core.",
+   "signatureApps": [
+    "penpot",
+    "planka",
+    "kimai",
+    "n8n",
+    "nextcloud"
+   ],
+   "coreSpot": {
+    "room": "Lounge & Dining",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 15.47,
+    "roomsPassed": [
+     "Vestibule",
+     "Stair Hall",
+     "Lounge & Dining"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 2
+   },
+   "rooms": [
+    {
+     "name": "Lounge & Dining",
+     "level": "l1",
+     "kinds": [
+      "dining",
+      "living"
+     ],
+     "areaSqm": 52
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 22.1
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 29.9
+    },
+    {
+     "name": "Vestibule",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 13
+    },
+    {
+     "name": "WC",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 2.88
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l1",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 32
+    },
+    {
+     "name": "Loft",
+     "level": "l2",
+     "kinds": [
+      "other"
+     ],
+     "areaSqm": 23.4
+    },
+    {
+     "name": "Upper Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 28.6
+    }
+   ],
+   "roles": {
+    "couch": 3,
+    "tv": 0,
+    "fireplace": 1,
+    "bookshelf": 3,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 1,
+    "dining-table": 2,
+    "desk": 0,
+    "bed": 1,
+    "crib": 0,
+    "toys": 0,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 1,
+    "garden": 2,
+    "driveway": 0,
+    "pool": 0,
+    "deck": 2
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    },
+    {
+     "no": "desk",
+     "status": "core-shelf-only",
+     "say": "The only desk is the shelf the Core stands on: office beats use the nearest desk-like surface or the couch group; do not invent a desk."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "kitchen-island/kitchen/1",
+    "outdoor-table/outside/1",
+    "zone/pond/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "mahlangu-engstrom",
+   "house": "valleyview",
+   "household": "solo-or-couple",
+   "business": true,
+   "narrator": "v-steady-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 192,
+   "homeStyle": "Powder-blue riverside villa: a set-back upper storey behind a full-width glass balcony, thin cream cantilevered slabs, a honey-timber pier portal, a curtained cabana on the water, an L-shaped glass-edged pool and a walled five-a-side pitch on a paved plaza",
+   "lotGround": "waterfront",
+   "household_text": "Couple in their 50s: a counsellor who sees clients in the Garden Room and a youth football coach",
+   "members": [
+    {
+     "role": "partner",
+     "age": "55",
+     "work": "counsellor with a private practice; session notes are the privacy story"
+    },
+    {
+     "role": "partner",
+     "age": "57",
+     "work": "coaches a youth five-a-side team on the plaza pitch"
+    }
+   ],
+   "businessText": "counselling practice (talk therapy, no medical claims)",
+   "categoryHints": [
+    "small business (appointments, notes)",
+    "sports and team scheduling",
+    "photos",
+    "media",
+    "smart home"
+   ],
+   "care": "Never imply compliance with any health-privacy law. Counselling is named as work only. No session notes, no clinical or confidentiality claim. The privacy story is the appointment calendar and the football rota.",
+   "signatureApps": [
+    "baikal",
+    "vikunja",
+    "immich",
+    "jellyfin",
+    "home-assistant"
+   ],
+   "coreSpot": {
+    "room": "Hearth Salon",
+    "level": "l1",
+    "surface": "shelf",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 5.98,
+    "roomsPassed": [
+     "Hearth Salon"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Hearth Salon",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 44.8
+    },
+    {
+     "name": "Dining Bay",
+     "level": "l1",
+     "kinds": [
+      "dining",
+      "living"
+     ],
+     "areaSqm": 22.79
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 9.46
+    },
+    {
+     "name": "Bay Seat",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 3.3
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 3.12
+    },
+    {
+     "name": "Garden Room",
+     "level": "l1",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 45.5
+    },
+    {
+     "name": "Master Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 24.15
+    },
+    {
+     "name": "Master Ensuite",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 10
+    },
+    {
+     "name": "Dressing Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 7.25
+    },
+    {
+     "name": "Upper Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 15.6
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "tv": 2,
+    "fireplace": 1,
+    "bookshelf": 1,
+    "fridge": 1,
+    "range": 1,
+    "kitchen-island": 1,
+    "counter": 2,
+    "dining-table": 1,
+    "desk": 1,
+    "bed": 1,
+    "crib": 0,
+    "toys": 0,
+    "music": 0,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 7,
+    "garden": 1,
+    "driveway": 4,
+    "pool": 1,
+    "deck": 6
+   },
+   "homeFlags": [
+    {
+     "no": "garden",
+     "status": "none",
+     "say": "No garden zone of 10 m2 or more: use the nearest planted bed, planter or deck (roles garden, deck) and say \"the planters\" or \"the deck\"."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "wall-tv/hearth-salon/1",
+    "fireplace/hearth-salon/1",
+    "breakfast-bar/outside/1",
+    "zone/pool/1",
+    "zone/lawn-game/1"
+   ],
+   "eyelessAnchors": []
+  },
+  {
+   "slug": "ochieng-sorensen",
+   "house": "vanilla",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-young-f",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 272,
+   "homeStyle": "Stepped five-part modern farmhouse in white brick: glass-box greenhouse, tall front gable, flat-roofed box, front-gabled living wing and a canopied east entry, behind a serpentine gravel path, deep planted beds and a lap pool",
+   "lotGround": "lawn",
+   "household_text": "Couple in their 30s who automate their greenhouse and house",
+   "members": [
+    {
+     "role": "partner",
+     "age": "35",
+     "work": "firmware engineer, remote"
+    },
+    {
+     "role": "partner",
+     "age": "37",
+     "work": "primary-school teacher"
+    },
+    {
+     "role": "visiting nephew",
+     "age": "12",
+     "work": "the Bedroom Three"
+    }
+   ],
+   "businessText": null,
+   "categoryHints": [
+    "smart home and sensors",
+    "garden and food",
+    "reading",
+    "photos",
+    "files"
+   ],
+   "care": "Only the sensors and automations Home Assistant genuinely supports; no 'it just works' claims.",
+   "signatureApps": [
+    "home-assistant",
+    "hortusfox",
+    "ntfy",
+    "kiwix",
+    "open-webui"
+   ],
+   "coreSpot": {
+    "room": "Library",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 20.99,
+    "roomsPassed": [
+     "Foyer",
+     "Living & Dining",
+     "Hall",
+     "Library"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 2
+   },
+   "rooms": [
+    {
+     "name": "Greenhouse",
+     "level": "l1",
+     "kinds": [
+      "other"
+     ],
+     "areaSqm": 24
+    },
+    {
+     "name": "Library",
+     "level": "l1",
+     "kinds": [
+      "living",
+      "office"
+     ],
+     "areaSqm": 36
+    },
+    {
+     "name": "Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 18
+    },
+    {
+     "name": "Bathroom",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 12.25
+    },
+    {
+     "name": "Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 8.75
+    },
+    {
+     "name": "Laundry",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 6.63
+    },
+    {
+     "name": "Powder Room",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 3.57
+    },
+    {
+     "name": "Living & Dining",
+     "level": "l1",
+     "kinds": [
+      "dining",
+      "living"
+     ],
+     "areaSqm": 45.5
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 20.8
+    },
+    {
+     "name": "Foyer",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 11.2
+    },
+    {
+     "name": "Landing",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 10.2
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 7.8
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 36
+    },
+    {
+     "name": "Family Bathroom",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 12.25
+    },
+    {
+     "name": "Bedroom Three",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 14.4
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "tv": 1,
+    "fireplace": 1,
+    "bookshelf": 6,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 4,
+    "dining-table": 1,
+    "desk": 1,
+    "bed": 2,
+    "crib": 0,
+    "toys": 0,
+    "music": 0,
+    "laundry": 2,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 0,
+    "patio-seat": 2,
+    "garden": 4,
+    "driveway": 0,
+    "pool": 1,
+    "deck": 3
+   },
+   "homeFlags": [],
+   "anchorsToUse": [
+    "core",
+    "wall-tv/living-and-dining/1",
+    "breakfast-bar/kitchen/1",
+    "bbq-grill/outside/1",
+    "zone/pool/1"
+   ],
+   "eyelessAnchors": []
+  }
+ ]
+}
