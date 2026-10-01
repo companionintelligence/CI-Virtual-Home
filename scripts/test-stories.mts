@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import * as T from '../assets/story/types.ts';
 import type { Story } from '../assets/story/types.ts';
 import { loadContext, ROOT, type Ctx } from './story/lib/context.mts';
@@ -303,4 +304,35 @@ test('a story naming an app the snapshot marks as gone from the store fails app-
   const r = validateStory(exemplar(), local);
   assert.ok(ruleIds(r).has('app-not-in-store'));
   assert.ok(!ruleIds(validateStory(exemplar(), ctx)).has('app-not-in-store'));
+});
+
+// ---------------------------------------------------------------------------------------------------------------------
+// The command line
+// ---------------------------------------------------------------------------------------------------------------------
+const cli = (...args: string[]) => spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'validate-stories.mts'), ...args], { encoding: 'utf8', cwd: ROOT });
+test('cli: the exemplar exits 0 with 0 errors, 0 review, 0 warnings in --json; a bad fixture exits 1', () => {
+  const ok = cli(path.join(FIX, 'example-vance-takahashi.json'), '--json');
+  assert.equal(ok.status, 0, ok.stderr);
+  const j = JSON.parse(ok.stdout);
+  assert.equal(j.ok, true);
+  assert.deepEqual([j.totals.errors, j.totals.review, j.totals.warnings], [0, 0, 0]);
+  assert.equal(j.families[0].slug, 'vance-takahashi');
+  const bad = cli(path.join(FIX, 'bad-9-ftue-leak.json'), '--json');
+  assert.equal(bad.status, 1);
+  assert.ok(JSON.parse(bad.stdout).families[0].errors.some((e: any) => e.rule === 'ftue-claims' && e.fix));
+});
+
+test('cli: no family files is a pass with a note; --complete then fails on the missing thirty; unknown flags and missing files are refused', () => {
+  const dir = path.join(ROOT, 'content', 'families');
+  const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => /^[a-z0-9][a-z0-9-]*\.json$/.test(f) && f !== 'films.json') : [];
+  if (!files.length) {
+    const none = cli();
+    assert.equal(none.status, 0); assert.match(none.stdout, /No family files yet/);
+    const complete = cli('--complete');
+    assert.equal(complete.status, 1); assert.match(complete.stdout, /Families present/);
+    assert.match(complete.stdout, /FAIL/);
+  }
+  assert.equal(cli('--nonsense').status, 2);
+  const missing = cli('no-such-family');
+  assert.equal(missing.status, 1); assert.match(missing.stdout, /no such family file/);
 });
