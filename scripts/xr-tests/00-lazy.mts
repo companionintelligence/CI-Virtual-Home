@@ -7,7 +7,7 @@ import { defineCase } from '../xr-harness/lib.mts';
 import { checkLazy, checkNoXrOnPages, WEIGHT_BUDGET_BYTES } from '../xr-harness/checks.mts';
 
 export const lazy = defineCase({
-  id: 'T-LAZY', title: 'no assets/xr/session before the Enter VR tap, nothing with ?no=xr, only XR modules after the tap, first-load weight delta < 1.5 KB gzip',
+  id: 'T-LAZY', timeoutMs: 600000, title: 'no assets/xr/session before the Enter VR tap, nothing with ?no=xr, only XR modules after the tap, first-load weight delta < 1.5 KB gzip',
   async run(t) {
     const tree = await t.tree('dist');
     t.needsProduct(tree);

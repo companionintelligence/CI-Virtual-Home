@@ -127,7 +127,7 @@ export const comfort = defineCase({
 });
 
 export const lazyChecks = defineCase({
-  id: 'XSELF-lazy', title: 'the T-LAZY check passes a lazy fake module and fails an eager one, a heavy entry and a session that fetches from a CDN',
+  id: 'XSELF-lazy', timeoutMs: 900000, title: 'the T-LAZY check passes a lazy fake module and fails an eager one, a heavy entry and a session that fetches from a CDN',
   async run(t) {
     t.forgive(/Failed to load resource|ERR_BLOCKED/);       // the CDN control's fetch is refused by the harness on purpose
     const lazy = await t.fake({});
@@ -135,7 +135,7 @@ export const lazyChecks = defineCase({
     t.check(r.entryLoaded && r.afterTapXr.some(f => /session/.test(f)), 'the lazy fake did not load entry before and session after the tap');
     t.note('lazyDeltaBytes', r.deltaBytes);
     t.note('eager', await expectFail('eager session', /session module must wait/, async () => { await checkLazy(t, await t.fake({ eager: true })); }));
-    t.note('heavy', await expectFail('heavy entry', /bytes \(gzip\) to the first player load/, async () => { await checkLazy(t, await t.fake({ heavy: true })); }));
+    t.note('heavy', await expectFail('heavy entry', /bytes \(gzip; \d+ brotli\) to the first player load, over the/, async () => { await checkLazy(t, await t.fake({ heavy: true })); }));
     t.note('cdn', await expectFail('session fetching a CDN', /another origin/, async () => { await checkLazy(t, await t.fake({ cdn: true })); }));
   },
 });

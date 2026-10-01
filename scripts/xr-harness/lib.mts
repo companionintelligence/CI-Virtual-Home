@@ -322,7 +322,8 @@ export interface Ctx {
   /** a served copy of dist/ with a FAKE product XR module added (fake-xr.mts), for validating the checks themselves */
   fake(o?: { eager?: boolean; heavy?: boolean; cdn?: boolean }): Promise<Tree>;
 }
-export interface Case { id: string; title: string; devices?: Device[]; run(t: Ctx): Promise<void> }
+/** `timeoutMs`: a case that loads the player many times (the lazy-loading checks do ~16 loads) says so, instead of the whole run's limit growing for everyone */
+export interface Case { id: string; title: string; devices?: Device[]; timeoutMs?: number; run(t: Ctx): Promise<void> }
 export const defineCase = (c: Case): Case => c;
 export const isCase = (v: any): v is Case => v && typeof v === 'object' && typeof v.id === 'string' && typeof v.run === 'function';
 

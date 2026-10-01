@@ -105,7 +105,8 @@ async function runOne({ file, c }: Entry, device: Device, attempt: number): Prom
     async screenshot(p, name) { fs.mkdirSync(SHOTS, { recursive: true }); const f = path.join(SHOTS, `${name}.png`); await p.page.screenshot({ path: f }); return f; },
   };
   let state: Result['state'] = 'pass', msg: string | undefined;
-  const timer = new Promise<never>((_, rej) => setTimeout(() => rej(new Error(`Timeout: case exceeded ${TIMEOUT} ms`)), TIMEOUT));
+  const limit = Math.max(TIMEOUT, c.timeoutMs || 0);
+  const timer = new Promise<never>((_, rej) => setTimeout(() => rej(new Error(`Timeout: case exceeded ${limit} ms`)), limit));
   try {
     await Promise.race([c.run(t), timer]);
     // any uncaught error or console.error on any page the case opened fails it, unless the case consumed it with p.expect()
