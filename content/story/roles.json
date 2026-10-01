@@ -1,0 +1,54 @@
+{
+  "v": 1,
+  "$comment": "Closed set of semantic anchor roles. Owner of the type lists: story-bake (it resolves roles in the page and in Node). The role NAMES are a contract (schema enum); changing a name is a showrunner decision. story-validator reads this file to check that a beat's anchor (or one of its fallbacks) resolves in the beat's house. Item types are the HouseSpec `items[].type` values (assets/ catalog); zones are `site` zone types. Types are listed in preference order.",
+  "builtin": {
+    "street": "The public street in front of the lot. Always resolves (lot frontage).",
+    "front-door": "The front door of the house. Always resolves (spec.entry / frontDoor).",
+    "core": "The Companion Core (spec.hero). Always resolves. Its surface is a shelf or a desk; its room varies (see casting.json coreSpot).",
+    "room": "The centre of the beat's room (use with anchor.room)."
+  },
+  "items": {
+    "couch": ["loveseat", "daybed", "chaise-lounge"],
+    "tv": ["tv-stand", "wall-tv"],
+    "fireplace": ["fireplace"],
+    "bookshelf": ["bookshelf", "low-bookshelf", "ladder-shelf", "open-shelving"],
+    "fridge": ["fridge"],
+    "range": ["range", "range-hood"],
+    "kitchen-island": ["kitchen-island", "breakfast-bar"],
+    "counter": ["counter-run", "sink-run"],
+    "dining-table": ["farmhouse-table", "round-dining-table", "octagonal-table", "bar-table"],
+    "desk": ["writing-desk", "standing-desk", "vanity-desk", "dual-monitor-arm", "laptop"],
+    "bed": ["headboard-bed", "four-poster-bed", "platform-bed", "canopy-bed", "single-bed", "bunk-bed", "loft-bed", "toddler-bed", "mattress-on-floor"],
+    "crib": ["crib"],
+    "toys": ["toy-box", "play-kitchen", "play-tent", "building-blocks", "rocking-horse", "kids-table"],
+    "music": ["keyboard-piano", "guitar-stand", "record-player", "drum-kit"],
+    "laundry": ["washing-machine", "dryer"],
+    "bicycle": ["bicycle"],
+    "easel": ["easel"],
+    "telescope": ["telescope"],
+    "patio-seat": ["patio-set", "outdoor-sofa", "lounger-set", "sun-lounger", "bistro-table", "umbrella-table", "outdoor-table", "picnic-table", "bench"]
+  },
+  "zones": {
+    "garden": ["garden"],
+    "driveway": ["drive"],
+    "pool": ["pool", "hottub"],
+    "deck": ["deck", "terrace", "roof-terrace", "porch", "patio"]
+  },
+  "rooms": {
+    "entry": { "names": "entry|foyer|mudroom|porch|vestibule" },
+    "living": { "kinds": ["living", "lounge"] },
+    "kitchen": { "kinds": ["kitchen"] },
+    "dining": { "kinds": ["dining"] },
+    "office": { "kinds": ["office"] },
+    "bedroom": { "kinds": ["bedroom"] },
+    "kids": { "names": "kid|nursery|play|child|girl|boy|bunk" },
+    "garage": { "kinds": ["garage", "workshop"] },
+    "laundry": { "kinds": ["utility"], "names": "laundry|mudroom" },
+    "bath": { "kinds": ["bath"] },
+    "garden": { "zones": ["garden"] },
+    "patio": { "zones": ["deck", "terrace", "roof-terrace", "porch", "patio"] },
+    "street": { "builtin": true }
+  },
+  "universal": ["street", "front-door", "core", "room", "couch", "counter", "garden"],
+  "universalNote": "These resolve in all 30 homes. Every other role needs a fallback chain that ends in one of these, or the beat's house must be named in casting.json as having it. The validator fails a beat whose anchor and fallbacks all miss."
+}
