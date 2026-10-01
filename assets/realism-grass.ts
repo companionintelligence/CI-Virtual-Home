@@ -31,7 +31,7 @@ const feature: RealismFeature = {
     const field = ctx.no.has('grassblades') ? null : G.createField({ THREE, scene, renderer, bake, seed, variant, style, tune, mean, windDir: h }, ctx.tier() >= 2 ? 2 : 1);
 
     const T = G.TIERS[ctx.tier() >= 2 ? 2 : 1];
-    const lawn = ctx.no.has('lawn') ? null : G.createLawnPatch({ THREE, scene, bake, r0: T.r0, r1: T.r1 });
+    const lawn = ctx.no.has('lawn') ? null : G.createLawnPatch({ THREE, scene, bake, reach: T.r1 });
     const fol = ctx.no.has('foliage') ? null : G.createFoliage({ THREE, scene, windDir: h });
     // the two blade programs are compiled now, against this scene's lights (compileAsync's third argument), so that a field that
     // arrives after the loader has lifted does not stall its first frame. (The lawn and crown programs follow their patch.)
@@ -73,7 +73,7 @@ const feature: RealismFeature = {
         // the wind moves while the grass is on screen: ask for a frame ~20 times a second even when nothing else changes
         if (vis && tS - markT > 0.05) { markT = tS; ctx.markDirty(); }
       },
-      setTier(t) { if (field) field.setTier(t >= 2 ? 2 : 1); },
+      setTier(t) { if (field) field.setTier(t >= 2 ? 2 : 1); if (lawn) lawn.setLook({ reach: G.TIERS[t >= 2 ? 2 : 1].r1 }); },
       dispose() { off(); if (field) field.dispose(); if (lawn) lawn.dispose(); if (fol) fol.dispose(); bake.dispose(); },
       stats: () => ({ bake: bake.stats, size: bake.size, ppm: +bake.ppm.toFixed(1), field: field ? field.stats() : null, lawn: lawn ? lawn.stats() : null, foliage: fol ? fol.stats() : null, readMask: () => bake.read(), rect: bake.rect }),
     };

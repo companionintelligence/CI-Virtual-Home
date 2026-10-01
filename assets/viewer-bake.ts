@@ -2,7 +2,7 @@
 // lawn read by world position (assets/viewer-grass.ts). Live player only (assets/realism-grass.ts installs it).
 //
 // WHAT IT SEES. An orthographic camera over the lot looks straight down through a thin SLICE of the scene: from just under
-// the lawn's top to 30 cm above it. Everything that stands in the slice is drawn once, flat, and nothing is lit. So the
+// the lawn's top to 60 cm above it. Everything that stands in the slice is drawn once, flat, and nothing is lit. So the
 // lawn top, beds, paths, patios, pool tops, decks, the house footprint, tree trunks and shrub bases are seen, and the
 // canopies, roofs and walls above the slice are cut away by the near plane (the temporary materials are double-sided,
 // so a wall that crosses the slice is seen from inside as its own flat colour, never as a window onto the lawn behind).
@@ -33,12 +33,16 @@ export type SiteBake = {
   dispose(): void;
 };
 
+// uBias pushes a surface away from the camera by a few millimetres: a wall's, a bed's or a car's bottom face lies in the
+// lawn's own plane (y = 0), and a depth tie there was won by whichever triangle the GPU drew last (the wall's centre read as lawn)
 const VERT = /* glsl */`
-uniform float uTop;
+uniform float uTop; uniform float uBias;
 varying float vY;
 void main() {
   #include <begin_vertex>
   #include <project_vertex>
+  mvPosition.z -= uBias;
+  gl_Position = projectionMatrix * mvPosition;
   vY = uTop + mvPosition.z;   // the camera looks straight down from y = uTop, so view depth is the drop below it
 }`;
 const FRAG = /* glsl */`
@@ -96,9 +100,10 @@ export function bakeSite(THREE: any, renderer: any, scene: any, opts: { maxSide?
   const maxSide = opts.maxSide ?? 1024;
   const ppm = Math.min(maxSide / Math.max(w, d), 32);
   const W = Math.max(64, Math.ceil(w * ppm)), H = Math.max(64, Math.ceil(d * ppm));
-  // the slice: just under the lawn's lowest top to 30 cm over its highest
+  // the slice: just under the lawn's lowest top to 60 cm over its highest
   const yMin = Math.min(...lawn.tops), yMax = Math.max(...lawn.tops);   // (a lawn's top is its mesh box's top)
-  const near = yMax + 0.3, far = yMin - 0.05;   // (world y of the slice's two planes; the camera sits on the top one)
+  // (60 cm and not 30: a raised bed's soil and a car's body sit above 30 cm, and a slice that cuts them away shows the lawn under them)
+  const near = yMax + 0.6, far = yMin - 0.05;   // (world y of the slice's two planes; the camera sits on the top one)
 
   const makeTarget = () => new THREE.WebGLRenderTarget(W, H, {
     type: THREE.HalfFloatType, format: THREE.RGBAFormat, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
@@ -112,8 +117,8 @@ export function bakeSite(THREE: any, renderer: any, scene: any, opts: { maxSide?
   cam.layers.enableAll();
   cam.updateMatrixWorld(true);
 
-  const mk = (cls: number[]) => new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, side: THREE.DoubleSide, uniforms: { uTop: { value: near }, uCls: { value: new THREE.Vector4(...cls) } } });
-  const mats = { hard: mk([0, 0, 0, 1]), lawn: mk([1, 1, 0, 0]), water: mk([0, 0, 1, 0]) };
+  const mk = (cls: number[], bias: number) => new THREE.ShaderMaterial({ vertexShader: VERT, fragmentShader: FRAG, side: THREE.DoubleSide, uniforms: { uTop: { value: near }, uBias: { value: bias }, uCls: { value: new THREE.Vector4(...cls) } } });
+  const mats = { hard: mk([0, 0, 0, 1], 0), lawn: mk([1, 1, 0, 0], 0.004), water: mk([0, 0, 1, 0], 0.002) };
 
   // ---- the swap: every visible mesh gets its class material for one render; a finally puts all of it back
   const saved: { o: any; material: any }[] = [], hidden: any[] = [];

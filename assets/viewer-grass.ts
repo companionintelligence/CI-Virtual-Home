@@ -74,8 +74,8 @@ export type GrassTier = {
 };
 // Research budgets (an M2 Max, ~0.7 to 1.2 ms per million triangles, vertex bound): mid ~180k triangles, high ~1.1 to 1.3 M.
 export const TIERS: Record<1 | 2, GrassTier> = {
-  1: { r0: 4.2, cell0: 0.045, seg0: 3, r1: 10, cell1: 0.1, seg1: 1, blades: 6 },
-  2: { r0: 7, cell0: 0.04, seg0: 4, r1: 16, cell1: 0.08, seg1: 1, blades: 6 },
+  1: { r0: 4.4, cell0: 0.04, seg0: 3, r1: 11, cell1: 0.1, seg1: 1, blades: 6 },
+  2: { r0: 6.5, cell0: 0.038, seg0: 4, r1: 16, cell1: 0.1, seg1: 1, blades: 6 },
 };
 export type GrassVariant = { height: number; width: number; label: string };
 export const VARIANTS: Record<string, GrassVariant> = {
@@ -167,7 +167,9 @@ void grassInstance(float bladeIx) {
   vec2 muv = vec2((xz.x - uRect.x) * uRect.z, (uRect.y - xz.y) * uRect.w);
   vec4 m = textureLod(uMask, muv, 0.0);
   float inside = all(greaterThanEqual(muv, vec2(0.0))) && all(lessThanEqual(muv, vec2(1.0))) ? 1.0 : 0.0;
-  float cov = m.r * inside * (1.0 - smoothstep(0.0, 0.35, m.b));
+  // (a hard line thinner than the blur, a 5 cm wall or a fence post, leaves the lawn channel at about 0.7: the remap takes it out, and
+  // moves a plain edge about 5 cm into the lawn, which is the inset a blade at an edge needs)
+  float cov = smoothstep(0.6, 0.98, m.r) * inside * (1.0 - smoothstep(0.0, 0.35, m.b));
   float gy = m.r > 0.02 ? m.g / m.r : 0.0;
   float d = distance(vec3(xz.x, gy, xz.y), uCam);
   // the random threshold: density thins out toward the edge of the lawn (cover < 1)
@@ -238,7 +240,7 @@ const FIELD_BEGIN = /* glsl */`
 `;
 const FIELD_FRAG_PARS = /* glsl */`
 varying float vH; varying float vRnd; varying float vPatch;
-uniform vec3 uMean; uniform float uLift; uniform float uTrans; uniform vec3 uTone;
+uniform vec3 uMean; uniform float uLift; uniform float uTrans; uniform vec3 uTone; uniform float uGain;
 `;
 const FIELD_COLOR = /* glsl */`
   {
@@ -252,7 +254,7 @@ const FIELD_COLOR = /* glsl */`
     float dry = smoothstep(0.52, 0.78, vPatch);
     c = mix(c, c * vec3(1.22, 1.06, 0.62), dry * 0.55 * (0.4 + 0.6 * g));
     c *= 0.82 + 0.36 * vRnd;
-    c *= uTone;
+    c *= uTone * uGain;
     diffuseColor.rgb = c;
   }
 `;
@@ -321,10 +323,10 @@ export function createField(host: FieldHost, tier: 1 | 2): Field {
     const w0 = (typeof tune.width === 'number' ? tune.width : host.variant.width) * (soft ? 1.9 : 1);
     const width = tuft ? (w0 * (c1 * c1) / (c0 * c0)) / T.blades * 1.0 : w0;
     const height = (typeof tune.height === 'number' ? tune.height : host.variant.height) * (tuft ? 0.92 : 1);
-    const band = tuft ? new THREE.Vector4(T.r0 * 0.55, T.r0, T.r1 - 5, T.r1) : new THREE.Vector4(T.r0 * 0.55, T.r0, 0, 0);
+    const band = tuft ? new THREE.Vector4(T.r0 * 0.55, T.r0, T.r1 * 0.45, T.r1) : new THREE.Vector4(T.r0 * 0.55, T.r0, 0, 0);
     const U: Record<string, { value: any }> = {
       uBaseCell: { value: new THREE.Vector2() }, uCell: { value: cell }, uG: { value: G }, uBand: { value: band },
-      uHeight: { value: height }, uWidth: { value: width }, uFan: { value: 1.1 },
+      uHeight: { value: height }, uWidth: { value: width }, uFan: { value: 1.1 }, uGain: { value: tuft ? 1.12 : 1.17 },
     };
     const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.DoubleSide });
     mat.name = tuft ? 'Grass tufts' : 'Grass blades';
@@ -423,19 +425,19 @@ export type LawnPatch = {
   apply(): void; restore(): void;
   /** a lighting change or a rebake made new materials: patch the ones that are new */
   sync(): void;
-  setLook(o: { lift?: number; mute?: number; edge?: number; soil?: number }): void;
+  setLook(o: { lift?: number; mute?: number; edge?: number; soil?: number; reach?: number }): void;
   update(camera: any): void;
   dispose(): void;
   stats(): Record<string, unknown>;
 };
-export function createLawnPatch(env: { THREE: any; scene: any; bake: SiteBake; r0: number; r1: number }): LawnPatch {
+export function createLawnPatch(env: { THREE: any; scene: any; bake: SiteBake; reach: number }): LawnPatch {
   const { THREE, scene, bake } = env;
   const U: Record<string, { value: any }> = {
     uLvMask: { value: bake.texture },
     uLvRect: { value: new THREE.Vector4(bake.rect.x0, bake.rect.z0 + bake.rect.d, 1 / bake.rect.w, 1 / bake.rect.d) },
-    uLvLook: { value: new THREE.Vector4(0.1, 0.12, 0.3, 0.16) },   // x unused, y muted, z edge darkening, w soil darkening under grass
+    uLvLook: { value: new THREE.Vector4(0.1, 0.12, 0.3, 0.03) },   // x unused, y muted, z edge darkening, w soil darkening under grass
     uLvLift: { value: 0 },
-    uLvGrass: { value: new THREE.Vector2(env.r0, env.r1) },
+    uLvGrass: { value: env.reach },   // the grass's reach: the soil under it darkens to here
   };
   const store = new Map<any, Saved>();
   let on = false;
@@ -445,7 +447,7 @@ export function createLawnPatch(env: { THREE: any; scene: any; bake: SiteBake; r
       .replace('#include <common>', '#include <common>\nvarying vec3 vLvW;')
       .replace('#include <project_vertex>', '#include <project_vertex>\n vLvW = ( modelMatrix * vec4( transformed, 1.0 ) ).xyz;');
     sh.fragmentShader = sh.fragmentShader
-      .replace('#include <common>', `#include <common>\nvarying vec3 vLvW;\nuniform sampler2D uLvMask; uniform vec4 uLvRect; uniform vec4 uLvLook; uniform float uLvLift; uniform vec2 uLvGrass;\n${HASH_GLSL}`)
+      .replace('#include <common>', `#include <common>\nvarying vec3 vLvW;\nuniform sampler2D uLvMask; uniform vec4 uLvRect; uniform vec4 uLvLook; uniform float uLvLift; uniform float uLvGrass;\n${HASH_GLSL}`)
       .replace('#include <color_fragment>', `#include <color_fragment>
         {
           vec3 lw = vLvW;
@@ -462,7 +464,7 @@ export function createLawnPatch(env: { THREE: any; scene: any; bake: SiteBake; r
           float inside = ( all( greaterThanEqual( muv, vec2( 0.0 ) ) ) && all( lessThanEqual( muv, vec2( 1.0 ) ) ) ) ? gnd : 0.0;
           vec4 bk = texture2D( uLvMask, muv );
           c *= 1.0 - uLvLook.z * smoothstep( 0.04, 0.65, bk.a ) * inside;
-          float gp = 1.0 - smoothstep( uLvGrass.x * 0.8, uLvGrass.x * 1.8, distance( cameraPosition, lw ) );
+          float gp = 1.0 - smoothstep( uLvGrass * 0.45, uLvGrass * 0.95, distance( cameraPosition, lw ) );
           c *= 1.0 - uLvLook.w * gp * bk.r * inside;
           diffuseColor.rgb = c;
         }`)
@@ -485,6 +487,7 @@ export function createLawnPatch(env: { THREE: any; scene: any; bake: SiteBake; r
       if (o.mute !== undefined) U.uLvLook.value.y = o.mute;
       if (o.edge !== undefined) U.uLvLook.value.z = o.edge;
       if (o.soil !== undefined) U.uLvLook.value.w = o.soil;
+      if (o.reach !== undefined) U.uLvGrass.value = o.reach;
     },
     update() { /* (cameraPosition is a three built-in) */ },
     dispose() { this.restore(); },

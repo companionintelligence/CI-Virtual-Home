@@ -26,6 +26,9 @@ const mod = (rel: string, root: string) => import(pathToFileURL(path.join(root, 
 // (the page-side code below imports through `new Function`: 'three' and './assets/…' resolve through the page's import map and
 // base URL, and the type checker does not try to resolve them in Node)
 
+// the feature installs within the loader's 1.5 s when it can and applies itself late when it cannot (a loaded machine): wait for it
+const waitGrass = (lp: any) => lp.page.waitForFunction(() => { const f = (window as any).__houseViewer.effects.features; return !!f.grass && f.grass.applied; }, null, { timeout: 60000 }).catch(() => {});
+
 export default async function check(env: LiveEnv): Promise<Result[]> {
   const out: Result[] = [];
   const add = (name: string, ok: boolean, detail?: string) => out.push({ name, ok, detail });
@@ -110,11 +113,12 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
     for (const h of houses) {
       const lp = await env.open(h, { query: 'q=1' });
       try {
+        await waitGrass(lp);
         const got = await lp.eval(() => {
           const g = (window as any).__houseViewer.effects.features.grass;
           if (!g || !g.readMask) return null;
           const px: Float32Array = g.readMask(), [W, H] = g.size, bytes = new Uint8Array(W * H);
-          for (let i = 0; i < W * H; i++) bytes[i] = px[i * 4] > 0.5 ? 1 : 0;
+          for (let i = 0; i < W * H; i++) bytes[i] = px[i * 4] > 0.8 ? 1 : 0;   // (the shader's remap, smoothstep(0.6, 0.98), is half way at 0.79)
           let s = ''; const CH = 8192;
           for (let i = 0; i < bytes.length; i += CH) s += String.fromCharCode(...bytes.subarray(i, i + CH));
           return { W, H, rect: g.rect, b64: btoa(s) };
@@ -122,7 +126,11 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
         if (!got) { add(`${h}: mask vs hard polygons`, false, 'no grass bake (not installed)'); continue; }
         const bytes = Buffer.from(got.b64, 'base64');
         const spec = JSON.parse(fs.readFileSync(path.join(env.ROOT, 'content', 'houses', `${h}.json`), 'utf8'));
-        const hard = planting.createSiteContext(spec).hard.map((x: any) => x.poly as number[][]);
+        // (only the kinds whose polygon IS the built footprint: a car, a pond, and the beds of a vegetable garden are boxes or
+        // ellipses inside a rectangle, a fence or a low wall is a ribbon wider than the wall)
+        const EXACT = new Set(['path', 'patio', 'deck', 'driveway', 'porch', 'steps', 'stair', 'pool', 'basin', 'rill', 'channel']);
+        const hardAll = planting.createSiteContext(spec).hard.filter((x: any) => EXACT.has(x.type));
+        const hard = hardAll.map((x: any) => x.poly as number[][]);
         const edgeDist = (px: number, pz: number, poly: number[][]) => {
           let d = Infinity;
           for (let i = 0; i < poly.length; i++) {
@@ -133,20 +141,22 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
           return d;
         };
         let nHard = 0, hardNotLawn = 0, hardLawn = 0, nLawn = 0;
+        const leakBy: Record<string, number> = {};
+        const types: string[] = hardAll.map((x: any) => x.type);
         const { W, H, rect } = got;
         for (let y = 2; y < H; y += 4) for (let x = 2; x < W; x += 4) {
           const wx = rect.x0 + (x + 0.5) / W * rect.w, wz = rect.z0 + rect.d - (y + 0.5) / H * rect.d;
           const lawn = bytes[y * W + x] === 1;
           if (lawn) nLawn++;
-          let inside = false, near = false;
-          for (const poly of hard) {
-            if (geom.inPoly(wx, wz, poly)) { if (edgeDist(wx, wz, poly) >= 0.15) inside = true; else near = true; }
+          let inside = false, near = false, which = '';
+          hard.forEach((poly: number[][], pi: number) => {
+            if (geom.inPoly(wx, wz, poly)) { if (edgeDist(wx, wz, poly) >= 0.15) { inside = true; which = types[pi]; } else near = true; }
             else if (edgeDist(wx, wz, poly) < 0.15) near = true;
-          }
-          if (inside && !near) { nHard++; if (lawn) hardLawn++; else hardNotLawn++; }
+          });
+          if (inside && !near) { nHard++; if (lawn) { hardLawn++; leakBy[which] = (leakBy[which] || 0) + 1; } else hardNotLawn++; }
         }
         const recall = nHard ? hardNotLawn / nHard : 1, leak = nHard ? hardLawn / nHard : 0;
-        add(`${h}: bake mask vs createSiteContext().hard (${hard.length} polygons)`, nHard > 20 ? recall >= 0.95 && leak <= 0.02 : nLawn > 1000, `${nHard} hard samples, ${(recall * 100).toFixed(1)} % not lawn, ${(leak * 100).toFixed(1)} % lawn; ${nLawn} lawn samples`);
+        add(`${h}: bake mask vs createSiteContext().hard (${hard.length} polygons)`, nHard > 20 ? recall >= 0.95 && leak <= 0.02 : nLawn > 1000, `${nHard} hard samples, ${(recall * 100).toFixed(1)} % not lawn, ${(leak * 100).toFixed(1)} % lawn; ${nLawn} lawn samples${hardLawn ? '; lawn inside: ' + JSON.stringify(leakBy) : ''}`);
       } finally { await lp.close(); }
     }
   }
@@ -188,38 +198,41 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
       });
       return { n: parts.length, text: parts.join('\n') };
     });
+    const firstDiff = (a: string, b: string) => { const x = a.split('\n'), y = b.split('\n'); for (let i = 0; i < Math.max(x.length, y.length); i++) if (x[i] !== y[i]) return `line ${i}: ${String(x[i]).slice(0, 160)} <> ${String(y[i]).slice(0, 160)}`; return ''; };
     const hashOf = (s: string) => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(16); };
     for (const h of [houses[0], houses[2]]) {
       const on = await env.open(h, { query: 'q=1' });
       const off = await env.open(h, { query: 'no=realism' });
       try {
+        await waitGrass(on);
         const fxOn = await on.effects();
         const patched = await on.eval(() => { let n = 0; (window as any).__houseDebug().scene.traverse((o: any) => { if (o.material && !Array.isArray(o.material) && o.material.userData && o.material.userData.__fol) n++; }); return n; });
         const sigWith = await sigOf(on);
         await on.eval(() => (window as any).__houseViewer.external.before());
+        await off.eval(() => (window as any).__houseViewer.external.before());   // (the glass swap goes back on both pages)
         const sigRestored = await sigOf(on), sigOff = await sigOf(off);
         add(`${h}: grass installed and crowns shaded (${patched} meshes) before the hooks`, !!fxOn.features.grass && patched > 0 && sigWith.text !== sigOff.text);
-        add(`${h}: restored scene equals the ?no=realism scene`, sigRestored.text === sigOff.text, sigRestored.text === sigOff.text ? `${sigOff.n} objects, ${hashOf(sigOff.text)}` : `${hashOf(sigRestored.text)} vs ${hashOf(sigOff.text)}`);
+        add(`${h}: restored scene equals the ?no=realism scene`, sigRestored.text === sigOff.text, sigRestored.text === sigOff.text ? `${sigOff.n} objects, ${hashOf(sigOff.text)}` : firstDiff(sigRestored.text, sigOff.text));
         await on.eval(() => (window as any).__houseViewer.external.after());
         const sigAgain = await sigOf(on);
-        add(`${h}: the effect comes back after the hooks`, sigAgain.text === sigWith.text, sigAgain.text === sigWith.text ? undefined : `${hashOf(sigAgain.text)} vs ${hashOf(sigWith.text)}`);
+        const sorted = (t: string) => t.split('\n').sort().join('\n');   // (the field's group is added last, where it was added the first time or later)
+        add(`${h}: the effect comes back after the hooks`, sorted(sigAgain.text) === sorted(sigWith.text), sorted(sigAgain.text) === sorted(sigWith.text) ? undefined : firstDiff(sorted(sigAgain.text), sorted(sigWith.text)));
       } finally { await on.close(); await off.close(); }
     }
     const lp = await env.open(houses[0], { query: 'no=grass' });
-    try { add('?no=grass installs nothing', !(await lp.effects()).installed.includes('grass')); } finally { await lp.close(); }
+    try { await new Promise(r => setTimeout(r, 3000)); add('?no=grass installs nothing', !(await lp.effects()).installed.includes('grass')); } finally { await lp.close(); }
     const lf = await env.open(houses[0], { query: 'q=1&no=foliage' });
     try {
+      await waitGrass(lf);
       const n = await lf.eval(() => { let n = 0; (window as any).__houseDebug().scene.traverse((o: any) => { if (o.material && !Array.isArray(o.material) && o.material.userData && o.material.userData.__fol) n++; }); return n; });
       add('?no=foliage leaves every crown material alone', n === 0, `${n} patched`);
     } finally { await lf.close(); }
     const ll = await env.open(houses[0], { query: 'q=1&no=lawn' });
-    try { const fx = await ll.effects(); add('?no=lawn leaves the lawn material alone', fx.features.grass && fx.features.grass.lawn === null); } finally { await ll.close(); }
+    try { await waitGrass(ll); const fx = await ll.effects(); add('?no=lawn leaves the lawn material alone', fx.features.grass && fx.features.grass.lawn === null); } finally { await ll.close(); }
   }
 
   // ---- 7: no grass where the ground is not lawn
   {
-    const bare = env.houses.length ? [] : [];
-    void bare;
     const specs = fs.readdirSync(path.join(env.ROOT, 'content', 'houses')).filter(f => f.endsWith('.json') && !f.includes('.plan') && f !== 'index.json');
     const wanted: string[] = [];
     for (const f of specs) {
@@ -228,7 +241,7 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
     }
     for (const h of wanted.slice(0, 3)) {
       const lp = await env.open(h, { query: 'q=1' });
-      try { const fx = await lp.effects(); add(`${h}: no grass on a non-lawn lot`, !fx.installed.includes('grass')); } finally { await lp.close(); }
+      try { await new Promise(r => setTimeout(r, 4000)); const fx = await lp.effects(); add(`${h}: no grass on a non-lawn lot`, !fx.installed.includes('grass')); } finally { await lp.close(); }
     }
     if (!wanted.length) add('no house in the gallery has a sand, gravel, desert or urban lot (nothing to check)', true);
   }

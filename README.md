@@ -502,7 +502,7 @@ tier 0. Files: [`assets/realism-grass.ts`](assets/realism-grass.ts) (the eager e
 (THIRD_PARTY.md → grass).
 
 - **The site bake.** Once per home, after the batch and before the first compile, a top-down orthographic render of a thin
-  slice of the built scene (from just under the lawn's top to 30 cm above it, so lawn, beds, paths, patios, pool tops,
+  slice of the built scene (from just under the lawn's top to 60 cm above it, so lawn, beds, paths, patios, pool tops,
   decks, the house footprint, trunks and shrub bases are seen and canopies, roofs and walls are cut away) into one
   ≤ 1024 px half-float target that is never read back: red = lawn, green = the lawn's height, blue = water, alpha = "hard
   stuff here", blurred into a soft 10 cm ramp (and a wider falloff for the lawn's edge darkening). Every visible mesh gets a flat
@@ -515,7 +515,7 @@ tier 0. Files: [`assets/realism-grass.ts`](assets/realism-grass.ts) (the eager e
   its distance (before the mask is even read), the mask's coverage and a per-cell draw, so density ramps instead of
   stopping. Equal cover: the tufts are cut so that width × height × count per m² matches the blades', their palette's
   mean is the lawn's own mean albedo, and the two levels fade through each other with complementary draws; the tufts' height
-  shrinks to nothing over their last 5 m so they melt into the flat lawn. No blade is thinner than about 0.9 px. The camera
+  shrinks to nothing over their last 6 m so they melt into the flat lawn. No blade is thinner than about 0.9 px. The camera
   pushes blades aside within 0.6 m. Wind: a gust front travelling across the lawn plus a per-blade flutter on the
   player's clock. Shading is a patched `MeshLambertMaterial` (all the scene's lights, so light-guard applies; it receives the sun's
   shadow, casts none) with the blade's base-to-tip gradient as its ambient occlusion and a back-light term toward the sun.
