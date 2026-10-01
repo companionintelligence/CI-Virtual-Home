@@ -10065,7 +10065,7 @@
 
       const delta = clock.getDelta();
       const time = clock.getElapsedTime();
-      if (viewer) { viewer.frame(delta); return; }
+      if (viewer) { if (!renderer.xr.isPresenting) viewer.frame(delta); return; }   // (a headset session draws the player itself: assets/xr/)
       if (recording) return;   // a still or a film owns the canvas (the Record and Still buttons)
 
       // Live playback of camera motion spline (loop-beat: round the beat, or v1 phase, the playhead is in)
