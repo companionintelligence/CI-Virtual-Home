@@ -1,0 +1,926 @@
+{
+  "schema": "family/v1",
+  "slug": "mbeki-fontaine",
+  "house": "riverbend",
+  "fictional": true,
+  "family": {
+    "surname": "Mbeki-Fontaine",
+    "tagline": "Six people, one dog, one calendar, and a quiet Core.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Lwazi runs a small building company from a truck and a desk. Camille keeps the family calendar around her part-time shifts. Naomi, Jabu, Eli and baby Kali fill the rest of the week.",
+    "address": {
+      "line": "118 Kingfisher Bend",
+      "place": "Redwater Landing"
+    },
+    "narrator": "v-storyteller-m"
+  },
+  "members": [
+    {
+      "id": "lwazi",
+      "name": "Lwazi",
+      "age": 44,
+      "role": "parent",
+      "work": "contractor, small building company",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Barnaby",
+        "runtime": "OpenClaw",
+        "job": "Opens Paperless-ngx in its own browser and files job receipts and permits.",
+        "personality": [
+          "steady",
+          "practical",
+          "patient"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Files what Lwazi scans. He checks each document."
+      }
+    },
+    {
+      "id": "camille",
+      "name": "Camille",
+      "age": 42,
+      "role": "parent",
+      "work": "pharmacy technician, part-time",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Odessa",
+        "runtime": "Hermes",
+        "job": "Turns the week's family messages into one calendar Camille edits.",
+        "personality": [
+          "organised",
+          "brisk",
+          "clear"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Proposes a calendar. Camille confirms it."
+      }
+    },
+    {
+      "id": "naomi",
+      "name": "Naomi",
+      "age": 16,
+      "role": "teen",
+      "work": "driving lessons",
+      "colour": "chart-3"
+    },
+    {
+      "id": "jabu",
+      "name": "Jabu",
+      "age": 14,
+      "role": "teen",
+      "work": "swim team",
+      "colour": "chart-4"
+    },
+    {
+      "id": "eli",
+      "name": "Eli",
+      "age": 9,
+      "role": "child",
+      "work": "school",
+      "colour": "chart-5"
+    },
+    {
+      "id": "kali",
+      "name": "Kali",
+      "age": 0,
+      "role": "baby",
+      "work": "baby, ten months, crib in the nursery",
+      "colour": "chart-1"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "mudroom",
+      "kind": "room",
+      "room": "laundry",
+      "title": "Before school, the mudroom"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Breakfast, the kitchen"
+    },
+    {
+      "id": "desk",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Midday, the desk upstairs"
+    },
+    {
+      "id": "garage",
+      "kind": "room",
+      "room": "garage",
+      "title": "After school, the garage"
+    },
+    {
+      "id": "family",
+      "kind": "room",
+      "room": "living",
+      "title": "Evening, the family room"
+    },
+    {
+      "id": "upstairs",
+      "kind": "room",
+      "room": "kids",
+      "title": "Bedtime, upstairs"
+    },
+    {
+      "id": "deck",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Dusk, the deck"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "naomi",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel in a busy week",
+        "body": "The parcel arrives between a swim meet and a job site. Naomi carries it through the foyer to the family room, where the shelf waits in plain sight."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "eli",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Four things, read aloud",
+        "body": "Eli reads the quick-start guide. Jabu lays out the Companion Core, a power cable and a recovery USB drive. Its footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "jabu",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "A button, then a network",
+        "body": "Jabu plugs in the cable and Lwazi presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "camille",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Camille joins the Core's own network from her phone. Then she chooses the home network and enters its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "lwazi",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "paperless",
+        "yuvomi",
+        "lubelogger",
+        "frigate"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Lwazi and Camille pick OpenClaw and Hermes first. They add Paperless-ngx, Yuvomi, LubeLogger and Frigate, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: OpenClaw, Hermes",
+            "Apps: Paperless-ngx, Yuvomi",
+            "Apps: LubeLogger, Frigate"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "camille",
+      "agent": "camille",
+      "approval": "camille",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Odessa answers first",
+        "body": "Camille texts the agent she named Odessa. Odessa answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "camille",
+        "text": "Good morning, Camille. Odessa here. Shall we start with the week?"
+      },
+      "film": true
+    },
+    {
+      "id": "mudroom-bag",
+      "chapter": "mudroom",
+      "member": "jabu",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "jotty",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "lightweight checklists and notes with Kanban boards and sharing",
+      "anchor": {
+        "role": "laundry",
+        "room": "laundry",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "laundry"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "The swim bag, ticked off",
+        "body": "Before school, Jabu ticks off the swim bag in Jotty: towel, goggles, cap. The dog watches from its bed by the door.",
+        "chips": [
+          "Jotty",
+          "replaces Todoist"
+        ]
+      }
+    },
+    {
+      "id": "mudroom-receipts",
+      "chapter": "mudroom",
+      "member": "lwazi",
+      "agent": "lwazi",
+      "approval": "lwazi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes the lot searchable",
+      "anchor": {
+        "role": "laundry",
+        "room": "laundry",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "laundry"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Barnaby files the day's receipts",
+        "body": "Lwazi scans the day's receipts and permits. Barnaby opens Paperless-ngx in its own browser and files them. Lwazi checks each document.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      },
+      "say": {
+        "speaker": "lwazi",
+        "text": "Filed and tagged. Please check each one."
+      },
+      "film": true
+    },
+    {
+      "id": "mudroom-dns",
+      "chapter": "mudroom",
+      "member": "lwazi",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "room",
+        "room": "laundry"
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "One filter for every device",
+        "body": "Lwazi sets up Pi-hole on the Core. It blocks ads and trackers at the DNS level for every phone, laptop and TV on the home Wi-Fi.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-week",
+      "chapter": "kitchen",
+      "member": "camille",
+      "agent": "camille",
+      "approval": "camille",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "yuvomi"
+      ],
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Odessa drafts one calendar",
+        "body": "Camille texts Odessa the week's swim meets, driving lessons and job sites. Odessa drafts one calendar. Camille edits it and enters it in Yuvomi."
+      },
+      "say": {
+        "speaker": "camille",
+        "text": "Here is the week. Please change what is wrong."
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-dinner",
+      "chapter": "kitchen",
+      "member": "camille",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals, notes, contacts and budget",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Dinner moves, everyone sees",
+        "body": "When the swim meet runs late, Camille moves Thursday's dinner in the Yuvomi meal planner. The new plan is on the Core for the whole house to open.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "desk-quote",
+      "chapter": "desk",
+      "member": "lwazi",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "invoice-ninja",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "send invoices and quotes, track expenses and time",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "A quote written at the desk",
+        "body": "Lwazi writes a remodel quote in Invoice Ninja at the desk in Bedroom Two. He prints it for the client's visit and keeps a copy on the Core.",
+        "chips": [
+          "Invoice Ninja",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "desk-hours",
+      "chapter": "desk",
+      "member": "lwazi",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "kimai",
+        "replaces": []
+      },
+      "capability": "track time per project and client, with reports",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Hours by job, not by guess",
+        "body": "Each evening Lwazi enters the crew's hours in Kimai. At the end of the month the report shows time per job and per client.",
+        "chips": [
+          "Kimai"
+        ]
+      }
+    },
+    {
+      "id": "garage-board",
+      "chapter": "garage",
+      "member": "lwazi",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "planka",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "capability": "a real-time Kanban board for a team or a family project",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "Every job on one board",
+        "body": "Lwazi pins the week's jobs to a Planka board: framing Monday, trim Wednesday. The crew's plan sits in one place on the Core.",
+        "chips": [
+          "Planka",
+          "replaces Trello"
+        ]
+      }
+    },
+    {
+      "id": "garage-orders",
+      "chapter": "garage",
+      "member": "lwazi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "baserow",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "build a no-code database for orders, inventory or projects",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Lumber orders, row by row",
+        "body": "Lwazi tracks lumber and hardware orders in Baserow. Each row holds a supplier, a job and a delivery day.",
+        "chips": [
+          "Baserow",
+          "replaces Airtable"
+        ]
+      }
+    },
+    {
+      "id": "garage-fuel",
+      "chapter": "garage",
+      "member": "naomi",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "lubelogger",
+        "replaces": [
+          "Fuelly"
+        ]
+      },
+      "capability": "keep a service history, fuel log and reminders for every vehicle",
+      "anchor": {
+        "role": "bicycle",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Fuel logged after the lesson",
+        "body": "After her driving lesson, Naomi logs the fuel in LubeLogger. The family car's service history sits beside Lwazi's truck on the Core.",
+        "chips": [
+          "LubeLogger",
+          "replaces Fuelly"
+        ]
+      }
+    },
+    {
+      "id": "garage-camera",
+      "chapter": "garage",
+      "member": "lwazi",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The drive, recorded at home",
+        "body": "The family's IP camera watches the drive where the work truck parks. Frigate records it, and the video stays on the Core.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "family-quiz",
+      "chapter": "family",
+      "member": "eli",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "razzia",
+        "replaces": []
+      },
+      "capability": "run a quiz night for a small group on your own Core",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Quiz night on the family TV",
+        "body": "On Friday the family runs a quiz night with Razzia on the TV. Eli reads the questions, and Naomi keeps the score.",
+        "chips": [
+          "Razzia"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "family-photos",
+      "chapter": "family",
+      "member": "camille",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "photoprism",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "browse and share your photo library, with automatic tagging, without uploading it anywhere",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Swim season, sorted on the couch",
+        "body": "On the couch, Camille sorts the swim meet photos in PhotoPrism. It tags them automatically, without uploading them anywhere.",
+        "chips": [
+          "PhotoPrism",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "upstairs-eli",
+      "chapter": "upstairs",
+      "member": "eli",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A river report, from the Core",
+        "body": "Eli looks up how rivers bend for a school project in Kiwix. The reference pages are served from the Core.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "upstairs-laps",
+      "chapter": "upstairs",
+      "member": "jabu",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "wingfit",
+        "replaces": []
+      },
+      "with": [
+        "yuvomi"
+      ],
+      "capability": "log workouts: sets, reps, weights, distances and personal records",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Laps logged, nothing more",
+        "body": "After practice, Jabu logs his laps in Wingfit. Then he checks the next meet on the family calendar in Yuvomi.",
+        "chips": [
+          "Wingfit"
+        ]
+      }
+    },
+    {
+      "id": "upstairs-kali",
+      "chapter": "upstairs",
+      "member": "kali",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "memos",
+        "replaces": [
+          "Google Keep"
+        ]
+      },
+      "capability": "capture quick notes and journal entries in Markdown",
+      "anchor": {
+        "role": "crib",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Kali's first year, in plain text",
+        "body": "Camille jots Kali's firsts in Memos by the crib. The journal is plain Markdown on the Core.",
+        "chips": [
+          "Memos",
+          "replaces Google Keep"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "deck-music",
+      "chapter": "deck",
+      "member": "naomi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "mstream",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music from your Core to a browser or an app",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Dusk music on the deck",
+        "body": "At dusk Naomi starts the family playlist on the deck with mStream. The songs are the family's own files, streamed from the Core to her phone.",
+        "chips": [
+          "mStream",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "outro-house",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One calendar, one quiet Core",
+        "body": "Six people, one dog and one calendar. The Mbeki-Fontaine family runs it all from one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your family's calendar, receipts and weekend plans can live on a Companion Core at home. Start with one week in Yuvomi.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Motif is the one family calendar: Yuvomi is the main app in kitchen-dinner and a named app in ftue-pick, kitchen-week and upstairs-laps, then in the closing. Hermes cannot act on Yuvomi (link ui), so Odessa drafts and Camille enters it.",
+    "No garden zone of 10 square meters or more (casting flag), so the garden beat is the deck and the text says the deck. Frigate needs the family's IP camera, which is not in the parcel; no prevents claim, no viewing from away.",
+    "Wingfit is logging only. Kiwix needs its content files downloaded once. Razzia needs a manager password at install; the scene does not show it.",
+    "The dog is scenery only (the catalog has no pet app). Camille's job is on the member card only, as casting gave it; no beat mentions pharmacy or health. Barnaby files permits as documents; no legal claim.",
+    "Riverside Build and Repair is not named in the text; the casting name is generic and needs a map and trademark check. Voice-over lexicon: Mbeki, Fontaine, Lwazi, Odessa, Barnaby, Jabu, Kali, Wingfit, Razzia, Kiwix, Jotty, Baserow.",
+    "Town Redwater Landing and street Kingfisher Bend are invented; still needs the human map check (Redwater is a real place name elsewhere, so check the full name)."
+  ]
+}

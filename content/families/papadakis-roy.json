@@ -412,13 +412,12 @@
       "category": "small-business",
       "segment": "small-business",
       "app": {
-        "id": "ci-openclaw",
-        "replaces": []
+        "id": "nocodb",
+        "replaces": [
+          "Airtable"
+        ]
       },
-      "with": [
-        "nocodb"
-      ],
-      "capability": "an agent with its own browser and coding tools, running in its own sandbox",
+      "capability": "turn a database into a spreadsheet-style app without writing code",
       "anchor": {
         "role": "dining-table",
         "room": "dining",
@@ -436,7 +435,11 @@
       },
       "popup": {
         "title": "Walt keeps the order table",
-        "body": "Marcus tells Walt which sourdough customers confirmed. Walt opens NocoDB in its own browser and updates the order table. Marcus checks every row."
+        "body": "Marcus tells Walt which sourdough customers confirmed. Walt opens NocoDB in its own browser and updates the order table. Marcus checks every row.",
+        "chips": [
+          "NocoDB",
+          "replaces Airtable"
+        ]
       },
       "say": {
         "speaker": "marcus",
