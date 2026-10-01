@@ -30,6 +30,7 @@
     "fleet-audit": "node --experimental-strip-types scripts/fleet-audit.mts",
     "shots": "node --experimental-strip-types scripts/render-house-shots.mts",
     "plans": "node --experimental-strip-types scripts/build-house-plan.mts",
+    "ao": "node --experimental-strip-types scripts/bake-ao.mts",
     "iso": "python3 scripts/generate_house_iso.py",
     "floorplans": "python3 scripts/generate_floor_plans.py",
     "catalog": "node --experimental-strip-types scripts/build-prop-catalog.mts",

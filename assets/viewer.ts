@@ -38,6 +38,7 @@
 import { displayName, buildCredit } from './home-names.js';
 import { createGlassSwap } from './viewer-glass.js';
 import { bakeStatic, restoreStatic } from './viewer-batch.js';
+import { createRealism } from './realism.js';
 
 type Api = {
   THREE: any; scene: any; renderer: any; canvas: HTMLCanvasElement; camera: any; controls: any;
@@ -277,6 +278,13 @@ export function mountViewer(api: Api) {
   // The plain path draws its panes without the transmission pass (viewer-glass.ts); Best quality and anything drawn
   // through the page's __houseRender* hooks get the transmissive glass back.
   const glass = createGlassSwap(THREE, api.scene, !no.has('glass'));
+  // The live realism features (assets/realism.ts): installed per house after the batch, restored for the page's own
+  // __houseRender* hooks, each switched off by ?no=<key>.
+  const realism = createRealism({
+    THREE, scene: api.scene, renderer: api.renderer, camera, canvas, params, no, coarse,
+    houseId: () => houseId, house: () => api.house(), lighting: () => api.lighting(), markDirty: () => { dirty = true; },
+    withUnbatched: fn => { const was = !!(window as any).__houseViewer?.batch; if (was) (window as any).__houseViewer.batchOn(false); try { return fn(); } finally { if (was) (window as any).__houseViewer.batchOn(true); } },
+  });
   let tod: string | null = null;   // the viewer's choice; null = the house's own hour
   let ready = false;
   let dirty = true;          // something changed: draw a frame even while paused
@@ -639,6 +647,7 @@ export function mountViewer(api: Api) {
     tod = key;
     api.setLighting(key);
     glass.sync();   // the window glow's twins are cloned from the panes as they are now
+    realism.onLighting(key);
     dirty = true;
     syncChips(); syncUrl();
   }
@@ -662,10 +671,10 @@ export function mountViewer(api: Api) {
     if (on && !hqWarm) {
       el.hq.classList.add('busy'); el.hq.setAttribute('aria-busy', 'true');
       // the transmissive glass comes back with the composer: its programs compile in the same held frame
-      requestAnimationFrame(() => requestAnimationFrame(() => { if (el.hq.getAttribute('aria-pressed') !== 'true') { hqDone(); return; } glass.restore(); hq = true; hqFirst = true; dirty = true; }));
+      requestAnimationFrame(() => requestAnimationFrame(() => { if (el.hq.getAttribute('aria-pressed') !== 'true') { hqDone(); return; } glass.restore(); hq = true; realism.setHq(true); hqFirst = true; dirty = true; }));
       return;
     }
-    hq = on;
+    hq = on; realism.setHq(on);
     if (on) { glass.restore(); toast('Best quality is on. Playback may be slower.'); }
     else glass.apply();   // (the swap is a program change, so it happens here and not per frame)
     dirty = true;
@@ -1025,8 +1034,9 @@ export function mountViewer(api: Api) {
   async function onHouse({ shotKey = null as string | null, at = 0, play = true } = {}) {
     const token = loadToken;
     const h = api.house();
-    batchHouse(h);
     houseId = h.id;
+    await realism.install('pre-batch');
+    batchHouse(h);
     const e = houseEntry(h.id);
     // the portal's name for the home (home-names.ts); the build's own title is in the tooltip, with the credit
     const own = { id: h.id, name: h.spec.name || (e && e.name) || h.id, author: h.spec.author || (e && e.author) };
@@ -1041,6 +1051,7 @@ export function mountViewer(api: Api) {
     document.title = `${name} · Virtual homes`;
     if (tod) api.setLighting(tod);   // a building resets the hour to the spec's; keep the viewer's choice
     if (!hq) glass.apply();          // before the first frame of this house, so the transmission programs never compile in the plain path
+    await realism.install('post-batch');   // (their downloads started in prefetch, so this waits for little)
     shots = listShots();
     renderShots();
     // A home opens on its Orbit: the whole house from above, which reads on every screen. Door to Core spends its
@@ -1063,6 +1074,7 @@ export function mountViewer(api: Api) {
     ready = false; playing = false;
     if (flying) exitFly();
     showLoading(id);
+    realism.prefetch(id);
     // let the overlay paint before the build takes the main thread
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
     // a precompile of the home on screen may still be polling its scene: let it end (4 s at most) before the scene is cleared
@@ -1259,6 +1271,7 @@ export function mountViewer(api: Api) {
   (async () => {
     const want = params.get('house') || 'aurora';
     showLoading(want);
+    realism.prefetch(want);
     await indexReady;
     // an id the index does not list fails now, without waiting on a build that will not come (room-creator.html
     // skips it too) and without a poster request for a thumbnail that does not exist
@@ -1284,8 +1297,8 @@ export function mountViewer(api: Api) {
   // The page's __houseRenderBegin / __houseRenderEnd call these: a film or a still drawn through those hooks is a
   // product frame, and gets the transmissive glass the goldens have (the plain path's swap is for the live view only).
   // After, the plain path takes its swap back unless Best quality is on.
-  function beforeExternalRender() { glass.restore(); }
-  function afterExternalRender() { if (!hq) glass.apply(); }
+  function beforeExternalRender() { glass.restore(); realism.restore(); }
+  function afterExternalRender() { if (!hq) glass.apply(); realism.reapply(); }
 
   return { frame, beforeExternalRender, afterExternalRender };
 }
