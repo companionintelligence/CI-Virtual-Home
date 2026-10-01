@@ -93,6 +93,8 @@ export class BeatCard {
     c.append(el('p', 'st-foot', FICTIONAL_LINE));
     this.setSayVisible(false);
   }
+  /** a phone's card without its drawing of the phone's screen (the placer asks for it when the full card would cover the subject) */
+  setCompact(on: boolean): void { this.el.classList.toggle('st-compact', on); }
   setSayVisible(on: boolean): void { this.say.classList.toggle('st-on', on); }
   /** light the narration at `ms` into its clip (null: plain text) */
   setNarration(ms: number | null): void { this.narration?.set(ms); }

@@ -58,6 +58,12 @@ export class Chapters {
         p.append(el('strong', '', `${bt.popup.title}. `), document.createTextNode(bt.popup.body));
         if (bt.popup.note) p.append(' ', el('em', '', bt.popup.note));
         body.append(p);
+        if (bt.popup.kind === 'phone' && bt.popup.phone) {
+          // (the drawing of a phone's screen is for the eye; its words are here)
+          const ul = el('ul', 'st-tr-phone');
+          for (const r of [bt.popup.phone.header, ...bt.popup.phone.rows]) ul.append(el('li', '', r));
+          body.append(ul);
+        }
         if (bt.say) {
           const who = rs.members.find(m => m.id === bt.say!.speaker)?.companion?.name || 'Companion';
           const q = el('p', 'st-tr-say'); q.append(el('strong', '', `${who}: `), document.createTextNode(bt.say.text));

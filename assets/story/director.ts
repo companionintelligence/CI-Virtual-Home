@@ -15,7 +15,7 @@
 import type { RuntimeStory, RuntimeBeat } from './runtime.js';
 import { beatIndexAt } from './runtime.js';
 import { trackFrameAt } from './track.js';
-import { focusRect, placePopup, placeEndCard, leaderTo, PHONE_MAX_WIDTH, type Rect } from './place.js';
+import { focusRect, placePopup, placeEndCard, leaderTo, inter, PHONE_MAX_WIDTH, type Rect } from './place.js';
 import { camera as probeCamera, projectBox } from '../shot-probe.js';
 import { Narrator } from './audio.js';
 import { BeatCard, StartCard, EndCard, el, type StartChoice } from './popup.js';
@@ -100,7 +100,7 @@ export class Director {
     this.narrator = Object.keys(clips).length ? new Narrator(clips) : null;
     if (this.narrator) {
       this.narrator.onFail = () => { if (!this.failToast) { this.failToast = true; env.control.toast('Narration could not load. Captions are on.', 4200); } };
-      this.narrator.prefetch(this.clipsFor(0, 2));
+      // (no clip is fetched until a person chooses sound: "Start without sound" costs no audio bytes at all)
     }
 
     this.card = new BeatCard(host);
@@ -402,15 +402,49 @@ export class Director {
     const width = phone ? o.w - 16 : o.w >= 1100 ? 360 : 320;
     const bars = this.barRects();
     const maxH = phone ? o.h * 0.38 : Math.max(120, o.h - 24);
-    const size = this.card.measure(width, maxH);
-    const out = placePopup({ vw: o.w, vh: o.h, focus, core, bars, card: size, phone, safe: { top: 12, right: 12, bottom: 12, left: 12 } });
+    let out: ReturnType<typeof placePopup>;
+    if (phone) out = this.placeSheet(o, focus, core, bars, width, maxH);
+    else {
+      this.card.setCompact(false);
+      out = placePopup({ vw: o.w, vh: o.h, focus, core, bars, card: this.card.measure(width, maxH), phone: false, safe: { top: 12, right: 12, bottom: 12, left: 12 } });
+    }
     this.card.put(out.rect, out.mode);
     this.place_ = { rect: out.rect, mode: out.mode, subject: focus, ok: out.ok, overlapFocus: out.overlapFocus };
   }
 
+  /**
+   * A phone's card is a sheet. place.ts puts it above the dock; when that covers the subject (a close shot of the Core sits low in a tall frame)
+   * there are three more things to try, in this order: the same sheet under the top bar, then the card without its phone drawing (the
+   * narration says what the drawing shows, and the transcript keeps its rows) at the bottom and at the top. The first that clears the
+   * subject, the Core and the bars wins; if none does the least bad is used (and `ok` says so, which the placement test reports).
+   */
+  private placeSheet(o: { w: number; h: number }, focus: Rect | null, core: Rect | null, bars: Rect[], width: number, maxH: number): ReturnType<typeof placePopup> {
+    const topEdge = bars.filter(b => b.y < o.h * 0.4).reduce((m, b) => Math.max(m, b.y + b.h), 0) + 8;
+    const area = (r: Rect) => Math.max(1, r.w * r.h);
+    let best: ReturnType<typeof placePopup> | null = null, bestCompact = false, bestCost = Infinity;
+    for (const compact of [false, true]) {
+      this.card.setCompact(compact);
+      const size = this.card.measure(width, maxH);
+      const bottom = placePopup({ vw: o.w, vh: o.h, focus, core, bars, card: size, phone: true, safe: { top: 12, right: 12, bottom: 12, left: 12 } });
+      const h = Math.min(size.h, o.h * 0.38);
+      const rt: Rect = { x: bottom.rect.x, y: topEdge, w: bottom.rect.w, h };
+      const top = (() => {
+        const fo = focus ? inter(rt, focus) / area(focus) : 0, co = core ? inter(rt, core) / area(core) : 0, bo = bars.reduce((a, b) => a + inter(rt, b), 0);
+        return { ...bottom, rect: rt, overlapFocus: fo, overlapCore: co, overlapBars: bo / area(rt), ok: fo < 0.02 && co < 0.02 && bo === 0 } as ReturnType<typeof placePopup>;
+      })();
+      for (const c of [bottom, top]) {
+        if (c.ok) { this.card.setCompact(compact); return c; }
+        const cost = c.overlapFocus + c.overlapCore + c.overlapBars * 10 + (compact ? 0.001 : 0);
+        if (cost < bestCost) { best = c; bestCompact = compact; bestCost = cost; }
+      }
+    }
+    this.card.setCompact(bestCompact);
+    return best!;
+  }
+
   /** the subject's rectangle through the camera as it is right now (px, relative to the player), or null when it is behind it */
-  private liveSubject(): Rect | null {
-    const sub = this.subjectBox; if (!sub) return null;
+  private liveSubject(box: number[] | null = this.subjectBox): Rect | null {
+    const sub = box; if (!sub) return null;
     const a = this.env.api, cam = a.camera, o = this.rect();
     const eye: [number, number, number] = [cam.position.x, cam.position.y, cam.position.z];
     const d = cam.getWorldDirection(new a.THREE.Vector3());
@@ -433,8 +467,7 @@ export class Director {
     this.env.root.dataset.beat = b.id;
     this.announce(i);
     writeBeat(b.id);
-    this.narrator?.prefetch(this.clipsFor(i, 3));
-    this.narrator?.warm(this.clipsFor(i, 2));
+    if (this.soundOn) { this.narrator?.prefetch(this.clipsFor(i, 3)); this.narrator?.warm(this.clipsFor(i, 2)); }
     this.prevClock = this.clock;
   }
   private announce(i: number): void { this.live.say(beatAnnouncement(this.rs, i)); }
@@ -582,7 +615,7 @@ export class Director {
   api() {
     const self = this;
     return {
-      get state() { return { started: self.started, beat: self.beat, sound: self.soundOn, audioCreated: !!self.narrator?.created, audioRunning: !!self.narrator?.running, end: self.endMode, step: self.stepMode, chaptersOpen: self.chapters.isOpen, clips: self.narrator ? Object.keys((self.rs.audio || {})).length : 0 }; },
+      get state() { return { started: self.started, beat: self.beat, sound: self.soundOn, audioCreated: !!self.narrator?.created, audioRunning: !!self.narrator?.running, speaking: self.narrator?.current ?? null, end: self.endMode, step: self.stepMode, chaptersOpen: self.chapters.isOpen, clips: self.narrator ? Object.keys((self.rs.audio || {})).length : 0 }; },
       rs: self.rs,
       /** Put the tour at a beat's rest pose, paused, and report where the card went and what it covers (px, relative to the player). */
       async measure(i: number) {
@@ -595,6 +628,16 @@ export class Director {
         const c: Rect = { x: card.left - o.x, y: card.top - o.y, w: card.width, h: card.height };
         const bars = self.barRects().map(r => inter(c, r));
         return { beat: self.beat, mode: self.place_?.mode, card: c, live, vw: o.w, vh: o.h, visible: self.card.visible, hidden: self.card.el.hidden, overlapLive: live ? inter(c, live) / Math.max(1, live.w * live.h) : 0, overlapBars: bars.reduce((a, b) => a + b, 0), planned: self.place_ ? { ok: self.place_.ok, overlapFocus: self.place_.overlapFocus } : null };
+      },
+      /** Go to the end card (paused), and report where it sits and how much of the Core, as the camera sees it now, it covers. */
+      async measureEnd() {
+        self.finish();
+        for (let k = 0; k < 6; k++) await new Promise(r => requestAnimationFrame(r));
+        const card = self.end.el.getBoundingClientRect(), o = self.rect();
+        const core = self.liveSubject(self.rs.track.core as any);
+        const c: Rect = { x: card.left - o.x, y: card.top - o.y, w: card.width, h: card.height };
+        const x = Math.max(0, Math.min(c.x + c.w, core ? core.x + core.w : 0) - Math.max(c.x, core ? core.x : 0)), y = Math.max(0, Math.min(c.y + c.h, core ? core.y + core.h : 0) - Math.max(c.y, core ? core.y : 0));
+        return { visible: self.end.visible, card: c, core, vw: o.w, vh: o.h, overlapCore: core ? (x * y) / Math.max(1, core.w * core.h) : 0, bars: self.barRects().reduce((a, r) => a + Math.max(0, Math.min(c.x + c.w, r.x + r.w) - Math.max(c.x, r.x)) * Math.max(0, Math.min(c.y + c.h, r.y + r.h) - Math.max(c.y, r.y)), 0) };
       },
       goBeat: (i: number) => self.goBeat(i),
       start: (c: StartChoice) => self.begin(c),
