@@ -31,18 +31,19 @@
 const MARK = 'RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );';
 const GUARDED = `if ( directLight.visible ) { ${MARK} }`;
 const SPOT_INFO = 'getSpotLightInfo( spotLight, geometryPosition, directLight );';
-// the clip: world position from the view-space one with the camera's matrixWorld (the 4 columns in vhClipM, and the
-// switch in vhClipM[4].x), tested against this spot's box
+// the clip: world position from the view-space one with the view matrix THE DRAW IS USING (a rigid transform: p_world = (p - t) * R,
+// the transpose of the rotation applied from the right), so a second camera (a mirror, a probe) clips correctly too; the switch is
+// vhClipOn[0].x. Tested against this spot's box.
 const CLIP = `${SPOT_INFO}
-		if ( directLight.visible && vhClipM[ 4 ].x > 0.5 ) {
-			vec3 vhW = ( mat4( vhClipM[ 0 ], vhClipM[ 1 ], vhClipM[ 2 ], vhClipM[ 3 ] ) * vec4( geometryPosition, 1.0 ) ).xyz;
+		if ( directLight.visible && vhClipOn[ 0 ].x > 0.5 ) {
+			vec3 vhW = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );
 			if ( any( lessThan( vhW, vhClipLo[ i ].xyz ) ) || any( greaterThan( vhW, vhClipHi[ i ].xyz ) ) ) { directLight.visible = false; directLight.color = vec3( 0.0 ); }
 		}`;
 const CLIP_DECL = `
 #if NUM_SPOT_LIGHTS > 0
 	uniform vec4 vhClipLo[ NUM_SPOT_LIGHTS ];
 	uniform vec4 vhClipHi[ NUM_SPOT_LIGHTS ];
-	uniform vec4 vhClipM[ 5 ];
+	uniform vec4 vhClipOn[ 1 ];
 #endif
 `;
 const SHADER_LIBS = ['lambert', 'phong', 'standard', 'physical', 'toon'];
@@ -51,7 +52,7 @@ const SHADER_LIBS = ['lambert', 'phong', 'standard', 'physical', 'toon'];
 export const MAX_SPOTS = 64;
 const FAR = 1e9;
 
-type Shared = { lo: any[]; hi: any[]; m: any[] };
+type Shared = { lo: any[]; hi: any[]; on: any[] };
 let done = false;
 let shared: Shared | null = null;
 
@@ -74,11 +75,11 @@ export function installLightGuard(THREE: any): boolean {
     try {
       const lo = Array.from({ length: MAX_SPOTS }, () => new THREE.Vector4(-FAR, -FAR, -FAR, 0));
       const hi = Array.from({ length: MAX_SPOTS }, () => new THREE.Vector4(FAR, FAR, FAR, 0));
-      const m = Array.from({ length: 5 }, () => new THREE.Vector4(0, 0, 0, 0));
-      for (const k of SHADER_LIBS) { const u = THREE.ShaderLib[k].uniforms; u.vhClipLo = { value: lo }; u.vhClipHi = { value: hi }; u.vhClipM = { value: m }; }
+      const on = [new THREE.Vector4(0, 0, 0, 0)];
+      for (const k of SHADER_LIBS) { const u = THREE.ShaderLib[k].uniforms; u.vhClipLo = { value: lo }; u.vhClipHi = { value: hi }; u.vhClipOn = { value: on }; }
       C.lights_pars_begin = pars + CLIP_DECL;
       text = text.replace(SPOT_INFO, CLIP);
-      shared = { lo, hi, m };
+      shared = { lo, hi, on };
     } catch (e) { shared = null; console.warn('installLightGuard: the room clip could not be installed', e); }
   }
   C.lights_fragment_begin = text + (src as string).slice(cut);
@@ -189,7 +190,7 @@ export function createSpotClip(o: { scene: any; renderer: any; house: () => any 
     if (b) { sh.lo[i].set(b.lo[0], b.lo[1], b.lo[2], 0); sh.hi[i].set(b.hi[0], b.hi[1], b.hi[2], 0); }
     else { sh.lo[i].set(-FAR, -FAR, -FAR, 0); sh.hi[i].set(FAR, FAR, FAR, 0); }
   };
-  const fail = (why: string) => { on = false; off = why; sh.m[4].x = 0; };
+  const fail = (why: string) => { on = false; off = why; sh.on[0].x = 0; };
 
   /** three's own spot array (view space): the one a lit material that has been drawn holds. It is the same array object for the life
    *  of the renderer (WebGLLights mutates it in place), so it is found once; a material that has not been refreshed yet holds a
@@ -211,14 +212,11 @@ export function createSpotClip(o: { scene: any; renderer: any; house: () => any 
   return {
     get mapped() { return boxes.size; },
     apply() { if (!off) on = true; },
-    restore() { on = false; sh.m[4].x = 0; },
+    restore() { on = false; sh.on[0].x = 0; },
     rescan,
     update(camera) {
-      if (!on || !boxes.size) { sh.m[4].x = 0; uploaded = []; return false; }
-      camera.updateMatrixWorld();
-      const e = camera.matrixWorld.elements;
-      for (let c = 0; c < 4; c++) sh.m[c].set(e[c * 4], e[c * 4 + 1], e[c * 4 + 2], e[c * 4 + 3]);
-      sh.m[4].x = 1;
+      if (!on || !boxes.size) { sh.on[0].x = 0; uploaded = []; return false; }
+      sh.on[0].x = 1;
       orderSpots(camera);
       const n = Math.min(order.length, MAX_SPOTS);
       for (let i = 0; i < n; i++) setBox(i, boxes.get(order[i]));

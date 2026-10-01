@@ -112,12 +112,19 @@ void main() {
 	gl_FragColor = vec4( clamp( sum / 144.0 / 8.0, 0.0, 1.0 ), 0.0, 0.0, 1.0 );
 }`;
 
-/** The GRADE the Best-quality chain uses, per time of day: the preset's own numbers, nudged. See the README (frame) for the measurements. */
+/**
+ * The GRADE the Best-quality chain uses, per time of day, as a pull of the preset's own numbers toward neutral. The film's presets
+ * desaturate dusk to 0.72 and night to 0.8 (a deliberate cinematic look) and darken the corners; the plain player has neither, and
+ * the lighter Best quality is a preview of the same picture with occlusion, bloom and antialiasing on top, so it keeps only a part
+ * of that grade. Measured against the plain path (README -> frame): the page's own chain read 8 to 17 % greyer.
+ */
 export const GRADE = {
-	/** multiplies the preset's contrast pivot exponent toward 1 (1 = the preset's own; the page's chain was greyer than the plain path) */
+	/** the preset's contrast exponent is pulled this far toward 1 (1 = the preset's own) */
 	contrastK: 0.55,
-	/** multiplies the preset's saturation (a lift: the film's grade with bloom and occlusion on top reads desaturated) */
-	saturationK: 1.1,
+	/** effective saturation = 1 - (1 - preset saturation) * this: dusk 0.72 -> 0.90, night 0.8 -> 0.93, day 0.88 -> 0.96 */
+	saturationPull: 0.35,
+	/** the vignette's strength relative to the preset's */
+	vignetteK: 0.6,
 	/** bloom strength relative to the preset's */
 	bloomK: 0.75,
 	/** the bloom threshold is at least this many times the frame's mean brightness, and never below the floor */
@@ -401,8 +408,8 @@ export function createFrameKit(ctx: KitCtx) {
 			u.toneMappingExposure.value = renderer.toneMappingExposure;
 			u.vhScale.value = 1;
 			u.contrast.value = 1 + (g.contrast - 1) * GRADE.contrastK;
-			u.saturation.value = g.saturation * GRADE.saturationK;
-			u.vignette.value = g.vignette;
+			u.saturation.value = 1 - (1 - g.saturation) * GRADE.saturationPull;
+			u.vignette.value = g.vignette * GRADE.vignetteK;
 			u.aspect.value = hq.w / hq.h;
 			drawQuad(m, hq.ldr);
 			// 5. SMAA on the display picture, to the canvas

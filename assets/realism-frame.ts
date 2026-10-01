@@ -7,7 +7,7 @@
 // most: the page's own is the film's renderer and halves their frame rate. What runs depends on ctx.tier(), read live:
 //
 //   tier 0   only the lighter Best quality (render(true) when the user turns it on). Everything else is exactly today's page.
-//   tier 1   + lamp pools (the room spots' penumbra raised, intensity trimmed), + the spot lights clipped to their rooms,
+//   tier 1   + lamp pools (the room spots' penumbra raised to 0.8, intensity regained to hold the room's level), + the spot lights clipped to their rooms,
 //            + idle accumulation, 8 jittered frames.
 //   tier 2   the same, 16 frames.
 //
@@ -28,10 +28,12 @@ const SLOW_STRIKES = 3;         // …and after this many such stops in a sessio
 
 // ---- lamp pools --------------------------------------------------------------------------------------------------------------
 // fixtures.ts hangs one warm SpotLight per room (penumbra 0.45, intensity base x lampGain), sized so the floor under it gets a set
-// illuminance. Its cone is wide enough to take in the side walls, so the walls near the light blow out, and the pool's edge is a
-// near-hard ellipse. Raising the penumbra turns the edge into a long soft falloff; the intensity is trimmed so the walls near the
-// lamp stop clipping while the floor under it keeps its level (it sits inside the full-strength inner cone for most rooms).
-export const POOL = { penumbra: 0.8, intensity: 0.9 };
+// illuminance. Its full-strength inner cone is wide (55 % of the beam), so the walls near the lamp clip to white and the pool's edge
+// reads as a near-hard ellipse. Raising the penumbra to 0.8 shrinks the inner cone to 20 % and turns the edge into a long smooth
+// falloff, but that alone takes about 40 % of the light out of the room (measured: mean luminance of lit interiors -16 %, see the
+// README). The intensity is raised again to hold most of it: the walls near the lamp (where the inverse-square term and a full-strength
+// cone met) stay below white, the floor keeps its level to within ~10 %.
+export const POOL = { penumbra: 0.8, intensity: 1.2 };
 
 type Lamp = { light: any; pen0: number; raw: number; set: number };
 

@@ -146,6 +146,12 @@ source** (the licence page and the API field are named in the row) and carry a c
 
 #### frame
 <!-- realism:frame:begin -->
+No third-party code or asset is added by the frame package. It is built from the vendored three.js r169 addons that are already
+listed above (`GTAOPass`, `UnrealBloomPass`, `SMAAPass`, `Pass`/`FullScreenQuad`, `OutputShader`, MIT) and from public algorithms
+written fresh: the Halton low-discrepancy sequence (bases 2 and 3) for the sub-pixel jitter, a running-mean accumulation, and a
+tone-map / grade resolve that reuses three's own `tonemapping_pars_fragment` and `colorspace_pars_fragment` chunks. LYGIA was not
+consulted and none of its noise, grading or tone-mapping code is used. `assets/light-guard.ts` patches three's
+`lights_fragment_begin` / `lights_pars_begin` chunk text at run time (the box test is original code).
 <!-- realism:frame:end -->
 
 ## Licence texts for adapted source
