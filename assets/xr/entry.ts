@@ -12,8 +12,6 @@
 import { probeXr } from '../platform.js';
 import type { XrPlayerHost, XrBus, XrSessionImpl } from './session.js';
 
-const ICON = '<svg class="vh-i" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 8.5A2.5 2.5 0 0 1 5.5 6h13A2.5 2.5 0 0 1 21 8.5v6a2.5 2.5 0 0 1-2.5 2.5h-3.2a2 2 0 0 1-1.7-.9L12 15l-1.6 1.1a2 2 0 0 1-1.7.9H5.5A2.5 2.5 0 0 1 3 14.5z"/><circle cx="8" cy="11.5" r="1.4"/><circle cx="16" cy="11.5" r="1.4"/></svg>';
-
 export function mountXr(host: XrPlayerHost): any {
   const xr: any = (navigator as any).xr;
   if (!xr || !(globalThis as any).isSecureContext) return null;
@@ -51,31 +49,13 @@ export function mountXr(host: XrPlayerHost): any {
   };
   (window as any).__houseViewer.xr = api;
 
-  // ---- the controls, only where VR is (re-asked when a PC headset is plugged in)
-  let btn: HTMLElement | null = null, pill: HTMLElement | null = null, styled = false;
-  const hl = host.params.get('xr') === 'vr';
-  async function show(on: boolean) {
-    if (!on) { if (btn) btn.hidden = true; if (pill) pill.hidden = true; return; }
-    if (btn) { btn.hidden = false; if (pill) pill.hidden = false; return; }
-    const bar = document.querySelector('.vh-actions'), row = document.querySelector('.vh-row-chips');
-    if (!bar) return;
-    if (!styled) { styled = true; const st = document.createElement('style'); st.dataset.xr = ''; st.textContent = (await import('./style.js')).XR_CSS; document.head.append(st); }
-    const make = (tag: string, cls: string, html: string, label: string) => {
-      const b = document.createElement(tag); b.className = cls + ' vh-xr' + (hl ? ' vh-xr-hl' : ''); (b as HTMLButtonElement).type = 'button';
-      b.title = label; b.setAttribute('aria-label', label); b.innerHTML = html;
-      b.addEventListener('click', () => { api.enter('vr'); });
-      for (const ev of ['pointerenter', 'focus', 'touchstart']) b.addEventListener(ev, () => { void load(); }, { passive: true, once: true });
-      return b;
-    };
-    btn = make('button', 'vh-iconbtn', ICON, 'Enter VR');
-    bar.insertBefore(btn, bar.querySelector('[data-act="share"]'));
-    if (row) { pill = make('button', 'vh-pill vh-xr-pill', ICON + '<span>Enter VR</span>', 'Enter VR'); row.append(pill); }
-    const sync = () => { const b = api.state !== 'idle'; for (const e of [btn, pill]) if (e) { e.toggleAttribute('disabled', b); e.setAttribute('aria-busy', String(b)); } };
-    for (const s of ['starting', 'started', 'ended', 'error']) api.on(s, sync);
-    sync();
-  }
-  const probe = () => probeXr().then(p => show(!!(p.xr.vr && p.signals.secure)), () => {});
+  const probe = () => probeXr().then(p => p.xr.vr && p.signals.secure ? import('./controls.js').then(c => c.showControls(api, true, host.params.get('xr') === 'vr', () => { void load(); })) : null, () => {});
   void probe();
-  xr.addEventListener?.('devicechange', probe);
+  // a PC headset plugged in or out later
+  xr.addEventListener?.('devicechange', () => probeXr().then(p => {
+    const on = !!(p.xr.vr && p.signals.secure);
+    if (on) import('./controls.js').then(c => c.showControls(api, true, false, () => { void load(); }));
+    else document.querySelectorAll<HTMLElement>('.vh-xr').forEach(e => { e.hidden = true; });
+  }));
   return api;
 }
