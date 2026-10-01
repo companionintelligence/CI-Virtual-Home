@@ -152,6 +152,27 @@ def trim(audio, np, silence_db, lead_keep_ms, tail_keep_ms):
     return audio[:end].astype(np.float32), cut_ms
 
 
+def median_f0(audio, np):
+    """Median fundamental frequency in Hz over the voiced 40 ms frames, by autocorrelation (70 to 320 Hz), or None.
+
+    A sanity measure, not a gate: it says whether the voice file that was loaded has the pitch the registry claims
+    (bf_isabella about 190 Hz, bm_lewis about 92 Hz), which catches a wrong mapping that no loudness check would."""
+    frame, hop = int(0.04 * SAMPLE_RATE), int(0.02 * SAMPLE_RATE)
+    lo, hi = int(SAMPLE_RATE / 320), int(SAMPLE_RATE / 70)
+    found = []
+    for i in range(0, len(audio) - frame, hop):
+        x = audio[i:i + frame].astype(np.float64)
+        x = x - x.mean()
+        e = float(np.dot(x, x))
+        if e / frame < 1e-4:          # below about -40 dBFS rms
+            continue
+        ac = np.correlate(x, x, mode="full")[frame - 1:]
+        k = lo + int(np.argmax(ac[lo:hi]))
+        if ac[k] / ac[0] > 0.5:
+            found.append(SAMPLE_RATE / k)
+    return round(float(np.median(found)), 1) if len(found) >= 10 else None
+
+
 def main():
     ap = argparse.ArgumentParser(description="Kokoro-82M batch synthesis for the family voice-over")
     ap.add_argument("--job")
@@ -242,7 +263,7 @@ def main():
             "wav": wav, "samples": int(len(audio)), "rawSamples": int(len(raw)), "trimmedLeadMs": cut_ms,
             "peak": peak, "clippedSamples": clipped,
             "rms": float(np.sqrt(np.mean(np.square(audio)))),
-            "chunks": len(pcs), "untimed": untimed, "phonemes": " ".join(phonemes),
+            "f0Hz": median_f0(audio, np), "chunks": len(pcs), "untimed": untimed, "phonemes": " ".join(phonemes),
             # word times in the TRIMMED audio, milliseconds, one decimal
             "words": [[w, round(s - cut_ms, 1), round(e - cut_ms, 1)] for w, s, e in words],
         })

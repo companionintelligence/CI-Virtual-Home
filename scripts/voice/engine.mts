@@ -47,7 +47,7 @@ export function requireEngine(): EngineEnv {
 }
 
 export interface Item { key: string; voice: string; speed: number; text: string }
-export interface Synth { wav: string; samples: number; rawSamples?: number; trimmedLeadMs: number; peak: number; clippedSamples: number; words: [string, number, number][]; untimed: number; phonemes: string; error?: string }
+export interface Synth { wav: string; samples: number; rawSamples?: number; f0Hz?: number | null; trimmedLeadMs: number; peak: number; clippedSamples: number; words: [string, number, number][]; untimed: number; phonemes: string; error?: string }
 export interface SynthResult { engine: Record<string, unknown>; clips: Record<string, Synth> }
 
 /** Synthesise a batch; `text` is the already lexicon-applied string. Returns the engine block and one result per key. */

@@ -108,6 +108,7 @@ if (args.dryRun) process.exit(0);
 const work = plans.flatMap(p => p.record.map(e => ({ slug: p.slug, e })));
 const tmp = scratch();
 let failures = 0;
+let fatal: unknown = null;
 try {
   let synthEngine: Record<string, unknown> | null = null;
   const done = new Map<string, import('./voice/engine.mts').Recorded>();
@@ -183,8 +184,9 @@ try {
     if (total > budget) { failures++; console.error(`FAIL ${p.slug}: ${total} bytes of audio is over the family budget of ${budget} bytes. Shorten the narration (popup.body) or change encoding.budgetBytes in content/story/voices.json on purpose.`); }
   }
 } catch (e) {
-  fail(e);
+  fatal = e;
 } finally {
-  fs.rmSync(tmp, { recursive: true, force: true });
+  fs.rmSync(tmp, { recursive: true, force: true });   // before any exit: fail() ends the process
 }
+if (fatal) fail(fatal);
 process.exit(failures ? 1 : 0);
