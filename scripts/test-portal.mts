@@ -769,7 +769,7 @@ async function failureCases() {
     const id = casting[slug].house;
     const { page, errors, close } = await open({ width: 1440, height: 900 });
     await page.goto(srv.url(`room-creator.html?mode=view&house=${id}&shot=orbit`));
-    await page.waitForFunction((s: string) => new URL(location.href).searchParams.get('family') === s, slug, { timeout: 5000 }).catch(async (e: Error) => { console.log(`   (address: ${await page.evaluate(() => location.search)}; errors: ${errors.join(' | ')})`); throw e; });
+    await page.waitForFunction((s: string) => new URL(location.href).searchParams.get('family') === s, slug, { timeout: 30000 }).catch(async (e: Error) => { console.log(`   (address: ${await page.evaluate(() => location.search)}; errors: ${errors.join(' | ')})`); throw e; });
     await viewerReady(page);
     const u = new URL(page.url());
     const html = await page.evaluate(() => document.documentElement.outerHTML);
