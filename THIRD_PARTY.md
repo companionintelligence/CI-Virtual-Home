@@ -183,10 +183,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Story site: landing
-
-_(none yet)_
-
 ## Story site: voice
 
 The family voice-over is generated **locally** by `pnpm run story:voice` (`scripts/build-voiceover.mts`, `scripts/voice/`), with no cloud
