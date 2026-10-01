@@ -277,7 +277,7 @@ export function buildMerged(THREE: any, plan: Plan, opts: BakeOptions, mutable: 
     for (const range of p.ranges) {
       const r = kit.resolve(range.mat, p.hot, p.core);
       const uv = !r.flat && !!p.geo.attributes.uv;
-      const key = `${cell}|${r.key}|${p.cast ? 1 : 0}${p.recv ? 1 : 0}|${p.ro}|${p.mask}|${p.frame ? p.frame.uuid : '-'}|${uv ? 'uv' : 'nouv'}`;
+      const key = `${cell}|${r.key}|${p.ro}|${p.mask}|${p.frame ? p.frame.uuid : '-'}|${uv ? 'uv' : 'nouv'}`;
       let g = groups.get(key);
       if (!g) { g = { items: [], mat: r.mat, flat: r.flat, level, cell, frame: p.frame, cast: p.cast, recv: p.recv, ro: p.ro, mask: p.mask, uv }; groups.set(key, g); }
       g.items.push({ piece: p, range, mat: r.mat, flat: r.flat });
@@ -359,7 +359,9 @@ export function buildMerged(THREE: any, plan: Plan, opts: BakeOptions, mutable: 
         box[0] = wb.min.x; box[1] = wb.min.y; box[2] = wb.min.z; box[3] = wb.max.x; box[4] = wb.max.y; box[5] = wb.max.z;
       }
       const mesh = new THREE.Mesh(geom, g.mat);
-      mesh.castShadow = g.cast && !g.mat.transparent; mesh.receiveShadow = g.recv; mesh.renderOrder = g.ro; mesh.layers.mask = g.mask;
+      // every merged mesh casts and receives: splitting by the 2D flags would multiply the draws by up to four, and the static sun map is the
+      // headset's only shadow (a rug that casts, a glow plane that receives, is not a difference anyone can see there)
+      mesh.castShadow = true; mesh.receiveShadow = true; mesh.renderOrder = g.ro; mesh.layers.mask = g.mask;
       mesh.name = `xr ${g.flat ? 'flat' : 'tex'} ${g.cell}`;
       mesh.matrixAutoUpdate = false; mesh.frustumCulled = true;
       mesh.userData = { xrBake: true, cell: g.cell };
