@@ -99,7 +99,7 @@
       "id": "deck",
       "kind": "outside",
       "room": "garden",
-      "title": "The deck and the pitch"
+      "title": "The deck and the drive"
     },
     {
       "id": "outro",
@@ -208,7 +208,7 @@
       "with": [
         "baikal",
         "vikunja",
-        "immich"
+        "jellyfin"
       ],
       "anchor": {
         "role": "core"
@@ -220,14 +220,14 @@
       "popup": {
         "kind": "phone",
         "title": "Pick your first agents and apps",
-        "body": "In Companion Hub, Thandi picks Hermes and Nils picks OpenClaw. They add Baikal, Vikunja and Immich, then walk away.",
+        "body": "In Companion Hub, Thandi picks Hermes and Nils picks OpenClaw. They add Baikal, Vikunja and Jellyfin, then walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agents: Hermes, OpenClaw",
             "Apps: Baikal, Vikunja",
-            "Apps: Immich"
+            "Apps: Jellyfin"
           ]
         }
       }
@@ -298,18 +298,16 @@
       "film": true
     },
     {
-      "id": "salon-photos",
+      "id": "salon-reports",
       "chapter": "salon",
       "member": "nils",
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "immich",
-        "replaces": [
-          "Google Photos"
-        ]
+        "id": "freshrss",
+        "replaces": []
       },
-      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "capability": "read the sites you follow in one feed, on your own Core",
       "anchor": {
         "role": "couch"
       },
@@ -318,11 +316,10 @@
         "from": "front"
       },
       "popup": {
-        "title": "The season's album, kept at home",
-        "body": "Nils sorts the season's match-day photos into an Immich album from the couch. The album stays on the Core.",
+        "title": "Match reports, in one feed",
+        "body": "Nils reads the league's match reports in FreshRSS on the couch. The sites he follows land in one feed on the Core.",
         "chips": [
-          "Immich",
-          "replaces Google Photos"
+          "FreshRSS"
         ]
       }
     },
@@ -333,12 +330,12 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "koodo-reader",
+        "id": "booklore",
         "replaces": [
-          "Amazon Kindle"
+          "Kindle"
         ]
       },
-      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
+      "capability": "manage and read books, comics and PDFs with automatic covers and metadata",
       "anchor": {
         "role": "fireplace",
         "room": "living",
@@ -353,11 +350,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "A book by the fire",
-        "body": "By the fire, Thandi reads in Koodo Reader. Her notes and highlights stay in the library on the Core.",
+        "title": "A novel by the fire",
+        "body": "By the fire, Thandi reads a novel in BookLore. Her library of books, comics and PDFs lives on the Core.",
         "chips": [
-          "Koodo Reader",
-          "replaces Amazon Kindle"
+          "BookLore",
+          "replaces Kindle"
         ]
       }
     },
@@ -488,7 +485,7 @@
       },
       "popup": {
         "title": "Nomsa drafts the day's reminders",
-        "body": "Thandi asks Nomsa for tomorrow's reminders. Nomsa drafts one per appointment, with the time only. Thandi reads each and sends it herself."
+        "body": "Thandi asks Nomsa for tomorrow's reminders. Nomsa drafts one message per appointment, with the time only. Thandi reads each and sends it herself."
       },
       "say": {
         "speaker": "thandi",
@@ -748,16 +745,18 @@
       }
     },
     {
-      "id": "deck-planters",
+      "id": "deck-article",
       "chapter": "deck",
       "member": "thandi",
       "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
-        "replaces": []
+        "id": "linkwarden",
+        "replaces": [
+          "Pocket"
+        ]
       },
-      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "capability": "save web pages with a screenshot and PDF so they survive link rot",
       "anchor": {
         "role": "deck",
         "fallback": [
@@ -771,48 +770,47 @@
         "eye": "standing"
       },
       "popup": {
-        "title": "The planters get a journal",
-        "body": "Thandi logs the deck planters in HortusFox: what grows where, when she watered it, and a photo for the journal.",
+        "title": "The planting guide, saved whole",
+        "body": "Thandi saves a planting guide in Linkwarden on the deck. It keeps a screenshot and a PDF of the page.",
         "chips": [
-          "HortusFox"
+          "Linkwarden",
+          "replaces Pocket"
         ]
       },
       "film": true
     },
     {
-      "id": "deck-lights",
+      "id": "deck-camera",
       "chapter": "deck",
       "member": "nils",
       "category": "iot",
       "segment": "consumer",
       "app": {
-        "id": "home-assistant",
+        "id": "frigate",
         "replaces": [
-          "Google Home"
+          "Ring"
         ]
       },
-      "capability": "control and automate your smart home from one place, locally",
+      "capability": "a local video recorder with object detection for your IP cameras",
       "anchor": {
-        "role": "patio-seat",
+        "role": "driveway",
         "fallback": [
           {
-            "role": "deck"
-          },
-          {
-            "role": "garden"
+            "role": "front-door"
           }
         ]
       },
       "camera": {
         "framing": "wide",
-        "side": "auto"
+        "from": "front",
+        "eye": "aerial"
       },
       "popup": {
-        "title": "Deck lights, set for dusk",
-        "body": "Nils sets the deck and cabana lights to come on at dusk in Home Assistant. It runs on the Core and reaches them over the home Wi-Fi.",
+        "title": "A camera on the drive",
+        "body": "Nils points the family's IP camera at the drive. Frigate keeps the video on the Core, and the clips play on the home Wi-Fi.",
         "chips": [
-          "Home Assistant",
-          "replaces Google Home"
+          "Frigate",
+          "replaces Ring"
         ]
       }
     },
@@ -831,13 +829,13 @@
       },
       "popup": {
         "title": "Two working lives, one Core",
-        "body": "A counselor and a coach, a garden room and a pitch. The Mahlangu-Engstrom household runs on one Companion Core."
+        "body": "A counselor and a coach, a garden room and a training pitch. The Mahlangu-Engstrom household runs on one Companion Core."
       },
       "film": true
     }
   ],
   "closing": {
-    "body": "Your appointment times, your team rota and your family photos can live on a Companion Core at home. Start with one calendar in Baikal.",
+    "body": "Your appointment times, your team rota and your evenings can live on a Companion Core at home. Start with one calendar in Baikal.",
     "cta": {
       "label": "See Companion Core",
       "url": "https://ci.computer/core"
@@ -846,11 +844,11 @@
   "notes": [
     "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
     "Care note kept: counseling is named as work only. No clinical, confidentiality or compliance wording; the privacy story is the times-only calendar, the reminders and the parents' contact list. Please re-read room-calendar.",
-    "No garden zone of ten square meters: the garden chapter is the deck planters and deck lights, and the text says \"the deck\" and \"the planters\". Music Assistant would suit the deck but the validator bans the word assistant.",
-    "salon-tv uses Jellyfin on the Hearth Salon TV (the home has a wall TV); Jellyfin plays the family's own library only. deck-lights is the Home Assistant iot beat: a schedule over the home Wi-Fi, no energy figure, no USB or Bluetooth device.",
+    "No garden zone of ten square meters: the garden chapter is on the deck and the drive. Home Assistant and HortusFox were left out because the fleet is over its cap.",
+    "salon-tv: Jellyfin plays the family's own library on the wall TV. deck-camera is the iot beat: Frigate needs an IP camera the family owns (not in the parcel). No prevention claim, no viewing from away.",
     "table-rota: the agent prepares the rota and Nils confirms with the parents himself, outside the Core. No parent is shown using an app. table-contacts claims nothing about the parents' devices.",
     "kitchen-balls: Spliit shows who owes whom and moves no money (catalog caveat). Football means association football; five-a-side is named in the story and the pitch is the walled plaza in the render.",
-    "Voice-over lexicon: Mahlangu, Engstrom, Thandi, Nils, Nomsa, Tully, Protea Vale, Fynbos, Jellyfin, Spliit, Baikal, Vikunja, BookStack, VaultWarden, Excalidraw, Audiobookshelf, HortusFox.",
+    "Voice-over lexicon: Mahlangu, Engstrom, Thandi, Nils, Nomsa, Tully, Protea Vale, Fynbos, Jellyfin, Spliit, Baikal, Vikunja, BookStack, VaultWarden, Excalidraw, Audiobookshelf, Linkwarden, BookLore, FreshRSS, Frigate.",
     "Street Fynbos Close and town Protea Vale are invented; the human map check is still open (fynbos and protea are plant words, check the pair is not a real address)."
   ]
 }

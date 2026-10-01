@@ -346,10 +346,10 @@
       "category": "food",
       "segment": "consumer",
       "app": {
-        "id": "kitchenowl",
+        "id": "yuvomi",
         "replaces": []
       },
-      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals, notes and contacts",
       "anchor": {
         "role": "range",
         "room": "kitchen",
@@ -364,9 +364,9 @@
       },
       "popup": {
         "title": "The week's dinners, planned",
-        "body": "Kemi plans the week's dinners in KitchenOwl at the range. The grocery list sits in the same app, so Ren shops from his phone.",
+        "body": "Kemi plans the week's dinners in Yuvomi at the range. The shopping list sits in the same app, so Ren shops from his phone.",
         "chips": [
-          "KitchenOwl"
+          "Yuvomi"
         ]
       }
     },
@@ -504,41 +504,6 @@
         "chips": [
           "Nextcloud",
           "replaces Dropbox"
-        ]
-      }
-    },
-    {
-      "id": "nook-lights",
-      "chapter": "nook",
-      "member": "ren",
-      "category": "iot",
-      "segment": "consumer",
-      "app": {
-        "id": "home-assistant",
-        "replaces": [
-          "Google Home"
-        ]
-      },
-      "capability": "control and automate your smart home from one place, locally",
-      "anchor": {
-        "role": "room",
-        "room": "office",
-        "fallback": [
-          {
-            "role": "couch"
-          }
-        ]
-      },
-      "camera": {
-        "framing": "wide",
-        "side": "right"
-      },
-      "popup": {
-        "title": "Grow lights on a schedule",
-        "body": "Ren sets the nook's grow lights on a Home Assistant schedule. It runs on the Core and reaches the lights over the home Wi-Fi.",
-        "chips": [
-          "Home Assistant",
-          "replaces Google Home"
         ]
       }
     },
@@ -778,6 +743,32 @@
       }
     },
     {
+      "id": "living-watch",
+      "chapter": "living",
+      "member": "ren",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "uptime-kuma",
+        "replaces": []
+      },
+      "capability": "watch your sites and services and get an alert when one goes down",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A status page for the farm",
+        "body": "Ren adds the order sheet and the photo library to Uptime Kuma. If either goes down, it alerts him.",
+        "chips": [
+          "Uptime Kuma"
+        ]
+      }
+    },
+    {
       "id": "deck-card",
       "chapter": "deck",
       "member": "kemi",
@@ -844,7 +835,7 @@
   "notes": [
     "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
     "No TV in this home: the media beat is Navidrome at the couch and the text never says TV or screen. The Core stands on the living room shelf; there is no desk, so office beats use room:office (the Garden Nook) with the couch as fallback.",
-    "nook-lights is the only IoT beat and uses Home Assistant (fleet-heavy). The text claims only a schedule over the home Wi-Fi: no USB or Bluetooth device, no energy figure.",
+    "living-watch is the iot beat: Uptime Kuma carries the catalog's IoT tag and watches services on the Core. Home Assistant was dropped because the fleet is over its cap. It makes no uptime promise.",
     "living-backup: Duplicati's catalog caveat says name a local disk, which the text does. The words \"with encryption before they leave the Core\" copy the listing; no stronger security claim is made.",
     "deck-card: LibreTranslate turns the reply into Japanese; check that Japanese is among the language models a Core installs (Yoruba was deliberately not used). Ren, not the app, confirms the wording.",
     "kitchen-note: Listmonk needs an SMTP provider to send at volume (catalog caveat); the text claims no delivery. HortusFox runs under OpenClaw's own browser on the Core, so no website note is needed.",

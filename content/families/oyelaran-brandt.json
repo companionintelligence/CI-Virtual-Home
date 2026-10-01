@@ -230,7 +230,7 @@
       "with": [
         "paperless",
         "vikunja",
-        "immich"
+        "photoprism"
       ],
       "anchor": {
         "role": "core"
@@ -242,14 +242,14 @@
       "popup": {
         "kind": "phone",
         "title": "Pick your first agents and apps",
-        "body": "In Companion Hub, Folake picks Hermes and Companion Memory (beta). Tobias picks OpenClaw. Together they add Paperless-ngx, Vikunja and Immich, then walk away.",
+        "body": "In Companion Hub, Folake picks Hermes and Companion Memory (beta). Tobias picks OpenClaw. Together they add Paperless-ngx, Vikunja and PhotoPrism, then walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agents: Hermes, OpenClaw",
             "Companion Memory (beta)",
-            "Apps: Paperless-ngx, Vikunja, Immich"
+            "Apps: Paperless-ngx, Vikunja, PhotoPrism"
           ]
         }
       }
@@ -291,12 +291,12 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "immich",
+        "id": "photoprism",
         "replaces": [
           "Google Photos"
         ]
       },
-      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "capability": "browse and share your photo library, with automatic tagging, without uploading it anywhere",
       "anchor": {
         "role": "couch"
       },
@@ -305,10 +305,10 @@
         "from": "front"
       },
       "popup": {
-        "title": "Weekend photos, backed up",
-        "body": "Tobias backs up the weekend's photos to Immich from the couch. The dog in the leaves and Hanna's sandcastle land on the Core, ready to search.",
+        "title": "Weekend photos, tagged at home",
+        "body": "Tobias browses the weekend's photos in PhotoPrism from the couch. It tags the dog in the leaves and Hanna's sandcastle on the Core, without uploading them.",
         "chips": [
-          "Immich",
+          "PhotoPrism",
           "replaces Google Photos"
         ]
       }

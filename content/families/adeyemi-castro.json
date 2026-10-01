@@ -405,10 +405,12 @@
       "category": "food",
       "segment": "consumer",
       "app": {
-        "id": "kitchenowl",
-        "replaces": []
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
       },
-      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
       "anchor": {
         "role": "kitchen-island",
         "room": "kitchen",
@@ -424,9 +426,10 @@
       },
       "popup": {
         "title": "Sunday's batch-cook, planned",
-        "body": "Tunde plans the batch-cook in KitchenOwl at the breakfast bar. The meal planner and the shopping list live in the same app.",
+        "body": "Tunde plans the batch-cook in Grocy at the breakfast bar. The pantry list, the recipes and the shopping list live in one place.",
         "chips": [
-          "KitchenOwl"
+          "Grocy",
+          "replaces AnyList"
         ]
       }
     },
@@ -568,12 +571,12 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "immich",
+        "id": "librephotos",
         "replaces": [
           "Google Photos"
         ]
       },
-      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "capability": "find photos by face, object and place, with albums built by date and location",
       "anchor": {
         "role": "couch",
         "nth": 1,
@@ -588,10 +591,10 @@
         "side": "left"
       },
       "popup": {
-        "title": "Leo's birthday, backed up",
-        "body": "Tunde backs up Leo's birthday photos to Immich from the loveseat. They land on the Core, ready to search.",
+        "title": "Leo's birthday, filed by date",
+        "body": "Tunde browses Leo's birthday album in LibrePhotos from the loveseat. It builds albums by date and location, all on the Core.",
         "chips": [
-          "Immich",
+          "LibrePhotos",
           "replaces Google Photos"
         ]
       }
@@ -906,7 +909,7 @@
   "notes": [
     "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
     "Told like any other family. The kids' data is the stake, so no beat claims child safety, monitoring or learning outcomes: Habitica, Audiobookshelf and Inkscape are everyday moments.",
-    "No TV: the media beats are Navidrome and Immich at the couch. Mealie (signature) has no QA screenshot, so KitchenOwl carries the food beat and HomeHub the chores.",
+    "No TV: the media beats are Navidrome and LibrePhotos at the couch. Mealie (signature) has no QA screenshot, so Grocy carries the food beat and HomeHub the chores.",
     "dining-draft: Hermes drafts and Tunde enters the plan himself, because Companion Planning has a UI link only. Companion Planning has a Google Calendar sync that is off by default; the text claims only a local file.",
     "bed-playlist: \"whether Rafael is flying or home\" implies no control from away. Music Assistant was dropped (the validator bans the word assistant). bed-bag is the Donetick iot beat; its outside notifications go unmentioned.",
     "living-dns: Pi-hole blocks at DNS and is not parental control (catalog caveat); the text never mentions the children. garage-service assumes the family owns a car; the scene shows only a bicycle.",

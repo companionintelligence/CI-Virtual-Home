@@ -363,7 +363,7 @@
       },
       "popup": {
         "title": "The release form, signed here",
-        "body": "A guest signs the release form on a tablet in the Desk Hall. Docuseal saves the signed PDF on the Core.",
+        "body": "A guest fills and signs the release form on a tablet in the Desk Hall. Docuseal runs on the Core.",
         "chips": [
           "Docuseal",
           "replaces DocuSign"
@@ -570,12 +570,12 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "navidrome",
+        "id": "mstream",
         "replaces": [
           "Spotify"
         ]
       },
-      "capability": "stream your own music collection to any device",
+      "capability": "stream your own music from your Core to a browser or an app",
       "anchor": {
         "role": "couch"
       },
@@ -585,9 +585,9 @@
       },
       "popup": {
         "title": "After the export, the couch",
-        "body": "After the last export, Obinna stretches out on the couch and plays tonight's mix from Navidrome. It streams from the Core to his phone.",
+        "body": "After the last export, Obinna stretches out on the couch and plays tonight's mix from mStream. It streams from the Core to his phone.",
         "chips": [
-          "Navidrome",
+          "mStream",
           "replaces Spotify"
         ]
       },
@@ -699,12 +699,10 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "koodo-reader",
-        "replaces": [
-          "Amazon Kindle"
-        ]
+        "id": "yamtrack",
+        "replaces": []
       },
-      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
+      "capability": "track the films, shows, books and games you have watched, read and played",
       "anchor": {
         "role": "bed",
         "room": "bedroom",
@@ -720,11 +718,10 @@
         "side": "left"
       },
       "popup": {
-        "title": "A long paper, read in bed",
-        "body": "In bed, Rhiannon reads a long paper in Koodo Reader. Her place and highlights stay in the library on the Core.",
+        "title": "The reading list, kept in bed",
+        "body": "In bed, Rhiannon logs the novel she just finished in Yamtrack. Her reading list builds up on the Core, one title at a time.",
         "chips": [
-          "Koodo Reader",
-          "replaces Amazon Kindle"
+          "Yamtrack"
         ]
       }
     },
