@@ -74,6 +74,8 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
 | `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
 | `pnpm run ui:test` | Drive the editor end to end (layout at four sizes in both schemes, contrast, the top bar, the checks, the timeline, the tree, the catalog, Compare, stills at 4K, a recorded MP4 checked with ffprobe and by PSNR) — `--only <sections>`, `--shots <dir>`. Needs a GPU and ffmpeg. |
+| `pnpm run xr:test` | The WebXR gate: the live player in Chromium with Meta's IWER (Immersive Web Emulation Runtime) as the headset — Quest 3, Quest 2, a Vision-like profile — over `dist/`. State restore, no third party, lazy loading, offline untouched, faults, and the harness's own self-test. `--only 00` (a file prefix or a case id), `--device quest3,quest2,vision,all`, `--house`, `--driver auto\|session\|bed`, `--require-session`, `--ref-dir`, `--fake-xr`, `--shots`, `--json`, `--list`. One Chromium at a time; needs `build` and `portal:build` and a GPU. Not part of `check`. See *Testing XR*. |
+| `pnpm run xr:census` | What a headset draws: the XR bake's census of the 30 houses (draw calls and triangles per eye at eight headings, against each XR tier's budget) in plain Chromium, no WebXR runtime. |
 
 Every script resolves the repo from its own location, so they run from any directory. After editing a spec:
 `validate` → `plans` → `iso` → `floorplans` → `check`, and commit the regenerated files with the spec.
@@ -111,8 +113,11 @@ scenes/                    isometric SVG + Lottie, CAD floor plans, and their ma
 scripts/                   the pipeline: build, validate, render, gate (.mts) and the Python generators (.py)
   validate/                validator plugins, one per stream (validate-house-spec.mts loads them)
   fleet/                   fleet-audit metrics, one file per stream
+  xr-harness/              the WebXR test harness (IWER in Chromium; lib, in-page bed and probe, Vision profile, fake module)
+  xr-tests/                the cases `pnpm run xr:test` runs, one file per package (00-* the harness and cross-cutting guarantees)
 reference/                 HOUSE-SPEC.md (the schema), PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
-                           HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review)
+                           HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review),
+                           XR-DEVICE-CHECKLIST.md (the on-hardware steps and what emulation cannot prove)
 test/goldens/macos-metal/  150 committed baseline frames (Git LFS) + PROFILE.json (the renderer that made them)
 test/goldens/expected-diffs/  the golden ledger: <stream>.json per stream, the frames it moves and why, and
                            <stream>/<profile>/ what each golden moved to (see How verification works)
@@ -389,6 +394,136 @@ How to take a number that means something:
   (Ollama, a VM), and the GPU timer query includes starvation gaps, so read the wall-clock frame time first and the
   `gpu` column as a hint. A weak CPU is emulated with `--throttle 4`.
 
+## Platform tiers
+
+The player runs on phones (360 to 430 px wide), tablets, desktops (1280 to 3840 px, ultrawide, hi-DPI) and in headsets. One
+module, `assets/platform.ts`, reads a **capability probe** (never the user agent: visionOS Safari sends a Macintosh UA, an
+emulator overrides it, and a PC can drive a Quest over Link) and returns one `PlatformProfile`; `viewer.ts` is its only
+importer, so the editor, the goldens, the fixtures, the films and the stills never load it. Two decisions are kept apart:
+
+- the **page tier** says how the 2D player draws. It is chosen at mount and moved by measurement (the existing ADAPT
+  pixel-ratio controller, plus promotion and an eco frame cap);
+- the **XR tier** says how an immersive session draws. It is chosen when a person taps Enter VR, from what the *granted*
+  session reports (input profiles, `supportedFrameRates`, `fixedFoveation`, blend mode).
+
+| Page tier | Who | Pixel ratio start / cap | Buffer | Sun map | fps target / floor | Composer | Realism start / ceiling |
+|---|---|---|---|---|---|---|---|
+| `desktop-high` | discrete GPU, all Apple silicon, an unknown GPU (= the player as it was before platform tiers) | min(dpr, 2) / 2 | 8.3 Mpx | 4096 | 60 / 42 | on demand | 1 / 2 |
+| `desktop-mid` | integrated GPU, 4 cores or fewer, 4 GB or less, data saver, a non-4g connection | min(dpr, 1.5) / 1.5 | 4.1 Mpx | 2048 | 60 / 42 | on demand | 0 / 1 |
+| `mobile-high` | a touch-first flagship, reached **only** by promotion | min(dpr, 2) / 2 | 2.2 Mpx | 2048 | 60 / 42, eco | never | 0 / 0 |
+| `mobile-low` | every phone and tablet at start; software GL | min(dpr, 1.25) / 1.25 | 1.2 Mpx | 1024, redrawn on a lighting change only | 30 / 24, eco | never | 0 / 0 |
+
+The mobile family is "the primary pointer is coarse" (an iPad with a trackpad is still a tablet); a phone is a screen whose
+short side is under 600 CSS px. *Weak* is 4 cores or fewer, or 4 GB or less (Chromium on a desktop reports 32, so 8 is not a
+ceiling). *Frugal* is Save-Data, `prefers-reduced-data`, or an effective connection type other than 4g. A phone is promoted
+from `mobile-low` to `mobile-high` after 6 s at 58 fps or better with ADAPT settled, and only when its ceiling allows. Eco (a
+30 fps cap) applies when ADAPT is already at pixel ratio 1 and a 2 s window is still under the floor. The data is
+`PAGE_TIERS` and `XR_TIERS` in `assets/platform-types.ts`; the reasons are written next to each number.
+
+| XR tier | Who | Refresh | Framebuffer scale | Foveation | Sun shadow | Lights | Calls @72 / 90 / 120 Hz (stereo) | Triangles | LOD radius |
+|---|---|---|---|---|---|---|---|---|---|
+| standalone gen2 | Quest 3, 3S, Pro, Pico 4, Galaxy XR (positive evidence of the controller profile only) | 72, up to 90 | 0.85 (0.7 to 1.0) | 0.66 | 2048 static | 4 | 300 / 250 / 150 | 800 k | 22 m |
+| standalone gen1 | Quest 2, Pico Neo 3, **and the safe default** when a standalone session shows no gen2 evidence | 72 | 0.8 (0.65 to 0.9) | 0.8 | 1024 static | 3 | 190 / 150 / n.a. | 450 k | 16 m |
+| tethered | PC VR through Chrome or Edge | session rate, up to 144 | 1.0 (0.7 to 1.4) | none | 2048 every 3rd frame | 8 | 1100 / 1000 / 700 | 3 M | 40 m |
+| vision | visionOS Safari (any `transient-pointer` input source) | 90 | 1.0 (0.6 to 1.0) | system | 2048 static | 6 | 800 @90 | 2 M | 30 m |
+
+In XR the realism tier is always 0 and the composer is never used (post-processing does not run in an immersive session).
+**What is measured and what is assumed.** Measured, on an M2 Max in Chromium: the desktop-high values equal the player as it
+was; a stereo frame costs exactly twice a mono frame's draw calls in r169 (no multiview); the per-house draw and triangle
+counts after the XR bake (`pnpm run xr:census`). **Assumed until a headset run**: the CPU factor behind every call budget
+(7.5 ms of JavaScript submission at 72 Hz divided by 4.2 to 5.8 microseconds a stereo call times a factor of 4 for a Quest 3
+and 6.5 for a Quest 2), the framebuffer scales, the foveation levels, the lights and the LOD radii. They are thresholds the
+XR module *enforces* (over budget it culls harder, or refuses with "this home is too detailed for this headset, view it on
+your phone or computer"), not facts; [`reference/XR-DEVICE-CHECKLIST.md`](reference/XR-DEVICE-CHECKLIST.md) section 5 has the ten
+steps that settle them.
+
+Overrides, all parsed once: `?tier=desktop-high|desktop-mid|mobile-high|mobile-low` forces the page tier (start and
+ceiling); `?no=platform` restores the pre-tier behaviour on every device (desktop-high); `?xrtier=standalone-gen1|standalone-gen2|tethered|vision`
+forces the XR tier at session start; `?no=xr` removes XR; `?xrlayers=0` does not ask for the layers feature. They compose with the
+existing `?no=` set (`glass`, `lightguard`, `batch`, `adapt`, …).
+
+## WebXR
+
+`immersive-vr` in headset browsers (Meta Quest Browser, visionOS Safari) and PC VR through Chrome or Edge. It is **live-player
+only** (`room-creator.html?mode=view`), lazy, and undone on exit; offline rendering is untouched. `immersive-ar` (Android
+Chrome) is deferred. iPhone Safari has no WebXR at all: it gets the 2D player.
+
+- **Lazy.** `viewer.ts` imports `assets/xr/entry.js` after the player is ready, unless `?no=xr`. The entry shows an Enter VR
+  control only where `immersive-vr` is supported in a secure context, and a facade at `window.__houseViewer.xr`. On the tap it calls
+  `requestSession` *inside the click* (a session needs a user gesture, and importing is an `await`), and only then imports
+  `assets/xr/session.js` and the rest. A visitor who never taps downloads none of it; the landing page and the family pages
+  download none of it either and import no `platform.js`.
+- **Session.** `session.ts` runs idle, starting, running, ending. It takes one snapshot of everything it will change (camera,
+  controls, renderer, scene, the player's own state) and puts it back on exit. three's `WebXRManager` overwrites the camera's fov and
+  projection every XR frame and never restores them, so the module does, field by field. The frame loop is
+  `renderer.xr.setAnimationLoop` (not `renderer.setAnimationLoop`, which also starts a second loop on `window.requestAnimationFrame`), and
+  the person is moved only by a rig (a group the camera lives in), never by the XR camera. `beforeExternalRender` in `viewer.ts`
+  ends a session first, so an offline hook never runs with XR state on the renderer.
+- **A different render of the same house.** In a headset the house is the *bake* (`assets/xr/bake*.ts`): merged into cells with
+  vertex colours, three to four lights, a static sun shadow, culled to the head's surroundings on each teleport, the glass in its
+  opaque-pass state, no grass, ocean or ambient-occlusion passes. The HUD says "headset view"; nobody compares it to a desktop
+  frame.
+- **UI is in the world.** HTML popups do not exist in VR (DOM overlay works only in `immersive-ar` on Android Chrome). Panels
+  are Canvas2D textures on planes, drawn with the Manrope the site already ships, hit-tested with a ray; a controller hovers
+  and presses, a visionOS `transient-pointer` (gaze and pinch) never hovers. The story tour renders its popups and captions
+  through the same panels (the `Presenter` contract). Controller models are our own simple geometry: nothing is fetched from
+  a CDN, and `XRControllerModelFactory` and `XRHandMeshModel` (which default to `cdn.jsdelivr.net`) are never used.
+- **Comfort.** Moving is a blink teleport with a fade, snap turn, and a comfort vignette; nothing moves the person smoothly
+  by default, and the viewpoint changes only on a fully black frame (`xr:test` checks that invariant).
+- **Modules.** `assets/xr/`: `entry`, `session`, `loop`, `rig`, `controller`, `hud`, `style` (the session); `bake`, `bake-merge`,
+  `bake-lod`, `bake-lights` (the cheap house); `host.ts`, `presenter.ts` and `types.ts` (the seams between them, types only).
+  The input and locomotion modules (`locomotion`, `input`, `nav`, `teleport`, `comfort`, `places`, `dress`, `doors`) and the UI kit
+  (`ui/*`) arrive with their own packages; this section is the place to list them once merged.
+- **Kill switches.** `?no=xr` (nothing under `assets/xr/` is requested; no button, no API), `?no=platform`, `?tier=`, `?xrtier=`,
+  `?xrlayers=0` (see *Platform tiers*). `window` fires `vh:xr` with `detail.state` `starting`, `started`, `ended` or `error`.
+
+**Not measured, and not claimed.** No headset was available to the agents that built this. Everything above that
+involves a clock, a pixel density, a body or a battery (frame times at 72, 90 and 120 Hz, text legibility, comfort, thermals,
+controller and hand feel, foveation and framebuffer-scale effects, the projection-layer path that Quest Browser and
+Chrome 147+ take) is a hypothesis until someone runs [`reference/XR-DEVICE-CHECKLIST.md`](reference/XR-DEVICE-CHECKLIST.md) on a
+Quest 3, a Quest 2 and a Vision Pro.
+
+### Testing XR
+
+`pnpm run xr:test` (`scripts/test-xr.mts`) opens the **built** player (`dist/`, served under `/ci-virtual-home/` as
+`portal:test` does) in one Chromium on the real GPU, with `iwer` 2.5.0 (Meta's Immersive Web Emulation Runtime, MIT, a
+pinned **devDependency**, listed in `THIRD_PARTY.md`) installed before the page's scripts, as a Quest 3, a Quest 2 or a
+Vision-like device (no controllers; hand input sources that are `transient-pointer` and exist only during a pinch). It
+discovers `scripts/xr-tests/*.mts`; each file exports named cases, and a package owns its own files: `00-*` the harness and the
+cross-cutting guarantees, `10-session`, `20-bake`, `30-ui`, `40-loco`.
+
+```bash
+pnpm run build && pnpm run portal:build
+pnpm run xr:test -- --only 00                       # the harness and the guarantees, Quest 3
+pnpm run xr:test -- --only 00 --device quest3,vision
+pnpm run xr:test -- --device all --require-session  # the merge gate: a missing session fails instead of skipping
+pnpm run xr:test -- --list
+```
+
+| Case | Proves |
+|---|---|
+| `T-X6a` | after a session ends the next mono frame has identical draw calls, triangles and pixel hash, the camera's fov, near, far, zoom, aspect and projection are back, a second session leaves no more than the first, and the 2D loop resumes |
+| `T-X7` | zero requests outside the origin while the player loads and during a session, none to `cdn.jsdelivr.net`; `_headers` does not switch `xr-spatial-tracking` off |
+| `T-LAZY` | no `assets/xr/session*.js` before the Enter VR tap; nothing under `assets/xr/` with `?no=xr`; only XR modules after the tap; XR adds under 1.5 KB gzip to the first player load (measured against the same page with `?no=xr`); the gallery loads no XR code and no `platform.js` |
+| `T-OFFLINE` | the editor page loads no XR or platform code; frame 0 of a fresh editor page is **byte-identical** to the reference commit (03edd3b) on this machine (`scripts/xr-harness/offline-baseline.json`, keyed by platform and Chromium build, or `--ref-dir <a built reference tree>`; `--record-offline` writes the baseline from a tree whose app code is the reference); the player has no offline hook |
+| `T-FAULT-*` | an exception in an XR handler is a page error; a controller or hand lost mid-press, a `hidden` visibility state and a system-ended session leave a session that keeps running or ends cleanly, and the last restores the player exactly |
+| `XSELF-*` | the harness proves itself on an in-page test bed (`scripts/xr-harness/xrbed.js`): 90 stereo frames with viewports that are halves and eyes 0.063 m apart; a panel button hovers and presses under a controller ray and never hovers on the transient profile; the blink-comfort check passes a teleport and flags a smooth move; the T-LAZY check passes a lazy fake module and fails an eager one, a heavy entry and a session that fetches from a CDN |
+
+`--driver auto` (the default) drives the product's own module when the built tree has `assets/xr/` (it clicks the Enter VR
+button, a real user gesture, and waits for `running`) and the in-page bed when it does not, and the result line says which
+(`driver=session` or `driver=bed`). A case that needs the product's module is *skipped* on a tree without one, with the
+reason, unless `--require-session`; on a tree that has `assets/xr/`, a missing session is a failure. `--fake-xr` layers a tiny
+fake module over `dist/` to exercise the session path before the real one exists. Any `pageerror` or `console.error` fails the
+case; a case that provokes one on purpose says so. A timeout or a crash is retried once, a failed expectation never.
+
+**What it proves is lifecycle, state restore, hit-testing and the request stream. It does not prove frame time, legibility,
+comfort, thermals, the layers path (IWER has no `XRWebGLBinding`), foveation or `immersive-ar` (no `dom-overlay`).** Those need
+a person with a headset: [`reference/XR-DEVICE-CHECKLIST.md`](reference/XR-DEVICE-CHECKLIST.md) (16 Quest rows, 10 Vision Pro
+rows, ten calibration steps, and the list of what emulation cannot prove). IWER is a 2.x project that releases often: the
+version is pinned and the lock file kept. Its quirks, all worked around in `scripts/xr-harness/lib.mts`: `select` fires before
+`selectstart`, a lost controller gets no `selectend`, frames continue while the session is `hidden`, and it overrides
+`navigator.userAgent`.
+
 ## How verification works
 
 `pnpm run check` runs these checks in order; only the goldens depend on an earlier one (they are skipped when a determinism check fails):
@@ -431,6 +566,8 @@ How to take a number that means something:
    box the composer had for it).
 7. **perf** — build ≤ 3 s, `__houseShotTrack` ≤ 1 s and shot QA ≤ 0.5 s a shot on aurora, mirage and vanilla:
    report-only, it never fails the gate.
+
+`pnpm run xr:test` (the WebXR gate, above) is not part of `check`: it drives the built portal. It touches no offline frame, and `T-OFFLINE` proves it.
 
 Baselines belong to a renderer profile (GPU + Chromium build), which is why `playwright` is pinned exactly.
 They are re-blessed **only on purpose** — `pnpm run goldens:update` after a change meant to alter the look,
