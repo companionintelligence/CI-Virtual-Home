@@ -1,0 +1,923 @@
+{
+  "schema": "family/v1",
+  "slug": "lacroix-adebayo",
+  "house": "seraphine",
+  "fictional": true,
+  "family": {
+    "surname": "Lacroix-Adebayo",
+    "tagline": "A press and a bookshop, with the manuscripts kept close.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Odile writes and publishes; Seun edits and runs the shop. They keep a small independent press and bookshop on the ground floor of a brick farmhouse, with three children upstairs. Their manuscripts live on one Companion Core in the Library.",
+    "address": {
+      "line": "24 Lamplighter Row",
+      "place": "Merrow Hollow"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "odile",
+      "name": "Odile",
+      "age": 49,
+      "role": "parent",
+      "work": "author and publisher",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Marguerite",
+        "runtime": "Hermes",
+        "job": "Drafts newsletter copy and catalog notes from what Odile texts it.",
+        "personality": [
+          "gentle",
+          "calm",
+          "thoughtful"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Drafts only. Odile sends every word."
+      }
+    },
+    {
+      "id": "seun",
+      "name": "Seun",
+      "age": 47,
+      "role": "parent",
+      "work": "editor and shop manager",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Ike",
+        "runtime": "OpenClaw",
+        "job": "Opens Akaunting in its own browser and enters the day's shop sales.",
+        "personality": [
+          "gentle",
+          "thoughtful",
+          "patient"
+        ],
+        "voice": "v-storyteller-m",
+        "memory": false,
+        "limits": "Enters what Seun reads out. He checks the entry."
+      }
+    },
+    {
+      "id": "amara",
+      "name": "Amara",
+      "age": 13,
+      "role": "teen",
+      "work": "school, chess club",
+      "colour": "chart-3"
+    },
+    {
+      "id": "jules",
+      "name": "Jules",
+      "age": 10,
+      "role": "child",
+      "work": "school",
+      "colour": "chart-4"
+    },
+    {
+      "id": "wren",
+      "name": "Wren",
+      "age": 1,
+      "role": "baby",
+      "work": "baby, the Nursery",
+      "colour": "chart-5"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "library",
+      "kind": "room",
+      "room": "office",
+      "title": "The Library"
+    },
+    {
+      "id": "shop",
+      "kind": "room",
+      "room": "entry",
+      "title": "The shop floor"
+    },
+    {
+      "id": "upstairs",
+      "kind": "room",
+      "room": "kids",
+      "title": "Upstairs"
+    },
+    {
+      "id": "suite",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The master suite"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The pool garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "A manuscript, kept close"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The long way to the library",
+        "body": "A parcel waits under the white-columned porch. Seun carries it through the entry hall, the chess hall and the living room to the desk in the Library."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "jules",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Jules lines up the contents",
+        "body": "Jules lines up the contents: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plugged in, among the manuscripts",
+        "body": "Odile plugs in the power cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "amara",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Amara has the quickest thumbs",
+        "body": "Amara joins the Core's own Wi-Fi from her phone, then picks the home network and types its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "collabora-online",
+        "listmonk",
+        "akaunting"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Agents and apps for a press",
+        "body": "In Companion Hub, Odile picks Hermes and Seun picks OpenClaw. They add Collabora Online, Listmonk and Akaunting, plus Companion Memory (beta). Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Collabora Online, Listmonk, Akaunting"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "odile",
+      "agent": "odile",
+      "approval": "odile",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Marguerite says hello",
+        "body": "Odile sends her first message. Marguerite, the agent she named, answers.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "odile",
+        "text": "Hello, Odile. I am Marguerite. Where does the story begin?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "member": "seun",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "Stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Film night, adaptations first",
+        "body": "Seun picks a film made from a book. Jellyfin plays it on the living-room TV, and the family argues about the ending.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "member": "amara",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "Read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "couch",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A novel and its margins",
+        "body": "Amara reads a novel in Koodo Reader on the couch. Her notes and highlights sit on the Core, beside the press's ebooks.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-recipe",
+      "chapter": "kitchen",
+      "member": "seun",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A recipe, written down once",
+        "body": "Seun types his mother's soup recipe into KitchenOwl at the breakfast bar. Now it sits in the family recipe book, beside the meal planner.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-chat",
+      "chapter": "kitchen",
+      "member": "odile",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "mattermost",
+        "replaces": [
+          "Slack"
+        ]
+      },
+      "capability": "Team chat with channels, threads and files that stays on your Core",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Supper at seven, posted once",
+        "body": "Odile posts the supper time in a Mattermost channel. It reaches the shop floor and the Library over the home Wi-Fi.",
+        "chips": [
+          "Mattermost",
+          "replaces Slack"
+        ]
+      }
+    },
+    {
+      "id": "library-draft",
+      "chapter": "library",
+      "member": "odile",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "collabora-online",
+        "replaces": [
+          "Google Workspace"
+        ]
+      },
+      "capability": "Edit documents, spreadsheets and presentations together in the browser",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Two editors, one page",
+        "body": "Odile drafts a chapter in Collabora Online. Seun edits the same page from the other end of the Library.",
+        "chips": [
+          "Collabora Online",
+          "replaces Google Workspace"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "library-newsletter",
+      "chapter": "library",
+      "member": "odile",
+      "agent": "odile",
+      "approval": "odile",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "listmonk"
+      ],
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Marguerite drafts the newsletter",
+        "body": "Odile texts Marguerite the notes for the spring list. Marguerite drafts the newsletter from context in Companion Memory. Odile reads every word, then sends it from Listmonk."
+      },
+      "say": {
+        "speaker": "odile",
+        "text": "Draft ready. Please read every word."
+      }
+    },
+    {
+      "id": "library-style",
+      "chapter": "library",
+      "member": "seun",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "capability": "Write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "House style, with a history",
+        "body": "Seun writes the press house style in BookStack, as books, chapters and pages. Page history keeps every revision of every rule.",
+        "chips": [
+          "BookStack",
+          "replaces Confluence"
+        ]
+      }
+    },
+    {
+      "id": "library-reading",
+      "chapter": "library",
+      "member": "odile",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "Adobe Audition"
+        ]
+      },
+      "capability": "Edit audio in a browser tab",
+      "anchor": {
+        "role": "music",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A reading, cut and tidied",
+        "body": "Odile trims a poet's reading in AudioMass, in one browser tab. She cuts, fades and normalizes, and the file stays on the Core.",
+        "chips": [
+          "AudioMass",
+          "replaces Adobe Audition"
+        ]
+      }
+    },
+    {
+      "id": "library-covers",
+      "chapter": "library",
+      "member": "seun",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "capability": "Design and prototype in a web-based design tool you host",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A cover, laid out at home",
+        "body": "Seun lays out next season's cover in Penpot, a web-based design tool hosted on the Core. Odile comments from the next desk.",
+        "chips": [
+          "Penpot",
+          "replaces Figma"
+        ]
+      }
+    },
+    {
+      "id": "library-manuscripts",
+      "chapter": "library",
+      "member": "odile",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "Your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Where the manuscripts live",
+        "body": "Unpublished manuscripts sit in one Nextcloud folder on the Core. They sync to Odile's laptop and to Seun's.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "shop-sales",
+      "chapter": "shop",
+      "member": "seun",
+      "agent": "seun",
+      "approval": "seun",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "Invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "entry"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ike enters the day's sales",
+        "body": "At closing, Seun reads out the day's shop sales. Ike enters them in Akaunting, in its own browser. Seun checks the totals.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      },
+      "say": {
+        "speaker": "seun",
+        "text": "Sales entered. Please check the totals."
+      },
+      "film": true
+    },
+    {
+      "id": "shop-stock",
+      "chapter": "shop",
+      "member": "seun",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nocodb",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "Turn a database into a spreadsheet-style app without writing code",
+      "anchor": {
+        "role": "bookshelf",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "entry"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "The stock list, after each delivery",
+        "body": "Seun updates the shop's stock list in NocoDB after each delivery. It works like a spreadsheet, and it runs on the Core.",
+        "chips": [
+          "NocoDB",
+          "replaces Airtable"
+        ]
+      }
+    },
+    {
+      "id": "upstairs-picturebook",
+      "chapter": "upstairs",
+      "member": "jules",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "tldraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "A shared whiteboard on an infinite canvas",
+      "anchor": {
+        "role": "room",
+        "room": "kids"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A picture book, page by page",
+        "body": "Jules draws a picture book on a tldraw whiteboard, one page at a time. Odile adds the words, and the whole book stays on the Core.",
+        "chips": [
+          "tldraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "upstairs-lullaby",
+      "chapter": "upstairs",
+      "member": "wren",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "Stream your own music collection to any device",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "low"
+      },
+      "popup": {
+        "title": "A lullaby, from the Core",
+        "body": "At bedtime, Odile plays the lullaby playlist from Navidrome in the baby's room. It streams from the Core.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "suite-telescope",
+      "chapter": "suite",
+      "member": "amara",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "Read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "telescope",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "From the telescope to Kiwix",
+        "body": "Amara and Seun find Jupiter through the telescope. Then she looks up its moons in Kiwix, which keeps Wikipedia on the Core.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "garden-proofs",
+      "chapter": "garden",
+      "member": "odile",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "Merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Proofs on the back porch",
+        "body": "On the back porch, Odile merges the corrected proofs into one PDF with Stirling-PDF. The merge runs on the Core.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "garden-lights",
+      "chapter": "garden",
+      "member": "seun",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "pool",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Garden lights for reading evenings",
+        "body": "Before the summer reading evening, Seun sets the garden lights in Home Assistant. They come on at dusk, run by the Core.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A press, a shop, one Core",
+        "body": "A press, a bookshop and a family of five. The Lacroix-Adebayo household keeps every manuscript on one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Keep your drafts, your paperwork and your mailing list on a Companion Core at home. A manuscript cannot be made twice, so keep it close.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner-specified hotspot flow; the fact sheet says only \"plug it in, pair it over Wi-Fi, and walk away\". Owner sign-off open.",
+    "The house has no crib in its spec, so no beat says crib or nursery: the baby appears in \"the baby's room\". Jules is never given a pronoun. Children are never voiced.",
+    "Public shop, online orders and card payments are held (remote access), so the shop beats are internal bookkeeping and stock only. Listmonk needs an SMTP provider to send; the beat claims no delivery.",
+    "library-reading assumes the poet's audio file is already on the Core; AudioMass only edits audio. The reading evening in garden-lights is a family event at home.",
+    "Motif: the manuscript (cannot be made twice). Beats library-draft, library-newsletter, library-manuscripts, outro-street, closing."
+  ]
+}
