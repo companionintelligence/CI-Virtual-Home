@@ -14,7 +14,7 @@ import type { LiveEnv, LivePage, Result } from '../test-live-effects.mts';
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 /** tolerances (relative): the accumulation must match the plain path closely; the lighter Best quality is a different, richer picture */
-export const TOL = { accumLum: 0.012, accumSat: 0.02, hqLum: 0.12, hqSat: 0.12 };
+export const TOL = { accumLum: 0.012, accumSat: 0.02, hqLum: 0.08, hqSat: 0.05 };
 
 async function waitFor(lp: LivePage, pred: (f: any) => boolean, ms = 20000): Promise<any> {
   const t0 = Date.now();
