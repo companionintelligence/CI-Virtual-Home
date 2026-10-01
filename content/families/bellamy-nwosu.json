@@ -163,7 +163,7 @@
         "framing": "close"
       },
       "popup": {
-        "title": "Plug it in",
+        "title": "The Core wakes",
         "body": "Winston plugs in the cable. Adaeze presses the button, and the Core wakes and opens its own Wi-Fi network.",
         "note": "Companion OS is in beta."
       },
@@ -188,7 +188,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Join it from a phone",
+        "title": "Winston joins from his phone",
         "body": "Winston joins the Core's own Wi-Fi network from his phone. Then he picks the home network.",
         "phone": {
           "header": "Wi-Fi",
@@ -220,7 +220,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Choose the first agents",
+        "title": "Two agents and a few apps",
         "body": "In Companion Hub, Adaeze picks Hermes and Winston picks OpenClaw. They add Companion Memory (beta), Kiwix and Koodo Reader, then settle into their chairs.",
         "note": "Installing apps uses the internet.",
         "phone": {
@@ -300,12 +300,12 @@
       "segment": "consumer",
       "member": "adaeze",
       "app": {
-        "id": "immich",
+        "id": "librephotos",
         "replaces": [
           "Google Photos"
         ]
       },
-      "capability": "back up, search and organise your family photos and videos",
+      "capability": "find photos by face, object and place, with albums built by date and location",
       "anchor": {
         "role": "fireplace",
         "fallback": [
@@ -320,9 +320,9 @@
       },
       "popup": {
         "title": "Old photographs by the fire",
-        "body": "Beside the fireplace, Adaeze and Kelechi look through old family pictures in Immich. The whole library sits on the Core.",
+        "body": "Beside the fireplace, Adaeze and Kelechi browse old family pictures in LibrePhotos. It builds albums by date and place.",
         "chips": [
-          "Immich",
+          "LibrePhotos",
           "replaces Google Photos"
         ]
       }

@@ -1,0 +1,806 @@
+{
+  "schema": "family/v1",
+  "slug": "ramos-whitfield",
+  "house": "starter18k",
+  "fictional": true,
+  "family": {
+    "surname": "Ramos-Whitfield",
+    "tagline": "A first house, a family office corner, and a quiet Core.",
+    "household": "young-family",
+    "business": false,
+    "story": "Caleb works delivery shifts and Daniela keeps books part time. They bought their first house with Luca and Maya in tow. The Companion Core sits in the family office corner of the bedroom.",
+    "address": {
+      "line": "42 Poppy Seed Lane",
+      "place": "Pecan Weir"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "caleb",
+      "name": "Caleb",
+      "age": 30,
+      "role": "parent",
+      "work": "delivery logistics, shift work",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Gil",
+        "runtime": "Hermes",
+        "job": "Turns the week's shift messages into a family plan Caleb edits.",
+        "personality": [
+          "steady",
+          "practical",
+          "patient"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Proposes a plan. Caleb confirms every shift."
+      }
+    },
+    {
+      "id": "daniela",
+      "name": "Daniela",
+      "age": 29,
+      "role": "parent",
+      "work": "part-time bookkeeper",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Pepper",
+        "runtime": "OpenClaw",
+        "job": "Opens Wallos in its own browser and lists the subscriptions that renew this week.",
+        "personality": [
+          "quick",
+          "wry",
+          "bright"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Reads the list. Daniela decides what to keep."
+      }
+    },
+    {
+      "id": "luca",
+      "name": "Luca",
+      "age": 5,
+      "role": "child",
+      "work": "kindergarten, loft bed",
+      "colour": "chart-3"
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "age": 3,
+      "role": "child",
+      "work": "toddler, kids corner",
+      "colour": "chart-4"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "corner",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The family office corner"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining table"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "entry",
+      "kind": "room",
+      "room": "entry",
+      "title": "The front entry"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "The kids' corner"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The stoop and back yard"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "caleb",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel for the front stoop",
+        "body": "A parcel waits on the front stoop. Caleb, home from an early shift, carries it through the vestibule to the family office corner in the bedroom."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "luca",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "The family opens the parcel",
+        "body": "Luca does the unwrapping. Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. It covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "daniela",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plugged in at the corner desk",
+        "body": "Daniela plugs in the cable behind the desk and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "caleb",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the home network",
+        "body": "Caleb joins the Core's own Wi-Fi network from his phone, then picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "daniela",
+      "with": [
+        "wallos",
+        "yuvomi"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Starter agents, starter apps",
+        "body": "In Companion Hub, Daniela picks OpenClaw and Caleb picks Hermes. They add Companion Memory (beta), Wallos and Yuvomi, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Wallos, Yuvomi"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "daniela",
+      "agent": "daniela",
+      "approval": "daniela",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and coding tools, running in its own sandbox",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Pepper checks in",
+        "body": "Daniela sends the first message to Pepper, the agent she named. Pepper answers, and the Core is running."
+      },
+      "say": {
+        "speaker": "daniela",
+        "text": "Hi, Daniela. I am Pepper. Which list first?"
+      },
+      "film": true
+    },
+    {
+      "id": "corner-renewals",
+      "chapter": "corner",
+      "category": "money",
+      "segment": "consumer",
+      "member": "daniela",
+      "agent": "daniela",
+      "approval": "daniela",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Pepper reads the renewal list",
+        "body": "Daniela asks Pepper which subscriptions renew this week. Pepper opens Wallos in its own browser and lists them. Daniela decides what to keep.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      },
+      "say": {
+        "speaker": "daniela",
+        "text": "Here is the list. You decide what to keep."
+      },
+      "film": true
+    },
+    {
+      "id": "corner-vault",
+      "chapter": "corner",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "daniela",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host. Works with the Bitwarden apps",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sign-ins in one vault",
+        "body": "Every password the family shares goes into VaultWarden, a vault hosted on the Core beside Daniela's chair. It works with the Bitwarden apps.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "corner-books",
+      "chapter": "corner",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "daniela",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A client's books, kept here",
+        "body": "On Tuesdays, Daniela keeps a client's books in Akaunting: invoices, expenses and customers. The records sit on the Core.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "corner-papers",
+      "chapter": "corner",
+      "category": "home",
+      "segment": "consumer",
+      "member": "daniela",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The house papers, searchable",
+        "body": "Daniela scans the closing papers for the new house into Paperless-ngx. It reads every page, tags it and makes the lot searchable.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "caleb",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Pantry first, then the shop",
+        "body": "Before the weekly shop, Caleb checks the pantry in Grocy. It tracks what is on the shelves and keeps the shopping list.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-plan",
+      "chapter": "kitchen",
+      "category": "home",
+      "segment": "consumer",
+      "member": "caleb",
+      "agent": "caleb",
+      "approval": "caleb",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "yuvomi"
+      ],
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Gil turns shifts into a plan",
+        "body": "Caleb texts Gil the week's shifts. Gil drafts a family plan, and Caleb confirms every shift in Yuvomi.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "caleb",
+        "text": "Here is the plan as a draft. Please check every shift."
+      },
+      "film": true
+    },
+    {
+      "id": "dining-month",
+      "chapter": "dining",
+      "category": "money",
+      "segment": "consumer",
+      "member": "daniela",
+      "app": {
+        "id": "firefly-iii",
+        "replaces": [
+          "YNAB"
+        ]
+      },
+      "capability": "track accounts, budgets, bills and savings goals, with rules that sort your transactions",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Month end, sorted by rules",
+        "body": "At the dining table, Daniela imports the month's statement as a CSV file into Firefly III. Its rules sort the transactions.",
+        "chips": [
+          "Firefly III",
+          "replaces YNAB"
+        ]
+      }
+    },
+    {
+      "id": "dining-card",
+      "chapter": "dining",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "caleb",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A birthday card for abuela",
+        "body": "Caleb writes a birthday card for Luca's abuela in English. LibreTranslate turns it into Spanish, and Daniela checks every line.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "luca",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The same cartoon, again",
+        "body": "Saturday morning, Luca asks for the same cartoon again. Jellyfin plays it on the living-room TV from the family's library on the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "caleb",
+      "app": {
+        "id": "photoprism",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "browse and share your photo library, with automatic tagging",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The year's photos, tagged",
+        "body": "On the couch after a late shift, Caleb scrolls the year's photos in PhotoPrism. It tags them as they arrive, with no upload anywhere.",
+        "chips": [
+          "PhotoPrism",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "entry-start",
+      "chapter": "entry",
+      "category": "home",
+      "segment": "consumer",
+      "member": "caleb",
+      "app": {
+        "id": "homarr",
+        "replaces": []
+      },
+      "capability": "one start page for your apps",
+      "anchor": {
+        "role": "room",
+        "room": "entry"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One start page for the family",
+        "body": "By the front door, Caleb sets Homarr as the family's start page. The apps on the Core sit together there, one tap from any phone.",
+        "chips": [
+          "Homarr"
+        ]
+      }
+    },
+    {
+      "id": "kids-story",
+      "chapter": "kids",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "maya",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Maya's bear story, resumed",
+        "body": "At bedtime, Maya asks for the bear story. Audiobookshelf starts it where it stopped, from the library on the Core.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-quest",
+      "chapter": "kids",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "luca",
+      "app": {
+        "id": "habitica",
+        "replaces": [
+          "Habitify"
+        ]
+      },
+      "capability": "turn habits and chores into a game with levels and quests",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Shoes away earns a level",
+        "body": "Luca puts his shoes away, and Daniela taps the check in Habitica. The game gives him a level, and the list lives on the Core.",
+        "chips": [
+          "Habitica",
+          "replaces Habitify"
+        ]
+      }
+    },
+    {
+      "id": "garden-tomatoes",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "luca",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The tomatoes keep a diary",
+        "body": "Luca waters the tomato plants. Daniela logs the date in HortusFox, so no one has to remember.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-stoop",
+      "chapter": "garden",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "caleb",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Clips waiting after a late shift",
+        "body": "The family's IP camera looks at the front stoop. Frigate keeps the clips on the Core, and Caleb checks them on the home Wi-Fi after a late shift.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one first house",
+        "body": "The Ramos-Whitfield household runs its renewals, shifts and photos from one Core in the family office corner."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your renewals, your photos and your family plan can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "The Core stands in the family bedroom: told as the family office corner in the FTUE and the first room chapter, never as a server in a bedroom.",
+    "A budget-conscious family: no saving, payback or price claim anywhere. Wallos is a subscription list, Firefly III a bookkeeping tool fed by a CSV file.",
+    "garden-stoop assumes the family owns an IP camera (not in the Core parcel, not in the 3D scene). No claim that it prevents anything.",
+    "Mealie (a signature app) is not used: it has no QA screenshot. Invented place and street: check Pecan Weir and Poppy Seed Lane against a map."
+  ]
+}

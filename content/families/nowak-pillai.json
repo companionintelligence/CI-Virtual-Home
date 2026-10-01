@@ -94,6 +94,12 @@
       "title": "The living room"
     },
     {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining room"
+    },
+    {
       "id": "studies",
       "kind": "room",
       "room": "office",
@@ -109,7 +115,7 @@
       "id": "garden",
       "kind": "outside",
       "room": "garden",
-      "title": "Out in the garden"
+      "title": "Out on the drive and patio"
     },
     {
       "id": "outro",
@@ -154,7 +160,7 @@
         "framing": "medium"
       },
       "popup": {
-        "title": "What is in the parcel",
+        "title": "Ila peeks into the parcel",
         "body": "Ila peeks in. Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
       }
     },
@@ -196,7 +202,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Join it from a phone",
+        "title": "Kasia joins from her phone",
         "body": "Kasia finds the Core's own Wi-Fi network on her phone and joins it. Then she chooses the home network.",
         "phone": {
           "header": "Wi-Fi",
@@ -217,7 +223,7 @@
       "member": "arun",
       "with": [
         "nextcloud",
-        "immich"
+        "excalidraw"
       ],
       "anchor": {
         "role": "core"
@@ -229,14 +235,14 @@
       "popup": {
         "kind": "phone",
         "title": "Choose the first agents",
-        "body": "In Companion Hub, Kasia picks Hermes and Arun picks OpenClaw. They add Companion Memory (beta), Nextcloud and Immich, then walk away.",
+        "body": "In Companion Hub, Kasia picks Hermes and Arun picks OpenClaw. They add Companion Memory (beta), Nextcloud and Excalidraw, then walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agents: Hermes, OpenClaw",
             "Companion Memory (beta)",
-            "Apps: Nextcloud, Immich"
+            "Apps: Nextcloud, Excalidraw"
           ]
         }
       }
@@ -299,40 +305,6 @@
         ]
       },
       "film": true
-    },
-    {
-      "id": "kitchen-pantry",
-      "chapter": "kitchen",
-      "category": "food",
-      "segment": "consumer",
-      "member": "kasia",
-      "app": {
-        "id": "grocy",
-        "replaces": [
-          "AnyList"
-        ]
-      },
-      "capability": "track the pantry, shopping lists, recipes, chores",
-      "anchor": {
-        "role": "fridge",
-        "fallback": [
-          {
-            "role": "counter"
-          }
-        ]
-      },
-      "camera": {
-        "framing": "medium",
-        "from": "left"
-      },
-      "popup": {
-        "title": "Pantry and list, side by side",
-        "body": "Before the shop, Kasia opens Grocy at the fridge. It tracks what sits in the pantry and keeps the shopping list in the same place.",
-        "chips": [
-          "Grocy",
-          "replaces AnyList"
-        ]
-      }
     },
     {
       "id": "kitchen-pancakes",
@@ -405,12 +377,12 @@
       "segment": "consumer",
       "member": "ila",
       "app": {
-        "id": "audiobookshelf",
+        "id": "booklore",
         "replaces": [
-          "Audible"
+          "Kindle"
         ]
       },
-      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
+      "capability": "manage and read books, comics and PDFs",
       "anchor": {
         "role": "couch"
       },
@@ -419,11 +391,47 @@
         "from": "front"
       },
       "popup": {
-        "title": "A story that waits for her",
-        "body": "On the couch, Ila asks for the dragon story again. Audiobookshelf starts it right where she stopped, from the library on the Core.",
+        "title": "A picture book on the couch",
+        "body": "On the couch, Kasia reads Ila a picture book from BookLore. The whole library lives on the Core.",
         "chips": [
-          "Audiobookshelf",
-          "replaces Audible"
+          "BookLore",
+          "replaces Kindle"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "dining-plan",
+      "chapter": "dining",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "arun",
+      "app": {
+        "id": "super-productivity",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "plan your day, track time and run a Pomodoro timer",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Arun blocks out his day",
+        "body": "At the dining table, Arun plans his workday in Super Productivity: tasks, time blocks and a timer. Kasia's lesson hours go in first.",
+        "chips": [
+          "Super Productivity",
+          "replaces Todoist"
         ]
       }
     },
@@ -643,54 +651,18 @@
       }
     },
     {
-      "id": "bedtime-lamp",
-      "chapter": "bedtime",
-      "category": "iot",
-      "segment": "consumer",
-      "member": "arun",
-      "app": {
-        "id": "home-assistant",
-        "replaces": [
-          "Google Home"
-        ]
-      },
-      "capability": "control and automate your smart home from one place, locally",
-      "anchor": {
-        "role": "crib",
-        "room": "kids",
-        "fallback": [
-          {
-            "role": "room",
-            "room": "kids"
-          }
-        ]
-      },
-      "camera": {
-        "framing": "wide",
-        "side": "right"
-      },
-      "popup": {
-        "title": "The nursery lamp keeps time",
-        "body": "At seven, the nursery lamp dims on a Home Assistant schedule. It runs on the Core and reaches the lamp over the home Wi-Fi.",
-        "chips": [
-          "Home Assistant",
-          "replaces Google Home"
-        ]
-      }
-    },
-    {
       "id": "bedtime-lullaby",
       "chapter": "bedtime",
       "category": "media",
       "segment": "consumer",
       "member": "kasia",
       "app": {
-        "id": "navidrome",
+        "id": "mstream",
         "replaces": [
           "Spotify"
         ]
       },
-      "capability": "stream your own music collection to any device",
+      "capability": "stream your own music from your Core to a browser or an app",
       "anchor": {
         "role": "bed",
         "room": "kids",
@@ -707,9 +679,9 @@
       },
       "popup": {
         "title": "A lullaby from the collection",
-        "body": "At bedtime, Kasia plays the lullaby her mother sang. Navidrome streams it from the family's music collection to her phone.",
+        "body": "At bedtime, Kasia plays the lullaby her mother sang. mStream sends it from the family's music collection on the Core to her phone.",
         "chips": [
-          "Navidrome",
+          "mStream",
           "replaces Spotify"
         ]
       }
@@ -751,38 +723,49 @@
       }
     },
     {
-      "id": "garden-plants",
+      "id": "garden-drive",
       "chapter": "garden",
-      "category": "home",
+      "category": "iot",
       "segment": "consumer",
-      "member": "kasia",
+      "member": "arun",
       "app": {
-        "id": "hortusfox",
+        "id": "strix",
         "replaces": []
       },
-      "capability": "track your plants, watering and care history across rooms and beds",
+      "with": [
+        "frigate"
+      ],
+      "capability": "point it at a camera on your network and it finds the stream address",
       "anchor": {
-        "role": "garden"
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "front-door"
+          },
+          {
+            "role": "street"
+          }
+        ]
       },
       "camera": {
-        "framing": "medium",
+        "framing": "wide",
+        "from": "front",
         "eye": "standing"
       },
       "popup": {
-        "title": "The hydrangeas get a journal",
-        "body": "Kasia logs the front hydrangeas in HortusFox, with where they grow and when she last watered them.",
+        "title": "Strix finds the camera",
+        "body": "Arun points Strix at the new camera on the drive. It finds the stream address and writes the Frigate configuration.",
         "chips": [
-          "HortusFox"
+          "Strix"
         ]
-      },
-      "film": true
+      }
     },
     {
       "id": "garden-patio",
       "chapter": "garden",
       "category": "productivity",
       "segment": "consumer",
-      "member": "arun",
+      "member": "kasia",
       "app": {
         "id": "readeck",
         "replaces": [
@@ -807,7 +790,7 @@
       },
       "popup": {
         "title": "Saved to read on the patio",
-        "body": "After bedtime, Arun reads a project article on the patio. He saved it to Readeck, which keeps it on the Core.",
+        "body": "After bedtime, Kasia reads a teaching article on the patio. She saved it to Readeck, which keeps it on the Core.",
         "chips": [
           "Readeck",
           "replaces Pocket"
@@ -844,7 +827,7 @@
   "notes": [
     "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
     "Students are minors: beats show where lesson files live and never name a student. No safety or learning-outcome claim anywhere.",
-    "kids-lamp assumes the family owns a smart lamp on the home Wi-Fi. Home Assistant has no USB or Bluetooth in the Hub; no energy claim.",
+    "garden-drive assumes the family owns an IP camera (not in the Core parcel, not in the 3D scene). Strix finds its stream address; Frigate keeps the clips. No claim that it prevents anything.",
     "study-update: Hermes drafts, Kasia sends. Pia is the Drafter persona with Companion Memory connected, opt-in.",
     "Invented place and street (Corvine Hill, Pennywhistle Close): check both against a map before launch."
   ]

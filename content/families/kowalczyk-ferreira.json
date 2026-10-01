@@ -179,7 +179,7 @@
         "framing": "close"
       },
       "popup": {
-        "title": "Plug it in",
+        "title": "A cable, a button, a Core",
         "body": "Davi plugs in the cable and presses the button. The Core wakes and opens a Wi-Fi network of its own.",
         "note": "Companion OS is in beta."
       },
@@ -204,7 +204,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Join it from a phone",
+        "title": "The phone finds the Core",
         "body": "On his phone, Wojtek joins the Core's own Wi-Fi network, then picks the home network.",
         "phone": {
           "header": "Wi-Fi",
@@ -236,7 +236,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Choose the first agents",
+        "title": "First agents, first apps",
         "body": "In Companion Hub, Beatriz picks Hermes and Wojtek picks OpenClaw. They add Companion Memory (beta), Twenty and PhotoPrism, then leave it to work.",
         "note": "Installing apps uses the internet.",
         "phone": {
@@ -847,16 +847,14 @@
     {
       "id": "garden-terrace",
       "chapter": "garden",
-      "category": "media",
+      "category": "home",
       "segment": "consumer",
       "member": "beatriz",
       "app": {
-        "id": "koodo-reader",
-        "replaces": [
-          "Amazon Kindle"
-        ]
+        "id": "trip",
+        "replaces": []
       },
-      "capability": "read ebooks in your browser, with notes and highlights",
+      "capability": "save places on a map and plan multi-day trips with a budget",
       "anchor": {
         "role": "patio-seat",
         "fallback": [
@@ -873,11 +871,10 @@
         "side": "auto"
       },
       "popup": {
-        "title": "A chapter on the terrace",
-        "body": "Beatriz reads an ebook on the terrace in Koodo Reader, with notes and highlights. The library lives on the Core.",
+        "title": "The summer trip, planned outside",
+        "body": "On the terrace, Beatriz plans the summer trip in TRIP: places pinned on a map and days put in order.",
         "chips": [
-          "Koodo Reader",
-          "replaces Amazon Kindle"
+          "TRIP"
         ]
       }
     },

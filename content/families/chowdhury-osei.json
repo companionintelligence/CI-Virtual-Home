@@ -182,7 +182,7 @@
         "framing": "close"
       },
       "popup": {
-        "title": "Plug it in",
+        "title": "One cable, one button",
         "body": "Nia plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
         "note": "Companion OS is in beta."
       },
@@ -207,7 +207,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Join it from a phone",
+        "title": "Two networks, one phone",
         "body": "Standing at the island, Rafiq joins the Core's own Wi-Fi network from his phone, then picks the home network.",
         "phone": {
           "header": "Wi-Fi",
@@ -239,7 +239,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Choose the first agents",
+        "title": "Hermes twice, OpenClaw once",
         "body": "In Companion Hub, the family picks Hermes twice and OpenClaw once. They add Companion Memory (beta), Nextcloud and BookStack, then go back to work.",
         "note": "Installing apps uses the internet.",
         "phone": {
@@ -288,10 +288,12 @@
       "segment": "consumer",
       "member": "abena",
       "app": {
-        "id": "kitchenowl",
-        "replaces": []
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
       },
-      "capability": "a shared grocery list, recipe book, meal planner",
+      "capability": "a shared household hub for notes, shopping, chores and expenses",
       "anchor": {
         "role": "kitchen-island",
         "fallback": [
@@ -306,9 +308,10 @@
       },
       "popup": {
         "title": "One list for four floors",
-        "body": "Rafiq adds olives from the loft. Nia adds oat milk from her room. Abena sees both on the KitchenOwl list at the island.",
+        "body": "Rafiq adds olives from the loft. Nia adds oat milk from her room. Abena sees both on the HomeHub shopping list at the island.",
         "chips": [
-          "KitchenOwl"
+          "HomeHub",
+          "replaces Cozi"
         ]
       },
       "film": true
@@ -371,18 +374,16 @@
       }
     },
     {
-      "id": "salon-music",
+      "id": "salon-feeds",
       "chapter": "salon",
       "category": "media",
       "segment": "consumer",
       "member": "abena",
       "app": {
-        "id": "navidrome",
-        "replaces": [
-          "Spotify"
-        ]
+        "id": "freshrss",
+        "replaces": []
       },
-      "capability": "stream your own music collection to any device",
+      "capability": "read the sites you follow in one feed, on your own Core",
       "anchor": {
         "role": "couch",
         "room": "living",
@@ -398,11 +399,10 @@
         "from": "front"
       },
       "popup": {
-        "title": "Music for a long evening",
-        "body": "On the couch in the living salon, Abena queues her music in Navidrome. It streams from the Core, and the piano waits its turn.",
+        "title": "Design news, on the couch",
+        "body": "On the couch in the living salon, Abena catches up on the design sites she follows in FreshRSS. The feed reader runs on the Core.",
         "chips": [
-          "Navidrome",
-          "replaces Spotify"
+          "FreshRSS"
         ]
       }
     },
@@ -869,7 +869,7 @@
   "notes": [
     "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
     "The Core is on the second floor, one stair tower above the front door; the casting stake says three flights, the house files show one. ftue-delivery says only \"up the stair tower\".",
-    "No TV in this home: the media beat is Navidrome at the couch. The word screen is avoided throughout. No desk: studio beats use the Den and its bookshelf.",
+    "No TV in this home: the couch media beat is FreshRSS; Home Assistant runs the stair tower lights (no energy claim). The word screen is avoided throughout. No desk: studio beats use the Den and its bookshelf.",
     "ftue-hello uses OpenClaw (Hugo); the Hermes disclosure note sits on studio-moodboard, the first Hermes beat.",
     "Invented place and street: check Oriel Heights and Switchback Terrace against a map. Setting is a waterfront render, so no hillside is described."
   ]
