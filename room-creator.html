@@ -8932,6 +8932,9 @@
     // ---------------------------------------------------------------------------------------
     window.__houseRenderBegin = function ({ shot, res = '1080', aspect = '16:9', fps = 60 } = {}) {
       // a studio scene (no home) records its own shots by their SplinePresets key; a home's shots are 'house:<id>:<shot>'
+      // the player installs live-only optimisations (merged static meshes, the light guard, the hidden flame light) that
+      // a product frame must never see, and the glass swap is the only one beforeExternalRender can take back
+      if (VIEW_MODE) throw new Error('offline rendering is not available in the player (?mode=view): open the page without it');
       const studio = !activeHouse && !!shot && !shot.startsWith('house:') && !!SplinePresets[shot];
       if (!activeHouse && !studio) throw new Error('no house loaded');
       const key = studio || (shot && shot.startsWith('house:')) ? shot : `house:${activeHouse.id}:${shot || 'door-to-core'}`;

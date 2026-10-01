@@ -149,6 +149,7 @@ Never re-bless to make a red gate green, and never on a machine whose profile di
   `check` or CI; time with one browser at a time, `uptime` recorded, median of 5+, on the presented `orbit` rows. An
   optimisation that only the live player needs lives behind `VIEW_MODE`, restores any renderer state it changes for its
   own frame, and has a `?no=<feature>` kill switch (so `--query no=<feature>` can time it on and off); the offline
-  path and the goldens must never see it.
+  path and the goldens must never see it. For that reason `__houseRenderBegin` throws under `?mode=view`: a film or a
+  still is rendered from the editor page, never from a player tab.
 - Multiple agents may work in this repo at once: never `git reset --hard`, `git clean -f`, force-push, or
   delete work you did not create without the owner's say-so.

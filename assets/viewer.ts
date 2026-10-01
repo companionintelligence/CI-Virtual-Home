@@ -1004,6 +1004,9 @@ export function mountViewer(api: Api) {
   // Never a reason for an endless loader: an error or a stalled driver ends the wait (4 s) and the first render
   // compiles what is left as it always did. ?no=compile skips it (A/B timing).
   const COMPILE_WAIT_MS = 4000;
+  // The compile in flight. three's compileAsync polls the scene it was given until every program is ready, so a second
+  // home must not clear the scene (api.loadHouse) under that poll: goHouse waits for this first (bounded).
+  let compiling: Promise<void> = Promise.resolve();
   async function precompile(s: Shot, at: number) {
     if ((params.get('no') || '').split(',').includes('compile') || typeof renderer.compileAsync !== 'function') return;
     let timer = 0;
@@ -1011,7 +1014,10 @@ export function mountViewer(api: Api) {
       api.useShot(`house:${houseId}:${s.key}`);
       api.applyFrame(clamp01(at));
       fitCamera();
-      await Promise.race([renderer.compileAsync(api.scene, camera), new Promise(r => { timer = window.setTimeout(r, COMPILE_WAIT_MS); })]);
+      // (its own catch: a compile that fails after the wait has ended must not become an unhandled rejection)
+      const p: Promise<void> = Promise.resolve(renderer.compileAsync(api.scene, camera)).then(() => {}, err => { console.warn('viewer: precompile skipped', err); });
+      compiling = p;
+      await Promise.race([p, new Promise(r => { timer = window.setTimeout(r, COMPILE_WAIT_MS); })]);
     } catch (err) {
       console.warn('viewer: precompile skipped', err);
     } finally { window.clearTimeout(timer); }
@@ -1059,6 +1065,9 @@ export function mountViewer(api: Api) {
     showLoading(id);
     // let the overlay paint before the build takes the main thread
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    // a precompile of the home on screen may still be polling its scene: let it end (4 s at most) before the scene is cleared
+    { let t = 0; await Promise.race([compiling, new Promise(r => { t = window.setTimeout(r, COMPILE_WAIT_MS); })]); window.clearTimeout(t); }
+    if (token !== loadToken) return;
     try {
       await api.loadHouse(id);
     } catch (err) {

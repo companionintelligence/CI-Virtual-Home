@@ -561,8 +561,12 @@ async function loadMode() {
         const row = { house, dpr, dcl: r.dcl, ready: r.ready, firstDraw: r.firstDraw, firstRenderEnd: r.firstRenderEnd, tti, blocking, longest, heap1, heap2, requests: o.bytes.n, kb: o.bytes.b / 1024, load: [+l0.toFixed(0), +load1().toFixed(0)] };
         rows.push(row); out.push({ ...row, run: i });
         log([house, dpr, i, f1(r.dcl), f1(r.ready), f1(r.firstDraw), f1(r.firstRenderEnd), f1(tti), f1(blocking), f1(longest), f1(heap1), f1(heap2), o.bytes.n, f1(o.bytes.b / 1024), row.load.join('->')].join('\t'));
+      } catch (e: any) {
+        // a run that never got there (a host sleep, a stalled driver) is an error row, not a crash of the whole mode
+        log(`${house}\t${dpr}\t${i}\tFAILED ${String(e.message).split('\n')[0]}`); out.push({ house, dpr, run: i, error: String(e.message) });
       } finally { await o.close(); }
     }
+    if (!rows.length) { out.push({ house, dpr, median: true, error: 'no run finished' }); continue; }
     const M = (k: string) => median(rows.map(r => r[k]));
     log(`${house}\tdpr ${dpr}\tMEDIAN of ${rows.length}\tdcl ${f1(M('dcl'))}\tready ${f1(M('ready'))}\tfirstDraw ${f1(M('firstDraw'))}\tfirstRenderEnd ${f1(M('firstRenderEnd'))}\ttti ${f1(M('tti'))}\tblocking ${f1(M('blocking'))}\theap ${f1(M('heap1'))}/${f1(M('heap2'))} MB\treq ${M('requests')}\tKB ${f1(M('kb'))}`);
     out.push({ house, dpr, median: true, ...Object.fromEntries(['dcl', 'ready', 'firstDraw', 'firstRenderEnd', 'tti', 'blocking', 'longest', 'heap1', 'heap2', 'requests', 'kb'].map(k => [k, M(k)])) });
