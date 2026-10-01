@@ -21,6 +21,10 @@
         return;
       }
       d.dataset.mode = 'view';
+      // Safari (and Chrome on a notched phone) report env(safe-area-inset-*) as 0 unless the page asks to extend under the notch and the
+      // home bar: viewer.css uses the insets for the chrome and assets/platform.ts reads them (defect P2). ?no=platform leaves the meta as it was.
+      var vp = document.querySelector('meta[name="viewport"]');
+      if (vp && !/viewport-fit/.test(vp.content) && !/(^|,)platform(,|$)/.test(q.get('no') || '')) vp.content += ', viewport-fit=cover';
       // the player's own title from the start (the static one above is the editor's), then the home's
       document.title = 'Virtual homes · Companion Intelligence';
       if (/^[a-z0-9-]+$/.test(id)) d.style.setProperty('--vh-poster', 'url("' + new URL('./portal/thumbs/' + id + '.webp', location.href).href + '")');
@@ -8208,6 +8212,7 @@
     // -------------------------------------------------------------
     // Window Resize Handling
     // -------------------------------------------------------------
+    const syncedSize = new THREE.Vector2();
     function syncViewportSize() {
       width = viewportBox.clientWidth;
       height = viewportBox.clientHeight;
@@ -8216,9 +8221,14 @@
       // (devtools opening, a tablet turning) must not change the size the frames are drawn at. The viewport's new size
       // is kept, and put back when the render ends (the end of Record, a still or __houseRenderEnd sets the size again).
       if (recording || headlessRender) return;
+      // A headset session sizes its own framebuffer (three warns on setSize while presenting) and the browser's window is not what it draws to.
+      if (renderer.xr.isPresenting) return;
       const newAspect = width / height;
 
-      renderer.setSize(width, height);
+      // The player: one setSize per change, not one per event: a resize fires this from the window and from the ResizeObserver at once, and each setSize
+      // reallocates the drawing buffer. (Compared with the renderer's own size, so a still or a film that sized it differently is put back.)
+      renderer.getSize(syncedSize);
+      if (!VIEW_MODE || syncedSize.x !== width || syncedSize.y !== height) renderer.setSize(width, height);   // (the editor sets it every time, as it always did)
 
       orthoCamera.left = (-frustumSize * newAspect) / 2;
       orthoCamera.right = (frustumSize * newAspect) / 2;

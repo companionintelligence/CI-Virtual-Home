@@ -39,6 +39,7 @@
     "portal:thumbs": "node --experimental-strip-types scripts/build-thumbs.mts",
     "portal:build": "node --experimental-strip-types scripts/build-portal.mts",
     "portal:test": "node --experimental-strip-types scripts/test-portal.mts",
+    "platform:test": "node --experimental-strip-types scripts/test-platform-matrix.mts",
     "ui:test": "node --experimental-strip-types scripts/test-ui.mts",
     "xr:test": "node --experimental-strip-types scripts/test-xr.mts",
     "portal:preview": "node --experimental-strip-types scripts/build-portal.mts --serve",

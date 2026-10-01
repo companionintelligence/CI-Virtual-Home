@@ -38,6 +38,7 @@
 import { displayName, buildCredit } from './home-names.js';
 import { createGlassSwap } from './viewer-glass.js';
 import { bakeStatic, restoreStatic } from './viewer-batch.js';
+import { mountPlatform } from './viewer-tier.js';
 
 type Api = {
   THREE: any; scene: any; renderer: any; canvas: HTMLCanvasElement; camera: any; controls: any;
@@ -105,6 +106,7 @@ const DRAG_TO_FLY = 6;        // px of drag on the scene before it counts as tak
 const IDLE_MS = 2600;         // controls fade after this long without input while a shot plays
 const IDLE_TOUCH_MS = 4000;   // on a touch screen, a little longer (a tap brings them back)
 const REF_ASPECT = 16 / 9;    // the aspect the shots are framed for
+const WIDE_CAP = !(new URLSearchParams(location.search).get('no') || '').split(',').includes('platform');   // fitFov's cap above 16:9
 const CORE_URL = 'https://ci.computer';
 const DEFAULT_SHOT = 'orbit';   // what a link without shot= opens on (onHouse)
 const CORE_NAME = 'Companion Core (Hero)';   // the house builder's name for the desk's Core (the QA gate finds it by it too)
@@ -119,7 +121,15 @@ const fmtWhole = (s: number): string => clock(Math.round(s));
 // mean of keeping the vertical field (a 9:19.5 phone would see a 19° sliver across) and keeping the horizontal
 // one (a 108° fisheye), so a phone held upright takes in about twice the width it would, capped at 80°.
 function fitFov(fov: number, aspect: number): number {
-  if (!(aspect > 0) || aspect >= REF_ASPECT) return fov;
+  if (!(aspect > 0)) return fov;
+  if (aspect >= REF_ASPECT) {
+    // Wider than 16:9 (an ultrawide, a laptop with the dock beside it): the shot's vertical field would spread to 85° across at 2.39:1.
+    // Past the point where it reaches 15 % more than the 16:9 horizontal field it stops spreading, so the extra width shows more of the
+    // sides instead of stretching the middle (and the vertical field narrows). Up to there, and under ?no=platform, the shot's own.
+    if (!WIDE_CAP) return fov;
+    const h0 = Math.atan(Math.tan((fov * Math.PI) / 360) * REF_ASPECT), cap = h0 * 1.15;
+    return Math.atan(Math.tan((fov * Math.PI) / 360) * aspect) <= cap ? fov : (2 * Math.atan(Math.tan(cap) / aspect) * 180) / Math.PI;
+  }
   const k = Math.sqrt(REF_ASPECT / aspect);
   return Math.min(80, (2 * Math.atan(Math.tan((fov * Math.PI) / 360) * k) * 180) / Math.PI);
 }
@@ -824,6 +834,23 @@ export function mountViewer(api: Api) {
     api.dress({ walls: 'up', roof: inside ? 'off' : 'on' }, camera.position, controls.target);
   }
 
+  // ------------------------------------------------------------------ platform
+  // What this device is and what to do about it (assets/platform.ts, assets/viewer-tier.ts): the start pixel ratio, the drawing-buffer cap and
+  // the sun's map for its tier, set here, BEFORE the frame-rate controller below reads the ratio (so that is not edited); the promotion of a phone
+  // that holds 60 fps, the 30 fps cap when nothing else is left, WebGL context loss, and the touch and gamepad controls. Player only.
+  // ?no=platform is the player as it was.
+  const platform = mountPlatform({
+    api, no, root, toast, reducedMotion,
+    act: {
+      playPause: () => setPlaying(!playing), tod: () => cycleTod(1), back: () => exitFly(), enter: () => enterFly(), poke: () => poke(),
+      shot: (step) => { const n = shots.length ? shots[(shots.indexOf(shot as Shot) + step + shots.length) % shots.length] : null; if (n) selectShot(n, { play: true }); },
+      flying: () => flying, moving: () => playing || flying, settled: () => settled, ratio: () => pixelRatio, dirty: () => { dirty = true; },
+      // after a context restore the sky (a PMREM render target) and the panes' copies are gone with the GPU's memory: bake the sky again
+      // (the baker caches by preset, so move off it and back) and swap the new panes
+      restored: () => { const cur = api.lighting(), other = Object.keys(api.TIME_OF_DAY).find(k => k !== cur); if (other) api.setLighting(other); api.setLighting(cur); glass.sync(); },
+    },
+  });
+
   // ------------------------------------------------------------------ the frame
   // Resolution follows the device: while the view moves, the presented frame rate (the rAF deltas, so the display's
   // own rate is its ceiling) is averaged over a window of ADAPT.window seconds and at least ADAPT.frames frames, and
@@ -841,7 +868,7 @@ export function mountViewer(api: Api) {
   const renderer = api.renderer;
   let pixelRatio = renderer.getPixelRatio(), perfTime = 0, perfFrames = 0, trial: { fps: number; pr: number } | null = null, settled = false;
   let stepped: number | null = null, upSpent = 0, upTrial: number | null = null, upDone = false;   // the ratio left by the accepted step down; seconds at ≥ upFps; the ratio being tried again
-  const stats = { fps: 0, pixelRatio, settled };
+  const stats: any = { fps: 0, pixelRatio, settled };
   (window as any).__houseViewer = stats;
   function setPixelRatio(pr: number) {
     pixelRatio = pr; stats.pixelRatio = pr;
@@ -849,6 +876,7 @@ export function mountViewer(api: Api) {
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     dirty = true;
   }
+  stats.setPixelRatio = setPixelRatio;   // the platform block's way to move the ratio without ADAPT's variable going stale
   function adapt(delta: number) {
     perfTime += delta; perfFrames++;
     if (perfTime < ADAPT.window || perfFrames < ADAPT.frames) return;
@@ -908,6 +936,7 @@ export function mountViewer(api: Api) {
 
   let wasFlying = false;
   function frame(delta: number) {
+    if ((delta = platform.tick(delta)) < 0) return;   // (a context lost, or the 30 fps cap between two frames)
     if (!ready) return;
     delta = Math.min(delta, 0.25);   // a tab that slept a minute does not skip the shot
     if (playing || flying) adapt(delta); else { perfTime = 0; perfFrames = 0; }
