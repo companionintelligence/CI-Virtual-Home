@@ -194,7 +194,7 @@ export function createSession(host: XrPlayerHost, bus: XrBus): XrSessionImpl {
   }
   /** a later look at the facts (a controller arrived, a pinch showed a transient-pointer): the tier may be a different one */
   function reclassify(l: Live, why: string) {
-    if (l.forced || !l.session || l.sessionEnded) return;
+    if (l.forced || !l.session || l.sessionEnded || l.tier.name === 'vision') return;   // (a pinch's transient-pointer exists only while pinching: once seen, vision stays)
     const c = chooseXrTier(readFacts(l.session, l.mode));
     if (c.tier === l.tier.name && c.gen === l.tier.gen) return;
     // never demote a standalone gen2 on a thin read; a gen1 start is promoted, and a headset that turns out to be a vision / tethered one is moved

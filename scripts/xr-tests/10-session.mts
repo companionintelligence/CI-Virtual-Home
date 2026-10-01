@@ -219,13 +219,13 @@ const QUEST = `(() => { const I = window.IWER; const d = new I.XRDevice(I.metaQu
 const EVENTS = `window.__xrEvents = []; window.addEventListener('vh:xr', e => window.__xrEvents.push(e.detail.state + (e.detail.reason ? ':' + e.detail.reason : '')));`;
 
 let srv: any, browser: any, IWER = '';
-type Page = { page: any; ctx: any; errors: string[]; warnings: string[]; requests: string[]; thirdParty: string[]; sizeWarnFromSync?: boolean };
+type Page = { page: any; ctx: any; errors: string[]; warnings: string[]; requests: string[]; thirdParty: string[]; infos: string[]; sizeWarnFromSync?: boolean };
 async function open(profile: 'quest3' | 'vision' | 'none', query = '', viewport = { width: 1280, height: 720 }): Promise<Page> {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1 });
   const page = await ctx.newPage();
-  const errors: string[] = [], warnings: string[] = [], requests: string[] = [], thirdParty: string[] = [];
-  page.on('pageerror', (e: Error) => errors.push(`pageerror: ${e.message.split('\n')[0]}`));
-  page.on('console', (m: any) => { const t = m.text(); if (m.type() === 'error') errors.push(`console.error: ${t.slice(0, 220)}`); else if (m.type() === 'warning') warnings.push(t.slice(0, 220)); });
+  const errors: string[] = [], warnings: string[] = [], requests: string[] = [], thirdParty: string[] = [], infos: string[] = [];
+  page.on('pageerror', (e: Error) => errors.push(`pageerror: ${e.message.split('\n')[0]} @ ${String(e.stack || '').split('\n').slice(1, 4).map(x => x.trim().replace(srv.origin, '')).join(' < ')}`));
+  page.on('console', (m: any) => { const t = m.text(); if (m.type() === 'error') errors.push(`console.error: ${t.slice(0, 220)}`); else if (m.type() === 'warning') warnings.push(t.slice(0, 220)); else if (m.type() === 'info' && t.startsWith('[xr]')) infos.push(t.slice(0, 300)); });
   page.on('request', (r: any) => { const u = r.url(); requests.push(u); if (!u.startsWith(srv.origin) && !u.startsWith('data:') && !u.startsWith('blob:')) thirdParty.push(u); });
   page.on('requestfailed', (r: any) => { if (!/fonts\.(googleapis|gstatic)\.com/.test(r.url())) errors.push(`request failed ${r.url()}`); });
   if (profile !== 'none') { await page.addInitScript(IWER); await page.addInitScript(profile === 'vision' ? VISION : QUEST); }
@@ -236,7 +236,7 @@ async function open(profile: 'quest3' | 'vision' | 'none', query = '', viewport 
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 240000 });
   await page.waitForFunction(() => document.documentElement.dataset.viewer === 'ready' || document.querySelector('.vh-error:not([hidden])') !== null, null, { timeout: 240000 });
   await sleep(400);
-  return { page, ctx, errors, warnings, requests, thirdParty };
+  return { page, ctx, errors, warnings, requests, thirdParty, infos };
 }
 const events = (page: any): Promise<string[]> => page.evaluate(() => (window as any).__xrEvents.slice());
 const waitEvent = (page: any, name: string, ms = 90000) => page.waitForFunction((n: string) => (window as any).__xrEvents.some((e: string) => e.startsWith(n)), name, { timeout: ms });
@@ -427,7 +427,8 @@ async function contextLoss() {
     // the page draws again: a canvas that is not blank
     const lum = await page.evaluate(() => { const c = document.getElementById('three-canvas') as HTMLCanvasElement; const t = document.createElement('canvas'); t.width = 40; t.height = 30; const g = t.getContext('2d')!; g.drawImage(c, 0, 0, 40, 30); const dd = g.getImageData(0, 0, 40, 30).data; let s = 0; const seen = new Set<number>(); for (let i = 0; i < dd.length; i += 4) { s += dd[i] + dd[i + 1] + dd[i + 2]; seen.add(dd[i] >> 3); } return { mean: s / (dd.length / 4) / 3, levels: seen.size }; });
     ok(lum.levels > 4, `... and after the context returns the page draws the home again (${lum.levels} luminance levels, mean ${lum.mean.toFixed(0)})`);
-    ok(p.errors.filter(e => !/context/i.test(e)).length === 0, `no page error${p.errors.length ? ': ' + p.errors.join(' | ') : ''}`);
+    const mine = p.errors.filter(e => !/context/i.test(e) && !/at onDeviceFrame \(<anonymous>/.test(e));   // (IWER's own device frame reads the lost context and throws inside the emulator; not the page)
+    ok(mine.length === 0, `no page error of ours${mine.length ? ': ' + mine.join(' | ') : ''}${p.errors.length > mine.length ? ` (IWER's own onDeviceFrame threw on the lost context ${p.errors.length - mine.length}x: emulator, not the page)` : ''}`);
     await p.ctx.close();
   }
 }
@@ -441,8 +442,10 @@ async function killSwitch() {
   await off.ctx.close();
   const none = await open('none', '');
   ok(!(await none.page.$('.vh-xr')), 'no navigator.xr (a phone, a laptop): no Enter VR control and no dead button');
-  ok(await none.page.evaluate(() => (window as any).__houseViewer.xr === undefined), 'no navigator.xr: no xr facade either');
-  ok(!none.requests.some(u => /\/assets\/xr\/(session|style|bake|locomotion|rig|loop|controller|hud)\./.test(u)), 'no navigator.xr: none of the session modules was requested');
+  ok(!none.requests.some(u => /\/assets\/xr\/(session|style|bake|locomotion|rig|loop|controller|hud)\./.test(u)), 'no navigator.xr: none of the session modules is requested until someone asks');
+  // (desktop Chromium has a navigator.xr that supports nothing; iPhone Safari has none at all. Either way nothing is shown.)
+  const refused = await none.page.evaluate(async () => { const x = (window as any).__houseViewer.xr; return x ? await x.enter('vr') : { ok: false, reason: 'no-api' }; });
+  ok(!refused.ok && ['unsupported', 'no-api'].includes(refused.reason), `a browser with no VR: enter() says so, it does not throw (${refused.reason})`);
   ok(none.errors.length === 0, `no console error${none.errors.length ? ': ' + none.errors.join(' | ') : ''}`);
   await none.ctx.close();
   // a secure-context-less or unsupported browser: isSessionSupported false
@@ -490,6 +493,7 @@ async function visionProfile() {
   await page.evaluate(async () => { await (window as any).__xrdev.pinch('right', { x: 0, y: 1.2, z: -2 }); });
   await sleep(500);
   const d1 = await page.evaluate(() => (window as any).__houseViewer.xr.debug());
+  if (d1.tier.name !== 'vision') for (const i of p.infos) note(i);
   ok(d1.tier.name === 'vision', `the first transient-pointer source moves the tier to vision (${d1.tier.name})`);
   ok(d1.budget.foveation === null && d1.budget.refreshHz.start === 90, 'the vision budget is in force (no foveation control, 90 Hz)');
   await page.screenshot({ path: path.join(SHOTS, '10-vision-in-session.png') });
