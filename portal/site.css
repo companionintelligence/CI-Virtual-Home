@@ -137,7 +137,7 @@ h1, h2, h3, h4, p, ul, ol, dl, figure { margin: 0; }
 
 /* ---------------- buttons, chips, discs ---------------- */
 .btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  display: inline-flex; text-align: center; align-items: center; justify-content: center; gap: 9px;
   min-height: 46px; padding: 0 20px; border-radius: 999px; border: 0; cursor: pointer;
   font-weight: 700; font-size: 15px; text-decoration: none;
   transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
@@ -186,7 +186,10 @@ a.chip:hover { background: var(--pg-hairline); }
 }
 @media (max-width: 520px) {
   .brand-text span { display: none; }
-  .head-cta { padding: 0 14px; }
+  .brand-text b { font-size: 14px; white-space: nowrap; }
+  .head-cta { padding: 0 12px; font-size: 13px; white-space: nowrap; min-height: 36px; }
+  .site-head { gap: 6px; }
+  .menu-btn { width: 40px; }
 }
 @media (pointer: coarse) { .site-foot a { min-height: 44px; } }
 @media (prefers-reduced-motion: reduce) {

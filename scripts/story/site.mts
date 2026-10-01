@@ -139,6 +139,7 @@ export async function buildStorySite(o: { ROOT: string; OUT: string; SITE: strin
   let fontUrl = '';
   if (fs.existsSync(fontSrc)) fontUrl = putHashed(fontSrc, path.join('portal', 'fonts'), 'archivo-black.woff2');
   else problem('portal/fonts/archivo-black.woff2 is missing');
+  if (fs.existsSync(pic(path.join('portal', 'fonts', 'LICENSE-Archivo-Black.txt')))) put(path.join('portal', 'fonts', 'LICENSE-Archivo-Black.txt'), fs.readFileSync(pic(path.join('portal', 'fonts', 'LICENSE-Archivo-Black.txt'))));   // (OFL: the licence travels with the font)
   const css = path.join(OUT, 'portal', 'site.css');
   if (fs.existsSync(css) && fontUrl) fs.writeFileSync(css, fs.readFileSync(css, 'utf8').replace('fonts/archivo-black.woff2', fontUrl.replace(/^portal\//, '')));
 

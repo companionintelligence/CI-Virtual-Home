@@ -133,6 +133,6 @@ export function cardOf(s: Story, ctx: { catalog: Loaded['catalog']; order: strin
 export const ogKey = (text: { kicker: string; title: string; line1: string; line2: string }, base: Uint8Array): string =>
   hash10(JSON.stringify(text) + sha256(base));
 export function ogText(kind: 'family' | 'home', s?: Story): { kicker: string; title: string; line1: string; line2: string } {
-  if (kind === 'home' || !s) return { kicker: 'COMPANION CORE · FICTIONAL FAMILIES', title: 'Uncloud your life', line1: 'Thirty fictional families.', line2: 'Real software.' };
+  if (kind === 'home' || !s) return { kicker: 'COMPANION CORE · FICTIONAL FAMILIES', title: 'Uncloud your life with Companion Core', line1: 'Thirty fictional families.', line2: 'Walk through their homes in 3D and see what stays at home.' };
   return { kicker: 'COMPANION CORE · FICTIONAL FAMILY', title: familyTitle(s), line1: addressLine(s), line2: s.family.tagline };
 }
