@@ -67,7 +67,7 @@ for (const house of HOUSES) {
       const mk = (x: number) => { const c = new THREE.PerspectiveCamera(96, ew / eh, 0.1, 160); c.position.copy(camera.position); c.quaternion.copy(camera.quaternion); c.translateX(x); c.updateMatrixWorld(true); c.viewport = new THREE.Vector4(x < 0 ? 0 : ew, 0, ew, eh); return c; };
       const L = mk(-ipd / 2), R = mk(ipd / 2); const ac = new THREE.ArrayCamera([L, R]); ac.position.copy(camera.position); ac.quaternion.copy(camera.quaternion); ac.updateMatrixWorld(true);
       ac.projectionMatrix.copy(L.projectionMatrix); ac.projectionMatrixInverse.copy(L.projectionMatrix.clone().invert());
-      const rt = new THREE.WebGLRenderTarget(ew * 2, eh, { samples: 4 });
+      const rt = new THREE.WebGLRenderTarget(ew * 2, eh, { samples: 4, colorSpace: r.outputColorSpace }); rt.isXRRenderTarget = true;   // as WebXRManager marks its own target: the programs are the XR frame's
       const Y = new THREE.Vector3(0, 1, 0);
       const measure = (frames: number) => {
         const prt = r.getRenderTarget(), au = r.shadowMap.autoUpdate, nu = r.shadowMap.needsUpdate, xe = r.xr.enabled;

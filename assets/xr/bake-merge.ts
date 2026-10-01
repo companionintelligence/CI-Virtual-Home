@@ -263,13 +263,18 @@ export function mutableMaterials(scene: any): Set<any> {
 
 // ---------------------------------------------------------------------------------------------------------------- merge
 
-export interface BuildResult { merged: Merged[]; kit: MatKit; geometries: any[]; bytes: number; tris: number; groups: number }
+export interface BuildResult {
+  merged: Merged[]; kit: MatKit; geometries: any[]; bytes: number; tris: number; groups: number;
+  /** source meshes whose material object the XR mesh uses as it is (fixtures, glow): their 2D program is replaced by the XR one until they are drawn again */
+  ownSources: any[];
+}
 
 type Item = { piece: Piece; range: Range; mat: any; flat: boolean };
 
 /** Group the pieces by (cell, storey, material bucket, shadow flags, frame) and build one mesh per group (split at 65 000 vertices). */
 export function buildMerged(THREE: any, plan: Plan, opts: BakeOptions, mutable: Set<any>): BuildResult {
   const kit = createMatKit(THREE, opts.textureCapPx, mutable);
+  const ownSources = new Set<any>();
   const groups = new Map<string, { items: Item[]; mat: any; flat: boolean; level: number; cell: string; frame: Frame; cast: boolean; recv: boolean; ro: number; mask: number; uv: boolean }>();
   for (const p of plan.pieces) {
     const level = p.ground ? -1 : levelAt(opts.levels, p.frame ? p.frame.getWorldPosition(new THREE.Vector3()).y : p.cy);
@@ -281,6 +286,7 @@ export function buildMerged(THREE: any, plan: Plan, opts: BakeOptions, mutable: 
       let g = groups.get(key);
       if (!g) { g = { items: [], mat: r.mat, flat: r.flat, level, cell, frame: p.frame, cast: p.cast, recv: p.recv, ro: p.ro, mask: p.mask, uv }; groups.set(key, g); }
       g.items.push({ piece: p, range, mat: r.mat, flat: r.flat });
+      if (r.mat === range.mat) ownSources.add(p.mesh);
     }
   }
 
@@ -371,5 +377,5 @@ export function buildMerged(THREE: any, plan: Plan, opts: BakeOptions, mutable: 
       merged.push({ mesh, frame: g.frame, box, level: g.level, tris: ni / 3, verts, bytes: mbytes, kind: g.flat ? 'flat' : 'textured', cell: g.cell });
     }
   }
-  return { merged, kit, geometries, bytes, tris, groups: groups.size };
+  return { merged, kit, geometries, bytes, tris, groups: groups.size, ownSources: [...ownSources] };
 }

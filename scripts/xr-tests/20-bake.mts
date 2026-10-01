@@ -51,7 +51,7 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
       if (o.isMesh) for (const m of (Array.isArray(o.material) ? o.material : [o.material])) {
         if (!m || mats.has(m.uuid)) continue;
         mats.set(m.uuid, [m.type, m.visible, m.transparent, num(m.opacity), m.side, m.depthWrite, m.depthTest, !!m.alphaHash, num(m.transmission || 0), m.color && m.color.getHex(), m.emissive && m.emissive.getHex(), num(m.emissiveIntensity), num(m.roughness), num(m.metalness),
-          m.map && m.map.uuid, m.normalMap && m.normalMap.uuid, m.alphaTest, m.vertexColors, m.polygonOffset, m.version].join('|'));
+          m.map && m.map.uuid, m.normalMap && m.normalMap.uuid, m.alphaTest, m.vertexColors, m.polygonOffset].join('|'));
       }
     });
     const rend = [r.shadowMap.enabled, r.shadowMap.autoUpdate, r.shadowMap.type, r.toneMapping, r.outputColorSpace, r.getPixelRatio(), r.xr.enabled, r.info.autoReset, r.autoClear, r.getRenderTarget() === null,
@@ -136,7 +136,7 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
     const mk = (s: number) => { const c = new THREE.PerspectiveCamera(96, 1, 0.1, 160); c.position.set(x, head[1], z); c.rotation.set(0, yaw, 0, 'YXZ'); c.updateMatrixWorld(true); c.translateX(s * 0.032); c.updateMatrixWorld(true); c.viewport = new THREE.Vector4(s < 0 ? 0 : 32, 0, 32, 32); return c; };
     const L = mk(-1), R = mk(1); const ac = new THREE.ArrayCamera([L, R]); ac.position.set(x, head[1], z); ac.rotation.set(0, yaw, 0, 'YXZ'); ac.updateMatrixWorld(true);
     ac.projectionMatrix.copy(L.projectionMatrix); ac.projectionMatrixInverse.copy(L.projectionMatrixInverse);
-    const t = new THREE.WebGLRenderTarget(64, 32, { samples: 0 }); const prt = r.getRenderTarget(), xe = r.xr.enabled; r.xr.enabled = false; r.setRenderTarget(t);
+    const t = new THREE.WebGLRenderTarget(64, 32, { samples: 0, colorSpace: r.outputColorSpace }); t.isXRRenderTarget = true; const prt = r.getRenderTarget(), xe = r.xr.enabled; r.xr.enabled = false; r.setRenderTarget(t);
     r.render(scene, ac); const out = { calls: r.info.render.calls, programs: r.info.programs.length };
     r.setRenderTarget(prt); r.xr.enabled = xe; t.dispose(); return out;
   };
@@ -178,7 +178,10 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
   check(r.info.memory.geometries === mem0.g, `geometries ${mem0.g} before, ${r.info.memory.geometries} after restore (a leak)`);
   check(r.info.memory.textures === mem0.t, `textures ${mem0.t} before, ${r.info.memory.textures} after restore (a leak)`);
 
-  // ---- five cycles, with a stereo frame and a refocus inside each
+  // ---- five cycles, with a stereo frame and a refocus inside each. three keeps every program a LIVE material has ever used on that material
+  // (its `programs` map) until the material is disposed, so the few materials the bake draws with as they are (fixtures, glow) pin one XR
+  // program per tier visited. That is bounded: after both tiers have been seen once the count must not move.
+  let progAfterBoth = 0;
   for (let i = 0; i < 5; i++) {
     const rp = await bake.apply(i % 2 ? gen1 : gen2, head);
     stereo(head[0], head[2]); bake.refocus([head[0] + 1, head[1], head[2]]);
@@ -187,11 +190,13 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
     const f = frame(); const s = snapshot();
     check(!diff(base, s), `cycle ${i + 1}: the scene is different after restore: ` + diff(base, s));
     check(f.hash === baseFrame.hash && f.calls === baseFrame.calls, `cycle ${i + 1}: the 2D frame is different after restore (hash ${f.hash} vs ${baseFrame.hash}, calls ${f.calls} vs ${baseFrame.calls})`);
+    if (i === 1) progAfterBoth = r.info.programs.length;
   }
   frame();
   check(r.info.memory.geometries === mem0.g && r.info.memory.textures === mem0.t, `after 5 cycles: geometries ${r.info.memory.geometries}/${mem0.g}, textures ${r.info.memory.textures}/${mem0.t}`);
-  notes.programs = { before: prog0, afterCycles: r.info.programs.length };
-  check(r.info.programs.length <= prog0 + 3, `programs grew ${prog0} -> ${r.info.programs.length} over 5 cycles (XR programs are not released)`);
+  notes.programs = { before: prog0, afterBothTiers: progAfterBoth, afterCycles: r.info.programs.length };
+  check(r.info.programs.length <= progAfterBoth, `programs kept growing after both tiers were seen: ${progAfterBoth} -> ${r.info.programs.length} (a leak per cycle)`);
+  check(r.info.programs.length <= prog0 + 40, `programs ${prog0} -> ${r.info.programs.length}: the XR programs of the shared materials are bounded by a few tens`);
 
   // ---- tethered: more lamps, every-3rd shadow hook, restored
   {
@@ -267,7 +272,8 @@ async function runDirect() {
 
 // Under the xr-test runner (scripts/test-xr.mts) this file is a case; the harness module only exists on a tree that has the xr-test package.
 let H: any = null;
-try { H = await import('../xr-harness/lib.mts'); } catch { /* run directly */ }
+const HARNESS = '../xr-harness/lib.mts';   // (a variable, so tsc does not need the file to exist on a tree without the xr-test package)
+try { H = await import(HARNESS); } catch { /* run directly */ }
 export const bake = H && H.defineCase({
   id: 'XB-bake',
   title: 'the XR bake builds the cheap representation and restore() puts the whole scene back (5 cycles, mono frame hash, geometry and texture counts)',

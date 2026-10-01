@@ -60,6 +60,7 @@ export function createBake(host: XrHost): XrBakeImpl {
   let levels: Array<{ y: number; h: number }> = [];
   let last: BakeReport | null = null, lastDetail: BakeDetail | null = null;
   let kit: MatKit | null = null;
+  let warming: Promise<void> | null = null, warmPending = false;
 
   const xrLevels = (): Array<{ y: number; h: number }> => {
     let a: any = null;
@@ -90,7 +91,10 @@ export function createBake(host: XrHost): XrBakeImpl {
 
   function sweep(head: V3, timed: boolean): { calls: number[]; tris: number[]; submitMs: number } {
     const w = 32, h = 32;
-    const rt = new THREE.WebGLRenderTarget(w * 2, h, { samples: 0 });
+    // marked the way WebXRManager marks its own target (isXRRenderTarget, the output colour space), so three picks the SAME program variants the
+    // XR frame will use: a plain target would compile (synchronously) a linear-output twin of every program that no headset frame ever draws with
+    const rt = new THREE.WebGLRenderTarget(w * 2, h, { samples: 0, colorSpace: renderer.outputColorSpace });
+    rt.isXRRenderTarget = true;
     const prevRt = renderer.getRenderTarget(), prevXr = renderer.xr.enabled;
     const calls: number[] = [], tris: number[] = [];
     let submitMs = 0;
@@ -134,32 +138,54 @@ export function createBake(host: XrHost): XrBakeImpl {
   // the scene, including the hidden 2D originals, and switch them to the XR light count (and the 2D player would then relink them all when the
   // person leaves). So it is given a throwaway group of TWIN meshes (same geometry, material and the flags that are part of three's program
   // key) for only the materials XR draws; the real scene supplies the lights, fog and environment.
-  async function warm(plan: Plan, xrMeshes: any[]): Promise<BakeDetail['warm']> {
-    const t0 = performance.now();
-    const programsBefore = renderer.info.programs ? renderer.info.programs.length : 0;
-    const seen = new Set<string>(), group = new THREE.Group();
-    const twin = (src: any) => {
+  const makeTwins = (meshes: any[], seen: Set<string>): any[] => {
+    const out: any[] = [];
+    for (const src of meshes) {
       const mats = Array.isArray(src.material) ? src.material : [src.material];
       const key = `${mats.map((m: any) => m && m.uuid).join(',')}|${src.isInstancedMesh ? 'i' : 'm'}${src.instanceColor ? 'c' : ''}|${src.receiveShadow ? 1 : 0}|${Object.keys(src.geometry.attributes).sort().join(',')}`;
-      if (seen.has(key)) return;
+      if (seen.has(key)) continue;
       seen.add(key);
       const t = src.isInstancedMesh ? new THREE.InstancedMesh(src.geometry, src.material, 1) : new THREE.Mesh(src.geometry, src.material);
       if (src.isInstancedMesh && src.instanceColor) t.setColorAt(0, new THREE.Color());
       t.receiveShadow = src.receiveShadow; t.castShadow = src.castShadow;
-      group.add(t);
-    };
-    for (const m of xrMeshes) twin(m);
-    for (const m of plan.keptMeshes) if (m.isMesh) twin(m);
-    // roofs and ceilings come and go with the head (xr-locomotion): their programs must be ready before the first time they show
+      out.push(t);
+    }
+    return out;
+  };
+  // The meshes XR leaves as built that come and go with the head (roofs, ceilings, door leaves) or stay (the screen, instanced cans). Their
+  // programs are rebuilt for the XR light count at apply() and for the 2D one at restore(), so neither the first roof shown in a headset nor the
+  // first one shown after leaving it stops the frame to link.
+  const keptMeshesOf = (plan: Plan): any[] => {
+    const out = new Set<any>(plan.keptMeshes.filter(m => m.isMesh));
     scene.traverse((o: any) => {
-      if (!o.isMesh || o.userData.xrBake) return;
-      for (let a = o.parent; a; a = a.parent) if (a.userData && (a.userData.isRoof || a.userData.isCeiling || a.userData.door)) { twin(o); return; }
+      if (!o.isMesh || (o.userData && o.userData.xrBake)) return;
+      for (let a = o.parent; a; a = a.parent) if (a.userData && (a.userData.isRoof || a.userData.isCeiling)) { out.add(o); return; }
     });
+    return [...out];
+  };
+
+  function relinkKept(twins: any[]): void {
+    if (!twins.length || typeof renderer.compileAsync !== 'function') return;
+    try {
+      const g = new THREE.Group();
+      for (const t of twins) g.add(t);
+      Promise.resolve(renderer.compileAsync(g, host.camera, scene)).catch(() => {});
+    } catch (err) { console.warn('xr bake: relinking the 2D programs failed; they link on first use', err); }
+  }
+
+  async function warm(twins: any[]): Promise<BakeDetail['warm']> {
+    const t0 = performance.now();
+    const programsBefore = renderer.info.programs ? renderer.info.programs.length : 0;
+    const group = new THREE.Group();
+    for (const t of twins) group.add(t);
     let timedOut = false, ok = true;
     if (typeof renderer.compileAsync === 'function' && group.children.length) {
       let timer = 0;
       try {
+        // (the owned materials are not disposed while this poll is in flight: three reads their programs on a timer and throws if they are gone)
         const p: Promise<unknown> = Promise.resolve(renderer.compileAsync(group, host.camera, scene));
+        warmPending = true;
+        warming = p.then(() => { warmPending = false; }, () => { warmPending = false; });
         await Promise.race([p, new Promise(r => { timer = window.setTimeout(() => { timedOut = true; r(null); }, WARM_TIMEOUT_MS); })]);
       } catch (err) { ok = false; console.warn('xr bake: shader warm-up failed, the first frame compiles what is left', err); }
       finally { window.clearTimeout(timer); }
@@ -223,6 +249,9 @@ export function createBake(host: XrHost): XrBakeImpl {
       const tc = performance.now();
 
       // ---- commit
+      // (pushed first, so run last: after the lights and visibility are back, link the 2D programs of the meshes XR left as built)
+      const keptTwinsRef: any[] = [];
+      undo.push(() => relinkKept(keptTwinsRef));
       const root = new THREE.Group(); root.name = 'XR bake'; root.userData = { xrBake: true }; root.matrixAutoUpdate = false;
       scene.add(root);
       undo.push(() => { if (root.parent) root.parent.remove(root); });
@@ -231,7 +260,11 @@ export function createBake(host: XrHost): XrBakeImpl {
         m.mesh.updateMatrixWorld(true);   // (a frame's child: its world matrix is the pivot's, current now)
         undo.push(() => { if (m.mesh.parent) m.mesh.parent.remove(m.mesh); });
       }
-      undo.push(() => { for (const g of built.geometries) g.dispose(); for (const mt of built.kit.owned) mt.dispose(); for (const t of built.kit.textures) t.dispose(); });
+      undo.push(() => {
+        for (const g of built.geometries) g.dispose();
+        const disposeOwned = () => { for (const mt of built.kit.owned) mt.dispose(); for (const t of built.kit.textures) t.dispose(); };
+        if (warmPending && warming) warming.then(disposeOwned); else disposeOwned();   // (see warm())
+      });
       for (const o of plan.hide) { o.visible = false; undo.push(() => { o.visible = true; }); }
       merged = built.merged;
       lb = collectLights(THREE, scene, budget);
@@ -249,8 +282,12 @@ export function createBake(host: XrHost): XrBakeImpl {
         setLights(lbRef, pickLights(THREE, lbRef, { x: head[0], y: head[1], z: head[2] }));
       };
       place();
-      const xrMeshes = built.merged.map(m => m.mesh);
-      const w = await warm(plan, xrMeshes);
+      const seenTwins = new Set<string>();
+      const keptList = keptMeshesOf(plan);
+      const keptTwins = makeTwins(keptList, seenTwins);
+      // (what restore() relinks for the 2D light count: the meshes left as built, and the originals whose material XR draws with as it is)
+      keptTwinsRef.push(...makeTwins([...keptList, ...built.ownSources], new Set<string>()));
+      const w = await warm([...makeTwins(built.merged.map(m => m.mesh), seenTwins), ...keptTwins]);
       if (gen !== generation) return emptyReport(performance.now() - T0);
 
       const tms = performance.now();
