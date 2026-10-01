@@ -2206,11 +2206,21 @@
     // Spec houses do not use these: their floors come from the kit per house (kit.floor).
     const pageTextures = createTextureLibrary({ THREE, rngFor: key => { let h = 0x811c9dc5; for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 0x01000193); } return mulberry32((h >>> 0) ^ 0x9e3779b9); } });
     const pageFloor = (kind, opts) => { const set = pageTextures.set(kind, opts); set.map.userData.pbr = set; return set.map; };
-    const oakTexture = pageFloor('oak', { color: 0xa0927b });                                           // fine oak planks
-    const terrazzoTexture = pageFloor('terrazzo', { color: 0x22272d, chips: [0xe7e5e4, 0x94a3b8, 0xa8a29e, 0x64748b, 0x3a4450] });   // charcoal terrazzo
-    const concreteTexture = pageFloor('concrete', {});                                                   // polished concrete
-    const phthaloTerrazzoTexture = pageFloor('terrazzo', { color: 0x041620, chips: [0xc5e8dc, 0x00a9a7, 0x0a6358, 0x72ddd4, 0xe8f2f4, 0x073038] });   // CI phthalo terrazzo (brand)
-    const carraraMarbleTexture = pageFloor('marble', {});                                                // Carrara-look marble
+    // Made on first read, not at start-up: the five sets cost about 0.75 s of main-thread time (oak 200 ms, the two
+    // terrazzos 185 and 235, marble 85, concrete 60) and almost no spec house asks for one (the kit makes its own
+    // floors per house: only stair treads, a site's oak and the editor's slabs read these). A set is a pure function
+    // of its kind and options (rngFor hashes the key; nothing here counts creations), so its pixels are the same
+    // whenever it is made, and the seed skip below is what keeps later canvases' streams where they were.
+    const pageTex = {}, pageTexMade = new Set();   // pageTexMade: the maps that exist, for SHARED_TEXTURES
+    const lazyPageFloor = (name, kind, opts) => {
+      let tex = null;
+      Object.defineProperty(pageTex, name, { enumerable: true, get() { if (!tex) { tex = pageFloor(kind, opts); pageTexMade.add(tex); } return tex; } });
+    };
+    lazyPageFloor('oak', 'oak', { color: 0xa0927b });                                           // fine oak planks
+    lazyPageFloor('terrazzo', 'terrazzo', { color: 0x22272d, chips: [0xe7e5e4, 0x94a3b8, 0xa8a29e, 0x64748b, 0x3a4450] });   // charcoal terrazzo
+    lazyPageFloor('phthalo-terrazzo', 'terrazzo', { color: 0x041620, chips: [0xc5e8dc, 0x00a9a7, 0x0a6358, 0x72ddd4, 0xe8f2f4, 0x073038] });   // CI phthalo terrazzo (brand)
+    lazyPageFloor('marble', 'marble', {});                                                // Carrara-look marble
+    lazyPageFloor('concrete', 'concrete', {});                                                   // polished concrete
     textureSeed += 5;   // the five canvases these replace each took a seed; later canvases keep theirs
 
     // Emissive Neural Graph Screen Texture
@@ -3221,9 +3231,8 @@
         const riserH = totalHeight / steps;
         const treadD = run / steps;
         
-        let treadTex = oakTexture;
-        if (treadWood === 'terrazzo' || treadWood === 'phthalo-terrazzo') treadTex = phthaloTerrazzoTexture;
-        if (treadWood === 'marble') treadTex = carraraMarbleTexture;
+        // (the page's sets are made on first read: pick by name, never read the default first)
+        const treadTex = (treadWood === 'terrazzo' || treadWood === 'phthalo-terrazzo') ? pageTex['phthalo-terrazzo'] : treadWood === 'marble' ? pageTex.marble : pageTex.oak;
 
         const treadMat = new THREE.MeshStandardMaterial({ map: treadTex, roughness: 0.35 });
         const steelMat = new THREE.MeshStandardMaterial({ color: 0x1e242b, metalness: 0.85, roughness: 0.3 });
@@ -3379,7 +3388,7 @@
         group.userData = { category: "Architecture", tags: "stairs, spiral, modern" };
 
         const centerMat = new THREE.MeshStandardMaterial({ color: 0x0c323c, metalness: 0.8, roughness: 0.25 });
-        const treadMat = new THREE.MeshStandardMaterial({ map: oakTexture, roughness: 0.35 });
+        const treadMat = new THREE.MeshStandardMaterial({ map: pageTex.oak, roughness: 0.35 });
         const chromeMat = new THREE.MeshStandardMaterial({ color: 0xc5e8dc, metalness: 0.9, roughness: 0.15 });
 
         // Central Vertical Steel Pillar
@@ -3499,10 +3508,7 @@
         group.userData = { category: "Architecture", tags: "floor, slab, upper-level" };
         group.position.y = baseY;
 
-        let floorTex = oakTexture;
-        if (type === 'terrazzo' || type === 'phthalo-terrazzo') floorTex = phthaloTerrazzoTexture;
-        if (type === 'marble') floorTex = carraraMarbleTexture;
-        if (type === 'concrete') floorTex = concreteTexture;
+        const floorTex = (type === 'terrazzo' || type === 'phthalo-terrazzo') ? pageTex['phthalo-terrazzo'] : type === 'marble' ? pageTex.marble : type === 'concrete' ? pageTex.concrete : pageTex.oak;
 
         const floorMat = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.35 });
         const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.7 });
@@ -4512,12 +4518,8 @@
           return group;
         }
 
-        let slabTex = oakTexture;
-        if (type === 'terrazzo' || type === 'phthalo-terrazzo') slabTex = phthaloTerrazzoTexture;
-        if (type === 'charcoal-terrazzo') slabTex = terrazzoTexture;
-        if (type === 'marble' || type === 'carrara-marble') slabTex = carraraMarbleTexture;
-        if (type === 'concrete') slabTex = concreteTexture;
-        if (texture) slabTex = texture;
+        const slabTex = texture || ((type === 'terrazzo' || type === 'phthalo-terrazzo') ? pageTex['phthalo-terrazzo'] : type === 'charcoal-terrazzo' ? pageTex.terrazzo
+          : (type === 'marble' || type === 'carrara-marble') ? pageTex.marble : type === 'concrete' ? pageTex.concrete : pageTex.oak);
 
         const pbr = slabTex.userData && slabTex.userData.pbr, per = slabTex.userData && slabTex.userData.period;
         if (per) { const uv = slabGeo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w / per[0], uv.getY(i) * d / per[1]); }   // metres, not one tile per slab
@@ -6412,7 +6414,7 @@
     }
 
     // Textures owned by the module (shared across many materials) must survive item disposal.
-    const SHARED_TEXTURES = new Set([oakTexture, terrazzoTexture, concreteTexture, phthaloTerrazzoTexture, carraraMarbleTexture, pascalSkyTexture]);
+    const SHARED_TEXTURES = { has: tex => pageTexMade.has(tex) || tex === pascalSkyTexture };   // a set that was never read is on no material
     function disposeObject(obj) {
       obj.traverse(node => {
         if (node.geometry) node.geometry.dispose();
@@ -7603,7 +7605,7 @@
     // -------------------------------------------------------------
     const houseBuilderDeps = {
       THREE, AssetFactory, ProceduralArchitecture, addItemToScene, registerTrackedWall, registerRoof, registerCeiling, fitShadow, setLightingPreset,
-      textures: { oak: oakTexture, terrazzo: terrazzoTexture, 'phthalo-terrazzo': phthaloTerrazzoTexture, marble: carraraMarbleTexture, concrete: concreteTexture }
+      textures: pageTex   // getters: a set is made when the builder first reads it
     };
     // A stream that needs one more page dependency in its builder module adds it on a new line under its own slot —
     // `houseBuilderDeps.raycast = …;` — and reads it there as bctx.extra.<name> (assets/build-context.ts). Insertions

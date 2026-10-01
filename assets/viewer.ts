@@ -995,7 +995,29 @@ export function mountViewer(api: Api) {
     // for the bench and the pixel check: flip the merged meshes in and out on the page that is open (A/B on one GPU state)
     stat.batchOn = (on: boolean) => { if (on && !stat.batch) bake(); else if (!on && stat.batch) { restoreStatic(); stat.batch = null; } dirty = true; return !!stat.batch; };
   }
-  function onHouse({ shotKey = null as string | null, at = 0, play = true } = {}) {
+  // Link the shaders before the loader lifts. The first render otherwise links every program (about 70 on a furnished
+  // home) one after another inside one call, 1 to 1.5 s of frozen page with the loader already fading; here they link
+  // on the driver's own threads (KHR_parallel_shader_compile) and the page keeps painting the loader meanwhile. The
+  // shot's own first frame is put in place first, so the scene is what the first render draws: lights, dressing,
+  // camera. It compiles every mesh's material, hidden or not, so the wall and roof states the dressing flips to later
+  // are mostly there too; depth materials for the sun's map still compile in the first shadow render (a few, small).
+  // Never a reason for an endless loader: an error or a stalled driver ends the wait (4 s) and the first render
+  // compiles what is left as it always did. ?no=compile skips it (A/B timing).
+  const COMPILE_WAIT_MS = 4000;
+  async function precompile(s: Shot, at: number) {
+    if ((params.get('no') || '').split(',').includes('compile') || typeof renderer.compileAsync !== 'function') return;
+    let timer = 0;
+    try {
+      api.useShot(`house:${houseId}:${s.key}`);
+      api.applyFrame(clamp01(at));
+      fitCamera();
+      await Promise.race([renderer.compileAsync(api.scene, camera), new Promise(r => { timer = window.setTimeout(r, COMPILE_WAIT_MS); })]);
+    } catch (err) {
+      console.warn('viewer: precompile skipped', err);
+    } finally { window.clearTimeout(timer); }
+  }
+  async function onHouse({ shotKey = null as string | null, at = 0, play = true } = {}) {
+    const token = loadToken;
     const h = api.house();
     batchHouse(h);
     houseId = h.id;
@@ -1019,6 +1041,8 @@ export function mountViewer(api: Api) {
     // middle in doorways and stairwells, framed a metre from a wall, and is one tap away (and a link can ask for it).
     const s = findShot(shotKey) || findShot(DEFAULT_SHOT) || findShot('door-to-core') || shots[0];
     if (!s) { showError('This home has no camera shots.'); return; }
+    await precompile(s, at);
+    if (token !== loadToken) return;   // another home was asked for meanwhile: its own onHouse takes over
     ready = true;
     if (flying) exitFly();
     selectShot(s, { play, at });
@@ -1040,12 +1064,12 @@ export function mountViewer(api: Api) {
     } catch (err) {
       if (token !== loadToken) return;
       console.warn('viewer: could not load', id, err);
-      if (api.house()) { ready = true; root.dataset.state = 'ready'; toast('That home could not be opened.'); onHouse({ shotKey: keepType, play: false }); }
+      if (api.house()) { ready = true; root.dataset.state = 'ready'; toast('That home could not be opened.'); await onHouse({ shotKey: keepType, play: false }); }
       else showError('That home could not be opened. Pick another from the gallery.');
       return;
     }
     if (token !== loadToken) return;
-    onHouse({ shotKey: keepType, play: !reducedMotion });
+    await onHouse({ shotKey: keepType, play: !reducedMotion });
   }
   function neighbour(step: number): string | null {
     if (!index.length) return null;
@@ -1244,7 +1268,7 @@ export function mountViewer(api: Api) {
     const play = pq === '0' ? false : (pq === '1' || tq === null) && !reducedMotion;
     const tq2 = params.get('tod');
     if (tq2 && api.TIME_OF_DAY[api.lightingName(tq2)]) tod = api.lightingName(tq2);
-    onHouse({ shotKey: params.get('shot'), at, play });
+    await onHouse({ shotKey: params.get('shot'), at, play });
     poke();
   })().catch(err => { console.error('viewer:', err); showError('Something went wrong while opening this home.'); });
 
