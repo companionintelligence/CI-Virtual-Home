@@ -411,7 +411,8 @@ algorithms (value noise and fbm, Henyey-Greenstein, Schlick), not from LYGIA or 
   meets it without a seam. Cloud colour and alpha reach the horizon colour by 4 degrees of elevation.
 - **The environment.** The same function baked once into a 256x128 half-float equirect (the page's own size: another size
   would change the PMREM and recompile every material), through PMREM into `scene.environment`. So glass, water and polished
-  floors reflect clouds, the sun and the colour of the hour. Cached per (preset, palette, sun); a time of day seen before is a
+  floors reflect clouds (half as bright as on the dome: structure to reflect, not a second light), the sun and the colour of
+  the hour. Cached per (preset, palette, sun); a time of day seen before is a
   pointer swap, an unseen one bakes once after a 90 ms debounce (about 1 ms to render plus 5 to 60 ms of PMREM). The new
   environment's irradiance (for a surface facing up, and for the four facing sideways) is measured against the old one's and
   `scene.environmentIntensity` is scaled by the ratio (0.7 to 1.3), so lit surfaces keep the exposure the presets were tuned for.

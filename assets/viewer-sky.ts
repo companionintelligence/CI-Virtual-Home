@@ -248,7 +248,7 @@ export function createSky(ctx: SkyCtx): SkyHandle {
   let detail: any = null;    // the last lighting detail
   let timer: any = null;
   let unsub: void | (() => void) = undefined;
-  const st = { bakes: 0, hits: 0, bakeMs: 0, pmremMs: 0, ratio: 1, drift: false, last: '' };
+  const st: Record<string, any> = { bakes: 0, hits: 0, bakeMs: 0, pmremMs: 0, ratio: 1, raw: [1, 1], drift: false, last: '' };
 
   // ---- parameters from the lighting ----------------------------------------------------------------------------------
   // `p0` is the preset as authored (the page keeps its own sky behind the house at look 2); the environment is lit by
@@ -283,6 +283,10 @@ export function createSky(ctx: SkyCtx): SkyHandle {
     const tint = moon ? u.uMoonCol.value : u.uSunCol.value;
     u.uCloudLit.value.setRGB(1, 1, 1).lerp(tint, moon ? 0.85 : 0.18 + 0.62 * low).multiplyScalar(k);
     u.uCloudShade.value.copy(top).lerp(hor, moon ? 0.6 : 0.35).multiplyScalar(moon ? 0.95 : 0.7);
+    // in the environment the clouds are structure for reflections, not a second light source: a lit cloud overhead at the
+    // dome's brightness would double the sky's irradiance on a house with a heavy seed (measured: up to 2x), so they are
+    // dimmer there
+    if (env) u.uCloudLit.value.multiplyScalar(0.5);
     const seed = fnv1a(ctx.houseId() || 'house');
     u.uSeed.value.set(((seed & 0xffff) / 65535) * 40, (((seed >>> 16) & 0xffff) / 65535) * 40);
     u.uCover.value = clamp((COVER[L.name] ?? 0.5) + (((seed >>> 8) & 0xff) / 255 - 0.5) * 0.08, 0.3, 0.8);
@@ -334,6 +338,7 @@ export function createSky(ctx: SkyCtx): SkyHandle {
       });
       rt.dispose();
       if (!(n.up > 1e-6 && n.side > 1e-6 && o.up > 1e-6 && o.side > 1e-6)) return 1;
+      st.raw = [o.up / n.up, o.side / n.side];
       return clamp(0.5 * (o.up / n.up) + 0.5 * (o.side / n.side), 0.7, 1.3);
     } catch { return 1; }
   }
@@ -405,7 +410,7 @@ export function createSky(ctx: SkyCtx): SkyHandle {
     const hit = cache.get(keyOf(L));
     if (timer) { clearTimeout(timer); timer = null; }
     if (hit || now) { installEnv(bake(L)); return; }
-    envOn = false;   // the page's own environment (just written) shows until the bake lands
+    if (!(current && scene.environment === current.texture)) envOn = false;   // the page's own environment (just written) shows until the bake lands; ours, if still in place, stays
     timer = setTimeout(() => { timer = null; if (!active || hq) return; try { installEnv(bake(lightingOf(detail))); ctx.markDirty(); } catch (e) { console.warn('sky: environment bake failed, the page\'s own stays', e); } }, DEBOUNCE_MS);
   }
 
