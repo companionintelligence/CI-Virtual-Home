@@ -103,6 +103,8 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
   ui/                      the editor's modules: recorder + mp4-mux + webm-mux (Record), timeline, plan-inset, path-overlay,
                            gallery, compare, qa, toast, undo, url-state, format (S6, the editor)
   viewer.ts                the portal's player: shots, scrubber, time of day, path, fly (room-creator ?mode=view)
+  viewer-batch.ts          the player's live-only static batching: merges each toggle unit's static opaque meshes (a third of the draw
+                           calls); only viewer.ts imports it, `?no=batch` switches it off, the recorder / goldens / editor never see it
 content/houses/            <id>.json — the 30 HouseSpecs (source); <id>.plan.json and index.json — derived
 content/house-catalog.json every item type's measured footprint, height and iso parts (derived)
 scenes/                    isometric SVG + Lottie, CAD floor plans, and their manifests (all derived, committed)
