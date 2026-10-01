@@ -1,6 +1,8 @@
 // Checks that more than one case runs, written once: T-LAZY runs checkLazy on the real dist, and the harness self-test runs it on
 // fake trees (fake-xr.mts) that are lazy (it must pass) and eager / heavy / fetching from a CDN (it must fail, each for its own reason).
-import { Fail, foreign, openPage, enterSession, endSession, tickFrames, findEnterButton, hasProductXr, xrRequests, rel, textWeight, sleep, type Ctx, type Tree, type Req } from './lib.mts';
+import fs from 'node:fs';
+import path from 'node:path';
+import { ROOT, sha, Fail, foreign, openPage, enterSession, endSession, tickFrames, findEnterButton, hasProductXr, xrRequests, rel, textWeight, sleep, type Ctx, type Tree, type Req, type P } from './lib.mts';
 
 /** assets/xr/ and its dependencies a session may legitimately pull in; anything else new after the tap is not an XR module. */
 const XR_OK = /^(assets\/xr\/|assets\/platform[^/]*\.js$|assets\/vendor\/three\/webxr\/)/;
@@ -13,7 +15,6 @@ async function settleAfterReady(ms = 1200) { await sleep(ms); }
 /** The four promises of N7 plus the landing page's zero. Throws Fail on the first broken one, naming the URLs. */
 export async function checkLazy(t: Ctx, tree: Tree, o: { house?: string } = {}): Promise<LazyResult> {
   const house = o.house || t.house;
-  const browser = null; void browser;
   // 1. first player load: the entry may mount, the session may not load
   const a = await t.open({ kind: 'player', tree, house });
   await settleAfterReady();
@@ -78,10 +79,6 @@ export async function expectFail(what: string, re: RegExp, fn: () => Promise<unk
 }
 
 // ------------------------------------------------------------------------------------------------------------ offline determinism
-import fs from 'node:fs';
-import path from 'node:path';
-import { ROOT, sha, type P } from './lib.mts';
-
 export const OFFLINE_BASELINE = path.join(import.meta.dirname, 'offline-baseline.json');
 export const OFFLINE_SHOT = 'door-to-core', OFFLINE_RES = '360', OFFLINE_FPS = 60;
 

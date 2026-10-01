@@ -63,7 +63,7 @@ export type Req = { url: string; type: string; at: number; i: number };
 export interface P {
   ctx: any; page: any; tree: Tree; device: Device; url: string;
   errors: string[]; warnings: string[]; requests: Req[];
-  /** errors the case expects (negative controls): they are removed from `errors` when the case asks, never silently */
+  /** a negative control caused errors on purpose: remove the ones matching `re` from `errors` and return them, so the case can assert they happened */
   expect(re: RegExp): string[];
   mark(): number;                                         // an index into `requests`
   since(mark: number): Req[];
@@ -109,7 +109,6 @@ export async function openPage(browser: any, o: OpenOpts): Promise<P> {
     else if (kind === 'editor') await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, house, { timeout: 240000, polling: 100 });
     else await page.waitForLoadState('load', { timeout: 60000 });
   }
-  const expected: RegExp[] = [];
   const p: P = {
     ctx, page, tree, device, url, errors, warnings, requests,
     expect(re) { const hit = errors.filter(e => re.test(e)); for (const e of hit) errors.splice(errors.indexOf(e), 1); return hit; },
@@ -117,7 +116,6 @@ export async function openPage(browser: any, o: OpenOpts): Promise<P> {
     since: (m) => requests.slice(m),
     close: async () => { await ctx.close().catch(() => {}); },
   };
-  void expected;
   return p;
 }
 
