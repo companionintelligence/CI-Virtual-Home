@@ -684,10 +684,12 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "foldergram",
-        "replaces": []
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
       },
-      "capability": "Turn a folder of photos and videos into a private feed with albums and a timeline",
+      "capability": "Back up, search and organise your family photos and videos on your own Core",
       "anchor": {
         "role": "room",
         "room": "kids"
@@ -696,10 +698,11 @@
         "framing": "close"
       },
       "popup": {
-        "title": "The fridge gallery gets a timeline",
-        "body": "Marisol photographs each of Mateo's drawings. Foldergram turns the folder into a feed with albums and a timeline, so last spring's dragon is a scroll away.",
+        "title": "The fridge gallery gets an album",
+        "body": "Marisol photographs each of Mateo's drawings and backs them up to Immich. Last spring's dragon sits in an album, one search away.",
         "chips": [
-          "Foldergram"
+          "Immich",
+          "replaces Google Photos"
         ]
       }
     },
@@ -764,31 +767,33 @@
       }
     },
     {
-      "id": "yard-photos",
+      "id": "yard-sky",
       "chapter": "yard",
-      "member": "marisol",
-      "category": "media",
+      "member": "mateo",
+      "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "immich",
-        "replaces": [
-          "Google Photos"
-        ]
+        "id": "skybro",
+        "replaces": []
       },
-      "capability": "Back up, search and organise your family photos and videos on your own Core",
+      "capability": "Get an alert when a plane, a satellite pass or a meteor shower is overhead, with hyperlocal weather",
       "anchor": {
-        "role": "garden"
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
       },
       "camera": {
         "framing": "wide",
         "eye": "standing"
       },
       "popup": {
-        "title": "Yard days, backed up",
-        "body": "Marisol backs up the afternoon's photos from her phone to Immich. Mateo's fifth year sits in one library on the Core.",
+        "title": "A satellite is a dragon tonight",
+        "body": "At dusk, SkyBro sends Marisol an alert that a satellite is passing overhead. Mateo is sure it is a dragon, and they watch from the patio.",
         "chips": [
-          "Immich",
-          "replaces Google Photos"
+          "SkyBro"
         ]
       }
     },
@@ -822,8 +827,8 @@
   "notes": [
     "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
     "Renter angle: the text says only that the cottage is rented and nothing needs a screwdriver. It does not say the Core can be moved between homes; the sheet does not.",
-    "Home Assistant (living-lamp): the smart plug is hardware the family bought; it is not in the parcel or the 3D scene. No energy or savings claim. The Hub has no USB, Bluetooth or GPIO, so the plug is a home-network device.",
-    "Kiwix (kids-komodo) needs content files downloaded once. The text says \"a copy on the Core\" and makes no offline claim.",
+    "Home Assistant (living-lamp): the smart plug is hardware the family bought; it is not in the parcel or the 3D scene. No energy or savings claim. The Hub has no USB, Bluetooth or GPIO.",
+    "SkyBro (yard-sky) reads outside sky feeds and sends alerts through an outside service (catalog caveat); no local-only claim. Kiwix (kids-komodo) needs content files downloaded once; the text says \"a copy on the Core\".",
     "Docuseal (table-sign): never \"legally binding\". Marisol fills in and signs a PDF form and sends it herself; no remote signing is shown.",
     "Habitica (kitchen-quest) is a chore game with a parent holding the tablet. No learning or behavior claim. Pi-hole (living-dns) is DNS-level blocking only, not parental control.",
     "Nico (OpenClaw) works only inside the Core's own apps, so the OpenClaw web note is not used. The dragon book is invented.",
