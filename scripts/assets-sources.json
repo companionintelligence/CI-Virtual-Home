@@ -1,0 +1,467 @@
+{
+  "_about": "The CC0 sources behind assets/media/assets/ (scripts/prep-assets.mts reads this and writes the hashed files, files.json and assets/media-assets.ts). One entry per asset: where it came from, who made it, why it is CC0 (the evidence), and the transform that makes it a detail map or a prop for the player. Nothing here is a dependency: the sources are downloaded into the gitignored .cache/prep-tools/ and only the converted files are committed.",
+  "budgetBytes": 12582912,
+  "tools": {
+    "@gltf-transform/core": "4.5.1",
+    "@gltf-transform/extensions": "4.5.1",
+    "@gltf-transform/functions": "4.5.1",
+    "@gltf-transform/cli": "4.5.1",
+    "sharp": "0.35.5",
+    "meshoptimizer": "1.3.0"
+  },
+  "userAgent": "ci-virtual-home-prep/1.0 (agents@lifescope.io)",
+  "licences": {
+    "polyhaven": {
+      "licence": "CC0-1.0",
+      "licencePage": "https://polyhaven.com/license",
+      "evidence": "polyhaven.com/license (fetched 2026-10-01): all assets on Poly Haven are CC0, no credit required; the authors are recorded here from https://api.polyhaven.com/info/<id> (that API has no per-asset licence field)"
+    },
+    "ambientcg": {
+      "licence": "CC0-1.0",
+      "licencePage": "https://docs.ambientcg.com/license/",
+      "evidence": "docs.ambientcg.com/license (fetched 2026-10-01): every ambientCG asset is CC0 1.0 Universal"
+    }
+  },
+  "textures": [
+    {
+      "id": "oak-laminate",
+      "source": "polyhaven",
+      "sourceId": "laminate_floor_02",
+      "authors": [
+        "Dario Barresi (processing)",
+        "Charlotte Baglioni (photography)"
+      ],
+      "periodM": 1.7,
+      "kinds": [
+        "oak"
+      ],
+      "tier": 1,
+      "chroma": 0,
+      "contrast": 1,
+      "rotate": 90,
+      "note": "boards run along image u in the photo; the kit lays boards along v (assets/textures.ts oak), so the maps are turned a quarter",
+      "normal": 1.8
+    },
+    {
+      "id": "parquet",
+      "source": "polyhaven",
+      "sourceId": "herringbone_parquet",
+      "authors": [
+        "Jenelle van Heerden (processing)",
+        "Sergej Majboroda (photography)"
+      ],
+      "periodM": 3.4,
+      "kinds": [
+        "herringbone"
+      ],
+      "tier": 1,
+      "chroma": 0,
+      "contrast": 1,
+      "rotUV": -45,
+      "note": "the kit lays its axis-aligned herringbone at 45 degrees; this photo is already a chevron, so that rotation is taken back out",
+      "normal": 1.8
+    },
+    {
+      "id": "concrete-worn",
+      "source": "polyhaven",
+      "sourceId": "concrete_floor_worn_001",
+      "authors": [
+        "Dimitrios Savva (photography)",
+        "Rico Cilliers (processing)"
+      ],
+      "periodM": 3,
+      "kinds": [
+        "concrete"
+      ],
+      "tier": 1,
+      "chroma": 0,
+      "contrast": 0.7
+    },
+    {
+      "id": "concrete-pavement",
+      "source": "polyhaven",
+      "sourceId": "concrete_pavement",
+      "authors": [
+        "Charlotte Baglioni"
+      ],
+      "periodM": 1.8,
+      "kinds": [
+        "concrete:exterior"
+      ],
+      "tier": 1,
+      "chroma": 0,
+      "contrast": 0.7
+    },
+    {
+      "id": "brick",
+      "source": "polyhaven",
+      "sourceId": "red_brick",
+      "authors": [
+        "Rob Tuytel"
+      ],
+      "periodM": 1.9,
+      "kinds": [
+        "brick"
+      ],
+      "tier": 1,
+      "chroma": 0.5,
+      "contrast": 0.8,
+      "note": "the photo has 8.5 bricks across; 1.9 m puts a brick at 215 mm like the kit course (Poly Haven lists 1.4 m)"
+    },
+    {
+      "id": "siding",
+      "source": "polyhaven",
+      "sourceId": "brown_planks_05",
+      "authors": [
+        "Rob Tuytel"
+      ],
+      "periodM": 1.8,
+      "kinds": [
+        "siding"
+      ],
+      "tier": 1,
+      "chroma": 0,
+      "contrast": 0.7,
+      "note": "9 boards in the photo height; 1.8 m makes a board 200 mm like the kit siding (Poly Haven lists 1 m)"
+    },
+    {
+      "id": "stone-wall",
+      "source": "polyhaven",
+      "sourceId": "stone_tile_wall",
+      "authors": [
+        "Charlotte Baglioni"
+      ],
+      "periodM": 2,
+      "kinds": [
+        "stone"
+      ],
+      "tier": 1,
+      "chroma": 0,
+      "contrast": 0.7
+    },
+    {
+      "id": "deck",
+      "source": "polyhaven",
+      "sourceId": "wood_floor_deck",
+      "authors": [
+        "Dimitrios Savva"
+      ],
+      "periodM": 1.8,
+      "kinds": [
+        "deck"
+      ],
+      "tier": 1,
+      "chroma": 0,
+      "contrast": 0.8,
+      "rotate": 90,
+      "note": "same as oak: the kit runs deck boards along v"
+    },
+    {
+      "id": "asphalt",
+      "source": "polyhaven",
+      "sourceId": "asphalt_04",
+      "authors": [
+        "Jenelle van Heerden (processing)",
+        "Sergej Majboroda (photography)"
+      ],
+      "periodM": 4.04,
+      "kinds": [
+        "asphalt"
+      ],
+      "tier": 1,
+      "chroma": 0,
+      "contrast": 0.7
+    },
+    {
+      "id": "clay-tile",
+      "source": "polyhaven",
+      "sourceId": "clay_roof_tiles_02",
+      "authors": [
+        "Amal Kumar"
+      ],
+      "periodM": 2.5,
+      "kinds": [
+        "clay-tile"
+      ],
+      "tier": 1,
+      "chroma": 0.3,
+      "contrast": 0.8
+    },
+    {
+      "id": "tile",
+      "source": "ambientcg",
+      "sourceId": "Tiles107",
+      "authors": [
+        "ambientCG"
+      ],
+      "periodM": 4.8,
+      "kinds": [
+        "tile"
+      ],
+      "tier": 1,
+      "chroma": 0,
+      "contrast": 0.8,
+      "followSet": 1.2,
+      "note": "Tiles107 has 8 tiles across its metre-wide face... measured 8 per image: 0.6 m tiles at the kit default (set period 1.2 m); a finish tile of 0.3 m scales it with the set"
+    }
+  ],
+  "models": [
+    {
+      "id": "vase-01",
+      "source": "polyhaven",
+      "sourceId": "ceramic_vase_01",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "types": [
+        "vase"
+      ],
+      "tier": 1,
+      "group": "vase",
+      "maxTris": 3000,
+      "fit": {
+        "hide": {
+          "first": 3
+        },
+        "mode": "height",
+        "gate": [
+          "y"
+        ],
+        "rotY": 0,
+        "anchorY": "floor"
+      }
+    },
+    {
+      "id": "vase-02",
+      "source": "polyhaven",
+      "sourceId": "ceramic_vase_02",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "types": [
+        "vase"
+      ],
+      "tier": 1,
+      "group": "vase",
+      "maxTris": 3000,
+      "fit": {
+        "hide": {
+          "first": 3
+        },
+        "mode": "height",
+        "gate": [
+          "y"
+        ],
+        "rotY": 0,
+        "anchorY": "floor"
+      }
+    },
+    {
+      "id": "vase-03",
+      "source": "polyhaven",
+      "sourceId": "ceramic_vase_03",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "types": [
+        "vase"
+      ],
+      "tier": 1,
+      "group": "vase",
+      "maxTris": 3000,
+      "fit": {
+        "hide": {
+          "first": 3
+        },
+        "mode": "height",
+        "gate": [
+          "y"
+        ],
+        "rotY": 0,
+        "anchorY": "floor"
+      }
+    },
+    {
+      "id": "vase-04",
+      "source": "polyhaven",
+      "sourceId": "ceramic_vase_04",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "types": [
+        "vase"
+      ],
+      "tier": 1,
+      "group": "vase",
+      "maxTris": 3000,
+      "fit": {
+        "hide": {
+          "first": 3
+        },
+        "mode": "height",
+        "gate": [
+          "y"
+        ],
+        "rotY": 0,
+        "anchorY": "floor"
+      }
+    },
+    {
+      "id": "wall-clock",
+      "source": "polyhaven",
+      "sourceId": "wall_clock",
+      "authors": [
+        "PierreB3D"
+      ],
+      "types": [
+        "wall-clock"
+      ],
+      "tier": 1,
+      "maxTris": 2500,
+      "fit": {
+        "hide": "all",
+        "mode": "width",
+        "gate": [
+          "x",
+          "y"
+        ],
+        "anchorY": "center",
+        "anchorZ": "back"
+      }
+    },
+    {
+      "id": "side-table",
+      "source": "polyhaven",
+      "sourceId": "side_table_01",
+      "authors": [
+        "James Ray Cock"
+      ],
+      "types": [
+        "side-table"
+      ],
+      "tier": 1,
+      "fit": {
+        "hide": "all",
+        "mode": "footprint",
+        "gate": [
+          "x",
+          "z"
+        ],
+        "tol": 0.25,
+        "anchorY": "floor"
+      }
+    },
+    {
+      "id": "coffee-table",
+      "source": "polyhaven",
+      "sourceId": "modern_coffee_table_01",
+      "authors": [
+        "Amin"
+      ],
+      "types": [
+        "coffee-table"
+      ],
+      "tier": 1,
+      "maxTris": 3500,
+      "fit": {
+        "hide": "all",
+        "mode": "footprint",
+        "gate": [
+          "x",
+          "z"
+        ],
+        "rotY": "auto",
+        "tol": 0.25,
+        "anchorY": "floor"
+      }
+    },
+    {
+      "id": "fern",
+      "source": "polyhaven",
+      "sourceId": "fern_02",
+      "authors": [
+        "Rob Tuytel (scanning)",
+        "Rico Cilliers (modeling)"
+      ],
+      "types": [
+        "fern"
+      ],
+      "tier": 1,
+      "fit": {
+        "hide": {
+          "from": 2
+        },
+        "mode": "width",
+        "gate": [
+          "x"
+        ],
+        "tol": 0.35,
+        "anchorY": "floor"
+      }
+    },
+    {
+      "id": "bowl",
+      "source": "polyhaven",
+      "sourceId": "wooden_bowl_02",
+      "authors": [
+        "Kuutti Siitonen"
+      ],
+      "types": [
+        "fruit-bowl"
+      ],
+      "tier": 1,
+      "group": "fruit-bowl",
+      "maxTris": 1200
+    },
+    {
+      "id": "lemon",
+      "source": "polyhaven",
+      "sourceId": "lemon",
+      "authors": [
+        "Kuutti Siitonen"
+      ],
+      "types": [],
+      "tier": 1,
+      "group": "fruit",
+      "maxTris": 600
+    },
+    {
+      "id": "apple",
+      "source": "polyhaven",
+      "sourceId": "food_apple_01",
+      "authors": [
+        "Oliver Harries"
+      ],
+      "types": [],
+      "tier": 1,
+      "group": "fruit",
+      "maxTris": 600
+    }
+  ],
+  "dropped": [
+    {
+      "sourceId": "beige_wall_001",
+      "why": "a smooth painted wall: its albedo is a flat tone and its normal map nearly flat, so after the luma-only normalisation the swap added nothing and, in an A/B still of the aurora stucco walls, replaced the kit's fine stucco grain with a blank surface. The kit keeps its procedural stucco"
+    },
+    {
+      "sourceId": "mid_century_lounge_chair",
+      "why": "dark leather and bent plywood against a kit club chair in oatmeal or white upholstery: the palette tint multiplies the texture, so it cannot lighten a dark one and the chair would break the room palette (judged from the source's materials, not from a render of it in a house)"
+    },
+    {
+      "sourceId": "wooden_display_shelves_01",
+      "why": "a tall open wooden shelf (1.08 x 0.37 x 1.56 m, from the source's bounding box) against the kit cube-storage, a 0.76 m low cubby grid in painted colours: it would fail the fit gate, so it was not adopted"
+    },
+    {
+      "sourceId": "potted_plant_04",
+      "why": "one potted succulent against the kit succulent-tray, a tray of five plants (0.36 x 0.2 m): no honest fit"
+    },
+    {
+      "sourceId": "wicker_basket_01",
+      "why": "a shallow 0.38 x 0.12 m basket against the kit laundry-basket, a 0.6 m hamper with laundry: wrong object"
+    },
+    {
+      "sourceId": "Gravel023",
+      "why": "no procedural kind to replace (the swap list is oak, herringbone, concrete, stucco, brick, siding, stone, asphalt, clay-tile, deck, tile)"
+    }
+  ]
+}
