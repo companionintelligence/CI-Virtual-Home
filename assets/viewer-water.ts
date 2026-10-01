@@ -472,10 +472,12 @@ export function createWater(ctx: RealismCtx): RealismHandle {
     if (oceanState !== 'none' || ctx.no.has('ocean')) return;
     oceanState = 'loading';
     try {
-      if (!ctx.renderer.extensions.has('EXT_color_buffer_float')) throw new Error('no EXT_color_buffer_float');
+      // (?waterdebug=noext: the live check's way of pretending the device has no float render targets)
+      if (ctx.params.get('waterdebug') === 'noext' || !ctx.renderer.extensions.has('EXT_color_buffer_float')) throw new Error('no EXT_color_buffer_float');
       const mod: any = await import('./viewer-ocean.js');
       const o = mod.createOcean(ctx);
       if (!o) throw new Error('ocean refused');
+      o.update(held !== null ? held : ctx.now(), ctx.camera, true, true);   // the first picture, before any pixel reads the map
       ocean = o; oceanState = 'on';
       oceanTex = o.normalMap();
       U.big.uWOcean.value = oceanTex;
@@ -520,7 +522,7 @@ export function createWater(ctx: RealismCtx): RealismHandle {
     tick(dtS: number, tS: number, camera: any) {
       if (!applied) return;
       uTime.value = held !== null ? held : tS % WRAP_S;
-      if (ocean && oceanOn()) { try { ocean.update(uTime.value, camera, visible); } catch (e) { fallback(String((e as Error)?.message || e)); } }
+      if (ocean && oceanOn()) { try { ocean.update(held !== null ? held : tS, camera, visible, held !== null); } catch (e) { fallback(String((e as Error)?.message || e)); } }
       // frames keep coming at 30 Hz while water is on screen (a paused view still moves)
       visCheck += dtS; acc += dtS;
       if (visCheck >= 0.2) {
