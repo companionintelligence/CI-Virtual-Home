@@ -1,0 +1,936 @@
+{
+  "schema": "family/v1",
+  "slug": "oyelaran-brandt",
+  "house": "cocoon",
+  "fictional": true,
+  "family": {
+    "surname": "Oyelaran-Brandt",
+    "tagline": "Eight clients, two kids and one dog, kept in order.",
+    "household": "young-family",
+    "business": true,
+    "story": "Folake keeps the books for eight small clients from the Den. Tobias teaches secondary school and marks at the dining table. Bayo, Hanna and the dog keep the house loud.",
+    "address": {
+      "line": "17 Bramblecott Road",
+      "place": "Netherwick"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "folake",
+      "name": "Folake",
+      "age": 41,
+      "role": "parent",
+      "work": "freelance bookkeeper for eight clients",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Tamar",
+        "runtime": "Hermes",
+        "job": "Drafts monthly client summaries from the notes Folake texts it.",
+        "personality": [
+          "organised",
+          "precise",
+          "calm"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Drafts only. Folake sends every summary."
+      }
+    },
+    {
+      "id": "tobias",
+      "name": "Tobias",
+      "age": 43,
+      "role": "parent",
+      "work": "secondary-school teacher",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Fenn",
+        "runtime": "OpenClaw",
+        "job": "Opens Vikunja in its own browser and files the term's marking tasks.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Adds tasks Tobias names. He ticks them off."
+      }
+    },
+    {
+      "id": "bayo",
+      "name": "Bayo",
+      "age": 10,
+      "role": "child",
+      "work": "school, bunk bed",
+      "colour": "chart-3"
+    },
+    {
+      "id": "hanna",
+      "name": "Hanna",
+      "age": 7,
+      "role": "child",
+      "work": "school, sandbox and swing",
+      "colour": "chart-4"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "family",
+      "kind": "room",
+      "room": "living",
+      "title": "Friday, the family room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "Sunday, the dining table"
+    },
+    {
+      "id": "den",
+      "kind": "room",
+      "room": "office",
+      "title": "The Den, month end"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Upstairs, the kids' rooms"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out back, by the pool"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "tobias",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel on the porch",
+        "body": "A parcel waits on the porch. Tobias carries it through the foyer to the living room, with the dog supervising."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "hanna",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Hanna reads the packing list",
+        "body": "Hanna reads the list: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Its footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "folake",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Folake plugs in the power cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "tobias",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Tobias joins from his phone",
+        "body": "Between two piles of marking, Tobias joins the Core's own network from his phone. Then he picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "folake",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "paperless",
+        "vikunja",
+        "immich"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Folake picks Hermes and Companion Memory (beta). Tobias picks OpenClaw. Together they add Paperless-ngx, Vikunja and Immich, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Paperless-ngx, Vikunja, Immich"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "folake",
+      "agent": "folake",
+      "approval": "folake",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Tamar says hello",
+        "body": "Folake messages the agent she named Tamar. Tamar answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "folake",
+        "text": "Hello, Folake. Tamar here. Where shall we start?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-photos",
+      "chapter": "living",
+      "member": "tobias",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Weekend photos, backed up",
+        "body": "Tobias backs up the weekend's photos to Immich from the couch. The dog in the leaves and Hanna's sandcastle land on the Core, ready to search.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "living-calendar",
+      "chapter": "living",
+      "member": "tobias",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "a small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "fireplace",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Parents' evening meets client calls",
+        "body": "By the fire, Tobias adds the school term dates to Baikal. Folake's phone reads the same calendar, so parents' evening and client calls sit side by side.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      }
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "member": "tobias",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One filter for the whole house",
+        "body": "Tobias opens Pi-hole beside the Core. It blocks ads, trackers and bad domains at the DNS level for every phone and laptop on the home Wi-Fi.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "family-tv",
+      "chapter": "family",
+      "member": "hanna",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "foldergram",
+        "replaces": []
+      },
+      "capability": "turn a folder of photos and videos into a private feed with albums and a timeline",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Summer, scrolling past on the TV",
+        "body": "Friday is photo night. Foldergram turns the summer folder into a private feed on the family-room TV, and Hanna calls out every picture.",
+        "chips": [
+          "Foldergram"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "family-quiz",
+      "chapter": "family",
+      "member": "bayo",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "razzia",
+        "replaces": []
+      },
+      "capability": "run a quiz night for a small group on your own Core",
+      "anchor": {
+        "role": "toys",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Bayo runs the quiz night",
+        "body": "Bayo writes the questions for Friday's family quiz and runs the night in Razzia. Everyone answers from the beanbags, and the dog gets no vote.",
+        "chips": [
+          "Razzia"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-jollof",
+      "chapter": "kitchen",
+      "member": "folake",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses, with a recipe book",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Mother's jollof rice, written once",
+        "body": "Folake types her mother's jollof rice into the HomeHub recipe book. Tobias adds the ingredients to the shared shopping list from his phone.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-month",
+      "chapter": "kitchen",
+      "member": "folake",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "firefly-iii",
+        "replaces": [
+          "YNAB"
+        ]
+      },
+      "capability": "track accounts, budgets, bills and savings goals, with rules that sort your transactions",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The month, sorted by rules",
+        "body": "Folake imports the household's month from a bank CSV into Firefly III. Its rules sort each transaction, and the totals stay on the Core.",
+        "chips": [
+          "Firefly III",
+          "replaces YNAB"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-dog",
+      "chapter": "kitchen",
+      "member": "bayo",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "donetick",
+        "replaces": [
+          "Tody"
+        ]
+      },
+      "capability": "assign and track household chores and recurring tasks, with NFC tag completion",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "A tag by the dog's bowl",
+        "body": "Bayo taps his phone on the tag by the dog's bowl. Donetick marks dinner done, and Tobias sees the tick.",
+        "chips": [
+          "Donetick",
+          "replaces Tody"
+        ]
+      }
+    },
+    {
+      "id": "dining-marking",
+      "chapter": "dining",
+      "member": "tobias",
+      "agent": "tobias",
+      "approval": "tobias",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "vikunja",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "lists, boards and calendars for tasks, with reminders and recurring jobs",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Fenn adds the marking tasks",
+        "body": "Tobias reads out the term's marking deadlines. Fenn opens Vikunja in its own browser and adds each one. Tobias ticks them off himself.",
+        "chips": [
+          "Vikunja",
+          "replaces Todoist"
+        ]
+      },
+      "say": {
+        "speaker": "tobias",
+        "text": "Tasks added. Please check the list."
+      }
+    },
+    {
+      "id": "den-carrier-bag",
+      "chapter": "den",
+      "member": "folake",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A carrier bag of receipts",
+        "body": "A client hands Folake a carrier bag of receipts. She scans them into Paperless-ngx, which reads every page, tags it and makes the lot searchable.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "den-draft",
+      "chapter": "den",
+      "member": "folake",
+      "agent": "folake",
+      "approval": "folake",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Tamar drafts the month's summary",
+        "body": "Folake texts Tamar her notes on a client's month. Tamar drafts the summary from the context Folake connected to Companion Memory. Folake reads it and sends it herself."
+      },
+      "say": {
+        "speaker": "folake",
+        "text": "Draft ready. Please read it before you send it."
+      },
+      "film": true
+    },
+    {
+      "id": "den-time",
+      "chapter": "den",
+      "member": "folake",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "kimai",
+        "replaces": []
+      },
+      "capability": "track time per project and client, with reports",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Hours per client, in one place",
+        "body": "Folake starts a timer in Kimai for each of her eight clients. At month end the report for every one is waiting.",
+        "chips": [
+          "Kimai"
+        ]
+      }
+    },
+    {
+      "id": "den-pdf",
+      "chapter": "den",
+      "member": "folake",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "bentopdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "a PDF toolkit that runs in your browser; nothing is uploaded",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Statements merged into one file",
+        "body": "At month end Folake merges a client's statements into one PDF with BentoPDF. It runs in her browser, and nothing is uploaded.",
+        "chips": [
+          "BentoPDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "den-memory",
+      "chapter": "den",
+      "member": "folake",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk, so your agents know your context",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Folake chooses what to connect",
+        "body": "Folake picks which client notes go into Companion Memory, a file on the Core's disk. The rest stay out, and she can disconnect it whenever she likes."
+      }
+    },
+    {
+      "id": "kids-draw",
+      "chapter": "kids",
+      "member": "hanna",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "tldraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "a shared whiteboard on an infinite canvas",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "One canvas for two artists",
+        "body": "Hanna and Bayo share one tldraw canvas at the kids' desk. She draws the dog, and he adds the speech bubble.",
+        "chips": [
+          "tldraw",
+          "replaces Miro"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-bunk",
+      "chapter": "kids",
+      "member": "bayo",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A chapter before lights out",
+        "body": "Bayo reads his current novel in Koodo Reader from the bunk bed. His place and highlights stay in the library on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "garden-swim",
+      "chapter": "garden",
+      "member": "tobias",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "wingfit",
+        "replaces": []
+      },
+      "capability": "log workouts: sets, reps, weights, distances and personal records",
+      "anchor": {
+        "role": "pool",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Lengths logged by the pool",
+        "body": "Tobias swims before breakfast and logs the distance in Wingfit on the pool terrace. His personal records sit in one list on the Core.",
+        "chips": [
+          "Wingfit"
+        ]
+      }
+    },
+    {
+      "id": "garden-walk",
+      "chapter": "garden",
+      "member": "folake",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "wanderer",
+        "replaces": []
+      },
+      "capability": "plan, map and share hiking and biking routes from GPX files",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Sunday's dog walk, mapped",
+        "body": "On Sunday morning Folake plans the dog walk in Wanderer. She loads a GPX file, and the saved route lives on the Core.",
+        "chips": [
+          "Wanderer"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Four people, one dog, one Core",
+        "body": "A bookkeeper, a teacher, two children and a dog. The Oyelaran-Brandt household runs on one Companion Core in the living room."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your receipts, your calendar and your carrier bags can live on a Companion Core at home. Start with one scan in Paperless-ngx.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Client ledgers care note: the Den beats say the files sit on the Core and make no compliance, tax or accuracy claim. Folake sends every summary herself.",
+    "kitchen-dog uses Donetick's NFC tag completion for the iot category. The catalog caveat says Donetick notifications use Telegram or Pushover; the text claims neither.",
+    "kitchen-month: bank CSV import only (catalog caveat: bank sync goes through outside providers). Firefly III is a bookkeeping tool: no advice, no savings promise.",
+    "den-pdf and den-carrier-bag: BentoPDF \"nothing is uploaded\" and Paperless-ngx OCR are copied from the catalog listings. Paperless-ngx AI features are off by default and unused.",
+    "Mealie was not used (no QA screenshot); HomeHub carries the recipe book. Jellyfin was left out for fleet spread. The dog is a pet: no pet app is claimed.",
+    "Voice-over lexicon: Oyelaran, Folake, Tobias, Bayo, Hanna, Tamar, Fenn, Netherwick, Bramblecott, Foldergram, Razzia, Kimai, BentoPDF, Wingfit, Wanderer, tldraw, Donetick, Vikunja.",
+    "Street Bramblecott Road and town Netherwick are invented; the human map check is still open."
+  ]
+}
