@@ -58,7 +58,7 @@ async function unitTests() {
   function world(opts: { reduced?: boolean } = {}) {
     const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
     const head = new THREE.Vector3(0.4, 1.6, -0.2), q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 6);
-    const renderer = { xr: { isPresenting: true, getCamera: () => ({ cameras: [{ position: head.clone().add(new THREE.Vector3(-0.03, 0, 0)) }, { position: head.clone().add(new THREE.Vector3(0.03, 0, 0)) }], quaternion: q }) } };
+    const renderer = { xr: { isPresenting: true, getCamera: () => ({ cameras: [{ position: head.clone().add(new THREE.Vector3(-0.03, 0, 0)), quaternion: q }, { position: head.clone().add(new THREE.Vector3(0.03, 0, 0)), quaternion: q }], quaternion: q }) } };
     const rig = createRig({ THREE, renderer, scene, camera, reducedMotion: opts.reduced });
     rig.attach();
     return { rig, scene, camera, head, q };
