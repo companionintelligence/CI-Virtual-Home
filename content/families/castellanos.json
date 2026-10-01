@@ -1,0 +1,832 @@
+{
+  "schema": "family/v1",
+  "slug": "castellanos",
+  "house": "cutestarter",
+  "fictional": true,
+  "family": {
+    "surname": "Castellanos",
+    "tagline": "A small rental, a drawing table, and a Core on the shelf.",
+    "household": "young-family",
+    "business": true,
+    "story": "Marisol illustrates and translates children's books from a rented cottage in Piedra Lisa. Her son Mateo, who is five, names every dragon she draws. Their drafts, drawings and bedtime stories sit on one Companion Core.",
+    "address": {
+      "line": "5 Cottonwood Alley",
+      "place": "Piedra Lisa"
+    },
+    "narrator": "v-bright-f"
+  },
+  "members": [
+    {
+      "id": "marisol",
+      "name": "Marisol",
+      "age": 34,
+      "role": "parent",
+      "work": "freelance illustrator and children's-book translator",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Nico",
+        "runtime": "OpenClaw",
+        "job": "Opens LibreTranslate in its own browser and runs a first pass on a paragraph.",
+        "personality": [
+          "curious",
+          "gentle",
+          "bright"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "First pass only. Marisol edits every line."
+      }
+    },
+    {
+      "id": "mateo",
+      "name": "Mateo",
+      "age": 5,
+      "role": "child",
+      "work": "kindergarten",
+      "colour": "chart-2"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "A galley for two"
+    },
+    {
+      "id": "table",
+      "kind": "room",
+      "room": "dining",
+      "title": "The drawing table"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Mateo's corner"
+    },
+    {
+      "id": "yard",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The little yard"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Everything on one shelf"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "marisol",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel for a rented cottage",
+        "body": "A parcel waits at the cottage door. Marisol carries it straight to the shelf in the living room. The cottage is rented, so nothing here needs a screwdriver."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "mateo",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mateo opens the parcel",
+        "body": "Mateo opens the parcel. Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "marisol",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "One plug, one button",
+        "body": "Marisol plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "marisol",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Marisol joins the Core's own network on her phone while Mateo reads the list aloud. Then she picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "marisol",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "libretranslate",
+        "inkscape",
+        "nextcloud"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In Companion Hub, Marisol picks OpenClaw and adds LibreTranslate, Inkscape and Nextcloud. Then she walks away to start dinner.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: OpenClaw",
+            "Apps: LibreTranslate, Inkscape",
+            "App: Nextcloud"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "marisol",
+      "agent": "marisol",
+      "approval": "marisol",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "OpenClaw is an agent with its own browser and coding tools, running in its own sandbox, with iOS",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Nico says hello",
+        "body": "Marisol sends the first message to the agent she named Nico. Nico answers, and the Core is running."
+      },
+      "say": {
+        "speaker": "marisol",
+        "text": "Hello, Marisol. Nico here. Which page first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-story",
+      "chapter": "living",
+      "member": "mateo",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "Listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A story that keeps its place",
+        "body": "Mateo curls up on the loveseat while Audiobookshelf plays the next chapter. It remembers where he stopped last night.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-lamp",
+      "chapter": "living",
+      "member": "marisol",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The lamp keeps a schedule",
+        "body": "Marisol puts the drawing lamp on a smart plug. Home Assistant switches it on at dusk from the Core, and nothing is wired into the cottage's walls.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "member": "marisol",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "Block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "One filter for every device",
+        "body": "Marisol points the home network at Pi-hole on the Core. Ads and trackers get blocked at the DNS level for every phone and tablet in the cottage.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "marisol",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One list, two sets of hands",
+        "body": "Marisol adds tortillas to the shared list in KitchenOwl at the counter. Mateo insists the mango goes on it too.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-quest",
+      "chapter": "kitchen",
+      "member": "mateo",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "habitica",
+        "replaces": [
+          "Habitify"
+        ]
+      },
+      "capability": "Turn habits and chores into a game with levels and quests",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Setting the table is a quest",
+        "body": "Mateo's job is setting the table. In Habitica, every night he finishes it, a dragon levels up on Marisol's tablet.",
+        "chips": [
+          "Habitica",
+          "replaces Habitify"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-subs",
+      "chapter": "kitchen",
+      "member": "marisol",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "Track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "A reminder before each renewal",
+        "body": "Marisol opens Wallos at the counter. It lists the subscriptions the household pays for and reminds her before each one renews. She decides which stay.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      }
+    },
+    {
+      "id": "table-sketch",
+      "chapter": "table",
+      "member": "marisol",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "Draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The dragon gets clean lines",
+        "body": "At the drawing table, Marisol turns a pencil dragon into clean vector line art in Inkscape. It runs in her browser, and the file stays on the Core.",
+        "chips": [
+          "Inkscape",
+          "replaces Adobe Illustrator"
+        ]
+      }
+    },
+    {
+      "id": "table-translate",
+      "chapter": "table",
+      "member": "marisol",
+      "agent": "marisol",
+      "approval": "marisol",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "Translate text and documents on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Nico takes the first pass",
+        "body": "Marisol sends Nico a paragraph of the dragon book. Nico opens LibreTranslate in its own browser and runs a first pass. Marisol edits every line.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      },
+      "say": {
+        "speaker": "marisol",
+        "text": "First pass done. Please edit every line."
+      },
+      "film": true
+    },
+    {
+      "id": "table-files",
+      "chapter": "table",
+      "member": "marisol",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "Your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "Every draft in one folder",
+        "body": "Marisol keeps the dragon book's drafts and sketches in one Nextcloud folder. It syncs to her laptop and her phone over the home Wi-Fi.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "table-proof",
+      "chapter": "table",
+      "member": "marisol",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "Merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Finished pages, one proof",
+        "body": "Marisol merges the finished pages into a single proof PDF with Stirling-PDF. The merge runs on the Core, and she prints it to mark up with a pen.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "table-sign",
+      "chapter": "table",
+      "member": "marisol",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "docuseal",
+        "replaces": [
+          "DocuSign"
+        ]
+      },
+      "capability": "Fill and sign PDF forms on any device, from your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A contract, signed at the table",
+        "body": "The publisher's contract is a PDF form. Marisol fills it in and signs it in Docuseal. The file sits on the Core until she sends it herself.",
+        "chips": [
+          "Docuseal",
+          "replaces DocuSign"
+        ]
+      }
+    },
+    {
+      "id": "kids-cave",
+      "chapter": "kids",
+      "member": "mateo",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "A whiteboard with a hand-drawn look",
+      "anchor": {
+        "role": "toys",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mateo draws the dragon's cave",
+        "body": "Mateo scribbles the dragon's cave on an Excalidraw whiteboard beside the toy box. Marisol adds a door, and they argue about dragons.",
+        "chips": [
+          "Excalidraw",
+          "replaces Miro"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-komodo",
+      "chapter": "kids",
+      "member": "marisol",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "Read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Are dragons real?",
+        "body": "Mateo asks if dragons are real. Marisol finds the Komodo dragon in Kiwix, and they read about it together from a copy on the Core.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "kids-fridge",
+      "chapter": "kids",
+      "member": "marisol",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "foldergram",
+        "replaces": []
+      },
+      "capability": "Turn a folder of photos and videos into a private feed with albums and a timeline",
+      "anchor": {
+        "role": "room",
+        "room": "kids"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "The fridge gallery gets a timeline",
+        "body": "Marisol photographs each of Mateo's drawings. Foldergram turns the folder into a feed with albums and a timeline, so last spring's dragon is a scroll away.",
+        "chips": [
+          "Foldergram"
+        ]
+      }
+    },
+    {
+      "id": "yard-marigolds",
+      "chapter": "yard",
+      "member": "mateo",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Marigolds get a journal",
+        "body": "Marisol and Mateo plant marigolds along the fence. HortusFox keeps a journal with a photo, the date and when each pot was watered.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "yard-reading",
+      "chapter": "yard",
+      "member": "marisol",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "Read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Highlights for the translator",
+        "body": "On the patio, Marisol reads the source book in Koodo Reader. Her highlights and notes stay beside the text, ready for the translation.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "yard-photos",
+      "chapter": "yard",
+      "member": "marisol",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "Back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Yard days, backed up",
+        "body": "Marisol backs up the afternoon's photos from her phone to Immich. Mateo's fifth year sits in one library on the Core.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "outro-house",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A small house, one Core",
+        "body": "A rented cottage, a drawing table and a five-year-old with opinions. The Castellanos household runs it all from one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your sketches, drafts and bedtime stories can live on a Companion Core on a shelf at home. Start with one dragon in Inkscape.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Renter angle: the text says only that the cottage is rented and nothing needs a screwdriver. It does not say the Core can be moved between homes; the sheet does not.",
+    "Home Assistant (living-lamp): the smart plug is hardware the family bought; it is not in the parcel or the 3D scene. No energy or savings claim. The Hub has no USB, Bluetooth or GPIO, so the plug is a home-network device.",
+    "Kiwix (kids-komodo) needs content files downloaded once. The text says \"a copy on the Core\" and makes no offline claim.",
+    "Docuseal (table-sign): never \"legally binding\". Marisol fills in and signs a PDF form and sends it herself; no remote signing is shown.",
+    "Habitica (kitchen-quest) is a chore game with a parent holding the tablet. No learning or behavior claim. Pi-hole (living-dns) is DNS-level blocking only, not parental control.",
+    "Nico (OpenClaw) works only inside the Core's own apps, so the OpenClaw web note is not used. The dragon book is invented.",
+    "Town Piedra Lisa and street Cottonwood Alley are invented and still need the human map check."
+  ]
+}
