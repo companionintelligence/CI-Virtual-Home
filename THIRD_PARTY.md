@@ -83,6 +83,39 @@ External tools the scripts call but this repository does not include: **ffmpeg**
 `prop-sheet.mts`; LGPL-2.1+/GPL depending on build), **rsvg-convert** from librsvg (`generate_floor_plans.py`,
 `generate_house_iso.py --png`; LGPL-2.1+), and **Python 3** (standard library only).
 
+## Live-player realism
+
+Third-party code and assets behind the player's look-only effects (`assets/realism*.ts`, `assets/viewer-*.ts`; README →
+*Live realism*). Each package records its own rows under its own sub-heading, between the two marker lines; the shared
+rows (the ocean source, the BVH, the tooling) are above them.
+
+<!-- realism:shared:begin -->
+<!-- realism:shared:end -->
+
+#### ao
+<!-- realism:ao:begin -->
+<!-- realism:ao:end -->
+
+#### water
+<!-- realism:water:begin -->
+<!-- realism:water:end -->
+
+#### sky
+<!-- realism:sky:begin -->
+<!-- realism:sky:end -->
+
+#### grass
+<!-- realism:grass:begin -->
+<!-- realism:grass:end -->
+
+#### assets
+<!-- realism:assets:begin -->
+<!-- realism:assets:end -->
+
+#### frame
+<!-- realism:frame:begin -->
+<!-- realism:frame:end -->
+
 ## Licence texts for adapted source
 
 ### furnishup/blueprint3d

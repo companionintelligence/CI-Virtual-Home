@@ -38,6 +38,7 @@
 import { displayName, buildCredit } from './home-names.js';
 import { createGlassSwap } from './viewer-glass.js';
 import { bakeStatic, restoreStatic } from './viewer-batch.js';
+import { createRealism } from './realism.js';
 
 type Api = {
   THREE: any; scene: any; renderer: any; canvas: HTMLCanvasElement; camera: any; controls: any;
@@ -277,6 +278,17 @@ export function mountViewer(api: Api) {
   // The plain path draws its panes without the transmission pass (viewer-glass.ts); Best quality and anything drawn
   // through the page's __houseRender* hooks get the transmissive glass back.
   const glass = createGlassSwap(THREE, api.scene, !no.has('glass'));
+  // The live realism effects (assets/realism.ts): installed per house in onHouse, ticked and drawn in frame(), shed or
+  // promoted by the ADAPT block, and taken off for the page's offline hooks. ?no=<key> or ?no=realism kills them.
+  // (the batch is undone and redone through the two functions below, which batchHouse's bake closure backs)
+  const realism = createRealism({
+    THREE, scene: api.scene, renderer: api.renderer, camera, canvas, params, no,
+    houseId: () => houseId || (api.house() || {}).id || '',
+    house: () => api.house(),
+    markDirty: () => { dirty = true; },
+    unbatch: () => unbatchHouse(),
+    rebatch: () => rebatchHouse(),
+  });
   let tod: string | null = null;   // the viewer's choice; null = the house's own hour
   let ready = false;
   let dirty = true;          // something changed: draw a frame even while paused
@@ -662,12 +674,13 @@ export function mountViewer(api: Api) {
     if (on && !hqWarm) {
       el.hq.classList.add('busy'); el.hq.setAttribute('aria-busy', 'true');
       // the transmissive glass comes back with the composer: its programs compile in the same held frame
-      requestAnimationFrame(() => requestAnimationFrame(() => { if (el.hq.getAttribute('aria-pressed') !== 'true') { hqDone(); return; } glass.restore(); hq = true; hqFirst = true; dirty = true; }));
+      requestAnimationFrame(() => requestAnimationFrame(() => { if (el.hq.getAttribute('aria-pressed') !== 'true') { hqDone(); return; } realism.setHq(true); if (!realism.keepsOpaqueGlass()) glass.restore(); hq = true; hqFirst = true; dirty = true; }));
       return;
     }
     hq = on;
-    if (on) { glass.restore(); toast('Best quality is on. Playback may be slower.'); }
-    else glass.apply();   // (the swap is a program change, so it happens here and not per frame)
+    realism.setHq(on);
+    if (on) { if (!realism.keepsOpaqueGlass()) glass.restore(); toast('Best quality is on. Playback may be slower.'); }
+    else { realism.reapply(); glass.apply(); }   // (the swap is a program change, so it happens here and not per frame)
     dirty = true;
   }
   function hqDone() {
@@ -838,18 +851,26 @@ export function mountViewer(api: Api) {
   const ADAPT = no.has('adapt')
     ? { window: 1.5, frames: 0, low: 28, gain: 1.15, upAfter: Infinity, upFps: 58 }
     : { window: 0.75, frames: 30, low: 42, gain: 1.10, upAfter: 6, upFps: 58 };
+  const TIER_UP_AFTER = 3;   // seconds settled at >= upFps before the quality tier tries the rung above
   const renderer = api.renderer;
   let pixelRatio = renderer.getPixelRatio(), perfTime = 0, perfFrames = 0, trial: { fps: number; pr: number } | null = null, settled = false;
   let stepped: number | null = null, upSpent = 0, upTrial: number | null = null, upDone = false;   // the ratio left by the accepted step down; seconds at ≥ upFps; the ratio being tried again
-  const stats = { fps: 0, pixelRatio, settled };
+  const stats: any = { fps: 0, pixelRatio, settled };
   (window as any).__houseViewer = stats;
+  // for the perf harness and scripts/test-live-effects.mts: the tier, what the device probe saw and each feature's own numbers;
+  // external.before/after are what the page's offline hooks call (they refuse in the player, so the tests call them directly)
+  stats.effects = realism.report;
+  stats.external = { before: () => beforeExternalRender(), after: () => afterExternalRender() };
   function setPixelRatio(pr: number) {
     pixelRatio = pr; stats.pixelRatio = pr;
     renderer.setPixelRatio(pr);
     renderer.setSize(canvas.clientWidth, canvas.clientHeight);
     dirty = true;
   }
+  let holdoff = 0;       // seconds to leave the frame-rate window alone after the quality tier moved (new programs compile)
+  let tierUp = 0;        // seconds at >= upFps, for promoting the quality tier
   function adapt(delta: number) {
+    if (holdoff > 0) { holdoff -= delta; perfTime = 0; perfFrames = 0; return; }
     perfTime += delta; perfFrames++;
     if (perfTime < ADAPT.window || perfFrames < ADAPT.frames) return;
     const fps = perfFrames / perfTime, span = perfTime;
@@ -861,6 +882,11 @@ export function mountViewer(api: Api) {
       return;
     }
     if (settled) {
+      // the quality tier (assets/viewer-quality.ts): a miss sheds a rung (a rung reached by promotion that cannot hold goes
+      // for good); 3 s at full speed tries the one above. Not while the pixel ratio is still being given back.
+      if (fps < ADAPT.low) { tierUp = 0; if (!no.has('adapt') && realism.shed(fps)) { holdoff = 1; return; } }
+      else if (fps >= ADAPT.upFps && stepped === null && !no.has('adapt')) { tierUp += span; if (tierUp >= TIER_UP_AFTER && realism.promote()) { tierUp = 0; holdoff = 1; return; } }
+      else tierUp = 0;
       // settled below where it started: a long enough run at full speed earns one look at the ratio it gave up
       if (stepped !== null && !upDone && ADAPT.upAfter < Infinity) {
         upSpent = fps >= ADAPT.upFps ? upSpent + span : 0;
@@ -872,6 +898,8 @@ export function mountViewer(api: Api) {
       if (fps < trial.fps * ADAPT.gain) { setPixelRatio(trial.pr); settled = stats.settled = true; }
       else stepped = trial.pr;   // kept (the next window may step again if it is still short)
       trial = null;
+    } else if (fps < ADAPT.low && !no.has('adapt') && realism.shed(fps)) {
+      holdoff = 1;   // a quality rung went first; the pixel ratio is touched only when there is none left to shed
     } else if (fps < ADAPT.low && pixelRatio > 1) {
       trial = { fps, pr: pixelRatio };
       setPixelRatio(pixelRatio > 1.5 ? 1.5 : pixelRatio > 1.25 ? 1.25 : 1);
@@ -885,7 +913,7 @@ export function mountViewer(api: Api) {
     const moving = playing || flying;
     const auto = renderer.shadowMap.autoUpdate;
     renderer.shadowMap.autoUpdate = !moving || shadowTick++ % 3 === 0;
-    try { api.render(hq); } finally { renderer.shadowMap.autoUpdate = auto; }
+    try { if (!realism.render(hq)) api.render(hq); } finally { renderer.shadowMap.autoUpdate = auto; }
     if (hqFirst) { hqFirst = false; hqWarm = true; hqDone(); toast('Best quality is on. Playback may be slower.'); }
   }
   // the shot's field of view, widened for a narrow window (fitFov); applySplineFrame puts the shot's own back
@@ -906,7 +934,7 @@ export function mountViewer(api: Api) {
     ghostRay.material.opacity = GHOST_OPACITY[2] * k;
   }
 
-  let wasFlying = false;
+  let wasFlying = false, lastDrawAt = 0;
   function frame(delta: number) {
     if (!ready) return;
     delta = Math.min(delta, 0.25);   // a tab that slept a minute does not skip the shot
@@ -950,7 +978,9 @@ export function mountViewer(api: Api) {
     // with the path showing, a ring marks what the shot is looking at right now (flying, the ghost's ray does)
     nowTarget.visible = showPath && !flying;
     if (nowTarget.visible && dirty) { const p = nowTarget.geometry.attributes.position; p.setXYZ(0, controls.target.x, controls.target.y, controls.target.z); p.needsUpdate = true; }
-    if (dirty) { render(); dirty = false; }
+    if (realism.active) realism.tick(delta, camera);   // (may mark the frame dirty: water, accumulation)
+    if (dirty) { render(); dirty = false; lastDrawAt = performance.now(); }
+    else if (realism.active && !playing && !flying && realism.idle(performance.now() - lastDrawAt)) render();   // idle accumulation
     if (shownEndCard && !endPlaced) placeEndCard();
   }
 
@@ -977,6 +1007,17 @@ export function mountViewer(api: Api) {
   // meshes inside each toggle unit become a few merged meshes, so a weak CPU issues a fifth of the draw calls. Player only:
   // the recorder, the goldens and the editor never call it. ?no=batch skips it; a throw leaves the house as built.
   let batchedHouse: any = null;
+  // (the realism registry undoes the batch around a pre-batch feature's apply/restore and for the offline hooks)
+  function unbatchHouse(): boolean {
+    const stat = (window as any).__houseViewer;
+    if (!stat || !stat.batch) return false;
+    restoreStatic(); stat.batch = null;
+    return true;
+  }
+  function rebatchHouse(): void {
+    const stat = (window as any).__houseViewer;
+    if (stat && stat.batchOn) stat.batchOn(true);
+  }
   function batchHouse(h: any) {
     if (h === batchedHouse) return;   // (the failed-load path calls onHouse again with the house already on screen)
     batchedHouse = h;
@@ -1025,8 +1066,15 @@ export function mountViewer(api: Api) {
   async function onHouse({ shotKey = null as string | null, at = 0, play = true } = {}) {
     const token = loadToken;
     const h = api.house();
-    batchHouse(h);
     houseId = h.id;
+    // Features that change what the batch merges go first; the rest after it, but both BEFORE glass.apply() and the
+    // precompile, so every program is compiled once, with the features' defines already in place. Each phase waits at
+    // most BUDGET_MS for its lazy imports (the rest apply themselves when ready), and a throw leaves the house as built.
+    await realism.install('pre-batch');
+    if (token !== loadToken) return;
+    batchHouse(h);
+    await realism.install('post-batch');
+    if (token !== loadToken) return;
     const e = houseEntry(h.id);
     // the portal's name for the home (home-names.ts); the build's own title is in the tooltip, with the credit
     const own = { id: h.id, name: h.spec.name || (e && e.name) || h.id, author: h.spec.author || (e && e.author) };
@@ -1061,6 +1109,7 @@ export function mountViewer(api: Api) {
     const token = ++loadToken;
     const keepType = shot ? shot.type : null;
     ready = false; playing = false;
+    realism.prefetch(id);
     if (flying) exitFly();
     showLoading(id);
     // let the overlay paint before the build takes the main thread
@@ -1068,6 +1117,7 @@ export function mountViewer(api: Api) {
     // a precompile of the home on screen may still be polling its scene: let it end (4 s at most) before the scene is cleared
     { let t = 0; await Promise.race([compiling, new Promise(r => { t = window.setTimeout(r, COMPILE_WAIT_MS); })]); window.clearTimeout(t); }
     if (token !== loadToken) return;
+    realism.dispose();   // the old home's effects go (restored, freed) before its scene is cleared
     try {
       await api.loadHouse(id);
     } catch (err) {
@@ -1268,6 +1318,7 @@ export function mountViewer(api: Api) {
       return;
     }
     showLoading(want);   // again, now with the name and the credit
+    realism.prefetch(want);   // the effects' modules (and a feature's own downloads) load while the house builds
     await api.ready;
     const h = api.house();
     if (!h) { showError(houseEntry(want) ? 'This home did not load. Check the connection and try again.' : `There is no home called “${want}”. Pick one from the gallery.`); return; }
@@ -1284,8 +1335,8 @@ export function mountViewer(api: Api) {
   // The page's __houseRenderBegin / __houseRenderEnd call these: a film or a still drawn through those hooks is a
   // product frame, and gets the transmissive glass the goldens have (the plain path's swap is for the live view only).
   // After, the plain path takes its swap back unless Best quality is on.
-  function beforeExternalRender() { glass.restore(); }
-  function afterExternalRender() { if (!hq) glass.apply(); }
+  function beforeExternalRender() { realism.restore(); glass.restore(); }
+  function afterExternalRender() { if (!hq) { realism.reapply(); glass.apply(); } }
 
   return { frame, beforeExternalRender, afterExternalRender };
 }

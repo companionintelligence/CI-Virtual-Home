@@ -57,6 +57,8 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run fixtures` | Validate, QA and render the fixture houses in `test/fixtures/houses/` to stills (`test/fixtures/out/`, to look at) and compare their frame hashes (`--fixture`, `--update` to bless your own fixture, `--record <stream>` for another's frame your branch moves). |
 | `pnpm run perf` | Build, track and shot-QA timings against their budgets (3 s / 1 s / 0.5 s), report-only, with each number's Δ against the committed `test/perf/baseline.json` (`--house`, `--all`, `--baseline` to rewrite it at integration). |
 | `pnpm run perf:player` | Advisory timing of the live player (`room-creator.html?mode=view`) in Chromium on the real GPU: presented frame times, CPU and GPU time of `renderer.render`, draw calls, programs. Modes `bench` (default) `attr` `load` `raf` `profile` `census`; `--houses a,b`, `--defaults 1,2`, `--dpr 2`, `--throttle 4`, `--runs N`, `--query no=glass,…` (appended to the player URL, for A/B of a live-only feature), `--out <file.md>` (rows plus the header line with commit and `uptime`), `--json <file>`. Not part of `check` or CI: timings depend on the machine's load. See *Player performance*. |
+| `pnpm run test:live` | The live-player realism effects on the real GPU: kill-switch identity against `03edd3b`, exact restore, a clean console, no leak across home switches, the ledgers untouched, then each package's `scripts/live-checks/<key>.mts` (`--quick`, `--houses`, `--only <key>`, `--base <dir>`). See *Live realism*. |
+| `pnpm run ao` / `pnpm run prep:assets` | Regenerate `content/ao/` (the baked ambient-occlusion volumes) / `assets/media/` (the CC0 textures and props), both with content-hashed file names. |
 | `pnpm run shot-planner` | Spline planner v2 on all 30 houses (`assets/shot-planner.ts`): planned twice byte-identical, QA v2, the fleet camera targets, the page's track hash equal to Node's (`--parity`), the planning and QA budgets. Worlds come from `test/qa/shot-worlds/` (built in the page once, `--rebuild-worlds` / `--stale-ok`); `--update` records `test/shots/<id>.track.json`. |
 | `pnpm run shot-qa` | A fault injected for every QA v2 code, and for every fleet check, on two frozen worlds (`test/shots/worlds/`): each must be caught. No browser. |
 | `pnpm run camera-audit` | A contact strip per house and planner (twelve frames, the plan with the path by beat), the camera metrics of v1 and v2 side by side → `test/qa/camera-audit/index.html` (`--house`, `--planner v1,v2`, `--fixtures`). |
@@ -388,6 +390,105 @@ How to take a number that means something:
   not reproducible, so it is a poor A/B house). The load average does not see GPU contention from other jobs
   (Ollama, a VM), and the GPU timer query includes starvation gaps, so read the wall-clock frame time first and the
   `gpu` column as a hint. A weak CPU is emulated with `--throttle 4`.
+
+## Live realism (the player)
+
+The player (`room-creator.html?mode=view`) draws a home better than the product frames do, because it has no frame to
+keep identical: baked ambient occlusion, water, a procedural sky, grass, CC0 detail textures and props, idle
+accumulation. Each of these is a **feature** in its own file, `assets/realism-<key>.ts` (`ao`, `water`, `sky`, `grass`,
+`assets`, `frame`), registered once in the table at the top of [`assets/realism.ts`](assets/realism.ts); the heavy part
+lives in a `viewer-<x>.ts` the feature imports lazily. `realism.ts` owns what they share (order, lifecycle, isolation,
+tiers, kill switches) and `assets/viewer.ts` calls it at seven seams, so a feature edits neither.
+
+**Live only.** Nothing here runs outside `?mode=view`. The goldens, fixtures, thumbs, films and stills, and every
+`__house*` hook, draw exactly what they drew before: a feature's `restore()` puts the scene back as built before an
+offline hook runs, and `apply()` brings the effect back after. The hooks themselves refuse in the player. A feature
+patches materials by clone or by define, never in place without an undo, and reads no wall clock in anything an
+offline frame depends on (the player's clock is `ctx.now()`).
+
+### Tiers
+
+The tier is picked at start from a probe that costs under 5 ms ([`assets/viewer-quality.ts`](assets/viewer-quality.ts))
+and moved while the page runs by the same frame-rate window that adapts the pixel ratio.
+
+| Tier | Who | What runs |
+|---|---|---|
+| 0 | A coarse pointer, `deviceMemory` ≤ 4, ≤ 4 cores, `saveData` or a connection below 4g, `MAX_TEXTURE_SIZE` < 4096, no float render targets, a SwiftShader / Mali / Adreno / Intel renderer string, or `?q=0` | Today's page: no effect with a `minTier` above 0 |
+| 1 | Everything else | The cheap effects: per package at most 0.4 ms of CPU and 8 draw calls |
+| 2 | Only by promotion: 3 s settled at ≥ 58 fps | Everything, including the lazily loaded heavy parts (ocean, big textures) |
+
+The renderer string is a hint, never the sole decider: a device that failed only a soft check (Intel graphics, few cores,
+little memory) may be promoted as far as tier 1; one that failed a hard check (touch, saved data, a software or
+mobile GPU, no float targets, small textures) stays at 0. The ladder sheds a rung on a window below 42 fps, *before* the
+pixel ratio is touched; a shed that does not buy 10% is put back and the ladder stops shedding; a rung reached by promotion
+that cannot hold 42 fps is left again and stays off for the session. `window.__houseViewer.effects` reports the tier,
+the probe, the ladder's moves and each feature's own numbers (`perf:player` prints it per row).
+
+Kill switches (the player's `?no=` list): `?no=ao,water,sky,grass,assets,frame` one feature each, `?no=realism` all of
+them. `?q=0|1|2` pins the tier (the ladder then never moves it); `?no=adapt` also stops the ladder.
+
+### The performance contract
+
+At the default tier on the reference machine no heavy house may regress more than **10%** in presented frame time
+against `03edd3b` (`pnpm run perf:player`, interleaved A/B, the median of at least 5, `uptime` recorded); tier 0 equals
+`03edd3b`; the first load grows by at most **1.5 MB**; every binary loads after the first frame, and only on a tier that
+uses it. Eager modules (`realism.js`, `viewer-quality.js`, `realism-<key>.js`) stay under 20 KB each (`portal:build`
+fails otherwise). Each package states what its feature costs in its own sub-heading below.
+
+### How to add a feature
+
+1. Write `assets/realism-<key>.ts`: `export default { key, phase, minTier, install(ctx) }` (the six stubs show the shape).
+   `phase` is `'pre-batch'` for a feature that changes what the static batch merges (materials, which props exist) and
+   `'post-batch'` for the rest; both run before the first compile, so every program compiles once with the feature's
+   defines in place. Set `batchSensitive` when `apply()`/`restore()` must run with the batch undone.
+2. `install(ctx)` loads what it needs (`await import('./viewer-<x>.js')`, textures, buffers) and returns a handle
+   `{ apply, restore, dispose, … }`, or `null` to opt out. It does not touch the scene: `realism.ts` calls `apply()`. A
+   feature that has not finished within 1.5 s (lazy imports, downloads) is not waited for; it applies itself when ready.
+3. The handle's optional hooks are `sync()` (the batch was redone), `tick(dtS, tS, camera)` before every drawn frame,
+   `idle(idleMs)` (return true for another frame while nothing else changes), `render(hq)` (draw the frame yourself),
+   `keepsOpaqueGlass()`, `setTier(t)`, `setHq(on)` and `stats()` (shown in the report). `apply()` and `restore()` are
+   idempotent and exact inverses; a throw anywhere removes that feature and leaves the house as built.
+4. Add `scripts/live-checks/<key>.mts` (`export default async function check(env)`, see its README) and a sub-heading
+   below; list every third-party file or code in [THIRD_PARTY.md](THIRD_PARTY.md). New binaries (`assets/media/**`,
+   `content/ao/**`) need content-hashed names: see *Deploying → Caching*.
+
+### Testing
+
+`pnpm run test:live` (`scripts/test-live-effects.mts`, the real GPU) hashes the player's canvas and compares pages: (a)
+`?no=realism` draws the same pixels as `03edd3b` (it builds a scratch worktree of it once; `--base <dir>` reuses one) for
+aurora, cocoon, lakecabin, mirage and vanilla at day, dusk and night; (b) with every effect on, the two functions behind
+the offline hooks (`__houseViewer.external.before/after`) leave the scene drawing the same pixels as `?no=realism` at
+shot positions 0, 200/719 and 1; (c) no console error, shader-link error or GL warning; (d) `renderer.info.memory` is back
+after switching homes; (e) the six `test/goldens/expected-diffs` ledgers are untouched; then every
+`scripts/live-checks/<key>.mts`. `--quick`, `--houses`, `--only <key>`. Not part of `check` (it needs a GPU and a second tree).
+
+### Notes per package
+
+Each package writes only between its own two marker lines.
+
+#### ao
+<!-- realism:ao:begin -->
+<!-- realism:ao:end -->
+
+#### water
+<!-- realism:water:begin -->
+<!-- realism:water:end -->
+
+#### sky
+<!-- realism:sky:begin -->
+<!-- realism:sky:end -->
+
+#### grass
+<!-- realism:grass:begin -->
+<!-- realism:grass:end -->
+
+#### assets
+<!-- realism:assets:begin -->
+<!-- realism:assets:end -->
+
+#### frame
+<!-- realism:frame:begin -->
+<!-- realism:frame:end -->
 
 ## How verification works
 
