@@ -6,7 +6,7 @@ import { Fail, foreign, openPage, enterSession, endSession, tickFrames, findEnte
 const XR_OK = /^(assets\/xr\/|assets\/platform[^/]*\.js$|assets\/vendor\/three\/webxr\/)/;
 export const WEIGHT_BUDGET_BYTES = 1500;     // gzip, entry.js and whatever else loads for XR at first player load
 
-export interface LazyResult { entryLoaded: boolean; firstLoadXr: string[]; afterTapXr: string[]; deltaBytes: number; weightXr: number; weightNoXr: number }
+export interface LazyResult { entryLoaded: boolean; firstLoadXr: string[]; afterTapXr: string[]; deltaBytes: number; deltaBrotli: number; weightXr: number; weightNoXr: number }
 
 async function settleAfterReady(ms = 1200) { await sleep(ms); }
 
@@ -24,7 +24,7 @@ export async function checkLazy(t: Ctx, tree: Tree, o: { house?: string } = {}):
   if (heavyEarly.length) throw new Fail(`the first player load requested XR modules beyond the entry: ${heavyEarly.join(', ')}`);
   const entryLoaded = first.includes('assets/xr/entry.js');
   if (tree.hasXr && !entryLoaded) throw new Fail('the tree has assets/xr/ but the first player load never requested assets/xr/entry.js: no Enter VR button can appear');
-  const weightXr = textWeight(tree, a.requests).total;
+  const wx = textWeight(tree, a.requests), weightXr = wx.total;
 
   // 2. ?no=xr: nothing under assets/xr/, no API, no button
   const b = await t.open({ kind: 'player', tree, house, query: 'no=xr' });
@@ -33,7 +33,7 @@ export async function checkLazy(t: Ctx, tree: Tree, o: { house?: string } = {}):
   if (killed.length) throw new Fail(`with ?no=xr the page requested ${killed.join(', ')}`);
   if (await hasProductXr(b)) throw new Fail('with ?no=xr window.__houseViewer.xr exists');
   if (await findEnterButton(b)) throw new Fail('with ?no=xr an Enter VR button exists');
-  const weightNoXr = textWeight(tree, b.requests).total;
+  const wn = textWeight(tree, b.requests), weightNoXr = wn.total;
   await b.close();
 
   // 3. the tap: exactly the XR modules load, from this origin
@@ -52,9 +52,10 @@ export async function checkLazy(t: Ctx, tree: Tree, o: { house?: string } = {}):
   await a.close();
 
   // 4. weight: what XR adds to the FIRST load (the entry, and anything else that loads before a tap), gzip
-  const delta = weightXr - weightNoXr;
-  if (delta > WEIGHT_BUDGET_BYTES) throw new Fail(`XR adds ${delta} bytes (gzip) to the first player load, over the ${WEIGHT_BUDGET_BYTES} byte budget`);
-  return { entryLoaded, firstLoadXr: first, afterTapXr: afterXr, deltaBytes: delta, weightXr, weightNoXr };
+  const delta = weightXr - weightNoXr, deltaBrotli = wx.brotli - wn.brotli;
+  const parts = Object.keys(wx.files).filter(k => !(k in wn.files)).map(k => `${k} ${wx.files[k]}`).join(', ');
+  if (delta > WEIGHT_BUDGET_BYTES) throw new Fail(`XR adds ${delta} bytes (gzip; ${deltaBrotli} brotli) to the first player load, over the ${WEIGHT_BUDGET_BYTES} byte budget (${parts})`);
+  return { entryLoaded, firstLoadXr: first, afterTapXr: afterXr, deltaBytes: delta, deltaBrotli, weightXr, weightNoXr };
 }
 
 /** The gallery and the editor never load platform.js or anything under assets/xr/ (landing weight 0; N4, N5, N8). */

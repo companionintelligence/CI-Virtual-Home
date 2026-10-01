@@ -134,15 +134,19 @@ export function gzipOf(tree: Tree, relPath: string): number {
   const f = path.join(tree.dir, relPath.split('?')[0]);
   try { return fs.statSync(f).isFile() ? zlib.gzipSync(fs.readFileSync(f), { level: 9 }).length : 0; } catch { return 0; }
 }
+export function brotliOf(tree: Tree, relPath: string): number {
+  const f = path.join(tree.dir, relPath.split('?')[0]);
+  try { return fs.statSync(f).isFile() ? zlib.brotliCompressSync(fs.readFileSync(f), { params: { [zlib.constants.BROTLI_PARAM_QUALITY]: 11 } }).length : 0; } catch { return 0; }
+}
 /** Sum of gzip sizes of the first-load text assets (js, css, html, json) among these requests, deduplicated by path. */
-export function textWeight(tree: Tree, requests: Req[]): { total: number; files: Record<string, number> } {
-  const files: Record<string, number> = {};
+export function textWeight(tree: Tree, requests: Req[]): { total: number; brotli: number; files: Record<string, number> } {
+  const files: Record<string, number> = {}; let brotli = 0;
   for (const r of requests) {
     const p = underBase(tree, r.url).split('?')[0];
     if (!/\.(js|mjs|css|html|json)$/.test(p) && p !== '') continue;
-    if (!(p in files)) files[p || 'index.html'] = gzipOf(tree, p || 'index.html');
+    if (!(p in files)) { files[p || 'index.html'] = gzipOf(tree, p || 'index.html'); brotli += brotliOf(tree, p || 'index.html'); }
   }
-  return { total: Object.values(files).reduce((a, b) => a + b, 0), files };
+  return { total: Object.values(files).reduce((a, b) => a + b, 0), brotli, files };
 }
 
 // ------------------------------------------------------------------------------------------------------------ sessions

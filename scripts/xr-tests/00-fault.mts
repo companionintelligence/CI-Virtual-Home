@@ -12,8 +12,10 @@
 import { defineCase, enterSession, endSession, tickFrames, settledSnapshot, equal, fmtDiff, sleep, until, type P, type Entered } from '../xr-harness/lib.mts';
 
 const bed = (p: P) => p.page.evaluate(() => { const B = (window as any).__bed; return B && B.state ? { down: B.state.down, pressed: B.pressed.slice(), cancelled: B.cancelled || 0 } : null; });
+// where to aim: the bed's Pause button; with the product's own session, straight ahead at chest height (whatever its UI put there)
 const buttonLocal = (p: P) => p.page.evaluate(() => {
-  const B = (window as any).__bed, T = (window as any).__THREE; const b = B.buttons.find((x: any) => x.id === 'pause');
+  const B = (window as any).__bed, T = (window as any).__THREE; if (!B || !B.panel) return [0, 1.3, -1.5];
+  const b = B.buttons.find((x: any) => x.id === 'pause');
   const v = new T.Vector3((b.x + b.w / 2) / 1024 * 0.9 - 0.45, (1 - (b.y + b.h / 2) / 456) * 0.4 - 0.2, 0); B.panel.localToWorld(v); return B.rig.worldToLocal(v).toArray() as number[];
 });
 

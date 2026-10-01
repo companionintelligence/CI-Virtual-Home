@@ -13,7 +13,7 @@ export const lazy = defineCase({
     t.needsProduct(tree);
     const r = await checkLazy(t, tree);
     t.note('firstLoadXr', r.firstLoadXr); t.note('afterTapXr', r.afterTapXr);
-    t.note('deltaGzipBytes', r.deltaBytes); t.note('budget', WEIGHT_BUDGET_BYTES);
+    t.note('deltaGzipBytes', r.deltaBytes); t.note('deltaBrotliBytes', r.deltaBrotli); t.note('budget', WEIGHT_BUDGET_BYTES);
     const pages = await checkNoXrOnPages(t, tree);
     t.note('galleryRequests', pages.gallery);
   },
