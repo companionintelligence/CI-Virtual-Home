@@ -24,6 +24,7 @@
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
+//   <out>/content/ao/                manifest.json and the baked ambient-occlusion volumes it lists (<id>.<hash>.bin)
 //
 // Everything the site references is relative, so the same tree works at / and under /ci-virtual-home/. No
 // goldens, scripts, scenes, videos or TypeScript sources go out. The build refuses to run on stale or missing
@@ -36,6 +37,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
+import { aoProblems, aoShipList } from './ao-files.mts';
 import { displayName, buildCredit } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
@@ -96,6 +98,13 @@ for (const h of index.houses || []) {
   copy(path.join('content', 'houses', `${h.id}.json`));
   if (!fs.existsSync(path.join(ROOT, 'portal', 'thumbs', `${h.id}.webp`))) problems.push(`no thumbnail for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
   if (!fs.existsSync(path.join(ROOT, 'portal', 'previews', `${h.id}.jpg`))) problems.push(`no link-preview image for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
+}
+// 5a. the baked AO volumes: the manifest and the files it lists, nothing else, each the bytes its name says (scripts/ao-files.mts)
+{
+  const ao = path.join(ROOT, 'content', 'ao');
+  const aoBad = aoProblems(ao, (index.houses || []).map((h: { id: string }) => h.id));
+  problems.push(...aoBad);
+  if (!aoBad.length) for (const f of aoShipList(ao)) copy(path.join('content', 'ao', f));
 }
 if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
 
