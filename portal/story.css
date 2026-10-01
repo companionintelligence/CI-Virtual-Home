@@ -8,7 +8,7 @@
 
 /* ---- the player's own chrome, put away while a tour runs: the shot and time-of-day chips (the chapters replace them), the speed
    button (narration plays at one speed) and the player's own end card (the tour has its own) */
-html[data-story] .vh-row-chips,
+html[data-story] .vh-shots,
 html[data-story] .vh-tool[data-act="speed"],
 html[data-story] .vh-end { display: none !important; }
 

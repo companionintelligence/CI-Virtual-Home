@@ -489,7 +489,7 @@ async function player(id: string, viewport: { width: number; height: number }, m
   console.log(`\nplayer ${id} ${label}`);
   const { page, errors, thirdParty, close } = await open(viewport, mobile);
   const t0 = Date.now();
-  await page.goto(srv.url(`room-creator.html?mode=view&family=${id}&play=1`));
+  await page.goto(srv.url(`room-creator.html?mode=view&family=${id}&play=1&no=story`));   // the plain player; the narrated tour has its own checks (scripts/story/portal-tests/player.mts)
   await sleep(250);
   await shot(page, `player-${id}-${label}-loading`);
   await viewerReady(page);
@@ -732,7 +732,7 @@ async function motion(id: string) {
   await viewerReady(page);
   const a = await scrubT(page); await sleep(900); const b = await scrubT(page);
   ok((await page.getAttribute('.vh', 'data-playing')) === '0' && a === 0 && b === 0, 'a family opened from the landing holds still');
-  await page.goto(srv.url(`room-creator.html?mode=view&family=${id}&play=1`));
+  await page.goto(srv.url(`room-creator.html?mode=view&family=${id}&play=1&no=story`));   // (the plain player: the tour steps by hand when motion is reduced, which its own checks cover)
   await viewerReady(page);
   await sleep(600);
   ok((await page.getAttribute('.vh', 'data-playing')) === '0', 'so does a link that says play=1');
