@@ -40,7 +40,7 @@
 .member { display: flex; gap: 14px; padding: 16px 18px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
 .member .avatar { width: 40px; height: 40px; font-size: 16px; box-shadow: none; }
 .member h3 { font-size: 17px; font-weight: 800; line-height: 1.25; }
-.member-meta { font-size: 13px; font-weight: 600; color: var(--muted-foreground); }
+.member p.member-meta { margin-top: 0; font-size: 13px; font-weight: 600; color: var(--muted-foreground); }
 .member p { margin-top: 4px; font-size: 14.5px; }
 .member .agent { color: var(--muted-foreground); }
 .member .agent b { color: var(--foreground); }

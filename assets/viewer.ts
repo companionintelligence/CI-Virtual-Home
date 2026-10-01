@@ -287,9 +287,8 @@ export function mountViewer(api: Api) {
   let endPlaced = false;      // the end card has been put where it does not cover the Core (placeEndCard)
   let flyHinted = false;      // the free camera's how-to has been said once where the bar has no room for it
 
-  // room-creator.html's head script asked for the list as the page started (window.__vhIndex); fetch it only
-  // when the player was mounted some other way
-  const indexReady: Promise<IndexEntry[]> = Promise.resolve((window as any).__vhIndex || fetch('./content/houses/index.json').then(r => (r.ok ? r.json() : null)))
+  // room-creator.html's head script asked for the list as the page started (window.__vhIndex), in both modes
+  const indexReady: Promise<IndexEntry[]> = Promise.resolve((window as any).__vhIndex)
     .then((j: any) => (index = (j && j.houses) || []), () => (index = []));
 
   // ------------------------------------------------------------------ scene overlays: the path and the ghost camera

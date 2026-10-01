@@ -46,7 +46,7 @@ export function plainCatalog(text: string | undefined, rules: RegExp[]): string 
   return rules.some(r => r.test(t)) ? '' : t;
 }
 export function errorRules(claims: any): RegExp[] {
-  return (claims.bannedPhrases as { pattern: string; flags?: string; severity: string }[]).filter(b => b.severity === 'error').map(b => new RegExp(b.pattern, b.flags || 'i'));
+  return (claims.bannedPhrases as { pattern: string; flags?: string; severity: string }[]).filter(b => b.severity === 'error').map(b => new RegExp(b.pattern, b.flags ?? 'i'));
 }
 
 export function header(rel: string): string {
@@ -75,7 +75,7 @@ export function footer(rel: string, claims: any, opts: { scripted?: boolean } = 
         <p class="foot-links"><a href="https://ci.computer" rel="noopener">ci.computer</a> <a href="https://docs.ci.computer" rel="noopener">docs.ci.computer</a> <a href="${HUB_URL}" rel="noopener">Companion Hub store</a> <a href="${rel}credits.html">Credits</a> <a href="${rel}index.html#disclosures">Disclosures</a></p>
       </div>
       <div class="foot-notes">
-        <p><b>${esc(FICTIONAL_LINE)}</b> The families on this site are made up. They are not customers and nothing here is a testimonial.</p>
+        <p><b>${esc(FICTIONAL_LINE)}</b> The families on this site are made up. They are not customers.</p>
         <p>${esc(BETA_LINE)} ${d('apps-availability')}</p>
         ${opts.scripted ? `<p>${d('scripted-scenes')}</p><p>${d('stylised-art')}</p><p>${d('synthetic-voice')}</p>` : ''}
         <p>${d('names-owners')}</p>
@@ -124,7 +124,8 @@ export function memberHtml(m: Member): string {
   return `<li class="member">
           <span class="avatar" style="--disc:var(--${m.colour})" aria-hidden="true">${esc(initial(m.name))}</span>
           <div class="member-body">
-            <h3>${esc(m.name)}<span class="member-meta"> ${esc(MEMBER_ROLE[m.role] || m.role)}, ${m.age}</span></h3>
+            <h3>${esc(m.name)}</h3>
+            <p class="member-meta">${esc(MEMBER_ROLE[m.role] || m.role)}, ${m.age}</p>
             ${m.work ? `<p>${esc(sentence(m.work).replace(/^./, ch => ch.toUpperCase()))}.</p>` : ''}
             ${c ? `<p class="agent"><b>${esc(c.name)}</b> is ${esc(m.name)}'s ${c.runtime === 'Hermes' ? 'Hermes' : 'OpenClaw'} agent. ${esc(sentence(c.job))} <span class="limits">${esc(sentence(c.limits))}</span></p>` : ''}
           </div>

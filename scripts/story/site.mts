@@ -35,8 +35,35 @@ import {
 } from './site-lib.mts';
 import type { Card } from './site-lib.mts';
 import * as pg from './pages.mts';
+import { needles } from './check-leaks.mts';
+
+const walkOut = (dir: string): string[] => fs.existsSync(dir) ? fs.readdirSync(dir).flatMap(n => { const p = path.join(dir, n); return fs.statSync(p).isDirectory() ? walkOut(p) : [p]; }) : [];
+const reEsc = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/** One pattern for everything check-leaks.mts looks for in prose: builders, Sims builds, names, and ids with a creator in them. */
+function leakNeedle(root: string): RegExp {
+  const n = needles(root);
+  return new RegExp([...n.names, ...n.fragmentIds, 'Sims 4', 'The Sims', 'SimsTree', 'Base Game'].map(reEsc).join('|'), 'i');
+}
 
 export const PROD_HOST = 'homes.ci.computer';
+
+/**
+ * Take out of a shipped script the COMMENTS that name a home, a builder, a Sims build or an id (a whole `//` line, a
+ * trailing `// ...`, a block or HTML comment). The engine's source comments cite the specs they were tuned on ("familyhouse-nora
+ * L1", "Villa Mesa Mariposa"); they are history for the repo, and the public site is not the place. Code is never touched:
+ * a needle in code is a finding for scripts/story/check-leaks.mts, not something to hide.
+ */
+export function stripLeakyComments(text: string, needle: RegExp): string {
+  const has = (s: string): boolean => needle.test(s);
+  let out = text.replace(/\/\*[\s\S]*?\*\//g, m => (has(m) ? '' : m)).replace(/<!--[\s\S]*?-->/g, m => (has(m) ? '' : m));
+  out = out.split('\n').map(line => {
+    if (!has(line)) return line;
+    if (/^\s*\/\//.test(line)) return null;
+    const m = /^(.*?[;,{}()\]]\s*)\/\/(?!\/).*$/.exec(line);   // a code line with a trailing comment (a "//" inside a string has a quote before it)
+    return m && !/['"`][^'"`]*$/.test(m[1]) && !has(m[1]) ? m[1].trimEnd() : line;
+  }).filter((l): l is string => l !== null).join('\n');
+  return out;
+}
 export type BuildArgs = Record<string, string>;
 export type SiteResult = { files: number; bytes: number; partial: boolean; noindex: boolean; families: number };
 
@@ -190,7 +217,7 @@ export async function buildStorySite(o: { ROOT: string; OUT: string; SITE: strin
     const featured = cardBy[favSlug];
     const rooms = pg.pickRooms(sorted, order, catalog);
     const people = cards.reduce((a, c) => a + c.members.length, 0);
-    const appCount = new Set(cards.flatMap(c => c.apps.map(a => a.id))).size;
+    const storyCount = cards.reduce((a, c) => a + c.beats, 0);
     let html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
     const sub = (marker: string, text: string): void => { if (!html.includes(marker)) problem(`index.html: no ${marker}`); html = html.split(marker).join(text); };
     sub('<!-- @head -->', pg.landingHead({ site: SITE, families: familiesUrl, og: new URL(homeOg, SITE).href, noindex, cards, hero: hero || urls[favSlug]?.thumb || '' }));
@@ -207,7 +234,7 @@ export async function buildStorySite(o: { ROOT: string; OUT: string; SITE: strin
     sub('@hero-title', featured.title);
     sub('@hero-slug', featured.slug);
     sub('@families-url', familiesUrl);
-    html = html.replace(/(data-stat="families">)[^<]*/, `$1${cards.length}`).replace(/(data-stat="people">)[^<]*/, `$1${people}`).replace(/(data-stat="apps">)[^<]*/, `$1${appCount}`);
+    html = html.replace(/(data-stat="families">)[^<]*/, `$1${cards.length}`).replace(/(data-stat="people">)[^<]*/, `$1${people}`).replace(/(data-stat="stories">)[^<]*/, `$1${storyCount}`);
     put('index.html', html);
   }
 
@@ -236,7 +263,26 @@ export async function buildStorySite(o: { ROOT: string; OUT: string; SITE: strin
     if (/Room Creator|SimsTree|Pascal Editor|Virtual homes/.test(rc.slice(0, rc.indexOf('<script type="importmap">')).replace(/<script>[\s\S]*?<\/script>/g, ''))) problem('room-creator.html: the static head still names the editor');
     const map = rc.indexOf('<script type="importmap">');
     if (map < 0 || /\bimport\(|type="module"|rel="modulepreload"/.test(rc.slice(0, map).replace(/<script>[\s\S]*?<\/script>/g, ''))) problem('room-creator.html: a module is loaded before the import map');
+    // The page is the editor's too, and its code and comments carry words the public site does not: the editor's own name
+    // and the gallery the specs were written from. The editor is not reachable here (the head script sends it to the landing),
+    // so these are only text.
+    rc = rc.replace(/Virtual homes editor/g, 'Editor').replace(/Virtual homes/g, 'Companion Core').replace(/SimsTree/g, 'gallery');
+    const needle = leakNeedle(ROOT);
+    rc = stripLeakyComments(rc, needle);
     fs.writeFileSync(rcPath, rc);
+    for (const f of walkOut(path.join(OUT, 'assets'))) {
+      if (!f.endsWith('.js') || f.includes(`${path.sep}vendor${path.sep}`)) continue;
+      const t = fs.readFileSync(f, 'utf8'), u = stripLeakyComments(t, needle);
+      if (u !== t) fs.writeFileSync(f, u);
+    }
+    // assets/home-names.js is the repo's map from a spec to a name and a builder's credit. room-creator.html imports it
+    // statically, so a stub with the same exports ships in its place (the real one never leaves the repo).
+    const stub = `// The public build's stand-in for assets/home-names.ts: a home is a family here, named by the family list, never by a spec.
+export const buildName = (h) => ((h && h.name) || '').trim();
+export const displayName = (h) => ((h && h.name) || 'Family');
+export const buildCredit = () => '';
+`;
+    put(path.join('assets', 'home-names.js'), stub);
   }
 
   // ---- crawlers and the old links
