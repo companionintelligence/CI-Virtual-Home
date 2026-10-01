@@ -852,6 +852,7 @@ export function mountViewer(api: Api) {
   let stepped: number | null = null, upSpent = 0, upTrial: number | null = null, upDone = false;   // the ratio left by the accepted step down; seconds at ≥ upFps; the ratio being tried again
   const stats = { fps: 0, pixelRatio, settled };
   (window as any).__houseViewer = stats;
+  (stats as any).realism = () => realism.stats();   // what the live realism features installed (the live checks read it)
   function setPixelRatio(pr: number) {
     pixelRatio = pr; stats.pixelRatio = pr;
     renderer.setPixelRatio(pr);
@@ -956,6 +957,7 @@ export function mountViewer(api: Api) {
       dirty = true;
     }
     wasFlying = flying;
+    if (realism.tick(delta)) dirty = true;   // (after the shot's dressing and hidden items: a feature may follow them)
     // with the path showing, a ring marks what the shot is looking at right now (flying, the ghost's ray does)
     nowTarget.visible = showPath && !flying;
     if (nowTarget.visible && dirty) { const p = nowTarget.geometry.attributes.position; p.setXYZ(0, controls.target.x, controls.target.y, controls.target.z); p.needsUpdate = true; }
@@ -1300,5 +1302,6 @@ export function mountViewer(api: Api) {
   function beforeExternalRender() { glass.restore(); realism.restore(); }
   function afterExternalRender() { if (!hq) glass.apply(); realism.reapply(); }
 
+  (stats as any).external = { begin: beforeExternalRender, end: afterExternalRender };   // (the live checks stand in for the page's __houseRender* hooks, which refuse to run in the player)
   return { frame, beforeExternalRender, afterExternalRender };
 }

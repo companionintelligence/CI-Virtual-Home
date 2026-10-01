@@ -21,7 +21,7 @@ export type RealismCtx = {
 
 export type RealismHandle = {
   apply(): void; restore(): void; sync?(): void;
-  tick?(dtS: number, tS: number, camera: any): void;
+  tick?(dtS: number, tS: number, camera: any): void | boolean;   // (scaffold: a true return marks the frame dirty)
   idle?(idleMs: number): boolean;
   render?(hq: boolean): boolean;
   keepsOpaqueGlass?(): boolean;
@@ -84,6 +84,8 @@ export function createRealism(host: RealismHost) {
     reapply() { on = true; for (const x of handles) { try { x.h.apply(); } catch (e) { warn(x.f, 'apply failed', e); } } },
     setHq(v: boolean) { hq = v; for (const x of handles) { try { x.h.setHq?.(v); } catch (e) { warn(x.f, 'setHq failed', e); } } },
     onLighting(name: string) { for (const cb of lightingCbs) cb(name); for (const x of handles) { try { x.h.sync?.(); } catch (e) { warn(x.f, 'sync failed', e); } } },
+    /** once per frame; true when a feature changed what is drawn */
+    tick(dtS: number): boolean { let d = false; if (!on) return d; for (const x of handles) { try { if (x.h.tick?.(dtS, 0, host.camera) === true) d = true; } catch (e) { warn(x.f, 'tick failed', e); } } return d; },
     stats() { const o: Record<string, any> = {}; for (const x of handles) { try { o[x.f.key] = x.h.stats?.() ?? true; } catch { o[x.f.key] = 'error'; } } return o; },
     get ctx() { return ctx; },
   };
