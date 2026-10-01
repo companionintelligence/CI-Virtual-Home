@@ -23,6 +23,7 @@ export const restore = defineCase({
     t.check(during.presenting, 'the session is not presenting');
     t.check(JSON.stringify(during.proj.map((v: number) => +v.toFixed(5))) !== JSON.stringify(before.camera.proj), 'the camera projection is the same during the session as before it: nothing was overwritten, so the restore check is vacuous');
     t.note('driver', e.driver);
+    await t.screenshot(p, `restore-${t.device}-${e.driver}-in-session`);   // both eyes side by side, for a human to look at
     await endSession(p, e);
     await sleep(500);
 
