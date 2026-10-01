@@ -63,7 +63,7 @@ for (const d of DEVICES) {
       const v: any = (window as any).__houseViewer, de = document.documentElement, cv = document.querySelector('canvas') as HTMLCanvasElement;
       const small: string[] = [];
       const min = touch ? 44 : 24;
-      for (const el of document.querySelectorAll<HTMLElement>('.vh button, .vh a, .vh input[type="range"]')) {
+      for (const el of Array.from(document.querySelectorAll<HTMLElement>('.vh button, .vh a, .vh input[type="range"]'))) {
         const cs = getComputedStyle(el), b = el.getBoundingClientRect();
         if (cs.display === 'none' || cs.visibility === 'hidden' || b.width === 0 || b.height === 0 || el.closest('[hidden], [inert]')) continue;
         if (Math.min(b.width, b.height) + 0.5 < min) small.push(`${el.dataset.act || el.className} ${Math.round(b.width)}x${Math.round(b.height)}`);

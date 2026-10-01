@@ -169,8 +169,9 @@ export function mountPlatform(c: TierCtx): Platform {
       lowT = fps < b.fpsFloor ? lowT + span : 0;
       if (lowT >= REVERT_SECONDS) { lowT = 0; state.promoted = false; state.noPromote = true; move('mobile-low', 'reverted: 3 s under the floor'); return raw; }
     }
-    // eco waits for ADAPT: at ratio 1, settled, and still under the floor for a whole window
-    if (b.eco && act.settled() && act.ratio() <= 1 + 1e-3) {
+    // eco waits for ADAPT: settled (it has stepped the ratio down and found it buys nothing, or reached 1), and still under the floor for a whole window.
+    // (Not "at ratio 1": a CPU-bound phone is put back at its start ratio by ADAPT's own undo, and that is exactly the phone that needs this.)
+    if (b.eco && act.settled()) {
       ecoT = fps < b.fpsFloor ? ecoT + span : 0;
       if (ecoT >= ECO_SECONDS) {
         ecoT = 0; state.eco = true; headT = 0; slowSeen = false; acc = 0;
