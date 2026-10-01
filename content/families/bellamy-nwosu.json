@@ -1,0 +1,809 @@
+{
+  "schema": "family/v1",
+  "slug": "bellamy-nwosu",
+  "house": "onestory",
+  "fictional": true,
+  "family": {
+    "surname": "Bellamy-Nwosu",
+    "tagline": "Radio logbooks, quilting patterns and a library of their own.",
+    "household": "grandparents",
+    "business": false,
+    "story": "Winston is a retired machinist who has kept radio logbooks for fifty years. Adaeze is a retired librarian who quilts and keeps a reading list. Their grandson Kelechi visits on weekends, and one Companion Core sits on a shelf in the living room.",
+    "address": {
+      "line": "330 Sparrow Mill Road",
+      "place": "Quarry Wick"
+    },
+    "narrator": "v-storyteller-m"
+  },
+  "members": [
+    {
+      "id": "winston",
+      "name": "Winston",
+      "age": 76,
+      "role": "partner",
+      "work": "retired machinist, amateur radio",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Percy",
+        "runtime": "OpenClaw",
+        "job": "Opens Kiwix in its own browser and pulls up the manual Winston names.",
+        "personality": [
+          "practical",
+          "patient",
+          "steady"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Pulls up a page. Winston reads it."
+      }
+    },
+    {
+      "id": "adaeze",
+      "name": "Adaeze",
+      "age": 72,
+      "role": "partner",
+      "work": "retired librarian, quilter",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Opal",
+        "runtime": "Hermes",
+        "job": "Finds the book or pattern Adaeze asks about, from what she put in Companion Memory.",
+        "personality": [
+          "gentle",
+          "calm",
+          "patient"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Finds and reports. Adaeze opens and decides."
+      }
+    },
+    {
+      "id": "kelechi",
+      "name": "Kelechi",
+      "age": 15,
+      "role": "visitor",
+      "work": "grandson, weekend visits",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining room"
+    },
+    {
+      "id": "bedrooms",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The two bedrooms"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The deck and garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "kelechi",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel, carried by a grandson",
+        "body": "The parcel arrives on a Friday, as Kelechi does. He carries it through the vestibule and entry hall to the living room. Winston rolls ahead on his scooter."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "adaeze",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Everything in the parcel",
+        "body": "Winston lifts out the Companion Core, a power cable and a recovery USB drive. Adaeze reads the quick-start guide. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "winston",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Winston plugs in the cable. Adaeze presses the button, and the Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "winston",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Winston joins the Core's own Wi-Fi network from his phone. Then he picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "adaeze",
+      "with": [
+        "kiwix",
+        "koodo-reader"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Choose the first agents",
+        "body": "In Companion Hub, Adaeze picks Hermes and Winston picks OpenClaw. They add Companion Memory (beta), Kiwix and Koodo Reader, then settle into their chairs.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Kiwix, Koodo Reader"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "adaeze",
+      "agent": "adaeze",
+      "approval": "adaeze",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Opal says good evening",
+        "body": "Adaeze sends the first message to Opal, the agent she named. Opal answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "adaeze",
+        "text": "Good evening, Adaeze. I am Opal. What shall we find first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "winston",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Where the chapter stopped",
+        "body": "Winston settles into the bay window loveseat. Audiobookshelf starts his book right where he stopped, from the library on the Core.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-nook",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "adaeze",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "fireplace",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Old photographs by the fire",
+        "body": "Beside the fireplace, Adaeze and Kelechi look through old family pictures in Immich. The whole library sits on the Core.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "living-lamps",
+      "chapter": "living",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "winston",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Lamps that come on at dusk",
+        "body": "At dusk, the lamps in the fireside nook come on by themselves, on a Home Assistant schedule. It runs on the Core over the home Wi-Fi.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-recipes",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "adaeze",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Recipe cards, typed at last",
+        "body": "At the breakfast bar, Adaeze types her mother's recipe cards into KitchenOwl, a few each evening. The recipe book lives on the Core.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-jobs",
+      "chapter": "kitchen",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "winston",
+      "app": {
+        "id": "vikunja",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "lists, boards and calendars for tasks, with reminders and recurring jobs",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The weekend list has reminders",
+        "body": "Winston keeps the weekend jobs in Vikunja, with a reminder for each. The gutters come first, and the list lives on the Core.",
+        "chips": [
+          "Vikunja",
+          "replaces Todoist"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-receipts",
+      "chapter": "kitchen",
+      "category": "money",
+      "segment": "consumer",
+      "member": "winston",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "archive the receipts, warranties and contracts you rarely look at",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "The oven's papers, filed",
+        "body": "Winston files the new oven's receipt and papers in Papra. They wait there, on the Core, until a question comes up.",
+        "chips": [
+          "Papra",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "dining-log",
+      "chapter": "dining",
+      "category": "creative",
+      "segment": "consumer",
+      "member": "winston",
+      "app": {
+        "id": "logseq",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "a daily journal in plain Markdown files",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A new line in the log",
+        "body": "At the dining table, Winston types the day's radio contacts into Logseq. One page a day, as plain files on the Core.",
+        "chips": [
+          "Logseq",
+          "replaces Notion"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "dining-reference",
+      "chapter": "dining",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "winston",
+      "agent": "winston",
+      "approval": "winston",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Percy finds the article",
+        "body": "Winston asks Percy for the article on dipole antennas. Percy opens Kiwix in its own browser and pulls it up. Winston reads it, pencil in hand.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "say": {
+        "speaker": "winston",
+        "text": "Here is the article. Please read it."
+      }
+    },
+    {
+      "id": "dining-readlist",
+      "chapter": "dining",
+      "category": "media",
+      "segment": "consumer",
+      "member": "adaeze",
+      "app": {
+        "id": "yamtrack",
+        "replaces": []
+      },
+      "capability": "track the films, shows, books and games you have watched, read and played",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "The reading list, kept up",
+        "body": "Adaeze keeps her reading list in Yamtrack: the books she has finished and the ones still waiting. It began on paper, in her library days.",
+        "chips": [
+          "Yamtrack"
+        ]
+      }
+    },
+    {
+      "id": "dining-quiz",
+      "chapter": "dining",
+      "category": "home",
+      "segment": "consumer",
+      "member": "kelechi",
+      "app": {
+        "id": "razzia",
+        "replaces": []
+      },
+      "capability": "run a quiz night for a small group",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Kelechi hosts the quiz",
+        "body": "On Saturday night, Kelechi hosts a quiz in Razzia at the dining table. Adaeze keeps score, and Winston argues the radio questions.",
+        "chips": [
+          "Razzia"
+        ]
+      }
+    },
+    {
+      "id": "bedrooms-reader",
+      "chapter": "bedrooms",
+      "category": "media",
+      "segment": "consumer",
+      "member": "kelechi",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with notes and highlights",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A novel and a highlighted line",
+        "body": "At the desk in the guest room, Kelechi reads a novel in Koodo Reader. He highlights a line to show his grandmother. The library lives on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "bedrooms-opal",
+      "chapter": "bedrooms",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "adaeze",
+      "agent": "adaeze",
+      "approval": "adaeze",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk; imports are opt-in",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Opal finds the quilt photo",
+        "body": "Adaeze asks Opal which pattern she used for the blue quilt. Opal finds the photo Adaeze chose to put in Companion Memory. Adaeze opens it herself."
+      },
+      "say": {
+        "speaker": "adaeze",
+        "text": "I found the photo. Please open it to check."
+      },
+      "film": true
+    },
+    {
+      "id": "bedrooms-quilt",
+      "chapter": "bedrooms",
+      "category": "creative",
+      "segment": "consumer",
+      "member": "adaeze",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A quilt block, drawn first",
+        "body": "Adaeze draws a new quilt block in Inkscape, in her browser. It is line art now and fabric next week.",
+        "chips": [
+          "Inkscape",
+          "replaces Adobe Illustrator"
+        ]
+      }
+    },
+    {
+      "id": "garden-music",
+      "chapter": "garden",
+      "category": "media",
+      "segment": "consumer",
+      "member": "kelechi",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Sunday music on the deck",
+        "body": "On Sunday, Kelechi plays his favorite albums from Navidrome on the deck. The collection streams from the Core to his phone.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-walk",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "winston",
+      "app": {
+        "id": "wanderer",
+        "replaces": []
+      },
+      "capability": "plan, map and share hiking and biking routes from GPX files",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A walk planned from the deck",
+        "body": "Winston and Kelechi load a GPX route into Wanderer and plan the afternoon's walk from the deck. The route lives on the Core.",
+        "chips": [
+          "Wanderer"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one shelf",
+        "body": "The Bellamy-Nwosu household keeps its logbooks, its reading list and its weekends on one Core in the living room."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your logbook, your reading list and your quilting patterns can live on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "No TV in this home: the media beat is Audiobookshelf at the couch (the bay window loveseat). The words TV and screen are not used.",
+    "Winston rides a mobility scooter (cast leaves it open which spouse). Mentioned once, as a fact, in ftue-delivery.",
+    "dining-reference: Kiwix needs its content files downloaded once; the text does not say offline. Percy opens a local app, not a website.",
+    "guest-opal is the Finder persona: Hermes drafts and reports, Adaeze opens and decides. Companion Memory is opt-in. Invented place and street: check Quarry Wick and Sparrow Mill Road against a map."
+  ]
+}
