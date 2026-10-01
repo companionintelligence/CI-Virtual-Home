@@ -7,7 +7,7 @@
 // transient-pointer). No headset is involved: what emulation cannot prove is listed at the end of every run.
 //
 //   node --experimental-strip-types scripts/xr-tests/10-session.mts [--only unit,lifecycle,context,killswitch,cycles,vision,weight]
-//        [--profile quest3,vision] [--house cutestarter] [--dist] [--shots test/xr] [--headed]
+//        [--profile quest3,vision] [--house cutestarter] [--dist] [--shots test/portal/xr] [--headed]
 //
 //   IWER      $IWER_JS (a path to iwer.min.js), else node_modules/iwer/build/iwer.min.js (the xr-test package makes it a devDependency)
 //   --dist    serve dist/ (pnpm run portal:build) at /ci-virtual-home/ instead of the checkout at / (needed for `weight`)
@@ -37,7 +37,7 @@ const ONLY = new Set((args.only || '').split(',').filter(Boolean));
 const want = (k: string): boolean => !ONLY.size || ONLY.has(k);
 const PROFILES = (args.profile || 'quest3,vision').split(',').filter(Boolean);
 const HOUSE = args.house || 'cutestarter';
-const SHOTS = path.resolve(args.shots || path.join(ROOT, 'test', 'xr'));
+const SHOTS = path.resolve(args.shots || path.join(ROOT, 'test', 'portal', 'xr'));
 fs.mkdirSync(SHOTS, { recursive: true });
 
 let failures = 0, passes = 0;
