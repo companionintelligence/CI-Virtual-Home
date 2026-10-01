@@ -21,6 +21,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import {
   ROOT, SUBPATH, DEVICES, Fail, Skip, loadPlaywright, LAUNCH_ARGS, serve, openPage, treeHasXr, parseArgs, iwerVersion,
   isCase, type Case, type Ctx, type Device, type OpenOpts, type P, type Tree, type Driver,
@@ -45,13 +46,20 @@ const TESTS = path.join(import.meta.dirname, 'xr-tests');
 const files = fs.existsSync(TESTS) ? fs.readdirSync(TESTS).filter(f => f.endsWith('.mts')).sort() : [];
 type Entry = { file: string; c: Case };
 const entries: Entry[] = [];
+// A file that starts with a shebang is a STANDALONE script (it runs its own browser at import time, as 10-session.mts did before it
+// was converted to cases): importing it here would run it with every `xr:test`, whatever --only said. So it is never imported. It is
+// listed, and it runs as a child process, after the cases, only when --only names its file ("--only 10"); the arguments it understands
+// (--house --dist --shots --profile) are passed on. A file that exports cases (no shebang) is the form this runner wants.
+const standalone: string[] = [];
 for (const f of files) {
+  if (fs.readFileSync(path.join(TESTS, f), 'utf8').startsWith('#!')) { standalone.push(f); continue; }
   const mod = await import(pathToFileURL(path.join(TESTS, f)).href);
   for (const v of Object.values(mod)) if (isCase(v)) entries.push({ file: f, c: v });
 }
+const standaloneSelected = standalone.filter(f => only && only.some(o => f.toLowerCase().startsWith(o) || f.toLowerCase().includes(o)));
 const selected = entries.filter(({ file, c }) => !only || only.some(o => file.toLowerCase().startsWith(o) || file.toLowerCase().includes(o) || c.id.toLowerCase() === o || c.id.toLowerCase().includes(o)));
-if (args.list === 'true') { for (const { file, c } of entries) console.log(`${file.padEnd(22)} ${c.id.padEnd(14)} ${(c.devices || ['any']).join(',').padEnd(18)} ${c.title}`); process.exit(0); }
-if (!selected.length) { console.error(`no case matches --only ${args.only} (${entries.length} cases in ${files.length} files; --list shows them)`); process.exit(2); }
+if (args.list === 'true') { for (const { file, c } of entries) console.log(`${file.padEnd(22)} ${c.id.padEnd(14)} ${(c.devices || ['any']).join(',').padEnd(18)} ${c.title}`); for (const f of standalone) console.log(`${f.padEnd(22)} (standalone script: run with --only ${f.slice(0, 2)})`); process.exit(0); }
+if (!selected.length && !standaloneSelected.length) { console.error(`no case matches --only ${args.only} (${entries.length} cases in ${files.length} files; --list shows them)`); process.exit(2); }
 
 // ---------------------------------------------------------------------------------------------------------------- servers and browser
 const trees: Partial<Record<'dist' | 'root', Tree>> = {};
@@ -80,7 +88,7 @@ const extra: Awaited<ReturnType<typeof serve>>[] = [];
 const pw = await loadPlaywright();
 let browser: any = null;
 async function launch() { if (browser) await browser.close().catch(() => {}); browser = await pw.chromium.launch({ headless: args.headed !== 'true', args: LAUNCH_ARGS }); }
-await launch();
+if (selected.length) await launch();
 
 // ---------------------------------------------------------------------------------------------------------------- run
 type Result = { id: string; file: string; device: Device; state: 'pass' | 'fail' | 'skip'; ms: number; msg?: string; notes: Record<string, any>; retried?: boolean };
@@ -136,13 +144,24 @@ try {
     }
   }
 } finally {
-  await browser.close().catch(() => {});
+  await browser?.close().catch(() => {});
   for (const tr of Object.values(trees)) await tr!.srv.close().catch(() => {});
   for (const s of extra) await s.close().catch(() => {});
   for (const d of temps) fs.rmSync(d, { recursive: true, force: true });
 }
 
+// standalone scripts (see discovery) run last, one at a time, after this process's own Chromium is closed: never two browsers at once
+let standaloneFailed = 0;
+for (const f of standaloneSelected) {
+  const a = ['--experimental-strip-types', path.join(TESTS, f), '--dist', '--house', HOUSE, '--shots', SHOTS];
+  const profiles = wantDevices.filter(d => d !== 'quest2');       // the standalone session script knows quest3 and vision
+  if (profiles.length) a.push('--profile', profiles.join(','));
+  console.log(`\nstandalone ${f}: node ${a.slice(1).join(' ')}`);
+  const r = spawnSync(process.execPath, a, { stdio: 'inherit', cwd: ROOT });
+  if (r.status !== 0) { standaloneFailed++; console.log(`FAIL  ${f} exited ${r.status}${r.signal ? ' (' + r.signal + ')' : ''}`); }
+}
+
 const n = (s: string) => results.filter(r => r.state === s).length;
 console.log(`\nxr:test  ${n('pass')} passed, ${n('fail')} failed, ${n('skip')} skipped`);
 if (args.json && args.json !== 'true') fs.writeFileSync(path.resolve(args.json), JSON.stringify({ iwer: iwerVersion(), house: HOUSE, driver: DRIVER, results }, null, 1));
-process.exit(n('fail') ? 1 : 0);
+process.exit(n('fail') || standaloneFailed ? 1 : 0);
