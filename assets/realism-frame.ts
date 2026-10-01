@@ -80,7 +80,6 @@ const feature: RealismFeature = {
     const kitP = floatOk && !(off('hqlite') && off('accum')) ? import('./viewer-composer.js').then(m => {
       kit = m.createFrameKit({ THREE: ctx.THREE, renderer, scene, camera, house: () => ctx.house(), lighting: () => ctx.lighting(), bakedAo: () => bakedAo });
       if (hqOn) kit.hqWarm();
-      (window as any).__vhKit = kit; // TEMP-DEBUG
       ctx.markDirty();
     }, err => { kitFailed = true; console.warn('realism: the frame kit could not be loaded', err); }) : Promise.resolve();
     void kitP;
@@ -96,7 +95,8 @@ const feature: RealismFeature = {
     let steps = 0, lastDt = 0, stepsTotal = 0, resets = 0, skipped = '';
     const pose = new Float64Array(32);       // the camera (world + projection) the accumulation started from
     const takePose = () => { pose.set(camera.matrixWorld.elements, 0); pose.set(camera.projectionMatrix.elements, 16); };
-    const samePose = (): boolean => { const a = camera.matrixWorld.elements, b = camera.projectionMatrix.elements; for (let i = 0; i < 16; i++) if (a[i] !== pose[i] || b[i] !== pose[16 + i]) return false; return true; };
+    // (to 0.01 mm / 1e-6: the free camera's controls rebuild the matrix every frame and shuffle its last bits without moving it)
+    const samePose = (): boolean => { const a = camera.matrixWorld.elements, b = camera.projectionMatrix.elements; for (let i = 0; i < 16; i++) if (Math.abs(a[i] - pose[i]) > 1e-5 || Math.abs(b[i] - pose[16 + i]) > 1e-6) return false; return true; };
     const frames = (): number => (ctx.tier() >= 2 ? 16 : 8);
     let lastReset = '';
     const resetAcc = (why = '') => { if (acc !== 'off') { resets++; lastReset = why; } acc = 'off'; want = false; slow = 0; steps = 0; if (kit) kit.accReset(); };
