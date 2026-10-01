@@ -1,0 +1,872 @@
+{
+  "schema": "family/v1",
+  "slug": "vasquez-nilsen",
+  "house": "neweco",
+  "fictional": true,
+  "family": {
+    "surname": "Vasquez-Nilsen",
+    "tagline": "A house full of sensors and a teen who builds things.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Rosa is a self-employed solar installer who writes her quotes at the dining table. Kari teaches science, and Idris builds robots. They share one table and one Companion Core.",
+    "address": {
+      "line": "7 Mossbank Road",
+      "place": "Tillyard Notch"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "rosa",
+      "name": "Rosa",
+      "age": 44,
+      "role": "parent",
+      "work": "solar installer, self-employed",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Dalia",
+        "runtime": "Hermes",
+        "job": "Drafts site-visit notes and quote cover letters from what Rosa texts it.",
+        "personality": [
+          "precise",
+          "organised",
+          "brisk"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Drafts only. Rosa sends every quote."
+      }
+    },
+    {
+      "id": "kari",
+      "name": "Kari",
+      "age": 43,
+      "role": "parent",
+      "work": "science teacher",
+      "colour": "chart-2"
+    },
+    {
+      "id": "idris",
+      "name": "Idris",
+      "age": 15,
+      "role": "teen",
+      "work": "robotics club, bicycle commuter",
+      "colour": "chart-3",
+      "companion": {
+        "name": "Wick",
+        "runtime": "Hermes",
+        "job": "Drafts parts lists and build notes for the robotics club from Idris's texts.",
+        "personality": [
+          "curious",
+          "bright",
+          "gentle"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Drafts only. Idris decides what to build."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The sunroom lounge"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining table"
+    },
+    {
+      "id": "garage",
+      "kind": "room",
+      "room": "garage",
+      "title": "Idris's workbench"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The garden beds"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Two ends of one table"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel on the timber steps",
+        "body": "A parcel sits on the broad timber steps, between the tropical beds. Idris carries it through the entry hall to the sunroom lounge."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "kari",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kari unpacks the parcel",
+        "body": "Kari unpacks the parcel: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "idris",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Idris plugs it in",
+        "body": "Idris plugs in the power cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "rosa",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Rosa joins from her phone",
+        "body": "Rosa joins the Core's own Wi-Fi from her phone. Then she picks the home network from the list and enters its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "home-assistant",
+        "docuseal",
+        "pi-hole"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Two agents, three apps",
+        "body": "In Companion Hub, Rosa and Idris each pick Hermes. They add Home Assistant, DocuSeal and Pi-hole, plus Companion Memory (beta). Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes",
+            "Companion Memory (beta)",
+            "Apps: Home Assistant, DocuSeal, Pi-hole"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "idris",
+      "agent": "idris",
+      "approval": "idris",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Wick says hello",
+        "body": "Idris texts the agent he named Wick. Wick answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "idris",
+        "text": "Hello, Idris. Wick here. What are we building?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-podcast",
+      "chapter": "living",
+      "member": "kari",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Apple Podcasts"
+        ]
+      },
+      "capability": "Listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Grading to a podcast",
+        "body": "Kari catches up on a science podcast in Audiobookshelf while she grades. The episodes live on the Core and pick up where she left off.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Apple Podcasts"
+        ]
+      }
+    },
+    {
+      "id": "living-dashboard",
+      "chapter": "living",
+      "member": "idris",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "glasshome",
+        "replaces": []
+      },
+      "with": [
+        "home-assistant"
+      ],
+      "capability": "Design a Home Assistant dashboard by dragging widgets, with no YAML",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A dashboard, built by dragging",
+        "body": "Idris drags widgets into a GlassHome dashboard, with no YAML. It shows what the family's own sensors read through Home Assistant.",
+        "chips": [
+          "GlassHome"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "member": "kari",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "Block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "What the house asks the internet",
+        "body": "Kari opens Pi-hole and reads which domains the house asked for this morning. It blocks ad and tracker domains at DNS for every device.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "living-reading",
+      "chapter": "living",
+      "member": "kari",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "archivebox",
+        "replaces": [
+          "Pocket"
+        ]
+      },
+      "capability": "Keep your own searchable archive of web pages",
+      "anchor": {
+        "role": "couch",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A reading list that stays put",
+        "body": "Kari saves the pages she teaches from in ArchiveBox. Her own searchable archive sits on the Core, ready for next term.",
+        "chips": [
+          "ArchiveBox",
+          "replaces Pocket"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-plan",
+      "chapter": "kitchen",
+      "member": "kari",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Meals planned at the breakfast bar",
+        "body": "Kari plans the week's meals in KitchenOwl at the breakfast bar. Idris adds his ride snacks, and the list syncs to every phone.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-subs",
+      "chapter": "kitchen",
+      "member": "kari",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "Track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Subscriptions, listed and reviewed",
+        "body": "Kari lists the household subscriptions in Wallos. It reminds her before each renewal, and she decides what to keep.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-calendar",
+      "chapter": "kitchen",
+      "member": "rosa",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "A family planner with a shared calendar, tasks, shopping, meals, notes, contacts and budget in one",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Three schedules, one calendar",
+        "body": "Rosa adds her site-visit days to Yuvomi's shared calendar. They sit beside Kari's school term and Idris's club nights.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "dining-quote",
+      "chapter": "dining",
+      "member": "rosa",
+      "agent": "rosa",
+      "approval": "rosa",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Dalia drafts the cover letter",
+        "body": "Rosa texts Dalia her site notes. Dalia drafts the cover letter from context in Companion Memory, and Rosa reads it and sends it herself."
+      },
+      "say": {
+        "speaker": "rosa",
+        "text": "Draft ready. Please read it first."
+      },
+      "film": true
+    },
+    {
+      "id": "dining-sign",
+      "chapter": "dining",
+      "member": "rosa",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "docuseal",
+        "replaces": [
+          "DocuSign"
+        ]
+      },
+      "capability": "Fill and sign PDF forms on any device, from your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Signed at the dining table",
+        "body": "A customer stops by to sign. Rosa fills in the quote form in DocuSeal, and the customer signs on a tablet at the table.",
+        "chips": [
+          "Docuseal",
+          "replaces DocuSign"
+        ]
+      }
+    },
+    {
+      "id": "dining-crm",
+      "chapter": "dining",
+      "member": "rosa",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "Keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Every customer, first call to quote",
+        "body": "Rosa tracks each customer in Twenty, from first call to signed quote, with custom fields of her own. The CRM runs on the Core.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      }
+    },
+    {
+      "id": "dining-books",
+      "chapter": "dining",
+      "member": "rosa",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "Invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The month's books, in one place",
+        "body": "Rosa enters the month's expenses in Akaunting. Invoices, customers and the profit and loss report all sit together on the Core.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "dining-papers",
+      "chapter": "dining",
+      "member": "rosa",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "Archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Warranty papers, filed and waiting",
+        "body": "Rosa files each customer's contract and warranty papers in Papra. They wait on the Core until someone asks for them.",
+        "chips": [
+          "Papra",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "dining-robot",
+      "chapter": "dining",
+      "member": "idris",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "blockbench",
+        "replaces": [
+          "MagicaVoxel"
+        ]
+      },
+      "capability": "Model low-poly 3D art and Minecraft-style models in your browser",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "dining-table",
+            "room": "dining"
+          },
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Robots at the other end",
+        "body": "Quotes at one end of the table, robots at the other. Idris sketches his next robot's body in Blockbench to check its shape.",
+        "chips": [
+          "Blockbench",
+          "replaces MagicaVoxel"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garage-parts",
+      "chapter": "garage",
+      "member": "idris",
+      "agent": "idris",
+      "approval": "idris",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "desk",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Wick drafts the parts list",
+        "body": "The robotics club needs a parts list. Idris texts Wick his build notes, and Wick drafts it. Idris checks every line and orders the parts himself."
+      },
+      "say": {
+        "speaker": "idris",
+        "text": "Parts list drafted. Please check it before you order."
+      }
+    },
+    {
+      "id": "garage-ride",
+      "chapter": "garage",
+      "member": "idris",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "endurain",
+        "replaces": [
+          "Strava"
+        ]
+      },
+      "capability": "Track runs, rides and gear and see your fitness stats on your own server",
+      "anchor": {
+        "role": "bicycle",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The commute, kept on the Core",
+        "body": "Idris adds his morning commute to Endurain as a GPX file. His rides and his bicycle gear are tracked on the Core.",
+        "chips": [
+          "Endurain",
+          "replaces Strava"
+        ]
+      }
+    },
+    {
+      "id": "garden-beds",
+      "chapter": "garden",
+      "member": "kari",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The raised beds have a journal",
+        "body": "Kari logs the raised beds in HortusFox, bed by bed, with watering notes and photos. The journal grows with the season.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-soil",
+      "chapter": "garden",
+      "member": "rosa",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "garden",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The soil sensor reports in",
+        "body": "A soil sensor in the raised beds reports to Home Assistant over the home Wi-Fi. Rosa checks the reading on the dashboard before she waters.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Quotes, robots and one Core",
+        "body": "The Vasquez-Nilsen family runs quotes at one end of the table and robots at the other. Both run from one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Keep your quotes, your contracts and your sensor readings on a Companion Core at home. Robots at one end of the table, paperwork at the other.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner-specified hotspot flow; the fact sheet says only \"plug it in, pair it over Wi-Fi, and walk away\". Owner sign-off open.",
+    "No living-room TV: the media beat is an Audiobookshelf podcast at the couch. Energy care: Home Assistant and GlassHome beats say only what sensors read on the home network; no energy figure, saving or solar claim.",
+    "Both companions are Hermes, so ftue-hello carries the Hermes note. dining-quote uses Companion Memory (Dalia has it connected, opt-in).",
+    "dining-sign: the customer signs on a tablet on the home Wi-Fi at the table; no remote signer and no legal claim. DocuSeal listing says signers outside the home network need access to the Core.",
+    "living-dashboard and garden-soil assume the family owns sensors on the home network; none is in the Core parcel. Endurain: GPX upload only, no Strava or Garmin sync. Blockbench is low-poly modelling; check the robot-body wording."
+  ]
+}
