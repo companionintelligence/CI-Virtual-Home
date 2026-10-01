@@ -23,6 +23,9 @@
 //   3. determinism test-frame-hash.mts      — two runs of THIS tree must agree (door-to-core, then core-orbit)
 //   4. goldens    test-goldens.mts          — this tree must still agree with the tree we blessed, less the frames
 //                                             test/goldens/expected-diffs/ declares as moving (the ledger)
+//   4b. ao        bake-ao.mts --check       — the baked ambient-occlusion volumes (content/ao) were made from this tree's
+//                                             geometry; a stale one is a failure (the player would skip it and draw the
+//                                             house without AO). Fix: pnpm run ao [--house id]
 //   5. test:*     scripts/test-*.mts        — every test script, found by glob (plan Completeness C8), so a stream
 //                                             adds its test by adding the file, never by editing this one. A file
 //                                             steers itself with a directive in its first lines:
@@ -81,6 +84,8 @@ const steps: Step[] = [
   // the 8 s product orbit, stepped as random access too (its own path function, not door-to-core's)
   { key: 'determinism:core-orbit', script: S('test-frame-hash.mts'), args: ['--res', RES!, '--shot', 'core-orbit', '--frames', '0,240,479', ...(HOUSE ? ['--house', HOUSE.split(',')[0]] : [])], quick: false },
   { key: 'goldens', script: S('test-goldens.mts'), args: ['--res', RES!, '--jobs', JOBS!, ...(flag('update-goldens') ? ['--update'] : []), ...houseArgs], quick: false, needs: 'determinism,determinism:core-orbit' },
+  // stale-bake check: the AO volumes still match the geometry the builders make (loads each house in the player, no GPU work)
+  { key: 'ao', script: S('bake-ao.mts'), args: ['--check', ...houseArgs], quick: false },
   ...testSteps,
   ...(flag('no-perf') ? [] : [{ key: 'perf', script: S('perf-house.mts'), args: HOUSE ? ['--house', HOUSE] : [], quick: false, advisory: true }]),
 ];
