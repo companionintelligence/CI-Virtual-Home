@@ -1,0 +1,904 @@
+{
+  "schema": "family/v1",
+  "slug": "eriksen-bautista",
+  "house": "familyhome",
+  "fictional": true,
+  "family": {
+    "surname": "Eriksen-Bautista",
+    "tagline": "Seedlings in the yard, orders and journals on the Core.",
+    "household": "young-family",
+    "business": true,
+    "story": "Tomas grows seeds and seedlings in the back yard. Luz is an electrician on call. With three children and a greenhouse, their orders, journal and mailing list live on one Companion Core.",
+    "address": {
+      "line": "77 Candlewick Lane",
+      "place": "Oatley Fork"
+    },
+    "narrator": "v-light-m"
+  },
+  "members": [
+    {
+      "id": "tomas",
+      "name": "Tomas",
+      "age": 36,
+      "role": "parent",
+      "work": "runs the seed and seedling shop",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Juniper",
+        "runtime": "OpenClaw",
+        "job": "Opens Grist in its own browser and updates the seedling stock sheet.",
+        "personality": [
+          "quick",
+          "wry",
+          "bright"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Edits one sheet at a time. Tomas checks it."
+      }
+    },
+    {
+      "id": "luz",
+      "name": "Luz",
+      "age": 38,
+      "role": "parent",
+      "work": "electrician, on call",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Ramon",
+        "runtime": "Hermes",
+        "job": "Drafts the day's job list and callback notes from what Luz texts it.",
+        "personality": [
+          "gentle",
+          "thoughtful",
+          "patient"
+        ],
+        "voice": "v-storyteller-m",
+        "memory": false,
+        "limits": "Drafts only. Luz sends every message."
+      }
+    },
+    {
+      "id": "marcos",
+      "name": "Marcos",
+      "age": 8,
+      "role": "child",
+      "work": "school, easel in the playroom",
+      "colour": "chart-3"
+    },
+    {
+      "id": "ines",
+      "name": "Ines",
+      "age": 2,
+      "role": "child",
+      "work": "toddler, crib in the Nursery",
+      "colour": "chart-4"
+    },
+    {
+      "id": "elio",
+      "name": "Elio",
+      "age": 0,
+      "role": "baby",
+      "work": "baby, six months",
+      "colour": "chart-5"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining table"
+    },
+    {
+      "id": "mudroom",
+      "kind": "room",
+      "room": "laundry",
+      "title": "The mudroom"
+    },
+    {
+      "id": "playroom",
+      "kind": "room",
+      "room": "kids",
+      "title": "The playroom"
+    },
+    {
+      "id": "upstairs",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Elio's room"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Greenhouse and beds"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Seeds and one Core"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel on the veranda",
+        "body": "Luz finds a parcel on the veranda, Elio on her hip. She carries it through the stair hall and the living room to the desk in the living bay."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "marcos",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Marcos helps unpack",
+        "body": "Marcos helps open it. Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug in, press the button",
+        "body": "Tomas plugs in the power cable. Luz presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "luz",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Joined, one phone at a time",
+        "body": "Luz joins the Core's own Wi-Fi from her phone, held out of Ines's reach. Then she picks the home network and types its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "grist",
+        "hortusfox",
+        "yuvomi"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Agents and apps, chosen",
+        "body": "In Companion Hub, Tomas picks OpenClaw and Luz picks Hermes. They add Grist, HortusFox and Yuvomi, and leave Companion Memory (beta) for later. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: OpenClaw, Hermes",
+            "Apps: Grist, HortusFox, Yuvomi",
+            "Companion Memory (beta): later"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "tomas",
+      "agent": "tomas",
+      "approval": "tomas",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "OpenClaw is an agent with its own browser and coding tools, running in its own sandbox, with iOS",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Juniper says hello",
+        "body": "Tomas types a first message to the agent he named Juniper. Juniper answers, and the Core is running."
+      },
+      "say": {
+        "speaker": "tomas",
+        "text": "Hello, Tomas. Juniper here. Which sheet first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-story",
+      "chapter": "living",
+      "member": "ines",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "Listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Tonight's story, picked by Ines",
+        "body": "Evenings here are for listening. Ines picks tonight's story, and Audiobookshelf plays it from the Core. Tomorrow it picks up where the family stopped.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-callbacks",
+      "chapter": "living",
+      "member": "luz",
+      "agent": "luz",
+      "approval": "luz",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "couch",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ramon drafts the callbacks",
+        "body": "After a late call-out, Luz texts Ramon the day's visits from the couch. Ramon drafts the callback notes, and Luz sends each one herself.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "luz",
+        "text": "Notes drafted. Please read each one before you send it."
+      }
+    },
+    {
+      "id": "kitchen-week",
+      "chapter": "kitchen",
+      "member": "luz",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "A family planner with a shared calendar, tasks, shopping, meals, notes, contacts and budget in one",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One calendar for five",
+        "body": "Luz moves the on-call shifts, the school pickups and Sunday supper into Yuvomi's shared calendar at the counter. Tomas sees it on his phone.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "member": "tomas",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "Track the pantry, shopping lists, recipes",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Jars counted, list written",
+        "body": "Tomas counts the jars of preserved tomatoes in Grocy, standing by the fridge. The shopping list shows what the family still needs.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "dining-stock",
+      "chapter": "dining",
+      "member": "tomas",
+      "agent": "tomas",
+      "approval": "tomas",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "grist",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Juniper keeps the stock sheet",
+        "body": "Seedling stock changes by the hour. Juniper opens Grist in its own browser and updates the sheet from Tomas's counts. Tomas checks it.",
+        "chips": [
+          "Grist",
+          "replaces Airtable"
+        ]
+      },
+      "say": {
+        "speaker": "tomas",
+        "text": "Sheet updated. Please check it."
+      },
+      "film": true
+    },
+    {
+      "id": "dining-labels",
+      "chapter": "dining",
+      "member": "tomas",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "Draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A new label, drawn at home",
+        "body": "Tomas draws the Cinder Hill packet label in Inkscape, in his browser. Marcos picks the color for the tomatoes.",
+        "chips": [
+          "Inkscape",
+          "replaces Adobe Illustrator"
+        ]
+      }
+    },
+    {
+      "id": "dining-spanish",
+      "chapter": "dining",
+      "member": "luz",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "Translate text and documents on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Packets in two languages",
+        "body": "Tomas runs the sowing notes for the new packets through LibreTranslate on the Core. Luz fixes the Spanish before the labels are printed.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "dining-newsletter",
+      "chapter": "dining",
+      "member": "tomas",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "listmonk",
+        "replaces": [
+          "Mailchimp"
+        ]
+      },
+      "capability": "Write and send newsletters to your own mailing list",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "The newsletter, list and all",
+        "body": "Tomas writes the spring newsletter in Listmonk. The mailing list of local gardeners stays on the Core, and he presses send himself.",
+        "chips": [
+          "Listmonk",
+          "replaces Mailchimp"
+        ]
+      }
+    },
+    {
+      "id": "dining-slips",
+      "chapter": "dining",
+      "member": "tomas",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "Merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Packing slips, one PDF",
+        "body": "Tomas merges the day's packing slips into one PDF with Stirling-PDF. The merge runs on the Core, and he checks every page.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "dining-books",
+      "chapter": "dining",
+      "member": "tomas",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "firefly-iii",
+        "replaces": [
+          "Mint"
+        ]
+      },
+      "capability": "Track accounts, budgets, bills and savings goals, with rules that sort your transactions",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The month's accounts, sorted",
+        "body": "After supper, Tomas imports the month's bank file into Firefly III from a CSV. Its rules sort the transactions into seed sales and supplies.",
+        "chips": [
+          "Firefly III",
+          "replaces Mint"
+        ]
+      }
+    },
+    {
+      "id": "mudroom-jobs",
+      "chapter": "mudroom",
+      "member": "luz",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "vikunja",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "Lists, boards and calendars for tasks, with reminders and recurring jobs",
+      "anchor": {
+        "role": "room",
+        "room": "laundry",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Tomorrow's jobs, by the door",
+        "body": "Boots on the mat, tool bag on the hook. Luz sorts tomorrow's call-outs into a Vikunja board before she goes up.",
+        "chips": [
+          "Vikunja",
+          "replaces Todoist"
+        ]
+      }
+    },
+    {
+      "id": "playroom-easel",
+      "chapter": "playroom",
+      "member": "marcos",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "tldraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "A shared whiteboard on an infinite canvas",
+      "anchor": {
+        "role": "easel",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Raised beds, drawn twice",
+        "body": "Marcos sketches next year's raised beds at the easel. Then he redraws the plan with Tomas on tldraw, and it stays on the Core.",
+        "chips": [
+          "tldraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "playroom-bugs",
+      "chapter": "playroom",
+      "member": "marcos",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "Read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "A beetle, looked up at home",
+        "body": "Marcos finds a beetle in the beds and wants its name. Kiwix keeps Wikipedia on the Core, so he looks it up beside the toy box.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "upstairs-photos",
+      "chapter": "upstairs",
+      "member": "elio",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "photoprism",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "Browse and share your photo library, with automatic tagging, without uploading it anywhere",
+      "anchor": {
+        "role": "crib",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "low"
+      },
+      "popup": {
+        "title": "Baby photos, kept close",
+        "body": "Beside Elio's crib, Luz browses the baby photos in PhotoPrism. They stay on the Core, and automatic tags help her find them.",
+        "chips": [
+          "PhotoPrism",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "garden-tomato",
+      "chapter": "garden",
+      "member": "marcos",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The first tomato flower",
+        "body": "Marcos waters the tomato seedlings and photographs the first flower. He adds it to HortusFox, where Tomas keeps the garden journal.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-vent",
+      "chapter": "garden",
+      "member": "luz",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "garden",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A vent that opens on schedule",
+        "body": "Luz has wired the greenhouse vent herself. Home Assistant opens it on a schedule from the Core, over the home Wi-Fi.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-pond",
+      "chapter": "garden",
+      "member": "tomas",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "Stream your own music collection to any device",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Sunday music by the pond",
+        "body": "On Sundays the family sits by the pond. Navidrome plays the family's own music from the Core to a phone on the umbrella table.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Seeds, orders and one Core",
+        "body": "Three children, one greenhouse and one Companion Core. The Eriksen-Bautista family keeps its orders, its journal and its mailing list at home."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Keep your orders, your garden journal and your mailing list on a Companion Core at home. Then spend the early morning in the greenhouse.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner-specified hotspot flow; the fact sheet says only \"plug it in, pair it over Wi-Fi, and walk away\". Owner sign-off open.",
+    "No TV by choice: living-story is the media beat at the couch and never names a TV or a screen. The house has no kitchen island, so the kitchen beats say the counter.",
+    "Neither companion has Companion Memory connected. ftue-pick says the family leaves it for later, which is the opt-in story.",
+    "garden-vent assumes the family has a Wi-Fi vent actuator; it is not in the Core parcel or in the 3D scene. Home Assistant has no USB or Zigbee here.",
+    "Newsletter beat claims no delivery: Listmonk needs an SMTP provider or mail server to send. Check the wording with the owner."
+  ]
+}
