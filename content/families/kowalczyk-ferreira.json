@@ -49,7 +49,7 @@
         "runtime": "Hermes",
         "job": "Drafts the family calendar and appointment notes from what Beatriz texts it.",
         "personality": [
-          "organised",
+          "organized",
           "brisk",
           "clear"
         ],
@@ -467,7 +467,7 @@
         "side": "right"
       },
       "popup": {
-        "title": "Choosing the film takes longer",
+        "title": "Choosing takes longer than watching",
         "body": "Rafa takes a long time to choose a film in Jellyfin. The Den TV plays it from the family's library on the Core.",
         "chips": [
           "Jellyfin",
@@ -884,7 +884,12 @@
       "category": "setup",
       "segment": "consumer",
       "anchor": {
-        "role": "street"
+        "role": "garden",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
       },
       "camera": {
         "framing": "wide",
