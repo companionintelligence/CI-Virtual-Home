@@ -45,6 +45,7 @@ const log = (slug: string, msg: string) => console.log(`${JOBS > 1 ? `[${slug}] 
 for (const t of ['ffmpeg', 'ffprobe']) if (spawnSync(t, ['-version'], { stdio: 'ignore' }).status !== 0) { console.error(`${t} is not on PATH`); process.exit(2); }
 
 // ---- one family -------------------------------------------------------------------------------------------------------------------------------
+const finished = new Map<string, Set<FilmKey>>();
 type Result = { slug: string; ok: boolean; skipped?: boolean; error?: string; entry?: FilmEntry; seconds: Record<string, number> };
 
 /** The film's sound, captions and timeline: everything a film needs that is not a picture. Throws with the reason a family cannot be filmed. */
@@ -86,12 +87,19 @@ async function renderFamily(browser: any, srv: Served, slug: string): Promise<Re
     const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
     const page = await ctx.newPage(); page.setDefaultTimeout(0); page.on('pageerror', (e: Error) => console.error('  page error:', e.message));
     const aspects: Record<string, FilmAspect> = {};
-    const filmDir = path.join(familiesDir(), slug, 'film'); fs.mkdirSync(filmDir, { recursive: true });
+    const filmDir = path.join(familiesDir(), slug, 'film'), vttBytes = Buffer.from(P.vtt), vName = vttFileName(vttBytes);
+    if (!flags.stills) {
+      // captions: one file for both shapes (the words and their times are the same)
+      fs.mkdirSync(filmDir, { recursive: true });
+      for (const old of fs.readdirSync(filmDir)) if (old.startsWith('captions.') && old !== vName) fs.rmSync(path.join(filmDir, old));
+      fs.writeFileSync(path.join(filmDir, vName), vttBytes);
+    }
     try {
       await stubGoogleFonts(page, srv.origin);
       await page.goto(`${srv.origin}/room-creator.html?house=${fam.story.house}&shot=orbit&res=${RES}&aspect=16:9`, { waitUntil: 'domcontentloaded', timeout: 240000 });
       await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, fam.story.house, { timeout: 300000 });
       for (const key of ASPECTS) {
+        if (finished.get(slug)?.has(key)) continue;          // done before a retry of this family
         const ta = Date.now(), f = formatFor(key, RES);
         await page.evaluate(([r, a]: string[]) => (window as any).__houseComposerWarm({ res: r, aspect: a }), [String(RES), aspectLabel(key)]);
         const info = await page.evaluate(async (a: any) => { // @ts-ignore (a URL in the page, not a module of this script)
@@ -102,7 +110,9 @@ async function renderFamily(browser: any, srv: Served, slug: string): Promise<Re
         let posterJpg: Buffer | null = null;
         const ff = spawn('ffmpeg', encodeArgs({ wav, fps: info.fps, web: tmpWeb, master: tmpMaster }), { stdio: ['pipe', 'ignore', 'pipe'] });
         let ffErr = ''; ff.stderr.on('data', (d: any) => (ffErr += d));
-        const ffDone = new Promise<void>((resolve, reject) => { ff.on('error', reject); ff.on('close', code => (code === 0 ? resolve() : reject(new Error(`ffmpeg exited ${code}: ${ffErr.trim()}`)))); });
+        const ffDone = new Promise<void>((resolve, reject) => { ff.on('error', reject); ff.on('close', (code, sig) => (code === 0 ? resolve() : reject(new Error(`ffmpeg exited ${code ?? sig}: ${ffErr.trim()}`)))); });
+        ffDone.catch(() => {});                       // (reported where it is awaited; a rejection nobody awaits yet must not end the process)
+        ff.stdin.on('error', () => {});               // a dead ffmpeg surfaces as ffDone's error, not as a broken pipe here
         const write = (buf: Buffer) => new Promise<void>(r => (ff.stdin.write(buf) ? r() : ff.stdin.once('drain', () => r())));
         try {
           const posterW = key === '16x9' ? 1280 : 720;
@@ -135,19 +145,16 @@ async function renderFamily(browser: any, srv: Served, slug: string): Promise<Re
         for (const old of fs.readdirSync(filmDir)) if (old.startsWith(key === '16x9' ? 'poster.' : 'poster-9x16.') && old !== pName) fs.rmSync(path.join(filmDir, old));
         fs.writeFileSync(path.join(filmDir, pName), posterJpg);
         aspects[key] = { file, sha256: sha256(bytes), bytes: bytes.length, width: f.w, height: f.h, durationMs: Math.round(rep.probe.duration * 1000), poster: `film/${pName}`, loudness: { I: +rep.loudness!.I.toFixed(1), TP: +rep.loudness!.TP.toFixed(1) } };
-        res.seconds[key] = (Date.now() - ta) / 1000;
+        res.seconds[key] = (Date.now() - ta) / 1000; finished.set(slug, (finished.get(slug) || new Set()).add(key));
+        // recorded as soon as THIS shape is done, so a later failure keeps it (a film is only ever listed with the inputs it was made from)
+        { const fl = readFilms(), cur = fl.families[slug]; const keep = cur && cur.inputsSha === inputsSha ? cur.aspects : {};
+          fl.families[slug] = { durationMs: Math.round(P.clock.duration * 1000), inputsSha, vtt: `film/${vName}`, aspects: { ...keep, [key]: aspects[key] } }; writeFilms(fl); }
         fs.writeFileSync(path.join(vdir, `${slug}.${key}.report.json`), JSON.stringify({ gates: rep, cards: info.cards, placements: info.placements, wallSeconds: res.seconds[key] }, null, 1));
         log(slug, `  ${key}: ${(bytes.length / 1048576).toFixed(1)} MiB, ${rep.probe.duration.toFixed(1)} s, ${rep.loudness!.I.toFixed(1)} LUFS / ${rep.loudness!.TP.toFixed(1)} dBTP, ${(res.seconds[key]).toFixed(0)} s wall`);
       }
       if (flags.stills) return { ...res, ok: true };
-      // captions (one file: the words and their times are the same in both shapes)
-      const vttBytes = Buffer.from(P.vtt), vName = vttFileName(vttBytes);
-      for (const old of fs.readdirSync(filmDir)) if (old.startsWith('captions.') && old !== vName) fs.rmSync(path.join(filmDir, old));
-      fs.writeFileSync(path.join(filmDir, vName), vttBytes);
-      const merged = prev && prev.inputsSha === inputsSha ? { ...prev.aspects, ...aspects } : aspects;
-      const entry: FilmEntry = { durationMs: Math.round(P.clock.duration * 1000), inputsSha, vtt: `film/${vName}`, aspects: merged };
-      films.families[slug] = entry; writeFilms(films);
-      res.entry = entry;
+      if (flags.stills) return { ...res, ok: true };
+      res.entry = readFilms().families[slug];
     } finally { await ctx.close().catch(() => {}); }
     res.ok = true; res.seconds.total = (Date.now() - t0) / 1000;
     log(slug, `${slug}: done in ${res.seconds.total.toFixed(0)} s`);
@@ -183,7 +190,7 @@ const queue = [...list], results: Result[] = [], t0 = Date.now();
 await Promise.all(Array.from({ length: Math.min(JOBS, list.length) }, async () => {
   for (let s = queue.shift(); s; s = queue.shift()) {
     let r = await renderFamily(browser, srv, s);
-    if (!r.ok && browser && /Timeout|crash|closed|Target page|navigation/i.test(r.error || '')) { console.error(`${s}: ${r.error}\n${s}: trying once more on a fresh page`); r = await renderFamily(browser, srv, s); }
+    if (!r.ok && browser && /Timeout|crash|closed|Target page|navigation|ffmpeg exited/i.test(r.error || '')) { console.error(`${s}: ${r.error}\n${s}: trying once more on a fresh page`); r = await renderFamily(browser, srv, s); }
     results.push(r);
   }
 }));
