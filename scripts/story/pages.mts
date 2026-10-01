@@ -58,6 +58,7 @@ export function header(rel: string): string {
       <a href="${rel}index.html#start">How it starts</a>
       <a href="${rel}index.html#local">Why local</a>
       <a href="${HUB_URL}" rel="noopener">${'Companion Hub'}${icon('out', 'i-out')}</a>
+      <a class="nav-cta" href="${CORE_URL}" rel="noopener">See ${PRODUCT}</a>
     </nav>
     <a class="btn btn-primary btn-sm head-cta" href="${CORE_URL}" rel="noopener">See ${PRODUCT}</a>
     <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">${icon('menu')}</button>
@@ -197,7 +198,7 @@ export function familyPage(c: FamilyPageCtx): string {
   <script type="module" src="../portal/site.js"></script>
 </head>
 <body class="page-family">
-  ${sprite(['out', 'play', 'next', 'prev', 'menu', 'film'])}
+  ${sprite(['out', 'play', 'next', 'prev', 'menu', 'film', 'box'])}
   ${header('../')}
   <main id="main">
     <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">${PRODUCT}</a></li><li><a href="../index.html#families">Families</a></li><li aria-current="page">${esc(card.title)}</li></ol></nav>

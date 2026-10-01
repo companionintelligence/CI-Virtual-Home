@@ -356,6 +356,17 @@ async function pages() {
       await close();
     }
   }
+  // the same pages in the dark scheme (the canon has two themes; a colour that only works in one is a bug)
+  for (const target of ['index.html', `family/${slug}`]) {
+    const { page, close } = await open({ width: 1440, height: 900 }, false, { colorScheme: 'dark' });
+    await page.goto(srv.url(target));
+    if (target === 'index.html') await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
+    await sleep(400);
+    const issues: string[] = await page.evaluate(AUDIT);
+    ok(issues.length === 0, `accessibility audit of ${target === 'index.html' ? 'the landing' : 'a family page'}, dark scheme${issues.length ? ': ' + issues.join(' | ') : ''}`);
+    await shot(page, `${target === 'index.html' ? 'landing' : 'family'}-dark`);
+    await close();
+  }
 }
 
 // ------------------------------------------------------------------ link previews of the built pages
