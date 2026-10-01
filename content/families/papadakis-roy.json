@@ -782,28 +782,36 @@
       }
     },
     {
-      "id": "water-herbs",
+      "id": "water-photo",
       "chapter": "water",
       "member": "eleni",
-      "category": "home",
+      "category": "creative",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
+        "id": "mazanoke",
         "replaces": []
       },
-      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "capability": "resize and compress images in the browser",
       "anchor": {
-        "role": "garden"
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
       },
       "camera": {
         "framing": "medium",
         "eye": "standing"
       },
       "popup": {
-        "title": "Rosemary for the focaccia",
-        "body": "Eleni logs the rosemary and thyme for the focaccia in HortusFox, and the care history stays on the Core.",
+        "title": "A loaf photo for the menu",
+        "body": "Eleni shoots the week's loaf on the patio and shrinks the photo for the menu in Mazanoke. Nothing is uploaded.",
         "chips": [
-          "HortusFox"
+          "Mazanoke"
         ]
       },
       "film": true
@@ -873,7 +881,7 @@
     "Listmonk needs an SMTP provider to send at volume (catalog caveat). The story only says Eleni writes and sends the note herself, with no delivery claim.",
     "floor-camera: Frigate on the pickup door records customers collecting loaves. Check that the owner is comfortable with a camera on a door that customers use. No \"prevents\" or viewing-away claim is made.",
     "water-walk: Wanderer plans routes from a GPX file; map tiles may come from outside the house. The text claims only that the saved route lives on the Core.",
-    "Upstairs Bakehouse is not named in the text; the casting business name is invented. Voice-over lexicon: Papadakis, Eleni, Iris, Walt, Grist, Foldergram, Wanderer, Donetick, Listmonk.",
+    "Upstairs Bakehouse is not named in the text; the casting business name is invented. Voice-over lexicon: Papadakis, Eleni, Iris, Walt, Grist, Foldergram, Mazanoke, Wanderer, Donetick, Listmonk.",
     "Town Spindle Cove and street Ledgewater Street are invented; still needs the human map check."
   ]
 }
