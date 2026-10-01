@@ -270,6 +270,15 @@ head of `main`, or of its open pull request: re-running an old run, or one that 
 with a notice instead of putting an older tree over a newer one. Pull requests from forks, and Dependabot's, get no
 preview, and **Run workflow** on any branch but `main` does nothing.
 
+**Caching.** The engine's modules are not fingerprinted (`assets/viewer.js` is the same URL on every deploy), and
+Cloudflare Pages' default for a static file is a four-hour browser cache with no check in between. A visitor who had
+opened the site in the four hours before a deploy then ran the *new* page against *old* modules from their cache, and
+every home stopped with "This home could not be opened" (`'./assets/shot-track.js' does not provide an export named
+'trackView'`). [`portal/_headers`](portal/_headers), which `portal:build` copies to the site root, makes every file
+`Cache-Control: public, max-age=0, must-revalidate`: the browser asks each time, and an unchanged file costs one empty
+304 (the files carry ETags). `portal:test` checks the file. A copy cached *before* that header shipped is not evicted
+by it: it stays until its four hours run out (a private window, or a hard reload, skips it).
+
 **What the token can do.** Cloudflare's **Pages · Edit** permission cannot be limited to one project: the token can
 publish to, or delete, every Pages project on the account, and this account holds seven today, among them the
 public website and the docs. So exactly one file may reach it: `deploy.yml`, as it is on `main`. A `workflow_run`

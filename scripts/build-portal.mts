@@ -19,6 +19,8 @@
 //                                    and some others read no WebP). og:image and og:url are absolute, as unfurlers
 //                                    want: the site's address is --site-url, else $SITE_URL, else the live site
 //                                    (https://homes.ci.computer/); ci.yml passes a pull request's preview address
+//   <out>/_headers                   Cloudflare Pages' header rules (portal/_headers): Cache-Control max-age=0 with
+//                                    must-revalidate on every file, because the modules below are not fingerprinted
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
@@ -67,13 +69,15 @@ if (stale.length) { console.error(`compiled assets are missing or older than the
 
 // 1. start from a clean copy of what this script owns (.nojekyll: an older build wrote it for GitHub Pages; now it is only
 //    cleared out of a dist/ that still has one)
-const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '.nojekyll'];
+const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '_headers', '.nojekyll'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
 
-// 2. pages
+// 2. pages, and Cloudflare Pages' header rules (portal/_headers: every file is revalidated, so a deploy never leaves
+//    a visitor with the new page and the old modules)
 copy('index.html');
 copy('room-creator.html');
+copy(path.join('portal', '_headers'), '_headers');
 
 // 3. portal: styles, script, the hero and the thumbnails
 for (const f of walk('portal', f => /\.(css|js|webp|jpg)$/.test(f))) copy(f);
