@@ -77,16 +77,29 @@ for (const house of HOUSES) {
         for (let k = 0; k < 8; k++) {
           const q = new THREE.Quaternion().setFromAxisAngle(Y, k * Math.PI / 4);
           for (const [c, i] of [[L, 0], [R, 1]] as any) { c.position.copy(camera.position).add(new THREE.Vector3(i ? ipd / 2 : -ipd / 2, 0, 0).applyQuaternion(camera.quaternion).applyQuaternion(q)); c.quaternion.copy(camera.quaternion).premultiply(q); c.updateMatrixWorld(true); }
-          ac.quaternion.copy(camera.quaternion).premultiply(q); ac.updateMatrixWorld(true);
+          ac.position.copy(camera.position); ac.quaternion.copy(camera.quaternion).premultiply(q); ac.updateMatrixWorld(true);
           r.render(scene, ac); calls.push(r.info.render.calls / 2); tris.push(r.info.render.triangles / 2);
         }
-        L.position.copy(p0[0]); R.position.copy(p0[1]); L.quaternion.copy(q0[0]); R.quaternion.copy(q0[1]); ac.quaternion.copy(q0[2]); L.updateMatrixWorld(true); R.updateMatrixWorld(true); ac.updateMatrixWorld(true);
+        L.position.copy(p0[0]); R.position.copy(p0[1]); L.quaternion.copy(q0[0]); R.quaternion.copy(q0[1]); ac.position.copy(camera.position); ac.quaternion.copy(q0[2]); L.updateMatrixWorld(true); R.updateMatrixWorld(true); ac.updateMatrixWorld(true);
         // JS submission: the heading the shot looks along
         r.render(scene, ac); r.render(scene, ac); sync();
         const cpu: number[] = []; for (let i = 0; i < frames; i++) { const a = performance.now(); r.render(scene, ac); cpu.push(performance.now() - a); } sync(); cpu.sort((a, b) => a - b);
         r.setRenderTarget(prt); r.shadowMap.autoUpdate = au; r.shadowMap.needsUpdate = nu; r.xr.enabled = xe;
         const avg = (a: number[]) => a.reduce((x, y) => x + y, 0) / a.length;
         return { avg: avg(calls), worst: Math.max(...calls), trisAvg: avg(tris), trisWorst: Math.max(...tris), cpuMed: cpu[cpu.length >> 1], cpuMin: cpu[0] };
+      };
+      // the same eight headings from any standing place (the room walk below): calls per eye only, no timing
+      const measureAt = (x: number, y: number, z: number) => {
+        const prt = r.getRenderTarget(), au = r.shadowMap.autoUpdate, xe = r.xr.enabled; r.xr.enabled = false; r.setRenderTarget(rt); r.shadowMap.autoUpdate = false;
+        const calls: number[] = [];
+        for (let k = 0; k < 8; k++) {
+          const q = new THREE.Quaternion().setFromAxisAngle(Y, k * Math.PI / 4);
+          for (const [c, i] of [[L, 0], [R, 1]] as any) { c.position.set(x, y, z).add(new THREE.Vector3(i ? ipd / 2 : -ipd / 2, 0, 0).applyQuaternion(q)); c.quaternion.copy(q); c.updateMatrixWorld(true); }
+          ac.position.set(x, y, z); ac.quaternion.copy(q); ac.updateMatrixWorld(true);
+          r.render(scene, ac); calls.push(r.info.render.calls / 2);
+        }
+        r.setRenderTarget(prt); r.shadowMap.autoUpdate = au; r.xr.enabled = xe;
+        return { avg: calls.reduce((a: number, b: number) => a + b, 0) / 8, worst: Math.max(...calls) };
       };
       const snap = () => {
         const vis: Record<string, boolean> = {}; let n = 0; scene.traverse((x: any) => { x.userData.__census = n++; vis[x.userData.__census] = x.visible; });
@@ -108,23 +121,36 @@ for (const house of HOUSES) {
         const det = bake.detail();
         const m = measure(o.frames);
         const lim = budget.callsSubmitted[budget.refreshHz.start] / 2;
-        out.tiers[label] = { report: rep, detail: det, ...m, limit: lim, fits: m.avg <= lim && m.trisAvg * 2 <= budget.trisSubmitted, fitsWorst: m.worst <= lim, applyMs: performance.now() - t0 };
+        // the room walk: a person standing in the middle of each room (eye 1.6 m), refocused as a teleport would
+        let walkAvg = 0, walkWorst = 0, rooms = 0, walkOver = 0;
+        if (o.rooms && label !== 'merge-only') {
+          const sw = d.house.anchors.shotWorld, lim0 = budget.callsSubmitted[budget.refreshHz.start] / 2;
+          for (const lv of sw.levels) for (const rm of lv.rooms) {
+            if (rooms >= 14) break;
+            const hx = rm.b.x + rm.b.w / 2, hz = rm.b.z + rm.b.d / 2, hy = lv.y + 1.6;
+            bake.refocus([hx, hy, hz]); const mm = measureAt(hx, hy, hz); rooms++;
+            walkAvg = Math.max(walkAvg, mm.avg); walkWorst = Math.max(walkWorst, mm.worst); if (mm.avg > lim0) walkOver++;
+          }
+          bake.refocus(head);
+        }
+        out.tiers[label] = { report: rep, detail: det, walk: { rooms, avg: walkAvg, worst: walkWorst, over: walkOver }, ...m, limit: lim, fits: m.avg <= lim && m.trisAvg * 2 <= budget.trisSubmitted, fitsWorst: m.worst <= lim, applyMs: performance.now() - t0 };
         // restore, twice (idempotent), and the scene must be what it was
         bake.restore(); bake.restore();
         const after = snap();
         out.tiers[label].restored = after.vis === before.vis && after.lights === before.lights && after.auto === before.auto && after.size === before.size;
+        if (!out.tiers[label].restored) out.tiers[label].restoreWhy = `vis ${after.vis === before.vis} lights ${after.lights === before.lights} (${before.lights} / ${after.lights}) auto ${after.auto === before.auto} size ${after.size === before.size}`;
       }
       const again = measure(Math.min(o.frames, 8));
       out.afterRestore = { avg: again.avg, worst: again.worst, same: again.avg === out.shipped.avg && again.worst === out.shipped.worst };
       rt.dispose();
       return out;
-    }, { frames: FRAMES, tiers: TIERS, hostParams: args.params && args.params !== 'true' ? args.params : '' });
+    }, { frames: FRAMES, tiers: TIERS, hostParams: args.params && args.params !== 'true' ? args.params : '', rooms: args.rooms !== 'false' });
     res.load = os.loadavg()[0];
     res.errors = errors;
     rows.push(res);
     const f = (x: any) => x ? `${x.avg.toFixed(0)}/${x.worst.toFixed(0)}` : '-';
     const t = (name: string) => { const x = res.tiers[name]; return x ? `${name} ${f(x)}${x.fits ? '' : '*'} p${x.report.programs} ${x.cpuMed.toFixed(1)}ms` : ''; };
-    console.log(`${house.padEnd(16)} shipped ${f(res.shipped)} ${res.shipped.cpuMed.toFixed(1)}ms | merge ${f(res.tiers['merge-only'])} ${res.tiers['merge-only'].cpuMed.toFixed(1)}ms | ${TIERS.map(t).join(' | ')} | restore ${Object.values(res.tiers).every((x: any) => x.restored) && res.afterRestore.same ? 'exact' : 'DIFFERS'} | load ${res.load.toFixed(0)}`);
+    console.log(`${house.padEnd(16)} shipped ${f(res.shipped)} ${res.shipped.cpuMed.toFixed(1)}ms | merge ${f(res.tiers['merge-only'])} ${res.tiers['merge-only'].cpuMed.toFixed(1)}ms | ${TIERS.map(t).join(' | ')} | restore ${Object.values(res.tiers).every((x: any) => x.restored) && res.afterRestore.same ? 'exact' : 'DIFFERS ' + Object.values(res.tiers).map((x: any) => x.restoreWhy || '').join(' ') + ' after:' + JSON.stringify(res.afterRestore)} | load ${res.load.toFixed(0)}`);
     if (errors.length) console.log('   page errors:', errors.slice(0, 3).join(' | '));
   } catch (err: any) {
     failed++;
@@ -153,6 +179,8 @@ if (ok.length) {
     const fit = x.filter(v => v.fits).length, fitW = x.filter(v => v.fitsWorst).length;
     const lim = x[0].limit;
     console.log(`${t.padEnd(12)} ${median(x.map(v => v.avg)).toFixed(0).padStart(4)} / ${median(x.map(v => v.worst)).toFixed(0).padStart(4)}   limit ${lim}/eye   fits ${fit}/${x.length} (average heading)   ${fitW}/${x.length} (worst heading)   programs median ${median(x.map(v => v.report.programs)).toFixed(0)} max ${Math.max(...x.map(v => v.report.programs))}   texture MB max ${Math.max(...x.map(v => v.report.textureMB))}   apply ms median ${median(x.map(v => v.applyMs)).toFixed(0)}`);
+    const wk = x.filter(v => v.walk && v.walk.rooms);
+    if (wk.length) console.log(`             room walk (up to 14 rooms a house, refocused like a teleport): worst room average ${Math.max(...wk.map(v => v.walk.avg)).toFixed(0)}/eye, worst heading ${Math.max(...wk.map(v => v.walk.worst)).toFixed(0)}/eye; houses with a room over the limit: ${wk.filter(v => v.walk.over).length}/${wk.length}`);
     const over = ok.filter(r => r.tiers[t] && !r.tiers[t].fits).map(r => `${r.houseId}(${r.tiers[t].avg.toFixed(0)}/${r.tiers[t].worst.toFixed(0)})`);
     if (over.length) console.log(`             too detailed: ${over.join(', ')}`);
   }
