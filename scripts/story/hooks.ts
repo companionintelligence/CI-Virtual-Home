@@ -2,8 +2,9 @@
 // scripts/build-portal.mts or scripts/test-portal.mts.
 //
 //   build   scripts/story/site.mts loads every scripts/story/ship/*.mts (alphabetical) and calls its default export
-//           with a ShipCtx, after the family pages, the sanitised specs and the manifest skeleton exist and before
-//           the manifest is written, so a ship file adds files and registers their URLs.
+//           with a ShipCtx, after the sanitised specs, the pictures and the manifest skeleton exist and BEFORE the
+//           family pages, the landing and the manifest are written, so a ship file adds files and registers their
+//           URLs (a film, say) and the pages that come after already know them.
 //   test    scripts/test-portal.mts loads every scripts/story/portal-tests/*.mts (alphabetical) and calls its default
 //           export with a TestCtx, after the landing, family-page and leak checks and inside the one browser process.
 //

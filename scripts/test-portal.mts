@@ -35,7 +35,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { ROOT, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
-import { leakScan, walkFiles, needles } from './story/check-leaks.mts';
+import { leakScan, walkFiles, needles, scanText } from './story/check-leaks.mts';
 import { copyLint } from './story/check-copy.mts';
 import { TEST_GLOB } from './story/hooks.ts';
 import type { TestCtx } from './story/hooks.ts';
@@ -82,6 +82,13 @@ async function open(viewport: { width: number; height: number }, mobile = false,
   await stubGoogleFonts(page, srv.origin);
   return { page, errors, thirdParty, requests, close: () => ctx.close() };
 }
+// T1, the dynamic half: what the page looks like once it has run (the DOM, the tab, the attributes, the meta tags)
+const LEAK_NEEDLES = needles();
+const dynamicLeaks = async (page: any, where: string, code = false): Promise<void> => {
+  const text: string = await page.evaluate(() => `${document.title}\n${document.documentElement.outerHTML}`);
+  const found = scanText(text, where, LEAK_NEEDLES, { code });
+  ok(found.length === 0, `T1 ${where}: nothing in the running page names a home, a builder or an id${found.length ? ': ' + found.slice(0, 3).join(' | ') : ''}`);
+};
 const shot = async (page: any, name: string) => { await page.screenshot({ path: path.join(SHOTS, `${name}.png`) }); };
 const viewerReady = (page: any) => page.waitForFunction(() => document.documentElement.dataset.viewer === 'ready', null, { timeout: 90000 });
 const scrubT = (page: any): Promise<number> => page.$eval('.vh-scrub input', (e: HTMLInputElement) => Number(e.value) / 1000);
@@ -226,6 +233,7 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   const staticStats = ['families', 'people', 'stories'].map(k => (staticHtml.match(new RegExp(`data-stat="${k}">([^<]*)<`)) || [])[1]);
   await page.goto(srv.url('index.html'));
   await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
+  await dynamicLeaks(page, 'the landing');
   const first = requests.map((u: string) => u.replace(srv.origin, ''));
   const noEngine = !first.some((u: string) => /three\.module|\/assets\/(house-builder|viewer)|\.m4a|\.mp4|\/audio\/|\/film\/|story\/[a-z-]+\.[0-9a-f]{10}\.json/.test(u) && !/story\/(families|legacy)\./.test(u));
   ok(noEngine, 'T9 before an interaction the landing loads no audio, no video, no three.js, no engine module and no story');
@@ -318,6 +326,7 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   // a card opens the family's page, and the page the tour
   await page.click('#grid .card:nth-child(2) h3 a');
   await page.waitForURL(new RegExp(`/family/${hrefs[1].slug}$`), { timeout: 15000 });
+  await dynamicLeaks(page, 'a family page');
   ok((await page.textContent('h1')) === titleOf(hrefs[1].slug) && (await page.title()) === `${titleOf(hrefs[1].slug)} · Companion Core`, `a card opens ${titleOf(hrefs[1].slug)}'s page, titled "${await page.title()}"`);
   await page.click('.stage-actions a.btn-primary');
   await page.waitForURL(/room-creator\.html\?mode=view&family=/, { waitUntil: 'commit', timeout: 30000 });
@@ -485,6 +494,7 @@ async function player(id: string, viewport: { width: number; height: number }, m
   await shot(page, `player-${id}-${label}-loading`);
   await viewerReady(page);
   ok(true, `built in ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+  await dynamicLeaks(page, `the tour (${id})`, true);
   ok(await page.evaluate(() => getComputedStyle(document.querySelector('.creator-topbar')!).display === 'none'), 'editor chrome is hidden');
   const chips = await page.$$eval('.vh-shots .vh-chip', (els: HTMLElement[]) => els.map(e => ({ key: e.dataset.shot, label: e.querySelector('span')!.textContent })));
   const presetShots = await page.evaluate(() => { const s = (window as any).__houseDebug().house.shots; return [...new Set(Object.values(s))].length; });
@@ -659,6 +669,7 @@ async function player(id: string, viewport: { width: number; height: number }, m
   await sleep(300);
   const endCard = await page.isVisible('.vh-end') && await page.isVisible('.vh-end [data-act="next"]') && await page.isVisible('.vh-end a[href^="https://ci.computer"]');
   ok(endCard, `the end of the shot offers ${(await page.$$eval('.vh-end button:not([hidden])', (bs: Element[]) => bs.map(b => (b.textContent || '').trim()))).join(', ')}`);
+  await dynamicLeaks(page, `the end card (${id})`, true);
   const cover = await coreCover(page);
   ok(cover >= 0 && cover < 0.05, `the end card covers ${Math.round(cover * 100)} % of the Core`);
   if (mobile) {
