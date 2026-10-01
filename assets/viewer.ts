@@ -138,6 +138,8 @@ export function mountViewer(api: Api) {
   const params = new URLSearchParams(location.search);
   // ?no=glass,adapt kills a live-only performance feature for A/B timing (each one falls back to what the player did before it)
   const no = new Set((params.get('no') || '').split(',').filter(Boolean));
+  // the narrated family tour (assets/story/), a lazy chunk: the landing page weighs the same with or without it. ?no=story is the kill switch
+  const storyP: Promise<any> | null = params.has('family') && !no.has('story') ? import('./story/mount.js').catch(() => null) : null;
   const coarse = matchMedia('(pointer: coarse)').matches;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   api.hideEditorHelpers();
@@ -824,8 +826,9 @@ export function mountViewer(api: Api) {
   const renderer = api.renderer;
   let pixelRatio = renderer.getPixelRatio(), perfTime = 0, perfFrames = 0, trial: { fps: number; pr: number } | null = null, settled = false;
   let stepped: number | null = null, upSpent = 0, upTrial: number | null = null, upDone = false;   // the ratio left by the accepted step down; seconds at ≥ upFps; the ratio being tried again
-  const stats = { fps: 0, pixelRatio, settled };
+  const stats: Record<string, any> = { fps: 0, pixelRatio, settled };
   (window as any).__houseViewer = stats;
+  stats.control = { seek, setPlaying, selectShot, toast, enterFly, exitFly };   // what the tour drives (assets/story/director.ts)
   function setPixelRatio(pr: number) {
     pixelRatio = pr; stats.pixelRatio = pr;
     renderer.setPixelRatio(pr);
@@ -874,6 +877,7 @@ export function mountViewer(api: Api) {
   // the shot's field of view, widened for a narrow window (fitFov); applySplineFrame puts the shot's own back
   // on every frame, so this never compounds
   function fitCamera() {
+    if (shot && shot.preset.fovFitted) return;   // the family tour's track already widens its own lens
     const f = fitFov(camera.fov, camera.aspect);
     if (Math.abs(f - camera.fov) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); }
   }
@@ -933,6 +937,7 @@ export function mountViewer(api: Api) {
     // with the path showing, a ring marks what the shot is looking at right now (flying, the ghost's ray does)
     nowTarget.visible = showPath && !flying;
     if (nowTarget.visible && dirty) { const p = nowTarget.geometry.attributes.position; p.setXYZ(0, controls.target.x, controls.target.y, controls.target.z); p.needsUpdate = true; }
+    stats.t = t; stats.playing = playing;   // the tour reads the clock from here
     if (dirty) { render(); dirty = false; }
     if (shownEndCard && !endPlaced) placeEndCard();
   }
@@ -1009,6 +1014,7 @@ export function mountViewer(api: Api) {
     const token = loadToken;
     const h = api.house();
     batchHouse(h);
+    if (storyP) await (await storyP)?.prepare(api, h);   // registers the tour's shot before the shots are listed
     houseId = h.id;
     const e = houseEntry(h.id);
     const name = who.title(e || { id: h.id });
@@ -1024,13 +1030,13 @@ export function mountViewer(api: Api) {
     renderShots();
     // A home opens on its Orbit: the whole house from above, which reads on every screen. Door to Core spends its
     // middle in doorways and stairwells, framed a metre from a wall, and is one tap away (and a link can ask for it).
-    const s = findShot(shotKey) || findShot(DEFAULT_SHOT) || findShot('door-to-core') || shots[0];
+    const s = findShot(shotKey) || (storyP && findShot('story')) || findShot(DEFAULT_SHOT) || findShot('door-to-core') || shots[0];
     if (!s) { showError(who.errors.noShots); return; }
     await precompile(s, at);
     if (token !== loadToken) return;   // another home was asked for meanwhile: its own onHouse takes over
     ready = true;
     if (flying) exitFly();
-    selectShot(s, { play, at });
+    selectShot(s, { play: play && s.key !== 'story', at });   // (the tour waits for its start card)
     root.dataset.state = 'ready';
     html.dataset.viewer = 'ready';
     canvas.setAttribute('aria-label', `${name}, 3D view`);
