@@ -162,3 +162,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Story site: voice
+
+The family voice-over is generated **locally** by `pnpm run story:voice` (`scripts/build-voiceover.mts`, `scripts/voice/`), with no cloud
+text-to-speech service and no API key. Only the generated audio (`content/families/<slug>/audio/*.m4a`) is committed and shipped; none
+of the software below is shipped or loaded by the site. The site discloses that the narration is synthetic. How to run and change it:
+[`reference/story/voice.md`](reference/story/voice.md).
+
+| Component | Version / revision | Licence | Role |
+|---|---|---|---|
+| [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (model weights and the eight British voice files `bf_emma bf_isabella bf_lily bf_alice bm_george bm_fable bm_lewis bm_daniel`; author hexgrad) | revision `f3ff3571791e39611d31c381e3a41a3af07b4987`; `kokoro-v1_0.pth` sha256 `496dba118d1a58f5f3db2efc88dbdc216e0483fc89fe6e47ee1f2c53f18ad1e4` (pinned in `content/story/voices.json`, checked on every run) | Apache-2.0 (model card) | the voice; its output is the shipped audio |
+| [kokoro](https://github.com/hexgrad/kokoro) | 0.9.4 | Apache-2.0 | inference pipeline and per-token timings |
+| [misaki](https://github.com/hexgrad/misaki) | 0.9.4 | Apache-2.0 | grapheme to phoneme front end (the lexicon overrides use its British phoneme set) |
+| [PyTorch](https://pytorch.org) | 2.13.0 | BSD-3-Clause, with Apache-2.0, BSD-2-Clause, BSL-1.0 and MIT parts (package metadata) | runs the model, CPU, pinned to four threads |
+| [NumPy](https://numpy.org) | 2.5.2 | BSD-3-Clause, with 0BSD, MIT, Zlib and CC0-1.0 parts (package metadata) | sample handling |
+| [python-soundfile](https://github.com/bastibe/python-soundfile) | 0.14.0 | BSD-3-Clause | writes the intermediate WAV |
+| [huggingface_hub](https://github.com/huggingface/huggingface_hub) | 1.27.0 | Apache-2.0 | reads the local, offline model cache (`HF_HUB_OFFLINE=1`; `synth.py` also blocks sockets) |
+| [spaCy](https://spacy.io) `en_core_web_sm` | 3.8.0 | MIT (the model's `LICENSES_SOURCES` lists the training corpora) | tokeniser used by misaki |
+| [espeak-ng](https://github.com/espeak-ng/espeak-ng) | 1.52.0 (Homebrew) | **GPL-3.0-or-later** | out-of-vocabulary pronunciation fallback, loaded through misaki |
+| [phonemizer-fork](https://github.com/bootphon/phonemizer) | 3.3.2 | **GPL-3.0-or-later** | misaki's espeak bridge |
+| [espeakng-loader](https://github.com/thewh1teagle/espeakng-loader) | 0.2.4 | **no licence declared in the wheel metadata**; the wheel bundles an espeak-ng build | locates the espeak-ng library (patched to the Homebrew one, see `scripts/voice/synth.py`) |
+| [FFmpeg](https://ffmpeg.org) | 9.0.2 (Homebrew; configured `--enable-gpl --enable-version3`) | LGPL-2.1-or-later / GPL-3.0-or-later depending on the build | loudness measurement and the native `aac` encoder (AAC-LC, 32 kbps mono 24 kHz). Build-time tool; its code is not in the output |
+
+The environment is CI-Common's `packages/video-kit/scripts/kokoro-setup.sh` (installs under `~/.cache/ci-video-kit/kokoro`). The
+syllable-per-second truncation guard in `scripts/voice/lib.mts` is ported from CI-Common `packages/video-kit/src/narrate.ts` (same
+organisation, first-party).
+
+**Not used.** Piper (its live engine is GPL-3.0 and each voice model has its own licence, unverified). macOS `say` is a last resort
+only; nothing is wired to it, and a lock made with it would have to carry `engine.labelled` (`scripts/test-voiceover.mts` enforces that).
+LYGIA and Grassworks are not used anywhere in the story site.
+
+**For counsel before launch** (also open item 5 in the story bible):
+
+1. **GPL build tooling.** espeak-ng and phonemizer-fork are GPL-3.0 programs that run at build time and whose **output** (audio, never
+   their code) ships. The usual reading is that program output is not a derivative work, but this is a legal call, not an engineering one.
+2. **Training data.** The Kokoro-82M model card states that the training data included synthetic audio from closed TTS providers
+   (recorded here from the plan; not re-verified against the live card). Whether that restricts commercial use of the generated audio
+   is for counsel; the model and code are Apache-2.0.
+3. **espeakng-loader** declares no licence in its wheel metadata. It is a build-time loader and nothing from it ships.
+4. **Voice files.** Each of the eight voice `.pt` files is covered by the model's Apache-2.0 licence per the card; their individual
+   dataset provenance was not independently checked.
+5. The voices are synthetic and disclosed on every surface ("Narration is generated locally with an open text-to-speech model. It is
+   not a recording of a person."). No voice imitates a real person.
