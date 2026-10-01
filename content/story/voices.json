@@ -5,6 +5,7 @@
     "name": "kokoro",
     "model": "hexgrad/Kokoro-82M",
     "modelRevision": "f3ff3571791e39611d31c381e3a41a3af07b4987",
+    "weightsSha256": "496dba118d1a58f5f3db2efc88dbdc216e0483fc89fe6e47ee1f2c53f18ad1e4",
     "licence": "Apache-2.0 (model weights, kokoro 0.9.4, misaki 0.9.4)",
     "run": "local, CPU, seed 0, HF_HUB_OFFLINE=1; reuse the CI-Common venv at ~/.cache/ci-video-kit/kokoro. No cloud TTS, no API key.",
     "fallbacks": "Piper is not used (its live engine is GPL-3.0 and per-voice licences vary). macOS say is a last resort only and must be labelled in the lock."
@@ -34,6 +35,7 @@
     "loudness": "per clip -16 LUFS integrated, limiter at -3 dBTP before AAC; post-decode gate: true peak <= -1.0 dBTP and |dI| <= 0.7 LU",
     "codec": "AAC-LC 32 kbps mono 24 kHz in .m4a, -fflags +bitexact, no metadata (plays on every browser including iOS Safari)",
     "fileName": "<beatId>[.say].<hash10>.m4a where hash10 = first 10 hex of sha256(file bytes); stored at content/families/<slug>/audio/",
-    "budget": "about 4.4 KB per second of speech; at most 700 KB of audio per family"
+    "budget": "about 4.4 KB per second of speech; at most 700 KB of audio per family",
+    "budgetBytes": 700000
   }
 }
