@@ -56,6 +56,8 @@ export interface XrSessionImpl extends XrSessionApi {
   /** `pre` is the requestSession() promise entry.ts made inside the click */
   enter(mode: XrMode, pre?: Promise<any>): Promise<EnterResult>;
   debug(): any;
+  /** the rig of the running session (tests and the story's director place the person through it); null when idle */
+  rig(): XrRigImpl | null;
 }
 
 const wait = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
@@ -377,8 +379,11 @@ export function createSession(host: XrPlayerHost, bus: XrBus): XrSessionImpl {
   }
   function doEnd(why: string): Promise<void> {
     if (endP) return endP;
-    endP = (async () => {
-      const l = L; if (!l) return;
+    // (endP exists before the body runs: session.end() below fires the session's own 'end' event synchronously in some runtimes,
+    // and that listener calls end() again)
+    let done!: () => void; endP = new Promise<void>(r => { done = r; });
+    void (async () => {
+      const l = L; if (!l) { done(); return; }
       state = 'ending';
       const step = (name: string, fn: () => void) => { try { fn(); } catch (e) { console.warn(`xr: ${name} failed while ending`, e); } };
       // 1. stop drawing; the XR animation callback is ours alone
@@ -414,6 +419,7 @@ export function createSession(host: XrPlayerHost, bus: XrBus): XrSessionImpl {
       if (why === 'too-detailed') host.toast(MSG.tooDetailed);
       else if (why === 'render-error') host.toast('VR stopped because of an error. The home is back on the page.');
       was?.finishEnter();
+      done();
     })();
     return endP;
   }
@@ -437,6 +443,7 @@ export function createSession(host: XrPlayerHost, bus: XrBus): XrSessionImpl {
     onFrame: cb => { bus.frame.add(cb); return () => { bus.frame.delete(cb); }; },
     ui: () => (L && L.ui) || null,
     locomotion: () => (L && L.loco) || null,
+    rig: () => (L && L.rig) || null,
     debug() {
       const l = L; if (!l) return null;
       return { state, ...describe(l), controller: l.controller?.state(), loop: l.loop?.stats(), phase: l.loop?.phase(), bake: l.bake?.report(), rigY: l.rig?.group.position.y, fade: l.rig?.fade.get() };

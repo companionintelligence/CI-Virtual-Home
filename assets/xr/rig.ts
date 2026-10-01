@@ -61,7 +61,7 @@ export function createRig(o: { THREE: any; renderer: any; scene: any; camera: an
     const xr = renderer.xr, eyes = xr.isPresenting ? xr.getCamera().cameras : [];
     if (eyes.length) {
       hl.set(0, 0, 0); for (const e of eyes) hl.add(e.position); hl.multiplyScalar(1 / eyes.length);
-      hq.copy(xr.getCamera().quaternion);
+      hq.copy(eyes[0].quaternion);   // (the eye cameras keep the tracking-space pose; the array camera's own quaternion is rewritten to world space by every render)
     } else { hl.copy(camera.position); hq.copy(camera.quaternion); }   // not presenting (a test ticking by hand): the camera's pose under the group
   }
   const yawOf = (quat: any): number => { fwd.set(0, 0, -1).applyQuaternion(quat); return Math.atan2(-fwd.x, -fwd.z); };

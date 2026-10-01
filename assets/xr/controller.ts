@@ -84,9 +84,10 @@ export function createController(o: {
   const bake = o.bake;
   const raiseRate = (hz: number): boolean => {
     try { const f = session.updateTargetFrameRate; if (typeof f !== 'function' || !(session.supportedFrameRates && Array.from(session.supportedFrameRates).includes(hz))) return false; void f.call(session, hz).catch?.(() => {}); } catch { return false; }
-    rate = hz; period = 1000 / hz; st.rateHz = hz; return true;
+    return true;
   };
   function evaluate(time: number) {
+    rate = rateOf(); period = 1000 / rate; st.rateHz = rate;   // (the runtime may have changed it since: updateTargetFrameRate answers later)
     const med = median(deltas), late = deltas.length ? deltas.filter(d => d > 1.5 * period).length / deltas.length : 0, cpuMed = median(cpu);
     const over = deltas.length >= 20 && (med > 1.25 * period || late > 0.2);
     let action = '';
@@ -150,6 +151,6 @@ export function createController(o: {
       const kept = budget.lodRadiusM; budget = b; budget.lodRadiusM = Math.max(kept, b.lodRadiusM);
       const applied = st.applied.slice(), stage = st.stage; buildLadder(); st.stage = Math.min(stage, steps.length); st.applied = applied;
     },
-    state: () => st,
+    state: () => { st.rateHz = rateOf(); return st; },
   };
 }

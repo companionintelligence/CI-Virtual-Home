@@ -46,6 +46,7 @@ export function mountXr(host: XrPlayerHost): any {
     onFrame: (cb: any) => { bus.frame.add(cb); return () => { bus.frame.delete(cb); }; },
     ui: () => (real ? real.ui() : null),
     locomotion: () => (real ? real.locomotion() : null),
+    rig: () => (real ? real.rig() : null),
     debug: () => (real ? real.debug() : null),
   };
   (window as any).__houseViewer.xr = api;
