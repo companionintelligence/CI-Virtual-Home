@@ -82,6 +82,10 @@ const TEXTURE_SLOTS = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMa
 const FLAT_SLOTS = [...TEXTURE_SLOTS, 'envMap', 'specularMap'];
 const MAX_VERTS = 65000;     // per merged mesh: 16-bit indices, and one draw never spans the house
 
+/** A "transparent" material that is really a cut-out: full opacity, normal blending, and a texture whose alpha is the cut (the Core's perforated
+ *  lid and grille). In a headset it is drawn as an alpha-tested opaque surface instead of being dropped with the glass. */
+export const isCutout = (m: any): boolean => !!m && m.transparent === true && m.opacity >= 0.99 && !!m.map && m.blending === 1 && !(m.transmission > 0) && /^Mesh(Standard|Physical)Material$/.test(m.type);
+
 /** Walk the scene and decide. Nothing changes. `opts.site` says whether the lot's planting is drawn. */
 export function planBake(THREE: any, scene: any, opts: BakeOptions): Plan {
   const hide: any[] = [], pieces: Piece[] = [], keptMeshes: any[] = [];
@@ -126,7 +130,7 @@ export function planBake(THREE: any, scene: any, opts: BakeOptions): Plan {
     const mats = matsOf(mesh);
     if (!mats.length) { counts.skipped++; return; }
     // see-through (glass, water, a lamp shade, a decal's soft edge): not drawn in a headset. A mesh whose every material is hidden is the same.
-    if (mats.some(m => !m || m.visible === false || m.transparent || (m.transmission || 0) > 0)) { hide.push(mesh); counts.seeThrough++; return; }
+    if (mats.some(m => !m || m.visible === false || (m.transparent && !isCutout(m)) || (m.transmission || 0) > 0)) { hide.push(mesh); counts.seeThrough++; return; }
     // what a merge cannot represent stays as built and visible: another material type, per-vertex colours, morphs, tangents, a partial draw range
     if (mats.some(m => !/^Mesh(Standard|Physical|Basic|Lambert|Phong|Toon|Matcap)Material$/.test(m.type) || m.wireframe || m.vertexColors || (m.clippingPlanes && m.clippingPlanes.length) || m.stencilWrite)
       || (geo.morphAttributes && Object.keys(geo.morphAttributes).length) || geo.attributes.tangent
@@ -249,6 +253,7 @@ export function createMatKit(THREE: any, cap: number | null, mutable: Set<any>):
         if (hasOwn(src, 'onBeforeCompile')) c.onBeforeCompile = src.onBeforeCompile;
         if (hasOwn(src, 'customProgramCacheKey')) c.customProgramCacheKey = src.customProgramCacheKey;
         c.userData = { ...(src.userData || {}), xrBake: true };
+        if (isCutout(src)) { c.transparent = false; c.alphaTest = 0.5; c.depthWrite = true; }
         for (const k of TEXTURE_SLOTS) if (src[k]) c[k] = capTexture(THREE, src[k], cap, madeTex, textures);
         for (const k of TEXTURE_SLOTS) if (c[k]) used.add(c[k]);
         clones.set(src, c); owned.push(c);

@@ -206,11 +206,15 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
     const rp = await bake.apply(tethered, head);
     check(scene.onBeforeRender !== hook0, 'the tethered tier did not install its shadow cadence hook');
     check(rp.lightsKept >= rep.lightsKept, `tethered keeps ${rp.lightsKept} lights, standalone kept ${rep.lightsKept}`);
-    let n = 0; const nu: boolean[] = []; r.shadowMap.needsUpdate = false;
+    // the sun's map is redrawn every third frame: needsUpdate is true at the shadow pass of exactly one render in three
+    const nu: boolean[] = []; r.shadowMap.needsUpdate = false;
+    const smRender = r.shadowMap.render; r.shadowMap.render = function (...a: any[]) { nu.push(r.shadowMap.needsUpdate); return smRender.apply(this, a); };
     const rtmp = new THREE.WebGLRenderTarget(32, 32); r.setRenderTarget(rtmp);
-    for (let i = 0; i < 6; i++) { r.render(scene, camera); nu.push(r.shadowMap.needsUpdate); n++; }
-    r.setRenderTarget(null); rtmp.dispose();
-    notes.tetheredNeedsAfterRender = nu.join('');
+    for (let i = 0; i < 6; i++) r.render(scene, camera);
+    r.setRenderTarget(null); rtmp.dispose(); r.shadowMap.render = smRender;
+    notes.tetheredShadowPass = nu.map(v => (v ? 'S' : '-')).join('');
+    const idx = nu.map((v, i) => (v ? i : -1)).filter(i => i >= 0);
+    check(idx.length === 2 && idx[1] - idx[0] === 3, `the tethered sun map was drawn on frames ${JSON.stringify(idx)} of 6, expected two, three apart`);
     bake.restore();
     check(scene.onBeforeRender === hook0, 'restore() did not put scene.onBeforeRender back');
     check(!diff(base, snapshot()), 'tethered: the scene is different after restore: ' + diff(base, snapshot()));
