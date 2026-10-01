@@ -1960,6 +1960,7 @@
     import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
     import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, createSkyBaker, installSkyFog, GradeShader, createLighting } from './assets/environment.js';
+    import { installLightGuard } from './assets/light-guard.js';
     // the editor's own UI (S6): assets/ui/*.ts
     import { displayName, buildCredit } from './assets/home-names.js';
     import { recordFrames, pickCodec, bitrateFor } from './assets/ui/recorder.js';
@@ -2129,6 +2130,11 @@
     // persCamera's far plane (160 m), so the ground is fully hazed before it is clipped and meets the backdrop,
     // baked with the same function, without a seam.
     const skyFog = installSkyFog(THREE);
+    // Live player only: skip the BRDF of spot and point lights a fragment is outside of (assets/light-guard.ts). It has
+    // to be in before the first program compiles, and it reads the URL itself — urlParams is declared far below.
+    // Without ?mode=view the editor, recorder, goldens and thumbs never see it. ?no=lightguard is the A/B switch.
+    const lightGuardOn = (() => { const q = new URLSearchParams(location.search); return q.get('mode') === 'view' && !q.getAll('no').join(',').split(',').includes('lightguard'); })();
+    if (lightGuardOn) installLightGuard(THREE);
     scene.fog = new THREE.Fog(0xdae5e4, 60, 155);
 
     // Fill: a cool, soft, shadowless light from the side opposite the sun. It used to be a cyan "studio rim";
@@ -2141,6 +2147,9 @@
     // Fireplace / warm amber interior point light
     const flamePointLight = new THREE.PointLight(0xf97316, 0, 8);
     flamePointLight.position.set(0, 1.2, 0);
+    // The editor's fireplace glow is 0 in every house, but as a light it still costs a loop iteration in every
+    // fragment shader. The player hides it now, before the first compile, so the light count never changes later.
+    if (lightGuardOn) flamePointLight.visible = false;
     scene.add(flamePointLight);
 
     // Floor Grid Helper (Architectural meter markings)
@@ -2197,11 +2206,21 @@
     // Spec houses do not use these: their floors come from the kit per house (kit.floor).
     const pageTextures = createTextureLibrary({ THREE, rngFor: key => { let h = 0x811c9dc5; for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 0x01000193); } return mulberry32((h >>> 0) ^ 0x9e3779b9); } });
     const pageFloor = (kind, opts) => { const set = pageTextures.set(kind, opts); set.map.userData.pbr = set; return set.map; };
-    const oakTexture = pageFloor('oak', { color: 0xa0927b });                                           // fine oak planks
-    const terrazzoTexture = pageFloor('terrazzo', { color: 0x22272d, chips: [0xe7e5e4, 0x94a3b8, 0xa8a29e, 0x64748b, 0x3a4450] });   // charcoal terrazzo
-    const concreteTexture = pageFloor('concrete', {});                                                   // polished concrete
-    const phthaloTerrazzoTexture = pageFloor('terrazzo', { color: 0x041620, chips: [0xc5e8dc, 0x00a9a7, 0x0a6358, 0x72ddd4, 0xe8f2f4, 0x073038] });   // CI phthalo terrazzo (brand)
-    const carraraMarbleTexture = pageFloor('marble', {});                                                // Carrara-look marble
+    // Made on first read, not at start-up: the five sets cost about 0.75 s of main-thread time (oak 200 ms, the two
+    // terrazzos 185 and 235, marble 85, concrete 60) and almost no spec house asks for one (the kit makes its own
+    // floors per house: only stair treads, a site's oak and the editor's slabs read these). A set is a pure function
+    // of its kind and options (rngFor hashes the key; nothing here counts creations), so its pixels are the same
+    // whenever it is made, and the seed skip below is what keeps later canvases' streams where they were.
+    const pageTex = {}, pageTexMade = new Set();   // pageTexMade: the maps that exist, for SHARED_TEXTURES
+    const lazyPageFloor = (name, kind, opts) => {
+      let tex = null;
+      Object.defineProperty(pageTex, name, { enumerable: true, get() { if (!tex) { tex = pageFloor(kind, opts); pageTexMade.add(tex); } return tex; } });
+    };
+    lazyPageFloor('oak', 'oak', { color: 0xa0927b });                                           // fine oak planks
+    lazyPageFloor('terrazzo', 'terrazzo', { color: 0x22272d, chips: [0xe7e5e4, 0x94a3b8, 0xa8a29e, 0x64748b, 0x3a4450] });   // charcoal terrazzo
+    lazyPageFloor('phthalo-terrazzo', 'terrazzo', { color: 0x041620, chips: [0xc5e8dc, 0x00a9a7, 0x0a6358, 0x72ddd4, 0xe8f2f4, 0x073038] });   // CI phthalo terrazzo (brand)
+    lazyPageFloor('marble', 'marble', {});                                                // Carrara-look marble
+    lazyPageFloor('concrete', 'concrete', {});                                                   // polished concrete
     textureSeed += 5;   // the five canvases these replace each took a seed; later canvases keep theirs
 
     // Emissive Neural Graph Screen Texture
@@ -3212,9 +3231,8 @@
         const riserH = totalHeight / steps;
         const treadD = run / steps;
         
-        let treadTex = oakTexture;
-        if (treadWood === 'terrazzo' || treadWood === 'phthalo-terrazzo') treadTex = phthaloTerrazzoTexture;
-        if (treadWood === 'marble') treadTex = carraraMarbleTexture;
+        // (the page's sets are made on first read: pick by name, never read the default first)
+        const treadTex = (treadWood === 'terrazzo' || treadWood === 'phthalo-terrazzo') ? pageTex['phthalo-terrazzo'] : treadWood === 'marble' ? pageTex.marble : pageTex.oak;
 
         const treadMat = new THREE.MeshStandardMaterial({ map: treadTex, roughness: 0.35 });
         const steelMat = new THREE.MeshStandardMaterial({ color: 0x1e242b, metalness: 0.85, roughness: 0.3 });
@@ -3370,7 +3388,7 @@
         group.userData = { category: "Architecture", tags: "stairs, spiral, modern" };
 
         const centerMat = new THREE.MeshStandardMaterial({ color: 0x0c323c, metalness: 0.8, roughness: 0.25 });
-        const treadMat = new THREE.MeshStandardMaterial({ map: oakTexture, roughness: 0.35 });
+        const treadMat = new THREE.MeshStandardMaterial({ map: pageTex.oak, roughness: 0.35 });
         const chromeMat = new THREE.MeshStandardMaterial({ color: 0xc5e8dc, metalness: 0.9, roughness: 0.15 });
 
         // Central Vertical Steel Pillar
@@ -3490,10 +3508,7 @@
         group.userData = { category: "Architecture", tags: "floor, slab, upper-level" };
         group.position.y = baseY;
 
-        let floorTex = oakTexture;
-        if (type === 'terrazzo' || type === 'phthalo-terrazzo') floorTex = phthaloTerrazzoTexture;
-        if (type === 'marble') floorTex = carraraMarbleTexture;
-        if (type === 'concrete') floorTex = concreteTexture;
+        const floorTex = (type === 'terrazzo' || type === 'phthalo-terrazzo') ? pageTex['phthalo-terrazzo'] : type === 'marble' ? pageTex.marble : type === 'concrete' ? pageTex.concrete : pageTex.oak;
 
         const floorMat = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.35 });
         const ceilingMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.7 });
@@ -4503,12 +4518,8 @@
           return group;
         }
 
-        let slabTex = oakTexture;
-        if (type === 'terrazzo' || type === 'phthalo-terrazzo') slabTex = phthaloTerrazzoTexture;
-        if (type === 'charcoal-terrazzo') slabTex = terrazzoTexture;
-        if (type === 'marble' || type === 'carrara-marble') slabTex = carraraMarbleTexture;
-        if (type === 'concrete') slabTex = concreteTexture;
-        if (texture) slabTex = texture;
+        const slabTex = texture || ((type === 'terrazzo' || type === 'phthalo-terrazzo') ? pageTex['phthalo-terrazzo'] : type === 'charcoal-terrazzo' ? pageTex.terrazzo
+          : (type === 'marble' || type === 'carrara-marble') ? pageTex.marble : type === 'concrete' ? pageTex.concrete : pageTex.oak);
 
         const pbr = slabTex.userData && slabTex.userData.pbr, per = slabTex.userData && slabTex.userData.period;
         if (per) { const uv = slabGeo.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w / per[0], uv.getY(i) * d / per[1]); }   // metres, not one tile per slab
@@ -6403,7 +6414,7 @@
     }
 
     // Textures owned by the module (shared across many materials) must survive item disposal.
-    const SHARED_TEXTURES = new Set([oakTexture, terrazzoTexture, concreteTexture, phthaloTerrazzoTexture, carraraMarbleTexture, pascalSkyTexture]);
+    const SHARED_TEXTURES = { has: tex => pageTexMade.has(tex) || tex === pascalSkyTexture };   // a set that was never read is on no material
     function disposeObject(obj) {
       obj.traverse(node => {
         if (node.geometry) node.geometry.dispose();
@@ -7594,7 +7605,7 @@
     // -------------------------------------------------------------
     const houseBuilderDeps = {
       THREE, AssetFactory, ProceduralArchitecture, addItemToScene, registerTrackedWall, registerRoof, registerCeiling, fitShadow, setLightingPreset,
-      textures: { oak: oakTexture, terrazzo: terrazzoTexture, 'phthalo-terrazzo': phthaloTerrazzoTexture, marble: carraraMarbleTexture, concrete: concreteTexture }
+      textures: pageTex   // getters: a set is made when the builder first reads it
     };
     // A stream that needs one more page dependency in its builder module adds it on a new line under its own slot —
     // `houseBuilderDeps.raycast = …;` — and reads it there as bctx.extra.<name> (assets/build-context.ts). Insertions
@@ -8921,11 +8932,15 @@
     // ---------------------------------------------------------------------------------------
     window.__houseRenderBegin = function ({ shot, res = '1080', aspect = '16:9', fps = 60 } = {}) {
       // a studio scene (no home) records its own shots by their SplinePresets key; a home's shots are 'house:<id>:<shot>'
+      // the player installs live-only optimisations (merged static meshes, the light guard, the hidden flame light) that
+      // a product frame must never see, and the glass swap is the only one beforeExternalRender can take back
+      if (VIEW_MODE) throw new Error('offline rendering is not available in the player (?mode=view): open the page without it');
       const studio = !activeHouse && !!shot && !shot.startsWith('house:') && !!SplinePresets[shot];
       if (!activeHouse && !studio) throw new Error('no house loaded');
       const key = studio || (shot && shot.startsWith('house:')) ? shot : `house:${activeHouse.id}:${shot || 'door-to-core'}`;
       if (!SplinePresets[key]) throw new Error(`unknown shot ${key}`);
       if (headlessRender) window.__houseRenderEnd();
+      viewer?.beforeExternalRender();   // the player draws its glass without the transmission pass; a film or still through these hooks gets the real thing
       splineSelect.value = key; if (videoSplineSync) videoSplineSync.value = key;
       buildSplineFromPreset(key);
       const { w, h } = recordSize(res, aspect);
@@ -9120,6 +9135,7 @@
     window.__houseRenderEnd = function () {
       if (!headlessRender) return;
       const r = headlessRender; headlessRender = null;
+      viewer?.afterExternalRender();
       isRecordingVideo = false;
       endShotCutaway();
       if (splineLineMesh) splineLineMesh.visible = r.helpers.spline;

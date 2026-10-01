@@ -36,6 +36,8 @@
 // applySplineFrame has set the shot's own. The eye path is the shot's; only how much of it the lens takes in
 // changes, so a phone sees the house at the door and the Core with its desk at the end.
 import { displayName, buildCredit } from './home-names.js';
+import { createGlassSwap } from './viewer-glass.js';
+import { bakeStatic, restoreStatic } from './viewer-batch.js';
 
 type Api = {
   THREE: any; scene: any; renderer: any; canvas: HTMLCanvasElement; camera: any; controls: any;
@@ -134,6 +136,8 @@ export function mountViewer(api: Api) {
   const { THREE, camera, controls, canvas } = api;
   const html = document.documentElement;
   const params = new URLSearchParams(location.search);
+  // ?no=glass,adapt kills a live-only performance feature for A/B timing (each one falls back to what the player did before it)
+  const no = new Set((params.get('no') || '').split(',').filter(Boolean));
   const coarse = matchMedia('(pointer: coarse)').matches;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   api.hideEditorHelpers();
@@ -270,6 +274,9 @@ export function mountViewer(api: Api) {
   let flying = false;
   let showPath = false, pathTouched = false;
   let hq = false;
+  // The plain path draws its panes without the transmission pass (viewer-glass.ts); Best quality and anything drawn
+  // through the page's __houseRender* hooks get the transmissive glass back.
+  const glass = createGlassSwap(THREE, api.scene, !no.has('glass'));
   let tod: string | null = null;   // the viewer's choice; null = the house's own hour
   let ready = false;
   let dirty = true;          // something changed: draw a frame even while paused
@@ -631,6 +638,7 @@ export function mountViewer(api: Api) {
   function setTod(key: string) {
     tod = key;
     api.setLighting(key);
+    glass.sync();   // the window glow's twins are cloned from the panes as they are now
     dirty = true;
     syncChips(); syncUrl();
   }
@@ -653,11 +661,13 @@ export function mountViewer(api: Api) {
     el.hq.classList.toggle('on', on); el.hq.setAttribute('aria-pressed', String(on));
     if (on && !hqWarm) {
       el.hq.classList.add('busy'); el.hq.setAttribute('aria-busy', 'true');
-      requestAnimationFrame(() => requestAnimationFrame(() => { if (el.hq.getAttribute('aria-pressed') !== 'true') { hqDone(); return; } hq = true; hqFirst = true; dirty = true; }));
+      // the transmissive glass comes back with the composer: its programs compile in the same held frame
+      requestAnimationFrame(() => requestAnimationFrame(() => { if (el.hq.getAttribute('aria-pressed') !== 'true') { hqDone(); return; } glass.restore(); hq = true; hqFirst = true; dirty = true; }));
       return;
     }
     hq = on;
-    if (on) toast('Best quality is on. Playback may be slower.');
+    if (on) { glass.restore(); toast('Best quality is on. Playback may be slower.'); }
+    else glass.apply();   // (the swap is a program change, so it happens here and not per frame)
     dirty = true;
   }
   function hqDone() {
@@ -815,13 +825,22 @@ export function mountViewer(api: Api) {
   }
 
   // ------------------------------------------------------------------ the frame
-  // Resolution follows the device: while the view moves, the frame rate is averaged over ~1.5 s, and a device
-  // that cannot hold ~28 fps steps its pixel ratio down (2 → 1.5 → 1.25 → 1). A step that does not buy at least
-  // 15 % more frames is undone and adaptation stops: a house is thousands of draw calls, and where the CPU is
-  // what limits the frame rate, fewer pixels would only make the picture softer. It never steps back up, so
-  // the picture does not pump. window.__houseViewer reports what it settled on.
+  // Resolution follows the device: while the view moves, the presented frame rate (the rAF deltas, so the display's
+  // own rate is its ceiling) is averaged over a window of ADAPT.window seconds and at least ADAPT.frames frames, and
+  // a device below ADAPT.low fps steps its pixel ratio down (2 → 1.5 → 1.25 → 1). A 60 Hz screen at 40 fps stutters,
+  // so the threshold sits well above 30. A step that does not buy at least ADAPT.gain more frames is undone and the
+  // downward adaptation stops: a house is thousands of draw calls, and where the CPU is what limits the frame rate,
+  // fewer pixels would only make the picture softer. Once, after ADAPT.upAfter seconds of at least ADAPT.upFps
+  // (a brief hitch, such as the first window's shader compiles, does not lock the picture low), it steps back up to
+  // the ratio it left, as one more trial: if that ratio cannot hold ADAPT.low it goes down again and stays. Never
+  // below 1. ?no=adapt restores the first controller (1.5 s, 28 fps, 15 %, never up).
+  // window.__houseViewer reports what it settled on.
+  const ADAPT = no.has('adapt')
+    ? { window: 1.5, frames: 0, low: 28, gain: 1.15, upAfter: Infinity, upFps: 58 }
+    : { window: 0.75, frames: 30, low: 42, gain: 1.10, upAfter: 6, upFps: 58 };
   const renderer = api.renderer;
   let pixelRatio = renderer.getPixelRatio(), perfTime = 0, perfFrames = 0, trial: { fps: number; pr: number } | null = null, settled = false;
+  let stepped: number | null = null, upSpent = 0, upTrial: number | null = null, upDone = false;   // the ratio left by the accepted step down; seconds at ≥ upFps; the ratio being tried again
   const stats = { fps: 0, pixelRatio, settled };
   (window as any).__houseViewer = stats;
   function setPixelRatio(pr: number) {
@@ -832,18 +851,31 @@ export function mountViewer(api: Api) {
   }
   function adapt(delta: number) {
     perfTime += delta; perfFrames++;
-    if (perfTime < 1.5) return;
-    const fps = perfFrames / perfTime;
+    if (perfTime < ADAPT.window || perfFrames < ADAPT.frames) return;
+    const fps = perfFrames / perfTime, span = perfTime;
     stats.fps = Math.round(fps);
     perfTime = 0; perfFrames = 0;
-    if (settled) return;
+    if (upTrial !== null) {   // the step back up: keep it if it still holds, else go down again for good
+      if (fps < ADAPT.low) setPixelRatio(upTrial);
+      upTrial = null; upDone = true; settled = stats.settled = true;
+      return;
+    }
+    if (settled) {
+      // settled below where it started: a long enough run at full speed earns one look at the ratio it gave up
+      if (stepped !== null && !upDone && ADAPT.upAfter < Infinity) {
+        upSpent = fps >= ADAPT.upFps ? upSpent + span : 0;
+        if (upSpent >= ADAPT.upAfter) { const pr = pixelRatio; setPixelRatio(stepped); upTrial = pr; upSpent = 0; }
+      }
+      return;
+    }
     if (trial) {
-      if (fps < trial.fps * 1.15) { setPixelRatio(trial.pr); settled = stats.settled = true; }
+      if (fps < trial.fps * ADAPT.gain) { setPixelRatio(trial.pr); settled = stats.settled = true; }
+      else stepped = trial.pr;   // kept (the next window may step again if it is still short)
       trial = null;
-    } else if (fps < 28 && pixelRatio > 1) {
+    } else if (fps < ADAPT.low && pixelRatio > 1) {
       trial = { fps, pr: pixelRatio };
       setPixelRatio(pixelRatio > 1.5 ? 1.5 : pixelRatio > 1.25 ? 1.25 : 1);
-    } else if (fps >= 28) settled = stats.settled = true;
+    } else if (fps >= ADAPT.low) settled = stats.settled = true;
   }
   // While the view moves, the sun's shadow map is redrawn every third frame rather than every frame (nothing in
   // a house moves but the camera, the roof's fade and the Core's fan); a still frame always redraws it. The
@@ -941,8 +973,59 @@ export function mountViewer(api: Api) {
     el.errorMsg.textContent = message;
     root.dataset.state = 'error';
   }
-  function onHouse({ shotKey = null as string | null, at = 0, play = true } = {}) {
+  // Static batching (assets/viewer-batch.ts): once per house build, before the first frame it is drawn, the static opaque
+  // meshes inside each toggle unit become a few merged meshes, so a weak CPU issues a fifth of the draw calls. Player only:
+  // the recorder, the goldens and the editor never call it. ?no=batch skips it; a throw leaves the house as built.
+  let batchedHouse: any = null;
+  function batchHouse(h: any) {
+    if (h === batchedHouse) return;   // (the failed-load path calls onHouse again with the house already on screen)
+    batchedHouse = h;
+    const stat = (window as any).__houseViewer;
+    if (String(params.get('no') || '').split(',').includes('batch')) { stat.batch = null; return; }
+    const bake = () => {
+      const t0 = performance.now();   // the player's clock, for the report only: nothing drawn depends on it
+      const r = bakeStatic(api.THREE, api.scene);
+      r.ms = Math.round((performance.now() - t0) * 10) / 10;
+      stat.batch = r;
+    };
+    try { bake(); } catch (err) {
+      console.warn('viewer: static batching failed, the home is drawn as built', err);
+      restoreStatic(); stat.batch = null;
+    }
+    // for the bench and the pixel check: flip the merged meshes in and out on the page that is open (A/B on one GPU state)
+    stat.batchOn = (on: boolean) => { if (on && !stat.batch) bake(); else if (!on && stat.batch) { restoreStatic(); stat.batch = null; } dirty = true; return !!stat.batch; };
+  }
+  // Link the shaders before the loader lifts. The first render otherwise links every program (about 70 on a furnished
+  // home) one after another inside one call, 1 to 1.5 s of frozen page with the loader already fading; here they link
+  // on the driver's own threads (KHR_parallel_shader_compile) and the page keeps painting the loader meanwhile. The
+  // shot's own first frame is put in place first, so the scene is what the first render draws: lights, dressing,
+  // camera. It compiles every mesh's material, hidden or not, so the wall and roof states the dressing flips to later
+  // are mostly there too; depth materials for the sun's map still compile in the first shadow render (a few, small).
+  // Never a reason for an endless loader: an error or a stalled driver ends the wait (4 s) and the first render
+  // compiles what is left as it always did. ?no=compile skips it (A/B timing).
+  const COMPILE_WAIT_MS = 4000;
+  // The compile in flight. three's compileAsync polls the scene it was given until every program is ready, so a second
+  // home must not clear the scene (api.loadHouse) under that poll: goHouse waits for this first (bounded).
+  let compiling: Promise<void> = Promise.resolve();
+  async function precompile(s: Shot, at: number) {
+    if ((params.get('no') || '').split(',').includes('compile') || typeof renderer.compileAsync !== 'function') return;
+    let timer = 0;
+    try {
+      api.useShot(`house:${houseId}:${s.key}`);
+      api.applyFrame(clamp01(at));
+      fitCamera();
+      // (its own catch: a compile that fails after the wait has ended must not become an unhandled rejection)
+      const p: Promise<void> = Promise.resolve(renderer.compileAsync(api.scene, camera)).then(() => {}, err => { console.warn('viewer: precompile skipped', err); });
+      compiling = p;
+      await Promise.race([p, new Promise(r => { timer = window.setTimeout(r, COMPILE_WAIT_MS); })]);
+    } catch (err) {
+      console.warn('viewer: precompile skipped', err);
+    } finally { window.clearTimeout(timer); }
+  }
+  async function onHouse({ shotKey = null as string | null, at = 0, play = true } = {}) {
+    const token = loadToken;
     const h = api.house();
+    batchHouse(h);
     houseId = h.id;
     const e = houseEntry(h.id);
     // the portal's name for the home (home-names.ts); the build's own title is in the tooltip, with the credit
@@ -957,12 +1040,15 @@ export function mountViewer(api: Api) {
     el.meta.title = buildCredit(own);
     document.title = `${name} · Virtual homes`;
     if (tod) api.setLighting(tod);   // a building resets the hour to the spec's; keep the viewer's choice
+    if (!hq) glass.apply();          // before the first frame of this house, so the transmission programs never compile in the plain path
     shots = listShots();
     renderShots();
     // A home opens on its Orbit: the whole house from above, which reads on every screen. Door to Core spends its
     // middle in doorways and stairwells, framed a metre from a wall, and is one tap away (and a link can ask for it).
     const s = findShot(shotKey) || findShot(DEFAULT_SHOT) || findShot('door-to-core') || shots[0];
     if (!s) { showError('This home has no camera shots.'); return; }
+    await precompile(s, at);
+    if (token !== loadToken) return;   // another home was asked for meanwhile: its own onHouse takes over
     ready = true;
     if (flying) exitFly();
     selectShot(s, { play, at });
@@ -979,17 +1065,20 @@ export function mountViewer(api: Api) {
     showLoading(id);
     // let the overlay paint before the build takes the main thread
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    // a precompile of the home on screen may still be polling its scene: let it end (4 s at most) before the scene is cleared
+    { let t = 0; await Promise.race([compiling, new Promise(r => { t = window.setTimeout(r, COMPILE_WAIT_MS); })]); window.clearTimeout(t); }
+    if (token !== loadToken) return;
     try {
       await api.loadHouse(id);
     } catch (err) {
       if (token !== loadToken) return;
       console.warn('viewer: could not load', id, err);
-      if (api.house()) { ready = true; root.dataset.state = 'ready'; toast('That home could not be opened.'); onHouse({ shotKey: keepType, play: false }); }
+      if (api.house()) { ready = true; root.dataset.state = 'ready'; toast('That home could not be opened.'); await onHouse({ shotKey: keepType, play: false }); }
       else showError('That home could not be opened. Pick another from the gallery.');
       return;
     }
     if (token !== loadToken) return;
-    onHouse({ shotKey: keepType, play: !reducedMotion });
+    await onHouse({ shotKey: keepType, play: !reducedMotion });
   }
   function neighbour(step: number): string | null {
     if (!index.length) return null;
@@ -1188,9 +1277,15 @@ export function mountViewer(api: Api) {
     const play = pq === '0' ? false : (pq === '1' || tq === null) && !reducedMotion;
     const tq2 = params.get('tod');
     if (tq2 && api.TIME_OF_DAY[api.lightingName(tq2)]) tod = api.lightingName(tq2);
-    onHouse({ shotKey: params.get('shot'), at, play });
+    await onHouse({ shotKey: params.get('shot'), at, play });
     poke();
   })().catch(err => { console.error('viewer:', err); showError('Something went wrong while opening this home.'); });
 
-  return { frame };
+  // The page's __houseRenderBegin / __houseRenderEnd call these: a film or a still drawn through those hooks is a
+  // product frame, and gets the transmissive glass the goldens have (the plain path's swap is for the live view only).
+  // After, the plain path takes its swap back unless Best quality is on.
+  function beforeExternalRender() { glass.restore(); }
+  function afterExternalRender() { if (!hq) glass.apply(); }
+
+  return { frame, beforeExternalRender, afterExternalRender };
 }

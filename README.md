@@ -56,6 +56,7 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run test:twins` | The Python twins (`generate_floor_plans.py`, `generate_house_iso.py`) on the 30 houses and every fixture: they must run, reproduce the committed sheets, isometrics and Lotties byte for byte on the 30, and draw what S2's fixtures show (porches, bays, L/U stairs, floor patterns …) from `<id>.plan.json`'s `arch` key. `check` runs it; ~2 min, needs a GPU for the fixtures' plans. |
 | `pnpm run fixtures` | Validate, QA and render the fixture houses in `test/fixtures/houses/` to stills (`test/fixtures/out/`, to look at) and compare their frame hashes (`--fixture`, `--update` to bless your own fixture, `--record <stream>` for another's frame your branch moves). |
 | `pnpm run perf` | Build, track and shot-QA timings against their budgets (3 s / 1 s / 0.5 s), report-only, with each number's Δ against the committed `test/perf/baseline.json` (`--house`, `--all`, `--baseline` to rewrite it at integration). |
+| `pnpm run perf:player` | Advisory timing of the live player (`room-creator.html?mode=view`) in Chromium on the real GPU: presented frame times, CPU and GPU time of `renderer.render`, draw calls, programs. Modes `bench` (default) `attr` `load` `raf` `profile` `census`; `--houses a,b`, `--defaults 1,2`, `--dpr 2`, `--throttle 4`, `--runs N`, `--query no=glass,…` (appended to the player URL, for A/B of a live-only feature), `--out <file.md>` (rows plus the header line with commit and `uptime`), `--json <file>`. Not part of `check` or CI: timings depend on the machine's load. See *Player performance*. |
 | `pnpm run shot-planner` | Spline planner v2 on all 30 houses (`assets/shot-planner.ts`): planned twice byte-identical, QA v2, the fleet camera targets, the page's track hash equal to Node's (`--parity`), the planning and QA budgets. Worlds come from `test/qa/shot-worlds/` (built in the page once, `--rebuild-worlds` / `--stale-ok`); `--update` records `test/shots/<id>.track.json`. |
 | `pnpm run shot-qa` | A fault injected for every QA v2 code, and for every fleet check, on two frozen worlds (`test/shots/worlds/`): each must be caught. No browser. |
 | `pnpm run camera-audit` | A contact strip per house and planner (twelve frames, the plan with the path by beat), the camera metrics of v1 and v2 side by side → `test/qa/camera-audit/index.html` (`--house`, `--planner v1,v2`, `--fixtures`). |
@@ -102,6 +103,8 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
   ui/                      the editor's modules: recorder + mp4-mux + webm-mux (Record), timeline, plan-inset, path-overlay,
                            gallery, compare, qa, toast, undo, url-state, format (S6, the editor)
   viewer.ts                the portal's player: shots, scrubber, time of day, path, fly (room-creator ?mode=view)
+  viewer-batch.ts          the player's live-only static batching: merges each toggle unit's static opaque meshes (a third of the draw
+                           calls); only viewer.ts imports it, `?no=batch` switches it off, the recorder / goldens / editor never see it
 content/houses/            <id>.json — the 30 HouseSpecs (source); <id>.plan.json and index.json — derived
 content/house-catalog.json every item type's measured footprint, height and iso parts (derived)
 scenes/                    isometric SVG + Lottie, CAD floor plans, and their manifests (all derived, committed)
@@ -325,6 +328,41 @@ not a devDependency: the workflow installs it in the upload job alone, so a norm
 **GitHub Pages is retired** for this repository. Its github.io address redirects to the organisation's old custom
 domain (store.ci.computer), which serves nothing, so the former `pages.yml` deployed to nowhere and has been
 removed. Nothing depends on GitHub Pages, so it can be switched off in the repository's settings.
+
+## Player performance
+
+`pnpm run perf:player` (`scripts/perf-player.mts`) times the live player, not the product frames. It opens the real
+player at 1280 x 720 with the real GPU flags (`portal-lib.mts`'s `LAUNCH_ARGS`), serves the site the way
+`portal:test` does, and injects its hooks from outside (an init script wraps `requestAnimationFrame`, and after the
+house is built `renderer.render` is wrapped on the instance), so it edits nothing and is not in the gate. It reads
+the clock; the product frames still never do.
+
+```bash
+pnpm run perf:player -- --mode census --houses lakecabin          # lights, meshes, materials, glass; no timing
+pnpm run perf:player -- --mode bench --houses cutestarter,lakecabin,cocoon,asymmetry --dpr 2 --runs 5 --out /tmp/bench.md
+pnpm run perf:player -- --mode bench --houses lakecabin --runs 5 --query no=glass,lightguard --out /tmp/no-glass.md
+```
+
+A run of `bench` gives, per house, a `shot` row (the shot plays), an `orbit` row (the free camera dragged 2 px a
+frame), `idle`, and the `sync-*` rows of a tight render loop; `--defaults 2` serves the spec with `"defaults": 2`
+through a route (`content/houses/` is not touched), and a fixture id from `test/fixtures/houses/` works as a house.
+`--query` is appended to the player's URL, so a live-only feature with a `?no=<feature>` kill switch can be timed
+on and off with the same tool. The player rewrites the address bar once it is up, so check that the query arrived
+with `performance.getEntriesByType('navigation')[0].name`, not `page.url()`.
+
+How to take a number that means something:
+
+- Run **one** GPU-timing browser at a time, and record `uptime` beside every timing (`--out` puts it in the header,
+  and every row carries its load average before and after; a row where it moved by more than 2x is marked `~`).
+- Take the **median of at least 5 runs** (`--runs 5`, after the warm-up the script does itself), and **interleave A/B**
+  (`attr` mode does; for two builds or two `--query` values, alternate them rather than doing all of one first).
+- Judge a change on the presented **`orbit`** rows (and `shot`), not on the `sync-*` rows. The tight loop never presents
+  and reads about 2.5x faster than the player's presented frames on the heavy houses (cocoon: 34 ms against 91 ms).
+  It is fine for the ratio between two knobs inside one page, not for an absolute frame time.
+- Noise: a house's orbit can move a lot between runs (`palms` read 27 fps at load 80 to 216 and 16 fps at load 4:
+  not reproducible, so it is a poor A/B house). The load average does not see GPU contention from other jobs
+  (Ollama, a VM), and the GPU timer query includes starvation gaps, so read the wall-clock frame time first and the
+  `gpu` column as a hint. A weak CPU is emulated with `--throttle 4`.
 
 ## How verification works
 

@@ -23,6 +23,7 @@
     "test:twins": "node --experimental-strip-types scripts/test-twins.mts",
     "fixtures": "node --experimental-strip-types scripts/test-fixtures.mts",
     "perf": "node --experimental-strip-types scripts/perf-house.mts",
+    "perf:player": "node --experimental-strip-types scripts/perf-player.mts",
     "shot-planner": "node --experimental-strip-types scripts/test-shot-planner.mts",
     "shot-qa": "node --experimental-strip-types scripts/test-shot-qa.mts",
     "camera-audit": "node --experimental-strip-types scripts/camera-audit.mts",
