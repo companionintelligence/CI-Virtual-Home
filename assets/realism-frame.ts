@@ -126,7 +126,7 @@ const feature: RealismFeature = {
         lamps.tick();
         if (kit && acc !== 'running' && ctx.now() - lastStepT > FREE_AFTER_S && kit.stats().accum.allocated) kit.accFree();
         if (clip) {
-          if (!clip.verify(cam)) { ctx.markDirty(); }
+          if (!clip.verify()) { ctx.markDirty(); }
           clip.update(cam);
         }
         if (acc === 'running' && dt > SLOW_FRAME_S) {

@@ -13,7 +13,8 @@
 // (directLight.visible = false, colour 0) for a fragment outside it. The box is a uniform per spot index, so it needs the
 // index of each light in three's uniform array: createSpotClip() keeps that mapping by walking the scene the way three
 // does (pre-order, invisible subtrees skipped, then WebGLLights' stable sort of shadow casters first) and PROVES it against
-// three's own state one frame later (verify()); on any mismatch the clip switches itself off and the lights behave as before.
+// three's own state one frame later (verify(), with no assumption about which camera drew); on a mismatch the clip
+// switches itself off and the lights behave as before, tries again 90 frames later, and after the third failure stays off.
 //
 // LIVE PLAYER ONLY. It is called from room-creator.html under ?mode=view, before any material compiles (three's
 // program cache key does not include chunk text, so a program compiled earlier would be reused unpatched). The
@@ -102,7 +103,7 @@ export const spotClipInstalled = (): boolean => !!shared;
 // The controller: which light is in which room, in which uniform slot.
 
 export type Box = { lo: [number, number, number]; hi: [number, number, number] };
-export type SpotClipStats = { lights: number; mapped: number; slots: number; verified: number; mismatches: number; off: string; on: boolean };
+export type SpotClipStats = { lights: number; mapped: number; slots: number; verified: number; mismatches: number; off: string; on: boolean; lastMismatch: string; strikes: number };
 export type SpotClip = {
   /** the boxes were found for this many of the house's room lights */
   readonly mapped: number;
@@ -112,8 +113,8 @@ export type SpotClip = {
   restore(): void;
   /** before a drawn frame: fill the slots for the lights three will upload, and the camera. false when the clip is off. */
   update(camera: any): boolean;
-  /** after a drawn frame: prove the slots matched three's own uniform array. false (and the clip off) when they did not. */
-  verify(camera: any): boolean;
+  /** after a drawn frame: prove the slots matched three's own uniform array. false (and the clip off for a while) when they did not. */
+  verify(): boolean;
   /** the scene's lights changed (a rebake, a new light): find them again */
   rescan(): void;
   stats(): SpotClipStats;
@@ -160,11 +161,14 @@ export function createSpotClip(o: { scene: any; renderer: any; house: () => any 
   const { scene, renderer } = o;
   let all: any[] = [];                       // every light in the scene, in three's visiting order (pre-order), visible or not
   let boxes = new Map<any, Box>();
-  let on = false;
+  let wanted = false;                        // apply() was called and restore() has not been
   let off = '';                              // why the clip switched itself off (empty: it has not)
+  let strikes = 0, retryAt = 0, ticks = 0;   // a failed proof switches the clip off for RETRY_TICKS frames; the third one is for good
+  const RETRY_TICKS = 90;
   const order: any[] = [];                   // the spot lights as three will upload them this frame
   let uploaded: any[] = [];                  // …and as the last update() left them, for verify()
-  let verified = 0, mismatches = 0;
+  let uploadedFrame = -1;                    // renderer.info.render.frame then: no draw since means nothing to prove yet
+  let verified = 0, mismatches = 0, lastMismatch = '';
   const live: any[] = [];
 
   const rescan = () => {
@@ -190,7 +194,8 @@ export function createSpotClip(o: { scene: any; renderer: any; house: () => any 
     if (b) { sh.lo[i].set(b.lo[0], b.lo[1], b.lo[2], 0); sh.hi[i].set(b.hi[0], b.hi[1], b.hi[2], 0); }
     else { sh.lo[i].set(-FAR, -FAR, -FAR, 0); sh.hi[i].set(FAR, FAR, FAR, 0); }
   };
-  const fail = (why: string) => { on = false; off = why; sh.on[0].x = 0; };
+  const isOn = () => wanted && !off;
+  const fail = (why: string) => { strikes++; off = why; retryAt = ticks + RETRY_TICKS; sh.on[0].x = 0; uploaded = []; };
 
   /** three's own spot array (view space): the one a lit material that has been drawn holds. It is the same array object for the life
    *  of the renderer (WebGLLights mutates it in place), so it is found once; a material that has not been refreshed yet holds a
@@ -211,38 +216,49 @@ export function createSpotClip(o: { scene: any; renderer: any; house: () => any 
 
   return {
     get mapped() { return boxes.size; },
-    apply() { if (!off) on = true; },
-    restore() { on = false; sh.on[0].x = 0; },
+    apply() { wanted = true; },
+    restore() { wanted = false; sh.on[0].x = 0; uploaded = []; },
     rescan,
     update(camera) {
-      if (!on || !boxes.size) { sh.on[0].x = 0; uploaded = []; return false; }
+      ticks++;
+      if (off && strikes < 3 && ticks >= retryAt) off = '';   // try again: the proof below decides
+      if (!isOn() || !boxes.size) { sh.on[0].x = 0; uploaded = []; return false; }
       sh.on[0].x = 1;
       orderSpots(camera);
       const n = Math.min(order.length, MAX_SPOTS);
       for (let i = 0; i < n; i++) setBox(i, boxes.get(order[i]));
       uploaded = order.slice(0, n);
+      uploadedFrame = renderer.info.render.frame;
       return true;
     },
-    verify(camera) {
-      if (!on || !uploaded.length) return true;
+    verify() {
+      if (!isOn() || !uploaded.length) return true;
+      if (renderer.info.render.frame === uploadedFrame) return true;   // nothing has been drawn with them yet
       const state = drawnSpots();
       if (!state) return true;   // nothing lit has been drawn yet: no proof either way
-      // the previous frame's slot i must be the light three put in its slot i: compare world positions (three's are view space)
-      camera.updateMatrixWorld();
-      const view = camera.matrixWorld;
-      let ok = state.length === uploaded.length;
-      for (let i = 0; ok && i < uploaded.length; i++) {
-        const s = state[i].position, l = uploaded[i].matrixWorld.elements;
-        const wx = view.elements[0] * s.x + view.elements[4] * s.y + view.elements[8] * s.z + view.elements[12];
-        const wy = view.elements[1] * s.x + view.elements[5] * s.y + view.elements[9] * s.z + view.elements[13];
-        const wz = view.elements[2] * s.x + view.elements[6] * s.y + view.elements[10] * s.z + view.elements[14];
-        if (Math.abs(wx - l[12]) > 0.02 || Math.abs(wy - l[13]) > 0.02 || Math.abs(wz - l[14]) > 0.02) ok = false;
+      // The slot i chosen at update() must be the light three put in its slot i. three's spot array holds view-space positions of
+      // WHICHEVER camera drew last (the main one, or a probe / mirror camera), so no camera is assumed: each slot's own cone
+      // (distance, cone cosine) and the distances between slots, which a rigid view transform keeps, must match the lights.
+      const n = uploaded.length;
+      let ok = state.length === n;
+      if (!ok) lastMismatch = `three holds ${state.length} spots, ${n} were mapped`;
+      for (let i = 0; ok && i < n; i++) {
+        const u = state[i], l = uploaded[i];
+        if (Math.abs(u.distance - l.distance) > 1e-3 || Math.abs(u.coneCos - Math.cos(l.angle)) > 1e-4) { ok = false; lastMismatch = `slot ${i}: cone ${u.distance}/${u.coneCos.toFixed(4)} vs light ${l.distance}/${Math.cos(l.angle).toFixed(4)}`; }
+      }
+      for (let i = 0; ok && i < n; i++) {
+        const pi = state[i].position, ei = uploaded[i].matrixWorld.elements;
+        for (let j = i + 1; ok && j < n; j++) {
+          const pj = state[j].position, ej = uploaded[j].matrixWorld.elements;
+          const dv = Math.hypot(pi.x - pj.x, pi.y - pj.y, pi.z - pj.z), dw = Math.hypot(ei[12] - ej[12], ei[13] - ej[13], ei[14] - ej[14]);
+          if (Math.abs(dv - dw) > 0.02) { ok = false; lastMismatch = `slots ${i},${j}: ${dv.toFixed(2)} m apart in three, ${dw.toFixed(2)} m as mapped`; }
+        }
       }
       verified++;
       if (!ok) { mismatches++; fail('slot mapping did not match three\'s light order'); }
       return ok;
     },
-    stats: () => ({ lights: all.filter(l => l.isSpotLight).length, mapped: boxes.size, slots: uploaded.length, verified, mismatches, off, on: on && !off }),
+    stats: () => ({ lights: all.filter(l => l.isSpotLight).length, mapped: boxes.size, slots: uploaded.length, verified, mismatches, off, on: isOn(), lastMismatch, strikes }),
     slotLights: () => uploaded.slice(),
     boxOf: (l: any) => boxes.get(l) || null,
   };

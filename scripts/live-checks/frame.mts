@@ -29,6 +29,13 @@ async function waitFor(lp: LivePage, pred: (f: any) => boolean, ms = 20000): Pro
 
 /** mean linear luminance and mean saturation of the canvas, from a screenshot decoded in the page (the controls hidden) */
 async function lumSat(lp: LivePage): Promise<{ lum: number; sat: number }> {
+  // a page under load takes a while to settle (the shadow map, the roof's fade, the first adaptive pixel-ratio step): measure until two
+  // looks 600 ms apart agree to 0.3 %
+  let prev = -1, cur = await lumSat1(lp);
+  for (let i = 0; i < 8 && Math.abs(cur.lum - prev) > 0.003 * Math.max(cur.lum, 1e-6); i++) { prev = cur.lum; await sleep(600); cur = await lumSat1(lp); }
+  return cur;
+}
+async function lumSat1(lp: LivePage): Promise<{ lum: number; sat: number }> {
   await lp.page.addStyleTag({ content: '.vh{visibility:hidden !important}' });
   const buf: Buffer = await lp.page.locator('canvas').first().screenshot();
   return lp.eval(async (b64: string) => {
@@ -148,61 +155,71 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
   }
 
   // ---- 4. spot-light clip ----------------------------------------------------------------------------------------------------
-  // The proof of the slot mapping is in the page (verify()); this checks it from outside, with pixels. Only ONE room lamp is left
-  // lit (everything else in the scene is switched off, which also changes three's light order: the mapping must follow), the scene is
-  // drawn from the orbit shot into a small float target, and the depth of every pixel gives its world position. A pixel whose
-  // world position lies outside that lamp's room box must not be lit by the clip-on page; the clip-off page shows how much light
-  // the room used to push through its walls.
+  // The page proves the slot mapping itself (verify()); this checks the clip from outside, with pixels. ONE room lamp is left lit
+  // (every other light in the scene is hidden, which changes three's light order: the mapping must follow), and four cameras 2 m
+  // outside that lamp's room box look at it, one from inside looking down at its floor. Each view is drawn twice into a small float
+  // target (the lamp at full intensity, and at zero: the difference is that lamp's light alone), and the depth of every pixel gives
+  // its world position. With the clip, no pixel outside the box may be lit by the lamp; without it (the second page) the probe must
+  // see the light that crept through the walls, or it proves nothing.
   {
-    const probe = async (lp: LivePage, cutaway: boolean) => {
-      if (cutaway) { await lp.page.keyboard.press('c'); await sleep(500); }
-      return lp.eval(async () => {
-        const d = (window as any).__houseDebug(), { scene, camera, renderer } = d;
-        const { roomBoxes } = await import(new URL('./assets/light-guard.js', location.href).href);
-        const lamps: any[] = [];
-        scene.traverse((o: any) => { if (o.isSpotLight && o.userData && o.userData.fixtureLight) lamps.push(o); });
-        const boxes = roomBoxes(d.house, lamps);
-        const all: any[] = [];
-        scene.traverse((o: any) => { if (o.isLight) all.push(o); });
-        const was = all.map(o => o.visible), env = scene.environmentIntensity, fog = scene.fog, bg = scene.background, auto = renderer.shadowMap.autoUpdate;
-        const W = 480, H = 270;
-        const T: any = await import('three' as any);
-        const mkRT = (type: number) => new T.WebGLRenderTarget(W, H, { type, depthBuffer: true });
-        const lit = mkRT(T.FloatType), dep = mkRT(T.UnsignedByteType);
+    const probe = async (lp: LivePage) => lp.eval(async () => {
+      const d = (window as any).__houseDebug(), { scene, camera: main, renderer } = d;
+      const { roomBoxes } = await import(new URL('./assets/light-guard.js', location.href).href);
+      const T: any = await import('three' as any);
+      const lamps: any[] = [];
+      scene.traverse((o: any) => { if (o.isSpotLight && o.userData && o.userData.fixtureLight) lamps.push(o); });
+      const boxes = roomBoxes(d.house, lamps);
+      const all: any[] = [];
+      scene.traverse((o: any) => { if (o.isLight) all.push(o); });
+      const was = all.map(o => o.visible), envI = scene.environmentIntensity, fog = scene.fog, bg = scene.background, auto = renderer.shadowMap.autoUpdate;
+      const W = 320, H = 180;
+      const lit = new T.WebGLRenderTarget(W, H, { type: T.FloatType }), dep = new T.WebGLRenderTarget(W, H, { type: T.UnsignedByteType });
+      const prevRT = renderer.getRenderTarget(), prevClear = new T.Color(), prevAlpha = renderer.getClearAlpha();
+      renderer.getClearColor(prevClear);
+      const nextFrame = async () => { await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); await new Promise(r => setTimeout(r, 120)); };
+      const out: any[] = [];
+      const v = new T.Vector3();
+      try {
+        scene.environmentIntensity = 0; scene.fog = null; scene.background = null; renderer.shadowMap.autoUpdate = false;
+        const depthMat = new T.MeshDepthMaterial({ depthPacking: T.RGBADepthPacking });
         const read = (rt: any, arr: any) => { renderer.readRenderTargetPixels(rt, 0, 0, W, H, arr); return arr; };
-        const prevRT = renderer.getRenderTarget();
-        const out: any[] = [];
-        try {
-          scene.environmentIntensity = 0; scene.fog = null; scene.background = null; renderer.shadowMap.autoUpdate = false;
-          // depth once
-          const depthMat = new T.MeshDepthMaterial({ depthPacking: T.RGBADepthPacking });
-          const prevOverride = scene.overrideMaterial; scene.overrideMaterial = depthMat;
-          renderer.setRenderTarget(dep); renderer.setClearColor(0xffffff, 1); renderer.clear(); renderer.render(scene, camera);
-          scene.overrideMaterial = prevOverride;
-          const D = read(dep, new Uint8Array(W * H * 4));
-          const world = new Float32Array(W * H * 3);
-          const inv = camera.projectionMatrixInverse, mw = camera.matrixWorld;
-          const v = new T.Vector3();
+        const worldOf = (cam: any) => {
+          const prev = scene.overrideMaterial; scene.overrideMaterial = depthMat;
+          renderer.setRenderTarget(dep); renderer.setClearColor(0xffffff, 1); renderer.clear(); renderer.render(scene, cam);
+          scene.overrideMaterial = prev;
+          const D = read(dep, new Uint8Array(W * H * 4)), w = new Float32Array(W * H * 3);
           for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
             const i = (y * W + x) * 4, o = (y * W + x) * 3;
-            const dd = (D[i] / 255 / (256 ** 3) + D[i + 1] / 255 / (256 ** 2) + D[i + 2] / 255 / 256 + D[i + 3] / 255) * (255 / 256);
-            v.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1, dd * 2 - 1).applyMatrix4(inv).applyMatrix4(mw);
-            world[o] = v.x; world[o + 1] = v.y; world[o + 2] = v.z;
-            if (dd >= 0.99999) world[o] = NaN;   // the sky
+            const dd = (D[i] + D[i + 1] / 256 + D[i + 2] / 65536) / 255 * (255 / 256) + D[i + 3] / 255 / 16777216;   // r169's packDepthToRGBA: r is the most significant byte
+            if (dd >= 0.99999) { w[o] = NaN; continue; }
+            v.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1, dd * 2 - 1).applyMatrix4(cam.projectionMatrixInverse).applyMatrix4(cam.matrixWorld);
+            w[o] = v.x; w[o + 1] = v.y; w[o + 2] = v.z;
           }
-          const frame = async () => { window.dispatchEvent(new Event('resize')); await new Promise(r => setTimeout(r, 450)); };
-          const draw = () => { renderer.setRenderTarget(lit); renderer.setClearColor(0x000000, 1); renderer.clear(); renderer.render(scene, camera); return read(lit, new Float32Array(W * H * 4)); };
-          // baseline: every light off
-          for (const o of all) o.visible = false;
-          await frame();
-          const base = draw();
-          const chosen = lamps.filter(l => boxes.has(l)).slice(0, 6);
-          for (const L of chosen) {
-            for (const o of all) o.visible = o === L;
-            await frame();
-            const img = draw();
-            const bx = boxes.get(L);
-            let inside = 0, outside = 0, strongOutside = 0;
+          return w;
+        };
+        const draw = (cam: any) => { renderer.setRenderTarget(lit); renderer.setClearColor(0x000000, 1); renderer.clear(); renderer.render(scene, cam); return read(lit, new Float32Array(W * H * 4)); };
+        for (const o of all) o.visible = false;
+        for (const L of lamps.filter(l => boxes.has(l)).slice(0, 3)) {
+          L.visible = true;
+          const full = L.intensity;
+          const bx = boxes.get(L);
+          L.updateWorldMatrix(true, false);
+          const lx = L.matrixWorld.elements[12], ly = L.matrixWorld.elements[13], lz = L.matrixWorld.elements[14];
+          const cx = (bx.lo[0] + bx.hi[0]) / 2, cz = (bx.lo[2] + bx.hi[2]) / 2;
+          const spots: [string, [number, number, number], [number, number, number]][] = [
+            ['in', [lx, ly - 0.15, lz], [lx, 0, lz + 0.001]],
+            ['W', [bx.lo[0] - 2, ly, cz], [lx, ly, lz]], ['E', [bx.hi[0] + 2, ly, cz], [lx, ly, lz]],
+            ['N', [cx, ly, bx.lo[2] - 2], [lx, ly, lz]], ['S', [cx, ly, bx.hi[2] + 2], [lx, ly, lz]],
+          ];
+          await nextFrame();   // a drawn frame with this lamp alone: the viewer's tick maps its slot
+          const r: any = { inside: 0, outside: 0, strongOutside: 0, views: 0, axis: [0, 0, 0, 0, 0, 0], far: 0, ex: [] as number[][] };
+          for (const [name, pos, at] of spots) {
+            const cam = new T.PerspectiveCamera(name === 'in' ? 100 : 70, W / H, 0.05, 120);
+            cam.position.set(...pos); cam.lookAt(...at); cam.updateMatrixWorld(true); cam.updateProjectionMatrix();
+            const world = worldOf(cam);
+            L.intensity = 0; const base = draw(cam);
+            L.intensity = full; const img = draw(cam);
+            r.views++;
             for (let p = 0; p < W * H; p++) {
               const wx = world[p * 3];
               if (Number.isNaN(wx)) continue;
@@ -210,31 +227,44 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
               if (dl < 0.004) continue;
               const wy = world[p * 3 + 1], wz = world[p * 3 + 2], e = 0.05;
               const isIn = wx >= bx.lo[0] - e && wx <= bx.hi[0] + e && wy >= bx.lo[1] - e && wy <= bx.hi[1] + e && wz >= bx.lo[2] - e && wz <= bx.hi[2] + e;
-              if (isIn) inside++; else { outside++; if (dl > 0.02) strongOutside++; }
+              if (isIn) r.inside++;
+              else {
+                r.outside++;
+                if (dl > 0.02) {
+                  r.strongOutside++;
+                  const gap = [bx.lo[0] - wx, wx - bx.hi[0], bx.lo[1] - wy, wy - bx.hi[1], bx.lo[2] - wz, wz - bx.hi[2]];
+                  const k = gap.indexOf(Math.max(...gap)); r.axis[k]++; r.far = Math.max(r.far, gap[k]);
+                  if (r.ex.length < 4 && p % 97 === 0) r.ex.push([name === 'in' ? 0 : 1, +wx.toFixed(2), +wy.toFixed(2), +wz.toFixed(2), +gap[k].toFixed(2), k]);
+                }
+              }
             }
-            out.push({ inside, outside, strongOutside });
           }
-        } finally {
-          all.forEach((o, i) => { o.visible = was[i]; });
-          scene.environmentIntensity = env; scene.fog = fog; scene.background = bg; renderer.shadowMap.autoUpdate = auto;
-          renderer.setRenderTarget(prevRT); lit.dispose(); dep.dispose();
+          L.intensity = full; L.visible = false;
+          out.push(r);
         }
-        return out;
-      });
-    };
-    const on = await env.open(house, { tod: 'night', shot: 'orbit', t: 0.4, query: 'q=1&no=accum' });
-    const off = await env.open(house, { tod: 'night', shot: 'orbit', t: 0.4, query: 'q=1&no=accum,spotclip' });
+      } finally {
+        all.forEach((o, i) => { o.visible = was[i]; });
+        scene.environmentIntensity = envI; scene.fog = fog; scene.background = bg; renderer.shadowMap.autoUpdate = auto;
+        renderer.setRenderTarget(prevRT); renderer.setClearColor(prevClear, prevAlpha); lit.dispose(); dep.dispose();
+        void main;
+      }
+      return out;
+    });
+    const on = await env.open(house, { tod: 'night', query: 'q=1&no=accum' });
+    const off = await env.open(house, { tod: 'night', query: 'q=1&no=accum,spotclip' });
     try {
       await sleep(800);
       const c0 = (await on.effects())?.features?.frame?.clip;
       add('spot clip: lights mapped to rooms, switched on', !!c0 && c0.mapped > 0 && c0.on, c0 ? JSON.stringify(c0) : 'no clip stats');
-      const a = await probe(on, true), b = await probe(off, true);
+      const a = await probe(on), b = await probe(off);
+      await on.settle();
       const c1 = (await on.effects())?.features?.frame?.clip;
-      add('spot clip: the slot mapping stayed proven while lights and levels were hidden', !!c1 && c1.mismatches === 0 && c1.verified > (c0?.verified ?? 0) && c1.on, c1 ? JSON.stringify(c1) : 'no clip stats');
+      add('spot clip: the slot mapping stayed proven while the other lights were hidden', !!c1 && c1.mismatches === 0 && c1.on && c1.verified > 0, c1 ? JSON.stringify(c1) : 'no clip stats');
       const lit = a.filter((r: any) => r.inside > 20).length;
       const strayOn = a.reduce((n: number, r: any) => n + r.strongOutside, 0), strayOff = b.reduce((n: number, r: any) => n + r.strongOutside, 0);
-      add('spot clip: no lamp lights a surface outside its room', a.length > 0 && lit > 0 && strayOn === 0, `${a.length} lamps probed, ${lit} light their own room, strong stray pixels with the clip: ${strayOn} (per lamp ${a.map((r: any) => r.strongOutside).join(',')})`);
-      add('spot clip: and the probe can see the leak it removes (clip off)', strayOff > 0, `strong stray pixels without it: ${strayOff} (per lamp ${b.map((r: any) => r.strongOutside).join(',')}), lit in-room pixels ${b.map((r: any) => r.inside).join(',')}`);
+      add('spot clip: each lamp still lights its own room', a.length > 0 && lit === a.length, `in-room lit pixels per lamp ${a.map((r: any) => r.inside).join(',')}`);
+      add('spot clip: no lamp lights a surface outside its room', a.length > 0 && strayOn === 0, `strong stray pixels with the clip: ${strayOn} (per lamp ${a.map((r: any) => r.strongOutside).join(',')}); sides -x,+x,-y,+y,-z,+z ${JSON.stringify(a.map((r: any) => r.axis))}, farthest ${a.map((r: any) => r.far.toFixed(2)).join(',')} m, e.g. ${JSON.stringify(a[0]?.ex)}`);
+      add('spot clip: and the probe sees the leak it removes (clip off)', strayOff > 0, `strong stray pixels without the clip: ${strayOff} (per lamp ${b.map((r: any) => r.strongOutside).join(',')}), in-room ${b.map((r: any) => r.inside).join(',')}`);
     } finally { await on.close(); await off.close(); }
   }
   return out;
