@@ -18,6 +18,7 @@
 //   d  renderer.info.memory returns to its first value after switching homes there and back
 //   e  git diff --quiet test/goldens/expected-diffs (the six ledgers stay as they are)
 // then every scripts/live-checks/<key>.mts: `export default async function check(env): Promise<Result[]>`.
+// @check-house skip — it needs a GPU and a second (built) tree of BASE_SHA and takes minutes: run pnpm run test:live after realism work
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
