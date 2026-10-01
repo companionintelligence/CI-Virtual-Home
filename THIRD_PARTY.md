@@ -37,6 +37,14 @@ Google Fonts stylesheet the pages link (see below), so a golden never depends on
 
 Their licence texts are reproduced at the end of this file.
 
+### Live realism: sky and glass
+
+`assets/viewer-sky.ts`, `assets/realism-sky.ts` and the fresnel patch in `assets/viewer-glass.ts` contain no third-party
+code, texture, model or HDRI. The shaders are original, written from published algorithms that need no notice: value noise
+and fractal Brownian motion (the textbook definitions), the Henyey-Greenstein phase function (Henyey and Greenstein, 1941),
+and Schlick's Fresnel approximation (Schlick, 1994). The one-line `fract(sin(dot(...)))` hash is the long-standing public-domain
+idiom. LYGIA (dual Prosperity non-commercial / paid licence) and Grassworks (commercial) were not consulted for it.
+
 ## Reference only — nothing copied
 
 - **Pascal's `/next` demo (pascal.app)** carries no licence. None of its code, textures, models or configuration

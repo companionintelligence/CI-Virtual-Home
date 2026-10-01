@@ -17,7 +17,7 @@
 //       * a cloud layer: fbm of a value noise, projected on a plane (direction.xz / (elevation + 0.09)) so that the clouds
 //         pile up and flatten toward the horizon, shaded by a second tap one step toward the sun (a cloud is dark where the
 //         neighbour toward the sun is denser, bright with a silver edge where it is thin). Cloud colour and alpha fade into
-//         the horizon colour between 3 and 16 degrees of elevation, which is what keeps the band the fog meets clean.
+//         the horizon colour between 4 and 17 degrees of elevation, which is what keeps the band the fog meets clean.
 //   - the dome: a unit sphere drawn LAST of the opaque objects with depth forced to the far plane (gl_Position.z =
 //     gl_Position.w), so the early depth test throws away every pixel a wall, a roof or the lawn already covers and the
 //     cloud shader runs only on sky. The view matrix is used rotation-only, so the dome needs no following the camera.
@@ -26,9 +26,10 @@
 //     as scene.environment. The baked clouds are the dome's frozen pattern (same seed, drift 0), blurred by PMREM to what a
 //     glossy surface can show. The bake is cached per (preset, palette, sun) and a time-of-day switch that was seen before
 //     costs a pointer swap. A bake is debounced: a house load sets the light several times in a row.
-//   - exposure: the new environment is not the old one with clouds on top, so its mean luminance is measured (a 64x32
-//     bake read back, against the page's own sky function at the same size) and scene.environmentIntensity is scaled by
-//     old / new (clamped to 0.8 .. 1.25), so the lit surfaces do not get brighter or darker than the preset was tuned for.
+//   - exposure: the new environment is not the old one with clouds on top, so the light it gives is measured (a 64x32
+//     bake read back, against the page's own sky function at the same size: the irradiance for a surface facing up and
+//     for the four facing sideways) and scene.environmentIntensity is scaled by old / new (clamped to 0.7 .. 1.3), so the
+//     lit surfaces do not get brighter or darker than the preset was tuned for.
 //
 // Tiers: 0 draws the dome with two noise octaves and time frozen; 1 and 2 four octaves, and the clouds drift with the
 // player's clock while the player is drawing (nothing forces a redraw: a paused shot is a still picture). The dome costs
@@ -56,6 +57,8 @@ export type SkyHandle = {
   apply(): void; restore(): void; sync(): void;
   tick(dtS: number, tS: number, camera?: any): void;
   setTier(t: number): void; setHq(on: boolean): void;
+  /** test hook: the dome's colours as a w*h linear RGBA float equirect (row 0 = nadir), time 0, tier-1 octaves */
+  probe(w: number, h: number): { data: Float32Array; w: number; h: number } | null;
   dispose(): void;
   stats(): Record<string, any>;
 };
@@ -94,13 +97,13 @@ vec3 skyColor( vec3 d, float oct, float pix ) {
 	// 2. Mie-like forward scattering: Henyey-Greenstein, g = 0.72, a wide warm halo round the sun (or the moon)
 	float hg = 0.4816 / pow( 1.5184 - 1.44 * cosA, 1.5 );
 	col += uSunCol * ( uSunGlow * 0.03 * hg * up * ( 1.0 - uMoon ) );
-	// 3. clouds on a plane above: pile up and flatten toward the horizon, gone into the haze by 3 degrees
+	// 3. clouds on a plane above: pile up and flatten toward the horizon, gone into the haze by 4 degrees
 	float ca = 0.0;
-	if ( d.y > 0.03 && uCover < 0.98 ) {
+	if ( d.y > 0.05 && uCover < 0.98 ) {
 		vec2 uv = d.xz / ( d.y + 0.09 ) * 0.62 + uSeed + vec2( uTime, uTime * 0.37 );
 		float dn = fbm( uv, oct );
 		float cd = smoothstep( uCover, uCover + 0.22, dn );
-		float ramp = smoothstep( 0.05, 0.26, d.y );
+		float ramp = smoothstep( 0.07, 0.30, d.y );
 		ca = cd * ramp;
 		if ( ca > 0.002 ) {
 			vec2 toSun = normalize( uSunDir.xz + vec2( 1e-4 ) );
@@ -111,7 +114,7 @@ vec3 skyColor( vec3 d, float oct, float pix ) {
 			cc += uSunCol * ( 4.0 * cd * ( 1.0 - cd ) * pow( cosA, 5.0 ) * 0.5 * ( 1.0 - uMoon ) );
 			// toward the horizon the cloud turns into the haze
 			vec3 hz = mix( uHor, uTop, 0.12 );
-			cc = mix( hz, cc, smoothstep( 0.05, 0.4, d.y ) );
+			cc = mix( hz, cc, smoothstep( 0.07, 0.45, d.y ) );
 			col = mix( col, cc, ca );
 		}
 	}
@@ -138,7 +141,7 @@ vec3 skyColor( vec3 d, float oct, float pix ) {
 	}
 	// 5. stars: one candidate per cell of a 3D grid cut by the unit sphere; a star is a small disc at least a pixel wide
 	// (so it does not swim when the camera moves), its energy kept constant as it widens
-	if ( uStars > 0.0 && d.y > 0.0 ) {
+	if ( uStars > 0.0 && d.y > 0.08 ) {
 		const float K = 110.0;
 		vec3 g = d * K, c = floor( g );
 		float h = hash12( c.xy + c.z * 37.17 );
@@ -149,7 +152,7 @@ vec3 skyColor( vec3 d, float oct, float pix ) {
 			float s = smoothstep( r, 0.0, length( g - sp ) ) * ( r0 * r0 ) / ( r * r );
 			float mag = pow( hash12( c.xy * 1.31 + c.z * 3.7 ), 5.0 );
 			vec3 tint = mix( vec3( 1.0, 0.82, 0.66 ), vec3( 0.72, 0.82, 1.0 ), hash12( c.yz + 2.9 ) );
-			col += tint * ( s * ( 0.35 + 2.2 * mag ) * uStarGain * smoothstep( 0.0, 0.2, d.y ) * ( 1.0 - ca ) );
+			col += tint * ( s * ( 0.35 + 2.2 * mag ) * uStarGain * smoothstep( 0.09, 0.3, d.y ) * ( 1.0 - ca ) );
 		}
 	}
 	return col;
@@ -283,7 +286,7 @@ export function createSky(ctx: SkyCtx): SkyHandle {
     const seed = fnv1a(ctx.houseId() || 'house');
     u.uSeed.value.set(((seed & 0xffff) / 65535) * 40, (((seed >>> 16) & 0xffff) / 65535) * 40);
     u.uCover.value = clamp((COVER[L.name] ?? 0.5) + (((seed >>> 8) & 0xff) / 255 - 0.5) * 0.08, 0.3, 0.8);
-    u.uDisc.value = env ? 5 : moon ? 1.5 : 9;
+    u.uDisc.value = moon ? 1.5 : env ? 5 : 9;
     u.uDiscR.value = env ? 0.045 : moon ? 0.04 : 0.024;
     u.uEnv.value = env ? 1 : 0;
   }
@@ -295,32 +298,43 @@ export function createSky(ctx: SkyCtx): SkyHandle {
     try { return fn(); } finally { renderer.setRenderTarget(prevRT, face, mip); renderer.autoClear = prevAuto; }
   }
   const half = (THREE as any).DataUtils.fromHalfFloat;
-  // mean luminance over the sphere (each row weighted by cos(latitude)) of a w*h RGBA float buffer
-  function meanLum(buf: ArrayLike<number>, w: number, h: number, decode: (v: number) => number): number {
-    let s = 0, wsum = 0;
+  // The light the sky gives a surface, per facing: irradiance (cosine-weighted sum of luminance over the sphere) for a normal
+  // up and, averaged, for the four horizontal ones, from a w*h equirect RGBA buffer. A surface in the house is lit by these,
+  // not by the sphere's plain mean, which would count the (dark) ground half the same as the sky.
+  function irradiance(buf: ArrayLike<number>, w: number, h: number, decode: (v: number) => number): { up: number; side: number } {
+    let up = 0, side = 0;
     for (let y = 0; y < h; y++) {
-      const cl = Math.cos(((y + 0.5) / h - 0.5) * Math.PI);
-      for (let x = 0; x < w; x++) { const i = (y * w + x) * 4; s += cl * (0.2126 * decode(buf[i]) + 0.7152 * decode(buf[i + 1]) + 0.0722 * decode(buf[i + 2])); wsum += cl; }
+      const lat = ((y + 0.5) / h - 0.5) * Math.PI, cl = Math.cos(lat), sl = Math.sin(lat);
+      const dOmega = cl * (Math.PI / h) * (2 * Math.PI / w);
+      for (let x = 0; x < w; x++) {
+        const phi = ((x + 0.5) / w - 0.5) * 2 * Math.PI;
+        const i = (y * w + x) * 4;
+        const L = 0.2126 * decode(buf[i]) + 0.7152 * decode(buf[i + 1]) + 0.0722 * decode(buf[i + 2]);
+        const dx = Math.cos(phi) * cl, dz = Math.sin(phi) * cl;
+        up += L * Math.max(0, sl) * dOmega;
+        side += L * (Math.max(0, dx) + Math.max(0, -dx) + Math.max(0, dz) + Math.max(0, -dz)) * 0.25 * dOmega;
+      }
     }
-    return s / Math.max(wsum, 1e-6);
+    return { up, side };
   }
-  // old / new mean luminance of the environment (see the header); 1 when the meter cannot run
+  // old / new irradiance (half from the up facing, half from the sides; see the header); 1 when the meter cannot run
   function exposureRatio(L: ReturnType<typeof lightingOf>): number {
     try {
       const envP = L.q.envSky ? { ...L.q, sky: L.q.envSky } : L.q;
       const old = skyEquirect(THREE, envP, L.sun, { width: METER_W, height: METER_H, below: 'ground' });
-      const oldM = meanLum(old.image.data, METER_W, METER_H, half);
+      const o = irradiance(old.image.data, METER_W, METER_H, half);
       old.dispose();
       const rt = new THREE.WebGLRenderTarget(METER_W, METER_H, { type: THREE.FloatType, format: THREE.RGBAFormat, depthBuffer: false, colorSpace: THREE.LinearSRGBColorSpace });
-      let newM = oldM;
+      let n = o;
       withTarget(() => {
         renderer.setRenderTarget(rt); renderer.render(bakeScene, bakeCam);
         const buf = new Float32Array(METER_W * METER_H * 4);
         renderer.readRenderTargetPixels(rt, 0, 0, METER_W, METER_H, buf);
-        newM = meanLum(buf, METER_W, METER_H, v => v);
+        n = irradiance(buf, METER_W, METER_H, v => v);
       });
       rt.dispose();
-      return newM > 1e-5 && oldM > 1e-5 ? clamp(oldM / newM, 0.8, 1.25) : 1;
+      if (!(n.up > 1e-6 && n.side > 1e-6 && o.up > 1e-6 && o.side > 1e-6)) return 1;
+      return clamp(0.5 * (o.up / n.up) + 0.5 * (o.side / n.side), 0.7, 1.3);
     } catch { return 1; }
   }
 
@@ -439,6 +453,18 @@ export function createSky(ctx: SkyCtx): SkyHandle {
       if (on === hq) return;
       if (on) { restore(); active = true; hq = true; }
       else { hq = false; active = false; apply(); }
+    },
+    probe(w: number, h: number) {
+      const L = lightingOf(detail || ctx.lighting());
+      try {
+        const u = bakeMat.uniforms;
+        paint(u, L, false); u.uTime.value = 0; u.uOct.value = 4;
+        const rt = new THREE.WebGLRenderTarget(w, h, { type: THREE.FloatType, format: THREE.RGBAFormat, depthBuffer: false, colorSpace: THREE.LinearSRGBColorSpace });
+        const data = new Float32Array(w * h * 4);
+        withTarget(() => { renderer.setRenderTarget(rt); renderer.render(bakeScene, bakeCam); renderer.readRenderTargetPixels(rt, 0, 0, w, h, data); });
+        rt.dispose();
+        return { data, w, h };
+      } catch { return null; }
     },
     dispose() {
       restore();

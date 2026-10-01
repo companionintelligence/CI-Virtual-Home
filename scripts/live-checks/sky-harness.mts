@@ -25,7 +25,8 @@ export async function installSky(page: any, { tier = 1, no = [] as string[], app
   return page.evaluate(async ({ tier, no, apply }: any) => {
     const w = window as any;
     const dbg = w.__houseDebug();
-    const mod = await import('/assets/realism-sky.js');
+    const url: string = '/assets/realism-sky.js';   // (a variable: tsc must not resolve it, it is the page's module)
+    const mod: any = await import(url);
     const house = new URLSearchParams(location.search).get('house') || 'aurora';
     const ctx = {
       THREE: w.__THREE, scene: dbg.scene, renderer: dbg.renderer, camera: dbg.camera,
