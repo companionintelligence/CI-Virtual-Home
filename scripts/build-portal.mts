@@ -32,6 +32,7 @@
 // (what a crawler or a visitor without JavaScript reads) are the ones gallery.js computes from index.json.
 //
 // Only the paths it writes are replaced in <out>; anything else there (dist/models from export:core) is left.
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
@@ -206,6 +207,73 @@ const SITE_NAME = 'Companion Intelligence';   // og:site_name on every page: the
   const map = page.indexOf('<script type="importmap">');
   if (map < 0 || /\bimport\(|type="module"|rel="modulepreload"/.test(page.slice(0, map))) problems.push('room-creator.html: a module is loaded before the import map');
   fs.writeFileSync(rc, page);
+}
+
+// 5e. name every module and stylesheet by a hash of its content. The files are not fingerprinted by name (assets/viewer.js is
+// the same URL on every deploy), and nothing server-side can be relied on to keep a browser from reusing a stale copy:
+// portal/_headers asks for revalidation, but the custom domain's zone can rewrite Cache-Control to hours whatever the
+// origin says (it did: homes.ci.computer served .js at max-age=14400 beside pages.dev's max-age=0). A visitor then ran the
+// NEW page against OLD modules and every home stopped with "This home could not be opened". So the page itself, which is
+// never cached, says which version of each file it wants:
+//   - modules: the import map (the page's own, in room-creator.html; one added to index.html) maps each plain URL to
+//     ./assets/x.js?v=<hash>. A module's relative imports resolve to the plain URL, which the map rewrites, so a module
+//     never needs to know its neighbours' hashes and a change to one file changes only its own URL
+//   - <script src> and <link href> to portal/*.js|css and assets/*.js get ?v=<hash> directly
+// vendor/three is left alone: it changes only when someone upgrades it on purpose.
+{
+  const hashOf = (fileRel: string): string => crypto.createHash('sha256').update(fs.readFileSync(path.join(OUT, fileRel))).digest('hex').slice(0, 10);
+  const walkOut = (dirRel: string, keep: (f: string) => boolean): string[] => {
+    const dir = path.join(OUT, dirRel);
+    if (!fs.existsSync(dir)) return [];
+    return fs.readdirSync(dir).flatMap(name => {
+      const r = path.join(dirRel, name);
+      return fs.statSync(path.join(OUT, r)).isDirectory() ? walkOut(r, keep) : keep(r) ? [r] : [];
+    });
+  };
+  const isVendor = (f: string): boolean => f.split(path.sep).slice(0, 2).join('/') === 'assets/vendor';
+  const modules = walkOut('assets', f => f.endsWith('.js') && !isVendor(f)).map(f => f.split(path.sep).join('/')).sort();
+  const sheetsAndScripts = walkOut('portal', f => /\.(js|css)$/.test(f)).map(f => f.split(path.sep).join('/')).sort();
+  const hashes = new Map<string, string>([...modules, ...sheetsAndScripts].map(f => [f, hashOf(f)]));
+  const versioned = (f: string): string => `./${f}?v=${hashes.get(f)}`;
+  const moduleMap: Record<string, string> = Object.fromEntries(modules.map(f => [`./${f}`, versioned(f)]));
+
+  const importMapBlock = (imports: Record<string, string>): string => `<script type="importmap">\n${JSON.stringify({ imports }, null, 2).replace(/^/gm, '  ')}\n  </script>`;
+  const retag = (html: string, name: string): string => html.replace(/((?:src|href)=")(\.\/(?:assets|portal)\/[^"?#]+\.(?:js|css))(")/g, (whole, a: string, url: string, z: string) => {
+    const f = url.slice(2);
+    if (isVendor(f)) return whole;
+    if (!hashes.has(f)) { problems.push(`${name}: ${url} is not in the output, so it cannot be fingerprinted`); return whole; }
+    return `${a}${versioned(f)}${z}`;
+  });
+
+  // room-creator.html: add to the page's own import map (three.js and its addons stay as they are)
+  {
+    const rc = path.join(OUT, 'room-creator.html');
+    let page = fs.readFileSync(rc, 'utf8');
+    const m = page.match(/<script type="importmap">([\s\S]*?)<\/script>/);
+    if (!m) problems.push('room-creator.html: no import map to add the module hashes to');
+    else {
+      let own: Record<string, string> = {};
+      try { own = JSON.parse(m[1]).imports || {}; } catch { problems.push('room-creator.html: its import map is not valid JSON'); }
+      page = page.replace(m[0], () => importMapBlock({ ...own, ...moduleMap }));
+    }
+    fs.writeFileSync(rc, retag(page, 'room-creator.html'));
+  }
+  // index.html: the gallery imports a module of the engine (assets/home-names.js) and had no import map; it goes before
+  // anything that loads a module
+  {
+    const ix = path.join(OUT, 'index.html');
+    let page = fs.readFileSync(ix, 'utf8');
+    if (/<script type="importmap">/.test(page)) problems.push('index.html: it already has an import map; merge the module hashes into it');
+    else if (!/<head[^>]*>/.test(page)) problems.push('index.html: no <head> to put the import map in');
+    else page = page.replace(/<head[^>]*>/, tag => `${tag}\n  ${importMapBlock(moduleMap)}`);
+    fs.writeFileSync(ix, retag(page, 'index.html'));
+  }
+  // nothing the pages name may be left un-hashed
+  for (const name of ['index.html', 'room-creator.html']) {
+    const left = [...fs.readFileSync(path.join(OUT, name), 'utf8').matchAll(/(?:src|href)="(\.\/(?:assets|portal)\/[^"?#]+\.(?:js|css))"/g)].map(x => x[1]).filter(u => !isVendor(u.slice(2)));
+    if (left.length) problems.push(`${name}: still names ${left.slice(0, 3).join(', ')} without a content hash`);
+  }
+  console.log(`portal: ${modules.length} modules and ${sheetsAndScripts.length} portal scripts/styles named by content hash`);
 }
 
 // 6. every relative URL the pages and stylesheets name must be in the output (a query or a fragment is fine)

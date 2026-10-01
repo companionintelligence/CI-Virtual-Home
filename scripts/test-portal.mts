@@ -29,8 +29,9 @@
 //             card that says so, with a way back, instead of an endless loader; the names module
 //             (home-names.js) not downloading: the gallery still lists the homes, and the player's tab never
 //             shows a spec's Sims title
-//   caching   dist/_headers revalidates every file (max-age=0, must-revalidate): the modules are not fingerprinted, so
-//             a long cache would run a deploy's new page against a returning visitor's old modules
+//   caching   dist/_headers revalidates every file (max-age=0, must-revalidate), and the pages name every module and
+//             stylesheet by a hash of its content (import map + ?v=): the player pulls each module by its hash, and with
+//             every un-hashed module URL poisoned (an old build in the browser's cache) it still starts
 //   editor    room-creator.html without ?mode=view still shows the editor and never mounts the player
 //   webkit    Safari's engine, when Playwright's WebKit for the pinned version is installed: the gallery, the player
 //             (plays, pauses, scrubs) and the editor (builds a home, hooks there), with no console error. Skipped with
@@ -39,6 +40,7 @@
 // Any console error, page error or failed request on any page fails the run (the failure cases allow exactly the
 // ones they cause). Screenshots land in --shots (gitignored test/portal/ by default) so a person can look at what
 // passed. Exit 0 only when everything did.
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
@@ -207,18 +209,57 @@ async function previews() {
 }
 
 // ------------------------------------------------------------------ caching of the built site
-// The engine's modules are not fingerprinted, so the only thing that keeps a returning visitor's browser from running
-// the new page against old modules after a deploy is that every file is revalidated (Pages' default is four hours
-// with no check, which stopped every home with "This home could not be opened" right after a deploy).
-function caching() {
+// The engine's modules are not fingerprinted by file name, and a browser (or the custom domain's zone, which rewrote
+// Cache-Control to four hours whatever the origin said) can keep an old copy of one while the page that asks for it is new:
+// the player then stops with "This home could not be opened". Two things keep that from happening: portal/_headers asks for
+// revalidation, and the pages name every module by a hash of its content, so an old copy is never the one asked for.
+async function caching() {
   console.log('\ncaching');
   const file = path.join(DIR, '_headers');
   ok(fs.existsSync(file), 'dist/_headers is there (Cloudflare Pages reads it from the site root)');
-  if (!fs.existsSync(file)) return;
-  const lines = fs.readFileSync(file, 'utf8').split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
-  const rules = lines.filter(l => !/^\s/.test(l)), values = lines.filter(l => /^\s+cache-control\s*:/i.test(l)).map(l => l.split(':').slice(1).join(':').trim());
-  ok(rules.includes('/*'), 'a rule for every path (/*)');
-  ok(values.length > 0 && values.every(v => /(^|[ ,])max-age=0([ ,]|$)/.test(v) && /must-revalidate/.test(v)), `every Cache-Control rule is max-age=0, must-revalidate (${values.join(' | ') || 'none'})`);
+  if (fs.existsSync(file)) {
+    const lines = fs.readFileSync(file, 'utf8').split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
+    const rules = lines.filter(l => !/^\s/.test(l)), values = lines.filter(l => /^\s+cache-control\s*:/i.test(l)).map(l => l.split(':').slice(1).join(':').trim());
+    ok(rules.includes('/*'), 'a rule for every path (/*)');
+    ok(values.length > 0 && values.every(v => /(^|[ ,])max-age=0([ ,]|$)/.test(v) && /must-revalidate/.test(v)), `every Cache-Control rule is max-age=0, must-revalidate (${values.join(' | ') || 'none'})`);
+  }
+
+  const hash = (rel: string): string => crypto.createHash('sha256').update(fs.readFileSync(path.join(DIR, rel))).digest('hex').slice(0, 10);
+  const walkDir = (dirRel: string): string[] => fs.readdirSync(path.join(DIR, dirRel)).flatMap(n => { const r = `${dirRel}/${n}`; return fs.statSync(path.join(DIR, r)).isDirectory() ? walkDir(r) : [r]; });
+  const modules = walkDir('assets').filter(f => f.endsWith('.js') && !f.startsWith('assets/vendor/'));
+  for (const page of ['index.html', 'room-creator.html']) {
+    const html = fs.readFileSync(path.join(DIR, page), 'utf8');
+    let map: Record<string, string> = {};
+    try { map = JSON.parse((html.match(/<script type="importmap">([\s\S]*?)<\/script>/) || [])[1] || '{}').imports || {}; } catch { /* reported below */ }
+    const wrong = modules.filter(m => map[`./${m}`] !== `./${m}?v=${hash(m)}`);
+    ok(modules.length > 50 && wrong.length === 0, `${page}: the import map names all ${modules.length} modules by the hash of their content${wrong.length ? ` (wrong: ${wrong.slice(0, 3).join(', ')})` : ''}`);
+    const bare = [...html.matchAll(/(?:src|href)="(\.\/(?:assets|portal)\/[^"?#]+\.(?:js|css))"/g)].map(m => m[1]).filter(u => !u.includes('/vendor/'));
+    ok(bare.length === 0, `${page}: every script, stylesheet and module preload carries a content hash${bare.length ? ` (without: ${bare.slice(0, 3).join(', ')})` : ''}`);
+    if (page === 'room-creator.html') ok(map.three && map['three/addons/'], "room-creator.html: three.js and its addons are still in the import map");
+  }
+
+  // in a browser: the player pulls every module by its hash...
+  {
+    const { page, errors, requests, close } = await open({ width: 1280, height: 800 });
+    await page.goto(srv.url('room-creator.html?mode=view&house=aurora'));
+    await viewerReady(page);
+    const asked = requests.filter(u => /\/assets\/.*\.js(\?|$)/.test(u) && !/\/assets\/vendor\//.test(u));
+    const bare = asked.filter(u => !/[?&]v=[0-9a-f]{10}$/.test(u));
+    ok(asked.length > 50 && bare.length === 0, `the player pulls ${asked.length} modules, each by its hash${bare.length ? ` (without: ${bare.slice(0, 3).join(', ')})` : ''}`);
+    ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
+    await close();
+  }
+  // ...so whatever an old build left in the browser's cache under the plain URLs is never used. Poison every plain module
+  // URL: the player must start without touching one (this is the failure that stopped every home after the first deploy)
+  {
+    const { page, errors, close } = await open({ width: 1280, height: 800 });
+    let poisoned = 0;
+    await page.route((u: URL) => /\/assets\/.*\.js$/.test(u.pathname) && !/\/assets\/vendor\//.test(u.pathname) && !u.searchParams.has('v'), (r: any) => { poisoned++; return r.fulfill({ status: 200, contentType: 'application/javascript', body: 'throw new Error("a stale module was used")' }); });
+    await page.goto(srv.url('room-creator.html?mode=view&house=aurora'));
+    const state = await viewerReady(page).then(() => 'ready').catch(() => 'not ready');
+    ok(state === 'ready' && poisoned === 0 && errors.length === 0, `with every un-hashed module URL poisoned, the player still starts and never asks for one (${state}, ${poisoned} asked${errors.length ? ': ' + errors[0] : ''})`);
+    await close();
+  }
 }
 
 // ------------------------------------------------------------------ player
@@ -499,7 +540,7 @@ async function failureCases() {
   }
   for (const file of ['viewer.js', 'house-builder.js']) {
     const { page, close } = await open({ width: 1440, height: 900 });
-    await page.route(`**/assets/${file}`, (r: any) => r.abort());
+    await page.route((u: URL) => u.pathname.endsWith(`/assets/${file}`), (r: any) => r.abort());   // (by path: the URL carries a ?v= hash)
     await page.goto(srv.url('room-creator.html?mode=view&house=aurora'));
     const card = await page.waitForSelector('.vh-fail', { timeout: 60000 }).catch(() => null);
     const state = await page.evaluate(() => document.documentElement.dataset.viewer);
@@ -513,7 +554,7 @@ async function failureCases() {
     // fallback), and the player, which cannot start without them, shows its card under the site's title rather
     // than a spec's Sims one
     const { page, close } = await open({ width: 1440, height: 900 });
-    await page.route('**/assets/home-names.js', (r: any) => r.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' }));
+    await page.route((u: URL) => u.pathname.endsWith('/assets/home-names.js'), (r: any) => r.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' }));
     await page.goto(srv.url('index.html'));
     const listed = await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 }).then(() => true).catch(() => false);
     const cards = await page.$$eval('#grid .card:not(.skel)', (els: Element[]) => els.length);
@@ -617,7 +658,7 @@ try {
   await gallery({ width: 1440, height: 900 }, false, '1440');
   await gallery({ width: 390, height: 844 }, true, '390');
   await previews();
-  caching();
+  await caching();
   for (const [i, id] of HOUSES.entries()) await player(id, { width: 1440, height: 900 }, false, '1440', i === 0);
   await player(HOUSES[0], { width: 390, height: 844 }, true, '390', false);
   await motion(HOUSES[0]);

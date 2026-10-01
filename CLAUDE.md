@@ -72,9 +72,11 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   page's static (editor) head, and absolute preview-image URLs (`--site-url`, default `https://homes.ci.computer/`).
 - A home's name on the portal is `displayName` in `assets/home-names.ts`, never the spec's `name` directly (that is
   the Sims build's title and stays the credit). Fix a name there, not in `content/houses/`.
-- The engine's modules are not fingerprinted, so `portal/_headers` makes every file revalidate (`max-age=0,
-  must-revalidate`). Never give an un-hashed file a long cache time: after a deploy a returning visitor would run the new
-  page against old cached modules and every home would stop with "This home could not be opened". `portal:test` checks it.
+- The engine's modules are not fingerprinted by file name, so `portal:build` names each one by a content hash in the page's
+  import map (and `?v=` on the `<script>`/`<link>` tags), and `portal/_headers` asks every file to revalidate. Never give an
+  un-hashed file a long cache time or load a module around the build's rewriting: after a deploy a returning visitor would
+  run the new page against old cached modules and every home would stop with "This home could not be opened" (it did, on
+  the first pass-4 deploy; the custom domain's zone rewrites `.js` to `max-age=14400` whatever `_headers` says). `portal:test` checks it.
 - `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
 
 **The editor.** `room-creator.html` without `?mode=view` (README: The editor) is the review and render tool, on the CI canon:
