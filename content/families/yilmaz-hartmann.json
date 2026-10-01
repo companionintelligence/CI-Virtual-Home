@@ -1,0 +1,802 @@
+{
+  "schema": "family/v1",
+  "slug": "yilmaz-hartmann",
+  "house": "sunnyhome",
+  "fictional": true,
+  "family": {
+    "surname": "Yilmaz-Hartmann",
+    "tagline": "A two-person studio, and the client files stay home.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Elif designs brands and Jonas builds the websites that go with them. Their two-person studio works from the loft of a barn-style house and meets every Friday in the lounge. One Companion Core keeps every client file next to the people who made it.",
+    "address": {
+      "line": "10 Kelpie Wynd",
+      "place": "Inverlyne"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "elif",
+      "name": "Elif",
+      "age": 34,
+      "role": "partner",
+      "work": "brand designer",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Lale",
+        "runtime": "OpenClaw",
+        "job": "Opens Penpot in its own browser and exports the logo sizes Elif asks for.",
+        "personality": [
+          "quick",
+          "bright",
+          "wry"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Exports copies. Elif keeps the source files."
+      }
+    },
+    {
+      "id": "jonas",
+      "name": "Jonas",
+      "age": 36,
+      "role": "partner",
+      "work": "web developer",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Otto",
+        "runtime": "Hermes",
+        "job": "Drafts client status notes from the commit notes Jonas texts it.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Drafts only. Jonas sends every note."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The lounge"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The Friday table"
+    },
+    {
+      "id": "loft",
+      "kind": "room",
+      "room": "living",
+      "title": "The loft studio"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "bedroom",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The bedroom"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The deck and the pond"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "jonas",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Past the stair to the lounge",
+        "body": "A parcel waits in the vestibule. Jonas carries it past the stair hall to the lounge, where Elif has cleared a spot on the shelf."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "elif",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Everything laid out in a grid",
+        "body": "Elif lays out a grid: the Companion Core, a power cable, a quick-start guide and a recovery USB drive."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "jonas",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug in, press, wait",
+        "body": "Jonas plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "elif",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Elif joins from her phone",
+        "body": "Elif joins the Core's own network on her phone, then chooses the home network and enters its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "jonas",
+      "with": [
+        "penpot",
+        "planka",
+        "nextcloud"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Two agents, three apps",
+        "body": "In Companion Hub, Jonas picks Hermes and Elif picks OpenClaw. They add Penpot, Planka and Nextcloud, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Penpot, Planka, Nextcloud"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "elif",
+      "agent": "elif",
+      "approval": "elif",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and coding tools, running in its own sandbox",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Lale says hello",
+        "body": "Elif messages the agent she named Lale. Lale answers, and the Core is running."
+      },
+      "say": {
+        "speaker": "elif",
+        "text": "Hello, Elif. I am Lale. What shall I open first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "jonas",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "Back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Last autumn's photo walk, found",
+        "body": "Jonas hunts for last autumn's photo walk in Immich on the couch. Search finds it, and the whole library sits on the Core.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "living-files",
+      "chapter": "living",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "elif",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Dropbox"
+        ]
+      },
+      "capability": "Your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Client files live in the lounge",
+        "body": "Elif drops a client's brand files into a Nextcloud folder on the Core. Jonas opens them on his laptop over the home Wi-Fi.",
+        "chips": [
+          "Nextcloud",
+          "replaces Dropbox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-vault",
+      "chapter": "living",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "jonas",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "Store every password in a vault you host. Works with the Bitwarden apps",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Client sign-ins in one vault",
+        "body": "Jonas keeps each client's hosting sign-ins in VaultWarden. The vault works with the Bitwarden apps, and it sits on the Core.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "dining-board",
+      "chapter": "dining",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "jonas",
+      "app": {
+        "id": "planka",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "capability": "A real-time Kanban board for a team or a family project",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Friday meeting, one board",
+        "body": "The studio meets at the lounge table every Friday. The Planka board shows each client job and who has it.",
+        "chips": [
+          "Planka",
+          "replaces Trello"
+        ]
+      }
+    },
+    {
+      "id": "dining-sketch",
+      "chapter": "dining",
+      "category": "creative",
+      "segment": "small-business",
+      "member": "elif",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "A whiteboard with a hand-drawn look. Sketch ideas together",
+      "anchor": {
+        "role": "dining-table",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A site map, sketched together",
+        "body": "Elif and Jonas sketch a client's site map on an Excalidraw whiteboard. The board is hand-drawn, and it lives on the Core.",
+        "chips": [
+          "Excalidraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "loft-logo",
+      "chapter": "loft",
+      "category": "creative",
+      "segment": "small-business",
+      "member": "elif",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "capability": "Design and prototype in a web-based design tool you host",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A logo, drawn in the loft",
+        "body": "Elif draws a client logo in Penpot, a design tool hosted on the Core. The file opens in any browser on the home network.",
+        "chips": [
+          "Penpot",
+          "replaces Figma"
+        ]
+      }
+    },
+    {
+      "id": "loft-export",
+      "chapter": "loft",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "elif",
+      "agent": "elif",
+      "approval": "elif",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "capability": "Design and prototype in a web-based design tool you host",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Lale exports the logo sizes",
+        "body": "Elif asks Lale for the logo in four sizes. Lale opens Penpot in its own browser and exports each one. Elif keeps the source file.",
+        "chips": [
+          "Penpot",
+          "replaces Figma"
+        ]
+      },
+      "say": {
+        "speaker": "elif",
+        "text": "Four sizes exported. Please check each one."
+      },
+      "film": true
+    },
+    {
+      "id": "loft-flow",
+      "chapter": "loft",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "jonas",
+      "app": {
+        "id": "n8n",
+        "replaces": [
+          "Zapier"
+        ]
+      },
+      "capability": "Connect your apps with workflows, with the data staying on your Core",
+      "anchor": {
+        "role": "couch",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Studio apps, joined by a workflow",
+        "body": "Jonas connects the studio's apps with a workflow in n8n. The steps run on the Core, so the client data stays there.",
+        "chips": [
+          "n8n",
+          "replaces Zapier"
+        ]
+      }
+    },
+    {
+      "id": "loft-note",
+      "chapter": "loft",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "jonas",
+      "agent": "jonas",
+      "approval": "jonas",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "couch",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Otto drafts the client note",
+        "body": "Jonas texts Otto his commit notes. Otto drafts a status note for the client, and Jonas reads and sends it himself.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "jonas",
+        "text": "Here is the note as a draft. Please read it first."
+      }
+    },
+    {
+      "id": "loft-watch",
+      "chapter": "loft",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "jonas",
+      "app": {
+        "id": "uptime-kuma",
+        "replaces": [
+          "Datadog"
+        ]
+      },
+      "capability": "Watch your sites and services and get an alert when one goes down",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Which apps are running now",
+        "body": "Jonas points Uptime Kuma at the apps on the Core. When one stops, he gets an alert, and the board shows which.",
+        "chips": [
+          "Uptime Kuma",
+          "replaces Datadog"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-lunch",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "elif",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Friday lunch, listed at the island",
+        "body": "Friday lunch starts at the island. Elif adds the ingredients to the KitchenOwl list, and Jonas sees them on his phone.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-subs",
+      "chapter": "kitchen",
+      "category": "money",
+      "segment": "consumer",
+      "member": "jonas",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "Track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Every studio subscription, listed",
+        "body": "Jonas lists the studio's software subscriptions in Wallos. Each one gets a reminder before it renews.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      }
+    },
+    {
+      "id": "bedroom-journal",
+      "chapter": "bedroom",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "jonas",
+      "app": {
+        "id": "logseq",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "Write a private knowledge base and daily journal in plain Markdown files",
+      "anchor": {
+        "role": "fireplace",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A daily journal, in plain files",
+        "body": "Before bed, Jonas writes up his day in Logseq beside the bedroom fireplace. The journal is plain Markdown files on the Core.",
+        "chips": [
+          "Logseq",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "garden-pond",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "elif",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The pond, in a garden journal",
+        "body": "Elif logs the pond plants in HortusFox, adding a picture for each. The garden journal sits on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-trip",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "jonas",
+      "app": {
+        "id": "trip",
+        "replaces": []
+      },
+      "capability": "Save places on a map and plan multi-day trips with a budget",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A trip planned over lunch",
+        "body": "On the deck, Elif and Jonas plan a trip in TRIP. They save the places on a map, and the plan stays on the Core.",
+        "chips": [
+          "TRIP"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one two-person studio",
+        "body": "The Yilmaz-Hartmann studio keeps its clients, its files and its Friday lunch on one Core in the lounge."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your client files, your design work and your project board can run on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "No TV in this house: the media beat sits on the couch and the copy never says TV or screen.",
+    "No desk and no office room in the model (the Core stands on a shelf): the loft chapter uses the living room role and its beats anchor on the loft bookshelf and the second couch.",
+    "The studio never publishes anything: no public site, no client portal, no booking page, no analytics. Client files stay on the Core and are shared on the home Wi-Fi only.",
+    "ftue-hello is Lale (OpenClaw), so the Hermes disclosure note sits on the first Hermes beat, loft-note (Otto). Lale works inside Penpot on the Core, so the OpenClaw website note is not needed.",
+    "loft-flow keeps to the catalog description of n8n (connect your apps with workflows, data stays on the Core). It names no specific integration. n8n is described as workflows, never as open source.",
+    "The studio has no name in the copy. Invented place and street: check Inverlyne and Kelpie Wynd against a map."
+  ]
+}
