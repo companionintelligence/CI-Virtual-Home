@@ -23,7 +23,7 @@ import { planBake, buildMerged, mutableMaterials, levelAt } from './bake-merge.j
 import type { BakeOptions, Merged, MatKit, Plan } from './bake-merge.js';
 import { focus } from './bake-lod.js';
 import type { LodState } from './bake-lod.js';
-import { collectLights, pickLights, setLights, restoreLights, configureShadow } from './bake-lights.js';
+import { collectLights, pickLights, setLights, restoreLights, configureShadow, dropFill } from './bake-lights.js';
 import type { LightBudget, ShadowPlan } from './bake-lights.js';
 
 /** what the census, the tests and the HUD read beyond BakeReport */
@@ -242,6 +242,7 @@ export function createBake(host: XrHost): XrBakeImpl {
       // ---- plan + merge: nothing in the scene changes until the commit below, so a throw here leaves the house exactly as it was
       const tp = performance.now();
       const plan = planBake(THREE, scene, opts);
+      if (plan.counts.wallsCut) console.warn(`xr bake: ${plan.counts.wallsCut} walls are not at full height; the house should be dressed walls-up before apply()`);
       const mutable = mutableMaterials(scene);
       const tm = performance.now();
       const built = buildMerged(THREE, plan, opts, mutable);
@@ -269,6 +270,7 @@ export function createBake(host: XrHost): XrBakeImpl {
       merged = built.merged;
       lb = collectLights(THREE, scene, budget);
       const lbRef = lb;
+      if (host.params.get('xrbake-fill') !== '1') dropFill(lb, budget);   // (?xrbake-fill=1 keeps it, for A/B)
       undo.push(() => restoreLights(lbRef));
       shadow = configureShadow(THREE, renderer, scene, budget);
       const sh = shadow; undo.push(() => sh.undo());
@@ -296,6 +298,7 @@ export function createBake(host: XrHost): XrBakeImpl {
       // "cull harder": over budget means a smaller radius, then the head's own storey only. (Each step changes only visibility.)
       const ladder: LodState[] = [{ radius: lod.radius * 0.75, levels: 1 }, { radius: Math.max(8, lod.radius * 0.5), levels: 1 }, { radius: Math.max(8, lod.radius * 0.5), levels: 0 }, { radius: 8, levels: 0 }];
       while ((avg(sw.calls) > lim.calls || avg(sw.tris) > lim.tris) && steps < ladder.length) { lod = ladder[steps++]; place(); sw = sweep(head, false); }
+      renderer.shadowMap.needsUpdate = true;     // the casters changed with the cull: draw the static map once more, for the final set
       sw = sweep(head, true);
       if (gen !== generation) return emptyReport(performance.now() - T0);
       const tdone = performance.now();
@@ -329,7 +332,7 @@ export function createBake(host: XrHost): XrBakeImpl {
       last = report;
       return report;
     } catch (err) {
-      restore();   // a throw leaves the house as it was built
+      if (gen === generation) restore();   // a throw leaves the house as it was built (unless a newer apply() or restore() already owns the scene)
       throw err;
     }
   }
