@@ -101,7 +101,7 @@
       "id": "garden",
       "kind": "outside",
       "room": "garden",
-      "title": "The garden beds"
+      "title": "The deck and beds"
     },
     {
       "id": "outro",
@@ -264,18 +264,16 @@
       "film": true
     },
     {
-      "id": "living-podcast",
+      "id": "living-feeds",
       "chapter": "living",
       "member": "kari",
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "audiobookshelf",
-        "replaces": [
-          "Apple Podcasts"
-        ]
+        "id": "freshrss",
+        "replaces": []
       },
-      "capability": "Listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "capability": "Read the sites you follow in one feed, on your own Core",
       "anchor": {
         "role": "couch"
       },
@@ -284,11 +282,10 @@
         "from": "front"
       },
       "popup": {
-        "title": "Grading to a podcast",
-        "body": "Kari catches up on a science podcast in Audiobookshelf while she grades. The episodes live on the Core and pick up where she left off.",
+        "title": "Science feeds, one quiet list",
+        "body": "Kari reads her science feeds in FreshRSS from the couch while she grades. The whole list sits on the Core.",
         "chips": [
-          "Audiobookshelf",
-          "replaces Apple Podcasts"
+          "FreshRSS"
         ]
       }
     },
@@ -394,10 +391,12 @@
       "category": "food",
       "segment": "consumer",
       "app": {
-        "id": "kitchenowl",
-        "replaces": []
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
       },
-      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "capability": "A shared household hub for notes, shopping, chores and expenses, with a recipe book",
       "anchor": {
         "role": "kitchen-island",
         "room": "kitchen",
@@ -413,9 +412,10 @@
       },
       "popup": {
         "title": "Meals planned at the breakfast bar",
-        "body": "Kari plans the week's meals in KitchenOwl at the breakfast bar. Idris adds his ride snacks, and the list syncs to every phone.",
+        "body": "Kari plans the week's meals in the HomeHub recipe book at the breakfast bar. Idris adds his ride snacks to the shopping list.",
         "chips": [
-          "KitchenOwl"
+          "HomeHub",
+          "replaces Cozi"
         ]
       }
     },
@@ -546,7 +546,7 @@
         "title": "Signed at the dining table",
         "body": "A customer stops by to sign. Rosa fills in the quote form in DocuSeal, and the customer signs on a tablet at the table.",
         "chips": [
-          "Docuseal",
+          "DocuSeal",
           "replaces DocuSign"
         ]
       }
@@ -771,28 +771,33 @@
       }
     },
     {
-      "id": "garden-beds",
+      "id": "garden-rover",
       "chapter": "garden",
-      "member": "kari",
-      "category": "home",
+      "member": "idris",
+      "category": "creative",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
+        "id": "freecut",
         "replaces": []
       },
-      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "capability": "Edit multi-track video in your browser",
       "anchor": {
-        "role": "garden"
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
       },
       "camera": {
         "framing": "medium",
         "eye": "standing"
       },
       "popup": {
-        "title": "The raised beds have a journal",
-        "body": "Kari logs the raised beds in HortusFox, bed by bed, with watering notes and photos. The journal grows with the season.",
+        "title": "A rover test, edited at home",
+        "body": "Idris films his rover's test run on the deck, then edits the clip in FreeCut, in his browser.",
         "chips": [
-          "HortusFox"
+          "FreeCut"
         ]
       }
     },
@@ -864,9 +869,9 @@
   },
   "notes": [
     "FTUE follows the owner-specified hotspot flow; the fact sheet says only \"plug it in, pair it over Wi-Fi, and walk away\". Owner sign-off open.",
-    "No living-room TV: the media beat is an Audiobookshelf podcast at the couch. Energy care: Home Assistant and GlassHome beats say only what sensors read on the home network; no energy figure, saving or solar claim.",
+    "No living-room TV: the media beat is reading feeds at the couch. Energy care: Home Assistant and GlassHome beats say only what sensors read on the home network; no energy figure, saving or solar claim.",
     "Both companions are Hermes, so ftue-hello carries the Hermes note. dining-quote uses Companion Memory (Dalia has it connected, opt-in).",
     "dining-sign: the customer signs on a tablet on the home Wi-Fi at the table; no remote signer and no legal claim. DocuSeal listing says signers outside the home network need access to the Core.",
-    "living-dashboard and garden-soil assume the family owns sensors on the home network; none is in the Core parcel. Endurain: GPX upload only, no Strava or Garmin sync. Blockbench is low-poly modelling; check the robot-body wording."
+    "living-dashboard and garden-soil assume sensors on the home network (not in the parcel). Endurain: GPX upload only. Blockbench is low-poly modelling; check the robot wording. FreeCut needs Chromium with WebGPU."
   ]
 }

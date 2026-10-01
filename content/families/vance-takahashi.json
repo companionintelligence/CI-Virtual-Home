@@ -273,7 +273,7 @@
       },
       "popup": {
         "title": "Thursday's portraits, sorted",
-        "body": "Elias sorts Thursday's portrait session into an Immich album from the couch. The faces in those photos stay on the Core, inside the house.",
+        "body": "Elias sorts Thursday's portrait session into an Immich album from the couch. When the clients ask where their photos live, the answer is the Core, in this house.",
         "chips": [
           "Immich",
           "replaces Google Photos"
@@ -322,10 +322,12 @@
       "category": "food",
       "segment": "consumer",
       "app": {
-        "id": "kitchenowl",
-        "replaces": []
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
       },
-      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "capability": "Track the pantry, shopping lists, recipes, chores and household habits in one place",
       "anchor": {
         "role": "kitchen-island",
         "room": "kitchen",
@@ -341,9 +343,10 @@
       },
       "popup": {
         "title": "Groceries, planned together",
-        "body": "Mika plans the week's suppers in KitchenOwl at the breakfast bar. When Elias adds oat milk on his phone, it appears on hers.",
+        "body": "Mika drafts the week's shopping list in Grocy at the breakfast bar. When Elias adds oat milk on his phone, it lands on the same list.",
         "chips": [
-          "KitchenOwl"
+          "Grocy",
+          "replaces AnyList"
         ]
       }
     },
@@ -514,18 +517,18 @@
       }
     },
     {
-      "id": "study-dns",
+      "id": "study-backup",
       "chapter": "study",
       "member": "elias",
       "category": "privacy",
       "segment": "consumer",
       "app": {
-        "id": "pi-hole",
+        "id": "duplicati",
         "replaces": [
-          "AdGuard"
+          "Backblaze"
         ]
       },
-      "capability": "Block ads, trackers and bad domains for every device on your network at the DNS level",
+      "capability": "Back up your files with encryption before they leave your Core",
       "anchor": {
         "role": "core"
       },
@@ -534,11 +537,11 @@
         "side": "left"
       },
       "popup": {
-        "title": "One blocklist for the house",
-        "body": "Pi-hole runs on the Core. It blocks ad and tracker domains for every device on the home Wi-Fi, from Elias's laptop to the TV.",
+        "title": "A second copy of every shoot",
+        "body": "On a schedule, Duplicati backs up the client folders to a local disk. The files are encrypted before they are written.",
         "chips": [
-          "Pi-hole",
-          "replaces AdGuard"
+          "Duplicati",
+          "replaces Backblaze"
         ]
       }
     },
@@ -633,12 +636,12 @@
       "category": "productivity",
       "segment": "small-business",
       "app": {
-        "id": "nextcloud",
+        "id": "copyparty",
         "replaces": [
-          "Google Drive"
+          "Dropbox"
         ]
       },
-      "capability": "Your files, calendar and contacts on your own Core, synced to your devices",
+      "capability": "A file server with media player, search and Markdown editor in the browser",
       "anchor": {
         "role": "desk",
         "room": "office",
@@ -655,10 +658,10 @@
       },
       "popup": {
         "title": "Every client has a folder",
-        "body": "Each client gets a folder in Nextcloud. Elias syncs the day's selects to his laptop and the calendar to both phones. The files sit on the Core.",
+        "body": "Each client gets a folder in copyparty, the file server on the Core. Elias searches and browses the day's selects from his laptop.",
         "chips": [
-          "Nextcloud",
-          "replaces Google Drive"
+          "copyparty",
+          "replaces Dropbox"
         ]
       }
     },
@@ -691,7 +694,7 @@
         "side": "right"
       },
       "popup": {
-        "title": "Phone to laptop, no cloud between",
+        "title": "Phone to laptop, over the Wi-Fi",
         "body": "After a location shoot, Elias sends test frames from his phone to his laptop with PairDrop. They travel over the home Wi-Fi.",
         "chips": [
           "PairDrop",
@@ -706,12 +709,12 @@
       "category": "small-business",
       "segment": "small-business",
       "app": {
-        "id": "stirling-pdf",
+        "id": "bentopdf",
         "replaces": [
           "Adobe Acrobat"
         ]
       },
-      "capability": "Merge, split, compress and convert PDFs on your own Core",
+      "capability": "A PDF toolkit that runs in your browser",
       "anchor": {
         "role": "desk",
         "room": "office",
@@ -728,34 +731,31 @@
       },
       "popup": {
         "title": "Plan and quote, one file",
-        "body": "Elias merges a shoot plan and a quote into one PDF with Stirling-PDF. The merge runs on the Core, and he checks every page before it goes out.",
+        "body": "Elias assembles a shoot plan and a quote into one PDF in BentoPDF, a toolkit that runs in his browser. He checks every page before it goes out.",
         "chips": [
-          "Stirling-PDF",
+          "BentoPDF",
           "replaces Adobe Acrobat"
         ]
       }
     },
     {
-      "id": "garden-lights",
+      "id": "garden-cameras",
       "chapter": "garden",
       "member": "mika",
       "category": "iot",
       "segment": "consumer",
       "app": {
-        "id": "home-assistant",
+        "id": "frigate",
         "replaces": [
-          "Google Home"
+          "Ring"
         ]
       },
-      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "capability": "A local video recorder with object detection for your IP cameras",
       "anchor": {
-        "role": "pool",
+        "role": "driveway",
         "fallback": [
           {
-            "role": "deck"
-          },
-          {
-            "role": "garden"
+            "role": "front-door"
           }
         ]
       },
@@ -764,25 +764,25 @@
         "eye": "aerial"
       },
       "popup": {
-        "title": "Pool lights at dusk",
-        "body": "At dusk the pool and patio lights come on from a Home Assistant schedule. It runs on the Core and reaches the lights over the home Wi-Fi.",
+        "title": "The carport, recorded at home",
+        "body": "An IP camera over the carport streams to Frigate. The recordings stay on the Core, and the clips play on the home network.",
         "chips": [
-          "Home Assistant",
-          "replaces Google Home"
+          "Frigate",
+          "replaces Ring"
         ]
       }
     },
     {
-      "id": "garden-olives",
+      "id": "garden-ride",
       "chapter": "garden",
       "member": "mika",
       "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
+        "id": "wanderer",
         "replaces": []
       },
-      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "capability": "Plan, map and share hiking and biking routes from GPX files",
       "anchor": {
         "role": "garden"
       },
@@ -791,10 +791,10 @@
         "eye": "standing"
       },
       "popup": {
-        "title": "The olive pots have a journal",
-        "body": "Mika logs the olive trees in HortusFox. She notes each pot and the last watering, then adds a photo for the garden journal.",
+        "title": "Sunday's ride, planned at home",
+        "body": "Mika plans Sunday's towpath ride in Wanderer from a GPX file. The route and the map stay on the Core.",
         "chips": [
-          "HortusFox"
+          "Wanderer"
         ]
       }
     },
@@ -805,12 +805,12 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "navidrome",
+        "id": "mstream",
         "replaces": [
           "Spotify"
         ]
       },
-      "capability": "Stream your own music collection to any device",
+      "capability": "Stream your own music from your Core to a browser or an app",
       "anchor": {
         "role": "patio-seat",
         "fallback": [
@@ -828,9 +828,9 @@
       },
       "popup": {
         "title": "Records by the canal",
-        "body": "Elias plays his own records from Navidrome on the patio, streamed from the Core to his phone.",
+        "body": "Elias plays his own records from mStream on the patio, streamed from the Core to a browser on his phone.",
         "chips": [
-          "Navidrome",
+          "mStream",
           "replaces Spotify"
         ]
       },
@@ -865,8 +865,9 @@
   },
   "notes": [
     "FTUE follows the owner-specified hotspot flow; the fact sheet says only \"plug it in, pair it over Wi-Fi, and walk away\". Owner sign-off open.",
-    "study-dns, living-tv and studio-pairdrop assume nothing the catalog entries do not say; PairDrop is described as Wi-Fi file transfer only.",
-    "Motif: where the clients' files live. Beats living-couch, studio-files, studio-pdf, closing. No legal claim about client photos is made.",
+    "Apps chosen to leave the busiest store apps to other families: Grocy, Duplicati (a local disk), copyparty, BentoPDF, Wanderer, mStream. PairDrop is described as Wi-Fi file transfer only.",
+    "Motif: where the clients' files live. Beats living-couch, study-backup, studio-files, closing. No legal claim about client photos is made.",
+    "garden-cameras assumes the family owns an IP camera over the carport: it is not in the Core parcel and not in the 3D scene. It records the family property only.",
     "Desk anchors: desk:office nth 0 is meant to be the ground-floor study and nth 1 the upstairs editing room; story-bake should confirm the order."
   ]
 }

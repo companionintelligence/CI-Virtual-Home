@@ -307,18 +307,18 @@
       "film": true
     },
     {
-      "id": "living-dns",
+      "id": "living-vault",
       "chapter": "living",
       "member": "minseo",
       "category": "privacy",
       "segment": "consumer",
       "app": {
-        "id": "pi-hole",
+        "id": "vaultwarden",
         "replaces": [
-          "AdGuard"
+          "LastPass"
         ]
       },
-      "capability": "Block ads, trackers and bad domains for every device on your network at the DNS level",
+      "capability": "Store every password in a vault you host",
       "anchor": {
         "role": "core"
       },
@@ -327,11 +327,11 @@
         "side": "left"
       },
       "popup": {
-        "title": "One blocklist, every device",
-        "body": "Pi-hole runs on the Core, on the shelf in the living room. It blocks ad and tracker domains for every device on the home Wi-Fi.",
+        "title": "Passwords kept on the Core",
+        "body": "Minseo keeps the family's passwords in VaultWarden. The vault lives on the Core, on the shelf in the living room, and it works with the Bitwarden apps.",
         "chips": [
-          "Pi-hole",
-          "replaces AdGuard"
+          "VaultWarden",
+          "replaces LastPass"
         ]
       }
     },
@@ -342,12 +342,12 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "koodo-reader",
+        "id": "booklore",
         "replaces": [
-          "Amazon Kindle"
+          "Kindle"
         ]
       },
-      "capability": "Read ebooks in your browser, with notes, highlights and text-to-speech",
+      "capability": "Manage and read books, comics and PDFs with automatic covers and metadata",
       "anchor": {
         "role": "fireplace",
         "fallback": [
@@ -361,11 +361,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "A novel by the fire",
-        "body": "Minseo reads a novel in Koodo Reader beside the fireplace. Her notes and highlights live on the Core with the rest of the library.",
+        "title": "Art books by the fire",
+        "body": "Minseo browses her art books in BookLore beside the fireplace. Covers and details fill in automatically, and the library lives on the Core.",
         "chips": [
-          "Koodo Reader",
-          "replaces Amazon Kindle"
+          "BookLore",
+          "replaces Kindle"
         ]
       }
     },
@@ -446,10 +446,10 @@
       "category": "food",
       "segment": "consumer",
       "app": {
-        "id": "kitchenowl",
+        "id": "yuvomi",
         "replaces": []
       },
-      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "capability": "A family planner with a shared calendar, tasks, shopping, meals, notes, contacts and budget in one",
       "anchor": {
         "role": "range",
         "fallback": [
@@ -464,9 +464,9 @@
       },
       "popup": {
         "title": "Sunday supper, planned",
-        "body": "Minseo plans Sunday supper for four in KitchenOwl. Ana adds the dessert, and the grocery list updates on every phone.",
+        "body": "Minseo plans Sunday supper for four in Yuvomi's meal planner. Ana adds the dessert, and the shopping list updates on every phone.",
         "chips": [
-          "KitchenOwl"
+          "Yuvomi"
         ]
       }
     },
@@ -682,12 +682,12 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "audiobookshelf",
+        "id": "koodo-reader",
         "replaces": [
-          "Audible"
+          "Amazon Kindle"
         ]
       },
-      "capability": "Listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "capability": "Read ebooks in your browser, with notes, highlights and text-to-speech",
       "anchor": {
         "role": "bed",
         "room": "kids",
@@ -704,10 +704,10 @@
       },
       "popup": {
         "title": "Bedtime, one chapter further",
-        "body": "Theo listens to the next chapter in Audiobookshelf at bedtime. It picks up exactly where he stopped, and the book stays on the Core.",
+        "body": "Theo reads the next chapter of his adventure book in Koodo Reader at bedtime, and highlights his favorite line.",
         "chips": [
-          "Audiobookshelf",
-          "replaces Audible"
+          "Koodo Reader",
+          "replaces Amazon Kindle"
         ]
       },
       "film": true
@@ -779,28 +779,36 @@
       }
     },
     {
-      "id": "terrace-trees",
+      "id": "terrace-trip",
       "chapter": "terrace",
       "member": "minseo",
       "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
+        "id": "trip",
         "replaces": []
       },
-      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "capability": "Save places on a map and plan multi-day trips with a budget",
       "anchor": {
-        "role": "garden"
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
       },
       "camera": {
         "framing": "medium",
         "eye": "standing"
       },
       "popup": {
-        "title": "The walled garden has a journal",
-        "body": "Minseo logs the walled garden's trees in HortusFox, with watering notes and a photo for each one.",
+        "title": "The summer trip, mapped",
+        "body": "Under the terrace shade, Minseo saves places on a map in TRIP and plans the summer trip day by day.",
         "chips": [
-          "HortusFox"
+          "TRIP"
         ]
       }
     },
@@ -873,7 +881,7 @@
     "FTUE follows the owner-specified hotspot flow; the fact sheet says only \"plug it in, pair it over Wi-Fi, and walk away\". Owner sign-off open.",
     "No living-room TV and no kitchen island in this house: the media beats are at the couch and the fireplace; the kitchen beats say the counter. The Core stands on a shelf, so there is no desk beat.",
     "Animals only: no beat makes a claim about anyone's health. garage-camera assumes an IP camera owned by the family (not in the parcel, not in the 3D scene).",
-    "The render does not show a desert; the setting is never described beyond the house and the pool terrace.",
+    "The render does not show a desert; the setting is never described beyond the house and the pool terrace. Apps picked to leave the busiest store apps to other families.",
     "Motif: the glovebox. Beats kitchen-calls, garage-truck, outro-street, closing."
   ]
 }

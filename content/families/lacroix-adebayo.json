@@ -367,10 +367,12 @@
       "category": "food",
       "segment": "consumer",
       "app": {
-        "id": "kitchenowl",
-        "replaces": []
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
       },
-      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "capability": "Track the pantry, shopping lists, recipes",
       "anchor": {
         "role": "kitchen-island",
         "room": "kitchen",
@@ -386,9 +388,10 @@
       },
       "popup": {
         "title": "A recipe, written down once",
-        "body": "Seun types his mother's soup recipe into KitchenOwl at the breakfast bar. Now it sits in the family recipe book, beside the meal planner.",
+        "body": "Seun types his mother's soup recipe into Grocy at the breakfast bar. Now it sits beside the pantry list and the shopping list.",
         "chips": [
-          "KitchenOwl"
+          "Grocy",
+          "replaces AnyList"
         ]
       }
     },
@@ -574,12 +577,12 @@
       "category": "creative",
       "segment": "small-business",
       "app": {
-        "id": "penpot",
+        "id": "excalidraw",
         "replaces": [
-          "Figma"
+          "Miro"
         ]
       },
-      "capability": "Design and prototype in a web-based design tool you host",
+      "capability": "A whiteboard with a hand-drawn look",
       "anchor": {
         "role": "desk",
         "room": "office",
@@ -596,11 +599,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "A cover, laid out at home",
-        "body": "Seun lays out next season's cover in Penpot, a web-based design tool hosted on the Core. Odile comments from the next desk.",
+        "title": "Cover ideas, sketched together",
+        "body": "Seun sketches next season's cover ideas on an Excalidraw whiteboard. Odile adds her notes from the next desk.",
         "chips": [
-          "Penpot",
-          "replaces Figma"
+          "Excalidraw",
+          "replaces Miro"
         ]
       }
     },
@@ -747,12 +750,12 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "navidrome",
+        "id": "mstream",
         "replaces": [
           "Spotify"
         ]
       },
-      "capability": "Stream your own music collection to any device",
+      "capability": "Stream your own music from your Core to a browser or an app",
       "anchor": {
         "role": "toys",
         "room": "kids",
@@ -769,9 +772,9 @@
       },
       "popup": {
         "title": "A lullaby, from the Core",
-        "body": "At bedtime, Odile plays the lullaby playlist from Navidrome in the baby's room. It streams from the Core.",
+        "body": "At bedtime, Odile plays the lullaby playlist from mStream in the baby's room. It streams from the Core.",
         "chips": [
-          "Navidrome",
+          "mStream",
           "replaces Spotify"
         ]
       }
@@ -783,12 +786,12 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "readeck",
         "replaces": [
-          "Google Search"
+          "Pocket"
         ]
       },
-      "capability": "Read Wikipedia and other reference sites offline",
+      "capability": "Save articles to read later without a hosted bookmarking service",
       "anchor": {
         "role": "telescope",
         "fallback": [
@@ -803,11 +806,11 @@
         "side": "auto"
       },
       "popup": {
-        "title": "From the telescope to Kiwix",
-        "body": "Amara and Seun find Jupiter through the telescope. Then she looks up its moons in Kiwix, which keeps Wikipedia on the Core.",
+        "title": "From the telescope to Readeck",
+        "body": "Amara and Seun find Jupiter through the telescope. Then Amara saves an article about its moons in Readeck, to read later.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Readeck",
+          "replaces Pocket"
         ]
       }
     },
@@ -815,15 +818,15 @@
       "id": "garden-proofs",
       "chapter": "garden",
       "member": "odile",
-      "category": "small-business",
+      "category": "creative",
       "segment": "small-business",
       "app": {
-        "id": "stirling-pdf",
+        "id": "memos",
         "replaces": [
-          "Adobe Acrobat"
+          "Google Keep"
         ]
       },
-      "capability": "Merge, split, compress and convert PDFs on your own Core",
+      "capability": "Capture quick notes and journal entries in Markdown",
       "anchor": {
         "role": "patio-seat",
         "fallback": [
@@ -840,11 +843,11 @@
         "side": "auto"
       },
       "popup": {
-        "title": "Proofs on the back porch",
-        "body": "On the back porch, Odile merges the corrected proofs into one PDF with Stirling-PDF. The merge runs on the Core.",
+        "title": "Proof notes on the back porch",
+        "body": "On the back porch, Odile jots margin notes for the corrected proofs in Memos. They sit on the Core, ready for Monday's edit.",
         "chips": [
-          "Stirling-PDF",
-          "replaces Adobe Acrobat"
+          "Memos",
+          "replaces Google Keep"
         ]
       }
     },

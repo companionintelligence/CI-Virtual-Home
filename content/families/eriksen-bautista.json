@@ -560,18 +560,18 @@
       }
     },
     {
-      "id": "dining-slips",
+      "id": "dining-invoices",
       "chapter": "dining",
       "member": "tomas",
       "category": "small-business",
       "segment": "small-business",
       "app": {
-        "id": "stirling-pdf",
+        "id": "invio",
         "replaces": [
-          "Adobe Acrobat"
+          "FreshBooks"
         ]
       },
-      "capability": "Merge, split, compress and convert PDFs on your own Core",
+      "capability": "Create and share invoices in seconds, with secure client links",
       "anchor": {
         "role": "dining-table",
         "room": "dining",
@@ -587,11 +587,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "Packing slips, one PDF",
-        "body": "Tomas merges the day's packing slips into one PDF with Stirling-PDF. The merge runs on the Core, and he checks every page.",
+        "title": "The day's invoices, one per order",
+        "body": "Tomas writes today's invoices in Invio, one for each order. They sit on the Core beside the stock sheet, and he checks every one.",
         "chips": [
-          "Stirling-PDF",
-          "replaces Adobe Acrobat"
+          "Invio",
+          "replaces FreshBooks"
         ]
       }
     },
@@ -702,18 +702,16 @@
       }
     },
     {
-      "id": "playroom-bugs",
+      "id": "playroom-quiz",
       "chapter": "playroom",
       "member": "marcos",
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
-        "replaces": [
-          "Google Search"
-        ]
+        "id": "razzia",
+        "replaces": []
       },
-      "capability": "Read Wikipedia and other reference sites offline",
+      "capability": "Run a quiz night for a small group on your own Core",
       "anchor": {
         "role": "toys",
         "room": "kids",
@@ -728,11 +726,10 @@
         "framing": "close"
       },
       "popup": {
-        "title": "A beetle, looked up at home",
-        "body": "Marcos finds a beetle in the beds and wants its name. Kiwix keeps Wikipedia on the Core, so he looks it up beside the toy box.",
+        "title": "A beetle round for quiz night",
+        "body": "Marcos hosts Sunday's quiz night in Razzia, with a round on beetles. Everyone plays on a phone, and the game runs on the Core.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Razzia"
         ]
       }
     },
@@ -831,18 +828,16 @@
       "film": true
     },
     {
-      "id": "garden-pond",
+      "id": "garden-walk",
       "chapter": "garden",
       "member": "tomas",
-      "category": "media",
+      "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "navidrome",
-        "replaces": [
-          "Spotify"
-        ]
+        "id": "wanderer",
+        "replaces": []
       },
-      "capability": "Stream your own music collection to any device",
+      "capability": "Plan, map and share hiking and biking routes from GPX files",
       "anchor": {
         "role": "patio-seat",
         "fallback": [
@@ -859,11 +854,10 @@
         "side": "auto"
       },
       "popup": {
-        "title": "Sunday music by the pond",
-        "body": "On Sundays the family sits by the pond. Navidrome plays the family's own music from the Core to a phone on the umbrella table.",
+        "title": "Sunday's walk, mapped at home",
+        "body": "On Sundays the family walks round the pond. Tomas draws the route from a GPX file in Wanderer, and the map stays on the Core.",
         "chips": [
-          "Navidrome",
-          "replaces Spotify"
+          "Wanderer"
         ]
       }
     },
@@ -899,6 +893,6 @@
     "No TV by choice: living-story is the media beat at the couch and never names a TV or a screen. The house has no kitchen island, so the kitchen beats say the counter.",
     "Neither companion has Companion Memory connected. ftue-pick says the family leaves it for later, which is the opt-in story.",
     "garden-vent assumes the family has a Wi-Fi vent actuator; it is not in the Core parcel or in the 3D scene. Home Assistant has no USB or Zigbee here.",
-    "Newsletter beat claims no delivery: Listmonk needs an SMTP provider or mail server to send. Check the wording with the owner."
+    "Newsletter beat claims no delivery: Listmonk needs an SMTP provider or mail server to send. Check the wording with the owner. Razzia is a quiz night for a small group; Wanderer plans routes from GPX files."
   ]
 }
