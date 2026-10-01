@@ -1,11 +1,13 @@
 // Ship step for the voice-over: copies each family's clips into the site and tells the manifest where they are.
 //
 // landing-site's scripts/story/site.mts loads every file in this folder and calls its default export with a ShipCtx (STORY-BIBLE
-// section 14). Until scripts/story/hooks.ts lands, this codes against the interface in the bible, structurally, so it needs no
-// import from a file that is not on this branch; when hooks.ts arrives, `ShipFn` from there is assignable to this signature.
+// section 14, and scripts/story/hooks.ts on the landing-site branch). It codes against the part of ShipCtx it uses, structurally, so
+// it needs no import from a file that is not on this branch; `ShipFn` from hooks.ts is assignable to the default export below.
 //
-//   dist/audio/<slug>/<clipId>.<hash10>.m4a      content-hashed already (the name carries the hash), so it is immutable
-//   ctx.register(slug, 'audio.<clipId>', url)    url is relative to the site root, no leading slash
+//   dist/audio/<slug>/<clipId>.<hash10>.m4a      ctx.addHashed(src, 'audio/<slug>'): the clips are already named by the hash of
+//                                                their bytes, and addHashed strips a hash from the name and puts the same one
+//                                                back, so the URL equals the committed file name (checked below)
+//   ctx.register(slug, 'audio:<clipId>', url)    url is relative to the site root, no leading slash
 //
 // It checks as it copies: the file must exist, its bytes must hash to the lock's sha256 and to the hash in its name, and the lock
 // must be current for the story (nothing recorded from older text). Anything else is ctx.problem(...), which fails the build.
@@ -15,8 +17,8 @@ import { familiesDir, clipsOf, loadStory, lockSlugs, readLock, sha256, statusOf,
 
 /** The part of ShipCtx this step uses. */
 export interface AudioShipCtx {
-  addFile(dstRel: string, bytes: Uint8Array): unknown;
-  register(slug: string, key: string, url: string): void;
+  addHashed(srcAbs: string, dstDir: string): string;
+  register(slug: string, key: `audio:${string}`, url: string): void;
   problem(msg: string): void;
   /** The stories being published (an array or a slug-keyed object); absent means every family that has a lock. */
   stories?: unknown;
@@ -50,9 +52,9 @@ export default async function shipAudio(ctx: AudioShipCtx): Promise<void> {
       const data = fs.readFileSync(src);
       const m = CLIP_FILE_RE.exec(name);
       if (!m || m.groups!.hash !== sha256(data).slice(0, 10)) { ctx.problem(`audio: ${slug}/${name} is not named by the hash of its bytes`); continue; }
-      const url = `audio/${slug}/${name}`;
-      ctx.addFile(url, data);
-      ctx.register(slug, `audio.${e.id}`, url);
+      const url = ctx.addHashed(src, `audio/${slug}`);
+      if (path.basename(url) !== name) { ctx.problem(`audio: ${slug}/${name} was shipped as ${url}; the hash in the name must survive`); continue; }
+      ctx.register(slug, `audio:${e.id}`, url);
       files++; bytes += data.length;
     }
   }

@@ -232,13 +232,13 @@ test('record, lock and ship: a lock built from real encodes is current; editing 
 
     const run = async () => {
       const added: string[] = [], registered: string[] = [], problems: string[] = [];
-      await shipAudio({ addFile: (d: string, b: Uint8Array) => { assert.ok(b.length > 1000); added.push(d); }, register: (s: string, k: string, u: string) => { registered.push(`${s} ${k} ${u}`); }, problem: (m: string) => problems.push(m), stories: [{ slug: 'test-family' }] });
+      await shipAudio({ addHashed: (src: string, dstDir: string) => { assert.ok(fs.statSync(src).size > 1000); const u = `${dstDir}/${path.basename(src)}`; added.push(u); return u; }, register: (s: string, k: `audio:${string}`, u: string) => { registered.push(`${s} ${k} ${u}`); }, problem: (m: string) => problems.push(m), stories: [{ slug: 'test-family' }] });
       return { added, registered, problems };
     };
     const ok = await run();
     assert.deepEqual(ok.problems, []);
     assert.equal(ok.added.length, 4);
-    assert.ok(ok.registered.includes(`test-family audio.ftue-hello.say ${ok.added[2]}`));
+    assert.ok(ok.registered.includes(`test-family audio:ftue-hello.say ${ok.added[2]}`));
     assert.ok(ok.added.every(a => /^audio\/test-family\/[a-z0-9.-]+\.[0-9a-f]{10}\.m4a$/.test(a)), 'relative URL, hashed name');
 
     // edit the story: that clip is stale, ship says so and names the command
