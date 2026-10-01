@@ -30,10 +30,12 @@ const feature: RealismFeature = {
     let tune: Record<string, number> | undefined; try { const q = ctx.params.get('gtune'); if (q) tune = JSON.parse(q); } catch { /* ignore a bad tune */ }
     const field = ctx.no.has('grassblades') ? null : G.createField({ THREE, scene, renderer, bake, seed, variant, style, tune, mean, windDir: h }, ctx.tier() >= 2 ? 2 : 1);
 
-    const tierNow = () => (ctx.tier() >= 2 ? 2 : 1) as 1 | 2;
-    const T = G.TIERS[tierNow()];
+    const T = G.TIERS[ctx.tier() >= 2 ? 2 : 1];
     const lawn = ctx.no.has('lawn') ? null : G.createLawnPatch({ THREE, scene, bake, r0: T.r0, r1: T.r1 });
     const fol = ctx.no.has('foliage') ? null : G.createFoliage({ THREE, scene, windDir: h });
+    // the two blade programs are compiled now, against this scene's lights (compileAsync's third argument), so that a field that
+    // arrives after the loader has lifted does not stall its first frame. (The lawn and crown programs follow their patch.)
+    if (field && typeof renderer.compileAsync === 'function') { try { field.group.visible = true; await renderer.compileAsync(field.group, ctx.camera, scene); } catch { /* it compiles on the first draw instead */ } }
     let applied = false, markT = 0;
     const look = () => {
       const L = ctx.lighting();

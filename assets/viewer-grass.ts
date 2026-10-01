@@ -42,6 +42,13 @@ float gh_noise(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0
 // the lawn's own patchiness (dry <-> healthy), read by the flat lawn and by every blade so they agree
 float gh_patch(vec2 p) { return gh_noise(p * 0.42) * 0.62 + gh_noise(p * 1.7 + 11.3) * 0.38; }
 `;
+// the torus: slot `id` of a G x G window whose lowest corner is `base` holds the one world cell inside the window that is congruent
+// to the slot modulo G. Moving `base` by one hands over only the slots on the window's trailing edge (scripts/live-checks/grass.mts
+// runs this very text on the GPU and checks both facts).
+export const SLOT_GLSL = /* glsl */`
+int gh_mod(int a, int b) { return ((a % b) + b) % b; }
+ivec2 gh_slot(int id, int G, ivec2 base) { return base + ivec2(gh_mod(id % G - base.x, G), gh_mod(id / G - base.y, G)); }
+`;
 const U32 = (x: number): number => x >>> 0;
 export function hashU(x: number): number {
   x = U32(x); x = U32(x ^ (x >>> 16)); x = U32(Math.imul(x, 0x7feb352d)); x = U32(x ^ (x >>> 15)); x = U32(Math.imul(x, 0x846ca68b)); x = U32(x ^ (x >>> 16));
@@ -134,34 +141,37 @@ const FIELD_VERT = /* glsl */`
 uniform float uTime; uniform vec3 uCam; uniform float uPxScale;
 uniform vec2 uBaseCell; uniform float uCell; uniform int uG; uniform uint uSeed;
 uniform vec4 uBand; uniform float uHeight; uniform float uWidth; uniform float uFan;
-uniform sampler2D uMask; uniform vec4 uRect; uniform vec3 uWind;
+uniform sampler2D uMask; uniform vec4 uRect; uniform vec3 uWind; uniform float uRefY;
 varying float vH; varying float vRnd; varying float vPatch;
 vec3 gBase; float gHs, gWs, gYaw, gBend, gVis; bool gCull; vec2 gDir;
 ${HASH_GLSL}
-int gh_mod(int a, int b) { return ((a % b) + b) % b; }
+${SLOT_GLSL}
 void grassInstance(float bladeIx) {
   int G = uG, id = gl_InstanceID;
-  ivec2 base = ivec2(uBaseCell);
-  ivec2 cell = base + ivec2(gh_mod(id % G - base.x, G), gh_mod(id / G - base.y, G));
+  ivec2 cell = gh_slot(id, G, ivec2(uBaseCell));
   uint key = gh_cell(cell, uSeed);
   vec2 xz = (vec2(cell) + vec2(gh_f(key + 1u), gh_f(key + 2u))) * uCell;
+  // how much of this level of detail is here at this distance (the two levels' shares add up to 1 in the overlap). The distance
+  // is taken to the lawn's reference height, so the cull below needs no look at the mask: most slots of the window are out of
+  // their level's reach or lose the random draw, and they leave before the texture fetch and the rest of the hashes.
+  float d0 = length(vec3(xz.x - uCam.x, uCam.y - uRefY, xz.y - uCam.z));
+#ifdef GRASS_TUFT
+  float vis = smoothstep(uBand.x, uBand.y, d0) * (1.0 - smoothstep(uBand.z, uBand.w, d0));
+  float grow = 1.0 - smoothstep(uBand.z, uBand.w, d0);
+#else
+  float vis = 1.0 - smoothstep(uBand.x, uBand.y, d0);
+  float grow = 1.0;
+#endif
+  gBase = vec3(xz.x, 0.0, xz.y); gHs = 0.0; gWs = 0.0; gYaw = 0.0; gBend = 0.0; gVis = 0.0; gCull = true; vRnd = 0.0; vPatch = 0.0;
+  if (!(gh_f(key + 3u) < vis)) return;
   vec2 muv = vec2((xz.x - uRect.x) * uRect.z, (uRect.y - xz.y) * uRect.w);
   vec4 m = textureLod(uMask, muv, 0.0);
   float inside = all(greaterThanEqual(muv, vec2(0.0))) && all(lessThanEqual(muv, vec2(1.0))) ? 1.0 : 0.0;
   float cov = m.r * inside * (1.0 - smoothstep(0.0, 0.35, m.b));
   float gy = m.r > 0.02 ? m.g / m.r : 0.0;
-  vec3 P = vec3(xz.x, gy, xz.y);
-  float d = distance(P, uCam);
-  // how much of this level of detail is here at this distance (the two levels' shares add up to 1 in the overlap)
-#ifdef GRASS_TUFT
-  float vis = smoothstep(uBand.x, uBand.y, d) * (1.0 - smoothstep(uBand.z, uBand.w, d));
-  float grow = 1.0 - smoothstep(uBand.z, uBand.w, d);
-#else
-  float vis = 1.0 - smoothstep(uBand.x, uBand.y, d);
-  float grow = 1.0;
-#endif
-  // the random threshold: density ramps with distance and thins out toward the edge of the lawn (cover < 1)
-  gCull = !(gh_f(key + 3u) < vis && gh_f(key + 4u) < cov);
+  float d = distance(vec3(xz.x, gy, xz.y), uCam);
+  // the random threshold: density thins out toward the edge of the lawn (cover < 1)
+  gCull = !(gh_f(key + 4u) < cov);
   float hs = uHeight * (0.7 + 0.6 * gh_f(key + 5u));
   float dryv = gh_patch(xz);
   hs *= (0.82 + 0.36 * dryv) * smoothstep(0.2, 0.9, cov) * grow;
@@ -288,7 +298,7 @@ export function createField(host: FieldHost, tier: 1 | 2): Field {
   const soft = host.style === 'soft';
   const shared: Record<string, { value: any }> = {
     uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uPxScale: { value: 700 },
-    uSeed: { value: host.seed >>> 0 },
+    uSeed: { value: host.seed >>> 0 }, uRefY: { value: bake.yMax },
     uMask: { value: bake.texture }, uRect: { value: new THREE.Vector4(bake.rect.x0, bake.rect.z0 + bake.rect.d, 1 / bake.rect.w, 1 / bake.rect.d) },
     uWind: { value: new THREE.Vector3(host.windDir[0], host.windDir[1], host.variant.height > 0.2 ? 0.55 : 0.4) },
     uMean: { value: new THREE.Vector3(host.mean.r, host.mean.g, host.mean.b) },

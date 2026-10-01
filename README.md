@@ -494,6 +494,47 @@ Each package writes only between its own two marker lines.
 
 #### grass
 <!-- realism:grass:begin -->
+**What it is.** Original instanced grass, a livelier lawn under it, and shaded, wind-moved tree and shrub crowns, for
+homes whose lot ground is a lawn or a meadow (none on sand, gravel, desert, urban or forest lots). Tier 1 and up; off at
+tier 0. Files: [`assets/realism-grass.ts`](assets/realism-grass.ts) (the eager entry, under 20 KB),
+[`assets/viewer-bake.ts`](assets/viewer-bake.ts) (the site bake) and [`assets/viewer-grass.ts`](assets/viewer-grass.ts)
+(the field, the lawn patch, the crowns); both are lazy imports. No binary, no third-party code
+(THIRD_PARTY.md → grass).
+
+- **The site bake.** Once per home, after the batch and before the first compile, a top-down orthographic render of a thin
+  slice of the built scene (from just under the lawn's top to 30 cm above it, so lawn, beds, paths, patios, pool tops,
+  decks, the house footprint, trunks and shrub bases are seen and canopies, roofs and walls are cut away) into one
+  ≤ 1024 px half-float target that is never read back: red = lawn, green = the lawn's height, blue = water, alpha = "hard
+  stuff here", blurred into a soft 10 cm ramp (and a wider falloff for the lawn's edge darkening). Every visible mesh gets a flat
+  class material for that one render and its own back in a `finally`. The grass shader and the lawn patch sample it by world x, z.
+- **The field.** A camera-relative torus: the geometry is one blade (LOD0, 3 segments, tapered, double sided) or one tuft of
+  six fanned blades (LOD1), drawn G × G times with no per-instance buffer. The vertex shader maps `gl_InstanceID` onto the
+  world cell that is congruent to it modulo G inside a window round the camera, so a cell keeps its slot as the camera
+  walks (nothing pops, zero CPU per frame) and everything about a blade (offset in its cell, height, width, yaw, bend, tint)
+  is a uint hash of (cell, the house's FNV-1a seed): the same field every time. A blade is dropped in the vertex shader by
+  its distance (before the mask is even read), the mask's coverage and a per-cell draw, so density ramps instead of
+  stopping. Equal cover: the tufts are cut so that width × height × count per m² matches the blades', their palette's
+  mean is the lawn's own mean albedo, and the two levels fade through each other with complementary draws; the tufts' height
+  shrinks to nothing over their last 5 m so they melt into the flat lawn. No blade is thinner than about 0.9 px. The camera
+  pushes blades aside within 0.6 m. Wind: a gust front travelling across the lawn plus a per-blade flutter on the
+  player's clock. Shading is a patched `MeshLambertMaterial` (all the scene's lights, so light-guard applies; it receives the sun's
+  shadow, casts none) with the blade's base-to-tip gradient as its ambient occlusion and a back-light term toward the sun.
+  Variants: a mown lawn (8.5 cm) and a meadow (`lot.ground: "meadow"`, 42 cm).
+- **The lawn** (the kit's lawn material, found by `userData.surface === 'lawn'`, patched in place with an undo): a second octave of
+  dry and healthy patches (the blades read the same noise), a less saturated green, edge darkening where it meets a hard
+  surface (from the bake), a darker soil under the grass, and a dusk and night lift so it does not go black.
+- **The crowns** (the instanced leaf clusters and hedges of `site.ts`, the beds' shrubs, the world's trees): flat shading off,
+  vertex normals blended toward the crown's own sphere, a darker underside, a glow where the sun is behind the leaves, a
+  low-frequency colour breathing, and a gentle vertex-shader sway. The geometry is untouched (no leaf cards).
+- **Tiers.** Tier 1 (mid): blades to 4.2 m (cell 4.5 cm), tufts to 10 m (cell 10 cm). Tier 2 (high): 7 m (4 cm) and 16 m (8 cm).
+  A camera higher over the lawn than the tufts' reach draws none of it (the group is hidden), so the orbit view costs
+  the lawn and crown patches only. `setTier` rebuilds the two levels; the programs are the same.
+- **Switches.** `?no=grass` (all of it), `?no=foliage` (crowns), `?no=lawn` (the lawn patch), `?no=grassblades` (everything but
+  the blades); `?gstyle=fine|soft` (blade look), `?gtune={"cell0":0.04,"height":0.1}` (tier-table and variant overrides, for judging).
+- **Checks.** `pnpm run test:live --only grass` (`scripts/live-checks/grass.mts`): GPU hash = CPU hash, the torus keeps a cell in
+  its slot, the bake's lawn mask against `createSiteContext(spec).hard` on five homes, the bake leaves the scene as it found
+  it, the restored scene equals `?no=realism`, the kill switches, no grass on a non-lawn lot.
+- **Cost.** TBD
 <!-- realism:grass:end -->
 
 #### assets
