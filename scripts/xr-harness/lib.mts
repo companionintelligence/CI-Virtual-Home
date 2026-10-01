@@ -76,7 +76,10 @@ export interface OpenOpts {
 }
 
 export function playerUrl(tree: Tree, house: string, query = ''): string {
-  return `${tree.srv.url('room-creator.html')}?mode=view&house=${house}&shot=orbit&play=0${query ? '&' + query : ''}`;
+  // the defaults are the opening view, paused; a case's own query (shot=, t=, no=, xrtier=, …) overrides them rather than repeating them
+  const q = new URLSearchParams({ mode: 'view', house, shot: 'orbit', play: '0' });
+  for (const [k, v] of new URLSearchParams(query)) q.set(k, v);
+  return `${tree.srv.url('room-creator.html')}?${q.toString().replace(/%2C/g, ',')}`;
 }
 
 export async function openPage(browser: any, o: OpenOpts): Promise<P> {
@@ -162,7 +165,7 @@ export async function hasProductXr(p: P, waitMs = 0): Promise<boolean> {
 
 const ENTER_SELECTORS = ['[data-xr-enter]', 'button[aria-label*="Enter VR" i]', 'button:has-text("Enter VR")', '[role=button]:has-text("Enter VR")'];
 export async function findEnterButton(p: P): Promise<any | null> {
-  for (const s of ENTER_SELECTORS) { const l = p.page.locator(s).first(); if (await l.count().catch(() => 0)) return l; }
+  for (const s of ENTER_SELECTORS) { const l = p.page.locator(s).filter({ visible: true }).first(); if (await l.count().catch(() => 0)) return l; }
   return null;
 }
 

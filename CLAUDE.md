@@ -78,6 +78,24 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   run the new page against old cached modules and every home would stop with "This home could not be opened" (it did, on
   the first pass-4 deploy; the custom domain's zone rewrites `.js` to `max-age=14400` whatever `_headers` says). `portal:test` checks it.
 - `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
+- **WebXR and the platform profile are live-player only** (README: *Platform tiers*, *WebXR*). `assets/platform.ts` is imported
+  by `viewer.ts` and by `assets/xr/*` and by nothing else; `assets/xr/*` is loaded by one dynamic `import('./xr/entry.js')` in
+  `viewer.ts`, after the player is ready, unless `?no=xr`. **Never import either from anything an offline hook loads** —
+  the editor, `__houseRenderBegin` / `__houseRenderFrames`, the goldens, the fixtures, films and stills — and never from
+  `index.html` or the family pages (the landing weight stays 0). `xr:test`'s `T-OFFLINE` and `T-LAZY` fail on it.
+- **Nothing under `assets/xr/` fetches a third party**, ever: no controller-model CDN, no font or library from a CDN. three's
+  `XRControllerModelFactory` and `XRHandMeshModel` default to `cdn.jsdelivr.net` and are not used; controller and hand visuals are our
+  own geometry (or a vendored, licensed addon added under `assets/vendor/three/`, add-only, with its row in THIRD_PARTY.md).
+  `T-X7` fails on a request outside the origin during a session.
+- **The XR restore runs before any `__houseRender*` call.** A session changes the camera (three overwrites its fov and
+  projection and never restores them), the renderer, the scene and the 2D player's own state, and puts every one back on
+  exit (`xr.end()`); `viewer.beforeExternalRender()` ends a session first, and `__houseRenderBegin` throws in view mode. Do not add
+  a renderer or camera change to the XR path without adding its restore and a field to `snapshotFn()` in
+  `scripts/xr-harness/lib.mts` (`T-X6a` compares the next mono frame's calls, triangles and pixels).
+- **XR is the cheapest tier by construction** (README: *Platform tiers*): realism pinned to tier 0, no post-processing, a baked
+  house, in-world UI. The numbers are hypotheses until the on-device checklist (`reference/XR-DEVICE-CHECKLIST.md`) is run;
+  do not write one into docs as measured. `iwer` is a pinned test-only devDependency; no WebKit browser download without asking.
+- `pnpm run xr:test` after XR or platform work (needs `portal:build` and a GPU; one Chromium at a time).
 
 **The editor.** `room-creator.html` without `?mode=view` (README: The editor) is the review and render tool, on the CI canon:
 

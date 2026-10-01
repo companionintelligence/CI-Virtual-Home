@@ -42,6 +42,7 @@
     "platform:test": "node --experimental-strip-types scripts/test-platform-matrix.mts",
     "ui:test": "node --experimental-strip-types scripts/test-ui.mts",
     "xr:test": "node --experimental-strip-types scripts/test-xr.mts",
+    "xr:census": "node --experimental-strip-types scripts/xr-bake-census.mts",
     "portal:preview": "node --experimental-strip-types scripts/build-portal.mts --serve",
     "serve": "python3 -m http.server 8080"
   },
