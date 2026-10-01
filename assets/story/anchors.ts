@@ -136,7 +136,9 @@ export function instancesOf(aw: AnchorWorld, leaf: AnchorLeaf): Instance[] {
   if (role === 'core') {
     const h = world.hero; if (!h) return [];
     const room = world.levels.find(l => l.id === h.level)?.rooms.find(r => inRect(h.x, h.z, r.b, 0.05)) || null;
-    return done([{ ...base, type: 'core', box: h.core, boxes: [h.core], level: h.level, outside: false, y: world.levels.find(l => l.id === h.level)?.y ?? 0, room, roomName: room ? room.name : null, fwd: h.fwd, aim: mid(h.core) }]);
+    // (framed with the thing it sits on and the screen behind it: a 23 cm box alone cannot be held at any distance a camera can stand)
+    const set = union([h.core, ...(h.surfaceBox ? [h.surfaceBox] : []), ...(h.monitor ? [h.monitor] : [])]);
+    return done([{ ...base, type: 'core', box: set, boxes: [h.core, ...(h.surfaceBox ? [h.surfaceBox] : []), ...(h.monitor ? [h.monitor] : []), ...(h.chair ? [h.chair] : [])], level: h.level, outside: false, y: world.levels.find(l => l.id === h.level)?.y ?? 0, room, roomName: room ? room.name : null, fwd: h.fwd, aim: mid(h.core) }]);
   }
   if (role === 'front-door') {
     const e = world.entry; if (!e) return [];
@@ -148,7 +150,7 @@ export function instancesOf(aw: AnchorWorld, leaf: AnchorLeaf): Instance[] {
   if (role === 'street') {
     const s = streetPoint(world), h = world.entry ? (world.levels.find(l => l.id === world.entry!.level)?.y ?? 0) : 0;
     const box: Box6 = [r3(s.at[0] - 3), 0, r3(s.at[1] - 3), r3(s.at[0] + 3), 1.2, r3(s.at[1] + 3)];
-    return done([{ ...base, type: 'street', box, boxes: [box], level: null, outside: true, y: 0, fwd: [-s.out[0], -s.out[1]], aim: [world.entry ? world.entry.x : 0, h + 1.8, world.entry ? world.entry.z : 0] }]);
+    return done([{ ...base, type: 'street', box, boxes: [box], level: null, outside: true, y: 0, fwd: [s.out[0], s.out[1]], aim: [world.entry ? world.entry.x : 0, h + 1.8, world.entry ? world.entry.z : 0] }]);
   }
   if (role === 'room') {
     if (!leaf.room) return [];
