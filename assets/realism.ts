@@ -23,7 +23,7 @@
 //   Patch materials by clone or by define, never in place without an undo; no Math.random / Date.now / performance.now
 //   in anything an offline frame can depend on (the player's clock is ctx.now()).
 import type { Tier } from './viewer-quality.js';
-import { createLadder, probeDevice, type Probe } from './viewer-quality.js';
+import { createLadder, probeDevice, readRenderer, type Probe } from './viewer-quality.js';
 
 export type { Tier };
 export type FeatureKey = 'ao' | 'water' | 'sky' | 'grass' | 'assets' | 'frame';
@@ -117,7 +117,12 @@ export function createRealism(host: RealismHost) {
   const { no, params } = host;
   const killed = (k: string): boolean => no.has('realism') || no.has(k);
   // the device probe runs even with every effect off: it is the report's first line (and costs < 5 ms)
-  const probe: Probe = probeDevice(host.renderer.getContext?.() ?? null, params);
+  const r = host.renderer, ext = r.extensions;
+  const probe: Probe = probeDevice({
+    gl: r.getContext?.() ?? null,
+    maxTexture: r.capabilities?.maxTextureSize,
+    floatTargets: ext?.has ? !!(ext.has('EXT_color_buffer_float') || ext.has('EXT_color_buffer_half_float')) : undefined,
+  }, params);
   const actives: Active[] = [];
   const failed: { key: string; error: string }[] = [];
   const loaded = new Map<FeatureKey, Promise<RealismFeature | null>>();
@@ -211,7 +216,11 @@ export function createRealism(host: RealismHost) {
 
   // ---- install one phase of this house's features
   async function install(phase: Phase): Promise<void> {
-    if (phase === 'pre-batch') { closed['pre-batch'] = closed['post-batch'] = false; deadline = performance.now() + BUDGET_MS; }
+    if (phase === 'pre-batch') {
+      closed['pre-batch'] = closed['post-batch'] = false; deadline = performance.now() + BUDGET_MS;
+      // the renderer string (the one probe query that asks the GPU) is read here, once the house is built, not at mount
+      if (!probe.renderer) { readRenderer(probe, host.renderer.getContext?.() ?? null); ladder.restart(); }
+    }
     const gen = generation;
     const jobs: Promise<void>[] = [];
     for (const e of TABLE) {

@@ -5,7 +5,7 @@
 //   --base    a checkout of the commit the player must still equal when every effect is off (BASE_SHA, a built tree:
 //             pnpm install && pnpm run build). `auto` (default) makes a detached worktree of it under the temp dir and
 //             builds it; `none` skips the comparison with it.
-//   --only    run one package's scripts/live-checks/<key>.mts and nothing else
+//   --only    run one package's scripts/live-checks/<key>.mts and nothing else (env.base is null unless --base is given too)
 //   --quick   two houses, day only
 //
 // Built-in checks (every one is a hash of the player's canvas, drawn on this machine's GPU, so it is a comparison
@@ -72,7 +72,7 @@ async function main(): Promise<number> {
 
   // ---- the trees
   let baseDir: string | null = null, madeBase = false;
-  const wantBase = !only && (args.base || 'auto') !== 'none';
+  const wantBase = (args.base || (only ? 'none' : 'auto')) !== 'none';   // (--only skips the BASE_SHA tree unless --base asks for it)
   if (wantBase) {
     if (args.base && args.base !== 'auto' && args.base !== 'true') baseDir = path.resolve(args.base);
     else {

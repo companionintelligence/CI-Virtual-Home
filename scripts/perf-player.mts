@@ -6,6 +6,8 @@
 //   --query <string>   appended to the player URL, e.g. --query no=glass,lightguard,shadowcache,batch,compile: switches a
 //                      live-only feature off for A/B (the player's ?no= kill switches), or --query 'no=glass&foo=1'.
 //                      The player rewrites the address bar once up: confirm with performance.getEntriesByType('navigation')[0].name, not page.url()
+//                      The live-realism tier is pinned with --query q=0|1|2 (assets/viewer-quality.ts); every bench row's note ends with
+//                      `fx t<tier>[installed features]` and a `# effects` line prints the probe, the ladder's moves and each feature's stats.
 //   --out <file.md>    the run as markdown: a header line (date, commit, uptime, dpr, throttle, query) and the rows as a table
 //
 // It drives the real player in Chromium with the real GPU flags (portal-lib's LAUNCH_ARGS: --use-angle=metal on a Mac),
@@ -439,8 +441,17 @@ async function bench() {
         }
         await setScrub(o.page, 0);
       }
+      // the live-realism report (assets/realism.ts) of the page just measured: the tier it settled on and what installed
+      let fxNote = '';
+      const fxOf = async (page: any) => {
+        const fx = await page.evaluate(() => { const e = (window as any).__houseViewer?.effects; return e ? { tier: e.tier, ceiling: e.probe.ceiling, why: e.probe.reasons, probeMs: e.probe.ms, installed: e.installed, failed: e.failed, moves: e.ladder.moves, features: e.features } : null; }).catch(() => null);
+        fxNote = fx ? ` fx t${fx.tier}${fx.installed.length ? `[${fx.installed.join(',')}]` : ''}${fx.failed.length ? ` FAILED ${fx.failed.map((f: any) => f.key).join(',')}` : ''}${fx.moves.length ? ` moves ${fx.moves.join(';')}` : ''}` : '';
+        if (fx) log(`# effects ${house}: ${JSON.stringify(fx)}`);
+      };
+      await fxOf(o.page);
       const rowOut = (label: string, s: any, extra: any = {}) => {
         const row = { house, defaults, dpr, throttle: thr, scenario: label, ...s, ...extra, load: [+l0.toFixed(0), +load1().toFixed(0)] };
+        row.note = `${row.note || ''}${fxNote}`.trim();
         out.push(row);
         log([house, defaults, dpr, thr, label, f1(s.fps), f1(s.dtMed), f1(s.dtP95), f1(s.dtMax), f1(s.cpuFrameMed), f1(s.cpuRenderMed), f1(s.gpuMed), Math.round(s.calls), f1(s.tris / 1000), s.programs, s.geos, s.tex, f1(row.thr), Number.isFinite(s.rendered) ? `${Math.round(100 * s.rendered / s.n)}` : '-', f1(s.idleCpuMed), row.note || '', `${row.load[0]}->${row.load[1]}${row.load[1] > 2 * row.load[0] || row.load[0] > 2 * row.load[1] ? ' ~' : ''}`].join('\t'));
       };
@@ -457,6 +468,7 @@ async function bench() {
           await o.page.keyboard.press('Escape'); await setScrub(o.page, 0);
           rows.push(await scenarioRun(o, 'orbit'));
         }
+        await fxOf(o.page);
         rowOut('orbit', medRows(rows));
         await o.close(); o = null;
       }
@@ -469,6 +481,7 @@ async function bench() {
         await sleep(1500);
         const rows: any[] = [];
         for (let i = 0; i < Math.max(2, Math.ceil(RUNS / 2)); i++) rows.push(await scenarioRun(o, 'hq'));
+        await fxOf(o.page);
         rowOut('hq', medRows(rows));
         await o.close(); o = null;
       }
