@@ -31,7 +31,7 @@ export interface ClaimsFile {
   disclosures: { id: string; text: string; long?: string; required: boolean }[];
 }
 export interface CatalogFile {
-  apps: CatalogApp[]; notInStore: { apps: { id: string; name: string; replaces?: string; visibility?: string }[] };
+  apps: CatalogApp[]; excluded?: { id: string; name?: string; kind?: string; reason?: string }[]; notInStore: { apps: { id: string; name: string; replaces?: string; visibility?: string }[] };
   meta?: { top15?: { id: string; name: string }[]; [k: string]: any };
 }
 

@@ -16,6 +16,7 @@ import { fleetMetrics } from './story/lib/fleet.mts';
 import { plain } from './story/lib/text.mts';
 import { CASES } from './story/lib/bad-cases.mts';
 import { castingDisagreements } from './story/lib/house.mts';
+import { applyDiff, diffBlocks, diffCatalog } from './story/lib/catalog-diff.mts';
 
 const ctx = loadContext();
 const J = (...p: string[]): any => JSON.parse(fs.readFileSync(path.join(ROOT, ...p), 'utf8'));
@@ -141,6 +142,16 @@ test('claims.json: 69 ban rules, ids unique, every regex compiles and none is gl
   }
 });
 
+test('claims.json: the three excellent beats of STORY-BIBLE section 11 pass the text rules', () => {
+  const good = [
+    'A draft, never sent alone', 'A client asks a tricky question. Mika texts Odette, and Odette drafts a reply using the context Mika connected to Companion Memory (beta). Mika reads it and sends it herself.', 'Here is a draft. Please read it before you send it.',
+    'Every subscription, in one list', 'Mika opens Wallos at the counter. It lists every subscription the household still pays for, with a reminder before each one renews.', 'replaces Rocket Money',
+    'Join it from a phone', 'Elias opens the Wi-Fi settings on his phone and joins the Core\'s own network. Then he chooses the home network from the list.', 'Join the Core\'s own network', 'Choose your home network', 'Enter its password',
+    'UnCloud your life.',
+  ];
+  for (const t of good) assert.deepEqual(ctx.bans.filter((b) => b.re.test(plain(t)) && b.severity !== 'warn').map((b) => b.id), [], t);
+});
+
 test('claims.json: every sanctioned allowedClaims text passes the ban list (hold claims are not sanctioned)', () => {
   const sanctioned = ctx.claims.allowedClaims.filter((c) => c.status !== 'hold');
   assert.ok(sanctioned.length >= 30);
@@ -260,4 +271,36 @@ test('every content/families/<slug>.json validates (zero files is a pass)', () =
     const r = validateStory(J('content', 'families', f), ctx as Ctx);
     assert.deepEqual([...r.errors, ...r.review].map((x) => r.line(x)), [], `${f}`);
   }
+});
+
+// ---------------------------------------------------------------------------------------------------------------------
+// The publish-day catalog re-check (scripts/story/build-catalog-snapshot.mts does the I/O; these are its pure parts)
+// ---------------------------------------------------------------------------------------------------------------------
+test('catalog re-check: an app that left the store fails stories; renames and new apps are information', () => {
+  const ids = ctx.catalog.apps.map((a) => a.id);
+  const live = ids.filter((id) => id !== 'wallos').map((id) => ({ id })).concat([{ id: 'brand-new-app' }]);
+  const manifests = new Map(ctx.catalog.apps.map((a) => [a.id, { id: a.id, name: a.name, available: true, replaces: a.replaces }]));
+  manifests.set('immich', { id: 'immich', name: 'Immich', available: true, replaces: ['iCloud Photos'] });     // dropped Google Photos
+  manifests.set('navidrome', { id: 'navidrome', name: 'Navidrome Pro', available: true, replaces: ['Spotify', 'Apple Music'] });
+  const d = diffCatalog(ctx.catalog, live, manifests);
+  assert.deepEqual(d.removed, ['wallos']);
+  assert.deepEqual(d.replacesDropped, [{ id: 'immich', names: ['Google Photos'] }]);
+  assert.deepEqual(d.renamed.map((r) => r.id), ['navidrome']);
+  assert.ok(d.newInStore.includes('brand-new-app'));
+  assert.ok(diffBlocks(d));
+  assert.equal(diffBlocks(diffCatalog(ctx.catalog, ids.map((id) => ({ id })), manifests.set('immich', { id: 'immich', name: 'Immich', available: true, replaces: ['Google Photos', 'iCloud Photos'] }))), false);
+
+  const refreshed = applyDiff(ctx.catalog, live, '2026-12-01');
+  assert.equal(refreshed.apps.find((a) => a.id === 'wallos')!.inLiveStore, false);
+  assert.equal(refreshed.apps.find((a) => a.id === 'immich')!.inLiveStore, true);
+  assert.equal(refreshed.apps.find((a) => a.id === 'immich')!.storySafe, ctx.apps.get('immich')!.storySafe, 'curated fields are untouched');
+  assert.equal(ctx.apps.get('wallos')!.inLiveStore, true, 'applyDiff does not mutate its input');
+});
+
+test('a story naming an app the snapshot marks as gone from the store fails app-not-in-store', () => {
+  const local = loadContext();
+  local.apps.get('wallos')!.inLiveStore = false;
+  const r = validateStory(exemplar(), local);
+  assert.ok(ruleIds(r).has('app-not-in-store'));
+  assert.ok(!ruleIds(validateStory(exemplar(), ctx)).has('app-not-in-store'));
 });

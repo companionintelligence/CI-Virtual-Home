@@ -29,6 +29,7 @@ function notInStoreHits(text: string, ctx: Ctx): string[] {
 function checkAppUse(b: Beat, id: string, ctx: Ctx, out: Report, main: boolean): void {
   const a = ctx.apps.get(id);
   if (!a) { out.E('app-unknown', b.id, main ? `app ${id} is not in the catalog snapshot (content/story/catalog-apps.json)` : `with: ${id} is not in the catalog snapshot`, 'Use the id exactly as the catalog has it (paperless, not paperless-ngx).'); return; }
+  if (a.inLiveStore === false) out.E('app-not-in-store', b.id, `${a.id} is no longer in the live store (catalog snapshot re-check)`, 'Choose an app a customer can install today.');
   if (a.storySafe === 'avoid') out.E('app-avoid', b.id, `${a.id} is marked avoid in the catalog`, 'Choose another app.');
   if (a.qa === 'not-boot-tested') out.E('app-qa', b.id, `${a.id} says it was not boot-tested on a live Hub device`, 'Choose an app that was.');
   if (a.qa === 'no-screenshot') out.R('app-qa-screenshot', b.id, `${a.id} has no QA screenshot; the owner must list the beat in content/story/reviewed.json`, 'Prefer an app with a QA screenshot, or ask the owner to review the beat.');
