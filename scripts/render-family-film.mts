@@ -94,7 +94,8 @@ async function renderFamily(browser: any, srv: Served, slug: string): Promise<Re
       for (const key of ASPECTS) {
         const ta = Date.now(), f = formatFor(key, RES);
         await page.evaluate(([r, a]: string[]) => (window as any).__houseComposerWarm({ res: r, aspect: a }), [String(RES), aspectLabel(key)]);
-        const info = await page.evaluate(async (a: any) => { const F = await import('/assets/story/film/index.js'); (window as any).__film = F; return F.prepare(a); },
+        const info = await page.evaluate(async (a: any) => { // @ts-ignore (a URL in the page, not a module of this script)
+          const F = await import('/assets/story/film/index.js'); (window as any).__film = F; return F.prepare(a); },
           { rs: fam.rs, format: key, res: RES, title: P.text.title, end: P.text.end, badge: P.text.badge });
         if (flags.stills) { await stills(page, slug, key, info, flags.stills); await page.evaluate(() => (window as any).__film.end()); continue; }
         const tmpWeb = path.join(scratch, `${key}.web.mp4`), tmpMaster = flags.master === 'true' ? path.join(scratch, `${key}.master.mp4`) : null;

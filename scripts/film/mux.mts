@@ -8,7 +8,9 @@ import type { Placement } from '../../assets/story/film/layout.js';
 
 /** Streaming delivery: -14 LUFS integrated, -1 dBTP. The limiter is set 1 dB lower because the AAC encode overshoots its own samples. */
 export const TARGET = { I: -14, TP: -1, LRA: 11 } as const;
-export const ENCODE_HEADROOM_DB = 1;
+/** The limiter sits this far under the delivery peak. The kit provisions 1 dB for a 192k encode; the web film is AAC 64k mono, which overshoots its own samples by about 1.1 dB on this voice (measured: a -2.0 dBTP
+ *  limiter gave -0.9 dBTP after the encode), so 2 dB. */
+export const ENCODE_HEADROOM_DB = 2;
 /** the clips are 24 kHz mono; the timeline is built at that rate (nothing is resampled until the very end) */
 export const CLIP_RATE = 24000;
 export const OUT_RATE = 48000;

@@ -22,6 +22,10 @@ export const FILM = {
   titleS: 4,
   /** a dip to ink joins two scenes: the first half fades the old picture out, the second fades the new one in */
   padS: FILM_PAD_S,
+  /** a film beat is cut in this long before its voice begins (the camera is then about to arrive, not walking in silence) and cut out this long after its
+   *  last word: the live tour lingers on a beat for its reading time or its walk, a film does not */
+  leadS: 0.3,
+  tailS: 0.5,
   /** the end card: the voice starts this long after it begins, and the card holds this long after the last word */
   outroLeadS: 0.6,
   outroTailS: 5.5,
@@ -87,11 +91,19 @@ export function filmClock(rs: RuntimeStory, o: { fps?: number } = {}): FilmClock
   if (rs.durations !== 'voice') throw new Error(`${rs.slug}: the film needs the recorded voice, and the bake used estimated durations (pnpm run story:voice -- ${rs.slug}; pnpm run story:bake -- ${rs.slug})`);
   if (!rs.film.parts.length) throw new Error(`${rs.slug}: no beat is flagged "film": true`);
   const first = FILM.titleS + FILM.padS;
-  const parts: FilmPartT[] = rs.film.parts.map(p => {
+  // Each part is the tour's beat from where the film cuts in to FILM.tailS after its last word: the tour holds a beat for its reading time, its
+  // minimum or its walk, and a film that held it too would be seconds of silence. The parts are laid end to end, a dip between each pair.
+  let cursor = first;
+  const parts: FilmPartT[] = rs.film.parts.map((p, n) => {
     const idx = rs.beats.findIndex(b => b.id === p.id);
     if (idx < 0) throw new Error(`${rs.slug}: film part ${p.id} is not a beat of the story`);
-    const at = R3(first + p.at);
-    return { id: p.id, idx, from: p.from, to: p.to, at, end: R3(at + (p.to - p.from)) };
+    const b = rs.beats[idx], say = b.say ? rs.audio[`${b.id}.say`] : null, narr = rs.audio[b.id];
+    const spoken = say && b.sayAt !== null ? b.sayAt + say.durationMs / 1000 : narr ? b.speechAt + narr.durationMs / 1000 : p.to;
+    const from = R3(Math.max(p.from, Math.min(b.speechAt - FILM.leadS, p.to - 1)));
+    const to = R3(Math.max(from + 1, Math.min(p.to, spoken + FILM.tailS)));
+    if (n) cursor += FILM.padS;
+    const at = R3(cursor); cursor += to - from;
+    return { id: p.id, idx, from, to, at, end: R3(at + (to - from)) };
   });
   const lastEnd = parts[parts.length - 1].end;
   const outro0 = R3(lastEnd + FILM.padS);
@@ -246,8 +258,9 @@ export function captionCues(rs: RuntimeStory, placements: Placement[], names: Re
       out.push({ start: words[0].s, end: words[words.length - 1].e, words, text: chunk.map(t => t.text).join(' '), speaker, clip: pl.id, scripted: pl.kind === 'say' });
     }
   }
-  // a cue comes up 0.08 s before its first word and stays up until the next begins (at most 0.6 s past its last word), never overlapping it
-  const starts = out.map(c => Math.max(0, R3(c.start - 0.08)));
+  // a cue comes up 0.08 s before its first word (never before the last word of the cue before it is done) and stays up until the next begins, at most
+  // 0.6 s past its last word; no two overlap
+  const starts = out.map((c, i) => Math.max(0, R3(Math.min(c.start, Math.max(c.start - 0.08, i ? out[i - 1].end : 0)))));
   for (let i = 0; i < out.length; i++) {
     const next = starts[i + 1], hold = R3(out[i].end + 0.6);
     out[i] = { ...out[i], start: starts[i], end: next === undefined ? hold : R3(Math.max(Math.min(hold, next), out[i].end)) };
