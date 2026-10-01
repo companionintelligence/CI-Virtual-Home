@@ -270,14 +270,30 @@ head of `main`, or of its open pull request: re-running an old run, or one that 
 with a notice instead of putting an older tree over a newer one. Pull requests from forks, and Dependabot's, get no
 preview, and **Run workflow** on any branch but `main` does nothing.
 
-**Caching.** The engine's modules are not fingerprinted (`assets/viewer.js` is the same URL on every deploy), and
-Cloudflare Pages' default for a static file is a four-hour browser cache with no check in between. A visitor who had
-opened the site in the four hours before a deploy then ran the *new* page against *old* modules from their cache, and
-every home stopped with "This home could not be opened" (`'./assets/shot-track.js' does not provide an export named
-'trackView'`). [`portal/_headers`](portal/_headers), which `portal:build` copies to the site root, makes every file
-`Cache-Control: public, max-age=0, must-revalidate`: the browser asks each time, and an unchanged file costs one empty
-304 (the files carry ETags). `portal:test` checks the file. A copy cached *before* that header shipped is not evicted
-by it: it stays until its four hours run out (a private window, or a hard reload, skips it).
+**Caching.** The engine's modules are not fingerprinted by file name (`assets/viewer.js` is the same URL on every
+deploy), and a browser can keep an old copy of one while the page that asks for it is new. That happened on the first
+pass-4 deploy: a visitor who had opened the site in the previous four hours ran the *new* page against *old* modules
+and every home stopped with "This home could not be opened" (`'./assets/shot-track.js' does not provide an export named
+'trackView'`). Two layers keep it from happening again:
+
+- **The page names every module by a hash of its content.** `portal:build` adds each `assets/**/*.js` (not
+  `vendor/`) to the page's import map as `./assets/x.js` → `./assets/x.js?v=<hash>`, adds an import map to `index.html`,
+  and puts the same `?v=` on the `<script>`, `<link rel="stylesheet">` and `<link rel="modulepreload">` tags. A module's
+  own relative imports resolve to the plain URL, which the map rewrites, so a module never needs to know its
+  neighbours' hashes and a change to one file changes only its own URL. The page itself is never cached, so it always
+  says which versions it wants, and whatever an old build left in a browser's cache under the plain URLs is never
+  asked for. This does not depend on any server or CDN setting.
+- **[`portal/_headers`](portal/_headers)** (copied to the site root) asks every file to revalidate
+  (`Cache-Control: public, max-age=0, must-revalidate`; unchanged files cost one empty 304). `ci-virtual-home.pages.dev`
+  honours it. **`homes.ci.computer` does not by itself**: that zone's *Browser Cache TTL* (Cloudflare dashboard →
+  `ci.computer` → Caching → Configuration, four hours by default) rewrites `.js`, `.css` and `.webp` responses to
+  `max-age=14400` whatever the origin sends (checked: same deployment, `pages.dev` says 0, `homes.ci.computer` says
+  14400 for those and 0 for `.json` and `.html`). Set it to **Respect Existing Headers** if you want revalidation on the
+  custom domain too; the fingerprints make the site correct either way.
+
+`portal:test` checks both: every module is in both import maps with its content hash, the player pulls every module by
+its hash, and with every un-hashed module URL poisoned the player still starts. Do not rename or move a module without
+rebuilding, and do not add a `<script>` or `<link>` to `assets/` or `portal/` that bypasses the build's rewriting.
 
 **What the token can do.** Cloudflare's **Pages · Edit** permission cannot be limited to one project: the token can
 publish to, or delete, every Pages project on the account, and this account holds seven today, among them the
