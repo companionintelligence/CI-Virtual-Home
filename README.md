@@ -501,8 +501,8 @@ Each package writes only between its own two marker lines.
 **CC0 detail textures and hero props** (`assets/realism-assets.ts`, `assets/media-registry.ts`, `assets/media-assets.ts`, the files in
 `assets/media/assets/`; tier 1 and up; `?no=assets` kills it; `?assetskip=plaster,vase-01` leaves single ids procedural, for A/B).
 
-*What it does.* The kit's procedural sets (`oak`, `herringbone`, `concrete`, `stucco`, `brick`, `siding`, `stone`, `asphalt`,
-`clay-tile`, `deck`, `tile`) give way to photographed CC0 detail maps (Poly Haven, ambientCG), and a few props
+*What it does.* The kit's procedural sets (`oak`, `herringbone`, `concrete`, `brick`, `siding`, `stone`, `asphalt`,
+`clay-tile`, `deck`, `tile`) give way to photographed CC0 detail maps (Poly Haven, ambientCG; `stucco` stays procedural: the one candidate, `beige_wall_001`, is a flat painted wall that looked blank next to the kit's grain), and a few props
 (`vase` ×4 variants, `wall-clock`, `side-table`, `coffee-table`, `fern`, `fruit-bowl` with a lemon and an apple) to CC0 models. A
 photographed albedo carries only the surface's detail, never its colour: `scripts/prep-assets.mts` reduces it to luma around a known mean, and
 the runtime tints the material by (the procedural set's mean colour in linear light) / (that mean), so the average colour the palette and the
@@ -531,8 +531,13 @@ removes every model, un-hiding the procedural pieces, so `viewer.external.before
 
 *Cost.* Eager: `realism-assets.js` 0.6 KB. Lazy, with the first house: `media-registry.js` + `media-assets.js` ≈ 43 KB (10 KB gzip) and the
 house's files (see the measured numbers in the pull request / `test:live --only assets`). GPU: a 512 map with mips is 1.4 MB, a 1k map 5.6 MB.
-Props add draw calls only until `viewer-batch` merges them (clones share their materials); shadow casters are capped at the three largest props
-per room and 150 000 triangles per house.
+Props add draw calls only until `viewer-batch` merges them (clones share their materials; repeats are therefore not turned into `InstancedMesh`es, the batch
+already merges them per cell); shadow casters are capped at the three largest props per room and 150 000 triangles per house.
+
+*Looks, honestly.* The textures are a modest change: floors, brick, stone and roads read as photographed rather than painted, calmer and with real
+board joints and wear, but at a distance the walls and roofs look like before. The props are the clear win (a wooden fruit bowl with real fruit, a
+scanned side table and coffee table, ceramic vases, a wall clock, ferns). Two things to know: a model keeps its own colours (the palette does not tint a
+prop), and a photographed roughness gives floors a visible lamp sheen at dusk and night that the procedural ones did not have.
 <!-- realism:assets:end -->
 
 #### frame

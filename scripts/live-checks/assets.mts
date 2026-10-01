@@ -109,8 +109,11 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
     try {
       await on.page.waitForTimeout(4000);
       const before = await on.eval(() => (window as any).__houseViewer.effects.features.assets.swappedMaterials);
+      // before() leaves a page with a batchSensitive feature UNBATCHED (the realism registry undoes the batch so the scene is exactly as
+      // built), and a batched scene draws a few pixels differently from an unbatched one; the reference page has no handle, so it is
+      // unbatched by hand to compare like with like
       await on.eval(() => (window as any).__houseViewer.external.before());
-      await off.eval(() => (window as any).__houseViewer.external.before());
+      await off.eval(() => { (window as any).__houseViewer.external.before(); (window as any).__houseViewer.batchOn(false); });
       const [x, y] = [await on.hash(), await off.hash()];
       add(`${h} ${q}: restored equals ?no=assets`, x === y, x === y ? x.slice(0, 8) : `${x.slice(0, 8)} vs ${y.slice(0, 8)}`);
       const p = await probe(on);
