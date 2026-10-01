@@ -1,287 +1,245 @@
-// The portal's gallery (index.html): lists content/houses/index.json as cards with the committed thumbnails
-// (portal/thumbs/<id>.webp, scripts/build-thumbs.mts), with search, a storeys filter and style tags. A card
-// opens the live player, room-creator.html?mode=view. No WebGL, no framework, relative URLs only (the site is
-// served under a sub-path by portal:test). The filters live in the URL (?q=&storeys=&tag=) so a filtered view
-// can be linked. A home's name is assets/home-names.js's displayName (the Sims build's own title is the credit).
+// The landing's family list (index.html): story/families.<hash>.json as cards, with a household facet, ten topic chips and a
+// search. A card opens the family's page (family/<slug>); "Take the tour" opens the live player. No WebGL, no framework,
+// relative URLs only (the site is served under a sub-path by portal:test). The filters live in the URL
+// (?household=&topic=a,b&q=) so a filtered view can be linked; values it does not know are ignored.
 //
-// The names are imported when the page runs, not statically: if that one file does not come (a partial deploy, a
-// dropped request), the gallery still lists the homes, under the spec's title with the Sims pack's name taken out
-// (most of what displayName does), instead of never running and leaving the placeholder cards up for good.
-const FALLBACK_NAMES = {
-  buildName: h => (h.name || h.id || '').trim(),
-  displayName: h => (h.name || '').replace(/\(?\b(base\s*game|basegame|bg)\b\)?/gi, ' ').replace(/\s{2,}/g, ' ').trim() || h.id,
-  buildCredit: () => '',
-};
-const namesReady = import('../assets/home-names.js').catch(err => { console.warn('gallery: the names did not load', err); return FALLBACK_NAMES; });
-let names = FALLBACK_NAMES;
-
-// The home the hero plays. scripts/build-thumbs.mts renders portal/hero.webp from the same house (--hero).
-const HERO = 'aurora';
-
-// Style tags: the words a visitor would filter by, matched against each spec's one-paragraph `style`. A tag is
-// shown when it matches three or more homes and no more than half of them (a tag that fits most homes, like
-// gables, narrows nothing), so the row follows the collection as it grows. Waterfront means open water: a pond
-// in the garden does not make a lake house.
-const TAGS = [
-  ['Modern', /\bmodern|contemporary/i],
-  ['Cottage', /\bcottage|cape cod|\bcabin|farmhouse/i],
-  ['Mediterranean', /mediterranean|spanish|stucco|terracotta|desert|adobe/i],
-  ['Pool', /\bpool\b/i],
-  ['Garden', /\bgarden|greenhouse|planting|orchard/i],
-  ['Waterfront', /\bwaterfront|\blake\b|\briver\b|\bdock\b|\bcreek\b/i],
-  ['Porch', /\bporch|veranda|portico/i],
-  ['Gables', /\bgable/i],
-  ['Brick', /\bbrick/i],
-  ['Stone', /\bstone\b/i],
-  ['Timber', /\btimber|\bwood|\blog\b|\bcedar/i],
-];
-
+// The page names no home and no builder: a card is a family (surname, an invented address, a tagline, who lives there,
+// which apps they run). Nothing the engine owns is imported here, and nothing is fetched before an interaction except the
+// family list itself: three.js, the engine and a family's spec are warmed when a card is pointed at or focused.
 const $ = sel => document.querySelector(sel);
-// No play=: the player starts the shot by itself, except for a visitor whose system asks for reduced motion, and
-// that is the player's call (it can read the setting; a link cannot).
-const viewerHref = id => `./room-creator.html?mode=view&house=${encodeURIComponent(id)}`;
-// the first clause of the spec's style paragraph: "Two-storey white modern villa, stacked flat roofs, …" → "Two-storey white modern villa"
-const shortStyle = s => (s || '').split(/[:;,(]| with | over | under /)[0].trim();
-const nf = new Intl.NumberFormat('en');
+const $$ = sel => [...document.querySelectorAll(sel)];
+const HOUSEHOLDS = ['solo-or-couple', 'young-family', 'older-kids', 'grandparents'];
+const TOPICS = ['home', 'food', 'iot', 'productivity', 'money', 'privacy', 'kids', 'media', 'creative', 'small-business'];
+const tourHref = slug => `./room-creator.html?mode=view&family=${encodeURIComponent(slug)}`;
+const pageHref = slug => `./family/${encodeURIComponent(slug)}`;
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
-let homes = [];
-let shownTags = [];
-const state = { q: '', storeys: '', tag: '' };
+let families = [];
+const state = { q: '', household: '', topics: new Set() };
 
 function readUrl() {
   const q = new URLSearchParams(location.search);
-  state.q = q.get('q') || '';
-  state.storeys = q.get('storeys') || '';
-  state.tag = q.get('tag') || '';
+  state.q = (q.get('q') || '').slice(0, 80);
+  const h = q.get('household') || '';
+  state.household = HOUSEHOLDS.includes(h) ? h : '';
+  state.topics = new Set((q.get('topic') || '').split(',').filter(t => TOPICS.includes(t)));
 }
 function writeUrl() {
   const q = new URLSearchParams();
+  if (state.household) q.set('household', state.household);
+  if (state.topics.size) q.set('topic', [...state.topics].join(','));
   if (state.q) q.set('q', state.q);
-  if (state.storeys) q.set('storeys', state.storeys);
-  if (state.tag) q.set('tag', state.tag);
   const s = q.toString();
   try { history.replaceState(null, '', s ? `?${s}${location.hash}` : `${location.pathname}${location.hash}`); } catch { /* file:// or sandboxed */ }
 }
 
-// each filter on its own, so a tag's count can be taken against the others
-const storeysOk = h => !state.storeys || String(h.storeys || 1) === state.storeys || (state.storeys === '3' && (h.storeys || 1) >= 3);
-const tagOk = h => !state.tag || h.tags.includes(state.tag);
-function queryOk(h) {
+// each facet on its own, so a count can be taken against the others
+const householdOk = f => !state.household || f.household === state.household;
+const topicsOk = f => [...state.topics].every(t => f.topics.includes(t));
+function queryOk(f) {
   if (!state.q) return true;
-  const hay = `${h.display} ${h.name} ${h.style || ''} ${h.author || ''} ${h.source || ''} ${h.id}`.toLowerCase();
-  return state.q.toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w));
+  return state.q.toLowerCase().split(/\s+/).filter(Boolean).every(w => f._hay.includes(w));
 }
-const matches = h => storeysOk(h) && tagOk(h) && queryOk(h);
+const matches = f => householdOk(f) && topicsOk(f) && queryOk(f);
+const hay = f => [f.title, f.surname, f.address, f.tagline, ...f.members.map(m => m.name), ...f.members.map(m => m.companion || ''), ...f.apps.map(a => a.name), ...(f.rooms || [])].join(' ').toLowerCase();
 
-// A thumbnail that will not load: the home's initial and name on a tinted tile, so the card still says what it is
-function missingThumb(thumb, h) {
-  thumb.classList.add('missing');
-  const ph = document.createElement('span');
-  ph.className = 'thumb-missing';
-  ph.setAttribute('aria-hidden', 'true');
-  const initial = document.createElement('b'); initial.textContent = h.display.replace(/^the\s+/i, '').charAt(0).toUpperCase();
-  const name = document.createElement('span'); name.textContent = h.display;
-  ph.append(initial, name);
-  thumb.prepend(ph);
-}
-
-function card(h, i) {
+function card(f, i) {
   const li = document.createElement('li');
   li.className = 'card';
-  li.dataset.id = h.id;
-  const a = document.createElement('a');
-  a.href = viewerHref(h.id);
-  a.setAttribute('aria-label', `${h.display}. ${shortStyle(h.style)}. Play in 3D`);
-
-  const thumb = document.createElement('div');
-  thumb.className = 'thumb';
+  li.dataset.slug = f.slug;
+  const thumb = document.createElement('div'); thumb.className = 'thumb';
   const img = document.createElement('img');
-  img.src = `./portal/thumbs/${encodeURIComponent(h.id)}.webp`;
-  img.alt = '';
-  img.width = 640; img.height = 360;
-  img.decoding = 'async';
+  img.src = `./${f.thumb}`; img.alt = `An aerial view of the ${f.surname} family home, drawn in 3D.`;
+  img.width = 640; img.height = 360; img.decoding = 'async';
   if (i > 5) img.loading = 'lazy';
-  img.addEventListener('error', () => missingThumb(thumb, h), { once: true });
-  const play = document.createElement('span');
-  play.className = 'thumb-play';
-  play.innerHTML = '<svg class="i i-fill"><use href="#i-play"/></svg>';
-  play.append('Play in 3D');
-  thumb.append(img, play);
+  thumb.append(img);
 
-  const body = document.createElement('div');
-  body.className = 'card-body';
-  const h3 = document.createElement('h3'); h3.textContent = h.display;
-  const style = document.createElement('p'); style.className = 'style'; style.textContent = shortStyle(h.style); style.title = h.style || '';
-  const facts = document.createElement('p'); facts.className = 'facts';
-  const fact = text => { const s = document.createElement('span'); s.className = 'fact'; s.textContent = text; return s; };
-  const storeys = h.storeys || 1;
-  facts.append(fact(`${storeys} ${storeys === 1 ? 'storey' : 'storeys'}`));
-  if (h.areaSqm) facts.append(fact(`${nf.format(h.areaSqm)} m²`));
-  // the builder's credit; its tooltip names the build the spec was written from, by its own title
-  const credit = document.createElement('span'); credit.className = 'credit';
-  credit.title = [names.buildCredit(h), h.source].filter(Boolean).join(', ');
-  if (h.author) { credit.append('by '); const b = document.createElement('b'); b.textContent = h.author; credit.append(b); }
-  facts.append(credit);
-  body.append(h3, style, facts);
+  const body = document.createElement('div'); body.className = 'card-body';
+  const kick = document.createElement('p'); kick.className = 'card-kicker'; kick.textContent = 'Fictional family';
+  const h3 = document.createElement('h3');
+  const a = document.createElement('a'); a.href = pageHref(f.slug); a.textContent = f.title; h3.append(a);
+  const addr = document.createElement('p'); addr.className = 'addr'; addr.textContent = f.address;
+  const tag = document.createElement('p'); tag.className = 'tag'; tag.textContent = f.tagline;
 
-  a.append(thumb, body);
-  li.append(a);
+  const people = document.createElement('div'); people.className = 'card-people';
+  const ul = document.createElement('ul'); ul.className = 'avatars';
+  const colours = ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5'];
+  f.members.slice(0, 5).forEach((m, k) => {
+    const li2 = document.createElement('li'); li2.className = 'avatar'; li2.style.setProperty('--disc', `var(--${colours[k % 5]})`); li2.setAttribute('aria-hidden', 'true');
+    li2.textContent = m.name.charAt(0).toUpperCase(); ul.append(li2);
+  });
+  const who = document.createElement('span'); who.className = 'sr';
+  who.textContent = `Who lives there: ${f.members.map(m => m.name).join(', ')}.`;
+  people.append(ul, who);
+
+  const apps = document.createElement('p'); apps.className = 'chips card-apps';
+  for (const app of f.apps.slice(0, 3)) { const c = document.createElement('span'); c.className = 'chip'; c.textContent = app.name; apps.append(c); }
+  if (f.apps.length > 3) { const c = document.createElement('span'); c.className = 'chip chip-quiet'; c.textContent = `+${f.apps.length - 3}`; apps.append(c); }
+
+  const tour = document.createElement('a'); tour.className = 'tour'; tour.href = tourHref(f.slug);
+  tour.setAttribute('aria-label', `Take the tour of ${f.title}`);
+  tour.innerHTML = 'Take the tour<svg class="i" aria-hidden="true"><use href="#i-next"/></svg>';
+  body.append(kick, h3, addr, tag, people, apps, tour);
+  li.append(thumb, body);
   return li;
-}
-
-function renderTags() {
-  const counts = new Map();
-  for (const h of homes) for (const t of h.tags) counts.set(t, (counts.get(t) || 0) + 1);
-  shownTags = TAGS.map(([name]) => name).filter(n => (counts.get(n) || 0) >= 3 && (counts.get(n) || 0) <= homes.length / 2);
-  if (state.tag && !shownTags.includes(state.tag)) state.tag = '';
-  $('#tags').replaceChildren(...shownTags.map(name => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.className = 'tag'; b.dataset.tag = name;
-    b.append(name);
-    const n = document.createElement('small'); b.append(n);
-    b.addEventListener('click', () => { state.tag = state.tag === name ? '' : name; apply(); });
-    return b;
-  }));
 }
 
 function apply() {
   let n = 0;
   for (const li of $('#grid').children) {
-    const h = homes.find(x => x.id === li.dataset.id);
-    if (!h) continue;
-    const on = matches(h);
+    const f = families.find(x => x.slug === li.dataset.slug);
+    if (!f) continue;
+    const on = matches(f);
     li.hidden = !on;
     if (on) n++;
   }
-  $('.count').textContent = n === homes.length ? String(homes.length) : `${n} of ${homes.length}`;
+  const total = families.length;
+  $('#count').textContent = n === total ? plural(total, 'family', 'families') : `${n} of ${plural(total, 'family', 'families')}`;
   $('#empty').hidden = n !== 0;
-  for (const b of document.querySelectorAll('#storeys button')) b.setAttribute('aria-pressed', String(b.dataset.storeys === state.storeys));
-  // a tag's count is the homes it would show with the search and storeys as they are; a tag that would show
-  // none is greyed out (the pressed one stays pressable, so it can be let go)
-  for (const b of document.querySelectorAll('#tags .tag')) {
-    const name = b.dataset.tag, on = name === state.tag;
-    const c = homes.filter(h => h.tags.includes(name) && storeysOk(h) && queryOk(h)).length;
+  // household counts: the families that facet would show with the topics and the search as they are
+  for (const b of $$('#household [data-household]')) {
+    const h = b.dataset.household, on = h === state.household;
+    b.setAttribute('aria-checked', String(on));
+    b.tabIndex = on ? 0 : -1;
+    const small = b.querySelector('small');
+    if (small) { const c = families.filter(f => f.household === h && topicsOk(f) && queryOk(f)).length; small.textContent = String(c); b.setAttribute('aria-label', `${b.firstChild.textContent.trim()}, ${plural(c, 'family', 'families')}`); }
+  }
+  // topic counts: the families it would show with the household and the search as they are; at none it is off (unless pressed, so it can be let go)
+  for (const b of $$('#topics [data-topic]')) {
+    const t = b.dataset.topic, on = state.topics.has(t);
+    const c = families.filter(f => f.topics.includes(t) && householdOk(f) && queryOk(f) && [...state.topics].filter(x => x !== t).every(x => f.topics.includes(x))).length;
     b.querySelector('small').textContent = String(c);
     b.setAttribute('aria-pressed', String(on));
     b.disabled = c === 0 && !on;
-    b.setAttribute('aria-label', `${name}, ${c} ${c === 1 ? 'home' : 'homes'}`);
+    b.setAttribute('aria-label', `${b.firstChild.textContent.trim()}, ${plural(c, 'family', 'families')}`);
   }
+  const active = (state.household ? 1 : 0) + state.topics.size + (state.q ? 1 : 0);
+  $('#clear-top').hidden = !active;
+  $('#filters-n').textContent = active ? String(active) : '';
   if ($('#q').value !== state.q) $('#q').value = state.q;
   writeUrl();
 }
 
-function stats() {
-  const builders = new Set(homes.map(h => h.author).filter(Boolean));
-  const area = homes.reduce((a, h) => a + (h.areaSqm || 0), 0);
-  $('[data-stat="homes"]').textContent = String(homes.length);
-  $('[data-stat="builders"]').textContent = String(builders.size);
-  $('[data-stat="area"]').textContent = nf.format(Math.round(area / 10) * 10);
-  const hero = homes.find(h => h.id === HERO);
-  if (hero) {
-    for (const el of document.querySelectorAll('[data-hero-name]')) el.textContent = hero.display;
-    $('#hero-play').href = viewerHref(HERO);
-    $('#hero-media').href = viewerHref(HERO);
-    $('#hero-media').setAttribute('aria-label', `Play ${hero.display} in 3D`);
-  }
-}
-
-// The footer's credits: every home against the build it was written from, by that build's own title and its
-// builder. The cards carry only the portal's name and the builder (a title's tooltip is out of reach on a touch
-// screen and to most screen readers), so this is where a home is tied to the build it credits.
-function credits() {
-  const list = $('#builds-list');
-  if (!list) return;
-  list.replaceChildren(...homes.map(h => {
-    const li = document.createElement('li');
-    const b = document.createElement('b'); b.textContent = h.display;
-    li.append(b, ` after “${h.name}”${h.author ? ` by ${h.author}` : ''}`);
-    return li;
-  }));
-  $('#builds').hidden = !homes.length;
-}
-
-// The list did not load: say so where the homes would be, with a way to try again, and put the filters away
-// (they have nothing to filter)
+// The list did not load: say so where the families would be, with a way to try again, and put the filters away
 function failed(on) {
   $('#failed').hidden = !on;
   $('#grid').hidden = on;
-  $('#tags').hidden = on;
-  $('#filters').classList.toggle('off', on);
-  for (const c of document.querySelectorAll('#filters input, #filters button')) c.disabled = on;
-  $('#grid').setAttribute('aria-busy', String(!on && !homes.length));
+  $('#filters').hidden = on;
+  $('#count').hidden = on;
+  $('#grid').setAttribute('aria-busy', String(!on && !families.length));
 }
 
 async function load() {
-  let index;
+  let list;
   try {
-    const res = await fetch('./content/houses/index.json', { cache: homes.length ? 'reload' : 'default' });
-    if (!res.ok) throw new Error(`index.json: ${res.status}`);
-    index = await res.json();
+    const url = document.querySelector('meta[name="vh-families"]').content;
+    const res = await fetch(`./${url}`, { cache: families.length ? 'reload' : 'default' });
+    if (!res.ok) throw new Error(`families: ${res.status}`);
+    list = await res.json();
   } catch (err) {
     console.warn(err);
     failed(true);
     return false;
   }
   failed(false);
-  homes = (index.houses || []).map(h => ({ ...h, name: names.buildName(h), display: names.displayName(h), tags: TAGS.filter(([, re]) => re.test(h.style || '')).map(([name]) => name) }));
-  stats();
-  renderTags();
-  credits();
-  $('#grid').replaceChildren(...homes.map(card));
+  families = list.families.slice().sort((a, b) => a.order - b.order);
+  for (const f of families) f._hay = hay(f);
+  // a topic or a household nobody in this build has is not a choice: take it out of the URL's state
+  $('#grid').replaceChildren(...families.map(card));
   $('#grid').setAttribute('aria-busy', 'false');
   apply();
   return true;
 }
 
+// ---------------------------------------------------------------- the phone's sheet: the same panel, moved into a <dialog>
+function wireSheet() {
+  const sheet = $('#sheet'), panel = $('#filter-panel'), opener = $('#filters-open'), home = $('#filters');
+  if (!sheet || typeof sheet.showModal !== 'function') { opener.hidden = true; return; }
+  const close = () => { if (sheet.open) sheet.close(); };
+  opener.addEventListener('click', () => { $('#sheet-body').append(panel); sheet.showModal(); });
+  sheet.addEventListener('close', () => { home.insertBefore(panel, $('#clear-top')); opener.focus(); });
+  $('#sheet-close').addEventListener('click', close);
+  $('#sheet-done').addEventListener('click', close);
+  $('#sheet-clear').addEventListener('click', () => { clearAll(); });
+  sheet.addEventListener('click', e => { if (e.target === sheet) close(); });   // the backdrop
+  matchMedia('(min-width: 701px)').addEventListener('change', e => { if (e.matches) close(); });
+}
+
+function clearAll() { state.q = ''; state.household = ''; state.topics.clear(); apply(); }
+
 let wired = false;
 function wire() {
   if (wired) return;
   wired = true;
-  // The player's heaviest files, fetched into the cache the first time a card is pointed at or focused, so the
-  // click lands on a warm three.js and engine; and the pointed-at home's spec, which the player fetches with the
-  // HTTP cache (room-creator.html itself is not warmed: the player's URL carries a query, so a request for the
-  // bare page would never be the one used). Not on touch: a finger that starts a scroll on a card is not a
-  // choice, and a phone's data is not ours to spend on one.
-  // Plain low-priority fetches, not <link rel="prefetch">: a browser marks a prefetch `Sec-Purpose: prefetch`, and the
-  // homes.ci.computer zone refuses every such request with a 503 (`cf-speculation-refused`), so nothing was ever warmed
-  // and the console filled with red. And each module is asked for by the URL the player will ask for: the page's import
-  // map names it by a hash of its content (scripts/build-portal.mts), so warming the plain URL would warm a file nobody uses.
+  // The player's heaviest files, fetched into the cache the first time a card is pointed at or focused, so the click lands
+  // on a warm three.js and engine; and the pointed-at family's spec (the player fetches it with the HTTP cache).
+  // Plain low-priority fetches, not <link rel="prefetch">: the live zone refuses a prefetch with a 503. Each module is asked
+  // for by the URL the player will ask for (the import map names it by a hash of its content). Not on touch: a finger that
+  // starts a scroll on a card is not a choice, and a phone's data is not ours to spend on one.
   const imports = (() => { try { return JSON.parse(document.querySelector('script[type="importmap"]').textContent).imports || {}; } catch { return {}; } })();
   const asked = new Set();
   const fetchLow = href => {
     const url = imports[href] || href;
     if (asked.has(url)) return;
     asked.add(url);
-    // read the body so the browser finishes the download and keeps it; the answer is not used
     fetch(url, { priority: 'low' }).then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => { /* a warm-up that fails costs nothing */ });
+  };
+  let manifest = null;
+  const specOf = async slug => {
+    try { manifest ||= await (await fetch('./story/manifest.json')).json(); } catch { return ''; }
+    return (manifest.byFamily[slug] || {}).spec || '';
   };
   let warmed = false;
   const warm = e => {
     if (e.pointerType === 'touch') return;
-    const a = e.target.closest && e.target.closest('.card a, #hero-play, #hero-media');
+    const a = e.target.closest && e.target.closest('.card, #hero-media, #hero-play');
     if (!a) return;
-    const id = new URL(a.href).searchParams.get('house');
-    const urls = warmed ? [] : ['./assets/vendor/three/three.module.min.js', './assets/house-builder.js', './assets/viewer.js'];
-    if (id) urls.push(`./content/houses/${encodeURIComponent(id)}.json`);
+    const link = a.matches('.card') ? a.querySelector('h3 a') : a;
+    const m = /(?:family\/|family=)([a-z-]+)/.exec(link.getAttribute('href') || '');
+    if (!warmed) for (const href of ['./assets/vendor/three/three.module.min.js', './assets/house-builder.js', './assets/viewer.js']) fetchLow(href);
     warmed = true;
-    for (const href of urls) fetchLow(href);
+    if (m) specOf(m[1]).then(u => { if (u) fetchLow(`./${u}`); });
   };
   for (const ev of ['pointerover', 'focusin']) document.addEventListener(ev, warm, { passive: true });
 
   let typing = 0;
   $('#q').addEventListener('input', e => { clearTimeout(typing); typing = setTimeout(() => { state.q = e.target.value.trim(); apply(); }, 80); });
-  for (const b of document.querySelectorAll('#storeys button')) b.addEventListener('click', () => { state.storeys = b.dataset.storeys; apply(); });
-  $('#clear').addEventListener('click', () => { state.q = ''; state.storeys = ''; state.tag = ''; apply(); $('#q').focus(); });
+  for (const b of $$('#household [data-household]')) b.addEventListener('click', () => { state.household = b.dataset.household; apply(); });
+  // a radio group: one tab stop, the arrows move and choose
+  $('#household .radios').addEventListener('keydown', e => {
+    const keys = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 };
+    if (!(e.key in keys)) return;
+    e.preventDefault();
+    const radios = $$('#household [data-household]'), at = radios.findIndex(r => r.getAttribute('aria-checked') === 'true');
+    const next = radios[(at + keys[e.key] + radios.length) % radios.length];
+    state.household = next.dataset.household; apply(); next.focus();
+  });
+  for (const b of $$('#topics [data-topic]')) b.addEventListener('click', () => { const t = b.dataset.topic; if (state.topics.has(t)) state.topics.delete(t); else state.topics.add(t); apply(); });
+  for (const id of ['#clear', '#clear-top']) $(id).addEventListener('click', () => { clearAll(); $('#q').focus(); });
+
+  // the arrow keys move among the cards (Left and Right one card, Up and Down one row, Home and End the first and last)
+  $('#grid').addEventListener('keydown', e => {
+    const link = e.target.closest && e.target.closest('h3 a');
+    if (!link || e.altKey || e.ctrlKey || e.metaKey) return;
+    const cards = $$('#grid .card:not([hidden])'), at = cards.indexOf(link.closest('.card'));
+    if (at < 0) return;
+    const cols = Math.max(1, Math.round($('#grid').clientWidth / (cards[0].getBoundingClientRect().width || 1)));
+    const to = { ArrowRight: at + 1, ArrowLeft: at - 1, ArrowDown: at + cols, ArrowUp: at - cols, Home: 0, End: cards.length - 1 }[e.key];
+    if (to === undefined || to < 0 || to >= cards.length) return;
+    e.preventDefault();
+    cards[to].querySelector('h3 a').focus();
+  });
   window.addEventListener('keydown', e => {
-    if (!homes.length) return;
-    if (e.key === '/' && document.activeElement !== $('#q') && !e.metaKey && !e.ctrlKey) { e.preventDefault(); $('#q').focus(); }
+    if (!families.length) return;
+    const typing = ['INPUT', 'TEXTAREA'].includes(document.activeElement && document.activeElement.tagName);
+    if (e.key === '/' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey) { e.preventDefault(); $('#q').focus(); }
     if (e.key === 'Escape' && document.activeElement === $('#q')) { state.q = ''; apply(); $('#q').blur(); }
   });
+  wireSheet();
 }
 
 async function main() {
   readUrl();
-  names = await namesReady;
   $('#retry').addEventListener('click', async () => {
     const b = $('#retry');
     b.disabled = true; b.setAttribute('aria-busy', 'true');

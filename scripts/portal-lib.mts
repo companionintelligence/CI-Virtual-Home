@@ -40,6 +40,7 @@ const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
   '.glb': 'model/gltf-binary', '.ico': 'image/x-icon', '.md': 'text/markdown; charset=utf-8',
+  '.xml': 'application/xml', '.m4a': 'audio/mp4', '.mp4': 'video/mp4', '.vtt': 'text/vtt; charset=utf-8',
 };
 export const FONT_FILES: Record<string, string> = { manrope: 'manrope-latin-var.woff2', 'jetbrains-mono': 'jetbrains-mono-latin-var.woff2' };
 
@@ -62,6 +63,8 @@ export async function serve(dir: string, base = '/', listenPort = 0): Promise<Se
       file = path.join(root, pathname.slice(base.length));
       if (!file.startsWith(root)) file = null;
       else if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
+      // Cloudflare Pages serves family/<slug>.html at /family/<slug> (no extension); so does this
+      else if (!path.extname(file) && !fs.existsSync(file) && fs.existsSync(`${file}.html`)) file = `${file}.html`;
     }
     if (!file || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); return; }
     res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });

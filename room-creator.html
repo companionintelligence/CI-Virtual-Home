@@ -15,15 +15,17 @@
   <script>
     (function () {
       var q = new URLSearchParams(location.search), d = document.documentElement, id = q.get('house') || 'aurora';
+      var pub = window.__VH_PUBLIC;   // only in dist/ (scripts/story/site.mts writes it): the public site, which has families, not houses
       if (q.get('mode') !== 'view') {
+        if (pub) { location.replace('./index.html'); return; }   // the editor lists the specs' names and credits: it is not served publicly
         document.write('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
           + '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">');
         return;
       }
       d.dataset.mode = 'view';
       // the player's own title from the start (the static one above is the editor's), then the home's
-      document.title = 'Virtual homes · Companion Intelligence';
-      if (/^[a-z0-9-]+$/.test(id)) d.style.setProperty('--vh-poster', 'url("' + new URL('./portal/thumbs/' + id + '.webp', location.href).href + '")');
+      document.title = 'Companion Core · Companion Intelligence';
+      if (!pub && /^[a-z0-9-]+$/.test(id)) d.style.setProperty('--vh-poster', 'url("' + new URL('./portal/thumbs/' + id + '.webp', location.href).href + '")');
       document.write('<link rel="stylesheet" href="./portal/viewer.css">');
       // The list of homes, asked for now, beside three.js and the engine: the loader names the home long before
       // the player mounts, and viewer.ts and the page's first build take this promise instead of fetching again.
@@ -31,8 +33,47 @@
       // to __vhNames: a module asked for before the import map would make a browser without multiple-import-map
       // support drop the map, and three.js with it. If it did not download, the loader says "Loading" and the tab
       // keeps the site's title: the spec's own name is the Sims build's, jargon and all, and not the portal's.
-      window.__vhIndex = fetch('./content/houses/index.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
       var cssString = function (v) { return '"' + String(v).replace(/["\\]/g, '\\$&') + '"'; };
+      // The public site: the page's "house id" is the family's slug. story/manifest.json (revalidated on every load) names
+      // the family list, the legacy-link map and each family's sanitised spec, all by content hash. window.__vhIndex is
+      // { houses: [{ id: slug, title, address, thumb }] }, window.__vhWant the slug the address asks for (the `family`
+      // parameter, or an old ?house= link found by the first 12 hex of its SHA-256 and rewritten to ?family= at once, so
+      // the old id never stays in the address bar), and __vhSpecUrl(slug) where loadHouse() fetches the spec from.
+      if (pub) {
+        var specs = {};
+        window.__vhSpecUrl = function (slug) { return specs[slug]; };
+        window.__vhWant = null;
+        window.__vhIndex = fetch('./story/manifest.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (m) {
+          if (!m) return null;
+          var lg = !q.get('family') && q.get('house') ? fetch(m.legacy).then(function (r) { return r.json(); }).catch(function () { return null; }) : null;   // (beside the list, not after it)
+          return fetch(m.families).then(function (r) { return r.json(); }).then(function (list) {
+            var houses = list.families.map(function (c) { specs[c.slug] = m.byFamily[c.slug] && m.byFamily[c.slug].spec; return { id: c.slug, title: c.title, address: c.address, thumb: c.thumb }; });
+            var fam = q.get('family'), old = q.get('house');
+            var done = function (slug) {
+              var h = houses.filter(function (x) { return x.id === slug && specs[slug]; })[0];
+              window.__vhWant = h ? slug : null;
+              if (h) {
+                d.style.setProperty('--vh-poster', 'url("' + new URL('./' + h.thumb, location.href).href + '")');
+                d.style.setProperty('--vh-boot-name', cssString(h.title));
+                d.style.setProperty('--vh-boot-meta', cssString(h.address + ' \u00b7 Fictional family. Real software.'));
+                if (!d.dataset.viewer || d.dataset.viewer === 'failed' || d.dataset.viewer === 'no-webgl') document.title = h.title + ' \u00b7 Companion Core';
+              } else d.style.removeProperty('--vh-poster');
+              return { houses: houses };
+            };
+            if (fam || !old) return done(/^[a-z]+(-[a-z]+){0,2}$/.test(fam || '') && fam.length <= 32 ? fam : null);
+            if (!(window.crypto && crypto.subtle)) return done(null);
+            return crypto.subtle.digest('SHA-256', new TextEncoder().encode(old)).then(function (b) {
+              var key = Array.prototype.map.call(new Uint8Array(b), function (x) { return ('0' + x.toString(16)).slice(-2); }).join('').slice(0, 12);
+              return lg.then(function (map) {
+                var slug = (map && map[key]) || null;
+                if (slug) { var n = new URLSearchParams(location.search); n.delete('house'); n.set('family', slug); try { history.replaceState(null, '', '?' + n.toString() + location.hash); } catch (e) { /* sandboxed */ } }
+                return done(slug);
+              });
+            }).catch(function () { return done(null); });
+          });
+        }).catch(function () { return null; });
+      } else {
+      window.__vhIndex = fetch('./content/houses/index.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
       window.__vhNames = function (names) { Promise.all([window.__vhIndex, names]).then(function (r) {
         var j = r[0], n = r[1];
         var h = j && (j.houses || []).filter(function (x) { return x.id === id; })[0];
@@ -41,21 +82,21 @@
           if (name) d.style.setProperty('--vh-boot-name', cssString(name));
           // the credit and the facts, as the player's loading card writes them (viewer.ts metaLine)
           var meta = [];
-          if (h.author) meta.push('By ' + h.author);
           if (h.storeys) meta.push(h.storeys + (h.storeys === 1 ? ' storey' : ' storeys'));
           if (h.areaSqm) meta.push(h.areaSqm + ' m²');
           if (meta.length) d.style.setProperty('--vh-boot-meta', cssString(meta.join(' · ')));
-          if (name && (!d.dataset.viewer || d.dataset.viewer === 'failed' || d.dataset.viewer === 'no-webgl')) document.title = name + ' · Virtual homes';
+          if (name && (!d.dataset.viewer || d.dataset.viewer === 'failed' || d.dataset.viewer === 'no-webgl')) document.title = name + ' \u00b7 Companion Core';
         }
         // an id the list does not have has no thumbnail either: drop the poster before the player's loader asks
         // for it a second time (the first paint may already have asked once)
         else if (j) d.style.removeProperty('--vh-poster');
       }); };
+      }
       // a way back to the gallery from the first paint on (the player's own back button takes over when it mounts)
       (function back() {
         if (!document.body) { setTimeout(back, 30); return; }
         var a = document.createElement('a');
-        a.className = 'vh-boot-back'; a.href = './index.html'; a.setAttribute('aria-label', 'All homes'); a.title = 'All homes';
+        a.className = 'vh-boot-back'; a.href = './index.html#families'; a.setAttribute('aria-label', 'All families'); a.title = 'All families';
         a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>';
         document.body.appendChild(a);
       })();
@@ -71,13 +112,13 @@
         d.dataset.viewer = state;
         var box = document.createElement('div');
         box.className = 'vh-fail'; box.setAttribute('role', 'alert');
-        box.innerHTML = '<img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./index.html">See all homes</a></div>';
+        box.innerHTML = '<img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./index.html#families">See all families</a></div>';
         box.querySelector('h2').textContent = title;
         box.querySelector('p').textContent = msg;
         if (retry) box.querySelector('button').addEventListener('click', function () { location.reload(); });
         (function put() { if (document.body) document.body.appendChild(box); else setTimeout(put, 30); })();
       }
-      function fail(msg) { card('failed', 'This home could not be opened.', msg, true); }
+      function fail(msg) { card('failed', 'This tour could not be opened.', msg, true); }
       window.__vhFail = fail;
       window.__vhBooted = function () { booted = true; };
       // three.js r169 draws with WebGL 2 only: a browser with just WebGL 1 would pass a looser test and then fail
@@ -94,7 +135,7 @@
         if (t && t.tagName === 'SCRIPT') fail('Part of the player did not download. Check the connection and try again.');
         else if (t === window && !booted) fail(/webgl/i.test(e.message || '')
           ? 'This browser could not start 3D (WebGL 2 would not open). Try a recent Chrome, Edge, Firefox or Safari, with hardware acceleration on.'
-          : 'The player stopped while starting. Try again, or pick another home.');
+          : 'The player stopped while starting. Try again, or pick another family.');
       }, true);
     })();
   </script>
@@ -7635,7 +7676,7 @@
       // The editor always reads the spec on disk (it is where specs are edited); the portal's player goes through
       // the HTTP cache, so the spec the gallery warmed on hover is the one it builds.
       const viewMode = document.documentElement.dataset.mode === 'view';
-      const res = await fetch(`./content/houses/${encodeURIComponent(id)}.json`, { cache: viewMode ? 'default' : 'no-store' });
+      const res = await fetch((window.__vhSpecUrl && window.__vhSpecUrl(id)) || `./content/houses/${encodeURIComponent(id)}.json`, { cache: viewMode ? 'default' : 'no-store' });
       if (!res.ok) throw new Error(`House spec "${id}" not found (${res.status})`);
       const spec = await res.json();
       houseSpecs.set(id, spec);
@@ -7977,7 +8018,7 @@
     // viewer.ts to say so, instead of building the editor's garden house behind the message. It has no use for the
     // editor's scene-preset catalogue either.
     const initialLoad = VIEW_MODE
-      ? Promise.resolve(window.__vhIndex).then(j => (j && !(j.houses || []).some(h => h.id === houseParam) ? null : loadHouse(houseParam))).catch(err => { console.warn('viewer: could not load', houseParam, err); return null; })
+      ? Promise.resolve(window.__vhIndex).then(j => { const id = window.__VH_PUBLIC ? window.__vhWant : houseParam; return j && !(j.houses || []).some(h => h.id === id) ? null : id && loadHouse(id); }).catch(err => { console.warn('viewer: could not load', houseParam, err); return null; })
       : houseParam ? loadHouse(houseParam).catch(err => { console.error(err); toasts.show(`No home "${houseParam}" could be built (${err.message}). Showing the studio garden house.`, { kind: 'error' }); loadPresetScene('pascal-garden-house'); }) : Promise.resolve(loadPresetScene(initialPreset));
     if (!VIEW_MODE) populateHouseCatalog();
 
@@ -10056,7 +10097,7 @@
         });
       }).catch(err => {
         console.error('viewer failed to start', err);
-        window.__vhFail?.(/import|fetch/i.test(String(err && err.message)) ? 'Part of the player did not download. Check the connection and try again.' : 'The player stopped while starting. Try again, or pick another home.');
+        window.__vhFail?.(/import|fetch/i.test(String(err && err.message)) ? 'Part of the player did not download. Check the connection and try again.' : 'The player stopped while starting. Try again, or pick another family.');
       });
     }
 
