@@ -57,7 +57,7 @@ const BIG: Record<string, Row> = {
   day:    { deep: 0x1c4a5a, shallow: 0x4d8c96, scatter: 0x1a5c70, scatterK: 0.03, chop: 1.0, tint: 1.0, env: 1.9 },
   golden: { deep: 0x233f50, shallow: 0x5a8090, scatter: 0x3a5a66, scatterK: 0.03, chop: 1.0, tint: 1.0, env: 1.7 },
   dusk:   { deep: 0x233a52, shallow: 0x4f6c88, scatter: 0x3b5268, scatterK: 0.03, chop: 1.0, tint: 1.0, env: 1.5 },
-  night:  { deep: 0x0b2036, shallow: 0x1a3e5a, scatter: 0x16385a, scatterK: 0.08, chop: 1.0, tint: 1.0, env: 1.8 },
+  night:  { deep: 0x10294a, shallow: 0x214a6e, scatter: 0x1a4268, scatterK: 0.14, chop: 1.0, tint: 1.0, env: 2.3 },
 };
 
 // ---------------------------------------------------------------------------------------------------------------
