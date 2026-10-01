@@ -66,7 +66,9 @@ window.__bed = (function () {
     sess.addEventListener('visibilitychange', () => { B.hidden = sess.visibilityState === 'hidden'; if (B.hidden && B.state.down) { B.state.down = null; B.cancelled = (B.cancelled || 0) + 1; draw(); } });
     await renderer.xr.setSession(sess);
     // page rAF is paused during a headset session: emulate that, but let IWER's own device frame through
-    if (pausePageRaf) { B.realRaf = window.requestAnimationFrame; const real = B.realRaf.bind(window); window.requestAnimationFrame = (cb) => (cb && cb.name === 'onDeviceFrame') ? real(cb) : 0; }
+    // (a headset browser holds the page's rAF callbacks and runs them again when the session ends, so the bed queues them and replays them in stop())
+    B.pending = [];
+    if (pausePageRaf) { B.realRaf = window.requestAnimationFrame; const real = B.realRaf.bind(window); let n = 1e6; window.requestAnimationFrame = (cb) => { if (cb && cb.name === 'onDeviceFrame') return real(cb); B.pending.push(cb); return ++n; }; }
     const gl = renderer.getContext();
     B.initBlink();
     // renderer.xr.setAnimationLoop, not renderer.setAnimationLoop: the latter also starts a SECOND loop on the page's rAF (measured)
@@ -130,7 +132,7 @@ window.__bed = (function () {
   B.stop = async function () {
     const { renderer, scene, camera } = B; const s = B.session;
     await s.end(); await new Promise(r => setTimeout(r, 200));
-    renderer.xr.setAnimationLoop(null); renderer.xr.enabled = B.savedXr; if (B.realRaf) window.requestAnimationFrame = B.realRaf;
+    renderer.xr.setAnimationLoop(null); renderer.xr.enabled = B.savedXr; if (B.realRaf) { window.requestAnimationFrame = B.realRaf; for (const cb of B.pending.splice(0)) window.requestAnimationFrame(cb); }
     B.rig.remove(camera); if (B.savedParent) B.savedParent.add(camera); camera.position.copy(B.savedPos); camera.quaternion.copy(B.savedQuat);
     // three's WebXRManager overwrites fov/near/far/aspect/projection and never restores them: the bed does (window.__bedNoCamRestore = true is the negative control)
     if (!window.__bedNoCamRestore) { const c = B.savedCam; camera.fov = c.fov; camera.near = c.near; camera.far = c.far; camera.zoom = c.zoom; camera.aspect = c.aspect; camera.updateProjectionMatrix(); }

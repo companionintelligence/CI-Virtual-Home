@@ -310,8 +310,12 @@ export interface Ctx {
   check(cond: any, msg: string): void;                                   // a failed expectation (Fail), after recording it was checked
   note(key: string, value: any): void;                                   // a measurement printed with the result
   skip(reason: string): never;
+  /** a negative control caused errors on purpose: ignore page errors matching this when the case ends (everything else still fails it) */
+  forgive(re: RegExp): void;
   needsProduct(tree: Tree): void;                                        // skip (or fail, per --require-session) when the tree has no XR modules
   screenshot(p: P, name: string): Promise<string>;
+  /** a served copy of dist/ with a FAKE product XR module added (fake-xr.mts), for validating the checks themselves */
+  fake(o?: { eager?: boolean; heavy?: boolean; cdn?: boolean }): Promise<Tree>;
 }
 export interface Case { id: string; title: string; devices?: Device[]; run(t: Ctx): Promise<void> }
 export const defineCase = (c: Case): Case => c;

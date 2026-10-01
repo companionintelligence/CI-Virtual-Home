@@ -25,12 +25,14 @@ import {
   ROOT, SUBPATH, DEVICES, Fail, Skip, loadPlaywright, LAUNCH_ARGS, serve, openPage, treeHasXr, parseArgs, iwerVersion,
   isCase, type Case, type Ctx, type Device, type OpenOpts, type P, type Tree, type Driver,
 } from './xr-harness/lib.mts';
+import { makeFakeXrTree, type FakeOpts } from './xr-harness/fake-xr.mts';
 
 const args = parseArgs(process.argv.slice(2));
 const only = args.only && args.only !== 'true' ? String(args.only).split(',').map(s => s.trim().toLowerCase()).filter(Boolean) : null;
 const HOUSE = args.house && args.house !== 'true' ? args.house : 'cutestarter';
 const DRIVER = (args.driver && args.driver !== 'true' ? args.driver : 'auto') as Driver;
 const REQUIRE = args['require-session'] === 'true';
+const FAKE = args['fake-xr'] === 'true';
 const TIMEOUT = Number(args.timeout || 300000);
 const SHOTS = path.resolve(args.shots && args.shots !== 'true' ? args.shots : path.join(ROOT, 'test', 'xr'));
 const DIST = path.resolve(args.dir && args.dir !== 'true' ? args.dir : path.join(ROOT, 'dist'));
@@ -53,13 +55,26 @@ if (!selected.length) { console.error(`no case matches --only ${args.only} (${en
 
 // ---------------------------------------------------------------------------------------------------------------- servers and browser
 const trees: Partial<Record<'dist' | 'root', Tree>> = {};
+const temps: string[] = [];
 async function tree(name: 'dist' | 'root'): Promise<Tree> {
   if (trees[name]) return trees[name]!;
   const dir = name === 'dist' ? DIST : ROOT, base = name === 'dist' ? SUBPATH : '/';
   if (!fs.existsSync(path.join(dir, 'room-creator.html'))) { throw new Fail(`no ${path.join(dir, 'room-creator.html')}: run pnpm run build && pnpm run portal:build`); }
-  const srv = await serve(dir, base);
-  return (trees[name] = { dir, base, srv, hasXr: treeHasXr(dir), name });
+  // --fake-xr: run every case against a copy of dist/ with a FAKE product module (fake-xr.mts): validates the harness's session path
+  // before the real assets/xr/ exists. It is never a substitute for the real tree: the result line says "fake".
+  const used = name === 'dist' && FAKE ? makeFakeXrTree(dir, {}) : dir;
+  if (used !== dir) temps.push(used);
+  const srv = await serve(used, base);
+  return (trees[name] = { dir: used, base, srv, hasXr: treeHasXr(used), name });
 }
+
+async function fakeTree(o: FakeOpts = {}): Promise<Tree> {
+  if (!fs.existsSync(path.join(DIST, 'room-creator.html'))) throw new Fail(`no ${DIST}/room-creator.html: run pnpm run build && pnpm run portal:build`);
+  const dir = makeFakeXrTree(DIST, o); temps.push(dir);
+  const srv = await serve(dir, SUBPATH); extra.push(srv);
+  return { dir, base: SUBPATH, srv, hasXr: treeHasXr(dir), name: 'dist' };
+}
+const extra: Awaited<ReturnType<typeof serve>>[] = [];
 
 const pw = await loadPlaywright();
 let browser: any = null;
@@ -72,14 +87,15 @@ const results: Result[] = [];
 const INFRA = /Timeout|timed out|Target (page|closed|crashed)|browser has been closed|Browser closed|crash|Protocol error|Execution context was destroyed/i;
 
 async function runOne({ file, c }: Entry, device: Device, attempt: number): Promise<Result> {
-  const t0 = Date.now(); const pages: P[] = []; const notes: Record<string, any> = {};
+  const t0 = Date.now(); const pages: P[] = []; const notes: Record<string, any> = {}; const forgiven: RegExp[] = [];
   const t: Ctx = {
     device, house: HOUSE, driver: DRIVER, args, shots: SHOTS,
-    tree,
+    tree, fake: fakeTree,
     async open(o) { const tr = o.tree || await tree(o.treeName || 'dist'); const p = await openPage(browser, { house: HOUSE, device, ...o, tree: tr }); pages.push(p); return p; },
     check(cond, msg) { if (!cond) throw new Fail(msg); },
     note(k, v) { notes[k] = v; },
     skip(reason) { throw new Skip(reason); },
+    forgive(re) { forgiven.push(re); },
     needsProduct(tr) {
       if (DRIVER === 'bed' || tr.hasXr) return;
       if (REQUIRE) throw new Fail(`this tree has no assets/xr/ (entry.js, session.js), and --require-session was given`);
@@ -92,7 +108,7 @@ async function runOne({ file, c }: Entry, device: Device, attempt: number): Prom
   try {
     await Promise.race([c.run(t), timer]);
     // any uncaught error or console.error on any page the case opened fails it, unless the case consumed it with p.expect()
-    const bad = pages.flatMap(p => p.errors);
+    const bad = pages.flatMap(p => p.errors).filter(e => !forgiven.some(re => re.test(e)));
     if (bad.length) throw new Fail(`${bad.length} page error(s): ${bad.slice(0, 3).join(' | ')}`);
   } catch (e: any) {
     if (e instanceof Skip) { state = 'skip'; msg = e.message; }
@@ -103,7 +119,7 @@ async function runOne({ file, c }: Entry, device: Device, attempt: number): Prom
   return { id: c.id, file, device, state, ms: Date.now() - t0, msg, notes };
 }
 
-console.log(`xr:test  iwer ${iwerVersion()}  house ${HOUSE}  devices ${wantDevices.join(',')}  driver ${DRIVER}  ${selected.length} case(s)`);
+console.log(`xr:test${FAKE ? ' (FAKE product module: harness validation only)' : ''}  iwer ${iwerVersion()}  house ${HOUSE}  devices ${wantDevices.join(',')}  driver ${DRIVER}  ${selected.length} case(s)`);
 try {
   for (const e of selected) {
     for (const device of wantDevices) {
@@ -120,6 +136,8 @@ try {
 } finally {
   await browser.close().catch(() => {});
   for (const tr of Object.values(trees)) await tr!.srv.close().catch(() => {});
+  for (const s of extra) await s.close().catch(() => {});
+  for (const d of temps) fs.rmSync(d, { recursive: true, force: true });
 }
 
 const n = (s: string) => results.filter(r => r.state === s).length;

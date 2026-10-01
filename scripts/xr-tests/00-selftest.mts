@@ -2,6 +2,7 @@
 // product's session: they test the EMULATION and the CHECKS (stereo geometry, hover and press on controllers versus the transient
 // profile, the blink-comfort check and its negative control), so a later green result for the product means something.
 // @check-house skip — needs the built dist and a GPU browser; run pnpm run xr:test
+import { checkLazy, expectFail } from '../xr-harness/checks.mts';
 import { defineCase, enterSession, endSession, tickFrames, eyes, startComfort, comfortReport, stopComfort, xrFrames, sleep, until, type P } from '../xr-harness/lib.mts';
 
 const IPD = 0.063;     // IWER's default inter-pupillary distance in metres; the Quest and Vision profiles both use it
@@ -122,5 +123,19 @@ export const comfort = defineCase({
     t.note('smoothFlagged', bad.movesWhileVisible);
     await stopComfort(p);
     await endSession(p, e);
+  },
+});
+
+export const lazyChecks = defineCase({
+  id: 'XSELF-lazy', title: 'the T-LAZY check passes a lazy fake module and fails an eager one, a heavy entry and a session that fetches from a CDN',
+  async run(t) {
+    t.forgive(/Failed to load resource|ERR_BLOCKED/);       // the CDN control's fetch is refused by the harness on purpose
+    const lazy = await t.fake({});
+    const r = await checkLazy(t, lazy);
+    t.check(r.entryLoaded && r.afterTapXr.some(f => /session/.test(f)), 'the lazy fake did not load entry before and session after the tap');
+    t.note('lazyDeltaBytes', r.deltaBytes);
+    t.note('eager', await expectFail('eager session', /session module must wait/, async () => { await checkLazy(t, await t.fake({ eager: true })); }));
+    t.note('heavy', await expectFail('heavy entry', /bytes \(gzip\) to the first player load/, async () => { await checkLazy(t, await t.fake({ heavy: true })); }));
+    t.note('cdn', await expectFail('session fetching a CDN', /another origin/, async () => { await checkLazy(t, await t.fake({ cdn: true })); }));
   },
 });
