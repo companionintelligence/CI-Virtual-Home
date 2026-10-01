@@ -114,7 +114,7 @@ const coreCover = (page: any): Promise<number> => page.evaluate(() => {
 // ------------------------------------------------------------------ gallery
 async function gallery(viewport: { width: number; height: number }, mobile: boolean, label: string) {
   console.log(`\ngallery ${label}`);
-  const { page, errors, thirdParty, close } = await open(viewport, mobile);
+  const { page, errors, thirdParty, requests, close } = await open(viewport, mobile);
   // the hero figures a visitor without JavaScript (or a crawler) reads, before gallery.js replaces them
   const staticStats = await (await fetch(srv.url('index.html'))).text().then(t => ['homes', 'builders', 'area'].map(k => (t.match(new RegExp(`data-stat="${k}">([^<]*)<`)) || [])[1]));
   await page.goto(srv.url('index.html'));
@@ -141,13 +141,17 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   await shot(page, `gallery-${label}`);
   const visible = () => page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length);
   if (!mobile) {
-    // a pointer over a card warms three.js, the engine and that home's spec — never room-creator.html, whose
-    // player URL carries a query and so could never be served from that prefetch
+    // a pointer over a card warms three.js, the engine and that home's spec — never room-creator.html, whose player URL
+    // carries a query and so could never be served from that request. They are ordinary fetches (a prefetch is refused with
+    // a 503 by the live zone), and the engine's modules are asked for by the hash the player will use
+    const before = requests.length;
     await page.hover('#grid .card:nth-child(5) a');
-    await sleep(200);
-    const warmed: string[] = await page.$$eval('link[rel="prefetch"]', (ls: HTMLLinkElement[]) => ls.map(l => l.getAttribute('href') || ''));
+    await sleep(1500);
+    const warmed: string[] = requests.slice(before).map((u: string) => u.replace(srv.origin, '')).filter((u: string) => /\/(assets|content)\//.test(u));
     const id5 = await page.$eval('#grid .card:nth-child(5)', (e: HTMLElement) => e.dataset.id);
-    ok(warmed.includes('./assets/vendor/three/three.module.min.js') && warmed.includes(`./content/houses/${id5}.json`) && !warmed.some(h => h.includes('room-creator')), `hovering a card warms ${warmed.length} files, not the page`);
+    const viewerUrl = await page.evaluate(() => JSON.parse(document.querySelector('script[type="importmap"]')!.textContent!).imports['./assets/viewer.js']);
+    ok(warmed.some(u => u.includes('assets/vendor/three/three.module.min.js')) && warmed.some(u => u.includes(`content/houses/${id5}.json`)) && warmed.some(u => u.endsWith(viewerUrl.replace(/^\.\//, ''))) && !warmed.some(u => u.includes('room-creator')), `hovering a card warms ${warmed.length} files (the engine by its hash), not the page`);
+    ok(await page.$$eval('link[rel="prefetch"]', (ls: Element[]) => ls.length) === 0, 'and with plain fetches: no <link rel="prefetch"> (the live zone refuses those with a 503)');
   }
   await page.fill('#q', 'brick');
   await sleep(250);
