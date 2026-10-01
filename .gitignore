@@ -46,3 +46,6 @@ __pycache__/
 .DS_Store
 .idea/
 .vscode/
+
+# Prep-time tools and the CC0 source downloads (scripts/prep-assets.mts installs and fills it; nothing here is source)
+.cache/prep-tools/
