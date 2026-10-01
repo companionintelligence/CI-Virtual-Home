@@ -34,12 +34,18 @@ export type Probe = {
   saveData: boolean;
   effectiveType: string | null;
   ms: number;              // what the probe cost
+  msGl: number;            // …of which the part that asks the GPU process (the renderer string)
 };
 
 const HARD_RENDERER = /swiftshader|mali|adreno|llvmpipe|software/i;
 const SOFT_RENDERER = /intel/i;
 
-export function probeDevice(gl: any, params: URLSearchParams): Probe {
+// What the probe reads of the renderer: its context (for the unmasked renderer string, the one call that has to ask the
+// GPU process) and the numbers three.js has already cached, so the rest costs nothing.
+export type ProbeSource = { gl: any; maxTexture?: number; floatTargets?: boolean };
+
+export function probeDevice(src: ProbeSource, params: URLSearchParams): Probe {
+  const gl = src.gl;
   const t0 = performance.now();   // the player's clock, for the report only
   const nav: any = navigator;
   const reasons: string[] = [];
@@ -59,13 +65,11 @@ export function probeDevice(gl: any, params: URLSearchParams): Probe {
   if (saveData) harden('saveData');
   if (effectiveType && effectiveType !== '4g') harden(`effectiveType ${effectiveType}`);
 
-  let maxTexture = 0, floatTargets = false, renderer = '';
+  let maxTexture = 0, floatTargets = false;
   try {
     if (gl) {
-      maxTexture = Number(gl.getParameter(gl.MAX_TEXTURE_SIZE)) || 0;
-      floatTargets = !!gl.getExtension('EXT_color_buffer_float') || !!gl.getExtension('EXT_color_buffer_half_float');
-      const info = gl.getExtension('WEBGL_debug_renderer_info');
-      renderer = String(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) || '');
+      maxTexture = src.maxTexture ?? (Number(gl.getParameter(gl.MAX_TEXTURE_SIZE)) || 0);
+      floatTargets = src.floatTargets ?? (!!gl.getExtension('EXT_color_buffer_float') || !!gl.getExtension('EXT_color_buffer_half_float'));
     }
   } catch { /* a lost context: the checks below treat it as weak */ }
   if (!gl) harden('no WebGL context');
@@ -73,16 +77,41 @@ export function probeDevice(gl: any, params: URLSearchParams): Probe {
     if (maxTexture < 4096) harden(`MAX_TEXTURE_SIZE ${maxTexture}`);
     if (!floatTargets) harden('no float render targets');
   }
-  if (HARD_RENDERER.test(renderer)) harden(`renderer ${renderer}`);
-  else if (SOFT_RENDERER.test(renderer)) soft(`renderer ${renderer}`);
 
   const q = params.get('q');
   const forced: Tier | null = q === '0' || q === '1' || q === '2' ? (Number(q) as Tier) : null;
-  if (forced !== null && forced === 0) reasons.push('?q=0');
-  const weak = reasons.length > 0;
-  const tier: Tier = forced !== null ? forced : weak ? 0 : 1;
-  const ceiling: Tier = forced !== null ? forced : hard ? 0 : weak ? 1 : 2;
-  return { tier, ceiling, forced, reasons, hard, renderer, maxTexture, floatTargets, cores, memoryGb, coarse, saveData, effectiveType, ms: Math.round((performance.now() - t0) * 100) / 100 };
+  if (forced === 0) reasons.push('?q=0');
+  const probe: Probe = { tier: 1, ceiling: 2, forced, reasons, hard, renderer: '', maxTexture, floatTargets, cores, memoryGb, coarse, saveData, effectiveType, ms: 0, msGl: 0 };
+  decide(probe);
+  probe.ms = Math.round((performance.now() - t0) * 100) / 100;
+  return probe;
+}
+
+// (re)decide where the page starts from what the probe has seen so far
+function decide(p: Probe): void {
+  const weak = p.reasons.length > 0 || p.forced === 0;
+  p.tier = p.forced !== null ? p.forced : weak ? 0 : 1;
+  p.ceiling = p.forced !== null ? p.forced : p.hard ? 0 : weak ? 1 : 2;
+}
+
+/**
+ * The renderer string, read later than the rest of the probe on purpose: the first query on a context that has commands in
+ * flight waits for them (6 to 9 ms measured at mount while the house builds, a few tenths once it is built), so it is asked
+ * at the first install, before any feature is. It only ever lowers the start (an Intel or software GPU), and a renderer
+ * string that is not on the lists changes nothing: the frame rate decides from there.
+ */
+export function readRenderer(p: Probe, gl: any): void {
+  if (p.renderer || !gl) return;
+  const t0 = performance.now();
+  try {
+    const info = gl.getExtension('WEBGL_debug_renderer_info');
+    p.renderer = String(info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER) || '');
+  } catch { /* a lost context */ }
+  if (HARD_RENDERER.test(p.renderer)) { p.reasons.push(`renderer ${p.renderer}`); p.hard = true; }
+  else if (SOFT_RENDERER.test(p.renderer)) p.reasons.push(`renderer ${p.renderer}`);
+  decide(p);
+  p.msGl = Math.round((performance.now() - t0) * 100) / 100;
+  p.ms = Math.round((p.ms + p.msGl) * 100) / 100;
 }
 
 export type Ladder = {
@@ -92,6 +121,8 @@ export type Ladder = {
   shed(fps: number): boolean;
   /** a long run at full speed: try the rung above. true: the tier moved. */
   promote(): boolean;
+  /** the probe learned something (the renderer string) before anything was installed: start from its tier */
+  restart(): void;
   stats(): { tier: Tier; start: Tier; ceiling: Tier; forced: boolean; banned: Tier[]; futile: boolean; moves: string[] };
 };
 
@@ -139,6 +170,7 @@ export function createLadder(o: {
       promotedTo = tier;
       return true;
     },
+    restart() { if (!moves.length && !forced) tier = probe.tier; },
     stats: () => ({ tier, start: probe.tier, ceiling: probe.ceiling, forced, banned: [...banned], futile, moves: moves.slice() }),
   };
 }

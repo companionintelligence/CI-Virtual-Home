@@ -47,6 +47,12 @@
 //                   glass without the transmission pass), viewer-batch.ts (the player's live-only batching), home-names.ts,
 //                   the page's editor UI and overlays, light-guard.ts (the live player's cheap spot and point lights;
 //                   installed only under ?mode=view)
+//   live realism    the player's look-only effects (README → Live realism), view mode only, none of it in a product frame:
+//                   realism.ts (the registry and the lifecycle), viewer-quality.ts (the device probe and the tier ladder),
+//                   realism-ao.ts / realism-water.ts / realism-sky.ts / realism-grass.ts / realism-assets.ts / realism-frame.ts
+//                   (one feature each, the thin eager entry), and the lazily loaded parts behind them: viewer-ao.ts,
+//                   viewer-contact.ts, viewer-water.ts, viewer-ocean.ts, viewer-sky.ts, viewer-grass.ts, viewer-bake.ts,
+//                   viewer-composer.ts, media-registry.ts, media-assets.ts
 // Every stream also owns its spec fragment (spec/<stream>.ts), validator plugin (scripts/validate/<stream>.mts),
 // scene checks (scene-qa/<stream>.ts), fleet metrics (scripts/fleet/<stream>.mts) and plan.json key
 // (plan-export/<stream>.ts). room-creator.html's shared builders alternate between streams: read its OWNER banners.

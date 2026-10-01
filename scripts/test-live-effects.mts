@@ -5,7 +5,7 @@
 //   --base    a checkout of the commit the player must still equal when every effect is off (BASE_SHA, a built tree:
 //             pnpm install && pnpm run build). `auto` (default) makes a detached worktree of it under the temp dir and
 //             builds it; `none` skips the comparison with it.
-//   --only    run one package's scripts/live-checks/<key>.mts and nothing else
+//   --only    run one package's scripts/live-checks/<key>.mts and nothing else (env.base is null unless --base is given too)
 //   --quick   two houses, day only
 //
 // Built-in checks (every one is a hash of the player's canvas, drawn on this machine's GPU, so it is a comparison
@@ -37,7 +37,9 @@ export type LivePage = {
   effects(): Promise<any>;
   /** sha256 of the canvas after one draw of the scene by the page's renderer (what a plain frame is), in the same task */
   hash(): Promise<string>;
-  /** sha256 of a screenshot of the canvas (what the player drew itself, effects and all; the controls are hidden) */
+  /** sha256 of a screenshot of the canvas (the player's last frame, effects and all; the controls are hidden). NOT stable from run
+   *  to run, even on one unchanged tree (what the last frame caught depends on timing: measured, three loads of 03edd3b gave
+   *  three hashes), so use it to look, and hash() to compare. */
   shotHash(): Promise<string>;
   /** a PNG of the canvas to disk (for the look sheets) */
   save(file: string): Promise<void>;
@@ -72,7 +74,7 @@ async function main(): Promise<number> {
 
   // ---- the trees
   let baseDir: string | null = null, madeBase = false;
-  const wantBase = !only && (args.base || 'auto') !== 'none';
+  const wantBase = (args.base || (only ? 'none' : 'auto')) !== 'none';   // (--only skips the BASE_SHA tree unless --base asks for it)
   if (wantBase) {
     if (args.base && args.base !== 'auto' && args.base !== 'true') baseDir = path.resolve(args.base);
     else {

@@ -23,7 +23,7 @@
 //   Patch materials by clone or by define, never in place without an undo; no Math.random / Date.now / performance.now
 //   in anything an offline frame can depend on (the player's clock is ctx.now()).
 import type { Tier } from './viewer-quality.js';
-import { createLadder, probeDevice, type Probe } from './viewer-quality.js';
+import { createLadder, probeDevice, readRenderer, type Probe } from './viewer-quality.js';
 
 export type { Tier };
 export type FeatureKey = 'ao' | 'water' | 'sky' | 'grass' | 'assets' | 'frame';
@@ -116,8 +116,13 @@ export type Realism = ReturnType<typeof createRealism>;
 export function createRealism(host: RealismHost) {
   const { no, params } = host;
   const killed = (k: string): boolean => no.has('realism') || no.has(k);
-  // the device probe runs even with every effect off: it is the report's first line (and costs < 5 ms)
-  const probe: Probe = probeDevice(host.renderer.getContext?.() ?? null, params);
+  // the device probe runs even with every effect off: it is the report's first line (0.1 ms here; its one GPU query is made later)
+  const r = host.renderer, ext = r.extensions;
+  const probe: Probe = probeDevice({
+    gl: r.getContext?.() ?? null,
+    maxTexture: r.capabilities?.maxTextureSize,
+    floatTargets: ext?.has ? !!(ext.has('EXT_color_buffer_float') || ext.has('EXT_color_buffer_half_float')) : undefined,
+  }, params);
   const actives: Active[] = [];
   const failed: { key: string; error: string }[] = [];
   const loaded = new Map<FeatureKey, Promise<RealismFeature | null>>();
@@ -128,12 +133,14 @@ export function createRealism(host: RealismHost) {
   const closed: Record<Phase, boolean> = { 'pre-batch': false, 'post-batch': false };
 
   const moduleCache = new Map<FeatureKey, RealismFeature>();
-  // a feature the current tier is too low for, whose module is fetched: installing it is something a promotion changes
-  const pending = (t: Tier): boolean => TABLE.some(e => { const f = moduleCache.get(e.key); return !!f && !killed(f.key) && f.minTier <= t && !actives.some(a => a.f.key === f.key); });
+  const tried = new Set<FeatureKey>();   // install() was run (it returned a handle, null or threw)
+  // a feature the tier it stood at was too low for, whose module is fetched and which has not been installed: a promotion to
+  // `to` installs it (one that was tried and declined, or failed, is not waiting for anything)
+  const pending = (from: Tier, to: Tier): boolean => TABLE.some(e => { const f = moduleCache.get(e.key); return !!f && !killed(f.key) && f.minTier > from && f.minTier <= to && !tried.has(f.key) && !actives.some(a => a.f.key === f.key); });
   const ladder = createLadder({
     probe,
     // a step changes something only if a handle would switch or lighten itself, or a feature waits for the tier
-    changes: (from, to) => actives.some(a => !!a.handle.setTier || (a.f.minTier > Math.min(from, to) && a.f.minTier <= Math.max(from, to))) || (to > from && pending(to)),
+    changes: (from, to) => actives.some(a => !!a.handle.setTier || (a.f.minTier > Math.min(from, to) && a.f.minTier <= Math.max(from, to))) || (to > from && pending(from, to)),
     apply: (to) => onTier(to),
   });
 
@@ -211,7 +218,11 @@ export function createRealism(host: RealismHost) {
 
   // ---- install one phase of this house's features
   async function install(phase: Phase): Promise<void> {
-    if (phase === 'pre-batch') { closed['pre-batch'] = closed['post-batch'] = false; deadline = performance.now() + BUDGET_MS; }
+    if (phase === 'pre-batch') {
+      closed['pre-batch'] = closed['post-batch'] = false; deadline = performance.now() + BUDGET_MS;
+      // the renderer string (the one probe query that asks the GPU) is read here, once the house is built, not at mount
+      if (!probe.renderer) { readRenderer(probe, host.renderer.getContext?.() ?? null); ladder.restart(); }
+    }
     const gen = generation;
     const jobs: Promise<void>[] = [];
     for (const e of TABLE) {
@@ -229,6 +240,7 @@ export function createRealism(host: RealismHost) {
   }
   async function startOne(f: RealismFeature, gen: number, forceLate = false): Promise<void> {
     if (actives.some(a => a.f.key === f.key)) return;
+    tried.add(f.key);
     const { ctx, unsub } = makeCtx(f.key);
     let handle: RealismHandle | null = null;
     try { handle = await f.install(ctx); } catch (err) { failed.push({ key: f.key, error: msg(err) }); console.warn(`realism: ${f.key} install failed`, err); for (const u of unsub) u(); return; }
@@ -259,7 +271,7 @@ export function createRealism(host: RealismHost) {
     const gen = generation;
     for (const e of TABLE) {
       const f = moduleCache.get(e.key);
-      if (f && wanted(f)) void startOne(f, gen, true);
+      if (f && wanted(f) && !tried.has(f.key)) void startOne(f, gen, true);
     }
     host.markDirty();
   }
@@ -308,6 +320,7 @@ export function createRealism(host: RealismHost) {
   // ---- a house goes (goHouse, before the scene is cleared)
   function dispose(): void {
     generation++;
+    tried.clear();
     for (const a of actives.slice().reverse()) remove(a);
     closed['pre-batch'] = closed['post-batch'] = false;
   }

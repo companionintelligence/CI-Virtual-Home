@@ -1,12 +1,33 @@
 # Cloudflare Pages reads this file from the root of the site; scripts/build-portal.mts copies it there.
 #
-# Revalidate every file on every load. The engine's modules are not fingerprinted (assets/viewer.js is the same URL on
-# every deploy), and Pages' default for a static file is a four-hour browser cache with no check in between. A
-# visitor who opened the site in the four hours before a deploy then ran the NEW page against OLD modules from their
-# cache, and the player stopped with "This home could not be opened" ('./assets/shot-track.js' does not provide an
-# export named 'trackView'). With max-age=0 and must-revalidate the browser asks every time and the files carry ETags,
-# so an unchanged module costs one empty 304.
-#
-# If a file is ever given a content hash in its name, that file (and only that one) can be cached for a long time.
+# Revalidate every file on every load. The engine's modules are not fingerprinted by name (assets/viewer.js is the same URL
+# on every deploy; the page's import map adds ?v=<hash> to each), and Pages' default for a static file is a four-hour
+# browser cache with no check in between. A visitor who opened the site in the four hours before a deploy then ran the NEW
+# page against OLD modules from their cache, and the player stopped with "This home could not be opened"
+# ('./assets/shot-track.js' does not provide an export named 'trackView'). With max-age=0 and must-revalidate the browser
+# asks every time and the files carry ETags, so an unchanged module costs one empty 304.
 /*
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The exception: binaries whose NAME is a hash of their content (assets/media/<key>/oak-floor-3fa91c07.webp,
+# content/ao/aurora.3fa91c07.bin; scripts/build-portal.mts refuses any other file in these directories). A different
+# content is a different URL, so these can be cached for a year. Do not put a file here whose name does not change with
+# its bytes.
+#
+# These two rules come AFTER /* on purpose, and detach the header it set. Cloudflare Pages applies every rule that matches
+# a path, in file order, and JOINS the values of a header set twice with a comma ("…immutable, public, max-age=0, …",
+# a contradiction browsers resolve as they like). "! Cache-Control" removes what an earlier rule set, so it can only work
+# below that rule.
+/assets/media/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/content/ao/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+# …except the AO manifest itself: it is not named by its content (it says which hashed volume belongs to which home),
+# so it is revalidated like the modules. Below the rule above for the same reason.
+/content/ao/manifest.json
+  ! Cache-Control
   Cache-Control: public, max-age=0, must-revalidate

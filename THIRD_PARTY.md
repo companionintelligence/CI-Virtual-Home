@@ -10,7 +10,7 @@ its licence text lives. When you add, upgrade or adapt one, update this file in 
 
 | Component | Version | Licence | Where | Licence text |
 |---|---|---|---|---|
-| [three.js](https://threejs.org) — core module build + 23 addon files from `examples/jsm` (OrbitControls, TransformControls, EffectComposer and passes, GTAO, SMAA, bloom, GLTFExporter/Loader, RoomEnvironment, utils) | r169 (`three@0.169.0`) | MIT — © 2010-2024 three.js authors | [`assets/vendor/three/`](assets/vendor/three/) | [`assets/vendor/three/LICENSE`](assets/vendor/three/LICENSE) |
+| [three.js](https://threejs.org) — core module build + 24 addon files from `examples/jsm` (OrbitControls, TransformControls, EffectComposer and passes, GTAO, SMAA, bloom, GLTFExporter/Loader, RoomEnvironment, utils, and `libs/meshopt_decoder.module.js`, the decoder for the meshopt-compressed models of the live player's CC0 props) | r169 (`three@0.169.0`) | MIT — © 2010-2024 three.js authors | [`assets/vendor/three/`](assets/vendor/three/) | [`assets/vendor/three/LICENSE`](assets/vendor/three/LICENSE) |
 | [pixelmatch](https://github.com/mapbox/pixelmatch) | 7.2.0 | ISC — © 2025 Mapbox | [`scripts/vendor/pixelmatch.mjs`](scripts/vendor/pixelmatch.mjs) | [`scripts/vendor/LICENSE-pixelmatch.txt`](scripts/vendor/LICENSE-pixelmatch.txt) |
 | [Manrope](https://github.com/sharanda/manrope) — variable, Latin subset (from `@fontsource-variable/manrope` 5.3.0, via CI-Common `styles/fonts/files/`) | v4.504 | OFL-1.1 — © 2019 The Manrope Project Authors | [`assets/fonts/manrope-latin-var.woff2`](assets/fonts/manrope-latin-var.woff2) | [`assets/fonts/LICENSE-Manrope.txt`](assets/fonts/LICENSE-Manrope.txt) |
 | [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) — variable, Latin subset (from `@fontsource-variable/jetbrains-mono` 5.3.0, via CI-Common) | v2.211 | OFL-1.1 — © 2020 The JetBrains Mono Project Authors | [`assets/fonts/jetbrains-mono-latin-var.woff2`](assets/fonts/jetbrains-mono-latin-var.woff2) | [`assets/fonts/LICENSE-JetBrains-Mono.txt`](assets/fonts/LICENSE-JetBrains-Mono.txt) |
@@ -19,6 +19,7 @@ its licence text lives. When you add, upgrade or adapt one, update this file in 
 **Local modification.** The three.js files are byte-identical to the `three@0.169.0` npm package except one:
 `postprocessing/GTAOPass.js` `generateNoise()` seeds its `SimplexNoise` with mulberry32 instead of
 `Math.random`, so every frame's ambient-occlusion dither is the same (the determinism the goldens depend on).
+`libs/meshopt_decoder.module.js` (24,850 B) is byte-identical to the npm package's.
 
 The fonts are OFL-1.1: they may be bundled and redistributed with this software, but not sold on their own, and
 a modified version may not use the reserved font names. The capture scripts serve them locally in place of the
@@ -52,6 +53,20 @@ Their licence texts are reproduced at the end of this file.
   from those builds or from The Sims are in this repository — the reference photos they were read from are
   third-party images and are deliberately not committed.
 
+- **LYGIA** ([patriciogonzalezvivo/lygia](https://github.com/patriciogonzalezvivo/lygia)) is dual-licensed Prosperity
+  (non-commercial) or a paid Patron licence, and this repository is proprietary: none of its code is copied, translated
+  or paraphrased. The live player's noise, colour-grading and tone-mapping GLSL is written fresh from the public
+  algorithms (hash and value noise, fbm, Schlick's fresnel, Gerstner waves, a Rayleigh / Mie sky, the Halton sequence,
+  an ACES fit).
+- **Grassworks** (grassworks.techredux.co) is a commercial product ($199). Only its public feature list was read, as a
+  reference for what a grass system offers; the grass system here is an original design and no source of it was seen.
+- **Quaternius** model packs: the pack pages say CC0, but the site now publishes its own non-CC0 asset licence for newer
+  releases and downloads are manual, so nothing from it is used. (Likewise not used: Kenney's flat-colour toy style,
+  Sketchfab, Poly Pizza and OpenGameArt, whose per-model licences are mixed, and any CC-BY-NC, "free for personal use",
+  unknown-licence or paid asset.)
+- **three-gpu-pathtracer**'s `DenoiseMaterial` (BSD-2) was considered for idle accumulation and deferred: nothing of it
+  is in the repository.
+
 The web portal (`pnpm run portal:build` → Cloudflare Pages) redistributes three.js with its `LICENSE`, and the two
 fonts with theirs (`assets/fonts/LICENSE-*.txt` are copied beside the woff2), which is what MIT and OFL-1.1 ask.
 The gallery (`index.html`) and the player's stylesheet load them from `assets/fonts/`; `room-creator.html` itself
@@ -79,6 +94,11 @@ commit. To upload the portal, `deploy.yml` installs Cloudflare's [`wrangler`](ht
 4.143.0 (MIT OR Apache-2.0) with `npm install --ignore-scripts` into a temporary directory and runs it from another,
 empty one. None of these is a dependency of the repository, and none of their code is in the site.
 
+Run at prep time with `pnpm dlx` and never added as a dependency (they make `assets/media/**`, `scripts/prep-assets.mts`):
+[`@gltf-transform/core`, `/extensions`, `/functions`, `/cli`](https://gltf-transform.dev) 4.5.1 (MIT),
+[`sharp`](https://sharp.pixelplumbing.com) 0.35.5 (Apache-2.0) and [`meshoptimizer`](https://github.com/zeux/meshoptimizer)
+1.3.0 (MIT). `scripts/bake-ao.mts` imports the vendored three-mesh-bvh below.
+
 External tools the scripts call but this repository does not include: **ffmpeg** (`render-house-shots.mts`,
 `prop-sheet.mts`; LGPL-2.1+/GPL depending on build), **rsvg-convert** from librsvg (`generate_floor_plans.py`,
 `generate_house_iso.py --png`; LGPL-2.1+), and **Python 3** (standard library only).
@@ -90,6 +110,18 @@ Third-party code and assets behind the player's look-only effects (`assets/reali
 rows (the ocean source, the BVH, the tooling) are above them.
 
 <!-- realism:shared:begin -->
+### Shared rows (written once, by the scaffold)
+
+| Source | Licence | What | Where |
+|---|---|---|---|
+| [jbouny/fft-ocean](https://github.com/jbouny/fft-ocean) (checked with `gh api`) | MIT — © 2014 Jérémy Bouny | the FFT ocean: the spectrum, the phase and the FFT passes, the normal map and the ocean shader, ported from its three.js r6x API to r169 as a module that loads only at tier 2, for large bodies of water. Modifications are listed by the water package under its own sub-heading; the one known in advance is the `tanh` the shader redeclares, which GLSL ES 3.00 already has and which stops the program compiling. | `assets/viewer-ocean.ts` (lazy) |
+| [dli/waves](https://github.com/dli/waves) | MIT — © 2014 David Li | the WebGL ocean fft-ocean's header credits as the original work it is a port of; its notice is kept with fft-ocean's | `assets/viewer-ocean.ts` |
+| [three-mesh-bvh](https://github.com/gkjohnson/three-mesh-bvh) 0.9.15 (checked with `gh api`) | MIT — © 2018 Garrett Johnson | the bounding-volume hierarchy the ambient-occlusion bake casts its rays through. One edit: its `import … from 'three'` becomes the path of this repository's vendored three. It runs in `scripts/bake-ao.mts` only and is **not shipped** to the site. Its GLSL distance functions (a Shadertoy-derived footnote in its source) are not used and must not be shipped. | `scripts/vendor/three-mesh-bvh.0.9.15.mjs`, licence: `scripts/vendor/LICENSE-three-mesh-bvh.txt` |
+
+Binary assets (textures, models, baked volumes) are committed only when they are **CC0 or public domain, verified at the
+source** (the licence page and the API field are named in the row) and carry a content-hashed name; the rows are under
+*assets* below. The owner's reference photos are never committed.
+
 <!-- realism:shared:end -->
 
 #### ao
@@ -183,6 +215,84 @@ SOFTWARE.
 MIT License
 
 Copyright (c) 2026 Pascal
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### jbouny/fft-ocean
+
+```
+The MIT License (MIT)
+
+Copyright (c) 2014 Jérémy Bouny
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### dli/waves
+
+```
+The MIT License (MIT)
+
+Copyright (c) 2014 David Li (http://david.li)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### gkjohnson/three-mesh-bvh
+
+```
+MIT License
+
+Copyright (c) 2018 Garrett Johnson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

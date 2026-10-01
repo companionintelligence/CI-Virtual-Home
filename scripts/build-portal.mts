@@ -20,10 +20,13 @@
 //                                    want: the site's address is --site-url, else $SITE_URL, else the live site
 //                                    (https://homes.ci.computer/); ci.yml passes a pull request's preview address
 //   <out>/_headers                   Cloudflare Pages' header rules (portal/_headers): Cache-Control max-age=0 with
-//                                    must-revalidate on every file, because the modules below are not fingerprinted
+//                                    must-revalidate on every file, because the modules below are not fingerprinted;
+//                                    one year and immutable on the content-hashed binaries (assets/media, content/ao)
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
 //   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
+//   <out>/assets/media/<key>/        the CC0 textures and props the manifest (files.json) lists, each named by a hash of its
+//   <out>/content/ao/                content; and the baked occlusion volumes content/ao/manifest.json lists, with it
 //
 // Everything the site references is relative, so the same tree works at / and under /ci-virtual-home/. No
 // goldens, scripts, scenes, videos or TypeScript sources go out. The build refuses to run on stale or missing
@@ -36,6 +39,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
+import { checkBinaryAssets } from './portal-assets.mts';
 import { displayName, buildCredit } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
@@ -98,6 +102,17 @@ for (const h of index.houses || []) {
   if (!fs.existsSync(path.join(ROOT, 'portal', 'previews', `${h.id}.jpg`))) problems.push(`no link-preview image for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
 }
 if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
+
+// 5a. binary assets (assets/media/** the CC0 textures and props, content/ao/** the baked occlusion volumes): only files that
+// carry their content hash in their name and are listed by their owner's manifest go out, and nothing else under those
+// directories (scripts/portal-assets.mts has the rules and the reasons; test-binary-guard.mts proves them). The import map
+// below fingerprints modules only, so a binary's name is its cache key.
+{
+  const bin = checkBinaryAssets(ROOT);
+  problems.push(...bin.problems);
+  if (!bin.problems.length) for (const f of bin.ship) copy(f);
+  if (bin.files) console.log(`portal: ${bin.files} binary files (${(bin.mediaBytes / 1048576).toFixed(1)} MB under assets/media), content-hashed and listed`);
+}
 
 // 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes, distinct builders, floor
 // area rounded to 10 m²), or a visitor sees them change as the page hydrates and a crawler keeps the wrong ones

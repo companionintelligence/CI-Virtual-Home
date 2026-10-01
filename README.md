@@ -293,6 +293,18 @@ and every home stopped with "This home could not be opened" (`'./assets/shot-tra
   14400 for those and 0 for `.json` and `.html`). Set it to **Respect Existing Headers** if you want revalidation on the
   custom domain too; the fingerprints make the site correct either way.
 
+- **Binaries are named by their content.** The import map covers modules only, so a model, a texture or a baked volume
+  carries its hash in its own name: `assets/media/<key>/oak-floor-3fa91c07.webp`, `content/ao/<id>.3fa91c07.bin` (the first
+  8 hex digits of its sha256), and the owner's manifest lists it (`assets/media/<key>/files.json`,
+  `content/ao/manifest.json`; the build reads every string in it as a file name relative to the manifest). `portal:build`
+  **fails** on an unhashed, unlisted, missing or mis-hashed file, on more than 12 MB under `assets/media`, and on an
+  eager realism module (`realism.js`, `viewer-quality.js`, `realism-<key>.js`) over 20 KB, and it ships exactly the listed
+  files (`scripts/portal-assets.mts`; `scripts/test-binary-guard.mts`, part of `check:quick`, proves each failure). Their
+  names change with their bytes, so `portal/_headers` gives these two directories `Cache-Control: public,
+  max-age=31536000, immutable` (below `/*`, detaching its header: Cloudflare joins the values of a header two rules set).
+  The AO manifest, which is not named by its content, stays on revalidation. Never put a file in those directories whose
+  name does not follow its content, and never reuse a name for different bytes.
+
 `portal:test` checks both: every module is in both import maps with its content hash, the player pulls every module by
 its hash, and with every un-hashed module URL poisoned the player still starts. Do not rename or move a module without
 rebuilding, and do not add a `<script>` or `<link>` to `assets/` or `portal/` that bypasses the build's rewriting.
@@ -460,7 +472,9 @@ aurora, cocoon, lakecabin, mirage and vanilla at day, dusk and night; (b) with e
 the offline hooks (`__houseViewer.external.before/after`) leave the scene drawing the same pixels as `?no=realism` at
 shot positions 0, 200/719 and 1; (c) no console error, shader-link error or GL warning; (d) `renderer.info.memory` is back
 after switching homes; (e) the six `test/goldens/expected-diffs` ledgers are untouched; then every
-`scripts/live-checks/<key>.mts`. `--quick`, `--houses`, `--only <key>`. Not part of `check` (it needs a GPU and a second tree).
+`scripts/live-checks/<key>.mts`. `--quick`, `--houses`, `--only <key>`. Not part of `check` (it needs a GPU and a second tree). Two browserless tests are
+part of `check:quick`: `test-quality-ladder.mts` (where each kind of device starts, how far the frame rate may move it, the
+ladder's put-back and ban rules) and `test-binary-guard.mts` (the portal's binary-asset rules, one failing fixture each).
 
 ### Notes per package
 
