@@ -144,7 +144,8 @@ function takeSnapshot(host: XrPlayerHost) {
 }
 
 // ---------------------------------------------------------------------------------------------------------- the session
-export function createSession(host: XrPlayerHost, bus: XrBus): XrSessionImpl {
+export function createSession(host: XrPlayerHost, frame: Set<(f: XrFrame) => void>): XrSessionImpl {
+  const bus: XrBus = { frame, emit: (state, detail) => window.dispatchEvent(new CustomEvent(XR_EVENT, { detail: { state, ...detail } })) };   // (the 'vh:xr' event; entry.ts owns the frame subscribers, which exist before any session)
   const { THREE, renderer, scene, camera, canvas } = host;
   let state: XrState = 'idle', mode: XrMode | null = null, L: Live | null = null, endP: Promise<void> | null = null;
   const log = (...a: any[]) => console.info('[xr]', ...a);
@@ -217,7 +218,7 @@ export function createSession(host: XrPlayerHost, bus: XrBus): XrSessionImpl {
     state = 'starting'; mode = m;
     let session: any;
     try {
-      session = await (pre ?? (navigator as any).xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'] }));
+      session = await (pre ?? (navigator as any).xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'] }));   // (`pre` is what entry.ts asked inside the click, with 'layers' where the projection-layer API exists; this fallback is for a caller that holds the session object directly)
     } catch (e: any) {
       state = 'idle'; mode = null;
       const n = e && e.name;

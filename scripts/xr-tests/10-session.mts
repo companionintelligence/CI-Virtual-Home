@@ -442,7 +442,7 @@ async function killSwitch() {
   await off.ctx.close();
   const none = await open('none', '');
   ok(!(await none.page.$('.vh-xr')), 'no navigator.xr (a phone, a laptop): no Enter VR control and no dead button');
-  ok(!none.requests.some(u => /\/assets\/xr\/(session|style|bake|locomotion|rig|loop|controller|hud)\./.test(u)), 'no navigator.xr: none of the session modules is requested until someone asks');
+  ok(!none.requests.some(u => /\/assets\/xr\//.test(u)), `no VR where the browser says there is none (desktop Chromium's navigator.xr supports nothing): not even entry.js is requested${none.requests.filter(u => /\/assets\/xr\//.test(u)).length ? ': ' + none.requests.filter(u => /\/assets\/xr\//.test(u)).join(' ') : ''}`);
   // (desktop Chromium has a navigator.xr that supports nothing; iPhone Safari has none at all. Either way nothing is shown.)
   const refused = await none.page.evaluate(async () => { const x = (window as any).__houseViewer.xr; return x ? await x.enter('vr') : { ok: false, reason: 'no-api' }; });
   ok(!refused.ok && ['unsupported', 'no-api'].includes(refused.reason), `a browser with no VR: enter() says so, it does not throw (${refused.reason})`);
@@ -519,19 +519,27 @@ async function weight() {
   const off = await open('quest3', 'no=xr');
   ok(!off.requests.some(u => /\/assets\/xr\//.test(u)), '?no=xr: nothing under assets/xr/');
   await off.ctx.close();
-  // the first-load cost of the XR hooks: entry.js and the import map's lines for assets/xr/*, in gzip bytes
+  // the first-load cost of XR, in gzip bytes, counted three ways. (1) the files a first load fetches that ?no=xr does not (what
+  // xr-test's T-LAZY counts); (2) what the XR hooks add to files both loads share: the import map's assets/xr lines in
+  // room-creator.html, and viewer.js's hook block, measured IN CONTEXT (gzip of the file with the block minus gzip without it:
+  // a block gzipped alone is dearer than it is inside the file); (3) the sum. A browser with no VR fetches entry.js alone.
   const dist = path.resolve(ROOT, 'dist');
-  const entry = fs.readdirSync(path.join(dist, 'assets', 'xr')).find(f => f === 'entry.js');
-  if (entry) {
-    const gz = (b: Buffer | string) => zlib.gzipSync(b, { level: 9 }).length;
-    const entrySrc = fs.readFileSync(path.join(dist, 'assets', 'xr', 'entry.js'));
-    const page = fs.readFileSync(path.join(dist, 'room-creator.html'), 'utf8');
-    const lines = page.split('\n').filter(l => /assets\/xr\//.test(l)).join('\n');
-    const viewer = fs.readFileSync(path.join(dist, 'assets', 'viewer.js'), 'utf8');
-    const hook = viewer.slice(viewer.indexOf('const XR_QUIET'), viewer.indexOf('// ------------------------------------------------------------------ boot'));
-    note(`entry.js ${gz(entrySrc)} B gz (${entrySrc.length} raw), import-map lines for assets/xr ${gz(lines)} B gz, viewer.js hook block ${gz(hook)} B gz`);
-    ok(gz(entrySrc) + gz(lines) + gz(hook) < 1500, `first-load delta ${gz(entrySrc) + gz(lines) + gz(hook)} B gzip (limit 1500)`);
-  }
+  const gz = (b: Buffer | string) => zlib.gzipSync(b, { level: 9 }).length;
+  const file = (u: string) => fs.readFileSync(path.join(dist, u.split('?')[0].replace(/^\//, '')));
+  const first = reqs.map(u => u.split('?')[0]);   // (captured before the tap)
+  const filesGz = first.reduce((n, u) => n + gz(file(u)), 0);
+  const entryOnly = gz(file('assets/xr/entry.js'));
+  const page = fs.readFileSync(path.join(dist, 'room-creator.html'), 'utf8');
+  const pageNo = page.split('\n').filter(l => !/"[^"]*assets\/xr\//.test(l)).join('\n');
+  const viewer = fs.readFileSync(path.join(dist, 'assets', 'viewer.js'), 'utf8');
+  const vl = viewer.split('\n'), a = vl.findIndex(l => /const XR_QUIET/.test(l)), b = vl.findIndex(l => /\.\/xr\/entry\.js/.test(l));   // (the dist file has no comments)
+  ok(a > 0 && b >= a, `the viewer.js hook block is found (lines ${a} to ${b} of ${vl.length})`);
+  const viewerNo = vl.filter((_, i) => i < a || i > b).join('\n').replace(/\n[^\n]*xr\?\.end\('offline-hook'\);?/, '');
+  const mapGz = gz(page) - gz(pageNo), hookGz = gz(viewer) - gz(viewerNo);
+  note(`files a headset browser fetches first (${first.join(', ')}): ${filesGz} B gz; a browser with no VR fetches entry.js alone: ${entryOnly} B gz`);
+  note(`in the files both loads share: import-map lines for assets/xr ${mapGz} B gz (grows with the modules the other packages add), viewer.js hook block ${hookGz} B gz in context`);
+  ok(entryOnly + hookGz + mapGz < 1500, `first-load delta of a browser with no VR: ${entryOnly + hookGz + mapGz} B gzip (entry + hook + import map; limit 1500)`);
+  if (filesGz + hookGz + mapGz >= 1500) note(`a headset browser adds the controls (style.js): ${filesGz + hookGz + mapGz} B gzip in all, over 1500: this is the cost of the button where VR exists; see the report`);
 }
 
 // =============================================================================================================== run

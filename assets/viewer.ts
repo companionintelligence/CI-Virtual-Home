@@ -1256,8 +1256,8 @@ export function mountViewer(api: Api) {
   new ResizeObserver(() => { dirty = true; ghostFov = -1; endPlaced = false; }).observe(canvas);
 
   // ------------------------------------------------------------------ WebXR (assets/xr/): lazy, live only, ?no=xr removes it
-  // entry.ts adds the Enter VR controls where a headset (or a PC VR runtime) really is, and window.__houseViewer.xr; where there is
-  // none, or with ?no=xr, nothing of assets/xr/ is fetched. xrHost is the one door into the player: accessors, and suspend(), which
+  // entry.ts (imported only where a headset or a PC VR runtime really is) adds the Enter VR controls and window.__houseViewer.xr; where
+  // there is none, or with ?no=xr, nothing of assets/xr/ is fetched. xrHost is the one door into the player: accessors, and suspend(), which
   // stops the player moving and answering the page for the length of a session (the XR modules draw the house themselves) and
   // returns the function that puts it back. frame() is not called while presenting (room-creator.html's animate()).
   const XR_QUIET = ['keydown', 'keyup', 'wheel', 'pointerdown', 'pointermove', 'pointerup', 'click'];
@@ -1286,7 +1286,10 @@ export function mountViewer(api: Api) {
       };
     },
   };
-  if (!no.has('xr')) import('./xr/entry.js').then(m => m.mountXr(xrHost)).catch(err => console.warn('viewer: VR is unavailable', err));
+  // (the probe is here, not in entry.ts, so a browser with no VR never requests the entry either; mountXr is idempotent)
+  const xrApi: any = (navigator as any).xr;
+  const xrMount = () => xrApi?.isSessionSupported?.('immersive-vr').then((yes: boolean) => yes && window.isSecureContext && import('./xr/entry.js').then(m => m.mountXr(xrHost))).catch((err: unknown) => console.warn('viewer: VR is unavailable', err));
+  if (!no.has('xr')) { xrMount(); xrApi?.addEventListener?.('devicechange', xrMount); }
 
   // ------------------------------------------------------------------ boot
   (async () => {
