@@ -1,0 +1,807 @@
+{
+  "schema": "family/v1",
+  "slug": "keane",
+  "house": "payorote",
+  "fictional": true,
+  "family": {
+    "surname": "Keane",
+    "tagline": "A treehouse office with a Core on the desk.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Imani is a technical writer who rents a treehouse by the lake in Carrowmere. Her office is a desk in the sleeping nook, and her friend Jonah visits on weekends. Her clients' drafts sit on one Companion Core.",
+    "address": {
+      "line": "3 Hazel Boreen",
+      "place": "Carrowmere"
+    },
+    "narrator": "v-young-f"
+  },
+  "members": [
+    {
+      "id": "imani",
+      "name": "Imani",
+      "age": 33,
+      "role": "partner",
+      "work": "technical writer, works from home",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Basil",
+        "runtime": "OpenClaw",
+        "job": "Opens Docmost in its own browser and files the draft Imani points to.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Files drafts only. Imani reviews every page."
+      }
+    },
+    {
+      "id": "jonah",
+      "name": "Jonah",
+      "age": 31,
+      "role": "visitor",
+      "work": "friend, weekend visits",
+      "colour": "chart-2"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "Before you begin"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "Level two, living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Level two, kitchen"
+    },
+    {
+      "id": "desk",
+      "kind": "room",
+      "room": "office",
+      "title": "The desk is the office"
+    },
+    {
+      "id": "bedroom",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Level three, to bed"
+    },
+    {
+      "id": "deck",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out on the deck"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Final draft"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "jonah",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel goes up the ladder",
+        "body": "The parcel waits at the foot of the ladder. Jonah, here for the weekend, hauls it up to the door and across to the desk."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "imani",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Imani reads the guide first",
+        "body": "Imani reads the quick-start guide first. Beside it: the Companion Core, a power cable and a recovery USB drive. The footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "imani",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Step one: plug it in",
+        "body": "Imani plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "imani",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Step two: join it",
+        "body": "Imani joins the Core's own network from her phone. Jonah reads out the home Wi-Fi password, and she types it in.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "imani",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "docmost",
+        "logseq",
+        "vaultwarden"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Step three: pick the apps",
+        "body": "In Companion Hub, Imani picks OpenClaw and adds Docmost, Logseq and VaultWarden. Then she walks away to make tea.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: OpenClaw",
+            "Apps: Docmost, Logseq",
+            "App: VaultWarden"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "imani",
+      "agent": "imani",
+      "approval": "imani",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "OpenClaw is an agent with its own browser and coding tools, running in its own sandbox, with iOS",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Basil answers, briefly",
+        "body": "Imani messages Basil, the agent she named. Basil answers in one dry line, and the Core is running."
+      },
+      "say": {
+        "speaker": "imani",
+        "text": "Hello, Imani. Basil here. Which page first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "member": "jonah",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "Stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Saturday is film night",
+        "body": "Jellyfin plays Jonah's own film files on the wall TV while Imani takes the loveseat. The films stream from the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-fire",
+      "chapter": "living",
+      "member": "imani",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "readeck",
+        "replaces": [
+          "Pocket"
+        ]
+      },
+      "capability": "Save articles to read later without a hosted bookmarking service",
+      "anchor": {
+        "role": "fireplace",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Saved articles, read by the fire",
+        "body": "By the fireplace, Imani reads the articles she bookmarked in Readeck. They sit on the Core, ready for the evening.",
+        "chips": [
+          "Readeck",
+          "replaces Pocket"
+        ]
+      }
+    },
+    {
+      "id": "living-walk",
+      "chapter": "living",
+      "member": "jonah",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "wanderer",
+        "replaces": []
+      },
+      "capability": "Plan, map and share hiking and biking routes from GPX files",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Sunday's lakeshore walk, planned",
+        "body": "Jonah sprawls on the loveseat and plans Sunday's lakeshore walk in Wanderer. The GPX route is saved on the Core.",
+        "chips": [
+          "Wanderer"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "member": "imani",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "Track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A small pantry, fully listed",
+        "body": "The treehouse kitchen is small, so Imani tracks the pantry in Grocy. It lists what is on the shelf and builds the shopping list.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-split",
+      "chapter": "kitchen",
+      "member": "jonah",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "spliit",
+        "replaces": [
+          "Splitwise"
+        ]
+      },
+      "capability": "Split shared costs with housemates, family or friends and settle up with the fewest payments",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Who owes whom, settled",
+        "body": "Jonah and Imani split the weekend shop in Spliit. It shows who owes whom, so nobody has to do the sums.",
+        "chips": [
+          "Spliit",
+          "replaces Splitwise"
+        ]
+      }
+    },
+    {
+      "id": "desk-draft",
+      "chapter": "desk",
+      "member": "imani",
+      "agent": "imani",
+      "approval": "imani",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "docmost",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "capability": "A collaborative wiki for notes and documentation",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Basil files the draft",
+        "body": "Imani points Basil at a finished draft. Basil opens Docmost in its own browser and files the page. Imani reviews every page.",
+        "chips": [
+          "Docmost",
+          "replaces Confluence"
+        ]
+      },
+      "say": {
+        "speaker": "imani",
+        "text": "Draft filed. Please review the page."
+      },
+      "film": true
+    },
+    {
+      "id": "desk-journal",
+      "chapter": "desk",
+      "member": "imani",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "logseq",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "Write a private knowledge base and daily journal in plain Markdown files",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The outline starts in the journal",
+        "body": "Imani starts each client job in the daily journal in Logseq: an outline, three questions, one deadline. The notes are plain Markdown files on the Core.",
+        "chips": [
+          "Logseq",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "desk-diagram",
+      "chapter": "desk",
+      "member": "imani",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "drawio",
+        "replaces": [
+          "Lucidchart"
+        ]
+      },
+      "capability": "Draw flowcharts, floor plans and network maps in the browser",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A flowchart for step four",
+        "body": "For a client's setup guide, Imani draws a flowchart in draw.io. The diagram is saved on the Core beside the draft.",
+        "chips": [
+          "draw.io",
+          "replaces Lucidchart"
+        ]
+      }
+    },
+    {
+      "id": "desk-time",
+      "chapter": "desk",
+      "member": "imani",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "kimai",
+        "replaces": []
+      },
+      "capability": "Track time per project and client, with reports",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Hours, per client, in a report",
+        "body": "Imani tracks her hours per client in Kimai. Before she writes an invoice, she reads the report.",
+        "chips": [
+          "Kimai"
+        ]
+      }
+    },
+    {
+      "id": "desk-plain",
+      "chapter": "desk",
+      "member": "imani",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "open-webui",
+        "replaces": []
+      },
+      "capability": "Chat with models running on your own Core, from any browser",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Plain language, on a local model",
+        "body": "Imani asks the model in Open WebUI to restate a dense paragraph in plain language. The model runs on the Core. She keeps what reads well and rewrites the rest.",
+        "chips": [
+          "Open WebUI"
+        ]
+      }
+    },
+    {
+      "id": "desk-pdf",
+      "chapter": "desk",
+      "member": "imani",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "bentopdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "A PDF toolkit that runs in your browser",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The finished guide, one PDF",
+        "body": "Imani merges the finished guide and its diagrams into one PDF with BentoPDF. It runs in the browser, and nothing is uploaded.",
+        "chips": [
+          "BentoPDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "desk-vault",
+      "chapter": "desk",
+      "member": "imani",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "Store every password in a vault you host",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Client logins, kept in a vault",
+        "body": "Imani keeps each client's logins in VaultWarden. It works with the Bitwarden apps, and the vault lives on the Core.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "bed-feeds",
+      "chapter": "bedroom",
+      "member": "imani",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "freshrss",
+        "replaces": []
+      },
+      "capability": "Read the sites you follow in one feed, on your own Core",
+      "anchor": {
+        "role": "desk",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The morning feeds, in one place",
+        "body": "At the writing desk in the loft, Imani reads the sites she follows in FreshRSS. Her feed lives on the Core.",
+        "chips": [
+          "FreshRSS"
+        ]
+      }
+    },
+    {
+      "id": "bed-book",
+      "chapter": "bedroom",
+      "member": "imani",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "Read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A novel before sleep",
+        "body": "In the tree bedroom, Imani reads a novel in Koodo Reader. Her highlights stay with the book, and the library lives on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "deck-lanterns",
+      "chapter": "deck",
+      "member": "imani",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The lanterns dim at ten",
+        "body": "At ten, the lanterns round the host tree dim on a Home Assistant schedule. It runs on the Core.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "deck-meadow",
+      "chapter": "deck",
+      "member": "imani",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A meadow with a journal",
+        "body": "Below the ladder, Imani logs the wildflowers in HortusFox: where each patch grows, and when it blooms.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "deck-music",
+      "chapter": "deck",
+      "member": "jonah",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "Stream your own music collection to any device",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A playlist for the deck",
+        "body": "Jonah queues his playlist on the deck. Navidrome streams it from the Core, and the lake does the rest.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "outro-house",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One desk, one ladder",
+        "body": "A treehouse on a lake, a desk in the sleeping nook and a friend on the weekends. The Keane household runs it all from one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your drafts, your clients' files and your lantern schedule can live on a Companion Core at home. Start with one page in Docmost.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "The care note asks for no internet claims and nothing about being off the grid. The text says neither. The only internet mention is the standard ftue-pick note.",
+    "Chapter titles borrow documentation headings (Before you begin, Step one) for a wry voice. The ftue beat titles use \"Step one/two/three\"; check they read well in the player and the film.",
+    "Eyeless anchors (canopy-bath, deck/1) are not used. Garden and deck beats anchor on patio-seat or garden with the garden fallback. The ladder, lake and lanterns are in the house description; the render shows a lake and a ladder.",
+    "Basil (OpenClaw) works inside Docmost on the Core, not on a website, so the OpenClaw web note is not used. Imani reviews every page.",
+    "Cast gave Jonah no companion; he is a visitor with four beats. Jonah reads out the home Wi-Fi password in ftue-join; no value is shown.",
+    "Spliit shows who owes whom and moves no money (catalog). Open WebUI is shown on the Core model only; no cloud key. Home Assistant has no USB or Bluetooth on the Hub, so the lanterns are home-network devices.",
+    "Town Carrowmere and street Hazel Boreen are invented and still need the human map check."
+  ]
+}
