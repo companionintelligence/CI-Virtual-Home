@@ -236,7 +236,7 @@ export function createBake(host: XrHost): XrBakeImpl {
     const lim = limitsOf(budget);
     levels = xrLevels();
     scene.updateMatrixWorld(true);
-    const opts: BakeOptions = { site: budget.foveation ? 'ground' : 'all', cellM: 6, textureCapPx: budget.textureCapPx, levels };
+    const opts: BakeOptions = { site: budget.foveation ? 'ground' : 'all', cellM: Number(host.params.get('xrbake-cell')) || 9, textureCapPx: budget.textureCapPx, levels };
 
     try {
       // ---- plan + merge: nothing in the scene changes until the commit below, so a throw here leaves the house exactly as it was

@@ -6,7 +6,7 @@
 //   pnpm run xr:census   (if the xr-test package has added the script; this file does not edit package.json)
 //
 // For each house it loads the live player (room-creator.html?mode=view, the Door-to-Core shot at t 0.55, paused, like the prototype this
-// replaces), puts a stereo ArrayCamera at the shot's eye (two eyes 64 mm apart, 96 degrees vertical, 1344 x 1408 per eye with 4x MSAA:
+// replaces), puts a stereo ArrayCamera at the shot's eye (two eyes 64 mm apart, 96 degrees vertical, 1344 x 1408 per eye:
 // a Quest 3 at scale 0.8), and counts what one frame submits at eight headings (45 degrees apart: the person can look anywhere):
 //
 //   as shipped   the 2D player's scene as it is (its static batch included), world and all
@@ -59,7 +59,7 @@ for (const house of HOUSES) {
       const d = w.__houseDebug(), r = d.renderer, scene = d.scene, camera = d.camera, THREE = w.__THREE, gl = r.getContext();
       const { createBake } = await import(new URL('./assets/xr/bake.js', location.href).href);
       const T = await import(new URL('./assets/platform-types.js', location.href).href);
-      const host = { THREE, renderer: r, scene, camera, canvas: r.domElement, controls: null, api: {}, houseId: () => d.house.id, anchors: () => d.house.anchors, markDirty() {}, toast() {}, now: () => performance.now(), params: new URLSearchParams(), no: new Set<string>() };
+      const host = { THREE, renderer: r, scene, camera, canvas: r.domElement, controls: null, api: {}, houseId: () => d.house.id, anchors: () => d.house.anchors, markDirty() {}, toast() {}, now: () => performance.now(), params: new URLSearchParams(o.hostParams || ''), no: new Set<string>() };
       const sync = () => { const px = new Uint8Array(4); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); };
       const head: [number, number, number] = [camera.position.x, camera.position.y, camera.position.z];
       // ---- the reference stereo rig: Quest 3 at scale 0.8, 8 headings from the player's own camera orientation
@@ -67,7 +67,7 @@ for (const house of HOUSES) {
       const mk = (x: number) => { const c = new THREE.PerspectiveCamera(96, ew / eh, 0.1, 160); c.position.copy(camera.position); c.quaternion.copy(camera.quaternion); c.translateX(x); c.updateMatrixWorld(true); c.viewport = new THREE.Vector4(x < 0 ? 0 : ew, 0, ew, eh); return c; };
       const L = mk(-ipd / 2), R = mk(ipd / 2); const ac = new THREE.ArrayCamera([L, R]); ac.position.copy(camera.position); ac.quaternion.copy(camera.quaternion); ac.updateMatrixWorld(true);
       ac.projectionMatrix.copy(L.projectionMatrix); ac.projectionMatrixInverse.copy(L.projectionMatrix.clone().invert());
-      const rt = new THREE.WebGLRenderTarget(ew * 2, eh, { samples: 4, colorSpace: r.outputColorSpace }); rt.isXRRenderTarget = true;   // as WebXRManager marks its own target: the programs are the XR frame's
+      const rt = new THREE.WebGLRenderTarget(ew * 2, eh, { samples: 0, colorSpace: r.outputColorSpace }); rt.isXRRenderTarget = true;   // as WebXRManager marks its own target, so the programs are the XR frame's (no MSAA: it changes the GPU cost, not the draw count or the JS)
       const Y = new THREE.Vector3(0, 1, 0);
       const measure = (frames: number) => {
         const prt = r.getRenderTarget(), au = r.shadowMap.autoUpdate, nu = r.shadowMap.needsUpdate, xe = r.xr.enabled;
@@ -118,7 +118,7 @@ for (const house of HOUSES) {
       out.afterRestore = { avg: again.avg, worst: again.worst, same: again.avg === out.shipped.avg && again.worst === out.shipped.worst };
       rt.dispose();
       return out;
-    }, { frames: FRAMES, tiers: TIERS });
+    }, { frames: FRAMES, tiers: TIERS, hostParams: args.params && args.params !== 'true' ? args.params : '' });
     res.load = os.loadavg()[0];
     res.errors = errors;
     rows.push(res);
