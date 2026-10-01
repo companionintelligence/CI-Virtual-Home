@@ -235,6 +235,8 @@ async function open(profile: 'quest3' | 'vision' | 'none', query = '', viewport 
   const url = `${srv.url('room-creator.html')}?mode=view&house=${HOUSE}&shot=orbit&play=0${query ? '&' + query : ''}`;
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 240000 });
   await page.waitForFunction(() => document.documentElement.dataset.viewer === 'ready' || document.querySelector('.vh-error:not([hidden])') !== null, null, { timeout: 240000 });
+  // (the controls arrive a few awaits after 'ready': isSessionSupported, then entry.js, then style.js)
+  if (profile !== 'none' && !/\bno=xr\b/.test(query)) await page.waitForSelector('.vh-xr-pill', { state: 'attached', timeout: 60000 });
   await sleep(400);
   return { page, ctx, errors, warnings, requests, thirdParty, infos };
 }
@@ -532,14 +534,14 @@ async function weight() {
   const page = fs.readFileSync(path.join(dist, 'room-creator.html'), 'utf8');
   const pageNo = page.split('\n').filter(l => !/"[^"]*assets\/xr\//.test(l)).join('\n');
   const viewer = fs.readFileSync(path.join(dist, 'assets', 'viewer.js'), 'utf8');
-  const vl = viewer.split('\n'), a = vl.findIndex(l => /const XR_QUIET/.test(l)), b = vl.findIndex(l => /\.\/xr\/entry\.js/.test(l));   // (the dist file has no comments)
+  const vl = viewer.split('\n'), a = vl.findIndex(l => /const XR_QUIET/.test(l)), b = vl.findIndex(l => /devicechange/.test(l)) + 1;   // (the dist file has no comments)
   ok(a > 0 && b >= a, `the viewer.js hook block is found (lines ${a} to ${b} of ${vl.length})`);
   const viewerNo = vl.filter((_, i) => i < a || i > b).join('\n').replace(/\n[^\n]*xr\?\.end\('offline-hook'\);?/, '');
   const mapGz = gz(page) - gz(pageNo), hookGz = gz(viewer) - gz(viewerNo);
-  note(`files a headset browser fetches first (${first.join(', ')}): ${filesGz} B gz; a browser with no VR fetches entry.js alone: ${entryOnly} B gz`);
+  note(`files a headset browser fetches first (${first.join(', ')}): ${filesGz} B gz; entry.js alone ${entryOnly} B gz. A browser with no VR fetches none of them`);
   note(`in the files both loads share: import-map lines for assets/xr ${mapGz} B gz (grows with the modules the other packages add), viewer.js hook block ${hookGz} B gz in context`);
-  ok(entryOnly + hookGz + mapGz < 1500, `first-load delta of a browser with no VR: ${entryOnly + hookGz + mapGz} B gzip (entry + hook + import map; limit 1500)`);
-  if (filesGz + hookGz + mapGz >= 1500) note(`a headset browser adds the controls (style.js): ${filesGz + hookGz + mapGz} B gzip in all, over 1500: this is the cost of the button where VR exists; see the report`);
+  ok(hookGz + mapGz < 1500, `first-load delta of a browser with no VR: ${hookGz + mapGz} B gzip (the viewer.js hook and the import map's lines; no XR file is requested; limit 1500)`);
+  note(`a headset browser adds entry.js and style.js: ${filesGz + hookGz + mapGz} B gzip in all${filesGz + hookGz + mapGz >= 1500 ? ', over 1500: the price of the button where VR exists (reported, not failed)' : ''}`);
 }
 
 // =============================================================================================================== run
