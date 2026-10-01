@@ -453,6 +453,7 @@ export function createWater(ctx: RealismCtx): RealismHandle {
       if (big && o.name === 'World · lake') {
         try { v.edge = addEdgeAttribute(o, slots); } catch { v.edge = false; }
       }
+      if (o.geometry && !o.geometry.boundingBox) o.geometry.computeBoundingBox();   // (tick() asks whether any water is on screen)
       targets.set(o, { mesh: o, orig: o.material, geo: o.geometry, addedAttr: v.edge });
       const next = list.map((m, i) => (slots[i] ? cloneFor(m, v) : m));
       o.material = Array.isArray(o.material) ? next : next[0];

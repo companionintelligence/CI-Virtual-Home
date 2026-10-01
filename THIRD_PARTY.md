@@ -98,6 +98,13 @@ rows (the ocean source, the BVH, the tooling) are above them.
 
 #### water
 <!-- realism:water:begin -->
+Code only; no binary asset. LYGIA is not used (its licence forbids it): the hash, noise and shading code in
+`assets/viewer-water.ts` is original, written from the public algorithms (integer hash `lowbias32` by Chris Wellons, public
+domain; cellular edges; Schlick Fresnel; Toksvig roughness).
+
+| What | Source | Author | Licence | Files | Modification |
+|---|---|---|---|---|---|
+| FFT ocean (initial spectrum, phase/spectrum pass, Stockham FFT, normals pass) | https://github.com/jbouny/fft-ocean at commit 930c096 (2015-09-28); licence checked with `gh api repos/jbouny/fft-ocean/license` | © 2014 Jérémy Bouny; its spectrum and FFT code credits dli/waves (© 2014 David Li, MIT, `gh api repos/dli/waves/license`) | MIT (both notices are in the module header; the licence texts are under the shared rows above) | `assets/viewer-ocean.ts` | Ported to three r169: `float tanh()` deleted (a compile error on r169), setRenderTarget/render/restore, PlaneGeometry, float32 only for the NEAREST ping-pong targets and half float for the displacement and normal maps, a deterministic integer-hash Box-Muller gaussian instead of `Math.random`, phase = omega(k) t computed in the spectrum shader (the surface is a pure function of t), the omega operator-precedence slip and the standing-wave h0 fixed, the screen-projected grid, the mirror, the original tone mapping and sky constants dropped, normals packed with the Jacobian foam in alpha for `viewer-water.ts` |
 <!-- realism:water:end -->
 
 #### sky
