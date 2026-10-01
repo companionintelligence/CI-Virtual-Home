@@ -99,7 +99,7 @@ Before the render, the plan refuses a film over 110 s (naming the longest beats 
 ## Determinism
 
 Frame `i` is `__houseRenderFrames(i)` plus an overlay that is a pure function of the film second, so frames are random access and a fresh browser draws them again identically; the camera is
-`trackFrameAt`, a pure function of the tour second and the aspect; the encode is bitexact with a pinned thread count. Two fresh runs give the same mp4 **on one machine profile** (the Chromium build in
+`trackFrameAt`, a pure function of the tour second and the aspect; the encode is bitexact and single-threaded (`-threads 1`): with four threads libx264 gave a different file from the same frames on every run, measured by encoding the same 241 JPEGs three times, and with one thread it gave the same bytes every time. Encoding is not the slow part, the render is. Two fresh runs give the same mp4 **on one machine profile** (the Chromium build in
 `test/goldens/<profile>/PROFILE.json`, the GPU and the FFmpeg build). Offline rendering is untouched: nothing here edits `room-creator.html`, `assets/shot-*.ts` or `house-builder.ts`, and the goldens do not move.
 
 ## Hosting (owner decision)

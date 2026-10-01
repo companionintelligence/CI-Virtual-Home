@@ -234,6 +234,7 @@ test('the loudness chain: linear gain from the measurement, then a limiter a dec
   assert.match(args, /-crf 18/); assert.match(args, /-b:a 128k/); assert.match(args, /\+faststart/);
   assert.equal((args.match(/-fflags \+bitexact/g) || []).length, 3, 'bitexact on the input and both outputs');
   assert.equal((args.match(/-map_metadata -1/g) || []).length, 2, 'no metadata');
+  assert.match(args, /-threads 1 /, 'one encoder thread: libx264 with frame threads is not reproducible');
   assert.equal(encodeArgs({ wav: 'a.wav', fps: 30, web: 'w.mp4' }).filter(a => a === 'm.mp4').length, 0, 'no master unless asked');
 });
 
