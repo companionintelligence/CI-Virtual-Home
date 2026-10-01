@@ -1,0 +1,916 @@
+{
+  "schema": "family/v1",
+  "slug": "adeyemi-castro",
+  "house": "palnknoll",
+  "fictional": true,
+  "family": {
+    "surname": "Adeyemi-Castro",
+    "tagline": "Two dads, two kids, and a calendar that keeps up.",
+    "household": "young-family",
+    "business": false,
+    "story": "Tunde is a civil-service planner who plans the family week too. Rafael flies a regional route, so some nights he is not home. Sade and Leo fill the house with piano and questions.",
+    "address": {
+      "line": "15 Foxglove Knoll Road",
+      "place": "Fallow Point"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "tunde",
+      "name": "Tunde",
+      "age": 42,
+      "role": "parent",
+      "work": "civil-service planner",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Maren",
+        "runtime": "Hermes",
+        "job": "Turns the family's week of messages into one calendar Tunde edits.",
+        "personality": [
+          "organised",
+          "precise",
+          "calm"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Proposes a calendar. Tunde confirms every date."
+      }
+    },
+    {
+      "id": "rafael",
+      "name": "Rafael",
+      "age": 44,
+      "role": "parent",
+      "work": "regional airline pilot",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Gus",
+        "runtime": "OpenClaw",
+        "job": "Opens AirTrail in its own browser and logs each flight Rafael names.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Logs what Rafael names. He checks the entry."
+      }
+    },
+    {
+      "id": "sade",
+      "name": "Sade",
+      "age": 9,
+      "role": "child",
+      "work": "school, piano in the living room",
+      "colour": "chart-3"
+    },
+    {
+      "id": "leo",
+      "name": "Leo",
+      "age": 6,
+      "role": "child",
+      "work": "school",
+      "colour": "chart-4"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "Sunday, the dining table"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Monday, the kitchen"
+    },
+    {
+      "id": "foyer",
+      "kind": "room",
+      "room": "entry",
+      "title": "Monday, the foyer"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "Tuesday, the living room"
+    },
+    {
+      "id": "garage",
+      "kind": "room",
+      "room": "garage",
+      "title": "Wednesday, the garage"
+    },
+    {
+      "id": "bedtime",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Thursday, bedtime"
+    },
+    {
+      "id": "terrace",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Saturday, the terrace"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "rafael",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Two flights up with a parcel",
+        "body": "The parcel waits at the top of two flights of stone steps. Rafael carries it through the foyer and the dining room to the living room."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "sade",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Sade holds the guide",
+        "body": "Sade holds the quick-start guide. Tunde lifts out the Companion Core, a power cable and a recovery USB drive. The footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "tunde",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Tunde plugs in the cable and presses the button as Leo counts down from ten. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "rafael",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Rafael joins from his phone",
+        "body": "Rafael joins the Core's own network from his phone. Then he picks the home network from the list.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "tunde",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "ci-planning",
+        "homehub",
+        "navidrome",
+        "airtrail"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Tunde picks Hermes and Companion Memory (beta). Rafael picks OpenClaw. They add Companion Planning, HomeHub, Navidrome and AirTrail, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Companion Planning, HomeHub",
+            "Apps: Navidrome, AirTrail"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "tunde",
+      "agent": "tunde",
+      "approval": "tunde",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Maren says hello",
+        "body": "Tunde messages the agent he named Maren. Maren answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "tunde",
+        "text": "Hello, Tunde. Maren here. What is on the calendar?"
+      },
+      "film": true
+    },
+    {
+      "id": "dining-draft",
+      "chapter": "dining",
+      "member": "tunde",
+      "agent": "tunde",
+      "approval": "tunde",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "ci-planning"
+      ],
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Maren drafts the week",
+        "body": "Tunde texts Maren the week's school and club messages. Maren drafts one plan. Tunde edits it and enters it in Companion Planning himself."
+      },
+      "say": {
+        "speaker": "tunde",
+        "text": "Draft week ready. Please correct the dates."
+      },
+      "film": true
+    },
+    {
+      "id": "dining-week",
+      "chapter": "dining",
+      "member": "tunde",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front"
+      },
+      "popup": {
+        "title": "One week, one local file",
+        "body": "Tunde blocks out Rafael's early routes, swim club and piano in Companion Planning. The whole week is one local file on the Core.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "dining-flights",
+      "chapter": "dining",
+      "member": "rafael",
+      "agent": "rafael",
+      "approval": "rafael",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "airtrail",
+        "replaces": [
+          "Flighty"
+        ]
+      },
+      "capability": "log your flights and see your whole travel history on a world map",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Gus logs the week's flights",
+        "body": "Rafael names the week's flights. Gus opens AirTrail in its own browser and logs each one. Rafael checks the entries on the map.",
+        "chips": [
+          "AirTrail",
+          "replaces Flighty"
+        ]
+      },
+      "say": {
+        "speaker": "rafael",
+        "text": "Flights logged. Please check the map."
+      }
+    },
+    {
+      "id": "kitchen-meals",
+      "chapter": "kitchen",
+      "member": "tunde",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Sunday's batch-cook, planned",
+        "body": "Tunde plans the batch-cook in KitchenOwl at the breakfast bar. The meal planner and the shopping list live in the same app.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-chores",
+      "chapter": "kitchen",
+      "member": "leo",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses, with a recipe book",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Leo waters the herbs",
+        "body": "Tunde posts the week's chores in HomeHub. Sade sets the table, Leo waters the herbs, and each tick shows on every phone in the house.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "foyer-start",
+      "chapter": "foyer",
+      "member": "tunde",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homarr",
+        "replaces": []
+      },
+      "capability": "one start page for every app on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "entry",
+        "fallback": [
+          {
+            "role": "front-door"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One start page for the house",
+        "body": "Tunde pins every family app to one Homarr page. Anyone on the home Wi-Fi opens the calendar, the chores and the music from the same place.",
+        "chips": [
+          "Homarr"
+        ]
+      }
+    },
+    {
+      "id": "living-track",
+      "chapter": "living",
+      "member": "rafael",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Sade's practice track",
+        "body": "From the couch, Rafael plays the backing track for Sade's piano piece from Navidrome. It streams from the Core, and she plays along.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-quest",
+      "chapter": "living",
+      "member": "sade",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "habitica",
+        "replaces": [
+          "Habitify"
+        ]
+      },
+      "capability": "turn habits and chores into a game with levels and quests",
+      "anchor": {
+        "role": "music",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Practice, turned into a quest",
+        "body": "Sade ticks off today's piano practice in Habitica. Each tick earns her character a level, and the game runs on the Core.",
+        "chips": [
+          "Habitica",
+          "replaces Habitify"
+        ]
+      }
+    },
+    {
+      "id": "living-photos",
+      "chapter": "living",
+      "member": "tunde",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "couch",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Leo's birthday, backed up",
+        "body": "Tunde backs up Leo's birthday photos to Immich from the loveseat. They land on the Core, ready to search.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "member": "tunde",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ads blocked house-wide, at DNS",
+        "body": "Tunde checks the Pi-hole list beside the Core. Ads and trackers are blocked at the DNS level for every phone, tablet and laptop on the Wi-Fi.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "garage-service",
+      "chapter": "garage",
+      "member": "rafael",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "lubelogger",
+        "replaces": [
+          "Fuelly"
+        ]
+      },
+      "capability": "keep a service history, fuel log and reminders for every vehicle",
+      "anchor": {
+        "role": "bicycle",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Every vehicle gets a service log",
+        "body": "Rafael logs the car's next service and the bicycle's new chain in LubeLogger. A reminder is set before each one is due.",
+        "chips": [
+          "LubeLogger",
+          "replaces Fuelly"
+        ]
+      }
+    },
+    {
+      "id": "bed-playlist",
+      "chapter": "bedtime",
+      "member": "tunde",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The same playlist, every night",
+        "body": "Tunde starts the bedtime playlist in Navidrome, whether Rafael is flying or home. It streams the family's own music to the bedrooms from the Core.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "bed-bag",
+      "chapter": "bedtime",
+      "member": "sade",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "donetick",
+        "replaces": [
+          "Tody"
+        ]
+      },
+      "capability": "assign and track household chores and recurring tasks, with NFC tag completion",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A tag on the bedroom door",
+        "body": "Sade taps the family phone on the tag by the bedroom door when her school bag is packed. Donetick ticks the chore, and Tunde sees the tick.",
+        "chips": [
+          "Donetick",
+          "replaces Tody"
+        ]
+      }
+    },
+    {
+      "id": "bed-story",
+      "chapter": "bedtime",
+      "member": "leo",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Leo's story, where he left off",
+        "body": "Leo picks up his story where he stopped last night. Audiobookshelf remembers the place, on any device in the house.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "bed-receipts",
+      "chapter": "bedtime",
+      "member": "rafael",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Uniform receipts, filed for good",
+        "body": "Rafael files the uniform receipts and a new suitcase's warranty card in Papra at the bedroom desk. They stay put until he needs them.",
+        "chips": [
+          "Papra",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "terrace-trip",
+      "chapter": "terrace",
+      "member": "rafael",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "trip",
+        "replaces": []
+      },
+      "capability": "save places on a map and plan multi-day trips with a budget",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The summer road trip, mapped",
+        "body": "Tunde and Rafael plan the summer road trip on the outdoor sofa. TRIP saves the places on a map and keeps the budget beside them.",
+        "chips": [
+          "TRIP"
+        ]
+      }
+    },
+    {
+      "id": "terrace-sign",
+      "chapter": "terrace",
+      "member": "sade",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A lemonade sign, drawn at home",
+        "body": "Sade draws a sign for her lemonade stand in Inkscape on the terrace. The vector file sits on the Core.",
+        "chips": [
+          "Inkscape",
+          "replaces Adobe Illustrator"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Four people, one calendar, one Core",
+        "body": "Two dads, two children, and a week that keeps moving. The Adeyemi-Castro household runs on one Companion Core in the living room."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your calendar, your playlists and your photos can live on a Companion Core at home. Start with one shared week in Companion Planning.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Told like any other family. The kids' data is the stake, so no beat claims child safety, monitoring or learning outcomes: Habitica, Audiobookshelf and Inkscape are everyday moments.",
+    "No TV: the media beats are Navidrome and Immich at the couch. Mealie (signature) has no QA screenshot, so KitchenOwl carries the food beat and HomeHub the chores.",
+    "dining-draft: Hermes drafts and Tunde enters the plan himself, because Companion Planning has a UI link only. Companion Planning has a Google Calendar sync that is off by default; the text claims only a local file.",
+    "bed-playlist: \"whether Rafael is flying or home\" implies no control from away. Music Assistant was dropped (the validator bans the word assistant). bed-bag is the Donetick iot beat; its outside notifications go unmentioned.",
+    "living-dns: Pi-hole blocks at DNS and is not parental control (catalog caveat); the text never mentions the children. garage-service assumes the family owns a car; the scene shows only a bicycle.",
+    "Voice-over lexicon: Adeyemi, Castro, Tunde, Rafael, Sade (shah-DAY), Leo, Maren, Gus, Fallow Point, Foxglove, Homarr, Habitica, Audiobookshelf, LubeLogger, Papra, TRIP, Inkscape, AirTrail.",
+    "Street Foxglove Knoll Road and town Fallow Point are invented; the human map check is still open."
+  ]
+}
