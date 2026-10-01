@@ -128,6 +128,7 @@ async function renderStills(items: Baked[], outDir: string, aspects: string[], r
       for (const aspect of aspects) {
         await page.evaluate(([r, a]: string[]) => (window as any).__houseComposerWarm({ res: r, aspect: a }), [res, aspect]);
         const info = await page.evaluate(async ({ track, house, res, aspect }: any) => {
+          // @ts-ignore (a URL in the page, not a module of this script)
           const W: any = window, R = await import('/assets/story/runtime.js'), dbg = W.__houseDebug();
           const key = `house:${house}:story`;
           dbg.presets[key] = R.presetFromStory(W.__THREE, track, { name: 'Family tour', world: W.__houseShotWorld() });
@@ -206,7 +207,7 @@ async function renderStills(items: Baked[], outDir: string, aspects: string[], r
 
 // ---- main ---------------------------------------------------------------------------------------------------------------------------------------
 async function main() {
-  const argv = process.argv.slice(2), flagVal = new Set(['stills', 'aspects', 'res']);
+  const argv = process.argv.slice(2), flagVal = new Set(['stills', 'aspects', 'res', 'strip']);
   const flags: Record<string, string> = {}, slugs: string[] = [];
   for (let i = 0; i < argv.length; i++) { const a = argv[i]; if (a.startsWith('--')) { const k = a.slice(2); if (flagVal.has(k)) flags[k] = argv[++i]; else flags[k] = 'true'; } else slugs.push(a); }
   const all = flags.all === 'true' || (!slugs.length);

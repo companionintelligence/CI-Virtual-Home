@@ -90,8 +90,14 @@ function frameOf(track: StoryTrack, idx: number, t: number, aspect: number): Raw
     return { eye, target: composeTarget(eye, bf.focus, row.nx, row.ny, row.fov, aspect), fov: row.fov, roof: seg.roof };
   }
   if (seg.k === 'ftue') {
-    const f = sampleTrack(inflate(seg), clamp01((t - seg.t0) / (seg.t1 - seg.t0)), aspect);
-    return { eye: f.eye, target: f.target, fov: f.fov, roof: f.roofAlpha };
+    const u = clamp01((t - seg.t0) / (seg.t1 - seg.t0)), f = sampleTrack(inflate(seg), u, aspect);
+    let target = f.target;
+    // a phone: the planner puts the Core where a wide frame wants it; on a tall one it goes above the bottom sheet, by the weight the planner gives the Core's composition
+    if (aspect < 0.8 && track.core) {
+      const w = lin1(seg.cw, u * (seg.n - 1)) * smooth((0.8 - aspect) / 0.3);
+      if (w > 1e-3) { const c = track.core, centre: V3 = [(c[0] + c[3]) / 2, (c[1] + c[4]) / 2, (c[2] + c[5]) / 2]; target = lerp3(target, composeTarget(f.eye, centre, 0, 0.34, f.fov, aspect), w); }
+    }
+    return { eye: f.eye, target, fov: f.fov, roof: f.roofAlpha };
   }
   // a move: the eye along its samples, the look blended from the neighbours' views and the heading
   const u = clamp01((t - seg.t0) / (seg.t1 - seg.t0)), su = u * (seg.n - 1);
@@ -405,14 +411,12 @@ function bakeFtue(world: ShotWorld, pt: PlannerTrack, fb: BakeBeat[], hz: number
   }
   const seg: FtueSeg = { k: 'ftue', t0: 0, t1: R3(total), n, pos, look, fov, roof, cw, tan, compose: pt.compose ? { ndcX: pt.compose.ndcX, ndcY: pt.compose.ndcY } : null, beats: fb.map(b => b.id) };
   const times = fb.map((b, j) => ({ id: b.id, t0: R3(T0s[j]), t1: R3(T0s[j] + lens[j]), travel: null as [number, number] | null }));
-  // the frames: every FTUE beat is about the Core's set, except the delivery (the front door)
+  // the frames: every FTUE beat is about the Core itself (the popup keeps off it), except the delivery (the front door)
   const h = world.hero!, core = h.core, e = world.entry!;
-  const parts = [core, ...(h.surfaceBox ? [h.surfaceBox] : []), ...(h.monitor ? [h.monitor] : [])];
-  const set: Box6 = [Math.min(...parts.map(q => q[0])), Math.min(...parts.map(q => q[1])), Math.min(...parts.map(q => q[2])), Math.max(...parts.map(q => q[3])), Math.max(...parts.map(q => q[4])), Math.max(...parts.map(q => q[5]))];
   const frames: Record<string, BeatFrame> = {};
   fb.forEach((b, j) => {
     const door = b.id === 'ftue-delivery';
-    frames[b.id] = { role: door ? 'front-door' : 'core', box: door ? [e.x - 0.5, 0, e.z - 0.5, e.x + 0.5, 2.1, e.z + 0.5] : set, focus: door ? [e.x, 1.2, e.z] : [(core[0] + core[3]) / 2, (core[1] + core[4]) / 2, (core[2] + core[5]) / 2], compose: [{ a: ASPECT_REF, nx: 0, ny: 0, fov: 50 }], level: door ? e.level : h.level, fits: true, partial: false, rest: R3(T0s[j] + lens[j] * 0.55) };
+    frames[b.id] = { role: door ? 'front-door' : 'core', box: door ? [e.x - 0.5, 0, e.z - 0.5, e.x + 0.5, 2.1, e.z + 0.5] : [core[0] - 0.12, core[1] - 0.04, core[2] - 0.12, core[3] + 0.12, core[4] + 0.12, core[5] + 0.12], focus: door ? [e.x, 1.2, e.z] : [(core[0] + core[3]) / 2, (core[1] + core[4]) / 2, (core[2] + core[5]) / 2], compose: [{ a: ASPECT_REF, nx: 0, ny: 0, fov: 50 }], level: door ? e.level : h.level, fits: true, partial: false, rest: R3(T0s[j] + lens[j] * 0.55) };
   });
   // the press: a moment into the plug-in beat (or the first beat that wakes the Core)
   const wake = fb.findIndex(b => b.id === 'ftue-plug-in'), w2 = wake >= 0 ? wake : fb.findIndex(b => b.wake);

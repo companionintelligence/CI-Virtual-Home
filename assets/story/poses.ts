@@ -216,9 +216,12 @@ function searchEye(ctx: PoseCtx, r: Resolved, s: {
         if (pitch < -52 || pitch > 30) { rej('pitch'); continue; }
         const comp = probe.composition(cam, roofs);
         if (comp.fore > 0.12 || comp.share(1.5) > 0.5) { rej('lens blocked'); continue; }                       // nothing in the lens, no blank wall filling the frame
+        // a plant or a chair filling a fifth of the frame within two metres of the lens is clutter, even where it is not within 0.8 m (comp.fore)
+        let near = 0; for (const q of comp.rays) if (q.i >= 0 && q.t < 2 && !s.own.has(q.i)) { const k = world.kinds[q.i]; if (k !== K.wall && k !== K.glass && k !== K.rail && k !== K.roof && k !== K.stair) near++; }
+        const clutter = Math.max(0, near / comp.rays.length - 0.1) * 5;
         const size = Math.max((pb.maxY - pb.minY) / 2, (pb.maxX - pb.minX) / 2);
         const depth = comp.rays.reduce((a, q) => a + Math.min(isFinite(q.t) ? q.t : 12, 12), 0) / comp.rays.length;
-        const sc = depth * 0.22 - comp.share(2.5) * 2 - Math.pow((size - band.size) / 0.16, 2) * 0.9 - (side === 0 ? 0.8 : 0);
+        const sc = depth * 0.22 - comp.share(2.5) * 2 - clutter - Math.pow((size - band.size) / 0.16, 2) * 0.9 - (side === 0 ? 0.8 : 0);
         if (!bestSide || sc > bestSide.sc) bestSide = { side, table: [wide.row], fits: true, sc, tgt, comp, size };
       }
       if (!bestSide) continue;
@@ -230,7 +233,14 @@ function searchEye(ctx: PoseCtx, r: Resolved, s: {
       score += Math.min(1.2, g.dW[c]) * 0.9 + Math.min(1.0, g.dI[c]) * 0.45;
       score -= Math.abs(d - (band.dMin + band.dMax) / 2) * 0.05;
       const yaw = Math.atan2(bestSide.tgt[0] - x, bestSide.tgt[2] - z);
-      for (const a of s.avoid) if (a.level === r.level && Math.hypot(a.eye[0] - x, a.eye[2] - z) < 1.3 && Math.abs(Math.atan2(Math.sin(a.yaw - yaw), Math.cos(a.yaw - yaw))) < 0.5) { score -= 3; break; }
+      // not the shot an earlier beat took of this anchor: the same bearing round it at about the same distance, or the same spot looking the same way
+      for (const a of s.avoid) {
+        if (a.level !== r.level) continue;
+        const ab = Math.atan2(a.eye[0] - cx, a.eye[2] - cz), mb = Math.atan2(x - cx, z - cz), ad = Math.hypot(a.eye[0] - cx, a.eye[2] - cz);
+        const sameBearing = Math.abs(Math.atan2(Math.sin(ab - mb), Math.cos(ab - mb))) < 0.6 && Math.abs(ad - d) / Math.max(d, 0.5) < 0.3;
+        const sameSpot = Math.hypot(a.eye[0] - x, a.eye[2] - z) < 1.3 && Math.abs(Math.atan2(Math.sin(a.yaw - yaw), Math.cos(a.yaw - yaw))) < 0.5;
+        if (sameBearing || sameSpot) { score -= 3; break; }
+      }
       if (outside) {
         // the house behind the anchor, seen at an angle, beats bare scenery
         const dir = norm2(cx - x, cz - z);
@@ -238,7 +248,7 @@ function searchEye(ctx: PoseCtx, r: Resolved, s: {
         if (back && (back.k === K.wall || back.k === K.glass || back.k === K.roof || back.k === 0)) {
           const nrm = norm2(back.nrm[0], back.nrm[2]), ang = Math.acos(Math.max(-1, Math.min(1, -(dir[0] * nrm[0] + dir[1] * nrm[1])))) / DEG;
           score += 0.9 + (ang >= 25 && ang <= 60 ? 0.9 : ang < 10 || ang > 78 ? -0.3 : 0.2);
-        } else if (back) score += 0.2; else score -= 0.5;
+        } else if (back) score -= 0.6; else score -= 1.2;
       }
       if (score > bestScore + 1e-9) {
         bestScore = score;
