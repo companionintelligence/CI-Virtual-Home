@@ -1,0 +1,12 @@
+# Cloudflare Pages reads this file from the root of the site; scripts/build-portal.mts copies it there.
+#
+# Revalidate every file on every load. The engine's modules are not fingerprinted (assets/viewer.js is the same URL on
+# every deploy), and Pages' default for a static file is a four-hour browser cache with no check in between. A
+# visitor who opened the site in the four hours before a deploy then ran the NEW page against OLD modules from their
+# cache, and the player stopped with "This home could not be opened" ('./assets/shot-track.js' does not provide an
+# export named 'trackView'). With max-age=0 and must-revalidate the browser asks every time and the files carry ETags,
+# so an unchanged module costs one empty 304.
+#
+# If a file is ever given a content hash in its name, that file (and only that one) can be cached for a long time.
+/*
+  Cache-Control: public, max-age=0, must-revalidate

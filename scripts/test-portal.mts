@@ -29,6 +29,8 @@
 //             card that says so, with a way back, instead of an endless loader; the names module
 //             (home-names.js) not downloading: the gallery still lists the homes, and the player's tab never
 //             shows a spec's Sims title
+//   caching   dist/_headers revalidates every file (max-age=0, must-revalidate): the modules are not fingerprinted, so
+//             a long cache would run a deploy's new page against a returning visitor's old modules
 //   editor    room-creator.html without ?mode=view still shows the editor and never mounts the player
 //   webkit    Safari's engine, when Playwright's WebKit for the pinned version is installed: the gallery, the player
 //             (plays, pauses, scrubs) and the editor (builds a home, hooks there), with no console error. Skipped with
@@ -202,6 +204,21 @@ async function previews() {
   ok(jpeg.ok && bytes[0] === 0xff && bytes[1] === 0xd8, 'portal/hero.jpg is served, and is a JPEG');
   const staticHead = player.slice(0, player.indexOf('<script'));
   ok(!/Room Creator|SimsTree|Pascal/.test(staticHead) && /<title>Virtual homes/.test(staticHead) && /^https?:\/\//.test(og(player, 'og:image')), `room-creator.html's static head is the site's, not the editor's (${(staticHead.match(/<title>([^<]*)/) || [])[1]})`);
+}
+
+// ------------------------------------------------------------------ caching of the built site
+// The engine's modules are not fingerprinted, so the only thing that keeps a returning visitor's browser from running
+// the new page against old modules after a deploy is that every file is revalidated (Pages' default is four hours
+// with no check, which stopped every home with "This home could not be opened" right after a deploy).
+function caching() {
+  console.log('\ncaching');
+  const file = path.join(DIR, '_headers');
+  ok(fs.existsSync(file), 'dist/_headers is there (Cloudflare Pages reads it from the site root)');
+  if (!fs.existsSync(file)) return;
+  const lines = fs.readFileSync(file, 'utf8').split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
+  const rules = lines.filter(l => !/^\s/.test(l)), values = lines.filter(l => /^\s+cache-control\s*:/i.test(l)).map(l => l.split(':').slice(1).join(':').trim());
+  ok(rules.includes('/*'), 'a rule for every path (/*)');
+  ok(values.length > 0 && values.every(v => /(^|[ ,])max-age=0([ ,]|$)/.test(v) && /must-revalidate/.test(v)), `every Cache-Control rule is max-age=0, must-revalidate (${values.join(' | ') || 'none'})`);
 }
 
 // ------------------------------------------------------------------ player
@@ -600,6 +617,7 @@ try {
   await gallery({ width: 1440, height: 900 }, false, '1440');
   await gallery({ width: 390, height: 844 }, true, '390');
   await previews();
+  caching();
   for (const [i, id] of HOUSES.entries()) await player(id, { width: 1440, height: 900 }, false, '1440', i === 0);
   await player(HOUSES[0], { width: 390, height: 844 }, true, '390', false);
   await motion(HOUSES[0]);
