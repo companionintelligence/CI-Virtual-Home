@@ -472,7 +472,9 @@ aurora, cocoon, lakecabin, mirage and vanilla at day, dusk and night; (b) with e
 the offline hooks (`__houseViewer.external.before/after`) leave the scene drawing the same pixels as `?no=realism` at
 shot positions 0, 200/719 and 1; (c) no console error, shader-link error or GL warning; (d) `renderer.info.memory` is back
 after switching homes; (e) the six `test/goldens/expected-diffs` ledgers are untouched; then every
-`scripts/live-checks/<key>.mts`. `--quick`, `--houses`, `--only <key>`. Not part of `check` (it needs a GPU and a second tree).
+`scripts/live-checks/<key>.mts`. `--quick`, `--houses`, `--only <key>`. Not part of `check` (it needs a GPU and a second tree). Two browserless tests are
+part of `check:quick`: `test-quality-ladder.mts` (where each kind of device starts, how far the frame rate may move it, the
+ladder's put-back and ban rules) and `test-binary-guard.mts` (the portal's binary-asset rules, one failing fixture each).
 
 ### Notes per package
 
