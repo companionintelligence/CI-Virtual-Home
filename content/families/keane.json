@@ -671,18 +671,16 @@
       }
     },
     {
-      "id": "deck-lanterns",
+      "id": "deck-build",
       "chapter": "deck",
       "member": "imani",
       "category": "iot",
       "segment": "consumer",
       "app": {
-        "id": "home-assistant",
-        "replaces": [
-          "Google Home"
-        ]
+        "id": "ntfy",
+        "replaces": []
       },
-      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "capability": "Send a push notification to your phone from any script or automation with one request",
       "anchor": {
         "role": "patio-seat",
         "fallback": [
@@ -697,11 +695,10 @@
         "eye": "standing"
       },
       "popup": {
-        "title": "The lanterns dim at ten",
-        "body": "At ten, the lanterns round the host tree dim on a Home Assistant schedule. It runs on the Core.",
+        "title": "A buzz when the build ends",
+        "body": "Imani starts a long docs build and steps outside. A script sends a ntfy note to her phone when it ends.",
         "chips": [
-          "Home Assistant",
-          "replaces Google Home"
+          "ntfy"
         ]
       },
       "film": true
@@ -713,10 +710,12 @@
       "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
-        "replaces": []
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
       },
-      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "capability": "Read Wikipedia and other reference sites offline",
       "anchor": {
         "role": "garden"
       },
@@ -725,10 +724,11 @@
         "eye": "standing"
       },
       "popup": {
-        "title": "A meadow with a journal",
-        "body": "Below the ladder, Imani logs the wildflowers in HortusFox: where each patch grows, and when it blooms.",
+        "title": "Settling a wildflower argument",
+        "body": "Imani and Jonah disagree about a wildflower below the ladder. Kiwix settles it, from a copy of Wikipedia on the Core.",
         "chips": [
-          "HortusFox"
+          "Kiwix",
+          "replaces Google Search"
         ]
       }
     },
@@ -739,12 +739,12 @@
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "navidrome",
+        "id": "mstream",
         "replaces": [
           "Spotify"
         ]
       },
-      "capability": "Stream your own music collection to any device",
+      "capability": "Stream your own music from your Core to a browser or an app",
       "anchor": {
         "role": "patio-seat",
         "fallback": [
@@ -759,9 +759,9 @@
       },
       "popup": {
         "title": "A playlist for the deck",
-        "body": "Jonah queues his playlist on the deck. Navidrome streams it from the Core, and the lake does the rest.",
+        "body": "Jonah queues his playlist on the deck. mStream streams it from the Core, and the lake does the rest.",
         "chips": [
-          "Navidrome",
+          "mStream",
           "replaces Spotify"
         ]
       },
@@ -788,7 +788,7 @@
     }
   ],
   "closing": {
-    "body": "Your drafts, your clients' files and your lantern schedule can live on a Companion Core at home. Start with one page in Docmost.",
+    "body": "Your drafts, your clients' files and your build alerts can live on a Companion Core at home. Start with one page in Docmost.",
     "cta": {
       "label": "See Companion Core",
       "url": "https://ci.computer/core"
@@ -798,10 +798,10 @@
     "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
     "The care note asks for no internet claims and nothing about being off the grid. The text says neither. The only internet mention is the standard ftue-pick note.",
     "Chapter titles borrow documentation headings (Before you begin, Step one) for a wry voice. The ftue beat titles use \"Step one/two/three\"; check they read well in the player and the film.",
-    "Eyeless anchors (canopy-bath, deck/1) are not used. Garden and deck beats anchor on patio-seat or garden with the garden fallback. The ladder, lake and lanterns are in the house description; the render shows a lake and a ladder.",
+    "Eyeless anchors (canopy-bath, deck/1) are not used. Garden and deck beats anchor on patio-seat or garden with the garden fallback. The ladder and the lake are in the house description and the render.",
     "Basil (OpenClaw) works inside Docmost on the Core, not on a website, so the OpenClaw web note is not used. Imani reviews every page.",
     "Cast gave Jonah no companion; he is a visitor with four beats. Jonah reads out the home Wi-Fi password in ftue-join; no value is shown.",
-    "Spliit shows who owes whom and moves no money (catalog). Open WebUI is shown on the Core model only; no cloud key. Home Assistant has no USB or Bluetooth on the Hub, so the lanterns are home-network devices.",
+    "Spliit shows who owes whom and moves no money. Open WebUI runs on the Core model, no cloud key. ntfy (deck-build): the script runs on her laptop, ntfy on the Core; iOS push uses a relay (catalog caveat), so nothing local is claimed.",
     "Town Carrowmere and street Hazel Boreen are invented and still need the human map check."
   ]
 }

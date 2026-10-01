@@ -47,7 +47,7 @@
       "companion": {
         "name": "Pernille",
         "runtime": "OpenClaw",
-        "job": "Opens HortusFox in its own browser and logs what the class planted.",
+        "job": "Opens Grist in its own browser and logs what the class planted.",
         "personality": [
           "cheerful",
           "curious",
@@ -216,7 +216,7 @@
       "segment": "consumer",
       "with": [
         "home-assistant",
-        "hortusfox",
+        "grist",
         "ntfy"
       ],
       "anchor": {
@@ -229,13 +229,13 @@
       "popup": {
         "kind": "phone",
         "title": "Two agents, three apps",
-        "body": "In Companion Hub, Amani picks Hermes and Freya picks OpenClaw. They add Home Assistant, HortusFox and ntfy, then walk out to inspect the greenhouse.",
+        "body": "In Companion Hub, Amani picks Hermes and Freya picks OpenClaw. They add Home Assistant, Grist and ntfy, then walk out to inspect the greenhouse.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agents: Hermes, OpenClaw",
-            "Apps: Home Assistant, HortusFox",
+            "Apps: Home Assistant, Grist",
             "App: ntfy"
           ]
         }
@@ -525,18 +525,18 @@
       }
     },
     {
-      "id": "library-seeds",
+      "id": "library-manual",
       "chapter": "library",
       "member": "amani",
       "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "grist",
+        "id": "docmost",
         "replaces": [
-          "Airtable"
+          "Confluence"
         ]
       },
-      "capability": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy",
+      "capability": "A collaborative wiki for notes and documentation",
       "anchor": {
         "role": "bookshelf",
         "fallback": [
@@ -551,11 +551,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "A seed calendar with real formulas",
-        "body": "Amani keeps the seed calendar in Grist. A short Python formula works out the sowing date for each tray.",
+        "title": "One manual page per sensor",
+        "body": "Amani documents every sensor he builds in Docmost, one page each. The wiki sits on the Core, where the sensors report.",
         "chips": [
-          "Grist",
-          "replaces Airtable"
+          "Docmost",
+          "replaces Confluence"
         ]
       }
     },
@@ -665,18 +665,18 @@
       }
     },
     {
-      "id": "bedroom-mystery",
+      "id": "bedroom-comic",
       "chapter": "bedroom",
       "member": "baraka",
       "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "audiobookshelf",
+        "id": "booklore",
         "replaces": [
-          "Audible"
+          "Kindle"
         ]
       },
-      "capability": "Listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "capability": "Manage and read books, comics and PDFs with automatic covers and metadata",
       "anchor": {
         "role": "bed",
         "room": "bedroom",
@@ -692,11 +692,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "A mystery with the lights out",
-        "body": "Baraka listens to a mystery in Audiobookshelf with the lights out. When he nods off, the app keeps his place for tomorrow.",
+        "title": "A comic before lights out",
+        "body": "Baraka reads a comic in BookLore before lights out. The covers fill in by themselves, and the whole library lives on the Core.",
         "chips": [
-          "Audiobookshelf",
-          "replaces Audible"
+          "BookLore",
+          "replaces Kindle"
         ]
       }
     },
@@ -766,10 +766,12 @@
       "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
-        "replaces": []
+        "id": "grist",
+        "replaces": [
+          "Airtable"
+        ]
       },
-      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "capability": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy",
       "anchor": {
         "role": "garden"
       },
@@ -779,9 +781,10 @@
       },
       "popup": {
         "title": "Pernille logs the trays",
-        "body": "Freya reads out what her class planted. Pernille opens HortusFox in its own browser and logs each tray. Freya checks every entry.",
+        "body": "Freya reads out what her class planted. Pernille opens Grist in its own browser and logs each tray. A formula counts the days. Freya checks every entry.",
         "chips": [
-          "HortusFox"
+          "Grist",
+          "replaces Airtable"
         ]
       },
       "say": {
@@ -845,7 +848,7 @@
     }
   ],
   "closing": {
-    "body": "Your sensors, your seed log and your lesson notes can live on a Companion Core at home. Start with one tray in HortusFox.",
+    "body": "Your sensors, your seed log and your lesson notes can live on a Companion Core at home. Start with one tray in Grist.",
     "cta": {
       "label": "See Companion Core",
       "url": "https://ci.computer/core"
@@ -855,7 +858,7 @@
     "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
     "Home Assistant (kitchen-kip, green-vent): the Hub has no USB, Bluetooth or GPIO, so the sensors Amani builds are home-network devices that report over Wi-Fi. No energy or savings claim; the text never says which protocol they use.",
     "ntfy (green-frost): iOS push goes through an upstream relay (catalog caveat), so the text says only that a note reaches his phone. Kip (Hermes) only reports; Amani decides. Hermes note sits on ftue-hello, the first Hermes beat.",
-    "Pernille (OpenClaw) works inside HortusFox on the Core, not on a website, so the OpenClaw web note is not used. Freya checks every entry.",
+    "Cast gave Pernille a HortusFox job. HortusFox is over the fleet cap, so only her job text changed, to Grist; name, runtime, voice and limits are as cast. No website is opened, so the OpenClaw web note is unused.",
     "Razzia needs a manager password set at install (catalog caveat); the text says nothing about it. Linkwarden saves a page with a screenshot and PDF; no cloud claim is made.",
     "Baraka is a visiting nephew aged twelve: three beats, never voiced, no companion. Freya's class is a school class; no school is named and no learning-outcome claim is made.",
     "Joplin Server is named in full because the catalog entry covers the server only; the Joplin apps are separate.",

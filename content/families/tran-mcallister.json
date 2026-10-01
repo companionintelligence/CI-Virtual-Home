@@ -98,12 +98,6 @@
       "title": "Mai's room, before bed"
     },
     {
-      "id": "bedroom",
-      "kind": "room",
-      "room": "bedroom",
-      "title": "Linh's mornings"
-    },
-    {
       "id": "deck",
       "kind": "outside",
       "room": "garden",
@@ -431,8 +425,7 @@
         "chips": [
           "Yuvomi"
         ]
-      },
-      "film": true
+      }
     },
     {
       "id": "kitchen-calendar",
@@ -461,6 +454,38 @@
           "replaces Google Calendar"
         ]
       }
+    },
+    {
+      "id": "kitchen-bell",
+      "chapter": "kitchen",
+      "member": "rory",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "ntfy",
+        "replaces": []
+      },
+      "capability": "Send a push notification to your phone from any script or automation with one request",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A dinner bell for the house",
+        "body": "Dinner is ready. Rory taps a shortcut on his phone, and ntfy sends a note to Linh's phone and Mai's tablet.",
+        "chips": [
+          "ntfy"
+        ]
+      },
+      "film": true
     },
     {
       "id": "kitchen-recipes",
@@ -701,56 +726,22 @@
           "Donetick",
           "replaces OurHome"
         ]
-      }
-    },
-    {
-      "id": "bedroom-lights",
-      "chapter": "bedroom",
-      "member": "linh",
-      "category": "iot",
-      "segment": "consumer",
-      "app": {
-        "id": "home-assistant",
-        "replaces": [
-          "Google Home"
-        ]
-      },
-      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
-      "anchor": {
-        "role": "bed",
-        "room": "bedroom",
-        "fallback": [
-          {
-            "role": "room",
-            "room": "bedroom"
-          }
-        ]
-      },
-      "camera": {
-        "framing": "medium",
-        "side": "left"
-      },
-      "popup": {
-        "title": "The landing lights keep her hours",
-        "body": "After a night shift, Linh sleeps while a Home Assistant schedule keeps the landing lights low. It runs on the Core.",
-        "chips": [
-          "Home Assistant",
-          "replaces Google Home"
-        ]
       },
       "film": true
     },
     {
-      "id": "deck-herbs",
+      "id": "deck-journal",
       "chapter": "deck",
-      "member": "rory",
-      "category": "home",
+      "member": "linh",
+      "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
-        "replaces": []
+        "id": "memos",
+        "replaces": [
+          "Google Keep"
+        ]
       },
-      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "capability": "Capture quick notes and journal entries in Markdown",
       "anchor": {
         "role": "garden"
       },
@@ -759,13 +750,13 @@
         "eye": "standing"
       },
       "popup": {
-        "title": "Coriander for the soup",
-        "body": "Rory and Mai plant coriander for Linh's grandmother's soup. HortusFox keeps the planting date, a watering log and a picture for each pot.",
+        "title": "A daily line by the herbs",
+        "body": "After a long shift, Linh sits on the deck beside the coriander pots. She adds one line to her journal in Memos.",
         "chips": [
-          "HortusFox"
+          "Memos",
+          "replaces Google Keep"
         ]
-      },
-      "film": true
+      }
     },
     {
       "id": "deck-dinner",
@@ -799,7 +790,8 @@
           "PairDrop",
           "replaces AirDrop"
         ]
-      }
+      },
+      "film": true
     },
     {
       "id": "deck-ride",
@@ -865,7 +857,7 @@
     "Shift work is told as a scheduling story only. No health claim; no workplace is named. Linh is a nurse (cast work); the text never says where.",
     "Yuvomi appears in ftue-pick, kitchen-plan (named inside the Hermes beat) and kitchen-board. Juno only drafts; Linh edits and confirms in Yuvomi herself (Hermes cannot act on a ui-only app).",
     "Firefly III (dining-statement): bank sync is an outside service (catalog caveat), so the text says a CSV file. Bookkeeping only, no financial advice.",
-    "Home Assistant (bedroom-lights): the lights are devices on the home network. No energy, sleep or health claim; the schedule is Linh's.",
+    "ntfy (kitchen-bell): a phone shortcut is the script. iOS push goes through an upstream relay (catalog caveat), so the text only says a note reaches the phones. No Home Assistant here, to keep that app within the fleet cap.",
     "Donetick's notifications use Telegram or Pushover (catalog caveat); the text mentions only an NFC tag on a pot, which the listing names. Pi-hole is DNS-level blocking, not parental control.",
     "Town Tallowfield and street Wattlebird Crescent are invented and still need the human map check. Grandparents are named only as \"Linh's grandmother\" and \"Rory's father\"."
   ]

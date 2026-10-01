@@ -274,32 +274,31 @@
       "film": true
     },
     {
-      "id": "living-lamp",
+      "id": "living-board",
       "chapter": "living",
       "member": "marisol",
-      "category": "iot",
-      "segment": "consumer",
+      "category": "productivity",
+      "segment": "small-business",
       "app": {
-        "id": "home-assistant",
+        "id": "planka",
         "replaces": [
-          "Google Home"
+          "Trello"
         ]
       },
-      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "capability": "A real-time Kanban board for a team or a family project",
       "anchor": {
-        "role": "room",
-        "room": "living"
+        "role": "couch"
       },
       "camera": {
         "framing": "wide",
         "side": "left"
       },
       "popup": {
-        "title": "The lamp keeps a schedule",
-        "body": "Marisol puts the drawing lamp on a smart plug. Home Assistant switches it on at dusk from the Core, and nothing is wired into the cottage's walls.",
+        "title": "The dragon book, as a board",
+        "body": "Marisol runs the dragon book as a Planka board on the loveseat: sketch, translate, proof, send. Mateo moves one card himself.",
         "chips": [
-          "Home Assistant",
-          "replaces Google Home"
+          "Planka",
+          "replaces Trello"
         ]
       }
     },
@@ -324,7 +323,7 @@
         "side": "auto"
       },
       "popup": {
-        "title": "One filter for every device",
+        "title": "One Pi-hole for the cottage",
         "body": "Marisol points the home network at Pi-hole on the Core. Ads and trackers get blocked at the DNS level for every phone and tablet in the cottage.",
         "chips": [
           "Pi-hole",
@@ -713,10 +712,12 @@
       "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
-        "replaces": []
+        "id": "memos",
+        "replaces": [
+          "Google Keep"
+        ]
       },
-      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "capability": "Capture quick notes and journal entries in Markdown",
       "anchor": {
         "role": "garden"
       },
@@ -726,9 +727,10 @@
       },
       "popup": {
         "title": "Marigolds get a journal",
-        "body": "Marisol and Mateo plant marigolds along the fence. HortusFox keeps a journal with a photo, the date and when each pot was watered.",
+        "body": "Marisol and Mateo plant marigolds along the fence. She jots the date and one line from Mateo in Memos, and the garden journal begins.",
         "chips": [
-          "HortusFox"
+          "Memos",
+          "replaces Google Keep"
         ]
       }
     },
@@ -770,7 +772,7 @@
       "id": "yard-sky",
       "chapter": "yard",
       "member": "mateo",
-      "category": "home",
+      "category": "iot",
       "segment": "consumer",
       "app": {
         "id": "skybro",
@@ -827,8 +829,8 @@
   "notes": [
     "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
     "Renter angle: the text says only that the cottage is rented and nothing needs a screwdriver. It does not say the Core can be moved between homes; the sheet does not.",
-    "Home Assistant (living-lamp): the smart plug is hardware the family bought; it is not in the parcel or the 3D scene. No energy or savings claim. The Hub has no USB, Bluetooth or GPIO.",
-    "SkyBro (yard-sky) reads outside sky feeds and sends alerts through an outside service (catalog caveat); no local-only claim. Kiwix (kids-komodo) needs content files downloaded once; the text says \"a copy on the Core\".",
+    "Category iot goes to SkyBro (yard-sky) to keep Home Assistant within the fleet cap. SkyBro reads outside sky feeds and alerts through an outside service (catalog caveat). Swap in a Home Assistant beat if preferred.",
+    "Kiwix (kids-komodo) needs content files downloaded once; the text says \"a copy on the Core\". Planka (living-board) is a family project board; Mateo moving one card is the only child detail.",
     "Docuseal (table-sign): never \"legally binding\". Marisol fills in and signs a PDF form and sends it herself; no remote signing is shown.",
     "Habitica (kitchen-quest) is a chore game with a parent holding the tablet. No learning or behavior claim. Pi-hole (living-dns) is DNS-level blocking only, not parental control.",
     "Nico (OpenClaw) works only inside the Core's own apps, so the OpenClaw web note is not used. The dragon book is invented.",
