@@ -1,0 +1,876 @@
+{
+  "schema": "family/v1",
+  "slug": "chowdhury-osei",
+  "house": "mirage",
+  "fictional": true,
+  "family": {
+    "surname": "Chowdhury-Osei",
+    "tagline": "A studio on four floors, with the drawings in one place.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Rafiq is an architect and Abena an interior designer. They run their studio from a four-story house, with their daughter Nia as junior designer. One Companion Core in the kitchen holds the drawings.",
+    "address": {
+      "line": "9 Switchback Terrace",
+      "place": "Oriel Heights"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "rafiq",
+      "name": "Rafiq",
+      "age": 52,
+      "role": "partner",
+      "work": "architect, runs the studio",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Hugo",
+        "runtime": "OpenClaw",
+        "job": "Opens BookStack in its own browser and files the project notes.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Files notes Rafiq names. Rafiq reads them."
+      }
+    },
+    {
+      "id": "abena",
+      "name": "Abena",
+      "age": 50,
+      "role": "partner",
+      "work": "interior designer, runs the studio",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Selma",
+        "runtime": "Hermes",
+        "job": "Drafts client moodboard notes from what Abena texts it.",
+        "personality": [
+          "gentle",
+          "warm",
+          "thoughtful"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Drafts only. Abena sends every note."
+      }
+    },
+    {
+      "id": "nia",
+      "name": "Nia",
+      "age": 24,
+      "role": "adult-child",
+      "work": "junior designer",
+      "colour": "chart-3",
+      "companion": {
+        "name": "Pim",
+        "runtime": "Hermes",
+        "job": "Drafts site-visit summaries from the notes Nia texts it.",
+        "personality": [
+          "quick",
+          "wry",
+          "bright"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Drafts only. Nia sends her summaries."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "salon",
+      "kind": "room",
+      "room": "living",
+      "title": "The living salon"
+    },
+    {
+      "id": "terrace",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The pool terrace"
+    },
+    {
+      "id": "studio",
+      "kind": "room",
+      "room": "office",
+      "title": "The studio den"
+    },
+    {
+      "id": "nia",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Nia's room upstairs"
+    },
+    {
+      "id": "loft",
+      "kind": "room",
+      "room": "living",
+      "title": "The reading loft"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "rafiq",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel and a long climb",
+        "body": "A parcel waits at the front door on the lowest floor. Rafiq and Nia carry it through the lobby and up the stair tower to the kitchen."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "abena",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unpacking on the shelf",
+        "body": "Abena unpacks the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "nia",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Nia plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "rafiq",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Standing at the island, Rafiq joins the Core's own Wi-Fi network from his phone, then picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "abena",
+      "with": [
+        "nextcloud",
+        "bookstack"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Choose the first agents",
+        "body": "In Companion Hub, the family picks Hermes twice and OpenClaw once. They add Companion Memory (beta), Nextcloud and BookStack, then go back to work.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Nextcloud, BookStack"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "rafiq",
+      "agent": "rafiq",
+      "approval": "rafiq",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and coding tools, running in its own sandbox",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Hugo answers, dryly",
+        "body": "Rafiq sends the first message to Hugo, the agent he named. Hugo answers, and the Core is running."
+      },
+      "say": {
+        "speaker": "rafiq",
+        "text": "Hello, Rafiq. I am Hugo. Which project first?"
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "abena",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One list for four floors",
+        "body": "Rafiq adds olives from the loft. Nia adds oat milk from her room. Abena sees both on the KitchenOwl list at the island.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-split",
+      "chapter": "kitchen",
+      "category": "money",
+      "segment": "consumer",
+      "member": "nia",
+      "app": {
+        "id": "spliit",
+        "replaces": [
+          "Splitwise"
+        ]
+      },
+      "capability": "split shared costs with housemates, family or friends",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Who owes whom, plainly",
+        "body": "At the island, Nia and her parents settle the week's groceries in Spliit. It shows who owes whom and moves no money.",
+        "chips": [
+          "Spliit",
+          "replaces Splitwise"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-memory",
+      "chapter": "kitchen",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "abena",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk; imports are opt-in",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Abena decides what Selma uses",
+        "body": "Abena opens Companion Memory and chooses which folders Selma may use. Nothing is connected by default, and she can remove a folder whenever she likes."
+      }
+    },
+    {
+      "id": "salon-music",
+      "chapter": "salon",
+      "category": "media",
+      "segment": "consumer",
+      "member": "abena",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Music for a long evening",
+        "body": "On the couch in the living salon, Abena queues her music in Navidrome. It streams from the Core, and the piano waits its turn.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "salon-lights",
+      "chapter": "salon",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "rafiq",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Stair lights on a schedule",
+        "body": "At dusk, the lights in the glass stair tower come up on a Home Assistant schedule. It runs on the Core and reaches them over the home Wi-Fi.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "terrace-lilies",
+      "chapter": "terrace",
+      "category": "home",
+      "segment": "consumer",
+      "member": "abena",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos",
+      "anchor": {
+        "role": "garden",
+        "fallback": [
+          {
+            "role": "deck"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A journal for the lily pond",
+        "body": "Abena logs the pond plants in HortusFox, with their care history and a photo for the journal.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "studio-drawings",
+      "chapter": "studio",
+      "category": "creative",
+      "segment": "small-business",
+      "member": "rafiq",
+      "app": {
+        "id": "drawio",
+        "replaces": [
+          "Lucidchart"
+        ]
+      },
+      "capability": "draw flowcharts, floor plans and network maps in the browser",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Floor plans, drawn in a tab",
+        "body": "Rafiq draws a client's floor plan in draw.io, in his browser. The drawing tool is hosted on the Core.",
+        "chips": [
+          "draw.io",
+          "replaces Lucidchart"
+        ]
+      }
+    },
+    {
+      "id": "studio-notes",
+      "chapter": "studio",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "rafiq",
+      "agent": "rafiq",
+      "approval": "rafiq",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "capability": "write a wiki or a set of manuals in books, chapters and pages",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Hugo files the site notes",
+        "body": "After the site meeting, Rafiq tells Hugo what mattered. Hugo opens BookStack in its own browser and files the notes under the project. Rafiq reads them.",
+        "chips": [
+          "BookStack",
+          "replaces Confluence"
+        ]
+      },
+      "say": {
+        "speaker": "rafiq",
+        "text": "Notes filed under the project. Please read them."
+      },
+      "film": true
+    },
+    {
+      "id": "studio-files",
+      "chapter": "studio",
+      "category": "productivity",
+      "segment": "small-business",
+      "member": "nia",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Drawings in one place",
+        "body": "Nia opens the whole drawing set in Nextcloud, whichever floor she is working on. The files sit on the Core.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "studio-set",
+      "chapter": "studio",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "rafiq",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sheets merged into one set",
+        "body": "Rafiq merges the drawing sheets into one PDF with Stirling-PDF, ready for the client meeting. The merge runs on the Core.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "studio-moodboard",
+      "chapter": "studio",
+      "category": "creative",
+      "segment": "small-business",
+      "member": "abena",
+      "agent": "abena",
+      "approval": "abena",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "penpot"
+      ],
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "couch",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Selma drafts, Abena designs",
+        "body": "Abena texts Selma her notes on a client's colors. Selma drafts the moodboard note, and Abena lays out the board in Penpot herself.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "abena",
+        "text": "Here is the draft note. Please read it first."
+      }
+    },
+    {
+      "id": "studio-site",
+      "chapter": "studio",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "nia",
+      "agent": "nia",
+      "approval": "nia",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Pim drafts the visit summary",
+        "body": "Back from a site visit, Nia texts Pim her notes. Pim drafts the summary, and Nia sends it to the client herself."
+      },
+      "say": {
+        "speaker": "nia",
+        "text": "Summary drafted. Please check it before it goes."
+      }
+    },
+    {
+      "id": "nia-photos",
+      "chapter": "nia",
+      "category": "media",
+      "segment": "consumer",
+      "member": "nia",
+      "app": {
+        "id": "foldergram",
+        "replaces": []
+      },
+      "capability": "turn a folder of photos and videos into a feed with albums and a timeline",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Site photos become a timeline",
+        "body": "Nia drops a folder of site-visit photos into Foldergram. It turns the folder into a feed with albums and a timeline.",
+        "chips": [
+          "Foldergram"
+        ]
+      }
+    },
+    {
+      "id": "nia-vault",
+      "chapter": "nia",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "nia",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host. Works with the Bitwarden apps",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Shared sign-ins, one vault",
+        "body": "Nia moves the studio's shared sign-ins into VaultWarden. It works with the Bitwarden apps, and the vault sits on the Core.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "loft-sky",
+      "chapter": "loft",
+      "category": "creative",
+      "segment": "consumer",
+      "member": "nia",
+      "app": {
+        "id": "memos",
+        "replaces": [
+          "Google Keep"
+        ]
+      },
+      "capability": "capture quick notes and journal entries in Markdown",
+      "anchor": {
+        "role": "telescope",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Observing notes, kept at home",
+        "body": "Nia sets up the telescope and jots the night's sky in Memos. The journal lives on the Core.",
+        "chips": [
+          "Memos",
+          "replaces Google Keep"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "loft-reference",
+      "chapter": "loft",
+      "category": "productivity",
+      "segment": "small-business",
+      "member": "rafiq",
+      "app": {
+        "id": "linkwarden",
+        "replaces": [
+          "Raindrop.io"
+        ]
+      },
+      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "anchor": {
+        "role": "couch",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "A reference page, saved for good",
+        "body": "On the loft daybed, Rafiq saves a reference page to Linkwarden, with a screenshot and a PDF. The copy stays on the Core if the page moves.",
+        "chips": [
+          "Linkwarden",
+          "replaces Raindrop.io"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, four floors",
+        "body": "The Chowdhury-Osei household runs a studio, a kitchen and a telescope from one Core on the second floor."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your drawings and project notes can live on a Companion Core at home, one place for every floor. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "The Core is on the second floor, one stair tower above the front door; the casting stake says three flights, the house files show one. ftue-delivery says only \"up the stair tower\".",
+    "No TV in this home: the media beat is Navidrome at the couch. The word screen is avoided throughout. No desk: studio beats use the Den and its bookshelf.",
+    "ftue-hello uses OpenClaw (Hugo); the Hermes disclosure note sits on studio-moodboard, the first Hermes beat.",
+    "Invented place and street: check Oriel Heights and Switchback Terrace against a map. Setting is a waterfront render, so no hillside is described."
+  ]
+}
