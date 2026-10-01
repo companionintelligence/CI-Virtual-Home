@@ -239,9 +239,22 @@ function wire() {
   wired = true;
   // The player's heaviest files, fetched into the cache the first time a card is pointed at or focused, so the
   // click lands on a warm three.js and engine; and the pointed-at home's spec, which the player fetches with the
-  // HTTP cache (room-creator.html itself is not warmed: the player's URL carries a query, so a prefetch of the
+  // HTTP cache (room-creator.html itself is not warmed: the player's URL carries a query, so a request for the
   // bare page would never be the one used). Not on touch: a finger that starts a scroll on a card is not a
   // choice, and a phone's data is not ours to spend on one.
+  // Plain low-priority fetches, not <link rel="prefetch">: a browser marks a prefetch `Sec-Purpose: prefetch`, and the
+  // homes.ci.computer zone refuses every such request with a 503 (`cf-speculation-refused`), so nothing was ever warmed
+  // and the console filled with red. And each module is asked for by the URL the player will ask for: the page's import
+  // map names it by a hash of its content (scripts/build-portal.mts), so warming the plain URL would warm a file nobody uses.
+  const imports = (() => { try { return JSON.parse(document.querySelector('script[type="importmap"]').textContent).imports || {}; } catch { return {}; } })();
+  const asked = new Set();
+  const fetchLow = href => {
+    const url = imports[href] || href;
+    if (asked.has(url)) return;
+    asked.add(url);
+    // read the body so the browser finishes the download and keeps it; the answer is not used
+    fetch(url, { priority: 'low' }).then(r => (r.ok ? r.arrayBuffer() : null)).catch(() => { /* a warm-up that fails costs nothing */ });
+  };
   let warmed = false;
   const warm = e => {
     if (e.pointerType === 'touch') return;
@@ -251,10 +264,7 @@ function wire() {
     const urls = warmed ? [] : ['./assets/vendor/three/three.module.min.js', './assets/house-builder.js', './assets/viewer.js'];
     if (id) urls.push(`./content/houses/${encodeURIComponent(id)}.json`);
     warmed = true;
-    for (const href of urls) {
-      if (document.querySelector(`link[rel="prefetch"][href="${href}"]`)) continue;
-      const l = document.createElement('link'); l.rel = 'prefetch'; l.href = href; document.head.append(l);
-    }
+    for (const href of urls) fetchLow(href);
   };
   for (const ev of ['pointerover', 'focusin']) document.addEventListener(ev, warm, { passive: true });
 
