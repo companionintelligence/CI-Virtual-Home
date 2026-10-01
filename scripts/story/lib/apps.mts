@@ -1,0 +1,100 @@
+// App rules: every app a story names is a real Companion Hub store app, is used inside its catalog caveats, and is
+// declared, so the family page can list exactly the apps a visitor will meet. STORY-BIBLE section 10.
+// The catalog is content/story/catalog-apps.json, a snapshot of the live store AND the manifests on main; re-check it on
+// publish day with scripts/story/build-catalog-snapshot.mts.
+import { FIRST_PARTY, type Beat, type Story } from '../../../assets/story/types.ts';
+import type { Ctx } from './context.mts';
+import type { Report } from './report.mts';
+import { plain } from './text.mts';
+
+const FIRST_PARTY_IDS = new Set<string>(FIRST_PARTY);
+
+// Phrases that name Bitwarden without naming the product: VaultWarden is Bitwarden-compatible (STORY-BIBLE section 10, item 4).
+const BITWARDEN_COMPAT = /\bthe Bitwarden apps\b|\bBitwarden-compatible\b/g;
+
+/** The app names a piece of text mentions, as catalog ids. */
+export function namedApps(text: string, ctx: Ctx): Set<string> {
+  const named = new Set<string>();
+  for (const m of ctx.appMatchers) if (m.re.test(text)) named.add(m.id);
+  // Paperless-ngx is the one catalog app whose short name is a common word; a bare "Paperless" is flagged by checkAppNames
+  return named;
+}
+
+/** Apps that cannot be named at all: not in the production store. */
+function notInStoreHits(text: string, ctx: Ctx): string[] {
+  const t = text.replace(BITWARDEN_COMPAT, ' ');
+  return ctx.notInStore.filter((n) => n.re.test(t)).map((n) => n.name);
+}
+
+function checkAppUse(b: Beat, id: string, ctx: Ctx, out: Report, main: boolean): void {
+  const a = ctx.apps.get(id);
+  if (!a) { out.E('app-unknown', b.id, main ? `app ${id} is not in the catalog snapshot (content/story/catalog-apps.json)` : `with: ${id} is not in the catalog snapshot`, 'Use the id exactly as the catalog has it (paperless, not paperless-ngx).'); return; }
+  if (a.storySafe === 'avoid') out.E('app-avoid', b.id, `${a.id} is marked avoid in the catalog`, 'Choose another app.');
+  if (a.qa === 'not-boot-tested') out.E('app-qa', b.id, `${a.id} says it was not boot-tested on a live Hub device`, 'Choose an app that was.');
+  if (a.qa === 'no-screenshot') out.R('app-qa-screenshot', b.id, `${a.id} has no QA screenshot; the owner must list the beat in content/story/reviewed.json`, 'Prefer an app with a QA screenshot, or ask the owner to review the beat.');
+  if (main && a.storySafe === 'with-caveat') {
+    const kinds = [...new Set(a.caveats.map((c) => c.kind).filter((k) => k !== 'note'))];
+    if (kinds.some((k) => ['public-access', 'hardware'].includes(k)) && !b.capability) out.W('app-caveat', b.id, `${a.id} carries caveats ${kinds.join(', ')}`, 'Write the capability and read the caveats in catalog-apps.json before using this app.');
+  }
+}
+
+export function checkApps(story: Story, ctx: Ctx, out: Report): void {
+  for (const b of story.beats) {
+    const text = beatText(b);
+    // ---- names that must not appear at all
+    for (const n of notInStoreHits(text, ctx)) out.E('app-not-in-store', b.id, `${n} is not in the production store`, 'Name an app a customer can install today.');
+    if (/\bPaperless\b(?!-ngx)/.test(text)) out.E('app-name', b.id, 'name the app Paperless-ngx, never bare "Paperless"', 'Write Paperless-ngx.');
+
+    // ---- the one app of the scene
+    const named = namedApps(text, ctx);
+    if (b.app) {
+      const a = ctx.apps.get(b.app.id);
+      checkAppUse(b, b.app.id, ctx, out, true);
+      if (!a) continue;                                   // unknown app: nothing else about it can be checked
+      for (const r of b.app.replaces) if (!a.replaces.includes(r)) out.E('app-replaces', b.id, `${a.id} replaces ${a.replaces.join(', ') || 'nothing'} in the catalog, not "${r}"`, 'Use only names from the catalog entry.');
+      const chips = b.popup.chips || [];
+      if (chips.length) {
+        if (chips[0].toLowerCase() !== a.name.toLowerCase() && !(a.id === 'ci-openclaw' && /openclaw/i.test(chips[0]))) out.E('chips', b.id, `the first chip must be the app name "${a.name}"`);
+        if (chips.slice(1).some((c) => !/^replaces /.test(c))) out.E('chips', b.id, 'the other chips read "replaces <name>"');
+        for (const r of chips.slice(1).map((c) => c.replace(/^replaces /, ''))) if (!b.app.replaces.includes(r)) out.E('chips', b.id, `chip names ${r}, which is not in app.replaces`);
+      }
+      if (b.app.replaces.length && !chips.some((c) => /^replaces /.test(c))) out.W('chips', b.id, 'app.replaces is set but no "replaces" chip shows it');
+      if (!b.capability && b.category !== 'setup') out.W('capability', b.id, 'name the one thing the app does (capability)');
+      if (b.capability) {
+        const claimApp = ctx.claims.apps.find((x) => x.id === b.app!.id);
+        const desc = `${a.description || ''} ${claimApp?.mayDescribeAs || ''}`.toLowerCase();
+        const keys = b.capability.toLowerCase().match(/[a-z]{5,}/g) || [];
+        if (keys.length && !keys.some((k) => desc.includes(k.slice(0, 5)))) out.W('capability', b.id, 'capability shares no word with the catalog description', 'Copy the capability from the catalog description.');
+      }
+      named.delete(b.app.id);
+    } else {
+      if (b.category !== 'setup') out.W('app', b.id, 'a beat outside the setup category without an app');
+      if ((b.popup.chips || []).length) out.W('chips', b.id, 'chips without an app');
+    }
+    // ---- other apps the text names
+    for (const w of b.with || []) {
+      if (ctx.apps.has(w)) checkAppUse(b, w, ctx, out, false); else out.E('app-unknown', b.id, `with: ${w} is not in the catalog snapshot`);
+      named.delete(w);
+    }
+    for (const id of FIRST_PARTY_IDS) named.delete(id);
+    for (const id of named) out.E('app-undeclared', b.id, `the text names ${ctx.apps.get(id)!.name} but it is not app.id or in with`, 'Add it to "with", or take the name out of the text.');
+  }
+
+  // ---- the family-level strings: a name there must be a real app that some beat shows
+  const shown = new Set<string>(story.beats.flatMap((b) => [...(b.app ? [b.app.id] : []), ...(b.with || [])]));
+  const family: [string, string][] = [['family.tagline', story.family.tagline], ['family.story', story.family.story], ['closing.body', story.closing.body]];
+  story.members.forEach((m) => { if (m.work) family.push([`member ${m.id}.work`, m.work]); if (m.companion) family.push([`member ${m.id}.companion.job`, m.companion.job], [`member ${m.id}.companion.limits`, m.companion.limits]); });
+  story.chapters.forEach((c) => family.push([`chapter ${c.id}`, c.title]));
+  for (const [at, raw] of family) {
+    const t = plain(raw);
+    for (const n of notInStoreHits(t, ctx)) out.E('app-not-in-store', at, `${n} is not in the production store`);
+    if (/\bPaperless\b(?!-ngx)/.test(t)) out.E('app-name', at, 'name the app Paperless-ngx, never bare "Paperless"');
+    for (const id of namedApps(t, ctx)) if (!shown.has(id) && !FIRST_PARTY_IDS.has(id)) out.E('app-undeclared', at, `names ${ctx.apps.get(id)!.name}, which no beat shows`, 'Show the app in a beat, or leave its name out.');
+  }
+  out.stats.apps = [...shown].sort();
+}
+
+function beatText(b: Beat): string {
+  // the text a visitor reads or hears in the beat, without the canned disclosure note
+  return [b.popup.title, b.popup.body, ...(b.popup.chips || []), ...(b.popup.phone?.rows || []), b.say?.text || ''].map(plain).join(' ');
+}

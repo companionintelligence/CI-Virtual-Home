@@ -13,7 +13,7 @@
     "build": "node --experimental-strip-types scripts/build-house-assets.mts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p assets/tsconfig.json",
     "validate": "node --experimental-strip-types scripts/validate-house-spec.mts",
-    "test": "node --experimental-strip-types --test scripts/test-floorplan-graph.mts",
+    "test": "node --experimental-strip-types --test scripts/test-floorplan-graph.mts scripts/test-stories.mts",
     "check": "node --experimental-strip-types scripts/check-house.mts",
     "check:quick": "node --experimental-strip-types scripts/check-house.mts --quick",
     "test:node": "node --experimental-strip-types scripts/check-house.mts --node",
