@@ -1,0 +1,840 @@
+{
+  "schema": "family/v1",
+  "slug": "okonkwo-reid",
+  "house": "modernhouse-nora",
+  "fictional": true,
+  "family": {
+    "surname": "Okonkwo-Reid",
+    "tagline": "Long interviews, quick spreadsheets, and one quiet shelf.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Obinna produces a podcast from the Desk Hall. Rhiannon, a data analyst, works at the next desk. Guests record in the house, and their raw files stay on the Core.",
+    "address": {
+      "line": "28 Peachfield Terrace",
+      "place": "Loblolly Cross"
+    },
+    "narrator": "v-deep-m"
+  },
+  "members": [
+    {
+      "id": "obinna",
+      "name": "Obinna",
+      "age": 35,
+      "role": "partner",
+      "work": "podcast producer",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Cass",
+        "runtime": "OpenClaw",
+        "job": "Opens AudioMass in its own browser and loads the latest interview file.",
+        "personality": [
+          "quick",
+          "wry",
+          "bright"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Loads a copy. Obinna does every edit."
+      }
+    },
+    {
+      "id": "rhiannon",
+      "name": "Rhiannon",
+      "age": 37,
+      "role": "partner",
+      "work": "data analyst, works from home",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Gwen",
+        "runtime": "Hermes",
+        "job": "Finds the sheet or note Rhiannon asks for, from what she put in Companion Memory.",
+        "personality": [
+          "calm",
+          "patient",
+          "gentle"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Finds and reports. Rhiannon opens and decides."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "Cold open"
+    },
+    {
+      "id": "hall",
+      "kind": "room",
+      "room": "office",
+      "title": "Segment one: the Desk Hall"
+    },
+    {
+      "id": "data",
+      "kind": "room",
+      "room": "office",
+      "title": "Segment two: the data desk"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "Segment three: living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Segment four: the kitchen"
+    },
+    {
+      "id": "upstairs",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Segment five: upstairs"
+    },
+    {
+      "id": "deck",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Last word: the deck"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "obinna",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel, mid-edit",
+        "body": "The parcel arrives while Obinna is mid-edit. He carries it through the entry to the Desk Hall, and Rhiannon clears a space on the desk."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "rhiannon",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Checking the packing list",
+        "body": "Rhiannon checks the list: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "obinna",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in, then listen",
+        "body": "Obinna plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network. At idle, it sits at nineteen decibels.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "rhiannon",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from the phone",
+        "body": "Rhiannon opens the Wi-Fi settings and joins the Core's own network. Then she picks the home network from the list.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "obinna",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "audiomass",
+        "nextcloud",
+        "grist",
+        "home-assistant"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Obinna picks OpenClaw. Rhiannon picks Hermes and Companion Memory (beta). They add AudioMass, Nextcloud, Grist and Home Assistant, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: AudioMass, Nextcloud",
+            "Apps: Grist, Home Assistant"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "rhiannon",
+      "agent": "rhiannon",
+      "approval": "rhiannon",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Gwen says hello",
+        "body": "Rhiannon messages the agent she named Gwen. Gwen answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "rhiannon",
+        "text": "Hello, Rhiannon. Gwen here. Ready when you are."
+      },
+      "film": true
+    },
+    {
+      "id": "hall-edit",
+      "chapter": "hall",
+      "member": "obinna",
+      "agent": "obinna",
+      "approval": "obinna",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "Adobe Audition"
+        ]
+      },
+      "capability": "edit audio in a browser tab: cut, fade, normalise, export",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Cass loads yesterday's interview",
+        "body": "Obinna asks Cass for yesterday's interview. Cass opens AudioMass in its own browser and loads a copy. Obinna makes every cut himself.",
+        "chips": [
+          "AudioMass",
+          "replaces Adobe Audition"
+        ]
+      },
+      "say": {
+        "speaker": "obinna",
+        "text": "Copy loaded. The edit is yours."
+      },
+      "film": true
+    },
+    {
+      "id": "hall-folders",
+      "chapter": "hall",
+      "member": "obinna",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Dropbox"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One folder per guest",
+        "body": "Each guest gets a folder in Nextcloud on the Core. The raw takes live there, and the studio laptop syncs the same folder.",
+        "chips": [
+          "Nextcloud",
+          "replaces Dropbox"
+        ]
+      }
+    },
+    {
+      "id": "hall-release",
+      "chapter": "hall",
+      "member": "obinna",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "docuseal",
+        "replaces": [
+          "DocuSign"
+        ]
+      },
+      "capability": "fill and sign PDF forms on any device, from your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The release form, signed here",
+        "body": "A guest signs the release form on a tablet in the Desk Hall. Docuseal saves the signed PDF on the Core.",
+        "chips": [
+          "Docuseal",
+          "replaces DocuSign"
+        ]
+      }
+    },
+    {
+      "id": "hall-sponsor",
+      "chapter": "hall",
+      "member": "obinna",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A sponsor, tracked as a deal",
+        "body": "A sponsor asks about the autumn run. Obinna adds the deal to Twenty with the dates and the notes from the call.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      }
+    },
+    {
+      "id": "hall-backup",
+      "chapter": "hall",
+      "member": "obinna",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "duplicati",
+        "replaces": [
+          "Backblaze"
+        ]
+      },
+      "capability": "back up your files with encryption before they leave your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Guest folders, copied to a disk",
+        "body": "Obinna points Duplicati at a local disk and backs up the guest folders. The copy sits in a drawer, a few steps from the Core.",
+        "chips": [
+          "Duplicati",
+          "replaces Backblaze"
+        ]
+      }
+    },
+    {
+      "id": "data-sheet",
+      "chapter": "data",
+      "member": "rhiannon",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "grist",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "a spreadsheet-database with real Python formulas, stored as a SQLite file you can copy",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Episodes and guests, one table",
+        "body": "Rhiannon keeps the episode schedule and guest list in one Grist table. Python formulas work out the dates, and the file is a SQLite file she can copy.",
+        "chips": [
+          "Grist",
+          "replaces Airtable"
+        ]
+      }
+    },
+    {
+      "id": "data-plan",
+      "chapter": "data",
+      "member": "rhiannon",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "super-productivity",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "plan your day, track time and run a Pomodoro timer",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A workday in timed blocks",
+        "body": "Rhiannon plans her workday in Super Productivity and starts a Pomodoro timer for each block. The plan sits on the Core.",
+        "chips": [
+          "Super Productivity",
+          "replaces Todoist"
+        ]
+      }
+    },
+    {
+      "id": "data-find",
+      "chapter": "data",
+      "member": "rhiannon",
+      "agent": "rhiannon",
+      "approval": "rhiannon",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Gwen finds the forecast sheet",
+        "body": "Rhiannon asks Gwen where the March sheet went. Gwen finds it from what Rhiannon put into Companion Memory. Rhiannon opens it herself."
+      },
+      "say": {
+        "speaker": "rhiannon",
+        "text": "Found it. Please open the file to check."
+      },
+      "film": true
+    },
+    {
+      "id": "data-handbook",
+      "chapter": "data",
+      "member": "rhiannon",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "capability": "write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The show handbook, written down",
+        "body": "Rhiannon writes the show handbook in BookStack: the guest briefing, the microphone checklist and the release steps.",
+        "chips": [
+          "BookStack",
+          "replaces Confluence"
+        ]
+      }
+    },
+    {
+      "id": "living-mix",
+      "chapter": "living",
+      "member": "obinna",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "After the export, the couch",
+        "body": "After the last export, Obinna stretches out on the couch and plays tonight's mix from Navidrome. It streams from the Core to his phone.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-lamp",
+      "chapter": "living",
+      "member": "rhiannon",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A lamp that says recording",
+        "body": "From the couch, Rhiannon adds the Desk Hall lamp to Home Assistant. One tap turns it red when Obinna records.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "member": "rhiannon",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The pantry, tracked at the bar",
+        "body": "Rhiannon tracks the pantry in Grocy at the breakfast bar. Obinna adds to the shopping list from his phone.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-warranty",
+      "chapter": "kitchen",
+      "member": "obinna",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "A microphone receipt, filed",
+        "body": "Obinna scans the new microphone's receipt and warranty card into Papra at the counter. Both wait there until the day he needs them.",
+        "chips": [
+          "Papra",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "upstairs-read",
+      "chapter": "upstairs",
+      "member": "rhiannon",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A long paper, read in bed",
+        "body": "In bed, Rhiannon reads a long paper in Koodo Reader. Her place and highlights stay in the library on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "deck-run",
+      "chapter": "deck",
+      "member": "rhiannon",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "endurain",
+        "replaces": [
+          "Strava"
+        ]
+      },
+      "capability": "track runs, rides and gear and see your fitness stats on your own server",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "This morning's run, logged",
+        "body": "Rhiannon loads this morning's run into Endurain from a GPX file. The route and her shoe mileage sit on the Core.",
+        "chips": [
+          "Endurain",
+          "replaces Strava"
+        ]
+      }
+    },
+    {
+      "id": "deck-trailer",
+      "chapter": "deck",
+      "member": "obinna",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "freecut",
+        "replaces": []
+      },
+      "capability": "edit multi-track video in your browser",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A trailer cut on the deck",
+        "body": "On the deck, Obinna cuts a trailer in FreeCut, using clips from the guest folders.",
+        "chips": [
+          "FreeCut"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Two desks, one quiet shelf",
+        "body": "A producer and an analyst share one Desk Hall. The Okonkwo-Reid household runs on one Companion Core, and the guests' recordings stay at home."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your recordings, your spreadsheets and your lamps can run from a Companion Core at home. Start with one guest folder in Nextcloud.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "The Core stands on a desk in the Desk Hall (casting roles list no desk item, so hall beats anchor on the core or on room:office). The dining room has no camera eye, so no beat anchors there.",
+    "Whisper-WebUI and Metabase (casting signature apps) have no QA screenshot and are not on the reviewed list, so they are not used. Signature apps used: AudioMass, Nextcloud, Home Assistant.",
+    "ftue-plug-in: \"nineteen decibels\" is the sheet's 19 dB at idle [V]; the text says \"At idle\". Check the voice-over reads it naturally.",
+    "hall-release: Docuseal, never called legally binding (catalog caveat). Signers outside the home network need access to the Core, so the guest signs on a tablet in the house.",
+    "hall-backup: Duplicati names a local disk (catalog caveat). deck-trailer: FreeCut runs in the browser of the device that edits; no claim about where media goes.",
+    "deck-run: Endurain is logging only, no health outcome; Strava sync is off the table (outside service), GPX upload is local.",
+    "Voice-over lexicon: Okonkwo, Obinna, Rhiannon, Cass, Gwen, Loblolly, Docuseal, Duplicati, Grist, Grocy, Papra, BookStack, Endurain, FreeCut, AudioMass, Navidrome. Street and town are invented; the human map check is still open."
+  ]
+}
