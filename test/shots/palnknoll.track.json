@@ -1,5 +1,5 @@
 {
- "hash": "04f077b8:3241:27",
+ "hash": "82807c64:3241:27",
  "duration": 27,
  "beats": {
   "establish": 5.04,
@@ -13,10 +13,10 @@
   "power": 2.1
  },
  "metrics": {
-  "outsideShare": 0.262,
+  "outsideShare": 0.263,
   "doorSpeed": 0.85,
   "maxYawRate": 46.1,
-  "lookErrorMedian": 4,
+  "lookErrorMedian": 3.9,
   "coreLOS": 18.82,
   "finalCoreHeight": 0.231,
   "finalCoreNDC": [
@@ -26,7 +26,7 @@
   "orbitArc": 97.8,
   "topRoomsSeen": 3,
   "errors": 0,
-  "warnings": 7
+  "warnings": 9
  },
  "establish": "axial"
 }

@@ -1,8 +1,8 @@
 {
- "hash": "ff889b9e:3781:31.5",
+ "hash": "e198c5ef:3781:31.5",
  "duration": 31.5,
  "beats": {
-  "establish": 4.75,
+  "establish": 4.76,
   "approach": 1.77,
   "threshold": 1.38,
   "reveal": 1.28,
@@ -13,10 +13,10 @@
   "power": 2.13
  },
  "metrics": {
-  "outsideShare": 0.228,
+  "outsideShare": 0.229,
   "doorSpeed": 0.85,
-  "maxYawRate": 44.1,
-  "lookErrorMedian": 2.2,
+  "maxYawRate": 44,
+  "lookErrorMedian": 2.4,
   "coreLOS": 12.32,
   "finalCoreHeight": 0.228,
   "finalCoreNDC": [
@@ -26,7 +26,7 @@
   "orbitArc": 106,
   "topRoomsSeen": 3,
   "errors": 0,
-  "warnings": 5
+  "warnings": 6
  },
  "establish": "garden"
 }
