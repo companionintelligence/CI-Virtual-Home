@@ -1,0 +1,864 @@
+{
+  "schema": "family/v1",
+  "slug": "tran-mcallister",
+  "house": "modernhouse1",
+  "fictional": true,
+  "family": {
+    "surname": "Tran-McAllister",
+    "tagline": "Different shifts, one family plan, and dinner at the table.",
+    "household": "young-family",
+    "business": false,
+    "story": "Linh is a nurse on rotating shifts and Rory teaches primary school. Their daughter Mai is six, and dinner is the one fixed point in the week. Recipes from three grandparents, on two continents, and the family plan sit on one Companion Core.",
+    "address": {
+      "line": "12 Wattlebird Crescent",
+      "place": "Tallowfield"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "linh",
+      "name": "Linh",
+      "age": 38,
+      "role": "parent",
+      "work": "nurse on rotating shifts",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Juno",
+        "runtime": "Hermes",
+        "job": "Turns the family's week of messages into a shift and dinner plan.",
+        "personality": [
+          "quick",
+          "wry",
+          "bright"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Proposes a plan. Linh edits and confirms it."
+      }
+    },
+    {
+      "id": "rory",
+      "name": "Rory",
+      "age": 40,
+      "role": "parent",
+      "work": "primary-school teacher",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Angus",
+        "runtime": "OpenClaw",
+        "job": "Opens KitchenOwl in its own browser and types in the recipes Rory points to.",
+        "personality": [
+          "gentle",
+          "thoughtful",
+          "patient"
+        ],
+        "voice": "v-storyteller-m",
+        "memory": false,
+        "limits": "Saves a copy. Rory edits the recipe."
+      }
+    },
+    {
+      "id": "mai",
+      "name": "Mai",
+      "age": 6,
+      "role": "child",
+      "work": "school, Kids Room upstairs",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "lounge",
+      "kind": "room",
+      "room": "living",
+      "title": "Sunday, the library lounge"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Sunday evening, the plan"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "Midweek, the dining table"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Mai's room, before bed"
+    },
+    {
+      "id": "deck",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Weekends, the deck"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "The week goes round"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "rory",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel between shifts",
+        "body": "The parcel arrives on a Tuesday morning, between Linh's shifts. Rory carries it into the library lounge and clears the bottom shelf."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "linh",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Linh lays it all out",
+        "body": "Linh lays out the contents: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "mai",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Mai presses the button",
+        "body": "Rory plugs in the cable and Mai presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "linh",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it between shifts",
+        "body": "Linh joins the Core's own network from her phone. She picks the home network and types its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "rory",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "yuvomi",
+        "kitchenowl",
+        "vaultwarden"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the agents and apps",
+        "body": "In Companion Hub, Linh picks Hermes and Rory picks OpenClaw. They add Yuvomi, KitchenOwl and VaultWarden, then walk away to start dinner.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Yuvomi, KitchenOwl",
+            "App: VaultWarden"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "linh",
+      "agent": "linh",
+      "approval": "linh",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Juno says hello",
+        "body": "Linh sends the first message to Juno, the agent she named. Juno answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "linh",
+        "text": "Hello, Linh. Juno here. What does the week look like?"
+      },
+      "film": true
+    },
+    {
+      "id": "lounge-cassettes",
+      "chapter": "lounge",
+      "member": "rory",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "Stream your own music collection to any device",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A father's cassettes, playing again",
+        "body": "Rory saved his father's old cassettes as audio files. On Sunday, Navidrome plays them from the loveseat, and Mai asks for the song about the frog.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "lounge-lessons",
+      "chapter": "lounge",
+      "member": "rory",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "A whiteboard with a hand-drawn look",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Monday's lesson, sketched",
+        "body": "Rory sketches Monday's lesson on an Excalidraw whiteboard by the bookshelves. He prints the board for the class, and the original stays on the Core.",
+        "chips": [
+          "Excalidraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "lounge-router",
+      "chapter": "lounge",
+      "member": "rory",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "Block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The router asks Pi-hole first",
+        "body": "Rory sets the router to ask Pi-hole first. It blocks ads, trackers and bad domains at the DNS level for every device in the house.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-plan",
+      "chapter": "kitchen",
+      "member": "linh",
+      "agent": "linh",
+      "approval": "linh",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "yuvomi"
+      ],
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Juno drafts the week",
+        "body": "On Sunday evening, Linh sends Juno the week's messages. Juno drafts a plan of shifts and dinners. Linh edits it in Yuvomi."
+      },
+      "say": {
+        "speaker": "linh",
+        "text": "Plan drafted. Please edit before you confirm."
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-board",
+      "chapter": "kitchen",
+      "member": "rory",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "A family planner with a shared calendar, tasks, shopping, meals, notes, contacts and budget in one",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Who is cooking tonight?",
+        "body": "Whoever gets home first opens Yuvomi on the fridge door. Tonight's dinner, who is cooking and who is on shift are all on one page.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-calendar",
+      "chapter": "kitchen",
+      "member": "linh",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "A small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "One calendar, two timetables",
+        "body": "Linh's shifts and Rory's school terms share one calendar in Baikal. It runs on the Core and syncs to both phones over the home Wi-Fi.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-bell",
+      "chapter": "kitchen",
+      "member": "rory",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "ntfy",
+        "replaces": []
+      },
+      "capability": "Send a push notification to your phone from any script or automation with one request",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A dinner bell for the house",
+        "body": "Dinner is ready. Rory taps a shortcut on his phone, and ntfy sends a note to Linh's phone and Mai's tablet.",
+        "chips": [
+          "ntfy"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-recipes",
+      "chapter": "kitchen",
+      "member": "rory",
+      "agent": "rory",
+      "approval": "rory",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Angus keeps the old recipes",
+        "body": "Rory reads out the recipe Linh's grandmother used to make. Angus opens KitchenOwl in its own browser and types it in. Rory corrects the quantities.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "say": {
+        "speaker": "rory",
+        "text": "Recipe saved. Please check the quantities."
+      }
+    },
+    {
+      "id": "dining-vault",
+      "chapter": "dining",
+      "member": "rory",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "Store every password in a vault you host",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Logins, moved into one vault",
+        "body": "At the dining table, Rory moves the family's logins into VaultWarden. It works with the Bitwarden apps, and the vault lives on the Core.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "dining-slips",
+      "chapter": "dining",
+      "member": "linh",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "Archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Every slip and warranty, kept",
+        "body": "Linh scans permission slips, warranties and the dishwasher manual into Papra. Months later, one search finds the right page.",
+        "chips": [
+          "Papra",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "dining-statement",
+      "chapter": "dining",
+      "member": "linh",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "firefly-iii",
+        "replaces": [
+          "Mint"
+        ]
+      },
+      "capability": "Track accounts, budgets, bills and savings goals, with rules that sort your transactions",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Last month's statement, sorted",
+        "body": "Linh imports last month's bank statement as a CSV file into Firefly III. Its rules sort each line into a category.",
+        "chips": [
+          "Firefly III",
+          "replaces Mint"
+        ]
+      }
+    },
+    {
+      "id": "kids-art",
+      "chapter": "kids",
+      "member": "mai",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "foldergram",
+        "replaces": []
+      },
+      "capability": "Turn a folder of photos and videos into a private feed with albums and a timeline",
+      "anchor": {
+        "role": "toys",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A year of Mai's drawings",
+        "body": "On Sunday, Rory photographs Mai's school drawings. Foldergram turns the folder into an album feed, so her year in pictures has a timeline.",
+        "chips": [
+          "Foldergram"
+        ]
+      }
+    },
+    {
+      "id": "kids-ebook",
+      "chapter": "kids",
+      "member": "linh",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "Read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A picture book, read aloud",
+        "body": "Linh opens a picture book in Koodo Reader and turns on text-to-speech. Mai follows along with her finger under each line.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "kids-chore",
+      "chapter": "kids",
+      "member": "mai",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "donetick",
+        "replaces": [
+          "OurHome"
+        ]
+      },
+      "capability": "Assign and track household chores and recurring tasks, with NFC tag completion",
+      "anchor": {
+        "role": "room",
+        "room": "kids"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Mai's chore has a tag",
+        "body": "Donetick lists the family's chores, and Mai's is watering the herbs. A tag on the pot lets her mark it done.",
+        "chips": [
+          "Donetick",
+          "replaces OurHome"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "deck-journal",
+      "chapter": "deck",
+      "member": "linh",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "memos",
+        "replaces": [
+          "Google Keep"
+        ]
+      },
+      "capability": "Capture quick notes and journal entries in Markdown",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A daily line by the herbs",
+        "body": "After a long shift, Linh sits on the deck beside the coriander pots. She adds one line to her journal in Memos.",
+        "chips": [
+          "Memos",
+          "replaces Google Keep"
+        ]
+      }
+    },
+    {
+      "id": "deck-dinner",
+      "chapter": "deck",
+      "member": "rory",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "pairdrop",
+        "replaces": [
+          "AirDrop"
+        ]
+      },
+      "capability": "Send files between phones and laptops on the same Wi-Fi",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sunday dinner, sent across the table",
+        "body": "Rory sends the photos of Sunday dinner to Linh's laptop with PairDrop, over the home Wi-Fi. Mai insists on the one with her thumb in it.",
+        "chips": [
+          "PairDrop",
+          "replaces AirDrop"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "deck-ride",
+      "chapter": "deck",
+      "member": "rory",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "wanderer",
+        "replaces": []
+      },
+      "capability": "Plan, map and share hiking and biking routes from GPX files",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Saturday's ride, mapped",
+        "body": "Rory plans a Saturday bike ride with Mai in Wanderer. He loads a GPX file, and the route is saved on the Core.",
+        "chips": [
+          "Wanderer"
+        ]
+      }
+    },
+    {
+      "id": "outro-house",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Three timetables, one plan",
+        "body": "Two shifts, a school day and a six-year-old. The Tran-McAllister household keeps its week on one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your family's week, your recipes and your logins can live on a Companion Core at home. Start with one grandmother's recipe in KitchenOwl.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Cast gave Angus a job built on Mealie. Mealie has no QA screenshot and reviewed.json is empty, so only the job text changed, to KitchenOwl. Name, runtime, voice and limits are as cast.",
+    "Shift work is told as a scheduling story only. No health claim; no workplace is named. Linh is a nurse (cast work); the text never says where.",
+    "Yuvomi appears in ftue-pick, kitchen-plan (named inside the Hermes beat) and kitchen-board. Juno only drafts; Linh edits and confirms in Yuvomi herself (Hermes cannot act on a ui-only app).",
+    "Firefly III (dining-statement): bank sync is an outside service (catalog caveat), so the text says a CSV file. Bookkeeping only, no financial advice.",
+    "ntfy (kitchen-bell): a phone shortcut is the script. iOS push goes through an upstream relay (catalog caveat), so the text only says a note reaches the phones. No Home Assistant here, to keep that app within the fleet cap.",
+    "Donetick's notifications use Telegram or Pushover (catalog caveat); the text mentions only an NFC tag on a pot, which the listing names. Pi-hole is DNS-level blocking, not parental control.",
+    "Town Tallowfield and street Wattlebird Crescent are invented and still need the human map check. Grandparents are named only as \"Linh's grandmother\" and \"Rory's father\"."
+  ]
+}

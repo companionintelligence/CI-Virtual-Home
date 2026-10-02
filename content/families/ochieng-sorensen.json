@@ -1,0 +1,867 @@
+{
+  "schema": "family/v1",
+  "slug": "ochieng-sorensen",
+  "house": "vanilla",
+  "fictional": true,
+  "family": {
+    "surname": "Ochieng-Sorensen",
+    "tagline": "A greenhouse with sensors, and a house that reads them.",
+    "household": "solo-or-couple",
+    "business": false,
+    "story": "Amani is a firmware engineer who builds the sensors in the family greenhouse. Freya teaches primary school, and her class plants the same seeds every spring. Their greenhouse log lives on one Companion Core.",
+    "address": {
+      "line": "85 Cattail Lane",
+      "place": "Fenwick Prairie"
+    },
+    "narrator": "v-young-f"
+  },
+  "members": [
+    {
+      "id": "amani",
+      "name": "Amani",
+      "age": 35,
+      "role": "partner",
+      "work": "firmware engineer, works from home",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Kip",
+        "runtime": "Hermes",
+        "job": "Reads Home Assistant sensor values and tells Amani what changed.",
+        "personality": [
+          "curious",
+          "bright",
+          "gentle"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Reports only. Amani decides what to change."
+      }
+    },
+    {
+      "id": "freya",
+      "name": "Freya",
+      "age": 37,
+      "role": "partner",
+      "work": "primary-school teacher",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Pernille",
+        "runtime": "OpenClaw",
+        "job": "Opens Grist in its own browser and logs what the class planted.",
+        "personality": [
+          "cheerful",
+          "curious",
+          "playful"
+        ],
+        "voice": "v-bright-f",
+        "memory": false,
+        "limits": "Logs what Freya reads out. She checks it."
+      }
+    },
+    {
+      "id": "baraka",
+      "name": "Baraka",
+      "age": 12,
+      "role": "visitor",
+      "work": "nephew, visits Bedroom Three",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living and dining room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen, before school"
+    },
+    {
+      "id": "library",
+      "kind": "room",
+      "room": "office",
+      "title": "The library desk"
+    },
+    {
+      "id": "laundry",
+      "kind": "room",
+      "room": "laundry",
+      "title": "The laundry room"
+    },
+    {
+      "id": "bedroom",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Bedroom three"
+    },
+    {
+      "id": "greenhouse",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The greenhouse and patio"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "The log stays open"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "freya",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A long walk to the library",
+        "body": "The parcel arrives in the foyer. Freya carries it past the living room and down the hall to the library. Amani has cleared the desk."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "baraka",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Baraka reads the guide aloud",
+        "body": "Baraka, visiting for the week, opens the parcel and reads the quick-start guide aloud. Also inside: the Companion Core, a power cable and a recovery USB drive."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "amani",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Press once, then wait",
+        "body": "Amani presses the button once the cable is in. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "freya",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Freya joins, Amani supervises",
+        "body": "Freya joins the Core's own network from her phone. Amani watches over her shoulder as she picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "amani",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "home-assistant",
+        "grist",
+        "ntfy"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Two agents, three apps",
+        "body": "In Companion Hub, Amani picks Hermes and Freya picks OpenClaw. They add Home Assistant, Grist and ntfy, then walk out to inspect the greenhouse.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Home Assistant, Grist",
+            "App: ntfy"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "amani",
+      "agent": "amani",
+      "approval": "amani",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Kip asks which sensor",
+        "body": "Amani sends the first message to Kip, the agent he named. Kip answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "amani",
+        "text": "Hello, Amani. Kip here. Which sensor first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-start",
+      "chapter": "living",
+      "member": "freya",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homarr",
+        "replaces": []
+      },
+      "capability": "One start page for every app on your Core",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The TV opens on the Core",
+        "body": "Homarr gives the wall TV a start page. It holds a tile for each app on the Core, and one for the greenhouse readings.",
+        "chips": [
+          "Homarr"
+        ]
+      }
+    },
+    {
+      "id": "living-seedlings",
+      "chapter": "living",
+      "member": "baraka",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "Back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Seedlings, pictured every morning",
+        "body": "On the couch, Baraka sends his morning seedling pictures to Immich. They are backed up to the Core, ready to search.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-notes",
+      "chapter": "living",
+      "member": "freya",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "joplin",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "Take notes and keep to-dos that sync across your devices through your own server",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Lesson notes, synced at home",
+        "body": "At the farmhouse table, Freya writes Monday's lesson notes in Joplin Server. They sync to her laptop and her phone through the Core.",
+        "chips": [
+          "Joplin Server",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-kip",
+      "chapter": "kitchen",
+      "member": "amani",
+      "agent": "amani",
+      "approval": "amani",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kip reads the overnight values",
+        "body": "Over coffee, Amani asks Kip what changed in the greenhouse. Kip reads the Home Assistant values and reports. Amani decides.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      },
+      "say": {
+        "speaker": "amani",
+        "text": "Overnight report ready. You decide the changes."
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "member": "freya",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "Track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Harvest in, shopping list shorter",
+        "body": "Tuesday's salad comes from the greenhouse. Freya logs the harvest in Grocy, so the shopping list leaves out the lettuce.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-quiz",
+      "chapter": "kitchen",
+      "member": "baraka",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "razzia",
+        "replaces": []
+      },
+      "capability": "Run a quiz night for a small group on your own Core",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Quiz night on the Core",
+        "body": "Friday is quiz night. Freya writes the questions, Amani runs Razzia from the breakfast bar, and Baraka defends his title.",
+        "chips": [
+          "Razzia"
+        ]
+      }
+    },
+    {
+      "id": "library-webui",
+      "chapter": "library",
+      "member": "amani",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "open-webui",
+        "replaces": []
+      },
+      "capability": "Chat with models running on your own Core, from any browser",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Datasheets, explained locally",
+        "body": "Amani asks the model in Open WebUI to explain a sensor datasheet in plain words. The model runs on the Core, and he checks the answer against the page.",
+        "chips": [
+          "Open WebUI"
+        ]
+      }
+    },
+    {
+      "id": "library-dns",
+      "chapter": "library",
+      "member": "amani",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "Block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Ads and trackers, blocked at DNS",
+        "body": "Amani points the home network's DNS at Pi-hole. His sensors, the phones and the laptops all ask the Core first, and ads and trackers get blocked.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "library-manual",
+      "chapter": "library",
+      "member": "amani",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "docmost",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "capability": "A collaborative wiki for notes and documentation",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One manual page per sensor",
+        "body": "Amani documents every sensor he builds in Docmost, one page each. The wiki sits on the Core, where the sensors report.",
+        "chips": [
+          "Docmost",
+          "replaces Confluence"
+        ]
+      }
+    },
+    {
+      "id": "library-links",
+      "chapter": "library",
+      "member": "amani",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "linkwarden",
+        "replaces": [
+          "Raindrop.io"
+        ]
+      },
+      "capability": "Save web pages with a screenshot and PDF so they survive link rot",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The datasheet page, saved for good",
+        "body": "Amani saves a datasheet page in Linkwarden, with a screenshot and a PDF. The copy survives if the original page disappears.",
+        "chips": [
+          "Linkwarden",
+          "replaces Raindrop.io"
+        ]
+      }
+    },
+    {
+      "id": "laundry-tag",
+      "chapter": "laundry",
+      "member": "freya",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "donetick",
+        "replaces": [
+          "OurHome"
+        ]
+      },
+      "capability": "Assign and track household chores and recurring tasks, with NFC tag completion",
+      "anchor": {
+        "role": "laundry",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "laundry"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Tap the tag, laundry done",
+        "body": "A tag on the washing machine marks the laundry chore done. Donetick keeps the rota for Amani and Freya.",
+        "chips": [
+          "Donetick",
+          "replaces OurHome"
+        ]
+      }
+    },
+    {
+      "id": "bedroom-kiwix",
+      "chapter": "bedroom",
+      "member": "baraka",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "Read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "How a seed sprouts, looked up",
+        "body": "At the writing desk, Baraka reads how seeds sprout in Kiwix. The pages come from a copy on the Core.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "bedroom-comic",
+      "chapter": "bedroom",
+      "member": "baraka",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "booklore",
+        "replaces": [
+          "Kindle"
+        ]
+      },
+      "capability": "Manage and read books, comics and PDFs with automatic covers and metadata",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A comic before lights out",
+        "body": "Baraka reads a comic in BookLore before lights out. The covers fill in by themselves, and the whole library lives on the Core.",
+        "chips": [
+          "BookLore",
+          "replaces Kindle"
+        ]
+      }
+    },
+    {
+      "id": "green-vent",
+      "chapter": "greenhouse",
+      "member": "amani",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "Control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The vent opens by rule",
+        "body": "A sensor Amani built reports the greenhouse temperature. Past his set point, Home Assistant runs the vent fan.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "green-frost",
+      "chapter": "greenhouse",
+      "member": "amani",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "ntfy",
+        "replaces": []
+      },
+      "capability": "Send a push notification to your phone from any script or automation with one request",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A cold-night note to the phone",
+        "body": "On a cold night, an automation sends a ntfy note to Amani's phone. He reads it and decides whether to cover the trays.",
+        "chips": [
+          "ntfy"
+        ]
+      }
+    },
+    {
+      "id": "green-log",
+      "chapter": "greenhouse",
+      "member": "freya",
+      "agent": "freya",
+      "approval": "freya",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "grist",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "A spreadsheet-database with real Python formulas, stored as a SQLite file you can copy",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "close",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Pernille logs the trays",
+        "body": "Freya reads out what her class planted. Pernille opens Grist in its own browser and logs each tray. A formula counts the days. Freya checks every entry.",
+        "chips": [
+          "Grist",
+          "replaces Airtable"
+        ]
+      },
+      "say": {
+        "speaker": "freya",
+        "text": "Trays logged. Please check each entry."
+      },
+      "film": true
+    },
+    {
+      "id": "patio-records",
+      "chapter": "greenhouse",
+      "member": "freya",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "Stream your own music collection to any device",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The patio gets a playlist",
+        "body": "On Sunday, Amani lights the grill and Freya queues her records on the patio. Navidrome streams them from the Core to the speaker.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "outro-house",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A house that reads its sensors",
+        "body": "A glass greenhouse, a library desk and a spare room for a visiting nephew. The Ochieng-Sorensen household runs it all from one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your sensors, your seed log and your lesson notes can live on a Companion Core at home. Start with one tray in Grist.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Home Assistant (kitchen-kip, green-vent): the Hub has no USB, Bluetooth or GPIO, so the sensors Amani builds are home-network devices that report over Wi-Fi. No energy or savings claim; the text never says which protocol they use.",
+    "ntfy (green-frost): iOS push goes through an upstream relay (catalog caveat), so the text says only that a note reaches his phone. Kip (Hermes) only reports; Amani decides. Hermes note sits on ftue-hello, the first Hermes beat.",
+    "Cast gave Pernille a HortusFox job. HortusFox is over the fleet cap, so only her job text changed, to Grist; name, runtime, voice and limits are as cast. No website is opened, so the OpenClaw web note is unused.",
+    "Razzia needs a manager password set at install (catalog caveat); the text says nothing about it. Linkwarden saves a page with a screenshot and PDF; no cloud claim is made.",
+    "Baraka is a visiting nephew aged twelve: three beats, never voiced, no companion. Freya's class is a school class; no school is named and no learning-outcome claim is made.",
+    "Joplin Server is named in full because the catalog entry covers the server only; the Joplin apps are separate.",
+    "Town Fenwick Prairie and street Cattail Lane are invented and still need the human map check."
+  ]
+}

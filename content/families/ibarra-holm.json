@@ -1,0 +1,874 @@
+{
+  "schema": "family/v1",
+  "slug": "ibarra-holm",
+  "house": "lakecabin",
+  "fictional": true,
+  "family": {
+    "surname": "Ibarra-Holm",
+    "tagline": "Field sketches on the deck, a Core in the study.",
+    "household": "young-family",
+    "business": true,
+    "story": "Camila illustrates wildlife and Soren writes software, both from their lake house in Alderkirk Bay. Alba is two, and her parents are making room for a second child. Years of sketchbooks and bird recordings live on one Companion Core.",
+    "address": {
+      "line": "66 Cormorant Drive",
+      "place": "Alderkirk Bay"
+    },
+    "narrator": "v-light-m"
+  },
+  "members": [
+    {
+      "id": "soren",
+      "name": "Soren",
+      "age": 36,
+      "role": "partner",
+      "work": "software developer, works from home",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Orrin",
+        "runtime": "OpenClaw",
+        "job": "Opens Super Productivity in its own browser and sorts the day's task list.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Sorts a list. Soren decides what gets done."
+      }
+    },
+    {
+      "id": "camila",
+      "name": "Camila",
+      "age": 34,
+      "role": "partner",
+      "work": "wildlife illustrator",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Nell",
+        "runtime": "Hermes",
+        "job": "Drafts print listings and notes to galleries from sketches Camila describes.",
+        "personality": [
+          "quick",
+          "bright",
+          "curious"
+        ],
+        "voice": "v-young-f",
+        "memory": true,
+        "limits": "Drafts only. Camila sends every message."
+      }
+    },
+    {
+      "id": "alba",
+      "name": "Alba",
+      "age": 2,
+      "role": "child",
+      "work": "toddler, crib in the Nursery",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living nook"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen wing, early"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "The study, at the far end"
+    },
+    {
+      "id": "nursery",
+      "kind": "room",
+      "room": "kids",
+      "title": "The nursery, after dark"
+    },
+    {
+      "id": "deck",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The lake deck"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Still water"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "soren",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The long way to the study",
+        "body": "The parcel arrives at the front door. Soren carries it down the lake passage and the lake hall, all the way to the study."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "camila",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Camila unpacks the parcel",
+        "body": "Camila slits the tape. Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "soren",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in beside the easel",
+        "body": "Soren plugs in the cable by Camila's easel and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "camila",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it while Alba sleeps",
+        "body": "With Alba asleep, Camila joins the Core's own network from her phone. Then she picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "soren",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "immich",
+        "jellyfin",
+        "memos"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Soren picks OpenClaw and Camila picks Hermes. They add Immich, Jellyfin and Memos, plus Companion Memory (beta) for her sketchbooks. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: OpenClaw, Hermes",
+            "Apps: Immich, Jellyfin, Memos",
+            "Companion Memory (beta)"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "soren",
+      "agent": "soren",
+      "approval": "soren",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "OpenClaw is an agent with its own browser and coding tools, running in its own sandbox, with iOS",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Orrin has a dry reply",
+        "body": "Soren sends the first message to Orrin, the agent he named. Orrin answers, and the Core is running."
+      },
+      "say": {
+        "speaker": "soren",
+        "text": "Hello, Soren. Orrin here. Which list first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-film",
+      "chapter": "living",
+      "member": "camila",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "Stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Friday film, played from the Core",
+        "body": "Alba is asleep. Soren and Camila play a nature film from their own files. Jellyfin streams it from the Core to the TV.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "living-photos",
+      "chapter": "living",
+      "member": "camila",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "Back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A library with room for spring",
+        "body": "On the couch, Camila searches Alba's photos by date in Immich. A second baby is due in spring, and the library is ready.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-freezer",
+      "chapter": "kitchen",
+      "member": "soren",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "A shared household hub for notes, shopping, chores and expenses, with a recipe book and an expiry",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Cook once, label the freezer",
+        "body": "Soren and Camila cook ahead at the breakfast bar. HomeHub's expiry tracker lists what is in the freezer and when each dish should be eaten.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-notes",
+      "chapter": "kitchen",
+      "member": "camila",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "memos",
+        "replaces": [
+          "Google Keep"
+        ]
+      },
+      "capability": "Capture quick notes and journal entries in Markdown",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The morning's sightings, noted",
+        "body": "Camila jots the morning's bird sightings into Memos at the breakfast bar. The quick Markdown notes pile up into a field journal.",
+        "chips": [
+          "Memos",
+          "replaces Google Keep"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-tasks",
+      "chapter": "kitchen",
+      "member": "soren",
+      "agent": "soren",
+      "approval": "soren",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "super-productivity",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "Plan your day, track time and run a Pomodoro timer",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Orrin sorts the day",
+        "body": "Soren tells Orrin the day's tasks. Orrin opens Super Productivity in its own browser and sorts the list. Soren decides what gets done.",
+        "chips": [
+          "Super Productivity",
+          "replaces Todoist"
+        ]
+      },
+      "say": {
+        "speaker": "soren",
+        "text": "List sorted. Please check the order."
+      }
+    },
+    {
+      "id": "study-linework",
+      "chapter": "study",
+      "member": "camila",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "Draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A heron becomes line art",
+        "body": "A heron stands in Camila's field sketch. She turns the pencil lines into clean vector art in Inkscape, ready for a print.",
+        "chips": [
+          "Inkscape",
+          "replaces Adobe Illustrator"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "study-listing",
+      "chapter": "study",
+      "member": "camila",
+      "agent": "camila",
+      "approval": "camila",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Nell drafts the gallery note",
+        "body": "Camila describes the heron print to Nell. Nell drafts the gallery note from the sketch notes Camila connected. Camila reads it and sends it herself.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "camila",
+        "text": "Here is a draft. Please read it before you send it."
+      },
+      "film": true
+    },
+    {
+      "id": "study-stock",
+      "chapter": "study",
+      "member": "camila",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nocodb",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "Turn a database into a spreadsheet-style app without writing code",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Every print, counted",
+        "body": "Camila tracks her prints in NocoDB: each size, each edition and how many are left. The table lives on the Core beside her easel.",
+        "chips": [
+          "NocoDB",
+          "replaces Airtable"
+        ]
+      }
+    },
+    {
+      "id": "study-contracts",
+      "chapter": "study",
+      "member": "camila",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "Scan and file your paperwork",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A consignment form, searchable",
+        "body": "A gallery's consignment agreement comes in as a scan. Paperless-ngx reads every page and tags it, so a search finds the terms later.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "study-portfolio",
+      "chapter": "study",
+      "member": "camila",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "Merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Six sketches, one portfolio",
+        "body": "For a gallery pitch, Camila merges six sketches into one portfolio PDF with Stirling-PDF. The merge runs on the Core.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "study-status",
+      "chapter": "study",
+      "member": "soren",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "uptime-kuma",
+        "replaces": []
+      },
+      "capability": "Watch your sites and services and get an alert when one goes down",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A status page, all clear",
+        "body": "Soren keeps a status page on the Core. Uptime Kuma sends him an alert when one of the family's apps stops answering.",
+        "chips": [
+          "Uptime Kuma"
+        ]
+      }
+    },
+    {
+      "id": "study-search",
+      "chapter": "study",
+      "member": "soren",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "searxng",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "Search the web without being tracked or profiled",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Searching without a search account",
+        "body": "Soren runs his searches through SearXNG on the Core. It asks other search engines for him and returns one list of results.",
+        "chips": [
+          "SearXNG",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "nursery-owls",
+      "chapter": "nursery",
+      "member": "alba",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "Stream your own music collection to any device",
+      "anchor": {
+        "role": "crib",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Owls sing Alba to sleep",
+        "body": "At bedtime Alba drifts off to a folder of Camila's owl recordings. Navidrome plays them beside the lullabies.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "nursery-checklist",
+      "chapter": "nursery",
+      "member": "soren",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "jotty",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "Lightweight checklists and notes with Kanban boards and sharing",
+      "anchor": {
+        "role": "toys",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One checklist for the corner",
+        "body": "Soren and Camila keep one checklist in Jotty: paint the shelf, wash the small clothes, move the rocking horse.",
+        "chips": [
+          "Jotty",
+          "replaces Todoist"
+        ]
+      }
+    },
+    {
+      "id": "deck-recording",
+      "chapter": "deck",
+      "member": "camila",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "Adobe Audition"
+        ]
+      },
+      "capability": "Edit audio in a browser tab",
+      "anchor": {
+        "role": "telescope",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A wren, trimmed and faded",
+        "body": "At dawn Camila records a wren from the deck. She trims and fades the clip in AudioMass, and it joins her field recordings on the Core.",
+        "chips": [
+          "AudioMass",
+          "replaces Adobe Audition"
+        ]
+      }
+    },
+    {
+      "id": "deck-guide",
+      "chapter": "deck",
+      "member": "camila",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "Read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A field guide, highlighted",
+        "body": "In a rocking chair, Camila reads a bird field guide in Koodo Reader. Her notes and highlights stay beside the page.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "deck-walk",
+      "chapter": "deck",
+      "member": "soren",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "wanderer",
+        "replaces": []
+      },
+      "capability": "Plan, map and share hiking and biking routes from GPX files",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Saturday's shoreline walk, mapped",
+        "body": "Soren plots Saturday's shoreline walk in Wanderer from a GPX file. The saved route lives on the Core.",
+        "chips": [
+          "Wanderer"
+        ]
+      }
+    },
+    {
+      "id": "outro-house",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A quiet house on the water",
+        "body": "A studio at the far end, a toddler who likes owls and a lake outside. The Ibarra-Holm household runs it all from one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your sketchbooks, recordings and family photos can live on a Companion Core at home. Start with one field sketch in Inkscape.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "The second baby is mentioned once, in the family story and in living-photos, as a family fact (\"due in spring\"). No health, pregnancy or safety claim. Cut living-photos second sentence if the owner prefers.",
+    "ftue-delivery tells the long walk (cast awkwardScore 4). The text names the lake passage and lake hall, which are real room names in the house.",
+    "Cast job for Orrin and Nell kept. Nell (Hermes) only drafts a note to a gallery; Camila sends it. The Hermes note is on study-listing, the first Hermes beat, because Orrin (OpenClaw) greets first.",
+    "No OpenClaw beat opens a website: Orrin works only inside Super Productivity on the Core, so the OpenClaw web note is not used.",
+    "SearXNG (study-search) asks outside search engines over the home internet (catalog caveat). The text says it asks other search engines and does not call the search offline or fully private.",
+    "Jellyfin plays the family's own files only (catalog claim). Uptime Kuma replaces nothing in the chips; the catalog lists monitoring tools that do not belong in a family story.",
+    "Camila's print business is invented (casting name Ibarra Field Studies is not printed). Town Alderkirk Bay and street Cormorant Drive are invented and need the human map check."
+  ]
+}
