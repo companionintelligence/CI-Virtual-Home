@@ -3,6 +3,7 @@
 //   T-X2   aim, hover, press: the ray over the dock's Menu button makes the pixel under it change (the panel's own, and the headset view's where it can be read)
 //          and nothing else; a trigger pull opens the menu exactly once; a ray at a wall hovers and presses nothing. On the Vision profile (transient-pointer)
 //          NOTHING EVER HOVERS and a pinch still presses. A press whose source is lost is cancelled and activates nothing; a press released off its button too
+//   T-X2b  the registry path: the panels are a RayTarget at priority 100; driven as the locomotion module drives it, a press activates once, a cancelled release never
 //   T-X3   content: with the mock tour running, the presenter's debug.texts() are the beat's own strings, in reading order (title, body, phone, note, chips,
 //          say, the Fictional footer), then the captions so far; the caption shows the spoken words and redraws once per word, not per frame
 //   T-X4   comfort: the person's viewpoint changes only on frames where the fade alpha is 1 (the harness's check, and the kit's own motion log), through the whole
@@ -10,6 +11,7 @@
 //   T-X8   budgets: panels <= 8, texture bytes <= 24 MB, draw calls <= 24 at the busiest moment of the demo (counted by walking the scene); a still frame
 //          uploads no texture; the per-frame cost of ui.tick with every panel up; every beat's placement is ok
 //   T-X7b  nothing outside the origin during all of it, fonts included (Manrope is the page's own woff2)
+//   T-X5   failure paths: held (too far), no stand, an aborted blink, interrupt and resume, the panel and texture budgets refuse, the session ending under a tour
 //   T-X10  the menu: Exit VR ends the session, a text-size change re-lays out and persists, and unmounting leaves no group in the scene
 //
 // What emulation cannot prove: legibility at a real distance (IWER's eye buffer is a few pixels per degree), ray ergonomics, pinch reliability on visionOS,
@@ -177,6 +179,53 @@ export const aimPress = defineCase({
   },
 });
 
+// =================================================================================================================== T-X2b
+export const registry = defineCase({
+  id: 'T-X2b', title: 'the panels register at priority 100 with the input module; driven the way the locomotion module drives a target, a press activates once and a cancelled release activates nothing',
+  timeoutMs: 300000,
+  async run(t) {
+    const { p, e } = await boot(t);
+    const r = await p.page.evaluate(async () => {
+      const u = (window as any).__houseViewer.xr.ui(), reg = u.debug.registry();
+      const { target, input } = reg, real = input.sources;
+      const info = { priority: target.priority, id: target.id, enabled: target.enabled, hasHit: typeof target.hit === 'function', hasPress: typeof target.onPress === 'function', hasRelease: typeof target.onRelease === 'function' };
+      // the registry looks alive: the kit's own session listeners must stand down, or one press would count twice
+      input.sources = () => [{ id: 7, handedness: 'right', targetRayMode: 'tracked-pointer', hasThumbstick: true, isHand: false, hover: true, haptics: true }];
+      const frames = (n: number) => new Promise<void>(res => { let k = 0; const off = (window as any).__houseViewer.xr.onFrame(() => { if (++k >= n) { off(); res(); } }); });
+      const head = u.debug.head().pos, rayAt = (panel: string, id: string) => {
+        const w = u.debug.widget(panel, id); if (!w) return null;
+        const d = [w.world[0] - head[0], w.world[1] - head[1], w.world[2] - head[2]], l = Math.hypot(d[0], d[1], d[2]);
+        return { origin: head.slice(), dir: d.map((v: number) => v / l) };
+      };
+      const out: any = { info };
+      const pr = rayAt('dock', 'menu'); const hit = target.hit(pr);
+      out.hit = !!hit && Array.isArray(hit.uv) && hit.dist > 0.5 && hit.dist < 3;
+      out.miss = target.hit({ origin: head.slice(), dir: [0, -1, 0] }) === null;      // straight down: no panel there
+      target.onPress(7, hit); await frames(4);
+      out.pressedLook = u.debug.panels().find((q: any) => q.name === 'dock').pressed;
+      target.onRelease(7, hit, false); await frames(4);
+      out.opened = u.debug.menu().open; out.activations1 = u.debug.hub().log.filter((l: any) => l.ev === 'activate' && l.id === 'menu').length;
+      u.debug.press('menu', 'close'); await frames(10);
+      // a cancelled release (the source was removed, the session hid): nothing activates
+      const hit2 = target.hit(rayAt('dock', 'menu'));
+      target.onPress(7, hit2); await frames(3);
+      target.onRelease(7, null, true); await frames(4);
+      out.openedAfterCancel = u.debug.menu().open; out.activations2 = u.debug.hub().log.filter((l: any) => l.ev === 'activate' && l.id === 'menu').length;
+      out.cancelLogged = u.debug.hub().log.some((l: any) => l.ev === 'release' && l.id === 'menu');
+      input.sources = real;
+      return out;
+    });
+    t.check(r.info.priority === 100 && r.info.enabled && r.info.hasHit && r.info.hasPress && r.info.hasRelease, `the registered target: ${JSON.stringify(r.info)}`);
+    t.check(r.hit, 'target.hit() did not find the dock for a ray at it');
+    t.check(r.miss, 'target.hit() found a panel for a ray pointing at the floor: the locomotion floor would be blocked');
+    t.check(r.pressedLook === 'menu', `onPress did not put the button in its pressed state (${r.pressedLook})`);
+    t.check(r.opened && r.activations1 === 1, `press and release through the registry: open ${r.opened}, activations ${r.activations1}`);
+    t.check(!r.openedAfterCancel && r.activations2 === 1 && r.cancelLogged, `a cancelled release: open ${r.openedAfterCancel}, activations ${r.activations2} (still 1), logged ${r.cancelLogged}`);
+    t.check(p.errors.length === 0, `page errors: ${p.errors.join(' | ')}`);
+    await endSession(p, e);
+  },
+});
+
 // =================================================================================================================== T-X3, T-X4, T-X8 on one run of the demo
 export const tour = defineCase({
   id: 'T-X3', title: 'the XR presenter shows the beat\'s own strings, the caption lights one word at a time, the person moves only behind black, and the budgets hold',
@@ -287,6 +336,63 @@ export const tour = defineCase({
     t.check(p.errors.length === 0, `page errors: ${p.errors.join(' | ')}`);
     await p.page.evaluate(() => { try { (window as any).__demo2.stop(); } catch { /* done */ } });
     await endSession(p, e);
+  },
+});
+
+// =================================================================================================================== T-X5
+export const failures = defineCase({
+  id: 'T-X5', title: 'failure paths: a subject too far to stand near, no stand at all, an aborted blink, an interrupt, the budget, and the session ending under a tour',
+  timeoutMs: 600000,
+  async run(t) {
+    const { p, e } = await boot(t);
+    const r = await p.page.evaluate(async () => {
+      const u = (window as any).__houseViewer.xr.ui(), mod = await u.debug.demo(), d = await mod.createDemoDirector(u);
+      (window as any).__d = d;
+      const frames = (n: number) => new Promise<void>(res => { let k = 0; const off = (window as any).__houseViewer.xr.onFrame(() => { if (++k >= n) { off(); res(); } }); });
+      const near = (a: number[], b: number[], tol = 0.02) => Math.hypot(a[0] - b[0], a[2] - b[2]) <= tol;
+      const out: any = {};
+      await d.start(); const b = d.beats();
+      // ---- held: a subject 30 m away (the street, the roof): nobody is moved, the card says how far
+      const h0 = u.debug.head().pos.slice(), f0 = b[1].anchor.focus;
+      b[1].anchor = { role: 'street', box: [f0[0] + 29, 0, f0[2] - 1, f0[0] + 31, 3, f0[2] + 1], focus: [f0[0] + 30, 1, f0[2]], level: null };
+      b[1].rest.eye = [h0[0], 1.6, h0[2]];
+      const rHeld = await d.go(1, 'jump'); await frames(10);
+      out.held = { reach: rHeld.reach, moved: !near(u.debug.head().pos, h0, 0.05), visible: rHeld.cardVisible, texts: u.presenter().debug.texts().join(' | '), far: u.debug.chrome().some((s: string) => /About \d+ m away/.test(s)) };
+      // ---- no stand: the baked spot is not walkable and nothing nearer sees the subject (and it is not far): held, with a fault
+      const w = u.debug.world(), realWalk = w.walkable; w.walkable = () => false;
+      b[2].anchor = { role: 'x', box: [h0[0] - 0.4, 0.2, h0[2] - 4.6, h0[0] + 0.4, 1.2, h0[2] - 3.8], focus: [h0[0], 0.9, h0[2] - 4.2], level: null };
+      b[2].rest.eye = [h0[0], 1.6, h0[2]];
+      const rNo = await d.go(2, 'jump'); await frames(6); w.walkable = realWalk;
+      out.noStand = { reach: rNo.reach, notes: rNo.notes.join('; '), fault: d.events.filter((x: any) => x.type === 'fault').map((x: any) => x.code) };
+      // ---- an aborted blink: the person is not moved and no card appears
+      b[3].rest.eye = [h0[0] + 1.5, 1.6, h0[2] - 1.0]; b[3].anchor = { role: 'x', box: [h0[0] + 1, 0.2, h0[2] - 5.2, h0[0] + 2, 1.2, h0[2] - 4.4], focus: [h0[0] + 1.5, 0.9, h0[2] - 4.8], level: null };
+      const ac = new AbortController(), before = u.debug.head().pos.slice();
+      const pr = d.presenter.enterBeat(b[3], { from: 'jump', reducedMotion: false, signal: ac.signal });
+      await frames(2); ac.abort();
+      const rAb = await pr; await frames(10);
+      out.aborted = { cardVisible: rAb.cardVisible, moved: !near(u.debug.head().pos, before, 0.05), notes: rAb.notes.join('; ') };
+      // ---- interrupt dims the card, resume brings it back
+      await d.go(1, 'jump'); await frames(30);
+      const card = () => u.debug.panels().find((q: any) => q.name === 'card');
+      const op0 = card().opacity; d.presenter.interrupt('blurred'); await frames(40); const op1 = card().opacity; d.presenter.resume(); await frames(40); const op2 = card().opacity;
+      out.interrupt = { before: op0, during: op1, after: op2 };
+      return out;
+    });
+    t.check(r.held.reach === 'held' && !r.held.moved && r.held.visible && r.held.far, `a subject 30 m away: ${JSON.stringify(r.held)}`);
+    t.check(r.noStand.reach === 'held' && r.noStand.fault.includes('unreachable-beat'), `no stand: ${JSON.stringify(r.noStand)}`);
+    t.check(!r.aborted.cardVisible && !r.aborted.moved, `an aborted blink: ${JSON.stringify(r.aborted)}`);
+    t.check(r.interrupt.before > 0.9 && r.interrupt.during < 0.4 && r.interrupt.after > 0.9, `interrupt/resume: ${JSON.stringify(r.interrupt)}`);
+    // ---- the budget: the ninth panel and a 48 MB texture are refused, with a fault, and everything made is gone again
+    const s = await ui(p, (u: any) => u.debug.stress(10));
+    t.check(s.panelError && /more than 8 panels/.test(s.panelError) && s.made === 8 - (await panels(p)).length, `ten more panels: made ${s.made}, error ${s.panelError}`);
+    t.check(s.textureError && /texture budget/.test(s.textureError), `a 48 MB texture: ${s.textureError}`);
+    t.check(s.faults.filter((f: any) => f.code === 'budget-exceeded').length >= 2, `faults after the stress: ${JSON.stringify(s.faults)}`);
+    t.check((await panels(p)).length <= 8 && !(await panels(p)).some((q: any) => /^stress/.test(q.name)), 'the stress panels were not disposed');
+    // ---- the session ends under a running tour: the presenter says so, and the page is clean
+    await endSession(p, e, 'test-end');
+    const ev = await p.page.evaluate(() => (window as any).__d.events.map((x: any) => x.type + (x.code ? ':' + x.code : '') + (x.reason ? ':' + x.reason : '')));
+    t.check(ev.includes('fault:xr-session-ended') && ev.includes('exit:session-end'), `the Director was told: ${JSON.stringify(ev)}`);
+    t.check(p.errors.length === 0, `page errors: ${p.errors.join(' | ')}`);
   },
 });
 

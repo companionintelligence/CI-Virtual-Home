@@ -116,7 +116,7 @@ export class RayHub {
   attach(): void {
     const session = this.session = this.d.renderer.xr.getSession?.();
     if (session && session.inputSources && session.inputSources.length === 0) { this.floorKind = 'handRay'; this.floorByEmpty = true; this.kind = 'handRay'; this.d.onKind('handRay'); }
-    this.unregister = this.d.input.addTarget(this.target());
+    this.unregister = this.d.input.addTarget(this.registryTarget());
     if (session) {
       const on = (n: string, f: (e: any) => void) => { session.addEventListener(n, f); this.offs.push(() => session.removeEventListener(n, f)); };
       on('selectstart', e => this.onSelectStart(e));
@@ -138,6 +138,9 @@ export class RayHub {
   }
 
   /** The registry's target: the panels, at priority 100. hit() is called by the locomotion module with each source's ray. */
+  /** the target as registered with the input module (tests drive it the way the locomotion module does) */
+  registryTarget(): RayTarget { return this.myTarget || (this.myTarget = this.target()); }
+  private myTarget: RayTarget | null = null;
   private target(): RayTarget {
     return {
       id: 'xr-ui: panels', priority: 100, enabled: true,

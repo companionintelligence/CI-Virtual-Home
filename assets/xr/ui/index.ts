@@ -30,8 +30,12 @@ export interface UiDebug {
   /** metres from `from` along `dir` to the first solid surface of the scene (Infinity if none within 40 m): for the demo's choice of open spots only; slow, never per frame */
   freeDistance(from: V3, dir: V3): number;
   footprint(): { nodes: number; textureBytes: number; drawCalls: number };
+  /** the chrome strings (kicker, button labels, counters, the Fictional chip, "About 30 m away") of every panel that has been drawn */
+  chrome(): string[];
   panels(): Array<{ name: string; visible: boolean; opacity: number; px: [number, number]; sizeM: [number, number]; centre: V3; widgets: Array<{ id: string; x: number; y: number; w: number; h: number; enabled: boolean }>; hover: string | null; pressed: string | null; uploads: number }>;
   hub(): ReturnType<RayHub['debug']>;
+  /** the target the kit registered with the input module, and the input module itself (the registry path is tested by driving it as the locomotion module does) */
+  registry(): { target: import('../host.js').RayTarget; input: XrInput } | null;
   /** canvas pixel [r,g,b,a] of a panel */
   pixel(panel: string, x: number, y: number): number[] | null;
   /** the centre of a widget in the TRACKING space (what an emulated controller aims at), and in the world */
@@ -42,6 +46,8 @@ export interface UiDebug {
   toasts(): string[];
   status(): string[];
   motionLog(): Array<{ frame: number; fade: number; moved: boolean }>;
+  /** try to build `n` more panels, then one with a 48 MB texture, and report what the budget did; everything made is disposed again */
+  stress(n: number): { made: number; panelError: string | null; textureError: string | null; faults: Array<{ code: string; detail?: string }> };
   /** the demo flow (demo.ts) loaded on demand: nothing of it is in a visitor's download */
   demo(): Promise<typeof import('./demo.js')>;
 }
@@ -216,10 +222,12 @@ export function createUi(host: XrHost): XrUiImpl {
         return Infinity;
       },
       footprint: () => kit.footprint(),
+      chrome: () => (panels ? panels.panels.flatMap(p => (p.layout ? p.layout.chrome : [])) : []),
       panels: () => (panels ? panels.panels.map(p => ({
         name: p.name, visible: p.visible, opacity: p.opacityNow, px: [p.canvas.width, p.canvas.height] as [number, number], sizeM: [p.widthM, p.heightM] as [number, number], centre: p.centre,
         widgets: p.widgets.map(w => ({ id: w.id, x: w.x, y: w.y, w: w.w, h: w.h, enabled: w.enabled })), hover: p.hover, pressed: p.pressed, uploads: p.uploads,
       })) : []),
+      registry: () => (hub && input ? { target: hub.registryTarget(), input } : null),
       hub: () => (hub ? hub.debug() : { kind: 'ray', pointing: false, haptics: { hover: 0, press: 0 }, pressed: [], sources: [], log: [] }),
       pixel(panel, x, y) {
         const p = panels?.panels.find(q => q.name === panel); if (!p) return null;
@@ -239,6 +247,19 @@ export function createUi(host: XrHost): XrUiImpl {
       toasts: () => (toasts ? toasts.shown.slice() : []),
       status: () => (status ? status.texts : []),
       motionLog: () => motion.slice(),
+      stress(n) {
+        const made: any[] = []; let panelError: string | null = null, textureError: string | null = null;
+        if (!panels) return { made: 0, panelError: 'not mounted', textureError: null, faults: [] };
+        try { for (let k = 0; k < n; k++) made.push(panels.create({ name: 'stress' + k, world: false, interactive: false, renderOrder: 1 })); } catch (e) { panelError = String((e as Error).message); }
+        const count = made.length;
+        for (const p of made) p.dispose();
+        try {
+          const p = panels.create({ name: 'stress-big', world: false, interactive: false, renderOrder: 1 });
+          try { p.setLayout({ w: 3000, h: 3000, ops: [], widgets: [], texts: [], chrome: [], overflow: false, lines: { title: 0, body: 0 } }, kit.metrics(1.7), 30, 1.7); } catch (e) { textureError = String((e as Error).message); }
+          p.dispose();
+        } catch (e) { textureError = 'could not even make the panel: ' + String((e as Error).message); }
+        return { made: count, panelError, textureError, faults: faults.slice() };
+      },
       demo: () => import('./demo.js'),
     },
   };

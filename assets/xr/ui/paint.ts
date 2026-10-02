@@ -537,7 +537,7 @@ export function layoutCaption(measure: Measure, v: CaptionView, m: Metrics, W: n
   // the footer row, always: the disclosure chip, who is speaking, the beat's progress
   const chipH = Math.round(emM * 1.9), chipF = fontOf(emM, 700), chipW = measure(chipF, v.fictional) + emM * 1.6;
   ops.push({ k: 'rect', x: pad, y, w: chipW, h: chipH, r: chipH / 2, fill: '#143e48', stroke: t.line, lw: Math.max(2, t.lineW - 1) });
-  ops.push({ k: 'text', x: pad + emM * 0.8, y: y + chipH * 0.66, s: v.fictional, font: chipF, fill: t.text }); texts.push(v.fictional);
+  ops.push({ k: 'text', x: pad + emM * 0.8, y: y + chipH * 0.66, s: v.fictional, font: chipF, fill: t.text }); chrome.push(v.fictional);
   let x = pad + chipW + emM * 0.7;
   if (v.speaker) { chrome.push(v.speaker); ops.push({ k: 'text', x, y: y + chipH * 0.66, s: v.speaker, font: fontOf(emM, 700), fill: t.muted }); x += measure(fontOf(emM, 700), v.speaker) + emM * 0.9; }
   if (v.progress != null) {
