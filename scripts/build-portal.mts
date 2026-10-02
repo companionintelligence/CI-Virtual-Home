@@ -40,6 +40,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
 import { checkBinaryAssets } from './portal-assets.mts';
+import { aoProblems } from './ao-files.mts';
 import { displayName, buildCredit } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
@@ -101,6 +102,8 @@ for (const h of index.houses || []) {
   if (!fs.existsSync(path.join(ROOT, 'portal', 'thumbs', `${h.id}.webp`))) problems.push(`no thumbnail for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
   if (!fs.existsSync(path.join(ROOT, 'portal', 'previews', `${h.id}.jpg`))) problems.push(`no link-preview image for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
 }
+// 5a. every home has a baked AO volume (scripts/ao-files.mts; the files themselves ship below, with the other binaries)
+problems.push(...aoProblems(path.join(ROOT, 'content', 'ao'), (index.houses || []).map((h: { id: string }) => h.id)));
 if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
 
 // 5a. binary assets (assets/media/** the CC0 textures and props, content/ao/** the baked occlusion volumes): only files that

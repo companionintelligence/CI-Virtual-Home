@@ -670,6 +670,25 @@ async function editor() {
   await close();
 }
 
+// ------------------------------------------------------------------ the baked ambient occlusion
+async function ao(id: string) {
+  console.log(`\nao ${id}`);
+  const { page, errors, requests, close } = await open({ width: 1280, height: 720 });
+  await page.goto(srv.url(`room-creator.html?mode=view&house=${id}&shot=orbit&play=0`));
+  await viewerReady(page);
+  const manifest = JSON.parse(fs.readFileSync(path.join(DIR, 'content', 'ao', 'manifest.json'), 'utf8'));
+  const file = manifest.houses[id] && manifest.houses[id].file;
+  ok(!!file && fs.existsSync(path.join(DIR, 'content', 'ao', file)), `dist/content/ao has ${file}, the file the manifest lists for ${id}`);
+  const got = requests.filter((u: string) => u.includes('/content/ao/')).map((u: string) => u.slice(u.indexOf('/content/ao/')));
+  ok(got.includes('/content/ao/manifest.json') && got.includes(`/content/ao/${file}`) && got.length === 2, `the player fetched exactly the manifest and ${file} (${got.join(', ')})`);
+  const st = await page.evaluate(() => { const r = (window as any).__houseViewer?.realism?.(); return r && r.ao; });
+  ok(st && st.volume === 'on', `the volume is on (${st && st.volume})${st && st.contact ? `, ${st.contact.items} contact pads in ${st.contact.drawCalls} draw call` : ''}`);
+  const lit = await page.evaluate(() => { let n = 0; (window as any).__houseDebug().scene.traverse((o: any) => { if (o.isMesh && o.material && !Array.isArray(o.material) && o.material.defines && 'VH_AO' in o.material.defines) n++; }); return n; });
+  ok(lit > 50, `${lit} meshes draw with it`);
+  ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
+  await close();
+}
+
 // ------------------------------------------------------------------ WebKit
 // The portal is public, and Safari is where WebGL, touch and video differ most from Chromium. Playwright's WebKit must
 // be the revision the pinned Playwright expects (another revision does not start), so this runs when that build is
@@ -735,6 +754,7 @@ try {
   for (const [i, id] of HOUSES.entries()) await player(id, { width: 1440, height: 900 }, false, '1440', i === 0);
   await player(HOUSES[0], { width: 390, height: 844 }, true, '390', false);
   await motion(HOUSES[0]);
+  for (const id of HOUSES) await ao(id);
   await failureCases();
   await editor();
   await webkit();

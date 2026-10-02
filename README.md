@@ -63,6 +63,7 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run shot-qa` | A fault injected for every QA v2 code, and for every fleet check, on two frozen worlds (`test/shots/worlds/`): each must be caught. No browser. |
 | `pnpm run camera-audit` | A contact strip per house and planner (twelve frames, the plan with the path by beat), the camera metrics of v1 and v2 side by side → `test/qa/camera-audit/index.html` (`--house`, `--planner v1,v2`, `--fixtures`). |
 | `pnpm run fleet-audit` | The fleet sameness metrics (door colours, claddings, lighting, furniture repetition, planting …) → `test/qa/fleet-audit.md`, beside the committed baseline `test/fleet/baseline.json`. `--built` measures what this tree's builders generate (plans rebuilt into `test/qa/plans/`); `--baseline` rewrites the baseline (integration only). |
+| `pnpm run ao` | Bake the player's ambient-occlusion volumes → `content/ao/<id>.<hash>.bin` and `manifest.json` (`--house a,b`, `--workers N`, `--check` to only test them for staleness). Re-run it after anything that moves a house's geometry; `check` fails on a stale one. See *Baked ambient occlusion and contact shadows*. |
 | `pnpm run plans` | Rebuild `content/houses/<id>.plan.json` — the seeded site instances the isometric twin draws. |
 | `pnpm run iso` | Rebuild the isometric SVGs, Lotties and `scenes/manifest.json` (`--only <id>`, `--png`). |
 | `pnpm run floorplans` | Rebuild the CAD sheets and `floorplans.json` (`--only <id>`, `--no-png`, `--fit lot`). |
@@ -108,6 +109,7 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
   viewer-batch.ts          the player's live-only static batching: merges each toggle unit's static opaque meshes (a third of the draw
                            calls); only viewer.ts imports it, `?no=batch` switches it off, the recorder / goldens / editor never see it
 content/houses/            <id>.json — the 30 HouseSpecs (source); <id>.plan.json and index.json — derived
+content/ao/                 the baked occlusion volumes <id>.<hash>.bin and manifest.json (derived: pnpm run ao)
 content/house-catalog.json every item type's measured footprint, height and iso parts (derived)
 scenes/                    isometric SVG + Lottie, CAD floor plans, and their manifests (all derived, committed)
 scripts/                   the pipeline: build, validate, render, gate (.mts) and the Python generators (.py)
@@ -482,6 +484,27 @@ Each package writes only between its own two marker lines.
 
 #### ao
 <!-- realism:ao:begin -->
+A live-only look feature of the player (`assets/realism-ao.ts`; `?no=ao` switches it off, `?no=contact` only the pads), on
+tier 1 and up. Two layers:
+
+- **The volume.** `pnpm run ao [--house id] [--workers N]` (`scripts/bake-ao.mts`) opens each house in the player with
+  `?aoexport=1`, takes the opaque triangles of that very scene (batched, ceilings and roofs on, a wall's full group, no door
+  leaves, no Core), and ray-casts a 0.25 m grid with the vendored three-mesh-bvh (32 rays a cell, 1.5 m radius, solid cells
+  refilled from their free neighbours, then one [1 2 1] blur pass that skips wall cells) in worker threads. It writes `content/ao/<id>.<sha8>.bin` (an R8 volume, 40-byte
+  header, 40 to 350 KB) and `content/ao/manifest.json`, which also holds a fingerprint of the geometry it saw. Same bytes for
+  any worker count and on every rerun, so `pnpm run ao` on an unchanged tree leaves `git status` clean; all 30 take about 9
+  minutes on a loaded machine. **Re-run it after any change that moves a house's geometry** (a builder, a prop, a spec):
+  `pnpm run check` fails on a stale volume (`bake-ao.mts --check`), and the player, which compares the same fingerprint, draws
+  a stale house without AO instead of with wrong AO. In the player the volume is one `sampler3D` tap per lit fragment, 0.2 m
+  out along the normal, divided by the value a flat wall measures (0.701) so flat surfaces are unchanged and only concavities
+  darken; it multiplies the indirect diffuse light and 0.6 of the indirect specular, never the sun or the lamps. Under Best
+  quality its strength drops to 0.35 of the exponent so it does not darken twice with the composer's GTAO. It does not follow
+  doors, cutaways or a hidden roof.
+- **The pads.** `assets/viewer-contact.ts` (tier 1 and up): one mesh, one draw call, of soft dark pads under floor-standing
+  furniture and plants, sized from each item's own footprint, no texture.
+
+`scripts/live-checks/ao.mts` is its test (kill switch, restore identity, a missing or stale volume, bake determinism, the
+portal's file guard); `portal:build` ships exactly the manifest's files and fails on an unlisted, missing or mis-hashed one.
 <!-- realism:ao:end -->
 
 #### water
@@ -506,7 +529,7 @@ Each package writes only between its own two marker lines.
 
 ## How verification works
 
-`pnpm run check` runs these checks in order; only the goldens depend on an earlier one (they are skipped when a determinism check fails):
+`pnpm run check` runs these checks in order (and, after the goldens, `ao`: the baked occlusion volumes still match the geometry); only the goldens depend on an earlier one (they are skipped when a determinism check fails):
 
 1. **assets** — compile `assets/**/*.ts`.
 2. **specs** — validate the 30 HouseSpecs.

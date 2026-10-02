@@ -11,6 +11,7 @@ its licence text lives. When you add, upgrade or adapt one, update this file in 
 | Component | Version | Licence | Where | Licence text |
 |---|---|---|---|---|
 | [three.js](https://threejs.org) — core module build + 24 addon files from `examples/jsm` (OrbitControls, TransformControls, EffectComposer and passes, GTAO, SMAA, bloom, GLTFExporter/Loader, RoomEnvironment, utils, and `libs/meshopt_decoder.module.js`, the decoder for the meshopt-compressed models of the live player's CC0 props) | r169 (`three@0.169.0`) | MIT — © 2010-2024 three.js authors | [`assets/vendor/three/`](assets/vendor/three/) | [`assets/vendor/three/LICENSE`](assets/vendor/three/LICENSE) |
+| [three-mesh-bvh](https://github.com/gkjohnson/three-mesh-bvh) — the BVH ray-caster of the offline ambient-occlusion bake (`scripts/bake-ao.mts`); never loaded by the player and not shipped to the site | 0.9.15 (`three-mesh-bvh@0.9.15`; tarball integrity `sha512-9xdEDkCzFoT8VPFH9DznwFSdbaIEjMvM106Iqq7TJurrIheUKDcdW4prfJTCxryih4XS/UxWs0H3K4MLMRFyOQ==`; `build/index.module.js` sha256 `4a1f29ae93208d5f97a1652182c2d3133ce9cf51a6ffffc04f4d20255bf21afe`) | MIT — © 2018 Garrett Johnson (`gh api repos/gkjohnson/three-mesh-bvh/license`: MIT) | [`scripts/vendor/three-mesh-bvh.0.9.15.mjs`](scripts/vendor/three-mesh-bvh.0.9.15.mjs) | [`scripts/vendor/LICENSE-three-mesh-bvh.txt`](scripts/vendor/LICENSE-three-mesh-bvh.txt) |
 | [pixelmatch](https://github.com/mapbox/pixelmatch) | 7.2.0 | ISC — © 2025 Mapbox | [`scripts/vendor/pixelmatch.mjs`](scripts/vendor/pixelmatch.mjs) | [`scripts/vendor/LICENSE-pixelmatch.txt`](scripts/vendor/LICENSE-pixelmatch.txt) |
 | [Manrope](https://github.com/sharanda/manrope) — variable, Latin subset (from `@fontsource-variable/manrope` 5.3.0, via CI-Common `styles/fonts/files/`) | v4.504 | OFL-1.1 — © 2019 The Manrope Project Authors | [`assets/fonts/manrope-latin-var.woff2`](assets/fonts/manrope-latin-var.woff2) | [`assets/fonts/LICENSE-Manrope.txt`](assets/fonts/LICENSE-Manrope.txt) |
 | [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono) — variable, Latin subset (from `@fontsource-variable/jetbrains-mono` 5.3.0, via CI-Common) | v2.211 | OFL-1.1 — © 2020 The JetBrains Mono Project Authors | [`assets/fonts/jetbrains-mono-latin-var.woff2`](assets/fonts/jetbrains-mono-latin-var.woff2) | [`assets/fonts/LICENSE-JetBrains-Mono.txt`](assets/fonts/LICENSE-JetBrains-Mono.txt) |
@@ -26,6 +27,13 @@ a modified version may not use the reserved font names. The capture scripts serv
 Google Fonts stylesheet the pages link (see below), so a golden never depends on the network.
 
 `scripts/vendor/png.mjs` sits beside pixelmatch but is first-party.
+
+**ao — baked ambient occlusion.** `scripts/vendor/three-mesh-bvh.0.9.15.mjs` is byte-identical to `build/index.module.js` of the npm
+package except its first line, where `from 'three'` became the relative path
+`../../assets/vendor/three/three.module.min.js` (one three.js instance, no import map in Node). It is used only by `pnpm run ao`; it
+is under `scripts/`, not `assets/`, so the portal does not ship it, and nothing in `assets/` imports it. Its GLSL distance
+functions (which carry a Shadertoy provenance note) are not used. The volumes in `content/ao/` are our own output (a function
+of our geometry), not third-party material, and no third-party image, texture or model was added for this feature.
 
 ## Adapted source — code or proportions reworked into our own files
 
