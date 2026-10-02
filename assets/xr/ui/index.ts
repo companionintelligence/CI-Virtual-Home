@@ -26,6 +26,7 @@ const DEFAULT_PPD = 20, PPD_RECHECK_FRAMES = 90;
 export interface UiDebug {
   texts(): string[];
   head(): { pos: V3; dir: V3; yawDeg: number };
+  world(): import('../host.js').XrLocomotion['world'] | null;
   footprint(): { nodes: number; textureBytes: number; drawCalls: number };
   panels(): Array<{ name: string; visible: boolean; opacity: number; px: [number, number]; sizeM: [number, number]; centre: V3; widgets: Array<{ id: string; x: number; y: number; w: number; h: number; enabled: boolean }>; hover: string | null; pressed: string | null; uploads: number }>;
   hub(): ReturnType<RayHub['debug']>;
@@ -203,6 +204,7 @@ export function createUi(host: XrHost): XrUiImpl {
         return out;
       },
       head: () => headNow,
+      world: () => (loco ? loco.world : null),
       footprint: () => kit.footprint(),
       panels: () => (panels ? panels.panels.map(p => ({
         name: p.name, visible: p.visible, opacity: p.opacityNow, px: [p.canvas.width, p.canvas.height] as [number, number], sizeM: [p.widthM, p.heightM] as [number, number], centre: p.centre,

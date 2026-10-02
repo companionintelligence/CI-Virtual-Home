@@ -58,6 +58,7 @@ export interface DemoDirector {
   readonly events: PresenterEvent[];
   readonly enter: Array<EnterResult & { id: string }>;
   index(): number;
+  beats(): BeatView[];
   state(): 'idle' | 'beat' | 'end' | 'stopped';
   start(): Promise<void>;
   /** play the current beat's clock to its end (words advance), without moving on */
@@ -126,7 +127,7 @@ export async function createDemoDirector(ui: XrUiImpl, o: DemoOpts = {}): Promis
   }
 
   const d: DemoDirector = {
-    presenter, events, enter, index: () => idx, state: () => st, model,
+    presenter, events, enter, index: () => idx, beats: () => beats, state: () => st, model,
     async start() {
       await presenter!.prepare(STORY);
       await presenter!.start({ audio: 'narrated', beat: 0, paused: false });
@@ -158,17 +159,29 @@ export async function createDemoDirector(ui: XrUiImpl, o: DemoOpts = {}): Promis
 interface Spec { title: string; body: string; member?: MemberView; say?: string; note?: string; chips?: string[]; phone?: { header: string; rows: string[] } }
 
 function buildBeats(ui: XrUiImpl): BeatView[] {
-  // anchored on where the person stands NOW, so the same mock tour works in any house
-  const h = ui.debug.head();
+  // anchored on where the person stands NOW, so the same mock tour works in any house. Each beat stands somewhere else (a metre or two away, on
+  // a floor the locomotion module calls walkable when it is present), so every beat is a real blink.
+  const h = ui.debug.head(), world = ui.debug.world();
   const base: V3 = [h.pos[0], 0, h.pos[2]], yaw0 = h.yawDeg * Math.PI / 180;
-  const at = (s: Spot): { eye: V3; focus: V3; box: BeatView['anchor']['box'] } => {
+  const rot = (dx: number, dz: number): [number, number] => [base[0] + dx * Math.cos(yaw0) + dz * Math.sin(yaw0), base[2] - dx * Math.sin(yaw0) + dz * Math.cos(yaw0)];
+  const OFFSETS: Array<Array<[number, number]>> = [
+    [[0, 0]], [[-1.5, 1.0], [-1.0, 0.6], [1.5, 1.0], [0, 0]], [[0, -1.5], [0.8, -1.0], [-0.8, 1.2], [0, 0]], [[1.2, 1.2], [1.0, 0.5], [-1.2, 0.8], [0, 0]],
+  ];
+  const stand = (i: number): V3 => {
+    for (const [dx, dz] of OFFSETS[i]) {
+      const [x, z] = rot(dx, dz);
+      try { if (!world || (world.floorY(x, z, null) != null && world.walkable(x, z, null, 0.3))) return [x, 1.6, z]; } catch { /* next */ }
+    }
+    return [base[0], 1.6, base[2]];
+  };
+  const at = (s: Spot, eye: V3): { eye: V3; focus: V3; box: BeatView['anchor']['box'] } => {
     const a = yaw0 - s.az * Math.PI / 180;
-    const fx = base[0] - Math.sin(a) * s.dist, fz = base[2] - Math.cos(a) * s.dist;
+    const fx = eye[0] - Math.sin(a) * s.dist, fz = eye[2] - Math.cos(a) * s.dist;
     const focus: V3 = [fx, 1.0, fz];
-    return { eye: [base[0], 1.6, base[2]], focus, box: [fx - s.w / 2, 0.2, fz - s.w / 2, fx + s.w / 2, 0.2 + s.h, fz + s.w / 2] };
+    return { eye, focus, box: [fx - s.w / 2, 0.2, fz - s.w / 2, fx + s.w / 2, 0.2 + s.h, fz + s.w / 2] };
   };
   const mk = (i: number, id: string, ch: number, spot: Spot, v: Spec): BeatView => {
-    const a = at(spot), member = v.member ?? null;
+    const a = at(spot, stand(i)), member = v.member ?? null;
     return {
       index: i, count: 4, id, chapter: CHAPTERS[ch], member, companion: member?.companion ?? null, say: v.say ? { speaker: member ? member.id : 'narrator', text: v.say } : null,
       popup: { kind: v.phone ? 'phone' : 'card', title: v.title, body: v.body, note: v.note ?? null, chips: v.chips ?? [], phone: v.phone ? { header: v.phone.header, rows: v.phone.rows } as any : null },
