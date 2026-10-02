@@ -40,6 +40,7 @@
     "portal:build": "node --experimental-strip-types scripts/build-portal.mts",
     "portal:test": "node --experimental-strip-types scripts/test-portal.mts",
     "portal:og": "node --experimental-strip-types scripts/story/build-og.mts",
+    "test:voiceover": "node --experimental-strip-types --test scripts/test-voiceover.mts",
     "ui:test": "node --experimental-strip-types scripts/test-ui.mts",
     "portal:preview": "node --experimental-strip-types scripts/build-portal.mts --serve",
     "story:validate": "node --experimental-strip-types scripts/validate-stories.mts",
