@@ -1,0 +1,908 @@
+{
+  "schema": "family/v1",
+  "slug": "lindqvist-abara",
+  "house": "asymmetry",
+  "fictional": true,
+  "family": {
+    "surname": "Lindqvist-Abara",
+    "tagline": "A lake house where the grandchildren's photos stay put.",
+    "household": "grandparents",
+    "business": true,
+    "story": "Anders is a semi-retired civil engineer who still keeps two clients. Chiamaka is a ceramicist who sells her pots at craft fairs. Their lake house fills with grandchildren every holiday.",
+    "address": {
+      "line": "22 Heron Rise",
+      "place": "Tamsin Reach"
+    },
+    "narrator": "v-storyteller-m"
+  },
+  "members": [
+    {
+      "id": "anders",
+      "name": "Anders",
+      "age": 64,
+      "role": "grandparent",
+      "work": "semi-retired civil engineer",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Ruben",
+        "runtime": "Hermes",
+        "job": "Drafts consulting updates and meeting notes from what Anders texts it.",
+        "personality": [
+          "steady",
+          "thorough",
+          "patient"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Drafts only. Anders reads and sends every note."
+      }
+    },
+    {
+      "id": "chiamaka",
+      "name": "Chiamaka",
+      "age": 62,
+      "role": "grandparent",
+      "work": "ceramicist, sells at craft fairs",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Ife",
+        "runtime": "OpenClaw",
+        "job": "Opens Nextcloud in its own browser and files kiln logs and glaze notes.",
+        "personality": [
+          "curious",
+          "cheerful",
+          "tidy"
+        ],
+        "voice": "v-bright-f",
+        "memory": true,
+        "limits": "One page at a time. Chiamaka checks each result."
+      }
+    },
+    {
+      "id": "tobi",
+      "name": "Tobi",
+      "age": 13,
+      "role": "visitor",
+      "work": "grandson, school",
+      "colour": "chart-3"
+    },
+    {
+      "id": "linnea",
+      "name": "Linnea",
+      "age": 9,
+      "role": "visitor",
+      "work": "granddaughter, school",
+      "colour": "chart-4"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining table"
+    },
+    {
+      "id": "green",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The green room desk"
+    },
+    {
+      "id": "studio",
+      "kind": "room",
+      "room": "garage",
+      "title": "Chiamaka's studio"
+    },
+    {
+      "id": "loft",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The loft"
+    },
+    {
+      "id": "terrace",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out on the terrace"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel at the door",
+        "body": "A parcel waits at the top of the stair, a week before the cousins arrive. Anders carries it through the entry passage to a living room shelf Chiamaka cleared."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Chiamaka lifts out the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core's footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Chiamaka plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Anders joins the Core's own network from his phone. Then he chooses the lake house network and types its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "immich",
+        "nextcloud"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Chiamaka picks OpenClaw and Anders picks Hermes. They add Immich, Nextcloud and Companion Memory (beta). Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Immich, Nextcloud"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "anders",
+      "agent": "anders",
+      "approval": "anders",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Ruben says hello",
+        "body": "Anders texts the agent he named Ruben. Ruben answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "anders",
+        "text": "Good evening, Anders. I am Ruben."
+      },
+      "film": true
+    },
+    {
+      "id": "living-photos",
+      "chapter": "living",
+      "member": "chiamaka",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The cousins' photos, on one shelf",
+        "body": "Four phones, one shelf. The cousins' photos go into one Immich library on the Core, and Chiamaka sorts them from the couch.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-films",
+      "chapter": "living",
+      "member": "anders",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Film night from the family collection",
+        "body": "On Friday night Anders plays an old film from his own collection. Jellyfin streams it from the Core to the living-room TV while the cousins argue over popcorn.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "living-share",
+      "chapter": "living",
+      "member": "tobi",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "pairdrop",
+        "replaces": [
+          "AirDrop"
+        ]
+      },
+      "capability": "send files between phones and laptops on the same Wi-Fi",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "A clip crosses the room",
+        "body": "Tobi sends a clip from the dock to his grandfather's laptop with PairDrop. Both are on the lake house Wi-Fi, so the file goes straight across.",
+        "chips": [
+          "PairDrop",
+          "replaces AirDrop"
+        ]
+      }
+    },
+    {
+      "id": "living-lights",
+      "chapter": "living",
+      "member": "anders",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "Lights that dim at dusk",
+        "body": "At dusk the living room lights dim on a schedule Anders set in Home Assistant. It runs on the Core and reaches the lights over the home Wi-Fi.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "chiamaka",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A dinner list for every phone",
+        "body": "Chiamaka plans the holiday dinner in KitchenOwl at the breakfast bar. Anders adds the fish, Linnea adds the cinnamon, and the list updates on every phone.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-subs",
+      "chapter": "kitchen",
+      "member": "anders",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Every renewal, announced in advance",
+        "body": "Anders lists the household's subscriptions in Wallos at the counter. A reminder arrives before each one renews, so he decides what stays.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      }
+    },
+    {
+      "id": "dining-dock",
+      "chapter": "dining",
+      "member": "tobi",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "a whiteboard with a hand-drawn look. Sketch ideas together",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "A dock plan, drawn together",
+        "body": "Tobi wants a new dock. Anders, a civil engineer, sketches the posts while Tobi draws the boat, both in Excalidraw at the dining table.",
+        "chips": [
+          "Excalidraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "green-hours",
+      "chapter": "green",
+      "member": "anders",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "kimai",
+        "replaces": []
+      },
+      "capability": "track time per project and client, with reports",
+      "anchor": {
+        "role": "desk",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Two clients, hours kept straight",
+        "body": "Two clients, two projects. Anders logs his hours in Kimai at the green room desk. The report is ready when he sends the invoice.",
+        "chips": [
+          "Kimai"
+        ]
+      }
+    },
+    {
+      "id": "green-update",
+      "chapter": "green",
+      "member": "anders",
+      "agent": "anders",
+      "approval": "anders",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "desk",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A client update, drafted",
+        "body": "Anders texts Ruben his site notes. Ruben drafts the client update. Anders reads it, fixes it and sends it himself."
+      },
+      "say": {
+        "speaker": "anders",
+        "text": "Your draft is ready. Please read it first."
+      },
+      "film": true
+    },
+    {
+      "id": "green-pdf",
+      "chapter": "green",
+      "member": "anders",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "desk",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Drawings and letter, one PDF",
+        "body": "Anders merges three drawings and a cover letter into one PDF with Stirling-PDF. The merge runs on the Core, and he sends the file to the client.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "studio-logs",
+      "chapter": "studio",
+      "member": "chiamaka",
+      "agent": "chiamaka",
+      "approval": "chiamaka",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": []
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "counter",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Ife files the kiln log",
+        "body": "At the end of a firing, Chiamaka hands Ife the kiln log. Ife opens Nextcloud in its own browser and files the glaze notes. Chiamaka checks the folder.",
+        "chips": [
+          "Nextcloud"
+        ]
+      },
+      "say": {
+        "speaker": "chiamaka",
+        "text": "Filed. Please check the folder."
+      }
+    },
+    {
+      "id": "studio-fair",
+      "chapter": "studio",
+      "member": "chiamaka",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "grist",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "a spreadsheet-database stored as a SQLite file you can copy",
+      "anchor": {
+        "role": "counter",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Every pot gets a row",
+        "body": "Before the autumn fair, Chiamaka lists every pot in a Grist table: glaze, size and price. The table is a single file on the Core.",
+        "chips": [
+          "Grist",
+          "replaces Airtable"
+        ]
+      }
+    },
+    {
+      "id": "studio-cards",
+      "chapter": "studio",
+      "member": "chiamaka",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "capability": "design and prototype in a web-based design tool you host",
+      "anchor": {
+        "role": "counter",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Price cards, designed at home",
+        "body": "Chiamaka designs the price cards for her fair table in Penpot, a design tool hosted on the Core. She prints a set before each fair.",
+        "chips": [
+          "Penpot",
+          "replaces Figma"
+        ]
+      }
+    },
+    {
+      "id": "studio-memory",
+      "chapter": "studio",
+      "member": "chiamaka",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "Chiamaka decides what Memory reads",
+        "body": "Chiamaka chooses which folders Companion Memory may read. Ife uses only those notes, and she can disconnect them whenever she likes."
+      }
+    },
+    {
+      "id": "loft-records",
+      "chapter": "loft",
+      "member": "tobi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Grandpa's albums, found and played",
+        "body": "Tobi finds his grandfather's old albums in Navidrome and plays them beside the record player. The music streams from the Core to his phone.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "loft-story",
+      "chapter": "loft",
+      "member": "linnea",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Linnea keeps her place",
+        "body": "Linnea listens to a bedtime audiobook in the loft. Audiobookshelf keeps her place for tomorrow night.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "terrace-herbs",
+      "chapter": "terrace",
+      "member": "chiamaka",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Planters with a care journal",
+        "body": "Chiamaka logs the stepped planters in HortusFox: where each herb grows and when she watered it.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "terrace-camera",
+      "chapter": "terrace",
+      "member": "anders",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The stair camera records at home",
+        "body": "An IP camera at the foot of the stair streams to Frigate. The video stays on the Core, and Anders plays the clips on the home network.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "outro-lake",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One shelf for the whole family",
+        "body": "Photos, drawings, glaze notes and a dock plan. The Lindqvist-Abara household keeps it all on one Companion Core in the living room."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your family's photos, files and agents can live on a Companion Core at home. Start with one shelf, and let the cousins fill it.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "terrace-camera assumes the family owns an IP camera. Cameras are not in the parcel and not in the 3D scene.",
+    "Ife has Companion Memory (beta) connected, opt-in; studio-memory shows the choice. The first mention is in ftue-pick.",
+    "Cousins Tobi (13) and Linnea (9) are visitors: third person only, no companion, never voiced.",
+    "Town Tamsin Reach and street Heron Rise are invented; still needs the human map check."
+  ]
+}
