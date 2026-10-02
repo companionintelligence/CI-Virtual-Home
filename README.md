@@ -680,6 +680,101 @@ prop), and a photographed roughness gives floors a visible lamp sheen at dusk an
 
 #### frame
 <!-- realism:frame:begin -->
+Frame quality in four parts. `assets/realism-frame.ts` is the thin eager entry (installed at every tier); the passes and the
+accumulation are in `assets/viewer-composer.ts`, loaded lazily (when the accumulation starts at tier 1+, or when Best quality is
+turned on at any tier); the clip's shader side is `assets/light-guard.ts`. `?no=frame` removes all of it; `?no=accum`,
+`?no=lamppool`, `?no=spotclip` and `?no=hqlite` remove one part (for A/B timing and for `scripts/live-checks/frame.mts`).
+The page's `composerFor` (the film's renderer: stills, the recorder, the goldens) is **not** touched, so the film pipeline's
+look is exactly what it was; the player's Best quality is now a *live preview* tier that does not promise to equal it.
+
+| Part | Tier | What it does |
+|---|---|---|
+| Lighter **Best quality** | 0, 1, 2 | The toggle draws `scene → 4x MSAA half-float target at the canvas size (no 2x supersample) → GTAO at half resolution, 10 samples → bloom with a threshold that follows the frame's mean brightness → one grade + tone-map + sRGB pass → SMAA → canvas`. The glass stays in the opaque pass, so the transmission pass (a second full scene draw, what made the old Best quality 2.4 to 4.5k calls) is not turned back on. |
+| **Idle accumulation** | 1 (8 samples), 2 (16) | After the view has been still ~250 ms and nothing else wants a frame, `idle()` asks for another frame; each is the scene drawn with a Halton-jittered `camera.setViewOffset` (sub-pixel) into a half-float target (4x MSAA up to 2.3 Mpx), added to a running sum, and the mean is shown. The sun's shadow map is drawn once for the whole run. Any plain draw, a new pose or a lighting change throws the sum away; a refinement frame over 45 ms twice stops the run (three stops ban it for the session); the targets are freed after 8 s. Thin mullions, fences and roof courses stop crawling on a paused view. |
+| **Lamp pools** | 1+ | The room `SpotLight`s' penumbra goes from 0.45 to 0.8 and their intensity ×1.2. The beam's full-strength inner cone drops from 55 % of its width to 20 %, so the pool's edge is a long falloff instead of a hard ellipse and the walls near the lamp stop clipping to white. |
+| **Spot-light room clip** | 1+ | Each room spot gets its room's box (one 16-byte `vec4` per spot index, in a `Float32Array` that every material shares); in `lights_fragment_begin` a fragment outside it gets `directLight.visible = false`. Light no longer reaches the next room's wall face, the back of a wall, or the ceiling of the storey below. |
+
+**Cost.** Measured with `perf:player` against `03edd3b`, interleaved, three invocations of five runs each per tree, default tier
+(1), dpr 2, 1280 x 720 (median over the rounds):
+
+| house, scenario | base ms/frame | now ms/frame | ratio | frame CPU base / now | draw calls base / now |
+|---|---|---|---|---|---|
+| cocoon, shot | 16.87 | 16.78 | 0.99 | 11.7 / 11.9 ms | 1564 / 1572 |
+| cocoon, orbit | 18.22 | 18.21 | 1.00 | 15.6 / 17.3 ms | 1824 / 1824 |
+| aurora, shot | 16.87 | 16.72 | 0.99 | 11.9 / 11.3 ms | 1322 / 1321 |
+| aurora, orbit | 16.90 | 16.70 | 0.99 | 13.1 / 12.2 ms | 1638 / 1638 |
+| cocoon, Best quality | 44.44 | 24.47 | 0.55 | 42.2 / 22.6 ms | 4414 / 3010 |
+| aurora, Best quality | 43.80 | 21.02 | 0.48 | 41.1 / 18.6 ms | 3646 / 2330 |
+| idle (paused, nothing dirty) | 16.67 | 16.67 | 1.00 | | |
+
+Four rounds, alternating A B / B A, 5 runs each, load average 20 to 100 (`uptime` is in each run's header); most rows sit at the
+display's 16.7 ms, so frame CPU is the finer figure: cocoon orbit +1.7 ms (about +11 %) is the one row above the noise, and still
+presents at the same rate. Best quality is about half the old frame time (and 30 % fewer draw calls, no transmission pass).
+Earlier runs at load 150 to 400 and in a fixed A-then-B order scattered between -10 % and +25 % on the same rows, so read only this table.
+
+The lamp pools and the clip are uniforms and a few instructions in the spot loop. The accumulation costs nothing while the view
+moves (it only runs when nothing else is drawn) and, while it runs, 8 extra renders over about 0.15 s plus two half-float
+targets of the canvas size (about 45 MB at 1280 x 720, 110 MB at the 2.3 Mpx MSAA cap, given back after 8 s). Source: about 25 KB
+(`realism-frame.js` 8 KB eager, `light-guard.js` 8 KB, `viewer-composer.js` 17 KB lazy, plus the vendored passes it imports, about 130 KB, lazy).
+
+**Colour match of the accumulation.** r169 tone-maps and sRGB-encodes only when a material draws to the screen, so a sample
+drawn into an ordinary render target holds linear light, and translucent surfaces (water, glass, the fading roof) blend in
+linear light instead of sRGB. A first version added linear samples and tone-mapped the mean: it came out 2 % too bright overall
+and 40 % too bright on the lake. The sample target is therefore flagged `isXRRenderTarget` with the output colour space as its
+texture's, which is the switch three itself uses for "draw this like the canvas" (`WebGLPrograms`, `WebGLBackground`): every
+material tone-maps and encodes as on screen and the resolve is only `sum / k`. Measured on aurora (day): a single unjittered
+sample differs from the plain frame by 0.06/255 on average and 2/255 at most. The eight-sample picture matches the plain path's
+mean luminance to 0.5 % and saturation to 0.3 % on aurora and 0.7 % / 0.2 % on lakecabin at dusk (`frame.mts` asserts 1.2 % / 2 %).
+
+**Best quality against the plain path.** The film's presets desaturate dusk to 0.72 and night to 0.8 and darken the corners, and
+the page's own chain came out 7 to 17 % less saturated than the plain player (aurora day -7.6 %, vanilla dusk -16.4 %, lakecabin
+dusk -17.5 %, lakecabin night interior -9.8 %, mirage day -7.5 %). The lighter chain keeps 35 % of the preset's saturation
+change and 60 % of its vignette (`GRADE` in `viewer-composer.ts`). Measured, lighter chain against plain: mean luminance -2.2 /
++0.4 / -6.3 / +0.6 / -2.0 % and mean saturation -2.2 / -3.0 / -2.3 / -2.7 / -3.1 % on the same five views; the tolerance
+`frame.mts` asserts is 8 % / 5 %. What Best quality adds that plain does not: half-resolution ambient occlusion (corners, under
+furniture and eaves), a soft bloom on lit windows and lamps (its threshold is 5.5 x the frame's mean brightness, between 1.7 and 4
+rather than the fixed 1.6 to 1.8, so white worktops and sofas do not glow like light sources), and SMAA on top of the 4x MSAA.
+
+**The spot clip's mapping.** The box is a uniform array indexed like three's spot-light array, and three sorts lights (shadow
+casters first) and skips invisible subtrees (cutaway levels, hidden roofs), so the index of a room's lamp changes with the
+state. `createSpotClip()` walks the scene the way three does each frame and *proves* the result against three's own uniform array
+after the next draw (`verify()`): each slot's cone (distance, cosine) and the distances between slots must match the lights it
+claims, which does not assume which camera drew last. On a mismatch the clip switches itself off, tries again 90 frames later,
+and after the third failure stays off; the lights then behave as before. `frame.mts` also checks the picture from outside: one
+lamp lit, five cameras, the depth of every pixel gives its world position, and no pixel outside that lamp's room box may be lit with
+the clip on (cocoon at night: 0 strong stray pixels with the clip, 1543 without it; the pixels inside the room differ by 1 %).
+The world position in the shader comes from the draw's own `viewMatrix`, so a second camera (a mirror, a probe) clips correctly too.
+
+**Why one small typed array.** three uploads a material's uniforms every time a draw switches to it (about a thousand times a frame in a
+house), so the clip's payload is a per-frame CPU cost. Measured on aurora (frame CPU, interleaved with the base commit): two arrays of
+`Vector4` boxes +3 to 4 ms, one `Float32Array` of 24 x 2 `vec4` about +2.5 ms, a 32-byte array +1 ms; the shipped form is 16 `vec4`
+(a box is the centre, two half sizes and a height range, packed to whole centimetres in two float32). Three's loop unrolling pastes the
+loop body without braces: the clip is a `{ }` block of its own, and `test-frame-units.mts` unrolls the patched chunk the way three
+does and rejects a redeclared name (`portal:test` found this once, as `'vhB' : redefinition`).
+
+**Lamp pools, measured.** Penumbra 0.8 on its own takes about 40 % of the beam's power out of the room (cocoon, dusk, inside the
+door: mean luminance 0.2039 -> 0.1717 with the gain at 0.9); the gain of 1.2 gives most of it back while keeping the walls near
+the lamp below white. The clip alone moves the same frame by -2 %.
+
+**Restore.** `viewer.external.before()` puts the lamps' penumbra and intensity back, switches the clip off and drops the
+accumulation, so the page's offline hooks see the scene as built; `after()` brings the pools back. The accumulation puts the
+camera's view offset, the render target and the shadow policy back inside every step, also on a throw (checked in
+`frame.mts`).
+
+**Needs from realism-core.** (1) `frame()` calls `realism.idle()` only while the shot is neither playing nor flying,
+and a drag, a WASD key or `C` enters the free camera, so the accumulation runs on a paused shot but not after the person has
+touched the camera, until they press Esc. Dropping `!flying` from that condition (nothing is dirty there, so the camera is
+still) makes it run in the free camera too: tried with a local patch of the compiled `viewer.js`, accumulation then runs after a
+drag and after a key is released; the pose test already tolerates the controls' matrix noise. (2) The toast in `setHq` still says
+"Best quality is on. Playback may be slower."; it should say that Best quality is a live preview and that films and stills use
+the full pipeline. (3) `test:live` check (b) compares hashes of the restored page and the killed page; the clip's extra shader text
+compiles to a program that differs from the killed page's by one level in one or two pixels (`frame.mts` measures it: max 1 level,
+2e-4 % of the pixels), so (b) needs that tolerance or a killed page that carries the same text. (4) Check (d) reads
+`renderer.info.memory` ~0.3 s after load, which is inside an accumulation run (two targets, one geometry): open its page with
+`no=accum`, or wait for `effects.features.frame.accum.state` to leave `running`.
+
+Checks: `node --experimental-strip-types scripts/test-frame-units.mts` (browserless, in `check:quick`: the jitter, the shader patch
+against r169's chunk text, the boxes, the slot order and the proof's rules) and `pnpm run test:live -- --only frame` (the GPU).
 <!-- realism:frame:end -->
 
 ## How verification works
