@@ -1,0 +1,876 @@
+{
+  "schema": "family/v1",
+  "slug": "aguirre-lund",
+  "house": "modernhome-nora",
+  "fictional": true,
+  "family": {
+    "surname": "Aguirre-Lund",
+    "tagline": "School at the kitchen table, and the lessons stay home.",
+    "household": "young-family",
+    "business": true,
+    "story": "Valentina teaches Emil and Sofia at the kitchen table and writes a weekly newsletter about it. Henrik works from home as a product manager. One Companion Core in the living room keeps the lessons, the notes and the newsletter in the house.",
+    "address": {
+      "line": "63 Spruce Tangle Drive",
+      "place": "Aspenholt"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "valentina",
+      "name": "Valentina",
+      "age": 39,
+      "role": "parent",
+      "work": "leads the homeschool days, writes a newsletter",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Greta",
+        "runtime": "Hermes",
+        "job": "Drafts the weekly newsletter and day plans from what Valentina texts it.",
+        "personality": [
+          "precise",
+          "organized",
+          "brisk"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Drafts only. Valentina sends the newsletter."
+      }
+    },
+    {
+      "id": "henrik",
+      "name": "Henrik",
+      "age": 41,
+      "role": "parent",
+      "work": "product manager, works from home",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Magnus",
+        "runtime": "OpenClaw",
+        "job": "Opens Joplin in its own browser and files Henrik's meeting notes.",
+        "personality": [
+          "curious",
+          "gentle",
+          "bright"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Files notes Henrik names. He checks the folder."
+      }
+    },
+    {
+      "id": "emil",
+      "name": "Emil",
+      "age": 11,
+      "role": "child",
+      "work": "school, bunk bed, upstairs desk",
+      "colour": "chart-3"
+    },
+    {
+      "id": "sofia",
+      "name": "Sofia",
+      "age": 8,
+      "role": "child",
+      "work": "school, bunk bed, upstairs desk",
+      "colour": "chart-4"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen counter"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The school table"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "The kids' room"
+    },
+    {
+      "id": "utility",
+      "kind": "room",
+      "room": "garage",
+      "title": "The utility room"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The deck and the planters"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "henrik",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The parcel crosses the kitchen",
+        "body": "A parcel waits in the front hall. Henrik carries it past the kitchen to the living room, where Emil has cleared a shelf."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "sofia",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Sofia reads out the list",
+        "body": "Sofia reads the list aloud: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "emil",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Emil plugs in the Core",
+        "body": "Emil plugs in the power cable, and Valentina presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "henrik",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Henrik joins from his phone",
+        "body": "Henrik opens the Wi-Fi settings and joins the Core's own network. Next he picks the home network and types its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "valentina",
+      "with": [
+        "ci-memory",
+        "kiwix",
+        "joplin"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Agents first, then the apps",
+        "body": "In Companion Hub, Valentina picks Hermes and Henrik picks OpenClaw. They add Companion Memory (beta), Kiwix and Joplin Server, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Kiwix, Joplin Server"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "valentina",
+      "agent": "valentina",
+      "approval": "valentina",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Greta says good morning",
+        "body": "Valentina texts the agent she named Greta. Greta answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "valentina",
+        "text": "Good morning, Valentina. I am Greta. Shall we plan the week?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-story",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "sofia",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "Listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Tonight's story, where it stopped",
+        "body": "Sofia picks tonight's story in Audiobookshelf and settles on the couch. The app remembers where the last chapter stopped.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "living-memory",
+      "chapter": "living",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "valentina",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "Keeps your digital life on your own disk, so your agents know your context; imports are opt-in",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "She decides what Memory reads",
+        "body": "Valentina chooses what Companion Memory (beta) may read: the lesson notes, nothing else. Greta drafts from those notes, and Valentina can revoke the connection at any time."
+      }
+    },
+    {
+      "id": "living-wiki",
+      "chapter": "living",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "valentina",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "capability": "Write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "anchor": {
+        "role": "bookshelf",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The curriculum, in books and chapters",
+        "body": "Valentina writes the curriculum in BookStack: a book for each term, a chapter for each unit. Search and page history keep every revision.",
+        "chips": [
+          "BookStack",
+          "replaces Confluence"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "emil",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "Track the pantry, shopping lists, recipes, chores",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Pantry check before shopping day",
+        "body": "Before shopping day, Emil and Sofia check the pantry in Grocy. Each adds one missing item to the list.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-split",
+      "chapter": "kitchen",
+      "category": "money",
+      "segment": "consumer",
+      "member": "henrik",
+      "app": {
+        "id": "spliit",
+        "replaces": [
+          "Splitwise"
+        ]
+      },
+      "capability": "Split shared costs with housemates, family or friends and settle up with the fewest payments",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sharing the science kit, fairly",
+        "body": "Two homeschool families share a science kit. Henrik logs the cost in Spliit at the counter, and it shows who owes whom.",
+        "chips": [
+          "Spliit",
+          "replaces Splitwise"
+        ]
+      }
+    },
+    {
+      "id": "dining-draft",
+      "chapter": "dining",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "valentina",
+      "agent": "valentina",
+      "approval": "valentina",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Greta drafts the weekly issue",
+        "body": "At the school table, Valentina texts Greta her lesson notes. Greta drafts the week's newsletter, and Valentina edits every line."
+      },
+      "say": {
+        "speaker": "valentina",
+        "text": "Here is the issue as a draft. Please read it first."
+      },
+      "film": true
+    },
+    {
+      "id": "dining-listmonk",
+      "chapter": "dining",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "valentina",
+      "app": {
+        "id": "listmonk",
+        "replaces": [
+          "Mailchimp"
+        ]
+      },
+      "capability": "Write and send newsletters to your own mailing list",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Friday's issue goes into Listmonk",
+        "body": "Valentina builds Friday's issue in Listmonk and checks the subscriber list. She presses send herself.",
+        "chips": [
+          "Listmonk",
+          "replaces Mailchimp"
+        ]
+      }
+    },
+    {
+      "id": "dining-pack",
+      "chapter": "dining",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "valentina",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "Merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "A week of worksheets, one pack",
+        "body": "Valentina merges the week's worksheets into one printable pack with Stirling-PDF. The merge runs on the Core.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "dining-board",
+      "chapter": "dining",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "valentina",
+      "app": {
+        "id": "planka",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "capability": "A real-time Kanban board for a team or a family project",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The next six issues, planned",
+        "body": "Valentina keeps the next six issues on a Planka board. Each card moves from idea to draft to sent.",
+        "chips": [
+          "Planka",
+          "replaces Trello"
+        ]
+      }
+    },
+    {
+      "id": "dining-notes",
+      "chapter": "dining",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "henrik",
+      "agent": "henrik",
+      "approval": "henrik",
+      "app": {
+        "id": "joplin",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "Take notes and keep to-dos that sync across your devices through your own server",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Magnus files the meeting notes",
+        "body": "Henrik pastes his meeting notes into chat and names a folder. Magnus files them in Joplin Server in its own browser, and Henrik checks the folder.",
+        "chips": [
+          "Joplin Server",
+          "replaces Evernote"
+        ]
+      },
+      "say": {
+        "speaker": "henrik",
+        "text": "Filed in the product folder. Please check it."
+      }
+    },
+    {
+      "id": "dining-quiz",
+      "chapter": "dining",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "emil",
+      "app": {
+        "id": "razzia",
+        "replaces": []
+      },
+      "capability": "Run a quiz night for a small group on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Friday quiz night, written by Emil",
+        "body": "On Friday, Emil writes the questions in Razzia. The whole family plays at the school table.",
+        "chips": [
+          "Razzia"
+        ]
+      }
+    },
+    {
+      "id": "kids-quests",
+      "chapter": "kids",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "emil",
+      "app": {
+        "id": "habitica",
+        "replaces": [
+          "Habitify"
+        ]
+      },
+      "capability": "Turn habits and chores into a game with levels and quests",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Reading done, level gained",
+        "body": "Emil ticks off his reading, and Habitica gives his character a level. The quest list lives on the Core.",
+        "chips": [
+          "Habitica",
+          "replaces Habitify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-volcano",
+      "chapter": "kids",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "sofia",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "Read Wikipedia and other reference sites from files kept on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "How a volcano works",
+        "body": "Sofia looks up how volcanoes work in Kiwix at the upstairs desk. The articles open from files saved on the Core.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "utility-dns",
+      "chapter": "utility",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "henrik",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "Block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "laundry",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Ads blocked for the whole house",
+        "body": "In the utility room, Henrik points the home network at Pi-hole. It blocks ads and trackers at the DNS level for every device on the Wi-Fi.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "garden-planters",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "sofia",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden",
+        "fallback": [
+          {
+            "role": "deck"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The lettuce keeps a diary",
+        "body": "Sofia waters the lettuce planters on the deck. Emil logs the date in HortusFox, so the lettuce has a diary.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-deck",
+      "chapter": "garden",
+      "category": "media",
+      "segment": "consumer",
+      "member": "valentina",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "Stream your own music collection to any device",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Supper over, music on the deck",
+        "body": "After supper, the family plays its own music on the deck. Navidrome streams the collection from the Core to a phone.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one school day",
+        "body": "The Aguirre-Lund household teaches, writes and plans from one Core in the living room."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your lessons, your notes and your weekly newsletter can run on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "Homeschool family: no claim about learning outcomes, grades or child safety anywhere. The children use Audiobookshelf, Habitica, Kiwix, Razzia and HortusFox in everyday moments, third person, never voiced and never monitored.",
+    "No TV in this house: the media beat sits on the couch. No island: the kitchen beats say \"the counter\". No garden zone of 10 m2: the garden chapter uses the planters and the deck.",
+    "Greta has memory true (cast). living-memory shows the opt-in: only the lesson notes are connected, and the connection can be revoked. Magnus is OpenClaw working inside Joplin Server on the Core, so the website note is not needed.",
+    "dining-listmonk: Listmonk needs an outside mail server to send (catalog caveat). The beat says Valentina presses send herself and promises no delivery.",
+    "Invented place and street: check Aspenholt and Spruce Tangle Drive against a map."
+  ]
+}

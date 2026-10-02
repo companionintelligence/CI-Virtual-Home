@@ -1,0 +1,777 @@
+{
+  "schema": "family/v1",
+  "slug": "ferrante-oyelowo",
+  "house": "palms",
+  "fictional": true,
+  "family": {
+    "surname": "Ferrante-Oyelowo",
+    "tagline": "Lessons in the living room, scores on the Core.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Antonia teaches piano in her living room and keeps thirty years of scanned scores in a drawer. Her son Femi visits and fills the guest room with music. One Companion Core in the stair study brings the scores, the lessons and the recordings together.",
+    "address": {
+      "line": "91 Saguaro Quill Way",
+      "place": "Saltgrass Wells"
+    },
+    "narrator": "v-bright-f"
+  },
+  "members": [
+    {
+      "id": "antonia",
+      "name": "Antonia",
+      "age": 54,
+      "role": "parent",
+      "work": "piano teacher",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Tessa",
+        "runtime": "Hermes",
+        "job": "Drafts lesson reminders and practice notes from what Antonia texts it.",
+        "personality": [
+          "precise",
+          "brisk",
+          "kind"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Drafts only. Antonia sends every reminder."
+      }
+    },
+    {
+      "id": "femi",
+      "name": "Femi",
+      "age": 26,
+      "role": "visitor",
+      "work": "adult child, visits the guest room",
+      "colour": "chart-2"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The galley kitchen"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "The stair study"
+    },
+    {
+      "id": "guest",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The guest room"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The pool and the deck"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "femi",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Femi carries it to the study",
+        "body": "A parcel waits at the front door. Femi carries it through the atrium and the galley kitchen to the stair study. His mother has cleared the desk."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "antonia",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "A guide read like a score",
+        "body": "Antonia reads the quick-start guide like a new score. Beside it lie the Companion Core, a power cable and a recovery USB drive."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "femi",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Count to three, press",
+        "body": "Femi plugs in the power cable. Antonia counts to three and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "femi",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Femi joins from his phone",
+        "body": "Femi joins the Core's own network on his phone, then picks the home network from the list. His mother types the password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "antonia",
+      "with": [
+        "baikal",
+        "nextcloud"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "One agent, two apps",
+        "body": "In Companion Hub, Antonia picks Hermes. She adds Baikal for the lesson calendar and Nextcloud for the score library, then walks away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Baikal, Nextcloud"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "antonia",
+      "agent": "antonia",
+      "approval": "antonia",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Tessa says hello",
+        "body": "Antonia texts the agent she named Tessa. Tessa answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "antonia",
+        "text": "Hello, Antonia. I am Tessa. Which lesson first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "antonia",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "Stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Last spring's recital, replayed",
+        "body": "Antonia plays a recital she filmed on the living-room TV. Jellyfin streams it from her own library on the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "living-take",
+      "chapter": "living",
+      "category": "creative",
+      "segment": "small-business",
+      "member": "antonia",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "Adobe Audition"
+        ]
+      },
+      "capability": "Edit audio in a browser tab. Cut, fade, normalise, export",
+      "anchor": {
+        "role": "music",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "A practice take, trimmed",
+        "body": "Antonia records a practice take on her phone, then trims the silence in AudioMass. Cut, fade and normalize in a browser tab.",
+        "chips": [
+          "AudioMass",
+          "replaces Adobe Audition"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-forms",
+      "chapter": "living",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "antonia",
+      "app": {
+        "id": "docuseal",
+        "replaces": [
+          "DocuSign"
+        ]
+      },
+      "capability": "Fill and sign PDF forms on any device, from your own Core",
+      "anchor": {
+        "role": "music",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Term form, signed at the piano",
+        "body": "At the piano, a parent signs the term form on Antonia's tablet in DocuSeal. The signed copy is filed on the Core.",
+        "chips": [
+          "Docuseal",
+          "replaces DocuSign"
+        ]
+      }
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "femi",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "Back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Searching the recital photos",
+        "body": "Femi opens Immich on the couch and searches for his mother's last recital. The photos sit on the Core, grouped and ready to find.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-meals",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "femi",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "A family planner with a shared calendar, tasks, shopping, meals, notes and contacts in one app",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Dinners planned at the island",
+        "body": "Antonia and Femi plan the week's dinners at the island in Yuvomi. Meals and shopping sit in one planner on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-tuning",
+      "chapter": "kitchen",
+      "category": "money",
+      "segment": "consumer",
+      "member": "antonia",
+      "app": {
+        "id": "monetr",
+        "replaces": [
+          "Mint"
+        ]
+      },
+      "capability": "Budget around recurring expenses by setting money aside for upcoming bills and goals",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Money set aside for tuning",
+        "body": "Antonia sets money aside in monetr for the piano's yearly tuning. The app budgets around recurring bills before they come due.",
+        "chips": [
+          "monetr",
+          "replaces Mint"
+        ]
+      }
+    },
+    {
+      "id": "study-remind",
+      "chapter": "study",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "antonia",
+      "agent": "antonia",
+      "approval": "antonia",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Tessa drafts the lesson reminders",
+        "body": "Antonia texts Tessa the week's lessons. Tessa drafts a reminder for each family, and Antonia reads and sends every one."
+      },
+      "say": {
+        "speaker": "antonia",
+        "text": "Here are the drafts. Please read each one first."
+      },
+      "film": true
+    },
+    {
+      "id": "study-contacts",
+      "chapter": "study",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "antonia",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "A small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Contacts that stay on the Core",
+        "body": "Antonia keeps each family's contact details in Baikal, on the Core. The lesson calendar sits beside them, and neither lives in an outside address book.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      }
+    },
+    {
+      "id": "study-library",
+      "chapter": "study",
+      "category": "productivity",
+      "segment": "small-business",
+      "member": "antonia",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Dropbox"
+        ]
+      },
+      "capability": "Your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Thirty years of scores, found",
+        "body": "Thirty years of scanned sheet music live in one Nextcloud folder on the Core. Antonia opens any score on her tablet at the piano.",
+        "chips": [
+          "Nextcloud",
+          "replaces Dropbox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "study-booklet",
+      "chapter": "study",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "antonia",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "Merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Six pieces, one recital booklet",
+        "body": "Antonia merges six pieces into one recital booklet with Stirling-PDF. The merge runs on the Core, and the booklet is ready to print.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "guest-book",
+      "chapter": "guest",
+      "category": "media",
+      "segment": "consumer",
+      "member": "femi",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "Listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "His place in the book, kept",
+        "body": "In the guest room, Femi picks up his audiobook where he left off. Audiobookshelf keeps his place on the Core.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "garden-lights",
+      "chapter": "garden",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "femi",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "Control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Deck lights, off at midnight",
+        "body": "Femi sets the deck lights to switch off at midnight on a Home Assistant schedule. The schedule runs on the Core and reaches the lights over the home Wi-Fi.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "garden-plants",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "antonia",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The poolside plants, in a journal",
+        "body": "Antonia logs the plants around the pool in HortusFox, with watering dates and photos for the garden journal.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-walk",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "femi",
+      "app": {
+        "id": "wanderer",
+        "replaces": []
+      },
+      "capability": "Plan, map and share hiking and biking routes from GPX files",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A morning walk, mapped",
+        "body": "Femi plans a morning walk in Wanderer from a GPX file. The route map stays on the Core.",
+        "chips": [
+          "Wanderer"
+        ]
+      }
+    },
+    {
+      "id": "garden-music",
+      "chapter": "garden",
+      "category": "media",
+      "segment": "consumer",
+      "member": "femi",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "Stream your own music collection to any device",
+      "anchor": {
+        "role": "pool",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Mother's recordings, by the pool",
+        "body": "Femi plays his mother's recordings by the pool. Navidrome streams the family collection from the Core to his phone.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one house of music",
+        "body": "The Ferrante-Oyelowo household teaches, practices and keeps its scores on one Core in the stair study."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your scores, your lesson calendar and your recordings can run on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "Students include children: no student is named, shown or quoted anywhere. study-contacts says only that families' contact details sit on the Core.",
+    "No dining table in this house (homeFlags): meals are planned at the island. No range in the galley: no beat anchors on one.",
+    "living-forms: DocuSeal fills and signs PDF forms. The parent signs on Antonia's own tablet at the piano, so no outside access is needed. The text never calls a signature legally binding.",
+    "Femi is a visitor (cast): he has no agent. Antonia is the only member with a companion (Tessa, Hermes, memory false), so Companion Memory is not picked in ftue-pick and is not mentioned.",
+    "The score library (study-library) is files in Nextcloud. No claim that the app reads sheet music.",
+    "Invented place and street: check Saltgrass Wells and Saguaro Quill Way against a map. The word for the house style is not used anywhere in the copy."
+  ]
+}
