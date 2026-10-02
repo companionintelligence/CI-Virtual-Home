@@ -205,7 +205,7 @@ Uniqueness metrics always gate, because a clash between two families is true for
 |---|---|---|
 | `fleet-count` | complete | all 30 casting slugs present; a slug not in casting or in two files always fails |
 | `fleet-topics` | complete | each of the ten topics (categories except setup) in at least ten families |
-| `fleet-apps` | complete | at least 70 distinct apps; no third-party app in more than 40% of families (from ten families on); the 15 story-rich apps (catalog `meta.top15`) each in at least three |
+| `fleet-apps` | complete | at least 70 distinct apps; no third-party app in more than 40% of families (from ten families on); the story-rich apps (catalog `meta.top15`) each in at least three; an app with no QA screenshot (`mealie` today) is left out of that list, because placing it needs an owner entry in `reviewed.json` and the catalog names a screenshot-backed fallback (`kitchenowl`), so 14 of the 15 count |
 | `fleet-segments` | complete | small-business beats at least 18% of all beats |
 | `fleet-unique` | always | no repeated surname, address place, companion name, beat title outside the ftue, or beat body; a first name used at most twice |
 | `fleet-voices` | complete | narrator counts equal `voices.json` `narratorFor` (never above it, even before complete) |

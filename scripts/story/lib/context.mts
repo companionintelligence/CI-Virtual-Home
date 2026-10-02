@@ -41,7 +41,7 @@ export interface Ctx {
   bans: Ban[]; apps: Map<string, CatalogApp>; castBySlug: Map<string, Casting['families'][number]>;
   appMatchers: { id: string; name: string; re: RegExp; ambiguous: boolean }[];
   notInStore: { name: string; re: RegExp }[];
-  /** the 15 story-rich apps (catalog meta.top15) that each need a place in at least three families */
+  /** the story-rich apps (catalog meta.top15, those with a QA screenshot; 14 of 15) that each need a place in at least three families */
   storyRich: string[];
   reviewedList: ReviewedEntry[]; reviewed: Set<string>; reviewedProblems: string[];
   house(houseId: string): HouseFacts | null;
@@ -86,7 +86,10 @@ export function loadContext(root: string = ROOT, over: Partial<{ reviewed: Revie
   });
   const notInStore = (catalog.notInStore?.apps ?? []).map((n) => ({ name: n.name, re: new RegExp(`\\b${escapeRe(n.name)}\\b`, 'i') }));
   const castBySlug = new Map(casting.families.map((f) => [f.slug, f]));
-  const storyRich = (catalog.meta?.top15 ?? []).map((a) => a.id);
+  // An app with no QA screenshot cannot be placed without an owner entry in reviewed.json (rule app-qa-screenshot), and the catalog
+  // itself names a screenshot-backed fallback for it (mealie -> kitchenowl), so it is not required of the fleet. Assembly decision,
+  // flagged for the owner: list three mealie beats in reviewed.json to make it count, or leave it out.
+  const storyRich = (catalog.meta?.top15 ?? []).filter((a) => a.qa === 'screenshot').map((a) => a.id);
 
   const houseCache = new Map<string, HouseFacts | null>();
   const house = (id: string): HouseFacts | null => {
