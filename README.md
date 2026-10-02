@@ -636,6 +636,46 @@ tier 0. Files: [`assets/realism-grass.ts`](assets/realism-grass.ts) (the eager e
 
 #### assets
 <!-- realism:assets:begin -->
+**CC0 detail textures and hero props** (`assets/realism-assets.ts`, `assets/media-registry.ts`, `assets/media-assets.ts`, the files in
+`assets/media/assets/`; tier 1 and up; `?no=assets` kills it; `?assetskip=plaster,vase-01` leaves single ids procedural, for A/B).
+
+*What it does.* The kit's procedural sets (`oak`, `herringbone`, `concrete`, `brick`, `siding`, `stone`, `asphalt`,
+`clay-tile`, `deck`, `tile`) give way to photographed CC0 detail maps (Poly Haven, ambientCG; `stucco` stays procedural: the one candidate, `beige_wall_001`, is a flat painted wall that looked blank next to the kit's grain), and a few props
+(`vase` ×4 variants, `wall-clock`, `side-table`, `coffee-table`, `fern`, `fruit-bowl` with a lemon and an apple) to CC0 models. A
+photographed albedo carries only the surface's detail, never its colour: `scripts/prep-assets.mts` reduces it to luma around a known mean, and
+the runtime tints the material by (the procedural set's mean colour in linear light) / (that mean), so the average colour the palette and the
+lighting presets were tuned for is kept and the surface gains grain, joints and relief. The material's world-UV period is set to the photograph's
+physical size (`period` in `scripts/assets-sources.json`). A swap is pointer assignments (map, normalMap, roughnessMap, a colour, three
+uniforms): no program compiles, so it can happen after the first frame and after the static batch. A prop swap adds the model as a child of the
+placed item, scaled to the box the hidden procedural pieces measured; a fit off by more than the model's `tol` (the `fit` object) leaves the
+procedural prop alone.
+
+*Tiers and loading.* `prefetch(houseId)` starts the downloads when the house id is known (concurrency 4, one promise per file, an `AbortController`
+per house so a switch cancels the old house's). `install()` waits at most 1.4 s: later textures swap in when they arrive, and models that are late are
+placed when they do (the static batch is undone around it and made again once, 250 ms after the last arrival). Tier 1: 512 px albedo, normal and roughness for the sets the house shows (biggest surfaces first), at most 8 props, at most
+1.5 MB per house. Tier 2: also the 1k albedo of the four biggest surfaces (loaded after the 512 ones, no program change, so no hitch beyond one
+upload), every prop, at most 3 MB. Tier 0 downloads nothing. Decoding uses `createImageBitmap` (off the main thread); each texture is uploaded with
+`renderer.initTexture` before it is drawn with.
+
+*Files.* Every name carries the first 8 hex digits of its sha256 and `assets/media/assets/files.json` lists them; `portal:build` refuses anything
+else (`scripts/portal-assets.mts`, `scripts/test-binary-guard.mts`). `pnpm run prep:assets` rebuilds them (needs network once for the sources: it
+installs its pinned tools into the gitignored `.cache/prep-tools/`, downloads from the exact URLs in the sources file, md5-checks against Poly
+Haven's API, and refuses to exceed 12 MB). `--offline` reuses the cache; `--only <id,…>` redoes ids. It also writes the rows of THIRD_PARTY.md's
+*assets* table. Maps are written with row 0 = v 0 (the kit's own convention), so the loader sets `flipY = false`; boards run along v, like the kit's.
+
+*Restore.* `batchSensitive`: `apply()`/`restore()` run with the batch undone. `restore()` puts back the original maps, colour and uniforms and
+removes every model, un-hiding the procedural pieces, so `viewer.external.before()` gives the exact pixels of `?no=assets`
+(`scripts/live-checks/assets.mts`).
+
+*Cost.* Eager: `realism-assets.js` 0.6 KB. Lazy, with the first house: `media-registry.js` + `media-assets.js` ≈ 43 KB (10 KB gzip) and the
+house's files (see the measured numbers in the pull request / `test:live --only assets`). GPU: a 512 map with mips is 1.4 MB, a 1k map 5.6 MB.
+Props add draw calls only until `viewer-batch` merges them (clones share their materials; repeats are therefore not turned into `InstancedMesh`es, the batch
+already merges them per cell); shadow casters are capped at the three largest props per room and 150 000 triangles per house.
+
+*Looks, honestly.* The textures are a modest change: floors, brick, stone and roads read as photographed rather than painted, calmer and with real
+board joints and wear, but at a distance the walls and roofs look like before. The props are the clear win (a wooden fruit bowl with real fruit, a
+scanned side table and coffee table, ceramic vases, a wall clock, ferns). Two things to know: a model keeps its own colours (the palette does not tint a
+prop), and a photographed roughness gives floors a visible lamp sheen at dusk and night that the procedural ones did not have.
 <!-- realism:assets:end -->
 
 #### frame
