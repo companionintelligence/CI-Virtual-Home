@@ -78,8 +78,8 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   run the new page against old cached modules and every home would stop with "This home could not be opened" (it did, on
   the first pass-4 deploy; the custom domain's zone rewrites `.js` to `max-age=14400` whatever `_headers` says). `portal:test` checks it.
 - `pnpm run portal:test` after portal work: it serves `dist/` under the sub-path and fails on any console error.
-- **WebXR and the platform profile are live-player only** (README: *Platform tiers*, *WebXR*). `assets/platform.ts` is imported
-  by `viewer.ts` and by `assets/xr/*` and by nothing else; `assets/xr/*` is loaded by one dynamic `import('./xr/entry.js')` in
+- **WebXR and the platform profile are live-player only** (README: *Platforms*, *Platform tiers*, *WebXR*). `assets/platform.ts` is
+  imported by `viewer-tier.ts` (which `viewer.ts` mounts) and by `assets/xr/*` and by nothing else; `assets/xr/*` is loaded by one dynamic `import('./xr/entry.js')` in
   `viewer.ts`, after the player is ready, unless `?no=xr`. **Never import either from anything an offline hook loads** —
   the editor, `__houseRenderBegin` / `__houseRenderFrames`, the goldens, the fixtures, films and stills — and never from
   `index.html` or the family pages (the landing weight stays 0). `xr:test`'s `T-OFFLINE` and `T-LAZY` fail on it.
@@ -95,7 +95,14 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 - **XR is the cheapest tier by construction** (README: *Platform tiers*): realism pinned to tier 0, no post-processing, a baked
   house, in-world UI. The numbers are hypotheses until the on-device checklist (`reference/XR-DEVICE-CHECKLIST.md`) is run;
   do not write one into docs as measured. `iwer` is a pinned test-only devDependency; no WebKit browser download without asking.
-- `pnpm run xr:test` after XR or platform work (needs `portal:build` and a GPU; one Chromium at a time).
+- **The Core stays stylised in a headset.** The bake merges and cheapens the house; it never swaps the Companion Core's look, and the
+  realism layer's PBR or foliage upgrades are not applied in XR (tier 0 only). Do not make XR "prettier" by adding a pass: add a
+  measured budget row first (`XR_TIERS` in `assets/platform-types.ts`).
+- **Mobile and desktop are not an afterthought to XR.** A feature of the player or the tour that works on one platform has to work, or say
+  why not, on the other two (README: *Platforms*); choose by capability probe (`getPlatform()`), never by user agent. A new control is 44 px
+  with a finger and has a keyboard and a gamepad path; `pnpm run platform:test` checks the sizes at twelve viewports.
+- `pnpm run xr:test` after XR or platform work (needs `portal:build` and a GPU; one Chromium at a time), and `--only 10`, `--only 20`,
+  `--only 40` for the three standalone scripts; `pnpm run platform:test` for the phone and desktop matrix.
 
 **The editor.** `room-creator.html` without `?mode=view` (README: The editor) is the review and render tool, on the CI canon:
 

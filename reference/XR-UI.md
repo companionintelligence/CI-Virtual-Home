@@ -10,7 +10,7 @@ person asks for VR, so a visitor who never does downloads none of it (`demo.ts` 
 |---|---|---|
 | sizes, colours, drawing | `paint.ts` | THREE-free. Layouts are lists of drawing ops; `paintCard(ctx, view, metrics)` is the story film overlay's to adopt. `XR_LEGIBILITY`, `XR_COMFORT`, `XR_BUDGET` and `emMetres()` from `presenter.ts` are the only source of sizes |
 | a panel | `panel.ts` | One quad, one `CanvasTexture`, mipmaps, anisotropy 8, drawn at `texelsPerDeg = clamp(1.5 x device ppd, 24, 40)`. Redraws only when something changed |
-| the ray | `ray.ts` | Hover and press from the XR frame's input sources; haptics; a 1.5 cm hit dot; a ~190 triangle controller proxy. No model, no CDN |
+| the ray | `ray.ts` | Hover and press from the XR frame's input sources; haptics; a 1.5 cm hit dot; a ~190 triangle controller proxy. No model, no CDN. When the locomotion module is present it draws the controllers and the ray (`pointer.ts`) and this hub draws neither (it still hit-tests and hovers) |
 | hit maths | `hit.ts` | Where a ray meets a panel; shared with the placement solver and the Node tests |
 | widgets | `button.ts` | Button, toggle, segment, row, progress bar: one record, four states (idle, hover, pressed, disabled), never colour alone |
 | captions | `caption.ts` | The caption bar (2 lines, karaoke, redrawn only when the word changes) and the lazy follow every head-following panel uses |

@@ -74,6 +74,7 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
 | `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
 | `pnpm run ui:test` | Drive the editor end to end (layout at four sizes in both schemes, contrast, the top bar, the checks, the timeline, the tree, the catalog, Compare, stills at 4K, a recorded MP4 checked with ffprobe and by PSNR) — `--only <sections>`, `--shots <dir>`. Needs a GPU and ffmpeg. |
+| `pnpm run platform:test` | The player on the devices it is for: 12 phone, tablet and desktop viewports (360 px to 3840 px and ultrawide, hi-DPI, touch and mouse) in light and dark, over `dist/` in one Chromium: no sideways scroll, 44 px targets with a finger and 24 px with a mouse, the dock on screen, the drawing buffer within the tier's budget, the tier the device row says, `viewport-fit=cover`, no console error, no third party; plus `scripts/test-platform.mts` (tier rows for real renderer strings, run by `check`). `--only iphone15,desktop-4k`, `--shots`. Needs `portal:build` and a GPU. |
 | `pnpm run xr:test` | The WebXR gate: the live player in Chromium with Meta's IWER (Immersive Web Emulation Runtime) as the headset — Quest 3, Quest 2, a Vision-like profile — over `dist/`. State restore, no third party, lazy loading, offline untouched, faults, and the harness's own self-test. `--only 00` (a file prefix or a case id), `--device quest3,quest2,vision,all`, `--house`, `--driver auto\|session\|bed`, `--require-session`, `--ref-dir`, `--fake-xr`, `--shots`, `--json`, `--list`. One Chromium at a time; needs `build` and `portal:build` and a GPU. Not part of `check`. See *Testing XR*. |
 | `pnpm run xr:census` | What a headset draws: the XR bake's census of the 30 houses (draw calls and triangles per eye at eight headings, against each XR tier's budget) in plain Chromium, no WebXR runtime. |
 
@@ -105,6 +106,11 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
   ui/                      the editor's modules: recorder + mp4-mux + webm-mux (Record), timeline, plan-inset, path-overlay,
                            gallery, compare, qa, toast, undo, url-state, format (S6, the editor)
   viewer.ts                the portal's player: shots, scrubber, time of day, path, fly (room-creator ?mode=view)
+  platform.ts, platform-types.ts   the player's capability probe and tiers (PlatformProfile); viewer-tier.ts mounts it (tiers, promotion, eco,
+                           context-loss redraw), viewer-touch.ts (touch look / stick / tap-to-walk / gyro) and viewer-pad.ts (gamepad) load on demand
+  xr/                      WebXR, live player only and lazy (README: WebXR): entry, session, rig, loop, controller, hud (the session),
+                           bake* (the cheap house), locomotion, input, nav, teleport, comfort, stairs, doors, pointer (moving and aiming),
+                           ui/ (the in-world UI kit and the tour's Presenter)
   viewer-batch.ts          the player's live-only static batching: merges each toggle unit's static opaque meshes (a third of the draw
                            calls); only viewer.ts imports it, `?no=batch` switches it off, the recorder / goldens / editor never see it
 content/houses/            <id>.json — the 30 HouseSpecs (source); <id>.plan.json and index.json — derived
@@ -117,7 +123,8 @@ scripts/                   the pipeline: build, validate, render, gate (.mts) an
   xr-tests/                the cases `pnpm run xr:test` runs, one file per package (00-* the harness and cross-cutting guarantees)
 reference/                 HOUSE-SPEC.md (the schema), PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
                            HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review),
-                           XR-DEVICE-CHECKLIST.md (the on-hardware steps and what emulation cannot prove)
+                           XR-DEVICE-CHECKLIST.md (the on-hardware steps and what emulation cannot prove), XR-UI.md (the in-world UI kit),
+                           xr/INTEGRATION.md (what the merge with the realism and story branches must wire)
 test/goldens/macos-metal/  150 committed baseline frames (Git LFS) + PROFILE.json (the renderer that made them)
 test/goldens/expected-diffs/  the golden ledger: <stream>.json per stream, the frames it moves and why, and
                            <stream>/<profile>/ what each golden moved to (see How verification works)
@@ -394,12 +401,35 @@ How to take a number that means something:
   (Ollama, a VM), and the GPU timer query includes starvation gaps, so read the wall-clock frame time first and the
   `gpu` column as a hint. A weak CPU is emulated with `--throttle 4`.
 
+## Platforms: mobile, desktop, XR
+
+The requirement is that every feature of the player works on a phone, a desktop and in a headset, or says plainly why it does
+not. Nothing is chosen by user agent; `assets/platform.ts` probes capabilities (README: *Platform tiers*), and each platform
+has its own input and its own cost.
+
+| | Phone and tablet (touch) | Desktop (mouse, keyboard, gamepad) | Headset (WebXR) |
+|---|---|---|---|
+| Starts as | `mobile-low` (cheapest), promoted to `mobile-high` after 6 s at 58 fps | `desktop-high`, or `desktop-mid` on a weak or frugal machine | an XR tier from the granted session |
+| Look and move | drag to look, hold the left thumb for a stick, tap the floor to walk (the shot planner's navigation grid), pinch to glide, double-tap back to the shot, optional gyro (More sheet; asks on iOS) | orbit and the free camera on mouse, W A S D, wheel; a paired gamepad (left stick walks, right looks, triggers rise and sink, A plays) | blink teleport with a fade, snap turn, comfort vignette, stairs and doors, places menu; no smooth motion unless the person turns it on |
+| UI | the transport is a bottom sheet; every control is 44 px, safe-area aware, 100dvh, no hover | the dock, the keyboard shortcuts, hover tooltips | in-world Canvas2D panels with a ray; the story tour renders its popups and captions through the same kit |
+| Draw | one pixel ratio ladder, sun map 1024 to 2048, no composer | the full ladder, realism up to tier 2 | the cheapest tier, a baked house, no post-processing, a fixed framebuffer scale with a slow controller |
+| Where it stops | iPhone Safari has no WebXR: the 2D player; USDZ / Quick Look (a separate, non-WebXR route) is neither built nor assessed yet | n/a | `immersive-ar` (Android Chrome) is deferred; no headset has run it yet: see *Not measured, and not claimed* |
+
+The `?no=` switches. They are read once, compose, and every one restores the earlier behaviour exactly:
+
+| Switch | Turns off |
+|---|---|
+| `?no=xr` | WebXR: nothing under `assets/xr/` is requested, no Enter VR button, no `__houseViewer.xr` facade |
+| `?no=platform` | the platform block: every device behaves as `desktop-high` did before tiers (no promotion, eco, touch controls, wide-screen cap) |
+| `?no=glass`, `?no=lightguard`, `?no=batch`, `?no=adapt` | the opaque-pass glass, the light guard, static batching, the pixel-ratio controller (README: *Player performance*) |
+| `?tier=`, `?xrtier=`, `?xrlayers=0` | force the page tier, force the XR tier at session start, do not request the layers feature |
+
 ## Platform tiers
 
 The player runs on phones (360 to 430 px wide), tablets, desktops (1280 to 3840 px, ultrawide, hi-DPI) and in headsets. One
 module, `assets/platform.ts`, reads a **capability probe** (never the user agent: visionOS Safari sends a Macintosh UA, an
 emulator overrides it, and a PC can drive a Quest over Link) and returns one `PlatformProfile`; `viewer.ts` is its only
-importer, so the editor, the goldens, the fixtures, the films and the stills never load it. Two decisions are kept apart:
+importers are `viewer-tier.ts` (which `viewer.ts` mounts) and `assets/xr/*`, so the editor, the goldens, the fixtures, the films and the stills never load it. Two decisions are kept apart:
 
 - the **page tier** says how the 2D player draws. It is chosen at mount and moved by measurement (the existing ADAPT
   pixel-ratio controller, plus promotion and an eco frame cap);
@@ -470,10 +500,11 @@ Chrome) is deferred. iPhone Safari has no WebXR at all: it gets the 2D player.
   a CDN, and `XRControllerModelFactory` and `XRHandMeshModel` (which default to `cdn.jsdelivr.net`) are never used.
 - **Comfort.** Moving is a blink teleport with a fade, snap turn, and a comfort vignette; nothing moves the person smoothly
   by default, and the viewpoint changes only on a fully black frame (`xr:test` checks that invariant).
-- **Modules.** `assets/xr/`: `entry`, `session`, `loop`, `rig`, `controller`, `hud`, `style` (the session); `bake`, `bake-merge`,
-  `bake-lod`, `bake-lights` (the cheap house); `host.ts`, `presenter.ts` and `types.ts` (the seams between them, types only).
-  The input and locomotion modules (`locomotion`, `input`, `nav`, `teleport`, `comfort`, `places`, `dress`, `doors`) and the UI kit
-  (`ui/*`) arrive with their own packages; this section is the place to list them once merged.
+- **Modules.** `assets/xr/`: `entry`, `session`, `loop`, `rig`, `controller`, `hud`, `style`, `controls` (the session and its Enter VR
+  button); `bake`, `bake-merge`, `bake-lod`, `bake-lights` (the cheap house); `input`, `nav`, `teleport`, `comfort`, `stairs`, `doors`,
+  `dress`, `places`, `pointer`, `locomotion` (moving, aiming and what the person sees of their own input); `ui/*` (the in-world UI kit
+  and the tour's Presenter, [`reference/XR-UI.md`](reference/XR-UI.md)); `host.ts`, `presenter.ts` and `types.ts` (the seams between
+  them, types only). With the locomotion module present it draws the controllers and the ray, and the UI hub stands down its own.
 - **Kill switches.** `?no=xr` (nothing under `assets/xr/` is requested; no button, no API), `?no=platform`, `?tier=`, `?xrtier=`,
   `?xrlayers=0` (see *Platform tiers*). `window` fires `vh:xr` with `detail.state` `starting`, `started`, `ended` or `error`.
 
@@ -492,7 +523,7 @@ Vision-like device (no controllers; hand input sources that are `transient-point
 discovers `scripts/xr-tests/*.mts`; each file exports named cases, and a package owns its own files: `00-*` the harness and the
 cross-cutting guarantees, `10-session`, `20-bake`, `30-ui`, `40-loco`. A file that starts with a shebang is a *standalone script*
 (it runs its own browser at import time): the runner never imports it, lists it in `--list`, and runs it after the cases, in its own
-process, only when `--only` names it (`--only 10`); convert it to cases when you can.
+process, only when `--only` names it. The three standalone scripts are `10-session` (the session: lifecycle, ten enters and exits, kill switches, weight), `20-bake` (the cheap house and that `restore()` puts everything back) and `40-loco` (input by source, teleport, stairs, doors, the comfort vignette, all in IWER, and the nav over every home); run each with `--only 10`, `--only 20`, `--only 40`. `--only 30` is the in-world UI kit. `pnpm run platform:test` is the mobile and desktop matrix (above), and `scripts/test-xr-nav.mts`, `scripts/test-presenter.mts` and `scripts/test-platform.mts` are Node tests that `check` runs.
 
 ```bash
 pnpm run build && pnpm run portal:build

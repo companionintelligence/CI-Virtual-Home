@@ -81,6 +81,12 @@ copied into `dist/`, and never reach a visitor; `scripts/xr-harness/` reads `iwe
 the browser under test. Their licence texts are in each package's `LICENSE`. (`@iwer/devui` and `@iwer/sem` are deliberately NOT
 installed: they pull in React 19 and a newer three.js than the player's r169.)
 
+**WebXR (`assets/xr/`) adds no vendored code and no asset.** It uses three.js's core `WebXRManager` (already in the core module build) and
+nothing from `examples/jsm/webxr/`: `XRControllerModelFactory` and `XRHandMeshModel` fetch their models from `cdn.jsdelivr.net` at runtime
+(the `webxr-input-profiles` assets) and are not used; the controllers, rays, hands, comfort vignette and every panel are our own geometry
+and Canvas2D, set in the Manrope the site already ships (OFL, above). If an addon or a controller model is ever vendored for it, it is
+added under `assets/vendor/three/` (add-only) with a row here (source URL, licence, files) in the same commit.
+
 The workflows (`.github/workflows/ci.yml`, `deploy.yml`) run GitHub's own `actions/checkout`, `actions/setup-node`,
 `actions/upload-artifact` and `actions/download-artifact` (MIT) and `pnpm/action-setup` (MIT), each pinned to a
 commit. To upload the portal, `deploy.yml` installs Cloudflare's [`wrangler`](https://github.com/cloudflare/workers-sdk)
