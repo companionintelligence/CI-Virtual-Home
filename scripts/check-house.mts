@@ -19,8 +19,8 @@
 //   1. specs      validate-house-spec.mts   — 30 HouseSpecs against the schema, the catalog and the registry
 //   2. shots      render-house-shots.mts    — camera paths through walls, floors, furniture, and the Core kept
 //                                             in frame through its orbits; and the scene gate: dressing,
-//                                             clashes, planting
-//   3. determinism test-frame-hash.mts      — two runs of THIS tree must agree (door-to-core, then core-orbit)
+//                                             clashes, planting. Again on planner v2 (shots:v2: QA v2 on its three films)
+//   3. determinism test-frame-hash.mts      — two runs of THIS tree must agree (door-to-core, then core-orbit, then planner v2's door-to-core)
 //   4. goldens    test-goldens.mts          — this tree must still agree with the tree we blessed, less the frames
 //                                             test/goldens/expected-diffs/ declares as moving (the ledger)
 //   5. test:*     scripts/test-*.mts        — every test script, found by glob (plan Completeness C8), so a stream
@@ -77,9 +77,13 @@ const steps: Step[] = [
   { key: 'assets', script: S('build-house-assets.mts'), args: [] },
   { key: 'specs', script: S('validate-house-spec.mts'), args: [] },
   { key: 'shots', script: S('render-house-shots.mts'), args: ['--qa-only', '--shot', 'door-to-core,orbit,hero-reveal,core-orbit', '--jobs', JOBS!, '--out', QA_OUT, ...houseArgs] },
+  // planner v2 (S5, off by default): the same houses planned on it in the page, QA v2 on every film (door-to-core, hero-reveal, walkthrough), and its frames as deterministic as v1's. The default is v1 until the flip at
+  // integration; these keep v2 honest meanwhile, in the gate and not only in test-shot-planner.mts (which plans in Node and compares the page's track).
+  { key: 'shots:v2', script: S('render-house-shots.mts'), args: ['--qa-only', '--planner', 'v2', '--shot', 'door-to-core,hero-reveal,walkthrough', '--jobs', JOBS!, '--out', path.join(QA_OUT, 'v2'), ...houseArgs], quick: false },
   { key: 'determinism', script: S('test-frame-hash.mts'), args: ['--res', RES!, '--frames', '0,200,719', ...(HOUSE ? ['--house', HOUSE.split(',')[0]] : [])], quick: false },
   // the 8 s product orbit, stepped as random access too (its own path function, not door-to-core's)
   { key: 'determinism:core-orbit', script: S('test-frame-hash.mts'), args: ['--res', RES!, '--shot', 'core-orbit', '--frames', '0,240,479', ...(HOUSE ? ['--house', HOUSE.split(',')[0]] : [])], quick: false },
+  { key: 'determinism:v2', script: S('test-frame-hash.mts'), args: ['--res', RES!, '--planner', 'v2', '--frames', '0,200,450', ...(HOUSE ? ['--house', HOUSE.split(',')[0]] : [])], quick: false },
   { key: 'goldens', script: S('test-goldens.mts'), args: ['--res', RES!, '--jobs', JOBS!, ...(flag('update-goldens') ? ['--update'] : []), ...houseArgs], quick: false, needs: 'determinism,determinism:core-orbit' },
   ...testSteps,
   ...(flag('no-perf') ? [] : [{ key: 'perf', script: S('perf-house.mts'), args: HOUSE ? ['--house', HOUSE] : [], quick: false, advisory: true }]),

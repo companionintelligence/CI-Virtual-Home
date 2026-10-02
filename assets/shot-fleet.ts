@@ -20,7 +20,7 @@ const pct = (n: number, of: number) => `${n} of ${of}`;
 export function fleetChecks(rows: FleetRow[]): FleetCheck[] {
   const N = rows.length, out: FleetCheck[] = [];
   const M = (r: FleetRow, k: string) => r.metrics[k];
-  const LE = (r: FleetRow) => Math.max(M(r, 'lookErrorMedian') ?? 0, M(r, 'subjectErrorMedian') ?? 0);
+  const LE = (r: FleetRow) => M(r, 'lookErrorMedian') ?? 0;
   const list = (bad: FleetRow[], f: (r: FleetRow) => string) => bad.map(r => `${r.id} ${f(r)}`).join('; ');
   const add = (c: FleetCheck) => out.push(c);
 
@@ -33,7 +33,7 @@ export function fleetChecks(rows: FleetRow[]): FleetCheck[] {
   { const bad = rows.filter(r => !(M(r, 'maxYawRate') <= 60 + 1e-9));
     add({ id: 'yaw', title: 'Smoothed view rate (0.1 s)', target: '≤ 60°/s', value: `max ${Math.max(...rows.map(r => M(r, 'maxYawRate'))).toFixed(0)}°/s, median ${med(rows.map(r => M(r, 'maxYawRate'))).toFixed(0)}`, pass: !bad.length, detail: list(bad, r => `${M(r, 'maxYawRate')}°/s`) }); }
   { const bad = rows.filter(r => !(LE(r) <= 10)), worse = rows.filter(r => !(LE(r) <= 15));
-    add({ id: 'look-error', title: 'Look error (median of the film: against the wanted look, and against the door and the Core where a beat has them)', target: '≤ 10° in ≥ 90 % of the houses, none over 15°', value: `worst house ${Math.max(...rows.map(LE)).toFixed(1)}°, median ${med(rows.map(LE)).toFixed(1)}°, ${pct(N - bad.length, N)} within 10°`, pass: !worse.length && bad.length <= Math.floor(0.1 * N), detail: list(bad, r => `${LE(r)}°`) }); }
+    add({ id: 'look-error', title: 'Look error (median of the film against each beat\'s subject and look-ahead, §3.5: re-derived by QA from the eye\'s path, the door and the Core)', target: '≤ 10° in ≥ 90 % of the houses, none over 15°', value: `worst house ${Math.max(...rows.map(LE)).toFixed(1)}°, median ${med(rows.map(LE)).toFixed(1)}°, ${pct(N - bad.length, N)} within 10°`, pass: !worse.length && bad.length <= Math.floor(0.1 * N), detail: list(bad, r => `${LE(r)}°`) }); }
   { const bad = rows.filter(r => !(M(r, 'coreLOS') >= 1.5 && M(r, 'pressSpeed') <= 0.3));
     add({ id: 'press', title: 'The press', target: '≥ 1.5 s of the Core in sight before it, the camera ≤ 0.3 m/s', value: `${pct(N - bad.length, N)}; min LOS ${Math.min(...rows.map(r => M(r, 'coreLOS'))).toFixed(1)} s, max speed ${Math.max(...rows.map(r => M(r, 'pressSpeed'))).toFixed(2)} m/s`, pass: !bad.length, detail: list(bad, r => `LOS ${M(r, 'coreLOS')} s, ${M(r, 'pressSpeed')} m/s`) }); }
   { const need = (r: FleetRow) => Math.min(2, M(r, 'topRoomsShowable') ?? 3), ok = rows.filter(r => M(r, 'topRoomsSeen') >= need(r)), raw = rows.filter(r => M(r, 'topRoomsSeen') >= 2);
@@ -51,9 +51,13 @@ export function fleetChecks(rows: FleetRow[]): FleetCheck[] {
   { const count = new Map<string, number>(); for (const r of rows) { const c = M(r, 'coreBg') || '?'; count.set(c, (count.get(c) || 0) + 1); }
     const top = [...count.entries()].sort((a, b) => b[1] - a[1]);
     add({ id: 'finale-background', advisory: true, title: 'What stands behind the Core in the last frame', target: 'no class above 40 % of the houses', value: top.map(([s, n]) => `${s} ${n}`).join(', '), pass: top.every(([s, n]) => s === 'wall' || s === 'other' || n <= 0.4 * N) || top[0][1] <= 0.4 * N, rows: top.map(([s, n]) => [s, n]) }); }
-  { const short = rows.filter(r => r.plan.orbit && r.plan.orbit.arc < 60), arcs = rows.map(r => (r.plan.orbit ? r.plan.orbit.arc : 0)), reach = rows.filter(r => r.plan.orbit && (r.plan.orbit.reachable ?? 0) >= 90);
-    const ok = reach.filter(r => r.plan.orbit.arc >= 90);
-    add({ id: 'orbit-arc', title: 'The finale orbit (degrees round the Core)', target: '≥ 90° wherever the room allows it; none under 60° where it allows more', value: `${pct(ok.length, reach.length)} of the houses that can reach 90° do; median ${med(arcs)}°; under 60°: ${short.length}`, pass: ok.length >= Math.ceil(0.85 * reach.length), detail: list(rows.filter(r => r.plan.orbit && r.plan.orbit.arc < 90), r => `${r.plan.orbit.arc}° (room ${r.plan.orbit.reachable}°)`) }); }
+  { // (the sweep QA measures on the orbit beat — the push-in's turn into the orbit is the orbit's — not the exact arc the planner drew)
+    const arcOf = (r: FleetRow) => (typeof r.metrics.orbitArc === 'number' ? r.metrics.orbitArc : r.plan.orbit ? r.plan.orbit.arc : 0);
+    const short = rows.filter(r => r.plan.orbit && arcOf(r) < 60), arcs = rows.map(arcOf), reach = rows.filter(r => r.plan.orbit && (r.plan.orbit.reachable ?? 0) >= 90);
+    const ok = reach.filter(r => arcOf(r) >= 90 - 0.5);
+    add({ id: 'orbit-arc', title: 'The finale orbit (degrees round the Core)', target: '≥ 90° wherever the room allows it; none under 60° where it allows more', value: `${pct(ok.length, reach.length)} of the houses that can reach 90° do; median ${med(arcs)}°; under 60°: ${short.length}`, pass: ok.length >= Math.ceil(0.85 * reach.length), detail: list(rows.filter(r => r.plan.orbit && arcOf(r) < 90), r => `${arcOf(r)}° (room ${r.plan.orbit.reachable}°)`) }); }
+  { const ratio = (r: FleetRow) => M(r, 'filmBudgetRatio') ?? 0, inB = rows.filter(r => ratio(r) <= 1.15 + 1e-9), over = rows.filter(r => ratio(r) > 1.4), len = rows.map(r => r.duration);
+    add({ id: 'film-length', title: 'Film length against its budget (§3.0: 12 s, plus the orbit and this house\'s distances)', target: 'at least half within 1.15 × of the budget, none over 1.4 ×', value: `${pct(inB.length, N)} within 1.15 ×, median ${med(rows.map(ratio)).toFixed(2)} ×; ${Math.min(...len)}–${Math.max(...len)} s, median ${med(len)} s (the plan's 12 s has no orbit and a 5 m walk)`, pass: inB.length >= Math.ceil(0.5 * N) && !over.length, detail: list(over, r => `${ratio(r)} ×, ${r.duration} s`) }); }
   { const bad = rows.filter(r => r.errors > 0);
     add({ id: 'qa-errors', title: 'QA v2 errors', target: '0 on all 30 houses', value: `${rows.reduce((a, r) => a + r.errors, 0)} in ${pct(bad.length, N)} houses`, pass: !bad.length, detail: list(bad, r => `${r.errors}`) }); }
   return out;

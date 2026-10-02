@@ -120,7 +120,7 @@ export type Establish = { style: EstablishStyle | 'custom'; eye: V3; aim: V3; fo
 /** Plan the establishing pose: `want` is shots[].establish ('auto', a style, or {bearing, height, dist}). */
 /** the seed under which the houses' favourite styles fall out evenly — scripts/fit-establish-salt.mts searches it, and it is searched again whenever the worlds or
  *  the framing change (fleet diversity is not a runtime input: it would couple houses together; a house's own `shots[].establish` is what the layout pass sets) */
-export const ESTABLISH_SALT = 'establish-style82';
+export const ESTABLISH_SALT = 'establish-style3';
 const EST_LENSES = [46, 49, 42];
 /** the establishing look's pitch range, degrees (§3.5: the look never tilts up at the house, or far down at it, unless it is a dollhouse: the high three-quarter aerial) */
 export const EST_PITCH: [number, number] = SPEC_PITCH.establish;

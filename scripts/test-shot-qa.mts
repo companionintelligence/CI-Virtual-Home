@@ -462,7 +462,7 @@ if (!only) {
   const styles = ['axial', 'garden', 'corner-right', 'dollhouse', 'corner-left'], bgs = ['art', 'wall', 'window', 'bookcase', 'other'];
   const good = (k: number): FleetRow => ({
     id: `h${k}`, duration: 20, errors: 0, warnings: 3,
-    metrics: { outsideShare: 0.27, firstSecond: 1.5, doorSpeed: 0.85, maxYawRate: 45, lookErrorMedian: 0.3, coreLOS: 4, pressSpeed: 0.02, topRoomsSeen: 3, finalCoreHeight: 0.22, finalCoreNDC: [((k % 7) - 3) * 0.1, ((k % 4) - 2) * 0.1], coreBg: bgs[k % 5], establish: { bearing: -45 + (k * 13) % 90 } },
+    metrics: { filmBudgetRatio: 1.05, outsideShare: 0.27, firstSecond: 1.5, doorSpeed: 0.85, maxYawRate: 45, lookErrorMedian: 0.3, coreLOS: 4, pressSpeed: 0.02, topRoomsSeen: 3, finalCoreHeight: 0.22, finalCoreNDC: [((k % 7) - 3) * 0.1, ((k % 4) - 2) * 0.1], coreBg: bgs[k % 5], establish: { bearing: -45 + (k * 13) % 90 } },
     plan: { establish: { style: styles[k % 5] }, outside: { hasExt: false }, orbit: { arc: 100, reachable: 130 } },
   });
   const rows = Array.from({ length: 30 }, (_, k) => good(k));
@@ -482,6 +482,7 @@ if (!only) {
     'establish-bearing': r => r.map(x => ({ ...x, metrics: { ...x.metrics, establish: { bearing: 5 } } })),
     'finale-background': r => r.map((x, i) => i < 14 ? { ...x, metrics: { ...x.metrics, coreBg: 'window' } } : x),
     'orbit-arc': r => r.map((x, i) => i < 10 ? { ...x, plan: { ...x.plan, orbit: { arc: 50, reachable: 130 } } } : x),
+    'film-length': r => r.map((x, i) => i < 3 ? { ...x, metrics: { ...x.metrics, filmBudgetRatio: 1.8 } } : x),
     'qa-errors': r => r.map((x, i) => i === 0 ? { ...x, errors: 2 } : x),
   };
   for (const c of base) {

@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { ROOT, houseIds, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
-import { ensureWorlds, fixtureIds, specFile } from './shot-worlds.mts';
+import { ensureWorlds, fixtureIds, specFile, routeFixtures } from './shot-worlds.mts';
 import { planDoorToCore, shotOptions, trackHash } from '../assets/shot-planner.js';
 import { qaTrack, qaAspects } from '../assets/shot-qa.js';
 import { fleetChecks, type FleetRow } from '../assets/shot-fleet.js';
@@ -110,9 +110,13 @@ for (const r of real) {
   delete rec.events;
   if (args.update === 'true') fs.writeFileSync(f, JSON.stringify(rec, null, 1) + '\n');
   else if (fs.existsSync(f)) { const old = JSON.parse(fs.readFileSync(f, 'utf8')); if (old.hash !== r.hash) drift.push(r.id); }
+  else drift.push(`${r.id} (not recorded)`);
 }
 if (args.update === 'true') console.log(`\n→ ${path.relative(process.cwd(), SHOTS_DIR)}/<id>.track.json (${real.length} recorded)`);
-else if (drift.length) console.log(`\n(${drift.length} track hash${drift.length === 1 ? '' : 'es'} differ from test/shots/: ${drift.join(', ')} — the worlds or the planner changed; --update records them)`);
+// (the recorded hashes are the Node bake of the film each house gets — test/shots/<id>.track.json, committed: a planner or world change that moves a film is a decision, recorded with --update in the commit that makes it, and
+// a hash that is not what the planner now bakes fails here, like a golden. Only a run of some of the houses, or of a stale world, is exempt: the worlds are the page's digest of the current tree.)
+else if (ids.length === houseIds().length) check(!drift.length, `the recorded track hashes (test/shots/<id>.track.json) are the films the planner bakes now (${real.length})`, `${drift.join(', ')} — the worlds or the planner changed; \`--update\` records them, in the commit that moves them`);
+else if (drift.length) console.log(`\n(${drift.length} of the ${real.length} track hashes differ from test/shots/: ${drift.join(', ')}; a partial run only reports)`);
 
 // ---- 5. budgets
 const load = os.loadavg()[0], cores = os.cpus().length, loaded = load > cores * 0.75;
@@ -123,9 +127,10 @@ check(planCpu <= 15000 * slack, `planning all the houses in Node within 15 s of 
 check(!slowQA2.length, `QA v2 within 0.5 s a shot${loaded ? ` (${(0.5 * slack).toFixed(1)} s: the machine is loaded)` : ''}`, slowQA2.map(r => `${r.id} ${r.qaMs.toFixed(0)} ms`).join(', '));
 
 // ---- 4. the page bakes the same track
-const parityN = args.parity === 'all' ? real.length : args.parity !== undefined ? parseInt(args.parity, 10) : 2;
+const parityN = args.parity === 'all' ? real.length : args.parity !== undefined ? parseInt(args.parity, 10) : 3;
 if (args['planner-only'] !== 'true' && (parityN > 0 || rows.length)) {
-  const pick = parityN > 0 ? real.filter((_, i) => i % Math.max(1, Math.floor(real.length / parityN)) === 0).slice(0, parityN) : [];
+  // (the houses, spread over the list, and S5's spiral and upper-entry fixtures: the spiral's helix is where the engines' last bits once parted)
+  const pick = parityN > 0 ? [...real.filter((_, i) => i % Math.max(1, Math.floor(real.length / parityN)) === 0).slice(0, parityN), ...fix.filter(r => /spiral|upper-entry/.test(r.id))] : [];
   const srv = await serve(ROOT, '/'), pw = await loadPlaywright();
   const browser = await pw.chromium.launch({ headless: true, args: LAUNCH_ARGS });
   try {
@@ -156,7 +161,7 @@ if (args['planner-only'] !== 'true' && (parityN > 0 || rows.length)) {
     // 4b. the page builds the house, and its own track is the Node bake (the world the page digests is the file the harness reads)
     if (pick.length) {
       const page = await (await browser.newContext({ viewport: { width: 1200, height: 700 } })).newPage();
-      await stubGoogleFonts(page, srv.origin);
+      await stubGoogleFonts(page, srv.origin); await routeFixtures(page);
       for (const r of pick) {
         await page.goto(srv.url(`room-creator.html?house=${r.id}&planner=v2`), { waitUntil: 'domcontentloaded', timeout: 120000 });
         await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, r.id, { timeout: 120000 });

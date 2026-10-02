@@ -1158,6 +1158,9 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     // readable for a beat's length without the zone taking two seconds)
     if (b === 'threshold') { const a = Math.abs((X[i] - e.x) * n2[0] + (Z[i] - e.z) * n2[1]); local[i] = Math.min(local[i], DOOR_PLANE_CAP * 0.95 + Math.max(0, a - DOOR_ZONE_M) * 1.2); }
   }
+  // (a flight's cap, 3-D, follows the slope: smoothed over ±0.5 m so the step from the flat to the flight is a ramp, not a jerk — 16–24 m/s³ on the stairs of mirage and newcrest)
+  { const fl = new Set<number>([BEATS.indexOf('stair'), BEATS.indexOf('descend'), BEATS.indexOf('extStair')]), src = cruise.slice(), W = 25;
+    for (let i = 0; i < NP; i++) { if (!fl.has(Bt[i])) continue; let sm = 0, ws = 0; for (let k = -W; k <= W; k++) { const j = i + k; if (j < 0 || j >= NP || !fl.has(Bt[j])) continue; const w = 0.5 + 0.5 * Math.cos(Math.PI * k / (W + 1)); sm += src[j] * w; ws += w; } cruise[i] = sm / ws; } }
   // curvature: v ≤ √(a_lat / κ), 1.5 m/s² inside and 3 outside (the look turns on its own solver, rate-limited)
   for (let i = 1; i < NP - 1; i++) {
     const j0 = Math.max(0, i - 10), j1 = Math.min(NP - 1, i + 10);
