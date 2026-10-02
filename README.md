@@ -509,6 +509,46 @@ portal's file guard); `portal:build` ships exactly the manifest's files and fail
 
 #### water
 <!-- realism:water:begin -->
+**Water** (`assets/realism-water.ts` → `viewer-water.ts`, and `viewer-ocean.ts` at tier 2). Tiers 1 and 2; off at 0 and with
+`?no=water`. `?no=ocean` keeps the analytic water on tier 2.
+
+- *What it targets.* Whatever the scene already tags, never a builder: every material with `userData.surface === 'water'`
+  (kit.water: pool and pond tops, shaped-water cells, the `lot.water` cells) and the mesh named `World · lake` (the flat
+  200 × 55 m plane of the waterfront houses). Each mesh is pointed at a **clone** of its material (patched with
+  `onBeforeCompile`, `customProgramCacheKey` `…|live-water-<tier>-<variant>`, so `restore()`/`apply()` flip with no recompile
+  after the first time); the original stays in `userData.__waterOrig` on the clone with its `transparent`, `opacity` and
+  `depthWrite`. The live water is **opaque** (opacity 1, depth write): no sorting against the glass panes. `restore()` points
+  every mesh back at its original, so `__houseRender*`, films, stills and goldens draw exactly what they drew. Every chunk the
+  patch touches is asserted at startup (`checkChunks`): a different three text means a warning and the original water.
+- *Analytic water (tier 1).* three's own light path stays (the sun's GGX glint, the sky in `scene.environment`, Schlick
+  Fresnel, the sky fog); the patch changes what feeds it. Two scrolling layers of a tileable normal map generated once at load
+  (256², about 30 ms, no binary), rotated against each other, faded and mip-biased with distance; roughness raised from the
+  length of the mip-averaged normal (Toksvig), so a distant glint spreads into a sun road instead of crawling; the reflected
+  sky is given a gain (`uWEnv`, the hour's environment is dimmed for the lit house, not for a mirror); a deep / shallow /
+  scatter colour table for four hours and three kinds (pool, pond, lake). Pools and ponds also get a shallow ledge that falls
+  to deep water from the distance to the edge of the top face (a per-vertex `aWater` attribute added on apply and deleted on
+  restore, because a merged mesh has lost the box a top face came from), and a faked refraction: the view ray refracted at a
+  calm normal to a floor 0.4 to 1.5 m down, read as a 0.3 m tile grid and a two-layer cellular caustic net, multiplied into
+  the albedo at about 10%. The lake gets a shore tint from its own corners and `polygonOffset` (it is 2 mm above the ground).
+  The animation clock is the player's, wrapped at 200 s; every scroll and orbit rate is a whole number of cycles per 200 s.
+- *FFT ocean (tier 2).* `viewer-ocean.ts` is a port of jbouny/fft-ocean (MIT; THIRD_PARTY.md has the notices and the list of
+  changes). It is imported lazily and only if `EXT_color_buffer_float` exists; N = 128, one 80 m tile, wind 2 m/s, run at 30 Hz
+  and skipped while no water is in the frustum. Its mip-mapped normal map (plus the slope variance, read as the mip-averaged
+  length, and Jacobian foam on crests) replaces the lake's and the sea's coarse analytic layer; a fine 1.7 m layer stays
+  on top. The surface is a pure function of `t` (phase = omega(k) t in the spectrum shader; the initial spectrum comes from an
+  integer hash, not `Math.random`). A missing extension, a failing import or a sim that throws drops the water to the
+  analytic layers (`?waterdebug=noext` rehearses the first; `__houseWater.failOcean()` the last).
+- *What it does not do.* No vertex displacement (a 150 m lake is normal-mapped; the one thing the sea fixtures would use it
+  for is not drawn), no planar reflection (a second scene pass), no tessellated lake grid. `s4-site-sea`, `lakeside` and `canal`
+  draw their water through the same fragment patch as the lake.
+- *Cost.* Source: 26 KB of `viewer-water.js` (type-stripped, comments and all; 9 KB gzipped; loaded after the first frame, only for a house with water) and 10 KB (3.4 KB gzipped)
+  of `viewer-ocean.js` (tier 2 only); no binary asset. Analytic water adds ALU only to the water pixels: no pass, no target,
+  no draw call. The FFT sim is 17 draws (spectrum, 2 x 7 FFT passes, normals) per update at 30 Hz, 0.1 to 0.5 ms of CPU encode,
+  and targets of about 1.6 MB. Frame-time A/B numbers (`perf:player`, interleaved, median of 6, uptime in the table) are in the
+  commit that added them.
+- *Debugging.* `?waterdebug=1` exposes `window.__houseWater` (`hold(t)` freezes the clock, `stats()`, `ocean()`, `failOcean()`).
+  `pnpm run test:live --only water` checks the install, the restore identity at tier 1 and 2, the fallback ladder, time purity
+  and the FFT's rms height against a CPU-integrated spectrum.
 <!-- realism:water:end -->
 
 #### sky

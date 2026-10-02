@@ -1,14 +1,28 @@
-// Live-player realism: animated water; the FFT ocean loads lazily at tier 2.
+// Live-player realism: animated, sky-reflecting water; an FFT ocean loads lazily on the big bodies at tier 2.
 //
-// STUB from the realism scaffold (package "water" replaces this file). Registered in assets/realism.ts's TABLE; it
-// installs nothing, so with it the player draws exactly what it drew before. See the contract at the top of
-// assets/realism.ts and README.md → "Live realism (the player)".
+// Registered in assets/realism.ts's TABLE. Post-batch: the pools' box tops are merged by viewer-batch.ts like any
+// static mesh, and the patch targets what the scene has after that (the merged meshes), so the feature installs
+// once the batch is baked and before the first compile. The heavy part (viewer-water.ts, 26 KB of type-stripped source; the ocean
+// 10 KB more, lazily and only on tier 2) is imported on demand. See that file's header for what is patched.
+// ?no=water (or ?no=realism) turns it off; ?no=ocean keeps the analytic water and skips the FFT.
 import type { RealismFeature } from './realism.js';
 
 const feature: RealismFeature = {
   key: 'water',
   phase: 'post-batch',
   minTier: 1,
-  install: async () => null,
+  async install(ctx) {
+    // nothing to do for a house without water: no import, no texture, no clone
+    let any = false;
+    ctx.scene.traverse((o: any) => {
+      if (any || !o.isMesh || !o.material) return;
+      for (const m of Array.isArray(o.material) ? o.material : [o.material]) if (m && m.userData && m.userData.surface === 'water') { any = true; return; }
+      if (o.name === 'World · lake') any = true;
+    });
+    if (!any) return null;
+    const m = await import('./viewer-water.js');
+    if (!m.checkChunks(ctx.THREE)) return null;
+    return m.createWater(ctx);
+  },
 };
 export default feature;
