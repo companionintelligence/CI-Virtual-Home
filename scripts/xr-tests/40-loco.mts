@@ -350,17 +350,23 @@ const HELPERS = `(() => {
     const m = new T.Matrix4().lookAt(o, t, new T.Vector3(0, 1, 0)), q = new T.Quaternion().setFromRotationMatrix(m);
     src.position.set(o.x, o.y, o.z); src.quaternion.set(q.x, q.y, q.z, q.w);
   };
+  // turn the head (the emulated device) toward a world point, level
+  L.look = p => { const d = dev(), t = L.local(p), hp = d.position, m = new T.Matrix4().lookAt(new T.Vector3(hp.x, hp.y, hp.z), new T.Vector3(t.x, hp.y, t.z), new T.Vector3(0, 1, 0)), q = new T.Quaternion().setFromRotationMatrix(m); d.quaternion.set(q.x, q.y, q.z, q.w); };
   L.stick = (side, x, y) => dev().controllers[side].updateAxes('thumbstick', x, y);
   L.button = (side, id, v) => dev().controllers[side].updateButtonValue(id, v);
   L.pinch = (side, v) => dev().hands[side].updatePinchValue(v);
   // a good teleport target: valid, walkable from the head, at least minD metres away, on the floor the person stands on
   L.goal = (minD, maxD) => {
-    const l = loco(), n = l.nav(), h = rig().head(), y = rig().floorY(); let best = null;
-    for (let a = 0; a < 360; a += 10) for (let d = minD; d <= maxD; d += 0.5) {
+    const l = loco(), n = l.nav(), h = rig().head(), y = rig().floorY();
+    // open floor: the stand and a ring of 0.3 m round it are valid, and the walk to it (and to the ring's near side) is clear: an arc swept by hand lands within a few tens of cm
+    for (let d = minD; d <= maxD; d += 0.25) for (let a = 0; a < 360; a += 10) {
       const x = h.pos[0] - Math.sin(a * Math.PI / 180) * d, z = h.pos[2] - Math.cos(a * Math.PI / 180) * d, s = n.stand(x, z, y);
-      if (s.ok && n.walkFree(h.pos[0], h.pos[2], s.x, s.z, y)) return [s.x, s.y, s.z];
+      if (!s.ok || s.clearance < 0.5 || !n.walkFree(h.pos[0], h.pos[2], s.x, s.z, y)) continue;
+      let open = true;
+      for (let k = 0; k < 6 && open; k++) { const px = s.x + 0.3 * Math.cos(k * 1.047), pz = s.z + 0.3 * Math.sin(k * 1.047); open = n.stand(px, pz, y).ok && n.walkFree(h.pos[0], h.pos[2], px, pz, y); }
+      if (open) return [s.x, s.y, s.z];
     }
-    return best;
+    return null;
   };
   // frames in which the head's world position moved (> 3 mm) and the fade alpha on that frame
   L.rec = { on: false, log: [] };
@@ -368,7 +374,6 @@ const HELPERS = `(() => {
   L.recStart = () => { L.rec.log = []; L.rec.on = true; };
   L.recStop = () => { L.rec.on = false; const lg = L.rec.log; let moves = 0, bad = 0, worst = 0; for (let i = 1; i < lg.length; i++) { const d = Math.hypot(lg[i].p[0] - lg[i-1].p[0], lg[i].p[1] - lg[i-1].p[1], lg[i].p[2] - lg[i-1].p[2]); if (d > 0.003) { moves++; if (lg[i].a < 0.995) { bad++; worst = Math.max(worst, d); } } } return { frames: lg.length, moves, bad, worst }; };
   L.roofs = () => { let n = 0, vis = 0; w.__houseDebug().scene.traverse(o => { if (o.userData && o.userData.isRoof) { n++; if (o.visible) vis++; } }); return { n, vis }; };
-  L.doors = () => ((w.__houseDebug && w.__houseViewer && (w.__houseViewer.__anchors && w.__houseViewer.__anchors()) ) || null);
   L.waitIdle = () => new Promise(res => { let k = 0; const off = xr().onFrame(() => { if (!rig().busy() && ++k > 3) { off(); res(true); } else if (rig().busy()) k = 0; }); });
   L.frames = n => new Promise(res => { let k = 0; const off = xr().onFrame(() => { if (++k >= n) { off(); res(k); } }); });
 })();`;
@@ -409,13 +414,13 @@ async function quest3(house: string) {
   console.log(`\nquest3 (${house}): controllers`);
   const p = await open('quest3', house);
   const { page } = p;
-  const doorsBefore: number[] = await page.evaluate(() => { const a = (window as any).__houseDebug().anchors || null; return a && a.doors ? a.doors.map((d: any) => d.pivot && d.pivot.rotation.y) : []; }).catch(() => []);
-  const roofsBefore = null as any; void roofsBefore;
+  const doorsBefore: number[] = await page.evaluate(() => { const a = (window as any).__houseDebug().house.anchors; return a && a.doors ? a.doors.map((d: any) => d.pivot && d.pivot.rotation.y) : []; }).catch(() => []);
   await enter(p);
   const s0: any = await ev(p, `() => L.state()`);
   const d0 = s0.dbg;
   ok(d0.live && d0.navMs >= 0, `locomotion is live; nav built in ${d0.navMs.toFixed(1)} ms; start() ${d0.startMs.toFixed(0)} ms`);
-  ok(d0.places > 4, `the wrist menu has places (${d0.places})`);
+  const places0: any[] = await ev(p, `() => window.__houseViewer.xr.locomotion().places()`);
+  ok(places0.length > 4 && places0[0].id === 'entry' && places0.some(x => x.kind === 'core'), `the wrist menu has places (${places0.length}: ${places0.slice(0, 5).map(x => x.label).join(', ')}, ...)`);
   ok(d0.spawn && near(s0.head[0], d0.spawn[0], 0.35) && near(s0.head[2], d0.spawn[2], 0.35), `the person starts at the nav's spawn (${d0.spawn?.map((v: number) => v.toFixed(2))}) and the head is at (${s0.head.map((v: number) => v.toFixed(2))})`);
   ok(d0.dress.roof === 'off' && d0.dress.inside === true, `spawned indoors: the roof is off (${d0.dress.roof})`);
   const rf = await ev<any>(p, `() => L.roofs()`);
@@ -425,23 +430,43 @@ async function quest3(house: string) {
   await page.screenshot({ path: path.join(SHOTS, `40-${house}-quest3-start.png`) });
 
   // ---- the stick teleport: aim, release, land where the arc said
+  // a roomy place first (the foyer is a corridor): the biggest room on the entry's storey, by a Place
+  const big: any = await ev(p, `() => { const l = window.__houseViewer.xr.locomotion(), n = l.nav(), lv = n.world.entry.level; let best = null; for (const r of n.world.levels.find(x => x.id === lv).rooms) { const id = 'room:' + lv + ':' + r.no, pl = l.places().find(x => x.id === id); if (pl && r.b && (!best || r.b.w * r.b.d > best.area)) best = { id, area: r.b.w * r.b.d, name: r.name }; } return best; }`);
+  await ev(p, `(id) => window.__houseViewer.xr.locomotion().goToPlace(id)`, big.id); await ev(p, `() => L.waitIdle()`); await ev(p, `() => L.frames(4)`);
+  const inBig: any = await ev(p, `() => L.state()`);
+  ok(near(inBig.head[0], places0.find(x => x.id === big.id).feet[0], 0.03), `goToPlace(${big.id}, ${big.name}, ${big.area.toFixed(0)} m2) lands the head on the place`);
+  // the physical head is 0.4 m off the tracking origin: the rig must land the HEAD on the target, not its own origin
+  await page.evaluate(() => { const d = (window as any).__xrdev; d.position.set(0.4, 1.6, -0.2); });
+  await ev(p, `() => L.frames(4)`);
   const g = await ev<number[] | null>(p, `() => L.goal(2.2, 3.5)`);
   ok(!!g, `a goal on the floor exists (${g?.map(v => v.toFixed(2))})`);
   if (g) {
-    // the physical head is 0.4 m off the tracking origin: the rig must land the HEAD on the target, not its own origin
-    await page.evaluate(() => { const d = (window as any).__xrdev; d.position.set(0.4, 1.6, -0.2); });
-    await ev(p, `() => L.frames(4)`);
     await ev(p, `(g) => { L.recStart(); L.aim('right', [g[0], 0.2, g[2]]); L.stick('right', 0, -1); }`, g);
     // the throw lands short or long of the goal depending on the pitch: sweep until the arc is valid, read where it says it lands
-    let aimed: any = null;
-    for (let pitch = -0.1; pitch <= 1.2 && !aimed; pitch += 0.08) {
+    // aim the controller at pitch `pitch` above the line to the goal, and read what the arc says
+    const aimAt = async (pitch: number) => {
       await ev(p, `(pitch) => { const d = L.state(); const h = d.head, dx = ${g[0]} - h[0], dz = ${g[2]} - h[2], hh = Math.hypot(dx, dz); L.aim('right', [h[0] + dx / hh * 2 * Math.cos(pitch), h[1] - 0.35 + 2 * Math.sin(pitch), h[2] + dz / hh * 2 * Math.cos(pitch)]); }`, pitch);
       await ev(p, `() => L.frames(3)`);
-      const st = await ev<any>(p, `() => L.state().dbg.teleport`);
-      if (st.aiming && st.last && st.last.ok && st.last.target) aimed = { ...st.last, pitch };
+      const r = await ev<any>(p, `() => { const s = L.state(); return { ...s.dbg.teleport, head: s.head }; }`);
+      return r;
+    };
+    // sweep the pitch: the valid aim whose landing is nearest 2.6 m from the head is the one a person would take
+    let aimed: any = null; const diag: string[] = [];
+    for (let pitch = -0.9; pitch <= 1.2; pitch += 0.06) {
+      const st = await aimAt(pitch);
+      const dist = st.last?.target ? Math.hypot(st.last.target.x - st.head[0], st.last.target.z - st.head[2]) : 0;
+      if (st.aiming && st.last && st.last.ok && st.last.target && (!aimed || Math.abs(dist - 2.6) < Math.abs(aimed.dist - 2.6))) aimed = { ...st.last, pitch, dist };
+      diag.push(`${pitch.toFixed(2)}:${st.aiming ? st.last?.why + (st.last?.target ? '@' + dist.toFixed(1) : st.last?.hit ? 'hit' : '') : 'idle'}`);
     }
-    ok(!!aimed, `the arc aims at a valid stand (pitch ${aimed?.pitch?.toFixed(2)}, target ${aimed ? [aimed.target.x, aimed.target.z].map((v: number) => v.toFixed(2)) : ''}, ${aimed ? Math.hypot(aimed.target.x - s0.head[0], aimed.target.z - s0.head[2]).toFixed(1) : ''} m away)`);
+    if (aimed) await aimAt(aimed.pitch);
+    if (!aimed) note(`sweep: ${diag.join(' ')}`);
+    ok(!!aimed, `the arc aims at a valid stand (pitch ${aimed?.pitch?.toFixed(2)}, target ${aimed ? [aimed.target.x, aimed.target.z].map((v: number) => v.toFixed(2)) : ''}, ${aimed ? aimed.dist.toFixed(1) : ''} m from the head)`);
+    await ev(p, `(g) => L.look(g)`, g); await ev(p, `() => L.frames(3)`);
+    const vis: any = await page.evaluate(() => { const sc = (window as any).__houseDebug().scene; const r = sc.getObjectByName('xr: aim ribbon'), ring = sc.getObjectByName('xr: aim ring'); const pos = r && r.geometry.attributes.position.array; return { ribbon: r && r.visible, ring: ring && ring.visible, p0: pos && Array.from(pos.slice(0, 6)), pN: pos && Array.from(pos.slice(60, 66)), draws: (window as any).__L.state().dbg.draws, head: (window as any).__L.state().head, yaw: (window as any).__L.state().yaw, aim: (window as any).__L.state().dbg.teleport.last && (window as any).__L.state().dbg.teleport.last.points.length }; });
+    note(`while aiming: ${JSON.stringify(vis)}`);
     await page.screenshot({ path: path.join(SHOTS, `40-${house}-quest3-aim.png`) });
+    await page.evaluate(() => { const d = (window as any).__xrdev; d.quaternion.set(0, 0, 0, 1); });
+    await ev(p, `() => L.frames(3)`);
     if (aimed) {
       const before = await ev<any>(p, `() => L.state()`);
       await ev(p, `() => L.stick('right', 0, 0)`);
@@ -467,7 +492,7 @@ async function quest3(house: string) {
     if (wallShot) {
       await ev(p, `(g) => { const h = L.state().head; for (let pitch = -0.1; pitch <= 1.2; pitch += 0.04) { } L.aim('right', [g[0], 0.0, g[2]]); L.stick('right', 0, -1); }`, wallShot);
       let refused: any = null;
-      for (let pitch = -0.1; pitch <= 1.2 && !refused; pitch += 0.06) {
+      for (let pitch = -0.9; pitch <= 1.2 && !refused; pitch += 0.05) {
         await ev(p, `(a) => { const d = L.state(), h = d.head, dx = a[0] - h[0], dz = a[2] - h[2], hh = Math.hypot(dx, dz); L.aim('right', [h[0] + dx / hh * 2 * Math.cos(a[3]), h[1] - 0.35 + 2 * Math.sin(a[3]), h[2] + dz / hh * 2 * Math.cos(a[3])]); }`, [...wallShot, pitch]);
         await ev(p, `() => L.frames(3)`);
         const st = await ev<any>(p, `() => L.state().dbg.teleport`);
@@ -597,7 +622,7 @@ async function quest3(house: string) {
   await page.evaluate(() => (window as any).__houseViewer.xr.end('test'));
   await waitEvent(page, 'ended');
   const after = await page.evaluate(() => {
-    const d = (window as any).__houseDebug(), a = d.anchors || null; const names: string[] = []; d.scene.traverse((o: any) => { if (/^xr: (pointer|stairs)/.test(o.name || '')) names.push(o.name); });
+    const d = (window as any).__houseDebug(), a = d.house.anchors; const names: string[] = []; d.scene.traverse((o: any) => { if (/^xr: (pointer|stairs|wall guard|vignette)/.test(o.name || '')) names.push(o.name); });
     return { leftover: names, doors: a && a.doors ? a.doors.map((x: any) => x.pivot && x.pivot.rotation.y) : [] };
   }).catch(() => ({ leftover: [] as string[], doors: [] as any[] }));
   ok(after.leftover.length === 0, `no xr: pointer / stairs object is left in the scene (${after.leftover.join()})`);
@@ -654,7 +679,7 @@ async function vision() {
     const l = window.__houseViewer.xr.locomotion(), inp = l.input(), T = window.__THREE;
     window.__tlog = [];
     const c = new T.Vector3(g[0], 0.4, g[2]);
-    inp.addTarget({ id: 'testpanel', priority: 100, enabled: true,
+    window.__toff = inp.addTarget({ id: 'testpanel', priority: 100, enabled: true,
       hit: ray => { const o = new T.Vector3(...ray.origin), d = new T.Vector3(...ray.dir), oc = o.clone().sub(c), b = oc.dot(d), cc = oc.lengthSq() - 0.4 * 0.4, disc = b * b - cc; if (disc < 0) return null; const t = -b - Math.sqrt(disc); return t > 0 ? { dist: t, point: [o.x + d.x * t, o.y + d.y * t, o.z + d.z * t] } : null; },
       onHover: (s, h) => window.__tlog.push('hover:' + (h ? 'on' : 'off')), onPress: () => window.__tlog.push('press'), onRelease: (s, h, c2) => window.__tlog.push('release:' + (h ? 'hit' : 'miss') + (c2 ? ':cancel' : '')) });
   }`, g);
@@ -672,7 +697,8 @@ async function vision() {
     const d: any = await ev(p, `() => L.state().dbg`);
     ok(d.draws <= 2, `no hand or controller drawn of ours on a system that draws hands (${d.draws} meshes)`);
   }
-  // a pinch on the floor teleports
+  // a pinch on the floor teleports (the test panel is taken away: it sat on the same spot)
+  await page.evaluate(() => (window as any).__toff && (window as any).__toff());
   const g2 = await ev<number[] | null>(p, `() => L.goal(2.2, 3.5)`);
   if (g2) {
     const before: any = await ev(p, `() => L.state()`);
@@ -697,12 +723,17 @@ async function houses(ids: string[]) {
   console.log(`\nhouses (${ids.length}): start, spawn indoors, places, end`);
   for (const id of ids) {
     const p = await open('quest3', id);
+    const doorsBefore: number[] = await p.page.evaluate(() => (window as any).__houseDebug().house.anchors.doors.map((d: any) => d.pivot && d.pivot.rotation.y));
     await enter(p);
     const s: any = await ev(p, `() => L.state()`), d = s.dbg;
+    const openNow: Array<[number, number | null]> = await p.page.evaluate(() => (window as any).__houseDebug().house.anchors.doors.map((d: any) => [d.pivot.rotation.y, d.pivot.userData.door ? d.pivot.userData.door.openAngle : null]));
+    ok(openNow.every(([y, a]) => a === null || near(y, a, 0.02)), `${id}: every door leaf is at its open angle in the headset (${openNow.length} doors, ${doorsBefore.filter((y, i) => openNow[i][1] !== null && !near(y, openNow[i][1] as number, 0.02)).length} were shut)`);
     const inside = await ev<any>(p, `() => { const n = window.__houseViewer.xr.locomotion().nav(), h = L.state().head; return n.world.levels.some(l => h[0] >= l.rects[0].x - 5 && l.rects.some(r => h[0] >= r.x && h[0] <= r.x + r.w && h[2] >= r.z && h[2] <= r.z + r.d)); }`);
-    ok(d.live && inside && d.dress.roof === 'off', `${id}: live, indoors, roof off; nav ${d.navMs.toFixed(1)} ms, start ${d.startMs.toFixed(0)} ms, ${d.places} places, ${d.stairLinks} flights, ${d.doors?.opened}/${d.doors?.total} doors opened`);
+    ok(d.live && inside && d.dress.roof === 'off', `${id}: live, indoors, roof off; nav ${d.navMs.toFixed(1)} ms, start ${d.startMs.toFixed(0)} ms, ${(await ev<any[]>(p, `() => window.__houseViewer.xr.locomotion().places()`)).length} places, ${d.stairLinks} flights, ${d.doors?.opened}/${d.doors?.total} doors opened`);
     await ev(p, `() => L.frames(30)`);
     await p.page.evaluate(() => (window as any).__houseViewer.xr.end('test')); await waitEvent(p.page, 'ended');
+    const doorsAfter: number[] = await p.page.evaluate(() => (window as any).__houseDebug().house.anchors.doors.map((d: any) => d.pivot && d.pivot.rotation.y));
+    ok(JSON.stringify(doorsAfter) === JSON.stringify(doorsBefore), `${id}: and every door is back where it was after the session`);
     ok(errs(p).length === 0 && p.thirdParty.length === 0, `${id}: no error, no third party${errs(p).length ? ': ' + errs(p).join(' | ') : ''}`);
     await p.ctx.close();
   }

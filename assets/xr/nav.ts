@@ -43,7 +43,7 @@ export interface StandCheck {
 export interface StairEnd {
   /** the stand: where the feet go when arriving here (null: no valid cell near, the flight is unusable from this end) */
   stand: V3 | null; yawDeg: number; level: string;
-  /** the ring's centre on the floor (a little toward the flight from the stand) */
+  /** the ring's centre on the floor: at the flight's end, a hand's breadth short of the first step (foot) or past the last (top) */
   ring: V3;
 }
 export interface StairLink {
@@ -255,7 +255,7 @@ export function createXrNav(world: ShotWorld): XrNav {
         const st = lv ? snap(aim[0], aim[1], lv.y, 2.6, within(lv)) : null;
         const stand: V3 | null = st ? [st.x, lv!.y, st.z] : null;
         const at: [number, number] = stand ? [stand[0], stand[2]] : aim;
-        const t = 0.35, ring: V3 = [at[0] + (end[0] - at[0]) * t, y + 0.02, at[1] + (end[1] - at[1]) * t];
+        const t = 0.9, ring: V3 = [at[0] + (end[0] - at[0]) * t, y + 0.02, at[1] + (end[1] - at[1]) * t];
         return { stand, yawDeg: yawOf(face[0], face[1]), level: lv ? lv.id : '', ring };
       };
       return {

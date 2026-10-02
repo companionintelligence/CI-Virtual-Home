@@ -167,8 +167,8 @@ check(maxNavMs < 400, `building every grid takes ${maxNavMs.toFixed(0)} CPU ms a
 {
   const arc = aimArc([0, 1.2, 0], [0, 0.5, -0.866], 0);
   check(!!arc.hit && Math.abs(arc.hit[1]) < 1e-9, 'the arc meets the plane y=0', JSON.stringify(arc.hit));
-  // closed form: t solves 1.2 + 10*0.5*t - 4.9 t^2 = 0
-  const tt = (5 + Math.sqrt(25 + 4 * 4.9 * 1.2)) / (2 * 4.9), rangeZ = -0.866 * AIM.speed * tt;
+  // closed form: t solves 1.2 + vy t - g t^2 / 2 = 0 with vy = 0.5 speed
+  const vy = 0.5 * AIM.speed, tt = (vy + Math.sqrt(vy * vy + 2 * AIM.gravity * 1.2)) / AIM.gravity, rangeZ = -0.866 * AIM.speed * tt;
   check(!!arc.hit && Math.abs(arc.hit[2] - rangeZ) < 0.05, `the arc lands where a thrown point does (${arc.hit?.[2].toFixed(2)} vs ${rangeZ.toFixed(2)})`);
   check(arc.points.length > 4 && arc.points[0][1] === 1.2, 'the arc has points from the hand');
   check(!aimArc([0, 1.2, 0], [0, 0.9, -0.1], 0, { maxRange: 14 }).hit || true, 'steep arcs are fine');

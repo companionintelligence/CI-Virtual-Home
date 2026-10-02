@@ -11,7 +11,7 @@
 //
 // Everything is added to ONE group in the scene, `xr: pointer`, tagged userData.xrOverlay, and removed and disposed by stop().
 import type { V3, XrFrame, XrHost, XrRig } from './host.js';
-import type { Aim, AimView } from './teleport.js';
+import { AIM, type Aim, type AimView } from './teleport.js';
 import type { XrInputImpl } from './input.js';
 
 const GREEN = 0x35d07f, RED = 0xff5a4d, WHITE = 0xffffff, ORANGE = 0xff7a45, GREY = 0x8f9aa0;
@@ -51,7 +51,7 @@ export function createPointer(host: XrHost, input: XrInputImpl, rig: XrRig): Poi
   const okPad = mat(GREEN, { transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false }), badPad = mat(RED, { transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false });
 
   // ---- the aim: a ribbon along the arc (or the line), a ring where it lands
-  const SEG = 40;
+  const SEG = AIM.steps;   // one segment per arc step (a flight is a few dozen of them)
   const ribbonGeo = geo(new THREE.BufferGeometry());
   const ribbonPos = new Float32Array((SEG + 1) * 2 * 3);
   ribbonGeo.setAttribute('position', new THREE.BufferAttribute(ribbonPos, 3).setUsage(THREE.DynamicDrawUsage));

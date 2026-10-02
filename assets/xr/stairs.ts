@@ -20,7 +20,9 @@ export interface Stairs {
   stop(): void;
 }
 
-const RADIUS = 0.5, LABEL_W = 0.56, LABEL_H = 0.2, LABEL_Y = 1.3, SHOW_R = 9, MAX_SHOWN = 4;
+const RADIUS = 0.5, LABEL_W = 0.56, LABEL_H = 0.2, LABEL_Y = 1.3, SHOW_R = 7, MAX_SHOWN = 4;
+// the label grows with distance (its text must stay over 1.1 degrees of visual angle at 7 m) and shrinks up close (a label 0.9 m away must not fill the view)
+const labelScale = (d: number) => Math.min(2, Math.max(0.65, d / 1.5));
 
 export function createStairs(d: StairsDeps): Stairs {
   const { THREE, nav, rig } = d;
@@ -49,7 +51,7 @@ export function createStairs(d: StairsDeps): Stairs {
 
   interface Ring {
     link: StairLink; dir: 'up' | 'down'; at: V3; level: string; to: { stand: V3; yawDeg: number };
-    grp: any; ring: any; pad: any; label: any; target: RayTarget; hover: boolean;
+    grp: any; ring: any; pad: any; label: any; target: RayTarget; hover: boolean; k: number;
   }
   const rings: Ring[] = [];
   const offs: Array<() => void> = [];
@@ -71,7 +73,7 @@ export function createStairs(d: StairsDeps): Stairs {
         const px = o[0] + dr[0] * t, py = o[1] + dr[1] * t, pz = o[2] + dr[2] * t;
         const rx = nz, rz = -nx;                                                          // the quad's right (+x column), horizontal
         const u = (px - cx) * rx + (pz - cz) * rz, w = py - cy;
-        if (Math.abs(u) <= LABEL_W / 2 + 0.05 && Math.abs(w) <= LABEL_H / 2 + 0.05) best = { dist: t, point: [px, py, pz] };
+        if (Math.abs(u) <= (LABEL_W / 2) * r.k + 0.05 && Math.abs(w) <= (LABEL_H / 2) * r.k + 0.05) best = { dist: t, point: [px, py, pz] };
       }
     }
     return best;
@@ -87,7 +89,7 @@ export function createStairs(d: StairsDeps): Stairs {
       ring.position.y = 0.03; pad.position.y = 0.025; label.position.y = LABEL_Y;
       grp.position.set(here.ring[0], here.ring[1], here.ring[2]);
       grp.add(ring, pad, label); root.add(grp);
-      const r: Ring = { link, dir, at: here.ring, level: here.level, to: { stand: there.stand, yawDeg: there.yawDeg }, grp, ring, pad, label, hover: false, target: null as any };
+      const r: Ring = { link, dir, at: here.ring, level: here.level, to: { stand: there.stand, yawDeg: there.yawDeg }, grp, ring, pad, label, hover: false, k: 1, target: null as any };
       r.target = {
         id: `xr-stairs-${link.index}-${dir}`, priority: 50, enabled: false,
         hit: ray => plane(r, ray),
@@ -118,6 +120,7 @@ export function createStairs(d: StairsDeps): Stairs {
     for (const r of shown) {
       // the label turns to the head about the vertical axis only (a tilted label reads badly in a headset)
       r.label.rotation.y = Math.atan2(head[0] - r.at[0], head[2] - r.at[2]);
+      r.k = labelScale(Math.hypot(head[0] - r.at[0], head[2] - r.at[2])); r.label.scale.setScalar(r.k);
       r.ring.material = r.hover ? hotMat : ringMat;
       const s = r.hover ? 1.12 : 1 + 0.04 * Math.sin(f.time / 400);   // a slow breathing so a ring reads as live
       r.ring.scale.set(s, 1, s);

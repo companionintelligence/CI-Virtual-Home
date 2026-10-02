@@ -15,7 +15,7 @@
 import type { RayHit, RayTarget, V3, XrFrame, XrInput, XrRig } from './host.js';
 import type { XrNav, StandCheck } from './nav.js';
 
-export const AIM = { speed: 10, gravity: 9.8, steps: 32, maxT: 2.4, maxRange: 14, rayRange: 12, minGo: 0.5, stickOn: 0.6, stickOff: 0.3, stickSide: 0.55 };
+export const AIM = { speed: 8.5, gravity: 9.8, steps: 96, maxT: 2.4, maxRange: 14, rayRange: 12, minGo: 0.5, stickOn: 0.6, stickOff: 0.3, stickSide: 0.55 };
 
 export interface Aim {
   source: number; mode: 'arc' | 'ray';
