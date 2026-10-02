@@ -228,5 +228,21 @@ LYGIA and Grassworks are not used anywhere in the story site.
 
 ## Story site: film
 
-_(none yet)_
+The per-family films are made on this machine by `pnpm run story:film` (`scripts/render-family-film.mts`, `scripts/film/`, `assets/story/film/`). Nothing below is shipped
+with the site or loaded by a page: the films are files hosted outside the Pages deploy, and the tools that make them are not in them. How it works and how to run
+it: [`reference/story/film.md`](reference/story/film.md).
 
+| Component | Version | Licence | Role |
+|---|---|---|---|
+| [FFmpeg](https://ffmpeg.org) | 9.0.2 (Homebrew; configured `--enable-gpl --enable-version3 --enable-libx264`) | LGPL-2.1-or-later / GPL-3.0-or-later depending on the build | a tool: decodes the voice clips, measures and normalises loudness (`loudnorm`, `alimiter`, `ebur128`), muxes, and runs the QA scans (`silencedetect`, `freezedetect`, `ffprobe`). Not shipped; its code is not in the films |
+| [x264](https://www.videolan.org/developers/x264.html) (libx264, through FFmpeg) | as built into the FFmpeg above | **GPL-2.0-or-later** | encodes the H.264 video. A tool whose **output** ships (an encoded stream carries none of its code); the same reading as the espeak-ng note under "Story site: voice", flagged for counsel with it |
+| FFmpeg's native AAC encoder | in the FFmpeg above | LGPL-2.1-or-later | encodes the sound. AAC patent licensing is a matter for counsel before a commercial launch (open item in `reference/story/film.md`) |
+| [Manrope](https://github.com/sharanda/manrope) | the file in `assets/fonts/` (row above) | OFL-1.1 | the type of every card, caption and title in the film, read from `assets/fonts/` by the page that renders it (the Google Fonts request is stubbed, as in `test-goldens.mts`) |
+| Playwright and its Chromium (rows above) | as above | Apache-2.0 | drives the page that renders the frames |
+| The loudness method (two passes: measure, then a linear gain and a true-peak limiter a decibel under the ceiling) | ported from CI-Common `packages/video-kit/src/loudness.ts` | first-party (same organisation) | `scripts/film/mux.mts` and `scripts/film/qa.mts` carry about sixty lines of that logic; the kit is **not** imported and is not a dependency |
+
+No stock footage, music, sound effect, image or typeface was added for the film. The voice is the one `Story site: voice` records (Kokoro-82M, generated locally); the picture
+is the repo's own renderer; the Companion Core in it is the stylised model the page builds, never a photograph. LYGIA and Grassworks are not used.
+
+The optional CI-Common brand bookends (`scripts/film-bookends.mts`) run only when the owner sets `CI_VIDEO_KIT` to a checkout of CI-Common's `packages/video-kit`; the
+kit is then a build-time tool of the owner's machine, never a dependency in `package.json`.

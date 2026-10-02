@@ -1,0 +1,38 @@
+{
+  "v": 1,
+  "families": {
+    "vance-takahashi": {
+      "durationMs": 90300,
+      "inputsSha": "a9b1b69bd524954d2673d296bb51afa5324fb949b2463d5d8d33410ae0f32e8c",
+      "vtt": "film/captions.4da6fbf61f.vtt",
+      "aspects": {
+        "16x9": {
+          "file": "vance-takahashi.16x9.cce99823c6.mp4",
+          "sha256": "cce99823c6f3e845de36cbd91f94c75b39bef4f32bd3ccba8f597621f41508b8",
+          "bytes": 13711819,
+          "width": 1920,
+          "height": 1080,
+          "durationMs": 90300,
+          "poster": "film/poster.e3add3cfdc.jpg",
+          "loudness": {
+            "I": -14.2,
+            "TP": -1.4
+          }
+        },
+        "9x16": {
+          "file": "vance-takahashi.9x16.9dd9311958.mp4",
+          "sha256": "9dd93119585860ce4fb256a6144fd72f8653e6458049dba0c4a13e28d35bc9ea",
+          "bytes": 13045568,
+          "width": 1080,
+          "height": 1920,
+          "durationMs": 90300,
+          "poster": "film/poster-9x16.64e93d96c6.jpg",
+          "loudness": {
+            "I": -14.2,
+            "TP": -1.4
+          }
+        }
+      }
+    }
+  }
+}
