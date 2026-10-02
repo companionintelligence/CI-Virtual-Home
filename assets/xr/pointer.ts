@@ -83,7 +83,7 @@ export function createPointer(host: XrHost, input: XrInputImpl, rig: XrRig): Poi
 
   // ---- one visual set per input source
   interface Vis { ray: any; dot: any; grip: any; joints: any; reticle: any; fill: any }
-  const vis = new Map<number, Vis>();
+  const vis = new Map<number, Vis>(), live = new Set<number>();
   const dummy = new THREE.Object3D(), v3 = new THREE.Vector3();
   function visOf(id: number): Vis {
     let v = vis.get(id); if (v) return v;
@@ -101,7 +101,7 @@ export function createPointer(host: XrHost, input: XrInputImpl, rig: XrRig): Poi
 
   function tick(f: XrFrame) {
     rig.group.updateMatrixWorld(true);
-    const live = new Set<number>();
+    live.clear();
     for (const info of input.sources()) {
       live.add(info.id);
       const v = visOf(info.id), ray = input.rayPose(info.id), p = input.pointing(info.id);

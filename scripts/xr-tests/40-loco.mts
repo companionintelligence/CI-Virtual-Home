@@ -185,6 +185,11 @@ async function unitTests() {
     f.fire('selectstart', T); f.fire('select', T); input.update(f.F()); f.fire('selectend', T); input.update(f.F());
     ok(log.join() === 'press,release:hit', `a pinch presses and releases with no hover first (${log.join()})`);
     ok(input.sawTransient(), 'the module knows a transient pointer was seen (the system draws the hands)');
+    // the source can already be gone on the frame that carries its selectend: the release still says where it let go
+    log.length = 0; f.session.inputSources.push(T); input.update(f.F());
+    f.fire('selectstart', T); input.update(f.F());
+    f.session.inputSources.length = 0; f.fire('selectend', T); input.update(f.F());
+    ok(log.join() === 'press,release:hit', `a transient pointer gone on its selectend frame still releases on the target (${log.join()})`);
     f.session.inputSources.length = 0; input.update(f.F());
     // gaze
     log.length = 0; f.session.inputSources.push(G); input.update(f.F());

@@ -50,7 +50,7 @@ interface Src {
   ray: Ray | null; rayAt: number; grip: { pos: V3; quat: [number, number, number, number] } | null;
   axes: [number, number] | null; pads: Partial<Record<ButtonName, Pad>>;
   selecting: boolean; selSeen: number; startSeen: boolean;
-  press: Pointing | null; point: Pointing | null; hovered: RayTarget | null;
+  press: Pointing | null; point: Pointing | null; lastPoint: Pointing | null; hovered: RayTarget | null;
   dwell: { target: RayTarget | null; ms: number; fired: boolean };
   joints: Float32Array | null; wantJoints: boolean;
   gone: boolean; lostAt: number;
@@ -88,7 +88,7 @@ export function createInput(host: XrHost, rig: XrRig): XrInputImpl {
     const id = nextId++;
     s = {
       id, src, info: infoOf(src, id), ray: null, rayAt: 0, grip: null, axes: null, pads: {}, selecting: false, selSeen: -1, startSeen: false,
-      press: null, point: null, hovered: null, dwell: { target: null, ms: 0, fired: false }, joints: null, wantJoints: false, gone: false, lostAt: 0,
+      press: null, point: null, lastPoint: null, hovered: null, dwell: { target: null, ms: 0, fired: false }, joints: null, wantJoints: false, gone: false, lostAt: 0,
     };
     if (src.targetRayMode === 'transient-pointer') transient = true;
     byObj.set(src, s); all.push(s);
@@ -187,7 +187,9 @@ export function createInput(host: XrHost, rig: XrRig): XrInputImpl {
     s.selecting = false;
     const pr = s.press; if (!pr) return;
     s.press = null;
-    const now = s.point && s.point.target === pr.target ? s.point.hit : null;
+    // a transient pointer's last frame can be the one that carries its selectend: the source is gone, so what it pointed at a frame ago is where it let go
+    const at = s.point || (s.gone ? s.lastPoint : null);
+    const now = at && at.target === pr.target ? at.hit : null;
     try { pr.target.onRelease?.(s.id, cancelled ? null : now, cancelled); } catch (e) { console.warn('xr target release', e); }
   }
 
@@ -208,6 +210,7 @@ export function createInput(host: XrHost, rig: XrRig): XrInputImpl {
     readPoses(f.xrFrame, now);
     // pointing, for everything with a ray
     for (const s of all) {
+      if (s.point) s.lastPoint = s.point;
       s.point = s.ray && !s.gone ? pick(s.ray) : null;
     }
     drain();
