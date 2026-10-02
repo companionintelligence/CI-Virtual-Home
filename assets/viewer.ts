@@ -1284,6 +1284,42 @@ export function mountViewer(api: Api) {
   window.addEventListener('blur', () => keys.clear());
   new ResizeObserver(() => { dirty = true; ghostFov = -1; endPlaced = false; }).observe(canvas);
 
+  // ------------------------------------------------------------------ WebXR (assets/xr/): lazy, live only, ?no=xr removes it
+  // entry.ts (imported only where a headset or a PC VR runtime really is) adds the Enter VR controls and window.__houseViewer.xr; where
+  // there is none, or with ?no=xr, nothing of assets/xr/ is fetched. xrHost is the one door into the player: accessors, and suspend(), which
+  // stops the player moving and answering the page for the length of a session (the XR modules draw the house themselves) and
+  // returns the function that puts it back. frame() is not called while presenting (room-creator.html's animate()).
+  const XR_QUIET = ['keydown', 'keyup', 'wheel', 'pointerdown', 'pointermove', 'pointerup', 'click'];
+  const xrHost = {
+    THREE, renderer, scene: api.scene, camera, canvas, controls, api, params, no,
+    houseId: () => houseId, anchors: () => (api.house() || {}).anchors, markDirty: () => { dirty = true; }, toast: (m: string) => toast(m), now: () => performance.now(),
+    getT: () => t, seek, pause: () => { playing = false; syncTransport(); }, setTod,
+    selectShot: (key: string) => { const s = shots.find(x => x.key === key); if (s) selectShot(s, { play: false }); },
+    suspend() {
+      const was = { playing, flying, cutaway, hq };
+      playing = false;
+      if (flying) exitFly();   // (it also closes the cutaway and the ghost, and drops a tween)
+      tween = null; keys.clear(); setMore(false); toggleHelp(false);
+      if (was.hq) glass.apply();   // a headset draws the opaque-pass glass, never the transmission pass
+      syncTransport();
+      root.inert = true;   // no pointer or focus reaches the page's own controls while a session runs ...
+      const quiet = (e: Event) => e.stopImmediatePropagation();   // ... and none of its window-level shortcuts, or a drag on the mirrored window, answers
+      for (const ev of XR_QUIET) window.addEventListener(ev, quiet, true);
+      return () => {
+        for (const ev of XR_QUIET) window.removeEventListener(ev, quiet, true);
+        root.inert = false;
+        if (was.hq) glass.restore();
+        if (was.flying) { enterFly({ keepDrag: true }); if (was.cutaway) setCutaway(true); }
+        playing = was.playing;
+        dirty = true; ghostDirty = true; syncTransport(true); poke();
+      };
+    },
+  };
+  // (the probe is here, not in entry.ts, so a browser with no VR never requests the entry either; mountXr is idempotent)
+  const xrApi: any = (navigator as any).xr;
+  const xrMount = () => xrApi?.isSessionSupported?.('immersive-vr').then((yes: boolean) => yes && window.isSecureContext && import('./xr/entry.js').then(m => m.mountXr(xrHost))).catch((err: unknown) => console.warn('viewer: VR is unavailable', err));
+  if (!no.has('xr')) { xrMount(); xrApi?.addEventListener?.('devicechange', xrMount); }
+
   // ------------------------------------------------------------------ boot
   (async () => {
     const want = params.get('house') || 'aurora';
@@ -1313,7 +1349,7 @@ export function mountViewer(api: Api) {
   // The page's __houseRenderBegin / __houseRenderEnd call these: a film or a still drawn through those hooks is a
   // product frame, and gets the transmissive glass the goldens have (the plain path's swap is for the live view only).
   // After, the plain path takes its swap back unless Best quality is on.
-  function beforeExternalRender() { glass.restore(); }
+  function beforeExternalRender() { (window as any).__houseViewer?.xr?.end('offline-hook'); glass.restore(); }
   function afterExternalRender() { if (!hq) glass.apply(); }
 
   return { frame, beforeExternalRender, afterExternalRender };
