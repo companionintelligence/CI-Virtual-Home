@@ -681,7 +681,7 @@ async function ao(id: string) {
   ok(!!file && fs.existsSync(path.join(DIR, 'content', 'ao', file)), `dist/content/ao has ${file}, the file the manifest lists for ${id}`);
   const got = requests.filter((u: string) => u.includes('/content/ao/')).map((u: string) => u.slice(u.indexOf('/content/ao/')));
   ok(got.includes('/content/ao/manifest.json') && got.includes(`/content/ao/${file}`) && got.length === 2, `the player fetched exactly the manifest and ${file} (${got.join(', ')})`);
-  const st = await page.evaluate(() => { const r = (window as any).__houseViewer?.realism?.(); return r && r.ao; });
+  const st = await page.evaluate(() => { const r = (window as any).__houseViewer?.effects?.features; return r && r.ao; });
   ok(st && st.volume === 'on', `the volume is on (${st && st.volume})${st && st.contact ? `, ${st.contact.items} contact pads in ${st.contact.drawCalls} draw call` : ''}`);
   const lit = await page.evaluate(() => { let n = 0; (window as any).__houseDebug().scene.traverse((o: any) => { if (o.isMesh && o.material && !Array.isArray(o.material) && o.material.defines && 'VH_AO' in o.material.defines) n++; }); return n; });
   ok(lit > 50, `${lit} meshes draw with it`);
