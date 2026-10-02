@@ -75,14 +75,21 @@ const feature: RealismFeature = {
 
     let kit: import('./viewer-composer.js').FrameKit | null = null;
     let kitFailed = false;
-    // the heavy part loads in the background: nothing here waits for it
+    // The heavy part (the passes, ~150 KB of source) loads in the background when something needs it: the accumulation at tier 1+, or
+    // Best quality at any tier. A phone at tier 0 that never turns Best quality on never downloads it. Nothing here waits for it.
     const floatOk = !!(renderer.extensions && (renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float')));
-    const kitP = floatOk && !(off('hqlite') && off('accum')) ? import('./viewer-composer.js').then(m => {
-      kit = m.createFrameKit({ THREE: ctx.THREE, renderer, scene, camera, house: () => ctx.house(), lighting: () => ctx.lighting(), bakedAo: () => bakedAo });
-      if (hqOn) kit.hqWarm();
-      ctx.markDirty();
-    }, err => { kitFailed = true; console.warn('realism: the frame kit could not be loaded', err); }) : Promise.resolve();
-    void kitP;
+    let kitStarted = false;
+    const loadKit = () => {
+      if (kitStarted || !floatOk || (off('hqlite') && off('accum'))) return;
+      kitStarted = true;
+      import('./viewer-composer.js').then(m => {
+        if (disposed) return;
+        kit = m.createFrameKit({ THREE: ctx.THREE, renderer, scene, camera, house: () => ctx.house(), lighting: () => ctx.lighting(), bakedAo: () => bakedAo });
+        if (hqOn) kit.hqWarm();
+        ctx.markDirty();
+      }, err => { kitFailed = true; console.warn('realism: the frame kit could not be loaded', err); });
+    };
+    let disposed = false;
 
     let applied = false, partsOn = false, hqOn = false;
     let bakedAo = false, aoCheck = 0;
@@ -92,7 +99,7 @@ const feature: RealismFeature = {
     let want = false;                       // idle() asked for a step; render() takes it
     let slow = 0, strikes = 0, banned = false;
     let lastStepT = 0;
-    let steps = 0, lastDt = 0, stepsTotal = 0, resets = 0, skipped = '';
+    let steps = 0, lastDt = 0, stepsTotal = 0, resets = 0;
     const pose = new Float64Array(32);       // the camera (world + projection) the accumulation started from
     const takePose = () => { pose.set(camera.matrixWorld.elements, 0); pose.set(camera.projectionMatrix.elements, 16); };
     // (to 0.01 mm / 1e-6: the free camera's controls rebuild the matrix every frame and shuffle its last bits without moving it)
@@ -105,7 +112,7 @@ const feature: RealismFeature = {
       const should = applied && t >= 1;
       if (should === partsOn) return;
       partsOn = should;
-      if (should) { if (!off('lamppool')) lamps.apply(); clip?.apply(); } else { lamps.restore(); clip?.restore(); resetAcc('parts'); }
+      if (should) { if (!off('lamppool')) lamps.apply(); clip?.apply(); if (!off('accum')) loadKit(); } else { lamps.restore(); clip?.restore(); resetAcc('parts'); }
       ctx.markDirty();
     };
 
@@ -124,7 +131,7 @@ const feature: RealismFeature = {
         syncParts();
         if (!partsOn) return;
         lamps.tick();
-        if (kit && acc !== 'running' && ctx.now() - lastStepT > FREE_AFTER_S && kit.stats().accum.allocated) kit.accFree();
+        if (kit && acc !== 'running' && ctx.now() - lastStepT > FREE_AFTER_S && kit.accAllocated()) kit.accFree();
         if (clip) {
           if (!clip.verify()) { ctx.markDirty(); }
           clip.update(cam);
@@ -173,11 +180,13 @@ const feature: RealismFeature = {
       keepsOpaqueGlass() { return hqOn && !kitFailed && floatOk && !off('hqlite'); },
       setHq(on) {
         hqOn = on;
+        if (on) loadKit();
         resetAcc('hq');
         if (on && kit) kit.hqWarm();
         if (!on && kit) kit.hqFree();   // (a few hundred MB of targets at retina sizes: give them back)
       },
       dispose() {
+        disposed = true;
         lamps.restore(); clip?.restore();
         if (kit) { kit.dispose(); kit = null; }
       },
@@ -186,7 +195,7 @@ const feature: RealismFeature = {
           parts: partsOn, tier: ctx.tier(), hq: hqOn,
           lamps: lamps.count, pool: POOL,
           clip: clip ? clip.stats() : null,
-          accum: { state: acc, lastReset, steps, frames: frames(), total: stepsTotal, resets, strikes, banned, skipped, lastDtMs: Math.round(lastDt * 1000) },
+          accum: { state: acc, lastReset, steps, frames: frames(), total: stepsTotal, resets, strikes, banned, lastDtMs: Math.round(lastDt * 1000) },
           kit: kit ? kit.stats() : { loaded: false, failed: kitFailed },
         };
       },

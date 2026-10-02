@@ -434,6 +434,7 @@ export function createFrameKit(ctx: KitCtx) {
 		accCount: () => acc.count,
 		accReset: () => { acc.count = 0; },
 		accFree,
+		accAllocated: () => !!acc.rt,
 		hqWarm, hqRender, hqFree,
 		dispose,
 		stats: (): FrameKitStats => ({

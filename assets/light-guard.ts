@@ -33,27 +33,42 @@ const MARK = 'RE_Direct( directLight, geometryPosition, geometryNormal, geometry
 const GUARDED = `if ( directLight.visible ) { ${MARK} }`;
 const SPOT_INFO = 'getSpotLightInfo( spotLight, geometryPosition, directLight );';
 // the clip: world position from the view-space one with the view matrix THE DRAW IS USING (a rigid transform: p_world = (p - t) * R,
-// the transpose of the rotation applied from the right), so a second camera (a mirror, a probe) clips correctly too; the switch is
-// vhClipOn[0].x. Tested against this spot's box.
+// the transpose of the rotation applied from the right), so a second camera (a mirror, a probe) clips correctly too.
+//
+// THE DATA IS ONE vec4 A SPOT, 16 BYTES, in one Float32Array shared by every material. three uploads a material's uniforms each time it is
+// drawn after another one (a house draws ~1000 of those a frame), so the payload is a per-frame cost: measured on aurora, two arrays of
+// Vector4 boxes (lo, hi) cost +3 to 4 ms of CPU a frame, one typed array of 24 x 2 vec4 about +2.5, and this (16 x 1 vec4) is what is left
+// of it. The box is (cx, cz, half width, half depth) and (y low, y high), the last four packed two to a float as whole centimetres
+// (12 bits each; y from -10 m): a float32 holds 24 bits of integer exactly, and /4096 and floor() are exact in it. Zero half width = no
+// box = no clip, which is also what an all-zero array means (a program with more spots than the array, or a light without a room).
+// UNROLLED_LOOP_INDEX because three unrolls this loop and only rewrites `[ i ]`.
 const CLIP = `${SPOT_INFO}
-		if ( directLight.visible && vhClipOn[ 0 ].x > 0.5 ) {
+		vec4 vhB = vhClip[ UNROLLED_LOOP_INDEX ];
+		if ( directLight.visible && vhB.z > 0.0 ) {
 			vec3 vhW = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );
-			if ( any( lessThan( vhW, vhClipLo[ i ].xyz ) ) || any( greaterThan( vhW, vhClipHi[ i ].xyz ) ) ) { directLight.visible = false; directLight.color = vec3( 0.0 ); }
+			float vhHW = floor( vhB.z / 4096.0 ), vhYH = floor( vhB.w / 4096.0 );
+			float vhHD = vhB.z - vhHW * 4096.0, vhYL = vhB.w - vhYH * 4096.0;
+			if ( abs( vhW.x - vhB.x ) > vhHW * 0.01 || abs( vhW.z - vhB.y ) > vhHD * 0.01 || vhW.y < vhYL * 0.01 - 10.0 || vhW.y > vhYH * 0.01 - 10.0 ) { directLight.visible = false; directLight.color = vec3( 0.0 ); }
 		}`;
 const CLIP_DECL = `
 #if NUM_SPOT_LIGHTS > 0
-	uniform vec4 vhClipLo[ NUM_SPOT_LIGHTS ];
-	uniform vec4 vhClipHi[ NUM_SPOT_LIGHTS ];
-	uniform vec4 vhClipOn[ 1 ];
+	uniform vec4 vhClip[ NUM_SPOT_LIGHTS ];
 #endif
 `;
 const SHADER_LIBS = ['lambert', 'phong', 'standard', 'physical', 'toon'];
-/** The most spot lights one program can hold. A house has at most LIGHT_CAP (16) room lights; the uniform arrays are this long so
- *  any NUM_SPOT_LIGHTS reads its first entries. */
-export const MAX_SPOTS = 64;
-const FAR = 1e9;
+/** The most spot lights one program can hold a box for (a house has at most LIGHT_CAP = 16 room lights). A program with more spots reads
+ *  past the array: the GL leaves those entries at 0, and a 0 half width means "no clip", so the extra lights just reach as far as before. */
+export const MAX_SPOTS = 16;
 
-type Shared = { lo: any[]; hi: any[]; on: any[] };
+/** The packed vec4 of a box (see CLIP), as plain numbers: [cx, cz, hw*4096 + hd, yh*4096 + yl]. Sizes round up, so the box only grows. */
+export function packBox(b: { lo: number[]; hi: number[] }): [number, number, number, number] {
+  const q = (v: number, hi: number) => Math.min(4095, Math.max(0, hi ? Math.ceil(v - 1e-9) : Math.floor(v + 1e-9)));
+  const hw = q((b.hi[0] - b.lo[0]) * 50, 1), hd = q((b.hi[2] - b.lo[2]) * 50, 1);
+  const yl = q((b.lo[1] + 10) * 100, 0), yh = q((b.hi[1] + 10) * 100, 1);
+  return [(b.lo[0] + b.hi[0]) / 2, (b.lo[2] + b.hi[2]) / 2, Math.max(1, hw) * 4096 + hd, yh * 4096 + yl];
+}
+
+type Shared = { data: Float32Array };
 let done = false;
 let shared: Shared | null = null;
 
@@ -74,13 +89,12 @@ export function installLightGuard(THREE: any): boolean {
   const pars: unknown = C?.lights_pars_begin;
   if (clipWanted() && head.split(SPOT_INFO).length === 2 && typeof pars === 'string' && pars.includes('uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ]') && SHADER_LIBS.every(k => THREE.ShaderLib?.[k]?.uniforms)) {
     try {
-      const lo = Array.from({ length: MAX_SPOTS }, () => new THREE.Vector4(-FAR, -FAR, -FAR, 0));
-      const hi = Array.from({ length: MAX_SPOTS }, () => new THREE.Vector4(FAR, FAR, FAR, 0));
-      const on = [new THREE.Vector4(0, 0, 0, 0)];
-      for (const k of SHADER_LIBS) { const u = THREE.ShaderLib[k].uniforms; u.vhClipLo = { value: lo }; u.vhClipHi = { value: hi }; u.vhClipOn = { value: on }; }
+      // (UniformsUtils.clone slices an Array but hands a typed array on as it is, so every material's own uniform map holds THIS array)
+      const data = new Float32Array(MAX_SPOTS * 4);
+      for (const k of SHADER_LIBS) THREE.ShaderLib[k].uniforms.vhClip = { value: data };
       C.lights_pars_begin = pars + CLIP_DECL;
       text = text.replace(SPOT_INFO, CLIP);
-      shared = { lo, hi, on };
+      shared = { data };
     } catch (e) { shared = null; console.warn('installLightGuard: the room clip could not be installed', e); }
   }
   C.lights_fragment_begin = text + (src as string).slice(cut);
@@ -190,43 +204,50 @@ export function createSpotClip(o: { scene: any; renderer: any; house: () => any 
     for (const l of live) if (l.isSpotLight) order.push(l);
   }
 
+  let flagged = 0;                           // how many slots carry a flag in the shared array now
   const setBox = (i: number, b: Box | undefined) => {
-    if (b) { sh.lo[i].set(b.lo[0], b.lo[1], b.lo[2], 0); sh.hi[i].set(b.hi[0], b.hi[1], b.hi[2], 0); }
-    else { sh.lo[i].set(-FAR, -FAR, -FAR, 0); sh.hi[i].set(FAR, FAR, FAR, 0); }
+    const d = sh.data, o = i * 4;
+    if (b) d.set(packBox(b), o);
+    else d[o + 2] = 0;   // a light without a box (not a room lamp) is not clipped
   };
+  const clearFrom = (from: number) => { for (let i = from; i < flagged; i++) sh.data[i * 4 + 2] = 0; flagged = Math.min(flagged, from); };
+  const clearFlags = () => clearFrom(0);
   const isOn = () => wanted && !off;
-  const fail = (why: string) => { strikes++; off = why; retryAt = ticks + RETRY_TICKS; sh.on[0].x = 0; uploaded = []; };
+  const fail = (why: string) => { strikes++; off = why; retryAt = ticks + RETRY_TICKS; clearFlags(); uploaded = []; };
 
-  /** three's own spot array (view space): the one a lit material that has been drawn holds. It is the same array object for the life
-   *  of the renderer (WebGLLights mutates it in place), so it is found once; a material that has not been refreshed yet holds a
-   *  private empty one, which is skipped. */
-  let stateArr: any[] | null = null;
+  /** three's own spot array (view space): the one a lit material that has been drawn holds. WebGLLights mutates it in place, but the
+   *  renderer may make a new one (a new render state), so the material is remembered and the array read from it each time; a material
+   *  that has not been refreshed yet holds a private empty array, which is skipped. */
+  let stateMat: any = null;
+  const spotsOf = (m: any): any[] | null => { const u = m && renderer.properties.get(m).uniforms; return u && u.spotLights && Array.isArray(u.spotLights.value) ? u.spotLights.value : null; };
   function drawnSpots(): any[] | null {
-    if (stateArr && stateArr.length) return stateArr;
-    stateArr = null;
+    const known = spotsOf(stateMat);
+    if (known && known.length) return known;
+    stateMat = null;
+    let found: any[] | null = null;
     scene.traverse((n: any) => {
-      if (stateArr || !n.isMesh) return;
+      if (found || !n.isMesh) return;
       for (const m of Array.isArray(n.material) ? n.material : [n.material]) {
-        const u = m && renderer.properties.get(m).uniforms;
-        if (u && u.spotLights && Array.isArray(u.spotLights.value) && u.spotLights.value.length) { stateArr = u.spotLights.value; return; }
+        const a = spotsOf(m);
+        if (a && a.length) { stateMat = m; found = a; return; }
       }
     });
-    return stateArr;
+    return found;
   }
 
   return {
     get mapped() { return boxes.size; },
     apply() { wanted = true; },
-    restore() { wanted = false; sh.on[0].x = 0; uploaded = []; },
+    restore() { wanted = false; clearFlags(); uploaded = []; },
     rescan,
     update(camera) {
       ticks++;
       if (off && strikes < 3 && ticks >= retryAt) off = '';   // try again: the proof below decides
-      if (!isOn() || !boxes.size) { sh.on[0].x = 0; uploaded = []; return false; }
-      sh.on[0].x = 1;
+      if (!isOn() || !boxes.size) { clearFlags(); uploaded = []; return false; }
       orderSpots(camera);
       const n = Math.min(order.length, MAX_SPOTS);
       for (let i = 0; i < n; i++) setBox(i, boxes.get(order[i]));
+      clearFrom(n); flagged = n;
       uploaded = order.slice(0, n);
       uploadedFrame = renderer.info.render.frame;
       return true;
