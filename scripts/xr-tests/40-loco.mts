@@ -313,6 +313,46 @@ async function unitTests() {
     c.stop(); ok(cam.children.length === 0, 'stop() takes the quads off the camera');
     input.dispose();
   }
+
+  {   // ---- the optional walk: head-relative, 1.4 m/s, vignette follows speed, stopped by a wall, off unless asked
+    const f = fake();
+    const input = createInput(f.host, f.rig);
+    const Lh = f.ctl('left', [sp.x - 0.2, 1.3, sp.z], [goal[0], 0, goal[2]]);
+    f.session.inputSources.push(Lh);
+    const cam = new THREE.Object3D();
+    // the head follows the rig group (the person stands at the tracking origin)
+    f.rig.head = () => ({ pos: [sp.x + f.rig.group.position.x, 1.6, sp.z + f.rig.group.position.z] as V3, dir: [0, 0, -1] as V3, yawDeg: 0 });
+    const c = createComfort({ THREE, camera: cam, input, rig: f.rig, nav: () => nav, busy: () => false, options: { continuous: true } });
+    let now = 0;
+    const step = (n: number, dt = 11) => { for (let i = 0; i < n; i++) { now += dt; const h = f.rig.head(); const fr = { time: now, dt: dt / 1000, xrFrame: {}, head: h, presenting: true }; input.update(fr as any); c.tick(fr as any); } };
+    step(3);
+    ok(c.options.continuous && c.walking(input.sources()[0].id), 'continuous on: the left stick is the walk\'s (teleport leaves it alone)');
+    // face -z (yaw 0): stick forward is -z. Find a direction with 2 m of open floor ahead, by turning the head instead: yaw 0, so test whichever of the four axes is free
+    const dirs: Array<[number, number, string]> = [[0, -1, 'forward'], [0, 1, 'back'], [-1, 0, 'left'], [1, 0, 'right']];
+    let free: [number, number, string] | null = null;
+    for (const d of dirs) if (nav.walkFree(sp.x, sp.z, sp.x + d[0] * 1.2, sp.z + d[1] * 1.2, 0) && nav.stand(sp.x + d[0] * 1.2, sp.z + d[1] * 1.2, 0).ok) { free = d; break; }
+    if (free) {
+      const stickFor = (d: [number, number, string]) => d[2] === 'forward' ? [0, -1] : d[2] === 'back' ? [0, 1] : d[2] === 'left' ? [-1, 0] : [1, 0];
+      const [sx, sy] = stickFor(free);
+      Lh.gamepad.axes = [0, 0, sx, sy];
+      const p0 = f.rig.group.position.clone(); const t0 = now;
+      step(45, 11);   // 0.5 s
+      const moved = f.rig.group.position.distanceTo(p0), secs = (now - t0) / 1000;
+      ok(Math.abs(moved / secs - 1.4) < 0.15, `full stick walks at 1.4 m/s (${(moved / secs).toFixed(2)})`);
+      ok(c.state().vignette > 0.2 && c.state().vignette <= 0.55 + 1e-6, `and the vignette rises with the speed (${c.state().vignette.toFixed(2)})`);
+      const dirOk = (f.rig.group.position.x - p0.x) * free[0] + (f.rig.group.position.z - p0.z) * free[1];
+      ok(dirOk > 0.9 * moved, `in the stick's direction relative to the head (${free[2]})`);
+      // keep going into whatever is there: the head must stop short of the wall
+      step(900, 11);
+      const h = f.rig.head();
+      ok(nav.wallDistance(h.pos[0], 1.6, h.pos[2]) >= 0.15 && nav.stand(h.pos[0], h.pos[2], 0).clearance >= 0.2, `walking on into the room stops before a wall (clearance ${nav.stand(h.pos[0], h.pos[2], 0).clearance.toFixed(2)} m)`);
+      Lh.gamepad.axes = [0, 0, 0, 0]; step(200, 11);
+      ok(c.state().vignette < 0.02, 'letting go clears the vignette');
+    } else ok(false, 'no free direction from the spawn for the walk test');
+    c.options.continuous = false; Lh.gamepad.axes = [0, 0, 0, -1]; const p1 = f.rig.group.position.clone(); step(30, 11);
+    ok(f.rig.group.position.distanceTo(p1) === 0, 'continuous off: the stick walks nobody');
+    c.stop(); input.dispose();
+  }
 }
 
 // =============================================================================================================== browser
@@ -374,6 +414,7 @@ const HELPERS = `(() => {
   L.recStart = () => { L.rec.log = []; L.rec.on = true; };
   L.recStop = () => { L.rec.on = false; const lg = L.rec.log; let moves = 0, bad = 0, worst = 0; for (let i = 1; i < lg.length; i++) { const d = Math.hypot(lg[i].p[0] - lg[i-1].p[0], lg[i].p[1] - lg[i-1].p[1], lg[i].p[2] - lg[i-1].p[2]); if (d > 0.003) { moves++; if (lg[i].a < 0.995) { bad++; worst = Math.max(worst, d); } } } return { frames: lg.length, moves, bad, worst }; };
   L.roofs = () => { let n = 0, vis = 0; w.__houseDebug().scene.traverse(o => { if (o.userData && o.userData.isRoof) { n++; if (o.visible) vis++; } }); return { n, vis }; };
+  L.ceilings = () => { let n = 0, vis = 0; w.__houseDebug().scene.traverse(o => { if (o.userData && o.userData.isCeiling) { n++; if (o.visible) vis++; } }); return { n, vis }; };
   L.waitIdle = () => new Promise(res => { let k = 0; const off = xr().onFrame(() => { if (!rig().busy() && ++k > 3) { off(); res(true); } else if (rig().busy()) k = 0; }); });
   L.frames = n => new Promise(res => { let k = 0; const off = xr().onFrame(() => { if (++k >= n) { off(); res(k); } }); });
 })();`;
@@ -406,7 +447,7 @@ async function enter(p: Page) {
   await p.page.evaluate(HELPERS);
   await p.page.waitForFunction(() => (window as any).__L.state().dbg.live === true, null, { timeout: 60000 });
 }
-const ev = <T>(p: Page, fn: string, ...a: any[]): Promise<T> => p.page.evaluate(`(async () => { const L = window.__L; return (${fn})(...${JSON.stringify(a)}); })()`);
+const ev = <T,>(p: Page, fn: string, ...a: any[]): Promise<T> => p.page.evaluate(`(async () => { const L = window.__L; return (${fn})(...${JSON.stringify(a)}); })()`);
 const errs = (p: Page) => p.errors.filter(e => !/at onDeviceFrame \(<anonymous>/.test(e));
 
 // ---- the controller headset
@@ -574,6 +615,7 @@ async function quest3(house: string) {
       // point at the ring and pull the trigger
       const ring = rings.find((r: any) => r.dir === 'up');
       const floor0 = at.floorY;
+      const ceil0 = await ev<any>(p, `() => L.ceilings()`);
       await ev(p, `(a) => { L.aim('right', [a[0], a[1], a[2]]); }`, ring.at);
       await ev(p, `() => L.frames(4)`);
       const hover: any = await ev(p, `() => { const l = window.__houseViewer.xr.locomotion(); const s = l.input().sources().find(x => x.handedness === 'right'); const pt = l.input().pointing(s.id); return pt ? pt.target.id : null; }`);
@@ -587,6 +629,8 @@ async function quest3(house: string) {
       ok(link.top.stand && near(top.head[0], link.top.stand[0], 0.03) && near(top.head[2], link.top.stand[2], 0.03), `and the head is at the top stand (${top.head.map((v: number) => v.toFixed(2))})`);
       ok(rec.bad === 0, `the stairs blink moved the head only on black frames (${rec.moves} move, ${rec.bad} bad)`);
       ok(top.dbg.dress.roof === 'off' && top.dbg.dress.inside, 'upstairs is inside too: the roof stays off');
+      const ceil1 = await ev<any>(p, `() => L.ceilings()`);
+      ok(ceil0.n === 0 || (ceil0.vis === ceil0.n && ceil1.vis < ceil0.vis), `ceilings follow the head: all ${ceil0.vis} of ${ceil0.n} shown on the ground floor, ${ceil1.vis} upstairs (the floor below the head's ceiling is hidden)`);
       const downRing = top.dbg.rings.find((r: any) => r.dir === 'down');
       ok(!!downRing, `a "Go down" ring is shown at the top (${JSON.stringify(top.dbg.rings.map((r: any) => r.dir))})`);
       await page.screenshot({ path: path.join(SHOTS, `40-${house}-quest3-stairs-top.png`) });
