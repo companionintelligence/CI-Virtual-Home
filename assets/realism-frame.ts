@@ -23,7 +23,7 @@ import { createSpotClip, spotClipInstalled, type SpotClip } from './light-guard.
 
 const STILL_MS = 250;           // the view has been still this long: start accumulating
 const SLOW_FRAME_S = 0.045;     // a refinement frame this slow (twice in a row) stops the accumulation
-const FREE_AFTER_S = 8;           // the accumulation's targets (two half-float images of the canvas) are given back after this long without a step
+const FREE_AFTER_S = 1.5;         // an accumulation that was cut short gives its targets (two half-float images of the canvas) back after this long without a step
 const SLOW_STRIKES = 3;         // …and after this many such stops in a session it is switched off for the session
 
 // ---- lamp pools --------------------------------------------------------------------------------------------------------------
@@ -174,7 +174,7 @@ const feature: RealismFeature = {
         if (!kit || acc !== 'running') return false;
         const n = kit.accStep(camera, steps === 0);
         steps = n; stepsTotal++; lastStepT = ctx.now();
-        if (n >= frames()) acc = 'done';
+        if (n >= frames()) { acc = 'done'; kit.accFree(); }   // the canvas holds the picture; the targets (45 to 110 MB) go at once
         return true;
       },
       keepsOpaqueGlass() { return hqOn && !kitFailed && floatOk && !off('hqlite'); },

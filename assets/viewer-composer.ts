@@ -228,6 +228,7 @@ export function createFrameKit(ctx: KitCtx) {
 		for (const k of ['rt', 'sum'] as const) { if (acc[k]) { acc[k].dispose(); acc[k] = null; } }
 		for (const k of ['add', 'out'] as const) { if (acc[k]) { acc[k].dispose(); acc[k] = null; } }
 		acc.count = 0; acc.w = acc.h = acc.msaa = 0;
+		if (!hq.built && quad._mesh) quad._mesh.geometry.dispose();   // (the quad's geometry is shared and uploads again on the next use; nothing is left on the GPU at rest)
 	}
 
 	/**
