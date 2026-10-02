@@ -1,54 +1,47 @@
 #!/usr/bin/env -S node --experimental-strip-types
-// Assembles the web portal for Cloudflare Pages: exactly the files the site loads, nothing else.
+// Assembles the public site for Cloudflare Pages: exactly the files it loads, nothing else.
 //
-//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/]
+//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/] [--families <dir>] [--allow-partial]
 //   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
 //
-//   <out>/index.html                 the gallery (portal/gallery.css + gallery.js, portal/thumbs/, portal/hero.webp),
-//                                    its link-preview image (portal/hero.jpg) and URL made absolute
-//   <out>/room-creator.html          the player (?mode=view: portal/viewer.css + assets/viewer.js) and the editor,
-//                                    plus one tag: <meta name="vh-share" content="homes/">, which tells the player
-//                                    the share pages below exist. Its static title and description are the site's
-//                                    (with preview tags), not the editor's: a player URL copied from the address bar
-//                                    unfurls as the site, never as the editor
-//   <out>/homes/<id>.html            what the player's share button hands out: a page with the home's own title,
-//                                    description and thumbnail for link previews (Slack, iMessage, social cards
-//                                    never run the player's script, so room-creator.html's static title is all they
-//                                    would see), which forwards to room-creator.html?mode=view&house=<id> with the
-//                                    link's query. Its image is portal/previews/<id>.jpg (1200 × 630 JPEG: LinkedIn
-//                                    and some others read no WebP). og:image and og:url are absolute, as unfurlers
-//                                    want: the site's address is --site-url, else $SITE_URL, else the live site
-//                                    (https://homes.ci.computer/); ci.yml passes a pull request's preview address
-//   <out>/_headers                   Cloudflare Pages' header rules (portal/_headers): Cache-Control max-age=0 with
-//                                    must-revalidate on every file, because the modules below are not fingerprinted
-//   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
-//                                    fonts/*.woff2 with their licences, brand/
-//   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
+// The site is thirty fictional families, not the homes the specs were written from, so the part of this build that knows
+// about them lives in scripts/story/site.mts (one call, step 5) and this file keeps the engine, the stylesheets and scripts,
+// the content hashes, and the checks that nothing is missing or extra:
 //
-// Everything the site references is relative, so the same tree works at / and under /ci-virtual-home/. No
-// goldens, scripts, scenes, videos or TypeScript sources go out. The build refuses to run on stale or missing
-// compiled assets (a .ts newer than its .js), and checks that every house in index.json has a spec and a
-// thumbnail, that nothing the HTML links is missing from the output, and that the gallery's static hero figures
-// (what a crawler or a visitor without JavaScript reads) are the ones gallery.js computes from index.json.
+//   <out>/index.html, family/<slug>.html, credits.html      the landing, one page per family, the credits (site.mts)
+//   <out>/room-creator.html          the player only (?mode=view&family=<slug>): window.__VH_PUBLIC=1 sends the editor
+//                                    page back to the landing, and its static head is the site's, with noindex
+//   <out>/story/ content/homes/ portal/{thumbs,posters,og,fonts}/ audio/ film/   data and pictures, every name carrying
+//                                    a content hash except story/manifest.json (site.mts and scripts/story/ship/*.mts)
+//   <out>/_headers _redirects robots.txt sitemap.xml
+//   <out>/portal/*.css *.js          the site's styles and scripts
+//   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE, fonts, brand
+//
+// Everything the site references is relative, so the same tree works at / and under /ci-virtual-home/. No goldens, scripts,
+// scenes, videos, TypeScript sources or content/houses go out (the specs ship sanitised under content/homes/). The build
+// refuses to run on stale or missing compiled assets (a .ts newer than its .js), and fails when a page links something that
+// is not in the output or the output holds a file nothing asked for.
 //
 // Only the paths it writes are replaced in <out>; anything else there (dist/models from export:core) is left.
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
-import { displayName, buildCredit } from '../assets/home-names.js';
+import { buildStorySite } from './story/site.mts';
 
 const args = parseArgs(process.argv.slice(2));
 const OUT = path.resolve(args.out || path.join(ROOT, 'dist'));
 const rel = (p: string): string => path.relative(ROOT, p) || '.';
 const problems: string[] = [];
 let files = 0, bytes = 0;
+const shipped = new Set<string>();   // every file written, as a path under <out>: the allowlist the last check holds the output to
 
 function copy(fromRel: string, toRel = fromRel): void {
   const from = path.join(ROOT, fromRel), to = path.join(OUT, toRel);
   if (!fs.existsSync(from)) { problems.push(`missing ${fromRel}`); return; }
   fs.mkdirSync(path.dirname(to), { recursive: true });
   fs.copyFileSync(from, to);
+  shipped.add(toRel.split(path.sep).join('/'));
   files++; bytes += fs.statSync(to).size;
 }
 function walk(dirRel: string, keep: (f: string) => boolean): string[] {
@@ -70,18 +63,17 @@ if (stale.length) { console.error(`compiled assets are missing or older than the
 
 // 1. start from a clean copy of what this script owns (.nojekyll: an older build wrote it for GitHub Pages; now it is only
 //    cleared out of a dist/ that still has one)
-const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '_headers', '.nojekyll'];
+const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', 'family', 'story', 'audio', 'film', 'credits.html', 'sitemap.xml', 'robots.txt', '_redirects', '_headers', '.nojekyll'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
 
 // 2. pages, and Cloudflare Pages' header rules (portal/_headers: every file is revalidated, so a deploy never leaves
 //    a visitor with the new page and the old modules)
-copy('index.html');
 copy('room-creator.html');
 copy(path.join('portal', '_headers'), '_headers');
 
-// 3. portal: styles, script, the hero and the thumbnails
-for (const f of walk('portal', f => /\.(css|js|webp|jpg)$/.test(f))) copy(f);
+// 3. the site's styles and scripts (pictures and fonts ship with a content hash, from site.mts)
+for (const f of walk('portal', f => /\.(css|js)$/.test(f))) copy(f);
 
 // 4. the engine: compiled modules, three.js (whole vendored tree: modules plus LICENSE), fonts, brand
 for (const f of sources) copy(f.replace(/\.ts$/, '.js'));
@@ -89,125 +81,13 @@ for (const f of walk(path.join('assets', 'vendor'), f => /\.js$|LICENSE/.test(f)
 for (const f of walk(path.join('assets', 'fonts'), f => /\.woff2$|LICENSE/.test(f))) copy(f);
 for (const f of walk(path.join('assets', 'brand'), () => true)) copy(f);
 
-// 5. the specs
-const index = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'houses', 'index.json'), 'utf8'));
-copy(path.join('content', 'houses', 'index.json'));
-for (const h of index.houses || []) {
-  copy(path.join('content', 'houses', `${h.id}.json`));
-  if (!fs.existsSync(path.join(ROOT, 'portal', 'thumbs', `${h.id}.webp`))) problems.push(`no thumbnail for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
-  if (!fs.existsSync(path.join(ROOT, 'portal', 'previews', `${h.id}.jpg`))) problems.push(`no link-preview image for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
-}
-if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
-
-// 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes, distinct builders, floor
-// area rounded to 10 m²), or a visitor sees them change as the page hydrates and a crawler keeps the wrong ones
-{
-  const houses: { author?: string; areaSqm?: number }[] = index.houses || [];
-  const want: Record<string, string> = {
-    homes: String(houses.length),
-    builders: String(new Set(houses.map(h => h.author).filter(Boolean)).size),
-    area: new Intl.NumberFormat('en').format(Math.round(houses.reduce((a, h) => a + (h.areaSqm || 0), 0) / 10) * 10),
-  };
-  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  for (const [k, v] of Object.entries(want)) {
-    const got = html.match(new RegExp(`data-stat="${k}">([^<]*)<`));
-    if (!got) problems.push(`index.html: no data-stat="${k}" figure`);
-    else if (got[1] !== v) problems.push(`index.html: the static ${k} figure is ${got[1]}, index.json says ${v}`);
-  }
-}
-
-// 5c. share pages: homes/<id>.html, one per home (see the header), and the tag that tells the player they exist
-const esc = (v: unknown): string => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// 5. the story site: the families' pages, the sanitised specs, the pictures, the data, the manifest and the player's public head
 const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'] : '') || process.env.SITE_URL || 'https://homes.ci.computer/').replace(/\/?$/, '/');
-const SITE_TITLE = 'Virtual homes · Companion Intelligence';
-const SITE_NAME = 'Companion Intelligence';   // og:site_name on every page: the title says which part of it
 {
-  const site = SITE;
-  const shortStyle = (s?: string): string => (s || '').split(/[:;,(]| with | over | under /)[0].trim();
-  fs.mkdirSync(path.join(OUT, 'homes'), { recursive: true });
-  for (const h of index.houses || []) {
-    if (!/^[a-z0-9-]+$/.test(h.id)) { problems.push(`house id ${JSON.stringify(h.id)} is not [a-z0-9-]: no share page`); continue; }
-    const player = `../room-creator.html?mode=view&house=${h.id}`;
-    const image = new URL(`portal/previews/${h.id}.jpg`, site).href;
-    const style = shortStyle(h.style);
-    const name = displayName(h);
-    // the credit names the build by its own title where the portal's name differs from it ("After the Sims 4
-    // build “Base Game Modern Home” by SimsWithNora"): the unfurl is somewhere a visitor can read it
-    const credit = buildCredit(h);
-    const desc = `${style ? `${style}. ` : ''}${credit ? `${credit}. ` : ''}Built live in 3D in your browser: fly its camera paths and change the hour.`;
-    const page = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${esc(name)} · Virtual homes</title>
-  <meta name="description" content="${esc(desc)}">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="${esc(SITE_NAME)}">
-  <meta property="og:title" content="${esc(name)}">
-  <meta property="og:description" content="${esc(desc)}">
-  <meta property="og:image" content="${esc(image)}">
-  <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="${esc(`An aerial view of ${name}`)}">
-  <meta property="og:url" content="${esc(new URL(`homes/${h.id}.html`, site).href)}">
-  <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="../assets/brand/ci-logo-mark.svg" type="image/svg+xml">
-  <script>location.replace(${JSON.stringify(player)} + (location.search ? '&' + location.search.slice(1) : '') + location.hash);</script>
-</head>
-<body>
-  <p><a href="${esc(player)}">Open ${esc(name)} in 3D</a></p>
-</body>
-</html>
-`;
-    fs.writeFileSync(path.join(OUT, 'homes', `${h.id}.html`), page);
-    files++; bytes += page.length;
-  }
-  const rc = path.join(OUT, 'room-creator.html');
-  const text = fs.readFileSync(rc, 'utf8');
-  if (!text.includes('</head>')) problems.push('room-creator.html has no </head> for the share tag');
-  else fs.writeFileSync(rc, text.replace('</head>', '  <meta name="vh-share" content="homes/">\n</head>'));
+  const r = await buildStorySite({ ROOT, OUT, SITE, args, problems, track: f => { shipped.add(f); } });
+  files += r.files; bytes += r.bytes;
 }
-
-// 5d. link previews for the site's own pages. The gallery's og:image is relative in the source (a checkout has no
-// address); here it becomes the site's, with og:url. room-creator.html's static head is the editor's (its title
-// and a description naming the editor), which is all an unfurler reads of a player URL copied from the address
-// bar: on the site it is the site's title, description and hero instead. The editor works the same; only its
-// tab title differs on the deployed site.
-{
-  const hero = new URL('portal/hero.jpg', SITE).href;
-  const ix = path.join(OUT, 'index.html');
-  let gallery = fs.readFileSync(ix, 'utf8');
-  const rel = '<meta property="og:image" content="./portal/hero.jpg">';
-  if (!gallery.includes(rel)) problems.push('index.html: no relative og:image for the hero to make absolute');
-  gallery = gallery.replace(rel, `<meta property="og:image" content="${esc(hero)}">\n  <meta property="og:url" content="${esc(SITE)}">`);
-  fs.writeFileSync(ix, gallery);
-
-  const rc = path.join(OUT, 'room-creator.html');
-  let page = fs.readFileSync(rc, 'utf8');
-  const desc = (gallery.match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
-  const head = `<title>${esc(SITE_TITLE)}</title>
-  <meta name="description" content="${desc}">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="${esc(SITE_NAME)}">
-  <meta property="og:title" content="${esc(SITE_TITLE)}">
-  <meta property="og:description" content="${desc}">
-  <meta property="og:image" content="${esc(hero)}">
-  <meta property="og:image:type" content="image/jpeg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">`;
-  const before = page;
-  page = page.replace(/<title>[^<]*<\/title>\s*<meta name="description" content="[^"]*">/, () => head);
-  if (page === before) problems.push('room-creator.html: its static <title> and description were not found to replace');
-  if (/Room Creator|SimsTree|Pascal Editor/.test(page.slice(0, page.indexOf('<script')))) problems.push('room-creator.html: the static head still names the editor');
-  // a module asked for before the import map makes a browser without multiple-import-map support drop the map
-  // (and three.js with it): only Chromium would still start
-  const map = page.indexOf('<script type="importmap">');
-  if (map < 0 || /\bimport\(|type="module"|rel="modulepreload"/.test(page.slice(0, map))) problems.push('room-creator.html: a module is loaded before the import map');
-  fs.writeFileSync(rc, page);
-}
+if (problems.length) { console.error(problems.map(p => `  ✗ ${p}`).join('\n')); process.exit(1); }   // (the steps below read the pages it writes)
 
 // 5e. name every module and stylesheet by a hash of its content. The files are not fingerprinted by name (assets/viewer.js is
 // the same URL on every deploy), and nothing server-side can be relied on to keep a browser from reusing a stale copy:
@@ -234,15 +114,19 @@ const SITE_NAME = 'Companion Intelligence';   // og:site_name on every page: the
   const modules = walkOut('assets', f => f.endsWith('.js') && !isVendor(f)).map(f => f.split(path.sep).join('/')).sort();
   const sheetsAndScripts = walkOut('portal', f => /\.(js|css)$/.test(f)).map(f => f.split(path.sep).join('/')).sort();
   const hashes = new Map<string, string>([...modules, ...sheetsAndScripts].map(f => [f, hashOf(f)]));
-  const versioned = (f: string): string => `./${f}?v=${hashes.get(f)}`;
+  const versioned = (f: string, prefix = './'): string => `${prefix}${f}?v=${hashes.get(f)}`;
   const moduleMap: Record<string, string> = Object.fromEntries(modules.map(f => [`./${f}`, versioned(f)]));
+  // the landing warms three.js, the builder and the player when a card is pointed at (portal/gallery.js), by the URL the
+  // player will ask for: these two are the only modules it names, so its import map holds only them
+  const WARM = ['assets/house-builder.js', 'assets/viewer.js'];
+  const warmMap: Record<string, string> = Object.fromEntries(WARM.map(f => [`./${f}`, versioned(f)]));
 
   const importMapBlock = (imports: Record<string, string>): string => `<script type="importmap">\n${JSON.stringify({ imports }, null, 2).replace(/^/gm, '  ')}\n  </script>`;
-  const retag = (html: string, name: string): string => html.replace(/((?:src|href)=")(\.\/(?:assets|portal)\/[^"?#]+\.(?:js|css))(")/g, (whole, a: string, url: string, z: string) => {
-    const f = url.slice(2);
+  const retag = (html: string, name: string): string => html.replace(/((?:src|href)=")((?:\.\.?\/)(?:assets|portal)\/[^"?#]+\.(?:js|css))(")/g, (whole, a: string, url: string, z: string) => {
+    const f = url.replace(/^\.\.?\//, '');
     if (isVendor(f)) return whole;
     if (!hashes.has(f)) { problems.push(`${name}: ${url} is not in the output, so it cannot be fingerprinted`); return whole; }
-    return `${a}${versioned(f)}${z}`;
+    return `${a}${versioned(f, url.slice(0, url.length - f.length))}${z}`;
   });
 
   // room-creator.html: add to the page's own import map (three.js and its addons stay as they are)
@@ -258,19 +142,22 @@ const SITE_NAME = 'Companion Intelligence';   // og:site_name on every page: the
     }
     fs.writeFileSync(rc, retag(page, 'room-creator.html'));
   }
-  // index.html: the gallery imports a module of the engine (assets/home-names.js) and had no import map; it goes before
+  // index.html: no module of its own is imported, but the warm-up needs the player's hashed URLs; the map goes before
   // anything that loads a module
   {
     const ix = path.join(OUT, 'index.html');
     let page = fs.readFileSync(ix, 'utf8');
     if (/<script type="importmap">/.test(page)) problems.push('index.html: it already has an import map; merge the module hashes into it');
     else if (!/<head[^>]*>/.test(page)) problems.push('index.html: no <head> to put the import map in');
-    else page = page.replace(/<head[^>]*>/, tag => `${tag}\n  ${importMapBlock(moduleMap)}`);
+    else page = page.replace(/<head[^>]*>/, tag => `${tag}\n  ${importMapBlock(warmMap)}`);
     fs.writeFileSync(ix, retag(page, 'index.html'));
   }
+  // the static pages (the families', the credits) link the same stylesheets and script, one folder up for a family
+  const staticPages = [...(fs.existsSync(path.join(OUT, 'family')) ? fs.readdirSync(path.join(OUT, 'family')).map(f => path.join('family', f)) : []), 'credits.html'];
+  for (const name of staticPages) fs.writeFileSync(path.join(OUT, name), retag(fs.readFileSync(path.join(OUT, name), 'utf8'), name));
   // nothing the pages name may be left un-hashed
-  for (const name of ['index.html', 'room-creator.html']) {
-    const left = [...fs.readFileSync(path.join(OUT, name), 'utf8').matchAll(/(?:src|href)="(\.\/(?:assets|portal)\/[^"?#]+\.(?:js|css))"/g)].map(x => x[1]).filter(u => !isVendor(u.slice(2)));
+  for (const name of ['index.html', 'room-creator.html', ...staticPages]) {
+    const left = [...fs.readFileSync(path.join(OUT, name), 'utf8').matchAll(/(?:src|href)="(\.\.?\/(?:assets|portal)\/[^"?#]+\.(?:js|css))"/g)].map(x => x[1]).filter(u => !isVendor(u.replace(/^\.\.?\//, '')));
     if (left.length) problems.push(`${name}: still names ${left.slice(0, 3).join(', ')} without a content hash`);
   }
   console.log(`portal: ${modules.length} modules and ${sheetsAndScripts.length} portal scripts/styles named by content hash`);
@@ -278,25 +165,43 @@ const SITE_NAME = 'Companion Intelligence';   // og:site_name on every page: the
 
 // 6. every relative URL the pages and stylesheets name must be in the output (a query or a fragment is fine)
 const refs = new Set<string>();
-const scan = (fileRel: string, re: RegExp): void => {
+const scan = (fileRel: string, re: RegExp, map: (u: string) => string = u => u): void => {
   const text = fs.readFileSync(path.join(OUT, fileRel), 'utf8');
   for (const m of text.matchAll(re)) {
-    const u = m[1];
+    const u = map(m[1]);
     if (/^(https?:|data:|mailto:|#|\$\{|javascript:)/.test(u) || u.includes('${')) continue;
     const clean = u.split(/[?#]/)[0];
     if (!clean) continue;
     refs.add(path.normalize(path.join(path.dirname(fileRel), clean)));
   }
 };
-for (const p of ['index.html', 'room-creator.html', ...(fs.existsSync(path.join(OUT, 'homes')) ? fs.readdirSync(path.join(OUT, 'homes')).map(f => path.join('homes', f)) : [])]) scan(p, /(?:href|src)="([^"]+)"/g);
+const pages = ['index.html', 'room-creator.html', 'credits.html', ...(fs.existsSync(path.join(OUT, 'family')) ? fs.readdirSync(path.join(OUT, 'family')).map(f => path.join('family', f)) : [])];
+// (the pages link a family extensionless, `family/<slug>` and `./<slug>` from one family to the next, which the host serves
+// from <slug>.html)
+const sub = (u: string, from: string): string => u.replace(/^([^?#]*)([?#].*)?$/, (_, p: string, rest = '') => (from.startsWith('family') ? /^\.\/[a-z-]+$/.test(p) : /^(\.\/)?family\/[a-z-]+$/.test(p)) ? `${p}.html${rest}` : u);
+for (const p of pages) scan(p, /(?:href|src)="([^"]+)"/g, u => sub(u, p));
 for (const p of ['index.html', 'room-creator.html']) scan(p, /from '(\.[^']+)'/g);
 for (const p of walk('portal', f => f.endsWith('.css'))) scan(p, /url\("?(\.[^")]+)"?\)/g);
 for (const r of refs) if (!fs.existsSync(path.join(OUT, r))) problems.push(`${r} is linked but not in ${rel(OUT)}`);
 // a root-relative URL would escape the /ci-virtual-home/ sub-path
-for (const p of ['index.html', 'room-creator.html', ...walk('portal', f => /\.(css|js)$/.test(f))]) {
+for (const p of [...pages, ...walk('portal', f => /\.(css|js)$/.test(f))]) {
   const text = fs.readFileSync(path.join(OUT, p), 'utf8');
   const bad = text.match(/(?:href|src)="\/(?!\/)[^"]*"|url\("?\/(?!\/)[^")]*"?\)|fetch\(['"`]\/(?!\/)/);
   if (bad) problems.push(`${p}: root-relative URL ${bad[0]} breaks under a sub-path`);
+}
+
+// 7. the allowlist: every file in the output is one this build wrote (what the site loads, nothing else), and nothing it wrote is gone
+{
+  const onDisk = new Set<string>();
+  const sweep = (relDir: string): void => {
+    const dir = path.join(OUT, relDir);
+    if (!fs.existsSync(dir)) return;
+    for (const n of fs.readdirSync(dir)) { const r = relDir ? `${relDir}/${n}` : n; if (fs.statSync(path.join(OUT, r)).isDirectory()) sweep(r); else onDisk.add(r); }
+  };
+  for (const o of OWNED) { if (fs.existsSync(path.join(OUT, o))) { if (fs.statSync(path.join(OUT, o)).isDirectory()) sweep(o); else onDisk.add(o); } }
+  const extra = [...onDisk].filter(f => !shipped.has(f)), missing = [...shipped].filter(f => !onDisk.has(f));
+  if (extra.length) problems.push(`${extra.length} file${extra.length === 1 ? '' : 's'} in ${rel(OUT)} nothing asked for: ${extra.slice(0, 4).join(', ')}${extra.length > 4 ? ', …' : ''}`);
+  if (missing.length) problems.push(`${missing.length} file${missing.length === 1 ? '' : 's'} the build wrote are gone: ${missing.slice(0, 4).join(', ')}`);
 }
 
 if (problems.length) { console.error(problems.map(p => `  ✗ ${p}`).join('\n')); process.exit(1); }

@@ -12,10 +12,11 @@ compiled from it:
 | **CAD floor plans** — one blueprint sheet per level, SVG + PNG, and a `floorplans.json` index | `scripts/generate_floor_plans.py` | `scenes/floorplans/` |
 | **Isometric cutaways** — landscape + portrait SVG and a pure-vector Lottie animation per house | `scripts/generate_house_iso.py` | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` |
 | **Product-shot videos** — frame-stepped, deterministic H.264 per house × shot, with posters | `scripts/render-house-shots.mts` (headless Chromium) | `video/houses/` (gitignored; browse with `video/houses/index.html`) |
-| **Web portal** — a gallery of the homes and a live player to fly their camera paths | [`index.html`](index.html), `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://homes.ci.computer/> (Cloudflare Pages, deployed from `main`; see [Deploying](#deploying)) |
+| **The public site** — thirty fictional families, each with a page and a live 3D tour of their home | [`index.html`](index.html) (template), `scripts/story/site.mts`, `room-creator.html?mode=view` ([`assets/viewer.ts`](assets/viewer.ts)), `scripts/build-portal.mts` | `dist/` → <https://homes.ci.computer/> (Cloudflare Pages, deployed from `main`; see [Deploying](#deploying)) |
 
-30 houses ship today, each a Sims 4 gallery build re-authored as a spec (see [THIRD_PARTY.md](THIRD_PARTY.md)
-for how they are credited).
+30 houses ship today (where each came from is in [THIRD_PARTY.md](THIRD_PARTY.md)). The public site does not present
+them as houses: it presents thirty fictional families, one per house, and never names a home or a builder (see
+[The public site](#the-public-site)).
 
 ## Quickstart
 
@@ -30,14 +31,13 @@ pnpm install                       # esbuild, typescript, and the exact Playwrig
 pnpm exec playwright install chromium   # its browser, once (skipped if ~/Library/Caches/ms-playwright has it)
 pnpm run build                     # assets/**/*.ts → sibling .js the page loads
 pnpm run serve                     # http://localhost:8080/room-creator.html?house=aurora — the editor
-                                   # http://localhost:8080/ — the portal's gallery
+                                   # (the public site is built, not served from here: pnpm run portal:preview)
 ```
 
 `room-creator.html` is plain ES modules with an importmap — no bundler — so any static server over the repo
 root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `shot=door-to-core|orbit|hero-reveal|walkthrough|core-orbit`,
 `t=<0…1>` (the moment in the shot), `lighting=day|golden|dusk|night`, `mode=review|edit`, `flythrough=1`, `res`, `aspect`, `planner=v2` (the spline planner v2 for every door-to-core, hero-reveal and walkthrough; v1 otherwise); the
-editor writes the first five as you change them, so a URL is a view (see [The editor](#the-editor)). Its "All homes" link opens
-the portal's gallery, `./index.html`; `mode=view` turns the page into the portal's player (see [The web portal](#the-web-portal)).
+editor writes the first five as you change them, so a URL is a view (see [The editor](#the-editor)). `mode=view` turns the page into the public site's player (see [The public site](#the-public-site)).
 
 ## Commands
 
@@ -69,10 +69,11 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run index` | Validate every spec and rebuild `content/houses/index.json` (the page's house list). |
 | `pnpm run prop-sheet` | Contact sheet of props, measured against their declared sizes (`--types`, `--module`, `--all`). |
 | `pnpm run export:core` | The Companion Core as glTF (`--finish`, `--pose`) → `dist/models/`. |
-| `pnpm run portal:thumbs` | Render the gallery's thumbnails → `portal/thumbs/<id>.webp` and `portal/hero.webp`, and the link-preview JPEGs → `portal/previews/<id>.jpg` and `portal/hero.jpg` (`--house`, `--hero`, `--hero-tod`, `--max-kb`). Needs a GPU; commit the output. |
-| `pnpm run portal:build` | Assemble the site in `dist/` — only what it loads — and check its links. Needs `build`. |
+| `pnpm run portal:thumbs` | Render the pictures the site is made from → `portal/thumbs/<house id>.webp` and `portal/hero.webp` (the featured family's), and the 1200 × 630 JPEGs `portal/previews/<house id>.jpg` and `portal/hero.jpg` (`--house`, `--hero`, `--hero-tod`, `--max-kb`). They keep the house's id because they are inputs: the build ships them under the family's slug with a content hash. Needs a GPU; commit the output. |
+| `pnpm run portal:og` | Draw the link-preview images → `portal/og/<slug>.jpg` and `home.jpg`, with `portal/og/manifest.json` (Chromium's 2D canvas, no GPU; `--only`, `--families`). Re-run it when a family's text or its preview picture changes: a production build refuses a stale one. Commit the output. |
+| `pnpm run portal:build` | Assemble the site in `dist/` — only what it loads — and check its links. Needs `build`. `--allow-partial` builds the families there are (development and previews; the live address needs all thirty); `--families <dir>` reads another folder. |
 | `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
-| `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
+| `pnpm run portal:test` | Check the built site under `/ci-virtual-home/`: the leak scan, slugs and routes, the copy lint, the landing's weight, then in Chromium the landing and its filters, the family pages, an accessibility audit, the player (fly, share, old links, failures) and the editor from a checkout (`--family a,b,c`, `--shots`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). Run it alone: one browser at a time. |
 | `pnpm run ui:test` | Drive the editor end to end (layout at four sizes in both schemes, contrast, the top bar, the checks, the timeline, the tree, the catalog, Compare, stills at 4K, a recorded MP4 checked with ffprobe and by PSNR) — `--only <sections>`, `--shots <dir>`. Needs a GPU and ffmpeg. |
 
 Every script resolves the repo from its own location, so they run from any directory. After editing a spec:
@@ -82,10 +83,15 @@ Every script resolves the repo from its own location, so they run from any direc
 
 ```
 room-creator.html          the editor + renderer page; loads assets/*.js and content/houses/*.json.
-                           ?mode=view is the portal's player (assets/viewer.ts, portal/viewer.css)
-index.html                 the portal's gallery (portal/gallery.css, portal/gallery.js)
-portal/                    the portal's styles and script, thumbs/<id>.webp and hero.webp, and the link-preview
-                           JPEGs previews/<id>.jpg and hero.jpg (derived, committed)
+                           ?mode=view is the player (assets/viewer.ts, portal/viewer.css); in dist/ it is the player only
+index.html                 the landing's TEMPLATE (portal/site.css, gallery.css, gallery.js); scripts/story/site.mts fills it
+portal/                    the site's styles and scripts, fonts/ (Archivo Black), thumbs/<house id>.webp, hero.webp, previews/
+                           <house id>.jpg and hero.jpg (derived, committed, shipped by slug and hash) and og/ (link previews)
+content/families/          the authored stories, <slug>.json (the writers' files; the voice and bake locks sit beside them)
+content/story/             casting.json (slug <-> house), claims.json, catalog-apps.json, the schema: the story system's inputs
+assets/site/identity.ts    who a home is on screen: the family's title, address, share link and errors (the only place)
+scripts/story/             site.mts (the build of the public pages), pages.mts, site-lib.mts, build-og.mts, check-leaks.mts,
+                           check-copy.mts, hooks.ts (the seams: ship/*.mts at build, portal-tests/*.mts at test)
 floorplan-graph-demo.html  the Phase 2 floor-plan graph beside its compiled walls
 assets/                    the three.js engine, in TypeScript. house-builder.ts is the orchestrator; each part is a
                            module one stream owns: item-map + hero-build (kit), structure-build (architecture),
@@ -175,80 +181,91 @@ Every `__house*` hook the gates and the portal use is unchanged; the editor adds
 `__houseRenderFrames(from, count, null)` (draw without encoding a JPEG) and a studio scene's shot key for `__houseRenderBegin`.
 `pnpm run ui:test` is the acceptance for all of it.
 
-## The web portal
+## The public site
 
-A static site anyone can open: [`index.html`](index.html) lists the homes from `content/houses/index.json` with
-the committed thumbnails (no WebGL on the gallery), and a card opens the live player,
+<a id="the-public-site"></a>The site is thirty **fictional families**, one per house: a landing, a page for each family, and a live 3D
+tour of their home. It says "Fictional family. Real software." wherever a family is, and it names no home, no builder and no
+house id anywhere (the owner's rule; provenance stays in this repository, in [THIRD_PARTY.md](THIRD_PARTY.md) and the specs'
+own `author` and `source` fields, which are never edited and never shipped).
 
-```
-room-creator.html?mode=view&house=<id>[&shot=<shot>][&t=<0…1>][&tod=day|golden|dusk|night][&play=1|0]
-```
+| URL | What |
+|---|---|
+| `/` | the landing: the first-run steps, the family cards with a household facet, ten topic chips and a search, a story in every room, what local means, the Companion Hub's swaps, the disclosures |
+| `/family/<slug>` | a family's page (static HTML, readable without JavaScript): the people, every scene of the tour as a transcript, the apps with what they replace, how the Core starts. A query with `t`, `shot`, `tod`, `play` or `beat` forwards to the tour |
+| `/room-creator.html?mode=view&family=<slug>[&shot=<shot>][&t=<0…1>][&tod=day|golden|dusk|night][&play=1|0][&no=glass|…]` | the tour: the editor's own renderer with its chrome put away (player notes below) |
+| `/credits.html`, `/sitemap.xml`, `/robots.txt`, `/_redirects` | credits, crawlers, and the 301s from the old `homes/<id>.html` share pages |
 
-— the editor's own renderer with its chrome put away. `t` is the fraction of the shot; a link with `t` opens
-paused there, one without plays from the start, and `play=1|0` says so outright — but nothing starts moving by
-itself for a visitor whose system asks for reduced motion (the gallery's links carry no `play`). The player lists
-the shots from the house's presets (so `core-orbit` and any later shot type appear by themselves), plays them
-through the page's `applySplineFrame` (its frames are the recorder's frames), and adds a scrubber, speed, time of
-day, the camera path drawn in the scene, a free-flying camera (drag, WASD, Q/E, Esc back to the shot; O for an
-overview and C for a cutaway that opens the house; taking the camera pauses the shot, whose own camera stays in
-the scene as a ghost that Play moves along the path; the free camera stays above the lot's ground), share links,
-full screen and prev/next. Keys: Space, ←/→ (Shift: 5 s), Home/End, 1–9, T, P, F, O, C, Esc, [ ], Shift F, ?
-(Space on a focused button presses that button). Everything under `?mode=view` is additive: without it the page
-is the editor, and every `__house*` hook behaves as before.
+**Where the words come from.** One authored file per family, `content/families/<slug>.json` (schema in
+`content/story/schema/`, rules in the story bible). `scripts/story/site.mts` is the only thing that turns them into pages. The
+**slug** is the public name (`^[a-z]+(-[a-z]+){0,2}$`, never a creator's name; `content/story/casting.json` maps it to the
+internal house id). Nothing else in `dist/` carries a house id: the specs ship as `content/homes/<slug>.<hash10>.json` with
+`name`, `author`, `source`, `emoji` and `$schema` removed and every other byte as it was (the `id` stays: 25 call sites seed the
+geometry from it). The old `?house=<id>` links still work: the player hashes the id (SHA-256, 12 hex), looks the hash up in
+`story/legacy.<hash10>.json`, rewrites the address to `?family=<slug>` at once and shows only the family. An unknown address gets
+"There is no family at this address" and nothing is echoed.
 
-A few things the player does that the editor does not:
+**The build** (`pnpm run portal:build`, step 5 of `scripts/build-portal.mts`):
 
-- **Names.** The portal calls a home by `displayName` ([`assets/home-names.ts`](assets/home-names.ts)): the spec's
-  title with the Sims gallery shorthand taken out ("Base Game", "BG", a build budget, "Fix"), or a hand-picked
-  name where that would leave a twin, nothing or what reads as a typo ("Base Game Modern House 1" → "Modern
-  Studio House"). The gallery, the player, the pre-mount loader and the share pages all use it; the spec's own
-  title stays the credit: the gallery's footer lists every home against it and its builder, a share page's
-  description names it, and it is the tooltip beside the builder's name. The specs are not edited for it.
-- **Framing.** Shots are framed for 16:9. For a narrower window the player widens the field of view after
-  `applySplineFrame` has set the shot's own (`fitFov`: the geometric mean of keeping the vertical and keeping the
-  horizontal field, capped at 80°), so a phone held upright sees the house at the door and the Core with its desk
-  at the end; turned while flying, the free camera takes the field the shot would have at the new shape. The eye
-  path is untouched, and nothing a golden or a video renders goes through the player.
-- **The first shot.** A link without `shot` opens on the house's Orbit, the whole house from above, which reads on
-  every screen; Door to Core spends its middle in doorways and stairwells and is one tap away.
-- **The end of a shot** is a card over the dock: replay, another shot, the next home, and one line on what the
-  Companion Core is, linking to <https://ci.computer>. The title steps back while it shows. Where the card would
-  cover the Core (a phone on its side, a 4:3 tablet) it moves to the end of the dock away from the Core, or drops
-  its sentence and keeps the heading, the link and the buttons.
-- **Phones** (and short landscape screens) get a compact dock: one scrolling row of shot and time-of-day chips,
-  then play, the seek bar, the time and a More button whose sheet holds speed, path, fly, best quality and full
-  screen. Every control is a 44 px target on a touch screen, and the controls fade a few seconds into playback
-  (a tap on the scene brings them back). Between 761 and 1011 px (a tablet held upright) the full dock puts the
-  time of day on a row of its own, so every shot's chip shows. The orange tick where the Core wakes names itself
-  under the seek bar when pointed at, when the playhead reaches it, and on a touch screen as a shot starts; where
-  the free-camera bar has no room for its how-to, it shows once as a toast.
+- `dist/story/manifest.json` (type `SiteManifest`) is the one un-hashed data file, revalidated on every load; everything it points
+  to is named `<name>.<hash10>.<ext>` and cached for a year (`portal/_headers`): the sanitised specs, `story/families.<hash>.json`
+  (the cards), `story/legacy.<hash>.json`, thumbnails, posters, link-preview images, Archivo Black, and whatever the other packages add.
+- `scripts/story/ship/*.mts` and `scripts/story/portal-tests/*.mts` are the seams (types in `scripts/story/hooks.ts`): the
+  voice-over, the tour and the films drop a file in and are built and tested without touching `build-portal.mts` or
+  `test-portal.mts`.
+- The output is an allowlist: the build fails on a file nothing asked for or one it wrote that is gone, on a link to a file the
+  output lacks, on a root-relative URL, and on a family whose app is not in `content/story/catalog-apps.json`.
+- A **production** build (`https://homes.ci.computer/`, the default) needs all thirty families and current link-preview images
+  (`pnpm run portal:og`). Any other address (`--site-url`, `$SITE_URL`: a preview, a checkout) or `--allow-partial` builds the
+  families that exist, with `noindex`; with none yet it builds the three test families in `test/fixtures/site/families/`.
+- `dist/room-creator.html` is the player only: `window.__VH_PUBLIC=1` is written into it, a visit without `?mode=view` is sent to
+  the landing, its static head is the site's, and comments that name a home or a builder are taken out of it and of the compiled
+  modules. `assets/home-names.js` is replaced by a neutral stub. The editor works from a checkout as it always did.
 
-Until the player's module has mounted, `room-creator.html`'s head script is the player: the house's poster, its
-name once `index.json` is in, a loader that says so when a slow connection makes it take a while, and a card with
-**Try again** and **See all homes** when the page cannot start (no WebGL 2, a module that did not download, an
-engine that threw). An id the index does not list gets the error card at once, with nothing built behind it. The
-player asks no third party for anything: its fonts, including the ones the scene draws text in, are the repo's
-own (`portal/viewer.css`); only the editor links Google Fonts.
+**The checks** (`pnpm run portal:test`, alone on the machine): T1 a leak scan of every file and file name (`scripts/story/check-leaks.mts`);
+T2 slugs, routes, the sitemap and the legacy map; T3 the copy lint of every page and the card data against `claims.json`
+(`scripts/story/check-copy.mts`); T4 every app is in the catalog; T9 the landing's weight (HTML + JS + CSS + JSON under 400 KB, and no
+audio, video, three.js or engine module before an interaction); T10 the offline renderers are untouched; then the browser checks.
+The accessibility audit is in-repo (names, landmarks, headings, labels, ids, contrast) because axe-core is MPL-2.0.
 
-The share button hands out `homes/<id>.html`: `portal:build` writes one page per home with the home's own title,
-description and preview image as link-preview tags (an unfurler never runs the player), and it forwards to the
-player with the link's query. Preview images are JPEG at 1200 × 630 (`portal/previews/<id>.jpg`, and
-`portal/hero.jpg` for the gallery and the player): LinkedIn and some other unfurlers read no WebP. A checkout served as it is has no such pages, and shares the player's own URL. The gallery
-carries preview tags too, and in `dist/` `room-creator.html`'s static title and description (the editor's, in the
-source) are replaced by the site's, so a player URL copied from the address bar never unfurls as the editor.
-Preview images must be absolute: `portal:build` takes the site's address from `--site-url`, else `$SITE_URL`, else
-the live site, `https://homes.ci.computer/`.
+### The player
 
-Every URL in the site is relative, so the same tree works at the root of any host (the live site, a preview's
-`pages.dev` address) and under a sub-path; `portal:preview` and `portal:test` serve it at `/ci-virtual-home/` to
-prove it. `portal:build` copies only what the site loads into `dist/` (and refuses stale compiled assets, a missing
-spec or thumbnail, a link to a file it does not ship, a root-relative URL, and hero figures in `index.html` that
-disagree with `index.json`); CI runs it on every PR. Nothing renders in CI: when a house's look changes, re-run
-`pnpm run portal:thumbs --house <id>` on a GPU and commit the new thumbnail and preview with the change.
-`portal:test` is the check to run before pushing portal work.
+The tour is `room-creator.html?mode=view&family=<slug>`. `t` is the fraction of the shot; a link with `t` opens paused there, one
+without plays from the start, and `play=1|0` says so outright, but nothing starts moving by itself for a visitor whose system asks
+for reduced motion (the landing's links carry no `play`). The player lists the shots from the house's presets, plays them through the
+page's `applySplineFrame` (its frames are the recorder's frames), and adds a scrubber, speed, time of day, the camera path drawn in
+the scene, a free-flying camera (drag, WASD, Q/E, Esc back to the shot; O for an overview and C for a cutaway that opens the house;
+taking the camera pauses the shot, whose own camera stays in the scene as a ghost that Play moves along the path; the free camera
+stays above the lot's ground), share links, full screen and previous and next family. Keys: Space, ←/→ (Shift: 5 s), Home/End, 1–9,
+T, P, F, O, C, Esc, [ ], Shift F, ? (Space on a focused button presses that button). Everything under `?mode=view` is additive: without
+it the page is the editor, and every `__house*` hook behaves as before.
 
-The site is public to anyone with its address, and it serves what a browser needs to draw the homes: the
-compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
+- **Names.** The player says what the family list says (`assets/site/identity.ts`): "The <Surname> family", the invented address and
+  the disclosure under it; the tab reads `<title> · Companion Core`. In public mode the page's "house id" is the slug: the head
+  script builds `window.__vhIndex` from the family list, sets `window.__vhWant`, and `loadHouse(slug)` fetches the sanitised spec by
+  the URL the manifest names (`window.__vhSpecUrl`). In a checkout (`?house=<id>`, as the perf tools use it) the title is the id
+  spelled out; there is no credit anywhere.
+- **Framing.** Shots are framed for 16:9. For a narrower window the player widens the field of view after `applySplineFrame` has set
+  the shot's own (`fitFov`: the geometric mean of keeping the vertical and keeping the horizontal field, capped at 80°). The eye path
+  is untouched, and nothing a golden or a video renders goes through the player.
+- **The first shot.** A link without `shot` opens on the house's Orbit; Door to Core is one tap away.
+- **The end of a shot** is a card over the dock: replay, another shot, the next family, and one line on what the Companion Core is,
+  linking to <https://ci.computer>. Where it would cover the Core it moves away from it, or drops its sentence.
+- **Phones** get a compact dock: one scrolling row of chips, then play, the seek bar, the time and a More sheet. Every control is a
+  44 px target on a touch screen.
+
+Until the player's module has mounted, `room-creator.html`'s head script is the player: the poster, the family's name, a loader that
+says so when a slow connection makes it take a while, and a card with **Try again** and **See all families** when the page cannot start.
+The player asks no third party for anything.
+
+Every URL in the site is relative, so the same tree works at the root of any host and under a sub-path; `portal:preview` and
+`portal:test` serve it at `/ci-virtual-home/` to prove it. Family pages are linked and served without an extension
+(`family/<slug>`); `scripts/portal-lib.mts` does what Cloudflare Pages does. Nothing renders in CI: when a house's look changes,
+re-run `pnpm run portal:thumbs --house <id>` on a GPU and `pnpm run portal:og`, and commit the new pictures with the change.
+
+**The first preview deploy must confirm** (not verifiable from here): that Pages serves `family/<slug>.html` at `/family/<slug>`
+without an extension, and what it does with a trailing slash; that a `_redirects` 301 keeps the query string
+(`/homes/<id>.html?t=…`); that the `! Cache-Control` lines of `portal/_headers` take the revalidate rule off the hashed folders (look
+at a response from `/portal/thumbs/…` and at `/story/manifest.json`); and that `story/manifest.json` revalidates. Record the answers here.
 
 ### Deploying
 
@@ -277,7 +294,7 @@ and every home stopped with "This home could not be opened" (`'./assets/shot-tra
 'trackView'`). Two layers keep it from happening again:
 
 - **The page names every module by a hash of its content.** `portal:build` adds each `assets/**/*.js` (not
-  `vendor/`) to the page's import map as `./assets/x.js` → `./assets/x.js?v=<hash>`, adds an import map to `index.html`,
+  `vendor/`) to the page's import map as `./assets/x.js` → `./assets/x.js?v=<hash>`, adds a small one (the two modules the landing warms) to `index.html`,
   and puts the same `?v=` on the `<script>`, `<link rel="stylesheet">` and `<link rel="modulepreload">` tags. A module's
   own relative imports resolve to the plain URL, which the map rewrites, so a module never needs to know its
   neighbours' hashes and a change to one file changes only its own URL. The page itself is never cached, so it always

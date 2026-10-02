@@ -5,9 +5,9 @@
 //   pnpm run portal:thumbs [--house aurora,mirage] [--hero aurora] [--no-hero] [--max-kb 60] [--out portal/thumbs]
 //
 //   portal/thumbs/<id>.webp     640 × 360, ≤ --max-kb (quality stepped down until it fits)
-//   portal/hero.webp            1600 × 900 of --hero (default aurora, the house index.html's hero plays), ≤ 190 KB
+//   portal/hero.webp            1600 × 900 of --hero (default: the featured family's house, the one the landing's hero shows), ≤ 190 KB
 //   portal/previews/<id>.jpg    1200 × 630 JPEG, ≤ 110 KB: the link-preview image of the home's share page
-//   portal/hero.jpg             1200 × 630 JPEG of the hero, ≤ 170 KB: the gallery's and the player's link preview
+//   portal/hero.jpg             1200 × 630 JPEG of the hero, ≤ 170 KB: the base of the landing's link preview (pnpm run portal:og)
 //
 // The previews are JPEG, not WebP, and 1.91:1: that is what every unfurler takes (LinkedIn reads no WebP), and
 // the size they show large. They are the same framing, rendered at 720p and cropped top and bottom.
@@ -25,12 +25,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts, houseIds } from './portal-lib.mts';
+import { FEATURED } from './story/site-lib.mts';
 
 const args = parseArgs(process.argv.slice(2));
 const OUT = path.resolve(args.out || path.join(ROOT, 'portal', 'thumbs'));
 const PREVIEWS = path.join(path.dirname(OUT), 'previews');
 const HOUSES = args.house ? args.house.split(',').filter(Boolean) : houseIds();
-const HERO = args['no-hero'] === 'true' ? null : (args.hero || 'aurora');
+// the landing's hero is the featured family's home (scripts/story/site-lib.mts FEATURED); the pictures keep the house's own name
+// here because this tool is internal and its output is renamed by slug, with a hash, when the site is built
+const featuredHouse = ((): string => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'casting.json'), 'utf8')).families.find((f: { slug: string }) => f.slug === FEATURED).house; } catch { return 'aurora'; } })();
+const HERO = args['no-hero'] === 'true' ? null : (args.hero || featuredHouse);
 const MAX_KB = Number(args['max-kb'] || 60);
 const HERO_MAX_KB = Number(args['hero-max-kb'] || 190);
 const HERO_TOD = args['hero-tod'] || null;   // e.g. golden; default: the house's own hour
