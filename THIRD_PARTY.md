@@ -72,6 +72,14 @@ still links the Google Fonts stylesheet below, in the player as in the editor.
 | [`esbuild`](https://esbuild.github.io) | ^0.28.2 | MIT |
 | [`typescript`](https://www.typescriptlang.org) | ^5 | Apache-2.0 |
 | [`@types/node`](https://github.com/DefinitelyTyped/DefinitelyTyped) | ^22 | MIT |
+| [`iwer`](https://github.com/meta-quest/immersive-web-emulation-runtime) — Meta's Immersive Web Emulation Runtime, the emulated headset behind `pnpm run xr:test` (files used: `build/iwer.min.js`, injected into Chromium by `scripts/xr-harness/lib.mts`) | `2.5.0` — pinned exactly | MIT — © Meta Platforms, Inc. and affiliates |
+| [`gl-matrix`](https://github.com/toji/gl-matrix) — a dependency of `iwer`, installed with it (nothing of it is imported by name: `iwer.min.js` is a bundle that carries what it needs) | `3.4.4` (transitive) | MIT — © 2015-2025 Brandon Jones, Colin MacKenzie IV |
+| [`webxr-layers-polyfill`](https://github.com/immersive-web/webxr-layers-polyfill) — a dependency of `iwer`, installed with it (same: bundled into `iwer.min.js`) | `1.1.0` (transitive) | Apache-2.0 — the licence file is the unfilled Apache template; the package's author is DM Liao (Meta) |
+
+`iwer`, `gl-matrix` and `webxr-layers-polyfill` are test-only: they are never imported by anything under `assets/`, never
+copied into `dist/`, and never reach a visitor; `scripts/xr-harness/` reads `iwer.min.js` from `node_modules` and hands it to
+the browser under test. Their licence texts are in each package's `LICENSE`. (`@iwer/devui` and `@iwer/sem` are deliberately NOT
+installed: they pull in React 19 and a newer three.js than the player's r169.)
 
 The workflows (`.github/workflows/ci.yml`, `deploy.yml`) run GitHub's own `actions/checkout`, `actions/setup-node`,
 `actions/upload-artifact` and `actions/download-artifact` (MIT) and `pnpm/action-setup` (MIT), each pinned to a
