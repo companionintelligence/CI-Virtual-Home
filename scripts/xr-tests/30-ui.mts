@@ -424,11 +424,12 @@ export const looks = defineCase({
     // the sheet: a subject as wide as the room leaves no place beside it
     await p.page.evaluate(async () => {
       const d = (window as any).__d, b = d.beats()[3], f = b.anchor.focus;
-      b.anchor = { role: 'wall', box: [f[0] - 14, 0, f[2] - 0.3, f[0] + 14, 3, f[2] + 0.3], focus: f, level: null };
+      b.anchor = { role: 'wall', box: [f[0] - 14, -2, f[2] - 0.3, f[0] + 14, 12, f[2] + 0.3], focus: f, level: null };
       await d.go(3, 'jump');
     });
     await tickFrames(p, 30);
     t.note('sheet', await p.page.evaluate(() => { const r = (window as any).__d.enter; const l = r[r.length - 1]; return `${l.placement && l.placement.mode} ${l.notes.join('; ')}`; }));
+    t.check(/sheet/.test(await p.page.evaluate(() => { const r = (window as any).__d.enter; const l = r[r.length - 1]; return String(l.placement && l.placement.mode); })), 'a subject that fills the whole view did not get the sheet');
     await shot('sheet');
     await ui(p, (u: any) => u.showStatus({ title: 'Preparing your home', body: 'Building the headset view.', progress: 0.4 }));
     await tickFrames(p, 20);
