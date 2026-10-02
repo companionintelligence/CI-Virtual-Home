@@ -50,6 +50,9 @@
 // Every stream also owns its spec fragment (spec/<stream>.ts), validator plugin (scripts/validate/<stream>.mts),
 // scene checks (scene-qa/<stream>.ts), fleet metrics (scripts/fleet/<stream>.mts) and plan.json key
 // (plan-export/<stream>.ts). room-creator.html's shared builders alternate between streams: read its OWNER banners.
+// The live player's device layer (not a stream; nothing a frame or a golden reads imports it): viewer-tier.ts (the platform block viewer.ts
+// mounts: tier, pixel ratio, context loss), viewer-touch.ts and viewer-pad.ts (touch and gamepad free camera), viewer-fp.ts (their shared
+// first-person moves), on top of platform.ts and platform-types.ts (the capability profile and the tier data).
 //
 // The order below is load-bearing: scene objects, materials and seeded streams are created in it, and a frame
 // depends on all three (object and material ids break ties in three.js's render sort). Do not reorder.
