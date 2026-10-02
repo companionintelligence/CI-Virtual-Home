@@ -90,6 +90,18 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
     } finally { await on.close(); await off.close(); }
   }
 
+  // ---- 1b. kill switch and tier 0 draw what 03edd3b drew (only when the harness has the BASE_SHA tree)
+  if (env.base) {
+    for (const [label, query] of [['?no=frame', 'no=frame'], ['tier 0 (?q=0)', 'q=0']] as const) {
+      const mine = await env.open(house, { tod: 'dusk', query });
+      const ref = await env.open(house, { of: 'base', tod: 'dusk' });
+      try {
+        const [x, y] = [await mine.hash(), await ref.hash()];
+        add(`${house} dusk: ${label} draws what the base commit drew`, x === y, x === y ? x.slice(0, 8) : `${x.slice(0, 8)} vs ${y.slice(0, 8)}`);
+      } finally { await mine.close(); await ref.close(); }
+    }
+  }
+
   // ---- 2. accumulation -------------------------------------------------------------------------------------------------------
   {
     const t1 = await env.open('aurora', { tod: 'day', query: 'q=1' });

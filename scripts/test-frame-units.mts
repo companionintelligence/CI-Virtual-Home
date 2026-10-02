@@ -40,6 +40,19 @@ check(chunk !== chunkBefore && chunk.includes('if ( directLight.visible ) {'), '
 check((chunk.match(/vhClip\[ UNROLLED_LOOP_INDEX \]/g) || []).length === 1 && chunk.includes('vhB.z > 0.0') && chunk.includes('viewMatrix'), 'the clip test is in the spot loop, once, indexed by the unrolled loop index, and reads the draw\'s own view matrix');
 const spotBlock = chunk.slice(chunk.indexOf('getSpotLightInfo'), chunk.indexOf('#pragma unroll_loop_end', chunk.indexOf('getSpotLightInfo')));
 check(spotBlock.indexOf('vhClip[') > spotBlock.indexOf('getSpotLightInfo') && spotBlock.indexOf('vhClip[') < spotBlock.indexOf('RE_Direct'), 'and it runs after the cone test and before the BRDF');
+// three unrolls the spot loop (WebGLProgram.unrollLoops: the loop body is pasted N times with NO braces round it, so a declaration made
+// in the loop body is a redefinition from the second light on; portal:test, which compiles the shaders, caught this once)
+{
+  const unroll = (s: string) => s.replace(/#pragma unroll_loop_start\s+for\s*\(\s*int\s+i\s*=\s*(\d+)\s*;\s*i\s*<\s*(\d+)\s*;\s*i\s*\+\+\s*\)\s*{([\s\S]+?)}\s+#pragma unroll_loop_end/g, (_m, a, b, body) => { let r = ''; for (let k = parseInt(a); k < parseInt(b); k++) r += body.replace(/\[\s*i\s*\]/g, `[ ${k} ]`).replace(/UNROLLED_LOOP_INDEX/g, String(k)); return r; });
+  const spotLoop = chunk.slice(chunk.indexOf('#if ( NUM_SPOT_LIGHTS > 0 )'), chunk.indexOf('#if ( NUM_DIR_LIGHTS > 0 )'));
+  const flat = unroll(spotLoop.replace(/NUM_SPOT_LIGHTS/g, '3').replace(/NUM_POINT_LIGHTS/g, '0'));
+  // declarations at brace depth 0 of the unrolled loop must be unique
+  let depth = 0, names: string[] = [], dup = '';
+  const re = /[{}]|\b(?:vec[234]|float|int|bool|mat3|SpotLight|PointLight)\s+([A-Za-z_]\w*)\s*(?:[=;,])/g;
+  const inner = flat.slice(flat.indexOf('for') >= 0 ? 0 : 0);
+  for (let m; (m = re.exec(inner)); ) { if (m[0] === '{') depth++; else if (m[0] === '}') depth--; else if (depth === 0 && !m[0].startsWith('SpotLight spotLight')) { if (names.includes(m[1])) dup = m[1]; names.push(m[1]); } }
+  check(flat.includes('vhClip[ 2 ]') && flat.includes('vhClip[ 0 ]') && !dup, 'the clip survives three\'s loop unrolling: one block a light, no redeclared name', dup ? `'${dup}' is declared twice at the loop\'s scope` : '');
+}
 check(((THREE as any).ShaderChunk.lights_pars_begin as string).includes('uniform vec4 vhClip[ NUM_SPOT_LIGHTS ]'), 'the uniform arrays are declared with the spot lights');
 const lib = (THREE as any).ShaderLib;
 check(['lambert', 'phong', 'standard', 'physical', 'toon'].every(k => lib[k].uniforms.vhClip.value === lib.standard.uniforms.vhClip.value) && lib.standard.uniforms.vhClip.value instanceof Float32Array, 'every lit material type carries the same shared Float32Array');

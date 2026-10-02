@@ -41,14 +41,17 @@ const SPOT_INFO = 'getSpotLightInfo( spotLight, geometryPosition, directLight );
 // of it. The box is (cx, cz, half width, half depth) and (y low, y high), the last four packed two to a float as whole centimetres
 // (12 bits each; y from -10 m): a float32 holds 24 bits of integer exactly, and /4096 and floor() are exact in it. Zero half width = no
 // box = no clip, which is also what an all-zero array means (a program with more spots than the array, or a light without a room).
-// UNROLLED_LOOP_INDEX because three unrolls this loop and only rewrites `[ i ]`.
+// UNROLLED_LOOP_INDEX because three unrolls this loop and only rewrites `[ i ]`; the block braces because the unrolled copies share one
+// scope (a bare `vec4 vhB` is a redefinition from the second light on: portal:test caught it).
 const CLIP = `${SPOT_INFO}
-		vec4 vhB = vhClip[ UNROLLED_LOOP_INDEX ];
-		if ( directLight.visible && vhB.z > 0.0 ) {
-			vec3 vhW = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );
-			float vhHW = floor( vhB.z / 4096.0 ), vhYH = floor( vhB.w / 4096.0 );
-			float vhHD = vhB.z - vhHW * 4096.0, vhYL = vhB.w - vhYH * 4096.0;
-			if ( abs( vhW.x - vhB.x ) > vhHW * 0.01 || abs( vhW.z - vhB.y ) > vhHD * 0.01 || vhW.y < vhYL * 0.01 - 10.0 || vhW.y > vhYH * 0.01 - 10.0 ) { directLight.visible = false; directLight.color = vec3( 0.0 ); }
+		{
+			vec4 vhB = vhClip[ UNROLLED_LOOP_INDEX ];
+			if ( directLight.visible && vhB.z > 0.0 ) {
+				vec3 vhW = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );
+				float vhHW = floor( vhB.z / 4096.0 ), vhYH = floor( vhB.w / 4096.0 );
+				float vhHD = vhB.z - vhHW * 4096.0, vhYL = vhB.w - vhYH * 4096.0;
+				if ( abs( vhW.x - vhB.x ) > vhHW * 0.01 || abs( vhW.z - vhB.y ) > vhHD * 0.01 || vhW.y < vhYL * 0.01 - 10.0 || vhW.y > vhYH * 0.01 - 10.0 ) { directLight.visible = false; directLight.color = vec3( 0.0 ); }
+			}
 		}`;
 const CLIP_DECL = `
 #if NUM_SPOT_LIGHTS > 0
