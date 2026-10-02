@@ -490,7 +490,9 @@ Quest 3, a Quest 2 and a Vision Pro.
 pinned **devDependency**, listed in `THIRD_PARTY.md`) installed before the page's scripts, as a Quest 3, a Quest 2 or a
 Vision-like device (no controllers; hand input sources that are `transient-pointer` and exist only during a pinch). It
 discovers `scripts/xr-tests/*.mts`; each file exports named cases, and a package owns its own files: `00-*` the harness and the
-cross-cutting guarantees, `10-session`, `20-bake`, `30-ui`, `40-loco`.
+cross-cutting guarantees, `10-session`, `20-bake`, `30-ui`, `40-loco`. A file that starts with a shebang is a *standalone script*
+(it runs its own browser at import time): the runner never imports it, lists it in `--list`, and runs it after the cases, in its own
+process, only when `--only` names it (`--only 10`); convert it to cases when you can.
 
 ```bash
 pnpm run build && pnpm run portal:build
