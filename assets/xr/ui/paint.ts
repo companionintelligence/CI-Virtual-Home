@@ -259,6 +259,8 @@ export interface CardView {
   kicker?: string;
   /** the subject is farther than a person stands from it (a 'held' beat): say how far */
   far?: string;
+  /** the phone's screen as one line of text instead of a drawing (the DOM card's compact variant): for a card that would be taller than the view allows */
+  compact?: boolean;
 }
 export interface Layout {
   w: number; h: number; ops: Op[]; widgets: Widget[];
@@ -315,7 +317,12 @@ export function layoutBeatCard(measure: Measure, cv: CardView, m: Metrics, W: nu
   y += emB * 0.45;
 
   // ---- the phone's screen (a stylised drawing, never a screenshot): a header and a few rows
-  if (b.popup.kind === 'phone' && b.popup.phone) {
+  if (b.popup.kind === 'phone' && b.popup.phone && cv.compact) {
+    const ph = b.popup.phone, pf = fontOf(emS, 600), line = `${ph.header}: ${ph.rows.join(' · ')}`;
+    texts.push(ph.header, ...ph.rows);
+    for (const l of clampLines(measure, pf, wrapText(measure, pf, line, cw), 3, cw).lines) { ops.push({ k: 'text', x: pad, y: y + emS, s: l, font: pf, fill: t.accent }); y += emS * 1.45; }
+    y += emS * 0.4;
+  } else if (b.popup.kind === 'phone' && b.popup.phone) {
     const ph = b.popup.phone, pw = Math.min(cw, Math.round(emB * 15)), px0 = pad;
     const rowH = Math.round(emS * 2.15), headH = Math.round(emS * 2.3), rows = ph.rows.slice(0, 5);
     const hh = headH + rows.length * (rowH + emM * 0.35) + emM * 0.6;
@@ -391,6 +398,26 @@ export function layoutBeatCard(measure: Measure, cv: CardView, m: Metrics, W: nu
   return { w: W, h: Math.round(y), ops, widgets, texts, chrome, overflow, lines: { title: tl.lines.length, body: bl.lines.length } };
 }
 
+/** The tallest a card may be, in degrees: the view's comfortable height is 70, and the caption bar needs the bottom of it */
+export const MAX_CARD_DEG = 56;
+/** Lay the card out; if it is taller than MAX_CARD_DEG, lay it out again with the phone's screen as one line of text. */
+export function layoutBeatCardFit(measure: Measure, cv: CardView, m: Metrics, W: number): Layout {
+  const L = layoutBeatCard(measure, cv, m, W);
+  if (L.h / m.texelsPerDeg <= MAX_CARD_DEG || cv.compact || cv.beat.popup.kind !== 'phone') return L;
+  const C = layoutBeatCard(measure, { ...cv, compact: true }, m, W);
+  return C.h < L.h ? C : L;
+}
+
+/** width / height of the card at a width in degrees (memoised): what the placement solver asks when it tries wider cards */
+export function cardAspectAt(measure: Measure, cv: CardView, m: Metrics): (widthDeg: number) => number {
+  const memo = new Map<number, number>();
+  return (widthDeg) => {
+    let a = memo.get(widthDeg);
+    if (a === undefined) { const L = layoutBeatCardFit(measure, cv, m, Math.round(widthDeg * m.texelsPerDeg)); a = L.w / L.h; memo.set(widthDeg, a); }
+    return a;
+  };
+}
+
 /** The card, drawn. THREE-free: the browser's canvas here, the film's canvas in the story overlay. The canvas must be W x layout.h; call measureCard first to size it. */
 export function paintCard(ctx: CanvasRenderingContext2D, cv: CardView, m: Metrics, W = ctx.canvas.width): Layout {
   const L = layoutBeatCard(ctxMeasure(ctx), cv, m, W);
@@ -409,10 +436,10 @@ export function layoutStartCard(measure: Measure, v: TitleView, m: Metrics, W: n
   const emH = m.px('heading'), emB = m.px('body'), emS = m.px('small'), emM = m.px('min');
   let y = pad, overflow = false;
   const hf = fontOf(emH, 800), head = `The ${s.surname} family home`;
-  const hl = clampLines(measure, hf, wrapText(measure, hf, head, cw), 2, cw); texts.push(head); overflow ||= hl.cut;
+  const hl = clampLines(measure, hf, wrapText(measure, hf, head, cw), 3, cw); texts.push(head); overflow ||= hl.cut;
   for (const l of hl.lines) { ops.push({ k: 'text', x: pad, y: y + emH * 0.98, s: l, font: hf, fill: t.text }); y += emH * 1.18; }
   y += emB * 0.3;
-  const bf = fontOf(emB, 500), tl = clampLines(measure, bf, wrapText(measure, bf, s.tagline, cw), 4, cw); texts.push(s.tagline); overflow ||= tl.cut;
+  const bf = fontOf(emB, 500), tl = clampLines(measure, bf, wrapText(measure, bf, s.tagline, cw), 6, cw); texts.push(s.tagline); overflow ||= tl.cut;
   for (const l of tl.lines) { ops.push({ k: 'text', x: pad, y: y + emB, s: l, font: bf, fill: t.text }); y += emB * 1.48; }
   if (s.address) { const af = fontOf(emS, 500); texts.push(s.address); y += emS * 0.2; for (const l of clampLines(measure, af, wrapText(measure, af, s.address, cw), 2, cw).lines) { ops.push({ k: 'text', x: pad, y: y + emS, s: l, font: af, fill: t.muted }); y += emS * 1.45; } }
   y += emB * 0.5;
