@@ -9,6 +9,7 @@ import { Math } from './detmath.js';
 import { K, DEG, clamp, inFootprint, indoors, wrapPi, createWorldIndex, type ShotWorld } from './shot-world.js';
 import { createNav } from './shot-nav.js';
 import { camera, project, projectBox, type V3 } from './shot-probe.js';
+import { LENS_HERO_MAX } from './shot-spec.js';
 
 export type FleetRow = { id: string; duration: number; metrics: Record<string, any>; plan: Record<string, any>; errors: number; warnings: number };
 export type FleetCheck = { id: string; title: string; target: string; value: string; pass: boolean; advisory?: boolean; detail?: string; rows?: Array<Array<string | number>> };
@@ -52,12 +53,25 @@ export function fleetChecks(rows: FleetRow[]): FleetCheck[] {
     const top = [...count.entries()].sort((a, b) => b[1] - a[1]);
     add({ id: 'finale-background', advisory: true, title: 'What stands behind the Core in the last frame', target: 'no class above 40 % of the houses', value: top.map(([s, n]) => `${s} ${n}`).join(', '), pass: top.every(([s, n]) => s === 'wall' || s === 'other' || n <= 0.4 * N) || top[0][1] <= 0.4 * N, rows: top.map(([s, n]) => [s, n]) }); }
   { // (the sweep QA measures on the orbit beat — the push-in's turn into the orbit is the orbit's — not the exact arc the planner drew)
+    // STRICT: every house the planner found a sound way to a sweep of 90° or more for flies one (the owner's brief: an orbit of 90° or more wherever the room allows it) — a share that
+    // may miss is a gate that says nothing about which houses, and the sweep that was 90° on main and 63° on the fix passed it ('24 of 25')
     const arcOf = (r: FleetRow) => (typeof r.metrics.orbitArc === 'number' ? r.metrics.orbitArc : r.plan.orbit ? r.plan.orbit.arc : 0);
     const short = rows.filter(r => r.plan.orbit && arcOf(r) < 60), arcs = rows.map(arcOf), reach = rows.filter(r => r.plan.orbit && (r.plan.orbit.reachable ?? 0) >= 90);
     const ok = reach.filter(r => arcOf(r) >= 90 - 0.5);
-    add({ id: 'orbit-arc', title: 'The finale orbit (degrees round the Core)', target: '≥ 90° wherever the room allows it; none under 60° where it allows more', value: `${pct(ok.length, reach.length)} of the houses that can reach 90° do; median ${med(arcs)}°; under 60°: ${short.length}`, pass: ok.length >= Math.ceil(0.85 * reach.length), detail: list(rows.filter(r => r.plan.orbit && arcOf(r) < 90), r => `${arcOf(r)}° (room ${r.plan.orbit.reachable}°)`) }); }
+    add({ id: 'orbit-arc', title: 'The finale orbit (degrees round the Core)', target: '≥ 90° in every house the planner found a sound way to 90° for; none under 60°', value: `${pct(ok.length, reach.length)} of the houses that can reach 90° do; median ${med(arcs)}°; under 60°: ${short.length}`, pass: ok.length === reach.length && !short.length, detail: list(rows.filter(r => r.plan.orbit && arcOf(r) < 90), r => `${arcOf(r)}° (room ${r.plan.orbit.reachable}°)`) });
+    // what the room allows against what the walk reaches (the free sweep round the Core at a radius it can be framed from, whatever the way in): a house whose room has 90° and whose film does not is a way in the planner did not find
+    const roomy = rows.filter(r => r.plan.orbit && (r.plan.orbit.roomArc ?? 0) >= 90 && arcOf(r) < 90 - 0.5);
+    add({ id: 'orbit-room', advisory: true, title: 'The finale orbit against the room (the free sweep round the Core, whatever the way in)', target: 'none whose room is free for 90° and whose film sweeps less (no sound way in found)', value: roomy.length ? roomy.map(r => `${r.id} ${arcOf(r)}° of ${r.plan.orbit.roomArc}°`).join(', ') : 'none', pass: !roomy.length }); }
+  { // the finale lens: the plan's is 38–44°; the planner goes up to LENS_HERO_MAX (56°) where the room is too tight to frame the Core at 44° and an orbit of 90° is the brief — the trade is here, in numbers
+    const fovs = rows.map(r => r.plan.finalFov).filter((v: any) => typeof v === 'number') as number[], inPlan = fovs.filter(f => f <= 44.5);
+    add({ id: 'finale-lens', title: 'The finale lens (vertical fov of the last frame, §3.5: 38–44°)', target: `none over ${LENS_HERO_MAX}° (the deviation's bound); the plan's 38–44° wherever the room allows it`, value: `${pct(inPlan.length, fovs.length)} within 38–44°, median ${med(fovs)}°, max ${Math.max(...fovs)}°`, pass: !fovs.length || Math.max(...fovs) <= LENS_HERO_MAX + 0.5, detail: list(rows.filter(r => typeof r.plan.finalFov === 'number' && r.plan.finalFov > 44.5), r => `${r.plan.finalFov}°`) }); }
+  { const lens = rows.map(r => r.metrics.establish && r.metrics.establish.lens).filter((v: any) => typeof v === 'number') as number[], inPlan = lens.filter(f => f <= 35.5);
+    add({ id: 'establish-lens', advisory: true, title: 'The establishing lens (vertical fov of the first frame, §3.5: 30–35°)', target: "30–35° (a declared deviation: DEVIATIONS.establishLens; each film is a `fov-range` warning)", value: `${pct(inPlan.length, lens.length)} within the plan's, median ${med(lens)}°, ${Math.min(...lens)}–${Math.max(...lens)}°`, pass: !lens.length || inPlan.length >= Math.ceil(0.5 * lens.length) }); }
   { const ratio = (r: FleetRow) => M(r, 'filmBudgetRatio') ?? 0, inB = rows.filter(r => ratio(r) <= 1.15 + 1e-9), over = rows.filter(r => ratio(r) > 1.4), len = rows.map(r => r.duration);
     add({ id: 'film-length', title: 'Film length against its budget (§3.0: 12 s, plus the orbit and this house\'s distances)', target: 'at least half within 1.15 × of the budget, none over 1.4 ×', value: `${pct(inB.length, N)} within 1.15 ×, median ${med(rows.map(ratio)).toFixed(2)} ×; ${Math.min(...len)}–${Math.max(...len)} s, median ${med(len)} s (the plan's 12 s has no orbit and a 5 m walk)`, pass: inB.length >= Math.ceil(0.5 * N) && !over.length, detail: list(over, r => `${ratio(r)} ×, ${r.duration} s`) }); }
+  { // the plan's own number, not the budget this module defines: 12 s (13 for three storeys) before the orbit, and the orbit's ORBIT_S — what the film would be if every beat took its §3.3 time
+    const plan = (r: FleetRow) => (r.metrics.filmPlanS as number) || 15.5, within = rows.filter(r => r.duration <= 1.15 * plan(r) + 0.25), len = rows.map(r => r.duration);
+    add({ id: 'film-length-plan', advisory: true, title: "Film length against the plan's own 12 s (13 for three storeys, plus the orbit)", target: 'within 1.15 × of 12–13 s + the orbit (a declared deviation: DEVIATIONS.filmLength)', value: `${pct(within.length, N)}; median ${med(len)} s against ${med(rows.map(plan)).toFixed(1)} s, ${Math.min(...len)}–${Math.max(...len)} s`, pass: within.length >= Math.ceil(0.5 * N) }); }
   { const bad = rows.filter(r => r.errors > 0);
     add({ id: 'qa-errors', title: 'QA v2 errors', target: '0 on all 30 houses', value: `${rows.reduce((a, r) => a + r.errors, 0)} in ${pct(bad.length, N)} houses`, pass: !bad.length, detail: list(bad, r => `${r.errors}`) }); }
   return out;

@@ -42,7 +42,7 @@ const worlds = await ensureWorlds([...ids, ...fixtures], { rebuild: args['rebuil
 const specOf = (id: string) => JSON.parse(fs.readFileSync(specFile(id), 'utf8'));
 
 // ---- 1 + 2. plan (twice), QA
-type Row = FleetRow & { hash: string; planMs: number; qaMs: number; notes: string[]; findings: any };
+type Row = FleetRow & { hash: string; planMs: number; qaMs: number; aspMs: number; notes: string[]; findings: any };
 const rows: Row[] = [], aspectErrors: string[] = [];
 let planCpu = 0, identical = true; const drift: string[] = [], nondet: string[] = [], failed: string[] = [];
 for (const id of [...ids, ...fixtures]) {
@@ -56,8 +56,8 @@ for (const id of [...ids, ...fixtures]) {
   const b = planDoorToCore(world, so.options);
   if (!b.ok || trackHash(a.track) !== trackHash(b.track) || JSON.stringify(a.track.plan) !== JSON.stringify(b.track.plan)) { identical = false; nondet.push(id); }
   const t1 = cpuMs(); const qa = qaTrack(a.track, world, { via: (so.shot && so.shot.via) || undefined }); const qaMs = cpuMs() - t1;
-  const asp = qaAspects(a.track, world, { via: (so.shot && so.shot.via) || undefined }); aspectErrors.push(...asp.map(e => `${id} t=${e.t} ${e.code}: ${e.message}`));
-  rows.push({ id, duration: a.track.duration, metrics: qa.metrics, plan: a.track.plan, errors: qa.errors.length, warnings: qa.warnings.length, hash: trackHash(a.track), planMs, qaMs, notes: a.notes, findings: { errors: qa.errors, warnings: qa.warnings } });
+  const t2 = cpuMs(); const asp = qaAspects(a.track, world, { via: (so.shot && so.shot.via) || undefined }); const aspMs = cpuMs() - t2; aspectErrors.push(...asp.map(e => `${id} t=${e.t} ${e.code}: ${e.message}`));
+  rows.push({ id, duration: a.track.duration, metrics: qa.metrics, plan: a.track.plan, errors: qa.errors.length, warnings: qa.warnings.length, hash: trackHash(a.track), planMs, qaMs, aspMs, notes: a.notes, findings: { errors: qa.errors, warnings: qa.warnings } });
 }
 check(!failed.length, `every house plans (${ids.length + fixtures.length})`, failed.join('\n'));
 check(identical, 'two plans of the same world are byte-identical (hash and plan)', nondet.join(', '));
@@ -120,11 +120,16 @@ else if (drift.length) console.log(`\n(${drift.length} of the ${real.length} tra
 
 // ---- 5. budgets
 const load = os.loadavg()[0], cores = os.cpus().length, loaded = load > cores * 0.75;
-console.log(`\nplanning ${real.length} houses: ${(planCpu / 1000).toFixed(1)} s of CPU (budget 15 s); QA v2 ${Math.max(...rows.map(r => r.qaMs)).toFixed(0)} ms at worst (budget 500); load average ${load.toFixed(1)} on ${cores} cores`);
+console.log(`\nplanning ${real.length} houses: ${(planCpu / 1000).toFixed(1)} s of CPU (budget 15 s); QA v2 ${Math.max(...rows.map(r => r.qaMs)).toFixed(0)} ms at worst (budget 500), its four aspect passes ${Math.max(...rows.map(r => r.aspMs)).toFixed(0)} ms at worst (budget 750); load average ${load.toFixed(1)} on ${cores} cores`);
 // (a loaded machine inflates CPU time too — cache and scheduling — so the budgets get 60 % more there, and are never waived)
 const slack = loaded ? 1.6 : 1, slowQA2 = rows.filter(r => r.qaMs > 500 * slack);
 check(planCpu <= 15000 * slack, `planning all the houses in Node within 15 s of CPU${loaded ? ` (${(15 * slack).toFixed(0)} s: the machine is loaded)` : ''}`);
 check(!slowQA2.length, `QA v2 within 0.5 s a shot${loaded ? ` (${(0.5 * slack).toFixed(1)} s: the machine is loaded)` : ''}`, slowQA2.map(r => `${r.id} ${r.qaMs.toFixed(0)} ms`).join(', '));
+// (the frame checks at 9:16, 3:4, 1:1 and 21:9 the page runs beside QA v2 (qaAspects): four passes, held to 1.5 times the one)
+{ const slowAsp = rows.filter(r => r.aspMs > 750 * slack); check(!slowAsp.length, `QA v2's four aspect passes within 0.75 s a shot${loaded ? ` (${(0.75 * slack).toFixed(2)} s: the machine is loaded)` : ''}`, slowAsp.map(r => `${r.id} ${r.aspMs.toFixed(0)} ms`).join(', ')); }
+// (a custom `shots[].establish` pose the garden blocks — the spec's own knob — plans: it is a film or a QA `route-failed`, never an exception in the page's glue)
+{ const bad3: string[] = []; for (const id of ['cutestarter', 'mirage']) { const world = worlds.get(id); if (!world) continue; for (const est of [{ bearing: -30, height: 1, dist: 3 }, { bearing: 30, height: 6, dist: 14 }]) { let r: any; try { r = planDoorToCore(world, { duration: 'auto', establish: est }); } catch (e: any) { bad3.push(`${id} ${JSON.stringify(est)} threw: ${e.message}`); continue; } if (!r.ok && r.code !== 'route-failed') bad3.push(`${id} ${JSON.stringify(est)}: ${r.code}`); } }
+  check(!bad3.length, 'a custom shots[].establish pose plans (a film, or route-failed), never throws', bad3.join('\n')); }
 
 // ---- 4. the page bakes the same track
 const parityN = args.parity === 'all' ? real.length : args.parity !== undefined ? parseInt(args.parity, 10) : 3;

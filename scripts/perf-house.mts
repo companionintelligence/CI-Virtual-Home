@@ -121,7 +121,7 @@ await browser.close(); server.close();
 // ---- report
 const BASELINE = path.join(ROOT, 'test', 'perf', 'baseline.json');
 const readJson = (f: string) => fs.existsSync(f) ? (() => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch { return null; } })() : null;
-const baseline = args.baseline === 'true' ? null : readJson(BASELINE);
+const baseline = args.baseline === 'true' || PLANNER ? null : readJson(BASELINE);   // (the committed baseline is the v1 fleet: a v2 run is compared with its own previous run)
 const prev = baseline || readJson(OUT), prevName = baseline ? `the baseline (${path.relative(process.cwd(), BASELINE)}: load ${(baseline.load || []).join(' ')} on ${baseline.cores} cores)` : path.relative(process.cwd(), OUT);
 const prevOf = (h: string) => prev && (prev.results || []).find(r => r.house === h);
 const f0 = (v: number | null) => (v === null || v === undefined ? '—' : `${Math.round(v)}`);

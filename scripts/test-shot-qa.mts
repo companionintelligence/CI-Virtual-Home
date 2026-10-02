@@ -264,6 +264,28 @@ const INJECT: Record<string, Injector> = {
   'look-snap': c => { const { t, w } = mk(c), i = c.midRoute(1.0); for (let k = i; k < c.N; k++) turnLook(t, k, 6 * DEG); return { track: t, world: w, window: win(c, i - 2, i + 2) }; },
   // the finale's frame filled by one wall within 1.5 m (the Core's own desk is the subject of it, a wall is not)
   'finale-blank': c => { const sp = spans(c.track, 'orbit'); const f = c.faceWall(); if (!sp.length || !f) return null; const { t, w } = mk(c), [i0, i1] = sp[0], m = (i0 + i1) >> 1; for (let k = 0; k < 96; k++) { setEye(t, m + k, f.eye(0.5)); setLook(t, m + k, f.at); } return { track: t, world: w, window: win(c, m, m + 96) }; },
+  // the push-in with the view turned 75° off the Core for 1.6 s (the Core out of the frame for over 0.5 s of its own beat)
+  'hero-core-off': c => { const sp = spans(c.track, 'hero'); if (!sp.length) return null; const { t, w } = mk(c), [i0, i1] = sp[0], m = (i0 + i1) >> 1, n = Math.min(100, (i1 - i0) >> 1); for (let k = m - n; k <= m + n; k++) turnLook(t, k, 75 * DEG * smooth(Math.min((k - (m - n)) / 20, (m + n - k) / 20))); return { track: t, world: w, window: win(c, m - n, m + n) }; },
+  // 3.4 s of the route called the room reveal (the first second of one is the walk's own turn onto the Core and is not held to it) with the view turned right round, away from the Core
+  'reveal-core-off': c => { const { t, w } = mk(c), i = c.midRoute(3.4), n = Math.round(3.4 / c.dt); for (let k = i; k < i + n; k++) { t.beat[k] = BEATS.indexOf('roomReveal'); const e = eyeAt(t, k), h = w.hero!, ctr: V3 = [(h.core[0] + h.core[3]) / 2, (h.core[1] + h.core[4]) / 2, (h.core[2] + h.core[5]) / 2]; setLook(t, k, add(e, mul(norm([e[0] - ctr[0], 0, e[2] - ctr[2]]), 3))); } return { track: t, world: w, window: win(c, i + Math.round(1.1 / c.dt), i + n) }; },
+  // the film begins at speed: the first frames already 2.4 m/s
+  'cold-start': c => { const { t, w } = mk(c); setEye(t, 2, add(eyeAt(t, 0), [0.04, 0, 0])); return { track: t, world: w, window: [0, 0] }; },
+  // a walk that stops dead for 0.6 s with a walking pace either side (a seam stall, a mid-route near-stop)
+  'stall': c => {
+    const sp = spans(c.track, 'route').sort((a, b) => (b[1] - b[0]) - (a[1] - a[0])), v = (k: number) => Math.hypot(c.track.pos[3 * (k + 1)] - c.track.pos[3 * (k - 1)], c.track.pos[3 * (k + 1) + 2] - c.track.pos[3 * (k - 1) + 2]) / (2 * c.dt);
+    for (const [r0, r1] of sp) for (let i = r0 + 100; i < r1 - 100; i += 6) if (v(i - 60) > 1.2 && v(i + 60) > 1.2 && v(i - 20) > 1.0 && v(i + 20) > 1.0) {
+      const { t, w } = mk(c), e = eyeAt(t, i); for (let k = i - 36; k <= i + 36; k++) setEye(t, k, e);
+      return { track: t, world: w, window: win(c, i - 36, i + 36) };
+    }
+    return null; },
+  // the eye walks out a metre and comes straight back (a 180° turn inside 1.5 m of walking)
+  'hairpin': c => { const { t, w } = mk(c), i = c.midRoute(2.0), e0 = eyeAt(t, i), h = norm(sub(eyeAt(t, i + 40), e0)), d: V3 = [h[0], 0, h[2]], n = 120;
+    for (let k = 0; k < 2 * n; k++) { const u = k < n ? k / n : (2 * n - k) / n; setEye(t, i + k, add(e0, mul(d, 1.0 * u))); setLook(t, i + k, add(add(e0, mul(d, 1.0 * u)), mul(d, 3))); }
+    return { track: t, world: w, window: win(c, i, i + 2 * n) }; },
+  // the film ends 100° round from the Core's front (behind it, as a viewer of its back)
+  'core-axis': c => { const { t, w } = mk(c), h = w.hero!, ctr: V3 = [(h.core[0] + h.core[3]) / 2, (h.core[1] + h.core[4]) / 2, (h.core[2] + h.core[5]) / 2], a = 100 * DEG, f = h.fwd, s2 = [f[1], -f[0]], e = eyeAt(t, c.N - 1);
+    for (let k = 0; k < 30; k++) setEye(t, c.N - 1 - k, [ctr[0] + 1.0 * (Math.cos(a) * f[0] + Math.sin(a) * s2[0]), e[1], ctr[2] + 1.0 * (Math.cos(a) * f[1] + Math.sin(a) * s2[1])]);
+    return { track: t, world: w, window: [c.T, c.T] }; },
   // the two below need a door leaf in the world: see the leaf tests
   'door-leaf': () => null,
 };
@@ -365,6 +387,61 @@ if (!only) {
     const { t, w } = inject(b, (t, w) => { addBox(w, [p[0] - 0.15, 0, p[2] - 0.15, p[0] + 0.15, 3, p[2] + 0.15], K.site, 'trunk'); });
     say(errOf(t, w, 'site-clip').some((f: any) => f.subject === 'trunk'), `site-clip (error) is caught for a trunk on the approach (${b.id}, door at ${e.x.toFixed(1)}, ${e.z.toFixed(1)})`);
   }
+  // ---- what an independent mutation review found the test did not protect: each of these fails when the check it names is loosened (scripts/mutants in the S5 review: GLASS_PAD → 0, the outside-beat clause of site-clip
+  // removed, the per-beat median look error off, the door zone narrowed to centimetres, the fixed subjects read from the track, the beat-yaw slack and the film budget widened) ----
+  const brandNew = (b: Base, t: Track, w: ShotWorld, code: string, t0: number, t1: number, level: 'errors' | 'warnings', pred: (f: any) => boolean = () => true) => {
+    const q = (qaTrack(t, w) as any)[level] as any[], clean = (level === 'errors' ? b.qa.errors : b.qa.warnings) as any[];
+    const near = (f: any) => f.code === code && pred(f) && f.tEnd >= t0 - 0.3 && f.t <= t1 + 0.3;
+    return q.some(near) && !clean.some(near);
+  };
+  // a pane of glass with NO thickness across an axis-aligned stretch of the walk: a point sample never lands in it, so the sweep pads it (GLASS_PAD, 3 cm) — a pad of 0 passes the eye through it
+  for (const b of [b0, b1]) {
+    let ok = false; const dt = b.track.dt, mid0 = routeMid(b);
+    for (const off of [0, -150, 150, -300, 300]) {
+      const mid = mid0 + off, { t, w } = inject(b, (t, w) => { const e = eyeAt(t, mid); for (let k = 0; k < 40; k++) { setEye(t, mid + k, [e[0] + 0.02 * k, e[1], e[2]]); setLook(t, mid + k, [e[0] + 0.02 * k + 3, e[1], e[2]]); }
+        const px = e[0] + 0.41; addBox(w, [px, e[1] - 1.0, e[2] - 0.9, px, e[1] + 0.8, e[2] + 0.9], K.glass, 'thin pane'); });
+      if (brandNew(b, t, w, 'wall-clip', mid * dt, (mid + 40) * dt, 'errors', f => /window/.test(f.message))) { ok = true; break; }
+    }
+    say(ok, `wall-clip (error) is caught for an eye through a window pane of NO thickness, walking straight at it (${b.id})`);
+  }
+  // a trunk on the approach at a point the storey's footprint covers (a porch, a deck, a landing at the head of an exterior stair: "indoors" by the rects): the outside beats test the site there too
+  for (const b of [b0, b1]) {
+    const sp = spans(b.track, 'approach'); if (!sp.length) continue;
+    const k = sp[sp.length - 1][1] - 40, p = eyeAt(b.track, k), dt = b.track.dt;
+    const { t, w } = inject(b, (t, w) => { const low = w.levels.slice().sort((x, y) => x.y - y.y)[0]; low.rects.push({ x: p[0] - 1, z: p[2] - 1, w: 2, d: 2 }); addBox(w, [p[0] - 0.15, 0, p[2] - 0.15, p[0] + 0.15, 3, p[2] + 0.15], K.site, 'trunk'); });
+    say(indoors(w, p[0], p[1], p[2]) && brandNew(b, t, w, 'site-clip', k * dt, k * dt, 'errors', f => f.subject === 'trunk'), `site-clip (error) is caught for a trunk on the approach where the footprint covers the eye (${b.id})`);
+  }
+  // a look 32° off where its beat's subject is, the whole beat through (pitched down: no 45° stretch, no crab, no turn rate): the beat's median is what says it
+  for (const b of [b0, b1]) {
+    const [r0, r1] = spans(b.track, 'route').sort((x, y) => (y[1] - y[0]) - (x[1] - x[0]))[0] || [0, 0]; if (r1 - r0 < 80) continue;
+    const { t, w } = inject(b, (t) => { for (let k = r0; k <= r1; k++) turnLook(t, k, 0, -32 * DEG * smooth(Math.min((k - r0) / 20, (r1 - k) / 20))); }), dt = b.track.dt;
+    say(brandNew(b, t, w, 'look-error', r0 * dt, r1 * dt, 'warnings', f => f.subject === 'route' && /off the beat's subject/.test(f.message)), `look-error (warning) is caught for a route whose look is 32° off its subject all the way (the beat's median over 25°, ${b.id})`);
+  }
+  // the entry door crossed at twice the pace 0.2–0.5 m before its plane and at the planned 0.9 at the plane itself: the zone (±0.45 m) holds it, a zone of centimetres does not see it
+  for (const b of [b0, b1]) {
+    const iE = b.qa.metrics.enterT === null || b.qa.metrics.enterT === undefined ? -1 : Math.round(b.qa.metrics.enterT / b.track.dt); if (iE < 0) continue;
+    const { t, w } = inject(b, (t) => { burst(t, iE - 60, 15, 2); }), dt = b.track.dt;
+    say(brandNew(b, t, w, 'door-zone-speed', (iE - 80) * dt, (iE - 40) * dt, 'warnings'), `door-zone-speed (warning) is caught for a run 0.2–0.5 m before the entry plane and the planned pace at it (${b.id})`);
+  }
+  // the planner's own record of its subject is not the plan's: the look turned 70° off the door on the approach, and the track's `subj` rewritten to where the look points — the door is the door
+  for (const b of [b0, b1]) {
+    const sp = spans(b.track, 'approach'); if (!sp.length || !b.track.subj) continue; const [i0, i1] = sp[0], dt = b.track.dt;
+    const { t, w } = inject(b, (t) => { for (let k = i0; k <= i1; k++) { turnLook(t, k, 70 * DEG * smooth(Math.min((k - i0) / 12, (i1 - k) / 12))); const l = lookAt(t, k); t.subj![3 * k] = l[0]; t.subj![3 * k + 1] = l[1]; t.subj![3 * k + 2] = l[2]; } });
+    say(brandNew(b, t, w, 'look-error', i0 * dt, i1 * dt, 'warnings', f => f.subject === 'approach'), `look-error (warning) is caught for an approach looking 70° off the door whatever the track says its subject was (${b.id})`);
+  }
+  // a hero beat that turns the view at about 21°/s (the plan's cap is 15): a smooth 5° bump over 0.8 s, so its flanks turn at 21°/s with no step — inside any slack worth the name; a threshold of three times the cap does not see it
+  for (const b of [b0, b1]) {
+    const sp = spans(b.track, 'hero'); if (!sp.length) continue; const [i0, i1] = sp[0], mid = (i0 + i1) >> 1, n = Math.min((i1 - i0) >> 1, 48), dt = b.track.dt;
+    const { t, w } = inject(b, (t) => { for (let k = mid - n; k <= mid + n; k++) turnLook(t, k, (21 * (2 * n * t.dt) / Math.PI) * DEG * Math.sin(Math.PI * (k - (mid - n)) / (2 * n)) ** 2); });
+    say(brandNew(b, t, w, 'beat-yaw', (mid - n) * dt, (mid + n) * dt, 'warnings', f => f.subject === 'hero'), `beat-yaw (warning) is caught for a hero beat that turns the view at 21°/s over its 15 (${b.id})`);
+  }
+  // a film 1.4 times its budget: the warning is at 1.15 times, and a budget widened to 1.65 times does not see it
+  for (const b of [b0, b1]) {
+    const r = planDoorToCore(b.world, { duration: Math.ceil(1.45 * b.qa.metrics.filmBudget) }); if (!r.ok) { say(false, `the planner plans ${b.id} pinned at 1.45 times its budget`, (r as any).message); continue; }
+    const q = qaTrack(r.track, b.world);
+    say(q.warnings.some(f => f.code === 'film-length') && q.metrics.filmBudgetRatio > 1.3 && q.metrics.filmBudgetRatio < 1.85, `film-length (warning) is caught for ${b.id} flown at ${q.metrics.filmBudgetRatio} times its budget`, `ratio ${q.metrics.filmBudgetRatio}`);
+  }
+
   // a portrait viewer (the planned still export, the phone player): the same track must hold its press frame and its finale
   for (const b of bases) for (const asp of [9 / 16, 3 / 4, 1, 21 / 9]) {
     const q = qaTrack(b.track, b.world, { aspect: asp }), bad = q.errors.filter(e => e.code === 'press-frame' || e.code === 'blank-frame' || e.code === 'orbit-core-out-of-frame');
@@ -461,9 +538,9 @@ if (!only) {
 {
   const styles = ['axial', 'garden', 'corner-right', 'dollhouse', 'corner-left'], bgs = ['art', 'wall', 'window', 'bookcase', 'other'];
   const good = (k: number): FleetRow => ({
-    id: `h${k}`, duration: 20, errors: 0, warnings: 3,
-    metrics: { filmBudgetRatio: 1.05, outsideShare: 0.27, firstSecond: 1.5, doorSpeed: 0.85, maxYawRate: 45, lookErrorMedian: 0.3, coreLOS: 4, pressSpeed: 0.02, topRoomsSeen: 3, finalCoreHeight: 0.22, finalCoreNDC: [((k % 7) - 3) * 0.1, ((k % 4) - 2) * 0.1], coreBg: bgs[k % 5], establish: { bearing: -45 + (k * 13) % 90 } },
-    plan: { establish: { style: styles[k % 5] }, outside: { hasExt: false }, orbit: { arc: 100, reachable: 130 } },
+    id: `h${k}`, duration: 17, errors: 0, warnings: 3,
+    metrics: { filmBudgetRatio: 1.05, outsideShare: 0.27, firstSecond: 1.5, doorSpeed: 0.85, maxYawRate: 45, lookErrorMedian: 0.3, coreLOS: 4, pressSpeed: 0.02, topRoomsSeen: 3, finalCoreHeight: 0.22, finalCoreNDC: [((k % 7) - 3) * 0.1, ((k % 4) - 2) * 0.1], coreBg: bgs[k % 5], establish: { bearing: -45 + (k * 13) % 90, lens: 33 } },
+    plan: { establish: { style: styles[k % 5] }, outside: { hasExt: false }, orbit: { arc: 100, reachable: 130, roomArc: 130 }, finalFov: 42 },
   });
   const rows = Array.from({ length: 30 }, (_, k) => good(k));
   const base = fleetChecks(rows);
@@ -482,9 +559,16 @@ if (!only) {
     'establish-bearing': r => r.map(x => ({ ...x, metrics: { ...x.metrics, establish: { bearing: 5 } } })),
     'finale-background': r => r.map((x, i) => i < 14 ? { ...x, metrics: { ...x.metrics, coreBg: 'window' } } : x),
     'orbit-arc': r => r.map((x, i) => i < 10 ? { ...x, plan: { ...x.plan, orbit: { arc: 50, reachable: 130 } } } : x),
+    'orbit-room': r => r.map((x, i) => i === 0 ? { ...x, plan: { ...x.plan, orbit: { arc: 70, reachable: 70, roomArc: 130 } } } : x),
+    'finale-lens': r => r.map((x, i) => i === 0 ? { ...x, plan: { ...x.plan, finalFov: 64 } } : x),
+    'establish-lens': r => r.map(x => ({ ...x, metrics: { ...x.metrics, establish: { ...x.metrics.establish, lens: 46 } } })),
+    'film-length-plan': r => r.map(x => ({ ...x, duration: 30 })),
     'film-length': r => r.map((x, i) => i < 3 ? { ...x, metrics: { ...x.metrics, filmBudgetRatio: 1.8 } } : x),
     'qa-errors': r => r.map((x, i) => i === 0 ? { ...x, errors: 2 } : x),
   };
+  // the orbit gate is strict: ONE house that has a sound way to 90° and flies 85° fails it (the fix that flew asymmetry at 63° where main flew 90° passed a gate that let 15 % of the houses miss)
+  { const one = rows.map((x, i) => i === 7 ? { ...x, metrics: { ...x.metrics, orbitArc: 85 }, plan: { ...x.plan, orbit: { arc: 85, reachable: 120, roomArc: 120 } } } : x), got = fleetChecks(one).find(x => x.id === 'orbit-arc');
+    say(!!got && !got.pass, 'fleet check "orbit-arc" fails for ONE house that can reach 90° and flies 85° (no share of the houses may miss)', got ? `it says: ${got.value}` : 'it did not report'); }
   for (const c of base) {
     const f = spoil[c.id]; if (!f) { say(false, `fleet check "${c.id}" has no spoiled row in scripts/test-shot-qa.mts`); continue; }
     const got = fleetChecks(f(rows)).find(x => x.id === c.id);

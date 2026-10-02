@@ -46,6 +46,32 @@ export function projectBox(c: Cam, b: Box6) {
   return { minX: x0, maxX: x1, minY: y0, maxY: y1 };
 }
 
+/** a box's footprint in the frame where it may be nearer than the lens or round it: its 12 edges clipped to the plane 5 cm in front of the eye, then projected —
+ *  { minX, maxX, minY, maxY } in NDC (the corners behind the eye stand at the frame's edge, never out of the sum), or null when all of it is behind the eye.
+ *  projectBox gives up when ANY corner is behind (a chair back 0.3 m from the lens, the eye over its top, has two such corners): a frame that is a fifth chair read as no chair at all. */
+export function projectBoxClipped(c: Cam, b: Box6) {
+  const NEAR = 0.05;
+  const cs: Array<[number, number, number]> = [];
+  for (const x of [b[0], b[3]]) for (const y of [b[1], b[4]]) for (const z of [b[2], b[5]]) { const d = sub([x, y, z], c.eye); cs.push([dot(d, c.right), dot(d, c.up), dot(d, c.fwd)]); }
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  const take = (p: [number, number, number]) => { const nx = p[0] / (p[2] * c.tanH), ny = p[1] / (p[2] * c.tanV); x0 = Math.min(x0, nx); x1 = Math.max(x1, nx); y0 = Math.min(y0, ny); y1 = Math.max(y1, ny); };
+  for (let i = 0; i < 8; i++) for (const bit of [1, 2, 4]) {
+    if (i & bit) continue;
+    const a = cs[i], q = cs[i | bit];
+    if (a[2] >= NEAR && q[2] >= NEAR) { take(a); take(q); continue; }
+    if (a[2] < NEAR && q[2] < NEAR) continue;
+    const f = (NEAR - a[2]) / (q[2] - a[2]), m: [number, number, number] = [a[0] + (q[0] - a[0]) * f, a[1] + (q[1] - a[1]) * f, NEAR];
+    take(a[2] >= NEAR ? a : q); take(m);
+  }
+  if (!Number.isFinite(x0)) return null;
+  return { minX: x0, maxX: x1, minY: y0, maxY: y1 };
+}
+/** the share of the frame (0…1) a box covers, from its clipped footprint (a nearer-than-the-lens box covers what its visible part does) */
+export function boxFrameShare(c: Cam, b: Box6): number {
+  const p = projectBoxClipped(c, b); if (!p) return 0;
+  return Math.max(0, Math.min(1, p.maxX) - Math.max(-1, p.minX)) * Math.max(0, Math.min(1, p.maxY) - Math.max(-1, p.minY)) / 4;
+}
+
 /** what stands behind the Core at the press, as the fleet audit classes it (plan §3.14: no class above 40 % of the houses) */
 export function bgClass(kind: number, name: string): string {
   if (kind === K.monitor) return 'screen';

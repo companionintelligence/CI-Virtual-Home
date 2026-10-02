@@ -32,7 +32,8 @@
 //                                               // @check-house advisory — <why> runs and reports, cannot fail the
 //                                               //                              gate (a test that is red on main
 //                                               //                              too, until the fix that greens it lands)
-//   6. perf       perf-house.mts            — build / track / shot-QA timings against their budgets (plan A4):
+//   6. perf       perf-house.mts            — build / track / shot-QA timings against their budgets (plan A4), on planner v1 and
+//                                             again on planner v2 (perf:v2: planning its three films, QA on each):
 //                                             report-only, it never fails the gate (`--no-perf` skips it)
 //
 // The order is a dependency chain, not a preference: goldens compared against a renderer that is not
@@ -86,7 +87,11 @@ const steps: Step[] = [
   { key: 'determinism:v2', script: S('test-frame-hash.mts'), args: ['--res', RES!, '--planner', 'v2', '--frames', '0,200,450', ...(HOUSE ? ['--house', HOUSE.split(',')[0]] : [])], quick: false },
   { key: 'goldens', script: S('test-goldens.mts'), args: ['--res', RES!, '--jobs', JOBS!, ...(flag('update-goldens') ? ['--update'] : []), ...houseArgs], quick: false, needs: 'determinism,determinism:core-orbit' },
   ...testSteps,
-  ...(flag('no-perf') ? [] : [{ key: 'perf', script: S('perf-house.mts'), args: HOUSE ? ['--house', HOUSE] : [], quick: false, advisory: true }]),
+  ...(flag('no-perf') ? [] : [
+    { key: 'perf', script: S('perf-house.mts'), args: HOUSE ? ['--house', HOUSE] : [], quick: false, advisory: true },
+    // planner v2 as well (S5, off by default): the planning of its three films inside `build` and each film's QA, against the same budgets — the v1 step above never plans a v2 film
+    { key: 'perf:v2', script: S('perf-house.mts'), args: [...(HOUSE ? ['--house', HOUSE] : []), '--planner', 'v2', '--shot', 'door-to-core,hero-reveal,walkthrough', '--out', path.join(QA_OUT, 'perf-v2.json')], quick: false, advisory: true },
+  ]),
 ];
 
 type Result = Step & { state: 'pass' | 'fail' | 'warn' | 'skipped'; why?: string; code?: number | null; secs?: string };

@@ -15,10 +15,10 @@
 import { Math } from './detmath.js';
 import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, wrapPi, createWorldIndex, leafSegment, type ShotWorld, type Box6 } from './shot-world.js';
 import { firstCrossing, leafOpen, DOOR_DONE_S } from './shot-doors.js';
-import { createProbe, camera, project, projectBox, bgClass, type V3 } from './shot-probe.js';
+import { createProbe, camera, project, projectBox, boxFrameShare, bgClass, type V3 } from './shot-probe.js';
 import { createNav, roomInterest } from './shot-nav.js';
 import { sampleTrack, type Track } from './shot-planner.js';
-import { BEATS, type Beat, beatWindow, filmBudget, BUDGET_SLACK, SPEC_LOOK_SUBJECT, LOOK_ERROR_WARN, LOOK_ERROR_STRETCH, SPEC_SPEED, SPEC_YAW, SPEC_PITCH, SPEC_FOV, BEAT_FLOOR, DOOR_PLANE_SPEED, DOOR_ZONE_M, DOORWAY_SPEED, YAW_WARN, YAW_ERROR, DOLLHOUSE_PITCH_MIN, INTERIOR_LEVEL_DEG, PITCH_ERROR, LENS_RATE, OUTSIDE_TARGET, OUTSIDE_ERROR, SPEC_ESTABLISH } from './shot-spec.js';
+import { BEATS, type Beat, SEAM_S, beatWindow, filmBudget, BUDGET_SLACK, SPEC_LOOK_SUBJECT, LOOK_ERROR_WARN, LOOK_ERROR_STRETCH, SPEC_SPEED, SPEC_YAW, SPEC_PITCH, SPEC_FOV, BEAT_FLOOR, DOOR_PLANE_SPEED, DOOR_ZONE_M, DOORWAY_SPEED, YAW_WARN, YAW_ERROR, DOLLHOUSE_PITCH_MIN, INTERIOR_LEVEL_DEG, PITCH_ERROR, LENS_RATE, OUTSIDE_TARGET, OUTSIDE_ERROR, SPEC_ESTABLISH } from './shot-spec.js';
 import { houseCorners, frameFit, wholeFit, coreHeightPct, lumOf } from './framing.js';
 
 export type Finding = { code: string; level: 'error' | 'warn'; t: number; tEnd: number; samples: number; subject: string; message: string };
@@ -41,7 +41,7 @@ export const QA_CODES: Record<string, 'error' | 'warn'> = {
   'doorway-speed': 'warn', 'accel': 'warn', 'jerk': 'warn', 'crab': 'warn', 'beat-pitch': 'warn', 'verticals': 'warn', 'look-near': 'warn',
   'graze': 'warn', 'look-whip': 'warn', 'look-snap': 'error', 'finale-blank': 'warn', 'door-funnel': 'warn', 'approach-axis': 'warn', 'establish-crop': 'warn', 'establish-sky': 'warn', 'establish-height': 'warn', 'establish-occluder': 'warn',
   'foreground-occluder': 'warn', 'monitor-cut': 'warn', 'core-contrast': 'warn', 'core-room-side': 'warn', 'orbit-short': 'warn',
-  'orbit-swing-back': 'warn', 'orbit-yaw-rate': 'warn',
+  'orbit-swing-back': 'warn', 'orbit-yaw-rate': 'warn', 'hero-core-off': 'error', 'reveal-core-off': 'warn', 'cold-start': 'warn', 'stall': 'warn', 'hairpin': 'warn', 'core-axis': 'warn',
 };
 
 const lum = lumOf;
@@ -84,7 +84,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   const isIndoors = (p: V3) => indoors(world, p[0], p[1], p[2]);
   // a beat's limits hold inside it; within 0.35 s of a seam the eye is still handing over from the neighbour's, so the looser
   // of the two applies (a cap that stepped up or down the instant the beat changed would need an infinite acceleration)
-  const seam = 0.35, seamN = Math.round(seam / dt);
+  const seam = SEAM_S, seamN = Math.round(seam / dt);
   const beatIdx: Array<[number, number, Beat]> = []; for (const [b, spans] of beatSpans) for (const [i0, i1] of spans) beatIdx.push([i0, i1, b]);
   beatIdx.sort((a, b) => a[0] - b[0]);
   const neighbours = (i: number): Beat[] => { const out: Beat[] = [beat[i]]; for (let k = 0; k < beatIdx.length; k++) { const [i0, i1, b] = beatIdx[k]; if (i < i0 || i > i1) continue; if (i - i0 < seamN && k > 0) out.push(beatIdx[k - 1][2]); if (i1 - i < seamN && k + 1 < beatIdx.length) out.push(beatIdx[k + 1][2]); } return out; };
@@ -167,8 +167,13 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   metrics.minClearance = Number.isFinite(minClear) ? +minClear.toFixed(3) : null;
   metrics.minClearanceAt = +minClearAt.toFixed(2);
 
-  // ---- entering: through the door, at walking pace -----------------------------------------------------------
+  // frameOnly (qaAspects, the frame checks at another aspect: the press frame, the orbit, the Core in sight, a blank wall) skips what does not depend on the shape of the frame — the pacing, the look error, the route, the establishing frame —
+  // which is most of the time a pass takes (four of them cost 0.97 s on average against 0.21 s for the whole of qaTrack)
+  const rates: number[] = [];
+  const travel = (i0: number, i1: number) => { let L = 0; for (let i = i0 + 1; i <= i1; i++) L += Math.hypot(eye[i][0] - eye[i - 1][0], eye[i][1] - eye[i - 1][1], eye[i][2] - eye[i - 1][2]); return L; };
   let enterT: number | null = null, doorSpeed: number | null = null;
+  if (!opts.frameOnly) {
+  // ---- entering: through the door, at walking pace -----------------------------------------------------------
   if (entry && d2c) {
     const eLv = world.levels.find(l => l.id === entry.level)!;
     let was: boolean | null = null;
@@ -216,15 +221,17 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   else if (outside > (ext ? OUTSIDE_ERROR : OUTSIDE_TARGET)) W('outside-share-high', 0, `${(outside * 100).toFixed(0)} % of the film is outside (target ≤ ${(ext ? OUTSIDE_ERROR : OUTSIDE_TARGET) * 100} %)`);
 
   // ---- travel in the first and last second -------------------------------------------------------------------
-  const travel = (i0: number, i1: number) => { let L = 0; for (let i = i0 + 1; i <= i1; i++) L += Math.hypot(eye[i][0] - eye[i - 1][0], eye[i][1] - eye[i - 1][1], eye[i][2] - eye[i - 1][2]); return L; };
   const n1 = Math.min(N - 1, Math.round(1 / dt));
   metrics.firstSecond = +travel(0, n1).toFixed(3); metrics.lastSecond = +travel(N - 1 - n1, N - 1).toFixed(3);
   if (metrics.firstSecond < 0.5 && d2c) W('first-second', 0, `the first second moves ${metrics.firstSecond} m (≥ 0.5)`);
+  // a film that begins at speed is a cut into motion: the first frame is at most 1.5 m/s and the speed rises at the plan's accelerations (1.5 m/s² inside, 3 outside)
+  metrics.startSpeed = +speed[1].toFixed(2);
+  if (speed[1] > 1.5 && d2c) W('cold-start', 0, `the first frame moves at ${speed[1].toFixed(2)} m/s: the film starts at speed (≤ 1.5, then the plan's accelerations)`);
   if (metrics.lastSecond < 0.02 || metrics.lastSecond > 0.3) W('last-second', T - 1, `the last second moves ${metrics.lastSecond} m (0.02–0.3: the film ends in motion, settled)`);
 
   // ---- look: yaw rates, pitch, crab, reverse, look distance ------------------------------------------------
   const W01 = Math.max(1, Math.round(0.05 / dt));   // (±0.05 s: the 0.1 s window of §3.14)
-  let maxYaw = 0, maxYawAt = 0; const rates: number[] = [];
+  let maxYaw = 0, maxYawAt = 0, overYawS = 0, overSpeedS = 0;
   let crabRun = 0, revRun = 0;
   for (let i = 0; i < N; i++) {
     const a = Math.max(0, i - W01), b = Math.min(N - 1, i + W01);
@@ -237,6 +244,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     else if (r > YAW_WARN) W('yaw-rate', tOf(i), `the view turns at ${r.toFixed(0)}°/s (over ${YAW_WARN})`);
     // the beat's cap is the plan's (§3.5, assets/shot-spec.ts), never the planner's own; 10 % and 1°/s of slack (the 0.1 s window of a turn that is eased in and out)
     const yc = loosest(i, b => SPEC_YAW[b], (a, b) => a > b);
+    if (r > SPEC_YAW[bt] * 1.1 + 1) overYawS += dt;
     if (r > yc * 1.1 + 1) W('beat-yaw', tOf(i), `${bt}: the view turns at ${r.toFixed(0)}°/s (the plan's cap is ${SPEC_YAW[bt]}${yc !== SPEC_YAW[bt] ? `, ${yc} at its seam` : ''})`, bt);
     const pd = pitch[i] / DEG;
     if (pd < PITCH_ERROR[0] || pd > PITCH_ERROR[1]) E('pitch', tOf(i), `pitch ${pd.toFixed(0)}° (outside ${PITCH_ERROR[0]}…+${PITCH_ERROR[1]})`);
@@ -342,10 +350,41 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const capOf = (b: Beat): number | null => b === 'orbit' ? null : SPEC_SPEED[b];
     let cap = capOf(bt), vOf = FLIGHT(bt) ? speedH[i] : speed[i];
     for (const nb of neighbours(i)) { const c2 = capOf(nb); if (cap !== null && (c2 === null || c2 > cap)) cap = c2; if (FLIGHT(nb)) vOf = Math.min(vOf, speedH[i]); }
+    { const own = capOf(bt); if (own !== null && (FLIGHT(bt) ? speedH[i] : speed[i]) > own * 1.1) overSpeedS += dt; }
     if (cap !== null && vOf > cap * 1.1) W('beat-speed', tOf(i), `${bt}: ${vOf.toFixed(2)} m/s${FLIGHT(bt) ? ' in plan' : ''} (the plan's cap is ${cap.toFixed(1)})`, bt);
     if (bt === 'orbit') { const r = Math.hypot(eye[i][0] - centre[0], eye[i][2] - centre[2]) || 1; const w2 = speed[i] / r / DEG; if (w2 > SPEC_YAW.orbit) W('orbit-yaw-rate', tOf(i), `the orbit turns at ${w2.toFixed(0)}°/s (≤ ${SPEC_YAW.orbit})`); }
   }
   metrics.maxAccel = +maxAcc.toFixed(2); metrics.maxJerk = +maxJerk.toFixed(1);
+  // the seconds the film is over a beat's OWN cap by more than 10 % (the seam allowance, DEVIATIONS.seam, is what QA then forgives): the size of what the allowance hides
+  metrics.overCapS = { yaw: +overYawS.toFixed(2), speed: +overSpeedS.toFixed(2) };
+  // the speed PROFILE (§3.4: adjacent beats share a boundary speed, equal to the lower of their caps; no dead stop between): a dip is a stall — the speed under 40 % of the lesser of the fastest it goes in the second before and in the second after, where both are
+  // a walking pace (1 m/s). A 13-film seam stall (the approach hooking back on itself at the establishing seam: 0.5–0.9 m/s between 2.5 and 3.7) and a mid-route near-stop (0.14 m/s between 2 m/s on either side) were no finding at all until this: the accelerations
+  // they have are inside the plan's, and only the shape of the speed says it
+  { const W1 = Math.round(1 / dt), stepS = 6; let worst = 1, worstAt = 0;
+    const sm = new Float64Array(N); { const hw = Math.round(0.1 / dt); for (let i = 0; i < N; i++) { let a = 0, c = 0; for (let k = -hw; k <= hw; k++) { const j = i + k; if (j < 0 || j >= N) continue; a += speed[j]; c++; } sm[i] = a / c; } }
+    for (let i = Math.round(0.5 / dt); i < N - Math.round(2 / dt); i += stepS) {
+      if (['power', 'orbit', 'hero'].includes(beat[i])) continue;
+      let L = 0, R = 0; for (let k = Math.max(0, i - W1); k <= i; k += stepS) L = Math.max(L, sm[k]); for (let k = i; k <= Math.min(N - 1, i + W1); k += stepS) R = Math.max(R, sm[k]);
+      const side = Math.min(L, R); if (side < 1.0) continue;
+      const r = sm[i] / side; if (r < worst) { worst = r; worstAt = tOf(i); }
+      if (r < 0.4) W('stall', tOf(i), `${beat[i]}: the speed falls to ${sm[i].toFixed(2)} m/s between ${L.toFixed(1)} and ${R.toFixed(1)} m/s either side (a stall: under 40 % of the lesser)`, beat[i]);
+    }
+    metrics.minSpeedRatio = +worst.toFixed(2); metrics.minSpeedRatioAt = +worstAt.toFixed(2); }
+  // the path's SHAPE: the eye turning back on itself — over 120° of heading inside 1.5 m of walking (a hairpin; a corner into a room is 90°) — outside the flights (a U-stair turns on its landing), the exterior stair and the orbit and the press (which circle the Core: the path is theirs);
+  // the push-in is not exempt — it leaves the walk's end for the orbit's start, and a U-turn there is a view that cannot follow the Core. 17 findings in 13 of the 30 films at 110° (epiphany 150°, lakecabin 146°, cocoon 154°, palms 122°), and no check saw it: a path that doubles back is a view that whips round or a walk that reverses
+  { const cum = new Float64Array(N); for (let i = 1; i < N; i++) cum[i] = cum[i - 1] + Math.hypot(eye[i][0] - eye[i - 1][0], eye[i][2] - eye[i - 1][2]);
+    const at = (d: number, from: number) => { let lo = from, hi = N - 1; if (cum[hi] < d) return hi; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (cum[m] < d) lo = m; else hi = m; } return hi; };
+    const headingOf = (i: number, fwd: boolean) => { const j = fwd ? at(cum[i] + 0.3, i) : at(Math.max(0, cum[i] - 0.3), 0); const a = fwd ? i : j, b = fwd ? j : i; return Math.atan2(eye[b][0] - eye[a][0], eye[b][2] - eye[a][2]); };
+    let worst = 0, worstAt = 0;
+    for (let i = Math.round(0.3 / dt); i < N - 1; i += 6) {
+      const bi = beat[i]; if (['stair', 'descend', 'extStair', 'orbit', 'power', 'establish'].includes(bi)) continue;
+      const j = at(cum[i] + 1.5, i); if (cum[j] - cum[i] < 1.4 || ['stair', 'descend', 'extStair', 'orbit', 'power'].includes(beat[j])) continue;
+      // the largest turn between the heading here and any heading in the next 1.5 m (the sum of the turns would call a gentle arc a hairpin)
+      const h0 = headingOf(i, true); let turn = 0; for (let k = i; k <= j; k += 6) turn = Math.max(turn, Math.abs(wrapPi(headingOf(k, true) - h0)));
+      const deg = turn / DEG; if (deg > worst) { worst = deg; worstAt = tOf(i); }
+      if (deg > 120) W('hairpin', tOf(i), `${bi}: the eye turns back ${deg.toFixed(0)}° on itself inside 1.5 m of walking (over 120°: a right-angled corner is 90)`, bi);
+    }
+    metrics.maxPathTurn = +worst.toFixed(0); metrics.maxPathTurnAt = +worstAt.toFixed(2); }
   // interior doorways: ≤ 1.2 m/s within ±0.6 m of the plane, through the middle (±0.1 m), square to it for ±0.7 m
   const doors = world.levels.flatMap(l => nav.doorsOn(l.id).map(d => ({ ...d, y: l.y })));
   const doorsCrossed: any[] = [];
@@ -410,7 +449,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const lenOf = (names: Beat[], plan = false) => { let L = 0; for (let i = 1; i < N; i++) if (names.includes(beat[i])) L += plan ? Math.hypot(eye[i][0] - eye[i - 1][0], eye[i][2] - eye[i - 1][2]) : Math.hypot(eye[i][0] - eye[i - 1][0], eye[i][1] - eye[i - 1][1], eye[i][2] - eye[i - 1][2]); return L; };
     const orbitDeg = (() => { const sp = beatSpans.get('orbit'); if (!sp) return 0; let sw = 0; for (const [i0, i1] of sp) for (let i = Math.max(1, i0); i <= i1; i++) sw += wrapPi(Math.atan2(eye[i][0] - centre[0], eye[i][2] - centre[2]) - Math.atan2(eye[i - 1][0] - centre[0], eye[i - 1][2] - centre[2])); return Math.abs(sw) / DEG; })();
     const bud = filmBudget({ storeys: storeysRoute, ext: beatSpans.has('extStair'), establishM: lenOf(['establish']), approachM: lenOf(['approach', 'extStair']), walkM: lenOf(['reveal', 'route', 'roomReveal', 'hero']), flightPlanM: lenOf(['stair', 'descend'], true), orbitDeg });
-    metrics.filmBudget = +bud.total.toFixed(1); metrics.filmBudgetRatio = +(T / bud.total).toFixed(2);
+    metrics.filmBudget = +bud.total.toFixed(1); metrics.filmBudgetRatio = +(T / bud.total).toFixed(2); metrics.filmPlanS = +(bud.base - (beatSpans.has('extStair') ? 0.6 : 0)).toFixed(1);
     if (T > bud.total * BUDGET_SLACK + 0.25) W('film-length', 0, `the film runs ${T.toFixed(1)} s against a budget of ${bud.total.toFixed(1)} s (the plan's ${bud.base.toFixed(1)} s with the orbit, and ${(bud.total - bud.base).toFixed(1)} s for this house's distances; over ${((BUDGET_SLACK - 1) * 100).toFixed(0)} % warns)`);
   }
   // the lens: its rate, and its range where a beat has one
@@ -423,6 +462,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     if (range && (f < range[0] - 0.5 || f > range[1] + 0.5)) W('fov-range', tOf(i), `${bt}: lens ${f.toFixed(1)}° (${range[0]}–${range[1]})`, bt);
   }
   metrics.maxFovRate = +maxFovRate.toFixed(2);
+  }   // (!opts.frameOnly)
 
   // ---- composition: a 7 × 5 ray grid every 0.1 s (blank, near-blank, foreground occluders) -------------------------
   let blankRun = 0, nearRun = 0, foreRun = 0, blankMax = 0, nearMax = 0;
@@ -443,6 +483,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     if (fore > 0.25) { foreRun += step * dt; if (foreRun > 0.3) W('foreground-occluder', tOf(i), `${(fore * 100).toFixed(0)} % of the frame is something within 0.8 m of the lens`); } else foreRun = 0;
   }
   metrics.blankMax = +blankMax.toFixed(2); metrics.nearBlankMax = +nearMax.toFixed(2);
+  if (!opts.frameOnly) {
   // dead air: a 1 s window outside the power beat with under 3° of view change (the turn, plus what the eye's travel
   // does to a subject 3 m away)
   { const w = Math.round(1 / dt); let worst = Infinity, at = 0;
@@ -469,7 +510,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const f = frameFit(eye[0], tgt[0], fov[0], houseCorners(world), 0.08, aspect);
     const c = probe.composition(cam0, true, 1.5);
     const occ = c.rays.filter(r => r.k === K.site && r.t < 6).length / c.rays.length;
-    metrics.establish = { style: track.plan && track.plan.establish ? track.plan.establish.style : null, crop: { top: +f.top.toFixed(3), bottom: +f.bottom.toFixed(3), side: +f.side.toFixed(3) }, sky: +c.sky.toFixed(3), occluder: +occ.toFixed(3), bearing: entry ? +(Math.atan2((eye[0][0] - entry.x) * entry.out[1] - (eye[0][2] - entry.z) * entry.out[0], (eye[0][0] - entry.x) * entry.out[0] + (eye[0][2] - entry.z) * entry.out[1]) / DEG).toFixed(1) : null };
+    metrics.establish = { style: track.plan && track.plan.establish ? track.plan.establish.style : null, lens: +fov[0].toFixed(1), crop: { top: +f.top.toFixed(3), bottom: +f.bottom.toFixed(3), side: +f.side.toFixed(3) }, sky: +c.sky.toFixed(3), occluder: +occ.toFixed(3), bearing: entry ? +(Math.atan2((eye[0][0] - entry.x) * entry.out[1] - (eye[0][2] - entry.z) * entry.out[0], (eye[0][0] - entry.x) * entry.out[0] + (eye[0][2] - entry.z) * entry.out[1]) / DEG).toFixed(1) : null };
     // (§3.9: the footprint and the roof inside the frame with 8 % margins — a stray eave or dormer, 3 % of the corners, and the ground line within 15 % of the bottom margin)
     if (!wholeFit(eye[0], tgt[0], fov[0], houseCorners(world), aspect)) W('establish-crop', 0, `the house is cropped on the first frame: ${(f.top * 100).toFixed(0)} % of its corners over the top margin, ${(f.bottom * 100).toFixed(0)} % under the bottom, ${(f.side * 100).toFixed(0)} % past a side (all of it in, with 8 % margins: at most 3 % over the top or a side)`);
     // §3.9: sky 15–35 % of the first frame (5 points of slack either side: the share is the 35 rays of a 7 × 5 grid)
@@ -490,6 +531,8 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     }
   }
 
+  }   // (!opts.frameOnly)
+
   // ---- the Core: in sight before the press, the press itself, the final frame -------------------------------
   const ev = track.events;
   const coreIn = (i: number, margin = 0.9) => { const cam = camera(eye[i], tgt[i], fov[i], aspect); const p = project(cam, centre); return p[2] > 0 && Math.abs(p[0]) < margin && Math.abs(p[1]) < margin; };
@@ -508,7 +551,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const pb = projectBox(camera(eye[pressI], tgt[pressI], fov[pressI], aspect), core);
     if (!pb || pb.minX < -0.92 || pb.maxX > 0.92 || pb.minY < -0.92 || pb.maxY > 0.92) E('press-frame', ev.pressT!, 'the Core is not wholly in frame with an 8 % margin at the press');
     if (ev.pressT! > T - 1.4 + 1e-3) E('press-late', ev.pressT!, `the press at ${ev.pressT!.toFixed(2)} s leaves under 1.4 s to watch the Core wake`);
-    metrics.pressT = ev.pressT; metrics.pressSpeed = +speed[pressI].toFixed(3); metrics.pressYaw = +rates[pressI].toFixed(1);
+    metrics.pressT = ev.pressT; metrics.pressSpeed = +speed[pressI].toFixed(3); metrics.pressYaw = rates.length ? +rates[pressI].toFixed(1) : null;
     // contrast: the Core's finish against what stands behind it (luminance of the first box behind, by colour)
     const d = [centre[0] - eye[pressI][0], centre[1] - eye[pressI][1], centre[2] - eye[pressI][2]], L = Math.hypot(d[0], d[1], d[2]);
     const coreIds = new Set<number>(); for (let i = 0; i < world.kinds.length; i++) if (world.kinds[i] === K.core) coreIds.add(i);
@@ -532,8 +575,28 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     if (wp < 0.10) W('core-narrow', T, `the Core is ${(wp * 100).toFixed(0)} % of the final frame's width (≥ 10 %)`);
     const thirds = Math.min(Math.abs(Math.abs(pc[0]) - 1 / 3), Math.abs(Math.abs(pc[1]) - 1 / 3));
     if (thirds > 0.08) W('core-thirds', T, `the Core ends at (${pc[0].toFixed(2)}, ${pc[1].toFixed(2)}), off every thirds line`);
-    if (hero.chair) { const cb = projectBox(cam, hero.chair); const share = cb ? Math.max(0, Math.min(1, cb.maxX) - Math.max(-1, cb.minX)) * Math.max(0, Math.min(1, cb.maxY) - Math.max(-1, cb.minY)) / 4 : 0; metrics.chairShare = +share.toFixed(3); if (share > 0.10) W('chair-share', T, `the chair covers ${(share * 100).toFixed(0)} % of the final frame (≤ 10 %)`); }
+    // (the chair's box clipped at the lens: a chair back 0.3 m from the eye has corners behind it, and a box with ANY corner behind the eye has no outline — that read as no chair at all, in a frame that was a fifth of it)
+    if (hero.chair) { const share = boxFrameShare(cam, hero.chair); metrics.chairShare = +share.toFixed(3); if (share > 0.10) W('chair-share', T, `the chair covers ${(share * 100).toFixed(0)} % of the final frame (≤ 10 %)`); }
+    // §3.11: the finale's eye stands 15–65° off the Core's facing axis (never dead-on, never round behind it): the Core's front is what the viewer reads it by
+    { const dx = p[0] - centre[0], dz = p[2] - centre[2], az = Math.abs(Math.atan2(dx * hero.fwd[1] - dz * hero.fwd[0], dx * hero.fwd[0] + dz * hero.fwd[1])) / DEG; metrics.finalAxisDeg = +az.toFixed(0);
+      if (az > 65.5 || az < 14.5) W('core-axis', T, `the film ends ${az.toFixed(0)}° off the Core's front (the plan's ${az > 65 ? '15–65°' : '15–65°, never dead-on'})`); }
     if (hero.monitor) { const m = hero.monitor, q = project(cam, [(m[0] + m[3]) / 2, m[4], (m[2] + m[5]) / 2]); const ok = q[2] > 0 && Math.abs(q[1]) < 0.98 && Math.abs(q[0]) < 1; metrics.monitorTop = ok; if (!ok) W('monitor-cut', T, 'the monitor\'s top edge is out of the final frame'); }
+  }
+  // the Core in the frame while the film closes on it (§3.5: roomReveal's subject is the Core and the room's focal item, hero's and the press's the Core alone; §3.12): on the push-in the Core stays in the
+  // frame (an error over 0.5 s outside it: the push-in is the shot of it), and from the first second of the room reveal it is in the frame for all but 1.5 s (a warning — the walk into the room turns the view
+  // onto it at the plan's 20°/s, and a walk that passes the Core and comes back at it has the look 75° off it for 3 s: the camera at a bookcase and a prop that is not the Core)
+  if (d2c) {
+    const outS: Record<string, { s: number; run: number; worst: number }> = {};
+    for (const bname of ['roomReveal', 'hero'] as Beat[]) {
+      let s = 0, run = 0, maxRun = 0, worst = 0, runAt = 0;
+      for (const [i0, i1] of beatSpans.get(bname) || []) for (let i = i0; i <= i1; i += 6) {
+        if (bname === 'roomReveal' && tOf(i) - tOf(i0) < 1.0) continue;
+        const cam = camera(eye[i], tgt[i], fov[i], aspect), p = project(cam, centre), m = p[2] > 0 ? Math.max(Math.abs(p[0]), Math.abs(p[1])) : 9;
+        if (m > 0.98) { s += 6 * dt; if (!run) runAt = tOf(i); run += 6 * dt; maxRun = Math.max(maxRun, run); worst = Math.max(worst, Math.min(m, 9)); if (bname === 'hero' && run > 0.5) E('hero-core-off', tOf(i), `hero: the Core is out of the frame for ${run.toFixed(1)} s on the push-in (the look is ${m > 8 ? 'behind' : 'at NDC ' + m.toFixed(1) + ' off'} it)`, 'hero'); if (bname === 'roomReveal' && run > 1.5) W('reveal-core-off', tOf(i), `roomReveal: the Core is out of the frame for ${run.toFixed(1)} s as the walk comes into its room`, 'roomReveal'); } else run = 0;
+      }
+      if (beatSpans.has(bname)) outS[bname] = { s: +s.toFixed(2), run: +maxRun.toFixed(2), worst: +worst.toFixed(1) };
+    }
+    metrics.coreOffFrame = outS;
   }
   // the orbit: the Core framed and in sight throughout, the sweep, the swing before it
   const orbitSpan = beatSpans.get('orbit');
@@ -564,7 +627,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   }
 
   // ---- the route: the rooms worth seeing, the via rooms, the Core room's side, attics ---------------------------
-  if (d2c) {
+  if (d2c && !opts.frameOnly) {
     const hLv = world.levels.find(l => l.id === hero.level)!, eLv = entry ? world.levels.find(l => l.id === entry.level)! : hLv;
     const rooms = [...new Set([...eLv.rooms, ...hLv.rooms])].filter(r => r.b).map(r => ({ r, lv: eLv.rooms.includes(r) ? eLv : hLv, ...roomInterest(r, world) }));
     rooms.sort((a, b) => b.interest - a.interest || a.r.no.localeCompare(b.r.no));

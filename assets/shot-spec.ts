@@ -29,6 +29,8 @@ export const DOORWAY_SPEED = 1.2;
 /** §3.5 yaw-rate caps, °/s, over a 0.1 s window. `extStair` has no plan value (30); `stair`/`descend` are the plan's "landing 60" (a straight flight turns far less); `orbit` has none (45: the
  *  eye circling the Core at its 30°/s cap turns the view by as much) */
 export const SPEC_YAW: Record<Beat, number> = { establish: 12, extStair: 30, approach: 20, threshold: 30, reveal: 25, route: 45, stair: 60, descend: 60, roomReveal: 20, hero: 15, orbit: 45, power: 5 };
+/** within this of a seam between two beats a cap is the looser of the two beats' (the speed and the yaw rate cannot step at the sample a beat changes): DEVIATIONS.seam */
+export const SEAM_S = 0.35;
 /** §3.14: the smoothed rate over a 0.1 s window is an error over 90°/s and a warning over 60 */
 export const YAW_WARN = 60, YAW_ERROR = 90;
 /** §3.5 pitch clamps, degrees. Inside the house the view is level within ±8° except on the stairs and in the finale (§3.5, "two-point perspective") */
@@ -42,10 +44,12 @@ export const PITCH_ERROR: [number, number] = [-45, 30];
 /** §3.5 lens (vertical fov, degrees): exterior 32 (30–35), interior 56 (55–60), hero 40 (38–44); the lens eases at ≤ 4°/s */
 export const LENS_EXTERIOR: [number, number] = [30, 35], LENS_INTERIOR: [number, number] = [55, 60], LENS_HERO: [number, number] = [38, 44];
 export const LENS_RATE = 4;
-/** the lens a beat may use. A beat that carries the lens from one to the other (the door, the push-in) spans both. The establishing lens is the plan's 30–35 where the whole
- *  house fits the frame with the plan's 8 % margins inside the move the outside's time allows, and wider where it does not (DEVIATIONS.establishLens). */
+/** the widest lens the finale may use where the room is too tight to frame the Core at 44° (DEVIATIONS.finaleLens): inside the plan's own interior lens (55–60), and QA warns (`fov-range`) on every sample of the orbit and the press above 44° */
+export const LENS_HERO_MAX = 56;
+/** the lens a beat may use. A beat that carries the lens from one to the other (the door, the push-in) spans both. The establishing lens is the plan's 30–35, and QA holds the opening to it (a `fov-range`
+ *  warning on every film that opens wider: DEVIATIONS.establishLens says why the planner does, and by how much) — it is not widened here to what the planner chose. */
 export const SPEC_FOV: Record<Beat, [number, number]> = {
-  establish: [LENS_EXTERIOR[0], 49.5], extStair: [LENS_EXTERIOR[0], LENS_INTERIOR[1]], approach: [LENS_EXTERIOR[0], LENS_INTERIOR[1]], threshold: [LENS_EXTERIOR[0], LENS_INTERIOR[1]],
+  establish: LENS_EXTERIOR, extStair: [LENS_EXTERIOR[0], LENS_INTERIOR[1]], approach: [LENS_EXTERIOR[0], LENS_INTERIOR[1]], threshold: [LENS_EXTERIOR[0], LENS_INTERIOR[1]],
   reveal: LENS_INTERIOR, route: LENS_INTERIOR, stair: LENS_INTERIOR, descend: LENS_INTERIOR,
   roomReveal: [LENS_HERO[0], LENS_INTERIOR[1]], hero: [LENS_HERO[0], LENS_INTERIOR[1]], orbit: LENS_HERO, power: LENS_HERO,
 };
@@ -95,11 +99,15 @@ export const OUTSIDE_TARGET = 0.30, OUTSIDE_ERROR = 0.35;
 /** things the plan states about the outside that QA holds the film to */
 export const SPEC_ESTABLISH = { eyeHeight: [5, 9] as [number, number], marginShare: 0.08, sky: [0.15, 0.35] as [number, number], firstSecondM: 0.5, occluderRadiusM: 6 };
 
-/** the deviations from the plan this planner makes, each with the reason, and what QA does about it. None is a loosened number: QA holds the film to the plan's value, and a film that deviates
- *  gets a warning (`fov-range`, `film-length`, `establish-crop` …) that says by how much. */
+/** the deviations from the plan this planner makes, each with the reason, and what QA does about it. A deviation is not a loosened number: QA holds the film to the plan's value where it can (a `fov-range`,
+ *  `film-length`, `establish-crop` … warning that says by how much, on every film that deviates), and where the plan cannot be held to without breaking another of its numbers the allowance is named here and
+ *  measured (`metrics.overCapS`, the fleet's `establish-lens`, `finale-lens` and `film-length-plan` lines). There is no silent one. */
 export const DEVIATIONS: Record<string, { plan: string; here: string; why: string }> = {
-  establishLens: { plan: '§3.5 exterior lens 30–35°', here: '42–49° (QA holds the establishing beat to 30–49.5°)', why: '§3.9 asks for the whole footprint and roof inside the frame with 8 % margins, §3.3 for 1.8 s of it: at 32° a 20 m house needs an eye 21 m out, a move of 17 m — 3.5 s at the 5 m/s cap; the nearest eye at which the house fits a 42–49° frame inside the move the outside\'s time allows is used' },
-  finaleLens: { plan: '§3.5 hero lens 38–44° with the Core 18–25 % of the frame (§3.11) on a ring 0.75–1.6 m out', here: '38–44° wherever the room allows a ≥ 90° orbit at a radius where the Core is no more than ~24 % of the frame at 44°; up to 52° where it does not (19 of 30 houses; each a `fov-range` warning on the orbit and the press)', why: 'a 9 cm slab seen from 1 m fills 23–28 % of the frame at 44°; a radius that frames it inside 25 % at 44° costs the sweep in a cramped room, and the owner\'s brief is an orbit of 90° or more. The radius choice prices a wider lens at 10 sweep-degrees a degree' },
+  establishLens: { plan: '§3.5 exterior lens 30–35°', here: '40–49° on the first frame (13 of 30 at 40°, none under); every film is a `fov-range` warning on its establishing beat', why: '§3.9 asks for the whole footprint and roof inside the frame with 8 % margins, §3.3 for 1.8 s of it: at 32° a 20 m house needs an eye 21 m out, a move of 17 m — 3.5 s at the 5 m/s cap, and the lens then has 4.7 s to reach the interior\'s 55° at the plan\'s 4°/s (a 38° opening cannot: QA `fov-rate`); the narrowest of 40, 42, 46 and 49° at which the house fits inside the move the outside\'s time allows, and is scored 2.5 points a degree over 35, is used' },
+  finaleLens: { plan: '§3.5 hero lens 38–44° with the Core 18–25 % of the frame (§3.11) on a ring 0.75–1.6 m out', here: '38–44° wherever the Core frames inside ~24 % of the frame at 44° from a radius with a sweep of 90° or more; up to LENS_HERO_MAX (56°) where the room is too tight for that (each a `fov-range` warning on the orbit and the press; the fleet\'s `finale-lens` line counts them)', why: 'a 9 cm slab seen from 1 m fills 23–28 % of the frame at 44°; the owner\'s brief is an orbit of 90° or more, and in a tight room the sweep of 90° is at 0.85–0.95 m, not at the radius the lens wants. The radius choice trades them: a sweep of 90° is worth 150 points, a lens degree over 44° costs 10' },
   orbit: { plan: '§3.3 has no orbit beat', here: 'a sweep of 90° or more at ≤ 30°/s (26°/s on average), budgeted ORBIT_S', why: 'the owner\'s finale (door → Core ending in an orbit round it): the v1 orbit, kept' },
   filmLength: { plan: '§3.0: 12 s (13 for three storeys)', here: '17–36 s, 25 s the median; QA `film-length` holds it to filmBudget()', why: 'the plan\'s budgets are for a walk of about 5 m, an opening of about 6 m and no orbit; a door 6–20 m from its Core cannot be walked in 2.4 s at 2.2 m/s (completeness D6: a layout rule, the hero viewpoint within ~3 m of the Core room\'s door)' },
+  seam: { plan: '§3.4 / §3.5: every cap holds throughout its beat', here: 'within SEAM_S (0.35 s) of a seam QA holds the film to the looser of the two beats\' caps (speed, yaw, pitch); metrics.overCapS reports how long the film is over a beat\'s own cap, seams included', why: 'the speed and the view\'s rate cannot step at the sample a beat changes (an infinite acceleration): the handover is eased over a few tenths of a second, and the plan has no number for it' },
+  doorZone: { plan: '§3.4 threshold: 0.9 m/s across the door\'s plane (±0.8 m)', here: '0.9 m/s at the plane, and QA\'s `door-zone-speed` holds ±0.45 m of it (DOOR_ZONE_M); the threshold beat\'s own cap is 1.2 m/s (the plan\'s doorway number) away from the plane', why: 'completeness D4: ±0.8 m at 0.9 m/s takes 1.8 s against a threshold beat of 0.8–1.0 s; the zone is the other way D4 allows' },
+  filmBudget: { plan: '§3.0 / §3.3: 12 s (13 for three storeys)', here: 'filmBudget(): the plan\'s 12 s, the orbit (ORBIT_S) and this house\'s distances at 4.0 / 2.0 / 1.6 / 1.2 m/s — QA\'s `film-length` and the fleet\'s `film-length` hold the film to it; the fleet\'s `film-length-plan` reports it against the plan\'s own 12 s + the orbit', why: 'the paces are measured from the films\' own beats (the plan gives none): a longer walk or a farther opening earns more budget, so the budget alone cannot say the film is as short as the plan wants — the plan\'s own figure is printed beside it' },
 };
