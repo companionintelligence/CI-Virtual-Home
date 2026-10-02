@@ -258,6 +258,9 @@ function wire() {
   let warmed = false;
   const warm = e => {
     if (e.pointerType === 'touch') return;
+    // Save-Data (or a slow link): the visitor asked not to spend bytes on a guess. An inline check, not an import of platform.js, so the gallery's weight is unchanged.
+    const net = navigator.connection;
+    if (net && (net.saveData || (net.effectiveType && net.effectiveType !== '4g'))) return;
     const a = e.target.closest && e.target.closest('.card a, #hero-play, #hero-media');
     if (!a) return;
     const id = new URL(a.href).searchParams.get('house');
