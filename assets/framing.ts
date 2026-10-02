@@ -11,7 +11,7 @@ import { Math } from './detmath.js';
 import { K, DEG, clamp, inRect, inFootprint, levelAt, mulberry32, fnv1a, type ShotWorld, type WorldIndex, type Box6, type WLevel } from './shot-world.js';
 import { camera, project, projectBox, type V3, type Probe } from './shot-probe.js';
 import { perimeterEdges } from './house-geometry.js';
-import { SPEC_PITCH } from './shot-spec.js';
+import { SPEC_PITCH, LENS_HERO } from './shot-spec.js';
 
 // ---- a Vector3 for core-orbit.ts's helpers (they only construct points and read x, y, z) ------------------------
 export class Vec3 {
@@ -257,11 +257,12 @@ export function coreHeightPct(eye: V3, target: V3, fov: number, core: Box6, aspe
   const pb = projectBox(camera(eye, target, fov, aspect), core);
   return pb ? (pb.maxY - pb.minY) / 2 : 0;
 }
-/** the vertical fov (38–52°) that puts the Core at `want` of the frame height from eye (the plan's 38–44 lens, wider where the
- *  room lets the eye no further from a 9 cm slab) */
-export function fovForCore(eye: V3, target: V3, core: Box6, want = 0.21) {
+/** the vertical fov that puts the Core at `want` of the frame height from eye — the plan's 38–44 lens (§3.5, LENS_HERO) whenever the Core is no more than `hmax` of the frame at its widest, and
+ *  wider (to 52°) only where it is: the eye is no further from a 9 cm slab than the room lets it (§3.11's ring is 0.75–1.6 m), and the Core would fill the frame at 44° */
+export function fovForCore(eye: V3, target: V3, core: Box6, want = 0.21, hmax = 0.25) {
   let best = 40, bd = Infinity;
   for (let f = 38; f <= 52.001; f += 0.5) { const d = Math.abs(coreHeightPct(eye, target, f, core) - want); if (d < bd) { bd = d; best = f; } }
+  if (best > LENS_HERO[1] && coreHeightPct(eye, target, LENS_HERO[1], core) <= hmax) return LENS_HERO[1];
   return best;
 }
 /** a look target that puts the Core at ndc (x, y) for this eye and fov: rotate the look from the Core's centre */
