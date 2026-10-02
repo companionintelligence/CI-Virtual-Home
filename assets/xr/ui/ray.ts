@@ -98,6 +98,8 @@ export class RayHub {
   private unregister: (() => void) | null = null;
   pointingAtPanel = false;
   readonly log: Array<{ ev: string; src: string; id?: string | null }> = [];
+  /** the log is a window on the last 200 events (a long session must not grow it without end) */
+  private note(ev: string, src: string, id?: string | null): void { this.log.push({ ev, src, id }); if (this.log.length > 200) this.log.splice(0, this.log.length - 200); }
 
   constructor(private d: HubDeps) {
     const T = (this.T = d.THREE);
@@ -252,13 +254,13 @@ export class RayHub {
       s.proxy = new T.Mesh(this.proxyGeo, this.proxyMat); s.proxy.name = 'xr ui: controller proxy'; s.proxy.visible = false; s.proxy.frustumCulled = false; s.proxy.renderOrder = 1290; s.proxy.matrixAutoUpdate = false; s.proxy.raycast = () => {};
       this.d.group.add(s.proxy);
     }
-    this.srcs.set(x, s); this.log.push({ ev: 'add', src: `${x.handedness}/${x.targetRayMode}` });
+    this.srcs.set(x, s); this.note('add', `${x.handedness}/${x.targetRayMode}`);
     return s;
   }
   private removeSource(x: any, s: Src, why: string): void {
     this.cancelKey(s.key, why);
     s.hoverPanel?.setHover(null);
-    this.dropVisuals(s); this.srcs.delete(x); this.log.push({ ev: 'remove:' + why, src: `${x.handedness}/${x.targetRayMode}` });
+    this.dropVisuals(s); this.srcs.delete(x); this.note('remove:' + why, `${x.handedness}/${x.targetRayMode}`);
   }
   private dropVisuals(s: Src): void { for (const o of [s.ray, s.dot, s.proxy]) o?.removeFromParent(); }
   private hideVisuals(s: Src): void { s.ray.visible = false; s.dot.visible = false; if (s.proxy) s.proxy.visible = false; }
@@ -335,20 +337,20 @@ export class RayHub {
     this.cancelKey(key, 'new-press');
     this.pressed.set(key, { panel, widget });
     if (widget && widget.enabled) { panel.setPressed(widget.id); this.buzz(key, 0.6, 40, 'press'); }
-    this.log.push({ ev: 'press', src: key, id: widget?.id ?? null });
+    this.note('press', key, widget?.id ?? null);
   }
   endPress(key: string, now: { panel: XrPanel; widget: Widget | null } | null, cancelled: boolean): void {
     const p = this.pressed.get(key); if (!p) return;
     this.pressed.delete(key);
     p.panel.setPressed(null);
     const hit = !cancelled && now && now.panel === p.panel && p.widget && now.widget && now.widget.id === p.widget.id && p.widget.enabled;
-    this.log.push({ ev: hit ? 'activate' : 'release', src: key, id: p.widget?.id ?? null });
+    this.note(hit ? 'activate' : 'release', key, p.widget?.id ?? null);
     if (hit && p.widget) this.d.onActivate(p.panel, p.widget);
   }
   private cancelKey(key: string, why: string): void {
     const p = this.pressed.get(key); if (!p) return;
     this.pressed.delete(key); p.panel.setPressed(null);
-    this.log.push({ ev: 'cancel:' + why, src: key, id: p.widget?.id ?? null });
+    this.note('cancel:' + why, key, p.widget?.id ?? null);
   }
   cancelAll(why: string): void { for (const k of [...this.pressed.keys()]) this.cancelKey(k, why); }
 

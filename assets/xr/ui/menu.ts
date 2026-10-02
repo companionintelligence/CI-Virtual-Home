@@ -183,7 +183,7 @@ export class Menu {
 
   // ------------------------------------------------------------------------------------------------------------------ doing things
   activate(id: string): void {
-    this.activations.push(id);
+    this.activations.push(id); if (this.activations.length > 100) this.activations.shift();
     const k = this.kit, s = k.settings.get();
     const [a, b] = [id.split(':')[0], id.slice(id.indexOf(':') + 1)];
     switch (a) {

@@ -17,6 +17,7 @@
 // What emulation cannot prove: legibility at a real distance (IWER's eye buffer is a few pixels per degree), ray ergonomics, pinch reliability on visionOS,
 // audio. They are steps in reference/XR-DEVICE-CHECKLIST.md.
 // @check-house skip — needs the built dist and a GPU browser; run pnpm run xr:test
+// @ts-ignore -- the harness (scripts/xr-harness/) belongs to the xr-test package: on this branch alone the import does not resolve, after the merge it does (and is typed)
 import { comfortReport, defineCase, enterSession, endSession, foreign, sleep, startComfort, stopComfort, tickFrames, until, type Ctx, type P } from '../xr-harness/lib.mts';
 
 type Boot = { p: P; e: Awaited<ReturnType<typeof enterSession>>; vision: boolean };
@@ -253,19 +254,19 @@ export const tour = defineCase({
     const cardTexts = async () => ui(p, (u: any) => u.presenter().debug.texts());
     let got = await cardTexts();
     let want = expectTexts(beats[0]);
-    t.check(JSON.stringify(got.slice(0, want.length)) === JSON.stringify(want), `beat 0 texts differ.\n  want ${JSON.stringify(want)}\n  got  ${JSON.stringify(got)}`);
+    t.check(JSON.stringify(got.slice(0, want.length)) === JSON.stringify(want), `T-X3: beat 0 texts differ.\n  want ${JSON.stringify(want)}\n  got  ${JSON.stringify(got)}`);
 
     // ---- a beat with a phone, a note, chips and a say line; speak it and watch the caption
     const r1 = await p.page.evaluate(async () => { const d = (window as any).__demo; d.presenter.press('next'); await new Promise<void>(res => { const x = (window as any).__houseViewer.xr; const off = x.onFrame(() => { if (d.index() === 1 && d.state() === 'beat' && d.enter.length === 2) { off(); res(); } }); }); return JSON.parse(JSON.stringify(d.enter[1])); });
     t.check(r1.cardVisible === true, 'the card was not visible when enterBeat resolved');
     await tickFrames(p, 15);
     got = await cardTexts(); want = expectTexts(beats[1]);
-    t.check(JSON.stringify(got.slice(0, want.length)) === JSON.stringify(want), `beat 1 texts differ.\n  want ${JSON.stringify(want)}\n  got  ${JSON.stringify(got)}`);
+    t.check(JSON.stringify(got.slice(0, want.length)) === JSON.stringify(want), `T-X3: beat 1 texts differ.\n  want ${JSON.stringify(want)}\n  got  ${JSON.stringify(got)}`);
     const up0 = (await panels(p)).find((q: any) => q.name === 'caption');
     const idle0 = (await panels(p)).map((q: any) => [q.name, q.uploads]);
     await tickFrames(p, 60);
     const idle1 = (await panels(p)).map((q: any) => [q.name, q.uploads]);
-    t.check(JSON.stringify(idle0) === JSON.stringify(idle1), `a still scene uploaded textures: ${JSON.stringify(idle0)} -> ${JSON.stringify(idle1)}`);
+    t.check(JSON.stringify(idle0) === JSON.stringify(idle1), `T-X8: a still scene uploaded textures: ${JSON.stringify(idle0)} -> ${JSON.stringify(idle1)}`);
     const words = beats[1].narration.words.length;
     await p.page.evaluate(async () => { await (window as any).__demo.speak(); });
     const capAfter = (await panels(p)).find((q: any) => q.name === 'caption');
@@ -289,7 +290,7 @@ export const tour = defineCase({
     for (const en of rep.enters) {
       t.check(en.mode === 'card' || en.mode === 'sheet', `${en.id}: no placement mode`);
       t.check(en.ok === true, `${en.id}: the placement is not ok (${en.mode}) ${en.notes.join('; ')}`);
-      t.check(en.texts.length > 3, `${en.id}: debug.texts() has ${en.texts.length} strings`);
+      t.check(en.texts.length >= 3 && en.texts.includes('Fictional family. Real software.'), `${en.id}: debug.texts() is ${JSON.stringify(en.texts)}`);
     }
     const ms = rep.enters.map((x: any) => x.ms).sort((a: number, b: number) => a - b), p95 = ms[Math.min(ms.length - 1, Math.floor(ms.length * 0.95))];
     t.note('enterMs', ms.map((x: number) => Math.round(x)).join(','));
@@ -305,9 +306,9 @@ export const tour = defineCase({
     await tickFrames(p, 20);
     const fp = await ui(p, (u: any) => u.debug.footprint());
     t.note('footprint', JSON.stringify(rep.maxFootprint) + ' now ' + JSON.stringify(fp));
-    t.check(rep.maxFootprint.panels <= 8 && (await panels(p)).length <= 8, `${rep.maxFootprint.panels} panels (budget 8)`);
-    t.check(rep.maxFootprint.textureBytes <= 24 * 1024 * 1024, `${(rep.maxFootprint.textureBytes / 1048576).toFixed(1)} MB of panel textures (budget 24)`);
-    t.check(rep.maxFootprint.drawCalls <= 24 && fp.drawCalls <= 24, `${rep.maxFootprint.drawCalls} draw calls from the kit (budget 24)`);
+    t.check(rep.maxFootprint.panels <= 8 && (await panels(p)).length <= 8, `T-X8: ${rep.maxFootprint.panels} panels (budget 8)`);
+    t.check(rep.maxFootprint.textureBytes <= 24 * 1024 * 1024, `T-X8: ${(rep.maxFootprint.textureBytes / 1048576).toFixed(1)} MB of panel textures (budget 24)`);
+    t.check(rep.maxFootprint.drawCalls <= 24 && fp.drawCalls <= 24, `T-X8: ${rep.maxFootprint.drawCalls} draw calls from the kit (budget 24)`);
     const cost = await p.page.evaluate(async () => {
       const u = (window as any).__houseViewer.xr.ui(), real = u.tick.bind(u), xs: number[] = []; let n = 0;
       u.tick = (f: any) => { const a = performance.now(); real(f); xs.push(performance.now() - a); n++; };
@@ -316,15 +317,15 @@ export const tour = defineCase({
       return { median: xs[Math.floor(xs.length / 2)], p95: xs[Math.floor(xs.length * 0.95)], n: xs.length };
     });
     t.note('uiTickMs', `median ${cost.median.toFixed(2)} p95 ${cost.p95.toFixed(2)} (${cost.n} frames, 5+ panels up)`);
-    t.check(cost.median < 1.5, `ui.tick costs a median ${cost.median.toFixed(2)} ms with the panels up`);
+    t.check(cost.median < 1.5, `T-X8: ui.tick costs a median ${cost.median.toFixed(2)} ms with the panels up`);
 
     // ---- T-X4: through all of it the person moved only behind black
     const rpt = await comfortReport(p);
     const own = await ui(p, (u: any) => u.debug.motionLog());
     t.note('comfort', `${rpt.frames} frames, ${rpt.moves} moves, ${rpt.movesWhileVisible} while visible; kit log ${own.length} moves`);
-    t.check(rpt.moves >= 3, `the tour moved the person ${rpt.moves} times: the comfort check proved nothing`);
-    t.check(rpt.movesWhileVisible === 0, `${rpt.movesWhileVisible} viewpoint changes on frames where the view was not black (worst ${rpt.worst.toFixed(3)} m, ${rpt.noFade} with no fade quad found)`);
-    t.check(own.every((m: any) => m.fade >= 0.995), `the kit's own motion log has a move at fade ${Math.min(...own.map((m: any) => m.fade))}`);
+    t.check(rpt.moves >= 3, `T-X4: the tour moved the person ${rpt.moves} times: the comfort check proved nothing`);
+    t.check(rpt.movesWhileVisible === 0, `T-X4: ${rpt.movesWhileVisible} viewpoint changes on frames where the view was not black (worst ${rpt.worst.toFixed(3)} m, ${rpt.noFade} with no fade quad found)`);
+    t.check(own.every((m: any) => m.fade >= 0.995), `T-X4: the kit's own motion log has a move at fade ${Math.min(...own.map((m: any) => m.fade))}`);
     await stopComfort(p);
     await t.screenshot(p, `ui-${t.device}-end-card`);
 
@@ -401,7 +402,20 @@ export const menuAndCleanup = defineCase({
   id: 'T-X10', title: 'the menu changes text size (and remembers it), Exit VR ends the session, and unmounting leaves nothing in the scene',
   timeoutMs: 600000,
   async run(t) {
-    const { p, e } = await boot(t);
+    const { p, e } = await boot(t, '');     // no ?xrppd: the kit measures the emulated eye itself
+    const dev = await ui(p, (u: any) => u.debug.ppd());
+    t.note('measured', `${dev.ppd.toFixed(1)} px/deg at the centre, ${dev.texelsPerDeg.toFixed(0)} texels/deg, cone +-${dev.cone.azHalf.toFixed(0)} / ${dev.cone.elMin.toFixed(0)}..${dev.cone.elMax.toFixed(0)}`);
+    t.check(dev.ppd >= 6 && dev.ppd <= 80 && dev.texelsPerDeg >= 24 && dev.texelsPerDeg <= 40, `the measured density is outside the clamps: ${JSON.stringify(dev)}`);
+    t.check(dev.cone.azHalf >= 28 && dev.cone.azHalf <= 56 && dev.cone.elMax <= 32 && dev.cone.elMin >= -38, `the view cone: ${JSON.stringify(dev.cone)}`);
+    // the entry status card
+    await ui(p, (u: any) => u.showStatus({ title: 'This home is too detailed for this headset', body: 'View it on your phone or computer.', progress: 0.5 }));
+    await tickFrames(p, 12);
+    const st = await ui(p, (u: any) => ({ texts: u.debug.status(), visible: u.debug.panels().find((q: any) => q.name === 'status').visible }));
+    t.check(st.visible && st.texts.includes('This home is too detailed for this headset') && st.texts.includes('View it on your phone or computer.'), `the status card: ${JSON.stringify(st)}`);
+    await ui(p, (u: any) => u.showStatus(null)); await tickFrames(p, 20);
+    t.check(!(await panels(p)).find((q: any) => q.name === 'status').visible, 'the status card did not go away');
+    await ui(p, (u: any) => { u.toast('Hello from a toast.', 'info', 800); }); await tickFrames(p, 10);
+    t.check((await ui(p, (u: any) => u.debug.toasts())).includes('Hello from a toast.') && (await panels(p)).find((q: any) => q.name === 'toast').widgets.length === 0, 'a toast shows its text and has nothing to press');
     const before = await p.page.evaluate(() => { const { scene } = (window as any).__houseDebug(); return { kids: scene.children.length, ui: !!scene.getObjectByName('xr ui') }; });
     t.check(before.ui, 'the kit\'s group is not in the scene during the session');
     await ui(p, (u: any) => u.menu.show());

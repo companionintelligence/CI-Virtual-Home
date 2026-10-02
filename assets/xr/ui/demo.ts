@@ -35,7 +35,7 @@ const CHAPTERS: ChapterView[] = [
 const STORY: PresenterStory = {
   slug: 'demo', surname: 'Demo', tagline: 'A short tour built from mock beats, to try the headset interface.', address: '12 Example Road',
   members: MEMBERS, chapters: CHAPTERS, beatCount: 4,
-  closing: { body: 'That was the tour. Your own home can do all of this, and none of it needs the cloud.', ctaLabel: 'See the Companion Core', ctaUrl: 'https://example.invalid/core' },
+  closing: { body: 'That was the tour. Your own home can do all of this, and none of it needs the cloud.', ctaLabel: 'See the Companion Core', ctaUrl: '' },
   disclosure: DISCLOSURE, core: null, durations: 'estimated', fonts: { family: 'Manrope', weights: [500, 600, 700, 800] },
 };
 
