@@ -13,7 +13,7 @@
     "build": "node --experimental-strip-types scripts/build-house-assets.mts",
     "typecheck": "tsc --noEmit && tsc --noEmit -p assets/tsconfig.json",
     "validate": "node --experimental-strip-types scripts/validate-house-spec.mts",
-    "test": "node --experimental-strip-types --test scripts/test-floorplan-graph.mts",
+    "test": "node --experimental-strip-types --test scripts/test-floorplan-graph.mts scripts/test-stories.mts",
     "check": "node --experimental-strip-types scripts/check-house.mts",
     "check:quick": "node --experimental-strip-types scripts/check-house.mts --quick",
     "test:node": "node --experimental-strip-types scripts/check-house.mts --node",
@@ -41,6 +41,11 @@
     "portal:test": "node --experimental-strip-types scripts/test-portal.mts",
     "ui:test": "node --experimental-strip-types scripts/test-ui.mts",
     "portal:preview": "node --experimental-strip-types scripts/build-portal.mts --serve",
+    "story:validate": "node --experimental-strip-types scripts/validate-stories.mts",
+    "story:bake": "node --experimental-strip-types scripts/story-bake.mts",
+    "story:voice": "node --experimental-strip-types scripts/build-voiceover.mts",
+    "story:film": "node --experimental-strip-types scripts/render-family-film.mts",
+    "portal:og": "node --experimental-strip-types scripts/story/build-og.mts",
     "serve": "python3 -m http.server 8080"
   },
   "devDependencies": {

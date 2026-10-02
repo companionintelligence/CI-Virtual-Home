@@ -1,0 +1,180 @@
+[
+  {
+    "name": "bad-1-hype",
+    "file": "bad-1-hype.json",
+    "expect": [
+      "buzz-core",
+      "vocab-home-server",
+      "num-dollar",
+      "exclamation",
+      "dash-em-en"
+    ]
+  },
+  {
+    "name": "bad-2-absolute",
+    "file": "bad-2-absolute.json",
+    "expect": [
+      "sec-never-leaves",
+      "fake-social-proof"
+    ]
+  },
+  {
+    "name": "bad-3-remote",
+    "file": "bad-3-remote.json",
+    "expect": [
+      "cap-remote-access"
+    ]
+  },
+  {
+    "name": "bad-4-autonomy",
+    "file": "bad-4-autonomy.json",
+    "expect": [
+      "cap-autonomy"
+    ]
+  },
+  {
+    "name": "bad-5-unknown-app",
+    "file": "bad-5-unknown-app.json",
+    "expect": [
+      "app-unknown"
+    ]
+  },
+  {
+    "name": "bad-6-invented-app-and-chip",
+    "file": "bad-6-invented-app-and-chip.json",
+    "expect": [
+      "app-undeclared",
+      "chips"
+    ]
+  },
+  {
+    "name": "bad-7-no-tv",
+    "file": "bad-7-no-tv.json",
+    "expect": [
+      "text-role"
+    ]
+  },
+  {
+    "name": "bad-8-agent-without-approval",
+    "file": "bad-8-agent-without-approval.json",
+    "expect": [
+      "agent"
+    ]
+  },
+  {
+    "name": "bad-9-ftue-leak",
+    "file": "bad-9-ftue-leak.json",
+    "expect": [
+      "ftue-claims"
+    ]
+  },
+  {
+    "name": "bad-10-too-long",
+    "file": "bad-10-too-long.json",
+    "expect": [
+      "len-body",
+      "len-title",
+      "digits"
+    ]
+  },
+  {
+    "name": "bad-11-anchor",
+    "file": "bad-11-anchor.json",
+    "expect": [
+      "anchor"
+    ]
+  },
+  {
+    "name": "bad-12-not-in-store",
+    "file": "bad-12-not-in-store.json",
+    "expect": [
+      "app-not-in-store"
+    ]
+  },
+  {
+    "name": "bad-13-disclosure",
+    "file": "bad-13-disclosure.json",
+    "expect": [
+      "disclosure"
+    ]
+  },
+  {
+    "name": "bad-14-voices",
+    "file": "bad-14-voices.json",
+    "expect": [
+      "voices"
+    ]
+  },
+  {
+    "name": "bad-15-memory-beta",
+    "file": "bad-15-memory-beta.json",
+    "expect": [
+      "disclosure"
+    ]
+  },
+  {
+    "name": "bad-16-film",
+    "file": "bad-16-film.json",
+    "expect": [
+      "film"
+    ]
+  },
+  {
+    "name": "bad-17-agent-app",
+    "file": "bad-17-agent-app.json",
+    "expect": [
+      "agent-app"
+    ]
+  },
+  {
+    "name": "bad-18-no-screenshot",
+    "file": "bad-18-no-screenshot.json",
+    "expect": [
+      "app-qa-screenshot"
+    ]
+  },
+  {
+    "name": "bad-19-bare-paperless",
+    "file": "bad-19-bare-paperless.json",
+    "expect": [
+      "app-name"
+    ]
+  },
+  {
+    "name": "bad-20-schema",
+    "file": "bad-20-schema.json",
+    "expect": [
+      "schema"
+    ]
+  },
+  {
+    "name": "bad-21-sign-off-typed",
+    "file": "bad-21-sign-off-typed.json",
+    "expect": [
+      "closing"
+    ]
+  },
+  {
+    "name": "bad-22-first-hermes-note",
+    "file": "bad-22-first-hermes-note.json",
+    "expect": [
+      "disclosure"
+    ]
+  },
+  {
+    "name": "ok-1-plant-nursery",
+    "file": "ok-1-plant-nursery.json",
+    "expect": [],
+    "absent": [
+      "text-role"
+    ]
+  },
+  {
+    "name": "ok-2-lake-island",
+    "file": "ok-2-lake-island.json",
+    "expect": [],
+    "absent": [
+      "text-role"
+    ]
+  }
+]
