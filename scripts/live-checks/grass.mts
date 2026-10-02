@@ -219,6 +219,20 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
         add(`${h}: the effect comes back after the hooks`, sorted(sigAgain.text) === sorted(sigWith.text), sorted(sigAgain.text) === sorted(sigWith.text) ? undefined : firstDiff(sorted(sigAgain.text), sorted(sigWith.text)));
       } finally { await on.close(); await off.close(); }
     }
+    if (env.base) {
+      // grass and foliage off, every other feature off too (so the check holds once those packages are merged): the base's pixels
+      for (const h of [houses[0], houses[1]]) {
+        const mine = await env.open(h, { query: 'q=2&no=ao,water,sky,assets,frame,grass,foliage' });
+        const ref = await env.open(h, { of: 'base' });
+        try {
+          for (const tod of ['day', 'night']) {
+            for (const lp of [mine, ref]) await lp.eval((t: string) => (window as any).__houseSetLighting(t), tod).then(() => lp.settle());
+            const [x, y] = [await mine.hash(), await ref.hash()];
+            add(`${h} ${tod}: ?no=grass,foliage draws what the base drew`, x === y, x === y ? x.slice(0, 8) : `${x.slice(0, 8)} vs ${y.slice(0, 8)}`);
+          }
+        } finally { await mine.close(); await ref.close(); }
+      }
+    }
     const lp = await env.open(houses[0], { query: 'no=grass' });
     try { await new Promise(r => setTimeout(r, 3000)); add('?no=grass installs nothing', !(await lp.effects()).installed.includes('grass')); } finally { await lp.close(); }
     const lf = await env.open(houses[0], { query: 'q=1&no=foliage' });

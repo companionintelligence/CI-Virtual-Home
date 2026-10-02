@@ -131,7 +131,12 @@ export function bakeSite(THREE: any, renderer: any, scene: any, opts: { maxSide?
   };
   try {
     scene.traverseVisible((o: any) => {
-      if (o.isMesh) {
+      if (o.name && o.name.startsWith('Cutaway Half-Wall')) {
+        // (the cutaway's lowered copy of a wall: the viewer shows one or the other and, while a home is still being opened, both are
+        // visible for a moment. The full wall is already in the slice; drawing the copy too would upload its buffers for nothing -
+        // the renderer's geometry count would then differ from a page without the bake - and change nothing in the mask)
+        hidden.push(o);
+      } else if (o.isMesh) {
         saved.push({ o, material: o.material }); meshes++;
         o.material = Array.isArray(o.material) ? o.material.map(classOf) : classOf(o.material);
       } else if (o.isLine || o.isPoints || o.isSprite) { hidden.push(o); }
