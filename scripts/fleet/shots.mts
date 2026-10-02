@@ -32,7 +32,7 @@ const ids: Array<[string, string]> = [
   ['outside-share', 'Outside share of the film'], ['first-second', 'Travel in the first second'], ['door-speed', 'Speed across the entry door'], ['yaw', 'Smoothed view rate'],
   ['look-error', 'Look error against the beat subject'], ['press', 'The press'], ['top-rooms', 'Top-3 rooms seen'], ['core-height', "The Core's height in the last frame"],
   ['final-positions', 'Where the Core ends in the frame'], ['establish-style', 'Establishing styles (planned)'], ['establish-bearing', 'Establishing bearings'],
-  ['finale-background', 'What stands behind the Core'], ['orbit-arc', 'The finale orbit'], ['qa-errors', 'QA v2 errors'],
+  ['finale-background', 'What stands behind the Core'], ['orbit-arc', 'The finale orbit'], ['film-length', 'Film length against its budget'], ['qa-errors', 'QA v2 errors'],
 ];
 
 export const metrics: Metric[] = [

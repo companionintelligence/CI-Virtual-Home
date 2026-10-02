@@ -14,7 +14,7 @@
 //   5. the budgets (plan Completeness A4): planning all 30 within 15 s of CPU, QA v2 within 0.5 s a shot (a loaded
 //      machine — load average over 0.75 per core — inflates CPU time too, so both budgets get 60 % more there; they are never waived).
 //
-//   node --experimental-strip-types scripts/test-shot-planner.mts [--house a,b] [--fixtures] [--update] [--parity 2|0|all]
+//   node --experimental-strip-types scripts/test-shot-planner.mts [--house a,b] [--fixtures all|--no-fixtures] [--update] [--parity 3|0|all]
 //        [--rebuild-worlds] [--stale-ok] [--planner-only] [--out test/qa/shot-planner.json]
 //   --update writes test/shots/<id>.track.json: the track's hash and metrics, which the next run compares (a drift is
 //   reported, never a failure: the layout pass and the other streams change the houses the worlds are made of).
@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { ROOT, houseIds, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
-import { ensureWorlds, fixtureIds, specFile } from './shot-worlds.mts';
+import { ensureWorlds, fixtureIds, specFile, routeFixtures } from './shot-worlds.mts';
 import { planDoorToCore, shotOptions, trackHash } from '../assets/shot-planner.js';
 import { qaTrack, qaAspects } from '../assets/shot-qa.js';
 import { fleetChecks, type FleetRow } from '../assets/shot-fleet.js';
@@ -31,7 +31,8 @@ import { planHeroReveal, planWalkthrough } from '../assets/shot-planner-tour.js'
 
 const args = parseArgs(process.argv.slice(2));
 const ids = args.house ? args.house.split(',') : houseIds();
-const fixtures = args.fixtures === 'true' ? fixtureIds() : [];
+// (S5's own fixtures — an upper entry, a descent, a spiral, an island, the spec's knobs — are planned, QA'd and compared across the engines with the houses; `--fixtures all` takes every fixture, `--no-fixtures` none)
+const fixtures = args['no-fixtures'] === 'true' ? [] : fixtureIds().filter(f => args.fixtures === 'all' || f.startsWith('s5-shot-'));
 const SHOTS_DIR = path.join(ROOT, 'test', 'shots');
 const cpuMs = () => { const u = process.cpuUsage(); return (u.user + u.system) / 1000; };
 let bad = 0;
@@ -41,7 +42,7 @@ const worlds = await ensureWorlds([...ids, ...fixtures], { rebuild: args['rebuil
 const specOf = (id: string) => JSON.parse(fs.readFileSync(specFile(id), 'utf8'));
 
 // ---- 1 + 2. plan (twice), QA
-type Row = FleetRow & { hash: string; planMs: number; qaMs: number; notes: string[]; findings: any };
+type Row = FleetRow & { hash: string; planMs: number; qaMs: number; aspMs: number; notes: string[]; findings: any };
 const rows: Row[] = [], aspectErrors: string[] = [];
 let planCpu = 0, identical = true; const drift: string[] = [], nondet: string[] = [], failed: string[] = [];
 for (const id of [...ids, ...fixtures]) {
@@ -55,8 +56,8 @@ for (const id of [...ids, ...fixtures]) {
   const b = planDoorToCore(world, so.options);
   if (!b.ok || trackHash(a.track) !== trackHash(b.track) || JSON.stringify(a.track.plan) !== JSON.stringify(b.track.plan)) { identical = false; nondet.push(id); }
   const t1 = cpuMs(); const qa = qaTrack(a.track, world, { via: (so.shot && so.shot.via) || undefined }); const qaMs = cpuMs() - t1;
-  const asp = qaAspects(a.track, world, { via: (so.shot && so.shot.via) || undefined }); aspectErrors.push(...asp.map(e => `${id} t=${e.t} ${e.code}: ${e.message}`));
-  rows.push({ id, duration: a.track.duration, metrics: qa.metrics, plan: a.track.plan, errors: qa.errors.length, warnings: qa.warnings.length, hash: trackHash(a.track), planMs, qaMs, notes: a.notes, findings: { errors: qa.errors, warnings: qa.warnings } });
+  const t2 = cpuMs(); const asp = qaAspects(a.track, world, { via: (so.shot && so.shot.via) || undefined }); const aspMs = cpuMs() - t2; aspectErrors.push(...asp.map(e => `${id} t=${e.t} ${e.code}: ${e.message}`));
+  rows.push({ id, duration: a.track.duration, metrics: qa.metrics, plan: a.track.plan, errors: qa.errors.length, warnings: qa.warnings.length, hash: trackHash(a.track), planMs, qaMs, aspMs, notes: a.notes, findings: { errors: qa.errors, warnings: qa.warnings } });
 }
 check(!failed.length, `every house plans (${ids.length + fixtures.length})`, failed.join('\n'));
 check(identical, 'two plans of the same world are byte-identical (hash and plan)', nondet.join(', '));
@@ -109,22 +110,32 @@ for (const r of real) {
   delete rec.events;
   if (args.update === 'true') fs.writeFileSync(f, JSON.stringify(rec, null, 1) + '\n');
   else if (fs.existsSync(f)) { const old = JSON.parse(fs.readFileSync(f, 'utf8')); if (old.hash !== r.hash) drift.push(r.id); }
+  else drift.push(`${r.id} (not recorded)`);
 }
 if (args.update === 'true') console.log(`\n→ ${path.relative(process.cwd(), SHOTS_DIR)}/<id>.track.json (${real.length} recorded)`);
-else if (drift.length) console.log(`\n(${drift.length} track hash${drift.length === 1 ? '' : 'es'} differ from test/shots/: ${drift.join(', ')} — the worlds or the planner changed; --update records them)`);
+// (the recorded hashes are the Node bake of the film each house gets — test/shots/<id>.track.json, committed: a planner or world change that moves a film is a decision, recorded with --update in the commit that makes it, and
+// a hash that is not what the planner now bakes fails here, like a golden. Only a run of some of the houses, or of a stale world, is exempt: the worlds are the page's digest of the current tree.)
+else if (ids.length === houseIds().length) check(!drift.length, `the recorded track hashes (test/shots/<id>.track.json) are the films the planner bakes now (${real.length})`, `${drift.join(', ')} — the worlds or the planner changed; \`--update\` records them, in the commit that moves them`);
+else if (drift.length) console.log(`\n(${drift.length} of the ${real.length} track hashes differ from test/shots/: ${drift.join(', ')}; a partial run only reports)`);
 
 // ---- 5. budgets
 const load = os.loadavg()[0], cores = os.cpus().length, loaded = load > cores * 0.75;
-console.log(`\nplanning ${real.length} houses: ${(planCpu / 1000).toFixed(1)} s of CPU (budget 15 s); QA v2 ${Math.max(...rows.map(r => r.qaMs)).toFixed(0)} ms at worst (budget 500); load average ${load.toFixed(1)} on ${cores} cores`);
+console.log(`\nplanning ${real.length} houses: ${(planCpu / 1000).toFixed(1)} s of CPU (budget 15 s); QA v2 ${Math.max(...rows.map(r => r.qaMs)).toFixed(0)} ms at worst (budget 500), its four aspect passes ${Math.max(...rows.map(r => r.aspMs)).toFixed(0)} ms at worst (budget 750); load average ${load.toFixed(1)} on ${cores} cores`);
 // (a loaded machine inflates CPU time too — cache and scheduling — so the budgets get 60 % more there, and are never waived)
 const slack = loaded ? 1.6 : 1, slowQA2 = rows.filter(r => r.qaMs > 500 * slack);
 check(planCpu <= 15000 * slack, `planning all the houses in Node within 15 s of CPU${loaded ? ` (${(15 * slack).toFixed(0)} s: the machine is loaded)` : ''}`);
 check(!slowQA2.length, `QA v2 within 0.5 s a shot${loaded ? ` (${(0.5 * slack).toFixed(1)} s: the machine is loaded)` : ''}`, slowQA2.map(r => `${r.id} ${r.qaMs.toFixed(0)} ms`).join(', '));
+// (the frame checks at 9:16, 3:4, 1:1 and 21:9 the page runs beside QA v2 (qaAspects): four passes, held to 1.5 times the one)
+{ const slowAsp = rows.filter(r => r.aspMs > 750 * slack); check(!slowAsp.length, `QA v2's four aspect passes within 0.75 s a shot${loaded ? ` (${(0.75 * slack).toFixed(2)} s: the machine is loaded)` : ''}`, slowAsp.map(r => `${r.id} ${r.aspMs.toFixed(0)} ms`).join(', ')); }
+// (a custom `shots[].establish` pose the garden blocks — the spec's own knob — plans: it is a film or a QA `route-failed`, never an exception in the page's glue)
+{ const bad3: string[] = []; for (const id of ['cutestarter', 'mirage']) { const world = worlds.get(id); if (!world) continue; for (const est of [{ bearing: -30, height: 1, dist: 3 }, { bearing: 30, height: 6, dist: 14 }]) { let r: any; try { r = planDoorToCore(world, { duration: 'auto', establish: est }); } catch (e: any) { bad3.push(`${id} ${JSON.stringify(est)} threw: ${e.message}`); continue; } if (!r.ok && r.code !== 'route-failed') bad3.push(`${id} ${JSON.stringify(est)}: ${r.code}`); } }
+  check(!bad3.length, 'a custom shots[].establish pose plans (a film, or route-failed), never throws', bad3.join('\n')); }
 
 // ---- 4. the page bakes the same track
-const parityN = args.parity === 'all' ? real.length : args.parity !== undefined ? parseInt(args.parity, 10) : 2;
+const parityN = args.parity === 'all' ? real.length : args.parity !== undefined ? parseInt(args.parity, 10) : 3;
 if (args['planner-only'] !== 'true' && (parityN > 0 || rows.length)) {
-  const pick = parityN > 0 ? real.filter((_, i) => i % Math.max(1, Math.floor(real.length / parityN)) === 0).slice(0, parityN) : [];
+  // (the houses, spread over the list, and S5's spiral and upper-entry fixtures: the spiral's helix is where the engines' last bits once parted)
+  const pick = parityN > 0 ? [...real.filter((_, i) => i % Math.max(1, Math.floor(real.length / parityN)) === 0).slice(0, parityN), ...fix.filter(r => /spiral|upper-entry/.test(r.id))] : [];
   const srv = await serve(ROOT, '/'), pw = await loadPlaywright();
   const browser = await pw.chromium.launch({ headless: true, args: LAUNCH_ARGS });
   try {
@@ -155,7 +166,7 @@ if (args['planner-only'] !== 'true' && (parityN > 0 || rows.length)) {
     // 4b. the page builds the house, and its own track is the Node bake (the world the page digests is the file the harness reads)
     if (pick.length) {
       const page = await (await browser.newContext({ viewport: { width: 1200, height: 700 } })).newPage();
-      await stubGoogleFonts(page, srv.origin);
+      await stubGoogleFonts(page, srv.origin); await routeFixtures(page);
       for (const r of pick) {
         await page.goto(srv.url(`room-creator.html?house=${r.id}&planner=v2`), { waitUntil: 'domcontentloaded', timeout: 120000 });
         await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, r.id, { timeout: 120000 });
