@@ -161,6 +161,14 @@ domain; cellular edges; Schlick Fresnel; Toksvig roughness).
 
 #### grass
 <!-- realism:grass:begin -->
+No third-party code, texture or model: the grass, the lawn patch, the site bake and the crown shading are original, and
+no binary file ships with them. Algorithms they use, all published, none copied from source:
+
+| Source | Licence | What | Where |
+|---|---|---|---|
+| [Chris Wellons, hash-prospector](https://github.com/skeeto/hash-prospector) "lowbias32" | The Unlicense (public domain) | the two multipliers and the three xor-shifts of the 32-bit integer hash (`0x7feb352d`, `0x846ca68b`); the rest of the hash, its use on a cell, and the value noise built on it are written here | `assets/viewer-grass.ts` (`HASH_GLSL`, `hashU`) |
+| Teschner et al., "Optimized Spatial Hashing for Collision Detection of Deformable Objects" (VMV 2003) | a published paper, no code | the two large primes `73856093`, `19349663` that mix a 2-D cell into one word | `assets/viewer-grass.ts` (`gh_cell`, `cellKey`) |
+| [Grassworks](https://grassworks.techredux.co/) | commercial product ($199), **reference only** | its public feature list (camera-relative field, levels of detail, wind, interaction) was the brief; no source was seen and none is used. See the shared *Reference only* notes above | none |
 <!-- realism:grass:end -->
 
 #### assets
