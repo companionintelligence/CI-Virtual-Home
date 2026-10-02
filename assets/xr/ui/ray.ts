@@ -183,6 +183,8 @@ export class RayHub {
     const live = new Set<any>();
     for (const x of session.inputSources) { live.add(x); if (!this.srcs.has(x)) this.addSource(x); }
     for (const [x, s] of this.srcs) if (!live.has(x)) this.removeSource(x, s, 'gone');
+    // with the locomotion module present it draws the controllers and the ray (pointer.ts): drawing ours as well would double both and add draw calls
+    const vis = !this.viaRegistry();
     let pointing = false;
     for (const s of this.srcs.values()) {
       s.has = !!(frame && ref && this.readRay(s, frame, ref));
@@ -191,7 +193,7 @@ export class RayHub {
       s.hit = h ? { panel: h.panel, widget: h.widget, dist: h.dist, point: h.point } : null;
       if (s.hit) pointing = true;
       this.updateHover(s);
-      this.updateVisuals(s, frame, ref);
+      if (vis) this.updateVisuals(s, frame, ref); else this.hideVisuals(s);
     }
     this.pointingAtPanel = pointing;
     this.setKind();
@@ -344,7 +346,7 @@ export class RayHub {
     this.pressed.delete(key);
     p.panel.setPressed(null);
     const hit = !cancelled && now && now.panel === p.panel && p.widget && now.widget && now.widget.id === p.widget.id && p.widget.enabled;
-    this.note(hit ? 'activate' : 'release', key, p.widget?.id ?? null);
+    this.note(hit ? 'activate' : cancelled ? 'cancel:registry' : 'release', key, p.widget?.id ?? null);
     if (hit && p.widget) this.d.onActivate(p.panel, p.widget);
   }
   private cancelKey(key: string, why: string): void {

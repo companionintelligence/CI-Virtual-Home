@@ -57,6 +57,9 @@ export function createUi(host: XrHost): XrUiImpl {
   const T = host.THREE;
   let mounted = false, group: any = null, panels: PanelSet | null = null, hub: RayHub | null = null, menu: Menu | null = null, toasts: ToastTray | null = null, status: StatusCard | null = null;
   let rig: XrRig | null = null, input: XrInput | null = null, loco: XrLocomotion | null = null;
+  // the menu's snap angle and vignette are the locomotion module's comfort options (the same live object); handedness and posture are read by the menu itself
+  let locoOpts: any = null;
+  const syncLoco = (): void => { const o = loco && (loco as any).options ? (loco as any).options() : null; if (!o) return; const st = settings.get(); o.snapDeg = st.snapTurnDeg; o.vignette = st.vignette; locoOpts = o; };
   let presenter: XrPresenterApi | null = null;
   let settings: SettingsStore = createSettings(undefined, false);
   let frameNo = 0, nowMs = 0, headNow: { pos: V3; dir: V3; yawDeg: number } = { pos: [0, 1.6, 0], dir: [0, 0, -1], yawDeg: 0 };
@@ -146,6 +149,7 @@ export function createUi(host: XrHost): XrUiImpl {
       hub.attach();
       // the dominant hand's height and the other settings the locomotion module reads
       const apply = (s: UiSettings, changed: Array<keyof UiSettings>) => {
+        if (changed.includes('snapTurnDeg') || changed.includes('vignette')) syncLoco();
         if (changed.includes('heightCm') && rig) rig.heightOffset = s.heightCm / 100;
         if (changed.includes('textScale') || changed.includes('contrast')) relayout();
         try { window.dispatchEvent(new CustomEvent('vh:xr-settings', { detail: { ...s, changed } })); } catch { /* not in a page */ }
@@ -164,6 +168,7 @@ export function createUi(host: XrHost): XrUiImpl {
 
     tick(f) {
       if (!mounted || !panels || !hub || !menu) return;
+      { const o = loco && (loco as any).options ? (loco as any).options() : null; if (o && o !== locoOpts) syncLoco(); }   // (the comfort module exists a moment after mount, and again after a restart)
       frameNo++; nowMs = f.time; headNow = f.head;
       if (!fixedPpd && (frameNo === 1 || frameNo % PPD_RECHECK_FRAMES === 0)) measurePpd();
       // the comfort record: the head moved, and how black the view was at that moment
@@ -200,7 +205,7 @@ export function createUi(host: XrHost): XrUiImpl {
       try { menu?.dispose(); toasts?.dispose(); status?.dispose(); } catch { /* gone */ }
       try { panels?.dispose(); } catch { /* gone */ }
       if (rig && settings.get().heightCm) { try { rig.heightOffset = 0; } catch { /* the rig is gone */ } }
-      group?.removeFromParent(); group = null; panels = null; hub = null; menu = null; toasts = null; status = null; rig = null; input = null; loco = null;
+      group?.removeFromParent(); group = null; panels = null; hub = null; menu = null; toasts = null; status = null; rig = null; input = null; loco = null; locoOpts = null;
       prevHead = null; motion.length = 0;
     },
 

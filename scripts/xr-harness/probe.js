@@ -10,8 +10,8 @@
     comfort: null,                                    // set by the harness: { log: [], on: true }
     lastFrameAt: 0, dts: [],
     readFade() {                                      // 0..1 black over the view, or null when the page has no fade quad at all
-      try { const f = window.__houseViewer && window.__houseViewer.xr && window.__houseViewer.xr.rig && window.__houseViewer.xr.rig.fade; if (f && f.get) return f.get(); } catch (e) { /* fall through */ }
-      try { const cam = window.__houseDebug().camera; const q = cam.getObjectByName('xr-fade'); if (q && q.material) return q.material.opacity; } catch (e) { /* none */ }
+      try { const x = window.__houseViewer && window.__houseViewer.xr; const r = x && (typeof x.rig === 'function' ? x.rig() : x.rig); const f = r && r.fade; if (f && f.get) return f.get(); } catch (e) { /* fall through */ }
+      try { const cam = window.__houseDebug().camera; const q = (cam.getObjectByName('xr: fade') || cam.getObjectByName('xr-fade')); if (q && q.material) return q.material.opacity; } catch (e) { /* none */ }
       return null;
     },
   };

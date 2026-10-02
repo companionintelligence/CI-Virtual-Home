@@ -213,7 +213,7 @@ export const registry = defineCase({
       target.onPress(7, hit2); await frames(3);
       target.onRelease(7, null, true); await frames(4);
       out.openedAfterCancel = u.debug.menu().open; out.activations2 = u.debug.hub().log.filter((l: any) => l.ev === 'activate' && l.id === 'menu').length;
-      out.cancelLogged = u.debug.hub().log.some((l: any) => l.ev === 'release' && l.id === 'menu');
+      out.cancelLogged = u.debug.hub().log.some((l: any) => /^(release|cancel)/.test(l.ev) && l.id === 'menu');
       input.sources = real;
       return out;
     });
@@ -361,10 +361,10 @@ export const failures = defineCase({
       const rHeld = await d.go(1, 'jump'); await frames(10);
       out.held = { reach: rHeld.reach, moved: !near(u.debug.head().pos, h0, 0.05), visible: rHeld.cardVisible, texts: u.presenter().debug.texts().join(' | '), far: u.debug.chrome().some((s: string) => /About \d+ m away/.test(s)) };
       // ---- no stand: the baked spot is not walkable and nothing nearer sees the subject (and it is not far): held, with a fault
-      const w = u.debug.world(), realWalk = w.walkable; w.walkable = () => false;
+      const w = u.debug.world(), realWalk = w.walkable, realStand = w.nearestStand; w.walkable = () => false; w.nearestStand = () => null;   // (with the locomotion module the world's nearestStand is its own nav, which would still find a stand)
       b[2].anchor = { role: 'x', box: [h0[0] - 0.4, 0.2, h0[2] - 4.6, h0[0] + 0.4, 1.2, h0[2] - 3.8], focus: [h0[0], 0.9, h0[2] - 4.2], level: null };
       b[2].rest.eye = [h0[0], 1.6, h0[2]];
-      const rNo = await d.go(2, 'jump'); await frames(6); w.walkable = realWalk;
+      const rNo = await d.go(2, 'jump'); await frames(6); w.walkable = realWalk; w.nearestStand = realStand;
       out.noStand = { reach: rNo.reach, notes: rNo.notes.join('; '), fault: d.events.filter((x: any) => x.type === 'fault').map((x: any) => x.code) };
       // ---- an aborted blink: the person is not moved and no card appears
       b[3].rest.eye = [h0[0] + 1.5, 1.6, h0[2] - 1.0]; b[3].anchor = { role: 'x', box: [h0[0] + 1, 0.2, h0[2] - 5.2, h0[0] + 2, 1.2, h0[2] - 4.4], focus: [h0[0] + 1.5, 0.9, h0[2] - 4.8], level: null };
@@ -485,6 +485,22 @@ export const menuAndCleanup = defineCase({
     const widgets15 = (await panels(p)).find((q: any) => q.name === 'menu').widgets[0];
     t.check(widgets15.h > 0, 'the menu has no widgets after the text size changed');
     await ui(p, (u: any) => { u.debug.press('menu', 'text:1'); });
+    // the settings the menu keeps that the locomotion module acts on (merge wiring: ui/index.ts syncLoco) and the one drawing of the controllers and the ray
+    const wired = await p.page.evaluate(async () => {
+      const x = (window as any).__houseViewer.xr, u = x.ui(), o = () => (x.locomotion?.options?.() ?? x.locomotion?.()?.options?.() ?? null);
+      u.settings.set({ snapTurnDeg: 45, vignette: false });
+      await new Promise<void>(res => { let k = 0; const off = x.onFrame(() => { if (++k >= 4) { off(); res(); } }); });
+      const opt = o();
+      const { scene } = (window as any).__houseDebug();
+      const dup: string[] = []; scene.traverse((m: any) => { if (m.isMesh && m.visible && /^xr ui: (ray|hit dot|controller proxy)$/.test(m.name)) dup.push(m.name); });
+      const out = { have: !!opt, snap: opt && opt.snapDeg, vignette: opt && opt.vignette, dup };   // (read before the restore: opt is the live object)
+      u.settings.set({ snapTurnDeg: 30, vignette: true });
+      return out;
+    });
+    if (wired.have) {
+      t.check(wired.snap === 45 && wired.vignette === false, `the menu's snap angle and vignette did not reach the locomotion module: ${JSON.stringify(wired)}`);
+      t.check(wired.dup.length === 0, `the UI drew its own controller or ray as well as the locomotion module's: ${wired.dup.join(', ')}`);
+    } else t.note('wired', 'no locomotion options reachable from xr.locomotion on this build');
     // Exit VR through the menu
     await ui(p, (u: any) => { u.debug.press('menu', 'back:root'); });
     await tickFrames(p, 6);
