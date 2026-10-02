@@ -44,7 +44,8 @@
 //                   the eye), shot-qa.ts and shot-fleet.ts (QA v2 and the fleet's camera checks), detmath.ts (the
 //                   planner's Math, the same last bit in Node and in the browser)
 //   S6 ui           visibility.ts (wall modes, the shot's cutaway, shotHidden / shotPose), viewer.ts, viewer-glass.ts (the player's
-//                   glass without the transmission pass), viewer-batch.ts (the player's live-only batching), home-names.ts,
+//                   glass without the transmission pass, and its fresnel), viewer-batch.ts (the player's live-only batching),
+//                   viewer-sky.ts + realism-sky.ts (the player's procedural sky and sky-based environment, live only), home-names.ts,
 //                   the page's editor UI and overlays, light-guard.ts (the live player's cheap spot and point lights;
 //                   installed only under ?mode=view)
 //   live realism    the player's look-only effects (README → Live realism), view mode only, none of it in a product frame:

@@ -553,6 +553,32 @@ portal's file guard); `portal:build` ships exactly the manifest's files and fail
 
 #### sky
 <!-- realism:sky:begin -->
+`assets/viewer-sky.ts` (installed by `assets/realism-sky.ts`; `?no=sky` leaves it out; the glass half is
+`assets/viewer-glass.ts`, `?no=glass`). Nothing third-party and no binary asset: every shader is written from public
+algorithms (value noise and fbm, Henyey-Greenstein, Schlick), not from LYGIA or any other library.
+
+- **The dome.** A unit sphere drawn after the opaque objects with its depth forced to the far plane, so only the pixels no
+  wall, roof or lawn covers are shaded. Its colours are the page's own sky function (the one the fog fades toward) plus a
+  Mie-like halo and a soft disc round the sun, a cloud layer on a plane above (fbm, flattening and fading into the haze
+  toward the horizon, lit from the sun's side with a silver edge), and at night a lit moon with maria and a hash-grid star
+  field (a few early stars at dusk). Between the horizon and 5 degrees above it, and over the ground half, it matches the
+  old backdrop to a CIE76 difference of under 0.5 (`scripts/live-checks/sky.mts` measures it per preset), so distant fog
+  meets it without a seam. Cloud colour and alpha reach the horizon colour by 4 degrees of elevation.
+- **The environment.** The same function baked once into a 256x128 half-float equirect (the page's own size: another size
+  would change the PMREM and recompile every material), through PMREM into `scene.environment`. So glass, water and polished
+  floors reflect clouds (half as bright as on the dome: structure to reflect, not a second light), the sun and the colour of
+  the hour. Cached per (preset, palette, sun); a time of day seen before is a
+  pointer swap, an unseen one bakes once after a 90 ms debounce (about 1 ms to render plus 5 to 60 ms of PMREM). The new
+  environment's irradiance (for a surface facing up, and for the four facing sideways) is measured against the old one's and
+  `scene.environmentIntensity` is scaled by the ratio (0.7 to 1.3), so lit surfaces keep the exposure the presets were tuned for.
+- **Tiers.** Installed at tier 1 and up (tier 0 is today's page). If the ladder sheds to 0 the feature is taken off; the handle's
+  `setTier` still knows the old tier-0 look (two noise octaves, time frozen). Tiers 1 and 2: four octaves, the clouds drift with the
+  player's clock while the player is drawing (a paused shot stays still; nothing forces a redraw). Best quality hands the page's own sky back.
+- **Glass.** The swapped panes (see `viewer-glass.ts`) raise their alpha toward 1 with Schlick's (1 - cos)^3 and lose
+  part of their diffuse colour as they go, so a pane is see-through head-on (measured: at cos > 0.8 the mean pane
+  brightness moves under 0.5 grey levels against the committed swap) and reflects the environment where the view skims it.
+- **Checks.** `pnpm run test:live --only sky` (or `node --experimental-strip-types scripts/live-checks/sky.mts [--houses a,b]`): restore identity (pointers and a
+  pixel hash of a plain render), the horizon seam, the cache (no bake storm, no recompile), the glass patch and its undo.
 <!-- realism:sky:end -->
 
 #### grass
