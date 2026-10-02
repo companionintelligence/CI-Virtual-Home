@@ -41,11 +41,11 @@ const feature: RealismFeature = {
       const L = ctx.lighting();
       const preset = (L && L.preset) || 'day';
       // dusk and night lift the lawn and the blades together so neither collapses to black (also tinted with the preset)
-      const lift = preset === 'night' ? 0.085 : preset === 'dusk' ? 0.035 : preset === 'golden' ? 0.006 : 0;
+      const lift = preset === 'night' ? 0.13 : preset === 'dusk' ? 0.045 : preset === 'golden' ? 0.006 : 0;
       const trans = preset === 'golden' ? 1.6 : preset === 'dusk' ? 0.9 : preset === 'night' ? 0.15 : 0.8;
       field && field.setLook({ lift, trans });
       lawn && lawn.setLook({ lift: lift * 0.9 });
-      fol && fol.setLook({ trans: preset === 'night' ? 0.2 : preset === 'dusk' ? 0.7 : preset === 'golden' ? 1.4 : 0.8 });
+      fol && fol.setLook({ trans: preset === 'night' ? 0.2 : preset === 'dusk' ? 0.7 : preset === 'golden' ? 1.4 : 0.8, lift: preset === 'night' ? 0.07 : preset === 'dusk' ? 0.02 : 0 });
     };
     const off = ctx.onLighting(() => { look(); ctx.markDirty(); });
     look();
@@ -70,8 +70,9 @@ const feature: RealismFeature = {
         fol && fol.update(tS);
         if (!field) return;
         const vis = field.update(camera, tS, renderer.domElement.height || ctx.canvas.height || 700);
-        // the wind moves while the grass is on screen: ask for a frame ~20 times a second even when nothing else changes
-        if (vis && tS - markT > 0.05) { markT = tS; ctx.markDirty(); }
+        // the wind moves while the grass is close enough to read as moving (the camera under the middle of the tufts' reach): ask
+        // for a frame ~20 times a second even when nothing else changes. From higher up the paused page stays still and idle.
+        if (vis && field.animated && tS - markT > 0.05) { markT = tS; ctx.markDirty(); }
       },
       setTier(t) { if (field) field.setTier(t >= 2 ? 2 : 1); if (lawn) lawn.setLook({ reach: G.TIERS[t >= 2 ? 2 : 1].r1 }); },
       dispose() { off(); if (field) field.dispose(); if (lawn) lawn.dispose(); if (fol) fol.dispose(); bake.dispose(); },

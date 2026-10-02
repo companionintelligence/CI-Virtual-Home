@@ -217,7 +217,7 @@ const FIELD_NORMAL = /* glsl */`
     vec2 dir = vec2(cos(gYaw), sin(gYaw));
     vec2 sd = vec2(-dir.y, dir.x);
     // a face normal, leaned toward the sky and rounded across the width: grass is lit like the ground it grows from
-    objectNormal = normalize(vec3(dir.x * 0.6 + sd.x * position.x * 0.45, 0.85 + gBend * 0.3, dir.y * 0.6 + sd.y * position.x * 0.45));
+    objectNormal = normalize(vec3(dir.x * 0.34 + sd.x * position.x * 0.3, 1.0 + gBend * 0.2, dir.y * 0.34 + sd.y * position.x * 0.3));
   }
 `;
 const FIELD_BEGIN = /* glsl */`
@@ -287,6 +287,8 @@ export type Field = {
   update(camera: any, tS: number, bufH: number): boolean;
   /** true when the field draws anything this frame (a camera above the reach draws none) */
   readonly visible: boolean;
+  /** true when the camera is close enough for the wind to read (the frames it asks for while paused are worth drawing) */
+  readonly animated: boolean;
   setLook(o: { lift?: number; trans?: number; tone?: [number, number, number] }): void;
   setTier(t: 1 | 2): void;
   dispose(): void;
@@ -308,7 +310,7 @@ export function createField(host: FieldHost, tier: 1 | 2): Field {
   };
   let cur: 1 | 2 = tier;
   let lods: { mesh: any; cfg: any; U: Record<string, { value: any }>; tris: number; instances: number; tuft: boolean }[] = [];
-  let visible = false, bufH = 700, lastR1 = 0;
+  let visible = false, animated = false, bufH = 700, lastR1 = 0;
 
   const tune = host.tune || {};
   const makeLod = (tuft: boolean, T: GrassTier) => {
@@ -326,7 +328,7 @@ export function createField(host: FieldHost, tier: 1 | 2): Field {
     const band = tuft ? new THREE.Vector4(T.r0 * 0.55, T.r0, T.r1 * 0.45, T.r1) : new THREE.Vector4(T.r0 * 0.55, T.r0, 0, 0);
     const U: Record<string, { value: any }> = {
       uBaseCell: { value: new THREE.Vector2() }, uCell: { value: cell }, uG: { value: G }, uBand: { value: band },
-      uHeight: { value: height }, uWidth: { value: width }, uFan: { value: 1.1 }, uGain: { value: tuft ? 1.12 : 1.17 },
+      uHeight: { value: height }, uWidth: { value: width }, uFan: { value: 1.1 }, uGain: { value: tuft ? 1.1 : 1.14 },
     };
     const mat = new THREE.MeshLambertMaterial({ color: 0xffffff, side: THREE.DoubleSide });
     mat.name = tuft ? 'Grass tufts' : 'Grass blades';
@@ -366,6 +368,7 @@ export function createField(host: FieldHost, tier: 1 | 2): Field {
   const field: Field = {
     group, uniforms: shared,
     get visible() { return visible; },
+    get animated() { return animated; },
     update(camera, tS, h) {
       shared.uTime.value = tS;
       shared.uCam.value.copy(camera.position);
@@ -375,6 +378,7 @@ export function createField(host: FieldHost, tier: 1 | 2): Field {
       // nothing can be nearer than the camera's height over the lawn: above the reach, the field costs nothing
       const above = camera.position.y - bake.yMax;
       visible = above < lastR1 + 0.5;
+      animated = above < lastR1 * 0.55;
       group.visible = visible;
       if (visible) for (const l of lods) {
         const c = l.cfg.cell, G = l.cfg.G;
@@ -500,7 +504,7 @@ export function createLawnPatch(env: { THREE: any; scene: any; bake: SiteBake; r
 export type Foliage = {
   apply(): void; restore(): void; sync(): void;
   update(tS: number): void;
-  setLook(o: { trans?: number }): void;
+  setLook(o: { trans?: number; lift?: number }): void;
   dispose(): void;
   stats(): Record<string, unknown>;
 };
@@ -510,7 +514,7 @@ const PER_INSTANCE = new Set(['World · crowns', 'World · conifers', 'Bed shrub
 export function createFoliage(env: { THREE: any; scene: any; windDir: [number, number] }): Foliage {
   const { THREE, scene } = env;
   const shared: Record<string, { value: any }> = {
-    uFolT: { value: 0 }, uFolWind: { value: new THREE.Vector2(env.windDir[0], env.windDir[1]) }, uFolTrans: { value: 0.8 },
+    uFolT: { value: 0 }, uFolWind: { value: new THREE.Vector2(env.windDir[0], env.windDir[1]) }, uFolTrans: { value: 0.8 }, uFolLift: { value: 0 },
   };
   type Entry = { mesh: any; orig: any; clone: any };
   const entries: Entry[] = [];
@@ -549,7 +553,7 @@ export function createFoliage(env: { THREE: any; scene: any; windDir: [number, n
         gl_Position = projectionMatrix * mvPosition;`);
     sh.fragmentShader = sh.fragmentShader
       .replace('#include <common>', `#include <common>
-        uniform float uFolTrans; varying vec3 vFolN; varying float vFolY; varying vec3 vFolW;
+        uniform float uFolTrans; uniform float uFolLift; varying vec3 vFolN; varying float vFolY; varying vec3 vFolW;
         ${HASH_GLSL}`)
       .replace('#include <color_fragment>', `#include <color_fragment>
         {
@@ -561,7 +565,7 @@ export function createFoliage(env: { THREE: any; scene: any; windDir: [number, n
         }`)
       .replace('#include <normal_fragment_begin>', `#include <normal_fragment_begin>
         normal = normalize( mix( normal, normalize( vFolN ), 0.5 ) );`)
-      .replace('vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;', `vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;
+      .replace('vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance;', `vec3 outgoingLight = totalDiffuse + totalSpecular + totalEmissiveRadiance + diffuseColor.rgb * uFolLift;   // (night: crowns lifted off black)
         #if NUM_DIR_LIGHTS > 0 && ! defined( FOL_CORE )
         {
           vec3 Ls = directionalLights[ 0 ].direction;
@@ -618,7 +622,7 @@ export function createFoliage(env: { THREE: any; scene: any; windDir: [number, n
     },
     sync() { if (on) for (const m of find()) add(m); },
     update(tS) { shared.uFolT.value = tS; },
-    setLook(o) { if (o.trans !== undefined) shared.uFolTrans.value = o.trans; },
+    setLook(o) { if (o.trans !== undefined) shared.uFolTrans.value = o.trans; if (o.lift !== undefined) shared.uFolLift.value = o.lift; },
     dispose() { this.restore(); },
     stats: () => ({ meshes: entries.length }),
   };
