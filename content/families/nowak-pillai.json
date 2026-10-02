@@ -1,0 +1,834 @@
+{
+  "schema": "family/v1",
+  "slug": "nowak-pillai",
+  "house": "bgfamily",
+  "fictional": true,
+  "family": {
+    "surname": "Nowak-Pillai",
+    "tagline": "Lesson files, bedtime stories and baby photos, all at home.",
+    "household": "young-family",
+    "business": true,
+    "story": "Kasia teaches math and reading to children from the neighborhood in the front study. Arun manages projects, some days from home, around a toddler and a baby. Lesson files and family photos sit on one Companion Core.",
+    "address": {
+      "line": "8 Pennywhistle Close",
+      "place": "Corvine Hill"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "kasia",
+      "name": "Kasia",
+      "age": 35,
+      "role": "parent",
+      "work": "runs a small tutoring practice",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Pia",
+        "runtime": "Hermes",
+        "job": "Drafts lesson plans and parent updates from notes Kasia texts it.",
+        "personality": [
+          "precise",
+          "organized",
+          "kind"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Drafts only. Kasia reviews and sends each one."
+      }
+    },
+    {
+      "id": "arun",
+      "name": "Arun",
+      "age": 37,
+      "role": "parent",
+      "work": "project manager, hybrid",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Sethu",
+        "runtime": "OpenClaw",
+        "job": "Opens Yuvomi in its own browser and adds the week's chores and meals.",
+        "personality": [
+          "curious",
+          "gentle",
+          "bright"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Adds nothing without Arun's yes."
+      }
+    },
+    {
+      "id": "ila",
+      "name": "Ila",
+      "age": 3,
+      "role": "child",
+      "work": "toddler",
+      "colour": "chart-3"
+    },
+    {
+      "id": "dev",
+      "name": "Dev",
+      "age": 0,
+      "role": "baby",
+      "work": "baby, seven months",
+      "colour": "chart-4"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The morning kitchen"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining room"
+    },
+    {
+      "id": "studies",
+      "kind": "room",
+      "room": "office",
+      "title": "The two studies"
+    },
+    {
+      "id": "bedtime",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Bedtime upstairs"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out on the drive and patio"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "arun",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel on the porch",
+        "body": "A parcel waits on the porch at Pennywhistle Close. Arun carries it past the living room to the study, where Kasia clears a corner of the desk."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "ila",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Ila peeks into the parcel",
+        "body": "Ila peeks in. Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "arun",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Arun plugs in the power cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "kasia",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Kasia joins from her phone",
+        "body": "Kasia finds the Core's own Wi-Fi network on her phone and joins it. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "arun",
+      "with": [
+        "nextcloud",
+        "excalidraw"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Choose the first agents",
+        "body": "In Companion Hub, Kasia picks Hermes and Arun picks OpenClaw. They add Companion Memory (beta), Nextcloud and Excalidraw, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Nextcloud, Excalidraw"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "kasia",
+      "agent": "kasia",
+      "approval": "kasia",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Pia says hello",
+        "body": "Kasia sends the first message to the agent she named Pia. Pia answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "kasia",
+        "text": "Hello, Kasia. I am Pia. Where would you like to start?"
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-week",
+      "chapter": "kitchen",
+      "category": "home",
+      "segment": "consumer",
+      "member": "arun",
+      "agent": "arun",
+      "approval": "arun",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sethu fills in the week",
+        "body": "Over coffee, Arun asks Sethu for next week's meals. Sethu opens Yuvomi in its own browser and adds them. Arun checks every line.",
+        "chips": [
+          "Yuvomi"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-pancakes",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "arun",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Pancakes go in the recipe book",
+        "body": "Ila stirs the batter while Arun types the pancake recipe into KitchenOwl. It joins the family recipe book on the Core.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "dev",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Dev's first months, on the TV",
+        "body": "Sunday afternoon, Arun puts an album of Dev's first months on the living-room TV. The photos come from Immich on the Core.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "ila",
+      "app": {
+        "id": "booklore",
+        "replaces": [
+          "Kindle"
+        ]
+      },
+      "capability": "manage and read books, comics and PDFs",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A picture book on the couch",
+        "body": "On the couch, Kasia reads Ila a picture book from BookLore. The whole library lives on the Core.",
+        "chips": [
+          "BookLore",
+          "replaces Kindle"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "dining-plan",
+      "chapter": "dining",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "arun",
+      "app": {
+        "id": "super-productivity",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "plan your day, track time and run a Pomodoro timer",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Arun blocks out his day",
+        "body": "At the dining table, Arun plans his workday in Super Productivity and runs its timer. Kasia's lesson hours go in first.",
+        "chips": [
+          "Super Productivity",
+          "replaces Todoist"
+        ]
+      }
+    },
+    {
+      "id": "study-files",
+      "chapter": "studies",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "kasia",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Worksheets stay in one folder",
+        "body": "Kasia keeps every worksheet in a Nextcloud folder on the Core. The family photos live in a different app.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "study-board",
+      "chapter": "studies",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "kasia",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "a whiteboard with a hand-drawn look",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A number line on the whiteboard",
+        "body": "Before the first lesson, Kasia sketches a number line in Excalidraw. The whiteboard runs on the Core and opens in any browser at home.",
+        "chips": [
+          "Excalidraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "study-update",
+      "chapter": "studies",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "kasia",
+      "agent": "kasia",
+      "approval": "kasia",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Pia drafts, Kasia sends",
+        "body": "After the last lesson, Kasia texts Pia her notes. Pia drafts each family's update, and Kasia sends it herself."
+      },
+      "say": {
+        "speaker": "kasia",
+        "text": "Here are the drafts. Please read each one before you send it."
+      },
+      "film": true
+    },
+    {
+      "id": "study-term",
+      "chapter": "studies",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "kasia",
+      "app": {
+        "id": "bentopdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "a PDF toolkit that runs in your browser",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Term worksheets, one PDF",
+        "body": "Kasia merges the term's worksheets into one PDF with BentoPDF. The toolkit runs in the browser, and nothing is uploaded.",
+        "chips": [
+          "BentoPDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "study-invoice",
+      "chapter": "studies",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "kasia",
+      "app": {
+        "id": "invoice-ninja",
+        "replaces": [
+          "FreshBooks"
+        ]
+      },
+      "capability": "send invoices and quotes, track expenses and time",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Invoices from the same desk",
+        "body": "At month end, Kasia writes an invoice for each family in Invoice Ninja. The invoices and the hours behind them sit on the Core.",
+        "chips": [
+          "Invoice Ninja",
+          "replaces FreshBooks"
+        ]
+      }
+    },
+    {
+      "id": "study-dns",
+      "chapter": "studies",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "arun",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains for every device on your network",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One filter for every device",
+        "body": "Arun opens Pi-hole on the Core. It blocks ad and tracker domains for every device on the home Wi-Fi, phones and laptops included.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "bedtime-lullaby",
+      "chapter": "bedtime",
+      "category": "media",
+      "segment": "consumer",
+      "member": "kasia",
+      "app": {
+        "id": "mstream",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music from your Core to a browser or an app",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "A lullaby from the collection",
+        "body": "At bedtime, Kasia plays the lullaby her mother sang. mStream sends it from the family's music collection on the Core to her phone.",
+        "chips": [
+          "mStream",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "bedtime-song",
+      "chapter": "bedtime",
+      "category": "creative",
+      "segment": "consumer",
+      "member": "arun",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "Adobe Audition"
+        ]
+      },
+      "capability": "edit audio in a browser tab. Cut, fade, normalise, export",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A birthday song, trimmed",
+        "body": "Arun records a birthday song on his guitar for Ila. He trims the take in AudioMass, an audio editor that opens in a browser tab.",
+        "chips": [
+          "AudioMass",
+          "replaces Adobe Audition"
+        ]
+      }
+    },
+    {
+      "id": "garden-drive",
+      "chapter": "garden",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "arun",
+      "app": {
+        "id": "strix",
+        "replaces": []
+      },
+      "with": [
+        "frigate"
+      ],
+      "capability": "point it at a camera on your network and it finds the stream address",
+      "anchor": {
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "front-door"
+          },
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Strix finds the camera",
+        "body": "Arun points Strix at the new camera on the drive. It finds the stream address and writes the Frigate configuration.",
+        "chips": [
+          "Strix"
+        ]
+      }
+    },
+    {
+      "id": "garden-patio",
+      "chapter": "garden",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "kasia",
+      "app": {
+        "id": "readeck",
+        "replaces": [
+          "Pocket"
+        ]
+      },
+      "capability": "save articles to read later without a hosted bookmarking service",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Saved to read on the patio",
+        "body": "After bedtime, Kasia reads a teaching article on the patio. She saved it to Readeck, which keeps it on the Core.",
+        "chips": [
+          "Readeck",
+          "replaces Pocket"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one busy house",
+        "body": "The Nowak-Pillai household runs worksheets, photos, bedtime stories and two agents from one Core in the study."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your worksheets, your family photos and your bedtime stories can sit on a Companion Core at home. Open the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "Students are minors: beats show where lesson files live and never name a student. No safety or learning-outcome claim anywhere.",
+    "garden-drive assumes the family owns an IP camera (not in the Core parcel, not in the 3D scene). Strix finds its stream address; Frigate keeps the clips. No claim that it prevents anything.",
+    "study-update: Hermes drafts, Kasia sends. Pia is the Drafter persona with Companion Memory connected, opt-in.",
+    "Invented place and street (Corvine Hill, Pennywhistle Close): check both against a map before launch."
+  ]
+}
