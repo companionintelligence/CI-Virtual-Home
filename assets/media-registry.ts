@@ -344,9 +344,16 @@ export async function install(ctx: any): Promise<Handle | null> {
       for (const t of [set.albedo, set.normal, set.rough]) renderer.initTexture(t);
       for (const [m, e] of mats) if (e.assets.id === id && !swapped.has(m)) swapMaterial(m, e, set);
       setsDone.add(id);
+      freeOriginals(id);
       ctx.markDirty();
     }
     if (ctx.tier() >= 2) await promote();
+  }
+  /** The procedural maps of a swapped set may have been uploaded already (a cold load draws a few frames before the files
+   *  arrive) and nothing draws with them now: free their GPU copies. The textures themselves (CPU data) stay for restore(),
+   *  and three uploads one again the next time it is drawn with. This is what makes a cold load hold what a warm one does. */
+  function freeOriginals(id: string): void {
+    for (const r of swaps) if (r.asset.id === id) for (const t of [r.orig.map, r.orig.normalMap, r.orig.roughnessMap]) if (t && t !== r.mat.map && t.dispose) t.dispose();
   }
   async function promote(): Promise<void> {
     for (const id of bigIds) {
@@ -355,13 +362,16 @@ export async function install(ctx: any): Promise<Handle | null> {
       try { t = await bigAlbedo(id); } catch { continue; }
       if (!applied || disposed || ctx.tier() < 2) return;
       renderer.initTexture(t);
+      const set = await texSet(id);
       for (const r of swaps) if (r.asset.id === id) r.mat.map = t;
+      set.albedo.dispose();   // (the 512 map is out of use until a demotion; it is uploaded again then)
       upgraded.add(id); ctx.markDirty();
     }
   }
   async function demote(): Promise<void> {
     for (const id of [...upgraded]) {
       const set = await texSet(id);
+      renderer.initTexture(set.albedo);
       for (const r of swaps) if (r.asset.id === id) r.mat.map = set.albedo;
       upgraded.delete(id);
     }
@@ -407,7 +417,8 @@ export async function install(ctx: any): Promise<Handle | null> {
       const tr = ids.reduce((a, id) => a + (MEDIA_ASSETS[id] as MediaModel).tris, 0);
       if (propTris + tr > MAX_TRIS) continue;
       propTris += tr;
-      for (const k of hide) { k.visible = false; k.userData.__procedural = true; }
+      // (hidden, so never drawn again until restore(): a cold load had drawn them a few frames, free what that uploaded)
+      for (const k of hide) { k.visible = false; k.userData.__procedural = true; k.traverse((c: any) => { if (c.isMesh && c.geometry) c.geometry.dispose(); }); }
       obj.add(wrapper);
       props.push({ obj, wrapper, hidden: hide, ids });
       const room = String(obj.userData.room || '');
