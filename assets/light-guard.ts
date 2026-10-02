@@ -43,11 +43,16 @@ const SPOT_INFO = 'getSpotLightInfo( spotLight, geometryPosition, directLight );
 // box = no clip, which is also what an all-zero array means (a program with more spots than the array, or a light without a room).
 // UNROLLED_LOOP_INDEX because three unrolls this loop and only rewrites `[ i ]`; the block braces because the unrolled copies share one
 // scope (a bare `vec4 vhB` is a redefinition from the second light on: portal:test caught it).
+const GEOM = 'vec3 geometryPosition = - vViewPosition;';
+// the fragment's world position, once per fragment and not once per light (16 copies of the matrix product were a measurable GPU cost)
+const WORLD = `${GEOM}
+#if NUM_SPOT_LIGHTS > 0
+	vec3 vhW = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );
+#endif`;
 const CLIP = `${SPOT_INFO}
 		{
 			vec4 vhB = vhClip[ UNROLLED_LOOP_INDEX ];
 			if ( directLight.visible && vhB.z > 0.0 ) {
-				vec3 vhW = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );
 				float vhHW = floor( vhB.z / 4096.0 ), vhYH = floor( vhB.w / 4096.0 );
 				float vhHD = vhB.z - vhHW * 4096.0, vhYL = vhB.w - vhYH * 4096.0;
 				if ( abs( vhW.x - vhB.x ) > vhHW * 0.01 || abs( vhW.z - vhB.y ) > vhHD * 0.01 || vhW.y < vhYL * 0.01 - 10.0 || vhW.y > vhYH * 0.01 - 10.0 ) { directLight.visible = false; directLight.color = vec3( 0.0 ); }
@@ -88,15 +93,17 @@ export function installLightGuard(THREE: any): boolean {
     return false;
   }
   let text = head.split(MARK).join(GUARDED);
-  // the room clip: only where the spot loop and the declarations have exactly the expected text, and the page did not switch it off
+  // the room clip: only where the spot loop and the declarations have exactly the expected text, and the page did not switch it off.
+  // Everything is built on the side and taken over only if all of it applied: half a patch is a shader that does not compile.
   const pars: unknown = C?.lights_pars_begin;
-  if (clipWanted() && head.split(SPOT_INFO).length === 2 && typeof pars === 'string' && pars.includes('uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ]') && SHADER_LIBS.every(k => THREE.ShaderLib?.[k]?.uniforms)) {
+  if (clipWanted() && head.split(SPOT_INFO).length === 2 && head.split(GEOM).length === 2 && typeof pars === 'string' && pars.includes('uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ]') && SHADER_LIBS.every(k => THREE.ShaderLib?.[k]?.uniforms)) {
     try {
       // (UniformsUtils.clone slices an Array but hands a typed array on as it is, so every material's own uniform map holds THIS array)
       const data = new Float32Array(MAX_SPOTS * 4);
+      const clipped = text.replace(SPOT_INFO, CLIP).replace(GEOM, WORLD);
       for (const k of SHADER_LIBS) THREE.ShaderLib[k].uniforms.vhClip = { value: data };
       C.lights_pars_begin = pars + CLIP_DECL;
-      text = text.replace(SPOT_INFO, CLIP);
+      text = clipped;
       shared = { data };
     } catch (e) { shared = null; console.warn('installLightGuard: the room clip could not be installed', e); }
   }

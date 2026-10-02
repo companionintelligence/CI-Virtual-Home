@@ -37,7 +37,7 @@ check(installLightGuard(THREE) === true, 'installLightGuard patches r169\'s ligh
 const chunk = (THREE as any).ShaderChunk.lights_fragment_begin as string;
 check(spotClipInstalled(), 'the room clip is installed when the page does not switch it off');
 check(chunk !== chunkBefore && chunk.includes('if ( directLight.visible ) {'), 'the RE_Direct guard is in');
-check((chunk.match(/vhClip\[ UNROLLED_LOOP_INDEX \]/g) || []).length === 1 && chunk.includes('vhB.z > 0.0') && chunk.includes('viewMatrix'), 'the clip test is in the spot loop, once, indexed by the unrolled loop index, and reads the draw\'s own view matrix');
+check((chunk.match(/vhClip\[ UNROLLED_LOOP_INDEX \]/g) || []).length === 1 && chunk.includes('vhB.z > 0.0') && (chunk.match(/vec3 vhW = /g) || []).length === 1 && chunk.indexOf('vec3 vhW') < chunk.indexOf('#pragma unroll_loop_start') && chunk.includes('viewMatrix'), 'the clip test is in the spot loop, once, indexed by the unrolled loop index, with the fragment\'s world position (from the draw\'s own view matrix) computed once before the loops');
 const spotBlock = chunk.slice(chunk.indexOf('getSpotLightInfo'), chunk.indexOf('#pragma unroll_loop_end', chunk.indexOf('getSpotLightInfo')));
 check(spotBlock.indexOf('vhClip[') > spotBlock.indexOf('getSpotLightInfo') && spotBlock.indexOf('vhClip[') < spotBlock.indexOf('RE_Direct'), 'and it runs after the cone test and before the BRDF');
 // three unrolls the spot loop (WebGLProgram.unrollLoops: the loop body is pasted N times with NO braces round it, so a declaration made
