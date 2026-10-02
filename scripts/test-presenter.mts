@@ -20,7 +20,7 @@ import { chordM, cardWidthDeg, placeWorld, reportPlacement, viewAngles, VIEW_CON
 import { panelBasis, rayPanel, rectAt } from '../assets/xr/ui/hit.js';
 import { approxMeasure, cardAspectAt, contrastRatio, layoutBeatCard, layoutBeatCardFit, layoutCaption, MAX_CARD_DEG, layoutEndCard, layoutStartCard, makeMetrics, memberFill, textPairs, THEMES, wrapText, fontOf } from '../assets/xr/ui/paint.js';
 import { followStep, lockedPose, newFollow, FOLLOW } from '../assets/xr/ui/caption.js';
-import { createSettings, ppdOfEye, texelsPerDegFor, DEFAULT_SETTINGS } from '../assets/xr/ui/kit.js';
+import { coneOfEye, createSettings, ppdOfEye, texelsPerDegFor, DEFAULT_SETTINGS } from '../assets/xr/ui/kit.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 let bad = 0, n = 0;
@@ -123,6 +123,34 @@ section('T-P1  placeWorld');
   check(widthBad === 0, `every card is ${XR_LEGIBILITY.card.minDeg} to ${XR_LEGIBILITY.card.maxDeg} degrees wide and every number is finite`, `${widthBad} were not`);
   check(facingSheets === 0, `after a blink the head faces the subject (yaw jitter 0): every one of ${facing} placements, tall real card included, finds a card beside the subject, never the sheet`);
   check(placed / cases >= 0.5, `with the head turned 22 degrees off the subject too, most placements still find a card (${Math.round(placed / cases * 100)} percent; the rest take the sheet, which is what it is for)`, JSON.stringify(reasons));
+  // a headset with a 90 degree field (IWER's, and Quest 2's inner edge): a card beside the subject would clip at the edge of the view, so the solver may turn the head
+  {
+    const narrow = { azHalf: 40, elMin: -30, elMax: 26 }, mt = makeMetrics({ texelsPerDeg: 30, distanceM: 1.7, textScale: 1, ppd: 20 });
+    const cvFull = { beat: mkBeat('Photos find themselves', thirtyWords, { kind: 'phone', phone: { header: 'Last summer', rows: ['The lake, June 14', 'Dad on the dock', 'Sunset from the boat'] } }), disclosure: disc, canPrev: true, canNext: true };
+    const aspectAt = cardAspectAt(approxMeasure, cvFull, mt, narrow.elMax + 11);
+    let n2 = 0, sheetNoTurn = 0, sheetTurn = 0, outside = 0, moved = 0, maxTurn = 0, samePlace = 0;
+    for (const eye of [1.2, 1.6]) for (let x = -2.4; x <= 2.41; x += 0.6) for (let z = -0.6; z <= 2.0; z += 0.65) {
+      const head: V3 = [x, eye, z];
+      if (Math.hypot(head[0] - TV.focus[0], head[2] - TV.focus[2]) < 1.6 || Math.hypot(head[0] - CORE.centre[0], head[2] - CORE.centre[2]) < 0.9) continue;
+      const yaw = yawTo(head, TV.focus), inp = input(head, yaw, { cardAspect: aspectAt(32) }); n2++;
+      const a = placeWorld(inp, undefined, { aspectAt, cone: narrow }), b = placeWorld(inp, undefined, { aspectAt, cone: narrow, turn: true });
+      if (a.mode === 'sheet') sheetNoTurn++;
+      if (b.mode === 'sheet') { sheetTurn++; continue; }
+      const [az, el] = viewAngles(head, b.headYaw, b.centre), hDeg = Math.atan2(b.heightM / 2, Math.hypot(b.centre[0] - head[0], b.centre[2] - head[2])) * 180 / Math.PI;
+      if (Math.abs(az) + b.widthDeg / 2 > narrow.azHalf + 0.5 || el - hDeg < narrow.elMin - 0.5 || el + hDeg > narrow.elMax + 0.5) outside++;
+      const [sa] = viewAngles(head, b.headYaw, TV.focus); if (Math.abs(sa) > narrow.azHalf) outside++;
+      const turned = Math.abs(((b.headYaw - yaw) * 180 / Math.PI + 540) % 360 - 180); maxTurn = Math.max(maxTurn, turned); if (turned > 0.5) moved++;
+      samePlace += finite([...b.centre]) ? 1 : 0;
+    }
+    console.log(`  90 degree field (azimuth +-40): ${n2} heads facing the subject; sheets without turning ${sheetNoTurn}, with turning ${sheetTurn}; the head turned in ${moved} (at most ${maxTurn.toFixed(0)} degrees)`);
+    check(sheetTurn === 0, 'with turning allowed, a narrow field still gets a card beside the subject for every head facing it');
+    check(outside === 0, 'after the turn the card and the subject are both inside the field');
+    check(sheetNoTurn > sheetTurn, 'turning is what makes it fit (without it the same heads need the sheet)');
+    check(maxTurn <= 40, `the turn is a part of a turn, never more than ${Math.round(maxTurn)} degrees`);
+  }
+  const cone = coneOfEye((() => { const t = Math.tan(45 * Math.PI / 180), q = new Array(16).fill(0); q[0] = 1 / t; q[5] = 1 / Math.tan(40 * Math.PI / 180); return q; })());
+  check(!!cone && Math.abs(cone.azHalf - 41) < 0.01 && Math.abs(cone.elMax - 32) < 1e-9 && Math.abs(cone.elMin + 35) < 1e-9, `the cone from a 90 x 80 degree eye is ${cone && cone.azHalf.toFixed(0)} degrees each side (45 less 4)`);
+  check(coneOfEye(new Array(16).fill(0)) === null, 'a missing projection gives no cone');
   // the sheet is the honest fallback: put the subject INSIDE the cone's whole width and the card cannot fit beside it
   const head: V3 = [0, 1.6, 1.2];
   const huge: BeatView['anchor'] = { role: 'wall', box: [-2.9, 0, -2.45, 2.9, 2.5, -2.35], focus: [0, 1.2, -2.4], level: null };

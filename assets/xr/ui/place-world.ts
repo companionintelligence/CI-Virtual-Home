@@ -112,10 +112,16 @@ function clearOf(head: V3, p: Pose, world: WorldProbe, hull: Box6[]): number {
 export interface PlaceDebug { candidates: Array<{ k: number; ok: boolean; why: string; score: number }>; sheet: boolean }
 
 export interface PlaceOpts {
+  /** the part of the view a card must sit inside (degrees); the kit measures it from the eye's projection. Default VIEW_CONE. */
+  cone?: { azHalf: number; elMin: number; elMax: number };
+  /** the person is about to be moved by a blink: the solver may also choose the head's yaw (Placed.headYaw), turning it up to a little toward the card so that
+   *  the subject and the card sit side by side in the middle of the view instead of the card at its edge. Without it the head's yaw is taken as given. */
+  turn?: boolean;
   /** the card's aspect (width / height) at another width in degrees: the solver tries wider cards (a wider card is a shorter one) before it gives up and uses the sheet */
   aspectAt?: (widthDeg: number) => number;
 }
-export type Placed = PlaceWorldOut & { widthDeg: number };
+/** `widthDeg`: the card's width (the layout should be redone at it). `headYaw`: the yaw (rad) the head should have after the move; the input's own unless `turn` was allowed. */
+export type Placed = PlaceWorldOut & { widthDeg: number; headYaw: number };
 
 /** Place the card. Never throws for finite input; a degenerate one gets the sheet. */
 export function placeWorld(inp: PlaceWorldInput, dbg?: PlaceDebug, opt: PlaceOpts = {}): Placed {
@@ -124,14 +130,16 @@ export function placeWorld(inp: PlaceWorldInput, dbg?: PlaceDebug, opt: PlaceOpt
   const w0 = cardWidthDeg(inp.textScale);
   const toFocus = dist3(head, anchor.focus);
   const D = clamp(Math.min(XR_LEGIBILITY.distance.card, toFocus - 0.3), Math.max(XR_LEGIBILITY.distance.min, XR_COMFORT.minCardDistM), XR_LEGIBILITY.distance.max);
+  const cone = opt.cone || VIEW_CONE;
   const subj = grow(boxRect(head, headYaw, anchor.box), MIN_SUBJECT_DEG, MIN_SUBJECT_DEG);
   const coreR = core ? grow(boxRect(head, headYaw, core.box), MIN_SUBJECT_DEG, MIN_SUBJECT_DEG) : null;
   const sa = (subj.a0 + subj.a1) / 2, se = (subj.e0 + subj.e1) / 2, sw = (subj.a1 - subj.a0) / 2, sh = (subj.e1 - subj.e0) / 2;
+  const shifted = (r: AngRect, d: number): AngRect => ({ a0: r.a0 - d, a1: r.a1 - d, e0: r.e0, e1: r.e1 });
 
   // widths to try: the default, then up to the 40 degree maximum in 4 degree steps (only when the caller can say how tall the card is at each)
-  const widths = [w0]; if (opt.aspectAt) for (let w = w0 + 4; w < XR_LEGIBILITY.card.maxDeg + 4; w += 4) widths.push(Math.min(XR_LEGIBILITY.card.maxDeg, w)); 
+  const widths = [w0]; if (opt.aspectAt) for (let w = w0 + 4; w < XR_LEGIBILITY.card.maxDeg + 4; w += 4) widths.push(Math.min(XR_LEGIBILITY.card.maxDeg, w));
   const seen = new Set<number>();
-  let best: { pose: Pose; score: number; widthDeg: number } | null = null;
+  let best: { pose: Pose; score: number; widthDeg: number; turnDeg: number } | null = null;
   for (const widthDeg of widths) {
     if (seen.has(widthDeg)) continue; seen.add(widthDeg);
     const aspect = Math.max(0.4, (opt.aspectAt ? opt.aspectAt(widthDeg) : inp.cardAspect) || 1);
@@ -141,30 +149,34 @@ export function placeWorld(inp: PlaceWorldInput, dbg?: PlaceDebug, opt: PlaceOpt
       const th = k * 30 * RAD, cx = Math.cos(th), cy = Math.sin(th);
       // the first distance at which the two rectangles clear each other, in this direction
       const t0 = Math.min(Math.abs(cx) > 1e-6 ? (sw + cw + GAP_DEG) / Math.abs(cx) : Infinity, Math.abs(cy) > 1e-6 ? (sh + ch + GAP_DEG) / Math.abs(cy) : Infinity);
-      if (VIEW_CONE.elMax - VIEW_CONE.elMin < hDeg) { if (dbg) dbg.candidates.push({ k, ok: false, why: 'taller than the cone', score: 0 }); continue; }
+      if (cone.elMax - cone.elMin < hDeg) { if (dbg) dbg.candidates.push({ k, ok: false, why: 'taller than the cone', score: 0 }); continue; }
       let why = '';
       // pushed further out in 2 degree steps while something (the caption bar's area, the Core) is in the way: a tall card beside a wide subject needs the room
       for (let push = 0; push <= 10; push += 2) {
         const t = t0 + push;
         let a = sa + cx * t, e = se + cy * t;
-        // inside the view cone: slide it back (the clearance test below then judges the result)
-        a = clamp(a, -VIEW_CONE.azHalf + cw, VIEW_CONE.azHalf - cw);
-        e = clamp(e, VIEW_CONE.elMin + ch, VIEW_CONE.elMax - ch);
-        const card = centred(a, e, widthDeg, hDeg);
-        if (coverage(card, subj) >= MAX_OVERLAP) { why = 'covers the subject'; continue; }
-        if (coreR && coverage(card, coreR) >= MAX_OVERLAP) { why = 'covers the core'; continue; }
+        e = clamp(e, cone.elMin + ch, cone.elMax - ch);
+        // where the head will look: as given, or turned so the subject and the card together sit in the middle of the view
+        let turn = 0;
+        if (opt.turn) turn = ((Math.min(subj.a0, a - cw) + Math.max(subj.a1, a + cw)) / 2);
+        else a = clamp(a, -cone.azHalf + cw, cone.azHalf - cw);
+        const card = centred(a, e, widthDeg, hDeg), cardV = shifted(card, turn), subjV = shifted(subj, turn), coreV = coreR ? shifted(coreR, turn) : null;
+        if (cardV.a0 < -cone.azHalf || cardV.a1 > cone.azHalf) { why = 'wider than the view'; continue; }
+        if (opt.turn && (subjV.a0 < -cone.azHalf || subjV.a1 > cone.azHalf) && sw < cone.azHalf) { why = 'wider than the view'; continue; }
+        if (coverage(cardV, subjV) >= MAX_OVERLAP) { why = 'covers the subject'; continue; }
+        if (coreV && coverage(cardV, coreV) >= MAX_OVERLAP) { why = 'covers the core'; continue; }
         let barHit = false;
-        for (const rs of inp.reservedDeg) if (rectIntersect(card, { a0: rs.x0, a1: rs.x1, e0: rs.y0, e1: rs.y1 }) / rectArea(card) >= MAX_OVERLAP) barHit = true;
+        for (const rs of inp.reservedDeg) if (rectIntersect(cardV, { a0: rs.x0, a1: rs.x1, e0: rs.y0, e1: rs.y1 }) / rectArea(cardV) >= MAX_OVERLAP) barHit = true;
         if (barHit) { why = 'covers the caption or menu area'; continue; }
         const centre = dirFrom(head, headYaw, a, e, D);
         const f = faceHead(head, centre);
         const pose: Pose = { centre, yaw: f.yaw, tiltDeg: f.tiltDeg, widthM: wM, heightM: hM, dist: D };
         const clearance = clearOf(head, pose, world, hull);
         if (clearance < 0) { why = 'the house is in the way'; continue; }
-        // the middle of the view first; a wider card than the default costs a little (it is a bigger thing in the face)
-        const score = Math.abs(a) + 1.3 * Math.abs(e) + 6 * Math.abs(D - XR_LEGIBILITY.distance.card) + (widthDeg - w0) * 0.5 + k * 0.001;
+        // the middle of the view first (and little turning); a wider card than the default costs a little (it is a bigger thing in the face)
+        const score = Math.abs(a - turn) + 0.6 * Math.abs(turn) + 1.3 * Math.abs(e) + 6 * Math.abs(D - XR_LEGIBILITY.distance.card) + (widthDeg - w0) * 0.5 + k * 0.001;
         if (dbg) dbg.candidates.push({ k, ok: true, why: 'ok', score });
-        if (!best || score < best.score) best = { pose, score, widthDeg };
+        if (!best || score < best.score) best = { pose, score, widthDeg, turnDeg: turn };
         why = ''; break;
       }
       if (why && dbg) dbg.candidates.push({ k, ok: false, why, score: 0 });
@@ -184,7 +196,7 @@ export function placeWorld(inp: PlaceWorldInput, dbg?: PlaceDebug, opt: PlaceOpt
   }
   if (dbg) dbg.sheet = mode === 'sheet';
 
-  const out: Placed = { centre: pose.centre, yaw: pose.yaw, tiltDeg: pose.tiltDeg, widthM: pose.widthM, heightM: pose.heightM, leader: null, mode, widthDeg };
+  const out: Placed = { centre: pose.centre, yaw: pose.yaw, tiltDeg: pose.tiltDeg, widthM: pose.widthM, heightM: pose.heightM, leader: null, mode, widthDeg, headYaw: best ? headYaw - best.turnDeg * RAD : headYaw };
   if (mode === 'card') out.leader = leaderFor(head, pose, anchor, world);
   return out;
 }

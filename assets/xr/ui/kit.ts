@@ -73,6 +73,8 @@ export interface UiKit {
   frame(): number; now(): number;
   /** device pixels per degree at the centre of the view, and the canvas density derived from it */
   ppd(): number; texelsPerDeg(): number;
+  /** the part of the view a card must sit inside, from the eye's projection (the headset's field of view less a margin) */
+  viewCone(): { azHalf: number; elMin: number; elMax: number };
   /** the least target size in degrees for the pointing in use */
   targetDeg(): number;
   /** metrics for a panel `distanceM` away with the person's current settings */
@@ -106,6 +108,14 @@ export function ppdOfEye(viewportW: number, proj: ArrayLike<number>): number {
   if (!(m0 > 0) || !(viewportW > 0)) return 0;
   const tanR = (m8 + 1) / m0, tanL = (1 - m8) / m0;   // tangents of the half angles right and left of the axis
   return viewportW / (tanR + tanL) * Math.PI / 180;
+}
+
+/** The part of the view a card must sit inside, from an eye's projection matrix: the narrower of its left and right half angles less 4 degrees, and its up and down less 5, within sane limits. */
+export function coneOfEye(proj: ArrayLike<number>): { azHalf: number; elMin: number; elMax: number } | null {
+  const m0 = proj[0], m5 = proj[5], m8 = proj[8], m9 = proj[9];
+  if (!(m0 > 0) || !(m5 > 0)) return null;
+  const D = 180 / Math.PI, left = Math.atan((1 - m8) / m0) * D, right = Math.atan((1 + m8) / m0) * D, up = Math.atan((1 + m9) / m5) * D, down = Math.atan((1 - m9) / m5) * D;
+  return { azHalf: clamp(Math.min(left, right) - 4, 28, 56), elMin: -clamp(down - 5, 18, 38), elMax: clamp(up - 5, 18, 32) };
 }
 
 /** the sizes a kit part asks the metrics for, in one place */

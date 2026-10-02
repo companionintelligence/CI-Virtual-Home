@@ -26,7 +26,7 @@ import { CaptionBar } from './caption.js';
 import { CardSurface } from './card.js';
 import type { UiKit } from './kit.js';
 import type { Menu } from './menu.js';
-import { cardAspectAt, layoutBeatCardFit, layoutEndCard, layoutStartCard, type CardView, type Layout } from './paint.js';
+import { cardAspectAt, layoutBeatCardFit, layoutEndCard, layoutStartCard, MAX_CARD_DEG, type CardView, type Layout } from './paint.js';
 import { cardWidthDeg, placeWorld, reportPlacement, type PlaceDebug } from './place-world.js';
 import { BudgetError } from './panel.js';
 
@@ -51,6 +51,8 @@ export interface XrPresenterApi extends Presenter {
   attach(host: PresenterHost): void;
   /** a press on a widget of the card, for tests that drive the flow without a ray */
   press(widgetId: string): void;
+  /** after dispose() a presenter is finished; XrUi.presenter() then makes a new one */
+  readonly disposed: boolean;
 }
 
 export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
@@ -77,6 +79,9 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
   const world = (): WorldProbe => kit.loco?.world || OPEN_WORLD;
   const cs = () => kit.settings.get();
 
+  /** a card should fit between the top of the caption bar and the top of the view; taller ones lose the phone drawing (paint.ts) */
+  const fitDeg = () => Math.max(34, Math.min(MAX_CARD_DEG, kit.viewCone().elMax + 11));
+
   // ---- the card's content and its layout
   const cardView = (b: BeatView, far?: string): CardView => ({
     beat: b, disclosure: story!.disclosure, canPrev: cardCanPrev, canNext: cardCanNext, nextLabel: b.index + 1 >= b.count ? 'Finish' : 'Next',
@@ -85,7 +90,7 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
   let farNote: string | undefined;
   function layoutFor(b: BeatView, widthDeg?: number): { L: Layout; m: ReturnType<UiKit['metrics']>; widthDeg: number } {
     const m = kit.metrics(CARD_DIST), wd = widthDeg ?? cardWidthDeg(m.textScale), W = Math.round(wd * m.texelsPerDeg);
-    return { L: layoutBeatCardFit(kit.measure, cardView(b, farNote), m, W), m, widthDeg: wd };
+    return { L: layoutBeatCardFit(kit.measure, cardView(b, farNote), m, W, fitDeg()), m, widthDeg: wd };
   }
 
   // ---- where to stand
@@ -119,13 +124,14 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
     return { pos: [stand.feet[0], stand.feet[1] + eye, stand.feet[2]], yaw: stand.yaw, eye };
   }
 
-  /** lay out and place for a head; the solver may choose a wider (so shorter) card, in which case the layout is redone at that width */
-  function layoutAndPlace(b: BeatView, head: { pos: V3; yaw: number; eye: number }, dbg?: PlaceDebug) {
+  /** lay out and place for a head; the solver may choose a wider (so shorter) card, in which case the layout is redone at that width, and, when the person is
+   *  about to be moved (`turn`), the yaw the head should end with (so the subject and the card are side by side in the middle of the view) */
+  function layoutAndPlace(b: BeatView, head: { pos: V3; yaw: number; eye: number }, turn: boolean, dbg?: PlaceDebug) {
     const first = layoutFor(b);
-    const inp = (L: Layout) => ({ head: head.pos, headYaw: head.yaw, eyeHeight: head.eye, anchor: b.anchor, core: story!.core, cardAspect: L.w / L.h, textScale: cs().textScale, world: world(), reservedDeg: RESERVED });
-    const out = placeWorld(inp(first.L), dbg, { aspectAt: cardAspectAt(kit.measure, cardView(b, farNote), first.m) });
+    const inp = (L: Layout, yaw = head.yaw) => ({ head: head.pos, headYaw: yaw, eyeHeight: head.eye, anchor: b.anchor, core: story!.core, cardAspect: L.w / L.h, textScale: cs().textScale, world: world(), reservedDeg: RESERVED });
+    const out = placeWorld(inp(first.L), dbg, { aspectAt: cardAspectAt(kit.measure, cardView(b, farNote), first.m, fitDeg()), turn, cone: kit.viewCone() });
     const lay = out.widthDeg === first.widthDeg ? first : layoutFor(b, out.widthDeg);
-    const report = reportPlacement(inp(lay.L), out);
+    const report = reportPlacement(inp(lay.L, out.headYaw), out);
     return { out, report, ...lay };
   }
 
@@ -224,7 +230,7 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
       const far = dist3(head.pos, view.anchor.focus);
       if (kind === 'held') { farNote = far > 6 ? `About ${Math.round(far)} m away` : undefined; if (far > HELD_FAR_M) notes.push(`subject ${Math.round(far)} m away`); else if (!stand) fault('unreachable-beat', view.id); }
       const dbg: PlaceDebug = { candidates: [], sheet: false };
-      let { out, report, L, m, widthDeg } = layoutAndPlace(view, head, dbg);
+      let { out, report, L, m, widthDeg } = layoutAndPlace(view, head, !!stand, dbg);
       lastPlacement = report;
       if (out.mode === 'sheet') { fault('no-placement', view.id); notes.push('sheet: no candidate fit'); }
       surface!.present(L, m, widthDeg, out, false);
@@ -234,13 +240,13 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
       if (stand && !ctx.signal.aborted) {
         pendingReveal = { at: kit.frame() };
         moved = true;
-        const r = await kit.rig.moveTo({ feet: stand.feet, yawDeg: stand.yaw * DEG }, { faceStandYaw: true, signal: ctx.signal });
+        const r = await kit.rig.moveTo({ feet: stand.feet, yawDeg: out.headYaw * DEG }, { faceStandYaw: true, signal: ctx.signal });
         notes.push(`blink ${Math.round(r.ms)} ms, head moved ${r.headMovedM.toFixed(2)} m`);
         if (token !== enterToken) return { reach: kind, placement: report, cardVisible: false, ms: kit.host.now() - t0, notes: [...notes, 'superseded'] };
         // the head is where it really is: re-place only if the prediction was off (eye height, a lean at the moment of the swap)
-        const actual = kit.head(), moveErr = dist3(actual.pos, head.pos), yawErr = Math.abs(((actual.yawDeg - head.yaw * DEG + 540) % 360) - 180);
+        const actual = kit.head(), moveErr = dist3(actual.pos, head.pos), yawErr = Math.abs(((actual.yawDeg - out.headYaw * DEG + 540) % 360) - 180);
         if (moveErr > 0.12 || yawErr > 6) {
-          const re = layoutAndPlace(view, { pos: actual.pos, yaw: actual.yawDeg * RAD, eye: head.eye });
+          const re = layoutAndPlace(view, { pos: actual.pos, yaw: actual.yawDeg * RAD, eye: head.eye }, false);
           out = re.out; report = re.report; L = re.L; m = re.m; widthDeg = re.widthDeg; lastPlacement = report; surface!.present(L, m, widthDeg, out, false);
           notes.push(`re-placed: head was ${moveErr.toFixed(2)} m / ${yawErr.toFixed(0)} deg off`);
         }
@@ -349,6 +355,7 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
       } catch { /* a host without settings */ } finally { syncing = false; }
     },
     press(id: string) { onCard(id); },
+    get disposed() { return disposed; },
 
     debug: {
       texts() {
@@ -368,7 +375,7 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
     const pose = surface.pose; if (!pose) return;
     if (stage === 'beat' && beat && story) {
       // a text scale or contrast change re-places the card (its shape changed), for the head where it is now; a label change only redraws
-      if (sizeChanged) { const h = kit.head(), r = layoutAndPlace(beat, { pos: h.pos, yaw: h.yawDeg * RAD, eye: Math.max(1.0, h.pos[1] - kit.rig.floorY()) }); lastPlacement = r.report; surface.present(r.L, r.m, r.widthDeg, r.out, true); }
+      if (sizeChanged) { const h = kit.head(), r = layoutAndPlace(beat, { pos: h.pos, yaw: h.yawDeg * RAD, eye: Math.max(1.0, h.pos[1] - kit.rig.floorY()) }, false); lastPlacement = r.report; surface.present(r.L, r.m, r.widthDeg, r.out, true); }
       else { const { L, m, widthDeg } = layoutFor(beat, surface.panel.widthDeg || undefined); surface.relayout(L, m, widthDeg); }
     }
     else if (stage === 'end' && endView) { const m = kit.metrics(CARD_DIST), widthDeg = cardWidthDeg(m.textScale); surface.relayout(layoutEndCard(kit.measure, endView, m, Math.round(widthDeg * m.texelsPerDeg), { canReplay: true, hasCta: !!endView.closing.ctaLabel }), m, widthDeg); }

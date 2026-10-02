@@ -47,11 +47,11 @@ async function pixelOf(p: P, panel: string, id: string): Promise<number[] | null
     return w ? u.debug.pixel(a.panel, w.x + w.w * 0.1, w.y + w.h / 2) : null;
   }, { panel, id });
 }
-/** The colour of the headset view at a widget: project its centre into the left eye and read the default framebuffer inside one task. null when it cannot be read. */
+/** The colour of the headset view at a widget (10 percent in from its left edge, clear of the ray's hit dot): project it into the left eye and read the default framebuffer inside one task. null when it cannot be read. */
 async function framePixel(p: P, panel: string, id: string): Promise<number[] | null> {
   return p.page.evaluate(({ panel, id }: { panel: string; id: string }) => {
     try {
-      const u = (window as any).__houseViewer.xr.ui(), w = u.debug.widget(panel, id); if (!w) return null;
+      const u = (window as any).__houseViewer.xr.ui(), w = u.debug.widget(panel, id, 0.1); if (!w) return null;
       const { renderer } = (window as any).__houseDebug(), T = (window as any).__THREE;
       const cam = renderer.xr.getCamera().cameras[0]; if (!cam) return null;
       const v = new T.Vector3(...w.world).project(cam), vp = cam.viewport;
@@ -74,6 +74,8 @@ export const aimPress = defineCase({
     t.check(!!px0, 'could not read a pixel of the dock panel');
     const hub0 = await hub(p);
     t.note('kind', hub0.kind);
+    if (vision) t.check((await ui(p, (u: any) => u.debug.ppd().targetDeg)) >= 4.5, 'a session that starts with no input source (hands only) sizes its targets for a hand (4.5 degrees or more) before the first pinch');
+    else t.check(hub0.kind === 'ray', `with controllers the pointing kind is ${hub0.kind}, expected ray`);
 
     if (!vision) {
       // ---- hover: pointing at the button
@@ -168,7 +170,7 @@ export const aimPress = defineCase({
       t.check(eq(await pixelOf(p, 'dock', 'menu'), px0) || true, 'n/a');
       const ever = await ui(p, (u: any) => u.debug.panels().filter((q: any) => q.hover).length);
       t.check(ever === 0, 'a panel is hovering after the pinch ended');
-      t.note('targetDeg', await ui(p, (u: any) => u.debug.ppd().targetDeg));
+      t.check((await ui(p, (u: any) => u.debug.ppd().targetDeg)) === 5, 'on the Vision tier the targets stay 5 degrees between pinches (there is no source to say so)');
     }
     t.check(p.errors.length === 0, `page errors: ${p.errors.join(' | ')}`);
     await endSession(p, e);
@@ -183,6 +185,9 @@ export const tour = defineCase({
     const { p, e } = await boot(t);
     const tree = await t.tree('dist');
     const m0 = p.mark();
+    // The harness's comfort sampler (probe.js) looks for the fade at window.__houseViewer.xr.rig.fade; the session module offers it as xr.rig().fade.
+    // Until the two agree (an integration item), read it where the session puts it.
+    await p.page.evaluate(() => { const X = (window as any).__xrh, old = X.readFade; X.readFade = () => { const x = (window as any).__houseViewer.xr, r = typeof x.rig === 'function' ? x.rig() : x.rig; return r && r.fade ? r.fade.get() : old(); }; });
     await startComfort(p);
 
     // ---- start the mock tour; the presenter is the product's own (ui.presenter())
@@ -218,6 +223,7 @@ export const tour = defineCase({
     const uploads = capAfter.uploads - up0.uploads;
     t.check(uploads <= words + beats[1].sayClip.words.length + 8, `the caption uploaded ${uploads} times for ${words + beats[1].sayClip.words.length} words: it redraws on something other than a word`);
     t.check(uploads >= words * 0.5, `the caption uploaded only ${uploads} times for ${words} words: the karaoke did not move`);
+    await t.screenshot(p, `ui-${t.device}-beat1`);
     const texts = await cardTexts();
     t.check(texts.some((s: string) => s.startsWith('Here is the weekend')), 'the captions so far do not include the spoken say line');
     t.note('captionUploads', `${uploads} for ${words} + ${beats[1].sayClip.words.length} words`);
@@ -295,6 +301,7 @@ export const menuAndCleanup = defineCase({
     await ui(p, (u: any) => u.menu.show());
     await tickFrames(p, 10);
     const open = await ui(p, (u: any) => ({ m: u.debug.menu(), px: u.debug.panels().find((q: any) => q.name === 'menu').px }));
+    await t.screenshot(p, `ui-${t.device}-menu`);
     t.check(open.m.open && open.m.texts.includes('Menu') && open.m.texts.includes('Exit VR'), `the menu shows ${JSON.stringify(open.m.texts)}`);
     t.check((await panels(p)).filter((q: any) => q.name === 'menu')[0].widgets.length <= 9, 'the first page of the menu has more than five rows plus its buttons');
     // text size 150 percent through the menu's own activation path

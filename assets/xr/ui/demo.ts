@@ -167,16 +167,29 @@ function buildBeats(ui: XrUiImpl): BeatView[] {
   const OFFSETS: Array<Array<[number, number]>> = [
     [[0, 0]], [[-1.5, 1.0], [-1.0, 0.6], [1.5, 1.0], [0, 0]], [[0, -1.5], [0.8, -1.0], [-0.8, 1.2], [0, 0]], [[1.2, 1.2], [1.0, 0.5], [-1.2, 0.8], [0, 0]],
   ];
+  const free = (from: V3, azRad: number) => ui.debug.freeDistance([from[0], 1.4, from[2]], [-Math.sin(azRad), 0, -Math.cos(azRad)]);
   const stand = (i: number): V3 => {
     for (const [dx, dz] of OFFSETS[i]) {
       const [x, z] = rot(dx, dz);
-      try { if (!world || (world.floorY(x, z, null) != null && world.walkable(x, z, null, 0.3))) return [x, 1.6, z]; } catch { /* next */ }
+      try {
+        if (world && !(world.floorY(x, z, null) != null && world.walkable(x, z, null, 0.3))) continue;
+        const d = Math.hypot(x - base[0], z - base[2]);
+        if (d > 0.05 && free([base[0], 0, base[2]], Math.atan2(-(x - base[0]), -(z - base[2]))) < d + 0.4) continue;   // nothing solid between here and there
+        return [x, 1.6, z];
+      } catch { /* next */ }
     }
     return [base[0], 1.6, base[2]];
   };
+  // the subject: along the spot's bearing if the way is open, else the most open bearing; never nearer than 1.8 m or farther than the wall
   const at = (s: Spot, eye: V3): { eye: V3; focus: V3; box: BeatView['anchor']['box'] } => {
-    const a = yaw0 - s.az * Math.PI / 180;
-    const fx = eye[0] - Math.sin(a) * s.dist, fz = eye[2] - Math.cos(a) * s.dist;
+    let best = { az: s.az, open: -1 };
+    for (const daz of [0, 25, -25, 50, -50, 80, -80, 120, -120, 180]) {
+      const open = free(eye, yaw0 - (s.az + daz) * Math.PI / 180);
+      if (open >= s.dist + 0.5) { best = { az: s.az + daz, open }; break; }
+      if (open > best.open) best = { az: s.az + daz, open };
+    }
+    const a = yaw0 - best.az * Math.PI / 180, dist = Math.max(1.8, Math.min(s.dist, best.open - 0.45));
+    const fx = eye[0] - Math.sin(a) * dist, fz = eye[2] - Math.cos(a) * dist;
     const focus: V3 = [fx, 1.0, fz];
     return { eye, focus, box: [fx - s.w / 2, 0.2, fz - s.w / 2, fx + s.w / 2, 0.2 + s.h, fz + s.w / 2] };
   };

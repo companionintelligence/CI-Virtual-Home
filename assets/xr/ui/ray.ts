@@ -3,9 +3,9 @@
 //   POINTING   each XR frame, for each input source: its target-ray pose (from the XRFrame, through the rig) meets the panels in front of
 //              it (hit.ts); the nearest panel and the widget under the ray are the source's hit. Only a TRACKED pointer hovers: visionOS
 //              shows no hover for web content (its source exists only while the person pinches), and a gaze or screen source has none.
-//   PRESSING   on `selectstart`; some runtimes send only `select` (and IWER sends `select` BEFORE `selectstart`), so a `select` with no press
-//              under way presses and releases at once, and the `selectstart` and `selectend` that follow it are ignored. A press activates
-//              on release over the SAME widget; released elsewhere, or cancelled, it does nothing.
+//   PRESSING   on `selectstart`; some runtimes send only `select` (and IWER sends `select` BEFORE `selectstart`, both at the press-down), so a
+//              `select` with no press under way waits out the current task and, if no `selectstart` came in it, presses and releases at once.
+//              A press activates on release over the SAME widget; released elsewhere, or cancelled, it does nothing.
 //   CANCEL     a press ends, unactivated, when its source goes away (controller lost mid-press: IWER sends no event for it, the kit
 //              cancels from `inputsourceschange` and from what the frame no longer contains), when the session becomes hidden or blurred,
 //              and when the session ends.
@@ -39,7 +39,7 @@ interface Src {
   has: boolean; origin: V3; dir: V3;
   hit: { panel: XrPanel; widget: Widget | null; dist: number; point: V3 } | null;
   hoverPanel: XrPanel | null; hoverId: string | null;
-  selectHandled: boolean; downAt: number;
+  pendingSelect: { panel: XrPanel; widget: Widget | null } | null;
   ray: any; dot: any; proxy: any; gripOk: boolean;
 }
 interface Press { panel: XrPanel; widget: Widget | null }
@@ -89,6 +89,7 @@ export class RayHub {
   private offs: Array<() => void> = [];
   private session: any = null;
   private kind: TargetKind = 'ray';
+  private floorKind: TargetKind = 'ray'; private floorByEmpty = false;
   private T: any; private tmpV: any; private tmpQ: any; private tmpD: any; private mat: any;
   private rayGeo: any; private dotGeo: any; private proxyGeo: any;
   private rayMat: any; private dotMat: any; private proxyMat: any;
@@ -114,6 +115,7 @@ export class RayHub {
   // ---------------------------------------------------------------------------------------------------------------------- lifecycle
   attach(): void {
     const session = this.session = this.d.renderer.xr.getSession?.();
+    if (session && session.inputSources && session.inputSources.length === 0) { this.floorKind = 'handRay'; this.floorByEmpty = true; this.kind = 'handRay'; this.d.onKind('handRay'); }
     this.unregister = this.d.input.addTarget(this.target());
     if (session) {
       const on = (n: string, f: (e: any) => void) => { session.addEventListener(n, f); this.offs.push(() => session.removeEventListener(n, f)); };
@@ -216,19 +218,28 @@ export class RayHub {
   }
 
   private setKind(): void {
-    let k: TargetKind = 'ray';
-    for (const s of this.srcs.values()) { if (s.mode === 'transient-pointer' || s.mode === 'gaze') k = 'gazePinch'; else if (s.hand && k === 'ray') k = 'handRay'; }
+    const rank: Record<TargetKind, number> = { ray: 0, handRay: 1, gazePinch: 2 };
+    let k: TargetKind = this.floorKind, controller = false;
+    for (const s of this.srcs.values()) {
+      const c: TargetKind = s.mode === 'transient-pointer' || s.mode === 'gaze' ? 'gazePinch' : s.hand ? 'handRay' : 'ray';
+      if (c === 'gazePinch') this.floorKind = 'gazePinch';           // sticky: between pinches there is no source to say so, and the person's aim is no better for it
+      if (c === 'ray') controller = true;
+      if (rank[c] > rank[k]) k = c;
+    }
+    // a session that began with no source at all (hands only, or a pinch-only device) is sized for a hand until a controller shows up
+    if (controller && this.floorKind === 'handRay' && this.floorByEmpty) { this.floorKind = 'ray'; this.floorByEmpty = false; k = 'ray'; for (const s of this.srcs.values()) if (s.hand && rank['handRay'] > rank[k]) k = 'handRay'; }
+    if (rank[this.floorKind] > rank[k]) k = this.floorKind;
     if (k !== this.kind) { this.kind = k; this.d.onKind(k); }
   }
-  /** called by the kit once at mount (the tier says `vision` before any pinch exists) */
-  forceKind(k: TargetKind): void { if (k !== this.kind) { this.kind = k; this.d.onKind(k); } }
+  /** the least target kind for the session: visionOS has no source until the first pinch, but its pointing is gaze plus pinch from the start */
+  forceKind(k: TargetKind): void { this.floorKind = k; this.setKind(); }
 
   // ---------------------------------------------------------------------------------------------------------------------- sources
   private addSource(x: any): Src {
     const T = this.T;
     const s: Src = {
       key: 's' + this.nextId, xr: x, id: this.nextId++, tracked: x.targetRayMode === 'tracked-pointer', hand: !!x.hand, mode: x.targetRayMode,
-      has: false, origin: [0, 0, 0], dir: [0, 0, -1], hit: null, hoverPanel: null, hoverId: null, selectHandled: false, downAt: -1,
+      has: false, origin: [0, 0, 0], dir: [0, 0, -1], hit: null, hoverPanel: null, hoverId: null, pendingSelect: null,
       ray: new T.Mesh(this.rayGeo, this.rayMat), dot: new T.Mesh(this.dotGeo, this.dotMat), proxy: null, gripOk: false,
     };
     for (const o of [s.ray, s.dot]) { o.visible = false; o.frustumCulled = false; o.renderOrder = 1300; o.raycast = () => {}; o.userData.xrOverlay = true; this.d.group.add(o); }
@@ -283,23 +294,30 @@ export class RayHub {
   private onSelectStart(e: any): void {
     if (this.viaRegistry()) return;
     const s = this.src(e); if (!s) return;
-    if (s.selectHandled) return;                    // IWER: `select` came first and did the whole press
+    s.pendingSelect = null;                         // a selectstart exists: `select` is not the only event this runtime sends
     const h = this.hitAt(s, e); if (!h) return;
     this.beginPress(s.key, h.panel, h.widget);
   }
+  /** The spec's order is selectstart, select (on release over the target), selectend. IWER sends `select` at the press-down and BEFORE selectstart; a runtime
+   *  could send `select` alone. So a `select` with no press under way waits for the end of the current task: if a selectstart arrives in it, that is the real
+   *  press; if none does, `select` was all there is, and it presses and releases at once. The hit is taken now, while the event's frame is active. */
   private onSelect(e: any): void {
     if (this.viaRegistry()) return;
     const s = this.src(e); if (!s) return;
     if (this.pressed.has(s.key)) return;            // the usual order: selectstart pressed, selectend will release
     const h = this.hitAt(s, e); if (!h) return;
-    s.selectHandled = true;
-    this.beginPress(s.key, h.panel, h.widget);
-    this.endPress(s.key, { panel: h.panel, widget: h.widget }, false);
+    const mine = s.pendingSelect = { panel: h.panel, widget: h.widget };
+    queueMicrotask(() => {
+      if (s.pendingSelect !== mine) return;
+      s.pendingSelect = null;
+      if (this.pressed.has(s.key)) return;
+      this.beginPress(s.key, mine.panel, mine.widget);
+      this.endPress(s.key, mine, false);
+    });
   }
   private onSelectEnd(e: any): void {
     if (this.viaRegistry()) return;
     const s = this.src(e); if (!s) return;
-    if (s.selectHandled) { s.selectHandled = false; return; }
     if (!this.pressed.has(s.key)) return;
     const h = this.hitAt(s, e);
     this.endPress(s.key, h ? { panel: h.panel, widget: h.widget } : null, false);

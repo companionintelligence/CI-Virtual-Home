@@ -12,7 +12,7 @@
 import type { XrFrame, XrHost, XrInput, XrLocomotion, XrRig, XrUi } from '../host.js';
 import type { Presenter, PresenterFault, PresenterHost, V3 } from '../presenter.js';
 import { XR_BUDGET, XR_COMFORT, XR_LEGIBILITY } from '../presenter.js';
-import { createSettings, metricsFor, ppdOfEye, texelsPerDegFor, type SettingsStore, type UiKit, type UiSettings } from './kit.js';
+import { coneOfEye, createSettings, metricsFor, ppdOfEye, texelsPerDegFor, type SettingsStore, type UiKit, type UiSettings } from './kit.js';
 import { Menu } from './menu.js';
 import { ctxMeasure, type Measure } from './paint.js';
 import { PanelSet } from './panel.js';
@@ -27,15 +27,17 @@ export interface UiDebug {
   texts(): string[];
   head(): { pos: V3; dir: V3; yawDeg: number };
   world(): import('../host.js').XrLocomotion['world'] | null;
+  /** metres from `from` along `dir` to the first solid surface of the scene (Infinity if none within 40 m): for the demo's choice of open spots only; slow, never per frame */
+  freeDistance(from: V3, dir: V3): number;
   footprint(): { nodes: number; textureBytes: number; drawCalls: number };
   panels(): Array<{ name: string; visible: boolean; opacity: number; px: [number, number]; sizeM: [number, number]; centre: V3; widgets: Array<{ id: string; x: number; y: number; w: number; h: number; enabled: boolean }>; hover: string | null; pressed: string | null; uploads: number }>;
   hub(): ReturnType<RayHub['debug']>;
   /** canvas pixel [r,g,b,a] of a panel */
   pixel(panel: string, x: number, y: number): number[] | null;
   /** the centre of a widget in the TRACKING space (what an emulated controller aims at), and in the world */
-  widget(panel: string, id: string): { tracking: V3; world: V3 } | null;
+  widget(panel: string, id: string, fx?: number): { tracking: V3; world: V3 } | null;
   press(panel: string, id: string): boolean;
-  ppd(): { ppd: number; texelsPerDeg: number; targetDeg: number };
+  ppd(): { ppd: number; texelsPerDeg: number; targetDeg: number; cone: { azHalf: number; elMin: number; elMax: number } };
   menu(): { open: boolean; page: string; texts: string[]; activations: string[] };
   toasts(): string[];
   status(): string[];
@@ -53,6 +55,7 @@ export function createUi(host: XrHost): XrUiImpl {
   let settings: SettingsStore = createSettings(undefined, false);
   let frameNo = 0, nowMs = 0, headNow: { pos: V3; dir: V3; yawDeg: number } = { pos: [0, 1.6, 0], dir: [0, 0, -1], yawDeg: 0 };
   let ppd = DEFAULT_PPD, fixedPpd = false, fonts = false, tKind: TargetKind = 'ray';
+  let cone = { azHalf: 50, elMin: -38, elMax: 32 };
   const frameCbs = new Set<(f: XrFrame) => void>(), relayoutCbs = new Set<() => void>(), endCbs = new Set<() => void>(), visCbs = new Set<(s: 'visible' | 'blurred' | 'hidden') => void>();
   const offs: Array<() => void> = [];
   const motion: Array<{ frame: number; fade: number; moved: boolean }> = [];
@@ -67,7 +70,7 @@ export function createUi(host: XrHost): XrUiImpl {
     get group() { return group; }, get panels() { return panels!; }, get hub() { return hub!; },
     get settings() { return settings; }, measure,
     head: () => headNow, frame: () => frameNo, now: () => nowMs,
-    ppd: () => ppd, texelsPerDeg: () => texelsPerDegFor(ppd),
+    ppd: () => ppd, texelsPerDeg: () => texelsPerDegFor(ppd), viewCone: () => cone,
     targetDeg: () => (tKind === 'gazePinch' ? XR_LEGIBILITY.targetDeg.gazePinch : tKind === 'handRay' ? XR_LEGIBILITY.targetDeg.handRay : XR_LEGIBILITY.targetDeg.ray),
     metrics: (d, o) => metricsFor(kit, d, o),
     fault(code, detail) { faults.push({ code, detail }); if (faults.length > 50) faults.shift(); console.warn(`xr ui: ${code}${detail ? ' ' + detail : ''}`); },
@@ -92,6 +95,7 @@ export function createUi(host: XrHost): XrUiImpl {
     try {
       const cams = host.renderer.xr.getCamera().cameras, eye = cams && cams[0];
       if (eye && eye.viewport && eye.viewport.z > 0) {
+        const c = coneOfEye(eye.projectionMatrix.elements); if (c) cone = c;
         const v = ppdOfEye(eye.viewport.z, eye.projectionMatrix.elements);
         if (v > 0) {
           const next = Math.min(80, Math.max(6, v));
@@ -174,7 +178,7 @@ export function createUi(host: XrHost): XrUiImpl {
 
     presenter(h?: PresenterHost) {
       if (!mounted || !menu) return null;
-      if (!presenter) presenter = createXrPresenter(kit, menu);
+      if (!presenter || presenter.disposed) presenter = createXrPresenter(kit, menu);
       if (h) presenter.attach(h);
       return presenter;
     },
@@ -205,6 +209,12 @@ export function createUi(host: XrHost): XrUiImpl {
       },
       head: () => headNow,
       world: () => (loco ? loco.world : null),
+      freeDistance(from, dir) {
+        const rc = new T.Raycaster(new T.Vector3(...from), new T.Vector3(...dir).normalize(), 0.05, 40);
+        const hits = rc.intersectObjects(host.scene.children.filter((o: any) => o !== group && !o.userData.xrOverlay && o.name !== 'xr: rig'), true);
+        for (const h of hits) { const m = h.object.material; if (h.object.visible && !(m && (m.transparent && m.opacity < 0.3))) return h.distance; }
+        return Infinity;
+      },
       footprint: () => kit.footprint(),
       panels: () => (panels ? panels.panels.map(p => ({
         name: p.name, visible: p.visible, opacity: p.opacityNow, px: [p.canvas.width, p.canvas.height] as [number, number], sizeM: [p.widthM, p.heightM] as [number, number], centre: p.centre,
@@ -215,16 +225,16 @@ export function createUi(host: XrHost): XrUiImpl {
         const p = panels?.panels.find(q => q.name === panel); if (!p) return null;
         try { return Array.from(p.g.getImageData(Math.round(x), Math.round(y), 1, 1).data); } catch { return null; }
       },
-      widget(panel, id) {
+      widget(panel, id, fx = 0.5) {
         const p = panels?.panels.find(q => q.name === panel), w = p?.widgets.find(q => q.id === id); if (!p || !w || !rig) return null;
-        const u = (w.x + w.w / 2) / p.canvas.width - 0.5, v = 0.5 - (w.y + w.h / 2) / p.canvas.height, b = p.basis;
+        const u = (w.x + w.w * fx) / p.canvas.width - 0.5, v = 0.5 - (w.y + w.h / 2) / p.canvas.height, b = p.basis;
         const world: V3 = [p.centre[0] + b.r[0] * u * p.widthM + b.u[0] * v * p.heightM, p.centre[1] + b.r[1] * u * p.widthM + b.u[1] * v * p.heightM, p.centre[2] + b.r[2] * u * p.widthM + b.u[2] * v * p.heightM];
         rig.group.updateMatrixWorld(true);
         const t = new T.Vector3(world[0], world[1], world[2]).applyMatrix4(rig.group.matrixWorld.clone().invert());
         return { tracking: [t.x, t.y, t.z] as V3, world };
       },
       press(panel, id) { const p = panels?.panels.find(q => q.name === panel), w = p?.widgets.find(q => q.id === id); if (!p || !w || !p.activate) return false; p.activate(w); return true; },
-      ppd: () => ({ ppd, texelsPerDeg: texelsPerDegFor(ppd), targetDeg: kit.targetDeg() }),
+      ppd: () => ({ ppd, texelsPerDeg: texelsPerDegFor(ppd), targetDeg: kit.targetDeg(), cone }),
       menu: () => ({ open: !!menu?.open, page: menu ? menu.currentPage : '', texts: menu ? menu.texts : [], activations: menu ? menu.activations.slice() : [] }),
       toasts: () => (toasts ? toasts.shown.slice() : []),
       status: () => (status ? status.texts : []),

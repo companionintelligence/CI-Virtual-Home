@@ -400,20 +400,20 @@ export function layoutBeatCard(measure: Measure, cv: CardView, m: Metrics, W: nu
 
 /** The tallest a card may be, in degrees: the view's comfortable height is 70, and the caption bar needs the bottom of it */
 export const MAX_CARD_DEG = 56;
-/** Lay the card out; if it is taller than MAX_CARD_DEG, lay it out again with the phone's screen as one line of text. */
-export function layoutBeatCardFit(measure: Measure, cv: CardView, m: Metrics, W: number): Layout {
+/** Lay the card out; if it is taller than `maxDeg` (the room between the top of the caption bar and the top of the view: about 37 to 43 degrees), lay it out again with the phone's screen as one line of text. */
+export function layoutBeatCardFit(measure: Measure, cv: CardView, m: Metrics, W: number, maxDeg = MAX_CARD_DEG): Layout {
   const L = layoutBeatCard(measure, cv, m, W);
-  if (L.h / m.texelsPerDeg <= MAX_CARD_DEG || cv.compact || cv.beat.popup.kind !== 'phone') return L;
+  if (L.h / m.texelsPerDeg <= maxDeg || cv.compact || cv.beat.popup.kind !== 'phone') return L;
   const C = layoutBeatCard(measure, { ...cv, compact: true }, m, W);
   return C.h < L.h ? C : L;
 }
 
 /** width / height of the card at a width in degrees (memoised): what the placement solver asks when it tries wider cards */
-export function cardAspectAt(measure: Measure, cv: CardView, m: Metrics): (widthDeg: number) => number {
+export function cardAspectAt(measure: Measure, cv: CardView, m: Metrics, maxDeg = MAX_CARD_DEG): (widthDeg: number) => number {
   const memo = new Map<number, number>();
   return (widthDeg) => {
     let a = memo.get(widthDeg);
-    if (a === undefined) { const L = layoutBeatCardFit(measure, cv, m, Math.round(widthDeg * m.texelsPerDeg)); a = L.w / L.h; memo.set(widthDeg, a); }
+    if (a === undefined) { const L = layoutBeatCardFit(measure, cv, m, Math.round(widthDeg * m.texelsPerDeg), maxDeg); a = L.w / L.h; memo.set(widthDeg, a); }
     return a;
   };
 }
