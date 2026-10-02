@@ -46,7 +46,6 @@
     "story:bake": "node --experimental-strip-types scripts/story-bake.mts",
     "story:voice": "node --experimental-strip-types scripts/build-voiceover.mts",
     "story:film": "node --experimental-strip-types scripts/render-family-film.mts",
-    "portal:og": "node --experimental-strip-types scripts/story/build-og.mts",
     "serve": "python3 -m http.server 8080"
   },
   "devDependencies": {
