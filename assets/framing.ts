@@ -9,9 +9,9 @@
 // Owner: S5 (shot). THREE-free.
 import { Math } from './detmath.js';
 import { K, DEG, clamp, inRect, inFootprint, levelAt, mulberry32, fnv1a, type ShotWorld, type WorldIndex, type Box6, type WLevel } from './shot-world.js';
-import { camera, project, projectBox, type V3, type Probe } from './shot-probe.js';
+import { camera, project, projectBox, boxFrameShare, type V3, type Probe } from './shot-probe.js';
 import { perimeterEdges } from './house-geometry.js';
-import { SPEC_PITCH, LENS_HERO } from './shot-spec.js';
+import { SPEC_PITCH, LENS_HERO, LENS_HERO_MAX } from './shot-spec.js';
 
 // ---- a Vector3 for core-orbit.ts's helpers (they only construct points and read x, y, z) ------------------------
 export class Vec3 {
@@ -121,7 +121,7 @@ export type Establish = { style: EstablishStyle | 'custom'; eye: V3; aim: V3; fo
 /** the seed under which the houses' favourite styles fall out evenly — scripts/fit-establish-salt.mts searches it, and it is searched again whenever the worlds or
  *  the framing change (fleet diversity is not a runtime input: it would couple houses together; a house's own `shots[].establish` is what the layout pass sets) */
 export const ESTABLISH_SALT = 'establish-style3';
-const EST_LENSES = [46, 49, 42];
+const EST_LENSES = [46, 49, 42, 40];
 /** the establishing look's pitch range, degrees (§3.5: the look never tilts up at the house, or far down at it, unless it is a dollhouse: the high three-quarter aerial) */
 export const EST_PITCH: [number, number] = SPEC_PITCH.establish;
 /** the point the eye looks at when it wants `aim` but its pitch is held to [lo, hi]° (what the look solver will do on frame 0) */
@@ -197,22 +197,33 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
         while (dist < 16 && axial(dist) < minAxial) dist += 0.25;
       }
     }
-    const fr = frameFit(eyeAt(dist), held(eyeAt(dist)), fov, hc, 0.08), fit = fr.cost;
-    const eye: V3 = [aimAt[0] + dir[0] * dist, height, aimAt[2] + dir[1] * dist];
-    if (!inLot(eye[0], eye[2])) return;
-    // clear where it stands, and what it sees: sky 15–35 %, nothing standing in the near foreground
-    if (index.pointHits(eye[0], eye[1], eye[2], k => (k === K.site || k === K.roof || k === K.wall) ? 0.4 : false).length) return;
-    const cam = camera(eye, held(eye), fov);
-    const comp = probe.composition(cam, !roofOff, 1.5);
-    const occ = comp.rays.filter(r => r.k === K.site && r.t < 6).length / comp.rays.length;
-    const skyScore = comp.sky >= 0.15 && comp.sky <= 0.35 ? 0 : -Math.min(1, Math.abs(comp.sky - 0.25) * 3);   // (and the house has to be in it: the score below)
-    // a crop costs little (the time budget forces one on a big house, whatever the style); the sky and a clear
-    // foreground cost more
-    // (and the house has to be in it: a pose within 7 m of the facade line shows a wall, not a house)
-    const facadeDist = (eyeAt(dist)[0] - e.x) * n[0] + (eyeAt(dist)[2] - e.z) * n[1];
-    const fitScore = -2.2 * fr.cost - 0.25 * Math.max(0, 8 - facadeDist) - 0.012 * Math.max(0, fov - 34);
-    const score = 1 + fitScore + 0.8 * skyScore - 1.5 * occ + 0.3 * rng();   // (a seeded whisker: poses that fit alike do not all fall on one bearing)
-    cands.push({ style, eye, aim: aimAt, fov, bearing, score, fit, sky: comp.sky, occluded: occ, roofOff });
+    // the nearest distance at which the house fits is the least of it: a small house fits from 11 m with its roof at the top of the frame, no sky over it and no lawn under it (cutestarter, starter18k) — §3.0 shows the house AND its garden, §3.9 asks for 15–35 % sky. The pose is
+    // scored at the distance that fits and at 2, 4 and 6 m beyond it where the move to the approach (lim.maxPath) allows; a longer move costs a little, the sky and the garden pay it back
+    const scoreAt = (d: number, extra: number): number | undefined => {
+      const fr = frameFit(eyeAt(d), held(eyeAt(d)), fov, hc, 0.08), fit = fr.cost;
+      const eye: V3 = [aimAt[0] + dir[0] * d, height, aimAt[2] + dir[1] * d];
+      if (!inLot(eye[0], eye[2])) return;
+      if (extra > 0 && lim.maxPath && pathLen(d) > lim.maxPath) return;
+      // clear where it stands, and what it sees: sky 15–35 %, nothing standing in the near foreground
+      if (index.pointHits(eye[0], eye[1], eye[2], k => (k === K.site || k === K.roof || k === K.wall) ? 0.4 : false).length) return;
+      if (extra > 0 && !wholeFit(eye, held(eye), fov, hc)) return;
+      const cam = camera(eye, held(eye), fov);
+      const comp = probe.composition(cam, !roofOff, 1.5);
+      const occ = comp.rays.filter(r => r.k === K.site && r.t < 6).length / comp.rays.length;
+      const skyScore = comp.sky >= 0.15 && comp.sky <= 0.35 ? 0 : -Math.min(1, Math.abs(comp.sky - 0.25) * 3);   // (and the house has to be in it: the score below)
+      // a crop costs little (the time budget forces one on a big house, whatever the style); the sky and a clear
+      // foreground cost more
+      // (and the house has to be in it: a pose within 7 m of the facade line shows a wall, not a house)
+      const facadeDist = (eyeAt(d)[0] - e.x) * n[0] + (eyeAt(d)[2] - e.z) * n[1];
+      // (the lens: §3.5's exterior lens is 30–35°; the narrower the better where the house fits it)
+      const fitScore = -2.2 * fr.cost - 0.25 * Math.max(0, 8 - facadeDist) - 0.02 * Math.max(0, fov - 35) - 0.05 * extra;
+      const score = 1 + fitScore + 0.8 * skyScore - 1.5 * occ + 0.3 * rng();   // (a seeded whisker: poses that fit alike do not all fall on one bearing)
+      cands.push({ style, eye, aim: aimAt, fov, bearing, score, fit, sky: comp.sky, occluded: occ, roofOff });
+      return comp.sky;
+    };
+    // (the farther poses only where the nearest has too little sky: a house that already shows its garden and sky from where it fits needs no longer move — the film is long enough)
+    if (distHint) scoreAt(dist, 0);
+    else { const sky = scoreAt(dist, 0); if (strictPass && sky !== undefined && sky < 0.15) for (const extra of [2, 4, 6]) scoreAt(dist + extra, extra); }
   };
   // (the lens: §3.5's exterior lens is 32° (30–35), which fits a 20 m house from 24–38 m away — a move of 6–8 s. The frame
   // holds the whole house at 46–49° from 10–17 m, 2.5–3.5 s of move, and the lens is already most of the way to the interior's 56°:
@@ -246,7 +257,10 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   // (every pose that scored, best first — the planner walks down it when the best one's move is blocked by the garden)
   const alts = [...cands].map(c => ({ c, t: c.score + (aff[c.style] ?? 0) + 0.08 * (c.style === 'corner-left' ? -sideBias : c.style === 'corner-right' ? sideBias : 0) + 0.25 * jitter[ESTABLISH_STYLES.indexOf(c.style as any)] + (ESTABLISH_STYLES.indexOf(c.style as any) === fav ? favNudge(c) : 0) }))
     .sort((a, b) => b.t - a.t).map(x => x.c);
-  return { ...pick!, scores, alts: [pick!, ...alts.filter(c => c !== pick)] };
+  // (the planner walks down the list when the best pose's move is blocked by the garden: the poses of one style, bearing and height at another lens or distance share the line of that move, so the first of each kind comes first and the variants after them)
+  const seenKey = new Set<string>(), diverse: Establish[] = [], rest: Establish[] = [];
+  for (const c of alts) { if (c === pick) continue; const k = `${c.style}:${c.bearing}:${c.eye[1]}`; if (seenKey.has(k)) rest.push(c); else { seenKey.add(k); diverse.push(c); } }
+  return { ...pick!, scores, alts: [pick!, ...diverse, ...rest] };
 }
 
 /** relative luminance of a 0xRRGGBB colour */
@@ -259,10 +273,10 @@ export function coreHeightPct(eye: V3, target: V3, fov: number, core: Box6, aspe
   return pb ? (pb.maxY - pb.minY) / 2 : 0;
 }
 /** the vertical fov that puts the Core at `want` of the frame height from eye — the plan's 38–44 lens (§3.5, LENS_HERO) whenever the Core is no more than `hmax` of the frame at its widest, and
- *  wider (to 52°) only where it is: the eye is no further from a 9 cm slab than the room lets it (§3.11's ring is 0.75–1.6 m), and the Core would fill the frame at 44° */
+ *  wider (to LENS_HERO_MAX, 56°) only where it is: the eye is no further from a 9 cm slab than the room lets it (§3.11's ring is 0.75–1.6 m), and the Core would fill the frame at 44° */
 export function fovForCore(eye: V3, target: V3, core: Box6, want = 0.21, hmax = 0.25) {
   let best = 40, bd = Infinity;
-  for (let f = 38; f <= 52.001; f += 0.5) { const d = Math.abs(coreHeightPct(eye, target, f, core) - want); if (d < bd) { bd = d; best = f; } }
+  for (let f = 38; f <= LENS_HERO_MAX + 0.001; f += 0.5) { const d = Math.abs(coreHeightPct(eye, target, f, core) - want); if (d < bd) { bd = d; best = f; } }
   if (best > LENS_HERO[1] && coreHeightPct(eye, target, LENS_HERO[1], core) <= hmax) return LENS_HERO[1];
   return best;
 }
@@ -303,11 +317,16 @@ export function heroRing(world: ShotWorld, probe: Probe, orbitProbe: ReturnType<
       const pb = projectBox(cam, core);
       if (!pb || pb.minX < -0.92 || pb.maxX > 0.92 || pb.minY < -0.92 || pb.maxY > 0.92) continue;
       // the chair's share of the frame, the monitor's top in frame, what stands behind the Core
+      // (clipped at the lens: a chair back 0.3 m from the eye has corners behind it, and projectBox gives no outline for such a box — it read as no chair)
       let chair = 0;
-      if (hero.chair) { const cb = projectBox(cam, hero.chair); if (cb) chair = Math.max(0, Math.min(1, cb.maxX) - Math.max(-1, cb.minX)) * Math.max(0, Math.min(1, cb.maxY) - Math.max(-1, cb.minY)) / 4; }
+      if (hero.chair) chair = boxFrameShare(cam, hero.chair);
       let monitorTop = true;
       if (hero.monitor) { const m = hero.monitor, p = project(cam, [(m[0] + m[3]) / 2, m[4], (m[2] + m[5]) / 2]); monitorTop = p[2] > 0 && Math.abs(p[1]) < 0.96 && Math.abs(p[0]) < 1; }
       const comp = probe.composition(cam, false, 1.5);
+      // the frame's largest single face of anything but the Core and its set within 2.5 m — a wall, but also a wardrobe's doors, a cabinet: a pose that ends with 45 % of the frame one black face (payorote) is no better than a wall (`blank` counts walls only)
+      const faces = new Map<string, number>(); let flat = 0;
+      for (const q of comp.rays) if (q.t <= 2.5 && q.k !== K.core && q.k !== K.surface && q.k !== K.heroSet && q.k !== K.monitor && q.k !== K.chair && q.k !== K.fixture) { const v = (faces.get(q.key) || 0) + 1; faces.set(q.key, v); if (v > flat) flat = v; }
+      flat /= comp.rays.length || 1;
       const behind = comp.rays.filter(q => Math.abs(q.y) < 0.6).map(q => Math.min(q.t, 12)).sort((x, y) => x - y);
       const depth = behind.length ? behind[behind.length >> 1] : 0;
       // what stands behind the Core seen from here: a window, art, a bookcase, a fireplace, greenery or a screen make a
@@ -315,7 +334,7 @@ export function heroRing(world: ShotWorld, probe: Probe, orbitProbe: ReturnType<
       const cls = probe.background(centre, eye), bgTerm = cls === 'wall' ? -0.4 : cls === 'other' ? 0 : cls === 'sky' ? -0.1 : 0.3;
       // the Core's finish against what is behind it (QA's core-contrast: a luminance ratio of at least 1.25)
       const bgc = probe.backgroundColor(centre, eye), cr = (Math.max(lumOf(coreColor), lumOf(bgc ?? 0xd8d8d8)) + 0.05) / (Math.min(lumOf(coreColor), lumOf(bgc ?? 0xd8d8d8)) + 0.05);
-      const score = 1 - 1.5 * Math.max(0, 1.3 - cr) - Math.abs(hp - 0.21) * 6 - Math.max(0, chair - 0.06) * 6 - (monitorTop ? 0 : 0.5) - Math.max(0, comp.blank - 0.35) * 2 + Math.min(depth, 6) * 0.06 + bgTerm - Math.abs(Math.abs(az) - 38) * 0.004 + rng() * 0.02;
+      const score = 1 - 1.5 * Math.max(0, 1.3 - cr) - Math.abs(hp - 0.21) * 6 - Math.max(0, chair - 0.06) * 6 - (monitorTop ? 0 : 0.5) - Math.max(0, comp.blank - 0.35) * 2 - Math.max(0, flat - 0.4) * 2.5 + Math.min(depth, 6) * 0.06 + bgTerm - Math.abs(Math.abs(az) - 38) * 0.004 + rng() * 0.02;
       out.push({ eye, az, r, h: hh, fov, ndc, score, heightPct: hp, chair, seen, monitorTop, blank: comp.blank, depth });
     }
   }

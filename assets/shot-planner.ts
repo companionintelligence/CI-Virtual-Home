@@ -24,11 +24,11 @@
 //
 // Owner: S5 (shot).
 import { Math } from './detmath.js';
-import { BEATS, type Beat, SPEC_SPEED, SPEC_YAW, SPEC_PITCH, BEAT_FLOOR, DOOR_PLANE_SPEED, DOOR_ZONE_M, DOORWAY_SPEED, LENS_RATE, LENS_HERO } from './shot-spec.js';
+import { BEATS, type Beat, SPEC_SPEED, SPEC_YAW, SPEC_PITCH, BEAT_FLOOR, DOOR_PLANE_SPEED, DOOR_ZONE_M, DOORWAY_SPEED, LENS_RATE, LENS_HERO, LENS_HERO_MAX, LENS_INTERIOR } from './shot-spec.js';
 import { planDoors } from './shot-doors.js';
 import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, mulberry32, fnv1a, wrapPi, createWorldIndex, type ShotWorld, type WLevel, type WStair, type WRoom } from './shot-world.js';
 import { createNav, roomInterest, CELL, type Nav } from './shot-nav.js';
-import { createProbe, camera, project, projectBox, type V3, type Probe } from './shot-probe.js';
+import { createProbe, camera, project, projectBox, boxFrameShare, type V3, type Probe } from './shot-probe.js';
 import { chooseEstablish, EST_PITCH, createOrbitProbeW, heroRing, fovForCore, coreHeightPct, composeTarget, THREE_SHIM, ESTABLISH_STYLES, houseBox, type Establish } from './framing.js';
 import { freeMap, frontRun, sweepFrom, ORBIT_STEP } from './core-orbit.js';
 
@@ -51,6 +51,7 @@ export const PITCH: Record<Beat, [number, number]> = { ...SPEC_PITCH, establish:
 export { BEAT_FLOOR };
 export const OUTSIDE = new Set<Beat>(['establish', 'extStair', 'approach']);
 export const LENS = { exterior: 34, interior: 57, hero: 40, rate: LENS_RATE };
+const LENS_INTERIOR_MIN = LENS_INTERIOR[0];
 /** an auto film is never under 12 s (§3.0): it is as long as its walk needs at the caps (plus a breath) — see the duration solve, and QA's `film-length` */
 export const AUTO_DURATION = { min: 12 };
 /** §3.4 acceleration limits (m/s²): 1.5 inside, 3 outside — the planner keeps a little under so smoothing never crosses them */
@@ -187,7 +188,10 @@ export function shotOptions(spec: any, type: string, globalPlanner: string | nul
 /** Plan door-to-core. (An earlier version planned an auto film a second time with a smaller establishing move whenever the outside
  *  would be over 30 % of it: an opening sized to the film. The house is now whole in the first frame, and it is the film that is as
  *  long as the opening needs — planOnce's duration solve — so there is one plan.) */
-export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) { return planOnce(world, opts); }
+export function planDoorToCore(world: ShotWorld, opts: PlanOptions = {}) {
+  // (a shot whose spec the planner cannot make a film of — a custom `establish` pose the garden blocks and nothing replaces — is QA's `route-failed`, not an exception in the page's glue that no check ever sees)
+  try { return planOnce(world, opts); } catch (e: any) { return { ok: false as const, code: 'route-failed', message: `the planner could not plan this shot: ${e && e.message ? e.message : e}`, notes: [] as string[] }; }
+}
 function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   const index = createWorldIndex(world), probe = createProbe(index), nav = createNav(world, index);
   const notes: string[] = [];
@@ -219,40 +223,53 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   let hs: [number, number] = HS_OPTIONS[0];
   const sweepOpt = { aMax: 150, aWant: 135, over: [15, 55] };
   const orbitPtAt = (deg: number, y: number, r: number): V3 => { const a = deg * DEG, f = hero.fwd, sd = [f[1], -f[0]]; return [centre[0] + r * (Math.cos(a) * f[0] + Math.sin(a) * sd[0]), y, centre[2] + r * (Math.cos(a) * f[1] + Math.sin(a) * sd[1])]; };
-  type OrbitPlan = { r: number; run: any; options: any[]; hs: [number, number] };
+  type OrbitPlan = { r: number; run: any; options: any[]; hs: [number, number]; rscore: number; lens: number; score: number };
   let orbit: OrbitPlan | null = null;
+  // the radii and eye heights the orbit can run at, with the free run round the Core at each (core-orbit.ts's freeMap: 144 probes a combination), ranked by what the sweep is worth
+  // (its length, ≥ 90° pays) less what the radius costs (away from the nominal one, and the lens it needs to frame the Core — the plan's finale lens is 38–44, LENS_HERO; up to LENS_HERO_MAX
+  // where the room forces it, 10 points a degree). The finale's own walk decides between them (finaleFrom below, per plan): a radius whose free run is long but whose way in
+  // swings round the Core against the sweep or arrives facing away from it is no radius at all (vanilla at 1.05 m: a 135° run, every way into it a walk past the Core and back at it).
+  const orbitPlans: OrbitPlan[] = [];
+  let moreOrbitPlans = (): boolean => false;
   {
-    let best: OrbitPlan | null = null, bs = -Infinity;
-    // the nominal radius and height first, the others only while the sweep is short of 120° (each is 144 probes)
-    // (the radii the Core is framed well from: its share of the frame at the finale's widest lens, the eye 35° past its
-    // front, 4 % closer for the push-in, at most 24 % — an upright Core, 23 cm tall, wants more room than a slab)
-    // (the narrowest lens, 38–52°, at which the Core is no more than CORE_HMAX of the frame from there: the plan's finale lens is 38–44 (§3.5), and a radius that needs more than that is one the room forced — so it costs the sweep it buys, 10 points a degree)
-    const lensNeeded = (r: number, hsx: [number, number]) => { const eyeAt = orbitPtAt(35, centre[1] + hsx[1] - 0.01, r * 0.96); for (let f = 38; f <= 52.001; f += 0.5) if (coreHeightPct(eyeAt, centre, f, core) <= CORE_HMAX - 0.015) return f; return 99; };
-    const heightAt = (r: number, hsx: [number, number]) => lensNeeded(r, hsx) <= 52 ? 0 : 1;
-    const RADII_ALL = (HV && typeof HV.dist === 'number' ? [r0] : [r0, r0 - 0.1, r0 + 0.1, r0 - 0.2, r0 + 0.2, r0 + 0.3, r0 + 0.4, r0 + 0.5]).filter(r => r >= 0.6 && r <= 2);
+    // (the narrowest lens, 38–LENS_HERO_MAX°, at which the Core is no more than CORE_HMAX of the frame from there: the plan's finale lens is 38–44 (§3.5), and a radius that needs more than that is one the room forced — so it costs the sweep it buys, 10 points a degree)
+    const lensNeeded = (r: number, hsx: [number, number]) => { const eyeAt = orbitPtAt(35, centre[1] + hsx[1] - 0.01, r * 0.96); for (let f = 38; f <= LENS_HERO_MAX + 0.001; f += 0.5) if (coreHeightPct(eyeAt, centre, f, core) <= CORE_HMAX - 0.015) return f; return 99; };
+    const heightAt = (r: number, hsx: [number, number]) => lensNeeded(r, hsx) <= LENS_HERO_MAX ? 0 : 1;
+    // (the radii in the order they are tried: the nominal one, then the nearer and the further by tenths — the nearer ones are where a tight room's sweep is longest, the Core fills more of the frame there)
+    const RADII_ALL = (HV && typeof HV.dist === 'number' ? [r0] : [r0, r0 - 0.1, r0 + 0.1, r0 - 0.2, r0 + 0.2, r0 - 0.25, r0 + 0.3, r0 + 0.4, r0 + 0.5]).filter(r => r >= 0.6 && r <= 2);
     const okRadii = HV && typeof HV.dist === 'number' ? RADII_ALL : RADII_ALL.filter(r => heightAt(r, HS_OPTIONS[0]) === 0);
-    const RADII = (okRadii.length ? okRadii : RADII_ALL.slice().sort((a, b) => lensNeeded(a, HS_OPTIONS[0]) - lensNeeded(b, HS_OPTIONS[0])).slice(0, 1).concat(RADII_ALL.slice(0, 3))).slice(0, 5);
+    const RADII = (okRadii.length ? okRadii : RADII_ALL.slice().sort((a, b) => lensNeeded(a, HS_OPTIONS[0]) - lensNeeded(b, HS_OPTIONS[0])).slice(0, 1).concat(RADII_ALL.slice(0, 3))).slice(0, 6);
     const combos: Array<[number, [number, number], number]> = [];
     for (const r of RADII) combos.push([0, HS_OPTIONS[0], r]);
     for (const [hi, hsx] of HS_OPTIONS.entries()) if (hi) for (const r of RADII) combos.push([hi, hsx, r]);
-    for (const [hi, hsx, r] of combos) {
-      if (best && bs >= 120 - 40 * 0.1 && Math.max(...best.options.map((o: any) => o.arc)) >= 120) break;
+    // each combination's free run and sweeps: a plan, or null where nothing is free round the Core
+    const evalCombo = ([hi, hsx, r]: [number, [number, number], number]): OrbitPlan | null => {
       const free = freeMap(THREE_SHIM, orbitProbe, new THREE_SHIM.Vector3(...centre), hero.fwd, r, hsx);
-      const run0 = frontRun(free); if (!run0) continue;
+      const run0 = frontRun(free); if (!run0) return null;
       // (5° in from where the free run ends: the final push-in and the eye's own size are not in the 5° probe)
       const run = run0.full || run0.hi - run0.lo < 30 ? run0 : { ...run0, lo: run0.lo + 5, hi: run0.hi - 5 };
       const opts2 = (run.full || (run.lo <= 0 && run.hi >= 0) ? [-1, 1] : [Math.abs(run.lo) < Math.abs(run.hi) ? -1 : 1])
         .map(dir => sweepFrom(run, dir, run.full ? -dir * 180 : dir < 0 ? run.hi : run.lo, sweepOpt)).filter(Boolean);
       // (hero.view.azimuth names the side the orbit ends on: only the sweep that ends there)
       if (HV && typeof HV.azimuth === 'number') { const keep = opts2.filter(o => Math.sign(o.dir) === Math.sign(HV.azimuth)); opts2.length = 0; opts2.push(...keep); }
-      if (!opts2.length) continue;
+      if (!opts2.length) return null;
       const arc = Math.max(...opts2.map(o => o.arc));
       // (the Core's share of the frame from where the orbit ends — 35° past its front, at the finale's widest lens: over the
       // 25 % the plan holds it to, the orbit is too close to frame it, however long its arc)
-      const score = Math.min(arc, 150) + (arc >= 90 ? 60 : 0) - 40 * Math.abs(r - r0) - 12 * hi - 500 * heightAt(r, hsx) - 10 * Math.max(0, Math.min(52, lensNeeded(r, hsx)) - LENS_HERO[1]);
-      if (score > bs + 1e-9) { bs = score; best = { r, run, options: opts2, hs: hsx }; }
+      const lens = lensNeeded(r, hsx);
+      const rscore = - 40 * Math.abs(r - r0) - 12 * hi - 500 * heightAt(r, hsx) - 10 * Math.max(0, Math.min(LENS_HERO_MAX, lens) - LENS_HERO[1]);
+      return { r, run, options: opts2, hs: hsx, rscore, lens, score: Math.min(arc, 150) + (arc >= 90 ? 150 : 0) + rscore };
+    };
+    // the nominal radius and height first, the others while the sweep is short of 120° (each is 144 probes); what is left over is evaluated when the finale asks for more (moreOrbitPlans)
+    let next = 0, bs = -Infinity, bestP: OrbitPlan | null = null;
+    for (; next < combos.length; next++) {
+      if (bestP && bs >= 120 - 40 * 0.1 && Math.max(...bestP.options.map((o: any) => o.arc)) >= 120) break;
+      const p = evalCombo(combos[next]); if (!p) continue;
+      orbitPlans.push(p); if (p.score > bs + 1e-9) { bs = p.score; bestP = p; }
     }
-    orbit = best;
+    moreOrbitPlans = () => { for (; next < combos.length;) { const p = evalCombo(combos[next++]); if (p) { orbitPlans.push(p); return true; } } return false; };
+    orbitPlans.sort((x, y) => y.score - x.score || x.r - y.r);
+    orbit = orbitPlans[0] || null;
     if (orbit) hs = orbit.hs;
   }
   const orbitPt = (deg: number, y: number, r: number): V3 => { const a = deg * DEG, f = hero.fwd, s = [f[1], -f[0]]; return [centre[0] + r * (Math.cos(a) * f[0] + Math.sin(a) * s[0]), y, centre[2] + r * (Math.cos(a) * f[1] + Math.sin(a) * s[1])]; };
@@ -408,7 +425,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
 
   // ---- 4. the finale's approach: chosen with the walk that reaches it -----------------------------------------
   const yA = heroLv.y + Math.min(1.42, heroLv.h - 0.35);
-  type Fin = { dir: number; from: number; to: number; arc: number; arcTotal: number; P: V3; S: V3; bez: V3[]; score: number; swing: number; circling: number; turning: number; sharp: number; face: number; walk: Array<[number, number]>; walkLen: number; rooms: string[] };
+  type Fin = { dir: number; from: number; to: number; arc: number; arcTotal: number; P: V3; S: V3; bez: V3[]; score: number; sound: boolean; swing: number; circling: number; turning: number; sharp: number; face: number; faceWorst: number; walk: Array<[number, number]>; walkLen: number; rooms: string[] };
   const smoothU = (u: number) => u * u * (3 - 2 * u);
   /** the orbit checked every 1° along its own eye-height profile (the 5° free map can step over a chair back): the furthest
    *  angle it is free and the Core in full view to, less 2° — the sweep's own end when all of it is, null when its start is not */
@@ -564,14 +581,19 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       // the walk should arrive facing the Core: the look can only turn to it at the push-in's pace
       const toCore = norm([centre[0] - c.P[0], 0, centre[2] - c.P[2]]), face = Math.acos(clamp(arrive[0] * toCore[0] + arrive[2] * toCore[2], -1, 1)) / DEG;
       // (the sweep counts from where the eye starts round the Core: the spiral in and the orbit)
-      const score = 3.0 * Math.min(c.arc, 120) + 0.6 * Math.min(c.arcTotal - c.arc, 60) + (c.arc >= 90 ? 70 : 0) + (c.arc >= 120 ? 10 : 0) - 4 * Math.max(0, swing - 10) - (swing > 20 ? 60 : 0) - 2 * Math.max(0, circling - 20) - 0.5 * w.len - 1.0 * Math.max(0, face - 40) - 0.7 * Math.max(0, turning - 150) - 0.5 * Math.max(0, turning - 220) - 1.6 * Math.max(0, sharp - 100) - (c.Dd < 1.4 ? 10 : 0) - 1.2 * Math.max(0, faceWorst - 70) - 2.0 * blankDeg(c.from, c.to, c.dir);
-      scored.push({ ...c, bez, score, swing, circling, turning, sharp, face, walk: pts, walkLen: w.len, rooms: w.rooms });
+      // a way in that is SOUND keeps the Core in the frame all the way and the eye from circling it against the sweep: the walk faces it within 90° where the push-in begins and within 118° over the last
+      // 3.5 m (the look can turn onto it at the room reveal's 20°/s and the push-in's 15 from there, never from further round: the crab cap lets it point 65° off the way the eye goes, and the frame holds the Core 45° either side of that), and the swing is QA's `orbit-swing-back` line (20°). An unsound way in
+      // loses to any sound one whatever its sweep (a 135° orbit reached by walking past the Core and back at it is a 3 s film of a bookcase and a decoy, vanilla at 1.05 m), and an orbit of 90°
+      // or more beats one that is shorter wherever a sound way in to it exists (the owner's brief): its bonus is more than the walk's turning, circling and blank frames cost together
+      const sound = swing <= 20 && face <= 90 && faceWorst <= 118;
+      const score = 3.0 * Math.min(c.arc, 120) + 0.6 * Math.min(c.arcTotal - c.arc, 60) + (c.arc >= 90 ? 150 : 0) + (c.arc >= 120 ? 10 : 0) - 4 * Math.max(0, swing - 10) - (swing > 20 ? 60 : 0) - 2 * Math.max(0, circling - 20) - 0.5 * w.len - 1.0 * Math.max(0, face - 40) - 0.7 * Math.max(0, turning - 150) - 0.5 * Math.max(0, turning - 220) - 1.6 * Math.max(0, sharp - 100) - (c.Dd < 1.4 ? 10 : 0) - 1.2 * Math.max(0, faceWorst - 70) - 0.8 * blankDeg(c.from, c.to, c.dir) - (sound ? 0 : 400);
+      scored.push({ ...c, bez, score, sound, swing, circling, turning, sharp, face, faceWorst, walk: pts, walkLen: w.len, rooms: w.rooms });
       }
     }
     scored.sort((x, y) => y.score - x.score || x.from - y.from);
     bestReachable = scored.filter(c => c.swing <= 20).reduce((m, c) => Math.max(m, c.arc), 0);
-    finaleAll = scored.map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), circ: +c.circling.toFixed(1), turn: +c.turning.toFixed(0), sharp: +c.sharp.toFixed(0), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0), score: +c.score.toFixed(0) }));
-    finaleCands = scored.slice(0, 8).map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), turn: +c.turning.toFixed(0), sharp: +c.sharp.toFixed(0), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0), score: +c.score.toFixed(0) }));
+    finaleAll = scored.map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), circ: +c.circling.toFixed(1), turn: +c.turning.toFixed(0), sharp: +c.sharp.toFixed(0), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0), faceWorst: +c.faceWorst.toFixed(0), sound: c.sound, score: +c.score.toFixed(0) }));
+    finaleCands = scored.slice(0, 8).map(c => ({ dir: c.dir, from: c.from, arc: c.arc, total: c.arcTotal, swing: +c.swing.toFixed(1), turn: +c.turning.toFixed(0), sharp: +c.sharp.toFixed(0), walkLen: +c.walkLen.toFixed(1), face: +c.face.toFixed(0), faceWorst: +c.faceWorst.toFixed(0), sound: c.sound, score: +c.score.toFixed(0) }));
     const top = scored[0];
     if (!top) return null;
     // the walk to the chosen approach again, this time through a room worth seeing on the way if one pays: kept when the
@@ -713,7 +735,27 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     cur = exitPt; curLv = lvTo;
   }
   // the last storey: to the finale's approach
-  const fin = finaleFrom(cur, budget * (flights.length ? 0.6 : 1));
+  // the finale: over the orbit plans (radii and eye heights) in the order they rank, the first whose way in is sound and whose sweep is 90° or more; where none is, the best of those tried (at most 5, the ones the first pass of
+  // plans did not hold evaluated as they are asked for) — a plan whose own free run cannot beat a sound one in hand by 10° is not tried
+  let fin: Fin | null = null;
+  const triedLog: any[] = [];
+  {
+    const startPt = cur, budgetM = budget * (flights.length ? 0.6 : 1);
+    let pick: { plan: OrbitPlan; fin: Fin; total: number; reach: number; cands: any[]; all: any[] } | null = null, tried = 0;
+    const done = new Set<OrbitPlan>(), freeArc = (p: OrbitPlan) => Math.max(...p.options.map((o: any) => o.arc));
+    while (tried < 5 && !(pick && pick.fin.sound && pick.fin.arc >= 90)) {
+      const plan = orbitPlans.filter(p => !done.has(p) && !(pick && pick.fin.sound && freeArc(p) < pick.fin.arc + 10)).sort((x, y) => y.score - x.score || x.r - y.r)[0];
+      if (!plan) { if (moreOrbitPlans()) continue; break; }
+      done.add(plan); orbit = plan; hs = plan.hs; blankMemo.clear(); tried++;
+      const f = finaleFrom(startPt, budgetM);
+      triedLog.push({ r: +plan.r.toFixed(2), hs: plan.hs, lens: plan.lens, rscore: +plan.rscore.toFixed(0), freeArc: freeArc(plan), arc: f ? f.arc : null, sound: f ? f.sound : null, score: f ? +f.score.toFixed(0) : null, face: f ? +f.face.toFixed(0) : null, faceWorst: f ? +f.faceWorst.toFixed(0) : null, swing: f ? +f.swing.toFixed(1) : null });
+      if (!f) continue;
+      const total = f.score + plan.rscore;
+      if (!pick || (f.sound && !pick.fin.sound) || (f.sound === pick.fin.sound && total > pick.total + 1e-9)) pick = { plan, fin: f, total, reach: bestReachable, cands: finaleCands, all: finaleAll };
+    }
+    if (pick) { orbit = pick.plan; hs = pick.plan.hs; fin = pick.fin; bestReachable = pick.reach; finaleCands = pick.cands; finaleAll = pick.all; if (tried > 1) notes.push(`the orbit runs at ${pick.plan.r.toFixed(2)} m, eye ${pick.plan.hs[1].toFixed(2)} m over the Core: ${tried} plans were tried`); }
+    else if (orbitPlans.length) { orbit = orbitPlans[0]; hs = orbit.hs; }
+  }
   let finalWalk;
   if (fin) finalWalk = { pts: fin.walk, rooms: fin.rooms };
   else {
@@ -796,23 +838,36 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     // power: the orbit carries on as it pushes in 4 %, still moving on the last frame (the press is on it): 11° where the probe
     // allows it, less where a wall stands 8° or 5° past the end, and a push-in only where it stands at once
     const powerAt = (extraDeg: number, dy: number, push: number) => { const out: V3[] = []; for (let k = 0; k <= 20; k++) { const u = k / 20; out.push(orbitPt(to + extraDeg * fin.dir * u, centre[1] + hs[1] + dy * u, r * (1 - push * u))); } return out; };
+    // (the chair's share of the frame from an eye, the Core composed on `ndc`, at the finale's lens — clipped at the lens, so a chair back 0.3 m from the eye counts)
+    const chairShareAt = (eye: V3, ndc: [number, number], fv = 46) => hero.chair ? boxFrameShare(camera(eye, composeTarget(eye, centre, fv, ndc), fv), hero.chair) : 0;
     const okPw = (pts: V3[]) => pts.every(p => orbitProbe.free(p[0], p[1], p[2]) && probe.coreSeen(p, core) >= 0.999);
+    // (the power beat's carry-on sweep is for the chair too: palms ends 16° past the front, and 11° more carries the eye over the chair back — a fifth of the frame, then two fifths, where the orbit's end had a fifth)
+    const chairAtEnd = chairShareAt(orbitPt(to, centre[1] + hs[1], r), [-fin.dir * Math.abs(compose.ndcX), compose.ndcY]);
+    const chairOkPw = (pts: V3[]) => !hero.chair || chairShareAt(pts[pts.length - 1], [-fin.dir * Math.abs(compose.ndcX), compose.ndcY]) <= Math.max(0.1, chairAtEnd + 0.02);
     let powerPts: V3[] | null = null;
-    for (const ex of [11, 8, 5, 0]) { const pw = powerAt(ex, -0.01, 0.04); if (okPw(pw)) { powerPts = pw; break; } }
+    // (the carry-on sweep leaves the eye inside the plan's ±65° of the Core's front — §3.11 — where the orbit ended inside it)
+    // (and where there is little sweep left to carry on with, the push-in is more: the film ends in motion, QA's `last-second` — 2–30 cm in the last second)
+    for (const [ex, push] of ([[11, 0.04], [8, 0.04], [5, 0.04], [3, 0.05], [0, 0.08]] as Array<[number, number]>).filter(([x]) => x === 0 || Math.abs(to + x * fin.dir) <= 65)) { const pw = powerAt(ex, -0.01, push); if (okPw(pw) && chairOkPw(pw)) { powerPts = pw; break; } }
     if (!powerPts) powerPts = powerAt(0, -0.01, 0.04);
     if (!okPw(powerPts)) powerPts = powerAt(0, 0.02, 0.02);
     finaleSegs.push({ beat: 'power', pts: powerPts, exact: true });
     const endEye = powerPts[powerPts.length - 1];
     finalFov = fovForCore(endEye, centre, core, CORE_H, CORE_HMAX - 0.015);   // (the frame composed on its thirds line measures a point or two over the Core on the axis)
-    orbitMeta = { r, hs, reachable: bestReachable, pushIn: fin.bez.length > 2 ? 'curve' : 'chord', from: fin.from, to, arc, arcTotal: +(arc + (fin.arcTotal - fin.arc)).toFixed(0), chosenArc: fin.arc, bestArc: Math.max(...orbit.options.map((o: any) => o.arc)), dir: fin.dir, run: [orbit.run.lo, orbit.run.hi], full: orbit.run.full, swing: +Math.max(fin.swing, fin.circling).toFixed(1), options: orbit.options.map((o: any) => ({ dir: o.dir, from: o.from, to: o.to, arc: o.arc })) };
+    orbitMeta = { r, hs, reachable: bestReachable, roomArc: Math.max(0, ...orbitPlans.filter(p => p.lens <= LENS_HERO_MAX).map(p => Math.max(...p.options.map((o: any) => o.arc)))), pushIn: fin.bez.length > 2 ? 'curve' : 'chord', from: fin.from, to, arc, arcTotal: +(arc + (fin.arcTotal - fin.arc)).toFixed(0), chosenArc: fin.arc, bestArc: Math.max(...orbit.options.map((o: any) => o.arc)), dir: fin.dir, run: [orbit.run.lo, orbit.run.hi], full: orbit.run.full, swing: +Math.max(fin.swing, fin.circling).toFixed(1), options: orbit.options.map((o: any) => ({ dir: o.dir, from: o.from, to: o.to, arc: o.arc })) };
     compose.ndcX = Math.abs(compose.ndcX) * -fin.dir;
+    // the Core on the other vertical third where that takes a chair that fills more than a tenth of the last frame out of it (the chair stands to one side of the Core in the frame: the Core on the side it is on
+    // is a frame with a chair back in it, on the other the view has turned away from it)
+    if (hero.chair) {
+      const a = chairShareAt(endEye, [compose.ndcX, compose.ndcY], finalFov), b = chairShareAt(endEye, [-compose.ndcX, compose.ndcY], finalFov);
+      if (a > 0.1 && b < a - 0.04) { compose.ndcX = -compose.ndcX; notes.push(`the Core is composed on the ${compose.ndcX > 0 ? 'right' : 'left'} third: the chair is ${(a * 100).toFixed(0)} % of the last frame on the other (${(b * 100).toFixed(0)} % here)`); }
+    }
     // the monitor's top edge stays in the last frame (QA's monitor-cut): the Core lower in the frame, down to −0.5 (where it stands on a vertical thirds
-    // line, so its height is free), then the lens wider, up to 52° — the Core is a little smaller in it
+    // line, so its height is free), then the lens wider, up to LENS_HERO_MAX — the Core is a little smaller in it
     if (hero.monitor) {
       const m = hero.monitor, top: V3 = [(m[0] + m[3]) / 2, m[4], (m[2] + m[5]) / 2], base = finalFov;
       const fits = (f: number, ny: number) => { const tg = composeTarget(endEye, centre, f, [compose.ndcX, ny]), q = project(camera(endEye, tg, f), top); return q[2] > 0 && Math.abs(q[1]) < 0.94 && Math.abs(q[0]) < 0.98; };
       let done = fits(base, compose.ndcY);
-      for (let f = base; !done && f <= Math.min(52, base + 5) + 1e-9; f += 0.5) {
+      for (let f = base; !done && f <= Math.min(LENS_HERO_MAX, base + 5) + 1e-9; f += 0.5) {
         for (let ny = compose.ndcY; ny >= (composeVertical ? -0.5 : compose.ndcY) - 1e-9; ny -= 0.05) if (fits(f, ny)) { finalFov = f; compose.ndcY = +ny.toFixed(3); done = true; break; }
       }
     }
@@ -941,7 +996,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       return { est, A, pathLed, establishPts, blocked, notes: notesE };
     };
     let chosenEst = attemptEstablish(ests);
-    if (chosenEst.blocked) for (const alt of ests.alts.slice(1, 10)) { const t = attemptEstablish(alt); if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose ${alt.style} (the first choice's move is blocked by the garden)`); break; } }
+    if (chosenEst.blocked) for (const alt of (ests.alts || []).slice(1, 40)) { const t = attemptEstablish(alt); if (!t.blocked) { chosenEst = t; chosenEst.notes.push(`establishing pose ${alt.style} (the first choice's move is blocked by the garden)`); break; } }
     // (no whole-house pose has a clear move: the cropped ones — the house nearer, less of it in the frame — are tried)
     let relaxed: Establish | null = null;
     if (chosenEst.blocked) {
@@ -951,9 +1006,11 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     // last resort: the same view from nearer — the pose's own eye (the whole-house pose's, then the cropped one's) drawn in along its line to the
     // approach start, and lifted a little, until the move down to the door is clear of the garden
     if (chosenEst.blocked) {
-      search2: for (const base of [ests, relaxed || ests]) {
+      // (the poses tried: the first, the cropped first, then the first of each other kind — a line the garden blocks may be one another bearing has clear)
+      const drawBases: Establish[] = [ests, relaxed || ests, ...(ests.alts || []).slice(1, 9), ...((relaxed && relaxed.alts) || []).slice(1, 5)];
+      search2: for (const base of drawBases) {
         const A0 = chosenEst.A, E0 = base.eye, dirOut = norm(sub(E0, A0)), D0 = len(sub(E0, A0));
-        for (const f of [0.8, 0.65, 0.5, 0.38]) for (const h of [0, 1.5, 3]) {
+        for (const f of [0.8, 0.65, 0.5, 0.38, 0.28]) for (const h of [0, 1.5, 3]) {
           const q: V3 = [A0[0] + dirOut[0] * D0 * f, E0[1] + h - (E0[1] - A0[1]) * (1 - f) * 0.3, A0[2] + dirOut[2] * D0 * f];
           if (!outsideOk(q)) continue;
           const t = attemptEstablish({ ...base, eye: q });
@@ -1194,7 +1251,8 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   // last frame is still moving
   const profile = (capArr: Float64Array) => {
     const v = new Float64Array(NP);
-    v[0] = Math.min(capArr[0], OUTSIDE.has(beatAt(0)) ? 3.8 : 1.2);
+    // (the film eases in: it starts at 0.8 m/s and the outside's 3 m/s² takes it to its 3.7 m/s in a second — a first frame already at 3.8 m/s is a cut into motion, QA's `cold-start`; the first second still moves 2.2 m, the plan's ≥ 0.5)
+    v[0] = Math.min(capArr[0], OUTSIDE.has(beatAt(0)) ? 0.8 : 1.2);
     for (let i = 1; i < NP; i++) { const a = OUTSIDE.has(beatAt(i)) ? ACC_OUT : ACC_IN, ds = S[i] - S[i - 1]; v[i] = Math.min(capArr[i], Math.sqrt(v[i - 1] * v[i - 1] + 2 * a * ds)); }
     v[NP - 1] = Math.min(v[NP - 1], 0.04);
     for (let i = NP - 2; i >= 0; i--) { const a = OUTSIDE.has(beatAt(i)) ? ACC_OUT : ACC_IN, ds = S[i + 1] - S[i]; v[i] = Math.min(v[i], Math.sqrt(v[i + 1] * v[i + 1] + 2 * a * ds)); }
@@ -1315,11 +1373,13 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   const RATE = LENS.rate * 0.9, ramp0 = (LENS.interior - fovExt) / RATE;
   const inRampEnd = Math.max(tInside - 0.05, tApproach + 0.5);
   const inRampStart = Math.max(Math.min(tApproach, inRampEnd - ramp0), (tOf('establish', true) || 1.5) - 1.0);
+  // (a narrow opening lens — the whole house from further out — has further to go: where the time before the reveal cannot take it to 57° at 3.6°/s it is taken to what it can, no less than the plan's interior 55°, so the lens never changes faster than the plan's 4°/s, QA's `fov-rate`)
+  const interiorLens = (LENS.interior - fovExt) / Math.max(0.1, inRampEnd - inRampStart) > RATE ? Math.max(LENS_INTERIOR_MIN, fovExt + RATE * (inRampEnd - inRampStart)) : LENS.interior;
   const outRampEnd = Math.max(tOrbit, tRoom + 0.5), outRampStart = Math.max(tRoom - 1.0, Math.min(tRoom, outRampEnd - (LENS.interior - finalFov) / RATE));
   for (let i = 0; i < N; i++) {
     const t = i * dt;
     const easeLin = (u: number) => u < 0.08 ? (u * u) / (2 * 0.08 * 0.92) : u > 0.92 ? 1 - ((1 - u) * (1 - u)) / (2 * 0.08 * 0.92) : (u - 0.04) / 0.92;   // constant rate, its ends eased (C1)
-    let f = fovExt + (LENS.interior - fovExt) * easeLin(ramp(t, inRampStart, inRampEnd));
+    let f = fovExt + (interiorLens - fovExt) * easeLin(ramp(t, inRampStart, inRampEnd));
     f = f + (finalFov - f) * easeLin(ramp(t, outRampStart, outRampEnd));
     fov[i] = f;
   }
@@ -1701,6 +1761,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   track.plan.topRoomsShowable = showable.size; track.plan.topRooms = [...topSet].map(r => r.name);
   track.plan.routeCap = +ROUTE_CAP.toFixed(2);
   track.plan.finaleCands = finaleCands;
+  track.plan.finaleTried = triedLog; track.plan.orbitPlans = orbitPlans.map(p => ({ r: +p.r.toFixed(2), hs: p.hs, lens: p.lens, arc: Math.max(...p.options.map((o: any) => o.arc)), score: +p.score.toFixed(0) }));
   track.plan.finaleAll = finaleAll;
   track.plan.capBeatTimes = Object.fromEntries([...capTimes].map(([b, v]) => [b, +v.toFixed(2)]));
   track.plan.rawBeatTimes = Object.fromEntries([...beatTimes(Traw)].map(([b, v]) => [b, +v.toFixed(2)]));
