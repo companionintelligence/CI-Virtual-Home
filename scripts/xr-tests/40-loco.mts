@@ -451,6 +451,8 @@ async function enter(p: Page) {
   await waitEvent(p.page, 'started');
   await p.page.evaluate(HELPERS);
   await p.page.waitForFunction(() => (window as any).__L.state().dbg.live === true, null, { timeout: 60000 });
+  // the black that lifts over 350 ms of XR time at the start is the session's, not ours: wait it out (a slow emulated frame rate stretches it)
+  await p.page.waitForFunction(() => (window as any).__L.state().fade === 0, null, { timeout: 60000, polling: 50 });
 }
 const ev = <T,>(p: Page, fn: string, ...a: any[]): Promise<T> => p.page.evaluate(`(async () => { const L = window.__L; return (${fn})(...${JSON.stringify(a)}); })()`);
 const errs = (p: Page) => p.errors.filter(e => !/at onDeviceFrame \(<anonymous>/.test(e));
@@ -698,6 +700,8 @@ async function hands() {
     await ev(p, `() => { L.recStart(); L.pinch('right', 1); }`); await ev(p, `() => L.frames(5)`);
     const aiming: any = await ev(p, `() => L.state().dbg.teleport`);
     ok(aiming.aiming, 'pinch and hold aims');
+    const dim: any = await ev(p, `() => { const s = L.state(); return { fade: s.fade, guard: s.dbg.comfort.guard, vignette: s.dbg.comfort.vignette }; }`);
+    ok(dim.fade === 0 && dim.guard === 0 && dim.vignette === 0, `while aiming nothing dims the view (fade ${dim.fade}, guard ${dim.guard}, vignette ${dim.vignette})`);
     await page.screenshot({ path: path.join(SHOTS, `40-hands-aim.png`) });
     await ev(p, `() => L.pinch('right', 0)`); await ev(p, `() => L.waitIdle()`); await ev(p, `() => L.frames(6)`);
     const after: any = await ev(p, `() => L.state()`), rec = await ev<any>(p, `() => L.recStop()`);
