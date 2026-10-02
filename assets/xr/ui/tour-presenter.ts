@@ -21,7 +21,7 @@ import type {
   AudioRoute, BeatClock, BeatView, ClipRef, EndView, EnterContext, EnterResult, ExitContext, PlaybackModel, PlacementReport, Presenter, PresenterAudio, PresenterCaps,
   PresenterDebug, PresenterEvent, PresenterFault, PresenterHost, PresenterSettings, PresenterStory, ReachKind, StandPose, StartOptions, V3, WorldProbe, Box6,
 } from '../presenter.js';
-import { XR_BUDGET, XR_COMFORT, XR_LEGIBILITY } from '../presenter.js';
+import { XR_COMFORT, XR_LEGIBILITY } from '../presenter.js';
 import { CaptionBar } from './caption.js';
 import { CardSurface } from './card.js';
 import type { UiKit } from './kit.js';
@@ -66,7 +66,6 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
   let endView: EndView | null = null;
   let lastPlacement: PlacementReport | null = null;
   let pendingReveal: { at: number } | null = null;
-  let interrupted: string | null = null;
   let countdown: number | null = null, cardCanPrev = true, cardCanNext = true;
   let syncing = false, disposed = false, announcedFont = false;
   let enterToken = 0;
@@ -256,7 +255,6 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
       surface!.reveal();
       const ms = kit.host.now() - t0;
       if (ms > XR_COMFORT.enterBudgetMs && moved) fault('budget-exceeded', `enterBeat took ${Math.round(ms)} ms (budget ${XR_COMFORT.enterBudgetMs})`);
-      void dbg; void XR_BUDGET;
       return { reach: kind, placement: report, cardVisible: true, ms, notes };
     },
 
@@ -329,11 +327,10 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
     toast(msg) { kit.toast(msg.text, msg.kind, msg.ms); },
 
     interrupt(reason) {
-      interrupted = reason;
+      void reason;
       surface?.dim(0.15); caption?.panel.dim(0.2, 0.25);
     },
     resume() {
-      interrupted = null;
       surface?.dim(1); caption?.panel.dim(1, 0.25);
     },
 
@@ -380,7 +377,6 @@ export function createXrPresenter(kit: UiKit, menu: Menu): XrPresenterApi {
     }
     else if (stage === 'end' && endView) { const m = kit.metrics(CARD_DIST), widthDeg = cardWidthDeg(m.textScale); surface.relayout(layoutEndCard(kit.measure, endView, m, Math.round(widthDeg * m.texelsPerDeg), { canReplay: true, hasCta: !!endView.closing.ctaLabel }), m, widthDeg); }
   }
-  void interrupted;
   return p;
 }
 

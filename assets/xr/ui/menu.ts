@@ -13,7 +13,7 @@ import { XR_LEGIBILITY } from '../presenter.js';
 import { across, button, row, segment, stack, toggle } from './button.js';
 import { followStep, lockedPose, newFollow, type FollowState } from './caption.js';
 import type { UiKit, UiSettings } from './kit.js';
-import { execOps, fontOf, panelBackOp, type Layout, type Metrics, type Op, type Widget } from './paint.js';
+import { fontOf, panelBackOp, type Layout, type Metrics, type Op, type Widget } from './paint.js';
 import type { XrPanel } from './panel.js';
 
 export interface TourBridge {
@@ -174,9 +174,8 @@ export class Menu {
   private draw(): void {
     const m = this.kit.metrics(MENU_DIST), W = Math.round(MENU_WIDTH_DEG * m.texelsPerDeg);
     const L = this.layout(this.build(), m, W);
+    // the panel keeps its centre where it opened; a page of another height grows or shrinks about it
     this.panel.setLayout(L, m, MENU_WIDTH_DEG, MENU_DIST);
-    // keep the world position of the panel's centre (its height changed with the page)
-    if (this.isOpen) { /* the pose was set at show(); the size changed in place */ }
   }
   get texts(): string[] { return this.panel.layout ? this.panel.layout.chrome.slice() : []; }
   get currentPage(): string { return this.page; }
@@ -265,4 +264,3 @@ export class Dock {
   }
   dispose(): void { this.off(); this.panel.dispose(); }
 }
-export { execOps };

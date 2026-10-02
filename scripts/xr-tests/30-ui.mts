@@ -12,6 +12,7 @@
 //          uploads no texture; the per-frame cost of ui.tick with every panel up; every beat's placement is ok
 //   T-X7b  nothing outside the origin during all of it, fonts included (Manrope is the page's own woff2)
 //   T-X5   failure paths: held (too far), no stand, an aborted blink, interrupt and resume, the panel and texture budgets refuse, the session ending under a tour
+//   T-X11  pictures for a person to look at (card, hover, sheet, 150 percent in high contrast, status, the display page)
 //   T-X10  the menu: Exit VR ends the session, a text-size change re-lays out and persists, and unmounting leaves no group in the scene
 //
 // What emulation cannot prove: legibility at a real distance (IWER's eye buffer is a few pixels per degree), ray ergonomics, pinch reliability on visionOS,
@@ -394,6 +395,50 @@ export const failures = defineCase({
     const ev = await p.page.evaluate(() => (window as any).__d.events.map((x: any) => x.type + (x.code ? ':' + x.code : '') + (x.reason ? ':' + x.reason : '')));
     t.check(ev.includes('fault:xr-session-ended') && ev.includes('exit:session-end'), `the Director was told: ${JSON.stringify(ev)}`);
     t.check(p.errors.length === 0, `page errors: ${p.errors.join(' | ')}`);
+  },
+});
+
+// =================================================================================================================== T-X11
+export const looks = defineCase({
+  id: 'T-X11', title: 'pictures: a card with hover, the sheet, 150 percent text in high contrast, the status card (per-eye stills for a person to look at; the checks are only that they are not blank)',
+  timeoutMs: 400000,
+  async run(t) {
+    const { p, e, vision } = await boot(t, 'xrppd=20');
+    const shot = async (name: string) => { const f = await t.screenshot(p, `looks-${t.device}-${name}`); const fs = await import('node:fs'); t.check(fs.statSync(f).size > 20000, `${name}: the still is nearly empty`); };
+    await p.page.evaluate(async () => { const u = (window as any).__houseViewer.xr.ui(), mod = await u.debug.demo(), d = await mod.createDemoDirector(u); (window as any).__d = d; await d.start(); await d.go(1, 'jump'); });
+    await tickFrames(p, 30);
+    await shot('card');
+    if (!vision) {
+      const next = await widgetPos(p, 'card', 'next');
+      if (next) {
+        await look(p, next.tracking);
+        await until(p, () => (window as any).__houseViewer.xr.ui().debug.hub().sources.some((s: any) => s.hover === 'next'), 'Next to hover', 30000);
+        await tickFrames(p, 8);
+        await shot('card-hover-next');
+      }
+    }
+    await ui(p, (u: any) => u.settings.set({ textScale: 1.5, contrast: 'high' }));
+    await tickFrames(p, 40);
+    await shot('card-150-high-contrast');
+    await ui(p, (u: any) => u.settings.set({ textScale: 1, contrast: 'normal' }));
+    // the sheet: a subject as wide as the room leaves no place beside it
+    await p.page.evaluate(async () => {
+      const d = (window as any).__d, b = d.beats()[3], f = b.anchor.focus;
+      b.anchor = { role: 'wall', box: [f[0] - 14, 0, f[2] - 0.3, f[0] + 14, 3, f[2] + 0.3], focus: f, level: null };
+      await d.go(3, 'jump');
+    });
+    await tickFrames(p, 30);
+    t.note('sheet', await p.page.evaluate(() => { const r = (window as any).__d.enter; const l = r[r.length - 1]; return `${l.placement && l.placement.mode} ${l.notes.join('; ')}`; }));
+    await shot('sheet');
+    await ui(p, (u: any) => u.showStatus({ title: 'Preparing your home', body: 'Building the headset view.', progress: 0.4 }));
+    await tickFrames(p, 20);
+    await shot('status');
+    await ui(p, (u: any) => { u.showStatus(null); u.menu.show('display'); });
+    await tickFrames(p, 20);
+    await shot('menu-display');
+    t.check(p.errors.length === 0, `page errors: ${p.errors.join(' | ')}`);
+    await p.page.evaluate(() => { try { (window as any).__d.stop(); } catch { /* done */ } });
+    await endSession(p, e);
   },
 });
 

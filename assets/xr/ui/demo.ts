@@ -8,9 +8,8 @@
 //
 //   const d = await createDemoDirector(ui);   d.start();   ...   d.stop();
 //   const report = await runDemo(ui);         // the whole script: start card, four beats with words, next, a chapter jump, the end card
-import type { XrFrame } from '../host.js';
 import type {
-  BeatClock, BeatView, ChapterView, ClipRef, Disclosure, EnterResult, MemberView, PlaybackModel, Presenter, PresenterEvent, PresenterHost, PresenterSettings, PresenterStory, V3,
+  BeatClock, BeatView, ChapterView, ClipRef, Disclosure, EnterResult, MemberView, PlaybackModel, PresenterEvent, PresenterHost, PresenterSettings, PresenterStory, V3,
 } from '../presenter.js';
 import type { XrUiImpl } from './index.js';
 import type { XrPresenterApi } from './tour-presenter.js';
@@ -264,4 +263,3 @@ async function waitFor(cond: () => boolean, frames: (n: number) => Promise<void>
   for (let i = 0; i < maxFrames; i++) { if (cond()) return; await frames(1); }
   throw new Error('the demo flow did not reach the expected state');
 }
-export type { Presenter, XrFrame };
