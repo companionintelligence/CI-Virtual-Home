@@ -34,6 +34,8 @@ export interface XrLocomotionImpl extends XrLocomotion {
   /** snap-turn (the wrist menu's arrows on visionOS, where there is no thumbstick) */
   turn(dir: 1 | -1): Promise<unknown> | null;
   places(): Array<Place>;
+  /** the input module (the UI kit gets it from mount(); tests and the story presenter can reach it from here) */
+  input(): XrInputImpl;
   debug(): any;
 }
 
@@ -90,6 +92,7 @@ export function createLocomotion(host: XrHost, rig: XrRig): { loco: XrLocomotion
     comfort: () => comfort,
     options: () => (comfort ? comfort.options : null),
     turn: dir => (comfort ? comfort.snap(dir) : null),
+    input: () => input,
 
     async start() {
       const t0 = performance.now();

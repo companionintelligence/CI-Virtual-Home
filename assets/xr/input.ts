@@ -212,7 +212,8 @@ export function createInput(host: XrHost, rig: XrRig): XrInputImpl {
     }
     drain();
     for (const s of all) {
-      // hover enter and leave (sources with no hover never hear of it)
+      // hover: onHover(id, hit) every frame the ray is on a target (the hit moves with the hand; a panel wants its uv), onHover(id, null) once on leaving.
+      // Sources with no hover (transient-pointer, screen) never hear of it.
       const t = s.info.hover && s.point ? s.point.target : null;
       if (t !== s.hovered) {
         if (s.hovered) try { s.hovered.onHover?.(s.id, null); } catch { /* ignore */ }

@@ -47,10 +47,13 @@ export function createComfort(d: {
   const guardMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0, depthTest: false, depthWrite: false, fog: false, toneMapped: false });
   const guard = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), guardMat);
   guard.name = 'xr: wall guard'; guard.position.set(0, 0, -0.25); guard.renderOrder = 9998; guard.frustumCulled = false; guard.visible = false; guard.userData.xrOverlay = true; guard.raycast = () => {};
-  // the vignette: black at the edge of the view, clear in the middle (a radial gradient; its strength is the mesh's opacity)
-  const cv = document.createElement('canvas'); cv.width = cv.height = 128;
-  { const g = cv.getContext('2d')!; const gr = g.createRadialGradient(64, 64, 18, 64, 64, 64); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(0.55, 'rgba(0,0,0,0.35)'); gr.addColorStop(1, 'rgba(0,0,0,1)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }
-  const vigTex = new THREE.CanvasTexture(cv); vigTex.generateMipmaps = false; vigTex.minFilter = THREE.LinearFilter;
+  // the vignette: black at the edge of the view, clear in the middle (a radial gradient built as data, no canvas; its strength is the mesh's opacity)
+  const N = 64, px = new Uint8Array(N * N * 4);
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+    const r = Math.hypot((i + 0.5) / N - 0.5, (j + 0.5) / N - 0.5) * 2;                        // 0 at the centre, 1 at the edge midpoints, 1.41 in the corners
+    const a = Math.min(1, Math.max(0, (r - 0.28) / 0.72)); px[(j * N + i) * 4 + 3] = Math.round(255 * a * a);   // clear to 0.28, then a smooth rise to black
+  }
+  const vigTex = new THREE.DataTexture(px, N, N, THREE.RGBAFormat); vigTex.generateMipmaps = false; vigTex.minFilter = THREE.LinearFilter; vigTex.magFilter = THREE.LinearFilter; vigTex.needsUpdate = true;
   const vigMat = new THREE.MeshBasicMaterial({ map: vigTex, transparent: true, opacity: 0, depthTest: false, depthWrite: false, fog: false, toneMapped: false });
   const vig = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.1), vigMat);
   vig.name = 'xr: vignette'; vig.position.set(0, 0, -0.2); vig.renderOrder = 9997; vig.frustumCulled = false; vig.visible = false; vig.userData.xrOverlay = true; vig.raycast = () => {};
@@ -73,7 +76,7 @@ export function createComfort(d: {
   }
 
   // ---- the walk (optional): head-relative, 1.4 m/s, stopped by the same body rules as a teleport target
-  function walk(f: XrFrame, id: number, ax: [number, number]) {
+  function walk(f: XrFrame, ax: [number, number]) {
     const nav = d.nav(); if (!nav || d.busy()) return 0;
     const sp = Math.hypot(ax[0], ax[1]); if (sp < 0.15) return 0;
     const yaw = (f.head.yawDeg * Math.PI) / 180, fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = -fz, rz = fx;
@@ -86,7 +89,6 @@ export function createComfort(d: {
     if (!ok(p[0] + dx, p[2] + dz)) { if (ok(p[0] + dx, p[2])) dz = 0; else if (ok(p[0], p[2] + dz)) dx = 0; else { dx = 0; dz = 0; } }
     if (dx === 0 && dz === 0) return 0;
     rig.group.position.x += dx; rig.group.position.z += dz;
-    void id;
     return Math.hypot(dx, dz) / Math.max(1e-3, f.dt);
   }
 
@@ -104,7 +106,7 @@ export function createComfort(d: {
       }
     }
     let speed = 0;
-    if (options.continuous && walker !== null) { const ax = input.axes(walker); if (ax) speed = walk(f, walker, ax); }
+    if (options.continuous && walker !== null) { const ax = input.axes(walker); if (ax) speed = walk(f, ax); }
     // ---- the wall guard
     let want = 0;
     if (nav && !d.busy()) {
@@ -126,7 +128,6 @@ export function createComfort(d: {
     stop() {
       camera.remove(guard, vig);
       guard.geometry.dispose(); guardMat.dispose(); vig.geometry.dispose(); vigMat.dispose(); vigTex.dispose();
-      if (offset !== 0 && rig.heightOffset === offset) { /* the rig is detached next; its offset dies with it */ }
     },
   };
 }
