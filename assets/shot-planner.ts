@@ -24,6 +24,7 @@
 //
 // Owner: S5 (shot).
 import { Math } from './detmath.js';
+import { BEATS, type Beat, SPEC_SPEED, SPEC_YAW, SPEC_PITCH, BEAT_FLOOR, DOOR_PLANE_SPEED, DOOR_ZONE_M, DOORWAY_SPEED, LENS_RATE } from './shot-spec.js';
 import { planDoors } from './shot-doors.js';
 import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, mulberry32, fnv1a, wrapPi, createWorldIndex, type ShotWorld, type WLevel, type WStair, type WRoom } from './shot-world.js';
 import { createNav, roomInterest, CELL, type Nav } from './shot-nav.js';
@@ -32,31 +33,25 @@ import { chooseEstablish, EST_PITCH, createOrbitProbeW, heroRing, fovForCore, co
 import { freeMap, frontRun, sweepFrom, ORBIT_STEP } from './core-orbit.js';
 
 export const FPS = 120;
-export const BEATS = ['establish', 'extStair', 'approach', 'threshold', 'reveal', 'route', 'stair', 'descend', 'roomReveal', 'hero', 'orbit', 'power'] as const;
-export type Beat = typeof BEATS[number];
-/** §3.4 cruise caps, m/s (a flight's is along it, in plan). Each is the plan's, except where noted: `threshold` 1.2 is the beat's cap away from the door plane (the plane itself
- *  is held to DOOR_PLANE_CAP); `descend` has no plan value (a flight down is walked at 1.0, a little under a flight up); `extStair` is the plan's climb; and `orbit`
- *  is angular, °/s — the orbit is a beat the plan predates (it walks the eye round the Core 90° or more, the v1 orbit did it at about 27°/s) and the plan's hero
- *  0.4 m/s is its opening pace. The interior route's cap is the plan's 2.2 m/s: walking pace is 1.4, and what limits a walk is its doorways, its corners and the
- *  rooms it slows for, never a cap it reaches. */
-export const SPEED_CAP: Record<Beat, number> = { establish: 5.0, extStair: 1.2, approach: 2.5, threshold: 1.2, reveal: 0.8, route: 2.2, stair: 1.2, descend: 1.0, roomReveal: 0.9, hero: 0.4, orbit: 30, power: 0.1 };
-/** the route beat's cruise cap (§3.4: 2.2 m/s), by the walk's length in metres */
+// The plan's numbers are assets/shot-spec.ts's (§3.3 – §3.14): the planner builds to them and QA v2 holds the film to them, neither reading the other's constants. What follows
+// is the planner's own: the film's frame rate, the beats' order, and the numbers the plan leaves to it.
+export { BEATS };
+export type { Beat };
+/** §3.4 cruise caps, m/s (a flight's is along it in plan) — the plan's, as assets/shot-spec.ts has them; `orbit` is angular, °/s */
+export const SPEED_CAP: Record<Beat, number> = { ...SPEC_SPEED };
+/** the route beat's cruise cap (§3.4: 2.2 m/s): walking pace is 1.4, and what limits a walk is its doorways, its corners and the rooms it slows for, never a cap it reaches */
 export const routeCap = (_lengthM: number) => SPEED_CAP.route;
 /** §3.4: the eye crosses the entry door's plane at no more than this (m/s) — the threshold beat's own cap is the wider zone's */
-export const DOOR_PLANE_CAP = 0.9;
-/** §3.5 yaw-rate caps, °/s. Two beats differ from the plan's table, on purpose (tried at the plan's values: the finale's walk-in cannot turn the view onto the Core
- *  in time — cocoon's Core leaves the frame, the view whips at 90°/s): roomReveal 25 (plan 20) and hero 30 (plan 15) — the eye is 1–2 m from a Core it circles at 22–30°/s,
- *  so the bearing to it turns that fast whatever the view does. `extStair` 30 has no plan value, and `stair` / `descend` are 55: the smoothed rate QA and the fleet target measure is yaw and pitch together over 0.1 s, and a 60 cap let it reach 62°/s on a stair landing (target ≤ 60). QA holds every beat to these numbers (`beat-yaw`). */
-export const YAW_CAP: Record<Beat, number> = { establish: 12, extStair: 30, approach: 20, threshold: 30, reveal: 25, route: 45, stair: 55, descend: 55, roomReveal: 25, hero: 30, orbit: 45, power: 5 };
+export const DOOR_PLANE_CAP = DOOR_PLANE_SPEED;
+/** §3.5 yaw-rate caps, °/s — the plan's. QA holds every beat to them (`beat-yaw`). */
+export const YAW_CAP: Record<Beat, number> = { ...SPEC_YAW };
 /** §3.5 pitch clamps, degrees */
-export const PITCH: Record<Beat, [number, number]> = { establish: EST_PITCH, extStair: [-15, 8], approach: [-15, 5], threshold: [-12, 8], reveal: [-12, 8], route: [-12, 8], stair: [-10, 18], descend: [-24, -4], roomReveal: [-18, 8], hero: [-40, 5], orbit: [-40, 5], power: [-40, 5] };
-/** the floors a beat never goes under (§3.4) and the windows QA holds it to */
-export const BEAT_FLOOR: Partial<Record<Beat, number>> = { threshold: 0.8, stair: 1.6, descend: 1.6, power: 1.8, hero: 0.8 };
-export const BEAT_WINDOW: Partial<Record<Beat, [number, number]>> = { establish: [1.2, 5.0], approach: [0.8, 5.5], threshold: [0.8, 2.4], reveal: [0.4, 3.5], roomReveal: [0.4, 3.5], hero: [0.8, 3.4], orbit: [2.0, 6.5], power: [1.8, 3.4] };
+export const PITCH: Record<Beat, [number, number]> = { ...SPEC_PITCH, establish: EST_PITCH, roomReveal: [-18, 8] };
+/** the floors a beat never goes under (§3.4) */
+export { BEAT_FLOOR };
 export const OUTSIDE = new Set<Beat>(['establish', 'extStair', 'approach']);
-export const LENS = { exterior: 34, interior: 56, hero: 40, rate: 4 };
-/** an auto film is never under 12 s (§3.0) and has no ceiling: it is as long as its walk needs at the caps — about 20 s for a small one-storey house, 25–30 for a two-storey one, 40 for
- *  three storeys (§3.0's 12 s cannot hold with the plan's own numbers: 0.85 m/s across the door, a whole-house opening, an orbit of 90° or more at 30°/s at most) */
+export const LENS = { exterior: 34, interior: 57, hero: 40, rate: LENS_RATE };
+/** an auto film is never under 12 s (§3.0): it is as long as its walk needs at the caps (plus a breath) — see the duration solve, and QA's `film-length` */
 export const AUTO_DURATION = { min: 12 };
 /** §3.4 acceleration limits (m/s²): 1.5 inside, 3 outside — the planner keeps a little under so smoothing never crosses them */
 export const ACC_IN = 1.45, ACC_OUT = 2.9;
@@ -74,7 +69,8 @@ export type Track = {
   doors: Record<string, Float32Array>;
   metrics: Record<string, any>;
   plan: Record<string, any>;               // what the planner chose (style, route rooms, orbit …), for QA and the audit
-  desired?: Float32Array;                  // the look solver's wanted direction before rate limits (QA's look error)
+  desired?: Float32Array;                  // the look solver's wanted direction before rate limits (the lag of the limiter: QA's `lookLag`)
+  subj?: Float32Array;                     // the beat's subject per sample (x, y, z): what the look solver was looking for, which QA's look error is measured against (§3.14)
   hash?: string;                           // trackHash: what a Node bake and the page's must agree on
 };
 
@@ -263,12 +259,19 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   // ---- 2. the door: its axis points (the establishing pose and the approach are planned after the inside, when
   //         the time the inside needs says how far out the film can start)
   const D: V3 = [e.x, e.y, e.z];
-  const yDoor = e.y + 1.55;
+  const outsideOk = (p: V3) => index.pointHits(p[0], p[1], p[2], k => (k === K.site || k === K.roof) ? 0.25 : (k === K.wall || k === K.glass || k === K.rail) ? 0.3 : (k === K.item || k === K.hull || k === K.fixture) ? 0.2 : false).length === 0;
+  const blockedOut = (pts: V3[]) => pts.findIndex(p => !outsideOk(p));
+  // the eye's height at the door: 1.55 m over the entry's floor — or lower (to 1.15 m) where the first 6 m of the door's axis would take it through a crown or a branch at that height
+  // (a front door among the leaves of a host tree: the approach ducks under them, never through)
+  let yDoor = e.y + 1.55;
+  for (const dy of [0, 0.1, 0.2, 0.3, 0.4]) {
+    let ok = true; for (let d = 0.4; d <= 6 && ok; d += 0.2) ok = outsideOk([e.x + n2[0] * d, e.y + 1.55 - dy, e.z + n2[1] * d]);
+    if (ok) { yDoor = e.y + 1.55 - dy; break; }
+    yDoor = e.y + 1.55 - dy;
+  }
   const P08: V3 = [e.x + n2[0] * 0.6, yDoor, e.z + n2[1] * 0.6];
   const P3: V3 = [e.x + n2[0] * 3, yDoor + 0.05, e.z + n2[1] * 3];
   const I0: V3 = [e.x - n2[0] * 0.6, eyeY(Le), e.z - n2[1] * 0.6];
-  const outsideOk = (p: V3) => index.pointHits(p[0], p[1], p[2], k => (k === K.site || k === K.roof) ? 0.25 : (k === K.wall || k === K.glass || k === K.rail) ? 0.3 : (k === K.item || k === K.hull || k === K.fixture) ? 0.2 : false).length === 0;
-  const blockedOut = (pts: V3[]) => pts.findIndex(p => !outsideOk(p));
 
   // ---- 3. inside: the stairs between the entry storey and the Core's, and the rooms on the way ----------------
   const flights: Array<{ st: WStair; up: boolean }> = [];
@@ -866,7 +869,8 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
           const along = ((cand[0] - e.x) * n2[0] + (cand[2] - e.z) * n2[1]);
           if (along < 3.3) continue;
           // (only where the walk in from there is clear: a path that winds through planting is the street's, not the camera's)
-          const c1: V3 = add(cand, mul(norm(sub(P3, cand)), Math.min(1.6, len(sub(P3, cand)) * 0.4))), c2: V3 = [P3[0] + n2[0] * 1.4, P3[1], P3[2] + n2[1] * 1.4];
+          // (the handles are 40 % of the chord at most: a second handle longer than the distance from the approach's start to the door axis hooks the curve back on itself — a kink at the start of the approach, the speed dipping to 0.7 m/s there)
+          const hd = Math.min(1.4, 0.4 * len(sub(P3, cand))), c1: V3 = add(cand, mul(norm(sub(P3, cand)), Math.min(1.6, len(sub(P3, cand)) * 0.4))), c2: V3 = [P3[0] + n2[0] * hd, P3[1], P3[2] + n2[1] * hd];
           if (blockedOut(bezier(cand, c1, c2, P3, 24)) >= 0) continue;
           A = cand; pathLed = true; notesE.push('approach follows the site path'); break;
         }
@@ -938,10 +942,11 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     if (stepsSeg) approachPts = [...stepsSeg.slice(1), ...(axial(stepsSeg[stepsSeg.length - 1]) > axial(P3) + 0.3 ? [P3] : []), P08].filter((p, i, arr) => i === 0 || len(sub(p, arr[i - 1])) > 0.05);
     else {
       const c1: V3 = add(A, mul(norm(sub(P3, A)), Math.min(1.6, len(sub(P3, A)) * 0.4)));
-      const c2: V3 = [P3[0] + n2[0] * 1.4, P3[1], P3[2] + n2[1] * 1.4];
+      const hd = Math.min(1.4, 0.4 * len(sub(P3, A))), c2: V3 = [P3[0] + n2[0] * hd, P3[1], P3[2] + n2[1] * hd];
       approachPts = [...bezier(A, c1, c2, P3, 24), P08];
       if (blockedOut(approachPts) >= 0) {
-        const g = nav.grid(null, 0);
+        // (an entry on an upper level — a treehouse deck, a stilted pod — is walked to at ITS eye height: the grid's solids are the ones at that height, a crown at 4 m is a wall there)
+        const g = nav.grid(null, e.y > 0.9 ? e.y : 0);
         const r = nav.leg(g, [A[0], A[2]], [P3[0], P3[2]], { snap: 1.0 });
         if (r) { const ys = (k: number) => A[1] + (P3[1] - A[1]) * (k / (r.pts.length - 1)); approachPts = [...r.pts.map((q, k) => [q[0], ys(k), q[1]] as V3), P08]; notes.push('approach routed round the garden'); }
         else notes.push('approach blocked and unroutable');
@@ -1108,20 +1113,21 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   for (let i = 0; i < NP; i++) {
     const b = beatAt(i);
     let c = b === 'orbit' ? (orbit ? orbit.r : 0.9) * SPEED_CAP.orbit * DEG * orbitTaper(i) : b === 'route' ? ROUTE_CAP : SPEED_CAP[b];
-    if (b === 'stair' || b === 'descend' || b === 'extStair') c = SPEED_CAP[b] * 1.35;   // along the flight (its run is ~74 % of its length)
+    // a flight's cap is along it in PLAN (§3.4): the 3-D speed that makes that is the plan's over the horizontal share of the way the eye is going over ±0.3 m of it
+    if (b === 'stair' || b === 'descend' || b === 'extStair') { const j0 = Math.max(0, i - 15), j1 = Math.min(NP - 1, i + 15), dh = Math.hypot(X[j1] - X[j0], Z[j1] - Z[j0]), d3 = Math.hypot(X[j1] - X[j0], Y[j1] - Y[j0], Z[j1] - Z[j0]); c = SPEED_CAP[b] / Math.max(0.4, d3 > 1e-6 ? dh / d3 : 1); }
     cruise[i] = c * 0.97;
     // an interior doorway: ≤ 1.2 m/s within ±0.6 m of its plane
     for (const d of doorsAll) {
       if (Y[i] < d.y + 0.5 || Y[i] > d.y + 2.5) continue;
       const a = (X[i] - d.c[0]) * d.n[0] + (Z[i] - d.c[1]) * d.n[1], lat = Math.abs((X[i] - d.c[0]) * d.n[1] - (Z[i] - d.c[1]) * d.n[0]);
-      if (Math.abs(a) < 0.6 && lat < d.w / 2 + 0.3) local[i] = Math.min(local[i], 1.2 * 0.95);
+      if (Math.abs(a) < 0.6 && lat < d.w / 2 + 0.3) local[i] = Math.min(local[i], DOORWAY_SPEED * 0.95);
     }
     // a room worth seeing (the top three) is walked through at 1.3 m/s at most: a second in it, at the least, when the walk
     // crosses more than a metre and a bit of it
     if ((b === 'route' || b === 'reveal') && topSet.size) { for (const r of topSet) { if (r === coreRoom) continue; const l = nav.levelOf(r === undefined ? '' : (Le.rooms.includes(r) ? Le.id : Lh.id)); if (Math.abs(Y[i] - l.y - 1.4) < 0.9 && inRect(X[i], Z[i], r.b, 0)) { local[i] = Math.min(local[i], 1.3); break; } } }
     // the entry door: ≤ 0.9 m/s across its plane, rising to the beat's 1.2 by 0.6 m either side of it (D4: the jambs stay
     // readable for a beat's length without the zone taking two seconds)
-    if (b === 'threshold') { const a = Math.abs((X[i] - e.x) * n2[0] + (Z[i] - e.z) * n2[1]); local[i] = Math.min(local[i], DOOR_PLANE_CAP * 0.95 + Math.max(0, a - 0.25) * 0.9); }
+    if (b === 'threshold') { const a = Math.abs((X[i] - e.x) * n2[0] + (Z[i] - e.z) * n2[1]); local[i] = Math.min(local[i], DOOR_PLANE_CAP * 0.95 + Math.max(0, a - DOOR_ZONE_M) * 1.2); }
   }
   // curvature: v ≤ √(a_lat / κ), 1.5 m/s² inside and 3 outside (the look turns on its own solver, rate-limited)
   for (let i = 1; i < NP - 1; i++) {
@@ -1424,11 +1430,14 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
               return { p: tgt, w: 0.8, kind: 'flight' };
             }
           } }
-        // inside the Core's room the Core is what the walk is going to
+        // inside the Core's room the Core is what the walk is going to — and for the 2.6 s before the room reveal on its storey, the look turns to it (the room reveal's yaw cap is 20°/s and the push-in's 15: a view that
+        // is still on the room beside it when they begin cannot get onto the Core in the time they have)
         if (coreRoom && levelIdAt(p) === Lh.id && inRect(p[0], p[2], coreRoom.b, 0.05)) return { p: coreTarget, w: 0.65, kind: 'core+focal' };
+        { const tt = i * dt, t0 = tRoom - 2.6; if (tt > t0 && levelIdAt(p) === Lh.id) return { p: coreTarget, w: 0.5 + 0.35 * smooth((tt - t0) / 2.6), kind: 'core+focal' }; }
         // the room worth seeing in front of the eye, else the next room ahead: the room 2.5 m on along the path
         const lv = levelIdAt(p) || Le.id, here = nav.roomAt(lv, p[0], p[2]);
-        { const g = glanceAt(i, lv); if (g) return { p: g.p, w: 0.55, kind: 'glance' }; }
+        // (no glance in the last 3 s of the walk to the Core's room: the corner into it is where the view has most to turn, at the room reveal's 20°/s — it follows the walk round the corner, never a room beside it first)
+        if (!(lv === Lh.id && i * dt > tRoom - 3.0)) { const g = glanceAt(i, lv); if (g) return { p: g.p, w: 0.55, kind: 'glance' }; }
         let ahead: WRoom | null = null;
         for (let k = i; k < Math.min(N, i + Math.round(3 * FPS)); k += 12) { const q = eyeAt(k); const l2 = levelIdAt(q); if (l2 !== lv) break; const r = nav.roomAt(lv, q[0], q[2]); if (r && r !== here) { ahead = r; break; } }
         return { p: focalOf(ahead || here, lv) || sightline, w: 0.5, kind: 'next room' };
@@ -1445,14 +1454,14 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
         const tgt: V3 = up ? [st.top[0] + st.dir[0] * 2.5, st.top[1] + 1.4, st.top[2] + st.dir[1] * 2.5] : [st.bottom[0] - st.dir[0] * 2.5, st.bottom[1] + 1.0, st.bottom[2] - st.dir[1] * 2.5];
         return { p: tgt, w: 0.4, kind: up ? 'landing' : 'foot' };
       }
-      case 'roomReveal': { const f = focalOf(coreRoom, Lh.id); const mid: V3 = f ? lerp3(coreTarget, f, 0.35) : coreTarget; return { p: mid, w: 0.7, kind: 'core+focal' }; }
+      case 'roomReveal': { const f = focalOf(coreRoom, Lh.id); const mid: V3 = f ? lerp3(coreTarget, f, 0.2) : coreTarget; return { p: mid, w: 0.85, kind: 'core+focal' }; }
       default: return { p: coreTarget, w: 1, kind: 'core' };
     }
   };
   // visibility of each sample's subject, every 0.1 s (the Core's with its own test)
   const vis = new Float64Array(N);
   const subj: Array<{ p: V3; w: number; kind: string }> = new Array(N);
-  for (let i = 0; i < N; i++) subj[i] = mustLook[i] ? { p: mustLook[i]!, w: 0.9, kind: 'must-see' } : subjectAt(i);
+  for (let i = 0; i < N; i++) subj[i] = mustLook[i] && !(i * dt > tRoom - 3.0 && levelIdAt(eyeAt(i)) === Lh.id) ? { p: mustLook[i]!, w: 0.9, kind: 'must-see' } : subjectAt(i);
   for (let i = 0; i < N; i += 12) {
     const s = subj[i], p = eyeAt(i);
     const roofs = OUTSIDE.has(BEATS[beatOf[i]]);
@@ -1625,8 +1634,9 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     version: 2, planner: 'v2', type: opts.inside ? 'walkthrough' : 'door-to-core', id: world.id, duration, fps: FPS, samples: N, dt,
     pos, look, fov, roofAlpha, composeW, compose, beat: beatOf, beats,
     events: { enterT, stairT: beats.filter(b => b.name === 'stair' || b.name === 'descend').map(b => b.t0), pressT: null, settleT: tPower, doneT: duration, firstCoreT: null },
-    doors: planDoors(world, pos, N, dt), metrics: {}, plan: {}, desired,
+    doors: planDoors(world, pos, N, dt), metrics: {}, plan: {}, desired, subj: new Float32Array(3 * N),
   };
+  for (let i = 0; i < N; i++) { const q = subj[i].p; track.subj![3 * i] = q[0]; track.subj![3 * i + 1] = q[1]; track.subj![3 * i + 2] = q[2]; }
   // first moment from which the Core stays in frame and seen
   let firstCore: number | null = null;
   for (let i = N - 1; i >= 0; i -= 6) {
@@ -1729,7 +1739,7 @@ export function trackHash(track: Track) {
   const str = (t: string) => { for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i) & 255; h = Math.imul(h, 0x01000193); } h ^= 0xff; h = Math.imul(h, 0x01000193); };
   const arr = (a: ArrayBufferView | undefined) => { if (a) feed(new Uint8Array(a.buffer, a.byteOffset, a.byteLength)); else num(null); };
   const doorIds = Object.keys(track.doors || {}).sort();
-  for (const a of [track.pos, track.look, track.fov, track.roofAlpha, track.composeW, track.beat, track.desired, track.tanHReq, ...doorIds.map(id => track.doors[id])]) arr(a);
+  for (const a of [track.pos, track.look, track.fov, track.roofAlpha, track.composeW, track.beat, track.desired, track.subj, track.tanHReq, ...doorIds.map(id => track.doors[id])]) arr(a);
   for (const id of doorIds) str(id);
   num(track.compose ? track.compose.ndcX : null); num(track.compose ? track.compose.ndcY : null);
   const ev = track.events;

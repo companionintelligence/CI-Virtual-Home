@@ -11,6 +11,7 @@ import { Math } from './detmath.js';
 import { K, DEG, clamp, inRect, inFootprint, levelAt, mulberry32, fnv1a, type ShotWorld, type WorldIndex, type Box6, type WLevel } from './shot-world.js';
 import { camera, project, projectBox, type V3, type Probe } from './shot-probe.js';
 import { perimeterEdges } from './house-geometry.js';
+import { SPEC_PITCH } from './shot-spec.js';
 
 // ---- a Vector3 for core-orbit.ts's helpers (they only construct points and read x, y, z) ------------------------
 export class Vec3 {
@@ -122,7 +123,7 @@ export type Establish = { style: EstablishStyle | 'custom'; eye: V3; aim: V3; fo
 export const ESTABLISH_SALT = 'establish-style82';
 const EST_LENSES = [46, 49, 42];
 /** the establishing look's pitch range, degrees (§3.5: the look never tilts up at the house, or far down at it, unless it is a dollhouse: the high three-quarter aerial) */
-export const EST_PITCH: [number, number] = [-28, -4];
+export const EST_PITCH: [number, number] = SPEC_PITCH.establish;
 /** the point the eye looks at when it wants `aim` but its pitch is held to [lo, hi]° (what the look solver will do on frame 0) */
 export function pitchHeld(eye: V3, aim: V3, lo: number, hi: number): V3 {
   const dx = aim[0] - eye[0], dy = aim[1] - eye[1], dz = aim[2] - eye[2], dh = Math.hypot(dx, dz), d = Math.hypot(dx, dy, dz);

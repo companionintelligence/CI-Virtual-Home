@@ -17,28 +17,25 @@ import { K, DEG, clamp, inRect, inFootprint, indoors, levelAt, wrapPi, createWor
 import { firstCrossing, leafOpen, DOOR_DONE_S } from './shot-doors.js';
 import { createProbe, camera, project, projectBox, bgClass, type V3 } from './shot-probe.js';
 import { createNav, roomInterest } from './shot-nav.js';
-import { BEATS, SPEED_CAP, YAW_CAP, PITCH, BEAT_FLOOR, BEAT_WINDOW, OUTSIDE, LENS, sampleTrack, type Track, type Beat } from './shot-planner.js';
+import { sampleTrack, type Track } from './shot-planner.js';
+import { BEATS, type Beat, beatWindow, filmBudget, BUDGET_SLACK, SPEC_LOOK_SUBJECT, LOOK_ERROR_WARN, LOOK_ERROR_STRETCH, SPEC_SPEED, SPEC_YAW, SPEC_PITCH, SPEC_FOV, BEAT_FLOOR, DOOR_PLANE_SPEED, DOOR_ZONE_M, DOORWAY_SPEED, YAW_WARN, YAW_ERROR, DOLLHOUSE_PITCH_MIN, INTERIOR_LEVEL_DEG, PITCH_ERROR, LENS_RATE, OUTSIDE_TARGET, OUTSIDE_ERROR } from './shot-spec.js';
 import { houseCorners, frameFit, wholeFit, coreHeightPct, lumOf } from './framing.js';
 
 export type Finding = { code: string; level: 'error' | 'warn'; t: number; tEnd: number; samples: number; subject: string; message: string };
 export type QAResult = { errors: Finding[]; warnings: Finding[]; metrics: Record<string, any> };
 
-/** the lens each beat may use, vertical degrees (§3.5: exterior 30–35 in the plan — the film opens on 42–49 so the whole house is in the frame — interior 55–60, hero 38–44): the ends of a lens change are the
- *  neighbouring beat's, so a beat that only carries the change from one to the other gets the span between them */
-export const FOV_RANGE: Partial<Record<Beat, [number, number]>> = {
-  establish: [30, 49.5], extStair: [40, 58], approach: [40, 58], threshold: [44, 58], reveal: [46, 60], route: [46, 60], stair: [44, 60], descend: [44, 60],
-  roomReveal: [44, 60], hero: [36, 58], orbit: [36, 56], power: [36, 52],
-};
+/** the beats that are outside the house: the establishing move, an exterior stair, the approach (the door itself is the threshold's) */
+const OUTSIDE = new Set<Beat>(['establish', 'extStair', 'approach']);
 
 /** every code QA v2 can report, with its level — the test (scripts/test-shot-qa.mts) injects a fault for each */
 export const QA_CODES: Record<string, 'error' | 'warn'> = {
   'wall-clip': 'error', 'item-clip': 'error', 'site-clip': 'error', 'stair-clip': 'error', 'roof-clip': 'error', 'floor-clip': 'error', 'ceiling': 'error',
   'enters-through-wall': 'error', 'route-failed': 'error', 'ends-outside': 'error', 'core-missing': 'error', 'core-occluded': 'error',
-  'late-core': 'error', 'press-speed': 'error', 'press-yaw': 'error', 'press-frame': 'error', 'press-late': 'error',
+  'late-core': 'error', 'void-clip': 'error', 'press-speed': 'error', 'press-yaw': 'error', 'press-frame': 'error', 'press-late': 'error',
   'yaw-whip': 'error', 'pitch': 'error', 'door-speed': 'error', 'reverse': 'error', 'hero-surface': 'error', 'monitor-near': 'error',
   'outside-share': 'error', 'blank-frame': 'error', 'dead-air': 'error', 'beat-floor': 'error', 'roof-timing': 'error', 'door-closed': 'error',
   'via-missed': 'error', 'attic-route': 'error', 'orbit-core-out-of-frame': 'error', 'orbit-core-occluded': 'error',
-  'door-leaf': 'warn', 'yaw-rate': 'warn', 'beat-yaw': 'warn', 'outside-share-high': 'warn', 'first-second': 'warn', 'last-second': 'warn', 'floor-proximity': 'warn',
+  'door-leaf': 'warn', 'door-zone-speed': 'warn', 'film-length': 'warn', 'yaw-rate': 'warn', 'beat-yaw': 'warn', 'outside-share-high': 'warn', 'first-second': 'warn', 'last-second': 'warn', 'floor-proximity': 'warn',
   'look-error': 'warn', 'core-height': 'warn', 'core-narrow': 'warn', 'core-thirds': 'warn', 'chair-share': 'warn', 'top-rooms': 'warn',
   'stair-short': 'warn', 'fov-rate': 'warn', 'fov-range': 'warn', 'near-blank': 'warn', 'beat-window': 'warn', 'beat-speed': 'warn',
   'doorway-speed': 'warn', 'accel': 'warn', 'jerk': 'warn', 'crab': 'warn', 'beat-pitch': 'warn', 'verticals': 'warn', 'look-near': 'warn',
@@ -77,8 +74,8 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   const dir = eye.map((e, i) => { const d = [tgt[i][0] - e[0], tgt[i][1] - e[1], tgt[i][2] - e[2]], l = Math.hypot(d[0], d[1], d[2]) || 1; return [d[0] / l, d[1] / l, d[2] / l] as V3; });
   const yaw = new Float64Array(N), pitch = new Float64Array(N);
   for (let i = 0; i < N; i++) { yaw[i] = Math.atan2(dir[i][0], dir[i][2]); pitch[i] = Math.asin(clamp(dir[i][1], -1, 1)); if (i) yaw[i] = yaw[i - 1] + wrapPi(yaw[i] - yaw[i - 1]); }
-  const speed = new Float64Array(N);
-  for (let i = 0; i < N; i++) { const a = Math.max(0, i - 1), b = Math.min(N - 1, i + 1); speed[i] = Math.hypot(eye[b][0] - eye[a][0], eye[b][1] - eye[a][1], eye[b][2] - eye[a][2]) / ((b - a) * dt); }
+  const speed = new Float64Array(N), speedH = new Float64Array(N);
+  for (let i = 0; i < N; i++) { const a = Math.max(0, i - 1), b = Math.min(N - 1, i + 1); speed[i] = Math.hypot(eye[b][0] - eye[a][0], eye[b][1] - eye[a][1], eye[b][2] - eye[a][2]) / ((b - a) * dt); speedH[i] = Math.hypot(eye[b][0] - eye[a][0], eye[b][2] - eye[a][2]) / ((b - a) * dt); }
   const tOf = (i: number) => i * dt;
   const beatSpans = new Map<Beat, Array<[number, number]>>();
   for (let i = 0; i < N;) { let j = i; while (j + 1 < N && beat[j + 1] === beat[i]) j++; if (!beatSpans.has(beat[i])) beatSpans.set(beat[i], []); beatSpans.get(beat[i])!.push([i, j]); i = j + 1; }
@@ -95,9 +92,18 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
 
   // ---- geometry: the eye path swept every 0.05 m ----------------------------------------------------------------
   const B = world.boxes;
-  const CLIP_WALL = (k: number) => (k === K.wall || k === K.glass || k === K.rail) ? 0 : false;
+  // a glass pane is a box with no thickness in plan (692 of the 766 panes of the 30 houses): a point sample never lands in it, so the clip test pads it — the sweep's step is 5 cm, the pad 3 cm
+  // either side — and leaves out the doorways (the entry's pane is the door's, S1's channel: the eye goes through the doorway, not the glass beside it)
+  const GLASS_PAD = 0.03;
+  const CLIP_WALL = (k: number) => (k === K.wall || k === K.rail) ? 0 : k === K.glass ? GLASS_PAD : false;
   const CLIP_ITEM = (k: number) => (k === K.hull || k === K.fixture || k === K.surface || k === K.monitor || k === K.chair || k === K.heroSet || k === K.core) ? 0 : false;
   const CLIP_ITEM_FAR = (k: number) => k === K.item ? 0 : false;
+  const doorways = world.levels.flatMap(l => nav.doorsOn(l.id).map(d => ({ ...d, y: l.y })));
+  const inDoorway = (p: V3) => {
+    if (entry && Math.abs((p[0] - entry.x) * entry.out[0] + (p[2] - entry.z) * entry.out[1]) < 0.5 && Math.abs((p[0] - entry.x) * entry.out[1] - (p[2] - entry.z) * entry.out[0]) < entry.w / 2 + 0.25) return true;
+    for (const d of doorways) if (p[1] > d.y && p[1] < d.y + 2.6 && Math.abs((p[0] - d.c[0]) * d.n[0] + (p[2] - d.c[1]) * d.n[1]) < 0.4 && Math.abs((p[0] - d.c[0]) * d.n[1] - (p[2] - d.c[1]) * d.n[0]) < d.w / 2 + 0.2) return true;
+    return false;
+  };
   let minClear = Infinity, minClearAt = 0;
   const hullIds = new Set<number>(); for (let i = 0; i < world.kinds.length; i++) if (world.kinds[i] === K.hull) hullIds.add(i);
   const sweep = (fn: (p: V3, t: number, i: number) => void) => {
@@ -109,15 +115,21 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   };
   const tag = (x: V3) => `(${x[0].toFixed(1)}, ${x[1].toFixed(1)}, ${x[2].toFixed(1)})`;
   if (!opts.frameOnly) sweep((p, t, i) => {
-    const w = index.pointHits(p[0], p[1], p[2], CLIP_WALL); if (w.length) { const n = w[0] >= 0 ? world.names[w[0]] : 'wall'; E('wall-clip', t, `eye inside wall "${n}" at ${tag(p)}`, n); }
+    { const w = index.pointHits(p[0], p[1], p[2], CLIP_WALL).filter(id => id < 0 || world.kinds[id] !== K.glass || !inDoorway(p)); if (w.length) { const n = w[0] >= 0 ? world.names[w[0]] : 'wall'; E('wall-clip', t, `eye inside ${w[0] >= 0 && world.kinds[w[0]] === K.glass ? 'a window or glazed wall' : 'wall'} "${n}" at ${tag(p)}`, n); } }
     const it = index.pointHits(p[0], p[1], p[2], CLIP_ITEM).concat(index.pointHits(p[0], p[1], p[2], CLIP_ITEM_FAR).filter(id => id >= 0 && !isNearCoreItem(id)));
     if (it.length) { const n = world.names[it[0]] || 'item'; E('item-clip', t, `eye inside "${n}" at ${tag(p)}`, n); }
     const st = index.pointHits(p[0], p[1], p[2], k => k === K.stair ? 0 : false); if (st.length) E('stair-clip', t, `eye inside a flight of stairs at ${tag(p)}`, 'stairs');
     const inside = isIndoors(p);
-    if (!inside) {
+    // (the outside beats too where the storey's footprint covers the point — a porch, a deck, a landing at the head of an exterior stair: the eye is "indoors" there by the rects, and a trunk beside the steps is still a trunk)
+    if (!inside || OUTSIDE.has(beat[i])) {
       const s = index.pointHits(p[0], p[1], p[2], k => k === K.site ? 0 : false).filter(id => id >= 0);
       if (s.length) E('site-clip', t, `eye inside "${world.names[s[0]]}" on the lot at ${tag(p)}`, world.names[s[0]]);
-      if (track.roofAlpha[Math.min(N - 1, Math.round(t / dt))] > 0.05) { const r = index.pointHits(p[0], p[1], p[2], k => k === K.roof ? 0 : false); if (r.length) E('roof-clip', t, `eye inside a roof at ${tag(p)}`, 'roof'); }
+    }
+    if (!inside && track.roofAlpha[Math.min(N - 1, Math.round(t / dt))] > 0.05) { const r = index.pointHits(p[0], p[1], p[2], k => k === K.roof ? 0 : false); if (r.length) E('roof-clip', t, `eye inside a roof at ${tag(p)}`, 'roof'); }
+    // §3.14: voids are solids — a storey's stairwell is not floor to cross at eye height (the flight through it is the stair beat's, and the seam round it)
+    if (beat[i] !== 'stair' && beat[i] !== 'descend' && !neighbours(i).some(b => b === 'stair' || b === 'descend')) for (const lv of world.levels) {
+      if (lv.y <= 0.05 || p[1] < lv.y + 0.9 || p[1] > lv.y + lv.h - 0.15) continue;
+      if (lv.voids.some(v => inRect(p[0], p[2], v, -0.05))) { E('void-clip', t, `eye over the ${lv.id} stairwell opening at ${tag(p)}`, lv.id); break; }
     }
     // floors: a slab is 0.3 m under a storey's floor line, except where the storey has a void (a stairwell)
     for (const l of world.levels) {
@@ -186,6 +198,11 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     }
     metrics.approachAxisDeg = +worst.toFixed(1);
     if (worst > 5) W('approach-axis', enterT ?? 0, `the last 3 m before the door are ${worst.toFixed(0)}° off its axis (±5°)`);
+    // §3.4: 0.9 m/s across the door's plane — the zone, not the instant of the crossing (the speed AT the plane is what the planner pins; what a viewer sees is the metre round it)
+    { let zone = 0, zoneAt = 0;
+      for (let i = 0; i < N; i++) { const p = eye[i], a = (p[0] - entry.x) * entry.out[0] + (p[2] - entry.z) * entry.out[1], l = (p[0] - entry.x) * entry.out[1] - (p[2] - entry.z) * entry.out[0]; if (Math.abs(a) <= DOOR_ZONE_M && Math.abs(l) <= entry.w / 2 + 0.3 && speed[i] > zone) { zone = speed[i]; zoneAt = tOf(i); } }
+      metrics.doorZoneSpeed = +zone.toFixed(2);
+      if (zone > DOOR_PLANE_SPEED * 1.1) W('door-zone-speed', zoneAt, `${zone.toFixed(2)} m/s within ${DOOR_ZONE_M} m of the door's plane (the plan's ${DOOR_PLANE_SPEED}, ±0.8 m in §3.4, ±${DOOR_ZONE_M} here)`); }
   }
   metrics.enterT = enterT === null ? null : +enterT.toFixed(3); metrics.doorSpeed = doorSpeed === null ? null : +doorSpeed.toFixed(2);
 
@@ -194,9 +211,9 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   const outside = out / N, ext = beatSpans.has('extStair');
   metrics.outsideShare = +outside.toFixed(3);
   if (!d2c) { /* inside shots: no outside share to hold */ }
-  // (§3.3 makes the cap 35 % with an exterior stair, 30 % without; the error sits 5 points over the cap in both — 40 and 35 — where §3.14's table names only the 35)
-  else if (outside > (ext ? 0.40 : 0.35)) E('outside-share', 0, `${(outside * 100).toFixed(0)} % of the film is outside (error over ${ext ? 40 : 35} %)`);
-  else if (outside > (ext ? 0.35 : 0.30)) W('outside-share-high', 0, `${(outside * 100).toFixed(0)} % of the film is outside (target ≤ ${ext ? 35 : 30} %)`);
+  // (§3.14: an error over 35 % whatever the entry, a warning over 30 — over 35 with an exterior stair, §3.3's raised cap: the two lines are one there)
+  else if (outside > OUTSIDE_ERROR) E('outside-share', 0, `${(outside * 100).toFixed(0)} % of the film is outside (error over ${OUTSIDE_ERROR * 100} %)`);
+  else if (outside > (ext ? OUTSIDE_ERROR : OUTSIDE_TARGET)) W('outside-share-high', 0, `${(outside * 100).toFixed(0)} % of the film is outside (target ≤ ${(ext ? OUTSIDE_ERROR : OUTSIDE_TARGET) * 100} %)`);
 
   // ---- travel in the first and last second -------------------------------------------------------------------
   const travel = (i0: number, i1: number) => { let L = 0; for (let i = i0 + 1; i <= i1; i++) L += Math.hypot(eye[i][0] - eye[i - 1][0], eye[i][1] - eye[i - 1][1], eye[i][2] - eye[i - 1][2]); return L; };
@@ -216,15 +233,16 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     rates.push(r);
     if (r > maxYaw) { maxYaw = r; maxYawAt = tOf(i); }
     const bt = beat[i];
-    if (r > 90) E('yaw-whip', tOf(i), `the view turns at ${r.toFixed(0)}°/s (error over 90)`);
-    else if (r > 60) W('yaw-rate', tOf(i), `the view turns at ${r.toFixed(0)}°/s (over 60)`);
-    const yc = loosest(i, b => YAW_CAP[b], (a, b) => a > b);
-    if (r > yc * 1.15 + 1.5) W('beat-yaw', tOf(i), `${bt}: the view turns at ${r.toFixed(0)}°/s (the beat's cap is ${YAW_CAP[bt]}${yc !== YAW_CAP[bt] ? `, ${yc} at its seam` : ''})`, bt);
+    if (r > YAW_ERROR) E('yaw-whip', tOf(i), `the view turns at ${r.toFixed(0)}°/s (error over ${YAW_ERROR})`);
+    else if (r > YAW_WARN) W('yaw-rate', tOf(i), `the view turns at ${r.toFixed(0)}°/s (over ${YAW_WARN})`);
+    // the beat's cap is the plan's (§3.5, assets/shot-spec.ts), never the planner's own; 10 % and 1°/s of slack (the 0.1 s window of a turn that is eased in and out)
+    const yc = loosest(i, b => SPEC_YAW[b], (a, b) => a > b);
+    if (r > yc * 1.1 + 1) W('beat-yaw', tOf(i), `${bt}: the view turns at ${r.toFixed(0)}°/s (the plan's cap is ${SPEC_YAW[bt]}${yc !== SPEC_YAW[bt] ? `, ${yc} at its seam` : ''})`, bt);
     const pd = pitch[i] / DEG;
-    if (pd < -45 || pd > 30) E('pitch', tOf(i), `pitch ${pd.toFixed(0)}° (outside −45…+30)`);
-    const [lo, hi] = [loosest(i, b => PITCH[b][0], (a, b) => a < b), loosest(i, b => PITCH[b][1], (a, b) => a > b)]; const loX = bt === 'establish' && track.plan && track.plan.establish && track.plan.establish.style === 'dollhouse' ? -40 : lo;
+    if (pd < PITCH_ERROR[0] || pd > PITCH_ERROR[1]) E('pitch', tOf(i), `pitch ${pd.toFixed(0)}° (outside ${PITCH_ERROR[0]}…+${PITCH_ERROR[1]})`);
+    const [lo, hi] = [loosest(i, b => SPEC_PITCH[b][0], (a, b) => a < b), loosest(i, b => SPEC_PITCH[b][1], (a, b) => a > b)]; const loX = bt === 'establish' && track.plan && track.plan.establish && track.plan.establish.style === 'dollhouse' ? DOLLHOUSE_PITCH_MIN : lo;
     if (pd < loX - 3 || pd > hi + 3) W('beat-pitch', tOf(i), `${bt}: pitch ${pd.toFixed(0)}° outside ${loX}…${hi}`, bt);
-    if (isIndoors(eye[i]) && !['stair', 'descend', 'hero', 'orbit', 'power', 'roomReveal'].includes(bt) && neighbours(i).length === 1 && Math.abs(pd) > 8.5) W('verticals', tOf(i), `${bt}: pitch ${pd.toFixed(0)}° indoors (verticals want ±8°)`, bt);
+    if (isIndoors(eye[i]) && !['stair', 'descend', 'hero', 'orbit', 'power', 'roomReveal'].includes(bt) && neighbours(i).length === 1 && Math.abs(pd) > INTERIOR_LEVEL_DEG + 0.5) W('verticals', tOf(i), `${bt}: pitch ${pd.toFixed(0)}° indoors (verticals want ±${INTERIOR_LEVEL_DEG}°)`, bt);
     // travel direction against the look
     const j = Math.min(N - 1, i + 1), k0 = Math.max(0, i - 1);
     const v: V3 = [eye[j][0] - eye[k0][0], eye[j][1] - eye[k0][1], eye[j][2] - eye[k0][2]], vl = Math.hypot(v[0], v[2]);
@@ -257,8 +275,7 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
       else if (r > 100) W('look-whip', tOf(i), `the view turns at ${r.toFixed(0)}°/s raw (over 100)`);
     }
     metrics.maxLookRate60 = +peak.toFixed(0); metrics.maxLookRate60At = +at.toFixed(2); }
-  // look error: the baked look against what the solver wanted (its subject blend before the rate limits: what this measures is the lag of the
-  // rate limits and the smoothing) — and against the subject itself where a beat has a fixed one (the door on the approach, the Core in the finale)
+  // the lag of the limiters: the baked look against the solver's own wanted direction before the rate limits and the smoothing (`track.desired`) — a measure of the filter, not of the film
   if (track.desired) {
     const errs: number[] = [];
     for (let i = 0; i < N; i++) {
@@ -268,21 +285,45 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
       errs.push(Math.acos(clamp((d0[0] * b[0] + d0[1] * b[1] + d0[2] * b[2]) / bl, -1, 1)) / DEG);
     }
     errs.sort((a, b) => a - b);
-    metrics.lookErrorMedian = +errs[errs.length >> 1].toFixed(1); metrics.lookErrorP95 = +errs[Math.floor(errs.length * 0.95)].toFixed(1);
-    if (metrics.lookErrorMedian > 25) W('look-error', 0, `the look lags what it wants by a median ${metrics.lookErrorMedian}° (≤ 25)`);
-  } else if (d2c) W('look-error', 0, 'the track records no wanted look: its look error cannot be measured');
-  { const errs: number[] = [];
-    for (const bt2 of track.beats) {
-      const fixed: V3 | null = bt2.name === 'approach' || bt2.name === 'extStair' ? bt2.subject : (bt2.name === 'hero' || bt2.name === 'orbit' || bt2.name === 'power') ? centre : null;
-      if (!fixed) continue;
-      for (let i = Math.round(bt2.t0 / dt); i <= Math.min(N - 1, Math.round(bt2.t1 / dt)); i += 3) {
-        const b = [track.look[3 * i] - track.pos[3 * i], track.look[3 * i + 1] - track.pos[3 * i + 1], track.look[3 * i + 2] - track.pos[3 * i + 2]], bl = Math.hypot(b[0], b[1], b[2]) || 1;
-        const a = [fixed[0] - track.pos[3 * i], fixed[1] - track.pos[3 * i + 1], fixed[2] - track.pos[3 * i + 2]], al = Math.hypot(a[0], a[1], a[2]) || 1;
-        errs.push(Math.acos(clamp((a[0] * b[0] + a[1] * b[1] + a[2] * b[2]) / (al * bl), -1, 1)) / DEG);
-      }
-    }
-    if (errs.length) { errs.sort((a, b) => a - b); metrics.subjectErrorMedian = +errs[errs.length >> 1].toFixed(1); if (metrics.subjectErrorMedian > 25) W('look-error', 0, `the look misses the door and the Core by a median ${metrics.subjectErrorMedian}° (≤ 25)`); }
+    metrics.lookLagMedian = +errs[errs.length >> 1].toFixed(1); metrics.lookLagP95 = +errs[Math.floor(errs.length * 0.95)].toFixed(1);
   }
+  // §3.14 look error: the baked look against the beat's SUBJECT — what the plan's look solver (§3.5) wants of this beat, re-derived here from the eye's own path and the subject, not read back
+  // from the solver: the blend of the look-ahead point (max(1.5 m, v × 1.2 s) ahead on the eye path) and the subject, weighted by the plan's table, the subject counting only where
+  // ≥ 60 % of 9 rays reach it (§3.5). Fixed subjects are independent of the planner: the door on the approach (extStair: the door too), the Core in the push-in, the orbit and the press.
+  // A film's median of it is the fleet's look error (target ≤ 10°); a beat of half a second or more whose own median is over 25° is a warning (the look is somewhere else than the subject
+  // — a wrong subject, a look rotated after solving — which a median over the whole film never shows).
+  if (d2c && track.subj) {
+    const cum = new Float64Array(N); for (let i = 1; i < N; i++) cum[i] = cum[i - 1] + Math.hypot(eye[i][0] - eye[i - 1][0], eye[i][1] - eye[i - 1][1], eye[i][2] - eye[i - 1][2]);
+    const aheadAt = (i: number) => { const want = cum[i] + Math.max(1.5, speed[i] * 1.2); let lo = i, hi = N - 1; if (cum[hi] < want) return hi; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (cum[m] < want) lo = m; else hi = m; } return hi; };
+    const door: V3 | null = entry ? [entry.x, entry.y + 1.3, entry.z] : null;
+    const visMemo = new Map<number, number>();
+    const lookErr = (i: number): number => {
+      const b = beat[i], p = eye[i];
+      const fixed: V3 | null = b === 'approach' || b === 'extStair' ? door : (b === 'hero' || b === 'orbit' || b === 'power') ? centre : null;
+      const sj: V3 = fixed || [track.subj![3 * i], track.subj![3 * i + 1], track.subj![3 * i + 2]];
+      let ws = SPEC_LOOK_SUBJECT[b];
+      if (ws < 1) { const k = Math.floor(i / 12); let v = visMemo.get(k); if (v === undefined) { v = probe.visibility(eye[k * 12], sj, 0.2, OUTSIDE.has(b)) >= 0.6 ? 1 : 0; visMemo.set(k, v); } ws *= v; }
+      const q = eye[aheadAt(i)], da = [q[0] - p[0], q[1] - 0.2 - p[1], q[2] - p[2]], dl = Math.hypot(da[0], da[1], da[2]) || 1, ds = [sj[0] - p[0], sj[1] - p[1], sj[2] - p[2]], dsl = Math.hypot(ds[0], ds[1], ds[2]) || 1;
+      const want = [da[0] / dl * (1 - ws) + ds[0] / dsl * ws, da[1] / dl * (1 - ws) + ds[1] / dsl * ws, da[2] / dl * (1 - ws) + ds[2] / dsl * ws], wl = Math.hypot(want[0], want[1], want[2]) || 1;
+      const g = [track.look[3 * i] - track.pos[3 * i], track.look[3 * i + 1] - track.pos[3 * i + 1], track.look[3 * i + 2] - track.pos[3 * i + 2]], gl = Math.hypot(g[0], g[1], g[2]) || 1;
+      return Math.acos(clamp((want[0] * g[0] + want[1] * g[1] + want[2] * g[2]) / (wl * gl), -1, 1)) / DEG;
+    };
+    const med = (a: number[]) => { const t = a.slice().sort((x, y) => x - y); return t[t.length >> 1]; };
+    const all: number[] = [], byBeat = new Map<Beat, number[]>();
+    // §3.14: the median over a beat of the look's error against the subject, a warning over 25°; and a stretch of 1.5 s inside a longer beat (a walk of ten seconds) whose own median is over
+    // 45° — the look somewhere else than the subject for a stretch, which the beat's median hides
+    const WIN = 30;
+    for (const [b, spans] of beatSpans) for (const [i0, i1] of spans) {
+      const es: number[] = []; for (let i = Math.ceil(i0 / 6) * 6; i <= i1; i += 6) es.push(lookErr(i));
+      all.push(...es); (byBeat.get(b) || byBeat.set(b, []).get(b)!).push(...es);
+      if ((i1 - i0 + 1) * dt < 0.5 || es.length < 4) continue;
+      const mb = med(es);
+      if (mb > LOOK_ERROR_WARN) W('look-error', tOf(i0), `${b}: the look is a median ${mb.toFixed(0)}° off the beat's subject and the look-ahead (the plan's solver, §3.5; ≤ ${LOOK_ERROR_WARN}°)`, b);
+      else if (es.length > WIN) for (let k = 0; k + WIN <= es.length; k++) { const m = med(es.slice(k, k + WIN)); if (m > LOOK_ERROR_STRETCH) W('look-error', tOf(Math.ceil(i0 / 6) * 6 + 6 * k), `${b}: the look is a median ${m.toFixed(0)}° off the subject and the look-ahead over ${(WIN * 0.05).toFixed(1)} s (≤ ${LOOK_ERROR_STRETCH}°)`, b); }
+    }
+    if (all.length) { all.sort((a, b) => a - b); metrics.lookErrorMedian = +all[all.length >> 1].toFixed(1); metrics.lookErrorP95 = +all[Math.floor(all.length * 0.95)].toFixed(1); }
+    metrics.lookErrorByBeat = Object.fromEntries([...byBeat].map(([b, es]) => [b, +med(es).toFixed(1)]));
+  } else if (d2c) W('look-error', 0, 'the track records no subjects: its look error cannot be measured');
 
   // ---- speed: per beat, doorways, acceleration, jerk -----------------------------------------------------
   const acc = new Float64Array(N);
@@ -296,11 +337,13 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     const j = Math.abs((accS[i + 1] - accS[i - 1]) / (2 * dt)); maxJerk = Math.max(maxJerk, j);
     if (j > (out2 ? 30 : 15)) W('jerk', tOf(i), `${beat[i]}: jerk ${j.toFixed(0)} m/s³ (≤ ${out2 ? 30 : 15})`, beat[i]);
     const bt = beat[i];
-    const capOf = (b: Beat): number | null => b === 'orbit' ? null : b === 'route' && track.plan && track.plan.routeCap ? track.plan.routeCap : (b === 'stair' || b === 'descend' || b === 'extStair') ? SPEED_CAP[b] * 1.35 : SPEED_CAP[b];
-    let cap = capOf(bt);
-    for (const nb of neighbours(i)) { const c2 = capOf(nb); if (cap !== null && (c2 === null || c2 > cap)) cap = c2; }
-    if (cap !== null && speed[i] > cap * 1.1) W('beat-speed', tOf(i), `${bt}: ${speed[i].toFixed(2)} m/s (cap ${cap.toFixed(1)})`, bt);
-    if (bt === 'orbit') { const r = Math.hypot(eye[i][0] - centre[0], eye[i][2] - centre[2]) || 1; const w2 = speed[i] / r / DEG; if (w2 > 45) W('orbit-yaw-rate', tOf(i), `the orbit turns at ${w2.toFixed(0)}°/s (≤ 45)`); }
+    // the caps are the plan's (§3.4, assets/shot-spec.ts): a flight's is along it in plan, so its speed is measured in plan; the orbit's is angular (below)
+    const FLIGHT = (b: Beat) => b === 'stair' || b === 'descend' || b === 'extStair';
+    const capOf = (b: Beat): number | null => b === 'orbit' ? null : SPEC_SPEED[b];
+    let cap = capOf(bt), vOf = FLIGHT(bt) ? speedH[i] : speed[i];
+    for (const nb of neighbours(i)) { const c2 = capOf(nb); if (cap !== null && (c2 === null || c2 > cap)) cap = c2; if (FLIGHT(nb)) vOf = Math.min(vOf, speedH[i]); }
+    if (cap !== null && vOf > cap * 1.1) W('beat-speed', tOf(i), `${bt}: ${vOf.toFixed(2)} m/s${FLIGHT(bt) ? ' in plan' : ''} (the plan's cap is ${cap.toFixed(1)})`, bt);
+    if (bt === 'orbit') { const r = Math.hypot(eye[i][0] - centre[0], eye[i][2] - centre[2]) || 1; const w2 = speed[i] / r / DEG; if (w2 > SPEC_YAW.orbit) W('orbit-yaw-rate', tOf(i), `the orbit turns at ${w2.toFixed(0)}°/s (≤ ${SPEC_YAW.orbit})`); }
   }
   metrics.maxAccel = +maxAcc.toFixed(2); metrics.maxJerk = +maxJerk.toFixed(1);
   // interior doorways: ≤ 1.2 m/s within ±0.6 m of the plane, through the middle (±0.1 m), square to it for ±0.7 m
@@ -352,22 +395,31 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   }
 
   // ---- beats: floors, windows ---------------------------------------------------------------------------
+  const storeysRoute = (() => { const ys = [...new Set(world.levels.map(l => Math.round(l.y * 2) / 2))].sort((a, b) => a - b), ie = entry ? ys.indexOf(Math.round(world.levels.find(l => l.id === entry.level)!.y * 2) / 2) : 0, ih = ys.indexOf(Math.round(world.levels.find(l => l.id === hero.level)!.y * 2) / 2); return Math.abs(ih - ie) + 1; })();
   for (const [b, spans] of beatSpans) {
     for (const [i0, i1] of spans) {
       const d = (Math.min(N - 1, i1 + 1) - i0) * dt, f = BEAT_FLOOR[b];
       if (f && d < f - 0.02) E('beat-floor', tOf(i0), `${b} lasts ${d.toFixed(2)} s (never under ${f})`, b);
-      const w = BEAT_WINDOW[b];
-      if (w && (d < w[0] - 0.05 || d > w[1] + 0.05)) W('beat-window', tOf(i0), `${b} lasts ${d.toFixed(2)} s (${w[0]}–${w[1]})`, b);
+      const w = d2c ? beatWindow(b, storeysRoute) : null;
+      if (w && (d < w[0] - 0.05 || d > w[1] + 0.05)) W('beat-window', tOf(i0), `${b} lasts ${d.toFixed(2)} s (the plan's budget allows ${w[0]}–${w[1].toFixed(1)})`, b);
       if ((b === 'stair' || b === 'descend') && d < 1.6) W('stair-short', tOf(i0), `a flight takes ${d.toFixed(2)} s (≥ 1.6)`, b);
     }
+  }
+  // ---- the film's length against the plan's budget (§3.0, §3.3: 12 s, plus the orbit and the distances of this house) ------------------
+  if (d2c) {
+    const lenOf = (names: Beat[], plan = false) => { let L = 0; for (let i = 1; i < N; i++) if (names.includes(beat[i])) L += plan ? Math.hypot(eye[i][0] - eye[i - 1][0], eye[i][2] - eye[i - 1][2]) : Math.hypot(eye[i][0] - eye[i - 1][0], eye[i][1] - eye[i - 1][1], eye[i][2] - eye[i - 1][2]); return L; };
+    const orbitDeg = (() => { const sp = beatSpans.get('orbit'); if (!sp) return 0; let sw = 0; for (const [i0, i1] of sp) for (let i = Math.max(1, i0); i <= i1; i++) sw += wrapPi(Math.atan2(eye[i][0] - centre[0], eye[i][2] - centre[2]) - Math.atan2(eye[i - 1][0] - centre[0], eye[i - 1][2] - centre[2])); return Math.abs(sw) / DEG; })();
+    const bud = filmBudget({ storeys: storeysRoute, ext: beatSpans.has('extStair'), establishM: lenOf(['establish']), approachM: lenOf(['approach', 'extStair']), walkM: lenOf(['reveal', 'route', 'roomReveal', 'hero']), flightPlanM: lenOf(['stair', 'descend'], true), orbitDeg });
+    metrics.filmBudget = +bud.total.toFixed(1); metrics.filmBudgetRatio = +(T / bud.total).toFixed(2);
+    if (T > bud.total * BUDGET_SLACK + 0.25) W('film-length', 0, `the film runs ${T.toFixed(1)} s against a budget of ${bud.total.toFixed(1)} s (the plan's ${bud.base.toFixed(1)} s with the orbit, and ${(bud.total - bud.base).toFixed(1)} s for this house's distances; over ${((BUDGET_SLACK - 1) * 100).toFixed(0)} % warns)`);
   }
   // the lens: its rate, and its range where a beat has one
   let maxFovRate = 0;
   for (let i = 1; i < N; i++) {
     const r = Math.abs(fov[i] - fov[i - 1]) / dt; maxFovRate = Math.max(maxFovRate, r);
-    if (r > LENS.rate * 1.1) W('fov-rate', tOf(i), `the lens changes at ${r.toFixed(1)}°/s (≤ ${LENS.rate})`);
+    if (r > LENS_RATE * 1.1) W('fov-rate', tOf(i), `the lens changes at ${r.toFixed(1)}°/s (≤ ${LENS_RATE})`);
     const bt = beat[i], f = fov[i];
-    const range: [number, number] | null = FOV_RANGE[bt] || null;
+    const range: [number, number] | null = SPEC_FOV[bt] || null;
     if (range && (f < range[0] - 0.5 || f > range[1] + 0.5)) W('fov-range', tOf(i), `${bt}: lens ${f.toFixed(1)}° (${range[0]}–${range[1]})`, bt);
   }
   metrics.maxFovRate = +maxFovRate.toFixed(2);
@@ -487,7 +539,8 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     for (const [i0, i1] of orbitSpan) for (let i = i0; i <= i1; i++) {
       if (!coreIn(i, 0.7)) E('orbit-core-out-of-frame', tOf(i), 'the Core leaves the middle 70 % of the frame while orbiting');
       if (i % 3 === 0 && probe.coreSeen(eye[i], core) < 0.95) E('orbit-core-occluded', tOf(i), 'something stands in front of the Core while orbiting');
-      if (i > i0) { const a = Math.atan2(eye[i][0] - centre[0], eye[i][2] - centre[2]), b = Math.atan2(eye[i - 1][0] - centre[0], eye[i - 1][2] - centre[2]); swept += wrapPi(a - b); }
+      // (from the sample before the beat's first: the sweep the eye makes INTO the orbit's first sample is the orbit's — a sweep planned as 90° measures 89.8° without it)
+      if (i > 0) { const a = Math.atan2(eye[i][0] - centre[0], eye[i][2] - centre[2]), b = Math.atan2(eye[i - 1][0] - centre[0], eye[i - 1][2] - centre[2]); swept += wrapPi(a - b); }
     }
     const arc = Math.abs(swept) / DEG; metrics.orbitArc = +arc.toFixed(1);
     // (what the room allows: the longest sweep the planner found a swing-free way to arrive at — a walk that comes straight
