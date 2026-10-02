@@ -18,7 +18,7 @@ import { firstCrossing, leafOpen, DOOR_DONE_S } from './shot-doors.js';
 import { createProbe, camera, project, projectBox, bgClass, type V3 } from './shot-probe.js';
 import { createNav, roomInterest } from './shot-nav.js';
 import { sampleTrack, type Track } from './shot-planner.js';
-import { BEATS, type Beat, beatWindow, filmBudget, BUDGET_SLACK, SPEC_LOOK_SUBJECT, LOOK_ERROR_WARN, LOOK_ERROR_STRETCH, SPEC_SPEED, SPEC_YAW, SPEC_PITCH, SPEC_FOV, BEAT_FLOOR, DOOR_PLANE_SPEED, DOOR_ZONE_M, DOORWAY_SPEED, YAW_WARN, YAW_ERROR, DOLLHOUSE_PITCH_MIN, INTERIOR_LEVEL_DEG, PITCH_ERROR, LENS_RATE, OUTSIDE_TARGET, OUTSIDE_ERROR } from './shot-spec.js';
+import { BEATS, type Beat, beatWindow, filmBudget, BUDGET_SLACK, SPEC_LOOK_SUBJECT, LOOK_ERROR_WARN, LOOK_ERROR_STRETCH, SPEC_SPEED, SPEC_YAW, SPEC_PITCH, SPEC_FOV, BEAT_FLOOR, DOOR_PLANE_SPEED, DOOR_ZONE_M, DOORWAY_SPEED, YAW_WARN, YAW_ERROR, DOLLHOUSE_PITCH_MIN, INTERIOR_LEVEL_DEG, PITCH_ERROR, LENS_RATE, OUTSIDE_TARGET, OUTSIDE_ERROR, SPEC_ESTABLISH } from './shot-spec.js';
 import { houseCorners, frameFit, wholeFit, coreHeightPct, lumOf } from './framing.js';
 
 export type Finding = { code: string; level: 'error' | 'warn'; t: number; tEnd: number; samples: number; subject: string; message: string };
@@ -39,7 +39,7 @@ export const QA_CODES: Record<string, 'error' | 'warn'> = {
   'look-error': 'warn', 'core-height': 'warn', 'core-narrow': 'warn', 'core-thirds': 'warn', 'chair-share': 'warn', 'top-rooms': 'warn',
   'stair-short': 'warn', 'fov-rate': 'warn', 'fov-range': 'warn', 'near-blank': 'warn', 'beat-window': 'warn', 'beat-speed': 'warn',
   'doorway-speed': 'warn', 'accel': 'warn', 'jerk': 'warn', 'crab': 'warn', 'beat-pitch': 'warn', 'verticals': 'warn', 'look-near': 'warn',
-  'graze': 'warn', 'look-whip': 'warn', 'look-snap': 'error', 'finale-blank': 'warn', 'door-funnel': 'warn', 'approach-axis': 'warn', 'establish-crop': 'warn', 'establish-sky': 'warn', 'establish-occluder': 'warn',
+  'graze': 'warn', 'look-whip': 'warn', 'look-snap': 'error', 'finale-blank': 'warn', 'door-funnel': 'warn', 'approach-axis': 'warn', 'establish-crop': 'warn', 'establish-sky': 'warn', 'establish-height': 'warn', 'establish-occluder': 'warn',
   'foreground-occluder': 'warn', 'monitor-cut': 'warn', 'core-contrast': 'warn', 'core-room-side': 'warn', 'orbit-short': 'warn',
   'orbit-swing-back': 'warn', 'orbit-yaw-rate': 'warn',
 };
@@ -472,7 +472,10 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
     metrics.establish = { style: track.plan && track.plan.establish ? track.plan.establish.style : null, crop: { top: +f.top.toFixed(3), bottom: +f.bottom.toFixed(3), side: +f.side.toFixed(3) }, sky: +c.sky.toFixed(3), occluder: +occ.toFixed(3), bearing: entry ? +(Math.atan2((eye[0][0] - entry.x) * entry.out[1] - (eye[0][2] - entry.z) * entry.out[0], (eye[0][0] - entry.x) * entry.out[0] + (eye[0][2] - entry.z) * entry.out[1]) / DEG).toFixed(1) : null };
     // (§3.9: the footprint and the roof inside the frame with 8 % margins — a stray eave or dormer, 3 % of the corners, and the ground line within 15 % of the bottom margin)
     if (!wholeFit(eye[0], tgt[0], fov[0], houseCorners(world), aspect)) W('establish-crop', 0, `the house is cropped on the first frame: ${(f.top * 100).toFixed(0)} % of its corners over the top margin, ${(f.bottom * 100).toFixed(0)} % under the bottom, ${(f.side * 100).toFixed(0)} % past a side (all of it in, with 8 % margins: at most 3 % over the top or a side)`);
-    if (c.sky > 0.45 || (c.sky < 0.02 && f.top > 0.05)) W('establish-sky', 0, `sky is ${(c.sky * 100).toFixed(0)} % of the first frame${c.sky > 0.45 ? ' (over 45 %: the house is a small thing under a sky)' : ' with the roof running off the top'}`);
+    // §3.9: sky 15–35 % of the first frame (5 points of slack either side: the share is the 35 rays of a 7 × 5 grid)
+    if (c.sky < SPEC_ESTABLISH.sky[0] - 0.05 || c.sky > SPEC_ESTABLISH.sky[1] + 0.05) W('establish-sky', 0, `sky is ${(c.sky * 100).toFixed(0)} % of the first frame (the plan's ${SPEC_ESTABLISH.sky[0] * 100}–${SPEC_ESTABLISH.sky[1] * 100} %)`);
+    // §3.9: an eye 5–9 m over the entry's floor (the dollhouse, the high cutaway, is higher by definition)
+    { const h = eye[0][1] - (entry ? entry.y : 0); metrics.establish.eyeHeight = +h.toFixed(1); if (track.plan && track.plan.establish && track.plan.establish.style !== 'dollhouse' && track.plan.establish.style !== 'garden' && (h < SPEC_ESTABLISH.eyeHeight[0] - 0.5 || h > SPEC_ESTABLISH.eyeHeight[1] + 0.5)) W('establish-height', 0, `the first frame's eye is ${h.toFixed(1)} m over the entry's floor (the plan's ${SPEC_ESTABLISH.eyeHeight[0]}–${SPEC_ESTABLISH.eyeHeight[1]} m)`); }
     if (occ > 0.1) W('establish-occluder', 0, `${(occ * 100).toFixed(0)} % of the first frame is planting or a car within 6 m`);
   }
 
@@ -537,7 +540,8 @@ export function qaTrack(track: Track, world: ShotWorld, opts: { via?: string[]; 
   if (orbitSpan) {
     let swept = 0;
     for (const [i0, i1] of orbitSpan) for (let i = i0; i <= i1; i++) {
-      if (!coreIn(i, 0.7)) E('orbit-core-out-of-frame', tOf(i), 'the Core leaves the middle 70 % of the frame while orbiting');
+      // (the middle 70 % of a wide frame; of a narrow one — a phone's, a third of the horizontal angle — the middle 85 %: the plan's hero yaw cap of 15°/s leaves the view a few degrees behind the Core where the push-in turns into the orbit, which is half the width of a portrait frame)
+      if (!coreIn(i, aspect < 1.5 ? 0.85 : 0.7)) E('orbit-core-out-of-frame', tOf(i), `the Core leaves the middle ${aspect < 1.5 ? 85 : 70} % of the frame while orbiting`);
       if (i % 3 === 0 && probe.coreSeen(eye[i], core) < 0.95) E('orbit-core-occluded', tOf(i), 'something stands in front of the Core while orbiting');
       // (from the sample before the beat's first: the sweep the eye makes INTO the orbit's first sample is the orbit's — a sweep planned as 90° measures 89.8° without it)
       if (i > 0) { const a = Math.atan2(eye[i][0] - centre[0], eye[i][2] - centre[2]), b = Math.atan2(eye[i - 1][0] - centre[0], eye[i - 1][2] - centre[2]); swept += wrapPi(a - b); }

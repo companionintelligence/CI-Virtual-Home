@@ -149,7 +149,8 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
   // not a runtime input) — a nudge, not a rule: a facade that does not fit it still opens the way it fits
   const fav = fnv1a(`${world.id}:${lim.salt || ESTABLISH_SALT}`) % ESTABLISH_STYLES.length;   // (the salt: the seed under which the 30 real houses fall seven, seven, seven, six, three)
   const lot = world.lot;
-  const inLot = (x: number, z: number) => Math.abs(x) <= lot.w / 2 + 4 && Math.abs(z) <= lot.d / 2 + 8;
+  // (the eye may stand over the street: a house 20 m wide fits a 46° frame from 20 m, which is 10 m past a shallow lot's front line — the aerial is in the air over the road, never in a neighbour's wall: the pose is checked for solids below)
+  const inLot = (x: number, z: number) => Math.abs(x) <= lot.w / 2 + 12 && Math.abs(z) <= lot.d / 2 + 18;
   // affinities: a facade mirrored about its door reads axial; a front garden with water or beds reads from the
   // garden; a house whose interest is inside (one storey, or a big plan) reads from above
   const lv0 = world.levels.find(x => x.id === e.level) || world.levels[0];
@@ -210,16 +211,16 @@ export function chooseEstablish(world: ShotWorld, probe: Probe, index: WorldInde
     // (and the house has to be in it: a pose within 7 m of the facade line shows a wall, not a house)
     const facadeDist = (eyeAt(dist)[0] - e.x) * n[0] + (eyeAt(dist)[2] - e.z) * n[1];
     const fitScore = -2.2 * fr.cost - 0.25 * Math.max(0, 8 - facadeDist) - 0.012 * Math.max(0, fov - 34);
-    const score = 1 + fitScore + 0.35 * skyScore - 1.5 * occ + 0.3 * rng();   // (a seeded whisker: poses that fit alike do not all fall on one bearing)
+    const score = 1 + fitScore + 0.8 * skyScore - 1.5 * occ + 0.3 * rng();   // (a seeded whisker: poses that fit alike do not all fall on one bearing)
     cands.push({ style, eye, aim: aimAt, fov, bearing, score, fit, sky: comp.sky, occluded: occ, roofOff });
   };
   // (the lens: §3.5's exterior lens is 32° (30–35), which fits a 20 m house from 24–38 m away — a move of 6–8 s. The frame
   // holds the whole house at 46–49° from 10–17 m, 2.5–3.5 s of move, and the lens is already most of the way to the interior's 56°:
   // QA's establishing range is 30–49°.)
   const styleOf = (s: string) => {
-    if (s === 'axial') for (const fv of EST_LENSES) for (const h of [3.0, 4.0, 5.0]) tryPose('axial', 0, Math.max(h, top * 0.55), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]);
-    if (s === 'corner-left' || s === 'corner-right') { const sg = s === 'corner-right' ? 1 : -1; for (const fv of EST_LENSES) for (const bb of [26, 34, 42]) for (const h of [3.6, 4.6, 5.8]) tryPose(s, sg * bb, Math.max(h, top * 0.65), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]); }
-    if (s === 'garden') for (const fv of EST_LENSES) for (const sg of [1, -1]) for (const bb of [18, 28]) for (const h of [3.0, 4.0, 5.0]) tryPose('garden', sg * bb, h, fv, false, [aim[0], Math.max(2.2, top * 0.5), aim[2]]);
+    if (s === 'axial') for (const fv of EST_LENSES) for (const h of [5.0, 6.5, 8.0]) tryPose('axial', 0, Math.max(h, top * 0.55), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]);
+    if (s === 'corner-left' || s === 'corner-right') { const sg = s === 'corner-right' ? 1 : -1; for (const fv of EST_LENSES) for (const bb of [26, 34, 42]) for (const h of [5.0, 6.5, 8.0]) tryPose(s, sg * bb, Math.max(h, top * 0.65), fv, false, [aim[0], Math.max(aim[1], top * 0.5), aim[2]]); }
+    if (s === 'garden') for (const fv of EST_LENSES) for (const sg of [1, -1]) for (const bb of [18, 28]) for (const h of [4.0, 5.0, 6.0]) tryPose('garden', sg * bb, h, fv, false, [aim[0], Math.max(2.2, top * 0.5), aim[2]]);
     if (s === 'dollhouse') for (const fv of [42, 46, 49]) for (const sg of [1, -1]) for (const h of [6, 7.5]) tryPose('dollhouse', sg * 30, Math.max(h, top + 2.2), fv, false, [cx * 0.5 + aim[0] * 0.5, 0.8, cz * 0.5 + aim[2] * 0.5]);
   };
   if (want && typeof want === 'object') {

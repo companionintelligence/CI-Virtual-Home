@@ -470,6 +470,26 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       for (let q = 0; q < path2.length - 2; q++) { if (total - cum[q] > 8) continue; let turn = 0; for (let m = q + 1; m < path2.length - 1 && cum[m] - cum[q] < 1.2; m++) { turn += wrapPi(hd(m) - hd(m - 1)); sharp = Math.max(sharp, Math.abs(turn) / DEG); } } }
     return { swing, circling, turning, sharp };
   };
+  // the Core's place in the finale's frame, seeded by the house (it is on the orbit's side once the sweep's direction is known, below)
+  const compose = { ndcX: 0, ndcY: -0.2 };
+  let composeVertical = false;   // (the Core on a vertical thirds line: its height in the frame is free)
+  {
+    const r7 = mulberry32(fnv1a(`${world.id}:compose`));
+    // the Core's final place in the frame: on a thirds line — the vertical one (x ±⅓, y seeded) or the horizontal
+    // (y −⅓, x seeded) — so the fleet's finales do not all end on one frame (plan §3.14: ≥ 20 distinct)
+    const vertical = r7() < 0.55; composeVertical = vertical;
+    compose.ndcY = vertical ? +(-0.55 + r7() * 0.65).toFixed(3) : -1 / 3;
+    compose.ndcX = vertical ? 1 / 3 : +(0.08 + r7() * 0.48).toFixed(3);
+  }
+  // the frames of the orbit that are blank (§3.11, §3.13: the finale's background is not a bare wall — 60 % of the frame's rays on one plane within 1.5 m): per 5° of the sweep, at the orbit's own radius and height,
+  // looking at the Core on the middle lens
+  const blankMemo = new Map<string, boolean>();
+  const isBlankAt = (deg: number, dir: number) => {
+    const k = Math.round(deg / 5), key = `${k}:${dir}`; let v = blankMemo.get(key);
+    if (v === undefined) { const p = orbitPt(k * 5, centre[1] + (hs[0] + hs[1]) / 2, orbit ? orbit.r : 1.05), tg = composeTarget(p, centre, 46, [-dir * Math.abs(compose.ndcX), compose.ndcY]); v = probe.composition(camera(p, tg, 46), false, 1.5).share(1.5) >= 0.6; blankMemo.set(key, v); }
+    return v;
+  };
+  const blankDeg = (from: number, to: number, dir: number) => { let n = 0; for (let d = from; (to - d) * dir >= 0; d += dir * 5) if (isBlankAt(d, dir)) n += 5; return n; };
   const finaleFrom = (start: [number, number], budgetM: number): Fin | null => {
     if (!orbit) return null;
     const cands: Array<Pick<Fin, 'dir' | 'from' | 'to' | 'arc' | 'arcTotal' | 'P' | 'S'> & { Dd: number }> = [];
@@ -544,7 +564,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
       // the walk should arrive facing the Core: the look can only turn to it at the push-in's pace
       const toCore = norm([centre[0] - c.P[0], 0, centre[2] - c.P[2]]), face = Math.acos(clamp(arrive[0] * toCore[0] + arrive[2] * toCore[2], -1, 1)) / DEG;
       // (the sweep counts from where the eye starts round the Core: the spiral in and the orbit)
-      const score = 3.0 * Math.min(c.arc, 120) + 0.6 * Math.min(c.arcTotal - c.arc, 60) + (c.arc >= 90 ? 70 : 0) + (c.arc >= 120 ? 10 : 0) - 4 * Math.max(0, swing - 10) - (swing > 20 ? 60 : 0) - 2 * Math.max(0, circling - 20) - 0.5 * w.len - 1.0 * Math.max(0, face - 40) - 0.7 * Math.max(0, turning - 150) - 0.5 * Math.max(0, turning - 220) - 1.6 * Math.max(0, sharp - 100) - (c.Dd < 1.4 ? 10 : 0) - 1.2 * Math.max(0, faceWorst - 70);
+      const score = 3.0 * Math.min(c.arc, 120) + 0.6 * Math.min(c.arcTotal - c.arc, 60) + (c.arc >= 90 ? 70 : 0) + (c.arc >= 120 ? 10 : 0) - 4 * Math.max(0, swing - 10) - (swing > 20 ? 60 : 0) - 2 * Math.max(0, circling - 20) - 0.5 * w.len - 1.0 * Math.max(0, face - 40) - 0.7 * Math.max(0, turning - 150) - 0.5 * Math.max(0, turning - 220) - 1.6 * Math.max(0, sharp - 100) - (c.Dd < 1.4 ? 10 : 0) - 1.2 * Math.max(0, faceWorst - 70) - 2.0 * blankDeg(c.from, c.to, c.dir);
       scored.push({ ...c, bez, score, swing, circling, turning, sharp, face, walk: pts, walkLen: w.len, rooms: w.rooms });
       }
     }
@@ -707,7 +727,8 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     if (!w) return fail('route-failed', `no way to the Core on ${Lh.id}`);
     finalWalk = { pts: w.pts, rooms: w.rooms, ring: ring[0] || null, P };
   }
-  pushWalk(finalWalk.pts, curLv, 'route'); routeRooms.push(...finalWalk.rooms);
+  // (the walk's last leg to the push-in — the straight run in from the waypoint on the line out from the Core — is not a leg of storeyWalk: a doorway it crosses gets its funnel here)
+  pushWalk(funnelDoors(curLv, nav.grid(curLv), finalWalk.pts as Array<[number, number]>), curLv, 'route'); routeRooms.push(...finalWalk.rooms);
 
   // ---- 6. split the interior walk into its beats: reveal (the first 2 m in), route, roomReveal (into the Core's
   //         room, up to 2.5 m), with the flights between ------------------------------------------------------
@@ -730,16 +751,6 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
   // roomReveal's subject is the Core, weighted in from 135° round), and the yaw limiter says where it is not (QA beat-yaw)
   const heroFloor = BEAT_FLOOR.hero || 0.8;
   let orbitMeta: any = null, finalFov = LENS.hero, endPose: any = null;
-  const compose = { ndcX: 0, ndcY: -0.2 };
-  let composeVertical = false;   // (the Core on a vertical thirds line: its height in the frame is free)
-  {
-    const r7 = mulberry32(fnv1a(`${world.id}:compose`));
-    // the Core's final place in the frame: on a thirds line — the vertical one (x ±⅓, y seeded) or the horizontal
-    // (y −⅓, x seeded) — so the fleet's finales do not all end on one frame (plan §3.14: ≥ 20 distinct)
-    const vertical = r7() < 0.55; composeVertical = vertical;
-    compose.ndcY = vertical ? +(-0.45 + r7() * 0.5).toFixed(3) : -1 / 3;
-    compose.ndcX = vertical ? 1 / 3 : +(0.12 + r7() * 0.36).toFixed(3);
-  }
   if (fin && orbit) {
     const r = orbit.r;
     // the end: where on its own side, 15–45° past the front, the ring frames the Core best at the orbit's radius
@@ -765,14 +776,14 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     if (!(HV && typeof HV.azimuth === 'number')) { const t2 = to + fin.dir; if (t2 >= lo && t2 <= hi) { const wv2 = verifyArc(fin.from, t2, fin.dir, r); if (wv2 !== null && Math.abs(wv2 - t2) < 1e-6) to = t2; } }
     const arc = (to - fin.from) * fin.dir;
     const S = orbitPt(fin.from, centre[1] + hs[0], r);
-    // the push-in is the hero beat while it closes on the Core; where it turns to run round it (its tangential share of the way the eye goes over 0.7) it is the orbit's — the eye is circling the Core
+    // the push-in is the hero beat while it closes on the Core; where it turns to run round it (its tangential share of the way the eye goes over 0.85) it is the orbit's — the eye is circling the Core
     // from there, at the orbit's pace and yaw (45°/s), not creeping at the push-in's 0.4 m/s and 15°/s: a push-in that arrives along the orbit is the beat's whole 2–4 s otherwise
     {
       const bz = fin.bez; let split = bz.length - 1;
       if (bz.length > 3) {
         for (let k = 1; k < bz.length - 1; k++) {
           const vx = bz[k + 1][0] - bz[k - 1][0], vz = bz[k + 1][2] - bz[k - 1][2], rx = bz[k][0] - centre[0], rz = bz[k][2] - centre[2], vl = Math.hypot(vx, vz) || 1, rl = Math.hypot(rx, rz) || 1;
-          if (Math.abs(vx * rz - vz * rx) / (vl * rl) > 0.7 && polyLen(bz.slice(0, k + 1)) >= 0.25) { split = k; break; }
+          if (Math.abs(vx * rz - vz * rx) / (vl * rl) > 0.85 && polyLen(bz.slice(0, k + 1)) >= 0.25) { split = k; break; }
         }
       }
       if (split < bz.length - 1) { finaleSegs.push({ beat: 'hero', pts: bz.slice(0, split + 1) }); finaleSegs.push({ beat: 'orbit', pts: bz.slice(split) }); }
@@ -1527,7 +1538,7 @@ function planOnce(world: ShotWorld, opts: PlanOptions = {}) {
     const STARE_D = 3, SP = 12, NS = Math.ceil(N / SP), OFFS = [-84, -72, -60, -48, -36, -24, -12, 0, 12, 24, 36, 48, 60, 72, 84], NO = OFFS.length, ZERO = 7;
     // (inside the wall and foreground terms both count; on the way in from the street only the foreground — a facade fills the frame at the door — and
     // only within 1 m: a shrub or a trunk the eye passes)
-    const modeOf = (i: number): 'in' | 'out' | null => { const b = BEATS[beatOf[i]]; if (b === 'hero' || b === 'orbit' || b === 'power' || b === 'establish' || b === 'threshold') return null; if (b === 'approach' || b === 'extStair') return 'out'; const p = eyeAt(i); return indoors(world, p[0], p[1], p[2]) ? 'in' : null; };
+    const modeOf = (i: number): 'in' | 'out' | null => { const b = BEATS[beatOf[i]]; if (b === 'hero' || b === 'orbit' || b === 'power' || b === 'establish') return null; if (b === 'approach' || b === 'extStair') return 'out'; const p = eyeAt(i); return indoors(world, p[0], p[1], p[2]) ? 'in' : null; };
     const foreShare = (rays: Array<{ t: number; k: number }>) => rays.filter(r => r.t < 1.0 && r.k !== 0 && r.k !== K.surface && r.k !== K.core && r.k !== K.monitor && r.k !== K.heroSet).length / rays.length;
     const data: Float64Array[] = [], flagged: boolean[] = [];
     for (let t = 0; t < NS; t++) {

@@ -14,7 +14,7 @@
 //   5. the budgets (plan Completeness A4): planning all 30 within 15 s of CPU, QA v2 within 0.5 s a shot (a loaded
 //      machine — load average over 0.75 per core — inflates CPU time too, so both budgets get 60 % more there; they are never waived).
 //
-//   node --experimental-strip-types scripts/test-shot-planner.mts [--house a,b] [--fixtures] [--update] [--parity 2|0|all]
+//   node --experimental-strip-types scripts/test-shot-planner.mts [--house a,b] [--fixtures all|--no-fixtures] [--update] [--parity 3|0|all]
 //        [--rebuild-worlds] [--stale-ok] [--planner-only] [--out test/qa/shot-planner.json]
 //   --update writes test/shots/<id>.track.json: the track's hash and metrics, which the next run compares (a drift is
 //   reported, never a failure: the layout pass and the other streams change the houses the worlds are made of).
@@ -31,7 +31,8 @@ import { planHeroReveal, planWalkthrough } from '../assets/shot-planner-tour.js'
 
 const args = parseArgs(process.argv.slice(2));
 const ids = args.house ? args.house.split(',') : houseIds();
-const fixtures = args.fixtures === 'true' ? fixtureIds() : [];
+// (S5's own fixtures — an upper entry, a descent, a spiral, an island, the spec's knobs — are planned, QA'd and compared across the engines with the houses; `--fixtures all` takes every fixture, `--no-fixtures` none)
+const fixtures = args['no-fixtures'] === 'true' ? [] : fixtureIds().filter(f => args.fixtures === 'all' || f.startsWith('s5-shot-'));
 const SHOTS_DIR = path.join(ROOT, 'test', 'shots');
 const cpuMs = () => { const u = process.cpuUsage(); return (u.user + u.system) / 1000; };
 let bad = 0;

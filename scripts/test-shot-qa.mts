@@ -235,6 +235,8 @@ const INJECT: Record<string, Injector> = {
   'establish-sky': c => {
     const { t, w } = mk(c); for (let k = 0; k < 6; k++) turnLook(t, k, 0, 45 * DEG);
     return { track: t, world: w, window: [0, 0], repairs: () => [-40, -35, -30, -25, -20, -15, -10, -5, 5, 10, 15, 20, 25, 30].map(deg => { const r = mk(c); for (let k = 0; k < 6; k++) turnLook(r.t, k, 0, deg * DEG); return { track: r.t, world: r.w }; }) }; },
+  // the opening flown at 1.5 m: a house seen from the lawn (the plan's eye is 5-9 m up)
+  'establish-height': c => { const { t, w } = mk(c); if (c.track.plan.establish.style === 'dollhouse' || c.track.plan.establish.style === 'garden') return null; const e = w.entry!; for (let k = 0; k < 6; k++) { const p = eyeAt(t, k); setEye(t, k, [p[0], e.y + 1.5, p[2]]); } return { track: t, world: w, window: [0, 0] }; },
   'establish-occluder': c => { const { t, w } = mk(c), e = eyeAt(t, 0), d = norm(sub(lookAt(t, 0), e)), p = add(e, mul(d, 3)); addBox(w, [p[0] - 2, p[1] - 2, p[2] - 2, p[0] + 2, p[1] + 2, p[2] + 2], K.site, 'tree'); return { track: t, world: w, window: [0, 0] }; },
   'look-near': c => { const { t, w } = mk(c), i = c.midRoute(0.6); for (let k = 0; k < 48; k++) { const e = eyeAt(t, i + k); setLook(t, i + k, add(e, mul(norm(sub(lookAt(t, i + k), e)), 1.0))); } return { track: t, world: w, window: win(c, i, i + 48) }; },
   'crab': c => { const { t, w } = mk(c), i = c.midRoute(1.4); for (let k = i - 40; k < i + 140; k++) { const e = eyeAt(t, k), v = sub(eyeAt(t, k + 1), eyeAt(t, k - 1)), yaw = Math.atan2(v[0], v[2]) + 90 * DEG * smooth(Math.min((k - (i - 40)) / 18, (i + 140 - k) / 18)), L = 4; setLook(t, k, [e[0] + Math.sin(yaw) * L, e[1], e[2] + Math.cos(yaw) * L]); } return { track: t, world: w, window: win(c, i, i + 100) }; },
