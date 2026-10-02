@@ -8,7 +8,7 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 
 ## Rules
 
-**Source vs derived.** The sources are `content/houses/<id>.json`, `assets/**/*.ts`, `room-creator.html`,
+**Source vs derived.** The sources are `content/families/<slug>.json` (the family stories), `content/story/` (casting, claims, catalog, roles, voices, lexicon, schema), `content/houses/<id>.json`, `assets/**/*.ts`, `room-creator.html`,
 `index.html`, `portal/*.css` and `portal/*.js`, `scripts/` and `reference/`. Everything else is generated — never hand-edit it; change the source and re-run:
 
 | Derived file | Regenerate with |
@@ -22,6 +22,10 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `scenes/floorplans/` | `pnpm run floorplans` |
 | `test/goldens/<profile>/` | `pnpm run goldens:update` — only on purpose, see below |
 | `portal/thumbs/<id>.webp`, `portal/hero.webp`, `portal/previews/<id>.jpg`, `portal/hero.jpg` | `pnpm run portal:thumbs [--house <id>]` — after a change to how a house looks |
+| `content/families/<slug>.voice.json`, `content/families/<slug>/audio/*.m4a` | `pnpm run story:voice -- <slug>` (local Kokoro; after the story text changed: `--stale`) |
+| `content/families/<slug>.bake.json` | `pnpm run story:bake -- <slug>` (after the voice, after a story or a role-table change) |
+| `portal/og/*.jpg`, `portal/og/manifest.json` | `pnpm run portal:og` (after a family's text or its preview picture changed) |
+| `content/families/films.json`, `content/families/<slug>/film/` | `pnpm run story:film -- <slug>` |
 | `dist/` (gitignored) | `pnpm run portal:build` |
 
 Edit `assets/*.ts`, never the compiled `.js` beside it. `assets/vendor/` is third-party: do not edit it (the
@@ -87,6 +91,24 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 - Copy on the site follows the Uncloud voice (CI-Common `uncloud-voice`): no em or en dashes, sentence case, no price or
   performance number that is not on the fact sheet, "Fictional family. Real software." wherever a family is, Companion OS
   is in beta. `scripts/story/check-copy.mts` lints the built pages against `content/story/claims.json`.
+- **The story system.** `content/families/<slug>.json` is the one source of every word about a family: the page, the popups,
+  the captions, the voice-over and the film are all made from it (`reference/story/`: validator, bake, voice, player, film).
+  The order after an edit: `pnpm run story:validate -- <slug>`, `story:voice -- <slug> --stale`, `story:bake -- <slug>`,
+  `portal:og`, then `portal:build` and `portal:test`. The `.voice.json`, `.bake.json`, audio and link-preview images are
+  generated and committed; never hand-edit them, and a stale one fails the production build. Every app a story names must be
+  in `content/story/catalog-apps.json` (the Companion Hub's catalog); do not invent an app or a capability, and take product
+  claims only from `content/story/claims.json`. Companion OS is in beta and the site says so. The families are fictional and
+  say so on every surface; the Companion Core is always drawn stylised.
+- **The voice-over is generated locally** (`pnpm run story:voice`, Kokoro-82M, Apache-2.0, CPU, no network at run time). No cloud
+  text-to-speech service, no API key, ever; macOS `say` is a labelled last resort only. Nothing in the pipeline is shipped but its
+  output: the AAC clips, which are content-hashed (`<clip>.<hash10>.m4a`), loaded per beat and only after the viewer chooses
+  sound. Every shipped binary (audio, image, film poster) carries a content hash in its name and is shipped by a
+  `scripts/story/ship/*.mts` step, and `portal:test` fails on a file the pages do not load. New components go in
+  THIRD_PARTY.md in the same commit (code, model, voices, licence, source URL).
+- **Story mode is a live-player feature.** It exists only under `room-creator.html?mode=view` (`?no=story` switches it off), its
+  modules are `assets/story/` and `portal/story.css`, and its hooks into `assets/viewer.ts`, `room-creator.html`,
+  `scripts/build-portal.mts` and `scripts/test-portal.mts` stay a line or two each. Offline rendering, the 150 goldens, the
+  fixtures and the films' frames do not go through it: a change that moves a golden is a bug in the change.
 - The engine's modules are not fingerprinted by file name, so `portal:build` names each one by a content hash in the page's
   import map (and `?v=` on the `<script>`/`<link>` tags), and `portal/_headers` asks every file to revalidate. Never give an
   un-hashed file a long cache time or load a module around the build's rewriting: after a deploy a returning visitor would

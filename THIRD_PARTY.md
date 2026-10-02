@@ -83,7 +83,15 @@ External tools the scripts call but this repository does not include: **ffmpeg**
 `prop-sheet.mts`; LGPL-2.1+/GPL depending on build), **rsvg-convert** from librsvg (`generate_floor_plans.py`,
 `generate_house_iso.py --png`; LGPL-2.1+), and **Python 3** (standard library only).
 
-## Story site: landing
+## The story site (families, tour, voice-over, films)
+
+Four sections follow: what the landing and family pages ship, what the voice-over tool builds with, what the films are built with, and
+what was considered and refused. In short: the site loads nothing from a third party at run time; the player adds no dependency; the only
+third-party **material** the site ships is Archivo Black (OFL-1.1) and the generated audio; Kokoro-82M, espeak-ng and FFmpeg are build-time
+tools whose **output** ships. Voice-over is generated locally; no cloud text-to-speech service or API key is used anywhere. Open
+questions for counsel are listed in the voice and film sections.
+
+### Story site: landing
 
 The public site (`pnpm run portal:build` → `dist/`, see README → The public site) adds this to what it ships. Nothing here is
 loaded from a third party at run time: the site makes no third-party request.
@@ -102,6 +110,70 @@ third-party apps are named in text only.
 is outside the licence list this repository takes (MIT, BSD, ISC, Apache-2.0, CC0), so `pnpm run portal:test` carries its own
 audit (`AUDIT` in `scripts/test-portal.mts`: names, landmarks, headings, labels, ids, contrast). If the owner approves MPL-2.0 for a
 test-only devDependency, it can be added beside it.
+
+### Story site: voice
+
+The family voice-over is generated **locally** by `pnpm run story:voice` (`scripts/build-voiceover.mts`, `scripts/voice/`), with no cloud
+text-to-speech service and no API key. Only the generated audio (`content/families/<slug>/audio/*.m4a`) is committed and shipped; none
+of the software below is shipped or loaded by the site. The site discloses that the narration is synthetic. How to run and change it:
+[`reference/story/voice.md`](reference/story/voice.md).
+
+| Component | Version / revision | Licence | Role |
+|---|---|---|---|
+| [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (model weights and the eight British voice files `bf_emma bf_isabella bf_lily bf_alice bm_george bm_fable bm_lewis bm_daniel`; author hexgrad) | revision `f3ff3571791e39611d31c381e3a41a3af07b4987`; `kokoro-v1_0.pth` sha256 `496dba118d1a58f5f3db2efc88dbdc216e0483fc89fe6e47ee1f2c53f18ad1e4` (pinned in `content/story/voices.json`, checked on every run) | Apache-2.0 (model card) | the voice; its output is the shipped audio |
+| [kokoro](https://github.com/hexgrad/kokoro) | 0.9.4 | Apache-2.0 | inference pipeline and per-token timings |
+| [misaki](https://github.com/hexgrad/misaki) | 0.9.4 | Apache-2.0 | grapheme to phoneme front end (the lexicon overrides use its British phoneme set) |
+| [PyTorch](https://pytorch.org) | 2.13.0 | BSD-3-Clause, with Apache-2.0, BSD-2-Clause, BSL-1.0 and MIT parts (package metadata) | runs the model, CPU, pinned to four threads |
+| [NumPy](https://numpy.org) | 2.5.2 | BSD-3-Clause, with 0BSD, MIT, Zlib and CC0-1.0 parts (package metadata) | sample handling |
+| [python-soundfile](https://github.com/bastibe/python-soundfile) | 0.14.0 | BSD-3-Clause | writes the intermediate WAV |
+| [huggingface_hub](https://github.com/huggingface/huggingface_hub) | 1.27.0 | Apache-2.0 | reads the local, offline model cache (`HF_HUB_OFFLINE=1`; `synth.py` also blocks sockets) |
+| [spaCy](https://spacy.io) `en_core_web_sm` | 3.8.0 | MIT (the model's `LICENSES_SOURCES` lists the training corpora) | tokeniser used by misaki |
+| [espeak-ng](https://github.com/espeak-ng/espeak-ng) | 1.52.0 (Homebrew) | **GPL-3.0-or-later** | out-of-vocabulary pronunciation fallback, loaded through misaki |
+| [phonemizer-fork](https://github.com/bootphon/phonemizer) | 3.3.2 | **GPL-3.0-or-later** | misaki's espeak bridge |
+| [espeakng-loader](https://github.com/thewh1teagle/espeakng-loader) | 0.2.4 | **no licence declared in the wheel metadata**; the wheel bundles an espeak-ng build | locates the espeak-ng library (patched to the Homebrew one, see `scripts/voice/synth.py`) |
+| [FFmpeg](https://ffmpeg.org) | 9.0.2 (Homebrew; configured `--enable-gpl --enable-version3`) | LGPL-2.1-or-later / GPL-3.0-or-later depending on the build | loudness measurement and the native `aac` encoder (AAC-LC, 32 kbps mono 24 kHz). Build-time tool; its code is not in the output |
+
+The environment is CI-Common's `packages/video-kit/scripts/kokoro-setup.sh` (installs under `~/.cache/ci-video-kit/kokoro`). The
+syllable-per-second truncation guard in `scripts/voice/lib.mts` is ported from CI-Common `packages/video-kit/src/narrate.ts` (same
+organisation, first-party).
+
+**Not used.** Piper (its live engine is GPL-3.0 and each voice model has its own licence, unverified). macOS `say` is a last resort
+only; nothing is wired to it, and a lock made with it would have to carry `engine.labelled` (`scripts/test-voiceover.mts` enforces that).
+LYGIA and Grassworks are not used anywhere in the story site.
+
+**For counsel before launch** (also open item 5 in the story bible):
+
+1. **GPL build tooling.** espeak-ng and phonemizer-fork are GPL-3.0 programs that run at build time and whose **output** (audio, never
+   their code) ships. The usual reading is that program output is not a derivative work, but this is a legal call, not an engineering one.
+2. **Training data.** The Kokoro-82M model card states that the training data included synthetic audio from closed TTS providers
+   (recorded here from the plan; not re-verified against the live card). Whether that restricts commercial use of the generated audio
+   is for counsel; the model and code are Apache-2.0.
+3. **espeakng-loader** declares no licence in its wheel metadata. It is a build-time loader and nothing from it ships.
+4. **Voice files.** Each of the eight voice `.pt` files is covered by the model's Apache-2.0 licence per the card; their individual
+   dataset provenance was not independently checked.
+5. The voices are synthetic and disclosed on every surface ("Narration is generated locally with an open text-to-speech model. It is
+   not a recording of a person."). No voice imitates a real person.
+
+### Story site: film
+
+The per-family films are made on this machine by `pnpm run story:film` (`scripts/render-family-film.mts`, `scripts/film/`, `assets/story/film/`). Nothing below is shipped
+with the site or loaded by a page: the films are files hosted outside the Pages deploy, and the tools that make them are not in them. How it works and how to run
+it: [`reference/story/film.md`](reference/story/film.md).
+
+| Component | Version | Licence | Role |
+|---|---|---|---|
+| [FFmpeg](https://ffmpeg.org) | 9.0.2 (Homebrew; configured `--enable-gpl --enable-version3 --enable-libx264`) | LGPL-2.1-or-later / GPL-3.0-or-later depending on the build | a tool: decodes the voice clips, measures and normalises loudness (`loudnorm`, `alimiter`, `ebur128`), muxes, and runs the QA scans (`silencedetect`, `freezedetect`, `ffprobe`). Not shipped; its code is not in the films |
+| [x264](https://www.videolan.org/developers/x264.html) (libx264, through FFmpeg) | as built into the FFmpeg above | **GPL-2.0-or-later** | encodes the H.264 video. A tool whose **output** ships (an encoded stream carries none of its code); the same reading as the espeak-ng note under "Story site: voice", flagged for counsel with it |
+| FFmpeg's native AAC encoder | in the FFmpeg above | LGPL-2.1-or-later | encodes the sound. AAC patent licensing is a matter for counsel before a commercial launch (open item in `reference/story/film.md`) |
+| [Manrope](https://github.com/sharanda/manrope) | the file in `assets/fonts/` (row above) | OFL-1.1 | the type of every card, caption and title in the film, read from `assets/fonts/` by the page that renders it (the Google Fonts request is stubbed, as in `test-goldens.mts`) |
+| Playwright and its Chromium (rows above) | as above | Apache-2.0 | drives the page that renders the frames |
+| The loudness method (two passes: measure, then a linear gain and a true-peak limiter a decibel under the ceiling) | ported from CI-Common `packages/video-kit/src/loudness.ts` | first-party (same organisation) | `scripts/film/mux.mts` and `scripts/film/qa.mts` carry about sixty lines of that logic; the kit is **not** imported and is not a dependency |
+
+No stock footage, music, sound effect, image or typeface was added for the film. The voice is the one `Story site: voice` records (Kokoro-82M, generated locally); the picture
+is the repo's own renderer; the Companion Core in it is the stylised model the page builds, never a photograph. LYGIA and Grassworks are not used.
+
+The optional CI-Common brand bookends (`scripts/film-bookends.mts`) run only when the owner sets `CI_VIDEO_KIT` to a checkout of CI-Common's `packages/video-kit`; the
+kit is then a build-time tool of the owner's machine, never a dependency in `package.json`.
 
 ## Licence texts for adapted source
 
@@ -182,67 +254,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
-
-## Story site: voice
-
-The family voice-over is generated **locally** by `pnpm run story:voice` (`scripts/build-voiceover.mts`, `scripts/voice/`), with no cloud
-text-to-speech service and no API key. Only the generated audio (`content/families/<slug>/audio/*.m4a`) is committed and shipped; none
-of the software below is shipped or loaded by the site. The site discloses that the narration is synthetic. How to run and change it:
-[`reference/story/voice.md`](reference/story/voice.md).
-
-| Component | Version / revision | Licence | Role |
-|---|---|---|---|
-| [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) (model weights and the eight British voice files `bf_emma bf_isabella bf_lily bf_alice bm_george bm_fable bm_lewis bm_daniel`; author hexgrad) | revision `f3ff3571791e39611d31c381e3a41a3af07b4987`; `kokoro-v1_0.pth` sha256 `496dba118d1a58f5f3db2efc88dbdc216e0483fc89fe6e47ee1f2c53f18ad1e4` (pinned in `content/story/voices.json`, checked on every run) | Apache-2.0 (model card) | the voice; its output is the shipped audio |
-| [kokoro](https://github.com/hexgrad/kokoro) | 0.9.4 | Apache-2.0 | inference pipeline and per-token timings |
-| [misaki](https://github.com/hexgrad/misaki) | 0.9.4 | Apache-2.0 | grapheme to phoneme front end (the lexicon overrides use its British phoneme set) |
-| [PyTorch](https://pytorch.org) | 2.13.0 | BSD-3-Clause, with Apache-2.0, BSD-2-Clause, BSL-1.0 and MIT parts (package metadata) | runs the model, CPU, pinned to four threads |
-| [NumPy](https://numpy.org) | 2.5.2 | BSD-3-Clause, with 0BSD, MIT, Zlib and CC0-1.0 parts (package metadata) | sample handling |
-| [python-soundfile](https://github.com/bastibe/python-soundfile) | 0.14.0 | BSD-3-Clause | writes the intermediate WAV |
-| [huggingface_hub](https://github.com/huggingface/huggingface_hub) | 1.27.0 | Apache-2.0 | reads the local, offline model cache (`HF_HUB_OFFLINE=1`; `synth.py` also blocks sockets) |
-| [spaCy](https://spacy.io) `en_core_web_sm` | 3.8.0 | MIT (the model's `LICENSES_SOURCES` lists the training corpora) | tokeniser used by misaki |
-| [espeak-ng](https://github.com/espeak-ng/espeak-ng) | 1.52.0 (Homebrew) | **GPL-3.0-or-later** | out-of-vocabulary pronunciation fallback, loaded through misaki |
-| [phonemizer-fork](https://github.com/bootphon/phonemizer) | 3.3.2 | **GPL-3.0-or-later** | misaki's espeak bridge |
-| [espeakng-loader](https://github.com/thewh1teagle/espeakng-loader) | 0.2.4 | **no licence declared in the wheel metadata**; the wheel bundles an espeak-ng build | locates the espeak-ng library (patched to the Homebrew one, see `scripts/voice/synth.py`) |
-| [FFmpeg](https://ffmpeg.org) | 9.0.2 (Homebrew; configured `--enable-gpl --enable-version3`) | LGPL-2.1-or-later / GPL-3.0-or-later depending on the build | loudness measurement and the native `aac` encoder (AAC-LC, 32 kbps mono 24 kHz). Build-time tool; its code is not in the output |
-
-The environment is CI-Common's `packages/video-kit/scripts/kokoro-setup.sh` (installs under `~/.cache/ci-video-kit/kokoro`). The
-syllable-per-second truncation guard in `scripts/voice/lib.mts` is ported from CI-Common `packages/video-kit/src/narrate.ts` (same
-organisation, first-party).
-
-**Not used.** Piper (its live engine is GPL-3.0 and each voice model has its own licence, unverified). macOS `say` is a last resort
-only; nothing is wired to it, and a lock made with it would have to carry `engine.labelled` (`scripts/test-voiceover.mts` enforces that).
-LYGIA and Grassworks are not used anywhere in the story site.
-
-**For counsel before launch** (also open item 5 in the story bible):
-
-1. **GPL build tooling.** espeak-ng and phonemizer-fork are GPL-3.0 programs that run at build time and whose **output** (audio, never
-   their code) ships. The usual reading is that program output is not a derivative work, but this is a legal call, not an engineering one.
-2. **Training data.** The Kokoro-82M model card states that the training data included synthetic audio from closed TTS providers
-   (recorded here from the plan; not re-verified against the live card). Whether that restricts commercial use of the generated audio
-   is for counsel; the model and code are Apache-2.0.
-3. **espeakng-loader** declares no licence in its wheel metadata. It is a build-time loader and nothing from it ships.
-4. **Voice files.** Each of the eight voice `.pt` files is covered by the model's Apache-2.0 licence per the card; their individual
-   dataset provenance was not independently checked.
-5. The voices are synthetic and disclosed on every surface ("Narration is generated locally with an open text-to-speech model. It is
-   not a recording of a person."). No voice imitates a real person.
-
-## Story site: film
-
-The per-family films are made on this machine by `pnpm run story:film` (`scripts/render-family-film.mts`, `scripts/film/`, `assets/story/film/`). Nothing below is shipped
-with the site or loaded by a page: the films are files hosted outside the Pages deploy, and the tools that make them are not in them. How it works and how to run
-it: [`reference/story/film.md`](reference/story/film.md).
-
-| Component | Version | Licence | Role |
-|---|---|---|---|
-| [FFmpeg](https://ffmpeg.org) | 9.0.2 (Homebrew; configured `--enable-gpl --enable-version3 --enable-libx264`) | LGPL-2.1-or-later / GPL-3.0-or-later depending on the build | a tool: decodes the voice clips, measures and normalises loudness (`loudnorm`, `alimiter`, `ebur128`), muxes, and runs the QA scans (`silencedetect`, `freezedetect`, `ffprobe`). Not shipped; its code is not in the films |
-| [x264](https://www.videolan.org/developers/x264.html) (libx264, through FFmpeg) | as built into the FFmpeg above | **GPL-2.0-or-later** | encodes the H.264 video. A tool whose **output** ships (an encoded stream carries none of its code); the same reading as the espeak-ng note under "Story site: voice", flagged for counsel with it |
-| FFmpeg's native AAC encoder | in the FFmpeg above | LGPL-2.1-or-later | encodes the sound. AAC patent licensing is a matter for counsel before a commercial launch (open item in `reference/story/film.md`) |
-| [Manrope](https://github.com/sharanda/manrope) | the file in `assets/fonts/` (row above) | OFL-1.1 | the type of every card, caption and title in the film, read from `assets/fonts/` by the page that renders it (the Google Fonts request is stubbed, as in `test-goldens.mts`) |
-| Playwright and its Chromium (rows above) | as above | Apache-2.0 | drives the page that renders the frames |
-| The loudness method (two passes: measure, then a linear gain and a true-peak limiter a decibel under the ceiling) | ported from CI-Common `packages/video-kit/src/loudness.ts` | first-party (same organisation) | `scripts/film/mux.mts` and `scripts/film/qa.mts` carry about sixty lines of that logic; the kit is **not** imported and is not a dependency |
-
-No stock footage, music, sound effect, image or typeface was added for the film. The voice is the one `Story site: voice` records (Kokoro-82M, generated locally); the picture
-is the repo's own renderer; the Companion Core in it is the stylised model the page builds, never a photograph. LYGIA and Grassworks are not used.
-
-The optional CI-Common brand bookends (`scripts/film-bookends.mts`) run only when the owner sets `CI_VIDEO_KIT` to a checkout of CI-Common's `packages/video-kit`; the
-kit is then a build-time tool of the owner's machine, never a dependency in `package.json`.
