@@ -1,0 +1,10 @@
+{
+  "note": "sha256 of the raw RGBA of frame 0, drawn as scripts/test-goldens.mts draws it, from the reference commit 03edd3b. Per machine: the GPU is part of the render. Written by: pnpm run xr:test -- --only T-OFFLINE --record-offline",
+  "frames": {
+    "darwin|chromium 154.0.8037.0": {
+      "cutestarter/door-to-core@360#0": "b2eab2e96e1c94751425a42d1e435e41f8c48a5f1cd41ff4defb3931323ddc07"
+    }
+  },
+  "reference": "03edd3b",
+  "goldenProfile": "macos-metal"
+}

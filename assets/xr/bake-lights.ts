@@ -23,20 +23,31 @@ export interface LightBudget {
   punctual: any[];             // the spot and point lights among them: the ones that are rationed
   n: number;                   // how many punctual lights stay on, fixed for the session
   on: Set<any>;
+  fill: any[];                 // shadowless directional lights (the cool fill): off in the standalone tiers
 }
 
 const worldPos = (THREE: any, l: any) => l.getWorldPosition(new THREE.Vector3());
 
 /** The lights that count (visible, in the scene). Call after the scene is in its XR dress. */
 export function collectLights(THREE: any, scene: any, budget: XrBudget): LightBudget {
-  const all: any[] = [], punctual: any[] = [];
+  const all: any[] = [], punctual: any[] = [], fill: any[] = [];
   scene.updateMatrixWorld(true);
   scene.traverseVisible((o: any) => {
     if (!o.isLight) return;
     all.push(o);
     if ((o.isSpotLight || o.isPointLight) && !o.castShadow) punctual.push(o);
+    else if (o.isDirectionalLight && !o.castShadow) fill.push(o);
   });
-  return { all, punctual, n: Math.min(budget.maxSpots, punctual.length), on: new Set() };
+  return { all, punctual, fill, n: Math.min(budget.maxSpots, punctual.length), on: new Set() };
+}
+
+/** A standalone headset evaluates every light in every fragment of every eye on a mobile GPU: the sky (hemisphere), the sun and the nearest
+ *  lamps stay, and the shadowless cool fill (a second full BRDF per fragment for a few percent of the picture) goes. Tethered and Vision keep it.
+ *  Done once at apply(): it changes the directional count, which recompiles, so it is never a per-teleport choice. */
+export function dropFill(lb: LightBudget, budget: XrBudget): number {
+  if (!budget.foveation) return 0;
+  for (const l of lb.fill) l.visible = false;
+  return lb.fill.length;
 }
 
 /** The `n` nearest punctual lights to the head. A light on another storey counts as 4x as far in height: a lamp through a floor lights
