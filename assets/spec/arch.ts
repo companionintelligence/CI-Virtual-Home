@@ -33,6 +33,8 @@ export interface RoomFloor {
   color?: Colour;
   /** tile / wallpaper patterns: 'stripe' | 'dot' | 'botanical' | 'grid' … (kit.finish, S1) */
   pattern?: string;
+  /** a checker's dark squares, or a wallpaper's motif (materials.ts finish()); only reaches a floor via kit.finish */
+  color2?: Colour;
   /** tile size or board width, metres */
   scale?: number;
   /** boards run along 'x' or 'z' (default: the room's long axis) */
@@ -84,7 +86,8 @@ export interface ArchStairs {
   gap?: number;
   /** L / U: the second flight's plan run (default: the first's pro rata) */
   run2?: number;
-  treadWood?: 'oak' | 'terrazzo' | 'phthalo-terrazzo' | 'marble';
+  /** structure-build.ts builds it with the same am().floor({kind}) as a room floor, so the whole FloorKind palette applies */
+  treadWood?: FloorKind;
   riser?: 'open' | 'closed';
   /** colonial / closed: the stringer (and riser) colour */
   stringer?: Colour;
@@ -332,6 +335,8 @@ export interface FireplaceFeature {
   /** the heading the hearth faces into the room (rot 0 faces +Z) */
   rot?: number;
   style?: 'modern' | 'mantel' | 'stone' | 'painted-brick' | 'tv-breast';
+  /** the breast/mantel tone (features.ts: hearth() already reads it for every style; declared here to match) */
+  color?: Colour;
   w?: number;
   /** its stack up through the storeys and the roof (default true) */
   chimney?: Chimney | boolean;

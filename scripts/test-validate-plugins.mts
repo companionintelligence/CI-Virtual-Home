@@ -28,8 +28,11 @@ async function validatorWith(plugins: Record<string, string>): Promise<{ validat
   finally { setTimeout(() => fs.rmSync(dir, { recursive: true, force: true }), 0); }
 }
 
-const house = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'houses', 'aurora.json'), 'utf8'));
-const errorsOf = (v: any, spec: any) => v.validate(structuredClone(spec), 'aurora.json').errors as string[];
+// a fixture, not a real content house: every content/houses/*.json is meant to lean on stream vocabulary (S1-S6)
+// post pass-4, so a real house is no longer a stable "needs no plugin" baseline — this one is core-vocabulary only
+// (rect footprint, axis-aligned partitions, point-free roofs, a numeric shot duration) on purpose, and stays that way.
+const house = JSON.parse(fs.readFileSync(path.join(ROOT, 'test', 'fixtures', 'houses', 's2-arch-vanilla.json'), 'utf8'));
+const errorsOf = (v: any, spec: any) => v.validate(structuredClone(spec), 's2-arch-vanilla.json').errors as string[];
 // a level whose footprint is not a list of rects, a diagonal partition, a pent roof
 const polygon = structuredClone(house); polygon.levels[0].footprint = [{ poly: [[0, 0], [4, 0], [4, 3]] }];
 const angled = structuredClone(house); angled.levels[0].partitions = [...(angled.levels[0].partitions || []), { from: [1, 1], to: [3, 2.5] }];
@@ -37,7 +40,7 @@ const pent = structuredClone(house); pent.roofs = [...(pent.roofs || []), { over
 
 const none = await validatorWith({});
 check(!none.error && none.PLUGINS!.length === 0, 'the validator loads with no plugin', none.error);
-check(errorsOf(none, house).length === 0, 'aurora validates clean with none');
+check(errorsOf(none, house).length === 0, 's2-arch-vanilla validates clean with none');
 check(errorsOf(none, polygon).some(e => /footprint must be a non-empty array of rects/.test(e)), 'core: a polygon footprint is reported');
 check(errorsOf(none, angled).some(e => /partition must be axis-aligned/.test(e)), 'core: an angled partition is reported');
 check(errorsOf(none, pent).some(e => /pent/.test(e)), 'core: an unknown roof type is reported');
@@ -52,8 +55,8 @@ if (!ok.error) {
   check(!errorsOf(ok, polygon).some(e => /array of rects/.test(e)), 'replaced footprint-rects: a polygon footprint is not reported by the core');
   check(!errorsOf(ok, angled).some(e => /axis-aligned/.test(e)), 'replaced partition-axis-aligned: an angled partition is not reported');
   check(!errorsOf(ok, pent).some(e => /pent/.test(e)), 'extend.roofTypes: a pent roof is accepted');
-  check(errorsOf(ok, house).length === 0, 'aurora still validates clean');
-  const r = ok.validate(structuredClone(house), 'aurora.json');
+  check(errorsOf(ok, house).length === 0, 's2-arch-vanilla still validates clean');
+  const r = ok.validate(structuredClone(house), 's2-arch-vanilla.json');
   check(r.warnings.some((w: string) => /probe ran; replaced: footprint-rects,partition-axis-aligned \[probe:probe\]/.test(w)), 'ctx.replaced tells a plugin what the core skips', r.warnings.join('\n'));
 }
 

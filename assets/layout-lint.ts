@@ -307,10 +307,17 @@ function widest(spec: any, lv: any, from: [number, number], to: [number, number]
   for (const p of lv.partitions || []) {
     if (!Array.isArray(p.from) || !Array.isArray(p.to)) continue;
     const px = Math.abs(p.from[1] - p.to[1]) < 1e-6, ln = px ? p.from[1] : p.from[0], lo = px ? Math.min(p.from[0], p.to[0]) : Math.min(p.from[1], p.to[1]), hi = px ? Math.max(p.from[0], p.to[0]) : Math.max(p.from[1], p.to[1]);
-    const dir = px ? Math.sign(p.to[0] - p.from[0]) || 1 : Math.sign(p.to[1] - p.from[1]) || 1, dc = p.door == null ? null : (px ? p.from[0] : p.from[1]) + dir * p.door, dw = (p.doorW || 0.9) / 2;
-    const segs: Array<[number, number]> = dc === null ? [[lo, hi]] : [[lo, dc - dw], [dc + dw, hi]];
+    const dir = px ? Math.sign(p.to[0] - p.from[0]) || 1 : Math.sign(p.to[1] - p.from[1]) || 1, base = px ? p.from[0] : p.from[1];
+    // a single door (`door` / `doorW`), and/or more than one doorway (`doors[]`) — both are real gaps in the wall
+    const gaps: Array<[number, number]> = [
+      ...(p.door == null ? [] : [[base + dir * p.door - (p.doorW || 0.9) / 2, base + dir * p.door + (p.doorW || 0.9) / 2] as [number, number]]),
+      ...(Array.isArray(p.doors) ? p.doors.map((d: any) => { const dc = base + dir * d.at, dw = (d.w || 0.9) / 2; return [dc - dw, dc + dw] as [number, number]; }) : []),
+    ].sort((a, b) => a[0] - b[0]);
+    let cursor = lo; const segs: Array<[number, number]> = [];
+    for (const [g0, g1] of gaps) { if (g0 > cursor) segs.push([cursor, g0]); cursor = Math.max(cursor, g1); }
+    if (cursor < hi) segs.push([cursor, hi]);
     for (const [a, b] of segs) if (b - a > 0.02) mark(px ? rectObb(a, ln - 0.07, b, ln + 0.07) : rectObb(ln - 0.07, a, ln + 0.07, b));
-    if (dc !== null) mark(px ? obb(dc, ln, 2 * dw + 1.2, 1.4, 0) : obb(ln, dc, 1.4, 2 * dw + 1.2, 0), 1, doorway);
+    for (const [g0, g1] of gaps) { const dc = (g0 + g1) / 2, dw = (g1 - g0) / 2; mark(px ? obb(dc, ln, 2 * dw + 1.2, 1.4, 0) : obb(ln, dc, 1.4, 2 * dw + 1.2, 0), 1, doorway); }
   }
   { const sg = stairSolids(spec, lv); for (const o of [...sg.obstacles, ...sg.holes]) mark(o); }
   for (const v of lv.voids || []) mark(rectObb(v.x, v.z, v.x + v.w, v.z + v.d));

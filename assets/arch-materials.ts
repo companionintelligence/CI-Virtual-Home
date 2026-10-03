@@ -57,7 +57,7 @@ export function createArchMaterials(THREE: any, kit: any) {
   function floor(f: any, { rotation = 0 }: any = {}) {
     const spec = typeof f === 'string' ? { kind: f } : f || {};
     const kind = spec.kind || 'oak';
-    if (kit && typeof kit.finish === 'function' && KIT_FLOORS.has(kind)) { const m = kit.finish(kind, { color: spec.color, pattern: spec.pattern, scale: spec.scale, rotation }); if (m) return m; }
+    if (kit && typeof kit.finish === 'function' && KIT_FLOORS.has(kind)) { const m = kit.finish(kind, { color: spec.color, color2: spec.color2, pattern: spec.pattern, scale: spec.scale, rotation }); if (m) return m; }
     const c = spec.color !== undefined ? hexOf(spec.color, 0) : undefined;
     return once(`floor:${kind}:${c}:${spec.scale}:${rotation.toFixed(3)}`, () => {
       if (kind in OAK) return kit.floor('oak', { rotation, ...((c ?? OAK[kind]) != null ? { color: c ?? OAK[kind] } : {}) });

@@ -58,8 +58,14 @@ const STUB = {
 const meanOf = (img: any): number => { const d = img.data; let r = 0, g = 0, b = 0; const n = d.length / 4; for (let i = 0; i < d.length; i += 4) { r += d[i]; g += d[i + 1]; b += d[i + 2]; } return (Math.round(r / n) << 16) | (Math.round(g / n) << 8) | Math.round(b / n); };
 const kitFor = (spec: any) => createMaterialKit({ THREE: STUB, palette: kitPalette(spec), seed: spec.id, defaults: spec.defaults === 2 ? 2 : 1, keep: (spec.palette && spec.palette.keep) || [], roofPull: !(spec.palette && spec.palette.roofPull === false), roofColors: (spec.roofs || []).filter(r => r.color).map(r => hex(r.color)) } as any);
 
-test('restraint: no palette.restraint / keep is today\'s palette, byte for byte, on all 30 houses', () => {
-  for (const s of fleet) assert.deepEqual(kitPalette(s), restrainPalette({ ...BASE_PALETTE, ...(s.palette || {}) }), s.id);
+test('restraint: no palette.restraint / keep is today\'s palette, byte for byte (defaults 1, and defaults 2 before it opts any house out)', () => {
+  // layout pass 4/5 had every one of the 30 real houses adopt defaults 2 and/or palette.keep (brief: "switch
+  // defaults: 2 on in every home" and "use palette.keep / palette.restraint where the photo's signature colour
+  // needs to survive"), so a real content house is no longer a stable "no override" fixture — a synthetic spec
+  // is, for both the old default (defaults 1, restraint 1) and the new one before any house opts a role out of it.
+  for (const s of [{ id: 'x', palette: { wall: '#0ea5e9', roof: '#c2410c', interior: '#f1efea', material: 'stucco' } },
+                    { id: 'x', defaults: 2, palette: { wall: '#0ea5e9', roof: '#c2410c', interior: '#f1efea', material: 'stucco', restraint: 1 } }])
+    assert.deepEqual(kitPalette(s), restrainPalette({ ...BASE_PALETTE, ...s.palette }), JSON.stringify(s));
 });
 
 test('restraint 0..1 moves each role from its authored colour to today\'s restrained one', () => {
@@ -81,16 +87,20 @@ test('restraint under defaults 2 defaults to D2_RESTRAINT: a cobalt keeps most o
   assert.ok(sat(p2.wall) > sat(p1.wall) + 0.15, `${p1.wall} (${sat(p1.wall).toFixed(2)}) → ${p2.wall} (${sat(p2.wall).toFixed(2)})`);
   assert.ok(sat(p2.wall) < sat(pk.wall), 'a neon wall is still tamed a little without keep');
   assert.equal(pk.wall, '#1a86e8');
-  // the whole fleet under defaults 2: never less saturated than restraint 1 gives, and the houses that lost > 0.05 of their
-  // wall's saturation to it (12 of 30) get most of it back
-  let regained = 0;
+  // the whole fleet under defaults 2: never less saturated than restraint 1 gives. Layout pass 4/5 had most homes
+  // (brief: "use palette.keep … where the photo's signature colour needs to survive") keep wall outright, so they
+  // never lose anything to restrain in the first place — regain only applies to the houses that still leave wall to
+  // the kit's own maths, and it still has to hold for whichever of those remain.
+  let candidates = 0, regained = 0;
   for (const s of fleet) {
+    if (Array.isArray(s.palette && s.palette.keep) && s.palette.keep.includes('wall')) continue;
+    candidates++;
     const at = (p: any) => sat(kitPalette({ ...s, defaults: 2, palette: { ...(s.palette || {}), ...p } }).wall);
     const full = at({ restraint: 1 }), dflt = kitPalette({ ...s, defaults: 2 }).wall;
     assert.ok(sat(dflt) >= full - 1e-9, s.id);
     if (sat(dflt) - full > 0.05) regained++;
   }
-  assert.ok(regained >= 8, `${regained} houses regain more than 0.05 of wall saturation`);
+  assert.ok(regained >= 1, `${regained} of ${candidates} non-keep houses regain more than 0.05 of wall saturation`);
   // and a defaults-1 house is untouched (today's palette, byte for byte: the first test)
 });
 
@@ -268,7 +278,9 @@ test('validator: door ids are strings, once — a repeated one warns kit:duplica
 });
 
 test('light: defaults 1 keeps the preset\'s swing; sunBearing is a compass bearing; defaults 2 spreads the fleet\'s suns', () => {
-  for (const s of fleet) assert.equal(lightingOf(s).swing, TIME_OF_DAY[lightingOf(s).preset].sun.swing, s.id);
+  // "defaults 1" by name: every real house now opts into defaults 2 (brief: "switch it on in every home"), so force
+  // defaults 1 explicitly rather than trust a fleet house's own field to still say so.
+  for (const s of fleet) { const s1 = { ...s, defaults: 1 }; assert.equal(lightingOf(s1).swing, TIME_OF_DAY[lightingOf(s1).preset].sun.swing, s.id); }
   const L = lightingOf({ id: 'b', lighting: { preset: 'golden', sunBearing: 225 } });
   assert.equal(L.preset, 'golden'); assert.equal(sunBearingOf(L, [0, 1]), 225);
   // the page's sun for bearing 225 (south-west) from a south entry: +z (south) and −x (west)
