@@ -4,118 +4,297 @@
   "name": "Base Game Modern House 1",
   "author": "SimsWithNora",
   "source": "SimsTree slide 30",
-  "style": "Two-storey modern: a dark-timber flat-roofed box under a floating two-band lid, carried on white and striped piers, stands forward of a white, steep street gable with a projecting open rake; a stair slot window, a glazed entry pair, a two-pane bay; gravel forecourt, deck with a rill and ball shrubs, a basin by the drive",
+  "style": "Two-storey modern: a dark-timber flat-roofed box under a floating two-band lid, white and striped piers, a French entry on a tiled porch and a glazed bay with slat fins, stands forward of a white double-gable wing whose front gable is an open frame; gravel forecourt, a timber deck wrapped by a reflecting rill, a koi fountain by the drive",
   "emoji": "🏡",
+  "defaults": 2,
+  "styleKey": "mid-century",
   "lot": {
     "w": 28,
-    "d": 24,
-    "ground": "lawn"
+    "d": 22,
+    "ground": "lawn",
+    "context": "waterfront",
+    "setback": 7,
+    "water": {
+      "kind": "lake",
+      "sides": [
+        "N"
+      ],
+      "farBank": "houses",
+      "edge": "bank"
+    }
   },
   "palette": {
-    "wall": "#2e2420",
+    "wall": "#3a2c26",
     "trim": "#161412",
     "roof": "#262626",
     "accent": "#2e6546",
-    "material": "siding"
+    "material": "timber",
+    "door": "#f1f1ee",
+    "restraint": 0.4,
+    "keep": [
+      "wall",
+      "accent",
+      "trim"
+    ]
   },
-  "lighting": "day",
+  "lighting": {
+    "preset": "day",
+    "sunBearing": 215
+  },
   "levels": [
     {
       "id": "l1",
       "name": "Ground Floor",
       "sheet": "A-101",
-      "y": 0,
-      "height": 3.0,
+      "y": 0.3,
+      "height": 2.9,
       "floor": "oak",
-      "interior": "#efe9df",
+      "interior": "#e8e0d0",
       "trimColor": "#f1f1ee",
+      "plinth": {
+        "h": 0.3,
+        "material": "concrete",
+        "color": "#2a2624"
+      },
       "footprint": [
         {
           "x": -1.5,
           "z": -5,
-          "w": 10,
-          "d": 8
+          "w": 1,
+          "d": 8,
+          "material": "siding",
+          "color": "#3a2c26"
+        },
+        {
+          "x": -0.9,
+          "z": -5,
+          "w": 3.7,
+          "d": 7.2,
+          "material": "siding",
+          "color": "#3a2c26"
+        },
+        {
+          "x": 2.4,
+          "z": -5,
+          "w": 6.1,
+          "d": 8,
+          "material": "siding",
+          "color": "#3a2c26"
+        },
+        {
+          "x": -5.5,
+          "z": -8,
+          "w": 7,
+          "d": 8,
+          "material": "siding",
+          "color": "#e6eaec"
+        },
+        {
+          "x": -5.5,
+          "z": 0,
+          "w": 1.8,
+          "d": 1.4,
+          "material": "siding",
+          "color": "#e6eaec"
         },
         {
           "x": -8,
-          "z": -5,
-          "w": 6.5,
-          "d": 5
+          "z": -1,
+          "w": 2,
+          "d": 1.6,
+          "h": 5.4,
+          "material": "siding",
+          "color": "#e6eaec"
+        },
+        {
+          "x": -1.5,
+          "z": 3,
+          "w": 0.5,
+          "d": 0.55,
+          "h": 5.7,
+          "material": "siding",
+          "color": "#eeeeea"
+        },
+        {
+          "x": 2.45,
+          "z": 3,
+          "w": 0.45,
+          "d": 0.45,
+          "h": 5.7,
+          "material": "timber",
+          "color": "#8a8580"
+        },
+        {
+          "x": 2.9,
+          "z": 3,
+          "w": 0.12,
+          "d": 0.45,
+          "h": 5.7,
+          "material": "timber",
+          "color": "#15130f"
+        },
+        {
+          "x": 6.3,
+          "z": 3,
+          "w": 0.45,
+          "d": 0.5,
+          "h": 5.7,
+          "material": "siding",
+          "color": "#eeeeea"
+        },
+        {
+          "x": 6.75,
+          "z": 3,
+          "w": 0.3,
+          "d": 0.5,
+          "h": 5.7,
+          "material": "timber",
+          "color": "#15130f"
+        },
+        {
+          "x": 7.05,
+          "z": 3,
+          "w": 0.5,
+          "d": 0.5,
+          "h": 5.7,
+          "material": "timber",
+          "color": "#8a8580"
+        },
+        {
+          "x": 7.55,
+          "z": 3,
+          "w": 0.3,
+          "d": 0.5,
+          "h": 5.7,
+          "material": "timber",
+          "color": "#15130f"
+        },
+        {
+          "x": 7.85,
+          "z": 3,
+          "w": 0.65,
+          "d": 0.5,
+          "h": 5.7,
+          "material": "siding",
+          "color": "#eeeeea"
         }
       ],
       "openings": [
         {
           "side": "S",
-          "at": -0.55,
-          "type": "window",
-          "w": 0.8,
-          "h": 0.42,
-          "sill": 1.5
-        },
-        {
-          "side": "S",
-          "at": 1.2,
-          "type": "slider",
-          "w": 1.6,
-          "h": 2.4
-        },
-        {
-          "side": "S",
-          "at": 3.75,
-          "type": "glass",
-          "w": 0.9
-        },
-        {
-          "side": "S",
-          "at": 5.85,
-          "type": "glass",
-          "w": 0.9
-        },
-        {
-          "side": "S",
-          "at": -2.6,
-          "type": "slider",
-          "w": 1.6,
-          "h": 2.6
-        },
-        {
-          "side": "N",
-          "at": 0.55,
-          "type": "slider",
+          "at": 1.45,
+          "type": "door",
           "w": 1.4,
-          "h": 2.3
+          "h": 2.2,
+          "style": "entry",
+          "leaf": "french",
+          "frame": "#f1f1ee",
+          "id": "front"
         },
         {
-          "side": "N",
-          "at": 5.45,
-          "type": "window",
-          "w": 1.6,
-          "h": 1.85,
-          "sill": 1.1
-        },
-        {
-          "side": "N",
-          "at": -7.0,
-          "type": "window",
-          "w": 1.0,
-          "h": 1.85,
-          "sill": 0.6
-        },
-        {
-          "side": "E",
-          "at": 1.2,
-          "type": "window",
-          "w": 1.6,
-          "h": 1.85,
-          "sill": 0.55
-        },
-        {
-          "side": "E",
-          "at": -3.3,
+          "side": "S",
+          "at": 3.65,
           "type": "window",
           "w": 0.8,
-          "h": 0.9,
-          "sill": 1.15
+          "h": 1.85,
+          "sill": 0.35,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "S",
+          "at": 5.5,
+          "type": "window",
+          "w": 0.8,
+          "h": 1.85,
+          "sill": 0.35,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "S",
+          "at": -2.45,
+          "type": "door",
+          "w": 1.1,
+          "h": 2.6,
+          "leaf": "french",
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "N",
+          "at": -3.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.4,
+          "sill": 0.9,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "N",
+          "at": 0,
+          "type": "slider",
+          "w": 1.6,
+          "h": 2.3,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "N",
+          "at": 4.6,
+          "type": "window",
+          "w": 1.6,
+          "h": 1,
+          "sill": 1,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "N",
+          "at": 7.3,
+          "type": "slider",
+          "w": 1.5,
+          "h": 2.3,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "E",
+          "at": -3,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.2,
+          "sill": 0.95,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "E",
+          "at": 1.6,
+          "type": "glass",
+          "w": 2.4,
+          "h": 2.6,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "E",
+          "at": -6.5,
+          "type": "window",
+          "w": 1,
+          "h": 1.4,
+          "sill": 0.9,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "W",
+          "at": -2.3,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.85,
+          "sill": 0.5,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "W",
+          "at": -6.2,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.85,
+          "sill": 0.5,
+          "frame": "#f1f1ee"
         }
       ],
       "partitions": [
@@ -126,7 +305,7 @@
           ],
           "to": [
             -0.2,
-            1.3
+            1
           ],
           "door": null,
           "color": "#7a4530"
@@ -140,11 +319,24 @@
             -0.2,
             -1.5
           ],
-          "door": null
+          "door": null,
+          "height": 2.3
         },
         {
           "from": [
-            1.4,
+            -0.2,
+            -1.5
+          ],
+          "to": [
+            1.5,
+            -1.5
+          ],
+          "door": 0.85,
+          "doorW": 1.4
+        },
+        {
+          "from": [
+            1.5,
             -1.5
           ],
           "to": [
@@ -152,500 +344,524 @@
             -1.5
           ],
           "door": null,
-          "color": "#34503f"
+          "color": "#34503f",
+          "doors": [
+            {
+              "at": 5.9,
+              "w": 1.2
+            }
+          ]
         },
         {
           "from": [
-            1.4,
+            1.5,
             -5
           ],
           "to": [
-            1.4,
+            1.5,
             -1.5
           ],
-          "door": 1.8,
+          "door": 1.75,
           "doorW": 1.2
         },
         {
           "from": [
             -1.5,
-            -5
+            -4.5
           ],
           "to": [
             -1.5,
             0
           ],
-          "door": 2.7,
-          "doorW": 1.2
+          "door": 1.3,
+          "doorW": 1,
+          "doorColor": "#f1f1ee"
         },
         {
           "from": [
-            -8.24,
-            0.16
+            -5.5,
+            -4.5
           ],
           "to": [
-            -3.45,
-            0.16
+            -1.5,
+            -4.5
           ],
           "door": null,
-          "height": 5.8,
-          "color": "#f8fafc"
+          "doors": [
+            {
+              "at": 2,
+              "w": 1.6
+            }
+          ]
+        },
+        {
+          "from": [
+            -5.5,
+            0
+          ],
+          "to": [
+            -3.7,
+            0
+          ],
+          "door": 0.7,
+          "doorW": 0.8,
+          "doorColor": "#f1f1ee"
+        },
+        {
+          "from": [
+            -1.5,
+            -8
+          ],
+          "to": [
+            -1.5,
+            -4.5
+          ],
+          "door": 1.7,
+          "doorW": 1,
+          "doorColor": "#f1f1ee"
         }
       ],
       "stairs": {
-        "type": "colonial",
+        "type": "timber",
         "at": [
           -0.85,
-          2.3
+          1.6
         ],
         "rot": 180,
         "to": "l2",
-        "w": 1.0
+        "w": 1,
+        "run": 3.1,
+        "riser": "closed",
+        "stringer": "#f1f1ee",
+        "autoVoid": true
       },
       "rooms": [
         {
           "no": "01",
-          "name": "Library Lounge",
+          "name": "Entry Gallery",
           "bounds": {
             "x": -0.2,
             "z": -1.5,
-            "w": 8.7,
-            "d": 4.5
+            "w": 2.6,
+            "d": 3.7
+          },
+          "program": "foyer",
+          "lock": true,
+          "floor": {
+            "kind": "honey-oak",
+            "color": "#b57a43"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#e3d9c6",
+            "feature": {
+              "partition": 0,
+              "kind": "brick",
+              "color": "#5a3424"
+            }
           },
           "items": [
             {
-              "type": "storage-bench",
+              "type": "gallery-wall",
               "at": [
-                0.07,
-                -0.3
+                -0.12,
+                -0.15
               ],
               "rot": 90,
-              "w": 1.6,
+              "w": 2,
+              "h": 1,
+              "y": 1.9,
+              "frame": "#e6dcc4",
+              "motifs": [
+                "map",
+                "line",
+                "map",
+                "line",
+                "map"
+              ],
+              "color": "#eadfc4"
+            },
+            {
+              "type": "storage-bench",
+              "at": [
+                0.08,
+                -0.15
+              ],
+              "rot": 90,
+              "w": 1.7,
               "color": "#e6e2da"
             },
             {
-              "type": "wall-art",
+              "type": "tripod-floor-lamp",
               "at": [
-                -0.13,
-                -1.0
-              ],
-              "rot": 90,
-              "w": 0.42,
-              "h": 0.55,
-              "y": 1.95,
-              "motif": 2,
-              "color": "#e6dcc4"
+                2.05,
+                -1.15
+              ]
             },
             {
-              "type": "wall-art",
+              "type": "runner-rug",
               "at": [
-                -0.13,
-                -0.3
+                1.45,
+                0.9
               ],
-              "rot": 90,
-              "w": 0.55,
-              "h": 0.7,
-              "y": 1.8,
-              "motif": 0,
-              "color": "#e6dcc4"
-            },
+              "w": 0.9,
+              "d": 2.4,
+              "color": "#2e6546"
+            }
+          ],
+          "fixtures": {
+            "fan": false
+          }
+        },
+        {
+          "no": "02",
+          "name": "Library Lounge",
+          "bounds": {
+            "x": 2.4,
+            "z": -1.5,
+            "w": 6.1,
+            "d": 4.5
+          },
+          "program": "living",
+          "lock": true,
+          "floor": {
+            "kind": "honey-oak",
+            "color": "#b57a43"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#e3d9c6",
+            "feature": {
+              "side": "N",
+              "kind": "paint",
+              "color": "#34503f"
+            }
+          },
+          "fixtures": {
+            "fan": false,
+            "ceiling": "flush"
+          },
+          "items": [
             {
-              "type": "wall-art",
+              "type": "chesterfield-sofa",
               "at": [
-                -0.13,
-                0.4
+                7.62,
+                1.2
               ],
-              "rot": 90,
-              "w": 0.42,
-              "h": 0.55,
-              "y": 1.95,
-              "motif": 1,
-              "color": "#e6dcc4"
-            },
-            {
-              "type": "wall-art",
-              "at": [
-                -0.13,
-                -1.0
-              ],
-              "rot": 90,
-              "w": 0.42,
-              "h": 0.42,
-              "y": 1.35,
-              "motif": 1,
-              "color": "#e6dcc4"
-            },
-            {
-              "type": "wall-art",
-              "at": [
-                -0.13,
-                0.4
-              ],
-              "rot": 90,
-              "w": 0.3,
-              "h": 0.3,
-              "y": 1.42,
-              "motif": 0,
-              "color": "#e6dcc4"
-            },
-            {
-              "type": "loveseat",
-              "at": [
-                1.85,
-                -0.1
-              ],
-              "rot": 90,
+              "rot": 270,
               "w": 2.4,
-              "d": 0.9,
               "color": "#c9a57a"
             },
             {
               "type": "cushion-set",
               "at": [
-                1.62,
-                -0.1
+                7.72,
+                0.6
               ],
-              "rot": 90,
-              "w": 1.4,
+              "rot": 270,
+              "w": 0.9,
               "y": 0.44,
               "color": "#2e6546"
             },
             {
-              "type": "area-rug",
+              "type": "cushion-set",
               "at": [
-                3.0,
-                -0.1
+                7.72,
+                1.85
+              ],
+              "rot": 270,
+              "w": 0.9,
+              "y": 0.44,
+              "color": "#5a3020"
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                5.55,
+                2.6
+              ],
+              "rot": 180,
+              "color": "#c9a57a"
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                3.5,
+                1.5
+              ],
+              "rot": 90,
+              "color": "#c9a57a"
+            },
+            {
+              "type": "round-coffee-table",
+              "at": [
+                5.55,
+                1.25
+              ],
+              "r": 0.48,
+              "color": "#9fb7b5"
+            },
+            {
+              "type": "patterned-rug",
+              "at": [
+                5.55,
+                1.3
               ],
               "w": 3.4,
               "d": 2.6,
-              "color": "#615847"
+              "pattern": "abstract",
+              "color": "#7b7561"
             },
             {
-              "type": "coffee-table",
+              "type": "open-shelving",
               "at": [
                 3.05,
-                -0.1
+                -1.3
               ],
-              "rot": 90
-            },
-            {
-              "type": "column",
-              "at": [
-                2.8,
-                3.55
-              ],
-              "style": "modern",
-              "size": 0.5,
-              "h": 5.8,
-              "color": "#8a8580"
-            },
-            {
-              "type": "column",
-              "at": [
-                6.85,
-                3.55
-              ],
-              "style": "modern",
-              "size": 0.5,
-              "h": 5.8,
-              "color": "#eeeeea"
-            },
-            {
-              "type": "column",
-              "at": [
-                7.3,
-                3.55
-              ],
-              "style": "modern",
-              "size": 0.34,
-              "h": 5.8,
-              "color": "#1b1a19"
-            },
-            {
-              "type": "column",
-              "at": [
-                7.8,
-                3.55
-              ],
-              "style": "modern",
-              "size": 0.54,
-              "h": 5.8,
-              "color": "#8a8580"
-            },
-            {
-              "type": "column",
-              "at": [
-                8.3,
-                3.55
-              ],
-              "style": "modern",
-              "size": 0.4,
-              "h": 5.8,
-              "color": "#eeeeea"
-            },
-            {
-              "type": "open-shelving",
-              "at": [
-                3.35,
-                -1.255
-              ],
-              "w": 0.8,
-              "h": 2.0,
+              "w": 0.9,
+              "h": 2.1,
               "d": 0.35,
               "color": "#4f2f1f"
             },
             {
               "type": "open-shelving",
               "at": [
-                5.85,
-                -1.255
+                5.95,
+                -1.3
               ],
-              "w": 0.8,
-              "h": 2.0,
+              "w": 0.9,
+              "h": 2.1,
               "d": 0.35,
-              "color": "#4f2f1f"
-            },
-            {
-              "type": "console-table",
-              "at": [
-                4.6,
-                -1.255
-              ],
-              "w": 1.3,
               "color": "#4f2f1f"
             },
             {
               "type": "wall-art",
               "at": [
-                4.6,
+                4.5,
                 -1.43
               ],
-              "w": 1.7,
+              "w": 1.6,
               "h": 0.85,
               "y": 1.85,
-              "motif": 1,
-              "color": "#dfe3e2"
+              "motif": "landscape",
+              "frame": "#4f2f1f"
             },
             {
-              "type": "vase",
+              "type": "flower-jug",
               "at": [
-                5.1,
-                -1.3
+                4.05,
+                -1.2
               ],
-              "y": 0.86,
-              "color": "#e0c35a"
-            },
-            {
-              "type": "tripod-floor-lamp",
-              "at": [
-                2.65,
-                -1.18
-              ]
-            },
-            {
-              "type": "wingback-armchair",
-              "at": [
-                5.65,
-                0.15
-              ],
-              "rot": 285,
-              "color": "#c9a57a"
-            },
-            {
-              "type": "wingback-armchair",
-              "at": [
-                7.7,
-                1.25
-              ],
-              "rot": 270,
-              "color": "#c9a57a"
-            },
-            {
-              "type": "side-table",
-              "at": [
-                7.95,
-                2.3
-              ]
+              "y": 0.8,
+              "color": "#efe9dc"
             },
             {
               "type": "book-stack",
               "at": [
-                7.95,
-                2.3
+                4.38,
+                -1.2
+              ],
+              "y": 0.8,
+              "n": 3,
+              "color": "#4f6b52"
+            },
+            {
+              "type": "side-table",
+              "at": [
+                7.3,
+                2.75
+              ]
+            },
+            {
+              "type": "globe-lamp",
+              "at": [
+                7.3,
+                2.75
               ],
               "y": 0.55
             },
             {
-              "type": "floor-lamp",
-              "at": [
-                8.1,
-                0.35
-              ]
-            },
-            {
               "type": "olive-tree-pot",
               "at": [
-                7.85,
-                -0.9
+                8.2,
+                -1.15
               ]
             },
             {
-              "type": "ceiling-light",
+              "type": "rubber-plant",
               "at": [
-                1.4,
-                0.5
-              ],
-              "w": 0.45
+                8.2,
+                2.8
+              ]
             },
             {
-              "type": "ceiling-light",
+              "type": "floor-lamp",
               "at": [
-                2.7,
-                0.9
+                7.3,
+                -0.5
               ],
-              "w": 0.45
-            },
-            {
-              "type": "ceiling-light",
-              "at": [
-                4.3,
-                0.3
-              ],
-              "w": 0.45
-            },
-            {
-              "type": "ceiling-light",
-              "at": [
-                6.2,
-                0.6
-              ],
-              "w": 0.45
-            }
-          ]
-        },
-        {
-          "no": "02",
-          "name": "Stair Hall",
-          "bounds": {
-            "x": -1.5,
-            "z": -1.5,
-            "w": 1.3,
-            "d": 4.5
-          },
-          "items": [
-            {
-              "type": "wall-sconce",
-              "at": [
-                -0.27,
-                0.9
-              ],
-              "rot": 270,
-              "y": 2.0
-            },
-            {
-              "type": "column",
-              "at": [
-                -1.25,
-                3.55
-              ],
-              "style": "modern",
-              "size": 0.5,
-              "h": 5.8,
-              "color": "#eeeeea"
-            },
-            {
-              "type": "mailbox",
-              "at": [
-                -2.0,
-                3.3
-              ],
-              "rot": 0,
-              "color": "#f2f2ee"
+              "rot": 0
             }
           ]
         },
         {
           "no": "03",
-          "name": "Rear Hall",
+          "name": "Stair Hall",
           "bounds": {
             "x": -1.5,
-            "z": -5,
-            "w": 2.9,
-            "d": 3.5
+            "z": -1.5,
+            "w": 1.3,
+            "d": 3.7
+          },
+          "program": "hall",
+          "lock": true,
+          "floor": {
+            "kind": "honey-oak",
+            "color": "#b57a43"
+          },
+          "walls": {
+            "kind": "brick",
+            "color": "#a85d3d"
           },
           "items": [
             {
-              "type": "runner-rug",
-              "at": [
-                0.55,
-                -3.3
-              ],
-              "w": 0.9,
-              "d": 2.6,
-              "color": "#2e6546"
-            },
-            {
               "type": "wall-sconce",
               "at": [
-                -1.43,
-                -4.2
+                -1.4,
+                1.9
               ],
               "rot": 90,
-              "y": 1.6
-            },
+              "y": 2
+            }
+          ],
+          "fixtures": {
+            "fan": false
+          }
+        },
+        {
+          "no": "04",
+          "name": "Rear Hall",
+          "bounds": {
+            "x": -1.5,
+            "z": -8,
+            "w": 3,
+            "d": 6.5
+          },
+          "program": "foyer",
+          "palette": {
+            "fabric": "#d8cdb5",
+            "wood": "#7b512f",
+            "accent": "#2e6546"
+          },
+          "floor": {
+            "kind": "tile",
+            "color": "#e9e9e4",
+            "pattern": "square",
+            "scale": 0.6
+          },
+          "walls": {
+            "kind": "tile",
+            "color": "#eeeeea"
+          },
+          "items": [
             {
-              "type": "wall-sconce",
+              "type": "console-table",
               "at": [
-                1.33,
-                -4.3
+                1.23,
+                -6.22
               ],
               "rot": 270,
-              "y": 1.6
+              "color": "#7b512f",
+              "src": "compose@1"
             },
             {
-              "type": "storage-bench",
+              "type": "column-lamp",
               "at": [
-                -1.28,
-                -3.8
+                1.23,
+                -6.22
               ],
-              "rot": 90,
-              "w": 1.0,
-              "color": "#e6e2da"
+              "rot": 270,
+              "color": "#d8cdb5",
+              "y": 0.8,
+              "src": "compose@1"
+            },
+            {
+              "type": "sculpture",
+              "at": [
+                1.23,
+                -6.52
+              ],
+              "rot": 270,
+              "color": "#d8cdb5",
+              "y": 0.8,
+              "src": "compose@1"
+            },
+            {
+              "type": "runner-rug",
+              "at": [
+                0,
+                -4.7
+              ],
+              "w": 1,
+              "d": 3,
+              "color": "#2e6546",
+              "src": "compose@1"
             },
             {
               "type": "coat-rack",
               "at": [
-                -1.15,
-                -4.6
-              ]
+                1.164,
+                -4.2
+              ],
+              "rot": 270,
+              "color": "#7b512f",
+              "src": "compose@1"
             },
             {
-              "type": "snake-plant",
+              "type": "tall-cactus",
               "at": [
-                1.15,
-                -1.9
-              ]
+                1.185,
+                -7.735
+              ],
+              "color": "#2e6546",
+              "src": "compose@1"
             }
-          ]
+          ],
+          "fixtures": {
+            "fan": false
+          },
+          "lock": true
         },
         {
-          "no": "04",
+          "no": "05",
           "name": "Kitchen",
           "bounds": {
-            "x": 1.4,
+            "x": 1.5,
             "z": -5,
-            "w": 7.1,
+            "w": 7,
             "d": 3.5
+          },
+          "program": "kitchen",
+          "lock": true,
+          "floor": {
+            "kind": "tile",
+            "color": "#8b857a",
+            "scale": 0.6
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#ece6da"
           },
           "items": [
             {
               "type": "pantry",
               "at": [
-                1.95,
-                -4.61
+                2,
+                -4.64
               ],
               "w": 0.9,
-              "d": 0.62
+              "d": 0.62,
+              "color": "#4f2f1f"
             },
             {
               "type": "fridge",
@@ -657,1431 +873,380 @@
             {
               "type": "counter-run",
               "at": [
-                3.95,
-                -4.61
+                3.575,
+                -4.64
               ],
-              "w": 1.2,
-              "d": 0.62
-            },
-            {
-              "type": "upper-cabinets",
-              "at": [
-                3.95,
-                -4.92
-              ],
-              "w": 1.2,
-              "y": 1.5
+              "w": 0.45,
+              "d": 0.62,
+              "color": "#4f2f1f"
             },
             {
               "type": "sink-run",
               "at": [
-                5.45,
-                -4.61
+                4.6,
+                -4.64
               ],
-              "w": 1.8,
-              "d": 0.62
+              "w": 1.6,
+              "d": 0.62,
+              "color": "#4f2f1f"
             },
             {
               "type": "dishwasher",
               "at": [
-                6.65,
-                -4.61
+                5.7,
+                -4.64
               ]
             },
             {
               "type": "range",
               "at": [
-                7.25,
-                -4.6
+                6.3,
+                -4.62
               ]
             },
             {
               "type": "range-hood",
               "at": [
-                7.25,
-                -4.92
+                6.3,
+                -4.9
               ],
               "y": 1.55
             },
             {
-              "type": "counter-run",
+              "type": "upper-cabinets",
               "at": [
-                7.99,
-                -4.61
+                3.575,
+                -4.88
               ],
-              "w": 0.87,
-              "d": 0.62
+              "w": 0.45,
+              "y": 1.5,
+              "color": "#e9e6df"
             },
             {
               "type": "counter-run",
               "at": [
-                8.11,
-                -3.6
+                8.12,
+                -3
               ],
               "rot": 270,
-              "w": 1.4,
-              "d": 0.62
+              "w": 2,
+              "d": 0.62,
+              "color": "#4f2f1f"
             },
             {
-              "type": "breakfast-bar",
+              "type": "kitchen-island",
               "at": [
-                5.0,
-                -1.95
+                4.9,
+                -2.8
               ],
-              "rot": 180,
-              "w": 2.2
-            },
-            {
-              "type": "bar-stool",
-              "at": [
-                4.3,
-                -2.75
-              ],
-              "rot": 180
-            },
-            {
-              "type": "bar-stool",
-              "at": [
-                5.0,
-                -2.75
-              ],
-              "rot": 180
-            },
-            {
-              "type": "bar-stool",
-              "at": [
-                5.7,
-                -2.75
-              ],
-              "rot": 180
+              "w": 2.4,
+              "d": 0.9,
+              "stools": 3,
+              "color": "#e9e6df"
             },
             {
               "type": "runner-rug",
               "at": [
-                5.2,
-                -3.6
+                4.9,
+                -3.75
               ],
               "rot": 90,
               "w": 0.8,
-              "d": 3.0
+              "d": 3.2,
+              "color": "#8a7a5c"
+            },
+            {
+              "type": "herb-pots",
+              "at": [
+                3.575,
+                -4.7
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "fruit-bowl",
+              "at": [
+                4.9,
+                -2.8
+              ],
+              "y": 0.94
+            },
+            {
+              "type": "coffee-maker",
+              "at": [
+                8.12,
+                -3.9
+              ],
+              "y": 0.9
             }
-          ]
+          ],
+          "fixtures": {
+            "fan": false
+          }
         },
         {
-          "no": "05",
+          "no": "06",
           "name": "Dining Room",
           "bounds": {
-            "x": -8,
-            "z": -5,
-            "w": 6.5,
-            "d": 5
+            "x": -5.5,
+            "z": -4.5,
+            "w": 4,
+            "d": 4.5
+          },
+          "program": "dining",
+          "lock": true,
+          "floor": {
+            "kind": "herringbone",
+            "color": "#86552e"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#ece6da",
+            "feature": {
+              "partition": 5,
+              "kind": "brick",
+              "color": "#7a4530"
+            }
           },
           "items": [
             {
-              "type": "farmhouse-table",
-              "at": [
-                -4.9,
-                -2.5
-              ],
-              "w": 2.2,
-              "d": 1.0
-            },
-            {
-              "type": "dining-chair",
-              "at": [
-                -5.5,
-                -3.25
-              ],
-              "rot": 0
-            },
-            {
-              "type": "dining-chair",
-              "at": [
-                -4.3,
-                -3.25
-              ],
-              "rot": 0
-            },
-            {
-              "type": "dining-chair",
-              "at": [
-                -5.5,
-                -1.75
-              ],
-              "rot": 180
-            },
-            {
-              "type": "dining-chair",
-              "at": [
-                -4.3,
-                -1.75
-              ],
-              "rot": 180
-            },
-            {
-              "type": "dining-chair",
-              "at": [
-                -6.3,
-                -2.5
-              ],
-              "rot": 90
-            },
-            {
-              "type": "dining-chair",
-              "at": [
-                -3.5,
-                -2.5
-              ],
-              "rot": 270
-            },
-            {
-              "type": "sideboard",
-              "at": [
-                -4.9,
-                -4.67
-              ],
-              "w": 1.9
-            },
-            {
-              "type": "wall-art",
-              "at": [
-                -4.9,
-                -4.92
-              ],
-              "w": 1.2,
-              "h": 0.8,
-              "y": 1.65,
-              "motif": 2
-            },
-            {
-              "type": "indoor-palm",
-              "at": [
-                -2.3,
-                -4.35
-              ]
-            },
-            {
-              "type": "wine-rack",
-              "at": [
-                -1.73,
-                -3.7
-              ],
-              "rot": 270
-            },
-            {
-              "type": "snake-plant",
-              "at": [
-                -7.55,
-                -0.5
-              ]
-            },
-            {
-              "type": "column",
-              "at": [
-                -8.19,
-                0.3
-              ],
-              "style": "modern",
-              "size": 0.1,
-              "h": 5.8,
-              "color": "#161412"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.2,
-                0.3
-              ],
-              "style": "modern",
-              "size": 0.1,
-              "h": 5.8,
-              "color": "#161412"
-            },
-            {
-              "type": "column",
+              "type": "pedestal-dining-table",
               "at": [
                 -3.6,
-                0.3
+                -2.2
               ],
-              "style": "modern",
-              "size": 0.1,
-              "h": 5.8,
-              "color": "#161412"
+              "r": 0.7,
+              "color": "#7b512f"
             },
             {
-              "type": "low-wall",
+              "type": "bentwood-chair",
               "at": [
-                -8.16,
-                -2.39
+                -3.006,
+                -1.606
+              ],
+              "rot": 225,
+              "color": "#7b512f"
+            },
+            {
+              "type": "bentwood-chair",
+              "at": [
+                -2.789,
+                -2.417
+              ],
+              "rot": 285,
+              "color": "#7b512f"
+            },
+            {
+              "type": "bentwood-chair",
+              "at": [
+                -3.383,
+                -3.011
+              ],
+              "rot": 345,
+              "color": "#7b512f"
+            },
+            {
+              "type": "bentwood-chair",
+              "at": [
+                -4.194,
+                -2.794
+              ],
+              "rot": 45,
+              "color": "#7b512f"
+            },
+            {
+              "type": "bentwood-chair",
+              "at": [
+                -4.411,
+                -1.983
+              ],
+              "rot": 105,
+              "color": "#7b512f"
+            },
+            {
+              "type": "bentwood-chair",
+              "at": [
+                -3.817,
+                -1.389
+              ],
+              "rot": 165,
+              "color": "#7b512f"
+            },
+            {
+              "type": "patterned-rug",
+              "at": [
+                -3.6,
+                -2.2
+              ],
+              "w": 3,
+              "d": 3,
+              "shape": "round",
+              "pattern": "border",
+              "color": "#a98a5e"
+            },
+            {
+              "type": "pendant-lamp",
+              "at": [
+                -3.6,
+                -2.2
+              ],
+              "drop": 0.85
+            },
+            {
+              "type": "vase",
+              "at": [
+                -3.6,
+                -2.2
+              ],
+              "y": 0.76,
+              "color": "#7a4530"
+            },
+            {
+              "type": "ficus-tree",
+              "at": [
+                -5,
+                -4.1
+              ]
+            }
+          ],
+          "fixtures": {
+            "fan": false
+          }
+        },
+        {
+          "no": "07",
+          "name": "Garden Room",
+          "bounds": {
+            "x": -5.5,
+            "z": -8,
+            "w": 4,
+            "d": 3.5
+          },
+          "program": "sunroom",
+          "lock": true,
+          "floor": {
+            "kind": "terracotta"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#e8e4d6"
+          },
+          "items": [
+            {
+              "type": "chaise-lounge",
+              "at": [
+                -4.7,
+                -6.3
               ],
               "rot": 90,
-              "w": 5.22,
-              "h": 5.55,
-              "y": 0,
-              "color": "#f8fafc"
+              "color": "#c9bfa0"
             },
             {
-              "type": "column",
+              "type": "rattan-armchair",
               "at": [
-                -8.08,
-                0.15
+                -3,
+                -5.45
               ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.191,
-              "y": 5.74,
-              "color": "#f8fafc"
+              "rot": 200
             },
             {
-              "type": "column",
+              "type": "round-coffee-table",
               "at": [
-                -8.01,
-                0.15
+                -3.55,
+                -6.3
               ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.291,
-              "y": 5.74,
-              "color": "#f8fafc"
+              "r": 0.32,
+              "color": "#7b512f"
             },
             {
-              "type": "column",
+              "type": "patterned-rug",
               "at": [
-                -7.94,
-                0.15
+                -3.7,
+                -6.3
               ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.391,
-              "y": 5.74,
-              "color": "#f8fafc"
+              "w": 2.6,
+              "d": 2,
+              "pattern": "kilim",
+              "color": "#a98a5e"
             },
             {
-              "type": "column",
+              "type": "potting-bench",
               "at": [
-                -7.87,
-                0.15
+                -4.8,
+                -4.85
               ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.491,
-              "y": 5.74,
-              "color": "#f8fafc"
+              "rot": 180,
+              "w": 1.2
             },
             {
-              "type": "column",
+              "type": "bird-of-paradise",
               "at": [
-                -7.8,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.591,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.73,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.691,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.66,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.791,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.59,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.891,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.52,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.991,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.45,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.091,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.38,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.191,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.31,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.291,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.24,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.391,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.17,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.491,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.1,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.591,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -7.03,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.691,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.96,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.791,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.89,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.891,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.82,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.991,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.75,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.091,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.68,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.191,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.61,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.291,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.54,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.391,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.47,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.491,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.4,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.591,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.33,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.691,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.26,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.791,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.19,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.891,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.12,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.99,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -6.05,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.09,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.98,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.19,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.91,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.29,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.84,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.39,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.77,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.49,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.7,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.59,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.63,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.69,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.56,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.79,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.49,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.89,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.42,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.99,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.35,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.09,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.28,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.19,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.21,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.29,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.14,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.39,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.07,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.49,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -5.0,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.59,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.93,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.69,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.86,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.776,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.79,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.776,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.72,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.776,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.65,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.676,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.58,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.576,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.51,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.476,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.44,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.376,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.37,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.276,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.3,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.176,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.23,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 4.076,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.16,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.976,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.09,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.876,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -4.02,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.776,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.95,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.676,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.88,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.576,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.81,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.476,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.74,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.376,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.67,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.276,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.6,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.176,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.53,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 3.076,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.46,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.976,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.39,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.876,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.32,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.776,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.25,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.676,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.18,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.576,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -3.11,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.476,
-              "y": 5.74,
-              "color": "#f8fafc"
+                -5,
+                -7.55
+              ]
             },
             {
-              "type": "column",
+              "type": "monstera",
               "at": [
-                -3.04,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.376,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.97,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.276,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.9,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.177,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.83,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 2.077,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.76,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.977,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.69,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.877,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.62,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.777,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.55,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.677,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.48,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.577,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.41,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.477,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.34,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.377,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.27,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.277,
-              "y": 5.74,
-              "color": "#f8fafc"
+                -2.1,
+                -7.45
+              ]
             },
             {
-              "type": "column",
+              "type": "hanging-plant",
               "at": [
-                -2.2,
-                0.15
+                -3.5,
+                -7.6
               ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.177,
-              "y": 5.74,
-              "color": "#f8fafc"
+              "y": 1.7
             },
             {
-              "type": "column",
+              "type": "ponytail-palm",
               "at": [
-                -2.13,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 1.077,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -2.06,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.977,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -1.99,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.877,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -1.92,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.777,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -1.85,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.677,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -1.78,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.577,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -1.71,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.477,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -1.64,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.377,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -1.57,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.277,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "column",
-              "at": [
-                -1.5,
-                0.15
-              ],
-              "style": "modern",
-              "size": 0.07,
-              "h": 0.177,
-              "y": 5.74,
-              "color": "#f8fafc"
-            },
-            {
-              "type": "cushioned-bench",
-              "at": [
-                -5.3,
-                0.52
-              ],
-              "rot": 0,
-              "w": 1.5,
-              "y": 0.15,
-              "color": "#f1f1ee"
-            },
-            {
-              "type": "dining-chair",
-              "at": [
-                -3.75,
-                0.58
-              ],
-              "rot": 0,
-              "y": 0.15,
-              "color": "#f1f1ee"
+                -2,
+                -4.95
+              ]
             }
-          ]
+          ],
+          "fixtures": {
+            "fan": false
+          }
+        },
+        {
+          "no": "08",
+          "name": "Coat Closet",
+          "bounds": {
+            "x": -5.5,
+            "z": 0,
+            "w": 1.8,
+            "d": 1.4
+          },
+          "program": "hall",
+          "lock": true,
+          "floor": {
+            "kind": "oak"
+          },
+          "items": [
+            {
+              "type": "wall-hooks",
+              "at": [
+                -4.6,
+                0.12
+              ],
+              "w": 1.2,
+              "y": 1.7
+            },
+            {
+              "type": "shoe-rack",
+              "at": [
+                -4.6,
+                1.2
+              ]
+            }
+          ],
+          "fixtures": {
+            "fan": false
+          }
         }
       ]
     },
@@ -2089,110 +1254,166 @@
       "id": "l2",
       "name": "Upper Floor",
       "sheet": "A-102",
-      "y": 3.0,
+      "y": 3.2,
       "height": 2.8,
       "floor": "oak",
-      "interior": "#ddd0b8",
+      "interior": "#e6dcc8",
       "trimColor": "#f1f1ee",
       "footprint": [
         {
           "x": -1.5,
           "z": -5,
           "w": 10,
-          "d": 8
+          "d": 8,
+          "material": "siding",
+          "color": "#3a2c26"
         },
         {
-          "x": -8,
-          "z": -5,
-          "w": 6.5,
-          "d": 5
-        }
-      ],
-      "voids": [
+          "x": -5.5,
+          "z": -8,
+          "w": 7,
+          "d": 8,
+          "material": "siding",
+          "color": "#e6eaec"
+        },
         {
-          "x": -1.45,
-          "z": -1.12,
-          "w": 1.23,
-          "d": 4.02
+          "x": -5.5,
+          "z": 0,
+          "w": 1.8,
+          "d": 1.4,
+          "material": "siding",
+          "color": "#e6eaec"
         }
       ],
       "openings": [
         {
           "side": "S",
-          "at": -0.55,
+          "at": 3.65,
           "type": "window",
           "w": 0.8,
-          "h": 0.42,
-          "sill": 0.95
+          "h": 2.1,
+          "sill": 0.2,
+          "frame": "#f1f1ee"
         },
         {
           "side": "S",
-          "at": 3.75,
-          "type": "glass",
-          "w": 0.9
-        },
-        {
-          "side": "S",
-          "at": 5.85,
-          "type": "glass",
-          "w": 0.9
-        },
-        {
-          "side": "S",
-          "at": -2.6,
-          "type": "glass",
-          "w": 1.6
-        },
-        {
-          "side": "N",
-          "at": 0.8,
+          "at": 5.5,
           "type": "window",
-          "w": 1.4,
-          "h": 1.85,
-          "sill": 0.5
+          "w": 0.8,
+          "h": 2.1,
+          "sill": 0.2,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "S",
+          "at": -2.45,
+          "type": "window",
+          "w": 1.1,
+          "h": 2.3,
+          "sill": 0.25,
+          "frame": "#f1f1ee",
+          "blinds": {
+            "color": "#6b3f26",
+            "drop": 0.5
+          }
         },
         {
           "side": "N",
-          "at": 5.0,
+          "at": -3.5,
+          "type": "window",
+          "w": 1.2,
+          "h": 0.8,
+          "sill": 1.2,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "N",
+          "at": 5,
           "type": "window",
           "w": 1.6,
-          "h": 1.85,
-          "sill": 0.8
-        },
-        {
-          "side": "N",
-          "at": -6.4,
-          "type": "window",
-          "w": 1.4,
-          "h": 2.0,
-          "sill": 0.45
-        },
-        {
-          "side": "N",
-          "at": -2.9,
-          "type": "window",
-          "w": 0.6,
-          "h": 0.8,
-          "sill": 1.5
+          "h": 1.6,
+          "sill": 0.7,
+          "frame": "#f1f1ee"
         },
         {
           "side": "E",
-          "at": -3.0,
+          "at": -3,
           "type": "window",
-          "w": 1.4,
-          "h": 1.85,
-          "sill": 0.5
+          "w": 1.2,
+          "h": 1.6,
+          "sill": 0.6,
+          "frame": "#f1f1ee"
         },
         {
           "side": "E",
           "at": 1.8,
           "type": "window",
-          "w": 1.2,
-          "h": 1.85,
-          "sill": 0.5
+          "w": 1.4,
+          "h": 1.6,
+          "sill": 0.6,
+          "frame": "#f1f1ee"
+        },
+        {
+          "side": "W",
+          "at": -7.3,
+          "type": "window",
+          "w": 0.7,
+          "h": 0.8,
+          "sill": 1.3,
+          "frame": "#f1f1ee"
         }
       ],
       "partitions": [
+        {
+          "from": [
+            1.8,
+            -5
+          ],
+          "to": [
+            1.8,
+            -1.2
+          ],
+          "door": 2.5,
+          "doorW": 0.9,
+          "doorColor": "#f1f1ee"
+        },
+        {
+          "from": [
+            1.8,
+            -1.2
+          ],
+          "to": [
+            1.8,
+            3
+          ],
+          "door": 0.6,
+          "doorW": 0.9,
+          "doorColor": "#f1f1ee"
+        },
+        {
+          "from": [
+            1.8,
+            -1.2
+          ],
+          "to": [
+            8.5,
+            -1.2
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            -1.5,
+            0.5
+          ],
+          "to": [
+            1.8,
+            0.5
+          ],
+          "door": 2.1,
+          "doorW": 0.9,
+          "doorColor": "#f1f1ee"
+        },
         {
           "from": [
             -1.5,
@@ -2202,487 +1423,607 @@
             -1.5,
             0
           ],
-          "door": 3.1,
-          "doorW": 0.9
+          "door": 1.1,
+          "doorW": 0.9,
+          "doorColor": "#f1f1ee"
         },
         {
           "from": [
-            -0.2,
-            -1.1
-          ],
-          "to": [
-            2.0,
-            -1.1
-          ],
-          "door": 1.55,
-          "doorW": 0.8
-        },
-        {
-          "from": [
-            -0.2,
-            -1.1
-          ],
-          "to": [
-            -0.2,
-            3
-          ],
-          "door": null
-        },
-        {
-          "from": [
-            2.0,
-            -1.1
-          ],
-          "to": [
-            2.0,
-            3
-          ],
-          "door": null
-        },
-        {
-          "from": [
-            3.2,
-            -1.1
-          ],
-          "to": [
-            3.2,
-            3
-          ],
-          "door": 2.0,
-          "doorW": 1.2
-        },
-        {
-          "from": [
-            3.2,
-            -5
-          ],
-          "to": [
-            3.2,
-            -1.1
-          ],
-          "door": 1.9,
-          "doorW": 0.9
-        },
-        {
-          "from": [
-            3.2,
-            -1.1
-          ],
-          "to": [
-            8.5,
-            -1.1
-          ],
-          "door": null
-        },
-        {
-          "from": [
-            -3.3,
-            -5
-          ],
-          "to": [
-            -3.3,
-            -2.5
-          ],
-          "door": null
-        },
-        {
-          "from": [
-            -3.3,
-            -2.5
+            -1.5,
+            -8
           ],
           "to": [
             -1.5,
-            -2.5
+            -5
           ],
-          "door": 1.2,
-          "doorW": 0.7
+          "door": 1.5,
+          "doorW": 0.9,
+          "doorColor": "#f1f1ee"
+        },
+        {
+          "from": [
+            -1.5,
+            -5
+          ],
+          "to": [
+            1.5,
+            -5
+          ],
+          "door": 1.5,
+          "doorW": 0.9,
+          "doorColor": "#f1f1ee"
+        },
+        {
+          "from": [
+            -5.5,
+            -4.5
+          ],
+          "to": [
+            -1.5,
+            -4.5
+          ],
+          "door": 3.4,
+          "doorW": 0.9,
+          "doorColor": "#f1f1ee"
+        },
+        {
+          "from": [
+            -5.5,
+            0
+          ],
+          "to": [
+            -3.7,
+            0
+          ],
+          "door": 0.7,
+          "doorW": 0.8,
+          "doorColor": "#f1f1ee"
+        }
+      ],
+      "balustrades": [
+        {
+          "from": [
+            -0.3,
+            -1.5
+          ],
+          "to": [
+            -0.3,
+            0.4
+          ],
+          "style": "glass"
         }
       ],
       "rooms": [
         {
-          "no": "06",
+          "no": "09",
           "name": "Landing",
           "bounds": {
             "x": -1.5,
             "z": -5,
-            "w": 4.7,
-            "d": 3.9
+            "w": 3.3,
+            "d": 5.5
+          },
+          "program": "hall",
+          "palette": {
+            "fabric": "#d8cdb5",
+            "wood": "#7b512f",
+            "accent": "#2e6546"
+          },
+          "floor": {
+            "kind": "honey-oak",
+            "color": "#b57a43"
+          },
+          "walls": {
+            "kind": "wainscot",
+            "color": "#e3d9c6",
+            "h": 1.1
           },
           "items": [
-            {
-              "type": "cushioned-bench",
-              "at": [
-                0.8,
-                -4.72
-              ],
-              "w": 1.3,
-              "color": "#2e6546"
-            },
             {
               "type": "runner-rug",
               "at": [
-                1.0,
-                -2.9
+                0.4,
+                -2.3
               ],
-              "rot": 90,
-              "w": 0.9,
-              "d": 2.6,
-              "color": "#8a7a5c"
+              "w": 1,
+              "d": 3,
+              "color": "#2e6546",
+              "src": "compose@1"
             },
             {
-              "type": "wall-art",
+              "type": "pampas-vase",
               "at": [
-                -1.43,
-                -3.6
+                1.546,
+                -4.739
               ],
-              "rot": 90,
-              "w": 0.8,
-              "h": 0.6,
-              "y": 1.6,
-              "motif": 0
-            },
-            {
-              "type": "snake-plant",
-              "at": [
-                2.8,
-                -4.6
-              ]
+              "color": "#2e6546",
+              "src": "compose@1"
             }
-          ]
+          ],
+          "fixtures": {
+            "fan": false
+          },
+          "lock": true
         },
         {
-          "no": "07",
+          "no": "10",
           "name": "Family Bath",
           "bounds": {
-            "x": -0.2,
-            "z": -1.1,
-            "w": 2.2,
-            "d": 4.1
+            "x": -1.5,
+            "z": 0.5,
+            "w": 3.3,
+            "d": 2.5
+          },
+          "program": "bath",
+          "bath": {
+            "tub": "built-in",
+            "shower": true,
+            "vanity": "single"
+          },
+          "floor": {
+            "kind": "hex-tile",
+            "color": "#d8d6cf"
+          },
+          "walls": {
+            "kind": "tile",
+            "color": "#eeeeea",
+            "h": 1.5
           },
           "items": [
             {
-              "type": "bathtub",
-              "at": [
-                0.9,
-                2.5
-              ]
-            },
-            {
               "type": "vanity-sink",
               "at": [
-                1.68,
-                0.6
+                -1.155,
+                1.52
               ],
-              "rot": 270,
-              "w": 1.0
-            },
-            {
-              "type": "mirror-cabinet",
-              "at": [
-                1.93,
-                0.6
-              ],
-              "rot": 270,
-              "y": 1.45
+              "rot": 90,
+              "src": "compose@1"
             },
             {
               "type": "toilet",
               "at": [
-                0.2,
-                0.5
+                -1.05,
+                2.465
               ],
-              "rot": 90
+              "rot": 90,
+              "src": "compose@1"
             },
             {
-              "type": "shower-cubicle",
+              "type": "bathtub",
               "at": [
-                0.32,
-                -0.55
-              ]
+                0.83,
+                2.505
+              ],
+              "rot": 180,
+              "src": "compose@1"
             },
             {
-              "type": "towel-rail",
+              "type": "heated-towel-rail",
               "at": [
-                1.93,
-                1.7
+                1.727,
+                1.82
               ],
               "rot": 270,
-              "y": 1.1
+              "y": 0.4,
+              "src": "compose@1"
             },
             {
-              "type": "bath-mat",
+              "type": "bath-rug",
               "at": [
-                0.9,
-                1.75
-              ]
+                0.83,
+                1.685
+              ],
+              "rot": 180,
+              "r": 0.35,
+              "src": "compose@1"
+            },
+            {
+              "type": "snake-plant",
+              "at": [
+                1.531,
+                0.967
+              ],
+              "rot": 270,
+              "src": "compose@1"
             }
-          ]
+          ],
+          "fixtures": {
+            "fan": false
+          },
+          "lock": true
         },
         {
-          "no": "08",
-          "name": "Upper Hall",
+          "no": "11",
+          "name": "Kids Room",
           "bounds": {
-            "x": 2.0,
-            "z": -1.1,
-            "w": 1.2,
-            "d": 4.1
+            "x": 1.8,
+            "z": -5,
+            "w": 6.7,
+            "d": 3.8
+          },
+          "program": "bed-kid",
+          "palette": {
+            "fabric": "#c3ccd4",
+            "wood": "#b98f5a",
+            "accent": "#d6a640"
+          },
+          "floor": {
+            "kind": "carpet",
+            "color": "#b9b3a2"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#dcc88f"
           },
           "items": [
             {
-              "type": "runner-rug",
+              "type": "house-bed",
               "at": [
-                2.6,
-                0.9
+                4.977,
+                -2.285
               ],
-              "w": 0.8,
-              "d": 3.0,
-              "color": "#8a7a5c"
+              "rot": 180,
+              "quilt": "check",
+              "color": "#d6a640",
+              "src": "compose@1"
+            },
+            {
+              "type": "bedside-table",
+              "at": [
+                5.749,
+                -1.495
+              ],
+              "rot": 180,
+              "color": "#b98f5a",
+              "src": "compose@1"
+            },
+            {
+              "type": "tripod-table-lamp",
+              "at": [
+                5.746,
+                -1.471
+              ],
+              "rot": 180,
+              "color": "#c3ccd4",
+              "y": 0.56,
+              "src": "compose@1"
+            },
+            {
+              "type": "canvas-art",
+              "at": [
+                4.977,
+                -1.273
+              ],
+              "rot": 180,
+              "w": 0.558,
+              "h": 0.509,
+              "motif": "story-moon",
+              "y": 2.081,
+              "src": "compose@1"
+            },
+            {
+              "type": "play-rug",
+              "at": [
+                4.977,
+                -2.915
+              ],
+              "rot": 180,
+              "w": 1.814,
+              "d": 1.74,
+              "color": "#d6a640",
+              "src": "compose@1"
+            },
+            {
+              "type": "low-bookshelf",
+              "at": [
+                3.92,
+                -1.435
+              ],
+              "rot": 180,
+              "color": "#d6a640",
+              "src": "compose@1"
+            },
+            {
+              "type": "kids-desk",
+              "at": [
+                6.62,
+                -1.715
+              ],
+              "rot": 180,
+              "color": "#c3ccd4",
+              "src": "compose@1"
+            },
+            {
+              "type": "desk-lamp",
+              "at": [
+                6.37,
+                -1.577
+              ],
+              "rot": 180,
+              "color": "#c3ccd4",
+              "y": 0.82,
+              "src": "compose@1"
+            },
+            {
+              "type": "canvas-art",
+              "at": [
+                6.62,
+                -1.273
+              ],
+              "rot": 180,
+              "w": 0.5,
+              "h": 0.327,
+              "motif": "line",
+              "y": 1.45,
+              "src": "compose@1"
+            },
+            {
+              "type": "rocking-horse",
+              "at": [
+                7.974,
+                -1.755
+              ],
+              "rot": 270,
+              "color": "#d6a640",
+              "src": "compose@1"
+            },
+            {
+              "type": "beanbag",
+              "at": [
+                7.879,
+                -4.484
+              ],
+              "color": "#c3ccd4",
+              "src": "compose@1"
+            },
+            {
+              "type": "chest-of-drawers",
+              "at": [
+                3.785,
+                -4.665
+              ],
+              "src": "compose@1"
+            },
+            {
+              "type": "globe-lamp",
+              "at": [
+                3.785,
+                -4.646
+              ],
+              "color": "#c3ccd4",
+              "y": 1.15,
+              "src": "compose@1"
+            },
+            {
+              "type": "vase",
+              "at": [
+                3.576,
+                -4.638
+              ],
+              "color": "#d6a640",
+              "y": 1.15,
+              "src": "compose@1"
             },
             {
               "type": "wall-art",
               "at": [
-                2.6,
-                2.92
+                3.785,
+                -4.917
               ],
-              "rot": 180,
-              "w": 0.6,
-              "h": 0.8,
-              "y": 1.5,
-              "motif": 2
+              "w": 0.5,
+              "h": 0.464,
+              "motif": "geometric",
+              "color": "#c3ccd4",
+              "y": 1.582,
+              "src": "compose@1"
             }
-          ]
+          ],
+          "fixtures": {
+            "fan": false
+          },
+          "lock": true
         },
         {
-          "no": "09",
+          "no": "12",
           "name": "Guest Bedroom",
           "bounds": {
-            "x": 3.2,
-            "z": -1.1,
-            "w": 5.3,
-            "d": 4.1
+            "x": 1.8,
+            "z": -1.2,
+            "w": 6.7,
+            "d": 4.2
+          },
+          "program": "bed-guest",
+          "palette": {
+            "fabric": "#d9d2c0",
+            "wood": "#7b512f",
+            "accent": "#8a9a82"
+          },
+          "floor": {
+            "kind": "walnut"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#7d8e78"
           },
           "items": [
             {
               "type": "platform-bed",
               "at": [
-                5.9,
-                0.12
+                5.26,
+                0.035
               ],
-              "rot": 0,
-              "color": "#8a8f86"
+              "color": "#d9d2c0",
+              "src": "compose@1"
             },
             {
-              "type": "wall-art",
+              "type": "bedside-table",
               "at": [
-                5.9,
-                -1.03
+                3.405,
+                -0.905
               ],
-              "w": 1.4,
-              "h": 0.7,
-              "y": 1.6,
-              "motif": 0
+              "color": "#7b512f",
+              "src": "compose@1"
             },
             {
-              "type": "dresser",
+              "type": "mushroom-lamp",
               "at": [
-                8.15,
-                -0.2
+                3.405,
+                -0.929
               ],
-              "rot": 270,
-              "w": 1.4
+              "color": "#d9d2c0",
+              "y": 0.56,
+              "src": "compose@1"
             },
             {
-              "type": "rocking-chair",
+              "type": "bedside-table",
               "at": [
-                3.9,
-                2.2
+                7.115,
+                -0.905
               ],
-              "rot": 150
+              "color": "#7b512f",
+              "src": "compose@1"
             },
             {
-              "type": "runner-rug",
+              "type": "globe-lamp",
               "at": [
-                5.9,
-                2.2
+                7.115,
+                -0.929
               ],
-              "w": 0.8,
-              "d": 2.4,
-              "color": "#b8ab8f",
-              "rot": 90
+              "color": "#d9d2c0",
+              "y": 0.56,
+              "src": "compose@1"
             },
             {
-              "type": "ficus-tree",
+              "type": "triptych",
               "at": [
-                8.0,
-                2.45
-              ]
+                5.26,
+                -1.127
+              ],
+              "w": 1.9,
+              "h": 0.75,
+              "y": 1.675,
+              "src": "compose@1"
             },
             {
-              "type": "ceiling-light",
+              "type": "shag-rug",
               "at": [
-                4.5,
-                0.95
+                5.26,
+                0.722
               ],
-              "w": 0.45
+              "w": 4.38,
+              "d": 1.926,
+              "color": "#8a9a82",
+              "src": "compose@1"
             },
             {
-              "type": "ceiling-light",
+              "type": "chest-of-drawers",
               "at": [
-                5.85,
-                0.95
+                4.485,
+                2.665
               ],
-              "w": 0.45
+              "rot": 180,
+              "src": "compose@1"
             },
             {
-              "type": "ceiling-light",
+              "type": "globe-lamp",
               "at": [
-                7.2,
-                0.95
+                4.485,
+                2.646
               ],
-              "w": 0.45
+              "rot": 180,
+              "color": "#d9d2c0",
+              "y": 1.15,
+              "src": "compose@1"
+            },
+            {
+              "type": "vase",
+              "at": [
+                4.694,
+                2.639
+              ],
+              "rot": 180,
+              "color": "#8a9a82",
+              "y": 1.15,
+              "src": "compose@1"
+            },
+            {
+              "type": "wall-hanging",
+              "at": [
+                4.485,
+                2.917
+              ],
+              "rot": 180,
+              "w": 0.5,
+              "color": "#d9d2c0",
+              "y": 1.912,
+              "src": "compose@1"
+            },
+            {
+              "type": "armoire",
+              "at": [
+                6.55,
+                2.605
+              ],
+              "rot": 180,
+              "color": "#7b512f",
+              "src": "compose@1"
+            },
+            {
+              "type": "olive-tree-pot",
+              "at": [
+                7.883,
+                2.459
+              ],
+              "rot": 180,
+              "color": "#8a9a82",
+              "src": "compose@1"
             }
-          ]
-        },
-        {
-          "no": "10",
-          "name": "Kids Room",
-          "bounds": {
-            "x": 3.2,
-            "z": -5,
-            "w": 5.3,
-            "d": 3.9
+          ],
+          "fixtures": {
+            "fan": false
           },
-          "items": [
-            {
-              "type": "single-bed",
-              "at": [
-                7.8,
-                -3.9
-              ],
-              "color": "#9fb3c8"
-            },
-            {
-              "type": "nightstand",
-              "at": [
-                6.95,
-                -4.65
-              ]
-            },
-            {
-              "type": "table-lamp",
-              "at": [
-                6.95,
-                -4.65
-              ],
-              "y": 0.57
-            },
-            {
-              "type": "writing-desk",
-              "at": [
-                5.0,
-                -4.62
-              ],
-              "w": 1.2
-            },
-            {
-              "type": "gaming-chair",
-              "at": [
-                5.0,
-                -3.95
-              ],
-              "rot": 180
-            },
-            {
-              "type": "toy-box",
-              "at": [
-                3.75,
-                -4.65
-              ]
-            },
-            {
-              "type": "low-bookshelf",
-              "at": [
-                3.6,
-                -2.2
-              ],
-              "rot": 90
-            },
-            {
-              "type": "bean-bag",
-              "at": [
-                4.3,
-                -1.8
-              ]
-            },
-            {
-              "type": "circular-rug",
-              "at": [
-                5.6,
-                -2.6
-              ],
-              "r": 0.9,
-              "color": "#c9b27a"
-            },
-            {
-              "type": "height-chart",
-              "at": [
-                8.42,
-                -1.9
-              ],
-              "rot": 270
-            },
-            {
-              "type": "ceiling-light",
-              "at": [
-                4.5,
-                -3.05
-              ],
-              "w": 0.45
-            },
-            {
-              "type": "ceiling-light",
-              "at": [
-                5.85,
-                -3.05
-              ],
-              "w": 0.45
-            },
-            {
-              "type": "ceiling-light",
-              "at": [
-                7.2,
-                -3.05
-              ],
-              "w": 0.45
-            }
-          ]
+          "lock": true
         },
         {
-          "no": "11",
+          "no": "13",
           "name": "Primary Bedroom",
           "bounds": {
-            "x": -8,
-            "z": -5,
-            "w": 4.7,
-            "d": 5
+            "x": -5.5,
+            "z": -4.5,
+            "w": 4,
+            "d": 4.5
+          },
+          "program": "bed-primary",
+          "lock": true,
+          "floor": {
+            "kind": "honey-oak",
+            "color": "#b57a43"
+          },
+          "walls": {
+            "kind": "plaster",
+            "color": "#c4ad8a"
+          },
+          "ceiling": {
+            "kind": "timber",
+            "color": "#e0b078"
           },
           "items": [
             {
-              "type": "headboard-bed",
+              "type": "upholstered-bed",
               "at": [
-                -6.87,
-                -2.5
+                -4.25,
+                -2.85
               ],
               "rot": 90,
-              "w": 1.8,
-              "d": 2.1,
-              "color": "#402817"
+              "w": 1.76,
+              "color": "#402817",
+              "quilt": "stripe"
             },
             {
               "type": "nightstand",
               "at": [
-                -7.7,
-                -3.75
+                -5.22,
+                -4.1
               ],
               "rot": 90,
               "color": "#d8ccb4"
@@ -2690,831 +2031,1398 @@
             {
               "type": "nightstand",
               "at": [
-                -7.7,
-                -1.25
+                -5.22,
+                -1.6
               ],
               "rot": 90,
               "color": "#d8ccb4"
             },
             {
-              "type": "table-lamp",
+              "type": "tripod-table-lamp",
               "at": [
-                -7.7,
-                -3.75
+                -5.22,
+                -4.1
               ],
               "y": 0.57
             },
             {
-              "type": "table-lamp",
+              "type": "tripod-table-lamp",
               "at": [
-                -7.7,
-                -1.25
+                -5.22,
+                -1.6
               ],
               "y": 0.57
-            },
-            {
-              "type": "wall-sconce",
-              "at": [
-                -7.92,
-                -3.75
-              ],
-              "rot": 90,
-              "y": 1.55
-            },
-            {
-              "type": "wall-sconce",
-              "at": [
-                -7.92,
-                -1.25
-              ],
-              "rot": 90,
-              "y": 1.55
             },
             {
               "type": "wall-art",
               "at": [
-                -7.92,
-                -2.5
+                -5.41,
+                -4.35
+              ],
+              "rot": 90,
+              "w": 0.22,
+              "h": 2.2,
+              "y": 0.1,
+              "motif": "colourfield",
+              "frame": "#7b512f",
+              "color": "#7b512f"
+            },
+            {
+              "type": "wall-art",
+              "at": [
+                -5.41,
+                -1.35
+              ],
+              "rot": 90,
+              "w": 0.22,
+              "h": 2.2,
+              "y": 0.1,
+              "motif": "colourfield",
+              "frame": "#7b512f",
+              "color": "#7b512f"
+            },
+            {
+              "type": "wall-sconce",
+              "at": [
+                -5.41,
+                -3.7
+              ],
+              "rot": 90,
+              "y": 1.7
+            },
+            {
+              "type": "wall-sconce",
+              "at": [
+                -5.41,
+                -2
+              ],
+              "rot": 90,
+              "y": 1.7
+            },
+            {
+              "type": "wall-art",
+              "at": [
+                -5.41,
+                -2.85
               ],
               "rot": 90,
               "w": 0.9,
               "h": 0.7,
-              "y": 1.85,
-              "motif": 0,
-              "color": "#e8d7a8"
+              "y": 1.7,
+              "motif": "floral",
+              "frame": "#7b512f",
+              "color": "#e0a92c"
             },
             {
               "type": "dresser",
               "at": [
-                -4.4,
-                -4.65
+                -1.85,
+                -2.3
               ],
+              "rot": 270,
               "w": 1.8,
+              "d": 0.5,
               "color": "#d8ccb4"
             },
             {
-              "type": "cushioned-bench",
+              "type": "patterned-rug",
               "at": [
-                -5.55,
-                -2.5
-              ],
-              "rot": 90,
-              "w": 1.3,
-              "color": "#5a3020"
-            },
-            {
-              "type": "area-rug",
-              "at": [
-                -5.8,
-                -2.5
+                -4,
+                -2.85
               ],
               "rot": 90,
               "w": 2.6,
-              "d": 1.8,
+              "d": 1.9,
+              "pattern": "stripe",
               "color": "#84764e"
+            },
+            {
+              "type": "arch-mirror",
+              "at": [
+                -3.2,
+                -0.12
+              ],
+              "rot": 180,
+              "w": 0.7,
+              "h": 1.6,
+              "y": 0.2
             },
             {
               "type": "ficus-tree",
               "at": [
-                -3.85,
-                -0.55
+                -1.9,
+                -0.45
+              ]
+            }
+          ],
+          "fixtures": {
+            "fan": false
+          }
+        },
+        {
+          "no": "14",
+          "name": "Primary Ensuite",
+          "bounds": {
+            "x": -5.5,
+            "z": -8,
+            "w": 4,
+            "d": 3.5
+          },
+          "program": "ensuite",
+          "lock": true,
+          "floor": {
+            "kind": "marble"
+          },
+          "walls": {
+            "kind": "tile",
+            "color": "#eeeeea",
+            "h": 1.5
+          },
+          "items": [
+            {
+              "type": "clawfoot-tub",
+              "at": [
+                -3.5,
+                -7.25
+              ],
+              "rot": 0
+            },
+            {
+              "type": "shower-cubicle",
+              "at": [
+                -4.95,
+                -7.35
               ]
             },
             {
-              "type": "ceiling-light",
+              "type": "double-vanity",
               "at": [
-                -5.65,
-                -1.8
+                -5.15,
+                -5.6
               ],
-              "w": 0.45
+              "rot": 90,
+              "w": 1.5
             },
             {
-              "type": "ceiling-light",
+              "type": "toilet",
               "at": [
-                -5.65,
-                -3.2
+                -4,
+                -4.93
               ],
-              "w": 0.45
+              "rot": 180
+            },
+            {
+              "type": "bath-rug",
+              "at": [
+                -3.6,
+                -5.9
+              ],
+              "r": 0.5
+            },
+            {
+              "type": "peace-lily",
+              "at": [
+                -1.95,
+                -7.55
+              ]
             }
-          ]
+          ],
+          "fixtures": {
+            "fan": false
+          }
         },
         {
-          "no": "12",
+          "no": "15",
           "name": "Dressing",
           "bounds": {
-            "x": -3.3,
-            "z": -2.5,
-            "w": 1.8,
-            "d": 2.5
+            "x": -1.5,
+            "z": -8,
+            "w": 3,
+            "d": 3
+          },
+          "program": "hall",
+          "lock": true,
+          "floor": {
+            "kind": "oak"
           },
           "items": [
             {
               "type": "open-shelving",
               "at": [
-                -1.75,
-                -0.75
+                0.9,
+                -6.5
               ],
               "rot": 270,
-              "w": 1.0,
+              "w": 1.6,
               "h": 1.9,
               "color": "#4f2f1f"
             },
             {
               "type": "wall-hooks",
               "at": [
-                -1.57,
-                -0.75
+                -1.4,
+                -6.5
               ],
-              "rot": 270,
-              "w": 1.0,
+              "rot": 90,
+              "w": 1.2,
               "y": 1.75
             },
             {
               "type": "round-mirror",
               "at": [
-                -3.0,
-                -2.43
+                0,
+                -7.9
               ],
-              "rot": 0,
               "y": 1.5
-            },
-            {
-              "type": "laundry-hamper",
-              "at": [
-                -3.0,
-                -1.9
-              ]
             }
-          ]
+          ],
+          "fixtures": {
+            "fan": false
+          }
         },
         {
-          "no": "13",
-          "name": "Primary Ensuite",
+          "no": "16",
+          "name": "Wardrobe Nook",
           "bounds": {
-            "x": -3.3,
-            "z": -5,
+            "x": -5.5,
+            "z": 0,
             "w": 1.8,
-            "d": 2.5
+            "d": 1.4
+          },
+          "program": "hall",
+          "lock": true,
+          "floor": {
+            "kind": "oak"
           },
           "items": [
             {
-              "type": "shower-cubicle",
+              "type": "wall-hooks",
               "at": [
-                -2.02,
-                -4.45
-              ]
-            },
-            {
-              "type": "vanity-sink",
-              "at": [
-                -2.85,
-                -4.67
+                -4.6,
+                0.12
               ],
-              "w": 0.8
-            },
-            {
-              "type": "toilet",
-              "at": [
-                -2.9,
-                -3.5
-              ],
-              "rot": 90
-            },
-            {
-              "type": "towel-rail",
-              "at": [
-                -1.57,
-                -3.2
-              ],
-              "rot": 270,
-              "y": 1.1
-            },
-            {
-              "type": "bath-mat",
-              "at": [
-                -2.3,
-                -3.2
-              ]
+              "w": 1.2,
+              "y": 1.7
             }
-          ]
+          ],
+          "fixtures": {
+            "fan": false
+          }
         }
       ]
+    }
+  ],
+  "facade": {
+    "zones": [
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -5.65,
+        "to": -5.57,
+        "material": "timber",
+        "color": "#111416"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -5.65,
+        "to": -5.57,
+        "material": "timber",
+        "color": "#111416"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -4.3,
+        "to": -4.22,
+        "material": "timber",
+        "color": "#111416"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -4.3,
+        "to": -4.22,
+        "material": "timber",
+        "color": "#111416"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -1.95,
+        "to": -1.87,
+        "material": "timber",
+        "color": "#111416"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -1.95,
+        "to": -1.87,
+        "material": "timber",
+        "color": "#111416"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 0.75,
+        "yTo": 0.8,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 1.2,
+        "yTo": 1.25,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -0.3,
+        "to": -0.25,
+        "yFrom": 0.8,
+        "yTo": 1.2,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": 0.45,
+        "to": 0.5,
+        "yFrom": 0.8,
+        "yTo": 1.2,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -0.25,
+        "to": 0.45,
+        "yFrom": 0.8,
+        "yTo": 1.2,
+        "material": "stucco",
+        "color": "#c3cfd6"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 1.55,
+        "yTo": 1.6,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 1.9999999999999998,
+        "yTo": 2.05,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -0.3,
+        "to": -0.25,
+        "yFrom": 1.6,
+        "yTo": 1.9999999999999998,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": 0.45,
+        "to": 0.5,
+        "yFrom": 1.6,
+        "yTo": 1.9999999999999998,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l1",
+        "side": "S",
+        "from": -0.25,
+        "to": 0.45,
+        "yFrom": 1.6,
+        "yTo": 1.9999999999999998,
+        "material": "stucco",
+        "color": "#c3cfd6"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 0.35,
+        "yTo": 0.39999999999999997,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 0.7999999999999999,
+        "yTo": 0.85,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.3,
+        "to": -0.25,
+        "yFrom": 0.39999999999999997,
+        "yTo": 0.7999999999999999,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": 0.45,
+        "to": 0.5,
+        "yFrom": 0.39999999999999997,
+        "yTo": 0.7999999999999999,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.25,
+        "to": 0.45,
+        "yFrom": 0.39999999999999997,
+        "yTo": 0.7999999999999999,
+        "material": "stucco",
+        "color": "#c3cfd6"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 1.15,
+        "yTo": 1.2,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 1.5999999999999999,
+        "yTo": 1.65,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.3,
+        "to": -0.25,
+        "yFrom": 1.2,
+        "yTo": 1.5999999999999999,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": 0.45,
+        "to": 0.5,
+        "yFrom": 1.2,
+        "yTo": 1.5999999999999999,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.25,
+        "to": 0.45,
+        "yFrom": 1.2,
+        "yTo": 1.5999999999999999,
+        "material": "stucco",
+        "color": "#c3cfd6"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 1.95,
+        "yTo": 2,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.3,
+        "to": 0.5,
+        "yFrom": 2.4000000000000004,
+        "yTo": 2.45,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.3,
+        "to": -0.25,
+        "yFrom": 2,
+        "yTo": 2.4000000000000004,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": 0.45,
+        "to": 0.5,
+        "yFrom": 2,
+        "yTo": 2.4000000000000004,
+        "material": "stucco",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": -0.25,
+        "to": 0.45,
+        "yFrom": 2,
+        "yTo": 2.4000000000000004,
+        "material": "stucco",
+        "color": "#c3cfd6"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": 4.4,
+        "to": 5,
+        "yFrom": 0.55,
+        "yTo": 0.62,
+        "material": "siding",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": 4.15,
+        "to": 4.75,
+        "yFrom": 1,
+        "yTo": 1.07,
+        "material": "siding",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": 4.4,
+        "to": 5,
+        "yFrom": 1.45,
+        "yTo": 1.52,
+        "material": "siding",
+        "color": "#f1f1ee"
+      },
+      {
+        "level": "l2",
+        "side": "S",
+        "from": 4.15,
+        "to": 4.75,
+        "yFrom": 1.9,
+        "yTo": 1.97,
+        "material": "siding",
+        "color": "#f1f1ee"
+      }
+    ]
+  },
+  "features": [
+    {
+      "type": "loggia",
+      "level": "l1",
+      "rect": {
+        "x": -0.5,
+        "z": 2.2,
+        "w": 2.9,
+        "d": 1.35
+      },
+      "rail": "none",
+      "floorColor": "#5b5a50"
     }
   ],
   "roofs": [
     {
       "over": {
-        "x": -2.1,
-        "z": -5.6,
-        "w": 11.2,
-        "d": 9.7
+        "x": -2,
+        "z": -5.8,
+        "w": 11.3,
+        "d": 9.8
       },
-      "y": 5.8,
+      "y": 6,
       "type": "flat",
-      "parapet": 0,
+      "parapet": 0.4,
       "overhang": 0,
-      "color": "#2b2b2b"
+      "color": "#1b1b1b",
+      "trim": "#111416",
+      "soffit": "#111416",
+      "chimney": {
+        "at": [
+          6.2,
+          0.4
+        ],
+        "w": 3.3,
+        "d": 1.8,
+        "h": 1.3,
+        "material": "metal",
+        "color": "#9a9d9f",
+        "cap": "metal"
+      }
     },
     {
       "over": {
-        "x": -1.85,
-        "z": -5.35,
-        "w": 10.7,
-        "d": 9.2
+        "x": -2,
+        "z": -5.8,
+        "w": 11.3,
+        "d": 9.8
       },
-      "y": 6.02,
+      "y": 5.78,
       "type": "flat",
       "parapet": 0,
       "overhang": 0,
-      "color": "#2b2b2b"
+      "color": "#1b1b1b",
+      "trim": "#111416",
+      "soffit": "#111416"
     },
     {
       "over": {
-        "x": -8.3,
-        "z": -5.3,
-        "w": 6.8,
-        "d": 6.5
+        "x": -5.8,
+        "z": -8.3,
+        "w": 7.3,
+        "d": 8.6
       },
-      "y": 5.8,
+      "y": 6,
       "type": "gable",
       "ridge": "z",
-      "pitch": 55,
+      "pitch": 50,
       "overhang": 0,
-      "color": "#262626"
+      "finish": "seam",
+      "color": "#1f2328",
+      "trim": "#14171a",
+      "soffit": "#3f5563",
+      "gutters": false,
+      "gableWindow": false
+    },
+    {
+      "over": {
+        "x": -8.1,
+        "z": -1.1,
+        "w": 2.2,
+        "d": 1.8
+      },
+      "y": 5.7,
+      "type": "gable",
+      "ridge": "z",
+      "pitch": 48,
+      "overhang": 0.15,
+      "finish": "seam",
+      "color": "#1f2328",
+      "trim": "#14171a",
+      "soffit": "#7d9fb6",
+      "gutters": false,
+      "gableWindow": false,
+      "ends": {
+        "S": "open"
+      }
     }
   ],
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": 1.45
+  },
   "site": [
     {
-      "type": "deck",
-      "at": [
-        -4.55,
-        1.6
-      ],
-      "w": 5.9,
-      "d": 2.6,
-      "h": 0.15
-    },
-    {
-      "type": "pool",
-      "at": [
-        -8.05,
-        1.8
-      ],
-      "w": 0.7,
-      "d": 2.9
-    },
-    {
-      "type": "path",
-      "path": [
+      "type": "patio",
+      "id": "forecourt",
+      "surface": "gravel",
+      "color": "#cdbfa5",
+      "poly": [
         [
-          -0.95,
-          3.52
+          -5.8,
+          3.6
         ],
         [
-          2.55,
-          3.52
-        ]
-      ],
-      "w": 1.05,
-      "color": "#56574f"
-    },
-    {
-      "type": "path",
-      "path": [
-        [
-          0.6,
-          4.05
+          3,
+          3.6
         ],
         [
-          0.6,
-          12.0
+          3,
+          10
+        ],
+        [
+          2.2,
+          11
+        ],
+        [
+          -3.8,
+          11
+        ],
+        [
+          -3.8,
+          6.7
+        ],
+        [
+          -5.8,
+          4.5
         ]
-      ],
-      "w": 3.6,
-      "color": "#c9b89a"
+      ]
     },
     {
-      "type": "planter",
+      "type": "wall-low",
+      "path": [
+        [
+          -3.8,
+          7.9
+        ],
+        [
+          -3.8,
+          11
+        ]
+      ],
+      "h": 0.12,
+      "t": 0.07,
+      "surface": "concrete",
+      "color": "#1c1c1c",
+      "cap": "#1c1c1c"
+    },
+    {
+      "type": "wall-low",
+      "path": [
+        [
+          3,
+          3.6
+        ],
+        [
+          3,
+          10
+        ],
+        [
+          2.2,
+          11
+        ]
+      ],
+      "h": 0.12,
+      "t": 0.07,
+      "surface": "concrete",
+      "color": "#1c1c1c",
+      "cap": "#1c1c1c"
+    },
+    {
+      "type": "steps",
       "at": [
-        2.7,
-        6.2
+        0.75,
+        3.85
       ],
-      "w": 0.6,
-      "d": 4.3
+      "n": 2,
+      "w": 3.3,
+      "h": 0.3,
+      "d": 0.6,
+      "style": "stone",
+      "color": "#3a3833"
     },
     {
-      "type": "path",
-      "path": [
+      "type": "driveway",
+      "surface": "concrete",
+      "color": "#262220",
+      "poly": [
         [
-          5.4,
-          4.05
+          3.9,
+          3.9
         ],
         [
-          5.4,
-          12.0
+          7.6,
+          3.9
+        ],
+        [
+          7.6,
+          11
+        ],
+        [
+          3.9,
+          11
         ]
-      ],
-      "w": 4.2,
-      "color": "#2d2a28"
+      ]
     },
     {
       "type": "car",
       "at": [
-        5.4,
-        7.0
+        5.75,
+        7.3
       ],
-      "rot": 180
+      "rot": 180,
+      "color": "#dcdcd8"
     },
     {
       "type": "planter",
       "at": [
-        4.75,
-        3.42
+        3.45,
+        7.2
       ],
-      "w": 3.1,
-      "d": 0.6
+      "w": 0.5,
+      "d": 6.2
     },
     {
-      "type": "cypress",
-      "at": [
-        4.8,
-        3.42
+      "type": "terrace",
+      "id": "deck",
+      "poly": [
+        [
+          -5.7,
+          0
+        ],
+        [
+          -2.3,
+          0
+        ],
+        [
+          -2.3,
+          3
+        ],
+        [
+          -4.7,
+          3
+        ],
+        [
+          -5.7,
+          2
+        ]
       ],
-      "h": 1.8,
-      "y": 0.45
-    },
-    {
-      "type": "planter",
-      "at": [
-        8.0,
-        4.3
-      ],
-      "w": 1.1,
-      "d": 0.5
+      "y": 0.12,
+      "surface": "decking",
+      "color": "#c8975a",
+      "edge": {
+        "kind": "retaining",
+        "material": "concrete",
+        "color": "#26231f",
+        "coping": "#26231f"
+      }
     },
     {
       "type": "pool",
-      "at": [
-        8.8,
-        6.1
+      "shape": "poly",
+      "poly": [
+        [
+          -5.8,
+          -0.6
+        ],
+        [
+          -5.8,
+          2.04
+        ],
+        [
+          -4.74,
+          3.1
+        ],
+        [
+          -3.2,
+          3.1
+        ],
+        [
+          -3.2,
+          3.7
+        ],
+        [
+          -4.99,
+          3.7
+        ],
+        [
+          -6.4,
+          2.29
+        ],
+        [
+          -6.4,
+          -0.6
+        ]
       ],
-      "w": 1.3,
-      "d": 3.0
+      "depth": 0.3,
+      "tile": "#a9bfc9",
+      "coping": {
+        "w": 0.08,
+        "color": "#26231f"
+      }
+    },
+    {
+      "type": "outdoor-sofa",
+      "at": [
+        -4,
+        2.5
+      ],
+      "rot": 0,
+      "w": 1.5,
+      "d": 0.55,
+      "color": "#f4f4f0"
     },
     {
       "type": "planter",
       "at": [
-        -1.95,
-        3.8
+        -5.2,
+        2.3
+      ],
+      "w": 0.5,
+      "d": 0.5
+    },
+    {
+      "type": "planter",
+      "at": [
+        -2,
+        3.7
       ],
       "w": 0.6,
       "d": 0.5
     },
     {
+      "type": "mailbox",
+      "at": [
+        -2,
+        3.7
+      ],
+      "rot": 0,
+      "color": "#f2f2ee",
+      "y": 0.4
+    },
+    {
       "type": "planter",
       "at": [
-        -6.6,
-        0.62
+        4.7,
+        3.95
       ],
-      "w": 0.5,
-      "d": 0.5,
-      "y": 0.15
+      "w": 2.8,
+      "d": 0.55
     },
     {
       "type": "shrub",
       "at": [
-        10.7,
-        3.4
+        4.55,
+        3.95
       ],
-      "form": "mound",
-      "r": 0.8
+      "form": "topiary-cone",
+      "h": 1.9,
+      "r": 0.45,
+      "y": 0.45,
+      "jitter": false
+    },
+    {
+      "type": "planting",
+      "kind": "border",
+      "along": [
+        [
+          -10.8,
+          7.9
+        ],
+        [
+          -3.8,
+          7.9
+        ],
+        [
+          -3.8,
+          6.7
+        ],
+        [
+          -5.8,
+          4.5
+        ]
+      ],
+      "side": "left",
+      "depth": 2.3,
+      "mix": {
+        "kinds": [
+          "hydrangea",
+          "broadleaf",
+          "agave",
+          "grass",
+          "spreading",
+          "groundcover",
+          "bloom"
+        ],
+        "weights": [
+          3,
+          2,
+          2,
+          2,
+          2,
+          2,
+          1
+        ]
+      },
+      "bloom": [
+        "#8fa9dc",
+        "#f0efe9",
+        "#e79ac0"
+      ],
+      "edge": {
+        "color": "#1c1c1c",
+        "h": 0.14,
+        "w": 0.1
+      },
+      "seed": "front-left"
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -10.2,
+        7.45
+      ],
+      "form": "agave",
+      "r": 0.5
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -9,
+        7.5
+      ],
+      "form": "agave",
+      "r": 0.5
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -7.8,
+        7.45
+      ],
+      "form": "agave",
+      "r": 0.5
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -6.6,
+        7.5
+      ],
+      "form": "agave",
+      "r": 0.5
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -5.4,
+        7.45
+      ],
+      "form": "agave",
+      "r": 0.45
+    },
+    {
+      "type": "shrub",
+      "at": [
+        -9.9,
+        4.4
+      ],
+      "form": "topiary-ball",
+      "r": 0.55,
+      "jitter": false
     },
     {
       "type": "shrub",
       "at": [
         -9.2,
-        3.1
+        3.5
       ],
-      "form": "boxwood",
+      "form": "topiary-ball",
       "r": 0.55,
       "jitter": false
     },
     {
       "type": "shrub",
       "at": [
-        -9.3,
-        1.8
+        -8.5,
+        2.6
       ],
-      "form": "boxwood",
+      "form": "topiary-ball",
       "r": 0.55,
       "jitter": false
     },
     {
       "type": "shrub",
       "at": [
-        -9.4,
-        0.5
+        -7.8,
+        1.7
       ],
-      "form": "boxwood",
+      "form": "topiary-ball",
       "r": 0.55,
       "jitter": false
     },
     {
       "type": "shrub",
       "at": [
-        -9.5,
-        -0.8
+        -7.1,
+        0.8
       ],
-      "form": "boxwood",
+      "form": "topiary-ball",
       "r": 0.55,
       "jitter": false
-    },
-    {
-      "type": "shrub",
-      "at": [
-        -9.6,
-        -2.1
-      ],
-      "form": "boxwood",
-      "r": 0.55,
-      "jitter": false
-    },
-    {
-      "type": "bed",
-      "poly": [
-        [
-          8.65,
-          -2.9
-        ],
-        [
-          9.7,
-          -2.5
-        ],
-        [
-          10.0,
-          0
-        ],
-        [
-          9.7,
-          2.5
-        ],
-        [
-          8.65,
-          2.9
-        ]
-      ],
-      "plants": "shrubs",
-      "density": 4
-    },
-    {
-      "type": "patio",
-      "at": [
-        0.7,
-        -7.5
-      ],
-      "w": 6.0,
-      "d": 4.9
     },
     {
       "type": "pool",
+      "shape": "rect",
       "at": [
-        0.7,
-        -8.2
+        9.2,
+        6.4
       ],
-      "w": 4.2,
-      "d": 2.2
+      "w": 1.6,
+      "d": 3,
+      "tile": "#a9bfc9",
+      "coping": {
+        "w": 0.12,
+        "color": "#26231f"
+      }
     },
     {
-      "type": "wall-low",
-      "from": [
-        -3.5,
-        -10.6
+      "type": "garden-fountain",
+      "at": [
+        9.2,
+        6.4
       ],
-      "to": [
-        4.9,
-        -10.6
-      ],
-      "h": 1.3
+      "r": 0.5,
+      "color": "#f2f2ee",
+      "y": 0.2
     },
     {
-      "type": "tree",
+      "type": "bird-bath",
       "at": [
-        -11.5,
-        -6.5
+        9.2,
+        5.5
       ],
-      "species": "broad",
-      "h": 6.5,
-      "color": "#9d86c4"
+      "color": "#f2f2ee"
     },
     {
-      "type": "tree",
+      "type": "rill",
       "at": [
-        11.3,
-        -4.5
+        9.2,
+        9.6
       ],
-      "species": "oval",
-      "h": 5.5,
-      "color": "#e3a5bf"
+      "w": 0.45,
+      "d": 3.2,
+      "rot": 0,
+      "coping": {
+        "w": 0.1,
+        "color": "#26231f"
+      },
+      "tile": "#a9bfc9"
     },
     {
-      "type": "grove",
+      "type": "shrub",
       "at": [
-        7.2,
-        -9.8
+        11.4,
+        4.2
       ],
-      "r": 2.2,
-      "n": 3,
-      "species": [
-        "broad",
-        "oval"
-      ],
-      "h": 7.5
-    },
-    {
-      "type": "tree",
-      "at": [
-        -10.3,
-        -10.2
-      ],
-      "species": "broad",
-      "h": 8.0
-    },
-    {
-      "type": "scatter",
-      "at": [
-        -11.0,
-        -2.0
-      ],
-      "r": 1.4,
-      "n": 6,
-      "species": [
-        "shrub",
-        "flowers"
-      ]
-    },
-    {
-      "type": "scatter",
-      "at": [
-        11.5,
-        0.5
-      ],
-      "r": 1.2,
-      "n": 5,
-      "species": [
-        "shrub",
-        "flowers"
-      ]
+      "form": "mound",
+      "r": 0.85
     },
     {
       "type": "path",
       "path": [
         [
-          -2.95,
-          3.0
+          9,
+          1.6
         ],
         [
-          -2.95,
-          7.0
+          10,
+          3
+        ],
+        [
+          9.9,
+          4.9
         ]
       ],
-      "w": 3.5,
-      "color": "#c9b89a"
+      "w": 0.9,
+      "smooth": true,
+      "surface": "flagstone"
     },
     {
-      "type": "bed",
+      "type": "planting",
+      "kind": "meadow",
       "poly": [
         [
-          -9.2,
-          5.25
+          10.4,
+          -0.6
         ],
         [
-          -4.7,
-          5.25
+          13,
+          -1
         ],
         [
-          -4.7,
-          7.05
+          13.4,
+          2.4
         ],
         [
-          -2.6,
-          7.05
-        ],
-        [
-          -2.6,
-          8.5
-        ],
-        [
-          -3.5,
-          9.4
-        ],
-        [
-          -8.3,
-          9.4
-        ],
-        [
-          -9.2,
-          8.5
+          11.2,
+          3
         ]
       ],
-      "plants": "mixed",
-      "density": 5,
-      "color": "#8fa9dc"
-    },
-    {
-      "type": "flowers",
-      "at": [
-        -8.3,
-        4.4
-      ],
-      "r": 0.45,
-      "color": "#f0efe9"
-    },
-    {
-      "type": "flowers",
-      "at": [
-        -6.9,
-        6.2
-      ],
-      "r": 0.45,
-      "color": "#e79ac0"
-    },
-    {
-      "type": "flowers",
-      "at": [
-        -5.6,
-        8.0
-      ],
-      "r": 0.45,
-      "color": "#8fa9dc"
-    },
-    {
-      "type": "flowers",
-      "at": [
-        -3.4,
-        8.2
-      ],
-      "r": 0.4,
-      "color": "#f0efe9"
-    },
-    {
-      "type": "flowers",
-      "at": [
-        -7.9,
-        7.6
-      ],
-      "r": 0.4,
-      "color": "#8fa9dc"
-    },
-    {
-      "type": "shrub",
-      "at": [
-        -7.3,
-        9.0
-      ],
-      "form": "grass",
-      "r": 0.35,
-      "color": "#7f9a8e"
-    },
-    {
-      "type": "shrub",
-      "at": [
-        -5.7,
-        9.05
-      ],
-      "form": "grass",
-      "r": 0.35,
-      "color": "#7f9a8e"
-    },
-    {
-      "type": "shrub",
-      "at": [
-        -4.1,
-        9.0
-      ],
-      "form": "grass",
-      "r": 0.35,
-      "color": "#7f9a8e"
-    },
-    {
-      "type": "shrub",
-      "at": [
-        -2.4,
-        8.75
-      ],
-      "form": "grass",
-      "r": 0.35,
-      "color": "#7f9a8e"
+      "seed": "east-meadow"
     },
     {
       "type": "patio",
-      "at": [
-        -8.05,
-        1.8
-      ],
-      "w": 1.1,
-      "d": 3.1
-    },
-    {
-      "type": "patio",
-      "at": [
-        8.8,
-        6.1
-      ],
-      "w": 1.9,
-      "d": 3.6
-    },
-    {
-      "type": "bed",
+      "surface": "brick",
+      "color": "#bdb6a8",
       "poly": [
         [
-          -9.2,
-          -5.25
+          2.8,
+          -5.2
         ],
         [
-          -4.7,
-          -5.25
+          9.9,
+          -5.2
         ],
         [
-          -4.7,
-          -7.05
+          10.3,
+          -5.8
         ],
         [
-          -2.6,
-          -7.05
+          10.3,
+          -7.4
         ],
         [
-          -2.6,
-          -8.5
+          2.8,
+          -7.4
+        ]
+      ]
+    },
+    {
+      "type": "pool",
+      "shape": "lap",
+      "at": [
+        6.4,
+        -8.6
+      ],
+      "w": 6.8,
+      "d": 1.5,
+      "coping": {
+        "w": 0.25,
+        "color": "#cfc9bd"
+      }
+    },
+    {
+      "type": "patio-set",
+      "at": [
+        8.2,
+        -6.3
+      ],
+      "y": 0
+    },
+    {
+      "type": "pergola",
+      "at": [
+        8.2,
+        -6.3
+      ],
+      "w": 3.4,
+      "d": 2.4,
+      "h": 2.6,
+      "style": "modern",
+      "climber": "wisteria",
+      "color": "#2a2624"
+    },
+    {
+      "type": "tree",
+      "at": [
+        -11.2,
+        -1.2
+      ],
+      "species": "willow",
+      "h": 6.8,
+      "color": "#9d86c4"
+    },
+    {
+      "type": "tree",
+      "at": [
+        11.4,
+        -3.2
+      ],
+      "species": "cherry",
+      "h": 5.4,
+      "color": "#e3a5bf"
+    },
+    {
+      "type": "tree",
+      "at": [
+        -12,
+        -9
+      ],
+      "species": "shade",
+      "h": 9
+    },
+    {
+      "type": "tree",
+      "at": [
+        10.2,
+        -10
+      ],
+      "species": "broad",
+      "h": 8.5
+    },
+    {
+      "type": "planting",
+      "kind": "border",
+      "along": [
+        [
+          -12.5,
+          -4
         ],
         [
-          -3.5,
-          -9.4
-        ],
-        [
-          -8.3,
-          -9.4
-        ],
-        [
-          -9.2,
-          -8.5
+          -12.5,
+          4.5
         ]
       ],
-      "plants": "mixed",
-      "density": 4
-    },
-    {
-      "type": "shrub",
-      "at": [
-        -7.55,
-        3.95
-      ],
-      "form": "boxwood",
-      "r": 0.5,
-      "jitter": false
-    },
-    {
-      "type": "shrub",
-      "at": [
-        -6.3,
-        3.95
-      ],
-      "form": "boxwood",
-      "r": 0.5,
-      "jitter": false
-    },
-    {
-      "type": "shrub",
-      "at": [
-        -5.15,
-        3.95
-      ],
-      "form": "boxwood",
-      "r": 0.5,
-      "jitter": false
+      "side": "right",
+      "depth": 1.4,
+      "mix": "woodland",
+      "seed": "west-edge"
     }
   ],
   "hero": {
     "level": "l1",
     "at": [
-      4.6,
-      -1.03
+      4.5,
+      -1.2
     ],
     "rot": 0,
     "device": "chalk",
     "pose": "prone",
-    "surface": "shelf",
-    "shelfHeight": 0.86
+    "surface": "console",
+    "surfaceColor": "#4f2f1f"
   },
-  "entry": {
-    "level": "l1",
-    "side": "S",
-    "at": 1.2
-  },
+  "showcase": [
+    "Library Lounge",
+    "Entry Gallery",
+    "Kitchen",
+    "Dining Room"
+  ],
   "shots": [
     {
       "id": "door-to-core",
       "type": "door-to-core",
-      "duration": 12
+      "planner": "v2",
+      "duration": "auto",
+      "route": "scenic",
+      "establish": "corner-left"
     },
     {
       "id": "orbit",
@@ -3522,5 +3430,5 @@
       "duration": 10
     }
   ],
-  "areaSqm": 219
+  "areaSqm": 245
 }
