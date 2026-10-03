@@ -37,7 +37,9 @@ const IN_PAGE = async (opts: { shots: boolean }) => {
   const check = (ok: any, msg: string) => { checks.push({ ok: !!ok, msg }); };
   const host = { THREE, renderer: r, scene, camera, canvas: r.domElement, controls: null, api: {}, houseId: () => d.house.id, anchors: () => d.house.anchors, markDirty() {}, toast() {}, now: () => performance.now(), params: new URLSearchParams(), no: new Set<string>() };
   const gen2 = T.XR_TIERS['standalone-gen2'], gen1 = T.XR_TIERS['standalone-gen1'], tethered = T.XR_TIERS.tethered;
-  const head: [number, number, number] = [camera.position.x, camera.position.y, camera.position.z];
+  // a standing person just inside the front door (the player's camera may be anywhere: an orbit shot hangs above the roof)
+  const sw0 = d.house.anchors.shotWorld, en = sw0 && sw0.entry;
+  const head: [number, number, number] = en ? [en.x - en.out[0] * 1.2, en.y + 1.6, en.z - en.out[1] * 1.2] : [camera.position.x, camera.position.y, camera.position.z];
 
   // ---- a snapshot of everything the bake may touch, as one comparable object
   const num = (v: number) => (typeof v === 'number' ? +v.toFixed(6) : v);

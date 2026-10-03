@@ -52,7 +52,7 @@ export interface Merged {
 export interface Plan {
   hide: any[];                 // originals to hide (merged sources, the world, see-through meshes)
   pieces: Piece[];
-  counts: { world: number; site: number; seeThrough: number; sources: number; kept: number; keptInstanced: number; skipped: number; helpers: number };
+  counts: { world: number; site: number; seeThrough: number; sources: number; kept: number; keptInstanced: number; skipped: number; helpers: number; wallsCut: number };
   keptMeshes: any[];           // meshes that stay as built and stay visible
 }
 
@@ -85,7 +85,7 @@ const MAX_VERTS = 65000;     // per merged mesh: 16-bit indices, and one draw ne
 /** Walk the scene and decide. Nothing changes. `opts.site` says whether the lot's planting is drawn. */
 export function planBake(THREE: any, scene: any, opts: BakeOptions): Plan {
   const hide: any[] = [], pieces: Piece[] = [], keptMeshes: any[] = [];
-  const counts = { world: 0, site: 0, seeThrough: 0, sources: 0, kept: 0, keptInstanced: 0, skipped: 0, helpers: 0 };
+  const counts = { world: 0, site: 0, seeThrough: 0, sources: 0, kept: 0, keptInstanced: 0, skipped: 0, helpers: 0, wallsCut: 0 };
   const m4 = new THREE.Matrix4(), inv = new THREE.Matrix4(), ctr = new THREE.Vector3();
 
   type Ctx = { hide: 'world' | 'site' | 'helper' | null; keep: boolean; frame: Frame; hot: boolean; core: boolean; ground: boolean };
@@ -95,6 +95,8 @@ export function planBake(THREE: any, scene: any, opts: BakeOptions): Plan {
       if (!c.visible) continue;
       const u = c.userData || {};
       let next = ctx;
+      // a wall in a cutaway/down mode is baked as it stands: the caller (xr-session) puts the house in its XR dress, walls up, BEFORE apply()
+      if (u.isWall && u.fullGroup && u.cutawayGroup && !u.fullGroup.visible) counts.wallsCut++;
       if (u.isHelper) next = { ...next, hide: 'helper' };
       else if (u.world) next = { ...next, hide: 'world' };
       else if (u.siteType || u.role === 'site') next = { ...next, hide: opts.site === 'all' ? next.hide : 'site' };
@@ -116,6 +118,8 @@ export function planBake(THREE: any, scene: any, opts: BakeOptions): Plan {
     if (ctx.hide === 'helper') { hide.push(mesh); counts.helpers++; return; }
     if (!mesh.isMesh) { counts.kept++; keptMeshes.push(mesh); return; }          // a line, points or a sprite elsewhere: as built
     if (ctx.keep) { counts.kept++; keptMeshes.push(mesh); return; }
+    // instanced scatter outside the ceilings (flora, grass, anything a realism layer adds) is not drawn on the standalone tiers
+    if (mesh.isInstancedMesh && opts.site === 'ground') { hide.push(mesh); counts.site++; return; }
     if (mesh.isInstancedMesh || mesh.isSkinnedMesh || mesh.isBatchedMesh) { counts.kept++; counts.keptInstanced++; keptMeshes.push(mesh); return; }
     const geo = mesh.geometry;
     if (!geo || !geo.attributes || !geo.attributes.position) { counts.skipped++; return; }
