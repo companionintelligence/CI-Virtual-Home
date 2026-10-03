@@ -94,7 +94,7 @@ Every clip, on the decoded file (the prototype measured fine before AAC and over
 - no clipped samples, before encoding or after decoding
 - true peak at most -1.0 dBTP and integrated loudness within 0.7 LU of -16 LUFS
 - word timings spell the text, are in order and sit inside the file
-- per family: at most 700,000 bytes of audio (`encoding.budgetBytes`)
+- per family: at most 1,150,000 bytes of audio (`encoding.budgetBytes`; it was 700,000 until assembly, when the first full set of 30 tours came out at about 600 spoken words and 230 to 270 s each; clips load per beat, only after the viewer chooses sound)
 
 A failing clip keeps its old lock entry (the test then reports it stale) and the command exits 1. Normalisation is a light
 compressor (3:1) and a limiter at -3 dBFS before AAC; if AAC overshoots, the tool lowers the ceiling and re-encodes (up to four

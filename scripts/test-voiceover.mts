@@ -65,7 +65,7 @@ test('voices.json: keys equal VOICE_KEYS, every voice is British and pinned', ()
   assert.equal(reg.engine.modelRevision, 'f3ff3571791e39611d31c381e3a41a3af07b4987');
   assert.match(reg.engine.weightsSha256 ?? '', /^496dba11[0-9a-f]{56}$/);
   assert.equal(reg.encoding.trimLeadMs, 80);
-  assert.equal(budgetBytes(reg), 700_000);
+  assert.equal(budgetBytes(reg), 1_150_000);
 });
 
 // ---- the clip list -------------------------------------------------------------------------------------------------------------------

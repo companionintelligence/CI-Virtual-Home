@@ -35,7 +35,7 @@
     "loudness": "per clip -16 LUFS integrated, limiter at -3 dBTP before AAC; post-decode gate: true peak <= -1.0 dBTP and |dI| <= 0.7 LU",
     "codec": "AAC-LC 32 kbps mono 24 kHz in .m4a, -fflags +bitexact, no metadata (plays on every browser including iOS Safari)",
     "fileName": "<beatId>[.say].<hash10>.m4a where hash10 = first 10 hex of sha256(file bytes); stored at content/families/<slug>/audio/",
-    "budget": "about 4.4 KB per second of speech; at most 700 KB of audio per family",
-    "budgetBytes": 700000
+    "budget": "about 4.2 KB per second of speech; at most 1.15 MB of audio per family (a full tour is about 600 spoken words, 230 to 270 s; raised from 700 KB at assembly because the tours are longer than the first estimate)",
+    "budgetBytes": 1150000
   }
 }
