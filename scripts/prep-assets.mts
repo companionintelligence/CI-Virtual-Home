@@ -333,9 +333,7 @@ API (\`api.polyhaven.com/info/<id>\`) has no per-asset licence field, so the sit
 <https://docs.ambientcg.com/license/> (fetched 2026-10-01) states that every asset is CC0 1.0 Universal. The authors are recorded although no
 credit is required. Poly Haven's API terms (a unique User-Agent, few calls) are followed by the prep script; nothing is scraped.
 
-Also in this package: \`assets/vendor/three/libs/meshopt_decoder.module.js\` — [meshoptimizer](https://github.com/zeux/meshoptimizer)'s decoder
-as shipped in three@0.169.0 \`examples/jsm/libs/\` (24 850 bytes, byte-identical to the npm package), MIT — © 2016-2022 Arseny Kapoulkine
-(the notice is in the file's header). It decodes the models above and nothing else.
+The decoder for the models (\`assets/vendor/three/libs/meshopt_decoder.module.js\`, meshoptimizer, MIT) is part of the three.js row under *Vendored*.
 
 | Source | Licence | Authors | Files | Modification |
 |---|---|---|---|---|

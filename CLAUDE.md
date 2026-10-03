@@ -148,11 +148,20 @@ Never re-bless to make a red gate green, and never on a machine whose profile di
   or config files. Looking at it is fine.
 - MIT code from `pascalorg/*` (editor, plugin-trees, …) and other permissive sources may be adapted: say so
   in a comment at the point of use and add a row (and the licence text) to THIRD_PARTY.md in the same commit.
-- The owner's reference photos (the Sims 4 screenshots specs are read from), and any third-party image, texture or model,
-  are never committed — except CC0 or public-domain assets that were verified at the source (the licence page URL and the
-  authors) and recorded in THIRD_PARTY.md with their files and any modification. Binary assets must have content-hashed
-  names. Everything else stays procedural (`assets/textures.ts`). Not usable at all: CC-BY-NC, "free for personal use",
-  unknown or paid assets, LYGIA (non-commercial) and Grassworks (commercial) code, and anything from Pascal's `/next` demo.
+- **Third-party textures, models and HDRIs are allowed**, by the owner's decision, when (and only when) they are CC0 or public
+  domain, or under a permissive MIT-like licence for code; CC-BY only with the attribution recorded. Each one is verified at its
+  source (the licence page or the API's licence field, named in the row) and recorded in THIRD_PARTY.md in the same commit:
+  source URL, author, licence, the files in the repo and every modification (resize, bake, simplify, recompress). Names are
+  content-hashed (`…-<first 8 hex of its sha256>.<ext>`), the files are listed in their manifest (`assets/media/<key>/files.json`),
+  and the total stays inside the budget (`assets/media` 12 MB; the initial player load grows by at most 1.5 MB: models, large
+  textures, HDRIs and the ocean load lazily, after the first frame, only for houses and tiers that use them). `pnpm run
+  prep:assets` makes them reproducibly from `scripts/assets-sources.json`; `test-third-party.mts` (in `check:quick`) fails on a
+  file without a row or a row without a file, and `portal:build` on a name without its hash or a file its manifest does not list.
+- **Still forbidden**: CC-BY-NC, "free for personal use", unknown-licence and paid packs; LYGIA (dual Prosperity non-commercial /
+  paid Patron licence: write original GLSL from the public algorithms) and Grassworks (a paid product) in any form, copied,
+  translated or paraphrased; anything from Pascal's `/next` demo; and the owner's reference photos (the Sims 4 screenshots
+  specs are read from) or any third-party image not covered by the rule above. Anything not on the allowed list stays
+  procedural (`assets/textures.ts`).
 - This repo is proprietary: no open-source licence file. New dependencies go in THIRD_PARTY.md.
 
 ## Practicalities

@@ -48,8 +48,8 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run validate` | All 30 specs against the schema, the prop catalog and the registry, then every `scripts/validate/*.mts` plugin. `--shots` adds the headless camera-path QA; `--layout` the layout lints. |
 | `pnpm run test` | `scripts/test-floorplan-graph.mts` under `node --test` — the floor-plan graph, mitres, and the wall compiler over every spec. Needs `build`. |
 | `pnpm run check` | **The gate** — every check below, in order (`pnpm run typecheck` is separate). `--house a,b`, `--jobs N`, `--res`, `--update-goldens`, `--no-perf`. |
-| `pnpm run check:quick` | assets + specs + shots, and the 15 test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site …): the fast loop while editing. |
-| `pnpm run test:node` | Only those 15 quick tests: pure Node, no browser, no GPU (a few minutes). CI runs it. |
+| `pnpm run check:quick` | assets + specs + shots, and the test scripts marked `@check-house quick` (19) (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site, the quality ladder, the binary-asset guard, the THIRD_PARTY ledger …): the fast loop while editing. |
+| `pnpm run test:node` | Only those quick tests: pure Node, no browser, no GPU (a few minutes). CI runs it. |
 | `pnpm run shots` | Render product shots to `video/houses/` (`--house`, `--shot`, `--res 1080`, `--aspect 16:9`, `--poster-only`, `--qa-only`, `--jobs`). |
 | `pnpm run goldens` / `goldens:update` | Compare 150 frames with the committed baselines / re-bless them. |
 | `pnpm run frame-hash` | Two fresh browser contexts must render the same frames. |
@@ -58,12 +58,12 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run perf` | Build, track and shot-QA timings against their budgets (3 s / 1 s / 0.5 s), report-only, with each number's Δ against the committed `test/perf/baseline.json` (`--house`, `--all`, `--baseline` to rewrite it at integration). |
 | `pnpm run perf:player` | Advisory timing of the live player (`room-creator.html?mode=view`) in Chromium on the real GPU: presented frame times, CPU and GPU time of `renderer.render`, draw calls, programs. Modes `bench` (default) `attr` `load` `raf` `profile` `census`; `--houses a,b`, `--defaults 1,2`, `--dpr 2`, `--throttle 4`, `--runs N`, `--query no=glass,…` (appended to the player URL, for A/B of a live-only feature), `--out <file.md>` (rows plus the header line with commit and `uptime`), `--json <file>`. Not part of `check` or CI: timings depend on the machine's load. See *Player performance*. |
 | `pnpm run test:live` | The live-player realism effects on the real GPU: kill-switch identity against `03edd3b`, exact restore, a clean console, no leak across home switches, the ledgers untouched, then each package's `scripts/live-checks/<key>.mts` (`--quick`, `--houses`, `--only <key>`, `--base <dir>`). See *Live realism*. |
-| `pnpm run ao` / `pnpm run prep:assets` | Regenerate `content/ao/` (the baked ambient-occlusion volumes) / `assets/media/` (the CC0 textures and props), both with content-hashed file names. |
+| `pnpm run prep:assets` | Rebuild `assets/media/assets/` (the CC0 detail textures and props: Poly Haven and ambientCG sources → content-hashed WebP and meshopt GLB), `assets/media-assets.ts` and THIRD_PARTY.md's *assets* rows from `scripts/assets-sources.json` (`--offline` reuses the cache, `--only <id,…>`). Needs the network once; its tools run through `pnpm dlx`, never as dependencies. See *Realism layer → Adding an asset*. |
 | `pnpm run shot-planner` | Spline planner v2 on all 30 houses (`assets/shot-planner.ts`): planned twice byte-identical, QA v2, the fleet camera targets, the page's track hash equal to Node's (`--parity`), the planning and QA budgets. Worlds come from `test/qa/shot-worlds/` (built in the page once, `--rebuild-worlds` / `--stale-ok`); `--update` records `test/shots/<id>.track.json`. |
 | `pnpm run shot-qa` | A fault injected for every QA v2 code, and for every fleet check, on two frozen worlds (`test/shots/worlds/`): each must be caught. No browser. |
 | `pnpm run camera-audit` | A contact strip per house and planner (twelve frames, the plan with the path by beat), the camera metrics of v1 and v2 side by side → `test/qa/camera-audit/index.html` (`--house`, `--planner v1,v2`, `--fixtures`). |
 | `pnpm run fleet-audit` | The fleet sameness metrics (door colours, claddings, lighting, furniture repetition, planting …) → `test/qa/fleet-audit.md`, beside the committed baseline `test/fleet/baseline.json`. `--built` measures what this tree's builders generate (plans rebuilt into `test/qa/plans/`); `--baseline` rewrites the baseline (integration only). |
-| `pnpm run ao` | Bake the player's ambient-occlusion volumes → `content/ao/<id>.<hash>.bin` and `manifest.json` (`--house a,b`, `--workers N`, `--check` to only test them for staleness). Re-run it after anything that moves a house's geometry; `check` fails on a stale one. See *Baked ambient occlusion and contact shadows*. |
+| `pnpm run ao` | Bake the player's ambient-occlusion volumes → `content/ao/<id>.<hash>.bin` and `manifest.json` (`--house a,b`, `--workers N`, `--check` to only test them for staleness). Re-run it after anything that moves a house's geometry; `check` fails on a stale one. See *Live realism → ao*. |
 | `pnpm run plans` | Rebuild `content/houses/<id>.plan.json` — the seeded site instances the isometric twin draws. |
 | `pnpm run iso` | Rebuild the isometric SVGs, Lotties and `scenes/manifest.json` (`--only <id>`, `--png`). |
 | `pnpm run floorplans` | Rebuild the CAD sheets and `floorplans.json` (`--only <id>`, `--no-png`, `--fit lot`). |
@@ -108,12 +108,19 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
   viewer.ts                the portal's player: shots, scrubber, time of day, path, fly (room-creator ?mode=view)
   viewer-batch.ts          the player's live-only static batching: merges each toggle unit's static opaque meshes (a third of the draw
                            calls); only viewer.ts imports it, `?no=batch` switches it off, the recorder / goldens / editor never see it
+  realism.ts, viewer-quality.ts  the live realism registry (lifecycle, isolation, kill switches) and the device probe + tier ladder;
+                           realism-<key>.ts is each feature's thin eager entry (ao, water, sky, grass, assets, frame), and
+                           viewer-ao / viewer-contact / viewer-water / viewer-ocean / viewer-sky / viewer-grass / viewer-bake /
+                           viewer-composer / media-registry / media-assets are the lazily loaded parts (README → Live realism)
+  media/                   CC0 detail textures and props the live player loads lazily (content-hashed names, files.json; pnpm run prep:assets)
 content/houses/            <id>.json — the 30 HouseSpecs (source); <id>.plan.json and index.json — derived
-content/ao/                 the baked occlusion volumes <id>.<hash>.bin and manifest.json (derived: pnpm run ao)
+content/ao/                the baked occlusion volumes <id>.<hash>.bin and manifest.json (derived: pnpm run ao)
 content/house-catalog.json every item type's measured footprint, height and iso parts (derived)
 scenes/                    isometric SVG + Lottie, CAD floor plans, and their manifests (all derived, committed)
 scripts/                   the pipeline: build, validate, render, gate (.mts) and the Python generators (.py)
   validate/                validator plugins, one per stream (validate-house-spec.mts loads them)
+  live-checks/             one GPU check per realism feature (`pnpm run test:live` runs them; lib/ holds helpers they share)
+  vendor/                  pixelmatch, the PNG codec and the BVH of the AO bake (offline only)
   fleet/                   fleet-audit metrics, one file per stream
 reference/                 HOUSE-SPEC.md (the schema), PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
                            HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review)
@@ -419,6 +426,36 @@ tiers, kill switches) and `assets/viewer.ts` calls it at seven seams, so a featu
 offline hook runs, and `apply()` brings the effect back after. The hooks themselves refuse in the player. A feature
 patches materials by clone or by define, never in place without an undo, and reads no wall clock in anything an
 offline frame depends on (the player's clock is `ctx.now()`).
+
+### The realism layer at a glance
+
+| Feature (`?no=` key) | Adds | Tier | Loads | Costs (see its sub-heading below) |
+|---|---|---|---|---|
+| `ao` (`contact` for the pads alone) | A baked ambient-occlusion volume on every lit material; soft contact pads under furniture and plants | 1+ | one 40-350 KB volume per house (`content/ao/`), after the first frame | one 3D-texture tap per lit fragment; the pads are one draw call |
+| `water` (`ocean` for the FFT sea alone) | Analytic water (fresnel, moving normals, pool ledge and caustics, lake shore); an FFT ocean on large water at tier 2 | 1+ / 2 | code only (26 KB + 10 KB), only for homes with water | ALU on water pixels; the ocean 17 draws at 30 Hz |
+| `sky` (`glass` the pane swap, `fresnel` its fresnel alone) | A procedural dome with clouds, sun, moon and stars; a sky-based environment; fresnel on the glass | 1+ | code only | the sky's pixels; one 256x128 bake and PMREM per hour seen |
+| `grass` (`foliage`, `lawn`, `grassblades`) | A site bake, an instanced grass field, a lawn patch, crown shading | 1+ | code only | measured under the grass sub-heading |
+| `assets` | CC0 photographed detail maps for the kit's procedural surfaces and CC0 models for a few props | 1+ (more at 2) | up to 1.5 MB (tier 1) or 3 MB (tier 2) per house, after the first frame | pointer swaps; no program compiles |
+| `frame` (`accum`, `lamppool`, `spotclip`, `hqlite`) | Idle temporal accumulation, a lighter Best quality, softer lamp pools, the spot-light room clip | 0+ / 1+ | code only | idle only; Best quality about half its old frame time |
+
+`?no=realism` turns all of it off (the page is then `03edd3b`'s, pixel for pixel: `pnpm run test:live`). `?q=0|1|2` pins the tier.
+Every feature is live-player only: `viewer.external.before()` (what the page's offline hooks call) restores the scene as built,
+so goldens, fixtures, films, stills and thumbnails never see any of it.
+
+### Adding an asset
+
+1. Only CC0 or public-domain files (CC-BY only with the attribution recorded). Check the licence at the source (Poly Haven and
+   ambientCG publish theirs site-wide; use the licence page URL as evidence). Never LYGIA, Grassworks, Pascal's `/next`, CC-BY-NC,
+   personal-use or paid packs, or the owner's reference photos (CLAUDE.md → Licensing).
+2. Add an entry to `textures` or `models` in `scripts/assets-sources.json` (`id`, `source` and `sourceId`, `authors`, the procedural
+   `kinds` a texture replaces and its physical `periodM` in metres, or the prop `types` a model stands in for and its `fit` box), then
+   `pnpm run prep:assets --only <id>`. It downloads from the exact URLs, md5-checks, converts (WebP at 512 / 1024 px, albedo reduced
+   to luma around a known mean, meshopt GLB capped at `maxTris`), writes `assets/media/assets/<tex|models>/<name>-<sha8>.<ext>`,
+   `files.json`, `assets/media-assets.ts` and the THIRD_PARTY.md rows.
+3. `pnpm run build && pnpm run test:live -- --only assets` (restore identity, the budgets, every request listed and 200) and look at
+   an A/B still (`?no=assets`). `pnpm run portal:build` fails on an unlisted, missing or mis-hashed file and over 12 MB.
+4. Commit the files and the rows together. A binary under a stable name against new code was an outage once; the hash in the name is
+   the only cache key the import map does not give it.
 
 ### Tiers
 

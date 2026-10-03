@@ -277,7 +277,8 @@ export function mountViewer(api: Api) {
   let hq = false;
   // The plain path draws its panes without the transmission pass (viewer-glass.ts); Best quality and anything drawn
   // through the page's __houseRender* hooks get the transmissive glass back.
-  const glass = createGlassSwap(THREE, api.scene, !no.has('glass'));
+  // (its fresnel patch is the sky package's glass look: off under ?no=realism / ?no=fresnel and at tier 0, where the swap is today's page)
+  const glass = createGlassSwap(THREE, api.scene, !no.has('glass'), () => !no.has('realism') && !no.has('fresnel') && realism.tier >= 1);
   // The live realism effects (assets/realism.ts): installed per house in onHouse, ticked and drawn in frame(), shed or
   // promoted by the ADAPT block, and taken off for the page's offline hooks. ?no=<key> or ?no=realism kills them.
   // (the batch is undone and redone through the two functions below, which batchHouse's bake closure backs)
@@ -288,6 +289,7 @@ export function mountViewer(api: Api) {
     markDirty: () => { dirty = true; },
     unbatch: () => unbatchHouse(),
     rebatch: () => rebatchHouse(),
+    onTier: () => glass.syncFresnel(),
   });
   let tod: string | null = null;   // the viewer's choice; null = the house's own hour
   let ready = false;
@@ -679,7 +681,7 @@ export function mountViewer(api: Api) {
     }
     hq = on;
     realism.setHq(on);
-    if (on) { if (!realism.keepsOpaqueGlass()) glass.restore(); toast('Best quality is on. Playback may be slower.'); }
+    if (on) { if (!realism.keepsOpaqueGlass()) glass.restore(); toast('Best quality is on: a live preview. Playback may be slower; films and stills use the full pipeline.'); }
     else { realism.reapply(); glass.apply(); }   // (the swap is a program change, so it happens here and not per frame)
     dirty = true;
   }
@@ -914,7 +916,7 @@ export function mountViewer(api: Api) {
     const auto = renderer.shadowMap.autoUpdate;
     renderer.shadowMap.autoUpdate = !moving || shadowTick++ % 3 === 0;
     try { if (!realism.render(hq)) api.render(hq); } finally { renderer.shadowMap.autoUpdate = auto; }
-    if (hqFirst) { hqFirst = false; hqWarm = true; hqDone(); toast('Best quality is on. Playback may be slower.'); }
+    if (hqFirst) { hqFirst = false; hqWarm = true; hqDone(); toast('Best quality is on: a live preview. Playback may be slower; films and stills use the full pipeline.'); }
   }
   // the shot's field of view, widened for a narrow window (fitFov); applySplineFrame puts the shot's own back
   // on every frame, so this never compounds
@@ -980,7 +982,7 @@ export function mountViewer(api: Api) {
     if (nowTarget.visible && dirty) { const p = nowTarget.geometry.attributes.position; p.setXYZ(0, controls.target.x, controls.target.y, controls.target.z); p.needsUpdate = true; }
     if (realism.active) realism.tick(delta, camera);   // (may mark the frame dirty: water, accumulation)
     if (dirty) { render(); dirty = false; lastDrawAt = performance.now(); }
-    else if (realism.active && !playing && !flying && realism.idle(performance.now() - lastDrawAt)) render();   // idle accumulation
+    else if (realism.active && !playing && realism.idle(performance.now() - lastDrawAt)) render();   // idle accumulation
     if (shownEndCard && !endPlaced) placeEndCard();
   }
 

@@ -112,7 +112,7 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
 
   // ---- 1b. kill switch and tier 0 draw what 03edd3b drew (only when the harness has the BASE_SHA tree)
   if (env.base) {
-    for (const [label, query] of [['?no=frame', 'no=frame'], ['tier 0 (?q=0)', 'q=0']] as const) {
+    for (const [label, query] of [['?no=frame', 'no=frame,ao,water,sky,grass,assets'], ['tier 0 (?q=0)', 'q=0']] as const) {   // (the other features change the picture too: this is the frame package's switch alone)
       const mine = await env.open(house, { tod: 'dusk', query });
       const ref = await env.open(house, { of: 'base', tod: 'dusk' });
       try {
@@ -124,7 +124,7 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
 
   // ---- 2. accumulation -------------------------------------------------------------------------------------------------------
   {
-    const t1 = await env.open('aurora', { tod: 'day', query: 'q=1' });
+    const t1 = await env.open('aurora', { tod: 'day', query: 'q=1&no=water' });   // (visible water keeps frames coming at 30 Hz, so a view with water in it is never still: no accumulation there, by design)
     try {
       const f = await waitFor(t1, f => f.accum.state === 'done');
       add('tier 1: a still view accumulates 8 samples and stops', !!f && f.accum.state === 'done' && f.accum.steps === 8, f ? JSON.stringify(f.accum) : 'no stats');
@@ -139,7 +139,7 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
       const h = await waitFor(t1, f => f.accum.state === 'done' && f.accum.total > (g?.accum.total ?? 0));
       add('and it accumulates again once the view is still', !!h && h.accum.state === 'done' && h.accum.steps === 8, h ? JSON.stringify(h.accum) : 'no stats');
     } finally { await t1.close(); }
-    const t2 = await env.open('aurora', { tod: 'day', query: 'q=2' });
+    const t2 = await env.open('aurora', { tod: 'day', query: 'q=2&no=water' });
     try {
       const f = await waitFor(t2, f => f.accum.state === 'done');
       // (a refinement frame over 45 ms twice stops the run by design; on a loaded machine that is the right answer, so it is accepted when it says so)
@@ -157,8 +157,8 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
   // ---- 3. colour match + 5. Best quality ---------------------------------------------------------------------------------------
   for (const [h, tod] of [['aurora', 'day'], ['lakecabin', 'dusk']] as const) {
     if (!env.houses.includes(h) && h !== 'aurora') continue;
-    const plain = await env.open(h, { tod, query: 'q=1&no=accum' });
-    const acc = await env.open(h, { tod, query: 'q=1' });
+    const plain = await env.open(h, { tod, query: 'q=1&no=accum,water' });
+    const acc = await env.open(h, { tod, query: 'q=1&no=water' });
     try {
       await waitFor(acc, f => f.accum.state === 'done');
       const [a, p] = [await lumSat(acc), await lumSat(plain)];

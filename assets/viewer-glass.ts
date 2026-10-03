@@ -87,9 +87,11 @@ function unpatchFresnel(m: any) {
   if ('key' in saved) m.customProgramCacheKey = saved.key; else delete m.customProgramCacheKey;
 }
 
-export type GlassSwap = { apply(): void; restore(): void; sync(): void; readonly swapped: boolean };
+export type GlassSwap = { apply(): void; restore(): void; sync(): void; /** the fresnel patch was switched on or off by `fresnel()`: bring the swapped panes to it */ syncFresnel(): void; readonly swapped: boolean };
 
-export function createGlassSwap(_THREE: any, scene: any, enabled = true): GlassSwap {
+/** `fresnel()` says whether the swapped panes carry the fresnel patch (read at every swap and by syncFresnel()): the player
+ *  answers false under ?no=realism / ?no=fresnel and at tier 0, where the swap alone is today's page. */
+export function createGlassSwap(_THREE: any, scene: any, enabled = true, fresnel: () => boolean = () => true): GlassSwap {
   let swapped = false;   // the state the scene's panes are in (true: the plain path's opaque-pass glass)
 
   const each = (fn: (m: any) => void) => {
@@ -109,7 +111,7 @@ export function createGlassSwap(_THREE: any, scene: any, enabled = true): GlassS
     // a faint pane gets a firmer tint; water (0.75+) and anything already firm is left as authored
     if (m.opacity < MIN_OPACITY) { const k = MIN_OPACITY / m.opacity; m.opacity = MIN_OPACITY; if (ud.orig && o.userOrigOpacity !== undefined) ud.orig.opacity = o.userOrigOpacity * k; }
     m.color.multiplyScalar(TINT);
-    patchFresnel(m);
+    if (fresnel()) patchFresnel(m);
     m.needsUpdate = true;
   };
   const unswap = (m: any) => {
@@ -144,7 +146,16 @@ export function createGlassSwap(_THREE: any, scene: any, enabled = true): GlassS
         if (m.transmission > 0 && !(m.userData && m.userData.__glassOrig)) swap(m);
         // a window-glow twin is a clone of a swapped pane: it has the swapped values (userData is deep-copied) but not the
         // patch, which a clone does not carry
-        else if (m.userData && m.userData.__glassOrig && !patched.has(m)) { patchFresnel(m); m.needsUpdate = true; }
+        else if (m.userData && m.userData.__glassOrig && !patched.has(m) && fresnel()) { patchFresnel(m); m.needsUpdate = true; }
+      });
+    },
+    syncFresnel() {
+      if (!enabled || !swapped) return;
+      const want = fresnel();
+      each(m => {
+        if (!(m.userData && m.userData.__glassOrig)) return;
+        if (want && !patched.has(m)) { patchFresnel(m); m.needsUpdate = true; }
+        else if (!want && patched.has(m)) { unpatchFresnel(m); m.needsUpdate = true; }
       });
     },
     get swapped() { return swapped; },

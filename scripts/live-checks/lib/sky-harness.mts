@@ -1,5 +1,5 @@
 // Shared by the sky live check and by the look/perf captures: open the live player in Chromium on the real GPU WITHOUT the
-// registry's own sky (?no=sky) and install the sky feature by hand (assets/realism-sky.ts's `feature.install(ctx)`), so a
+// registry's features (?no=sky,ao,water,…: those would change the picture between two renders) and install the sky feature by hand (assets/realism-sky.ts's `feature.install(ctx)`), so a
 // check can hold the page's plain picture, the handle and the order of events. The page's own frame loop keeps running;
 // this adds only the context the feature asks for. (Lives in lib/ so test:live does not run it as a check.)
 import path from 'node:path';
@@ -16,7 +16,8 @@ export async function openPlayer(browser: any, origin: string, house: string, { 
   page.on('pageerror', (e: Error) => errors.push('pageerror ' + e.message.split('\n')[0]));
   page.on('console', (m: any) => { if (m.type() === 'error' || m.type() === 'warning') errors.push(m.type() + ' ' + m.text().slice(0, 200)); });
   await stubGoogleFonts(page, origin);
-  const q = /(^|&)no=/.test(query) ? query.replace(/(^|&)no=/, '$1no=sky,') : (query ? query + '&' : '') + 'no=sky';
+  const OTHERS = 'sky,ao,water,grass,assets,frame';   // (every registry feature: the harness installs the sky itself; the glass's fresnel stays on, it is part of what is checked)
+  const q = /(^|&)no=/.test(query) ? query.replace(/(^|&)no=/, `$1no=${OTHERS},`) : (query ? query + '&' : '') + `no=${OTHERS}`;
   await page.goto(`${origin}/room-creator.html?mode=view&house=${house}&shot=orbit&play=0&${q}`, { waitUntil: 'domcontentloaded', timeout: 240000 });
   await page.waitForFunction(() => document.documentElement.dataset.viewer === 'ready' || document.querySelector('.vh-error:not([hidden])') !== null, null, { timeout: 240000 });
   return { page, ctx, errors };

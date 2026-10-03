@@ -210,7 +210,11 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
         const sigWith = await sigOf(on);
         await on.eval(() => (window as any).__houseViewer.external.before());
         await off.eval(() => (window as any).__houseViewer.external.before());   // (the glass swap goes back on both pages)
+        // a restore that had to undo the static batch leaves the scene unbatched: the killed page is put in the same state
+        const unbatched = await on.eval(() => !(window as any).__houseViewer.batch);
+        const undid = unbatched && await off.eval(() => { const v = (window as any).__houseViewer; if (!v.batch) return false; v.batchOn(false); return true; });
         const sigRestored = await sigOf(on), sigOff = await sigOf(off);
+        if (undid) await off.eval(() => (window as any).__houseViewer.batchOn(true));
         add(`${h}: grass installed and crowns shaded (${patched} meshes) before the hooks`, !!fxOn.features.grass && patched > 0 && sigWith.text !== sigOff.text);
         add(`${h}: restored scene equals the ?no=realism scene`, sigRestored.text === sigOff.text, sigRestored.text === sigOff.text ? `${sigOff.n} objects, ${hashOf(sigOff.text)}` : firstDiff(sigRestored.text, sigOff.text));
         await on.eval(() => (window as any).__houseViewer.external.after());
@@ -222,7 +226,7 @@ export default async function check(env: LiveEnv): Promise<Result[]> {
     if (env.base) {
       // grass and foliage off, every other feature off too (so the check holds once those packages are merged): the base's pixels
       for (const h of [houses[0], houses[1]]) {
-        const mine = await env.open(h, { query: 'q=2&no=ao,water,sky,assets,frame,grass,foliage' });
+        const mine = await env.open(h, { query: 'q=2&no=ao,water,sky,assets,frame,grass,foliage,fresnel' });
         const ref = await env.open(h, { of: 'base' });
         try {
           for (const tod of ['day', 'night']) {

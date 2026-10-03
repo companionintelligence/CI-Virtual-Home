@@ -210,7 +210,7 @@ async function exportHouse(browser: any, srv: { url: (p: string) => string; orig
     page.on('pageerror', (e: Error) => errs.push(e.message));
     await stubGoogleFonts(page, srv.origin);
     // (no=compile: nothing here is drawn; no=ao,contact would leave the export out, so only the shader work is skipped)
-    await page.goto(`${srv.url('room-creator.html')}?mode=view&house=${encodeURIComponent(id)}&shot=orbit&play=0&aoexport=1&no=compile,contact`, { waitUntil: 'domcontentloaded', timeout: 240000 });
+    await page.goto(`${srv.url('room-creator.html')}?mode=view&house=${encodeURIComponent(id)}&shot=orbit&play=0&aoexport=1&no=compile,contact,water,sky,grass,assets,frame,fresnel`, { waitUntil: 'domcontentloaded', timeout: 240000 });
     try { await page.waitForFunction(() => !!(window as any).__vhAoExport, null, { timeout: 240000 }); }
     catch (e) { throw new Error(`ao: ${id} did not export its occluders (${errs.join('; ') || (e as Error).message})`); }
     const r = await page.evaluate((withTris: boolean) => {

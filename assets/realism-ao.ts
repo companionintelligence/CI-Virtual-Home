@@ -16,6 +16,11 @@ const MANIFEST_URL = './content/ao/manifest.json';
 type Entry = { file: string; bytes: number; fp: any };
 type Loaded = { entry: Entry; buf: ArrayBuffer };
 const pending = new Map<string, Promise<Loaded | null>>();
+// The geometry fingerprint of each house as the builders made it, taken in observe() before any other feature has hidden, added
+// or re-materialled anything (the assets' props, the grass, the water's opaque clones all change what the walk would count).
+// viewer-ao.js is requested by prefetch() while the house builds; if it has not arrived, install() measures the scene as it finds it.
+let viewerAo: typeof import('./viewer-ao.js') | null = null;
+const seen = new Map<string, { fp: any }>();
 
 async function load(houseId: string): Promise<Loaded | null> {
   try {
@@ -41,6 +46,12 @@ const aoFeature: RealismFeature = {
     // the exporter (scripts/bake-ao.mts) loads no volume: it is what makes them
     if (ctx.params.has('aoexport') || pending.has(houseId)) return;
     pending.set(houseId, load(houseId));
+    if (!viewerAo) void import('./viewer-ao.js').then(m => { viewerAo = m; }, () => { /* install() imports it again and reports */ });
+  },
+  observe(ctx: RealismCtx) {
+    if (!viewerAo || ctx.params.has('aoexport')) return;
+    const house = ctx.house();
+    seen.set(house.id, { fp: viewerAo.fingerprint(ctx.THREE, ctx.scene, viewerAo.volumeBox(house)) });
   },
   async install(ctx: RealismCtx): Promise<RealismHandle | null> {
     const { THREE, scene } = ctx;
@@ -73,7 +84,8 @@ const aoFeature: RealismFeature = {
       else {
         try {
           const vol = V.parseVolume(got.buf);
-          const fp = V.fingerprint(THREE, scene, V.volumeBox(house));
+          const snap = seen.get(house.id);
+          const fp = snap ? snap.fp : V.fingerprint(THREE, scene, V.volumeBox(house));
           if (!V.sameFingerprint(got.entry.fp, fp)) { stats.volume = 'stale'; console.info(`ao: ${house.id}'s volume was baked from other geometry (${got.entry.fp.n} triangles, now ${fp.n}); drawn without it. Run: pnpm run ao --house ${house.id}`); }
           else {
             // (?aok=<exponent> is a tuning knob for looking at stills; the shipped strength is V.DEFAULTS)

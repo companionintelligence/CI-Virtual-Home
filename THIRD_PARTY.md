@@ -6,6 +6,12 @@
 Every third-party component this repository ships, adapts, loads or builds with, with its licence and where
 its licence text lives. When you add, upgrade or adapt one, update this file in the same commit.
 
+**What may be added** (CLAUDE.md → Licensing has the rule): code under MIT / BSD / ISC / Apache-2.0, and textures, models and
+HDRIs that are CC0 or public domain (CC-BY only with the attribution recorded), each verified at its source, with a row here (name,
+source URL, author, licence, files, modification) and a content-hashed file name. Not usable: CC-BY-NC, "free for personal use",
+unknown or paid assets, LYGIA, Grassworks, Pascal's `/next` demo, and the owner's reference photos. `scripts/test-third-party.mts`
+(in `check:quick`) checks that every third-party file has a row and every row a file.
+
 ## Vendored — shipped in this repository
 
 | Component | Version | Licence | Where | Licence text |
@@ -20,7 +26,7 @@ its licence text lives. When you add, upgrade or adapt one, update this file in 
 **Local modification.** The three.js files are byte-identical to the `three@0.169.0` npm package except one:
 `postprocessing/GTAOPass.js` `generateNoise()` seeds its `SimplexNoise` with mulberry32 instead of
 `Math.random`, so every frame's ambient-occlusion dither is the same (the determinism the goldens depend on).
-`libs/meshopt_decoder.module.js` (24,850 B) is byte-identical to the npm package's.
+`libs/meshopt_decoder.module.js` (24,850 B; meshoptimizer's decoder, MIT © 2016-2022 Arseny Kapoulkine, notice in its header) is byte-identical to the npm package's.
 
 The fonts are OFL-1.1: they may be bundled and redistributed with this software, but not sold on their own, and
 a modified version may not use the reserved font names. The capture scripts serve them locally in place of the
@@ -28,12 +34,11 @@ Google Fonts stylesheet the pages link (see below), so a golden never depends on
 
 `scripts/vendor/png.mjs` sits beside pixelmatch but is first-party.
 
-**ao — baked ambient occlusion.** `scripts/vendor/three-mesh-bvh.0.9.15.mjs` is byte-identical to `build/index.module.js` of the npm
+**three-mesh-bvh (for the AO bake).** `scripts/vendor/three-mesh-bvh.0.9.15.mjs` is byte-identical to `build/index.module.js` of the npm
 package except its first line, where `from 'three'` became the relative path
 `../../assets/vendor/three/three.module.min.js` (one three.js instance, no import map in Node). It is used only by `pnpm run ao`; it
 is under `scripts/`, not `assets/`, so the portal does not ship it, and nothing in `assets/` imports it. Its GLSL distance
-functions (which carry a Shadertoy provenance note) are not used. The volumes in `content/ao/` are our own output (a function
-of our geometry), not third-party material, and no third-party image, texture or model was added for this feature.
+functions (which carry a Shadertoy provenance note) are not used. 
 
 ## Adapted source — code or proportions reworked into our own files
 
@@ -45,14 +50,6 @@ of our geometry), not third-party material, and no third-party image, texture or
 | [pascalorg/plugin-trees](https://github.com/pascalorg/plugin-trees) | MIT — © 2026 Pascal | flower-head geometry (daisy ring, tulip cup, lavender spike; `src/flower-geometry.ts`), the grass tuft of flattened leaning cones (`src/grass-geometry.ts`) and the one-geometry-per-variant instancing pattern | [`assets/site.ts`](assets/site.ts) |
 
 Their licence texts are reproduced at the end of this file.
-
-### Live realism: sky and glass
-
-`assets/viewer-sky.ts`, `assets/realism-sky.ts` and the fresnel patch in `assets/viewer-glass.ts` contain no third-party
-code, texture, model or HDRI. The shaders are original, written from published algorithms that need no notice: value noise
-and fractal Brownian motion (the textbook definitions), the Henyey-Greenstein phase function (Henyey and Greenstein, 1941),
-and Schlick's Fresnel approximation (Schlick, 1994). The one-line `fract(sin(dot(...)))` hash is the long-standing public-domain
-idiom. LYGIA (dual Prosperity non-commercial / paid licence) and Grassworks (commercial) were not consulted for it.
 
 ## Reference only — nothing copied
 
@@ -113,7 +110,7 @@ empty one. None of these is a dependency of the repository, and none of their co
 Run at prep time with `pnpm dlx` and never added as a dependency (they make `assets/media/**`, `scripts/prep-assets.mts`):
 [`@gltf-transform/core`, `/extensions`, `/functions`, `/cli`](https://gltf-transform.dev) 4.5.1 (MIT),
 [`sharp`](https://sharp.pixelplumbing.com) 0.35.5 (Apache-2.0) and [`meshoptimizer`](https://github.com/zeux/meshoptimizer)
-1.3.0 (MIT). `scripts/bake-ao.mts` imports the vendored three-mesh-bvh below.
+1.3.0 (MIT). `scripts/bake-ao.mts` imports the vendored three-mesh-bvh (the *Vendored* table above).
 
 External tools the scripts call but this repository does not include: **ffmpeg** (`render-house-shots.mts`,
 `prop-sheet.mts`; LGPL-2.1+/GPL depending on build), **rsvg-convert** from librsvg (`generate_floor_plans.py`,
@@ -123,16 +120,15 @@ External tools the scripts call but this repository does not include: **ffmpeg**
 
 Third-party code and assets behind the player's look-only effects (`assets/realism*.ts`, `assets/viewer-*.ts`; README →
 *Live realism*). Each package records its own rows under its own sub-heading, between the two marker lines; the shared
-rows (the ocean source, the BVH, the tooling) are above them.
+rows (the ocean source) are above them; the BVH is in *Vendored* at the top and the prep-time tools are under *Build and test tooling*.
 
 <!-- realism:shared:begin -->
-### Shared rows (written once, by the scaffold)
+### Shared rows
 
 | Source | Licence | What | Where |
 |---|---|---|---|
 | [jbouny/fft-ocean](https://github.com/jbouny/fft-ocean) (checked with `gh api`) | MIT — © 2014 Jérémy Bouny | the FFT ocean: the spectrum, the phase and the FFT passes, the normal map and the ocean shader, ported from its three.js r6x API to r169 as a module that loads only at tier 2, for large bodies of water. Modifications are listed by the water package under its own sub-heading; the one known in advance is the `tanh` the shader redeclares, which GLSL ES 3.00 already has and which stops the program compiling. | `assets/viewer-ocean.ts` (lazy) |
 | [dli/waves](https://github.com/dli/waves) | MIT — © 2014 David Li | the WebGL ocean fft-ocean's header credits as the original work it is a port of; its notice is kept with fft-ocean's | `assets/viewer-ocean.ts` |
-| [three-mesh-bvh](https://github.com/gkjohnson/three-mesh-bvh) 0.9.15 (checked with `gh api`) | MIT — © 2018 Garrett Johnson | the bounding-volume hierarchy the ambient-occlusion bake casts its rays through. One edit: its `import … from 'three'` becomes the path of this repository's vendored three. It runs in `scripts/bake-ao.mts` only and is **not shipped** to the site. Its GLSL distance functions (a Shadertoy-derived footnote in its source) are not used and must not be shipped. | `scripts/vendor/three-mesh-bvh.0.9.15.mjs`, licence: `scripts/vendor/LICENSE-three-mesh-bvh.txt` |
 
 Binary assets (textures, models, baked volumes) are committed only when they are **CC0 or public domain, verified at the
 source** (the licence page and the API field are named in the row) and carry a content-hashed name; the rows are under
@@ -142,6 +138,8 @@ source** (the licence page and the API field are named in the row) and carry a c
 
 #### ao
 <!-- realism:ao:begin -->
+The baked volumes in `content/ao/` are our own output (a function of our geometry), not third-party material. The only third-party
+thing in this package is the vendored three-mesh-bvh, in the *Vendored* table at the top (offline bake only, never shipped).
 <!-- realism:ao:end -->
 
 #### water
@@ -157,6 +155,11 @@ domain; cellular edges; Schlick Fresnel; Toksvig roughness).
 
 #### sky
 <!-- realism:sky:begin -->
+`assets/viewer-sky.ts`, `assets/realism-sky.ts` and the fresnel patch in `assets/viewer-glass.ts` contain no third-party
+code, texture, model or HDRI. The shaders are original, written from published algorithms that need no notice: value noise
+and fractal Brownian motion (the textbook definitions), the Henyey-Greenstein phase function (Henyey and Greenstein, 1941),
+and Schlick's Fresnel approximation (Schlick, 1994). The one-line `fract(sin(dot(...)))` hash is the long-standing public-domain
+idiom. LYGIA (dual Prosperity non-commercial / paid licence) and Grassworks (commercial) were not consulted for it.
 <!-- realism:sky:end -->
 
 #### grass
@@ -180,9 +183,7 @@ API (`api.polyhaven.com/info/<id>`) has no per-asset licence field, so the site-
 <https://docs.ambientcg.com/license/> (fetched 2026-10-01) states that every asset is CC0 1.0 Universal. The authors are recorded although no
 credit is required. Poly Haven's API terms (a unique User-Agent, few calls) are followed by the prep script; nothing is scraped.
 
-Also in this package: `assets/vendor/three/libs/meshopt_decoder.module.js` — [meshoptimizer](https://github.com/zeux/meshoptimizer)'s decoder
-as shipped in three@0.169.0 `examples/jsm/libs/` (24 850 bytes, byte-identical to the npm package), MIT — © 2016-2022 Arseny Kapoulkine
-(the notice is in the file's header). It decodes the models above and nothing else.
+The decoder for the models (`assets/vendor/three/libs/meshopt_decoder.module.js`, meshoptimizer, MIT) is part of the three.js row under *Vendored*.
 
 | Source | Licence | Authors | Files | Modification |
 |---|---|---|---|---|

@@ -37,6 +37,8 @@ export type LivePage = {
   effects(): Promise<any>;
   /** sha256 of the canvas after one draw of the scene by the page's renderer (what a plain frame is), in the same task */
   hash(): Promise<string>;
+  /** the data URL behind hash(): one draw of the scene by the page's renderer, as a PNG (for a comparison with a tolerance) */
+  pngUrl(): Promise<string>;
   /** sha256 of a screenshot of the canvas (the player's last frame, effects and all; the controls are hidden). NOT stable from run
    *  to run, even on one unchanged tree (what the last frame caught depends on timing: measured, three loads of 03edd3b gave
    *  three hashes), so use it to look, and hash() to compare. */
@@ -63,6 +65,22 @@ export type LiveEnv = {
 const args = parseArgs(process.argv.slice(2));
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const sha = (s: string | Buffer): string => crypto.createHash('sha256').update(s).digest('hex').slice(0, 16);
+/** two PNG data URLs compared pixel by pixel: how many pixels differ and by how many levels at most */
+async function pngDiff(a: string, b: string): Promise<{ n: number; total: number; max: number }> {
+  const { decodePNG } = await import('./vendor/png.mjs');
+  const A = decodePNG(Buffer.from(a.slice(a.indexOf(',') + 1), 'base64')), B = decodePNG(Buffer.from(b.slice(b.indexOf(',') + 1), 'base64'));
+  if (A.width !== B.width || A.height !== B.height) return { n: Infinity, total: A.width * A.height, max: 255 };
+  let n = 0, max = 0;
+  for (let i = 0; i < A.width * A.height; i++) {
+    let d = 0;
+    for (let c = 0; c < 3; c++) d = Math.max(d, Math.abs(A.data[i * 4 + c] - B.data[i * 4 + c]));
+    if (d) { n++; if (d > max) max = d; }
+  }
+  return { n, total: A.width * A.height, max };
+}
+// check (b)'s tolerance: a restored page whose shader programs carry a patch the killed page's do not (the frame package's spot
+// clip, restored to "off" but still compiled in) may differ by one level in a handful of pixels (frame.mts measures 2e-4 %).
+const RESTORE_TOL = { fraction: 1e-4, levels: 2 };
 const NOISE = /GL Driver Message|GPU stall due to ReadPixels|Automatic fallback to software WebGL|Failed to load resource: net::ERR_FAILED.*fonts\./;
 
 async function main(): Promise<number> {
@@ -131,14 +149,12 @@ async function main(): Promise<number> {
         page, errors,
         effects: () => page.evaluate(() => JSON.parse(JSON.stringify((window as any).__houseViewer.effects || null))),
         settle: async () => { await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))); await sleep(250); },
-        hash: async () => {
-          const url = await page.evaluate(() => {
-            const d = (window as any).__houseDebug(), r = d.renderer;
-            r.render(d.scene, d.camera);
-            return r.domElement.toDataURL('image/png');   // same task as the draw: the drawing buffer is still there
-          });
-          return sha(url);
-        },
+        pngUrl: () => page.evaluate(() => {
+          const d = (window as any).__houseDebug(), r = d.renderer;
+          r.render(d.scene, d.camera);
+          return r.domElement.toDataURL('image/png') as string;   // same task as the draw: the drawing buffer is still there
+        }),
+        hash: async () => sha(await lp.pngUrl()),
         shotHash: async () => {
           await page.addStyleTag({ content: '.vh{visibility:hidden !important}' });
           return sha(await page.locator('canvas').first().screenshot());
@@ -190,10 +206,20 @@ async function main(): Promise<number> {
             await on.settle(); await off.settle();
             await on.eval(() => (window as any).__houseViewer.external.before());
             await off.eval(() => (window as any).__houseViewer.external.before());
-            const [x, y] = [await on.hash(), await off.hash()];
+            // a restore that had to undo the static batch leaves the scene unbatched (what a product frame draws): the killed page is
+            // put in the same state, since merged and unmerged meshes may differ in the last bit of a vertex
+            const unbatched = await on.eval(() => !(window as any).__houseViewer.batch);
+            const undid = unbatched && await off.eval(() => { const v = (window as any).__houseViewer; if (!v.batch) return false; v.batchOn(false); return true; });
+            const [pa, pb] = [await on.pngUrl(), await off.pngUrl()];
+            if (undid) await off.eval(() => (window as any).__houseViewer.batchOn(true));
             await on.eval(() => (window as any).__houseViewer.external.after());
             await off.eval(() => (window as any).__houseViewer.external.after());
-            add(`${h}: t=${k.toFixed(3)} restored equals killed`, x === y, x === y ? x.slice(0, 8) : `${x.slice(0, 8)} vs ${y.slice(0, 8)}`);
+            const [x, y] = [sha(pa), sha(pb)];
+            if (x === y) add(`${h}: t=${k.toFixed(3)} restored equals killed`, true, x.slice(0, 8));
+            else {
+              const d = await pngDiff(pa, pb), frac = d.n / d.total;
+              add(`${h}: t=${k.toFixed(3)} restored equals killed${undid ? ' (both unbatched)' : ''}`, frac <= RESTORE_TOL.fraction && d.max <= RESTORE_TOL.levels, `${x.slice(0, 8)} vs ${y.slice(0, 8)}: ${d.n} of ${d.total} pixels differ (${(frac * 100).toExponential(1)} %), by at most ${d.max} levels; tolerance ${RESTORE_TOL.fraction * 100} % and ${RESTORE_TOL.levels}`);
+            }
           }
         } finally { await on.close(); await off.close(); }
       }
@@ -201,9 +227,10 @@ async function main(): Promise<number> {
       // ---- d. memory returns after switching homes
       section('d. renderer.info.memory returns to baseline after switching homes');
       {
-        const lp = await env.open(houses[0], { query: 'q=2' });
+        const lp = await env.open(houses[0], { query: 'q=2&no=accum' });   // (an accumulation run holds two targets for its first seconds)
         try {
           const mem = () => lp.eval(() => { const m = (window as any).__houseDebug().renderer.info.memory; return { geometries: m.geometries, textures: m.textures }; });
+          await sleep(3500);   // (the features' downloads land after the first frame; a swap frees the procedural textures it replaces)
           const m0 = await mem();
           const name = () => lp.eval(() => document.querySelector('.vh-name')!.textContent);
           for (const key of [']', ']', '[', '[']) {
@@ -212,7 +239,7 @@ async function main(): Promise<number> {
             await lp.page.waitForFunction((n: string | null) => document.documentElement.dataset.viewer === 'ready' && document.querySelector('.vh-name')!.textContent !== n, before, { timeout: 120000 });
             await lp.settle();
           }
-          await sleep(500);
+          await sleep(3500);
           const m1 = await mem();
           add('geometries and textures back to the first load', m1.geometries === m0.geometries && m1.textures === m0.textures, `${m0.geometries}/${m0.textures} → ${m1.geometries}/${m1.textures}`);
         } finally { await lp.close(); }

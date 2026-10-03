@@ -80,6 +80,10 @@ export type RealismFeature = {
   batchSensitive?: boolean;
   /** called as soon as the house id is known (before the build finishes): start downloads here, touch nothing else */
   prefetch?(houseId: string, ctx: RealismCtx): void;
+  /** called once per house, synchronously, at the start of the pre-batch install and before any feature has applied anything:
+   *  the scene is exactly as the builders made it (a feature that must measure that, as ao's geometry fingerprint does, measures
+   *  it here, not in install(), where another feature may already have hidden, added or re-materialled things). Touch nothing. */
+  observe?(ctx: RealismCtx): void;
   install(ctx: RealismCtx): Promise<RealismHandle | null>;
 };
 
@@ -107,6 +111,8 @@ export type RealismHost = {
   /** undo the static batch; true when there was one to undo */
   unbatch(): boolean;
   rebatch(): void;
+  /** the ladder moved to `to` (after the features were switched): for what the host itself ties to the tier (the glass's fresnel) */
+  onTier?(to: Tier): void;
 };
 
 type Active = { f: RealismFeature; ctx: RealismCtx; handle: RealismHandle; applied: boolean; unsub: (() => void)[] };
@@ -222,6 +228,14 @@ export function createRealism(host: RealismHost) {
       closed['pre-batch'] = closed['post-batch'] = false; deadline = performance.now() + BUDGET_MS;
       // the renderer string (the one probe query that asks the GPU) is read here, once the house is built, not at mount
       if (!probe.renderer) { readRenderer(probe, host.renderer.getContext?.() ?? null); ladder.restart(); }
+      // the modules were requested by prefetch() while the house built: this waits for little. Then each feature that wants to look
+      // at the scene as built does, before any of them applies anything.
+      await Promise.all(TABLE.filter(e => !killed(e.key)).map(e => load(e.key)));
+      for (const e of TABLE) {
+        const f = moduleCache.get(e.key);
+        if (!f || !f.observe || killed(f.key) || f.minTier > ladder.ceiling) continue;
+        try { f.observe(makeCtx(f.key).ctx); } catch (err) { console.warn(`realism: ${f.key} observe failed`, err); }
+      }
     }
     const gen = generation;
     const jobs: Promise<void>[] = [];
@@ -273,6 +287,7 @@ export function createRealism(host: RealismHost) {
       const f = moduleCache.get(e.key);
       if (f && wanted(f) && !tried.has(f.key)) void startOne(f, gen, true);
     }
+    try { host.onTier?.(to); } catch (e) { console.warn('realism: onTier failed', e); }
     host.markDirty();
   }
 
