@@ -61,7 +61,7 @@
   <rect x="33" y="33" width="1534" height="934" fill="none" stroke="#72ddd4" stroke-width="0.8" opacity="0.4"/>
 
 <rect class="lot" clip-path="url(#planClip)" x="241.43" y="48" width="1117.14" height="782" fill="none" stroke="#72ddd4" stroke-width="1" stroke-dasharray="10,6" opacity="0.35"/>
-<text x="100" y="846" fill="#a4c2db" font-family="'Space Grotesk', monospace" font-size="10" font-weight="600" text-anchor="start">LOT 30 × 21 m · WATERFRONT</text>
+<text x="100" y="846" fill="#a4c2db" font-family="'Space Grotesk', monospace" font-size="10" font-weight="600" text-anchor="start">LOT 30 × 21 m · LAWN</text>
 <g class="level-below" opacity="0.35">
 <line x1="494.65" y1="558.16" x2="1172.38" y2="558.16" stroke="#72ddd4" stroke-width="1" stroke-dasharray="5,5"/>
 <line x1="494.65" y1="312.39" x2="1172.38" y2="312.39" stroke="#72ddd4" stroke-width="1" stroke-dasharray="5,5"/>
@@ -72,7 +72,8 @@
 <rect x="725.52" y="379.42" width="93.1" height="119.16" fill="url(#stoneTile)"/>
 <rect x="956.4" y="308.67" width="201.09" height="189.91" fill="url(#stoneTile)"/>
 </g>
-<g class="void"><rect x="1094.18" y="317.98" width="72.61" height="72.61" fill="#040f1a"/><rect x="1094.18" y="317.98" width="72.61" height="72.61" fill="url(#wallHatch)" stroke="#c89d55" stroke-dasharray="4,4" stroke-width="1.5"/></g>
+<g class="room-floors"><rect class="room-floor room-floor-concrete" x="725.52" y="379.42" width="93.1" height="119.16" fill="url(#stoneTile)"/><rect class="room-floor room-floor-honey-oak" x="956.4" y="308.67" width="201.09" height="189.91" fill="url(#woodParquet)"/></g>
+<g class="void"><rect x="1077.42" y="316.11" width="72.61" height="72.61" fill="#040f1a"/><rect x="1077.42" y="316.11" width="72.61" height="72.61" fill="url(#wallHatch)" stroke="#c89d55" stroke-dasharray="4,4" stroke-width="1.5"/></g>
 <g class="rooms">
 <rect x="725.52" y="379.42" width="93.1" height="119.16" fill="none" stroke="#72ddd4" stroke-width="0.6" stroke-dasharray="2,4" opacity="0.35"/>
 <rect x="956.4" y="308.67" width="201.09" height="189.91" fill="none" stroke="#72ddd4" stroke-width="0.6" stroke-dasharray="2,4" opacity="0.35"/>
@@ -84,63 +85,60 @@
 <g class="item item-cube-storage">
 <rect class="item" x="785.1" y="375.7" width="29.79" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-cushioned-bench">
-<rect class="item" x="1001.09" y="478.1" width="59.58" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-tv-stand">
+<rect class="item" x="1015.61" y="309.23" width="59.58" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-olive-tree-pot">
-<rect class="item" x="967.57" y="465.07" width="22.34" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-modular-sectional">
+<rect class="item" x="1001.09" y="447.34" width="111.71" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-canvas-art">
+<rect class="item" x="1028.81" y="300.59" width="33.18" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-ottoman">
+<rect class="item" x="1027.15" y="384.26" width="33.51" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-slipper-chair">
+<polygon class="item" points="998.45,410.29 984.33,392.98 1001.64,378.86 1015.76,396.17" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-side-table">
+<rect class="item" x="978.59" y="471.55" width="22.34" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-globe-lamp">
+<rect class="item" x="978.59" y="471.55" width="22.34" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-wall-art">
-<rect class="item" x="1012.26" y="485.55" width="37.24" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<rect class="item" x="1034.6" y="484.32" width="44.69" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-storage-bench">
-<rect class="item" x="971.3" y="314.25" width="44.69" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-open-shelving">
+<rect class="item" x="955.28" y="431.55" width="22.34" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-tripod-floor-lamp">
+<rect class="item" x="1133.5" y="474.79" width="22.34" height="22.34" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 </g>
 <g class="stairs stairs-spiral stairs-dn" opacity="0.7">
-<circle cx="1131.42" cy="351.49" r="35.38" fill="rgba(20, 52, 77, 0.45)" stroke="#72ddd4" stroke-width="1.4" stroke-dasharray="4,3"/>
-<line x1="1131.42" y1="351.49" x2="1131.42" y2="386.87" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1121.15" y2="385.34" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1111.77" y2="380.9" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1104.07" y2="373.93" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1098.74" y2="365.03" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1096.21" y2="354.96" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1096.72" y2="344.59" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1100.22" y2="334.81" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1106.4" y2="326.48" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1114.74" y2="320.29" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1124.52" y2="316.79" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1134.89" y2="316.28" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1144.96" y2="318.81" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1153.86" y2="324.14" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1160.83" y2="331.84" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1165.27" y2="341.22" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<line x1="1131.42" y1="351.49" x2="1166.8" y2="351.49" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
-<circle cx="1131.42" cy="351.49" r="2.61" fill="#72ddd4"/>
-<text x="1131.42" y="312.11" fill="#ffb900" font-family="'Space Grotesk', monospace" font-size="10" font-weight="800" text-anchor="middle">DN</text>
+<circle cx="1114.66" cy="349.63" r="35.38" fill="rgba(20, 52, 77, 0.45)" stroke="#72ddd4" stroke-width="1.4" stroke-dasharray="4,3"/>
+<line x1="1114.66" y1="349.63" x2="1114.66" y2="385" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1104.39" y2="383.48" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1095.01" y2="379.04" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1087.32" y2="372.07" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1081.98" y2="363.17" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1079.46" y2="353.1" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1079.97" y2="342.73" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1083.46" y2="332.95" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1089.65" y2="324.61" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1097.99" y2="318.43" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1107.76" y2="314.93" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1118.13" y2="314.42" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1128.2" y2="316.95" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1137.1" y2="322.28" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1144.08" y2="329.97" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1148.51" y2="339.36" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<line x1="1114.66" y1="349.63" x2="1150.04" y2="349.63" stroke="#72ddd4" stroke-width="0.8" opacity="0.8"/>
+<circle cx="1114.66" cy="349.63" r="2.61" fill="#72ddd4"/>
+<text x="1114.66" y="310.25" fill="#ffb900" font-family="'Space Grotesk', monospace" font-size="10" font-weight="800" text-anchor="middle">DN</text>
 </g>
-<g class="walls-int">
-<line x1="724.03" y1="500.07" x2="820.11" y2="500.07" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="724.03" y1="377.93" x2="820.11" y2="377.93" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="820.11" y1="377.93" x2="820.11" y2="422.24" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="820.11" y1="455.76" x2="820.11" y2="500.07" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="724.03" y1="377.93" x2="724.03" y2="500.07" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="954.91" y1="500.07" x2="1158.98" y2="500.07" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="954.91" y1="307.18" x2="1158.98" y2="307.18" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="1158.98" y1="307.18" x2="1158.98" y2="500.07" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="954.91" y1="307.18" x2="954.91" y2="344.04" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="954.91" y1="377.56" x2="954.91" y2="500.07" stroke="#4facbe" stroke-width="8.4" stroke-linecap="square"/>
-<line x1="724.03" y1="500.07" x2="820.11" y2="500.07" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-<line x1="724.03" y1="377.93" x2="820.11" y2="377.93" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-<line x1="820.11" y1="377.93" x2="820.11" y2="422.24" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-<line x1="820.11" y1="455.76" x2="820.11" y2="500.07" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-<line x1="724.03" y1="377.93" x2="724.03" y2="500.07" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-<line x1="954.91" y1="500.07" x2="1158.98" y2="500.07" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-<line x1="954.91" y1="307.18" x2="1158.98" y2="307.18" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-<line x1="1158.98" y1="307.18" x2="1158.98" y2="500.07" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-<line x1="954.91" y1="307.18" x2="954.91" y2="344.04" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-<line x1="954.91" y1="377.56" x2="954.91" y2="500.07" stroke="#0a2233" stroke-width="6" stroke-linecap="square"/>
-</g>
+
 <g class="walls-ext">
 <line x1="725.52" y1="498.58" x2="818.62" y2="498.58" stroke="#72ddd4" stroke-width="14.37" stroke-linecap="square"/>
 <line x1="956.4" y1="498.58" x2="1157.49" y2="498.58" stroke="#72ddd4" stroke-width="14.37" stroke-linecap="square"/>
@@ -176,7 +174,7 @@
 
   <g class="room-tag-group" transform="translate(1056.94, 403.62) scale(0.82)">
     <rect x="-117.95" y="-24" width="235.9" height="48" rx="6" fill="rgba(8, 26, 42, 0.88)" stroke="#72ddd4" stroke-width="1.2"/>
-    <text x="0" y="-6" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="12.5" font-weight="800" text-anchor="middle" letter-spacing="0.6">21 / ROOF LANDING</text>
+    <text x="0" y="-6" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-size="12.5" font-weight="800" text-anchor="middle" letter-spacing="0.6">21 / SKY LOUNGE</text>
     <text x="0" y="12" fill="#72ddd4" font-family="'Space Grotesk', monospace" font-size="10" font-weight="600" text-anchor="middle">27.5 m² [296 SQ FT] · ELEV +6.00m</text>
   </g>
 
