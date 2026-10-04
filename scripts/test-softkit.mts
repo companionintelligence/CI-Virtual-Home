@@ -4,6 +4,10 @@
 //
 //   A  grammar    every primitive builds with no NaN, no degenerate triangle left in, indices in range; a closed lens (sheet th > 0) is watertight
 //   B  source     no Math.random / Date / performance in softkit.ts; no `map` in it (a quilt's map is the builder's, beds.ts)
+//   C  caps       per-type mesh and triangle caps (the PLAN 5.3 table), under 12 seeds
+//   D  material   no `map` except a quilt; fresh materials per create(); opaque except the one sheer; vertex colours are a NEUTRAL multiplier
+//   E  determinism the same seed twice gives the same geometry hash (to 1e-4); the rng spends a fixed count (bedding: exactly one draw)
+//   F  theming    sheet = linen, duvet = it.color else accent or fabric, a spec colour repaints only the signature surface, after kit.theme()
 //
 // @check-house node-test
 // @check-house quick
@@ -112,3 +116,69 @@ test('B source: no clock, no Math.random, no texture in the grammar', () => {
   assert.ok(!/\bmap\s*:\s*[^n]/.test(src.replace(/map = new Map/g, '')), 'a material map in softkit.ts');
 });
 
+// ---- the per-type caps (PLAN 5.3) ---------------------------------------------------------------------------------------------
+const BEDS = ['single-bed', 'upholstered-bed', 'headboard-bed', 'sleigh-bed', 'canopy-bed', 'four-poster-bed', 'toddler-bed', 'bunk-bed', 'loft-bed', 'house-bed'];
+test('C caps: bedding is at most 4 meshes and 1,100 triangles on every bed, under 12 seeds, and at least two meshes', () => {
+  for (const t of BEDS) for (const sd of SEEDS) {
+    const o = build(t, {}, sd), soft = roleMeshes(o);
+    assert.ok(soft.length >= 2 && soft.length <= 4, `${t}/${sd}: ${soft.length} bedding meshes`);
+    const tris = sum(soft.map(trisOf));
+    assert.ok(tris <= 1100 * (t === 'bunk-bed' ? 2 : 1), `${t}/${sd}: bedding is ${tris} triangles`);   // a bunk has two mattresses
+    assert.ok(meshesOf(o).length < 60, `${t}: ${meshesOf(o).length} meshes`);
+  }
+});
+
+// ---- D: materials -----------------------------------------------------------------------------------------------------------
+test('D material: no map but a quilt; fresh materials per create; opaque; the vertex colour is a neutral multiplier', () => {
+  for (const t of BEDS) {
+    const a = build(t), b = build(t);
+    const ma = new Set(meshesOf(a).map(m => m.material)), mb = new Set(meshesOf(b).map(m => m.material));
+    for (const m of ma) assert.ok(!mb.has(m), `${t}: a material is shared between two create() calls`);
+    for (const m of roleMeshes(a)) {
+      assert.ok(!m.material.map, `${t}: a map on a ${m.userData.role} mesh`);
+      assert.ok(!m.material.transparent, `${t}: transparent bedding`);
+      const c = m.geometry.attributes.color.array;
+      for (let i = 0; i < c.length; i += 3) assert.ok(c[i] === c[i + 1] && c[i] === c[i + 2], `${t}: a hue in the vertex colour`);
+      assert.ok(m.material.vertexColors, `${t}: vertexColors off`);
+    }
+  }
+});
+
+test('D material: a quilt gives the duvet UVs and a map; every other bedding mesh keeps none', () => {
+  const o = build('upholstered-bed', { quilt: 'check' });
+  const duvets = roleMeshes(o, 'duvet'); assert.equal(duvets.length, 1);
+  assert.ok(duvets[0].material.map, 'the quilt pattern is on the duvet');
+  assert.ok(duvets[0].geometry.attributes.uv, 'the duvet has UVs');
+  const uv = duvets[0].geometry.attributes.uv.array; let lo = 9, hi = -9; for (const v of uv) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+  assert.ok(lo >= -0.05 && hi <= 1.05, `planar UVs span ${lo.toFixed(2)}..${hi.toFixed(2)}`);
+  for (const m of roleMeshes(o)) if (m !== duvets[0]) { assert.ok(!m.material.map && !m.geometry.attributes.uv, `${m.userData.role} has no map/UV`); }
+  const plain = build('upholstered-bed'); assert.ok(!roleMeshes(plain, 'duvet')[0].geometry.attributes.uv, 'no UVs without a quilt');
+});
+
+// ---- E: determinism ---------------------------------------------------------------------------------------------------------
+test('E determinism: the same seed twice is the same geometry; bedding spends exactly one draw', () => {
+  for (const t of BEDS) {
+    assert.equal(hashGeom(build(t, {}, 'a')), hashGeom(build(t, {}, 'a')), `${t}: two builds of one seed differ`);
+    const seen = new Set(SEEDS.map(sd => hashGeom(build(t, {}, sd))));
+    assert.ok(seen.size > 1, `${t}: every seed builds the same bed`);
+  }
+  // these three beds' frames draw once (the duvet colour pick) and bedding adds exactly one more: the seed of its private stream
+  for (const t of ['single-bed', 'canopy-bed', 'four-poster-bed']) { const n = { n: 0 }; build(t, {}, 'a', n); assert.equal(n.n, 2, `${t}: ${n.n} rng draws, expected the frame's 1 + bedding's 1`); }
+});
+
+// ---- F: theming -------------------------------------------------------------------------------------------------------------
+const roleOf = (c: number) => Object.entries(kit.colors).find(([, v]) => v === c)?.[0];
+test('F theming: the sheet is linen, the duvet is the spec colour or an accent/fabric, the throw is the other accent — after kit.theme', () => {
+  for (const sd of SEEDS) {
+    const o = build('single-bed', {}, sd); kit.theme(o);
+    const lin = roleMeshes(o, 'linen')[0], dv = roleMeshes(o, 'duvet')[0];
+    assert.equal(lin.material.color.getHex(), kit.colors.linen, 'linen mesh is the house linen');
+    assert.ok(['accent', 'fabric'].includes(roleOf(dv.material.color.getHex()) as string), `duvet is a house role (${roleOf(dv.material.color.getHex())})`);
+    const th = roleMeshes(o, 'throw')[0];
+    if (th) assert.notEqual(th.material.color.getHex(), dv.material.color.getHex(), 'the throw is not the duvet colour');
+  }
+  const c = 0xb3402a, o = build('single-bed', { color: '#b3402a' });   // (themeItem keeps it: the part painted the item's colour is `explicit`)
+  const dv = roleMeshes(o, 'duvet')[0];
+  assert.equal(dv.material.color.getHex(), c, 'a spec colour paints the duvet');
+  assert.equal(roleMeshes(o, 'linen')[0].material.color.getHex(), kit.colors.linen, 'and only the duvet');
+});
