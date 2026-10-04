@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "comment": "Role table for the PSX-family packs (Deds_others, Armchair, Chairs, Bath_Hygiene, Electronics_kitchen, All ...): material name -> role. Curated by hand, one line per material a shipped model uses; the bake fails on a material not listed here or in the entry's own `roles.materials`. The role says what the part IS, not what the swatch looked like: an entry overrides a line when design intent differs (a nightstand's body is `cabinet`, a medicine cabinet's glass is `mirror`). The swatch colours are for the human only (scripts/bake/bake.mts --swatches <id> prints each material's mean colour); nothing from a swatch ships.",
+  "by": "material",
+  "textureRoot": "{pack}/Textures",
+  "materials": {
+    "Glass": "glassOpaque",
+    "Metal_04": "metal",
+    "Wood_02": "wood",
+    "Wood_07": "wood",
+    "Wood_15": "wood"
+  }
+}
