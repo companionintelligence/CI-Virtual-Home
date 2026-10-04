@@ -14,8 +14,8 @@
 //    `free()` marks the ones that must read and `Kit.thinnestFree` reports them, so the invariant is structural and the test reads the numbers.
 //    Both come from the G-READ spike (_audit/wave2/small-gread.md): at the 1.5 m eye and 1280 x 720 through GTAO and SMAA, a 6 mm part never halos
 //    or shimmers more than a thick one, but a free dark part that thin is a faint grey wisp from 3.5 m; 10 mm is solid to 3.5 m and 12 mm to 4.5 m;
-//  - round bodies are lathes of 20-24 segments (R-FACET: at least 16 for anything 6 cm or wider), with smooth normals along the profile and
-//    hard edges only where the profile says so;
+//  - round bodies are lathes of 12-22 segments, never fewer than 16 for anything 6 cm or wider (R-FACET: `Kit.minSegWide`, asserted by the test), with
+//    smooth normals along the profile and hard edges only where the profile says so;
 //  - the origin is the floor centre, the item faces +z at rot 0 and stands on y = 0 (the host's top), like every catalog item;
 //  - rng draws a FIXED count (`rolls`) whatever branch is taken, so no later draw of the item's stream moves with a variant, and nothing here
 //    touches Math.random or a clock.
