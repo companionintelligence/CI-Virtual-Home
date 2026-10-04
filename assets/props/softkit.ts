@@ -9,8 +9,8 @@
 //   • one mesh per role colour, `material.color` is the house role (or `it.color`), and the per-vertex `color` attribute
 //     is a NEUTRAL shade multiplier only (seam darkening, fold valleys, underside), never a hue — one constant, SHADE;
 //   • fresh materials per create(), geometry is built per create() and never cached across houses;
-//   • opaque everywhere (GTAO turns an alpha-cut card into a solid quad; a leaf is a closed lens), the one allowance being
-//     the optional sheer curtain, which is transparent, casts no shadow and sits behind one constant;
+//   • opaque everywhere, no exception (GTAO turns an alpha-cut card into a solid quad; a leaf is a closed lens). The wave-2 sheer curtain
+//     was the one alpha in the grammar; it showed as a pale haze over window glass in the R24 frames and was removed in wave 3;
 //   • no part thinner than 6 mm (a lens has a rim strip, not a collapsed edge), round bodies at least 16 segments;
 //   • every random draw comes from ctx.rng (or a stream seeded by ONE draw from it), a fixed count per builder;
 //   • no Math.random, Date or performance anywhere in this file (scripts/test-softkit.mts greps for them).
@@ -432,20 +432,17 @@ export function layBedding(g: any, ctx: any, o: any) {
 // =================================================================================================================
 // Curtains — a pair of drawn panels on a rod (soft.ts 'curtains'), 2-3 meshes
 // =================================================================================================================
-/** the optional sheer layer behind the drapery: transparent (casts no shadow, GTAO leaves it out, the player's batcher skips it), 40% of curtains
- *  at least 1.4 m wide. ONE constant removes it, and with it the only alpha in the grammar. */
-export const SHEER = true;
 /** the envelope the old 19-box curtain had and the composer's MEASURED box is built from: x to w/2 + 0.052, z 0..0.13, y 0.02..h + 0.052 */
 export const CURTAIN = { zRod: 0.09, zFront: 0.13, hem: 0.02, finial: 0.022 } as const;
 
-/** Two panels (pinch-pleat 55%, wave 30%, ring-top 15%; flared hem; a tie-back 25%) on a rod with brackets and finials, and a sheer when wide enough.
- *  Meshes: drape (the two lens panels, material.color = it.color or fabric2), hardware (rod, rings, brackets, finials: the metal role), sheer. ONE ctx.rng draw. */
+/** Two panels (pinch-pleat 55%, wave 30%, ring-top 15%; flared hem; a tie-back 25%) on a rod with brackets and finials, (no sheer layer: removed in wave 3, see the header).
+ *  Meshes: drape (the two lens panels, material.color = it.color or fabric2), hardware (rod, rings, brackets, finials: the metal role). ONE ctx.rng draw. */
 export function hangCurtains(ctx: any, it: any) {
   const { THREE, std, group, colors, hex } = ctx, K = softkit(THREE), { Acc, sheet, strut, band } = K;
   const w = it.w || 2.0, h = it.h || 2.4, g = group('Curtains');
   const r = splitRng(ctx.rng);
-  const kindR = r(), tieR = r(), sheerR = r(), ph = r() * 6.28;
-  const style = kindR < 0.55 ? 'pinch' : kindR < 0.85 ? 'wave' : 'ring', tie = tieR < 0.25, sheerOn = SHEER && w >= 1.4 && sheerR < 0.4;
+  const kindR = r(), tieR = r(), _spare = r(), ph = r() * 6.28;   // (_spare: the draw the removed sheer used, kept so every other choice of a seed is what it was)
+  const style = kindR < 0.55 ? 'pinch' : kindR < 0.85 ? 'wave' : 'ring', tie = tieR < 0.25;
   const { zRod, zFront, hem, finial } = CURTAIN, ry = h + 0.03, TH = 0.014;
   // ---- hardware: rod, finials, brackets (and rings for the ring-top), one metal mesh
   const hard = new Acc();
@@ -484,12 +481,6 @@ export function hangCurtains(ctx: any, it: any) {
   drape.userData.role = 'drape'; g.add(drape);
   const rod = hard.mesh(std(colors.metal, { metalness: 0.8, roughness: 0.3, vertexColors: true }), { cast: true, receive: false });
   rod.userData.role = 'hardware'; g.add(rod);
-  if (sheerOn) {
-    const sh = new Acc(), sw = w * 0.92;
-    sheet(sh, { U: Array.from({ length: 13 }, (_, i) => i / 12), Vn: [0, 0.5, 1], th: 0, want: [0, 0, 1], pos: (u: number, v: number) => [-sw / 2 + sw * u, 0.03 + (ry - 0.06) * v, 0.035 + 0.011 * Math.cos(Math.PI * 2 * 5 * u + 0.7)] });
-    const m = sh.mesh(std(0xf2efe8, { roughness: 1, vertexColors: true, transparent: true, opacity: 0.38, depthWrite: false, side: THREE.DoubleSide }), { cast: false, receive: false });
-    m.renderOrder = 2; m.userData.role = 'sheer'; g.add(m);
-  }
   return g;
 }
 

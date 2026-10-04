@@ -151,7 +151,7 @@ registerProps({
   'curtains': {
     footprint: [2.1, 0.14], height: 2.44, params: ['w', 'h', 'color'], tags: ['living', 'bedroom', 'dining', 'kids', 'office'],
     // softkit.ts hangCurtains: two lens panels (pinch-pleat, wave or ring-top, a flared hem, sometimes a tie-back), the rod, brackets and
-    // finials in one metal mesh, and — on a wide curtain, 40% — a transparent sheer behind. 2-3 meshes where the box curtain had 19.
+    // finials in one metal mesh (the wave-2 transparent sheer is gone: it hazed window glass). 2 meshes where the box curtain had 19.
     create(it, ctx) { return hangCurtains(ctx, it); },
     iso: [{ shape: 'box', box: [-1.0, 0.02, 0.06, -0.36, 2.41, 0.12], color: 'role:fabric2' }, { shape: 'box', box: [0.36, 0.02, 0.06, 1.0, 2.41, 0.12], color: 'role:fabric2' }, { shape: 'box', box: [-1.05, 2.42, 0.08, 1.05, 2.44, 0.1], color: 'role:metal' }],
   },

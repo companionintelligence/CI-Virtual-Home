@@ -5,7 +5,7 @@
 //   A  grammar    every primitive builds with no NaN, no degenerate triangle left in, indices in range; a closed lens (sheet th > 0) is watertight
 //   B  source     no Math.random / Date / performance in softkit.ts; no `map` in it (a quilt's map is the builder's, beds.ts)
 //   C  caps       per-type mesh and triangle caps (the PLAN 5.3 table), under 12 seeds
-//   D  material   no `map` except a quilt; fresh materials per create(); opaque except the one sheer; vertex colours are a NEUTRAL multiplier
+//   D  material   no `map` except a quilt; fresh materials per create(); opaque, no exception (the sheer was removed in wave 3); vertex colours are a NEUTRAL multiplier
 //   E  determinism the same seed twice gives the same geometry hash (to 1e-4); the rng spends a fixed count (bedding: exactly one draw)
 //   F  theming    sheet = linen, duvet = it.color else accent or fabric, a spec colour repaints only the signature surface, after kit.theme()
 //
@@ -184,30 +184,26 @@ test('F theming: the sheet is linen, the duvet is the spec colour or an accent/f
 });
 
 // ---- curtains (T3) -----------------------------------------------------------------------------------------------------------
-test('C caps: curtains are at most 4 meshes and 1,400 triangles, the sheer only when wide, its envelope the old curtain\'s', () => {
-  let sheers = 0;
+test('C caps: curtains are at most 4 meshes and 1,400 triangles, no sheer layer, its envelope the old curtain\'s', () => {
   for (const w of [0.6, 1.0, 1.4, 2.0, 3.2]) for (const sd of SEEDS) {
     const o = build('curtains', { w, h: 2.2 }, sd), ms = meshesOf(o), tris = sum(ms.map(trisOf));
     assert.ok(ms.length >= 2 && ms.length <= 4, `w ${w}/${sd}: ${ms.length} meshes`);
     assert.ok(tris <= 1400, `w ${w}/${sd}: ${tris} triangles`);
-    const sheer = ms.filter(m => m.userData.role === 'sheer'); sheers += sheer.length;
-    if (w < 1.4) assert.equal(sheer.length, 0, `w ${w}: a sheer on a narrow curtain`);
+    assert.equal(ms.filter(m => m.userData.role === 'sheer' || m.material.transparent).length, 0, `w ${w}/${sd}: an alpha layer`);
     const b = new THREE.Box3().setFromObject(o);
     assert.ok(b.max.z <= 0.13 + 0.01 && b.min.z >= -0.001, `w ${w}/${sd}: z ${b.min.z.toFixed(3)}..${b.max.z.toFixed(3)} outside 0..0.13`);
     assert.ok(b.max.x <= w / 2 + 0.052 + 0.005 && b.min.x >= -(w / 2 + 0.052 + 0.005), `w ${w}/${sd}: x ${b.min.x.toFixed(3)}..${b.max.x.toFixed(3)}`);
     assert.ok(b.min.y >= 0.02 - 0.005 && b.max.y <= 2.2 + 0.052 + 0.005, `w ${w}/${sd}: y ${b.min.y.toFixed(3)}..${b.max.y.toFixed(3)}`);
     for (const m of ms) { m.geometry.computeBoundingBox(); const s = m.geometry.boundingBox.getSize(new THREE.Vector3()); assert.ok(Math.min(s.x, s.y, s.z) >= 0.006, `w ${w}/${sd}: a ${m.userData.role} part under 6 mm (${Math.min(s.x, s.y, s.z).toFixed(4)})`); }
   }
-  assert.ok(sheers > 0, 'the sheer is built for some seeds');
 });
 
-test('D material: curtain drape is fabric2 or the spec colour, the sheer is the one transparent mesh and has no shadow, no map anywhere', () => {
+test('D material: curtain drape is fabric2 or the spec colour, nothing transparent, no map anywhere', () => {
   for (const sd of SEEDS) {
     const o = build('curtains', { w: 2.2 }, sd); kit.theme(o);
     for (const m of meshesOf(o)) {
       assert.ok(!m.material.map, `a map on ${m.userData.role}`);
-      if (m.userData.role === 'sheer') { assert.ok(m.material.transparent && !m.castShadow && !m.receiveShadow, 'the sheer is transparent, no shadow'); }
-      else assert.ok(!m.material.transparent, `${m.userData.role} is opaque`);
+      assert.ok(!m.material.transparent, `${m.userData.role} is opaque`);
     }
     assert.equal(roleMeshes(o, 'drape')[0].material.color.getHex(), kit.colors.fabric2, 'the drape is the house fabric2');
     assert.equal(roleMeshes(o, 'hardware')[0].material.color.getHex(), kit.colors.metal, 'the hardware is the house metal');
