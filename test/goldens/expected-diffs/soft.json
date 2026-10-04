@@ -1,0 +1,120 @@
+{
+  "$note": "SOFT stream (feat/int-soft): the frames the soft-grammar rebuilds move (bedding, curtains, towels, loose soft goods; all in place by type id). Recorded with `pnpm run goldens --record soft`; never re-blessed on this branch, the integration re-blesses once. The cause names what the house holds (counts from test/review/baselines/cost.json), not a per-pixel attribution.",
+  "bghouse-olcia/hero-reveal@1": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x2, curtains (T3) x5, towels (T6) x2"
+  },
+  "bghouse-olcia/core-orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x2, curtains (T3) x5, towels (T6) x2"
+  },
+  "bghouse-olcia/door-to-core@1": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x2, curtains (T3) x5, towels (T6) x2"
+  },
+  "aurora/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x1, curtains (T3) x6, towels (T6) x3, loose goods (T7) x4"
+  },
+  "epiphany/door-to-core@1": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x3, curtains (T3) x5, towels (T6) x1"
+  },
+  "cutestarter/hero-reveal@1": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x2, curtains (T3) x4, towels (T6) x1"
+  },
+  "epiphany/core-orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x3, curtains (T3) x5, towels (T6) x1"
+  },
+  "cutestarter/door-to-core@1": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x2, curtains (T3) x4, towels (T6) x1"
+  },
+  "seraphine/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x5, curtains (T3) x2, towels (T6) x1, loose goods (T7) x6"
+  },
+  "mesamariposa/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x3, curtains (T3) x5, towels (T6) x2, loose goods (T7) x3"
+  },
+  "epiphany/hero-reveal@1": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x3, curtains (T3) x5, towels (T6) x1"
+  },
+  "gardennook/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x1, curtains (T3) x5, towels (T6) x1, loose goods (T7) x3"
+  },
+  "asymmetry/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x3, curtains (T3) x2, towels (T6) x2, loose goods (T7) x5"
+  },
+  "modernhome-nora/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x3, curtains (T3) x3, towels (T6) x2, loose goods (T7) x1"
+  },
+  "palnknoll/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x3, curtains (T3) x2, towels (T6) x3, loose goods (T7) x3"
+  },
+  "bgfamily/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x2, curtains (T3) x7, towels (T6) x2, loose goods (T7) x7"
+  },
+  "bghouse-olcia/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x2, curtains (T3) x5, towels (T6) x2"
+  },
+  "valleyview/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x1, curtains (T3) x6, towels (T6) x1, loose goods (T7) x4"
+  },
+  "modernhouse1/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x2, towels (T6) x1, loose goods (T7) x3"
+  },
+  "cocoon/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x3, curtains (T3) x3, towels (T6) x2, loose goods (T7) x4"
+  },
+  "onestory/door-to-core@1": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x2, curtains (T3) x3, towels (T6) x1, loose goods (T7) x3"
+  },
+  "newcrest/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x1, curtains (T3) x3, towels (T6) x1, loose goods (T7) x1"
+  },
+  "familyhouse-nora/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x3, towels (T6) x2, loose goods (T7) x6"
+  },
+  "modernhome-nora/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x3, curtains (T3) x3, towels (T6) x2, loose goods (T7) x1"
+  },
+  "mediterranean/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x4, curtains (T3) x5, towels (T6) x2"
+  },
+  "onestory/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x2, curtains (T3) x3, towels (T6) x1, loose goods (T7) x3"
+  },
+  "valleyview/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x1, curtains (T3) x6, towels (T6) x1, loose goods (T7) x4"
+  },
+  "mesamariposa/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x3, curtains (T3) x5, towels (T6) x2, loose goods (T7) x3"
+  },
+  "palnknoll/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x3, curtains (T3) x2, towels (T6) x3, loose goods (T7) x3"
+  },
+  "aurora/door-to-core@1": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x1, curtains (T3) x6, towels (T6) x3, loose goods (T7) x4"
+  },
+  "payorote/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x2, towels (T6) x1"
+  },
+  "payorote/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x2, towels (T6) x1"
+  },
+  "familyhome/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x2, curtains (T3) x3, towels (T6) x2, loose goods (T7) x5"
+  },
+  "sunnyhome/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x1, towels (T6) x1, loose goods (T7) x1"
+  },
+  "aurora/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x1, curtains (T3) x6, towels (T6) x3, loose goods (T7) x4"
+  },
+  "cutestarter/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x2, curtains (T3) x4, towels (T6) x1"
+  },
+  "epiphany/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x3, curtains (T3) x5, towels (T6) x1"
+  },
+  "asymmetry/orbit@0.55": {
+    "cause": "soft grammar rebuilds in place (seen through the windows): bedding (T2) x3, curtains (T3) x2, towels (T6) x2, loose goods (T7) x5"
+  },
+  "bghouse-olcia/door-to-core@0.55": {
+    "cause": "soft grammar rebuilds in place (interior seen in the frame): bedding (T2) x2, curtains (T3) x5, towels (T6) x2"
+  }
+}
