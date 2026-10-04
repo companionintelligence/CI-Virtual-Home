@@ -204,12 +204,13 @@ export function foldedCloth(k: Kit, at: Xf, o: { roles: string[]; w?: number; d?
   const w = o.w ?? 0.3, d = o.d ?? 0.2, n = o.layers ?? 2, t = 0.016;
   k.with(at, () => { for (let i = 0; i < n; i++) k.add(o.roles[i % o.roles.length], roundedBox(w - i * 0.012, t, d - i * 0.008, 0.005, 1), { y: i * t * 0.94, ry: (o.turns ? o.turns[i] : 0) || 0, x: i * 0.004 }); });
 }
-/** A shoe: a rubber sole and a domed upper, toe toward +z. */
+/** A shoe: a rubber sole with a heel block and a domed upper tilted toe-down (the heel stands higher), toe toward +z. */
 export function shoe(k: Kit, at: Xf, o: { upper?: string; sole?: string; shade?: number } = {}): void {
-  const upper = o.upper || 'fabric2', sole = o.sole || 'rubber';
+  const upper = o.upper || 'leather', sole = o.sole || 'rubber';
   k.with(at, () => {
-    k.add(sole, cylinder(0.046, 0.046, 0.02, 10), { s: [1, 1, 2.93] });                                            // an elliptical sole, 0.092 x 0.27
-    k.add(upper, lathe([[0, 0], [0.046 * 0.7, 0.078 * 0.3], [0.046, 0.078 * 0.6], [0.046 * 0.7, 0.078 * 0.9], [0, 0.078]], 8, 0.08), { y: 0.02, z: 0.004, s: [1, 1, 2.45] }, o.shade ?? 1);
+    k.add(sole, cylinder(0.046, 0.046, 0.016, 10), { s: [1, 1, 2.93] });                                            // an elliptical sole, 0.092 x 0.27
+    k.add(sole, box(0.066, 0.014, 0.06), { y: 0.016, z: -0.092 });                                                 // the heel block
+    k.add(upper, lathe([[0, 0], [0.046 * 0.7, 0.085 * 0.3], [0.046, 0.085 * 0.6], [0.046 * 0.7, 0.085 * 0.9], [0, 0.085]], 8, 0.085), { y: 0.022, z: 0.0, rx: -0.14, s: [1, 1, 2.35] }, o.shade ?? 1);
   });
 }
 /** A slipper: a cork sole and a low fabric toe-cap, toe toward +z. */

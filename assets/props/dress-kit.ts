@@ -280,6 +280,7 @@ export const DRESS_ROLES: Record<string, RoleSpec> = {
   accent: { from: 'accent', rough: 0.5 },
   ceramic: { from: 'ceramic', fallback: 'linen', rough: 0.3 },
   metal: { from: 'metal', rough: 0.35, metal: 0.8 },
+  leather: { fixed: 0x6a4a35, rough: 0.55 },                // shoes, belts, a bag: a warm tan that reads as leather in any house
   glass: { fixed: 0xb7ccd2, rough: 0.06 },           // opaque pale blue-grey: reads as glass at 8 cm and stays in AO and in the player's batcher
   smoke: { fixed: 0x56636b, rough: 0.08 },
   wax: { fixed: 0xefe6d3, rough: 0.55 },

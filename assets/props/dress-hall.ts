@@ -18,11 +18,11 @@ registerDress({
     name: 'door-mat', footprint: [0.75, 0.45], height: 0.02, params: ['w', 'd', 'color'], rolls: 1, paint: 'rug', tags: ['hall'], surface: false, group: 'rug',
     build(k, it) { mat(k, {}, { w: Math.max(0.4, it.w || 0.75), d: Math.max(0.3, it.d || 0.45) }); },
   }),
-  // Three pairs of shoes in a row by the door, each a shade darker.
+  // Three pairs of shoes in a row by the door: tan leather, darker leather, cream canvas.
   'shoe-row': dressType({
-    name: 'shoe-row', footprint: [0.61, 0.27], height: 0.1, rolls: 6, tags: ['hall'], surface: false,
+    name: 'shoe-row', footprint: [0.61, 0.27], height: 0.11, rolls: 6, tags: ['hall'], surface: false,
     build(k, it, u) {
-      [1, 0.8, 0.62].forEach((sh, i) => { const x = -0.2 + i * 0.2; shoe(k, { x: x - 0.052, ry: (u[i] - 0.5) * 0.2 }, { shade: sh }); shoe(k, { x: x + 0.052, ry: (u[i + 3] - 0.5) * 0.2 }, { shade: sh }); });
+      ([['leather', 1], ['leather', 0.62], ['linen', 0.92]] as const).forEach(([role, sh], i) => { const x = -0.2 + i * 0.2; shoe(k, { x: x - 0.052, ry: (u[i] - 0.5) * 0.2 }, { upper: role, shade: sh }); shoe(k, { x: x + 0.052, ry: (u[i + 3] - 0.5) * 0.2 }, { upper: role, shade: sh }); });
     },
   }),
   // A tall mirror leaning on the wall behind it: a wooden frame and a mirror panel, its top resting 0.16 m back.
