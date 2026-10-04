@@ -40,7 +40,9 @@ import './hobby.js';
 import './dress-table.js';
 import './dress-kitchen.js';
 import './dress-living.js';
+import './dress-bed.js';
 import './dress-bath.js';
+import './dress-hall.js';
 
 // BAKED LAST — assets/props/baked.ts overrides registered types in place, so it stays the last import; another stream's module goes ABOVE this line
 import './baked.js';

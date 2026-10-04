@@ -4,8 +4,8 @@
 //
 //   A  primitives   closed solids wind outward (positive signed volume), finite positions and unit normals, indices in range, thin dimensions clamped to MIN_PART
 //   B  every type   at most 3 meshes and 600 triangles over 12 seeds and every variant, opaque, no map, no UVs, material userData only `muted`, fresh materials per
-//                   create(), the same item and seed build the same bytes, a fixed number of rng draws whatever the variant, no part under MIN_PART and no FREE part
-//                   under MIN_FREE, the union box over 12 seeds and every variant inside the declared footprint (+ 0.04 m), and the catalogued MEASURED box inside it too
+//                   create(), the same item and seed build the same bytes, a fixed number of rng draws whatever the variant, no part under MIN_PART, no FREE part
+//                   under MIN_FREE and no round body 6 cm or wider under 16 segments (R-FACET), the union box over 12 seeds and every variant inside the declared footprint (+ 0.04 m), and the catalogued MEASURED box inside it too
 //   C  roles        paint comes from the house's roles: two houses give two colours, an item's own `color` repaints only its signature role, fixed literals are muted
 //   D  placement    every type has a placement, a surface type is an onSurface placement, its roles are all NEW `dx-*` roles that no other type shares (so no existing
 //                   role's candidate list grew and no pick re-rolls), the group agrees with the definition
@@ -79,7 +79,8 @@ test('B: every dress type holds the kit contract', () => {
   const kitA = kitFor('dress-a'), kitB = kitFor('dress-b', '#c2410c');
   for (const [type, def] of DRESS) {
     const where = `${type}`;
-    assert.equal(def.surface, !(def.mountY !== undefined) && def.surface, where);
+    assert.ok(def.surface === true || def.surface === false, `${where}: surface is explicit`);
+    if (def.mountY !== undefined) assert.equal(def.surface, false, `${where}: a wall prop is not a surface prop`);
     assert.deepEqual(def.iso, [], `${where}: dress types carry no iso hints`);
     assert.ok(Array.isArray(def.footprint) && def.footprint.length === 2, `${where}: footprint`);
     assert.ok(def.budget && def.budget.meshes === K.DRESS_MAX_MESHES && def.budget.tris === K.DRESS_MAX_TRIS, `${where}: budget on the definition`);
@@ -105,6 +106,7 @@ test('B: every dress type holds the kit contract', () => {
       const d = o.userData.dress;
       assert.ok(d && d.thinnest >= K.MIN_PART - 1e-6, `${where}: thinnest part ${d && d.thinnest} m, floor ${K.MIN_PART}`);
       assert.ok(d.thinnestFree === null || d.thinnestFree >= K.MIN_FREE - 1e-6, `${where}: thinnest free part ${d.thinnestFree} m, floor ${K.MIN_FREE}`);
+      assert.ok(d.segWide === null || d.segWide >= 16, `${where}: a round body 6 cm or wider has ${d.segWide} segments, at least 16 (R-FACET)`);
       const bb = boxOf(o); union[0] = Math.min(union[0], bb.min.x); union[1] = Math.min(union[1], bb.min.y); union[2] = Math.min(union[2], bb.min.z); union[3] = Math.max(union[3], bb.max.x); union[4] = Math.max(union[4], bb.max.y); union[5] = Math.max(union[5], bb.max.z);
       assert.ok(bb.min.y > -0.001, `${where}: stands on y = 0 (min y ${bb.min.y})`);
     }

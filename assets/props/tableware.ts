@@ -179,8 +179,62 @@ export function canister(k: Kit, at: Xf, o: { role?: string; lid?: string; r?: n
   const r = o.r ?? 0.055, h = o.h ?? 0.18, seg = segFor(r) >= 22 ? 16 : 14;
   k.with(at, () => { k.add(o.role || 'ceramic', cylinder(r, r, h, seg)); k.add(o.lid || 'wood', cylinder(r * 1.04, r * 1.04, 0.022, seg), { y: h }); });
 }
-/** A picture frame standing a little back on its foot: a wood frame and a paper panel set 2 mm proud of it. */
+/** A picture frame leaning back a little: a wood frame and a paper panel set 2 mm proud of it, pivoting on the bottom of its back face. */
 export function frame(k: Kit, at: Xf, o: { role?: string; w?: number; h?: number; paper?: string } = {}): void {
   const w = o.w ?? 0.15, h = o.h ?? 0.2, t = 0.02;
-  k.with(at, () => k.with({ rx: -0.1 }, () => { k.add(o.role || 'wood', box(w, h, t)); k.add(o.paper || 'paper', box(w - 0.036, h - 0.036, t + 0.002), { y: 0.018 }); }));
+  k.with(at, () => k.with({ rx: -0.1 }, () => { k.add(o.role || 'wood', box(w, h, t), { z: t / 2 }); k.add(o.paper || 'paper', box(w - 0.036, h - 0.036, t + 0.002), { y: 0.018, z: t / 2 + 0.001 }); }));   // pivot at the bottom of the back face: nothing dips under the host
+}
+
+// ---- wave 1 pieces: kitchen, bedroom, bath, hall ---------------------------------------------------------------------------------------
+/** A wooden spoon or spatula: a round handle (free: 16 mm) and a flat oval head, standing on its handle end at the origin (lean it with `at.rz`). */
+export function spoon(k: Kit, at: Xf, o: { role?: string; len?: number; head?: string } = {}): void {
+  const len = o.len ?? 0.24;
+  k.with(at, () => {
+    k.add(o.role || 'wood', free(cylinder(0.008, 0.007, len, 8)));
+    k.add(o.head || o.role || 'wood', free(cylinder(0.026, 0.026, MIN_FREE, 10)), { y: len + 0.02, rx: Math.PI / 2, s: [1, 1, 1.4] });   // the head, a flat oval facing the front
+  });
+}
+/** A crock: a straight ceramic pot with a short collar inside (the utensils hide the rest). */
+export function crock(k: Kit, at: Xf, o: { role?: string; r?: number; h?: number } = {}): void {
+  const r = o.r ?? 0.06, h = o.h ?? 0.14;
+  k.with(at, () => k.add(o.role || 'ceramic', vessel([[r * 0.88, 0], [r, h]], { seg: 16, wall: 0.008, floor: 0.012, depth: 0.04 })));
+}
+/** A folded cloth: n stacked slabs, each a little turned and shifted (the stand-in for the soft stream's towels until they land). */
+export function foldedCloth(k: Kit, at: Xf, o: { roles: string[]; w?: number; d?: number; layers?: number; turns?: number[] } = { roles: ['linen'] }): void {
+  const w = o.w ?? 0.3, d = o.d ?? 0.2, n = o.layers ?? 2, t = 0.016;
+  k.with(at, () => { for (let i = 0; i < n; i++) k.add(o.roles[i % o.roles.length], roundedBox(w - i * 0.012, t, d - i * 0.008, 0.005, 1), { y: i * t * 0.94, ry: (o.turns ? o.turns[i] : 0) || 0, x: i * 0.004 }); });
+}
+/** A shoe: a rubber sole and a domed upper, toe toward +z. */
+export function shoe(k: Kit, at: Xf, o: { upper?: string; sole?: string; shade?: number } = {}): void {
+  const upper = o.upper || 'fabric2', sole = o.sole || 'rubber';
+  k.with(at, () => {
+    k.add(sole, cylinder(0.046, 0.046, 0.02, 10), { s: [1, 1, 2.93] });                                            // an elliptical sole, 0.092 x 0.27
+    k.add(upper, lathe([[0, 0], [0.046 * 0.7, 0.078 * 0.3], [0.046, 0.078 * 0.6], [0.046 * 0.7, 0.078 * 0.9], [0, 0.078]], 8, 0.08), { y: 0.02, z: 0.004, s: [1, 1, 2.45] }, o.shade ?? 1);
+  });
+}
+/** A slipper: a cork sole and a low fabric toe-cap, toe toward +z. */
+export function slipper(k: Kit, at: Xf, o: { upper?: string; sole?: string } = {}): void {
+  k.with(at, () => {
+    k.add(o.sole || 'cork', cylinder(0.046, 0.046, 0.014, 12), { s: [1, 1, 2.87] });                              // an elliptical sole, 0.092 x 0.265
+    k.add(o.upper || 'fabric', lathe([[0, 0], [0.044 * 0.8, 0.07 * 0.3], [0.044, 0.07 * 0.65], [0.044 * 0.5, 0.07 * 0.95], [0, 0.07]], 10, 0.07), { y: 0.014, z: 0.05, s: [1.04, 1, 2.0] });
+  });
+}
+/** A furled umbrella standing on its canopy end at the origin: canopy, shaft and a hooked handle on +x... (the stand it stands in is the caller's). */
+export function umbrella(k: Kit, at: Xf, o: { role?: string; handle?: string } = {}): void {
+  const R = 0.03;
+  k.with(at, () => {
+    k.add(o.role || 'fabric', cylinder(0.03, 0.017, 0.34, 8), { x: R });
+    k.add(o.handle || 'wood', free(cylinder(0.008, 0.008, 0.26, 6)), { x: R, y: 0.34 });
+    k.add(o.handle || 'wood', free(torus(R, 0.007, 8, 5, Math.PI)), { y: 0.6 });
+  });
+}
+/** A mat: a pile slab with an inner panel in a second role. */
+export function mat(k: Kit, at: Xf, o: { role?: string; inner?: string; w?: number; d?: number } = {}): void {
+  const w = o.w ?? 0.75, d = o.d ?? 0.45;
+  k.with(at, () => { k.add(o.role || 'rug', roundedBox(w, 0.016, d, 0.006, 1)); k.add(o.inner || 'fabric2', roundedBox(w - 0.1, 0.018, d - 0.1, 0.005, 1)); });
+}
+/** A tissue box: a pale box with a tuft of tissue standing out of its slot. */
+export function tissueBox(k: Kit, at: Xf, o: { role?: string } = {}): void {
+  const role = o.role || 'paper';
+  k.with(at, () => { k.add(role, roundedBox(0.24, 0.085, 0.12, 0.012, 1)); k.add(role, lathe([[0, 0], [0.022, 0.012], [0.03, 0.034], [0.016, 0.052], [0, 0.058]], 8, 0.058), { y: 0.082, s: [2.4, 1, 0.7] }); });
 }

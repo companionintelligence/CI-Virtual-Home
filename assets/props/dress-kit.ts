@@ -34,7 +34,8 @@ export const DRESS_MAX_TRIS = 600;
 export const SEG = 22;
 
 // ---- geometry accumulators -------------------------------------------------------------------------------------------------------
-export interface Geo { p: number[]; n: number[]; i: number[]; /** the thinnest dimension this primitive was built with, metres (Infinity when it has no thin part) */ thin: number; /** a part that stands or lies on its own and has to read: held to MIN_FREE, not MIN_PART */ free?: boolean }
+export interface Geo { p: number[]; n: number[]; i: number[]; /** the thinnest dimension this primitive was built with, metres (Infinity when it has no thin part) */ thin: number; /** a part that stands or lies on its own and has to read: held to MIN_FREE, not MIN_PART */ free?: boolean;
+  /** a lathe's segment count and its widest radius in metres, across the narrower of its two scaled axes (an elongated sole is not a round body): R-FACET asks 16 segments or more of a round body 6 cm or wider */ seg?: number; rmax?: number }
 export type V3 = [number, number, number];
 /** a placement: translate (x, y, z), rotate (rx, ry, rz radians, applied Y then X then Z), scale (uniform or per axis) */
 export interface Xf { x?: number; y?: number; z?: number; rx?: number; ry?: number; rz?: number; s?: number | V3 }
@@ -69,7 +70,7 @@ export function place(g: Geo, t: Xf = {}): Geo {
   }
   let i = g.i;
   if (flip) { i = g.i.slice(); for (let k = 0; k < i.length; k += 3) { const q = i[k + 1]; i[k + 1] = i[k + 2]; i[k + 2] = q; } }
-  return { p, n, i, thin: g.thin * Math.min(Math.abs(sc[0]), Math.abs(sc[1]), Math.abs(sc[2])), ...(g.free ? { free: true } : {}) };
+  return { p, n, i, thin: g.thin * Math.min(Math.abs(sc[0]), Math.abs(sc[1]), Math.abs(sc[2])), ...(g.free ? { free: true } : {}), ...(g.seg ? { seg: g.seg, rmax: (g.rmax || 0) * Math.min(Math.abs(sc[0]), Math.abs(sc[2])) } : {}) };
 }
 
 /** Mark a part as free (it has to read on its own): the kit then holds it to MIN_FREE. */
@@ -119,7 +120,7 @@ export function lathe(profile: PP[], seg = SEG, thin = Infinity): Geo {
       else idx.push(a + c, b + c, a + c + 1, a + c + 1, b + c, b + c + 1);
     }
   }
-  return { p, n, i: idx, thin };
+  return { p, n, i: idx, thin, seg, rmax: Math.max(...P.map(q => q[0])) };
 }
 
 /** A vessel's options. `wall` is the rim thickness (clamped to MIN_PART), `floor` the thickness under the inside, `depth` how far the inside goes
@@ -287,6 +288,7 @@ export const DRESS_ROLES: Record<string, RoleSpec> = {
   cork: { fixed: 0xb89a74, rough: 0.9 },
   brass: { fixed: 0xb08d4f, rough: 0.35, metal: 0.85 },
   chrome: { fixed: 0xc9ced3, rough: 0.2, metal: 0.9 },
+  mirror: { fixed: 0xe2e8f0, rough: 0.08, metal: 0.9 },     // the repo's own mirrorMat (bathroom.ts): it reflects the environment only, until LIGHT F5
   steel: { fixed: 0xb4bac0, rough: 0.3, metal: 0.55 },   // cutlery and cookware: a light grey that keeps its colour (metalness 0.9 reflects the dark ceiling and goes near black), and still reads on a white top
 };
 
@@ -296,6 +298,8 @@ export class Kit {
   thinnest = Infinity;
   /** the thinnest FREE part added so far, metres */
   thinnestFree = Infinity;
+  /** the fewest lathe segments on a round body 6 cm or wider (R-FACET asks 16) */
+  minSegWide = Infinity;
   private stack: Xf[] = [];
   /** Everything added inside `fn` is placed by `t` as well (after its own placement): a piece built at the origin and set down anywhere. */
   with(t: Xf, fn: () => void): this { this.stack.push(t); try { fn(); } finally { this.stack.pop(); } return this; }
@@ -313,6 +317,7 @@ export class Kit {
     for (const v of q.i) acc.i.push(base + v);
     if (q.thin < this.thinnest) this.thinnest = q.thin;
     if (q.free && q.thin < this.thinnestFree) this.thinnestFree = q.thin;
+    if (q.seg && (q.rmax || 0) >= 0.06 && q.seg < this.minSegWide) this.minSegWide = q.seg;
     return this;
   }
   get meshes(): number { return this.roles.size; }
@@ -340,7 +345,7 @@ export class Kit {
       if (spec.fixed !== undefined && paint[role] === undefined) mat.userData.muted = true;
       const m = new THREE.Mesh(geo, mat); m.name = role; m.castShadow = true; m.receiveShadow = true; g.add(m);
     }
-    g.userData.dress = { thinnest: r5(this.thinnest), thinnestFree: this.thinnestFree === Infinity ? null : r5(this.thinnestFree) };   // the invariants test-dress-kit.mts reads (group data only: material userData is the batcher's)
+    g.userData.dress = { thinnest: r5(this.thinnest), thinnestFree: this.thinnestFree === Infinity ? null : r5(this.thinnestFree), segWide: this.minSegWide === Infinity ? null : this.minSegWide };   // the invariants test-dress-kit.mts reads (group data only: material userData is the batcher's)
     return g;
   }
 }

@@ -1,8 +1,10 @@
 // Dress types for the table: what a dining table, a kitchen island or a sideboard is set with (plan 5.5 SMALL). Each is DORMANT: registered with its
 // placement on a new `dx-*` role (so the composer never picks it, test-compose-stability proves it) and placed only by a fixture or, later, a DRESS recipe.
 // Pieces are tableware.ts's; the types merge them into one to three role meshes.
-import { registerDress, dressType, variantOf, pickOf, cylinder } from './dress-kit.js';
+import { registerDress, dressType, variantOf, pickOf, cylinder, box } from './dress-kit.js';
 import { plate, plateStack, napkin, cutlery, tumbler, carafe, candle, candlestick, vase, bowl, lump } from './tableware.js';
+
+const RUNNER_T = 0.012;
 
 registerDress({
   // One diner's place: a dinner plate with a napkin on it, a tumbler to the upper right, a fork on the left, a knife and spoon on the right.
@@ -17,7 +19,7 @@ registerDress({
   }),
   // Three candles of different heights: pillars, or tapers in metal sticks, or one pillar and two tapers.
   'candle-trio': dressType({
-    name: 'candle-trio', footprint: [0.26, 0.1], height: 0.24, rolls: 3, tags: ['dining', 'living', 'kitchen', 'bedroom'],
+    name: 'candle-trio', footprint: [0.25, 0.09], height: 0.24, rolls: 3, tags: ['dining', 'living', 'kitchen', 'bedroom'],
     build(k, it, u) {
       const v = variantOf(it, u[0], 3);
       if (v === 0) { candle(k, { x: -0.085 }, { r: 0.032, h: 0.08 }); candle(k, { x: 0.0, z: 0.012 }, { r: 0.036, h: 0.13 }); candle(k, { x: 0.088 }, { r: 0.032, h: 0.105 }); }
@@ -53,6 +55,16 @@ registerDress({
       const n = 2 + Math.floor(u[0] * 2), bw = pickOf(['ceramic', 'accent'], u[1]);
       plateStack(k, { x: -0.08, ry: u[2] * 6 }, { n, r: 0.134, seg: 16 });
       bowl(k, { x: 0.15, z: 0.02 }, { r: 0.075, h: 0.05, role: bw });
+    },
+  }),
+  // A table runner of length `w` (default 1.6 m): plain, with two candlesticks, or with three bud vases along it. The cloth is the house's fabric2.
+  'table-runner': dressType({
+    name: 'table-runner', footprint: [1.6, 0.34], height: 0.24, params: ['w', 'color', 'variant'], rolls: 3, paint: 'fabric2', tags: ['dining'],
+    build(k, it, u) {
+      const w = Math.max(0.6, it.w || 1.6), v = variantOf(it, u[0], 3), role = pickOf(['ceramic', 'accent'], u[1]);
+      k.add('fabric2', box(w, RUNNER_T, 0.34));
+      if (v === 1) for (const sx of [-0.22, 0.22]) { candlestick(k, { x: sx * w, y: RUNNER_T }, { h: 0.085 }); candle(k, { x: sx * w, y: RUNNER_T + 0.073 }, { role: 'paper', r: 0.011, h: 0.15 }); }
+      else if (v === 2) for (const [sx, s] of [[-0.2, 0.9], [0, 1.15], [0.2, 0.9]] as const) vase(k, { x: sx * w, y: RUNNER_T }, { kind: 'bud', role, s });
     },
   }),
 }, { group: 'decor' });
