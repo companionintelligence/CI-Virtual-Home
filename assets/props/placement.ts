@@ -286,6 +286,17 @@ export const PLACEMENT: Record<string, Place> = {
   // sectionals by size: the modular (compact), the L (standard, l-sectional above) and the U (large room)
   'u-sectional': def('seating', ['sofa-l', 'sofa-u'], ['living', 'den', 'media'], ['modern', 'industrial', 'mid-century', 'tropical'], { faces: 'focus' }),
   'modular-sectional': def('seating', ['sofa-l'], ['living', 'den', 'media', 'study'], ['mid-century', 'scandi', 'modern', 'tropical'], { faces: 'focus' }),
+
+  // ---- OWNER small (the dress kit: procedural small goods, assets/props/dress-*.ts). DORMANT: every role is a NEW dx-* role that no composer program asks
+  // for, so no pick re-rolls anywhere (scripts/test-compose-stability.mts proves it); only a fixture or a DRESS recipe places them. ----
+  'place-setting': def('decor', ['dx-place-setting'], [...DINING, ...KITCHENS], [], { surfaces: ['table', 'fitted'], pairsWith: ['dining-table'], colorRole: null }),
+  'plate-stack': def('decor', ['dx-plates'], [...DINING, ...KITCHENS], [], { surfaces: [...ON, 'fitted'], colorRole: null }),
+  'candle-trio': def('decor', ['dx-candles'], [...DINING, ...LIVING, ...KITCHENS, ...BEDS], [], { surfaces: [...ON, 'fitted'], colorRole: null }),
+  'carafe': def('decor', ['dx-carafe'], [...DINING, ...KITCHENS, ...BEDS], [], { surfaces: [...ON, 'fitted'], colorRole: null }),
+  'centerpiece': def('decor', ['dx-centerpiece'], [...DINING, ...LIVING, ...KITCHENS, 'hall', 'foyer'], [], { surfaces: [...ON, 'fitted'], colorRole: null }),
+  'kettle-and-mug': def('decor', ['dx-kettle'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  'tray-vignette': def('decor', ['dx-tray'], [...LIVING, ...BEDS, 'hall', 'foyer'], [], { surfaces: ON, colorRole: null }),
+  'vanity-set': def('decor', ['dx-vanity-set'], BATHS, [], { surfaces: ['bath', 'fitted'], colorRole: null }),
 };
 
 // A floor plant stands wherever people live: which rooms have the light and the size for one is the composer's business

@@ -36,6 +36,11 @@ import './kids.js';
 import './office.js';
 import './outdoor.js';
 import './hobby.js';
+// ---- OWNER small (dress kit: procedural small goods, DORMANT until a recipe or a fixture places them) ----
+import './dress-table.js';
+import './dress-kitchen.js';
+import './dress-living.js';
+import './dress-bath.js';
 
 // BAKED LAST — assets/props/baked.ts overrides registered types in place, so it stays the last import; another stream's module goes ABOVE this line
 import './baked.js';
