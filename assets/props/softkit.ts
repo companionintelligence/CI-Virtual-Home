@@ -334,8 +334,8 @@ export function layBedding(g: any, ctx: any, o: any) {
       const sag = Math.max(0, hh / 2 - 0.06 - yy) / 0.14;
       let dx = 0, dy = 0, dz = 0;
       if (ny > 0.5) dy = 0.008 * Math.cos((x / W2) * Math.PI * 2 * Math.round(W2 / 0.3)) + 0.004 * Math.sin(zz * 11 + ph);
-      if (Math.abs(nx) > 0.5) dx = Math.sign(x) * (0.0075 * Math.sin(zz * 14 + ph)) * Math.min(1, sag + 0.2);
-      if (nz > 0.5) dz = 0.0075 * Math.sin(x * 14 + ph) * Math.min(1, sag + 0.2);
+      if (Math.abs(nx) > 0.5) dx = Math.sign(x) * (0.007 * Math.sin(zz * 8 + ph)) * Math.min(1, sag + 0.2);
+      if (nz > 0.5) dz = 0.007 * Math.sin(x * 8 + ph) * Math.min(1, sag + 0.2);
       return [dx, dy, dz];
     },
     shade: (x: number, yy: number, zz: number, nx: number, ny: number, nz: number) => {
@@ -346,16 +346,20 @@ export function layBedding(g: any, ctx: any, o: any) {
   // the fold-back: a roll of duvet at the fold line and the linen lining lying toward the head
   const flap = Math.min(0.24, bl * 0.28);
   shell(duvetA, { cy: matTop + loft + 0.016, cz: headEdge + flap + 0.02, w: W2 - 0.004, h: 0.07, d: 0.075, r: 0.033, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(W2 / 2, 6), ky: [-0.035, 0, 0.035], kz: [-0.0375, 0, 0.0375] });
-  shell(linenA, { cy: matTop + loft + 0.012, cz: headEdge + flap / 2, w: W2 - 0.04, h: 0.026, d: flap + 0.01, r: 0.012, faces: ['py', 'px', 'nx', 'nz'], kx: lin((W2 - 0.04) / 2, 4), kz: [-(flap + 0.01) / 2, (flap + 0.01) / 2] });
+  // the lining lies toward the head, rippled, its ends drooping over the duvet's sides like cloth, not a board
+  const fw = W2 - 0.03, fd = flap + 0.01;
+  shell(linenA, { cy: matTop + loft + 0.014, cz: headEdge + flap / 2, w: fw, h: 0.03, d: fd, r: 0.014, faces: ['py', 'px', 'nx', 'nz'], kx: lin(fw / 2, 6), kz: [-fd / 2, 0, fd / 2],
+    wave: (x: number, _y: number, zz: number, _nx: number, ny: number) => (ny > 0.5 ? [0, -0.035 * smooth(0.55, 1, Math.abs(x) / (fw / 2)) + 0.005 * Math.sin(x * 17 + ph) * Math.cos(zz * 12), 0] : [0, -0.02 * smooth(0.55, 1, Math.abs(x) / (fw / 2)), 0]),
+    shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.97 - 0.05 * smooth(0.6, 1, Math.abs(x) / (fw / 2)) : 0.85) });
   // ---- a throw across the foot (not on a kid's bed)
   const throwOn = r() < 0.6 && !kid, altCol = duvet === colors.accent ? colors.fabric2 : colors.accent;
   const tph = r() * 6.28;
   if (throwOn) {
     const tw = W2 + 0.02, td = 0.36, th2 = 0.26;
     shell(altA, {
-      cy: matTop + loft + 0.012 - th2 / 2 + 0.01, cz: zf - 0.18 - 0.02, w: tw, h: th2, d: td, r: 0.016, faces: ['py', 'px', 'nx'], puff: 0.012,
-      kx: lin(tw / 2, 8), kz: lin(td / 2, 2), ky: [-th2 / 2, -th2 / 2 + 0.05, th2 / 2 - 0.025, th2 / 2],
-      wave: (x: number, yy: number, zz: number, nx: number, ny: number) => (Math.abs(nx) > 0.5 ? [Math.sign(x) * 0.012 * Math.sin(zz * 19 + tph), 0, 0] : [0, 0.007 * Math.sin(x * 9 + tph) + 0.003 * Math.sin(zz * 21 + x * 5), 0]),
+      cy: matTop + loft + 0.012 - th2 / 2 + 0.026, cz: zf - 0.18 - 0.02, w: tw, h: th2, d: td, r: 0.016, faces: ['py', 'px', 'nx'], puff: 0.012,
+      kx: lin(tw / 2, 8), kz: lin(td / 2, 3), ky: [-th2 / 2, -th2 / 2 + 0.05, th2 / 2 - 0.025, th2 / 2],
+      wave: (x: number, yy: number, zz: number, nx: number, ny: number) => (Math.abs(nx) > 0.5 ? [Math.sign(x) * 0.009 * Math.sin(zz * 8 + tph), 0, 0] : [0, 0.007 * Math.sin(x * 9 + tph) + 0.003 * Math.sin(zz * 9 + x * 4), 0]),
       shade: (x: number, yy: number, zz: number, nx: number, ny: number) => (ny > 0.5 ? (1 - 0.1 * (0.5 + 0.5 * Math.sin(x * 9 + tph))) * (Math.abs(zz) > td / 2 - 0.04 ? 0.82 : 1) : 0.82 + 0.12 * smooth(-th2 / 2, th2 / 2, yy)),
     });
   }
@@ -369,7 +373,7 @@ export function layBedding(g: any, ctx: any, o: any) {
     pillow(linenA, { x: px, y: matTop + 0.01 + (euro ? 0.03 : 0), z: pz, w: pw, d: pillowD, t: kid ? 0.11 : 0.14, rotX: lean, rotY: yawJ * (i % 2 ? -1 : 1), nu: 8, nv: 6, floorY: matTop });
   }
   if (euro) {
-    for (const s of [-1, 1]) pillow(altA, { x: s * (w / 4), y: matTop + 0.03, z: zh + 0.2, w: 0.54, d: 0.5, t: 0.17, rotX: 0.5, rotY: s * 0.03 + euroJ[(s + 1) / 2], nu: 7, nv: 5, floorY: matTop });
+    for (const s of [-1, 1]) pillow(altA, { x: s * (w / 4), y: matTop + 0.03, z: zh + 0.2, w: 0.54, d: 0.5, t: 0.17, rotX: 0.5, rotY: s * 0.03 + euroJ[(s + 1) / 2], nu: 6, nv: 4, floorY: matTop });
     pillow(altA, { x: lumJ[0] * 0.4, y: matTop + loft + 0.01, z: pz + pillowD / 2 + 0.2, w: 0.5, d: 0.2, t: 0.08, rotX: 0.32, rotY: lumJ[1], nu: 6, nv: 3, floorY: matTop + loft - 0.01 });
   }
   const uv = quilt ? (x: number, _y: number, zz: number): [number, number] => [(x + W2 / 2) / W2, (zz - (zf - cl)) / cl] : undefined;
