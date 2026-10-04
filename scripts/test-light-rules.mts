@@ -183,3 +183,10 @@ test('L3: the fixtures read the lamp colour from the scheme and the lamps from k
   assert.match(src, /LAMP_ITEMS\.has/);
   assert.match(src, /cost > left/, 'the budget is spent per room: a lamp room costs two lights');
 });
+
+// ---- the night ambient (L3 tuning) ------------------------------------------------------------------------------------------------------
+test('night keeps enough sky fill for shadows to survive the room fill\'s retune (the crush rows were tuned on these numbers)', () => {
+  assert.ok(TIME_OF_DAY.night.hemi.intensity >= 1.2 && TIME_OF_DAY.night.env >= 0.3, `night hemi ${TIME_OF_DAY.night.hemi.intensity} env ${TIME_OF_DAY.night.env}`);
+  assert.ok(TIME_OF_DAY.night.hemi.intensity < TIME_OF_DAY.day.hemi.intensity, 'still darker than day');
+  assert.ok(TIME_OF_DAY.night.env < TIME_OF_DAY.dusk.env, 'and below dusk');
+});

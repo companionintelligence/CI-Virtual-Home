@@ -29,6 +29,9 @@
 //                                             serves another checkout) and compare: L2's tag on ceiling materials must cost at most +2 % median.
 //                                             --houses a,b  --label <name>
 //
+//   pnpm run test:light -- --probe           the bench without the provenance rules: the same cameras (from before.manifest.json) and the same 19 reads, on the
+//                                             tree as it is, committed or not, for tuning a constant. Not a gate result (use --bench for that).   --tods dusk,night
+//
 // Frames are read off the product's own composer path (__houseSnapshot / __houseRenderFrames, 2x supersample, GTAO, bloom, grade, SMAA), at
 // the rig's pinned profile; every decision is a pure function of the files' bytes (luma.mts decodes with ffmpeg). Images go outside git
 // (<REVIEW_DIR>/after/light/...).
@@ -310,13 +313,49 @@ async function playerCallsMode(): Promise<number> {
   return 0;
 }
 
+// ---- probe: the bench on a dirty tree, for tuning ------------------------------------------------------------------------------------
+async function probeMode(): Promise<number> {
+  const m = loadManifest(path.join(BASELINES, 'before.manifest.json'));
+  const before = readJson(path.join(BASELINES, 'before.metrics.json')).frames as Record<string, Luma>;
+  const tods = new Set((args.tods && args.tods !== 'true' ? args.tods : 'day,dusk,night').split(','));
+  const dir = out('probe');
+  const shots = m.shots.filter(x => x.kind === 'eye' && BENCH_ROOMS.includes(x.room) && x.corner === 'NW' && tods.has(x.tod));
+  const session = await startSession();
+  const after: Record<string, Luma> = {};
+  try {
+    for (const house of [...new Set(shots.map(x => x.house))]) {
+      const burn = await session.open(house, { res: RES });
+      try { await burn.page.evaluate((r: string) => (window as any).__houseSnapshot({ res: r, quality: 0.5 }), RES); } finally { await burn.close(); }
+      const w = await session.open(house, { res: RES });
+      for (const tod of ['day', 'dusk', 'night']) {
+        if (!tods.has(tod)) continue;
+        await w.page.evaluate((t: string) => (window as any).__houseSetLighting(t), tod);
+        for (const x of shots.filter(y => y.house === house && y.tod === tod)) {
+          const url = await w.page.evaluate(({ cam, res, quality }: any) => {
+            const W = window as any, d = W.__houseDebug(), c = d.camera;
+            c.position.set(...cam.pos); c.lookAt(...cam.target); c.fov = cam.fov; c.near = cam.near; c.updateProjectionMatrix();
+            return W.__houseSnapshot({ res, dressing: { walls: 'up', roof: 'on' }, quality });
+          }, { cam: x.camera, res: RES, quality: QUALITY });
+          const f = path.join(dir, x.file); fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(f, Buffer.from(url.slice(url.indexOf(',') + 1), 'base64'));
+          after[x.id] = roundLuma(lumaOfFile(f));
+        }
+      }
+      await w.close();
+    }
+  } finally { await session.close(); }
+  for (const r of lightAcceptance(before, after)) say({ check: r.check, frame: r.frame, value: num(r.value, 3), limit: r.limit, ok: r.ok });
+  const bad = rows.filter(r => !r.ok).length; console.log(bad ? `${bad} of ${rows.length} failed` : `all ${rows.length} pass`);
+  return 0;
+}
+
 let code = 0;
-if (args['player-calls'] === 'true') code = await playerCallsMode();
+if (args.probe === 'true') code = await probeMode();
+else if (args['player-calls'] === 'true') code = await playerCallsMode();
 else if (args.hitch === 'true') code = await hitchMode();
 else if (args.portal === 'true') code = await portalMode();
 else if (args.bench === 'true') code = await benchMode();
 else code = await fixturesMode();
 const bad = rows.filter(r => !r.ok).length;
-if (args.portal !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
+if (args.portal !== 'true' && args.probe !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
 console.log(`(load ${machine().load1})`);
 process.exit(code);
