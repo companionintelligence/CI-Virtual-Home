@@ -60,3 +60,20 @@ test('the baked-model role table agrees with the finish roles where both name a 
   assert.equal(rough('ceramic'), FINISH_ROLES.ceramic.rough);
   assert.equal(rough('rubber'), FINISH_ROLES.rubber.rough);
 });
+
+// ---- L1: the room fill ------------------------------------------------------------------------------------------------------------------
+import { ROOM_FILL_K, FILL_PENUMBRA, FILL_ANGLE_MAX, FILL_ON_GAIN, LIGHT_CAP, hideOffGain, applyLampGain } from '../assets/fixtures.js';
+import { TIME_OF_DAY } from '../assets/environment.js';
+
+test('L1: the room light is a soft fill (numbers the acceptance was calibrated on)', () => {
+  assert.equal(ROOM_FILL_K, 0.3);
+  assert.equal(FILL_PENUMBRA, 1.0);
+  assert.ok(FILL_ANGLE_MAX <= 1.25 + 1e-9);
+  assert.equal(LIGHT_CAP, 16);
+});
+
+test('L1: only daylight turns the fill off, and only the offline path hides it', () => {
+  for (const [name, p] of Object.entries(TIME_OF_DAY)) assert.equal(p.lampGain < FILL_ON_GAIN, name === 'day', `${name} lampGain ${p.lampGain}`);
+  assert.equal(hideOffGain(), true, 'no window (Node) is the offline path: hidden');
+  applyLampGain(0.5);   // no house built: a no-op, not a throw
+});

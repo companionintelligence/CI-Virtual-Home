@@ -19,6 +19,11 @@
 //                                             seven hand-picked rooms. It writes <out>/portal-day.json and prints the table.
 //                                             --houses a,b  --frames 1,0.55  --variants base,bounce  --label <name>
 //
+//   pnpm run test:light -- --hitch           the L1 spike: in the live player (?mode=view), how long the first frame after a time-of-day switch takes
+//                                             when the room lights are HIDDEN while it is day (three recompiles every lit material, NUM_SPOT_LIGHTS
+//                                             changes) against left in the scene at intensity 0. Policy lives in assets/fixtures.ts (hideOffGain);
+//                                             this reports the numbers it was chosen on.   --houses a,b  --reps 3
+//
 // Frames are read off the product's own composer path (__houseSnapshot / __houseRenderFrames, 2x supersample, GTAO, bloom, grade, SMAA), at
 // the rig's pinned profile; every decision is a pure function of the files' bytes (luma.mts decodes with ffmpeg). Images go outside git
 // (<REVIEW_DIR>/after/light/...).
@@ -215,11 +220,57 @@ async function portalMode(): Promise<number> {
   return 0;
 }
 
+
+// ---- hitch: the L1 spike ---------------------------------------------------------------------------------------------------------------
+async function hitchMode(): Promise<number> {
+  const houses = args.houses && args.houses !== 'true' ? args.houses.split(',') : ['aurora', 'riverbend'];
+  const reps = Number(args.reps && args.reps !== 'true' ? args.reps : 3);
+  const session = await startSession();
+  const table: any[] = [];
+  try {
+    for (const house of houses) for (const policy of ['hide', 'zero'] as const) {
+      const ctx = await session.browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
+      const page = await ctx.newPage();
+      const errors: string[] = []; page.on('pageerror', (e: Error) => errors.push(e.message.split('\n')[0]));
+      await page.route('https://fonts.googleapis.com/**', (r: any) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+      await page.route('https://fonts.gstatic.com/**', (r: any) => r.abort());
+      await page.addInitScript((hide: boolean) => { (window as any).__fillHide = hide; }, policy === 'hide');   // the policy is in force from the build, as shipped code would have it
+      await page.goto(session.srv.url(`room-creator.html?mode=view&house=${house}&tod=day&play=0`), { waitUntil: 'domcontentloaded', timeout: 240000 });
+      await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, house, { timeout: 240000 });
+      const r = await page.evaluate(async ({ reps }: any) => {
+        const W = window as any, d = W.__houseDebug(), R = d.renderer, gl = R.getContext(), px = new Uint8Array(4);
+        const frame = () => { const t0 = performance.now(); R.render(d.scene, d.camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return performance.now() - t0; };
+        const steady = (n = 12) => { const xs: number[] = []; for (let i = 0; i < n; i++) xs.push(frame()); xs.sort((a, b) => a - b); return xs[xs.length >> 1]; };
+        let spots = 0, hidden = 0; d.scene.traverse((o: any) => { if (o.isSpotLight && o.userData.fixtureLight) { spots++; if (!o.visible) hidden++; } });
+        const programs0 = R.info.programs.length;
+        // the house was built (and the player has drawn it) at its own hour, day: the first night frame is the cold one
+        const dayMs = steady();
+        const out: any = { spots, hidden, programsDay: R.info.programs.length, dayMs, flips: [] };
+        for (let k = 0; k < reps; k++) {
+          W.__houseSetLighting('night'); const toNight = frame(); const nightMs = steady();
+          W.__houseSetLighting('day'); const toDay = frame();
+          out.flips.push({ toNight, toDay, nightMs });
+        }
+        out.programsAfter = R.info.programs.length; out.programs0 = programs0;
+        return out;
+      }, { reps });
+      console.log(`${house.padEnd(10)} ${policy.padEnd(5)} spots ${r.spots} (${r.hidden} hidden)  programs ${r.programsDay} > ${r.programsAfter}  day frame ${r.dayMs.toFixed(1)} ms   first frame after the switch: ${r.flips.map((f: any) => `night ${f.toNight.toFixed(0)} / day ${f.toDay.toFixed(0)}`).join(' | ')}   (night steady ${r.flips[0].nightMs.toFixed(1)} ms)${errors.length ? '  ERR ' + errors[0] : ''}`);
+      table.push({ house, policy, ...r });
+      await ctx.close();
+    }
+  } finally { await session.close(); }
+  writeText(out('hitch.json'), stableJson({ schema: 1, what: 'first frame after a time-of-day switch in the player, hide vs intensity 0 (scripts/test-interior-light.mts --hitch)', rows: table, machine: machine() }));
+  const worst = Math.max(...table.filter(t => t.policy === 'hide').map(t => Math.max(...t.flips.map((f: any) => Math.max(f.toNight, f.toDay)))));
+  console.log(`worst first frame under HIDE: ${worst.toFixed(0)} ms (limit 250 ms for hiding in the player)`);
+  return 0;
+}
+
 let code = 0;
-if (args.portal === 'true') code = await portalMode();
+if (args.hitch === 'true') code = await hitchMode();
+else if (args.portal === 'true') code = await portalMode();
 else if (args.bench === 'true') code = await benchMode();
 else code = await fixturesMode();
 const bad = rows.filter(r => !r.ok).length;
-if (args.portal !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
+if (args.portal !== 'true' && args.hitch !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
 console.log(`(load ${machine().load1})`);
 process.exit(code);

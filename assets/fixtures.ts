@@ -32,6 +32,15 @@ export const LIGHT_CAP = 16;          // dynamic lights per house (one per room 
 const DAY_GAIN = 0.035;               // lamp gain when no environment has announced one (a daylight preset's)
 const WARM = 0xffd7a8;                // ~2900 K: the pools read warm-white, not orange
 const ROOM_MIN_AREA = 2.5;            // m² — a cupboard gets no light
+// The room's own light is a soft FILL, not a spot (plan 5.2 L1). Before, it was aimed straight down at about ten times the
+// illuminance a sunlit wall receives, with a 0.45 penumbra: the nearest horizontal surface (a bed, a coffee table, an island)
+// clipped to white and the cone's edge scalloped the wall. Now it is a wide, fully soft cone at 0.3 of that.
+export const ROOM_FILL_K = 0.3;       // × the floor-illuminance target below (service 0.6 and hall 0.45 still scale it down)
+export const FILL_PENUMBRA = 1.0;     // the whole cone is a falloff: no edge
+export const FILL_ANGLE_MAX = 1.25;   // rad (~72°): a wider cone only lights the lawn
+/** lampGain under which the room's light is off for good: day (0.035). Offline (composer, editor) the spot is then HIDDEN, so the
+ *  day shader has no spot lights to loop over; the live player keeps it in the scene at intensity 0 (see applyLampGain). */
+export const FILL_ON_GAIN = 0.1;
 
 // ---- the kind of room, from its name (the specs name rooms freely: "Sunset Terrace Suite", "Study & Bar") ----
 const KINDS: Array<[string, RegExp]> = [
@@ -72,10 +81,22 @@ const readGain = (): number => {
   const g = w && w.__houseLighting && w.__houseLighting.lampGain;
   return typeof g === 'number' && Number.isFinite(g) ? g : DAY_GAIN;
 };
+/** Set every room light for a lamp gain. A light below FILL_ON_GAIN is off: hidden offline (the day frames drop their spot loop), and, in
+ *  the live player (?mode=view), left in the scene at intensity 0, because a hidden light changes three's NUM_SPOT_LIGHTS and every lit
+ *  material recompiles on the time-of-day switch (the hitch measured in the L1 commit). */
+export const hideOffGain = (): boolean => {
+  const w: any = typeof window !== 'undefined' ? window : null;
+  if (w && typeof w.__fillHide === 'boolean') return w.__fillHide;   // a measurement hook (test-interior-light --hitch sets it before the build)
+  return !(w && /[?&]mode=view\b/.test(w.location.search));
+};
 export function applyLampGain(gain: number = readGain()) {
   if (!current) return;
   current.gain = gain;
-  for (const { light, base } of current.lights) light.intensity = base * gain;
+  const hide = hideOffGain();
+  for (const { light, base } of current.lights) {
+    light.intensity = gain >= FILL_ON_GAIN ? base * gain : (hide ? base * gain : 0);
+    light.visible = !hide || gain >= FILL_ON_GAIN;
+  }
 }
 if (typeof window !== 'undefined') {
   window.addEventListener('house:lighting', (e: any) => {
@@ -486,7 +507,7 @@ export function dressLevel(ctx) {
       const c0 = ceilAt(cx, cz) ?? (y + H - 0.02);
       const ly = Math.min(c0 - 0.25, y + 2.6), drop = Math.max(1, ly - y);
       const rs = Math.min(b.w, b.d) / 2;
-      const angle = Math.min(80, Math.max(50, Math.atan(rs / Math.max(0.35, drop - 1.9)) / DEG)) * DEG;
+      const angle = Math.min(FILL_ANGLE_MAX, Math.min(80, Math.max(50, Math.atan(rs / Math.max(0.35, drop - 1.9)) / DEG)) * DEG);
       const distance = Math.hypot(drop + 0.35, rs + 0.1);
       // intensity: set by what the floor under the light receives (room kind × area, 1.3× the first cone's: the
       // pool is smaller now), the window's loss there made up to at most 2× (a hall's walls, close to the light,
@@ -495,12 +516,13 @@ export function dressLevel(ctx) {
       // a garage at dusk is not a living room; a hall or landing is lit for passing through, and its walls sit
       // close enough to the light that the 18 floor would blow them (and the stairwell below) out white
       const floorE = 0.26 * Math.min(36, Math.max(18, 12 + 0.8 * area)) * (kind === 'service' ? 0.6 : kind === 'hall' ? 0.45 : 1) * Math.min(1, Math.max(0.55, rs / 1.6));
-      const base = floorE * drop ** decay / Math.max(0.5, win);
-      const light = new THREE.SpotLight(WARM, base * s.gain, distance, angle, 0.45, decay);
+      const base = ROOM_FILL_K * floorE * drop ** decay / Math.max(0.5, win);
+      const light = new THREE.SpotLight(WARM, base * s.gain, distance, angle, FILL_PENUMBRA, decay);
       light.name = 'Fixture light'; light.castShadow = false;
       light.position.copy(local(cx, ly, cz));
       light.target.position.copy(local(cx, y, cz));
       light.userData.fixtureLight = true;   // not `fixture`: that tag means "a mesh whose emissive the gain scales"
+      light.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
       g.add(light, light.target);
       s.lights.push({ light, base, room: room.name });
       s.stats.lights++;
