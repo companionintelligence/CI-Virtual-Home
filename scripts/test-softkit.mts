@@ -182,3 +182,43 @@ test('F theming: the sheet is linen, the duvet is the spec colour or an accent/f
   assert.equal(dv.material.color.getHex(), c, 'a spec colour paints the duvet');
   assert.equal(roleMeshes(o, 'linen')[0].material.color.getHex(), kit.colors.linen, 'and only the duvet');
 });
+
+// ---- curtains (T3) -----------------------------------------------------------------------------------------------------------
+test('C caps: curtains are at most 4 meshes and 1,400 triangles, the sheer only when wide, its envelope the old curtain\'s', () => {
+  let sheers = 0;
+  for (const w of [0.6, 1.0, 1.4, 2.0, 3.2]) for (const sd of SEEDS) {
+    const o = build('curtains', { w, h: 2.2 }, sd), ms = meshesOf(o), tris = sum(ms.map(trisOf));
+    assert.ok(ms.length >= 2 && ms.length <= 4, `w ${w}/${sd}: ${ms.length} meshes`);
+    assert.ok(tris <= 1400, `w ${w}/${sd}: ${tris} triangles`);
+    const sheer = ms.filter(m => m.userData.role === 'sheer'); sheers += sheer.length;
+    if (w < 1.4) assert.equal(sheer.length, 0, `w ${w}: a sheer on a narrow curtain`);
+    const b = new THREE.Box3().setFromObject(o);
+    assert.ok(b.max.z <= 0.13 + 0.01 && b.min.z >= -0.001, `w ${w}/${sd}: z ${b.min.z.toFixed(3)}..${b.max.z.toFixed(3)} outside 0..0.13`);
+    assert.ok(b.max.x <= w / 2 + 0.052 + 0.005 && b.min.x >= -(w / 2 + 0.052 + 0.005), `w ${w}/${sd}: x ${b.min.x.toFixed(3)}..${b.max.x.toFixed(3)}`);
+    assert.ok(b.min.y >= 0.02 - 0.005 && b.max.y <= 2.2 + 0.052 + 0.005, `w ${w}/${sd}: y ${b.min.y.toFixed(3)}..${b.max.y.toFixed(3)}`);
+    for (const m of ms) { m.geometry.computeBoundingBox(); const s = m.geometry.boundingBox.getSize(new THREE.Vector3()); assert.ok(Math.min(s.x, s.y, s.z) >= 0.006, `w ${w}/${sd}: a ${m.userData.role} part under 6 mm (${Math.min(s.x, s.y, s.z).toFixed(4)})`); }
+  }
+  assert.ok(sheers > 0, 'the sheer is built for some seeds');
+});
+
+test('D material: curtain drape is fabric2 or the spec colour, the sheer is the one transparent mesh and has no shadow, no map anywhere', () => {
+  for (const sd of SEEDS) {
+    const o = build('curtains', { w: 2.2 }, sd); kit.theme(o);
+    for (const m of meshesOf(o)) {
+      assert.ok(!m.material.map, `a map on ${m.userData.role}`);
+      if (m.userData.role === 'sheer') { assert.ok(m.material.transparent && !m.castShadow && !m.receiveShadow, 'the sheer is transparent, no shadow'); }
+      else assert.ok(!m.material.transparent, `${m.userData.role} is opaque`);
+    }
+    assert.equal(roleMeshes(o, 'drape')[0].material.color.getHex(), kit.colors.fabric2, 'the drape is the house fabric2');
+    assert.equal(roleMeshes(o, 'hardware')[0].material.color.getHex(), kit.colors.metal, 'the hardware is the house metal');
+  }
+  const o = build('curtains', { color: '#b3402a' });
+  assert.equal(roleMeshes(o, 'drape')[0].material.color.getHex(), 0xb3402a, 'a spec colour paints the drape');
+  assert.equal(roleMeshes(o, 'hardware')[0].material.color.getHex(), kit.colors.metal, 'and not the hardware');
+});
+
+test('E determinism: curtains are the same twice for a seed, differ across seeds, and spend exactly one draw', () => {
+  for (const sd of ['a', 'b', 'c']) assert.equal(hashGeom(build('curtains', {}, sd)), hashGeom(build('curtains', {}, sd)));
+  assert.ok(new Set(SEEDS.map(sd => hashGeom(build('curtains', {}, sd)))).size > 3, 'the seeds build different curtains');
+  const n = { n: 0 }; build('curtains', {}, 'a', n); assert.equal(n.n, 1, 'one draw');
+});

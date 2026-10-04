@@ -16,6 +16,7 @@
 //     rim is the kit's metal). Variation is ctx.rng(), seeded per item.
 import { registerProps } from './registry.js';
 import { patternTexture, motifTexture, RUG_PATTERNS, ART_MOTIFS } from './patterns.js';
+import { hangCurtains } from './softkit.js';
 
 const pick = (rng, arr) => arr[Math.floor(rng() * arr.length)];
 const jit = (rng, a) => (rng() - 0.5) * 2 * a;   // ±a
@@ -143,24 +144,9 @@ registerProps({
   },
   'curtains': {
     footprint: [2.1, 0.14], height: 2.44, params: ['w', 'h', 'color'], tags: ['living', 'bedroom', 'dining', 'kids', 'office'],
-    create(it, { THREE, std, box, group, colors, hex }) {
-      const w = it.w || 2.0, h = it.h || 2.4, g = group('Curtains');
-      const fab = std(it.color ? hex(it.color) : colors.fabric2, { roughness: 0.95 });
-      const metal = std(colors.metal, { metalness: 0.8, roughness: 0.3 });
-      const zr = 0.09, ry = h + 0.03;   // the rail stands 9 cm off the wall, just above the panels
-      const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, w + 0.06, 10), metal); rail.rotation.z = Math.PI / 2; rail.position.set(0, ry, zr); rail.castShadow = true; g.add(rail);
-      for (const s of [-1, 1]) {
-        const fin = new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), metal); fin.position.set(s * (w / 2 + 0.03), ry, zr); g.add(fin);
-        g.add(box(0.02, 0.02, zr, metal, s * (w / 2 - 0.12), ry, zr / 2));
-      }
-      // two pleated panels drawn to the sides: alternating pleats straddle the rail line
-      const pw = Math.min(0.32 * w, 0.75), n = Math.max(4, Math.round(pw / 0.09)), pleat = pw / n;
-      for (const s of [-1, 1]) for (let i = 0; i < n; i++) {
-        const x = s * (w / 2 - (i + 0.5) * pleat);
-        g.add(box(pleat + 0.004, h - 0.01, 0.05, fab, x, (h + 0.03) / 2, zr + (i % 2 ? 0.015 : -0.015)));
-      }
-      return g;
-    },
+    // softkit.ts hangCurtains: two lens panels (pinch-pleat, wave or ring-top, a flared hem, sometimes a tie-back), the rod, brackets and
+    // finials in one metal mesh, and — on a wide curtain, 40% — a transparent sheer behind. 2-3 meshes where the box curtain had 19.
+    create(it, ctx) { return hangCurtains(ctx, it); },
     iso: [{ shape: 'box', box: [-1.0, 0.02, 0.06, -0.36, 2.41, 0.12], color: 'role:fabric2' }, { shape: 'box', box: [0.36, 0.02, 0.06, 1.0, 2.41, 0.12], color: 'role:fabric2' }, { shape: 'box', box: [-1.05, 2.42, 0.08, 1.05, 2.44, 0.1], color: 'role:metal' }],
   },
   'wall-hanging': {

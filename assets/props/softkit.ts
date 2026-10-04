@@ -371,3 +371,67 @@ export function layBedding(g: any, ctx: any, o: any) {
   put(g, altA, softMat(ctx, altCol, { roughness: 0.93 }), 'throw');
   return matTop + 0.11 + pillowD * 0.22;
 }
+
+// =================================================================================================================
+// Curtains — a pair of drawn panels on a rod (soft.ts 'curtains'), 2-3 meshes
+// =================================================================================================================
+/** the optional sheer layer behind the drapery: transparent (casts no shadow, GTAO leaves it out, the player's batcher skips it), 40% of curtains
+ *  at least 1.4 m wide. ONE constant removes it, and with it the only alpha in the grammar. */
+export const SHEER = true;
+/** the envelope the old 19-box curtain had and the composer's MEASURED box is built from: x to w/2 + 0.052, z 0..0.13, y 0.02..h + 0.052 */
+export const CURTAIN = { zRod: 0.09, zFront: 0.13, hem: 0.02, finial: 0.022 } as const;
+
+/** Two panels (pinch-pleat 55%, wave 30%, ring-top 15%; flared hem; a tie-back 25%) on a rod with brackets and finials, and a sheer when wide enough.
+ *  Meshes: drape (the two lens panels, material.color = it.color or fabric2), hardware (rod, rings, brackets, finials: the metal role), sheer. ONE ctx.rng draw. */
+export function hangCurtains(ctx: any, it: any) {
+  const { THREE, std, group, colors, hex } = ctx, K = softkit(THREE), { Acc, sheet, strut, band } = K;
+  const w = it.w || 2.0, h = it.h || 2.4, g = group('Curtains');
+  const r = splitRng(ctx.rng);
+  const kindR = r(), tieR = r(), sheerR = r(), ph = r() * 6.28;
+  const style = kindR < 0.55 ? 'pinch' : kindR < 0.85 ? 'wave' : 'ring', tie = tieR < 0.25, sheerOn = SHEER && w >= 1.4 && sheerR < 0.4;
+  const { zRod, zFront, hem, finial } = CURTAIN, ry = h + 0.03, TH = 0.014;
+  // ---- hardware: rod, finials, brackets (and rings for the ring-top), one metal mesh
+  const hard = new Acc();
+  strut(hard, [-(w / 2 + 0.03), ry, zRod], [w / 2 + 0.03, ry, zRod], 0.012, 0.012, 10);
+  for (const s of [-1, 1]) {
+    strut(hard, [s * (w / 2 + 0.03) - finial, ry, zRod], [s * (w / 2 + 0.03) + finial, ry, zRod], finial, finial, 8);
+    strut(hard, [s * (w / 2 - 0.12), ry, 0], [s * (w / 2 - 0.12), ry, zRod], 0.009, 0.009, 6);
+  }
+  // ---- two panels drawn to the sides: the fold pitch widens with the panel so a wide curtain stays at six folds a side
+  const pw = Math.min(0.32 * w, 0.75), pitch = Math.max(0.115, pw / 6), n = Math.max(4, Math.round(pw / pitch)), nc = n * (style === 'pinch' ? 4 : 3);
+  const A = Math.min(0.03, (pw / n) * 0.3), zc = zFront - TH / 2 - A;
+  const top = ry - 0.012, rows = tie ? [0, 0.1, 0.4, 0.8, 0.94, 1] : [0, 0.07, 0.5, 0.93, 1];
+  const panel = new Acc();
+  for (const s of [-1, 1]) {
+    const xo = s * (w / 2), xi = s * (w / 2 - pw);
+    sheet(panel, {
+      U: Array.from({ length: nc + 1 }, (_, i) => i / nc), Vn: rows, th: TH, want: [0, 0, 1], rimK: 0.5,
+      pos: (u: number, v: number) => {
+        const headBand = smooth(0.86, 0.93, v), flare = 1 - smooth(0, 0.08, v);
+        const amp = A * (0.72 + 0.28 * headBand + 0.22 * flare);
+        const phase = Math.PI * 2 * n * u + (style === 'wave' ? ph * 0.0 : 0);
+        const f = Math.cos(phase), sharp = style === 'pinch' ? Math.sign(f) * Math.pow(Math.abs(f), 1 - 0.35 * headBand) : f;
+        // a tie-back gathers the panel toward the wall at a third of its height and lets it flare below
+        const gather = tie ? 1 - 0.26 * Math.exp(-(((v - 0.4) / 0.13) ** 2)) : 1;
+        const x = xo + (xi - xo) * u * gather;
+        return [x, hem + (top - hem) * v, zc + amp * sharp];
+      },
+      shade: (u: number, v: number, _x: number, _y: number, z: number) => {
+        const fold = 0.82 + 0.18 * (((z - zc) / A) * 0.5 + 0.5), tieBand = tie ? 1 - 0.12 * Math.exp(-(((v - 0.4) / 0.025) ** 2)) : 1;
+        return clamp(fold * tieBand * (0.93 + 0.07 * smooth(0, 0.3, v)), 0.55, 1);
+      },
+    });
+  }
+  if (style === 'ring') for (const s of [-1, 1]) for (let i = 0; i < 5; i++) band(hard, s * (w / 2 - (0.03 + (pw - 0.06) * (i / 4))), ry, zRod, 0.016, 0.01, 6);
+  const drape = panel.mesh(std(it.color ? hex(it.color) : colors.fabric2, { roughness: 0.95, vertexColors: true }), { cast: true, receive: true });
+  drape.userData.role = 'drape'; g.add(drape);
+  const rod = hard.mesh(std(colors.metal, { metalness: 0.8, roughness: 0.3, vertexColors: true }), { cast: true, receive: false });
+  rod.userData.role = 'hardware'; g.add(rod);
+  if (sheerOn) {
+    const sh = new Acc(), sw = w * 0.92;
+    sheet(sh, { U: Array.from({ length: 13 }, (_, i) => i / 12), Vn: [0, 0.5, 1], th: 0, want: [0, 0, 1], pos: (u: number, v: number) => [-sw / 2 + sw * u, 0.03 + (ry - 0.06) * v, 0.035 + 0.011 * Math.cos(Math.PI * 2 * 5 * u + 0.7)] });
+    const m = sh.mesh(std(0xf2efe8, { roughness: 1, vertexColors: true, transparent: true, opacity: 0.38, depthWrite: false, side: THREE.DoubleSide }), { cast: false, receive: false });
+    m.renderOrder = 2; m.userData.role = 'sheer'; g.add(m);
+  }
+  return g;
+}
