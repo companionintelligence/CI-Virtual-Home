@@ -321,7 +321,7 @@ export function layBedding(g: any, ctx: any, o: any) {
   const loft = 0.046, drop = Math.min(0.17, thick - 0.025);
   // ---- the mattress and its fitted sheet
   const rM = Math.min(0.05, thick / 2.2);
-  shell(linenA, { cy: y + thick / 2, cz: z, w, h: thick, d, r: rM, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(w / 2, 4), kz: lin(d / 2, 6), ky: [-thick / 2, -thick / 2 + rM, thick / 2 - rM, thick / 2],
+  shell(linenA, { cy: y + thick / 2, cz: z, w, h: thick, d, r: rM, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(w / 2, 4), kz: lin(d / 2, 4), ky: [-thick / 2, -thick / 2 + rM, thick / 2 - rM, thick / 2],
     shade: (x: number, yy: number, zz: number, nx: number, ny: number) => SHADE.mattress * (0.93 + 0.07 * smooth(-thick / 2, thick / 2, yy)) * (ny > 0.5 ? 1 : 0.94) });
   // ---- the duvet: puffed channelled top, a skirt hanging over both sides and the foot, folded back at the head
   const bl = d * (cover + r() * 0.05), cl = bl + 0.02, cz = zf - cl / 2 + 0.008, headEdge = zf - cl;
