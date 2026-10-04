@@ -68,7 +68,7 @@ export function plantKit(ctx: any) {
 
   /** scale a set of accumulators about the pot axis so none stands more than `over` outside the box {x0, z0, x1, z1, top, bottom?}, each side on its own (the baseline's boxes are
    *  not symmetric); never grows anything, never moves the pot (it is not passed in), and no vertex ends below `floorY` (a drooping leaf never sinks through the surface it stands on) */
-  function fit(accs: any[], box: Box, rim: number, over = 0.03, floorY: number | null = 0.002) {
+  function fit(accs: any[], box: Box, rim: number, over = 0.02, floorY: number | null = 0.002) {
     let mxp = 0, mxn = 0, mzp = 0, mzn = 0, my = -Infinity;
     for (const a of accs) { const P = a.pos; for (let i = 0; i < P.length; i += 3) { mxp = Math.max(mxp, P[i]); mxn = Math.max(mxn, -P[i]); mzp = Math.max(mzp, P[i + 2]); mzn = Math.max(mzn, -P[i + 2]); my = Math.max(my, P[i + 1]); } }
     const f = (m: number, lim: number) => (m > lim + over ? (lim + over) / m : 1);

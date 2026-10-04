@@ -26,8 +26,10 @@ export const BOXES: Record<string, BoxRow[]> = {
   'pampas-vase': [["def", -0.159, -0.165, 0.169, 0.166, 1.179, 0], [0.88, -0.106, -0.116, 0.126, 0.114, 0.871, 0], [1.18, -0.142, -0.155, 0.169, 0.153, 1.168, 0], [1.59, -0.191, -0.209, 0.228, 0.206, 1.574, 0]],
 };
 
-BOXES['vase'] = [["def", -0.091, -0.098, 0.095, 0.084, 0.569, 0], [0.43, -0.084, -0.09, 0.078, 0.084, 0.729, 0], [0.57, -0.084, -0.09, 0.078, 0.084, 0.869, 0], [0.77, -0.084, -0.09, 0.078, 0.084, 1.069, 0]];
-BOXES['flower-jug'] = [["def", -0.113, -0.118, 0.143, 0.115, 0.465, 0], [0.35, -0.113, -0.111, 0.143, 0.095, 0.465, 0], [0.47, -0.113, -0.111, 0.143, 0.095, 0.465, 0], [0.63, -0.113, -0.111, 0.143, 0.095, 0.465, 0]];
+// (vase and flower-jug were not foliage and their MEASURED box is one default-seed build, tighter than the 12-seed union: the composer lays rooms out with MEASURED, and
+// compose-parity judges a built arrangement against it, so these two clamp to MEASURED in x and z, and to the union's top at each h)
+BOXES['vase'] = [["def", -0.078, -0.077, 0.081, 0.062, 0.569, 0], [0.43, -0.078, -0.077, 0.081, 0.062, 0.729, 0], [0.57, -0.078, -0.077, 0.081, 0.062, 0.869, 0], [0.77, -0.078, -0.077, 0.081, 0.062, 1.069, 0]];
+BOXES['flower-jug'] = [["def", -0.089, -0.09, 0.143, 0.09, 0.465, 0], [0.35, -0.089, -0.09, 0.143, 0.09, 0.465, 0], [0.47, -0.089, -0.09, 0.143, 0.09, 0.465, 0], [0.63, -0.089, -0.09, 0.143, 0.09, 0.465, 0]];
 
 export const SPEC: Record<string, PlantSpec> = {
   'bird-of-paradise': { H0: 1.7, pot: [0.22, 0.18, 0.4], rows: BOXES['bird-of-paradise'] },
@@ -245,7 +247,8 @@ function bare(it: any, ctx: any, name: string, type: string) {
   const P = plantKit(ctx), g = ctx.group(name), potCol = potColor(it, ctx.colors, ctx.rng, ctx.hex), r = splitRng(ctx.rng);
   const potA = new P.K.Acc(), leafA = new P.K.Acc(), caneA = new P.K.Acc(), bloomA = new P.K.Acc();
   const box = boxAt(BOXES[type], it.h);
-  const done = (leafCol: number, o: any = {}) => { P.fit([leafA, caneA, bloomA], box, 0, 0.03, box.bottom ? box.bottom - 0.03 : 0.002); return P.finish(g, { pot: potA, potCol, leaf: leafA, leafCol, cane: caneA, bloom: bloomA, ...o }); };
+  // (0.02 of the 0.03 the drift gate allows: the composer's sizeOf is the symmetrised box and parity, 0.03 on foliage, is judged against it)
+  const done = (leafCol: number, o: any = {}) => { P.fit([leafA, caneA, bloomA], box, 0, 0.02, box.bottom ? box.bottom - 0.02 : 0.002); return P.finish(g, { pot: potA, potCol, leaf: leafA, leafCol, cane: caneA, bloom: bloomA, ...o }); };
   return { P, K: P.K, g, r, potA, leafA, caneA, bloomA, potCol, done, jit: (a: number) => P.jit(r, a), green: (a = 0, b = GREENS.length - 1) => GREENS[a + Math.floor(r() * (b - a + 1))] };
 }
 
