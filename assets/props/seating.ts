@@ -122,7 +122,7 @@ registerProps({
       const fab = new K.Acc(), feet = new K.Acc(), tw = w - 0.04, td = d - 0.04;
       K.shell(fab, { cy: 0.23, w, h: 0.26, d, r: 0.04, faces: ['px', 'nx', 'pz', 'nz', 'py'], kx: lin(w / 2, 4), kz: lin(d / 2, 3), shade: (_x: number, y: number, _z: number, nx: number, _ny: number, nz: number) => 0.9 - 0.06 * (1 - smooth(-0.13, 0.13, y)) + 0.02 * (Math.abs(nx) + Math.abs(nz) > 0.5 ? 0 : 1) });
       const buttons = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sz]) => [sx * w * 0.2, sz * d * 0.2]);
-      K.shell(fab, { cy: 0.36, w: tw, h: 0.06, d: td, r: 0.025, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(tw / 2, 8), kz: lin(td / 2, 6), puff: 0.035,
+      K.shell(fab, { cy: 0.36, w: tw, h: 0.06, d: td, r: 0.025, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(tw / 2, 8), kz: lin(td / 2, 6), puff: 0.038,
         wave: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? [0, -0.012 * buttons.reduce((a, [bx, bz]) => a + Math.exp(-((x - bx) ** 2 + (z - bz) ** 2) / 0.0006), 0), 0] : [0, 0, 0]),
         shade: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? 1 - 0.14 * buttons.reduce((a, [bx, bz]) => a + Math.exp(-((x - bx) ** 2 + (z - bz) ** 2) / 0.0006), 0) : 0.9) });   // the tufting buttons are dimples
       for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) K.strut(feet, [sx * (w / 2 - 0.07), 0, sz * (d / 2 - 0.07)], [sx * (w / 2 - 0.07), 0.1, sz * (d / 2 - 0.07)], 0.028, 0.02, 8);
@@ -143,7 +143,7 @@ registerProps({
       const g = group('Pouf');
       const base = it.color ? hex(it.color) : (rng() < 0.4 ? colors.accent : rng() < 0.5 ? colors.fabric2 : colors.fabric);
       const acc = new K.Acc();
-      K.lathe(acc, [[0.001, 0, 0.84], [0.2, 0, 0.84], [0.26, 0.05, 0.94], [0.275, 0.17, 1], [0.26, 0.29, 1], [0.19, 0.355, 1], [0.1, 0.377, 1], [0.035, 0.381, 0.94], [0.001, 0.366, 0.78]], 18, 0, 1, null, (ph: number) => 0.9 + 0.1 * Math.abs(Math.cos(ph * 3)));
+      K.lathe(acc, [[0.001, 0, 0.84], [0.2, 0, 0.84], [0.26, 0.05, 0.94], [0.275, 0.17, 1], [0.26, 0.29, 1], [0.19, 0.355, 1], [0.1, 0.377, 1], [0.035, 0.382, 0.94], [0.001, 0.367, 0.78]], 16, 0, 1, (x: number, y: number, z: number) => [x * 0.9745, y, z], (ph: number) => 0.9 + 0.1 * Math.abs(Math.cos(ph * 3)));
       put(g, acc, softMat(ctx, base, { roughness: 0.95 }), 'pouf');
       return g;
     },
@@ -250,7 +250,7 @@ registerProps({
       for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) K.slab(wood, sx * (w / 2 - 0.06), 0.2, sz * (d / 2 - 0.06), 0.04, 0.4, 0.04);   // legs
       K.slab(wood, 0, 0.37, 0, w, 0.06, d);                                                                                                       // frame
       const cw = w - 0.02, cd = d - 0.02, ch = Math.max(2, Math.round(cw / 0.3));
-      K.shell(fab, { cy: 0.435, w: cw, h: 0.07, d: cd, r: 0.02, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(cw / 2, ch * 4), kz: lin(cd / 2, 3), puff: 0.01,
+      K.shell(fab, { cy: 0.432, w: cw, h: 0.07, d: cd, r: 0.02, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(cw / 2, ch * 4), kz: lin(cd / 2, 3), puff: 0.01,
         wave: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? [0, 0.004 * Math.cos((x / cw) * Math.PI * 2 * ch), 0] : [0, 0, 0]),
         shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.94 + 0.06 * (0.5 + 0.5 * Math.cos((x / cw) * Math.PI * 2 * ch)) : 0.88) });   // channels
       put(g, wood, softMat(ctx, colors.wood, { roughness: 0.55 }), 'frame');

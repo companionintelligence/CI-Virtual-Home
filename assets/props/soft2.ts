@@ -91,8 +91,8 @@ registerProps({
 rebuild('floor-cushion', (it, ctx) => {
   const { THREE, group, colors, hex, rng } = ctx, K = softkit(THREE), g = group('Floor Cushion');
   const col = it.color ? hex(it.color) : (rng() < 0.5 ? colors.fabric : colors.accent), yaw = (rng() - 0.5) * 0.4, acc = new K.Acc();
-  const puff = 0.03;   // the crown stands `puff` over the 0.15 top of the body: 0.18 in all, the old box's height; the body dips 2 cm into the floor so its rounded bottom edge meets it
-  K.shell(acc, { cy: 0.065, w: 0.63, h: 0.17, d: 0.63, r: 0.05, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(0.315, 8), kz: lin(0.315, 8), puff,
+  const puff = 0.031;   // the crown stands `puff` over the 0.15 top of the body: 0.18 in all, the old box's height; the body dips 2 cm into the floor so its rounded bottom edge meets it
+  K.shell(acc, { cy: 0.07, w: 0.619, h: 0.17, d: 0.619, r: 0.05, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(0.3095, 8), kz: lin(0.3095, 8), puff,
     wave: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? [0, -0.018 * Math.exp(-(x * x + z * z) / 0.006), 0] : [0, 0, 0]),
     shade: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? 1 - 0.12 * Math.exp(-(x * x + z * z) / 0.004) : 0.86),
     xf: new THREE.Matrix4().makeRotationY(yaw) });
@@ -105,7 +105,7 @@ rebuild('beanbag', (it, ctx) => {
   const col = it.color ? hex(it.color) : (rng() < 0.5 ? colors.fabric : colors.fabric2), acc = new K.Acc();
   // one turn: flat base, full hips, a dimpled top; the heights scale with z so the back rises and the front sinks into a seat (the old shear, kept)
   K.lathe(acc, [[0.001, 0, 0.8], [0.34, 0, 0.84], [0.395, 0.05, 0.93], [0.41, 0.09, 1], [0.408, 0.16, 1], [0.405, 0.22, 1], [0.38, 0.28, 1], [0.35, 0.34, 1], [0.3, 0.39, 1], [0.25, 0.43, 1], [0.13, 0.48, 0.96], [0.05, 0.45, 0.88], [0.001, 0.44, 0.84]], 16, 0, 1,
-    (x: number, y: number, z: number) => [x, y * (1 - 0.32 * z / 0.42), z - 0.12 * y * y], (ph: number) => 0.92 + 0.08 * Math.cos(ph * 5 + 1.1));
+    (x: number, y: number, z: number) => [x * 0.9976, y * (1 - 0.32 * z / 0.42), (z - 0.12 * y * y) * 1.0245], (ph: number) => 0.92 + 0.08 * Math.cos(ph * 5 + 1.1));
   put(g, acc, softMat(ctx, col, { roughness: 0.95 }), 'beanbag');
   return g;
 });
