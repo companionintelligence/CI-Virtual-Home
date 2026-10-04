@@ -502,7 +502,7 @@ export function hangCurtains(ctx: any, it: any) {
  *  `cx` is the towel's centre along x, `tw` its width. `rows` and `cols` size the grid (a rail's towel: 5 x 8). */
 export function drapeTowel(THREE: any, acc: any, o: any) {
   const K = softkit(THREE);
-  const { cx = 0, by, zb, rb, tw, L1, L2, belly = 0.01, ph = 0, th = 0.012, cols = 6 } = o;
+  const { cx = 0, by, zb, rb, tw, L1, L2, belly = 0.01, ph = 0, th = 0.012, cols = 6, taper = null } = o;   // taper(d): width multiplier by the cloth's distance d (0..1) from the bar, a robe's shoulders
   const Ra = rb + 0.017, arc = Math.PI * Ra, tot = L2 + arc + L1;
   const prof = (v: number): [number, number, number] => {
     const s = v * tot;
@@ -517,7 +517,8 @@ export function drapeTowel(THREE: any, acc: any, o: any) {
     U: Array.from({ length: cols + 1 }, (_, i) => i / cols), Vn, th, want: [0, 0, 1], rimK: 0.5,
     pos: (u: number, v: number) => {
       const [y, z] = prof(v), hemW = (1 - smooth(0, 0.12, v)) + smooth(0.88, 1, v);
-      return [cx + (u - 0.5) * tw, y, z + (v > a2 ? 0.004 * Math.sin(u * 11 + ph) * (0.3 + hemW) : 0)];
+      const sv = v * tot, dist = sv < L2 ? (L2 + arc / 2 - sv) / (L2 + arc / 2) : sv > L2 + arc ? (sv - L2 - arc / 2) / (L1 + arc / 2) : 0;
+      return [cx + (u - 0.5) * tw * (taper ? taper(Math.min(1, dist)) : 1), y, z + (v > a2 ? 0.004 * Math.sin(u * 11 + ph) * (0.3 + hemW) : 0)];
     },
     shade: (u: number, v: number) => { const [, , base] = prof(v); const band = (v > 0.9 && v < 0.955) || (v > 0.03 && v < 0.075) ? 0.8 : 1; return base * band * (0.95 + 0.05 * Math.sin(u * 23)); },
   });

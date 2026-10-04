@@ -43,42 +43,51 @@ registerProps({
     iso: [{ shape: 'box', box: [-0.14, 0, -0.1, 0.14, 0.135, 0.1], color: 'role:linen' }],
   },
 
-  // ---- a hand towel through a ring on the wall -----------------------------------------------------------------------------------------------
+  // ---- a hand towel through a ring on the wall: the ring hangs from a post at its top and the towel is hung over its BOTTOM arc, so the whole ring shows above the towel --------
   'towel-ring-set': {
     footprint: [0.2, 0.14], height: 0.4, params: ['y', 'color'], tags: ['bathroom'],
     create(it, ctx) {
       const { THREE, std, group, colors, hex, rng } = ctx, K = softkit(THREE), g = group('Towel Ring');
-      const y0 = mountY(it, 0.95), L1 = 0.3, R = 0.05, rb = 0.006, by = y0 + L1 + 0.02, cy = by - rb - R, zc = 0.085;
+      const y0 = mountY(it, 0.95), L1 = 0.27, R = 0.055, rb = 0.006, by = y0 + L1, cy = by + R, zc = 0.085;
       const hard = new K.Acc();
-      K.slab(hard, 0, cy, 0.006, 0.05, 0.05, 0.012);                                  // the wall plate
-      K.strut(hard, [0, cy, 0.012], [0, cy, zc], 0.008, 0.008, 8);                    // the post
-      const N = 14;                                                                   // the ring: a ring of short struts, facing the room
-      for (let k = 0; k < N; k++) { const a0 = (k / N) * Math.PI * 2, a1 = ((k + 1) / N) * Math.PI * 2; K.strut(hard, [Math.cos(a0) * R, cy + Math.sin(a0) * R, zc], [Math.cos(a1) * R, cy + Math.sin(a1) * R, zc], 0.006, 0.006, 6, 1, 1, false); }
+      K.slab(hard, 0, cy + R, 0.006, 0.05, 0.07, 0.012);                              // the wall plate, behind the top of the ring
+      K.strut(hard, [0, cy + R, 0.012], [0, cy + R, zc], 0.009, 0.009, 8);            // the post out to the ring
+      const N = 16;                                                                   // the ring: short struts round a circle in the plane parallel to the wall, facing the room
+      for (let k = 0; k < N; k++) { const a0 = (k / N) * Math.PI * 2, a1 = ((k + 1) / N) * Math.PI * 2; K.strut(hard, [Math.cos(a0) * R, cy + Math.sin(a0) * R, zc], [Math.cos(a1) * R, cy + Math.sin(a1) * R, zc], 0.0065, 0.0065, 6, 1, 1, false); }
       put(g, hard, std(colors.metal, { metalness: 0.85, roughness: 0.28, vertexColors: true }), 'hardware', { receive: false });
       const r = splitRng(rng), col = it.color ? hex(it.color) : r() < 0.5 ? colors.linen : colors.accent, tw = new K.Acc();
-      drapeTowel(THREE, tw, { by, zb: zc, rb, tw: 0.12, L1, L2: L1 - 0.04, belly: 0.012, ph: r() * 6.28, cols: 5 });
+      drapeTowel(THREE, tw, { by, zb: zc, rb, tw: 0.13, L1, L2: L1 - 0.05, belly: 0.014, ph: r() * 6.28, cols: 5 });   // through the ring: a back leaf toward the wall, the front leaf hangs in the room
       put(g, tw, softMat(ctx, col, { roughness: 0.96 }), 'towel');
       return g;
     },
-    iso: [{ shape: 'box', box: [-0.06, 0.95, 0, 0.06, 1.35, 0.12], color: 'role:linen' }],
+    iso: [{ shape: 'box', box: [-0.065, 0.95, 0, 0.065, 1.4, 0.12], color: 'role:linen' }],
   },
 
-  // ---- a robe on a wall hook -------------------------------------------------------------------------------------------------------------------
+  // ---- a robe on a wall hook: an A-line body with sloped shoulders, a rolled shawl collar down the front, sleeves hanging at the sides, a tied belt with two loose ends ---------------------
   'robe-hook': {
     footprint: [0.4, 0.2], height: 1.1, params: ['y', 'color'], tags: ['bathroom', 'bedroom'],
     create(it, ctx) {
       const { THREE, std, group, colors, hex, rng } = ctx, K = softkit(THREE), g = group('Robe Hook');
-      const L1 = 0.98, L2 = 0.92, y0 = mountY(it, 0.55), by = y0 + L1 + 0.04, zb = 0.07, rb = 0.012;
+      const L1 = 0.98, L2 = 0.92, y0 = mountY(it, 0.55), by = y0 + L1 + 0.04, zb = 0.07, rb = 0.012, Ra = rb + 0.017;
       const hard = new K.Acc();
       K.slab(hard, 0, by, 0.006, 0.06, 0.06, 0.012);
       K.strut(hard, [0, by, 0.012], [0, by, zb + 0.035], rb, rb, 8);
-      K.strut(hard, [0, by + 0.0, zb + 0.035], [0, by, zb + 0.05], 0.022, 0.022, 10);   // the knob
+      K.strut(hard, [0, by, zb + 0.035], [0, by, zb + 0.05], 0.022, 0.022, 10);   // the knob
       put(g, hard, std(colors.metal, { metalness: 0.85, roughness: 0.28, vertexColors: true }), 'hardware', { receive: false });
       const r = splitRng(rng), col = it.color ? hex(it.color) : colors.linen, robe = new K.Acc();
-      drapeTowel(THREE, robe, { by, zb, rb, tw: 0.36, L1, L2, belly: 0.03, ph: r() * 6.28, cols: 5, th: 0.016 });
-      // two sleeves hanging at the sides (narrow lenses from the shoulder, a little forward), and a darker shawl collar down the front
-      for (const sx of [-1, 1]) drapeTowel(THREE, robe, { cx: sx * 0.205, by: by - 0.03, zb: zb + 0.012, rb, tw: 0.1, L1: 0.55, L2: 0.5, belly: 0.012, ph: r() * 6.28, cols: 3, th: 0.016 });
-      K.shell(robe, { cx: 0, cy: by - 0.46, cz: zb + rb + 0.017 + 0.03 * Math.sin(Math.PI * Math.min(1, (0.46 / L1) * 1.1)) + 0.008 + 0.006, w: 0.37, h: 0.05, d: 0.02, r: 0.008, faces: ['py', 'ny', 'px', 'nx', 'pz'], kx: [-0.185, 0.185], ky: [-0.025, 0.025], kz: [-0.01, 0.01], shade: () => 0.8 });   // the belt
+      const ph = r() * 6.28, zf = zb + Ra;                                           // zf: the front leaf's surface at the bar
+      // the body: one cloth over the hook, narrower at the shoulders than at the hem (an A-line)
+      drapeTowel(THREE, robe, { by, zb, rb, tw: 0.4, L1, L2, belly: 0.034, ph, cols: 4, th: 0.016, taper: (d: number) => 0.72 + 0.28 * Math.min(1, d * 1.6) });
+      // two sleeves: narrow lenses from the shoulder hanging a little outward and forward of the body, with a turned cuff
+      for (const sx of [-1, 1]) drapeTowel(THREE, robe, { cx: sx * 0.205, by: by - 0.035, zb: zb + 0.02, rb, tw: 0.11, L1: 0.6, L2: 0.5, belly: 0.016, ph: ph + sx, cols: 2, th: 0.016, taper: (d: number) => 1 - 0.18 * d });
+      // the rolled shawl collar: a thick tube from each side of the neck, crossing down to the belt in a V
+      const front = (y: number) => zf + 0.034 * Math.sin(Math.PI * Math.min(1, ((by - y) / L1) * 1.1)) + 0.012;
+      const yb = by - 0.5, yn = by - 0.02;
+      for (const sx of [-1, 1]) K.strut(robe, [sx * 0.085, yn, front(yn) + 0.004], [-sx * 0.012, yb, front(yb) + 0.004], 0.021, 0.015, 7, 0.82, 0.78);
+      // the belt: a band round the waist, a knot, two ends hanging unequal
+      K.shell(robe, { cx: 0, cy: yb - 0.01, cz: front(yb - 0.01) - 0.004, w: 0.355, h: 0.05, d: 0.026, r: 0.01, faces: ['py', 'ny', 'px', 'nx', 'pz'], kx: [-0.1775, 0.1775], ky: [-0.025, 0.025], kz: [-0.013, 0.013], shade: () => 0.76 });
+      K.slab(robe, 0, yb - 0.01, front(yb - 0.01) + 0.018, 0.06, 0.06, 0.03, 0.72);   // the knot
+      for (const [sx, len] of [[-0.018, 0.2], [0.022, 0.15]]) K.strut(robe, [sx, yb - 0.035, front(yb - 0.035) + 0.022], [sx * 1.6, yb - 0.035 - len, front(yb - 0.035 - len) + 0.026], 0.016, 0.014, 6, 0.74, 0.7);
       put(g, robe, softMat(ctx, col, { roughness: 0.97 }), 'robe');
       return g;
     },
