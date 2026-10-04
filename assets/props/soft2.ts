@@ -8,6 +8,7 @@
 import { registerProps, PROPS } from './registry.js';
 import { softkit, softMat, put, splitRng, drapeTowel, lin, smooth } from './softkit.js';
 import { recipes as PLANT_RECIPES } from './plants2.js';
+import { romanBlind, rollerShade, cafeCurtain, shutters, valance } from './windows.js';
 
 const mountY = (it: any, natural: number) => (it.y !== undefined ? 0 : natural);
 /** a folded-towel colour: the bath's accent, fabric2 or linen, in a seeded order (never the same role twice in a row) */
@@ -139,3 +140,12 @@ registerProps({
     iso: [{ shape: 'cyl', box: [-0.085, 0, -0.085, 0.085, 0.12, 0.085], color: 'role:accent' }, { shape: 'blob', box: [-0.15, 0, -0.15, 0.15, 0.3, 0.15], color: '#40916c' }],
   },
 }, { foliage: true });
+
+// ---- window treatments (T10): five new dormant types, built like the curtain (origin at the floor under the window, the wall at z = 0, w the width, h the height of the head) -------------------------
+registerProps({
+  'roman-blind': { footprint: [1.0, 0.1], height: 2.15, params: ['w', 'h', 'color'], tags: ['living', 'bedroom', 'dining', 'kitchen'], create: romanBlind, iso: [{ shape: 'box', box: [-0.5, 0.8, 0, 0.5, 2.1, 0.07], color: 'role:fabric2' }] },
+  'roller-shade': { footprint: [1.0, 0.08], height: 2.15, params: ['w', 'h', 'color'], tags: ['living', 'bedroom', 'office', 'kitchen', 'bathroom'], create: rollerShade, iso: [{ shape: 'box', box: [-0.5, 0.6, 0, 0.5, 2.1, 0.06], color: 'role:linen' }] },
+  'cafe-curtain': { footprint: [0.9, 0.12], height: 1.65, params: ['w', 'h', 'color'], tags: ['kitchen', 'bathroom', 'dining'], create: cafeCurtain, iso: [{ shape: 'box', box: [-0.45, 0.85, 0, 0.45, 1.6, 0.09], color: 'role:fabric2' }] },
+  'shutters': { footprint: [1.0, 0.08], height: 2.15, params: ['w', 'h', 'color'], tags: ['living', 'bedroom', 'dining', 'kitchen'], create: shutters, iso: [{ shape: 'box', box: [-0.5, 0.8, 0, 0.5, 2.1, 0.07], color: 'role:linen' }] },
+  'valance': { footprint: [1.4, 0.1], height: 2.35, params: ['w', 'h', 'color'], tags: ['living', 'bedroom', 'dining', 'kitchen'], create: valance, iso: [{ shape: 'box', box: [-0.7, 2.05, 0, 0.7, 2.32, 0.07], color: 'role:fabric2' }] },
+});

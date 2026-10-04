@@ -412,3 +412,24 @@ test('C caps: a vase and a flower jug are at most 3 meshes and 600 triangles, fo
     for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && f !== 'index.json')) assert.ok(!fs.readFileSync(path.join(dir, f), 'utf8').includes(`"${t}"`), `${f} places ${t}`);
   }
 });
+
+// ---- window treatments (T10, windows.ts) -------------------------------------------------------------------------------------------
+const WINDOWS = ['roman-blind', 'roller-shade', 'cafe-curtain', 'shutters', 'valance'];
+test('C caps: a window treatment is at most 3 meshes and 900 triangles, opaque, no map, finite, in front of the wall and not wider than its w plus its hardware; dormant, under its own roles', async () => {
+  const { PLACEMENT } = await import('../assets/props/placement.js');
+  for (const t of WINDOWS) for (const w of [0.6, 1.0, 1.6, 2.4]) for (const sd of SEEDS.slice(0, 3)) {
+    const o = build(t, { w, h: 2.2 }, sd), ms = meshesOf(o), tris = sum(ms.map(trisOf)), b = new THREE.Box3().setFromObject(o);
+    assert.ok(ms.length <= 3 && tris <= (t === 'shutters' ? 1300 : 900), `${t} w ${w}: ${ms.length} meshes, ${tris} triangles`);
+    for (const m of ms) assert.ok(!m.material.map && !m.material.transparent && finiteGeom(m.geometry), `${t}: material`);
+    assert.ok(b.min.z >= -0.001 && b.max.z <= 0.13, `${t} w ${w}: z ${b.min.z.toFixed(3)}..${b.max.z.toFixed(3)}`);
+    assert.ok(b.max.x <= w / 2 + 0.08 && b.min.x >= -(w / 2 + 0.08), `${t} w ${w}: x ${b.min.x.toFixed(3)}..${b.max.x.toFixed(3)}`);
+    assert.equal(hashGeom(o), hashGeom(build(t, { w, h: 2.2 }, sd)), `${t}: unstable`);
+  }
+  const dir = path.join(ROOT, 'content', 'houses');
+  for (const t of WINDOWS) {
+    assert.ok(PLACEMENT[t].roles.every((r: string) => ['blind', 'blind-cafe', 'shutter', 'valance'].includes(r)), `${t}: roles ${PLACEMENT[t].roles}`);
+    for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && f !== 'index.json')) assert.ok(!new RegExp(`"type"\\s*:\\s*"${t}"`).test(fs.readFileSync(path.join(dir, f), 'utf8')), `${f} places ${t}`);   // (an opening's `shutters` key is the facade's, not an item)
+  }
+  for (const [t, p] of Object.entries(PLACEMENT) as any) if (!WINDOWS.includes(t)) for (const r of p.roles) assert.ok(!['blind', 'blind-cafe', 'shutter', 'valance'].includes(r), `${t} fills the window-treatment role ${r}`);
+  assert.equal(roleMeshes(build('roman-blind', { color: '#b3402a' }), 'blind')[0].material.color.getHex(), 0xb3402a, 'the spec colour is the blind');
+});

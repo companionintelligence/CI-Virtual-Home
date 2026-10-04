@@ -297,6 +297,12 @@ Object.assign(PLACEMENT, {
   'robe-hook': def('art', ['soft-robe-hook'], [...BATHS, ...BEDS], [], { mountY: 0.55, colorRole: 'linen' }),
   'trough-planter': def('plant', ['soft-planter'], [...LIVING, 'foyer', 'sunroom', ...KITCHENS], [], { clear: C(0.2, 0.05, 0.05), colorRole: 'accent' }),
   'pothos': def('plant', ['soft-pothos'], [...LIVING, ...KITCHENS, ...BEDS, ...WORK], [], { onSurface: true, surfaces: ON }),
+  // window treatments (assets/props/windows.ts): roles `blind` and `shutter` are the plan's own, the others new too; none is asked for until the dress phase
+  'roman-blind': def('textile', ['blind'], [...LIVING, ...BEDS, ...DINING, ...KITCHENS], [], { against: 'window', hangs: 'wall' }),
+  'roller-shade': def('textile', ['blind'], [...LIVING, ...BEDS, ...WORK, ...KITCHENS, ...BATHS], [], { against: 'window', hangs: 'wall' }),
+  'cafe-curtain': def('textile', ['blind-cafe'], [...KITCHENS, ...BATHS, ...DINING], [], { against: 'window', hangs: 'wall' }),
+  'shutters': def('textile', ['shutter'], [...LIVING, ...BEDS, ...DINING, ...KITCHENS], [], { against: 'window', hangs: 'wall', colorRole: 'linen' }),
+  'valance': def('textile', ['valance'], [...LIVING, ...BEDS, ...DINING, ...KITCHENS], [], { against: 'window', hangs: 'wall' }),
 });
 
 // A floor plant stands wherever people live: which rooms have the light and the size for one is the composer's business
