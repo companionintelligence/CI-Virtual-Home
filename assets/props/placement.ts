@@ -295,6 +295,8 @@ Object.assign(PLACEMENT, {
   'towel-stack': def('textile', ['soft-towel-stack'], BATHS, [], { onSurface: true, surfaces: ['bath', 'fitted', 'storage'], colorRole: 'accent' }),
   'towel-ring-set': def('art', ['soft-towel-ring'], BATHS, [], { mountY: 0.95, colorRole: 'metal' }),
   'robe-hook': def('art', ['soft-robe-hook'], [...BATHS, ...BEDS], [], { mountY: 0.55, colorRole: 'linen' }),
+  'trough-planter': def('plant', ['soft-planter'], [...LIVING, 'foyer', 'sunroom', ...KITCHENS], [], { clear: C(0.2, 0.05, 0.05), colorRole: 'accent' }),
+  'pothos': def('plant', ['soft-pothos'], [...LIVING, ...KITCHENS, ...BEDS, ...WORK], [], { onSurface: true, surfaces: ON }),
 });
 
 // A floor plant stands wherever people live: which rooms have the light and the size for one is the composer's business

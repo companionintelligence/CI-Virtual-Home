@@ -26,6 +26,9 @@ export const BOXES: Record<string, BoxRow[]> = {
   'pampas-vase': [["def", -0.159, -0.165, 0.169, 0.166, 1.179, 0], [0.88, -0.106, -0.116, 0.126, 0.114, 0.871, 0], [1.18, -0.142, -0.155, 0.169, 0.153, 1.168, 0], [1.59, -0.191, -0.209, 0.228, 0.206, 1.574, 0]],
 };
 
+BOXES['vase'] = [["def", -0.091, -0.098, 0.095, 0.084, 0.569, 0], [0.43, -0.084, -0.09, 0.078, 0.084, 0.729, 0], [0.57, -0.084, -0.09, 0.078, 0.084, 0.869, 0], [0.77, -0.084, -0.09, 0.078, 0.084, 1.069, 0]];
+BOXES['flower-jug'] = [["def", -0.113, -0.118, 0.143, 0.115, 0.465, 0], [0.35, -0.113, -0.111, 0.143, 0.095, 0.465, 0], [0.47, -0.113, -0.111, 0.143, 0.095, 0.465, 0], [0.63, -0.113, -0.111, 0.143, 0.095, 0.465, 0]];
+
 export const SPEC: Record<string, PlantSpec> = {
   'bird-of-paradise': { H0: 1.7, pot: [0.22, 0.18, 0.4], rows: BOXES['bird-of-paradise'] },
   'rubber-plant': { H0: 1.5, pot: [0.17, 0.14, 0.34], rows: BOXES['rubber-plant'] },
@@ -319,4 +322,66 @@ recipes['trailing-ivy'] = (it, ctx) => {
     [0.3, 0.55, 0.8].forEach((t, k) => P.leaf(leafA, { x: p1[0] + (p2[0] - p1[0]) * t, y: 0.013, z: p1[2] + (p2[2] - p1[2]) * t, a: a + (k % 2 ? 1 : -1) * 1.1 + B.jit(0.3), t: 1.45, L: 0.085, W: 0.062, droop: 0.1, fold: 0.2, rows: 2, th: 0.009, profile: ovate, baseS: 0.55 + 0.2 * r() }));
   }
   return B.done(col);
+};
+
+// ---- cut flowers (T9): a vase and a jug of stems, a leaf mesh and one bloom colour: 3 meshes, 600 triangles at most ---------------------------------------------------------------
+const BLOOMS = [0xf59e0b, 0xf43f5e, 0xfef3c7, 0xc084fc], WILD = [0xf9a8d4, 0xfde68a, 0xffffff, 0xc4b5fd, 0xfdba74];
+/** a bloom: a squat dome of `seg` sides (a flower head seen from above is a disc with a boss), at (x, y, z) leaning with the stem */
+function bloom(K: any, acc: any, x: number, y: number, z: number, r: number, seg = 6) {
+  K.lathe(acc, [[r, 0, 0.8], [r * 0.85, r * 0.45, 1], [r * 0.4, r * 0.8, 0.95], [0.001, r * 0.85, 0.9]], seg, 0, 1, (px: number, py: number, pz: number) => [px + x, py + y, pz + z]);
+}
+
+recipes['vase'] = (it, ctx) => {
+  const B = bare(it, ctx, 'Vase', 'vase'), { P, K, r, leafA, bloomA } = B, h = it.h || 0.26;
+  K.lathe(B.potA, [[0.056, 0, 0.8], [0.062, 0.1 * h, 0.95], [0.05, 0.7 * h, 1], [0.033, 0.92 * h, 0.98], [0.037, h, 1], [0.028, h, 0.85], [0.001, h - 0.02, 0.3]], 16);
+  const col = B.green(), n = 2 + Math.floor(r() * 2), a0 = r() * Math.PI * 2, headCol = BLOOMS[Math.floor(r() * 4)];
+  for (let i = 0; i < n; i++) {   // two or three stems leaning out of the neck, a pair of leaves each, a bloom on the tallest (and a bud on the others)
+    const a = a0 + (i * Math.PI * 2) / n + B.jit(0.4), lean = 0.12 + r() * 0.14, len = 0.24 + r() * 0.07;
+    const dx = Math.sin(a) * Math.sin(lean), dz = Math.cos(a) * Math.sin(lean), c = Math.cos(lean);
+    const p0 = [0, h - 0.03, 0], tip = [dx * len, h - 0.03 + c * len, dz * len];
+    K.strut(leafA, p0, tip, 0.004, 0.003, 5, 0.5, 0.65, false);
+    for (const t of [0.5, 0.78]) P.leaf(leafA, { x: dx * len * t, y: h - 0.03 + c * len * t, z: dz * len * t, a: a + (t > 0.6 ? 1.2 : -0.4), t: 1.2, L: 0.075, W: 0.04, droop: 0.4, fold: 0.3, rows: 2, th: 0.008, profile: ovate, baseS: 0.55 });
+    bloom(K, bloomA, tip[0], tip[1], tip[2], i === 0 ? 0.03 : 0.02, 6);
+  }
+  return B.done(col, { potCol: it.color ? ctx.hex(it.color) : ctx.colors.accent, bloomCol: headCol, leafRough: 0.7 });
+};
+
+recipes['flower-jug'] = (it, ctx) => {
+  const B = bare(it, ctx, 'Flower Jug', 'flower-jug'), { P, K, r, leafA, bloomA } = B;
+  K.lathe(B.potA, [[0.06, 0, 0.8], [0.085, 0.05, 0.95], [0.09, 0.1, 1], [0.07, 0.16, 1], [0.06, 0.2, 0.98], [0.075, 0.22, 1], [0.058, 0.22, 0.85], [0.001, 0.2, 0.3]], 14);
+  // the handle: half a ring on the +x side, three struts
+  for (let k = 0; k < 3; k++) { const a0 = -Math.PI / 2 + (k * Math.PI) / 3, a1 = -Math.PI / 2 + ((k + 1) * Math.PI) / 3; K.strut(B.potA, [0.085 + Math.cos(a0) * 0.05, 0.12 + Math.sin(a0) * 0.05, 0], [0.085 + Math.cos(a1) * 0.05, 0.12 + Math.sin(a1) * 0.05, 0], 0.008, 0.008, 5, 0.9, 0.9, false); }
+  const col = B.green(), n = 5 + Math.floor(r() * 3), a0 = r() * Math.PI * 2, headCol = WILD[Math.floor(r() * 5)];
+  for (let i = 0; i < n; i++) {
+    const a = a0 + i * 2.4, lean = 0.1 + r() * 0.32, len = 0.14 + r() * 0.1, dx = Math.sin(a) * Math.sin(lean), dz = Math.cos(a) * Math.sin(lean), c = Math.cos(lean), tip = [dx * len, 0.2 + c * len, dz * len];
+    K.strut(leafA, [0, 0.2, 0], tip, 0.0035, 0.003, 4, 0.5, 0.65, false);
+    if (i < 4) P.leaf(leafA, { x: dx * len * 0.45, y: 0.2 + c * len * 0.45, z: dz * len * 0.45, a, t: 1.2, L: 0.06, W: 0.032, droop: 0.4, fold: 0.3, rows: 2, th: 0.008, profile: ovate, baseS: 0.55 });
+    bloom(K, bloomA, tip[0], tip[1] + 0.005, tip[2], 0.026 + r() * 0.012, 6);
+  }
+  return B.done(col, { potCol: it.color ? ctx.hex(it.color) : ctx.colors.accent, bloomCol: headCol, leafRough: 0.7 });
+};
+
+// ---- two new dormant surface types (T9): a trough planter for the floor and a pothos for a shelf ---------------------------------------------------------------------------------------
+recipes['trough-planter'] = (it, ctx) => {
+  const P = plantKit(ctx), { K } = P, g = ctx.group('Planter'), r = splitRng(ctx.rng), w = it.w || 0.7, d = 0.24, h = 0.32;
+  const trough = new K.Acc(), leafA = new K.Acc(), potCol = it.color ? ctx.hex(it.color) : r() < 0.5 ? ctx.colors.accent : TERRACOTTA;
+  K.shell(trough, { cy: h / 2, w, h, d, r: 0.025, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: [-w / 2, -w / 2 + 0.025, w / 2 - 0.025, w / 2], ky: [-h / 2, -h / 2 + 0.025, h / 2 - 0.05, h / 2], kz: [-d / 2, -d / 2 + 0.025, d / 2 - 0.025, d / 2], shade: (_x: number, y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.32 : 0.82 + 0.18 * smooth(-h / 2, h / 2, y)) });
+  const n = Math.max(3, Math.round(w / 0.17)), col = GREENS[Math.floor(r() * GREENS.length)];
+  for (let c = 0; c < n; c++) { const x = -w / 2 + 0.1 + ((w - 0.2) * c) / (n - 1); for (let k = 0; k < 6; k++) { const a = k * 1.05 + c, t = 0.15 + r() * 0.5; P.leaf(leafA, { x: x + Math.sin(a) * 0.02, y: h - 0.02, z: Math.cos(a) * 0.02, a, t, L: 0.2 + r() * 0.12, W: 0.055, droop: 0.5, fold: 0.3, rows: 2, th: 0.008, profile: strap, baseS: 0.5 + 0.2 * r() }); } }
+  return P.finish(g, { pot: trough, potCol, leaf: leafA, leafCol: col });
+};
+
+recipes['pothos'] = (it, ctx) => {
+  const B = bare(it, ctx, 'Pothos', 'trailing-ivy'), { P, K, r, leafA } = B;
+  const rim = P.pot(B.potA, ['terracotta', 'glazed', 'ribbed'][Math.floor(r() * 3)], 0.085, 0.065, 0.12, 16), col = B.green(0, 3);
+  const heart = (u: number) => Math.pow(Math.sin(Math.PI * Math.pow(u, 0.45)), 0.9);
+  for (let i = 0; i < 8; i++) { const a = i * 2.399, t = 0.5 + r() * 0.5; P.leaf(leafA, { x: Math.sin(a) * 0.03, y: rim - 0.01, z: Math.cos(a) * 0.03, a, t, L: 0.12, W: 0.1, droop: 0.5, fold: 0.3, rows: 3, th: 0.009, profile: heart, baseS: 0.55 + 0.2 * r() }); }
+  for (let i = 0; i < 4; i++) {   // vines over the rim and out along the surface, a heart leaf every few cm
+    const a = i * 1.6 + 0.4, p0 = [Math.sin(a) * 0.07, rim, Math.cos(a) * 0.07], p1 = [Math.sin(a) * 0.115, 0.018, Math.cos(a) * 0.115], p2 = [Math.sin(a) * (0.24 + 0.05 * r()), 0.012, Math.cos(a) * (0.24 + 0.05 * r())];
+    const pts = P.arc(leafA, p0, [Math.sin(a) * 0.105, rim - 0.01, Math.cos(a) * 0.105], p1, 0.005, 0.004, 3, 0.7, 0.7, 4);
+    K.strut(leafA, p1, p2, 0.004, 0.004, 4, 0.7, 0.7, true);
+    [pts[2]].forEach(p => P.leaf(leafA, { x: p[0], y: p[1], z: p[2], a: a + 1.3, t: 2.0, L: 0.09, W: 0.075, droop: 0.2, fold: 0.25, rows: 2, th: 0.008, profile: heart, baseS: 0.6 }));
+    [0.25, 0.5, 0.78].forEach((t, k) => P.leaf(leafA, { x: p1[0] + (p2[0] - p1[0]) * t, y: 0.013, z: p1[2] + (p2[2] - p1[2]) * t, a: a + (k % 2 ? 1.2 : -1.2), t: 1.5, L: 0.095, W: 0.08, droop: 0.1, fold: 0.2, rows: 2, th: 0.008, profile: heart, baseS: 0.6 + 0.2 * r() }));
+  }
+  return B.done(col, { leafRough: 0.4 });
 };

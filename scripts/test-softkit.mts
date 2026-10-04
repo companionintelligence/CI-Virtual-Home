@@ -393,3 +393,22 @@ test('F theming: the pot is the house accent, terracotta or the spec colour; a h
   }
   assert.equal(roleMeshes(build('hanging-plant'), 'cane')[0].material.color.getHex(), kit.colors.metal, 'the chains and hook are the house metal');
 });
+
+// ---- cut flowers (T9) and the two new plant types ---------------------------------------------------------------------------------
+test('C caps: a vase and a flower jug are at most 3 meshes and 600 triangles, foliage, opaque, stable; the trough-planter and pothos are dormant new types under soft- roles', async () => {
+  const { PLACEMENT } = await import('../assets/props/placement.js');
+  for (const t of ['vase', 'flower-jug']) for (const sd of SEEDS) {
+    const o = build(t, {}, sd), ms = meshesOf(o);
+    assert.ok(ms.length <= 3 && sum(ms.map(trisOf)) <= 600, `${t}/${sd}: ${ms.length} meshes, ${sum(ms.map(trisOf))} triangles`);
+    for (const m of ms) assert.ok(!m.material.map && !m.material.transparent && finiteGeom(m.geometry), `${t}: material`);
+    assert.equal(hashGeom(o), hashGeom(build(t, {}, sd)), `${t}/${sd}: unstable`);
+    assert.ok(PROPS.get(t).foliage, `${t}: a stem arrangement is foliage`);
+  }
+  assert.equal(roleMeshes(build('vase', { color: '#b3402a' }), 'pot')[0].material.color.getHex(), 0xb3402a, 'the spec colour paints the vase');
+  for (const t of ['trough-planter', 'pothos']) {
+    for (const sd of SEEDS.slice(0, 4)) { const ms = meshesOf(build(t, {}, sd)); assert.ok(ms.length <= 4 && sum(ms.map(trisOf)) <= 1300, `${t}/${sd}: ${ms.length} meshes, ${sum(ms.map(trisOf))} triangles`); }
+    assert.ok(PLACEMENT[t].roles.every((r: string) => r.startsWith('soft-')), `${t}: roles ${PLACEMENT[t].roles}`);
+    const dir = path.join(ROOT, 'content', 'houses');
+    for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && f !== 'index.json')) assert.ok(!fs.readFileSync(path.join(dir, f), 'utf8').includes(`"${t}"`), `${f} places ${t}`);
+  }
+});

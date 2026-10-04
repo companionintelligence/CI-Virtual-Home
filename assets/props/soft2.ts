@@ -7,16 +7,17 @@
 // `OWNER soft` block) use NEW roles only, so no existing role's candidate list changes and no pick re-rolls.
 import { registerProps, PROPS } from './registry.js';
 import { softkit, softMat, put, splitRng, drapeTowel, lin, smooth } from './softkit.js';
+import { recipes as PLANT_RECIPES } from './plants2.js';
 
 const mountY = (it: any, natural: number) => (it.y !== undefined ? 0 : natural);
 /** a folded-towel colour: the bath's accent, fabric2 or linen, in a seeded order (never the same role twice in a row) */
 const towelRoles = (colors: any, r: () => number) => { const all = [colors.accent, colors.linen, colors.fabric2]; const o = r() < 0.5 ? all : [all[1], all[0], all[2]]; return r() < 0.5 ? o : [o[1], o[2], o[0]]; };
 
 // ---- in-place rebuilds of types registered elsewhere: only `create` is replaced, footprint / height / params / tags / iso stay the module's own
-export function rebuild(type: string, create: (it: any, ctx: any) => any) {
+export function rebuild(type: string, create: (it: any, ctx: any) => any, extra: any = {}) {
   const was = PROPS.get(type);
   if (!was) throw new Error(`soft2: cannot rebuild "${type}": not registered`);
-  registerProps({ [type]: { ...was, create } });
+  registerProps({ [type]: { ...was, create, ...extra } });
 }
 
 registerProps({
@@ -118,3 +119,23 @@ rebuild('beanbag', (it, ctx) => {
   put(g, acc, softMat(ctx, col, { roughness: 0.95 }), 'beanbag');
   return g;
 });
+
+// ---- cut flowers (T9): the vase and the jug of stems, in place; a flower arrangement is foliage (a stem's box is not its shape), which also moves their drift check to the one-sided rule ------------
+rebuild('vase', PLANT_RECIPES['vase'], { foliage: true });
+rebuild('flower-jug', PLANT_RECIPES['flower-jug'], { foliage: true });
+
+registerProps({
+  // a trough planter for the floor along a wall or under a window, three clumps of strap leaves; dormant until the dress phase places it
+  // (the id is 'trough-planter': 'planter' is the outdoor site kit's, and house-builder asks the page's items first)
+  'trough-planter': {
+    footprint: [0.7, 0.24], height: 0.62, params: ['w', 'color'], tags: ['living', 'entry', 'sunroom', 'kitchen'],
+    create: PLANT_RECIPES['trough-planter'],
+    iso: [{ shape: 'box', box: [-0.35, 0, -0.12, 0.35, 0.32, 0.12], color: 'role:accent' }, { shape: 'blob', box: [-0.33, 0.3, -0.1, 0.33, 0.62, 0.1], color: '#4f772d' }],
+  },
+  // a pothos in a small pot on a shelf or a counter, vines trailing over the rim; dormant
+  'pothos': {
+    footprint: [0.34, 0.34], height: 0.3, surface: true, params: ['color'], tags: ['living', 'kitchen', 'bedroom', 'office'],
+    create: PLANT_RECIPES['pothos'],
+    iso: [{ shape: 'cyl', box: [-0.085, 0, -0.085, 0.085, 0.12, 0.085], color: 'role:accent' }, { shape: 'blob', box: [-0.15, 0, -0.15, 0.15, 0.3, 0.15], color: '#40916c' }],
+  },
+}, { foliage: true });
