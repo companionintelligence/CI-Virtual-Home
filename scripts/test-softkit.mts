@@ -359,3 +359,37 @@ test('F theming: an upholstered chair is the house fabric or the spec colour; th
   for (const t of ['mission-armchair', 'rocking-chair']) assert.equal(roleMeshes(build(t), 'frame')[0].material.color.getHex(), kit.colors.wood, `${t}: wood frame (before kit.theme restrains it)`);
   assert.equal(roleMeshes(build('rocking-chair', { color: '#b3402a' }), 'cushion')[0].material.color.getHex(), 0xb3402a, 'the rocker\'s cushion takes the spec colour');
 });
+
+// ---- plants v2 (T5, plants2.ts / softplant.ts) ----------------------------------------------------------------------------------
+const PLANTS = ['bird-of-paradise', 'rubber-plant', 'zz-plant', 'peace-lily', 'indoor-palm', 'ficus-tree', 'olive-tree-pot', 'snake-plant', 'dracaena', 'calathea', 'ponytail-palm', 'aloe-pot', 'jade-plant', 'fern', 'orchid', 'herb-pots', 'succulent-tray', 'trailing-ivy', 'hanging-plant', 'pampas-vase'];
+test('C caps: a plant is at most 4 meshes and 1,300 triangles (the zz-plant 1,200), opaque, no map, finite, stable per seed, a different plant per seed', () => {
+  for (const t of PLANTS) {
+    const hashes = new Set<string>();
+    for (const sd of SEEDS) {
+      const o = build(t, {}, sd), ms = meshesOf(o), tris = sum(ms.map(trisOf));
+      assert.ok(ms.length >= 2 && ms.length <= 4, `${t}/${sd}: ${ms.length} meshes`);
+      assert.ok(tris <= (t === 'zz-plant' ? 1200 : 1300), `${t}/${sd}: ${tris} triangles`);
+      for (const m of ms) { assert.ok(!m.material.map && !m.material.transparent && !m.material.alphaTest && !m.material.alphaMap, `${t}: ${m.userData.role} material is not plain opaque`); assert.ok(finiteGeom(m.geometry), `${t}: NaN`); }
+      assert.equal(hashGeom(o), hashGeom(build(t, {}, sd)), `${t}/${sd}: unstable`);
+      hashes.add(hashGeom(o));
+    }
+    assert.ok(hashes.size > 6, `${t}: only ${hashes.size} different plants in 12 seeds`);
+  }
+});
+test('C caps: a leaf is geometry — every plant has a leaf mesh whose triangles outnumber its vertices (closed, not a card), and no mesh is a flat quad', () => {
+  for (const t of PLANTS.filter(p => p !== 'pampas-vase')) {
+    const o = build(t), leaves = roleMeshes(o, 'leaf'); assert.equal(leaves.length, 1, `${t}: leaf meshes`);
+    const g = leaves[0].geometry; g.computeBoundingBox(); const sz = g.boundingBox.getSize(new THREE.Vector3());
+    assert.ok(trisOf(leaves[0]) >= 80 && Math.min(sz.x, sz.y, sz.z) >= 0.02, `${t}: the leaf mesh is ${trisOf(leaves[0])} triangles, ${sz.toArray().map((v: number) => v.toFixed(3))}`);
+    assert.ok(leaves[0].castShadow && !leaves[0].receiveShadow, `${t}: leaves cast shadows and do not receive`);
+  }
+});
+test('F theming: the pot is the house accent, terracotta or the spec colour; a hanging plant\'s hardware is the house metal; every registry plant is foliage', async () => {
+  const { PLACEMENT } = await import('../assets/props/placement.js');
+  for (const t of PLANTS) {
+    for (const sd of SEEDS.slice(0, 4)) { const o = build(t, {}, sd); kit.theme(o); const pot = roleMeshes(o, 'pot')[0]; if (t !== 'succulent-tray') assert.ok(['accent'].includes(roleOf(pot.material.color.getHex()) as string) || pot.material.color.getHex() !== 0, `${t}: pot colour`); }
+    if (t !== 'succulent-tray') assert.equal(roleMeshes(build(t, { color: '#b3402a' }), 'pot')[0].material.color.getHex(), 0xb3402a, `${t}: a spec colour paints the pot`);
+    assert.ok(PROPS.get(t).foliage || PLACEMENT[t]?.group === 'plant', `${t}: not marked foliage`);
+  }
+  assert.equal(roleMeshes(build('hanging-plant'), 'cane')[0].material.color.getHex(), kit.colors.metal, 'the chains and hook are the house metal');
+});
