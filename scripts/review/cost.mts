@@ -139,6 +139,13 @@ export function judge(base: ReturnType<typeof summarise>, now: ReturnType<typeof
   return rows;
 }
 
+/** The BASELINE side of a --compare: the committed summary when every house is compared, else a summary of just the
+ *  compared houses taken from the baseline's own per-house numbers. (It used to be the fresh run's summary when all houses
+ *  were compared, so every row read +0.0% and passed whatever had changed.) Never takes anything from the fresh run. */
+export function compareBase(base: { summary: ReturnType<typeof summarise>; houses: Record<string, any> }, ids: string[]) {
+  return ids.length === Object.keys(base.houses).length ? base.summary : summarise(Object.fromEntries(ids.map(i => [i, base.houses[i]])) as any);
+}
+
 async function main() {
   const fp = productFingerprint('HEAD');
   if (fp.dirty.length) { console.error(`the product code has uncommitted changes (${fp.dirty.slice(0, 4).join('; ')}): commit or stash them first`); process.exit(2); }
@@ -184,12 +191,9 @@ async function main() {
     summary, houses,
   };
   if (compare) {
-    const bs = base.summary;
     console.log(`\nfleet against ${rel(basePath)} (${ids.length} houses):`);
-    const sub = ids.length === Object.keys(base.houses).length ? summary : summarise(Object.fromEntries(ids.map(i => [i, base.houses[i]])) as any);
-    const rows = judge(sub, summary);
+    const rows = judge(compareBase(base, ids), summary);
     for (const r of rows) console.log(`  ${r.ok ? '✓' : '✗'} ${r.what.padEnd(48)} ${String(r.base).padStart(9)} -> ${String(r.now).padStart(9)}  ${r.change.padStart(7)}  (limit ${r.limit})`);
-    void bs;
     const exact = ids.every(i => base.houses[i] && stableJson(base.houses[i]) === stableJson(houses[i]));
     console.log(exact ? '  identical to the baseline, house by house' : '  differs from the baseline');
     if (args.out && args.out !== 'true') writeText(path.resolve(args.out), stableJson(doc));

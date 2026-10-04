@@ -18,6 +18,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { compareBase, judge, summarise } from './review/cost.mts';
 import { cornerCam, costCameras, R24, r24Shots, MANNEQUIN, mannequinTop, EYE, FOV, type CostRoom } from './review/cameras.mts';
 import { ADDENDUM, OBSTRUCTED, ALT_CORNERS, addendumShots, candidateShots } from './review/addendum.mts';
 import { lumaMetrics } from './review/luma.mts';
@@ -216,4 +217,20 @@ test('camera addendum: three alternatives for the three obstructed frames, none 
     assert.deepEqual(m.renderer, fm.renderer);
     for (const s of m.shots) { assert.match(s.sha256, /^[0-9a-f]{64}$/); assert.equal(s.tod, 'day'); assert.equal(s.kind, 'eye'); assert.ok(!fm.shots.some(x => x.id === s.id)); }
   }
+});
+
+test('cost --compare judges the fresh run against the BASELINE, never against itself', () => {
+  const house = (calls: number, meshes: number) => ({
+    meshes, triangles: meshes * 200, textureMB: 10, lights: { spot: 4, point: 1 }, types: { sofa: [1, 5, 100] }, propMeshes: meshes / 2, propTriangles: meshes * 100, items: 50,
+    cameras: [{ cost: { audit: { calls, triangles: meshes * 150 }, pass: { calls: calls * 4 }, frame: { calls: calls * 7 }, visible: { meshes: calls / 2 } } }],
+  });
+  const mk = (calls: number) => ({ a: house(calls, 1000), b: house(calls, 1100), c: house(calls, 1200) }) as any;
+  const base = { summary: summarise(mk(1000)), houses: mk(1000) };
+  const worse = summarise(mk(1200));                                   // +20% interior draw calls
+  const all = judge(compareBase(base, ['a', 'b', 'c']), worse);
+  assert.ok(all.some(r => !r.ok), 'a 20% draw-call regression must fail when all houses are compared');
+  assert.equal(compareBase(base, ['a', 'b', 'c']), base.summary, 'the base side is the committed summary');
+  const sub = judge(compareBase(base, ['a', 'b']), summarise({ a: mk(1200).a, b: mk(1200).b } as any));
+  assert.ok(sub.some(r => !r.ok), 'and for a subset of houses');
+  assert.ok(judge(compareBase(base, ['a', 'b', 'c']), summarise(mk(1000))).every(r => r.ok), 'an unchanged tree passes');
 });
