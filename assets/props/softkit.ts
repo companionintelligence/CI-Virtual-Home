@@ -204,18 +204,14 @@ export function softkit(THREE: any) {
       const p0 = A.clone().addScaledVector(e1, c * r0).addScaledVector(e2, s * r0), p1 = B.clone().addScaledVector(e1, c * r1).addScaledVector(e2, s * r1);
       r0i.push(acc.v(p0.x, p0.y, p0.z, s0)); r1i.push(acc.v(p1.x, p1.y, p1.z, s1));
     }
-    // wind the side so it faces outward whichever way e1 × e2 came out
-    const flip = new THREE.Vector3().crossVectors(e1, e2).dot(d) < 0;
+    // the ring runs counter-clockwise about d (e1 x e2 = d), so (k, k1, up) faces OUTWARD and the caps follow: a signed-volume test pins it
     for (let k = 0; k < sides; k++) {
       const k1 = (k + 1) % sides;
-      if (!flip) { acc.tri(r0i[k], r1i[k], r1i[k1]); acc.tri(r0i[k], r1i[k1], r0i[k1]); } else { acc.tri(r0i[k], r1i[k1], r1i[k]); acc.tri(r0i[k], r0i[k1], r1i[k1]); }
+      acc.tri(r0i[k], r1i[k1], r1i[k]); acc.tri(r0i[k], r0i[k1], r1i[k1]);
     }
     if (cap) {
       const ca = acc.v(A.x, A.y, A.z, s0), cb = acc.v(B.x, B.y, B.z, s1);
-      for (let k = 0; k < sides; k++) {
-        const k1 = (k + 1) % sides;
-        if (!flip) { acc.tri(ca, r0i[k1], r0i[k]); acc.tri(cb, r1i[k], r1i[k1]); } else { acc.tri(ca, r0i[k], r0i[k1]); acc.tri(cb, r1i[k1], r1i[k]); }
-      }
+      for (let k = 0; k < sides; k++) { const k1 = (k + 1) % sides; acc.tri(ca, r0i[k], r0i[k1]); acc.tri(cb, r1i[k1], r1i[k]); }
     }
   }
 
@@ -232,8 +228,8 @@ export function softkit(THREE: any) {
     }
     for (let k = 0; k < seg; k++) {
       const k1 = (k + 1) % seg;
-      acc.tri(o[k], o2[k], o2[k1]); acc.tri(o[k], o2[k1], o[k1]);          // outside
-      acc.tri(i2[k], i3[k1], i3[k]); acc.tri(i2[k], i2[k1], i3[k1]);        // inside (opposite winding)
+      acc.tri(o[k], o2[k1], o2[k]); acc.tri(o[k], o[k1], o2[k1]);          // outside
+      acc.tri(i2[k], i3[k], i3[k1]); acc.tri(i2[k], i3[k1], i2[k1]);        // inside (opposite winding)
     }
   }
 

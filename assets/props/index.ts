@@ -37,5 +37,8 @@ import './office.js';
 import './outdoor.js';
 import './hobby.js';
 
+// OWNER soft: new soft types, and in-place rebuilds of soft goods registered above (replaces by type id, Map order untouched)
+import './soft2.js';
+
 // BAKED LAST — assets/props/baked.ts overrides registered types in place, so it stays the last import; another stream's module goes ABOVE this line
 import './baked.js';

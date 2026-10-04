@@ -288,6 +288,15 @@ export const PLACEMENT: Record<string, Place> = {
   'modular-sectional': def('seating', ['sofa-l'], ['living', 'den', 'media', 'study'], ['mid-century', 'scandi', 'modern', 'tropical'], { faces: 'focus' }),
 };
 
+// ---- OWNER soft ---------------------------------------------------------------------------------------------------
+// New soft types (assets/props/soft2.ts), each under a NEW role so no existing role's candidate list changes and no pick re-rolls: they are
+// dormant until the dress phase places them. Never append to an existing role's list.
+Object.assign(PLACEMENT, {
+  'towel-stack': def('textile', ['soft-towel-stack'], BATHS, [], { onSurface: true, surfaces: ['bath', 'fitted', 'storage'], colorRole: 'accent' }),
+  'towel-ring-set': def('art', ['soft-towel-ring'], BATHS, [], { mountY: 0.95, colorRole: 'metal' }),
+  'robe-hook': def('art', ['soft-robe-hook'], [...BATHS, ...BEDS], [], { mountY: 0.55, colorRole: 'linen' }),
+});
+
 // A floor plant stands wherever people live: which rooms have the light and the size for one is the composer's business
 // (its clearances and windows), not a list per plant, and a bedroom that could only take three of the fourteen kinds
 // would put the same three in every house.

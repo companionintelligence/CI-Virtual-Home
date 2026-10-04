@@ -245,3 +245,40 @@ test('F theming: a towel is accent, fabric2 or linen; a spec colour paints the t
 test('E determinism: towel rails are stable per seed and draw a fixed count', () => {
   for (const t of RAILS) { assert.equal(hashGeom(build(t, {}, 'a')), hashGeom(build(t, {}, 'a'))); const n = { n: 0 }; build(t, {}, 'a', n); assert.equal(n.n, 2, `${t}: the colour pick and the cloth's seed`); }
 });
+
+test('A grammar: the closed solids are wound outward (signed volume positive): shell, strut, slab', () => {
+  const K = softkit(THREE);
+  const vol = (a: any) => { const P = a.pos; let v = 0; for (let t = 0; t < a.idx.length; t += 3) { const [x, y, z] = [0, 1, 2].map(k => a.idx[t + k] * 3); v += (P[x] * (P[y + 1] * P[z + 2] - P[y + 2] * P[z + 1]) - P[x + 1] * (P[y] * P[z + 2] - P[y + 2] * P[z]) + P[x + 2] * (P[y] * P[z + 1] - P[y + 1] * P[z])) / 6; } return v; };
+  const dirs: Array<[number[], number[]]> = [[[0, 0, 0], [0.3, 0.4, 0.1]], [[0, 0, 0], [0, 0.4, 0]], [[0, 0, 0], [0.4, 0, 0]], [[0, 0, 0], [0, 0, 0.4]], [[0.1, 0.2, 0.3], [-0.2, 0.1, 0.5]]];
+  for (const [a0, b0] of dirs) { const a = new K.Acc(); K.strut(a, a0, b0, 0.02, 0.02, 8); assert.ok(vol(a) > 0, `strut ${a0} -> ${b0} has volume ${vol(a)}`); }
+  const s = new K.Acc(); K.slab(s, 0, 0, 0, 0.1, 0.1, 0.1); assert.ok(vol(s) > 0.0009);
+  // a band's outer wall faces away from its axis, its inner wall toward it
+  const b = new K.Acc(); K.band(b, 0, 1, 0, 0.02, 0.01, 10);
+  let net = 0; for (let t = 0; t < b.idx.length; t += 3) {
+    const P = b.pos, [i, j, k] = [0, 1, 2].map(q => b.idx[t + q] * 3), A = [P[i], P[i + 1], P[i + 2]], B = [P[j], P[j + 1], P[j + 2]], C = [P[k], P[k + 1], P[k + 2]];
+    const u = [B[0] - A[0], B[1] - A[1], B[2] - A[2]], v = [C[0] - A[0], C[1] - A[1], C[2] - A[2]], n = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+    const c = [(A[1] + B[1] + C[1]) / 3 - 1, (A[2] + B[2] + C[2]) / 3];   // radial (y - 1, z)
+    net += n[1] * c[0] + n[2] * c[1];
+  }
+  assert.ok(net > 0, 'the band is wound outward');
+});
+
+// ---- the new dormant types (T6b, soft2.ts) ---------------------------------------------------------------------------------
+const NEW = ['towel-stack', 'towel-ring-set', 'robe-hook'];
+test('C caps: the new soft types are at most 3 meshes, 600 triangles, no map, no transparency, stable per seed, with a fixed draw count', () => {
+  for (const t of NEW) for (const sd of SEEDS) {
+    const o = build(t, {}, sd), ms = meshesOf(o);
+    assert.ok(ms.length <= 3 && sum(ms.map(trisOf)) <= 600, `${t}/${sd}: ${ms.length} meshes, ${sum(ms.map(trisOf))} triangles`);
+    for (const m of ms) { assert.ok(!m.material.map && !m.material.transparent); m.geometry.computeBoundingBox(); const s = m.geometry.boundingBox.getSize(new THREE.Vector3()); assert.ok(Math.min(s.x, s.y, s.z) >= 0.006, `${t}: ${m.userData.role} under 6 mm`); assert.ok(finiteGeom(m.geometry)); }
+    assert.equal(hashGeom(build(t, {}, sd)), hashGeom(o), `${t}/${sd}: unstable`);
+  }
+  for (const t of NEW) { const n = { n: 0 }; build(t, {}, 'a', n); assert.equal(n.n, 1, `${t}: one draw (the cloth's seed)`); }
+});
+test('B source: the new types are dormant (no committed house uses them) and sit under NEW roles only', async () => {
+  const { PLACEMENT } = await import('../assets/props/placement.js');
+  const dir = path.join(ROOT, 'content', 'houses');
+  for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && f !== 'index.json')) { const txt = fs.readFileSync(path.join(dir, f), 'utf8'); for (const t of NEW) assert.ok(!txt.includes(`"${t}"`), `${f} places ${t}`); }
+  const mine = new Set(NEW.flatMap(t => PLACEMENT[t].roles));
+  for (const [t, p] of Object.entries(PLACEMENT) as any) if (!NEW.includes(t)) for (const r of p.roles) assert.ok(!mine.has(r), `${t} fills the soft role ${r}`);
+  for (const r of mine) assert.ok(String(r).startsWith('soft-'), `${r} is a soft- role`);
+});
