@@ -50,7 +50,8 @@
     "review:verify": "node --experimental-strip-types scripts/review/verify.mts",
     "dress-census": "node --experimental-strip-types scripts/dress-census.mts",
     "prop-drift": "node --experimental-strip-types scripts/check-prop-drift.mts",
-    "test:neutrality": "node --experimental-strip-types scripts/test-build-neutrality.mts"
+    "test:neutrality": "node --experimental-strip-types scripts/test-build-neutrality.mts",
+    "test:light": "node --experimental-strip-types scripts/test-interior-light.mts"
   },
   "devDependencies": {
     "@types/node": "^22",
