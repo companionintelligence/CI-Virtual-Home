@@ -12,6 +12,10 @@
 //              the ground is fully hazed before it is clipped.
 //   exposure, env   tone-mapping exposure, set for ACES filmic (TONE_EXPOSURE rescales it for the A/B
 //              mappers), and scene.environmentIntensity.
+//   bounce     the emissive of every CEILING material (userData.bounce, set by the kit and the arch materials): the light a
+//              room's own surfaces throw up at its ceiling, which no light here models. Without it a ceiling is lit by the
+//              hemisphere's ground colour alone (greyed to luma, kit-build.ts neutralIndirect): flat mid-grey by day, black
+//              at night. A scalar of white-warm emissive, ramped by hour (plan 5.2 L2).
 //   lampGain   the house's own lamps: every material under an object tagged userData.fixture has its emissive
 //              scaled by it (and fixture lights read it from the `house:lighting` event).
 //   windowGlow glass under an object tagged userData.windowGlow glows glowColor at this emissive intensity.
@@ -43,6 +47,7 @@ export type Preset = {
   fog: [number, number];
   shadow: number;
   lampGain: number;
+  bounce: number;
   windowGlow: number;
   glowColor: string;
   sunGlow: number;
@@ -60,7 +65,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     ambient: 0,
     exposure: 0.78, env: 0.48,
     fog: [60, 155], shadow: 0.8,
-    lampGain: 0.035, windowGlow: 0, glowColor: '#ffe2bd', sunGlow: 0.25,
+    lampGain: 0.035, bounce: 0.12, windowGlow: 0, glowColor: '#ffe2bd', sunGlow: 0.25,
     bloom: { strength: 0.08, radius: 0.4, threshold: 2.5 },
     grade: { contrast: 1.06, saturation: 0.88, vignette: 0.14 },
   },
@@ -73,7 +78,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     ambient: 0,
     exposure: 1.0, env: 0.55,
     fog: [55, 150], shadow: 0.8,
-    lampGain: 0.3, windowGlow: 0.18, glowColor: '#ffdcb0', sunGlow: 0.6,
+    lampGain: 0.3, bounce: 0.10, windowGlow: 0.18, glowColor: '#ffdcb0', sunGlow: 0.6,
     bloom: { strength: 0.15, radius: 0.4, threshold: 2.0 },
     grade: { contrast: 1.05, saturation: 0.9, vignette: 0.18 },
   },
@@ -86,7 +91,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     ambient: 0,
     exposure: 0.9, env: 0.7,
     fog: [70, 155], shadow: 0.6,
-    lampGain: 1.6, windowGlow: 0.8, glowColor: '#ffd9a8', sunGlow: 0.8,
+    lampGain: 1.6, bounce: 0.07, windowGlow: 0.8, glowColor: '#ffd9a8', sunGlow: 0.8,
     bloom: { strength: 0.35, radius: 0.4, threshold: 1.8 },
     grade: { contrast: 1.05, saturation: 0.72, vignette: 0.22 },
   },
@@ -99,7 +104,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     ambient: 0,
     exposure: 0.85, env: 0.22,
     fog: [55, 150], shadow: 0.5,
-    lampGain: 1.7, windowGlow: 1.0, glowColor: '#ffd49e', sunGlow: 0.1,
+    lampGain: 1.7, bounce: 0.07, windowGlow: 1.0, glowColor: '#ffd49e', sunGlow: 0.1,
     bloom: { strength: 0.4, radius: 0.4, threshold: 1.6 },
     grade: { contrast: 1.05, saturation: 0.8, vignette: 0.26 },
   },
@@ -303,14 +308,25 @@ export function installSkyFog(THREE: any): { ground: any; sky: any } {
 // screen), so a tagged pane gets a glowing twin of its material — one twin per source material — rather than
 // lighting every other user of the original.
 const glowTwins = new WeakMap<object, any>();
+/** the warm white a ceiling's bounce emits: the room's own light off its floor and walls, not the lamp's colour */
+export const BOUNCE_COLOR = 0xfff0dc;
 const matsOf = (o: any): any[] => (Array.isArray(o.material) ? o.material : o.material ? [o.material] : []);
 const seeThrough = (m: any): boolean => !!m && (m.transparent || (m.transmission || 0) > 0 || /glass|glazing|pane/i.test(m.name || ''));
 
-export function applyHouseGlow(THREE: any, root: any, p: Preset): { fixtures: number; panes: number } {
+export function applyHouseGlow(THREE: any, root: any, p: Preset): { fixtures: number; panes: number; bounced: number } {
   const glow = new THREE.Color(hexOf(p.glowColor));
-  let fixtures = 0, panes = 0;
+  let fixtures = 0, panes = 0, bounced = 0;
   root.traverse((o: any) => {
     const ud = o.userData;
+    // ceiling bounce: a material tagged userData.bounce (a number: 1, or less on a textured ceiling that a flat emissive would wash out)
+    // takes the preset's bounce as its emissive. Set, never scaled, so re-lighting is idempotent (the fixtureBase pattern, without the base)
+    if (o.isMesh) for (const m of matsOf(o)) {
+      const b = m && m.userData && m.userData.bounce;
+      if (!b || !m.emissive) continue;
+      m.emissive.setHex(BOUNCE_COLOR);
+      m.emissiveIntensity = p.bounce * (typeof b === 'number' ? b : 1);
+      bounced++;
+    }
     if (!ud) return;
     if (ud.fixture) {
       o.traverse((n: any) => {
@@ -344,7 +360,7 @@ export function applyHouseGlow(THREE: any, root: any, p: Preset): { fixtures: nu
       });
     }
   });
-  return { fixtures, panes };
+  return { fixtures, panes, bounced };
 }
 
 // The composer's scene-referred grade, applied in linear light before tone mapping: contrast about mid-grey

@@ -24,6 +24,11 @@
 //                                             changes) against left in the scene at intensity 0. Policy lives in assets/fixtures.ts (hideOffGain);
 //                                             this reports the numbers it was chosen on.   --houses a,b  --reps 3
 //
+//   pnpm run test:light -- --player-calls    the player's static batcher (assets/viewer-batch.ts): draw calls a frame issues for the whole home before and
+//                                             after batching, per house, read from window.__houseViewer.batch. Run it on two trees (REVIEW_SERVE_ROOT=<tree>
+//                                             serves another checkout) and compare: L2's tag on ceiling materials must cost at most +2 % median.
+//                                             --houses a,b  --label <name>
+//
 // Frames are read off the product's own composer path (__houseSnapshot / __houseRenderFrames, 2x supersample, GTAO, bloom, grade, SMAA), at
 // the rig's pinned profile; every decision is a pure function of the files' bytes (luma.mts decodes with ffmpeg). Images go outside git
 // (<REVIEW_DIR>/after/light/...).
@@ -265,12 +270,40 @@ async function hitchMode(): Promise<number> {
   return 0;
 }
 
+// ---- player calls: the batcher's draw-call census ----------------------------------------------------------------------------------------
+async function playerCallsMode(): Promise<number> {
+  const houses = args.houses && args.houses !== 'true' ? args.houses.split(',') : ['aurora', 'cutestarter', 'seraphine', 'riverbend', 'lakecabin', 'mediterranean', 'mesamariposa', 'neweco', 'vanilla', 'modernhouse-nora', 'palnknoll', 'valleyview'];
+  const label = args.label && args.label !== 'true' ? args.label : 'player-calls';
+  const session = await startSession();
+  const rows: Record<string, any> = {};
+  try {
+    for (const house of houses) {
+      const ctx = await session.browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
+      const page = await ctx.newPage();
+      await page.route('https://fonts.googleapis.com/**', (r: any) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+      await page.route('https://fonts.gstatic.com/**', (r: any) => r.abort());
+      await page.goto(session.srv.url(`room-creator.html?mode=view&house=${house}&tod=day&play=0`), { waitUntil: 'domcontentloaded', timeout: 240000 });
+      await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, house, { timeout: 240000 });
+      await page.waitForFunction(() => !!((window as any).__houseViewer && (window as any).__houseViewer.batch), null, { timeout: 60000 });
+      const b = await page.evaluate(() => { const b = (window as any).__houseViewer.batch; return { before: b.before, after: b.after, meshesBefore: b.meshesBefore, meshesAfter: b.meshesAfter, materialsAfter: b.materialsAfter, merged: b.merged }; });
+      rows[house] = b;
+      console.log(`  ${house.padEnd(18)} draw calls ${String(b.before).padStart(5)} > ${String(b.after).padStart(5)}   meshes ${b.meshesBefore} > ${b.meshesAfter}   materials ${b.materialsAfter}`);
+      await ctx.close();
+    }
+  } finally { await session.close(); }
+  writeText(out(`${label}.json`), stableJson({ schema: 1, what: 'the player batcher\'s draw-call census (scripts/test-interior-light.mts --player-calls)', rows }));
+  const after = Object.values(rows).map((r: any) => r.after).sort((a: number, b: number) => a - b);
+  console.log(`median draw calls after batching: ${after[after.length >> 1]}   total ${after.reduce((a: number, b: number) => a + b, 0)}`);
+  return 0;
+}
+
 let code = 0;
-if (args.hitch === 'true') code = await hitchMode();
+if (args['player-calls'] === 'true') code = await playerCallsMode();
+else if (args.hitch === 'true') code = await hitchMode();
 else if (args.portal === 'true') code = await portalMode();
 else if (args.bench === 'true') code = await benchMode();
 else code = await fixturesMode();
 const bad = rows.filter(r => !r.ok).length;
-if (args.portal !== 'true' && args.hitch !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
+if (args.portal !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
 console.log(`(load ${machine().load1})`);
 process.exit(code);

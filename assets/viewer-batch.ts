@@ -58,9 +58,11 @@ export type BatchStats = {
 // what a subtree carries when something reaches into it after the build (see the header)
 const DYNAMIC_KEYS = ['core', 'screen', 'animate', 'door', 'world', 'fixture', 'windowGlow'];
 // userData a material may carry and still be merged by content: `muted` is the fleet's colour restraint, applied at build
-const BENIGN_MATERIAL_USERDATA = new Set(['muted']);
+// `bounce` (environment.ts ceiling bounce) is a tag on a ceiling material that applyHouseGlow sets the emissive of, the same way for every tagged
+// material, so two ceilings of equal content stay equal; it is also in MUTATED_MATERIAL_KEYS so a tagged ceiling never stands in for an untagged surface
+const BENIGN_MATERIAL_USERDATA = new Set(['muted', 'bounce']);
 // userData on a material that says something else edits it in place
-const MUTATED_MATERIAL_KEYS = ['fixture', 'windowGlow', 'orig', 'fixtureBase', '__glowTwin', '__baseEmissive'];
+const MUTATED_MATERIAL_KEYS = ['fixture', 'windowGlow', 'orig', 'fixtureBase', '__glowTwin', '__baseEmissive', 'bounce'];
 const CELL = 6;             // m: merge pieces only within a cell of this size (frustum culling stays local)
 const MAX_VERTS = 65000;    // per merged mesh: 16-bit indices, and one draw never spans the house
 const SIMPLE_MATERIALS = new Set(['MeshStandardMaterial', 'MeshBasicMaterial', 'MeshLambertMaterial']);

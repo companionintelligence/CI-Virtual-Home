@@ -63,7 +63,7 @@ test('the baked-model role table agrees with the finish roles where both name a 
 
 // ---- L1: the room fill ------------------------------------------------------------------------------------------------------------------
 import { ROOM_FILL_K, FILL_PENUMBRA, FILL_ANGLE_MAX, FILL_ON_GAIN, LIGHT_CAP, hideOffGain, applyLampGain } from '../assets/fixtures.js';
-import { TIME_OF_DAY } from '../assets/environment.js';
+import { TIME_OF_DAY, lookOf } from '../assets/environment.js';
 
 test('L1: the room light is a soft fill (numbers the acceptance was calibrated on)', () => {
   assert.equal(ROOM_FILL_K, 0.3);
@@ -76,4 +76,40 @@ test('L1: only daylight turns the fill off, and only the offline path hides it',
   for (const [name, p] of Object.entries(TIME_OF_DAY)) assert.equal(p.lampGain < FILL_ON_GAIN, name === 'day', `${name} lampGain ${p.lampGain}`);
   assert.equal(hideOffGain(), true, 'no window (Node) is the offline path: hidden');
   applyLampGain(0.5);   // no house built: a no-op, not a throw
+});
+
+// ---- L2: the ceiling bounce -------------------------------------------------------------------------------------------------------------
+import { applyHouseGlow, BOUNCE_COLOR } from '../assets/environment.js';
+
+const stubTHREE = { Color: class { hex: number; constructor(h: number) { this.hex = h; } } };
+const mat = (bounce?: number) => ({ userData: bounce === undefined ? {} : { bounce }, emissive: { hex: 0, setHex(h: number) { this.hex = h; } }, emissiveIntensity: 1 });
+const rootOf = (...mats: any[]) => ({ traverse(f: (o: any) => void) { f({ userData: {} }); for (const m of mats) f({ isMesh: true, material: m, userData: {} }); } });
+
+test('L2: every preset carries a bounce, brightest by day, never over the cap that keeps a ceiling under the walls', () => {
+  for (const [name, p] of Object.entries(TIME_OF_DAY)) assert.ok(typeof p.bounce === 'number' && p.bounce > 0 && p.bounce <= 0.15, `${name}.bounce ${p.bounce}`);
+  assert.ok(TIME_OF_DAY.day.bounce >= TIME_OF_DAY.dusk.bounce && TIME_OF_DAY.day.bounce >= TIME_OF_DAY.night.bounce);
+  for (const k of [1, 2] as const) assert.equal(lookOf(TIME_OF_DAY.dusk, k).bounce, TIME_OF_DAY.dusk.bounce, `look ${k} keeps it`);
+});
+
+test('L2: applyHouseGlow sets a tagged ceiling to the hour\'s bounce, scales a textured one, leaves everything else alone, and is idempotent', () => {
+  const flat = mat(1), timber = mat(0.5), wall = mat(), noEmissive: any = { userData: { bounce: 1 } };
+  const root = rootOf(flat, timber, wall, noEmissive);
+  for (const t of ['dusk', 'night', 'day', 'dusk', 'night', 'day', 'dusk']) {
+    const r = applyHouseGlow(stubTHREE, root, TIME_OF_DAY[t]);
+    assert.equal(r.bounced, 2, 'two tagged materials with an emissive');
+    assert.equal(flat.emissiveIntensity, TIME_OF_DAY[t].bounce);
+    assert.equal(timber.emissiveIntensity, TIME_OF_DAY[t].bounce * 0.5);
+    assert.equal(flat.emissive.hex, BOUNCE_COLOR);
+    assert.equal(wall.emissiveIntensity, 1, 'an untagged surface keeps its emissive intensity');
+    assert.equal(wall.emissive.hex, 0);
+  }
+});
+
+test('L2: the sources tag the ceilings and the batcher knows the tag', () => {
+  const read = (f: string) => fs.readFileSync(path.join(ROOT, 'assets', f), 'utf8');
+  assert.match(read('kit-build.ts'), /m\.userData\.bounce = 1/);
+  assert.match(read('arch-materials.ts'), /userData\.bounce = 0\.5/);
+  assert.match(read('arch-materials.ts'), /userData\.bounce = 1/);
+  assert.match(read('viewer-batch.ts'), /BENIGN_MATERIAL_USERDATA = new Set\(\[[^\]]*'bounce'/);
+  assert.match(read('viewer-batch.ts'), /MUTATED_MATERIAL_KEYS = \[[^\]]*'bounce'/);
 });

@@ -141,6 +141,7 @@ export function createKitBuild(bctx) {
   // bounce stopped cancelling it).
   function ceilingMaterial({ where }) {
     const m = where === 'slab-underside' ? std(0xf2f2f0, { side: THREE.DoubleSide }) : std(0xf2f2f0, { side: THREE.DoubleSide, roughness: 0.9 });
+    m.userData.bounce = 1;   // environment.ts applyHouseGlow lifts a tagged ceiling with the hour's bounce
     return neutralIndirect(m);
   }
 
