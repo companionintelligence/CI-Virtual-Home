@@ -1,5 +1,5 @@
 {
- "hash": "bdb7fbd9:2761:23",
+ "hash": "276735a7:2761:23",
  "duration": 23,
  "beats": {
   "establish": 4.38,
@@ -15,8 +15,8 @@
  "metrics": {
   "outsideShare": 0.292,
   "doorSpeed": 0.85,
-  "maxYawRate": 45.3,
-  "lookErrorMedian": 3.8,
+  "maxYawRate": 44.7,
+  "lookErrorMedian": 3.6,
   "coreLOS": 8.28,
   "finalCoreHeight": 0.179,
   "finalCoreNDC": [
@@ -24,9 +24,9 @@
    -0.452
   ],
   "orbitArc": 76.2,
-  "topRoomsSeen": 1,
+  "topRoomsSeen": 2,
   "errors": 0,
-  "warnings": 5
+  "warnings": 6
  },
  "establish": "corner-left"
 }
