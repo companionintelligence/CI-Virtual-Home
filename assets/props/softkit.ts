@@ -325,7 +325,7 @@ export function layBedding(g: any, ctx: any, o: any) {
     shade: (x: number, yy: number, zz: number, nx: number, ny: number) => SHADE.mattress * (0.93 + 0.07 * smooth(-thick / 2, thick / 2, yy)) * (ny > 0.5 ? 1 : 0.94) });
   // ---- the duvet: puffed channelled top, a skirt hanging over both sides and the foot, folded back at the head
   const bl = d * (cover + r() * 0.05), cl = bl + 0.02, cz = zf - cl / 2 + 0.008, headEdge = zf - cl;
-  const W2 = w + 0.02, hh = loft + drop, ph = r() * 6.28, nxk = Math.max(8, Math.round(W2 / 0.15) * 2 - 4);
+  const W2 = w + 0.02, hh = loft + drop, ph = r() * 6.28, nxk = Math.max(8, Math.round(W2 / 0.2) * 2 - 2);
   const sideK = (nx: number, nz: number) => Math.abs(nx) > 0.4 || nz > 0.4;
   shell(duvetA, {
     cy: matTop + loft - hh / 2, cz, w: W2, h: hh, d: cl, r: 0.05, faces: ['py', 'px', 'nx', 'pz'], puff: 0.018,
@@ -351,16 +351,43 @@ export function layBedding(g: any, ctx: any, o: any) {
   shell(linenA, { cy: matTop + loft + 0.014, cz: headEdge + flap / 2, w: fw, h: 0.03, d: fd, r: 0.014, faces: ['py', 'px', 'nx', 'nz'], kx: lin(fw / 2, 6), kz: [-fd / 2, 0, fd / 2],
     wave: (x: number, _y: number, zz: number, _nx: number, ny: number) => (ny > 0.5 ? [0, -0.035 * smooth(0.55, 1, Math.abs(x) / (fw / 2)) + 0.005 * Math.sin(x * 17 + ph) * Math.cos(zz * 12), 0] : [0, -0.02 * smooth(0.55, 1, Math.abs(x) / (fw / 2)), 0]),
     shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.97 - 0.05 * smooth(0.6, 1, Math.abs(x) / (fw / 2)) : 0.85) });
-  // ---- a throw across the foot (not on a kid's bed)
+  // ---- a throw tossed across the foot (not on a kid's bed): ONE cloth that follows the duvet's cross-section — down one side, over the crest, down the other —
+  // with an unequal hang at each end, a turned-back near edge, a hem that waves, diagonal creases across the top and a darker woven stripe near each hem. Never a band.
   const throwOn = r() < 0.6 && !kid, altCol = duvet === colors.accent ? colors.fabric2 : colors.accent;
   const tph = r() * 6.28;
   if (throwOn) {
-    const tw = W2 + 0.02, td = 0.36, th2 = 0.26;
-    shell(altA, {
-      cy: matTop + loft + 0.012 - th2 / 2 + 0.026, cz: zf - 0.18 - 0.02, w: tw, h: th2, d: td, r: 0.016, faces: ['py', 'px', 'nx'], puff: 0.012,
-      kx: lin(tw / 2, 8), kz: lin(td / 2, 3), ky: [-th2 / 2, -th2 / 2 + 0.05, th2 / 2 - 0.025, th2 / 2],
-      wave: (x: number, yy: number, zz: number, nx: number, ny: number) => (Math.abs(nx) > 0.5 ? [Math.sign(x) * 0.009 * Math.sin(zz * 8 + tph), 0, 0] : [0, 0.007 * Math.sin(x * 9 + tph) + 0.003 * Math.sin(zz * 9 + x * 4), 0]),
-      shade: (x: number, yy: number, zz: number, nx: number, ny: number) => (ny > 0.5 ? (1 - 0.1 * (0.5 + 0.5 * Math.sin(x * 9 + tph))) * (Math.abs(zz) > td / 2 - 0.04 ? 0.82 : 1) : 0.82 + 0.12 * smooth(-th2 / 2, th2 / 2, yy)),
+    const td = 0.38, tz = zf - 0.21 - 0.02, yaw = (r() - 0.5) * 0.1, side = r() < 0.5 ? 1 : -1;
+    const hangA = 0.2 + 0.1 * r(), hangB = 0.08 + 0.08 * r();                 // the long end hangs 20-30 cm, the short one 8-16
+    const hx = W2 / 2 + 0.003, topY = matTop + loft + 0.05, rc = 0.04;        // the cloth stands 3 mm off the duvet's side (the old throw's width) and 5 cm over its crest line, settling 2 cm toward the edges
+    // the path across the bed as a polyline in (x, y) by arclength, from the long end up, over and down the short end
+    const run = W2 - 2 * rc, arc = Math.PI * rc / 2, tot = hangA + arc + run + arc + hangB;
+    const pathAt = (s0: number): [number, number, number] => {                // -> [x, y, outward-bulge scale]
+      let s1 = s0 * tot;
+      if (s1 < hangA) return [-side * hx, topY - rc - (hangA - s1), 1];
+      s1 -= hangA; if (s1 < arc) { const a = (s1 / arc) * Math.PI / 2; return [-side * (hx - rc + Math.cos(a) * rc), topY - rc + Math.sin(a) * rc, 1]; }
+      s1 -= arc; if (s1 < run) return [-side * (hx - rc) + side * s1, topY, 0.2];
+      s1 -= run; if (s1 < arc) { const a = (s1 / arc) * Math.PI / 2; return [side * (hx - rc + Math.sin(a) * rc), topY - rc + Math.cos(a) * rc, 1]; }
+      s1 -= arc; return [side * hx, topY - rc - s1, 1];
+    };
+    const Un = 16, Vr = [0, 0.2, 0.8, 1], Us = Array.from({ length: Un + 1 }, (_, i) => i / Un);
+    const cy = Math.cos(yaw), sy = Math.sin(yaw);
+    K.sheet(altA, {
+      U: Us, Vn: Vr, th: 0, want: [0, 1, 0],
+      pos: (u: number, v: number) => {
+        const [px, py, bulge] = pathAt(u), vz = (v - 0.5) * td, onTop = bulge < 0.5 ? 1 : 0;
+        const hemDroop = py < topY - rc ? 1 : 0;                                // on a hang, the hem edge waves and the near edge curls out
+        const crease = 0.008 * Math.sin(px * 16 + vz * 7 + tph) * (0.4 + 0.6 * onTop) + 0.004 * Math.sin(px * 31 + tph * 2) * onTop;
+        const lip = 0.008 * smooth(0.72, 1, v) * (1 - hemDroop);
+        const out = Math.sign(px) * (hemDroop ? 0.004 * Math.sin(vz * 19 + tph) : 0);
+        const dy = onTop ? crease + 0.008 * Math.exp(-(((vz - 0.05) / 0.09) ** 2)) + lip : hemDroop ? 0.01 * Math.sin(vz * 21 + tph + py * 9) * smooth(topY - rc - 0.12, topY - rc - hangA, py) : crease * 0.3;
+        const settle = 0.024 * smooth(0.35, 1, Math.abs(px) / hx) * smooth(topY - rc, topY, py);
+        const x = px + out, y = py + dy - settle, z = vz;
+        return [x * cy + z * sy, y, tz - x * sy + z * cy];
+      },
+      shade: (u: number, v: number, _x: number, y: number) => {
+        const stripe = (v > 0.1 && v < 0.2) || (v > 0.8 && v < 0.9) ? 0.86 : 1, hang = y < topY - rc - 0.02 ? 0.88 - 0.1 * smooth(0, 0.3, topY - rc - y) : 1;
+        return clamp(stripe * hang * (0.93 + 0.07 * Math.sin(u * 61 + v * 9 + tph)), 0.6, 1);
+      },
     });
   }
   // ---- the pillows: the sleeping pair (or one) of linen, behind them euro shams for a wide bed, a lumbar in front
@@ -370,11 +397,30 @@ export function layBedding(g: any, ctx: any, o: any) {
   const lean = kid ? 0.2 : 0.3;
   for (let i = 0; i < pillows; i++) {
     const px = pillows > 1 ? (i - (pillows - 1) / 2) * (w / pillows) : 0;
-    pillow(linenA, { x: px, y: matTop + 0.01 + (euro ? 0.03 : 0), z: pz, w: pw, d: pillowD, t: kid ? 0.11 : 0.14, rotX: lean, rotY: yawJ * (i % 2 ? -1 : 1), nu: 8, nv: 6, floorY: matTop });
+    pillow(linenA, { x: px, y: matTop + 0.01 + (euro ? 0.03 : 0), z: pz, w: pw, d: pillowD, t: kid ? 0.11 : 0.14, rotX: lean, rotY: yawJ * (i % 2 ? -1 : 1), nu: 7, nv: 5, floorY: matTop });
   }
   if (euro) {
-    for (const s of [-1, 1]) pillow(altA, { x: s * (w / 4), y: matTop + 0.03, z: zh + 0.2, w: 0.54, d: 0.5, t: 0.17, rotX: 0.5, rotY: s * 0.03 + euroJ[(s + 1) / 2], nu: 6, nv: 4, floorY: matTop });
-    pillow(altA, { x: lumJ[0] * 0.4, y: matTop + loft + 0.01, z: pz + pillowD / 2 + 0.2, w: 0.5, d: 0.2, t: 0.08, rotX: 0.32, rotY: lumJ[1], nu: 6, nv: 3, floorY: matTop + loft - 0.01 });
+    // euro shams: a square, fat, rounded cushion standing against the headboard and leaning back on it. A closed shell (it is seen from the side, where a one-sided
+    // pillow would be hollow), puffed front and back, the top corners drooping and the crown dipping between them; the base sinks into the mattress and has no underside
+    const SW = 0.56, SH = 0.5, SD = 0.13, rr = 0.055, hx = SW / 2, hy = SH / 2, hz = SD / 2, leanE = -0.34;
+    for (const s of [-1, 1]) {
+      const yawS = s * 0.04 + euroJ[(s + 1) / 2], lift = SH / 2 * Math.cos(leanE) - 0.012;
+      const xf = new THREE.Matrix4().makeTranslation(s * (w / 4) + euroJ[0] * 0.2, matTop + lift, zh + 0.17).multiply(new THREE.Matrix4().makeRotationY(yawS)).multiply(new THREE.Matrix4().makeRotationX(leanE));
+      shell(altA, { w: SW, h: SH, d: SD, r: rr, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: [-hx, -hx + rr, hx - rr, hx], ky: [-hy, -hy + rr, 0, hy - rr, hy], kz: [-hz, 0, hz], xf,
+        wave: (x: number, y: number, z: number, nx: number, ny: number, nz: number) => {
+          const fx = Math.max(0, 1 - (x / hx) ** 2), fy = Math.max(0, 1 - (y / hy) ** 2);
+          const bulge = 0.032 * fx * fy * Math.sign(z || 1) * (Math.abs(nz) > 0.3 ? 1 : 0.3);   // puffed front and back
+          const droop = -0.05 * smooth(0.45, 1, Math.abs(x) / hx) * smooth(0.2, 1, y / hy);       // the top corners fall
+          const dip = -0.022 * Math.exp(-(x * x) / 0.012) * smooth(0.3, 1, y / hy);              // the crown dips between them
+          const dish = -0.012 * Math.exp(-(x * x + y * y) / 0.02) * Math.sign(z || 1);           // a soft dent in each face
+          return [0, droop + dip, bulge + dish];
+        },
+        shade: (x: number, y: number, _z: number, nx: number, ny: number, nz: number) => clamp((0.88 + 0.12 * Math.max(0, 1 - (x / hx) ** 2) * Math.max(0, 1 - (y / hy) ** 2) * 1.2) * (ny > 0.5 ? 0.95 : 1) * (nz < -0.5 ? 0.9 : 1), 0.55, 1) });
+    }
+    // a lumbar cushion lying against the pillows' feet: a rounded, puffed bolster, not a plank
+    const lxf = new THREE.Matrix4().makeTranslation(lumJ[0] * 0.4, matTop + loft + 0.045, pz + pillowD / 2 + 0.2).multiply(new THREE.Matrix4().makeRotationY(lumJ[1])).multiply(new THREE.Matrix4().makeRotationX(-0.3));
+    shell(altA, { w: 0.5, h: 0.11, d: 0.17, r: 0.05, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(0.25, 4), ky: [-0.055, -0.005, 0.055], kz: [-0.085, 0, 0.085], puff: 0.012, xf: lxf,
+      shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.97 - 0.1 * smooth(0.6, 1, Math.abs(x) / 0.25) : 0.86) });
   }
   const uv = quilt ? (x: number, _y: number, zz: number): [number, number] => [(x + W2 / 2) / W2, (zz - (zf - cl)) / cl] : undefined;
   put(g, linenA, softMat(ctx, colors.linen, { roughness: 0.95 }), 'linen');
