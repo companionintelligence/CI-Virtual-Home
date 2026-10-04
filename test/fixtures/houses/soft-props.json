@@ -5,12 +5,12 @@
   "author": "ci-virtual-home",
   "source": "test fixture (SOFT stream, PLAN 5.3 T14): every soft type the grammar rebuilds or adds, authored by hand and unprogrammed, so a stream proves its props here and not on the 150 goldens",
   "style": "Single-storey gallery of the soft furnishings",
-  "emoji": "🧪",
+  "emoji": "\ud83e\uddea",
   "fixture": {
-    "note": "every soft type: ten bed types and six of them again (different instances, so different streams), six curtains of different widths, the three towel rails and the new towel stack, ring set and robe hook, sofas with cushion sets and throws, an ottoman, pouf, two bean bags, a floor cushion and a bench"
+    "note": "every soft type: ten bed types and six of them again (different instances, so different streams), six curtains of different widths, the three towel rails and the new towel stack, ring set and robe hook, sofas with cushion sets and throws, an ottoman, pouf, two bean bags, a floor cushion and a bench. Wave 3 adds: eight sofas and sectionals, six armchairs (each twice, one repainted), twelve floor plants at default and other heights, surface plants on consoles, cut flowers, pampas, hanging plants, and the five window treatments."
   },
   "lot": {
-    "w": 53.4,
+    "w": 130,
     "d": 24,
     "ground": "lawn"
   },
@@ -33,7 +33,7 @@
         {
           "x": -20.7,
           "z": -6,
-          "w": 41.4,
+          "w": 78.4,
           "d": 12
         }
       ],
@@ -131,6 +131,54 @@
           "at": 3.0,
           "type": "window",
           "w": 1.2,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 27.0,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 38.5,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": 50.0,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 27.0,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 40.0,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 52.0,
+          "type": "window",
+          "w": 1.8,
           "h": 1.3,
           "sill": 0.9
         }
@@ -294,6 +342,122 @@
           ],
           "to": [
             9.7,
+            6
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            20.7,
+            -1
+          ],
+          "to": [
+            34.7,
+            -1
+          ],
+          "door": 0.6,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            34.7,
+            -1
+          ],
+          "to": [
+            43.7,
+            -1
+          ],
+          "door": 0.6,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            43.7,
+            -1
+          ],
+          "to": [
+            57.7,
+            -1
+          ],
+          "door": 0.6,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            34.7,
+            -6
+          ],
+          "to": [
+            34.7,
+            -1
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            43.7,
+            -6
+          ],
+          "to": [
+            43.7,
+            -1
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            20.7,
+            1
+          ],
+          "to": [
+            34.7,
+            1
+          ],
+          "door": 0.6,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            34.7,
+            1
+          ],
+          "to": [
+            46.7,
+            1
+          ],
+          "door": 0.6,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            46.7,
+            1
+          ],
+          "to": [
+            57.7,
+            1
+          ],
+          "door": 0.6,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            34.7,
+            1
+          ],
+          "to": [
+            34.7,
+            6
+          ],
+          "door": null
+        },
+        {
+          "from": [
+            46.7,
+            1
+          ],
+          "to": [
+            46.7,
             6
           ],
           "door": null
@@ -822,11 +986,698 @@
           "bounds": {
             "x": -20.7,
             "z": -1,
-            "w": 41.4,
+            "w": 78.4,
             "d": 2
           },
           "program": "hall",
           "items": []
+        },
+        {
+          "no": "10",
+          "name": "Sofas and sectionals",
+          "bounds": {
+            "x": 20.7,
+            "z": -6,
+            "w": 14,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "sofa",
+              "at": [
+                22.0,
+                -5.4
+              ]
+            },
+            {
+              "type": "slipcover-sofa",
+              "at": [
+                24.5,
+                -5.4
+              ]
+            },
+            {
+              "type": "mid-century-sofa",
+              "at": [
+                27.0,
+                -5.4
+              ]
+            },
+            {
+              "type": "tuxedo-sofa",
+              "at": [
+                29.5,
+                -5.4
+              ],
+              "color": "#b3402a"
+            },
+            {
+              "type": "loveseat",
+              "at": [
+                32.0,
+                -5.4
+              ]
+            },
+            {
+              "type": "l-sectional",
+              "at": [
+                22.5,
+                -2.5
+              ]
+            },
+            {
+              "type": "u-sectional",
+              "at": [
+                27.0,
+                -2.4
+              ]
+            },
+            {
+              "type": "modular-sectional",
+              "at": [
+                31.6,
+                -2.5
+              ],
+              "hand": "right"
+            },
+            {
+              "type": "cushion-set",
+              "at": [
+                22.0,
+                -5.65
+              ],
+              "y": 0.44
+            },
+            {
+              "type": "loveseat",
+              "at": [
+                33.9,
+                -3.0
+              ],
+              "rot": 90,
+              "w": 1.2
+            }
+          ]
+        },
+        {
+          "no": "11",
+          "name": "Armchairs",
+          "bounds": {
+            "x": 34.7,
+            "z": -6,
+            "w": 9,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "wingback-armchair",
+              "at": [
+                35.6,
+                -5.3
+              ]
+            },
+            {
+              "type": "slipper-chair",
+              "at": [
+                37.0,
+                -5.3
+              ]
+            },
+            {
+              "type": "mission-armchair",
+              "at": [
+                38.5,
+                -5.3
+              ]
+            },
+            {
+              "type": "barrel-chair",
+              "at": [
+                40.0,
+                -5.3
+              ]
+            },
+            {
+              "type": "rattan-armchair",
+              "at": [
+                41.5,
+                -5.3
+              ]
+            },
+            {
+              "type": "rocking-chair",
+              "at": [
+                42.9,
+                -5.2
+              ]
+            },
+            {
+              "type": "wingback-armchair",
+              "at": [
+                35.6,
+                -2.6
+              ],
+              "color": "#b3402a"
+            },
+            {
+              "type": "slipper-chair",
+              "at": [
+                37.0,
+                -2.6
+              ],
+              "color": "#b3402a"
+            },
+            {
+              "type": "mission-armchair",
+              "at": [
+                38.5,
+                -2.6
+              ]
+            },
+            {
+              "type": "barrel-chair",
+              "at": [
+                40.0,
+                -2.6
+              ],
+              "color": "#b3402a"
+            },
+            {
+              "type": "rattan-armchair",
+              "at": [
+                41.5,
+                -2.6
+              ]
+            },
+            {
+              "type": "rocking-chair",
+              "at": [
+                42.9,
+                -2.6
+              ],
+              "color": "#b3402a"
+            }
+          ]
+        },
+        {
+          "no": "12",
+          "name": "Floor plants",
+          "bounds": {
+            "x": 43.7,
+            "z": -6,
+            "w": 14,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "bird-of-paradise",
+              "at": [
+                45.0,
+                -5.0
+              ]
+            },
+            {
+              "type": "rubber-plant",
+              "at": [
+                46.7,
+                -5.2
+              ]
+            },
+            {
+              "type": "zz-plant",
+              "at": [
+                48.1,
+                -5.2
+              ]
+            },
+            {
+              "type": "peace-lily",
+              "at": [
+                49.5,
+                -5.2
+              ]
+            },
+            {
+              "type": "indoor-palm",
+              "at": [
+                51.8,
+                -4.8
+              ]
+            },
+            {
+              "type": "ficus-tree",
+              "at": [
+                54.3,
+                -5.0
+              ]
+            },
+            {
+              "type": "olive-tree-pot",
+              "at": [
+                56.2,
+                -5.0
+              ]
+            },
+            {
+              "type": "snake-plant",
+              "at": [
+                44.7,
+                -2.4
+              ]
+            },
+            {
+              "type": "dracaena",
+              "at": [
+                46.4,
+                -2.4
+              ]
+            },
+            {
+              "type": "calathea",
+              "at": [
+                48.0,
+                -2.4
+              ]
+            },
+            {
+              "type": "ponytail-palm",
+              "at": [
+                49.8,
+                -2.4
+              ]
+            },
+            {
+              "type": "trough-planter",
+              "at": [
+                52.0,
+                -2.4
+              ],
+              "w": 1.0
+            },
+            {
+              "type": "bird-of-paradise",
+              "at": [
+                54.2,
+                -2.4
+              ],
+              "h": 1.3
+            },
+            {
+              "type": "zz-plant",
+              "at": [
+                55.6,
+                -2.4
+              ],
+              "h": 1.15
+            },
+            {
+              "type": "rubber-plant",
+              "at": [
+                56.6,
+                -2.6
+              ],
+              "h": 1.9
+            }
+          ]
+        },
+        {
+          "no": "13",
+          "name": "Plants and flowers on surfaces",
+          "bounds": {
+            "x": 20.7,
+            "z": 1,
+            "w": 14,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "console-table",
+              "at": [
+                22.0,
+                1.4
+              ]
+            },
+            {
+              "type": "herb-pots",
+              "at": [
+                22.0,
+                1.4
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "console-table",
+              "at": [
+                24.0,
+                1.4
+              ]
+            },
+            {
+              "type": "aloe-pot",
+              "at": [
+                23.7,
+                1.4
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "jade-plant",
+              "at": [
+                24.3,
+                1.4
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "console-table",
+              "at": [
+                26.2,
+                1.4
+              ]
+            },
+            {
+              "type": "fern",
+              "at": [
+                26.2,
+                1.4
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "console-table",
+              "at": [
+                28.4,
+                1.4
+              ]
+            },
+            {
+              "type": "orchid",
+              "at": [
+                28.2,
+                1.4
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "succulent-tray",
+              "at": [
+                28.7,
+                1.4
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "console-table",
+              "at": [
+                30.6,
+                1.4
+              ]
+            },
+            {
+              "type": "trailing-ivy",
+              "at": [
+                30.6,
+                1.5
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "console-table",
+              "at": [
+                32.8,
+                1.4
+              ]
+            },
+            {
+              "type": "pothos",
+              "at": [
+                32.8,
+                1.5
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "console-table",
+              "at": [
+                22.0,
+                3.2
+              ]
+            },
+            {
+              "type": "vase",
+              "at": [
+                21.6,
+                3.2
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "vase",
+              "at": [
+                22.2,
+                3.2
+              ],
+              "y": 0.8,
+              "h": 0.43
+            },
+            {
+              "type": "vase",
+              "at": [
+                22.7,
+                3.2
+              ],
+              "y": 0.8,
+              "color": "#b3402a"
+            },
+            {
+              "type": "console-table",
+              "at": [
+                24.4,
+                3.2
+              ]
+            },
+            {
+              "type": "flower-jug",
+              "at": [
+                24.0,
+                3.2
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "flower-jug",
+              "at": [
+                24.8,
+                3.2
+              ],
+              "y": 0.8,
+              "color": "#b3402a"
+            },
+            {
+              "type": "pampas-vase",
+              "at": [
+                27.0,
+                3.4
+              ]
+            },
+            {
+              "type": "pampas-vase",
+              "at": [
+                28.4,
+                3.4
+              ],
+              "h": 1.6
+            },
+            {
+              "type": "hanging-plant",
+              "at": [
+                30.5,
+                3.6
+              ]
+            },
+            {
+              "type": "hanging-plant",
+              "at": [
+                32.5,
+                3.6
+              ]
+            }
+          ]
+        },
+        {
+          "no": "14",
+          "name": "Window treatments",
+          "bounds": {
+            "x": 34.7,
+            "z": 1,
+            "w": 12,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "roman-blind",
+              "at": [
+                36.0,
+                1.02
+              ],
+              "w": 1.2,
+              "h": 2.1
+            },
+            {
+              "type": "roller-shade",
+              "at": [
+                38.0,
+                1.02
+              ],
+              "w": 1.2,
+              "h": 2.1
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                40.0,
+                1.02
+              ],
+              "w": 1.0,
+              "h": 1.3
+            },
+            {
+              "type": "shutters",
+              "at": [
+                42.0,
+                1.02
+              ],
+              "w": 1.2,
+              "h": 2.1
+            },
+            {
+              "type": "valance",
+              "at": [
+                44.3,
+                1.02
+              ],
+              "w": 1.6,
+              "h": 2.3
+            },
+            {
+              "type": "curtains",
+              "at": [
+                44.3,
+                1.02
+              ],
+              "w": 1.6,
+              "h": 2.3
+            },
+            {
+              "type": "roman-blind",
+              "at": [
+                36.0,
+                5.98
+              ],
+              "w": 1.2,
+              "h": 2.1,
+              "rot": 180
+            },
+            {
+              "type": "shutters",
+              "at": [
+                39.0,
+                5.98
+              ],
+              "w": 0.8,
+              "h": 1.8,
+              "rot": 180
+            }
+          ]
+        },
+        {
+          "no": "15",
+          "name": "Remaining plants",
+          "bounds": {
+            "x": 46.7,
+            "z": 1,
+            "w": 11,
+            "d": 5
+          },
+          "items": [
+            {
+              "type": "console-table",
+              "at": [
+                48.0,
+                1.4
+              ]
+            },
+            {
+              "type": "trailing-ivy",
+              "at": [
+                48.0,
+                1.5
+              ],
+              "y": 0.8
+            },
+            {
+              "type": "console-table",
+              "at": [
+                50.0,
+                1.4
+              ]
+            },
+            {
+              "type": "herb-pots",
+              "at": [
+                50.0,
+                1.4
+              ],
+              "y": 0.8,
+              "color": "#b3402a"
+            },
+            {
+              "type": "console-table",
+              "at": [
+                52.0,
+                1.4
+              ]
+            },
+            {
+              "type": "succulent-tray",
+              "at": [
+                52.0,
+                1.4
+              ],
+              "y": 0.8,
+              "color": "#b3402a"
+            },
+            {
+              "type": "indoor-palm",
+              "at": [
+                48.5,
+                4.4
+              ],
+              "h": 1.5
+            },
+            {
+              "type": "peace-lily",
+              "at": [
+                50.6,
+                4.5
+              ]
+            },
+            {
+              "type": "bird-of-paradise",
+              "at": [
+                52.8,
+                4.4
+              ]
+            },
+            {
+              "type": "dracaena",
+              "at": [
+                55.2,
+                4.5
+              ],
+              "h": 1.5
+            }
+          ]
         }
       ]
     }
@@ -836,7 +1687,7 @@
       "over": {
         "x": -20.7,
         "z": -6,
-        "w": 41.4,
+        "w": 78.4,
         "d": 12
       },
       "y": 2.8,
@@ -873,7 +1724,7 @@
     {
       "type": "tree",
       "at": [
-        23.7,
+        62.0,
         -8
       ],
       "h": 6.5
