@@ -255,13 +255,20 @@ export function softkit(THREE: any) {
   }
 
   // ---- a lathe-turned pot or vase: profile of [r, y, shade], `seg` radial segments (at least 16 in the eye line) --------------
-  function lathe(acc: any, prof: number[][], seg = 20, flute = 0, s = 1) {
+  // `bend(x, y, z) -> [x, y, z]` bends the turned shape afterwards (a slumped bean bag); `rib(phase, rowIndex)` is an extra shade multiplier round the
+  // turn (stitched seams, a pouf's gores). The first row is a pole (r ~ 0): its vertices weld, so the cap needs no fan.
+  function lathe(acc: any, prof: number[][], seg = 20, flute = 0, s = 1, bend: ((x: number, y: number, z: number) => number[]) | null = null, rib: ((ph: number, j: number) => number) | null = null) {
     const rows: number[][] = [];
-    for (const [r, y, sh = 1] of prof) {
+    prof.forEach(([r, y, sh = 1], j) => {
       const row: number[] = [];
-      for (let k = 0; k < seg; k++) { const ph = (k / seg) * Math.PI * 2, rr = r * (1 + flute * Math.cos(ph * 12)); row.push(acc.v(Math.cos(ph) * rr, y, Math.sin(ph) * rr, sh * s)); }
+      for (let k = 0; k < seg; k++) {
+        const ph = (k / seg) * Math.PI * 2, rr = r * (1 + flute * Math.cos(ph * 12));
+        let x = Math.cos(ph) * rr, z = Math.sin(ph) * rr, yy = y;
+        if (bend) { const m = bend(x, yy, z); x = m[0]; yy = m[1]; z = m[2]; }
+        row.push(acc.v(x, yy, z, clamp(sh * s * (rib ? rib(ph, j) : 1), 0.3, 1)));
+      }
       rows.push(row);
-    }
+    });
     for (let j = 0; j < rows.length - 1; j++) for (let k = 0; k < seg; k++) {
       const k1 = (k + 1) % seg;
       acc.tri(rows[j][k], rows[j + 1][k1], rows[j][k1]); acc.tri(rows[j][k], rows[j + 1][k], rows[j + 1][k1]);

@@ -16,7 +16,7 @@
 //     rim is the kit's metal). Variation is ctx.rng(), seeded per item.
 import { registerProps } from './registry.js';
 import { patternTexture, motifTexture, RUG_PATTERNS, ART_MOTIFS } from './patterns.js';
-import { hangCurtains } from './softkit.js';
+import { hangCurtains, softkit, softMat, put, splitRng, lin } from './softkit.js';
 
 const pick = (rng, arr) => arr[Math.floor(rng() * arr.length)];
 const jit = (rng, a) => (rng() - 0.5) * 2 * a;   // ±a
@@ -30,47 +30,52 @@ registerProps({
   // ---- textiles on the seating -----------------------------------------------------------------------------
   'throw-blanket': {
     footprint: [0.7, 0.55], height: 0.16, params: ['w', 'd', 'y', 'color'], tags: ['living', 'bedroom', 'kids'],
-    create(it, { THREE, std, box, group, colors, hex, mix, rng }) {
+    // softkit: the same fold (two layers sharing a rolled fold at −z, the open fringed end at +z, the top layer's end rolled over) in rounded,
+    // gently waved cloth — one mesh for the cloth and one for the fringe, where the box throw was five
+    create(it, ctx) {
+      const { THREE, std, group, colors, hex, mix, rng } = ctx, K = softkit(THREE);
       const w = it.w || 0.7, d = it.d || 0.5, g = group('Throw Blanket');
       const col = it.color ? hex(it.color) : colors.fabric2;
-      const fab = std(col, { roughness: 0.95 }), fringe = std(mix(col, 0xffffff, 0.45), { roughness: 1 });
-      // folded in half and in half again: two layers sharing one rounded fold at −z, the open (fringed) end at +z,
-      // the top layer's end rolled over — the rolls are what make a box stack read as cloth
       const t1 = 0.05, t2 = 0.045, R = (t1 + t2) / 2, z0 = -d / 2 + R;   // z0: the fold's axis; the flat layers run from there
-      const roll = (r, len, y, z) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 14), fab); m.rotation.z = Math.PI / 2; m.position.set(0, y, z); m.castShadow = true; m.receiveShadow = true; return m; };
-      g.add(box(w, t1, d / 2 - z0, fab, 0, t1 / 2, (z0 + d / 2) / 2));            // bottom layer, fold to fringe
-      const d2 = d * 0.62 - R;                                                       // top layer, fold to its rolled end
-      g.add(box(w * 0.97, t2, d2, fab, 0, t1 + t2 / 2, z0 + d2 / 2));
-      g.add(roll(R, w * 0.97, R, z0));                                               // the fold
-      g.add(roll(0.035, w * 0.94, t1 + t2 + 0.03, z0 + d2 - 0.02));                 // the rolled end, sunk 5 mm into the top layer
-      g.add(box(w * 0.98, 0.014, 0.05, fringe, 0, 0.007, d / 2 + 0.02));            // tassel fringe on the open end
       g.rotation.y = jit(rng, 0.08);
+      const r = splitRng(rng), ph = r() * 6.28, cloth = new K.Acc(), fringe = new K.Acc();
+      const L1 = d / 2 - z0, d2 = d * 0.62 - R;
+      const wave = (amp: number) => (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? [0, amp * Math.sin(x * 11 + ph) * Math.cos(z * 9 + ph), 0] : [0, 0, 0]);
+      K.shell(cloth, { cy: t1 / 2, cz: (z0 + d / 2) / 2, w, h: t1, d: L1, r: 0.018, faces: ['py', 'px', 'nx', 'pz'], kx: lin(w / 2, 8), kz: lin(L1 / 2, 4), wave: wave(0.004), shade: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? 1 - 0.07 * (0.5 + 0.5 * Math.sin(x * 11 + ph)) : 0.84) });
+      K.shell(cloth, { cy: t1 + t2 / 2, cz: z0 + d2 / 2, w: w * 0.97, h: t2, d: d2, r: 0.016, faces: ['py', 'px', 'nx', 'pz'], kx: lin(w * 0.485, 8), kz: lin(d2 / 2, 3), wave: wave(0.004), shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 1 - 0.05 * (0.5 + 0.5 * Math.sin(x * 13 + ph)) : 0.86) });
+      K.strut(cloth, [-w * 0.485, R, z0], [w * 0.485, R, z0], R, R, 12, 0.94, 0.94);                                                 // the fold
+      K.strut(cloth, [-w * 0.47, t1 + t2 + 0.03, z0 + d2 - 0.02], [w * 0.47, t1 + t2 + 0.03, z0 + d2 - 0.02], 0.035, 0.035, 12, 0.96, 0.96);   // the rolled end, sunk into the top layer
+      K.shell(fringe, { cy: 0.007, cz: d / 2 + 0.02, w: w * 0.98, h: 0.014, d: 0.05, r: 0.005, faces: ['py', 'px', 'nx', 'pz'], kx: lin(w * 0.49, 14), kz: [-0.025, 0.025], ky: [-0.007, 0.007], shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.82 + 0.18 * (Math.sin(x * 160) > 0 ? 1 : 0.8) : 0.85) });   // tassels
+      put(g, cloth, softMat(ctx, col, { roughness: 0.96 }), 'throw');
+      put(g, fringe, softMat(ctx, mix(col, 0xffffff, 0.45), { roughness: 1 }), 'fringe');
       return g;
     },
     iso: [{ shape: 'box', box: [-0.35, 0, -0.25, 0.35, 0.05, 0.27], color: 'role:fabric2' }, { shape: 'box', box: [-0.34, 0.05, -0.25, 0.34, 0.095, 0.06], color: 'role:fabric2' }, { shape: 'box', box: [-0.33, 0.09, 0.005, 0.33, 0.16, 0.075], color: 'role:fabric2' }],
   },
   'cushion-set': {
     footprint: [1.3, 0.25], height: 0.44, params: ['w', 'y', 'color'], tags: ['living', 'bedroom', 'kids'],
-    create(it, { std, box, group, colors, hex, rng }) {
+    // softkit: the same three cushions leaning back on the same pivots and the same rng draws (so the layout is the old one to the millimetre),
+    // each a puffed, rounded cushion with a dimple; one mesh per fabric colour (3) where the slabs were 6 meshes
+    create(it, ctx) {
+      const { THREE, std, group, colors, hex, rng } = ctx, K = softkit(THREE);
       const w = it.w || 1.3, g = group('Cushion Set');
-      const size = 0.42, t = 0.11, lean = 0.28, n = 3, step = (w - size) / (n - 1);
+      const size = 0.42, t = 0.11, lean = 0.28, n = 3, step = (w - size) / (n - 1), pad = 0.014, sink = 0.002;   // pad and sink: the rounded corners give back what the slab's sharp ones reached, and the pivot edge dips into the seat's give
       // three cushions leaning back, a seeded mix of the two fabrics and the accent; it.color pins the middle one
-      const mats = [colors.fabric, colors.accent, colors.fabric2].map(c => std(c, { roughness: 0.95 }));
+      const roles = [colors.fabric, colors.accent, colors.fabric2];
       const order = rng() < 0.5 ? [0, 1, 2] : [2, 1, 0];
-      const gap = t * Math.sin(lean), foot = t * Math.cos(lean);   // a leaning slab touches along its back edge; its front edge sits `gap` up
+      const accs = [new K.Acc(), new K.Acc(), new K.Acc()], mine = new K.Acc();
       for (let i = 0; i < n; i++) {
-        const mat = it.color && i === 1 ? std(hex(it.color), { roughness: 0.95 }) : mats[order[i]];
-        const c = group('Cushion'), s = group('Slab');
-        c.position.set(-w / 2 + size / 2 + i * step + jit(rng, 0.01), 0, 0);
-        c.rotation.y = jit(rng, 0.12);                        // yaw on the parent, so the contact edge stays on the floor
-        s.rotation.x = -lean + jit(rng, 0.04);                // pivot at the bottom-BACK edge (z = 0): tips back toward −z, nothing below y = 0
-        s.add(box(size, size, t, mat, 0, size / 2, t / 2));
-        // a piped band on the accent cushion
-        if (order[i] === 1 && !(it.color && i === 1)) s.add(box(size * 0.9, 0.05, 0.006, std(colors.linen, { roughness: 0.9 }), 0, size * 0.5, t + 0.003));
-        c.add(s);
-        c.add(box(size * 0.9, gap, foot * 0.8, mat, 0, gap / 2, foot * 0.4, false));   // the squashed bottom fills the wedge under the lean
-        g.add(c);
+        const cx = -w / 2 + size / 2 + i * step + jit(rng, 0.01), yaw = jit(rng, 0.12), tilt = -lean + jit(rng, 0.04);
+        // pivot at the bottom-BACK edge (z = 0): yaw on the parent so the contact edge stays on the floor, then the lean
+        const xf = new THREE.Matrix4().makeTranslation(cx, 0, 0).multiply(new THREE.Matrix4().makeRotationY(yaw)).multiply(new THREE.Matrix4().makeRotationX(tilt))
+          
+          .multiply(new THREE.Matrix4().makeTranslation(0, size / 2 - sink, t / 2)).multiply(new THREE.Matrix4().makeRotationX(Math.PI / 2));
+        const dim = (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? [0, -0.012 * Math.exp(-(x * x + z * z) / 0.004), 0] : [0, 0, 0]);
+        K.shell(it.color && i === 1 ? mine : accs[order[i]], { w: size + pad, h: t + 0.014, d: size + pad, r: 0.026, faces: ['py', 'ny', 'px', 'nx', 'nz'], kx: lin((size + pad) / 2, 6), kz: lin((size + pad) / 2, 6), puff: 0.025, wave: dim, xf,
+          shade: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? 1 - 0.1 * Math.exp(-(x * x + z * z) / 0.003) : 0.86) });
       }
+      accs.forEach((a, i) => put(g, a, softMat(ctx, roles[i], { roughness: 0.95 }), 'cushion'));
+      if (it.color) put(g, mine, softMat(ctx, hex(it.color), { roughness: 0.95 }), 'cushion');
       return g;
     },
     iso: [{ shape: 'box', box: [-0.65, 0, -0.13, -0.23, 0.42, 0.06], color: 'role:fabric' }, { shape: 'box', box: [-0.21, 0, -0.13, 0.21, 0.42, 0.06], color: 'role:accent' }, { shape: 'box', box: [0.23, 0, -0.13, 0.65, 0.42, 0.06], color: 'role:fabric2' }],

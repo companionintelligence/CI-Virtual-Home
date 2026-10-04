@@ -282,3 +282,33 @@ test('B source: the new types are dormant (no committed house uses them) and sit
   for (const [t, p] of Object.entries(PLACEMENT) as any) if (!NEW.includes(t)) for (const r of p.roles) assert.ok(!mine.has(r), `${t} fills the soft role ${r}`);
   for (const r of mine) assert.ok(String(r).startsWith('soft-'), `${r} is a soft- role`);
 });
+
+// ---- loose soft goods (T7) -----------------------------------------------------------------------------------------------------
+const LOOSE: Array<[string, number, number]> = [['cushion-set', 4, 900], ['throw-blanket', 3, 600], ['floor-cushion', 2, 500], ['pouf', 2, 400], ['ottoman', 3, 700], ['bean-bag', 2, 500], ['beanbag', 2, 500], ['cushioned-bench', 3, 600]];
+test('C caps: the loose soft goods stay under their mesh and triangle caps (fewer meshes than the boxes they replace), opaque, no map, finite, no part under 6 mm', () => {
+  for (const [t, maxMeshes, maxTris] of LOOSE) for (const sd of SEEDS) {
+    const o = build(t, {}, sd), ms = meshesOf(o);
+    assert.ok(ms.length <= maxMeshes, `${t}/${sd}: ${ms.length} meshes`);
+    assert.ok(sum(ms.map(trisOf)) <= maxTris, `${t}/${sd}: ${sum(ms.map(trisOf))} triangles`);
+    for (const m of ms) { assert.ok(!m.material.map && !m.material.transparent && m.material.vertexColors, `${t}: material`); assert.ok(finiteGeom(m.geometry)); m.geometry.computeBoundingBox(); const s = m.geometry.boundingBox.getSize(new THREE.Vector3()); assert.ok(Math.min(s.x, s.y, s.z) >= 0.006, `${t}: part under 6 mm`); }
+    assert.equal(hashGeom(o), hashGeom(build(t, {}, sd)), `${t}/${sd}: unstable`);
+  }
+  assert.ok(new Set(SEEDS.map(sd => hashGeom(build('cushion-set', {}, sd)))).size > 3, 'cushion sets differ by seed');
+});
+test('F theming: loose goods are house roles, and a spec colour paints the signature surface only', () => {
+  for (const [t] of LOOSE) for (const sd of SEEDS.slice(0, 4)) {
+    const o = build(t, {}, sd); kit.theme(o);
+    for (const m of meshesOf(o)) { const rc = roleOf(m.material.color.getHex());   /* wood and the lightened fringe are restrained by the kit, not role-mapped */
+       if (['fringe', 'feet', 'frame'].includes(m.userData.role)) continue; assert.ok(rc, `${t}/${sd}: ${m.userData.role} is not a house role colour (${m.material.color.getHexString()})`); }
+  }
+  const C = 0xb3402a;
+  for (const t of ['pouf', 'bean-bag', 'beanbag', 'floor-cushion', 'cushioned-bench', 'ottoman', 'throw-blanket']) {
+    const o = build(t, { color: '#b3402a' }); assert.ok(meshesOf(o).some(m => m.material.color.getHex() === C), `${t}: the spec colour paints a surface`);
+  }
+  const o = build('ottoman', { color: '#b3402a' }); assert.equal(roleMeshes(o, 'feet')[0].material.color.getHex(), kit.colors.wood, 'ottoman feet stay wood');
+  const cs = build('cushion-set', { color: '#b3402a' }); assert.equal(meshesOf(cs).filter(m => m.material.color.getHex() === C).length, 1, 'only the middle cushion takes the spec colour');
+});
+test('E determinism: loose goods keep the draws they always made (cushion-set 10, throw 2, floor-cushion 3, ottoman 0, bench 0)', () => {
+  const draws = (t: string) => { const n = { n: 0 }; build(t, {}, 'a', n); return n.n; };
+  assert.equal(draws('cushion-set'), 10); assert.equal(draws('throw-blanket'), 2); assert.equal(draws('floor-cushion'), 2); assert.equal(draws('ottoman'), 0); assert.equal(draws('cushioned-bench'), 0);
+});

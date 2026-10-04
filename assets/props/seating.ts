@@ -3,6 +3,7 @@
 // rot 0, big surfaces take a role colour from ctx.colors (or it.color), only trims and buttons use literals, and
 // any variation comes from ctx.rng so frames stay deterministic.
 import { registerProps } from './registry.js';
+import { softkit, softMat, put, lin, smooth } from './softkit.js';
 
 // a cushion is the shell's colour lifted a little; legs are the kit's wood unless the fabric is already wood-like
 const lift = (mix, c, t = 0.12) => mix(c, 0xffffff, t);
@@ -114,19 +115,19 @@ registerProps({
   // Ottoman — a rectangular upholstered block with a buttoned top on stubby wooden feet.
   'ottoman': {
     footprint: [0.7, 0.5], height: 0.42, params: ['w', 'd', 'color'], tags: ['living', 'bedroom'],
-    create(it, { THREE, std, box, group, colors, hex, mix }) {
-      const w = it.w || 0.7, d = it.d || 0.5, g = group('Ottoman');
-      const base = upholstery(it, colors, hex);
-      const shell = std(base, { roughness: 0.85 }), top = std(lift(mix, base, 0.08), { roughness: 0.9 });
-      const legMat = std(colors.wood, { roughness: 0.5 }), buttonMat = std(drop(mix, base, 0.35), { roughness: 0.6 });
-      g.add(box(w, 0.26, d, shell, 0, 0.1 + 0.13, 0));                                             // body
-      g.add(box(w - 0.04, 0.06, d - 0.04, top, 0, 0.36 + 0.03, 0));                                // top cushion
-      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.028, 0.1, 8), legMat);
-        leg.position.set(sx * (w / 2 - 0.07), 0.05, sz * (d / 2 - 0.07)); leg.castShadow = true; g.add(leg);
-        const button = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.008, 8), buttonMat);
-        button.position.set(sx * w * 0.2, 0.424, sz * d * 0.2); g.add(button);                    // tufting buttons
-      }
+    // softkit: a rounded body and a puffed, buttoned top in ONE upholstery mesh, the four feet one timber mesh: 2 meshes where there were 10
+    create(it, ctx) {
+      const { THREE, std, group, colors, hex } = ctx, K = softkit(THREE);
+      const w = it.w || 0.7, d = it.d || 0.5, g = group('Ottoman'), base = upholstery(it, colors, hex);
+      const fab = new K.Acc(), feet = new K.Acc(), tw = w - 0.04, td = d - 0.04;
+      K.shell(fab, { cy: 0.23, w, h: 0.26, d, r: 0.04, faces: ['px', 'nx', 'pz', 'nz', 'py'], kx: lin(w / 2, 4), kz: lin(d / 2, 3), shade: (_x: number, y: number, _z: number, nx: number, _ny: number, nz: number) => 0.9 - 0.06 * (1 - smooth(-0.13, 0.13, y)) + 0.02 * (Math.abs(nx) + Math.abs(nz) > 0.5 ? 0 : 1) });
+      const buttons = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sz]) => [sx * w * 0.2, sz * d * 0.2]);
+      K.shell(fab, { cy: 0.36, w: tw, h: 0.06, d: td, r: 0.025, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(tw / 2, 8), kz: lin(td / 2, 6), puff: 0.035,
+        wave: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? [0, -0.012 * buttons.reduce((a, [bx, bz]) => a + Math.exp(-((x - bx) ** 2 + (z - bz) ** 2) / 0.0006), 0), 0] : [0, 0, 0]),
+        shade: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? 1 - 0.14 * buttons.reduce((a, [bx, bz]) => a + Math.exp(-((x - bx) ** 2 + (z - bz) ** 2) / 0.0006), 0) : 0.9) });   // the tufting buttons are dimples
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) K.strut(feet, [sx * (w / 2 - 0.07), 0, sz * (d / 2 - 0.07)], [sx * (w / 2 - 0.07), 0.1, sz * (d / 2 - 0.07)], 0.028, 0.02, 8);
+      put(g, fab, softMat(ctx, base, { roughness: 0.9 }), 'upholstery');
+      put(g, feet, softMat(ctx, colors.wood, { roughness: 0.5 }), 'feet');
       return g;
     },
     iso: [{ shape: 'box', box: [-0.35, 0.1, -0.25, 0.35, 0.42, 0.25], color: 'role:fabric' }],
@@ -136,14 +137,14 @@ registerProps({
   // Pouf — a round knitted floor seat: a lathe with a flat bottom and a domed top, flat shaded, seeded fabric pick.
   'pouf': {
     footprint: [0.55, 0.55], height: 0.38, params: ['color'], tags: ['living', 'bedroom', 'kids'],
-    create(it, { THREE, std, group, colors, hex, mix, rng }) {
+    // softkit: a turned, knitted-looking floor seat — smooth, gored by neutral shade, a dimpled top — in ONE mesh (the button is part of it): 1 mesh where there were 2
+    create(it, ctx) {
+      const { THREE, group, colors, hex, rng } = ctx, K = softkit(THREE);
       const g = group('Pouf');
       const base = it.color ? hex(it.color) : (rng() < 0.4 ? colors.accent : rng() < 0.5 ? colors.fabric2 : colors.fabric);
-      const profile = [[0, 0], [0.2, 0], [0.26, 0.05], [0.275, 0.17], [0.26, 0.29], [0.19, 0.355], [0, 0.38]].map(([x, y]) => new THREE.Vector2(x, y));
-      const body = new THREE.Mesh(new THREE.LatheGeometry(profile, 14), std(base, { roughness: 0.95, flatShading: true }));
-      body.castShadow = true; body.receiveShadow = true; g.add(body);
-      const button = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.012, 10), std(lift(mix, base, 0.25), { roughness: 0.9 }));
-      button.position.y = 0.376; g.add(button);
+      const acc = new K.Acc();
+      K.lathe(acc, [[0.001, 0, 0.84], [0.2, 0, 0.84], [0.26, 0.05, 0.94], [0.275, 0.17, 1], [0.26, 0.29, 1], [0.19, 0.355, 1], [0.1, 0.377, 1], [0.035, 0.381, 0.94], [0.001, 0.366, 0.78]], 18, 0, 1, null, (ph: number) => 0.9 + 0.1 * Math.abs(Math.cos(ph * 3)));
+      put(g, acc, softMat(ctx, base, { roughness: 0.95 }), 'pouf');
       return g;
     },
     iso: [{ shape: 'blob', box: [-0.275, 0, -0.275, 0.275, 0.38, 0.275], color: 'role:fabric' }],
@@ -242,12 +243,18 @@ registerProps({
   // Cushioned bench — a wooden frame and four legs under a full-width fabric cushion; end-of-bed or hallway.
   'cushioned-bench': {
     footprint: [1.2, 0.4], height: 0.48, params: ['w', 'd', 'color'], tags: ['bedroom', 'hall', 'dining'],
-    create(it, { std, box, group, colors, hex }) {
-      const w = it.w || 1.2, d = it.d || 0.4, g = group('Cushioned Bench');
-      const wood = std(colors.wood, { roughness: 0.55 });
-      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) g.add(box(0.04, 0.4, 0.04, wood, sx * (w / 2 - 0.06), 0.2, sz * (d / 2 - 0.06)));   // legs
-      g.add(box(w, 0.06, d, wood, 0, 0.37, 0));                                                     // frame
-      g.add(box(w - 0.02, 0.08, d - 0.02, std(it.color ? hex(it.color) : colors.fabric, { roughness: 0.9 }), 0, 0.44, 0));   // cushion
+    // softkit: legs and frame are one timber mesh, the cushion one puffed, channelled mesh: 2 meshes where there were 6
+    create(it, ctx) {
+      const { THREE, group, colors, hex } = ctx, K = softkit(THREE);
+      const w = it.w || 1.2, d = it.d || 0.4, g = group('Cushioned Bench'), wood = new K.Acc(), fab = new K.Acc();
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) K.slab(wood, sx * (w / 2 - 0.06), 0.2, sz * (d / 2 - 0.06), 0.04, 0.4, 0.04);   // legs
+      K.slab(wood, 0, 0.37, 0, w, 0.06, d);                                                                                                       // frame
+      const cw = w - 0.02, cd = d - 0.02, ch = Math.max(2, Math.round(cw / 0.3));
+      K.shell(fab, { cy: 0.435, w: cw, h: 0.07, d: cd, r: 0.02, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(cw / 2, ch * 4), kz: lin(cd / 2, 3), puff: 0.01,
+        wave: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? [0, 0.004 * Math.cos((x / cw) * Math.PI * 2 * ch), 0] : [0, 0, 0]),
+        shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.94 + 0.06 * (0.5 + 0.5 * Math.cos((x / cw) * Math.PI * 2 * ch)) : 0.88) });   // channels
+      put(g, wood, softMat(ctx, colors.wood, { roughness: 0.55 }), 'frame');
+      put(g, fab, softMat(ctx, it.color ? hex(it.color) : colors.fabric, { roughness: 0.9 }), 'cushion');
       return g;
     },
     iso: [
@@ -292,13 +299,15 @@ registerProps({
   // face meets the sitter at +z; the shear is baked into the geometry so the measurement stays exact.
   'bean-bag': {
     footprint: [0.8, 0.8], height: 0.58, params: ['color'], tags: ['kids', 'living'],
-    create(it, { THREE, std, group, colors, hex, rng }) {
+    // softkit: the same slumped turn — the peak back at −z, the low face meeting the sitter at +z, the shear baked into the vertices — smooth and creased by shade
+    create(it, ctx) {
+      const { THREE, group, colors, hex, rng } = ctx, K = softkit(THREE);
       const g = group('Bean Bag');
       const base = it.color ? hex(it.color) : (rng() < 0.5 ? colors.accent : colors.fabric2);
-      const profile = [[0, 0], [0.34, 0], [0.41, 0.1], [0.4, 0.24], [0.32, 0.4], [0.2, 0.5], [0.09, 0.56], [0, 0.58]].map(([x, y]) => new THREE.Vector2(x, y));
-      const geo = new THREE.LatheGeometry(profile, 12).applyMatrix4(new THREE.Matrix4().set(1, 0, 0, 0, 0, 1, 0, 0, 0, -0.3, 1, 0.06, 0, 0, 0, 1));   // z -= 0.3·y, slid so the base stays centred
-      const body = new THREE.Mesh(geo, std(base, { roughness: 0.95, flatShading: true }));
-      body.scale.z = 0.94; body.castShadow = true; body.receiveShadow = true; g.add(body);
+      const acc = new K.Acc();
+      K.lathe(acc, [[0.001, 0, 0.8], [0.34, 0, 0.84], [0.395, 0.05, 0.92], [0.41, 0.1, 1], [0.405, 0.17, 1], [0.4, 0.24, 1], [0.37, 0.32, 1], [0.32, 0.4, 1], [0.26, 0.46, 1], [0.2, 0.5, 1], [0.09, 0.56, 0.96], [0.001, 0.58, 0.9]], 16, 0, 1,
+        (x: number, y: number, z: number) => [x, y, (z - 0.3 * y + 0.06) * 0.94], (ph: number) => 0.92 + 0.08 * Math.cos(ph * 5 + 0.6));
+      put(g, acc, softMat(ctx, base, { roughness: 0.95 }), 'beanbag');
       return g;
     },
     iso: [{ shape: 'blob', box: [-0.4, 0, -0.4, 0.4, 0.58, 0.4], color: 'role:accent' }],
