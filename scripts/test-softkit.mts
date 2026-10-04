@@ -308,3 +308,33 @@ test('E determinism: loose goods keep the draws they always made (cushion-set 10
   const draws = (t: string) => { const n = { n: 0 }; build(t, {}, 'a', n); return n.n; };
   assert.equal(draws('cushion-set'), 10); assert.equal(draws('throw-blanket'), 2); assert.equal(draws('floor-cushion'), 2); assert.equal(draws('ottoman'), 0); assert.equal(draws('cushioned-bench'), 0);
 });
+
+// ---- sofas and sectionals (T4, softseat.ts) -------------------------------------------------------------------------------------
+const SOFAS: Array<[string, number, number, number]> = [['sofa', 5, 1500, 3], ['slipcover-sofa', 5, 1500, 3], ['mid-century-sofa', 5, 1500, 2], ['tuxedo-sofa', 5, 1500, 3], ['loveseat', 5, 1500, 3]];
+const SECTIONALS: Array<[string, number, number, number]> = [['l-sectional', 5, 1800, 2], ['u-sectional', 5, 1800, 2], ['modular-sectional', 5, 1800, 2]];
+test('C caps: a sofa or loveseat is at most 5 meshes and 1,500 triangles (a sectional 5 and 1,800), opaque, no map, finite, no part under 6 mm, stable per seed', () => {
+  for (const [t, maxM, maxT] of [...SOFAS, ...SECTIONALS]) for (const sd of SEEDS) {
+    const o = build(t, {}, sd), ms = meshesOf(o);
+    assert.ok(ms.length <= maxM, `${t}/${sd}: ${ms.length} meshes`);
+    assert.ok(sum(ms.map(trisOf)) <= maxT, `${t}/${sd}: ${sum(ms.map(trisOf))} triangles`);
+    for (const m of ms) { assert.ok(!m.material.map && !m.material.transparent && m.material.vertexColors, `${t}: material`); assert.ok(finiteGeom(m.geometry)); m.geometry.computeBoundingBox(); const s = m.geometry.boundingBox.getSize(new THREE.Vector3()); assert.ok(Math.min(s.x, s.y, s.z) >= 0.006, `${t}: part under 6 mm`); }
+    assert.equal(hashGeom(o), hashGeom(build(t, {}, sd)), `${t}/${sd}: unstable`);
+  }
+  for (const [t] of [...SOFAS, ...SECTIONALS]) if (t !== 'mid-century-sofa') assert.ok(new Set(SEEDS.map(sd => hashGeom(build(t, {}, sd)))).size > 3, `${t}: the seeds build different pieces`);   // (the mid-century's bolsters are the same every time: only their colour is the seed's)
+});
+test('F theming: the upholstery is the house fabric (or the spec colour), the cushions its lift, the pillow an accent or fabric2, the legs wood or metal; the draw counts are the old ones', () => {
+  for (const [t, , , draws] of [...SOFAS, ...SECTIONALS]) for (const sd of SEEDS.slice(0, 4)) {
+    const o = build(t, {}, sd); kit.theme(o);
+    assert.equal(roleMeshes(o, 'upholstery')[0].material.color.getHex(), kit.colors.fabric, `${t}: upholstery is the house fabric`);
+    assert.ok(['accent', 'fabric2'].includes(roleOf(roleMeshes(o, 'pillow')[0].material.color.getHex()) as string), `${t}: pillow colour`);
+    const n = { n: 0 }; build(t, {}, sd, n); assert.equal(n.n, draws, `${t}: ${n.n} draws`);
+  }
+  for (const [t] of [...SOFAS, ...SECTIONALS]) { const o = build(t, { color: '#b3402a' }); assert.equal(roleMeshes(o, 'upholstery')[0].material.color.getHex(), 0xb3402a, `${t}: a spec colour paints the upholstery`); }
+});
+test('B source: a sofa keeps every option — the arm, the legs, the seat count and the width — under different params', () => {
+  const kinds = (t: string, it: any = {}) => new Set(meshesOf(build(t, it)).map(m => m.userData.role));
+  for (const t of ['sofa', 'slipcover-sofa', 'mid-century-sofa', 'tuxedo-sofa', 'loveseat']) for (const k of ['upholstery', 'cushion', 'pillow']) assert.ok(kinds(t).has(k), `${t}: no ${k} mesh`);
+  const wide = new THREE.Box3().setFromObject(build('loveseat', { w: 2.4 })), narrow = new THREE.Box3().setFromObject(build('loveseat', { w: 1.2 }));
+  assert.ok(wide.max.x - wide.min.x > narrow.max.x - narrow.min.x + 1.0, 'w resizes a loveseat');
+  assert.ok(roleMeshes(build('mid-century-sofa'), 'pillow').length === 1 && roleMeshes(build('sofa'), 'pillow').length === 1);
+});
