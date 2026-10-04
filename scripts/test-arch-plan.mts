@@ -111,8 +111,11 @@ check(near(area(cut), 96) && cut.every(r => !(r.x < 5 && r.x + r.w > 3 && r.z < 
   check(warns(s => { s.levels[1].rooms[2].walls = { kind: 'wainscot', feature: { side: 'E', kind: 'brick' } }; }).some(w => /room-feature/.test(w)), 'a walls.feature on a side with no wall to line is a warning');
   check(warns(s => { s.levels[0].rooms[0].floorOffset = -0.3; }).some(w => /not built sunken/.test(w)), 'a sunken room on the ground floor says it stays flat');
   check(warns(s => { s.roofs.pop(); s.levels.pop(); s.features.pop(); s.features.pop(); s.roofs[0].clip = undefined; }).every(w => !/roof-open-sky/.test(w)), 'a roof clipped round nothing says nothing');
-  const epi = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'houses', 'epiphany.json'), 'utf8')); epi.defaults = 2;
-  check((validate(epi, 'epiphany.json').warnings as string[]).some(w => /roof-open-sky/.test(w)), 'epiphany under defaults 2: the clipped roof leaves l2 with no roof (a warning)');
+  // the inverse, same fixture: drop only the roof that used to cover the clipped storey (l3 still rises through
+  // roofs[0]'s clip) so that storey is left with no roof of its own. (Was epiphany.json forced to defaults 2, a real
+  // content house happening to exhibit this — but layout pass 4/5 re-laid its roof as part of the fleet-wide fix and
+  // it no longer does; a fixture mutation that builds the condition on purpose doesn't drift with the fleet.)
+  check(warns(s => { s.roofs.pop(); }).some(w => /roof-open-sky/.test(w)), 'a roof clipped round a storey that lost its own roof is a warning');
 }
 
 console.log(bad ? `\n${bad} check(s) failed` : '\nall checks passed');

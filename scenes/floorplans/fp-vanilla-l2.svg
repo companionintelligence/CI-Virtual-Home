@@ -82,6 +82,8 @@
 <rect x="433.44" y="333.1" width="244.37" height="244.37" fill="url(#woodParquet)"/>
 <rect x="677.81" y="162.04" width="244.37" height="333.98" fill="url(#woodParquet)"/>
 </g>
+<defs><pattern id="carpetPlan" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#0c2231"/><circle cx="2" cy="2" r="0.7" fill="rgba(114, 221, 212, 0.26)"/><circle cx="6" cy="6" r="0.7" fill="rgba(114, 221, 212, 0.26)"/></pattern><pattern id="herringbonePlan" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#0d2433"/><path d="M0 10 L20 0 L40 10 M0 20 L20 10 L40 20 M0 30 L20 20 L40 30 M0 40 L20 30 L40 40" fill="none" stroke="rgba(114, 221, 212, 0.2)" stroke-width="0.9"/></pattern><pattern id="hexTilePlan" width="24" height="41.57" patternUnits="userSpaceOnUse"><rect width="24" height="41.57" fill="#0a1e2c"/><path d="M12 0 L24 6.93 L24 20.78 L12 27.71 L0 20.78 L0 6.93 Z M12 27.71 L12 41.57 M0 20.78 L-12 27.71 M24 20.78 L36 27.71" fill="none" stroke="rgba(255, 255, 255, 0.11)" stroke-width="0.8"/></pattern></defs>
+<g class="room-floors"><rect class="room-floor room-floor-stone" x="677.81" y="162.04" width="244.37" height="69.24" fill="url(#stoneTile)"/><rect class="room-floor room-floor-herringbone" x="677.81" y="231.28" width="48.87" height="264.74" fill="url(#herringbonePlan)"/><rect class="room-floor room-floor-oak" x="433.44" y="333.1" width="244.37" height="244.37" fill="url(#woodParquet)"/><rect class="room-floor room-floor-hex-tile" x="726.69" y="231.28" width="142.55" height="142.55" fill="url(#hexTilePlan)"/><rect class="room-floor room-floor-carpet" x="726.69" y="373.83" width="195.5" height="122.19" fill="url(#carpetPlan)"/></g>
 <g class="void"><rect x="872.5" y="233.32" width="48.06" height="140.52" fill="#040f1a"/><rect x="872.5" y="233.32" width="48.06" height="140.52" fill="url(#wallHatch)" stroke="#c89d55" stroke-dasharray="4,4" stroke-width="1.5"/></g>
 <g class="rooms">
 <rect x="677.81" y="162.04" width="244.37" height="69.24" fill="none" stroke="#72ddd4" stroke-width="0.6" stroke-dasharray="2,4" opacity="0.35"/>
@@ -91,110 +93,108 @@
 <rect x="726.69" y="373.83" width="195.5" height="122.19" fill="none" stroke="#72ddd4" stroke-width="0.6" stroke-dasharray="2,4" opacity="0.35"/>
 </g>
 <g class="furniture">
-<g class="item item-runner-rug">
-<rect class="item" x="702.25" y="180.37" width="146.62" height="32.58" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-cushioned-bench">
-<rect class="item" x="726.69" y="161.23" width="48.87" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-wall-art">
-<rect class="item" x="779.64" y="215.8" width="40.73" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-snake-plant">
-<rect class="item" x="681.89" y="164.08" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-runner-rug">
-<rect class="item" x="685.96" y="267.94" width="32.58" height="187.35" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-wall-art">
-<rect class="item" x="711.21" y="451.22" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-headboard-bed">
-<rect class="item" x="518.97" y="366.5" width="73.31" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-nightstand">
-<rect class="item" x="490.46" y="333.1" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-nightstand">
-<rect class="item" x="596.35" y="333.1" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-sofa-table">
+<rect class="item" x="676.79" y="190.55" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-table-lamp">
-<rect class="item" x="490.46" y="333.1" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<rect class="item" x="676.79" y="190.55" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-table-lamp">
-<rect class="item" x="596.35" y="333.1" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-throw-blanket">
-<rect class="item" x="523.04" y="394.2" width="65.17" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-wall-art">
-<rect class="item" x="531.19" y="324.14" width="48.87" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-dresser">
-<rect class="item" x="652.15" y="485.84" width="24.44" height="52.95" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-wingback-armchair">
-<polygon class="item" points="452.81,540.82 470.09,523.54 487.37,540.82 470.09,558.1" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-sculpture">
+<rect class="item" x="676.79" y="202.77" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-pampas-vase">
-<rect class="item" x="641.16" y="546.93" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<rect class="item" x="843.54" y="208.84" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-ceiling-light">
-<rect class="item" x="506.75" y="443.07" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-platform-bed">
+<rect class="item" x="513.67" y="336.97" width="89.6" height="93.68" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<rect class="item" x="519.05" y="341.05" width="34.05" height="16.29" rx="2" fill="#1b4661" stroke="#72ddd4" stroke-width="0.8"/>
+<rect class="item" x="563.85" y="341.05" width="34.05" height="16.29" rx="2" fill="#1b4661" stroke="#72ddd4" stroke-width="0.8"/>
+<text x="558.48" y="386.81" fill="#a4c2db" font-family="'Space Grotesk', monospace" font-size="7.5" font-weight="700" text-anchor="middle">BED</text>
 </g>
-<g class="item item-ceiling-light">
-<rect class="item" x="580.06" y="443.07" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-side-table">
+<rect class="item" x="469.69" y="335.75" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-bathtub">
-<rect class="item" x="761.31" y="238.61" width="69.24" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-tripod-table-lamp">
+<rect class="item" x="469.81" y="334.53" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-vanity-sink">
-<rect class="item" x="843.99" y="290.34" width="24.44" height="44.8" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-toilet">
-<rect class="item" x="800" y="345.73" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-heated-towel-rail">
-<rect class="item" x="717.73" y="320.89" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-bath-mat">
-<rect class="item" x="783.71" y="269.97" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-fern">
-<rect class="item" x="843.99" y="329.03" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-single-bed">
-<rect class="item" x="875.35" y="405.19" width="40.73" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
-</g>
-<g class="item item-nightstand">
-<rect class="item" x="850.91" y="375.87" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-side-table">
+<rect class="item" x="622.83" y="335.75" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-table-lamp">
-<rect class="item" x="850.91" y="375.87" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<rect class="item" x="622.83" y="334.53" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-writing-desk">
-<rect class="item" x="763.34" y="468.32" width="48.87" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-framed-print">
+<rect class="item" x="534.04" y="324.27" width="48.87" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-dining-chair">
-<rect class="item" x="775.56" y="445.11" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-area-rug">
+<rect class="item" x="469.28" y="372.57" width="178.39" height="78.44" rx="3" fill="rgba(27, 61, 82, 0.35)" stroke="#ffb900" stroke-width="1.0"/>
+<text x="558.48" y="414.79" fill="#a4c2db" font-family="'Space Grotesk', monospace" font-size="7.5" font-weight="700" text-anchor="middle">RUG</text>
+</g>
+<g class="item item-cushioned-bench">
+<rect class="item" x="529.97" y="428.61" width="57.02" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-lowboy-dresser">
+<rect class="item" x="485.57" y="552.02" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-table-lamp">
+<rect class="item" x="485.57" y="551.37" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-book-stack">
+<rect class="item" x="497.59" y="551.37" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-armoire">
+<rect class="item" x="649.51" y="515.57" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-vanity-sink">
+<rect class="item" x="776.38" y="347.97" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-toilet">
+<rect class="item" x="733.41" y="236.98" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-bathtub">
+<rect class="item" x="837.27" y="256.53" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-heated-towel-rail">
+<rect class="item" x="796.74" y="222.04" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-bath-rug">
+<rect class="item" x="803.87" y="256.53" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-zz-plant">
+<rect class="item" x="838.24" y="343.73" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-laundry-hamper">
+<rect class="item" x="733.9" y="349.6" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-house-bed">
+<rect class="item" x="815.35" y="405.81" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-drum-table">
+<rect class="item" x="783.71" y="375.26" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-desk-lamp">
-<rect class="item" x="791.85" y="471.58" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<rect class="item" x="783.71" y="372.41" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-low-bookshelf">
-<rect class="item" x="721.8" y="449.18" width="24.44" height="36.66" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-framed-print">
+<rect class="item" x="816.21" y="364.59" width="22.73" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-beanbag">
-<rect class="item" x="812.22" y="394.2" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-play-rug">
+<rect class="item" x="790.63" y="408.25" width="73.88" height="70.87" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-wall-art">
-<rect class="item" x="806.11" y="364.87" width="36.66" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-cube-storage">
+<rect class="item" x="725.87" y="445.31" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-ceiling-light">
-<rect class="item" x="782.89" y="422.71" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-kids-desk">
+<rect class="item" x="888.59" y="419.45" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-ceiling-light">
-<rect class="item" x="841.54" y="422.71" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-desk-lamp">
+<rect class="item" x="894.21" y="429.63" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-rocking-horse">
+<rect class="item" x="888.55" y="379.33" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+</g>
+<g class="item item-bean-bag">
+<rect class="item" x="880.64" y="464.17" width="24.44" height="24.44" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 </g>
 <g class="stairs stairs-timber stairs-dn" opacity="0.7">

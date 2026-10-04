@@ -632,12 +632,20 @@ export class FloorplanGraph {
     }
     segs.forEach((s, i) => {
       const p = s.partition;
-      if (!p || p.door === null || p.door === undefined) return;
+      if (!p) return;
       const ax = Math.abs(s.b[0] - s.a[0]) > Math.abs(s.b[1] - s.a[1]) ? 0 : 1;
       const dir = Math.sign(s.b[ax] - s.a[ax]) || 1;
-      const centre = s.a[ax] + dir * p.door;
-      const dw = p.doorW || 0.9, dh = Math.min(DEFAULT_DOOR_HEIGHT, (p.height || partitionHeight) - 0.15);
-      addSpanOpening(segWalls[i], ax === 0 ? 'x' : 'z', centre - dw / 2, centre + dw / 2, { kind: 'door', w: dw, h: dh, sill: 0, style: 'cased' });
+      // a single door (`door` / `doorW`), and/or more than one doorway (`doors[]`, HOUSE-SPEC: "door / doorW still
+      // work" alongside it) — both are real openings a room's connectivity (and the entry-to-Core walk) must see.
+      const doors = [
+        ...(p.door !== null && p.door !== undefined ? [{ at: p.door, w: p.doorW, h: undefined }] : []),
+        ...(Array.isArray(p.doors) ? p.doors.map((d: any) => ({ at: d.at, w: d.w, h: d.h })) : []),
+      ];
+      for (const d of doors) {
+        const centre = s.a[ax] + dir * d.at;
+        const dw = d.w || 0.9, dh = Math.min(DEFAULT_DOOR_HEIGHT, (d.h || p.height || partitionHeight) - 0.15);
+        addSpanOpening(segWalls[i], ax === 0 ? 'x' : 'z', centre - dw / 2, centre + dw / 2, { kind: 'door', w: dw, h: dh, sill: 0, style: 'cased' });
+      }
     });
 
     g.update();
