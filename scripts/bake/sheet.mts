@@ -52,7 +52,7 @@ async function render(mode: string, types: string[], params: Record<string, any>
 }
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'vh-sheet-'));
-const tiles: Array<{ file: string; label: string }> = [];
+const tiles: Array<{ file: string; label: string; eid?: string }> = [];
 const types = entries.map((e: any) => e.prop_type);
 if (opt('stretch')) {
   // the nine-slice at 0.75x, 1x and 1.35x of each declared size (the catalog's probe points), and just outside the range
@@ -68,16 +68,17 @@ if (opt('stretch')) {
   }
   entries.length = 0;
 }
-const modes = flag('compare') || opt('compare') ? ['0', 'all'] : [opt('baked', 'all')!];
+const modes = flag('compare') || opt('compare') ? ['0', 'all'] : flag('procedural') ? [opt('baked', 'all')!, '0'] : [opt('baked', 'all')!];   // --procedural: the ?baked=0 tile after the baked one, for the types that have a procedural builder
 for (const mode of modes) {
   const shots = await render(mode, types);
   for (const e of entries) {
+    if (mode === '0' && e.action === 'add' && flag('procedural')) continue;   // a new type has no procedural prop to show
     const s = shots[e.prop_type];
     if (!s || s.error) { console.log(`x ${e.id} (?baked=${mode}): ${s ? s.error : 'no render'}`); continue; }
     const f = path.join(tmp, `${e.id}-${mode}.jpg`); fs.writeFileSync(f, Buffer.from(s.jpg, 'base64'));
     console.log(`${e.id} ?baked=${mode}: ${s.size[0]} x ${s.size[2]} m, ${s.size[1]} m tall`);
-    if (flag('sources')) { const src = sourceRender(e); if (src) tiles.push({ file: src, label: `${e.id} source` }); }
-    tiles.push({ file: f, label: `${e.id} ${mode === '0' ? 'procedural' : 'baked'}` });
+    if (flag('sources') && mode === modes[0]) { const src = sourceRender(e); if (src) tiles.push({ eid: e.id, file: src, label: `${e.id}: source (Blender, textures as shipped)` }); }
+    tiles.push({ eid: e.id, file: f, label: `${e.id}: ${mode === '0' ? 'the repo procedural prop (?baked=0)' : 'baked (role colours, the house kit)'}` });
   }
 }
 await browser.close(); server.close();
@@ -93,16 +94,10 @@ function sourceRender(e: any): string | null {
 
 if (tiles.length) {
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
+  tiles.sort((a, b) => ids.indexOf(a.eid || '') - ids.indexOf(b.eid || ''));   // stable: a model's tiles stay together, source first
   const cols = Number(opt('cols', String(Math.min(tiles.length, flag('sources') ? 2 : 3))));
-  const inputs = tiles.flatMap(t => ['-i', t.file]);
-  const fc = tiles.map((t, i) => `[${i}:v]scale=480:270:force_original_aspect_ratio=decrease,pad=484:274:(ow-iw)/2:(oh-ih)/2:color=0xdddddd,drawtext=text='${t.label}':x=8:y=h-22:fontsize=15:fontcolor=0x222222[v${i}]`).join(';') + ';' +
-    tiles.map((_, i) => `[v${i}]`).join('') + `xstack=inputs=${tiles.length}:layout=${tiles.map((_, i) => `${(i % cols) * 484}_${Math.floor(i / cols) * 274}`).join('|')}:fill=black`;
-  let r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-filter_complex', fc, '-q:v', '3', OUT], { encoding: 'utf8' });
-  if (r.status !== 0) {   // an ffmpeg without drawtext: the same sheet without labels
-    const fc2 = tiles.map((_, i) => `[${i}:v]scale=480:270:force_original_aspect_ratio=decrease,pad=484:274:(ow-iw)/2:(oh-ih)/2:color=0xdddddd[v${i}]`).join(';') + ';' + tiles.map((_, i) => `[v${i}]`).join('') + `xstack=inputs=${tiles.length}:layout=${tiles.map((_, i) => `${(i % cols) * 484}_${Math.floor(i / cols) * 274}`).join('|')}:fill=black`;
-    r = spawnSync('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-filter_complex', fc2, '-q:v', '3', OUT], { encoding: 'utf8' });
-    if (r.status === 0) console.log('(no drawtext in this ffmpeg: tiles are in the order ' + tiles.map(t => t.label).join(', ') + ')');
-  }
+  const tj = path.join(tmp, 'tiles.json'); fs.writeFileSync(tj, JSON.stringify(tiles));
+  const r = spawnSync('python3', [path.join(import.meta.dirname, 'compose_sheet.py'), tj, OUT, String(cols)], { encoding: 'utf8' });
   if (r.status !== 0) console.error(r.stderr); else console.log(`${tiles.length} tiles -> ${OUT}`);
 }
 fs.rmSync(tmp, { recursive: true, force: true });
