@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export const REPO = path.resolve(import.meta.dirname, '..', '..');
-export const MANIFEST = path.join(REPO, 'models', 'manifest.json');
+export const MANIFEST = process.env.BAKE_MANIFEST || path.join(REPO, 'models', 'manifest.json');   // BAKE_MANIFEST: a scratch manifest for experiments (with --no-write)
 export const PACKS = path.join(REPO, 'models', 'packs.json');
 export const readManifest = () => JSON.parse(fs.readFileSync(MANIFEST, 'utf8'));
 export const readJson = (rel: string) => JSON.parse(fs.readFileSync(path.join(REPO, rel), 'utf8'));

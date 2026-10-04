@@ -221,6 +221,7 @@ async function main() {
   }
   if (verify) { console.log(failures ? `verify-repro: ${failures} entr${failures === 1 ? 'y' : 'ies'} NOT reproducible` : 'verify-repro: every entry reproduces bit for bit'); process.exit(failures ? 1 : 0); }
 
+  if (flag('no-write')) { console.log('--no-write: nothing written'); return; }
   const script = scriptDigest();
   for (const [family, recs] of Object.entries(baked)) {
     const have = await committedRecords(family);
