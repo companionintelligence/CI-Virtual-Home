@@ -338,3 +338,24 @@ test('B source: a sofa keeps every option — the arm, the legs, the seat count 
   assert.ok(wide.max.x - wide.min.x > narrow.max.x - narrow.min.x + 1.0, 'w resizes a loveseat');
   assert.ok(roleMeshes(build('mid-century-sofa'), 'pillow').length === 1 && roleMeshes(build('sofa'), 'pillow').length === 1);
 });
+
+// ---- armchairs (T8, softseat.ts) ----------------------------------------------------------------------------------------------
+const CHAIRS = ['wingback-armchair', 'slipper-chair', 'mission-armchair', 'barrel-chair', 'rattan-armchair', 'rocking-chair'];
+test('C caps: an armchair is at most 4 meshes and 900 triangles, opaque, no map, finite, no part under 6 mm, stable, and draws nothing from the rng', () => {
+  for (const t of CHAIRS) for (const sd of SEEDS.slice(0, 3)) {
+    const n = { n: 0 }, o = build(t, {}, sd, n), ms = meshesOf(o);
+    assert.ok(ms.length <= 4 && ms.length >= 2, `${t}: ${ms.length} meshes`);
+    assert.ok(sum(ms.map(trisOf)) <= 900, `${t}: ${sum(ms.map(trisOf))} triangles`);
+    assert.equal(n.n, 0, `${t}: draws ${n.n} from the rng (the old chairs drew none, so no spec's chair changes with a seed)`);
+    for (const m of ms) { assert.ok(!m.material.map && !m.material.transparent && m.material.vertexColors, `${t}: material`); assert.ok(finiteGeom(m.geometry)); m.geometry.computeBoundingBox(); const s = m.geometry.boundingBox.getSize(new THREE.Vector3()); assert.ok(Math.min(s.x, s.y, s.z) >= 0.006, `${t}: ${m.userData.role} part under 6 mm`); }
+    assert.equal(hashGeom(o), hashGeom(build(t, {}, sd)), `${t}: unstable`);
+  }
+});
+test('F theming: an upholstered chair is the house fabric or the spec colour; the timber is the house wood', () => {
+  for (const t of ['wingback-armchair', 'slipper-chair', 'barrel-chair']) {
+    const o = build(t); kit.theme(o); assert.equal(roleMeshes(o, 'upholstery')[0].material.color.getHex(), kit.colors.fabric, `${t}: the house fabric`);
+    assert.equal(roleMeshes(build(t, { color: '#b3402a' }), 'upholstery')[0].material.color.getHex(), 0xb3402a, `${t}: the spec colour`);
+  }
+  for (const t of ['mission-armchair', 'rocking-chair']) assert.equal(roleMeshes(build(t), 'frame')[0].material.color.getHex(), kit.colors.wood, `${t}: wood frame (before kit.theme restrains it)`);
+  assert.equal(roleMeshes(build('rocking-chair', { color: '#b3402a' }), 'cushion')[0].material.color.getHex(), 0xb3402a, 'the rocker\'s cushion takes the spec colour');
+});
