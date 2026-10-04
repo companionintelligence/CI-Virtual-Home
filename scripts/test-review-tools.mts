@@ -19,6 +19,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { cornerCam, costCameras, R24, r24Shots, MANNEQUIN, mannequinTop, EYE, FOV, type CostRoom } from './review/cameras.mts';
+import { ADDENDUM, OBSTRUCTED, ALT_CORNERS, addendumShots, candidateShots } from './review/addendum.mts';
 import { lumaMetrics } from './review/luma.mts';
 import { planPairs } from './review/ab.mts';
 import { diffManifests, type Manifest } from './review/manifest.mts';
@@ -186,4 +187,33 @@ test('committed baselines are keyed by content: no commit hash and no GPU memory
   assert.equal(productKeyId(fp), productKeyId(fp2));
   assert.notEqual(productKeyId(fp), productKeyId({ rev: 'aaaa', tree: { assets: 'x', content: 'z' } }));
   assert.equal((productKey(fp) as any).rev, undefined);
+});
+
+test('camera addendum: three alternatives for the three obstructed frames, none of them a frozen frame', () => {
+  const frozen = new Set(r24Shots().map(s => s.id));
+  assert.equal(frozen.size, 92, 'the frozen BEFORE set is untouched: 68 eye + 24 scale frames');
+  assert.equal(OBSTRUCTED.length, 3); assert.equal(ADDENDUM.length, 3);
+  assert.deepEqual(ADDENDUM.map(a => `${a.room}/${a.replaces}`).sort(), ['aurora-hall/NW', 'aurora-primary-bedroom/SE', 'riverbend-foyer/NW']);
+  for (const a of ADDENDUM) {
+    const o = OBSTRUCTED.find(x => x.room === a.room)!;
+    assert.equal(a.replaces, o.corner, `${a.room}: names the frozen corner it stands in for`);
+    assert.ok(ALT_CORNERS.includes(a.corner) && a.corner !== a.replaces, `${a.room}: another corner`);
+    assert.ok(R24.some(r => r.id === a.room && r.house === a.house), `${a.room} is an R24 room`);
+    assert.ok(a.why.length > 30, 'the reason is recorded');
+  }
+  for (const s of [...addendumShots(), ...candidateShots()]) assert.ok(!frozen.has(s.id), `${s.id} must not collide with a frozen frame`);
+  assert.equal(addendumShots().length, 3); assert.equal(candidateShots().length, 6);
+  // same formula as the frozen cameras, only the corner differs
+  const b = { x: 0, z: 0, w: 6, d: 4 };
+  assert.notDeepEqual(cornerCam(b, 0, 'NE').pos, cornerCam(b, 0, 'NW').pos);
+  assert.deepEqual(cornerCam(b, 0, 'SW').pos, [0.55, EYE, 3.45]); assert.deepEqual(cornerCam(b, 0, 'NE').pos, [5.45, EYE, 0.55]);
+  // an addendum manifest, when committed, was taken from the same product code as the frozen set
+  const f = path.join(BASELINES, 'before-addendum.manifest.json'), bf = path.join(BASELINES, 'before.manifest.json');
+  if (fs.existsSync(f) && fs.existsSync(bf)) {
+    const m: Manifest = JSON.parse(fs.readFileSync(f, 'utf8')), fm: Manifest = JSON.parse(fs.readFileSync(bf, 'utf8'));
+    assert.deepEqual(m.shots.map(s => s.id).sort(), addendumShots().map(s => s.id).sort());
+    assert.deepEqual(m.product, fm.product, 'taken from the frozen set\'s product code');
+    assert.deepEqual(m.renderer, fm.renderer);
+    for (const s of m.shots) { assert.match(s.sha256, /^[0-9a-f]{64}$/); assert.equal(s.tod, 'day'); assert.equal(s.kind, 'eye'); assert.ok(!fm.shots.some(x => x.id === s.id)); }
+  }
 });

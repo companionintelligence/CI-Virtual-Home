@@ -21,6 +21,7 @@ export interface Manifest {
 }
 
 export const BEFORE_MANIFEST = path.join(BASELINES, 'before.manifest.json');
+export const ADDENDUM_MANIFEST = path.join(BASELINES, 'before-addendum.manifest.json');
 export const loadManifest = (f: string): Manifest => readJson<Manifest>(f);
 export const manifestText = (m: Manifest) => stableJson(m, 1);
 

@@ -7,6 +7,8 @@
 //
 //   node --experimental-strip-types scripts/review/capture.mts --set before                 the frozen BEFORE (refuses unless the product code equals baseline/stage0-green)
 //   node --experimental-strip-types scripts/review/capture.mts --set after-<label>          an AFTER: the same cameras (read from before.manifest.json), any product code
+//   node --experimental-strip-types scripts/review/capture.mts --addendum chosen --set before-addendum    the camera addendum's BEFORE (same refusal rule; scripts/review/addendum.mts); `after-<label>-addendum` reads its cameras from before-addendum.manifest.json
+//            --addendum candidates   every alternative corner of the three obstructed frames, for choosing (use --out and --manifest into a scratch dir)
 //   options: --out <dir> (default <REVIEW_DIR>/<set>)   --only a,b (room ids)   --no-scale   --tods day,dusk   --allow-drift (before: skip the tag check)
 //            --manifest <file> (where to write the manifest; default <out>/<set>.manifest.json; for `before` it is also copied to test/review/baselines/)
 //
@@ -17,7 +19,8 @@ import path from 'node:path';
 import { ROOT, REVIEW_DIR, BEFORE_TAG, parseArgs, productFingerprint, productKey, recordProvenance, productDiffersFromTag, round, machine, writeText } from './lib.mts';
 import { R24, r24Shots, cornerCam, RES, QUALITY, SIZE, MANNEQUIN, MANNEQUIN_HEIGHT, type Cam, type Corner, type Tod } from './cameras.mts';
 import { startSession, burnColdContext, roomsOf } from './page.mts';
-import { BEFORE_MANIFEST, loadManifest, manifestText, type Manifest, type ManifestShot } from './manifest.mts';
+import { addendumShots, candidateShots, ADDENDUM_SET } from './addendum.mts';
+import { BEFORE_MANIFEST, ADDENDUM_MANIFEST, loadManifest, manifestText, type Manifest, type ManifestShot } from './manifest.mts';
 import { sha256 } from './lib.mts';
 
 const args = parseArgs(process.argv.slice(2));
@@ -27,7 +30,12 @@ const OUT = path.resolve(args.out && args.out !== 'true' ? args.out : path.join(
 const only = args.only ? new Set(args.only.split(',')) : null;
 const todFilter = args.tods ? new Set(args.tods.split(',')) : null;
 const withScale = args['no-scale'] !== 'true';
-const isBefore = set === 'before';
+const addendum = args.addendum && args.addendum !== 'true' ? args.addendum : '';   // '' | 'chosen' | 'candidates'
+if (addendum && addendum !== 'chosen' && addendum !== 'candidates') { console.error('--addendum chosen | candidates'); process.exit(2); }
+const isBefore = set === 'before' || set === ADDENDUM_SET;
+if (set === ADDENDUM_SET && addendum !== 'chosen') { console.error(`--set ${ADDENDUM_SET} needs --addendum chosen`); process.exit(2); }
+if (!addendum && set.endsWith('-addendum')) { console.error('a set named ...-addendum needs --addendum chosen'); process.exit(2); }
+const REF_MANIFEST = addendum ? ADDENDUM_MANIFEST : BEFORE_MANIFEST;
 
 // ---- provenance: a BEFORE must be the baseline tag's product code, clean
 const fp = productFingerprint('HEAD');
@@ -38,11 +46,11 @@ if (isBefore && args['allow-drift'] !== 'true') {
 }
 
 // ---- the cameras: a BEFORE derives them from the rooms, every other set reads them from before.manifest.json (unless --derive)
-const derive = isBefore || args.derive === 'true';   // --derive: cameras from the rooms, not from the manifest (probes and determinism checks)
-const ref: Manifest | null = derive ? null : (fs.existsSync(BEFORE_MANIFEST) ? loadManifest(BEFORE_MANIFEST) : null);
-if (!derive && !ref) { console.error(`no ${path.relative(ROOT, BEFORE_MANIFEST)}: capture the BEFORE first`); process.exit(2); }
+const derive = isBefore || addendum === 'candidates' || args.derive === 'true';   // --derive: cameras from the rooms, not from the manifest (probes and determinism checks)
+const ref: Manifest | null = derive ? null : (fs.existsSync(REF_MANIFEST) ? loadManifest(REF_MANIFEST) : null);
+if (!derive && !ref) { console.error(`no ${path.relative(ROOT, REF_MANIFEST)}: capture the BEFORE first`); process.exit(2); }
 
-const wanted = r24Shots().filter(s => (!only || only.has(s.room)) && (!todFilter || todFilter.has(s.tod)) && (withScale || s.kind !== 'scale'));
+const wanted = (addendum === 'candidates' ? candidateShots() : addendum === 'chosen' ? addendumShots() : r24Shots()).filter(s => (!only || only.has(s.room)) && (!todFilter || todFilter.has(s.tod)) && (withScale || s.kind !== 'scale'));
 const houses = [...new Set(wanted.map(s => s.house))];
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -133,7 +141,7 @@ try {
   }
 } finally { await session.close(); }
 
-const order = new Map(r24Shots().map((s, i) => [s.id, i]));
+const order = new Map([...r24Shots(), ...candidateShots()].map((s, i) => [s.id, i]));
 shots.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
 const manifest: Manifest = {
   schema: 1, set, tag: BEFORE_TAG, product: productKey(fp),
@@ -148,7 +156,12 @@ if ((only || todFilter || !withScale) && fs.existsSync(mfile)) {
 }
 writeText(mfile, manifestText(manifest));
 console.log(`manifest: ${path.relative(process.cwd(), mfile)} (${manifest.shots.length} frames)`);
-if (isBefore && !only && !todFilter && withScale && !failed) {
+if (isBefore && addendum === 'chosen' && !only && !todFilter && !failed) {
+  writeText(ADDENDUM_MANIFEST, manifestText(manifest));
+  recordProvenance('before-addendum.manifest.json', fp);
+  console.log(`copied to ${path.relative(ROOT, ADDENDUM_MANIFEST)}`);
+}
+if (isBefore && !addendum && !only && !todFilter && withScale && !failed) {
   writeText(BEFORE_MANIFEST, manifestText(manifest));
   recordProvenance('before.manifest.json', fp);
   console.log(`copied to ${path.relative(ROOT, BEFORE_MANIFEST)}`);
