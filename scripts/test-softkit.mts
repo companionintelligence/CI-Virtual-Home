@@ -222,3 +222,26 @@ test('E determinism: curtains are the same twice for a seed, differ across seeds
   assert.ok(new Set(SEEDS.map(sd => hashGeom(build('curtains', {}, sd)))).size > 3, 'the seeds build different curtains');
   const n = { n: 0 }; build('curtains', {}, 'a', n); assert.equal(n.n, 1, 'one draw');
 });
+
+// ---- towels (T6) -------------------------------------------------------------------------------------------------------------
+const RAILS = ['towel-rail', 'heated-towel-rail', 'towel-ladder'];
+test('C caps: a towel set is at most 3 towel meshes and 450 triangles; a rail is hardware + towels, at most 4 meshes, no part under 6 mm', () => {
+  for (const t of RAILS) for (const sd of SEEDS) {
+    const o = build(t, {}, sd), towels = roleMeshes(o, 'towel'), all = meshesOf(o);
+    assert.ok(towels.length >= 1 && towels.length <= 3, `${t}/${sd}: ${towels.length} towel meshes`);
+    assert.ok(sum(towels.map(trisOf)) <= 450, `${t}/${sd}: towels are ${sum(towels.map(trisOf))} triangles`);
+    assert.ok(all.length <= 4, `${t}/${sd}: ${all.length} meshes`);
+    for (const m of all) { m.geometry.computeBoundingBox(); const s = m.geometry.boundingBox.getSize(new THREE.Vector3()); assert.ok(Math.min(s.x, s.y, s.z) >= 0.006, `${t}: a ${m.userData.role} part under 6 mm`); assert.ok(!m.material.map && !m.material.transparent); }
+  }
+});
+test('F theming: a towel is accent, fabric2 or linen; a spec colour paints the towel on the towel-rail and the metal elsewhere; hardware stays metal', () => {
+  for (const sd of SEEDS) for (const t of RAILS) {
+    const o = build(t, {}, sd); kit.theme(o);
+    for (const m of roleMeshes(o, 'towel')) assert.ok(['accent', 'fabric2', 'linen'].includes(roleOf(m.material.color.getHex()) as string), `${t}: towel colour is a house role`);
+  }
+  assert.equal(roleMeshes(build('towel-rail', { color: '#b3402a' }), 'towel')[0].material.color.getHex(), 0xb3402a);
+  assert.equal(roleMeshes(build('heated-towel-rail', { color: '#b3402a' }), 'hardware')[0].material.color.getHex(), 0xb3402a);
+});
+test('E determinism: towel rails are stable per seed and draw a fixed count', () => {
+  for (const t of RAILS) { assert.equal(hashGeom(build(t, {}, 'a')), hashGeom(build(t, {}, 'a'))); const n = { n: 0 }; build(t, {}, 'a', n); assert.equal(n.n, 2, `${t}: the colour pick and the cloth's seed`); }
+});

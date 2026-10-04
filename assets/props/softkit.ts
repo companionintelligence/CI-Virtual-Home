@@ -135,13 +135,17 @@ export function softkit(THREE: any) {
     for (let j = 0; j <= nv; j++) for (let i = 0; i <= nu; i++) {
       const u = (i / nu) * 2 - 1, v = (j / nv) * 2 - 1;
       const ear = 1 + 0.035 * Math.pow(Math.abs(u * v), 3);
-      const k = Math.pow(Math.max(0, 1 - Math.pow(Math.abs(u), 3.2)) * Math.max(0, 1 - Math.pow(Math.abs(v), 3.2)), 0.55);
-      const th = (t / 2) * k, lx = (w / 2) * u * ear, lz = (d / 2) * v * ear;
+      const k = Math.pow(Math.max(0, 1 - Math.pow(Math.abs(u), 2.6)) * Math.max(0, 1 - Math.pow(Math.abs(v), 2.6)), 0.5);
+      const th = t * k, lx = (w / 2) * u * ear, lz = (d / 2) * v * ear;
       V.set(lx, th, lz).applyMatrix4(m);
-      top.push(acc.v(V.x, floorY === null ? V.y : Math.max(V.y, floorY + 0.002), V.z, seamShade + (1 - seamShade) * k));
+      // the seam ring stands ON the mattress (a leaning pillow's raised edge is pulled down to it): there is no underside to leave a gap or to
+      // paint a halo, and the pillow reads as a mound sitting on the bed
+      const border = i === 0 || j === 0 || i === nu || j === nv;
+      const yy = floorY === null ? V.y : border ? floorY + 0.002 : Math.max(V.y, floorY + 0.002);
+      top.push(acc.v(V.x, yy, V.z, seamShade + (1 - seamShade) * k));
     }
     acc.grid(top, nu, nv, [0, 1, 0]);
-    // No underside: a down-facing face lying just over an up-facing one (a pillow on a mattress) is what GTAO's normal/depth pass reads as
+    // No underside (and the border is on the floor): a down-facing face lying just over an up-facing one (a pillow on a mattress) is what GTAO's normal/depth pass reads as
     // a solid occluder, and it paints a black halo round the pillow (seen in the first cut). Open underneath, the pillow rests on its seam.
   }
 
@@ -359,11 +363,11 @@ export function layBedding(g: any, ctx: any, o: any) {
   const lean = kid ? 0.2 : 0.3;
   for (let i = 0; i < pillows; i++) {
     const px = pillows > 1 ? (i - (pillows - 1) / 2) * (w / pillows) : 0;
-    pillow(linenA, { x: px, y: matTop + 0.035 + (euro ? 0.028 : 0), z: pz, w: pw, d: pillowD, t: kid ? 0.1 : 0.115, rotX: lean, rotY: yawJ * (i % 2 ? -1 : 1), nu: 6, nv: 4, floorY: matTop });
+    pillow(linenA, { x: px, y: matTop + 0.01 + (euro ? 0.03 : 0), z: pz, w: pw, d: pillowD, t: kid ? 0.11 : 0.14, rotX: lean, rotY: yawJ * (i % 2 ? -1 : 1), nu: 8, nv: 6, floorY: matTop });
   }
   if (euro) {
-    for (const s of [-1, 1]) pillow(altA, { x: s * (w / 4), y: matTop + 0.1, z: zh + 0.2, w: 0.54, d: 0.5, t: 0.13, rotX: 0.5, rotY: s * 0.03 + euroJ[(s + 1) / 2], nu: 6, nv: 4, floorY: matTop });
-    pillow(altA, { x: lumJ[0] * 0.4, y: matTop + loft + 0.03, z: pz + pillowD / 2 + 0.2, w: 0.5, d: 0.2, t: 0.075, rotX: 0.32, rotY: lumJ[1], nu: 6, nv: 2, floorY: matTop + loft - 0.01 });
+    for (const s of [-1, 1]) pillow(altA, { x: s * (w / 4), y: matTop + 0.03, z: zh + 0.2, w: 0.54, d: 0.5, t: 0.17, rotX: 0.5, rotY: s * 0.03 + euroJ[(s + 1) / 2], nu: 7, nv: 5, floorY: matTop });
+    pillow(altA, { x: lumJ[0] * 0.4, y: matTop + loft + 0.01, z: pz + pillowD / 2 + 0.2, w: 0.5, d: 0.2, t: 0.08, rotX: 0.32, rotY: lumJ[1], nu: 6, nv: 3, floorY: matTop + loft - 0.01 });
   }
   const uv = quilt ? (x: number, _y: number, zz: number): [number, number] => [(x + W2 / 2) / W2, (zz - (zf - cl)) / cl] : undefined;
   put(g, linenA, softMat(ctx, colors.linen, { roughness: 0.95 }), 'linen');
@@ -434,4 +438,34 @@ export function hangCurtains(ctx: any, it: any) {
     m.renderOrder = 2; m.userData.role = 'sheer'; g.add(m);
   }
   return g;
+}
+
+// =================================================================================================================
+// Towels — a towel hung over a bar (the three rails in bathroom.ts), 1 mesh each
+// =================================================================================================================
+/** A towel draped over a horizontal bar of radius `rb` running along x at (y = by, z = zb): a back leaf, the arc over the bar and a front leaf with a
+ *  belly, as one closed lens (12 mm), a woven border band at both hems (a shade, not a texture) and a ripple at the hem. The hems are at fixed
+ *  heights (by − L2 and by − L1): variation is in the cloth, never in the box. Adds to `acc`; the caller owns the material (a towel role colour).
+ *  `cx` is the towel's centre along x, `tw` its width. `rows` and `cols` size the grid (a rail's towel: 5 x 8). */
+export function drapeTowel(THREE: any, acc: any, o: any) {
+  const K = softkit(THREE);
+  const { cx = 0, by, zb, rb, tw, L1, L2, belly = 0.01, ph = 0, th = 0.012, cols = 6 } = o;
+  const Ra = rb + 0.017, arc = Math.PI * Ra, tot = L2 + arc + L1;
+  const prof = (v: number): [number, number, number] => {
+    const s = v * tot;
+    if (s < L2) return [by - (L2 - s), zb - Ra, 0.9];
+    if (s < L2 + arc) { const phi = Math.PI - ((s - L2) / arc) * Math.PI; return [by + Math.sin(phi) * Ra, zb + Math.cos(phi) * Ra, 0.97]; }
+    const t = (s - L2 - arc) / L1;
+    return [by - t * L1, zb + Ra + belly * Math.sin(Math.PI * Math.min(1, t * 1.1)), 1];
+  };
+  const a1 = L2 / tot, a2 = (L2 + arc) / tot;
+  const Vn = [0, 0.05, a1 * 0.6, a1 + (a2 - a1) * 0.1, (a1 + a2) / 2, a2 - (a2 - a1) * 0.1, a2 + (1 - a2) * 0.3, 0.93, 1];
+  K.sheet(acc, {
+    U: Array.from({ length: cols + 1 }, (_, i) => i / cols), Vn, th, want: [0, 0, 1], rimK: 0.5,
+    pos: (u: number, v: number) => {
+      const [y, z] = prof(v), hemW = (1 - smooth(0, 0.12, v)) + smooth(0.88, 1, v);
+      return [cx + (u - 0.5) * tw, y, z + (v > a2 ? 0.004 * Math.sin(u * 11 + ph) * (0.3 + hemW) : 0)];
+    },
+    shade: (u: number, v: number) => { const [, , base] = prof(v); const band = (v > 0.9 && v < 0.955) || (v > 0.03 && v < 0.075) ? 0.8 : 1; return base * band * (0.95 + 0.05 * Math.sin(u * 23)); },
+  });
 }
