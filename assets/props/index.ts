@@ -36,3 +36,6 @@ import './kids.js';
 import './office.js';
 import './outdoor.js';
 import './hobby.js';
+
+// BAKED LAST — assets/props/baked.ts overrides registered types in place, so it stays the last import; another stream's module goes ABOVE this line
+import './baked.js';
