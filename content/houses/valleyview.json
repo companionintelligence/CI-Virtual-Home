@@ -5,7 +5,7 @@
   "author": "Axiisims",
   "source": "SimsTree slide 20",
   "style": "Powder-blue riverside villa on a raised plinth: a set-back upper storey behind a full-width glass balcony, thin cream cantilevered slabs, a honey-timber pier portal, a curtained cabana on the water, an L-shaped glass-edged pool and a walled five-a-side pitch on a paved plaza",
-  "emoji": "\u26bd",
+  "emoji": "⚽",
   "defaults": 2,
   "styleKey": "modern",
   "lot": {
@@ -267,7 +267,7 @@
           "lock": true,
           "items": [
             {
-              "type": "dracaena",
+              "type": "bird-of-paradise",
               "at": [
                 -3.5,
                 -11.45
@@ -424,7 +424,7 @@
               "color": "#7a5a40"
             },
             {
-              "type": "drum-table",
+              "type": "nesting-tables",
               "at": [
                 -6.4,
                 -5.05
@@ -572,7 +572,7 @@
                 -9.2
               ],
               "rot": 270,
-              "w": 2.0,
+              "w": 2,
               "d": 0.95,
               "color": "#e9e6df",
               "top": "quartz",
@@ -884,7 +884,7 @@
           },
           "items": [
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 3.78,
                 -9.2
@@ -946,7 +946,7 @@
               "src": "compose@1"
             },
             {
-              "type": "drum-table",
+              "type": "nesting-tables",
               "at": [
                 9.079,
                 -7.006
@@ -1207,7 +1207,7 @@
               "y": 0.5
             },
             {
-              "type": "wood-stool",
+              "type": "bar-stool",
               "at": [
                 -10.45,
                 -10.7
@@ -1218,7 +1218,7 @@
               "color": "#9a7449"
             },
             {
-              "type": "wood-stool",
+              "type": "bar-stool",
               "at": [
                 -10.45,
                 -9.7
@@ -1577,7 +1577,7 @@
               "src": "compose@1"
             },
             {
-              "type": "tall-cactus",
+              "type": "rubber-plant",
               "at": [
                 -5.685,
                 -5.665
@@ -1661,7 +1661,7 @@
               "src": "compose@1"
             },
             {
-              "type": "snake-plant",
+              "type": "zz-plant",
               "at": [
                 -2.869,
                 -9.523
@@ -1996,7 +1996,7 @@
         "side": "W",
         "from": -11.15,
         "to": -9.25,
-        "yFrom": 1.0,
+        "yFrom": 1,
         "yTo": 2.2,
         "material": "stucco",
         "color": "#3d5a36"
@@ -2357,7 +2357,7 @@
         -9.3
       ],
       "h": 2.4,
-      "y": 1.0
+      "y": 1
     },
     {
       "type": "path",
@@ -2521,10 +2521,10 @@
       "type": "deck",
       "at": [
         8.7,
-        -9.0
+        -9
       ],
       "w": 4.2,
-      "d": 4.0,
+      "d": 4,
       "h": 0.1,
       "y": 4.419999999999999,
       "posts": false,

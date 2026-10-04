@@ -258,7 +258,7 @@
               "src": "compose@1"
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 -0.26,
                 2.17
@@ -429,7 +429,7 @@
               "src": "compose@1"
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 -0.26,
                 -0.9
@@ -553,7 +553,7 @@
               "src": "compose@1"
             },
             {
-              "type": "c-table",
+              "type": "nesting-tables",
               "at": [
                 4.22,
                 -3.874
@@ -574,7 +574,7 @@
               "src": "compose@1"
             },
             {
-              "type": "c-table",
+              "type": "nesting-tables",
               "at": [
                 4.22,
                 -1.089
@@ -595,7 +595,7 @@
               "src": "compose@1"
             },
             {
-              "type": "ladder-shelf",
+              "type": "cube-storage",
               "at": [
                 1.97,
                 1.167
@@ -615,7 +615,7 @@
               "src": "compose@1"
             },
             {
-              "type": "ficus-tree",
+              "type": "bird-of-paradise",
               "at": [
                 7.323,
                 -5.354
@@ -624,7 +624,7 @@
               "src": "compose@1"
             },
             {
-              "type": "plant-stand",
+              "type": "rubber-plant",
               "at": [
                 6.46,
                 -5.698
@@ -1285,7 +1285,7 @@
               "y": 1.9
             },
             {
-              "type": "plant-stand",
+              "type": "bird-of-paradise",
               "at": [
                 2.25,
                 1.55
@@ -1431,7 +1431,7 @@
               "color": "#a0623a"
             },
             {
-              "type": "drum-table",
+              "type": "nesting-tables",
               "at": [
                 7.65,
                 0.5
@@ -1501,17 +1501,16 @@
               "motif": "mountains"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 5.2,
                 -0.72
               ],
               "rot": 0,
-              "w": 1.0,
+              "w": 1,
               "h": 0.8,
               "y": 1.5,
-              "motif": "landscape",
-              "frame": "#e9dfca"
+              "motif": "landscape"
             },
             {
               "type": "ceiling-light",
@@ -1576,13 +1575,12 @@
               "color": "#6b4a35"
             },
             {
-              "type": "side-table",
+              "type": "drum-table",
               "at": [
                 1.72,
                 0.95
               ],
-              "rot": 0,
-              "w": 0.45
+              "rot": 0
             },
             {
               "type": "table-lamp",
@@ -1594,7 +1592,7 @@
               "y": 0.55
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 1.95,
                 -0.555
@@ -1645,7 +1643,7 @@
           },
           "items": [
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 3.95,
                 -5.7
@@ -1874,7 +1872,7 @@
           },
           "items": [
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 0.245,
                 -4.2
@@ -2066,7 +2064,7 @@
               "src": "compose@1"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -6.12,
                 4.117
@@ -2089,7 +2087,7 @@
               "src": "compose@1"
             },
             {
-              "type": "plant-stand",
+              "type": "rubber-plant",
               "at": [
                 -7.495,
                 3.898
@@ -2237,7 +2235,7 @@
               "src": "compose@1"
             },
             {
-              "type": "snake-plant",
+              "type": "zz-plant",
               "at": [
                 -4.582,
                 -2.531

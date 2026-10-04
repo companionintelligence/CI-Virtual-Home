@@ -5,7 +5,7 @@
   "author": "Schnuck01",
   "source": "SimsTree slide 18",
   "style": "Two-storey two-tone brick family traditional on a riverside lot: one long side-gabled ridge with a single dormer, three wall gables across the front (brick over the garage, a tall brick centre gable, a whitewashed gable over a recessed glazed entry), a pent roof over the garage, a bay under its own hip, a lower hipped east wing with the hearth chimney; a rock-edged stream and topiary cones in front, a lily pond and willow on the west lawn, the river behind",
-  "emoji": "\ud83c\udfd8\ufe0f",
+  "emoji": "🏘️",
   "lot": {
     "w": 42,
     "d": 26,
@@ -74,7 +74,7 @@
           "side": "S",
           "at": -8.5,
           "type": "garage",
-          "w": 5.0,
+          "w": 5,
           "h": 2.1,
           "color": "#eeeeea",
           "lantern": true
@@ -101,7 +101,7 @@
           "side": "S",
           "at": 6.8,
           "type": "window",
-          "w": 1.0,
+          "w": 1,
           "h": 1.7,
           "sill": 0.5,
           "shutters": {
@@ -114,7 +114,7 @@
           "side": "S",
           "at": 9.6,
           "type": "window",
-          "w": 1.0,
+          "w": 1,
           "h": 1.7,
           "sill": 0.5,
           "shutters": {
@@ -135,8 +135,8 @@
           "side": "N",
           "at": -7.6,
           "type": "window",
-          "w": 1.0,
-          "h": 1.0,
+          "w": 1,
+          "h": 1,
           "sill": 1.1
         },
         {
@@ -165,7 +165,7 @@
         },
         {
           "side": "N",
-          "at": 8.0,
+          "at": 8,
           "type": "window",
           "w": 1.6,
           "h": 1.5,
@@ -177,7 +177,7 @@
           "type": "window",
           "w": 1.2,
           "h": 1.3,
-          "sill": 1.0
+          "sill": 1
         },
         {
           "side": "E",
@@ -199,8 +199,8 @@
           "side": "W",
           "at": -4.3,
           "type": "window",
-          "w": 1.0,
-          "h": 1.0,
+          "w": 1,
+          "h": 1,
           "sill": 1.1
         }
       ],
@@ -261,12 +261,12 @@
             5,
             3.8
           ],
-          "door": 6.0,
+          "door": 6,
           "doorW": 2.8,
           "doors": [
             {
               "at": 2.1,
-              "w": 2.0
+              "w": 2
             }
           ]
         }
@@ -301,7 +301,7 @@
           },
           "items": [
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 -11.72,
                 0.15
@@ -312,7 +312,7 @@
               "color": "#8a8580"
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 -11.72,
                 3.4
@@ -364,7 +364,7 @@
             {
               "type": "weight-bench",
               "at": [
-                -9.0,
+                -9,
                 -1.05
               ],
               "rot": 0
@@ -377,7 +377,7 @@
               ],
               "rot": 180,
               "w": 0.9,
-              "h": 2.0,
+              "h": 2,
               "color": "#8a8580"
             }
           ]
@@ -582,7 +582,7 @@
               "y": 0.9
             },
             {
-              "type": "wood-stool",
+              "type": "bar-stool",
               "at": [
                 -3.3,
                 -2.85
@@ -590,7 +590,7 @@
               "color": "#3b2c22"
             },
             {
-              "type": "wood-stool",
+              "type": "bar-stool",
               "at": [
                 -2.5,
                 -2.85
@@ -598,7 +598,7 @@
               "color": "#3b2c22"
             },
             {
-              "type": "wood-stool",
+              "type": "bar-stool",
               "at": [
                 -1.7,
                 -2.85
@@ -862,7 +862,7 @@
               "y": 0.42
             },
             {
-              "type": "sofa-table",
+              "type": "console-table",
               "at": [
                 -0.45,
                 -1.36
@@ -887,7 +887,7 @@
               "color": "#9c9a94"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -0.45,
                 -1.5
@@ -895,8 +895,7 @@
               "w": 1.3,
               "h": 0.85,
               "y": 1.55,
-              "motif": "line",
-              "frame": "#b7a07a"
+              "motif": "line"
             },
             {
               "type": "floor-lamp",
@@ -906,7 +905,7 @@
               ]
             },
             {
-              "type": "drum-table",
+              "type": "nesting-tables",
               "at": [
                 -4.55,
                 0.15
@@ -922,7 +921,7 @@
               "y": 0.52
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -4.93,
                 1.7
@@ -931,8 +930,7 @@
               "w": 1.5,
               "h": 0.95,
               "y": 1.5,
-              "motif": "landscape",
-              "frame": "#6b5846"
+              "motif": "landscape"
             },
             {
               "type": "column",
@@ -974,16 +972,13 @@
               "color": "#6b5846"
             },
             {
-              "type": "arch-mirror",
+              "type": "round-mirror",
               "at": [
                 4.92,
                 2.6
               ],
               "rot": 270,
-              "w": 0.7,
-              "h": 1.7,
-              "y": 0.55,
-              "color": "#8a7a60"
+              "y": 0.55
             },
             {
               "type": "wall-sconce",
@@ -1021,7 +1016,7 @@
               "color": "#7d6a58"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 0.78,
                 3.25
@@ -1071,7 +1066,7 @@
             {
               "type": "slipcover-sofa",
               "at": [
-                7.0,
+                7,
                 -2.3
               ],
               "rot": 90,
@@ -1081,7 +1076,7 @@
             {
               "type": "wingback-armchair",
               "at": [
-                9.0,
+                9,
                 -3.9
               ],
               "rot": 300,
@@ -1105,12 +1100,11 @@
               "color": "#4a3a2e"
             },
             {
-              "type": "side-table",
+              "type": "nesting-tables",
               "at": [
                 9.95,
                 -4.3
               ],
-              "w": 0.5,
               "color": "#4a3a2e"
             },
             {
@@ -1131,7 +1125,7 @@
               "y": 0.42
             },
             {
-              "type": "pampas-vase",
+              "type": "zz-plant",
               "at": [
                 10.5,
                 -5.4
@@ -1149,13 +1143,13 @@
             {
               "type": "record-player",
               "at": [
-                6.0,
+                6,
                 -5.66
               ],
               "y": 0.95
             },
             {
-              "type": "ficus-tree",
+              "type": "bird-of-paradise",
               "at": [
                 5.6,
                 -2.15
@@ -1175,7 +1169,7 @@
             {
               "type": "rocking-horse",
               "at": [
-                6.0,
+                6,
                 3.1
               ],
               "rot": 20
@@ -1195,7 +1189,7 @@
                 3.62
               ],
               "rot": 180,
-              "w": 1.0
+              "w": 1
             },
             {
               "type": "floor-lamp",
@@ -1217,7 +1211,7 @@
       "id": "l2",
       "name": "Upper Floor",
       "sheet": "A-102",
-      "y": 3.0,
+      "y": 3,
       "height": 2.4,
       "floor": "oak",
       "interior": "#ddd5c8",
@@ -1309,7 +1303,7 @@
           "side": "S",
           "at": -0.1,
           "type": "window",
-          "w": 1.0,
+          "w": 1,
           "h": 1.4,
           "sill": 0.8,
           "shutters": {
@@ -1343,7 +1337,7 @@
           "side": "S",
           "at": 6.9,
           "type": "window",
-          "w": 1.0,
+          "w": 1,
           "h": 1.4,
           "sill": 0.8,
           "shutters": {
@@ -1359,7 +1353,7 @@
           "side": "S",
           "at": 9.7,
           "type": "window",
-          "w": 1.0,
+          "w": 1,
           "h": 1.4,
           "sill": 0.8,
           "shutters": {
@@ -1375,21 +1369,21 @@
           "side": "N",
           "at": -10.5,
           "type": "window",
-          "w": 1.0,
-          "h": 1.0,
+          "w": 1,
+          "h": 1,
           "sill": 1.2
         },
         {
           "side": "N",
-          "at": -3.0,
+          "at": -3,
           "type": "window",
-          "w": 1.0,
-          "h": 1.0,
+          "w": 1,
+          "h": 1,
           "sill": 1.2
         },
         {
           "side": "N",
-          "at": 1.0,
+          "at": 1,
           "type": "window",
           "w": 1.2,
           "h": 1.3,
@@ -1407,9 +1401,9 @@
           "side": "N",
           "at": 6.6,
           "type": "window",
-          "w": 1.0,
+          "w": 1,
           "h": 1.2,
-          "sill": 1.0
+          "sill": 1
         },
         {
           "side": "N",
@@ -1417,7 +1411,7 @@
           "type": "window",
           "w": 0.8,
           "h": 1.2,
-          "sill": 1.0
+          "sill": 1
         },
         {
           "side": "E",
@@ -1433,15 +1427,15 @@
           "type": "window",
           "w": 1.2,
           "h": 1.3,
-          "sill": 1.0
+          "sill": 1
         },
         {
           "side": "E",
           "at": 3.6,
           "type": "window",
-          "w": 1.0,
+          "w": 1,
           "h": 1.3,
-          "sill": 1.0
+          "sill": 1
         },
         {
           "side": "W",
@@ -1453,10 +1447,10 @@
         },
         {
           "side": "W",
-          "at": -4.0,
+          "at": -4,
           "type": "window",
-          "w": 1.0,
-          "h": 1.0,
+          "w": 1,
+          "h": 1,
           "sill": 1.2
         }
       ],
@@ -1656,7 +1650,7 @@
                 1.9
               ],
               "rot": 90,
-              "w": 1.0,
+              "w": 1,
               "h": 0.7,
               "y": 1.5,
               "motif": "landscape"
@@ -1737,7 +1731,7 @@
               "y": 1.15
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -6.95,
                 -2.12
@@ -1880,7 +1874,7 @@
               "src": "compose@1"
             },
             {
-              "type": "snake-plant",
+              "type": "pampas-vase",
               "at": [
                 -11.708,
                 -5.721
@@ -1937,7 +1931,7 @@
               "color": "#6b5846"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -2.4,
                 -1.07
@@ -1949,7 +1943,7 @@
               "motif": "botanical"
             },
             {
-              "type": "demilune-console",
+              "type": "console-table",
               "at": [
                 -3.43,
                 -1.295
@@ -1990,7 +1984,7 @@
               "src": "compose@1"
             },
             {
-              "type": "snake-plant",
+              "type": "zz-plant",
               "at": [
                 -1.397,
                 -2.531
@@ -2148,14 +2142,14 @@
               ]
             },
             {
-              "type": "olive-tree-pot",
+              "type": "bird-of-paradise",
               "at": [
                 4.45,
                 -5.45
               ]
             },
             {
-              "type": "demilune-console",
+              "type": "console-table",
               "at": [
                 2.77,
                 -5.695
@@ -2181,7 +2175,7 @@
               "src": "compose@1"
             },
             {
-              "type": "pampas-vase",
+              "type": "peace-lily",
               "at": [
                 -0.949,
                 -3.151
@@ -2222,7 +2216,7 @@
               "color": "#6b5846"
             },
             {
-              "type": "sofa-table",
+              "type": "console-table",
               "at": [
                 4.735,
                 -2.1
@@ -2864,7 +2858,7 @@
               "src": "compose@1"
             },
             {
-              "type": "plant-stand",
+              "type": "rubber-plant",
               "at": [
                 10.695,
                 -1.292
@@ -2948,7 +2942,7 @@
         "x": -1.9,
         "z": 0.8,
         "w": 3.6,
-        "d": 5.0
+        "d": 5
       },
       "y": 5.4,
       "type": "gable",
@@ -2986,11 +2980,11 @@
     {
       "over": {
         "x": -12.2,
-        "z": 5.0,
+        "z": 5,
         "w": 8.2,
         "d": 1.3
       },
-      "y": 3.0,
+      "y": 3,
       "type": "shed",
       "high": "N",
       "pitch": 25,
@@ -3007,11 +3001,11 @@
       "poly": [
         [
           -12,
-          5.0
+          5
         ],
         [
           -5,
-          5.0
+          5
         ],
         [
           -5,
@@ -3075,11 +3069,11 @@
       "type": "wall-low",
       "path": [
         [
-          -5.0,
+          -5,
           7.6
         ],
         [
-          -5.0,
+          -5,
           12.6
         ]
       ],
@@ -3092,11 +3086,11 @@
       "type": "wall-low",
       "path": [
         [
-          -12.0,
+          -12,
           7.2
         ],
         [
-          -12.0,
+          -12,
           12.4
         ]
       ],
@@ -3119,7 +3113,7 @@
       "id": "front-terrace",
       "poly": [
         [
-          5.0,
+          5,
           3.6
         ],
         [
@@ -3131,7 +3125,7 @@
           6.6
         ],
         [
-          5.0,
+          5,
           6.6
         ]
       ],
@@ -3172,7 +3166,7 @@
         ],
         [
           -2.4,
-          7.0
+          7
         ],
         [
           0.2,
@@ -3187,7 +3181,7 @@
           6.7
         ]
       ],
-      "w": 1.0,
+      "w": 1,
       "smooth": true,
       "surface": "flagstone",
       "color": "#b8a58c"
@@ -3221,7 +3215,7 @@
         ],
         [
           0.2,
-          10.0
+          10
         ],
         [
           -1.8,
@@ -3242,7 +3236,7 @@
       "type": "planting",
       "kind": "walk",
       "along": "path:front-walk",
-      "depth": 1.0,
+      "depth": 1,
       "mix": {
         "kinds": [
           "grass-tall",
@@ -3307,7 +3301,7 @@
     {
       "type": "shrub",
       "at": [
-        1.0,
+        1,
         9.9
       ],
       "form": "grass",
@@ -3318,7 +3312,7 @@
       "type": "flowers",
       "at": [
         12.6,
-        12.0
+        12
       ],
       "r": 0.6,
       "color": "#e8892b",
@@ -3336,7 +3330,7 @@
           4.7
         ],
         [
-          -14.0,
+          -14,
           5.2
         ],
         [
@@ -3386,7 +3380,7 @@
       "type": "picnic-table",
       "at": [
         -18.4,
-        11.0
+        11
       ],
       "rot": 20,
       "color": "#7b5634"
@@ -3396,7 +3390,7 @@
       "path": [
         [
           -12.8,
-          10.0
+          10
         ],
         [
           -14.6,
@@ -3471,7 +3465,7 @@
         5.2
       ],
       "species": "cypress",
-      "h": 6.0
+      "h": 6
     },
     {
       "type": "tree",
@@ -3524,7 +3518,7 @@
       ],
       "side": "right",
       "mix": "cottage",
-      "depth": 1.0,
+      "depth": 1,
       "bloom": [
         "#e8892b",
         "#f0b43a"
@@ -3659,7 +3653,7 @@
       {
         "level": "l1",
         "side": "S",
-        "from": 2.0,
+        "from": 2,
         "to": 7.8,
         "material": "brick",
         "color": "#d3d3d1"
@@ -3675,8 +3669,8 @@
       {
         "level": "l2",
         "side": "S",
-        "from": -2.0,
-        "to": 2.0,
+        "from": -2,
+        "to": 2,
         "material": "brick",
         "color": "#703c32"
       },
@@ -3739,11 +3733,11 @@
       "kind": "window-seat",
       "from": [
         -3.2,
-        5.0
+        5
       ],
       "to": [
-        0.0,
-        5.0
+        0,
+        5
       ],
       "face": "left",
       "h": 0.45,
