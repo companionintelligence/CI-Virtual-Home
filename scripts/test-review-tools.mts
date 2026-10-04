@@ -18,11 +18,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { compareBase, judge, summarise } from './review/cost.mts';
 import { cornerCam, costCameras, R24, r24Shots, MANNEQUIN, mannequinTop, EYE, FOV, type CostRoom } from './review/cameras.mts';
+import { ADDENDUM, OBSTRUCTED, ALT_CORNERS, addendumShots, candidateShots } from './review/addendum.mts';
 import { lumaMetrics } from './review/luma.mts';
 import { planPairs } from './review/ab.mts';
 import { diffManifests, type Manifest } from './review/manifest.mts';
-import { stableJson, mulberry32, fnv1a, productFingerprint, git, BASELINES, BEFORE_TAG, PRODUCT_PATHS } from './review/lib.mts';
+import { stableJson, mulberry32, fnv1a, productFingerprint, productKey, productKeyId, git, BASELINES, BEFORE_TAG, PRODUCT_PATHS } from './review/lib.mts';
 import { inFrustum } from './dress-census.mts';
 
 const REPO = path.resolve(import.meta.dirname, '..');
@@ -116,7 +118,7 @@ test('A/B plan: seeded, balanced, order not the room order', () => {
 });
 
 test('manifest diff names what moved', () => {
-  const mk = (h: string, cam = 1): Manifest => ({ schema: 1, set: 'x', tag: 't', product: { rev: 'r', tree: {} }, renderer: {} as any, shots: [{ id: 'a/NW/day', sha256: h, camera: { pos: [cam, 0, 0] } } as any, { id: 'b/NW/day', sha256: 'z', camera: { pos: [0, 0, 0] } } as any] });
+  const mk = (h: string, cam = 1): Manifest => ({ schema: 1, set: 'x', tag: 't', product: { tree: {} }, renderer: {} as any, shots: [{ id: 'a/NW/day', sha256: h, camera: { pos: [cam, 0, 0] } } as any, { id: 'b/NW/day', sha256: 'z', camera: { pos: [0, 0, 0] } } as any] });
   assert.equal(diffManifests(mk('h'), mk('h')).same, true);
   const d = diffManifests(mk('h'), mk('g'));
   assert.deepEqual(d.moved, ['a/NW/day']); assert.equal(d.same, false);
@@ -167,4 +169,68 @@ test('stableJson: keys sorted at every depth, same bytes whatever the insertion 
   assert.ok(stableJson({ b: 1, a: 2 }).indexOf('"a"') < stableJson({ b: 1, a: 2 }).indexOf('"b"'));
   assert.equal(fnv1a('x'), fnv1a('x')); assert.notEqual(fnv1a('x'), fnv1a('y'));
   assert.equal(typeof productFingerprint, 'function');
+});
+
+test('committed baselines are keyed by content: no commit hash and no GPU memory counter in any compared byte', () => {
+  // `rev` is the commit a baseline was frozen from, `memory` is renderer.info.memory: neither is a function of the product code, so a
+  // re-freeze from another commit with identical trees, or from a fresh process, would change bytes that nothing should compare.
+  for (const name of ['before.manifest.json', 'cost.json', 'before-addendum.manifest.json']) {
+    const f = path.join(BASELINES, name);
+    if (!fs.existsSync(f)) { assert.notEqual(name, 'cost.json'); continue; }
+    const text = fs.readFileSync(f, 'utf8'), j = JSON.parse(text);
+    assert.equal(j.product.rev, undefined, `${name}: product.rev (the commit) must not be in the compared bytes`);
+    assert.deepEqual(Object.keys(j.product).sort(), name === 'cost.json' ? ['tag', 'tree'] : ['tree'], name);
+    assert.ok(!/"memory"|"geometries"/.test(text), `${name}: renderer.info.memory counters are not reproducible across processes`);
+    assert.equal(Object.keys(j.product.tree).sort().join(), [...PRODUCT_PATHS].sort().join(), name);
+  }
+  const fp = { rev: 'aaaa', tree: { assets: 'x', content: 'y' } }, fp2 = { rev: 'bbbb', tree: { content: 'y', assets: 'x' } };
+  assert.equal(stableJson(productKey(fp)), stableJson(productKey(fp2)), 'two commits with identical trees give identical bytes');
+  assert.equal(productKeyId(fp), productKeyId(fp2));
+  assert.notEqual(productKeyId(fp), productKeyId({ rev: 'aaaa', tree: { assets: 'x', content: 'z' } }));
+  assert.equal((productKey(fp) as any).rev, undefined);
+});
+
+test('camera addendum: three alternatives for the three obstructed frames, none of them a frozen frame', () => {
+  const frozen = new Set(r24Shots().map(s => s.id));
+  assert.equal(frozen.size, 92, 'the frozen BEFORE set is untouched: 68 eye + 24 scale frames');
+  assert.equal(OBSTRUCTED.length, 3); assert.equal(ADDENDUM.length, 3);
+  assert.deepEqual(ADDENDUM.map(a => `${a.room}/${a.replaces}`).sort(), ['aurora-hall/NW', 'aurora-primary-bedroom/SE', 'riverbend-foyer/NW']);
+  for (const a of ADDENDUM) {
+    const o = OBSTRUCTED.find(x => x.room === a.room)!;
+    assert.equal(a.replaces, o.corner, `${a.room}: names the frozen corner it stands in for`);
+    assert.ok(ALT_CORNERS.includes(a.corner) && a.corner !== a.replaces, `${a.room}: another corner`);
+    assert.ok(R24.some(r => r.id === a.room && r.house === a.house), `${a.room} is an R24 room`);
+    assert.ok(a.why.length > 30, 'the reason is recorded');
+  }
+  for (const s of [...addendumShots(), ...candidateShots()]) assert.ok(!frozen.has(s.id), `${s.id} must not collide with a frozen frame`);
+  assert.equal(addendumShots().length, 3); assert.equal(candidateShots().length, 6);
+  // same formula as the frozen cameras, only the corner differs
+  const b = { x: 0, z: 0, w: 6, d: 4 };
+  assert.notDeepEqual(cornerCam(b, 0, 'NE').pos, cornerCam(b, 0, 'NW').pos);
+  assert.deepEqual(cornerCam(b, 0, 'SW').pos, [0.55, EYE, 3.45]); assert.deepEqual(cornerCam(b, 0, 'NE').pos, [5.45, EYE, 0.55]);
+  // an addendum manifest, when committed, was taken from the same product code as the frozen set
+  const f = path.join(BASELINES, 'before-addendum.manifest.json'), bf = path.join(BASELINES, 'before.manifest.json');
+  if (fs.existsSync(f) && fs.existsSync(bf)) {
+    const m: Manifest = JSON.parse(fs.readFileSync(f, 'utf8')), fm: Manifest = JSON.parse(fs.readFileSync(bf, 'utf8'));
+    assert.deepEqual(m.shots.map(s => s.id).sort(), addendumShots().map(s => s.id).sort());
+    assert.deepEqual(m.product, fm.product, 'taken from the frozen set\'s product code');
+    assert.deepEqual(m.renderer, fm.renderer);
+    for (const s of m.shots) { assert.match(s.sha256, /^[0-9a-f]{64}$/); assert.equal(s.tod, 'day'); assert.equal(s.kind, 'eye'); assert.ok(!fm.shots.some(x => x.id === s.id)); }
+  }
+});
+
+test('cost --compare judges the fresh run against the BASELINE, never against itself', () => {
+  const house = (calls: number, meshes: number) => ({
+    meshes, triangles: meshes * 200, textureMB: 10, lights: { spot: 4, point: 1 }, types: { sofa: [1, 5, 100] }, propMeshes: meshes / 2, propTriangles: meshes * 100, items: 50,
+    cameras: [{ cost: { audit: { calls, triangles: meshes * 150 }, pass: { calls: calls * 4 }, frame: { calls: calls * 7 }, visible: { meshes: calls / 2 } } }],
+  });
+  const mk = (calls: number) => ({ a: house(calls, 1000), b: house(calls, 1100), c: house(calls, 1200) }) as any;
+  const base = { summary: summarise(mk(1000)), houses: mk(1000) };
+  const worse = summarise(mk(1200));                                   // +20% interior draw calls
+  const all = judge(compareBase(base, ['a', 'b', 'c']), worse);
+  assert.ok(all.some(r => !r.ok), 'a 20% draw-call regression must fail when all houses are compared');
+  assert.equal(compareBase(base, ['a', 'b', 'c']), base.summary, 'the base side is the committed summary');
+  const sub = judge(compareBase(base, ['a', 'b']), summarise({ a: mk(1200).a, b: mk(1200).b } as any));
+  assert.ok(sub.some(r => !r.ok), 'and for a subset of houses');
+  assert.ok(judge(compareBase(base, ['a', 'b', 'c']), summarise(mk(1000))).every(r => r.ok), 'an unchanged tree passes');
 });

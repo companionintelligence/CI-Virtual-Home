@@ -1,0 +1,101 @@
+{
+ "product": {
+  "tree": {
+   "assets": "2346630eb450639b2c357c038ca2843fc5ce2dbc",
+   "content": "61713bc934c7f751b99e359aa9747b33ddca468e",
+   "index.html": "4c3b61139a1738d39a94032bfcd5ca9c28f76451",
+   "portal": "92ee799553360aeb93fa5345414fbc3a5a1f98cb",
+   "room-creator.html": "444aefbedda05db45f497ce40fb9e321ae5070cc",
+   "scripts/vendor": "76a68a31c91fdb69760ea0887f83d815a32a2572"
+  }
+ },
+ "renderer": {
+  "chromium": "154.0.8037.0",
+  "dressing": {
+   "roof": "on",
+   "walls": "up"
+  },
+  "profile": "macos-metal",
+  "quality": 0.93,
+  "res": "720",
+  "size": {
+   "h": 720,
+   "w": 1280
+  },
+  "supersample": 2
+ },
+ "schema": 1,
+ "set": "before-addendum",
+ "shots": [
+  {
+   "bytes": 158699,
+   "camera": {
+    "corner": "SW",
+    "eye": 1.5,
+    "fov": 60,
+    "near": 0.05,
+    "pos": [1.25, 1.9, 3.25],
+    "target": [3.925, 1.45, -0.25]
+   },
+   "corner": "SW",
+   "file": "riverbend-foyer__SW-day.jpg",
+   "house": "riverbend",
+   "id": "riverbend-foyer/SW/day",
+   "kind": "eye",
+   "level": "l1",
+   "program": null,
+   "res": "1280x720",
+   "room": "riverbend-foyer",
+   "roomName": "Foyer & Stair Hall",
+   "sha256": "aa77195ee4c5b79205bdc67af47e767b1045d45f4ed076fc29c3ede0884e335b",
+   "tod": "day"
+  },
+  {
+   "bytes": 99043,
+   "camera": {
+    "corner": "NE",
+    "eye": 1.5,
+    "fov": 60,
+    "near": 0.05,
+    "pos": [5.65, 4.5, -0.85],
+    "target": [3.05, 4.05, 2.05]
+   },
+   "corner": "NE",
+   "file": "aurora-primary-bedroom__NE-day.jpg",
+   "house": "aurora",
+   "id": "aurora-primary-bedroom/NE/day",
+   "kind": "eye",
+   "level": "l2",
+   "program": "bed-primary",
+   "res": "1280x720",
+   "room": "aurora-primary-bedroom",
+   "roomName": "Primary Bedroom",
+   "sha256": "7657f8b25b048c64372673bc4cde5867528f3118963a2828205b498159af5f17",
+   "tod": "day"
+  },
+  {
+   "bytes": 134056,
+   "camera": {
+    "corner": "SW",
+    "eye": 1.5,
+    "fov": 60,
+    "near": 0.05,
+    "pos": [-5.2, 4.5, -1.8],
+    "target": [6.1, 4.05, -2.9]
+   },
+   "corner": "SW",
+   "file": "aurora-hall__SW-day.jpg",
+   "house": "aurora",
+   "id": "aurora-hall/SW/day",
+   "kind": "eye",
+   "level": "l2",
+   "program": "hall",
+   "res": "1280x720",
+   "room": "aurora-hall",
+   "roomName": "Hall",
+   "sha256": "fb1f92221d4295f0cebcc20cd47b03d035f434070a606ca1c13fba61f92fbc11",
+   "tod": "day"
+  }
+ ],
+ "tag": "baseline/stage0-green"
+}
