@@ -99,7 +99,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     label: 'Night',
     sky: ['#0b1731', '#424b64', '#17202a'],
     sun: { color: '#bed5ff', intensity: 0.35, elevation: 38, swing: 40 },
-    hemi: { sky: '#829fc9', ground: '#3d4656', intensity: 1.25 },
+    hemi: { sky: '#829fc9', ground: '#3d4656', intensity: 1.4 },
     fill: { color: '#8aa2c9', intensity: 0.22 },
     ambient: 0,
     exposure: 0.85, env: 0.30,

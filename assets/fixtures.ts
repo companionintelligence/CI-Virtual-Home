@@ -46,12 +46,15 @@ export const FILL_ANGLE_MAX = 1.25;   // rad (~72°): a wider cone only lights t
 /** lampGain under which the room's light is off for good: day (0.035). Offline (composer, editor) the spot is then HIDDEN, so the
  *  day shader has no spot lights to loop over; the live player keeps it in the scene at intensity 0 (see applyLampGain). */
 export const FILL_ON_GAIN = 0.1;
-// Practical lamp pools (plan 5.2 L3): a room that has a lamp lights the way a room with a lamp is lit, from the lamp. One static
-// PointLight at the lamp head nearest the room's centre (no camera dependence, no shadow), and the room's fill spot drops to
-// LAMP_ROOM_FILL_K of its own floor target (0.12 against ROOM_FILL_K's 0.3 elsewhere). The pool's intensity scales with the room's
-// size (to a cap) and its reach is a fixed fraction of the room's diagonal: no shadows, so what keeps it in its room is distance.
-export const LAMP_ROOM_FILL_K = 0.12;
-export const LAMP_POOL_I = 2.2;       // cd at gain 1, for a 3 m room; × √area / 3, at most × LAMP_POOL_MAX
+// Practical lamp pools (plan 5.2 L3): a room that has a lamp is lit the way a room with a lamp is lit, from the lamp. One static
+// PointLight at the lamp head nearest the room's centre (no camera dependence, no shadow) IS that room's light: the fill spot is not made
+// when LAMP_ROOM_FILL_K is 0, so a lamp room costs one light like any other and a house still runs at most LIGHT_CAP of them (16 rooms lit;
+// the design's own budget line, "the lamp light replaces the room fill"). A positive LAMP_ROOM_FILL_K keeps a weak spot beside the pool at that
+// fraction of the floor target and charges the room two lights (measured: 7 of 16 lit rooms then lose the fill entirely in a lamp-heavy house).
+// The pool's intensity scales with the room's size (to a cap) and its reach is a fixed fraction of the room's diagonal: no shadows, so what keeps
+// it in its room is distance. The sky and bounce light that every room has anyway carry what the pool does not reach.
+export const LAMP_ROOM_FILL_K = 0;
+export const LAMP_POOL_I = 2.6;       // cd at gain 1, for a 3 m room; × √area / 3, at most × LAMP_POOL_MAX
 export const LAMP_POOL_MAX = 1.6;
 export const LAMP_POOL_REACH = 0.62;  // × the room's diagonal
 export const LAMP_POOL_DECAY = 1.6;
@@ -132,8 +135,8 @@ function stateFor(ctx) {
   const rng = mulberry32(fnv1a(`${spec.id}:fixtures`));
   const pick = arr => arr[Math.floor(rng() * arr.length)];
 
-  // which rooms get a light: room kind × √area, highest first, while LIGHT_CAP lights last. A room costs one light, two when it has a
-  // lamp (its lamp's pool and its weak fill), so the house never runs more than LIGHT_CAP dynamic lights of ours
+  // which rooms get a light: room kind × √area, highest first, while LIGHT_CAP lights last. A room costs one light (its fill spot or its lamp's
+  // pool), two only when LAMP_ROOM_FILL_K keeps a fill beside a pool, so the house never runs more than LIGHT_CAP dynamic lights of ours
   const scheme = schemeOf(spec);
   const ranked = [];
   (spec.levels || []).forEach((lv, li) => (lv.rooms || []).forEach((r, ri) => {
@@ -177,7 +180,7 @@ function stateFor(ctx) {
   s = {
     rng, pick, lit, scheme, warm: scheme.lampColor, M, G, fanStyle, diningStyle: pick(['dome', 'globe', 'dome']),
     lights: [], gain: readGain(),
-    stats: { recessed: 0, pendants: 0, fans: 0, lights: 0, pools: 0, glass: 0, halos: 0, lamps: {} as Record<string, number> },
+    stats: { recessed: 0, pendants: 0, fans: 0, lights: 0, pools: 0, litRooms: [] as string[], glass: 0, halos: 0, lamps: {} as Record<string, number> },
     // kit-rules.ts: which rooms may hang a fan (rooms[].fixtures.fan; under defaults 2 a seeded minority), and the
     // lamp kind each room's floor lamps become (rooms[].fixtures.lamp; defaults 2 seeded) — both keyed lv#room
     fans: fanPlan(spec, fanEligible), lamps: lampPlan(spec),
@@ -564,16 +567,20 @@ export function dressLevel(ctx) {
       const floorE = 0.26 * Math.min(36, Math.max(18, 12 + 0.8 * area)) * (kind === 'service' ? 0.6 : kind === 'hall' ? 0.45 : 1) * Math.min(1, Math.max(0.55, rs / 1.6));
       // the lamp that will pool this room's light: of the room's lamps, the head nearest its centre (ties by item order)
       const pool = litRoom.lamp ? lampHead_(items, cx, cz) : null;
-      const base = (pool ? LAMP_ROOM_FILL_K : ROOM_FILL_K) * floorE * drop ** decay / Math.max(0.5, win);
-      const light = new THREE.SpotLight(s.warm, base * s.gain, distance, angle, FILL_PENUMBRA, decay);
-      light.name = 'Fixture light'; light.castShadow = false;
-      light.position.copy(local(cx, ly, cz));
-      light.target.position.copy(local(cx, y, cz));
-      light.userData.fixtureLight = true;   // not `fixture`: that tag means "a mesh whose emissive the gain scales"
-      light.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
-      g.add(light, light.target);
-      s.lights.push({ light, base, room: room.name });
-      s.stats.lights++;
+      s.stats.litRooms.push(room.name);
+      // a lamp room's fill is LAMP_ROOM_FILL_K of the floor target; at 0 the lamp's pool IS the room's light and no spot is made
+      if (!pool || LAMP_ROOM_FILL_K > 0) {
+        const base = (pool ? LAMP_ROOM_FILL_K : ROOM_FILL_K) * floorE * drop ** decay / Math.max(0.5, win);
+        const light = new THREE.SpotLight(s.warm, base * s.gain, distance, angle, FILL_PENUMBRA, decay);
+        light.name = 'Fixture light'; light.castShadow = false;
+        light.position.copy(local(cx, ly, cz));
+        light.target.position.copy(local(cx, y, cz));
+        light.userData.fixtureLight = true;   // not `fixture`: that tag means "a mesh whose emissive the gain scales"
+        light.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
+        g.add(light, light.target);
+        s.lights.push({ light, base, room: room.name });
+        s.stats.lights++;
+      }
       if (pool) {
         const diag = Math.hypot(b.w, b.d), pbase = LAMP_POOL_I * Math.min(LAMP_POOL_MAX, Math.sqrt(area) / 3);
         const pl = new THREE.PointLight(s.warm, pbase * s.gain, LAMP_POOL_REACH * diag, LAMP_POOL_DECAY);
