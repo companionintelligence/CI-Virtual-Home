@@ -23507,6 +23507,112 @@
     ],
     "styles": []
    }
+  },
+  "medicine-cabinet": {
+   "footprint": [
+    0.6,
+    0.13
+   ],
+   "height": 0.56,
+   "box": [
+    -0.3,
+    0,
+    0,
+    0.3,
+    0.56,
+    0.131
+   ],
+   "meshes": 3,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "y",
+    "color"
+   ],
+   "tags": [
+    "bathroom"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.3,
+      0,
+      0,
+      0.3,
+      0.56,
+      0.114
+     ],
+     "color": "role:cabinet"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.022,
+      0.336,
+      0.107,
+      0.022,
+      0.354,
+      0.131
+     ],
+     "color": "role:metal"
+    },
+    {
+     "shape": "box",
+     "box": [
+      -0.258,
+      0.167,
+      0.105,
+      0.258,
+      0.512,
+      0.11
+     ],
+     "color": "#e2e8f0"
+    }
+   ],
+   "place": null
+  },
+  "cardboard-box": {
+   "footprint": [
+    0.45,
+    0.54
+   ],
+   "height": 0.42,
+   "box": [
+    -0.225,
+    0,
+    -0.272,
+    0.225,
+    0.42,
+    0.272
+   ],
+   "meshes": 1,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "h"
+   ],
+   "tags": [
+    "storage",
+    "garage"
+   ],
+   "iso": [
+    {
+     "shape": "box",
+     "box": [
+      -0.225,
+      0,
+      -0.272,
+      0.225,
+      0.42,
+      0.272
+     ],
+     "color": "#c79f7e"
+    }
+   ],
+   "place": null
   }
  },
  "patterns": {

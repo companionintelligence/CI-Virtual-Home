@@ -1952,6 +1952,7 @@
     import { TransformControls } from 'three/addons/TransformControls.js';
     import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
     import { createHouseBuilder } from './assets/house-builder.js';
+    import { ensureBaked } from './assets/props/model-kit.js';   // OWNER bake: the lazy-chunk seam of the baked prop layer (a no-op while every family is eager)
     import { createVisibility, ISO_VIEW, placeIsoCamera } from './assets/visibility.js';
     import { trackFromV1, trackView } from './assets/shot-track.js';
     import { qaTrack, qaAspects } from './assets/shot-qa.js';
@@ -7660,6 +7661,8 @@
     // In the editor it first names the home over the viewport (the build blocks the page for a second or two, so the
     // overlay is painted before it starts), and the transport is off until the home is in (Completeness J).
     // `quiet`: build it for a poster (Compare homes) and say nothing about it: no overlay, no URL, no checks, no ready signal.
+    // every item type a spec's rooms use (what ensureBaked needs to know)
+    const propTypesOf = spec => { const t = new Set(); for (const lv of spec.levels || []) for (const r of lv.rooms || []) for (const it of r.items || []) if (it && it.type) t.add(it.type); return t; };
     async function loadHouse(id, { quiet = false } = {}) {
       const chrome = !VIEW_MODE && !quiet;
       if (chrome) showBuilding(id);
@@ -7669,6 +7672,7 @@
         if (chrome) { showBuilding(id, spec); await nextPaint(); }
       } catch (err) { if (chrome) hideBuilding(); throw err; }
       try {
+        await ensureBaked(propTypesOf(spec));   // OWNER bake: baked families are loaded before the build (nothing to load yet)
         clearScene();
         setLightingPreset(spec.lighting, {});   // the hour first, so builders reading window.__houseLighting / scene.userData.horizon see this house's; the build re-aims it
         beginBatch();
@@ -8893,7 +8897,8 @@
     window.__houseDebug = () => ({ house: activeHouse, scene, camera: activeCamera, presets: SplinePresets, renderer });
     // Prop sheet (scripts/prop-sheet.mts): each type built alone on a neutral floor, shot from the front-right
     // three-quarter, framed to its size. Returns base64 JPEGs keyed by type. Registry props and page items alike.
-    window.__housePropSheet = function (types, { res = '540', palette = null, params = {} } = {}) {
+    window.__housePropSheet = async function (types, { res = '540', palette = null, params = {} } = {}) {
+      await ensureBaked(types);   // OWNER bake
       const out = {};
       const pal = palette || { wall: '#f1f5f9', trim: '#1e293b', accent: '#0f766e', roof: '#334155', material: 'stucco' };
       clearScene();
