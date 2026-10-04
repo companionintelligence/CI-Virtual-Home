@@ -113,3 +113,55 @@ test('L2: the sources tag the ceilings and the batcher knows the tag', () => {
   assert.match(read('viewer-batch.ts'), /BENIGN_MATERIAL_USERDATA = new Set\(\[[^\]]*'bounce'/);
   assert.match(read('viewer-batch.ts'), /MUTATED_MATERIAL_KEYS = \[[^\]]*'bounce'/);
 });
+
+// ---- F0: the house scheme ---------------------------------------------------------------------------------------------------------------
+import { schemeOf, SCHEME_STYLES, LAMP_COLORS } from '../assets/house-scheme.js';
+import { STYLE_KEYS } from '../assets/house-styles.js';
+
+const HOUSES_DIR = path.join(ROOT, 'content', 'houses');
+const fleetSpecs = fs.readdirSync(HOUSES_DIR).filter(f => f.endsWith('.json') && f !== 'index.json' && !f.endsWith('.plan.json')).sort().map(f => JSON.parse(fs.readFileSync(path.join(HOUSES_DIR, f), 'utf8')));
+
+test('F0: every style has a scheme row, and the scheme reads the style the house is furnished in', () => {
+  assert.deepEqual([...SCHEME_STYLES].sort(), [...STYLE_KEYS].sort());
+  assert.equal(schemeOf({ styleKey: 'cottage' }).metal, 'brass');
+  assert.equal(schemeOf({ styleKey: 'modern' }).metal, 'black');
+  assert.equal(schemeOf({ styleKey: 'craftsman' }).metal, 'bronze');
+  assert.equal(schemeOf({ styleKey: 'industrial' }).metal, 'steel');
+  assert.equal(schemeOf({ style: 'A queen anne farmhouse with a wrap porch' }).style, 'farmhouse', 'the free-text style is read when there is no styleKey');
+  assert.equal(schemeOf({}).style, 'modern', 'no style at all is modern');
+});
+
+test('F0: schemeOf is pure: same spec, equal scheme, and the spec is untouched', () => {
+  for (const spec of fleetSpecs) {
+    const before = JSON.stringify(spec);
+    assert.deepEqual(schemeOf(spec), schemeOf(spec), spec.id);
+    assert.equal(JSON.stringify(spec), before, `${spec.id} not mutated`);
+  }
+});
+
+test('F0: the shipped fleet gets a metal the plan expects (cottage brass, modern black) and lamp colours that are today\'s or warmer', () => {
+  const metals = new Map<string, Set<string>>();
+  for (const spec of fleetSpecs) { const s = schemeOf(spec); (metals.get(s.style) || metals.set(s.style, new Set()).get(s.style)!).add(s.metal); assert.ok([2700, 3000, 3500].includes(s.lampK)); assert.equal(s.lampColor, LAMP_COLORS[s.lampK]); }
+  for (const [style, ms] of metals) assert.equal(ms.size, 1, `${style}: one metal per style`);
+  assert.deepEqual([...metals.get('cottage') || []], ['brass']);
+  assert.deepEqual([...metals.get('modern') || []], ['black']);
+  assert.equal(LAMP_COLORS[3000], 0xffd7a8, '3000 K is the WARM the fixtures have always used');
+  for (const k of [2700, 3000, 3500] as const) { const c = LAMP_COLORS[k]; assert.ok((c >> 16) === 0xff, 'red channel full'); }
+  assert.ok(LAMP_COLORS[2700] < LAMP_COLORS[3000] && LAMP_COLORS[3000] < LAMP_COLORS[3500], 'warmer is lower in blue and green');
+});
+
+test('F0: schemes use only what exists: ceiling kinds room-finish builds, floors and walls the bundle lists, trim in a sane range', () => {
+  const KINDS = new Set(['flat', 'timber', 'beams', 'tray']);
+  for (const key of STYLE_KEYS) {
+    const s = schemeOf({ styleKey: key });
+    for (const k of Object.values(s.ceiling)) assert.ok(KINDS.has(k as string), `${key} ceiling ${k}`);
+    assert.ok(s.trim.crown >= 0 && s.trim.crown <= 0.15, `${key} crown`);
+    assert.deepEqual(s.floors, STYLES[key].finish.floor); assert.deepEqual(s.walls, STYLES[key].finish.wall);
+  }
+});
+
+test('F0: house-scheme.ts is THREE-free and clock-free, and the kit carries it', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'assets', 'house-scheme.ts'), 'utf8').replace(/\/\/.*$/gm, '');
+  assert.ok(!/THREE|Math\.random|Date\.now|performance\.now/.test(src));
+  assert.match(fs.readFileSync(path.join(ROOT, 'assets', 'kit-build.ts'), 'utf8'), /\.scheme = schemeOf\(spec\)/);
+});
