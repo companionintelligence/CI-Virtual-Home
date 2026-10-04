@@ -29,7 +29,7 @@
 //                                             serves another checkout) and compare: L2's tag on ceiling materials must cost at most +2 % median.
 //                                             --houses a,b  --label <name>
 //
-//   pnpm run test:light -- --probe           the bench without the provenance rules: the same cameras (from before.manifest.json) and the same 19 reads, on the
+//   pnpm run test:light -- --probe           (--variant grade|ao|all: with a runtime L4 variant) the bench without the provenance rules: the same cameras (from before.manifest.json) and the same 19 reads, on the
 //                                             tree as it is, committed or not, for tuning a constant. Not a gate result (use --bench for that).   --tods dusk,night
 //
 // Frames are read off the product's own composer path (__houseSnapshot / __houseRenderFrames, 2x supersample, GTAO, bloom, grade, SMAA), at
@@ -327,6 +327,11 @@ async function probeMode(): Promise<number> {
       const burn = await session.open(house, { res: RES });
       try { await burn.page.evaluate((r: string) => (window as any).__houseSnapshot({ res: r, quality: 0.5 }), RES); } finally { await burn.close(); }
       const w = await session.open(house, { res: RES });
+      // --variant grade|ao|all: the runtime L4 variants of --portal, to read what they would add to the bench rooms (quantifying a row that L4 owns)
+      if (args.variant && args.variant !== 'true') {
+        if (!(args.variant in VARIANTS)) throw new Error(`unknown variant ${args.variant}`);
+        await w.page.evaluate(async (src: string) => { const W = window as any, d = W.__houseDebug(); return await new Function('W', 'd', `return (async () => { ${src} })();`)(W, d); }, VARIANTS[args.variant]);
+      }
       for (const tod of ['day', 'dusk', 'night']) {
         if (!tods.has(tod)) continue;
         await w.page.evaluate((t: string) => (window as any).__houseSetLighting(t), tod);
