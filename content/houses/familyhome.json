@@ -431,7 +431,7 @@
             -2,
             4
           ],
-          "door": 1.0,
+          "door": 1,
           "doorW": 0.8
         },
         {
@@ -615,7 +615,7 @@
               "color": "#e4d9ab"
             },
             {
-              "type": "side-table",
+              "type": "nesting-tables",
               "at": [
                 -3.7,
                 -4.1
@@ -804,7 +804,7 @@
               "color": "#ece6d4"
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 2.5,
                 -4.32
@@ -949,7 +949,7 @@
               "color": "#6b4a2e"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 4.88,
                 0.45
@@ -1075,7 +1075,7 @@
               "src": "compose@1"
             },
             {
-              "type": "olive-tree-pot",
+              "type": "bird-of-paradise",
               "at": [
                 4.383,
                 3.859
@@ -1405,13 +1405,12 @@
               "color": "#efe6cc"
             },
             {
-              "type": "side-table",
+              "type": "drum-table",
               "at": [
                 5.3,
                 5.3
               ],
               "rot": 0,
-              "w": 0.45,
               "y": 0,
               "color": "#efe6cc"
             },
@@ -1445,7 +1444,7 @@
               "rot": 270
             },
             {
-              "type": "plant-stand",
+              "type": "bird-of-paradise",
               "at": [
                 5.75,
                 3.7
@@ -1966,7 +1965,7 @@
               "y": 0.82
             },
             {
-              "type": "wood-stool",
+              "type": "bar-stool",
               "at": [
                 -3,
                 2.98
@@ -2245,7 +2244,7 @@
               "y": 1.3
             },
             {
-              "type": "snake-plant",
+              "type": "peace-lily",
               "at": [
                 -1.35,
                 3.7
@@ -2353,7 +2352,7 @@
               "src": "compose@1"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 1.073,
                 2.05
@@ -2376,7 +2375,7 @@
               "src": "compose@1"
             },
             {
-              "type": "ficus-tree",
+              "type": "rubber-plant",
               "at": [
                 4.323,
                 3.754
@@ -3191,7 +3190,7 @@
           -10.9
         ],
         [
-          -1.0,
+          -1,
           -10.6
         ]
       ],
@@ -3370,7 +3369,7 @@
         1.9,
         -11.4
       ],
-      "r": 1.0,
+      "r": 1,
       "n": 4,
       "species": [
         "shrub",

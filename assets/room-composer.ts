@@ -268,8 +268,10 @@ export class Composer {
       // the group may not: the sofa goes there, its side table does not)
       for (const o of g.keepouts) if (overlap(it.box, o) > 0.005 && !(this.relaxed && !it.opt && g.soft.includes(o))) return no('in a keep-out');
       // a plant or a lamp by the glass is fine; a bed under a window is the bed group's penalty, not a veto (plan S3:
-      // "not under a window unless unavoidable")
-      if (grp !== 'plant' && grp !== 'lamp' && grp !== 'bed' && !(this.relaxed && (grp === 'appliance' || grp === 'fitted')) && !this.clearOfWindows(it)) return no('in front of a window');
+      // "not under a window unless unavoidable"). A tight real bathroom, every wall glazed, is relaxed the same way a
+      // tight kitchen already was: a last-resort vanity or shower in front of the window beats none at all (the room's
+      // essentials, bathGroups' own comment: "never left with nothing to wash in")
+      if (grp !== 'plant' && grp !== 'lamp' && grp !== 'bed' && !(this.relaxed && (grp === 'appliance' || grp === 'fitted' || grp === 'bath')) && !this.clearOfWindows(it)) return no('in front of a window');
     }
     if (it.layer === 'floor') { for (const o of g.obstacles) if (overlap(it.box, o) > 0.05) return no('rug on an obstacle'); }
     if (it.layer === 'wall' && !this.clearOfWindows(it)) return no('hung over a window');
@@ -829,7 +831,7 @@ function seatingGroup(c: C, fc: { side: Side; t: number; type: string }, { big =
 function diningGroup(c: C, region: { x0: number; z0: number; x1: number; z1: number } | null = null): Group | null {
   const g = c.geo, R = region || { x0: g.b.x, z0: g.b.z, x1: g.b.x + g.b.w, z1: g.b.z + g.b.d };
   const W = R.x1 - R.x0, D = R.z1 - R.z0, along = W >= D, long = Math.max(W, D), short = Math.min(W, D);
-  if (short < 2.2) return null;
+  if (short < 2.2 - 1e-6) return null;
   const round = (long < 3.4 || long - short < 0.6) && c.rng() < 0.7;
   const type = round ? (c.pick('dining-table-round') || 'round-dining-table') : (c.pick('dining-table') || 'farmhouse-table');
   const isRound = PLACEMENT[type].roles.includes('dining-table-round') && (type === 'round-dining-table' || type === 'pedestal-dining-table');
@@ -1205,9 +1207,13 @@ function fillers(c: C): Array<() => Group | null> {
   if (lounge) list.push(() => storageGroup(c, P === 'library' ? 'bookcase' : 'sideboard'));
   if (bed) list.push(() => storageGroup(c, 'dresser'), () => deskGroup(c));
   if (P === 'dining') list.push(() => storageGroup(c, 'sideboard'));
-  // a kitchen with a bare half has room for a table to eat at: the biggest empty floor
-  if (P === 'kitchen' && g.area >= 16 && !c.groups.some(x => x.name === 'dining')) list.push(() => { const r = freeRects(c, 2.2, 1); return r.length ? diningGroup(c, r[0]) : null; });
+  // a kitchen with a bare half has room for a table to eat at: the biggest empty floor. freeRects is the real gate (its
+  // own 2.2 m minimum): a galley run that only eats 1 m of a deep room leaves most of a sub-16 m² kitchen free for one
+  if (P === 'kitchen' && !c.groups.some(x => x.name === 'dining')) list.push(() => { const r = freeRects(c, 2.2, 1); return r.length ? diningGroup(c, r[0]) : null; });
   if (P === 'foyer' || P === 'hall') list.push(() => storageGroup(c, 'console'), () => storageGroup(c, 'bench', { dress: false }));
+  // a laundry's pair, hamper and hooks naturally cluster on the one wall that fits a washer and dryer: open shelving or
+  // a shoe rack on another wall uses the floor those leave bare (no floor-lamp or floor plant suits the program)
+  if (P === 'laundry') list.push(() => storageGroup(c, 'shelving', { dress: false }), () => storageGroup(c, 'shoe-rack', { dress: false }));
   list.push(() => floorLampGroup(c), () => plantGroup(c), () => plantGroup(c));
   return list;
 }
@@ -1369,6 +1375,10 @@ function composeRoomOnce(spec: any, lv: any, room: any, house: HouseState, compo
   // a label one group could not stand and a later one did (the bathing: a tub, else a shower) is not missing
   const missing = dropped.filter(n => labelled.has(n) && !placedLabels.has(n));
   c.avoid = new Set(); c.attempt = 0;
+  // the essentials' own annealing (400 seeded steps over the movable groups) runs first: it can shift a lounge or a
+  // reading corner across the room, and the empty-half call below must see where things actually end up, not where
+  // the unannealed first pass left them (a room anneal later unbalanced was passing the check for the wrong layout)
+  c.anneal(400);
   // a room of 12 m² or more whose every piece stands in one half (the `empty-half` lint, plan H: "no furniture islands with empty
   // halves") is given what its program can use in the other half: a reading corner, a sideboard or shelves, a lamp, plants
   const half = emptyHalf(c);
@@ -1387,7 +1397,6 @@ function composeRoomOnce(spec: any, lv: any, room: any, house: HouseState, compo
     }
     c.avoid = new Set(); c.attempt = 0;
   }
-  c.anneal(400);
   // the report: the lanes at the room's width (0.9 m where it has 3 m to give, else 0.8) and anything its geometry
   // alone already blocks (a stair across a landing), which no composition can open
   const lanes = lanesOk(c.geo, laneGrid(c.geo, c.blockers()), c.laneW, c.access());

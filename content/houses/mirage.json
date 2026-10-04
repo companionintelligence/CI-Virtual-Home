@@ -282,7 +282,7 @@
               "color": "#5f6b34"
             },
             {
-              "type": "arch-mirror",
+              "type": "round-mirror",
               "at": [
                 -7.1,
                 3.3
@@ -310,7 +310,7 @@
               "color": "#3d3a30"
             },
             {
-              "type": "olive-tree-pot",
+              "type": "bird-of-paradise",
               "at": [
                 -9,
                 4.1
@@ -414,14 +414,14 @@
               "color": "#4a3121"
             },
             {
-              "type": "olive-tree-pot",
+              "type": "bird-of-paradise",
               "at": [
                 -12.45,
                 1.5
               ]
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -12.92,
                 -0.7
@@ -472,7 +472,7 @@
               "src": "compose@1"
             },
             {
-              "type": "sofa-table",
+              "type": "console-table",
               "at": [
                 -4.275,
                 -4.32
@@ -904,7 +904,7 @@
               "src": "compose@1"
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 -7.26,
                 -2.52
@@ -924,7 +924,7 @@
               "src": "compose@1"
             },
             {
-              "type": "ponytail-palm",
+              "type": "bird-of-paradise",
               "at": [
                 -12.453,
                 -4.951
@@ -962,14 +962,14 @@
           },
           "items": [
             {
-              "type": "olive-tree-pot",
+              "type": "bird-of-paradise",
               "at": [
                 -4.4,
                 0.05
               ]
             },
             {
-              "type": "snake-plant",
+              "type": "peace-lily",
               "at": [
                 -6.85,
                 -7.65
@@ -1088,7 +1088,7 @@
               "color": "#3a4524"
             },
             {
-              "type": "side-table",
+              "type": "nesting-tables",
               "at": [
                 -2.85,
                 -7.4
@@ -1096,7 +1096,7 @@
               "color": "#14120d"
             },
             {
-              "type": "snake-plant",
+              "type": "zz-plant",
               "at": [
                 -2.85,
                 -7.4
@@ -1106,7 +1106,7 @@
               "color": "#9aa86a"
             },
             {
-              "type": "olive-tree-pot",
+              "type": "bird-of-paradise",
               "at": [
                 -3.55,
                 -0.55
@@ -1167,7 +1167,7 @@
               "color": "#4d5a32"
             },
             {
-              "type": "drum-table",
+              "type": "nesting-tables",
               "at": [
                 -1.9,
                 -1.45
@@ -1834,7 +1834,7 @@
               "color": "#4a3121"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -2.4,
                 -7.89
@@ -1875,7 +1875,7 @@
               "src": "compose@1"
             },
             {
-              "type": "pampas-vase",
+              "type": "peace-lily",
               "at": [
                 -0.094,
                 -2.251
@@ -2031,14 +2031,12 @@
               "src": "compose@1"
             },
             {
-              "type": "arch-mirror",
+              "type": "round-mirror",
               "at": [
                 1.427,
                 -0.215
               ],
               "rot": 270,
-              "w": 0.5,
-              "h": 1.1,
               "y": 1.85,
               "src": "compose@1"
             },
@@ -2053,7 +2051,7 @@
               "src": "compose@1"
             },
             {
-              "type": "tall-cactus",
+              "type": "rubber-plant",
               "at": [
                 -3.685,
                 1.635
@@ -2192,7 +2190,7 @@
               "src": "compose@1"
             },
             {
-              "type": "side-table",
+              "type": "nesting-tables",
               "at": [
                 6.635,
                 -3.62
@@ -2213,7 +2211,7 @@
               "src": "compose@1"
             },
             {
-              "type": "side-table",
+              "type": "nesting-tables",
               "at": [
                 6.635,
                 -1
@@ -2536,7 +2534,18 @@
         }
       ],
       "partitions": [
-        {"from": [-3, -2.1], "to": [-0.4, -2.1], "door": 1.3, "doorW": 2.4}
+        {
+          "from": [
+            -3,
+            -2.1
+          ],
+          "to": [
+            -0.4,
+            -2.1
+          ],
+          "door": 1.3,
+          "doorW": 2.4
+        }
       ],
       "rooms": [
         {
@@ -2621,7 +2630,7 @@
               "color": "#8a7f6a"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 2,
                 -1.97
@@ -3193,7 +3202,7 @@
     {
       "type": "rock",
       "at": [
-        -3.0,
+        -3,
         10.4
       ],
       "r": 0.6
@@ -3209,7 +3218,7 @@
     {
       "type": "rock",
       "at": [
-        -1.0,
+        -1,
         10.2
       ],
       "r": 0.5

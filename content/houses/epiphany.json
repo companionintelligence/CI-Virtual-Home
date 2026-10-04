@@ -489,14 +489,12 @@
               "color": "#161514"
             },
             {
-              "type": "arch-mirror",
+              "type": "round-mirror",
               "at": [
                 7,
                 -0.5
               ],
               "rot": 0,
-              "w": 0.8,
-              "h": 1.4,
               "y": 0.95
             },
             {
@@ -609,7 +607,7 @@
           },
           "items": [
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 3.88,
                 0.5
@@ -756,7 +754,7 @@
                 2.6
               ],
               "rot": 0,
-              "w": 4.0,
+              "w": 4,
               "d": 2.6,
               "pattern": "solid",
               "color": "#c9c7c1"
@@ -811,7 +809,7 @@
             {
               "type": "shell-chair",
               "at": [
-                -1.0,
+                -1,
                 1.78
               ],
               "rot": 0,
@@ -820,7 +818,7 @@
             {
               "type": "shell-chair",
               "at": [
-                -1.0,
+                -1,
                 3.42
               ],
               "rot": 180,
@@ -1182,7 +1180,7 @@
             {
               "type": "club-chair",
               "at": [
-                -3.0,
+                -3,
                 -1.95
               ],
               "rot": 50,
@@ -1249,7 +1247,7 @@
               "color": "#b08a4a"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -2.1,
                 -5.8
@@ -1261,7 +1259,7 @@
               "motif": "line"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -1.8,
                 -5.8
@@ -1328,11 +1326,11 @@
             {
               "type": "patterned-rug",
               "at": [
-                7.0,
+                7,
                 -4.3
               ],
               "rot": 0,
-              "w": 3.0,
+              "w": 3,
               "d": 2.6,
               "pattern": "solid",
               "color": "#d8cdb2"
@@ -1417,14 +1415,12 @@
               "color": "#1c1a18"
             },
             {
-              "type": "arch-mirror",
+              "type": "round-mirror",
               "at": [
                 6.67,
                 -0.7
               ],
               "rot": 180,
-              "w": 0.8,
-              "h": 1.1,
               "y": 1.3
             },
             {
@@ -1440,7 +1436,7 @@
               "motif": "landscape"
             },
             {
-              "type": "tall-cactus",
+              "type": "rubber-plant",
               "at": [
                 5.8,
                 -3.4
@@ -1557,7 +1553,7 @@
               "color": "#141210"
             },
             {
-              "type": "drum-table",
+              "type": "nesting-tables",
               "at": [
                 -8.78,
                 -1.6
@@ -1623,7 +1619,7 @@
               "h": 1.7
             },
             {
-              "type": "snake-plant",
+              "type": "pampas-vase",
               "at": [
                 -5.5,
                 -1.36
@@ -1721,7 +1717,7 @@
               "src": "compose@1"
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 -7.3,
                 -0.74
@@ -2223,14 +2219,12 @@
               "src": "compose@1"
             },
             {
-              "type": "arch-mirror",
+              "type": "round-mirror",
               "at": [
                 9.917,
                 2.3
               ],
               "rot": 270,
-              "w": 0.8,
-              "h": 1.1,
               "y": 1.424,
               "src": "compose@1"
             },
@@ -2310,7 +2304,7 @@
       "chimney": {
         "at": [
           9.6,
-          1.0
+          1
         ],
         "w": 0.9,
         "d": 0.7,

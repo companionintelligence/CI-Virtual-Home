@@ -5,7 +5,7 @@
   "author": "Schnuck01",
   "source": "SimsTree slide 06",
   "style": "White modern on a knoll: a three-band glazed tower between a lower entry block and a shed-roofed garage wing, thin charcoal slab roofs, two jogged flights of stone steps to a parapet-walled entry, a raised stone terrace and cascading pools in curved tropical beds",
-  "emoji": "\ud83c\udfdd\ufe0f",
+  "emoji": "🏝️",
   "defaults": 2,
   "styleKey": "modern",
   "lot": {
@@ -580,7 +580,7 @@
           ],
           "to": [
             1.5,
-            -1.0
+            -1
           ],
           "style": "glass"
         }
@@ -659,7 +659,7 @@
                 2.45
               ],
               "rot": 0,
-              "w": 3.0,
+              "w": 3,
               "d": 2.4,
               "pattern": "border",
               "color": "#e8e2d0"
@@ -725,7 +725,7 @@
               "color": "#ebe2d2"
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 1.3,
                 -4.5
@@ -736,7 +736,7 @@
               "color": "#383c3a"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 1.42,
                 -6.05
@@ -745,8 +745,7 @@
               "y": 1.45,
               "w": 1,
               "h": 0.75,
-              "motif": "map",
-              "frame": "#d8d2c2"
+              "motif": "map"
             },
             {
               "type": "patterned-rug",
@@ -781,7 +780,7 @@
               "color": "#d8d2c2"
             },
             {
-              "type": "snake-plant",
+              "type": "peace-lily",
               "at": [
                 1.1,
                 -3.45
@@ -812,7 +811,7 @@
               "color": "#e5dfcc"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -2.92,
                 2.35
@@ -821,24 +820,22 @@
               "y": 1.5,
               "w": 0.9,
               "h": 0.7,
-              "motif": "landscape",
-              "frame": "#4b4533"
+              "motif": "landscape"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 -2.92,
-                -3.0
+                -3
               ],
               "rot": 90,
               "y": 1.36,
               "w": 1.3,
               "h": 0.85,
-              "motif": "mountains",
-              "frame": "#4b4533"
+              "motif": "mountains"
             },
             {
-              "type": "dracaena",
+              "type": "bird-of-paradise",
               "at": [
                 -2.65,
                 -4.2
@@ -1281,7 +1278,7 @@
               "color": "#f4f1ea"
             },
             {
-              "type": "framed-print",
+              "type": "canvas-art",
               "at": [
                 8.41,
                 1.95
@@ -1290,11 +1287,10 @@
               "y": 1.5,
               "w": 0.9,
               "h": 0.7,
-              "motif": "arches",
-              "frame": "#f4f1ea"
+              "motif": "arches"
             },
             {
-              "type": "plant-stand",
+              "type": "bird-of-paradise",
               "at": [
                 2.7,
                 2.95
@@ -1314,7 +1310,7 @@
               "h": 1.2
             },
             {
-              "type": "plant-stand",
+              "type": "bird-of-paradise",
               "at": [
                 6.85,
                 2.95
@@ -1417,7 +1413,7 @@
               "y": 1
             },
             {
-              "type": "snake-plant",
+              "type": "pampas-vase",
               "at": [
                 8.208,
                 -6.721
@@ -1784,7 +1780,7 @@
               "src": "compose@1"
             },
             {
-              "type": "side-table",
+              "type": "nesting-tables",
               "at": [
                 -1.91,
                 -1.845
@@ -1802,7 +1798,7 @@
               "src": "compose@1"
             },
             {
-              "type": "side-table",
+              "type": "nesting-tables",
               "at": [
                 0.71,
                 -1.845
@@ -2041,7 +2037,7 @@
               "src": "compose@1"
             },
             {
-              "type": "sofa-table",
+              "type": "console-table",
               "at": [
                 2.57,
                 -6.725
@@ -2190,7 +2186,7 @@
               "src": "compose@1"
             },
             {
-              "type": "ponytail-palm",
+              "type": "rubber-plant",
               "at": [
                 7.953,
                 -6.451
@@ -2338,7 +2334,7 @@
               "src": "compose@1"
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 8.23,
                 -1.63

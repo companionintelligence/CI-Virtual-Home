@@ -355,7 +355,7 @@
       "stairs": {
         "type": "closed",
         "at": [
-          2.0,
+          2,
           4.5
         ],
         "rot": 0,
@@ -406,7 +406,7 @@
               "rot": 90
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 -8,
                 1
@@ -425,7 +425,7 @@
               "src": "compose@1"
             },
             {
-              "type": "open-shelving",
+              "type": "cube-storage",
               "at": [
                 -7.26,
                 2.68
@@ -729,7 +729,7 @@
               "motif": "botanical"
             },
             {
-              "type": "snake-plant",
+              "type": "zz-plant",
               "at": [
                 -2.7,
                 0.85
@@ -823,14 +823,14 @@
               "color": "#b9a47e"
             },
             {
-              "type": "snake-plant",
+              "type": "zz-plant",
               "at": [
                 3.5,
                 4.85
               ]
             },
             {
-              "type": "snake-plant",
+              "type": "peace-lily",
               "at": [
                 0.5,
                 4.85
@@ -1219,7 +1219,7 @@
         },
         {
           "side": "N",
-          "at": 2.0,
+          "at": 2,
           "type": "door",
           "w": 2.1,
           "h": 2.15,
@@ -1266,7 +1266,7 @@
               "type": "mission-armchair",
               "at": [
                 0.44,
-                6.0
+                6
               ],
               "rot": 90,
               "color": "#8b5a3a"
@@ -1421,7 +1421,7 @@
       "over": {
         "x": 3.2,
         "z": 0.5,
-        "w": 1.0,
+        "w": 1,
         "d": 4.9
       },
       "y": 2.7,
@@ -1468,7 +1468,7 @@
     {
       "over": {
         "x": 0,
-        "z": 4.0,
+        "z": 4,
         "w": 3.2,
         "d": 1.4
       },
@@ -1496,7 +1496,7 @@
         "x": -12.5,
         "z": 0.5,
         "w": 5.5,
-        "d": 6.0
+        "d": 6
       },
       "y": 2.7,
       "type": "gable",
@@ -1592,7 +1592,7 @@
     "surfaceColor": "#7a6048",
     "upstairs": true,
     "view": {
-      "dist": 1.0,
+      "dist": 1,
       "height": 0.35
     }
   },
@@ -2737,7 +2737,7 @@
       "type": "flowers",
       "at": [
         6.95,
-        5.0
+        5
       ],
       "kind": "tulip",
       "color": "#e8853a",
@@ -2901,14 +2901,14 @@
         9.57,
         -1.7
       ],
-      "h": 1.0,
-      "y": 1.0
+      "h": 1,
+      "y": 1
     },
     {
       "type": "climber",
       "species": "rose",
       "from": [
-        5.0,
+        5,
         6.42
       ],
       "to": [
@@ -2928,10 +2928,10 @@
       ],
       "to": [
         4.1,
-        5.0
+        5
       ],
       "h": 0.9,
-      "y": 1.0
+      "y": 1
     },
     {
       "type": "planting",
@@ -2967,7 +2967,7 @@
         ],
         [
           7.2,
-          8.0
+          8
         ],
         [
           4.9,
@@ -3031,7 +3031,7 @@
           7.5
         ],
         [
-          13.0,
+          13,
           7.1
         ],
         [
@@ -3081,7 +3081,7 @@
       "kind": "meadow",
       "poly": [
         [
-          5.0,
+          5,
           12.8
         ],
         [
@@ -3149,7 +3149,7 @@
       "type": "shrub",
       "at": [
         16.4,
-        9.0
+        9
       ],
       "r": 0.7,
       "form": "grass",
@@ -3214,7 +3214,7 @@
       "w": 1.7,
       "d": 0.95,
       "h": 0.14,
-      "rot": -8.0,
+      "rot": -8,
       "posts": false,
       "rails": "none",
       "color": "#3f2f23"
@@ -3228,7 +3228,7 @@
       "w": 1.15,
       "d": 0.58,
       "h": 0.14,
-      "rot": 17.0,
+      "rot": 17,
       "posts": false,
       "rails": "none",
       "color": "#3f2f23"
@@ -3242,7 +3242,7 @@
       "w": 1.15,
       "d": 0.58,
       "h": 0.14,
-      "rot": -33.0,
+      "rot": -33,
       "posts": false,
       "rails": "none",
       "color": "#3f2f23"
@@ -3256,7 +3256,7 @@
       "w": 0.12,
       "d": 0.85,
       "h": 0.2,
-      "rot": -8.0,
+      "rot": -8,
       "posts": false,
       "rails": "none",
       "color": "#8a6d4a"
@@ -3270,7 +3270,7 @@
       "w": 0.12,
       "d": 0.9,
       "h": 0.2,
-      "rot": -8.0,
+      "rot": -8,
       "posts": false,
       "rails": "none",
       "color": "#8a6d4a"
@@ -3284,7 +3284,7 @@
       "w": 0.1,
       "d": 0.6,
       "h": 0.2,
-      "rot": -8.0,
+      "rot": -8,
       "posts": false,
       "rails": "none",
       "color": "#8a6d4a"

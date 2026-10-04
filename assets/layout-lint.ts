@@ -181,8 +181,9 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
         const lacks = missingAnchors(room.program, items, { heroDesk: geo.heroHere && (spec.hero.surface || 'desk') === 'desk' });
         if (lacks.length) add('missing-anchor', `${room.program} has no ${lacks.join(', no ')}`, lv, room);
       }
-      // a furniture island with an empty half
-      if (geo.area >= 12) {
+      // a furniture island with an empty half (a garage's other half is for the car, an outdoor room's furniture does not
+      // need to fill its whole deck or patio: the composer's own emptyHalf() never tries to fill either, for the same reason)
+      if (geo.area >= 12 && !outdoor && room.program !== 'garage') {
         const along = geo.b.w >= geo.b.d, mid = along ? geo.b.x + geo.b.w / 2 : geo.b.z + geo.b.d / 2;
         const solidItems = boxes.filter(b => b.solid && b.o);
         const lo = solidItems.filter(b => (along ? b.o!.cx : b.o!.cz) < mid).length, hi = solidItems.length - lo;
