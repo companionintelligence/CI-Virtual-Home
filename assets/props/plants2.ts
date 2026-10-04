@@ -200,7 +200,7 @@ export const recipes: Record<string, Recipe> = {
       P.arc(caneA, [Math.sin(a) * 0.08, rim - 0.02, Math.cos(a) * 0.08], [top[0] * 0.5, rim + len * 0.5, top[2] * 0.5], top, 0.015, 0.009, 3, 0.7, 0.9, 5);
       for (let k = 0; k < 6; k++) {
         const fa = a + (k - 2.5) * 0.65 + B.jit(0.15);
-        P.leaf(leafA, { x: top[0], y: top[1] - 0.02, z: top[2], a: fa, t: 0.5 + Math.abs(k - 2.5) * 0.18 + B.jit(0.1), L: (0.68 + r() * 0.1) * s, W: 0.17, droop: 1.35 + B.jit(0.15), fold: 0.2, rows: 5, th: 0.006, profile: pinnate, baseS: 0.5 + 0.1 * r() });
+        P.leaf(leafA, { x: top[0], y: top[1] - 0.02, z: top[2], a: fa, t: 0.5 + Math.abs(k - 2.5) * 0.18 + B.jit(0.1), L: (0.7 + r() * 0.1) * s, W: 0.26, droop: 1.3 + B.jit(0.15), fold: 0.25, rows: 5, th: 0.006, profile: pinnate, baseS: 0.5 + 0.1 * r() });
       }
     }
     return B.done(g0, { caneCol: 0x4f6b3a, leafRough: 0.5 });
@@ -291,9 +291,9 @@ recipes['herb-pots'] = (it, ctx) => {
   const order = r() < 0.5 ? [0, 1, 2] : [2, 0, 1];
   [-0.13, 0, 0.13].forEach((x, i) => {
     const rim = P.pot(B.potA, 'terracotta', 0.055, 0.045, 0.1, 12, [x, 0.02, 0]) + 0.008, kind = order[i];
-    if (kind === 0) for (let k = 0; k < 6; k++) { const a = k * 1.1; P.leaf(leafA, { x: x + Math.sin(a) * 0.012, y: rim - 0.012, z: Math.cos(a) * 0.012, a, t: 0.55 + (k % 2) * 0.35, L: 0.095, W: 0.075, droop: 0.45, fold: 0.3, rows: 2, th: 0.01, profile: ovate, baseS: 0.65 + 0.1 * r() }); }   // basil
-    else if (kind === 1) for (let k = 0; k < 14; k++) { const a = k * 0.9, t = 0.12 + r() * 0.4; K.strut(leafA, [x + Math.sin(a) * 0.01, rim - 0.015, Math.cos(a) * 0.01], [x + Math.sin(a) * Math.sin(t) * 0.13, rim - 0.015 + Math.cos(t) * 0.13, Math.cos(a) * Math.sin(t) * 0.13], 0.004, 0.0025, 4, 0.7, 0.95, true); }   // rosemary: needles
-    else for (let k = 0; k < 8; k++) { const a = k * 0.8 + 0.8; P.leaf(leafA, { x: x + Math.sin(a) * 0.02, y: rim - 0.012, z: Math.cos(a) * 0.02, a, t: 1.15 + r() * 0.2, L: 0.065, W: 0.05, droop: 0.2, fold: 0.2, rows: 1, th: 0.008, profile: ovate, baseS: 0.7 + 0.1 * r() }); }   // mint
+    if (kind === 0) for (let k = 0; k < 6; k++) { const a = k * 1.1; P.leaf(leafA, { x: x + Math.sin(a) * 0.012, y: rim - 0.012, z: Math.cos(a) * 0.012, a, t: 0.55 + (k % 2) * 0.35, L: 0.115, W: 0.095, droop: 0.45, fold: 0.3, rows: 2, th: 0.01, profile: ovate, baseS: 0.7 + 0.1 * r() }); }   // basil
+    else if (kind === 1) for (let k = 0; k < 18; k++) { const a = k * 0.9, t = 0.12 + r() * 0.45; K.strut(leafA, [x + Math.sin(a) * 0.01, rim - 0.015, Math.cos(a) * 0.01], [x + Math.sin(a) * Math.sin(t) * 0.15, rim - 0.015 + Math.cos(t) * 0.15, Math.cos(a) * Math.sin(t) * 0.15], 0.005, 0.003, 4, 0.8, 1, true); }   // rosemary: needles
+    else for (let k = 0; k < 8; k++) { const a = k * 0.8 + 0.8; P.leaf(leafA, { x: x + Math.sin(a) * 0.02, y: rim - 0.012, z: Math.cos(a) * 0.02, a, t: 1.15 + r() * 0.2, L: 0.085, W: 0.068, droop: 0.2, fold: 0.2, rows: 2, th: 0.008, profile: ovate, baseS: 0.75 + 0.1 * r() }); }   // mint
   });
   return B.done(0x4f9d3f, { caneCol: ctx.colors.wood, caneExtra: { roughness: 0.6 } });
 };
