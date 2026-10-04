@@ -7,10 +7,12 @@
 //                        view, which hides the ceiling, hides them too
 //   pendants             over dining tables, islands and breakfast bars (the lit parts: fixture = 'pendant')
 //   ceiling fans         living rooms, bedrooms and studies big enough to take one (the light kit: fixture = 'fan')
-//   one warm light       at most one per room and LIGHT_CAP per house, no shadows, chosen by a fixed rule — room
+//   one warm light       at most one per room and LIGHT_CAP lights per house, no shadows, chosen by a fixed rule — room
 //                        kind × √area, ties by storey then room order — so the same rooms light every run. It is
-//                        a wide SpotLight aimed straight down whose distance cutoff stops just past the room's side
-//                        walls (see the room loop: the walls wash, the lawn and the lower roofs stay dark)
+//                        a wide, fully soft SpotLight fill aimed straight down whose distance cutoff stops just past the
+//                        room's side walls (see the room loop: the walls wash, the lawn and the lower roofs stay dark);
+//                        a room with a lamp also gets a PointLight at the lamp head nearest its centre (the lamp's
+//                        pool) and its fill drops to a fraction (plan 5.2 L1, L3)
 // and the storey's existing things get two touch-ups: window glass is tagged userData.windowGlow (the environment
 // gives it an emissive at dusk and night), and the catalog's halo lamp loses its cyan ring and blue PointLight —
 // the rings read as UI markers in every room — and becomes a drum floor lamp the lamp gain drives like any other
@@ -25,12 +27,15 @@
 // __houseRenderFrames stays random access. Everything is seeded from the house id.
 import { mulberry32, fnv1a } from './materials.js';
 import { inRect } from './house-geometry.js';
-import { programKind, fanPlan, lampPlan, REGISTRY_LAMPS } from './kit-rules.js';
+import { programKind, fanPlan, lampPlan, REGISTRY_LAMPS, LAMP_ITEMS } from './kit-rules.js';
+import { schemeOf } from './house-scheme.js';
 import { heroFrame } from './hero-frame.js';
 
 export const LIGHT_CAP = 16;          // dynamic lights per house (one per room at most)
 const DAY_GAIN = 0.035;               // lamp gain when no environment has announced one (a daylight preset's)
-const WARM = 0xffd7a8;                // ~2900 K: the pools read warm-white, not orange
+// the colour of the house's lights is its scheme's lamp temperature (house-scheme.ts LAMP_COLORS: 3000 K is the ~2900 K warm white
+// these pools have always had, so modern, mid-century and tropical homes are unchanged; cottage, craftsman, farmhouse and
+// mediterranean homes go to 2700 K)
 const ROOM_MIN_AREA = 2.5;            // m² — a cupboard gets no light
 // The room's own light is a soft FILL, not a spot (plan 5.2 L1). Before, it was aimed straight down at about ten times the
 // illuminance a sunlit wall receives, with a 0.45 penumbra: the nearest horizontal surface (a bed, a coffee table, an island)
@@ -41,6 +46,15 @@ export const FILL_ANGLE_MAX = 1.25;   // rad (~72°): a wider cone only lights t
 /** lampGain under which the room's light is off for good: day (0.035). Offline (composer, editor) the spot is then HIDDEN, so the
  *  day shader has no spot lights to loop over; the live player keeps it in the scene at intensity 0 (see applyLampGain). */
 export const FILL_ON_GAIN = 0.1;
+// Practical lamp pools (plan 5.2 L3): a room that has a lamp lights the way a room with a lamp is lit, from the lamp. One static
+// PointLight at the lamp head nearest the room's centre (no camera dependence, no shadow), and the room's fill spot drops to
+// LAMP_ROOM_FILL_K of its own floor target (0.12 against ROOM_FILL_K's 0.3 elsewhere). The pool's intensity scales with the room's
+// size (to a cap) and its reach is a fixed fraction of the room's diagonal: no shadows, so what keeps it in its room is distance.
+export const LAMP_ROOM_FILL_K = 0.12;
+export const LAMP_POOL_I = 2.2;       // cd at gain 1, for a 3 m room; × √area / 3, at most × LAMP_POOL_MAX
+export const LAMP_POOL_MAX = 1.6;
+export const LAMP_POOL_REACH = 0.62;  // × the room's diagonal
+export const LAMP_POOL_DECAY = 1.6;
 
 // ---- the kind of room, from its name (the specs name rooms freely: "Sunset Terrace Suite", "Study & Bar") ----
 const KINDS: Array<[string, RegExp]> = [
@@ -118,16 +132,24 @@ function stateFor(ctx) {
   const rng = mulberry32(fnv1a(`${spec.id}:fixtures`));
   const pick = arr => arr[Math.floor(rng() * arr.length)];
 
-  // which rooms get a PointLight: room kind × √area, highest first, the first LIGHT_CAP of them
+  // which rooms get a light: room kind × √area, highest first, while LIGHT_CAP lights last. A room costs one light, two when it has a
+  // lamp (its lamp's pool and its weak fill), so the house never runs more than LIGHT_CAP dynamic lights of ours
+  const scheme = schemeOf(spec);
   const ranked = [];
   (spec.levels || []).forEach((lv, li) => (lv.rooms || []).forEach((r, ri) => {
     if (!r.bounds) return;
     const area = r.bounds.w * r.bounds.d; if (area < ROOM_MIN_AREA) return;
     const kind = roomKind(r); if (kind === 'outdoor') return;
-    ranked.push({ key: `${lv.id}#${ri}`, score: WEIGHT[kind] * Math.sqrt(area), li, ri });
+    const lamp = (r.items || []).some(it => it && LAMP_ITEMS.has(it.type));
+    ranked.push({ key: `${lv.id}#${ri}`, score: WEIGHT[kind] * Math.sqrt(area), li, ri, lamp });
   }));
   ranked.sort((a, b) => b.score - a.score || a.li - b.li || a.ri - b.ri);
-  const lit = new Set(ranked.slice(0, LIGHT_CAP).map(r => r.key));
+  const lit = new Map<string, { lamp: boolean }>();
+  for (let left = LIGHT_CAP, k = 0; k < ranked.length && left > 0; k++) {
+    const r = ranked[k], cost = r.lamp && LAMP_ROOM_FILL_K > 0 ? 2 : 1;
+    if (cost > left) continue;   // a cheaper room further down may still fit
+    lit.set(r.key, { lamp: r.lamp }); left -= cost;
+  }
 
   const mat = (o: any, fixtureBase?: number) => { const m = new THREE.MeshStandardMaterial(o); if (fixtureBase !== undefined) m.userData.fixtureBase = fixtureBase; return m; };
   const fanStyle = pick(['black', 'black', 'walnut']);
@@ -153,9 +175,9 @@ function stateFor(ctx) {
     diffuser: new THREE.CircleGeometry(0.178, 32).rotateX(Math.PI / 2),            // faces down, closes the drum's foot
   };
   s = {
-    rng, pick, lit, M, G, fanStyle, diningStyle: pick(['dome', 'globe', 'dome']),
+    rng, pick, lit, scheme, warm: scheme.lampColor, M, G, fanStyle, diningStyle: pick(['dome', 'globe', 'dome']),
     lights: [], gain: readGain(),
-    stats: { recessed: 0, pendants: 0, fans: 0, lights: 0, glass: 0, halos: 0, lamps: {} as Record<string, number> },
+    stats: { recessed: 0, pendants: 0, fans: 0, lights: 0, pools: 0, glass: 0, halos: 0, lamps: {} as Record<string, number> },
     // kit-rules.ts: which rooms may hang a fan (rooms[].fixtures.fan; under defaults 2 a seeded minority), and the
     // lamp kind each room's floor lamps become (rooms[].fixtures.lamp; defaults 2 seeded) — both keyed lv#room
     fans: fanPlan(spec, fanEligible), lamps: lampPlan(spec),
@@ -338,6 +360,29 @@ function chandelier(THREE, s, drop: number) {
   return g;
 }
 
+
+// The head of the lamp nearest (cx, cz): the centre of the box round a lamp's lit parts (its meshes tagged userData.fixture = 'lamp': a
+// drum, globe, cone, mushroom or tripod head, or the halo lamp's drum and diffuser), for the registry's floor, arc, tripod and table lamps and the
+// halo lamp (kit-rules.ts LAMP_ITEMS). null when the room has none placed (the spec lists one that did not fit).
+function lampHead_(items: Array<{ o: any; type: string }>, cx: number, cz: number): { x: number; y: number; z: number } | null {
+  let best: { x: number; y: number; z: number; d: number } | null = null;
+  for (const it of items) {
+    if (!LAMP_ITEMS.has(it.type)) continue;
+    let box: any = null;
+    it.o.traverse((m: any) => {
+      if (!m.isMesh || !m.userData || m.userData.fixture !== 'lamp') return;
+      m.updateWorldMatrix(true, false);
+      const g = m.geometry; if (!g.boundingBox) g.computeBoundingBox();
+      const b = g.boundingBox.clone().applyMatrix4(m.matrixWorld);
+      box = box ? box.union(b) : b;
+    });
+    if (!box) continue;
+    const x = (box.min.x + box.max.x) / 2, y = (box.min.y + box.max.y) / 2, z = (box.min.z + box.max.z) / 2, d = Math.hypot(x - cx, z - cz);
+    if (!best || d < best.d - 1e-9) best = { x, y, z, d };
+  }
+  return best;
+}
+
 // ---- dressLevel ------------------------------------------------------------------------------------------------
 export function dressLevel(ctx) {
   const { THREE, spec, lv, y, H, put, placed, anchors, registerCeiling } = ctx;
@@ -503,7 +548,8 @@ export function dressLevel(ctx) {
     // just past those walls' foot — three.js fades a light to 0 AT its distance, (1 − (d/D)⁴)², so the walls
     // come out brighter than the middle of the floor and the room reads as a lit box, which is how Pascal's
     // dusk cut views look. The end walls of a long room fall off; nothing outside is lit past a faint band.
-    if (s.lit.has(`${lv.id}#${ri}`)) {
+    const litRoom = s.lit.get(`${lv.id}#${ri}`);
+    if (litRoom) {
       const c0 = ceilAt(cx, cz) ?? (y + H - 0.02);
       const ly = Math.min(c0 - 0.25, y + 2.6), drop = Math.max(1, ly - y);
       const rs = Math.min(b.w, b.d) / 2;
@@ -516,8 +562,10 @@ export function dressLevel(ctx) {
       // a garage at dusk is not a living room; a hall or landing is lit for passing through, and its walls sit
       // close enough to the light that the 18 floor would blow them (and the stairwell below) out white
       const floorE = 0.26 * Math.min(36, Math.max(18, 12 + 0.8 * area)) * (kind === 'service' ? 0.6 : kind === 'hall' ? 0.45 : 1) * Math.min(1, Math.max(0.55, rs / 1.6));
-      const base = ROOM_FILL_K * floorE * drop ** decay / Math.max(0.5, win);
-      const light = new THREE.SpotLight(WARM, base * s.gain, distance, angle, FILL_PENUMBRA, decay);
+      // the lamp that will pool this room's light: of the room's lamps, the head nearest its centre (ties by item order)
+      const pool = litRoom.lamp ? lampHead_(items, cx, cz) : null;
+      const base = (pool ? LAMP_ROOM_FILL_K : ROOM_FILL_K) * floorE * drop ** decay / Math.max(0.5, win);
+      const light = new THREE.SpotLight(s.warm, base * s.gain, distance, angle, FILL_PENUMBRA, decay);
       light.name = 'Fixture light'; light.castShadow = false;
       light.position.copy(local(cx, ly, cz));
       light.target.position.copy(local(cx, y, cz));
@@ -526,6 +574,17 @@ export function dressLevel(ctx) {
       g.add(light, light.target);
       s.lights.push({ light, base, room: room.name });
       s.stats.lights++;
+      if (pool) {
+        const diag = Math.hypot(b.w, b.d), pbase = LAMP_POOL_I * Math.min(LAMP_POOL_MAX, Math.sqrt(area) / 3);
+        const pl = new THREE.PointLight(s.warm, pbase * s.gain, LAMP_POOL_REACH * diag, LAMP_POOL_DECAY);
+        pl.name = 'Lamp pool'; pl.castShadow = false;
+        pl.position.copy(local(pool.x, pool.y, pool.z));
+        pl.userData.fixtureLight = true; pl.userData.lampPool = true;
+        pl.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
+        g.add(pl);
+        s.lights.push({ light: pl, base: pbase, room: room.name });
+        s.stats.lights++; s.stats.pools++;
+      }
     }
 
     if (g.children.length) place(g, cx, cz);

@@ -165,3 +165,21 @@ test('F0: house-scheme.ts is THREE-free and clock-free, and the kit carries it',
   assert.ok(!/THREE|Math\.random|Date\.now|performance\.now/.test(src));
   assert.match(fs.readFileSync(path.join(ROOT, 'assets', 'kit-build.ts'), 'utf8'), /\.scheme = schemeOf\(spec\)/);
 });
+
+// ---- L3: lamp pools ---------------------------------------------------------------------------------------------------------------------
+import { LAMP_ROOM_FILL_K, LAMP_POOL_I, LAMP_POOL_MAX, LAMP_POOL_REACH, LAMP_POOL_DECAY } from '../assets/fixtures.js';
+
+test('L3: the pool numbers (design 3.1) and the fill a lamp room keeps', () => {
+  assert.equal(LAMP_ROOM_FILL_K, 0.12);
+  assert.ok(LAMP_ROOM_FILL_K < ROOM_FILL_K, 'a lamp room\'s fill is weaker than a lampless one\'s');
+  assert.equal(LAMP_POOL_REACH, 0.62); assert.equal(LAMP_POOL_DECAY, 1.6);
+  assert.ok(LAMP_POOL_I > 0 && LAMP_POOL_MAX >= 1);
+});
+
+test('L3: the fixtures read the lamp colour from the scheme and the lamps from kit-rules, and cap the lights they run', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'assets', 'fixtures.ts'), 'utf8');
+  assert.match(src, /schemeOf\(spec\)/); assert.match(src, /warm: scheme\.lampColor/);
+  assert.ok(!/\bWARM\b/.test(src.replace(/\/\/.*$/gm, '')), 'no hard-coded WARM left');
+  assert.match(src, /LAMP_ITEMS\.has/);
+  assert.match(src, /cost > left/, 'the budget is spent per room: a lamp room costs two lights');
+});
