@@ -17,7 +17,7 @@
 // (needs `pnpm run build`; a GPU; ~10-20 s a house. One browser job at a time on this machine.)
 import fs from 'node:fs';
 import path from 'node:path';
-import { REVIEW_DIR, BEFORE_TAG, BASELINES, productFingerprint, productDiffersFromTag, parseArgs, readJson, stableJson, writeText, median, round, rel, machine } from './lib.mts';
+import { REVIEW_DIR, BEFORE_TAG, BASELINES, productFingerprint, productKey, recordProvenance, productDiffersFromTag, parseArgs, readJson, stableJson, writeText, median, round, rel, machine } from './lib.mts';
 import { costCameras, type CostCam, type CostRoom } from './cameras.mts';
 import { startSession, burnColdContext } from './page.mts';
 import { M, houseIds, loadSpec } from '../fleet/_compose-dry.mts';
@@ -25,7 +25,11 @@ import { M, houseIds, loadSpec } from '../fleet/_compose-dry.mts';
 export const COST_FILE = path.join(BASELINES, 'cost.json');
 const args = parseArgs(process.argv.slice(2));
 
-export interface CamCost { key: string; audit: { calls: number; triangles: number }; room: string; program: string | null; frame: { calls: number; triangles: number }; pass: { calls: number; triangles: number }; visible: { meshes: number; triangles: number }; memory: { geometries: number; textures: number } }
+export interface CamCost { key: string; audit: { calls: number; triangles: number }; room: string; program: string | null; frame: { calls: number; triangles: number }; pass: { calls: number; triangles: number }; visible: { meshes: number; triangles: number } }
+/** renderer.info.memory at the end of a camera's snapshot: GPU-side counters that depend on what the page happened to allocate and
+ *  free before (a different count in a fresh process for the same house), so they are information only, written next to the timings
+ *  outside git (cost-memory.json) and never to the committed baseline. */
+export interface CamMemory { geometries: number; textures: number }
 export interface HouseCost {
   meshes: number; triangles: number; uniqueGeometries: number; uniqueMaterials: number; uniqueTextures: number; textureMB: number;
   lights: { spot: number; point: number; dir: number; hemi: number; other: number }; casters: number; instanced: number;
@@ -148,6 +152,7 @@ async function main() {
   const base = compare ? readJson(basePath) : null;
   const session = await startSession();
   const houses: Record<string, HouseCost> = {};
+  const memoryLog: Record<string, Record<string, CamMemory>> = {};
   const timing: Array<{ house: string; seconds: number; load1: number }> = [];
   try {
     for (const id of ids) {
@@ -158,7 +163,7 @@ async function main() {
       try {
         const m = await measure(w, cams);
         const { cams: camCosts, ...rest } = m;
-        houses[id] = { ...rest, cameras: cams.map((c, i) => { const { key: _k, ...cost } = camCosts[i] as any; return { ...c, cost }; }) } as HouseCost;
+        houses[id] = { ...rest, cameras: cams.map((c, i) => { const { key: _k, memory, ...cost } = camCosts[i] as any; (memoryLog[id] ||= {})[c.key] = memory; return { ...c, cost }; }) } as HouseCost;
         const secs = Number(process.hrtime.bigint() - t0) / 1e9;
         timing.push({ house: id, seconds: round(secs, 1), load1: machine().load1 });
         const au = houses[id].cameras.map(c => c.cost.audit.calls), ps = houses[id].cameras.map(c => c.cost.pass.calls), fr = houses[id].cameras.map(c => c.cost.frame.calls);
@@ -172,9 +177,9 @@ async function main() {
   const summary = summarise(houses);
   const doc = {
     schema: 1,
-    what: 'cost census of every house (scripts/review/cost.mts): house-wide meshes, triangles, geometries, materials, textures and texture memory, lights, prop cost by type, and for each of twelve fixed interior cameras the draw calls and triangles of the composed frame and of one camera pass, and the meshes in view. No timing: two runs of an unchanged tree write the same bytes.',
+    what: 'cost census of every house (scripts/review/cost.mts): house-wide meshes, triangles, geometries, materials, textures and texture memory, lights, prop cost by type, and for each of twelve fixed interior cameras the draw calls and triangles of the composed frame and of one camera pass, and the meshes in view. No timing: two runs of an unchanged tree write the same bytes. Keyed by the tree ids of the product code, not by the commit; the GPU memory counters are not here (see CamMemory in cost.mts).',
     regenerate: 'pnpm run build && node --experimental-strip-types scripts/review/cost.mts --write   (only to re-freeze the BEFORE: at baseline/stage0-green, never to turn a budget green)',
-    product: { tag: BEFORE_TAG, rev: fp.rev, tree: fp.tree },
+    product: { tag: BEFORE_TAG, ...productKey(fp) },
     renderer: { profile: 'macos-metal', chromium: session.version, res: '360', supersample: 2, dressing: { walls: 'up', roof: 'on' } },
     summary, houses,
   };
@@ -185,16 +190,17 @@ async function main() {
     const rows = judge(sub, summary);
     for (const r of rows) console.log(`  ${r.ok ? '✓' : '✗'} ${r.what.padEnd(48)} ${String(r.base).padStart(9)} -> ${String(r.now).padStart(9)}  ${r.change.padStart(7)}  (limit ${r.limit})`);
     void bs;
-    const exact = ids.every(i => base.houses[i] && JSON.stringify(base.houses[i]) === JSON.stringify(houses[i]));
+    const exact = ids.every(i => base.houses[i] && stableJson(base.houses[i]) === stableJson(houses[i]));
     console.log(exact ? '  identical to the baseline, house by house' : '  differs from the baseline');
     if (args.out && args.out !== 'true') writeText(path.resolve(args.out), stableJson(doc));
     if (rows.some(r => !r.ok)) process.exitCode = 1;
   } else {
     const out = args.out && args.out !== 'true' ? path.resolve(args.out) : args.write === 'true' ? COST_FILE : null;
     if (!out) { console.log('(not written: --write for test/review/baselines/cost.json, or --out <file>)'); }
-    else { writeText(out, stableJson(doc)); console.log(`→ ${rel(out)}`); }
+    else { writeText(out, stableJson(doc)); console.log(`→ ${rel(out)}`); if (out === COST_FILE) recordProvenance('cost.json', fp); }
     console.log(`fleet: median meshes ${summary.medianMeshes}, triangles ${summary.medianTriangles}, texture ${summary.medianTextureMB} MB; interior eye-view calls median ${summary.interiorCalls.median} max ${summary.interiorCalls.max} (camera pass ${summary.interiorPassCalls.median}, frame ${summary.interiorFrameCalls.median}); max spot lights ${summary.maxSpotLights} (spot + point ${summary.maxLights})`);
     writeText(path.join(REVIEW_LOGS, 'cost-timing.json'), JSON.stringify({ machine: machine(), timing }, null, 1) + '\n');
+    writeText(path.join(REVIEW_LOGS, 'cost-memory.json'), stableJson({ what: 'renderer.info.memory per house and camera (information only, not reproducible across processes)', memory: memoryLog }));
   }
 }
 const REVIEW_LOGS = path.join(REVIEW_DIR, 'logs');   // outside git: timings and logs, never baselines

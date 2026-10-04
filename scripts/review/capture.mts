@@ -14,7 +14,7 @@
 // if the renderer is deterministic (scripts/review/verify.mts compares two).
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, REVIEW_DIR, BEFORE_TAG, parseArgs, productFingerprint, productDiffersFromTag, round, machine, writeText } from './lib.mts';
+import { ROOT, REVIEW_DIR, BEFORE_TAG, parseArgs, productFingerprint, productKey, recordProvenance, productDiffersFromTag, round, machine, writeText } from './lib.mts';
 import { R24, r24Shots, cornerCam, RES, QUALITY, SIZE, MANNEQUIN, MANNEQUIN_HEIGHT, type Cam, type Corner, type Tod } from './cameras.mts';
 import { startSession, burnColdContext, roomsOf } from './page.mts';
 import { BEFORE_MANIFEST, loadManifest, manifestText, type Manifest, type ManifestShot } from './manifest.mts';
@@ -136,7 +136,7 @@ try {
 const order = new Map(r24Shots().map((s, i) => [s.id, i]));
 shots.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
 const manifest: Manifest = {
-  schema: 1, set, tag: BEFORE_TAG, product: { rev: fp.rev, tree: fp.tree },
+  schema: 1, set, tag: BEFORE_TAG, product: productKey(fp),
   renderer: { profile: 'macos-metal', chromium: session.version, supersample: 2, res: RES, quality: QUALITY, dressing: { walls: 'up', roof: 'on' }, size: SIZE },
   shots,
 };
@@ -150,6 +150,7 @@ writeText(mfile, manifestText(manifest));
 console.log(`manifest: ${path.relative(process.cwd(), mfile)} (${manifest.shots.length} frames)`);
 if (isBefore && !only && !todFilter && withScale && !failed) {
   writeText(BEFORE_MANIFEST, manifestText(manifest));
+  recordProvenance('before.manifest.json', fp);
   console.log(`copied to ${path.relative(ROOT, BEFORE_MANIFEST)}`);
 }
 writeText(path.join(OUT, `${set}.capture-log.json`), JSON.stringify({ machine: machine(), houses: log, skipped }, null, 1) + '\n');

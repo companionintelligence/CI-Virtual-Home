@@ -75,6 +75,18 @@ export function productFingerprint(rev = 'HEAD') {
   const dirty = rev === 'HEAD' ? git(['status', '--porcelain', '--', ...PRODUCT_PATHS]).split('\n').filter(Boolean) : [];
   return { rev: git(['rev-parse', rev]), tree, dirty };
 }
+/** What a committed baseline records of the product code it was taken from: the content (the tree ids), never the commit. Two
+ *  freezes from different commits with identical trees must write identical bytes, so `rev` stays out of every compared file. */
+export const productKey = (fp: { tree: Record<string, string> }) => ({ tree: fp.tree });
+/** `rev` is informational: which commit a baseline was last frozen from. It lives in its own file, never in the compared bytes. */
+export const PROVENANCE = path.join(BASELINES, 'provenance.json');
+export function recordProvenance(name: string, fp: { rev: string; tree: Record<string, string> }, file = PROVENANCE) {
+  const cur = fs.existsSync(file) ? readJson<Record<string, any>>(file) : {};
+  cur[name] = { rev: fp.rev, treeAtFreeze: productKeyId(fp) };
+  writeText(file, stableJson({ schema: 1, what: 'informational only: the commit each baseline was last frozen from. Nothing compares this file; the baselines are keyed by product.tree (content), so a re-freeze from another commit with the same trees changes only this file.', ...cur }));
+}
+/** one short id for a tree map (fnv1a over its sorted entries) */
+export const productKeyId = (fp: { tree: Record<string, string> }) => fnv1a(Object.keys(fp.tree).sort().map(k => `${k}=${fp.tree[k]}`).join('\n')).toString(16).padStart(8, '0');
 /** HEAD against the frozen BEFORE tag: which product paths differ */
 export function productDiffersFromTag(tag = BEFORE_TAG): string[] {
   const a = productFingerprint(tag).tree, b = productFingerprint('HEAD').tree;

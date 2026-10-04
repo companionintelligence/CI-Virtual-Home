@@ -1,0 +1,12 @@
+{
+ "before.manifest.json": {
+  "rev": "b61c08fe4f0c076795d0b98f84238b7f2944883c",
+  "treeAtFreeze": "8e5440fe"
+ },
+ "cost.json": {
+  "rev": "b61c08fe4f0c076795d0b98f84238b7f2944883c",
+  "treeAtFreeze": "8e5440fe"
+ },
+ "schema": 1,
+ "what": "informational only: the commit each baseline was last frozen from. Nothing compares this file; the baselines are keyed by product.tree (content), so a re-freeze from another commit with the same trees changes only this file."
+}

@@ -22,7 +22,7 @@ import { cornerCam, costCameras, R24, r24Shots, MANNEQUIN, mannequinTop, EYE, FO
 import { lumaMetrics } from './review/luma.mts';
 import { planPairs } from './review/ab.mts';
 import { diffManifests, type Manifest } from './review/manifest.mts';
-import { stableJson, mulberry32, fnv1a, productFingerprint, git, BASELINES, BEFORE_TAG, PRODUCT_PATHS } from './review/lib.mts';
+import { stableJson, mulberry32, fnv1a, productFingerprint, productKey, productKeyId, git, BASELINES, BEFORE_TAG, PRODUCT_PATHS } from './review/lib.mts';
 import { inFrustum } from './dress-census.mts';
 
 const REPO = path.resolve(import.meta.dirname, '..');
@@ -116,7 +116,7 @@ test('A/B plan: seeded, balanced, order not the room order', () => {
 });
 
 test('manifest diff names what moved', () => {
-  const mk = (h: string, cam = 1): Manifest => ({ schema: 1, set: 'x', tag: 't', product: { rev: 'r', tree: {} }, renderer: {} as any, shots: [{ id: 'a/NW/day', sha256: h, camera: { pos: [cam, 0, 0] } } as any, { id: 'b/NW/day', sha256: 'z', camera: { pos: [0, 0, 0] } } as any] });
+  const mk = (h: string, cam = 1): Manifest => ({ schema: 1, set: 'x', tag: 't', product: { tree: {} }, renderer: {} as any, shots: [{ id: 'a/NW/day', sha256: h, camera: { pos: [cam, 0, 0] } } as any, { id: 'b/NW/day', sha256: 'z', camera: { pos: [0, 0, 0] } } as any] });
   assert.equal(diffManifests(mk('h'), mk('h')).same, true);
   const d = diffManifests(mk('h'), mk('g'));
   assert.deepEqual(d.moved, ['a/NW/day']); assert.equal(d.same, false);
@@ -167,4 +167,23 @@ test('stableJson: keys sorted at every depth, same bytes whatever the insertion 
   assert.ok(stableJson({ b: 1, a: 2 }).indexOf('"a"') < stableJson({ b: 1, a: 2 }).indexOf('"b"'));
   assert.equal(fnv1a('x'), fnv1a('x')); assert.notEqual(fnv1a('x'), fnv1a('y'));
   assert.equal(typeof productFingerprint, 'function');
+});
+
+test('committed baselines are keyed by content: no commit hash and no GPU memory counter in any compared byte', () => {
+  // `rev` is the commit a baseline was frozen from, `memory` is renderer.info.memory: neither is a function of the product code, so a
+  // re-freeze from another commit with identical trees, or from a fresh process, would change bytes that nothing should compare.
+  for (const name of ['before.manifest.json', 'cost.json', 'before-addendum.manifest.json']) {
+    const f = path.join(BASELINES, name);
+    if (!fs.existsSync(f)) { assert.notEqual(name, 'cost.json'); continue; }
+    const text = fs.readFileSync(f, 'utf8'), j = JSON.parse(text);
+    assert.equal(j.product.rev, undefined, `${name}: product.rev (the commit) must not be in the compared bytes`);
+    assert.deepEqual(Object.keys(j.product).sort(), name === 'cost.json' ? ['tag', 'tree'] : ['tree'], name);
+    assert.ok(!/"memory"|"geometries"/.test(text), `${name}: renderer.info.memory counters are not reproducible across processes`);
+    assert.equal(Object.keys(j.product.tree).sort().join(), [...PRODUCT_PATHS].sort().join(), name);
+  }
+  const fp = { rev: 'aaaa', tree: { assets: 'x', content: 'y' } }, fp2 = { rev: 'bbbb', tree: { content: 'y', assets: 'x' } };
+  assert.equal(stableJson(productKey(fp)), stableJson(productKey(fp2)), 'two commits with identical trees give identical bytes');
+  assert.equal(productKeyId(fp), productKeyId(fp2));
+  assert.notEqual(productKeyId(fp), productKeyId({ rev: 'aaaa', tree: { assets: 'x', content: 'z' } }));
+  assert.equal((productKey(fp) as any).rev, undefined);
 });

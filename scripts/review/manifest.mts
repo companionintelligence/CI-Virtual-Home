@@ -15,7 +15,7 @@ export interface ManifestShot {
 }
 export interface Manifest {
   schema: 1; set: string; tag: string;
-  product: { rev: string; tree: Record<string, string> };
+  product: { tree: Record<string, string> };   // content only: the commit it was taken from is informational (provenance.json)
   renderer: { profile: string; chromium: string; supersample: number; res: string; quality: number; dressing: { walls: string; roof: string }; size: { w: number; h: number } };
   shots: ManifestShot[];
 }
