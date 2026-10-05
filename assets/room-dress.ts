@@ -32,9 +32,9 @@ import { inferProgram } from './room-programs.js';
 import { styleOf, type StyleBundle } from './house-styles.js';
 import { mulberry32, fnv1a } from './materials.js';
 import { HERO_SET } from './item-map.js';
-import { hostOf, freeRects, standingOn, nearOn, fitIn, footprintIn, coverIn, toWorld, toLocal, subtract, rectArea, neighbourGap, reachOf, NEIGHBOUR_GAP, MIN_GAP, cornerEyes, camBlocked, CAM, type CornerEye, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
+import { hostOf, freeRects, standingOn, nearOn, fitIn, footprintIn, coverIn, toWorld, toLocal, subtract, rectArea, neighbourGap, reachOf, NEIGHBOUR_GAP, MIN_GAP, cornerEyes, camBlocked, CAM, LAMP_EYE, type CornerEye, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
 import { dressSchemeOf, type DressScheme } from './house-scheme-dress.js';
-import { RECIPES, BASE_COUNT, windowTypes, type Recipe } from './dress-recipes.js';
+import { RECIPES, BASE_COUNT, BARE_LAMPS, windowTypes, type Recipe } from './dress-recipes.js';
 import { planCafe, CURTAIN_PAD, VPAD, type Panel } from './dress-curtains.js';
 import { leafStrips, leafSensitive } from './dress-leaves.js';
 
@@ -164,6 +164,13 @@ export class Dresser {
     // a piece that reaches the camera's height keeps CAM.clear from the rig's corner eyes (the zone, in the host's frame, comes off the free area)
     if (h.top + (o.lift || 0) + s.h > CAM.eye - CAM.clear) for (const e of this.eyes) {
       const q = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => toLocal(h, e.x + a * CAM.clear, e.z + b * CAM.clear)), z: Rect = [Math.min(...q.map(v => v[0])), Math.min(...q.map(v => v[1])), Math.max(...q.map(v => v[0])), Math.max(...q.map(v => v[1]))];
+      free = free.flatMap(r => subtract(r, z));
+    }
+    // a lamp with a bare lit head keeps LAMP_EYE from every corner eye (LAMP_EYE is 3-D: the square is the plan footprint of the sphere at the lamp's own height over the eye line). A shaded lamp
+    // (a drum on a nightstand, a floor lamp, which stands through the composer in a corner by design) keeps CAM's own clearance: its light is diffused by the shade, not a hot bulb at the lens
+    if (BARE_LAMPS.has(type)) for (const e of this.eyes) {
+      const y1 = h.top + (o.lift || 0) + s.h, vg = Math.max(0, CAM.eye - y1, h.top + (o.lift || 0) - CAM.eye), rr = Math.sqrt(Math.max(0, LAMP_EYE * LAMP_EYE - vg * vg));
+      const q = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => toLocal(h, e.x + a * rr, e.z + b * rr)), z: Rect = [Math.min(...q.map(v => v[0])), Math.min(...q.map(v => v[1])), Math.max(...q.map(v => v[0])), Math.max(...q.map(v => v[1]))];
       free = free.flatMap(r => subtract(r, z));
     }
     // a piece tall enough to reach a planned curtain keeps out of the cloth's volume, its pad and its own reach round it

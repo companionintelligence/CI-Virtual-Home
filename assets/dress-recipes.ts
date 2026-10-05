@@ -30,19 +30,27 @@ export const BASE_COUNT: Record<string, number> = {
 };
 
 export const TABLE_LAMPS = ['table-lamp', 'ginger-lamp', 'column-lamp', 'globe-lamp', 'mushroom-lamp', 'tripod-table-lamp'];
-export const FLOOR_LAMPS = ['floor-lamp', 'halo-lamp', 'tripod-floor-lamp'];
+// (no 'halo-lamp': the page's legacy ambient halo, a 3.0-emissive cyan ring on a rod with a blue PointLight. fixtures.ts re-dresses it as a drum lamp only in a room with no `program`; in a
+// programmed room, which is where 23 of the 27 first-bake halos stood, it stays a glowing ring and costs a dynamic light of its own, outside the 16-light cap)
+export const FLOOR_LAMPS = ['floor-lamp', 'tripod-floor-lamp'];
 /** the small ones, for a counter or a bar (0.34-0.52 m high) */
 export const SMALL_LAMPS = ['mushroom-lamp', 'globe-lamp', 'tripod-table-lamp'];
+/** the lamps whose lit head is bare (a mushroom, a globe, a tripod's bulb: no shade), the ones a recipe stands on a counter: they keep LAMP_EYE from the rig's corner eyes (room-dress.ts) */
+export const BARE_LAMPS: ReadonlySet<string> = new Set(SMALL_LAMPS);
 const COUNTER_KITS = ['cutting-board-set', 'canister-trio', 'bread-bin', 'utensil-crock', 'tea-towel', 'oil-pair', 'plate-stack', 'kettle-and-mug'];
 
 // ---- shared moves --------------------------------------------------------------------------------------------------------------------
 /** the lamp the room lacks: on the first host of the first kind that takes one, else (when the room allows it) a floor lamp in a corner */
+/** a lamp on a host: the pick, and where its bare head would stand within LAMP_EYE of a corner eye (room-dress.ts refuses it there) the shaded table lamp, which has no hot bulb to put in the lens */
+function putLamp(d: Dresser, h: Host, type: string, o: Parameters<Dresser['put']>[3]): any | null {
+  return d.put('lamp', h, type, o) || (BARE_LAMPS.has(type) ? d.put('lamp', h, 'table-lamp', o) : null);
+}
 function lampIfNone(d: Dresser, kinds: Array<Parameters<Dresser['hostsOf']>>, o: { floor?: boolean; pair?: boolean; desk?: boolean; anchor?: 'back' | 'back-left' | 'back-right' } = {}) {
   if (d.hasLamp()) return;
   let n = 0;
   for (const ks of kinds) for (const h of d.hostsOf(...ks)) {
     const t = o.desk ? 'desk-lamp' : d.pick('lamp', TABLE_LAMPS);
-    if (d.put('lamp', h, t, { anchor: o.anchor || 'back', cost: 0.5 })) { n++; if (!o.pair || n >= 2) return; }
+    if (putLamp(d, h, t, { anchor: o.anchor || 'back', cost: 0.5 })) { n++; if (!o.pair || n >= 2) return; }
   }
   // no host will take one: a floor lamp in a corner, else against a wall (a narrow hall has the wall and no corner)
   // (the keep-out round the rig's corner cameras leaves a crowded foyer little floor: the type picked first, then each of the others, the slimmest last chance)
@@ -52,7 +60,7 @@ function lampIfNone(d: Dresser, kinds: Array<Parameters<Dresser['hostsOf']>>, o:
     // no floor of the room takes a floor lamp outside the cameras' way: a small lamp on a side table in the corner (0.55 + at most 0.52 m, under the eye line)
     const tbl = d.corner('lamp', 'side-table', {}, undefined, 0.5);
     const h = tbl && hostOf(tbl);
-    if (h && !d.put('lamp', h, d.pick('lamp', SMALL_LAMPS), { anchor: 'back', cost: 0.5 })) d.retract(tbl!, 0.5);
+    if (h && !putLamp(d, h, d.pick('lamp', SMALL_LAMPS), { anchor: 'back', cost: 0.5 })) d.retract(tbl!, 0.5);
   }
 }
 
@@ -164,9 +172,10 @@ const kitchen: Slot[] = [
   { id: 'lamp', tier: 1, what: 'a small lamp at the end of a counter run where the room has none', run(d) {
     if (d.hasLamp()) return;
     const range = d.hostsOf('hob')[0], dist = (h: Host) => (range ? Math.hypot(h.at[0] - range.at[0], h.at[1] - range.at[1]) : 0);
-    // the run farthest from the range, then the cart, the bar, the island: the first with room for it
-    for (const h of [...d.hostsOfType('counter-run').sort((a, b) => dist(b) - dist(a)), ...d.hostsOfType('kitchen-cart', 'breakfast-bar'), ...d.hostsOf('island')]) {
-      if (d.put('lamp', h, d.pick('lamp', SMALL_LAMPS), { anchor: 'back-right', cost: 0.5 })) return;
+    // the island, the cart and the bar first (a lamp has nothing over its head there: on a counter run a mushroom lamp's pool is a hot spot on the underside of the upper cabinets 0.2 m above it,
+    // aurora Kitchen NW night clipped 6 % of the frame), then the run farthest from the range: the first with room for it
+    for (const h of [...d.hostsOf('island'), ...d.hostsOfType('kitchen-cart', 'breakfast-bar'), ...d.hostsOfType('counter-run').sort((a, b) => dist(b) - dist(a))]) {
+      if (putLamp(d, h, d.pick('lamp', SMALL_LAMPS), { anchor: 'back-right', cost: 0.5 })) return;
     }
   } },
   { id: 'counters', tier: 1, what: 'clusters along the counters, those by the range first: boards, canisters, a bread bin, a crock, a tea towel, oils, a kettle', run(d) {

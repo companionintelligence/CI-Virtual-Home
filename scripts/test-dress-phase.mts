@@ -3,8 +3,8 @@
 // @check-house quick
 // The dress phase's gates (plan 5.6 D2/D3; assets/room-dress.ts, assets/dress-recipes.ts, assets/room-dress-hosts.ts). Pure Node, no browser.
 //
-//   A  no-op        no shipped house has a `dress` field or a `dress@1` item, and the build's dress phase adds nothing to any of the 30 (a room opts in with an
-//                   explicit `dress.level`, and none does), so every shipped house builds as it did; `?dress=0` is off in Node
+//   A  no live opt-in  no shipped house has a `dress` field (a room opts in live with an explicit `dress.level`, and none does), the dress items they carry are the baked ones of
+//                   pass 6 (src `dress@1` with a seed key; all 30 houses or none), and the build's live phase adds nothing to any of them; `?dress=0` is off in Node
 //   B  determinism  dressing a house twice, in a fresh copy and in another order, gives the same items byte for byte; two houses do not share a scheme
 //   C  no re-roll   switching one slot off (`dress.off`) leaves every other slot's items exactly as they were: a dress item's choices draw from a stream of
 //                   its own (room, slot, ordinal), so a new item moves no other; and a higher level only ever adds (what a lower level places, a higher one places)
@@ -23,6 +23,10 @@
 //   K  corner keep-out  the dress pieces of all 30 houses (pilot level 0.5) and the fixtures stay out of the rig's corner cameras' way: the camera points are the rig's
 //                   own `cornerCam` (the Node copy in assets/ is compared with it), no dress piece within 0.3 m of an eye (3-D, at the 1.5 m eye), no floor piece
 //                   taller than 0.8 m inside a 0.5 m corner square; and the lamp census holds (105 lamp-less rooms lit before the corner keep-out, 102 after the leaf strips of R)
+//   K3 bare lamps   a lamp with a bare lit head (mushroom, globe, tripod bulb) stands at least LAMP_EYE (1.0 m, 3-D) from every corner eye, and the phase places no halo lamp (the legacy
+//                   ring with its own PointLight, toned only outside a programmed room): pass 6's review found both (aurora Kitchen NW night clipped 6 %, 23 raw halos); with controls
+//   T  lamp heads   baking dress items re-rolls no lamp the layout already had: kit-rules lampPlan walks the permutation of lamp kinds over the layout's lamps only, and a dress lamp takes its
+//                   own seeded pick (cutestarter's bedside lamps turned into blown-out globes when 102 rooms joined the walk)
 //   L  neighbour gap  no dress item stands under 1.5 cm from another item on its surface (authored, composed or dressed, an item with no `y` at the page's DESK_TOP
 //                   included), by the layout lint and by an independent obb measure over the 30 houses baked and the fixtures; the 12 cases the skeptic found are fixed;
 //                   and the lint sees the flower-jug case the first cut did not (a control)
@@ -33,8 +37,8 @@
 //   R  door leaves   no dress piece the scene check counts (not foliage, not hung in its wall, over 0.3 m) stands in the strip an open door leaf parks in, for any door of its
 //                   storey that may carry one (a partition's, an opening's, both jambs): the five pieces the scene check found in a leaf's way (three robe hooks, an umbrella stand,
 //                   a floor lamp) are in the strips, and no piece of the 30 houses baked is; the scene gate's warning count (baked == unbaked) is dress-fleet's neighbour, run by hand
-//   S  byte identity compose-house.mts --dress then --undress gives each of the 30 houses and 5 fixtures back byte for byte (its final newline, or none, kept: the houses
-//                   have none, the fixtures one), and --dress twice writes the file --dress once did; a spec that is not canonical JSON is told so, and a room with no `items`
+//   S  byte identity compose-house.mts --dress then --undress gives each unbaked spec back byte for byte (its final newline, or none, kept: the houses have none, the fixtures one),
+//                   --dress twice writes the file --dress once did, and a baked house IS what --dress writes today (re-bake after any change to a recipe or a host); a spec that is not canonical JSON is told so, and a room with no `items`
 //                   key at all is the one case that comes back JSON-equal (a control)
 //   P  bake hygiene  a baked house raises no warning its unbaked self does not: the validator's warning count (the `dk` seed key a dress item carries is a declared item key
 //                   like `src`) and the layout lint's silent-param count are equal before and after the bake, for all 30 houses; and a dress item's `dk` is the one key
@@ -57,11 +61,12 @@ import { createMaterialKit } from '../assets/materials.js';
 import { composeHouse, layerOf } from '../assets/room-composer.js';
 import { dressHouse, dressRooms, dressOff, dressOptIn, dressProgram, isDress, bareViolation, Dresser, DRESS_SRC } from '../assets/room-dress.js';
 import { dressSchemeOf } from '../assets/house-scheme-dress.js';
-import { RECIPES, CAFE, cafeFit } from '../assets/dress-recipes.js';
+import { RECIPES, CAFE, cafeFit, BARE_LAMPS, FLOOR_LAMPS, TABLE_LAMPS, SMALL_LAMPS } from '../assets/dress-recipes.js';
+import { lampPlan, LAMP_ITEMS } from '../assets/kit-rules.js';
 import { PARTS, CURTAIN_GAP, curtainObb, planCafe, DRESSERS } from '../assets/dress-curtains.js';
 import { surfaceTypes, spillOf } from './dress-reach.mts';
 import { leafStrips, leafSensitive } from '../assets/dress-leaves.js';
-import { cornerEyes, eyeGap, camBlocked, CAM, hostOf, footprintIn, nearOn, freeRects, reachOf, standingOn as standingOnHost, surfaceY, neighbourGap, rectGap, toWorld, MIN_GAP, NEIGHBOUR_GAP, DESK_TOP, REACH } from '../assets/room-dress-hosts.js';
+import { cornerEyes, eyeGap, camBlocked, CAM, LAMP_EYE, hostOf, footprintIn, nearOn, freeRects, reachOf, standingOn as standingOnHost, surfaceY, neighbourGap, rectGap, toWorld, MIN_GAP, NEIGHBOUR_GAP, DESK_TOP, REACH } from '../assets/room-dress-hosts.js';
 import { cornerCam } from './review/cameras.mts';
 import { standingOn, rectArea } from '../assets/room-dress-hosts.js';
 import { lintLayout } from '../assets/layout-lint.js';
@@ -80,13 +85,19 @@ const rooms = (spec: any) => (spec.levels || []).flatMap((lv: any) => (lv.rooms 
 const dressedItems = (spec: any, level?: number) => [...dressRooms(spec, level === undefined ? {} : { level })].flatMap(([room, r]) => r.items.map(it => ({ room, it })));
 const strip = (o: any) => JSON.stringify(o);
 
-test('A: every shipped house builds exactly as before (the phase is opt-in and nobody opts in)', () => {
+test('A: no shipped house opts in live, and the dress items it carries are the baked ones (pass 6): src dress@1, a seed key, nothing else', () => {
+  let baked = 0;
   for (const h of houses) {
     const spec = load(h.file), text = fs.readFileSync(h.file, 'utf8');
-    assert.ok(!/"dress"\s*:/.test(text) && !text.includes(DRESS_SRC), `${h.id} carries a dress field or a dress@1 item`);
+    assert.ok(!/"dress"\s*:/.test(text), `${h.id} carries a dress field (a live opt-in: shipped houses are baked)`);
     assert.equal(dressHouse(spec).size, 0, `${h.id}: the live phase added to a house that does not opt in`);
-    for (const { room } of rooms(spec)) assert.ok(!dressOptIn(room), `${h.id}/${room.name} opts in`);
+    for (const { room } of rooms(spec)) {
+      assert.ok(!dressOptIn(room), `${h.id}/${room.name} opts in`);
+      for (const it of (room.items || []).filter(isDress)) assert.ok(typeof it.dk === 'string' && it.dk.startsWith(`${(spec.levels.find((l: any) => l.rooms.includes(room)) || {}).id}.`), `${h.id}/${room.name}: a dress item without its seed key: ${JSON.stringify(it)}`);
+    }
+    if (text.includes(DRESS_SRC)) baked++;
   }
+  assert.ok(baked === 0 || baked === houses.length, `${baked} of ${houses.length} houses are baked: pass 6 bakes all of them or none`);
   assert.equal(dressOff(), false, 'in Node, ?dress=0 is never on');
 });
 
@@ -419,6 +430,46 @@ test('K2 (control): a fiddle-leaf in the corner is in the way, a low basket is n
   assert.ok(!camBlocked(eyes, obb(0.55, 1.2, 0.3, 0.3), 0, 1.7, true), 'a lamp 0.5 m away');
   assert.ok(!camBlocked(eyes, obb(0.55, 0.7, 0.4, 0.4), 0.9, 1.1, false), 'a counter piece 0.4 m under the eye is no obstacle');
   assert.ok(eyeGap(obb(0.55, 1.0, 0.1, 0.1), 0, 1.7, nw) > 0.39 && eyeGap(obb(0.55, 1.0, 0.1, 0.1), 0, 1.7, nw) < 0.41);
+});
+
+test('K3: a bare-headed lamp keeps LAMP_EYE from every corner eye, no lamp is the legacy halo, and the check can fail (controls)', () => {
+  const eyesOf = (room: any) => cornerEyes(room.bounds);
+  let bare = 0, lamps = 0, nearest = Infinity;
+  const specs = [...houses.map(h => ({ id: h.id, spec: load(h.file) })), ...FIX.map(id => ({ id, spec: fixture(id) }))];
+  for (const { id, spec } of specs) {
+    for (const { room, it } of dressedItems(spec)) {
+      if (!['lamp'].includes((PLACEMENT[it.type] as any)?.group)) continue;
+      lamps++;
+      assert.notEqual(it.type, 'halo-lamp', `${id}/${room.name}: the phase placed the legacy halo lamp (a glowing ring and its own PointLight outside a programmed room's toning)`);
+      if (!BARE_LAMPS.has(it.type)) continue;
+      bare++;
+      const o = itemObb(it), sp = spanOfItem(it); if (!o || !sp) continue;
+      for (const e of eyesOf(room)) { const g = eyeGap(o, sp.lo, sp.hi, e); nearest = Math.min(nearest, g); assert.ok(g >= LAMP_EYE - 1e-6, `${id}/${room.name}/${e.corner}: a bare ${it.type} stands ${(g * 100).toFixed(0)} cm from the camera`); }
+    }
+  }
+  assert.ok(lamps > 80 && bare > 10, `${lamps} lamps, ${bare} bare-headed ones measured`);
+  assert.ok(!FLOOR_LAMPS.includes('halo-lamp') && !TABLE_LAMPS.includes('halo-lamp') && !SMALL_LAMPS.includes('halo-lamp'), 'no recipe list names the halo lamp');
+  // control: the measure sees a mushroom lamp half a metre from the NW eye (aurora Kitchen NW night clipped 6 % of the frame with one there)
+  const eyes = cornerEyes({ x: 0, z: 0, w: 4, d: 3 }), nw = eyes[0], near = obb(nw.x + 0.5, nw.z, 0.2, 0.2);
+  assert.ok(eyeGap(near, 0.9, 1.25, nw) < LAMP_EYE, 'control: a lamp 0.5 m from the eye is inside LAMP_EYE');
+  console.log(`K3: ${lamps} dress lamps over the 30 houses and the fixtures, ${bare} bare-headed, the nearest ${(nearest * 100).toFixed(0)} cm from any corner eye (limit ${LAMP_EYE * 100} cm), no halo lamp`);
+});
+
+test('T: baking dress items re-rolls no lamp the layout already had: lampPlan reads the layout\'s lamps, a dress lamp takes its own pick', () => {
+  let rooms_ = 0, dressLampRooms = 0;
+  for (const h of houses) {
+    const baked = load(h.file), bare = JSON.parse(JSON.stringify(baked));
+    for (const { room } of rooms(bare)) room.items = (room.items || []).filter((i: any) => !isDress(i));
+    const a = lampPlan(baked), b = lampPlan(bare);
+    for (const { lv, room } of rooms(baked)) {
+      const ri = lv.rooms.indexOf(room), key = `${lv.id}#${ri}`, hadLamp = (room.items || []).some((i: any) => LAMP_ITEMS.has(i.type) && !isDress(i));
+      if (hadLamp) { assert.equal(a.get(key), b.get(key), `${h.id}/${room.name}: a lamp the layout had changed its head when the house was dressed (${b.get(key)} -> ${a.get(key)})`); rooms_++; }
+      else if ((room.items || []).some((i: any) => LAMP_ITEMS.has(i.type) && isDress(i))) dressLampRooms++;
+    }
+  }
+  const isBaked = houses.some(h => fs.readFileSync(h.file, 'utf8').includes(DRESS_SRC));
+  assert.ok(rooms_ > 100 && (!isBaked || dressLampRooms > 20), `${rooms_} lamp rooms held their head, ${dressLampRooms} rooms were given a lamp`);
+  console.log(`T: ${rooms_} rooms with a layout lamp keep their lamp head baked or not; ${dressLampRooms} dress-lamp rooms take their own seeded pick`);
 });
 
 // ---- L: the gap to a neighbour ----------------------------------------------------------------------------------------------------------
@@ -777,7 +828,7 @@ function composeAll(jobsArgs: string[][], jobs = 4): Promise<Array<{ status: num
   };
   return Promise.all(Array.from({ length: jobs }, worker)).then(() => results);
 }
-test('S: --dress then --undress gives every house and fixture back byte for byte, and --dress twice writes what once did', async () => {
+test('S: --dress then --undress gives every house and fixture back byte for byte, --dress twice writes what once did, and a baked house is what --dress writes today', async () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dress-bytes-'));
   try {
     const srcs = [...houses.map(h => ({ id: h.id, file: h.file })), ...FIX.map(id => ({ id, file: path.join(ROOT, 'test', 'fixtures', 'houses', `${id}.json`) }))];
@@ -786,17 +837,23 @@ test('S: --dress then --undress gives every house and fixture back byte for byte
     const a = await step((id, file) => ['--house', file, '--dress', '--out', f(id, 'a')]);
     await step((id) => ['--house', f(id, 'a'), '--dress', '--out', f(id, 'b')]);
     await step((id) => ['--house', f(id, 'a'), '--undress', '--out', f(id, 'c')]);
-    let withNl = 0, items = 0;
+    await step((id) => ['--house', f(id, 'c'), '--dress', '--out', f(id, 'd')]);
+    let withNl = 0, items = 0, baked = 0;
     for (const s of srcs) {
-      const orig = fs.readFileSync(s.file), A = fs.readFileSync(f(s.id, 'a')), B = fs.readFileSync(f(s.id, 'b')), C = fs.readFileSync(f(s.id, 'c'));
+      const orig = fs.readFileSync(s.file), A = fs.readFileSync(f(s.id, 'a')), B = fs.readFileSync(f(s.id, 'b')), C = fs.readFileSync(f(s.id, 'c')), D = fs.readFileSync(f(s.id, 'd'));
       assert.ok(A.equals(B), `${s.id}: --dress twice is not --dress once`);
-      assert.ok(orig.equals(C), `${s.id}: --undress did not give the original back (${C.length} bytes, was ${orig.length}; ends with newline: ${C[C.length - 1] === 10} / ${orig[orig.length - 1] === 10})`);
+      assert.ok(A.equals(D), `${s.id}: --undress then --dress is not --dress`);
+      assert.ok(!C.toString().includes(DRESS_SRC), `${s.id}: --undress left a dress item`);
+      // pass 6: a shipped house carries its dress items baked; an unbaked house (the fixtures: they opt in live) is given back by --undress to the byte
+      if (orig.toString().includes(DRESS_SRC)) { baked++; assert.ok(orig.equals(A), `${s.id}: the baked dress items are not what compose-house.mts --dress writes today (re-bake: compose-house.mts --house ${s.id} --dress --write)`); }
+      else assert.ok(orig.equals(C), `${s.id}: --undress did not give the original back (${C.length} bytes, was ${orig.length}; ends with newline: ${C[C.length - 1] === 10} / ${orig[orig.length - 1] === 10})`);
       assert.equal(A[A.length - 1] === 10, orig[orig.length - 1] === 10, `${s.id}: the baked file's ending is not the original's`);
       if (orig[orig.length - 1] === 10) withNl++;
       items += JSON.parse(A.toString()).levels.flatMap((lv: any) => lv.rooms).flatMap((r: any) => r.items || []).filter(isDress).length;
     }
     assert.ok(a.every(x => !/note: .* not in canonical/.test(x.out)), 'every house and fixture is in canonical 2-space JSON');
     assert.ok(withNl === FIX.length && items >= 900, `${withNl} files end with a newline (the fixtures), ${items} dress items round-tripped`);
+    assert.ok(baked === 0 || baked === houses.length, `${baked} of ${houses.length} shipped houses are baked: pass 6 bakes all of them or none`);
     // the one honest exception: a room with no `items` key at all comes back with an empty one (the control), and a spec that is not canonical JSON is reported
     const spec = load(srcs.find(x => x.id === 'aurora')!.file), kitchen = spec.levels.flatMap((lv: any) => lv.rooms).find((r: any) => /^kitchen$/i.test(r.name)); delete kitchen.items;
     const odd = path.join(dir, 'noitems.json'); fs.writeFileSync(odd, JSON.stringify(spec, null, 2)); fs.writeFileSync(path.join(dir, 'ugly.json'), JSON.stringify(spec));
@@ -806,6 +863,6 @@ test('S: --dress then --undress gives every house and fixture back byte for byte
     assert.ok(/note: .*ugly\.json is not in canonical 2-space JSON/.test(ugly.out), 'a spec that is not canonical JSON is told so');
     const back = load(path.join(dir, 'n3.json')), roomOf = (sp: any) => sp.levels.flatMap((lv: any) => lv.rooms).find((r: any) => /^kitchen$/i.test(r.name));
     assert.ok(!('items' in roomOf(spec)) && Array.isArray(roomOf(back).items) && roomOf(back).items.length === 0 && !fs.readFileSync(odd).equals(fs.readFileSync(path.join(dir, 'n3.json'))), 'control: a room without an items key comes back with an empty one');
-    console.log(`S: ${srcs.length} specs, ${items} dress items: --dress then --undress is the identity on the bytes (${withNl} with a final newline, ${srcs.length - withNl} without), --dress twice is --dress once`);
+    console.log(`S: ${srcs.length} specs, ${items} dress items: --dress then --undress is the identity on the bytes (${withNl} with a final newline, ${srcs.length - withNl} without), --dress twice is --dress once, ${baked} baked houses are what --dress writes today`);
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });

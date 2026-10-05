@@ -281,6 +281,8 @@ export { area as rectArea };
  * of the rig's (THREE-free, in assets/): test-dress-phase K runs the rig's own `cornerCam` against it.
  */
 export const CAM = { eye: 1.5, inset: 0.55, share: 0.2, clear: 0.3, square: 0.5, tall: 0.8 };
+/** a lamp with a bare lit head (a mushroom, a globe, a tripod's bulb) keeps this far (3-D) from a corner eye: half a metre from the lens it is a white ball with a hot wall behind it (the bloom, not the box, is what blocks the frame) */
+export const LAMP_EYE = 1.0;
 export type CornerName = 'NW' | 'SE' | 'NE' | 'SW';
 export interface CornerEye { corner: CornerName; x: number; z: number; /** the corner square, a rect [x0, z0, x1, z1] */ sq: [number, number, number, number] }
 const FLIP: Record<CornerName, [number, number]> = { NW: [0, 0], SE: [1, 1], NE: [1, 0], SW: [0, 1] };

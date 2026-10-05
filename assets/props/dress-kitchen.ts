@@ -39,12 +39,13 @@ registerDress({
       canister(k, { x: -0.115 }, { r: 0.055, h: 0.2 }); canister(k, { x: 0.0, z: 0.004 }, { r: 0.05, h: 0.17 }); canister(k, { x: 0.112 }, { r: 0.046, h: 0.14 });
     },
   }),
-  // A bread bin: a lacquered box, a lid and a bar handle.
+  // A bread bin: a wooden box, a lid and a bar handle. (It was lacquered in the house's cabinet colour; in a dark-cabinet house that is a black block on a white counter, seraphine's cart,
+  // gardennook's dishwasher top: pass 6's review.)
   'bread-bin': dressType({
-    name: 'bread-bin', footprint: [0.4, 0.27], height: 0.23, rolls: 1, paint: 'cabinet', tags: ['kitchen'],
+    name: 'bread-bin', footprint: [0.4, 0.27], height: 0.23, rolls: 1, paint: 'wood', tags: ['kitchen'],
     build(k) {
-      k.add('cabinet', roundedBox(0.38, 0.19, 0.24, 0.02, 1));
-      k.add('cabinet', roundedBox(0.4, 0.04, 0.255, 0.015, 1), { y: 0.19 });
+      k.add('wood', roundedBox(0.38, 0.19, 0.24, 0.02, 1));
+      k.add('wood', roundedBox(0.4, 0.04, 0.255, 0.015, 1), { y: 0.19 });
       k.add('metal', free(box(0.12, MIN_FREE, 0.014)), { y: 0.12, z: 0.127 });
     },
   }),

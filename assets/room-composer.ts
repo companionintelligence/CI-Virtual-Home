@@ -1273,7 +1273,9 @@ export function pinsFor(spec: any, lv: any, room: any, composed: Map<any, any[]>
     const rb = r.bounds; if (!rb) continue;
     if (r !== room && (rb.x >= b.x + b.w || rb.x + rb.w <= b.x || rb.z >= b.z + b.d || rb.z + rb.d <= b.z)) continue;
     for (const it of [...(r.items || []), ...(composed.get(r) || [])]) {
-      if (it.src === 'dress@1' && !withDress) continue;   // the dress phase runs after the layout and is no pin of it: a baked dress item moves no composition (plan 5.6)
+      // the dress phase runs after the layout and is no pin of it: a baked dress item moves no composition (plan 5.6). The dress phase itself (withDress) sees the dress items of the rooms
+      // beside it, but never the ones baked into its OWN room: those are the ones it is about to make again, and counting them as pins would block each piece from the place it was baked at
+      if (it.src === 'dress@1' && (!withDress || r === room)) continue;
       if (heroHere && HERO.has(it.type) && Array.isArray(it.at) && Math.hypot(it.at[0] - spec.hero.at[0], it.at[1] - spec.hero.at[1]) < 1.3) continue;
       const o = itemObb(it); if (!o) continue;
       const s = sizeOf(it.type, it)!, layer = layerOf(it.type);
