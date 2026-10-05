@@ -43,7 +43,8 @@ function lampIfNone(d: Dresser, kinds: Array<Parameters<Dresser['hostsOf']>>, o:
     const t = o.desk ? 'desk-lamp' : d.pick('lamp', TABLE_LAMPS);
     if (d.put('lamp', h, t, { anchor: o.anchor || 'back', cost: 0.5 })) { n++; if (!o.pair || n >= 2) return; }
   }
-  if (n === 0 && o.floor !== false) d.corner('lamp', d.pick('lamp', FLOOR_LAMPS), {}, undefined, 0.5);
+  // no host will take one: a floor lamp in a corner, else against a wall (a narrow hall has the wall and no corner)
+  if (n === 0 && o.floor !== false) { const t = d.pick('lamp', FLOOR_LAMPS); if (!d.corner('lamp', t, {}, undefined, 0.5)) d.against('lamp', t, {}, null, undefined, 0.5); }
 }
 
 /** the dining table of the room laid: a centrepiece first (it is the table's middle), then a place per chair, as many as keep 40 % of the top free */
@@ -118,6 +119,14 @@ const bedroom: Slot[] = [
 
 const kitchen: Slot[] = [
   { id: 'hob', tier: 1, what: 'a lidded pot on the range', run(d) { d.hostsOf('hob').slice(0, 1).forEach(h => d.put('hob', h, 'pot-on-hob', { anchor: 'centre' })); } },
+  { id: 'lamp', tier: 1, what: 'a small lamp at the end of a counter run where the room has none', run(d) {
+    if (d.hasLamp()) return;
+    const range = d.hostsOf('hob')[0], dist = (h: Host) => (range ? Math.hypot(h.at[0] - range.at[0], h.at[1] - range.at[1]) : 0);
+    // the run farthest from the range, then the cart, the bar, the island: the first with room for it
+    for (const h of [...d.hostsOfType('counter-run').sort((a, b) => dist(b) - dist(a)), ...d.hostsOfType('kitchen-cart', 'breakfast-bar'), ...d.hostsOf('island')]) {
+      if (d.put('lamp', h, d.pick('lamp', SMALL_LAMPS), { anchor: 'back-right', cost: 0.5 })) return;
+    }
+  } },
   { id: 'counters', tier: 1, what: 'clusters along the counters, those by the range first: boards, canisters, a bread bin, a crock, a tea towel, oils, a kettle', run(d) {
     const queue = COUNTER_KITS.filter(t => t !== 'kettle-and-mug' || !d.has('kettle')).slice();
     const r = d.pick('counters', queue, false); while (queue[0] !== r) queue.push(queue.shift()!);
@@ -141,14 +150,6 @@ const kitchen: Slot[] = [
     }
   } },
   { id: 'table', tier: 2, what: 'an eat-in table laid: a centrepiece and a place for each chair', run(d) { setTable(d); } },
-  { id: 'lamp', tier: 1, what: 'a small lamp at the end of a counter run where the room has none', run(d) {
-    if (d.hasLamp()) return;
-    const range = d.hostsOf('hob')[0], dist = (h: Host) => (range ? Math.hypot(h.at[0] - range.at[0], h.at[1] - range.at[1]) : 0);
-    // the run farthest from the range, then the cart, the bar, the island: the first with room for it
-    for (const h of [...d.hostsOfType('counter-run').sort((a, b) => dist(b) - dist(a)), ...d.hostsOfType('kitchen-cart', 'breakfast-bar'), ...d.hostsOf('island')]) {
-      if (d.put('lamp', h, d.pick('lamp', SMALL_LAMPS), { anchor: 'back-right', cost: 0.5 })) return;
-    }
-  } },
 ];
 
 const dining: Slot[] = [
