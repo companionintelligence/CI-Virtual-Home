@@ -335,6 +335,47 @@ jobs:
         with:
           node-version: 22
 
+      # Google Analytics 4, production only (previews would pollute the stats). The measurement id is the repository
+      # variable GA_MEASUREMENT_ID (a variable, not a secret: it ships in every page's HTML), never in the code:
+      #   gh variable set GA_MEASUREMENT_ID --body G-XXXX --repo companionintelligence/ci-virtual-home
+      # Inline, because this workflow runs no checkout and no repository script. It edits the downloaded files only, in
+      # a step with no token. No-op unless the id matches /^G-[A-Z0-9]+$/; idempotent (a page that already carries
+      # gtag.js is skipped). The site sets no CSP (portal/_headers), so the inline config snippet needs no header change.
+      - name: Inject Google Analytics
+        if: steps.gate.outputs.ready == 'true' && needs.plan.outputs.target == 'production'
+        working-directory: ${{ runner.temp }}/pages
+        env:
+          GA_MEASUREMENT_ID: ${{ vars.GA_MEASUREMENT_ID }}
+        run: |
+          node --input-type=module - <<'EOF'
+          import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+          import { join } from 'node:path';
+          const id = (process.env.GA_MEASUREMENT_ID || '').trim();
+          if (!/^G-[A-Z0-9]+$/.test(id)) {
+            console.log('Google Analytics: GA_MEASUREMENT_ID unset or invalid, nothing to do');
+            process.exit(0);
+          }
+          const snippet =
+            `<script async src="https://www.googletagmanager.com/gtag/js?id=${id}"></script>\n` +
+            `<script>\nwindow.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\n` +
+            `gtag('js', new Date());\ngtag('config', '${id}');\n</script>\n`;
+          function* htmlFiles(dir) {
+            for (const e of readdirSync(dir, { withFileTypes: true })) {
+              const p = join(dir, e.name);
+              if (e.isDirectory()) yield* htmlFiles(p);
+              else if (/\.html?$/i.test(e.name)) yield p;
+            }
+          }
+          let changed = 0;
+          for (const f of htmlFiles('site')) {
+            const src = readFileSync(f, 'utf8');
+            if (src.includes('googletagmanager.com/gtag/js') || !/<\/head>/i.test(src)) continue;
+            writeFileSync(f, src.replace(/<\/head>/i, () => snippet + '</head>'));
+            changed++;
+          }
+          console.log(`Google Analytics: ${id} injected into ${changed} file(s)`);
+          EOF
+
       # No token in this step's environment, and no install scripts (esbuild's and workerd's are for Wrangler's local
       # dev server, which `pages deploy` never starts). Wrangler pins its direct dependencies; the rest resolve when
       # this runs. The step below runs it from a directory with no package.json, no Wrangler config and no git for it to
