@@ -432,13 +432,17 @@ export function layBedding(g: any, ctx: any, o: any) {
     shell(altA, { w: 0.5, h: 0.11, d: 0.17, r: 0.05, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(0.25, 4), ky: [-0.055, -0.005, 0.055], kz: [-0.085, 0, 0.085], puff: 0.012, xf: lxf,
       shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.97 - 0.1 * smooth(0.6, 1, Math.abs(x) / 0.25) : 0.86) });
   }
-  // the quilt's planar UVs, UNFOLDED over the edge: a plain top-down projection gives every vertex of a side or foot skirt the same u (or v), so the plaid smeared into long streaks
-  // down the skirt and the rounded edge read as an odd striped tube (lakecabin master bedroom SE). A vertex below the crown is mapped as if the cloth continued over the edge: moved
-  // inward by how far it hangs, so the pattern runs on down the skirt (mirrored, which a plaid does not show)
-  const crown = matTop + loft;
+  // the quilt's planar UVs, UNFOLDED over the edge: a plain top-down projection gave every vertex of a side or foot skirt the same u (or v), so the plaid smeared into long streaks
+  // down the skirt and the rounded edge read as an odd striped tube (lakecabin master bedroom SE). Past the start of the rounded edge a vertex is mapped by its distance ALONG the cloth
+  // (how far out it has gone plus how far it hangs), so the pattern runs on over the edge and down the skirt; where that distance would pass the duvet's own half width it is
+  // reflected back (the plaid is symmetric, so the fold does not show)
+  const crown = matTop + loft, edgeX = W2 / 2 - 0.05, edgeZ = zf - 0.05;
   const uv = quilt ? (x: number, y: number, zz: number): [number, number] => {
-    const hang = Math.max(0, crown - 0.02 - y), sx = Math.abs(x) > W2 / 2 - 0.03 ? Math.sign(x) * hang : 0, sz = zz > zf - 0.03 ? hang : 0;
-    return [(x - sx + W2 / 2) / W2, (zz - sz - (zf - cl)) / cl];
+    const drop = Math.max(0, crown - 0.012 - y), ax = Math.abs(x);
+    let tx = Math.min(ax, edgeX) + (ax > edgeX + 1e-6 ? ax - edgeX + drop : 0), tz = Math.min(zz, edgeZ) + (zz > edgeZ + 1e-6 ? zz - edgeZ + drop : 0);
+    if (tx > W2 / 2) tx = W2 - tx;
+    if (tz > zf) tz = 2 * zf - tz;
+    return [(Math.sign(x) * tx + W2 / 2) / W2, (tz - (zf - cl)) / cl];
   } : undefined;
   put(g, linenA, softMat(ctx, colors.linen, { roughness: 0.95 }), 'linen');
   put(g, duvetA, softMat(ctx, duvet, { roughness: 0.88 }), 'duvet', { uv });
