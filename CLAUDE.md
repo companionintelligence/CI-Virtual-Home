@@ -73,6 +73,9 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 - `portal:build` writes more than copies: `dist/homes/<id>.html` share pages, one `<meta name="vh-share">` in
   `dist/room-creator.html` that tells the player they exist, the site's title and preview tags in place of that
   page's static (editor) head, and absolute preview-image URLs (`--site-url`, default `https://homes.ci.computer/`).
+- Search hygiene is also `portal:build`'s (5d2): canonical, twitter title/description/image and Organization JSON-LD on every page,
+  plus `404.html`, `robots.txt` and `sitemap.xml`. Canonical and sitemap URLs are the extensionless ones Pages serves
+  (`/homes/<id>`, `/room-creator`), never `.html` (that answers 308). A new page needs a `seo(...)` call there.
 - A home's name on the portal is `displayName` in `assets/home-names.ts`, never the spec's `name` directly (that is
   the Sims build's title and stays the credit). Fix a name there, not in `content/houses/`.
 - The engine's modules are not fingerprinted by file name, so `portal:build` names each one by a content hash in the page's
