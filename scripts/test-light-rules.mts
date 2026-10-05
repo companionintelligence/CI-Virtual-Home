@@ -243,6 +243,16 @@ test('night is lamp-lit: a cool sky over a warm ground, env 0.30 kept, and dusk 
   const s = parseInt(n.hemi.sky.slice(1), 16); assert.ok((s & 255) > ((s >> 16) & 255), 'the sky stays cool');
 });
 
+test('LIGHT v3 (5): the composer reads a curtain as thin (GTAO thickness 0.15) and the day grade turns about a lighter grey', () => {
+  const page = fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8');
+  assert.match(page, /gtao\.updateGtaoMaterial\(\{ radius: 0\.8, distanceExponent: 1, thickness: 0\.15,/);
+  assert.match(page, /u\.pivot\.value = p\.grade\.pivot \?\? 0\.18/);
+  const g = TIME_OF_DAY.day.grade;
+  assert.ok(g.contrast > 1.3 && (g.pivot ?? 0.18) > 0.25, 'a stronger contrast about a lighter grey: the range grows without the walls brightening');
+  assert.ok(g.saturation <= 1 && g.vignette <= 0.25);
+  for (const t of ['dusk', 'night', 'golden']) assert.equal((TIME_OF_DAY as any)[t].grade.pivot, undefined, `${t} keeps the 0.18 pivot`);
+});
+
 test('linen holds its albedo cap, so a bed can take a lamp without clipping (L0\'s 0.85), and only bedding, pillows and towels are held to it', async () => {
   const max = (c: number) => Math.max((c >> 16) & 255, (c >> 8) & 255, c & 255) / 255;
   assert.ok(max(capAlbedo(0xf2efe9, ROLES.linen.albedoCap)) <= ROLES.linen.albedoCap + 1 / 255);

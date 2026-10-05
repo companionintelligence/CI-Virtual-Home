@@ -29,10 +29,11 @@
 //                                             serves another checkout) and compare: L2's tag on ceiling materials must cost at most +2 % median.
 //                                             --houses a,b  --label <name>
 //
+//   pnpm run test:light -- --closeups        GTAO thickness 1 against the shipped value on pendants, shades, curtains, plants, a stair and a chair (LIGHT v3 item 5)
 //   pnpm run test:light -- --mood            night: the luma within 1.2 m of a lamp against the room's far wall, on the bench rooms (LIGHT v3 item 2; target 1.3 or more)
 //   pnpm run test:light -- --lamps           the lamp census: every glowing lamp of every house by type, and which rooms have no pool (LIGHT v3 item 1)
 //
-//   pnpm run test:light -- --probe           (--corners NW,SE --rooms a,b --label <dir> --tune '{json}' (fixtures.ts tune hook) --env '{json}' (TIME_OF_DAY merge) --variant grade|ao|all: with a runtime L4 variant) the bench without the provenance rules: the same cameras (from before.manifest.json) and the same 19 reads, on the
+//   pnpm run test:light -- --probe           (--corners NW,SE --rooms a,b --label <dir> --tune '{json}' (fixtures.ts tune hook) --env '{json}' (TIME_OF_DAY merge) --gtao '{json}' --variant grade|ao|all: with a runtime L4 variant) the bench without the provenance rules: the same cameras (from before.manifest.json) and the same 19 reads, on the
 //                                             tree as it is, committed or not, for tuning a constant. Not a gate result (use --bench for that).   --tods dusk,night
 //
 // Frames are read off the product's own composer path (__houseSnapshot / __houseRenderFrames, 2x supersample, GTAO, bloom, grade, SMAA), at
@@ -348,6 +349,8 @@ async function probeMode(): Promise<number> {
         const merge = (t: any, u: any) => { for (const k of Object.keys(u)) { if (u[k] && typeof u[k] === 'object' && !Array.isArray(u[k]) && t[k] && typeof t[k] === 'object') merge(t[k], u[k]); else t[k] = u[k]; } };
         merge(E.TIME_OF_DAY, o);
       }, JSON.parse(args.env));
+      // --gtao '{"radius":0.55,"thickness":0.15,"blend":1.4}': the composer's GTAO pass on this page (room-creator.html composerFor sets the shipped numbers)
+      if (args.gtao && args.gtao !== 'true') await w.page.evaluate((o: any) => { const fc = (window as any).__houseComposer(); if (!fc) throw new Error('no composer'); if (typeof o.blend === 'number') fc.gtao.blendIntensity = o.blend; fc.gtao.updateGtaoMaterial({ radius: o.radius ?? 0.8, distanceExponent: 1, thickness: o.thickness ?? 1, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false }); }, JSON.parse(args.gtao));
       for (const tod of ['day', 'dusk', 'night']) {
         if (!tods.has(tod)) continue;
         await w.page.evaluate((t: string) => (window as any).__houseSetLighting(t), tod);
@@ -667,8 +670,76 @@ async function moodMode(): Promise<number> {
   return rows.some(r => !r.ok) ? 1 : 0;
 }
 
+
+// ---- closeups: does the GTAO retune put a halo round anything thin? ------------------------------------------------------------------------
+// LIGHT v3 item 5. Pendants, lamp shades, curtains, plants, a stair and a chair, each from 1-2 m, by day and at night, rendered through the composer with the shipped
+// GTAO thickness and with the old one (1); the pair side by side and an amplified difference go to <out>/closeups/. A halo is a LIGHTER outline: the sheet is for the eye.
+//   pnpm run test:light -- --closeups [--houses aurora,seraphine,cutestarter]
+async function closeupsMode(): Promise<number> {
+  const houses = args.houses && args.houses !== 'true' ? args.houses.split(',') : ['aurora', 'seraphine', 'cutestarter'];
+  const dir = out('closeups'); fs.mkdirSync(dir, { recursive: true });
+  const session = await startSession();
+  const manifest: any[] = [];
+  try {
+    for (const house of houses) {
+      const w = await session.open(house, { res: RES });
+      const targets: any[] = await w.page.evaluate(() => {
+        const d = (window as any).__houseDebug(), scene = d.scene, TH = (window as any).__THREE;
+        const kinds: Array<[string, (o: any) => boolean]> = [
+          ['pendant', o => /^Pendant/.test(o.name || '') && o.isGroup && !!o.parent && /Pendants/.test(o.parent.name || '')],
+          ['curtains', o => o.userData && o.userData.itemType === 'curtains'],
+          ['plant', o => o.userData && /plant|palm|fiddle|fern|monstera|pothos|ficus|tree/.test(o.userData.itemType || '') && o.userData.role === 'item'],
+          ['lamp', o => o.userData && /lamp/.test(o.userData.itemType || '') && !/pendant/.test(o.userData.itemType) && o.userData.role === 'item'],
+          ['stairs', o => o.userData && o.userData.stair === true],
+          ['chair', o => o.userData && /chair/.test(o.userData.itemType || '') && o.userData.role === 'item'],
+        ];
+        const out: any[] = [];
+        for (const [kind, f] of kinds) {
+          let n = 0;
+          scene.traverse((o: any) => {
+            if (n >= 2 || !o.visible || !f(o)) return;
+            o.updateWorldMatrix(true, true);
+            const b = new TH.Box3().setFromObject(o); if (b.isEmpty()) return;
+            const c = b.getCenter(new TH.Vector3()), sz = b.getSize(new TH.Vector3());
+            if (Math.max(sz.x, sz.y, sz.z) < 0.15 || Math.max(sz.x, sz.y, sz.z) > 6) return;
+            // the room the object stands in: toward its middle is where the eye is
+            const rooms = d.house.spec.levels.flatMap((lv: any) => (lv.rooms || []).map((r: any) => ({ lv, r })));
+            const home = rooms.filter(({ lv, r }: any) => r.bounds && c.x >= r.bounds.x && c.x <= r.bounds.x + r.bounds.w && c.z >= r.bounds.z && c.z <= r.bounds.z + r.bounds.d && c.y >= (lv.y || 0) - 0.1 && c.y <= (lv.y || 0) + (lv.height || 3))[0];
+            const m = home ? { x: home.r.bounds.x + home.r.bounds.w / 2, z: home.r.bounds.z + home.r.bounds.d / 2 } : { x: c.x + 1, z: c.z + 1 };
+            let dx = m.x - c.x, dz = m.z - c.z; const l = Math.hypot(dx, dz) || 1; dx /= l; dz /= l;
+            const dist = Math.min(l * 0.9, Math.max(sz.x, sz.y, sz.z) * 1.6 + 0.7);
+            out.push({ kind, name: o.name || kind, c: c.toArray(), cam: [c.x + dx * dist, Math.min(c.y + 0.25, (home ? (home.lv.y || 0) : 0) + 1.6), c.z + dz * dist] });
+            n++;
+          });
+        }
+        return out;
+      });
+      for (const [ti, t] of targets.entries()) for (const tod of ['day', 'night'] as const) {
+        await w.page.evaluate((tt: string) => (window as any).__houseSetLighting(tt), tod);
+        const files: string[] = [];
+        for (const [tag, thick] of [['old', 1], ['new', null]] as Array<[string, number | null]>) {
+          if (thick !== null) await w.page.evaluate((th: number) => { const fc = (window as any).__houseComposer(); fc.gtao.updateGtaoMaterial({ radius: 0.8, distanceExponent: 1, thickness: th, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false }); }, thick);
+          else await w.page.evaluate(() => { const fc = (window as any).__houseComposer(); fc.gtao.updateGtaoMaterial({ radius: 0.8, distanceExponent: 1, thickness: 0.15, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false }); });
+          const url = await w.page.evaluate(({ t, res, quality }: any) => {
+            const W = window as any, d = W.__houseDebug(), c = d.camera;
+            c.position.set(...(t.cam as [number, number, number])); c.lookAt(...(t.c as [number, number, number])); c.fov = 60; c.near = 0.05; c.updateProjectionMatrix();
+            return W.__houseSnapshot({ res, dressing: { walls: 'up', roof: 'on' }, quality });
+          }, { t, res: RES, quality: QUALITY });
+          const f = path.join(dir, `${house}__${t.kind}${ti}__${tod}-${tag}.jpg`); fs.writeFileSync(f, Buffer.from(url.slice(url.indexOf(',') + 1), 'base64')); files.push(f);
+        }
+        manifest.push({ house, kind: t.kind, name: t.name, tod, files: files.map(f => path.basename(f)) });
+        console.log(`  ${house.padEnd(12)} ${t.kind.padEnd(8)} ${tod}  ${t.name}`);
+      }
+      await w.close();
+    }
+  } finally { await session.close(); }
+  writeText(path.join(dir, 'closeups.json'), stableJson({ schema: 1, what: 'GTAO thickness 1 (old) against the shipped value, close-ups (test-interior-light.mts --closeups)', rows: manifest }));
+  return 0;
+}
+
 let code = 0;
-if (args.mood === 'true') code = await moodMode();
+if (args.closeups === 'true') code = await closeupsMode();
+else if (args.mood === 'true') code = await moodMode();
 else if (args.lamps === 'true') code = await lampsMode();
 else if (args.leak === 'true') code = await leakMode();
 else if (args.probe === 'true') code = await probeMode();
@@ -678,6 +749,6 @@ else if (args.portal === 'true') code = await portalMode();
 else if (args.bench === 'true') code = await benchMode();
 else code = await fixturesMode();
 const bad = rows.filter(r => !r.ok).length;
-if (args.portal !== 'true' && args.probe !== 'true' && args.leak !== 'true' && args.lamps !== 'true' && args.mood !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
+if (args.portal !== 'true' && args.probe !== 'true' && args.leak !== 'true' && args.lamps !== 'true' && args.mood !== 'true' && args.closeups !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
 console.log(`(load ${machine().load1})`);
 process.exit(code);

@@ -54,7 +54,7 @@ export type Preset = {
   glowColor: string;
   sunGlow: number;
   bloom: { strength: number; radius: number; threshold: number };
-  grade: { contrast: number; saturation: number; vignette: number };
+  grade: { contrast: number; saturation: number; vignette: number; /** the linear grey the contrast turns about (default 0.18); a higher pivot keeps a contrast boost from brightening the walls */ pivot?: number };
   /** look 2's white balance: how far toward neutral the frame is corrected (0 none, 1 fully; default 0.75). Dusk is held back so a warm hour stays warm (LIGHT v3). */
   wb?: number;
   /** the colour a ceiling's bounce emits (default BOUNCE_COLOR, a warm white): dusk's is warmer, a ceiling that read teal under a peach sky was the one cool thing in a warm room */
@@ -73,7 +73,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     fog: [60, 155], shadow: 0.8,
     lampGain: 0.035, bounce: 0.12, windowGlow: 0, glowColor: '#ffe2bd', sunGlow: 0.25,
     bloom: { strength: 0.08, radius: 0.4, threshold: 2.5 },
-    grade: { contrast: 1.06, saturation: 0.88, vignette: 0.14 },
+    grade: { contrast: 1.5, pivot: 0.34, saturation: 0.97, vignette: 0.2 },   // LIGHT v3 item 5: a contrast about a lighter grey (0.34), so the walls are not brightened by it (mean luma within 3 % of BEFORE) and the day range gains +0.09 on the three rows that read it; was 1.06 / 0.88 / 0.14
   },
   golden: {
     label: 'Golden hour',
@@ -396,6 +396,7 @@ export const GradeShader = {
   uniforms: {
     tDiffuse: { value: null },
     contrast: { value: 1.0 },
+    pivot: { value: 0.18 },
     saturation: { value: 1.0 },
     vignette: { value: 0.0 },
     aspect: { value: 16 / 9 },
@@ -407,13 +408,13 @@ export const GradeShader = {
     void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse;
-    uniform float contrast, saturation, vignette, aspect;
+    uniform float contrast, saturation, vignette, aspect, pivot;
     uniform vec3 look, balance;
     varying vec2 vUv;
     void main() {
       vec4 c = texture2D(tDiffuse, vUv);
       vec3 rgb = max(c.rgb, vec3(0.0)) * balance;
-      rgb = pow(rgb / 0.18, vec3(contrast)) * 0.18;
+      rgb = pow(rgb / pivot, vec3(contrast)) * pivot;
       float l = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
       rgb = max(mix(vec3(l), rgb, saturation * look.x), vec3(0.0));
       vec2 d = (vUv - 0.5) * vec2(aspect, 1.0) / length(vec2(aspect, 1.0)) * 2.0;   // 0 centre, 1 corners
