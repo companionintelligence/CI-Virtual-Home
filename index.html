@@ -17,6 +17,7 @@
   <meta property="og:image:alt" content="An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@companionintel">
+  <meta name="twitter:image:alt" content="An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser.">
   <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
   <!--
@@ -34,7 +35,8 @@
   <link rel="preload" href="./assets/fonts/manrope-latin-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./content/houses/index.json" as="fetch" crossorigin>
   <link rel="stylesheet" href="./portal/gallery.css">
-  <!-- gallery.js imports the portal's names when it runs, and lists the homes without them if they fail to come -->
+  <!-- gallery.js imports the portal's names when it runs, and lists the homes without them if they fail to come. The built page
+       has its import map just above the first module (scripts/build-portal.mts), after this head's title and preview tags -->
   <link rel="modulepreload" href="./assets/home-names.js">
   <noscript><style>.skel { display: none; }</style></noscript>
   <!-- data-cfasync="false": Cloudflare's Rocket Loader would otherwise hold the script back and rewrite its type -->
@@ -81,11 +83,8 @@
           <a class="btn btn-ghost hero-browse" href="#homes"><span>Browse the homes</span><svg class="i"><use href="#i-down"/></svg></a>
         </div>
         <div class="core-card">
-          <p class="core-line"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg><span>The small computer on your desk is a <b>Companion Core</b>: your own AI, apps and memory, running at home.</span></p>
-          <p class="core-actions">
-            <a class="btn btn-buy" href="https://ci.computer/core">Buy Companion Core</a>
-            <a class="btn btn-ghost" href="https://ci.computer/download">Download Companion</a>
-          </p>
+          <p class="core-line"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg><span>Every home has a <b>Companion Core</b> in it. Watch one to find it.</span></p>
+          <p class="core-actions"><a class="core-more" href="#core"><span>What is the Companion Core?</span><svg class="i" aria-hidden="true"><use href="#i-down"/></svg></a></p>
         </div>
         <dl class="stats" aria-label="The collection">
           <div><dt>Homes</dt><dd data-stat="homes">30</dd></div>
@@ -139,7 +138,7 @@
       <noscript><p class="empty">Search and the filters need JavaScript. The homes are listed above.</p></noscript>
     </section>
 
-    <section class="cta-band" aria-labelledby="cta-title">
+    <section class="cta-band" id="core" aria-labelledby="cta-title">
       <div class="cta-copy">
         <h2 id="cta-title">Meet the Companion Core.</h2>
         <p>The small computer on your desk runs your own AI, apps and memory at home, not in someone else's cloud.</p>
@@ -155,7 +154,7 @@
   <footer class="site-foot">
     <div class="foot-grid">
       <div>
-        <p class="foot-brand"><a href="https://ci.computer"><img src="./assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>Companion Intelligence</b></a></p>
+        <p class="foot-brand"><img src="./assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>Companion Intelligence</b></p>
         <p>Every frame is drawn on your device, with three.js and WebGL. Nothing is streamed: your browser builds each home from its spec.</p>
       </div>
       <nav class="foot-links" aria-label="Companion Intelligence">
@@ -178,7 +177,9 @@
         </details>
       </div>
     </div>
-    <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence. <a href="https://ci.computer">ci.computer</a></p>
+    <!-- foot-homes: scripts/build-portal.mts writes the list of every home's own page here (the pages are build output, so a
+         checkout served as it is has none) -->
+    <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence.</p>
   </footer>
 </body>
 </html>

@@ -189,8 +189,9 @@ kbd {
 }
 .core-line .i { width: 18px; height: 18px; margin-top: 2px; color: var(--primary); }
 .core-line b { color: var(--foreground); font-weight: 700; }
-.core-actions { margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.core-actions .btn { height: 42px; padding: 0 16px; font-size: 14.5px; }
+.core-actions { margin: 4px 0 0 28px; }
+.core-more { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; font-weight: 600; font-size: 14px; text-underline-offset: 3px; }
+.core-more .i { width: 15px; height: 15px; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
@@ -421,9 +422,7 @@ kbd {
 .foot-grid { display: grid; grid-template-columns: 1.15fr 0.8fr 1.15fr; gap: 24px 48px; }
 .foot-grid p { margin: 0 0 6px; max-width: 46em; }
 .foot-grid b { color: var(--foreground); font-weight: 700; }
-.foot-brand { display: flex; align-items: center; }
-.foot-brand a { display: inline-flex; align-items: center; gap: 8px; min-height: 28px; color: var(--foreground); text-decoration: none; }
-.foot-brand a:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.foot-brand { display: flex; align-items: center; gap: 8px; min-height: 28px; color: var(--foreground); }
 .foot-links ul { list-style: none; margin: 0; padding: 0; }
 .foot-links a { display: inline-flex; align-items: center; min-height: 28px; font-weight: 600; text-underline-offset: 3px; }
 /* every home against the build it was written from (gallery.js credits()) */
@@ -435,6 +434,13 @@ kbd {
 .builds ul { margin: 8px 0 0; padding: 0; list-style: none; columns: 2 220px; column-gap: 28px; font-size: 12.5px; line-height: 1.45; }
 .builds li { break-inside: avoid; margin: 0 0 5px; }
 .builds li b { color: var(--foreground); font-weight: 600; }
+/* every home's own page (scripts/portal-pages.mts galleryHomeIndex) */
+.foot-homes { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--pg-hairline); }
+.foot-homes p { margin: 0 0 6px; }
+.foot-homes b { color: var(--foreground); font-weight: 700; }
+.foot-homes ul { list-style: none; margin: 0; padding: 0; columns: 4 150px; column-gap: 28px; }
+.foot-homes li { break-inside: avoid; }
+.foot-homes a { display: inline-flex; align-items: center; min-height: 28px; font-weight: 600; text-underline-offset: 3px; }
 .legal { margin: 28px 0 0; font-size: 12px; }
 
 /* ---------------- a home's own page (homes/<id>, written by scripts/build-portal.mts) ---------------- */
@@ -496,7 +502,6 @@ kbd {
   .lede { font-size: 15.5px; margin-top: 10px; }
   .core-card { margin-top: 14px; padding: 12px; }
   .core-line { font-size: 14px; }
-  .core-actions .btn { flex: 1 1 auto; }
   .cta-actions .btn { flex: 1 1 auto; }
   .hero-cta { margin-top: 18px; }
   .hero-cta .btn { flex: 1 1 auto; }
@@ -525,7 +530,8 @@ kbd {
 }
 @media (pointer: coarse) {
   .search { height: 44px; }
-  .site-nav a, .brand a, .builds summary, .foot-links a, .foot-brand a { min-height: 44px; }
+  .site-nav a, .brand a, .builds summary, .foot-links a, .core-more { min-height: 44px; }
+  .foot-homes a { min-height: 36px; }
 }
 @media (hover: none) {
   .thumb-play { opacity: 1; transform: none; }

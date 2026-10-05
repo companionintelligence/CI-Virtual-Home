@@ -37,7 +37,7 @@ pnpm run serve                     # http://localhost:8080/room-creator.html?hou
 root works; it cannot run from `file://`. Useful URL parameters: `house=<id>`, `shot=door-to-core|orbit|hero-reveal|walkthrough|core-orbit`,
 `t=<0…1>` (the moment in the shot), `lighting=day|golden|dusk|night`, `mode=review|edit`, `flythrough=1`, `res`, `aspect`, `planner=v2` (the spline planner v2 for every door-to-core, hero-reveal and walkthrough; v1 otherwise); the
 editor writes the first five as you change them, so a URL is a view (see [The editor](#the-editor)). Its "All homes" link opens
-the portal's gallery, `./index.html`; `mode=view` turns the page into the portal's player (see [The web portal](#the-web-portal)).
+the portal's gallery, `./` (Cloudflare Pages answers `./index.html` with a 308); `mode=view` turns the page into the portal's player (see [The web portal](#the-web-portal)).
 
 ## Commands
 
@@ -212,10 +212,10 @@ A few things the player does that the editor does not:
   path is untouched, and nothing a golden or a video renders goes through the player.
 - **The first shot.** A link without `shot` opens on the house's Orbit, the whole house from above, which reads on
   every screen; Door to Core spends its middle in doorways and stairwells and is one tap away.
-- **The end of a shot** is a card over the dock: replay, another shot, the next home, and one line on what the
-  Companion Core is, linking to <https://ci.computer>. The title steps back while it shows. Where the card would
+- **The end of a shot** is a card over the dock: replay, another shot, the next home, one line on what the
+  Companion Core is, and a row with two links (Buy Companion Core, Download Companion). The title steps back while it shows. Where the card would
   cover the Core (a phone on its side, a 4:3 tablet) it moves to the end of the dock away from the Core, or drops
-  its sentence and keeps the heading, the link and the buttons.
+  its sentence and keeps the heading, the links and the buttons.
 - **Phones** (and short landscape screens) get a compact dock: one scrolling row of shot and time-of-day chips,
   then play, the seek bar, the time and a More button whose sheet holds speed, path, fly, best quality and full
   screen. Every control is a 44 px target on a touch screen, and the controls fade a few seconds into playback
@@ -223,6 +223,9 @@ A few things the player does that the editor does not:
   time of day on a row of its own, so every shot's chip shows. The orange tick where the Core wakes names itself
   under the seek bar when pointed at, when the playhead reaches it, and on a touch screen as a shot starts; where
   the free-camera bar has no room for its how-to, it shows once as a toast.
+- **About.** The "?" button (or the `?` key) opens a panel with what the Companion Core is, the four links (the main site, Buy Companion
+  Core, Download Companion, the docs, each in a new tab) and, with a keyboard, the shortcuts. A phone has no "?" key and no room for the
+  button: More > About opens the same panel, with 44 px links and no keyboard list; a press on the scene puts it away.
 
 Until the player's module has mounted, `room-creator.html`'s head script is the player: the house's poster, its
 name once `index.json` is in, a loader that says so when a slow connection makes it take a while, and a card with
@@ -235,10 +238,11 @@ Each home has a page of its own, `homes/<id>`: `portal:build` writes it (`script
 it is, its picture, a button into the player, the Companion Core callout, and the home's own title (`<Name> · Virtual homes ·
 Companion Intelligence`, one string for `<title>`, `og:title` and `twitter:title`), a description under 160 characters,
 preview image and JSON-LD (a breadcrumb and the page). It is also what the share button hands out: a link that carries a
-moment (`shot`, `t`, `tod`) forwards to the player with the link's query, and one without stays on the page. The player's own address is that home's page
-for a search engine (its head script sets the canonical from `?house=`), and the editor (`room-creator.html` without
-`?mode=view`) marks itself `noindex`. The gallery's HTML lists all the homes, each linking its page, so a visitor without JavaScript and a
-crawler that does not run it see them (`gallery.js` replaces them with cards that go straight to the player). Preview images
+moment (`shot`, `t`, `tod`) forwards to the player with the link's query, and one without stays on the page. A search engine finds the gallery and each home's page, not the player:
+the player and the editor are one file, `room-creator.html`, and `portal:build` writes `noindex, follow` into its own HTML
+(nothing has to run for a crawler to know), with no canonical. The gallery's HTML lists all the homes, each linking its page, so a visitor
+without JavaScript and a crawler that does not run it see them (`gallery.js` replaces them with cards that go straight to the player; the
+footer's "Every home, on its own page" list, which it leaves alone, keeps the pages linked in the rendered DOM). Preview images
 are JPEG at 1200 × 630 (`portal/previews/<id>.jpg`, and `portal/hero.jpg` for the gallery and the player): LinkedIn and some other
 unfurlers read no WebP. A checkout served as it is has no such pages, and shares the player's own URL. The gallery
 carries preview tags too, and in `dist/` `room-creator.html`'s static title and description (the editor's, in the
@@ -247,16 +251,16 @@ Preview images must be absolute: `portal:build` takes the site's address from `-
 the live site, `https://homes.ci.computer/`.
 
 Every page sends a visitor on to the company: the header (Companion Intelligence, Docs, Download Companion, Buy Companion
-Core), the Companion Core callout under the hero and the band after the homes, the footer, a home's page, the 404 page,
-and the player's end card and help panel carry the same four addresses, exactly: <https://ci.computer>, <https://ci.computer/core>
+Core), the band after the homes (the hero's Core line points at it), the footer, a home's page, the 404 page,
+and the player's own HTML (a `<noscript>`), end card and About panel carry the same four addresses, exactly: <https://ci.computer>, <https://ci.computer/core>
 (`/core` redirects to the product page and is still the address to link), <https://ci.computer/download>, and
 the docs' first-party apps page, <https://docs.ci.computer/docs/apps-available/first-party-apps> (there is no page for the
 virtual homes in the docs yet, and `docs.ci.computer/docs` itself answers 404). `portal:build` fails if a built page lacks one;
 the footer also links ci.computer's privacy policy and terms.
 
 The pages live under extensionless addresses, as Cloudflare Pages serves them (`/homes/aurora`, `/room-creator`; the
-`.html` address answers a 308), so the built pages link each other without `.html` (the source `index.html` keeps it, for
-`python3 -m http.server`; `portal:build` rewrites it and marks the page `vh-clean-urls` for `gallery.js`), and the
+`.html` address answers a 308), so the built pages link each other without `.html` (the gallery is `./`; the source `index.html` links the
+player as `room-creator.html` for `python3 -m http.server`; `portal:build` rewrites that and marks the page `vh-clean-urls` for `gallery.js`), and the
 canonical and sitemap URLs are the extensionless ones. `404.html` is the 404 page, `robots.txt` allows everything and names
 `sitemap.xml`, which lists the gallery and every home's page. Every `<script>` of the built pages that is not JSON carries
 `data-cfasync="false"`: the `ci.computer` zone has Cloudflare's Rocket Loader on, which otherwise holds a script back and runs it after
@@ -304,7 +308,7 @@ and every home stopped with "This home could not be opened" (`'./assets/shot-tra
 'trackView'`). Two layers keep it from happening again:
 
 - **The page names every module by a hash of its content.** `portal:build` adds each `assets/**/*.js` (not
-  `vendor/`) to the page's import map as `./assets/x.js` → `./assets/x.js?v=<hash>`, adds an import map to `index.html`,
+  `vendor/`) to the page's import map as `./assets/x.js` → `./assets/x.js?v=<hash>`, adds an import map to `index.html` (just before its first module, after its charset, title and preview tags),
   and puts the same `?v=` on the `<script>`, `<link rel="stylesheet">` and `<link rel="modulepreload">` tags. A module's
   own relative imports resolve to the plain URL, which the map rewrites, so a module never needs to know its
   neighbours' hashes and a change to one file changes only its own URL. The page itself is never cached, so it always

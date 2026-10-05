@@ -148,6 +148,8 @@ export function mountViewer(api: Api) {
   const no = new Set((params.get('no') || '').split(',').filter(Boolean));
   const coarse = matchMedia('(pointer: coarse)').matches;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // the About panel: what the Companion Core is and where to find it, then (for a keyboard) the shortcuts
+  const helpLabel = coarse ? 'About' : 'About and keyboard shortcuts';
   api.hideEditorHelpers();
   controls.minDistance = 0.25;   // a pinch never parks the camera on its own pivot
 
@@ -169,12 +171,12 @@ export function mountViewer(api: Api) {
         ${icon('alert')}
         <h2>We could not open this home.</h2>
         <p class="vh-error-msg">Check the link, or pick a home from the gallery.</p>
-        <a class="vh-btn vh-btn-primary" href="./index.html">See all homes</a>
+        <a class="vh-btn vh-btn-primary" href="./">See all homes</a>
       </div>
     </div>
 
     <header class="vh-top">
-      <a class="vh-iconbtn vh-back" href="./index.html" aria-label="All homes" title="All homes">${icon('back')}</a>
+      <a class="vh-iconbtn vh-back" href="./" aria-label="All homes" title="All homes">${icon('back')}</a>
       <div class="vh-title">
         <h1 class="vh-name">&nbsp;</h1>
         <p class="vh-meta"></p>
@@ -185,7 +187,7 @@ export function mountViewer(api: Api) {
         <span class="vh-sep" aria-hidden="true"></span>
         <button class="vh-iconbtn" data-act="share" aria-label="Copy a link to this moment" title="Copy a link to this moment">${icon('link')}</button>
         <button class="vh-iconbtn vh-hide-compact" data-act="fullscreen" aria-label="Full screen" title="Full screen  Shift F">${icon('maximize', 'vh-i-max')}${icon('minimize', 'vh-i-min')}</button>
-        <button class="vh-iconbtn vh-hide-coarse" data-act="help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts  ?">${icon('help')}</button>
+        <button class="vh-iconbtn vh-hide-compact" data-act="help" aria-haspopup="dialog" aria-label="${helpLabel}" title="${helpLabel}${coarse ? '' : '  ?'}">${icon('help')}</button>
       </div>
     </header>
 
@@ -201,7 +203,8 @@ export function mountViewer(api: Api) {
     <div class="vh-dock" role="group" aria-label="Player">
       <div class="vh-end" hidden role="group" aria-labelledby="vh-end-title">
         <h2 id="vh-end-title">Meet the Companion Core.</h2>
-        <p><span class="vh-end-body">The small computer on the desk runs your own AI, apps and memory at home, not in someone else's cloud. </span><span class="vh-end-links">${newTab(BUY_URL, 'Buy Companion Core', 'Buy Core')}<span class="vh-end-dot" aria-hidden="true">·</span>${newTab(DOWNLOAD_URL, 'Download Companion', 'Download')}</span></p>
+        <p class="vh-end-body">The small computer on the desk runs your own AI, apps and memory at home, not in someone else's cloud.</p>
+        <p class="vh-end-links">${newTab(BUY_URL, 'Buy Companion Core', 'Buy Core')}${newTab(DOWNLOAD_URL, 'Download Companion', 'Download')}</p>
         <div class="vh-end-actions">
           <button class="vh-end-btn" data-act="replay">${icon('replay')}<span>Replay</span></button>
           <button class="vh-end-btn" data-act="try-shot">${icon('play', 'vh-i-play')}<span class="vh-try-label"></span></button>
@@ -226,32 +229,37 @@ export function mountViewer(api: Api) {
           <button class="vh-tool" data-act="fly" aria-pressed="false" title="Fly the camera yourself  F">${icon('fly')}<span>Fly</span></button>
           <button class="vh-tool" data-act="hq" aria-pressed="false" title="Best quality: ambient occlusion, bloom and colour grading. Slower on most devices.">${icon('sparkles', 'vh-i-hq')}${icon('loader', 'vh-i-busy')}<span>Best quality</span></button>
           <button class="vh-tool vh-show-compact" data-act="fullscreen" title="Full screen">${icon('maximize', 'vh-i-max')}${icon('minimize', 'vh-i-min')}<span>Full screen</span></button>
+          <button class="vh-tool vh-show-compact" data-act="help" aria-haspopup="dialog" title="About, and what the Companion Core is">${icon('help')}<span>About</span></button>
         </div>
       </div>
     </div>
 
     <div class="vh-toast" role="status" aria-live="polite"></div>
 
-    <div class="vh-help" hidden role="dialog" aria-label="Keyboard shortcuts">
-      <div class="vh-help-head"><b>Keyboard</b><button class="vh-iconbtn" data-act="help" aria-label="Close">${icon('x')}</button></div>
-      <dl>
-        <dt><kbd>Space</kbd></dt><dd>Play or pause</dd>
-        <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Back or forward 1 s (Shift: 5 s)</dd>
-        <dt><kbd>Home</kbd> <kbd>End</kbd></dt><dd>Start or end of the shot</dd>
-        <dt><kbd>1</kbd>…<kbd>9</kbd></dt><dd>Pick a shot</dd>
-        <dt><kbd>T</kbd></dt><dd>Next time of day</dd>
-        <dt><kbd>P</kbd></dt><dd>Show the camera path</dd>
-        <dt><kbd>F</kbd></dt><dd>Fly the camera yourself</dd>
-        <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Move while flying (Shift: faster)</dd>
-        <dt><kbd>Q</kbd> <kbd>E</kbd></dt><dd>Sink and rise while flying</dd>
-        <dt><kbd>O</kbd></dt><dd>Overview of the whole path</dd>
-        <dt><kbd>C</kbd></dt><dd>Cutaway: open the house while flying</dd>
-        <dt><kbd>Esc</kbd></dt><dd>Back to the shot</dd>
-        <dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Previous or next home</dd>
-        <dt><kbd>Shift</kbd> <kbd>F</kbd></dt><dd>Full screen</dd>
-      </dl>
-      <p class="vh-help-legend"><span class="vh-help-tick" aria-hidden="true"></span>The orange tick on the timeline is where the Companion Core wakes.</p>
+    <div class="vh-help" hidden role="dialog" aria-labelledby="vh-help-title">
+      <div class="vh-help-head"><b id="vh-help-title">About</b><button class="vh-iconbtn" data-act="help" aria-label="Close">${icon('x')}</button></div>
+      <p class="vh-help-about">The small computer on the desk is a Companion Core: your own AI, apps and memory, running at home, not in someone else's cloud.</p>
       <p class="vh-help-links">${newTab(SITE_URL, 'Companion Intelligence')}${newTab(BUY_URL, 'Buy Companion Core')}${newTab(DOWNLOAD_URL, 'Download Companion')}${newTab(DOCS_URL, 'Docs')}</p>
+      <div class="vh-help-keys vh-hide-coarse">
+        <p class="vh-help-sub">Keyboard</p>
+        <dl>
+          <dt><kbd>Space</kbd></dt><dd>Play or pause</dd>
+          <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Back or forward 1 s (Shift: 5 s)</dd>
+          <dt><kbd>Home</kbd> <kbd>End</kbd></dt><dd>Start or end of the shot</dd>
+          <dt><kbd>1</kbd>…<kbd>9</kbd></dt><dd>Pick a shot</dd>
+          <dt><kbd>T</kbd></dt><dd>Next time of day</dd>
+          <dt><kbd>P</kbd></dt><dd>Show the camera path</dd>
+          <dt><kbd>F</kbd></dt><dd>Fly the camera yourself</dd>
+          <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Move while flying (Shift: faster)</dd>
+          <dt><kbd>Q</kbd> <kbd>E</kbd></dt><dd>Sink and rise while flying</dd>
+          <dt><kbd>O</kbd></dt><dd>Overview of the whole path</dd>
+          <dt><kbd>C</kbd></dt><dd>Cutaway: open the house while flying</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Back to the shot</dd>
+          <dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Previous or next home</dd>
+          <dt><kbd>Shift</kbd> <kbd>F</kbd></dt><dd>Full screen</dd>
+        </dl>
+      </div>
+      <p class="vh-help-legend"><span class="vh-help-tick" aria-hidden="true"></span>The orange tick on the timeline is where the Companion Core wakes.</p>
     </div>`;
   host.appendChild(root);
   html.dataset.viewer = 'mounted';
@@ -1138,6 +1146,10 @@ export function mountViewer(api: Api) {
   window.addEventListener('pointerdown', (e) => {
     if (moreOpen && !(e.target as HTMLElement).closest('.vh-tools, [data-act="more"]')) setMore(false);
   }, true);
+  // (on a touch screen the panel is a sheet over the scene: a press on the scene puts it away, as the tools' sheet does)
+  window.addEventListener('pointerdown', (e) => {
+    if (coarse && !el.help.hidden && !(e.target as HTMLElement).closest('.vh-help, [data-act="help"]')) toggleHelp(false);
+  }, true);
   function toggleHelp(force?: boolean) {
     const open = force ?? el.help.hidden;
     el.help.hidden = !open;
@@ -1183,7 +1195,7 @@ export function mountViewer(api: Api) {
     else if (act === 'next') goHouse(neighbour(1)!);
     else if (act === 'share') share();
     else if (act === 'fullscreen') { setMore(false); toggleFullscreen(); }
-    else if (act === 'help') toggleHelp();
+    else if (act === 'help') { setMore(false); toggleHelp(); }
   });
   // A pointer press leaves focus on the control, and Space would then press the button again (or the arrows
   // nudge the slider a thousandth) instead of reaching the player: hand focus back to the page after a pointer
