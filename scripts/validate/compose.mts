@@ -73,6 +73,19 @@ const check: Check = spec => {
       }
       if (isProgram(room.program) && !BATHS.has(room.program)) warn(`${at}: bath fixtures on a ${room.program} room are ignored`, 'inert');
     }
+    // the dress phase's (assets/room-dress.ts): false (never dressed), or { level: 0..1, off: [slot ids] }; a level opts the room into the live phase
+    if (has('dress')) {
+      const d = room.dress;
+      if (d !== false) {
+        if (!d || typeof d !== 'object' || Array.isArray(d)) err(`${at}: dress is false or { level, off }`, 'dress');
+        else {
+          for (const k of Object.keys(d)) if (!['level', 'off'].includes(k)) err(`${at}: dress.${k} is not a dress field (level, off)`, 'dress');
+          if (d.level !== undefined && !(isNum(d.level) && d.level >= 0 && d.level <= 1)) err(`${at}: dress.level must be a number from 0 to 1`, 'dress');
+          if (d.off !== undefined && !(Array.isArray(d.off) && d.off.every((x: unknown) => typeof x === 'string'))) err(`${at}: dress.off is a list of slot ids`, 'dress');
+          if (d.level === undefined) warn(`${at}: dress has no level, so the build does not dress the room (a baked dress@1 item still builds)`, 'inert');
+        }
+      }
+    }
     // the composer's inputs on a room it will not compose
     const inputs = ['focus', 'density', 'style', 'palette', 'seed', 'kitchen', 'bath'].filter(has);
     if (!has('program') && inputs.length) warn(`${at}: ${inputs.join(', ')} ${inputs.length === 1 ? 'does' : 'do'} nothing without a program (no program: the room is never composed)`, 'inert');

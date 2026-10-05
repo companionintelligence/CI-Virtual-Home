@@ -53,7 +53,13 @@
     "test:neutrality": "node --experimental-strip-types scripts/test-build-neutrality.mts",
     "soft-sheet": "node --experimental-strip-types scripts/soft-sheet.mts",
     "soft-rooms": "node --experimental-strip-types scripts/soft-rooms.mts",
-    "test:light": "node --experimental-strip-types scripts/test-interior-light.mts"
+    "test:light": "node --experimental-strip-types scripts/test-interior-light.mts",
+    "test:dress-hosts": "node --experimental-strip-types scripts/test-dress-hosts.mts",
+    "test:dress-neutral": "node --experimental-strip-types scripts/test-dress-neutral.mts",
+    "dress-project": "node --experimental-strip-types scripts/dress-project.mts",
+    "dress-cost": "node --experimental-strip-types scripts/dress-cost.mts",
+    "dress-fleet": "node --experimental-strip-types scripts/dress-fleet.mts",
+    "dress-reach": "node --experimental-strip-types scripts/dress-reach.mts"
   },
   "devDependencies": {
     "@types/node": "^22",

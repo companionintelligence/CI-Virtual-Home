@@ -259,7 +259,7 @@ console.log('── baking a composition (compose-house.mts --write)');
       const mine = [...composed.entries()].find(([r]: any) => r.name === room.name);
       const pins = (oRooms[i].items || []), made = room.items.filter((it: any) => it.src === 'compose@1');
       if (mine && JSON.stringify(made) !== JSON.stringify((mine[1] as any).items)) same = false;
-      if (JSON.stringify(room.items.filter((it: any) => it.src !== 'compose@1')) !== JSON.stringify(pins)) pinsKept = false;
+      if (JSON.stringify(room.items.filter((it: any) => it.src !== 'compose@1' && it.src !== 'dress@1')) !== JSON.stringify(pins)) pinsKept = false;   // (a dress item is neither the author's nor the composer's: plan 5.6)
       if (room.program && room.lock !== true) locked = false;
     });
     check(same, 'the baked items are exactly what the build composes (src compose@1)');

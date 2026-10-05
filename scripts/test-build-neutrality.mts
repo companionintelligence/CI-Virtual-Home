@@ -55,7 +55,7 @@ export function compareHouse(id: string, base: HouseSnap, now: HouseSnap, change
   return bad;
 }
 
-async function snapshot(houses: string[], query: string, specs: Record<string, string> = {}): Promise<{ doc: Record<string, HouseSnap>; version: string }> {
+export async function snapshot(houses: string[], query: string, specs: Record<string, string> = {}): Promise<{ doc: Record<string, HouseSnap>; version: string }> {
   const { startSession } = await import('./review/page.mts');
   const session = await startSession();
   const doc: Record<string, HouseSnap> = {};

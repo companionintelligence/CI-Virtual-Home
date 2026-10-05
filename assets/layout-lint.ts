@@ -28,6 +28,12 @@
 //                    unfurnished composed room is a warning and never passes as furnished. Rooms under 3 m² are left out
 //   surface-kind     an item standing on another that its placement does not allow (`surfaces`: a lamp on a nightstand, a kettle
 //                    on a counter)
+//   dress-floating   a dress item (src dress@1, plan 5.6) that is not on a host of the dress registry (assets/room-dress-hosts.ts), hangs over its
+//                    edge by more than 1 cm, or is not at the host's top
+//   dress-overlap    two surface items on one host, one of them a dress item, whose footprints overlap or stand under MIN_GAP (1.5 cm) apart (the other
+//                    may be authored, composed or dressed: a candle against the table's own flower-jug reads as one object)
+//   dress-lane       a dress item that closes a lane the room's other furniture leaves open
+//   dress-bare       a dressed room (it has dress items, or opts in) that its program's never-bare rule still finds bare
 //
 // Owner: S3 (compose).
 import { PROPS } from './props/index.js';
@@ -42,6 +48,8 @@ import {
 import { composeHouse, layerOf, snapWallMount, stackOnSurface } from './room-composer.js';
 import { houseStairs, levelStairs } from './stairs.js';
 import { isComposed, isProgram } from './room-programs.js';
+import { dressHouse, dressOff, dressOptIn, isDress, bareViolation } from './room-dress.js';
+import { hostOf, footprintIn, nearOn, rectGap, MIN_GAP } from './room-dress-hosts.js';
 
 /** What a room of each program cannot do without: each anchor is satisfied by `n` items (default 1) with any of the roles
  *  (assets/props/placement.ts). The composer's essentials (its `missing`), the `missing-anchor` lint and the composer's
@@ -75,7 +83,7 @@ export function missingAnchors(program: string, items: any[], { heroDesk = false
 
 export interface LayoutIssue { code: string; level: 'warn' | 'error'; message: string; room?: string; level_id?: string }
 
-const UNIVERSAL = new Set(['type', 'at', 'rot', 'y', 'src', 'note', 'label', 'id', 'name', 'hero']);
+const UNIVERSAL = new Set(['type', 'at', 'rot', 'y', 'src', 'dk', 'note', 'label', 'id', 'name', 'hero']);   // (`dk`: a dress item's seed key, which no builder reads)
 const REPEAT_EXEMPT_GROUPS = new Set(['rug', 'lamp', 'fitted', 'appliance', 'lighting', 'chair', 'bath', 'hero', 'structure', 'decor', 'textile']);
 const solidOf = (it: any) => { const l = layerOf(it.type); if (l !== 'body') return false; const s = sizeOf(it.type, it); return !!s && s.h > 0.12; };
 /** the body item a surface item stands on (the one under its point that offers the highest top) */
@@ -91,8 +99,12 @@ const r1 = (v: number) => v.toFixed(1), fmt = (p: number[]) => `(${r1(p[0])}, ${
 
 /** the items of every room: its authored items plus, for a composed room, the composer's */
 export function roomItems(spec: any): Map<any, any[]> {
-  const out = new Map<any, any[]>(), comp = composeHouse(spec);
-  for (const lv of spec.levels || []) for (const r of lv.rooms || []) out.set(r, [...(r.items || []), ...(isComposed(r) && comp.get(r) ? comp.get(r)!.items : [])]);
+  const out = new Map<any, any[]>(), comp = composeHouse(spec), dress = dressOff() ? new Map<any, any>() : dressHouse(spec);
+  for (const lv of spec.levels || []) for (const r of lv.rooms || []) {
+    const base = [...(r.items || []), ...(isComposed(r) && comp.get(r) ? comp.get(r)!.items : [])];
+    // (what the build adds to an opted-in room that carries no baked dress item of its own: rooms-build.ts)
+    out.set(r, dressOptIn(r) && !base.some(isDress) && dress.get(r) ? [...base, ...dress.get(r).items] : base);
+  }
   return out;
 }
 
@@ -110,6 +122,28 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
       const geo = analyzeRoom(spec, lv, room), items = (all.get(room) || []).filter(it => Array.isArray(it.at) && !(heroAt && heroAt.level === lv.id && HERO_SET.has(it.type) && Math.hypot(it.at[0] - heroAt.at[0], it.at[1] - heroAt.at[1]) < 1.3));
       const outdoor = room.program === 'outdoor' || /terrace|patio|deck|porch|balcony|yard|garden|stoop|pool/i.test(room.name) || room.bounds.w * room.bounds.d < 1.2;
       const boxes = items.map(it => ({ it, o: itemObb(it), solid: solidOf(it) }));
+      // the dress phase's items (plan 5.6): each stands on a host of the registry, inside its measured rects and at its top, and on nothing else
+      const dressed = items.filter(isDress);
+      if (dressed.length) {
+        const hosts = items.map(hostOf).filter((h): h is NonNullable<ReturnType<typeof hostOf>> => !!h);
+        for (const it of dressed) {
+          if (layerOf(it.type) !== 'surface') continue;
+          const under = hosts.find(h => { const f = footprintIn(h, it); return !!f && h.rects.some(r => (f[0] + f[2]) / 2 >= r[0] && (f[0] + f[2]) / 2 <= r[2] && (f[1] + f[3]) / 2 >= r[1] && (f[1] + f[3]) / 2 <= r[3]); });
+          if (!under) { add('dress-floating', `${it.type} at ${fmt(it.at)} stands on no host of the dress registry`, lv, room); continue; }
+          const f = footprintIn(under, it)!, inside = under.rects.some(r => f[0] >= r[0] - 0.01 && f[1] >= r[1] - 0.01 && f[2] <= r[2] + 0.01 && f[3] <= r[3] + 0.01);
+          if (!inside) add('dress-floating', `${it.type} at ${fmt(it.at)} overhangs its ${under.type} (outside the flat top by ${Math.max(0, ...under.rects.map(r => Math.max(r[0] - f[0], r[1] - f[1], f[2] - r[2], f[3] - r[3]))).toFixed(2)} m)`, lv, room);
+          if (Math.abs((it.y ?? 0) - under.top) > 0.01) add('dress-floating', `${it.type} at ${fmt(it.at)} is at y ${it.y} on a ${under.type} whose top is ${under.top}`, lv, room);
+          for (const o of nearOn(under, items)) {   // (on this host and on the next unit of the run: a gap is a gap across the seam)
+            if (o === it) continue;
+            const g = footprintIn(under, o); if (!g) continue;
+            const gap = rectGap(f, g);
+            // (two dress items are reported once, from the later one)
+            if (gap < MIN_GAP && (!isDress(o) || String(o.dk) < String(it.dk))) add('dress-overlap', `${it.type} at ${fmt(it.at)} and ${o.type} at ${fmt(o.at)} ${gap < 0.005 && gap > -0.005 ? 'touch' : gap < 0 ? 'overlap' : `stand ${(gap * 1000).toFixed(0)} mm apart`} on the ${under.type} (under ${MIN_GAP * 100} cm)`, lv, room);
+          }
+        }
+        const bare = bareViolation(room.program || null, items, room);
+        if (bare && (dressOptIn(room) || dressed.length)) add('dress-bare', bare, lv, room);
+      }
       // overlap: solid against solid (tucked chairs, and one item standing on another, excepted)
       for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
         const A = boxes[i], B = boxes[j]; if (!A.solid || !B.solid || !A.o || !B.o) continue;
@@ -144,11 +178,12 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
         if (P) for (const k of Object.keys(it)) if (!UNIVERSAL.has(k) && !P.includes(k) && !(k === 'y')) add('silent-param', `${it.type} at ${fmt(it.at)}: "${k}" is ignored by its builder`, lv, room);
         // mounts inside the wall, surface items floating or sunk
         if (layer === 'wall' && snapWallMount(it, geo)) add('mount-in-wall', `${it.type} at ${fmt(it.at)} is set inside the wall`, lv, room);
-        if (layer === 'surface') {
+        // (a dress item's host is the dress registry's to judge: assets/room-dress-hosts.ts, the `dress-*` lints; PLACEMENT.surfaces is the composer's own)
+        if (layer === 'surface' && !isDress(it)) {
           const pl = PLACEMENT[it.type], top = pl && pl.surfaces.length ? supportOf(it, items) : null;
           if (top && !pl.surfaces.includes(groupOf(top.type))) add('surface-kind', `${it.type} at ${fmt(it.at)} stands on a ${top.type}, which its placement does not allow (${pl.surfaces.join(', ')})`, lv, room);
         }
-        if (layer === 'surface' && stackOnSurface(it, items)) add('surface-height', `${it.type} at ${fmt(it.at)} (y ${it.y ?? 'default 0.77'}) is not on the top of what stands under it`, lv, room);
+        if (layer === 'surface' && !isDress(it) && stackOnSurface(it, items)) add('surface-height', `${it.type} at ${fmt(it.at)} (y ${it.y ?? 'default 0.77'}) is not on the top of what stands under it`, lv, room);
         // facing: seating that looks at a wall
         if (solid && PLACEMENT[it.type] && PLACEMENT[it.type].faces === 'focus' && !PLACEMENT[it.type].roles.some(r => ['bench', 'bed-bench', 'ottoman', 'pouf', 'floor-seat', 'dining-bench', 'hammock'].includes(r))) {
           const [fx, fz] = turn(0, 1, it.rot || 0), s = sizeOf(it.type, it)!;
@@ -163,7 +198,7 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
         }
         // repetition counts
         // (a wall of matched bookcases is one piece of furniture: the library's run of four is not four repeats)
-        if (!REPEAT_EXEMPT_GROUPS.has(groupOf(it.type)) && !HERO_SET.has(it.type) && !(PLACEMENT[it.type] && PLACEMENT[it.type].roles.includes('bookcase'))) {
+        if (!isDress(it) && !REPEAT_EXEMPT_GROUPS.has(groupOf(it.type)) && !HERO_SET.has(it.type) && !(PLACEMENT[it.type] && PLACEMENT[it.type].roles.includes('bookcase'))) {
           houseCount.set(it.type, (houseCount.get(it.type) || 0) + 1);
           (storeyRooms.get(it.type) || storeyRooms.set(it.type, new Set()).get(it.type)!).add(room.name);
         }
@@ -174,7 +209,9 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
         const bare = lanesOk(geo, laneGrid(geo, geo.obstacles), 0.8);
         const rep = lanesOk(geo, laneGrid(geo, blockers), 0.8);
         const extra = rep.failed.filter(f => !bare.failed.includes(f));
-        for (const f of extra) add('lane', f, lv, room);
+        // (a lane the room's own furniture leaves open and a dress item closes is the dress phase's: dress-lane)
+        const noDress = lanesOk(geo, laneGrid(geo, [...geo.obstacles, ...boxes.filter(b => b.solid && b.o && !isDress(b.it)).map(b => b.o!)]), 0.8);
+        for (const f of extra) add(dressed.length && !noDress.failed.includes(f) ? 'dress-lane' : 'lane', f, lv, room);
       }
       // a room with a program that lacks what the program cannot do without
       if (isProgram(room.program) && geo.area >= 3 && !outdoor) {

@@ -552,6 +552,51 @@ wall out to its face, and `stackOnSurface(item, items)` puts a surface item (a l
 it instead of the desk default (0.77 m); the builder applies both to authored items under `"defaults": 2`, and the lints
 report them either way.
 
+**The dress phase** (`assets/room-dress.ts`, plan 5.6). A second, additive pass over a frozen layout: it reads a room's final items as pins and adds
+`src: "dress@1"` items — the small goods of `assets/props/dress-*.ts`, lamps, towels, a door mat — to the surfaces the layout made. It never moves a piece
+(`composeHouse` is bit-identical with or without it: a baked `dress@1` item is no pin and no usage of the composer) and it is **opt-in**:
+
+| | |
+|---|---|
+| `"dress": { "level": 0..1, "off": ["lamp"] }` on a room | the build dresses the room live: level 0 is the program's never-bare floor and its lamp (tier 1), 0.3 and up adds tier 2, 0.6 tier 3, all inside a budget `base x (0.55 + 0.45 x area / ref) x (0.6 + 0.8 x level)`; `off` skips slots by id (`assets/dress-recipes.ts`) |
+| `"dress": false` | never dressed, not even by the bake tool |
+| no `dress` field | not dressed by the build: **every shipped house builds as it always did** (a `dress@1` item already in `items` builds either way) |
+| `?dress=0` on the page | leaves every dress item out, baked or live: the exact BEFORE of a dressed house (`scripts/test-dress-neutral.mts` proves it object for object and frame for frame) |
+| `compose-house.mts --house <id> --dress [--level n] [--rooms a,b] --write` | bakes the live phase's items into `items` (idempotent: every `dress@1` item is stripped first); `--undress` strips them. Dress items build last in their room, so a baked room builds what the live phase builds |
+
+A **host** (`assets/room-dress-hosts.ts`) is a catalog type with a top the page builds as declared: the height, and the flat clear *rects* of it (so a dress
+footprint fitting its host is the contract; `scripts/test-dress-hosts.mts` samples every rect at 2 cm and fails past 1 cm). Coffee, side and dining tables,
+dressers, desks, counters, the island, a range, the strip between a double vanity's basins, a toilet tank and a machine's top are hosts. A console's bowl and a
+sideboard's vases stand at seeded spots the phase cannot know, so those types (and a nightstand, a media credenza, a chest, the single vanity and the tubs) are
+**not** hosts (`DROPPED`, each with its reason). A small good is packed into the host's free area (the rects less everything on it, less a margin) at an anchor
+(centre, a quarter from an end, the back edge, a corner), never past 60 % cover; the floor (a floor lamp, a door mat) and the walls (a towel ring, a robe hook, a roll
+holder) go through the composer's own `place`, so lanes, door swings, windows and stair run-ins hold. Nothing the phase places stands in the way of the review rig's corner
+cameras (`scripts/review/cameras.mts` `cornerCam`, the eye 1.5 m up, inset 0.55 m or a fifth of the shorter side, at all four corners): no piece within 0.3 m of an eye,
+and no floor piece taller than 0.8 m in a 0.5 m square at a room corner (a shorter piece may stand there); a floor lamp the keep-out leaves no floor for becomes a small
+lamp on a side table in a corner. A café curtain hangs on the lower half of a kitchen window only (hem 3 cm over the sill, rod at most sill + 0.55 x the window's height,
+clear of the 1.45-1.55 m eye line wherever the window leaves room), in the house's pale cloth. The curtain is planned before the first slot runs (`assets/dress-curtains.ts`),
+and nothing may pass through its cloth: it is lifted over what stands low under the window (a counter higher than the sill, at most 0.22 m), parted into two panels round what
+stands narrow (the sink's tap, a lamp), left off where cabinets or a pantry cover the window, and every dress item keeps out of the volume it takes (a lamp or a canister that
+would reach the cloth moves along the counter). Two windows side by side each get a curtain whose box ends 1.25 cm from the middle of the wall between them (2.5 cm
+between the two rods and finials), and a curtain keeps 2.5 cm from a blind or curtain the layout hung and never runs past the end of its wall.
+
+| Program | Recipe (tier 1 = always; the lamp only where the layout placed none) |
+|---|---|
+| living, den, media, sunroom | a tray vignette or a centrepiece on the coffee table; a book, coaster and glass on a side table; **lamp**: a table lamp on a side table or console, else a floor lamp in a corner (a wall when no corner) |
+| bed-primary, bed-guest, bed-kid, nursery | **lamp**: one on each bedside (a pair in the primary) or the dresser, else a floor lamp; a book, glass and candle on a bedside; a tray with scent bottles, a box and a frame on a dresser |
+| kitchen, kitchen-dining | a pot on the range; a small **lamp** at the end of a run (a mushroom, globe or tripod lamp); a café curtain on the lower half of a bare window (sill 0.6 m or more); clusters on the counters, those by the range first (boards, canisters, a bread bin, a crock, a tea towel, oils, a kettle), a dish rack beside the basin; a bowl, a carafe and plates on the island; an eat-in table laid |
+| dining | the table laid: a centrepiece, candles, a place for each chair (as many as keep 40 % of the top free); a floor **lamp** |
+| bath, ensuite, powder | soap, a cup and a dish on the strip between a double vanity's basins; a tissue box and a candle on the tank; a towel ring (when there is no rail or ladder), a robe hook, a roll holder |
+| hall, foyer | at the entry: a door mat, an umbrella stand, a shoe row; a console arrangement on a demilune console; a **lamp**; a leaning mirror; a floor plant |
+| study, library, studio | a **desk lamp** on the desk; a book and a glass |
+| laundry | folded towels on the dryer, a tea towel on the washer, a cluster on a counter |
+| garage, gym, greenhouse, outdoor | nothing: no dress type exists for them yet (BAKE's types) |
+
+The never-bare rule of a program (`bareViolation`): a bath, ensuite or powder has 3 dress items and a towel object, a dining room a set table, a kitchen 4 counter
+clusters, a hall of 8 m2 or more 3 dress items. The layout lints add `dress-floating` (not on a registry host, over its edge, not at its top), `dress-overlap` (a dress item under 1.5 cm from another item on its surface, authored, composed or dressed; the packer keeps 2 cm plus how far each piece's built mesh reaches past its measured box, `REACH`),
+`dress-lane` and `dress-bare`. Every choice draws from `mulberry32(fnv1a("<spec id>:<room>:dress:<slot>:<n>"))`, and the page seeds a dress item from `kit.itemRng("dress:" + dk)`:
+a stream keyed by the item alone that never takes a `propIndex`, so adding, moving or removing a dress item moves no other prop's colour or jitter.
+
 **New furniture** (`content/house-catalog.json` lists every type's measured footprint, height, draw calls (`meshes`),
 honoured params and `place`ment: what it backs onto, the clear floor it needs, what it faces, its programs and styles).
 
