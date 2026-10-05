@@ -35,6 +35,10 @@ export const TABLE_LAMPS = ['table-lamp', 'ginger-lamp', 'column-lamp', 'globe-l
 export const FLOOR_LAMPS = ['floor-lamp', 'tripod-floor-lamp'];
 /** the small ones, for a counter or a bar (0.34-0.52 m high) */
 export const SMALL_LAMPS = ['mushroom-lamp', 'globe-lamp', 'tripod-table-lamp'];
+/** every type a recipe stands as a lamp that glows */
+export const LAMP_TYPES: ReadonlySet<string> = new Set([...TABLE_LAMPS, ...FLOOR_LAMPS, ...SMALL_LAMPS, 'desk-lamp']);
+/** a room under this area (m2) gets no light from the light rig (assets/fixtures.ts ROOM_MIN_AREA: test-dress-phase K3 reads that source and fails if the two differ), so a lamp stood in it would glow and light nothing */
+export const LAMP_MIN_AREA = 2.5;
 /** the lamps whose lit head is bare (a mushroom, a globe, a tripod's bulb: no shade), the ones a recipe stands on a counter: they keep LAMP_EYE from the rig's corner eyes (room-dress.ts) */
 export const BARE_LAMPS: ReadonlySet<string> = new Set(SMALL_LAMPS);
 const COUNTER_KITS = ['cutting-board-set', 'canister-trio', 'bread-bin', 'utensil-crock', 'tea-towel', 'oil-pair', 'plate-stack', 'kettle-and-mug'];

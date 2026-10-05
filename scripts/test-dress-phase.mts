@@ -61,7 +61,7 @@ import { createMaterialKit } from '../assets/materials.js';
 import { composeHouse, layerOf } from '../assets/room-composer.js';
 import { dressHouse, dressRooms, dressOff, dressOptIn, dressProgram, isDress, bareViolation, Dresser, DRESS_SRC } from '../assets/room-dress.js';
 import { dressSchemeOf } from '../assets/house-scheme-dress.js';
-import { RECIPES, CAFE, cafeFit, BARE_LAMPS, FLOOR_LAMPS, TABLE_LAMPS, SMALL_LAMPS } from '../assets/dress-recipes.js';
+import { RECIPES, CAFE, cafeFit, BARE_LAMPS, FLOOR_LAMPS, TABLE_LAMPS, SMALL_LAMPS, LAMP_TYPES, LAMP_MIN_AREA } from '../assets/dress-recipes.js';
 import { lampPlan, LAMP_ITEMS } from '../assets/kit-rules.js';
 import { PARTS, CURTAIN_GAP, curtainObb, planCafe, DRESSERS } from '../assets/dress-curtains.js';
 import { surfaceTypes, spillOf } from './dress-reach.mts';
@@ -448,6 +448,9 @@ test('K3: a bare-headed lamp keeps LAMP_EYE from every corner eye, no lamp is th
     }
   }
   assert.ok(lamps > 80 && bare > 10, `${lamps} lamps, ${bare} bare-headed ones measured`);
+  // a lamp glows only where the light rig gives its room a pool: nothing under the rig's minimum room area (read from the source, so the two cannot drift)
+  assert.equal(LAMP_MIN_AREA, Number((fs.readFileSync(path.join(ROOT, 'assets', 'fixtures.ts'), 'utf8').match(/const ROOM_MIN_AREA\s*=\s*([0-9.]+)/) || [])[1]), 'LAMP_MIN_AREA is fixtures.ts ROOM_MIN_AREA');
+  for (const { id, spec } of specs) for (const { room, it } of dressedItems(spec)) if (LAMP_TYPES.has(it.type)) assert.ok(room.bounds.w * room.bounds.d >= LAMP_MIN_AREA, `${id}/${room.name}: a ${it.type} in a ${(room.bounds.w * room.bounds.d).toFixed(1)} m2 room, which the light rig does not light`);
   assert.ok(!FLOOR_LAMPS.includes('halo-lamp') && !TABLE_LAMPS.includes('halo-lamp') && !SMALL_LAMPS.includes('halo-lamp'), 'no recipe list names the halo lamp');
   // control: the measure sees a mushroom lamp half a metre from the NW eye (aurora Kitchen NW night clipped 6 % of the frame with one there)
   const eyes = cornerEyes({ x: 0, z: 0, w: 4, d: 3 }), nw = eyes[0], near = obb(nw.x + 0.5, nw.z, 0.2, 0.2);

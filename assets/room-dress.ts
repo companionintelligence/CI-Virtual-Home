@@ -34,7 +34,7 @@ import { mulberry32, fnv1a } from './materials.js';
 import { HERO_SET } from './item-map.js';
 import { hostOf, freeRects, standingOn, nearOn, fitIn, footprintIn, coverIn, toWorld, toLocal, subtract, rectArea, neighbourGap, reachOf, NEIGHBOUR_GAP, MIN_GAP, cornerEyes, camBlocked, CAM, LAMP_EYE, type CornerEye, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
 import { dressSchemeOf, type DressScheme } from './house-scheme-dress.js';
-import { RECIPES, BASE_COUNT, BARE_LAMPS, windowTypes, type Recipe } from './dress-recipes.js';
+import { RECIPES, BASE_COUNT, BARE_LAMPS, LAMP_TYPES, LAMP_MIN_AREA, windowTypes, type Recipe } from './dress-recipes.js';
 import { planCafe, CURTAIN_PAD, VPAD, type Panel } from './dress-curtains.js';
 import { leafStrips, leafSensitive } from './dress-leaves.js';
 
@@ -153,6 +153,7 @@ export class Dresser {
     if (!this.open(slot)) return null;
     const tier = o.tier ?? this.curTier, cost = o.cost ?? 1;
     if (!this.afford(tier, cost)) { this.skip(slot, 'the room budget is spent'); return null; }
+    if (LAMP_TYPES.has(type) && this.area < LAMP_MIN_AREA) { this.skip(slot, `${type}: the room is under ${LAMP_MIN_AREA} m2, which the light rig does not light`); return null; }
     const n = this.ord.get(slot) ?? 0, r = this.rngFor(slot, n);
     const params: any = { ...(o.params || {}) }, P = paramsOf(type);
     const u0 = r(), u1 = r();
@@ -254,10 +255,12 @@ export class Dresser {
   inTheWay(ci: CItem): boolean { const sp = spanOf(ci); return !!sp && camBlocked(this.eyes, ci.box, sp[0], sp[1], ci.layer === 'body'); }
   /** a piece in a corner (a floor lamp, a plant) */
   corner(slot: string, type: string, params: any = {}, tier = this.curTier, cost = 1): any | null {
+    if (LAMP_TYPES.has(type) && this.area < LAMP_MIN_AREA) { this.skip(slot, `${type}: the room is under ${LAMP_MIN_AREA} m2, which the light rig does not light`); return null; }
     const c = this.comp(); return this.placeGroup(slot, cornerGroup(c, slot, type, params, { score: it => 0 }), params, tier, cost);
   }
   /** a piece against a wall, scored toward a point (the entry door, a fixture) */
   against(slot: string, type: string, params: any = {}, near: [number, number] | null = null, tier = this.curTier, cost = 1): any | null {
+    if (LAMP_TYPES.has(type) && this.area < LAMP_MIN_AREA) { this.skip(slot, `${type}: the room is under ${LAMP_MIN_AREA} m2, which the light rig does not light`); return null; }
     const c = this.comp();
     const g = wallGroup(c, slot, type, params, { score: (p, it) => (near ? -0.6 * Math.hypot(it.cx - near[0], it.cz - near[1]) : 0) });
     return this.placeGroup(slot, g, params, tier, cost);
