@@ -3,6 +3,8 @@
 // rot 0, big surfaces take a role colour from ctx.colors (or it.color), only trims and buttons use literals, and
 // any variation comes from ctx.rng so frames stay deterministic.
 import { registerProps } from './registry.js';
+import { softkit, softMat, put, lin, smooth } from './softkit.js';
+import { softSofa, softSectional, softModular, softWingback, softSlipper, softMission, softBarrel, softRattan, softRocking } from './softseat.js';
 
 // a cushion is the shell's colour lifted a little; legs are the kit's wood unless the fabric is already wood-like
 const lift = (mix, c, t = 0.12) => mix(c, 0xffffff, t);
@@ -15,30 +17,8 @@ registerProps({
   // w ≥ 2.1 grows a third seat, so the same prop is the three-seater.
   'loveseat': {
     footprint: [1.5, 0.85], height: 0.8, params: ['w', 'd', 'color'], tags: ['living', 'bedroom', 'office'],
-    create(it, { THREE, std, box, group, colors, hex, mix, rng }) {
-      const w = it.w || 1.5, d = it.d || 0.85, g = group('Loveseat');
-      const base = upholstery(it, colors, hex);
-      const shell = std(base, { roughness: 0.85 }), cushion = std(lift(mix, base), { roughness: 0.9 });
-      const legMat = std(colors.wood, { roughness: 0.5 });
-      const legH = 0.1, armW = 0.14, backD = 0.2, seatY = 0.34;
-      g.add(box(w, seatY - legH, d, shell, 0, legH + (seatY - legH) / 2, 0));                       // plinth
-      g.add(box(w, 0.8 - seatY, backD, shell, 0, seatY + (0.8 - seatY) / 2, -d / 2 + backD / 2));   // back
-      for (const s of [-1, 1]) g.add(box(armW, 0.28, d - backD, shell, s * (w / 2 - armW / 2), seatY + 0.14, backD / 2));
-      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.028, legH, 8), legMat);
-        leg.position.set(sx * (w / 2 - 0.08), legH / 2, sz * (d / 2 - 0.08)); leg.castShadow = true; g.add(leg);
-      }
-      const n = Math.max(2, Math.round(w / 0.75)), inner = w - 2 * armW - 0.04, cw = inner / n - 0.02, cd = d - backD - 0.06;
-      for (let i = 0; i < n; i++) {
-        const cx = -inner / 2 + inner / n * (i + 0.5);
-        g.add(box(cw, 0.12, cd, cushion, cx, seatY + 0.06, backD / 2 + 0.01));                    // seat cushion
-        const bc = box(cw, 0.36, 0.1, cushion, cx, seatY + 0.12 + 0.17, -d / 2 + backD + 0.04);    // back cushion, leaning
-        bc.rotation.x = -0.12; g.add(bc);
-      }
-      const pillow = box(0.36, 0.36, 0.11, std(rng() < 0.5 ? colors.accent : colors.fabric2, { roughness: 0.9 }), (rng() < 0.5 ? -1 : 1) * (inner / 2 - 0.22), seatY + 0.3, -d / 2 + backD + 0.14);
-      pillow.rotation.set(-0.18, (rng() - 0.5) * 0.5, 0.08); g.add(pillow);
-      return g;
-    },
+    // softkit: the sofa grammar at two seats wide (w ≥ 2.1 grows the third): a plinth, a back, two track arms, puffed cushions, one pillow, four block legs
+    create: (it, ctx) => softSofa(ctx, it, 'Loveseat', { w: 1.5, d: 0.85, seatY: 0.44, backH: 0.8, armW: 0.14, armTop: 0.62, arm: 'track', legs: 'block', legH: 0.1, backCushions: true, top: 0.845 }, upholstery(it, ctx.colors, ctx.hex)),
     iso: [
       { shape: 'box', box: [-0.75, 0.1, -0.425, 0.75, 0.34, 0.425], color: 'role:fabric' },
       { shape: 'box', box: [-0.75, 0.34, -0.425, 0.75, 0.8, -0.225], color: 'role:fabric' },
@@ -51,29 +31,7 @@ registerProps({
   // Wingback armchair — tall back with two forward-wrapping wings, rolled arms, a loose seat cushion, turned wooden legs.
   'wingback-armchair': {
     footprint: [0.8, 0.85], height: 1.1, params: ['color'], tags: ['living', 'bedroom', 'office'],
-    create(it, { THREE, std, box, group, colors, hex, mix }) {
-      const w = 0.8, d = 0.85, bt = 0.16, g = group('Wingback Armchair');
-      const base = upholstery(it, colors, hex);
-      const shell = std(base, { roughness: 0.85 }), cushion = std(lift(mix, base), { roughness: 0.9 });
-      const legMat = std(colors.wood, { roughness: 0.5 });
-      const legH = 0.12, seatY = 0.38, zi = bt / 2;   // zi: centre of the seat well in front of the back
-      g.add(box(w, seatY - legH, d - bt, shell, 0, legH + (seatY - legH) / 2, zi));               // plinth
-      g.add(box(w, 1.1 - seatY, bt, shell, 0, seatY + (1.1 - seatY) / 2, -d / 2 + bt / 2));         // tall back
-      for (const s of [-1, 1]) {
-        const wing = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.5, 0.3).translate(0, 0, 0.15), shell);   // hinged at its rear face, flush with the back's side
-        wing.position.set(s * (w / 2 - 0.04), 0.85, -d / 2 + bt); wing.rotation.y = -s * 0.18; wing.castShadow = true; g.add(wing);   // wing, wrapping forward and a little inward
-        g.add(box(0.14, 0.26, d - bt, shell, s * (w / 2 - 0.07), seatY + 0.13, zi));               // arm
-        const roll = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, d - bt, 12), shell);     // rolled arm top
-        roll.rotation.x = Math.PI / 2; roll.position.set(s * (w / 2 - 0.07), seatY + 0.26, zi); roll.castShadow = true; g.add(roll);
-      }
-      g.add(box(w - 0.3, 0.12, d - bt - 0.04, cushion, 0, seatY + 0.06, zi + 0.01));               // seat cushion
-      g.add(box(w - 0.3, 0.4, 0.08, cushion, 0, seatY + 0.34, -d / 2 + bt + 0.04));                // back pad
-      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.016, legH, 8), legMat);
-        leg.position.set(sx * (w / 2 - 0.08), legH / 2, zi + sz * ((d - bt) / 2 - 0.08)); leg.castShadow = true; g.add(leg);
-      }
-      return g;
-    },
+    create: (it, ctx) => softWingback(ctx, it, upholstery(it, ctx.colors, ctx.hex)),   // softkit (T8): 3 meshes
     iso: [
       { shape: 'box', box: [-0.4, 0.12, -0.345, 0.4, 0.64, 0.425], color: 'role:fabric' },
       { shape: 'box', box: [-0.4, 0.38, -0.425, 0.4, 1.1, -0.265], color: 'role:fabric' },
@@ -114,19 +72,19 @@ registerProps({
   // Ottoman — a rectangular upholstered block with a buttoned top on stubby wooden feet.
   'ottoman': {
     footprint: [0.7, 0.5], height: 0.42, params: ['w', 'd', 'color'], tags: ['living', 'bedroom'],
-    create(it, { THREE, std, box, group, colors, hex, mix }) {
-      const w = it.w || 0.7, d = it.d || 0.5, g = group('Ottoman');
-      const base = upholstery(it, colors, hex);
-      const shell = std(base, { roughness: 0.85 }), top = std(lift(mix, base, 0.08), { roughness: 0.9 });
-      const legMat = std(colors.wood, { roughness: 0.5 }), buttonMat = std(drop(mix, base, 0.35), { roughness: 0.6 });
-      g.add(box(w, 0.26, d, shell, 0, 0.1 + 0.13, 0));                                             // body
-      g.add(box(w - 0.04, 0.06, d - 0.04, top, 0, 0.36 + 0.03, 0));                                // top cushion
-      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.028, 0.1, 8), legMat);
-        leg.position.set(sx * (w / 2 - 0.07), 0.05, sz * (d / 2 - 0.07)); leg.castShadow = true; g.add(leg);
-        const button = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.008, 8), buttonMat);
-        button.position.set(sx * w * 0.2, 0.424, sz * d * 0.2); g.add(button);                    // tufting buttons
-      }
+    // softkit: a rounded body and a puffed, buttoned top in ONE upholstery mesh, the four feet one timber mesh: 2 meshes where there were 10
+    create(it, ctx) {
+      const { THREE, std, group, colors, hex } = ctx, K = softkit(THREE);
+      const w = it.w || 0.7, d = it.d || 0.5, g = group('Ottoman'), base = upholstery(it, colors, hex);
+      const fab = new K.Acc(), feet = new K.Acc(), tw = w - 0.04, td = d - 0.04;
+      K.shell(fab, { cy: 0.23, w, h: 0.26, d, r: 0.04, faces: ['px', 'nx', 'pz', 'nz', 'py'], kx: lin(w / 2, 4), kz: lin(d / 2, 3), shade: (_x: number, y: number, _z: number, nx: number, _ny: number, nz: number) => 0.9 - 0.06 * (1 - smooth(-0.13, 0.13, y)) + 0.02 * (Math.abs(nx) + Math.abs(nz) > 0.5 ? 0 : 1) });
+      const buttons = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sz]) => [sx * w * 0.2, sz * d * 0.2]);
+      K.shell(fab, { cy: 0.36, w: tw, h: 0.06, d: td, r: 0.025, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(tw / 2, 8), kz: lin(td / 2, 6), puff: 0.038,
+        wave: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? [0, -0.012 * buttons.reduce((a, [bx, bz]) => a + Math.exp(-((x - bx) ** 2 + (z - bz) ** 2) / 0.0006), 0), 0] : [0, 0, 0]),
+        shade: (x: number, _y: number, z: number, _nx: number, ny: number) => (ny > 0.5 ? 1 - 0.14 * buttons.reduce((a, [bx, bz]) => a + Math.exp(-((x - bx) ** 2 + (z - bz) ** 2) / 0.0006), 0) : 0.9) });   // the tufting buttons are dimples
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) K.strut(feet, [sx * (w / 2 - 0.07), 0, sz * (d / 2 - 0.07)], [sx * (w / 2 - 0.07), 0.1, sz * (d / 2 - 0.07)], 0.028, 0.02, 8);
+      put(g, fab, softMat(ctx, base, { roughness: 0.9 }), 'upholstery');
+      put(g, feet, softMat(ctx, colors.wood, { roughness: 0.5 }), 'feet');
       return g;
     },
     iso: [{ shape: 'box', box: [-0.35, 0.1, -0.25, 0.35, 0.42, 0.25], color: 'role:fabric' }],
@@ -136,14 +94,14 @@ registerProps({
   // Pouf — a round knitted floor seat: a lathe with a flat bottom and a domed top, flat shaded, seeded fabric pick.
   'pouf': {
     footprint: [0.55, 0.55], height: 0.38, params: ['color'], tags: ['living', 'bedroom', 'kids'],
-    create(it, { THREE, std, group, colors, hex, mix, rng }) {
+    // softkit: a turned, knitted-looking floor seat — smooth, gored by neutral shade, a dimpled top — in ONE mesh (the button is part of it): 1 mesh where there were 2
+    create(it, ctx) {
+      const { THREE, group, colors, hex, rng } = ctx, K = softkit(THREE);
       const g = group('Pouf');
       const base = it.color ? hex(it.color) : (rng() < 0.4 ? colors.accent : rng() < 0.5 ? colors.fabric2 : colors.fabric);
-      const profile = [[0, 0], [0.2, 0], [0.26, 0.05], [0.275, 0.17], [0.26, 0.29], [0.19, 0.355], [0, 0.38]].map(([x, y]) => new THREE.Vector2(x, y));
-      const body = new THREE.Mesh(new THREE.LatheGeometry(profile, 14), std(base, { roughness: 0.95, flatShading: true }));
-      body.castShadow = true; body.receiveShadow = true; g.add(body);
-      const button = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.012, 10), std(lift(mix, base, 0.25), { roughness: 0.9 }));
-      button.position.y = 0.376; g.add(button);
+      const acc = new K.Acc();
+      K.lathe(acc, [[0.001, 0, 0.84], [0.2, 0, 0.84], [0.26, 0.05, 0.94], [0.275, 0.17, 1], [0.26, 0.29, 1], [0.19, 0.355, 1], [0.1, 0.377, 1], [0.035, 0.382, 0.94], [0.001, 0.367, 0.78]], 16, 0, 1, (x: number, y: number, z: number) => [x * 0.9745, y, z], (ph: number) => 0.9 + 0.1 * Math.abs(Math.cos(ph * 3)));
+      put(g, acc, softMat(ctx, base, { roughness: 0.95 }), 'pouf');
       return g;
     },
     iso: [{ shape: 'blob', box: [-0.275, 0, -0.275, 0.275, 0.38, 0.275], color: 'role:fabric' }],
@@ -206,30 +164,7 @@ registerProps({
   // Rocking chair — two torus-arc rockers, four posts, a spindle back and flat arms; a thin cushion on the seat.
   'rocking-chair': {
     footprint: [0.66, 0.92], height: 1.05, params: ['color'], tags: ['living', 'bedroom', 'kids', 'outdoor'],
-    create(it, { THREE, std, box, group, colors, hex }) {
-      const g = group('Rocking Chair');
-      const wood = std(colors.wood, { roughness: 0.55 });
-      const R = 1.0, arc = 0.95, tube = 0.018, seatY = 0.44;
-      for (const s of [-1, 1]) {
-        const rocker = new THREE.Mesh(new THREE.TorusGeometry(R, tube, 6, 28, arc).rotateZ(-Math.PI / 2 - arc / 2).rotateY(Math.PI / 2), wood);   // arc centred under the axle, ring in the yz plane
-        rocker.position.set(s * 0.27, R + tube, 0); rocker.castShadow = true; g.add(rocker);
-        for (const sz of [-1, 1]) g.add(box(0.035, seatY - 0.04, 0.035, wood, s * 0.27, 0.04 + (seatY - 0.04) / 2, sz * 0.22));   // posts
-      }
-      g.add(box(0.6, 0.05, 0.55, wood, 0, seatY - 0.025, 0));                                      // seat
-      g.add(box(0.5, 0.05, 0.46, std(it.color ? hex(it.color) : colors.fabric, { roughness: 0.9 }), 0, seatY + 0.025, 0.02));   // cushion
-      const back = new THREE.Group(); back.position.set(0, seatY, -0.24); back.rotation.x = -0.15; g.add(back);
-      for (const s of [-1, 1]) back.add(box(0.04, 0.58, 0.04, wood, s * 0.27, 0.29, 0));           // back posts
-      for (let i = 0; i < 5; i++) {
-        const sp = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.54, 6), wood);
-        sp.position.set(-0.18 + i * 0.09, 0.27, 0); sp.castShadow = true; back.add(sp);            // spindles, seat to top rail
-      }
-      back.add(box(0.6, 0.07, 0.04, wood, 0, 0.555, 0));                                           // top rail
-      for (const s of [-1, 1]) {
-        g.add(box(0.06, 0.035, 0.5, wood, s * 0.3, seatY + 0.26, -0.02));                          // arm
-        g.add(box(0.03, 0.24, 0.03, wood, s * 0.3, seatY + 0.12, 0.2));                            // front arm post
-      }
-      return g;
-    },
+    create: (it, ctx) => softRocking(ctx, it, 0),   // softkit (T8): rockers, posts and spindles are one timber mesh
     iso: [
       { shape: 'box', box: [-0.3, 0.4, -0.28, 0.3, 0.5, 0.28], color: 'role:wood' },
       { shape: 'box', box: [-0.3, 0.5, -0.33, 0.3, 1.05, -0.22], color: 'role:wood' },
@@ -242,12 +177,18 @@ registerProps({
   // Cushioned bench — a wooden frame and four legs under a full-width fabric cushion; end-of-bed or hallway.
   'cushioned-bench': {
     footprint: [1.2, 0.4], height: 0.48, params: ['w', 'd', 'color'], tags: ['bedroom', 'hall', 'dining'],
-    create(it, { std, box, group, colors, hex }) {
-      const w = it.w || 1.2, d = it.d || 0.4, g = group('Cushioned Bench');
-      const wood = std(colors.wood, { roughness: 0.55 });
-      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) g.add(box(0.04, 0.4, 0.04, wood, sx * (w / 2 - 0.06), 0.2, sz * (d / 2 - 0.06)));   // legs
-      g.add(box(w, 0.06, d, wood, 0, 0.37, 0));                                                     // frame
-      g.add(box(w - 0.02, 0.08, d - 0.02, std(it.color ? hex(it.color) : colors.fabric, { roughness: 0.9 }), 0, 0.44, 0));   // cushion
+    // softkit: legs and frame are one timber mesh, the cushion one puffed, channelled mesh: 2 meshes where there were 6
+    create(it, ctx) {
+      const { THREE, group, colors, hex } = ctx, K = softkit(THREE);
+      const w = it.w || 1.2, d = it.d || 0.4, g = group('Cushioned Bench'), wood = new K.Acc(), fab = new K.Acc();
+      for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) K.slab(wood, sx * (w / 2 - 0.06), 0.2, sz * (d / 2 - 0.06), 0.04, 0.4, 0.04);   // legs
+      K.slab(wood, 0, 0.37, 0, w, 0.06, d);                                                                                                       // frame
+      const cw = w - 0.02, cd = d - 0.02, ch = Math.max(2, Math.round(cw / 0.3));
+      K.shell(fab, { cy: 0.432, w: cw, h: 0.07, d: cd, r: 0.02, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(cw / 2, ch * 4), kz: lin(cd / 2, 3), puff: 0.01,
+        wave: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? [0, 0.004 * Math.cos((x / cw) * Math.PI * 2 * ch), 0] : [0, 0, 0]),
+        shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.94 + 0.06 * (0.5 + 0.5 * Math.cos((x / cw) * Math.PI * 2 * ch)) : 0.88) });   // channels
+      put(g, wood, softMat(ctx, colors.wood, { roughness: 0.55 }), 'frame');
+      put(g, fab, softMat(ctx, it.color ? hex(it.color) : colors.fabric, { roughness: 0.9 }), 'cushion');
       return g;
     },
     iso: [
@@ -292,13 +233,15 @@ registerProps({
   // face meets the sitter at +z; the shear is baked into the geometry so the measurement stays exact.
   'bean-bag': {
     footprint: [0.8, 0.8], height: 0.58, params: ['color'], tags: ['kids', 'living'],
-    create(it, { THREE, std, group, colors, hex, rng }) {
+    // softkit: the same slumped turn — the peak back at −z, the low face meeting the sitter at +z, the shear baked into the vertices — smooth and creased by shade
+    create(it, ctx) {
+      const { THREE, group, colors, hex, rng } = ctx, K = softkit(THREE);
       const g = group('Bean Bag');
       const base = it.color ? hex(it.color) : (rng() < 0.5 ? colors.accent : colors.fabric2);
-      const profile = [[0, 0], [0.34, 0], [0.41, 0.1], [0.4, 0.24], [0.32, 0.4], [0.2, 0.5], [0.09, 0.56], [0, 0.58]].map(([x, y]) => new THREE.Vector2(x, y));
-      const geo = new THREE.LatheGeometry(profile, 12).applyMatrix4(new THREE.Matrix4().set(1, 0, 0, 0, 0, 1, 0, 0, 0, -0.3, 1, 0.06, 0, 0, 0, 1));   // z -= 0.3·y, slid so the base stays centred
-      const body = new THREE.Mesh(geo, std(base, { roughness: 0.95, flatShading: true }));
-      body.scale.z = 0.94; body.castShadow = true; body.receiveShadow = true; g.add(body);
+      const acc = new K.Acc();
+      K.lathe(acc, [[0.001, 0, 0.8], [0.34, 0, 0.84], [0.395, 0.05, 0.92], [0.41, 0.1, 1], [0.405, 0.17, 1], [0.4, 0.24, 1], [0.37, 0.32, 1], [0.32, 0.4, 1], [0.26, 0.46, 1], [0.2, 0.5, 1], [0.09, 0.56, 0.96], [0.001, 0.58, 0.9]], 16, 0, 1,
+        (x: number, y: number, z: number) => [x, y, (z - 0.3 * y + 0.06) * 0.94], (ph: number) => 0.92 + 0.08 * Math.cos(ph * 5 + 0.6));
+      put(g, acc, softMat(ctx, base, { roughness: 0.95 }), 'beanbag');
       return g;
     },
     iso: [{ shape: 'blob', box: [-0.4, 0, -0.4, 0.4, 0.58, 0.4], color: 'role:accent' }],
@@ -344,7 +287,13 @@ const quad = (w, d, inset) => [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sz]
 
 // One upholstered sofa, parametrised by its arm, its legs and its cushions. deckY is the top of the base (the seat
 // cushions sit on it), backH the top of the back, armTop the top of the arms (a roll adds its radius on top).
+// (T4: the sofa family is built on the softkit grammar — assets/props/softseat.ts. The tufted leather chesterfield is BAKE's (PLAN 2.1): it keeps the box build below,
+// which the baked model replaces in place when it is switched on.)
 function sofa(ctx, it, name, o) {
+  if (!o.tufted) return softSofa(ctx, it, name, o, upholstery(it, ctx.colors, ctx.hex));
+  return sofaBoxes(ctx, it, name, o);
+}
+function sofaBoxes(ctx, it, name, o) {
   const { THREE, std, box, group, colors, hex, mix, rng } = ctx;
   const w = it.w || o.w, d = it.d || o.d, g = group(name);
   const base = upholstery(it, colors, hex);
@@ -404,13 +353,13 @@ registerProps({
   // Track-arm sofa — square low arms, loose seat and back cushions on short block legs (modern, scandi).
   'sofa': {
     footprint: [2.2, 0.95], height: 0.82, params: ['w', 'd', 'color'], tags: ['living', 'den', 'media'],
-    create: (it, ctx) => sofa(ctx, it, 'Sofa', { w: 2.2, d: 0.95, seatY: 0.44, backH: 0.82, armW: 0.16, armTop: 0.62, arm: 'track', legs: 'block', legH: 0.1, backCushions: true }),
+    create: (it, ctx) => sofa(ctx, it, 'Sofa', { w: 2.2, d: 0.95, seatY: 0.44, backH: 0.82, armW: 0.16, armTop: 0.62, arm: 'track', legs: 'block', legH: 0.1, backCushions: true, top: 0.895 }),
     iso: sofaIso(2.2, 0.95, 0.82, 0.16),
   },
   // Slipcover sofa — a skirt to the floor, rolled arms, loose back cushions (farmhouse, cottage).
   'slipcover-sofa': {
     footprint: [2.1, 0.97], height: 0.86, params: ['w', 'd', 'color'], tags: ['living', 'den'],
-    create: (it, ctx) => sofa(ctx, it, 'Slipcover Sofa', { w: 2.1, d: 0.95, seatY: 0.46, backH: 0.86, armW: 0.2, armTop: 0.7, arm: 'roll', legs: 'skirt', legH: 0.14, backCushions: true }),
+    create: (it, ctx) => sofa(ctx, it, 'Slipcover Sofa', { w: 2.1, d: 0.95, seatY: 0.46, backH: 0.86, armW: 0.2, armTop: 0.7, arm: 'roll', legs: 'skirt', legH: 0.14, backCushions: true, top: 0.915 }),
     iso: sofaIso(2.1, 0.95, 0.86, 0.22),
   },
   // Chesterfield — arms rolled to the height of the back, deep-buttoned, on bun feet; leather sheen (library,
@@ -423,13 +372,13 @@ registerProps({
   // Mid-century sofa — thin arms, two long seat cushions and bolsters on splayed tapered legs (mid-century, scandi).
   'mid-century-sofa': {
     footprint: [2.0, 0.89], height: 0.78, params: ['w', 'd', 'color'], tags: ['living', 'den', 'study'],
-    create: (it, ctx) => sofa(ctx, it, 'Mid-century Sofa', { w: 2.0, d: 0.85, seatY: 0.43, backH: 0.78, armW: 0.07, armTop: 0.58, arm: 'thin', legs: 'taper', legH: 0.2, seats: 2, backCushions: true, bolsters: true, backD: 0.14 }),
+    create: (it, ctx) => sofa(ctx, it, 'Mid-century Sofa', { w: 2.0, d: 0.85, seatY: 0.43, backH: 0.78, armW: 0.07, armTop: 0.58, arm: 'thin', legs: 'taper', legH: 0.2, seats: 2, backCushions: true, bolsters: true, backD: 0.14, top: 0.825, footY: -0.005 }),
     iso: sofaIso(2.0, 0.85, 0.78, 0.07, 0.14),
   },
   // Tuxedo sofa — arms and back one height, a tight crisp box on slim metal legs (modern, industrial).
   'tuxedo-sofa': {
     footprint: [2.2, 0.9], height: 0.72, params: ['w', 'd', 'color'], tags: ['living', 'den', 'media'],
-    create: (it, ctx) => sofa(ctx, it, 'Tuxedo Sofa', { w: 2.2, d: 0.9, seatY: 0.43, backH: 0.72, armW: 0.16, armTop: 0.72, arm: 'tux', legs: 'metal', legH: 0.1, seats: 3 }),
+    create: (it, ctx) => sofa(ctx, it, 'Tuxedo Sofa', { w: 2.2, d: 0.9, seatY: 0.43, backH: 0.72, armW: 0.16, armTop: 0.72, arm: 'tux', legs: 'metal', legH: 0.1, seats: 3, top: 0.795 }),
     iso: sofaIso(2.2, 0.9, 0.72, 0.16),
   },
 
@@ -438,31 +387,8 @@ registerProps({
   'l-sectional': {
     footprint: [2.8, 1.7], height: 0.82, params: ['w', 'l', 'd', 'hand', 'color'], tags: ['living', 'den', 'media'],
     create(it, ctx) {
-      const { THREE, std, box, group, colors, hex, mix, rng } = ctx;
-      const w = it.w || 2.8, l = it.l || 1.7, d = it.d || 0.95, g = group(`L-Sectional (${it.hand === 'right' ? 'right' : 'left'})`);
-      const side = it.hand === 'right' ? -1 : 1;   // the chaise's end
-      const base = upholstery(it, colors, hex), shell = std(base, { roughness: 0.85 }), cushion = std(lift(mix, base), { roughness: 0.9 });
-      const legMat = std(colors.metal, { metalness: 0.8, roughness: 0.3 });
-      const legH = 0.1, deckY = 0.32, seatTop = 0.46, backD = 0.2, armW = 0.16, cw = d;   // the chaise is one seat deep wide
-      const z0 = -l / 2, runZ = z0 + d / 2;                                                    // the run's centre line
-      g.add(box(w, deckY - legH, d, shell, 0, legH + (deckY - legH) / 2, runZ));                // run base
-      const chX = side * (w / 2 - cw / 2), chL = l - d;                                          // the chaise's extension toward +z
-      g.add(box(cw, deckY - legH, chL, shell, chX, legH + (deckY - legH) / 2, z0 + d + chL / 2));
-      g.add(box(w, 0.82 - deckY, backD, shell, 0, deckY + (0.82 - deckY) / 2, z0 + backD / 2));   // back along the run
-      g.add(box(armW, 0.62 - legH, d - backD, shell, -side * (w / 2 - armW / 2), legH + (0.62 - legH) / 2, z0 + backD + (d - backD) / 2));   // the far arm
-      legsAt(THREE, g, legMat, [[-w / 2 + 0.08, z0 + 0.08], [w / 2 - 0.08, z0 + 0.08], [-side * (w / 2 - 0.08), z0 + d - 0.08], [side * (w / 2 - 0.08), l / 2 - 0.08], [side * (w / 2 - cw + 0.08), l / 2 - 0.08], [side * (w / 2 - cw + 0.08), z0 + d - 0.08]], legH, 0.02, 0.02);
-      // seats along the run (from the arm to the chaise), then the chaise's long cushion
-      const runIn = w - armW - cw - 0.02, n = Math.max(1, Math.round(runIn / 0.65)), sw = runIn / n - 0.015, sd = d - backD - 0.04;
-      for (let i = 0; i < n; i++) {
-        const x = -side * (w / 2 - armW - 0.01) + side * (runIn / n) * (i + 0.5);
-        g.add(box(sw, seatTop - deckY, sd, cushion, x, deckY + (seatTop - deckY) / 2, z0 + backD + sd / 2 + 0.02));
-        const bc = box(sw, 0.36, 0.12, cushion, x, seatTop + 0.18, z0 + backD + 0.05); bc.rotation.x = -0.1; g.add(bc);
-      }
-      g.add(box(cw - 0.03, seatTop - deckY, l - backD - 0.03, cushion, chX, deckY + (seatTop - deckY) / 2, z0 + backD + (l - backD) / 2));
-      const bc = box(cw - 0.03, 0.36, 0.12, cushion, chX, seatTop + 0.18, z0 + backD + 0.05); bc.rotation.x = -0.1; g.add(bc);
-      const pillow = box(0.4, 0.4, 0.11, std(rng() < 0.5 ? colors.accent : colors.fabric2, { roughness: 0.9 }), chX - side * 0.12, seatTop + 0.22, z0 + backD + 0.18);
-      pillow.rotation.set(-0.18, (rng() - 0.5) * 0.5, 0.08); g.add(pillow);
-      return g;
+      const w = it.w || 2.8, l = it.l || 1.7, d = it.d || 0.95, side = it.hand === 'right' ? -1 : 1;
+      return softSectional(ctx, it, `L-Sectional (${it.hand === 'right' ? 'right' : 'left'})`, { kind: 'L', w, l, d, side, deckY: 0.32, seatTop: 0.46, backH: 0.82, backD: 0.2, legH: 0.1, legKind: 'metal', top: 0.909, armW: 0.16, wing: [] }, upholstery(it, ctx.colors, ctx.hex));
     },
     iso: [
       { shape: 'box', box: [-1.4, 0.1, -0.85, 1.4, 0.46, 0.1], color: 'role:fabric' },
@@ -476,23 +402,7 @@ registerProps({
   // (craftsman, farmhouse, mediterranean).
   'mission-armchair': {
     footprint: [0.78, 0.84], height: 0.95, params: ['color'], tags: ['living', 'library', 'study', 'den'],
-    create(it, { THREE, std, box, group, colors, hex, mix }) {
-      const w = 0.78, d = 0.84, g = group('Mission Armchair');
-      const wood = std(colors.wood, { roughness: 0.55 }), fab = std(upholstery(it, colors, hex), { roughness: 0.88 });
-      const post = 0.05, armY = 0.62;
-      for (const [x, z] of quad(w, d, post / 2)) g.add(box(post, z < 0 ? 0.95 : armY, post, wood, x, (z < 0 ? 0.95 : armY) / 2, z));   // back posts run up to the crest
-      for (const s of [-1, 1]) {
-        g.add(box(0.11, 0.03, d + 0.04, wood, s * (w / 2 - 0.03), armY + 0.015, 0.02));                     // flat arm
-        g.add(box(0.03, 0.05, d - 2 * post, wood, s * (w / 2 - post / 2), 0.22, 0));                        // low side rail
-        for (let k = 0; k < 3; k++) g.add(box(0.012, armY - 0.25, 0.05, wood, s * (w / 2 - post / 2), 0.25 + (armY - 0.25) / 2, -0.2 + k * 0.2));   // side slats
-      }
-      g.add(box(w - 2 * post, 0.05, d - 2 * post, wood, 0, 0.33, 0));                                        // seat frame
-      for (let k = 0; k < 5; k++) g.add(box(0.05, 0.48, 0.012, wood, -0.24 + k * 0.12, 0.62, -d / 2 + post / 2));   // back slats
-      g.add(box(w - 2 * post, 0.07, 0.03, wood, 0, 0.91, -d / 2 + post / 2));                                // crest rail
-      g.add(box(w - 2 * post - 0.02, 0.12, d - 2 * post - 0.06, fab, 0, 0.415, 0.03));                        // seat cushion
-      const bc = box(w - 2 * post - 0.04, 0.44, 0.1, std(lift(mix, upholstery(it, colors, hex), 0.08), { roughness: 0.9 }), 0, 0.7, -d / 2 + post + 0.07); bc.rotation.x = -0.12; g.add(bc);
-      return g;
-    },
+    create: (it, ctx) => softMission(ctx, it, upholstery(it, ctx.colors, ctx.hex)),   // softkit (T8): the oak frame is one timber mesh
     iso: [
       { shape: 'box', box: [-0.39, 0, -0.42, 0.39, 0.65, 0.44], color: 'role:wood' },
       { shape: 'box', box: [-0.34, 0.36, -0.36, 0.34, 0.48, 0.36], color: 'role:fabric' },
@@ -502,36 +412,13 @@ registerProps({
   // Barrel chair — a curved back wrapping round a round seat, on a low plinth (modern, mid-century).
   'barrel-chair': {
     footprint: [0.78, 0.78], height: 0.76, params: ['color'], tags: ['living', 'bedroom', 'study'],
-    create(it, { THREE, std, group, colors, hex, mix }) {
-      const R = 0.39, g = group('Barrel Chair'), base = upholstery(it, colors, hex);
-      const shell = std(base, { roughness: 0.85, side: THREE.DoubleSide }), cushion = std(lift(mix, base, 0.1), { roughness: 0.9 });
-      const plinth = new THREE.Mesh(new THREE.CylinderGeometry(R - 0.06, R - 0.04, 0.08, 28), std(colors.wood, { roughness: 0.5 }));
-      plinth.position.y = 0.04; plinth.castShadow = true; g.add(plinth);
-      const seat = new THREE.Mesh(new THREE.CylinderGeometry(R - 0.02, R - 0.02, 0.3, 28), shell); seat.position.y = 0.23; seat.castShadow = true; g.add(seat);
-      const pad = new THREE.Mesh(new THREE.CylinderGeometry(R - 0.1, R - 0.08, 0.1, 28), cushion); pad.position.set(0, 0.43, 0.03); pad.castShadow = true; g.add(pad);
-      // the wrap: an open arc round the back 240° wide, thick enough to read (outer + inner walls and a top band)
-      const arc = Math.PI * 4 / 3, start = Math.PI - arc / 2;   // centred on −z (a cylinder's θ 0 is +z)
-      for (const [r, h, y] of [[R, 0.5, 0.51], [R - 0.08, 0.36, 0.58]]) {
-        const wall = new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, 32, 1, true, start, arc), shell); wall.position.y = y; wall.castShadow = true; g.add(wall);
-      }
-      const rim = new THREE.Mesh(new THREE.RingGeometry(R - 0.08, R, 32, 1, start - Math.PI / 2, arc).rotateX(-Math.PI / 2), shell); rim.position.y = 0.76; g.add(rim);
-      return g;
-    },
+    create: (it, ctx) => softBarrel(ctx, it, upholstery(it, ctx.colors, ctx.hex)),   // softkit (T8)
     iso: [{ shape: 'cyl', box: [-0.39, 0, -0.39, 0.39, 0.46, 0.39], color: 'role:fabric' }, { shape: 'box', box: [-0.39, 0.46, -0.39, 0.39, 0.76, -0.1], color: 'role:fabric' }],
   },
   // Slipper chair — armless, a tall slightly raked back, on short tapered legs (cottage, scandi, bedroom corners).
   'slipper-chair': {
     footprint: [0.62, 0.74], height: 0.88, params: ['color'], tags: ['living', 'bedroom'],
-    create(it, { THREE, std, box, group, colors, hex, mix }) {
-      const w = 0.62, d = 0.72, g = group('Slipper Chair'), base = upholstery(it, colors, hex);
-      const shell = std(base, { roughness: 0.85 }), cushion = std(lift(mix, base, 0.1), { roughness: 0.9 });
-      legsAt(THREE, g, std(colors.wood, { roughness: 0.5 }), quad(w, d, 0.08), 0.15, 0.022, 0.014, 0.1);
-      g.add(box(w, 0.2, d, shell, 0, 0.25, 0));
-      g.add(box(w - 0.04, 0.08, d - 0.14, cushion, 0, 0.39, 0.05));
-      const back = new THREE.Group(); back.position.set(0, 0.35, -d / 2 + 0.07); back.rotation.x = -0.14; g.add(back);
-      back.add(box(w, 0.52, 0.14, shell, 0, 0.26, 0));
-      return g;
-    },
+    create: (it, ctx) => softSlipper(ctx, it, upholstery(it, ctx.colors, ctx.hex)),   // softkit (T8)
     iso: [{ shape: 'box', box: [-0.31, 0.15, -0.36, 0.31, 0.43, 0.36], color: 'role:fabric' }, { shape: 'box', box: [-0.31, 0.35, -0.37, 0.31, 0.88, -0.2], color: 'role:fabric' }],
   },
   // Lounge chair — moulded wooden shells (seat and raked back) with leather cushions on a five-spoke swivel base
@@ -558,18 +445,7 @@ registerProps({
   // (tropical, mediterranean, cottage, sunrooms).
   'rattan-armchair': {
     footprint: [0.8, 0.8], height: 0.8, params: ['color'], tags: ['living', 'sunroom', 'bedroom'],
-    create(it, { THREE, std, box, group, colors, hex, mix }) {
-      const g = group('Rattan Armchair'), R = 0.38;
-      const cane = std(mix(colors.wood, 0xc9a26b, 0.5), { roughness: 0.8, side: THREE.DoubleSide, flatShading: true });
-      legsAt(THREE, g, cane, quad(0.6, 0.6, 0.04), 0.12, 0.02, 0.02);
-      const seat = new THREE.Mesh(new THREE.CylinderGeometry(R - 0.04, R - 0.04, 0.08, 24), cane); seat.position.y = 0.16; seat.castShadow = true; g.add(seat);
-      // the wrap of cane round the back and arms (220°, open to +z), and a rolled rim along its top edge
-      const arc = Math.PI * 11 / 9, start = Math.PI - arc / 2;
-      const wrap = new THREE.Mesh(new THREE.CylinderGeometry(R, R - 0.02, 0.5, 28, 1, true, start, arc), cane); wrap.position.y = 0.45; wrap.castShadow = true; g.add(wrap);
-      const rim = new THREE.Mesh(new THREE.TorusGeometry(R, 0.035, 8, 28, arc).rotateX(Math.PI / 2), cane); rim.rotation.y = Math.PI / 2 + arc / 2;   // the arc (after rotateX) spans θ π/2 − arc … π/2; turn it onto π ± arc/2 rim.position.y = 0.72; rim.castShadow = true; g.add(rim);
-      g.add(box(0.56, 0.1, 0.5, std(it.color ? hex(it.color) : colors.linen, { roughness: 0.95 }), 0, 0.25, 0.04));
-      return g;
-    },
+    create: (it, ctx) => softRattan(ctx, it, 0),   // softkit (T8): the weave is a shade pattern, not a texture
     iso: [{ shape: 'cyl', box: [-0.4, 0, -0.4, 0.4, 0.76, 0.4], color: 'role:wood' }, { shape: 'box', box: [-0.28, 0.2, -0.21, 0.28, 0.3, 0.29], color: 'role:linen' }],
   },
 
@@ -671,29 +547,8 @@ registerProps({
   'u-sectional': {
     footprint: [3.6, 1.9], height: 0.82, params: ['w', 'l', 'd', 'color'], tags: ['living', 'den', 'media'],
     create(it, ctx) {
-      const { THREE, std, box, group, colors, hex, mix, rng } = ctx;
-      const w = it.w || 3.6, l = it.l || 1.9, d = it.d || 0.95, g = group('U-Sectional');
-      const base = upholstery(it, colors, hex), shell = std(base, { roughness: 0.85 }), cushion = std(lift(mix, base), { roughness: 0.9 });
-      const legMat = std(colors.metal, { metalness: 0.8, roughness: 0.3 });
-      const legH = 0.1, deckY = 0.32, seatTop = 0.46, backD = 0.2, cw = d, z0 = -l / 2, wing = l - d;
-      g.add(box(w, deckY - legH, d, shell, 0, legH + (deckY - legH) / 2, z0 + d / 2));                       // the run's base
-      for (const s of [-1, 1]) g.add(box(cw, deckY - legH, wing, shell, s * (w / 2 - cw / 2), legH + (deckY - legH) / 2, z0 + d + wing / 2));   // the two chaises
-      g.add(box(w, 0.82 - deckY, backD, shell, 0, deckY + (0.82 - deckY) / 2, z0 + backD / 2));               // the back
-      legsAt(THREE, g, legMat, [[-w / 2 + 0.08, z0 + 0.08], [w / 2 - 0.08, z0 + 0.08], [-w / 2 + 0.08, l / 2 - 0.08], [w / 2 - 0.08, l / 2 - 0.08], [-w / 2 + cw - 0.08, l / 2 - 0.08], [w / 2 - cw + 0.08, l / 2 - 0.08], [-w / 2 + cw - 0.08, z0 + d - 0.08], [w / 2 - cw + 0.08, z0 + d - 0.08]], legH, 0.02, 0.02);
-      const runIn = w - 2 * cw - 0.02, n = Math.max(1, Math.round(runIn / 0.7)), sw = runIn / n - 0.015, sd = d - backD - 0.04;
-      for (let i = 0; i < n; i++) {
-        const x = -runIn / 2 + runIn / n * (i + 0.5);
-        g.add(box(sw, seatTop - deckY, sd, cushion, x, deckY + (seatTop - deckY) / 2, z0 + backD + sd / 2 + 0.02));
-        const bc = box(sw, 0.36, 0.12, cushion, x, seatTop + 0.18, z0 + backD + 0.05); bc.rotation.x = -0.1; g.add(bc);
-      }
-      for (const s of [-1, 1]) {
-        const x = s * (w / 2 - cw / 2);
-        g.add(box(cw - 0.03, seatTop - deckY, l - backD - 0.03, cushion, x, deckY + (seatTop - deckY) / 2, z0 + backD + (l - backD) / 2));
-        const bc = box(cw - 0.03, 0.36, 0.12, cushion, x, seatTop + 0.18, z0 + backD + 0.05); bc.rotation.x = -0.1; g.add(bc);
-      }
-      const pillow = box(0.4, 0.4, 0.11, std(rng() < 0.5 ? colors.accent : colors.fabric2, { roughness: 0.9 }), -w / 2 + cw / 2 + 0.1, seatTop + 0.22, z0 + backD + 0.2);
-      pillow.rotation.set(-0.18, (rng() - 0.5) * 0.5, 0.08); g.add(pillow);
-      return g;
+      const w = it.w || 3.6, l = it.l || 1.9, d = it.d || 0.95;
+      return softSectional(ctx, it, 'U-Sectional', { kind: 'U', w, l, d, side: 1, deckY: 0.32, seatTop: 0.46, backH: 0.82, backD: 0.2, legH: 0.1, legKind: 'metal', top: 0.909, wing: [] }, upholstery(it, ctx.colors, ctx.hex));
     },
     iso: [
       { shape: 'box', box: [-1.8, 0.1, -0.95, 1.8, 0.46, 0.0], color: 'role:fabric' },
@@ -707,28 +562,7 @@ registerProps({
   // L-sectional's. Footprint w × l.
   'modular-sectional': {
     footprint: [2.5, 1.65], height: 0.86, params: ['w', 'l', 'd', 'hand', 'color'], tags: ['living', 'den', 'media'],
-    create(it, ctx) {
-      const { THREE, std, box, group, colors, hex, mix, rng } = ctx;
-      const w = it.w || 2.5, l = it.l || 1.65, d = it.d || 0.92, side = it.hand === 'right' ? -1 : 1, g = group(`Modular Sectional (${it.hand === 'right' ? 'right' : 'left'})`);
-      const base = upholstery(it, colors, hex), shell = std(base, { roughness: 0.9 }), cushion = std(lift(mix, base, 0.1), { roughness: 0.92 });
-      const wood = std(colors.wood, { roughness: 0.5 }), legH = 0.13, seatTop = 0.42, backTop = 0.7, backD = 0.16, gap = 0.012, z0 = -l / 2;
-      const module = (mw, md, x, z, back) => {
-        g.add(box(mw - gap, seatTop - 0.05 - legH, md - gap, shell, x, legH + (seatTop - 0.05 - legH) / 2, z));
-        g.add(box(mw - gap - 0.02, 0.05, md - gap - 0.02 - (back ? backD : 0), cushion, x, seatTop - 0.025, z + (back ? backD / 2 : 0)));
-        if (back) g.add(box(mw - gap, backTop - (seatTop - 0.05), backD, shell, x, seatTop - 0.05 + (backTop - seatTop + 0.05) / 2, z - md / 2 + backD / 2));
-        for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-          const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.014, legH, 8), wood);
-          leg.position.set(x + sx * (mw / 2 - 0.1), legH / 2, z + sz * (md / 2 - 0.1)); leg.rotation.set(-sz * 0.1, 0, sx * 0.1); leg.castShadow = true; g.add(leg);
-        }
-      };
-      const cw = d, n = Math.max(2, Math.round((w - cw) / 0.85)), mw = (w - cw) / n;
-      for (let i = 0; i < n; i++) module(mw, d, -side * (w / 2) + side * (mw * (i + 0.5)), z0 + d / 2, true);   // the run, from the far end toward the chaise
-      module(cw, d, side * (w / 2 - cw / 2), z0 + d / 2, true);                                                    // the corner module
-      module(cw, l - d, side * (w / 2 - cw / 2), z0 + d + (l - d) / 2, false);                                     // the chaise
-      const pillow = box(0.42, 0.42, 0.1, std(rng() < 0.5 ? colors.accent : colors.fabric2, { roughness: 0.9 }), -side * (w / 2 - 0.5), seatTop + 0.2, z0 + backD + 0.12);
-      pillow.rotation.set(-0.2, (rng() - 0.5) * 0.4, 0.1); g.add(pillow);
-      return g;
-    },
+    create: (it, ctx) => softModular(ctx, it, `Modular Sectional (${it.hand === 'right' ? 'right' : 'left'})`, upholstery(it, ctx.colors, ctx.hex)),
     iso: [
       { shape: 'box', box: [-1.25, 0.13, -0.825, 1.25, 0.42, 0.08], color: 'role:fabric' },
       { shape: 'box', box: [0.3, 0.13, 0.08, 1.25, 0.42, 0.825], color: 'role:fabric' },

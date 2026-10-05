@@ -321,6 +321,23 @@ export const PLACEMENT: Record<string, Place> = {
   'leaner-mirror': def('decor', ['dx-leaner-mirror'], [...BEDS, 'foyer', 'hall'], [], { onSurface: false, against: 'wall', clear: C(0.4, 0.05), colorRole: null }),
 };
 
+// ---- OWNER soft ---------------------------------------------------------------------------------------------------
+// New soft types (assets/props/soft2.ts), each under a NEW role so no existing role's candidate list changes and no pick re-rolls: they are
+// dormant until the dress phase places them. Never append to an existing role's list.
+Object.assign(PLACEMENT, {
+  'towel-stack': def('textile', ['soft-towel-stack'], BATHS, [], { onSurface: true, surfaces: ['bath', 'fitted', 'storage'], colorRole: 'accent' }),
+  'towel-ring-set': def('art', ['soft-towel-ring'], BATHS, [], { mountY: 0.95, colorRole: 'metal' }),
+  'robe-hook': def('art', ['soft-robe-hook'], [...BATHS, ...BEDS], [], { mountY: 0.55, colorRole: 'linen' }),
+  'trough-planter': def('plant', ['soft-planter'], [...LIVING, 'foyer', 'sunroom', ...KITCHENS], [], { clear: C(0.2, 0.05, 0.05), colorRole: 'accent' }),
+  'pothos': def('plant', ['soft-pothos'], [...LIVING, ...KITCHENS, ...BEDS, ...WORK], [], { onSurface: true, surfaces: ON }),
+  // window treatments (assets/props/windows.ts): roles `blind` and `shutter` are the plan's own, the others new too; none is asked for until the dress phase
+  'roman-blind': def('textile', ['blind'], [...LIVING, ...BEDS, ...DINING, ...KITCHENS], [], { against: 'window', hangs: 'wall' }),
+  'roller-shade': def('textile', ['blind'], [...LIVING, ...BEDS, ...WORK, ...KITCHENS, ...BATHS], [], { against: 'window', hangs: 'wall' }),
+  'cafe-curtain': def('textile', ['blind-cafe'], [...KITCHENS, ...BATHS, ...DINING], [], { against: 'window', hangs: 'wall' }),
+  'shutters': def('textile', ['shutter'], [...LIVING, ...BEDS, ...DINING, ...KITCHENS], [], { against: 'window', hangs: 'wall', colorRole: 'linen' }),
+  'valance': def('textile', ['valance'], [...LIVING, ...BEDS, ...DINING, ...KITCHENS], [], { against: 'window', hangs: 'wall' }),
+});
+
 // A floor plant stands wherever people live: which rooms have the light and the size for one is the composer's business
 // (its clearances and windows), not a list per plant, and a bedroom that could only take three of the fourteen kinds
 // would put the same three in every house.

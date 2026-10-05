@@ -44,5 +44,8 @@ import './dress-bed.js';
 import './dress-bath.js';
 import './dress-hall.js';
 
+// OWNER soft: new soft types, and in-place rebuilds of soft goods registered above (replaces by type id, Map order untouched)
+import './soft2.js';
+
 // BAKED LAST — assets/props/baked.ts overrides registered types in place, so it stays the last import; another stream's module goes ABOVE this line
 import './baked.js';
