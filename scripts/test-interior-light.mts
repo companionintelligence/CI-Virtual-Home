@@ -47,7 +47,7 @@ import { lumaOfFile, lumaMetrics, roundLuma, lightAcceptance, type Luma } from '
 import { loadManifest } from './review/manifest.mts';
 
 const args = parseArgs(process.argv.slice(2));
-const OUT_ROOT = path.join(REVIEW_DIR, 'after', 'light');
+const OUT_ROOT = path.join(REVIEW_DIR, 'after', args.stream && args.stream !== 'true' ? args.stream : 'light2');   // --stream light  reads LIGHT v1's old directory
 const out = (...p: string[]) => path.join(OUT_ROOT, ...p);
 const LIGHT_CAP = 16;
 
@@ -353,14 +353,143 @@ async function probeMode(): Promise<number> {
   return 0;
 }
 
+
+// ---- leak: does a room's light stay in its room? ------------------------------------------------------------------------------------------
+// LIGHT v2 item 2. For every room of every house (or --houses a,b), at night, from the room's NW corner camera (the rig's), three plain renders
+// of the same state: everything on; every OTHER room's lamp pools at intensity 0; every other room's light of any kind at 0. A world-position
+// pass of the same frame says which pixels are the room's own surfaces (its box shrunk by 1 cm: walls are centred on the room bounds, so the room's own wall face is 6-8 cm inside them and the next room's as far outside, and the end cap of a wall at an opening belongs to neither), and only those are
+// judged: a room seen through an opening is not the room (its own pool lights it, legitimately), and neither is a surface where two rooms' rectangles overlap (an authored 20 cm overlap puts one room's sofa inside the next). The mask is eroded by a pixel (the canvas is multisampled, the position pass is not: a slat screen or a balustrade would otherwise count its
+// own anti-aliased edge against the room behind it). A pixel CHANGED when a channel moved by 3 of 255 or more in the tone-mapped 8-bit frame. Limits (the task's acceptance): <= 1 % of a lampless room's pixels, <= 3 % of a lamp room's.
+//   pnpm run test:light -- --leak [--houses a,b] [--tod night] [--stream <dir>] [--min-px 1500] [--query no=roomclip]
+const LEAK_T = 3;
+async function leakMode(): Promise<number> {
+  const all = fs.readdirSync(path.join(ROOT, 'content', 'houses')).filter(f => f.endsWith('.json') && f !== 'index.json' && !f.endsWith('.plan.json')).map(f => f.replace(/\.json$/, '')).sort();
+  const houses = args.houses && args.houses !== 'true' ? args.houses.split(',') : all;
+  const tod = args.tod && args.tod !== 'true' ? args.tod : 'night';
+  const minPx = Number(args['min-px'] && args['min-px'] !== 'true' ? args['min-px'] : 1500);
+  const session = await startSession();
+  const result: any[] = [];
+  try {
+    for (const house of houses) {
+      const w = await session.open(house, { res: '360', composer: false, query: args.query && args.query !== 'true' ? args.query : '' });
+      await w.page.evaluate((t: string) => (window as any).__houseSetLighting(t), tod);
+      const rooms: any[] = await w.page.evaluate(() => {
+        const d = (window as any).__houseDebug(), s = d.house.spec, out: any[] = [];
+        s.levels.forEach((lv: any) => (lv.rooms || []).forEach((r: any, ri: number) => out.push({ key: `${lv.id}#${ri}`, lv: lv.id, name: r.name, program: r.program || null, y: lv.y || 0, H: lv.height || 3, b: { x: r.bounds.x, z: r.bounds.z, w: r.bounds.w, d: r.bounds.d } })));
+        return out;
+      });
+      const pools: string[] = await w.page.evaluate(() => { const o: string[] = []; (window as any).__houseDebug().scene.traverse((l: any) => { if (l.isLight && l.userData.lampPool) o.push(l.userData.roomKey); }); return o; });
+      let nPool = 0;
+      for (const r of rooms) {
+        if (r.program === 'outdoor' || r.b.w * r.b.d < 2.5) continue;
+        if (args.room && args.room !== 'true' && args.room !== r.name) continue;
+        const cam = cornerCam(r.b, r.y, 'NW');
+        const m: any = await w.page.evaluate(({ cam, key, box, others, T, res, eachPool }: any) => {
+          const W = window as any, d = W.__houseDebug(), renderer = d.renderer, scene = d.scene, TH = W.__THREE, c = d.camera;
+          c.position.set(...cam.pos); c.lookAt(...cam.target); c.fov = cam.fov; c.near = cam.near; c.updateProjectionMatrix();
+          const lights: any[] = []; scene.traverse((o: any) => { if (o.isLight && o.userData.fixtureLight) lights.push(o); });
+          const base = new Map(lights.map(l => [l, l.intensity]));
+          const set = (kind: string) => { for (const l of lights) { const mine = l.userData.roomKey === key; l.intensity = !mine && (kind === 'all' || (kind === 'pools' && l.userData.lampPool)) ? 0 : base.get(l); } };
+          const orig = renderer.render;
+          let res_: any = null;
+          (renderer as any).render = (s: any, cm: any) => {
+            (renderer as any).render = orig;
+            const gl = renderer.getContext(), cv = renderer.domElement, Wd = cv.width, Hd = cv.height;
+            const grab = () => { const px = new Uint8Array(Wd * Hd * 4); gl.readPixels(0, 0, Wd, Hd, gl.RGBA, gl.UNSIGNED_BYTE, px); return px; };
+            set('none'); orig.call(renderer, s, cm); const A = grab();
+            set('pools'); orig.call(renderer, s, cm); const B = grab();
+            set('all'); orig.call(renderer, s, cm); const C = grab();
+            set('none');
+            // the world position of every pixel
+            const rt = new TH.WebGLRenderTarget(Wd, Hd, { type: TH.FloatType, format: TH.RGBAFormat, depthBuffer: true, minFilter: TH.NearestFilter, magFilter: TH.NearestFilter });
+            const pm = new TH.MeshBasicMaterial({ fog: false });
+            pm.onBeforeCompile = (sh: any) => {
+              sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vhPos;').replace('#include <project_vertex>', '#include <project_vertex>\nvec4 vhw = vec4( transformed, 1.0 );\n#ifdef USE_INSTANCING\nvhw = instanceMatrix * vhw;\n#endif\nvhw = modelMatrix * vhw; vhPos = vhw.xyz;');
+              sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vhPos;').replace('#include <opaque_fragment>', 'gl_FragColor = vec4( vhPos, 1.0 );');
+            };
+            const prevOverride = scene.overrideMaterial, prevFog = scene.fog, prevBg = scene.background, prevTone = renderer.toneMapping;
+            scene.overrideMaterial = pm; scene.fog = null; scene.background = null; renderer.toneMapping = TH.NoToneMapping;
+            // a see-through surface (window glass, a 10 % overlay plane) is not what the pixel shows: hide it, so the position is the opaque surface behind
+            const seeThrough: any[] = [];
+            scene.traverse((o: any) => { if (!o.isMesh || !o.visible) return; const ms = Array.isArray(o.material) ? o.material : [o.material]; if (ms.some((m: any) => m && ((m.transparent && m.opacity < 0.95) || (m.transmission || 0) > 0))) { seeThrough.push(o); o.visible = false; } });
+            renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); orig.call(renderer, s, cm);
+            for (const o of seeThrough) o.visible = true;
+            const P = new Float32Array(Wd * Hd * 4); renderer.readRenderTargetPixels(rt, 0, 0, Wd, Hd, P);
+            renderer.setRenderTarget(null); scene.overrideMaterial = prevOverride; scene.fog = prevFog; scene.background = prevBg; renderer.toneMapping = prevTone; rt.dispose(); pm.dispose();
+            const PAD = -0.01, mask = new Uint8Array(Wd * Hd);
+            let inMask = 0;
+            for (let i = 0; i < Wd * Hd; i++) {
+              if (P[i * 4 + 3] < 0.5) continue;
+              const x = P[i * 4], y = P[i * 4 + 1], z = P[i * 4 + 2];
+              if (x < box.x0 - PAD || x > box.x1 + PAD || z < box.z0 - PAD || z > box.z1 + PAD || y < box.y0 - 0.02 || y > box.y1 - 0.005) continue;
+              if (others.some((o: any) => x >= o.x0 && x <= o.x1 && z >= o.z0 && z <= o.z1)) continue;   // where two rooms' rectangles overlap the surface is not one room's
+              mask[i] = 1;
+            }
+            // one pixel in from the room's silhouette: the canvas is multisampled and the position pass is not, so a pixel on the edge of a see-through
+            // boundary (a slat screen, a balustrade, a window frame) blends the next room's lit surface behind it into the room's own surface
+            const keep = new Uint8Array(Wd * Hd);
+            for (let yy = 1; yy < Hd - 1; yy++) for (let xx = 1; xx < Wd - 1; xx++) {
+              const i = yy * Wd + xx;
+              if (mask[i] && mask[i - 1] && mask[i + 1] && mask[i - Wd] && mask[i + Wd] && mask[i - Wd - 1] && mask[i - Wd + 1] && mask[i + Wd - 1] && mask[i + Wd + 1]) { keep[i] = 1; inMask++; }
+            }
+            mask.set(keep);
+            const samples: number[][] = [];
+            const diff = (X: Uint8Array) => { let chg = 0, sum = 0, minX = 1e9, maxX = -1e9, minZ = 1e9, maxZ = -1e9, minY = 1e9, maxY = -1e9; for (let i = 0; i < Wd * Hd; i++) { if (!mask[i]) continue; const d = Math.max(Math.abs(A[i * 4] - X[i * 4]), Math.abs(A[i * 4 + 1] - X[i * 4 + 1]), Math.abs(A[i * 4 + 2] - X[i * 4 + 2])); sum += d; if (d >= T) { chg++; if (X !== B && X !== C && samples.length < 400 && chg % 17 === 0) samples.push([P[i * 4], P[i * 4 + 1], P[i * 4 + 2], d]); minX = Math.min(minX, P[i * 4]); maxX = Math.max(maxX, P[i * 4]); minY = Math.min(minY, P[i * 4 + 1]); maxY = Math.max(maxY, P[i * 4 + 1]); minZ = Math.min(minZ, P[i * 4 + 2]); maxZ = Math.max(maxZ, P[i * 4 + 2]); } } return { chg, sum, where: chg ? [minX, maxX, minY, maxY, minZ, maxZ].map(v => Math.round(v * 100) / 100) : null }; };
+            const dp = diff(B), da = diff(C);
+            let chgFrame = 0; for (let i = 0; i < Wd * Hd; i++) if (Math.max(Math.abs(A[i * 4] - B[i * 4]), Math.abs(A[i * 4 + 1] - B[i * 4 + 1]), Math.abs(A[i * 4 + 2] - B[i * 4 + 2])) >= T) chgFrame++;
+            const each: any[] = [];
+            if (eachPool) for (const l of lights) {
+              if (!l.userData.lampPool || l.userData.roomKey === key) continue;
+              for (const o of lights) o.intensity = o === l ? 0 : base.get(o);
+              orig.call(renderer, s, cm); const X = grab(); const r = diff(X);
+              let hit: any = null;
+              if (r.chg && samples.length) {
+                const sp = samples[0], dir = new TH.Vector3(sp[0], sp[1], sp[2]).sub(c.position).normalize(), rc = new TH.Raycaster(c.position.clone(), dir, 0.05, 80);
+                const hs = rc.intersectObjects(scene.children, true).filter((h: any) => h.object.isMesh && h.object.visible);
+                if (hs[0]) { const o = hs[0].object, mm = Array.isArray(o.material) ? o.material[0] : o.material; hit = { name: o.name, parent: o.parent && o.parent.name, type: mm.type, transmission: mm.transmission || 0, transparent: !!mm.transparent, opacity: mm.opacity, side: mm.side, ud: Object.keys(o.userData || {}).join(','), dist: +hs[0].distance.toFixed(2), pt: hs[0].point.toArray().map((v: number) => Math.round(v * 100) / 100) }; }
+              }
+              if (r.chg) each.push({ roomKey: l.userData.roomKey, chg: r.chg, hit, samples: samples.splice(0, 12).map(v => v.map((q: number) => Math.round(q * 100) / 100)), where: r.where, at: l.position.toArray().map((v: number) => Math.round(v * 100) / 100) });
+            }
+            res_ = { total: Wd * Hd, inMask, chgPools: dp.chg, chgAll: da.chg, chgFrame, meanPools: inMask ? dp.sum / inMask : 0, meanAll: inMask ? da.sum / inMask : 0, where: dp.where, each };
+          };
+          W.__housePlainRender = true;
+          try { W.__houseSnapshot({ res, dressing: { walls: 'up', roof: 'on' }, quality: 0.3 }); } finally { W.__housePlainRender = false; (renderer as any).render = orig; for (const [l, v] of base) l.intensity = v; }
+          return res_;
+        }, { cam, key: r.key, box: { x0: r.b.x, x1: r.b.x + r.b.w, z0: r.b.z, z1: r.b.z + r.b.d, y0: r.y, y1: r.y + r.H }, others: rooms.filter(o => o.lv === r.lv && o.key !== r.key && o.program !== 'outdoor').map(o => ({ x0: o.b.x, x1: o.b.x + o.b.w, z0: o.b.z, z1: o.b.z + o.b.d })), T: LEAK_T, res: '360', eachPool: args.each === 'true' });
+        const lamp = pools.includes(r.key); if (lamp) nPool++;
+        const row = { house, room: r.name, level: r.lv, key: r.key, lamp, ...m, pctPools: m.inMask ? 100 * m.chgPools / m.inMask : 0, pctAll: m.inMask ? 100 * m.chgAll / m.inMask : 0 };
+        result.push(row);
+        if (args.each === 'true' && m.each.length) console.log(`    ${house}/${r.name} (${r.key}): changed by`, JSON.stringify(m.each), 'in', JSON.stringify(m.where));
+        if (m.inMask < minPx) continue;
+        const lim = lamp ? 3 : 1;
+        say({ check: `other rooms' pools: <= ${lim} % of the ${lamp ? 'lamp' : 'lampless'} room's pixels change`, frame: `${house}/${r.name}`, value: `${num(row.pctPools, 2)} % of ${m.inMask} px (all other lights ${num(row.pctAll, 2)} %)`, limit: String(lim), ok: row.pctPools <= lim });
+      }
+      if (w.errors.length) say({ check: 'no page errors', frame: house, value: w.errors[0], limit: 'none', ok: false });
+      console.log(`  ${house}: ${rooms.length} rooms, ${nPool} lamp rooms with a pool`);
+      await w.close();
+    }
+  } finally { await session.close(); }
+  writeText(out('leak.json'), stableJson({ schema: 1, what: 'does a room\'s light stay in its room (scripts/test-interior-light.mts --leak)', tod, threshold: LEAK_T, rows: result, machine: machine() }));
+  const judged = result.filter(r => r.inMask >= minPx);
+  const worst = (xs: any[], k: string) => xs.reduce((a, r) => Math.max(a, r[k]), 0);
+  const lampRooms = judged.filter(r => r.lamp), lampless = judged.filter(r => !r.lamp);
+  console.log(`\n${result.length} rooms, ${judged.length} judged (>= ${minPx} px of the room's own surfaces), ${result.filter(r => r.lamp).length} with a pool`);
+  console.log(`  lamp rooms    ${lampRooms.length}: worst ${num(worst(lampRooms, 'pctPools'), 2)} % (pools only), ${num(worst(lampRooms, 'pctAll'), 2)} % (all other lights)   limit 3 %`);
+  console.log(`  lampless      ${lampless.length}: worst ${num(worst(lampless, 'pctPools'), 2)} % (pools only), ${num(worst(lampless, 'pctAll'), 2)} % (all other lights)   limit 1 %`);
+  const badRooms = rows.filter(r => !r.ok).length;
+  console.log(badRooms ? `${badRooms} of ${rows.length} room rows failed` : `all ${rows.length} room rows pass`);
+  return badRooms ? 1 : 0;
+}
+
 let code = 0;
-if (args.probe === 'true') code = await probeMode();
+if (args.leak === 'true') code = await leakMode();
+else if (args.probe === 'true') code = await probeMode();
 else if (args['player-calls'] === 'true') code = await playerCallsMode();
 else if (args.hitch === 'true') code = await hitchMode();
 else if (args.portal === 'true') code = await portalMode();
 else if (args.bench === 'true') code = await benchMode();
 else code = await fixturesMode();
 const bad = rows.filter(r => !r.ok).length;
-if (args.portal !== 'true' && args.probe !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
+if (args.portal !== 'true' && args.probe !== 'true' && args.leak !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
 console.log(`(load ${machine().load1})`);
 process.exit(code);

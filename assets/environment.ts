@@ -35,6 +35,8 @@
 // Everything is a pure function of the preset and the sun direction: no randomness, no clock — the frame-hash
 // test and the goldens depend on two runs agreeing.
 
+import { installRoomClip } from './room-clip.js';
+
 export type Preset = {
   label: string;
   sky: [string, string, string];
@@ -290,6 +292,7 @@ export function installSkyFog(THREE: any): { ground: any; sky: any } {
   const add = (u: any) => { if (u && u.fogColor && !u.fogGroundColor) { u.fogGroundColor = { value: ground }; u.fogSkyColor = { value: sky }; } };
   for (const k of Object.keys(THREE.ShaderLib)) add(THREE.ShaderLib[k].uniforms);
   add(THREE.UniformsLib.fog);
+  installRoomClip(THREE);   // the page's one patch point that runs before any program compiles: the room's light stays in its room (room-clip.ts)
   const C = THREE.ShaderChunk;
   C.fog_pars_vertex = '#ifdef USE_FOG\n\tvarying float vFogDepth;\n\tvarying vec3 vFogView;\n#endif';
   C.fog_vertex = '#ifdef USE_FOG\n\tvFogDepth = - mvPosition.z;\n\tvFogView = mvPosition.xyz;\n#endif';

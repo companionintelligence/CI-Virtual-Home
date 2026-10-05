@@ -30,6 +30,7 @@ import { inRect } from './house-geometry.js';
 import { programKind, fanPlan, lampPlan, REGISTRY_LAMPS, LAMP_ITEMS } from './kit-rules.js';
 import { schemeOf } from './house-scheme.js';
 import { heroFrame } from './hero-frame.js';
+import { clearSlots, setSlot, codedDecay, roomClipBox } from './room-clip.js';
 
 export const LIGHT_CAP = 16;          // dynamic lights per house (one per room at most)
 const DAY_GAIN = 0.035;               // lamp gain when no environment has announced one (a daylight preset's)
@@ -122,7 +123,7 @@ if (typeof window !== 'undefined') {
   });
   (window as any).__houseFixtures = {   // QA hook: what the fixtures did, and a way to drive the gain by hand
     applyLampGain,
-    stats: () => current && { ...current.stats, gain: current.gain, lights: current.lights.map(l => { const p = l.light.getWorldPosition(new l.light.position.constructor()); return { room: l.room, base: +l.base.toFixed(2), at: [p.x, p.y, p.z].map(v => +v.toFixed(2)) }; }) },
+    stats: () => current && { ...current.stats, gain: current.gain, lights: current.lights.map(l => { const p = l.light.getWorldPosition(new l.light.position.constructor()); return { room: l.room, pool: !!l.pool, slot: l.slot, base: +l.base.toFixed(2), at: [p.x, p.y, p.z].map(v => +v.toFixed(2)) }; }) },
   };
 }
 
@@ -132,6 +133,7 @@ function stateFor(ctx) {
   let s = states.get(ctx.anchors);
   if (s) return s;
   const { THREE, spec } = ctx;
+  clearSlots();   // a new house on screen: no room clip survives from the last one (room-clip.ts)
   const rng = mulberry32(fnv1a(`${spec.id}:fixtures`));
   const pick = arr => arr[Math.floor(rng() * arr.length)];
 
@@ -438,6 +440,9 @@ export function dressLevel(ctx) {
   }
   const clearOf = (p: Pt, reach: number) => keepOut.every(k => segDist(p, k.a, k.b) > k.r + reach);
   const partitions = (lv.partitions || []).map(p => ({ a: { x: p.from[0], z: p.from[1] }, b: { x: p.to[0], z: p.to[1] } }));
+  // the walls a room's light is clipped by (room-clip.ts): the storey's outline and its partitions
+  const footprint = (lv.footprint || []) as Array<{ x: number; z: number; w: number; d: number }>;
+  const partitionSegs = (lv.partitions || []).filter(p => Array.isArray(p.from) && Array.isArray(p.to)).map(p => ({ from: p.from as [number, number], to: p.to as [number, number] }));
   const offWalls = (p: Pt, reach: number) => partitions.every(w => segDist(p, w.a, w.b) > reach);
 
   // what stands in each room (items the builder placed on this storey), as world boxes
@@ -571,25 +576,30 @@ export function dressLevel(ctx) {
       // a lamp room's fill is LAMP_ROOM_FILL_K of the floor target; at 0 the lamp's pool IS the room's light and no spot is made
       if (!pool || LAMP_ROOM_FILL_K > 0) {
         const base = (pool ? LAMP_ROOM_FILL_K : ROOM_FILL_K) * floorE * drop ** decay / Math.max(0.5, win);
-        const light = new THREE.SpotLight(s.warm, base * s.gain, distance, angle, FILL_PENUMBRA, decay);
+        const slot = s.lights.length;
+        setSlot(slot, roomClipBox(b, y, H, footprint, partitionSegs));
+        const light = new THREE.SpotLight(s.warm, base * s.gain, distance, angle, FILL_PENUMBRA, codedDecay(decay, slot));
         light.name = 'Fixture light'; light.castShadow = false;
         light.position.copy(local(cx, ly, cz));
         light.target.position.copy(local(cx, y, cz));
         light.userData.fixtureLight = true;   // not `fixture`: that tag means "a mesh whose emissive the gain scales"
+        light.userData.roomKey = `${lv.id}#${ri}`;
         light.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
         g.add(light, light.target);
-        s.lights.push({ light, base, room: room.name });
+        s.lights.push({ light, base, room: room.name, pool: false, slot });
         s.stats.lights++;
       }
       if (pool) {
         const diag = Math.hypot(b.w, b.d), pbase = LAMP_POOL_I * Math.min(LAMP_POOL_MAX, Math.sqrt(area) / 3);
-        const pl = new THREE.PointLight(s.warm, pbase * s.gain, LAMP_POOL_REACH * diag, LAMP_POOL_DECAY);
+        const slot = s.lights.length;
+        setSlot(slot, roomClipBox(b, y, H, footprint, partitionSegs));
+        const pl = new THREE.PointLight(s.warm, pbase * s.gain, LAMP_POOL_REACH * diag, codedDecay(LAMP_POOL_DECAY, slot));
         pl.name = 'Lamp pool'; pl.castShadow = false;
         pl.position.copy(local(pool.x, pool.y, pool.z));
-        pl.userData.fixtureLight = true; pl.userData.lampPool = true;
+        pl.userData.fixtureLight = true; pl.userData.lampPool = true; pl.userData.roomKey = `${lv.id}#${ri}`;
         pl.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
         g.add(pl);
-        s.lights.push({ light: pl, base: pbase, room: room.name });
+        s.lights.push({ light: pl, base: pbase, room: room.name, pool: true, slot });
         s.stats.lights++; s.stats.pools++;
       }
     }
