@@ -26,6 +26,8 @@
 //                   and the lint sees the flower-jug case the first cut did not (a control)
 //   M  reach          REACH (how far a small good's built mesh passes its measured box) holds over 96 fresh seeds of every surface type at every variant (scripts/dress-reach.mts
 //                   measured the table over 1000), and no spilling type is missing
+//   Q  in the room    every dress item's origin is within 0.5 m of its room's bounds: a host drawn across the edge of a small room (palnknoll's Outdoor Kitchen counter) is
+//                   dressed only near the room, the validator's "lies outside room" (0.6 m) never fires on a dress item
 //   N  curtain parts  PARTS (the sink run's tap: a 3 cm column over a 0.96 m body) covers every mesh the page builds for the type, at three widths and three depths; a table
 //                   without the tap fails the same measurement (a control)
 //   O  curtain plan   over the 30 houses baked and the fixtures, no café curtain's box (plan, catalog heights, PARTS) meets another item's, however it is stood over, parted
@@ -660,3 +662,24 @@ test('O2 (controls): the first cut\'s curtains meet what the plan now keeps clea
   }
   assert.ok(clashes.size >= 3, `the first cut's neighbours clash in ${[...clashes]}`);
 });
+
+// ---- Q: a dress item is in its room -------------------------------------------------------------------------------------------------------
+test('Q: every dress item stands within 0.5 m of the bounds of its room, even where its host reaches out of them', () => {
+  let n = 0, reaching = 0;
+  for (const { id, spec } of fleet()) for (const { room } of rooms(spec)) {
+    const r = dressRooms(spec).get(room); if (!r) continue;
+    const b = room.bounds;
+    for (const it of r.items) {
+      n++; assert.ok(it.at[0] >= b.x - 0.5 && it.at[0] <= b.x + b.w + 0.5 && it.at[1] >= b.z - 0.5 && it.at[1] <= b.z + b.d + 0.5, `${id}/${room.name}: ${it.type} at ${it.at} is outside the room`);
+    }
+    // a host that reaches out of its room: the dress phase said why it left part of it bare
+    if ((room.items || []).some((h: any) => HOSTS_OF_NOTE(h, b)) && r.skipped.some((x: any) => /outside the room/.test(x.why))) reaching++;
+  }
+  assert.ok(n >= 800, `${n} dress items`);
+  assert.ok(reaching >= 1, 'palnknoll\'s Outdoor Kitchen: a counter across the edge of the room, dressed only inside it');
+});
+/** an authored host whose box passes the room's bounds by more than 0.5 m */
+function HOSTS_OF_NOTE(it: any, b: { x: number; z: number; w: number; d: number }): boolean {
+  const h = hostOf(it); if (!h) return false;
+  return h.rects.some(r => { const [x0, z0] = toWorld(h, r[0], r[1]), [x1, z1] = toWorld(h, r[2], r[3]); return Math.min(x0, x1) < b.x - 0.5 || Math.max(x0, x1) > b.x + b.w + 0.5 || Math.min(z0, z1) < b.z - 0.5 || Math.max(z0, z1) > b.z + b.d + 0.5; });
+}

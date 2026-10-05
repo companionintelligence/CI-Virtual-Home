@@ -171,6 +171,9 @@ export class Dresser {
     const total = h.rects.reduce((a, q) => a + rectArea(q), 0);
     if (this.covered(h) + fw * fd > (o.cover ?? (h.kind === 'tank' ? 0.8 : COVER)) * total + 1e-9) { this.skip(slot, `the ${h.type} would be over ${Math.round((o.cover ?? COVER) * 100)} % covered`); return null; }
     const [ox, oz] = turn(s.ox, s.oz, ex), [wx, wz] = toWorld(h, c[0] - ox, c[1] - oz);
+    // a host that reaches far out of its room (a counter drawn across the edge of a small room's bounds) is dressed only where it is near the room: the origin stays within 0.5 m of the
+    // bounds (the validator's "lies outside room" is 0.6 m)
+    { const b = this.room.bounds; if (wx < b.x - 0.5 || wx > b.x + b.w + 0.5 || wz < b.z - 0.5 || wz > b.z + b.d + 0.5) { this.skip(slot, `${type} would stand outside the room (the ${h.type} reaches out of its bounds)`); return null; } }
     const rot = ((h.rot + ex) % 360 + 360) % 360;
     const it: any = { type, at: [wx, wz] };
     if (rot) it.rot = mm(rot);
