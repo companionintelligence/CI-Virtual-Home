@@ -131,10 +131,10 @@ async function fixturesMode(): Promise<number> {
       say({ check: `lights <= ${LIGHT_CAP}`, frame: id, value: String(info.stats ? info.stats.lights : 0), limit: String(LIGHT_CAP), ok: !!info.stats && info.stats.lights <= LIGHT_CAP });
       say({ check: 're-lighting is idempotent (dusk x4 equal)', frame: id, value: info.stable ? 'equal' : 'differs', limit: 'equal', ok: info.stable });
       // the rig's facts (L1: soft fill, L3: lamp pools), read off the lights of the page at dusk
-      const spots = info.lights.filter((l: any) => l.type === 'SpotLight' && l.fixtureLight), pools = info.lights.filter((l: any) => l.pool);
+      const spots = info.lights.filter((l: any) => l.type === 'SpotLight' && l.fixtureLight && !l.pool), pools = info.lights.filter((l: any) => l.pool);
       say({ check: 'fill spots: penumbra 1.0, cone <= 1.25 rad', frame: id, value: spots.map((l: any) => `${l.penumbra}/${round(l.angle, 2)}`).join(' '), limit: '1 / 1.25', ok: spots.length > 0 && spots.every((l: any) => l.penumbra === 1 && l.angle <= 1.25 + 1e-9) });
       say({ check: HAS_LAMP[id] ? 'lamp room: one pool' : 'lampless room: no pool', frame: id, value: String(pools.length), limit: HAS_LAMP[id] ? '1' : '0', ok: pools.length === (HAS_LAMP[id] ? 1 : 0) });
-      if (HAS_LAMP[id]) say({ check: 'pool reaches no further than the room (0.62 x diagonal)', frame: id, value: `${round(pools[0]?.distance ?? 0, 2)} m`, limit: '<= 0.62 x 6.7 m', ok: !!pools[0] && pools[0].distance <= 0.62 * Math.hypot(4.5, 5) + 1e-6 });
+      if (HAS_LAMP[id]) say({ check: 'pool: a soft spot cone (penumbra 1, wide), falloff ends inside the room\'s diagonal', frame: id, value: `${pools[0]?.type} ${round(pools[0]?.angle ?? 0, 2)} rad, ${round(pools[0]?.distance ?? 0, 2)} m`, limit: '<= 0.8 x 6.7 m', ok: !!pools[0] && pools[0].type === 'SpotLight' && pools[0].penumbra === 1 && pools[0].distance <= 0.8 * Math.hypot(4.5, 5) + 1e-6 });
       if (w.errors.length) say({ check: 'no page errors', frame: id, value: w.errors[0], limit: 'none', ok: false });
       (fixturesMode as any).seen = ((fixturesMode as any).seen || {}) as Record<string, any>;
       (fixturesMode as any).seen[id] = { room: room.name, lights: info.lights, hasLamp: HAS_LAMP[id] };

@@ -9,10 +9,10 @@
 //   ceiling fans         living rooms, bedrooms and studies big enough to take one (the light kit: fixture = 'fan')
 //   one warm light       at most one per room and LIGHT_CAP lights per house, no shadows, chosen by a fixed rule — room
 //                        kind × √area, ties by storey then room order — so the same rooms light every run. It is
-//                        a wide, fully soft SpotLight fill aimed straight down whose distance cutoff stops just past the
-//                        room's side walls (see the room loop: the walls wash, the lawn and the lower roofs stay dark);
-//                        a room with a lamp also gets a PointLight at the lamp head nearest its centre (the lamp's
-//                        pool) and its fill drops to a fraction (plan 5.2 L1, L3)
+//                        a wide, fully soft SpotLight fill aimed straight down; a room with a registry lamp has instead
+//                        a soft SpotLight POOL at the lamp head nearest its centre, aimed into the room (plan 5.2 L1, L3,
+//                        LIGHT v2). Neither can leave its room: room-clip.ts cuts each light off at its room's walls, in
+//                        the shader, in every path (the distance cutoff alone lit the next room and the lawn)
 // and the storey's existing things get two touch-ups: window glass is tagged userData.windowGlow (the environment
 // gives it an emissive at dusk and night), and the catalog's halo lamp loses its cyan ring and blue PointLight —
 // the rings read as UI markers in every room — and becomes a drum floor lamp the lamp gain drives like any other
@@ -41,24 +41,29 @@ const ROOM_MIN_AREA = 2.5;            // m² — a cupboard gets no light
 // The room's own light is a soft FILL, not a spot (plan 5.2 L1). Before, it was aimed straight down at about ten times the
 // illuminance a sunlit wall receives, with a 0.45 penumbra: the nearest horizontal surface (a bed, a coffee table, an island)
 // clipped to white and the cone's edge scalloped the wall. Now it is a wide, fully soft cone at 0.3 of that.
-export const ROOM_FILL_K = 0.3;       // × the floor-illuminance target below (service 0.6 and hall 0.45 still scale it down)
+export const ROOM_FILL_K = 0.375;     // × the floor-illuminance target below (service 0.6 and hall 0.45 still scale it down). v1 had 0.3 and leaned on light leaking in from the next room; the room clip took that away, 0.375 is the most the five bench rooms take with every clip row under 1 %
 export const FILL_PENUMBRA = 1.0;     // the whole cone is a falloff: no edge
 export const FILL_ANGLE_MAX = 1.25;   // rad (~72°): a wider cone only lights the lawn
 /** lampGain under which the room's light is off for good: day (0.035). Offline (composer, editor) the spot is then HIDDEN, so the
  *  day shader has no spot lights to loop over; the live player keeps it in the scene at intensity 0 (see applyLampGain). */
 export const FILL_ON_GAIN = 0.1;
-// Practical lamp pools (plan 5.2 L3): a room that has a lamp is lit the way a room with a lamp is lit, from the lamp. One static
-// PointLight at the lamp head nearest the room's centre (no camera dependence, no shadow) IS that room's light: the fill spot is not made
-// when LAMP_ROOM_FILL_K is 0, so a lamp room costs one light like any other and a house still runs at most LIGHT_CAP of them (16 rooms lit;
-// the design's own budget line, "the lamp light replaces the room fill"). A positive LAMP_ROOM_FILL_K keeps a weak spot beside the pool at that
-// fraction of the floor target and charges the room two lights (measured: 7 of 16 lit rooms then lose the fill entirely in a lamp-heavy house).
-// The pool's intensity scales with the room's size (to a cap) and its reach is a fixed fraction of the room's diagonal: no shadows, so what keeps
-// it in its room is distance. The sky and bounce light that every room has anyway carry what the pool does not reach.
+// Practical lamp pools (plan 5.2 L3, LIGHT v2 item 3): a room that has a lamp is lit the way a room with a lamp is lit, from the lamp. One static
+// light at the lamp head nearest the room's centre (no camera dependence, no shadow) IS that room's light: the fill spot is not made when
+// LAMP_ROOM_FILL_K is 0, so a lamp room costs one light like any other and a house still runs at most LIGHT_CAP of them. v1 made it a PointLight;
+// a point light shines every way at once, and a lamp stands a hand's breadth from the curtain, the pillow or the wall it leans on, where the
+// 1/d^1.6 falloff blows those surfaces white long before the pool reaches the room (measured on the cutestarter bedroom: pool x1 clips 0.2 % of the
+// frame, x1.5 clips 2 %, x2 3 %, and at x1 the pool is too faint to read). It is a wide soft SpotLight now, aimed from the lamp head at the room's
+// middle (LAMP_POOL_AIM_Y over the floor), a cone of LAMP_POOL_ANGLE with a penumbra of 1 (no edge: the whole cone is the falloff): what is
+// behind the lamp is outside the cone and keeps its fill, what is beside it and in front gets the wash, brightest near the lamp and falling away
+// across the bed, the desk, the curtain and the far wall (x3 the v1 intensity, under 1 % of that frame clipped). What keeps it in its room is room-clip.ts.
 export const LAMP_ROOM_FILL_K = 0;
-export const LAMP_POOL_I = 2.6;       // cd at gain 1, for a 3 m room; × √area / 3, at most × LAMP_POOL_MAX
+export const LAMP_POOL_I = 7.8;       // cd at gain 1, for a 3 m room; × √area / 3, at most × LAMP_POOL_MAX
 export const LAMP_POOL_MAX = 1.6;
-export const LAMP_POOL_REACH = 0.62;  // × the room's diagonal
+export const LAMP_POOL_REACH = 0.8;   // × the room's diagonal: where the falloff reaches 0 (the clip, not this, stops it at the walls)
 export const LAMP_POOL_DECAY = 1.6;
+export const LAMP_POOL_ANGLE = 1.5;   // rad (86 degrees): the cone's half angle, as wide as a spot goes (behind the lamp is outside it, the walls beside it and ahead are in it)
+export const LAMP_POOL_PENUMBRA = 1.0;
+export const LAMP_POOL_AIM_Y = 1.5;   // m over the floor, at the room's centre: a slight tilt up, so the wall above the lamp and the curtain beside it take the wash
 
 // ---- the kind of room, from its name (the specs name rooms freely: "Sunset Terrace Suite", "Study & Bar") ----
 const KINDS: Array<[string, RegExp]> = [
@@ -593,12 +598,13 @@ export function dressLevel(ctx) {
         const diag = Math.hypot(b.w, b.d), pbase = LAMP_POOL_I * Math.min(LAMP_POOL_MAX, Math.sqrt(area) / 3);
         const slot = s.lights.length;
         setSlot(slot, roomClipBox(b, y, H, footprint, partitionSegs));
-        const pl = new THREE.PointLight(s.warm, pbase * s.gain, LAMP_POOL_REACH * diag, codedDecay(LAMP_POOL_DECAY, slot));
+        const pl = new THREE.SpotLight(s.warm, pbase * s.gain, LAMP_POOL_REACH * diag, LAMP_POOL_ANGLE, LAMP_POOL_PENUMBRA, codedDecay(LAMP_POOL_DECAY, slot));
         pl.name = 'Lamp pool'; pl.castShadow = false;
         pl.position.copy(local(pool.x, pool.y, pool.z));
+        pl.target.position.copy(local(cx, y + LAMP_POOL_AIM_Y, cz));
         pl.userData.fixtureLight = true; pl.userData.lampPool = true; pl.userData.roomKey = `${lv.id}#${ri}`;
         pl.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
-        g.add(pl);
+        g.add(pl, pl.target);
         s.lights.push({ light: pl, base: pbase, room: room.name, pool: true, slot });
         s.stats.lights++; s.stats.pools++;
       }

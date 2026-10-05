@@ -66,7 +66,7 @@ import { ROOM_FILL_K, FILL_PENUMBRA, FILL_ANGLE_MAX, FILL_ON_GAIN, LIGHT_CAP, hi
 import { TIME_OF_DAY, lookOf } from '../assets/environment.js';
 
 test('L1: the room light is a soft fill (numbers the acceptance was calibrated on)', () => {
-  assert.equal(ROOM_FILL_K, 0.3);
+  assert.equal(ROOM_FILL_K, 0.375);
   assert.equal(FILL_PENUMBRA, 1.0);
   assert.ok(FILL_ANGLE_MAX <= 1.25 + 1e-9);
   assert.equal(LIGHT_CAP, 16);
@@ -167,13 +167,17 @@ test('F0: house-scheme.ts is THREE-free and clock-free, and the kit carries it',
 });
 
 // ---- L3: lamp pools ---------------------------------------------------------------------------------------------------------------------
-import { LAMP_ROOM_FILL_K, LAMP_POOL_I, LAMP_POOL_MAX, LAMP_POOL_REACH, LAMP_POOL_DECAY } from '../assets/fixtures.js';
+import { LAMP_ROOM_FILL_K, LAMP_POOL_I, LAMP_POOL_MAX, LAMP_POOL_REACH, LAMP_POOL_DECAY, LAMP_POOL_ANGLE, LAMP_POOL_PENUMBRA, LAMP_POOL_AIM_Y } from '../assets/fixtures.js';
 
 test('L3: the pool numbers (design 3.1) and the fill a lamp room keeps', () => {
   assert.equal(LAMP_ROOM_FILL_K, 0, 'the pool is the lamp room\'s light: no spot beside it, so the room costs one light');
   assert.ok(LAMP_ROOM_FILL_K < ROOM_FILL_K);
-  assert.equal(LAMP_POOL_REACH, 0.62); assert.equal(LAMP_POOL_DECAY, 1.6);
+  assert.equal(LAMP_POOL_DECAY, 1.6);
+  assert.ok(LAMP_POOL_REACH > 0.5 && LAMP_POOL_REACH <= 1, 'the falloff reaches zero inside the room\'s diagonal');
   assert.ok(LAMP_POOL_I > 0 && LAMP_POOL_MAX >= 1);
+  assert.equal(LAMP_POOL_PENUMBRA, 1, 'no cone edge: the whole cone is the falloff');
+  assert.ok(LAMP_POOL_ANGLE > 1.25 && LAMP_POOL_ANGLE < Math.PI / 2, 'a wide cone aimed into the room, not the omni light that blew the curtain and the pillow beside the lamp');
+  assert.ok(LAMP_POOL_AIM_Y > 0.5 && LAMP_POOL_AIM_Y < 1.6);
 });
 
 test('L3: the fixtures read the lamp colour from the scheme and the lamps from kit-rules, and cap the lights they run', () => {
