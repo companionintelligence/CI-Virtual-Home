@@ -26,7 +26,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { M, houseIds } from './fleet/_compose-dry.mts';
 import { build, canonicalText, compute, houseSha, sha, verify, type Baseline } from './fleet/_compose-baseline.mts';
-import { FIXTURES_FILE, buildFixtures, canonicalFixtures, computeFixtures, fixtureIds, unbaselined, verifyFixtures } from './review/compose-fixtures.mts';
+import { FIXTURES_FILE, buildFixtures, canonicalFixtures, computeFixtures, fixtureIds, verifyFixtures } from './review/compose-fixtures.mts';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const FILE = path.join(ROOT, 'test', 'fixtures', 'hashes', 'compose-baseline.json');
@@ -123,7 +123,6 @@ const fids = fixtureIds();
 const fixFresh = computeFixtures(fids);
 const fixBase = verifyFixtures(fixCommitted, fixFresh, fids, true, fixText);
 check(fixBase.length === 0, `holds on this tree (${Object.keys(fixCommitted.houses).length} fixtures, ${fixCommitted.fleet.rooms} rooms, ${fixCommitted.fleet.items} items)`, fixBase.slice(0, 4).join('; '));
-for (const id of unbaselined(fixCommitted, fids)) console.log(`  note: fixture ${id} has no entry in the baseline yet (the integration branch adds it)`);
 check(fixText === canonicalFixtures(buildFixtures(Object.fromEntries(Object.entries(fixFresh).filter(([id]) => fixCommitted.houses[id])))), 'the file is byte-identical to what --write produces from this tree');
 check(verifyFixtures(fixCommitted, fixFresh, [fids[0]], false).length === 0, '--fixture restricts the compare and still passes');
 const fx0 = Object.keys(fixCommitted.houses).sort()[0], fxRoom = Object.keys(fixCommitted.houses[fx0].roomHashes)[0];

@@ -3,6 +3,88 @@
   "what": "sha256 of composeHouse's items for every room of every fixture house in test/fixtures/houses (the same dry run as test/fixtures/hashes/compose-baseline.json: authored items dropped, programs inferred, no seed variant). Consumed by scripts/test-compose-stability.mts: new types, roles and modules must not move any hash.",
   "regenerate": "pnpm run build && node --experimental-strip-types scripts/review/compose-fixtures.mts --write   (when a fixture is added, or in a commit that means to move the composer, the prop registry, placement.ts or a fixture; no timestamp, two runs write the same bytes)",
   "houses": {
+    "dress-baths": {
+      "rooms": 10,
+      "items": 63,
+      "sha256": "7e3bacc77e7a24d3b8fd37211952bd69b04b4ab4070ffb965305397513ef93c8",
+      "roomHashes": {
+        "l1/Study": "a33714e1dda1af74",
+        "l1/Bath, clawfoot": "0ee6e2207c405123",
+        "l1/Ensuite, soaking tub": "865a71558f5bb342",
+        "l1/Bath, built-in tub": "c325c6f69cad805d",
+        "l1/Powder, pedestal": "8a0f0f06c04a2fa1",
+        "l1/Bath, shower only": "3a4261e741fbb27e",
+        "l1/Ensuite, double, big shower": "7a81fd6c052cddd8",
+        "l1/Bath, default": "c0d24dddfef2555e",
+        "l1/Powder, single": "a54e57d026af923d",
+        "l1/Hall": "ac3e3ba043f34032"
+      }
+    },
+    "dress-kitchens": {
+      "rooms": 11,
+      "items": 164,
+      "sha256": "bd049a090816c87510c98f42d4db3f7fc7b1ba3691624482ad7017a1637ef290",
+      "roomHashes": {
+        "l1/Study": "c3ef0c69cf2b2cae",
+        "l1/L Kitchen, marble": "85c041683512f59f",
+        "l1/L Kitchen, peninsula": "c2b3e20ed07d0f63",
+        "l1/U Kitchen, quartz": "5b73e028db1dab85",
+        "l1/Galley, butcher block": "7c9537cc1f3cfd59",
+        "l1/Kitchen-dining, terrazzo": "9adabca8ba9a4157",
+        "l1/Kitchen, stone (default)": "60b9026de34b0694",
+        "l1/Kitchen, style mid-century": "72c9162a37d8896c",
+        "l1/Kitchen, style industrial": "f3570808965a5897",
+        "l1/Hall": "8d9072bcdad0e7a3",
+        "l1/Kitchen, glass wall": "fb718eae5e4c394e"
+      }
+    },
+    "dress-rooms": {
+      "rooms": 12,
+      "items": 128,
+      "sha256": "36bbf7ed49ade60d7ae41fa0849126c3954903d94978c74736fa428f0059d82d",
+      "roomHashes": {
+        "l1/Living Room": "86eca3d5a73bd034",
+        "l1/Foyer": "0af567dc525a6eab",
+        "l1/Kitchen": "8cb8ece3650324bf",
+        "l1/Library": "29a685ca64144c30",
+        "l1/Hall": "ee33a4902c508d1f",
+        "l1/Dining Room": "ca7e3b576c7da4c2",
+        "l2/Primary Bedroom": "f0991c2f7e29d23a",
+        "l2/Bath": "a923d4c2d4d46496",
+        "l2/Study": "e31b1bb567c12bc9",
+        "l2/Landing": "78b0ce8ae9c57ad7",
+        "l2/Kids Room": "c27e4b7cbea4910c",
+        "l2/Nursery": "f079073450f17011"
+      }
+    },
+    "dress-styles": {
+      "rooms": 4,
+      "items": 27,
+      "sha256": "cde5f8376874a246d35c18d543b7c31e0597df62074126ed3186bbcc1ba6f12b",
+      "roomHashes": {
+        "l1/Study": "cb83b478552117b8",
+        "l1/Craftsman": "a01d9029dd843d3d",
+        "l1/Living & Dining, craftsman, seed b": "2fe54a045934ff46",
+        "l1/Hall": "f3bf75f5faffe5e8"
+      }
+    },
+    "dress-utility": {
+      "rooms": 10,
+      "items": 80,
+      "sha256": "71b9bb4c3ef453c4d3350bf76a844e17aec055a3474329712ad342f5788f8e19",
+      "roomHashes": {
+        "l1/Study": "c3a1adab9adea2f3",
+        "l1/Laundry": "5a8cdfc6d00ffbe7",
+        "l1/Guest Bedroom": "8bdbd9c11128bdff",
+        "l1/Den": "385b06c446574294",
+        "l1/Mudroom": "f2f7d284e6db2750",
+        "l1/Garage": "c42bd5b9d66797f0",
+        "l1/Sunroom": "840ada078c2cbc0c",
+        "l1/Media Room": "83cc8994ea97fa16",
+        "l1/Laundry, big": "421a09e380ab6f79",
+        "l1/Hall": "db2b532116c802c1"
+      }
+    },
     "integration-all": {
       "rooms": 12,
       "items": 117,
@@ -39,6 +121,42 @@
         "l2/Landing": "106017475850de0e",
         "l2/Kids Room": "5811830c61da5e74",
         "l2/Nursery": "9edc2093a81201f8"
+      }
+    },
+    "light-bath-tile": {
+      "rooms": 2,
+      "items": 11,
+      "sha256": "27dcd23d15dac590e98053ab2455e2f3adc1bb7d8933835a9910d8b61ce2b91e",
+      "roomHashes": {
+        "l1/Hall": "a2837092dd78fae1",
+        "l1/Bath": "a0f9e91f99864af1"
+      }
+    },
+    "light-bed-lamp": {
+      "rooms": 2,
+      "items": 17,
+      "sha256": "7fcf1a7f9516de205ba2627197007c6d1b65f3217b1f649b3f2773e3d282e02d",
+      "roomHashes": {
+        "l1/Hall": "9d9f93317fac24a0",
+        "l1/Primary Bedroom": "ad16d05af1c9e093"
+      }
+    },
+    "light-kitchen-nolamp": {
+      "rooms": 2,
+      "items": 17,
+      "sha256": "066e710c55e69c0e886d3b69771caa2e36769f3b81f85d76e286c1c0827a2624",
+      "roomHashes": {
+        "l1/Hall": "15ced0ac5b397b0e",
+        "l1/Kitchen": "8d6fa297217edb18"
+      }
+    },
+    "light-living-lamp": {
+      "rooms": 2,
+      "items": 16,
+      "sha256": "52d125d42aaa601976baa9fff5576cd2fb39fc5464589f20dd9b66a5763af798",
+      "roomHashes": {
+        "l1/Hall": "6709f2be07353810",
+        "l1/Living Room": "9031ac7193b94bdb"
       }
     },
     "s0-seams": {
@@ -756,12 +874,35 @@
         "l2/Office": "a164b2a6a7685dbc",
         "l2/Bedroom": "804ef39ff4a74d4d"
       }
+    },
+    "small-props": {
+      "rooms": 4,
+      "items": 61,
+      "sha256": "7163347159eac58f4e2e112c2f703f16864bcfcea0f78cb97b2859383f59b669",
+      "roomHashes": {
+        "l1/Kitchen and Dining": "fc53046dd88a8657",
+        "l1/Living and Hall": "0b26865d315e348d",
+        "l1/Bedroom": "ceece3a025abbbbe",
+        "l1/Bath": "8513a83b1fdc6f76"
+      }
+    },
+    "soft-props": {
+      "rooms": 5,
+      "items": 49,
+      "sha256": "b696ae977ff1d2ffd0f11ae11c0defa541db7d762ecce951b4f08d770bcd4523",
+      "roomHashes": {
+        "l1/Study": "087467e708b9d078",
+        "l1/Beds": "3541b65d8f8b7c76",
+        "l1/Beds again and a quilt": "401c33a776555d89",
+        "l1/Bath and kitchen kit": "f77f70d6f33e4b02",
+        "l1/Hall": "e10111a61fafe5af"
+      }
     }
   },
   "fleet": {
-    "houses": 51,
-    "rooms": 397,
-    "items": 3063,
-    "sha256": "a0fbf8d3ffadd1387846f332262aeba8f414c266b5ae94a84564b5641a04cf04"
+    "houses": 62,
+    "rooms": 461,
+    "items": 3696,
+    "sha256": "4d7d614c122b3c92323064143b6bf7b3f48a1a477d27d65bf966ebec187b36bf"
   }
 }

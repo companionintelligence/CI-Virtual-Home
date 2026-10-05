@@ -43,22 +43,19 @@ export function computeFixtures(ids: string[]): Record<string, HouseEntry> {
 export const buildFixtures = (houses: Record<string, HouseEntry>): Baseline => ({ ...build(houses), what: WHAT, regenerate: REGENERATE });
 export const canonicalFixtures = (b: Baseline) => canonicalText(b);
 
-/** A stream adds its fixture houses as test/fixtures/houses/<key>-*.json and may not edit this file (RIG owns it), so a fixture named for
- *  a stream (plan section 4: light, soft, bake, small, dress, ident, and the rig and integration themselves) with no entry yet is a note,
- *  never a failure; the integration branch adds it with --write when it merges the stream. Any OTHER fixture must have its entry: a
- *  baseline entry dropped from the file would otherwise look exactly like a new stream fixture. */
-export const STREAM_FIXTURE = /^(light|soft|bake|small|dress|ident|rig|int)-/;
-export const unbaselined = (want: any, ids: string[]): string[] => ids.filter(id => !want?.houses?.[id] && STREAM_FIXTURE.test(id));
+/** Every fixture on disk has an entry in the file. (While the interiors program ran, a fixture named for a stream (light, soft, bake, small, dress, ident, rig, int) with no entry yet was a
+ *  note, because a stream could not edit this file; the integration added their 11 entries with --write, and the exemption ended with it: a baseline entry dropped from the file now
+ *  fails, whatever the fixture is called, and a new fixture is added with --write in the commit that adds it.) */
 
 /** everything that differs between the committed file (`raw` text, as read) and a fresh run; empty = holds. The check covers every fixture
- *  the file names: a fixture the file lacks is not judged (see unbaselined), one the file names and the tree lost is. `full`: the run covers
+ *  the file names: a fixture the file lacks fails, and so does one the file names and the tree lost. `full`: the run covers
  *  every fixture on disk, so the whole file is compared as canonical text. */
 export function verifyFixtures(want: any, fresh: Record<string, HouseEntry>, ids: string[], full: boolean, raw?: string): string[] {
   // the shared verifier does the field-by-field work on the baselined fixtures; its whole-file canonical-text comparison is against the main
   // file's WHAT, so it runs with full=false and the canonical text of THIS file is compared below
   const known = ids.filter(id => want?.houses?.[id]);
   const bad = verify(want, fresh, known, false, raw);
-  for (const id of ids) if (!want?.houses?.[id] && !STREAM_FIXTURE.test(id)) bad.push(`${id}: a fixture with no entry in the baseline, and not named for a stream (an entry dropped from the file, or a fixture that needs one: --write)`);
+  for (const id of ids) if (!want?.houses?.[id]) bad.push(`${id}: a fixture with no entry in the baseline (an entry dropped from the file, or a fixture that needs one: --write)`);
   if (full) {
     for (const id of Object.keys(want?.houses || {})) if (!fresh[id]) bad.push(`${id}: in the baseline but no longer a fixture`);
     const kept = Object.fromEntries(Object.entries(fresh).filter(([id]) => want?.houses?.[id]));
@@ -87,7 +84,6 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   let raw = '', want: any;
   try { raw = fs.readFileSync(FIXTURES_FILE, 'utf8'); want = JSON.parse(raw); } catch { console.error(`no readable baseline at ${FIXTURES_FILE}: run with --write`); process.exit(2); }
   const problems = verifyFixtures(want, fresh, ids, !only, raw);
-  for (const id of unbaselined(want, ids)) console.log(`  note: ${id} is not in the baseline yet (the integration branch adds it with --write)`);
   for (const p of problems) console.log(`  ✗ ${p}`);
   console.log(problems.length ? `${problems.length} problem(s) with the fixture compose baseline` : `fixture compose baseline holds: ${ids.length} fixtures`);
   process.exit(problems.length ? 1 : 0);
