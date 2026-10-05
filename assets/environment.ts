@@ -55,6 +55,9 @@ export type Preset = {
   sunGlow: number;
   bloom: { strength: number; radius: number; threshold: number };
   grade: { contrast: number; saturation: number; vignette: number; /** the linear grey the contrast turns about (default 0.18); a higher pivot keeps a contrast boost from brightening the walls */ pivot?: number };
+  /** the grade a frame has from OUTSIDE the building (LIGHT v3.1): `grade` is the interior one, and the composer blends the two by how far inside the house the camera is
+   *  (interiorWeight). A strong day grade lifts the range of a room and crushes a tree and a brick wall; absent, the hour grades both the same. */
+  gradeOutside?: { contrast: number; saturation: number; vignette: number; pivot?: number };
   /** look 2's white balance: how far toward neutral the frame is corrected (0 none, 1 fully; default 0.75). Dusk is held back so a warm hour stays warm (LIGHT v3). */
   wb?: number;
   /** the colour a ceiling's bounce emits (default BOUNCE_COLOR, a warm white): dusk's is warmer, a ceiling that read teal under a peach sky was the one cool thing in a warm room */
@@ -74,6 +77,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     lampGain: 0.035, bounce: 0.12, windowGlow: 0, glowColor: '#ffe2bd', sunGlow: 0.25,
     bloom: { strength: 0.08, radius: 0.4, threshold: 2.5 },
     grade: { contrast: 1.5, pivot: 0.34, saturation: 0.97, vignette: 0.2 },   // LIGHT v3 item 5: a contrast about a lighter grey (0.34), so the walls are not brightened by it (mean luma within 3 % of BEFORE) and the day range gains +0.09 on the three rows that read it; was 1.06 / 0.88 / 0.14
+    gradeOutside: { contrast: 1.06, saturation: 0.88, vignette: 0.14 },       // LIGHT v3.1: that grade is for a room. From outside it turned trees near-black and brick black-maroon (golden mae 11-20 on every exterior frame), so the camera outside the house gets v2's
   },
   golden: {
     label: 'Golden hour',
@@ -399,6 +403,13 @@ export const GradeShader = {
     pivot: { value: 0.18 },
     saturation: { value: 1.0 },
     vignette: { value: 0.0 },
+    // LIGHT v3.1: the grade a frame has from outside the building, and how much of the frame's grade is the interior one (interiorWeight). Defaults make the
+    // outside grade the same as the inside one, so a caller that never sets them (an hour with no gradeOutside) is graded as before.
+    outContrast: { value: 1.0 },
+    outPivot: { value: 0.18 },
+    outSaturation: { value: 1.0 },
+    outVignette: { value: 0.0 },
+    interior: { value: 1.0 },
     aspect: { value: 16 / 9 },
     look: { value: GRADE_LOOK },
     balance: { value: GRADE_BALANCE },
@@ -409,19 +420,56 @@ export const GradeShader = {
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse;
     uniform float contrast, saturation, vignette, aspect, pivot;
+    uniform float outContrast, outSaturation, outVignette, outPivot, interior;
     uniform vec3 look, balance;
     varying vec2 vUv;
+    // one grade: contrast about a grey, saturation, vignette. The inside and the outside grade are two calls, mixed by how far inside the house the camera is.
+    vec3 gradeOf(vec3 rgb, float k, float piv, float sat, float vig, float edge) {
+      rgb = pow(rgb / piv, vec3(k)) * piv;
+      float l = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
+      rgb = max(mix(vec3(l), rgb, sat * look.x), vec3(0.0));
+      return rgb * (1.0 - vig * edge);
+    }
     void main() {
       vec4 c = texture2D(tDiffuse, vUv);
       vec3 rgb = max(c.rgb, vec3(0.0)) * balance;
-      rgb = pow(rgb / pivot, vec3(contrast)) * pivot;
-      float l = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
-      rgb = max(mix(vec3(l), rgb, saturation * look.x), vec3(0.0));
       vec2 d = (vUv - 0.5) * vec2(aspect, 1.0) / length(vec2(aspect, 1.0)) * 2.0;   // 0 centre, 1 corners
-      rgb *= 1.0 - vignette * smoothstep(0.35, 1.0, length(d));
-      gl_FragColor = vec4(rgb, c.a);
+      float edge = smoothstep(0.35, 1.0, length(d));
+      vec3 inside = gradeOf(rgb, contrast, pivot, saturation, vignette, edge);
+      vec3 graded = inside;
+      if (interior < 1.0) graded = mix(gradeOf(rgb, outContrast, outPivot, outSaturation, outVignette, edge), inside, interior);
+      gl_FragColor = vec4(graded, c.a);
     }`,
 };
+
+// Which grade a frame gets (LIGHT v3.1). The day grade that lifts a room's range (contrast 1.5 about 0.34) turned trees into near-black blobs and brick into black-maroon
+// from outside, on every orbit and hero frame. So the composer asks how far INSIDE the building the camera is, and the grade is the interior one inside and the preset's
+// `gradeOutside` out of doors. It is a function of the camera's position alone, continuous in it (a smoothstep of the distance to the building's volume), so a camera
+// walking in through a door crosses the wall without a pop: the grade is 0.5 a metre or so outside the wall and 1 at the wall, not a switch at the threshold.
+// The building's volume is each storey's footprint rectangles from the storey's floor (0.3 m under, as the room boxes) to its ceiling.
+export const GRADE_FADE = 2.5;   // m: the distance from the building's volume at which the interior grade is gone
+export interface GradeStorey { y: number; height: number; rects: Array<{ x: number; z: number; w: number; d: number }> }
+/** 0 (the outside grade) to 1 (the interior grade): 1 - smoothstep(0, fade, the distance from the camera to the nearest storey box of the building) */
+export function interiorWeight(cam: { x: number; y: number; z: number }, storeys: GradeStorey[], fade: number = GRADE_FADE): number {
+  let best = Infinity;
+  for (const s of storeys) {
+    const y0 = s.y - 0.3, y1 = s.y + s.height;
+    const dy = Math.max(y0 - cam.y, 0, cam.y - y1);
+    for (const r of s.rects) {
+      const dx = Math.max(r.x - cam.x, 0, cam.x - (r.x + r.w)), dz = Math.max(r.z - cam.z, 0, cam.z - (r.z + r.d));
+      const d = Math.hypot(dx, dy, dz);
+      if (d < best) best = d;
+    }
+  }
+  if (!isFinite(best)) return 1;   // no footprint (a bare prop sheet): the grade is the interior one, as it was
+  return 1 - smooth(0, fade, best);
+}
+/** GTAO's thickness (how thick the pass takes an occluder to be) inside the building and out of doors, blended by the same weight as the grade. A curtain beside a wall left a speckled
+ *  dark fringe at thickness 1 (LIGHT v3 item 5), so a room's is thin; but a tree's crown is leaf clumps, and at the thin value the occlusion between them goes and the crown goes flat
+ *  and lighter (golden orbit frames, mae 1-3 against BEFORE on 21 houses): out of doors the old value stays. */
+export const GTAO_THICKNESS = { inside: 0.15, outside: 1 };
+/** the storeys interiorWeight reads, from a HouseSpec's levels */
+export const storeysOf = (levels: any[] = []): GradeStorey[] => levels.map(l => ({ y: l.y || 0, height: l.height || 2.8, rects: l.footprint || [] }));
 
 // ---- the light on the page: a preset and an aim, applied to the scene ------------------------------------------
 // Moved out of room-creator.html (plan S0; Completeness A1 gives the light to S1, which owns this file): the page

@@ -221,7 +221,7 @@ test('LIGHT v3 (1): every free-standing lamp type the catalog places pools its r
 // v1 pinned `night hemisphere >= 1.3`: a number tuned on ONE crush row (cutestarter bedroom) that put night above dusk and day. What the preset
 // has to be is ordered, not a number: less sky fill at night than at dusk than by day, a warm ground colour (the lamps' bounce, not a cool sky
 // shining up), and the environment image kept at 0.30.
-import { ambientOf } from '../assets/environment.js';
+import { ambientOf, interiorWeight, storeysOf, GRADE_FADE, GTAO_THICKNESS } from '../assets/environment.js';
 import { capAlbedo } from '../assets/materials.js';
 import { FINISH_ROLES as ROLES } from '../assets/props/finish-roles.js';
 
@@ -250,7 +250,8 @@ test('night is lamp-lit: a cool sky over a warm ground, env 0.30 kept, and dusk 
 
 test('LIGHT v3 (5): the composer reads a curtain as thin (GTAO thickness 0.15) and the day grade turns about a lighter grey', () => {
   const page = fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8');
-  assert.match(page, /gtao\.updateGtaoMaterial\(\{ radius: 0\.8, distanceExponent: 1, thickness: 0\.15,/);
+  assert.match(page, /gtao\.updateGtaoMaterial\(\{ radius: 0\.8, distanceExponent: 1, thickness: GTAO_THICKNESS\.inside,/);
+  assert.equal(GTAO_THICKNESS.inside, 0.15);
   assert.match(page, /u\.pivot\.value = p\.grade\.pivot \?\? 0\.18/);
   const g = TIME_OF_DAY.day.grade;
   assert.ok(g.contrast > 1.3 && (g.pivot ?? 0.18) > 0.25, 'a stronger contrast about a lighter grey: the range grows without the walls brightening');
@@ -287,4 +288,35 @@ test('linen holds its albedo cap, so a bed can take a lamp without clipping (L0\
   assert.equal(capLinen([bed]), 0, 'idempotent');
   for (const t of ['upholstered-bed', 'towel-rail', 'cushion-set']) assert.ok(LINEN_ITEMS.has(t)); for (const t of ['duvet', 'linen', 'towel']) assert.ok(LINEN_ROLES.has(t));
   for (const t of ['fridge', 'toilet', 'clawfoot-tub', 'piano', 'candle-set', 'kitchen-island']) assert.ok(!LINEN_ITEMS.has(t), `${t} is not linen`);
+});
+
+// ---- LIGHT v3.1 (1): the day grade is an interior grade ----------------------------------------------------------------------------------
+test('LIGHT v3.1 (1): the grade is the interior one inside the building, the outside one far from it, and the weight is continuous across a wall', () => {
+  const st = storeysOf([{ y: 0, height: 3, footprint: [{ x: -5, z: -4, w: 10, d: 8 }, { x: 5, z: -1, w: 3, d: 4 }] }, { y: 3, height: 2.8, footprint: [{ x: -5, z: -4, w: 6, d: 8 }] }]);
+  const at = (x: number, y: number, z: number) => interiorWeight({ x, y, z }, st);
+  assert.equal(at(0, 1.6, 0), 1, 'in a room');
+  assert.equal(at(7, 1.6, 1), 1, 'in the wing');
+  assert.equal(at(-2, 4.6, 0), 1, 'upstairs');
+  assert.equal(at(40, 1.6, 0), 0, 'far away, an orbit');
+  assert.equal(at(0, 30, 0), 0, 'a camera over the roof (a hero reveal from above)');
+  assert.equal(at(-5, 1.6, 0), 1, 'on the wall line');
+  assert.ok(at(-5 - GRADE_FADE - 0.01, 1.6, 0) === 0 && at(-5 - GRADE_FADE / 2, 1.6, 0) > 0.4 && at(-5 - GRADE_FADE / 2, 1.6, 0) < 0.6, 'half-way through the fade it is half');
+  // a walk in through a door: no step in the weight bigger than a small fraction at any sample, and monotone
+  let prev = at(-12, 1.6, 0), maxStep = 0, mono = true;
+  for (let x = -12; x <= -2; x += 0.05) { const w = at(x, 1.6, 0); maxStep = Math.max(maxStep, Math.abs(w - prev)); if (w < prev - 1e-9) mono = false; prev = w; }
+  assert.ok(mono && maxStep < 0.05, `monotone and smooth (max step ${maxStep.toFixed(3)} per 5 cm)`);
+  assert.equal(interiorWeight({ x: 0, y: 0, z: 0 }, []), 1, 'no footprint (a prop sheet): the interior grade, as before');
+});
+
+test('LIGHT v3.1 (1): day has an outside grade that is v2\'s; the other hours grade inside and out alike; the page blends by the camera and the shader mixes two grades', () => {
+  const d = TIME_OF_DAY.day;
+  assert.deepEqual(d.gradeOutside, { contrast: 1.06, saturation: 0.88, vignette: 0.14 }, 'BEFORE/v2\'s day grade');
+  for (const t of ['golden', 'dusk', 'night']) assert.equal((TIME_OF_DAY as any)[t].gradeOutside, undefined, `${t} is graded the same everywhere`);
+  const page = fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8');
+  assert.match(page, /interiorWeight\( gradeEye, gradeStoreys\( activeHouse\.spec \) \)|interiorWeight\(gradeEye, gradeStoreys\(activeHouse\.spec\)\)/);
+  assert.match(page, /u\.interior\.value = w/);
+  assert.match(page, /thickness: GTAO_THICKNESS\.outside \+ \(GTAO_THICKNESS\.inside - GTAO_THICKNESS\.outside\) \* w/);
+  const env = fs.readFileSync(path.join(ROOT, 'assets', 'environment.ts'), 'utf8');
+  assert.match(env, /mix\(gradeOf\(rgb, outContrast, outPivot, outSaturation, outVignette, edge\), inside, interior\)/);
+  assert.ok(!/Math\.random|Date\.now|performance\.now/.test(env.replace(/\/\/.*$/gm, '')), 'no clock or random in the grade');
 });
