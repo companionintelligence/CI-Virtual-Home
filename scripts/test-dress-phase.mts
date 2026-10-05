@@ -15,6 +15,9 @@
 //   H  layout       a baked dress@1 item is no pin and no usage of the composer: composing a spec that carries them gives the items of the one that does not (so
 //                   the compose-stability hashes hold whatever a house's dress items are), and the lints of the dressed fixtures add no layout finding
 //   I  bake         compose-house.mts --dress writes exactly the live phase's items, twice gives the same file, --undress gives the original back
+//   J  café curtain the BUILT geometry of every café curtain the phase places (the 30 houses at the pilot level 0.5, and the dress fixtures), measured in three.js
+//                   in Node, against its own window: it hangs from the sill (hem no lower), tops out at most sill + 0.55 x the window's height, keeps the 1.45-1.55 m
+//                   eye line clear unless the window is small, is a pale cloth and not a dark slab; and the first cut's params fail the same measurement (a control)
 //
 // @check-house node-test
 // @check-house quick
@@ -24,10 +27,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import * as THREE from '../assets/vendor/three/three.module.min.js';
+import { createBuildContext } from '../assets/build-context.js';
+import { createMaterialKit } from '../assets/materials.js';
 import { composeHouse, layerOf } from '../assets/room-composer.js';
-import { dressHouse, dressRooms, dressOff, dressOptIn, isDress, bareViolation, DRESS_SRC } from '../assets/room-dress.js';
+import { dressHouse, dressRooms, dressOff, dressOptIn, dressProgram, isDress, bareViolation, Dresser, DRESS_SRC } from '../assets/room-dress.js';
 import { dressSchemeOf } from '../assets/house-scheme-dress.js';
-import { RECIPES } from '../assets/dress-recipes.js';
+import { RECIPES, CAFE, cafeFit } from '../assets/dress-recipes.js';
 import { hostOf, footprintIn, standingOn, rectArea } from '../assets/room-dress-hosts.js';
 import { lintLayout } from '../assets/layout-lint.js';
 import { PLACEMENT } from '../assets/props/placement.js';
@@ -225,4 +231,74 @@ test('I: the bake tool (compose-house.mts --dress / --undress)', () => {
     const baked = JSON.parse(fs.readFileSync(a, 'utf8')); for (const { room } of rooms(baked)) delete room.dress;
     assert.equal(dressHouse(baked).size, 0, 'a baked house with no dress.level is not dressed live a second time');
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+// ---- J: the café curtain, measured as built --------------------------------------------------------------------------------------------
+/** the specs the fleet checks run over: the 30 houses and the dress fixtures */
+const fleet = () => [...houses.map(h => ({ id: h.id, spec: load(h.file) })), ...FIX.map(id => ({ id, spec: fixture(id) }))];
+/** a window of a room, from the composer's own wall runs: the item a café curtain stands at is [t, face + gap] on an x-wall and [face + gap, t] on a z-wall */
+function windowOf(spec: any, lv: any, room: any, composed: Map<any, any[]>, at: [number, number]) {
+  const program = dressProgram(room, lv)!, base = [...(room.items || []).filter((x: any) => !isDress(x)), ...(composed.get(room) || [])];
+  const geo = (new Dresser(spec, lv, room, program, 0.5, base, composed) as any).geoC().geo;
+  for (const run of geo.runs) for (const w of run.windows) {
+    const along = run.side === 'N' || run.side === 'S' ? at[0] : at[1], across = run.side === 'N' || run.side === 'S' ? at[1] : at[0];
+    if (Math.abs(along - (w.a + w.b) / 2) < 0.005 && Math.abs(across - run.face) < 0.02) return { sill: w.sill as number, hgt: w.h as number, width: (w.b - w.a) as number };
+  }
+  return null;
+}
+const bcx = createBuildContext({ THREE } as any);
+const kitx = createMaterialKit({ THREE, palette: { wall: '#f1f5f9', trim: '#1e293b', accent: '#0f766e', material: 'stucco' }, seed: 'cafe' } as any);
+/** y range [min, max] a café curtain of these params occupies in the room (the item's own lift added to what three.js builds) */
+function curtainRange(it: any): { lo: number; hi: number } {
+  const def = (PROPS as Map<string, any>).get('cafe-curtain');
+  const o = def.create({ ...it }, { THREE, std: bcx.std, box: bcx.box, group: bcx.group, mix: bcx.mix, hex: bcx.hex, colors: kitx.colors, rng: kitx.itemRng('cafe'), H: 2.8 });
+  o.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(o);
+  return { lo: b.min.y + (it.y || 0), hi: b.max.y + (it.y || 0) };
+}
+/** what is wrong with a curtain of this built range on a window (empty: nothing) */
+function curtainFaults(r: { lo: number; hi: number }, win: { sill: number; hgt: number }): string[] {
+  const out: string[] = [], eps = 0.002;
+  if (r.hi > win.sill + CAFE.topShare * win.hgt + eps) out.push(`top ${r.hi.toFixed(3)} is above sill + ${CAFE.topShare} x height (${(win.sill + CAFE.topShare * win.hgt).toFixed(3)})`);
+  if (r.lo < win.sill - eps) out.push(`hem ${r.lo.toFixed(3)} hangs below the sill ${win.sill}`);
+  if (r.hi - r.lo < CAFE.minDrop - eps) out.push(`only ${(r.hi - r.lo).toFixed(3)} m of curtain`);
+  const clearable = win.sill + CAFE.hemAboveSill + CAFE.hemGap + CAFE.minDrop + CAFE.rodAbove <= CAFE.eyeLo;
+  if (r.lo < CAFE.eyeHi && r.hi > CAFE.eyeLo && (clearable || win.hgt > CAFE.small)) out.push(`stands across the ${CAFE.eyeLo}-${CAFE.eyeHi} m eye line (${r.lo.toFixed(3)}-${r.hi.toFixed(3)}) on a ${win.hgt} m window${clearable ? ' that had room to clear it' : ''}`);
+  return out;
+}
+test('J: every café curtain, as built, hangs on the lower half of its window and clears the eye line', () => {
+  let n = 0, narrow = 0, crossed = 0;
+  for (const { id, spec } of fleet()) {
+    const composed = new Map<any, any[]>(); for (const [room, res] of composeHouse(spec)) composed.set(room, res.items);
+    for (const { lv, room } of rooms(spec)) {
+      const res = dressRooms(spec).get(room); if (!res) continue;
+      for (const it of res.items.filter((x: any) => x.type === 'cafe-curtain')) {
+        const win = windowOf(spec, lv, room, composed, it.at); assert.ok(win, `${id}/${room.name}: no window under the curtain at ${it.at}`);
+        const r = curtainRange(it), faults = curtainFaults(r, win!);
+        assert.deepEqual(faults, [], `${id}/${room.name}: curtain ${JSON.stringify({ w: it.w, h: it.h, y: it.y })} on window sill ${win!.sill} x ${win!.hgt}: ${faults.join('; ')}`);
+        assert.ok(r.hi - r.lo <= win!.hgt * CAFE.topShare + 0.1, `${id}/${room.name}: longer than the lower half of the window`);
+        assert.ok(it.w <= win!.width + 0.3 + 1e-6, `${id}/${room.name}: wider than its window plus the rod's reach`);
+        // a pale cloth from the house scheme, not the palette's dark fabric role (a slab against a light wall)
+        const m = /^#([0-9a-f]{6})$/i.exec(it.color || ''); assert.ok(m, `${id}/${room.name}: the curtain carries the scheme's colour (${it.color})`);
+        const n3 = parseInt(m![1], 16), lum = (0.2126 * ((n3 >> 16) & 255) + 0.7152 * ((n3 >> 8) & 255) + 0.0722 * (n3 & 255)) / 255;
+        assert.ok(lum >= 0.7, `${id}/${room.name}: curtain colour ${it.color} is dark (luma ${lum.toFixed(2)})`);
+        assert.equal(it.color, dressSchemeOf(spec).curtain);
+        n++; if (r.lo < CAFE.eyeHi && r.hi > CAFE.eyeLo) crossed++; if (win!.width < 1) narrow++;
+      }
+    }
+  }
+  assert.ok(n >= 25, `the test measured ${n} curtains: it must see the fleet's kitchens`);
+  console.log(`J: ${n} curtains measured as built (${crossed} cross the eye line, all on small windows; ${narrow} on windows under 1 m)`);
+});
+
+test('J2 (control): the first cut\'s params fail the same measurement', () => {
+  // the slot passed h = min(head, sill + 0.95) and no lift, head = min(sill + height + 0.12, H - 0.12): the rod at sill + 0.95, the cloth 0.75 below it
+  for (const [sill, hgt, H] of [[1.15, 1.0, 3], [1.0, 1.1, 2.8], [0.9, 1.3, 2.8]]) {
+    const head = Math.min(sill + hgt + 0.12, H - 0.12), old = { type: 'cafe-curtain', w: 1.4, h: Math.min(head, sill + 0.95) };
+    const faults = curtainFaults(curtainRange(old), { sill, hgt });
+    assert.ok(faults.length > 0, `the old params on a ${sill} + ${hgt} window pass: the test cannot see the slab`);
+  }
+  // and the fit for the same windows passes, with a window too low or too short left bare
+  for (const [sill, hgt] of [[1.15, 1.0], [1.0, 1.1], [0.9, 1.3], [1.5, 0.7]]) { const f = cafeFit(sill, hgt)!; assert.ok(f, `${sill} x ${hgt}`); assert.deepEqual(curtainFaults(curtainRange({ type: 'cafe-curtain', w: 1.4, h: f.h, y: f.y }), { sill, hgt }), []); }
+  assert.equal(cafeFit(0.3, 2.2), null, 'a window to the floor is left bare');
+  assert.equal(cafeFit(1.0, 0.5), null, 'a window too short for the shortest curtain is left bare');
 });

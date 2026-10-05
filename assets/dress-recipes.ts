@@ -93,14 +93,43 @@ function counterClusters(d: Dresser, h: Host, queue: string[], max = 3): number 
 }
 
 /**
- * A window with nothing on it wears a café curtain where one belongs: a kitchen's (the lower part of the window; the view above stays). Nowhere else. SOFT's blinds hang
- * fully drawn (their drop is a function of the head height alone), and drawn they are a flat white sheet that shuts the view and the sun out of the room: seen on the
- * pilot bath (a roller shade over a 1.4 m window, the lawn gone), so a bath keeps its window bare, and the lived-in rooms keep the curtains their authors hung.
+ * A window with nothing on it wears a café curtain where one belongs: a kitchen's, the LOWER part of the window, its hem at the sill and its rod at about half the
+ * window's height (never above sill + 0.55 x the window's height, and clear of the 1.45-1.55 m eye line wherever the window leaves room to be). The upper window and the
+ * view stay. Nowhere else: SOFT's blinds hang fully drawn (their drop is a function of the head height alone), and drawn they are a flat white sheet that shuts the view
+ * and the sun out of the room (seen on the pilot bath: a roller shade over a 1.4 m window, the lawn gone), so a bath keeps its window bare, and the lived-in rooms keep
+ * the curtains their authors hung.
+ *
+ * Why the first cut was a slab across the eye line: SOFT's `cafe-curtain` takes `h` as the height of its ROD and hangs the cloth a fixed drop below it, `clamp(h - 0.5,
+ * 0.3, 0.75)`; the slot passed `min(head, sill + 0.95)` as if `h` were the top of the part to cover, so the rod stood at sill + 0.95 (1.95-2.1 m in the fleet's kitchens) and the
+ * cloth hung 0.75 below it, y 1.19-1.97. The type has no other size, so the slot sizes it with what the item does have: `h` for the drop (h = drop + 0.5) and `y`, the
+ * item's own lift, for where the rod stands. `cafeFit` is that arithmetic; the test measures the BUILT geometry against it.
  */
 const WINDOW_TYPE: Record<string, string[]> = { kitchen: ['cafe-curtain'], 'kitchen-dining': ['cafe-curtain'] };
-const windowSlot: Slot = { id: 'windows', tier: 2, what: 'a café curtain on a kitchen window that wears nothing', run(d) {
+/** SOFT's cafe-curtain: the cloth hangs `drop(h)` below the rod at h (windows.ts: Math.min(0.75, Math.max(0.3, h - 0.5))), the rod (with its finials) stands 0.019 above h, the hem 0.015 below the cloth's top */
+export const CAFE = { minDrop: 0.3, maxDrop: 0.75, rodAbove: 0.019, hemGap: 0.015, topShare: 0.55, hemAboveSill: 0.03, eyeLo: 1.45, eyeHi: 1.55, minSill: 0.6, small: 1.25 };
+export const cafeDrop = (h: number) => Math.min(CAFE.maxDrop, Math.max(CAFE.minDrop, h - 0.5));
+/** the params of a café curtain for a window (its sill and height, m): `h` and `y` so the cloth runs from just above the sill to about the window's middle; null when the window is too short to hold the shortest curtain, or sits so near the floor (sill under 0.6 m) that it is a door in all but name and no café curtain hangs there */
+export function cafeFit(sill: number, hgt: number): { h: number; y: number; rod: number; hem: number } | null {
+  if (sill < CAFE.minSill) return null;
+  const hem = sill + CAFE.hemAboveSill, cap = sill + CAFE.topShare * hgt - CAFE.rodAbove;
+  let rod = Math.min(sill + 0.5 * hgt, cap);
+  // the eye line: a curtain whose top reaches 1.45-1.55 m from below hides the room's view at the height people look at it; where the shortest curtain still ends below it, end it there
+  const eyeRod = CAFE.eyeLo - CAFE.rodAbove - 0.005, clearable = eyeRod - CAFE.hemGap - hem >= CAFE.minDrop;
+  if (rod + CAFE.rodAbove >= CAFE.eyeLo && hem <= CAFE.eyeHi && clearable) rod = eyeRod;
+  // a window that cannot hold a curtain below the eye line is dressed only when it is small (a high sill and a short window: the curtain is bound to stand there); a big one keeps its view
+  else if (!clearable && hem <= CAFE.eyeHi && hgt > CAFE.small) return null;
+  const drop = Math.min(CAFE.maxDrop, rod - CAFE.hemGap - hem);
+  if (drop < CAFE.minDrop) return null;
+  rod = hem + CAFE.hemGap + drop;   // (a window tall enough for the longest drop hangs it from the hem up, never longer than the type)
+  const h = Math.round((drop + 0.5) * 1000) / 1000;
+  return { h, y: Math.round((rod - h) * 1000) / 1000, rod, hem };
+}
+const windowSlot: Slot = { id: 'windows', tier: 2, what: 'a café curtain on the lower half of a kitchen window that wears nothing', run(d) {
   const types = WINDOW_TYPE[d.program]; if (!types) return;
-  for (const w of d.bareWindows()) d.raw('windows', d.pick('windows', types), w.at, w.rot, { w: w.w, h: Math.min(w.head, w.sill + 0.95) });
+  for (const w of d.bareWindows()) {
+    const f = cafeFit(w.sill, w.hgt); if (!f) continue;
+    d.raw('windows', d.pick('windows', types), w.at, w.rot, { w: w.w, h: f.h, y: f.y, color: d.scheme.curtain });
+  }
 } };
 
 // ---- the recipes ---------------------------------------------------------------------------------------------------------------------

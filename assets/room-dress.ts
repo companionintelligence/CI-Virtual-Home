@@ -200,8 +200,8 @@ export class Dresser {
     return this.placeGroup(slot, g, params, tier, cost);
   }
   /** the room's windows that wear nothing: a window (not a glass door or a slider) with no curtain, blind or shutter of the layout within reach along its wall */
-  bareWindows(): Array<{ side: string; at: [number, number]; rot: number; w: number; head: number; sill: number }> {
-    const c = this.comp(), out: Array<{ side: string; at: [number, number]; rot: number; w: number; head: number; sill: number }> = [];
+  bareWindows(): Array<{ side: string; at: [number, number]; rot: number; w: number; head: number; sill: number; hgt: number }> {
+    const c = this.comp(), out: Array<{ side: string; at: [number, number]; rot: number; w: number; head: number; sill: number; hgt: number }> = [];
     const dressers = this.base.filter(it => ['curtains', 'roman-blind', 'roller-shade', 'cafe-curtain', 'shutters', 'valance'].includes(it.type) && Array.isArray(it.at));
     const H = this.lv.height || 2.8;
     for (const run of c.geo.runs) for (const w of run.windows) {
@@ -211,7 +211,7 @@ export class Dresser {
       // something already hangs here: any curtain or blind within half a window and a bit of its centre, on this wall
       if (dressers.some(d => Math.hypot(d.at[0] - at[0], d.at[1] - at[1]) < (w.b - w.a) / 2 + 0.6)) continue;
       if (this.placed.some(d => (d.type === 'roman-blind' || d.type === 'roller-shade' || d.type === 'cafe-curtain') && Math.hypot(d.at[0] - at[0], d.at[1] - at[1]) < 0.3)) continue;
-      out.push({ side: run.side, at, rot: ROT_OF_WALL[run.side], w: mm(Math.min(w.b - w.a + 0.2, 3.0)), head: mm(Math.min(w.sill + w.h + 0.12, H - 0.12)), sill: mm(w.sill) });
+      out.push({ side: run.side, at, rot: ROT_OF_WALL[run.side], w: mm(Math.min(w.b - w.a + 0.2, 3.0)), head: mm(Math.min(w.sill + w.h + 0.12, H - 0.12)), sill: mm(w.sill), hgt: mm(w.h) });
     }
     return out.sort((p, q) => p.at[0] - q.at[0] || p.at[1] - q.at[1]);
   }
