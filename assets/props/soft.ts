@@ -24,6 +24,8 @@ const jit = (rng, a) => (rng() - 0.5) * 2 * a;   // ±a
 const disc = (THREE, r, depth, mat, x, y, z, seg = 32) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, depth, seg), mat); m.rotation.x = Math.PI / 2; m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; return m; };
 // a cylinder between two points (stand legs, stems)
 const strut = (THREE, a, b, r, mat, seg = 8) => { const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), d = B.clone().sub(A), L = d.length(); const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, L, seg), mat); m.position.copy(A).add(B).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); m.castShadow = true; return m; };
+/** a throw whose spec y is at least BED_Y lies on a bed; the crown of the bed's duvet tops out BED_TOP above the floor (mattress top 0.56 + duvet crown 0.07) */
+const BED_Y = 0.49, BED_TOP = 0.63;
 const GREENS = [0x2f6b3a, 0x3f7f45, 0x4a8a3a, 0x2b5d3a];
 
 registerProps({
@@ -46,7 +48,11 @@ registerProps({
       K.strut(cloth, [-w * 0.485, R, z0], [w * 0.485, R, z0], R, R, 12, 0.94, 0.94);                                                 // the fold
       K.strut(cloth, [-w * 0.47, t1 + t2 + 0.029, z0 + d2 - 0.02], [w * 0.47, t1 + t2 + 0.029, z0 + d2 - 0.02], 0.035, 0.035, 12, 0.96, 0.96);   // the rolled end, sunk into the top layer
       K.shell(fringe, { cy: 0.007, cz: d / 2 + 0.02 + 0.0003, w: w * 0.98, h: 0.014, d: 0.0512, r: 0.005, faces: ['py', 'px', 'nx', 'pz'], kx: lin(w * 0.49, 14), kz: [-0.025, 0.025], ky: [-0.007, 0.007], shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.82 + 0.18 * (Math.sin(x * 160) > 0 ? 1 : 0.8) : 0.85) });   // tassels
-      for (const acc of [cloth, fringe]) for (let i = 0; i < acc.pos.length; i += 3) { acc.pos[i] -= 0.0015; acc.pos[i + 2] += 0.0006; }   // pins the box to the old one's offsets
+      // a throw spec'd at bed height (y 0.50-0.55: every authored throw on a bed, against a seat's 0.45 or less) was placed INSIDE the mattress: the bed's mattress top is 0.54-0.56 and its duvet crown
+      // 0.04-0.07 above that, so the cloth's top layer (0.045-0.095 over y) coincided with the crown. The old flat duvet box hid it except for the roll; the puffed, waved duvet cuts through it in
+      // jagged white tears (seraphine master suite SE). Lay it ON the duvet instead: its underside at the crown's highest point, 0.63 above the floor.
+      const lift = (it.y ?? 0) >= BED_Y ? Math.max(0, BED_TOP - it.y) : 0;
+      for (const acc of [cloth, fringe]) for (let i = 0; i < acc.pos.length; i += 3) { acc.pos[i] -= 0.0015; acc.pos[i + 1] += lift; acc.pos[i + 2] += 0.0006; }   // pins the box to the old one's offsets
       put(g, cloth, softMat(ctx, col, { roughness: 0.96 }), 'throw');
       put(g, fringe, softMat(ctx, mix(col, 0xffffff, 0.45), { roughness: 1 }), 'fringe');
       return g;

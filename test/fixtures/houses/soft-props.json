@@ -7,7 +7,7 @@
   "style": "Single-storey gallery of the soft furnishings",
   "emoji": "\ud83e\uddea",
   "fixture": {
-    "note": "every soft type: ten bed types and six of them again (different instances, so different streams), six curtains of different widths, the three towel rails and the new towel stack, ring set and robe hook, sofas with cushion sets and throws, an ottoman, pouf, two bean bags, a floor cushion and a bench. Wave 3 adds: eight sofas and sectionals, six armchairs (each twice, one repainted), twelve floor plants at default and other heights, surface plants on consoles, cut flowers, pampas, hanging plants, and the five window treatments."
+    "note": "every soft type, by hand and unprogrammed: ten bed types and six of them again (different instances, so different streams), a quilted bed, three throws laid on beds at the specs' bed heights (y 0.50-0.55, the SOFT wave-3 fix), eight curtains of different widths, the three towel rails and towel-stack, towel-ring-set and robe-hook, the loose soft goods (cushion sets, throws, ottoman, poufs, two bean bags, floor cushions, a bench), eight sofas and sectionals, six armchairs (each twice, one repainted), twenty-two plant types (floor plants at default and other heights, surface plants on consoles, cut flowers, pampas, hanging plants, the dormant trough-planter and pothos) and the five dormant window treatments (roman blind, roller shade, cafe curtain, shutters, valance)."
   },
   "lot": {
     "w": 130,
@@ -555,6 +555,38 @@
                 -0.82,
                 -4.93
               ]
+            },
+            {
+              "type": "throw-blanket",
+              "at": [
+                -13.22,
+                -4.25
+              ],
+              "w": 1.4,
+              "d": 0.6,
+              "y": 0.52,
+              "color": "#7d9a55"
+            },
+            {
+              "type": "throw-blanket",
+              "at": [
+                -11.24,
+                -4.3
+              ],
+              "w": 1.3,
+              "d": 0.6,
+              "y": 0.55
+            },
+            {
+              "type": "throw-blanket",
+              "at": [
+                -9.3,
+                -4.2
+              ],
+              "w": 1.3,
+              "d": 0.6,
+              "y": 0.5,
+              "color": "#a35d3a"
             }
           ]
         },

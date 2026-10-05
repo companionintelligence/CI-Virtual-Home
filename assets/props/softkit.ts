@@ -57,6 +57,8 @@ export function softkit(THREE: any) {
       if (at !== undefined) { const c = this.col; c[at * 3] = c[at * 3 + 1] = c[at * 3 + 2] = Math.min(c[at * 3], s); return at; }
       const i = this.pos.length / 3; this.pos.push(x, y, z); this.col.push(s, s, s); this.map.set(key, i); return i;
     }
+    /** a vertex that is never welded to another (two faces that meet at an edge but must not share its normal) */
+    vRaw(x: number, y: number, z: number, s = 1): number { const i = this.pos.length / 3; this.pos.push(x, y, z); this.col.push(s, s, s); return i; }
     tri(a: number, b: number, c: number) { if (a !== b && b !== c && a !== c) this.idx.push(a, b, c); }
     get tris() { return this.idx.length / 3; }
     get verts() { return this.pos.length / 3; }
@@ -235,7 +237,7 @@ export function softkit(THREE: any) {
 
   // ---- a closed lens leaf (later waves: plants): a real outline, a V fold, a droop; closed so GTAO sees the true silhouette ---
   function leaf(acc: any, o: any) {
-    const { x = 0, y = 0, z = 0, a = 0, t = 0.3, L = 0.2, W = 0.1, droop = 0.6, fold = 0.18, th = 0.006, rows = 5, profile = (u: number) => Math.sin(Math.PI * Math.pow(u, 0.65)), roll = 0, tipS = 1, baseS = SHADE.floor } = o;
+    const { x = 0, y = 0, z = 0, a = 0, t = 0.3, L = 0.2, W = 0.1, droop = 0.6, fold = 0.18, th = 0.006, rows = 5, profile = (u: number) => Math.sin(Math.PI * Math.pow(u, 0.65)), roll = 0, tipS = 1, baseS = SHADE.floor, under = 0.72, edge = 0.92 } = o;   // under: the shade of the lower face (a leaf seen from below: a palm over eye height); edge: the shade of the two rim vertices
     const sa = Math.sin(a), ca = Math.cos(a), S = [ca, 0, -sa];
     let cx = x, cy = y, cz = z;
     const top: number[] = [], bot: number[] = [];
@@ -245,11 +247,16 @@ export function softkit(THREE: any) {
       const ang = t + droop * Math.pow(u, 1.15), st = Math.sin(ang), ct = Math.cos(ang);
       const T = [sa * st, ct, ca * st], N = [T[1] * S[2] - T[2] * S[1], T[2] * S[0] - T[0] * S[2], T[0] * S[1] - T[1] * S[0]];
       const hw = (W / 2) * Math.max(0.0001, profile(u)), lift = fold * hw, s = baseS + (tipS - baseS) * u, rl = roll * hw, e = i === 0 || i === rows;
-      const l = acc.v(cx - S[0] * hw + N[0] * (lift + rl), cy - S[1] * hw + N[1] * (lift + rl), cz - S[2] * hw + N[2] * (lift + rl), s * 0.92);
-      const r = acc.v(cx + S[0] * hw + N[0] * (lift - rl), cy + S[1] * hw + N[1] * (lift - rl), cz + S[2] * hw + N[2] * (lift - rl), s * 0.92);
+      const l = acc.v(cx - S[0] * hw + N[0] * (lift + rl), cy - S[1] * hw + N[1] * (lift + rl), cz - S[2] * hw + N[2] * (lift + rl), s * edge);
+      const r = acc.v(cx + S[0] * hw + N[0] * (lift - rl), cy + S[1] * hw + N[1] * (lift - rl), cz + S[2] * hw + N[2] * (lift - rl), s * edge);
       const rt = acc.v(cx + N[0] * th / 2, cy + N[1] * th / 2, cz + N[2] * th / 2, Math.min(1, s * 1.1));
-      const rb = e ? rt : acc.v(cx - N[0] * th / 2, cy - N[1] * th / 2, cz - N[2] * th / 2, s * 0.72);
-      top.push(l, rt, r); bot.push(l, rb, r);
+      const rb = e ? rt : acc.v(cx - N[0] * th / 2, cy - N[1] * th / 2, cz - N[2] * th / 2, s * under);
+      // the rim is TWO vertices (same place), one for the top face and one for the lower: if they were welded, computeVertexNormals would average an upward and a downward face into a
+      // sideways normal, a surface lit as if edge-on, and GTAO (which reads the normal) turned the whole rim black, from above and from below. A rim split keeps the geometry closed
+      // to the eye (no gap) and gives each face its own smooth normal.
+      const l2 = e ? l : acc.vRaw(cx - S[0] * hw + N[0] * (lift + rl), cy - S[1] * hw + N[1] * (lift + rl), cz - S[2] * hw + N[2] * (lift + rl), s * edge);
+      const r2 = e ? r : acc.vRaw(cx + S[0] * hw + N[0] * (lift - rl), cy + S[1] * hw + N[1] * (lift - rl), cz + S[2] * hw + N[2] * (lift - rl), s * edge);
+      top.push(l, rt, r); bot.push(l2, rb, r2);
     }
     acc.grid(top, 2, rows, [0, 1, 0]); acc.grid(bot, 2, rows, [0, -1, 0]);
   }
@@ -345,7 +352,10 @@ export function layBedding(g: any, ctx: any, o: any) {
   });
   // the fold-back: a roll of duvet at the fold line and the linen lining lying toward the head
   const flap = Math.min(0.24, bl * 0.28);
-  shell(duvetA, { cy: matTop + loft + 0.016, cz: headEdge + flap + 0.02, w: W2 - 0.004, h: 0.07, d: 0.075, r: 0.033, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(W2 / 2, 6), ky: [-0.035, 0, 0.035], kz: [-0.0375, 0, 0.0375] });
+  // (wave 3 fix, lakecabin master bedroom SE: the first roll was a 7 cm log lying ACROSS the whole duvet with pill-shaped ends at its sides, which read as an odd striped tube once a
+  // quilt pattern ran over it. It is now a lower, wider, softer fold that stops short of the duvet's sides, sunk into the crown, so it reads as the cloth turned over)
+  shell(duvetA, { cy: matTop + loft + 0.004, cz: headEdge + flap + 0.02, w: W2 - 0.1, h: 0.05, d: 0.12, r: 0.024, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin((W2 - 0.1) / 2, 6), ky: [-0.025, 0, 0.025], kz: [-0.06, 0, 0.06], puff: 0.006,
+    shade: (x: number, _y: number, zz: number, _nx: number, ny: number) => (ny > 0.5 ? 0.97 - 0.06 * smooth(0.7, 1, Math.abs(x) / ((W2 - 0.1) / 2)) - 0.04 * smooth(0.3, 1, Math.abs(zz) / 0.06) : 0.84) });
   // the lining lies toward the head, rippled, its ends drooping over the duvet's sides like cloth, not a board
   const fw = W2 - 0.03, fd = flap + 0.01;
   shell(linenA, { cy: matTop + loft + 0.014, cz: headEdge + flap / 2, w: fw, h: 0.03, d: fd, r: 0.014, faces: ['py', 'px', 'nx', 'nz'], kx: lin(fw / 2, 6), kz: [-fd / 2, 0, fd / 2],
@@ -422,7 +432,18 @@ export function layBedding(g: any, ctx: any, o: any) {
     shell(altA, { w: 0.5, h: 0.11, d: 0.17, r: 0.05, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(0.25, 4), ky: [-0.055, -0.005, 0.055], kz: [-0.085, 0, 0.085], puff: 0.012, xf: lxf,
       shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.97 - 0.1 * smooth(0.6, 1, Math.abs(x) / 0.25) : 0.86) });
   }
-  const uv = quilt ? (x: number, _y: number, zz: number): [number, number] => [(x + W2 / 2) / W2, (zz - (zf - cl)) / cl] : undefined;
+  // the quilt's planar UVs, UNFOLDED over the edge: a plain top-down projection gave every vertex of a side or foot skirt the same u (or v), so the plaid smeared into long streaks
+  // down the skirt and the rounded edge read as an odd striped tube (lakecabin master bedroom SE). Past the start of the rounded edge a vertex is mapped by its distance ALONG the cloth
+  // (how far out it has gone plus how far it hangs), so the pattern runs on over the edge and down the skirt; where that distance would pass the duvet's own half width it is
+  // reflected back (the plaid is symmetric, so the fold does not show)
+  const crown = matTop + loft, edgeX = W2 / 2 - 0.05, edgeZ = zf - 0.05;
+  const uv = quilt ? (x: number, y: number, zz: number): [number, number] => {
+    const drop = Math.max(0, crown - 0.012 - y), ax = Math.abs(x);
+    let tx = Math.min(ax, edgeX) + (ax > edgeX + 1e-6 ? ax - edgeX + drop : 0), tz = Math.min(zz, edgeZ) + (zz > edgeZ + 1e-6 ? zz - edgeZ + drop : 0);
+    if (tx > W2 / 2) tx = W2 - tx;
+    if (tz > zf) tz = 2 * zf - tz;
+    return [(Math.sign(x) * tx + W2 / 2) / W2, (tz - (zf - cl)) / cl];
+  } : undefined;
   put(g, linenA, softMat(ctx, colors.linen, { roughness: 0.95 }), 'linen');
   put(g, duvetA, softMat(ctx, duvet, { roughness: 0.88 }), 'duvet', { uv });
   put(g, altA, softMat(ctx, altCol, { roughness: 0.93 }), 'throw');

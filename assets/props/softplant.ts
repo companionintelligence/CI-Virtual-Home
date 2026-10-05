@@ -85,15 +85,17 @@ export function plantKit(ctx: any) {
   }
 
   /** the finished plant group: pot (house pot colour), leaves (a green), optional cane (bark) and bloom (a colour) */
-  function finish(g: any, o: { pot: any; potCol: number; leaf: any; leafCol: number; cane?: any; caneCol?: number; caneExtra?: any; bloom?: any; bloomCol?: number; leafRough?: number }) {
+  function finish(g: any, o: { pot: any; potCol: number; leaf: any; leafCol: number; cane?: any; caneCol?: number; caneExtra?: any; bloom?: any; bloomCol?: number; leafRough?: number; leafExtra?: any; bloomExtra?: any }) {
     put(g, o.pot, softMat(ctx, o.potCol, { roughness: 0.62 }), 'pot');
     if (o.cane && o.cane.tris) put(g, o.cane, softMat(ctx, o.caneCol ?? BARK, { roughness: 0.85, ...(o.caneExtra || {}) }), 'cane', { receive: !!o.caneExtra });
-    put(g, o.leaf, softMat(ctx, o.leafCol, { roughness: o.leafRough ?? 0.42 }), 'leaf', { receive: false });
-    if (o.bloom && o.bloom.tris) put(g, o.bloom, softMat(ctx, o.bloomCol ?? 0xf6f4ee, { roughness: 0.5 }), 'bloom', { receive: false });
+    put(g, o.leaf, softMat(ctx, o.leafCol, { roughness: o.leafRough ?? 0.42, ...(o.leafExtra || {}) }), 'leaf', { receive: false });
+    if (o.bloom && o.bloom.tris) put(g, o.bloom, softMat(ctx, o.bloomCol ?? 0xf6f4ee, { roughness: 0.5, ...(o.bloomExtra || {}) }), 'bloom', { receive: false });
     return g;
   }
   return { K, jit, pot, POTS, leaf, stalk, arc, fit, finish, rng, colors, hex };
 }
 
+/** a colour scaled toward black by f (an emissive that is a fraction of a leaf's own colour: it lifts a shaded face without changing its hue) */
+export const dim = (c: number, f: number) => (Math.round(((c >> 16) & 255) * f) << 16) | (Math.round(((c >> 8) & 255) * f) << 8) | Math.round((c & 255) * f);
 export const potColor = (it: any, colors: any, rng: () => number, hex: any) => (it.color ? hex(it.color) : rng() < 0.5 ? colors.accent : TERRACOTTA);
 export { TERRACOTTA, BARK, STEM_BROWN, clamp, smooth, splitRng };
