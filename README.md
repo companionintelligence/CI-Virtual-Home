@@ -48,8 +48,8 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run validate` | All 30 specs against the schema, the prop catalog and the registry, then every `scripts/validate/*.mts` plugin. `--shots` adds the headless camera-path QA; `--layout` the layout lints. |
 | `pnpm run test` | `scripts/test-floorplan-graph.mts` under `node --test` — the floor-plan graph, mitres, and the wall compiler over every spec. Needs `build`. |
 | `pnpm run check` | **The gate** — every check below, in order (`pnpm run typecheck` is separate). `--house a,b`, `--jobs N`, `--res`, `--update-goldens`, `--no-perf`. |
-| `pnpm run check:quick` | assets + specs + shots, and the 15 test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site …): the fast loop while editing. |
-| `pnpm run test:node` | Only those 15 quick tests: pure Node, no browser, no GPU (a few minutes). CI runs it. |
+| `pnpm run check:quick` | assets + specs + shots, and the 16 test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site …): the fast loop while editing. |
+| `pnpm run test:node` | Only those 16 quick tests: pure Node, no browser, no GPU (a few minutes). CI runs it. |
 | `pnpm run shots` | Render product shots to `video/houses/` (`--house`, `--shot`, `--res 1080`, `--aspect 16:9`, `--poster-only`, `--qa-only`, `--jobs`). |
 | `pnpm run goldens` / `goldens:update` | Compare 150 frames with the committed baselines / re-bless them. |
 | `pnpm run frame-hash` | Two fresh browser contexts must render the same frames. |
@@ -70,6 +70,7 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run prop-sheet` | Contact sheet of props, measured against their declared sizes (`--types`, `--module`, `--all`). |
 | `pnpm run export:core` | The Companion Core as glTF (`--finish`, `--pose`) → `dist/models/`. |
 | `pnpm run portal:thumbs` | Render the gallery's thumbnails → `portal/thumbs/<id>.webp` and `portal/hero.webp`, and the link-preview JPEGs → `portal/previews/<id>.jpg` and `portal/hero.jpg` (`--house`, `--hero`, `--hero-tod`, `--max-kb`). Needs a GPU; commit the output. |
+| `pnpm run portal:icons` | Render the site's raster icons (`portal/icons/`: `favicon.ico`, the manifest's 192 and 512 px PNGs, the 180 px apple-touch-icon) from the brand mark with Chromium. Commit the output. |
 | `pnpm run portal:build` | Assemble the site in `dist/` — only what it loads — and check its links. Needs `build`. |
 | `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
 | `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
@@ -230,20 +231,46 @@ engine that threw). An id the index does not list gets the error card at once, w
 player asks no third party for anything: its fonts, including the ones the scene draws text in, are the repo's
 own (`portal/viewer.css`); only the editor links Google Fonts.
 
-The share button hands out `homes/<id>.html`: `portal:build` writes one page per home with the home's own title,
-description and preview image as link-preview tags (an unfurler never runs the player), and it forwards to the
-player with the link's query. Preview images are JPEG at 1200 × 630 (`portal/previews/<id>.jpg`, and
-`portal/hero.jpg` for the gallery and the player): LinkedIn and some other unfurlers read no WebP. A checkout served as it is has no such pages, and shares the player's own URL. The gallery
+Each home has a page of its own, `homes/<id>`: `portal:build` writes it (`scripts/portal-pages.mts`) with the home's name, what
+it is, its picture, a button into the player, the Companion Core callout, and the home's own title (`<Name> · Virtual homes ·
+Companion Intelligence`, one string for `<title>`, `og:title` and `twitter:title`), a description under 160 characters,
+preview image and JSON-LD (a breadcrumb and the page). It is also what the share button hands out: a link that carries a
+moment (`shot`, `t`, `tod`) forwards to the player with the link's query, and one without stays on the page. The player's own address is that home's page
+for a search engine (its head script sets the canonical from `?house=`), and the editor (`room-creator.html` without
+`?mode=view`) marks itself `noindex`. The gallery's HTML lists all the homes, each linking its page, so a visitor without JavaScript and a
+crawler that does not run it see them (`gallery.js` replaces them with cards that go straight to the player). Preview images
+are JPEG at 1200 × 630 (`portal/previews/<id>.jpg`, and `portal/hero.jpg` for the gallery and the player): LinkedIn and some other
+unfurlers read no WebP. A checkout served as it is has no such pages, and shares the player's own URL. The gallery
 carries preview tags too, and in `dist/` `room-creator.html`'s static title and description (the editor's, in the
-source) are replaced by the site's, so a player URL copied from the address bar never unfurls as the editor.
+source) are replaced by the player's, so a player URL copied from the address bar never unfurls as the editor.
 Preview images must be absolute: `portal:build` takes the site's address from `--site-url`, else `$SITE_URL`, else
 the live site, `https://homes.ci.computer/`.
+
+Every page sends a visitor on to the company: the header (Companion Intelligence, Docs, Download Companion, Buy Companion
+Core), the Companion Core callout under the hero and the band after the homes, the footer, a home's page, the 404 page,
+and the player's end card and help panel carry the same four addresses, exactly: <https://ci.computer>, <https://ci.computer/core>
+(`/core` redirects to the product page and is still the address to link), <https://ci.computer/download>, and
+the docs' first-party apps page, <https://docs.ci.computer/docs/apps-available/first-party-apps> (there is no page for the
+virtual homes in the docs yet, and `docs.ci.computer/docs` itself answers 404). `portal:build` fails if a built page lacks one;
+the footer also links ci.computer's privacy policy and terms.
+
+The pages live under extensionless addresses, as Cloudflare Pages serves them (`/homes/aurora`, `/room-creator`; the
+`.html` address answers a 308), so the built pages link each other without `.html` (the source `index.html` keeps it, for
+`python3 -m http.server`; `portal:build` rewrites it and marks the page `vh-clean-urls` for `gallery.js`), and the
+canonical and sitemap URLs are the extensionless ones. `404.html` is the 404 page, `robots.txt` allows everything and names
+`sitemap.xml`, which lists the gallery and every home's page. Every `<script>` of the built pages that is not JSON carries
+`data-cfasync="false"`: the `ci.computer` zone has Cloudflare's Rocket Loader on, which otherwise holds a script back and runs it after
+the first paint (the player's head script, which sets the player up before the body parses, ran 400 ms late). `portal/_headers`
+revalidates every file and sets a `frame-ancestors` Content-Security-Policy (the company's own sites may embed the pages; scripts
+are unrestricted, so Google Analytics keeps working), a Permissions-Policy and `X-Robots-Tag: noindex` on the `pages.dev`
+addresses.
 
 Every URL in the site is relative, so the same tree works at the root of any host (the live site, a preview's
 `pages.dev` address) and under a sub-path; `portal:preview` and `portal:test` serve it at `/ci-virtual-home/` to
 prove it. `portal:build` copies only what the site loads into `dist/` (and refuses stale compiled assets, a missing
-spec or thumbnail, a link to a file it does not ship, a root-relative URL, and hero figures in `index.html` that
-disagree with `index.json`); CI runs it on every PR. Nothing renders in CI: when a house's look changes, re-run
+spec or thumbnail, a link to a file it does not ship, a root-relative URL, hero figures in `index.html` that
+disagree with `index.json`, a written-out count ("thirty") that is not the number of homes, and a built page without the four
+links above, a `<script>` without `data-cfasync="false"`, a second `<h1>` or invalid JSON-LD); CI runs it on every PR. Nothing renders in CI: when a house's look changes, re-run
 `pnpm run portal:thumbs --house <id>` on a GPU and commit the new thumbnail and preview with the change.
 `portal:test` is the check to run before pushing portal work.
 
@@ -438,7 +465,7 @@ reviewed frame by frame, committed with that change. Failing runs leave `*.actua
 `test/diff/`.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs what needs no GPU: install, build, typecheck,
-spec validation, the floor-plan-graph tests, `pnpm run test:node` (the 15 quick test scripts) and the portal build. 150 frames through a software rasteriser would cost the better
+spec validation, the floor-plan-graph tests, `pnpm run test:node` (the 16 quick test scripts) and the portal build. 150 frames through a software rasteriser would cost the better
 part of an hour of runner time per push, so the render gate runs locally before you push, as it did in
 CI-Common.
 

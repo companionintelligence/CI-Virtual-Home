@@ -256,7 +256,11 @@ jobs:
           if [ "$deploy" = true ]; then
             echo "Deploying ${sha} (ci run ${run_id}) to the ${target} site: Pages branch ${branch} → ${site_url}"
           else
-            echo "::notice title=Cloudflare Pages deploy skipped::Not deploying the ${target} site: ${reason}"
+            # This run itself ends green. When production is held back because ci is red, say so as a warning (it shows on the
+            # run's summary and in the Actions tab), not a notice nobody reads: the live site is not getting the merged commits.
+            level=notice
+            if [ "$target" = production ] && [ -n "$RUN_CONCLUSION" ] && [ "$RUN_CONCLUSION" != success ]; then level=warning; fi
+            echo "::${level} title=Cloudflare Pages deploy skipped::Not deploying the ${target} site: ${reason}"
             printf '### Cloudflare Pages deploy skipped\n\nNot deploying the %s site: %s\n' "$target" "$reason" >> "$GITHUB_STEP_SUMMARY"
           fi
 
@@ -340,7 +344,9 @@ jobs:
       #   gh variable set GA_MEASUREMENT_ID --body G-XXXX --repo companionintelligence/ci-virtual-home
       # Inline, because this workflow runs no checkout and no repository script. It edits the downloaded files only, in
       # a step with no token. No-op unless the id matches /^G-[A-Z0-9]+$/; idempotent (a page that already carries
-      # gtag.js is skipped). The site sets no CSP (portal/_headers), so the inline config snippet needs no header change.
+      # gtag.js is skipped). The site's only CSP is frame-ancestors (portal/_headers), which restricts no script, so the inline
+      # config snippet needs no header change. data-cfasync="false" keeps Cloudflare's Rocket Loader (on for the ci.computer zone)
+      # from holding both tags back and rewriting their type.
       - name: Inject Google Analytics
         if: steps.gate.outputs.ready == 'true' && needs.plan.outputs.target == 'production'
         working-directory: ${{ runner.temp }}/pages
@@ -356,8 +362,8 @@ jobs:
             process.exit(0);
           }
           const snippet =
-            `<script async src="https://www.googletagmanager.com/gtag/js?id=${id}"></script>\n` +
-            `<script>\nwindow.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\n` +
+            `<script async src="https://www.googletagmanager.com/gtag/js?id=${id}" data-cfasync="false"></script>\n` +
+            `<script data-cfasync="false">\nwindow.dataLayer = window.dataLayer || [];\nfunction gtag(){dataLayer.push(arguments);}\n` +
             `gtag('js', new Date());\ngtag('config', '${id}');\n</script>\n`;
           function* htmlFiles(dir) {
             for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -428,6 +434,53 @@ jobs:
             echo "| Commit | ${SHA} |"
           } >> "$GITHUB_STEP_SUMMARY"
           echo "::notice title=Deployed to Cloudflare Pages (${TARGET})::${SITE_URL}"
+
+      # The upload returns when the files are accepted; this asks the live address for the three things a regression in how the
+      # site is served would break: an unknown path answers 404 (without a 404.html Pages answers 200 with the gallery, and a
+      # crawler is handed that as its robots.txt and sitemap), robots.txt is text/plain, and sitemap.xml lists URLs. Production
+      # only; no token in this step. Only an affirmative sign of a regression (a 200 for an unknown path, an HTML robots.txt, an
+      # empty sitemap) fails the run; an answer it cannot judge (a 403 or 503 from Cloudflare to a runner) is a warning. It retries
+      # for a minute, for an address that has not caught up yet.
+      - name: Smoke-test the live site
+        if: steps.gate.outputs.ready == 'true' && needs.plan.outputs.target == 'production'
+        env:
+          SITE_URL: ${{ needs.plan.outputs.site-url }}
+        run: |
+          base="${SITE_URL%/}"
+          bad=''; unsure=''; urls=0
+          for _ in 1 2 3 4 5 6; do
+            bad=''; unsure=''
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "$base/smoke-test-no-such-page-${GITHUB_RUN_ID}") || code=000
+            case "$code" in
+              404) ;;
+              200) bad="$bad an unknown path answered 200 (no 404.html is being served);" ;;
+              *) unsure="$unsure an unknown path answered ${code};" ;;
+            esac
+            out=$(curl -sS -o /dev/null -w '%{http_code} %{content_type}' "$base/robots.txt") || out='000 '
+            code=${out%% *}; ctype=${out#* }
+            if [ "$code" != 200 ]; then unsure="$unsure robots.txt answered ${code};"
+            else
+              case "$ctype" in
+                text/plain*) ;;
+                text/html*) bad="$bad robots.txt is HTML (${ctype});" ;;
+                *) unsure="$unsure robots.txt is ${ctype:-of no type};" ;;
+              esac
+            fi
+            code=$(curl -sS -o "$RUNNER_TEMP/sitemap.xml" -w '%{http_code}' "$base/sitemap.xml") || code=000
+            urls=$(grep -o '<loc>' "$RUNNER_TEMP/sitemap.xml" 2>/dev/null | wc -l | tr -d ' ')
+            if [ "$code" != 200 ]; then unsure="$unsure sitemap.xml answered ${code};"
+            elif [ "$urls" -lt 2 ]; then bad="$bad sitemap.xml lists ${urls} URLs;"; fi
+            if [ -z "$bad$unsure" ]; then break; fi
+            sleep 10
+          done
+          if [ -n "$bad" ]; then
+            echo "::error title=Smoke test failed on ${base}::${bad}${unsure}"
+            exit 1
+          elif [ -n "$unsure" ]; then
+            echo "::warning title=Smoke test inconclusive on ${base}::${unsure}"
+          else
+            echo "Smoke test passed on ${base}: an unknown path answers 404, robots.txt is text/plain, sitemap.xml lists ${urls} URLs"
+          fi
 
   # A workflow_run's deployment is not attached to the pull request, so the preview's address goes on it as a commit
   # status, which its checks list. No secret and no environment: the token is not in this job.

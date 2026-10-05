@@ -5,17 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Virtual homes editor · Companion Intelligence</title>
   <meta name="description" content="The Companion virtual homes editor: build a home from its spec, review its camera shots and their checks, and export stills and videos of the Companion Core at home.">
+  <link rel="icon" href="./assets/brand/ci-logo-mark.svg" type="image/svg+xml">
+  <link rel="icon" href="./portal/icons/favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon" href="./portal/icons/apple-touch-icon.png">
+  <link rel="manifest" href="./portal/site.webmanifest">
+  <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
   <!-- ?mode=view is the portal's player: decided before the body parses, so the editor chrome never flashes.
        portal/viewer.css hides the editor and assets/viewer.js (mounted at the end of the module) plays the house.
        Until the player mounts, this block is all of it: the poster and the loader (with the home's name once
        index.json is in, and a word when a slow connection makes it take a while), and a message with a way out
        if the page cannot start (no WebGL 2, a module that did not download, an engine that threw). The player
        uses the repo's own fonts (viewer.css), so it asks Google for nothing.
-       Without ?mode=view this block only writes the editor's Google Fonts links, and the page is the editor. -->
-  <script>
+       Without ?mode=view this block only writes the editor's Google Fonts links, and the page is the editor.
+       data-cfasync="false" on every script of the page: Cloudflare's Rocket Loader would otherwise rewrite each one's type
+       and run it late, after the first paint, and this block's whole point is to run before it. -->
+  <script data-cfasync="false">
     (function () {
       var q = new URLSearchParams(location.search), d = document.documentElement, id = q.get('house') || 'aurora';
       if (q.get('mode') !== 'view') {
+        // the editor is a tool, not a page to find: out of search results (the player's canonical is its home's page, below)
+        var robots = document.createElement('meta');
+        robots.name = 'robots'; robots.content = 'noindex';
+        document.head.appendChild(robots);
         document.write('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
           + '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">');
         return;
@@ -37,6 +49,13 @@
         var j = r[0], n = r[1];
         var h = j && (j.houses || []).filter(function (x) { return x.id === id; })[0];
         if (h) {
+          // this player URL is that home's page for a search engine: the build writes the canonical link (the player's
+          // own address) and the vh-share meta (where the homes' pages are) at the end of the head
+          var canonical = function () {
+            var share = document.querySelector('meta[name="vh-share"]'), link = document.querySelector('link[rel="canonical"]');
+            if (share && link && /^[a-z0-9-]+\/$/.test(share.content)) link.href = new URL(share.content + id, link.href).href;
+          };
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', canonical); else canonical();
           var name = n && n.displayName(h);
           if (name) d.style.setProperty('--vh-boot-name', cssString(name));
           // the credit and the facts, as the player's loading card writes them (viewer.ts metaLine)
@@ -110,7 +129,7 @@
   </script>
   <!-- ?mode=view only (the head script above defines __vhNames): the portal's names for the loader, imported after
        the import map. In the editor this does nothing. -->
-  <script>if (window.__vhNames) window.__vhNames(import('./assets/home-names.js').catch(function () { return null; }));</script>
+  <script data-cfasync="false">if (window.__vhNames) window.__vhNames(import('./assets/home-names.js').catch(function () { return null; }));</script>
 
   <style>
     /* -------------------------------------------------------------------------------------------
@@ -1939,7 +1958,7 @@
 
   <div id="toasts" class="rc-chrome"></div>
   <!-- Application Logic (ES Module) -->
-  <script type="module">
+  <script type="module" data-cfasync="false">
     import * as THREE from 'three';
     import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
     import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';

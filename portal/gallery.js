@@ -39,7 +39,11 @@ const TAGS = [
 const $ = sel => document.querySelector(sel);
 // No play=: the player starts the shot by itself, except for a visitor whose system asks for reduced motion, and
 // that is the player's call (it can read the setting; a link cannot).
-const viewerHref = id => `./room-creator.html?mode=view&house=${encodeURIComponent(id)}`;
+// Cloudflare Pages serves room-creator.html as /room-creator and answers the .html address with a 308, which a card
+// click would pay for first. scripts/build-portal.mts marks the built page <meta name="vh-clean-urls">; a checkout
+// served as it is (python -m http.server) has no such routing and keeps the file name.
+const CLEAN_URLS = !!document.querySelector('meta[name="vh-clean-urls"]');
+const viewerHref = id => `./room-creator${CLEAN_URLS ? '' : '.html'}?mode=view&house=${encodeURIComponent(id)}`;
 // the first clause of the spec's style paragraph: "Two-storey white modern villa, stacked flat roofs, …" → "Two-storey white modern villa"
 const shortStyle = s => (s || '').split(/[:;,(]| with | over | under /)[0].trim();
 const nf = new Intl.NumberFormat('en');
@@ -223,13 +227,22 @@ async function load() {
     return false;
   }
   failed(false);
-  homes = (index.houses || []).map(h => ({ ...h, name: names.buildName(h), display: names.displayName(h), tags: TAGS.filter(([, re]) => re.test(h.style || '')).map(([name]) => name) }));
-  stats();
-  renderTags();
-  credits();
-  $('#grid').replaceChildren(...homes.map(card));
-  $('#grid').setAttribute('aria-busy', 'false');
-  apply();
+  // Anything that throws from here on (a record the page did not expect) ends on the same card, with the same way to
+  // try again, as a list that did not download: a gallery never stays on its placeholders.
+  try {
+    homes = (index.houses || []).map(h => ({ ...h, name: names.buildName(h), display: names.displayName(h), tags: TAGS.filter(([, re]) => re.test(h.style || '')).map(([name]) => name) }));
+    stats();
+    renderTags();
+    credits();
+    $('#grid').replaceChildren(...homes.map(card));
+    $('#grid').setAttribute('aria-busy', 'false');
+    apply();
+  } catch (err) {
+    console.warn('gallery: the list could not be shown', err);
+    homes = [];
+    failed(true);
+    return false;
+  }
   return true;
 }
 
@@ -294,4 +307,8 @@ async function main() {
   document.documentElement.dataset.gallery = 'ready';
 }
 
-main();
+main().catch(err => {
+  console.warn('gallery: stopped', err);
+  try { failed(true); } catch { /* the page has no card to show */ }
+  document.documentElement.dataset.gallery = 'failed';
+});

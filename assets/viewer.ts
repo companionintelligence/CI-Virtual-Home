@@ -105,7 +105,15 @@ const DRAG_TO_FLY = 6;        // px of drag on the scene before it counts as tak
 const IDLE_MS = 2600;         // controls fade after this long without input while a shot plays
 const IDLE_TOUCH_MS = 4000;   // on a touch screen, a little longer (a tap brings them back)
 const REF_ASPECT = 16 / 9;    // the aspect the shots are framed for
-const CORE_URL = 'https://ci.computer';
+// Where the end card and the help panel send a visitor. Exactly these addresses (portal:build checks the site's pages for
+// them too); /core redirects to the product page, and is still the address to link.
+const BUY_URL = 'https://ci.computer/core';
+const DOWNLOAD_URL = 'https://ci.computer/download';
+const DOCS_URL = 'https://docs.ci.computer/docs/apps-available/first-party-apps';
+const SITE_URL = 'https://ci.computer';
+// a link that opens a new tab says so to a screen reader (the player keeps playing in this one)
+const newTab = (href: string, label: string, short = ''): string =>
+  `<a href="${href}" target="_blank" rel="noopener">${short ? `<span class="vh-long">${label}</span><span class="vh-short">${short}</span>` : label}${icon('out', 'vh-i-out')}<span class="vh-sr"> (opens in a new tab)</span></a>`;
 const DEFAULT_SHOT = 'orbit';   // what a link without shot= opens on (onHouse)
 const CORE_NAME = 'Companion Core (Hero)';   // the house builder's name for the desk's Core (the QA gate finds it by it too)
 const FLY_FLOOR = 0.25;       // m: the lowest the free camera goes (the lot's ground is y = 0)
@@ -152,7 +160,7 @@ export function mountViewer(api: Api) {
     <div class="vh-loading" role="status" aria-live="polite">
       <div class="vh-loading-card">
         <img class="vh-mark" src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28">
-        <h2 class="vh-loading-name">Loading</h2>
+        <p class="vh-loading-name">Loading</p>
         <p class="vh-loading-meta"></p>
         <div class="vh-bar"><span></span></div>
         <p class="vh-loading-status">Building the house</p>
@@ -193,7 +201,7 @@ export function mountViewer(api: Api) {
     <div class="vh-dock" role="group" aria-label="Player">
       <div class="vh-end" hidden role="group" aria-labelledby="vh-end-title">
         <h2 id="vh-end-title">Meet the Companion Core.</h2>
-        <p><span class="vh-end-body">The small computer on the desk runs your own AI, apps and memory at home, not in someone else's cloud. </span><a href="${CORE_URL}" target="_blank" rel="noopener">What is Companion Core?${icon('out', 'vh-i-out')}</a></p>
+        <p><span class="vh-end-body">The small computer on the desk runs your own AI, apps and memory at home, not in someone else's cloud. </span><span class="vh-end-links">${newTab(BUY_URL, 'Buy Companion Core', 'Buy Core')}<span class="vh-end-dot" aria-hidden="true">·</span>${newTab(DOWNLOAD_URL, 'Download Companion', 'Download')}</span></p>
         <div class="vh-end-actions">
           <button class="vh-end-btn" data-act="replay">${icon('replay')}<span>Replay</span></button>
           <button class="vh-end-btn" data-act="try-shot">${icon('play', 'vh-i-play')}<span class="vh-try-label"></span></button>
@@ -243,6 +251,7 @@ export function mountViewer(api: Api) {
         <dt><kbd>Shift</kbd> <kbd>F</kbd></dt><dd>Full screen</dd>
       </dl>
       <p class="vh-help-legend"><span class="vh-help-tick" aria-hidden="true"></span>The orange tick on the timeline is where the Companion Core wakes.</p>
+      <p class="vh-help-links">${newTab(SITE_URL, 'Companion Intelligence')}${newTab(BUY_URL, 'Buy Companion Core')}${newTab(DOWNLOAD_URL, 'Download Companion')}${newTab(DOCS_URL, 'Docs')}</p>
     </div>`;
   host.appendChild(root);
   html.dataset.viewer = 'mounted';
@@ -443,17 +452,18 @@ export function mountViewer(api: Api) {
     return `${location.pathname}?${q.toString()}`;
   }
   const syncUrl = () => { try { history.replaceState(null, '', url(false)); } catch { /* sandboxed */ } };
-  // What the share button hands out. Deployed, that is homes/<id>.html: scripts/build-portal.mts writes one page
-  // per home carrying the home's own title, description and thumbnail for link previews (which never run this
-  // script, so they would otherwise show the editor's title), and it forwards here with the query. It marks the
-  // built room-creator.html with <meta name="vh-share" content="homes/">; a checkout served as it is has no such
-  // pages, and shares this page's own URL.
+  // What the share button hands out. Deployed, that is homes/<id> (the address Cloudflare Pages serves homes/<id>.html
+  // at, so there is no redirect to pay for): scripts/build-portal.mts writes one page per home, the home's own page, with
+  // its title, description and thumbnail (link unfurlers never run this script, so they would otherwise show the
+  // editor's title). A link that carries a moment (shot, t, tod) forwards here with the query. It marks the built
+  // room-creator.html with <meta name="vh-share" content="homes/">; a checkout served as it is has no such pages, and
+  // shares this page's own URL.
   const sharePages = (document.querySelector('meta[name="vh-share"]') as HTMLMetaElement | null)?.content || '';
   function shareUrl(): string {
     if (!sharePages || !/^[a-z0-9-]+\/$/.test(sharePages)) return new URL(url(true), location.href).href;
     const q = new URLSearchParams(new URL(url(true), location.href).search);
     q.delete('mode'); q.delete('house');
-    return new URL(`./${sharePages}${encodeURIComponent(houseId)}.html?${q.toString()}`, location.href).href;
+    return new URL(`./${sharePages}${encodeURIComponent(houseId)}?${q.toString()}`, location.href).href;
   }
 
   // ------------------------------------------------------------------ building the chips

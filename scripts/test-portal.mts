@@ -29,6 +29,11 @@
 //             card that says so, with a way back, instead of an endless loader; the names module
 //             (home-names.js) not downloading: the gallery still lists the homes, and the player's tab never
 //             shows a spec's Sims title
+//   pages     the built site's own pages, without a browser's help: the gallery lists its 30 homes in the HTML itself (each
+//             linking its page), a home's page names and shows the home and offers the player, a shared moment forwards
+//             to the player, /robots.txt is text/plain, /sitemap.xml lists the gallery and every home, an unknown path
+//             answers 404 with the 404 page, the icons and the manifest are served, and every page carries the Companion
+//             Core, download, docs and main-site links
 //   caching   dist/_headers revalidates every file (max-age=0, must-revalidate), and the pages name every module and
 //             stylesheet by a hash of its content (import map + ?v=): the player pulls each module by its hash, and with
 //             every un-hashed module URL poisoned (an old build in the browser's cache) it still starts
@@ -188,12 +193,85 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   await page.click('#grid .card:nth-child(2) a');
   // the navigation, not its load event (three.js and the engine are part of that, and a loaded machine takes a
   // while over them); viewerReady below waits for the player itself
-  await page.waitForURL(/room-creator\.html\?mode=view/, { waitUntil: 'commit', timeout: 30000 });
+  await page.waitForURL(/room-creator\?mode=view/, { waitUntil: 'commit', timeout: 30000 });
   await viewerReady(page);
   ok(true, `a card opens the player (${new URL(page.url()).searchParams.get('house')})`);
   ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
   ok(thirdParty.length === 0, `the gallery and the player ask no third party for anything${thirdParty.length ? ': ' + thirdParty.join(' | ') : ''}`);
   await close();
+}
+
+// ------------------------------------------------------------------ the built site's own pages
+async function pages() {
+  console.log('\npages');
+  const get = async (p: string) => { const r = await fetch(srv.url(p), { redirect: 'manual' }); return { status: r.status, type: r.headers.get('content-type') || '', text: await r.text() }; };
+  const index = JSON.parse(fs.readFileSync(path.join(DIR, 'content', 'houses', 'index.json'), 'utf8'));
+  const ids: string[] = index.houses.map((h: { id: string }) => h.id);
+  const links = ['https://ci.computer', 'https://ci.computer/core', 'https://ci.computer/download', 'https://docs.ci.computer/docs/apps-available/first-party-apps'];
+
+  // the gallery's HTML, as a crawler or a visitor without JavaScript gets it
+  const gallery = await get('index.html');
+  const listed = [...gallery.text.matchAll(/<li class="card" data-id="([^"]+)"><a href="\.\/homes\/([^"]+)"/g)];
+  ok(listed.length === ids.length && listed.every(m => m[1] === m[2]) && listed.map(m => m[1]).join() === ids.join(), `the gallery's HTML lists all ${listed.length} homes, each linking its page (./homes/<id>)`);
+  ok(links.every(l => gallery.text.includes(`href="${l}"`)) && gallery.text.includes('href="https://ci.computer/privacy-policy"') && gallery.text.includes('href="https://ci.computer/terms-of-service"'), 'and carries the main site, /core, /download, the docs, privacy and terms');
+  const heroLinks = [...gallery.text.matchAll(/id="hero-(?:play|media)" href="([^"]+)"/g)].map(m => m[1]);
+  ok(heroLinks.length === 2 && heroLinks.every(h => h.startsWith('./room-creator?mode=view')), 'its hero links go to the player without .html');
+
+  // a home's own page
+  const aurora = await get('homes/aurora');
+  const h1 = (aurora.text.match(/<h1[^>]*>([^<]*)<\/h1>/) || [])[1];
+  ok(aurora.status === 200 && h1 === 'Aurora' && /<img src="\.\.\/portal\/previews\/aurora\.jpg" alt="[^"]+" width="1200" height="630"/.test(aurora.text) && aurora.text.includes('href="../room-creator?mode=view&amp;house=aurora"'), `/homes/aurora is a page of its own: <h1>${h1}</h1>, its picture, a way into the player`);
+  ok(/<link rel="canonical" href="https:\/\/homes\.ci\.computer\/homes\/aurora">/.test(aurora.text) && /"@type":"BreadcrumbList"/.test(aurora.text) && links.every(l => aurora.text.includes(`href="${l}"`)), 'with its canonical, a breadcrumb in JSON-LD and the four links');
+  const direct = await get('homes/aurora.html');
+  ok(direct.status === 200, '… and homes/aurora.html is served too (Pages answers it with a 308 to the address above)');
+
+  // robots, sitemap, 404, icons, manifest
+  const robots = await get('robots.txt');
+  ok(robots.status === 200 && /^text\/plain/.test(robots.type) && /^Sitemap: https:\/\/\S+\/sitemap\.xml$/m.test(robots.text), `robots.txt is text/plain and names the sitemap`);
+  const sitemap = await get('sitemap.xml');
+  const locs = [...sitemap.text.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
+  ok(sitemap.status === 200 && locs.length === ids.length + 1 && ids.every(id => locs.some(l => l.endsWith(`/homes/${id}`))) && !locs.some(l => /\.html$/.test(l)), `sitemap.xml lists the gallery and ${locs.length - 1} homes, none with .html`);
+  const missing = await get('no-such-page');
+  ok(missing.status === 404 && /<title>Page not found/.test(missing.text) && /<h1>Page not found<\/h1>/.test(missing.text) && links.every(l => missing.text.includes(`href="${l}"`)), 'an unknown path answers 404 with the 404 page, which links the four');
+  const ico = await fetch(srv.url('favicon.ico')), apple = await fetch(srv.url('apple-touch-icon.png'));
+  const icoBytes = new Uint8Array(await ico.arrayBuffer()), appleBytes = new Uint8Array(await apple.arrayBuffer());
+  ok(ico.ok && icoBytes[2] === 1 && apple.ok && appleBytes[1] === 0x50 && appleBytes[2] === 0x4e, '/favicon.ico (an ICO) and /apple-touch-icon.png (a PNG) are served at the root');
+  const manifest = JSON.parse((await get('portal/site.webmanifest')).text);
+  const iconsThere = (manifest.icons || []).every((i: { src: string }) => fs.existsSync(path.join(DIR, 'portal', i.src)));
+  ok(manifest.name && manifest.icons?.length >= 2 && iconsThere, `the web manifest names the site and its ${manifest.icons?.length} icons, which exist`);
+  const headers = fs.readFileSync(path.join(DIR, '_headers'), 'utf8');
+  ok(/frame-ancestors/.test(headers) && /Permissions-Policy/.test(headers) && /https:\/\/:project\.pages\.dev\/\*\s+X-Robots-Tag: noindex/.test(headers) && !/script-src|default-src/.test(headers), '_headers: frame-ancestors, a Permissions-Policy, noindex on the pages.dev addresses, and no script-src to trip the analytics snippet');
+
+  // a shared moment forwards to the player; the page without one stays
+  {
+    const { page, errors, close } = await open({ width: 1280, height: 800 });
+    await page.goto(srv.url('homes/aurora'));
+    await sleep(600);
+    ok(new URL(page.url()).pathname === `${BASE}homes/aurora` && (await page.$eval('h1', (e: Element) => e.textContent)) === 'Aurora', 'a home\'s page without a shared moment stays on the page');
+    await page.screenshot({ path: path.join(SHOTS, 'home-page-1280.png') });
+    ok(await page.isVisible('.cta-band a[href="https://ci.computer/core"]') && await page.isVisible('.site-head a[href="https://ci.computer/core"]'), 'its header and its band offer the Companion Core');
+    await page.click('.hero-cta .btn-primary');
+    await page.waitForURL(/room-creator\?mode=view&house=aurora/, { waitUntil: 'commit', timeout: 30000 });
+    await viewerReady(page);
+    ok(true, 'Open in 3D starts the player');
+    ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
+    await close();
+  }
+  {
+    // the player's own address is that home's page for a search engine; the editor stays out of the index
+    const { page, errors, close } = await open({ width: 1280, height: 800 });
+    await page.goto(srv.url('room-creator?mode=view&house=aurora'));
+    await viewerReady(page);
+    await sleep(300);
+    const canonical = await page.$eval('link[rel="canonical"]', (e: HTMLLinkElement) => e.href);
+    ok(/\/homes\/aurora$/.test(canonical), `the player's canonical is the home's page (${canonical})`);
+    ok(await page.$('meta[name="robots"]') === null, 'the player is indexable');
+    await page.goto(srv.url('room-creator?house=aurora'));
+    await page.waitForFunction(() => document.documentElement.dataset.houseReady === 'aurora', null, { timeout: 90000 });
+    ok(await page.$eval('meta[name="robots"]', (e: HTMLMetaElement) => e.content) === 'noindex', 'the editor is noindex');
+    ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
+    await close();
+  }
 }
 
 // ------------------------------------------------------------------ link previews of the built pages
@@ -277,6 +355,13 @@ async function player(id: string, viewport: { width: number; height: number }, m
   await viewerReady(page);
   ok(true, `built in ${((Date.now() - t0) / 1000).toFixed(1)} s`);
   ok(await page.evaluate(() => getComputedStyle(document.querySelector('.creator-topbar')!).display === 'none'), 'editor chrome is hidden');
+  if (!mobile) {
+    // the help panel carries the main site, buy, download and docs, each opening a tab (the shot keeps playing here)
+    await page.click('.vh-top [data-act="help"]');
+    const helpLinks = await page.$$eval('.vh-help-links a', (as: HTMLAnchorElement[]) => as.map(a => ({ href: a.href, tab: a.target === '_blank' && /noopener/.test(a.rel), shown: a.getBoundingClientRect().height > 0 })));
+    ok(JSON.stringify(helpLinks.map((l: any) => l.href)) === JSON.stringify(['https://ci.computer/', 'https://ci.computer/core', 'https://ci.computer/download', 'https://docs.ci.computer/docs/apps-available/first-party-apps']) && helpLinks.every((l: any) => l.tab && l.shown), `the help panel links ci.computer, /core, /download and the docs, each in a new tab`);
+    await page.click('.vh-help [data-act="help"]');
+  }
   const chips = await page.$$eval('.vh-shots .vh-chip', (els: HTMLElement[]) => els.map(e => ({ key: e.dataset.shot, label: e.querySelector('span')!.textContent })));
   const presetShots = await page.evaluate(() => { const s = (window as any).__houseDebug().house.shots; return [...new Set(Object.values(s))].length; });
   ok(chips.length === presetShots && chips.length >= 4, `${chips.length} shots listed from the house's presets (${chips.map((c: any) => c.label).join(', ')})`);
@@ -447,8 +532,10 @@ async function player(id: string, viewport: { width: number; height: number }, m
   if ((await page.getAttribute('.vh', 'data-playing')) === '1') await page.click('.vh-play');
   await setScrub(page, 1000);
   await sleep(300);
-  const endCard = await page.isVisible('.vh-end') && await page.isVisible('.vh-end [data-act="next"]') && await page.isVisible('.vh-end a[href^="https://ci.computer"]');
-  ok(endCard, `the end of the shot offers ${(await page.$$eval('.vh-end button:not([hidden])', (bs: Element[]) => bs.map(b => (b.textContent || '').trim()))).join(', ')}`);
+  const endCard = await page.isVisible('.vh-end') && await page.isVisible('.vh-end [data-act="next"]') && await page.isVisible('.vh-end a[href="https://ci.computer/core"]') && await page.isVisible('.vh-end a[href="https://ci.computer/download"]');
+  ok(endCard, `the end of the shot offers ${(await page.$$eval('.vh-end button:not([hidden])', (bs: Element[]) => bs.map(b => (b.textContent || '').trim()))).join(', ')}, and the Core and the download`);
+  const endLinks = await page.$$eval('.vh-end a', (as: HTMLAnchorElement[]) => as.map(a => ({ href: a.href, tab: a.target === '_blank' && /noopener/.test(a.rel), name: (a.textContent || '').replace(/\s+/g, ' ').trim() })));
+  ok(endLinks.length === 2 && endLinks.every((l: any) => l.tab && /\(opens in a new tab\)/.test(l.name)), `the end card's two links open a tab with noopener and say so (${endLinks.map((l: any) => l.name).join(' | ')})`);
   const cover = await coreCover(page);
   ok(cover >= 0 && cover < 0.05, `the end card covers ${Math.round(cover * 100)} % of the Core`);
   if (mobile) {
@@ -472,17 +559,17 @@ async function player(id: string, viewport: { width: number; height: number }, m
     await sleep(300);
     const link: string = await page.evaluate(() => navigator.clipboard.readText()).catch(() => '');
     const u = link ? new URL(link) : null;
-    ok(!!u && u.pathname === `${BASE}homes/${id}.html` && u.searchParams.has('t') && u.searchParams.has('shot') && u.searchParams.has('tod'), `share copies ${link.replace(srv.origin, '')}`);
+    ok(!!u && u.pathname === `${BASE}homes/${id}` && u.searchParams.has('t') && u.searchParams.has('shot') && u.searchParams.has('tod'), `share copies ${link.replace(srv.origin, '')} (no .html: Pages would answer that with a redirect)`);
     if (u) {
       const sharePage = await (await fetch(link)).text();
       const name = (await page.textContent('.vh-name'))!.trim();
       const tag = (p: string) => (sharePage.match(new RegExp(`<meta property="${p}" content="([^"]*)"`)) || [])[1] || '';
       const unesc = (v: string) => v.replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-      ok(unesc(tag('og:title')) === name && tag('og:image').endsWith(`portal/previews/${id}.jpg`) && tag('og:image:type') === 'image/jpeg' && tag('og:description').length > 20 && !/Room Creator/.test(sharePage), `the share page previews as "${unesc(tag('og:title'))}" with its JPEG preview`);
+      ok(unesc(tag('og:title')) === `${name} · Virtual homes · Companion Intelligence` && tag('og:image').endsWith(`portal/previews/${id}.jpg`) && tag('og:image:type') === 'image/jpeg' && tag('og:description').length > 20 && !/Room Creator/.test(sharePage), `the share page previews as "${unesc(tag('og:title'))}" with its JPEG preview`);
       const { page: p2, errors: e2, close: c2 } = await open(viewport, mobile);
       await p2.goto(link);
       await viewerReady(p2);
-      ok(new URL(p2.url()).pathname === `${BASE}room-creator.html` && new URL(p2.url()).searchParams.get('house') === id, 'the share page forwards to the player');
+      ok(new URL(p2.url()).pathname === `${BASE}room-creator` && new URL(p2.url()).searchParams.get('house') === id, 'the share link forwards to the player');
       const t2 = await scrubT(p2);
       ok(Math.abs(t2 - Number(u.searchParams.get('t'))) < 0.002 && (await p2.getAttribute('.vh', 'data-playing')) === '0', `the link opens paused at t = ${t2.toFixed(3)}`);
       ok(e2.length === 0, `no console errors on the shared link${e2.length ? ': ' + e2.join(' | ') : ''}`);
@@ -661,6 +748,7 @@ async function webkit() {
 try {
   await gallery({ width: 1440, height: 900 }, false, '1440');
   await gallery({ width: 390, height: 844 }, true, '390');
+  await pages();
   await previews();
   await caching();
   for (const [i, id] of HOUSES.entries()) await player(id, { width: 1440, height: 900 }, false, '1440', i === 0);

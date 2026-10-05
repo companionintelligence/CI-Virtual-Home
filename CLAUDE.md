@@ -22,6 +22,7 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `scenes/floorplans/` | `pnpm run floorplans` |
 | `test/goldens/<profile>/` | `pnpm run goldens:update` — only on purpose, see below |
 | `portal/thumbs/<id>.webp`, `portal/hero.webp`, `portal/previews/<id>.jpg`, `portal/hero.jpg` | `pnpm run portal:thumbs [--house <id>]` — after a change to how a house looks |
+| `portal/icons/*` (the favicon, the manifest's PNGs, the apple-touch-icon) | `pnpm run portal:icons` — after a change to `assets/brand/ci-logo-mark.svg` |
 | `dist/` (gitignored) | `pnpm run portal:build` |
 
 Edit `assets/*.ts`, never the compiled `.js` beside it. `assets/vendor/` is third-party: do not edit it (the
@@ -55,7 +56,12 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   the token; never ask for it.
 - Google Analytics 4 is injected into the production site's HTML by an inline step in `deploy.yml` ("Inject Google Analytics"),
   from the repository variable `GA_MEASUREMENT_ID` (a variable, not a secret). Never hardcode the id; the step is a no-op
-  unless it matches `/^G-[A-Z0-9]+$/`, and it is idempotent. The site sets no CSP, so no header change is needed.
+  unless it matches `/^G-[A-Z0-9]+$/`, and it is idempotent. Its two tags carry `data-cfasync="false"` (the zone has Rocket Loader on).
+  The site's only CSP is `frame-ancestors` (`portal/_headers`), which restricts no script, so no header change is needed; if a
+  `script-src` is ever added it must allow `googletagmanager.com` and `google-analytics.com`. The site's pages therefore are not
+  free of third parties once deployed (the source pages are): consent handling is the owner's call. A step after the upload
+  smoke-tests the live address (404 for an unknown path, `robots.txt` as text/plain, a sitemap with URLs).
+  `pnpm run test:node` runs both inline scripts from `deploy.yml` as they are (`scripts/test-deploy-workflow.mts`).
 - Do not deploy by hand; merge, or ask the owner to run the workflow. The by-hand steps in the README are the
   owner's fallback. GitHub Pages is retired (its github.io address redirects to a dead org domain): do not bring a
   github.io deploy back, and do not make Wrangler a devDependency.
@@ -73,9 +79,17 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 - `portal:build` writes more than copies: `dist/homes/<id>.html` share pages, one `<meta name="vh-share">` in
   `dist/room-creator.html` that tells the player they exist, the site's title and preview tags in place of that
   page's static (editor) head, and absolute preview-image URLs (`--site-url`, default `https://homes.ci.computer/`).
-- Search hygiene is also `portal:build`'s (5d2): canonical, twitter title/description/image and Organization JSON-LD on every page,
-  plus `404.html`, `robots.txt` and `sitemap.xml`. Canonical and sitemap URLs are the extensionless ones Pages serves
-  (`/homes/<id>`, `/room-creator`), never `.html` (that answers 308). A new page needs a `seo(...)` call there.
+- Search hygiene is also `portal:build`'s (5d2): canonical, twitter title/description/image and JSON-LD (publisher, site, the list of
+  homes, a home's page and breadcrumb: `scripts/portal-pages.mts`) on every page, plus `404.html`, `robots.txt` and `sitemap.xml`.
+  Canonical and sitemap URLs are the extensionless ones Pages serves (`/homes/<id>`, `/room-creator`), never `.html` (that answers
+  308), and the built pages link each other without `.html` too. A new page needs a `seo(...)` call there and an entry in step 7's checks.
+- A home's page (`homes/<id>`, from `portal-pages.mts`) is a page of its own, not a redirect: only a link that carries a moment (`shot`,
+  `t`, `tod`, `play`) forwards to the player. Every page of the site (gallery, a home's page, 404) and the player's end card and help
+  panel send a visitor to exactly `https://ci.computer`, `https://ci.computer/core` (Buy Companion Core), `https://ci.computer/download`
+  (Download Companion) and the docs (`LINKS` in `portal-pages.mts`; `assets/viewer.ts` has the same four); `portal:build` fails without them.
+  No prices, specs or availability on these pages: reuse the wording ci.computer and the docs use.
+- Every executable `<script>` in the built pages has `data-cfasync="false"` (Cloudflare's Rocket Loader is on for the zone and would
+  run the player's head script after the first paint); `portal:build` checks it. New icons go through `pnpm run portal:icons`.
 - A home's name on the portal is `displayName` in `assets/home-names.ts`, never the spec's `name` directly (that is
   the Sims build's title and stays the credit). Fix a name there, not in `content/houses/`.
 - The engine's modules are not fingerprinted by file name, so `portal:build` names each one by a content hash in the page's
@@ -102,14 +116,14 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   `<main>` because `<main>` goes inert while a drawer is open.
 - `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
 
-**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and the 15 quick
+**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and the 16 quick
 Node tests (`pnpm run test:node`) and assembles the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
 passes those goes live on its own. The render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
 pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (150 / 150)
-pnpm run check:quick    # while iterating: assets + specs + shots + the 15 quick tests
+pnpm run check:quick    # while iterating: assets + specs + shots + the 16 quick tests
 ```
 
 A clean run has 0 shot errors and 0 scene errors (warnings are reported but do not fail — compare their count
