@@ -52,7 +52,8 @@
     "prop-drift": "node --experimental-strip-types scripts/check-prop-drift.mts",
     "test:neutrality": "node --experimental-strip-types scripts/test-build-neutrality.mts",
     "soft-sheet": "node --experimental-strip-types scripts/soft-sheet.mts",
-    "soft-rooms": "node --experimental-strip-types scripts/soft-rooms.mts"
+    "soft-rooms": "node --experimental-strip-types scripts/soft-rooms.mts",
+    "test:light": "node --experimental-strip-types scripts/test-interior-light.mts"
   },
   "devDependencies": {
     "@types/node": "^22",

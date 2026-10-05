@@ -17,7 +17,9 @@
 //                   windows, partition doors, cladding, ceilings, theming, lighting), kit-rules.ts (the pure rules
 //                   behind them: restraint and keep, door colours, the sun, fans and lamps), item-map.ts (spec item type →
 //                   AssetFactory builder, ITEM_PARAMS, DESK_TOP, the on-surface and hero sets), hero-build.ts and
-//                   hero-frame.ts, materials.ts, textures.ts, fixtures.ts, environment.ts, props/lighting.ts;
+//                   hero-frame.ts, materials.ts, textures.ts, fixtures.ts, environment.ts, house-scheme.ts (the style as finish
+//                   decisions: metal, lamp temperature, ceiling, trim, tile), room-clip.ts (a room's light stays in its room: a box
+//                   a light in the shader), props/lighting.ts, props/finish-roles.ts;
 //                   the room-creator.html door / window / furniture builders (its OWNER banners)
 //   S2 architecture structure-build.ts (slabs, walls, openings, partitions, stairs, balustrades, ceilings, roofs),
 //                   roofs.ts, wall-compiler.ts, floorplan-graph.ts, house-geometry.ts, stairs.ts (a storey's flights: plan

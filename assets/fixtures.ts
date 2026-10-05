@@ -7,10 +7,12 @@
 //                        view, which hides the ceiling, hides them too
 //   pendants             over dining tables, islands and breakfast bars (the lit parts: fixture = 'pendant')
 //   ceiling fans         living rooms, bedrooms and studies big enough to take one (the light kit: fixture = 'fan')
-//   one warm light       at most one per room and LIGHT_CAP per house, no shadows, chosen by a fixed rule — room
+//   one warm light       at most one per room and LIGHT_CAP lights per house, no shadows, chosen by a fixed rule — room
 //                        kind × √area, ties by storey then room order — so the same rooms light every run. It is
-//                        a wide SpotLight aimed straight down whose distance cutoff stops just past the room's side
-//                        walls (see the room loop: the walls wash, the lawn and the lower roofs stay dark)
+//                        a wide, fully soft SpotLight fill aimed straight down; a room with a registry lamp has instead
+//                        a soft SpotLight POOL at the lamp head nearest its centre, aimed into the room (plan 5.2 L1, L3,
+//                        LIGHT v2). Neither can leave its room: room-clip.ts cuts each light off at its room's walls, in
+//                        the shader, in every path (the distance cutoff alone lit the next room and the lawn)
 // and the storey's existing things get two touch-ups: window glass is tagged userData.windowGlow (the environment
 // gives it an emissive at dusk and night), and the catalog's halo lamp loses its cyan ring and blue PointLight —
 // the rings read as UI markers in every room — and becomes a drum floor lamp the lamp gain drives like any other
@@ -25,13 +27,45 @@
 // __houseRenderFrames stays random access. Everything is seeded from the house id.
 import { mulberry32, fnv1a } from './materials.js';
 import { inRect } from './house-geometry.js';
-import { programKind, fanPlan, lampPlan, REGISTRY_LAMPS } from './kit-rules.js';
+import { programKind, fanPlan, lampPlan, REGISTRY_LAMPS, LAMP_ITEMS } from './kit-rules.js';
+import { schemeOf } from './house-scheme.js';
+import { capAlbedo } from './materials.js';
+import { FINISH_ROLES } from './props/finish-roles.js';
 import { heroFrame } from './hero-frame.js';
+import { clearSlots, setSlot, codedDecay, roomClipBox, POOL_DATA, POOL_CORE, POOL_HALO_R, POOL_HALO_K, POOL_UP_FADE } from './room-clip.js';
 
 export const LIGHT_CAP = 16;          // dynamic lights per house (one per room at most)
 const DAY_GAIN = 0.035;               // lamp gain when no environment has announced one (a daylight preset's)
-const WARM = 0xffd7a8;                // ~2900 K: the pools read warm-white, not orange
+// the colour of the house's lights is its scheme's lamp temperature (house-scheme.ts LAMP_COLORS: 3000 K is the ~2900 K warm white
+// these pools have always had, so modern, mid-century and tropical homes are unchanged; cottage, craftsman, farmhouse and
+// mediterranean homes go to 2700 K)
 const ROOM_MIN_AREA = 2.5;            // m² — a cupboard gets no light
+// The room's own light is a soft FILL, not a spot (plan 5.2 L1). Before, it was aimed straight down at about ten times the
+// illuminance a sunlit wall receives, with a 0.45 penumbra: the nearest horizontal surface (a bed, a coffee table, an island)
+// clipped to white and the cone's edge scalloped the wall. Now it is a wide, fully soft cone at 0.3 of that.
+export const ROOM_FILL_K = 0.375;     // × the floor-illuminance target below (service 0.6 and hall 0.45 still scale it down). v1 had 0.3 and leaned on light leaking in from the next room; the room clip took that away, 0.375 is the most the five bench rooms take with every clip row under 1 %
+export const FILL_PENUMBRA = 1.0;     // the whole cone is a falloff: no edge
+export const FILL_ANGLE_MAX = 1.25;   // rad (~72°): a wider cone only lights the lawn
+/** lampGain under which the room's light is off for good: day (0.035). Off is hidden, with the night programs built in idle time (see applyLampGain, prewarmNight). */
+export const FILL_ON_GAIN = 0.1;
+// Practical lamp pools (plan 5.2 L3, LIGHT v2 item 3): a room that has a lamp is lit the way a room with a lamp is lit, from the lamp. One static
+// light at the lamp head nearest the room's centre (no camera dependence, no shadow) IS that room's light: the fill spot is not made when
+// LAMP_ROOM_FILL_K is 0, so a lamp room costs one light like any other and a house still runs at most LIGHT_CAP of them. v1 made it a PointLight;
+// a point light shines every way at once, and a lamp stands a hand's breadth from the curtain, the pillow or the wall it leans on, where the
+// 1/d^1.6 falloff blows those surfaces white long before the pool reaches the room (measured on the cutestarter bedroom: pool x1 clips 0.2 % of the
+// frame, x1.5 clips 2 %, x2 3 %, and at x1 the pool is too faint to read). It is a wide soft SpotLight now, aimed from the lamp head at the room's
+// middle (LAMP_POOL_AIM_Y over the floor), a cone of LAMP_POOL_ANGLE with a penumbra of 1 (no edge: the whole cone is the falloff): what is
+// behind the lamp is outside the cone and keeps its fill, what is beside it and in front gets the wash, brightest near the lamp and falling away
+// across the bed, the desk, the curtain and the far wall (x3 the v1 intensity, under 1 % of that frame clipped). What keeps it in its room is room-clip.ts.
+export const LAMP_ROOM_FILL_K = 0;
+export const LAMP_RANK_BONUS = 1.35;  // × the ranking score of a room that has a free-standing lamp (which rooms the 16-light cap lights)
+export const LAMP_POOL_I = 12;        // cd at gain 1, for a 3 m room; × √area / 3, at most × LAMP_POOL_MAX (v2: 7.8 at decay 1.6; the decay is steeper now, see LAMP_POOL_DECAY)
+export const LAMP_POOL_MAX = 1.6;
+export const LAMP_POOL_REACH = 0.7;   // × the room's diagonal: where the falloff reaches 0 (the clip, not this, stops it at the walls)
+export const LAMP_POOL_DECAY = 2;     // the inverse square of a lamp (v2: 1.6, which carried the pool to the far wall: far wall 0.113 luma against 0.153 beside the lamp)
+export const LAMP_POOL_ANGLE = 1.3;   // rad (86 degrees): the cone's half angle, as wide as a spot goes (behind the lamp is outside it, the walls beside it and ahead are in it)
+export const LAMP_POOL_PENUMBRA = 1.0;
+export const LAMP_POOL_AIM_Y = 1.2;   // m over the floor, at the room's centre: a slight tilt up, so the wall above the lamp and the curtain beside it take the wash
 
 // ---- the kind of room, from its name (the specs name rooms freely: "Sunset Terrace Suite", "Study & Bar") ----
 const KINDS: Array<[string, RegExp]> = [
@@ -61,6 +95,14 @@ export const fanEligible = (room: any): boolean => {
 // what a pendant hangs over (catalog and registry types) and what already hangs from a ceiling
 const PENDANT_OVER = { 'kitchen-island': 'island', 'breakfast-bar': 'island', 'dining-set': 'dining', 'dining-table': 'dining', 'farmhouse-table': 'dining', 'round-dining-table': 'round' };
 const HUNG = new Set(['pendant-lamp', 'chandelier', 'ceiling-light']);
+/** Every free-standing lamp a house places, the types whose lit head a room's pool can sit at (LIGHT v3 item 1). v2 pooled only kit-rules.ts LAMP_ITEMS (the halo
+ *  lamp and the registry's floor, arc, tripod-floor and table lamps: 138 of the fleet's 295 lamp items), so a room whose lamp was a column, ginger, globe, desk,
+ *  mushroom or tripod-table lamp had a glowing lamp that lit nothing. These are the placed types of placement.ts's 'lamp' group that stand on a floor or a
+ *  surface; `lantern` is a flame (always lit, no lamp gain) and the wall sconce is a wall light, which the room's fill stands for (see SCONCES). The set
+ *  is read here, not edited in kit-rules.ts (not LIGHT's file); a new lamp type needs one word here, and `test:light -- --lamps` counts any it misses. */
+export const POOL_LAMPS: ReadonlySet<string> = new Set([...LAMP_ITEMS, 'desk-lamp', 'column-lamp', 'ginger-lamp', 'globe-lamp', 'mushroom-lamp', 'tripod-table-lamp']);
+/** a wall sconce glows and hangs on a wall; a room with only sconces keeps its fill (a sconce has no head to pool from that is not against the wall it lights) */
+export const SCONCES: ReadonlySet<string> = new Set(['wall-sconce']);
 
 type Pt = { x: number; z: number };
 const segDist = (p: Pt, a: Pt, b: Pt) => { const dx = b.x - a.x, dz = b.z - a.z, l2 = dx * dx + dz * dz || 1e-9; const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / l2)); return Math.hypot(p.x - (a.x + dx * t), p.z - (a.z + dz * t)); };
@@ -72,19 +114,138 @@ const readGain = (): number => {
   const g = w && w.__houseLighting && w.__houseLighting.lampGain;
   return typeof g === 'number' && Number.isFinite(g) ? g : DAY_GAIN;
 };
+/** Set every room light for a lamp gain. A light below FILL_ON_GAIN is OFF: hidden (`visible` false), so by day no lit material has a room light in its program and a day
+ *  frame costs what it did before any room light existed. Hiding changes three's NUM_SPOT_LIGHTS, and a lit material that meets a light count it has not run before compiles
+ *  a program for it: v1 hid the lights and the first Day-to-Dusk switch cost 2.6 to 13.9 s in the editor, 5.5 s in the player (every program, built on the first night
+ *  frame). v2 left them in the scene at intensity 0 instead, which made the switch free and every day frame 15-23 % dearer (sixteen spot set-ups a fragment for nothing).
+ *  v3 hides them again and BUILDS THE NIGHT PROGRAMS IN IDLE TIME after the house is up (prewarmNight below): three keeps every program a material has built in its own
+ *  Map, so once the lit variant exists the switch is a lookup, and neither hour pays for the other. (A third way, evaluating the lights in one shader loop whose bound is a
+ *  uniform so no program ever changes, was built and measured: +7-10 % on a day frame, the loop's mere presence. Not shipped.) `window.__fillZero = true`, set before the build,
+ *  brings v2's intensity-0 policy back for an A/B. */
+export const hideOffGain = (): boolean => {
+  const w: any = typeof window !== 'undefined' ? window : null;
+  return !(w && w.__fillZero === true);
+};
+/** a room light's intensity at a lamp gain: base × gain, or 0 when the light is off (hidden, or under __fillZero kept in the loop at 0) */
+export const lightLevel = (base: number, gain: number): number => (gain >= FILL_ON_GAIN ? base * gain : 0);
 export function applyLampGain(gain: number = readGain()) {
   if (!current) return;
   current.gain = gain;
-  for (const { light, base } of current.lights) light.intensity = base * gain;
+  const hide = hideOffGain();
+  if (gain < FILL_ON_GAIN) current.sawOff = true;
+  let show = !hide || gain >= FILL_ON_GAIN;
+  // LIGHT v3.1 (2): a person's flip to dusk before the night programs are built would build them on the first frame (380-830 ms). That flip keeps the room lights hidden
+  // until the pre-warm is done (a few frames in the player, a second or two in the editor; the hour itself changes at once) and shows them then, a lookup. Only a flip the
+  // UI makes (`window.__houseUiFlip`) waits: a build, a harness and an offline frame never see a held light (see settleNight).
+  const hold = show && hide && gain >= FILL_ON_GAIN && (uiFlip() || !!current.held) && holdForWarm(current);   // `current.held`: a relight that is not a UI flip (the sun slider) must not release lights a flip is still holding (a 500 ms cold compile)
+  if (hold) show = false;
+  setHeld(current, hold);
+  for (const { light, base } of current.lights) {
+    light.intensity = lightLevel(base, gain);
+    light.visible = show;
+  }
+}
+const uiFlip = (): boolean => typeof window !== 'undefined' && (window as any).__houseUiFlip === true;
+const setHeld = (s: any, held: boolean) => {
+  if (!!s.held === held) return;
+  s.held = held;
+  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('house:lights', { detail: { warming: held } }));
+};
+/** should a flip to a lit hour keep the lights hidden for now? Only a house that has been shown at day (its programs are the day's), with the night programs not yet all built:
+ *  a house that opens at dusk is lit from its first frame, as it always was. Starts the pre-warm if it has not begun. */
+function holdForWarm(s: any): boolean {
+  if (!s.sawOff || !s.lights.length || (window as any).__fillNoWarm === true) return false;   // no room lights: nothing to build, nothing to hold
+  if (!s.prewarm) { clearTimeout(s.prewarmTimer); prewarmNight(s); }
+  return !!s.prewarm && !s.prewarm.done;
+}
+/** an offline frame (the composer: a film, a still, the preview) must never be drawn with a held light: show them now, paying the compile in that frame (nothing interactive waits on it) */
+export function settleNight() {
+  const s = current;
+  if (!s || !s.held) return;
+  if (s.prewarm) s.prewarm.done = true;
+  applyLampGain(s.gain);   // not a UI flip here: the lights show
+}
+
+// ---- the night programs, built in idle time (LIGHT v3 item 6) -----------------------------------------------------------------------------
+// With the room lights hidden by day, the first frame at dusk meets a light count (16 spots) that no lit material has run: each builds its program then (the 3.6 s
+// editor and 5.5 s player hitch of v1). three keeps every program a material has built in `materialProperties.programs`, so building them while it is still day, a few
+// objects at a time, makes the switch a lookup. Each step shows the lights, asks the renderer to compile one slice of the scene (compile does not render: no frame is
+// drawn with the lights on), and hides them again in the same call; a slice is a fixed number of the scene's children, no clock. Nothing here changes a pixel: an
+// editor or composer frame renders the same whether or not the programs exist yet (they would be built on first use).
+export const PREWARM_SLICE = 24;        // scene children compiled per step
+export const PREWARM_DELAY_MS = 0;      // after the build returns: v3 waited 2.5 s, which left a person who flipped to dusk in the first seconds a cold switch (LIGHT v3.1 item 2)
+const glassInScene = (scene: any): boolean => { let g = false; scene.traverse((o: any) => { if (!g && o.isMesh && o.userData && o.userData.windowGlow) g = true; }); return g; };
+function prewarmNight(s: any) {
+  if (typeof window === 'undefined' || s.prewarm) return;
+  const w: any = window, d = typeof w.__houseDebug === 'function' ? w.__houseDebug() : null;
+  if (!d || !d.renderer || typeof d.renderer.compile !== 'function' || !d.scene || !d.camera) return;
+  s.prewarm = { next: 0 };
+  const lights = s.lights.map((l: any) => l.light);
+  // done: the lights a flip was holding come on now (a lookup)
+  const finish = () => { s.prewarm.done = true; if (s.held && current === s) applyLampGain(s.gain); };
+  const step = () => {
+    if (current !== s) return;                                         // another house is on screen
+    if (!lights.length) { finish(); return; }                          // no room lights: nothing to build (never leave a hold waiting on a pre-warm that cannot finish)
+    if (s.prewarm.done) return;                                        // settled by an offline frame meanwhile
+    if (lights.some((l: any) => l.visible)) { finish(); return; }      // it is dusk or night: the programs exist because they were just used
+    const kids = d.scene.children.slice(), end = Math.min(kids.length, s.prewarm.next + PREWARM_SLICE);
+    // a double-sided transmissive material (window glass) is drawn back faces first, then front: the frame builds both programs, `compile` only the side it has
+    const glass: any[] = [];
+    for (let k = s.prewarm.next; k < end; k++) kids[k].traverse((o: any) => { if (o.isMesh) for (const m of (Array.isArray(o.material) ? o.material : [o.material])) if (m && m.transmission > 0 && m.side === 2 && !glass.includes(m)) glass.push(m); });
+    // a frame with window glass in it draws the opaque scene a second time, into the transmission target (linear, no tone mapping): a program of its own for every material
+    // that shows through a window, which `compile` builds only with a render target bound
+    if (s.prewarm.glassScene === undefined) s.prewarm.glassScene = glassInScene(d.scene);
+    const rt = s.THREE && s.prewarm.glassScene ? new s.THREE.WebGLRenderTarget(4, 4) : null;
+    for (const l of lights) l.visible = true;
+    let failed = false;
+    try {
+      for (let k = s.prewarm.next; k < end; k++) d.renderer.compile(kids[k], d.camera, d.scene);
+      if (rt) {
+        const prev = d.renderer.getRenderTarget();
+        d.renderer.setRenderTarget(rt);
+        try { for (let k = s.prewarm.next; k < end; k++) d.renderer.compile(kids[k], d.camera, d.scene); } finally { d.renderer.setRenderTarget(prev); rt.dispose(); }
+      }
+      if (glass.length) {
+        for (const m of glass) m.side = 1;   // BackSide
+        try { for (let k = s.prewarm.next; k < end; k++) d.renderer.compile(kids[k], d.camera, d.scene); }
+        finally { for (const m of glass) { m.side = 2; m.needsUpdate = true; } }
+      }
+    }
+    catch (e) { s.prewarm.error = String(e); failed = true; }
+    finally { for (const l of lights) l.visible = false; }
+    if (failed) { finish(); return; }
+    s.prewarm.next = end;
+    if (end >= kids.length) { finish(); return; }
+    if (!s.prewarm.done) setTimeout(step, 0);   // between two frames: v3 asked for idle time, which an editor drawing a frame every 40 ms never gave (the pre-warm took 5 s there)
+  };
+  setTimeout(step, 0);   // never inside the flip's own frame
+}
+function schedulePrewarm(s: any) {
+  if (typeof window === 'undefined' || !hideOffGain() || (window as any).__fillNoWarm === true) return;   // __fillNoWarm: v1's cold switch, for the hitch test to measure
+  clearTimeout(s.prewarmTimer);
+  s.prewarmTimer = setTimeout(() => prewarmNight(s), PREWARM_DELAY_MS);   // re-armed by each storey's dressLevel: it starts once the last one is up
 }
 if (typeof window !== 'undefined') {
+  (window as any).__houseFixturesWarm = () => current && current.prewarm;   // QA hook: how far the pre-warm got
+  (window as any).__houseLightsHeld = () => !!(current && current.held);
+  (window as any).__houseFixturesSettle = settleNight;                       // the composer calls it before an offline frame (room-creator.html tuneComposerLook)
   window.addEventListener('house:lighting', (e: any) => {
     const g = e && e.detail && e.detail.lampGain;
     applyLampGain(typeof g === 'number' && Number.isFinite(g) ? g : readGain());
   });
   (window as any).__houseFixtures = {   // QA hook: what the fixtures did, and a way to drive the gain by hand
     applyLampGain,
-    stats: () => current && { ...current.stats, gain: current.gain, lights: current.lights.map(l => { const p = l.light.getWorldPosition(new l.light.position.constructor()); return { room: l.room, base: +l.base.toFixed(2), at: [p.x, p.y, p.z].map(v => +v.toFixed(2)) }; }) },
+    lampTypes: () => [...POOL_LAMPS],
+    /** QA hook for tuning on a page that is open (test-interior-light --probe --tune '{...}'): { poolI, poolMax, poolAngle, poolPenumbra, poolAimY, poolReach, poolDecay,
+     *  fillK, core, haloR, haloK, upFade }. Re-aims and re-scales the lights built; it never changes what a build makes. */
+    tune: (o: any = {}) => {
+      if (!current) return;
+      const n = (v: any, d: number) => (typeof v === 'number' ? v : d);   // every call is a full state: a key it does not name is the shipped constant
+      POOL_DATA[0] = n(o.core, POOL_CORE); POOL_DATA[1] = n(o.haloR, POOL_HALO_R); POOL_DATA[2] = n(o.haloK, POOL_HALO_K); POOL_DATA[3] = n(o.upFade, POOL_UP_FADE);
+      for (const l of current.lights) if (l.tune) l.tune(o);
+      applyLampGain(current.gain);
+    },
+    stats: () => current && { ...current.stats, gain: current.gain, lights: current.lights.map(l => { const p = l.light.getWorldPosition(new l.light.position.constructor()); return { room: l.room, pool: !!l.pool, slot: l.slot, base: +l.base.toFixed(2), at: [p.x, p.y, p.z].map(v => +v.toFixed(2)) }; }) },
   };
 }
 
@@ -94,19 +255,30 @@ function stateFor(ctx) {
   let s = states.get(ctx.anchors);
   if (s) return s;
   const { THREE, spec } = ctx;
+  clearSlots();   // a new house on screen: no room clip survives from the last one (room-clip.ts)
   const rng = mulberry32(fnv1a(`${spec.id}:fixtures`));
   const pick = arr => arr[Math.floor(rng() * arr.length)];
 
-  // which rooms get a PointLight: room kind × √area, highest first, the first LIGHT_CAP of them
+  // which rooms get a light: room kind × √area, highest first, while LIGHT_CAP lights last. A room costs one light (its fill spot or its lamp's
+  // pool), two only when LAMP_ROOM_FILL_K keeps a fill beside a pool, so the house never runs more than LIGHT_CAP dynamic lights of ours
+  const scheme = schemeOf(spec);
   const ranked = [];
   (spec.levels || []).forEach((lv, li) => (lv.rooms || []).forEach((r, ri) => {
     if (!r.bounds) return;
     const area = r.bounds.w * r.bounds.d; if (area < ROOM_MIN_AREA) return;
     const kind = roomKind(r); if (kind === 'outdoor') return;
-    ranked.push({ key: `${lv.id}#${ri}`, score: WEIGHT[kind] * Math.sqrt(area), li, ri });
+    const lamp = (r.items || []).some(it => it && POOL_LAMPS.has(it.type));
+    // a room with a lamp is lit before a lampless room of the same standing (the cap leaves out the rooms at the bottom of this ranking, and a room whose
+    // lamp glows must not be one of them while a lampless room is lit): LAMP_RANK_BONUS stands in for a lamp's glow in the score
+    ranked.push({ key: `${lv.id}#${ri}`, score: WEIGHT[kind] * Math.sqrt(area) * (lamp ? LAMP_RANK_BONUS : 1), li, ri, lamp });
   }));
   ranked.sort((a, b) => b.score - a.score || a.li - b.li || a.ri - b.ri);
-  const lit = new Set(ranked.slice(0, LIGHT_CAP).map(r => r.key));
+  const lit = new Map<string, { lamp: boolean }>();
+  for (let left = LIGHT_CAP, k = 0; k < ranked.length && left > 0; k++) {
+    const r = ranked[k], cost = r.lamp && LAMP_ROOM_FILL_K > 0 ? 2 : 1;
+    if (cost > left) continue;   // a cheaper room further down may still fit
+    lit.set(r.key, { lamp: r.lamp }); left -= cost;
+  }
 
   const mat = (o: any, fixtureBase?: number) => { const m = new THREE.MeshStandardMaterial(o); if (fixtureBase !== undefined) m.userData.fixtureBase = fixtureBase; return m; };
   const fanStyle = pick(['black', 'black', 'walnut']);
@@ -132,14 +304,15 @@ function stateFor(ctx) {
     diffuser: new THREE.CircleGeometry(0.178, 32).rotateX(Math.PI / 2),            // faces down, closes the drum's foot
   };
   s = {
-    rng, pick, lit, M, G, fanStyle, diningStyle: pick(['dome', 'globe', 'dome']),
+    rng, pick, lit, scheme, warm: scheme.lampColor, M, G, fanStyle, diningStyle: pick(['dome', 'globe', 'dome']),
     lights: [], gain: readGain(),
-    stats: { recessed: 0, pendants: 0, fans: 0, lights: 0, glass: 0, halos: 0, lamps: {} as Record<string, number> },
+    stats: { recessed: 0, pendants: 0, fans: 0, lights: 0, pools: 0, litRooms: [] as string[], glass: 0, halos: 0, lamps: {} as Record<string, number> },
     // kit-rules.ts: which rooms may hang a fan (rooms[].fixtures.fan; under defaults 2 a seeded minority), and the
     // lamp kind each room's floor lamps become (rooms[].fixtures.lamp; defaults 2 seeded) — both keyed lv#room
     fans: fanPlan(spec, fanEligible), lamps: lampPlan(spec),
   };
   states.set(ctx.anchors, s);
+  s.THREE = THREE;
   current = s;
   ctx.anchors.fixtures = s.stats;
   return s;
@@ -263,6 +436,40 @@ function varyRegistryLamps(placed, s, THREE, lampOf) {
   }
 }
 
+// ---- the linen cap, scoped (LIGHT v3 item 4) ------------------------------------------------------------------------------------
+// finish-roles.ts holds linen under an albedo of 0.85: pure white has no fold to read and clips under a lamp (the cutestarter bedspread was a navy cloth
+// blown to white by a hot pool over a 0.95 albedo). v2 applied the cap through kit.colors.linen, the one colour every prop reads, and that reached 90 more item
+// classes than the intent (appliances, cabinets, toilets, tubs, the piano, a printer, candles: whatever called itself linen). It is applied here instead, by what the
+// thing IS: the item types that are bedding, pillows or towels, and (so SOFT's softkit lands in it without an edit) any mesh whose userData.role is one of the cloth
+// roles its bedding and towels use. Only a flat colour over the cap is touched (a patterned quilt carries its own palette), the hue is kept (the channels scale together),
+// and kit.colors.linen is the 0xf2efe9 it always was, so no other class moves and plan.json's kit.colors does not change.
+export const LINEN_CAP = FINISH_ROLES.linen.albedoCap;
+/** the bed types (placement.ts group 'bed'), the cloth things that lie on or hang by one, and the towels */
+export const LINEN_ITEMS: ReadonlySet<string> = new Set([
+  'single-bed', 'bunk-bed', 'daybed', 'four-poster-bed', 'canopy-bed', 'mattress-on-floor', 'toddler-bed', 'headboard-bed', 'loft-bed', 'sleigh-bed', 'upholstered-bed', 'house-bed',
+  'platform-bed', 'crib', 'cushion-set', 'throw-blanket', 'floor-cushion', 'towel-rail', 'heated-towel-rail', 'towel-ladder', 'towel-stack', 'towel-ring-set', 'bath-mat']);
+/** the mesh roles of SOFT's bedding and towels (softkit.ts: 'linen' mattress and sleeping pillows, 'duvet', ...; soft2.ts towels): capped on any item */
+export const LINEN_ROLES: ReadonlySet<string> = new Set(['linen', 'duvet', 'pillow', 'sheet', 'towel', 'robe', 'throw']);
+export function capLinen(placed: any[]): number {
+  let n = 0;
+  for (const o of placed) {
+    const u = o.userData || {};
+    if (u.linenCapped) continue;
+    const byType = LINEN_ITEMS.has(u.itemType);
+    u.linenCapped = true;
+    o.traverse((m: any) => {
+      if (!m.isMesh || !m.material) return;
+      if (!byType && !LINEN_ROLES.has(m.userData && m.userData.role)) return;
+      for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
+        if (!mat || !mat.color || mat.map || (mat.emissive && mat.emissive.getHex() !== 0)) continue;
+        const c = mat.color.getHex(), k = capAlbedo(c, LINEN_CAP);
+        if (k !== c) { mat.color.setHex(k); n++; }
+      }
+    });
+  }
+  return n;
+}
+
 // ---- builders (origin at the ceiling point; everything hangs into −y) -------------------------------------------
 function ceilingFan(THREE, s, drop) {
   const g = new THREE.Group(); g.name = `Ceiling Fan (${s.fanStyle})`;
@@ -317,12 +524,36 @@ function chandelier(THREE, s, drop: number) {
   return g;
 }
 
+
+// The head of the lamp nearest (cx, cz): the centre of the box round a lamp's lit parts (its meshes tagged userData.fixture = 'lamp': a
+// drum, globe, cone, mushroom or tripod head, or the halo lamp's drum and diffuser), for the registry's floor, arc, tripod and table lamps and the
+// halo lamp, and since v3 every other free-standing lamp type (POOL_LAMPS). null when the room has none placed (the spec lists one that did not fit).
+function lampHead_(items: Array<{ o: any; type: string }>, cx: number, cz: number): { x: number; y: number; z: number } | null {
+  let best: { x: number; y: number; z: number; d: number } | null = null;
+  for (const it of items) {
+    if (!POOL_LAMPS.has(it.type)) continue;
+    let box: any = null;
+    it.o.traverse((m: any) => {
+      if (!m.isMesh || !m.userData || m.userData.fixture !== 'lamp') return;
+      m.updateWorldMatrix(true, false);
+      const g = m.geometry; if (!g.boundingBox) g.computeBoundingBox();
+      const b = g.boundingBox.clone().applyMatrix4(m.matrixWorld);
+      box = box ? box.union(b) : b;
+    });
+    if (!box) continue;
+    const x = (box.min.x + box.max.x) / 2, y = (box.min.y + box.max.y) / 2, z = (box.min.z + box.max.z) / 2, d = Math.hypot(x - cx, z - cz);
+    if (!best || d < best.d - 1e-9) best = { x, y, z, d };
+  }
+  return best;
+}
+
 // ---- dressLevel ------------------------------------------------------------------------------------------------
 export function dressLevel(ctx) {
   const { THREE, spec, lv, y, H, put, placed, anchors, registerCeiling } = ctx;
   const cans: Array<{ p: Pt; ceil: number }> = [];   // the storey's recessed cans, built after the rooms
   const s = stateFor(ctx);
   tagWindowGlass(placed, s);
+  s.stats.linenCapped = (s.stats.linenCapped || 0) + capLinen(placed.filter(o => o.position.y > y - 0.05 && o.position.y < y + H));
   // a room's lamp kind (by its name on this storey — the rooms loop tags each item with its room's name); a room
   // with a program (S3's composer dresses its own lamps: plan Completeness C9) keeps what it placed
   // Two rooms may share a name on a storey ("Bedroom", "Bedroom"): the lamp's own plan position then settles which.
@@ -369,6 +600,9 @@ export function dressLevel(ctx) {
   }
   const clearOf = (p: Pt, reach: number) => keepOut.every(k => segDist(p, k.a, k.b) > k.r + reach);
   const partitions = (lv.partitions || []).map(p => ({ a: { x: p.from[0], z: p.from[1] }, b: { x: p.to[0], z: p.to[1] } }));
+  // the walls a room's light is clipped by (room-clip.ts): the storey's outline and its partitions
+  const footprint = (lv.footprint || []) as Array<{ x: number; z: number; w: number; d: number }>;
+  const partitionSegs = (lv.partitions || []).filter(p => Array.isArray(p.from) && Array.isArray(p.to)).map(p => ({ from: p.from as [number, number], to: p.to as [number, number] }));
   const offWalls = (p: Pt, reach: number) => partitions.every(w => segDist(p, w.a, w.b) > reach);
 
   // what stands in each room (items the builder placed on this storey), as world boxes
@@ -482,11 +716,12 @@ export function dressLevel(ctx) {
     // just past those walls' foot — three.js fades a light to 0 AT its distance, (1 − (d/D)⁴)², so the walls
     // come out brighter than the middle of the floor and the room reads as a lit box, which is how Pascal's
     // dusk cut views look. The end walls of a long room fall off; nothing outside is lit past a faint band.
-    if (s.lit.has(`${lv.id}#${ri}`)) {
+    const litRoom = s.lit.get(`${lv.id}#${ri}`);
+    if (litRoom) {
       const c0 = ceilAt(cx, cz) ?? (y + H - 0.02);
       const ly = Math.min(c0 - 0.25, y + 2.6), drop = Math.max(1, ly - y);
       const rs = Math.min(b.w, b.d) / 2;
-      const angle = Math.min(80, Math.max(50, Math.atan(rs / Math.max(0.35, drop - 1.9)) / DEG)) * DEG;
+      const angle = Math.min(FILL_ANGLE_MAX, Math.min(80, Math.max(50, Math.atan(rs / Math.max(0.35, drop - 1.9)) / DEG)) * DEG);
       const distance = Math.hypot(drop + 0.35, rs + 0.1);
       // intensity: set by what the floor under the light receives (room kind × area, 1.3× the first cone's: the
       // pool is smaller now), the window's loss there made up to at most 2× (a hall's walls, close to the light,
@@ -495,15 +730,49 @@ export function dressLevel(ctx) {
       // a garage at dusk is not a living room; a hall or landing is lit for passing through, and its walls sit
       // close enough to the light that the 18 floor would blow them (and the stairwell below) out white
       const floorE = 0.26 * Math.min(36, Math.max(18, 12 + 0.8 * area)) * (kind === 'service' ? 0.6 : kind === 'hall' ? 0.45 : 1) * Math.min(1, Math.max(0.55, rs / 1.6));
-      const base = floorE * drop ** decay / Math.max(0.5, win);
-      const light = new THREE.SpotLight(WARM, base * s.gain, distance, angle, 0.45, decay);
-      light.name = 'Fixture light'; light.castShadow = false;
-      light.position.copy(local(cx, ly, cz));
-      light.target.position.copy(local(cx, y, cz));
-      light.userData.fixtureLight = true;   // not `fixture`: that tag means "a mesh whose emissive the gain scales"
-      g.add(light, light.target);
-      s.lights.push({ light, base, room: room.name });
-      s.stats.lights++;
+      // the lamp that will pool this room's light: of the room's lamps, the head nearest its centre (ties by item order)
+      const pool = litRoom.lamp ? lampHead_(items, cx, cz) : null;
+      s.stats.litRooms.push(room.name);
+      // a lamp room's fill is LAMP_ROOM_FILL_K of the floor target; at 0 the lamp's pool IS the room's light and no spot is made
+      if (!pool || LAMP_ROOM_FILL_K > 0) {
+        const base = (pool ? LAMP_ROOM_FILL_K : ROOM_FILL_K) * floorE * drop ** decay / Math.max(0.5, win);
+        const slot = s.lights.length;
+        setSlot(slot, roomClipBox(b, y, H, footprint, partitionSegs));
+        const light = new THREE.SpotLight(s.warm, lightLevel(base, s.gain), distance, angle, FILL_PENUMBRA, codedDecay(decay, slot));
+        light.name = 'Fixture light'; light.castShadow = false;
+        light.position.copy(local(cx, ly, cz));
+        light.target.position.copy(local(cx, y, cz));
+        light.userData.fixtureLight = true;   // not `fixture`: that tag means "a mesh whose emissive the gain scales"
+        light.userData.roomKey = `${lv.id}#${ri}`;
+        light.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
+        g.add(light, light.target);
+        const entry: any = { light, base, room: room.name, pool: false, slot };
+        entry.tune = (o: any) => { entry.base = (pool ? LAMP_ROOM_FILL_K : (typeof o.fillK === 'number' ? o.fillK : ROOM_FILL_K)) * floorE * drop ** decay / Math.max(0.5, win); };
+        s.lights.push(entry);
+        s.stats.lights++;
+      }
+      if (pool) {
+        const diag = Math.hypot(b.w, b.d), pbase = LAMP_POOL_I * Math.min(LAMP_POOL_MAX, Math.sqrt(area) / 3);
+        const slot = s.lights.length;
+        setSlot(slot, roomClipBox(b, y, H, footprint, partitionSegs));
+        const pl = new THREE.SpotLight(s.warm, lightLevel(pbase, s.gain), LAMP_POOL_REACH * diag, LAMP_POOL_ANGLE, LAMP_POOL_PENUMBRA, codedDecay(LAMP_POOL_DECAY, slot));
+        pl.name = 'Lamp pool'; pl.castShadow = false;
+        pl.position.copy(local(pool.x, pool.y, pool.z));
+        pl.target.position.copy(local(cx, y + LAMP_POOL_AIM_Y, cz));
+        pl.userData.fixtureLight = true; pl.userData.lampPool = true; pl.userData.roomKey = `${lv.id}#${ri}`;
+        pl.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
+        g.add(pl, pl.target);
+        const entry: any = { light: pl, base: pbase, room: room.name, pool: true, slot };
+        entry.tune = (o: any) => {
+          const I = typeof o.poolI === 'number' ? o.poolI : LAMP_POOL_I, mx = typeof o.poolMax === 'number' ? o.poolMax : LAMP_POOL_MAX;
+          entry.base = I * Math.min(mx, Math.sqrt(area) / 3);
+          const n = (v: any, d: number) => (typeof v === 'number' ? v : d);
+          pl.angle = n(o.poolAngle, LAMP_POOL_ANGLE); pl.penumbra = n(o.poolPenumbra, LAMP_POOL_PENUMBRA); pl.distance = n(o.poolReach, LAMP_POOL_REACH) * diag;
+          pl.decay = codedDecay(n(o.poolDecay, LAMP_POOL_DECAY), slot); pl.target.position.copy(local(cx, y + n(o.poolAimY, LAMP_POOL_AIM_Y), cz));
+        };
+        s.lights.push(entry);
+        s.stats.lights++; s.stats.pools++;
+      }
     }
 
     if (g.children.length) place(g, cx, cz);
@@ -534,4 +803,5 @@ export function dressLevel(ctx) {
     if (typeof registerCeiling === 'function') registerCeiling(o, hc / 100);
     s.stats.recessed += set.length;
   }
+  schedulePrewarm(s);
 }

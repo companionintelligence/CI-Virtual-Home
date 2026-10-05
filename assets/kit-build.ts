@@ -25,6 +25,7 @@
 // a different order (material ids break ties in three.js's render sort); a house that asks for nothing new builds
 // the same objects as before.
 import { createMaterialKit } from './materials.js';
+import { schemeOf } from './house-scheme.js';
 import { hex } from './build-context.js';
 import { specDefaults } from './spec/index.js';
 import { HERO_SET } from './item-map.js';
@@ -48,6 +49,7 @@ export function createKitBuild(bctx) {
       THREE, palette, seed: spec.id, keep: [...keepSet(spec)], defaults: specDefaults(spec), roofPull: p.roofPull !== false, restraint: restraintOf(spec),
       roofColors: (spec.roofs || []).filter(r => r && r.color).map(r => hex(r.color)),
     });
+    (kit as any).scheme = schemeOf(spec);   // house-scheme.ts: the style's metal, lamp temperature, ceiling, trim and tile for the whole house
     current = { spec, kit, palette };
     return kit;
   }
@@ -141,6 +143,7 @@ export function createKitBuild(bctx) {
   // bounce stopped cancelling it).
   function ceilingMaterial({ where }) {
     const m = where === 'slab-underside' ? std(0xf2f2f0, { side: THREE.DoubleSide }) : std(0xf2f2f0, { side: THREE.DoubleSide, roughness: 0.9 });
+    m.userData.bounce = 1;   // environment.ts applyHouseGlow lifts a tagged ceiling with the hour's bounce
     return neutralIndirect(m);
   }
 

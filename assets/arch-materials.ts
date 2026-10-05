@@ -97,8 +97,10 @@ export function createArchMaterials(THREE: any, kit: any) {
   function ceiling(kind = 'flat', color?: any) {
     const c = hexOf(color, 0xf1f5f9);
     return once(`ceil:${kind}:${c}`, () => {
-      if (kind === 'timber') { const set = setOf('oak', { color: color !== undefined ? c : 0xa88660 }); const m = set ? pbr(set, { mode: 'auto', side: THREE.DoubleSide }) : plain(c, { side: THREE.DoubleSide }); return m; }
-      return plain(c, { side: THREE.DoubleSide, roughness: 0.9 });
+      // userData.bounce: environment.ts applyHouseGlow gives a tagged ceiling the hour's emissive bounce (timber carries grain a flat
+      // emissive would wash out, so half of it)
+      if (kind === 'timber') { const set = setOf('oak', { color: color !== undefined ? c : 0xa88660 }); const m = set ? pbr(set, { mode: 'auto', side: THREE.DoubleSide }) : plain(c, { side: THREE.DoubleSide }); m.userData.bounce = 0.5; return m; }
+      const m = plain(c, { side: THREE.DoubleSide, roughness: 0.9 }); m.userData.bounce = 1; return m;
     });
   }
 
