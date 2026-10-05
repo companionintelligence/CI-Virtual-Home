@@ -22,6 +22,7 @@
 //   node --experimental-strip-types scripts/dress-census.mts --check            compare a fresh census with the committed file (exit 1 on any difference)
 //   node --experimental-strip-types scripts/dress-census.mts --seed             also print the difference from design/dressing-first/baseline-census.json
 //   node --experimental-strip-types scripts/dress-census.mts --specs <dir>      census another set of specs (a fixture directory, a worktree's content/houses)
+//   node --experimental-strip-types scripts/dress-census.mts --project          census with every room that has a recipe dressed (the dress phase at each room's level or 0.5: what `compose-house.mts --dress` would bake). An opted-in room (`dress.level`) is always counted dressed
 // No timestamp and no machine detail in the file: two runs of an unchanged tree write the same bytes.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -39,13 +40,17 @@ type Item = { type: string; at?: [number, number]; y?: number; rot?: number; src
 export interface RoomRec { house: string; level: string; name: string; program: string | null; inferred: string | null; area: number; H: number; items: Item[]; room: any; lv: any; spec: any }
 
 /** every room of a spec with the items the builder places in it */
-export function roomsOf(spec: any, id: string): RoomRec[] {
+export function roomsOf(spec: any, id: string, { project = false }: { project?: boolean } = {}): RoomRec[] {
   const out: RoomRec[] = [];
   const res = M.composeHouse(spec);
+  // the dress phase's items for a room that has none baked: an opted-in room's (the build adds them live), and with `project` every room that has a recipe
+  // (what `compose-house.mts --dress` would bake: the projection of the layout pass that dresses a house)
+  const dress = project ? M.dress.dressRooms(spec) : M.dress.dressHouse(spec);
   for (const lv of spec.levels || []) for (const r of lv.rooms || []) {
     if (!r.bounds) continue;
     const comp = M.isComposed(r) && res.get(r) ? res.get(r).items : [];
-    let items: Item[] = [...(r.items || []), ...comp];
+    const baked = (r.items || []).some((it: any) => it.src === 'dress@1');
+    let items: Item[] = [...(r.items || []), ...comp, ...(!baked && dress.get(r) ? dress.get(r).items : [])];
     if (spec.hero && spec.hero.level === lv.id) items = items.filter(it => !(HERO_SET.has(it.type) && Array.isArray(it.at) && Math.hypot(it.at[0] - spec.hero.at[0], it.at[1] - spec.hero.at[1]) < 1.3));
     out.push({ house: id, level: lv.id, name: r.name, program: r.program || null, inferred: r.program || M.inferProgram(r, lv) || null, area: r.bounds.w * r.bounds.d, H: lv.height || 2.8, items, room: r, lv, spec });
   }
@@ -126,8 +131,8 @@ const norm = (a: number[]) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; ret
 const mean = (xs: number[]) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
 const p90 = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); return s.length ? s[Math.min(s.length - 1, Math.floor(0.9 * (s.length - 1) + 0.5))] : 0; };
 
-export function census(specs: Array<{ id: string; spec: any }>) {
-  const recs = specs.flatMap(({ id, spec }) => roomsOf(spec, id));
+export function census(specs: Array<{ id: string; spec: any }>, o: { project?: boolean } = {}) {
+  const recs = specs.flatMap(({ id, spec }) => roomsOf(spec, id, o));
   // by program
   const groups = new Map<string, RoomRec[]>();
   for (const r of recs) { const k = r.program || 'none'; (groups.get(k) || groups.set(k, []).get(k)!).push(r); }
@@ -191,7 +196,7 @@ export const REGENERATE = 'pnpm run build && node --experimental-strip-types scr
 if (import.meta.url === `file://${process.argv[1]}`) {
   const args = parseArgs(process.argv.slice(2));
   const dir = path.resolve(args.specs && args.specs !== 'true' ? args.specs : path.join(ROOT, 'content', 'houses'));
-  const c = census(loadSpecs(dir));
+  const c = census(loadSpecs(dir), { project: args.project === 'true' });
   const doc = { schema: 1, what: WHAT, regenerate: REGENERATE, ...c };
   const text = stableJson(doc);
   console.log(`${c.houses} houses, ${c.rooms} rooms, ${c.dress.items} dress items`);

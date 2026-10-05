@@ -1265,7 +1265,7 @@ export const seedKeyOf = (spec: any, room: any) => `${spec.id}:${room.no ?? room
 
 /** pins as composer items (the room's own and those of overlapping rooms on the storey), skipping the hero set that
  *  the hero block places */
-export function pinsFor(spec: any, lv: any, room: any, composed: Map<any, any[]>): CItem[] {   // (exported for the dress phase's floor layer, assets/room-dress.ts)
+export function pinsFor(spec: any, lv: any, room: any, composed: Map<any, any[]>, withDress = false): CItem[] {   // (exported for the dress phase's floor layer, assets/room-dress.ts: `withDress`)
   const b = room.bounds, out: CItem[] = [];
   const HERO = new Set(['walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
   const heroHere = spec.hero && spec.hero.level === lv.id;
@@ -1273,6 +1273,7 @@ export function pinsFor(spec: any, lv: any, room: any, composed: Map<any, any[]>
     const rb = r.bounds; if (!rb) continue;
     if (r !== room && (rb.x >= b.x + b.w || rb.x + rb.w <= b.x || rb.z >= b.z + b.d || rb.z + rb.d <= b.z)) continue;
     for (const it of [...(r.items || []), ...(composed.get(r) || [])]) {
+      if (it.src === 'dress@1' && !withDress) continue;   // the dress phase runs after the layout and is no pin of it: a baked dress item moves no composition (plan 5.6)
       if (heroHere && HERO.has(it.type) && Array.isArray(it.at) && Math.hypot(it.at[0] - spec.hero.at[0], it.at[1] - spec.hero.at[1]) < 1.3) continue;
       const o = itemObb(it); if (!o) continue;
       const s = sizeOf(it.type, it)!, layer = layerOf(it.type);
@@ -1424,7 +1425,7 @@ export function composeHouse(spec: any, opts: { program?: (room: any, lv: any) =
   const house: HouseState = { usage: new Map(), storey: new Map(), roomsOn: new Map(), palettes: [], styleOf: room => styleOf(spec, room), prefer: new Map(), prefAny: new Set(), seed: String(spec.id) };
   const byRoom = new Map<any, ComposeResult>(), composed = new Map<any, any[]>();
   // every authored type counts as used, so the composer reaches for something else
-  for (const lv of spec.levels || []) for (const r of lv.rooms || []) for (const it of r.items || []) { house.usage.set(it.type, (house.usage.get(it.type) || 0) + 1); const k = `${lv.id}:${it.type}`; house.storey.set(k, (house.storey.get(k) || 0) + 1); }
+  for (const lv of spec.levels || []) for (const r of lv.rooms || []) for (const it of r.items || []) { if (it.src === 'dress@1') continue; house.usage.set(it.type, (house.usage.get(it.type) || 0) + 1); const k = `${lv.id}:${it.type}`; house.storey.set(k, (house.storey.get(k) || 0) + 1); }
   for (const lv of spec.levels || []) (lv.rooms || []).forEach((room: any) => {
     const prog = opts.program ? opts.program(room, lv) : (isComposed(room) ? room.program : null);
     if (!prog || !room.bounds) return;

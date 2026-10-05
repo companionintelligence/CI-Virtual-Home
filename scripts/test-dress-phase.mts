@@ -12,6 +12,9 @@
 //   F  recipes      the fixtures prove each program: every wet room has 3 dress items and a towel, every dining room a set table, every kitchen 4 clusters, a
 //                   lamp where the room had none (counted against the layout's own), every item a real type that exists in the catalog
 //   G  census       the never-bare violations before and after, on the dress fixtures (printed; the plan's fleet targets are the census's, not this test's)
+//   H  layout       a baked dress@1 item is no pin and no usage of the composer: composing a spec that carries them gives the items of the one that does not (so
+//                   the compose-stability hashes hold whatever a house's dress items are), and the lints of the dressed fixtures add no layout finding
+//   I  bake         compose-house.mts --dress writes exactly the live phase's items, twice gives the same file, --undress gives the original back
 //
 // @check-house node-test
 // @check-house quick
@@ -30,6 +33,8 @@ import { lintLayout } from '../assets/layout-lint.js';
 import { PLACEMENT } from '../assets/props/placement.js';
 import { PROPS } from '../assets/props/index.js';
 import { itemObb, overlap, analyzeRoom, sizeOf } from '../assets/room-geo.js';
+import { spawnSync } from 'node:child_process';
+import os from 'node:os';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const load = (f: string) => JSON.parse(fs.readFileSync(f, 'utf8'));
@@ -185,4 +190,39 @@ test('G: the never-bare census before and after, on the dress fixtures', () => {
   console.log(`  never-bare rooms on the fixtures: ${n}; violations before ${viol0}, after ${viol1}${rows.length ? '\n    ' + rows.join('\n    ') : ''}`);
   assert.ok(viol1 < viol0, 'the phase reduces the never-bare violations');
   void sizeOf;
+});
+
+test('H: a baked dress item moves no composition', () => {
+  for (const id of ['dress-rooms', 'dress-styles']) {
+    const spec = fixture(id), res = dressRooms(spec);
+    const baked = JSON.parse(JSON.stringify(spec)); for (const { room } of rooms(baked)) delete room.dress;
+    const plain = JSON.parse(JSON.stringify(baked));
+    rooms(spec).forEach(({ room }: any, i: number) => { const r = res.get(room); if (r) { const t = rooms(baked)[i].room; t.items = [...(t.items || []), ...r.items]; } });
+    assert.ok(rooms(baked).some(({ room }: any) => (room.items || []).some(isDress)), `${id}: dress items baked`);
+    const a = composeHouse(plain), b = composeHouse(baked);
+    const ra = rooms(plain), rb = rooms(baked);
+    ra.forEach(({ room }: any, i: number) => { assert.equal(strip((a.get(room) || { items: [] }).items), strip((b.get(rb[i].room) || { items: [] }).items), `${id}/${room.name}: a baked dress item moved the composition`); });
+  }
+});
+
+test('I: the bake tool (compose-house.mts --dress / --undress)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dress-bake-')), src = path.join(ROOT, 'test', 'fixtures', 'houses', 'dress-rooms.json');
+  const a = path.join(dir, 'a.json'), b = path.join(dir, 'b.json'), c = path.join(dir, 'c.json');
+  const run = (...args: string[]) => spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'compose-house.mts'), ...args], { encoding: 'utf8' });
+  try {
+    const r1 = run('--house', src, '--dress', '--out', a), r2 = run('--house', a, '--dress', '--out', b), r3 = run('--house', a, '--undress', '--out', c);
+    assert.ok(r1.status === 0 && r2.status === 0 && r3.status === 0, `${r1.stderr}${r2.stderr}${r3.stderr}`);
+    const orig = fixture('dress-rooms'), A = JSON.parse(fs.readFileSync(a, 'utf8'));
+    // the baked items are the live phase's, per room, in order
+    const live = dressRooms(orig);
+    rooms(orig).forEach(({ room }: any, i: number) => {
+      const got = (rooms(A)[i].room.items || []).filter(isDress), want = (live.get(room) || { items: [] }).items;
+      assert.equal(strip(got), strip(want), `${room.name}: the baked items differ from the live phase's`);
+    });
+    assert.equal(fs.readFileSync(a, 'utf8'), fs.readFileSync(b, 'utf8'), '--dress twice writes the same file');
+    assert.equal(strip(JSON.parse(fs.readFileSync(c, 'utf8'))), strip(orig), '--undress gives the original back');
+    // a baked spec with the dress fields stripped is dressed by the bake alone: no live phase, the same items
+    const baked = JSON.parse(fs.readFileSync(a, 'utf8')); for (const { room } of rooms(baked)) delete room.dress;
+    assert.equal(dressHouse(baked).size, 0, 'a baked house with no dress.level is not dressed live a second time');
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });

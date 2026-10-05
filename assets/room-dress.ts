@@ -158,7 +158,7 @@ export class Dresser {
   private comp(): Composer {
     if (!this.composer) {
       const house: HouseState = { usage: new Map(), storey: new Map(), roomsOn: new Map(), palettes: [], styleOf: r => styleOf(this.spec, r), prefer: new Map(), prefAny: new Set(), seed: String(this.spec.id) };
-      const pins = pinsFor(this.spec, this.lv, this.room, this.composedItems);
+      const pins = pinsFor(this.spec, this.lv, this.room, this.composedItems, true);
       this.composer = new Composer(this.spec, this.lv, this.room, pins, house, `${this.spec.id}:${this.roomKey}:dress`);
       // what this phase has already put on the floor stands in the way too
       for (const it of this.placed) { const ci = this.toCItem(it); if (ci) this.composer.placed.push(ci); }

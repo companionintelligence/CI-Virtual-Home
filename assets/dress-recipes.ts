@@ -140,6 +140,7 @@ const kitchen: Slot[] = [
       if (wide >= 1.8 && !busy) { d.put('island', h, 'carafe', { anchor: 'left' }); d.put('island', h, 'plate-stack', { anchor: 'right' }); }
     }
   } },
+  { id: 'table', tier: 2, what: 'an eat-in table laid: a centrepiece and a place for each chair', run(d) { setTable(d); } },
   { id: 'lamp', tier: 1, what: 'a small lamp at the end of a counter run where the room has none', run(d) {
     if (d.hasLamp()) return;
     const range = d.hostsOf('hob')[0], dist = (h: Host) => (range ? Math.hypot(h.at[0] - range.at[0], h.at[1] - range.at[1]) : 0);
@@ -200,7 +201,7 @@ export const RECIPES: Record<string, Recipe> = {
   playroom: { program: 'playroom', ref: 20, slots: living.filter(s => s.id === 'lamp' || s.id === 'side') },
   'bed-primary': { program: 'bed-primary', ref: 24, slots: bedroom }, 'bed-guest': { program: 'bed-guest', ref: 22, slots: bedroom }, 'bed-kid': { program: 'bed-kid', ref: 14, slots: bedroom }, nursery: { program: 'nursery', ref: 15, slots: bedroom },
   kitchen: { program: 'kitchen', ref: 18, slots: kitchen },
-  'kitchen-dining': { program: 'kitchen-dining', ref: 24, slots: [...kitchen, ...dining.filter(s => s.id === 'table')] },
+  'kitchen-dining': { program: 'kitchen-dining', ref: 24, slots: [...kitchen.filter(s => s.id !== 'table'), { ...dining[0], tier: 1 }] },
   dining: { program: 'dining', ref: 20, slots: dining },
   bath: { program: 'bath', ref: 8, slots: bath }, ensuite: { program: 'ensuite', ref: 14, slots: bath }, powder: { program: 'powder', ref: 4, slots: bath },
   hall: { program: 'hall', ref: 12, slots: hall }, foyer: { program: 'foyer', ref: 11, slots: hall },
