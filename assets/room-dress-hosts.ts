@@ -1,0 +1,185 @@
+// The dress phase's host registry (plan 5.6 D1): what a small good may stand ON. A HOST is a catalog type with a top the dress phase has measured:
+// the height of its surface, and the part of it that is flat and clear at that height (its RECTS, in the item's own frame). A small good is packed
+// into those rects and nowhere else, so its footprint fitting its host is the contract, not a hope (SMALL's skeptic saw a dresser tray overhang its
+// dresser by 10 cm in a hand-placed pair): scripts/test-dress-hosts.mts builds every host in the page, samples every rect at 2 cm and fails unless the
+// geometry there is within 1 cm of the declared top (nothing higher, nothing lower), at the default size and at 0.75 and 1.35 times each sizing param.
+//
+// THREE-free. A rect is [x0, z0, x1, z1] in the host's frame (its origin, +z its front, like every catalog item), metres. Rects come from the measured
+// box (sizeOf), so they follow the item's `w` and `d`.
+//
+//   HOSTS      type -> HostDef, the sound hosts only
+//   DROPPED    type -> why it is NOT a host: a type the phase will not dress, with the reason the test re-checks (never guessed in)
+//   hostOf(item)        the host an item is, in world terms (origin, rot, top, rects), or null
+//   hostRects(host)     its rects as world-aligned obbs
+//   freeRects(host, on, margin)   the host's rects minus the footprints of what already stands on it, minus `margin` all round
+//   fitIn(free, w, d, anchor)     where a w x d box fits in the free rects (host frame), or null
+//
+// A host with a body of its own on top that the page seeds (a console's bowl, a sideboard's vases, a nightstand's decor: `rng() * (w - 0.5)`, from a stream
+// keyed on the house-wide prop index) cannot be dressed from Node, which does not know where it stands: those are DROPPED, and the phase says so.
+//
+// Owner: DRESS.
+import { PLACEMENT } from './props/placement.js';
+import { sizeOf, itemObb, obb, turn, mm, type Size, type Obb } from './room-geo.js';
+
+export type Rect = [number, number, number, number];
+export type HostKind = 'coffee-table' | 'side-table' | 'nightstand' | 'dresser' | 'desk' | 'counter' | 'island' | 'hob' | 'dining-table' | 'console' | 'tank' | 'appliance-top';
+export interface HostDef {
+  kind: HostKind;
+  /** the height of the flat top above the host's own floor, metres (the measured one: PLACEMENT.top where it is right, else what the page builds) */
+  top: number;
+  /** the flat, clear part of the top in the host's frame, from its measured box and its own params */
+  rects: (s: Size, it: any) => Rect[];
+  /** the item's `w` / `d` params change its rects (the test sweeps them) */
+  sized?: Array<'w' | 'd'>;
+}
+
+const box = (s: Size): Rect => [s.ox - s.w / 2, s.oz - s.d / 2, s.ox + s.w / 2, s.oz + s.d / 2];
+/** the box with an inset on each side: left (-x), back (-z), right (+x), front (+z) */
+const inset = (s: Size, l: number, b: number, r: number, f: number): Rect => { const [x0, z0, x1, z1] = box(s); return [x0 + l, z0 + b, x1 - r, z1 - f]; };
+/** a round top: the inscribed square of the box's circle (0.7 of its diameter), centred on it */
+const round = (s: Size): Rect => { const h = (Math.min(s.w, s.d) / 2) * Math.SQRT1_2; return [s.ox - h, s.oz - h, s.ox + h, s.oz + h]; };
+/** the box minus a hole across its whole depth, centred on the box's middle: the two sides */
+const sides = (s: Size, hole: number, ins = 0): Rect[] => { const [x0, z0, x1, z1] = box(s), c = s.ox; return [[x0, z0 + ins, c - hole, z1 - ins], [c + hole, z0 + ins, x1, z1 - ins]]; };
+
+export const HOSTS: Record<string, HostDef> = {
+  // ---- coffee tables
+  'coffee-table': { kind: 'coffee-table', top: 0.40, rects: s => [inset(s, 0, 0, 0, 0)], sized: ['w', 'd'] },
+  'round-coffee-table': { kind: 'coffee-table', top: 0.42, rects: s => [round(s)], sized: ['w'] },
+  'trunk-coffee-table': { kind: 'coffee-table', top: 0.46, rects: s => [inset(s, 0.03, 0.03, 0.03, 0.03)], sized: ['w', 'd'] },
+  // ---- side tables and nightstands
+  'side-table': { kind: 'side-table', top: 0.55, rects: s => [inset(s, 0, 0, 0, 0)] },
+  'nesting-tables': { kind: 'side-table', top: 0.50, rects: s => [inset(s, 0, 0, 0, 0.2)] },
+  'drum-table': { kind: 'side-table', top: 0.52, rects: s => [round(s)] },
+  'bedside-table': { kind: 'nightstand', top: 0.56, rects: s => [inset(s, 0, 0, 0, 0)] },
+  'bedside-cabinet': { kind: 'nightstand', top: 0.60, rects: s => [inset(s, 0.03, 0.03, 0.03, 0.03)] },
+  'drum-nightstand': { kind: 'nightstand', top: 0.56, rects: s => [round(s)] },
+  // ---- dressers and desks
+  'dresser': { kind: 'dresser', top: 0.85, rects: s => [inset(s, 0, 0, 0, 0)], sized: ['w'] },
+  'lowboy-dresser': { kind: 'dresser', top: 0.72, rects: s => [inset(s, 0, 0, 0, 0)], sized: ['w'] },
+  'chest-of-drawers': { kind: 'dresser', top: 1.15, rects: s => [inset(s, 0, 0, 0, 0.03)] },
+  'writing-desk': { kind: 'desk', top: 0.75, rects: s => [inset(s, 0, 0, 0, 0)], sized: ['w'] },
+  // ---- the kitchen
+  'counter-run': { kind: 'counter', top: 0.90, rects: s => [inset(s, 0.02, 0.02, 0.02, 0.05)], sized: ['w'] },
+  'sink-run': { kind: 'counter', top: 0.90, rects: s => sides(s, 0.33, 0.03).map(r => [r[0] + (r[0] < s.ox ? 0.02 : 0), r[1], r[2] - (r[2] > s.ox ? 0.02 : 0), r[3] - 0.02] as Rect), sized: ['w'] },
+  'breakfast-bar': { kind: 'counter', top: 0.90, rects: s => [inset(s, 0.04, 0.04, 0.04, 0.04)], sized: ['w'] },
+  'kitchen-cart': { kind: 'counter', top: 0.90, rects: s => [[s.ox - s.w / 2 + 0.09, s.oz - 0.2, s.ox + s.w / 2 - 0.1, s.oz + 0.2]] },
+  'kitchen-island': { kind: 'island', top: 0.945, rects: s => { const [x0, z0, x1] = box(s), z1 = z0 + 0.86; return [[x0 + 0.04, z0 + 0.04, s.ox + 0.34, z1], [s.ox + 0.52, z0 + 0.04, x1 - 0.04, z1]]; }, sized: ['w'] },
+  'range': { kind: 'hob', top: 0.918, rects: s => [inset(s, 0.02, 0.02, 0.02, 0.1)] },
+  // ---- dining tables
+  'glass-dining-table': { kind: 'dining-table', top: 0.75, rects: s => [inset(s, 0, 0, 0, 0)], sized: ['w', 'd'] },
+  'trestle-table': { kind: 'dining-table', top: 0.76, rects: s => [inset(s, 0, 0, 0, 0)], sized: ['w', 'd'] },
+  'farmhouse-table': { kind: 'dining-table', top: 0.76, rects: s => [inset(s, 0.03, 0.03, 0.03, 0.03)], sized: ['w', 'd'] },
+  'oval-dining-table': { kind: 'dining-table', top: 0.75, rects: s => [inset(s, 0.42, 0.17, 0.42, 0.17)], sized: ['w', 'd'] },
+  'round-dining-table': { kind: 'dining-table', top: 0.75, rects: s => [round(s)] },
+  'pedestal-dining-table': { kind: 'dining-table', top: 0.76, rects: s => [round(s)] },
+  // ---- a console, a tank, the top of a machine
+  'demilune-console': { kind: 'console', top: 0.82, rects: s => [inset(s, 0.13, 0.02, 0.13, 0.14)] },
+  'toilet': { kind: 'tank', top: 0.805, rects: s => [[s.ox - 0.17, s.oz - s.d / 2, s.ox + 0.17, s.oz - s.d / 2 + 0.19]] },
+  'dryer': { kind: 'appliance-top', top: 0.85, rects: s => [inset(s, 0.02, 0.02, 0.02, 0.1)] },
+  'washing-machine': { kind: 'appliance-top', top: 0.85, rects: s => [inset(s, 0.02, 0.02, 0.02, 0.1)] },
+};
+
+/** types that look like hosts and are not, and why (scripts/test-dress-hosts.mts re-reads these against the page: a reason that stops being true is a host to take back) */
+export const DROPPED: Record<string, string> = {
+  'console-table': 'a bowl of its own, 0.11 m in radius, standing at a seeded spot across the middle span: the dress phase cannot know where',
+  'sideboard': 'two bodies of its own (vases) at seeded spots on its top, and a top 0.15 m under its box',
+  'media-credenza': 'a body of its own on a top that is not flat (0.67, 0.65, 0.61)',
+  'nightstand': 'a body of its own at a seeded spot (a lamp stand or a candle) on a 0.4 m top',
+  'chest': 'a lid with a raised centre panel: 0.50 m round the edge, 0.56 m in the middle',
+  'octagonal-table': 'a body of its own at the centre',
+  'vanity-sink': 'a vessel basin and a tap across the whole counter: 0.05 m2 of flat top',
+  'double-vanity': 'two vessel basins with a 0.30 m strip between them: no dress type fits with a margin',
+  'pedestal-sink': 'the basin is the top',
+  'bathtub': 'no rim to stand a tray on: the shell is flat at the water line',
+  'clawfoot-tub': 'a rolled rim, 0.04 m of flat',
+  'soaking-tub': 'a rolled rim, 0.04 m of flat',
+  'tv-stand': 'a screen on its top',
+  'ottoman': 'a cushion, not a surface',
+};
+
+export interface Host { item: any; type: string; kind: HostKind; at: [number, number]; rot: number; top: number; rects: Rect[]; size: Size }
+
+/** the host an item is, or null (not a host type, no origin, no size) */
+export function hostOf(it: any): Host | null {
+  const def = HOSTS[it && it.type];
+  if (!def || !Array.isArray(it.at)) return null;
+  const s = sizeOf(it.type, it); if (!s) return null;
+  return { item: it, type: it.type, kind: def.kind, at: [it.at[0], it.at[1]], rot: it.rot || 0, top: it.y !== undefined && PLACEMENT[it.type]?.onSurface ? it.y : def.top, rects: def.rects(s, it), size: s };
+}
+
+/** a rect in the host's frame as a world obb */
+export function hostRectObb(h: Host, r: Rect): Obb {
+  const [lx, lz] = [(r[0] + r[2]) / 2, (r[1] + r[3]) / 2], [dx, dz] = turn(lx, lz, h.rot);
+  return obb(h.at[0] + dx, h.at[1] + dz, r[2] - r[0], r[3] - r[1], h.rot);
+}
+export const hostRects = (h: Host): Obb[] => h.rects.map(r => hostRectObb(h, r));
+
+/** a world point in the host's frame */
+export const toLocal = (h: Host, x: number, z: number): [number, number] => turn(x - h.at[0], z - h.at[1], -h.rot);
+export const toWorld = (h: Host, lx: number, lz: number): [number, number] => { const [dx, dz] = turn(lx, lz, h.rot); return [mm(h.at[0] + dx), mm(h.at[1] + dz)]; };
+
+/** an item's footprint as a host-frame rect (the axis-aligned cover of its obb in the host's frame): what it takes from the host's free area */
+export function footprintIn(h: Host, it: any): Rect | null {
+  const o = itemObb(it); if (!o) return null;
+  const hw = o.hw, hd = o.hd, c = toLocal(h, o.cx, o.cz), rel = (o.rot - h.rot) * Math.PI / 180, cs = Math.abs(Math.cos(rel)), sn = Math.abs(Math.sin(rel));
+  const ex = hw * cs + hd * sn, ez = hw * sn + hd * cs;
+  return [c[0] - ex, c[1] - ez, c[0] + ex, c[1] + ez];
+}
+
+const area = (r: Rect) => Math.max(0, r[2] - r[0]) * Math.max(0, r[3] - r[1]);
+/** a rect minus another: up to four rects (left, right, back, front strips) */
+export function subtract(r: Rect, h: Rect): Rect[] {
+  if (h[2] <= r[0] || h[0] >= r[2] || h[3] <= r[1] || h[1] >= r[3]) return [r];
+  const out: Rect[] = [];
+  if (h[0] > r[0]) out.push([r[0], r[1], h[0], r[3]]);
+  if (h[2] < r[2]) out.push([h[2], r[1], r[2], r[3]]);
+  const x0 = Math.max(r[0], h[0]), x1 = Math.min(r[2], h[2]);
+  if (h[1] > r[1]) out.push([x0, r[1], x1, h[1]]);
+  if (h[3] < r[3]) out.push([x0, h[3], x1, r[3]]);
+  return out.filter(q => area(q) > 1e-6);
+}
+
+/** the host's free rects: its rects minus `margin` on every edge, minus the footprints of what stands on it (grown by `margin`) */
+export function freeRects(h: Host, on: any[], margin = 0.04): Rect[] {
+  let free: Rect[] = h.rects.map(r => [r[0] + margin, r[1] + margin, r[2] - margin, r[3] - margin] as Rect).filter(r => r[2] - r[0] > 0.02 && r[3] - r[1] > 0.02);
+  for (const it of on) {
+    const f = footprintIn(h, it); if (!f) continue;
+    const g: Rect = [f[0] - margin, f[1] - margin, f[2] + margin, f[3] + margin];
+    free = free.flatMap(r => subtract(r, g));
+  }
+  return free;
+}
+
+/** what already stands ON a host: items whose origin is over one of its rects (grown a little) at about its top */
+export function standingOn(h: Host, items: any[]): any[] {
+  return items.filter(it => {
+    if (it === h.item || !Array.isArray(it.at) || it.y === undefined) return false;
+    if (Math.abs(it.y - h.top) > 0.04) return false;
+    const [lx, lz] = toLocal(h, it.at[0], it.at[1]);
+    return h.rects.some(r => lx >= r[0] - 0.1 && lx <= r[2] + 0.1 && lz >= r[1] - 0.1 && lz <= r[3] + 0.1);
+  });
+}
+
+export type Anchor = 'centre' | 'left' | 'right' | 'back' | 'front' | 'back-left' | 'back-right' | 'front-left' | 'front-right';
+/**
+ * Where a w x d box (its OWN box: the footprint's centre) fits in the free rects. The anchor names the preferred spot of the rect it is packed into:
+ * the centre, a third from an end, against the back or the front edge (a tall piece goes to the back, toward a wall) or in a corner. The rect tried
+ * first is the largest; the box is slid on a 1 cm grid to the nearest spot to the anchor that still fits, so a rect that is only just big enough
+ * still takes it. Returns the box's centre in the host frame.
+ */
+export function fitIn(free: Rect[], w: number, d: number, anchor: Anchor = 'centre'): [number, number] | null {
+  const order = free.slice().sort((a, b) => area(b) - area(a) || a[0] - b[0] || a[1] - b[1]);
+  for (const r of order) {
+    const rw = r[2] - r[0], rd = r[3] - r[1];
+    if (rw < w - 1e-6 || rd < d - 1e-6) continue;
+    const spanX = rw - w, spanZ = rd - d;
+    const fx = /left/.test(anchor) ? 0 : /right/.test(anchor) ? 1 : anchor === 'centre' || anchor === 'back' || anchor === 'front' ? 0.5 : 0.5;
+    const fz = /back/.test(anchor) ? 0 : /front/.test(anchor) ? 1 : 0.5;
+    // a left or right anchor is a third from the end, not the corner (a pair of anchors then leaves a gap between them)
+    const tx = anchor === 'left' || anchor === 'right' ? (fx === 0 ? 0.25 : 0.75) : fx;
+    const cx = r[0] + w / 2 + spanX * tx, cz = r[1] + d / 2 + spanZ * fz;
+    return [Math.round(cx * 100) / 100, Math.round(cz * 100) / 100];
+  }
+  return null;
+}
+export { area as rectArea };
