@@ -186,9 +186,23 @@ test('L3: the fixtures read the lamp colour from the scheme and the lamps from k
   const src = fs.readFileSync(path.join(ROOT, 'assets', 'fixtures.ts'), 'utf8');
   assert.match(src, /schemeOf\(spec\)/); assert.match(src, /warm: scheme\.lampColor/);
   assert.ok(!/\bWARM\b/.test(src.replace(/\/\/.*$/gm, '')), 'no hard-coded WARM left');
-  assert.match(src, /LAMP_ITEMS\.has/);
+  assert.match(src, /POOL_LAMPS\.has/);
   assert.match(src, /cost > left/, 'the budget is spent per room, in lights');
   assert.match(src, /LAMP_ROOM_FILL_K > 0 \? 2 : 1/, 'a lamp room costs two lights only when a fill is kept beside the pool');
+});
+
+test('LIGHT v3 (1): every free-standing lamp type the catalog places pools its room, not only the registry\'s four', async () => {
+  const { POOL_LAMPS, SCONCES } = await import('../assets/fixtures.js');
+  const { LAMP_ITEMS } = await import('../assets/kit-rules.js');
+  for (const t of LAMP_ITEMS) assert.ok(POOL_LAMPS.has(t), `${t} (the registry's) still pools`);
+  for (const t of ['column-lamp', 'ginger-lamp', 'globe-lamp', 'desk-lamp', 'mushroom-lamp', 'tripod-table-lamp']) assert.ok(POOL_LAMPS.has(t), `${t} lights its room`);
+  assert.ok(!POOL_LAMPS.has('wall-sconce') && SCONCES.has('wall-sconce') && !POOL_LAMPS.has('pendant-lamp') && !POOL_LAMPS.has('lantern'), 'hung lights, sconces and flames are not pooled');
+  // the catalog's own 'lamp' group is the list this one must not fall behind: every placed lamp type is pooled or named as an exception
+  const place = fs.readFileSync(path.join(ROOT, 'assets', 'props', 'placement.ts'), 'utf8');
+  const groups = [...place.matchAll(/^\s*'([a-z-]+)': def\('lamp',/gm)].map(m => m[1]);
+  const exempt = new Set(['lantern']);
+  for (const t of groups) assert.ok(POOL_LAMPS.has(t) || exempt.has(t), `placement.ts places ${t} as a lamp: pool it in fixtures.ts POOL_LAMPS or exempt it here`);
+  assert.ok(groups.length >= 11, `read ${groups.length} lamp types out of placement.ts`);
 });
 
 // ---- the hours are in order (LIGHT v2 item 1) ------------------------------------------------------------------------------------------

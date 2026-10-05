@@ -29,7 +29,10 @@
 //                                             serves another checkout) and compare: L2's tag on ceiling materials must cost at most +2 % median.
 //                                             --houses a,b  --label <name>
 //
-//   pnpm run test:light -- --probe           (--variant grade|ao|all: with a runtime L4 variant) the bench without the provenance rules: the same cameras (from before.manifest.json) and the same 19 reads, on the
+//   pnpm run test:light -- --mood            night: the luma within 1.2 m of a lamp against the room's far wall, on the bench rooms (LIGHT v3 item 2; target 1.3 or more)
+//   pnpm run test:light -- --lamps           the lamp census: every glowing lamp of every house by type, and which rooms have no pool (LIGHT v3 item 1)
+//
+//   pnpm run test:light -- --probe           (--corners NW,SE --rooms a,b --label <dir> --tune '{json}' (fixtures.ts tune hook) --env '{json}' (TIME_OF_DAY merge) --variant grade|ao|all: with a runtime L4 variant) the bench without the provenance rules: the same cameras (from before.manifest.json) and the same 19 reads, on the
 //                                             tree as it is, committed or not, for tuning a constant. Not a gate result (use --bench for that).   --tods dusk,night
 //
 // Frames are read off the product's own composer path (__houseSnapshot / __houseRenderFrames, 2x supersample, GTAO, bloom, grade, SMAA), at
@@ -47,7 +50,7 @@ import { lumaOfFile, lumaMetrics, roundLuma, lightAcceptance, type Luma } from '
 import { loadManifest } from './review/manifest.mts';
 
 const args = parseArgs(process.argv.slice(2));
-const OUT_ROOT = path.join(REVIEW_DIR, 'after', args.stream && args.stream !== 'true' ? args.stream : 'light2');   // --stream light  reads LIGHT v1's old directory
+const OUT_ROOT = path.join(REVIEW_DIR, 'after', args.stream && args.stream !== 'true' ? args.stream : 'light3');   // --stream light  reads LIGHT v1's old directory
 const out = (...p: string[]) => path.join(OUT_ROOT, ...p);
 const LIGHT_CAP = 16;
 
@@ -321,8 +324,10 @@ async function probeMode(): Promise<number> {
   const m = loadManifest(path.join(BASELINES, 'before.manifest.json'));
   const before = readJson(path.join(BASELINES, 'before.metrics.json')).frames as Record<string, Luma>;
   const tods = new Set((args.tods && args.tods !== 'true' ? args.tods : 'day,dusk,night').split(','));
-  const dir = out('probe');
-  const shots = m.shots.filter(x => x.kind === 'eye' && BENCH_ROOMS.includes(x.room) && x.corner === 'NW' && tods.has(x.tod));
+  const dir = out(args.label && args.label !== 'true' ? args.label : 'probe');
+  const corners = new Set((args.corners && args.corners !== 'true' ? args.corners : 'NW').split(','));   // --corners NW,SE: both of the rig's cameras
+  const rooms = args.rooms && args.rooms !== 'true' ? new Set(args.rooms.split(',')) : null;
+  const shots = m.shots.filter(x => x.kind === 'eye' && BENCH_ROOMS.includes(x.room) && corners.has(x.corner) && tods.has(x.tod) && (!rooms || rooms.has(x.room)));
   const session = await startSession();
   const after: Record<string, Luma> = {};
   try {
@@ -335,6 +340,14 @@ async function probeMode(): Promise<number> {
         if (!(args.variant in VARIANTS)) throw new Error(`unknown variant ${args.variant}`);
         await w.page.evaluate(async (src: string) => { const W = window as any, d = W.__houseDebug(); return await new Function('W', 'd', `return (async () => { ${src} })();`)(W, d); }, VARIANTS[args.variant]);
       }
+      // --tune '{"poolI":9,"haloK":0.2}': fixtures.ts' QA hook, applied to the lights this page built
+      if (args.tune && args.tune !== 'true') await w.page.evaluate((o: any) => (window as any).__houseFixtures.tune(o), JSON.parse(args.tune));
+      // --env '{"night":{"hemi":{"intensity":0.8}}}': a deep merge into environment.ts TIME_OF_DAY on this page (the presets are plain data the page reads on every re-light)
+      if (args.env && args.env !== 'true') await w.page.evaluate(async (o: any) => {
+        const E: any = await import('./assets/environment.js');
+        const merge = (t: any, u: any) => { for (const k of Object.keys(u)) { if (u[k] && typeof u[k] === 'object' && !Array.isArray(u[k]) && t[k] && typeof t[k] === 'object') merge(t[k], u[k]); else t[k] = u[k]; } };
+        merge(E.TIME_OF_DAY, o);
+      }, JSON.parse(args.env));
       for (const tod of ['day', 'dusk', 'night']) {
         if (!tods.has(tod)) continue;
         await w.page.evaluate((t: string) => (window as any).__houseSetLighting(t), tod);
@@ -484,8 +497,180 @@ async function leakMode(): Promise<number> {
   return badRooms ? 1 : 0;
 }
 
+
+// ---- lamps: the census of every lamp a built house has, and whether its room is lit by it ----------------------------------------------
+// LIGHT v3 item 1. For every house (or --houses a,b), at night: each placed item that carries a glowing part tagged userData.fixture = 'lamp' and
+// is not hung from a ceiling (pendants, chandeliers, string lights are the room fill's), by type, in its room; and for each room that has one,
+// whether the room has a lamp pool (a light with userData.lampPool). A room with a glowing lamp and no pool is "unlit by its lamp": it must be 0,
+// or the room is one of those the 16-light cap leaves out (reported separately: `capped`). Writes <out>/lamps.json.
+//   pnpm run test:light -- --lamps [--houses a,b]
+async function lampsMode(): Promise<number> {
+  const all = fs.readdirSync(path.join(ROOT, 'content', 'houses')).filter(f => f.endsWith('.json') && f !== 'index.json' && !f.endsWith('.plan.json')).map(f => f.replace(/\.json$/, '')).sort();
+  const houses = args.houses && args.houses !== 'true' ? args.houses.split(',') : all;
+  const session = await startSession();
+  const result: any[] = [];
+  const byType: Record<string, { items: number; pooled: number }> = {};
+  try {
+    for (const house of houses) {
+      const w = await session.open(house, { res: '360', composer: false });
+      await w.page.evaluate(() => (window as any).__houseSetLighting('night'));
+      const r: any = await w.page.evaluate(() => {
+        const W = window as any, d = W.__houseDebug(), spec = d.house.spec, st = W.__houseFixtures.stats();
+        const rooms: any[] = [];
+        spec.levels.forEach((lv: any) => (lv.rooms || []).forEach((rm: any, ri: number) => rooms.push({ key: `${lv.id}#${ri}`, name: rm.name, y: lv.y || 0, H: lv.height || 3, program: rm.program || null, b: rm.bounds })));
+        const roomAt = (o: any, wp: any) => {
+          const c = rooms.filter(r => r.b && wp.x >= r.b.x - 0.05 && wp.x <= r.b.x + r.b.w + 0.05 && wp.z >= r.b.z - 0.05 && wp.z <= r.b.z + r.b.d + 0.05 && wp.y > r.y - 0.1 && wp.y < r.y + r.H);
+          return c.find((r: any) => r.name === o.userData.room) || c[0] || null;
+        };
+        const items: any[] = [];
+        d.scene.traverse((o: any) => {
+          const u = o.userData || {}; if (!u.itemType || u.role !== 'item') return;
+          let glow = 0; o.traverse((m: any) => { if (m.isMesh && m.userData && m.userData.fixture === 'lamp') glow++; });
+          if (!glow) return;
+          const wp = o.getWorldPosition(new (o.position.constructor)());
+          const rm = roomAt(o, wp);
+          items.push({ type: u.itemType, name: o.name, room: rm ? rm.key : null, roomName: rm ? rm.name : u.room, program: rm ? rm.program : null, x: +wp.x.toFixed(2), y: +wp.y.toFixed(2), z: +wp.z.toFixed(2) });
+        });
+        const pools = new Set<string>(), lit = new Set<string>();
+        d.scene.traverse((l: any) => { if (l.isLight && l.userData.fixtureLight) { lit.add(l.userData.roomKey); if (l.userData.lampPool) pools.add(l.userData.roomKey); } });
+        return { items, pools: [...pools], lit: [...lit], lights: st ? st.lights.length : 0, poolTypes: W.__houseFixtures.lampTypes ? W.__houseFixtures.lampTypes() : [] };
+      });
+      const hung = new Set(['pendant-lamp', 'chandelier', 'ceiling-light', 'string-lights']);
+      // a wall sconce glows and hangs on a wall: the room's fill is its light (fixtures.ts SCONCES), so it is counted apart; a free-standing lamp type that glows
+      // and is NOT in fixtures.ts POOL_LAMPS is a miss and fails the run
+      const sconce = new Set(['wall-sconce']);
+      const poolTypes = new Set<string>(r.poolTypes);
+      const missed = r.items.filter((i: any) => !hung.has(i.type) && !sconce.has(i.type) && !poolTypes.has(i.type));
+      if (missed.length) say({ check: 'every glowing free-standing lamp type is a pool lamp', frame: house, value: [...new Set(missed.map((i: any) => i.type))].join(','), limit: 'none missed', ok: false });
+      const lamps = r.items.filter((i: any) => !hung.has(i.type) && !sconce.has(i.type));
+      const sconces = r.items.filter((i: any) => sconce.has(i.type));
+      const roomKeys = [...new Set(lamps.map((i: any) => i.room))] as string[];
+      const poolSet = new Set<string>(r.pools), litSet = new Set<string>(r.lit);
+      const noPool = roomKeys.filter(k => k && !poolSet.has(k));
+      const capped = noPool.filter(k => !litSet.has(k));
+      for (const i of lamps) { const t = (byType[i.type] ||= { items: 0, pooled: 0 }); t.items++; if (i.room && poolSet.has(i.room)) t.pooled++; }
+      result.push({ house, lights: r.lights, lampRooms: roomKeys.length, pooled: roomKeys.filter(k => poolSet.has(k)).length, noPool: noPool.length, capped: capped.length, sconces: sconces.length, sconceRooms: [...new Set(sconces.map((i: any) => i.room))].filter(k => k && !roomKeys.includes(k as string)).length, noPoolRooms: noPool.map(k => ({ key: k, capped: !litSet.has(k), types: [...new Set(lamps.filter((i: any) => i.room === k).map((i: any) => i.type))] })), items: lamps, hungOnly: r.items.length - lamps.length });
+      const rr = result[result.length - 1];
+      console.log(`  ${house.padEnd(20)} lights ${String(rr.lights).padStart(2)}  lamp rooms ${String(rr.lampRooms).padStart(2)}  with a pool ${String(rr.pooled).padStart(2)}  without ${String(rr.noPool).padStart(2)} (capped out ${rr.capped})  lamp items ${lamps.length}  sconces ${sconces.length} (${rr.sconceRooms} sconce-only rooms)`);
+      if (w.errors.length) say({ check: 'no page errors', frame: house, value: w.errors[0], limit: 'none', ok: false });
+      await w.close();
+    }
+  } finally { await session.close(); }
+  writeText(out('lamps.json'), stableJson({ schema: 1, what: 'the lamp census (scripts/test-interior-light.mts --lamps)', byType, rows: result, machine: machine() }));
+  console.log('\nby type (items / in a room with a pool):'); for (const [t, v] of Object.entries(byType).sort()) console.log(`  ${t.padEnd(20)} ${String(v.items).padStart(4)} / ${v.pooled}`);
+  const tot = (k: string) => result.reduce((a, r) => a + r[k], 0);
+  console.log(`\n${result.length} houses: ${tot('lampRooms')} rooms with a glowing free-standing lamp, ${tot('pooled')} with a pool, ${tot('noPool')} without (${tot('capped')} of them left out by the ${LIGHT_CAP}-light cap), max lights ${Math.max(...result.map(r => r.lights))}`);
+  return tot('noPool') - tot('capped') > 0 ? 1 : 0;
+}
+
+
+// ---- mood: how much of a lamp's pool there is against the room, at night ------------------------------------------------------------------
+// LIGHT v3 item 2. For each bench room that has a lamp pool, from the rig's two corner cameras at night: the mean luma (Rec. 709 of the tone-mapped 8-bit
+// frame, plain render: no GTAO, bloom or grade) of the room's own surfaces within 1.2 m of the lamp head (outside 0.3 m, so the glowing shade itself is not
+// counted), against the mean luma of the room's FAR WALL: the wall pixels (within 12 cm of a plane of the room's bounds, 0.3 to 2.2 m up) that are among the
+// farthest quarter from the lamp. Target: near / far >= 1.3 in a lamp room at night. A frame where fewer than 400 px of either class are seen is "not seen"
+// and reported, not judged. World positions come from the same position pass as --leak. Which lamp: the pool light's own position (the lamp head).
+//   pnpm run test:light -- --mood [--rooms a,b] [--tod night] [--tune '{json}'] [--env '{json}']
+async function moodMode(): Promise<number> {
+  const tod = args.tod && args.tod !== 'true' ? args.tod : 'night';
+  const only = args.rooms && args.rooms !== 'true' ? new Set(args.rooms.split(',')) : null;
+  const rooms = R24.filter(r => r.bench && (!only || only.has(r.id)));
+  // --tune '{json}' once, or --sweep '[{json},{json}]': each applied in turn to the same page (a tune sets only the keys it names, so a sweep entry lists all it changes)
+  const tunes: any[] = args.sweep && args.sweep !== 'true' ? JSON.parse(args.sweep) : args.tune && args.tune !== 'true' ? [JSON.parse(args.tune)] : [null];
+  const session = await startSession();
+  const res: any[] = [];
+  try {
+    for (const house of [...new Set(rooms.map(r => r.house))]) {
+      const w = await session.open(house, { res: '360', composer: false });
+      if (args.env && args.env !== 'true') await w.page.evaluate(async (o: any) => { const E: any = await import('./assets/environment.js'); const merge = (t: any, u: any) => { for (const k of Object.keys(u)) { if (u[k] && typeof u[k] === 'object' && !Array.isArray(u[k]) && t[k] && typeof t[k] === 'object') merge(t[k], u[k]); else t[k] = u[k]; } }; merge(E.TIME_OF_DAY, o); }, JSON.parse(args.env));
+      await w.page.evaluate((t: string) => (window as any).__houseSetLighting(t), tod);
+      const allRooms = await roomsOf(w.page);
+      for (const [ti, tune] of tunes.entries()) {
+      if (tune) await w.page.evaluate((o: any) => (window as any).__houseFixtures.tune(o), tune);
+      const label = tunes.length > 1 || tune ? `#${ti}` : '';
+      for (const r of rooms.filter(x => x.house === house)) {
+        const room = allRooms.find(x => x.name === r.room);
+        if (!room) throw new Error(`${r.id}: no room ${r.room}`);
+        for (const corner of ['NW', 'SE'] as const) {
+          const cam = cornerCam(room.b, room.y, corner);
+          const m: any = await w.page.evaluate(({ cam, key, box }: any) => {
+            const W = window as any, d = W.__houseDebug(), renderer = d.renderer, scene = d.scene, TH = W.__THREE, c = d.camera;
+            c.position.set(...cam.pos); c.lookAt(...cam.target); c.fov = cam.fov; c.near = cam.near; c.updateProjectionMatrix();
+            let head: any = null; scene.traverse((o: any) => { if (o.isLight && o.userData.lampPool && o.userData.roomKey === key) head = o.getWorldPosition(new TH.Vector3()); });
+            if (!head) return { noPool: true };
+            const orig = renderer.render; let out: any = null;
+            (renderer as any).render = (s: any, cm: any) => {
+              (renderer as any).render = orig;
+              const gl = renderer.getContext(), cv = renderer.domElement, Wd = cv.width, Hd = cv.height;
+              orig.call(renderer, s, cm);
+              const A = new Uint8Array(Wd * Hd * 4); gl.readPixels(0, 0, Wd, Hd, gl.RGBA, gl.UNSIGNED_BYTE, A);
+              // the same frame with this room's pool off: what the lamp adds to the same surfaces (albedo cancels)
+              const poolL: any[] = []; scene.traverse((o: any) => { if (o.isLight && o.userData.lampPool && o.userData.roomKey === key) poolL.push(o); });
+              const I0 = poolL.map(l => l.intensity); for (const l of poolL) l.intensity = 0;
+              orig.call(renderer, s, cm);
+              const Z = new Uint8Array(Wd * Hd * 4); gl.readPixels(0, 0, Wd, Hd, gl.RGBA, gl.UNSIGNED_BYTE, Z);
+              poolL.forEach((l, i) => { l.intensity = I0[i]; });
+              const rt = new TH.WebGLRenderTarget(Wd, Hd, { type: TH.FloatType, format: TH.RGBAFormat, depthBuffer: true, minFilter: TH.NearestFilter, magFilter: TH.NearestFilter });
+              const pm = new TH.MeshBasicMaterial({ fog: false });
+              pm.onBeforeCompile = (sh: any) => {
+                sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vhPos;').replace('#include <project_vertex>', '#include <project_vertex>\nvec4 vhw = vec4( transformed, 1.0 );\n#ifdef USE_INSTANCING\nvhw = instanceMatrix * vhw;\n#endif\nvhw = modelMatrix * vhw; vhPos = vhw.xyz;');
+                sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vhPos;').replace('#include <opaque_fragment>', 'gl_FragColor = vec4( vhPos, 1.0 );');
+              };
+              const prevOverride = scene.overrideMaterial, prevFog = scene.fog, prevBg = scene.background, prevTone = renderer.toneMapping;
+              scene.overrideMaterial = pm; scene.fog = null; scene.background = null; renderer.toneMapping = TH.NoToneMapping;
+              const seeThrough: any[] = [];
+              scene.traverse((o: any) => { if (!o.isMesh || !o.visible) return; const ms = Array.isArray(o.material) ? o.material : [o.material]; if (ms.some((mm: any) => mm && ((mm.transparent && mm.opacity < 0.95) || (mm.transmission || 0) > 0))) { seeThrough.push(o); o.visible = false; } });
+              renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); orig.call(renderer, s, cm);
+              for (const o of seeThrough) o.visible = true;
+              const P = new Float32Array(Wd * Hd * 4); renderer.readRenderTargetPixels(rt, 0, 0, Wd, Hd, P);
+              renderer.setRenderTarget(null); scene.overrideMaterial = prevOverride; scene.fog = prevFog; scene.background = prevBg; renderer.toneMapping = prevTone; rt.dispose(); pm.dispose();
+              const lum = (i: number, B: Uint8Array = A) => { const f = (v: number) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(B[i * 4]) + 0.7152 * f(B[i * 4 + 1]) + 0.0722 * f(B[i * 4 + 2]); };
+              const walls: Array<{ l: number; dist: number }> = [], near: number[] = [], nearOff: number[] = [];
+              for (let i = 0; i < Wd * Hd; i++) {
+                if (P[i * 4 + 3] < 0.5) continue;
+                const x = P[i * 4], y = P[i * 4 + 1], z = P[i * 4 + 2];
+                if (x < box.x0 - 0.01 || x > box.x1 + 0.01 || z < box.z0 - 0.01 || z > box.z1 + 0.01 || y < box.y0 - 0.02 || y > box.y1 - 0.005) continue;
+                const d3 = Math.hypot(x - head.x, y - head.y, z - head.z);
+                if (d3 >= 0.3 && d3 <= 1.2) { near.push(lum(i)); nearOff.push(lum(i, Z)); }
+                const onWall = Math.min(x - box.x0, box.x1 - x, z - box.z0, box.z1 - z) < 0.12 && y > box.y0 + 0.3 && y < box.y0 + 2.2;
+                if (onWall) walls.push({ l: lum(i), dist: Math.hypot(x - head.x, z - head.z) });
+              }
+              walls.sort((a, b) => a.dist - b.dist);
+              const far = walls.slice(Math.floor(walls.length * 0.75));
+              const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
+              out = { nearN: near.length, near: mean(near), nearOff: mean(nearOff), farN: far.length, far: mean(far.map(f => f.l)), allWallsN: walls.length };
+            };
+            W.__housePlainRender = true;
+            try { W.__houseSnapshot({ res: '720', dressing: { walls: 'up', roof: 'on' }, quality: 0.3 }); } finally { W.__housePlainRender = false; (renderer as any).render = orig; }
+            return out;
+          }, { cam, key: `${room.lv}#${allRooms.filter(x => x.lv === room.lv).findIndex(x => x.name === room.name)}`, box: { x0: room.b.x, x1: room.b.x + room.b.w, z0: room.b.z, z1: room.b.z + room.b.d, y0: room.y, y1: room.y + 3 } });
+          const row = { room: r.id + label, corner, tod, tune: tune || null, ...m, ratio: m && m.far > 0 && m.nearN >= 400 && m.farN >= 400 ? m.near / m.far : null };
+          res.push(row);
+          if (m.noPool) console.log(`  ${(r.id + label).padEnd(26)} ${corner}  no lamp pool (a fill room)`);
+          else console.log(`  ${(r.id + label).padEnd(26)} ${corner}  near ${m.near.toFixed(3)} (${m.nearN} px)  far wall ${m.far.toFixed(3)} (${m.farN} px)  ratio ${row.ratio === null ? 'not seen' : row.ratio.toFixed(2)}`);
+        }
+      }
+      }
+      await w.close();
+    }
+  } finally { await session.close(); }
+  writeText(out(`mood-${tod}.json`), stableJson({ schema: 1, what: 'pool against far wall (scripts/test-interior-light.mts --mood)', rows: res }));
+  // judged per room over both corners (pixel-weighted): one corner often sees the lamp's back or a dark piece of furniture beside it
+  for (const id of [...new Set(res.filter(r => !r.noPool).map(r => r.room))]) {
+    const rs = res.filter(r => r.room === id && !r.noPool && r.nearN >= 400 && r.farN >= 400);
+    if (!rs.length) { console.log(`  ${id}: not seen well enough to judge`); continue; }
+    const wm = (k: string, n: string) => rs.reduce((a, r) => a + r[k] * r[n], 0) / rs.reduce((a, r) => a + r[n], 0);
+    const near = wm('near', 'nearN'), far = wm('far', 'farN'), off = wm('nearOff', 'nearN');
+    console.log(`  ${id.padEnd(26)} both corners: near ${near.toFixed(3)}  far wall ${far.toFixed(3)}  pool gain on the same surfaces ${(near / Math.max(off, 1e-6)).toFixed(2)}x`);
+    say({ check: `${tod}: lamp pool / far wall luma >= 1.3`, frame: id, value: `${(near / far).toFixed(2)} (pool adds ${(near / Math.max(off, 1e-6)).toFixed(2)}x)`, limit: '1.3', ok: near / far >= 1.3 });
+  }
+  return rows.some(r => !r.ok) ? 1 : 0;
+}
+
 let code = 0;
-if (args.leak === 'true') code = await leakMode();
+if (args.mood === 'true') code = await moodMode();
+else if (args.lamps === 'true') code = await lampsMode();
+else if (args.leak === 'true') code = await leakMode();
 else if (args.probe === 'true') code = await probeMode();
 else if (args['player-calls'] === 'true') code = await playerCallsMode();
 else if (args.hitch === 'true') code = await hitchMode();
@@ -493,6 +678,6 @@ else if (args.portal === 'true') code = await portalMode();
 else if (args.bench === 'true') code = await benchMode();
 else code = await fixturesMode();
 const bad = rows.filter(r => !r.ok).length;
-if (args.portal !== 'true' && args.probe !== 'true' && args.leak !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
+if (args.portal !== 'true' && args.probe !== 'true' && args.leak !== 'true' && args.lamps !== 'true' && args.mood !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
 console.log(`(load ${machine().load1})`);
 process.exit(code);

@@ -56,6 +56,7 @@ export const FILL_ON_GAIN = 0.1;
 // behind the lamp is outside the cone and keeps its fill, what is beside it and in front gets the wash, brightest near the lamp and falling away
 // across the bed, the desk, the curtain and the far wall (x3 the v1 intensity, under 1 % of that frame clipped). What keeps it in its room is room-clip.ts.
 export const LAMP_ROOM_FILL_K = 0;
+export const LAMP_RANK_BONUS = 1.35;  // × the ranking score of a room that has a free-standing lamp (which rooms the 16-light cap lights)
 export const LAMP_POOL_I = 7.8;       // cd at gain 1, for a 3 m room; × √area / 3, at most × LAMP_POOL_MAX
 export const LAMP_POOL_MAX = 1.6;
 export const LAMP_POOL_REACH = 0.8;   // × the room's diagonal: where the falloff reaches 0 (the clip, not this, stops it at the walls)
@@ -92,6 +93,14 @@ export const fanEligible = (room: any): boolean => {
 // what a pendant hangs over (catalog and registry types) and what already hangs from a ceiling
 const PENDANT_OVER = { 'kitchen-island': 'island', 'breakfast-bar': 'island', 'dining-set': 'dining', 'dining-table': 'dining', 'farmhouse-table': 'dining', 'round-dining-table': 'round' };
 const HUNG = new Set(['pendant-lamp', 'chandelier', 'ceiling-light']);
+/** Every free-standing lamp a house places, the types whose lit head a room's pool can sit at (LIGHT v3 item 1). v2 pooled only kit-rules.ts LAMP_ITEMS (the halo
+ *  lamp and the registry's floor, arc, tripod-floor and table lamps: 138 of the fleet's 295 lamp items), so a room whose lamp was a column, ginger, globe, desk,
+ *  mushroom or tripod-table lamp had a glowing lamp that lit nothing. These are the placed types of placement.ts's 'lamp' group that stand on a floor or a
+ *  surface; `lantern` is a flame (always lit, no lamp gain) and the wall sconce is a wall light, which the room's fill stands for (see SCONCES). The set
+ *  is read here, not edited in kit-rules.ts (not LIGHT's file); a new lamp type needs one word here, and `test:light -- --lamps` counts any it misses. */
+export const POOL_LAMPS: ReadonlySet<string> = new Set([...LAMP_ITEMS, 'desk-lamp', 'column-lamp', 'ginger-lamp', 'globe-lamp', 'mushroom-lamp', 'tripod-table-lamp']);
+/** a wall sconce glows and hangs on a wall; a room with only sconces keeps its fill (a sconce has no head to pool from that is not against the wall it lights) */
+export const SCONCES: ReadonlySet<string> = new Set(['wall-sconce']);
 
 type Pt = { x: number; z: number };
 const segDist = (p: Pt, a: Pt, b: Pt) => { const dx = b.x - a.x, dz = b.z - a.z, l2 = dx * dx + dz * dz || 1e-9; const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.z - a.z) * dz) / l2)); return Math.hypot(p.x - (a.x + dx * t), p.z - (a.z + dz * t)); };
@@ -131,6 +140,7 @@ if (typeof window !== 'undefined') {
   });
   (window as any).__houseFixtures = {   // QA hook: what the fixtures did, and a way to drive the gain by hand
     applyLampGain,
+    lampTypes: () => [...POOL_LAMPS],
     stats: () => current && { ...current.stats, gain: current.gain, lights: current.lights.map(l => { const p = l.light.getWorldPosition(new l.light.position.constructor()); return { room: l.room, pool: !!l.pool, slot: l.slot, base: +l.base.toFixed(2), at: [p.x, p.y, p.z].map(v => +v.toFixed(2)) }; }) },
   };
 }
@@ -153,8 +163,10 @@ function stateFor(ctx) {
     if (!r.bounds) return;
     const area = r.bounds.w * r.bounds.d; if (area < ROOM_MIN_AREA) return;
     const kind = roomKind(r); if (kind === 'outdoor') return;
-    const lamp = (r.items || []).some(it => it && LAMP_ITEMS.has(it.type));
-    ranked.push({ key: `${lv.id}#${ri}`, score: WEIGHT[kind] * Math.sqrt(area), li, ri, lamp });
+    const lamp = (r.items || []).some(it => it && POOL_LAMPS.has(it.type));
+    // a room with a lamp is lit before a lampless room of the same standing (the cap leaves out the rooms at the bottom of this ranking, and a room whose
+    // lamp glows must not be one of them while a lampless room is lit): LAMP_RANK_BONUS stands in for a lamp's glow in the score
+    ranked.push({ key: `${lv.id}#${ri}`, score: WEIGHT[kind] * Math.sqrt(area) * (lamp ? LAMP_RANK_BONUS : 1), li, ri, lamp });
   }));
   ranked.sort((a, b) => b.score - a.score || a.li - b.li || a.ri - b.ri);
   const lit = new Map<string, { lamp: boolean }>();
@@ -376,11 +388,11 @@ function chandelier(THREE, s, drop: number) {
 
 // The head of the lamp nearest (cx, cz): the centre of the box round a lamp's lit parts (its meshes tagged userData.fixture = 'lamp': a
 // drum, globe, cone, mushroom or tripod head, or the halo lamp's drum and diffuser), for the registry's floor, arc, tripod and table lamps and the
-// halo lamp (kit-rules.ts LAMP_ITEMS). null when the room has none placed (the spec lists one that did not fit).
+// halo lamp, and since v3 every other free-standing lamp type (POOL_LAMPS). null when the room has none placed (the spec lists one that did not fit).
 function lampHead_(items: Array<{ o: any; type: string }>, cx: number, cz: number): { x: number; y: number; z: number } | null {
   let best: { x: number; y: number; z: number; d: number } | null = null;
   for (const it of items) {
-    if (!LAMP_ITEMS.has(it.type)) continue;
+    if (!POOL_LAMPS.has(it.type)) continue;
     let box: any = null;
     it.o.traverse((m: any) => {
       if (!m.isMesh || !m.userData || m.userData.fixture !== 'lamp') return;
