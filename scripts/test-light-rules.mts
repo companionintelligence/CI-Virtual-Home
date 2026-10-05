@@ -248,10 +248,10 @@ test('night is lamp-lit: a cool sky over a warm ground, env 0.30 kept, and dusk 
   const s = parseInt(n.hemi.sky.slice(1), 16); assert.ok((s & 255) > ((s >> 16) & 255), 'the sky stays cool');
 });
 
-test('LIGHT v3 (5): the composer reads a curtain as thin (GTAO thickness 0.15) and the day grade turns about a lighter grey', () => {
+test('LIGHT v3 (5): the composer reads a curtain as thin (thin GTAO thickness) and the day grade turns about a lighter grey', () => {
   const page = fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8');
   assert.match(page, /gtao\.updateGtaoMaterial\(\{ radius: 0\.8, distanceExponent: 1, thickness: GTAO_THICKNESS\.inside,/);
-  assert.equal(GTAO_THICKNESS.inside, 0.15);
+  assert.ok(GTAO_THICKNESS.inside >= 0.15 && GTAO_THICKNESS.inside <= 0.3 && GTAO_THICKNESS.outside === 1, 'thin enough to read a curtain as thin (0.3 left a faint smudge by the curtain), 1 out of doors');
   assert.match(page, /u\.pivot\.value = p\.grade\.pivot \?\? 0\.18/);
   const g = TIME_OF_DAY.day.grade;
   assert.ok(g.contrast > 1.3 && (g.pivot ?? 0.18) > 0.25, 'a stronger contrast about a lighter grey: the range grows without the walls brightening');

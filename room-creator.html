@@ -9030,8 +9030,9 @@
       // a room-scale radius (Pascal's SSGI occlusion runs at radius 1, intensity 1.5): 0.35 m only darkened
       // skirting lines; 0.8 m lets a corner, a wardrobe's flank and the floor under a bed fall off softly too.
       // thickness: how thick the pass takes an occluder to be. At 1 any near surface counted as a metre-thick wall, and a curtain
-      // beside a wall left a speckled dark fringe on it (aurora living NW day, cutestarter bedroom NW night); 0.15 reads a curtain
-      // for what it is (LIGHT v3 item 5; the day grade, environment.ts, makes up the contrast this took out of the contact shadows)
+      // beside a wall left a speckled dark fringe on it (aurora living NW day, cutestarter bedroom NW night); the thin value
+      // (environment.ts GTAO_THICKNESS: 0.25 inside the house, 1 out of doors, blended per frame in tuneComposerLook) reads a curtain
+      // for what it is (LIGHT v3 item 5; the day grade makes up the contrast this took out of the contact shadows)
       gtao.blendIntensity = 1.1;
       gtao.updateGtaoMaterial({ radius: 0.8, distanceExponent: 1, thickness: GTAO_THICKNESS.inside, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false });
       fitGtaoClipBox(gtao);

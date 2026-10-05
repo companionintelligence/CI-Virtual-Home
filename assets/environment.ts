@@ -467,7 +467,7 @@ export function interiorWeight(cam: { x: number; y: number; z: number }, storeys
 /** GTAO's thickness (how thick the pass takes an occluder to be) inside the building and out of doors, blended by the same weight as the grade. A curtain beside a wall left a speckled
  *  dark fringe at thickness 1 (LIGHT v3 item 5), so a room's is thin; but a tree's crown is leaf clumps, and at the thin value the occlusion between them goes and the crown goes flat
  *  and lighter (golden orbit frames, mae 1-3 against BEFORE on 21 houses): out of doors the old value stays. */
-export const GTAO_THICKNESS = { inside: 0.15, outside: 1 };
+export const GTAO_THICKNESS = { inside: 0.25, outside: 1 };   // inside: v3 had 0.15; 0.25 keeps the curtain fringe fix (87-94 % of the dark fringe gone, residual 1.0-1.3 of 255 in luma) and gives back about a third of the contact shadow at chair feet, a sideboard base and a bedside (LIGHT v3.1 item 3)
 /** the storeys interiorWeight reads, from a HouseSpec's levels */
 export const storeysOf = (levels: any[] = []): GradeStorey[] => levels.map(l => ({ y: l.y || 0, height: l.height || 2.8, rects: l.footprint || [] }));
 

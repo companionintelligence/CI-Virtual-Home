@@ -52,9 +52,11 @@ import { lumaOfFile, lumaMetrics, roundLuma, lightAcceptance, type Luma } from '
 import { loadManifest } from './review/manifest.mts';
 
 const args = parseArgs(process.argv.slice(2));
-const OUT_ROOT = path.join(REVIEW_DIR, 'after', args.stream && args.stream !== 'true' ? args.stream : 'light3');   // --stream light  reads LIGHT v1's old directory
+const OUT_ROOT = path.join(REVIEW_DIR, 'after', args.stream && args.stream !== 'true' ? args.stream : 'light3b');   // --stream light  reads LIGHT v1's old directory
 const out = (...p: string[]) => path.join(OUT_ROOT, ...p);
 const LIGHT_CAP = 16;
+// the area under which no room gets a light (assets/fixtures.ts ROOM_MIN_AREA), read from the source so the census cannot disagree with it
+const ROOM_MIN_AREA = Number((fs.readFileSync(path.join(ROOT, 'assets', 'fixtures.ts'), 'utf8').match(/const ROOM_MIN_AREA\s*=\s*([0-9.]+)/) || [])[1]);
 
 interface Row { check: string; frame: string; value: string; limit: string; ok: boolean }
 const rows: Row[] = [];
@@ -351,7 +353,8 @@ async function probeMode(): Promise<number> {
         merge(E.TIME_OF_DAY, o);
       }, JSON.parse(args.env));
       // --gtao '{"radius":0.55,"thickness":0.15,"blend":1.4}': the composer's GTAO pass on this page (room-creator.html composerFor sets the shipped numbers)
-      if (args.gtao && args.gtao !== 'true') await w.page.evaluate((o: any) => { const fc = (window as any).__houseComposer(); if (!fc) throw new Error('no composer'); if (typeof o.blend === 'number') fc.gtao.blendIntensity = o.blend; fc.gtao.updateGtaoMaterial({ radius: o.radius ?? 0.8, distanceExponent: 1, thickness: o.thickness ?? 1, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false }); }, JSON.parse(args.gtao));
+      // (the composer re-reads environment.ts GTAO_THICKNESS on every frame, blending the thickness by how far inside the house the camera is, so `thickness` here sets the inside value there)
+      if (args.gtao && args.gtao !== 'true') await w.page.evaluate(async (o: any) => { if (typeof o.thickness === 'number') { const E: any = await import(String('./assets/environment.js')); E.GTAO_THICKNESS.inside = o.thickness; } const fc = (window as any).__houseComposer(); if (!fc) throw new Error('no composer'); if (typeof o.blend === 'number') fc.gtao.blendIntensity = o.blend; fc.gtao.updateGtaoMaterial({ radius: o.radius ?? 0.8, distanceExponent: 1, thickness: o.thickness ?? 1, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false }); }, JSON.parse(args.gtao));
       for (const tod of ['day', 'dusk', 'night']) {
         if (!tods.has(tod)) continue;
         await w.page.evaluate((t: string) => (window as any).__houseSetLighting(t), tod);
@@ -521,7 +524,7 @@ async function lampsMode(): Promise<number> {
       const r: any = await w.page.evaluate(() => {
         const W = window as any, d = W.__houseDebug(), spec = d.house.spec, st = W.__houseFixtures.stats();
         const rooms: any[] = [];
-        spec.levels.forEach((lv: any) => (lv.rooms || []).forEach((rm: any, ri: number) => rooms.push({ key: `${lv.id}#${ri}`, name: rm.name, y: lv.y || 0, H: lv.height || 3, program: rm.program || null, b: rm.bounds })));
+        spec.levels.forEach((lv: any) => (lv.rooms || []).forEach((rm: any, ri: number) => rooms.push({ key: `${lv.id}#${ri}`, name: rm.name, y: lv.y || 0, H: lv.height || 3, program: rm.program || null, b: rm.bounds, area: rm.bounds ? rm.bounds.w * rm.bounds.d : 0 })));
         const roomAt = (o: any, wp: any) => {
           const c = rooms.filter(r => r.b && wp.x >= r.b.x - 0.05 && wp.x <= r.b.x + r.b.w + 0.05 && wp.z >= r.b.z - 0.05 && wp.z <= r.b.z + r.b.d + 0.05 && wp.y > r.y - 0.1 && wp.y < r.y + r.H);
           return c.find((r: any) => r.name === o.userData.room) || c[0] || null;
@@ -537,7 +540,7 @@ async function lampsMode(): Promise<number> {
         });
         const pools = new Set<string>(), lit = new Set<string>();
         d.scene.traverse((l: any) => { if (l.isLight && l.userData.fixtureLight) { lit.add(l.userData.roomKey); if (l.userData.lampPool) pools.add(l.userData.roomKey); } });
-        return { items, pools: [...pools], lit: [...lit], lights: st ? st.lights.length : 0, poolTypes: W.__houseFixtures.lampTypes ? W.__houseFixtures.lampTypes() : [] };
+        return { areas: Object.fromEntries(rooms.map((r: any) => [r.key, r.area])), items, pools: [...pools], lit: [...lit], lights: st ? st.lights.length : 0, poolTypes: W.__houseFixtures.lampTypes ? W.__houseFixtures.lampTypes() : [] };
       });
       const hung = new Set(['pendant-lamp', 'chandelier', 'ceiling-light', 'string-lights']);
       // a wall sconce glows and hangs on a wall: the room's fill is its light (fixtures.ts SCONCES), so it is counted apart; a free-standing lamp type that glows
@@ -553,9 +556,9 @@ async function lampsMode(): Promise<number> {
       const noPool = roomKeys.filter(k => k && !poolSet.has(k));
       const capped = noPool.filter(k => !litSet.has(k));
       for (const i of lamps) { const t = (byType[i.type] ||= { items: 0, pooled: 0 }); t.items++; if (i.room && poolSet.has(i.room)) t.pooled++; }
-      result.push({ house, lights: r.lights, lampRooms: roomKeys.length, pooled: roomKeys.filter(k => poolSet.has(k)).length, noPool: noPool.length, capped: capped.length, sconces: sconces.length, sconceRooms: [...new Set(sconces.map((i: any) => i.room))].filter(k => k && !roomKeys.includes(k as string)).length, sconceUnlit: [...new Set(sconces.map((i: any) => i.room))].filter(k => k && !roomKeys.includes(k as string) && !litSet.has(k as string)).length, noPoolRooms: noPool.map(k => ({ key: k, capped: !litSet.has(k), types: [...new Set(lamps.filter((i: any) => i.room === k).map((i: any) => i.type))] })), items: lamps, hungOnly: r.items.length - lamps.length });
+      result.push({ house, lights: r.lights, lampRooms: roomKeys.length, pooled: roomKeys.filter(k => poolSet.has(k)).length, noPool: noPool.length, capped: capped.length, sconces: sconces.length, sconceRooms: [...new Set(sconces.map((i: any) => i.room))].filter(k => k && !roomKeys.includes(k as string)).length, sconceUnlit: [...new Set(sconces.map((i: any) => i.room))].filter(k => k && !roomKeys.includes(k as string) && !litSet.has(k as string)).length, sconceUnlitSmall: [...new Set(sconces.map((i: any) => i.room))].filter(k => k && !roomKeys.includes(k as string) && !litSet.has(k as string) && (r.areas[k as string] ?? 0) < ROOM_MIN_AREA).length, noPoolRooms: noPool.map(k => ({ key: k, capped: !litSet.has(k), types: [...new Set(lamps.filter((i: any) => i.room === k).map((i: any) => i.type))] })), items: lamps, hungOnly: r.items.length - lamps.length });
       const rr = result[result.length - 1];
-      console.log(`  ${house.padEnd(20)} lights ${String(rr.lights).padStart(2)}  lamp rooms ${String(rr.lampRooms).padStart(2)}  with a pool ${String(rr.pooled).padStart(2)}  without ${String(rr.noPool).padStart(2)} (capped out ${rr.capped})  lamp items ${lamps.length}  sconces ${sconces.length} (${rr.sconceRooms} sconce-only rooms, ${rr.sconceUnlit} with no light)`);
+      console.log(`  ${house.padEnd(20)} lights ${String(rr.lights).padStart(2)}  lamp rooms ${String(rr.lampRooms).padStart(2)}  with a pool ${String(rr.pooled).padStart(2)}  without ${String(rr.noPool).padStart(2)} (capped out ${rr.capped})  lamp items ${lamps.length}  sconces ${sconces.length} (${rr.sconceRooms} sconce-only rooms, ${rr.sconceUnlit} with no light, ${rr.sconceUnlitSmall} of them under ${ROOM_MIN_AREA} m2)`);
       if (w.errors.length) say({ check: 'no page errors', frame: house, value: w.errors[0], limit: 'none', ok: false });
       await w.close();
     }
@@ -563,7 +566,7 @@ async function lampsMode(): Promise<number> {
   writeText(out('lamps.json'), stableJson({ schema: 1, what: 'the lamp census (scripts/test-interior-light.mts --lamps)', byType, rows: result, machine: machine() }));
   console.log('\nby type (items / in a room with a pool):'); for (const [t, v] of Object.entries(byType).sort()) console.log(`  ${t.padEnd(20)} ${String(v.items).padStart(4)} / ${v.pooled}`);
   const tot = (k: string) => result.reduce((a, r) => a + r[k], 0);
-  console.log(`\n${tot('sconceRooms')} rooms have only wall sconces: ${tot('sconceRooms') - tot('sconceUnlit')} are lit by their fill, ${tot('sconceUnlit')} are left out by the ${LIGHT_CAP}-light cap`);
+  console.log(`\n${tot('sconceRooms')} rooms have only wall sconces: ${tot('sconceRooms') - tot('sconceUnlit')} are lit by their fill, ${tot('sconceUnlit')} have no light: ${tot('sconceUnlitSmall')} are under the ${ROOM_MIN_AREA} m2 minimum area (ROOM_MIN_AREA, no room that small gets a light), ${tot('sconceUnlit') - tot('sconceUnlitSmall')} are left out by the ${LIGHT_CAP}-light cap`);
   console.log(`${result.length} houses: ${tot('lampRooms')} rooms with a glowing free-standing lamp, ${tot('pooled')} with a pool, ${tot('noPool')} without (${tot('capped')} of them left out by the ${LIGHT_CAP}-light cap), max lights ${Math.max(...result.map(r => r.lights))}`);
   return tot('noPool') - tot('capped') > 0 ? 1 : 0;
 }
@@ -676,10 +679,12 @@ async function moodMode(): Promise<number> {
 // ---- closeups: does the GTAO retune put a halo round anything thin? ------------------------------------------------------------------------
 // LIGHT v3 item 5. Pendants, lamp shades, curtains, plants, a stair and a chair, each from 1-2 m, by day and at night, rendered through the composer with the shipped
 // GTAO thickness and with the old one (1); the pair side by side and an amplified difference go to <out>/closeups/. A halo is a LIGHTER outline: the sheet is for the eye.
-//   pnpm run test:light -- --closeups [--houses aurora,seraphine,cutestarter]
+//   pnpm run test:light -- --closeups [--houses aurora,seraphine,cutestarter] [--thick 1,0.15,0.25] [--dir closeups]   (--thick: inside thicknesses to compare, files named ...-t<value>.jpg)
 async function closeupsMode(): Promise<number> {
+  const THICKS = (args.thick && args.thick !== 'true' ? args.thick : '1,0.15').split(',').map(Number);   // GTAO thickness variants (inside the house); the first is the reference
+  const dir0 = args.dir && args.dir !== 'true' ? args.dir : 'closeups';
   const houses = args.houses && args.houses !== 'true' ? args.houses.split(',') : ['aurora', 'seraphine', 'cutestarter'];
-  const dir = out('closeups'); fs.mkdirSync(dir, { recursive: true });
+  const dir = out(dir0); fs.mkdirSync(dir, { recursive: true });
   const session = await startSession();
   const manifest: any[] = [];
   try {
@@ -719,9 +724,10 @@ async function closeupsMode(): Promise<number> {
       for (const [ti, t] of targets.entries()) for (const tod of ['day', 'night'] as const) {
         await w.page.evaluate((tt: string) => (window as any).__houseSetLighting(tt), tod);
         const files: string[] = [];
-        for (const [tag, thick] of [['old', 1], ['new', null]] as Array<[string, number | null]>) {
-          if (thick !== null) await w.page.evaluate((th: number) => { const fc = (window as any).__houseComposer(); fc.gtao.updateGtaoMaterial({ radius: 0.8, distanceExponent: 1, thickness: th, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false }); }, thick);
-          else await w.page.evaluate(() => { const fc = (window as any).__houseComposer(); fc.gtao.updateGtaoMaterial({ radius: 0.8, distanceExponent: 1, thickness: 0.15, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false }); });
+        // the composer reads environment.ts GTAO_THICKNESS.inside every frame (v3.1: a camera inside the house takes it, out of doors 1), so a variant is set there
+        for (const thick of THICKS) {
+          const tag = `t${thick}`;
+          await w.page.evaluate(async (th: number) => { const E: any = await import(String('./assets/environment.js')); E.GTAO_THICKNESS.inside = th; }, thick);
           const url = await w.page.evaluate(({ t, res, quality }: any) => {
             const W = window as any, d = W.__houseDebug(), c = d.camera;
             c.position.set(...(t.cam as [number, number, number])); c.lookAt(...(t.c as [number, number, number])); c.fov = 60; c.near = 0.05; c.updateProjectionMatrix();
