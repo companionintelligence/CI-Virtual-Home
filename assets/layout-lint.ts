@@ -83,7 +83,7 @@ export function missingAnchors(program: string, items: any[], { heroDesk = false
 
 export interface LayoutIssue { code: string; level: 'warn' | 'error'; message: string; room?: string; level_id?: string }
 
-const UNIVERSAL = new Set(['type', 'at', 'rot', 'y', 'src', 'note', 'label', 'id', 'name', 'hero']);
+const UNIVERSAL = new Set(['type', 'at', 'rot', 'y', 'src', 'dk', 'note', 'label', 'id', 'name', 'hero']);   // (`dk`: a dress item's seed key, which no builder reads)
 const REPEAT_EXEMPT_GROUPS = new Set(['rug', 'lamp', 'fitted', 'appliance', 'lighting', 'chair', 'bath', 'hero', 'structure', 'decor', 'textile']);
 const solidOf = (it: any) => { const l = layerOf(it.type); if (l !== 'body') return false; const s = sizeOf(it.type, it); return !!s && s.h > 0.12; };
 /** the body item a surface item stands on (the one under its point that offers the highest top) */

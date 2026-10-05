@@ -28,6 +28,9 @@
 //                   measured the table over 1000), and no spilling type is missing
 //   Q  in the room    every dress item's origin is within 0.5 m of its room's bounds: a host drawn across the edge of a small room (palnknoll's Outdoor Kitchen counter) is
 //                   dressed only near the room, the validator's "lies outside room" (0.6 m) never fires on a dress item
+//   P  bake hygiene  a baked house raises no warning its unbaked self does not: the validator's warning count (the `dk` seed key a dress item carries is a declared item key
+//                   like `src`) and the layout lint's silent-param count are equal before and after the bake, for all 30 houses; and a dress item's `dk` is the one key
+//                   no builder reads (a control: a key made up fails the same measurement)
 //   N  curtain parts  PARTS (the sink run's tap: a 3 cm column over a 0.96 m body) covers every mesh the page builds for the type, at three widths and three depths; a table
 //                   without the tap fails the same measurement (a control)
 //   O  curtain plan   over the 30 houses baked and the fixtures, no café curtain's box (plan, catalog heights, PARTS) meets another item's, however it is stood over, parted
@@ -661,6 +664,44 @@ test('O2 (controls): the first cut\'s curtains meet what the plan now keeps clea
     for (const run of g.runs) { const ws = run.windows.filter((w: any) => w.type === 'window').sort((p: any, q: any) => p.a - q.a); for (let i = 0; i + 1 < ws.length; i++) if ((ws[i + 1].a + ws[i + 1].b) / 2 - (ws[i].a + ws[i].b) / 2 < (ws[i].b - ws[i].a) / 2 + (ws[i + 1].b - ws[i + 1].a) / 2 + 0.3 - CURTAIN_GAP && room.name === 'Kitchen') clashes.add(id); }
   }
   assert.ok(clashes.size >= 3, `the first cut's neighbours clash in ${[...clashes]}`);
+});
+
+// ---- P: the bake adds no warning ---------------------------------------------------------------------------------------------------------
+/** the validator's warnings per file ("✓ file  (0 errors, N warnings)"), for the given spec files, in one run */
+function validatorWarnings(files: string[]): Record<string, { errors: number; warnings: number }> {
+  const r = spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'validate-house-spec.mts'), ...files], { encoding: 'utf8', maxBuffer: 1 << 26 });
+  const out: Record<string, { errors: number; warnings: number }> = {};
+  for (const m of (r.stdout + r.stderr).matchAll(/^[✓✗] (\S+)\s+\((\d+) errors?, (\d+) warnings?\)/gm)) out[m[1]] = { errors: Number(m[2]), warnings: Number(m[3]) };
+  return out;
+}
+test('P: a baked house raises no validator warning and no silent-param its unbaked self does not (all 30 houses)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dress-warn-'));
+  try {
+    const orig: string[] = [], baked: string[] = [];
+    for (const h of houses) {
+      const out = path.join(dir, `${h.id}.json`), r = spawnSync(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'compose-house.mts'), '--house', h.file, '--dress', '--out', out], { encoding: 'utf8' });
+      assert.equal(r.status, 0, r.stderr); orig.push(h.file); baked.push(out);
+    }
+    const before = validatorWarnings(orig), after = validatorWarnings(baked);
+    let items = 0, warned = 0;
+    for (let i = 0; i < houses.length; i++) {
+      const b = before[orig[i]], a = after[baked[i]]; assert.ok(b && a, `${houses[i].id}: the validator printed no summary`);
+      assert.equal(a.errors, 0, `${houses[i].id}: the baked house has validator errors`);
+      assert.equal(a.warnings, b.warnings, `${houses[i].id}: ${b.warnings} validator warnings unbaked, ${a.warnings} baked`);
+      warned += b.warnings;
+      const spec = load(orig[i]), all = bakedItems(spec);
+      const lint = (m: Map<any, any[]>) => lintLayout(spec, { only: new Set(['silent-param']), items: m }).length;
+      const bare = new Map<any, any[]>([...all].map(([room, its]) => [room, its.filter((x: any) => !isDress(x))] as [any, any[]]));
+      assert.equal(lint(all), lint(bare), `${houses[i].id}: the layout lint's silent-param count moves with the bake`);
+      items += [...all.values()].flat().filter(isDress).length;
+    }
+    assert.ok(items >= 800, `${items} dress items baked over the 30 houses`);
+    // the control: a made-up key on a dress item is still reported, so the count above can fail
+    const spec = JSON.parse(fs.readFileSync(baked[1], 'utf8')); const it = spec.levels.flatMap((lv: any) => lv.rooms).flatMap((r: any) => r.items || []).find(isDress)!; it.zz = 1;
+    const bad = path.join(dir, 'control.json'); fs.writeFileSync(bad, JSON.stringify(spec, null, 2));
+    assert.equal(validatorWarnings([bad])[bad].warnings, before[orig[1]].warnings + 1, 'a made-up key on a dress item is a silent-param warning');
+    console.log(`P: 30 houses, ${items} dress items baked, validator warnings ${warned} before and after (the bake used to add about 33 per house); layout silent-param equal`);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
 
 // ---- Q: a dress item is in its room -------------------------------------------------------------------------------------------------------
