@@ -19,6 +19,10 @@
 //                                    and some others read no WebP). og:image and og:url are absolute, as unfurlers
 //                                    want: the site's address is --site-url, else $SITE_URL, else the live site
 //                                    (https://homes.ci.computer/); ci.yml passes a pull request's preview address
+//   <out>/404.html, robots.txt, sitemap.xml
+//                                    a real 404 page (Pages answers unknown paths with it and a 404 status), robots.txt
+//                                    (Allow: / and the Sitemap line) and a sitemap of the gallery and every share page; every
+//                                    page also gets a canonical link, twitter title/description/image and Organization JSON-LD
 //   <out>/_headers                   Cloudflare Pages' header rules (portal/_headers): Cache-Control max-age=0 with
 //                                    must-revalidate on every file, because the modules below are not fingerprinted
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
@@ -70,7 +74,7 @@ if (stale.length) { console.error(`compiled assets are missing or older than the
 
 // 1. start from a clean copy of what this script owns (.nojekyll: an older build wrote it for GitHub Pages; now it is only
 //    cleared out of a dist/ that still has one)
-const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '_headers', '.nojekyll'];
+const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '_headers', '.nojekyll', '404.html', 'robots.txt', 'sitemap.xml'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
 
@@ -151,7 +155,7 @@ const SITE_NAME = 'Companion Intelligence';   // og:site_name on every page: the
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${esc(`An aerial view of ${name}`)}">
-  <meta property="og:url" content="${esc(new URL(`homes/${h.id}.html`, site).href)}">
+  <meta property="og:url" content="${esc(new URL(`homes/${h.id}`, site).href)}">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="../assets/brand/ci-logo-mark.svg" type="image/svg+xml">
   <script>location.replace(${JSON.stringify(player)} + (location.search ? '&' + location.search.slice(1) : '') + location.hash);</script>
@@ -207,6 +211,86 @@ const SITE_NAME = 'Companion Intelligence';   // og:site_name on every page: the
   const map = page.indexOf('<script type="importmap">');
   if (map < 0 || /\bimport\(|type="module"|rel="modulepreload"/.test(page.slice(0, map))) problems.push('room-creator.html: a module is loaded before the import map');
   fs.writeFileSync(rc, page);
+}
+
+// 5d2. search and sharing hygiene on every page the site serves: a canonical link, the twitter card's own title, description and
+// image, og:url where a page has none, and Organization JSON-LD; then robots.txt, sitemap.xml and a real 404.html. Cloudflare Pages
+// serves pages without their .html (homes/aurora.html answers 308 → homes/aurora), so the canonical and sitemap forms are the
+// extensionless ones; the site sets no CSP (portal/_headers), so the inline JSON-LD needs no header. Idempotent: it runs over
+// the copies above, and a tag a page already has is never added twice.
+{
+  const homeUrl = (id: string): string => new URL(`homes/${id}`, SITE).href;
+  const hero = new URL('portal/hero.jpg', SITE).href;
+  const ld = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: SITE_NAME, url: 'https://ci.computer' }).replace(/</g, '\\u003c');
+  const seo = (file: string, canonical: string): string => {
+    const fp = path.join(OUT, file);
+    let page = fs.readFileSync(fp, 'utf8');
+    const meta = (re: RegExp): string => (page.match(re) || [])[1] || '';
+    const title = meta(/<title>([^<]*)<\/title>/);
+    const desc = meta(/<meta name="description" content="([^"]*)">/);
+    const image = meta(/<meta property="og:image" content="([^"]*)">/) || esc(hero);
+    if (!title || !desc) { problems.push(`${file}: no <title> or description for its link-preview tags`); return page; }
+    const add: string[] = [];
+    if (!/<link rel="canonical"/.test(page)) add.push(`<link rel="canonical" href="${esc(canonical)}">`);
+    if (!/<meta property="og:url"/.test(page)) add.push(`<meta property="og:url" content="${esc(canonical)}">`);
+    if (!/<meta name="twitter:title"/.test(page)) add.push(`<meta name="twitter:title" content="${title}">`);
+    if (!/<meta name="twitter:description"/.test(page)) add.push(`<meta name="twitter:description" content="${desc}">`);
+    if (!/<meta name="twitter:image"/.test(page)) add.push(`<meta name="twitter:image" content="${image}">`);
+    if (!/application\/ld\+json/.test(page)) add.push(`<script type="application/ld+json">${ld}</script>`);
+    if (!/<\/head>/.test(page)) { problems.push(`${file}: no </head> for its search tags`); return page; }
+    page = page.replace('</head>', () => `  ${add.join('\n  ')}\n</head>`);
+    fs.writeFileSync(fp, page);
+    return page;
+  };
+  seo('index.html', SITE);
+  seo('room-creator.html', new URL('room-creator', SITE).href);
+  for (const h of index.houses || []) if (fs.existsSync(path.join(OUT, 'homes', `${h.id}.html`))) seo(path.join('homes', `${h.id}.html`), homeUrl(h.id));
+
+  // robots.txt and sitemap.xml: the gallery and one share page per home. The player (room-creator) is a viewer for them, not a page
+  // of its own, and its ?house= variants all share one canonical, so it is not listed.
+  fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${new URL('sitemap.xml', SITE).href}\n`);
+  const urls = [SITE, ...(index.houses || []).filter((h: { id: string }) => /^[a-z0-9-]+$/.test(h.id)).map((h: { id: string }) => homeUrl(h.id))];
+  fs.writeFileSync(path.join(OUT, 'sitemap.xml'),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `  <url><loc>${esc(u)}</loc></url>`).join('\n')}\n</urlset>\n`);
+
+  // 404.html: Pages answers an unknown path with it and a 404 status (without one it answers 200 with the gallery). It is served at
+  // any depth, so it is self-contained: inline style, no relative URL, one absolute link home.
+  const d404 = 'That page does not exist. The virtual homes gallery has all thirty homes, each built live in your browser.';
+  fs.writeFileSync(path.join(OUT, '404.html'), `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page not found · Companion Intelligence</title>
+  <meta name="description" content="${esc(d404)}">
+  <meta name="robots" content="noindex">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="${esc(SITE_NAME)}">
+  <meta property="og:title" content="Page not found · Companion Intelligence">
+  <meta property="og:description" content="${esc(d404)}">
+  <meta property="og:image" content="${esc(hero)}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Page not found · Companion Intelligence">
+  <meta name="twitter:description" content="${esc(d404)}">
+  <meta name="twitter:image" content="${esc(hero)}">
+  <meta name="theme-color" content="#041620">
+  <script type="application/ld+json">${ld}</script>
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-content: center; gap: 12px; padding: 24px; text-align: center;
+      font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; background: #041620; color: #e8f4f0; }
+    h1 { margin: 0; font-size: 28px; }
+    p { margin: 0; color: #a9c2ba; }
+    a { color: #7fe0c0; }
+  </style>
+</head>
+<body>
+  <h1>Page not found</h1>
+  <p>${esc(d404)}</p>
+  <p><a href="${esc(SITE)}">See the virtual homes</a></p>
+</body>
+</html>
+`);
+  files += 3;
 }
 
 // 5e. name every module and stylesheet by a hash of its content. The files are not fingerprinted by name (assets/viewer.js is
