@@ -44,8 +44,7 @@ const ROOM_MIN_AREA = 2.5;            // m² — a cupboard gets no light
 export const ROOM_FILL_K = 0.375;     // × the floor-illuminance target below (service 0.6 and hall 0.45 still scale it down). v1 had 0.3 and leaned on light leaking in from the next room; the room clip took that away, 0.375 is the most the five bench rooms take with every clip row under 1 %
 export const FILL_PENUMBRA = 1.0;     // the whole cone is a falloff: no edge
 export const FILL_ANGLE_MAX = 1.25;   // rad (~72°): a wider cone only lights the lawn
-/** lampGain under which the room's light is off for good: day (0.035). Offline (composer, editor) the spot is then HIDDEN, so the
- *  day shader has no spot lights to loop over; the live player keeps it in the scene at intensity 0 (see applyLampGain). */
+/** lampGain under which the room's light is off for good: day (0.035). Off is intensity 0 and the light stays in the scene (see hideOffGain). */
 export const FILL_ON_GAIN = 0.1;
 // Practical lamp pools (plan 5.2 L3, LIGHT v2 item 3): a room that has a lamp is lit the way a room with a lamp is lit, from the lamp. One static
 // light at the lamp head nearest the room's centre (no camera dependence, no shadow) IS that room's light: the fill spot is not made when
@@ -104,20 +103,24 @@ const readGain = (): number => {
   const g = w && w.__houseLighting && w.__houseLighting.lampGain;
   return typeof g === 'number' && Number.isFinite(g) ? g : DAY_GAIN;
 };
-/** Set every room light for a lamp gain. A light below FILL_ON_GAIN is off: hidden offline (the day frames drop their spot loop), and, in
- *  the live player (?mode=view), left in the scene at intensity 0, because a hidden light changes three's NUM_SPOT_LIGHTS and every lit
- *  material recompiles on the time-of-day switch (the hitch measured in the L1 commit). */
+/** Set every room light for a lamp gain. A light below FILL_ON_GAIN is OFF, and off means intensity 0 in every path (the editor, the composer, the
+ *  goldens and the live player alike): the light stays in the scene, so three's NUM_SPOT_LIGHTS and NUM_POINT_LIGHTS never change and no lit material
+ *  recompiles on a time-of-day switch. v1 hid the lights offline instead (visible = false) to keep the day shader free of them, and that cost the
+ *  first Day-to-Dusk toggle 2.6 to 13.9 s in the editor (the programs all rebuilt, measured at load 8-12). The day shader pays nothing for a
+ *  light at intensity 0 now: room-clip.ts wraps the BRDF in `if ( directLight.visible )`, and an off light has no colour. `window.__fillHide`
+ *  is a measurement hook (test-interior-light --hitch sets it before the build) that brings the hiding back. */
 export const hideOffGain = (): boolean => {
   const w: any = typeof window !== 'undefined' ? window : null;
-  if (w && typeof w.__fillHide === 'boolean') return w.__fillHide;   // a measurement hook (test-interior-light --hitch sets it before the build)
-  return !(w && /[?&]mode=view\b/.test(w.location.search));
+  return !!(w && w.__fillHide === true);
 };
+/** a room light's intensity at a lamp gain: base × gain, or 0 when the light is off (see hideOffGain) */
+export const lightLevel = (base: number, gain: number): number => (gain >= FILL_ON_GAIN || hideOffGain() ? base * gain : 0);
 export function applyLampGain(gain: number = readGain()) {
   if (!current) return;
   current.gain = gain;
   const hide = hideOffGain();
   for (const { light, base } of current.lights) {
-    light.intensity = gain >= FILL_ON_GAIN ? base * gain : (hide ? base * gain : 0);
+    light.intensity = lightLevel(base, gain);
     light.visible = !hide || gain >= FILL_ON_GAIN;
   }
 }
@@ -583,7 +586,7 @@ export function dressLevel(ctx) {
         const base = (pool ? LAMP_ROOM_FILL_K : ROOM_FILL_K) * floorE * drop ** decay / Math.max(0.5, win);
         const slot = s.lights.length;
         setSlot(slot, roomClipBox(b, y, H, footprint, partitionSegs));
-        const light = new THREE.SpotLight(s.warm, base * s.gain, distance, angle, FILL_PENUMBRA, codedDecay(decay, slot));
+        const light = new THREE.SpotLight(s.warm, lightLevel(base, s.gain), distance, angle, FILL_PENUMBRA, codedDecay(decay, slot));
         light.name = 'Fixture light'; light.castShadow = false;
         light.position.copy(local(cx, ly, cz));
         light.target.position.copy(local(cx, y, cz));
@@ -598,7 +601,7 @@ export function dressLevel(ctx) {
         const diag = Math.hypot(b.w, b.d), pbase = LAMP_POOL_I * Math.min(LAMP_POOL_MAX, Math.sqrt(area) / 3);
         const slot = s.lights.length;
         setSlot(slot, roomClipBox(b, y, H, footprint, partitionSegs));
-        const pl = new THREE.SpotLight(s.warm, pbase * s.gain, LAMP_POOL_REACH * diag, LAMP_POOL_ANGLE, LAMP_POOL_PENUMBRA, codedDecay(LAMP_POOL_DECAY, slot));
+        const pl = new THREE.SpotLight(s.warm, lightLevel(pbase, s.gain), LAMP_POOL_REACH * diag, LAMP_POOL_ANGLE, LAMP_POOL_PENUMBRA, codedDecay(LAMP_POOL_DECAY, slot));
         pl.name = 'Lamp pool'; pl.castShadow = false;
         pl.position.copy(local(pool.x, pool.y, pool.z));
         pl.target.position.copy(local(cx, y + LAMP_POOL_AIM_Y, cz));

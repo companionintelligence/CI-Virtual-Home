@@ -62,7 +62,7 @@ test('the baked-model role table agrees with the finish roles where both name a 
 });
 
 // ---- L1: the room fill ------------------------------------------------------------------------------------------------------------------
-import { ROOM_FILL_K, FILL_PENUMBRA, FILL_ANGLE_MAX, FILL_ON_GAIN, LIGHT_CAP, hideOffGain, applyLampGain } from '../assets/fixtures.js';
+import { ROOM_FILL_K, FILL_PENUMBRA, FILL_ANGLE_MAX, FILL_ON_GAIN, LIGHT_CAP, hideOffGain, applyLampGain, lightLevel } from '../assets/fixtures.js';
 import { TIME_OF_DAY, lookOf } from '../assets/environment.js';
 
 test('L1: the room light is a soft fill (numbers the acceptance was calibrated on)', () => {
@@ -72,9 +72,11 @@ test('L1: the room light is a soft fill (numbers the acceptance was calibrated o
   assert.equal(LIGHT_CAP, 16);
 });
 
-test('L1: only daylight turns the fill off, and only the offline path hides it', () => {
+test('L1: only daylight turns the fill off, and off is intensity 0 in every path (no hiding: nothing recompiles on a time-of-day switch)', () => {
   for (const [name, p] of Object.entries(TIME_OF_DAY)) assert.equal(p.lampGain < FILL_ON_GAIN, name === 'day', `${name} lampGain ${p.lampGain}`);
-  assert.equal(hideOffGain(), true, 'no window (Node) is the offline path: hidden');
+  assert.equal(hideOffGain(), false, 'no window (Node) is no hiding: v1 hid the lights offline and the editor stalled seconds on the first toggle');
+  assert.equal(lightLevel(5, TIME_OF_DAY.day.lampGain), 0, 'off by day');
+  assert.equal(lightLevel(5, TIME_OF_DAY.dusk.lampGain), 5 * TIME_OF_DAY.dusk.lampGain);
   applyLampGain(0.5);   // no house built: a no-op, not a throw
 });
 

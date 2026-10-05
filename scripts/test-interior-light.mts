@@ -19,7 +19,7 @@
 //                                             seven hand-picked rooms. It writes <out>/portal-day.json and prints the table.
 //                                             --houses a,b  --frames 1,0.55  --variants base,bounce  --label <name>
 //
-//   pnpm run test:light -- --hitch           the L1 spike: in the live player (?mode=view), how long the first frame after a time-of-day switch takes
+//   pnpm run test:light -- --hitch [--editor]  the L1 spike (--editor: the page without ?mode=view, the offline path): in the live player (?mode=view), how long the first frame after a time-of-day switch takes
 //                                             when the room lights are HIDDEN while it is day (three recompiles every lit material, NUM_SPOT_LIGHTS
 //                                             changes) against left in the scene at intensity 0. Policy lives in assets/fixtures.ts (hideOffGain);
 //                                             this reports the numbers it was chosen on.   --houses a,b  --reps 3
@@ -256,8 +256,9 @@ async function hitchMode(): Promise<number> {
       await page.route('https://fonts.googleapis.com/**', (r: any) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
       await page.route('https://fonts.gstatic.com/**', (r: any) => r.abort());
       await page.addInitScript((hide: boolean) => { (window as any).__fillHide = hide; }, policy === 'hide');   // the policy is in force from the build, as shipped code would have it
-      await page.goto(session.srv.url(`room-creator.html?mode=view&house=${house}&tod=day&play=0`), { waitUntil: 'domcontentloaded', timeout: 240000 });
+      await page.goto(session.srv.url(args.editor === 'true' ? `room-creator.html?house=${house}` : `room-creator.html?mode=view&house=${house}&tod=day&play=0`), { waitUntil: 'domcontentloaded', timeout: 240000 });
       await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, house, { timeout: 240000 });
+      if (args.editor === 'true') await page.evaluate(() => (window as any).__houseSetLighting('day'));
       const r = await page.evaluate(async ({ reps }: any) => {
         const W = window as any, d = W.__houseDebug(), R = d.renderer, gl = R.getContext(), px = new Uint8Array(4);
         const frame = () => { const t0 = performance.now(); R.render(d.scene, d.camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return performance.now() - t0; };
@@ -281,6 +282,8 @@ async function hitchMode(): Promise<number> {
     }
   } finally { await session.close(); }
   writeText(out('hitch.json'), stableJson({ schema: 1, what: 'first frame after a time-of-day switch in the player, hide vs intensity 0 (scripts/test-interior-light.mts --hitch)', rows: table, machine: machine() }));
+  const worstZero = Math.max(...table.filter(t => t.policy === 'zero').map(t => Math.max(...t.flips.map((f: any) => Math.max(f.toNight, f.toDay)))));
+  console.log(`worst first frame under INTENSITY 0 (what ships): ${worstZero.toFixed(0)} ms (target < 250 ms)`);
   const worst = Math.max(...table.filter(t => t.policy === 'hide').map(t => Math.max(...t.flips.map((f: any) => Math.max(f.toNight, f.toDay)))));
   console.log(`worst first frame under HIDE: ${worst.toFixed(0)} ms (limit 250 ms for hiding in the player)`);
   return 0;
