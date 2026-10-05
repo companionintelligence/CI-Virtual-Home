@@ -26,7 +26,7 @@
 //
 // Owner: DRESS.
 import { PLACEMENT } from './props/placement.js';
-import { sizeOf, paramsOf, turn, mm, itemObb, overlap, obb } from './room-geo.js';
+import { sizeOf, paramsOf, turn, mm, itemObb, overlap, obb, INWARD, ROT_OF_WALL, alongX } from './room-geo.js';
 import { Composer, composeHouse, pinsFor, cornerGroup, wallGroup, layerOf, type Group, type CItem, type HouseState } from './room-composer.js';
 import { inferProgram } from './room-programs.js';
 import { styleOf, type StyleBundle } from './house-styles.js';
@@ -198,6 +198,33 @@ export class Dresser {
     const c = this.comp();
     const g = wallGroup(c, slot, type, params, { score: (p, it) => (near ? -0.6 * Math.hypot(it.cx - near[0], it.cz - near[1]) : 0) });
     return this.placeGroup(slot, g, params, tier, cost);
+  }
+  /** the room's windows that wear nothing: a window (not a glass door or a slider) with no curtain, blind or shutter of the layout within reach along its wall */
+  bareWindows(): Array<{ side: string; at: [number, number]; rot: number; w: number; head: number }> {
+    const c = this.comp(), out: Array<{ side: string; at: [number, number]; rot: number; w: number; head: number }> = [];
+    const dressers = this.base.filter(it => ['curtains', 'roman-blind', 'roller-shade', 'cafe-curtain', 'shutters', 'valance'].includes(it.type) && Array.isArray(it.at));
+    const H = this.lv.height || 2.8;
+    for (const run of c.geo.runs) for (const w of run.windows) {
+      if (w.type !== 'window' || w.b - w.a < 0.5 || w.b - w.a > 3.2) continue;
+      const t = (w.a + w.b) / 2, [nx, nz] = INWARD[run.side], gap = 0.004;
+      const at: [number, number] = alongX(run.side) ? [mm(t), mm(run.face + nz * gap)] : [mm(run.face + nx * gap), mm(t)];
+      // something already hangs here: any curtain or blind within half a window and a bit of its centre, on this wall
+      if (dressers.some(d => Math.hypot(d.at[0] - at[0], d.at[1] - at[1]) < (w.b - w.a) / 2 + 0.6)) continue;
+      if (this.placed.some(d => (d.type === 'roman-blind' || d.type === 'roller-shade' || d.type === 'cafe-curtain') && Math.hypot(d.at[0] - at[0], d.at[1] - at[1]) < 0.3)) continue;
+      out.push({ side: run.side, at, rot: ROT_OF_WALL[run.side], w: mm(Math.min(w.b - w.a + 0.2, 3.0)), head: mm(Math.min(w.sill + w.h + 0.12, H - 0.12)) });
+    }
+    return out.sort((p, q) => p.at[0] - q.at[0] || p.at[1] - q.at[1]);
+  }
+  /** an item the slot places outright (a blind on its window): no host and no composer fit, only its own key */
+  raw(slot: string, type: string, at: [number, number], rot: number, params: any = {}, cost = 0.5): any | null {
+    if (!this.open(slot)) return null;
+    if (!this.afford(this.curTier, cost)) { this.skip(slot, 'the room budget is spent'); return null; }
+    const n = this.ord.get(slot) ?? 0, it: any = { type, at };
+    if (rot) it.rot = mm(rot);
+    for (const [k, v] of Object.entries(params)) it[k] = typeof v === 'number' ? mm(v) : v;
+    it.src = DRESS_SRC; it.dk = `${this.roomKey}:${slot}:${n}`;
+    this.ord.set(slot, n + 1); this.placed.push(it); this.counts.set(slot, (this.counts.get(slot) || 0) + 1); this.spent += cost;
+    return it;
   }
   /** an item at a fixed pose (a door mat in front of the entry): a one-candidate group */
   atPose(slot: string, type: string, x: number, z: number, rot: number, params: any = {}, tier = this.curTier, cost = 1): any | null {

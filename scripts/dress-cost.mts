@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, median, round } from './review/lib.mts';
 import { costCameras } from './review/cameras.mts';
-import { startSession, burnColdContext } from './review/page.mts';
+import { startSession } from './review/page.mts';
 
 const args = parseArgs(process.argv.slice(2));
 const FIX = args.fixtures && args.fixtures !== 'true' ? args.fixtures.split(',') : ['dress-rooms', 'dress-baths', 'dress-kitchens', 'dress-styles'];
@@ -25,7 +25,7 @@ try {
     const cams = costCameras(rooms);
     const out: Record<string, any> = {};
     for (const mode of ['off', 'on']) {
-      await burnColdContext(session, id, '360').catch(() => {});
+      { const w0 = await session.open(id, { res: '360', spec: file, query: mode === 'off' ? 'dress=0' : '' }); try { await w0.page.evaluate((r: string) => (window as any).__houseSnapshot({ res: r, quality: 0.4 }), '360'); } finally { await w0.close(); } }   // a throwaway context first: the cold pipeline
       const w = await session.open(id, { res: '360', spec: file, query: mode === 'off' ? 'dress=0' : '' });
       try {
         out[mode] = await w.page.evaluate(({ cams }: any) => {

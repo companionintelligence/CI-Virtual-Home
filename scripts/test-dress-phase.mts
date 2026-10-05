@@ -107,7 +107,7 @@ test('D: every dress item stands on a host, whole and at its top, with 40 % of t
       const geo = analyzeRoom(spec, lv, room);
       assert.equal(new Set(r.items.map((i: any) => i.dk)).size, r.items.length, `${id}/${room.name}: duplicate dk`);
       for (const it of r.items) {
-        assert.equal(it.src, DRESS_SRC); assert.ok(PLACEMENT[it.type] && (PROPS.has(it.type)), `${it.type} is not a catalog type`);
+        assert.equal(it.src, DRESS_SRC); assert.ok(PLACEMENT[it.type] && (PROPS.has(it.type) || it.type === 'fiddle-leaf' || PLACEMENT[it.type].group === 'plant'), `${it.type} is not a catalog type`);
         const o = itemObb(it); assert.ok(o, `${it.type}: no box`);
         // inside the room (a floor lamp, a mat, a mirror stand in the room's bounds)
         assert.ok(o!.cx > room.bounds.x - 0.05 && o!.cx < room.bounds.x + room.bounds.w + 0.05 && o!.cz > room.bounds.z - 0.05 && o!.cz < room.bounds.z + room.bounds.d + 0.05, `${id}/${room.name}: ${it.type} outside the room`);

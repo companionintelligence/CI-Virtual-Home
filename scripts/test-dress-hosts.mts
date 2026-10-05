@@ -8,6 +8,7 @@
 //      and every dropped type exists
 //   C  the packer (fitIn / freeRects / subtract): a box returned fits inside the free rect, never overlaps what stands on the host, honours the margin,
 //      and an anchor moves it the way it says
+//   D  every dress item the phase puts in the four fixtures, built alone in the page with its own params, measures the box sizeOf gave the packer (0.04 m)
 //
 // Needs `pnpm run build`. One browser job (~20 s).
 //
@@ -157,5 +158,38 @@ try {
     check(r.bad === 0, name, `${r.bad} samples off the top by more than 1 cm (${r.hi} above, ${r.lo} below or empty); worst at x ${r.worst && r.worst.x} z ${r.worst && r.worst.z}: height ${r.worst && r.worst.y}, ${r.worst && r.worst.dev} from the top\nheights (to 5 mm): ${JSON.stringify(r.modes)}\nrects: ${JSON.stringify(p.rects.map(q => q.map(v => Math.round(v * 1000) / 1000)))}`);
   }
 } finally { await session.close(); }
+
+// ---- D. the dress items' own sizes: every item the phase puts, built alone in the page with its own params, measures the box sizeOf gave the packer ---------------
+console.log('── D: the packer\'s sizes are the page\'s (every dress item of the fixtures, within 0.04 m a side)');
+{
+  const { dressRooms } = await A('room-dress.js');
+  const fs = await import('node:fs');
+  const seen = new Map<string, any>();
+  for (const id of ['dress-rooms', 'dress-baths', 'dress-kitchens', 'dress-styles']) {
+    const spec = JSON.parse(fs.readFileSync(path.join(path.resolve(import.meta.dirname, '..'), 'test', 'fixtures', 'houses', `${id}.json`), 'utf8'));
+    for (const r of dressRooms(spec).values()) for (const it of r.items) { const k = JSON.stringify([it.type, it.w, it.d, it.variant, it.color]); if (!seen.has(k)) seen.set(k, it); }
+  }
+  const items = [...seen.values()];
+  const s2 = await startSession();
+  try {
+    const w = await s2.openBare();
+    const res: Array<{ type: string; params: any; got: number[] | null }> = await w.page.evaluate(({ items }: any) => {
+      const hb = (window as any).__houseBuilderRef, T = (window as any).__THREE, pal = { wall: '#f1f5f9', trim: '#1e293b', accent: '#0f766e', material: 'stucco' };
+      return items.map((it: any) => { const { type, at, rot, y, src, dk, ...params } = it; const o = hb.buildProp(type, params, pal, 'a'); if (!o) return { type, params, got: null }; o.updateMatrixWorld(true); const b = new T.Box3().setFromObject(o); return { type, params, got: [b.min.x, b.max.x, b.min.z, b.max.z, b.max.y - b.min.y] }; });
+    }, { items });
+    await w.close();
+    const off: string[] = [];
+    for (const r of res) {
+      if (!r.got) { off.push(`${r.type}: not built`); continue; }
+      const sz = sizeOf(r.type, r.params), [x0, x1, z0, z1] = r.got;
+      if (!sz) { off.push(`${r.type}: no size`); continue; }
+      const dw = Math.abs((x1 - x0) - sz.w), dd = Math.abs((z1 - z0) - sz.d), dx = Math.abs((x0 + x1) / 2 - sz.ox), dz = Math.abs((z0 + z1) / 2 - sz.oz);
+      // (foliage leans a different way in every seed: it may be SMALLER than the box it was measured at, never bigger)
+      const plant = PLACEMENT[r.type] && PLACEMENT[r.type].group === 'plant', grew = Math.max((x1 - x0) - sz.w, (z1 - z0) - sz.d);
+      if (plant ? grew > 0.04 : Math.max(dw, dd, dx, dz) > 0.04) off.push(`${r.type} ${JSON.stringify(r.params)}: the page builds ${(x1 - x0).toFixed(3)} x ${(z1 - z0).toFixed(3)} (centre ${((x0 + x1) / 2).toFixed(3)}, ${((z0 + z1) / 2).toFixed(3)}), sizeOf says ${sz.w.toFixed(3)} x ${sz.d.toFixed(3)} (centre ${sz.ox.toFixed(3)}, ${sz.oz.toFixed(3)})`);
+    }
+    check(!off.length, `${items.length} distinct dress items (type, size, variant, glaze) build the box the packer used`, off.join('\n'));
+  } finally { await s2.close(); }
+}
 console.log(bad ? `✗ ${bad} wrong` : `✓ dress hosts: ${probes.length} probes over ${Object.keys(HOSTS).length} hosts, 0 wrong`);
 process.exit(bad ? 1 : 0);

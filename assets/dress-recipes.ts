@@ -82,13 +82,26 @@ function counterClusters(d: Dresser, h: Host, queue: string[], max = 3): number 
   const free = d.free(h), widest = Math.max(0, ...free.map(f => f[2] - f[0]));
   const spots = (widest >= 1.55 ? ['left', 'right', 'centre'] : widest >= 0.7 ? ['left', 'right'] : ['centre']).slice(0, max) as Array<'left' | 'right' | 'centre'>;
   for (const a of spots) {
+    // (a kitchen has one bread bin, one kettle, one of each kit: a kit the room already holds is left to the next)
     for (let k = 0; k < queue.length; k++) {
       const t = queue.shift()!; queue.push(t);
+      if (d.has(t)) continue;
       if (d.put('counters', h, t, { anchor: a === 'centre' ? 'back' : (`back-${a}` as any) })) { placed++; break; }
     }
   }
   return placed;
 }
+
+/** a window with nothing on it wears a blind (SOFT's types, dormant until now): the type by what the room is, the width and head from the window */
+const WINDOW_TYPE: Record<string, string[]> = {
+  kitchen: ['cafe-curtain', 'roman-blind'], 'kitchen-dining': ['cafe-curtain', 'roman-blind'], laundry: ['roller-shade'], bath: ['roller-shade'], ensuite: ['roller-shade'], powder: ['roller-shade'],
+  dining: ['roman-blind'], living: ['roman-blind'], den: ['roman-blind'], media: ['roman-blind'], study: ['roller-shade', 'roman-blind'], library: ['roman-blind'], studio: ['roller-shade'],
+  'bed-primary': ['roman-blind', 'roller-shade'], 'bed-guest': ['roman-blind', 'roller-shade'], 'bed-kid': ['roller-shade'], nursery: ['roller-shade'], sunroom: ['roller-shade'],
+};
+const windowSlot: Slot = { id: 'windows', tier: 2, what: 'a blind or a café curtain on a window that wears nothing', run(d) {
+  const types = WINDOW_TYPE[d.program]; if (!types) return;
+  for (const w of d.bareWindows()) d.raw('windows', d.pick('windows', types), w.at, w.rot, { w: w.w, h: w.head });
+} };
 
 // ---- the recipes ---------------------------------------------------------------------------------------------------------------------
 const living: Slot[] = [
@@ -178,8 +191,8 @@ const hall: Slot[] = [
   } },
   { id: 'console', tier: 1, what: 'a console arrangement on a console (demilune)', run(d) { d.hostsOf('console').slice(0, 1).forEach(h => d.put('console', h, 'console-set', { anchor: 'centre' })); } },
   { id: 'lamp', tier: 1, what: 'a table lamp on a console, else a floor lamp in a corner, where the hall has no lamp', run(d) { lampIfNone(d, [['console']]); } },
-  { id: 'mirror', tier: 2, what: 'a leaning mirror against a wall', run(d) { d.against('mirror', 'leaner-mirror', {}, null); } },
-  { id: 'plant', tier: 3, what: 'a floor plant in a corner (the third thing a hall of 8 m2 or more is never without)', run(d) { if (d.area >= 6) d.corner('plant', d.pick('plant', d.roleTypes('plant-floor').filter(t => !/palm|tree|tall/.test(t))), {}); } },
+  { id: 'mirror', tier: 1, what: 'a leaning mirror against a wall', run(d) { d.against('mirror', 'leaner-mirror', {}, null); } },
+  { id: 'plant', tier: 1, what: 'a floor plant in a corner, while a hall of 8 m2 or more has fewer than the 3 dress items it is never without', run(d) { for (let k = 0; k < 2 && d.area >= 8 && d.placed.length < 3; k++) if (!d.corner('plant', d.pick('plant', d.roleTypes('plant-floor').filter(t => !/palm|tree|tall/.test(t))), {})) break; } },
 ];
 
 const study: Slot[] = [
@@ -196,18 +209,19 @@ const laundry: Slot[] = [
   { id: 'counters', tier: 2, what: 'a cluster on the counter', run(d) { const q = ['canister-trio', 'tea-towel', 'utensil-crock']; d.hostsOf('counter').slice(0, 1).forEach(h => counterClusters(d, h, q, 1)); } },
 ];
 
+const withWindows = (slots: Slot[]): Slot[] => [...slots, windowSlot];
 export const RECIPES: Record<string, Recipe> = {
-  living: { program: 'living', ref: 27, slots: living }, den: { program: 'den', ref: 25, slots: living }, media: { program: 'media', ref: 25, slots: living },
-  sunroom: { program: 'sunroom', ref: 9, slots: living.filter(s => s.id !== 'console') }, bar: { program: 'bar', ref: 27, slots: living.filter(s => s.id === 'lamp' || s.id === 'side') },
+  living: { program: 'living', ref: 27, slots: withWindows(living) }, den: { program: 'den', ref: 25, slots: withWindows(living) }, media: { program: 'media', ref: 25, slots: withWindows(living) },
+  sunroom: { program: 'sunroom', ref: 9, slots: withWindows(living.filter(s => s.id !== 'console')) }, bar: { program: 'bar', ref: 27, slots: living.filter(s => s.id === 'lamp' || s.id === 'side') },
   playroom: { program: 'playroom', ref: 20, slots: living.filter(s => s.id === 'lamp' || s.id === 'side') },
-  'bed-primary': { program: 'bed-primary', ref: 24, slots: bedroom }, 'bed-guest': { program: 'bed-guest', ref: 22, slots: bedroom }, 'bed-kid': { program: 'bed-kid', ref: 14, slots: bedroom }, nursery: { program: 'nursery', ref: 15, slots: bedroom },
-  kitchen: { program: 'kitchen', ref: 18, slots: kitchen },
-  'kitchen-dining': { program: 'kitchen-dining', ref: 24, slots: [...kitchen.filter(s => s.id !== 'table'), { ...dining[0], tier: 1 }] },
-  dining: { program: 'dining', ref: 20, slots: dining },
-  bath: { program: 'bath', ref: 8, slots: bath }, ensuite: { program: 'ensuite', ref: 14, slots: bath }, powder: { program: 'powder', ref: 4, slots: bath },
+  'bed-primary': { program: 'bed-primary', ref: 24, slots: withWindows(bedroom) }, 'bed-guest': { program: 'bed-guest', ref: 22, slots: withWindows(bedroom) }, 'bed-kid': { program: 'bed-kid', ref: 14, slots: withWindows(bedroom) }, nursery: { program: 'nursery', ref: 15, slots: withWindows(bedroom) },
+  kitchen: { program: 'kitchen', ref: 18, slots: withWindows(kitchen) },
+  'kitchen-dining': { program: 'kitchen-dining', ref: 24, slots: withWindows([...kitchen.filter(s => s.id !== 'table'), { ...dining[0], tier: 1 }]) },
+  dining: { program: 'dining', ref: 20, slots: withWindows(dining) },
+  bath: { program: 'bath', ref: 8, slots: withWindows(bath) }, ensuite: { program: 'ensuite', ref: 14, slots: withWindows(bath) }, powder: { program: 'powder', ref: 4, slots: withWindows(bath) },
   hall: { program: 'hall', ref: 12, slots: hall }, foyer: { program: 'foyer', ref: 11, slots: hall },
-  study: { program: 'study', ref: 19, slots: study }, library: { program: 'library', ref: 18, slots: study }, studio: { program: 'studio', ref: 16, slots: study },
-  laundry: { program: 'laundry', ref: 12, slots: laundry },
+  study: { program: 'study', ref: 19, slots: withWindows(study) }, library: { program: 'library', ref: 18, slots: withWindows(study) }, studio: { program: 'studio', ref: 16, slots: withWindows(study) },
+  laundry: { program: 'laundry', ref: 12, slots: withWindows(laundry) },
   garage: { program: 'garage', ref: 34, slots: [] },   // nothing exists to dress a garage with until BAKE's bk-* types (a car, shelving, bins, a vise) are merged
   gym: { program: 'gym', ref: 37, slots: [] }, greenhouse: { program: 'greenhouse', ref: 24, slots: [] }, outdoor: { program: 'outdoor', ref: 0, slots: [] },
 };
