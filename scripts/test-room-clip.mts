@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as THREE from '../assets/vendor/three/three.module.min.js';
-import { packBox, unpackBox, clipMask, codedDecay, slotOfDecay, openSides, roomClipBox, installRoomClip, roomClipInstalled, setSlot, clearSlots, CLIP_DATA, MAX_SLOTS, FADE, POOL_DATA, POOL_CORE, POOL_HALO_R, POOL_HALO_K, POOL_UP_FADE, type ClipBox } from '../assets/room-clip.js';
+import { packBox, unpackBox, clipMask, codedDecay, slotOfDecay, openSides, roomClipBox, installRoomClip, roomClipInstalled, setSlot, clearSlots, CLIP_DATA, MAX_SLOTS, FADE, WALL_MARGIN, FACE_DOWN, POOL_DATA, POOL_CORE, POOL_HALO_R, POOL_HALO_K, POOL_UP_FADE, type ClipBox } from '../assets/room-clip.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const HOUSES = path.join(ROOT, 'content', 'houses');
@@ -86,6 +86,15 @@ test('the fleet: every lit-size room has a box that packs, and open-plan houses 
   assert.ok(withOpen > 20 && withOpen < rooms, `${withOpen} of ${rooms} rooms have an open side`);
 });
 
+test('LIGHT v3 (7): a surface that faces down is lit across the whole wall thickness; nothing else is, so the next room\'s door leaves and faces stay dark', () => {
+  assert.ok(WALL_MARGIN > 0.04 && WALL_MARGIN < 0.07, `${WALL_MARGIN}: past the middle of the thinnest wall, short of its far face (0.07)`);
+  const c = roomClipBox({ x: 0, z: 0, w: 4, d: 4 }, 0, 3, [{ x: 0, z: 0, w: 4, d: 4 }], []);
+  assert.equal(clipMask(c, { x: 4.06, y: 2.1, z: 2 }, true), 1, 'a header\'s underside, outer half: lit');
+  assert.equal(clipMask(c, { x: 4.06, y: 2.1, z: 2 }, false), 0, 'a door leaf or a jamb there: not');
+  assert.equal(clipMask(c, { x: 4.075, y: 2.1, z: 2 }, true), 0, 'and past the wall\'s far face nothing is');
+  assert.ok(FACE_DOWN < 0 && FACE_DOWN >= -0.9);
+});
+
 test('slots written to the shared array, cleared on a new house, and an unwritten slot is no clip', () => {
   clearSlots(); assert.ok(CLIP_DATA.every(v => v === 0));
   setSlot(3, box());
@@ -103,8 +112,8 @@ test('the shader patch: applied once to three\'s r169 chunks, to both loops, uni
   assert.equal(installRoomClip(THREE), true); assert.equal(roomClipInstalled(), true);
   const after = THREE.ShaderChunk.lights_fragment_begin, pars = THREE.ShaderChunk.lights_pars_begin;
   assert.notEqual(after, before);
-  assert.equal(after.split('vhRoomClip( pointLight.decay, vhWorld, directLight, pointLight.position - geometryPosition, pointLight.color );').length, 2);
-  assert.equal(after.split('vhRoomClip( spotLight.decay, vhWorld, directLight, spotLight.position - geometryPosition, spotLight.color );').length, 2);
+  assert.equal(after.split('vhRoomClip( pointLight.decay, vhWorld, directLight, pointLight.position - geometryPosition, pointLight.color, vhWallMargin( geometryNormal ) );').length, 2);
+  assert.equal(after.split('vhRoomClip( spotLight.decay, vhWorld, directLight, spotLight.position - geometryPosition, spotLight.color, vhWallMargin( geometryNormal ) );').length, 2);
   assert.equal(after.split('vec3 vhWorld = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );').length, 2);
   assert.ok(pars.includes(`uniform vec4 vhClip[ ${MAX_SLOTS} ];`) && pars.includes('void vhRoomClip('));
   assert.ok(!/undefined|NaN|\$\{/.test(pars.slice(pars.indexOf('uniform vec4 vhClip'))), 'no template left in the GLSL');

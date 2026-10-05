@@ -22,6 +22,12 @@
 export const MAX_SLOTS = 16;
 export const FADE = 0.5;               // m: the soft edge of an open side, measured inside the room
 export const MARGIN = 0;               // m: the box is the room's bounds (walls are centred on the bounds: the room's own face is 0.07 inside, the next room's 0.07 outside)
+/** m: a DOWNWARD-FACING surface (a door header's underside, a cove strip's, a lintel's) is lit this far past the box on a walled side. Those surfaces span the whole wall
+ *  thickness, and with the box ending on the centre line only the room's half of them was lit: a thin bright line along every doorway and cove (aurora primary bedroom SE
+ *  night). Widening the whole box lit the next room's door leaves and jambs instead (measured: 7 of 409 rooms over the leak limit, up to 4.5 %), so the margin is for the
+ *  surfaces that face down, which a lamp in the room lights from below and which no wall face, door leaf or floor is. 0.068: the whole thickness bar 2 mm (a partition is 0.14). */
+export const WALL_MARGIN = 0.068;
+export const FACE_DOWN = -0.5;         // world normal y at or below which a surface counts as facing down
 export const DECAY_STEP = 0.0005;
 // A lamp pool (fixtures.ts) is a spot with a base decay above this; a room fill's is 1. The shader tells them apart by it (the coded decay is the one thing
 // a light carries into the fragment shader that nothing else touches).
@@ -98,8 +104,9 @@ export function unpackBox(v: ArrayLike<number>): ClipBox | null {
     open: { xmin: (fz & 1) === 1, xmax: (fz & 2) === 2, zmin: (fw & 1) === 1, zmax: (fw & 2) === 2 } };
 }
 /** the mask the shader computes (1 inside, 0 outside, a smoothstep over FADE on an open side): the same arithmetic, for Node */
-export function clipMask(c: ClipBox, p: { x: number; y: number; z: number }): number {
-  const side = (d: number, open: boolean) => (open ? (() => { const t = Math.max(0, Math.min(1, d / FADE)); return t * t * (3 - 2 * t); })() : d >= 0 ? 1 : 0);
+export function clipMask(c: ClipBox, p: { x: number; y: number; z: number }, faceDown = false): number {
+  const mg = faceDown ? WALL_MARGIN : 0;
+  const side = (d: number, open: boolean) => (open ? (() => { const t = Math.max(0, Math.min(1, d / FADE)); return t * t * (3 - 2 * t); })() : d + mg >= 0 ? 1 : 0);
   return side(p.x - c.x0, c.open.xmin) * side(c.x1 - p.x, c.open.xmax) * side(p.z - c.z0, c.open.zmin) * side(c.z1 - p.z, c.open.zmax) * (p.y >= c.y0 && p.y <= c.y1 ? 1 : 0);
 }
 
@@ -129,9 +136,11 @@ vec3 vhWorld = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );`
 const DECL = `
 uniform vec4 vhClip[ ${MAX_SLOTS} ];
 uniform vec4 vhPool;
-float vhSide( float d, float open ) { return open > 0.5 ? smoothstep( 0.0, ${FADE.toFixed(2)}, d ) : step( 0.0, d ); }
+float vhSide( float d, float open, float mg ) { return open > 0.5 ? smoothstep( 0.0, ${FADE.toFixed(2)}, d ) : step( 0.0, d + mg ); }
+// how far past the box a surface is still lit: the wall's thickness for one that faces down (see WALL_MARGIN), nothing for the rest; n is its normal in view space
+float vhWallMargin( const in vec3 n ) { return ( n * mat3( viewMatrix ) ).y <= ${FACE_DOWN.toFixed(2)} ? ${WALL_MARGIN.toFixed(3)} : 0.0; }
 // \`lv\`: from the fragment to the light (view space), \`lc\`: the light's colour before any attenuation (intensity included)
-void vhRoomClip( const in float decay, const in vec3 w, inout IncidentLight light, const in vec3 lv, const in vec3 lc ) {
+void vhRoomClip( const in float decay, const in vec3 w, inout IncidentLight light, const in vec3 lv, const in vec3 lc, const in float mg ) {
 	if ( dot( lc, vec3( 1.0 ) ) <= 0.0 ) return;   // a light that is off adds nothing: skip its box and its pool (every room light by day)
 	float c = decay * 100.0;
 	float n = floor( ( c - floor( c ) ) / 0.05 + 0.5 );
@@ -141,8 +150,8 @@ void vhRoomClip( const in float decay, const in vec3 w, inout IncidentLight ligh
 	float fw = floor( b.w / ${B24}.0 ), rw = b.w - fw * ${B24}.0, yh = floor( rw / 2048.0 ), yl = rw - yh * 2048.0;
 	if ( hw <= 0.0 && hd <= 0.0 ) return;
 	float xo = fz - 2.0 * floor( fz * 0.5 ), xp = floor( fz * 0.5 ), zo = fw - 2.0 * floor( fw * 0.5 ), zp = floor( fw * 0.5 );
-	float m = vhSide( w.x - ( b.x - hw * ${XZ_UNIT} ), xo ) * vhSide( ( b.x + hw * ${XZ_UNIT} ) - w.x, xp )
-	        * vhSide( w.z - ( b.y - hd * ${XZ_UNIT} ), zo ) * vhSide( ( b.y + hd * ${XZ_UNIT} ) - w.z, zp )
+	float m = vhSide( w.x - ( b.x - hw * ${XZ_UNIT} ), xo, mg ) * vhSide( ( b.x + hw * ${XZ_UNIT} ) - w.x, xp, mg )
+	        * vhSide( w.z - ( b.y - hd * ${XZ_UNIT} ), zo, mg ) * vhSide( ( b.y + hd * ${XZ_UNIT} ) - w.z, zp, mg )
 	        * step( 0.0, w.y - ( yl * ${Y_UNIT} - ${Y_BASE.toFixed(1)} ) ) * step( 0.0, ( yh * ${Y_UNIT} - ${Y_BASE.toFixed(1)} ) - w.y );
 	if ( c >= ${(POOL_DECAY_MIN * 100).toFixed(1)} && m > 0.0 ) {
 		float d2 = dot( lv, lv );
@@ -176,8 +185,8 @@ export function installRoomClip(THREE: any): boolean {
   }
   // on the side, then taken over only if all of it applied
   let text = begin.replace(GEOM, WORLD)
-    .replace(POINT_INFO, `${POINT_INFO}\n\t\tvhRoomClip( pointLight.decay, vhWorld, directLight, pointLight.position - geometryPosition, pointLight.color );`)
-    .replace(SPOT_INFO, `${SPOT_INFO}\n\t\tvhRoomClip( spotLight.decay, vhWorld, directLight, spotLight.position - geometryPosition, spotLight.color );`);
+    .replace(POINT_INFO, `${POINT_INFO}\n\t\tvhRoomClip( pointLight.decay, vhWorld, directLight, pointLight.position - geometryPosition, pointLight.color, vhWallMargin( geometryNormal ) );`)
+    .replace(SPOT_INFO, `${SPOT_INFO}\n\t\tvhRoomClip( spotLight.decay, vhWorld, directLight, spotLight.position - geometryPosition, spotLight.color, vhWallMargin( geometryNormal ) );`);
   // BRDF only where a light reaches (the spot and point loops come before the directional one). A light a fragment is clipped from, or one at
   // intensity 0 (a room light under the v2 policy, fixtures.ts __fillZero), adds exactly +0, so the picture is the same bit for bit; without the
   // branch sixteen of them cost sixteen Lambert + GGX evaluations a fragment for nothing. light-guard.ts does this for the live player;
