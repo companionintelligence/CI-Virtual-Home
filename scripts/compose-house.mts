@@ -30,7 +30,7 @@
 //   The dress phase (plan 5.6, assets/room-dress.ts) is a second, separate pass over a frozen layout; these two flags do ONLY it (the layout is never recomposed):
 //     --dress           add the dress phase's items (src: 'dress@1', the small goods, lamps, towels) to every room that has a recipe and no `dress: false`, at
 //                       --level <0..1> (default each room's own `dress.level`, else 0.5). Idempotent: every dress@1 item is stripped first, so a second run writes the same file
-//     --undress         strip every dress@1 item, and nothing else
+//     --undress         strip every dress@1 item, and nothing else: --dress then --undress gives the original back byte for byte (the file's final newline, or none, is kept)
 //     --rooms a,b       (with either) only these rooms;  --write / --out <file>  as above (--dress / --undress never lock a room)
 //   A dress item stands on a host the layout made, so redo it after a layout re-bake. Streams never bake into content/houses/ (plan 5.6): the pilot and the fleet pass do.
 //
@@ -49,7 +49,15 @@ if (!src) { console.error('usage: compose-house.mts --house <id | path.json> [--
 
 const file = [src, path.join(ROOT, 'content', 'houses', `${src}.json`), path.join(ROOT, 'test', 'fixtures', 'houses', `${src}.json`)].find(f => f.endsWith('.json') && fs.existsSync(f));
 if (!file) { console.error(`no spec "${src}" (looked in content/houses, test/fixtures/houses and as a path)`); process.exit(2); }
-const spec = JSON.parse(fs.readFileSync(file, 'utf8'));
+// (JSON in and out with the number tokens kept: a spec a script wrote has `1.0` and `-5.0` (the dress fixtures), and a rewrite that turns them into `1` and `-5` is not the file it was.
+// Node's JSON.parse hands a reviver each number's source text, and JSON.rawJSON writes it back: a token is replayed only for a number that still has its value)
+const tokens = new WeakMap<object, Map<string, string>>();
+const parseFaithful = (text: string): any => JSON.parse(text, function (this: any, k: string, v: any, ctx?: { source?: string }) {
+  if (typeof v === 'number' && ctx && ctx.source !== undefined && ctx.source !== JSON.stringify(v)) { let m = tokens.get(this); if (!m) tokens.set(this, m = new Map()); m.set(k, ctx.source); }
+  return v;
+} as any);
+const stringifyFaithful = (v: any): string => JSON.stringify(v, function (this: any, k: string, val: any) { const t = typeof val === 'number' ? tokens.get(this)?.get(k) : undefined; return t !== undefined && Number(t) === val ? (JSON as any).rawJSON(t) : val; }, 2);
+const raw = fs.readFileSync(file, 'utf8'), spec = parseFaithful(raw);
 const { composeHouse } = await import(path.join(ROOT, 'assets', 'room-composer.js'));
 const { inferProgram, isProgram, isComposed, PROGRAMS } = await import(path.join(ROOT, 'assets', 'room-programs.js'));
 const { STYLE_KEYS } = await import(path.join(ROOT, 'assets', 'house-styles.js'));
@@ -93,7 +101,14 @@ if (DRESS || UNDRESS) {
   if (WRITE || opt('out')) {
     const out = opt('out') ? path.resolve(opt('out')!) : file;
     fs.mkdirSync(path.dirname(out), { recursive: true });
-    fs.writeFileSync(out, JSON.stringify(spec, null, 2) + '\n');
+    // (the file's own form is kept, so --dress then --undress is the identity on the bytes: its final newline, or none (the repo's specs have none, a fixture has one), its number tokens (`1.0`), and whether it
+    // writes non-ASCII as \uXXXX escapes (cocoon's emoji does) or as characters. A file in neither form is reformatted by any write of this tool, said so below, and a room with no
+    // `items` key at all comes back with `"items": []`: JSON-equal, not byte-equal)
+    const ascii = (t: string) => t.replace(/[\u0080-\uffff]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+    const body = raw.replace(/\n$/, ''), plainRaw = stringifyFaithful(parseFaithful(raw)), escaped = body === ascii(plainRaw) && body !== plainRaw;
+    if (body !== plainRaw && !escaped) console.log(`note: ${path.relative(process.cwd(), file)} is not in canonical 2-space JSON: this write reformats it (the content is the same)`);
+    const text = stringifyFaithful(spec);
+    fs.writeFileSync(out, (escaped ? ascii(text) : text) + (raw.endsWith('\n') ? '\n' : ''));
     console.log(`written → ${path.relative(process.cwd(), out)}`);
   }
   process.exit(0);

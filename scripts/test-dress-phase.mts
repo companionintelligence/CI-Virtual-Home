@@ -31,6 +31,9 @@
 //   R  door leaves   no dress piece the scene check counts (not foliage, not hung in its wall, over 0.3 m) stands in the strip an open door leaf parks in, for any door of its
 //                   storey that may carry one (a partition's, an opening's, both jambs): the five pieces the scene check found in a leaf's way (three robe hooks, an umbrella stand,
 //                   a floor lamp) are in the strips, and no piece of the 30 houses baked is; the scene gate's warning count (baked == unbaked) is dress-fleet's neighbour, run by hand
+//   S  byte identity compose-house.mts --dress then --undress gives each of the 30 houses and 5 fixtures back byte for byte (its final newline, or none, kept: the houses
+//                   have none, the fixtures one), and --dress twice writes the file --dress once did; a spec that is not canonical JSON is told so, and a room with no `items`
+//                   key at all is the one case that comes back JSON-equal (a control)
 //   P  bake hygiene  a baked house raises no warning its unbaked self does not: the validator's warning count (the `dk` seed key a dress item carries is a declared item key
 //                   like `src`) and the layout lint's silent-param count are equal before and after the bake, for all 30 houses; and a dress item's `dk` is the one key
 //                   no builder reads (a control: a key made up fails the same measurement)
@@ -65,7 +68,7 @@ import { lintLayout } from '../assets/layout-lint.js';
 import { PLACEMENT } from '../assets/props/placement.js';
 import { PROPS } from '../assets/props/index.js';
 import { itemObb, overlap, analyzeRoom, sizeOf, obb, corners, CENTRE_MOUNT, TOP_MOUNT } from '../assets/room-geo.js';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, spawn } from 'node:child_process';
 import os from 'node:os';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -755,4 +758,54 @@ test('R: no dress piece the scene check counts stands in a door leaf\'s parking 
     }
   }
   assert.ok(strips >= 150 && checked >= 250, `${strips} strips, ${checked} pieces checked`);
+});
+
+// ---- S: --dress then --undress is the identity on the bytes ----------------------------------------------------------------------------
+/** run compose-house.mts with `args` (many at once: `jobs` at a time) and resolve with each one's { status, out } */
+function composeAll(jobsArgs: string[][], jobs = 4): Promise<Array<{ status: number | null; out: string }>> {
+  const results: Array<{ status: number | null; out: string }> = new Array(jobsArgs.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < jobsArgs.length) {
+      const i = next++;
+      results[i] = await new Promise(resolve => {
+        const ch = spawn(process.execPath, ['--experimental-strip-types', path.join(ROOT, 'scripts', 'compose-house.mts'), ...jobsArgs[i]], { stdio: ['ignore', 'pipe', 'pipe'] });
+        let out = ''; ch.stdout.on('data', d => { out += d; }); ch.stderr.on('data', d => { out += d; });
+        ch.on('close', status => resolve({ status, out }));
+      });
+    }
+  };
+  return Promise.all(Array.from({ length: jobs }, worker)).then(() => results);
+}
+test('S: --dress then --undress gives every house and fixture back byte for byte, and --dress twice writes what once did', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dress-bytes-'));
+  try {
+    const srcs = [...houses.map(h => ({ id: h.id, file: h.file })), ...FIX.map(id => ({ id, file: path.join(ROOT, 'test', 'fixtures', 'houses', `${id}.json`) }))];
+    const f = (id: string, k: string) => path.join(dir, `${id}.${k}.json`);
+    const step = async (args: (id: string, file: string) => string[]) => { const r = await composeAll(srcs.map(s => args(s.id, s.file))); r.forEach((x, i) => assert.equal(x.status, 0, `${srcs[i].id}: ${x.out}`)); return r; };
+    const a = await step((id, file) => ['--house', file, '--dress', '--out', f(id, 'a')]);
+    await step((id) => ['--house', f(id, 'a'), '--dress', '--out', f(id, 'b')]);
+    await step((id) => ['--house', f(id, 'a'), '--undress', '--out', f(id, 'c')]);
+    let withNl = 0, items = 0;
+    for (const s of srcs) {
+      const orig = fs.readFileSync(s.file), A = fs.readFileSync(f(s.id, 'a')), B = fs.readFileSync(f(s.id, 'b')), C = fs.readFileSync(f(s.id, 'c'));
+      assert.ok(A.equals(B), `${s.id}: --dress twice is not --dress once`);
+      assert.ok(orig.equals(C), `${s.id}: --undress did not give the original back (${C.length} bytes, was ${orig.length}; ends with newline: ${C[C.length - 1] === 10} / ${orig[orig.length - 1] === 10})`);
+      assert.equal(A[A.length - 1] === 10, orig[orig.length - 1] === 10, `${s.id}: the baked file's ending is not the original's`);
+      if (orig[orig.length - 1] === 10) withNl++;
+      items += JSON.parse(A.toString()).levels.flatMap((lv: any) => lv.rooms).flatMap((r: any) => r.items || []).filter(isDress).length;
+    }
+    assert.ok(a.every(x => !/note: .* not in canonical/.test(x.out)), 'every house and fixture is in canonical 2-space JSON');
+    assert.ok(withNl === FIX.length && items >= 900, `${withNl} files end with a newline (the fixtures), ${items} dress items round-tripped`);
+    // the one honest exception: a room with no `items` key at all comes back with an empty one (the control), and a spec that is not canonical JSON is reported
+    const spec = load(srcs.find(x => x.id === 'aurora')!.file), kitchen = spec.levels.flatMap((lv: any) => lv.rooms).find((r: any) => /^kitchen$/i.test(r.name)); delete kitchen.items;
+    const odd = path.join(dir, 'noitems.json'); fs.writeFileSync(odd, JSON.stringify(spec, null, 2)); fs.writeFileSync(path.join(dir, 'ugly.json'), JSON.stringify(spec));
+    const [d1, ugly] = await composeAll([['--house', odd, '--dress', '--out', path.join(dir, 'n1.json')], ['--house', path.join(dir, 'ugly.json'), '--dress', '--out', path.join(dir, 'n2.json')]]);
+    await composeAll([['--house', path.join(dir, 'n1.json'), '--undress', '--out', path.join(dir, 'n3.json')]]);
+    assert.ok(d1.status === 0 && !/note:/.test(d1.out));
+    assert.ok(/note: .*ugly\.json is not in canonical 2-space JSON/.test(ugly.out), 'a spec that is not canonical JSON is told so');
+    const back = load(path.join(dir, 'n3.json')), roomOf = (sp: any) => sp.levels.flatMap((lv: any) => lv.rooms).find((r: any) => /^kitchen$/i.test(r.name));
+    assert.ok(!('items' in roomOf(spec)) && Array.isArray(roomOf(back).items) && roomOf(back).items.length === 0 && !fs.readFileSync(odd).equals(fs.readFileSync(path.join(dir, 'n3.json'))), 'control: a room without an items key comes back with an empty one');
+    console.log(`S: ${srcs.length} specs, ${items} dress items: --dress then --undress is the identity on the bytes (${withNl} with a final newline, ${srcs.length - withNl} without), --dress twice is --dress once`);
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
