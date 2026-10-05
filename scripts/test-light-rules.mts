@@ -88,8 +88,15 @@ const mat = (bounce?: number) => ({ userData: bounce === undefined ? {} : { boun
 const rootOf = (...mats: any[]) => ({ traverse(f: (o: any) => void) { f({ userData: {} }); for (const m of mats) f({ isMesh: true, material: m, userData: {} }); } });
 
 test('L2: every preset carries a bounce, brightest by day, never over the cap that keeps a ceiling under the walls', () => {
-  for (const [name, p] of Object.entries(TIME_OF_DAY)) assert.ok(typeof p.bounce === 'number' && p.bounce > 0 && p.bounce <= 0.15, `${name}.bounce ${p.bounce}`);
-  assert.ok(TIME_OF_DAY.day.bounce >= TIME_OF_DAY.dusk.bounce && TIME_OF_DAY.day.bounce >= TIME_OF_DAY.night.bounce);
+  // the light a ceiling emits, as luminance: bounce x the luma of its colour. Dusk's is the warm peach that replaced a teal ceiling (LIGHT v3 item 3), which
+  // needs more of it than day's white to beat the cool sky the ceiling is lit by; it stays under the 0.2 that keeps a ceiling below the walls it sits over
+  const lumOf = (c: number) => 0.2126 * ((c >> 16) & 255) / 255 + 0.7152 * ((c >> 8) & 255) / 255 + 0.0722 * (c & 255) / 255;
+  for (const [name, p] of Object.entries(TIME_OF_DAY)) {
+    assert.ok(typeof p.bounce === 'number' && p.bounce > 0 && p.bounce <= 0.25, `${name}.bounce ${p.bounce}`);
+    const emit = p.bounce * lumOf(p.bounceColor ? parseInt(p.bounceColor.slice(1), 16) : BOUNCE_COLOR);
+    assert.ok(emit <= 0.2, `${name} ceiling emits ${emit.toFixed(3)}`);
+  }
+  assert.ok(TIME_OF_DAY.day.bounce >= TIME_OF_DAY.night.bounce);
   for (const k of [1, 2] as const) assert.equal(lookOf(TIME_OF_DAY.dusk, k).bounce, TIME_OF_DAY.dusk.bounce, `look ${k} keeps it`);
 });
 
@@ -101,7 +108,7 @@ test('L2: applyHouseGlow sets a tagged ceiling to the hour\'s bounce, scales a t
     assert.equal(r.bounced, 2, 'two tagged materials with an emissive');
     assert.equal(flat.emissiveIntensity, TIME_OF_DAY[t].bounce);
     assert.equal(timber.emissiveIntensity, TIME_OF_DAY[t].bounce * 0.5);
-    assert.equal(flat.emissive.hex, BOUNCE_COLOR);
+    assert.equal(flat.emissive.hex, TIME_OF_DAY[t].bounceColor ? parseInt(TIME_OF_DAY[t].bounceColor!.slice(1), 16) : BOUNCE_COLOR);
     assert.equal(wall.emissiveIntensity, 1, 'an untagged surface keeps its emissive intensity');
     assert.equal(wall.emissive.hex, 0);
   }
@@ -223,10 +230,14 @@ test('the hours are ordered: night ambient <= dusk <= day, in raw hemisphere int
   assert.ok(ambientOf(night) > 0.15 && ambientOf(night) > ambientOf(dusk) * 0.4, 'night is dim, not black: shadows survive without a lamp');
 });
 
-test('night is lamp-lit: a cool sky over a warm ground, env 0.30 kept', () => {
+test('night is lamp-lit: a cool sky over a warm ground, env 0.30 kept, and dusk is warm (its white balance held back)', () => {
   const n = TIME_OF_DAY.night, g = parseInt(n.hemi.ground.slice(1), 16);
   assert.ok(n.hemi.intensity >= 1.2 && n.hemi.intensity <= 1.5, `hemisphere ${n.hemi.intensity}`);
-
+  const d = TIME_OF_DAY.dusk, dg = parseInt(d.hemi.ground.slice(1), 16);
+  assert.ok(((dg >> 16) & 255) - (dg & 255) >= 0x30, `dusk ground ${d.hemi.ground} is warm`);
+  assert.ok(typeof d.wb === 'number' && d.wb < 0.6 && TIME_OF_DAY.day.wb === undefined && n.wb === undefined, 'only dusk holds the white balance back from the 0.75 default');
+  const bc = parseInt((d.bounceColor || '#000000').slice(1), 16);
+  assert.ok(((bc >> 16) & 255) - (bc & 255) >= 0x40 && d.bounce > TIME_OF_DAY.night.bounce, 'dusk\'s ceiling bounce is a warm light, stronger than night\'s: the ceiling was the one teal thing in the room');
   assert.ok(((g >> 16) & 255) > (g & 255), `ground ${n.hemi.ground} is warm (red above blue)`);
   assert.equal(n.env, 0.30);
   const s = parseInt(n.hemi.sky.slice(1), 16); assert.ok((s & 255) > ((s >> 16) & 255), 'the sky stays cool');

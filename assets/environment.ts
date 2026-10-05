@@ -57,6 +57,8 @@ export type Preset = {
   grade: { contrast: number; saturation: number; vignette: number };
   /** look 2's white balance: how far toward neutral the frame is corrected (0 none, 1 fully; default 0.75). Dusk is held back so a warm hour stays warm (LIGHT v3). */
   wb?: number;
+  /** the colour a ceiling's bounce emits (default BOUNCE_COLOR, a warm white): dusk's is warmer, a ceiling that read teal under a peach sky was the one cool thing in a warm room */
+  bounceColor?: string;
 };
 
 export const TIME_OF_DAY: Record<string, Preset> = {
@@ -90,12 +92,12 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     label: 'Dusk',
     sky: ['#4e638b', '#e5a38b', '#5d626e'],
     sun: { color: '#ffa98f', intensity: 1.0, elevation: 8, swing: -64 },
-    hemi: { sky: '#b9aed0', ground: '#9a8576', intensity: 1.28 },
-    fill: { color: '#9eaecd', intensity: 0.3 },
+    hemi: { sky: '#cdb8c4', ground: '#b8906f', intensity: 1.45 },
+    fill: { color: '#b8aac2', intensity: 0.3 },
     ambient: 0,
     exposure: 0.9, env: 0.7,
     fog: [70, 155], shadow: 0.6,
-    lampGain: 1.6, bounce: 0.07, windowGlow: 0.8, glowColor: '#ffd9a8', sunGlow: 0.8,
+    lampGain: 1.6, bounce: 0.22, bounceColor: '#ffc590', windowGlow: 0.8, glowColor: '#ffd9a8', sunGlow: 0.8, wb: 0.4,
     bloom: { strength: 0.35, radius: 0.4, threshold: 1.8 },
     grade: { contrast: 1.05, saturation: 0.72, vignette: 0.22 },
   },
@@ -340,7 +342,7 @@ export function applyHouseGlow(THREE: any, root: any, p: Preset): { fixtures: nu
     if (o.isMesh) for (const m of matsOf(o)) {
       const b = m && m.userData && m.userData.bounce;
       if (!b || !m.emissive) continue;
-      m.emissive.setHex(BOUNCE_COLOR);
+      m.emissive.setHex(p.bounceColor ? hexOf(p.bounceColor) : BOUNCE_COLOR);
       m.emissiveIntensity = p.bounce * (typeof b === 'number' ? b : 1);
       bounced++;
     }
