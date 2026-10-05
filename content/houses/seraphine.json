@@ -487,6 +487,16 @@
                 1
               ],
               "rot": 0
+            },
+            {
+              "type": "shoe-row",
+              "at": [
+                2.852,
+                5.276
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.01:entry:0"
             }
           ]
         },
@@ -737,6 +747,28 @@
                 3.9
               ],
               "rot": 0
+            },
+            {
+              "type": "dresser-set",
+              "at": [
+                6.201,
+                -1.03
+              ],
+              "y": 0.72,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.02:dresser:0"
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                7,
+                -0.9
+              ],
+              "y": 0.72,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.02:dresser:1"
             }
           ]
         },
@@ -959,6 +991,131 @@
                 -0.6
               ],
               "rot": 90
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                3.641,
+                -2.625
+              ],
+              "y": 0.918,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.03:hob:0"
+            },
+            {
+              "type": "globe-lamp",
+              "at": [
+                2.33,
+                -0.925
+              ],
+              "y": 0.9,
+              "src": "dress@1",
+              "dk": "l1.03:lamp:0"
+            },
+            {
+              "type": "tea-towel",
+              "at": [
+                2.064,
+                -2.725
+              ],
+              "y": 0.9,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.03:counters:0"
+            },
+            {
+              "type": "oil-pair",
+              "at": [
+                4.21,
+                -2.575
+              ],
+              "y": 0.9,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.03:counters:1"
+            },
+            {
+              "type": "kettle-and-mug",
+              "at": [
+                4.598,
+                -2.512
+              ],
+              "y": 0.9,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.03:counters:2"
+            },
+            {
+              "type": "canister-trio",
+              "at": [
+                2.596,
+                -2.465
+              ],
+              "y": 0.9,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.03:counters:3"
+            },
+            {
+              "type": "utensil-crock",
+              "at": [
+                3.064,
+                -2.79
+              ],
+              "y": 0.9,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.03:counters:4"
+            },
+            {
+              "type": "plate-stack",
+              "at": [
+                0.445,
+                -2.721
+              ],
+              "y": 0.9,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.03:counters:5"
+            },
+            {
+              "type": "bread-bin",
+              "at": [
+                -0.143,
+                -0.63
+              ],
+              "rot": 90,
+              "y": 0.9,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.03:counters:6"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                1.158,
+                -2.916
+              ],
+              "w": 0.615,
+              "h": 0.955,
+              "y": 0.695,
+              "color": "#e3e2d9",
+              "src": "dress@1",
+              "dk": "l1.03:windows:0"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                1.943,
+                -2.916
+              ],
+              "w": 0.615,
+              "h": 0.955,
+              "y": 0.695,
+              "color": "#e3e2d9",
+              "src": "dress@1",
+              "dk": "l1.03:windows:1"
             }
           ],
           "lock": true
@@ -1131,6 +1288,84 @@
                 -2.6
               ],
               "rot": 0
+            },
+            {
+              "type": "candle-trio",
+              "at": [
+                -4.3,
+                -1.33
+              ],
+              "y": 0.75,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.04:table:0"
+            },
+            {
+              "type": "candle-trio",
+              "at": [
+                -3.8,
+                -1.206
+              ],
+              "y": 0.75,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.04:table:1"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -4.731,
+                -1.49
+              ],
+              "rot": 180,
+              "y": 0.75,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.04:table:2"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -3.831,
+                -1.49
+              ],
+              "rot": 180,
+              "y": 0.75,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.04:table:3"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -4.769,
+                -0.909
+              ],
+              "y": 0.75,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.04:table:4"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -3.869,
+                -0.909
+              ],
+              "y": 0.75,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.04:table:5"
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                -6.111,
+                -1.316
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l1.04:lamp:0"
             }
           ],
           "lock": true
@@ -1239,6 +1474,16 @@
                 1.2
               ],
               "rot": 0
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                -0.751,
+                5.161
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.05:lamp:0"
             }
           ]
         },
@@ -1298,6 +1543,16 @@
               "w": 2.4,
               "d": 0.9,
               "color": "#b8ad99"
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                -2.816,
+                6.801
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.19:lamp:0"
             }
           ]
         },
@@ -2254,6 +2509,50 @@
                 2.55
               ],
               "rot": 180
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                -7.966,
+                2.81
+              ],
+              "rot": 180,
+              "y": 0.805,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l2.12:tank:0"
+            },
+            {
+              "type": "towel-ring-set",
+              "at": [
+                -8.354,
+                2.827
+              ],
+              "rot": 180,
+              "y": 0.95,
+              "src": "dress@1",
+              "dk": "l2.12:towels:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                -7.76,
+                1.073
+              ],
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l2.12:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                -8.24,
+                2.789
+              ],
+              "rot": 180,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l2.12:roll:0"
             }
           ]
         },
@@ -2513,6 +2812,27 @@
                 -1.55
               ],
               "rot": 0
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                2.581,
+                -2.81
+              ],
+              "y": 0.805,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l2.14:tank:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                2.85,
+                -2.879
+              ],
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l2.14:roll:0"
             }
           ],
           "lock": true
@@ -3190,6 +3510,16 @@
                 6.7
               ],
               "rot": 0
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                0.084,
+                6.801
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l2.21:lamp:0"
             }
           ]
         },
@@ -3266,6 +3596,16 @@
               "d": 3.4,
               "pattern": "stripe",
               "color": "#cfc4b0"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                1.68,
+                5.247
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l2.20:mirror:0"
             }
           ],
           "lock": true
