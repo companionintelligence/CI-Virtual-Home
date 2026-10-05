@@ -102,14 +102,14 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   `<main>` because `<main>` goes inert while a drawer is open.
 - `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
 
-**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and the 15 quick
+**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph tests and the 24 quick
 Node tests (`pnpm run test:node`) and assembles the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
 passes those goes live on its own. The render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
 pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (150 / 150)
-pnpm run check:quick    # while iterating: assets + specs + shots + the 15 quick tests
+pnpm run check:quick    # while iterating: assets + specs + shots + the 24 quick tests
 ```
 
 A clean run has 0 shot errors and 0 scene errors (warnings are reported but do not fail — compare their count
@@ -131,6 +131,12 @@ optional and a look-changing default applies only under `"defaults": 2` (`specDe
 your stream's `test/goldens/expected-diffs/<stream>.json` and record what it moved to (`pnpm run goldens --record
 <stream>`, and `fixtures --record <stream>` for another stream's fixture). The integration re-blesses once and
 empties that ledger.
+
+**The interior layers (LIGHT, SOFT, SMALL, DRESS, BAKE, README → The interior layers).** The 30 houses carry their dress items baked in (`src: 'dress@1'`, a `dk` seed key): never
+hand-edit one and never add a `dress` field (a live opt-in) to a shipped house; after a layout re-bake run `node --experimental-strip-types scripts/compose-house.mts --house <id>
+--dress --write` (`test-dress-phase` S fails on a stale bake; `--undress` restores the bytes). A lamp placed by the dress phase is lit by LIGHT's room pool, so a recipe or a host
+change that moves lamps moves night frames: check `pnpm run test:light -- --bench` (19 rows) and `-- --lamps`. A change to how rooms look is judged with the review rig
+(`scripts/review/`, needs committed product code) and by eye, not by the goldens alone.
 
 **Goldens are re-blessed only on purpose.** A golden failure means the picture changed. If the change was not
 meant to alter the look, fix the code. If it was, run `pnpm run goldens:update`, look at the frames that moved
