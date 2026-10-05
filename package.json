@@ -56,7 +56,8 @@
     "test:dress-hosts": "node --experimental-strip-types scripts/test-dress-hosts.mts",
     "test:dress-neutral": "node --experimental-strip-types scripts/test-dress-neutral.mts",
     "dress-project": "node --experimental-strip-types scripts/dress-project.mts",
-    "dress-cost": "node --experimental-strip-types scripts/dress-cost.mts"
+    "dress-cost": "node --experimental-strip-types scripts/dress-cost.mts",
+    "dress-fleet": "node --experimental-strip-types scripts/dress-fleet.mts"
   },
   "devDependencies": {
     "@types/node": "^22",
