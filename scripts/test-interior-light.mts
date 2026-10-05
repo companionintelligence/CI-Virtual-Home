@@ -334,7 +334,7 @@ async function probeMode(): Promise<number> {
     for (const house of [...new Set(shots.map(x => x.house))]) {
       const burn = await session.open(house, { res: RES });
       try { await burn.page.evaluate((r: string) => (window as any).__houseSnapshot({ res: r, quality: 0.5 }), RES); } finally { await burn.close(); }
-      const w = await session.open(house, { res: RES });
+      const w = await session.open(house, { res: RES, query: args.query && args.query !== 'true' ? args.query : '' });
       // --variant grade|ao|all: the runtime L4 variants of --portal, to read what they would add to the bench rooms (quantifying a row that L4 owns)
       if (args.variant && args.variant !== 'true') {
         if (!(args.variant in VARIANTS)) throw new Error(`unknown variant ${args.variant}`);
@@ -344,7 +344,7 @@ async function probeMode(): Promise<number> {
       if (args.tune && args.tune !== 'true') await w.page.evaluate((o: any) => (window as any).__houseFixtures.tune(o), JSON.parse(args.tune));
       // --env '{"night":{"hemi":{"intensity":0.8}}}': a deep merge into environment.ts TIME_OF_DAY on this page (the presets are plain data the page reads on every re-light)
       if (args.env && args.env !== 'true') await w.page.evaluate(async (o: any) => {
-        const E: any = await import('./assets/environment.js');
+        const E: any = await import(String('./assets/environment.js'));
         const merge = (t: any, u: any) => { for (const k of Object.keys(u)) { if (u[k] && typeof u[k] === 'object' && !Array.isArray(u[k]) && t[k] && typeof t[k] === 'object') merge(t[k], u[k]); else t[k] = u[k]; } };
         merge(E.TIME_OF_DAY, o);
       }, JSON.parse(args.env));
@@ -582,7 +582,7 @@ async function moodMode(): Promise<number> {
   try {
     for (const house of [...new Set(rooms.map(r => r.house))]) {
       const w = await session.open(house, { res: '360', composer: false });
-      if (args.env && args.env !== 'true') await w.page.evaluate(async (o: any) => { const E: any = await import('./assets/environment.js'); const merge = (t: any, u: any) => { for (const k of Object.keys(u)) { if (u[k] && typeof u[k] === 'object' && !Array.isArray(u[k]) && t[k] && typeof t[k] === 'object') merge(t[k], u[k]); else t[k] = u[k]; } }; merge(E.TIME_OF_DAY, o); }, JSON.parse(args.env));
+      if (args.env && args.env !== 'true') await w.page.evaluate(async (o: any) => { const E: any = await import(String('./assets/environment.js')); const merge = (t: any, u: any) => { for (const k of Object.keys(u)) { if (u[k] && typeof u[k] === 'object' && !Array.isArray(u[k]) && t[k] && typeof t[k] === 'object') merge(t[k], u[k]); else t[k] = u[k]; } }; merge(E.TIME_OF_DAY, o); }, JSON.parse(args.env));
       await w.page.evaluate((t: string) => (window as any).__houseSetLighting(t), tod);
       const allRooms = await roomsOf(w.page);
       for (const [ti, tune] of tunes.entries()) {

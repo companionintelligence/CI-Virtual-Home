@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as THREE from '../assets/vendor/three/three.module.min.js';
-import { packBox, unpackBox, clipMask, codedDecay, slotOfDecay, openSides, roomClipBox, installRoomClip, roomClipInstalled, setSlot, clearSlots, CLIP_DATA, MAX_SLOTS, FADE, type ClipBox } from '../assets/room-clip.js';
+import { packBox, unpackBox, clipMask, codedDecay, slotOfDecay, openSides, roomClipBox, installRoomClip, roomClipInstalled, setSlot, clearSlots, CLIP_DATA, MAX_SLOTS, FADE, POOL_DATA, POOL_CORE, POOL_HALO_R, POOL_HALO_K, POOL_UP_FADE, type ClipBox } from '../assets/room-clip.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const HOUSES = path.join(ROOT, 'content', 'houses');
@@ -103,8 +103,8 @@ test('the shader patch: applied once to three\'s r169 chunks, to both loops, uni
   assert.equal(installRoomClip(THREE), true); assert.equal(roomClipInstalled(), true);
   const after = THREE.ShaderChunk.lights_fragment_begin, pars = THREE.ShaderChunk.lights_pars_begin;
   assert.notEqual(after, before);
-  assert.equal(after.split('vhRoomClip( pointLight.decay, vhWorld, directLight );').length, 2);
-  assert.equal(after.split('vhRoomClip( spotLight.decay, vhWorld, directLight );').length, 2);
+  assert.equal(after.split('vhRoomClip( pointLight.decay, vhWorld, directLight, pointLight.position - geometryPosition, pointLight.color );').length, 2);
+  assert.equal(after.split('vhRoomClip( spotLight.decay, vhWorld, directLight, spotLight.position - geometryPosition, spotLight.color );').length, 2);
   assert.equal(after.split('vec3 vhWorld = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );').length, 2);
   assert.ok(pars.includes(`uniform vec4 vhClip[ ${MAX_SLOTS} ];`) && pars.includes('void vhRoomClip('));
   assert.ok(!/undefined|NaN|\$\{/.test(pars.slice(pars.indexOf('uniform vec4 vhClip'))), 'no template left in the GLSL');
@@ -115,6 +115,15 @@ test('the shader patch: applied once to three\'s r169 chunks, to both loops, uni
   for (const k of ['lambert', 'phong', 'standard', 'physical', 'toon']) assert.equal((THREE.ShaderLib as any)[k].uniforms.vhClip.value, CLIP_DATA, `${k} shares the array`);
   // a material's own uniform map (UniformsUtils.clone) hands a typed array on by reference
   assert.equal(THREE.UniformsUtils.clone((THREE.ShaderLib as any).physical.uniforms).vhClip.value, CLIP_DATA);
+});
+
+test('LIGHT v3 (2): the pool shaping is in the shader (core, halo, up-fade) and an off light skips the clip', () => {
+  const pars = THREE.ShaderChunk.lights_pars_begin;
+  assert.ok(pars.includes('uniform vec4 vhPool;') && pars.includes('dot( lc, vec3( 1.0 ) ) <= 0.0 ) return;'), 'a light with no colour returns before the box maths');
+  assert.ok(pars.includes('pow( d2 / ( d2 + vhPool.x * vhPool.x )') && pars.includes('smoothstep( 0.35 * vhPool.w, vhPool.w'));
+  assert.equal(POOL_DATA.length, 4); assert.deepEqual(Array.from(POOL_DATA).map(v => +v.toFixed(3)), [POOL_CORE, POOL_HALO_R, POOL_HALO_K, POOL_UP_FADE].map(v => +v.toFixed(3)));
+  assert.ok(POOL_CORE > 0.2 && POOL_CORE < 0.8 && POOL_HALO_R > 0.6 && POOL_HALO_R < 2 && POOL_HALO_K > 0 && POOL_HALO_K < 0.5);
+  assert.equal((THREE.ShaderLib as any).physical.uniforms.vhPool.value, POOL_DATA, 'shared by reference');
 });
 
 test('the fixtures use it: a slot and a coded decay per room light, cleared per house', () => {

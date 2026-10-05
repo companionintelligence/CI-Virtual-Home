@@ -30,7 +30,7 @@ import { inRect } from './house-geometry.js';
 import { programKind, fanPlan, lampPlan, REGISTRY_LAMPS, LAMP_ITEMS } from './kit-rules.js';
 import { schemeOf } from './house-scheme.js';
 import { heroFrame } from './hero-frame.js';
-import { clearSlots, setSlot, codedDecay, roomClipBox } from './room-clip.js';
+import { clearSlots, setSlot, codedDecay, roomClipBox, POOL_DATA, POOL_CORE, POOL_HALO_R, POOL_HALO_K, POOL_UP_FADE } from './room-clip.js';
 
 export const LIGHT_CAP = 16;          // dynamic lights per house (one per room at most)
 const DAY_GAIN = 0.035;               // lamp gain when no environment has announced one (a daylight preset's)
@@ -57,13 +57,13 @@ export const FILL_ON_GAIN = 0.1;
 // across the bed, the desk, the curtain and the far wall (x3 the v1 intensity, under 1 % of that frame clipped). What keeps it in its room is room-clip.ts.
 export const LAMP_ROOM_FILL_K = 0;
 export const LAMP_RANK_BONUS = 1.35;  // × the ranking score of a room that has a free-standing lamp (which rooms the 16-light cap lights)
-export const LAMP_POOL_I = 7.8;       // cd at gain 1, for a 3 m room; × √area / 3, at most × LAMP_POOL_MAX
+export const LAMP_POOL_I = 12;        // cd at gain 1, for a 3 m room; × √area / 3, at most × LAMP_POOL_MAX (v2: 7.8 at decay 1.6; the decay is steeper now, see LAMP_POOL_DECAY)
 export const LAMP_POOL_MAX = 1.6;
-export const LAMP_POOL_REACH = 0.8;   // × the room's diagonal: where the falloff reaches 0 (the clip, not this, stops it at the walls)
-export const LAMP_POOL_DECAY = 1.6;
-export const LAMP_POOL_ANGLE = 1.5;   // rad (86 degrees): the cone's half angle, as wide as a spot goes (behind the lamp is outside it, the walls beside it and ahead are in it)
+export const LAMP_POOL_REACH = 0.7;   // × the room's diagonal: where the falloff reaches 0 (the clip, not this, stops it at the walls)
+export const LAMP_POOL_DECAY = 2;     // the inverse square of a lamp (v2: 1.6, which carried the pool to the far wall: far wall 0.113 luma against 0.153 beside the lamp)
+export const LAMP_POOL_ANGLE = 1.3;   // rad (86 degrees): the cone's half angle, as wide as a spot goes (behind the lamp is outside it, the walls beside it and ahead are in it)
 export const LAMP_POOL_PENUMBRA = 1.0;
-export const LAMP_POOL_AIM_Y = 1.5;   // m over the floor, at the room's centre: a slight tilt up, so the wall above the lamp and the curtain beside it take the wash
+export const LAMP_POOL_AIM_Y = 1.2;   // m over the floor, at the room's centre: a slight tilt up, so the wall above the lamp and the curtain beside it take the wash
 
 // ---- the kind of room, from its name (the specs name rooms freely: "Sunset Terrace Suite", "Study & Bar") ----
 const KINDS: Array<[string, RegExp]> = [
@@ -141,6 +141,15 @@ if (typeof window !== 'undefined') {
   (window as any).__houseFixtures = {   // QA hook: what the fixtures did, and a way to drive the gain by hand
     applyLampGain,
     lampTypes: () => [...POOL_LAMPS],
+    /** QA hook for tuning on a page that is open (test-interior-light --probe --tune '{...}'): { poolI, poolMax, poolAngle, poolPenumbra, poolAimY, poolReach, poolDecay,
+     *  fillK, core, haloR, haloK, upFade }. Re-aims and re-scales the lights built; it never changes what a build makes. */
+    tune: (o: any = {}) => {
+      if (!current) return;
+      const n = (v: any, d: number) => (typeof v === 'number' ? v : d);   // every call is a full state: a key it does not name is the shipped constant
+      POOL_DATA[0] = n(o.core, POOL_CORE); POOL_DATA[1] = n(o.haloR, POOL_HALO_R); POOL_DATA[2] = n(o.haloK, POOL_HALO_K); POOL_DATA[3] = n(o.upFade, POOL_UP_FADE);
+      for (const l of current.lights) if (l.tune) l.tune(o);
+      applyLampGain(current.gain);
+    },
     stats: () => current && { ...current.stats, gain: current.gain, lights: current.lights.map(l => { const p = l.light.getWorldPosition(new l.light.position.constructor()); return { room: l.room, pool: !!l.pool, slot: l.slot, base: +l.base.toFixed(2), at: [p.x, p.y, p.z].map(v => +v.toFixed(2)) }; }) },
   };
 }
@@ -606,7 +615,9 @@ export function dressLevel(ctx) {
         light.userData.roomKey = `${lv.id}#${ri}`;
         light.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
         g.add(light, light.target);
-        s.lights.push({ light, base, room: room.name, pool: false, slot });
+        const entry: any = { light, base, room: room.name, pool: false, slot };
+        entry.tune = (o: any) => { entry.base = (pool ? LAMP_ROOM_FILL_K : (typeof o.fillK === 'number' ? o.fillK : ROOM_FILL_K)) * floorE * drop ** decay / Math.max(0.5, win); };
+        s.lights.push(entry);
         s.stats.lights++;
       }
       if (pool) {
@@ -620,7 +631,15 @@ export function dressLevel(ctx) {
         pl.userData.fixtureLight = true; pl.userData.lampPool = true; pl.userData.roomKey = `${lv.id}#${ri}`;
         pl.visible = !hideOffGain() || s.gain >= FILL_ON_GAIN;
         g.add(pl, pl.target);
-        s.lights.push({ light: pl, base: pbase, room: room.name, pool: true, slot });
+        const entry: any = { light: pl, base: pbase, room: room.name, pool: true, slot };
+        entry.tune = (o: any) => {
+          const I = typeof o.poolI === 'number' ? o.poolI : LAMP_POOL_I, mx = typeof o.poolMax === 'number' ? o.poolMax : LAMP_POOL_MAX;
+          entry.base = I * Math.min(mx, Math.sqrt(area) / 3);
+          const n = (v: any, d: number) => (typeof v === 'number' ? v : d);
+          pl.angle = n(o.poolAngle, LAMP_POOL_ANGLE); pl.penumbra = n(o.poolPenumbra, LAMP_POOL_PENUMBRA); pl.distance = n(o.poolReach, LAMP_POOL_REACH) * diag;
+          pl.decay = codedDecay(n(o.poolDecay, LAMP_POOL_DECAY), slot); pl.target.position.copy(local(cx, y + n(o.poolAimY, LAMP_POOL_AIM_Y), cz));
+        };
+        s.lights.push(entry);
         s.stats.lights++; s.stats.pools++;
       }
     }

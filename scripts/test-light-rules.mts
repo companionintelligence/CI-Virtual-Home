@@ -174,11 +174,11 @@ import { LAMP_ROOM_FILL_K, LAMP_POOL_I, LAMP_POOL_MAX, LAMP_POOL_REACH, LAMP_POO
 test('L3: the pool numbers (design 3.1) and the fill a lamp room keeps', () => {
   assert.equal(LAMP_ROOM_FILL_K, 0, 'the pool is the lamp room\'s light: no spot beside it, so the room costs one light');
   assert.ok(LAMP_ROOM_FILL_K < ROOM_FILL_K);
-  assert.equal(LAMP_POOL_DECAY, 1.6);
+  assert.equal(LAMP_POOL_DECAY, 2, 'the inverse square of a lamp: the far wall of the room is not lit like the wall beside it');
   assert.ok(LAMP_POOL_REACH > 0.5 && LAMP_POOL_REACH <= 1, 'the falloff reaches zero inside the room\'s diagonal');
   assert.ok(LAMP_POOL_I > 0 && LAMP_POOL_MAX >= 1);
   assert.equal(LAMP_POOL_PENUMBRA, 1, 'no cone edge: the whole cone is the falloff');
-  assert.ok(LAMP_POOL_ANGLE > 1.25 && LAMP_POOL_ANGLE < Math.PI / 2, 'a wide cone aimed into the room, not the omni light that blew the curtain and the pillow beside the lamp');
+  assert.ok(LAMP_POOL_ANGLE > 1.0 && LAMP_POOL_ANGLE < Math.PI / 2, 'a wide cone aimed into the room, not the omni light that blew the curtain and the pillow beside the lamp');
   assert.ok(LAMP_POOL_AIM_Y > 0.5 && LAMP_POOL_AIM_Y < 1.6);
 });
 
@@ -215,16 +215,18 @@ import { FINISH_ROLES as ROLES } from '../assets/props/finish-roles.js';
 
 test('the hours are ordered: night ambient <= dusk <= day, in raw hemisphere intensity and in luminance-weighted light', () => {
   const { day, dusk, night } = TIME_OF_DAY;
-  assert.ok(night.hemi.intensity <= dusk.hemi.intensity && dusk.hemi.intensity <= day.hemi.intensity, `hemisphere ${night.hemi.intensity} <= ${dusk.hemi.intensity} <= ${day.hemi.intensity}`);
+  // (v2 also pinned the RAW hemisphere intensity in order. v3 does not: dusk's hemisphere is a warm peach lit at 1.45 and day's a white-blue at 1.3, and what a
+  // surface receives is the luminance-weighted sum below, which is the order that means something; the raw number only said "less sky at night" in v2.)
   assert.ok(ambientOf(night) <= ambientOf(dusk) && ambientOf(dusk) <= ambientOf(day), `ambient ${ambientOf(night).toFixed(3)} <= ${ambientOf(dusk).toFixed(3)} <= ${ambientOf(day).toFixed(3)}`);
   assert.ok(night.env < dusk.env, 'the night sky image is dimmer than dusk\'s');
   assert.ok(night.sun.intensity < day.sun.intensity, 'and the sun is weaker than by day');
   assert.ok(ambientOf(night) > 0.15 && ambientOf(night) > ambientOf(dusk) * 0.4, 'night is dim, not black: shadows survive without a lamp');
 });
 
-test('night is moody and lamp-lit: hemisphere 1.0-1.1, a warm ground, env 0.30 kept', () => {
+test('night is lamp-lit: a cool sky over a warm ground, env 0.30 kept', () => {
   const n = TIME_OF_DAY.night, g = parseInt(n.hemi.ground.slice(1), 16);
-  assert.ok(n.hemi.intensity >= 1.0 && n.hemi.intensity <= 1.1, `hemisphere ${n.hemi.intensity}`);
+  assert.ok(n.hemi.intensity >= 1.2 && n.hemi.intensity <= 1.5, `hemisphere ${n.hemi.intensity}`);
+
   assert.ok(((g >> 16) & 255) > (g & 255), `ground ${n.hemi.ground} is warm (red above blue)`);
   assert.equal(n.env, 0.30);
   const s = parseInt(n.hemi.sky.slice(1), 16); assert.ok((s & 255) > ((s >> 16) & 255), 'the sky stays cool');

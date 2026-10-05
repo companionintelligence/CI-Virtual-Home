@@ -21,8 +21,21 @@
 
 export const MAX_SLOTS = 16;
 export const FADE = 0.5;               // m: the soft edge of an open side, measured inside the room
-export const MARGIN = 0;               // m: the box is the room's bounds (walls are centred on the bounds: the room's own face is 0.08 inside, the next room's 0.08 outside)
+export const MARGIN = 0;               // m: the box is the room's bounds (walls are centred on the bounds: the room's own face is 0.07 inside, the next room's 0.07 outside)
 export const DECAY_STEP = 0.0005;
+// A lamp pool (fixtures.ts) is a spot with a base decay above this; a room fill's is 1. The shader tells them apart by it (the coded decay is the one thing
+// a light carries into the fragment shader that nothing else touches).
+export const POOL_DECAY_MIN = 1.5;
+// What shapes a pool beyond the cone (LIGHT v3 item 2). A lamp is a lit shade 0.3 m across, not a point: `core` is the radius (m) inside which the
+// falloff stops climbing (1/(d^2 + core^2)^(decay/2) instead of 1/d^decay), so the wall, the pillow or the curtain a hand's breadth from the shade is lit and not
+// blown out, and the pool can carry the intensity that makes it read across the room. `halo` is the bounded wash a lamp throws on whatever is round it, the wall it
+// stands against and the ceiling above a table lamp, which a cone aimed into the room cannot reach: `haloK` of the pool's colour, at full strength at the lamp and
+// falling to nothing at `haloR` (m). Lambert still decides how much a surface takes. `upFade` (m): a lamp's shade throws its light out and down, and a ceiling
+// a metre over it is lit by what the room's own surfaces send up (environment.ts `bounce`), not by the lamp: the cone fades to nothing over fragments that far
+// above the lamp head (from 35 % of it), which is what stops a spot aimed into the room from painting the ceiling white. The halo is not faded, it is bounded
+// by its own radius. [core, haloR, haloK, upFade]; one array every lit material shares by reference.
+export const POOL_CORE = 0.45, POOL_HALO_R = 1.1, POOL_HALO_K = 0.25, POOL_UP_FADE = 1.3;
+export const POOL_DATA = new Float32Array([POOL_CORE, POOL_HALO_R, POOL_HALO_K, POOL_UP_FADE]);
 
 export interface Rect { x: number; z: number; w: number; d: number }
 export interface Seg { from: [number, number]; to: [number, number] }
@@ -115,8 +128,11 @@ const WORLD = `${GEOM}
 vec3 vhWorld = ( geometryPosition - viewMatrix[ 3 ].xyz ) * mat3( viewMatrix );`;
 const DECL = `
 uniform vec4 vhClip[ ${MAX_SLOTS} ];
+uniform vec4 vhPool;
 float vhSide( float d, float open ) { return open > 0.5 ? smoothstep( 0.0, ${FADE.toFixed(2)}, d ) : step( 0.0, d ); }
-void vhRoomClip( const in float decay, const in vec3 w, inout IncidentLight light ) {
+// \`lv\`: from the fragment to the light (view space), \`lc\`: the light's colour before any attenuation (intensity included)
+void vhRoomClip( const in float decay, const in vec3 w, inout IncidentLight light, const in vec3 lv, const in vec3 lc ) {
+	if ( dot( lc, vec3( 1.0 ) ) <= 0.0 ) return;   // a light that is off adds nothing: skip its box and its pool (every room light by day)
 	float c = decay * 100.0;
 	float n = floor( ( c - floor( c ) ) / 0.05 + 0.5 );
 	if ( n < 1.0 || n > ${MAX_SLOTS}.0 ) return;
@@ -128,6 +144,13 @@ void vhRoomClip( const in float decay, const in vec3 w, inout IncidentLight ligh
 	float m = vhSide( w.x - ( b.x - hw * ${XZ_UNIT} ), xo ) * vhSide( ( b.x + hw * ${XZ_UNIT} ) - w.x, xp )
 	        * vhSide( w.z - ( b.y - hd * ${XZ_UNIT} ), zo ) * vhSide( ( b.y + hd * ${XZ_UNIT} ) - w.z, zp )
 	        * step( 0.0, w.y - ( yl * ${Y_UNIT} - ${Y_BASE.toFixed(1)} ) ) * step( 0.0, ( yh * ${Y_UNIT} - ${Y_BASE.toFixed(1)} ) - w.y );
+	if ( c >= ${(POOL_DECAY_MIN * 100).toFixed(1)} && m > 0.0 ) {
+		float d2 = dot( lv, lv );
+		float h = clamp( 1.0 - sqrt( d2 ) / vhPool.y, 0.0, 1.0 );
+		float up = 1.0 - smoothstep( 0.35 * vhPool.w, vhPool.w, - ( lv * mat3( viewMatrix ) ).y );
+		light.color = light.color * pow( d2 / ( d2 + vhPool.x * vhPool.x ), decay * 0.5 ) * up + lc * ( vhPool.z * h * h );
+		light.visible = dot( light.color, vec3( 1.0 ) ) > 0.0;
+	}
 	light.color *= m;
 	if ( m <= 0.0 ) light.visible = false;
 }
@@ -153,15 +176,15 @@ export function installRoomClip(THREE: any): boolean {
   }
   // on the side, then taken over only if all of it applied
   let text = begin.replace(GEOM, WORLD)
-    .replace(POINT_INFO, `${POINT_INFO}\n\t\tvhRoomClip( pointLight.decay, vhWorld, directLight );`)
-    .replace(SPOT_INFO, `${SPOT_INFO}\n\t\tvhRoomClip( spotLight.decay, vhWorld, directLight );`);
+    .replace(POINT_INFO, `${POINT_INFO}\n\t\tvhRoomClip( pointLight.decay, vhWorld, directLight, pointLight.position - geometryPosition, pointLight.color );`)
+    .replace(SPOT_INFO, `${SPOT_INFO}\n\t\tvhRoomClip( spotLight.decay, vhWorld, directLight, spotLight.position - geometryPosition, spotLight.color );`);
   // BRDF only where a light reaches (the spot and point loops come before the directional one). A light a fragment is clipped from, or one at
   // intensity 0 (every room light by day, see fixtures.ts hideOffGain), adds exactly +0, so the picture is the same bit for bit; without the
   // branch sixteen of them cost sixteen Lambert + GGX evaluations a fragment for nothing. light-guard.ts does this for the live player;
   // wrapping again there is harmless (the text it looks for is still there, twice).
   const cut = text.indexOf('#if ( NUM_DIR_LIGHTS > 0 )');
   if (cut > 0) text = text.slice(0, cut).split(MARK).join(`if ( directLight.visible ) { ${MARK} }`) + text.slice(cut);
-  for (const k of SHADER_LIBS) THREE.ShaderLib[k].uniforms.vhClip = { value: CLIP_DATA };
+  for (const k of SHADER_LIBS) { THREE.ShaderLib[k].uniforms.vhClip = { value: CLIP_DATA }; THREE.ShaderLib[k].uniforms.vhPool = { value: POOL_DATA }; }
   C.lights_pars_begin = pars + DECL;
   C.lights_fragment_begin = text;
   installed = true;

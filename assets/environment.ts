@@ -55,6 +55,8 @@ export type Preset = {
   sunGlow: number;
   bloom: { strength: number; radius: number; threshold: number };
   grade: { contrast: number; saturation: number; vignette: number };
+  /** look 2's white balance: how far toward neutral the frame is corrected (0 none, 1 fully; default 0.75). Dusk is held back so a warm hour stays warm (LIGHT v3). */
+  wb?: number;
 };
 
 export const TIME_OF_DAY: Record<string, Preset> = {
@@ -101,7 +103,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     label: 'Night',
     sky: ['#0b1731', '#424b64', '#17202a'],
     sun: { color: '#bed5ff', intensity: 0.35, elevation: 38, swing: 40 },
-    hemi: { sky: '#829fc9', ground: '#6a5a4e', intensity: 1.05 },
+    hemi: { sky: '#829fc9', ground: '#6a5a4e', intensity: 1.4 },
     fill: { color: '#8aa2c9', intensity: 0.22 },
     ambient: 0,
     exposure: 0.85, env: 0.30,
@@ -174,13 +176,13 @@ export function lookOf(p: Preset, look: Look = 1): Preset & { envSky?: [string, 
     grade: { ...p.grade, saturation: Math.max(p.grade.saturation, 0.86) },
   };
   // white balance: what a white wall facing the sun reads under this light (sRGB-ish linear weights), corrected
-  // three-quarters of the way toward neutral (the exponent 0.75 below) and normalised to luma 1, so exposure is untouched;
+  // three-quarters (p.wb) of the way toward neutral (the exponent 0.75 below) and normalised to luma 1, so exposure is untouched;
   // scripts/test-kit-look.mts measures the result on a white and a cobalt wall
   const lin = (c: string) => { const n = hexOf(c); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => (v / 255) ** 2.2); };
   const sun = lin(q.sun.color), hs = lin(q.hemi.sky), hg = lin(q.hemi.ground);
   const W = [0, 1, 2].map(k => sun[k] * q.sun.intensity * 0.5 + hs[k] * q.hemi.intensity * 0.5 + hg[k] * q.hemi.intensity * 0.2);
   const Y = 0.2126 * W[0] + 0.7152 * W[1] + 0.0722 * W[2];
-  const bal = W.map(w => Math.pow(Y / Math.max(w, 1e-6), 0.75));
+  const bal = W.map(w => Math.pow(Y / Math.max(w, 1e-6), typeof p.wb === 'number' ? p.wb : 0.75));
   const bY = 0.2126 * bal[0] + 0.7152 * bal[1] + 0.0722 * bal[2];
   q.balance = bal.map(v => +(v / bY).toFixed(4)) as [number, number, number];
   return q;
