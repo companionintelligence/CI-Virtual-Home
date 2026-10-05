@@ -36,6 +36,7 @@ import { hostOf, freeRects, standingOn, nearOn, fitIn, footprintIn, coverIn, toW
 import { dressSchemeOf, type DressScheme } from './house-scheme-dress.js';
 import { RECIPES, BASE_COUNT, windowTypes, type Recipe } from './dress-recipes.js';
 import { planCafe, CURTAIN_PAD, VPAD, type Panel } from './dress-curtains.js';
+import { leafStrips, leafSensitive } from './dress-leaves.js';
 
 export const DRESS_SRC = 'dress@1';
 export const isDress = (it: any): boolean => !!it && it.src === DRESS_SRC;
@@ -77,6 +78,8 @@ export class Dresser {
   readonly eyes: CornerEye[];
   /** the café curtains the `windows` slot will hang (planned before any slot runs, against the layout), and the volume each takes: nothing else stands in it */
   readonly panels: Panel[];
+  /** where the storey's open door leaves park (assets/dress-leaves.ts): nothing the scene check counts as in a leaf's way stands in them */
+  readonly leaves: Obb[];
   private keep: Array<{ o: Obb; y0: number; y1: number }>;
   private off: Set<string>; private viaGroup = new Map<any, Group>(); private ord = new Map<string, number>(); private composer: Composer | null = null; private composedItems: Map<any, any[]>;
 
@@ -96,6 +99,11 @@ export class Dresser {
     // layout alone: whatever the level and whether or not `windows` is switched off, so a lower level places what a higher one places first and no slot moves another (test C)
     this.panels = windowTypes(program) ? planCafe(analyzeRoom(spec, lv, room), base, this.eyes) : [];
     this.keep = this.panels.map(p => ({ o: p.obb, y0: p.hem, y1: p.top }));
+    this.leaves = leafStrips(spec, lv);
+  }
+  /** does a piece of this type and height, on this footprint (grown by `grow`), stand in the strip an open door leaf parks in */
+  inLeaf(o: Obb, type: string, h: number, grow = 0): boolean {
+    return leafSensitive(type, h) && this.leaves.some(l => overlap({ ...o, hw: o.hw + grow, hd: o.hd + grow }, l) > 0);
   }
   /** the café curtains this room's `windows` slot hangs */
   curtainPanels(): Panel[] { return this.panels; }
@@ -161,6 +169,8 @@ export class Dresser {
     // a piece tall enough to reach a planned curtain keeps out of the cloth's volume, its pad and its own reach round it
     { const y0 = h.top + (o.lift || 0) + (s.y0 || 0), y1 = y0 + s.h + VPAD;
       for (const k of this.keep) if (y1 > k.y0 - CURTAIN_PAD && y0 < k.y1 + CURTAIN_PAD) { const z = coverIn(h, k.o, CURTAIN_PAD + reachOf(type) + 0.004); free = free.flatMap(r => subtract(r, z)); } }
+    // and out of the strips an open leaf parks in, if the scene check would count it (not foliage, over 0.3 m)
+    if (leafSensitive(type, s.h)) for (const l of this.leaves) { const z = coverIn(h, l, 0.02 + reachOf(type)); free = free.flatMap(r => subtract(r, z)); }
     let c: [number, number] | null;
     if (o.at) {
       c = o.at;
@@ -209,7 +219,7 @@ export class Dresser {
     if (!this.open(slot)) return null;
     if (!this.afford(tier, cost)) { this.skip(slot, 'the room budget is spent'); return null; }
     const c = this.comp(), prev = g.accept;
-    g.accept = items => (!prev || prev(items)) && !items.some(ci => this.inTheWay(ci) || this.inTheCloth(ci));
+    g.accept = items => (!prev || prev(items)) && !items.some(ci => this.inTheWay(ci) || this.inTheCloth(ci) || this.inLeaf(ci.box, ci.type, ci.h, 0.02));
     if (!g.cands.length || !c.place(g)) { this.skip(slot, `${g.name}: no place in the room (lanes, doors, windows and the furniture hold)`); return null; }
     const ci = (g.items || [])[0]; if (!ci) return null;
     const n = this.ord.get(slot) ?? 0, [dx, dz] = turn(ci.ox, ci.oz, ci.rot);

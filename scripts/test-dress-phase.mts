@@ -20,7 +20,7 @@
 //                   eye line clear unless the window is small, is a pale cloth and not a dark slab; and the first cut's params fail the same measurement (a control)
 //   K  corner keep-out  the dress pieces of all 30 houses (pilot level 0.5) and the fixtures stay out of the rig's corner cameras' way: the camera points are the rig's
 //                   own `cornerCam` (the Node copy in assets/ is compared with it), no dress piece within 0.3 m of an eye (3-D, at the 1.5 m eye), no floor piece
-//                   taller than 0.8 m inside a 0.5 m corner square; and the lamp census holds (105 lamp-less rooms lit before the keep-out, never fewer)
+//                   taller than 0.8 m inside a 0.5 m corner square; and the lamp census holds (105 lamp-less rooms lit before the corner keep-out, 102 after the leaf strips of R)
 //   L  neighbour gap  no dress item stands under 1.5 cm from another item on its surface (authored, composed or dressed, an item with no `y` at the page's DESK_TOP
 //                   included), by the layout lint and by an independent obb measure over the 30 houses baked and the fixtures; the 12 cases the skeptic found are fixed;
 //                   and the lint sees the flower-jug case the first cut did not (a control)
@@ -28,6 +28,9 @@
 //                   measured the table over 1000), and no spilling type is missing
 //   Q  in the room    every dress item's origin is within 0.5 m of its room's bounds: a host drawn across the edge of a small room (palnknoll's Outdoor Kitchen counter) is
 //                   dressed only near the room, the validator's "lies outside room" (0.6 m) never fires on a dress item
+//   R  door leaves   no dress piece the scene check counts (not foliage, not hung in its wall, over 0.3 m) stands in the strip an open door leaf parks in, for any door of its
+//                   storey that may carry one (a partition's, an opening's, both jambs): the five pieces the scene check found in a leaf's way (three robe hooks, an umbrella stand,
+//                   a floor lamp) are in the strips, and no piece of the 30 houses baked is; the scene gate's warning count (baked == unbaked) is dress-fleet's neighbour, run by hand
 //   P  bake hygiene  a baked house raises no warning its unbaked self does not: the validator's warning count (the `dk` seed key a dress item carries is a declared item key
 //                   like `src`) and the layout lint's silent-param count are equal before and after the bake, for all 30 houses; and a dress item's `dk` is the one key
 //                   no builder reads (a control: a key made up fails the same measurement)
@@ -54,6 +57,7 @@ import { dressSchemeOf } from '../assets/house-scheme-dress.js';
 import { RECIPES, CAFE, cafeFit } from '../assets/dress-recipes.js';
 import { PARTS, CURTAIN_GAP, curtainObb, planCafe, DRESSERS } from '../assets/dress-curtains.js';
 import { surfaceTypes, spillOf } from './dress-reach.mts';
+import { leafStrips, leafSensitive } from '../assets/dress-leaves.js';
 import { cornerEyes, eyeGap, camBlocked, CAM, hostOf, footprintIn, nearOn, freeRects, reachOf, standingOn as standingOnHost, surfaceY, neighbourGap, rectGap, toWorld, MIN_GAP, NEIGHBOUR_GAP, DESK_TOP, REACH } from '../assets/room-dress-hosts.js';
 import { cornerCam } from './review/cameras.mts';
 import { standingOn, rectArea } from '../assets/room-dress-hosts.js';
@@ -395,10 +399,11 @@ test('K: the rig\'s corner camera points are the Node copy\'s, and nothing the p
   }
   assert.ok(cams >= 800, `${cams} corner cameras were measured: the fleet's rooms`);
   console.log(`K: ${cams} corner cameras over the 30 houses and the fixtures, none within 0.3 m of a dress piece (${near} pieces between 0.3 and 0.6 m); lamp census: ${lamps.asks} rooms ask, ${lamps.lampless} lamp-less in the layout, ${lamps.lit} lit by the phase`);
-  // the shipped houses' census before the keep-out: 105 of 132 lit (wave6/dress-lamps.tsv); the fixtures add their own rooms on top
+  // the shipped houses' census: 105 of 132 lit before the leaf strips (wave6/dress-lamps.tsv); the strips an open door leaf parks in cost three (bghouse-olcia's Lower Hall, seraphine's
+  // Entry Hall, sunnyhome's Kitchen: a lamp stood where the scene check found a leaf swinging into it); the fixtures add their own rooms on top
   const ship = houses.map(h => lampLit(load(h.file))).reduce((a, l) => ({ asks: a.asks + l.asks, lampless: a.lampless + l.lampless, lit: a.lit + l.lit }), { asks: 0, lampless: 0, lit: 0 });
   assert.equal(ship.lampless, 132, 'the layout leaves 132 lamp-less rooms in the 30 houses');
-  assert.ok(ship.lit >= 105, `the lamp census lost rooms to the keep-out: ${ship.lit} lit, 105 before`);
+  assert.ok(ship.lit >= 102, `the lamp census lost rooms to the keep-outs: ${ship.lit} lit, 105 before the leaf strips`);
 });
 
 test('K2 (control): a fiddle-leaf in the corner is in the way, a low basket is not, and the 0.3 m ring is where the rig says', () => {
@@ -724,3 +729,30 @@ function HOSTS_OF_NOTE(it: any, b: { x: number; z: number; w: number; d: number 
   const h = hostOf(it); if (!h) return false;
   return h.rects.some(r => { const [x0, z0] = toWorld(h, r[0], r[1]), [x1, z1] = toWorld(h, r[2], r[3]); return Math.min(x0, x1) < b.x - 0.5 || Math.max(x0, x1) > b.x + b.w + 0.5 || Math.min(z0, z1) < b.z - 0.5 || Math.max(z0, z1) > b.z + b.d + 0.5; });
 }
+
+// ---- R: a dress piece is out of the strips an open door leaf parks in -----------------------------------------------------------------------
+test('R: no dress piece the scene check counts stands in a door leaf\'s parking strip (the five it found are in the strips)', () => {
+  // the five pieces the first cut stood in a leaf's way (scene QA leaf-in-lane on the pilot bakes: "swings into robe-hook", "swings into umbrella-stand", "swings into floor-lamp")
+  const old: Array<[string, string, string, [number, number]]> = [['epiphany', 'l1', 'robe-hook', [2.43, 1.527]], ['flowerycottage', 'l1', 'robe-hook', [-1.46, 4.073]], ['mesamariposa', 'l2', 'robe-hook', [-3.97, -0.127]],
+    ['seraphine', 'l1', 'umbrella-stand', [2.995, 5.31]], ['bghouse-olcia', 'l1', 'floor-lamp', [0.711, -2.016]]];
+  for (const [h, lvId, type, at] of old) {
+    const spec = load(path.join(ROOT, 'content', 'houses', `${h}.json`)), lv = spec.levels.find((l: any) => l.id === lvId), o = itemObb({ type, at })!;
+    assert.ok(leafSensitive(type, sizeOf(type, {})!.h), `${type} counts for the scene check`);
+    assert.ok(leafStrips(spec, lv).some(st => overlap({ ...o, hw: o.hw + 0.02, hd: o.hd + 0.02 }, st) > 0), `${h}: the first cut's ${type} at ${at} is in no leaf strip`);
+  }
+  let checked = 0, strips = 0;
+  for (const { id, spec } of fleet()) {
+    const res = dressRooms(spec);
+    for (const lv of spec.levels) {
+      const st = leafStrips(spec, lv); strips += st.length;
+      for (const room of lv.rooms || []) for (const it of res.get(room)?.items || []) {
+        // (a café curtain hangs at its window, 4 mm off the wall, planned by assets/dress-curtains.ts: none of the 52 trips the scene check, which is the gate that sees it)
+        if (it.type === 'cafe-curtain') continue;
+        const s = sizeOf(it.type, it), o = itemObb(it); if (!s || !o || !leafSensitive(it.type, s.h)) continue;
+        checked++;
+        assert.ok(!st.some(t => overlap(o, t) > 0), `${id}/${room.name}: ${it.type} at ${it.at} stands in a door leaf's parking strip`);
+      }
+    }
+  }
+  assert.ok(strips >= 150 && checked >= 250, `${strips} strips, ${checked} pieces checked`);
+});
