@@ -30,7 +30,8 @@
 //                    on a counter)
 //   dress-floating   a dress item (src dress@1, plan 5.6) that is not on a host of the dress registry (assets/room-dress-hosts.ts), hangs over its
 //                    edge by more than 1 cm, or is not at the host's top
-//   dress-overlap    two surface items on one host whose footprints overlap, one of them a dress item
+//   dress-overlap    two surface items on one host, one of them a dress item, whose footprints overlap or stand under MIN_GAP (1.5 cm) apart (the other
+//                    may be authored, composed or dressed: a candle against the table's own flower-jug reads as one object)
 //   dress-lane       a dress item that closes a lane the room's other furniture leaves open
 //   dress-bare       a dressed room (it has dress items, or opts in) that its program's never-bare rule still finds bare
 //
@@ -48,7 +49,7 @@ import { composeHouse, layerOf, snapWallMount, stackOnSurface } from './room-com
 import { houseStairs, levelStairs } from './stairs.js';
 import { isComposed, isProgram } from './room-programs.js';
 import { dressHouse, dressOff, dressOptIn, isDress, bareViolation } from './room-dress.js';
-import { hostOf, footprintIn, standingOn } from './room-dress-hosts.js';
+import { hostOf, footprintIn, standingOn, rectGap, MIN_GAP } from './room-dress-hosts.js';
 
 /** What a room of each program cannot do without: each anchor is satisfied by `n` items (default 1) with any of the roles
  *  (assets/props/placement.ts). The composer's essentials (its `missing`), the `missing-anchor` lint and the composer's
@@ -135,8 +136,9 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
           for (const o of standingOn(under, items)) {
             if (o === it) continue;
             const g = footprintIn(under, o); if (!g) continue;
-            const ox = Math.min(f[2], g[2]) - Math.max(f[0], g[0]), oz = Math.min(f[3], g[3]) - Math.max(f[1], g[1]);
-            if (ox > 0.005 && oz > 0.005 && (!isDress(o) || String(o.dk) < String(it.dk)) && Math.abs((o.y ?? 0) - (it.y ?? 0)) < 0.02) add('dress-overlap', `${it.type} at ${fmt(it.at)} and ${o.type} at ${fmt(o.at)} overlap on the ${under.type}`, lv, room);
+            const gap = rectGap(f, g);
+            // (two dress items are reported once, from the later one)
+            if (gap < MIN_GAP && (!isDress(o) || String(o.dk) < String(it.dk))) add('dress-overlap', `${it.type} at ${fmt(it.at)} and ${o.type} at ${fmt(o.at)} ${gap < 0.005 && gap > -0.005 ? 'touch' : gap < 0 ? 'overlap' : `stand ${(gap * 1000).toFixed(0)} mm apart`} on the ${under.type} (under ${MIN_GAP * 100} cm)`, lv, room);
           }
         }
         const bare = bareViolation(room.program || null, items, room);

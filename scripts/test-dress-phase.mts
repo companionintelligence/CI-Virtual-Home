@@ -21,6 +21,10 @@
 //   K  corner keep-out  the dress pieces of all 30 houses (pilot level 0.5) and the fixtures stay out of the rig's corner cameras' way: the camera points are the rig's
 //                   own `cornerCam` (the Node copy in assets/ is compared with it), no dress piece within 0.3 m of an eye (3-D, at the 1.5 m eye), no floor piece
 //                   taller than 0.8 m inside a 0.5 m corner square; and the lamp census holds (105 lamp-less rooms lit before the keep-out, never fewer)
+//   L  neighbour gap  no dress item stands under 1.5 cm from another item on its surface (authored, composed or dressed, an item with no `y` at the page's DESK_TOP
+//                   included), by the layout lint and by an independent obb measure over the 30 houses baked and the fixtures; the 12 cases the skeptic found are fixed;
+//                   and the lint sees the flower-jug case the first cut did not (a control)
+//   M  reach          REACH (how far a small good's built mesh passes its measured box) holds over 24 fresh seeds of every surface type, and no spilling type is missing
 //
 // @check-house node-test
 // @check-house quick
@@ -37,9 +41,9 @@ import { composeHouse, layerOf } from '../assets/room-composer.js';
 import { dressHouse, dressRooms, dressOff, dressOptIn, dressProgram, isDress, bareViolation, Dresser, DRESS_SRC } from '../assets/room-dress.js';
 import { dressSchemeOf } from '../assets/house-scheme-dress.js';
 import { RECIPES, CAFE, cafeFit } from '../assets/dress-recipes.js';
-import { cornerEyes, eyeGap, camBlocked, CAM } from '../assets/room-dress-hosts.js';
+import { cornerEyes, eyeGap, camBlocked, CAM, hostOf, footprintIn, standingOn as standingOnHost, surfaceY, neighbourGap, rectGap, toWorld, MIN_GAP, NEIGHBOUR_GAP, DESK_TOP, REACH } from '../assets/room-dress-hosts.js';
 import { cornerCam } from './review/cameras.mts';
-import { hostOf, footprintIn, standingOn, rectArea } from '../assets/room-dress-hosts.js';
+import { standingOn, rectArea } from '../assets/room-dress-hosts.js';
 import { lintLayout } from '../assets/layout-lint.js';
 import { PLACEMENT } from '../assets/props/placement.js';
 import { PROPS } from '../assets/props/index.js';
@@ -391,4 +395,111 @@ test('K2 (control): a fiddle-leaf in the corner is in the way, a low basket is n
   assert.ok(!camBlocked(eyes, obb(0.55, 1.2, 0.3, 0.3), 0, 1.7, true), 'a lamp 0.5 m away');
   assert.ok(!camBlocked(eyes, obb(0.55, 0.7, 0.4, 0.4), 0.9, 1.1, false), 'a counter piece 0.4 m under the eye is no obstacle');
   assert.ok(eyeGap(obb(0.55, 1.0, 0.1, 0.1), 0, 1.7, nw) > 0.39 && eyeGap(obb(0.55, 1.0, 0.1, 0.1), 0, 1.7, nw) < 0.41);
+});
+
+// ---- L: the gap to a neighbour ----------------------------------------------------------------------------------------------------------
+/** gap between two obbs (polygon to polygon, 0 when they touch or cross): independent of the rect cover the lint and the packer use */
+function obbGap(a: ReturnType<typeof obb>, b: ReturnType<typeof obb>): number {
+  const pa = corners(a), pb = corners(b);
+  const seg = (p: [number, number], u: [number, number], v: [number, number]) => { const ex = v[0] - u[0], ez = v[1] - u[1], t = Math.max(0, Math.min(1, ((p[0] - u[0]) * ex + (p[1] - u[1]) * ez) / (ex * ex + ez * ez))); return Math.hypot(p[0] - u[0] - t * ex, p[1] - u[1] - t * ez); };
+  if (overlap(a, b) > 0) return 0;
+  let g = Infinity;
+  for (const [P, Q] of [[pa, pb], [pb, pa]] as const) for (const p of P) for (let i = 0; i < 4; i++) g = Math.min(g, seg(p, Q[i], Q[(i + 1) % 4]));
+  return g;
+}
+/** a house with its dress items baked into its rooms (what compose-house.mts --dress writes), and the items per room as the lint reads them */
+function bakedItems(spec: any): Map<any, any[]> {
+  const comp = composeHouse(spec), res = dressRooms(spec), out = new Map<any, any[]>();
+  for (const { room } of rooms(spec)) out.set(room, [...(room.items || []).filter((x: any) => !isDress(x)), ...((comp.get(room) || { items: [] }).items), ...(res.get(room)?.items || [])]);
+  return out;
+}
+test('L: no dress item stands under 1.5 cm from another item on its surface, by the lint and by an independent measure', () => {
+  let pairs = 0, tight = 0;
+  for (const { id, spec } of fleet()) {
+    const all = bakedItems(spec);
+    const issues = lintLayout(spec, { only: new Set(['dress-overlap']), items: all });
+    assert.deepEqual(issues.map(i => i.message), [], `${id}: dress-overlap findings`);
+    for (const { room } of rooms(spec)) {
+      const items = all.get(room) || [], hosts = items.map(hostOf).filter((h: any) => !!h) as any[];
+      for (const h of hosts) {
+        const on = standingOnHost(h, items);
+        for (let i = 0; i < on.length; i++) for (let j = i + 1; j < on.length; j++) {
+          if (!isDress(on[i]) && !isDress(on[j])) continue;
+          const A = itemObb(on[i]), B = itemObb(on[j]); if (!A || !B) continue;
+          pairs++;
+          const g = obbGap(A, B);
+          if (g < 0.03) tight++;
+          assert.ok(g >= MIN_GAP, `${id}/${room.name}: ${on[i].type}${isDress(on[i]) ? '*' : ''} and ${on[j].type}${isDress(on[j]) ? '*' : ''} stand ${(g * 1000).toFixed(1)} mm apart on the ${h.type}`);
+        }
+      }
+    }
+  }
+  assert.ok(pairs >= 400, `${pairs} pairs measured`);
+  console.log(`L: ${pairs} neighbouring pairs (a dress item and another) over the 30 houses baked and the fixtures, none under ${MIN_GAP * 100} cm (${tight} between 1.5 and 3 cm)`);
+});
+
+test('L2: the 12 neighbours the skeptic found under 1 cm are fixed (the pair is apart by 1.5 cm or the dress piece is not there)', () => {
+  // [house, room, the dress piece, its neighbour]: built-geometry gaps of 0-9 mm on the first cut
+  const cases: Array<[string, string, string, string, number]> = [
+    ['aurora', 'Dining', 'candle-trio', 'vase', 1], ['dress-kitchens', 'Kitchen-dining, terrazzo', 'centerpiece', 'ceramic-bowl', 1], ['dress-kitchens', 'Kitchen-dining, terrazzo', 'place-setting', 'place-setting', 4],
+    ['lakecabin', 'Dining', 'candle-trio', 'flower-jug', 1], ['lakecabin', 'Dining', 'place-setting', 'flower-jug', 1], ['neweco', 'Breakfast Nook', 'candle-trio', 'place-setting', 1], ['neweco', 'Breakfast Nook', 'place-setting', 'candle-trio', 2],
+    ['neweco', 'Sunroom Lounge', 'side-set', 'ginger-lamp', 1],
+  ];
+  let covered = 0;
+  for (const [house, roomName, mine, theirs, n] of cases) {
+    const spec = FIX.includes(house) ? fixture(house) : load(path.join(ROOT, 'content', 'houses', `${house}.json`)), all = bakedItems(spec);
+    const room = rooms(spec).find(({ room }: any) => room.name === roomName)!.room, items = all.get(room) || [];
+    const hosts = items.map(hostOf).filter((h: any) => !!h) as any[];
+    let seen = 0;
+    for (const h of hosts) {
+      const on = standingOnHost(h, items);
+      for (const it of on.filter((x: any) => isDress(x) && x.type === mine)) for (const o of on) {
+        if (o === it || o.type !== theirs) continue;
+        seen++; const g = obbGap(itemObb(it)!, itemObb(o)!);
+        assert.ok(g >= MIN_GAP, `${house}/${roomName}: the ${mine} stands ${(g * 1000).toFixed(1)} mm from the ${theirs}`);
+      }
+    }
+    covered += n; void seen;
+  }
+  assert.equal(covered, 12, 'the 12 cases of the skeptic');
+});
+
+test('L3 (control): the flower-jug the first cut could not see, and the lint that did not see it', () => {
+  // lakecabin's Dining table carries an authored flower-jug with no `y` (the page builds it at DESK_TOP 0.77): the first cut's standingOn needed a `y`
+  assert.equal(DESK_TOP, 0.77);
+  const spec = load(path.join(ROOT, 'content', 'houses', 'lakecabin.json')), room = rooms(spec).find(({ room }: any) => room.name === 'Dining')!.room;
+  const jug = (room.items as any[]).find(x => x.type === 'flower-jug'), table = (room.items as any[]).find(x => x.type === 'trestle-table'), h = hostOf(table)!;
+  assert.equal(jug.y, undefined); assert.equal(surfaceY(jug), DESK_TOP);
+  assert.ok(standingOnHost(h, [jug]).length === 1, 'the jug stands on the table');
+  // a dress candle-trio 8 mm from the jug's footprint (in the host's frame, to its right), at the table's top
+  const f = footprintIn(h, jug)!, ct = sizeOf('candle-trio', {})!, lx = f[2] + 0.008 + ct.w / 2, lz = (f[1] + f[3]) / 2;
+  const [wx, wz] = toWorld(h, lx, lz), trio = { type: 'candle-trio', at: [wx, wz], rot: h.rot, y: h.top, src: DRESS_SRC, dk: 'x:control:0' };
+  const nb = neighbourGap(h, trio, standingOnHost(h, [jug, trio]))!;
+  assert.ok(nb.gap > 0.006 && nb.gap < MIN_GAP, `the control gap is ${nb.gap}`);
+  const map = new Map<any, any[]>(rooms(spec).map(({ room: r }: any) => [r, r === room ? [...r.items, trio] : (r.items || [])] as [any, any[]]));
+  const found = lintLayout(spec, { only: new Set(['dress-overlap']), items: map });
+  assert.ok(found.length === 1 && /candle-trio/.test(found[0].message) && /flower-jug/.test(found[0].message), `the lint sees the control: ${JSON.stringify(found.map(i => i.message))}`);
+  // 2 cm apart: no finding
+  const trio2 = { ...trio, at: toWorld(h, f[2] + 0.021 + ct.w / 2, lz) };
+  assert.equal(lintLayout(spec, { only: new Set(['dress-overlap']), items: new Map<any, any[]>(rooms(spec).map(({ room: r }: any) => [r, r === room ? [...r.items, trio2] : (r.items || [])] as [any, any[]])) }).length, 0);
+  assert.ok(NEIGHBOUR_GAP > MIN_GAP, 'the packer keeps more than the lint demands');
+  void rectGap;
+});
+
+test('M: REACH holds, over 24 fresh seeds of every type that stands on a surface', () => {
+  const seen: Record<string, number> = {};
+  for (const [type, def] of PROPS as Map<string, any>) {
+    const pl: any = PLACEMENT[type]; if (!((pl && pl.onSurface) || def.surface)) continue;
+    const s0 = sizeOf(type, {}); if (!s0) continue;
+    let worst = 0;
+    for (let k = 0; k < 24; k++) {
+      const o = def.create({ type }, { THREE, std: bcx.std, box: bcx.box, group: bcx.group, mix: bcx.mix, hex: bcx.hex, colors: kitx.colors, rng: kitx.itemRng(`reach${k}:${type}`), H: 2.8 });
+      o.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(o), ox = s0.ox || 0, oz = s0.oz || 0;
+      worst = Math.max(worst, b.max.x - (ox + s0.w / 2), (ox - s0.w / 2) - b.min.x, b.max.z - (oz + s0.d / 2), (oz - s0.d / 2) - b.min.z);
+    }
+    seen[type] = worst;
+    assert.ok(worst <= (REACH[type] || 0.002) + 1e-9, `${type}: the built mesh passes its measured box by ${(worst * 1000).toFixed(1)} mm, REACH says ${((REACH[type] || 0) * 1000).toFixed(0)}`);
+  }
+  for (const t of Object.keys(REACH)) assert.ok(t in seen, `REACH names ${t}, which is no surface type`);
+  assert.ok(Object.keys(seen).length >= 60, `${Object.keys(seen).length} surface types measured`);
 });

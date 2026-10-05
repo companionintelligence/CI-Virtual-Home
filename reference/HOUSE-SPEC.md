@@ -589,7 +589,7 @@ clear of the 1.45-1.55 m eye line wherever the window leaves room), in the house
 | garage, gym, greenhouse, outdoor | nothing: no dress type exists for them yet (BAKE's types) |
 
 The never-bare rule of a program (`bareViolation`): a bath, ensuite or powder has 3 dress items and a towel object, a dining room a set table, a kitchen 4 counter
-clusters, a hall of 8 m2 or more 3 dress items. The layout lints add `dress-floating` (not on a registry host, over its edge, not at its top), `dress-overlap`,
+clusters, a hall of 8 m2 or more 3 dress items. The layout lints add `dress-floating` (not on a registry host, over its edge, not at its top), `dress-overlap` (a dress item under 1.5 cm from another item on its surface, authored, composed or dressed; the packer keeps 2 cm plus how far each piece's built mesh reaches past its measured box, `REACH`),
 `dress-lane` and `dress-bare`. Every choice draws from `mulberry32(fnv1a("<spec id>:<room>:dress:<slot>:<n>"))`, and the page seeds a dress item from `kit.itemRng("dress:" + dk)`:
 a stream keyed by the item alone that never takes a `propIndex`, so adding, moving or removing a dress item moves no other prop's colour or jitter.
 

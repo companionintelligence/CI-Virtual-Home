@@ -11,7 +11,8 @@
 //   DROPPED    type -> why it is NOT a host: a type the phase will not dress, with the reason the test re-checks (never guessed in)
 //   hostOf(item)        the host an item is, in world terms (origin, rot, top, rects), or null
 //   hostRects(host)     its rects as world-aligned obbs
-//   freeRects(host, on, margin)   the host's rects minus the footprints of what already stands on it, minus `margin` all round
+//   freeRects(host, on, margin, gap)   the host's rects minus the footprints of what already stands on it (grown by `gap`, at least NEIGHBOUR_GAP), minus `margin` all round
+//   neighbourGap(host, item, on)       the smallest gap between an item's footprint and the others on the host (negative: they overlap); MIN_GAP is what the lint demands
 //   fitIn(free, w, d, anchor)     where a w x d box fits in the free rects (host frame), or null
 //
 // A host with a body of its own on top that the page seeds (a console's bowl, a sideboard's vases, a nightstand's decor: `rng() * (w - 0.5)`, from a stream
@@ -19,6 +20,7 @@
 //
 // Owner: DRESS.
 import { PLACEMENT } from './props/placement.js';
+import { PROPS } from './props/index.js';
 import { sizeOf, itemObb, obb, turn, mm, overlap, rectObb, type Size, type Obb } from './room-geo.js';
 
 export type Rect = [number, number, number, number];
@@ -148,25 +150,76 @@ export function subtract(r: Rect, h: Rect): Rect[] {
 /** drop the rects another contains */
 const prune = (rs: Rect[]): Rect[] => rs.filter((r, i) => !rs.some((q, j) => j !== i && q[0] <= r[0] + 1e-9 && q[1] <= r[1] + 1e-9 && q[2] >= r[2] - 1e-9 && q[3] >= r[3] - 1e-9 && (j < i || area(q) > area(r) + 1e-9 || !(q[0] === r[0] && q[1] === r[1] && q[2] === r[2] && q[3] === r[3]) )));
 
-/** the host's free rects: its rects minus `margin` on every edge, minus the footprints of what stands on it (grown by `margin`) */
-export function freeRects(h: Host, on: any[], margin = 0.04): Rect[] {
+/** how far the packer keeps a new piece from a neighbour on the same top (the lint demands MIN_GAP: the packer's is a little more, for the millimetre rounding of two positions) */
+export const NEIGHBOUR_GAP = 0.02;
+/** the least gap the layout lint accepts between two surface items on one host, authored or dressed (plan: a gap under 1.5 cm reads as one object) */
+export const MIN_GAP = 0.015;
+/**
+ * How far a small good's BUILT mesh reaches past the measured box the packer and the lint work from (a flower-jug's flowers, a book stack's leaning top book, a
+ * candle-trio's wicks): the page seeds those spills per item, so the packer cannot know them and keeps the worst case of each type clear instead. Measured over 24
+ * seeds per type in three.js (every surface type in the catalog whose built box passed its measured box by more than 2 mm), rounded up to the millimetre, plus 2 mm;
+ * test-dress-phase M builds 24 other seeds of each and fails past it, and fails for a surface type that spills and is missing here.
+ */
+export const REACH: Record<string, number> = {
+  'vase': 0.023, 'book-stack': 0.038, 'flower-jug': 0.022, 'herb-pots': 0.015, 'fern': 0.012, 'aloe-pot': 0.008, 'jade-plant': 0.022, 'candle-trio': 0.009,
+  'centerpiece': 0.014, 'kettle-and-mug': 0.007, 'cutting-board-set': 0.007, 'utensil-crock': 0.009, 'tea-towel': 0.016, 'pot-on-hob': 0.027, 'side-set': 0.012,
+  'shelf-style': 0.010, 'nightstand-set': 0.028, 'tissue-candle': 0.012, 'towel-stack': 0.011,
+};
+export const reachOf = (type: string): number => REACH[type] || 0;
+
+/** the host's free rects: its rects minus `margin` on every edge, minus the footprints of what stands on it, each grown by what it needs round it: the margin, or `gap` (never less than NEIGHBOUR_GAP) plus its own reach and the new piece's (`reach`, the piece the area is for) */
+export function freeRects(h: Host, on: any[], margin = 0.04, gap = NEIGHBOUR_GAP, reach = 0): Rect[] {
   let free: Rect[] = h.rects.map(r => [r[0] + margin, r[1] + margin, r[2] - margin, r[3] - margin] as Rect).filter(r => r[2] - r[0] > 0.02 && r[3] - r[1] > 0.02);
   for (const it of on) {
     const f = footprintIn(h, it); if (!f) continue;
-    const g: Rect = [f[0] - margin, f[1] - margin, f[2] + margin, f[3] + margin];
+    const grow = Math.max(margin, gap + reachOf(it.type) + reach);
+    const g: Rect = [f[0] - grow, f[1] - grow, f[2] + grow, f[3] + grow];
     free = prune(free.flatMap(r => subtract(r, g)).filter(r => r[2] - r[0] > 0.02 && r[3] - r[1] > 0.02));
   }
   return free;
 }
 
-/** what already stands ON a host: items whose origin is over one of its rects (grown a little) at about its top */
+/** the DESK_TOP of the page (assets/item-map.ts): a surface type given no `y` is built at this height */
+export const DESK_TOP = 0.77;
+/** the height an item stands at, as the page builds it: its `y`, else DESK_TOP for a type that stands on a surface; undefined for anything else (a floor piece, a wall piece) */
+export function surfaceY(it: any): number | undefined {
+  if (!it) return undefined;
+  if (it.y !== undefined) return it.y;
+  const pl: any = PLACEMENT[it.type], def: any = PROPS.get(it.type);
+  return (pl && pl.onSurface) || (def && def.surface) ? DESK_TOP : undefined;
+}
+
+/**
+ * what already stands ON a host: surface items whose origin is over one of its rects (grown a little) at about its top (from 4 cm under to 8 cm over: a lamp
+ * on the taller of a pair of nesting tables stands 5 cm above the host's top and is no less a neighbour). An authored item given no `y` stands at DESK_TOP,
+ * as the page builds it (the table's own flower-jug), which the first cut missed, so the packer put a candle against it.
+ */
 export function standingOn(h: Host, items: any[]): any[] {
   return items.filter(it => {
-    if (it === h.item || !Array.isArray(it.at) || it.y === undefined) return false;
-    if (Math.abs(it.y - h.top) > 0.04) return false;
+    if (it === h.item || !Array.isArray(it.at)) return false;
+    const y = surfaceY(it); if (y === undefined) return false;
+    if (y < h.top - 0.04 || y > h.top + 0.08) return false;
     const [lx, lz] = toLocal(h, it.at[0], it.at[1]);
     return h.rects.some(r => lx >= r[0] - 0.1 && lx <= r[2] + 0.1 && lz >= r[1] - 0.1 && lz <= r[3] + 0.1);
   });
+}
+
+/** the gap between two host-frame rects: positive apart, negative when they overlap (by how much, the lesser overlap of the two axes) */
+export function rectGap(a: Rect, b: Rect): number {
+  const gx = Math.max(b[0] - a[2], a[0] - b[2]), gz = Math.max(b[1] - a[3], a[1] - b[3]);
+  return gx > 0 || gz > 0 ? Math.hypot(Math.max(gx, 0), Math.max(gz, 0)) : Math.max(gx, gz);
+}
+/** the smallest gap between `it`'s footprint and every other item standing on host `h` (`on` is what standingOn gave), and which one; null when it stands alone. `withReach` takes both pieces' REACH off the gap: the gap their built meshes can be at worst */
+export function neighbourGap(h: Host, it: any, on: any[], withReach = false): { gap: number; other: any } | null {
+  const f = footprintIn(h, it); if (!f) return null;
+  let best: { gap: number; other: any } | null = null;
+  for (const o of on) {
+    if (o === it) continue;
+    const g = footprintIn(h, o); if (!g) continue;
+    const gap = rectGap(f, g) - (withReach ? reachOf(it.type) + reachOf(o.type) : 0);
+    if (!best || gap < best.gap) best = { gap, other: o };
+  }
+  return best;
 }
 
 export type Anchor = 'centre' | 'left' | 'right' | 'back' | 'front' | 'back-left' | 'back-right' | 'front-left' | 'front-right';
