@@ -74,7 +74,7 @@ export class Dresser {
   curTier = 1;
   /** the rig's corner cameras of this room: nothing stands in their way */
   readonly eyes: CornerEye[];
-  private off: Set<string>; private ord = new Map<string, number>(); private composer: Composer | null = null; private composedItems: Map<any, any[]>;
+  private off: Set<string>; private viaGroup = new Map<any, Group>(); private ord = new Map<string, number>(); private composer: Composer | null = null; private composedItems: Map<any, any[]>;
 
   constructor(spec: any, lv: any, room: any, program: string, level: number, base: any[], composedItems: Map<any, any[]>) {
     this.spec = spec; this.lv = lv; this.room = room; this.program = program; this.level = level; this.base = base; this.composedItems = composedItems;
@@ -199,16 +199,17 @@ export class Dresser {
     for (const [k, v] of Object.entries(ci.params)) if (v !== undefined && v !== null && k !== 'y') it[k] = typeof v === 'number' ? mm(v) : v;
     for (const [k, v] of Object.entries(params)) if (it[k] === undefined) it[k] = v;
     it.src = DRESS_SRC; it.dk = `${this.roomKey}:${slot}:${n}`;
-    this.ord.set(slot, n + 1); this.placed.push(it); this.counts.set(slot, (this.counts.get(slot) || 0) + 1); this.spent += cost;
+    this.ord.set(slot, n + 1); this.viaGroup.set(it, g); this.placed.push(it); this.counts.set(slot, (this.counts.get(slot) || 0) + 1); this.spent += cost;
     return it;
   }
-  /** take back the last item a floor placer put (a table whose lamp then found no room), the budget and the composer's floor with it */
+  /** take back the last item put (a table whose lamp then found no room, a candle trio that left no place for a setting): the budget, the count and, for a floor piece, the composer's floor with it */
   retract(it: any, cost = 1): void {
     if (this.placed[this.placed.length - 1] !== it) return;
     this.placed.pop();
     const slot = String(it.dk).split(':').slice(-2)[0], n = this.ord.get(slot) ?? 1;
     this.ord.set(slot, n - 1); this.counts.set(slot, (this.counts.get(slot) || 1) - 1); this.spent -= cost;
-    if (this.composer) { const g = this.composer.groups[this.composer.groups.length - 1]; if (g && g.items) { for (const ci of g.items) { const i = this.composer.placed.indexOf(ci); if (i >= 0) this.composer.placed.splice(i, 1); } this.composer.groups.pop(); } }
+    const g = this.viaGroup.get(it); this.viaGroup.delete(it);
+    if (g && this.composer) { for (const ci of g.items || []) { const i = this.composer.placed.indexOf(ci); if (i >= 0) this.composer.placed.splice(i, 1); } const k = this.composer.groups.indexOf(g); if (k >= 0) this.composer.groups.splice(k, 1); }
   }
   /** is a composer item in a corner camera's way (CAM): a rug and a ceiling piece never are */
   inTheWay(ci: CItem): boolean { const sp = spanOf(ci); return !!sp && camBlocked(this.eyes, ci.box, sp[0], sp[1], ci.layer === 'body'); }

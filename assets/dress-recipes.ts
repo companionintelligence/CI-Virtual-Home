@@ -82,6 +82,11 @@ function setTable(d: Dresser) {
     else { at = [r[0] + m + sd / 2, Math.max(r[1] + sw / 2 + m, Math.min(r[3] - sw / 2 - m, s.t))]; rotExtra = 270; }
     d.put('table', h, 'place-setting', { at, rotExtra, margin: 0.0, cost: 0.25 });
   }
+  // a laid table is never without a setting, a centrepiece or a runner (the never-bare rule): a table whose middle holds an authored jug and a candle trio, or a round one too small for the
+  // chairs' places once every neighbour has its 2 cm and its reach, takes one setting wherever the free top has room, else the candles make way for a centrepiece
+  const laid = () => d.all().some(it => it.type === 'place-setting' || it.type === 'table-runner' || it.type === 'centerpiece');
+  if (!laid()) for (const a of ['front', 'back', 'left', 'right'] as const) if (d.put('table', h, 'place-setting', { anchor: a, margin: 0.0, cost: 0.25 })) break;
+  if (!laid() && mid && mid.type === 'candle-trio') { d.retract(mid); if (!d.put('table', h, 'centerpiece', { anchor: 'centre', margin: 0.01 })) d.put('table', h, 'place-setting', { anchor: 'centre', margin: 0.0, cost: 0.25 }); }
 }
 
 /** a run of counter clusters along a host's free top: one to three of the kitchen's small goods, left to right */
@@ -215,7 +220,8 @@ const bath: Slot[] = [
   { id: 'towels', tier: 1, what: 'a towel ring by the vanity or the toilet and a robe hook by the bathing', run(d) {
     const near = (re: RegExp): [number, number] | null => { const it = d.base.find(i => re.test(i.type) && Array.isArray(i.at)); return it ? [it.at[0], it.at[1]] : null; };
     if (!d.has('towel-ladder') && !d.has('towel-rail') && !d.has('heated-towel-rail')) d.against('towels', 'towel-ring-set', {}, near(/vanity|sink/));
-    d.against('hook', 'robe-hook', {}, near(/shower|tub/));
+    // (a bath so small that every wall within reach of the bathing is also within 0.3 m of a corner camera keeps its third piece low and on the floor: a hamper in the corner, 0.6 m, under the eye line)
+    if (!d.against('hook', 'robe-hook', {}, near(/shower|tub/))) d.corner('hook', 'laundry-hamper', {}, undefined, 0.5);
   } },
   { id: 'roll', tier: 1, what: 'a toilet roll holder beside the toilet', run(d) { d.against('roll', 'roll-holder', {}, (() => { const t = d.base.find(i => i.type === 'toilet' && Array.isArray(i.at)); return t ? [t.at[0], t.at[1]] as [number, number] : null; })()); } },
 ];
@@ -231,7 +237,12 @@ const hall: Slot[] = [
   { id: 'console', tier: 1, what: 'a console arrangement on a console (demilune)', run(d) { d.hostsOf('console').slice(0, 1).forEach(h => d.put('console', h, 'console-set', { anchor: 'centre' })); } },
   { id: 'lamp', tier: 1, what: 'a table lamp on a console, else a floor lamp in a corner, where the hall has no lamp', run(d) { lampIfNone(d, [['console']]); } },
   { id: 'mirror', tier: 1, what: 'a leaning mirror against a wall', run(d) { d.against('mirror', 'leaner-mirror', {}, null); } },
-  { id: 'plant', tier: 1, what: 'a floor plant in a corner, while a hall of 8 m2 or more has fewer than the 3 dress items it is never without', run(d) { for (let k = 0; k < 2 && d.area >= 8 && d.placed.length < 3; k++) if (!d.corner('plant', d.pick('plant', d.roleTypes('plant-floor').filter(t => !/palm|tree|tall/.test(t))), {})) break; } },
+  { id: 'plant', tier: 1, what: 'a floor plant in a corner, while a hall of 8 m2 or more has fewer than the 3 dress items it is never without', run(d) { for (let k = 0; k < 2 && d.area >= 8 && d.placed.length < 3; k++) {
+      // (the type the house favours first, then each of the others: the keep-out round the corner cameras leaves a narrow hall room for the slim ones only)
+      const all = d.roleTypes('plant-floor').filter(t => !/palm|tree|tall/.test(t)), first = d.pick('plant', all);
+      if (![first, ...all.filter(t => t !== first)].some(t => d.corner('plant', t, {}))) break;
+    }
+  } },
 ];
 
 const study: Slot[] = [
