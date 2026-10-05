@@ -48,7 +48,7 @@ const { inferProgram, isProgram, isComposed, PROGRAMS } = await import(path.join
 const { STYLE_KEYS } = await import(path.join(ROOT, 'assets', 'house-styles.js'));
 const { lintLayout } = await import(path.join(ROOT, 'assets', 'layout-lint.js'));
 const { PLACEMENT } = await import(path.join(ROOT, 'assets', 'props', 'placement.js'));
-const SRC = 'compose@1';
+const SRC = 'compose@1', DRESS_SRC = 'dress@1';   // (a layout re-bake strips both: a dress item stands on a host the new layout may not have, the dress phase makes them again)
 
 const only = opt('rooms') ? new Set(opt('rooms')!.split(',').map(s => s.trim())) : null;
 const style = opt('style'); if (style && !STYLE_KEYS.includes(style)) { console.error(`unknown style "${style}": ${STYLE_KEYS.join(', ')}`); process.exit(2); }
@@ -66,7 +66,7 @@ for (const lv of spec.levels || []) for (const room of lv.rooms || []) {
   if (!room.bounds) continue;
   if (only && !only.has(room.name) && !only.has(String(room.no))) continue;
   const items: any[] = room.items || [];
-  if (REBAKE && room.lock) { room.items = items.filter(i => i.src !== SRC); delete room.lock; }
+  if (REBAKE && room.lock) { room.items = items.filter(i => i.src !== SRC && i.src !== DRESS_SRC); delete room.lock; }
   let inferred = false;
   if (!isProgram(room.program)) {
     if (!INFER) continue;
@@ -99,7 +99,7 @@ function bake(s: any, results: Map<any, any>) {
   srcRooms.forEach((room: any, i: number) => {
     const r = results.get(room); if (!r) return;
     const dst = dstRooms[i];
-    dst.items = [...(room.items || []).filter((it: any) => it.src !== SRC), ...r.items];
+    dst.items = [...(room.items || []).filter((it: any) => it.src !== SRC && it.src !== DRESS_SRC), ...r.items];
     dst.lock = true;
   });
   return copy;

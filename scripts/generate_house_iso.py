@@ -1627,6 +1627,8 @@ class HouseRenderer:
         for room in lv.get("rooms", []):
             for it_ in list(room.get("items", [])) + self.composed_items(lv, room):
                 t = it_.get("type")
+                if it_.get("src") == "dress@1":
+                    continue  # the dress phase's small goods (plan 5.6) are not drawn in the isometric twin
                 if hero_here and hero.get("surface", "desk") == "desk" and t in ("walnut-desk", "task-chair", "curved-monitor", "chalk-tower", "charcoal-tower", "strix-mini", "speakers"):
                     if math.hypot(it_["at"][0] - hero["at"][0], it_["at"][1] - hero["at"][1]) < 1.3:
                         continue  # the hero desk set is drawn by draw_hero

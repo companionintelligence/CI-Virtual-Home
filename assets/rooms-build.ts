@@ -17,6 +17,7 @@ import { isComposed } from './room-programs.js';
 import { analyzeRoom } from './room-geo.js';
 import { sunkRooms } from './arch-plan.js';
 import { defaultsAtLeast } from './spec/index.js';
+import { DRESS_SRC, isDress, dressOff, dressOptIn, dressHouse } from './room-dress.js';
 
 /** the offset of a composed item's room floor over the storey's (see buildRooms) */
 const ON_FLOOR = Symbol('onFloor');
@@ -28,7 +29,9 @@ export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
   // across the whole build (every storey), so the Nth registry prop of a house always draws the same stream.
   function propContextFor(kit) {
     let propIndex = 0;
-    const propCtx = (it, H) => ({ THREE, std, box, group, mix, hex, colors: kit.colors, rng: kit.itemRng(`${it.type}:${propIndex++}`), H });   // registry props (assets/props/)
+    // A dress item (plan 5.6) draws from a stream keyed by the item alone (`dk`: its room, slot and ordinal) and never advances `propIndex`:
+    // every other registry prop's stream is counted on propIndex, so one more dress item anywhere must not shift the Nth prop after it.
+    const propCtx = (it, H) => ({ THREE, std, box, group, mix, hex, colors: kit.colors, rng: kit.itemRng(it.src === DRESS_SRC ? `dress:${it.dk ?? `${it.type}@${it.at}`}` : `${it.type}:${propIndex++}`), H });   // registry props (assets/props/)
     return propCtx;
   }
 
@@ -47,6 +50,7 @@ export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
     const PAGE_FOLIAGE = new Set(['fiddle-leaf', 'monstera', 'bonsai', 'bamboo', 'cactus-group']);
     const tidy = defaultsAtLeast(spec, 2);
     const sunk = new Set(sunkRooms(spec, lv));
+    const noDress = dressOff();   // ?dress=0: the exact BEFORE of a dressed house (every dress item left out, baked or live)
     for (const room of lv.rooms || []) {
       let items = room.items || [];
       // a composed piece stands on the room's own floor: a raised platform or a sunken pit (rooms[].floorOffset, S2) moves it with the floor —
@@ -60,9 +64,15 @@ export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
           (anchors.compose ||= []).push({ level: lv.id, room: room.no ?? room.name, name: room.name, program: res.program, style: res.style, items: res.items });
         }
       }
+      // the dress phase (plan 5.6): a room that opts in with an explicit `dress.level` and carries no baked dress item of its own is dressed live
+      if (noDress) items = items.filter(it => !isDress(it));
+      else if (dressOptIn(room) && !items.some(isDress)) {
+        const d = dressHouse(spec).get(room);
+        if (d && d.items.length) items = [...items, ...d.items.map(it => (floorOff ? { ...it, [ON_FLOOR]: floorOff } : it))];
+      }
       if (tidy) {
         const geo = analyzeRoom(spec, lv, room);
-        items = items.map(it => { if (it.src === SRC) return it; const a = snapWallMount(it, geo) || it; return stackOnSurface(a, items) || a; });
+        items = items.map(it => { if (it.src === SRC || it.src === DRESS_SRC) return it; const a = snapWallMount(it, geo) || it; return stackOnSurface(a, items) || a; });
       }
       for (const it of items) {
         if (heroHere && HERO_SET.has(it.type) && Math.hypot(it.at[0] - spec.hero.at[0], it.at[1] - spec.hero.at[1]) < 1.3) continue;
@@ -76,6 +86,7 @@ export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
         o.userData.onSurface = ON_SURFACE.has(it.type) || !!(prop && prop.surface);
         o.userData.mounted = !!(prop && prop.mountY !== undefined);   // art, sconces, upper cabinets: they live IN the wall plane by design, whatever y they mount at
         o.userData.foliage = !!(prop && prop.foliage) || PAGE_FOLIAGE.has(it.type);
+        if (it.src === DRESS_SRC) o.userData.dress = true;   // the shot planner and the QA gates skip small dress items as camera obstacles
         kitb.themeItem(kit, o, it);   // props take the house's role colours; the Core and explicitly coloured items keep theirs (kit-build.ts)
         // anything the door-to-core eye (1.45 m up) could meet is a routing obstacle on this storey — a desk
         // ornament sitting at DESK_TOP + its own height clears 1.1 m easily without blocking anything at floor

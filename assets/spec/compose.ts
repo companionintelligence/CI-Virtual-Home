@@ -100,8 +100,15 @@ export interface ComposeRoom {
   bath?: BathPlan;
   /** composition baked into `items` and hand-tuned: do not compose again (the program stays the room's type) */
   lock?: boolean;
+  /** the dress phase (assets/room-dress.ts, plan 5.6): after the layout is frozen it adds small goods, lamps and towels (`src: 'dress@1'` items) to
+   *  the room's surfaces. ABSENT: the build does not dress the room (so every shipped house builds as it always did; a `dress@1` item already baked
+   *  into `items` is a plain item and builds either way). `false`: never dressed, not even by `compose-house.mts --dress`. `{ level }`: opts the
+   *  room in, 0 (the program's never-bare floor only) … 1 (every slot its host has room for). `off`: slot ids to skip (assets/dress-recipes.ts).
+   *  `?dress=0` on the page leaves every dress item out. The program is the room's own, else read off its name (a hand-authored room is dressed
+   *  additively: its own items are pins and the free area of each host is all the phase uses). */
+  dress?: false | { level?: number; off?: string[] };
 }
-// Room items: the composer's own carry `src: 'compose@1'` (scripts/compose-house.mts --write keeps it when it bakes a
+// Room items: the dress phase's carry `src: 'dress@1'` and a `dk` (room, slot, ordinal: their seed key); the composer's own carry `src: 'compose@1'` (scripts/compose-house.mts --write keeps it when it bakes a
 // composition into the spec, so a re-bake can tell its own items from the author's). Not declared here: an item takes
 // any builder parameter (the base item has an index signature), and scripts/test-spec-merge.mts adds `src` to this
 // interface itself to prove a stream can, so it stays empty.

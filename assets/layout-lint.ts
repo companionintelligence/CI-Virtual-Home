@@ -42,6 +42,7 @@ import {
 import { composeHouse, layerOf, snapWallMount, stackOnSurface } from './room-composer.js';
 import { houseStairs, levelStairs } from './stairs.js';
 import { isComposed, isProgram } from './room-programs.js';
+import { dressHouse, dressOff, dressOptIn, isDress } from './room-dress.js';
 
 /** What a room of each program cannot do without: each anchor is satisfied by `n` items (default 1) with any of the roles
  *  (assets/props/placement.ts). The composer's essentials (its `missing`), the `missing-anchor` lint and the composer's
@@ -91,8 +92,12 @@ const r1 = (v: number) => v.toFixed(1), fmt = (p: number[]) => `(${r1(p[0])}, ${
 
 /** the items of every room: its authored items plus, for a composed room, the composer's */
 export function roomItems(spec: any): Map<any, any[]> {
-  const out = new Map<any, any[]>(), comp = composeHouse(spec);
-  for (const lv of spec.levels || []) for (const r of lv.rooms || []) out.set(r, [...(r.items || []), ...(isComposed(r) && comp.get(r) ? comp.get(r)!.items : [])]);
+  const out = new Map<any, any[]>(), comp = composeHouse(spec), dress = dressOff() ? new Map<any, any>() : dressHouse(spec);
+  for (const lv of spec.levels || []) for (const r of lv.rooms || []) {
+    const base = [...(r.items || []), ...(isComposed(r) && comp.get(r) ? comp.get(r)!.items : [])];
+    // (what the build adds to an opted-in room that carries no baked dress item of its own: rooms-build.ts)
+    out.set(r, dressOptIn(r) && !base.some(isDress) && dress.get(r) ? [...base, ...dress.get(r).items] : base);
+  }
   return out;
 }
 
@@ -144,11 +149,12 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
         if (P) for (const k of Object.keys(it)) if (!UNIVERSAL.has(k) && !P.includes(k) && !(k === 'y')) add('silent-param', `${it.type} at ${fmt(it.at)}: "${k}" is ignored by its builder`, lv, room);
         // mounts inside the wall, surface items floating or sunk
         if (layer === 'wall' && snapWallMount(it, geo)) add('mount-in-wall', `${it.type} at ${fmt(it.at)} is set inside the wall`, lv, room);
-        if (layer === 'surface') {
+        // (a dress item's host is the dress registry's to judge: assets/room-dress-hosts.ts, the `dress-*` lints; PLACEMENT.surfaces is the composer's own)
+        if (layer === 'surface' && !isDress(it)) {
           const pl = PLACEMENT[it.type], top = pl && pl.surfaces.length ? supportOf(it, items) : null;
           if (top && !pl.surfaces.includes(groupOf(top.type))) add('surface-kind', `${it.type} at ${fmt(it.at)} stands on a ${top.type}, which its placement does not allow (${pl.surfaces.join(', ')})`, lv, room);
         }
-        if (layer === 'surface' && stackOnSurface(it, items)) add('surface-height', `${it.type} at ${fmt(it.at)} (y ${it.y ?? 'default 0.77'}) is not on the top of what stands under it`, lv, room);
+        if (layer === 'surface' && !isDress(it) && stackOnSurface(it, items)) add('surface-height', `${it.type} at ${fmt(it.at)} (y ${it.y ?? 'default 0.77'}) is not on the top of what stands under it`, lv, room);
         // facing: seating that looks at a wall
         if (solid && PLACEMENT[it.type] && PLACEMENT[it.type].faces === 'focus' && !PLACEMENT[it.type].roles.some(r => ['bench', 'bed-bench', 'ottoman', 'pouf', 'floor-seat', 'dining-bench', 'hammock'].includes(r))) {
           const [fx, fz] = turn(0, 1, it.rot || 0), s = sizeOf(it.type, it)!;
@@ -163,7 +169,7 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
         }
         // repetition counts
         // (a wall of matched bookcases is one piece of furniture: the library's run of four is not four repeats)
-        if (!REPEAT_EXEMPT_GROUPS.has(groupOf(it.type)) && !HERO_SET.has(it.type) && !(PLACEMENT[it.type] && PLACEMENT[it.type].roles.includes('bookcase'))) {
+        if (!isDress(it) && !REPEAT_EXEMPT_GROUPS.has(groupOf(it.type)) && !HERO_SET.has(it.type) && !(PLACEMENT[it.type] && PLACEMENT[it.type].roles.includes('bookcase'))) {
           houseCount.set(it.type, (houseCount.get(it.type) || 0) + 1);
           (storeyRooms.get(it.type) || storeyRooms.set(it.type, new Set()).get(it.type)!).add(room.name);
         }

@@ -190,6 +190,9 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
         else if (heroA && heroA.surface === 'desk' && /monitor/i.test(o.name || '') && near((heroA.deskX ?? heroA.x) - heroA.fwd[0] * 0.1, (heroA.deskZ ?? heroA.z) - heroA.fwd[1] * 0.1)) { k = K.monitor; monitorBox = b6(bb); }
         else if (heroA && heroA.surface === 'desk' && /chair/i.test(o.name || '') && near((heroA.deskX ?? heroA.x) + heroA.fwd[0] * 0.8, (heroA.deskZ ?? heroA.z) + heroA.fwd[1] * 0.8)) { k = K.chair; chairBox = b6(bb); }
         if (bb.max.y - bb.min.y < 0.1 && k === K.item) continue;   // rugs: part of the floor
+        // a small good the dress phase set on a surface (plan 5.6): a camera passes over a counter or a table top, it is no obstacle (a
+        // floor-standing dress item, an umbrella stand, still is one)
+        if (ud.dress && ud.onSurface && k === K.item) continue;
         // near the Core (and for the hero set) mesh by mesh for sight lines, plus the whole box as a hull that only the
         // clip tests read — the QA gate's item-clip box, as v1 has it
         if (nearCore(bb) || k !== K.item) { if (k === K.item || k === K.fixture) push(bb, K.hull, name, 0); meshes(o, m => meshBoxes(m, b => { if (!b.isEmpty() && b.max.y - b.min.y > 0.02) push(b, k, name, colorOf(m)); })); }
@@ -206,7 +209,7 @@ export function digestWorld(THREE: any, spec: any, anchors: any, placed: any[]):
     // every hole the slab has: its own voids, then what S2 cuts on its own (a flight's autoVoid, the room below a double-height one), clipped to the outline as built
     voids: [...(l.voids || []), ...((l.y || 0) > 0.001 ? insideOutline(l, [...autoVoidsFor(spec, l.id), ...doubleRoomsUnder(spec, l).map((d: any) => d.rect)].filter((r: any) => r && r.w > 0 && r.d > 0)).map((r: any) => ({ x: mm(r.x), z: mm(r.z), w: mm(r.w), d: mm(r.d) })) : [])].map((r: any) => ({ x: r.x, z: r.z, w: r.w, d: r.d })),
     parts: (l.partitions || []).map((p: any) => ({ a: [p.from[0], p.from[1]], b: [p.to[0], p.to[1]], door: p.door === undefined ? null : p.door, doorW: p.doorW || 0.9, h: p.height || (l.height || 2.8) - 0.1 })),
-    rooms: (l.rooms || []).map((r: any) => ({ no: String(r.no ?? ''), name: r.name || '', program: r.program || null, b: r.bounds, items: (r.items || []).filter((it: any) => Array.isArray(it.at)).map((it: any) => ({ type: it.type, at: [it.at[0], it.at[1]], rot: it.rot || 0 })) })),
+    rooms: (l.rooms || []).map((r: any) => ({ no: String(r.no ?? ''), name: r.name || '', program: r.program || null, b: r.bounds, items: (r.items || []).filter((it: any) => Array.isArray(it.at) && it.src !== 'dress@1').map((it: any) => ({ type: it.type, at: [it.at[0], it.at[1]], rot: it.rot || 0 })) })),
     openings: (l.openings || []).map((o: any) => ({ side: o.side, at: o.at, type: o.type, w: o.w, h: o.h, sill: o.sill, style: o.style })),
   }));
   const stairs: WStair[] = (anchors.stairs || []).map((s: any, i: number) => {
