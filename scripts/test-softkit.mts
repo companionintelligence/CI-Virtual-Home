@@ -259,6 +259,8 @@ test('A grammar: the closed solids are wound outward (signed volume positive): s
   assert.ok(net > 0, 'the band is wound outward');
 });
 
+// a dormant type may appear in a shipped house only as a dress item the dress phase baked (pass 6: src 'dress@1'), never authored or composed: the item records of a spec file that carry `type`
+const placedOutsideDress = (txt: string, type: string): number => { let n = 0; const walk = (o: any) => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') { if (o.type === type && o.src !== 'dress@1' && Array.isArray(o.at)) n++; Object.values(o).forEach(walk); } }; walk(JSON.parse(txt)); return n; };
 // ---- the new dormant types (T6b, soft2.ts) ---------------------------------------------------------------------------------
 const NEW = ['towel-stack', 'towel-ring-set', 'robe-hook'];
 test('C caps: the new soft types are at most 3 meshes, 600 triangles, no map, no transparency, stable per seed, with a fixed draw count', () => {
@@ -273,7 +275,7 @@ test('C caps: the new soft types are at most 3 meshes, 600 triangles, no map, no
 test('B source: the new types are dormant (no committed house uses them) and sit under NEW roles only', async () => {
   const { PLACEMENT } = await import('../assets/props/placement.js');
   const dir = path.join(ROOT, 'content', 'houses');
-  for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && f !== 'index.json')) { const txt = fs.readFileSync(path.join(dir, f), 'utf8'); for (const t of NEW) assert.ok(!txt.includes(`"${t}"`), `${f} places ${t}`); }
+  for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && f !== 'index.json')) { const txt = fs.readFileSync(path.join(dir, f), 'utf8'); for (const t of NEW) assert.equal(placedOutsideDress(txt, t), 0, `${f} places ${t} outside the dress phase`); }
   const mine = new Set(NEW.flatMap(t => PLACEMENT[t].roles));
   for (const [t, p] of Object.entries(PLACEMENT) as any) if (!NEW.includes(t)) for (const r of p.roles) assert.ok(!mine.has(r), `${t} fills the soft role ${r}`);
   for (const r of mine) assert.ok(String(r).startsWith('soft-'), `${r} is a soft- role`);
@@ -441,7 +443,7 @@ test('C caps: a window treatment is at most 3 meshes and 900 triangles, opaque, 
   const dir = path.join(ROOT, 'content', 'houses');
   for (const t of WINDOWS) {
     assert.ok(PLACEMENT[t].roles.every((r: string) => ['blind', 'blind-cafe', 'shutter', 'valance'].includes(r)), `${t}: roles ${PLACEMENT[t].roles}`);
-    for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && f !== 'index.json')) assert.ok(!new RegExp(`"type"\\s*:\\s*"${t}"`).test(fs.readFileSync(path.join(dir, f), 'utf8')), `${f} places ${t}`);   // (an opening's `shutters` key is the facade's, not an item)
+    for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && f !== 'index.json')) assert.equal(placedOutsideDress(fs.readFileSync(path.join(dir, f), 'utf8'), t), 0, `${f} places ${t} outside the dress phase`);   // (an opening's `shutters` key is the facade's, not an item)
   }
   for (const [t, p] of Object.entries(PLACEMENT) as any) if (!WINDOWS.includes(t)) for (const r of p.roles) assert.ok(!['blind', 'blind-cafe', 'shutter', 'valance'].includes(r), `${t} fills the window-treatment role ${r}`);
   assert.equal(roleMeshes(build('roman-blind', { color: '#b3402a' }), 'blind')[0].material.color.getHex(), 0xb3402a, 'the spec colour is the blind');

@@ -9,7 +9,7 @@
 //   C  roles        paint comes from the house's roles: two houses give two colours, an item's own `color` repaints only its signature role, fixed literals are muted
 //   D  placement    every type has a placement, a surface type is an onSurface placement, its roles are all NEW `dx-*` roles that no other type shares (so no existing
 //                   role's candidate list grew and no pick re-rolls), the group agrees with the definition
-//   E  dormant      no house spec and no fixture outside the small-* ones names a dress type (nothing places them yet; a recipe or a fixture does)
+//   E  authored     no house spec and no fixture outside the small-* and dress-* ones AUTHORS a dress type: the shipped houses carry them only as baked `dress@1` items (pass 6)
 //   F  source       no Math.random, Date or performance clock in dress-kit.ts, tableware.ts or a dress-*.ts module; no module-level material
 //
 // @check-house node-test
@@ -170,13 +170,15 @@ test('D: placements are new dx-* roles, nothing else moves', () => {
   for (const [t, p] of Object.entries(PLACEMENT as Record<string, any>)) if (!dressTypes.has(t)) assert.ok(!p.roles.some((r: string) => r.startsWith('dx-')), `${t} fills a dx-* role`);
 });
 
-test('E: dormant: no house places a dress type', () => {
-  const names = DRESS.map(([t]) => t);
+test('E: no house AUTHORS a dress type: the shipped houses carry them only as baked dress@1 items, the fixtures only the small-* and dress-* ones', () => {
+  const names = new Set(DRESS.map(([t]) => t));
   const dirs = [path.join(ROOT, 'content', 'houses'), path.join(ROOT, 'test', 'fixtures', 'houses')];
-  for (const dir of dirs) for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && !/^(index|small-)/.test(f))) {
-    const text = fs.readFileSync(path.join(dir, f), 'utf8');
-    for (const t of names) assert.ok(!text.includes(`"type": "${t}"`) && !text.includes(`"type":"${t}"`), `${path.relative(ROOT, path.join(dir, f))} places the dormant type ${t}`);
+  let baked = 0;
+  for (const dir of dirs) for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json') && !f.endsWith('.plan.json') && !/^(index|small-|dress-)/.test(f))) {
+    const walk = (o: any) => { if (Array.isArray(o)) o.forEach(walk); else if (o && typeof o === 'object') { if (names.has(o.type) && Array.isArray(o.at)) { assert.equal(o.src, 'dress@1', `${path.relative(ROOT, path.join(dir, f))} places the dress type ${o.type} outside the dress phase`); baked++; } Object.values(o).forEach(walk); } };
+    walk(JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
   }
+  assert.ok(baked === 0 || baked > 500, `${baked} baked dress items in the shipped houses`);
 });
 
 test('F: the source is deterministic and holds no module-level material', () => {
