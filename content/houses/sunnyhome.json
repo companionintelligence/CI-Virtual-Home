@@ -385,6 +385,28 @@
               "h": 0.7,
               "y": 1.4,
               "motif": "abstract"
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                -5.44,
+                2.15
+              ],
+              "rot": 90,
+              "y": 0.46,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.01:coffee:0"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                -2.571,
+                3.661
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.01:lamp:0"
             }
           ]
         },
@@ -513,6 +535,79 @@
                 -2.75
               ],
               "y": 0.76
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                -4.305,
+                -3.036
+              ],
+              "y": 0.76,
+              "variant": 0,
+              "color": "#c7b08c",
+              "src": "dress@1",
+              "dk": "l1.02:table:0"
+            },
+            {
+              "type": "candle-trio",
+              "at": [
+                -3.8,
+                -2.756
+              ],
+              "y": 0.76,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.02:table:1"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -4.931,
+                -3.04
+              ],
+              "rot": 180,
+              "y": 0.76,
+              "variant": 0,
+              "color": "#c7b08c",
+              "src": "dress@1",
+              "dk": "l1.02:table:2"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -3.631,
+                -3.04
+              ],
+              "rot": 180,
+              "y": 0.76,
+              "variant": 1,
+              "color": "#c7b08c",
+              "src": "dress@1",
+              "dk": "l1.02:table:3"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -4.969,
+                -2.46
+              ],
+              "y": 0.76,
+              "variant": 2,
+              "color": "#c7b08c",
+              "src": "dress@1",
+              "dk": "l1.02:table:4"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -3.669,
+                -2.46
+              ],
+              "y": 0.76,
+              "variant": 1,
+              "color": "#c7b08c",
+              "src": "dress@1",
+              "dk": "l1.02:table:5"
             }
           ]
         },
@@ -665,6 +760,90 @@
               ],
               "rot": 270,
               "color": "#1c1c1c"
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                5.15,
+                2.711
+              ],
+              "rot": 270,
+              "y": 0.918,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.03:hob:0"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                5.06,
+                2.07
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "src": "dress@1",
+              "dk": "l1.03:lamp:0"
+            },
+            {
+              "type": "dish-rack",
+              "at": [
+                2.945,
+                3.06
+              ],
+              "rot": 90,
+              "y": 0.9,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.03:counters:0"
+            },
+            {
+              "type": "tea-towel",
+              "at": [
+                2.905,
+                1.936
+              ],
+              "rot": 90,
+              "y": 0.9,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.03:counters:1"
+            },
+            {
+              "type": "utensil-crock",
+              "at": [
+                5.135,
+                1.544
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 2,
+              "color": "#c7b08c",
+              "src": "dress@1",
+              "dk": "l1.03:counters:2"
+            },
+            {
+              "type": "oil-pair",
+              "at": [
+                5.35,
+                2.055
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.03:counters:3"
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                0.445,
+                2.294
+              ],
+              "y": 0.76,
+              "variant": 2,
+              "color": "#c7b08c",
+              "src": "dress@1",
+              "dk": "l1.03:table:0"
             }
           ]
         },
@@ -722,6 +901,15 @@
                 -2
               ],
               "color": "#1c1c1c"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                0.549,
+                -3.661
+              ],
+              "src": "dress@1",
+              "dk": "l1.04:lamp:0"
             }
           ]
         },
@@ -792,6 +980,47 @@
               ],
               "rot": 0,
               "color": "#1c1c1c"
+            },
+            {
+              "type": "door-mat",
+              "at": [
+                7.2,
+                1.64
+              ],
+              "rot": 180,
+              "w": 0.9,
+              "d": 0.45,
+              "src": "dress@1",
+              "dk": "l1.05:entry:0"
+            },
+            {
+              "type": "umbrella-stand",
+              "at": [
+                9.245,
+                1.81
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.05:entry:1"
+            },
+            {
+              "type": "shoe-row",
+              "at": [
+                8.448,
+                1.776
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.05:entry:2"
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                6.574,
+                -0.311
+              ],
+              "src": "dress@1",
+              "dk": "l1.05:lamp:0"
             }
           ]
         },
@@ -853,6 +1082,27 @@
                 -1.98
               ],
               "rot": 0
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                5.966,
+                -1.99
+              ],
+              "y": 0.805,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.06:tank:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                5.65,
+                -1.989
+              ],
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l1.06:roll:0"
             }
           ]
         },
@@ -1007,6 +1257,37 @@
               "h": 0.8,
               "y": 1.5,
               "motif": 1
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                7.649,
+                -6.661
+              ],
+              "src": "dress@1",
+              "dk": "l1.07:lamp:0"
+            },
+            {
+              "type": "nightstand-set",
+              "at": [
+                6.599,
+                -5.2
+              ],
+              "y": 0.56,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.07:bedside:0"
+            },
+            {
+              "type": "nightstand-set",
+              "at": [
+                6.599,
+                -2.6
+              ],
+              "y": 0.56,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.07:bedside:1"
             }
           ]
         },
@@ -1447,6 +1728,17 @@
               "rot": 180,
               "color": "#b08d57",
               "src": "compose@1"
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                2.95,
+                2.52
+              ],
+              "y": 0.42,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l2.10:coffee:0"
             }
           ],
           "lock": true
