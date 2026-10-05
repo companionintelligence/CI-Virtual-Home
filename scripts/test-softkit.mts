@@ -309,6 +309,11 @@ test('E determinism: loose goods keep the draws they always made (cushion-set 10
   assert.equal(draws('cushion-set'), 10); assert.equal(draws('throw-blanket'), 2); assert.equal(draws('floor-cushion'), 2); assert.equal(draws('ottoman'), 0); assert.equal(draws('cushioned-bench'), 0);
 });
 
+test('F placement: a throw spec\'d at bed height lies ON the duvet (its underside at or above 0.63 m), one at a seat\'s height stays where its y puts it (SOFT wave 3 fix: seraphine master suite SE)', () => {
+  const low = (it: any) => { const b = new THREE.Box3().setFromObject(build('throw-blanket', it)); return b.min.y + (it.y ?? 0); };
+  for (const y of [0.49, 0.5, 0.52, 0.55, 0.6]) assert.ok(low({ y }) >= 0.63 - 1e-6, `y ${y}: the cloth starts at ${low({ y }).toFixed(3)}, inside the duvet's crown`);
+  for (const y of [undefined, 0, 0.42, 0.45, 0.48]) assert.ok(Math.abs(low({ y }) - (y ?? 0)) < 0.011, `y ${y}: a seat throw is not lifted`);
+});
 // ---- sofas and sectionals (T4, softseat.ts) -------------------------------------------------------------------------------------
 const SOFAS: Array<[string, number, number, number]> = [['sofa', 5, 1500, 3], ['slipcover-sofa', 5, 1500, 3], ['mid-century-sofa', 5, 1500, 2], ['tuxedo-sofa', 5, 1500, 3], ['loveseat', 5, 1500, 3]];
 const SECTIONALS: Array<[string, number, number, number]> = [['l-sectional', 5, 1800, 2], ['u-sectional', 5, 1800, 2], ['modular-sectional', 5, 1800, 2]];
