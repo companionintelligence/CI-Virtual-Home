@@ -240,7 +240,8 @@ const hall: Slot[] = [
   { id: 'plant', tier: 1, what: 'a floor plant in a corner, while a hall of 8 m2 or more has fewer than the 3 dress items it is never without', run(d) { for (let k = 0; k < 2 && d.area >= 8 && d.placed.length < 3; k++) {
       // (the type the house favours first, then each of the others: the keep-out round the corner cameras leaves a narrow hall room for the slim ones only)
       const all = d.roleTypes('plant-floor').filter(t => !/palm|tree|tall/.test(t)), first = d.pick('plant', all);
-      if (![first, ...all.filter(t => t !== first)].some(t => d.corner('plant', t, {}))) break;
+      // (not the plant stand: 18 meshes, the heaviest plant, and a hall of the fleet is not worth the triangle share it would take past the plan's 3 %)
+      if (![first, ...all.filter(t => t !== first && t !== 'plant-stand')].some(t => d.corner('plant', t, {}))) break;
     }
   } },
 ];
