@@ -12,8 +12,8 @@
 //
 // The gates (every one must read 0):
 //   curtain-vs-item     a café curtain's mesh passes through another item's mesh by more than 1 mm (box against box, every mesh of the curtain and of every item
-//                       of its room that is a placed item, authored, composed or dressed). Architecture the page builds with no item type (a wall, a casing; not the lot and the world,
-//                       whose boxes are the size of the street) is counted apart as `trim`, informational
+//                       of its room that is a placed item, authored, composed or dressed). Architecture the page builds with no item type (the wall pieces and their finish, which the
+//                       rod brackets sink 3-14 mm into; not the lot and the world, whose boxes are the size of the street) is counted apart as `trim`, informational
 //   curtain-vs-curtain  two curtains of one room whose whole boxes (rod and finials included) stand under CURTAIN_GAP of each other in plan while their heights overlap
 //   neighbour-gap       a dress item on a surface stands under 1.5 cm (triangle-level plan distance) from any other item that stands at the same level
 //   corner-camera       a rig corner camera (all four corners) inside a dress mesh (4 cm), within 0.3 m of one, or a dress floor piece taller than 0.8 m in a 0.5 m corner square
@@ -205,7 +205,7 @@ async function measure(list: Array<{ id: string; file: string }>) {
 export function verdict(R: any): { bad: number; lines: string[] } {
   const lines: string[] = []; let bad = 0;
   const gate = (name: string, n: number, what: string, detail: string[] = []) => { lines.push(`${n === 0 ? '✓' : '✗'} ${name.padEnd(18)} ${n}  ${what}`); for (const d of detail.slice(0, 12)) lines.push(`      ${d}`); if (n) bad++; };
-  gate('curtain-vs-item', R.itemHits.length, `curtain meshes through another item's mesh (> 1 mm) over ${R.curtains.length} curtains in ${R.builds} builds (${R.trim} touches of window trim, not counted)`, R.itemHits.map((h: any) => `${h.id}/${h.room}: ${h.other} ${JSON.stringify(h.ov)}`));
+  gate('curtain-vs-item', R.itemHits.length, `curtain meshes through another item's mesh (> 1 mm) over ${R.curtains.length} curtains in ${R.builds} builds (${R.trim} touches of wall pieces, not counted)`, R.itemHits.map((h: any) => `${h.id}/${h.room}: ${h.other} ${JSON.stringify(h.ov)}`));
   gate('curtain-vs-curtain', R.curtainPairs.length, `curtain pairs under ${CURTAIN_GAP * 100} cm apart (boxes with rod and finials, plan)`, R.curtainPairs.map((h: any) => `${h.id}/${h.room}: gap ${h.gap}`));
   gate('neighbour-gap', R.gaps.under15.length, `dress items under 1.5 cm from a neighbour (${R.gaps.pairs} pairs near, ${R.gaps.all.length} measured at triangle level)`, R.gaps.under15.map((g: any) => `${g.id}/${g.room}: ${g.a} and ${g.b} ${(g.tri * 1000).toFixed(1)} mm`));
   gate('corner-camera', R.inside.length + R.near.length + R.squareHits.length, `corner cameras inside (${R.inside.length}), within 0.3 m (${R.near.length}) of a dress mesh, or tall pieces in the corner square (${R.squareHits.length}), of ${R.cams} cameras (${R.camsWithDress} in rooms with a dress piece)`, [...R.inside, ...R.near, ...R.squareHits].map((c: any) => `${c.id}/${c.room} ${c.corner}: ${c.type || c.sq} ${c.best}`));
