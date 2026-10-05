@@ -4,14 +4,16 @@
 // finials reach 0.05 m past the cloth each side (its whole box is `w + 0.1` wide). The first cut (f3b4388) put one on every bare kitchen window, `window + 0.2` wide with its hem
 // 3 cm over the sill; the second skeptic measured what that built:
 //   - the cloth passes 2-4 cm through whatever stands against the wall under the window (a mushroom lamp, a bread bin, the sink's tap and spout, a pantry, an upper cabinet), 23 of
-//     the fleet's 39 curtains, authored and composed items as much as dress ones.
-// This plan fixes the first, with one idea: the curtain is planned FIRST, against the room's layout, and the dress phase keeps the volume it takes clear.
+//     the fleet's 39 curtains, authored and composed items as much as dress ones;
+//   - two windows side by side get two curtains whose boxes overlap by 5-15 cm, coplanar (flowerycottage, lakecabin).
+// This plan fixes both, with one idea: the curtain is planned FIRST, against the room's layout, and the dress phase keeps the volume it takes clear.
 //
-//   1. each window's curtain starts as the first cut's: its whole box `window + 0.3` wide, centred;
-//   2. obstacles: every item of the room whose box meets the cloth's volume (the curtain's footprint, its rod height range) is either stood over (the hem lifts to clear it, at most
+//   1. each window's curtain starts as the first cut's: its whole box `window + 0.3` wide, centred, between the run's own ends;
+//   2. neighbours: a curtain's box never comes within GAP of the box of another curtain or blind on that wall (two windows side by side share the wall between them);
+//   3. obstacles: every item of the room whose box meets the cloth's volume (the curtain's footprint, its rod height range) is either stood over (the hem lifts to clear it, at most
 //      MAXLIFT over the sill, where the curtain still fits the window's lower half) or stood beside (its span of the wall is cut out and the curtain becomes two panels with a
 //      gap where it stands, a parted café curtain); the plan keeps the way that covers more of the window, the lower one on a tie;
-//   3. a panel narrower than MIN_PANEL, or in the way of a corner camera, is dropped, and a window whose obstacles leave no panel stays bare.
+//   4. a panel narrower than MIN_PANEL, or in the way of a corner camera, is dropped, and a window whose obstacles leave no panel stays bare.
 // A dress item is then kept out of every panel's volume (room-dress.ts `put`, `placeGroup`), by the same pads.
 //
 // What is an obstacle is read from the catalog: the box sizeOf measured (its footprint, its height from its mount), grown by the REACH of a small good and PAD; a type whose
@@ -135,6 +137,8 @@ export function planCafe(geo: Geo, items: any[], eyes: CornerEye[]): Panel[] {
     const [nx, nz] = INWARD[run.side], rot = ROT_OF_WALL[run.side], px = alongX(run.side);
     // the volumes whose box meets the cloth's depth on this wall, in the wall's frame
     const near = vols.map(v => ({ v, ...inWall(v.o, run.side, run.face) })).filter(b => b.c1 > -CURTAIN_PAD && b.c0 < WALL_GAP + CURTAIN_DEPTH + CURTAIN_PAD + b.v.reach);
+    // what already hangs on this wall: its extent along it
+    const fixed = dressers.filter(d => { const o = itemObb(d); if (!o) return false; const b = inWall(o, run.side, run.face); return b.c1 > -0.05 && b.c0 < 0.3; }).map(d => { const b = inWall(itemObb(d)!, run.side, run.face); return { a0: b.a0, a1: b.a1 }; });
     interface Cand { win: any; t: number; wid: number; L: number; R: number; fit: CafeFit }
     const cands: Cand[] = [];
     for (const w of run.windows.filter(w => w.type === 'window' && w.b - w.a >= 0.5 && w.b - w.a <= 3.2).sort((p, q) => p.a - q.a)) {
@@ -145,7 +149,17 @@ export function planCafe(geo: Geo, items: any[], eyes: CornerEye[]): Panel[] {
       const wid = mm(Math.min(w.b - w.a + 0.2, 3.0)), half = (wid + FINIAL) / 2;
       cands.push({ win: w, t, wid, L: t - half, R: t + half, fit });
     }
-    // obstacles: stood over, or stood beside
+    // (2) the run's own ends and what already hangs beside: a box never crosses into the next wall, and keeps GAP from a blind or a curtain of the layout
+    for (const c of cands) {
+      c.L = Math.max(c.L, run.a + 0.005); c.R = Math.min(c.R, run.b - 0.005);
+      for (const f of fixed) { if (f.a1 + CURTAIN_GAP > c.L && f.a0 < c.R + CURTAIN_GAP) { if ((f.a0 + f.a1) / 2 < c.t) c.L = Math.max(c.L, f.a1 + CURTAIN_GAP); else c.R = Math.min(c.R, f.a0 - CURTAIN_GAP); } }
+    }
+    // (2) two windows side by side share the wall between them: each box ends GAP / 2 from the middle of it
+    for (let i = 0; i + 1 < cands.length; i++) {
+      const p = cands[i], q = cands[i + 1];
+      if (p.R + CURTAIN_GAP > q.L) { const m = (p.win.b + q.win.a) / 2; p.R = Math.min(p.R, m - CURTAIN_GAP / 2); q.L = Math.max(q.L, m + CURTAIN_GAP / 2); }
+    }
+    // (3) obstacles: stood over, or stood beside
     for (const c of cands) {
       if (c.R - c.L < MIN_PANEL) continue;
       const hemNom = c.win.sill + CAFE.hemAboveSill;

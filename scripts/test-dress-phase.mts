@@ -28,8 +28,8 @@
 //   N  curtain parts  PARTS (the sink run's tap: a 3 cm column over a 0.96 m body) covers every mesh the page builds for the type, at three widths and three depths; a table
 //                   without the tap fails the same measurement (a control)
 //   O  curtain plan   over the 30 houses baked and the fixtures, no café curtain's box (plan, catalog heights, PARTS) meets another item's, however it is stood over, parted
-//                   round or skipped; the plan parts and lifts where it should (a control: a lamp and a tap in a window's way part it, a counter higher than the sill lifts
-//                   the hem, a wall of cabinets leaves the window bare)
+//                   round or skipped, and no two curtains of a wall (or a curtain and a blind of the layout) stand under 2 cm apart; the plan parts and lifts where it should
+//                   (a control: a lamp and a tap in a window's way part it, a counter higher than the sill lifts the hem, a wall of cabinets leaves the window bare)
 //
 // @check-house node-test
 // @check-house quick
@@ -46,7 +46,7 @@ import { composeHouse, layerOf } from '../assets/room-composer.js';
 import { dressHouse, dressRooms, dressOff, dressOptIn, dressProgram, isDress, bareViolation, Dresser, DRESS_SRC } from '../assets/room-dress.js';
 import { dressSchemeOf } from '../assets/house-scheme-dress.js';
 import { RECIPES, CAFE, cafeFit } from '../assets/dress-recipes.js';
-import { PARTS, curtainObb, planCafe, DRESSERS } from '../assets/dress-curtains.js';
+import { PARTS, CURTAIN_GAP, curtainObb, planCafe, DRESSERS } from '../assets/dress-curtains.js';
 import { cornerEyes, eyeGap, camBlocked, CAM, hostOf, footprintIn, standingOn as standingOnHost, surfaceY, neighbourGap, rectGap, toWorld, MIN_GAP, NEIGHBOUR_GAP, DESK_TOP, REACH } from '../assets/room-dress-hosts.js';
 import { cornerCam } from './review/cameras.mts';
 import { standingOn, rectArea } from '../assets/room-dress-hosts.js';
@@ -552,7 +552,7 @@ function boxesOf(it: any): Array<{ o: ReturnType<typeof obb>; lo: number; hi: nu
   return out;
 }
 const grow = (o: ReturnType<typeof obb>, g: number) => obb(o.cx, o.cz, (o.hw + g) * 2, (o.hd + g) * 2, o.rot);
-test('O: no café curtain meets another item (stood over, parted round or skipped)', () => {
+test('O: no café curtain meets another item (stood over, parted round or skipped), and neighbours keep 2 cm', () => {
   let curtains = 0, checked = 0;
   for (const { id, spec } of fleet()) {
     const comp = composeHouse(spec), res = dressRooms(spec);
@@ -565,7 +565,14 @@ test('O: no café curtain meets another item (stood over, parted round or skippe
         const co = curtainObb(c.at, c.rot || 0, c.w, c.h)!, range = curtainRange(c);
         for (const it of items) {
           if (it === c || !Array.isArray(it.at)) continue;
-          if (DRESSERS.includes(it.type)) continue;   // (curtain against curtain: the neighbours' gate, below)
+          if (DRESSERS.includes(it.type)) {
+            // a curtain against another curtain or blind of the layout: the boxes keep CURTAIN_GAP in plan wherever their heights overlap
+            const o2 = itemObb(it); if (!o2) continue;
+            const y2 = it.type === 'cafe-curtain' ? curtainRange(it) : (() => { const sp = spanOfItem(it); return sp ? { lo: sp.lo, hi: sp.hi } : { lo: 0, hi: 9 }; })();
+            if (Math.min(range.hi, y2.hi) - Math.max(range.lo, y2.lo) <= 0.01) continue;
+            assert.ok(obbGap(co, o2) >= CURTAIN_GAP - 1e-6, `${id}/${room.name}: curtain at ${c.at} is ${(obbGap(co, o2) * 1000).toFixed(1)} mm from the ${it.type} at ${it.at}`);
+            checked++; continue;
+          }
           for (const b of boxesOf(it)) {
             if (b.hi <= range.lo - 0.01 || b.lo >= range.hi + 0.01) continue;
             assert.equal(overlap(grow(b.o, 0.01), co) > 0, false, `${id}/${room.name}: curtain at ${c.at} (${range.lo.toFixed(2)}-${range.hi.toFixed(2)} m, w ${c.w}) meets the ${it.type}${isDress(it) ? '*' : ''} at ${it.at} (${b.lo.toFixed(2)}-${b.hi.toFixed(2)} m)`);
@@ -576,10 +583,10 @@ test('O: no café curtain meets another item (stood over, parted round or skippe
     }
   }
   assert.ok(curtains >= 45 && checked >= 400, `${curtains} curtains, ${checked} pairs measured`);
-  console.log(`O: ${curtains} curtain panels over the 30 houses baked and the fixtures, ${checked} box pairs against the other items of their rooms (heights from the catalog and PARTS): none meet`);
+  console.log(`O: ${curtains} curtain panels over the 30 houses baked and the fixtures, ${checked} box pairs against the other items of their rooms (heights from the catalog and PARTS): none meet, neighbours keep ${CURTAIN_GAP * 100} cm`);
 });
 
-test('O2 (controls): the plan parts, lifts and skips where it should', () => {
+test('O2 (controls): the first cut\'s curtains meet what the plan now keeps clear of, and the plan parts, lifts and skips where it should', () => {
   // a straight wall on z = 0 (side N, the room to +z), one window 1.2 m wide, sill 1.0, 1.2 high: the plan of its curtain in the face of one thing at a time
   const geo = (windows: any[]) => ({ runs: [{ side: 'N', kind: 'ext', line: -0.08, face: 0, a: -4, b: 4, windows, doors: [] }] }) as any;
   const win = { a: -0.6, b: 0.6, sill: 1.0, h: 1.2, type: 'window' };
@@ -599,4 +606,22 @@ test('O2 (controls): the plan parts, lifts and skips where it should', () => {
   assert.equal(low.length, 1); assert.ok(low[0].hem >= 0.96 + 0.02, `the hem ${low[0].hem} clears the 0.96 m run`);
   // a wall of cabinets across the window (hung at 1.4 m): nothing is left
   assert.equal(plan([{ type: 'upper-cabinets', at: [0, 0], rot: 0, w: 3, y: 1.4 }]).length, 0, 'upper cabinets across a window leave it bare');
+  // a window with a curtain of its own beside it: the box keeps 2.5 cm from it
+  const own = { type: 'curtains', at: [1.5, 0.05], rot: 0 };
+  const beside = plan([own]); assert.equal(beside.length, 1);
+  assert.ok(obbGap(beside[0].obb, itemObb(own)!) >= CURTAIN_GAP - 1e-6, 'clear of the authored curtain');
+  // two windows 0.1 m apart: two curtains whose boxes keep CURTAIN_GAP (the first cut's overlap by 0.2 m)
+  const two = plan([], [win, { ...win, a: 0.7, b: 1.9 }]);
+  assert.equal(two.length, 2); assert.ok(obbGap(two[0].obb, two[1].obb) >= CURTAIN_GAP - 1e-6, `neighbours ${(obbGap(two[0].obb, two[1].obb) * 1000).toFixed(1)} mm apart`);
+  const old = [{ at: 0, w: 1.4 }, { at: 1.3, w: 1.4 }].map(c => obb(c.at, 0.047, c.w + 0.1, 0.094, 0));
+  assert.ok(obbGap(old[0], old[1]) === 0, 'the first cut\'s two curtains overlap');
+  // over the fleet: the first cut (each window\'s box at window + 0.3, as the first cut) has neighbours under the gap in at least the three houses the skeptic named
+  const clashes = new Set<string>();
+  for (const { id, spec } of fleet()) for (const { lv, room } of rooms(spec)) {
+    const program = dressProgram(room, lv); if (!program) continue;
+    const comp = new Map<any, any[]>(); for (const [rm, rr] of composeHouse(spec)) comp.set(rm, rr.items);
+    const g = (new Dresser(spec, lv, room, program, 0.5, [...(room.items || []).filter((x: any) => !isDress(x)), ...(comp.get(room) || [])], comp) as any).geoC().geo;
+    for (const run of g.runs) { const ws = run.windows.filter((w: any) => w.type === 'window').sort((p: any, q: any) => p.a - q.a); for (let i = 0; i + 1 < ws.length; i++) if ((ws[i + 1].a + ws[i + 1].b) / 2 - (ws[i].a + ws[i].b) / 2 < (ws[i].b - ws[i].a) / 2 + (ws[i + 1].b - ws[i + 1].a) / 2 + 0.3 - CURTAIN_GAP && room.name === 'Kitchen') clashes.add(id); }
+  }
+  assert.ok(clashes.size >= 3, `the first cut's neighbours clash in ${[...clashes]}`);
 });

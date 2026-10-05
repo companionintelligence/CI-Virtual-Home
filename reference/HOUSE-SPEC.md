@@ -577,7 +577,8 @@ lamp on a side table in a corner. A café curtain hangs on the lower half of a k
 clear of the 1.45-1.55 m eye line wherever the window leaves room), in the house's pale cloth. The curtain is planned before the first slot runs (`assets/dress-curtains.ts`),
 and nothing may pass through its cloth: it is lifted over what stands low under the window (a counter higher than the sill, at most 0.22 m), parted into two panels round what
 stands narrow (the sink's tap, a lamp), left off where cabinets or a pantry cover the window, and every dress item keeps out of the volume it takes (a lamp or a canister that
-would reach the cloth moves along the counter).
+would reach the cloth moves along the counter). Two windows side by side each get a curtain whose box ends 1.25 cm from the middle of the wall between them (2.5 cm
+between the two rods and finials), and a curtain keeps 2.5 cm from a blind or curtain the layout hung and never runs past the end of its wall.
 
 | Program | Recipe (tier 1 = always; the lamp only where the layout placed none) |
 |---|---|
