@@ -57,6 +57,8 @@ export function softkit(THREE: any) {
       if (at !== undefined) { const c = this.col; c[at * 3] = c[at * 3 + 1] = c[at * 3 + 2] = Math.min(c[at * 3], s); return at; }
       const i = this.pos.length / 3; this.pos.push(x, y, z); this.col.push(s, s, s); this.map.set(key, i); return i;
     }
+    /** a vertex that is never welded to another (two faces that meet at an edge but must not share its normal) */
+    vRaw(x: number, y: number, z: number, s = 1): number { const i = this.pos.length / 3; this.pos.push(x, y, z); this.col.push(s, s, s); return i; }
     tri(a: number, b: number, c: number) { if (a !== b && b !== c && a !== c) this.idx.push(a, b, c); }
     get tris() { return this.idx.length / 3; }
     get verts() { return this.pos.length / 3; }
@@ -235,7 +237,7 @@ export function softkit(THREE: any) {
 
   // ---- a closed lens leaf (later waves: plants): a real outline, a V fold, a droop; closed so GTAO sees the true silhouette ---
   function leaf(acc: any, o: any) {
-    const { x = 0, y = 0, z = 0, a = 0, t = 0.3, L = 0.2, W = 0.1, droop = 0.6, fold = 0.18, th = 0.006, rows = 5, profile = (u: number) => Math.sin(Math.PI * Math.pow(u, 0.65)), roll = 0, tipS = 1, baseS = SHADE.floor } = o;
+    const { x = 0, y = 0, z = 0, a = 0, t = 0.3, L = 0.2, W = 0.1, droop = 0.6, fold = 0.18, th = 0.006, rows = 5, profile = (u: number) => Math.sin(Math.PI * Math.pow(u, 0.65)), roll = 0, tipS = 1, baseS = SHADE.floor, under = 0.72, edge = 0.92 } = o;   // under: the shade of the lower face (a leaf seen from below: a palm over eye height); edge: the shade of the two rim vertices
     const sa = Math.sin(a), ca = Math.cos(a), S = [ca, 0, -sa];
     let cx = x, cy = y, cz = z;
     const top: number[] = [], bot: number[] = [];
@@ -245,11 +247,16 @@ export function softkit(THREE: any) {
       const ang = t + droop * Math.pow(u, 1.15), st = Math.sin(ang), ct = Math.cos(ang);
       const T = [sa * st, ct, ca * st], N = [T[1] * S[2] - T[2] * S[1], T[2] * S[0] - T[0] * S[2], T[0] * S[1] - T[1] * S[0]];
       const hw = (W / 2) * Math.max(0.0001, profile(u)), lift = fold * hw, s = baseS + (tipS - baseS) * u, rl = roll * hw, e = i === 0 || i === rows;
-      const l = acc.v(cx - S[0] * hw + N[0] * (lift + rl), cy - S[1] * hw + N[1] * (lift + rl), cz - S[2] * hw + N[2] * (lift + rl), s * 0.92);
-      const r = acc.v(cx + S[0] * hw + N[0] * (lift - rl), cy + S[1] * hw + N[1] * (lift - rl), cz + S[2] * hw + N[2] * (lift - rl), s * 0.92);
+      const l = acc.v(cx - S[0] * hw + N[0] * (lift + rl), cy - S[1] * hw + N[1] * (lift + rl), cz - S[2] * hw + N[2] * (lift + rl), s * edge);
+      const r = acc.v(cx + S[0] * hw + N[0] * (lift - rl), cy + S[1] * hw + N[1] * (lift - rl), cz + S[2] * hw + N[2] * (lift - rl), s * edge);
       const rt = acc.v(cx + N[0] * th / 2, cy + N[1] * th / 2, cz + N[2] * th / 2, Math.min(1, s * 1.1));
-      const rb = e ? rt : acc.v(cx - N[0] * th / 2, cy - N[1] * th / 2, cz - N[2] * th / 2, s * 0.72);
-      top.push(l, rt, r); bot.push(l, rb, r);
+      const rb = e ? rt : acc.v(cx - N[0] * th / 2, cy - N[1] * th / 2, cz - N[2] * th / 2, s * under);
+      // the rim is TWO vertices (same place), one for the top face and one for the lower: if they were welded, computeVertexNormals would average an upward and a downward face into a
+      // sideways normal, a surface lit as if edge-on, and GTAO (which reads the normal) turned the whole rim black, from above and from below. A rim split keeps the geometry closed
+      // to the eye (no gap) and gives each face its own smooth normal.
+      const l2 = e ? l : acc.vRaw(cx - S[0] * hw + N[0] * (lift + rl), cy - S[1] * hw + N[1] * (lift + rl), cz - S[2] * hw + N[2] * (lift + rl), s * edge);
+      const r2 = e ? r : acc.vRaw(cx + S[0] * hw + N[0] * (lift - rl), cy + S[1] * hw + N[1] * (lift - rl), cz + S[2] * hw + N[2] * (lift - rl), s * edge);
+      top.push(l, rt, r); bot.push(l2, rb, r2);
     }
     acc.grid(top, 2, rows, [0, 1, 0]); acc.grid(bot, 2, rows, [0, -1, 0]);
   }
