@@ -82,7 +82,7 @@ test('L1: only daylight turns the fill off; off is hidden and the night programs
   assert.match(src, /function prewarmNight\(/); assert.match(src, /renderer\.compile\(kids\[k\], d\.camera, d\.scene\)/); assert.match(src, /schedulePrewarm\(s\);\n\}/);
   const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
   assert.ok(!/Date\.now|performance\.now|Math\.random/.test(code), 'no clock in the fixtures: a frame must not depend on when the pre-warm ran');
-  assert.ok(PREWARM_SLICE >= 8 && PREWARM_SLICE <= 64 && PREWARM_DELAY_MS >= 1000);
+  assert.ok(PREWARM_SLICE >= 8 && PREWARM_SLICE <= 64 && PREWARM_DELAY_MS <= 250, 'the pre-warm starts as the build returns (v3: 2.5 s, which left an early flip cold)');
 });
 
 // ---- L2: the ceiling bounce -------------------------------------------------------------------------------------------------------------
@@ -319,4 +319,18 @@ test('LIGHT v3.1 (1): day has an outside grade that is v2\'s; the other hours gr
   const env = fs.readFileSync(path.join(ROOT, 'assets', 'environment.ts'), 'utf8');
   assert.match(env, /mix\(gradeOf\(rgb, outContrast, outPivot, outSaturation, outVignette, edge\), inside, interior\)/);
   assert.ok(!/Math\.random|Date\.now|performance\.now/.test(env.replace(/\/\/.*$/gm, '')), 'no clock or random in the grade');
+});
+
+test('LIGHT v3.1 (2): a flip a person makes before the night programs are built holds the lights, and nothing else ever sees a held light', () => {
+  const src = fs.readFileSync(path.join(ROOT, 'assets', 'fixtures.ts'), 'utf8');
+  const page = fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8');
+  assert.match(src, /const hold = show && hide && gain >= FILL_ON_GAIN && uiFlip\(\) && holdForWarm\(current\)/, 'only a UI flip to a lit hour, under the hide policy, waits');
+  assert.match(src, /if \(!s\.sawOff \|\| \(window as any\)\.__fillNoWarm === true\) return false/, 'a house that opens at dusk is lit from its first frame; the cold switch (__fillNoWarm) is never held');
+  assert.match(src, /export function settleNight\(\)/); assert.match(src, /__houseFixturesSettle = settleNight/);
+  assert.match(page, /if \(window\.__houseFixturesSettle\) window\.__houseFixturesSettle\(\)/, 'the composer settles before an offline frame');
+  assert.match(page, /const uiFlip = fn => \{ window\.__houseUiFlip = true; try \{ return fn\(\); \} finally \{ window\.__houseUiFlip = false; \} \}/);
+  assert.match(page, /uiFlip\(\(\) => setLightingPreset\(k === 'auto' \? homeLighting\(\) : k\)\)/, 'the editor\'s time-of-day control');
+  assert.match(page, /setLighting: name => uiFlip\(\(\) => setLightingPreset\(name\)\)/, 'the player\'s toggle');
+  assert.ok(!/__houseSetLighting = \(preset\) => \{ uiFlip/.test(page), 'the QA hook, a build and a harness are never held');
+  assert.ok(/setTimeout\(step, 0\)/.test(src) && !/requestIdleCallback/.test(src.replace(/\/\/.*$/gm, '')), 'paced between frames, not by idle time an editor never has');
 });

@@ -132,10 +132,38 @@ export function applyLampGain(gain: number = readGain()) {
   if (!current) return;
   current.gain = gain;
   const hide = hideOffGain();
+  if (gain < FILL_ON_GAIN) current.sawOff = true;
+  let show = !hide || gain >= FILL_ON_GAIN;
+  // LIGHT v3.1 (2): a person's flip to dusk before the night programs are built would build them on the first frame (380-830 ms). That flip keeps the room lights hidden
+  // until the pre-warm is done (a few frames in the player, a second or two in the editor; the hour itself changes at once) and shows them then, a lookup. Only a flip the
+  // UI makes (`window.__houseUiFlip`) waits: a build, a harness and an offline frame never see a held light (see settleNight).
+  const hold = show && hide && gain >= FILL_ON_GAIN && uiFlip() && holdForWarm(current);
+  if (hold) show = false;
+  setHeld(current, hold);
   for (const { light, base } of current.lights) {
     light.intensity = lightLevel(base, gain);
-    light.visible = !hide || gain >= FILL_ON_GAIN;
+    light.visible = show;
   }
+}
+const uiFlip = (): boolean => typeof window !== 'undefined' && (window as any).__houseUiFlip === true;
+const setHeld = (s: any, held: boolean) => {
+  if (!!s.held === held) return;
+  s.held = held;
+  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('house:lights', { detail: { warming: held } }));
+};
+/** should a flip to a lit hour keep the lights hidden for now? Only a house that has been shown at day (its programs are the day's), with the night programs not yet all built:
+ *  a house that opens at dusk is lit from its first frame, as it always was. Starts the pre-warm if it has not begun. */
+function holdForWarm(s: any): boolean {
+  if (!s.sawOff || (window as any).__fillNoWarm === true) return false;
+  if (!s.prewarm) { clearTimeout(s.prewarmTimer); prewarmNight(s); }
+  return !!s.prewarm && !s.prewarm.done;
+}
+/** an offline frame (the composer: a film, a still, the preview) must never be drawn with a held light: show them now, paying the compile in that frame (nothing interactive waits on it) */
+export function settleNight() {
+  const s = current;
+  if (!s || !s.held) return;
+  if (s.prewarm) s.prewarm.done = true;
+  applyLampGain(s.gain);   // not a UI flip here: the lights show
 }
 
 // ---- the night programs, built in idle time (LIGHT v3 item 6) -----------------------------------------------------------------------------
@@ -145,7 +173,7 @@ export function applyLampGain(gain: number = readGain()) {
 // drawn with the lights on), and hides them again in the same call; a slice is a fixed number of the scene's children, no clock. Nothing here changes a pixel: an
 // editor or composer frame renders the same whether or not the programs exist yet (they would be built on first use).
 export const PREWARM_SLICE = 24;        // scene children compiled per step
-export const PREWARM_DELAY_MS = 2500;   // after the last storey is dressed: the player's own first-frame compile (viewer.ts precompile) is done by then
+export const PREWARM_DELAY_MS = 0;      // after the build returns: v3 waited 2.5 s, which left a person who flipped to dusk in the first seconds a cold switch (LIGHT v3.1 item 2)
 const glassInScene = (scene: any): boolean => { let g = false; scene.traverse((o: any) => { if (!g && o.isMesh && o.userData && o.userData.windowGlow) g = true; }); return g; };
 function prewarmNight(s: any) {
   if (typeof window === 'undefined' || s.prewarm) return;
@@ -153,9 +181,12 @@ function prewarmNight(s: any) {
   if (!d || !d.renderer || typeof d.renderer.compile !== 'function' || !d.scene || !d.camera) return;
   s.prewarm = { next: 0 };
   const lights = s.lights.map((l: any) => l.light);
+  // done: the lights a flip was holding come on now (a lookup)
+  const finish = () => { s.prewarm.done = true; if (s.held && current === s) applyLampGain(s.gain); };
   const step = () => {
     if (current !== s || !lights.length) return;                       // another house is on screen
-    if (lights.some((l: any) => l.visible)) { s.prewarm.done = true; return; }   // it is dusk or night: the programs exist because they were just used
+    if (s.prewarm.done) return;                                        // settled by an offline frame meanwhile
+    if (lights.some((l: any) => l.visible)) { finish(); return; }      // it is dusk or night: the programs exist because they were just used
     const kids = d.scene.children.slice(), end = Math.min(kids.length, s.prewarm.next + PREWARM_SLICE);
     // a double-sided transmissive material (window glass) is drawn back faces first, then front: the frame builds both programs, `compile` only the side it has
     const glass: any[] = [];
@@ -165,6 +196,7 @@ function prewarmNight(s: any) {
     if (s.prewarm.glassScene === undefined) s.prewarm.glassScene = glassInScene(d.scene);
     const rt = s.THREE && s.prewarm.glassScene ? new s.THREE.WebGLRenderTarget(4, 4) : null;
     for (const l of lights) l.visible = true;
+    let failed = false;
     try {
       for (let k = s.prewarm.next; k < end; k++) d.renderer.compile(kids[k], d.camera, d.scene);
       if (rt) {
@@ -178,13 +210,14 @@ function prewarmNight(s: any) {
         finally { for (const m of glass) { m.side = 2; m.needsUpdate = true; } }
       }
     }
-    catch (e) { s.prewarm.error = String(e); s.prewarm.done = true; }
+    catch (e) { s.prewarm.error = String(e); failed = true; }
     finally { for (const l of lights) l.visible = false; }
+    if (failed) { finish(); return; }
     s.prewarm.next = end;
-    if (end >= kids.length) { s.prewarm.done = true; return; }
-    if (!s.prewarm.done) (typeof w.requestIdleCallback === 'function' ? w.requestIdleCallback(step, { timeout: 200 }) : setTimeout(step, 16));
+    if (end >= kids.length) { finish(); return; }
+    if (!s.prewarm.done) setTimeout(step, 0);   // between two frames: v3 asked for idle time, which an editor drawing a frame every 40 ms never gave (the pre-warm took 5 s there)
   };
-  step();
+  setTimeout(step, 0);   // never inside the flip's own frame
 }
 function schedulePrewarm(s: any) {
   if (typeof window === 'undefined' || !hideOffGain() || (window as any).__fillNoWarm === true) return;   // __fillNoWarm: v1's cold switch, for the hitch test to measure
@@ -193,6 +226,8 @@ function schedulePrewarm(s: any) {
 }
 if (typeof window !== 'undefined') {
   (window as any).__houseFixturesWarm = () => current && current.prewarm;   // QA hook: how far the pre-warm got
+  (window as any).__houseLightsHeld = () => !!(current && current.held);
+  (window as any).__houseFixturesSettle = settleNight;                       // the composer calls it before an offline frame (room-creator.html tuneComposerLook)
   window.addEventListener('house:lighting', (e: any) => {
     const g = e && e.detail && e.detail.lampGain;
     applyLampGain(typeof g === 'number' && Number.isFinite(g) ? g : readGain());

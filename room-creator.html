@@ -6868,7 +6868,8 @@
       const p = TIME_OF_DAY[appliedPreset] || TIME_OF_DAY.day, L = window.__houseLighting;
       const sun = L && L.sun, az = sun ? ((Math.atan2(sun[0], -sun[2]) * 180 / Math.PI) + 360) % 360 : null;   // compass: +x east, −z north
       const readout = document.getElementById('sun-readout');
-      if (readout) readout.textContent = `${uiLighting === 'auto' ? "The home's own: " : ''}${p.label}. Sun ${az === null ? '' : `from ${Math.round(az)}° (${compass(az)}), `}${p.sun.elevation}° up.`;
+      const warming = window.__houseFixturesWarm && window.__houseFixturesWarm() && window.__houseLightsHeld && window.__houseLightsHeld();
+      if (readout) readout.textContent = `${uiLighting === 'auto' ? "The home's own: " : ''}${p.label}. Sun ${az === null ? '' : `from ${Math.round(az)}° (${compass(az)}), `}${p.sun.elevation}° up.${warming ? ' Preparing the room lights…' : ''}`;
     }
     const compass = a => ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'][Math.round(a / 45) % 8];
     // the sun's turn: the home's entry bearing (lightingAim.front, set by the build) rotated by sunTurn degrees
@@ -6878,9 +6879,11 @@
       applyLighting(undefined, { front: [fx * Math.cos(a) + fz * Math.sin(a), -fx * Math.sin(a) + fz * Math.cos(a)] });
       syncTod();
     }
+    // a flip a person makes holds the room lights back until the night programs are built (fixtures.ts applyLampGain, LIGHT v3.1 item 2); a build or a harness never waits
+    const uiFlip = fn => { window.__houseUiFlip = true; try { return fn(); } finally { window.__houseUiFlip = false; } };
     function chooseLighting(k) {
       uiLighting = k;
-      setLightingPreset(k === 'auto' ? homeLighting() : k);
+      uiFlip(() => setLightingPreset(k === 'auto' ? homeLighting() : k));
       if (sunTurn) applySunTurn();
       syncTod();
       if (!VIEW_MODE) writeUiState({ lighting: k === 'auto' ? null : k });
@@ -6896,6 +6899,7 @@
     const sunSlider = document.getElementById('slider-sun-bearing'), sunOut = document.getElementById('val-sun-bearing');
     sunSlider?.addEventListener('input', () => { sunTurn = Number(sunSlider.value); sunOut.textContent = `${sunTurn > 0 ? '+' : ''}${sunTurn}°`; applySunTurn(); });
     window.addEventListener('house:lighting', () => syncTod());
+    window.addEventListener('house:lights', () => syncTod());   // a flip is holding the room lights back for a moment (fixtures.ts)
     buildTodControl();
 
     // -------------------------------------------------------------
@@ -8991,6 +8995,7 @@
     // Bloom and grade follow the time of day: re-read from the active preset on every composerFor() call, cache
     // hit or miss, like the GTAO clip box — a preset change never needs the composer rebuilt.
     function tuneComposerLook(fc) {
+      if (window.__houseFixturesSettle) window.__houseFixturesSettle();   // an offline frame is never drawn with a room light a flip is still holding back (fixtures.ts settleNight)
       const p = TIME_OF_DAY[lightingAim.preset] || TIME_OF_DAY.day;
       fc.bloom.strength = p.bloom.strength; fc.bloom.radius = p.bloom.radius; fc.bloom.threshold = p.bloom.threshold;
       const u = fc.grade.uniforms;
@@ -10061,7 +10066,7 @@
           dress: (dressing, eye, target) => applyShotCutaway({ dressing }, 0, eye, target),
           houseInside,
           lighting: () => lightingAim.preset,
-          setLighting: name => setLightingPreset(name),
+          setLighting: name => uiFlip(() => setLightingPreset(name)),
           hideEditorHelpers() { gridHelper.visible = false; transformControls.detach(); },
           // HQ goes through the recorder's composer at the canvas's own resolution — the CSS size times the pixel
           // ratio the player has settled on — not the CSS size: renderFrame supersamples 2× only up to 1080p, so a
