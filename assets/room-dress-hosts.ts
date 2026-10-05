@@ -77,7 +77,7 @@ export const HOSTS: Record<string, HostDef> = {
   'round-dining-table': { kind: 'dining-table', top: 0.75, rects: s => [round(s)], margin: 0 },
   'pedestal-dining-table': { kind: 'dining-table', top: 0.76, rects: s => [round(s)], margin: 0 },
   // ---- the strip of counter between a double vanity's two vessel basins (0.34 m clear: the vanity set is 0.30)
-  'double-vanity': { kind: 'vanity', top: 0.90, rects: s => [[s.ox - 0.16, s.oz - 0.23, s.ox + 0.16, s.oz + 0.23]], margin: 0 },
+  'double-vanity': { kind: 'vanity', top: 0.89, rects: s => [[s.ox - 0.16, s.oz - 0.23, s.ox + 0.16, s.oz + 0.23]], margin: 0 },
   // ---- a console, a tank, the top of a machine
   'demilune-console': { kind: 'console', top: 0.82, rects: s => [inset(s, 0.13, 0.02, 0.13, 0.14)] },
   'toilet': { kind: 'tank', top: 0.805, rects: s => [[s.ox - 0.185, s.oz - s.d / 2, s.ox + 0.185, s.oz - s.d / 2 + 0.19]], margin: 0.012 },
@@ -188,6 +188,10 @@ export function fitIn(free: Rect[], w: number, d: number, anchor: Anchor = 'cent
     const dist = Math.hypot(x - tx, z - tz), a = area(r);
     if (!best || dist < best.dist - 1e-9 || (Math.abs(dist - best.dist) <= 1e-9 && a > best.a)) best = { x, z, dist, a };
   }
-  return best ? [Math.round(best.x * 100) / 100, Math.round(best.z * 100) / 100] : null;
+  if (!best) return null;
+  // to the centimetre where that stays inside the rect, else to the millimetre toward the inside (the box never ends up outside what fitted)
+  const snap = (v: number, lo: number, hi: number): number => { const a = Math.ceil(lo * 1000 - 1e-6) / 1000, b = Math.floor(hi * 1000 + 1e-6) / 1000; if (a > b) return v; return Math.max(a, Math.min(b, Math.round(v * 100) / 100)); };
+  const r = free.filter(q => q[2] - q[0] >= w - 1e-6 && q[3] - q[1] >= d - 1e-6 && best!.x - w / 2 >= q[0] - 1e-6 && best!.x + w / 2 <= q[2] + 1e-6 && best!.z - d / 2 >= q[1] - 1e-6 && best!.z + d / 2 <= q[3] + 1e-6)[0];
+  return r ? [snap(best.x, r[0] + w / 2, r[2] - w / 2), snap(best.z, r[1] + d / 2, r[3] - d / 2)] : [Math.round(best.x * 1000) / 1000, Math.round(best.z * 1000) / 1000];
 }
 export { area as rectArea };
