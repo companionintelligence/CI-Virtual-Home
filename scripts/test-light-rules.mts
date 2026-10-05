@@ -243,12 +243,33 @@ test('night is lamp-lit: a cool sky over a warm ground, env 0.30 kept, and dusk 
   const s = parseInt(n.hemi.sky.slice(1), 16); assert.ok((s & 255) > ((s >> 16) & 255), 'the sky stays cool');
 });
 
-test('linen holds its albedo cap, so a bed can take a lamp without clipping (L0\'s 0.85, applied through colors.linen)', () => {
+test('linen holds its albedo cap, so a bed can take a lamp without clipping (L0\'s 0.85), and only bedding, pillows and towels are held to it', async () => {
   const max = (c: number) => Math.max((c >> 16) & 255, (c >> 8) & 255, c & 255) / 255;
   assert.ok(max(capAlbedo(0xf2efe9, ROLES.linen.albedoCap)) <= ROLES.linen.albedoCap + 1 / 255);
   assert.ok(max(capAlbedo(0xf2efe9, ROLES.linen.albedoCap)) >= ROLES.linen.albedoCap - 2 / 255, 'and no darker than it must be');
   assert.equal(capAlbedo(0x808080, 0.85), 0x808080, 'a colour under the cap is untouched');
   const r = (c: number) => [(c >> 16) & 255, (c >> 8) & 255, c & 255], a = r(0xf2efe9), b = r(capAlbedo(0xf2efe9, 0.85));
   assert.ok(Math.abs(a[0] / a[2] - b[0] / b[2]) < 0.02, 'hue kept: the channels scale together');
-  assert.match(fs.readFileSync(path.join(ROOT, 'assets', 'materials.ts'), 'utf8'), /linen: capAlbedo\(0xf2efe9, FINISH_ROLES\.linen\.albedoCap\)/);
+  // LIGHT v3 (4): the role's own colour is the soft white it always was; the cap is applied by what a thing is, in fixtures.ts
+  const mats = fs.readFileSync(path.join(ROOT, 'assets', 'materials.ts'), 'utf8');
+  assert.match(mats, /linen: 0xf2efe9, metal: 0x2b2f33/); assert.ok(!/linen: capAlbedo/.test(mats), 'kit.colors.linen is not capped: that moved 90 classes that are not bedding');
+  const { capLinen, LINEN_ITEMS, LINEN_ROLES, LINEN_CAP } = await import('../assets/fixtures.js');
+  assert.equal(LINEN_CAP, 0.85);
+  const col = (hex: number) => ({ hex, getHex() { return this.hex; }, setHex(h: number) { this.hex = h; } });
+  const mesh = (hex: number, role?: string, extra: any = {}) => ({ isMesh: true, userData: role ? { role } : {}, material: { color: col(hex), ...extra } });
+  const item = (type: string | undefined, ...ms: any[]) => ({ userData: { itemType: type }, traverse(f: any) { f(this); ms.forEach(f); } });
+  const bed = item('upholstered-bed', mesh(0xf2efe9)), fridge = item('fridge', mesh(0xf2efe9)), tub = item('clawfoot-tub', mesh(0xf2efe9)), toilet = item('toilet', mesh(0xf2efe9));
+  const softBed = item('some-new-bed', mesh(0xf2efe9, 'duvet'), mesh(0xf2efe9, 'wood')), towel = item('towel-rail', mesh(0xf2efe9)), quilt = item('headboard-bed', mesh(0xf2efe9, undefined, { map: {} }));
+  const lamp = item('floor-lamp', mesh(0xf2efe9, undefined, { emissive: col(0xffd9a6) }));
+  assert.ok(capLinen([bed, fridge, tub, toilet, softBed, towel, quilt, lamp]) > 0);
+  const hexOf = (it: any) => { let h = -1; it.traverse((m: any) => { if (m.material && h < 0) h = m.material.color.getHex(); }); return h; };
+  const mx = (c: number) => Math.max((c >> 16) & 255, (c >> 8) & 255, c & 255) / 255;
+  assert.ok(mx(hexOf(bed)) <= LINEN_CAP + 1 / 255 && mx(hexOf(towel)) <= LINEN_CAP + 1 / 255, 'a bed and a towel are held');
+  assert.equal(hexOf(fridge), 0xf2efe9); assert.equal(hexOf(tub), 0xf2efe9); assert.equal(hexOf(toilet), 0xf2efe9);   // appliances, tubs and toilets keep the white they had
+  let duvet = -1, wood = -1; softBed.traverse((m: any) => { if (m.userData && m.userData.role === 'duvet') duvet = m.material.color.getHex(); if (m.userData && m.userData.role === 'wood') wood = m.material.color.getHex(); });
+  assert.ok(mx(duvet) <= LINEN_CAP + 1 / 255, 'SOFT\'s duvet role is held on an item type this file has never heard of'); assert.equal(wood, 0xf2efe9, 'a mesh of another role on it is not');
+  assert.equal(hexOf(quilt), 0xf2efe9, 'a textured cloth carries its own palette'); assert.equal(hexOf(lamp), 0xf2efe9, 'a lamp shade (emissive) is not bedding');
+  assert.equal(capLinen([bed]), 0, 'idempotent');
+  for (const t of ['upholstered-bed', 'towel-rail', 'cushion-set']) assert.ok(LINEN_ITEMS.has(t)); for (const t of ['duvet', 'linen', 'towel']) assert.ok(LINEN_ROLES.has(t));
+  for (const t of ['fridge', 'toilet', 'clawfoot-tub', 'piano', 'candle-set', 'kitchen-island']) assert.ok(!LINEN_ITEMS.has(t), `${t} is not linen`);
 });

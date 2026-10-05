@@ -29,6 +29,8 @@ import { mulberry32, fnv1a } from './materials.js';
 import { inRect } from './house-geometry.js';
 import { programKind, fanPlan, lampPlan, REGISTRY_LAMPS, LAMP_ITEMS } from './kit-rules.js';
 import { schemeOf } from './house-scheme.js';
+import { capAlbedo } from './materials.js';
+import { FINISH_ROLES } from './props/finish-roles.js';
 import { heroFrame } from './hero-frame.js';
 import { clearSlots, setSlot, codedDecay, roomClipBox, POOL_DATA, POOL_CORE, POOL_HALO_R, POOL_HALO_K, POOL_UP_FADE } from './room-clip.js';
 
@@ -340,6 +342,40 @@ function varyRegistryLamps(placed, s, THREE, lampOf) {
   }
 }
 
+// ---- the linen cap, scoped (LIGHT v3 item 4) ------------------------------------------------------------------------------------
+// finish-roles.ts holds linen under an albedo of 0.85: pure white has no fold to read and clips under a lamp (the cutestarter bedspread was a navy cloth
+// blown to white by a hot pool over a 0.95 albedo). v2 applied the cap through kit.colors.linen, the one colour every prop reads, and that reached 90 more item
+// classes than the intent (appliances, cabinets, toilets, tubs, the piano, a printer, candles: whatever called itself linen). It is applied here instead, by what the
+// thing IS: the item types that are bedding, pillows or towels, and (so SOFT's softkit lands in it without an edit) any mesh whose userData.role is one of the cloth
+// roles its bedding and towels use. Only a flat colour over the cap is touched (a patterned quilt carries its own palette), the hue is kept (the channels scale together),
+// and kit.colors.linen is the 0xf2efe9 it always was, so no other class moves and plan.json's kit.colors does not change.
+export const LINEN_CAP = FINISH_ROLES.linen.albedoCap;
+/** the bed types (placement.ts group 'bed'), the cloth things that lie on or hang by one, and the towels */
+export const LINEN_ITEMS: ReadonlySet<string> = new Set([
+  'single-bed', 'bunk-bed', 'daybed', 'four-poster-bed', 'canopy-bed', 'mattress-on-floor', 'toddler-bed', 'headboard-bed', 'loft-bed', 'sleigh-bed', 'upholstered-bed', 'house-bed',
+  'platform-bed', 'crib', 'cushion-set', 'throw-blanket', 'floor-cushion', 'towel-rail', 'heated-towel-rail', 'towel-ladder', 'towel-stack', 'towel-ring-set', 'bath-mat']);
+/** the mesh roles of SOFT's bedding and towels (softkit.ts: 'linen' mattress and sleeping pillows, 'duvet', ...; soft2.ts towels): capped on any item */
+export const LINEN_ROLES: ReadonlySet<string> = new Set(['linen', 'duvet', 'pillow', 'sheet', 'towel', 'robe', 'throw']);
+export function capLinen(placed: any[]): number {
+  let n = 0;
+  for (const o of placed) {
+    const u = o.userData || {};
+    if (u.linenCapped) continue;
+    const byType = LINEN_ITEMS.has(u.itemType);
+    u.linenCapped = true;
+    o.traverse((m: any) => {
+      if (!m.isMesh || !m.material) return;
+      if (!byType && !LINEN_ROLES.has(m.userData && m.userData.role)) return;
+      for (const mat of Array.isArray(m.material) ? m.material : [m.material]) {
+        if (!mat || !mat.color || mat.map || (mat.emissive && mat.emissive.getHex() !== 0)) continue;
+        const c = mat.color.getHex(), k = capAlbedo(c, LINEN_CAP);
+        if (k !== c) { mat.color.setHex(k); n++; }
+      }
+    });
+  }
+  return n;
+}
+
 // ---- builders (origin at the ceiling point; everything hangs into −y) -------------------------------------------
 function ceilingFan(THREE, s, drop) {
   const g = new THREE.Group(); g.name = `Ceiling Fan (${s.fanStyle})`;
@@ -423,6 +459,7 @@ export function dressLevel(ctx) {
   const cans: Array<{ p: Pt; ceil: number }> = [];   // the storey's recessed cans, built after the rooms
   const s = stateFor(ctx);
   tagWindowGlass(placed, s);
+  s.stats.linenCapped = (s.stats.linenCapped || 0) + capLinen(placed.filter(o => o.position.y > y - 0.05 && o.position.y < y + H));
   // a room's lamp kind (by its name on this storey — the rooms loop tags each item with its room's name); a room
   // with a program (S3's composer dresses its own lamps: plan Completeness C9) keeps what it placed
   // Two rooms may share a name on a storey ("Bedroom", "Bedroom"): the lamp's own plan position then settles which.
