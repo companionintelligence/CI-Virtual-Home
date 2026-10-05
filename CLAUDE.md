@@ -53,6 +53,9 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   must stay protected — pull requests only, a code owner's review, `.github/CODEOWNERS` covering `.github/` — because
   whoever can change `deploy.yml` on `main` can read the token; `deploy.yml` skips until it is. Only the owner sets
   the token; never ask for it.
+- Google Analytics 4 is injected into the production site's HTML by an inline step in `deploy.yml` ("Inject Google Analytics"),
+  from the repository variable `GA_MEASUREMENT_ID` (a variable, not a secret). Never hardcode the id; the step is a no-op
+  unless it matches `/^G-[A-Z0-9]+$/`, and it is idempotent. The site sets no CSP, so no header change is needed.
 - Do not deploy by hand; merge, or ask the owner to run the workflow. The by-hand steps in the README are the
   owner's fallback. GitHub Pages is retired (its github.io address redirects to a dead org domain): do not bring a
   github.io deploy back, and do not make Wrangler a devDependency.
