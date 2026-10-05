@@ -62,7 +62,7 @@ test('the baked-model role table agrees with the finish roles where both name a 
 });
 
 // ---- L1: the room fill ------------------------------------------------------------------------------------------------------------------
-import { ROOM_FILL_K, FILL_PENUMBRA, FILL_ANGLE_MAX, FILL_ON_GAIN, LIGHT_CAP, hideOffGain, applyLampGain, lightLevel } from '../assets/fixtures.js';
+import { ROOM_FILL_K, FILL_PENUMBRA, FILL_ANGLE_MAX, FILL_ON_GAIN, LIGHT_CAP, hideOffGain, applyLampGain, lightLevel, PREWARM_SLICE, PREWARM_DELAY_MS } from '../assets/fixtures.js';
 import { TIME_OF_DAY, lookOf } from '../assets/environment.js';
 
 test('L1: the room light is a soft fill (numbers the acceptance was calibrated on)', () => {
@@ -72,12 +72,17 @@ test('L1: the room light is a soft fill (numbers the acceptance was calibrated o
   assert.equal(LIGHT_CAP, 16);
 });
 
-test('L1: only daylight turns the fill off, and off is intensity 0 in every path (no hiding: nothing recompiles on a time-of-day switch)', () => {
+test('L1: only daylight turns the fill off; off is hidden and the night programs are built in idle time (so neither hour pays for the other)', () => {
   for (const [name, p] of Object.entries(TIME_OF_DAY)) assert.equal(p.lampGain < FILL_ON_GAIN, name === 'day', `${name} lampGain ${p.lampGain}`);
-  assert.equal(hideOffGain(), false, 'no window (Node) is no hiding: v1 hid the lights offline and the editor stalled seconds on the first toggle');
+  assert.equal(hideOffGain(), true, 'hiding is the policy (v2\'s intensity 0 cost every day frame 15-23 %); window.__fillZero brings v2 back for an A/B');
   assert.equal(lightLevel(5, TIME_OF_DAY.day.lampGain), 0, 'off by day');
   assert.equal(lightLevel(5, TIME_OF_DAY.dusk.lampGain), 5 * TIME_OF_DAY.dusk.lampGain);
   applyLampGain(0.5);   // no house built: a no-op, not a throw
+  const src = fs.readFileSync(path.join(ROOT, 'assets', 'fixtures.ts'), 'utf8');
+  assert.match(src, /function prewarmNight\(/); assert.match(src, /renderer\.compile\(kids\[k\], d\.camera, d\.scene\)/); assert.match(src, /schedulePrewarm\(s\);\n\}/);
+  const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+  assert.ok(!/Date\.now|performance\.now|Math\.random/.test(code), 'no clock in the fixtures: a frame must not depend on when the pre-warm ran');
+  assert.ok(PREWARM_SLICE >= 8 && PREWARM_SLICE <= 64 && PREWARM_DELAY_MS >= 1000);
 });
 
 // ---- L2: the ceiling bounce -------------------------------------------------------------------------------------------------------------

@@ -179,7 +179,7 @@ export function installRoomClip(THREE: any): boolean {
     .replace(POINT_INFO, `${POINT_INFO}\n\t\tvhRoomClip( pointLight.decay, vhWorld, directLight, pointLight.position - geometryPosition, pointLight.color );`)
     .replace(SPOT_INFO, `${SPOT_INFO}\n\t\tvhRoomClip( spotLight.decay, vhWorld, directLight, spotLight.position - geometryPosition, spotLight.color );`);
   // BRDF only where a light reaches (the spot and point loops come before the directional one). A light a fragment is clipped from, or one at
-  // intensity 0 (every room light by day, see fixtures.ts hideOffGain), adds exactly +0, so the picture is the same bit for bit; without the
+  // intensity 0 (a room light under the v2 policy, fixtures.ts __fillZero), adds exactly +0, so the picture is the same bit for bit; without the
   // branch sixteen of them cost sixteen Lambert + GGX evaluations a fragment for nothing. light-guard.ts does this for the live player;
   // wrapping again there is harmless (the text it looks for is still there, twice).
   const cut = text.indexOf('#if ( NUM_DIR_LIGHTS > 0 )');

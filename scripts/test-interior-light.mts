@@ -29,6 +29,7 @@
 //                                             serves another checkout) and compare: L2's tag on ceiling materials must cost at most +2 % median.
 //                                             --houses a,b  --label <name>
 //
+//   pnpm run test:light -- --steady          the steady DAY frame time of the shipped off-light policy against the old hide policy, player or --editor, many-frame medians (LIGHT v3 item 6)
 //   pnpm run test:light -- --closeups        GTAO thickness 1 against the shipped value on pendants, shades, curtains, plants, a stair and a chair (LIGHT v3 item 5)
 //   pnpm run test:light -- --mood            night: the luma within 1.2 m of a lamp against the room's far wall, on the bench rooms (LIGHT v3 item 2; target 1.3 or more)
 //   pnpm run test:light -- --lamps           the lamp census: every glowing lamp of every house by type, and which rooms have no pool (LIGHT v3 item 1)
@@ -253,16 +254,18 @@ async function hitchMode(): Promise<number> {
   const session = await startSession();
   const table: any[] = [];
   try {
-    for (const house of houses) for (const policy of ['hide', 'zero'] as const) {
+    for (const house of houses) for (const policy of (args.policies && args.policies !== 'true' ? args.policies : 'hide,cold,zero').split(',') as Array<'hide' | 'cold' | 'zero'>) {   // hide: shipped (hidden by day, night programs pre-warmed, waited for); cold: hidden, no pre-warm (v1); zero: intensity 0 in the loop (v2)
       const ctx = await session.browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
       const page = await ctx.newPage();
       const errors: string[] = []; page.on('pageerror', (e: Error) => errors.push(e.message.split('\n')[0]));
       await page.route('https://fonts.googleapis.com/**', (r: any) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
       await page.route('https://fonts.gstatic.com/**', (r: any) => r.abort());
-      await page.addInitScript((hide: boolean) => { (window as any).__fillHide = hide; }, policy === 'hide');   // the policy is in force from the build, as shipped code would have it
+      await page.addInitScript((p: string) => { (window as any).__fillZero = p === 'zero'; (window as any).__fillNoWarm = p === 'cold'; }, policy);   // the policy is in force from the build, as shipped code would have it
       await page.goto(session.srv.url(args.editor === 'true' ? `room-creator.html?house=${house}` : `room-creator.html?mode=view&house=${house}&tod=day&play=0`), { waitUntil: 'domcontentloaded', timeout: 240000 });
       await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, house, { timeout: 240000 });
       if (args.editor === 'true') await page.evaluate(() => (window as any).__houseSetLighting('day'));
+      let warmMs = -1;
+      if (policy === 'hide') { const t0 = Date.now(); await page.waitForFunction(() => { const w = (window as any).__houseFixturesWarm && (window as any).__houseFixturesWarm(); return !!(w && w.done); }, null, { timeout: 180000, polling: 250 }); warmMs = Date.now() - t0; }
       const r = await page.evaluate(async ({ reps }: any) => {
         const W = window as any, d = W.__houseDebug(), R = d.renderer, gl = R.getContext(), px = new Uint8Array(4);
         const frame = () => { const t0 = performance.now(); R.render(d.scene, d.camera); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return performance.now() - t0; };
@@ -280,16 +283,14 @@ async function hitchMode(): Promise<number> {
         out.programsAfter = R.info.programs.length; out.programs0 = programs0;
         return out;
       }, { reps });
-      console.log(`${house.padEnd(10)} ${policy.padEnd(5)} spots ${r.spots} (${r.hidden} hidden)  programs ${r.programsDay} > ${r.programsAfter}  day frame ${r.dayMs.toFixed(1)} ms   first frame after the switch: ${r.flips.map((f: any) => `night ${f.toNight.toFixed(0)} / day ${f.toDay.toFixed(0)}`).join(' | ')}   (night steady ${r.flips[0].nightMs.toFixed(1)} ms)${errors.length ? '  ERR ' + errors[0] : ''}`);
+      console.log(`${house.padEnd(10)} ${policy.padEnd(5)} ${warmMs >= 0 ? `[pre-warm done ${warmMs} ms after ready] ` : ''}spots ${r.spots} (${r.hidden} hidden)  programs ${r.programsDay} > ${r.programsAfter}  day frame ${r.dayMs.toFixed(1)} ms   first frame after the switch: ${r.flips.map((f: any) => `night ${f.toNight.toFixed(0)} / day ${f.toDay.toFixed(0)}`).join(' | ')}   (night steady ${r.flips[0].nightMs.toFixed(1)} ms)${errors.length ? '  ERR ' + errors[0] : ''}`);
       table.push({ house, policy, ...r });
       await ctx.close();
     }
   } finally { await session.close(); }
   writeText(out('hitch.json'), stableJson({ schema: 1, what: 'first frame after a time-of-day switch in the player, hide vs intensity 0 (scripts/test-interior-light.mts --hitch)', rows: table, machine: machine() }));
-  const worstZero = Math.max(...table.filter(t => t.policy === 'zero').map(t => Math.max(...t.flips.map((f: any) => Math.max(f.toNight, f.toDay)))));
-  console.log(`worst first frame under INTENSITY 0 (what ships): ${worstZero.toFixed(0)} ms (target < 250 ms)`);
-  const worst = Math.max(...table.filter(t => t.policy === 'hide').map(t => Math.max(...t.flips.map((f: any) => Math.max(f.toNight, f.toDay)))));
-  console.log(`worst first frame under HIDE: ${worst.toFixed(0)} ms (limit 250 ms for hiding in the player)`);
+  const worstOf = (pol: string) => { const rows = table.filter(t => t.policy === pol); return rows.length ? Math.max(...rows.flatMap(t => t.flips.map((f: any) => Math.max(f.toNight, f.toDay)))) : NaN; };
+  console.log(`worst first frame after the switch: shipped (hidden, pre-warmed) ${worstOf('hide').toFixed(0)} ms (target < 250 ms)   cold (hidden, no pre-warm: v1) ${worstOf('cold').toFixed(0)} ms   intensity 0 (v2) ${worstOf('zero').toFixed(0)} ms`);
   return 0;
 }
 
@@ -737,8 +738,66 @@ async function closeupsMode(): Promise<number> {
   return 0;
 }
 
+
+// ---- steady: what do lights at intensity 0 cost a DAY frame? ----------------------------------------------------------------------------------
+// LIGHT v3 item 6. v2 left the room lights in the scene at intensity 0 by day (so the Day-to-Dusk switch recompiles nothing), and a skeptic measured steady day frames
+// 15-30 % dearer than the old policy that hid them. Here: per house, the page of each policy (cold = hidden and never warmed: the old baseline; hide = what ships, after its pre-warm; zero = v2's intensity 0) in turn, `--rounds`
+// times, each page rendering `--frames` frames through the plain renderer (render + a 1-pixel readback, so the GPU has finished) after a warm-up, the median of them; the player (?mode=view,
+// the default) or the editor (--editor). Load is recorded before and after every page: the machine is shared, so the ratio inside a round, not the milliseconds, is the result.
+//   pnpm run test:light -- --steady [--editor] [--houses aurora,seraphine] [--rounds 3] [--frames 60] [--policies hide,zero] [--query no=x]
+async function steadyMode(): Promise<number> {
+  const houses = args.houses && args.houses !== 'true' ? args.houses.split(',') : ['aurora', 'seraphine'];
+  const rounds = Number(args.rounds && args.rounds !== 'true' ? args.rounds : 3), nFrames = Number(args.frames && args.frames !== 'true' ? args.frames : 60);
+  const policies = (args.policies && args.policies !== 'true' ? args.policies : 'cold,hide,zero').split(',');
+  const editor = args.editor === 'true';
+  const extra = args.query && args.query !== 'true' ? `&${args.query}` : '';
+  const session = await startSession();
+  const res: Record<string, Record<string, number[]>> = {}, cpuRes: Record<string, Record<string, number[]>> = {};
+  const loads: number[] = [];
+  try {
+    for (let round = 0; round < rounds; round++) for (const house of houses) for (const policy of (round % 2 ? [...policies].reverse() : policies)) {
+      const ctx = await session.browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
+      const page = await ctx.newPage();
+      await page.route('https://fonts.googleapis.com/**', (r: any) => r.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+      await page.route('https://fonts.gstatic.com/**', (r: any) => r.abort());
+      await page.addInitScript((p: string) => { (window as any).__fillZero = p === 'zero'; (window as any).__fillNoWarm = p === 'cold'; }, policy);   // hide: shipped (waited for the pre-warm); cold: hidden, never warmed (the v1 baseline); zero: v2
+      await page.goto(session.srv.url(editor ? `room-creator.html?house=${house}${extra}` : `room-creator.html?mode=view&house=${house}&tod=day&play=0${extra}`), { waitUntil: 'domcontentloaded', timeout: 240000 });
+      await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, house, { timeout: 240000 });
+      if (editor) await page.evaluate(() => (window as any).__houseSetLighting('day'));
+      if (policy === 'hide') await page.waitForFunction(() => { const w = (window as any).__houseFixturesWarm && (window as any).__houseFixturesWarm(); return !!(w && w.done); }, null, { timeout: 180000, polling: 250 });
+      const l0 = machine().load1;
+      const { ms, cpu, calls, lights }: any = await page.evaluate(async ({ n }: any) => {
+        const W = window as any, d = W.__houseDebug(), R = d.renderer, gl = R.getContext(), px = new Uint8Array(4);
+        let cpuT = 0;
+        const frame = () => { const t0 = performance.now(); R.render(d.scene, d.camera); cpuT = performance.now() - t0; gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); return performance.now() - t0; };
+        for (let i = 0; i < 12; i++) frame();
+        const xs: number[] = [], cs: number[] = []; for (let i = 0; i < n; i++) { xs.push(frame()); cs.push(cpuT); } xs.sort((a, b) => a - b); cs.sort((a, b) => a - b);
+        let vis = 0; d.scene.traverse((o: any) => { if (o.isSpotLight && o.userData.fixtureLight && o.visible) vis++; });
+        return { ms: xs[xs.length >> 1], cpu: cs[cs.length >> 1], calls: R.info.render.calls, lights: vis };
+      }, { n: nFrames });
+      (cpuRes[house] ||= {})[policy] ||= []; cpuRes[house][policy].push(cpu);
+      loads.push(l0, machine().load1);
+      (res[house] ||= {})[policy] ||= []; res[house][policy].push(ms);
+      console.log(`  round ${round} ${house.padEnd(10)} ${policy.padEnd(5)} ${ms.toFixed(1)} ms (render call alone ${cpu.toFixed(1)}, ${calls} calls, ${lights} lights visible)  (load ${l0} > ${machine().load1})`);
+      await ctx.close();
+    }
+  } finally { await session.close(); }
+  const med = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); return s[s.length >> 1]; };
+  console.log(`\nsteady DAY frame, ${editor ? 'editor' : 'player'}, median of ${nFrames} frames, median over ${rounds} rounds`);
+  const table: any = {};
+  for (const house of houses) {
+    const m: Record<string, number> = {}; for (const p of policies) m[p] = med(res[house][p]);
+    const base = m[policies[0]];
+    table[house] = m;
+    console.log(`  ${house.padEnd(10)} ${policies.map(p => `${p} ${m[p].toFixed(1)} ms (${res[house][p].map(v => v.toFixed(1)).join(' ')}; render call ${med(cpuRes[house][p]).toFixed(1)})`).join('   ')}   ${policies.slice(1).map(p => `${p}/${policies[0]} ${(m[p] / base).toFixed(3)}`).join('  ')}`);
+  }
+  writeText(out(`steady-${editor ? 'editor' : 'player'}${args.label && args.label !== 'true' ? '-' + args.label : ''}.json`), stableJson({ schema: 1, what: 'steady day frame cost by policy (scripts/test-interior-light.mts --steady)', editor, nFrames, rounds, res, cpuRes, table, loadsRecorded: loads, machine: machine() }));
+  return 0;
+}
+
 let code = 0;
-if (args.closeups === 'true') code = await closeupsMode();
+if (args.steady === 'true') code = await steadyMode();
+else if (args.closeups === 'true') code = await closeupsMode();
 else if (args.mood === 'true') code = await moodMode();
 else if (args.lamps === 'true') code = await lampsMode();
 else if (args.leak === 'true') code = await leakMode();
@@ -749,6 +808,6 @@ else if (args.portal === 'true') code = await portalMode();
 else if (args.bench === 'true') code = await benchMode();
 else code = await fixturesMode();
 const bad = rows.filter(r => !r.ok).length;
-if (args.portal !== 'true' && args.probe !== 'true' && args.leak !== 'true' && args.lamps !== 'true' && args.mood !== 'true' && args.closeups !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
+if (args.portal !== 'true' && args.probe !== 'true' && args.leak !== 'true' && args.lamps !== 'true' && args.mood !== 'true' && args.closeups !== 'true' && args.steady !== 'true' && args.hitch !== 'true' && args['player-calls'] !== 'true') console.log(bad ? `\n${bad} of ${rows.length} rows failed` : `\nall ${rows.length} rows pass`);
 console.log(`(load ${machine().load1})`);
 process.exit(code);

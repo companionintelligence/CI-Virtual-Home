@@ -46,7 +46,7 @@ const ROOM_MIN_AREA = 2.5;            // m² — a cupboard gets no light
 export const ROOM_FILL_K = 0.375;     // × the floor-illuminance target below (service 0.6 and hall 0.45 still scale it down). v1 had 0.3 and leaned on light leaking in from the next room; the room clip took that away, 0.375 is the most the five bench rooms take with every clip row under 1 %
 export const FILL_PENUMBRA = 1.0;     // the whole cone is a falloff: no edge
 export const FILL_ANGLE_MAX = 1.25;   // rad (~72°): a wider cone only lights the lawn
-/** lampGain under which the room's light is off for good: day (0.035). Off is intensity 0 and the light stays in the scene (see hideOffGain). */
+/** lampGain under which the room's light is off for good: day (0.035). Off is hidden, with the night programs built in idle time (see applyLampGain, prewarmNight). */
 export const FILL_ON_GAIN = 0.1;
 // Practical lamp pools (plan 5.2 L3, LIGHT v2 item 3): a room that has a lamp is lit the way a room with a lamp is lit, from the lamp. One static
 // light at the lamp head nearest the room's centre (no camera dependence, no shadow) IS that room's light: the fill spot is not made when
@@ -114,18 +114,20 @@ const readGain = (): number => {
   const g = w && w.__houseLighting && w.__houseLighting.lampGain;
   return typeof g === 'number' && Number.isFinite(g) ? g : DAY_GAIN;
 };
-/** Set every room light for a lamp gain. A light below FILL_ON_GAIN is OFF, and off means intensity 0 in every path (the editor, the composer, the
- *  goldens and the live player alike): the light stays in the scene, so three's NUM_SPOT_LIGHTS and NUM_POINT_LIGHTS never change and no lit material
- *  recompiles on a time-of-day switch. v1 hid the lights offline instead (visible = false) to keep the day shader free of them, and that cost the
- *  first Day-to-Dusk toggle 2.6 to 13.9 s in the editor (the programs all rebuilt, measured at load 8-12). The day shader pays nothing for a
- *  light at intensity 0 now: room-clip.ts wraps the BRDF in `if ( directLight.visible )`, and an off light has no colour. `window.__fillHide`
- *  is a measurement hook (test-interior-light --hitch sets it before the build) that brings the hiding back. */
+/** Set every room light for a lamp gain. A light below FILL_ON_GAIN is OFF: hidden (`visible` false), so by day no lit material has a room light in its program and a day
+ *  frame costs what it did before any room light existed. Hiding changes three's NUM_SPOT_LIGHTS, and a lit material that meets a light count it has not run before compiles
+ *  a program for it: v1 hid the lights and the first Day-to-Dusk switch cost 2.6 to 13.9 s in the editor, 5.5 s in the player (every program, built on the first night
+ *  frame). v2 left them in the scene at intensity 0 instead, which made the switch free and every day frame 15-23 % dearer (sixteen spot set-ups a fragment for nothing).
+ *  v3 hides them again and BUILDS THE NIGHT PROGRAMS IN IDLE TIME after the house is up (prewarmNight below): three keeps every program a material has built in its own
+ *  Map, so once the lit variant exists the switch is a lookup, and neither hour pays for the other. (A third way, evaluating the lights in one shader loop whose bound is a
+ *  uniform so no program ever changes, was built and measured: +7-10 % on a day frame, the loop's mere presence. Not shipped.) `window.__fillZero = true`, set before the build,
+ *  brings v2's intensity-0 policy back for an A/B. */
 export const hideOffGain = (): boolean => {
   const w: any = typeof window !== 'undefined' ? window : null;
-  return !!(w && w.__fillHide === true);
+  return !(w && w.__fillZero === true);
 };
-/** a room light's intensity at a lamp gain: base × gain, or 0 when the light is off (see hideOffGain) */
-export const lightLevel = (base: number, gain: number): number => (gain >= FILL_ON_GAIN || hideOffGain() ? base * gain : 0);
+/** a room light's intensity at a lamp gain: base × gain, or 0 when the light is off (hidden, or under __fillZero kept in the loop at 0) */
+export const lightLevel = (base: number, gain: number): number => (gain >= FILL_ON_GAIN ? base * gain : 0);
 export function applyLampGain(gain: number = readGain()) {
   if (!current) return;
   current.gain = gain;
@@ -135,7 +137,62 @@ export function applyLampGain(gain: number = readGain()) {
     light.visible = !hide || gain >= FILL_ON_GAIN;
   }
 }
+
+// ---- the night programs, built in idle time (LIGHT v3 item 6) -----------------------------------------------------------------------------
+// With the room lights hidden by day, the first frame at dusk meets a light count (16 spots) that no lit material has run: each builds its program then (the 3.6 s
+// editor and 5.5 s player hitch of v1). three keeps every program a material has built in `materialProperties.programs`, so building them while it is still day, a few
+// objects at a time, makes the switch a lookup. Each step shows the lights, asks the renderer to compile one slice of the scene (compile does not render: no frame is
+// drawn with the lights on), and hides them again in the same call; a slice is a fixed number of the scene's children, no clock. Nothing here changes a pixel: an
+// editor or composer frame renders the same whether or not the programs exist yet (they would be built on first use).
+export const PREWARM_SLICE = 24;        // scene children compiled per step
+export const PREWARM_DELAY_MS = 2500;   // after the last storey is dressed: the player's own first-frame compile (viewer.ts precompile) is done by then
+const glassInScene = (scene: any): boolean => { let g = false; scene.traverse((o: any) => { if (!g && o.isMesh && o.userData && o.userData.windowGlow) g = true; }); return g; };
+function prewarmNight(s: any) {
+  if (typeof window === 'undefined' || s.prewarm) return;
+  const w: any = window, d = typeof w.__houseDebug === 'function' ? w.__houseDebug() : null;
+  if (!d || !d.renderer || typeof d.renderer.compile !== 'function' || !d.scene || !d.camera) return;
+  s.prewarm = { next: 0 };
+  const lights = s.lights.map((l: any) => l.light);
+  const step = () => {
+    if (current !== s || !lights.length) return;                       // another house is on screen
+    if (lights.some((l: any) => l.visible)) { s.prewarm.done = true; return; }   // it is dusk or night: the programs exist because they were just used
+    const kids = d.scene.children.slice(), end = Math.min(kids.length, s.prewarm.next + PREWARM_SLICE);
+    // a double-sided transmissive material (window glass) is drawn back faces first, then front: the frame builds both programs, `compile` only the side it has
+    const glass: any[] = [];
+    for (let k = s.prewarm.next; k < end; k++) kids[k].traverse((o: any) => { if (o.isMesh) for (const m of (Array.isArray(o.material) ? o.material : [o.material])) if (m && m.transmission > 0 && m.side === 2 && !glass.includes(m)) glass.push(m); });
+    // a frame with window glass in it draws the opaque scene a second time, into the transmission target (linear, no tone mapping): a program of its own for every material
+    // that shows through a window, which `compile` builds only with a render target bound
+    if (s.prewarm.glassScene === undefined) s.prewarm.glassScene = glassInScene(d.scene);
+    const rt = s.THREE && s.prewarm.glassScene ? new s.THREE.WebGLRenderTarget(4, 4) : null;
+    for (const l of lights) l.visible = true;
+    try {
+      for (let k = s.prewarm.next; k < end; k++) d.renderer.compile(kids[k], d.camera, d.scene);
+      if (rt) {
+        const prev = d.renderer.getRenderTarget();
+        d.renderer.setRenderTarget(rt);
+        try { for (let k = s.prewarm.next; k < end; k++) d.renderer.compile(kids[k], d.camera, d.scene); } finally { d.renderer.setRenderTarget(prev); rt.dispose(); }
+      }
+      if (glass.length) {
+        for (const m of glass) m.side = 1;   // BackSide
+        try { for (let k = s.prewarm.next; k < end; k++) d.renderer.compile(kids[k], d.camera, d.scene); }
+        finally { for (const m of glass) { m.side = 2; m.needsUpdate = true; } }
+      }
+    }
+    catch (e) { s.prewarm.error = String(e); s.prewarm.done = true; }
+    finally { for (const l of lights) l.visible = false; }
+    s.prewarm.next = end;
+    if (end >= kids.length) { s.prewarm.done = true; return; }
+    if (!s.prewarm.done) (typeof w.requestIdleCallback === 'function' ? w.requestIdleCallback(step, { timeout: 200 }) : setTimeout(step, 16));
+  };
+  step();
+}
+function schedulePrewarm(s: any) {
+  if (typeof window === 'undefined' || !hideOffGain() || (window as any).__fillNoWarm === true) return;   // __fillNoWarm: v1's cold switch, for the hitch test to measure
+  clearTimeout(s.prewarmTimer);
+  s.prewarmTimer = setTimeout(() => prewarmNight(s), PREWARM_DELAY_MS);   // re-armed by each storey's dressLevel: it starts once the last one is up
+}
 if (typeof window !== 'undefined') {
+  (window as any).__houseFixturesWarm = () => current && current.prewarm;   // QA hook: how far the pre-warm got
   window.addEventListener('house:lighting', (e: any) => {
     const g = e && e.detail && e.detail.lampGain;
     applyLampGain(typeof g === 'number' && Number.isFinite(g) ? g : readGain());
@@ -219,6 +276,7 @@ function stateFor(ctx) {
     fans: fanPlan(spec, fanEligible), lamps: lampPlan(spec),
   };
   states.set(ctx.anchors, s);
+  s.THREE = THREE;
   current = s;
   ctx.anchors.fixtures = s.stats;
   return s;
@@ -709,4 +767,5 @@ export function dressLevel(ctx) {
     if (typeof registerCeiling === 'function') registerCeiling(o, hc / 100);
     s.stats.recessed += set.length;
   }
+  schedulePrewarm(s);
 }
