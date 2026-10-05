@@ -15,6 +15,10 @@
 //   node --experimental-strip-types scripts/review/luma.mts --compare before.metrics.json after.metrics.json [--gate light]   deltas, and LIGHT's acceptance
 //
 // Images are decoded by ffmpeg (rgb24 raw), the same decoder every run: the metrics are a pure function of the file's bytes.
+// Against the audit's PIL/numpy metrics.py the numbers agree to within 0.17 percentage points (measured over the 68 BEFORE eye frames by an
+// independent recomputation: worst crush 0.165, seraphine-living SE night; worst clip 0.059; mean, p5, p50, p95, range, ceil and cont
+// within 0.003). That is a JPEG decoder difference, not a defect, and the skeptic found no LIGHT threshold decided by it;
+// but never compare these metrics with ones computed by another decoder to better than 0.17 points of clip or crush.
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
