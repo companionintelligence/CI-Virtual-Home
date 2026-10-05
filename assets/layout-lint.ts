@@ -49,7 +49,7 @@ import { composeHouse, layerOf, snapWallMount, stackOnSurface } from './room-com
 import { houseStairs, levelStairs } from './stairs.js';
 import { isComposed, isProgram } from './room-programs.js';
 import { dressHouse, dressOff, dressOptIn, isDress, bareViolation } from './room-dress.js';
-import { hostOf, footprintIn, standingOn, rectGap, MIN_GAP } from './room-dress-hosts.js';
+import { hostOf, footprintIn, nearOn, rectGap, MIN_GAP } from './room-dress-hosts.js';
 
 /** What a room of each program cannot do without: each anchor is satisfied by `n` items (default 1) with any of the roles
  *  (assets/props/placement.ts). The composer's essentials (its `missing`), the `missing-anchor` lint and the composer's
@@ -133,7 +133,7 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
           const f = footprintIn(under, it)!, inside = under.rects.some(r => f[0] >= r[0] - 0.01 && f[1] >= r[1] - 0.01 && f[2] <= r[2] + 0.01 && f[3] <= r[3] + 0.01);
           if (!inside) add('dress-floating', `${it.type} at ${fmt(it.at)} overhangs its ${under.type} (outside the flat top by ${Math.max(0, ...under.rects.map(r => Math.max(r[0] - f[0], r[1] - f[1], f[2] - r[2], f[3] - r[3]))).toFixed(2)} m)`, lv, room);
           if (Math.abs((it.y ?? 0) - under.top) > 0.01) add('dress-floating', `${it.type} at ${fmt(it.at)} is at y ${it.y} on a ${under.type} whose top is ${under.top}`, lv, room);
-          for (const o of standingOn(under, items)) {
+          for (const o of nearOn(under, items)) {   // (on this host and on the next unit of the run: a gap is a gap across the seam)
             if (o === it) continue;
             const g = footprintIn(under, o); if (!g) continue;
             const gap = rectGap(f, g);

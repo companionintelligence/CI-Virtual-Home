@@ -32,7 +32,7 @@ import { inferProgram } from './room-programs.js';
 import { styleOf, type StyleBundle } from './house-styles.js';
 import { mulberry32, fnv1a } from './materials.js';
 import { HERO_SET } from './item-map.js';
-import { hostOf, freeRects, standingOn, fitIn, footprintIn, coverIn, toWorld, toLocal, subtract, rectArea, neighbourGap, reachOf, NEIGHBOUR_GAP, MIN_GAP, cornerEyes, camBlocked, CAM, type CornerEye, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
+import { hostOf, freeRects, standingOn, nearOn, fitIn, footprintIn, coverIn, toWorld, toLocal, subtract, rectArea, neighbourGap, reachOf, NEIGHBOUR_GAP, MIN_GAP, cornerEyes, camBlocked, CAM, type CornerEye, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
 import { dressSchemeOf, type DressScheme } from './house-scheme-dress.js';
 import { RECIPES, BASE_COUNT, windowTypes, type Recipe } from './dress-recipes.js';
 import { planCafe, CURTAIN_PAD, VPAD, type Panel } from './dress-curtains.js';
@@ -115,7 +115,7 @@ export class Dresser {
   roleTypes(role: string): string[] { return Object.keys(PLACEMENT).sort().filter(t => PLACEMENT[t].roles.includes(role)); }
   hasLamp(): boolean { return this.all().some(it => this.groupOf(it) === 'lamp'); }
   has(type: string): boolean { return this.all().some(it => it.type === type); }
-  free(h: Host, margin = 0.03, type?: string): Rect[] { return freeRects(h, standingOn(h, this.all()), margin, NEIGHBOUR_GAP, type ? reachOf(type) : 0); }
+  free(h: Host, margin = 0.03, type?: string): Rect[] { return freeRects(h, nearOn(h, this.all()), margin, NEIGHBOUR_GAP, type ? reachOf(type) : 0); }
   covered(h: Host): number { return standingOn(h, this.all()).reduce((a, it) => { const f = footprintIn(h, it); return a + (f ? rectArea(f) : 0); }, 0); }
   skip(slot: string, why: string) { this.skipped.push({ slot, why }); }
   /** can the budget take one more (tier 1 may run to 1.5 x the cap) */
@@ -176,7 +176,7 @@ export class Dresser {
     if (rot) it.rot = mm(rot);
     it.y = mm(h.top + (o.lift || 0));
     // (the free area keeps NEIGHBOUR_GAP from what stands here; a piece turned off the host's axes has a larger cover than the box the area was cut for, so the lint's own measure has the last word)
-    { const nb = neighbourGap(h, { ...it, ...params }, standingOn(h, this.all()), true); if (nb && nb.gap < MIN_GAP) { this.skip(slot, `${type} would stand ${Math.max(0, Math.round(nb.gap * 1000))} mm from the ${nb.other.type} on the ${h.type}`); return null; } }
+    { const nb = neighbourGap(h, { ...it, ...params }, nearOn(h, this.all()), true); if (nb && nb.gap < MIN_GAP) { this.skip(slot, `${type} would stand ${Math.max(0, Math.round(nb.gap * 1000))} mm from the ${nb.other.type} on the ${h.type}`); return null; } }
     for (const [k, v] of Object.entries(params)) it[k] = typeof v === 'number' ? mm(v) : v;
     it.src = DRESS_SRC; it.dk = `${this.roomKey}:${slot}:${n}`;
     this.ord.set(slot, n + 1); this.placed.push(it); this.counts.set(slot, (this.counts.get(slot) || 0) + 1); this.spent += cost;

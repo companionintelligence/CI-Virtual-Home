@@ -159,14 +159,16 @@ export const NEIGHBOUR_GAP = 0.02;
 export const MIN_GAP = 0.015;
 /**
  * How far a small good's BUILT mesh reaches past the measured box the packer and the lint work from (a flower-jug's flowers, a book stack's leaning top book, a
- * candle-trio's wicks): the page seeds those spills per item, so the packer cannot know them and keeps the worst case of each type clear instead. Measured over 24
- * seeds per type in three.js (every surface type in the catalog whose built box passed its measured box by more than 2 mm), rounded up to the millimetre, plus 2 mm;
- * test-dress-phase M builds 24 other seeds of each and fails past it, and fails for a surface type that spills and is missing here.
+ * candle-trio's wicks): the page seeds those spills per item, so the packer cannot know them and keeps the worst case of each type clear instead. Measured by
+ * scripts/dress-reach.mts over 1000 seeds of EVERY surface type of the catalog (61) at every variant its params offer (variant 0-2; w, d and r at 0.75 and 1.35 times the
+ * default), rounded up to the millimetre, plus 2 mm (`dress-reach --check` fails when a row is short); test-dress-phase M builds 96 other seeds of each and fails past
+ * it, and fails for a surface type that spills over 2 mm and is missing here. (The first table was 24 seeds of the default only: 13 of its 21 rows were short, the
+ * book-stack's by 5 mm, the aloe pot's by 11 mm, and the orchid and the pothos, which spill 5 and 3 mm, were missing.)
  */
 export const REACH: Record<string, number> = {
-  'vase': 0.023, 'book-stack': 0.038, 'flower-jug': 0.022, 'herb-pots': 0.015, 'fern': 0.012, 'aloe-pot': 0.008, 'jade-plant': 0.022, 'candle-trio': 0.009,
-  'centerpiece': 0.014, 'kettle-and-mug': 0.007, 'cutting-board-set': 0.007, 'utensil-crock': 0.009, 'tea-towel': 0.016, 'pot-on-hob': 0.027, 'side-set': 0.012,
-  'shelf-style': 0.010, 'nightstand-set': 0.028, 'tissue-candle': 0.012, 'towel-stack': 0.011,
+  'vase': 0.023, 'book-stack': 0.043, 'flower-jug': 0.022, 'herb-pots': 0.015, 'orchid': 0.007, 'fern': 0.017, 'aloe-pot': 0.019, 'jade-plant': 0.023, 'candle-trio': 0.009,
+  'centerpiece': 0.014, 'kettle-and-mug': 0.008, 'cutting-board-set': 0.007, 'utensil-crock': 0.010, 'tea-towel': 0.016, 'pot-on-hob': 0.031, 'side-set': 0.013,
+  'shelf-style': 0.013, 'nightstand-set': 0.029, 'tissue-candle': 0.012, 'towel-stack': 0.013, 'pothos': 0.005,
 };
 export const reachOf = (type: string): number => REACH[type] || 0;
 
@@ -205,6 +207,24 @@ export function standingOn(h: Host, items: any[]): any[] {
     const [lx, lz] = toLocal(h, it.at[0], it.at[1]);
     return h.rects.some(r => lx >= r[0] - 0.1 && lx <= r[2] + 0.1 && lz >= r[1] - 0.1 && lz <= r[3] + 0.1);
   });
+}
+
+/** how far from a host's rects a surface item of another host may stand and still be a neighbour of what goes on this one */
+export const NEAR = 0.3;
+/**
+ * What `standingOn` says, and the surface items of the NEIGHBOURING host that stand at this one's height within NEAR of its rects. Counter units run end to end: a piece
+ * at the end of one is a neighbour of the piece at the start of the next, and a packer that only looks at the items whose origin is over its own host never sees it (the
+ * second skeptic's last miss: epiphany Kitchen's mushroom lamp, 18 mm from the authored herb pots, which stand on the next unit of the run).
+ */
+export function nearOn(h: Host, items: any[]): any[] {
+  const on = new Set(standingOn(h, items));
+  for (const it of items) {
+    if (on.has(it) || it === h.item || !Array.isArray(it.at)) continue;
+    const y = surfaceY(it); if (y === undefined || y < h.top - 0.04 || y > h.top + 0.08) continue;
+    const f = footprintIn(h, it); if (!f) continue;
+    if (h.rects.some(r => rectGap(f, r) < NEAR)) on.add(it);
+  }
+  return [...on];
 }
 
 /** the gap between two host-frame rects: positive apart, negative when they overlap (by how much, the lesser overlap of the two axes) */

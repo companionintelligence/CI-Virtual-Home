@@ -24,7 +24,8 @@
 //   L  neighbour gap  no dress item stands under 1.5 cm from another item on its surface (authored, composed or dressed, an item with no `y` at the page's DESK_TOP
 //                   included), by the layout lint and by an independent obb measure over the 30 houses baked and the fixtures; the 12 cases the skeptic found are fixed;
 //                   and the lint sees the flower-jug case the first cut did not (a control)
-//   M  reach          REACH (how far a small good's built mesh passes its measured box) holds over 24 fresh seeds of every surface type, and no spilling type is missing
+//   M  reach          REACH (how far a small good's built mesh passes its measured box) holds over 96 fresh seeds of every surface type at every variant (scripts/dress-reach.mts
+//                   measured the table over 1000), and no spilling type is missing
 //   N  curtain parts  PARTS (the sink run's tap: a 3 cm column over a 0.96 m body) covers every mesh the page builds for the type, at three widths and three depths; a table
 //                   without the tap fails the same measurement (a control)
 //   O  curtain plan   over the 30 houses baked and the fixtures, no café curtain's box (plan, catalog heights, PARTS) meets another item's, however it is stood over, parted
@@ -47,7 +48,8 @@ import { dressHouse, dressRooms, dressOff, dressOptIn, dressProgram, isDress, ba
 import { dressSchemeOf } from '../assets/house-scheme-dress.js';
 import { RECIPES, CAFE, cafeFit } from '../assets/dress-recipes.js';
 import { PARTS, CURTAIN_GAP, curtainObb, planCafe, DRESSERS } from '../assets/dress-curtains.js';
-import { cornerEyes, eyeGap, camBlocked, CAM, hostOf, footprintIn, standingOn as standingOnHost, surfaceY, neighbourGap, rectGap, toWorld, MIN_GAP, NEIGHBOUR_GAP, DESK_TOP, REACH } from '../assets/room-dress-hosts.js';
+import { surfaceTypes, spillOf } from './dress-reach.mts';
+import { cornerEyes, eyeGap, camBlocked, CAM, hostOf, footprintIn, nearOn, freeRects, reachOf, standingOn as standingOnHost, surfaceY, neighbourGap, rectGap, toWorld, MIN_GAP, NEIGHBOUR_GAP, DESK_TOP, REACH } from '../assets/room-dress-hosts.js';
 import { cornerCam } from './review/cameras.mts';
 import { standingOn, rectArea } from '../assets/room-dress-hosts.js';
 import { lintLayout } from '../assets/layout-lint.js';
@@ -495,22 +497,55 @@ test('L3 (control): the flower-jug the first cut could not see, and the lint tha
   void rectGap;
 });
 
-test('M: REACH holds, over 24 fresh seeds of every type that stands on a surface', () => {
-  const seen: Record<string, number> = {};
-  for (const [type, def] of PROPS as Map<string, any>) {
-    const pl: any = PLACEMENT[type]; if (!((pl && pl.onSurface) || def.surface)) continue;
-    const s0 = sizeOf(type, {}); if (!s0) continue;
-    let worst = 0;
-    for (let k = 0; k < 24; k++) {
-      const o = def.create({ type }, { THREE, std: bcx.std, box: bcx.box, group: bcx.group, mix: bcx.mix, hex: bcx.hex, colors: kitx.colors, rng: kitx.itemRng(`reach${k}:${type}`), H: 2.8 });
-      o.updateMatrixWorld(true); const b = new THREE.Box3().setFromObject(o), ox = s0.ox || 0, oz = s0.oz || 0;
-      worst = Math.max(worst, b.max.x - (ox + s0.w / 2), (ox - s0.w / 2) - b.min.x, b.max.z - (oz + s0.d / 2), (oz - s0.d / 2) - b.min.z);
+test('L4: no dress item stands under 1.5 cm from ANY item at its height, on its host or across the seam of the next unit of a run', () => {
+  let pairs = 0, across = 0;
+  for (const { id, spec } of fleet()) {
+    const all = bakedItems(spec);
+    for (const { room } of rooms(spec)) {
+      const items = (all.get(room) || []).filter((x: any) => Array.isArray(x.at) && layerOf(x.type) === 'surface' && surfaceY(x) !== undefined);
+      const hosts = (all.get(room) || []).map(hostOf).filter((h: any) => !!h) as any[];
+      for (let i = 0; i < items.length; i++) for (let j = i + 1; j < items.length; j++) {
+        const a = items[i], b = items[j]; if (!isDress(a) && !isDress(b)) continue;
+        if (Math.abs(surfaceY(a)! - surfaceY(b)!) > 0.05) continue;
+        const A = itemObb(a), B = itemObb(b); if (!A || !B) continue;
+        pairs++; const g = obbGap(A, B);
+        if (g < 0.2 && !hosts.some(h => standingOnHost(h, [a, b]).length === 2)) across++;
+        assert.ok(g >= MIN_GAP, `${id}/${room.name}: ${a.type}${isDress(a) ? '*' : ''} and ${b.type}${isDress(b) ? '*' : ''} stand ${(g * 1000).toFixed(1)} mm apart at ${surfaceY(a)} m`);
+        // and by what the packer reserved: the box gap less both pieces' REACH (the worst their built meshes can pass their boxes) is still the lint's 1.5 cm
+        assert.ok(g - reachOf(a.type) - reachOf(b.type) >= MIN_GAP - 1e-6, `${id}/${room.name}: ${a.type}${isDress(a) ? '*' : ''} and ${b.type}${isDress(b) ? '*' : ''} are ${(g * 1000).toFixed(1)} mm apart, and their reach (${((reachOf(a.type) + reachOf(b.type)) * 1000).toFixed(0)} mm) can close it under ${MIN_GAP * 100} cm`);
+      }
     }
-    seen[type] = worst;
-    assert.ok(worst <= (REACH[type] || 0.002) + 1e-9, `${type}: the built mesh passes its measured box by ${(worst * 1000).toFixed(1)} mm, REACH says ${((REACH[type] || 0) * 1000).toFixed(0)}`);
+  }
+  assert.ok(pairs >= 1000 && across >= 5, `${pairs} pairs, ${across} near pairs on different hosts`);
+  console.log(`L4: ${pairs} pairs of surface items at one height (a dress item and another) over the 30 houses baked and the fixtures, ${across} within 20 cm of each other on DIFFERENT hosts: none under ${MIN_GAP * 100} cm`);
+});
+
+test('L5 (control): epiphany\'s mushroom lamp, 18 mm from the herb pots of the next unit of the run, is a neighbour the packer now sees', () => {
+  // the first cut's pair (the skeptic's last miss): the lamp at the end of one counter unit, the authored herb pots on the next, 18 mm apart by their boxes, 12 mm by their meshes
+  const spec = load(path.join(ROOT, 'content', 'houses', 'epiphany.json')), room = rooms(spec).find(({ room }: any) => room.name === 'Kitchen')!.room;
+  const pots = (room.items as any[]).find(x => x.type === 'herb-pots'), lamp = { type: 'mushroom-lamp', at: [2.13, -5.67], y: 0.9, src: DRESS_SRC, dk: 'x:control:0' };
+  const items = [...(room.items as any[]), lamp], hosts = items.map(hostOf).filter((h: any) => !!h) as any[];
+  const lampHost = hosts.find((h: any) => standingOnHost(h, items).includes(lamp))!;
+  assert.ok(lampHost, 'the lamp stands on a host');
+  assert.ok(!standingOnHost(lampHost, items).includes(pots), 'the herb pots stand on the NEXT unit: standingOn never sees them from the lamp\'s host');
+  assert.ok(nearOn(lampHost, items).includes(pots), 'nearOn does');
+  const g = obbGap(itemObb(lamp)!, itemObb(pots)!);
+  assert.ok(g >= MIN_GAP && g - reachOf('herb-pots') < MIN_GAP, `the pair is ${(g * 1000).toFixed(1)} mm apart by its boxes (passes the lint) and under ${MIN_GAP * 100} cm by its reach: only the reach-aware measure of L4 sees it`);
+  // the packer keeps NEIGHBOUR_GAP + both reaches from it on the lamp's own host
+  const free = freeRects(lampHost, nearOn(lampHost, items.filter(x => x !== lamp)), 0.03, NEIGHBOUR_GAP, reachOf('mushroom-lamp'));
+  const f = footprintIn(lampHost, lamp)!;
+  assert.ok(!free.some(r => f[0] >= r[0] - 1e-6 && f[2] <= r[2] + 1e-6 && f[1] >= r[1] - 1e-6 && f[3] <= r[3] + 1e-6), 'the first cut\'s spot is no longer free');
+});
+
+test('M: REACH holds, over 96 fresh seeds of every surface type at every variant, and no spilling type is missing', () => {
+  const seen: Record<string, number> = {}; let measured = 0;
+  for (const type of surfaceTypes()) {
+    const { worst, at } = spillOf(type, 96, 'M:');
+    seen[type] = worst; measured++;
+    assert.ok(worst <= (REACH[type] || 0.002) + 1e-9, `${type}: the built mesh passes its measured box by ${(worst * 1000).toFixed(1)} mm (${at}), REACH says ${((REACH[type] || 0) * 1000).toFixed(0)}; scripts/dress-reach.mts prints the table`);
   }
   for (const t of Object.keys(REACH)) assert.ok(t in seen, `REACH names ${t}, which is no surface type`);
-  assert.ok(Object.keys(seen).length >= 60, `${Object.keys(seen).length} surface types measured`);
+  assert.ok(measured >= 60, `${measured} surface types measured`);
 });
 
 // ---- N: PARTS covers what the page builds ----------------------------------------------------------------------------------------------
