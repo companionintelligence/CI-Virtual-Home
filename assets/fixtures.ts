@@ -32,6 +32,7 @@ import { schemeOf } from './house-scheme.js';
 import { capAlbedo } from './materials.js';
 import { FINISH_ROLES } from './props/finish-roles.js';
 import { heroFrame } from './hero-frame.js';
+import { isDress, dressOff, dressOptIn, dressHouse } from './room-dress.js';
 import { clearSlots, setSlot, codedDecay, roomClipBox, POOL_DATA, POOL_CORE, POOL_HALO_R, POOL_HALO_K, POOL_UP_FADE } from './room-clip.js';
 
 export const LIGHT_CAP = 16;          // dynamic lights per house (one per room at most)
@@ -251,6 +252,16 @@ if (typeof window !== 'undefined') {
 
 // ---- per-build state: ranking, style picks, shared geometry and materials -------------------------------------
 const states = new WeakMap();
+/** the items a room is built with, as far as lamps go: its spec items, with the dress phase the way rooms-build.ts applies it (`?dress=0` leaves every dress item out,
+ *  baked or live; a room that opted in with `dress.level` and carries no baked dress item is dressed live). A live lamp must light its room exactly as the same lamp
+ *  baked into the spec does (test:dress-neutral C), so the lamp flag that ranks the rooms and picks pool over fill reads this, not `room.items` alone. */
+function roomItemsAsBuilt(spec, r): any[] {
+  const items = r.items || [];
+  if (dressOff()) return items.filter(it => !isDress(it));
+  if (dressOptIn(r) && !items.some(isDress)) { const d = dressHouse(spec).get(r); if (d && d.items.length) return [...items, ...d.items]; }
+  return items;
+}
+
 function stateFor(ctx) {
   let s = states.get(ctx.anchors);
   if (s) return s;
@@ -267,7 +278,7 @@ function stateFor(ctx) {
     if (!r.bounds) return;
     const area = r.bounds.w * r.bounds.d; if (area < ROOM_MIN_AREA) return;
     const kind = roomKind(r); if (kind === 'outdoor') return;
-    const lamp = (r.items || []).some(it => it && POOL_LAMPS.has(it.type));
+    const lamp = roomItemsAsBuilt(spec, r).some(it => it && POOL_LAMPS.has(it.type));
     // a room with a lamp is lit before a lampless room of the same standing (the cap leaves out the rooms at the bottom of this ranking, and a room whose
     // lamp glows must not be one of them while a lampless room is lit): LAMP_RANK_BONUS stands in for a lamp's glow in the score
     ranked.push({ key: `${lv.id}#${ri}`, score: WEIGHT[kind] * Math.sqrt(area) * (lamp ? LAMP_RANK_BONUS : 1), li, ri, lamp });

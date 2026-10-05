@@ -6,7 +6,8 @@
 //   B  no re-roll   the same house built dressed differs from the stripped one ONLY in the classes of the dress items' own types (the lamp a recipe adds is a
 //                   `table-lamp`, and the composer's table lamps are the same class, so a type the phase placed is declared changed; every other class
 //                   is identical): one more dress item moves no other prop's colour, jitter or place, because it seeds from `dress:<dk>` and never takes a
-//                   `propIndex`
+//                   `propIndex`. One class is excused only room by room: a lamp the phase adds is lit like any lamp (LIGHT's pool, assets/fixtures.ts), so the
+//                   `role:fixture` of a room that was given a lamp moves (its fill spot becomes the lamp's pool); the fixtures of every other room may not
 //   C  baked        the dress items baked into a spec (`src: 'dress@1'`, no `dress` field) build the same objects as the live phase, frames bit-exact
 //
 // @check-house skip — a browser job (~2 minutes) that needs a built tree: run by hand in a DRESS PR, and by INT after the pilot bake
@@ -27,6 +28,7 @@ const args = parseArgs(process.argv.slice(2));
 const FIX = args.fixtures && args.fixtures !== 'true' ? args.fixtures.split(',') : ['dress-rooms', 'dress-baths'];
 const A = (f: string) => import(pathToFileURL(path.join(SERVE_ROOT, 'assets', f)).href);
 const { dressRooms, dressHouse } = await A('room-dress.js');
+const { POOL_LAMPS } = await A('fixtures.js');
 let bad = 0;
 const check = (ok: boolean, what: string, detail = '') => { console.log(`${ok ? '✓' : '✗'} ${what}${ok || !detail ? '' : `\n    ${detail.split('\n').join('\n    ')}`}`); if (!ok) bad++; };
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'dress-neutral-'));
@@ -71,7 +73,13 @@ for (const id of FIX) {
   const A_ = compareHouse(id, base, off, []);
   check(A_.length === 0, `A: ?dress=0 builds the stripped house object for object (${base.objects} objects)`, A_.join('\n'));
   const on = await snap('', file);
-  const B_ = compareHouse(id, base, on, types);
+  // the lamp rooms: where the phase added a lamp the light rig pools (the one place a LIGHT fixture may move); every other `role:fixture` room must be the stripped house's
+  const lampRooms = new Set<string>(); for (const [r, res] of live) if (res.items.some((i: any) => POOL_LAMPS.has(i.type))) lampRooms.add(r.name);
+  const fxRooms = (h: any) => h.classes['role:fixture']?.rooms || {};
+  const fxMoved = [...new Set([...Object.keys(fxRooms(base)), ...Object.keys(fxRooms(on))])].filter(r => fxRooms(base)[r] !== fxRooms(on)[r] && !lampRooms.has(r));
+  const B_ = compareHouse(id, base, on, [...types, 'role:fixture']);
+  if (base.classes['role:fixture']?.n !== on.classes['role:fixture']?.n) B_.push(`${id}: role:fixture has ${on.classes['role:fixture']?.n} object(s), the stripped ${base.classes['role:fixture']?.n}`);
+  if (fxMoved.length) B_.push(`${id}: role:fixture moved in room(s) the phase gave no lamp: ${fxMoved.join(', ')}`);
   check(B_.length === 0, `B: dressed, only the dress items' own classes differ (${on.objects - base.objects} objects added; ${types.length} classes declared)`, B_.join('\n'));
   check(on.objects > base.objects, 'B: the phase did add objects');
   const bk = await snap('', bakedFile);
