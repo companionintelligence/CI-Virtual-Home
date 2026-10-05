@@ -137,7 +137,7 @@ export function applyLampGain(gain: number = readGain()) {
   // LIGHT v3.1 (2): a person's flip to dusk before the night programs are built would build them on the first frame (380-830 ms). That flip keeps the room lights hidden
   // until the pre-warm is done (a few frames in the player, a second or two in the editor; the hour itself changes at once) and shows them then, a lookup. Only a flip the
   // UI makes (`window.__houseUiFlip`) waits: a build, a harness and an offline frame never see a held light (see settleNight).
-  const hold = show && hide && gain >= FILL_ON_GAIN && uiFlip() && holdForWarm(current);
+  const hold = show && hide && gain >= FILL_ON_GAIN && (uiFlip() || !!current.held) && holdForWarm(current);   // `current.held`: a relight that is not a UI flip (the sun slider) must not release lights a flip is still holding (a 500 ms cold compile)
   if (hold) show = false;
   setHeld(current, hold);
   for (const { light, base } of current.lights) {
@@ -154,7 +154,7 @@ const setHeld = (s: any, held: boolean) => {
 /** should a flip to a lit hour keep the lights hidden for now? Only a house that has been shown at day (its programs are the day's), with the night programs not yet all built:
  *  a house that opens at dusk is lit from its first frame, as it always was. Starts the pre-warm if it has not begun. */
 function holdForWarm(s: any): boolean {
-  if (!s.sawOff || (window as any).__fillNoWarm === true) return false;
+  if (!s.sawOff || !s.lights.length || (window as any).__fillNoWarm === true) return false;   // no room lights: nothing to build, nothing to hold
   if (!s.prewarm) { clearTimeout(s.prewarmTimer); prewarmNight(s); }
   return !!s.prewarm && !s.prewarm.done;
 }
@@ -184,7 +184,8 @@ function prewarmNight(s: any) {
   // done: the lights a flip was holding come on now (a lookup)
   const finish = () => { s.prewarm.done = true; if (s.held && current === s) applyLampGain(s.gain); };
   const step = () => {
-    if (current !== s || !lights.length) return;                       // another house is on screen
+    if (current !== s) return;                                         // another house is on screen
+    if (!lights.length) { finish(); return; }                          // no room lights: nothing to build (never leave a hold waiting on a pre-warm that cannot finish)
     if (s.prewarm.done) return;                                        // settled by an offline frame meanwhile
     if (lights.some((l: any) => l.visible)) { finish(); return; }      // it is dusk or night: the programs exist because they were just used
     const kids = d.scene.children.slice(), end = Math.min(kids.length, s.prewarm.next + PREWARM_SLICE);

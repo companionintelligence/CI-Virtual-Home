@@ -324,8 +324,9 @@ test('LIGHT v3.1 (1): day has an outside grade that is v2\'s; the other hours gr
 test('LIGHT v3.1 (2): a flip a person makes before the night programs are built holds the lights, and nothing else ever sees a held light', () => {
   const src = fs.readFileSync(path.join(ROOT, 'assets', 'fixtures.ts'), 'utf8');
   const page = fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8');
-  assert.match(src, /const hold = show && hide && gain >= FILL_ON_GAIN && uiFlip\(\) && holdForWarm\(current\)/, 'only a UI flip to a lit hour, under the hide policy, waits');
-  assert.match(src, /if \(!s\.sawOff \|\| \(window as any\)\.__fillNoWarm === true\) return false/, 'a house that opens at dusk is lit from its first frame; the cold switch (__fillNoWarm) is never held');
+  assert.match(src, /const hold = show && hide && gain >= FILL_ON_GAIN && \(uiFlip\(\) \|\| !!current\.held\) && holdForWarm\(current\)/, 'only a UI flip to a lit hour, under the hide policy, starts a hold; a relight that is not a flip (the sun slider) must not release one a flip is still holding');
+  assert.match(src, /if \(!s\.sawOff \|\| !s\.lights\.length \|\| \(window as any\)\.__fillNoWarm === true\) return false/, 'a house that opens at dusk is lit from its first frame; a house with no room lights has nothing to warm and is never held; the cold switch (__fillNoWarm) is never held');
+  assert.match(src, /if \(current !== s\) return;[^\n]*\n\s*if \(!lights\.length\) \{ finish\(\); return; \}/, 'a pre-warm with no lights is done at once, never left holding a readout forever');
   assert.match(src, /export function settleNight\(\)/); assert.match(src, /__houseFixturesSettle = settleNight/);
   assert.match(page, /if \(window\.__houseFixturesSettle\) window\.__houseFixturesSettle\(\)/, 'the composer settles before an offline frame');
   assert.match(page, /const uiFlip = fn => \{ window\.__houseUiFlip = true; try \{ return fn\(\); \} finally \{ window\.__houseUiFlip = false; \} \}/);
