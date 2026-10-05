@@ -6,7 +6,7 @@
 // metal rows (F1) and the other streams adopt the rest as they land. Owner: LIGHT. Every other stream reads it, never edits it.
 //
 // A row is { rough, metal } for the PBR material plus, where it matters, `albedoCap` (the brightest sRGB luma-ish channel a surface
-// of this role may carry: pure white has no fold or shadow to read and clips at dusk, so linen stops at 0.85), `opaque` (no alpha
+// of this role may carry: pure white has no fold or shadow to read and clips at dusk, so linen stops at 0.80), `opaque` (no alpha
 // card: GTAO's normal pre-pass turns a cut-out leaf into a solid quad) and `glow` (the role is a light source, driven by lampGain).
 export interface FinishRole {
   /** MeshStandardMaterial.roughness */
@@ -26,7 +26,7 @@ export interface FinishRole {
 export const FINISH_ROLES = {
   fabric: { rough: 0.92, metal: 0, note: 'upholstery, cushions, curtains' },
   fabric2: { rough: 0.9, metal: 0, note: 'the second fabric of a house' },
-  linen: { rough: 0.9, metal: 0, albedoCap: 0.85, note: 'sheets, towels, shades: a soft white, never 0.95' },
+  linen: { rough: 0.9, metal: 0, albedoCap: 0.80, note: 'sheets, towels, shades: a soft white, never 0.95' },
   rug: { rough: 0.95, metal: 0, note: 'rugs and mats' },
   leather: { rough: 0.55, metal: 0, note: 'leather and vinyl seating (fabric2 darkened)' },
   wood: { rough: 0.55, metal: 0, note: 'oiled and matte timber' },

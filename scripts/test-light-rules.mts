@@ -17,7 +17,7 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 
 test('finish roles: the values the plan names', () => {
   assert.equal(FINISH_ROLES.fabric.rough, 0.92); assert.equal(FINISH_ROLES.fabric.metal, 0);
-  assert.equal(FINISH_ROLES.linen.albedoCap, 0.85);
+  assert.equal(FINISH_ROLES.linen.albedoCap, 0.80);
   assert.equal(FINISH_ROLES.wood.rough, 0.55);
   assert.equal(FINISH_ROLES.lacquer.rough, 0.35);
   assert.equal(FINISH_ROLES.ceramic.rough, 0.3);
@@ -259,18 +259,18 @@ test('LIGHT v3 (5): the composer reads a curtain as thin (thin GTAO thickness) a
   for (const t of ['dusk', 'night', 'golden']) assert.equal((TIME_OF_DAY as any)[t].grade.pivot, undefined, `${t} keeps the 0.18 pivot`);
 });
 
-test('linen holds its albedo cap, so a bed can take a lamp without clipping (L0\'s 0.85), and only bedding, pillows and towels are held to it', async () => {
+test('linen holds its albedo cap, so a bed can take a lamp without clipping (L0\'s cap, 0.80 since the integration with SOFT\'s mounded pillows), and only bedding, pillows and towels are held to it', async () => {
   const max = (c: number) => Math.max((c >> 16) & 255, (c >> 8) & 255, c & 255) / 255;
   assert.ok(max(capAlbedo(0xf2efe9, ROLES.linen.albedoCap)) <= ROLES.linen.albedoCap + 1 / 255);
   assert.ok(max(capAlbedo(0xf2efe9, ROLES.linen.albedoCap)) >= ROLES.linen.albedoCap - 2 / 255, 'and no darker than it must be');
-  assert.equal(capAlbedo(0x808080, 0.85), 0x808080, 'a colour under the cap is untouched');
-  const r = (c: number) => [(c >> 16) & 255, (c >> 8) & 255, c & 255], a = r(0xf2efe9), b = r(capAlbedo(0xf2efe9, 0.85));
+  assert.equal(capAlbedo(0x808080, 0.80), 0x808080, 'a colour under the cap is untouched');
+  const r = (c: number) => [(c >> 16) & 255, (c >> 8) & 255, c & 255], a = r(0xf2efe9), b = r(capAlbedo(0xf2efe9, 0.80));
   assert.ok(Math.abs(a[0] / a[2] - b[0] / b[2]) < 0.02, 'hue kept: the channels scale together');
   // LIGHT v3 (4): the role's own colour is the soft white it always was; the cap is applied by what a thing is, in fixtures.ts
   const mats = fs.readFileSync(path.join(ROOT, 'assets', 'materials.ts'), 'utf8');
   assert.match(mats, /linen: 0xf2efe9, metal: 0x2b2f33/); assert.ok(!/linen: capAlbedo/.test(mats), 'kit.colors.linen is not capped: that moved 90 classes that are not bedding');
   const { capLinen, LINEN_ITEMS, LINEN_ROLES, LINEN_CAP } = await import('../assets/fixtures.js');
-  assert.equal(LINEN_CAP, 0.85);
+  assert.equal(LINEN_CAP, 0.80);
   const col = (hex: number) => ({ hex, getHex() { return this.hex; }, setHex(h: number) { this.hex = h; } });
   const mesh = (hex: number, role?: string, extra: any = {}) => ({ isMesh: true, userData: role ? { role } : {}, material: { color: col(hex), ...extra } });
   const item = (type: string | undefined, ...ms: any[]) => ({ userData: { itemType: type }, traverse(f: any) { f(this); ms.forEach(f); } });

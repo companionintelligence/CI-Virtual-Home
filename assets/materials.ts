@@ -40,7 +40,7 @@ const restrain = (c, sMax = 0.3, keep = 0.4) => {
   return fromRgb([r, g, b].map(x => (Y + (x - Y) * k) * 255) as [number, number, number]);
 };
 /** a colour held under an albedo cap: every channel scaled together so the brightest is at most `cap` (0..1) of full. Pure white has no fold
- *  or shadow to read and clips under any lamp; finish-roles.ts says linen stops at 0.85 (fixtures.ts capLinen applies it, to bedding, pillows and towels). */
+ *  or shadow to read and clips under any lamp; finish-roles.ts says linen stops at 0.80 (fixtures.ts capLinen applies it, to bedding, pillows and towels). */
 export const capAlbedo = (c: number, cap: number): number => { const m = Math.max(...toRgb(c)) / 255; return m <= cap ? c : fromRgb(toRgb(c).map(v => v * cap / m) as [number, number, number]); };
 export const colourMath = { hex, mix, lum, css, toRgb, fromRgb, restrain };
 

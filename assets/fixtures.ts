@@ -437,7 +437,7 @@ function varyRegistryLamps(placed, s, THREE, lampOf) {
 }
 
 // ---- the linen cap, scoped (LIGHT v3 item 4) ------------------------------------------------------------------------------------
-// finish-roles.ts holds linen under an albedo of 0.85: pure white has no fold to read and clips under a lamp (the cutestarter bedspread was a navy cloth
+// finish-roles.ts holds linen under an albedo of 0.80 (0.85 until SOFT's mounded pillows met the lamp pools): pure white has no fold to read and clips under a lamp (the cutestarter bedspread was a navy cloth
 // blown to white by a hot pool over a 0.95 albedo). v2 applied the cap through kit.colors.linen, the one colour every prop reads, and that reached 90 more item
 // classes than the intent (appliances, cabinets, toilets, tubs, the piano, a printer, candles: whatever called itself linen). It is applied here instead, by what the
 // thing IS: the item types that are bedding, pillows or towels, and (so SOFT's softkit lands in it without an edit) any mesh whose userData.role is one of the cloth
