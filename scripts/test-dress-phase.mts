@@ -1,4 +1,6 @@
 #!/usr/bin/env -S node --experimental-strip-types
+// @check-house node-test
+// @check-house quick
 // The dress phase's gates (plan 5.6 D2/D3; assets/room-dress.ts, assets/dress-recipes.ts, assets/room-dress-hosts.ts). Pure Node, no browser.
 //
 //   A  no-op        no shipped house has a `dress` field or a `dress@1` item, and the build's dress phase adds nothing to any of the 30 (a room opts in with an
@@ -43,8 +45,6 @@
 //                   round or skipped, and no two curtains of a wall (or a curtain and a blind of the layout) stand under 2 cm apart; the plan parts and lifts where it should
 //                   (a control: a lamp and a tap in a window's way part it, a counter higher than the sill lifts the hem, a wall of cabinets leaves the window bare)
 //
-// @check-house node-test
-// @check-house quick
 //
 //   node --experimental-strip-types --test scripts/test-dress-phase.mts      (needs `pnpm run build`; any cwd)
 import test from 'node:test';

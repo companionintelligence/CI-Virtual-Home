@@ -29,7 +29,7 @@
 //                   program sets), room-units.ts (the kitchen and bath packers), room-geo.ts (room geometry, lanes,
 //                   item sizes), room-programs.ts (the 26 programs), house-styles.ts (the style bundles),
 //                   layout-lint.ts (the layout lints), room-dress.ts (the dress phase: a second pass over the frozen layout),
-//                   room-dress-hosts.ts (what stands under a small good), dress-recipes.ts (what each program is dressed with),
+//                   room-dress-hosts.ts (what stands under a small good), dress-recipes.ts (what each program is dressed with), dress-curtains.ts (the café curtain's plan), dress-leaves.ts (where an open door leaf parks),
 //                   house-scheme-dress.ts (a house's dress palette); props/*.ts except lighting.ts and outdoor.ts, props/place-kit.ts
 //                   and props/placement.ts (every type's placement), props/page-place.ts (page items' placement),
 //                   props/patterns.ts (rug patterns and the art-motif library), props/registry.ts,
