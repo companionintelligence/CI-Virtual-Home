@@ -15,8 +15,9 @@
 //
 // Owner: DRESS.
 import type { Dresser } from './room-dress.js';
-import { INWARD, ROT_OF_WALL, itemObb } from './room-geo.js';
-import { toLocal, rectArea, standingOn, camBlocked, hostOf, type Host } from './room-dress-hosts.js';
+import { INWARD, ROT_OF_WALL } from './room-geo.js';
+import { toLocal, rectArea, standingOn, hostOf, type Host } from './room-dress-hosts.js';
+import { CAFE, cafeFit, cafeDrop } from './dress-curtains.js';
 import { PLACEMENT } from './props/placement.js';
 
 export interface Slot { id: string; tier: 1 | 2 | 3; min?: number; what: string; run: (d: Dresser) => void }
@@ -116,35 +117,19 @@ function counterClusters(d: Dresser, h: Host, queue: string[], max = 3): number 
  * 0.3, 0.75)`; the slot passed `min(head, sill + 0.95)` as if `h` were the top of the part to cover, so the rod stood at sill + 0.95 (1.95-2.1 m in the fleet's kitchens) and the
  * cloth hung 0.75 below it, y 1.19-1.97. The type has no other size, so the slot sizes it with what the item does have: `h` for the drop (h = drop + 0.5) and `y`, the
  * item's own lift, for where the rod stands. `cafeFit` is that arithmetic; the test measures the BUILT geometry against it.
+ *
+ * Where it hangs, how wide and what it keeps clear of is assets/dress-curtains.ts's plan, made before the first slot runs (the second skeptic measured the first cut's cloth, 0.094 m
+ * deep and 3 cm over the sill, passing 2-4 cm through whatever stood against the wall under the window, and two neighbours' boxes overlapping): a curtain is lifted over a low
+ * obstacle, parted round a narrow one (a tap, a lamp), skipped where nothing is left, and never within 2.5 cm of the next curtain; every dress item keeps out of its volume.
  */
 const WINDOW_TYPE: Record<string, string[]> = { kitchen: ['cafe-curtain'], 'kitchen-dining': ['cafe-curtain'] };
-/** SOFT's cafe-curtain: the cloth hangs `drop(h)` below the rod at h (windows.ts: Math.min(0.75, Math.max(0.3, h - 0.5))), the rod (with its finials) stands 0.019 above h, the hem 0.015 below the cloth's top */
-export const CAFE = { minDrop: 0.3, maxDrop: 0.75, rodAbove: 0.019, hemGap: 0.015, topShare: 0.55, hemAboveSill: 0.03, eyeLo: 1.45, eyeHi: 1.55, minSill: 0.6, small: 1.25 };
-export const cafeDrop = (h: number) => Math.min(CAFE.maxDrop, Math.max(CAFE.minDrop, h - 0.5));
-/** the params of a café curtain for a window (its sill and height, m): `h` and `y` so the cloth runs from just above the sill to about the window's middle; null when the window is too short to hold the shortest curtain, or sits so near the floor (sill under 0.6 m) that it is a door in all but name and no café curtain hangs there */
-export function cafeFit(sill: number, hgt: number): { h: number; y: number; rod: number; hem: number } | null {
-  if (sill < CAFE.minSill) return null;
-  const hem = sill + CAFE.hemAboveSill, cap = sill + CAFE.topShare * hgt - CAFE.rodAbove;
-  let rod = Math.min(sill + 0.5 * hgt, cap);
-  // the eye line: a curtain whose top reaches 1.45-1.55 m from below hides the room's view at the height people look at it; where the shortest curtain still ends below it, end it there
-  const eyeRod = CAFE.eyeLo - CAFE.rodAbove - 0.005, clearable = eyeRod - CAFE.hemGap - hem >= CAFE.minDrop;
-  if (rod + CAFE.rodAbove >= CAFE.eyeLo && hem <= CAFE.eyeHi && clearable) rod = eyeRod;
-  // a window that cannot hold a curtain below the eye line is dressed only when it is small (a high sill and a short window: the curtain is bound to stand there); a big one keeps its view
-  else if (!clearable && hem <= CAFE.eyeHi && hgt > CAFE.small) return null;
-  const drop = Math.min(CAFE.maxDrop, rod - CAFE.hemGap - hem);
-  if (drop < CAFE.minDrop) return null;
-  rod = hem + CAFE.hemGap + drop;   // (a window tall enough for the longest drop hangs it from the hem up, never longer than the type)
-  const h = Math.round((drop + 0.5) * 1000) / 1000;
-  return { h, y: Math.round((rod - h) * 1000) / 1000, rod, hem };
-}
-const windowSlot: Slot = { id: 'windows', tier: 2, what: 'a café curtain on the lower half of a kitchen window that wears nothing', run(d) {
+/** the types the `windows` slot hangs in a program's windows, or undefined when the program hangs none (the planner needs to know before the slots run: it keeps their volume clear) */
+export const windowTypes = (program: string): string[] | undefined => WINDOW_TYPE[program];
+export { CAFE, cafeFit, cafeDrop };
+const windowSlot: Slot = { id: 'windows', tier: 2, what: 'a café curtain (a parted pair where a tap or a lamp stands) on the lower half of a kitchen window that wears nothing', run(d) {
   const types = WINDOW_TYPE[d.program]; if (!types) return;
-  for (const w of d.bareWindows()) {
-    const f = cafeFit(w.sill, w.hgt); if (!f) continue;
-    // (a curtain that stands within reach of a corner camera, in a small kitchen, is left off)
-    const o = itemObb({ type: 'cafe-curtain', at: w.at, rot: w.rot, w: w.w, h: f.h }); if (o && camBlocked(d.eyes, o, f.hem, f.rod + CAFE.rodAbove, false)) continue;
-    d.raw('windows', d.pick('windows', types), w.at, w.rot, { w: w.w, h: f.h, y: f.y, color: d.scheme.curtain });
-  }
+  // (the plan was made before the first slot ran, against the layout, and every dress item since has kept out of its volume: assets/dress-curtains.ts)
+  for (const p of d.curtainPanels()) d.raw('windows', d.pick('windows', types), p.at, p.rot, { w: p.w, h: p.h, y: p.y, color: d.scheme.curtain });
 } };
 
 // ---- the recipes ---------------------------------------------------------------------------------------------------------------------

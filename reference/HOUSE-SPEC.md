@@ -574,7 +574,10 @@ holder) go through the composer's own `place`, so lanes, door swings, windows an
 cameras (`scripts/review/cameras.mts` `cornerCam`, the eye 1.5 m up, inset 0.55 m or a fifth of the shorter side, at all four corners): no piece within 0.3 m of an eye,
 and no floor piece taller than 0.8 m in a 0.5 m square at a room corner (a shorter piece may stand there); a floor lamp the keep-out leaves no floor for becomes a small
 lamp on a side table in a corner. A café curtain hangs on the lower half of a kitchen window only (hem 3 cm over the sill, rod at most sill + 0.55 x the window's height,
-clear of the 1.45-1.55 m eye line wherever the window leaves room), in the house's pale cloth.
+clear of the 1.45-1.55 m eye line wherever the window leaves room), in the house's pale cloth. The curtain is planned before the first slot runs (`assets/dress-curtains.ts`),
+and nothing may pass through its cloth: it is lifted over what stands low under the window (a counter higher than the sill, at most 0.22 m), parted into two panels round what
+stands narrow (the sink's tap, a lamp), left off where cabinets or a pantry cover the window, and every dress item keeps out of the volume it takes (a lamp or a canister that
+would reach the cloth moves along the counter).
 
 | Program | Recipe (tier 1 = always; the lamp only where the layout placed none) |
 |---|---|

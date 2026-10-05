@@ -25,6 +25,11 @@
 //                   included), by the layout lint and by an independent obb measure over the 30 houses baked and the fixtures; the 12 cases the skeptic found are fixed;
 //                   and the lint sees the flower-jug case the first cut did not (a control)
 //   M  reach          REACH (how far a small good's built mesh passes its measured box) holds over 24 fresh seeds of every surface type, and no spilling type is missing
+//   N  curtain parts  PARTS (the sink run's tap: a 3 cm column over a 0.96 m body) covers every mesh the page builds for the type, at three widths and three depths; a table
+//                   without the tap fails the same measurement (a control)
+//   O  curtain plan   over the 30 houses baked and the fixtures, no café curtain's box (plan, catalog heights, PARTS) meets another item's, however it is stood over, parted
+//                   round or skipped; the plan parts and lifts where it should (a control: a lamp and a tap in a window's way part it, a counter higher than the sill lifts
+//                   the hem, a wall of cabinets leaves the window bare)
 //
 // @check-house node-test
 // @check-house quick
@@ -41,6 +46,7 @@ import { composeHouse, layerOf } from '../assets/room-composer.js';
 import { dressHouse, dressRooms, dressOff, dressOptIn, dressProgram, isDress, bareViolation, Dresser, DRESS_SRC } from '../assets/room-dress.js';
 import { dressSchemeOf } from '../assets/house-scheme-dress.js';
 import { RECIPES, CAFE, cafeFit } from '../assets/dress-recipes.js';
+import { PARTS, curtainObb, planCafe, DRESSERS } from '../assets/dress-curtains.js';
 import { cornerEyes, eyeGap, camBlocked, CAM, hostOf, footprintIn, standingOn as standingOnHost, surfaceY, neighbourGap, rectGap, toWorld, MIN_GAP, NEIGHBOUR_GAP, DESK_TOP, REACH } from '../assets/room-dress-hosts.js';
 import { cornerCam } from './review/cameras.mts';
 import { standingOn, rectArea } from '../assets/room-dress-hosts.js';
@@ -249,11 +255,14 @@ const fleet = () => [...houses.map(h => ({ id: h.id, spec: load(h.file) })), ...
 function windowOf(spec: any, lv: any, room: any, composed: Map<any, any[]>, at: [number, number]) {
   const program = dressProgram(room, lv)!, base = [...(room.items || []).filter((x: any) => !isDress(x)), ...(composed.get(room) || [])];
   const geo = (new Dresser(spec, lv, room, program, 0.5, base, composed) as any).geoC().geo;
+  // (a panel of a parted or clipped curtain is not centred on its window: the window it hangs at is the nearest on that wall whose span, less the rod's reach, the panel meets)
+  let best: { sill: number; hgt: number; width: number; d: number } | null = null;
   for (const run of geo.runs) for (const w of run.windows) {
     const along = run.side === 'N' || run.side === 'S' ? at[0] : at[1], across = run.side === 'N' || run.side === 'S' ? at[1] : at[0];
-    if (Math.abs(along - (w.a + w.b) / 2) < 0.005 && Math.abs(across - run.face) < 0.02) return { sill: w.sill as number, hgt: w.h as number, width: (w.b - w.a) as number };
+    if (Math.abs(across - run.face) > 0.02 || along < w.a - 0.2 || along > w.b + 0.2) continue;
+    const d = Math.abs(along - (w.a + w.b) / 2); if (!best || d < best.d) best = { sill: w.sill as number, hgt: w.h as number, width: (w.b - w.a) as number, d };
   }
-  return null;
+  return best;
 }
 const bcx = createBuildContext({ THREE } as any);
 const kitx = createMaterialKit({ THREE, palette: { wall: '#f1f5f9', trim: '#1e293b', accent: '#0f766e', material: 'stucco' }, seed: 'cafe' } as any);
@@ -502,4 +511,92 @@ test('M: REACH holds, over 24 fresh seeds of every type that stands on a surface
   }
   for (const t of Object.keys(REACH)) assert.ok(t in seen, `REACH names ${t}, which is no surface type`);
   assert.ok(Object.keys(seen).length >= 60, `${Object.keys(seen).length} surface types measured`);
+});
+
+// ---- N: PARTS covers what the page builds ----------------------------------------------------------------------------------------------
+/** every mesh of a PARTS type, built in three.js at the given params, against its parts: a mesh above the body's top must lie inside one of the extras (item frame, 3 mm slack) */
+function partsFaults(type: string, parts: (it: any, s: any) => { top: number; extras: number[][] }, params: any): string[] {
+  const def = (PROPS as Map<string, any>).get(type), it = { type, ...params }, s = sizeOf(type, it)!, p = parts(it, s), out: string[] = [], eps = 0.003;
+  const o = def.create(it, { THREE, std: bcx.std, box: bcx.box, group: bcx.group, mix: bcx.mix, hex: bcx.hex, colors: kitx.colors, rng: kitx.itemRng(`parts:${type}`), H: 2.8 });
+  o.updateMatrixWorld(true);
+  o.traverse((m: any) => {
+    if (!m.isMesh) return;
+    const b = new THREE.Box3().setFromObject(m); if (b.max.y <= p.top + eps) return;
+    const inside = p.extras.some(([x0, z0, x1, z1, y0, y1]) => b.min.x >= x0 - eps && b.max.x <= x1 + eps && b.min.z >= z0 - eps && b.max.z <= z1 + eps && b.min.y >= y0 - eps && b.max.y <= y1 + eps);
+    if (!inside) out.push(`${type} ${JSON.stringify(params)}: a mesh [${b.min.toArray().map(v => v.toFixed(3))}] -> [${b.max.toArray().map(v => v.toFixed(3))}] stands over the body's ${p.top} m outside every part`);
+  });
+  return out;
+}
+test('N: PARTS covers every mesh the page builds over the body of its type (and a table without the tap fails the same measurement)', () => {
+  for (const type of Object.keys(PARTS)) for (const w of [undefined, 1.2, 2.4]) for (const d of [undefined, 0.5, 0.75]) {
+    const params: any = {}; if (w) params.w = w; if (d) params.d = d;
+    assert.deepEqual(partsFaults(type, PARTS[type] as any, params), []);
+  }
+  const noTap = (it: any, s: any) => ({ top: PARTS['sink-run'](it, s).top, extras: [] as number[][] });
+  assert.ok(partsFaults('sink-run', noTap, {}).length > 0, 'a sink run with its tap left out passes: the test cannot see the tap');
+  // the body: nothing of the type stands over its top except the parts, so the box under `top` is the box sizeOf measured
+  const s = sizeOf('sink-run', {})!; assert.ok(s.h > PARTS['sink-run']({}, s).top, 'the whole box is taller than the body (that is why the parts exist)');
+});
+
+// ---- O: the café curtain plan -----------------------------------------------------------------------------------------------------------
+/** the boxes an item takes in the plan, each with its height range: its measured box (heights read from the catalog, a `y` on a floor piece lifting it), or its PARTS; independent of the planner's own code */
+function boxesOf(it: any): Array<{ o: ReturnType<typeof obb>; lo: number; hi: number }> {
+  const s = sizeOf(it.type, it), o = itemObb(it); if (!s || !o) return [];
+  const layer = layerOf(it.type); let lo: number, hi: number;
+  if (layer === 'wall') { const sp = spanOfItem(it); if (!sp) return []; lo = sp.lo; hi = sp.hi; }
+  else if (layer === 'surface') { const y = surfaceY(it)!; lo = y + (s.y0 || 0); hi = lo + s.h; }
+  else { lo = (typeof it.y === 'number' ? it.y : 0) + (s.y0 || 0); hi = lo + s.h; }
+  const f = (PARTS as any)[it.type]; if (!f) return [{ o, lo, hi }];
+  const p = f(it, s), rot = it.rot || 0, out = [{ o, lo, hi: Math.min(hi, p.top) }];
+  for (const [x0, z0, x1, z1, y0, y1] of p.extras as number[][]) { const [dx, dz] = [((x0 + x1) / 2) * Math.cos(rot * Math.PI / 180) + ((z0 + z1) / 2) * Math.sin(rot * Math.PI / 180), -((x0 + x1) / 2) * Math.sin(rot * Math.PI / 180) + ((z0 + z1) / 2) * Math.cos(rot * Math.PI / 180)]; out.push({ o: obb(it.at[0] + dx, it.at[1] + dz, x1 - x0, z1 - z0, rot), lo: y0, hi: y1 }); }
+  return out;
+}
+const grow = (o: ReturnType<typeof obb>, g: number) => obb(o.cx, o.cz, (o.hw + g) * 2, (o.hd + g) * 2, o.rot);
+test('O: no café curtain meets another item (stood over, parted round or skipped)', () => {
+  let curtains = 0, checked = 0;
+  for (const { id, spec } of fleet()) {
+    const comp = composeHouse(spec), res = dressRooms(spec);
+    for (const { room } of rooms(spec)) {
+      const r = res.get(room); if (!r) continue;
+      const cs = r.items.filter((x: any) => x.type === 'cafe-curtain'); if (!cs.length) continue;
+      const items = [...(room.items || []).filter((x: any) => !isDress(x)), ...((comp.get(room) || { items: [] }).items), ...r.items];
+      for (const c of cs) {
+        curtains++;
+        const co = curtainObb(c.at, c.rot || 0, c.w, c.h)!, range = curtainRange(c);
+        for (const it of items) {
+          if (it === c || !Array.isArray(it.at)) continue;
+          if (DRESSERS.includes(it.type)) continue;   // (curtain against curtain: the neighbours' gate, below)
+          for (const b of boxesOf(it)) {
+            if (b.hi <= range.lo - 0.01 || b.lo >= range.hi + 0.01) continue;
+            assert.equal(overlap(grow(b.o, 0.01), co) > 0, false, `${id}/${room.name}: curtain at ${c.at} (${range.lo.toFixed(2)}-${range.hi.toFixed(2)} m, w ${c.w}) meets the ${it.type}${isDress(it) ? '*' : ''} at ${it.at} (${b.lo.toFixed(2)}-${b.hi.toFixed(2)} m)`);
+            checked++;
+          }
+        }
+      }
+    }
+  }
+  assert.ok(curtains >= 45 && checked >= 400, `${curtains} curtains, ${checked} pairs measured`);
+  console.log(`O: ${curtains} curtain panels over the 30 houses baked and the fixtures, ${checked} box pairs against the other items of their rooms (heights from the catalog and PARTS): none meet`);
+});
+
+test('O2 (controls): the plan parts, lifts and skips where it should', () => {
+  // a straight wall on z = 0 (side N, the room to +z), one window 1.2 m wide, sill 1.0, 1.2 high: the plan of its curtain in the face of one thing at a time
+  const geo = (windows: any[]) => ({ runs: [{ side: 'N', kind: 'ext', line: -0.08, face: 0, a: -4, b: 4, windows, doors: [] }] }) as any;
+  const win = { a: -0.6, b: 0.6, sill: 1.0, h: 1.2, type: 'window' };
+  const plan = (items: any[], w: any[] = [win]) => planCafe(geo(w), items, []);
+  const bare = plan([]);
+  assert.equal(bare.length, 1); assert.equal(bare[0].w, 1.4, 'a free window gets the first cut\'s curtain: window + 0.2'); assert.ok(Math.abs(bare[0].hem - 1.03) < 1e-9, 'its hem 3 cm over the sill');
+  // the sink's tap (a 3 cm riser and an arm over the basin, in the middle of a 1.8 m run): the curtain parts round it; the run's own body (0.96 m) is under the hem
+  const sink = { type: 'sink-run', at: [0, 0.321], rot: 0 };
+  const parted = plan([sink]);
+  assert.equal(parted.length, 2, 'a tap in the middle parts the curtain'); assert.ok(parted[0].a1 < 0 && parted[1].a0 > 0, 'the gap is where the tap stands');
+  assert.ok(parted.every(p => Math.abs(p.hem - 1.03) < 1e-9), 'at the sill, not lifted: the tap is narrow');
+  // a mushroom lamp (0.34 m) on a counter run in the middle of the window: parts it too (one at its side leaves a panel too narrow to hang, and the plan takes the wide one)
+  const lamp = { type: 'mushroom-lamp', at: [0, 0.2], y: 0.9, src: 'dress@1' };
+  assert.equal(plan([{ type: 'counter-run', at: [0, 0.3], rot: 0 }, lamp]).length, 2, 'a lamp on the counter parts the curtain');
+  // a counter higher than the sill + 3 cm (a window at 0.8 over a 0.96 m run) lifts the hem over it, and the cloth still ends under the eye line or the window's lower half
+  const low = plan([{ type: 'counter-run', at: [0, 0.3], rot: 0 }], [{ ...win, sill: 0.8 }]);
+  assert.equal(low.length, 1); assert.ok(low[0].hem >= 0.96 + 0.02, `the hem ${low[0].hem} clears the 0.96 m run`);
+  // a wall of cabinets across the window (hung at 1.4 m): nothing is left
+  assert.equal(plan([{ type: 'upper-cabinets', at: [0, 0], rot: 0, w: 3, y: 1.4 }]).length, 0, 'upper cabinets across a window leave it bare');
 });

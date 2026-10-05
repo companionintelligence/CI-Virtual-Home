@@ -26,15 +26,16 @@
 //
 // Owner: DRESS.
 import { PLACEMENT } from './props/placement.js';
-import { sizeOf, paramsOf, turn, mm, itemObb, INWARD, ROT_OF_WALL, alongX } from './room-geo.js';
+import { sizeOf, paramsOf, turn, mm, itemObb, overlap, analyzeRoom, type Obb } from './room-geo.js';
 import { Composer, composeHouse, pinsFor, cornerGroup, wallGroup, layerOf, type Group, type CItem, type HouseState } from './room-composer.js';
 import { inferProgram } from './room-programs.js';
 import { styleOf, type StyleBundle } from './house-styles.js';
 import { mulberry32, fnv1a } from './materials.js';
 import { HERO_SET } from './item-map.js';
-import { hostOf, freeRects, standingOn, fitIn, footprintIn, toWorld, toLocal, subtract, rectArea, neighbourGap, reachOf, NEIGHBOUR_GAP, MIN_GAP, cornerEyes, camBlocked, CAM, type CornerEye, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
+import { hostOf, freeRects, standingOn, fitIn, footprintIn, coverIn, toWorld, toLocal, subtract, rectArea, neighbourGap, reachOf, NEIGHBOUR_GAP, MIN_GAP, cornerEyes, camBlocked, CAM, type CornerEye, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
 import { dressSchemeOf, type DressScheme } from './house-scheme-dress.js';
-import { RECIPES, BASE_COUNT, type Recipe } from './dress-recipes.js';
+import { RECIPES, BASE_COUNT, windowTypes, type Recipe } from './dress-recipes.js';
+import { planCafe, CURTAIN_PAD, VPAD, type Panel } from './dress-curtains.js';
 
 export const DRESS_SRC = 'dress@1';
 export const isDress = (it: any): boolean => !!it && it.src === DRESS_SRC;
@@ -74,6 +75,9 @@ export class Dresser {
   curTier = 1;
   /** the rig's corner cameras of this room: nothing stands in their way */
   readonly eyes: CornerEye[];
+  /** the café curtains the `windows` slot will hang (planned before any slot runs, against the layout), and the volume each takes: nothing else stands in it */
+  readonly panels: Panel[];
+  private keep: Array<{ o: Obb; y0: number; y1: number }>;
   private off: Set<string>; private viaGroup = new Map<any, Group>(); private ord = new Map<string, number>(); private composer: Composer | null = null; private composedItems: Map<any, any[]>;
 
   constructor(spec: any, lv: any, room: any, program: string, level: number, base: any[], composedItems: Map<any, any[]>) {
@@ -88,6 +92,16 @@ export class Dresser {
       .sort((a, b) => (a.type < b.type ? -1 : a.type > b.type ? 1 : a.at[0] - b.at[0] || a.at[1] - b.at[1]));
     const ref = RECIPES[program]?.ref ?? 12, base0 = BASE_COUNT[program] ?? 6;
     this.cap = Math.max(2, Math.round(base0 * (0.55 + 0.45 * Math.max(0.5, Math.min(2.2, this.area / ref))) * (0.6 + 0.8 * level)));
+    // the curtains are planned now, before a slot has placed anything, so every dress item can keep out of their volume (assets/dress-curtains.ts). The plan is a function of the
+    // layout alone: whatever the level and whether or not `windows` is switched off, so a lower level places what a higher one places first and no slot moves another (test C)
+    this.panels = windowTypes(program) ? planCafe(analyzeRoom(spec, lv, room), base, this.eyes) : [];
+    this.keep = this.panels.map(p => ({ o: p.obb, y0: p.hem, y1: p.top }));
+  }
+  /** the café curtains this room's `windows` slot hangs */
+  curtainPanels(): Panel[] { return this.panels; }
+  /** does a box standing between y0 and y1 (grown by `grow` in plan) meet the volume of a planned curtain */
+  inCurtain(o: Obb, y0: number, y1: number, grow = 0): boolean {
+    return this.keep.some(k => y1 + VPAD > k.y0 - CURTAIN_PAD && y0 < k.y1 + CURTAIN_PAD && overlap({ ...o, hw: o.hw + CURTAIN_PAD + grow, hd: o.hd + CURTAIN_PAD + grow }, k.o) > 0);
   }
 
   // ---- what is here
@@ -144,6 +158,9 @@ export class Dresser {
       const q = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => toLocal(h, e.x + a * CAM.clear, e.z + b * CAM.clear)), z: Rect = [Math.min(...q.map(v => v[0])), Math.min(...q.map(v => v[1])), Math.max(...q.map(v => v[0])), Math.max(...q.map(v => v[1]))];
       free = free.flatMap(r => subtract(r, z));
     }
+    // a piece tall enough to reach a planned curtain keeps out of the cloth's volume, its pad and its own reach round it
+    { const y0 = h.top + (o.lift || 0) + (s.y0 || 0), y1 = y0 + s.h + VPAD;
+      for (const k of this.keep) if (y1 > k.y0 - CURTAIN_PAD && y0 < k.y1 + CURTAIN_PAD) { const z = coverIn(h, k.o, CURTAIN_PAD + reachOf(type) + 0.004); free = free.flatMap(r => subtract(r, z)); } }
     let c: [number, number] | null;
     if (o.at) {
       c = o.at;
@@ -189,7 +206,7 @@ export class Dresser {
     if (!this.open(slot)) return null;
     if (!this.afford(tier, cost)) { this.skip(slot, 'the room budget is spent'); return null; }
     const c = this.comp(), prev = g.accept;
-    g.accept = items => (!prev || prev(items)) && !items.some(ci => this.inTheWay(ci));
+    g.accept = items => (!prev || prev(items)) && !items.some(ci => this.inTheWay(ci) || this.inTheCloth(ci));
     if (!g.cands.length || !c.place(g)) { this.skip(slot, `${g.name}: no place in the room (lanes, doors, windows and the furniture hold)`); return null; }
     const ci = (g.items || [])[0]; if (!ci) return null;
     const n = this.ord.get(slot) ?? 0, [dx, dz] = turn(ci.ox, ci.oz, ci.rot);
@@ -211,6 +228,8 @@ export class Dresser {
     const g = this.viaGroup.get(it); this.viaGroup.delete(it);
     if (g && this.composer) { for (const ci of g.items || []) { const i = this.composer.placed.indexOf(ci); if (i >= 0) this.composer.placed.splice(i, 1); } const k = this.composer.groups.indexOf(g); if (k >= 0) this.composer.groups.splice(k, 1); }
   }
+  /** is a composer item in a planned curtain's volume (a floor lamp or a plant under a window that is to wear a café curtain) */
+  inTheCloth(ci: CItem): boolean { const sp = spanOf(ci); return !!sp && this.inCurtain(ci.box, sp[0], sp[1]); }
   /** is a composer item in a corner camera's way (CAM): a rug and a ceiling piece never are */
   inTheWay(ci: CItem): boolean { const sp = spanOf(ci); return !!sp && camBlocked(this.eyes, ci.box, sp[0], sp[1], ci.layer === 'body'); }
   /** a piece in a corner (a floor lamp, a plant) */
@@ -222,22 +241,6 @@ export class Dresser {
     const c = this.comp();
     const g = wallGroup(c, slot, type, params, { score: (p, it) => (near ? -0.6 * Math.hypot(it.cx - near[0], it.cz - near[1]) : 0) });
     return this.placeGroup(slot, g, params, tier, cost);
-  }
-  /** the room's windows that wear nothing: a window (not a glass door or a slider) with no curtain, blind or shutter of the layout within reach along its wall */
-  bareWindows(): Array<{ side: string; at: [number, number]; rot: number; w: number; head: number; sill: number; hgt: number }> {
-    const c = this.comp(), out: Array<{ side: string; at: [number, number]; rot: number; w: number; head: number; sill: number; hgt: number }> = [];
-    const dressers = this.base.filter(it => ['curtains', 'roman-blind', 'roller-shade', 'cafe-curtain', 'shutters', 'valance'].includes(it.type) && Array.isArray(it.at));
-    const H = this.lv.height || 2.8;
-    for (const run of c.geo.runs) for (const w of run.windows) {
-      if (w.type !== 'window' || w.b - w.a < 0.5 || w.b - w.a > 3.2) continue;
-      const t = (w.a + w.b) / 2, [nx, nz] = INWARD[run.side], gap = 0.004;
-      const at: [number, number] = alongX(run.side) ? [mm(t), mm(run.face + nz * gap)] : [mm(run.face + nx * gap), mm(t)];
-      // something already hangs here: any curtain or blind within half a window and a bit of its centre, on this wall
-      if (dressers.some(d => Math.hypot(d.at[0] - at[0], d.at[1] - at[1]) < (w.b - w.a) / 2 + 0.6)) continue;
-      if (this.placed.some(d => (d.type === 'roman-blind' || d.type === 'roller-shade' || d.type === 'cafe-curtain') && Math.hypot(d.at[0] - at[0], d.at[1] - at[1]) < 0.3)) continue;
-      out.push({ side: run.side, at, rot: ROT_OF_WALL[run.side], w: mm(Math.min(w.b - w.a + 0.2, 3.0)), head: mm(Math.min(w.sill + w.h + 0.12, H - 0.12)), sill: mm(w.sill), hgt: mm(w.h) });
-    }
-    return out.sort((p, q) => p.at[0] - q.at[0] || p.at[1] - q.at[1]);
   }
   /** an item the slot places outright (a blind on its window): no host and no composer fit, only its own key */
   raw(slot: string, type: string, at: [number, number], rot: number, params: any = {}, cost = 0.5): any | null {

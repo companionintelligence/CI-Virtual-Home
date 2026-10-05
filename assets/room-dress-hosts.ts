@@ -127,8 +127,11 @@ export const toWorld = (h: Host, lx: number, lz: number): [number, number] => { 
 
 /** an item's footprint as a host-frame rect (the axis-aligned cover of its obb in the host's frame): what it takes from the host's free area */
 export function footprintIn(h: Host, it: any): Rect | null {
-  const o = itemObb(it); if (!o) return null;
-  const hw = o.hw, hd = o.hd, c = toLocal(h, o.cx, o.cz), rel = (o.rot - h.rot) * Math.PI / 180, cs = Math.abs(Math.cos(rel)), sn = Math.abs(Math.sin(rel));
+  const o = itemObb(it); return o ? coverIn(h, o) : null;
+}
+/** an obb as a host-frame rect (its axis-aligned cover in the host's frame), grown by `grow` all round */
+export function coverIn(h: Host, o: Obb, grow = 0): Rect {
+  const hw = o.hw + grow, hd = o.hd + grow, c = toLocal(h, o.cx, o.cz), rel = (o.rot - h.rot) * Math.PI / 180, cs = Math.abs(Math.cos(rel)), sn = Math.abs(Math.sin(rel));
   const ex = hw * cs + hd * sn, ez = hw * sn + hd * cs;
   return [c[0] - ex, c[1] - ez, c[0] + ex, c[1] + ez];
 }
