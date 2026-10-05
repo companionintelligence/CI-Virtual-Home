@@ -352,7 +352,10 @@ export function layBedding(g: any, ctx: any, o: any) {
   });
   // the fold-back: a roll of duvet at the fold line and the linen lining lying toward the head
   const flap = Math.min(0.24, bl * 0.28);
-  shell(duvetA, { cy: matTop + loft + 0.016, cz: headEdge + flap + 0.02, w: W2 - 0.004, h: 0.07, d: 0.075, r: 0.033, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(W2 / 2, 6), ky: [-0.035, 0, 0.035], kz: [-0.0375, 0, 0.0375] });
+  // (wave 3 fix, lakecabin master bedroom SE: the first roll was a 7 cm log lying ACROSS the whole duvet with pill-shaped ends at its sides, which read as an odd striped tube once a
+  // quilt pattern ran over it. It is now a lower, wider, softer fold that stops short of the duvet's sides, sunk into the crown, so it reads as the cloth turned over)
+  shell(duvetA, { cy: matTop + loft + 0.004, cz: headEdge + flap + 0.02, w: W2 - 0.1, h: 0.05, d: 0.12, r: 0.024, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin((W2 - 0.1) / 2, 6), ky: [-0.025, 0, 0.025], kz: [-0.06, 0, 0.06], puff: 0.006,
+    shade: (x: number, _y: number, zz: number, _nx: number, ny: number) => (ny > 0.5 ? 0.97 - 0.06 * smooth(0.7, 1, Math.abs(x) / ((W2 - 0.1) / 2)) - 0.04 * smooth(0.3, 1, Math.abs(zz) / 0.06) : 0.84) });
   // the lining lies toward the head, rippled, its ends drooping over the duvet's sides like cloth, not a board
   const fw = W2 - 0.03, fd = flap + 0.01;
   shell(linenA, { cy: matTop + loft + 0.014, cz: headEdge + flap / 2, w: fw, h: 0.03, d: fd, r: 0.014, faces: ['py', 'px', 'nx', 'nz'], kx: lin(fw / 2, 6), kz: [-fd / 2, 0, fd / 2],
@@ -429,7 +432,14 @@ export function layBedding(g: any, ctx: any, o: any) {
     shell(altA, { w: 0.5, h: 0.11, d: 0.17, r: 0.05, faces: ['py', 'px', 'nx', 'pz', 'nz'], kx: lin(0.25, 4), ky: [-0.055, -0.005, 0.055], kz: [-0.085, 0, 0.085], puff: 0.012, xf: lxf,
       shade: (x: number, _y: number, _z: number, _nx: number, ny: number) => (ny > 0.5 ? 0.97 - 0.1 * smooth(0.6, 1, Math.abs(x) / 0.25) : 0.86) });
   }
-  const uv = quilt ? (x: number, _y: number, zz: number): [number, number] => [(x + W2 / 2) / W2, (zz - (zf - cl)) / cl] : undefined;
+  // the quilt's planar UVs, UNFOLDED over the edge: a plain top-down projection gives every vertex of a side or foot skirt the same u (or v), so the plaid smeared into long streaks
+  // down the skirt and the rounded edge read as an odd striped tube (lakecabin master bedroom SE). A vertex below the crown is mapped as if the cloth continued over the edge: moved
+  // inward by how far it hangs, so the pattern runs on down the skirt (mirrored, which a plaid does not show)
+  const crown = matTop + loft;
+  const uv = quilt ? (x: number, y: number, zz: number): [number, number] => {
+    const hang = Math.max(0, crown - 0.02 - y), sx = Math.abs(x) > W2 / 2 - 0.03 ? Math.sign(x) * hang : 0, sz = zz > zf - 0.03 ? hang : 0;
+    return [(x - sx + W2 / 2) / W2, (zz - sz - (zf - cl)) / cl];
+  } : undefined;
   put(g, linenA, softMat(ctx, colors.linen, { roughness: 0.95 }), 'linen');
   put(g, duvetA, softMat(ctx, duvet, { roughness: 0.88 }), 'duvet', { uv });
   put(g, altA, softMat(ctx, altCol, { roughness: 0.93 }), 'throw');
