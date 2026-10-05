@@ -1,6 +1,6 @@
 // The plant recipes (PLAN 5.3 T5 + T9): one function per registry plant type, built on softplant.ts. plants.ts registers each type (footprint, height, params, tags,
 // iso) and calls `recipes[type]` for its geometry. A recipe: pot colour (the old draw), a private stream (the one new draw), a pot form, the plant, `fit` to the old box.
-import { plantKit, potColor, sizeOf, boxAt, GREENS, TERRACOTTA, BARK, STEM_BROWN, splitRng, clamp, smooth, type PlantSpec, type BoxRow } from './softplant.js';
+import { plantKit, potColor, dim, sizeOf, boxAt, GREENS, TERRACOTTA, BARK, STEM_BROWN, splitRng, clamp, smooth, type PlantSpec, type BoxRow } from './softplant.js';
 
 /** the baseline boxes by type and `h` (test/review/baselines/prop-boxes.json, the 12-seed union; [h, x0, z0, x1, z1, top, bottom]) */
 export const BOXES: Record<string, BoxRow[]> = {
@@ -192,18 +192,22 @@ export const recipes: Record<string, Recipe> = {
   },
   // ---- F5 fronds ---------------------------------------------------------------------------------------------------------------------------------------------------
   'indoor-palm'(it, ctx) {
-    const B = begin('indoor-palm', it, ctx, 'Kentia Palm'), { P, r, rim, s, leafA, caneA } = B;
-    const g0 = B.green(0, 3), pinnate = (u: number) => Math.max(0.1, Math.sin(Math.PI * Math.pow(u, 0.7))) * (0.72 + 0.28 * Math.abs(Math.cos(u * Math.PI * 7)));
-    for (let i = 0; i < 3; i++) {
-      const a = (i + 0.5) * (Math.PI * 2 / 3) + B.jit(0.4), lean = 0.08 + r() * 0.08, len = (1.0 + r() * 0.25) * s;
+    // wave 3 fix: the first cut read as a near-black, glossy, creased palm (one thin cane, three crowns, a scalloped outline folded at five rows). The old palm was FOUR canes with a
+    // crown of bright, clean blades each; this one is four canes, five arching blades and a spear a crown, a smooth blade outline with a gentle fold, two neighbouring greens (the
+    // old palette), a base-to-tip shade that stays above 0.8 and a matte surface (roughness 0.9: no sun streaks), the lower face of a blade as light as its upper (it is seen from below)
+    const B = begin('indoor-palm', it, ctx, 'Kentia Palm'), { P, r, rim, s, leafA, caneA, bloomA } = B;
+    const gi = 2 + Math.floor(r() * 3), blade = (u: number) => Math.sin(Math.PI * Math.pow(u, 0.66)) * (1 - 0.18 * u);
+    for (let i = 0; i < 4; i++) {
+      const a = (i + 0.5) * (Math.PI / 2) + B.jit(0.4), lean = 0.1 + r() * 0.1, len = (0.95 + r() * 0.25) * s;
       const top = [Math.sin(a) * (0.08 + Math.sin(lean) * len), rim + Math.cos(lean) * len, Math.cos(a) * (0.08 + Math.sin(lean) * len)];
-      P.arc(caneA, [Math.sin(a) * 0.08, rim - 0.02, Math.cos(a) * 0.08], [top[0] * 0.5, rim + len * 0.5, top[2] * 0.5], top, 0.015, 0.009, 3, 0.7, 0.9, 5);
+      P.arc(caneA, [Math.sin(a) * 0.08, rim - 0.02, Math.cos(a) * 0.08], [top[0] * 0.5, rim + len * 0.5, top[2] * 0.5], top, 0.015, 0.009, 2, 0.7, 0.9, 5);
       for (let k = 0; k < 6; k++) {
-        const fa = a + (k - 2.5) * 0.65 + B.jit(0.15);
-        P.leaf(leafA, { x: top[0], y: top[1] - 0.02, z: top[2], a: fa, t: 0.5 + Math.abs(k - 2.5) * 0.18 + B.jit(0.1), L: (0.7 + r() * 0.1) * s, W: 0.26, droop: 1.3 + B.jit(0.15), fold: 0.25, rows: 5, th: 0.006, profile: pinnate, baseS: 0.5 + 0.1 * r() });
+        const fa = a + (k - 2.5) * 0.6 + B.jit(0.14), into = (i + k) % 2 ? bloomA : leafA;
+        P.leaf(into, { x: top[0], y: top[1] - 0.02, z: top[2], a: fa, t: 0.45 + Math.abs(k - 2.5) * 0.18 + B.jit(0.08), L: (0.74 + r() * 0.12) * s, W: 0.2, droop: 1.5 + B.jit(0.15), fold: 0.1, rows: 4, th: 0.006, profile: blade, baseS: 0.9 + 0.06 * r(), under: 0.95, edge: 1 });
       }
+      P.leaf(leafA, { x: top[0], y: top[1], z: top[2], a: a + Math.PI + B.jit(0.5), t: 0.3, L: 0.3 * s, W: 0.1, droop: 0.5, fold: 0.1, rows: 3, th: 0.006, profile: blade, baseS: 0.92, under: 0.95, edge: 1 });   // the new spear, back over the pot
     }
-    return B.done(g0, { caneCol: 0x4f6b3a, leafRough: 0.5 });
+    return B.done(GREENS[gi], { caneCol: 0x4f6b3a, bloomCol: GREENS[gi + 1], leafRough: 0.9, leafExtra: { emissive: dim(GREENS[gi], 0.3) }, bloomExtra: { roughness: 0.9, emissive: dim(GREENS[gi + 1], 0.3) } });   // a little emissive stands in for a leaf's translucency: the lower face of a crown that is seen from below (eye 1.5 m, crown 1.9 m) is lit by nothing and read black
   },
   'fern'(it, ctx) {
     const B = begin('fern', it, ctx, 'Fern'), { P, r, rim, leafA } = B;
