@@ -23508,6 +23508,1648 @@
     "styles": []
    }
   },
+  "place-setting": {
+   "footprint": [
+    0.41,
+    0.33
+   ],
+   "height": 0.11,
+   "box": [
+    -0.184,
+    0,
+    -0.163,
+    0.222,
+    0.11,
+    0.162
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "color",
+    "variant"
+   ],
+   "tags": [
+    "dining",
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "fitted"
+    ],
+    "pairsWith": [
+     "dining-table"
+    ],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-place-setting"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "candle-trio": {
+   "footprint": [
+    0.24,
+    0.07
+   ],
+   "height": 0.23,
+   "box": [
+    -0.12,
+    0,
+    -0.029,
+    0.12,
+    0.23,
+    0.041
+   ],
+   "meshes": 2,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "dining",
+    "living",
+    "kitchen",
+    "bedroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk",
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-candles"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "kitchen",
+     "kitchen-dining",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
+  },
+  "carafe": {
+   "footprint": [
+    0.3,
+    0.3
+   ],
+   "height": 0.24,
+   "box": [
+    -0.15,
+    0,
+    -0.148,
+    0.15,
+    0.241,
+    0.148
+   ],
+   "meshes": 2,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "dining",
+    "kitchen",
+    "bedroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk",
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-carafe"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "kitchen",
+     "kitchen-dining",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
+  },
+  "centerpiece": {
+   "footprint": [
+    0.28,
+    0.19
+   ],
+   "height": 0.24,
+   "box": [
+    -0.136,
+    0,
+    -0.087,
+    0.147,
+    0.245,
+    0.099
+   ],
+   "meshes": 1,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "color",
+    "variant"
+   ],
+   "tags": [
+    "dining",
+    "living",
+    "kitchen",
+    "hall"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk",
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-centerpiece"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "kitchen",
+     "kitchen-dining",
+     "hall",
+     "foyer"
+    ],
+    "styles": []
+   }
+  },
+  "plate-stack": {
+   "footprint": [
+    0.44,
+    0.27
+   ],
+   "height": 0.05,
+   "box": [
+    -0.214,
+    0,
+    -0.134,
+    0.225,
+    0.05,
+    0.134
+   ],
+   "meshes": 1,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "color",
+    "variant"
+   ],
+   "tags": [
+    "dining",
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk",
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-plates"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining",
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "table-runner": {
+   "footprint": [
+    1.6,
+    0.34
+   ],
+   "height": 0.14,
+   "box": [
+    -0.8,
+    0,
+    -0.17,
+    0.8,
+    0.144,
+    0.17
+   ],
+   "meshes": 2,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "w",
+    "color",
+    "variant"
+   ],
+   "tags": [
+    "dining"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table"
+    ],
+    "pairsWith": [
+     "dining-table"
+    ],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-runner"
+    ],
+    "programs": [
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "kettle-and-mug": {
+   "footprint": [
+    0.34,
+    0.19
+   ],
+   "height": 0.21,
+   "box": [
+    -0.168,
+    0,
+    -0.097,
+    0.172,
+    0.213,
+    0.097
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-kettle"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "cutting-board-set": {
+   "footprint": [
+    0.54,
+    0.23
+   ],
+   "height": 0.07,
+   "box": [
+    -0.273,
+    0,
+    -0.115,
+    0.27,
+    0.068,
+    0.115
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-boards"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "utensil-crock": {
+   "footprint": [
+    0.16,
+    0.13
+   ],
+   "height": 0.31,
+   "box": [
+    -0.083,
+    0,
+    -0.06,
+    0.076,
+    0.313,
+    0.071
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "color",
+    "variant"
+   ],
+   "tags": [
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-crock"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "canister-trio": {
+   "footprint": [
+    0.33,
+    0.11
+   ],
+   "height": 0.22,
+   "box": [
+    -0.172,
+    0,
+    -0.056,
+    0.16,
+    0.222,
+    0.056
+   ],
+   "meshes": 2,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "color",
+    "variant"
+   ],
+   "tags": [
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-canisters"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "bread-bin": {
+   "footprint": [
+    0.4,
+    0.26
+   ],
+   "height": 0.23,
+   "box": [
+    -0.2,
+    0,
+    -0.127,
+    0.2,
+    0.23,
+    0.134
+   ],
+   "meshes": 2,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "color",
+    "variant"
+   ],
+   "tags": [
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-bread-bin"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "dish-rack": {
+   "footprint": [
+    0.49,
+    0.32
+   ],
+   "height": 0.2,
+   "box": [
+    -0.245,
+    0,
+    -0.16,
+    0.245,
+    0.2,
+    0.16
+   ],
+   "meshes": 2,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-dish-rack"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "tea-towel": {
+   "footprint": [
+    0.3,
+    0.2
+   ],
+   "height": 0.05,
+   "box": [
+    -0.15,
+    0,
+    -0.102,
+    0.152,
+    0.046,
+    0.102
+   ],
+   "meshes": 2,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-tea-towel"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "oil-pair": {
+   "footprint": [
+    0.22,
+    0.08
+   ],
+   "height": 0.27,
+   "box": [
+    -0.094,
+    0,
+    -0.039,
+    0.125,
+    0.265,
+    0.04
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "fitted",
+     "appliance"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-oils"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "pot-on-hob": {
+   "footprint": [
+    0.32,
+    0.21
+   ],
+   "height": 0.18,
+   "box": [
+    -0.172,
+    0,
+    -0.104,
+    0.15,
+    0.184,
+    0.104
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "kitchen"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "appliance",
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-pot"
+    ],
+    "programs": [
+     "kitchen",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "tray-vignette": {
+   "footprint": [
+    0.42,
+    0.3
+   ],
+   "height": 0.12,
+   "box": [
+    -0.21,
+    0,
+    -0.15,
+    0.21,
+    0.12,
+    0.15
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "living",
+    "bedroom",
+    "hall"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-tray"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "hall",
+     "foyer"
+    ],
+    "styles": []
+   }
+  },
+  "side-set": {
+   "footprint": [
+    0.26,
+    0.23
+   ],
+   "height": 0.11,
+   "box": [
+    -0.128,
+    0,
+    -0.114,
+    0.135,
+    0.108,
+    0.114
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "living",
+    "bedroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "table",
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-side-set"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
+  },
+  "console-set": {
+   "footprint": [
+    0.64,
+    0.15
+   ],
+   "height": 0.21,
+   "box": [
+    -0.305,
+    0,
+    -0.074,
+    0.33,
+    0.211,
+    0.074
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "hall",
+    "living",
+    "dining"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "storage",
+     "table"
+    ],
+    "pairsWith": [
+     "console",
+     "sideboard"
+    ],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-console-set"
+    ],
+    "programs": [
+     "hall",
+     "foyer",
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "dining",
+     "kitchen-dining"
+    ],
+    "styles": []
+   }
+  },
+  "shelf-style": {
+   "footprint": [
+    0.56,
+    0.21
+   ],
+   "height": 0.25,
+   "box": [
+    -0.28,
+    0,
+    -0.106,
+    0.283,
+    0.25,
+    0.106
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "w",
+    "variant"
+   ],
+   "tags": [
+    "living",
+    "study",
+    "bedroom",
+    "hall"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "storage",
+     "desk"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-shelf-style"
+    ],
+    "programs": [
+     "living",
+     "den",
+     "media",
+     "library",
+     "sunroom",
+     "study",
+     "study",
+     "library",
+     "studio",
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "hall"
+    ],
+    "styles": []
+   }
+  },
+  "nightstand-set": {
+   "footprint": [
+    0.25,
+    0.21
+   ],
+   "height": 0.1,
+   "box": [
+    -0.126,
+    0,
+    -0.106,
+    0.128,
+    0.1,
+    0.106
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "bedroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "storage",
+     "table"
+    ],
+    "pairsWith": [
+     "nightstand",
+     "bed"
+    ],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-nightstand-set"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
+  },
+  "dresser-set": {
+   "footprint": [
+    0.5,
+    0.18
+   ],
+   "height": 0.2,
+   "box": [
+    -0.25,
+    0,
+    -0.09,
+    0.247,
+    0.201,
+    0.09
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "bedroom",
+    "hall"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "storage"
+    ],
+    "pairsWith": [
+     "dresser"
+    ],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-dresser-set"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "hall"
+    ],
+    "styles": []
+   }
+  },
+  "slippers": {
+   "footprint": [
+    0.24,
+    0.27
+   ],
+   "height": 0.08,
+   "box": [
+    -0.121,
+    0,
+    -0.13,
+    0.124,
+    0.084,
+    0.144
+   ],
+   "meshes": 2,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "bedroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0.1,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-slippers"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery"
+    ],
+    "styles": []
+   }
+  },
+  "vanity-set": {
+   "footprint": [
+    0.3,
+    0.16
+   ],
+   "height": 0.17,
+   "box": [
+    -0.15,
+    0,
+    -0.08,
+    0.15,
+    0.173,
+    0.08
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "color",
+    "variant"
+   ],
+   "tags": [
+    "bathroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "bath",
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-vanity-set"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": []
+   }
+  },
+  "tissue-candle": {
+   "footprint": [
+    0.33,
+    0.13
+   ],
+   "height": 0.14,
+   "box": [
+    -0.182,
+    0,
+    -0.066,
+    0.15,
+    0.14,
+    0.066
+   ],
+   "meshes": 2,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "bathroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "bath",
+     "fitted"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-tissue-candle"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": []
+   }
+  },
+  "tub-tray": {
+   "footprint": [
+    0.7,
+    0.3
+   ],
+   "height": 0.13,
+   "box": [
+    -0.35,
+    0,
+    -0.15,
+    0.35,
+    0.126,
+    0.15
+   ],
+   "meshes": 3,
+   "surface": true,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "bathroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "free",
+    "clear": {
+     "front": 0,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": true,
+    "surfaces": [
+     "bath"
+    ],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-tub-tray"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": []
+   }
+  },
+  "roll-holder": {
+   "footprint": [
+    0.16,
+    0.17
+   ],
+   "height": 0.14,
+   "box": [
+    -0.08,
+    0,
+    -0.038,
+    0.08,
+    0.14,
+    0.13
+   ],
+   "meshes": 2,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "bathroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.2,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": "wall",
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-roll-holder"
+    ],
+    "programs": [
+     "bath",
+     "ensuite",
+     "powder"
+    ],
+    "styles": [],
+    "mountY": 0.75
+   }
+  },
+  "umbrella-stand": {
+   "footprint": [
+    0.2,
+    0.19
+   ],
+   "height": 0.97,
+   "box": [
+    -0.109,
+    0,
+    -0.095,
+    0.095,
+    0.975,
+    0.095
+   ],
+   "meshes": 3,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "hall"
+   ],
+   "iso": [],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-umbrella-stand"
+    ],
+    "programs": [
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
+  },
+  "door-mat": {
+   "footprint": [
+    0.75,
+    0.45
+   ],
+   "height": 0.02,
+   "box": [
+    -0.375,
+    0,
+    -0.225,
+    0.375,
+    0.018,
+    0.225
+   ],
+   "meshes": 2,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "w",
+    "d",
+    "color"
+   ],
+   "tags": [
+    "hall"
+   ],
+   "iso": [],
+   "place": {
+    "against": "center",
+    "clear": {
+     "front": 0,
+     "side": 0,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "rug",
+    "roles": [
+     "dx-door-mat"
+    ],
+    "programs": [
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
+  },
+  "shoe-row": {
+   "footprint": [
+    0.6,
+    0.26
+   ],
+   "height": 0.11,
+   "box": [
+    -0.298,
+    0,
+    -0.129,
+    0.298,
+    0.108,
+    0.129
+   ],
+   "meshes": 3,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "hall"
+   ],
+   "iso": [],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.3,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-shoe-row"
+    ],
+    "programs": [
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
+  },
+  "leaner-mirror": {
+   "footprint": [
+    0.56,
+    0.2
+   ],
+   "height": 1.58,
+   "box": [
+    -0.28,
+    0,
+    -0.158,
+    0.28,
+    1.576,
+    0.04
+   ],
+   "meshes": 2,
+   "surface": false,
+   "source": "registry",
+   "params": [
+    "variant"
+   ],
+   "tags": [
+    "hall",
+    "bedroom"
+   ],
+   "iso": [],
+   "place": {
+    "against": "wall",
+    "clear": {
+     "front": 0.4,
+     "side": 0.05,
+     "back": 0
+    },
+    "faces": "room",
+    "hangs": null,
+    "onSurface": false,
+    "surfaces": [],
+    "pairsWith": [],
+    "colorRole": null,
+    "group": "decor",
+    "roles": [
+     "dx-leaner-mirror"
+    ],
+    "programs": [
+     "bed-primary",
+     "bed-guest",
+     "bed-kid",
+     "nursery",
+     "foyer",
+     "hall"
+    ],
+    "styles": []
+   }
+  },
   "medicine-cabinet": {
    "footprint": [
     0.6,

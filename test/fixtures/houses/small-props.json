@@ -1,0 +1,699 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "small-props",
+  "name": "SMALL Props Fixture",
+  "author": "ci-virtual-home",
+  "source": "test fixture (plan 5.5 SMALL): every dress-kit type, authored by hand on a real host (a counter, a table, a sideboard, a console, a vanity, a tub, a bed side), unprogrammed: the small goods that are DORMANT everywhere else",
+  "style": "Single-storey gallery of the small goods",
+  "emoji": "🧪",
+  "fixture": {
+    "note": "every dress-kit type (assets/props/dress-*.ts), hand-placed on a real host; the proof that a type builds, stands on its host and renders, outside the 150 goldens. No house places these types."
+  },
+  "lot": {
+    "w": 40,
+    "d": 20,
+    "ground": "lawn"
+  },
+  "palette": {
+    "wall": "#eeebe4",
+    "trim": "#2c2f33",
+    "roof": "#3a3d42",
+    "accent": "#6d8a74",
+    "material": "siding"
+  },
+  "lighting": "day",
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Ground Floor",
+      "y": 0,
+      "height": 2.8,
+      "floor": "oak",
+      "footprint": [
+        {
+          "x": -14,
+          "z": -4,
+          "w": 28,
+          "d": 8
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -9.5,
+          "type": "door",
+          "w": 1.0,
+          "h": 2.1,
+          "style": "entry"
+        },
+        {
+          "side": "S",
+          "at": -1.0,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 5.5,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.3,
+          "sill": 0.9
+        },
+        {
+          "side": "S",
+          "at": 11.0,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.2,
+          "sill": 0.9
+        },
+        {
+          "side": "N",
+          "at": -9.5,
+          "type": "window",
+          "w": 1.4,
+          "h": 0.8,
+          "sill": 1.3
+        },
+        {
+          "side": "N",
+          "at": 5.5,
+          "type": "window",
+          "w": 1.4,
+          "h": 0.8,
+          "sill": 1.3
+        },
+        {
+          "side": "N",
+          "at": 11.0,
+          "type": "window",
+          "w": 0.8,
+          "h": 0.6,
+          "sill": 1.5
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -4,
+            -4
+          ],
+          "to": [
+            -4,
+            4
+          ],
+          "door": 6.0,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            3,
+            -4
+          ],
+          "to": [
+            3,
+            4
+          ],
+          "door": 6.0,
+          "doorW": 0.9
+        },
+        {
+          "from": [
+            8,
+            -4
+          ],
+          "to": [
+            8,
+            4
+          ],
+          "door": 5.8,
+          "doorW": 0.9
+        }
+      ],
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Kitchen and Dining",
+          "bounds": {
+            "x": -14,
+            "z": -4,
+            "w": 9,
+            "d": 8
+          },
+          "items": [
+            {
+              "type": "counter-run",
+              "at": [
+                -13,
+                -3.7
+              ],
+              "w": 2.0
+            },
+            {
+              "type": "counter-run",
+              "at": [
+                -11,
+                -3.7
+              ],
+              "w": 2.0
+            },
+            {
+              "type": "counter-run",
+              "at": [
+                -9,
+                -3.7
+              ],
+              "w": 2.0
+            },
+            {
+              "type": "counter-run",
+              "at": [
+                -7,
+                -3.7
+              ],
+              "w": 2.0
+            },
+            {
+              "type": "range",
+              "at": [
+                -5.45,
+                -3.7
+              ]
+            },
+            {
+              "type": "cutting-board-set",
+              "at": [
+                -13.55,
+                -3.62
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "kettle-and-mug",
+              "at": [
+                -12.5,
+                -3.62
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "utensil-crock",
+              "at": [
+                -11.75,
+                -3.62
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "canister-trio",
+              "at": [
+                -11.1,
+                -3.62
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "bread-bin",
+              "at": [
+                -10.4,
+                -3.62
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "dish-rack",
+              "at": [
+                -9.65,
+                -3.62
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "tea-towel",
+              "at": [
+                -8.95,
+                -3.62
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "oil-pair",
+              "at": [
+                -8.4,
+                -3.62
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "plate-stack",
+              "at": [
+                -7.6,
+                -3.62
+              ],
+              "y": 0.9
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                -5.45,
+                -3.62
+              ],
+              "y": 0.926
+            },
+            {
+              "type": "glass-dining-table",
+              "at": [
+                -9.5,
+                1.2
+              ],
+              "w": 2.4,
+              "d": 1.0
+            },
+            {
+              "type": "table-runner",
+              "at": [
+                -9.5,
+                1.2
+              ],
+              "y": 0.75,
+              "w": 1.6,
+              "variant": 0
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -10.1,
+                1.5
+              ],
+              "rot": 0,
+              "y": 0.75
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -8.9,
+                1.5
+              ],
+              "rot": 0,
+              "y": 0.75
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -10.1,
+                0.9
+              ],
+              "rot": 180,
+              "y": 0.75
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -8.9,
+                0.9
+              ],
+              "rot": 180,
+              "y": 0.75
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                -9.5,
+                1.2
+              ],
+              "y": 0.762,
+              "variant": 1
+            },
+            {
+              "type": "candle-trio",
+              "at": [
+                -10.35,
+                1.2
+              ],
+              "y": 0.762,
+              "variant": 1
+            },
+            {
+              "type": "carafe",
+              "at": [
+                -8.65,
+                1.2
+              ],
+              "y": 0.762
+            },
+            {
+              "type": "dining-chair",
+              "at": [
+                -10.3,
+                2.3
+              ],
+              "rot": 180
+            },
+            {
+              "type": "dining-chair",
+              "at": [
+                -8.7,
+                2.3
+              ],
+              "rot": 180
+            },
+            {
+              "type": "dining-chair",
+              "at": [
+                -10.3,
+                0.1
+              ],
+              "rot": 0
+            },
+            {
+              "type": "dining-chair",
+              "at": [
+                -8.7,
+                0.1
+              ],
+              "rot": 0
+            }
+          ]
+        },
+        {
+          "no": "02",
+          "name": "Living and Hall",
+          "bounds": {
+            "x": -4,
+            "z": -4,
+            "w": 6,
+            "d": 8
+          },
+          "fixtures": {
+            "fan": false
+          },
+          "items": [
+            {
+              "type": "sideboard",
+              "at": [
+                -2.6,
+                -3.75
+              ],
+              "w": 1.6
+            },
+            {
+              "type": "shelf-style",
+              "at": [
+                -3.1,
+                -3.75
+              ],
+              "y": 0.95,
+              "w": 0.58
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                -2.4,
+                -3.75
+              ],
+              "y": 0.95,
+              "variant": 0
+            },
+            {
+              "type": "candle-trio",
+              "at": [
+                -2.0,
+                -3.75
+              ],
+              "y": 0.95,
+              "variant": 0
+            },
+            {
+              "type": "console-table",
+              "at": [
+                -0.35,
+                -3.8
+              ]
+            },
+            {
+              "type": "console-set",
+              "at": [
+                -0.35,
+                -3.8
+              ],
+              "y": 0.85
+            },
+            {
+              "type": "coffee-table",
+              "at": [
+                -1.0,
+                -0.2
+              ]
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                -1.0,
+                -0.2
+              ],
+              "y": 0.4,
+              "variant": 0
+            },
+            {
+              "type": "side-table",
+              "at": [
+                -2.9,
+                0.6
+              ]
+            },
+            {
+              "type": "side-set",
+              "at": [
+                -2.9,
+                0.6
+              ],
+              "y": 0.55
+            },
+            {
+              "type": "door-mat",
+              "at": [
+                0.8,
+                3.45
+              ]
+            },
+            {
+              "type": "umbrella-stand",
+              "at": [
+                1.6,
+                3.4
+              ]
+            },
+            {
+              "type": "shoe-row",
+              "at": [
+                -0.2,
+                3.62
+              ],
+              "rot": 180
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                -3.72,
+                -1.0
+              ],
+              "rot": 90
+            }
+          ]
+        },
+        {
+          "no": "03",
+          "name": "Bedroom",
+          "bounds": {
+            "x": 3,
+            "z": -4,
+            "w": 5,
+            "d": 8
+          },
+          "items": [
+            {
+              "type": "upholstered-bed",
+              "at": [
+                5.5,
+                -2.95
+              ],
+              "w": 1.6
+            },
+            {
+              "type": "drum-nightstand",
+              "at": [
+                4.15,
+                -3.7
+              ]
+            },
+            {
+              "type": "nightstand-set",
+              "at": [
+                4.15,
+                -3.7
+              ],
+              "y": 0.56
+            },
+            {
+              "type": "slippers",
+              "at": [
+                4.0,
+                -1.6
+              ],
+              "rot": 15
+            },
+            {
+              "type": "chest-of-drawers",
+              "at": [
+                5.5,
+                3.7
+              ],
+              "rot": 180
+            },
+            {
+              "type": "dresser-set",
+              "at": [
+                5.5,
+                3.7
+              ],
+              "rot": 180,
+              "y": 1.15
+            }
+          ]
+        },
+        {
+          "no": "04",
+          "name": "Bath",
+          "bounds": {
+            "x": 8,
+            "z": -4,
+            "w": 6,
+            "d": 8
+          },
+          "items": [
+            {
+              "type": "double-vanity",
+              "at": [
+                11.5,
+                -3.74
+              ]
+            },
+            {
+              "type": "vanity-set",
+              "at": [
+                11.5,
+                -3.7
+              ],
+              "y": 0.89
+            },
+            {
+              "type": "console-table",
+              "at": [
+                9.2,
+                -3.8
+              ]
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                9.2,
+                -3.8
+              ],
+              "y": 0.85
+            },
+            {
+              "type": "bathtub",
+              "at": [
+                11.5,
+                0.8
+              ],
+              "w": 1.7
+            },
+            {
+              "type": "tub-tray",
+              "at": [
+                11.5,
+                0.8
+              ],
+              "rot": 90,
+              "y": 0.6
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                8.12,
+                -1.5
+              ],
+              "rot": 90
+            },
+            {
+              "type": "toilet",
+              "at": [
+                13.2,
+                -3.6
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -14.4,
+        "z": -4.4,
+        "w": 28.8,
+        "d": 8.8
+      },
+      "y": 2.8,
+      "type": "hip",
+      "pitch": 22,
+      "overhang": 0.4,
+      "color": "#3d4046"
+    }
+  ],
+  "site": [
+    {
+      "type": "tree",
+      "at": [
+        -16,
+        6
+      ],
+      "h": 5
+    },
+    {
+      "type": "tree",
+      "at": [
+        16,
+        -7
+      ],
+      "h": 6
+    }
+  ],
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": -9.5
+  },
+  "hero": {
+    "level": "l1",
+    "at": [
+      -13.55,
+      0.6
+    ],
+    "rot": 90,
+    "device": "chalk",
+    "pose": "prone",
+    "surface": "desk"
+  },
+  "shots": [
+    {
+      "type": "door-to-core",
+      "duration": 12
+    }
+  ]
+}
