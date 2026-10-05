@@ -86,7 +86,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     label: 'Dusk',
     sky: ['#4e638b', '#e5a38b', '#5d626e'],
     sun: { color: '#ffa98f', intensity: 1.0, elevation: 8, swing: -64 },
-    hemi: { sky: '#b9aed0', ground: '#837773', intensity: 0.9 },
+    hemi: { sky: '#b9aed0', ground: '#9a8576', intensity: 1.28 },
     fill: { color: '#9eaecd', intensity: 0.3 },
     ambient: 0,
     exposure: 0.9, env: 0.7,
@@ -99,7 +99,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     label: 'Night',
     sky: ['#0b1731', '#424b64', '#17202a'],
     sun: { color: '#bed5ff', intensity: 0.35, elevation: 38, swing: 40 },
-    hemi: { sky: '#829fc9', ground: '#3d4656', intensity: 1.4 },
+    hemi: { sky: '#829fc9', ground: '#6a5a4e', intensity: 1.05 },
     fill: { color: '#8aa2c9', intensity: 0.22 },
     ambient: 0,
     exposure: 0.85, env: 0.30,
@@ -109,6 +109,18 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     grade: { contrast: 1.05, saturation: 0.8, vignette: 0.26 },
   },
 };
+
+/** How much light the sky and the room's own bounce give a surface before any lamp: the hemisphere's two colours weighed by their luminance
+ *  (a bare intensity says nothing: night's cool sky is a third as bright as day's at any number), plus the image-based environment and the cool
+ *  fill, each weighed the same way. Used to keep the hours in order (night <= dusk <= day), which no single field can: dusk's env is above
+ *  day's because its sky image is dim, and the hemisphere's ground colour at night is a warm lamp-bounce stand-in, not a sky. */
+export function ambientOf(p: Preset): number {
+  const lin = (h: string) => { const n = hexOf(h); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => { const x = v / 255; return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); };
+  const L = (h: string) => { const [r, g, b] = lin(h); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const hemi = p.hemi.intensity * (L(p.hemi.sky) + L(p.hemi.ground)) / 2;
+  const env = p.env * (L(p.sky[0]) + L(p.sky[1]) + L(p.sky[2])) / 3;
+  return hemi + env + p.fill.intensity * L(p.fill.color);
+}
 
 // The tone mapper is ACES filmic, as in Pascal's renderer, and every preset's exposure above is set for it.
 // Against the same frames, Khronos PBR Neutral kept a bright warm lamp's hue all the way up, so a lit room at

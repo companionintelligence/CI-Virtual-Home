@@ -185,9 +185,37 @@ test('L3: the fixtures read the lamp colour from the scheme and the lamps from k
   assert.match(src, /LAMP_ROOM_FILL_K > 0 \? 2 : 1/, 'a lamp room costs two lights only when a fill is kept beside the pool');
 });
 
-// ---- the night ambient (L3 tuning) ------------------------------------------------------------------------------------------------------
-test('night keeps enough sky fill for shadows to survive the room fill\'s retune (the crush rows were tuned on these numbers)', () => {
-  assert.ok(TIME_OF_DAY.night.hemi.intensity >= 1.3 && TIME_OF_DAY.night.env >= 0.3, `night hemi ${TIME_OF_DAY.night.hemi.intensity} env ${TIME_OF_DAY.night.env}`);
-  assert.ok(TIME_OF_DAY.night.env < TIME_OF_DAY.day.env && TIME_OF_DAY.night.sun.intensity < TIME_OF_DAY.day.sun.intensity, 'still darker than day: the sun and the sky image are far weaker (the hemisphere number alone is not the measure)');
-  assert.ok(TIME_OF_DAY.night.env < TIME_OF_DAY.dusk.env, 'and below dusk');
+// ---- the hours are in order (LIGHT v2 item 1) ------------------------------------------------------------------------------------------
+// v1 pinned `night hemisphere >= 1.3`: a number tuned on ONE crush row (cutestarter bedroom) that put night above dusk and day. What the preset
+// has to be is ordered, not a number: less sky fill at night than at dusk than by day, a warm ground colour (the lamps' bounce, not a cool sky
+// shining up), and the environment image kept at 0.30.
+import { ambientOf } from '../assets/environment.js';
+import { capAlbedo } from '../assets/materials.js';
+import { FINISH_ROLES as ROLES } from '../assets/props/finish-roles.js';
+
+test('the hours are ordered: night ambient <= dusk <= day, in raw hemisphere intensity and in luminance-weighted light', () => {
+  const { day, dusk, night } = TIME_OF_DAY;
+  assert.ok(night.hemi.intensity <= dusk.hemi.intensity && dusk.hemi.intensity <= day.hemi.intensity, `hemisphere ${night.hemi.intensity} <= ${dusk.hemi.intensity} <= ${day.hemi.intensity}`);
+  assert.ok(ambientOf(night) <= ambientOf(dusk) && ambientOf(dusk) <= ambientOf(day), `ambient ${ambientOf(night).toFixed(3)} <= ${ambientOf(dusk).toFixed(3)} <= ${ambientOf(day).toFixed(3)}`);
+  assert.ok(night.env < dusk.env, 'the night sky image is dimmer than dusk\'s');
+  assert.ok(night.sun.intensity < day.sun.intensity, 'and the sun is weaker than by day');
+  assert.ok(ambientOf(night) > 0.15 && ambientOf(night) > ambientOf(dusk) * 0.4, 'night is dim, not black: shadows survive without a lamp');
+});
+
+test('night is moody and lamp-lit: hemisphere 1.0-1.1, a warm ground, env 0.30 kept', () => {
+  const n = TIME_OF_DAY.night, g = parseInt(n.hemi.ground.slice(1), 16);
+  assert.ok(n.hemi.intensity >= 1.0 && n.hemi.intensity <= 1.1, `hemisphere ${n.hemi.intensity}`);
+  assert.ok(((g >> 16) & 255) > (g & 255), `ground ${n.hemi.ground} is warm (red above blue)`);
+  assert.equal(n.env, 0.30);
+  const s = parseInt(n.hemi.sky.slice(1), 16); assert.ok((s & 255) > ((s >> 16) & 255), 'the sky stays cool');
+});
+
+test('linen holds its albedo cap, so a bed can take a lamp without clipping (L0\'s 0.85, applied through colors.linen)', () => {
+  const max = (c: number) => Math.max((c >> 16) & 255, (c >> 8) & 255, c & 255) / 255;
+  assert.ok(max(capAlbedo(0xf2efe9, ROLES.linen.albedoCap)) <= ROLES.linen.albedoCap + 1 / 255);
+  assert.ok(max(capAlbedo(0xf2efe9, ROLES.linen.albedoCap)) >= ROLES.linen.albedoCap - 2 / 255, 'and no darker than it must be');
+  assert.equal(capAlbedo(0x808080, 0.85), 0x808080, 'a colour under the cap is untouched');
+  const r = (c: number) => [(c >> 16) & 255, (c >> 8) & 255, c & 255], a = r(0xf2efe9), b = r(capAlbedo(0xf2efe9, 0.85));
+  assert.ok(Math.abs(a[0] / a[2] - b[0] / b[2]) < 0.02, 'hue kept: the channels scale together');
+  assert.match(fs.readFileSync(path.join(ROOT, 'assets', 'materials.ts'), 'utf8'), /linen: capAlbedo\(0xf2efe9, FINISH_ROLES\.linen\.albedoCap\)/);
 });
