@@ -1,0 +1,211 @@
+// The dress recipes (plan 5.6 D2/D3): what each room program is dressed with. A RECIPE is a program's list of SLOTS; a slot is one idea (the coffee table's
+// tray, the bedside lamp, the laid dining table, the counter clusters) as a small function over a `Dresser` (assets/room-dress.ts): ask for the hosts of a kind,
+// pick a kit by the house's taste, `put` it on the free area of the host. Data plus tiny functions, THREE-free.
+//
+// Tiers. Tier 1 is the never-bare floor and the lamp: placed at any level (up to 1.5 x the room's budget). Tier 2 runs from level 0.3, tier 3 from 0.6, and both stop
+// when the budget is spent. A slot's `min` raises its threshold. A room's `dress.off` skips slots by id.
+//
+// What a recipe may ask for is what exists: the 30 small goods of assets/props/dress-*.ts, SOFT's towels, the registry's lamps, plants and the floor/wall pieces
+// the composer can place. The composer's hosts that carry a body of their own on a seeded spot (a console's bowl, a sideboard's vases) are not hosts
+// (assets/room-dress-hosts.ts DROPPED), so a hall's console and a dining room's sideboard are not dressed; a garage has nothing to dress with until BAKE's types land.
+//
+// Lamps. LIGHT lights a room from every free-standing lamp in it (one pool per lamp room), and a room with none is flat at night: the lamp slot of each recipe puts a
+// fitting lamp on a host where the layout placed none (a table lamp on a bedside, a side table, a counter end; a desk lamp on a desk; a floor lamp in a corner where
+// no host will do). It is a tier-1 slot of every living, sleeping, eating, working and passing room.
+//
+// Owner: DRESS.
+import type { Dresser } from './room-dress.js';
+import { INWARD, ROT_OF_WALL } from './room-geo.js';
+import { toLocal, rectArea, standingOn, type Host } from './room-dress-hosts.js';
+import { PLACEMENT } from './props/placement.js';
+
+export interface Slot { id: string; tier: 1 | 2 | 3; min?: number; what: string; run: (d: Dresser) => void }
+export interface Recipe { program: string; /** the program's reference area, m2 (its fleet median) */ ref: number; slots: Slot[] }
+
+/** placements at the reference area, density 0.5 (the design's table: surface + wall + floor) */
+export const BASE_COUNT: Record<string, number> = {
+  living: 10, den: 8, media: 8, library: 9, study: 7, studio: 7, dining: 6, kitchen: 9.5, 'kitchen-dining': 9.5, 'bed-primary': 9, 'bed-guest': 7, 'bed-kid': 7, nursery: 7, playroom: 6,
+  bath: 6, ensuite: 8, powder: 4, foyer: 6, hall: 5, laundry: 5, sunroom: 6, bar: 6,
+};
+
+export const TABLE_LAMPS = ['table-lamp', 'ginger-lamp', 'column-lamp', 'globe-lamp', 'mushroom-lamp', 'tripod-table-lamp'];
+export const FLOOR_LAMPS = ['floor-lamp', 'halo-lamp', 'tripod-floor-lamp'];
+/** the small ones, for a counter or a bar (0.34-0.52 m high) */
+export const SMALL_LAMPS = ['mushroom-lamp', 'globe-lamp', 'tripod-table-lamp'];
+const COUNTER_KITS = ['cutting-board-set', 'canister-trio', 'bread-bin', 'utensil-crock', 'tea-towel', 'oil-pair', 'plate-stack', 'kettle-and-mug'];
+
+// ---- shared moves --------------------------------------------------------------------------------------------------------------------
+/** the lamp the room lacks: on the first host of the first kind that takes one, else (when the room allows it) a floor lamp in a corner */
+function lampIfNone(d: Dresser, kinds: Array<Parameters<Dresser['hostsOf']>>, o: { floor?: boolean; pair?: boolean; desk?: boolean; anchor?: 'back' | 'back-left' | 'back-right' } = {}) {
+  if (d.hasLamp()) return;
+  let n = 0;
+  for (const ks of kinds) for (const h of d.hostsOf(...ks)) {
+    const t = o.desk ? 'desk-lamp' : d.pick('lamp', TABLE_LAMPS);
+    if (d.put('lamp', h, t, { anchor: o.anchor || 'back', cost: 0.5 })) { n++; if (!o.pair || n >= 2) return; }
+  }
+  if (n === 0 && o.floor !== false) d.corner('lamp', d.pick('lamp', FLOOR_LAMPS), {}, undefined, 0.5);
+}
+
+/** the dining table of the room laid: a centrepiece first (it is the table's middle), then a place per chair, as many as keep 40 % of the top free */
+function setTable(d: Dresser) {
+  const h = d.hostsOf('dining-table')[0]; if (!h) return;
+  const r = h.rects[0], long = r[2] - r[0], deep = r[3] - r[1];
+  const mid = d.put('table', h, d.pick('table', ['centerpiece', 'centerpiece', 'candle-trio']), { anchor: 'centre', margin: 0.01 });
+  if (mid && long >= 1.5 && deep >= 0.8) d.put('table', h, 'candle-trio', { at: [(r[0] + r[2]) / 2 + Math.min(0.5, long * 0.28), (r[1] + r[3]) / 2], margin: 0.01 });
+  // the seats: the dining chairs within reach of the table, each by the edge it is nearest, turned to face its diner
+  const chairs = d.base.filter(it => ((PLACEMENT[it.type] && PLACEMENT[it.type].roles) || []).includes('dining-chair') && Array.isArray(it.at));
+  const seats: Array<{ side: 'front' | 'back' | 'left' | 'right'; t: number }> = [];
+  for (const c of chairs) {
+    const [lx, lz] = toLocal(h, c.at[0], c.at[1]);
+    const dx = Math.max(r[0] - lx, 0, lx - r[2]), dz = Math.max(r[1] - lz, 0, lz - r[3]);
+    if (Math.hypot(dx, dz) > 0.95) continue;
+    const side = Math.abs(dz) >= Math.abs(dx) ? (lz < r[1] ? 'back' : 'front') : (lx < r[0] ? 'left' : 'right');
+    seats.push({ side, t: side === 'front' || side === 'back' ? lx : lz });
+  }
+  if (!seats.length) { seats.push({ side: 'front', t: (r[0] + r[2]) / 2 - 0.3 }, { side: 'back', t: (r[0] + r[2]) / 2 + 0.3 }); }
+  seats.sort((a, b) => (a.side < b.side ? -1 : a.side > b.side ? 1 : a.t - b.t));
+  for (const s of seats.slice(0, 8)) {
+    const sw = 0.41, sd = 0.33, m = 0.02;
+    let at: [number, number], rotExtra: number;
+    if (s.side === 'front') { at = [Math.max(r[0] + sw / 2 + m, Math.min(r[2] - sw / 2 - m, s.t)), r[3] - m - sd / 2]; rotExtra = 0; }
+    else if (s.side === 'back') { at = [Math.max(r[0] + sw / 2 + m, Math.min(r[2] - sw / 2 - m, s.t)), r[1] + m + sd / 2]; rotExtra = 180; }
+    else if (s.side === 'right') { at = [r[2] - m - sd / 2, Math.max(r[1] + sw / 2 + m, Math.min(r[3] - sw / 2 - m, s.t))]; rotExtra = 90; }
+    else { at = [r[0] + m + sd / 2, Math.max(r[1] + sw / 2 + m, Math.min(r[3] - sw / 2 - m, s.t))]; rotExtra = 270; }
+    d.put('table', h, 'place-setting', { at, rotExtra, margin: 0.0, cost: 0.25 });
+  }
+}
+
+/** a run of counter clusters along a host's free top: one to three of the kitchen's small goods, left to right */
+function counterClusters(d: Dresser, h: Host, queue: string[], max = 3): number {
+  let placed = 0;
+  const free = d.free(h), widest = Math.max(0, ...free.map(f => f[2] - f[0]));
+  const spots = (widest >= 1.55 ? ['left', 'right', 'centre'] : widest >= 0.7 ? ['left', 'right'] : ['centre']).slice(0, max) as Array<'left' | 'right' | 'centre'>;
+  for (const a of spots) {
+    for (let k = 0; k < queue.length; k++) {
+      const t = queue.shift()!; queue.push(t);
+      if (d.put('counters', h, t, { anchor: a === 'centre' ? 'back' : (`back-${a}` as any) })) { placed++; break; }
+    }
+  }
+  return placed;
+}
+
+// ---- the recipes ---------------------------------------------------------------------------------------------------------------------
+const living: Slot[] = [
+  { id: 'coffee', tier: 1, what: 'a tray vignette (tray, books, a candle or a bowl) on the coffee table, a centrepiece on a second', run(d) {
+    d.hostsOf('coffee-table').slice(0, 2).forEach((h, i) => d.put('coffee', h, i === 0 ? 'tray-vignette' : d.pick('coffee', ['centerpiece', 'tray-vignette']), { anchor: 'centre' }));
+  } },
+  { id: 'lamp', tier: 1, what: 'a table lamp on a side table or a console where the room has no lamp, else a floor lamp in a corner', run(d) { lampIfNone(d, [['side-table'], ['console']]); } },
+  { id: 'side', tier: 1, what: 'a book, a coaster and a glass on a side table', run(d) {
+    d.hostsOf('side-table').slice(0, 2).forEach(h => d.put('side', h, 'side-set', { anchor: 'centre' }));
+  } },
+  { id: 'console', tier: 2, what: 'a console arrangement on a console', run(d) { d.hostsOf('console').slice(0, 1).forEach(h => d.put('console', h, 'console-set', { anchor: 'centre' })); } },
+];
+
+const bedroom: Slot[] = [
+  { id: 'lamp', tier: 1, what: 'a lamp on each bedside (a pair in the primary), on the dresser, else a floor lamp, where the room has none', run(d) {
+    lampIfNone(d, [['nightstand'], ['dresser']], { pair: d.program === 'bed-primary' });
+  } },
+  { id: 'bedside', tier: 1, what: 'a book, a glass and a candle on a bedside', run(d) {
+    d.hostsOf('nightstand').slice(0, 2).forEach(h => d.put('bedside', h, 'nightstand-set', { anchor: 'centre' }));
+  } },
+  { id: 'dresser', tier: 1, what: 'a tray with scent bottles, a box and a frame on a dresser; a tray vignette on a long one', run(d) {
+    d.hostsOf('dresser').slice(0, 2).forEach(h => {
+      d.put('dresser', h, 'dresser-set', { anchor: 'back-left' });
+      if (h.rects[0][2] - h.rects[0][0] >= 1.3) d.put('dresser', h, 'tray-vignette', { anchor: 'right' });
+    });
+  } },
+];
+
+const kitchen: Slot[] = [
+  { id: 'hob', tier: 1, what: 'a lidded pot on the range', run(d) { d.hostsOf('hob').slice(0, 1).forEach(h => d.put('hob', h, 'pot-on-hob', { anchor: 'centre' })); } },
+  { id: 'counters', tier: 1, what: 'clusters along the counters, those by the range first: boards, canisters, a bread bin, a crock, a tea towel, oils, a kettle', run(d) {
+    const queue = COUNTER_KITS.filter(t => t !== 'kettle-and-mug' || !d.has('kettle')).slice();
+    const r = d.pick('counters', queue, false); while (queue[0] !== r) queue.push(queue.shift()!);
+    const range = d.hostsOf('hob')[0], dist = (h: Host) => (range ? Math.hypot(h.at[0] - range.at[0], h.at[1] - range.at[1]) : 0);
+    const sinks = d.hostsOfType('sink-run'), runs = d.hostsOfType('counter-run', 'dishwasher').filter(h => h.rects.some(q => q[2] - q[0] >= 0.5)).sort((a, b) => dist(a) - dist(b));
+    // beside the basin: the dish rack on the wider side, a tea towel on the other
+    for (const h of sinks.slice(0, 1)) {
+      const sides = d.free(h).slice().sort((a, b) => rectArea(b) - rectArea(a));
+      sides.slice(0, 2).forEach((s, i) => { const t = i === 0 ? 'dish-rack' : 'tea-towel', onRight = s[0] > 0, fw = t === 'dish-rack' ? 0.5 : 0.31; d.put('counters', h, t, { at: [onRight ? s[0] + fw / 2 : s[2] - fw / 2, s[1] + (t === 'dish-rack' ? 0.16 : 0.12)] }); });
+    }
+    // (a run that already carries things gets one cluster, not three)
+    for (const h of runs.slice(0, 4)) counterClusters(d, h, queue, standingOn(h, d.all()).length >= 2 ? 1 : 3);
+    // a bar or a cart: one cluster, and only where nothing stands yet
+    for (const h of d.hostsOfType('breakfast-bar', 'kitchen-cart')) if (!standingOn(h, d.all()).length) counterClusters(d, h, queue, 1);
+  } },
+  { id: 'island', tier: 1, what: 'a bowl, a carafe and a stack of plates on the island', run(d) {
+    for (const h of d.hostsOf('island').slice(0, 1)) {
+      const wide = h.rects.reduce((m, q) => Math.max(m, q[2] - q[0]), 0), busy = standingOn(h, d.all()).length;
+      d.put('island', h, d.pick('island', ['centerpiece', 'centerpiece', 'tray-vignette']), { anchor: 'centre' });
+      if (wide >= 1.8 && !busy) { d.put('island', h, 'carafe', { anchor: 'left' }); d.put('island', h, 'plate-stack', { anchor: 'right' }); }
+    }
+  } },
+  { id: 'lamp', tier: 1, what: 'a small lamp at the end of a counter run where the room has none', run(d) {
+    if (d.hasLamp()) return;
+    const range = d.hostsOf('hob')[0], dist = (h: Host) => (range ? Math.hypot(h.at[0] - range.at[0], h.at[1] - range.at[1]) : 0);
+    // the run farthest from the range, then the cart, the bar, the island: the first with room for it
+    for (const h of [...d.hostsOfType('counter-run').sort((a, b) => dist(b) - dist(a)), ...d.hostsOfType('kitchen-cart', 'breakfast-bar'), ...d.hostsOf('island')]) {
+      if (d.put('lamp', h, d.pick('lamp', SMALL_LAMPS), { anchor: 'back-right', cost: 0.5 })) return;
+    }
+  } },
+];
+
+const dining: Slot[] = [
+  { id: 'table', tier: 1, what: 'the table laid: a centrepiece, candles, and a place for each chair', run(d) { setTable(d); } },
+  { id: 'lamp', tier: 1, what: 'a floor lamp in a corner where the room has no lamp (the sideboard is not a host)', run(d) { lampIfNone(d, [], { floor: true }); } },
+];
+
+const bath: Slot[] = [
+  { id: 'vanity', tier: 1, what: 'a soap dispenser, a cup and a soap dish on the strip between a double vanity\'s basins', run(d) { d.hostsOf('vanity').slice(0, 1).forEach(h => d.put('vanity', h, 'vanity-set', { anchor: 'centre' })); } },
+  { id: 'tank', tier: 1, what: 'a tissue box and a candle on the toilet tank', run(d) { d.hostsOf('tank').slice(0, 1).forEach(h => d.put('tank', h, 'tissue-candle', { anchor: 'centre' })); } },
+  { id: 'towels', tier: 1, what: 'a towel ring by the vanity or the toilet and a robe hook by the bathing', run(d) {
+    const near = (re: RegExp): [number, number] | null => { const it = d.base.find(i => re.test(i.type) && Array.isArray(i.at)); return it ? [it.at[0], it.at[1]] : null; };
+    if (!d.has('towel-ladder') && !d.has('towel-rail') && !d.has('heated-towel-rail')) d.against('towels', 'towel-ring-set', {}, near(/vanity|sink/));
+    d.against('hook', 'robe-hook', {}, near(/shower|tub/));
+  } },
+  { id: 'roll', tier: 1, what: 'a toilet roll holder beside the toilet', run(d) { d.against('roll', 'roll-holder', {}, (() => { const t = d.base.find(i => i.type === 'toilet' && Array.isArray(i.at)); return t ? [t.at[0], t.at[1]] as [number, number] : null; })()); } },
+];
+
+const hall: Slot[] = [
+  { id: 'entry', tier: 1, what: 'a door mat in front of the entry, an umbrella stand and a shoe row beside it', run(d) {
+    const c = d.geoC(), p = c.geo.portals.find(q => q.entry); if (!p) return;
+    const [nx, nz] = INWARD[p.side];
+    d.atPose('entry', 'door-mat', p.x + nx * 0.36, p.z + nz * 0.36, ROT_OF_WALL[p.side], { w: Math.max(0.6, Math.min(0.9, p.w - 0.12)), d: 0.45 });
+    d.against('entry', 'umbrella-stand', {}, [p.x, p.z]);
+    d.against('entry', 'shoe-row', {}, [p.x, p.z]);
+  } },
+  { id: 'console', tier: 1, what: 'a console arrangement on a console (demilune)', run(d) { d.hostsOf('console').slice(0, 1).forEach(h => d.put('console', h, 'console-set', { anchor: 'centre' })); } },
+  { id: 'lamp', tier: 1, what: 'a table lamp on a console, else a floor lamp in a corner, where the hall has no lamp', run(d) { lampIfNone(d, [['console']]); } },
+  { id: 'mirror', tier: 2, what: 'a leaning mirror against a wall', run(d) { d.against('mirror', 'leaner-mirror', {}, null); } },
+  { id: 'plant', tier: 3, what: 'a floor plant in a corner (the third thing a hall of 8 m2 or more is never without)', run(d) { if (d.area >= 6) d.corner('plant', d.pick('plant', d.roleTypes('plant-floor').filter(t => !/palm|tree|tall/.test(t))), {}); } },
+];
+
+const study: Slot[] = [
+  { id: 'lamp', tier: 1, what: 'a desk lamp on the desk (a floor lamp in a corner when there is no desk) where the room has no lamp', run(d) { lampIfNone(d, [['desk']], { desk: true, anchor: 'back-right' }); } },
+  { id: 'desk', tier: 2, what: 'a book, a coaster and a glass on the desk', run(d) { d.hostsOf('desk').slice(0, 1).forEach(h => d.put('desk', h, 'side-set', { anchor: 'left' })); } },
+  { id: 'console', tier: 2, what: 'a console arrangement on a console', run(d) { d.hostsOf('console').slice(0, 1).forEach(h => d.put('console', h, 'console-set', { anchor: 'centre' })); } },
+];
+
+const laundry: Slot[] = [
+  { id: 'tops', tier: 1, what: 'folded towels on the dryer, a tea towel on the washer', run(d) {
+    d.hostsOfType('dryer').slice(0, 1).forEach(h => d.put('tops', h, 'towel-stack', { anchor: 'centre' }));
+    d.hostsOfType('washing-machine').slice(0, 1).forEach(h => d.put('tops', h, 'tea-towel', { anchor: 'centre' }));
+  } },
+  { id: 'counters', tier: 2, what: 'a cluster on the counter', run(d) { const q = ['canister-trio', 'tea-towel', 'utensil-crock']; d.hostsOf('counter').slice(0, 1).forEach(h => counterClusters(d, h, q, 1)); } },
+];
+
+export const RECIPES: Record<string, Recipe> = {
+  living: { program: 'living', ref: 27, slots: living }, den: { program: 'den', ref: 25, slots: living }, media: { program: 'media', ref: 25, slots: living },
+  sunroom: { program: 'sunroom', ref: 9, slots: living.filter(s => s.id !== 'console') }, bar: { program: 'bar', ref: 27, slots: living.filter(s => s.id === 'lamp' || s.id === 'side') },
+  playroom: { program: 'playroom', ref: 20, slots: living.filter(s => s.id === 'lamp' || s.id === 'side') },
+  'bed-primary': { program: 'bed-primary', ref: 24, slots: bedroom }, 'bed-guest': { program: 'bed-guest', ref: 22, slots: bedroom }, 'bed-kid': { program: 'bed-kid', ref: 14, slots: bedroom }, nursery: { program: 'nursery', ref: 15, slots: bedroom },
+  kitchen: { program: 'kitchen', ref: 18, slots: kitchen },
+  'kitchen-dining': { program: 'kitchen-dining', ref: 24, slots: [...kitchen, ...dining.filter(s => s.id === 'table')] },
+  dining: { program: 'dining', ref: 20, slots: dining },
+  bath: { program: 'bath', ref: 8, slots: bath }, ensuite: { program: 'ensuite', ref: 14, slots: bath }, powder: { program: 'powder', ref: 4, slots: bath },
+  hall: { program: 'hall', ref: 12, slots: hall }, foyer: { program: 'foyer', ref: 11, slots: hall },
+  study: { program: 'study', ref: 19, slots: study }, library: { program: 'library', ref: 18, slots: study }, studio: { program: 'studio', ref: 16, slots: study },
+  laundry: { program: 'laundry', ref: 12, slots: laundry },
+  garage: { program: 'garage', ref: 34, slots: [] },   // nothing exists to dress a garage with until BAKE's bk-* types (a car, shelving, bins, a vise) are merged
+  gym: { program: 'gym', ref: 37, slots: [] }, greenhouse: { program: 'greenhouse', ref: 24, slots: [] }, outdoor: { program: 'outdoor', ref: 0, slots: [] },
+};

@@ -1265,7 +1265,7 @@ export const seedKeyOf = (spec: any, room: any) => `${spec.id}:${room.no ?? room
 
 /** pins as composer items (the room's own and those of overlapping rooms on the storey), skipping the hero set that
  *  the hero block places */
-function pinsFor(spec: any, lv: any, room: any, composed: Map<any, any[]>): CItem[] {
+export function pinsFor(spec: any, lv: any, room: any, composed: Map<any, any[]>): CItem[] {   // (exported for the dress phase's floor layer, assets/room-dress.ts)
   const b = room.bounds, out: CItem[] = [];
   const HERO = new Set(['walnut-desk', 'task-chair', 'curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
   const heroHere = spec.hero && spec.hero.level === lv.id;

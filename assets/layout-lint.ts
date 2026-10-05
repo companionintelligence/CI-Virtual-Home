@@ -28,6 +28,11 @@
 //                    unfurnished composed room is a warning and never passes as furnished. Rooms under 3 m² are left out
 //   surface-kind     an item standing on another that its placement does not allow (`surfaces`: a lamp on a nightstand, a kettle
 //                    on a counter)
+//   dress-floating   a dress item (src dress@1, plan 5.6) that is not on a host of the dress registry (assets/room-dress-hosts.ts), hangs over its
+//                    edge by more than 1 cm, or is not at the host's top
+//   dress-overlap    two surface items on one host whose footprints overlap, one of them a dress item
+//   dress-lane       a dress item that closes a lane the room's other furniture leaves open
+//   dress-bare       a dressed room (it has dress items, or opts in) that its program's never-bare rule still finds bare
 //
 // Owner: S3 (compose).
 import { PROPS } from './props/index.js';
@@ -42,7 +47,8 @@ import {
 import { composeHouse, layerOf, snapWallMount, stackOnSurface } from './room-composer.js';
 import { houseStairs, levelStairs } from './stairs.js';
 import { isComposed, isProgram } from './room-programs.js';
-import { dressHouse, dressOff, dressOptIn, isDress } from './room-dress.js';
+import { dressHouse, dressOff, dressOptIn, isDress, bareViolation } from './room-dress.js';
+import { hostOf, footprintIn, standingOn } from './room-dress-hosts.js';
 
 /** What a room of each program cannot do without: each anchor is satisfied by `n` items (default 1) with any of the roles
  *  (assets/props/placement.ts). The composer's essentials (its `missing`), the `missing-anchor` lint and the composer's
@@ -115,6 +121,27 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
       const geo = analyzeRoom(spec, lv, room), items = (all.get(room) || []).filter(it => Array.isArray(it.at) && !(heroAt && heroAt.level === lv.id && HERO_SET.has(it.type) && Math.hypot(it.at[0] - heroAt.at[0], it.at[1] - heroAt.at[1]) < 1.3));
       const outdoor = room.program === 'outdoor' || /terrace|patio|deck|porch|balcony|yard|garden|stoop|pool/i.test(room.name) || room.bounds.w * room.bounds.d < 1.2;
       const boxes = items.map(it => ({ it, o: itemObb(it), solid: solidOf(it) }));
+      // the dress phase's items (plan 5.6): each stands on a host of the registry, inside its measured rects and at its top, and on nothing else
+      const dressed = items.filter(isDress);
+      if (dressed.length) {
+        const hosts = items.map(hostOf).filter((h): h is NonNullable<ReturnType<typeof hostOf>> => !!h);
+        for (const it of dressed) {
+          if (layerOf(it.type) !== 'surface') continue;
+          const under = hosts.find(h => { const f = footprintIn(h, it); return !!f && h.rects.some(r => (f[0] + f[2]) / 2 >= r[0] && (f[0] + f[2]) / 2 <= r[2] && (f[1] + f[3]) / 2 >= r[1] && (f[1] + f[3]) / 2 <= r[3]); });
+          if (!under) { add('dress-floating', `${it.type} at ${fmt(it.at)} stands on no host of the dress registry`, lv, room); continue; }
+          const f = footprintIn(under, it)!, inside = under.rects.some(r => f[0] >= r[0] - 0.01 && f[1] >= r[1] - 0.01 && f[2] <= r[2] + 0.01 && f[3] <= r[3] + 0.01);
+          if (!inside) add('dress-floating', `${it.type} at ${fmt(it.at)} overhangs its ${under.type} (outside the flat top by ${Math.max(0, ...under.rects.map(r => Math.max(r[0] - f[0], r[1] - f[1], f[2] - r[2], f[3] - r[3]))).toFixed(2)} m)`, lv, room);
+          if (Math.abs((it.y ?? 0) - under.top) > 0.01) add('dress-floating', `${it.type} at ${fmt(it.at)} is at y ${it.y} on a ${under.type} whose top is ${under.top}`, lv, room);
+          for (const o of standingOn(under, items)) {
+            if (o === it) continue;
+            const g = footprintIn(under, o); if (!g) continue;
+            const ox = Math.min(f[2], g[2]) - Math.max(f[0], g[0]), oz = Math.min(f[3], g[3]) - Math.max(f[1], g[1]);
+            if (ox > 0.005 && oz > 0.005 && (!isDress(o) || String(o.dk) < String(it.dk)) && Math.abs((o.y ?? 0) - (it.y ?? 0)) < 0.02) add('dress-overlap', `${it.type} at ${fmt(it.at)} and ${o.type} at ${fmt(o.at)} overlap on the ${under.type}`, lv, room);
+          }
+        }
+        const bare = bareViolation(room.program || null, items, room);
+        if (bare && (dressOptIn(room) || dressed.length)) add('dress-bare', bare, lv, room);
+      }
       // overlap: solid against solid (tucked chairs, and one item standing on another, excepted)
       for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
         const A = boxes[i], B = boxes[j]; if (!A.solid || !B.solid || !A.o || !B.o) continue;
@@ -180,7 +207,9 @@ export function lintLayout(spec: any, { only = null as Set<string> | null, items
         const bare = lanesOk(geo, laneGrid(geo, geo.obstacles), 0.8);
         const rep = lanesOk(geo, laneGrid(geo, blockers), 0.8);
         const extra = rep.failed.filter(f => !bare.failed.includes(f));
-        for (const f of extra) add('lane', f, lv, room);
+        // (a lane the room's own furniture leaves open and a dress item closes is the dress phase's: dress-lane)
+        const noDress = lanesOk(geo, laneGrid(geo, [...geo.obstacles, ...boxes.filter(b => b.solid && b.o && !isDress(b.it)).map(b => b.o!)]), 0.8);
+        for (const f of extra) add(dressed.length && !noDress.failed.includes(f) ? 'dress-lane' : 'lane', f, lv, room);
       }
       // a room with a program that lacks what the program cannot do without
       if (isProgram(room.program) && geo.area >= 3 && !outdoor) {

@@ -59,6 +59,7 @@ console.log('── C: the packer');
   check(!!p && Math.abs(p[0]) < 0.011 && Math.abs(p[1]) < 0.011, 'a box in an empty host goes to the centre');
   const left = fitIn(free0, w, d, 'left')!, right = fitIn(free0, w, d, 'right')!;
   check(left[0] < p[0] && right[0] > p[0] && Math.abs(left[0] + right[0]) < 0.011, 'left and right anchors are mirror images either side of the centre');
+  check(Math.abs(left[0] - (-0.3 + 0.0)) < 0.2 && fitIn(free0, w, d, 'back-left')![1] < fitIn(free0, w, d, 'front-left')![1], 'a corner anchor combines its two');
   const back = fitIn(free0, w, d, 'back')!, front = fitIn(free0, w, d, 'front')!;
   check(back[1] < front[1], 'back is toward -z (the wall side), front toward +z');
   check(Math.abs((back[1] - d / 2) - free0[0][1]) < 0.011, 'a back anchor stands against the back margin');
@@ -70,7 +71,14 @@ console.log('── C: the packer');
   const q = fitIn(free1, 0.25, 0.2, 'right');
   check(q === null || q[0] + 0.125 <= lf[0] - 0.04 + 1e-6 || q[0] - 0.125 >= lf[2] + 0.04 - 1e-6, 'a box packed beside a lamp does not overlap it');
   const sub = subtract([0, 0, 1, 1], [0.4, 0.4, 0.6, 0.6]);
-  check(sub.length === 4 && Math.abs(sub.reduce((a: number, r: number[]) => a + rectArea(r), 0) - 0.96) < 1e-9, 'subtracting a hole from the middle leaves four strips and 0.96 of the area');
+  check(sub.length === 4 && sub.every((r: number[]) => !(r[0] < 0.6 && r[2] > 0.4 && r[1] < 0.6 && r[3] > 0.4)), 'subtracting a hole from the middle leaves four maximal rects (left, right, behind, in front), none over the hole');
+  // every box that clears the hole stands whole in one of them, and none that touches it does
+  let bad1 = 0;
+  for (let x = 0.05; x <= 0.85; x += 0.1) for (let z = 0.05; z <= 0.85; z += 0.1) {
+    const box = [x - 0.05, z - 0.05, x + 0.05, z + 0.05], clear = box[2] <= 0.4 || box[0] >= 0.6 || box[3] <= 0.4 || box[1] >= 0.6, inOne = sub.some((r: number[]) => box[0] >= r[0] - 1e-9 && box[1] >= r[1] - 1e-9 && box[2] <= r[2] + 1e-9 && box[3] <= r[3] + 1e-9);
+    if (clear !== inOne) bad1++;
+  }
+  check(bad1 === 0, 'a box is inside one of the remaining rects exactly when it clears the hole');
   // a rotated host: the rects turn with it
   const hr = hostOf({ type: 'coffee-table', at: [0, 0], rot: 90 })!;
   check(hr.rot === 90 && hr.rects.length === 1, 'a host keeps its rot');
