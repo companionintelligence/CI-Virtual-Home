@@ -26,13 +26,13 @@
 //
 // Owner: DRESS.
 import { PLACEMENT } from './props/placement.js';
-import { sizeOf, paramsOf, turn, mm, itemObb, overlap, obb, INWARD, ROT_OF_WALL, alongX } from './room-geo.js';
+import { sizeOf, paramsOf, turn, mm, itemObb, INWARD, ROT_OF_WALL, alongX } from './room-geo.js';
 import { Composer, composeHouse, pinsFor, cornerGroup, wallGroup, layerOf, type Group, type CItem, type HouseState } from './room-composer.js';
 import { inferProgram } from './room-programs.js';
 import { styleOf, type StyleBundle } from './house-styles.js';
 import { mulberry32, fnv1a } from './materials.js';
 import { HERO_SET } from './item-map.js';
-import { hostOf, freeRects, standingOn, fitIn, footprintIn, toWorld, toLocal, rectArea, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
+import { hostOf, freeRects, standingOn, fitIn, footprintIn, toWorld, rectArea, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
 import { dressSchemeOf, type DressScheme } from './house-scheme-dress.js';
 import { RECIPES, BASE_COUNT, type Recipe } from './dress-recipes.js';
 
@@ -301,4 +301,3 @@ export function dressHouse(spec: any): Map<any, DressResult> { return run(spec, 
 /** room -> what the dress phase would add to EVERY room that has a recipe (not a room with `dress: false`), at `level` or each room's own: the bake tool and the census */
 export function dressRooms(spec: any, o: { level?: number } = {}): Map<any, DressResult> { return run(spec, true, o.level ?? null); }
 
-export { obb, overlap, toLocal };

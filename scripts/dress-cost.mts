@@ -4,7 +4,7 @@
 // column is (one direct renderer.render after a snapshot has ended its dressing), once with `?dress=0` and once dressed: the draw calls, the triangles, the meshes
 // and the scene's own totals. A fixture is a house with every room opted in, so its ratio is the upper end of what a dressed house costs.
 //
-//   node --experimental-strip-types scripts/dress-cost.mts [--fixtures dress-rooms,dress-baths,dress-kitchens,dress-styles] [--json out.json]
+//   node --experimental-strip-types scripts/dress-cost.mts [--fixtures dress-rooms,dress-baths,dress-kitchens,dress-styles,dress-utility] [--json out.json]
 // (needs `pnpm run build` and a GPU; one browser job at a time.)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -13,7 +13,7 @@ import { costCameras } from './review/cameras.mts';
 import { startSession } from './review/page.mts';
 
 const args = parseArgs(process.argv.slice(2));
-const FIX = args.fixtures && args.fixtures !== 'true' ? args.fixtures.split(',') : ['dress-rooms', 'dress-baths', 'dress-kitchens', 'dress-styles'];
+const FIX = args.fixtures && args.fixtures !== 'true' ? args.fixtures.split(',') : ['dress-rooms', 'dress-baths', 'dress-kitchens', 'dress-styles', 'dress-utility'];
 const BUDGET = 1.12;
 
 const session = await startSession();

@@ -8,7 +8,7 @@
 //      and every dropped type exists
 //   C  the packer (fitIn / freeRects / subtract): a box returned fits inside the free rect, never overlaps what stands on the host, honours the margin,
 //      and an anchor moves it the way it says
-//   D  every dress item the phase puts in the four fixtures, built alone in the page with its own params, measures the box sizeOf gave the packer (0.04 m)
+//   D  every dress item the phase puts in the five fixtures, built alone in the page with its own params, measures the box sizeOf gave the packer (0.04 m)
 //
 // Needs `pnpm run build`. One browser job (~20 s).
 //
@@ -165,7 +165,7 @@ console.log('── D: the packer\'s sizes are the page\'s (every dress item of 
   const { dressRooms } = await A('room-dress.js');
   const fs = await import('node:fs');
   const seen = new Map<string, any>();
-  for (const id of ['dress-rooms', 'dress-baths', 'dress-kitchens', 'dress-styles']) {
+  for (const id of ['dress-rooms', 'dress-baths', 'dress-kitchens', 'dress-styles', 'dress-utility']) {
     const spec = JSON.parse(fs.readFileSync(path.join(path.resolve(import.meta.dirname, '..'), 'test', 'fixtures', 'houses', `${id}.json`), 'utf8'));
     for (const r of dressRooms(spec).values()) for (const it of r.items) { const k = JSON.stringify([it.type, it.w, it.d, it.variant, it.color]); if (!seen.has(k)) seen.set(k, it); }
   }

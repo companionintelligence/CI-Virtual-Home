@@ -14,6 +14,7 @@
 //   node --experimental-strip-types scripts/dress-project.mts --level 0.5         a level for every room
 //   node --experimental-strip-types scripts/dress-project.mts --houses a,b        some houses (ids, or fixture ids)
 //   node --experimental-strip-types scripts/dress-project.mts --json out.json     also write the numbers
+//   node --experimental-strip-types scripts/dress-project.mts --lamps out.tsv     one row per room that asks for a lamp: what the layout has, what the phase put and where
 import fs from 'node:fs';
 import path from 'node:path';
 import * as THREE from '../assets/vendor/three/three.module.min.js';
@@ -27,7 +28,7 @@ import { RECIPES } from '../assets/dress-recipes.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const argv = process.argv.slice(2), opt = (n: string) => { const i = argv.indexOf('--' + n); return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : null; };
-const level = opt('level') !== null ? Number(opt('level')) : undefined, only = opt('houses') ? new Set(opt('houses')!.split(',')) : null, jsonOut = opt('json');
+const level = opt('level') !== null ? Number(opt('level')) : undefined, only = opt('houses') ? new Set(opt('houses')!.split(',')) : null, jsonOut = opt('json'), lampsOut = opt('lamps');
 const ids = fs.readdirSync(path.join(ROOT, 'content', 'houses')).filter(f => f.endsWith('.json') && f !== 'index.json' && !f.endsWith('.plan.json')).map(f => f.replace(/\.json$/, '')).sort();
 const fixtures = fs.readdirSync(path.join(ROOT, 'test', 'fixtures', 'houses')).filter(f => /^dress-/.test(f)).map(f => f.replace(/\.json$/, ''));
 const wanted = only ? [...only] : ids;
@@ -55,6 +56,7 @@ function costOf(it: any) {
 // ---- the census ----------------------------------------------------------------------------------------------------------------------
 const byProg: Record<string, { rooms: number; items: number; slots: Record<string, number> }> = {};
 const lamp = { rooms: 0, lampless: 0, fixed: 0, still: [] as string[] };
+const lampRows: string[] = ['house\tlevel\troom\tprogram\tlayout lamps\tdress lamp\tplaced on\twhy not'];
 const skipped: Record<string, number> = {};
 const houses: any[] = [];
 let totalItems = 0;
@@ -74,6 +76,7 @@ for (const id of wanted) {
       const base = [...(room.items || []).filter((i: any) => i.src !== 'dress@1'), ...((comp.get(room) || { items: [] }).items)];
       const has = (xs: any[]) => xs.some(i => PLACEMENT[i.type] && PLACEMENT[i.type].group === 'lamp');
       lamp.rooms++;
+      { const lt = base.filter((i: any) => PLACEMENT[i.type] && PLACEMENT[i.type].group === 'lamp').map((i: any) => i.type), dl = r.items.find((i: any) => i.dk && String(i.dk).includes(':lamp:')); lampRows.push([id, lv.id, room.name, prog, lt.join('+') || '-', dl ? dl.type : '-', dl ? (dl.y !== undefined ? `host top ${dl.y}` : 'floor') : '-', !lt.length && !dl ? (r.skipped.filter((s: any) => s.slot === 'lamp').map((s: any) => s.why).join('; ') || 'no host and no corner') : ''].join('\t')); }
       if (!has(base)) { lamp.lampless++; if (has(r.items)) lamp.fixed++; else lamp.still.push(`${id}/${lv.id}/${room.name} (${prog}, ${r.skipped.filter(s => s.slot === 'lamp').map(s => s.why).join('; ') || 'no host and no corner'})`); }
     }
   }
@@ -94,5 +97,6 @@ if (withCost.length) {
   console.log(`  highest: ${worst.map(h => `${h.id} +${h.meshes} meshes (${h.meshPct} %)`).join(', ')}`);
 }
 console.log('skipped, by reason (rooms x slots):'); for (const [k, v] of Object.entries(skipped).sort((a, b) => b[1] - a[1]).slice(0, 14)) console.log(`  ${String(v).padStart(4)}  ${k}`);
+if (lampsOut) { fs.writeFileSync(path.resolve(lampsOut), lampRows.join('\n') + '\n'); console.log(`→ ${lampsOut} (${lampRows.length - 1} rooms)`); }
 if (jsonOut) { fs.writeFileSync(path.resolve(jsonOut), JSON.stringify({ level: level ?? null, houses, byProg, lamp, skipped, types: Object.fromEntries(memo) }, null, 1) + '\n'); console.log(`→ ${jsonOut}`); }
 void fixtures;

@@ -39,7 +39,7 @@ import os from 'node:os';
 const ROOT = path.resolve(import.meta.dirname, '..');
 const load = (f: string) => JSON.parse(fs.readFileSync(f, 'utf8'));
 const houses = fs.readdirSync(path.join(ROOT, 'content', 'houses')).filter(f => f.endsWith('.json') && f !== 'index.json' && !f.endsWith('.plan.json')).sort().map(f => ({ id: f.replace(/\.json$/, ''), file: path.join(ROOT, 'content', 'houses', f) }));
-const FIX = ['dress-rooms', 'dress-baths', 'dress-kitchens', 'dress-styles'];
+const FIX = ['dress-rooms', 'dress-baths', 'dress-kitchens', 'dress-styles', 'dress-utility'];
 const fixture = (id: string) => load(path.join(ROOT, 'test', 'fixtures', 'houses', `${id}.json`));
 const rooms = (spec: any) => (spec.levels || []).flatMap((lv: any) => (lv.rooms || []).map((room: any) => ({ lv, room })));
 const dressedItems = (spec: any, level?: number) => [...dressRooms(spec, level === undefined ? {} : { level })].flatMap(([room, r]) => r.items.map(it => ({ room, it })));
