@@ -54,16 +54,16 @@ for (const id of FIX) {
   const file = path.join(ROOT, 'test', 'fixtures', 'houses', `${id}.json`), spec = JSON.parse(fs.readFileSync(file, 'utf8'));
   const stripped = JSON.parse(JSON.stringify(spec)); for (const lv of stripped.levels) for (const r of lv.rooms || []) delete r.dress;
   const strippedFile = write(`${id}-stripped`, stripped);
-  const live = dressHouse(JSON.parse(JSON.stringify(spec)));
+  const specCopy = JSON.parse(JSON.stringify(spec)), live = dressHouse(specCopy);
   const types = [...new Set([...live.values()].flatMap((r: any) => r.items.map((i: any) => `item:${i.type}`)))].sort();
   console.log(`  the phase adds ${[...live.values()].reduce((a: number, r: any) => a + r.items.length, 0)} items of ${types.length} types: ${types.map(t => t.slice(5)).join(', ')}`);
   // baked: the same items written into the spec as dress@1, the dress field gone
-  const baked = JSON.parse(JSON.stringify(stripped)), all = dressRooms(JSON.parse(JSON.stringify(spec)));
+  const baked = JSON.parse(JSON.stringify(stripped)), all = dressRooms(specCopy);
   const rooms = (sp: any) => sp.levels.flatMap((lv: any) => lv.rooms || []);
-  const optedIn = rooms(spec).map((r: any) => !!(r.dress && typeof r.dress.level === 'number'));
-  rooms(spec).forEach((r: any, i: number) => { const res = all.get(r); if (res && optedIn[i]) rooms(baked)[i].items = [...(rooms(baked)[i].items || []), ...res.items]; });
+  const optedIn = rooms(specCopy).map((r: any) => !!(r.dress && typeof r.dress.level === 'number'));
+  rooms(specCopy).forEach((r: any, i: number) => { const res = all.get(r); if (res && optedIn[i]) rooms(baked)[i].items = [...(rooms(baked)[i].items || []), ...res.items]; });
   const bakedFile = write(`${id}-baked`, baked);
-  const picks = rooms(spec).filter((r: any) => r.dress && live.get(r) && live.get(r).items.length).slice(0, 3).map((r: any) => ({ room: r.name }));
+  const picks = rooms(specCopy).filter((r: any) => r.dress && live.get(r) && live.get(r).items.length).slice(0, 3).map((r: any) => ({ room: r.name }));
 
   const snap = async (query: string, spec_: string) => (await snapshot([id], query, { [id]: spec_ })).doc[id];
   const base = await snap('', strippedFile);

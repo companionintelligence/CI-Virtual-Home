@@ -70,6 +70,9 @@ export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
         const d = dressHouse(spec).get(room);
         if (d && d.items.length) items = [...items, ...d.items.map(it => (floorOff ? { ...it, [ON_FLOOR]: floorOff } : it))];
       }
+      // dress items build last in their room, baked or live, whatever order the spec lists them in: the build order is what object and material ids (and so
+      // ties in the render sort) follow, and a baked room must build exactly what the live phase builds
+      if (!noDress && items.some(isDress)) items = [...items.filter(it => !isDress(it)), ...items.filter(isDress)];
       if (tidy) {
         const geo = analyzeRoom(spec, lv, room);
         items = items.map(it => { if (it.src === SRC || it.src === DRESS_SRC) return it; const a = snapWallMount(it, geo) || it; return stackOnSurface(a, items) || a; });
