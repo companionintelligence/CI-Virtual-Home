@@ -9005,9 +9005,10 @@
       const o = p.gradeOutside || p.grade;
       u.outContrast.value = o.contrast; u.outPivot.value = o.pivot ?? 0.18; u.outSaturation.value = o.saturation; u.outVignette.value = o.vignette;
       let w = 1;
-      if (p.gradeOutside && activeHouse && activeHouse.spec) { fc.camera.getWorldPosition(gradeEye); w = interiorWeight(gradeEye, gradeStoreys(activeHouse.spec)); }
-      u.interior.value = w; window.__houseGradeInterior = w;
-      fc.gtao.updateGtaoMaterial({ thickness: GTAO_THICKNESS.outside + (GTAO_THICKNESS.inside - GTAO_THICKNESS.outside) * w });   // QA hook: the weight of the last frame's grade
+      if (activeHouse && activeHouse.spec) { fc.camera.getWorldPosition(gradeEye); w = interiorWeight(gradeEye, gradeStoreys(activeHouse.spec)); }
+      u.interior.value = p.gradeOutside ? w : 1;   // an hour with no gradeOutside is graded the same everywhere (exactly: no mix)
+      window.__houseGradeInterior = w;             // QA hook: the weight of the last frame
+      fc.gtao.updateGtaoMaterial({ thickness: GTAO_THICKNESS.outside + (GTAO_THICKNESS.inside - GTAO_THICKNESS.outside) * w });   // every hour: a tree's crown wants the old thickness at dusk too
     }
     const gradeEye = new THREE.Vector3();
     let gradeStoreysOf = null, gradeStoreysCache = null;

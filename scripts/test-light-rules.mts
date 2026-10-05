@@ -314,7 +314,7 @@ test('LIGHT v3.1 (1): day has an outside grade that is v2\'s; the other hours gr
   for (const t of ['golden', 'dusk', 'night']) assert.equal((TIME_OF_DAY as any)[t].gradeOutside, undefined, `${t} is graded the same everywhere`);
   const page = fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8');
   assert.match(page, /interiorWeight\( gradeEye, gradeStoreys\( activeHouse\.spec \) \)|interiorWeight\(gradeEye, gradeStoreys\(activeHouse\.spec\)\)/);
-  assert.match(page, /u\.interior\.value = w/);
+  assert.match(page, /u\.interior\.value = p\.gradeOutside \? w : 1/);
   assert.match(page, /thickness: GTAO_THICKNESS\.outside \+ \(GTAO_THICKNESS\.inside - GTAO_THICKNESS\.outside\) \* w/);
   const env = fs.readFileSync(path.join(ROOT, 'assets', 'environment.ts'), 'utf8');
   assert.match(env, /mix\(gradeOf\(rgb, outContrast, outPivot, outSaturation, outVignette, edge\), inside, interior\)/);
