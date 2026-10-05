@@ -32,7 +32,7 @@ import { inferProgram } from './room-programs.js';
 import { styleOf, type StyleBundle } from './house-styles.js';
 import { mulberry32, fnv1a } from './materials.js';
 import { HERO_SET } from './item-map.js';
-import { hostOf, freeRects, standingOn, fitIn, footprintIn, toWorld, rectArea, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
+import { hostOf, freeRects, standingOn, fitIn, footprintIn, toWorld, toLocal, subtract, rectArea, cornerEyes, camBlocked, CAM, type CornerEye, type Host, type HostKind, type Rect, type Anchor } from './room-dress-hosts.js';
 import { dressSchemeOf, type DressScheme } from './house-scheme-dress.js';
 import { RECIPES, BASE_COUNT, type Recipe } from './dress-recipes.js';
 
@@ -59,6 +59,9 @@ const COVER = 0.6;   // at most this much of a host's top is under things: 40 % 
 const hostBounds = (h: Host): Rect => [Math.min(...h.rects.map(r => r[0])), Math.min(...h.rects.map(r => r[1])), Math.max(...h.rects.map(r => r[2])), Math.max(...h.rects.map(r => r[3]))];
 const affinity = (seed: string, type: string): number => (fnv1a(`${seed}:dress-likes:${type}`) >>> 0) / 4294967296;
 
+/** the vertical span a composer item occupies (a wall item's mount is its centre or its bottom, so the span is taken both ways round) */
+const spanOf = (ci: CItem): [number, number] | null => ci.layer === 'body' ? [0, ci.h] : ci.layer === 'surface' ? [ci.y, ci.y + ci.h] : ci.layer === 'wall' ? [ci.y - ci.h, ci.y + ci.h] : null;
+
 // ---- the Dresser: what a slot works with --------------------------------------------------------------------------------------------
 export class Dresser {
   readonly spec: any; readonly lv: any; readonly room: any; readonly program: string; readonly level: number; readonly area: number;
@@ -69,11 +72,13 @@ export class Dresser {
   cap: number; spent = 0;
   /** the tier of the slot being run: what `put` and the floor placers charge the budget at */
   curTier = 1;
+  /** the rig's corner cameras of this room: nothing stands in their way */
+  readonly eyes: CornerEye[];
   private off: Set<string>; private ord = new Map<string, number>(); private composer: Composer | null = null; private composedItems: Map<any, any[]>;
 
   constructor(spec: any, lv: any, room: any, program: string, level: number, base: any[], composedItems: Map<any, any[]>) {
     this.spec = spec; this.lv = lv; this.room = room; this.program = program; this.level = level; this.base = base; this.composedItems = composedItems;
-    this.area = room.bounds.w * room.bounds.d;
+    this.area = room.bounds.w * room.bounds.d; this.eyes = cornerEyes(room.bounds);
     this.roomKey = `${lv.id}.${room.no ?? room.name}`;
     this.style = styleOf(spec, room); this.scheme = dressSchemeOf(spec);
     this.off = new Set(room.dress && typeof room.dress === 'object' && Array.isArray(room.dress.off) ? room.dress.off : []);
@@ -133,7 +138,12 @@ export class Dresser {
     if (P.includes('color') && GLAZED.has(type) && params.color === undefined && this.scheme.glaze) params.color = this.scheme.glaze;
     const s = sizeOf(type, params); if (!s) { this.skip(slot, `no size for ${type}`); return null; }
     const ex = o.rotExtra || 0, swap = ex % 180 !== 0, fw = swap ? s.d : s.w, fd = swap ? s.w : s.d;
-    const free = this.free(h, o.margin ?? h.margin);
+    let free = this.free(h, o.margin ?? h.margin);
+    // a piece that reaches the camera's height keeps CAM.clear from the rig's corner eyes (the zone, in the host's frame, comes off the free area)
+    if (h.top + (o.lift || 0) + s.h > CAM.eye - CAM.clear) for (const e of this.eyes) {
+      const q = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([a, b]) => toLocal(h, e.x + a * CAM.clear, e.z + b * CAM.clear)), z: Rect = [Math.min(...q.map(v => v[0])), Math.min(...q.map(v => v[1])), Math.max(...q.map(v => v[0])), Math.max(...q.map(v => v[1]))];
+      free = free.flatMap(r => subtract(r, z));
+    }
     let c: [number, number] | null;
     if (o.at) {
       c = o.at;
@@ -176,7 +186,8 @@ export class Dresser {
   placeGroup(slot: string, g: Group, params: any = {}, tier = this.curTier, cost = 1): any | null {
     if (!this.open(slot)) return null;
     if (!this.afford(tier, cost)) { this.skip(slot, 'the room budget is spent'); return null; }
-    const c = this.comp();
+    const c = this.comp(), prev = g.accept;
+    g.accept = items => (!prev || prev(items)) && !items.some(ci => this.inTheWay(ci));
     if (!g.cands.length || !c.place(g)) { this.skip(slot, `${g.name}: no place in the room (lanes, doors, windows and the furniture hold)`); return null; }
     const ci = (g.items || [])[0]; if (!ci) return null;
     const n = this.ord.get(slot) ?? 0, [dx, dz] = turn(ci.ox, ci.oz, ci.rot);
@@ -189,6 +200,16 @@ export class Dresser {
     this.ord.set(slot, n + 1); this.placed.push(it); this.counts.set(slot, (this.counts.get(slot) || 0) + 1); this.spent += cost;
     return it;
   }
+  /** take back the last item a floor placer put (a table whose lamp then found no room), the budget and the composer's floor with it */
+  retract(it: any, cost = 1): void {
+    if (this.placed[this.placed.length - 1] !== it) return;
+    this.placed.pop();
+    const slot = String(it.dk).split(':').slice(-2)[0], n = this.ord.get(slot) ?? 1;
+    this.ord.set(slot, n - 1); this.counts.set(slot, (this.counts.get(slot) || 1) - 1); this.spent -= cost;
+    if (this.composer) { const g = this.composer.groups[this.composer.groups.length - 1]; if (g && g.items) { for (const ci of g.items) { const i = this.composer.placed.indexOf(ci); if (i >= 0) this.composer.placed.splice(i, 1); } this.composer.groups.pop(); } }
+  }
+  /** is a composer item in a corner camera's way (CAM): a rug and a ceiling piece never are */
+  inTheWay(ci: CItem): boolean { const sp = spanOf(ci); return !!sp && camBlocked(this.eyes, ci.box, sp[0], sp[1], ci.layer === 'body'); }
   /** a piece in a corner (a floor lamp, a plant) */
   corner(slot: string, type: string, params: any = {}, tier = this.curTier, cost = 1): any | null {
     const c = this.comp(); return this.placeGroup(slot, cornerGroup(c, slot, type, params, { score: it => 0 }), params, tier, cost);

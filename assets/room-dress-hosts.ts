@@ -19,7 +19,7 @@
 //
 // Owner: DRESS.
 import { PLACEMENT } from './props/placement.js';
-import { sizeOf, itemObb, obb, turn, mm, type Size, type Obb } from './room-geo.js';
+import { sizeOf, itemObb, obb, turn, mm, overlap, rectObb, type Size, type Obb } from './room-geo.js';
 
 export type Rect = [number, number, number, number];
 export type HostKind = 'vanity' | 'coffee-table' | 'side-table' | 'nightstand' | 'dresser' | 'desk' | 'counter' | 'island' | 'hob' | 'dining-table' | 'console' | 'tank' | 'appliance-top';
@@ -195,3 +195,36 @@ export function fitIn(free: Rect[], w: number, d: number, anchor: Anchor = 'cent
   return r ? [snap(best.x, r[0] + w / 2, r[2] - w / 2), snap(best.z, r[1] + d / 2, r[3] - d / 2)] : [Math.round(best.x * 1000) / 1000, Math.round(best.z * 1000) / 1000];
 }
 export { area as rectArea };
+
+// ---- the review rig's corners (a keep-out for what stands where its cameras stand) ---------------------------------------------------------------
+/**
+ * The rig's corner cameras (scripts/review/cameras.mts `cornerCam`: the eye 1.5 m up, inset min(0.55, 20 % of the shorter side) from the corner, looking across the room) are
+ * where every review frame (R24 takes NW and SE; the camera addendum and the shot planner's candidates use all four, so all four are kept) is taken from. A floor lamp or a plant in the corner swallows the frame (a fiddle-leaf with the lens inside
+ * its leaves is a green blob), so nothing the phase places may come within CAM_CLEAR of one, and a floor piece taller than TALL keeps out of a CORNER_SQ square at every corner of the
+ * room too. A shorter floor piece and anything on a counter below the eye are no obstacle (their 3-D gap to the eye is already more than CAM_CLEAR). The formula is a copy
+ * of the rig's (THREE-free, in assets/): test-dress-phase K runs the rig's own `cornerCam` against it.
+ */
+export const CAM = { eye: 1.5, inset: 0.55, share: 0.2, clear: 0.3, square: 0.5, tall: 0.8 };
+export type CornerName = 'NW' | 'SE' | 'NE' | 'SW';
+export interface CornerEye { corner: CornerName; x: number; z: number; /** the corner square, a rect [x0, z0, x1, z1] */ sq: [number, number, number, number] }
+const FLIP: Record<CornerName, [number, number]> = { NW: [0, 0], SE: [1, 1], NE: [1, 0], SW: [0, 1] };
+export function cornerEyes(b: { x: number; z: number; w: number; d: number }): CornerEye[] {
+  const m = Math.min(CAM.inset, Math.min(b.w, b.d) * CAM.share);
+  return (Object.keys(FLIP) as CornerName[]).map(corner => {
+    const [fx, fz] = FLIP[corner], q = Math.min(CAM.square, b.w, b.d);
+    return { corner, x: mm(fx ? b.x + b.w - m : b.x + m), z: mm(fz ? b.z + b.d - m : b.z + m), sq: [fx ? b.x + b.w - q : b.x, fz ? b.z + b.d - q : b.z, fx ? b.x + b.w : b.x + q, fz ? b.z + b.d : b.z + q] };
+  });
+}
+/** the 3-D gap between a corner camera's eye and a box (an obb footprint standing between y0 and y1); 0 inside it */
+export function eyeGap(o: Obb, y0: number, y1: number, e: { x: number; z: number }): number {
+  const [lx, lz] = turn(e.x - o.cx, e.z - o.cz, -o.rot);
+  return Math.hypot(Math.max(Math.abs(lx) - o.hw, 0), Math.max(Math.abs(lz) - o.hd, 0), Math.max(y0 - CAM.eye, CAM.eye - y1, 0));
+}
+/** does a box (footprint, y range, standing on the floor or not) stand in a corner camera's way: within CAM.clear of an eye, or (a tall floor piece) in a corner square */
+export function camBlocked(eyes: CornerEye[], o: Obb, y0: number, y1: number, floorPiece: boolean): boolean {
+  for (const e of eyes) {
+    if (eyeGap(o, y0, y1, e) < CAM.clear) return true;
+    if (floorPiece && y1 - y0 > CAM.tall && overlap(o, rectObb(e.sq[0], e.sq[1], e.sq[2], e.sq[3])) > 0) return true;
+  }
+  return false;
+}

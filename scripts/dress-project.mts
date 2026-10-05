@@ -76,7 +76,7 @@ for (const id of wanted) {
       const base = [...(room.items || []).filter((i: any) => i.src !== 'dress@1'), ...((comp.get(room) || { items: [] }).items)];
       const has = (xs: any[]) => xs.some(i => PLACEMENT[i.type] && PLACEMENT[i.type].group === 'lamp');
       lamp.rooms++;
-      { const lt = base.filter((i: any) => PLACEMENT[i.type] && PLACEMENT[i.type].group === 'lamp').map((i: any) => i.type), dl = r.items.find((i: any) => i.dk && String(i.dk).includes(':lamp:')); lampRows.push([id, lv.id, room.name, prog, lt.join('+') || '-', dl ? dl.type : '-', dl ? (dl.y !== undefined ? `host top ${dl.y}` : 'floor') : '-', !lt.length && !dl ? (r.skipped.filter((s: any) => s.slot === 'lamp').map((s: any) => s.why).join('; ') || 'no host and no corner') : ''].join('\t')); }
+      { const lt = base.filter((i: any) => PLACEMENT[i.type] && PLACEMENT[i.type].group === 'lamp').map((i: any) => i.type), dl = r.items.find((i: any) => i.dk && String(i.dk).includes(':lamp:') && PLACEMENT[i.type] && PLACEMENT[i.type].group === 'lamp'); lampRows.push([id, lv.id, room.name, prog, lt.join('+') || '-', dl ? dl.type : '-', dl ? (dl.y !== undefined ? `host top ${dl.y}` : 'floor') : '-', !lt.length && !dl ? (r.skipped.filter((s: any) => s.slot === 'lamp').map((s: any) => s.why).join('; ') || 'no host and no corner') : ''].join('\t')); }
       if (!has(base)) { lamp.lampless++; if (has(r.items)) lamp.fixed++; else lamp.still.push(`${id}/${lv.id}/${room.name} (${prog}, ${r.skipped.filter(s => s.slot === 'lamp').map(s => s.why).join('; ') || 'no host and no corner'})`); }
     }
   }

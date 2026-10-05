@@ -15,8 +15,8 @@
 //
 // Owner: DRESS.
 import type { Dresser } from './room-dress.js';
-import { INWARD, ROT_OF_WALL } from './room-geo.js';
-import { toLocal, rectArea, standingOn, type Host } from './room-dress-hosts.js';
+import { INWARD, ROT_OF_WALL, itemObb } from './room-geo.js';
+import { toLocal, rectArea, standingOn, camBlocked, hostOf, type Host } from './room-dress-hosts.js';
 import { PLACEMENT } from './props/placement.js';
 
 export interface Slot { id: string; tier: 1 | 2 | 3; min?: number; what: string; run: (d: Dresser) => void }
@@ -44,7 +44,15 @@ function lampIfNone(d: Dresser, kinds: Array<Parameters<Dresser['hostsOf']>>, o:
     if (d.put('lamp', h, t, { anchor: o.anchor || 'back', cost: 0.5 })) { n++; if (!o.pair || n >= 2) return; }
   }
   // no host will take one: a floor lamp in a corner, else against a wall (a narrow hall has the wall and no corner)
-  if (n === 0 && o.floor !== false) { const t = d.pick('lamp', FLOOR_LAMPS); if (!d.corner('lamp', t, {}, undefined, 0.5)) d.against('lamp', t, {}, null, undefined, 0.5); }
+  // (the keep-out round the rig's corner cameras leaves a crowded foyer little floor: the type picked first, then each of the others, the slimmest last chance)
+  if (n === 0 && o.floor !== false) {
+    const first = d.pick('lamp', FLOOR_LAMPS);
+    for (const t of [first, ...FLOOR_LAMPS.filter(x => x !== first)]) if (d.corner('lamp', t, {}, undefined, 0.5) || d.against('lamp', t, {}, null, undefined, 0.5)) return;
+    // no floor of the room takes a floor lamp outside the cameras' way: a small lamp on a side table in the corner (0.55 + at most 0.52 m, under the eye line)
+    const tbl = d.corner('lamp', 'side-table', {}, undefined, 0.5);
+    const h = tbl && hostOf(tbl);
+    if (h && !d.put('lamp', h, d.pick('lamp', SMALL_LAMPS), { anchor: 'back', cost: 0.5 })) d.retract(tbl!, 0.5);
+  }
 }
 
 /** the dining table of the room laid: a centrepiece first (it is the table's middle), then a place per chair, as many as keep 40 % of the top free */
@@ -128,6 +136,8 @@ const windowSlot: Slot = { id: 'windows', tier: 2, what: 'a café curtain on the
   const types = WINDOW_TYPE[d.program]; if (!types) return;
   for (const w of d.bareWindows()) {
     const f = cafeFit(w.sill, w.hgt); if (!f) continue;
+    // (a curtain that stands within reach of a corner camera, in a small kitchen, is left off)
+    const o = itemObb({ type: 'cafe-curtain', at: w.at, rot: w.rot, w: w.w, h: f.h }); if (o && camBlocked(d.eyes, o, f.hem, f.rod + CAFE.rodAbove, false)) continue;
     d.raw('windows', d.pick('windows', types), w.at, w.rot, { w: w.w, h: f.h, y: f.y, color: d.scheme.curtain });
   }
 } };

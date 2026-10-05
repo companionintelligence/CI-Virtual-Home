@@ -18,6 +18,9 @@
 //   J  café curtain the BUILT geometry of every café curtain the phase places (the 30 houses at the pilot level 0.5, and the dress fixtures), measured in three.js
 //                   in Node, against its own window: it hangs from the sill (hem no lower), tops out at most sill + 0.55 x the window's height, keeps the 1.45-1.55 m
 //                   eye line clear unless the window is small, is a pale cloth and not a dark slab; and the first cut's params fail the same measurement (a control)
+//   K  corner keep-out  the dress pieces of all 30 houses (pilot level 0.5) and the fixtures stay out of the rig's corner cameras' way: the camera points are the rig's
+//                   own `cornerCam` (the Node copy in assets/ is compared with it), no dress piece within 0.3 m of an eye (3-D, at the 1.5 m eye), no floor piece
+//                   taller than 0.8 m inside a 0.5 m corner square; and the lamp census holds (105 lamp-less rooms lit before the keep-out, never fewer)
 //
 // @check-house node-test
 // @check-house quick
@@ -34,11 +37,13 @@ import { composeHouse, layerOf } from '../assets/room-composer.js';
 import { dressHouse, dressRooms, dressOff, dressOptIn, dressProgram, isDress, bareViolation, Dresser, DRESS_SRC } from '../assets/room-dress.js';
 import { dressSchemeOf } from '../assets/house-scheme-dress.js';
 import { RECIPES, CAFE, cafeFit } from '../assets/dress-recipes.js';
+import { cornerEyes, eyeGap, camBlocked, CAM } from '../assets/room-dress-hosts.js';
+import { cornerCam } from './review/cameras.mts';
 import { hostOf, footprintIn, standingOn, rectArea } from '../assets/room-dress-hosts.js';
 import { lintLayout } from '../assets/layout-lint.js';
 import { PLACEMENT } from '../assets/props/placement.js';
 import { PROPS } from '../assets/props/index.js';
-import { itemObb, overlap, analyzeRoom, sizeOf } from '../assets/room-geo.js';
+import { itemObb, overlap, analyzeRoom, sizeOf, obb, corners, CENTRE_MOUNT, TOP_MOUNT } from '../assets/room-geo.js';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 
@@ -301,4 +306,89 @@ test('J2 (control): the first cut\'s params fail the same measurement', () => {
   for (const [sill, hgt] of [[1.15, 1.0], [1.0, 1.1], [0.9, 1.3], [1.5, 0.7]]) { const f = cafeFit(sill, hgt)!; assert.ok(f, `${sill} x ${hgt}`); assert.deepEqual(curtainFaults(curtainRange({ type: 'cafe-curtain', w: 1.4, h: f.h, y: f.y }), { sill, hgt }), []); }
   assert.equal(cafeFit(0.3, 2.2), null, 'a window to the floor is left bare');
   assert.equal(cafeFit(1.0, 0.5), null, 'a window too short for the shortest curtain is left bare');
+});
+
+// ---- K: the rig's corner cameras keep their view ---------------------------------------------------------------------------------------
+/** the vertical span a spec item occupies, read from the catalog (a floor piece from 0; a surface or wall piece from its own y; a hung piece's y is its centre, its top or its bottom) */
+function spanOfItem(it: any): { lo: number; hi: number; floor: boolean } | null {
+  const s = sizeOf(it.type, it), pl: any = PLACEMENT[it.type]; if (!s) return null;
+  const layer = layerOf(it.type);
+  if (layer === 'floor' || layer === 'ceiling') return null;   // a rug, a pendant: out of the eye's reach
+  if (layer === 'wall') { const y = it.y ?? pl?.mountY ?? 1.5; return CENTRE_MOUNT.has(it.type) ? { lo: y - s.h / 2, hi: y + s.h / 2, floor: false } : TOP_MOUNT.has(it.type) ? { lo: y - s.h, hi: y, floor: false } : { lo: y, hi: y + s.h, floor: false }; }
+  if (layer === 'surface') return { lo: it.y ?? 0, hi: (it.y ?? 0) + s.h, floor: false };
+  return { lo: s.y0 || 0, hi: (s.y0 || 0) + s.h, floor: true };
+}
+/** 3-D distance from a point to a box (an obb footprint over [lo, hi]), by polygon edges: independent of eyeGap's local-frame arithmetic */
+function gapToBox(o: ReturnType<typeof obb>, lo: number, hi: number, p: [number, number, number]): number {
+  const poly = corners(o); let d2 = Infinity; const cross: number[] = [];
+  for (let i = 0; i < 4; i++) {
+    const [ax, az] = poly[i], [bx, bz] = poly[(i + 1) % 4], ex = bx - ax, ez = bz - az, t = Math.max(0, Math.min(1, ((p[0] - ax) * ex + (p[2] - az) * ez) / (ex * ex + ez * ez)));
+    d2 = Math.min(d2, (p[0] - ax - t * ex) ** 2 + (p[2] - az - t * ez) ** 2);
+    cross.push(ex * (p[2] - az) - ez * (p[0] - ax));
+  }
+  const inside = cross.every(c => c >= 0) || cross.every(c => c <= 0);
+  return Math.hypot(inside ? 0 : Math.sqrt(d2), Math.max(lo - p[1], p[1] - hi, 0));
+}
+const lampLit = (spec: any) => {
+  // the lamp census (scripts/dress-project.mts): rooms whose recipe asks for a lamp, that the layout leaves without one, and the phase lights
+  let asks = 0, lampless = 0, lit = 0;
+  const comp = composeHouse(spec), res = dressRooms(spec), isLamp = (i: any) => PLACEMENT[i.type] && (PLACEMENT[i.type] as any).group === 'lamp';
+  for (const { lv, room } of rooms(spec)) {
+    const prog = dressProgram(room, lv); if (!prog || !res.get(room) || !RECIPES[prog].slots.some(x => x.id === 'lamp')) continue;
+    asks++;
+    const base = [...(room.items || []).filter((i: any) => !isDress(i)), ...((comp.get(room) || { items: [] }).items)];
+    if (base.some(isLamp)) continue;
+    lampless++; if ((res.get(room)?.items || []).some(isLamp)) lit++;
+  }
+  return { asks, lampless, lit };
+};
+test('K: the rig\'s corner camera points are the Node copy\'s, and nothing the phase places stands in their way', () => {
+  // the formula: a copy in assets/ (THREE-free), compared with the rig's own cornerCam for every room of every house and every corner
+  let cams = 0, near = 0;
+  const lamps = { asks: 0, lampless: 0, lit: 0 };
+  for (const { id, spec } of fleet()) {
+    const res = dressRooms(spec);
+    for (const { room } of rooms(spec)) {
+      if (!room.bounds) continue;
+      for (const e of cornerEyes(room.bounds)) {
+        const cam = cornerCam(room.bounds, 0, e.corner);
+        assert.ok(Math.abs(cam.pos[0] - e.x) < 1e-6 && Math.abs(cam.pos[2] - e.z) < 1e-6 && cam.eye === CAM.eye, `${id}/${room.name}/${e.corner}: the keep-out's camera point is not the rig's`);
+      }
+      const r = res.get(room); if (!r) continue;
+      for (const e of cornerEyes(room.bounds)) {
+        cams++;
+        for (const it of r.items) {
+          const o = itemObb(it), sp = spanOfItem(it); if (!o || !sp) continue;
+          const g = gapToBox(o, sp.lo, sp.hi, [e.x, CAM.eye, e.z]);
+          assert.ok(g >= CAM.clear - 1e-6, `${id}/${room.name}/${e.corner}: the camera is ${(g * 100).toFixed(1)} cm from the dress ${it.type} at ${it.at}`);
+          // (and the packer's own arithmetic agrees with this independent one)
+          assert.ok(!camBlocked(cornerEyes(room.bounds), o, sp.lo, sp.hi, sp.floor), `${id}/${room.name}: camBlocked disagrees about ${it.type}`);
+          if (sp.floor && sp.hi - sp.lo > CAM.tall) {
+            const q = obb((e.sq[0] + e.sq[2]) / 2, (e.sq[1] + e.sq[3]) / 2, e.sq[2] - e.sq[0], e.sq[3] - e.sq[1], 0);
+            assert.ok(overlap(o, q) <= 0, `${id}/${room.name}/${e.corner}: the ${(sp.hi - sp.lo).toFixed(2)} m ${it.type} stands in the corner square`);
+          }
+          if (g < 0.6) near++;
+        }
+      }
+    }
+    const l = lampLit(spec); lamps.asks += l.asks; lamps.lampless += l.lampless; lamps.lit += l.lit;
+  }
+  assert.ok(cams >= 800, `${cams} corner cameras were measured: the fleet's rooms`);
+  console.log(`K: ${cams} corner cameras over the 30 houses and the fixtures, none within 0.3 m of a dress piece (${near} pieces between 0.3 and 0.6 m); lamp census: ${lamps.asks} rooms ask, ${lamps.lampless} lamp-less in the layout, ${lamps.lit} lit by the phase`);
+  // the shipped houses' census before the keep-out: 105 of 132 lit (wave6/dress-lamps.tsv); the fixtures add their own rooms on top
+  const ship = houses.map(h => lampLit(load(h.file))).reduce((a, l) => ({ asks: a.asks + l.asks, lampless: a.lampless + l.lampless, lit: a.lit + l.lit }), { asks: 0, lampless: 0, lit: 0 });
+  assert.equal(ship.lampless, 132, 'the layout leaves 132 lamp-less rooms in the 30 houses');
+  assert.ok(ship.lit >= 105, `the lamp census lost rooms to the keep-out: ${ship.lit} lit, 105 before`);
+});
+
+test('K2 (control): a fiddle-leaf in the corner is in the way, a low basket is not, and the 0.3 m ring is where the rig says', () => {
+  const b = { x: 0, z: 0, w: 4, d: 3 }, eyes = cornerEyes(b), nw = eyes.find(e => e.corner === 'NW')!;
+  assert.deepEqual([nw.x, nw.z], [0.55, 0.55]);
+  const plant = obb(0.3, 0.3, 0.5, 0.5), basket = obb(0.3, 0.3, 0.5, 0.5);
+  assert.ok(camBlocked(eyes, plant, 0, 1.6, true), 'a tall plant in the corner');
+  assert.ok(!camBlocked(eyes, basket, 0, 0.5, true), 'a 0.5 m basket in the corner is allowed');
+  assert.ok(camBlocked(eyes, obb(0.55, 0.95, 0.4, 0.3), 0, 1.7, true), 'a lamp 0.25 m from the camera, beside the corner square');
+  assert.ok(!camBlocked(eyes, obb(0.55, 1.2, 0.3, 0.3), 0, 1.7, true), 'a lamp 0.5 m away');
+  assert.ok(!camBlocked(eyes, obb(0.55, 0.7, 0.4, 0.4), 0.9, 1.1, false), 'a counter piece 0.4 m under the eye is no obstacle');
+  assert.ok(eyeGap(obb(0.55, 1.0, 0.1, 0.1), 0, 1.7, nw) > 0.39 && eyeGap(obb(0.55, 1.0, 0.1, 0.1), 0, 1.7, nw) < 0.41);
 });
