@@ -553,9 +553,9 @@ async function lampsMode(): Promise<number> {
       const noPool = roomKeys.filter(k => k && !poolSet.has(k));
       const capped = noPool.filter(k => !litSet.has(k));
       for (const i of lamps) { const t = (byType[i.type] ||= { items: 0, pooled: 0 }); t.items++; if (i.room && poolSet.has(i.room)) t.pooled++; }
-      result.push({ house, lights: r.lights, lampRooms: roomKeys.length, pooled: roomKeys.filter(k => poolSet.has(k)).length, noPool: noPool.length, capped: capped.length, sconces: sconces.length, sconceRooms: [...new Set(sconces.map((i: any) => i.room))].filter(k => k && !roomKeys.includes(k as string)).length, noPoolRooms: noPool.map(k => ({ key: k, capped: !litSet.has(k), types: [...new Set(lamps.filter((i: any) => i.room === k).map((i: any) => i.type))] })), items: lamps, hungOnly: r.items.length - lamps.length });
+      result.push({ house, lights: r.lights, lampRooms: roomKeys.length, pooled: roomKeys.filter(k => poolSet.has(k)).length, noPool: noPool.length, capped: capped.length, sconces: sconces.length, sconceRooms: [...new Set(sconces.map((i: any) => i.room))].filter(k => k && !roomKeys.includes(k as string)).length, sconceUnlit: [...new Set(sconces.map((i: any) => i.room))].filter(k => k && !roomKeys.includes(k as string) && !litSet.has(k as string)).length, noPoolRooms: noPool.map(k => ({ key: k, capped: !litSet.has(k), types: [...new Set(lamps.filter((i: any) => i.room === k).map((i: any) => i.type))] })), items: lamps, hungOnly: r.items.length - lamps.length });
       const rr = result[result.length - 1];
-      console.log(`  ${house.padEnd(20)} lights ${String(rr.lights).padStart(2)}  lamp rooms ${String(rr.lampRooms).padStart(2)}  with a pool ${String(rr.pooled).padStart(2)}  without ${String(rr.noPool).padStart(2)} (capped out ${rr.capped})  lamp items ${lamps.length}  sconces ${sconces.length} (${rr.sconceRooms} sconce-only rooms)`);
+      console.log(`  ${house.padEnd(20)} lights ${String(rr.lights).padStart(2)}  lamp rooms ${String(rr.lampRooms).padStart(2)}  with a pool ${String(rr.pooled).padStart(2)}  without ${String(rr.noPool).padStart(2)} (capped out ${rr.capped})  lamp items ${lamps.length}  sconces ${sconces.length} (${rr.sconceRooms} sconce-only rooms, ${rr.sconceUnlit} with no light)`);
       if (w.errors.length) say({ check: 'no page errors', frame: house, value: w.errors[0], limit: 'none', ok: false });
       await w.close();
     }
@@ -563,7 +563,8 @@ async function lampsMode(): Promise<number> {
   writeText(out('lamps.json'), stableJson({ schema: 1, what: 'the lamp census (scripts/test-interior-light.mts --lamps)', byType, rows: result, machine: machine() }));
   console.log('\nby type (items / in a room with a pool):'); for (const [t, v] of Object.entries(byType).sort()) console.log(`  ${t.padEnd(20)} ${String(v.items).padStart(4)} / ${v.pooled}`);
   const tot = (k: string) => result.reduce((a, r) => a + r[k], 0);
-  console.log(`\n${result.length} houses: ${tot('lampRooms')} rooms with a glowing free-standing lamp, ${tot('pooled')} with a pool, ${tot('noPool')} without (${tot('capped')} of them left out by the ${LIGHT_CAP}-light cap), max lights ${Math.max(...result.map(r => r.lights))}`);
+  console.log(`\n${tot('sconceRooms')} rooms have only wall sconces: ${tot('sconceRooms') - tot('sconceUnlit')} are lit by their fill, ${tot('sconceUnlit')} are left out by the ${LIGHT_CAP}-light cap`);
+  console.log(`${result.length} houses: ${tot('lampRooms')} rooms with a glowing free-standing lamp, ${tot('pooled')} with a pool, ${tot('noPool')} without (${tot('capped')} of them left out by the ${LIGHT_CAP}-light cap), max lights ${Math.max(...result.map(r => r.lights))}`);
   return tot('noPool') - tot('capped') > 0 ? 1 : 0;
 }
 
