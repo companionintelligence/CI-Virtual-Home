@@ -92,15 +92,18 @@ function counterClusters(d: Dresser, h: Host, queue: string[], max = 3): number 
   return placed;
 }
 
-/** a window with nothing on it wears a blind (SOFT's types, dormant until now): the type by what the room is, the width and head from the window */
+/**
+ * A window with nothing on it wears a blind (SOFT's types, dormant until now) where one belongs: a café curtain over a kitchen's window (the lower half; the view above
+ * stays), a roller shade in a bath, ensuite, powder or laundry (privacy). Not in a living room, a dining room, a study or a bedroom: SOFT's blinds hang fully drawn
+ * (their drop is a function of the head height alone), which would shut the view and the sun out of every room that is lived in by its windows, and the specs already
+ * hang curtains where an author wanted them.
+ */
 const WINDOW_TYPE: Record<string, string[]> = {
-  kitchen: ['cafe-curtain', 'roman-blind'], 'kitchen-dining': ['cafe-curtain', 'roman-blind'], laundry: ['roller-shade'], bath: ['roller-shade'], ensuite: ['roller-shade'], powder: ['roller-shade'],
-  dining: ['roman-blind'], living: ['roman-blind'], den: ['roman-blind'], media: ['roman-blind'], study: ['roller-shade', 'roman-blind'], library: ['roman-blind'], studio: ['roller-shade'],
-  'bed-primary': ['roman-blind', 'roller-shade'], 'bed-guest': ['roman-blind', 'roller-shade'], 'bed-kid': ['roller-shade'], nursery: ['roller-shade'], sunroom: ['roller-shade'],
+  kitchen: ['cafe-curtain'], 'kitchen-dining': ['cafe-curtain'], laundry: ['roller-shade'], bath: ['roller-shade'], ensuite: ['roller-shade'], powder: ['roller-shade'],
 };
-const windowSlot: Slot = { id: 'windows', tier: 2, what: 'a blind or a café curtain on a window that wears nothing', run(d) {
+const windowSlot: Slot = { id: 'windows', tier: 2, what: 'a café curtain on a kitchen window, a roller shade on a bath window, where the window wears nothing', run(d) {
   const types = WINDOW_TYPE[d.program]; if (!types) return;
-  for (const w of d.bareWindows()) d.raw('windows', d.pick('windows', types), w.at, w.rot, { w: w.w, h: w.head });
+  for (const w of d.bareWindows()) d.raw('windows', d.pick('windows', types), w.at, w.rot, { w: w.w, h: d.program === 'kitchen' || d.program === 'kitchen-dining' ? Math.min(w.head, w.sill + 0.95) : w.head });
 } };
 
 // ---- the recipes ---------------------------------------------------------------------------------------------------------------------
