@@ -36,3 +36,16 @@ import './kids.js';
 import './office.js';
 import './outdoor.js';
 import './hobby.js';
+// ---- OWNER small (dress kit: procedural small goods, DORMANT until a recipe or a fixture places them) ----
+import './dress-table.js';
+import './dress-kitchen.js';
+import './dress-living.js';
+import './dress-bed.js';
+import './dress-bath.js';
+import './dress-hall.js';
+
+// OWNER soft: new soft types, and in-place rebuilds of soft goods registered above (replaces by type id, Map order untouched)
+import './soft2.js';
+
+// BAKED LAST — assets/props/baked.ts overrides registered types in place, so it stays the last import; another stream's module goes ABOVE this line
+import './baked.js';

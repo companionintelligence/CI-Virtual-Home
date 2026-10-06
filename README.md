@@ -48,8 +48,8 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run validate` | All 30 specs against the schema, the prop catalog and the registry, then every `scripts/validate/*.mts` plugin. `--shots` adds the headless camera-path QA; `--layout` the layout lints. |
 | `pnpm run test` | `scripts/test-floorplan-graph.mts` under `node --test` — the floor-plan graph, mitres, and the wall compiler over every spec. Needs `build`. |
 | `pnpm run check` | **The gate** — every check below, in order (`pnpm run typecheck` is separate). `--house a,b`, `--jobs N`, `--res`, `--update-goldens`, `--no-perf`. |
-| `pnpm run check:quick` | assets + specs + shots, and the 15 test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site …): the fast loop while editing. |
-| `pnpm run test:node` | Only those 15 quick tests: pure Node, no browser, no GPU (a few minutes). CI runs it. |
+| `pnpm run check:quick` | assets + specs + shots, and the 24 test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site …): the fast loop while editing. |
+| `pnpm run test:node` | Only those 24 quick tests: pure Node, no browser, no GPU (a few minutes). CI runs it. |
 | `pnpm run shots` | Render product shots to `video/houses/` (`--house`, `--shot`, `--res 1080`, `--aspect 16:9`, `--poster-only`, `--qa-only`, `--jobs`). |
 | `pnpm run goldens` / `goldens:update` | Compare 150 frames with the committed baselines / re-bless them. |
 | `pnpm run frame-hash` | Two fresh browser contexts must render the same frames. |
@@ -74,6 +74,14 @@ the portal's gallery, `./index.html`; `mode=view` turns the page into the portal
 | `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
 | `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
 | `pnpm run ui:test` | Drive the editor end to end (layout at four sizes in both schemes, contrast, the top bar, the checks, the timeline, the tree, the catalog, Compare, stills at 4K, a recorded MP4 checked with ffprobe and by PSNR) — `--only <sections>`, `--shots <dir>`. Needs a GPU and ffmpeg. |
+| `pnpm run test:light` | The interior-light gate (a GPU, minutes; the product code must be committed): the four `light-*` fixtures at day, dusk and night, and with `-- --bench` the 19 luma checks of the plan on the five bench rooms (clipped highlights, crushed shadows, ceiling and range against `before.metrics.json`), `-- --leak` every room's pool against its neighbours (409 rooms), `-- --lamps` the lamp census (every glowing lamp, whether its room has a pool, the 16-light cap), and the tuning modes `--portal` `--hitch` `--steady` `--closeups` `--mood` `--probe`. |
+| `pnpm run test:dress-hosts` / `test:dress-neutral` | The dress phase in the page: every host's flat top measured at 2 cm against the registry (and the packer's sizes against the built boxes), and the neutrality gate (`?dress=0` is the stripped house object for object and bit-exact in three frames; dressed differs only in the dress items' own classes and the fixtures of a room that was given a lamp; baked `dress@1` items build what the live phase builds). Both by hand: they need a GPU. |
+| `node --experimental-strip-types scripts/compose-house.mts --house <id> --dress [--write]` | The dress phase alone (`assets/room-dress.ts`): add the `src: 'dress@1'` small goods, lamps, towels and café curtains of each room's recipe (`--level`, `--rooms`), over a frozen layout; `--undress` strips them again and gives the file back byte for byte; `--dress` twice writes what once did. Pass 6 baked all 30 houses with it. |
+| `pnpm run dress-project` / `dress-census` / `dress-cost` / `dress-fleet` / `dress-reach` | What the phase would add (items per program, lamp coverage, meshes and triangles, `--lamps` table), the census of the specs (never-bare rules, blank walls; `census.json` is the frozen BEFORE), the draw-call sub-gate on the dress fixtures (at most ×1.12), the five fleet gates measured on the built meshes of the 30 baked houses (curtain-vs-item, curtain-vs-curtain, neighbour gap, corner camera, curtain-window), and REACH measured over 1,000 seeds (`--check`). |
+| `pnpm run review:capture` / `review:luma` / `review:sheets` / `review:ab` / `review:cost` / `review:verify` | The review rig (`scripts/review/`): 92 frames of the 24 review rooms at the rig's corner cameras (1.5 m eye, 60°, NW and SE, 1280 × 720 through the composer; dusk and night on the five bench rooms; a 1.7 m mannequin for scale), luma metrics, before/after sheets, the blind A/B pair generator and scorer, the cost census (`--compare` against `test/review/baselines/cost.json`: draw calls, meshes, triangles, texture memory, lights) and the determinism check. Outside git, in `REVIEW_DIR` (`scripts/review/lib.mts`). |
+| `pnpm run prop-drift` / `test:neutrality` | A type rebuilt in place keeps its box (`prop-boxes.json`), and a change moves only the object classes it declared (`--changed item:a,role:b`; `--query dress=0`). |
+| `pnpm run soft-sheet` / `soft-rooms` | SOFT's prop sheet (one column per seed) and the soft fixture house seen from inside at the rig's cameras. |
+| `node --experimental-strip-types scripts/bake/bake.mts` | The 3Dinside bake: `models/manifest.json` plus a source pack outside git → `assets/props/baked/<family>.ts` (Blender, deterministic; `--check` needs neither, `--verify-repro` bakes twice). `scripts/bake/attribution.mts [--check]` writes `ATTRIBUTION.md` byte for byte; `scripts/bake/sheet.mts` renders review sheets (`--compare` procedural against baked). |
 
 Every script resolves the repo from its own location, so they run from any directory. After editing a spec:
 `validate` → `plans` → `iso` → `floorplans` → `check`, and commit the regenerated files with the spec.
@@ -96,7 +104,7 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
                            environment, core-orbit, shot-path, plan-export/ (one plan.json key per stream)
   spec/                    the HouseSpec as a TypeScript type: base.ts + one fragment per stream, merged in index.ts
   scene-qa/                the scene checks each stream registers with __houseSceneQA
-  props/                   the prop registry — one module per category, ~150 props
+  props/                   the prop registry — one module per category, 287 types (plus `props/baked/`, the baked 3Dinside derivatives)
   vendor/three/            three.js r169 + addons, vendored (one local patch; see THIRD_PARTY.md)
   fonts/                   Manrope + JetBrains Mono woff2 the capture scripts serve instead of Google Fonts
   brand/                   the CI mark the page shows
@@ -105,12 +113,19 @@ assets/                    the three.js engine, in TypeScript. house-builder.ts 
   viewer.ts                the portal's player: shots, scrubber, time of day, path, fly (room-creator ?mode=view)
   viewer-batch.ts          the player's live-only static batching: merges each toggle unit's static opaque meshes (a third of the draw
                            calls); only viewer.ts imports it, `?no=batch` switches it off, the recorder / goldens / editor never see it
-content/houses/            <id>.json — the 30 HouseSpecs (source); <id>.plan.json and index.json — derived
+content/houses/            <id>.json — the 30 HouseSpecs (source; pass 6 baked each room's dress@1 items into them); <id>.plan.json and index.json — derived
 content/house-catalog.json every item type's measured footprint, height and iso parts (derived)
 scenes/                    isometric SVG + Lottie, CAD floor plans, and their manifests (all derived, committed)
 scripts/                   the pipeline: build, validate, render, gate (.mts) and the Python generators (.py)
   validate/                validator plugins, one per stream (validate-house-spec.mts loads them)
   fleet/                   fleet-audit metrics, one file per stream
+models/                    manifest.json (the shipped 3Dinside derivatives), packs.json (the 22 packs: licence basis and evidence), roles/ (the role colour tables);
+                           never a source pack, an image or a texture. ATTRIBUTION.md (generated) lists every pack
+assets/props/baked/        the baked derivatives, data-only modules (geometry + role-named flat materials) behind `?baked=0`
+scripts/bake/              the bake pipeline (Blender), the attribution generator, review sheets
+scripts/review/            the review rig: capture, luma, sheets, A/B, cost, verify, the committed baselines' tools
+test/review/baselines/     the rig's frozen BEFORE and the stability baselines (before.manifest.json, before.metrics.json, cost.json, census.json,
+                           prop-boxes.json, build-neutrality.json, compose-fixtures.json)
 reference/                 HOUSE-SPEC.md (the schema), PARAMETRIC-INTERIORS-PLAN.md (design + roadmap),
                            HOUSE-SYSTEM-REVIEW-2026-09-15.md (historical review)
 test/goldens/macos-metal/  150 committed baseline frames (Git LFS) + PROFILE.json (the renderer that made them)
@@ -164,7 +179,7 @@ focus back to its toggle). On a phone the transport is a bottom sheet, and every
   are drawn at (the disturbed film is the same frames, `test-ui.mts`). A film's size is even (21:9 is 1280 × 548, not 549), and the
   bit rate the dialog names is what is asked for, "up to": a calm shot at a small size fills less of it.
 - **Editing.** A home's own parts (built from its spec) are locked: Backspace and the bin do nothing, and a toast says where to
-  change them. What you add from the catalog (the four tabs, and **Props**: the 154 registry props of `house-catalog.json`) lands
+  change them. What you add from the catalog (the four tabs, and **Props**: the 287 registry props of `house-catalog.json`) lands
   where the view's centre ray meets the floor (three metres ahead of the eye through a level shot's lens, and always on the lot);
   a prop whose placement metadata says `against: 'wall'` (S3's `place`) is set against the nearest outside wall, facing in. Undo
   and redo (Ctrl or Cmd Z, with Shift) cover adding, deleting, duplicating, moving and re-finishing. Opening another home rebuilds
@@ -420,7 +435,7 @@ How to take a number that means something:
    `@check-house` line in its header, and `@check-house advisory — <why>` lets one that is red on `main` too run
    and report without failing the gate until the fix that greens it lands (none is advisory today; delete the
    directive with the fix, so a real regression fails again). Among them `test-fixtures.mts`, the fixture houses' QA
-   and frame hashes (all 51 fixtures, including `integration-all` and `integration-all-upstairs`, the all-streams smoke tests that use
+   and frame hashes (all 62 fixtures, including `integration-all` and `integration-all-upstairs`, the all-streams smoke tests that use
    one of everything each stream added; ~13 minutes under load, not in `--quick`), and the seams' own tests, each a second or two and in `--quick`: `test-spec-types.mts` (every
    spec against `HouseSpec`), `test-spec-merge.mts` (the fragment merge rule), `test-validate-plugins.mts` (a
    plugin's `extend` and `replaces`), `test-builder-seams.mts` (what the catalog and the validator read off the
@@ -438,9 +453,41 @@ reviewed frame by frame, committed with that change. Failing runs leave `*.actua
 `test/diff/`.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs what needs no GPU: install, build, typecheck,
-spec validation, the floor-plan-graph tests, `pnpm run test:node` (the 15 quick test scripts) and the portal build. 150 frames through a software rasteriser would cost the better
+spec validation, the floor-plan-graph tests, `pnpm run test:node` (the 24 quick test scripts) and the portal build. 150 frames through a software rasteriser would cost the better
 part of an hour of runner time per push, so the render gate runs locally before you push, as it did in
 CI-Common.
+
+## The interior layers
+
+The interiors program (2026-10) put five layers on top of the room composer, each owned by its own modules and gate, and a rig to measure them. They are all in the specs and the
+builders now; nothing below needs a flag except the two switches that turn a layer off for an exact A/B.
+
+| Layer | Where | What it does | Gate |
+|---|---|---|---|
+| **LIGHT** | `fixtures.ts`, `room-clip.ts`, `environment.ts`, `house-scheme.ts` | One room-bounded pool per lamp room (a spot clipped to the room's walls), a soft fill where there is no lamp, the ceiling bounce, the house's lamp temperature and finish scheme, GTAO 0.25 inside, an interior-aware day grade; at most 16 dynamic lights a house | `pnpm run test:light` |
+| **SOFT** | `props/soft*.ts`, `props/windows.ts` | Bedding, curtains, blinds, towels, sofas, armchairs and plants rebuilt in place (same boxes: `prop-drift`) | `test-softkit`, `prop-drift`, `soft-sheet` |
+| **SMALL** | `props/dress-*.ts`, `props/tableware.ts`, `props/dress-kit.ts` | The small goods a room is dressed with (counter kits, table settings, vanity sets, lamps, a café curtain …): dormant types the dress phase places | `test-dress-kit` |
+| **DRESS** | `room-dress.ts`, `room-dress-hosts.ts`, `dress-recipes.ts`, `dress-curtains.ts`, `dress-leaves.ts` | The dress phase: a second pass over a frozen layout that puts those goods on the hosts the layout made. **Baked into the 30 houses** as `src: 'dress@1'` items | `test-dress-phase`, `test:dress-hosts`, `test:dress-neutral`, `dress-fleet` |
+| **BAKE** | `props/baked/`, `models/`, `scripts/bake/` | 3Dinside derivatives (geometry plus role-named flat materials; no image or texture), three pilot types, **dormant**: nothing in a house references one yet | `test-baked`, `test-no-third-party-bytes` |
+| **RIG** | `scripts/review/` | The review rig and the frozen BEFORE (`test/review/baselines/`) | `test-review-tools` |
+
+**The dress phase.** `compose-house.mts --house <id> --dress --write` adds each room's recipe (`dress-recipes.ts`: kitchens a pot on the hob, counter clusters, a lamp, a café curtain;
+dining a laid table; baths a roll holder, a robe hook, a towel; halls a mirror and a plant; …) at the room's own `dress.level` or 0.5, `--undress` takes every `dress@1` item out
+and gives the file back byte for byte. A dress item stands on a *host* of the registry (a counter, a console, a nightstand: its flat top measured, `test:dress-hosts`), keeps 1.5 cm from
+its neighbours, out of an open door leaf's parking strip and of a planned curtain's cloth, 0.3 m from the review rig's corner eyes (a bare-headed lamp 1 m), and gets its own seed
+(`dress:<room>:<slot>:<n>`), so adding one moves no other prop's pick. A lamp is never the legacy halo lamp, and never in a room under 2.5 m2 (no light is built for it). A room opts
+out with `"dress": false`; `?dress=0` builds any house without its dress items (baked or live), exactly the stripped house. **After a layout re-bake** (`compose-house.mts --write`
+or `--rebake`) re-run `--dress --write` for the house: a dress item stands on a host the old layout had, and `test-dress-phase` (S) fails when a baked house is not what `--dress` writes today.
+`?baked=0` does the same for the BAKE layer.
+
+**Looking at a change.** A change to how rooms look is judged by eye and by the rig's numbers, not by the 150 goldens (five frames a house, most of them exteriors). Commit the product
+code (the rig refuses to capture a dirty tree), `pnpm run review:capture -- --set after-<label>` (the cameras are read from `before.manifest.json`), `review:sheets --after <dir>` for the
+before/after contact sheets, `review:luma` and `test:light -- --bench` for the LIGHT numbers, `review:cost -- --compare` for the budget (draw calls, meshes, triangles, texture memory,
+lights per house), `review:ab generate` for the blind pairs. Run them one GPU job at a time. Frames are comparable only on the profile that made them
+(`test/goldens/<profile>/PROFILE.json`, `test/review/baselines/before.manifest.json`).
+
+**Third-party models.** The owner's 3Dinside collection (22 packs) may appear only as baked derivatives (CLAUDE.md → Licensing); `ATTRIBUTION.md` is generated and must be current
+(`scripts/bake/attribution.mts --check`, run by `test-baked`), and `test-no-third-party-bytes` fails on any model, image or archive file under `assets/props/` or `models/`.
 
 ## Where it came from
 

@@ -12,6 +12,10 @@
 //              the ground is fully hazed before it is clipped.
 //   exposure, env   tone-mapping exposure, set for ACES filmic (TONE_EXPOSURE rescales it for the A/B
 //              mappers), and scene.environmentIntensity.
+//   bounce     the emissive of every CEILING material (userData.bounce, set by the kit and the arch materials): the light a
+//              room's own surfaces throw up at its ceiling, which no light here models. Without it a ceiling is lit by the
+//              hemisphere's ground colour alone (greyed to luma, kit-build.ts neutralIndirect): flat mid-grey by day, black
+//              at night. A scalar of white-warm emissive, ramped by hour (plan 5.2 L2).
 //   lampGain   the house's own lamps: every material under an object tagged userData.fixture has its emissive
 //              scaled by it (and fixture lights read it from the `house:lighting` event).
 //   windowGlow glass under an object tagged userData.windowGlow glows glowColor at this emissive intensity.
@@ -31,6 +35,8 @@
 // Everything is a pure function of the preset and the sun direction: no randomness, no clock — the frame-hash
 // test and the goldens depend on two runs agreeing.
 
+import { installRoomClip } from './room-clip.js';
+
 export type Preset = {
   label: string;
   sky: [string, string, string];
@@ -43,11 +49,19 @@ export type Preset = {
   fog: [number, number];
   shadow: number;
   lampGain: number;
+  bounce: number;
   windowGlow: number;
   glowColor: string;
   sunGlow: number;
   bloom: { strength: number; radius: number; threshold: number };
-  grade: { contrast: number; saturation: number; vignette: number };
+  grade: { contrast: number; saturation: number; vignette: number; /** the linear grey the contrast turns about (default 0.18); a higher pivot keeps a contrast boost from brightening the walls */ pivot?: number };
+  /** the grade a frame has from OUTSIDE the building (LIGHT v3.1): `grade` is the interior one, and the composer blends the two by how far inside the house the camera is
+   *  (interiorWeight). A strong day grade lifts the range of a room and crushes a tree and a brick wall; absent, the hour grades both the same. */
+  gradeOutside?: { contrast: number; saturation: number; vignette: number; pivot?: number };
+  /** look 2's white balance: how far toward neutral the frame is corrected (0 none, 1 fully; default 0.75). Dusk is held back so a warm hour stays warm (LIGHT v3). */
+  wb?: number;
+  /** the colour a ceiling's bounce emits (default BOUNCE_COLOR, a warm white): dusk's is warmer, a ceiling that read teal under a peach sky was the one cool thing in a warm room */
+  bounceColor?: string;
 };
 
 export const TIME_OF_DAY: Record<string, Preset> = {
@@ -60,9 +74,10 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     ambient: 0,
     exposure: 0.78, env: 0.48,
     fog: [60, 155], shadow: 0.8,
-    lampGain: 0.035, windowGlow: 0, glowColor: '#ffe2bd', sunGlow: 0.25,
+    lampGain: 0.035, bounce: 0.12, windowGlow: 0, glowColor: '#ffe2bd', sunGlow: 0.25,
     bloom: { strength: 0.08, radius: 0.4, threshold: 2.5 },
-    grade: { contrast: 1.06, saturation: 0.88, vignette: 0.14 },
+    grade: { contrast: 1.5, pivot: 0.34, saturation: 0.97, vignette: 0.2 },   // LIGHT v3 item 5: a contrast about a lighter grey (0.34), so the walls are not brightened by it (mean luma within 3 % of BEFORE) and the day range gains +0.09 on the three rows that read it; was 1.06 / 0.88 / 0.14
+    gradeOutside: { contrast: 1.06, saturation: 0.88, vignette: 0.14 },       // LIGHT v3.1: that grade is for a room. From outside it turned trees near-black and brick black-maroon (golden mae 11-20 on every exterior frame), so the camera outside the house gets v2's
   },
   golden: {
     label: 'Golden hour',
@@ -73,7 +88,7 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     ambient: 0,
     exposure: 1.0, env: 0.55,
     fog: [55, 150], shadow: 0.8,
-    lampGain: 0.3, windowGlow: 0.18, glowColor: '#ffdcb0', sunGlow: 0.6,
+    lampGain: 0.3, bounce: 0.10, windowGlow: 0.18, glowColor: '#ffdcb0', sunGlow: 0.6,
     bloom: { strength: 0.15, radius: 0.4, threshold: 2.0 },
     grade: { contrast: 1.05, saturation: 0.9, vignette: 0.18 },
   },
@@ -81,12 +96,12 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     label: 'Dusk',
     sky: ['#4e638b', '#e5a38b', '#5d626e'],
     sun: { color: '#ffa98f', intensity: 1.0, elevation: 8, swing: -64 },
-    hemi: { sky: '#b9aed0', ground: '#837773', intensity: 0.9 },
-    fill: { color: '#9eaecd', intensity: 0.3 },
+    hemi: { sky: '#cdb8c4', ground: '#b8906f', intensity: 1.35 },
+    fill: { color: '#b8aac2', intensity: 0.3 },
     ambient: 0,
-    exposure: 0.9, env: 0.7,
+    exposure: 0.9, env: 0.55,
     fog: [70, 155], shadow: 0.6,
-    lampGain: 1.6, windowGlow: 0.8, glowColor: '#ffd9a8', sunGlow: 0.8,
+    lampGain: 1.6, bounce: 0.19, bounceColor: '#ffc590', windowGlow: 0.8, glowColor: '#ffd9a8', sunGlow: 0.8, wb: 0.4,
     bloom: { strength: 0.35, radius: 0.4, threshold: 1.8 },
     grade: { contrast: 1.05, saturation: 0.72, vignette: 0.22 },
   },
@@ -94,16 +109,28 @@ export const TIME_OF_DAY: Record<string, Preset> = {
     label: 'Night',
     sky: ['#0b1731', '#424b64', '#17202a'],
     sun: { color: '#bed5ff', intensity: 0.35, elevation: 38, swing: 40 },
-    hemi: { sky: '#829fc9', ground: '#3d4656', intensity: 0.72 },
+    hemi: { sky: '#829fc9', ground: '#6a5a4e', intensity: 1.4 },
     fill: { color: '#8aa2c9', intensity: 0.22 },
     ambient: 0,
-    exposure: 0.85, env: 0.22,
+    exposure: 0.85, env: 0.30,
     fog: [55, 150], shadow: 0.5,
-    lampGain: 1.7, windowGlow: 1.0, glowColor: '#ffd49e', sunGlow: 0.1,
+    lampGain: 1.7, bounce: 0.07, windowGlow: 1.0, glowColor: '#ffd49e', sunGlow: 0.1,
     bloom: { strength: 0.4, radius: 0.4, threshold: 1.6 },
     grade: { contrast: 1.05, saturation: 0.8, vignette: 0.26 },
   },
 };
+
+/** How much light the sky and the room's own bounce give a surface before any lamp: the hemisphere's two colours weighed by their luminance
+ *  (a bare intensity says nothing: night's cool sky is a third as bright as day's at any number), plus the image-based environment and the cool
+ *  fill, each weighed the same way. Used to keep the hours in order (night <= dusk <= day), which no single field can: dusk's env is above
+ *  day's because its sky image is dim, and the hemisphere's ground colour at night is a warm lamp-bounce stand-in, not a sky. */
+export function ambientOf(p: Preset): number {
+  const lin = (h: string) => { const n = hexOf(h); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => { const x = v / 255; return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); };
+  const L = (h: string) => { const [r, g, b] = lin(h); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  const hemi = p.hemi.intensity * (L(p.hemi.sky) + L(p.hemi.ground)) / 2;
+  const env = p.env * (L(p.sky[0]) + L(p.sky[1]) + L(p.sky[2])) / 3;
+  return hemi + env + p.fill.intensity * L(p.fill.color);
+}
 
 // The tone mapper is ACES filmic, as in Pascal's renderer, and every preset's exposure above is set for it.
 // Against the same frames, Khronos PBR Neutral kept a bright warm lamp's hue all the way up, so a lit room at
@@ -155,13 +182,13 @@ export function lookOf(p: Preset, look: Look = 1): Preset & { envSky?: [string, 
     grade: { ...p.grade, saturation: Math.max(p.grade.saturation, 0.86) },
   };
   // white balance: what a white wall facing the sun reads under this light (sRGB-ish linear weights), corrected
-  // three-quarters of the way toward neutral (the exponent 0.75 below) and normalised to luma 1, so exposure is untouched;
+  // three-quarters (p.wb) of the way toward neutral (the exponent 0.75 below) and normalised to luma 1, so exposure is untouched;
   // scripts/test-kit-look.mts measures the result on a white and a cobalt wall
   const lin = (c: string) => { const n = hexOf(c); return [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => (v / 255) ** 2.2); };
   const sun = lin(q.sun.color), hs = lin(q.hemi.sky), hg = lin(q.hemi.ground);
   const W = [0, 1, 2].map(k => sun[k] * q.sun.intensity * 0.5 + hs[k] * q.hemi.intensity * 0.5 + hg[k] * q.hemi.intensity * 0.2);
   const Y = 0.2126 * W[0] + 0.7152 * W[1] + 0.0722 * W[2];
-  const bal = W.map(w => Math.pow(Y / Math.max(w, 1e-6), 0.75));
+  const bal = W.map(w => Math.pow(Y / Math.max(w, 1e-6), typeof p.wb === 'number' ? p.wb : 0.75));
   const bY = 0.2126 * bal[0] + 0.7152 * bal[1] + 0.0722 * bal[2];
   q.balance = bal.map(v => +(v / bY).toFixed(4)) as [number, number, number];
   return q;
@@ -273,6 +300,7 @@ export function installSkyFog(THREE: any): { ground: any; sky: any } {
   const add = (u: any) => { if (u && u.fogColor && !u.fogGroundColor) { u.fogGroundColor = { value: ground }; u.fogSkyColor = { value: sky }; } };
   for (const k of Object.keys(THREE.ShaderLib)) add(THREE.ShaderLib[k].uniforms);
   add(THREE.UniformsLib.fog);
+  installRoomClip(THREE);   // the page's one patch point that runs before any program compiles: the room's light stays in its room (room-clip.ts)
   const C = THREE.ShaderChunk;
   C.fog_pars_vertex = '#ifdef USE_FOG\n\tvarying float vFogDepth;\n\tvarying vec3 vFogView;\n#endif';
   C.fog_vertex = '#ifdef USE_FOG\n\tvFogDepth = - mvPosition.z;\n\tvFogView = mvPosition.xyz;\n#endif';
@@ -303,14 +331,25 @@ export function installSkyFog(THREE: any): { ground: any; sky: any } {
 // screen), so a tagged pane gets a glowing twin of its material — one twin per source material — rather than
 // lighting every other user of the original.
 const glowTwins = new WeakMap<object, any>();
+/** the warm white a ceiling's bounce emits: the room's own light off its floor and walls, not the lamp's colour */
+export const BOUNCE_COLOR = 0xfff0dc;
 const matsOf = (o: any): any[] => (Array.isArray(o.material) ? o.material : o.material ? [o.material] : []);
 const seeThrough = (m: any): boolean => !!m && (m.transparent || (m.transmission || 0) > 0 || /glass|glazing|pane/i.test(m.name || ''));
 
-export function applyHouseGlow(THREE: any, root: any, p: Preset): { fixtures: number; panes: number } {
+export function applyHouseGlow(THREE: any, root: any, p: Preset): { fixtures: number; panes: number; bounced: number } {
   const glow = new THREE.Color(hexOf(p.glowColor));
-  let fixtures = 0, panes = 0;
+  let fixtures = 0, panes = 0, bounced = 0;
   root.traverse((o: any) => {
     const ud = o.userData;
+    // ceiling bounce: a material tagged userData.bounce (a number: 1, or less on a textured ceiling that a flat emissive would wash out)
+    // takes the preset's bounce as its emissive. Set, never scaled, so re-lighting is idempotent (the fixtureBase pattern, without the base)
+    if (o.isMesh) for (const m of matsOf(o)) {
+      const b = m && m.userData && m.userData.bounce;
+      if (!b || !m.emissive) continue;
+      m.emissive.setHex(p.bounceColor ? hexOf(p.bounceColor) : BOUNCE_COLOR);
+      m.emissiveIntensity = p.bounce * (typeof b === 'number' ? b : 1);
+      bounced++;
+    }
     if (!ud) return;
     if (ud.fixture) {
       o.traverse((n: any) => {
@@ -344,7 +383,7 @@ export function applyHouseGlow(THREE: any, root: any, p: Preset): { fixtures: nu
       });
     }
   });
-  return { fixtures, panes };
+  return { fixtures, panes, bounced };
 }
 
 // The composer's scene-referred grade, applied in linear light before tone mapping: contrast about mid-grey
@@ -361,8 +400,16 @@ export const GradeShader = {
   uniforms: {
     tDiffuse: { value: null },
     contrast: { value: 1.0 },
+    pivot: { value: 0.18 },
     saturation: { value: 1.0 },
     vignette: { value: 0.0 },
+    // LIGHT v3.1: the grade a frame has from outside the building, and how much of the frame's grade is the interior one (interiorWeight). Defaults make the
+    // outside grade the same as the inside one, so a caller that never sets them (an hour with no gradeOutside) is graded as before.
+    outContrast: { value: 1.0 },
+    outPivot: { value: 0.18 },
+    outSaturation: { value: 1.0 },
+    outVignette: { value: 0.0 },
+    interior: { value: 1.0 },
     aspect: { value: 16 / 9 },
     look: { value: GRADE_LOOK },
     balance: { value: GRADE_BALANCE },
@@ -372,20 +419,57 @@ export const GradeShader = {
     void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
   fragmentShader: /* glsl */`
     uniform sampler2D tDiffuse;
-    uniform float contrast, saturation, vignette, aspect;
+    uniform float contrast, saturation, vignette, aspect, pivot;
+    uniform float outContrast, outSaturation, outVignette, outPivot, interior;
     uniform vec3 look, balance;
     varying vec2 vUv;
+    // one grade: contrast about a grey, saturation, vignette. The inside and the outside grade are two calls, mixed by how far inside the house the camera is.
+    vec3 gradeOf(vec3 rgb, float k, float piv, float sat, float vig, float edge) {
+      rgb = pow(rgb / piv, vec3(k)) * piv;
+      float l = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
+      rgb = max(mix(vec3(l), rgb, sat * look.x), vec3(0.0));
+      return rgb * (1.0 - vig * edge);
+    }
     void main() {
       vec4 c = texture2D(tDiffuse, vUv);
       vec3 rgb = max(c.rgb, vec3(0.0)) * balance;
-      rgb = pow(rgb / 0.18, vec3(contrast)) * 0.18;
-      float l = dot(rgb, vec3(0.2126, 0.7152, 0.0722));
-      rgb = max(mix(vec3(l), rgb, saturation * look.x), vec3(0.0));
       vec2 d = (vUv - 0.5) * vec2(aspect, 1.0) / length(vec2(aspect, 1.0)) * 2.0;   // 0 centre, 1 corners
-      rgb *= 1.0 - vignette * smoothstep(0.35, 1.0, length(d));
-      gl_FragColor = vec4(rgb, c.a);
+      float edge = smoothstep(0.35, 1.0, length(d));
+      vec3 inside = gradeOf(rgb, contrast, pivot, saturation, vignette, edge);
+      vec3 graded = inside;
+      if (interior < 1.0) graded = mix(gradeOf(rgb, outContrast, outPivot, outSaturation, outVignette, edge), inside, interior);
+      gl_FragColor = vec4(graded, c.a);
     }`,
 };
+
+// Which grade a frame gets (LIGHT v3.1). The day grade that lifts a room's range (contrast 1.5 about 0.34) turned trees into near-black blobs and brick into black-maroon
+// from outside, on every orbit and hero frame. So the composer asks how far INSIDE the building the camera is, and the grade is the interior one inside and the preset's
+// `gradeOutside` out of doors. It is a function of the camera's position alone, continuous in it (a smoothstep of the distance to the building's volume), so a camera
+// walking in through a door crosses the wall without a pop: the grade is 0.5 a metre or so outside the wall and 1 at the wall, not a switch at the threshold.
+// The building's volume is each storey's footprint rectangles from the storey's floor (0.3 m under, as the room boxes) to its ceiling.
+export const GRADE_FADE = 2.5;   // m: the distance from the building's volume at which the interior grade is gone
+export interface GradeStorey { y: number; height: number; rects: Array<{ x: number; z: number; w: number; d: number }> }
+/** 0 (the outside grade) to 1 (the interior grade): 1 - smoothstep(0, fade, the distance from the camera to the nearest storey box of the building) */
+export function interiorWeight(cam: { x: number; y: number; z: number }, storeys: GradeStorey[], fade: number = GRADE_FADE): number {
+  let best = Infinity;
+  for (const s of storeys) {
+    const y0 = s.y - 0.3, y1 = s.y + s.height;
+    const dy = Math.max(y0 - cam.y, 0, cam.y - y1);
+    for (const r of s.rects) {
+      const dx = Math.max(r.x - cam.x, 0, cam.x - (r.x + r.w)), dz = Math.max(r.z - cam.z, 0, cam.z - (r.z + r.d));
+      const d = Math.hypot(dx, dy, dz);
+      if (d < best) best = d;
+    }
+  }
+  if (!isFinite(best)) return 1;   // no footprint (a bare prop sheet): the grade is the interior one, as it was
+  return 1 - smooth(0, fade, best);
+}
+/** GTAO's thickness (how thick the pass takes an occluder to be) inside the building and out of doors, blended by the same weight as the grade. A curtain beside a wall left a speckled
+ *  dark fringe at thickness 1 (LIGHT v3 item 5), so a room's is thin; but a tree's crown is leaf clumps, and at the thin value the occlusion between them goes and the crown goes flat
+ *  and lighter (golden orbit frames, mae 1-3 against BEFORE on 21 houses): out of doors the old value stays. */
+export const GTAO_THICKNESS = { inside: 0.25, outside: 1 };   // inside: v3 had 0.15; 0.25 keeps the curtain fringe fix (87-94 % of the dark fringe gone, residual 1.0-1.3 of 255 in luma) and gives back about a third of the contact shadow at chair feet, a sideboard base and a bedside (LIGHT v3.1 item 3)
+/** the storeys interiorWeight reads, from a HouseSpec's levels */
+export const storeysOf = (levels: any[] = []): GradeStorey[] => levels.map(l => ({ y: l.y || 0, height: l.height || 2.8, rects: l.footprint || [] }));
 
 // ---- the light on the page: a preset and an aim, applied to the scene ------------------------------------------
 // Moved out of room-creator.html (plan S0; Completeness A1 gives the light to S1, which owns this file): the page

@@ -286,7 +286,57 @@ export const PLACEMENT: Record<string, Place> = {
   // sectionals by size: the modular (compact), the L (standard, l-sectional above) and the U (large room)
   'u-sectional': def('seating', ['sofa-l', 'sofa-u'], ['living', 'den', 'media'], ['modern', 'industrial', 'mid-century', 'tropical'], { faces: 'focus' }),
   'modular-sectional': def('seating', ['sofa-l'], ['living', 'den', 'media', 'study'], ['mid-century', 'scandi', 'modern', 'tropical'], { faces: 'focus' }),
+
+  // ---- OWNER small (the dress kit: procedural small goods, assets/props/dress-*.ts). DORMANT: every role is a NEW dx-* role that no composer program asks
+  // for, so no pick re-rolls anywhere (scripts/test-compose-stability.mts proves it); only a fixture or a DRESS recipe places them. ----
+  'place-setting': def('decor', ['dx-place-setting'], [...DINING, ...KITCHENS], [], { surfaces: ['table', 'fitted'], pairsWith: ['dining-table'], colorRole: null }),
+  'plate-stack': def('decor', ['dx-plates'], [...DINING, ...KITCHENS], [], { surfaces: [...ON, 'fitted'], colorRole: null }),
+  'candle-trio': def('decor', ['dx-candles'], [...DINING, ...LIVING, ...KITCHENS, ...BEDS], [], { surfaces: [...ON, 'fitted'], colorRole: null }),
+  'carafe': def('decor', ['dx-carafe'], [...DINING, ...KITCHENS, ...BEDS], [], { surfaces: [...ON, 'fitted'], colorRole: null }),
+  'centerpiece': def('decor', ['dx-centerpiece'], [...DINING, ...LIVING, ...KITCHENS, 'hall', 'foyer'], [], { surfaces: [...ON, 'fitted'], colorRole: null }),
+  'kettle-and-mug': def('decor', ['dx-kettle'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  'tray-vignette': def('decor', ['dx-tray'], [...LIVING, ...BEDS, 'hall', 'foyer'], [], { surfaces: ON, colorRole: null }),
+  'vanity-set': def('decor', ['dx-vanity-set'], BATHS, [], { surfaces: ['bath', 'fitted'], colorRole: null }),
+  'table-runner': def('decor', ['dx-runner'], DINING, [], { surfaces: ['table'], pairsWith: ['dining-table'], colorRole: null }),
+  'cutting-board-set': def('decor', ['dx-boards'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  'utensil-crock': def('decor', ['dx-crock'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  'canister-trio': def('decor', ['dx-canisters'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  'bread-bin': def('decor', ['dx-bread-bin'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  'dish-rack': def('decor', ['dx-dish-rack'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  'tea-towel': def('decor', ['dx-tea-towel'], KITCHENS, [], { surfaces: ['fitted'], colorRole: null }),
+  'oil-pair': def('decor', ['dx-oils'], KITCHENS, [], { surfaces: ['fitted', 'appliance'], colorRole: null }),
+  'pot-on-hob': def('decor', ['dx-pot'], KITCHENS, [], { surfaces: ['appliance', 'fitted'], colorRole: null }),
+  'side-set': def('decor', ['dx-side-set'], [...LIVING, ...BEDS], [], { surfaces: ON, colorRole: null }),
+  'console-set': def('decor', ['dx-console-set'], ['hall', 'foyer', ...LIVING, ...DINING], [], { surfaces: ['storage', 'table'], pairsWith: ['console', 'sideboard'], colorRole: null }),
+  'shelf-style': def('decor', ['dx-shelf-style'], [...LIVING, ...WORK, ...BEDS, 'hall'], [], { surfaces: ['storage', 'desk'], colorRole: null }),
+  'nightstand-set': def('decor', ['dx-nightstand-set'], BEDS, [], { surfaces: ['storage', 'table'], pairsWith: ['nightstand', 'bed'], colorRole: null }),
+  'dresser-set': def('decor', ['dx-dresser-set'], [...BEDS, 'hall'], [], { surfaces: ['storage'], pairsWith: ['dresser'], colorRole: null }),
+  'slippers': def('decor', ['dx-slippers'], BEDS, [], { onSurface: false, against: 'free', clear: C(0.1, 0.05), colorRole: null }),
+  'tissue-candle': def('decor', ['dx-tissue-candle'], BATHS, [], { surfaces: ['bath', 'fitted'], colorRole: null }),
+  'tub-tray': def('decor', ['dx-tub-tray'], BATHS, [], { surfaces: ['bath'], colorRole: null }),
+  'roll-holder': def('decor', ['dx-roll-holder'], BATHS, [], { onSurface: false, against: 'wall', hangs: 'wall', mountY: 0.75, clear: C(0.2, 0.05), colorRole: null }),
+  'umbrella-stand': def('decor', ['dx-umbrella-stand'], ['foyer', 'hall'], [], { onSurface: false, against: 'wall', clear: C(0.3, 0.05), colorRole: null }),
+  'door-mat': def('rug', ['dx-door-mat'], ['foyer', 'hall'], [], { colorRole: null }),
+  'shoe-row': def('decor', ['dx-shoe-row'], ['foyer', 'hall'], [], { onSurface: false, against: 'wall', clear: C(0.3, 0.05), colorRole: null }),
+  'leaner-mirror': def('decor', ['dx-leaner-mirror'], [...BEDS, 'foyer', 'hall'], [], { onSurface: false, against: 'wall', clear: C(0.4, 0.05), colorRole: null }),
 };
+
+// ---- OWNER soft ---------------------------------------------------------------------------------------------------
+// New soft types (assets/props/soft2.ts), each under a NEW role so no existing role's candidate list changes and no pick re-rolls: they are
+// dormant until the dress phase places them. Never append to an existing role's list.
+Object.assign(PLACEMENT, {
+  'towel-stack': def('textile', ['soft-towel-stack'], BATHS, [], { onSurface: true, surfaces: ['bath', 'fitted', 'storage'], colorRole: 'accent' }),
+  'towel-ring-set': def('art', ['soft-towel-ring'], BATHS, [], { mountY: 0.95, colorRole: 'metal' }),
+  'robe-hook': def('art', ['soft-robe-hook'], [...BATHS, ...BEDS], [], { mountY: 0.55, colorRole: 'linen' }),
+  'trough-planter': def('plant', ['soft-planter'], [...LIVING, 'foyer', 'sunroom', ...KITCHENS], [], { clear: C(0.2, 0.05, 0.05), colorRole: 'accent' }),
+  'pothos': def('plant', ['soft-pothos'], [...LIVING, ...KITCHENS, ...BEDS, ...WORK], [], { onSurface: true, surfaces: ON }),
+  // window treatments (assets/props/windows.ts): roles `blind` and `shutter` are the plan's own, the others new too; none is asked for until the dress phase
+  'roman-blind': def('textile', ['blind'], [...LIVING, ...BEDS, ...DINING, ...KITCHENS], [], { against: 'window', hangs: 'wall' }),
+  'roller-shade': def('textile', ['blind'], [...LIVING, ...BEDS, ...WORK, ...KITCHENS, ...BATHS], [], { against: 'window', hangs: 'wall' }),
+  'cafe-curtain': def('textile', ['blind-cafe'], [...KITCHENS, ...BATHS, ...DINING], [], { against: 'window', hangs: 'wall' }),
+  'shutters': def('textile', ['shutter'], [...LIVING, ...BEDS, ...DINING, ...KITCHENS], [], { against: 'window', hangs: 'wall', colorRole: 'linen' }),
+  'valance': def('textile', ['valance'], [...LIVING, ...BEDS, ...DINING, ...KITCHENS], [], { against: 'window', hangs: 'wall' }),
+});
 
 // A floor plant stands wherever people live: which rooms have the light and the size for one is the composer's business
 // (its clearances and windows), not a list per plant, and a bedroom that could only take three of the fourteen kinds

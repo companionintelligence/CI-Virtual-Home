@@ -33,7 +33,7 @@ const LEAVES = ['single', 'double', 'french', 'glazed', 'none'];
 const GRIDS = ['none', '2x2', 'vertical', 'prairie'];
 const HEADS = ['flat', 'arch', 'segmental', 'pediment', 'keystone', 'crown'];   // the last three are S2's dressing (scripts/validate/arch.mts checks the same list)
 // every item takes these; anything else must be one of its builder's parameters
-const COMMON = new Set(['type', 'at', 'rot', 'y', 'id', 'note', '$comment', 'src', 'name', 'label', 'lock']);
+const COMMON = new Set(['type', 'at', 'rot', 'y', 'id', 'note', '$comment', 'src', 'dk', 'name', 'label', 'lock']);   // (`src` marks an item the composer or the dress phase wrote; `dk` is the dress phase's seed key: room, slot, ordinal)
 const ON_SURFACE = new Set(['curved-monitor', 'chalk-tower', 'charcoal-tower', 'strix-mini', 'speakers']);
 const HUNG = new Set(['pendant-lamp', 'chandelier', 'ceiling-light']);
 

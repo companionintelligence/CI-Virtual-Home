@@ -562,6 +562,38 @@
               "d": 3,
               "color": "#6b6335",
               "src": "compose@1"
+            },
+            {
+              "type": "door-mat",
+              "at": [
+                2.1,
+                5.64
+              ],
+              "rot": 180,
+              "w": 0.9,
+              "d": 0.45,
+              "src": "dress@1",
+              "dk": "l2.02:entry:0"
+            },
+            {
+              "type": "umbrella-stand",
+              "at": [
+                0.98,
+                4.645
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l2.02:entry:1"
+            },
+            {
+              "type": "shoe-row",
+              "at": [
+                3.548,
+                5.776
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l2.02:entry:2"
             }
           ],
           "lock": true
@@ -687,6 +719,18 @@
               "motif": "botanical",
               "y": 1.539,
               "src": "compose@1"
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                -0.555,
+                4.794
+              ],
+              "y": 0.76,
+              "variant": 0,
+              "color": "#a0afa3",
+              "src": "dress@1",
+              "dk": "l2.03:table:0"
             }
           ],
           "lock": true
@@ -929,6 +973,101 @@
                 -2.55,
                 -0.55
               ]
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                -0.759,
+                -5.61
+              ],
+              "y": 0.918,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l2.04:hob:0"
+            },
+            {
+              "type": "mushroom-lamp",
+              "at": [
+                2.53,
+                -3.898
+              ],
+              "y": 0.9,
+              "src": "dress@1",
+              "dk": "l2.04:lamp:0"
+            },
+            {
+              "type": "tea-towel",
+              "at": [
+                3.75,
+                -3.786
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l2.04:counters:0"
+            },
+            {
+              "type": "kettle-and-mug",
+              "at": [
+                -0.152,
+                -5.75
+              ],
+              "y": 0.9,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l2.04:counters:1"
+            },
+            {
+              "type": "cutting-board-set",
+              "at": [
+                0.15,
+                -5.5
+              ],
+              "y": 0.9,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l2.04:counters:2"
+            },
+            {
+              "type": "canister-trio",
+              "at": [
+                2.676,
+                -5.79
+              ],
+              "y": 0.9,
+              "variant": 0,
+              "color": "#a0afa3",
+              "src": "dress@1",
+              "dk": "l2.04:counters:3"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                3.916,
+                -4.942
+              ],
+              "rot": 270,
+              "w": 1.115,
+              "h": 0.881,
+              "y": 0.545,
+              "color": "#cccfc0",
+              "src": "dress@1",
+              "dk": "l2.04:windows:0"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                3.916,
+                -3.657
+              ],
+              "rot": 270,
+              "w": 1.115,
+              "h": 0.881,
+              "y": 0.545,
+              "color": "#cccfc0",
+              "src": "dress@1",
+              "dk": "l2.04:windows:1"
             }
           ]
         },
@@ -1110,6 +1249,69 @@
                 -5.451
               ],
               "src": "compose@1"
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                -5.805,
+                -3.296
+              ],
+              "y": 0.76,
+              "variant": 1,
+              "color": "#a0afa3",
+              "src": "dress@1",
+              "dk": "l2.05:table:0"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -6.041,
+                -2.754
+              ],
+              "y": 0.76,
+              "variant": 0,
+              "color": "#a0afa3",
+              "src": "dress@1",
+              "dk": "l2.05:table:1"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -6.146,
+                -3.424
+              ],
+              "rot": 270,
+              "y": 0.76,
+              "variant": 1,
+              "color": "#a0afa3",
+              "src": "dress@1",
+              "dk": "l2.05:table:2"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -5.454,
+                -3.334
+              ],
+              "rot": 90,
+              "y": 0.76,
+              "variant": 2,
+              "color": "#a0afa3",
+              "src": "dress@1",
+              "dk": "l2.05:table:3"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -5.454,
+                -2.776
+              ],
+              "rot": 90,
+              "y": 0.76,
+              "variant": 2,
+              "color": "#a0afa3",
+              "src": "dress@1",
+              "dk": "l2.05:table:4"
             }
           ],
           "lock": true
@@ -1632,6 +1834,18 @@
               "color": "#a8573d",
               "y": 0.72,
               "src": "compose@1"
+            },
+            {
+              "type": "dresser-set",
+              "at": [
+                -2.795,
+                -5.141
+              ],
+              "rot": 90,
+              "y": 0.72,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l3.07:dresser:0"
             }
           ],
           "lock": true
@@ -1722,6 +1936,41 @@
               "rot": 90,
               "color": "#6d8c80",
               "src": "compose@1"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                2.18,
+                -5.316
+              ],
+              "rot": 90,
+              "y": 0.805,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l3.08:tank:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                2.073,
+                -4.76
+              ],
+              "rot": 90,
+              "y": 0.55,
+              "color": "#e8e4d6",
+              "src": "dress@1",
+              "dk": "l3.08:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                2.111,
+                -5.64
+              ],
+              "rot": 90,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l3.08:roll:0"
             }
           ],
           "lock": true
@@ -1845,6 +2094,52 @@
                 -5.715
               ],
               "src": "compose@1"
+            },
+            {
+              "type": "vanity-set",
+              "at": [
+                -5.27,
+                -5.645
+              ],
+              "y": 0.89,
+              "variant": 1,
+              "color": "#a0afa3",
+              "src": "dress@1",
+              "dk": "l3.09:vanity:0"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                -8.509,
+                -5.81
+              ],
+              "y": 0.805,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l3.09:tank:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                -4.76,
+                -1.083
+              ],
+              "rot": 180,
+              "y": 0.55,
+              "color": "#e8e4d6",
+              "src": "dress@1",
+              "dk": "l3.09:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                -8.879,
+                -5.54
+              ],
+              "rot": 90,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l3.09:roll:0"
             }
           ],
           "lock": true
@@ -2019,6 +2314,18 @@
               "rot": 180,
               "color": "#e0d6bf",
               "src": "compose@1"
+            },
+            {
+              "type": "dresser-set",
+              "at": [
+                0.595,
+                4.177
+              ],
+              "rot": 270,
+              "y": 0.72,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l3.10:dresser:0"
             }
           ],
           "lock": true
@@ -2110,6 +2417,16 @@
               "rot": 180,
               "color": "#6b6335",
               "src": "compose@1"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                1.043,
+                4.205
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l3.11:mirror:0"
             }
           ],
           "lock": true

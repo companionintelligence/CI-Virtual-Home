@@ -27,6 +27,13 @@
 //     --lint            the layout lints (assets/layout-lint.ts) of the result, by code
 //     --json            print the report as JSON
 //
+//   The dress phase (plan 5.6, assets/room-dress.ts) is a second, separate pass over a frozen layout; these two flags do ONLY it (the layout is never recomposed):
+//     --dress           add the dress phase's items (src: 'dress@1', the small goods, lamps, towels) to every room that has a recipe and no `dress: false`, at
+//                       --level <0..1> (default each room's own `dress.level`, else 0.5). Idempotent: every dress@1 item is stripped first, so a second run writes the same file
+//     --undress         strip every dress@1 item, and nothing else: --dress then --undress gives the original back byte for byte (the file's final newline, or none, is kept)
+//     --rooms a,b       (with either) only these rooms;  --write / --out <file>  as above (--dress / --undress never lock a room)
+//   A dress item stands on a host the layout made, so redo it after a layout re-bake. Streams never bake into content/houses/ (plan 5.6): the pilot and the fleet pass do.
+//
 // Re-baking is safe: an item the composer wrote carries `src: 'compose@1'`, an authored one does not, so a re-bake
 // keeps yours and replaces the composer's. JSON is written with 2-space indent like the specs (a float authored as
 // `3.0` comes back as `3`: the numbers are the same).
@@ -42,23 +49,70 @@ if (!src) { console.error('usage: compose-house.mts --house <id | path.json> [--
 
 const file = [src, path.join(ROOT, 'content', 'houses', `${src}.json`), path.join(ROOT, 'test', 'fixtures', 'houses', `${src}.json`)].find(f => f.endsWith('.json') && fs.existsSync(f));
 if (!file) { console.error(`no spec "${src}" (looked in content/houses, test/fixtures/houses and as a path)`); process.exit(2); }
-const spec = JSON.parse(fs.readFileSync(file, 'utf8'));
+// (JSON in and out with the number tokens kept: a spec a script wrote has `1.0` and `-5.0` (the dress fixtures), and a rewrite that turns them into `1` and `-5` is not the file it was.
+// Node's JSON.parse hands a reviver each number's source text, and JSON.rawJSON writes it back: a token is replayed only for a number that still has its value)
+const tokens = new WeakMap<object, Map<string, string>>();
+const parseFaithful = (text: string): any => JSON.parse(text, function (this: any, k: string, v: any, ctx?: { source?: string }) {
+  if (typeof v === 'number' && ctx && ctx.source !== undefined && ctx.source !== JSON.stringify(v)) { let m = tokens.get(this); if (!m) tokens.set(this, m = new Map()); m.set(k, ctx.source); }
+  return v;
+} as any);
+const stringifyFaithful = (v: any): string => JSON.stringify(v, function (this: any, k: string, val: any) { const t = typeof val === 'number' ? tokens.get(this)?.get(k) : undefined; return t !== undefined && Number(t) === val ? (JSON as any).rawJSON(t) : val; }, 2);
+const raw = fs.readFileSync(file, 'utf8'), spec = parseFaithful(raw);
 const { composeHouse } = await import(path.join(ROOT, 'assets', 'room-composer.js'));
 const { inferProgram, isProgram, isComposed, PROGRAMS } = await import(path.join(ROOT, 'assets', 'room-programs.js'));
 const { STYLE_KEYS } = await import(path.join(ROOT, 'assets', 'house-styles.js'));
 const { lintLayout } = await import(path.join(ROOT, 'assets', 'layout-lint.js'));
 const { PLACEMENT } = await import(path.join(ROOT, 'assets', 'props', 'placement.js'));
-const SRC = 'compose@1';
+const SRC = 'compose@1', DRESS_SRC = 'dress@1';   // (a layout re-bake strips both: a dress item stands on a host the new layout may not have, the dress phase makes them again)
 
 const only = opt('rooms') ? new Set(opt('rooms')!.split(',').map(s => s.trim())) : null;
 const style = opt('style'); if (style && !STYLE_KEYS.includes(style)) { console.error(`unknown style "${style}": ${STYLE_KEYS.join(', ')}`); process.exit(2); }
 const seed = opt('seed'), density = opt('density') !== null ? Number(opt('density')) : null;
 if (density !== null && !(density >= 0 && density <= 1)) { console.error('--density is 0..1'); process.exit(2); }
-const INFER = flag('infer'), REPLACE = flag('replace'), REBAKE = flag('rebake'), WRITE = flag('write');
+const INFER = flag('infer'), REPLACE = flag('replace'), REBAKE = flag('rebake'), WRITE = flag('write'), DRESS = flag('dress'), UNDRESS = flag('undress');
+if (DRESS && UNDRESS) { console.error('--dress and --undress are one or the other (--dress strips first)'); process.exit(2); }
 if (REPLACE && !INFER) { console.error('--replace goes with --infer'); process.exit(2); }
 // what --replace keeps: the focal pieces the composer arranges round, and the hero set / structure (the Core's own pieces)
 const KEEP = new Set(opt('keep') === 'none' ? [] : (opt('keep') || 'fireplace,wall-tv').split(',').map(t => t.trim()));
 const keepsPiece = (it: any) => KEEP.has(it.type) || (opt('keep') !== 'none' && ['hero', 'structure'].includes((PLACEMENT[it.type] || {}).group));
+
+// ---- the dress phase alone: strip, then (--dress) dress, and write
+if (DRESS || UNDRESS) {
+  const { dressRooms } = await import(path.join(ROOT, 'assets', 'room-dress.js'));
+  const level = opt('level') !== null ? Number(opt('level')) : undefined;
+  if (level !== undefined && !(level >= 0 && level <= 1)) { console.error('--level is 0..1'); process.exit(2); }
+  const wanted = (room: any) => !only || only.has(room.name) || only.has(String(room.no));
+  let stripped = 0, added = 0;
+  for (const lv of spec.levels || []) for (const room of lv.rooms || []) {
+    if (!room.bounds || !wanted(room)) continue;
+    if (room.items) { const before = room.items.length; room.items = room.items.filter((i: any) => i.src !== DRESS_SRC); stripped += before - room.items.length; }
+  }
+  const rows: Array<{ level: string; name: string; program: string; items: number; level_: number; slots: string; skipped: number }> = [];
+  if (DRESS) {
+    const res = dressRooms(spec, level === undefined ? {} : { level });
+    for (const lv of spec.levels || []) for (const room of lv.rooms || []) {
+      const r = res.get(room); if (!r || !wanted(room)) continue;
+      room.items = [...(room.items || []), ...r.items]; added += r.items.length;
+      rows.push({ level: lv.id, name: room.name, program: r.program, items: r.items.length, level_: r.level, slots: r.slots.map((x: any) => `${x.slot}:${x.n}`).join(' '), skipped: r.skipped.length });
+    }
+  }
+  console.log(`${path.relative(process.cwd(), file)}: ${UNDRESS ? `stripped ${stripped} dress item${stripped === 1 ? '' : 's'}` : `dressed ${rows.length} room${rows.length === 1 ? '' : 's'} with ${added} items${stripped ? ` (after stripping ${stripped})` : ''}`}`);
+  for (const r of rows) console.log(`  ${r.level} ${r.name.padEnd(26)} ${r.program.padEnd(14)} ${String(r.items).padStart(3)} items at level ${r.level_}  ${r.slots}${r.skipped ? `  (${r.skipped} skipped)` : ''}`);
+  if (WRITE || opt('out')) {
+    const out = opt('out') ? path.resolve(opt('out')!) : file;
+    fs.mkdirSync(path.dirname(out), { recursive: true });
+    // (the file's own form is kept, so --dress then --undress is the identity on the bytes: its final newline, or none (the repo's specs have none, a fixture has one), its number tokens (`1.0`), and whether it
+    // writes non-ASCII as \uXXXX escapes (cocoon's emoji does) or as characters. A file in neither form is reformatted by any write of this tool, said so below, and a room with no
+    // `items` key at all comes back with `"items": []`: JSON-equal, not byte-equal)
+    const ascii = (t: string) => t.replace(/[\u0080-\uffff]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+    const body = raw.replace(/\n$/, ''), plainRaw = stringifyFaithful(parseFaithful(raw)), escaped = body === ascii(plainRaw) && body !== plainRaw;
+    if (body !== plainRaw && !escaped) console.log(`note: ${path.relative(process.cwd(), file)} is not in canonical 2-space JSON: this write reformats it (the content is the same)`);
+    const text = stringifyFaithful(spec);
+    fs.writeFileSync(out, (escaped ? ascii(text) : text) + (raw.endsWith('\n') ? '\n' : ''));
+    console.log(`written → ${path.relative(process.cwd(), out)}`);
+  }
+  process.exit(0);
+}
 
 // ---- prepare the copy: which rooms compose, and as what
 const picked: Array<{ lv: any; room: any; inferred: boolean }> = [];
@@ -66,7 +120,7 @@ for (const lv of spec.levels || []) for (const room of lv.rooms || []) {
   if (!room.bounds) continue;
   if (only && !only.has(room.name) && !only.has(String(room.no))) continue;
   const items: any[] = room.items || [];
-  if (REBAKE && room.lock) { room.items = items.filter(i => i.src !== SRC); delete room.lock; }
+  if (REBAKE && room.lock) { room.items = items.filter(i => i.src !== SRC && i.src !== DRESS_SRC); delete room.lock; }
   let inferred = false;
   if (!isProgram(room.program)) {
     if (!INFER) continue;
@@ -99,7 +153,7 @@ function bake(s: any, results: Map<any, any>) {
   srcRooms.forEach((room: any, i: number) => {
     const r = results.get(room); if (!r) return;
     const dst = dstRooms[i];
-    dst.items = [...(room.items || []).filter((it: any) => it.src !== SRC), ...r.items];
+    dst.items = [...(room.items || []).filter((it: any) => it.src !== SRC && it.src !== DRESS_SRC), ...r.items];
     dst.lock = true;
   });
   return copy;

@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "comment": "Role table for LowPolyAssetPack_Free: every mesh uses one material, MasterMaterial, a 32 x 32 flat-colour palette (TextureMap/MasterMaterial1px.png). A triangle's role comes from the palette cell its UVs sit in: \"col,row\" with row counted from the TOP of the image. Curated by hand, one line per cell a shipped model uses; the bake fails on a cell not listed here or in the entry's own `roles.cells`. `bake.mts --swatches <id>` prints each cell's mean colour for the human; nothing from the palette ships (its colours become role names, and the role's colour comes from the house at runtime or from a fixed literal in assets/props/model-kit.ts).",
+  "by": "palette",
+  "paletteMaterials": ["MasterMaterial"],
+  "grid": [32, 32],
+  "paletteImage": "LowPolyAssetPack_Free/LowPolyAssetPack_Free/TextureMap/MasterMaterial1px.png",
+  "cells": {
+    "9,22": "cardboard"
+  }
+}

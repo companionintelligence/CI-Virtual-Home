@@ -39,6 +39,9 @@ const restrain = (c, sMax = 0.3, keep = 0.4) => {
   const k = (sMax + (s - sMax) * keep) / s, Y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
   return fromRgb([r, g, b].map(x => (Y + (x - Y) * k) * 255) as [number, number, number]);
 };
+/** a colour held under an albedo cap: every channel scaled together so the brightest is at most `cap` (0..1) of full. Pure white has no fold
+ *  or shadow to read and clips under any lamp; finish-roles.ts says linen stops at 0.80 (fixtures.ts capLinen applies it, to bedding, pillows and towels). */
+export const capAlbedo = (c: number, cap: number): number => { const m = Math.max(...toRgb(c)) / 255; return m <= cap ? c : fromRgb(toRgb(c).map(v => v * cap / m) as [number, number, number]); };
 export const colourMath = { hex, mix, lum, css, toRgb, fromRgb, restrain };
 
 // The palette as the house is built: saturated walls and roofs are pulled toward restraint (colour comes from
@@ -149,7 +152,7 @@ export function createMaterialKit({ THREE, palette = {}, seed = 'house', keep = 
   const wood = lift(pick(WOODS));
   const cabinet = lift(pick(CABINETS));
   const rug = mix(restrain(accent, 0.2, 0.3), 0x7a746c, 0.55);
-  const colors = { wall, trim, accent: keeps.has('accent') ? accent : restrain(accent, 0.18, 0.2), roof, fabric, fabric2, wood, cabinet, rug, linen: 0xf2efe9, metal: 0x2b2f33 };
+  const colors = { wall, trim, accent: keeps.has('accent') ? accent : restrain(accent, 0.18, 0.2), roof, fabric, fabric2, wood, cabinet, rug, linen: 0xf2efe9, metal: 0x2b2f33 };   // linen stays the soft white it was: the albedo cap (finish-roles.ts, 0.85) is applied to bedding, pillows and towels only, in fixtures.ts capLinen, not to every off-white object that reads this role
 
   // ---- textures: one library per house, seeded by its id; sets are cached per (kind, options)
   const lib = createTextureLibrary({ THREE, rngFor: key => mulberry32(fnv1a(`${seed}:${key}`)) });

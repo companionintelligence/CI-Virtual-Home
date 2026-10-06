@@ -14,6 +14,7 @@
 //   no y     → the prop hangs itself at its natural height above the floor origin (the sheet, the catalog, terse specs)
 // `height` is the prop's own extent either way; the iso hints are written for the no-y case.
 import { registerProps } from './registry.js';
+import { softkit, softMat, put, splitRng, drapeTowel } from './softkit.js';
 
 // ---- small builders shared by the props below
 const cyl = (THREE, rt, rb, h, mat, x = 0, y = 0, z = 0, seg = 20, shadow = true) => {
@@ -196,15 +197,17 @@ registerProps({
   // (bar at 1.09) unless the spec gives y.
   'towel-rail': {
     footprint: [0.6, 0.14], height: 0.37, params: ['w', 'y', 'color'], tags: ['bathroom'],
-    create(it, { THREE, std, box, group, colors, hex, rng }) {
-      const w = it.w || 0.6, g = group('Towel Rail'), metal = chrome(std, colors.metal);
-      const y0 = mountY(it, 0.72), by = y0 + 0.37;
-      for (const s of [-1, 1]) { g.add(box(0.05, 0.05, 0.01, metal, s * (w / 2 - 0.04), by, 0.005)); g.add(box(0.024, 0.024, 0.08, metal, s * (w / 2 - 0.04), by, 0.045)); }
-      g.add(bar(THREE, 0.012, w, metal, 0, by, 0.09, 'x', 12));
-      const towel = std(it.color ? hex(it.color) : towelColor(colors, rng), { roughness: 0.95 }), tw = w * 0.55;
-      g.add(box(tw, 0.03, 0.065, towel, 0, by + 0.02, 0.09));                                           // over the bar
-      g.add(box(tw, 0.35, 0.025, towel, 0, by - 0.16, 0.1225));                                         // front leaf
-      g.add(box(tw, 0.3, 0.025, towel, 0, by - 0.135, 0.0575));                                         // back leaf
+    // softkit: the brackets and the bar are one chrome mesh, the towel one closed lens draped over the bar (drapeTowel): 2 meshes where the boxes were 8
+    create(it, ctx) {
+      const { THREE, std, group, colors, hex, rng } = ctx, K = softkit(THREE);
+      const w = it.w || 0.6, g = group('Towel Rail'), y0 = mountY(it, 0.72), by = y0 + 0.37;
+      const hard = new K.Acc();
+      for (const s of [-1, 1]) { K.slab(hard, s * (w / 2 - 0.04), by, 0.005, 0.05, 0.05, 0.01); K.slab(hard, s * (w / 2 - 0.04), by, 0.045, 0.024, 0.024, 0.08); }
+      K.strut(hard, [-w / 2, by, 0.09], [w / 2, by, 0.09], 0.012, 0.012, 12);
+      put(g, hard, chrome(std, colors.metal, { vertexColors: true }), 'hardware', { receive: false });
+      const col = it.color ? hex(it.color) : towelColor(colors, rng), r = splitRng(rng), tw = new K.Acc();
+      drapeTowel(THREE, tw, { by, zb: 0.09, rb: 0.012, tw: w * 0.55, L1: 0.335, L2: 0.285, belly: 0.01, ph: r() * 6.28 });
+      put(g, tw, softMat(ctx, col, { roughness: 0.96 }), 'towel');
       return g;
     },
     iso: [
@@ -310,17 +313,21 @@ registerProps({
   // rung above the gap. Chrome unless the spec colours it (a painted rail). Bottom at 0.25 unless y is given.
   'heated-towel-rail': {
     footprint: [0.5, 0.11], height: 1.0, params: ['w', 'h', 'y', 'color'], tags: ['bathroom'],
-    create(it, { THREE, std, box, group, colors, hex, rng }) {
+    // softkit: uprights, rungs and brackets are one metal mesh, the towel one lens over the rung above the gap: 2 meshes where there were ~16
+    create(it, ctx) {
+      const { THREE, std, group, colors, hex, rng } = ctx, K = softkit(THREE);
       const w = it.w || 0.5, h = it.h || 1.0, g = group('Heated Towel Rail');
-      const y0 = mountY(it, 0.25), metal = it.color ? std(hex(it.color), { roughness: 0.35 }) : chrome(std, colors.metal);
-      for (const s of [-1, 1]) g.add(cyl(THREE, 0.013, 0.013, h, metal, s * (w / 2 - 0.013), y0 + h / 2, 0.07, 10));   // uprights
-      const n = Math.max(4, Math.round(h / 0.11)), rungs = [];
+      const y0 = mountY(it, 0.25), metal = it.color ? std(hex(it.color), { roughness: 0.35, vertexColors: true }) : chrome(std, colors.metal, { vertexColors: true });
+      const hard = new K.Acc();
+      for (const s of [-1, 1]) K.strut(hard, [s * (w / 2 - 0.013), y0, 0.07], [s * (w / 2 - 0.013), y0 + h, 0.07], 0.013, 0.013, 10);   // uprights
+      const n = Math.max(4, Math.round(h / 0.11)), rungs: number[] = [];
       for (let i = 0; i < n; i++) { const t = (i + 0.5) / n; if (t > 0.42 && t < 0.58) continue; rungs.push(y0 + 0.05 + t * (h - 0.1)); }
-      for (const y of rungs) g.add(bar(THREE, 0.009, w - 0.04, metal, 0, y, 0.07, 'x', 8));
-      for (const [sx, ty] of [[-1, 0.15], [1, 0.15], [-1, 0.85], [1, 0.85]]) g.add(box(0.026, 0.026, 0.06, metal, sx * (w / 2 - 0.013), y0 + ty * h, 0.03));   // brackets
-      const towel = std(rng() < 0.5 ? colors.accent : colors.linen, { roughness: 0.95 }), ty = rungs[Math.floor(rungs.length / 2)];
-      g.add(box(w * 0.6, 0.03, 0.06, towel, 0, ty + 0.018, 0.07));
-      g.add(box(w * 0.6, 0.3, 0.025, towel, 0, ty - 0.135, 0.0975));
+      for (const y of rungs) K.strut(hard, [-(w / 2 - 0.02), y, 0.07], [w / 2 - 0.02, y, 0.07], 0.009, 0.009, 8, 1, 1, false);
+      for (const [sx, ty] of [[-1, 0.15], [1, 0.15], [-1, 0.85], [1, 0.85]]) K.slab(hard, sx * (w / 2 - 0.013), y0 + ty * h, 0.03, 0.026, 0.026, 0.06);   // brackets
+      put(g, hard, metal, 'hardware', { receive: false });
+      const col = rng() < 0.5 ? colors.accent : colors.linen, ty = rungs[Math.floor(rungs.length / 2)], r = splitRng(rng), tw = new K.Acc();
+      drapeTowel(THREE, tw, { by: ty, zb: 0.07, rb: 0.009, tw: w * 0.6, L1: 0.285, L2: 0.2, belly: 0.008, ph: r() * 6.28 });
+      put(g, tw, softMat(ctx, col, { roughness: 0.96 }), 'towel');
       return g;
     },
     iso: [
@@ -481,18 +488,22 @@ registerProps({
   // (the towel rail's alternative: farmhouse, cottage, tropical, scandi). Its back is at z = −d/2 at the top.
   'towel-ladder': {
     footprint: [0.55, 0.32], height: 1.6, params: ['color'], tags: ['bathroom'],
-    create(it, { THREE, std, box, group, colors, hex, rng }) {
-      const w = 0.5, g = group('Towel Ladder'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.55 });
-      const V = (x, y, z) => new THREE.Vector3(x, y, z), top = V(0, 1.6, -0.15), foot = V(0, 0.02, 0.15), d = top.clone().sub(foot), L = d.length();
-      const lean = Math.atan2(0.3, 1.58);
-      for (const s of [-1, 1]) {
-        const m = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, L, 10), wood);
-        m.position.set(s * w / 2, 0.81, 0); m.rotation.x = lean; m.castShadow = true; g.add(m);
-      }
-      const rung = (t, mat = wood) => { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, w, 10), mat); r.rotation.z = Math.PI / 2; r.position.set(0, 0.02 + 1.58 * t, 0.15 - 0.3 * t); r.castShadow = true; g.add(r); };
-      for (const t of [0.12, 0.3, 0.48, 0.66, 0.84, 0.97]) rung(t);
-      const towel = std(towelColor(colors, rng), { roughness: 0.95 });
-      for (const [t, len] of [[0.66, 0.55], [0.3, 0.45]]) { const y = 0.02 + 1.58 * t, z = 0.15 - 0.3 * t; g.add(box(w * 0.8, len, 0.02, towel, 0, y - len / 2 + 0.03, z + 0.03)); g.add(box(w * 0.8, len * 0.85, 0.02, towel, 0, y - len * 0.85 / 2 + 0.03, z - 0.03)); g.add(box(w * 0.8, 0.02, 0.09, towel, 0, y + 0.03, z)); }
+    // softkit: the two stiles and six rungs are one timber mesh, each towel one lens draped over its rung (two colours): 3 meshes where there were 14.
+    // The stiles lean the way the rungs step (foot forward, top to the wall).
+    create(it, ctx) {
+      const { THREE, std, group, colors, hex, rng } = ctx, K = softkit(THREE);
+      const w = 0.5, g = group('Towel Ladder'), wood = std(it.color ? hex(it.color) : colors.wood, { roughness: 0.55, vertexColors: true });
+      const hard = new K.Acc();
+      for (const s of [-1, 1]) K.strut(hard, [s * w / 2, 0.02, 0.15], [s * w / 2, 1.6, -0.15], 0.018, 0.018, 10);
+      const rungAt = (t: number) => [0.02 + 1.58 * t, 0.15 - 0.3 * t] as const;
+      for (const t of [0.12, 0.3, 0.48, 0.66, 0.84, 0.97]) { const [y, z] = rungAt(t); K.strut(hard, [-w / 2, y, z], [w / 2, y, z], 0.011, 0.011, 8, 1, 1, false); }
+      put(g, hard, wood, 'hardware');
+      const c1 = towelColor(colors, rng), c2 = c1 === colors.accent ? colors.fabric2 : colors.accent, r = splitRng(rng);
+      [[0.66, 0.52, c1], [0.3, 0.42, c2]].forEach(([t, len, col]: any) => {
+        const [y, z] = rungAt(t), tw = new K.Acc();
+        drapeTowel(THREE, tw, { by: y, zb: z, rb: 0.011, tw: w * 0.8, L1: len, L2: len * 0.85 - 0.03, belly: 0.008 + r() * 0.004, ph: r() * 6.28, cols: 5 });
+        put(g, tw, softMat(ctx, col, { roughness: 0.96 }), 'towel');
+      });
       return g;
     },
     iso: [{ shape: 'box', box: [-0.25, 0, -0.15, 0.25, 1.6, 0.15], color: 'role:wood' }],

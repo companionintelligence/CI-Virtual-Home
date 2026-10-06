@@ -59,7 +59,7 @@ jobs:
       - name: Floor-plan graph + wall compiler tests
         run: pnpm run test
 
-      # the 15 quick test scripts (scripts/test-*.mts marked `@check-house quick`): spec types, the kit's rules, QA v2's fault
+      # the 24 quick test scripts (scripts/test-*.mts marked `@check-house quick`): spec types, the kit's rules, QA v2's fault
       # injection, the room composer, the site and species builders, the validator plugin seam … pure Node, no browser, no GPU,
       # a few minutes in all. A pull request that breaks one is red here, before deploy.yml can publish it.
       - name: Node-only tests (spec types, kit, composer, shot QA, site …)

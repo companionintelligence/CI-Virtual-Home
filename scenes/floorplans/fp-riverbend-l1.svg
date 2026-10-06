@@ -112,10 +112,10 @@
 <rect x="1085.19" y="153.81" width="311.11" height="508.15" fill="none" stroke="#72ddd4" stroke-width="0.6" stroke-dasharray="2,4" opacity="0.35"/>
 </g>
 <g class="furniture">
-<g class="item item-open-shelving">
+<g class="item item-cube-storage">
 <rect class="item" x="202.67" y="436.41" width="31.11" height="72.59" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-open-shelving">
+<g class="item item-cube-storage">
 <rect class="item" x="202.67" y="604.93" width="31.11" height="72.59" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-workbench">
@@ -190,13 +190,13 @@
 <g class="item item-herb-pots">
 <rect class="item" x="758.52" y="149.67" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-wood-stool">
+<g class="item item-bar-stool">
 <rect class="item" x="639.26" y="301.59" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-wood-stool">
+<g class="item item-bar-stool">
 <rect class="item" x="680.74" y="301.59" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-wood-stool">
+<g class="item item-bar-stool">
 <rect class="item" x="722.22" y="301.59" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-fruit-bowl">
@@ -266,7 +266,7 @@
 <g class="item item-zz-plant">
 <rect class="item" x="685.93" y="537.52" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-sofa-table">
+<g class="item item-console-table">
 <rect class="item" x="766.3" y="378.85" width="72.59" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-sculpture">
@@ -275,19 +275,19 @@
 <g class="item item-flower-jug">
 <rect class="item" x="805.19" y="378.85" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-framed-print">
+<g class="item item-canvas-art">
 <rect class="item" x="768.89" y="371.59" width="67.41" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-floor-lamp">
 <rect class="item" x="823.33" y="464.93" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-drum-table">
+<g class="item item-nesting-tables">
 <rect class="item" x="574.44" y="457.15" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-table-lamp">
 <rect class="item" x="574.44" y="457.15" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-framed-print">
+<g class="item item-canvas-art">
 <rect class="item" x="554.74" y="514.19" width="31.11" height="77.78" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-column">
@@ -296,8 +296,8 @@
 <g class="item item-storage-bench">
 <rect class="item" x="1055.63" y="568.63" width="31.11" height="62.22" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-arch-mirror">
-<rect class="item" x="1065.48" y="581.59" width="31.11" height="36.3" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-round-mirror">
+<rect class="item" x="1065.48" y="584.19" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-wall-sconce">
 <rect class="item" x="1066" y="540.11" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
@@ -311,7 +311,7 @@
 <g class="item item-runner-rug">
 <rect class="item" x="963.33" y="475.3" width="57.04" height="165.93" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-framed-print">
+<g class="item item-canvas-art">
 <rect class="item" x="850.81" y="612.7" width="31.11" height="41.48" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-patterned-rug">
@@ -329,8 +329,8 @@
 <g class="item item-round-coffee-table">
 <rect class="item" x="1245.93" y="330.11" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-side-table">
-<rect class="item" x="1328.89" y="226.41" width="25.93" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
+<g class="item item-nesting-tables">
+<rect class="item" x="1326.3" y="226.41" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-table-lamp">
 <rect class="item" x="1326.3" y="226.41" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
@@ -338,7 +338,7 @@
 <g class="item item-flower-jug">
 <rect class="item" x="1245.93" y="330.11" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-pampas-vase">
+<g class="item item-zz-plant">
 <rect class="item" x="1354.81" y="169.37" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-sideboard">
@@ -347,7 +347,7 @@
 <g class="item item-record-player">
 <rect class="item" x="1121.48" y="155.89" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
-<g class="item item-ficus-tree">
+<g class="item item-bird-of-paradise">
 <rect class="item" x="1100.74" y="337.89" width="31.11" height="31.11" rx="3" fill="rgba(20, 52, 77, 0.55)" stroke="#72ddd4" stroke-width="1.1"/>
 </g>
 <g class="item item-patterned-rug">
