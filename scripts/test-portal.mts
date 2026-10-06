@@ -136,6 +136,9 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   ok(credits.length === 30 && credits.some(c => /after “Base Game Modern Home” by SimsWithNora/.test(c)), `the footer credits every build by its own title (${credits.find(c => /Base Game Modern Home”/.test(c)) || credits[0]})`);
   const hrefs: string[] = await page.$$eval('#grid .card a, #hero-play, #hero-media', (els: HTMLAnchorElement[]) => els.map(a => a.href));
   ok(hrefs.length === 32 && hrefs.every(h => !new URL(h).searchParams.has('play')), 'no gallery link forces autoplay (the player decides, and honours reduced motion)');
+  // the cards go to the player; the homes' own pages are linked from the footer, in the rendered DOM a crawler that runs the page reads
+  const pageLinks: string[] = await page.$$eval('a[href*="homes/"]', (els: HTMLAnchorElement[]) => els.map(a => new URL(a.href).pathname));
+  ok(pageLinks.length === 30 && new Set(pageLinks).size === 30 && pageLinks.every(h => h.startsWith(`${BASE}homes/`)), `once gallery.js has run, the page links all ${new Set(pageLinks).size} homes' own pages (the footer's list: ${pageLinks[0].replace(BASE, '')} … ${pageLinks[29].replace(BASE, '')})`);
   // load every thumbnail (lazy ones too) and check each decoded
   await page.$$eval('#grid img', (imgs: HTMLImageElement[]) => imgs.forEach(i => { i.loading = 'eager'; }));
   await page.waitForFunction(() => Array.from(document.querySelectorAll<HTMLImageElement>('#grid img')).every(i => i.complete), null, { timeout: 20000 });
@@ -189,6 +192,10 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
     await sleep(400);
     await shot(page, `gallery-${label}-scrolled`);
   }
+  // the hero's Core line points at the band that says what it is
+  await page.click('.core-more');
+  await sleep(200);
+  ok(await page.evaluate(() => location.hash === '#core' && document.getElementById('core')!.matches('.cta-band')), 'the hero\'s "What is the Companion Core?" goes to the band that says');
   // a card opens the player
   await page.click('#grid .card:nth-child(2) a');
   // the navigation, not its load event (three.js and the engine are part of that, and a loaded machine takes a
@@ -214,6 +221,12 @@ async function pages() {
   const listed = [...gallery.text.matchAll(/<li class="card" data-id="([^"]+)"><a href="\.\/homes\/([^"]+)"/g)];
   ok(listed.length === ids.length && listed.every(m => m[1] === m[2]) && listed.map(m => m[1]).join() === ids.join(), `the gallery's HTML lists all ${listed.length} homes, each linking its page (./homes/<id>)`);
   ok(links.every(l => gallery.text.includes(`href="${l}"`)) && gallery.text.includes('href="https://ci.computer/privacy-policy"') && gallery.text.includes('href="https://ci.computer/terms-of-service"'), 'and carries the main site, /core, /download, the docs, privacy and terms');
+  // one callout, not four: the header, the band and the footer offer Buy and Download (the hero only says what the Core is, and
+  // points at the band), the main site is linked from the header and the footer, and no sentence is said twice
+  const count = (t: string, url: string) => t.split(`href="${url}"`).length - 1;
+  ok(count(gallery.text, links[1]) === 3 && count(gallery.text, links[2]) === 3 && count(gallery.text, links[0]) === 2, `the gallery offers Buy Companion Core ${count(gallery.text, links[1])}×, Download ${count(gallery.text, links[2])}× and links ci.computer ${count(gallery.text, links[0])}×`);
+  const sentences = [...gallery.text.matchAll(/The small computer on (?:your|the) desk/g)].length;
+  ok(sentences === 1, `"The small computer on your desk …" is said once on the gallery (${sentences})`);
   const heroLinks = [...gallery.text.matchAll(/id="hero-(?:play|media)" href="([^"]+)"/g)].map(m => m[1]);
   ok(heroLinks.length === 2 && heroLinks.every(h => h.startsWith('./room-creator?mode=view')), 'its hero links go to the player without .html');
 
@@ -222,8 +235,18 @@ async function pages() {
   const h1 = (aurora.text.match(/<h1[^>]*>([^<]*)<\/h1>/) || [])[1];
   ok(aurora.status === 200 && h1 === 'Aurora' && /<img src="\.\.\/portal\/previews\/aurora\.jpg" alt="[^"]+" width="1200" height="630"/.test(aurora.text) && aurora.text.includes('href="../room-creator?mode=view&amp;house=aurora"'), `/homes/aurora is a page of its own: <h1>${h1}</h1>, its picture, a way into the player`);
   ok(/<link rel="canonical" href="https:\/\/homes\.ci\.computer\/homes\/aurora">/.test(aurora.text) && /"@type":"BreadcrumbList"/.test(aurora.text) && links.every(l => aurora.text.includes(`href="${l}"`)), 'with its canonical, a breadcrumb in JSON-LD and the four links');
+  // every home's title fits a search result and is its own
+  const homeTitles: string[] = [];
+  for (const id of ids) homeTitles.push(((await get(`homes/${id}`)).text.match(/<title>([^<]*)<\/title>/) || [])[1] || '');
+  const longest = homeTitles.reduce((a, t) => (t.length > a.length ? t : a), '');
+  ok(homeTitles.length === ids.length && new Set(homeTitles).size === ids.length && longest.length <= 60, `the ${ids.length} homes' titles are all different and at most 60 characters (the longest: "${longest}", ${longest.length})`);
   const direct = await get('homes/aurora.html');
   ok(direct.status === 200, '… and homes/aurora.html is served too (Pages answers it with a 308 to the address above)');
+
+  // the player and the editor are one file: out of the index in its own HTML, with the four links where JavaScript is off
+  const rc = await get('room-creator.html');
+  ok(links.every(l => rc.text.includes(`href="${l}"`)) && /<noscript>/.test(rc.text), 'room-creator.html (the player and the editor) carries the four links in its own HTML, in a <noscript> for a visitor without JavaScript');
+  ok((rc.text.match(/<meta name="robots"/g) || []).length === 1 && /<meta name="robots" content="noindex, follow">/.test(rc.text) && !/<link rel="canonical"/.test(rc.text), 'and is noindex, follow in that HTML (nothing has to run for a crawler to know), with no canonical to contradict it');
 
   // robots, sitemap, 404, icons, manifest
   const robots = await get('robots.txt');
@@ -233,6 +256,7 @@ async function pages() {
   ok(sitemap.status === 200 && locs.length === ids.length + 1 && ids.every(id => locs.some(l => l.endsWith(`/homes/${id}`))) && !locs.some(l => /\.html$/.test(l)), `sitemap.xml lists the gallery and ${locs.length - 1} homes, none with .html`);
   const missing = await get('no-such-page');
   ok(missing.status === 404 && /<title>Page not found/.test(missing.text) && /<h1>Page not found<\/h1>/.test(missing.text) && links.every(l => missing.text.includes(`href="${l}"`)), 'an unknown path answers 404 with the 404 page, which links the four');
+  ok(['og:url', 'og:image:width', 'og:image:height', 'og:image:alt'].every(p => missing.text.includes(`property="${p}"`)) && missing.text.includes('name="twitter:image:alt"') && gallery.text.includes('name="twitter:image:alt"'), 'the 404 page and the gallery carry og:url (the 404), the image\'s size and alt, and twitter:image:alt');
   const ico = await fetch(srv.url('favicon.ico')), apple = await fetch(srv.url('apple-touch-icon.png'));
   const icoBytes = new Uint8Array(await ico.arrayBuffer()), appleBytes = new Uint8Array(await apple.arrayBuffer());
   ok(ico.ok && icoBytes[2] === 1 && apple.ok && appleBytes[1] === 0x50 && appleBytes[2] === 0x4e, '/favicon.ico (an ICO) and /apple-touch-icon.png (a PNG) are served at the root');
@@ -258,17 +282,15 @@ async function pages() {
     await close();
   }
   {
-    // the player's own address is that home's page for a search engine; the editor stays out of the index
+    // the player and the editor stay out of the index (each home's own page is what a search engine finds)
     const { page, errors, close } = await open({ width: 1280, height: 800 });
     await page.goto(srv.url('room-creator?mode=view&house=aurora'));
     await viewerReady(page);
     await sleep(300);
-    const canonical = await page.$eval('link[rel="canonical"]', (e: HTMLLinkElement) => e.href);
-    ok(/\/homes\/aurora$/.test(canonical), `the player's canonical is the home's page (${canonical})`);
-    ok(await page.$('meta[name="robots"]') === null, 'the player is indexable');
+    ok((await page.$$('meta[name="robots"]')).length === 1 && await page.$eval('meta[name="robots"]', (e: HTMLMetaElement) => e.content) === 'noindex, follow' && await page.$('link[rel="canonical"]') === null, 'the player is out of the index, once, with no canonical (the home\'s page is what a search engine finds)');
     await page.goto(srv.url('room-creator?house=aurora'));
     await page.waitForFunction(() => document.documentElement.dataset.houseReady === 'aurora', null, { timeout: 90000 });
-    ok(await page.$eval('meta[name="robots"]', (e: HTMLMetaElement) => e.content) === 'noindex', 'the editor is noindex');
+    ok((await page.$$('meta[name="robots"]')).length === 1 && /^noindex/.test(await page.$eval('meta[name="robots"]', (e: HTMLMetaElement) => e.content)), 'the editor is noindex, and its script adds no second tag to the one in the HTML');
     ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
     await close();
   }
@@ -283,6 +305,9 @@ async function previews() {
   const og = (h: string, p: string) => (h.match(new RegExp(`<meta property="${p}" content="([^"]*)"`)) || [])[1] || '';
   ok(/^https?:\/\//.test(og(gallery, 'og:image')) && og(gallery, 'og:image').endsWith('portal/hero.jpg') && og(gallery, 'og:image:type') === 'image/jpeg' && /summary_large_image/.test(gallery), `the gallery previews with its hero, a JPEG (${og(gallery, 'og:image')})`);
   ok(og(player, 'og:image').endsWith('portal/hero.jpg') && og(player, 'og:site_name') === og(gallery, 'og:site_name'), `the player previews with the same image and site name (${og(player, 'og:site_name')})`);
+  // the import map (~8 KB) comes after the charset, the title and the preview tags, not before them
+  const raw = await (await fetch(srv.url('index.html'))).text();
+  ok(raw.search(/<meta charset/i) < 1024 && raw.indexOf('<meta property="og:title"') < 4096 && raw.indexOf('<meta name="twitter:image:alt"') < raw.indexOf('type="importmap"') && raw.indexOf('type="importmap"') < raw.indexOf('rel="modulepreload"'), `the gallery's charset (byte ${raw.search(/<meta charset/i)}) and preview tags (og:title at ${raw.indexOf('<meta property="og:title"')}) come before its import map (${raw.indexOf('type="importmap"')}), which comes before the first module`);
   const jpeg = await fetch(srv.url('portal/hero.jpg'));
   const bytes = new Uint8Array(await jpeg.arrayBuffer());
   ok(jpeg.ok && bytes[0] === 0xff && bytes[1] === 0xd8, 'portal/hero.jpg is served, and is a JPEG');
@@ -359,8 +384,20 @@ async function player(id: string, viewport: { width: number; height: number }, m
     // the help panel carries the main site, buy, download and docs, each opening a tab (the shot keeps playing here)
     await page.click('.vh-top [data-act="help"]');
     const helpLinks = await page.$$eval('.vh-help-links a', (as: HTMLAnchorElement[]) => as.map(a => ({ href: a.href, tab: a.target === '_blank' && /noopener/.test(a.rel), shown: a.getBoundingClientRect().height > 0 })));
-    ok(JSON.stringify(helpLinks.map((l: any) => l.href)) === JSON.stringify(['https://ci.computer/', 'https://ci.computer/core', 'https://ci.computer/download', 'https://docs.ci.computer/docs/apps-available/first-party-apps']) && helpLinks.every((l: any) => l.tab && l.shown), `the help panel links ci.computer, /core, /download and the docs, each in a new tab`);
+    ok(JSON.stringify(helpLinks.map((l: any) => l.href)) === JSON.stringify(['https://ci.computer/', 'https://ci.computer/core', 'https://ci.computer/download', 'https://docs.ci.computer/docs/apps-available/first-party-apps']) && helpLinks.every((l: any) => l.tab && l.shown), `the About panel links ci.computer, /core, /download and the docs, each in a new tab`);
+    ok(await page.isVisible('.vh-help-keys') && /Companion Core/.test((await page.textContent('.vh-help-about')) || ''), 'and says what the Companion Core is, then lists the keyboard shortcuts');
     await page.click('.vh-help [data-act="help"]');
+  } else {
+    // a phone has no "?" key and no mouse: the same panel is in the More sheet (More > About), with 44 px links and no keyboard list
+    await tapTool(page, 'help');
+    await sleep(300);
+    const sheet = await page.$$eval('.vh-help-links a', (as: HTMLAnchorElement[]) => as.map(a => ({ href: a.href, h: Math.round(a.getBoundingClientRect().height), tab: a.target === '_blank' && /noopener/.test(a.rel) })));
+    ok(await page.isVisible('.vh-help') && JSON.stringify(sheet.map((l: any) => l.href)) === JSON.stringify(['https://ci.computer/', 'https://ci.computer/core', 'https://ci.computer/download', 'https://docs.ci.computer/docs/apps-available/first-party-apps']) && sheet.every((l: any) => l.tab && l.h >= 44), `on a phone, More > About opens the panel with ci.computer, /core, /download and the docs, each a ${sheet.map((l: any) => l.h).join('/')} px tap target`);
+    ok(!(await page.isVisible('.vh-help-keys')) && (await page.$eval('.vh-help', (e: HTMLElement) => { const r = e.getBoundingClientRect(); return r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth; })), 'without the keyboard list, and inside the screen');
+    await shot(page, `player-${id}-${label}-about`);
+    await page.tap('.vh-help [data-act="help"]');
+    await sleep(200);
+    ok(!(await page.isVisible('.vh-help')), 'and its close button puts it away');
   }
   const chips = await page.$$eval('.vh-shots .vh-chip', (els: HTMLElement[]) => els.map(e => ({ key: e.dataset.shot, label: e.querySelector('span')!.textContent })));
   const presetShots = await page.evaluate(() => { const s = (window as any).__houseDebug().house.shots; return [...new Set(Object.values(s))].length; });
@@ -536,6 +573,8 @@ async function player(id: string, viewport: { width: number; height: number }, m
   ok(endCard, `the end of the shot offers ${(await page.$$eval('.vh-end button:not([hidden])', (bs: Element[]) => bs.map(b => (b.textContent || '').trim()))).join(', ')}, and the Core and the download`);
   const endLinks = await page.$$eval('.vh-end a', (as: HTMLAnchorElement[]) => as.map(a => ({ href: a.href, tab: a.target === '_blank' && /noopener/.test(a.rel), name: (a.textContent || '').replace(/\s+/g, ' ').trim() })));
   ok(endLinks.length === 2 && endLinks.every((l: any) => l.tab && /\(opens in a new tab\)/.test(l.name)), `the end card's two links open a tab with noopener and say so (${endLinks.map((l: any) => l.name).join(' | ')})`);
+  const endSizes: number[] = await page.$$eval('.vh-end-links a', (as: HTMLAnchorElement[]) => as.map(a => Math.round(a.getBoundingClientRect().height)));
+  ok(endSizes.length === 2 && endSizes.every(h => h >= (mobile ? 44 : 32)), `the end card's two links are ${endSizes.join(' and ')} px tall targets (at least ${mobile ? 44 : 32})`);
   const cover = await coreCover(page);
   ok(cover >= 0 && cover < 0.05, `the end card covers ${Math.round(cover * 100)} % of the Core`);
   if (mobile) {
@@ -635,7 +674,7 @@ async function failureCases() {
     await page.goto(srv.url('room-creator.html?mode=view&house=aurora'));
     const card = await page.waitForSelector('.vh-fail', { timeout: 60000 }).catch(() => null);
     const state = await page.evaluate(() => document.documentElement.dataset.viewer);
-    ok(!!card && state === 'failed' && (await page.isVisible('.vh-fail a[href="./index.html"]')) && (await page.isVisible('.vh-fail button')), `${file} not downloading: a card with Try again and See all homes (${state})`);
+    ok(!!card && state === 'failed' && (await page.isVisible('.vh-fail a[href="./"]')) && (await page.isVisible('.vh-fail button')), `${file} not downloading: a card with Try again and See all homes (${state})`);
     ok(!/Room Creator|SimsTree/.test(await page.title()) && await page.isVisible('.vh-boot-back'), `the tab says "${await page.title()}", and a back arrow shows`);
     await shot(page, `failure-${file.replace('.js', '')}`);
     await close();

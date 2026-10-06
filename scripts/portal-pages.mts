@@ -21,6 +21,8 @@ export const TWITTER_SITE = '@companionintel';
 export const SITE_NAME = 'Companion Intelligence';
 export const SITE_TITLE = 'Virtual homes · Companion Intelligence';
 export const PLAYER_TITLE = 'Virtual homes player · Companion Intelligence';
+// what the gallery's hero picture (portal/hero.jpg, the site's link-preview image) shows: index.html's og:image:alt says the same
+export const HERO_ALT = 'An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser.';
 
 export type House = { id: string; name?: string; author?: string; style?: string; storeys?: number; areaSqm?: number; source?: string };
 
@@ -50,7 +52,13 @@ export function homeDescription(h: House): string {
   if (style.length > room) style = `${style.slice(0, room - 1).replace(/\s+\S*$/, '')}…`;
   return `${style ? `${style}. ` : ''}${tail}`;
 }
-export const homeTitle = (h: House): string => `${displayName(h)} · Virtual homes · ${SITE_NAME}`;
+// A title that fits a search result (about 60 characters): the name, the site's section and the brand; a name too long for all three
+// keeps the first two (og:site_name and the publisher in the JSON-LD still say whose it is). portal:build fails on a longer one.
+export const TITLE_MAX = 60;
+export const homeTitle = (h: House): string => {
+  const name = displayName(h), full = `${name} · Virtual homes · ${SITE_NAME}`;
+  return full.length <= TITLE_MAX ? full : `${name} · Virtual homes`;
+};
 
 export const homeUrl = (site: string, id: string): string => new URL(`homes/${id}`, site).href;
 
@@ -95,6 +103,18 @@ export function galleryCards(houses: House[]): string {
   }).join('\n        ');
 }
 
+// The gallery's footer: every home's own page, as a list of links. The cards link to the player (a card is one click from the
+// 3D), so this is how the rendered gallery, which a crawler that runs JavaScript reads, links the pages; it is not drawn by
+// gallery.js, so it is the same in the HTML a crawler fetches and in the DOM it renders. Written into index.html at its marker.
+export function galleryHomeIndex(houses: House[]): string {
+  return `<nav class="foot-homes" aria-label="Every home">
+      <p><b>Every home, on its own page</b></p>
+      <ul>
+        ${houses.map(h => `<li><a href="./homes/${esc(encodeURIComponent(h.id))}">${esc(displayName(h))}</a></li>`).join('\n        ')}
+      </ul>
+    </nav>`;
+}
+
 // ---- a home's own page: homes/<id>.html, served at homes/<id>. A page of its own for a search engine and a person (name, what
 // it is, its picture, a way in), and the address the player's share button hands out: a link that carries a moment (shot, t,
 // tod) forwards to the player with it, so a shared moment still opens in the player.
@@ -117,7 +137,7 @@ const header = (): string => `<header class="site-head">
       <a class="nav-buy" href="${LINKS.core}"><span class="nav-long">Buy Companion Core</span><span class="nav-short">Buy Core</span></a>
     </nav>
   </header>`;
-const ctaBand = (): string => `<section class="cta-band" aria-labelledby="cta-title">
+const ctaBand = (): string => `<section class="cta-band" id="core" aria-labelledby="cta-title">
       <div class="cta-copy">
         <h2 id="cta-title">Meet the Companion Core.</h2>
         <p>The small computer on your desk runs your own AI, apps and memory at home, not in someone else's cloud.</p>
@@ -131,7 +151,7 @@ const ctaBand = (): string => `<section class="cta-band" aria-labelledby="cta-ti
 const footer = (): string => `<footer class="site-foot">
     <div class="foot-grid">
       <div>
-        <p class="foot-brand"><a href="${LINKS.site}"><img src="../assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>${SITE_NAME}</b></a></p>
+        <p class="foot-brand"><img src="../assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>${SITE_NAME}</b></p>
         <p>Every frame is drawn on your device, with three.js and WebGL. Nothing is streamed: your browser builds each home from its spec.</p>
       </div>
       <nav class="foot-links" aria-label="${SITE_NAME}">
@@ -150,7 +170,7 @@ const footer = (): string => `<footer class="site-foot">
         <p>Each home is a HouseSpec written by hand from a Sims 4 gallery build, and each card names its builder. No files, textures or screenshots from those builds or from The Sims are used.</p>
       </div>
     </div>
-    <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence. <a href="${LINKS.site}">ci.computer</a></p>
+    <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence.</p>
   </footer>`;
 
 export function homePage(h: House, site: string): string {
@@ -247,11 +267,17 @@ export function notFoundPage(site: string, word: string): string {
   <meta property="og:title" content="${esc(title)}">
   <meta property="og:description" content="${esc(desc)}">
   <meta property="og:image" content="${esc(hero)}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${esc(HERO_ALT)}">
+  <meta property="og:url" content="${esc(site)}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="${TWITTER_SITE}">
   <meta name="twitter:title" content="${esc(title)}">
   <meta name="twitter:description" content="${esc(desc)}">
   <meta name="twitter:image" content="${esc(hero)}">
+  <meta name="twitter:image:alt" content="${esc(HERO_ALT)}">
   <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="${esc(new URL('assets/brand/ci-logo-mark.svg', site).href)}" type="image/svg+xml">

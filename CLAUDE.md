@@ -81,13 +81,25 @@ are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
   page's static (editor) head, and absolute preview-image URLs (`--site-url`, default `https://homes.ci.computer/`).
 - Search hygiene is also `portal:build`'s (5d2): canonical, twitter title/description/image and JSON-LD (publisher, site, the list of
   homes, a home's page and breadcrumb: `scripts/portal-pages.mts`) on every page, plus `404.html`, `robots.txt` and `sitemap.xml`.
-  Canonical and sitemap URLs are the extensionless ones Pages serves (`/homes/<id>`, `/room-creator`), never `.html` (that answers
-  308), and the built pages link each other without `.html` too. A new page needs a `seo(...)` call there and an entry in step 7's checks.
+  Canonical and sitemap URLs are the extensionless ones Pages serves (`/homes/<id>`), never `.html` (that answers 308), and the built
+  pages link each other without `.html` too: the gallery is `./` or `../`, never `./index.html` (`portal:build` fails on it, in the player
+  too). A new page needs a `seo(...)` call there and an entry in step 7's checks. The player and the editor are one file and are
+  `noindex, follow` in that file's own HTML (written by `portal:build`, never by a script a crawler may not run) and have no canonical:
+  what a search engine finds is the gallery and each home's page. The preview tags sit right after the page's last `og:`/`twitter:` tag, and
+  the import map just before the first module, so `<meta charset>` (inside 1024 bytes) and `og:image` (inside 4 KB) come first;
+  every title is at most 60 characters (`homeTitle` drops the brand for a long name) and every `og:image` has a `twitter:image:alt`.
 - A home's page (`homes/<id>`, from `portal-pages.mts`) is a page of its own, not a redirect: only a link that carries a moment (`shot`,
-  `t`, `tod`, `play`) forwards to the player. Every page of the site (gallery, a home's page, 404) and the player's end card and help
-  panel send a visitor to exactly `https://ci.computer`, `https://ci.computer/core` (Buy Companion Core), `https://ci.computer/download`
+  `t`, `tod`, `play`) forwards to the player. Every page of the site (gallery, a home's page, 404), the player's own HTML (a `<noscript>`
+  in `room-creator.html`) and the player's end card and About panel send a visitor to exactly `https://ci.computer`, `https://ci.computer/core` (Buy Companion Core), `https://ci.computer/download`
   (Download Companion) and the docs (`LINKS` in `portal-pages.mts`; `assets/viewer.ts` has the same four); `portal:build` fails without them.
-  No prices, specs or availability on these pages: reuse the wording ci.computer and the docs use.
+  No prices, specs or availability on these pages: reuse the wording ci.computer and the docs use. Say it once: Buy and Download are offered
+  by the header, the band after the homes and the footer (the gallery's hero only says what a Core is and points at the band), and the
+  main site is linked from the header and the footer list only. On a phone the player's About panel is More > About (the "?" button
+  needs the room a phone's top bar has not), its links are 44 px targets, and it does not list keyboard shortcuts; the end card's two
+  links are a row of 32 px (44 px on touch) targets.
+- The gallery's cards go to the player (one click from the 3D); the homes' own pages are linked by the footer's "Every home, on its own
+  page" list, which `portal:build` writes at the `<!-- foot-homes: -->` marker in `index.html` and `gallery.js` leaves alone, so the rendered
+  DOM links them and not only the sitemap does.
 - Every executable `<script>` in the built pages has `data-cfasync="false"` (Cloudflare's Rocket Loader is on for the zone and would
   run the player's head script after the first paint); `portal:build` checks it. New icons go through `pnpm run portal:icons`.
 - A home's name on the portal is `displayName` in `assets/home-names.ts`, never the spec's `name` directly (that is

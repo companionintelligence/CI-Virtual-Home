@@ -50,7 +50,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
 import {
-  type House, LINKS, SITE_NAME, PLAYER_TITLE, TWITTER_SITE, esc, numberWord, capital, galleryCards, galleryLd, homeDescription, homeLd, homePage, homeTitle, homeUrl, notFoundPage, playerLd,
+  type House, LINKS, SITE_NAME, PLAYER_TITLE, HERO_ALT, TITLE_MAX, TWITTER_SITE, esc, numberWord, capital, galleryCards, galleryHomeIndex, galleryLd, homeDescription, homeLd, homePage, homeTitle, homeUrl, notFoundPage, playerLd,
 } from './portal-pages.mts';
 
 const args = parseArgs(process.argv.slice(2));
@@ -175,6 +175,10 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
   const list = /(<ul class="grid" id="grid")( aria-busy="true")?>[\s\S]*?<\/ul>/;
   if (!list.test(gallery)) problems.push('index.html: no <ul class="grid" id="grid"> to write the homes into');
   else gallery = gallery.replace(list, (_m, open: string) => `${open}>\n        ${galleryCards(houses)}\n      </ul>`);
+  // every home's own page, linked from the footer (the cards go to the player; gallery.js leaves this list as it is)
+  const marker = /<!-- foot-homes:[\s\S]*?-->/;
+  if (!marker.test(gallery)) problems.push('index.html: no <!-- foot-homes: --> marker to write the list of the homes\' pages at');
+  else gallery = gallery.replace(marker, () => galleryHomeIndex(houses));
   // links without ".html", and the mark gallery.js reads to do the same for the cards it draws
   gallery = gallery.replace(/href="\.\/room-creator\.html\?/g, 'href="./room-creator?');
   gallery = gallery.replace('<meta name="viewport" content="width=device-width, initial-scale=1">', m => `${m}\n  <meta name="vh-clean-urls" content="1">`);
@@ -185,8 +189,12 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
   const galleryDesc = (gallery.match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
   const alt = (gallery.match(/<meta property="og:image:alt" content="([^"]*)">/) || [])[1] || '';
   const playerDesc = `Fly through one of ${COUNT_WORD} virtual homes in 3D, built live in your browser from one spec file. Change the hour and meet the Companion Core.`;
+  // The player and the editor are one file, a viewer and a tool rather than pages to find: out of the index in the page's own
+  // HTML, where a crawler that never runs the page's script reads it (the pages to find are the gallery and each home's page,
+  // which link the player). "follow": the links on the page, the way back to the gallery and the Core's, still count.
   const head = `<title>${esc(PLAYER_TITLE)}</title>
   <meta name="description" content="${esc(playerDesc)}">
+  <meta name="robots" content="noindex, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${esc(SITE_NAME)}">
   <meta property="og:title" content="${esc(PLAYER_TITLE)}">
@@ -213,13 +221,17 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
 
 // 5d2. search and sharing hygiene on every page the site serves: a canonical link, the twitter card's own title, description and
 // image, og:url where a page has none, and JSON-LD (portal-pages.mts: the publisher, the site, the list of homes, a home's
-// page and its breadcrumb); then robots.txt, sitemap.xml and a real 404.html. Cloudflare Pages serves pages without their .html
+// page and its breadcrumb; the player is out of the index, so it gets the twitter tags and the publisher but no canonical); then
+// robots.txt, sitemap.xml and a real 404.html. Cloudflare Pages serves pages without their .html
 // (homes/aurora.html answers 308 → homes/aurora), so the canonical and sitemap forms are the extensionless ones. The site's only
 // CSP is frame-ancestors (portal/_headers), which restricts no script, so the inline JSON-LD needs no header. Idempotent: it
 // runs over the copies above, and a tag a page already has is never added twice.
 {
   const hero = new URL('portal/hero.jpg', SITE).href;
-  const seo = (file: string, canonical: string, ld: string): string => {
+  // `canonical` is null for a page that is not to be found (the player and the editor: noindex, so no canonical). The link and preview
+  // tags go straight after the page's last og:/twitter: tag, near the top of the head (a link unfurler that reads only the first few
+  // KB of a page must meet them), the JSON-LD at the end of it.
+  const seo = (file: string, canonical: string | null, ld: string): string => {
     const fp = path.join(OUT, file);
     let page = fs.readFileSync(fp, 'utf8');
     const meta = (re: RegExp): string => (page.match(re) || [])[1] || '';
@@ -228,28 +240,34 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
     const image = meta(/<meta property="og:image" content="([^"]*)">/) || esc(hero);
     if (!title || !desc) { problems.push(`${file}: no <title> or description for its link-preview tags`); return page; }
     const add: string[] = [];
-    if (!/<link rel="canonical"/.test(page)) add.push(`<link rel="canonical" href="${esc(canonical)}">`);
-    if (!/<meta property="og:url"/.test(page)) add.push(`<meta property="og:url" content="${esc(canonical)}">`);
+    if (canonical && !/<link rel="canonical"/.test(page)) add.push(`<link rel="canonical" href="${esc(canonical)}">`);
+    if (canonical && !/<meta property="og:url"/.test(page)) add.push(`<meta property="og:url" content="${esc(canonical)}">`);
     if (!/<meta name="twitter:title"/.test(page)) add.push(`<meta name="twitter:title" content="${title}">`);
     if (!/<meta name="twitter:description"/.test(page)) add.push(`<meta name="twitter:description" content="${desc}">`);
     if (!/<meta name="twitter:image"/.test(page)) add.push(`<meta name="twitter:image" content="${image}">`);
-    if (!/application\/ld\+json/.test(page)) add.push(ld);
-    if (!/<\/head>/.test(page)) { problems.push(`${file}: no </head> for its search tags`); return page; }
-    page = page.replace('</head>', () => `  ${add.join('\n  ')}\n</head>`);
+    const headEnd = page.indexOf('</head>');
+    if (headEnd < 0) { problems.push(`${file}: no </head> for its search tags`); return page; }
+    if (add.length) {
+      const last = [...page.slice(0, headEnd).matchAll(/<meta (?:property="og:|name="twitter:)[^>]*>/g)].pop();
+      if (!last) { problems.push(`${file}: no og: or twitter: tag to put its search tags after`); return page; }
+      const at = (last.index ?? 0) + last[0].length;
+      page = `${page.slice(0, at)}\n  ${add.join('\n  ')}${page.slice(at)}`;
+    }
+    if (!/application\/ld\+json/.test(page)) page = page.replace('</head>', () => `  ${ld}\n</head>`);
     fs.writeFileSync(fp, page);
     return page;
   };
   const galleryTitle = (fs.readFileSync(path.join(OUT, 'index.html'), 'utf8').match(/<title>([^<]*)<\/title>/) || [])[1] || '';
   const galleryDesc = (fs.readFileSync(path.join(OUT, 'index.html'), 'utf8').match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
   seo('index.html', SITE, galleryLd(SITE, houses, galleryTitle, galleryDesc.replace(/&quot;/g, '"').replace(/&amp;/g, '&')));
-  seo('room-creator.html', new URL('room-creator', SITE).href, playerLd(SITE));
+  seo('room-creator.html', null, playerLd(SITE));
   for (const h of houses) {
     const file = path.join('homes', `${h.id}.html`);
     if (fs.existsSync(path.join(OUT, file))) seo(file, homeUrl(SITE, h.id), homeLd(SITE, h, new URL(`portal/previews/${h.id}.jpg`, SITE).href, homeTitle(h), homeDescription(h)));
   }
 
   // robots.txt and sitemap.xml: the gallery and one page per home. The player (room-creator) is a viewer for them, not a page
-  // of its own: each ?house= variant's canonical is its home's page (room-creator.html's head script sets it), so it is not listed.
+  // of its own: it is noindex in its own HTML (above), so it is not listed.
   fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${new URL('sitemap.xml', SITE).href}\n`);
   const urls = [SITE, ...houses.filter(h => /^[a-z0-9-]+$/.test(h.id)).map(h => homeUrl(SITE, h.id))];
   fs.writeFileSync(path.join(OUT, 'sitemap.xml'),
@@ -315,8 +333,13 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
     const ix = path.join(OUT, 'index.html');
     let page = fs.readFileSync(ix, 'utf8');
     if (/<script type="importmap">/.test(page)) problems.push('index.html: it already has an import map; merge the module hashes into it');
-    else if (!/<head[^>]*>/.test(page)) problems.push('index.html: no <head> to put the import map in');
-    else page = page.replace(/<head[^>]*>/, tag => `${tag}\n  ${importMapBlock(moduleMap)}`);
+    else {
+      // just before the first module the page asks for: after <meta charset>, the title and the preview tags, which a parser's
+      // prescan and an unfurler that reads a page's first few KB must reach before the ~8 KB of the map
+      const at = page.search(/<link\b[^>]*rel="modulepreload"|<script\b[^>]*type="module"/);
+      if (at < 0) problems.push('index.html: nothing loads a module, so there is no place for its import map');
+      else page = `${page.slice(0, at)}${importMapBlock(moduleMap)}\n  ${page.slice(at)}`;
+    }
     fs.writeFileSync(ix, retag(page, 'index.html'));
   }
   // the pages in homes/ sit one level down: their stylesheet is ../portal/gallery.css
@@ -369,7 +392,22 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...walk('porta
 {
   const read = (f: string): string => fs.readFileSync(path.join(OUT, f), 'utf8');
   const tag = (t: string, re: RegExp): string => (t.match(re) || [])[1] || '';
+  const alt = (t: string): string => tag(t, /<meta property="og:image:alt" content="([^"]*)">/);
   const titles = new Map<string, string>();
+  // what every page's head owes a crawler and a link unfurler, whatever its kind: a title a search result does not cut, the charset
+  // inside the first 1024 bytes (a parser's prescan), the preview tags inside the first 4 KB (an unfurler may read no more), and a
+  // twitter:image:alt wherever there is an og:image
+  const headChecks = (f: string, t: string, title: string): string[] => {
+    const out: string[] = [];
+    const entities = (v: string): string => v.replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+    if (entities(title).length > TITLE_MAX) out.push(`${f}: the title "${title}" is ${entities(title).length} characters; a search result cuts it at about ${TITLE_MAX}`);
+    const charset = t.search(/<meta charset=/i);
+    if (charset < 0 || charset > 1024) out.push(`${f}: <meta charset> is at byte ${charset}, past the 1024 a parser's prescan reads`);
+    const og = t.indexOf('<meta property="og:image"');
+    if (og < 0 || og > 4096) out.push(`${f}: the og:image tag is at byte ${og}, past the first 4 KB a link unfurler may stop at`);
+    if (og >= 0 && !/<meta name="twitter:image:alt" /.test(t)) out.push(`${f}: an og:image but no twitter:image:alt`);
+    return out;
+  };
   const pages = ['index.html', ...homePages, '404.html'];
   const need: [string, string][] = [['Companion Intelligence', LINKS.site], ['Buy Companion Core', LINKS.core], ['Download Companion', LINKS.download], ['the docs', LINKS.docs]];
   for (const f of pages) {
@@ -386,6 +424,7 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...walk('porta
     if (f !== '404.html' && !/<link rel="canonical"/.test(t)) problems.push(`${f}: no canonical link`);
     const title = tag(t, /<title>([^<]*)<\/title>/), desc = tag(t, /<meta name="description" content="([^"]*)">/);
     if (!title || !desc) problems.push(`${f}: no title or description`);
+    problems.push(...headChecks(f, t, title));
     if (f.startsWith(`homes${path.sep}`)) {
       if (tag(t, /<meta property="og:title" content="([^"]*)">/) !== title || tag(t, /<meta name="twitter:title" content="([^"]*)">/) !== title) problems.push(`${f}: <title>, og:title and twitter:title are not one string`);
       if (desc.replace(/&quot;|&amp;|&lt;|&gt;/g, '.').length > 160) problems.push(`${f}: the description is over 160 characters and will be cut in a search result`);
@@ -393,15 +432,30 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...walk('porta
       titles.set(title, f);
     }
   }
+  // the player, which is out of the index in its own HTML, and says where to go on without JavaScript (its <noscript>)
+  {
+    const t = read('room-creator.html');
+    for (const [what, url] of need) if (!t.includes(`href="${url}"`)) problems.push(`room-creator.html: no link to ${what} (${url}) in its own HTML`);
+    if (!/<meta name="robots" content="noindex, follow">/.test(t)) problems.push('room-creator.html: no <meta name="robots" content="noindex, follow"> in its own HTML');
+    if (/<link rel="canonical"/.test(t)) problems.push('room-creator.html: a canonical link on a page that is noindex');
+    problems.push(...headChecks('room-creator.html', t, tag(t, /<title>([^<]*)<\/title>/)));
+  }
   // the gallery's static list is the data's, and its links need no ".html"
   const g = read('index.html');
+  const homeIndex = (g.match(/<nav class="foot-homes"[\s\S]*?<\/nav>/) || [''])[0];
+  const indexed = [...homeIndex.matchAll(/<a href="\.\/homes\/([^"]+)">/g)].map(m => decodeURIComponent(m[1]));
+  if (indexed.join() !== houses.map(h => h.id).join()) problems.push(`index.html: the footer lists ${indexed.length} homes' own pages, index.json has ${houses.length}`);
+  if (alt(g) !== HERO_ALT) problems.push('index.html: its og:image:alt is not HERO_ALT (portal-pages.mts), which the 404 page uses');
   const listed = [...g.matchAll(/<li class="card" data-id="([^"]+)"/g)].map(m => m[1]);
   if (listed.join() !== houses.map(h => h.id).join()) problems.push(`index.html: the static list of homes (${listed.length}) is not index.json's (${houses.length})`);
   if (/href="[^"]*room-creator\.html/.test(g)) problems.push('index.html: a link still names room-creator.html (Cloudflare Pages answers it with a 308)');
+  // nothing links the gallery by its file name either: ./index.html is answered with a 308 to ./
+  for (const f of [...pages, 'room-creator.html']) if (/href="[^"]*\bindex\.html/.test(read(f))) problems.push(`${f}: a link names index.html (Cloudflare Pages answers it with a 308); link ./ or ../`);
   if (!/<meta name="vh-clean-urls"/.test(g)) problems.push('index.html: no vh-clean-urls mark for gallery.js');
   // the player's end card and help panel carry the same four addresses (assets/viewer.ts)
   const viewer = read(path.join('assets', 'viewer.js'));
   for (const url of [LINKS.site, LINKS.core, LINKS.download, LINKS.docs]) if (!viewer.includes(url)) problems.push(`assets/viewer.js: no ${url} (the end card and the help panel)`);
+  if (viewer.includes('index.html')) problems.push('assets/viewer.js: names index.html (the player\'s way back is ./: Cloudflare Pages answers index.html with a 308)');
   // titles are distinct across the site's own pages too
   for (const f of ['index.html', 'room-creator.html']) { const t = tag(read(f), /<title>([^<]*)<\/title>/); if (titles.has(t)) problems.push(`${f}: its title "${t}" is also ${titles.get(t)}'s`); titles.set(t, f); }
 }

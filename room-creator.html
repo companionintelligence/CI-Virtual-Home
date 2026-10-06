@@ -24,10 +24,13 @@
     (function () {
       var q = new URLSearchParams(location.search), d = document.documentElement, id = q.get('house') || 'aurora';
       if (q.get('mode') !== 'view') {
-        // the editor is a tool, not a page to find: out of search results (the player's canonical is its home's page, below)
-        var robots = document.createElement('meta');
-        robots.name = 'robots'; robots.content = 'noindex';
-        document.head.appendChild(robots);
+        // the editor is a tool, not a page to find: out of search results. The built site says so in this page's own HTML
+        // (scripts/build-portal.mts, for the player too); a checkout served as it is says it here
+        if (!document.querySelector('meta[name="robots"]')) {
+          var robots = document.createElement('meta');
+          robots.name = 'robots'; robots.content = 'noindex';
+          document.head.appendChild(robots);
+        }
         document.write('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
           + '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">');
         return;
@@ -49,13 +52,6 @@
         var j = r[0], n = r[1];
         var h = j && (j.houses || []).filter(function (x) { return x.id === id; })[0];
         if (h) {
-          // this player URL is that home's page for a search engine: the build writes the canonical link (the player's
-          // own address) and the vh-share meta (where the homes' pages are) at the end of the head
-          var canonical = function () {
-            var share = document.querySelector('meta[name="vh-share"]'), link = document.querySelector('link[rel="canonical"]');
-            if (share && link && /^[a-z0-9-]+\/$/.test(share.content)) link.href = new URL(share.content + id, link.href).href;
-          };
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', canonical); else canonical();
           var name = n && n.displayName(h);
           if (name) d.style.setProperty('--vh-boot-name', cssString(name));
           // the credit and the facts, as the player's loading card writes them (viewer.ts metaLine)
@@ -74,7 +70,7 @@
       (function back() {
         if (!document.body) { setTimeout(back, 30); return; }
         var a = document.createElement('a');
-        a.className = 'vh-boot-back'; a.href = './index.html'; a.setAttribute('aria-label', 'All homes'); a.title = 'All homes';
+        a.className = 'vh-boot-back'; a.href = './'; a.setAttribute('aria-label', 'All homes'); a.title = 'All homes';
         a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>';
         document.body.appendChild(a);
       })();
@@ -90,7 +86,7 @@
         d.dataset.viewer = state;
         var box = document.createElement('div');
         box.className = 'vh-fail'; box.setAttribute('role', 'alert');
-        box.innerHTML = '<img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./index.html">See all homes</a></div>';
+        box.innerHTML = '<img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./">See all homes</a></div>';
         box.querySelector('h2').textContent = title;
         box.querySelector('p').textContent = msg;
         if (retry) box.querySelector('button').addEventListener('click', function () { location.reload(); });
@@ -1471,6 +1467,14 @@
   </style>
 </head>
 <body>
+  <!-- Neither the player nor the editor runs without JavaScript: say so, with a way on (the gallery, the main site, where the
+       Companion Core is bought and downloaded, the docs). The same four addresses as assets/viewer.ts and the portal's pages. -->
+  <noscript>
+    <nav aria-label="Companion Intelligence" style="padding: 24px; font: 15px/1.6 system-ui, sans-serif; color: var(--foreground); background: var(--background);">
+      <p style="margin: 0 0 8px;"><b>The virtual homes need JavaScript.</b> Turn it on to fly through a home in 3D, or go on from here.</p>
+      <p style="margin: 0;"><a href="./">See all homes</a> · <a href="https://ci.computer">Companion Intelligence</a> · <a href="https://ci.computer/core">Buy Companion Core</a> · <a href="https://ci.computer/download">Download Companion</a> · <a href="https://docs.ci.computer/docs/apps-available/first-party-apps">Docs</a></p>
+    </nav>
+  </noscript>
 
   <!-- Icon sprite: lucide (https://lucide.dev — the canon icon set, CI-Common styles/UI-STYLE-GUIDE.md §6),
        path data copied from lucide-react 0.469.0. Use as <svg class="i"><use href="#i-name"/></svg>.
@@ -1618,7 +1622,7 @@
     <button type="button" class="btn-ctrl icon-only rc-edit-only" id="btn-redo" aria-label="Redo" title="Redo (Shift Ctrl or Cmd Z)" disabled><svg class="i" aria-hidden="true"><use href="#i-redo"/></svg></button>
     <button type="button" class="btn-ctrl icon-only drawer-toggle rc-edit-only" id="btn-toggle-catalog" aria-controls="catalog" aria-expanded="false" aria-label="Catalog" title="Catalog: what you can add"><svg class="i" aria-hidden="true"><use href="#i-furniture"/></svg></button>
     <button type="button" class="btn-ctrl icon-only drawer-toggle" id="btn-toggle-inspector" aria-controls="inspector" aria-expanded="false" aria-label="Inspector" title="Inspector: shots, checks, time of day"><svg class="i" aria-hidden="true"><use href="#i-sliders"/></svg></button>
-    <a href="./index.html" class="btn-ctrl btn-link" title="All homes: the portal's gallery"><svg class="i" aria-hidden="true"><use href="#i-back"/></svg><span class="lbl">All homes</span></a>
+    <a href="./" class="btn-ctrl btn-link" title="All homes: the portal's gallery"><svg class="i" aria-hidden="true"><use href="#i-back"/></svg><span class="lbl">All homes</span></a>
     <button type="button" class="btn-ctrl btn-outline" id="btn-open-export" aria-haspopup="dialog" title="Export a still image"><svg class="i" aria-hidden="true"><use href="#i-image"/></svg><span class="lbl">Still</span></button>
     <button type="button" class="btn-export" id="btn-open-video-export" aria-haspopup="dialog" title="Record the shot as a video"><svg class="i" aria-hidden="true"><use href="#i-video"/></svg><span class="lbl">Record</span></button>
   </header>
