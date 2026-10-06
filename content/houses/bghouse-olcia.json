@@ -447,6 +447,16 @@
               ],
               "rot": 180,
               "src": "compose@1"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                0.747,
+                2.25
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l1.02:mirror:0"
             }
           ],
           "lock": true,
@@ -649,6 +659,29 @@
               ],
               "rot": 270,
               "src": "compose@1"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                -6.31,
+                -1.051
+              ],
+              "rot": 90,
+              "y": 0.805,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.05:tank:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                -6.379,
+                -1.35
+              ],
+              "rot": 90,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l1.05:roll:0"
             }
           ],
           "lock": true,
@@ -718,6 +751,29 @@
               "rot": 90,
               "y": 1.6,
               "src": "compose@1"
+            },
+            {
+              "type": "towel-stack",
+              "at": [
+                -3.524,
+                -0.009
+              ],
+              "rot": 90,
+              "y": 0.85,
+              "src": "dress@1",
+              "dk": "l1.06:tops:0"
+            },
+            {
+              "type": "tea-towel",
+              "at": [
+                -3.515,
+                -0.629
+              ],
+              "rot": 90,
+              "y": 0.85,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.06:tops:1"
             }
           ],
           "lock": true,
@@ -799,6 +855,17 @@
               "rot": 180,
               "color": "#6f7657",
               "src": "compose@1"
+            },
+            {
+              "type": "side-set",
+              "at": [
+                4.652,
+                -1.03
+              ],
+              "y": 0.5,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.07:side:0"
             }
           ],
           "floor": {
@@ -869,6 +936,28 @@
               ],
               "rot": 270,
               "src": "compose@1"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                1.396,
+                -4.84
+              ],
+              "y": 0.805,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.08:tank:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                1.111,
+                -4.14
+              ],
+              "rot": 90,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l1.08:roll:0"
             }
           ],
           "lock": true,
@@ -1527,6 +1616,17 @@
               ],
               "rot": 270,
               "y": 1.7
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                -3.6,
+                3.15
+              ],
+              "y": 0.42,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l2.11:coffee:0"
             }
           ],
           "lock": true,
@@ -1670,6 +1770,103 @@
               ],
               "rot": 0,
               "y": 0.9
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                1.37,
+                -3.761
+              ],
+              "rot": 90,
+              "y": 0.918,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l2.12:hob:0"
+            },
+            {
+              "type": "globe-lamp",
+              "at": [
+                4.58,
+                -3.32
+              ],
+              "y": 0.945,
+              "src": "dress@1",
+              "dk": "l2.12:lamp:0"
+            },
+            {
+              "type": "bread-bin",
+              "at": [
+                1.277,
+                -2.45
+              ],
+              "rot": 90,
+              "y": 0.9,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l2.12:counters:0"
+            },
+            {
+              "type": "utensil-crock",
+              "at": [
+                1.215,
+                -2.873
+              ],
+              "rot": 90,
+              "y": 0.9,
+              "variant": 0,
+              "color": "#4e544b",
+              "src": "dress@1",
+              "dk": "l2.12:counters:1"
+            },
+            {
+              "type": "tea-towel",
+              "at": [
+                2.949,
+                -4.748
+              ],
+              "y": 0.9,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l2.12:counters:2"
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                3.895,
+                -3.106
+              ],
+              "y": 0.945,
+              "variant": 2,
+              "color": "#4e544b",
+              "src": "dress@1",
+              "dk": "l2.12:island:0"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                4.31,
+                -4.916
+              ],
+              "w": 0.55,
+              "h": 0.914,
+              "y": 0.512,
+              "color": "#ddd9c6",
+              "src": "dress@1",
+              "dk": "l2.12:windows:0"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                5.416,
+                -2.8
+              ],
+              "rot": 270,
+              "w": 1.4,
+              "h": 1.031,
+              "y": 0.395,
+              "color": "#ddd9c6",
+              "src": "dress@1",
+              "dk": "l2.12:windows:1"
             }
           ],
           "kitchen": {
@@ -1829,6 +2026,38 @@
               ],
               "color": "#e3d5c4",
               "src": "compose@1"
+            },
+            {
+              "type": "door-mat",
+              "at": [
+                3.9,
+                0.64
+              ],
+              "rot": 180,
+              "w": 0.83,
+              "d": 0.45,
+              "src": "dress@1",
+              "dk": "l2.14:entry:0"
+            },
+            {
+              "type": "umbrella-stand",
+              "at": [
+                2.165,
+                0.81
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l2.14:entry:1"
+            },
+            {
+              "type": "shoe-row",
+              "at": [
+                3.068,
+                0.776
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l2.14:entry:2"
             }
           ],
           "fixtures": {

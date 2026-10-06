@@ -5,6 +5,7 @@
 // on a bed, the headboard on the headboard-bed, the cloth on the hammock, the cushion on the daybed and pet-bed.
 import { registerProps } from './registry.js';
 import { patternTexture } from './patterns.js';
+import { layBedding } from './softkit.js';
 
 const CORNERS = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
 
@@ -25,24 +26,10 @@ function rod({ THREE }, a, b, r, mat, { radial = 8, square = false } = {}) {
   m.castShadow = true; m.receiveShadow = true; return m;
 }
 
-// mattress + folded duvet + pillows for a bed whose mattress base sits at y (head at −z). Returns the top of the
-// pillows. The fitted sheet is a shade off the linen so the pillows read against it.
-function bedding(g, ctx, { w, d, y, z = 0, duvet, pillows = w > 1.2 ? 2 : 1, thick = 0.2, pillowD = 0.4, cover = 0.58 }) {
-  const { std, box, colors, mix } = ctx;
-  const sheet = std(mix(colors.linen, 0xd6d3d1, 0.3), { roughness: 0.9 });
-  const duvetMat = std(duvet, { roughness: 0.85 });
-  const linen = std(colors.linen, { roughness: 0.95 });
-  g.add(box(w, thick, d, sheet, 0, y + thick / 2, z));
-  const top = y + thick, bl = d * cover;
-  g.add(box(w + 0.02, 0.06, bl, duvetMat, 0, top + 0.03, z + d / 2 - bl / 2));                    // duvet, foot to mid-bed
-  g.add(box(w + 0.02, 0.05, 0.18, duvetMat, 0, top + 0.085, z + d / 2 - bl + 0.09));             // folded over at its top edge
-  const pw = Math.min(0.62, pillows > 1 ? w / 2 - 0.08 : w - 0.16);
-  for (let i = 0; i < pillows; i++) {
-    const px = pillows > 1 ? (i - (pillows - 1) / 2) * (w / pillows) : 0;
-    const p = box(pw, 0.11, pillowD, linen, px, top + 0.06, z - d / 2 + pillowD / 2 + 0.06); p.rotation.x = 0.22; g.add(p);
-  }
-  return top + 0.11 + pillowD * 0.22;
-}
+// mattress + duvet + throw + pillows for a bed whose mattress base sits at y (head at −z). Returns the top of the
+// pillows. The grammar is assets/props/softkit.ts (SOFT stream): 2-3 merged, role-tinted, vertex-shaded meshes instead of
+// five boxes. Same arguments as ever; the fitted sheet is a shade off the linen so the pillows read against it.
+function bedding(g, ctx, o) { return layBedding(g, ctx, o); }
 
 // a guard rail: a top rail at y on three short uprights rising from yBase, along z at x (length len from z0)
 function guardRail(g, { box }, { x, z0, len, y, yBase, mat }) {
@@ -397,15 +384,16 @@ registerProps({
 // the bedrooms of one house can differ in bed as well as in linen. `quilt` (a pattern from assets/props/patterns.ts:
 // check, stripe, dots, diamond, kilim, border …) paints the duvet as a patterned textile.
 // =================================================================================================================
-// bedding() with the duvet painted by a pattern when the item names one
+// bedding() with the duvet painted by a pattern when the item names one. The duvet mesh is found by its role
+// (userData.role = 'duvet'), not by comparing colours, and carries planar UVs only when a quilt was asked for.
 function beddingQuilt(g, ctx, it, o) {
   const before = g.children.length, duvet = o.duvet;
-  const top = bedding(g, ctx, o);
+  const top = bedding(g, ctx, it.quilt ? { ...o, quilt: true } : o);
   if (it.quilt) {
     const { THREE, std, colors } = ctx;
     const map = patternTexture(THREE, String(it.quilt), [duvet, colors.linen, colors.accent, colors.fabric2], { w: o.w, d: o.d * 0.6 });
-    const mat = std(0xffffff, { roughness: 0.85, map });
-    for (const m of g.children.slice(before)) if (m.material && m.material.color && m.material.color.getHex() === (duvet & 0xffffff) && !m.material.map) m.material = mat;
+    const mat = std(0xffffff, { roughness: 0.88, map, vertexColors: true });
+    for (const m of g.children.slice(before)) if (m.userData.role === 'duvet') m.material = mat;
   }
   return top;
 }

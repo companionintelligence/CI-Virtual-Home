@@ -1,0 +1,586 @@
+{
+ "blankWalls": {
+  "median_longest": 2.52,
+  "rooms": 326,
+  "share_le_3_5": 0.755,
+  "share_le_4_5": 0.89,
+  "worst": [
+   {
+    "area": 64.8,
+    "longest": 11.84,
+    "program": "den",
+    "room": "newcrest/l3/Loft"
+   },
+   {
+    "area": 50.4,
+    "longest": 11.04,
+    "program": null,
+    "room": "palnknoll/l0/Undercroft"
+   },
+   {
+    "area": 12.6,
+    "longest": 7.02,
+    "program": "hall",
+    "room": "familyhouse-nora/l1/Hall"
+   },
+   {
+    "area": 53.2,
+    "longest": 6.87,
+    "program": "garage",
+    "room": "riverbend/l1/Two-Car Garage"
+   },
+   {
+    "area": 37.1,
+    "longest": 6.85,
+    "program": "gym",
+    "room": "asymmetry/l1/Spa & Gym"
+   },
+   {
+    "area": 24.5,
+    "longest": 6.85,
+    "program": "kitchen",
+    "room": "modernhouse1/l1/Kitchen"
+   },
+   {
+    "area": 24.8,
+    "longest": 6.72,
+    "program": "bed-primary",
+    "room": "gardennook/l1/Bedroom & Nursery"
+   },
+   {
+    "area": 29.9,
+    "longest": 6.3,
+    "program": "hall",
+    "room": "sunnyhome/l1/Stair Hall"
+   },
+   {
+    "area": 20.2,
+    "longest": 6.15,
+    "program": "bed-kid",
+    "room": "familyhouse-nora/l1/Kids Bedroom"
+   },
+   {
+    "area": 37.2,
+    "longest": 6.04,
+    "program": "garage",
+    "room": "palnknoll/l0/Garage"
+   },
+   {
+    "area": 36,
+    "longest": 6.02,
+    "program": "playroom",
+    "room": "familyhouse-nora/l0/Playroom"
+   },
+   {
+    "area": 10.7,
+    "longest": 5.91,
+    "program": "hall",
+    "room": "valleyview/l1/Stair Hall"
+   },
+   {
+    "area": 35.1,
+    "longest": 5.85,
+    "program": "bed-guest",
+    "room": "riverbend/l2/Bedroom Two"
+   },
+   {
+    "area": 22.4,
+    "longest": 5.48,
+    "program": "hall",
+    "room": "neweco/l3/Upper Landing"
+   },
+   {
+    "area": 22,
+    "longest": 5.34,
+    "program": "study",
+    "room": "flowerycottage/l1/Study"
+   }
+  ]
+ },
+ "byProgram": {
+  "bar": {
+   "area_med": 27.3,
+   "area_p90": 30.2,
+   "body": 9.33,
+   "ceiling": 1.67,
+   "floor": 1,
+   "items": 14.33,
+   "n": 3,
+   "surf": 0.67,
+   "wall": 1.67
+  },
+  "bath": {
+   "area_med": 8.3,
+   "area_p90": 12.3,
+   "body": 4.23,
+   "ceiling": 0.03,
+   "floor": 0.81,
+   "items": 6,
+   "n": 31,
+   "surf": 0.03,
+   "wall": 0.9
+  },
+  "bed-guest": {
+   "area_med": 21.5,
+   "area_p90": 30.6,
+   "body": 5.72,
+   "ceiling": 0.17,
+   "floor": 0.78,
+   "items": 11.44,
+   "n": 18,
+   "surf": 3.06,
+   "wall": 1.72
+  },
+  "bed-kid": {
+   "area_med": 14.4,
+   "area_p90": 25.5,
+   "body": 6.31,
+   "ceiling": 0.08,
+   "floor": 0.92,
+   "items": 11.31,
+   "n": 13,
+   "surf": 2.46,
+   "wall": 1.54
+  },
+  "bed-primary": {
+   "area_med": 24.1,
+   "area_p90": 36,
+   "body": 6.91,
+   "ceiling": 0.28,
+   "floor": 1,
+   "items": 12.88,
+   "n": 32,
+   "surf": 2.75,
+   "wall": 1.94
+  },
+  "den": {
+   "area_med": 25.8,
+   "area_p90": 51.8,
+   "body": 7.13,
+   "ceiling": 0,
+   "floor": 0.5,
+   "items": 8.75,
+   "n": 8,
+   "surf": 0.5,
+   "wall": 0.63
+  },
+  "dining": {
+   "area_med": 19.6,
+   "area_p90": 29.7,
+   "body": 8.17,
+   "ceiling": 0.91,
+   "floor": 0.74,
+   "items": 12.22,
+   "n": 23,
+   "surf": 1.3,
+   "wall": 1.09
+  },
+  "ensuite": {
+   "area_med": 14,
+   "area_p90": 21.6,
+   "body": 4.76,
+   "ceiling": 0,
+   "floor": 1,
+   "items": 6.65,
+   "n": 17,
+   "surf": 0,
+   "wall": 0.88
+  },
+  "foyer": {
+   "area_med": 10.6,
+   "area_p90": 21.6,
+   "body": 2.65,
+   "ceiling": 0.04,
+   "floor": 0.69,
+   "items": 5.23,
+   "n": 26,
+   "surf": 0.88,
+   "wall": 0.96
+  },
+  "garage": {
+   "area_med": 33.8,
+   "area_p90": 42.2,
+   "body": 4.22,
+   "ceiling": 0.11,
+   "floor": 0,
+   "items": 4.56,
+   "n": 9,
+   "surf": 0,
+   "wall": 0.22
+  },
+  "greenhouse": {
+   "area_med": 24,
+   "area_p90": 24,
+   "body": 6,
+   "ceiling": 2,
+   "floor": 0,
+   "items": 16,
+   "n": 1,
+   "surf": 8,
+   "wall": 0
+  },
+  "gym": {
+   "area_med": 37.1,
+   "area_p90": 37.1,
+   "body": 2,
+   "ceiling": 0,
+   "floor": 1,
+   "items": 3,
+   "n": 1,
+   "surf": 0,
+   "wall": 0
+  },
+  "hall": {
+   "area_med": 12,
+   "area_p90": 30.9,
+   "body": 1.88,
+   "ceiling": 0.04,
+   "floor": 0.63,
+   "items": 4.16,
+   "n": 56,
+   "surf": 0.89,
+   "wall": 0.73
+  },
+  "kitchen": {
+   "area_med": 18.2,
+   "area_p90": 25.6,
+   "body": 8.68,
+   "ceiling": 0.28,
+   "floor": 0.48,
+   "items": 13.4,
+   "n": 25,
+   "surf": 1.56,
+   "wall": 2.4
+  },
+  "kitchen-dining": {
+   "area_med": 23.5,
+   "area_p90": 23.5,
+   "body": 13,
+   "ceiling": 0,
+   "floor": 0,
+   "items": 17,
+   "n": 1,
+   "surf": 1,
+   "wall": 3
+  },
+  "laundry": {
+   "area_med": 12.3,
+   "area_p90": 26.4,
+   "body": 4.25,
+   "ceiling": 0.17,
+   "floor": 0.08,
+   "items": 5.67,
+   "n": 12,
+   "surf": 0,
+   "wall": 1.17
+  },
+  "library": {
+   "area_med": 17.6,
+   "area_p90": 17.6,
+   "body": 4,
+   "ceiling": 0,
+   "floor": 2,
+   "items": 9,
+   "n": 1,
+   "surf": 2,
+   "wall": 1
+  },
+  "living": {
+   "area_med": 27.2,
+   "area_p90": 50.4,
+   "body": 8.73,
+   "ceiling": 0.31,
+   "floor": 1.23,
+   "items": 14.23,
+   "n": 26,
+   "surf": 1.5,
+   "wall": 2.46
+  },
+  "media": {
+   "area_med": 25.2,
+   "area_p90": 60,
+   "body": 10.33,
+   "ceiling": 0,
+   "floor": 1,
+   "items": 14,
+   "n": 3,
+   "surf": 1.67,
+   "wall": 1
+  },
+  "none": {
+   "area_med": 9.9,
+   "area_p90": 36,
+   "body": 4.2,
+   "ceiling": 0.29,
+   "floor": 0.32,
+   "items": 6.67,
+   "n": 94,
+   "surf": 0.67,
+   "wall": 1.19
+  },
+  "nursery": {
+   "area_med": 14.8,
+   "area_p90": 30.2,
+   "body": 5.67,
+   "ceiling": 0.17,
+   "floor": 1.5,
+   "items": 9.5,
+   "n": 6,
+   "surf": 0.67,
+   "wall": 1.5
+  },
+  "outdoor": {
+   "area_med": 1.1,
+   "area_p90": 14.6,
+   "body": 1.8,
+   "ceiling": 0.2,
+   "floor": 0,
+   "items": 3.2,
+   "n": 5,
+   "surf": 0,
+   "wall": 1.2
+  },
+  "playroom": {
+   "area_med": 19.9,
+   "area_p90": 22.1,
+   "body": 7.14,
+   "ceiling": 0.29,
+   "floor": 1.14,
+   "items": 9.57,
+   "n": 7,
+   "surf": 0.14,
+   "wall": 0.86
+  },
+  "powder": {
+   "area_med": 4.1,
+   "area_p90": 4.8,
+   "body": 2.29,
+   "ceiling": 0.14,
+   "floor": 0.86,
+   "items": 3.86,
+   "n": 7,
+   "surf": 0,
+   "wall": 0.57
+  },
+  "studio": {
+   "area_med": 16.1,
+   "area_p90": 20.4,
+   "body": 5.5,
+   "ceiling": 0,
+   "floor": 0,
+   "items": 7,
+   "n": 2,
+   "surf": 1,
+   "wall": 0.5
+  },
+  "study": {
+   "area_med": 19.3,
+   "area_p90": 25.9,
+   "body": 5.29,
+   "ceiling": 0.14,
+   "floor": 0.71,
+   "items": 9.71,
+   "n": 7,
+   "surf": 1.14,
+   "wall": 2.43
+  },
+  "sunroom": {
+   "area_med": 9.2,
+   "area_p90": 33.8,
+   "body": 5.2,
+   "ceiling": 0.7,
+   "floor": 0.3,
+   "items": 7.4,
+   "n": 10,
+   "surf": 0.9,
+   "wall": 0.3
+  }
+ },
+ "dress": {
+  "byKind": {},
+  "items": 0,
+  "rooms": 0,
+  "target": "2350-3150"
+ },
+ "houses": 30,
+ "neverBare": [
+  {
+   "looseNow": 0.02,
+   "name": "wet-3-dress-and-towel",
+   "rate": 1,
+   "rooms": 56,
+   "violations": 56,
+   "what": "bath, ensuite, powder: at least 3 dress items and a towel object",
+   "worst": ["asymmetry/l3/Primary Bath", "asymmetry/l4/Loft Ensuite", "aurora/l1/Guest Bath", "aurora/l2/Shower Room", "aurora/l2/Bath"]
+  },
+  {
+   "looseNow": 1.28,
+   "name": "dining-table-setting",
+   "rate": 1,
+   "rooms": 25,
+   "violations": 25,
+   "what": "dining: a table setting",
+   "worst": ["asymmetry/l2/Dining", "aurora/l1/Dining", "bgfamily/l1/Dining", "cocoon/l1/Dining Room", "cutestarter/l1/Dining"]
+  },
+  {
+   "looseNow": 1.67,
+   "name": "kitchen-4-counter-clusters",
+   "rate": 1,
+   "rooms": 33,
+   "violations": 33,
+   "what": "kitchen: at least 4 counter clusters",
+   "worst": ["asymmetry/l2/Kitchen", "aurora/l1/Kitchen", "bgfamily/l1/Kitchen", "bghouse-olcia/l2/Kitchen", "cocoon/l1/Kitchen"]
+  },
+  {
+   "looseNow": 0,
+   "name": "hall-8m2-3-dress",
+   "rate": 1,
+   "rooms": 55,
+   "violations": 55,
+   "what": "hall of 8 m2 or more: at least 3 dress items",
+   "worst": ["asymmetry/l1/Lower Hall", "asymmetry/l2/Stair Hall", "asymmetry/l2/Entry Passage", "asymmetry/l3/Upper Landing", "asymmetry/l3/Stair Landing"]
+  }
+ ],
+ "regenerate": "pnpm run build && node --experimental-strip-types scripts/dress-census.mts --write   (only to re-freeze the BEFORE at baseline/stage0-green; never to turn a target green)",
+ "rooms": 444,
+ "schema": 1,
+ "visible": {
+  "byKind": {
+   "bath": {
+    "mean": 5.3,
+    "target": 12
+   },
+   "bedroom": {
+    "mean": 11.8,
+    "target": 20
+   },
+   "living": {
+    "mean": 13.6,
+    "target": 25
+   }
+  },
+  "rooms": {
+   "aurora-bath": {
+    "NW": 6,
+    "SE": 6,
+    "items": 7
+   },
+   "aurora-dining": {
+    "NW": 13,
+    "SE": 13,
+    "items": 13
+   },
+   "aurora-hall": {
+    "NW": 5,
+    "SE": 5,
+    "items": 5
+   },
+   "aurora-kitchen": {
+    "NW": 18,
+    "SE": 19,
+    "items": 19
+   },
+   "aurora-living": {
+    "NW": 20,
+    "SE": 18,
+    "items": 20
+   },
+   "aurora-primary-bedroom": {
+    "NW": 8,
+    "SE": 8,
+    "items": 12
+   },
+   "cutestarter-bath": {
+    "NW": 5,
+    "SE": 4,
+    "items": 5
+   },
+   "cutestarter-bedroom": {
+    "NW": 8,
+    "SE": 6,
+    "items": 10
+   },
+   "cutestarter-kids-corner": {
+    "NW": 7,
+    "SE": 7,
+    "items": 8
+   },
+   "cutestarter-living": {
+    "NW": 9,
+    "SE": 9,
+    "items": 11
+   },
+   "lakecabin-kitchen": {
+    "NW": 10,
+    "SE": 8,
+    "items": 10
+   },
+   "lakecabin-master-bedroom": {
+    "NW": 10,
+    "SE": 7,
+    "items": 11
+   },
+   "mediterranean-dining": {
+    "NW": 14,
+    "SE": 15,
+    "items": 16
+   },
+   "mesamariposa-garage": {
+    "NW": 3,
+    "SE": 3,
+    "items": 3
+   },
+   "neweco-dining": {
+    "NW": 14,
+    "SE": 12,
+    "items": 15
+   },
+   "riverbend-family-room": {
+    "NW": 15,
+    "SE": 14,
+    "items": 17
+   },
+   "riverbend-foyer": {
+    "NW": 7,
+    "SE": 1,
+    "items": 7
+   },
+   "riverbend-mudroom-laundry": {
+    "NW": 4,
+    "SE": 7,
+    "items": 8
+   },
+   "riverbend-primary-suite": {
+    "NW": 18,
+    "SE": 21,
+    "items": 22
+   },
+   "seraphine-kitchen": {
+    "NW": 19,
+    "SE": 15,
+    "items": 19
+   },
+   "seraphine-living": {
+    "NW": 7,
+    "SE": 11,
+    "items": 12
+   },
+   "seraphine-master-suite": {
+    "NW": 23,
+    "SE": 19,
+    "items": 24
+   },
+   "vanilla-bathroom": {
+    "NW": 6,
+    "SE": 5,
+    "items": 7
+   },
+   "vanilla-living-dining": {
+    "NW": 14,
+    "SE": 19,
+    "items": 19
+   }
+  }
+ },
+ "what": "dress census (scripts/dress-census.mts): items per room by program and layer, dress items (src dress@1), the never-bare rules, the longest blank wall span, and the visible-object proxy on the R24 cameras. Node only, no timestamp: two runs of an unchanged tree write the same bytes."
+}

@@ -1,0 +1,4 @@
+{
+  "comment": "Files under assets/props/ or models/ that are allowed to have a model or image extension (scripts/test-no-third-party-bytes.mts). Exact posix paths, no globs, each with a written reason: where the bytes come from and why they may ship. Empty on purpose: the 3Dinside collection ships only as baked .ts modules (CLAUDE.md, Licensing). An entry whose file is gone fails the test.",
+  "allow": []
+}

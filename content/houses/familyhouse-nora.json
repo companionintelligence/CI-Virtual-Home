@@ -336,6 +336,29 @@
               "rot": 270,
               "y": 1.6,
               "src": "compose@1"
+            },
+            {
+              "type": "towel-stack",
+              "at": [
+                -3.776,
+                -3.501
+              ],
+              "rot": 270,
+              "y": 0.85,
+              "src": "dress@1",
+              "dk": "l0.02:tops:0"
+            },
+            {
+              "type": "tea-towel",
+              "at": [
+                -3.785,
+                -4.121
+              ],
+              "rot": 270,
+              "y": 0.85,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l0.02:tops:1"
             }
           ],
           "program": "laundry",
@@ -631,6 +654,42 @@
               ],
               "color": "#a0623a",
               "src": "compose@1"
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                5.82,
+                -2.5
+              ],
+              "rot": 90,
+              "y": 0.42,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l0.04:coffee:0"
+            },
+            {
+              "type": "side-set",
+              "at": [
+                4.12,
+                -3.871
+              ],
+              "rot": 90,
+              "y": 0.5,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l0.04:side:0"
+            },
+            {
+              "type": "side-set",
+              "at": [
+                4.12,
+                -1.085
+              ],
+              "rot": 90,
+              "y": 0.5,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l0.04:side:1"
             }
           ],
           "program": "media",
@@ -745,6 +804,17 @@
               ],
               "color": "#8ea878",
               "src": "compose@1"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                3.249,
+                5.661
+              ],
+              "rot": 180,
+              "color": "#e6dcc4",
+              "src": "dress@1",
+              "dk": "l0.05:lamp:0"
             }
           ],
           "program": "playroom",
@@ -1529,6 +1599,17 @@
               ],
               "rot": 0,
               "y": 2.58
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                6.1,
+                1.9
+              ],
+              "y": 0.4,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.12:coffee:0"
             }
           ],
           "floor": {
@@ -1840,6 +1921,111 @@
               ],
               "rot": 180,
               "y": 1.95
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                7.63,
+                -2.439
+              ],
+              "rot": 270,
+              "y": 0.918,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.14:hob:0"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                6.545,
+                -5.7
+              ],
+              "y": 0.9,
+              "src": "dress@1",
+              "dk": "l1.14:lamp:0"
+            },
+            {
+              "type": "tea-towel",
+              "at": [
+                7.758,
+                -1.811
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.14:counters:0"
+            },
+            {
+              "type": "oil-pair",
+              "at": [
+                7.821,
+                -1.445
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.14:counters:1"
+            },
+            {
+              "type": "plate-stack",
+              "at": [
+                7.726,
+                -4.985
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.14:counters:2"
+            },
+            {
+              "type": "kettle-and-mug",
+              "at": [
+                7.76,
+                -4.512
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.14:counters:3"
+            },
+            {
+              "type": "canister-trio",
+              "at": [
+                6.516,
+                -5.46
+              ],
+              "y": 0.9,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.14:counters:4"
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                2.495,
+                -4.956
+              ],
+              "y": 0.75,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.14:table:0"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                2.413,
+                -5.916
+              ],
+              "w": 1.975,
+              "h": 0.981,
+              "y": 0.445,
+              "color": "#dbcfbd",
+              "src": "dress@1",
+              "dk": "l1.14:windows:0"
             }
           ],
           "floor": {
@@ -1931,6 +2117,26 @@
                 -5.411
               ],
               "src": "compose@1"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                -0.329,
+                -1.271
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l1.16:lamp:0"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                -0.243,
+                -2.04
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l1.16:mirror:0"
             }
           ],
           "program": "hall",
@@ -2095,6 +2301,18 @@
               "rot": 180,
               "color": "#9a5a3a",
               "src": "compose@1"
+            },
+            {
+              "type": "dresser-set",
+              "at": [
+                -6.562,
+                3.985
+              ],
+              "rot": 180,
+              "y": 0.72,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.17:dresser:0"
             }
           ],
           "program": "bed-primary",
@@ -2241,6 +2459,38 @@
                 -2.531
               ],
               "src": "compose@1"
+            },
+            {
+              "type": "vanity-set",
+              "at": [
+                -6.17,
+                -2.455
+              ],
+              "y": 0.89,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.19:vanity:0"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                -7.309,
+                -2.62
+              ],
+              "y": 0.805,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.19:tank:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                -7.04,
+                -2.689
+              ],
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l1.19:roll:0"
             }
           ],
           "program": "ensuite",
@@ -2322,6 +2572,39 @@
               "w": 0.55,
               "d": 1.2,
               "src": "compose@1"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                -4.12,
+                -2.351
+              ],
+              "rot": 90,
+              "y": 0.805,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.20:tank:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                -2.87,
+                -0.673
+              ],
+              "rot": 180,
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l1.20:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                -3.95,
+                -2.689
+              ],
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l1.20:roll:0"
             }
           ],
           "program": "bath",

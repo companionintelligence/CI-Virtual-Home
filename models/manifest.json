@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "comment": "The shipped models of the 3Dinside collection: one entry per baked model. Sources stay outside git (THREEDINSIDE_ROOT); only the baked derivatives under assets/props/baked/ are committed, with outSha256 and stats written by scripts/bake/bake.mts. ATTRIBUTION.md is generated from this file and models/packs.json (scripts/bake/attribution.mts). Entry fields: id, family (the module assets/props/baked/<family>.ts), wave, prop_type, action (add: a new dormant type | replace: the same type id in place, procedural builder kept as fallback), enabled (the per-model removal switch; a replace entry stays false until an owner look), tags, params (the spec keys the model honours), src {pack, display, file, sha256, objects, include, exclude, flipObjects}, pose {front, yaw, pivot, pivotParts}, scale {height | uniform}, roles {table, materials, cells}, colorParam (the one role a spec colour repaints), open (roles allowed to be open shells), fit (nine-slice per param), budget, frontProbe, then what the bake writes: changes, stats, outSha256.",
+  "tool": {
+    "blender": "4.5.6",
+    "hash": "a78963ed6435",
+    "args": "-b --factory-startup, PYTHONHASHSEED=0",
+    "script": "486376818d36e8b4416391825ee897ef54e61a6684858bc983c3a4df7069a1b6"
+  },
+  "models": [
+    {
+      "id": "box-carton",
+      "family": "storage",
+      "wave": "B1",
+      "prop_type": "cardboard-box",
+      "action": "add",
+      "enabled": true,
+      "pilot": "CC0 flat-palette pack (cell of a 32 x 32 palette to a role)",
+      "tags": ["storage", "garage"],
+      "params": ["w", "d", "h"],
+      "src": {
+        "pack": "lowpolyassetpack-free",
+        "display": "FBX and Blend Files/Misc Props/Mesh_Box_04.fbx",
+        "file": "LowPolyAssetPack_Free/LowPolyAssetPack_Free/FBX and Blend Files/Misc Props/Mesh_Box_04.fbx",
+        "sha256": "5be46d698b649898ef6fc4529316359d9189de47d983190ba8d3c94dde6f231a",
+        "objects": ["Mesh_Box_04"]
+      },
+      "pose": {
+        "front": "+Y",
+        "pivot": "floor-centre"
+      },
+      "scale": {
+        "height": 0.42
+      },
+      "roles": {
+        "table": "lowpoly"
+      },
+      "fit": {
+        "w": {
+          "axis": "x",
+          "band": [-0.225, 0.225],
+          "range": [0.3, 0.75],
+          "anchor": "mid"
+        },
+        "d": {
+          "axis": "z",
+          "band": [-0.272, 0.272],
+          "range": [0.38, 0.85],
+          "anchor": "mid"
+        },
+        "h": {
+          "axis": "y",
+          "band": [0, 0.291],
+          "range": [0.3, 0.6],
+          "anchor": "min"
+        }
+      },
+      "open": ["cardboard"],
+      "openReason": "a carton is open on purpose: the top flaps stand open and there is no inside bottom, so no closed shell exists to measure",
+      "frontProbe": "none",
+      "budget": {
+        "tris": 300
+      },
+      "outSha256": "eaaa7eee29a998f57703ad0506756dfbdc902b0d04b2bb618b1d5bdaa8a85855",
+      "stats": {
+        "tris": 92,
+        "parts": 1,
+        "verts": 128,
+        "bytesRaw": 1044,
+        "box": [-0.22501, 0, -0.27208, 0.22501, 0.42, 0.27208],
+        "scale": 0.777047,
+        "nativeDims": [0.5791, 0.5405, 0.7003],
+        "mirroredObjects": [],
+        "objects": [
+          {
+            "name": "Mesh_Box_04",
+            "tris": 60,
+            "closed": true,
+            "vol": 0.00521586,
+            "flipped": false
+          }
+        ],
+        "shells": 1,
+        "dropped": 0,
+        "decimated": false,
+        "cutTriangles": 16
+      },
+      "changes": ["re-pivot", "uniform rescale", "nine-slice", "role-colouring", "clean-up"]
+    },
+    {
+      "id": "nightstand-a",
+      "family": "bedroom",
+      "wave": "B1",
+      "prop_type": "nightstand",
+      "action": "replace",
+      "enabled": false,
+      "pilot": "PSX-family retexture (material name to role); in place of the procedural nightstand, held disabled until the owner look (PLAN B4)",
+      "tags": ["bedroom", "guest", "kids"],
+      "params": ["color"],
+      "src": {
+        "pack": "deds-others",
+        "display": "Models/Deds_others.fbx",
+        "file": "Deds_others/Deds_others/Models/Deds_others.fbx",
+        "sha256": "f59d6c78602a093f4d55a201ac221997e89ff3b5b55d77e2f4305308d8cc9528",
+        "objects": ["Cajonera_01.001"]
+      },
+      "pose": {
+        "front": "+Y",
+        "pivot": "floor-centre"
+      },
+      "scale": {
+        "uniform": 0.81
+      },
+      "parityTol": 0.025,
+      "parityNote": "the pack nightstand is squarer (1.09) than the procedural one (1.18): one uniform scalar cannot match both width and depth, so each is 2 cm off; the owner look decides",
+      "roles": {
+        "table": "psx",
+        "materials": {
+          "Wood_07": "cabinet"
+        }
+      },
+      "colorParam": "cabinet",
+      "open": ["cabinet", "metal", "wood"],
+      "openReason": "the pack mesh drops faces nobody sees (the carcass underside, the back of the drawer front), so the shell is open by construction; its winding is held by the per-object volume check",
+      "frontProbe": "frontRole:metal",
+      "budget": {
+        "tris": 150
+      },
+      "outSha256": "2dd95952532f99ce68fd6ae1aa077360a5da24028c5e6a6e590e08195de51185",
+      "stats": {
+        "tris": 84,
+        "parts": 3,
+        "verts": 156,
+        "bytesRaw": 1188,
+        "box": [-0.24889, 0, -0.22931, 0.24889, 0.566, 0.22931],
+        "scale": 0.81,
+        "nativeDims": [0.6145, 0.6988, 0.5662],
+        "mirroredObjects": [],
+        "objects": [
+          {
+            "name": "Cajonera_01.001",
+            "tris": 38,
+            "closed": false,
+            "vol": 0.00664023,
+            "flipped": false
+          },
+          {
+            "name": "Drawer_03",
+            "tris": 46,
+            "closed": true,
+            "vol": 0.00736614,
+            "flipped": false
+          }
+        ],
+        "shells": 4,
+        "dropped": 0,
+        "decimated": false,
+        "cutTriangles": 0
+      },
+      "changes": ["re-pivot", "uniform rescale", "role-colouring", "clean-up"]
+    },
+    {
+      "id": "medicine-cabinet-a",
+      "family": "bath",
+      "wave": "B1",
+      "prop_type": "medicine-cabinet",
+      "action": "add",
+      "enabled": true,
+      "pilot": "needs a winding fix (one door is a mirrored, negative-determinant copy of the other)",
+      "tags": ["bathroom"],
+      "mountY": 1.15,
+      "params": ["y", "color"],
+      "src": {
+        "pack": "bath-hygiene",
+        "display": "Models/Bath_Hygiene.fbx",
+        "file": "Bath_Hygiene/Bath_Hygiene/Models/Bath_Hygiene.fbx",
+        "sha256": "6d3ed9baeab5d73c1a277bafe8b62838c36c9cd640a5a969920b099091979182",
+        "objects": ["Bathroom_cabinet"]
+      },
+      "pose": {
+        "front": "+Y",
+        "pivot": "wall-back"
+      },
+      "scale": {
+        "height": 0.56
+      },
+      "roles": {
+        "table": "psx",
+        "materials": {
+          "Wood_15": "cabinet",
+          "Glass": "mirror"
+        }
+      },
+      "colorParam": "cabinet",
+      "open": ["cabinet", "metal", "mirror"],
+      "openReason": "the pack mesh drops faces nobody sees (the cabinet back, the back of each door panel), so the shells are open by construction; their winding is held by the per-object volume check",
+      "frontProbe": "frontRole:mirror",
+      "budget": {
+        "tris": 200
+      },
+      "outSha256": "270c9a275be8e24186a4d555e0a4c8d15607e91bf35c487f810b3f00ecbdd0ab",
+      "stats": {
+        "tris": 154,
+        "parts": 3,
+        "verts": 276,
+        "bytesRaw": 2118,
+        "box": [-0.30009, 0, 0, 0.30009, 0.56, 0.13069],
+        "scale": 0.801775,
+        "nativeDims": [0.7486, 0.6985, 0.163],
+        "mirroredObjects": ["Bathroom_cabinet_door"],
+        "objects": [
+          {
+            "name": "Bathroom_cabinet",
+            "tris": 46,
+            "closed": false,
+            "vol": 0.01121638,
+            "flipped": false
+          },
+          {
+            "name": "Bathroom_cabinet_door",
+            "tris": 54,
+            "closed": false,
+            "vol": 0.00056699,
+            "flipped": true
+          },
+          {
+            "name": "Bathroom_cabinet_door_01",
+            "tris": 54,
+            "closed": false,
+            "vol": 0.00056699,
+            "flipped": false
+          }
+        ],
+        "shells": 7,
+        "dropped": 0,
+        "decimated": false,
+        "cutTriangles": 0
+      },
+      "changes": ["re-pivot", "uniform rescale", "role-colouring", "clean-up"]
+    }
+  ]
+}

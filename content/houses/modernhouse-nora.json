@@ -420,6 +420,26 @@
               "d": 1.1,
               "pattern": "stripe",
               "color": "#7a6a55"
+            },
+            {
+              "type": "umbrella-stand",
+              "at": [
+                -1.409,
+                2.31
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.03:entry:0"
+            },
+            {
+              "type": "shoe-row",
+              "at": [
+                -2.252,
+                2.276
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.03:entry:1"
             }
           ]
         },
@@ -660,6 +680,17 @@
               "w": 0.14,
               "drop": 0.8,
               "color": "#eceae4"
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                -5.855,
+                -1.506
+              ],
+              "y": 0.75,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.05:table:0"
             }
           ]
         },
@@ -771,6 +802,28 @@
               "w": 0.34,
               "drop": 0.8,
               "color": "#f4f0e6"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                5.766,
+                -4.88
+              ],
+              "y": 0.805,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.06:tank:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                7.379,
+                -4.64
+              ],
+              "rot": 270,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l1.06:roll:0"
             }
           ]
         },
@@ -838,6 +891,25 @@
               ],
               "rot": 90,
               "src": "compose@1"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                -4.271,
+                -2.729
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.07:lamp:0"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                -5.24,
+                -4.747
+              ],
+              "src": "dress@1",
+              "dk": "l1.07:mirror:0"
             }
           ]
         },
@@ -1029,6 +1101,28 @@
               "w": 0.14,
               "drop": 0.8,
               "color": "#eceae4"
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                5.75,
+                0.35
+              ],
+              "y": 0.42,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.08:coffee:0"
+            },
+            {
+              "type": "side-set",
+              "at": [
+                4.297,
+                4
+              ],
+              "y": 0.52,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.08:side:0"
             }
           ]
         },
@@ -1118,6 +1212,15 @@
                 0.45,
                 -4.55
               ]
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                1.349,
+                -4.661
+              ],
+              "src": "dress@1",
+              "dk": "l1.10:lamp:0"
             }
           ]
         },
@@ -1597,6 +1700,26 @@
               ],
               "rot": 90,
               "src": "compose@1"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                6.361,
+                2.049
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l2.19:lamp:0"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                6.447,
+                2.68
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l2.19:mirror:0"
             }
           ]
         },
@@ -1679,6 +1802,16 @@
               ],
               "color": "#9b6350",
               "src": "compose@1"
+            },
+            {
+              "type": "globe-lamp",
+              "at": [
+                1.5,
+                -2.966
+              ],
+              "y": 0.5,
+              "src": "dress@1",
+              "dk": "l2.20:lamp:0"
             }
           ]
         }

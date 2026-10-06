@@ -24,7 +24,7 @@ export interface StyleBundle {
   /** cushions, rugs, art */
   accent: string[];
   /** hardware and lamp bases */
-  metal: 'black' | 'brass' | 'chrome' | 'bronze';
+  metal: 'black' | 'brass' | 'chrome' | 'bronze' | 'steel';
   /** patterned-rug patterns, in order of preference */
   rugs: string[];
   /** wall-art motifs (the motif library in assets/props/soft.ts), in order of preference */
@@ -67,7 +67,7 @@ export const STYLES: Record<string, StyleBundle> = {
   industrial: {
     key: 'industrial', label: 'Industrial', tags: ['industrial', 'modern', 'rustic'],
     fabric: ['#5a534c', '#8b8a86', '#3a3d40', '#a39a8b', '#6b4a36'], wood: ['#5b4636', '#3a2e27', '#7d6147'], accent: ['#a0522d', '#5c6b73', '#b08d57'],
-    metal: 'black', rugs: ['solid', 'kilim', 'border'], art: ['map', 'line', 'abstract', 'geometric'],
+    metal: 'steel', rugs: ['solid', 'kilim', 'border'], art: ['map', 'line', 'abstract', 'geometric'],
     finish: { floor: ['concrete', 'oak'], wall: ['painted-brick', 'paint'], kitchenTop: 'concrete', cabinet: ['#24272b', '#3f3a33', '#8a8580'] },
   },
   scandi: {

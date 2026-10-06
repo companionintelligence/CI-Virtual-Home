@@ -1,0 +1,908 @@
+{
+  "schema": 1,
+  "what": "sha256 of composeHouse's items for every room of every fixture house in test/fixtures/houses (the same dry run as test/fixtures/hashes/compose-baseline.json: authored items dropped, programs inferred, no seed variant). Consumed by scripts/test-compose-stability.mts: new types, roles and modules must not move any hash.",
+  "regenerate": "pnpm run build && node --experimental-strip-types scripts/review/compose-fixtures.mts --write   (when a fixture is added, or in a commit that means to move the composer, the prop registry, placement.ts or a fixture; no timestamp, two runs write the same bytes)",
+  "houses": {
+    "dress-baths": {
+      "rooms": 10,
+      "items": 63,
+      "sha256": "7e3bacc77e7a24d3b8fd37211952bd69b04b4ab4070ffb965305397513ef93c8",
+      "roomHashes": {
+        "l1/Study": "a33714e1dda1af74",
+        "l1/Bath, clawfoot": "0ee6e2207c405123",
+        "l1/Ensuite, soaking tub": "865a71558f5bb342",
+        "l1/Bath, built-in tub": "c325c6f69cad805d",
+        "l1/Powder, pedestal": "8a0f0f06c04a2fa1",
+        "l1/Bath, shower only": "3a4261e741fbb27e",
+        "l1/Ensuite, double, big shower": "7a81fd6c052cddd8",
+        "l1/Bath, default": "c0d24dddfef2555e",
+        "l1/Powder, single": "a54e57d026af923d",
+        "l1/Hall": "ac3e3ba043f34032"
+      }
+    },
+    "dress-kitchens": {
+      "rooms": 11,
+      "items": 164,
+      "sha256": "bd049a090816c87510c98f42d4db3f7fc7b1ba3691624482ad7017a1637ef290",
+      "roomHashes": {
+        "l1/Study": "c3ef0c69cf2b2cae",
+        "l1/L Kitchen, marble": "85c041683512f59f",
+        "l1/L Kitchen, peninsula": "c2b3e20ed07d0f63",
+        "l1/U Kitchen, quartz": "5b73e028db1dab85",
+        "l1/Galley, butcher block": "7c9537cc1f3cfd59",
+        "l1/Kitchen-dining, terrazzo": "9adabca8ba9a4157",
+        "l1/Kitchen, stone (default)": "60b9026de34b0694",
+        "l1/Kitchen, style mid-century": "72c9162a37d8896c",
+        "l1/Kitchen, style industrial": "f3570808965a5897",
+        "l1/Hall": "8d9072bcdad0e7a3",
+        "l1/Kitchen, glass wall": "fb718eae5e4c394e"
+      }
+    },
+    "dress-rooms": {
+      "rooms": 12,
+      "items": 128,
+      "sha256": "36bbf7ed49ade60d7ae41fa0849126c3954903d94978c74736fa428f0059d82d",
+      "roomHashes": {
+        "l1/Living Room": "86eca3d5a73bd034",
+        "l1/Foyer": "0af567dc525a6eab",
+        "l1/Kitchen": "8cb8ece3650324bf",
+        "l1/Library": "29a685ca64144c30",
+        "l1/Hall": "ee33a4902c508d1f",
+        "l1/Dining Room": "ca7e3b576c7da4c2",
+        "l2/Primary Bedroom": "f0991c2f7e29d23a",
+        "l2/Bath": "a923d4c2d4d46496",
+        "l2/Study": "e31b1bb567c12bc9",
+        "l2/Landing": "78b0ce8ae9c57ad7",
+        "l2/Kids Room": "c27e4b7cbea4910c",
+        "l2/Nursery": "f079073450f17011"
+      }
+    },
+    "dress-styles": {
+      "rooms": 4,
+      "items": 27,
+      "sha256": "cde5f8376874a246d35c18d543b7c31e0597df62074126ed3186bbcc1ba6f12b",
+      "roomHashes": {
+        "l1/Study": "cb83b478552117b8",
+        "l1/Craftsman": "a01d9029dd843d3d",
+        "l1/Living & Dining, craftsman, seed b": "2fe54a045934ff46",
+        "l1/Hall": "f3bf75f5faffe5e8"
+      }
+    },
+    "dress-utility": {
+      "rooms": 10,
+      "items": 80,
+      "sha256": "71b9bb4c3ef453c4d3350bf76a844e17aec055a3474329712ad342f5788f8e19",
+      "roomHashes": {
+        "l1/Study": "c3a1adab9adea2f3",
+        "l1/Laundry": "5a8cdfc6d00ffbe7",
+        "l1/Guest Bedroom": "8bdbd9c11128bdff",
+        "l1/Den": "385b06c446574294",
+        "l1/Mudroom": "f2f7d284e6db2750",
+        "l1/Garage": "c42bd5b9d66797f0",
+        "l1/Sunroom": "840ada078c2cbc0c",
+        "l1/Media Room": "83cc8994ea97fa16",
+        "l1/Laundry, big": "421a09e380ab6f79",
+        "l1/Hall": "db2b532116c802c1"
+      }
+    },
+    "integration-all": {
+      "rooms": 12,
+      "items": 117,
+      "sha256": "4faf4372cf40bd5df293dc5dfdac3bbbb5004902e608b034ef36e147966d3ad5",
+      "roomHashes": {
+        "l1/Living Room": "2a8383e006765f2a",
+        "l1/Foyer": "0ee417c5cef4ec3b",
+        "l1/Kitchen": "0bae6ce457dd7be7",
+        "l1/Library": "ce145c9be1d16e47",
+        "l1/Hall": "735ef5d6e0038c6c",
+        "l1/Dining Room": "81c127a91785d7fa",
+        "l2/Primary Bedroom": "7f6440255d9d2794",
+        "l2/Bath": "eba5d770b5796b82",
+        "l2/Study": "8ec8e8f0c5f38292",
+        "l2/Landing": "c39eefa81c989fc1",
+        "l2/Kids Room": "0dea34eab831ce2b",
+        "l2/Nursery": "4b7beec8c45f820f"
+      }
+    },
+    "integration-all-upstairs": {
+      "rooms": 12,
+      "items": 125,
+      "sha256": "9edaca4a1ca39d5c99f4c97ade7dd096503369a3d8c2891bbb0fb2de72e52251",
+      "roomHashes": {
+        "l1/Living Room": "7556d511eb86aa13",
+        "l1/Foyer": "1572080983c297ab",
+        "l1/Kitchen": "363b82365d45ba56",
+        "l1/Library": "5325e5e44f0ac60a",
+        "l1/Hall": "852d411567eeb950",
+        "l1/Dining Room": "c90ee88fbdf38e41",
+        "l2/Primary Bedroom": "6bcd303746f5656a",
+        "l2/Bath": "818625d404d45bbc",
+        "l2/Study": "b19244f794eb7ebd",
+        "l2/Landing": "106017475850de0e",
+        "l2/Kids Room": "5811830c61da5e74",
+        "l2/Nursery": "9edc2093a81201f8"
+      }
+    },
+    "light-bath-tile": {
+      "rooms": 2,
+      "items": 11,
+      "sha256": "27dcd23d15dac590e98053ab2455e2f3adc1bb7d8933835a9910d8b61ce2b91e",
+      "roomHashes": {
+        "l1/Hall": "a2837092dd78fae1",
+        "l1/Bath": "a0f9e91f99864af1"
+      }
+    },
+    "light-bed-lamp": {
+      "rooms": 2,
+      "items": 17,
+      "sha256": "7fcf1a7f9516de205ba2627197007c6d1b65f3217b1f649b3f2773e3d282e02d",
+      "roomHashes": {
+        "l1/Hall": "9d9f93317fac24a0",
+        "l1/Primary Bedroom": "ad16d05af1c9e093"
+      }
+    },
+    "light-kitchen-nolamp": {
+      "rooms": 2,
+      "items": 17,
+      "sha256": "066e710c55e69c0e886d3b69771caa2e36769f3b81f85d76e286c1c0827a2624",
+      "roomHashes": {
+        "l1/Hall": "15ced0ac5b397b0e",
+        "l1/Kitchen": "8d6fa297217edb18"
+      }
+    },
+    "light-living-lamp": {
+      "rooms": 2,
+      "items": 16,
+      "sha256": "52d125d42aaa601976baa9fff5576cd2fb39fc5464589f20dd9b66a5763af798",
+      "roomHashes": {
+        "l1/Hall": "6709f2be07353810",
+        "l1/Living Room": "9031ac7193b94bdb"
+      }
+    },
+    "s0-seams": {
+      "rooms": 4,
+      "items": 37,
+      "sha256": "76c8b29e7da571b0bb320cc0ccf01079bd91a40d8cb04874484e0b282e239203",
+      "roomHashes": {
+        "l1/Living Room": "351a307fa8bdacbe",
+        "l1/Study": "57f01b912661a34b",
+        "l2/Office": "5d23cb3186cf5c77",
+        "l2/Bedroom": "924fe54443db2792"
+      }
+    },
+    "s1-kit-cladding": {
+      "rooms": 3,
+      "items": 31,
+      "sha256": "39f87ff98c5c730c6746bff9f356e36a7e7908b7eff3d965f25714eb52ab6e01",
+      "roomHashes": {
+        "l1/Living Room": "92c21f4e88d6524e",
+        "l1/Study": "e2348830c446dec9",
+        "l2/Bedroom": "8b874dde066d21e7"
+      }
+    },
+    "s1-kit-doors": {
+      "rooms": 3,
+      "items": 21,
+      "sha256": "38e0267e21f92acb4654676821d95435a864d83f03b465075cc2206d41f49f20",
+      "roomHashes": {
+        "l1/Living Room": "eefad7a242fb8c16",
+        "l1/Study": "ec65313e415333ae",
+        "l1/Garage": "7557757d5645c54a"
+      }
+    },
+    "s1-kit-hero-console": {
+      "rooms": 1,
+      "items": 6,
+      "sha256": "bc91d464b1ff0d2934b9e450350983973ec6d3731bf481d16af1a7ef01341bde",
+      "roomHashes": {
+        "l1/Hall": "1bc6af060ec0c46b"
+      }
+    },
+    "s1-kit-hero-counter": {
+      "rooms": 1,
+      "items": 19,
+      "sha256": "08b45e417e616f70d161ab8bbcf8c5262054531fa9f57e0359337f606189b8ff",
+      "roomHashes": {
+        "l1/Kitchen": "dcb6823be0c10d65"
+      }
+    },
+    "s1-kit-hero-credenza": {
+      "rooms": 1,
+      "items": 13,
+      "sha256": "c3de6a0239579e281b4c566cc3647d0ba4642a582dcb9147ac55e465dab99c1c",
+      "roomHashes": {
+        "l1/Living Room": "32eff4a9c5886632"
+      }
+    },
+    "s1-kit-hero-island": {
+      "rooms": 1,
+      "items": 23,
+      "sha256": "219918dda31f481b2dbafe534346df89cdf2641e647276f9b79f82b0aa3e3cf4",
+      "roomHashes": {
+        "l1/Kitchen": "077e41de308921fb"
+      }
+    },
+    "s1-kit-look": {
+      "rooms": 11,
+      "items": 96,
+      "sha256": "b6275656f610d5e0e71090dab988cb1d75988883acfde0f644701e769f28ac74",
+      "roomHashes": {
+        "l1/Hall": "81bea86c8d09e122",
+        "l1/Living Room": "d13521ebac090735",
+        "l1/Study": "1afc1e96d8036eff",
+        "l1/Kitchen": "0b27604817a4c9bc",
+        "l1/Dining Room": "6aba1c6b9e55891a",
+        "l2/Landing": "1ec661eabe122554",
+        "l2/Bedroom": "d26fda3b0d762592",
+        "l2/Kids Room": "ffd5b1b7b0073abf",
+        "l2/Bedroom 2": "003fbb0d069b2faa",
+        "l2/Bath": "636c237f0735160e",
+        "l2/Den": "7243cc85dc1bfec0"
+      }
+    },
+    "s2-arch-defaults2": {
+      "rooms": 18,
+      "items": 91,
+      "sha256": "c13420b2d493fac6ac07aa0dcd9d18d54b7e118f7cb25e787cb6193b928bf491",
+      "roomHashes": {
+        "l1/Entry & Stair Hall": "a41396bad763dcb2",
+        "l1/Living Room": "b03926afcdd4e70a",
+        "l1/Living Bay": "8438ec5c48bd1337",
+        "l1/Kitchen": "3ae03da421123da4",
+        "l1/Dining Room": "3fc5779d9805b5c2",
+        "l1/Playroom": "9dd9f7402df6aade",
+        "l1/Mudroom": "feffd5158c97b9c6",
+        "l1/Powder Room": "45dfc5cf93e7ae8b",
+        "l1/Veranda": "dd08810e4f15856d",
+        "l1/Wrap Porch": "a520e9b94997d0eb",
+        "l1/Back Porch": "2dd29be182827f6b",
+        "l1/Garden Patio": "1ea8cdb98dd89639",
+        "l2/Kids' Bedroom": "13ec0e3b84d59446",
+        "l2/Nursery": "99128400041825f4",
+        "l2/Family Bathroom": "cad496cb4679c405",
+        "l2/Upper Hall": "228f4211671d34e0",
+        "l2/Primary Bedroom": "9d71bf2f1fe47d1c",
+        "l2/Primary Ensuite": "fd2022a224031891"
+      }
+    },
+    "s2-arch-demands": {
+      "rooms": 6,
+      "items": 60,
+      "sha256": "f0c77320fd70c151e83e7f5f7eeb7ec3e29a6ba6b3650ad5bf5715662943d400",
+      "roomHashes": {
+        "l1/Living Room": "959576eef74824b6",
+        "l1/Hall": "85f8b51374b152fe",
+        "l1/Garage": "3dd4c0d218e04d42",
+        "l1/Kitchen": "b236cbaee68f403e",
+        "l1/Dining": "c45846b2e3476570",
+        "l1/Living": "4fdb487821b1694a"
+      }
+    },
+    "s2-arch-facade": {
+      "rooms": 3,
+      "items": 29,
+      "sha256": "13c45397beb9135f5d1b42dfa53587c6ff72a5b2155dc22860f17f93997f849d",
+      "roomHashes": {
+        "l1/Living Room": "2234ea3232866470",
+        "l1/Study": "0c082f99fcb8b825",
+        "l2/Bedroom": "408c095dc2e2843c"
+      }
+    },
+    "s2-arch-finishes": {
+      "rooms": 9,
+      "items": 87,
+      "sha256": "44eceb187f35164c983223ebf20027e1fef2e88e658da3b0751e13b556f01350",
+      "roomHashes": {
+        "l1/Living Room": "f8cb5fe0dd8e77ba",
+        "l1/Kitchen": "74a47a5dd42b3203",
+        "l1/Dining Room": "f7ecfd72f2262e43",
+        "l1/Entry Hall": "3df6b69ed1e47906",
+        "l1/Study": "e5ab5ae15f6f7674",
+        "l1/Bath": "d8de31cc0642bc99",
+        "l2/Primary Bedroom": "3bed7861feade31b",
+        "l2/Guest Room": "d6db1e313139fc07",
+        "l2/Landing": "0e2f0af04838d2e4"
+      }
+    },
+    "s2-arch-porch": {
+      "rooms": 6,
+      "items": 52,
+      "sha256": "8d3f414ac847459e38c610c2dfd1d3d2945b9fca766b81265531e0bdc8babb7e",
+      "roomHashes": {
+        "l1/Living Room": "ca3e56c007e67bb4",
+        "l1/Kitchen": "5cfd1024ae09a03a",
+        "l1/Hall": "d9f3ae07aa7ac35d",
+        "l1/Library": "26d5f14e3b345324",
+        "l2/Bedroom": "e5816deddf24cd0e",
+        "l2/Sitting Room": "47c0644439155281"
+      }
+    },
+    "s2-arch-roofs": {
+      "rooms": 5,
+      "items": 41,
+      "sha256": "a007ebb272a3ba4ac5a73b1875c656518f3755e136ed9b5f740e123b9e7b42a8",
+      "roomHashes": {
+        "l1/Living Room": "aae6312fda55a8f1",
+        "l1/Studio": "7c79dd66164ed109",
+        "l1/Garden Room": "80d6d1571ead758d",
+        "l1/Workshop": "0f5e47c4d13e146a",
+        "l2/Loft Bedroom": "c74bbfb0a7f7bb5d"
+      }
+    },
+    "s2-arch-sections": {
+      "rooms": 6,
+      "items": 48,
+      "sha256": "13937a09b3947827fbc3a286d4d1c5527ace0ac9ab5a46cb3a9a41e03f7c4db2",
+      "roomHashes": {
+        "l1/Hall": "b1fdd3cc894a2b54",
+        "l1/Living": "2e17ff50715e5f55",
+        "l2/Pit Lounge": "19fe08aca06bd2b2",
+        "l2/Landing": "2cbbf29b3df3ee1b",
+        "l2/Bedroom": "8e5e2c0f8f089922",
+        "l3/Studio": "ef586aecc1b84b1b"
+      }
+    },
+    "s2-arch-split": {
+      "rooms": 3,
+      "items": 15,
+      "sha256": "20d3d1ee66fb0dda25f25176622a5a2bf4d23b2ad2545bc4adf9413a06c4d825",
+      "roomHashes": {
+        "l1/Garage": "d6c58569367ec091",
+        "l2/Living Room": "92a9052d6ee8df0e",
+        "l3/Study": "ddbf47494283ea7a"
+      }
+    },
+    "s2-arch-stairs": {
+      "rooms": 3,
+      "items": 15,
+      "sha256": "92ab80163ab13c89808878988861ed7c8917d686a3f23e9bbf2fdd689b2fb6ec",
+      "roomHashes": {
+        "l1/Stair Hall": "3cec0c09acc471b6",
+        "l1/Study": "0d54bc0d9d9c9549",
+        "l2/Landing": "3f601595f128771c"
+      }
+    },
+    "s2-arch-vanilla": {
+      "rooms": 18,
+      "items": 115,
+      "sha256": "ab4a24b564d6bb6083202baf300d840f1b6e7b1ecd10c9e43d76b6f96a5f7f88",
+      "roomHashes": {
+        "l1/Greenhouse": "d42636703acde91a",
+        "l1/Library": "142ff1fb80f0bfdd",
+        "l1/Hall": "759fb2242e982a61",
+        "l1/Bathroom": "052bec528322b290",
+        "l1/Stair Hall": "2b5b5adaffd86a64",
+        "l1/Laundry": "ac47b8f6d27a42ac",
+        "l1/Powder Room": "fba37771f4b2418b",
+        "l1/Living & Dining": "e60fcbb5de06c58d",
+        "l1/Kitchen": "d10dc6fa1d7b7877",
+        "l1/Foyer": "092f84d31d890fe5",
+        "l1/Dining Terrace": "1c98cef8cc395c09",
+        "l1/Pool Deck": "4e735be82556c084",
+        "l1/Entry Stoop": "c7a880a35f7d170d",
+        "l2/Landing": "6a041acd6b2703fb",
+        "l2/Upper Hall": "e586aecdb7632e5d",
+        "l2/Primary Bedroom": "d140250fae65ea22",
+        "l2/Family Bathroom": "9e685c8148ddfd7c",
+        "l2/Bedroom Three": "cead58721d1659bb"
+      }
+    },
+    "s3-compose-baths": {
+      "rooms": 10,
+      "items": 62,
+      "sha256": "f4bfe4e75a136aaeea4d2e677e2cdd2c27aa59e9de0ac23f7f9bc583405b755e",
+      "roomHashes": {
+        "l1/Study": "438a4da429d9b0f9",
+        "l1/Bath, clawfoot": "080dce24c8815bb3",
+        "l1/Ensuite, soaking tub": "7284abcff37001ea",
+        "l1/Bath, built-in tub": "eb842eeac2205737",
+        "l1/Powder, pedestal": "0cd0cbc9441b9642",
+        "l1/Bath, shower only": "09183fc7c06d5a05",
+        "l1/Ensuite, double, big shower": "34c06c702987aafb",
+        "l1/Bath, default": "7c454c6fdf12fa29",
+        "l1/Powder, single": "8c3d84f51935771a",
+        "l1/Hall": "41353b6afe3927e7"
+      }
+    },
+    "s3-compose-house": {
+      "rooms": 12,
+      "items": 126,
+      "sha256": "33b29e24373a00a3084beb1f9e8ec1ca02627360bde14d63325ed67a04be85f9",
+      "roomHashes": {
+        "l1/Living Room": "fc951dd8c808066b",
+        "l1/Foyer": "563f727d8ef440d7",
+        "l1/Kitchen": "8ad4bc7dc570246e",
+        "l1/Library": "0499e03fb01b9776",
+        "l1/Hall": "6e74a2dfde2f9ac8",
+        "l1/Dining Room": "7275977d5bb4c5de",
+        "l2/Primary Bedroom": "b447fe77ee36e05f",
+        "l2/Bath": "a0b592b515f754f0",
+        "l2/Study": "021666131d0eafa4",
+        "l2/Landing": "06a63fe69e7957da",
+        "l2/Kids Room": "44daa314ddee0f53",
+        "l2/Nursery": "a93a1007d88c6e5f"
+      }
+    },
+    "s3-compose-kitchens": {
+      "rooms": 11,
+      "items": 147,
+      "sha256": "1bbe614a9d40e66896a0d270a2ca79e5a2dd02bab369561444f4f8849de4edd6",
+      "roomHashes": {
+        "l1/Study": "cc2c8bc144fd9920",
+        "l1/L Kitchen, marble": "ddeaaf5e46770be8",
+        "l1/L Kitchen, peninsula": "141065bfce0ea7c8",
+        "l1/U Kitchen, quartz": "12df747651a5e2be",
+        "l1/Galley, butcher block": "c5da881962e6053d",
+        "l1/Kitchen-dining, terrazzo": "7aabd7bc2bf533c4",
+        "l1/Kitchen, stone (default)": "619ebe6cbf97f6c7",
+        "l1/Kitchen, style mid-century": "26cc0276f3e2ccf8",
+        "l1/Kitchen, style industrial": "7e4bcb98abc1f076",
+        "l1/Hall": "0e943c5bf21a0f2b",
+        "l1/Kitchen, glass wall": "592451dc150488e3"
+      }
+    },
+    "s3-compose-props": {
+      "rooms": 5,
+      "items": 47,
+      "sha256": "0fcc418167997e9d64917fe00c5519a8662d4110b78aa0ca7fe87fbff17cd300",
+      "roomHashes": {
+        "l1/Study": "bd496d1df1cd8253",
+        "l1/Art": "0e1f82d4c66f918b",
+        "l1/Dining": "236ffc9a92b56980",
+        "l1/Bath and kitchen kit": "609bd613f42ea838",
+        "l1/Hall": "e25b19c3fd5a4e70"
+      }
+    },
+    "s3-compose-styles": {
+      "rooms": 4,
+      "items": 28,
+      "sha256": "5c58bdc5396722d1d6aae673951d35ab94377cd61dda0de303ee876ed0c6a687",
+      "roomHashes": {
+        "l1/Study": "a24f78e40dac370d",
+        "l1/Craftsman": "7a9d0a57913763d9",
+        "l1/Living & Dining, craftsman, seed b": "a7cb4b24faadde80",
+        "l1/Hall": "4b9607d43ac4d255"
+      }
+    },
+    "s3-compose-tidy": {
+      "rooms": 5,
+      "items": 49,
+      "sha256": "c62316ee0f84b7ee8bf2057ff60a66d6a83d325184b5994724f6b8f0cdbb742b",
+      "roomHashes": {
+        "l1/Study": "75765b645ff4264e",
+        "l1/Bedroom, head on the E wall": "c4fa6ff9237b0f39",
+        "l1/Kitchen, island asked for by focus": "e79e1ae4acef6de2",
+        "l1/Bedroom, head on the S wall": "6d3cb6886e0a0036",
+        "l1/Hall": "8c5ab80294a5009b"
+      }
+    },
+    "s4-site-canal": {
+      "rooms": 4,
+      "items": 41,
+      "sha256": "b36f40aebb3475e89684e3e02ebf2bd0e30cd3f62731738aef1886303745c82b",
+      "roomHashes": {
+        "l1/Living Room": "ae552b5ef0278c5d",
+        "l1/Study": "10fe85d258f9a72c",
+        "l2/Office": "8e32c22dbcb93a3d",
+        "l2/Bedroom": "051197a370f6deb5"
+      }
+    },
+    "s4-site-city": {
+      "rooms": 4,
+      "items": 40,
+      "sha256": "aa4970f668405cb13b44ee7e22ab944b995a89a7a879c5b28a0aae7f2f585415",
+      "roomHashes": {
+        "l1/Living Room": "db6e9921e3e8506a",
+        "l1/Study": "79e65eb0982bf767",
+        "l2/Office": "35b1c193503b7d63",
+        "l2/Bedroom": "2ad414633b1d1c8c"
+      }
+    },
+    "s4-site-desert": {
+      "rooms": 4,
+      "items": 36,
+      "sha256": "84cbae06504f5e6c7ff0c45972961d9a2a927650862c9474cd8a264d483ba862",
+      "roomHashes": {
+        "l1/Living Room": "71e701927e18f7a2",
+        "l1/Study": "d79c935f157ac91f",
+        "l2/Office": "ce2a3ec0e398a6f8",
+        "l2/Bedroom": "2185f219b95346cd"
+      }
+    },
+    "s4-site-forest": {
+      "rooms": 4,
+      "items": 41,
+      "sha256": "51dbe76d32d379badf39beb992263eb9f6d6e2b1eb56f3a677e2ce1f915f4564",
+      "roomHashes": {
+        "l1/Living Room": "4ab6e5275ffbeb7d",
+        "l1/Study": "44a32489e94bcb96",
+        "l2/Office": "6ca1f185640d2f86",
+        "l2/Bedroom": "164ce2b4183267da"
+      }
+    },
+    "s4-site-garden": {
+      "rooms": 4,
+      "items": 39,
+      "sha256": "d7092117d2b6a65f10fbbf8c2ebbb65d2b56f5843f935892812dc86026b77a81",
+      "roomHashes": {
+        "l1/Living Room": "7ed113ebcdd89ee8",
+        "l1/Study": "97c847673f269915",
+        "l2/Office": "f61435c28832f0e2",
+        "l2/Bedroom": "3219e10d97805873"
+      }
+    },
+    "s4-site-hills": {
+      "rooms": 4,
+      "items": 35,
+      "sha256": "5b0312d1ff5dc5636dbcc71d7106b1965953cf7c811760b35d6d0f1904c9c54a",
+      "roomHashes": {
+        "l1/Living Room": "1ee6bfc15a9578fb",
+        "l1/Study": "991e653b613cf867",
+        "l2/Office": "0305cf4e464b1aa9",
+        "l2/Bedroom": "018caecc6abaa891"
+      }
+    },
+    "s4-site-lakeside": {
+      "rooms": 4,
+      "items": 40,
+      "sha256": "60e63a0fda192053b854074633ca7c98967c51b21484cfa595163f990dfe669d",
+      "roomHashes": {
+        "l1/Living Room": "ff4195beb6a0e599",
+        "l1/Study": "dedc914f004fa853",
+        "l2/Office": "7aa9be7418bf7444",
+        "l2/Bedroom": "ba2cc65b4d67a03b"
+      }
+    },
+    "s4-site-lot-asymmetry": {
+      "rooms": 20,
+      "items": 118,
+      "sha256": "5e5983e6550d1af0f6f9351036058b8f89cec34c505c64b6a25318370392250b",
+      "roomHashes": {
+        "l1/Lower Hall": "f5d4f09f624707cc",
+        "l1/Bar Lounge": "dd871693a074deab",
+        "l1/Garage": "b39d1841be148dc1",
+        "l1/Wine Cellar": "7df6f93b4efde5d0",
+        "l1/Laundry": "6d080a1bf7fef0ca",
+        "l1/Pool Plant & Storage": "d6ea9f9ad7b9bfab",
+        "l2/Entry": "5f1c8e47f66fd6b7",
+        "l2/Stair Hall": "f6708fb51d6d8bd7",
+        "l2/Kitchen": "bf46f626efd9d5f6",
+        "l2/Dining": "7d8462c446246af4",
+        "l2/Entry Passage": "978e78e762db157b",
+        "l2/Living": "03d5e75514de4361",
+        "l2/Green Bedroom": "487e8e372bec9e61",
+        "l3/Upper Landing": "0dbfda34b497a488",
+        "l3/Primary Bedroom": "c61754d27669184f",
+        "l3/Upper Stair Hall": "2287f6b00899abc4",
+        "l3/Primary Bath": "764dceddbeee661e",
+        "l3/Upper Hall": "625767de43f0d644",
+        "l4/Loft Bedroom": "b6089e8f307ed9a8",
+        "l4/Loft Ensuite": "deeb0d913723d721"
+      }
+    },
+    "s4-site-lot-lakecabin": {
+      "rooms": 14,
+      "items": 99,
+      "sha256": "c416cc39a855b8c6354c8400d7d37f67653b331f74bbeabd0a671cfd245c1ea4",
+      "roomHashes": {
+        "l1/Living Nook": "cabbc9143ad68c9b",
+        "l1/Bath": "85ebf74e786b1ae3",
+        "l1/Dining": "87f2386dd20f12c6",
+        "l1/Kitchen": "5cfe697a55757f41",
+        "l1/Lake Passage": "f58db08ad9f68663",
+        "l1/Lake Deck": "4a02ec32d499c004",
+        "l1/Lake Hall": "58b37c8173ea5b26",
+        "l1/Study": "e5ff0d6320e52fee",
+        "l2/Master Bedroom": "760864c73c5d79a2",
+        "l2/Upper Hall": "d303327e851c3456",
+        "l2/Stair Landing": "a673772ec9fa5dce",
+        "l2/Bath": "5a47bf32b53fca4c",
+        "l2/Nursery": "8ce46d2908f4f7a6",
+        "l2/Chimney Breast": "addff31f92b9e6eb"
+      }
+    },
+    "s4-site-lot-mediterranean": {
+      "rooms": 15,
+      "items": 129,
+      "sha256": "b52ccdaf12a8ef5ba4e7aa4b982569e5e02de174ef1384a3261edc89c298e580",
+      "roomHashes": {
+        "l1/Stair Hall": "7b4c8643587b9a6e",
+        "l1/TV Room": "9b47dc6cf2e46849",
+        "l1/Dining Room": "59c826b2047d90ff",
+        "l1/Salon": "652af9e0ad185227",
+        "l1/Games Den": "110eec1108b9a776",
+        "l1/Breakfast Room": "d9420c1fc6f156ea",
+        "l1/Kitchen": "02b9776d46e79086",
+        "l1/Guest Bedroom": "beecb7b0fb08b55e",
+        "l1/Guest Bath": "32bcd98e483982f3",
+        "l1/Pool Terrace": "9514b9d620044f9d",
+        "l1/Pergola Dining": "9a6f22e5a1a79d10",
+        "l2/Upper Landing": "36e0877bca09ca4b",
+        "l2/Front Bedroom": "b2d8dcb4a335f14a",
+        "l2/Primary Suite": "56b071e9bface607",
+        "l2/Primary Bath": "d18730bca51cb95e"
+      }
+    },
+    "s4-site-lot-modernhouse-nora": {
+      "rooms": 18,
+      "items": 66,
+      "sha256": "2eee6d4a3f8137284f87da8491c9d5d5fb327f99252c038d198ef76c6e032a9f",
+      "roomHashes": {
+        "l1/Kitchen": "683dffcaa67b93c1",
+        "l1/Pantry": "75926d85e1697723",
+        "l1/Entry": "331d4d439235202a",
+        "l1/Dining": "716d3e27bd401e77",
+        "l1/Bath": "343d10634c890884",
+        "l1/Back Hall": "37a749ac83048709",
+        "l1/Living Room": "e920ecb9bb0ecaf4",
+        "l1/Stair Hall": "a0952517cc166bb0",
+        "l1/Desk Hall": "62df1d77388658a2",
+        "l1/Porch": "a21a4595cf52a2e2",
+        "l1/Porch Fins West": "6415538ea022ef0c",
+        "l1/Porch Fins East": "4223588d2c378ee7",
+        "l1/Deck Bar": "93f9f2c21342d74b",
+        "l1/Deck Grill": "b7ed09322d92f878",
+        "l1/Deck Umbrella": "9f216784b4c73add",
+        "l2/Primary Bedroom": "42cde31c58f9c4d9",
+        "l2/Stair Landing": "fe82ac9ecf3ba5ea",
+        "l2/Roof Terrace": "4a978444209e31e7"
+      }
+    },
+    "s4-site-lot-onestory": {
+      "rooms": 10,
+      "items": 72,
+      "sha256": "814dae683a1b89f0606c4f9793fcba00e6bcae8c03298915f06aac1c8a1b7365",
+      "roomHashes": {
+        "l1/Living Room": "b66c79be0e1355d1",
+        "l1/Entry Hall": "5cedd2a92a663d46",
+        "l1/Vestibule": "80661ae2aea15408",
+        "l1/Kitchen": "601d40cd64b9f2c1",
+        "l1/Dining Room": "5aaa7be330165b72",
+        "l1/Bathroom": "43553f52d1d0244e",
+        "l1/Primary Bedroom": "aa420d94ec0803e1",
+        "l1/Guest Bedroom": "25a90537b9441eaa",
+        "l1/Chimney": "1be9fc7f2202735e",
+        "l1/Deck": "ead55dde1ee3dc7f"
+      }
+    },
+    "s4-site-lot-vanilla": {
+      "rooms": 18,
+      "items": 121,
+      "sha256": "22d4ba9541e6c2946669811602e890d05c3b6eb8434eadf23990f26d2c028351",
+      "roomHashes": {
+        "l1/Greenhouse": "b3f7024add65655e",
+        "l1/Library": "27b0a46e40fdc3b6",
+        "l1/Hall": "b5a9144baac62231",
+        "l1/Bathroom": "818dbfe32ccf56f9",
+        "l1/Stair Hall": "6a8a181cd5610ae6",
+        "l1/Laundry": "086dc71a214a0c7b",
+        "l1/Powder Room": "6fdc987c7300bc10",
+        "l1/Living & Dining": "94e15dcd8ab360d4",
+        "l1/Kitchen": "06be6a2836d3d60e",
+        "l1/Foyer": "82edcba8ba648306",
+        "l1/Dining Terrace": "1c98cef8cc395c09",
+        "l1/Pool Deck": "4e735be82556c084",
+        "l1/Entry Stoop": "c7a880a35f7d170d",
+        "l2/Landing": "0cca102a2949d10f",
+        "l2/Upper Hall": "6f10010294d2372a",
+        "l2/Primary Bedroom": "82679240af0b1547",
+        "l2/Family Bathroom": "d70e60a52c81b228",
+        "l2/Bedroom Three": "db297dc174b3cce2"
+      }
+    },
+    "s4-site-rural": {
+      "rooms": 4,
+      "items": 39,
+      "sha256": "5794e0817cd559b30416cb482c66ec4308cec6c5aa7572b19c8ee385fd6d9a3b",
+      "roomHashes": {
+        "l1/Living Room": "1b21b14b2466e154",
+        "l1/Study": "4957ed9ece0353bd",
+        "l2/Office": "9bbb925abf63e170",
+        "l2/Bedroom": "879255467155edeb"
+      }
+    },
+    "s4-site-sea": {
+      "rooms": 4,
+      "items": 41,
+      "sha256": "a3ff263f7175bbd26cbed67767dc1752e6d77ddc2e867a35cd8e4f41db4a081d",
+      "roomHashes": {
+        "l1/Living Room": "659c7d0fa04ab2fe",
+        "l1/Study": "0cd1ca2613f7fd64",
+        "l2/Office": "71f3ced13c244327",
+        "l2/Bedroom": "9f91b6c1e5fb2d4b"
+      }
+    },
+    "s4-site-suburb2": {
+      "rooms": 4,
+      "items": 41,
+      "sha256": "3de3b11639241b9af035ba945bcf35eadb8d7fd7c678639af3dfbced9384434f",
+      "roomHashes": {
+        "l1/Living Room": "9193199d2bc012f7",
+        "l1/Study": "048d44cecb6aa54f",
+        "l2/Office": "788f2d2a8e783cd4",
+        "l2/Bedroom": "1f610ba066ffcf4a"
+      }
+    },
+    "s4-site-terrace": {
+      "rooms": 4,
+      "items": 40,
+      "sha256": "7220f90942db18bbab08dc95cbd052037b3f4a17dc51660f03bfc129842b22a8",
+      "roomHashes": {
+        "l1/Living Room": "9ad97cb42ac7f8bc",
+        "l1/Study": "d6a4af9c40ec642f",
+        "l2/Office": "3cc7fbd741065f31",
+        "l2/Bedroom": "7112d7aeb7444176"
+      }
+    },
+    "s4-site-water": {
+      "rooms": 4,
+      "items": 39,
+      "sha256": "76996cc1dd3b817c10d2ead85a0ea0c05ffce55b0d33ce98873e0ef2348579d2",
+      "roomHashes": {
+        "l1/Living Room": "2c89218a9f4ef162",
+        "l1/Study": "ebe8347fb2e33805",
+        "l2/Office": "4d308a7c907ec295",
+        "l2/Bedroom": "0bcdff2105933246"
+      }
+    },
+    "s5-shot-descend": {
+      "rooms": 18,
+      "items": 100,
+      "sha256": "ace672f5d6b759101d2e8df58bcaf493f2619f77067489fa8c757019b0049d65",
+      "roomHashes": {
+        "l0/Garage": "9ce527d275dc610c",
+        "l0/Garage Front": "7cb4cd38b7033e41",
+        "l1/Living Room": "e6bb64fcdd2f1894",
+        "l1/Kitchen": "300a33fa74a25ff5",
+        "l1/Dining": "b39d5c8ba324b882",
+        "l1/Foyer": "16b90b5333e1fad0",
+        "l1/Powder Room": "a9e055eae3070022",
+        "l1/Landing": "5127d568be878db5",
+        "l1/Landing Planters": "28bd624677f0ec98",
+        "l1/Terrace Dining": "d91c10e2770ed520",
+        "l1/Outdoor Kitchen": "6ce1e8d28014fbf3",
+        "l1/Terrace Lounge": "91e6ead42a3479b4",
+        "l2/Primary Suite": "74fd08084cab43df",
+        "l2/Landing": "54a18e42b233bcf2",
+        "l2/Hall": "8905b476d5231113",
+        "l2/Bedroom": "5a0e8f571ae72ba4",
+        "l2/Bathroom": "2e713c3dd7b2b09b",
+        "l2/Guest Bedroom": "7b9eee6483e1637a"
+      }
+    },
+    "s5-shot-island": {
+      "rooms": 8,
+      "items": 44,
+      "sha256": "79f50a23d228c93a603babe4c08801ac7b83833708637dcc1327e35696e424f0",
+      "roomHashes": {
+        "l1/Front Stoop": "b424e389c423fb8b",
+        "l1/Kitchen": "0e29d175da1f805f",
+        "l1/Living Room": "f9a8cb8cfb3a3abb",
+        "l1/Dining": "2c89d4c638590e26",
+        "l1/Kids Corner": "744b370ee19a45fe",
+        "l1/Bedroom": "2a5ce74827da0690",
+        "l1/Hall": "120f35427dc9c99e",
+        "l1/Bath": "b76f172eaace8dd0"
+      }
+    },
+    "s5-shot-knobs": {
+      "rooms": 18,
+      "items": 89,
+      "sha256": "2258e29a0aa48b0986b59a983cd9d398ceedb1cdf7c68b37623027c3f784d67e",
+      "roomHashes": {
+        "l1/Entry & Stair Hall": "69521446a0aba8cf",
+        "l1/Living Room": "3bc6a0f58320f0d3",
+        "l1/Living Bay": "8438ec5c48bd1337",
+        "l1/Kitchen": "d3584f370457e229",
+        "l1/Dining Room": "ea2ff9b3c1c9ea32",
+        "l1/Playroom": "7b324e90eec837a9",
+        "l1/Mudroom": "107a08204fa49cdd",
+        "l1/Powder Room": "b247fab455300674",
+        "l1/Veranda": "dd08810e4f15856d",
+        "l1/Wrap Porch": "a520e9b94997d0eb",
+        "l1/Back Porch": "2dd29be182827f6b",
+        "l1/Garden Patio": "1ea8cdb98dd89639",
+        "l2/Kids' Bedroom": "c7c321d1e421e801",
+        "l2/Nursery": "e92420baa96c406f",
+        "l2/Family Bathroom": "4f08b837b7330035",
+        "l2/Upper Hall": "7f23d79b233930c2",
+        "l2/Primary Bedroom": "b54adc9181aa454e",
+        "l2/Primary Ensuite": "357aadeb943eeb42"
+      }
+    },
+    "s5-shot-spiral": {
+      "rooms": 14,
+      "items": 92,
+      "sha256": "c9959a63381665bae45d817911c22a0a4e1c33d187b840c89dc9eb22c10c538f",
+      "roomHashes": {
+        "l1/Living Nook": "0a0326f914e298df",
+        "l1/Bath": "f982d4e0375c377d",
+        "l1/Dining": "22d7b16b4eb3bdc0",
+        "l1/Kitchen": "c42a31eabecb5b09",
+        "l1/Lake Passage": "0cba67c6d8b4d7f3",
+        "l1/Lake Deck": "4a02ec32d499c004",
+        "l1/Lake Hall": "94b182789eadf5be",
+        "l1/Study": "b8ad46f610a7fcf0",
+        "l2/Master Bedroom": "488a3b9ad730a392",
+        "l2/Upper Hall": "ede45f00bdd88aa4",
+        "l2/Stair Landing": "c93bc03cb8f37ab5",
+        "l2/Bath": "c73fd58aa1d6e849",
+        "l2/Nursery": "e4669748172ee2f6",
+        "l2/Chimney Breast": "addff31f92b9e6eb"
+      }
+    },
+    "s5-shot-upper-entry": {
+      "rooms": 17,
+      "items": 99,
+      "sha256": "b9a786c1067ed97af47aeaeba0ec963925903a7b5ccf22cb650d3d68ebd9d811",
+      "roomHashes": {
+        "l0/Garage": "ec08fbe236153229",
+        "l0/Laundry": "edb11658e1084a5a",
+        "l0/Workshop": "6cc093a865cdb3cc",
+        "l0/Den": "7c595bb4eb1d1444",
+        "l0/Back Patio": "ef931e439cf98301",
+        "l1/Foyer": "0950c60e2e8598fa",
+        "l1/Living Room": "5c9db5d2ca44ef87",
+        "l1/Reading Nook": "185f8b9ab546c3bc",
+        "l1/Kitchen & Dining": "e0a0d22ad80f86b0",
+        "l1/Pantry": "0ae2c335017a6f92",
+        "l1/Hall": "5651bbf08a433374",
+        "l1/Primary Bedroom": "f37d5111b10b686a",
+        "l1/Ensuite": "1e591154a54c5150",
+        "l1/Bath": "6df4780d962710b7",
+        "l1/Kids Bedroom": "2d5a01a2cc14779d",
+        "l1/Loggia": "8df64a62fe143b90",
+        "l1/Terrace": "a1e8bcb4d30f84a1"
+      }
+    },
+    "s6-editor-single": {
+      "rooms": 2,
+      "items": 22,
+      "sha256": "44fc9ec9cd0c20cd0b0ca98c8051bd9abe56897a5fe8b3e6818e2c42c1332ac9",
+      "roomHashes": {
+        "l1/Living Room": "c7bf9715ff5af281",
+        "l1/Bedroom": "738ddc85af59ff8e"
+      }
+    },
+    "s6-editor-storeys": {
+      "rooms": 4,
+      "items": 40,
+      "sha256": "f138cc85ba95814342c730e78c8c4f0bb852339dbd779bf7e13f31e6758b8fcc",
+      "roomHashes": {
+        "l1/Living Room": "f5c1e86de207cc46",
+        "l1/Study": "8488b0ca0163ec1f",
+        "l2/Office": "a164b2a6a7685dbc",
+        "l2/Bedroom": "804ef39ff4a74d4d"
+      }
+    },
+    "small-props": {
+      "rooms": 4,
+      "items": 61,
+      "sha256": "7163347159eac58f4e2e112c2f703f16864bcfcea0f78cb97b2859383f59b669",
+      "roomHashes": {
+        "l1/Kitchen and Dining": "fc53046dd88a8657",
+        "l1/Living and Hall": "0b26865d315e348d",
+        "l1/Bedroom": "ceece3a025abbbbe",
+        "l1/Bath": "8513a83b1fdc6f76"
+      }
+    },
+    "soft-props": {
+      "rooms": 5,
+      "items": 49,
+      "sha256": "b696ae977ff1d2ffd0f11ae11c0defa541db7d762ecce951b4f08d770bcd4523",
+      "roomHashes": {
+        "l1/Study": "087467e708b9d078",
+        "l1/Beds": "3541b65d8f8b7c76",
+        "l1/Beds again and a quilt": "401c33a776555d89",
+        "l1/Bath and kitchen kit": "f77f70d6f33e4b02",
+        "l1/Hall": "e10111a61fafe5af"
+      }
+    }
+  },
+  "fleet": {
+    "houses": 62,
+    "rooms": 461,
+    "items": 3696,
+    "sha256": "4d7d614c122b3c92323064143b6bf7b3f48a1a477d27d65bf966ebec187b36bf"
+  }
+}

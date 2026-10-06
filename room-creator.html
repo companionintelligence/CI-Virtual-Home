@@ -1975,6 +1975,7 @@
     import { TransformControls } from 'three/addons/TransformControls.js';
     import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
     import { createHouseBuilder } from './assets/house-builder.js';
+    import { ensureBaked } from './assets/props/model-kit.js';   // OWNER bake: the lazy-chunk seam of the baked prop layer (a no-op while every family is eager)
     import { createVisibility, ISO_VIEW, placeIsoCamera } from './assets/visibility.js';
     import { trackFromV1, trackView } from './assets/shot-track.js';
     import { qaTrack, qaAspects } from './assets/shot-qa.js';
@@ -1982,7 +1983,7 @@
     import { registerSceneCheck, runSceneChecks } from './assets/scene-qa/registry.js';   // the registry; the streams' checks load below (sceneChecksLoaded)
     import { timingValid } from './assets/shot-path.js';
     import { createTextureLibrary } from './assets/textures.js';
-    import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, createSkyBaker, installSkyFog, GradeShader, createLighting } from './assets/environment.js';
+    import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, createSkyBaker, installSkyFog, GradeShader, createLighting, interiorWeight, storeysOf, GTAO_THICKNESS } from './assets/environment.js';
     import { installLightGuard } from './assets/light-guard.js';
     // the editor's own UI (S6): assets/ui/*.ts
     import { displayName, buildCredit } from './assets/home-names.js';
@@ -6890,7 +6891,8 @@
       const p = TIME_OF_DAY[appliedPreset] || TIME_OF_DAY.day, L = window.__houseLighting;
       const sun = L && L.sun, az = sun ? ((Math.atan2(sun[0], -sun[2]) * 180 / Math.PI) + 360) % 360 : null;   // compass: +x east, −z north
       const readout = document.getElementById('sun-readout');
-      if (readout) readout.textContent = `${uiLighting === 'auto' ? "The home's own: " : ''}${p.label}. Sun ${az === null ? '' : `from ${Math.round(az)}° (${compass(az)}), `}${p.sun.elevation}° up.`;
+      const warming = window.__houseFixturesWarm && window.__houseFixturesWarm() && window.__houseLightsHeld && window.__houseLightsHeld();
+      if (readout) readout.textContent = `${uiLighting === 'auto' ? "The home's own: " : ''}${p.label}. Sun ${az === null ? '' : `from ${Math.round(az)}° (${compass(az)}), `}${p.sun.elevation}° up.${warming ? ' Preparing the room lights…' : ''}`;
     }
     const compass = a => ['north', 'north-east', 'east', 'south-east', 'south', 'south-west', 'west', 'north-west'][Math.round(a / 45) % 8];
     // the sun's turn: the home's entry bearing (lightingAim.front, set by the build) rotated by sunTurn degrees
@@ -6900,9 +6902,11 @@
       applyLighting(undefined, { front: [fx * Math.cos(a) + fz * Math.sin(a), -fx * Math.sin(a) + fz * Math.cos(a)] });
       syncTod();
     }
+    // a flip a person makes holds the room lights back until the night programs are built (fixtures.ts applyLampGain, LIGHT v3.1 item 2); a build or a harness never waits
+    const uiFlip = fn => { window.__houseUiFlip = true; try { return fn(); } finally { window.__houseUiFlip = false; } };
     function chooseLighting(k) {
       uiLighting = k;
-      setLightingPreset(k === 'auto' ? homeLighting() : k);
+      uiFlip(() => setLightingPreset(k === 'auto' ? homeLighting() : k));
       if (sunTurn) applySunTurn();
       syncTod();
       if (!VIEW_MODE) writeUiState({ lighting: k === 'auto' ? null : k });
@@ -6918,6 +6922,7 @@
     const sunSlider = document.getElementById('slider-sun-bearing'), sunOut = document.getElementById('val-sun-bearing');
     sunSlider?.addEventListener('input', () => { sunTurn = Number(sunSlider.value); sunOut.textContent = `${sunTurn > 0 ? '+' : ''}${sunTurn}°`; applySunTurn(); });
     window.addEventListener('house:lighting', () => syncTod());
+    window.addEventListener('house:lights', () => syncTod());   // a flip is holding the room lights back for a moment (fixtures.ts)
     buildTodControl();
 
     // -------------------------------------------------------------
@@ -7683,6 +7688,8 @@
     // In the editor it first names the home over the viewport (the build blocks the page for a second or two, so the
     // overlay is painted before it starts), and the transport is off until the home is in (Completeness J).
     // `quiet`: build it for a poster (Compare homes) and say nothing about it: no overlay, no URL, no checks, no ready signal.
+    // every item type a spec's rooms use (what ensureBaked needs to know)
+    const propTypesOf = spec => { const t = new Set(); for (const lv of spec.levels || []) for (const r of lv.rooms || []) for (const it of r.items || []) if (it && it.type) t.add(it.type); return t; };
     async function loadHouse(id, { quiet = false } = {}) {
       const chrome = !VIEW_MODE && !quiet;
       if (chrome) showBuilding(id);
@@ -7692,6 +7699,7 @@
         if (chrome) { showBuilding(id, spec); await nextPaint(); }
       } catch (err) { if (chrome) hideBuilding(); throw err; }
       try {
+        await ensureBaked(propTypesOf(spec));   // OWNER bake: baked families are loaded before the build (nothing to load yet)
         clearScene();
         setLightingPreset(spec.lighting, {});   // the hour first, so builders reading window.__houseLighting / scene.userData.horizon see this house's; the build re-aims it
         beginBatch();
@@ -8916,7 +8924,8 @@
     window.__houseDebug = () => ({ house: activeHouse, scene, camera: activeCamera, presets: SplinePresets, renderer });
     // Prop sheet (scripts/prop-sheet.mts): each type built alone on a neutral floor, shot from the front-right
     // three-quarter, framed to its size. Returns base64 JPEGs keyed by type. Registry props and page items alike.
-    window.__housePropSheet = function (types, { res = '540', palette = null, params = {} } = {}) {
+    window.__housePropSheet = async function (types, { res = '540', palette = null, params = {} } = {}) {
+      await ensureBaked(types);   // OWNER bake
       const out = {};
       const pal = palette || { wall: '#f1f5f9', trim: '#1e293b', accent: '#0f766e', roof: '#334155', material: 'stucco' };
       clearScene();
@@ -9009,11 +9018,24 @@
     // Bloom and grade follow the time of day: re-read from the active preset on every composerFor() call, cache
     // hit or miss, like the GTAO clip box — a preset change never needs the composer rebuilt.
     function tuneComposerLook(fc) {
+      if (window.__houseFixturesSettle) window.__houseFixturesSettle();   // an offline frame is never drawn with a room light a flip is still holding back (fixtures.ts settleNight)
       const p = TIME_OF_DAY[lightingAim.preset] || TIME_OF_DAY.day;
       fc.bloom.strength = p.bloom.strength; fc.bloom.radius = p.bloom.radius; fc.bloom.threshold = p.bloom.threshold;
       const u = fc.grade.uniforms;
-      u.contrast.value = p.grade.contrast; u.saturation.value = p.grade.saturation; u.vignette.value = p.grade.vignette; u.aspect.value = fc.w / fc.h;
+      u.contrast.value = p.grade.contrast; u.pivot.value = p.grade.pivot ?? 0.18; u.saturation.value = p.grade.saturation; u.vignette.value = p.grade.vignette; u.aspect.value = fc.w / fc.h;
+      // LIGHT v3.1: the grade is the interior one inside the building and `gradeOutside` out of doors (environment.ts interiorWeight: the camera's distance to the building's
+      // volume, so a walk through a door has no pop). An hour with no gradeOutside is graded the same everywhere.
+      const o = p.gradeOutside || p.grade;
+      u.outContrast.value = o.contrast; u.outPivot.value = o.pivot ?? 0.18; u.outSaturation.value = o.saturation; u.outVignette.value = o.vignette;
+      let w = 1;
+      if (activeHouse && activeHouse.spec) { fc.camera.getWorldPosition(gradeEye); w = interiorWeight(gradeEye, gradeStoreys(activeHouse.spec)); }
+      u.interior.value = p.gradeOutside ? w : 1;   // an hour with no gradeOutside is graded the same everywhere (exactly: no mix)
+      window.__houseGradeInterior = w;             // QA hook: the weight of the last frame
+      fc.gtao.updateGtaoMaterial({ thickness: GTAO_THICKNESS.outside + (GTAO_THICKNESS.inside - GTAO_THICKNESS.outside) * w });   // every hour: a tree's crown wants the old thickness at dusk too
     }
+    const gradeEye = new THREE.Vector3();
+    let gradeStoreysOf = null, gradeStoreysCache = null;
+    const gradeStoreys = spec => (gradeStoreysOf === spec ? gradeStoreysCache : (gradeStoreysCache = storeysOf(spec.levels), gradeStoreysOf = spec, gradeStoreysCache));
     let frameComposer = null;
     function composerFor(w, h, camera = persCamera) {
       const ss = supersample(w, h);
@@ -9030,9 +9052,13 @@
       const gtao = new GTAOPass(scene, camera, w, h);
       gtao.output = GTAOPass.OUTPUT.Default;
       // a room-scale radius (Pascal's SSGI occlusion runs at radius 1, intensity 1.5): 0.35 m only darkened
-      // skirting lines; 0.8 m lets a corner, a wardrobe's flank and the floor under a bed fall off softly too
+      // skirting lines; 0.8 m lets a corner, a wardrobe's flank and the floor under a bed fall off softly too.
+      // thickness: how thick the pass takes an occluder to be. At 1 any near surface counted as a metre-thick wall, and a curtain
+      // beside a wall left a speckled dark fringe on it (aurora living NW day, cutestarter bedroom NW night); the thin value
+      // (environment.ts GTAO_THICKNESS: 0.25 inside the house, 1 out of doors, blended per frame in tuneComposerLook) reads a curtain
+      // for what it is (LIGHT v3 item 5; the day grade makes up the contrast this took out of the contact shadows)
       gtao.blendIntensity = 1.1;
-      gtao.updateGtaoMaterial({ radius: 0.8, distanceExponent: 1, thickness: 1, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false });
+      gtao.updateGtaoMaterial({ radius: 0.8, distanceExponent: 1, thickness: GTAO_THICKNESS.inside, scale: 1, samples: 16, distanceFallOff: 1, screenSpaceRadius: false });
       fitGtaoClipBox(gtao);
       gtao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 4, radiusExponent: 1, rings: 2, samples: 16 });
       // glass, screens and other transparent surfaces neither occlude nor take occlusion: keep them out of the
@@ -10065,7 +10091,7 @@
           dress: (dressing, eye, target) => applyShotCutaway({ dressing }, 0, eye, target),
           houseInside,
           lighting: () => lightingAim.preset,
-          setLighting: name => setLightingPreset(name),
+          setLighting: name => uiFlip(() => setLightingPreset(name)),
           hideEditorHelpers() { gridHelper.visible = false; transformControls.detach(); },
           // HQ goes through the recorder's composer at the canvas's own resolution — the CSS size times the pixel
           // ratio the player has settled on — not the CSS size: renderFrame supersamples 2× only up to 1080p, so a

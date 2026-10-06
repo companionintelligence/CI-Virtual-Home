@@ -1502,6 +1502,8 @@ def render_level(spec, level, n, sh=None, view_mode="lot"):
     svg.append('<g class="furniture">')
     for room in rooms:
         for it in list(room.get("items", []) or []) + composed_items(spec_id, level_id, room):
+            if it.get("src") == "dress@1":
+                continue  # the dress phase's small goods (plan 5.6): not drawn, or every cup would be a 0.6 x 0.6 rectangle
             svg.append(draw_item(sh, it, level_id, spec_id))
     svg.append("</g>")
 
@@ -1604,6 +1606,8 @@ def composed_items(spec_id, level_id, room):
 def room_items(room, extra=()):
     counts, order = {}, []
     for it in list(room.get("items", []) or []) + list(extra):
+        if it.get("src") == "dress@1":
+            continue
         name = pretty_item(it.get("type", "item"))
         if name not in counts:
             order.append(name)

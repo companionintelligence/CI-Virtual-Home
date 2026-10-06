@@ -481,6 +481,55 @@
               "h": 1.5,
               "y": 0.95,
               "color": "#f1e8d4"
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                -2.559,
+                -3.205
+              ],
+              "y": 0.918,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.01:hob:0"
+            },
+            {
+              "type": "canister-trio",
+              "at": [
+                -3.254,
+                -3.39
+              ],
+              "y": 0.9,
+              "variant": 1,
+              "color": "#d1b7a8",
+              "src": "dress@1",
+              "dk": "l1.01:counters:0"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                -4.502,
+                -3.416
+              ],
+              "w": 0.395,
+              "h": 0.955,
+              "y": 0.645,
+              "color": "#e9dece",
+              "src": "dress@1",
+              "dk": "l1.01:windows:0"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                -3.925,
+                -3.416
+              ],
+              "w": 0.42,
+              "h": 0.955,
+              "y": 0.645,
+              "color": "#e9dece",
+              "src": "dress@1",
+              "dk": "l1.01:windows:1"
             }
           ],
           "lock": true
@@ -588,6 +637,39 @@
               "rot": 0,
               "h": 1.45,
               "color": "#f1efe9"
+            },
+            {
+              "type": "candle-trio",
+              "at": [
+                -1.4,
+                -2.186
+              ],
+              "y": 0.76,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.02:table:0"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                -1.419,
+                -1.689
+              ],
+              "y": 0.76,
+              "variant": 0,
+              "color": "#d1b7a8",
+              "src": "dress@1",
+              "dk": "l1.02:table:1"
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                0.511,
+                -2.016
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l1.02:lamp:0"
             }
           ],
           "lock": true
@@ -843,6 +925,18 @@
               ],
               "rot": 270,
               "w": 0.9
+            },
+            {
+              "type": "dresser-set",
+              "at": [
+                0.99,
+                1.659
+              ],
+              "rot": 90,
+              "y": 0.85,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.07:dresser:0"
             }
           ],
           "lock": true
@@ -1035,6 +1129,15 @@
               "rot": 0,
               "y": 1.55,
               "r": 0.28
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                2.579,
+                -0.411
+              ],
+              "src": "dress@1",
+              "dk": "l1.04:lamp:0"
             }
           ],
           "lock": true
@@ -1115,6 +1218,39 @@
               "rot": 0,
               "r": 0.4,
               "color": "#9fb3d9"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                6.76,
+                0.466
+              ],
+              "rot": 270,
+              "y": 0.805,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.05:tank:0"
+            },
+            {
+              "type": "laundry-hamper",
+              "at": [
+                6.595,
+                0.987
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l1.05:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                6.779,
+                0.16
+              ],
+              "rot": 270,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l1.05:roll:0"
             }
           ],
           "lock": true
@@ -1144,7 +1280,51 @@
           "style": "cottage",
           "density": 0,
           "seed": "e",
-          "items": [],
+          "items": [
+            {
+              "type": "door-mat",
+              "at": [
+                0,
+                4.04
+              ],
+              "rot": 180,
+              "w": 0.88,
+              "d": 0.45,
+              "src": "dress@1",
+              "dk": "l1.08:entry:0"
+            },
+            {
+              "type": "shoe-row",
+              "at": [
+                0.848,
+                4.176
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.08:entry:1"
+            },
+            {
+              "type": "side-table",
+              "at": [
+                -1.055,
+                3.75
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l1.08:lamp:0"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                -1.125,
+                3.75
+              ],
+              "rot": 90,
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l1.08:lamp:1"
+            }
+          ],
           "lock": true
         }
       ]

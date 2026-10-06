@@ -17,7 +17,9 @@
 //                   windows, partition doors, cladding, ceilings, theming, lighting), kit-rules.ts (the pure rules
 //                   behind them: restraint and keep, door colours, the sun, fans and lamps), item-map.ts (spec item type →
 //                   AssetFactory builder, ITEM_PARAMS, DESK_TOP, the on-surface and hero sets), hero-build.ts and
-//                   hero-frame.ts, materials.ts, textures.ts, fixtures.ts, environment.ts, props/lighting.ts;
+//                   hero-frame.ts, materials.ts, textures.ts, fixtures.ts, environment.ts, house-scheme.ts (the style as finish
+//                   decisions: metal, lamp temperature, ceiling, trim, tile), room-clip.ts (a room's light stays in its room: a box
+//                   a light in the shader), props/lighting.ts, props/finish-roles.ts;
 //                   the room-creator.html door / window / furniture builders (its OWNER banners)
 //   S2 architecture structure-build.ts (slabs, walls, openings, partitions, stairs, balustrades, ceilings, roofs),
 //                   roofs.ts, wall-compiler.ts, floorplan-graph.ts, house-geometry.ts, stairs.ts (a storey's flights: plan
@@ -28,7 +30,9 @@
 //   S3 compose      rooms-build.ts (the rooms loop) and the composer it calls: room-composer.ts (the solver and the
 //                   program sets), room-units.ts (the kitchen and bath packers), room-geo.ts (room geometry, lanes,
 //                   item sizes), room-programs.ts (the 26 programs), house-styles.ts (the style bundles),
-//                   layout-lint.ts (the layout lints); props/*.ts except lighting.ts and outdoor.ts, props/place-kit.ts
+//                   layout-lint.ts (the layout lints), room-dress.ts (the dress phase: a second pass over the frozen layout),
+//                   room-dress-hosts.ts (what stands under a small good), dress-recipes.ts (what each program is dressed with), dress-curtains.ts (the café curtain's plan), dress-leaves.ts (where an open door leaf parks),
+//                   house-scheme-dress.ts (a house's dress palette); props/*.ts except lighting.ts and outdoor.ts, props/place-kit.ts
 //                   and props/placement.ts (every type's placement), props/page-place.ts (page items' placement),
 //                   props/patterns.ts (rug patterns and the art-motif library), props/registry.ts,
 //                   scripts/build-prop-catalog.mts, compose-house.mts

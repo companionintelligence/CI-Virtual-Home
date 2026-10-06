@@ -532,6 +532,56 @@
               ],
               "rot": 270,
               "y": 1.7
+            },
+            {
+              "type": "door-mat",
+              "at": [
+                -0.5,
+                3.64
+              ],
+              "rot": 180,
+              "w": 0.88,
+              "d": 0.45,
+              "src": "dress@1",
+              "dk": "l1.01:entry:0"
+            },
+            {
+              "type": "umbrella-stand",
+              "at": [
+                -0.821,
+                -0.32
+              ],
+              "src": "dress@1",
+              "dk": "l1.01:entry:1"
+            },
+            {
+              "type": "shoe-row",
+              "at": [
+                0.448,
+                3.776
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.01:entry:2"
+            },
+            {
+              "type": "side-table",
+              "at": [
+                -1.665,
+                -0.165
+              ],
+              "src": "dress@1",
+              "dk": "l1.01:lamp:0"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                -1.665,
+                -0.235
+              ],
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l1.01:lamp:1"
             }
           ],
           "lock": true
@@ -909,6 +959,79 @@
               ],
               "rot": 180,
               "y": 1.9
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                4.62,
+                -1.789
+              ],
+              "rot": 270,
+              "y": 0.918,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.04:hob:0"
+            },
+            {
+              "type": "tripod-table-lamp",
+              "at": [
+                2.333,
+                -2.61
+              ],
+              "y": 0.9,
+              "src": "dress@1",
+              "dk": "l1.04:lamp:0"
+            },
+            {
+              "type": "utensil-crock",
+              "at": [
+                4.503,
+                -2.736
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 2,
+              "color": "#d5bca2",
+              "src": "dress@1",
+              "dk": "l1.04:counters:0"
+            },
+            {
+              "type": "oil-pair",
+              "at": [
+                4.531,
+                -2.375
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.04:counters:1"
+            },
+            {
+              "type": "plate-stack",
+              "at": [
+                3.495,
+                -4.226
+              ],
+              "y": 0.9,
+              "variant": 0,
+              "color": "#d5bca2",
+              "src": "dress@1",
+              "dk": "l1.04:counters:2"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                4.916,
+                -2.707
+              ],
+              "rot": 270,
+              "w": 1.085,
+              "h": 0.955,
+              "y": 0.695,
+              "color": "#e8dbc7",
+              "src": "dress@1",
+              "dk": "l1.04:windows:0"
             }
           ]
         },
@@ -1083,6 +1206,91 @@
               "rot": 180,
               "color": "#556e8e",
               "src": "compose@1"
+            },
+            {
+              "type": "candle-trio",
+              "at": [
+                2.77,
+                2.2
+              ],
+              "rot": 90,
+              "y": 0.76,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.05:table:0"
+            },
+            {
+              "type": "candle-trio",
+              "at": [
+                2.994,
+                1.7
+              ],
+              "rot": 90,
+              "y": 0.76,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l1.05:table:1"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                2.685,
+                2.981
+              ],
+              "rot": 270,
+              "y": 0.76,
+              "variant": 2,
+              "color": "#d5bca2",
+              "src": "dress@1",
+              "dk": "l1.05:table:2"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                2.685,
+                1.381
+              ],
+              "rot": 270,
+              "y": 0.76,
+              "variant": 1,
+              "color": "#d5bca2",
+              "src": "dress@1",
+              "dk": "l1.05:table:3"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                3.316,
+                3.019
+              ],
+              "rot": 90,
+              "y": 0.76,
+              "variant": 0,
+              "color": "#d5bca2",
+              "src": "dress@1",
+              "dk": "l1.05:table:4"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                3.316,
+                1.419
+              ],
+              "rot": 90,
+              "y": 0.76,
+              "variant": 0,
+              "color": "#d5bca2",
+              "src": "dress@1",
+              "dk": "l1.05:table:5"
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                2.246,
+                -0.211
+              ],
+              "src": "dress@1",
+              "dk": "l1.05:lamp:0"
             }
           ],
           "lock": true
@@ -1271,6 +1479,17 @@
               ],
               "rot": 0,
               "y": 2.88
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                -5.471,
+                3.661
+              ],
+              "rot": 180,
+              "color": "#a9b1b4",
+              "src": "dress@1",
+              "dk": "l1.06:lamp:0"
             }
           ]
         },
@@ -1381,6 +1600,51 @@
               "w": 0.56,
               "d": 0.5,
               "src": "compose@1"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                -3.551,
+                3.81
+              ],
+              "rot": 180,
+              "y": 0.805,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.08:tank:0"
+            },
+            {
+              "type": "towel-ring-set",
+              "at": [
+                -3.264,
+                3.917
+              ],
+              "rot": 180,
+              "y": 0.95,
+              "src": "dress@1",
+              "dk": "l1.08:towels:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                -3.927,
+                3.03
+              ],
+              "rot": 90,
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l1.08:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                -3.889,
+                3.65
+              ],
+              "rot": 90,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l1.08:roll:0"
             }
           ],
           "lock": true
@@ -2098,6 +2362,17 @@
               "pattern": "check",
               "color": "#b9c9b0",
               "src": "compose@1"
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                -2.716,
+                -0.589
+              ],
+              "rot": 180,
+              "color": "#efe3c4",
+              "src": "dress@1",
+              "dk": "l2.17:lamp:0"
             }
           ],
           "lock": true
@@ -2171,6 +2446,40 @@
               "w": 0.8,
               "d": 0.5,
               "src": "compose@1"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                0.82,
+                -2.609
+              ],
+              "rot": 270,
+              "y": 0.805,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l2.18:tank:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                0.927,
+                -3.26
+              ],
+              "rot": 270,
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l2.18:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                0.38,
+                -2.261
+              ],
+              "rot": 180,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l2.18:roll:0"
             }
           ],
           "lock": true
@@ -2250,6 +2559,16 @@
                 3.7
               ],
               "rot": 0
+            },
+            {
+              "type": "floor-lamp",
+              "at": [
+                -1.311,
+                2.904
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l2.19:lamp:0"
             }
           ],
           "lock": true
@@ -2383,6 +2702,18 @@
               "rot": 180,
               "color": "#8d9bb4",
               "src": "compose@1"
+            },
+            {
+              "type": "dresser-set",
+              "at": [
+                1.205,
+                1.598
+              ],
+              "rot": 90,
+              "y": 0.72,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l2.20:dresser:0"
             }
           ],
           "lock": true
@@ -2460,6 +2791,51 @@
               "w": 0.8,
               "d": 0.5,
               "src": "compose@1"
+            },
+            {
+              "type": "vanity-set",
+              "at": [
+                1.345,
+                -3.57
+              ],
+              "rot": 90,
+              "y": 0.89,
+              "variant": 2,
+              "color": "#d5bca2",
+              "src": "dress@1",
+              "dk": "l2.21:vanity:0"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                4.81,
+                -4.009
+              ],
+              "rot": 270,
+              "y": 0.805,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l2.21:tank:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                4.03,
+                -4.417
+              ],
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l2.21:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                4.65,
+                -4.379
+              ],
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l2.21:roll:0"
             }
           ],
           "lock": true

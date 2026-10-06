@@ -253,7 +253,8 @@ export const LAMP_ITEMS: ReadonlySet<string> = new Set(['halo-lamp', ...REGISTRY
 /**
  * The lamp kind a room's lamps become: rooms[].fixtures.lamp, else under defaults 2 a seeded pick, else null (today's
  * drum). The rooms that HAVE a lamp in their items walk in order through a seeded permutation of the five kinds, so
- * any five rooms with lamps show all five kinds and three rooms three (a room without a lamp does not spend a kind);
+ * any five rooms with lamps show all five kinds and three rooms three (a room without a lamp does not spend a kind; nor does one whose only lamp is the dress
+ * phase's, src 'dress@1': baking dress items into a house must not re-roll the head of a lamp the layout already had, so such a room takes its own seeded pick, as a room with none listed does);
  * a room with none listed (S3's composer will place them) gets its own seeded pick.
  */
 export function lampPlan(spec: any): Map<string, LampKind | null> {
@@ -268,7 +269,7 @@ export function lampPlan(spec: any): Map<string, LampKind | null> {
     const key = `${lv.id}#${ri}`, f = room.fixtures || {};
     let kind: LampKind | null = null;
     if (LAMP_KINDS.includes(f.lamp)) kind = f.lamp;
-    else if (d2) kind = (room.items || []).some(it => LAMP_ITEMS.has(it.type)) ? perm[k++ % perm.length] : LAMP_KINDS[Math.floor(mulberry32(fnv1a(`${id}:lamps:${key}`))() * LAMP_KINDS.length)];
+    else if (d2) kind = (room.items || []).some(it => LAMP_ITEMS.has(it.type) && it.src !== 'dress@1') ? perm[k++ % perm.length] : LAMP_KINDS[Math.floor(mulberry32(fnv1a(`${id}:lamps:${key}`))() * LAMP_KINDS.length)];
     out.set(key, kind);
   }));
   return out;

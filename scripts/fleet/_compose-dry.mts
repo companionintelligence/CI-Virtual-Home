@@ -15,11 +15,11 @@ export interface DryHouse { id: string; spec: any; rooms: DryRoom[] }
  *  the dry run below is synchronous (a fleet metric's compute() is). */
 export async function composerModules() {
   try {
-    const [composer, placement, geo, lint, styles, programs] = await Promise.all([
+    const [composer, placement, geo, lint, styles, programs, dress] = await Promise.all([
       load('assets/room-composer.js'), load('assets/props/placement.js'), load('assets/room-geo.js'), load('assets/layout-lint.js'),
-      load('assets/house-styles.js'), load('assets/room-programs.js'),
+      load('assets/house-styles.js'), load('assets/room-programs.js'), load('assets/room-dress.js'),
     ]);
-    return { ...composer, PLACEMENT: placement.PLACEMENT, geo, lint, styles, programs } as any;
+    return { ...composer, PLACEMENT: placement.PLACEMENT, geo, lint, styles, programs, dress } as any;
   } catch { return null; }
 }
 export const M: any = await composerModules();

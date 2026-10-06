@@ -618,6 +618,54 @@
               "color": "#7a9cc6",
               "y": 0.9,
               "src": "compose@1"
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                1.835,
+                -11.329
+              ],
+              "rot": 270,
+              "y": 0.918,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.03:hob:0"
+            },
+            {
+              "type": "mushroom-lamp",
+              "at": [
+                0.085,
+                -9.17
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "src": "dress@1",
+              "dk": "l1.03:lamp:0"
+            },
+            {
+              "type": "bread-bin",
+              "at": [
+                1.938,
+                -9.76
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.03:counters:0"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                -0.3,
+                -11.716
+              ],
+              "w": 1.8,
+              "h": 0.881,
+              "y": 0.545,
+              "color": "#dbcdb6",
+              "src": "dress@1",
+              "dk": "l1.03:windows:0"
             }
           ],
           "lock": true
@@ -791,6 +839,53 @@
               "rot": 90,
               "y": 1.5,
               "r": 0.34
+            },
+            {
+              "type": "centerpiece",
+              "at": [
+                0.404,
+                -5.706
+              ],
+              "y": 0.75,
+              "variant": 1,
+              "color": "#baa183",
+              "src": "dress@1",
+              "dk": "l1.04:table:0"
+            },
+            {
+              "type": "place-setting",
+              "at": [
+                1.324,
+                -5.845
+              ],
+              "rot": 180,
+              "y": 0.75,
+              "variant": 0,
+              "color": "#baa183",
+              "src": "dress@1",
+              "dk": "l1.04:table:1"
+            },
+            {
+              "type": "side-table",
+              "at": [
+                1.865,
+                -7.65
+              ],
+              "rot": 270,
+              "color": "#8c6d4f",
+              "src": "dress@1",
+              "dk": "l1.04:lamp:0"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                1.935,
+                -7.65
+              ],
+              "rot": 270,
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l1.04:lamp:1"
             }
           ],
           "lock": true
@@ -852,6 +947,26 @@
               "h": 0.9,
               "y": 1.6,
               "motif": "abstract"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                3.171,
+                -9.771
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l1.06:lamp:0"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                3.257,
+                -10.94
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l1.06:mirror:0"
             }
           ]
         },
@@ -972,6 +1087,30 @@
               ],
               "color": "#7a9cc6",
               "src": "compose@1"
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                7.645,
+                -9.52
+              ],
+              "rot": 180,
+              "y": 0.42,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.07:coffee:0"
+            },
+            {
+              "type": "side-set",
+              "at": [
+                9.083,
+                -6.906
+              ],
+              "rot": 180,
+              "y": 0.5,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.07:side:0"
             }
           ],
           "lock": true
@@ -1585,6 +1724,18 @@
               "rot": 180,
               "color": "#7a9cc6",
               "src": "compose@1"
+            },
+            {
+              "type": "dresser-set",
+              "at": [
+                0.695,
+                -7.468
+              ],
+              "rot": 270,
+              "y": 0.72,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l2.15:dresser:0"
             }
           ],
           "lock": true
@@ -1668,6 +1819,53 @@
               ],
               "rot": 270,
               "src": "compose@1"
+            },
+            {
+              "type": "vanity-set",
+              "at": [
+                -2.945,
+                -10.67
+              ],
+              "rot": 270,
+              "y": 0.89,
+              "variant": 1,
+              "color": "#baa183",
+              "src": "dress@1",
+              "dk": "l2.16:vanity:0"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                -5.81,
+                -9.541
+              ],
+              "rot": 90,
+              "y": 0.805,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l2.16:tank:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                -5.917,
+                -10.66
+              ],
+              "rot": 90,
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l2.16:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                -5.879,
+                -10.04
+              ],
+              "rot": 90,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l2.16:roll:0"
             }
           ],
           "lock": true
@@ -1786,6 +1984,16 @@
               "h": 0.7,
               "y": 1.6,
               "motif": "skyline"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                1.143,
+                -7.74
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l2.18:mirror:0"
             }
           ]
         },
