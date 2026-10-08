@@ -15,10 +15,14 @@
 # what this job builds is what production serves.
 name: ci
 
+# >>> ci-local:gated original triggers below, restore with `ci-local restore`
+# on:
+#   push:
+#     branches: [main]
+#   pull_request:
+# <<< ci-local:gated
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
