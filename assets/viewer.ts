@@ -105,7 +105,15 @@ const DRAG_TO_FLY = 6;        // px of drag on the scene before it counts as tak
 const IDLE_MS = 2600;         // controls fade after this long without input while a shot plays
 const IDLE_TOUCH_MS = 4000;   // on a touch screen, a little longer (a tap brings them back)
 const REF_ASPECT = 16 / 9;    // the aspect the shots are framed for
-const CORE_URL = 'https://ci.computer';
+// Where the end card and the help panel send a visitor. Exactly these addresses (portal:build checks the site's pages for
+// them too); /core redirects to the product page, and is still the address to link.
+const BUY_URL = 'https://ci.computer/core';
+const DOWNLOAD_URL = 'https://ci.computer/download';
+const DOCS_URL = 'https://docs.ci.computer/docs/apps-available/first-party-apps';
+const SITE_URL = 'https://ci.computer';
+// a link that opens a new tab says so to a screen reader (the player keeps playing in this one)
+const newTab = (href: string, label: string, short = ''): string =>
+  `<a href="${href}" target="_blank" rel="noopener">${short ? `<span class="vh-long">${label}</span><span class="vh-short">${short}</span>` : label}${icon('out', 'vh-i-out')}<span class="vh-sr"> (opens in a new tab)</span></a>`;
 const DEFAULT_SHOT = 'orbit';   // what a link without shot= opens on (onHouse)
 const CORE_NAME = 'Companion Core (Hero)';   // the house builder's name for the desk's Core (the QA gate finds it by it too)
 const FLY_FLOOR = 0.25;       // m: the lowest the free camera goes (the lot's ground is y = 0)
@@ -140,6 +148,8 @@ export function mountViewer(api: Api) {
   const no = new Set((params.get('no') || '').split(',').filter(Boolean));
   const coarse = matchMedia('(pointer: coarse)').matches;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // the About panel: what the Companion Core is and where to find it, then (for a keyboard) the shortcuts
+  const helpLabel = coarse ? 'About' : 'About and keyboard shortcuts';
   api.hideEditorHelpers();
   controls.minDistance = 0.25;   // a pinch never parks the camera on its own pivot
 
@@ -152,7 +162,7 @@ export function mountViewer(api: Api) {
     <div class="vh-loading" role="status" aria-live="polite">
       <div class="vh-loading-card">
         <img class="vh-mark" src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28">
-        <h2 class="vh-loading-name">Loading</h2>
+        <p class="vh-loading-name">Loading</p>
         <p class="vh-loading-meta"></p>
         <div class="vh-bar"><span></span></div>
         <p class="vh-loading-status">Building the house</p>
@@ -161,12 +171,12 @@ export function mountViewer(api: Api) {
         ${icon('alert')}
         <h2>We could not open this home.</h2>
         <p class="vh-error-msg">Check the link, or pick a home from the gallery.</p>
-        <a class="vh-btn vh-btn-primary" href="./index.html">See all homes</a>
+        <a class="vh-btn vh-btn-primary" href="./">See all homes</a>
       </div>
     </div>
 
     <header class="vh-top">
-      <a class="vh-iconbtn vh-back" href="./index.html" aria-label="All homes" title="All homes">${icon('back')}</a>
+      <a class="vh-iconbtn vh-back" href="./" aria-label="All homes" title="All homes">${icon('back')}</a>
       <div class="vh-title">
         <h1 class="vh-name">&nbsp;</h1>
         <p class="vh-meta"></p>
@@ -177,7 +187,7 @@ export function mountViewer(api: Api) {
         <span class="vh-sep" aria-hidden="true"></span>
         <button class="vh-iconbtn" data-act="share" aria-label="Copy a link to this moment" title="Copy a link to this moment">${icon('link')}</button>
         <button class="vh-iconbtn vh-hide-compact" data-act="fullscreen" aria-label="Full screen" title="Full screen  Shift F">${icon('maximize', 'vh-i-max')}${icon('minimize', 'vh-i-min')}</button>
-        <button class="vh-iconbtn vh-hide-coarse" data-act="help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts  ?">${icon('help')}</button>
+        <button class="vh-iconbtn vh-hide-compact" data-act="help" aria-haspopup="dialog" aria-label="${helpLabel}" title="${helpLabel}${coarse ? '' : '  ?'}">${icon('help')}</button>
       </div>
     </header>
 
@@ -193,7 +203,8 @@ export function mountViewer(api: Api) {
     <div class="vh-dock" role="group" aria-label="Player">
       <div class="vh-end" hidden role="group" aria-labelledby="vh-end-title">
         <h2 id="vh-end-title">Meet the Companion Core.</h2>
-        <p><span class="vh-end-body">The small computer on the desk runs your own AI, apps and memory at home, not in someone else's cloud. </span><a href="${CORE_URL}" target="_blank" rel="noopener">What is Companion Core?${icon('out', 'vh-i-out')}</a></p>
+        <p class="vh-end-body">The small computer on the desk runs your own AI, apps and memory at home, not in someone else's cloud.</p>
+        <p class="vh-end-links">${newTab(BUY_URL, 'Buy Companion Core', 'Buy Core')}${newTab(DOWNLOAD_URL, 'Download Companion', 'Download')}</p>
         <div class="vh-end-actions">
           <button class="vh-end-btn" data-act="replay">${icon('replay')}<span>Replay</span></button>
           <button class="vh-end-btn" data-act="try-shot">${icon('play', 'vh-i-play')}<span class="vh-try-label"></span></button>
@@ -218,30 +229,36 @@ export function mountViewer(api: Api) {
           <button class="vh-tool" data-act="fly" aria-pressed="false" title="Fly the camera yourself  F">${icon('fly')}<span>Fly</span></button>
           <button class="vh-tool" data-act="hq" aria-pressed="false" title="Best quality: ambient occlusion, bloom and colour grading. Slower on most devices.">${icon('sparkles', 'vh-i-hq')}${icon('loader', 'vh-i-busy')}<span>Best quality</span></button>
           <button class="vh-tool vh-show-compact" data-act="fullscreen" title="Full screen">${icon('maximize', 'vh-i-max')}${icon('minimize', 'vh-i-min')}<span>Full screen</span></button>
+          <button class="vh-tool vh-show-compact" data-act="help" aria-haspopup="dialog" title="About, and what the Companion Core is">${icon('help')}<span>About</span></button>
         </div>
       </div>
     </div>
 
     <div class="vh-toast" role="status" aria-live="polite"></div>
 
-    <div class="vh-help" hidden role="dialog" aria-label="Keyboard shortcuts">
-      <div class="vh-help-head"><b>Keyboard</b><button class="vh-iconbtn" data-act="help" aria-label="Close">${icon('x')}</button></div>
-      <dl>
-        <dt><kbd>Space</kbd></dt><dd>Play or pause</dd>
-        <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Back or forward 1 s (Shift: 5 s)</dd>
-        <dt><kbd>Home</kbd> <kbd>End</kbd></dt><dd>Start or end of the shot</dd>
-        <dt><kbd>1</kbd>…<kbd>9</kbd></dt><dd>Pick a shot</dd>
-        <dt><kbd>T</kbd></dt><dd>Next time of day</dd>
-        <dt><kbd>P</kbd></dt><dd>Show the camera path</dd>
-        <dt><kbd>F</kbd></dt><dd>Fly the camera yourself</dd>
-        <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Move while flying (Shift: faster)</dd>
-        <dt><kbd>Q</kbd> <kbd>E</kbd></dt><dd>Sink and rise while flying</dd>
-        <dt><kbd>O</kbd></dt><dd>Overview of the whole path</dd>
-        <dt><kbd>C</kbd></dt><dd>Cutaway: open the house while flying</dd>
-        <dt><kbd>Esc</kbd></dt><dd>Back to the shot</dd>
-        <dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Previous or next home</dd>
-        <dt><kbd>Shift</kbd> <kbd>F</kbd></dt><dd>Full screen</dd>
-      </dl>
+    <div class="vh-help" hidden role="dialog" aria-labelledby="vh-help-title">
+      <div class="vh-help-head"><b id="vh-help-title">About</b><button class="vh-iconbtn" data-act="help" aria-label="Close">${icon('x')}</button></div>
+      <p class="vh-help-about">The small computer on the desk is a Companion Core: your own AI, apps and memory, running at home, not in someone else's cloud.</p>
+      <p class="vh-help-links">${newTab(SITE_URL, 'Companion Intelligence')}${newTab(BUY_URL, 'Buy Companion Core')}${newTab(DOWNLOAD_URL, 'Download Companion')}${newTab(DOCS_URL, 'Docs')}</p>
+      <div class="vh-help-keys vh-hide-coarse">
+        <p class="vh-help-sub">Keyboard</p>
+        <dl>
+          <dt><kbd>Space</kbd></dt><dd>Play or pause</dd>
+          <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Back or forward 1 s (Shift: 5 s)</dd>
+          <dt><kbd>Home</kbd> <kbd>End</kbd></dt><dd>Start or end of the shot</dd>
+          <dt><kbd>1</kbd>…<kbd>9</kbd></dt><dd>Pick a shot</dd>
+          <dt><kbd>T</kbd></dt><dd>Next time of day</dd>
+          <dt><kbd>P</kbd></dt><dd>Show the camera path</dd>
+          <dt><kbd>F</kbd></dt><dd>Fly the camera yourself</dd>
+          <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Move while flying (Shift: faster)</dd>
+          <dt><kbd>Q</kbd> <kbd>E</kbd></dt><dd>Sink and rise while flying</dd>
+          <dt><kbd>O</kbd></dt><dd>Overview of the whole path</dd>
+          <dt><kbd>C</kbd></dt><dd>Cutaway: open the house while flying</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Back to the shot</dd>
+          <dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Previous or next home</dd>
+          <dt><kbd>Shift</kbd> <kbd>F</kbd></dt><dd>Full screen</dd>
+        </dl>
+      </div>
       <p class="vh-help-legend"><span class="vh-help-tick" aria-hidden="true"></span>The orange tick on the timeline is where the Companion Core wakes.</p>
     </div>`;
   host.appendChild(root);
@@ -443,17 +460,18 @@ export function mountViewer(api: Api) {
     return `${location.pathname}?${q.toString()}`;
   }
   const syncUrl = () => { try { history.replaceState(null, '', url(false)); } catch { /* sandboxed */ } };
-  // What the share button hands out. Deployed, that is homes/<id>.html: scripts/build-portal.mts writes one page
-  // per home carrying the home's own title, description and thumbnail for link previews (which never run this
-  // script, so they would otherwise show the editor's title), and it forwards here with the query. It marks the
-  // built room-creator.html with <meta name="vh-share" content="homes/">; a checkout served as it is has no such
-  // pages, and shares this page's own URL.
+  // What the share button hands out. Deployed, that is homes/<id> (the address Cloudflare Pages serves homes/<id>.html
+  // at, so there is no redirect to pay for): scripts/build-portal.mts writes one page per home, the home's own page, with
+  // its title, description and thumbnail (link unfurlers never run this script, so they would otherwise show the
+  // editor's title). A link that carries a moment (shot, t, tod) forwards here with the query. It marks the built
+  // room-creator.html with <meta name="vh-share" content="homes/">; a checkout served as it is has no such pages, and
+  // shares this page's own URL.
   const sharePages = (document.querySelector('meta[name="vh-share"]') as HTMLMetaElement | null)?.content || '';
   function shareUrl(): string {
     if (!sharePages || !/^[a-z0-9-]+\/$/.test(sharePages)) return new URL(url(true), location.href).href;
     const q = new URLSearchParams(new URL(url(true), location.href).search);
     q.delete('mode'); q.delete('house');
-    return new URL(`./${sharePages}${encodeURIComponent(houseId)}.html?${q.toString()}`, location.href).href;
+    return new URL(`./${sharePages}${encodeURIComponent(houseId)}?${q.toString()}`, location.href).href;
   }
 
   // ------------------------------------------------------------------ building the chips
@@ -1128,6 +1146,10 @@ export function mountViewer(api: Api) {
   window.addEventListener('pointerdown', (e) => {
     if (moreOpen && !(e.target as HTMLElement).closest('.vh-tools, [data-act="more"]')) setMore(false);
   }, true);
+  // (on a touch screen the panel is a sheet over the scene: a press on the scene puts it away, as the tools' sheet does)
+  window.addEventListener('pointerdown', (e) => {
+    if (coarse && !el.help.hidden && !(e.target as HTMLElement).closest('.vh-help, [data-act="help"]')) toggleHelp(false);
+  }, true);
   function toggleHelp(force?: boolean) {
     const open = force ?? el.help.hidden;
     el.help.hidden = !open;
@@ -1173,7 +1195,7 @@ export function mountViewer(api: Api) {
     else if (act === 'next') goHouse(neighbour(1)!);
     else if (act === 'share') share();
     else if (act === 'fullscreen') { setMore(false); toggleFullscreen(); }
-    else if (act === 'help') toggleHelp();
+    else if (act === 'help') { setMore(false); toggleHelp(); }
   });
   // A pointer press leaves focus on the control, and Space would then press the button again (or the arrows
   // nudge the slider a thousandth) instead of reaching the player: hand focus back to the page after a pointer

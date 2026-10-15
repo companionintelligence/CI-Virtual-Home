@@ -40,6 +40,7 @@ const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
   '.glb': 'model/gltf-binary', '.ico': 'image/x-icon', '.md': 'text/markdown; charset=utf-8',
+  '.xml': 'application/xml', '.webmanifest': 'application/manifest+json',
 };
 export const FONT_FILES: Record<string, string> = { manrope: 'manrope-latin-var.woff2', 'jetbrains-mono': 'jetbrains-mono-latin-var.woff2' };
 
@@ -47,7 +48,10 @@ export type Served = { port: number; origin: string; base: string; url: (p?: str
 
 // Serve `dir` at `base` (e.g. '/ci-virtual-home/'). Anything outside `base` is a 404, so a URL that
 // escapes the sub-path (a leading-slash href) fails the test instead of quietly working. A directory serves its
-// index.html. /__fonts/<name> serves assets/fonts/ for the Google Fonts stub.
+// index.html, and so does Cloudflare Pages' extensionless routing: /room-creator is room-creator.html and /homes/aurora is
+// homes/aurora.html (the live site answers the .html address with a 308 to those; here both are served, so a test can
+// follow either). A path that is no file answers 404 with the site's 404.html, as Pages does. /__fonts/<name> serves
+// assets/fonts/ for the Google Fonts stub.
 export async function serve(dir: string, base = '/', listenPort = 0): Promise<Served> {
   const root = path.resolve(dir);
   if (!base.endsWith('/')) base += '/';
@@ -62,8 +66,13 @@ export async function serve(dir: string, base = '/', listenPort = 0): Promise<Se
       file = path.join(root, pathname.slice(base.length));
       if (!file.startsWith(root)) file = null;
       else if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
+      else if (!fs.existsSync(file) && !path.extname(file) && fs.existsSync(`${file}.html`)) file = `${file}.html`;
     }
-    if (!file || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); return; }
+    if (!file || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
+      const notFound = path.join(root, '404.html');
+      if (file && pathname.startsWith(base) && fs.existsSync(notFound)) { res.writeHead(404, { 'Content-Type': MIME['.html'], 'Cache-Control': 'no-cache' }); res.end(fs.readFileSync(notFound)); return; }
+      res.writeHead(404, { 'Content-Type': 'text/plain' }); res.end('not found'); return;
+    }
     res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     fs.createReadStream(file).pipe(res);
   });

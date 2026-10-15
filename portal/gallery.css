@@ -113,19 +113,27 @@ kbd {
   padding: 14px var(--pg-gutter);
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
-.brand { display: inline-flex; align-items: center; gap: 10px; color: inherit; text-decoration: none; }
-.brand-text { display: flex; flex-direction: column; line-height: 1.15; }
-.brand-text b { font-size: 15px; font-weight: 700; }
-.brand-text span { font-size: 12px; color: var(--muted-foreground); font-weight: 500; }
-.site-nav { display: flex; gap: 4px; }
+/* the brand row: Companion Intelligence (the main site) / Virtual homes (the top of this one). Two links on one
+   line, not stacked, so each is a target of its own; the logo is the main site's link on a screen too narrow for its name */
+.brand { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.brand a { display: inline-flex; align-items: center; gap: 10px; min-height: 36px; color: inherit; text-decoration: none; border-radius: 8px; }
+.brand-ci span { font-size: 13px; font-weight: 600; color: var(--muted-foreground); white-space: nowrap; }
+.brand-ci:hover span { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; }
+.brand-sep { color: var(--muted-foreground); opacity: 0.55; }
+.brand-title { font-size: 15px; font-weight: 700; white-space: nowrap; }
+.brand-title:hover { text-decoration: underline; text-underline-offset: 3px; }
+.site-nav { display: flex; align-items: center; gap: 4px; }
 .site-nav a {
   display: inline-flex; align-items: center; gap: 4px;
   min-height: 36px;
   color: var(--muted-foreground); text-decoration: none; font-weight: 600; font-size: 14px;
   padding: 0 12px; border-radius: 999px;
+  white-space: nowrap;
 }
 .site-nav a:hover { color: var(--foreground); background: var(--pg-hairline); }
-.site-nav .i-out { width: 14px; height: 14px; }
+.site-nav .nav-buy { margin-left: 4px; padding: 0 16px; background: var(--primary); color: var(--primary-foreground); font-weight: 700; box-shadow: var(--shadow-sm); }
+.site-nav .nav-buy:hover { background: var(--phthalo-hover); color: var(--primary-foreground); }
+.nav-short { display: none; }
 
 /* ---------------- hero ----------------
    Sized so the first row of homes starts inside the first screen: on a 1440 × 900 laptop the thumbnails of the
@@ -163,9 +171,17 @@ kbd {
   color: var(--muted-foreground);
   text-wrap: pretty;
 }
+/* The Companion Core callout under the hero's buttons: a card of its own, so the one-line product explainer and its
+   two ways in (buy, download) read as a unit and Watch stays the page's first action */
+.core-card {
+  margin-top: 18px; max-width: 34em;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--pg-hairline);
+}
 .core-line {
-  margin: 12px 0 0;
-  max-width: 34em;
+  margin: 0;
   display: flex; align-items: flex-start; gap: 10px;
   font-size: 14.5px; line-height: 1.55;
   color: var(--muted-foreground);
@@ -173,7 +189,9 @@ kbd {
 }
 .core-line .i { width: 18px; height: 18px; margin-top: 2px; color: var(--primary); }
 .core-line b { color: var(--foreground); font-weight: 700; }
-.core-line a { font-weight: 600; text-underline-offset: 3px; white-space: nowrap; }
+.core-actions { margin: 4px 0 0 28px; }
+.core-more { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; font-weight: 600; font-size: 14px; text-underline-offset: 3px; }
+.core-more .i { width: 15px; height: 15px; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
@@ -185,8 +203,8 @@ kbd {
   transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 .btn .i { width: 16px; height: 16px; }
-.btn-primary { background: var(--primary); color: var(--primary-foreground); box-shadow: var(--shadow-md); }
-.btn-primary:hover { background: var(--phthalo-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.btn-primary, .btn-buy { background: var(--primary); color: var(--primary-foreground); box-shadow: var(--shadow-md); }
+.btn-primary:hover, .btn-buy:hover { background: var(--phthalo-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
 .btn-ghost { background: transparent; color: var(--foreground); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
 .btn-ghost:hover { background: var(--pg-hairline); }
 .stats {
@@ -376,6 +394,22 @@ kbd {
 .skel i:nth-child(3) { width: 40%; height: 22px; border-radius: 999px; margin-top: 12px; }
 @keyframes pg-pulse { 50% { opacity: 0.55; } }
 
+/* ---------------- the Companion Core band, after the homes ---------------- */
+.cta-band {
+  width: min(calc(100% - 2 * var(--pg-gutter)), calc(var(--pg-wide) - 2 * var(--pg-gutter)));
+  margin: 0 auto 56px;
+  padding: clamp(20px, 3vw, 32px);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px;
+  border-radius: 22px;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--pg-hairline), var(--shadow-sm);
+}
+.cta-copy { flex: 1 1 320px; max-width: 40em; }
+.cta-copy h2 { margin: 0 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+.cta-copy p { margin: 0; color: var(--muted-foreground); text-wrap: pretty; }
+.cta-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
+.cta-docs { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; font-weight: 600; font-size: 14.5px; text-underline-offset: 3px; }
+
 /* ---------------- footer ---------------- */
 .site-foot {
   max-width: var(--pg-wide);
@@ -385,10 +419,12 @@ kbd {
   color: var(--muted-foreground);
   font-size: 13px;
 }
-.foot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 48px; }
+.foot-grid { display: grid; grid-template-columns: 1.15fr 0.8fr 1.15fr; gap: 24px 48px; }
 .foot-grid p { margin: 0 0 6px; max-width: 46em; }
 .foot-grid b { color: var(--foreground); font-weight: 700; }
-.foot-brand { display: flex; align-items: center; gap: 8px; }
+.foot-brand { display: flex; align-items: center; gap: 8px; min-height: 28px; color: var(--foreground); }
+.foot-links ul { list-style: none; margin: 0; padding: 0; }
+.foot-links a { display: inline-flex; align-items: center; min-height: 28px; font-weight: 600; text-underline-offset: 3px; }
 /* every home against the build it was written from (gallery.js credits()) */
 .builds { margin-top: 8px; }
 .builds summary { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; cursor: pointer; color: var(--foreground); font-weight: 600; list-style: none; }
@@ -398,7 +434,28 @@ kbd {
 .builds ul { margin: 8px 0 0; padding: 0; list-style: none; columns: 2 220px; column-gap: 28px; font-size: 12.5px; line-height: 1.45; }
 .builds li { break-inside: avoid; margin: 0 0 5px; }
 .builds li b { color: var(--foreground); font-weight: 600; }
+/* every home's own page (scripts/portal-pages.mts galleryHomeIndex) */
+.foot-homes { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--pg-hairline); }
+.foot-homes p { margin: 0 0 6px; }
+.foot-homes b { color: var(--foreground); font-weight: 700; }
+.foot-homes ul { list-style: none; margin: 0; padding: 0; columns: 4 150px; column-gap: 28px; }
+.foot-homes li { break-inside: avoid; }
+.foot-homes a { display: inline-flex; align-items: center; min-height: 28px; font-weight: 600; text-underline-offset: 3px; }
 .legal { margin: 28px 0 0; font-size: 12px; }
+
+/* ---------------- a home's own page (homes/<id>, written by scripts/build-portal.mts) ---------------- */
+.crumbs { max-width: var(--pg-wide); margin: 0 auto; padding: 4px var(--pg-gutter) 0; font-size: 13.5px; color: var(--muted-foreground); }
+.crumbs ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; }
+.crumbs li + li::before { content: "/"; margin-right: 8px; opacity: 0.55; }
+.crumbs a { display: inline-flex; align-items: center; min-height: 32px; font-weight: 600; text-underline-offset: 3px; }
+.crumbs [aria-current] { color: var(--foreground); font-weight: 600; }
+.home-page .hero h1 { font-size: clamp(32px, 4vw, 48px); }
+.home-page .hero-media { aspect-ratio: 1200 / 630; }
+.home-facts { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.home-facts .fact { height: 28px; padding: 0 12px; font-size: 13px; }
+.home-credit { margin: 14px 0 0; max-width: 34em; font-size: 13.5px; color: var(--muted-foreground); text-wrap: pretty; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 /* a short desktop screen (a 1280 × 800 laptop, a 1024 × 768 tablet on its side): the eyebrow and the figures go,
    so the homes start on the first screen */
@@ -409,7 +466,11 @@ kbd {
 /* ---------------- narrow ---------------- */
 /* Stacked (a tablet held upright): the picture, a shorter one, over the copy; no eyebrow, no figures and no second
    sentence, so the first homes start inside the first screen; the heading and the filters share a row when they fit. */
+@media (max-width: 1100px) {
+  .site-nav .nav-homes { display: none; }
+}
 @media (max-width: 900px) {
+  .brand-ci span { display: none; }
   .hero { grid-template-columns: 1fr; gap: 20px; }
   .hero-media { order: -1; aspect-ratio: 21 / 9; border-radius: 18px; }
   .eyebrow, .lede-more, .stats { display: none; }
@@ -417,8 +478,10 @@ kbd {
   .search kbd { display: none; }
   .filters { flex: 1 1 auto; justify-content: flex-end; }
   .foot-grid { grid-template-columns: 1fr; }
+  .foot-links ul { columns: 2 180px; column-gap: 28px; }
 }
 @media (max-width: 700px) {
+  .site-nav .nav-docs, .site-nav .nav-download { display: none; }
   .homes-head { align-items: stretch; flex-direction: column; }
   .filters { width: 100%; justify-content: flex-start; }
 }
@@ -427,7 +490,9 @@ kbd {
    picture and builder, so the first homes show on the first screen. */
 @media (max-width: 520px) {
   .site-head { padding-top: 10px; padding-bottom: 8px; }
-  .site-nav a[href="#homes"] { display: none; }
+  .nav-long { display: none; }
+  .nav-short { display: inline; }
+  .site-nav .nav-buy { padding: 0 14px; }
   .hero { padding-top: 2px; padding-bottom: 28px; gap: 18px; }
   .hero-media { aspect-ratio: 16 / 9; }
   .hero-play { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
@@ -435,7 +500,9 @@ kbd {
   .eyebrow, .lede-more { display: none; }
   .hero h1 { font-size: 34px; }
   .lede { font-size: 15.5px; margin-top: 10px; }
-  .core-line { font-size: 14px; margin-top: 12px; }
+  .core-card { margin-top: 14px; padding: 12px; }
+  .core-line { font-size: 14px; }
+  .cta-actions .btn { flex: 1 1 auto; }
   .hero-cta { margin-top: 18px; }
   .hero-cta .btn { flex: 1 1 auto; }
   .hero-browse, .stats { display: none; }
@@ -463,7 +530,8 @@ kbd {
 }
 @media (pointer: coarse) {
   .search { height: 44px; }
-  .site-nav a, .brand, .builds summary { min-height: 44px; }
+  .site-nav a, .brand a, .builds summary, .foot-links a, .core-more { min-height: 44px; }
+  .foot-homes a { min-height: 36px; }
 }
 @media (hover: none) {
   .thumb-play { opacity: 1; transform: none; }

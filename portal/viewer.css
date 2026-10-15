@@ -492,9 +492,15 @@ html[data-mode="view"] .vh-scrub input {
 .vh[data-end-side="right"] .vh-end { left: auto; right: 0; }
 .vh-end h2 { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.3; }
 .vh-end p { margin: 4px 0 12px; font-size: 13px; line-height: 1.5; color: var(--muted-foreground); }
-.vh-end p a { color: var(--primary); font-weight: 700; text-decoration: none; white-space: nowrap; }
-.vh-end p a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.vh-end p .vh-i-out { width: 13px; height: 13px; margin-left: 2px; vertical-align: -2px; }
+.vh-end .vh-end-body { margin: 4px 0 2px; }
+/* the two ways in are a row of their own, each a target (32 px; 44 on a touch screen) with room round it, so a wrapped line
+   never starts with a separator and a finger does not have to find 17 px of text */
+.vh-end .vh-end-links { display: flex; flex-wrap: wrap; gap: 0 4px; margin: 0 -8px 8px; }
+.vh-end-links a { display: inline-flex; align-items: center; min-height: 32px; padding: 0 8px; border-radius: 8px; color: var(--primary); font-weight: 700; text-decoration: none; white-space: nowrap; }
+.vh-end-links a:hover { background-color: var(--vh-hover); }
+.vh-end-links .vh-i-out { width: 13px; height: 13px; margin-left: 3px; }
+/* the end card's two ways in carry a short label where the card is tight (a phone, a short screen, a card that moved aside) */
+.vh-short { display: none; }
 .vh-end-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 .vh-end-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
@@ -571,15 +577,26 @@ html[data-mode="view"] .vh-scrub input {
   border-radius: var(--vh-radius);
   pointer-events: auto;
   background: var(--vh-glass-strong);
+  /* a short screen scrolls the panel rather than letting it run off the bottom */
+  max-height: calc(100% - var(--vh-gap) * 2 - var(--vh-top-h) - 8px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto; overscroll-behavior: contain;
 }
 .vh[data-fly="1"] .vh-toast { top: calc(var(--vh-gap) + var(--vh-top-h) + 60px + env(safe-area-inset-top, 0px)); }
 .vh[data-fly="1"] .vh-help { top: calc(var(--vh-gap) + var(--vh-top-h) + 56px + env(safe-area-inset-top, 0px)); }
 .vh-help-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
 .vh-help-head .vh-iconbtn { width: 30px; height: 30px; margin-right: -6px; }
+.vh-help-about { margin: 6px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--muted-foreground); }
+.vh-help-keys { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--vh-ring); }
+.vh-help-sub { margin: 0 0 8px; font-size: 11.5px; font-weight: 700; color: var(--muted-foreground); }
 .vh-help dl { display: grid; grid-template-columns: auto 1fr; gap: 7px 12px; margin: 0; align-items: center; }
 .vh-help dt { margin: 0; white-space: nowrap; display: flex; gap: 3px; }
 .vh-help dd { margin: 0; color: var(--muted-foreground); font-size: 12px; }
-.vh-help-legend { display: flex; align-items: center; gap: 9px; margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--vh-ring); color: var(--muted-foreground); font-size: 12px; }
+.vh-help-legend { display: flex; align-items: center; gap: 9px; margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--vh-ring); color: var(--muted-foreground); font-size: 12px; }
+.vh-help-links { display: flex; flex-wrap: wrap; gap: 0 14px; margin: 10px 0 0; padding-top: 8px; border-top: 1px solid var(--vh-ring); font-size: 12px; }
+.vh-help-links a { display: inline-flex; align-items: center; min-height: 28px; color: var(--primary); font-weight: 600; text-decoration: none; }
+.vh-help-links a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.vh-help-links .vh-i-out { width: 12px; height: 12px; margin-left: 3px; }
+.vh-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .vh-help-tick { flex: none; width: 2px; height: 10px; border-radius: 2px; background: var(--heat); margin: 0 4px; }
 
 /* ---------------- no room for the flybar's keyboard hint (the touch one is shorter) ---------------- */
@@ -644,18 +661,20 @@ html[data-mode="view"] .vh-scrub input {
   .vh-meta-facts { display: none; }
   .vh-end { width: 100%; padding: 13px 12px 12px 14px; }
   .vh-end h2 { font-size: 15px; }
-  .vh-end p { font-size: 12.5px; margin-bottom: 10px; }
+  .vh-end .vh-end-body { font-size: 12.5px; }
   .vh-end-btn { padding: 0 12px; }
+  .vh-end .vh-long { display: none; }
+  .vh-end .vh-short { display: inline; }
 }
 /* short screens (a phone on its side): the end card is its heading, the link and the buttons; the sentence on
    what the Core is would make it tall enough to reach the Core */
 @media (max-height: 500px) {
-  .vh-end-body { display: none; }
-  .vh-end p { margin-top: 2px; }
+  .vh-end .vh-end-body { display: none; }
 }
 /* anywhere else the same, when the card has nowhere to stand that clears the Core (viewer.ts placeEndCard) */
-.vh[data-end-compact] .vh-end-body { display: none; }
-.vh[data-end-compact] .vh-end p { margin-top: 2px; }
+.vh[data-end-compact] .vh-end .vh-end-body { display: none; }
+.vh[data-end-compact] .vh-end .vh-long { display: none; }
+.vh[data-end-compact] .vh-end .vh-short { display: inline; }
 /* short and wide (a phone on its side): the dock is one row, so the scene keeps the height */
 @media (max-height: 500px) and (min-width: 600px) {
   .vh-dock { flex-direction: row; align-items: center; gap: 6px; }
@@ -680,6 +699,8 @@ html[data-mode="view"] .vh-scrub input {
   .vh-scrub, html[data-mode="view"] .vh-scrub input { height: 44px; }
   .vh-tool { height: 44px; }
   .vh-end-btn, .vh-btn { height: 44px; }
+  .vh-end-links a, .vh-help-links a { min-height: 44px; }
+  .vh-help-head .vh-iconbtn { width: 44px; height: 44px; margin-right: -10px; margin-top: -6px; }
   /* the free-camera bar's 44 px pills make it taller: the toast (its how-to, on a phone) goes clear of it */
   .vh[data-fly="1"] .vh-toast { top: calc(var(--vh-gap) + var(--vh-top-h) + 72px + env(safe-area-inset-top, 0px)); }
 }

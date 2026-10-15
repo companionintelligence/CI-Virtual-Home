@@ -37,6 +37,7 @@
     "prop-sheet": "node --experimental-strip-types scripts/prop-sheet.mts",
     "export:core": "node --experimental-strip-types scripts/export-core-gltf.mts",
     "portal:thumbs": "node --experimental-strip-types scripts/build-thumbs.mts",
+    "portal:icons": "node --experimental-strip-types scripts/build-icons.mts",
     "portal:build": "node --experimental-strip-types scripts/build-portal.mts",
     "portal:test": "node --experimental-strip-types scripts/test-portal.mts",
     "ui:test": "node --experimental-strip-types scripts/test-ui.mts",

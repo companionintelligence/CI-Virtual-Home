@@ -5,17 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Virtual homes editor · Companion Intelligence</title>
   <meta name="description" content="The Companion virtual homes editor: build a home from its spec, review its camera shots and their checks, and export stills and videos of the Companion Core at home.">
+  <link rel="icon" href="./assets/brand/ci-logo-mark.svg" type="image/svg+xml">
+  <link rel="icon" href="./portal/icons/favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon" href="./portal/icons/apple-touch-icon.png">
+  <link rel="manifest" href="./portal/site.webmanifest">
+  <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
   <!-- ?mode=view is the portal's player: decided before the body parses, so the editor chrome never flashes.
        portal/viewer.css hides the editor and assets/viewer.js (mounted at the end of the module) plays the house.
        Until the player mounts, this block is all of it: the poster and the loader (with the home's name once
        index.json is in, and a word when a slow connection makes it take a while), and a message with a way out
        if the page cannot start (no WebGL 2, a module that did not download, an engine that threw). The player
        uses the repo's own fonts (viewer.css), so it asks Google for nothing.
-       Without ?mode=view this block only writes the editor's Google Fonts links, and the page is the editor. -->
-  <script>
+       Without ?mode=view this block only writes the editor's Google Fonts links, and the page is the editor.
+       data-cfasync="false" on every script of the page: Cloudflare's Rocket Loader would otherwise rewrite each one's type
+       and run it late, after the first paint, and this block's whole point is to run before it. -->
+  <script data-cfasync="false">
     (function () {
       var q = new URLSearchParams(location.search), d = document.documentElement, id = q.get('house') || 'aurora';
       if (q.get('mode') !== 'view') {
+        // the editor is a tool, not a page to find: out of search results. The built site says so in this page's own HTML
+        // (scripts/build-portal.mts, for the player too); a checkout served as it is says it here
+        if (!document.querySelector('meta[name="robots"]')) {
+          var robots = document.createElement('meta');
+          robots.name = 'robots'; robots.content = 'noindex';
+          document.head.appendChild(robots);
+        }
         document.write('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
           + '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">');
         return;
@@ -55,7 +70,7 @@
       (function back() {
         if (!document.body) { setTimeout(back, 30); return; }
         var a = document.createElement('a');
-        a.className = 'vh-boot-back'; a.href = './index.html'; a.setAttribute('aria-label', 'All homes'); a.title = 'All homes';
+        a.className = 'vh-boot-back'; a.href = './'; a.setAttribute('aria-label', 'All homes'); a.title = 'All homes';
         a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>';
         document.body.appendChild(a);
       })();
@@ -71,7 +86,7 @@
         d.dataset.viewer = state;
         var box = document.createElement('div');
         box.className = 'vh-fail'; box.setAttribute('role', 'alert');
-        box.innerHTML = '<img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./index.html">See all homes</a></div>';
+        box.innerHTML = '<img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./">See all homes</a></div>';
         box.querySelector('h2').textContent = title;
         box.querySelector('p').textContent = msg;
         if (retry) box.querySelector('button').addEventListener('click', function () { location.reload(); });
@@ -110,7 +125,7 @@
   </script>
   <!-- ?mode=view only (the head script above defines __vhNames): the portal's names for the loader, imported after
        the import map. In the editor this does nothing. -->
-  <script>if (window.__vhNames) window.__vhNames(import('./assets/home-names.js').catch(function () { return null; }));</script>
+  <script data-cfasync="false">if (window.__vhNames) window.__vhNames(import('./assets/home-names.js').catch(function () { return null; }));</script>
 
   <style>
     /* -------------------------------------------------------------------------------------------
@@ -1452,6 +1467,14 @@
   </style>
 </head>
 <body>
+  <!-- Neither the player nor the editor runs without JavaScript: say so, with a way on (the gallery, the main site, where the
+       Companion Core is bought and downloaded, the docs). The same four addresses as assets/viewer.ts and the portal's pages. -->
+  <noscript>
+    <nav aria-label="Companion Intelligence" style="padding: 24px; font: 15px/1.6 system-ui, sans-serif; color: var(--foreground); background: var(--background);">
+      <p style="margin: 0 0 8px;"><b>The virtual homes need JavaScript.</b> Turn it on to fly through a home in 3D, or go on from here.</p>
+      <p style="margin: 0;"><a href="./">See all homes</a> · <a href="https://ci.computer">Companion Intelligence</a> · <a href="https://ci.computer/core">Buy Companion Core</a> · <a href="https://ci.computer/download">Download Companion</a> · <a href="https://docs.ci.computer/docs/apps-available/first-party-apps">Docs</a></p>
+    </nav>
+  </noscript>
 
   <!-- Icon sprite: lucide (https://lucide.dev — the canon icon set, CI-Common styles/UI-STYLE-GUIDE.md §6),
        path data copied from lucide-react 0.469.0. Use as <svg class="i"><use href="#i-name"/></svg>.
@@ -1599,7 +1622,7 @@
     <button type="button" class="btn-ctrl icon-only rc-edit-only" id="btn-redo" aria-label="Redo" title="Redo (Shift Ctrl or Cmd Z)" disabled><svg class="i" aria-hidden="true"><use href="#i-redo"/></svg></button>
     <button type="button" class="btn-ctrl icon-only drawer-toggle rc-edit-only" id="btn-toggle-catalog" aria-controls="catalog" aria-expanded="false" aria-label="Catalog" title="Catalog: what you can add"><svg class="i" aria-hidden="true"><use href="#i-furniture"/></svg></button>
     <button type="button" class="btn-ctrl icon-only drawer-toggle" id="btn-toggle-inspector" aria-controls="inspector" aria-expanded="false" aria-label="Inspector" title="Inspector: shots, checks, time of day"><svg class="i" aria-hidden="true"><use href="#i-sliders"/></svg></button>
-    <a href="./index.html" class="btn-ctrl btn-link" title="All homes: the portal's gallery"><svg class="i" aria-hidden="true"><use href="#i-back"/></svg><span class="lbl">All homes</span></a>
+    <a href="./" class="btn-ctrl btn-link" title="All homes: the portal's gallery"><svg class="i" aria-hidden="true"><use href="#i-back"/></svg><span class="lbl">All homes</span></a>
     <button type="button" class="btn-ctrl btn-outline" id="btn-open-export" aria-haspopup="dialog" title="Export a still image"><svg class="i" aria-hidden="true"><use href="#i-image"/></svg><span class="lbl">Still</span></button>
     <button type="button" class="btn-export" id="btn-open-video-export" aria-haspopup="dialog" title="Record the shot as a video"><svg class="i" aria-hidden="true"><use href="#i-video"/></svg><span class="lbl">Record</span></button>
   </header>
@@ -1939,7 +1962,7 @@
 
   <div id="toasts" class="rc-chrome"></div>
   <!-- Application Logic (ES Module) -->
-  <script type="module">
+  <script type="module" data-cfasync="false">
     import * as THREE from 'three';
     import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
     import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';

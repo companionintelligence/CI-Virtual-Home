@@ -8,5 +8,22 @@
 # so an unchanged module costs one empty 304.
 #
 # If a file is ever given a content hash in its name, that file (and only that one) can be cached for a long time.
+# The security headers share the block. frame-ancestors is the only directive of the Content-Security-Policy: it keeps another site from
+# putting this one in a frame (clickjacking) and leaves scripts, styles and requests alone, so the deploy-time Google Analytics
+# snippet (googletagmanager.com, google-analytics.com) and the player's own scripts run exactly as before; the company's own sites
+# may still embed it. The Permissions-Policy turns off what no page here uses. nosniff and the Referrer-Policy are Pages' defaults,
+# repeated so they stay if the default changes.
 /*
   Cache-Control: public, max-age=0, must-revalidate
+  Content-Security-Policy: frame-ancestors 'self' https://ci.computer https://*.ci.computer
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# The pages.dev addresses (the production alias and every pull request's preview) are for the team, not for a search engine: they serve
+# the same pages as homes.ci.computer, and a preview's canonical is its own address, so an indexed one would be a duplicate of the real site.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex

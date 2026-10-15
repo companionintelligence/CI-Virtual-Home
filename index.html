@@ -4,18 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Virtual homes · Companion Intelligence</title>
-  <meta name="description" content="Thirty homes, each built live in your browser from one spec file. Fly the camera paths, change the hour, walk in to the Companion Core.">
+  <meta name="description" content="Thirty homes, each built live in your browser from one spec file. Fly the camera paths, change the hour, and meet the Companion Core.">
   <!-- link previews: scripts/build-portal.mts makes og:image and og:url absolute for the deployed site -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Companion Intelligence">
   <meta property="og:title" content="Virtual homes · Companion Intelligence">
-  <meta property="og:description" content="Thirty homes, each built live in your browser from one spec file. Fly the camera paths, change the hour, walk in to the Companion Core.">
+  <meta property="og:description" content="Thirty homes, each built live in your browser from one spec file. Fly the camera paths, change the hour, and meet the Companion Core.">
   <meta property="og:image" content="./portal/hero.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser.">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@companionintel">
+  <meta name="twitter:image:alt" content="An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser.">
   <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
   <!--
@@ -23,16 +25,22 @@
     in portal/thumbs/ (scripts/build-thumbs.mts); there is no WebGL on this page. A card opens the live player,
     room-creator.html?mode=view (assets/viewer.ts). Every URL here is relative, so the site works at any host's
     root and under a sub-path (portal:test serves it at /ci-virtual-home/). Fonts are the repo's own woff2, so
-    this page makes no third-party requests.
+    the source page makes no third-party requests; the deployed site adds Google Analytics at deploy time
+    (.github/workflows/deploy.yml), which is the only third party it talks to.
   -->
   <link rel="icon" href="./assets/brand/ci-logo-mark.svg" type="image/svg+xml">
+  <link rel="icon" href="./portal/icons/favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon" href="./portal/icons/apple-touch-icon.png">
+  <link rel="manifest" href="./portal/site.webmanifest">
   <link rel="preload" href="./assets/fonts/manrope-latin-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./content/houses/index.json" as="fetch" crossorigin>
   <link rel="stylesheet" href="./portal/gallery.css">
-  <!-- gallery.js imports the portal's names when it runs, and lists the homes without them if they fail to come -->
+  <!-- gallery.js imports the portal's names when it runs, and lists the homes without them if they fail to come. The built page
+       has its import map just above the first module (scripts/build-portal.mts), after this head's title and preview tags -->
   <link rel="modulepreload" href="./assets/home-names.js">
   <noscript><style>.skel { display: none; }</style></noscript>
-  <script type="module" src="./portal/gallery.js"></script>
+  <!-- data-cfasync="false": Cloudflare's Rocket Loader would otherwise hold the script back and rewrite its type -->
+  <script type="module" src="./portal/gallery.js" data-cfasync="false"></script>
 </head>
 <body>
   <!-- Icons: Lucide (lucide-react 0.469.0, ISC; see THIRD_PARTY.md). Use as <svg class="i"><use href="#i-name"/></svg>. -->
@@ -51,13 +59,16 @@
   <a class="skip" href="#homes">Skip to the homes</a>
 
   <header class="site-head">
-    <a class="brand" href="./index.html" aria-label="Virtual homes, home">
-      <img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28">
-      <span class="brand-text"><b>Virtual homes</b><span>Companion Intelligence</span></span>
-    </a>
+    <div class="brand">
+      <a class="brand-ci" href="https://ci.computer" aria-label="Companion Intelligence"><img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><span>Companion Intelligence</span></a>
+      <span class="brand-sep" aria-hidden="true">/</span>
+      <a class="brand-title" href="./">Virtual homes</a>
+    </div>
     <nav class="site-nav" aria-label="Site">
-      <a href="#homes">Homes</a>
-      <a href="https://ci.computer" rel="noopener">Companion Core<svg class="i i-out" aria-hidden="true"><use href="#i-out"/></svg></a>
+      <a class="nav-homes" href="#homes">Homes</a>
+      <a class="nav-docs" href="https://docs.ci.computer/docs/apps-available/first-party-apps">Docs</a>
+      <a class="nav-download" href="https://ci.computer/download">Download Companion</a>
+      <a class="nav-buy" href="https://ci.computer/core"><span class="nav-long">Buy Companion Core</span><span class="nav-short">Buy Core</span></a>
     </nav>
   </header>
 
@@ -67,10 +78,13 @@
         <p class="eyebrow">Live 3D, in your browser</p>
         <h1 id="hero-title">Walk into thirty homes.</h1>
         <p class="lede">Your browser builds each home from one spec file: walls, rooms, furniture, garden and light.<span class="lede-more"> Pick a home, fly its camera paths, change the hour.</span></p>
-        <p class="core-line"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg><span>The small computer on every desk is a <b>Companion Core</b>: your own AI, apps and memory, running at home. <a href="https://ci.computer" rel="noopener">What is Companion Core?</a></span></p>
         <div class="hero-cta">
           <a class="btn btn-primary" id="hero-play" href="./room-creator.html?mode=view&amp;house=aurora"><svg class="i i-fill"><use href="#i-play"/></svg><span>Watch <span data-hero-name>Aurora</span></span></a>
           <a class="btn btn-ghost hero-browse" href="#homes"><span>Browse the homes</span><svg class="i"><use href="#i-down"/></svg></a>
+        </div>
+        <div class="core-card">
+          <p class="core-line"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg><span>Every home has a <b>Companion Core</b> in it. Watch one to find it.</span></p>
+          <p class="core-actions"><a class="core-more" href="#core"><span>What is the Companion Core?</span><svg class="i" aria-hidden="true"><use href="#i-down"/></svg></a></p>
         </div>
         <dl class="stats" aria-label="The collection">
           <div><dt>Homes</dt><dd data-stat="homes">30</dd></div>
@@ -121,7 +135,19 @@
         <p><b>The list of homes did not load.</b> Check the connection and try again.</p>
         <button type="button" class="btn btn-primary" id="retry"><svg class="i"><use href="#i-retry"/></svg><span>Try again</span></button>
       </div>
-      <noscript><p class="empty">The gallery needs JavaScript to list the homes.</p></noscript>
+      <noscript><p class="empty">Search and the filters need JavaScript. The homes are listed above.</p></noscript>
+    </section>
+
+    <section class="cta-band" id="core" aria-labelledby="cta-title">
+      <div class="cta-copy">
+        <h2 id="cta-title">Meet the Companion Core.</h2>
+        <p>The small computer on your desk runs your own AI, apps and memory at home, not in someone else's cloud.</p>
+      </div>
+      <div class="cta-actions">
+        <a class="btn btn-buy" href="https://ci.computer/core">Buy Companion Core</a>
+        <a class="btn btn-ghost" href="https://ci.computer/download">Download Companion</a>
+        <a class="cta-docs" href="https://docs.ci.computer/docs/apps-available/first-party-apps">Read the docs</a>
+      </div>
     </section>
   </main>
 
@@ -131,6 +157,17 @@
         <p class="foot-brand"><img src="./assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>Companion Intelligence</b></p>
         <p>Every frame is drawn on your device, with three.js and WebGL. Nothing is streamed: your browser builds each home from its spec.</p>
       </div>
+      <nav class="foot-links" aria-label="Companion Intelligence">
+        <p><b>Companion Intelligence</b></p>
+        <ul>
+          <li><a href="https://ci.computer">ci.computer</a></li>
+          <li><a href="https://ci.computer/core">Buy Companion Core</a></li>
+          <li><a href="https://ci.computer/download">Download Companion</a></li>
+          <li><a href="https://docs.ci.computer/docs/apps-available/first-party-apps">Docs</a></li>
+          <li><a href="https://ci.computer/privacy-policy">Privacy</a></li>
+          <li><a href="https://ci.computer/terms-of-service">Terms</a></li>
+        </ul>
+      </nav>
       <div>
         <p><b>Credits</b></p>
         <p>Each home is a HouseSpec written by hand from a Sims 4 gallery build, and each card names its builder. No files, textures or screenshots from those builds or from The Sims are used.</p>
@@ -140,7 +177,9 @@
         </details>
       </div>
     </div>
-    <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence. <a href="https://ci.computer">ci.computer</a></p>
+    <!-- foot-homes: scripts/build-portal.mts writes the list of every home's own page here (the pages are build output, so a
+         checkout served as it is has none) -->
+    <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence.</p>
   </footer>
 </body>
 </html>
