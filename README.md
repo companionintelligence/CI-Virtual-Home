@@ -245,7 +245,8 @@ A few things the player does that the editor does not:
 Until the player's module has mounted, `room-creator.html`'s head script is the player: the house's poster, its
 name once `index.json` is in, a loader that says so when a slow connection makes it take a while, and a card with
 **Try again** and **See all homes** when the page cannot start (no WebGL 2, a module that did not download, an
-engine that threw). An id the index does not list gets the error card at once, with nothing built behind it. The
+engine that threw; only the page's own scripts count, so a blocked analytics tag never raises it). An id the index
+does not list gets the error card at once, with nothing built behind it. The
 player asks no third party for anything: its fonts, including the ones the scene draws text in, are the repo's
 own (`portal/viewer.css`); only the editor links Google Fonts.
 
