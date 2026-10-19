@@ -1,0 +1,880 @@
+{
+  "schema": "family/v1",
+  "slug": "petrov",
+  "house": "newcrest",
+  "fictional": true,
+  "family": {
+    "surname": "Petrov",
+    "tagline": "A loft desk, a busy kitchen and a nursery, run from one Companion Core.",
+    "household": "young-family",
+    "business": false,
+    "story": "Elena manages projects from a writing desk in the loft. Nikolai is home with one-year-old Mila, and the days run through the kitchen. One Companion Core sits on a shelf there.",
+    "address": {
+      "line": "6 Quillfield Terrace",
+      "place": "Highmoor Cross"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "elena",
+      "name": "Elena",
+      "age": 34,
+      "role": "parent",
+      "work": "project manager",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Nettle",
+        "runtime": "Hermes",
+        "job": "Drafts Elena’s weekly status note from the points she types.",
+        "personality": [
+          "calm",
+          "exact",
+          "patient"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Drafts only. Elena reads and sends every note herself."
+      }
+    },
+    {
+      "id": "nikolai",
+      "name": "Nikolai",
+      "age": 36,
+      "role": "parent",
+      "work": "at home with the baby",
+      "colour": "chart-2",
+      "archetype": "host",
+      "companion": {
+        "name": "Barley",
+        "runtime": "Hermes",
+        "job": "Drafts Nikolai’s shopping list from the week’s meal plan.",
+        "personality": [
+          "warm",
+          "playful",
+          "steady"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Drafts the list only. Nikolai reads it and does the shopping."
+      }
+    },
+    {
+      "id": "mila",
+      "name": "Mila",
+      "age": 1,
+      "role": "baby",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Nikolai in the kitchen"
+    },
+    {
+      "id": "loft",
+      "kind": "room",
+      "room": "office",
+      "title": "Elena in the loft"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "nursery",
+      "kind": "room",
+      "room": "kids",
+      "title": "Mila’s nursery"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Mila crawls after the parcel",
+        "body": "Up the outside stair, a parcel waits. Nikolai carries it to the kitchen while Elena clears the shelf, and Mila crawls behind."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Elena unwraps the Companion Core",
+        "body": "Elena finds the Companion Core inside, with a power cable, a quick-start guide and a recovery USB drive. Nikolai sets it on the kitchen shelf."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Mila taps the power button",
+        "body": "On the shelf, Elena lifts Mila to tap the button. The Companion Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Elena joins from her phone",
+        "body": "On her phone, Elena joins the Core’s own network from the Wi-Fi settings. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "kitchenowl",
+        "nextcloud"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "The family picks the first apps",
+        "body": "In the Companion Hub store, Elena picks Hermes, and the family names its agents Nettle and Barley. Nikolai adds KitchenOwl and Nextcloud.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: KitchenOwl, Nextcloud"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "elena",
+      "agent": "elena",
+      "approval": "elena",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Nettle says hello",
+        "body": "At the kitchen counter, Elena messages the agent she named Nettle. The reply comes from the Core.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "elena",
+        "text": "Hello, Elena. I am Nettle. Where shall we begin?"
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-shelf",
+      "chapter": "kitchen",
+      "member": "nikolai",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nikolai backs up the playground week",
+        "body": "Back home, Nikolai’s phone backs a week of playground photos up to Immich on the Core, not a photo cloud.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ],
+        "note": "Immich’s first start takes a while."
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-lemons",
+      "chapter": "kitchen",
+      "member": "nikolai",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Lemons arrive from the loft",
+        "body": "From the loft, Elena adds lemons to the family list. At the island, Nikolai sees the new line, because KitchenOwl keeps one shared list on the Core.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-barley",
+      "chapter": "kitchen",
+      "member": "nikolai",
+      "agent": "nikolai",
+      "approval": "nikolai",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "kitchenowl"
+      ],
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nikolai checks the list Barley drafted",
+        "body": "While Mila’s porridge cools, Nikolai types the week’s meals to Barley. Barley drafts the list on the Core’s local model, and Nikolai reads it, then adds it to KitchenOwl.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "nikolai",
+        "text": "Here is the list from this week’s meals. Please check it."
+      }
+    },
+    {
+      "id": "kitchen-recipe",
+      "chapter": "kitchen",
+      "member": "nikolai",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The dumpling card can retire",
+        "body": "A dumpling recipe from his mother has lived on a stained card for years. Nikolai types it into KitchenOwl, and Elena can now cook from it too.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "loft-plan",
+      "chapter": "loft",
+      "member": "elena",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The plan follows a moved review",
+        "body": "The review moves a day earlier. From the loft sofa, Elena shifts the launch tasks, and Companion Planning keeps the plan as one local file.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "loft-paper",
+      "chapter": "loft",
+      "member": "elena",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "couch",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nikolai asks for a gas bill",
+        "body": "The permit form wants a utility bill, so Nikolai calls upstairs. Elena types one word, and Paperless-ngx finds last winter’s gas bill, read and tagged on the Core.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Google Drive"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "loft-nettle",
+      "chapter": "loft",
+      "member": "elena",
+      "agent": "elena",
+      "approval": "elena",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "ci-memory"
+      ],
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Five points become the weekly note",
+        "body": "Friday morning, Elena types five points. With Companion Memory (beta) connected, Nettle drafts the weekly note, and Elena reads it and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "film": true
+    },
+    {
+      "id": "loft-files",
+      "chapter": "loft",
+      "member": "elena",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Dropbox"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Elena stops emailing herself",
+        "body": "After the engineer’s visit, Elena saves the new boiler warranty in Nextcloud. She stops emailing copies to herself, because the folder is on the Core.",
+        "chips": [
+          "Nextcloud",
+          "replaces Dropbox"
+        ]
+      }
+    },
+    {
+      "id": "living-week",
+      "chapter": "living",
+      "member": "nikolai",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "iCloud"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Story hour reaches Elena’s phone",
+        "body": "Beside Mila on the sofa, Nikolai puts Saturday’s story hour into the family calendar. Nextcloud serves it from the Core, so Elena’s phone shows it too.",
+        "chips": [
+          "Nextcloud",
+          "replaces iCloud"
+        ]
+      }
+    },
+    {
+      "id": "living-vault",
+      "chapter": "living",
+      "member": "elena",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host, working with the Bitwarden apps",
+      "anchor": {
+        "role": "desk",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Elena swaps a weak password",
+        "body": "At the living-room writing desk, Elena swaps the childcare portal’s weak password for a new one. VaultWarden keeps it in a vault the family hosts.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "living-renewals",
+      "chapter": "living",
+      "member": "elena",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "fireplace",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 2
+          },
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Elena catches a trial before renewal",
+        "body": "A streaming trial is about to renew, and Wallos on the Core has already reminded Elena. By the fireplace, she and Nikolai decide to cancel it.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      }
+    },
+    {
+      "id": "living-film",
+      "chapter": "living",
+      "member": "elena",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Elena chooses the afternoon film",
+        "body": "On her afternoon off, Elena picks the film in the family room downstairs. Jellyfin plays it from the family’s own collection on the Core to the TV.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "nursery-songs",
+      "chapter": "nursery",
+      "member": "mila",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mila drums along to old songs",
+        "body": "Mila drums on the toy box while Nikolai plays the folder of songs Elena’s grandmother sang, copied from old tapes. Jellyfin plays them from the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "nursery-nap",
+      "chapter": "nursery",
+      "member": "nikolai",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "crib",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Nikolai dims the nursery for naptime",
+        "body": "As Mila settles, Nikolai taps once and the nursery lamp turns low and warm. Home Assistant runs it from the Core, needing no cloud account of its own.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-beds",
+      "chapter": "garden",
+      "member": "nikolai",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Nikolai waters, then writes it down",
+        "body": "Tuesday morning, Nikolai waters the bed under the willow. He logs it in HortusFox with a picture of the new leaves, and the journal keeps the date.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-deck",
+      "chapter": "garden",
+      "member": "elena",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "joplin",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "take notes and keep to-dos that sync across your devices through your own server",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Elena takes the call outside",
+        "body": "Elena takes the committee call on the side deck and types notes as she listens. Joplin Server syncs them to her laptop before she is back at her desk.",
+        "chips": [
+          "Joplin Server",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "From loft desk to kitchen shelf",
+        "body": "Status notes, meal plans, photos and the nursery lamp run from one Companion Core on the kitchen shelf."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your lists, photos and paperwork can sit on a Companion Core at home. Pick your first apps in the Companion Hub store.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Elena’s loft beats anchor on the one writing desk, the sofa, the daybed and the room (couch nth 0 and 1 narrowed to office). living-vault uses the real writing desk in the main-floor living room. No bookshelf or laptop item is named.",
+    "Mila is a baby with no archetype or companion. nursery-songs carries her: she drums on the toy box while Nikolai plays the old tape songs.",
+    "First Companion Memory mention is loft-nettle (a film beat) and reads Companion Memory (beta). ftue-pick names no Memory.",
+    "No small-business beats: the household has no business. Wallos, Nextcloud, Paperless-ngx, VaultWarden and Joplin Server chips use the catalog replaces names only.",
+    "Hermes beats name who sends: Elena reads the weekly note and sends it herself; Barley drafts a shopping list and Nikolai does the shopping. No agent contacts a third party. Filed papers are the family’s own; no employer files.",
+    "Home Assistant runs the nap scene from the Core and needs no cloud account of its own; the beat says nothing about the lamp’s own app. No Zigbee claim.",
+    "The tv-stand is on the garden-level family room, so living-film says the family room downstairs. The fireplace and writing desk are in the main-floor living room; the crib and toy box are in the nursery."
+  ]
+}

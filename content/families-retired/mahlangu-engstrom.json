@@ -1,0 +1,854 @@
+{
+  "schema": "family/v1",
+  "slug": "mahlangu-engstrom",
+  "house": "valleyview",
+  "fictional": true,
+  "family": {
+    "surname": "Mahlangu-Engstrom",
+    "tagline": "A garden room for clients, a football rota on the Core.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Thandi is a counselor who sees clients in the Garden Room. Nils coaches a youth five-a-side team. The appointment times and the weekend rota share one Core.",
+    "address": {
+      "line": "36 Fynbos Close",
+      "place": "Protea Vale"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "thandi",
+      "name": "Thandi",
+      "age": 55,
+      "role": "partner",
+      "work": "counselor with a private practice",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Nomsa",
+        "runtime": "Hermes",
+        "job": "Drafts appointment reminders for Thandi to send. Times only.",
+        "personality": [
+          "gentle",
+          "calm",
+          "patient"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Times only. Thandi sends every message."
+      }
+    },
+    {
+      "id": "nils",
+      "name": "Nils",
+      "age": 57,
+      "role": "partner",
+      "work": "coaches a youth five-a-side team",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Tully",
+        "runtime": "OpenClaw",
+        "job": "Opens Vikunja in its own browser and lines up the weekend team rota.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Lines up a rota. Nils confirms with parents."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "salon",
+      "kind": "room",
+      "room": "living",
+      "title": "The Hearth Salon"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "room",
+      "kind": "room",
+      "room": "office",
+      "title": "Mornings, the Garden Room"
+    },
+    {
+      "id": "table",
+      "kind": "room",
+      "room": "dining",
+      "title": "Afternoons, the dining bay"
+    },
+    {
+      "id": "upstairs",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Upstairs"
+    },
+    {
+      "id": "deck",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The deck and the drive"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "nils",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Home from practice, a parcel",
+        "body": "Nils comes home from practice and finds a parcel at the front door. He carries it a few steps to the shelf in the Hearth Salon."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "thandi",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Everything in the parcel",
+        "body": "Thandi unpacks the parcel: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "nils",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in, start the clock",
+        "body": "Nils plugs in the cable and presses the button, like a referee starting the clock. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "thandi",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Thandi joins from her phone",
+        "body": "Thandi joins the Core's own network from her phone. Then she picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "nils",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "baikal",
+        "vikunja",
+        "jellyfin"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Thandi picks Hermes and Nils picks OpenClaw. They add Baikal, Vikunja and Jellyfin, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Baikal, Vikunja",
+            "Apps: Jellyfin"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "thandi",
+      "agent": "thandi",
+      "approval": "thandi",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Nomsa says hello",
+        "body": "Thandi messages the agent she named Nomsa. Nomsa answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "thandi",
+        "text": "Hello, Thandi. Nomsa here. Shall we begin?"
+      },
+      "film": true
+    },
+    {
+      "id": "salon-tv",
+      "chapter": "salon",
+      "member": "thandi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Film night, from their own library",
+        "body": "On Friday, Thandi and Nils pick a film from their own library in Jellyfin. It streams from the Core to the TV.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "salon-reports",
+      "chapter": "salon",
+      "member": "nils",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "freshrss",
+        "replaces": []
+      },
+      "capability": "read the sites you follow in one feed, on your own Core",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Match reports, in one feed",
+        "body": "Nils reads the league's match reports in FreshRSS on the couch. The sites he follows land in one feed on the Core.",
+        "chips": [
+          "FreshRSS"
+        ]
+      }
+    },
+    {
+      "id": "salon-fire",
+      "chapter": "salon",
+      "member": "thandi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "booklore",
+        "replaces": [
+          "Kindle"
+        ]
+      },
+      "capability": "manage and read books, comics and PDFs with automatic covers and metadata",
+      "anchor": {
+        "role": "fireplace",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A novel by the fire",
+        "body": "By the fire, Thandi reads a novel in BookLore. Her library of books, comics and PDFs lives on the Core.",
+        "chips": [
+          "BookLore",
+          "replaces Kindle"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-dinners",
+      "chapter": "kitchen",
+      "member": "thandi",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Dinners, plus oranges for the match",
+        "body": "Thandi keeps the week's dinners in KitchenOwl at the breakfast bar. Nils adds the oranges for Saturday's match from his phone.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-balls",
+      "chapter": "kitchen",
+      "member": "nils",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "spliit",
+        "replaces": [
+          "Splitwise"
+        ]
+      },
+      "capability": "split shared costs with housemates, family or friends and settle up with the fewest payments",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen"
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Who owes what for the balls",
+        "body": "Nils splits the cost of new match balls among the parents with Spliit. It shows who owes whom, and no money moves.",
+        "chips": [
+          "Spliit",
+          "replaces Splitwise"
+        ]
+      }
+    },
+    {
+      "id": "room-calendar",
+      "chapter": "room",
+      "member": "thandi",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "a small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Appointment times, nothing else",
+        "body": "Thandi keeps her appointment times in Baikal. The calendar holds times only, and it sits on the Core.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      }
+    },
+    {
+      "id": "room-reminders",
+      "chapter": "room",
+      "member": "thandi",
+      "agent": "thandi",
+      "approval": "thandi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Nomsa drafts the day's reminders",
+        "body": "Thandi asks Nomsa for tomorrow's reminders. Nomsa drafts one message per appointment, with the time only. Thandi reads each and sends it herself."
+      },
+      "say": {
+        "speaker": "thandi",
+        "text": "Drafts ready. Times only. Please check each one."
+      },
+      "film": true
+    },
+    {
+      "id": "room-invoices",
+      "chapter": "room",
+      "member": "thandi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "invoice-ninja",
+        "replaces": [
+          "FreshBooks"
+        ]
+      },
+      "capability": "send invoices and quotes, track expenses and time",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Invoices written at the desk",
+        "body": "At month end Thandi writes the practice invoices in Invoice Ninja at her desk. Every invoice stays on the Core.",
+        "chips": [
+          "Invoice Ninja",
+          "replaces FreshBooks"
+        ]
+      }
+    },
+    {
+      "id": "room-handbook",
+      "chapter": "room",
+      "member": "thandi",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "capability": "write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The practice handbook, written down",
+        "body": "Thandi writes the practice handbook in BookStack: opening hours, room rules and the supplier list.",
+        "chips": [
+          "BookStack",
+          "replaces Confluence"
+        ]
+      }
+    },
+    {
+      "id": "room-vault",
+      "chapter": "room",
+      "member": "thandi",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host; works with the Bitwarden apps",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Practice logins, kept in a vault",
+        "body": "Thandi keeps the practice logins in VaultWarden. It works with the Bitwarden apps, and the vault lives on the Core.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "table-rota",
+      "chapter": "table",
+      "member": "nils",
+      "agent": "nils",
+      "approval": "nils",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "vikunja",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "lists, boards and calendars for tasks, with reminders and recurring jobs",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Tully lines up the weekend rota",
+        "body": "Nils reads out the weekend's pitch slots. Tully opens Vikunja in its own browser and lines up the rota. Nils confirms with the parents himself.",
+        "chips": [
+          "Vikunja",
+          "replaces Todoist"
+        ]
+      },
+      "say": {
+        "speaker": "nils",
+        "text": "Rota lined up. Please check the slots."
+      },
+      "film": true
+    },
+    {
+      "id": "table-contacts",
+      "chapter": "table",
+      "member": "nils",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "baikal",
+        "replaces": []
+      },
+      "capability": "a small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The parents' numbers stay put",
+        "body": "Nils keeps the parents' phone numbers in Baikal's contact list. They sit on the Core, and his phone reads the same list.",
+        "chips": [
+          "Baikal"
+        ]
+      }
+    },
+    {
+      "id": "table-tactics",
+      "chapter": "table",
+      "member": "nils",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "a whiteboard with a hand-drawn look; sketch ideas together",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Corner routines on a whiteboard",
+        "body": "Nils sketches Saturday's corner routine on an Excalidraw whiteboard. The hand-drawn arrows are saved on the Core.",
+        "chips": [
+          "Excalidraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "bed-podcast",
+      "chapter": "upstairs",
+      "member": "nils",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Apple Podcasts"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A coaching podcast, picked up",
+        "body": "In bed, Nils plays a coaching podcast in Audiobookshelf. It remembers where he stopped, so tomorrow starts in the same place.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Apple Podcasts"
+        ]
+      }
+    },
+    {
+      "id": "deck-article",
+      "chapter": "deck",
+      "member": "thandi",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "linkwarden",
+        "replaces": [
+          "Pocket"
+        ]
+      },
+      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The planting guide, saved whole",
+        "body": "Thandi saves a planting guide in Linkwarden on the deck. It keeps a screenshot and a PDF of the page.",
+        "chips": [
+          "Linkwarden",
+          "replaces Pocket"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "deck-camera",
+      "chapter": "deck",
+      "member": "nils",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "front-door"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A camera on the drive",
+        "body": "Nils points the family's IP camera at the drive. Frigate keeps the video on the Core, and the clips play on the home Wi-Fi.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Two working lives, one Core",
+        "body": "A counselor and a coach, a garden room and a training pitch. The Mahlangu-Engstrom household runs on one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your appointment times, your team rota and your evenings can live on a Companion Core at home. Start with one calendar in Baikal.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Care note kept: counseling is named as work only. No clinical, confidentiality or compliance wording; the privacy story is the times-only calendar, the reminders and the parents' contact list. Please re-read room-calendar.",
+    "No garden zone of ten square meters: the garden chapter is on the deck and the drive. Home Assistant and HortusFox were left out because the fleet is over its cap.",
+    "salon-tv: Jellyfin plays the family's own library on the wall TV. deck-camera is the iot beat: Frigate needs an IP camera the family owns (not in the parcel). No prevention claim, no viewing from away.",
+    "table-rota: the agent prepares the rota and Nils confirms with the parents himself, outside the Core. No parent is shown using an app. table-contacts claims nothing about the parents' devices.",
+    "kitchen-balls: Spliit shows who owes whom and moves no money (catalog caveat). Football means association football; five-a-side is named in the story and the pitch is the walled plaza in the render.",
+    "Voice-over lexicon: Mahlangu, Engstrom, Thandi, Nils, Nomsa, Tully, Protea Vale, Fynbos, Jellyfin, Spliit, Baikal, Vikunja, BookStack, VaultWarden, Excalidraw, Audiobookshelf, Linkwarden, BookLore, FreshRSS, Frigate.",
+    "Street Fynbos Close and town Protea Vale are invented; the human map check is still open (fynbos and protea are plant words, check the pair is not a real address)."
+  ]
+}

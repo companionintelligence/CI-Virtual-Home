@@ -1,0 +1,170 @@
+/* ---------------------------------------------------------------------------------------------------------------
+ * The family tour (assets/story/*): the beat card, the leader, the start and end cards, the chapters panel.
+ *
+ * Loaded by assets/story/mount.js with its own <link>, only for ?family=<slug> (never the landing, never the editor), after
+ * portal/viewer.css, whose tokens it uses (--vh-glass-strong, --vh-ring, --vh-shadow, --vh-font, --foreground, --primary ...).
+ * Colour is the canon's dark semantic set; text on the glass is at least 7:1, the dimmed karaoke words 4.5:1 or better.
+ * ------------------------------------------------------------------------------------------------------------- */
+
+/* ---- the player's own chrome, put away while a tour runs: the shot and time-of-day chips (the chapters replace them), the speed
+   button (narration plays at one speed) and the player's own end card (the tour has its own) */
+html[data-story] .vh-shots,
+html[data-story] .vh-tool[data-act="speed"],
+html[data-story] .vh-end { display: none !important; }
+
+/* ---- the tour's layer */
+.st { position: absolute; inset: 0; z-index: 6; pointer-events: none; font-family: var(--vh-font); color: var(--foreground); }
+.st * { box-sizing: border-box; }
+.st [hidden] { display: none !important; }
+.vh:not([data-state="ready"]) .st { display: none; }
+.st :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.st-live-region { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.st-btn-sound[aria-pressed="true"] { color: var(--primary); }
+.st-btn-chapters[aria-expanded="true"] { background-color: var(--vh-on); color: var(--primary); }
+.st-tick { position: absolute; top: 50%; width: 2px; height: 10px; margin: -5px 0 0 -1px; border-radius: 2px; background: var(--foreground); opacity: 0.5; pointer-events: none; }
+
+/* ---- the picture fading (a step, a chapter jump, a cut across the house, reduced motion) */
+.st-fade { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; z-index: 1; }
+
+/* ---- the beat card */
+.st-card {
+  position: absolute; z-index: 2;
+  padding: 14px 16px 12px;
+  border-radius: 16px;
+  font-size: 14px; line-height: 1.5;
+  background: var(--vh-glass-strong);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow: var(--vh-shadow), inset 0 0 0 1px var(--vh-ring);
+  overflow-y: auto; overscroll-behavior: contain;
+  opacity: 0; transform: translateY(6px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.st-card.st-in { opacity: 1; transform: none; }
+.st-card[data-mode="sheet"] { pointer-events: auto; border-radius: 16px; padding: 10px 14px 8px; font-size: 14px; }
+/* a phone's sheet is held to 38 % of the window and must clear what the beat is about: its lines sit a little closer than the floating card's, so a beat with a scripted line and a note (whose room is kept from the start) fits */
+.st-card[data-mode="sheet"] { line-height: 1.42; }
+.st-card[data-mode="sheet"] .st-title { margin: 6px 0 3px; }
+.st-card[data-mode="sheet"] .st-chips { margin-top: 8px; }
+.st-card[data-mode="sheet"] .st-say { margin-top: 5px; padding: 5px 10px; }
+.st-card[data-mode="sheet"] .st-note { margin-top: 6px; }
+.st-card[data-mode="sheet"] .st-foot { margin-top: 6px; }
+.st-kicker { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 12px; line-height: 1.3; font-weight: 600; }
+.st-who { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-with { color: var(--muted-foreground); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-disc { flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 11.5px; font-weight: 700; color: var(--primary-foreground); background: var(--primary); }
+.st-disc[data-colour="chart-1"] { background: var(--chart-1); }
+.st-disc[data-colour="chart-2"] { background: var(--chart-2); }
+.st-disc[data-colour="chart-3"] { background: var(--chart-3); }
+.st-disc[data-colour="chart-4"] { background: var(--chart-4); }
+.st-disc[data-colour="chart-5"] { background: var(--chart-5); color: var(--foreground); }
+.st-title { margin: 8px 0 4px; font-size: 16px; line-height: 1.3; font-weight: 700; letter-spacing: 0.1pt; }
+.st-body { margin: 0; color: var(--foreground); }
+.st-w { transition: color 0.12s ease, background-color 0.12s ease; border-radius: 4px; }
+.st-live .st-w { color: var(--muted-foreground); }
+.st-live .st-w.st-done { color: var(--foreground); }
+.st-live .st-w.st-now { color: var(--foreground); background-color: color-mix(in srgb, var(--primary) 26%, transparent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 26%, transparent); }
+.st-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.st-chip { padding: 4px 9px; border-radius: 999px; font-size: 12px; line-height: 1.2; font-weight: 700; background: color-mix(in srgb, var(--foreground) 12%, transparent); }
+.st-chip-replaces { background: none; box-shadow: inset 0 0 0 1px var(--vh-ring); color: var(--muted-foreground); font-weight: 600; }
+.st-say { margin-top: 10px; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, var(--primary) 12%, transparent); opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s; }
+.st-say.st-on { opacity: 1; visibility: visible; transform: none; transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s; }
+.st-say-who { display: block; font-size: 12px; line-height: 1.3; font-weight: 700; color: var(--primary); }
+.st-say-text { margin: 2px 0 0; }
+.st-note { margin: 10px 0 0; padding-left: 9px; border-left: 2px solid var(--primary); font-size: 12px; line-height: 1.4; color: var(--muted-foreground); }
+.st-foot { margin: 10px 0 0; font-size: 11.5px; line-height: 1.3; color: var(--muted-foreground); }
+
+/* a stylised phone screen (a drawing, never a screenshot) */
+.st-phone { margin: 10px 0 0; padding: 8px 10px 10px; border-radius: 16px; background: color-mix(in srgb, var(--foreground) 8%, transparent); box-shadow: inset 0 0 0 1px var(--vh-ring); }
+.st-phone-head { font-size: 12px; font-weight: 700; color: var(--primary); padding-bottom: 6px; margin-bottom: 4px; border-bottom: 1px solid var(--vh-ring); }
+.st-phone-rows { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.st-phone-rows li { display: flex; align-items: center; gap: 8px; font-size: 12.5px; line-height: 1.3; }
+.st-phone-rows li::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); opacity: 0.85; }
+
+.st-compact .st-phone { display: none; }
+
+/* ---- the leader and the pin */
+.st-leader { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 1; }
+.st-leader-line { stroke: var(--primary); stroke-width: 1.75; stroke-linecap: round; opacity: 0.95; filter: drop-shadow(0 0 2px rgba(2, 16, 24, 0.8)); }
+.st-pin-dot { fill: var(--primary); stroke: var(--vh-ink); stroke-width: 2; }
+.st-pin-ring { fill: none; stroke: var(--primary); stroke-width: 2; opacity: 0.7; transform-box: fill-box; transform-origin: center; animation: st-pulse 1.9s ease-out infinite; }
+@keyframes st-pulse { from { transform: scale(0.55); opacity: 0.9; } to { transform: scale(1.7); opacity: 0; } }
+
+/* ---- the start card */
+.st-start { position: absolute; inset: 0; z-index: 8; display: grid; place-items: center; padding: 16px; pointer-events: auto; background: linear-gradient(180deg, rgba(2, 16, 24, 0.28), rgba(2, 16, 24, 0.55)); overflow: auto; }
+.st-start-card { width: min(460px, 100%); padding: 24px 24px 20px; border-radius: 20px; background: var(--vh-glass-strong); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: var(--vh-shadow), inset 0 0 0 1px var(--vh-ring); }
+.st-start-kick { margin: 0 0 6px; font-size: 12px; line-height: 1.3; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--primary); }
+.st-start-card h2 { margin: 0 0 6px; font-size: 22px; line-height: 1.2; font-weight: 700; }
+.st-start-p { margin: 0 0 10px; font-size: 14.5px; line-height: 1.5; color: var(--foreground); }
+.st-start-meta { margin: 0 0 16px; font-size: 12.5px; line-height: 1.4; color: var(--muted-foreground); }
+/* the family on the start card: one button for each person (a monogram, the name, the archetype word), 44 px */
+.st-members { margin: 16px 0 0; padding: 12px 0 0; border-top: 1px solid var(--vh-ring); }
+.st-members-h { margin: 0 0 8px; font-size: 12px; line-height: 1.3; font-weight: 700; color: var(--muted-foreground); }
+.st-members-list { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.st-member { display: grid; grid-template-columns: 22px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 8px; align-items: center; width: 100%; min-height: 44px; padding: 5px 10px; border: 0; border-radius: 12px; background: var(--vh-hover); color: var(--foreground); font: inherit; text-align: left; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; transition: background-color 0.15s ease; }
+.st-member:hover { background: color-mix(in srgb, var(--foreground) 16%, transparent); }
+.st-member .st-disc { grid-row: 1 / span 2; }
+.st-member-name { font-size: 14px; line-height: 1.2; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-member-role { font-size: 12px; line-height: 1.2; font-weight: 500; color: var(--muted-foreground); }
+.st-fine { margin: 16px 0 0; padding: 12px 0 0; border-top: 1px solid var(--vh-ring); list-style: none; display: grid; gap: 4px; font-size: 11.5px; line-height: 1.4; color: var(--muted-foreground); }
+
+/* ---- buttons (44 px: the same size for a finger and a pointer) */
+.st-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.st-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; font: inherit; font-size: 14px; font-weight: 700; line-height: 1.2; text-align: center; text-decoration: none; cursor: pointer; color: var(--foreground); background: var(--vh-hover); pointer-events: auto; -webkit-tap-highlight-color: transparent; transition: background-color 0.15s ease; }
+.st-btn:hover { background: color-mix(in srgb, var(--foreground) 16%, transparent); }
+.st-primary { background: var(--primary); color: var(--primary-foreground); }
+.st-primary:hover { background: color-mix(in srgb, var(--primary) 88%, var(--foreground)); }
+
+/* ---- the end card */
+.st-end { position: absolute; z-index: 4; padding: 18px 20px 16px; border-radius: 18px; pointer-events: auto; background: var(--vh-glass-strong); -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25); box-shadow: var(--vh-shadow), inset 0 0 0 1px var(--vh-ring); opacity: 0; transform: translateY(8px); transition: opacity 0.3s ease, transform 0.3s ease; }
+.st-end.st-in { opacity: 1; transform: none; }
+.st-end h2 { margin: 0; font-size: 20px; line-height: 1.25; font-weight: 700; }
+.st-end-lead { margin: 4px 0 8px; font-size: 14px; line-height: 1.4; font-weight: 600; color: var(--primary); }
+.st-end-body { margin: 0 0 14px; }
+
+/* ---- the chapters panel: a drawer on a wide screen, a sheet above the dock below that */
+.st-chapters { position: absolute; z-index: 5; pointer-events: auto; display: flex; flex-direction: column; overflow: hidden; background: var(--vh-glass-strong); -webkit-backdrop-filter: blur(18px) saturate(1.25); backdrop-filter: blur(18px) saturate(1.25); box-shadow: var(--vh-shadow), inset 0 0 0 1px var(--vh-ring); border-radius: var(--vh-radius, 16px);
+  right: calc(var(--vh-gap, 12px) + env(safe-area-inset-right, 0px)); top: calc(var(--vh-gap, 12px) + var(--vh-top-h, 50px) + 12px + env(safe-area-inset-top, 0px)); bottom: 104px; width: 340px; animation: st-slide 0.22s ease both; }
+@keyframes st-slide { from { opacity: 0; transform: translateX(10px); } }
+.st-ch-head { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 6px 6px 6px 16px; border-bottom: 1px solid var(--vh-ring); }
+.st-ch-head h2 { margin: 0; font-size: 15px; font-weight: 700; }
+.st-x { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 12px; background: none; color: var(--foreground); cursor: pointer; }
+.st-x:hover { background: var(--vh-hover); }
+.st-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.st-ch-nav { flex: 1 1 auto; overflow-y: auto; padding: 6px; }
+.st-ch-list, .st-beats { margin: 0; padding: 0; list-style: none; }
+.st-ch { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 6px 10px; border: 0; border-radius: 10px; background: none; color: var(--foreground); font: inherit; font-size: 14px; font-weight: 600; text-align: left; cursor: pointer; }
+.st-ch:hover { background: var(--vh-hover); }
+.st-ch[aria-current] { background: var(--vh-on); color: var(--primary); }
+.st-ch small { font-size: 12px; font-weight: 500; color: var(--muted-foreground); }
+.st-n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; font-weight: 700; background: color-mix(in srgb, var(--foreground) 14%, transparent); }
+.st-beats { margin: 2px 0 6px 34px; }
+.st-bt { width: 100%; min-height: 36px; padding: 6px 10px; border: 0; border-radius: 8px; background: none; color: var(--muted-foreground); font: inherit; font-size: 13.5px; text-align: left; cursor: pointer; }
+.st-bt:hover { background: var(--vh-hover); color: var(--foreground); }
+.st-bt[aria-current] { color: var(--foreground); font-weight: 700; box-shadow: inset 2px 0 0 var(--primary); border-radius: 0 8px 8px 0; }
+.st-transcript { flex: none; max-height: 40%; overflow-y: auto; padding: 0 16px 8px; border-top: 1px solid var(--vh-ring); }
+.st-transcript summary { display: flex; align-items: center; min-height: 44px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.st-tr-body h3 { margin: 12px 0 4px; font-size: 13px; font-weight: 700; color: var(--primary); }
+.st-tr-body p { margin: 0 0 8px; font-size: 13px; line-height: 1.5; color: var(--muted-foreground); }
+.st-tr-phone { margin: 0 0 8px; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--muted-foreground); }
+.st-tr-body strong { color: var(--foreground); }
+
+/* ---- below a desktop: the panel is a sheet above the dock */
+@media (max-width: 1099px) {
+  .st-chapters { left: 8px; right: 8px; width: auto; top: auto; bottom: 88px; max-height: min(62%, 520px); }
+}
+/* a phone: the beat card is a bottom sheet; the chapters panel takes its place while it is open */
+@media (max-width: 600px) {
+  .st-start-card { padding: 20px 18px 16px; }
+  .st-start-card h2 { font-size: 20px; }
+  .vh[data-chapters="1"] .st-card[data-mode="sheet"] { visibility: hidden; }
+  .st-end { left: 8px !important; width: calc(100% - 16px) !important; }
+}
+@media (pointer: coarse) { .st-bt { min-height: 44px; } }
+
+/* ---- reduced motion: nothing glides, nothing pulses. (The 250 ms cross-fade between pictures is a cut, not a motion, and is kept.) */
+@media (prefers-reduced-motion: reduce) {
+  .st-card, .st-say, .st-end, .st-w, .st-btn, .st-member { transition: none !important; transform: none !important; }
+  .st-pin-ring { animation: none !important; display: none; }
+  .st-chapters { animation: none !important; }
+}

@@ -1,0 +1,926 @@
+{
+  "schema": "family/v1",
+  "slug": "brennan-hollin",
+  "house": "bgfamily",
+  "fictional": true,
+  "family": {
+    "surname": "Brennan",
+    "tagline": "Four people, two studies and one Companion Core under one roof.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Sally runs her consultancy from the front study, and John writes code in the downstairs study, where the Core sits. Steve claims the living-room TV, and Jean has the desk in her room. One Companion Core keeps their files, code, films and homework.",
+    "address": {
+      "line": "7 Tarnside Lane",
+      "place": "Hollin Cross"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "sally",
+      "name": "Sally",
+      "age": 43,
+      "role": "parent",
+      "work": "consultant, runs her own small practice",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Juniper",
+        "runtime": "OpenClaw",
+        "job": "Opens Nextcloud in its own browser and files the client papers Sally lists.",
+        "personality": [
+          "precise",
+          "brisk",
+          "organised"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Files only. Sally checks every folder before anything is shared."
+      }
+    },
+    {
+      "id": "john",
+      "name": "John",
+      "age": 45,
+      "role": "parent",
+      "work": "software engineer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Quill",
+        "runtime": "OpenClaw",
+        "job": "Opens Forgejo in its own browser and writes up the issues John lists.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Opens issues only. John reads every issue before it stands."
+      }
+    },
+    {
+      "id": "steve",
+      "name": "Steve",
+      "age": 16,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-3",
+      "archetype": "gamer"
+    },
+    {
+      "id": "jean",
+      "name": "Jean",
+      "age": 14,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-4",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "John's study"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "office",
+      "kind": "room",
+      "room": "office",
+      "title": "Sally's front study"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Jean's room"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out on the drive"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel on the porch",
+        "body": "A parcel waits on the porch. John carries it through the entry hall and the living room to the study, and Jean holds the door."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Sally lifts the Core out and sets it on the study desk."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "John plugs it in and Steve presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      }
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "On her phone, Sally joins the Core's own network, then chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "with": [
+        "yuvomi",
+        "libreoffice"
+      ],
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agents and apps",
+        "body": "In the Companion Hub store, Sally and John pick OpenClaw. The family names its agents Juniper and Quill. Companion Memory (beta) comes along, and then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Yuvomi, LibreOffice"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "member": "sally",
+      "agent": "sally",
+      "approval": "sally",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Juniper says hello",
+        "body": "Sally greets Juniper, the agent the family named. Juniper answers, and the Core is running.",
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "sally",
+        "text": "Hello, Sally. I am Juniper. Where shall we begin?"
+      }
+    },
+    {
+      "id": "study-code",
+      "chapter": "study",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "john",
+      "app": {
+        "id": "code-server",
+        "replaces": [
+          "Cursor"
+        ]
+      },
+      "capability": "write code in VS Code in your browser, with the editor and your files on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "John codes in his laptop's browser",
+        "body": "Morning in the study. John works in Code Server, in his laptop's browser. The editor and his projects both sit on the Core.",
+        "chips": [
+          "Code Server",
+          "replaces Cursor"
+        ],
+        "note": "Installing extensions uses the internet."
+      }
+    },
+    {
+      "id": "study-repos",
+      "chapter": "study",
+      "category": "productivity",
+      "segment": "consumer",
+      "film": true,
+      "member": "john",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own Git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "John's code lives on his desk",
+        "body": "John pushes the day's work to Forgejo. The repositories sit on the Core beside him, not on a rented code host.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      }
+    },
+    {
+      "id": "study-model",
+      "chapter": "study",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "john",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "When the notebook breaks, John asks",
+        "body": "A new idea goes into a JupyterLab notebook first. When it breaks, John asks a model on the Core through Open WebUI, and the chat stays there by default.",
+        "chips": [
+          "JupyterLab"
+        ]
+      },
+      "with": [
+        "open-webui"
+      ]
+    },
+    {
+      "id": "study-quill",
+      "chapter": "study",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "john",
+      "agent": "john",
+      "approval": "john",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own Git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Quill opens the issues John lists",
+        "body": "After the morning's testing, John lists the bugs he found. Quill opens each one in Forgejo, in its own browser, and John reads every issue before it stands.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "say": {
+        "speaker": "john",
+        "text": "The issues are drafted. Please read each before it stands."
+      }
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "film": true,
+      "member": "steve",
+      "app": {
+        "id": "steam-headless",
+        "replaces": [
+          "GeForce Now"
+        ]
+      },
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Steve's Steam session runs at home",
+        "body": "Steve starts a session from the sectional. Steam Headless runs it on the Core and shows it in a browser on the living-room screen.",
+        "chips": [
+          "Steam Headless",
+          "replaces GeForce Now"
+        ]
+      }
+    },
+    {
+      "id": "living-valve",
+      "chapter": "living",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "steve",
+      "app": {
+        "id": "steam-headless",
+        "replaces": [
+          "GeForce Now"
+        ]
+      },
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Steve signs in to Steam himself",
+        "body": "Steve signs in with his own Valve account, so the library stays Valve's. The Core runs the session over the home network.",
+        "chips": [
+          "Steam Headless",
+          "replaces GeForce Now"
+        ]
+      }
+    },
+    {
+      "id": "living-films",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "steve",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Steve picks the family film",
+        "body": "It is Friday afternoon, and Steve and Jean argue over the film. Jellyfin plays whichever they pick, from the family's own files on the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-meals",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "sally",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping and meals",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The week's dinners, planned once",
+        "body": "While the kettle boils, Sally plans the week's dinners. Yuvomi keeps the plan and the shopping list in a database on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-chores",
+      "chapter": "kitchen",
+      "category": "home",
+      "segment": "consumer",
+      "member": "steve",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping and meals",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Steve ticks off the washing-up",
+        "body": "It is Steve's night to wash up. He ticks the job off in Yuvomi, the planner Sally used for dinner.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "office-report",
+      "chapter": "office",
+      "category": "productivity",
+      "segment": "small-business",
+      "member": "sally",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "capability": "the LibreOffice suite in your browser",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sally writes the quarterly report",
+        "body": "The quarterly report is due by Thursday. Sally writes it in LibreOffice, in her browser, and the file is saved on the Core.",
+        "chips": [
+          "LibreOffice",
+          "replaces Microsoft Office"
+        ]
+      }
+    },
+    {
+      "id": "office-clients",
+      "chapter": "office",
+      "category": "productivity",
+      "segment": "small-business",
+      "member": "sally",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A folder for every client",
+        "body": "Each client gets a folder in Nextcloud. Sally's contracts sit on the Core, not in a rented drive, and her contacts are served from there too.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "office-draft",
+      "chapter": "office",
+      "category": "small-business",
+      "segment": "small-business",
+      "film": true,
+      "member": "sally",
+      "agent": "sally",
+      "approval": "sally",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Juniper files, Sally checks first",
+        "body": "A client sends new papers. Juniper opens Nextcloud and files them in the client's folder on the Core. Sally decides what the client sees.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "office-paper",
+      "chapter": "office",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "sally",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "A search finds last year's invoice",
+        "body": "Receipts and supplier invoices go through Paperless-ngx on the Core. Every page is read and tagged, so Sally finds an invoice by the words on it.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "office-pdf",
+      "chapter": "office",
+      "category": "productivity",
+      "segment": "small-business",
+      "member": "sally",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Contract and schedule, one PDF",
+        "body": "Sally merges a contract and its schedule into one PDF. Stirling-PDF does the merging on the Core, not on a PDF website.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "kids-homework",
+      "chapter": "kids",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "jean",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Jean revises with a quiz",
+        "body": "Jean keeps her revision notes in Obsidian, as plain files on the Core. A model on the Core quizzes her through Open WebUI, and the chat stays there by default.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      },
+      "with": [
+        "open-webui"
+      ]
+    },
+    {
+      "id": "kids-lookup",
+      "chapter": "kids",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "jean",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "serve Wikipedia and other reference sites from the Core",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "No search engine sees Jean's question",
+        "body": "A geography project is due. Jean looks up glaciers in Kiwix, which serves Wikipedia from the Core, so no search engine sees the question.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ],
+        "note": "The Wikipedia file is downloaded once."
+      },
+      "film": true
+    },
+    {
+      "id": "kids-french",
+      "chapter": "kids",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "jean",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Jean checks her homework",
+        "body": "Before she hands it in, Jean checks her French paragraph in LibreTranslate. It does the work on the Core, so no translation service sees the words.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ],
+        "note": "Language models are downloaded once."
+      }
+    },
+    {
+      "id": "garden-drive",
+      "chapter": "garden",
+      "category": "iot",
+      "segment": "consumer",
+      "film": true,
+      "member": "john",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "front-door"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "John finds the parcel clip",
+        "body": "John wants to know when the parcel came. Frigate recorded it from the family's drive camera, and the clip sits on the Core.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core under a stone gable",
+        "body": "Contracts, code, films and homework. The Brennan household keeps them on one Companion Core."
+      }
+    }
+  ],
+  "closing": {
+    "body": "Your contracts, code, family films and homework can all sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "study-code uses Code Server, which has no QA screenshot: the owner must list app-qa-screenshot at study-code in content/story/reviewed.json. The writer did not add it.",
+    "John's Study has no desk item in the spec (the Core's own desk with the curved monitor is the hero), so John's beats anchor on the core. Sally's beats use desk nth 0 and 1, the two Front Study desks.",
+    "Both agents run OpenClaw (casting signature ci-openclaw) and act only in apps on the Core with a web interface; no beat opens an outside website, so the OpenClaw website note is not carried.",
+    "Steam Headless beats carry the Valve account, home network and no frame rate, game title or gaming-PC wording. Jean has no agent (casting gives none); Steve has none either.",
+    "garden-drive assumes the family owns an IP camera: it is not in the Core box and not in the 3D scene.",
+    "Sleeping is never told. Steve and Jean are never shown asleep, and no beat frames the crib or the toddler bed that dress the Kids Room and the Study."
+  ]
+}

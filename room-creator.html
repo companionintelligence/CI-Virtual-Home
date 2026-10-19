@@ -45,7 +45,7 @@
       // The name is the portal's (assets/home-names.js), which the script after the import map imports and hands
       // to __vhNames: a module asked for before the import map would make a browser without multiple-import-map
       // support drop the map, and three.js with it. If it did not download, the loader says "Loading" and the tab
-      // keeps the site's title: the spec's own name is the Sims build's, jargon and all, and not the portal's.
+      // keeps the site's title: only the portal's name (displayName) is ever shown.
       window.__vhIndex = fetch('./content/houses/index.json').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
       var cssString = function (v) { return '"' + String(v).replace(/["\\]/g, '\\$&') + '"'; };
       window.__vhNames = function (names) { Promise.all([window.__vhIndex, names]).then(function (r) {
@@ -54,9 +54,8 @@
         if (h) {
           var name = n && n.displayName(h);
           if (name) d.style.setProperty('--vh-boot-name', cssString(name));
-          // the credit and the facts, as the player's loading card writes them (viewer.ts metaLine)
+          // the facts, as the player's loading card writes them (viewer.ts metaLine)
           var meta = [];
-          if (h.author) meta.push('By ' + h.author);
           if (h.storeys) meta.push(h.storeys + (h.storeys === 1 ? ' storey' : ' storeys'));
           if (h.areaSqm) meta.push(h.areaSqm + ' m²');
           if (meta.length) d.style.setProperty('--vh-boot-meta', cssString(meta.join(' · ')));
@@ -81,12 +80,21 @@
       // script that failed to download fires its error at the <script> element, which only a capturing listener
       // on window sees.
       var booted = false;
+      // a link that asks for a family's tour (&family=<slug>) has a page that tells the same story with no 3D at all: the card offers it
+      // (the slug has the shape a family's always has, never a house id, and goes into a relative address only)
+      var fam = /^[a-z]+(-[a-z]+){0,2}$/.test(q.get('family') || '') ? q.get('family') : '';
       function card(state, title, msg, retry) {
         if (d.dataset.viewer === 'no-webgl' || d.dataset.viewer === 'failed') return;
         d.dataset.viewer = state;
         var box = document.createElement('div');
         box.className = 'vh-fail'; box.setAttribute('role', 'alert');
         box.innerHTML = '<img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><h2></h2><p></p><div class="vh-fail-actions">' + (retry ? '<button type="button">Try again</button>' : '') + '<a href="./">See all homes</a></div>';
+        if (fam) {   // (the family's story goes before "See all homes", and first when there is no Try again: it is the way on that still shows them the family)
+          var story = document.createElement('a'), acts = box.querySelector('.vh-fail-actions');
+          story.className = 'vh-fail-story'; story.href = './family/' + fam; story.textContent = "Read the family's story";
+          acts.insertBefore(story, acts.lastChild);
+          Array.prototype.forEach.call(acts.children, function (c) { c.style.minHeight = '44px'; });   // (a 44 px target, and the same height as its neighbours)
+        }
         box.querySelector('h2').textContent = title;
         box.querySelector('p').textContent = msg;
         if (retry) box.querySelector('button').addEventListener('click', function () { location.reload(); });
@@ -111,6 +119,20 @@
           ? 'This browser could not start 3D (WebGL 2 would not open). Try a recent Chrome, Edge, Firefox or Safari, with hardware acceleration on.'
           : 'The player stopped while starting. Try again, or pick another home.');
       }, true);
+      // The drawing context can be taken back after the page has started (a GPU reset, a phone that gave its graphics memory to another app).
+      // The renderer asks for it again and usually gets it. If it is still gone after 6 seconds of looking at the page, the same card
+      // says so and offers the way out, so a tour never ends on a frozen picture. This only listens: it sits in the capture phase, never calls
+      // preventDefault, and touches neither the renderer nor its frames. (A canvas that is not in the page, like the probe above, is not the player's.)
+      var lostTimer = 0;
+      function watchLost() {
+        clearTimeout(lostTimer);
+        lostTimer = setTimeout(function () {
+          if (document.hidden) { watchLost(); return; }   // not while nobody is looking: a phone gives the context back when the tab does
+          card('failed', 'The 3D view stopped.', 'The browser took back the graphics this page draws with. Try again to load the home.', true);
+        }, 6000);
+      }
+      addEventListener('webglcontextlost', function (e) { if (e.target && e.target.isConnected === false) return; watchLost(); }, true);
+      addEventListener('webglcontextrestored', function () { clearTimeout(lostTimer); }, true);
     })();
   </script>
 
@@ -1986,7 +2008,7 @@
     import { TIME_OF_DAY, TONE_EXPOSURE, lightingName, createSkyBaker, installSkyFog, GradeShader, createLighting, interiorWeight, storeysOf, GTAO_THICKNESS } from './assets/environment.js';
     import { installLightGuard } from './assets/light-guard.js';
     // the editor's own UI (S6): assets/ui/*.ts
-    import { displayName, buildCredit } from './assets/home-names.js';
+    import { displayName } from './assets/home-names.js';
     import { recordFrames, pickCodec, bitrateFor } from './assets/ui/recorder.js';
     import { createToasts } from './assets/ui/toast.js';
     import { createUndo } from './assets/ui/undo.js';
@@ -2430,7 +2452,7 @@
     }
 
     // =========================================================================
-    // PARAMETRIC ARCHITECTURE ENGINE (Pascal garden-house.ts & Sims Standards)
+    // PARAMETRIC ARCHITECTURE ENGINE (Pascal garden-house.ts and the editor's own cutaway standards)
     // =========================================================================
     // Ownership (pass 4, plan S0): the builders below alternate between streams, so each run of one stream's builders
     // opens with an `// ---- OWNER … ----` banner. Edit your own runs; a new builder goes at the END of your own run
@@ -2439,7 +2461,7 @@
     const ProceduralArchitecture = {
       // ---- OWNER S2 (architecture) + S1 (kit): createParametricWall (1 builder) — the wall shell, cladding and corners are S2's; the door and window units its openings loop builds are S1's ----
       // Parametric Wall Generator with Any Openings (Doors & Windows), Watertight Piers,
-      // Wall Aprons Under Windows, Lintel Headers, Baseboards, Sills, and Sims Cutaways
+      // Wall Aprons Under Windows, Lintel Headers, Baseboards, Sills, and Cutaways
       createParametricWall(config = {}) {
         const {
           length = 12,
@@ -2465,7 +2487,7 @@
         const hz = thickness / 2;
         const exterior = orientation !== 'partition';   // a perimeter wall's local +z faces out
         const wallPaint = new THREE.MeshStandardMaterial({ color: wallColor, roughness: 0.7 });
-        // Every wall box's top (box face 2) is the section: a clean white top wherever the Sims cut or a
+        // Every wall box's top (box face 2) is the section: a clean white top wherever the per-wall cutaway cut or a
         // roof-off view opens the wall — Pascal's cutaway reads as a drawing, not as paint or a hardwood rail.
         const capMat = new THREE.MeshStandardMaterial({ color: 0xf6f5f2, roughness: 0.92 });
         // config.cladding (a material from the house's material kit) goes on the outward face — local +z, box
@@ -7112,7 +7134,7 @@
       return Promise.resolve();
     }
 
-    // The six SimsTree builds used to be hand-coded presets here; they are HouseSpec JSON now
+    // Six homes used to be hand-coded presets here; they are HouseSpec JSON now
     // (content/houses/<id>.json). Old ids keep working via URL / API for one release — remove after that.
     const LEGACY_HOUSE_PRESETS = {
       'sims-mesamariposa': 'mesamariposa', 'mesa-mariposa': 'mesamariposa',
@@ -7737,9 +7759,9 @@
     const nextPaint = () => new Promise(r => { let done = false; const go = () => { if (!done) { done = true; r(); } }; requestAnimationFrame(() => requestAnimationFrame(go)); setTimeout(go, 80); });
     const loadingOverlay = document.getElementById('loading-overlay');
     function showBuilding(id, spec = null) {
-      const h = homeIndex.get(id) || (spec ? { id, name: spec.name, author: spec.author } : { id });
+      const h = homeIndex.get(id) || (spec ? { id, name: spec.name } : { id });
       document.getElementById('loading-title').textContent = `Building ${displayName(h)}`;
-      document.getElementById('loading-sub').textContent = spec ? [spec.author ? `By ${spec.author}` : '', `${(spec.levels || []).length} storey${(spec.levels || []).length === 1 ? '' : 's'}`].filter(Boolean).join(' · ') : 'Reading its spec';
+      document.getElementById('loading-sub').textContent = spec ? `${(spec.levels || []).length} storey${(spec.levels || []).length === 1 ? '' : 's'}` : 'Reading its spec';
       loadingOverlay.hidden = false;
       document.documentElement.dataset.building = '1';
     }
@@ -7789,7 +7811,7 @@
         const index = await res.json();
         for (const h of index.houses || []) homeIndex.set(h.id, h);
         gallery.setHomes((index.houses || []).map(h => ({
-          id: h.id, name: displayName(h), credit: h.author ? `By ${h.author}` : '',
+          id: h.id, name: displayName(h),
           meta: [h.storeys ? `${h.storeys}\u00a0storey${h.storeys === 1 ? '' : 's'}` : '', h.areaSqm ? `${h.areaSqm}\u00a0m²` : ''].filter(Boolean).join(' · '),   // (no-break spaces: a number never parts from its unit)
           thumb: `./portal/thumbs/${h.id}.webp`,
         })), STUDIO_SCENES);
@@ -7805,7 +7827,7 @@
     // the editor's own home is rebuilt and put back at the same shot and moment when the set is done or stopped.
     const COMPARE_SHOTS = ['door-to-core', 'orbit', 'hero-reveal', 'core-orbit'];
     const compare = VIEW_MODE ? null : createCompare(document.getElementById('compare-dialog'), {
-      homes: () => [...homeIndex.values()].map(h => ({ id: h.id, name: displayName(h), credit: h.author ? `By ${h.author}` : '' })),
+      homes: () => [...homeIndex.values()].map(h => ({ id: h.id, name: displayName(h) })),
       shots: COMPARE_SHOTS.map(id => [id, shotLabel(id)]),
       lightings: [['auto', "Each home's own"], ...Object.entries(TIME_OF_DAY).map(([k, p]) => [k, p.label.replace(/\s*\(.*\)$/, '')])],
       poster: async (id, { shot, t, lighting }) => {

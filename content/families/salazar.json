@@ -1,0 +1,832 @@
+{
+  "schema": "family/v1",
+  "slug": "salazar",
+  "house": "payorote",
+  "fictional": true,
+  "family": {
+    "surname": "Salazar",
+    "tagline": "A painter, a developer and one Companion Core in a treehouse.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Valeria paints and sells prints from the studio loft, and Rafael builds software for clients from the study nook. One Companion Core, on his desk, serves both of their small businesses.",
+    "address": {
+      "line": "5 Larkspur Steps",
+      "place": "Brindle Cross"
+    },
+    "narrator": "v-deep-m"
+  },
+  "members": [
+    {
+      "id": "valeria",
+      "name": "Valeria",
+      "age": 36,
+      "role": "partner",
+      "work": "painter, sells prints",
+      "colour": "chart-1",
+      "archetype": "maker",
+      "companion": {
+        "name": "Hazel",
+        "runtime": "OpenClaw",
+        "job": "Fills in the framer’s order form in its own browser from Valeria’s list.",
+        "personality": [
+          "gentle",
+          "tidy",
+          "curious"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Prepares the form only. Valeria checks every field and presses send."
+      }
+    },
+    {
+      "id": "rafael",
+      "name": "Rafael",
+      "age": 38,
+      "role": "partner",
+      "work": "freelance developer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Aspen",
+        "runtime": "OpenClaw",
+        "job": "Reads library release pages in its own browser and lists what changed.",
+        "personality": [
+          "patient",
+          "practical",
+          "dry"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Reads and lists only. Rafael decides what gets upgraded."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "nook",
+      "kind": "room",
+      "room": "office",
+      "title": "Rafael in the study nook"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The hearth room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "loft",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Valeria in the studio loft"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Decks and meadow"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Rafael carries the parcel in",
+        "body": "A parcel waits at the top of the steps. Rafael carries it to the study nook, where Valeria clears the desk."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Valeria slits the tape",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Valeria lifts the Core out and sets it on the desk."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Rafael plugs in the cable",
+        "body": "The cable goes in, and Valeria presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Valeria joins from her phone",
+        "body": "From the study nook, Valeria opens the Wi-Fi settings on her phone and joins the Core’s own network. Then she picks the home network.",
+        "kind": "phone",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "inkscape",
+        "forgejo"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Valeria chooses OpenClaw first",
+        "body": "In the Companion Hub store, Valeria picks OpenClaw and Inkscape, and Rafael adds Forgejo. The installs carry on while the two of them make breakfast.",
+        "note": "Installing apps uses the internet.",
+        "kind": "phone",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: OpenClaw",
+            "Apps: Inkscape, Forgejo"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "valeria",
+      "agent": "valeria",
+      "approval": "valeria",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and tools, running in its own sandbox",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Hazel says hello",
+        "body": "A first message goes to the agent Valeria named Hazel. Hazel answers from the Core beside her.",
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "valeria",
+        "text": "Hello, Valeria. I am Hazel. Tell me where to start."
+      },
+      "film": true
+    },
+    {
+      "id": "nook-tag",
+      "chapter": "nook",
+      "member": "rafael",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own Git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The invoice script ships",
+        "body": "A client waits on the invoice script. Rafael tags the release and pushes it to Forgejo. The repository sits on the Core, not on a rented code host.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "nook-aspen",
+      "chapter": "nook",
+      "member": "rafael",
+      "agent": "rafael",
+      "approval": "rafael",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and tools, running in its own sandbox",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Rafael hands Aspen a reading list",
+        "body": "Three libraries need a look. Aspen reads each release page in its own browser and writes up what changed. Rafael decides which ones to upgrade.",
+        "chips": [
+          "OpenClaw"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "rafael",
+        "text": "Here is what changed. Please read it before you upgrade."
+      }
+    },
+    {
+      "id": "nook-model",
+      "chapter": "nook",
+      "member": "rafael",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "with": [
+        "open-webui"
+      ],
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Rafael hunts for a missing row",
+        "body": "A quarterly total comes one row short. Rafael traces it in JupyterLab, then asks the Core’s model through Open WebUI, which answers from the hardware beside him.",
+        "chips": [
+          "JupyterLab"
+        ]
+      }
+    },
+    {
+      "id": "nook-flow",
+      "chapter": "nook",
+      "member": "valeria",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "n8n",
+        "replaces": [
+          "Zapier"
+        ]
+      },
+      "capability": "connect your apps with workflows, with the data staying on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Valeria’s order becomes a packing slip",
+        "body": "Valeria adds a print order, and a flow Rafael built in n8n writes the packing slip. It runs on the Core, with no connector service in the middle.",
+        "chips": [
+          "n8n",
+          "replaces Zapier"
+        ]
+      }
+    },
+    {
+      "id": "nook-pdf",
+      "chapter": "nook",
+      "member": "rafael",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Timesheets travel behind the invoice",
+        "body": "A month of timesheets must travel behind one invoice. Rafael merges the pages in Stirling-PDF on the Core, then attaches the single file.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "living-scene",
+      "chapter": "living",
+      "member": "rafael",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Rafael links the lamp and TV",
+        "body": "On Saturday afternoon, the floor lamp’s smart bulb and the wall TV switch together in a scene Rafael built. Home Assistant itself needs no cloud account.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "living-timelapse",
+      "chapter": "living",
+      "member": "valeria",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Valeria replays a canvas in time-lapse",
+        "body": "The time-lapse of Valeria’s last canvas plays from Jellyfin on the Core to the wall TV. Rafael asks to see the blue wash again.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "member": "valeria",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The olive oil reaches the list",
+        "body": "The olive oil is nearly gone, so Valeria marks it low in Grocy. The shopping list on the Core gains a line, and Rafael adds lemons.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-chores",
+      "chapter": "kitchen",
+      "member": "rafael",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Recycling and compost swap hands",
+        "body": "This Sunday, Rafael takes the recycling and Valeria takes the compost. Grocy swaps the two jobs on the chore list, next to the pantry stock.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "loft-lines",
+      "chapter": "loft",
+      "member": "valeria",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "bedroom"
+          },
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Valeria redraws the sketch",
+        "body": "A pencil sketch waits on the easel while Valeria traces it in Inkscape. The vector file for the next print edition is kept on the Core.",
+        "chips": [
+          "Inkscape",
+          "replaces Adobe Illustrator"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "loft-photos",
+      "chapter": "loft",
+      "member": "valeria",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "mazanoke",
+        "replaces": []
+      },
+      "capability": "resize and compress images in the browser",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Valeria shrinks the canvas photos",
+        "body": "On a bright morning Valeria shoots the finished canvases, then shrinks each photo in Mazanoke. The app resizes and compresses in her browser, and nothing is uploaded.",
+        "chips": [
+          "Mazanoke"
+        ]
+      }
+    },
+    {
+      "id": "loft-shop",
+      "chapter": "loft",
+      "member": "rafael",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "wordpress",
+        "replaces": [
+          "Squarespace"
+        ]
+      },
+      "capability": "run a website or blog on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "easel"
+          },
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The print page gets a draft",
+        "body": "At Valeria’s desk, Rafael builds the print page in WordPress and drops in her shrunken photos. The draft stays on the Core while Valeria reads it through.",
+        "chips": [
+          "WordPress",
+          "replaces Squarespace"
+        ]
+      }
+    },
+    {
+      "id": "loft-hazel",
+      "chapter": "loft",
+      "member": "valeria",
+      "agent": "valeria",
+      "approval": "valeria",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and tools, running in its own sandbox",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Valeria checks Hazel’s order form",
+        "body": "Six prints need frames. Valeria’s agent, Hazel, fills in the framer’s order form in its own browser. Valeria checks each field and presses send herself.",
+        "chips": [
+          "OpenClaw"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "film": true
+    },
+    {
+      "id": "loft-notes",
+      "chapter": "loft",
+      "member": "valeria",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "bedroom"
+          },
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The green gets written down",
+        "body": "Beside the easel, Valeria writes down the green she mixed, in Obsidian. It runs in a browser session, and the note is a plain Markdown file on the Core.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "garden-statement",
+      "chapter": "garden",
+      "member": "rafael",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "capability": "the LibreOffice suite in your browser, saved on your Core",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Rafael drafts a client proposal",
+        "body": "Beside the tulip planter, Rafael drafts a client proposal in LibreOffice, in his browser. Valeria reads the first line aloud, and he saves the file to the Core.",
+        "chips": [
+          "LibreOffice",
+          "replaces Microsoft Office"
+        ]
+      }
+    },
+    {
+      "id": "garden-ride",
+      "chapter": "garden",
+      "member": "valeria",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "wanderer",
+        "replaces": []
+      },
+      "capability": "plan and map hiking and biking routes from GPX files",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Friday’s ride gets a route",
+        "body": "On the bench in the meadow, Valeria loads the lake path’s GPX file into Wanderer and traces Friday’s ride. Rafael adds a boathouse stop before she saves it.",
+        "chips": [
+          "Wanderer"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core up in the branches",
+        "body": "A painter’s prints, a developer’s code and a shared pantry list sit on one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your drawings, repositories and pantry list can live on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Nook has a sleigh bed and no desk item; the Core stands on a desk there. Rafael's desk beats fall back to the Core, and no beat names a monitor or a second screen.",
+    "WordPress carries a public-access caveat: loft-shop tells a draft that stays on the Core and never says a visitor can open the page. Remote access is not claimed.",
+    "Both companions are OpenClaw (the plan's agent app). nook-aspen and loft-hazel open websites and carry the OpenClaw note; Valeria presses send on the framer's form herself.",
+    "Walk: front steps, the Nook with the Core, the hearth room and kitchen on the same level, up to the studio loft, then the tulip planter on the deck and the ground-level bench in the meadow. The lot has planters on decks, no ground garden.",
+    "Home Assistant switches a bulb and the TV only (network devices); no Zigbee stick and no energy claim. The kitchen has a counter and a bistro table, never an island.",
+    "Extra apps beyond the plan: JupyterLab with Open WebUI in with, n8n, Stirling-PDF, Jellyfin, Obsidian, LibreOffice. Open WebUI is never the beat app, so its ChatGPT chip never appears.",
+    "No Companion Memory, no Hermes: nothing here needs the first-mention beta wording or the chat-service note. Hello, Valeria's agent line, is the only say beside Aspen's.",
+    "garden-ride anchors on the meadow bench, not the roof-terrace umbrella table. loft-shop anchors on the loft desk, since the bedroom role alone picks the Tree Bedroom. Mazanoke claims no storage."
+  ]
+}

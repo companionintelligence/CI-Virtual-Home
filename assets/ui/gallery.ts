@@ -4,7 +4,7 @@
 // Enter or Space opens a home; Esc closes. A native <dialog> (showModal), so focus stays inside while it is open and
 // returns to the button that opened it.
 
-export type GalleryHome = { id: string; name: string; credit?: string; meta?: string; thumb?: string };
+export type GalleryHome = { id: string; name: string; meta?: string; thumb?: string };
 export type GalleryScene = { key: string; name: string; note?: string };
 
 const esc = (s: string) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
@@ -41,7 +41,7 @@ export function createGallery(dialog: HTMLDialogElement, { onPick }: { onPick: (
   dialog.innerHTML = `
     <form method="dialog" class="rc-dialog-head">
       <h2 id="gallery-title">Choose a home</h2>
-      <label class="rc-search">${svg('search')}<input type="search" id="gallery-search" placeholder="Search homes, builders, styles" aria-label="Search homes" autocomplete="off" spellcheck="false"></label>
+      <label class="rc-search">${svg('search')}<input type="search" id="gallery-search" placeholder="Search homes or styles" aria-label="Search homes" autocomplete="off" spellcheck="false"></label>
       <button type="button" class="btn-ctrl btn-outline rc-gallery-compare" id="gallery-compare" title="Every home at the same shot, side by side (C)">${svg('grid')}<span class="lbl">Compare</span></button>
       <button class="rc-icon-btn" value="close" aria-label="Close" title="Close (Esc)">${svg('x')}</button>
     </form>
@@ -72,8 +72,8 @@ export function createGallery(dialog: HTMLDialogElement, { onPick }: { onPick: (
   function render() {
     const q = norm(search.value.trim());
     const hit = (s: string) => !q || norm(s).includes(q);
-    const shown = homes.filter(h => hit(`${h.name} ${h.credit || ''} ${h.meta || ''} ${h.id}`));
-    grid.replaceChildren(...shown.map(h => card(`house:${h.id}`, h.name, [h.credit, h.meta].filter(Boolean).join(' · '), h.thumb || null, '')));
+    const shown = homes.filter(h => hit(`${h.name} ${h.meta || ''} ${h.id}`));
+    grid.replaceChildren(...shown.map(h => card(`house:${h.id}`, h.name, h.meta || '', h.thumb || null, '')));
     count.textContent = q ? `${shown.length} of ${homes.length}` : String(homes.length);
     empty.hidden = shown.length > 0;
     const sc = scenes.filter(s => hit(`${s.name} ${s.note || ''}`));

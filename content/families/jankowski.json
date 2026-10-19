@@ -1,0 +1,880 @@
+{
+  "schema": "family/v1",
+  "slug": "jankowski",
+  "house": "neweco",
+  "fictional": true,
+  "family": {
+    "surname": "Jankowski",
+    "tagline": "A bookkeeper, a device consultant and one Companion Core by the sea.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Agnieszka runs a bookkeeping and HR service from the writing desk upstairs. Tomasz, an IoT consultant, works at the octagonal table in the sunroom. One Companion Core on a shelf there serves both businesses.",
+    "address": {
+      "line": "4 Cuttlebone Walk",
+      "place": "Oakenholt"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "agnieszka",
+      "name": "Agnieszka",
+      "age": 42,
+      "role": "partner",
+      "work": "runs a bookkeeping and HR service",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Truffle",
+        "runtime": "OpenClaw",
+        "job": "Opens Twenty in its own browser and moves the deals Agnieszka names.",
+        "personality": [
+          "brisk",
+          "careful",
+          "tidy"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Prepares entries only. Agnieszka checks every field before it stands."
+      }
+    },
+    {
+      "id": "tomasz",
+      "name": "Tomasz",
+      "age": 44,
+      "role": "partner",
+      "work": "IoT consultant",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Gadget",
+        "runtime": "Hermes",
+        "job": "Drafts the handover notes Tomasz sends to clients after an install.",
+        "personality": [
+          "curious",
+          "bright",
+          "gentle"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Drafts only. Tomasz reads every note and sends it himself."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The sunroom lounge"
+    },
+    {
+      "id": "table",
+      "kind": "room",
+      "room": "living",
+      "title": "Tomasz at his table"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining room"
+    },
+    {
+      "id": "desk",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Agnieszka at her desk"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Deck and drive"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Tomasz carries the Core in",
+        "body": "Up the broad timber steps, a parcel waits at the double doors. Tomasz carries the Companion Core to the sunroom shelf Agnieszka has cleared."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Agnieszka lifts out the Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Agnieszka sets the Core on its shelf, in sight of the door."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "One press wakes the Core",
+        "body": "Tomasz plugs in the cable and Agnieszka presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "The phone finds the Core",
+        "body": "Agnieszka opens the Wi-Fi settings on her phone and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "nextcloud",
+        "forgejo"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Agnieszka picks OpenClaw, and the couple add Nextcloud and Forgejo. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: OpenClaw",
+            "Apps: Nextcloud, Forgejo"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "agnieszka",
+      "agent": "agnieszka",
+      "approval": "agnieszka",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser, running in its own sandbox on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Truffle says hello",
+        "body": "Agnieszka greets the agent she named Truffle. Truffle answers from the Core on its shelf.",
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "agnieszka",
+        "text": "Good morning, Agnieszka. Truffle here. Which client first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-read",
+      "chapter": "living",
+      "member": "agnieszka",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with notes and highlights; your library lives on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Agnieszka picks up where she stopped",
+        "body": "After lunch, Agnieszka stretches along the sectional with a thick biography from the family’s ebook library. Koodo Reader keeps her place and her margin notes on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "table-repo",
+      "chapter": "table",
+      "member": "tomasz",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own Git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A client’s settings get a branch",
+        "body": "Before a client’s install, Tomasz saves her sensor settings as a branch, so any change can be undone. Forgejo keeps that history on the Core.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "table-notebook",
+      "chapter": "table",
+      "member": "tomasz",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "open-webui",
+        "replaces": [
+          "ChatGPT"
+        ]
+      },
+      "with": [
+        "jupyterlab"
+      ],
+      "capability": "a chat interface wired to the local model on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The gappy log gets a question",
+        "body": "A client’s sensor log is full of gaps. Tomasz sorts it in JupyterLab, then asks a model through Open WebUI. The question stays on the Core by default.",
+        "chips": [
+          "Open WebUI",
+          "replaces ChatGPT"
+        ]
+      }
+    },
+    {
+      "id": "table-gadget",
+      "chapter": "table",
+      "member": "tomasz",
+      "agent": "tomasz",
+      "approval": "tomasz",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "dining-table",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Gadget drafts, and Tomasz sends",
+        "body": "After an install, Tomasz messages Gadget his notes. Gadget drafts the handover on the Core’s local model, and Tomasz reads it and sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "tomasz",
+        "text": "Here is the handover note. Please read it before you send it."
+      }
+    },
+    {
+      "id": "kitchen-deck-oil",
+      "chapter": "kitchen",
+      "member": "agnieszka",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "OurHome"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Agnieszka gives Tomasz the deck oiling",
+        "body": "The deck needs oil before the weather turns. Agnieszka adds it to the HomeHub chore board and gives it to Tomasz. The board is served from the Core.",
+        "chips": [
+          "HomeHub",
+          "replaces OurHome"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-mackerel",
+      "chapter": "kitchen",
+      "member": "agnieszka",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub with a recipe book, a shopping list and an expiry tracker",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The oldest mackerel goes first",
+        "body": "A neighbour’s boat lands more mackerel than the street can eat. Agnieszka dates the spare bags in HomeHub’s expiry tracker on the Core, so the oldest gets cooked first.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-sensors",
+      "chapter": "kitchen",
+      "member": "tomasz",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Tomasz measures the warm sunroom",
+        "body": "The sunroom runs warm, so Tomasz puts a Wi-Fi sensor there and one in the kitchen. Home Assistant compares both readings on the Core and itself needs no cloud account.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "dining-sign",
+      "chapter": "dining",
+      "member": "agnieszka",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "docuseal",
+        "replaces": [
+          "DocuSign"
+        ]
+      },
+      "capability": "fill and sign PDF forms on any device, from your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A client signs at the table",
+        "body": "The boatyard’s owner comes by on Wednesday morning. She signs the engagement letter on her phone, over the home Wi-Fi, with Docuseal on the Core. Agnieszka pours the tea.",
+        "chips": [
+          "Docuseal",
+          "replaces DocuSign"
+        ]
+      }
+    },
+    {
+      "id": "dining-budget",
+      "chapter": "dining",
+      "member": "tomasz",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "monetr",
+        "replaces": [
+          "YNAB"
+        ]
+      },
+      "capability": "budget around recurring expenses by setting money aside for upcoming bills and goals",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Money set aside for the van",
+        "body": "The van’s service and the software renewals land in one month. At the dining table Tomasz sets money aside in monetr, which keeps the budget on the Core.",
+        "chips": [
+          "monetr",
+          "replaces YNAB"
+        ]
+      }
+    },
+    {
+      "id": "desk-payroll",
+      "chapter": "desk",
+      "member": "agnieszka",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The payroll run finds its folder",
+        "body": "A client’s payroll run lists her staff’s wages. Agnieszka files it in Nextcloud, on the Core, not in a rented drive.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "desk-deal",
+      "chapter": "desk",
+      "member": "agnieszka",
+      "agent": "agnieszka",
+      "approval": "agnieszka",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Truffle moves the boatyard along",
+        "body": "The boatyard has signed. Agnieszka asks Truffle to move the deal along, and Truffle opens Twenty on the Core. Agnieszka checks the new stage herself before the deal moves on.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      },
+      "say": {
+        "speaker": "agnieszka",
+        "text": "The stage is ready. Please check it before it moves on."
+      }
+    },
+    {
+      "id": "desk-flow",
+      "chapter": "desk",
+      "member": "tomasz",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "activepieces",
+        "replaces": [
+          "Zapier"
+        ]
+      },
+      "capability": "connect your apps with visual automations",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A report lands where Agnieszka looks",
+        "body": "Each Friday morning, an Activepieces flow Tomasz built gathers the clients’ device reports for Agnieszka. It runs on the Core, and she finds them ready when she bills.",
+        "chips": [
+          "Activepieces",
+          "replaces Zapier"
+        ]
+      }
+    },
+    {
+      "id": "desk-invoice",
+      "chapter": "desk",
+      "member": "agnieszka",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The boatyard gets its first invoice",
+        "body": "This week the boatyard’s first invoice goes out. Agnieszka raises it in Akaunting on the Core, beside her other clients’ invoices and expenses.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "desk-handbook",
+      "chapter": "desk",
+      "member": "agnieszka",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "capability": "the LibreOffice suite in your browser",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A new client’s handbook takes shape",
+        "body": "A new client wants a staff handbook before the month ends. Agnieszka drafts it in LibreOffice, which runs on the Core and shows in her browser.",
+        "chips": [
+          "LibreOffice",
+          "replaces Microsoft Office"
+        ]
+      }
+    },
+    {
+      "id": "garden-music",
+      "chapter": "garden",
+      "member": "tomasz",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Tomasz finds the album from breakfast",
+        "body": "After a client call, Tomasz takes his phone to the deck bench and searches for the album Agnieszka mentioned. Navidrome serves it from the Core over the home Wi-Fi.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "garden-zone",
+      "chapter": "garden",
+      "member": "tomasz",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "front-door"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Tomasz draws the drive’s edge",
+        "body": "Passing cars on the lane keep starting clips, so Tomasz draws a zone around his own drive in Frigate. The clips stay on the Core.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Two businesses, one shelf",
+        "body": "Payroll files, sensor settings and drive clips sit on one Companion Core, on a shelf in the sunroom."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your client files, invoices and device settings can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "No TV, screen or fireplace in this home: the media beat is living-read at the couch (Koodo Reader). No text says TV or screen.",
+    "Bedroom 2 has the only desk (the writing desk): Agnieszka’s anchors are that desk, then the room. Tomasz sits at the octagonal table in the Sunroom Lounge (dining-table, room living).",
+    "garden-zone assumes the family fitted their own IP camera over the garage door: it is not in the Core box or the 3D scene. Frigate: no detection claim, nothing prevented.",
+    "Truffle is OpenClaw (ftue-hello and desk-deal open apps on the Core only: no website). Gadget is Hermes; table-gadget is the first Hermes beat and carries the chat-service note. Tomasz sends every note.",
+    "Docuseal is spelled as the catalog does. The client signs on her phone over the home Wi-Fi, so no outside signer needs the Core. No legal claim; Akaunting carries no accounting advice.",
+    "Apps over the fleet 40 percent cap (immich, hortusfox, paperless, vaultwarden) were left out. table-notebook: Open WebUI carries the chip, JupyterLab is the companion; the question stays on the Core by default.",
+    "desk-flow names no Nextcloud step: the Activepieces listing does not promise one.",
+    "desk-handbook (LibreOffice) is the one office-suite beat, no feature claim. kitchen-sensors sits on the second counter run; the dining beats use the nook and dining room tables."
+  ]
+}

@@ -1,0 +1,982 @@
+{
+  "schema": "family/v1",
+  "slug": "iyer",
+  "house": "mesamariposa",
+  "fictional": true,
+  "family": {
+    "surname": "Iyer",
+    "tagline": "A translator, a sound designer and two children share one Companion Core.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Meenakshi runs a translation and tutoring agency from the conservatory table, and Ravi designs sound upstairs beside a record player. Arjun, fifteen, plays in the guest bedroom, and Kavya, ten, studies at her desk. One Companion Core sits on a credenza in the living room.",
+    "address": {
+      "line": "9 Copperwing Rise",
+      "place": "Tarrow Heights"
+    },
+    "narrator": "v-young-f"
+  },
+  "members": [
+    {
+      "id": "meenakshi",
+      "name": "Meenakshi",
+      "age": 45,
+      "role": "parent",
+      "work": "translator, runs a small agency",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Clover",
+        "runtime": "Hermes",
+        "job": "Drafts reply messages to Meenakshi’s clients and pupils from her notes.",
+        "personality": [
+          "calm",
+          "patient",
+          "exact"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Writes drafts and nothing more. Meenakshi sends each reply herself."
+      }
+    },
+    {
+      "id": "ravi",
+      "name": "Ravi",
+      "age": 47,
+      "role": "parent",
+      "work": "sound designer",
+      "colour": "chart-2",
+      "archetype": "maker",
+      "companion": {
+        "name": "Maple",
+        "runtime": "Hermes",
+        "job": "Drafts delivery notes for Ravi’s sound packs from his file lists.",
+        "personality": [
+          "gentle",
+          "curious",
+          "tidy"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Drafts only. Ravi reads each note and sends it himself."
+      }
+    },
+    {
+      "id": "arjun",
+      "name": "Arjun",
+      "age": 15,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-3",
+      "archetype": "gamer"
+    },
+    {
+      "id": "kavya",
+      "name": "Kavya",
+      "age": 10,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-4",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "table",
+      "kind": "room",
+      "room": "dining",
+      "title": "The conservatory table"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "guest",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Arjun’s room"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Kavya’s room"
+    },
+    {
+      "id": "records",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Ravi and the record player"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out by the pool"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Ravi carries the parcel indoors",
+        "body": "A parcel waits under the slatted canopy. Ravi carries it past the kitchen and the utility room to the living room, where Kavya clears the credenza."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Arjun unpacks the Companion Core",
+        "body": "The lid lifts: the Companion Core, a power cable, a guide and a recovery USB drive. Arjun carries the Core to the credenza."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Ravi plugs in, Kavya presses",
+        "body": "Ravi plugs in the cable, and Kavya presses the power button. The Core wakes and opens a Wi-Fi network of its own.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Meenakshi joins on her phone",
+        "body": "Meenakshi opens the Wi-Fi settings on her phone and joins the Core’s own network. Then she picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "onlyoffice",
+        "libretranslate"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Meenakshi picks the first agent",
+        "body": "In the Companion Hub store, Meenakshi picks Hermes, and the family adds ONLYOFFICE Desktop Editors and LibreTranslate. Then the family walks away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "App: ONLYOFFICE Desktop Editors",
+            "App: LibreTranslate"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "meenakshi",
+      "agent": "meenakshi",
+      "approval": "meenakshi",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Clover says hello",
+        "body": "Meenakshi messages the agent she named Clover from the sofa. Clover answers from the Core on the credenza.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "meenakshi",
+        "text": "Hello, Meenakshi. I am Clover. Where shall we begin?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-playlist",
+      "chapter": "living",
+      "member": "ravi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Ravi finds the song Kavya hummed",
+        "body": "On the chesterfield, Ravi finds the song Kavya hummed at breakfast. Navidrome serves his own music files from the Core to the phone in his hand.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "table-brochure",
+      "chapter": "table",
+      "member": "meenakshi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The brochure gets a first pass",
+        "body": "A client’s brochure arrives in Spanish. Meenakshi runs a first pass in LibreTranslate, then polishes it herself. The models were downloaded once, so the Core does the translating.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "table-reschedule",
+      "chapter": "table",
+      "member": "meenakshi",
+      "agent": "meenakshi",
+      "approval": "meenakshi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "fireplace",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "dining-table",
+            "room": "dining",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Meenakshi moves a lesson",
+        "body": "By the fireplace, Meenakshi names two free slots for a pupil’s parent. Clover drafts the reply on the Core’s local model, and Meenakshi reads it and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "meenakshi",
+        "text": "Here is a draft with both slots. Please read it before you send it."
+      }
+    },
+    {
+      "id": "table-clearing",
+      "chapter": "table",
+      "member": "arjun",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "OurHome"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Arjun clears, then ticks it off",
+        "body": "After breakfast it is Arjun’s turn to clear the table. He ticks the chore off in HomeHub, and the family’s chore list is served from the Core.",
+        "chips": [
+          "HomeHub",
+          "replaces OurHome"
+        ]
+      }
+    },
+    {
+      "id": "table-columns",
+      "chapter": "table",
+      "member": "meenakshi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "onlyoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "capability": "write documents, spreadsheets and slides with a full office suite in your browser",
+      "anchor": {
+        "role": "room",
+        "room": "dining",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Meenakshi lays out a bilingual contract",
+        "body": "Two languages, two columns. Meenakshi lays out a client’s contract in ONLYOFFICE Desktop Editors, which runs on the Core and shows in her browser.",
+        "chips": [
+          "ONLYOFFICE Desktop Editors",
+          "replaces Microsoft Office"
+        ]
+      }
+    },
+    {
+      "id": "table-glossary",
+      "chapter": "table",
+      "member": "meenakshi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The old glossary is still there",
+        "body": "A client returns after a year. Meenakshi opens the old folder in Nextcloud. The glossary she built is saved on the Core, not in a rented drive.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-recipe",
+      "chapter": "kitchen",
+      "member": "kavya",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kavya adds tamarind to the list",
+        "body": "At the fridge, Kavya sees the tamarind is nearly gone and adds it to the HomeHub list. Meenakshi reads the list, served from the Core, before she shops.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-bell",
+      "chapter": "kitchen",
+      "member": "ravi",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "ntfy",
+        "replaces": []
+      },
+      "capability": "send a push notification to your phone from any script or automation with one request",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ravi sends the lunch bell",
+        "body": "At the range, Ravi runs a one-line script that sends ‘lunch’ to the family’s phones through ntfy. The ntfy server that delivers it runs on the Core.",
+        "chips": [
+          "ntfy"
+        ]
+      }
+    },
+    {
+      "id": "guest-session",
+      "chapter": "guest",
+      "member": "arjun",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "steam-headless",
+        "replaces": [
+          "GeForce Now"
+        ]
+      },
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind"
+      },
+      "popup": {
+        "title": "Arjun’s game runs downstairs",
+        "body": "Saturday afternoon, Arjun opens his Steam library in a browser on the bed. Steam Headless runs the session on the Core downstairs.",
+        "chips": [
+          "Steam Headless",
+          "replaces GeForce Now"
+        ],
+        "note": "Steam needs a Valve account."
+      },
+      "film": true
+    },
+    {
+      "id": "guest-vault",
+      "chapter": "guest",
+      "member": "arjun",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Arjun’s game password joins the vault",
+        "body": "Arjun keeps forgetting his Valve password. He saves it in the family’s VaultWarden vault, which works with the Bitwarden apps and lives on the Core.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "guest-match",
+      "chapter": "guest",
+      "member": "arjun",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Arjun backs up a painting",
+        "body": "On his bed, Arjun looks over the pictures he took of Kavya’s finished painting. Over the home network, his phone backs them up to Immich on the Core.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "kids-tortoise",
+      "chapter": "kids",
+      "member": "kavya",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Kavya and Arjun settle an argument",
+        "body": "Kavya and Arjun disagree about how long a tortoise lives. Kiwix settles it from a Wikipedia file downloaded once, so no search engine hears the question.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-label",
+      "chapter": "kids",
+      "member": "kavya",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "easel",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "kids",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kavya labels her frog painting",
+        "body": "By the easel, Kavya types frog into LibreTranslate and letters the Spanish word, rana, under her painting. Its language models were downloaded once, so the translating happens at home.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "kids-journal",
+      "chapter": "kids",
+      "member": "kavya",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kavya keeps a reading journal",
+        "body": "After school, Kavya adds a line about her library book to her Obsidian journal. It is a plain Markdown note on the Core, readable in any text editor.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "records-trim",
+      "chapter": "records",
+      "member": "ravi",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "Adobe Audition"
+        ]
+      },
+      "capability": "edit audio in a browser tab",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ravi trims a record he copied",
+        "body": "Beside the record player, Ravi trims a record he copied to files. The Core serves AudioMass, and the trimming happens in his browser tab.",
+        "chips": [
+          "AudioMass",
+          "replaces Adobe Audition"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "records-week",
+      "chapter": "records",
+      "member": "ravi",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ravi fits the recording week",
+        "body": "On Monday morning, Ravi fits the week’s recording hours into Companion Planning, one local file on the Core. He leaves Thursday afternoon empty for retakes.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "records-delivery",
+      "chapter": "records",
+      "member": "ravi",
+      "agent": "ravi",
+      "approval": "ravi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Maple drafts the delivery note",
+        "body": "A studio is waiting for a pack of door sounds. Ravi lists the files, and Maple drafts the delivery note on the Core’s local model. Ravi sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "ravi",
+        "text": "The note names the pack and lists the files. Read it, then send it."
+      }
+    },
+    {
+      "id": "garden-planter",
+      "chapter": "garden",
+      "member": "kavya",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Kavya waters, then writes it down",
+        "body": "After school, Kavya waters the planter by the pool and notes it in HortusFox. The planter’s care history lives on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Four routines share one Companion Core",
+        "body": "Translation, sound, game sessions and homework run on one Companion Core, under the villa’s dark tile roofs."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your client work, family music and homework can live on a Companion Core at home. Pick your apps in the Companion Hub store.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The house has no TV, no office and no bookshelf. The media beat sits at the couch (Navidrome); Arjun plays in a browser on his bed, never a screen; Meenakshi works at the conservatory trestle table.",
+    "Both companions are Hermes. Clover and Maple draft; Meenakshi and Ravi read and send. The Hermes note rides on ftue-hello, table-reschedule and records-delivery.",
+    "LibreTranslate beats carry the models-downloaded line and the Core does the work. Spanish appears in two LibreTranslate beats; the listing says dozens of languages and persona-apps uses French as the example.",
+    "Steam Headless: Valve account note, no title, no frame rate, home network only. guest-vault names the Valve sign-in but not the app, so no with entry.",
+    "ntfy iOS push uses an upstream relay; kitchen-bell says only that the ntfy server runs on the Core. AudioMass exports by browser download, so no file-storage claim. No Companion Memory beat; memory flags are false.",
+    "Starts at the Core (living room), then the conservatory beside it, kitchen, upstairs east to west (Arjun, Kavya, Ravi), the pool garden, the street."
+  ]
+}

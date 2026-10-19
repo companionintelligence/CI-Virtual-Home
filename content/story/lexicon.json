@@ -1,0 +1,16 @@
+{
+  "v": 1,
+  "$comment": "Pronunciation overrides for the voice-over (owner: voiceover-tool; see reference/story/voice.md). `word` is matched whole-word and case-insensitively in the spoken text; `ph` is in misaki's British phoneme alphabet (the symbols Kokoro's bf_ and bm_ voices take: A=eɪ I=aɪ Q=əʊ W=aʊ Y=ɔɪ, ˈ primary stress, ˌ secondary, ː long). The text sent to the engine becomes [Odoo](/ˈuːduː/), so the word stays in the token list and keeps its timing and its place in the caption. `say` is how a person would write it out loud. Only add a name when the default is wrong or unstable: the build prints which entries a family used. An edit here re-records exactly the clips whose spoken text it changes (--stale).",
+  "entries": [
+    { "word": "Odoo", "ph": "ˈuːduː", "say": "oo-doo", "note": "Default read is oh-doo." },
+    { "word": "Koodo", "ph": "kˈuːdQ", "say": "koo-doh", "note": "Koodo Reader. Pinned so a G2P change cannot move it." },
+    { "word": "Spliit", "ph": "splˈɪt", "say": "split", "note": "The extra i is part of the name; the default reads two short i sounds." },
+    { "word": "SearXNG", "ph": "sˈɜːksˌɛnʤˈiː", "say": "searks en-jee", "note": "The default spells it out letter by letter." },
+    { "word": "Keila", "ph": "kˈAlə", "say": "kay-la", "note": "Pinned." },
+    { "word": "Affine", "ph": "əfˈIn", "say": "a-fine", "note": "Pinned." },
+    { "word": "n8n", "ph": "ɛnˈAtˌɛn", "say": "en-eight-en", "note": "The default puts a primary stress on every syllable." },
+    { "word": "ntfy", "ph": "nˈɒtɪfˌI", "say": "notify", "note": "The default spells it out." },
+    { "word": "Rallly", "ph": "ɹˈali", "say": "rally", "note": "Three l's in the name." },
+    { "word": "UnCloud", "ph": "ʌnklˈWd", "say": "un-cloud", "note": "The sign-off. The default splits it in two with a pause." }
+  ]
+}

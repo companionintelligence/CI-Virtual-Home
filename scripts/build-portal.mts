@@ -1,11 +1,11 @@
 #!/usr/bin/env -S node --experimental-strip-types
 // Assembles the web portal for Cloudflare Pages: exactly the files the site loads, nothing else.
 //
-//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/]
+//   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/] [--families <dir>] [--strict-families] [--stale-report]
 //   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
 //
-//   <out>/index.html                 the gallery (portal/gallery.css + gallery.js, portal/thumbs/, portal/hero.webp),
-//                                    its link-preview image (portal/hero.jpg) and URL made absolute
+//   <out>/index.html                 the front page: the families and their homes (portal/gallery.css + gallery.js + campaign.js,
+//                                    portal/thumbs/, the hero's picture), its link-preview image (portal/hero.jpg) and URL made absolute
 //   <out>/room-creator.html          the player (?mode=view: portal/viewer.css + assets/viewer.js) and the editor,
 //                                    plus one tag: <meta name="vh-share" content="homes/">, which tells the player
 //                                    the share pages below exist. Its static title and description are the site's
@@ -21,9 +21,16 @@
 //                                    and some others read no WebP). og:image and og:url are absolute, as unfurlers
 //                                    want: the site's address is --site-url, else $SITE_URL, else the live site
 //                                    (https://homes.ci.computer/); ci.yml passes a pull request's preview address
+//   <out>/family/<slug>.html         a fictional family's page (scripts/story/site.mts), served at /family/<slug>: who they are, the
+//                                    scenes of their tour, the apps they run, a link to the tour (room-creator?mode=view&house=<id>
+//                                    &family=<slug>) and fine print naming the home they live in, linked to homes/<id>. One page per
+//                                    CURRENT family (scripts/story/site.mts, "stale families"), under the same rules as a home's page
+//   <out>/story/ audio/ film/ portal/og/ portal/fonts/
+//                                    the tour's data and pictures, every name carrying a content hash except story/manifest.json
+//                                    (scripts/story/site.mts and scripts/story/ship/*.mts). The player loads the tour only for ?family=
 //   <out>/404.html, robots.txt, sitemap.xml
 //                                    a real 404 page (Pages answers unknown paths with it and a 404 status), robots.txt
-//                                    (Allow: / and the Sitemap line) and a sitemap of the gallery and every home's page; every
+//                                    (Allow: / and the Sitemap line) and a sitemap of the gallery, every home's page and every family's page; every
 //                                    page also gets a canonical link, twitter title/description/image and JSON-LD
 //   <out>/favicon.ico, apple-touch-icon.png
 //                                    the icons at the root, where browsers and crawlers look first (the rest are in portal/icons/)
@@ -31,11 +38,17 @@
 //                                    must-revalidate on every file, because the modules below are not fingerprinted
 //   <out>/assets/**/*.js             the compiled engine (not the .ts), vendor/three with its LICENSE,
 //                                    fonts/*.woff2 with their licences, brand/
-//   <out>/content/houses/            <id>.json and index.json — the specs the page builds (not the .plan.json twins)
+//   <out>/content/houses/            <id>.json and index.json: the specs the page builds (not the .plan.json twins), REDACTED: no `author`,
+//                                    no `source`, and `name` is the portal's name for the home (scripts/portal-redact.mts)
 //
-// The gallery's list of homes is also written into the built index.html (a visitor without JavaScript, and a crawler that does not run
-// it, see the homes and can follow each to its page; gallery.js replaces them), and the built pages link each other without
-// ".html", as Cloudflare Pages serves them (the file-name address answers a 308).
+// The front page's cards are also written into the built index.html (a visitor without JavaScript, and a crawler that does not run
+// it, see the families, each linking its page, and the homes with no family, each linking its own; gallery.js adopts the families' cards and
+// replaces the plain ones; the `front page` blocks and scripts/portal-front.mts), and the built pages link each other without
+// ".html", as Cloudflare Pages serves them (the file-name address answers a 308). A campaign's tags are never in the built hrefs:
+// portal/campaign.js adds them in the browser.
+//
+// The story pieces (family pages, the tour's data, the sitemap's family entries) are added by scripts/story/site.mts through ONE call
+// (step 5c2) and held to the same checks (step 7). Where the story is told is up to the homes' own front page: see FRONT PAGE HOOK below.
 //
 // Everything the site references is relative, so the same tree works at / and under /ci-virtual-home/. No
 // goldens, scripts, scenes, videos or TypeScript sources go out. The build refuses to run on stale or missing
@@ -44,14 +57,24 @@
 // (what a crawler or a visitor without JavaScript reads) are the ones gallery.js computes from index.json, that the hand-written
 // copy's "thirty" is the number of homes, and that every built page carries the Companion Core, download, docs and main-site links.
 //
+// Nothing credits a builder or names the build a home was written from, anywhere in the output (step 8): the specs' `author` and
+// `source` stay in the repository as internal records and are redacted from what is shipped, and the guard reads every text file of
+// the output for the builders' handles (derived from the specs), the word "Sims", "Base Game" and "BG " and fails the build on a hit.
+//
 // Only the paths it writes are replaced in <out>; anything else there (dist/models from export:core) is left.
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, parseArgs, serve } from './portal-lib.mts';
+import { redactIndex, redactSpecText, guardOutput, GUARD_ALLOW } from './portal-redact.mts';
 import {
   type House, LINKS, SITE_NAME, PLAYER_TITLE, HERO_ALT, TITLE_MAX, TWITTER_SITE, esc, numberWord, capital, galleryCards, galleryHomeIndex, galleryLd, homeDescription, homeLd, homePage, homeTitle, homeUrl, notFoundPage, playerLd,
 } from './portal-pages.mts';
+import { buildStorySite } from './story/site.mts';
+// ---- front page ----
+import { HERO, readFamilies, frontCards, personaButtons, meetFamily } from './portal-front.mts';
+import { MEET_MARKER } from './portal-pages.mts';
+import { displayName } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
 const OUT = path.resolve(args.out || path.join(ROOT, 'dist'));
@@ -85,7 +108,7 @@ if (stale.length) { console.error(`compiled assets are missing or older than the
 
 // 1. start from a clean copy of what this script owns (.nojekyll: an older build wrote it for GitHub Pages; now it is only
 //    cleared out of a dist/ that still has one)
-const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', '_headers', '.nojekyll', '404.html', 'robots.txt', 'sitemap.xml', 'favicon.ico', 'apple-touch-icon.png'];
+const OWNED = ['index.html', 'room-creator.html', 'assets', 'content', 'portal', 'homes', 'family', 'story', 'audio', 'film', '_headers', '.nojekyll', '404.html', 'robots.txt', 'sitemap.xml', 'favicon.ico', 'apple-touch-icon.png'];
 fs.mkdirSync(OUT, { recursive: true });
 for (const o of OWNED) fs.rmSync(path.join(OUT, o), { recursive: true, force: true });
 
@@ -98,8 +121,9 @@ copy(path.join('portal', '_headers'), '_headers');
 copy(path.join('portal', 'icons', 'favicon.ico'), 'favicon.ico');
 copy(path.join('portal', 'icons', 'apple-touch-icon.png'), 'apple-touch-icon.png');
 
-// 3. portal: styles, script, the hero, the thumbnails, the icons and the manifest
-for (const f of walk('portal', f => /\.(css|js|webp|jpg|png|ico|webmanifest)$/.test(f))) copy(f);
+// 3. portal: styles, script, the hero, the thumbnails, the icons and the manifest. (portal/og/ and portal/fonts/ are the story's:
+//    scripts/story/site.mts ships them under a hash of their content, which _headers lets a cache keep for a year)
+for (const f of walk('portal', f => /\.(css|js|webp|jpg|png|ico|webmanifest)$/.test(f) && !f.startsWith(path.join('portal', 'og') + path.sep))) copy(f);
 
 // 4. the engine: compiled modules, three.js (whole vendored tree: modules plus LICENSE), fonts, brand
 for (const f of sources) copy(f.replace(/\.ts$/, '.js'));
@@ -107,17 +131,32 @@ for (const f of walk(path.join('assets', 'vendor'), f => /\.js$|LICENSE/.test(f)
 for (const f of walk(path.join('assets', 'fonts'), f => /\.woff2$|LICENSE/.test(f))) copy(f);
 for (const f of walk(path.join('assets', 'brand'), () => true)) copy(f);
 
-// 5. the specs
+// 5. the specs, redacted (scripts/portal-redact.mts): the repository's `author`, `source` and filed title stay in the repository; what is
+// shipped carries the portal's name for each home and no builder. `index` below stays the repository's own (the pages written here
+// take names from it through displayName, and nothing of it is written out as it is).
 const index = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'houses', 'index.json'), 'utf8'));
-copy(path.join('content', 'houses', 'index.json'));
+const ship = (toRel: string, text: string): void => {
+  const to = path.join(OUT, toRel);
+  fs.mkdirSync(path.dirname(to), { recursive: true });
+  fs.writeFileSync(to, text);
+  files++; bytes += Buffer.byteLength(text);
+};
+ship(path.join('content', 'houses', 'index.json'), `${JSON.stringify(redactIndex(index), null, 2)}\n`);
 for (const h of index.houses || []) {
-  copy(path.join('content', 'houses', `${h.id}.json`));
+  const specFile = path.join(ROOT, 'content', 'houses', `${h.id}.json`);
+  if (!fs.existsSync(specFile)) problems.push(`missing ${rel(specFile)}`);
+  else {
+    const red = redactSpecText(fs.readFileSync(specFile, 'utf8'));
+    // a reader that still calls displayName on the shipped name must get the same name back
+    if (displayName({ id: h.id, name: red.name }) !== red.name) problems.push(`${h.id}: displayName of its display name "${red.name}" is not itself`);
+    ship(path.join('content', 'houses', `${h.id}.json`), red.text);
+  }
   if (!fs.existsSync(path.join(ROOT, 'portal', 'thumbs', `${h.id}.webp`))) problems.push(`no thumbnail for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
   if (!fs.existsSync(path.join(ROOT, 'portal', 'previews', `${h.id}.jpg`))) problems.push(`no link-preview image for ${h.id}: pnpm run portal:thumbs --house ${h.id}`);
 }
 if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no portal/hero.jpg (the site\'s link-preview image): pnpm run portal:thumbs --house aurora');
 
-// 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes, distinct builders, floor
+// 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes and floor
 // area rounded to 10 m²), or a visitor sees them change as the page hydrates and a crawler keeps the wrong ones; and the
 // hand-written copy's count in words ("Walk into thirty homes", "Thirty homes, each built live …") must be the number of homes
 // (the generated pages take the word from the data, this one is written by hand)
@@ -126,7 +165,6 @@ const COUNT_WORD = numberWord(houses.length);
 {
   const want: Record<string, string> = {
     homes: String(houses.length),
-    builders: String(new Set(houses.map(h => h.author).filter(Boolean)).size),
     area: new Intl.NumberFormat('en').format(Math.round(houses.reduce((a, h) => a + (h.areaSqm || 0), 0) / 10) * 10),
   };
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
@@ -157,6 +195,35 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
   else fs.writeFileSync(rc, text.replace('</head>', '  <meta name="vh-share" content="homes/">\n</head>'));
 }
 
+// 5c2. the families: a page each (family/<slug>), the tour's data and files, the manifest the player reads (scripts/story/site.mts).
+// A family that is not current is skipped and reported, not an error, unless --strict-families (see site.mts). Its pages are held to
+// the homes' pages' rules in step 7, and listed in the sitemap below.
+//
+// FRONT PAGE HOOK. The gallery (index.html, portal/gallery.js) is the front page: families first, the homes that have no current family
+// after them. `story.cards` is the cards (type FamiliesIndex, also written to story/families.<hash>.json and named by
+// story/manifest.json) and `story.built` the pages; the block below turns them into what the front page and the homes' pages need,
+// step 5d writes the cards into index.html and step 7 holds the result to the same rules as the homes' own pages (scripts/portal-front.mts).
+const story = await buildStorySite({ ROOT, OUT, SITE, args, problems, houses });
+files += story.files; bytes += story.bytes;
+const familyPages = story.built.map(b => b.file);
+
+// ---- front page ----
+// The families the front page tells (static HTML in index.html, at step 5d), the hero's tour, and "Meet the family" on the home each
+// one lives in. Only current families are here (story.built); a home with none keeps its plain card and its page without the block.
+const front = readFamilies({ ROOT, dir: path.resolve(ROOT, args.families && args.families !== 'true' ? args.families : path.join('content', 'families')), built: story.built, cards: story.cards });
+const heroFamily = front.find(f => f.slug === HERO.slug && f.house === HERO.house);
+if (!heroFamily) console.log(`front: the hero's tour is the ${HERO.slug} family, which is not current (pnpm run story:validate -- ${HERO.slug}): the hero plays its home`);
+for (const h of houses) {
+  const file = path.join(OUT, 'homes', `${h.id}.html`);
+  if (!fs.existsSync(file)) continue;
+  const text = fs.readFileSync(file, 'utf8');
+  if (!text.includes(MEET_MARKER)) { problems.push(`homes/${h.id}.html: no meet-family marker for the family block`); continue; }
+  const f = front.find(x => x.house === h.id);
+  fs.writeFileSync(file, text.replace(MEET_MARKER, () => (f ? meetFamily(f) : '')));
+}
+console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on the front page, ${houses.filter(h => !front.some(f => f.house === h.id)).length} home${houses.filter(h => !front.some(f => f.house === h.id)).length === 1 ? '' : 's'} with none`);
+// ---- end front page ----
+
 // 5d. link previews for the site's own pages. The gallery's og:image is relative in the source (a checkout has no
 // address); here it becomes the site's, with og:url. room-creator.html's static head is the editor's (its title
 // and a description naming the editor), which is all an unfurler reads of a player URL copied from the address
@@ -174,7 +241,17 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
   // the list of homes, in place of the placeholders (which stay in the source: the page is served as it is in a checkout)
   const list = /(<ul class="grid" id="grid")( aria-busy="true")?>[\s\S]*?<\/ul>/;
   if (!list.test(gallery)) problems.push('index.html: no <ul class="grid" id="grid"> to write the homes into');
-  else gallery = gallery.replace(list, (_m, open: string) => `${open}>\n        ${galleryCards(houses)}\n      </ul>`);
+  // ---- front page ---- the families' cards first (static HTML: a crawler, a visitor without JavaScript and an in-app browser with a slow
+  // script see them; gallery.js adopts them), then a plain card for each home with no current family
+  else gallery = gallery.replace(list, (_m, open: string) => `${open}>\n        ${frontCards(houses, front, galleryCards)}\n      </ul>`);
+  // ---- front page ---- the buttons for the jobs the families do (gallery.js counts them and filters by them: ?persona=<archetype>)
+  const personas = /(<div class="personas"[^>]*?) hidden><\/div>/;
+  if (!personas.test(gallery)) problems.push('index.html: no <div class="personas" … hidden></div> to write the persona buttons into');
+  else gallery = gallery.replace(personas, (_m, open: string) => (front.length ? `${open}>\n        ${personaButtons(front)}\n      </div>` : `${open} hidden></div>`));
+  // ---- front page ---- the hero tours the Brennan family (index.html's source says so); without a current one it plays the home
+  if (!gallery.includes(`house=${HERO.house}&amp;family=${HERO.slug}"`)) problems.push(`index.html: the hero's tour link is not house=${HERO.house}&family=${HERO.slug} (portal-front.mts HERO)`);
+  else if (!heroFamily) gallery = gallery.split(`&amp;family=${HERO.slug}"`).join('"');
+  // ---- end front page ----
   // every home's own page, linked from the footer (the cards go to the player; gallery.js leaves this list as it is)
   const marker = /<!-- foot-homes:[\s\S]*?-->/;
   if (!marker.test(gallery)) problems.push('index.html: no <!-- foot-homes: --> marker to write the list of the homes\' pages at');
@@ -266,10 +343,10 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
     if (fs.existsSync(path.join(OUT, file))) seo(file, homeUrl(SITE, h.id), homeLd(SITE, h, new URL(`portal/previews/${h.id}.jpg`, SITE).href, homeTitle(h), homeDescription(h)));
   }
 
-  // robots.txt and sitemap.xml: the gallery and one page per home. The player (room-creator) is a viewer for them, not a page
+  // robots.txt and sitemap.xml: the gallery, one page per home and one per family. The player (room-creator) is a viewer for them, not a page
   // of its own: it is noindex in its own HTML (above), so it is not listed.
   fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${new URL('sitemap.xml', SITE).href}\n`);
-  const urls = [SITE, ...houses.filter(h => /^[a-z0-9-]+$/.test(h.id)).map(h => homeUrl(SITE, h.id))];
+  const urls = [SITE, ...houses.filter(h => /^[a-z0-9-]+$/.test(h.id)).map(h => homeUrl(SITE, h.id)), ...story.built.map(b => b.url)];
   fs.writeFileSync(path.join(OUT, 'sitemap.xml'),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `  <url><loc>${esc(u)}</loc></url>`).join('\n')}\n</urlset>\n`);
 
@@ -342,8 +419,8 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
     }
     fs.writeFileSync(ix, retag(page, 'index.html'));
   }
-  // the pages in homes/ sit one level down: their stylesheet is ../portal/gallery.css
-  for (const f of walkOut('homes', f => f.endsWith('.html'))) {
+  // the pages in homes/ and family/ sit one level down: their stylesheet is ../portal/gallery.css (a family's, ../portal/site.css)
+  for (const f of [...walkOut('homes', f => f.endsWith('.html')), ...walkOut('family', f => f.endsWith('.html'))]) {
     const fp = path.join(OUT, f);
     const page = fs.readFileSync(fp, 'utf8').replace(/((?:src|href)=")\.\.\/((?:assets|portal)\/[^"?#]+\.(?:js|css))(")/g, (whole, a: string, file: string, z: string) => {
       if (isVendor(file)) return whole;
@@ -362,6 +439,18 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
   console.log(`portal: ${modules.length} modules and ${sheetsAndScripts.length} portal scripts/styles named by content hash`);
 }
 
+// ---- front page ---- the 404 page is served at any depth, so it names portal/campaign.js by the site's absolute address (portal-pages.mts);
+// it gets the content hash the other pages' copies got above, so a returning visitor never runs an old script from a cache
+{
+  const f = path.join(OUT, '404.html');
+  const hash = crypto.createHash('sha256').update(fs.readFileSync(path.join(OUT, 'portal', 'campaign.js'))).digest('hex').slice(0, 10);
+  const text = fs.readFileSync(f, 'utf8');
+  const next = text.replace(/(<script src="[^"]*\/portal\/campaign\.js)(")/, `$1?v=${hash}$2`);
+  if (next === text) problems.push('404.html: no portal/campaign.js to name by a content hash');
+  fs.writeFileSync(f, next);
+}
+// ---- end front page ----
+
 // 6. every relative URL the pages and stylesheets name must be in the output (a query or a fragment is fine)
 const refs = new Set<string>();
 const scan = (fileRel: string, re: RegExp): void => {
@@ -374,14 +463,14 @@ const scan = (fileRel: string, re: RegExp): void => {
     refs.add(path.normalize(path.join(path.dirname(fileRel), clean)));
   }
 };
-for (const p of ['index.html', 'room-creator.html', ...(fs.existsSync(path.join(OUT, 'homes')) ? fs.readdirSync(path.join(OUT, 'homes')).map(f => path.join('homes', f)) : [])]) scan(p, /(?:href|src)="([^"]+)"/g);
+for (const p of ['index.html', 'room-creator.html', ...(fs.existsSync(path.join(OUT, 'homes')) ? fs.readdirSync(path.join(OUT, 'homes')).map(f => path.join('homes', f)) : []), ...familyPages]) scan(p, /(?:href|src)="([^"]+)"/g);
 for (const p of ['index.html', 'room-creator.html']) scan(p, /from '(\.[^']+)'/g);
 for (const p of walk('portal', f => f.endsWith('.css'))) scan(p, /url\("?(\.[^")]+)"?\)/g);
 // (an address without an extension is a page, as Cloudflare Pages serves them: ./homes/aurora is homes/aurora.html)
 for (const r of refs) if (!fs.existsSync(path.join(OUT, r)) && !fs.existsSync(path.join(OUT, `${r}.html`))) problems.push(`${r} is linked but not in ${rel(OUT)}`);
 // a root-relative URL would escape the /ci-virtual-home/ sub-path
 const homePages = fs.existsSync(path.join(OUT, 'homes')) ? fs.readdirSync(path.join(OUT, 'homes')).map(f => path.join('homes', f)) : [];
-for (const p of ['index.html', 'room-creator.html', ...homePages, ...walk('portal', f => /\.(css|js)$/.test(f))]) {
+for (const p of ['index.html', 'room-creator.html', ...homePages, ...familyPages, ...walk('portal', f => /\.(css|js)$/.test(f))]) {
   const text = fs.readFileSync(path.join(OUT, p), 'utf8');
   const bad = text.match(/(?:href|src)="\/(?!\/)[^"]*"|url\("?\/(?!\/)[^")]*"?\)|fetch\(['"`]\/(?!\/)/);
   if (bad) problems.push(`${p}: root-relative URL ${bad[0]} breaks under a sub-path`);
@@ -408,7 +497,7 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...walk('porta
     if (og >= 0 && !/<meta name="twitter:image:alt" /.test(t)) out.push(`${f}: an og:image but no twitter:image:alt`);
     return out;
   };
-  const pages = ['index.html', ...homePages, '404.html'];
+  const pages = ['index.html', ...homePages, ...familyPages, '404.html'];
   const need: [string, string][] = [['Companion Intelligence', LINKS.site], ['Buy Companion Core', LINKS.core], ['Download Companion', LINKS.download], ['the docs', LINKS.docs]];
   for (const f of pages) {
     const t = read(f);
@@ -425,7 +514,7 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...walk('porta
     const title = tag(t, /<title>([^<]*)<\/title>/), desc = tag(t, /<meta name="description" content="([^"]*)">/);
     if (!title || !desc) problems.push(`${f}: no title or description`);
     problems.push(...headChecks(f, t, title));
-    if (f.startsWith(`homes${path.sep}`)) {
+    if (f.startsWith(`homes${path.sep}`) || f.startsWith(`family${path.sep}`)) {
       if (tag(t, /<meta property="og:title" content="([^"]*)">/) !== title || tag(t, /<meta name="twitter:title" content="([^"]*)">/) !== title) problems.push(`${f}: <title>, og:title and twitter:title are not one string`);
       if (desc.replace(/&quot;|&amp;|&lt;|&gt;/g, '.').length > 160) problems.push(`${f}: the description is over 160 characters and will be cut in a search result`);
       if (titles.has(title)) problems.push(`${f}: the title "${title}" is also ${titles.get(title)}'s`);
@@ -446,8 +535,19 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...walk('porta
   const indexed = [...homeIndex.matchAll(/<a href="\.\/homes\/([^"]+)">/g)].map(m => decodeURIComponent(m[1]));
   if (indexed.join() !== houses.map(h => h.id).join()) problems.push(`index.html: the footer lists ${indexed.length} homes' own pages, index.json has ${houses.length}`);
   if (alt(g) !== HERO_ALT) problems.push('index.html: its og:image:alt is not HERO_ALT (portal-pages.mts), which the 404 page uses');
-  const listed = [...g.matchAll(/<li class="card" data-id="([^"]+)"/g)].map(m => m[1]);
-  if (listed.join() !== houses.map(h => h.id).join()) problems.push(`index.html: the static list of homes (${listed.length}) is not index.json's (${houses.length})`);
+  // ---- front page ---- the static list is each current family's card, in the story's order, then a card for each home with no current
+  // family (so every home is still there once: index.json's homes), and the campaign script, the family links and the tour are in it
+  const listed = [...g.matchAll(/<li class="card(?: card-family)?" data-id="([^"]+)"/g)].map(m => m[1]);
+  const wanted = [...front.map(f => f.house), ...houses.filter(h => !front.some(f => f.house === h.id)).map(h => h.id)];
+  if (listed.join() !== wanted.join()) problems.push(`index.html: the static cards (${listed.length}) are not the current families then the homes with none (${wanted.length})`);
+  if (new Set(houses.map(h => h.id)).size !== new Set(listed).size) problems.push(`index.html: the static cards cover ${new Set(listed).size} of index.json's ${houses.length} homes`);
+  for (const f of front) if (!g.includes(`<a href="./family/${f.slug}" data-campaign `)) problems.push(`index.html: the ${f.slug} family's card does not link ./family/${f.slug}`);
+  if (front.length && !/<div class="personas"[^>]*>\s*<button/.test(g)) problems.push('index.html: families, but no persona buttons');
+  if (!/<script src="\.\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/.test(g)) problems.push('index.html: no portal/campaign.js (with its content hash, defer and data-cfasync="false")');
+  for (const f of ['404.html', ...homePages.filter(p => p.endsWith('.html'))]) if (!/<script src="[^"]*\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/.test(read(f))) problems.push(`${f}: no portal/campaign.js (with its content hash, defer and data-cfasync="false")`);
+  // a campaign's tags are added in the browser, never in the built page: every link to ci.computer is exactly as step 7 above requires
+  for (const f of [...pages, 'room-creator.html']) if (/href="https:\/\/ci\.computer\/?[?#]/.test(read(f))) problems.push(`${f}: a link to ci.computer carries a query or fragment (portal/campaign.js adds a campaign's tags at run time)`);
+  // ---- end front page ----
   if (/href="[^"]*room-creator\.html/.test(g)) problems.push('index.html: a link still names room-creator.html (Cloudflare Pages answers it with a 308)');
   // nothing links the gallery by its file name either: ./index.html is answered with a 308 to ./
   for (const f of [...pages, 'room-creator.html']) if (/href="[^"]*\bindex\.html/.test(read(f))) problems.push(`${f}: a link names index.html (Cloudflare Pages answers it with a 308); link ./ or ../`);
@@ -456,8 +556,33 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...walk('porta
   const viewer = read(path.join('assets', 'viewer.js'));
   for (const url of [LINKS.site, LINKS.core, LINKS.download, LINKS.docs]) if (!viewer.includes(url)) problems.push(`assets/viewer.js: no ${url} (the end card and the help panel)`);
   if (viewer.includes('index.html')) problems.push('assets/viewer.js: names index.html (the player\'s way back is ./: Cloudflare Pages answers index.html with a 308)');
+  // a family's page: the tour link carries its house and itself, the fine print names the home and links its page (and credits no
+  // one), and what the player reads (story/manifest.json) lists exactly the families that have a page
+  {
+    const m = JSON.parse(read(path.join('story', 'manifest.json')));
+    if (!fs.existsSync(path.join(OUT, m.families))) problems.push(`story/manifest.json: ${m.families} is not in the output`);
+    if (Object.keys(m.byFamily).join() !== story.built.map(b => b.slug).join()) problems.push('story/manifest.json lists other families than the ones that have a page');
+    for (const b of story.built) {
+      const t = read(b.file);
+      if (!t.includes(`href="../room-creator?mode=view&amp;house=${encodeURIComponent(b.house)}&amp;family=${b.slug}"`)) problems.push(`${b.file}: no link to the tour (room-creator?mode=view&house=<id>&family=<slug>)`);
+      if (!t.includes('<p class="home-note">The home is <a href="../homes/' + b.house + '">')) problems.push(`${b.file}: no fine print that names the home and links homes/${b.house}`);
+      if (/home-credit|\bCredit:/i.test(t)) problems.push(`${b.file}: a credit line on a family page (no builder is credited on the site)`);
+      if (!fs.existsSync(path.join(OUT, 'homes', `${b.house}.html`))) problems.push(`${b.file}: its home has no page (homes/${b.house})`);
+      if (!/<link rel="canonical" href="[^"]+\/family\/[a-z-]+">/.test(t)) problems.push(`${b.file}: its canonical is not family/<slug>`);
+      if (m.byFamily[b.slug].house !== b.house) problems.push(`story/manifest.json: ${b.slug} names another house than its page does`);
+    }
+  }
   // titles are distinct across the site's own pages too
   for (const f of ['index.html', 'room-creator.html']) { const t = tag(read(f), /<title>([^<]*)<\/title>/); if (titles.has(t)) problems.push(`${f}: its title "${t}" is also ${titles.get(t)}'s`); titles.set(t, f); }
+}
+
+// 8. nothing in the output credits a builder or names the build a home was written from (scripts/portal-redact.mts has the rule and
+// the guard): every text file of the output, the shipped specs and the family and story JSON included, is read for the builders'
+// handles (derived from the specs' `author` fields, never listed), the word "Sims", "Base Game" and "BG ". The allowlist is empty.
+{
+  const g = guardOutput(OUT, ROOT);
+  problems.push(...g.problems.map(p => `credit guard: ${p}`));
+  console.log(`credit guard: ${g.files} text files read for ${g.handles} builder handles, "Sims", "Base Game" and "BG "${GUARD_ALLOW.length ? ` (${GUARD_ALLOW.length} allowed)` : ', nothing allowed'}${g.problems.length ? `: ${g.problems.length} hit${g.problems.length === 1 ? '' : 's'}` : ': clean'}`);
 }
 
 if (problems.length) { console.error(problems.map(p => `  ✗ ${p}`).join('\n')); process.exit(1); }

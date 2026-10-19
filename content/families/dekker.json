@@ -1,0 +1,829 @@
+{
+  "schema": "family/v1",
+  "slug": "dekker",
+  "house": "onestory",
+  "fictional": true,
+  "family": {
+    "surname": "Dekker",
+    "tagline": "Two grandparents, a grandson and one Companion Core on a living-room shelf.",
+    "household": "grandparents",
+    "business": false,
+    "story": "Willem, a retired accountant, keeps the household paperwork at the dining table, and Greet cooks and tends the garden. Their grandson Joris, ten, studies in the guest room. One Companion Core stands on the shelf in the living room.",
+    "address": {
+      "line": "11 Tansy Hollow",
+      "place": "Verrin Park"
+    },
+    "narrator": "v-storyteller-m"
+  },
+  "members": [
+    {
+      "id": "willem",
+      "name": "Willem",
+      "age": 71,
+      "role": "grandparent",
+      "work": "retired accountant",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Marmalade",
+        "runtime": "Hermes",
+        "job": "Looks up the papers Willem connects and drafts short messages for him.",
+        "personality": [
+          "calm",
+          "patient",
+          "thorough"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Looks up and drafts only. Willem reads and sends every message."
+      }
+    },
+    {
+      "id": "greet",
+      "name": "Greet",
+      "age": 69,
+      "role": "grandparent",
+      "work": "cooks, keeps the garden",
+      "colour": "chart-2",
+      "archetype": "host",
+      "companion": {
+        "name": "Parsley",
+        "runtime": "OpenClaw",
+        "job": "Opens web pages in its own browser and fills in the forms Greet lists.",
+        "personality": [
+          "cheerful",
+          "curious",
+          "quick"
+        ],
+        "voice": "v-bright-f",
+        "memory": false,
+        "limits": "Fills in forms only. Greet checks each one and pays for it herself."
+      }
+    },
+    {
+      "id": "joris",
+      "name": "Joris",
+      "age": 10,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-3",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "joris",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Joris in the guest room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Greet in the kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "Willem at the dining table"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel for the shelf",
+        "body": "On the step of the blue cottage sits a parcel. Willem carries the Companion Core in, and Greet clears the shelf."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Joris lifts out the Core, and Greet holds the guide."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Joris plugs in the cable, and Willem presses the button. The Core wakes and opens a Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Willem opens the Wi-Fi settings on his phone and joins the Core's own network. Then he chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "paperless",
+        "kitchenowl"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agents and apps",
+        "body": "In the Companion Hub store, Willem picks Hermes, Greet picks OpenClaw, and the family adds Paperless-ngx and KitchenOwl. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Paperless-ngx, KitchenOwl"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "willem",
+      "agent": "willem",
+      "approval": "willem",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Marmalade says good morning",
+        "body": "Willem stands by the shelf and messages the agent he named Marmalade. Marmalade answers from the Core.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "willem",
+        "text": "Good morning, Willem. I am Marmalade."
+      },
+      "film": true
+    },
+    {
+      "id": "living-album",
+      "chapter": "living",
+      "member": "greet",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Greet finds the first summer",
+        "body": "Beside Joris on the sofa, Greet looks back at his first summer. Immich took a while to sort those pictures on the Core, not in a photo cloud.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-contacts",
+      "chapter": "living",
+      "member": "greet",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "iCloud"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A new neighbour joins the contacts",
+        "body": "On the sofa, Greet types a new neighbour's number into the address book. Nextcloud serves it from the Core to Willem's phone as well as her own.",
+        "chips": [
+          "Nextcloud",
+          "replaces iCloud"
+        ]
+      }
+    },
+    {
+      "id": "living-audio",
+      "chapter": "living",
+      "member": "willem",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Willem's audiobook resumes mid-chapter",
+        "body": "On the loveseat in the nook, Willem presses play, and his audiobook resumes where he left it in the garden. Audiobookshelf serves the book from the Core.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "joris-windmill",
+      "chapter": "joris",
+      "member": "joris",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind"
+      },
+      "popup": {
+        "title": "Joris asks how a rainbow forms",
+        "body": "On the guest bed, Joris looks up how a rainbow forms in Kiwix. The Wikipedia file was downloaded once, so no search engine sees the question.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "joris-honey",
+      "chapter": "joris",
+      "member": "joris",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Joris decodes a honey label",
+        "body": "The honey jar a neighbour brought back from her trip has a label Joris cannot read. He types it into LibreTranslate, which translates on the Core with models downloaded once.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "joris-bees",
+      "chapter": "joris",
+      "member": "joris",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Joris types up his bee project",
+        "body": "Under the wall hanging, Joris types his bee project into Obsidian, one fact to a line. The notes are plain Markdown files on the Core.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-apples",
+      "chapter": "kitchen",
+      "member": "greet",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Greet plans an apple cake",
+        "body": "A bowl of windfall apples sits by the sink. At the breakfast bar, Greet adds apple cake to the week's plan in KitchenOwl, and the flour joins the list.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-loaf",
+      "chapter": "kitchen",
+      "member": "greet",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "ntfy",
+        "replaces": []
+      },
+      "capability": "send a push notification to your phone from any script or automation",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The loaf calls Greet indoors",
+        "body": "With the loaf in the oven, Greet heads out to the beds. A timer Willem set on the Core sends her phone a ntfy note when the loaf is done.",
+        "chips": [
+          "ntfy"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-diary",
+      "chapter": "kitchen",
+      "member": "greet",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Greet adds the harvest assembly",
+        "body": "Beside the fridge, Greet adds Friday's harvest assembly to Yuvomi, the house's one calendar. Willem sees it too, since Yuvomi keeps one shared calendar in a database on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "dining-receipts",
+      "chapter": "dining",
+      "member": "willem",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Willem tips out the biscuit tin",
+        "body": "A biscuit tin of receipts comes out onto the table. Willem scans them into Paperless-ngx on the Core, not a rented drive, and one search finds the boiler bill.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Google Drive"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "dining-vault",
+      "chapter": "dining",
+      "member": "greet",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host",
+      "anchor": {
+        "role": "room",
+        "room": "dining"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Greet finds the Wi-Fi password",
+        "body": "A visiting aunt asks for the Wi-Fi password, and Greet finds it in VaultWarden. The vault runs on the Core and works with the Bitwarden apps.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "dining-service",
+      "chapter": "dining",
+      "member": "willem",
+      "agent": "willem",
+      "approval": "willem",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk, so your agents know your context",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Marmalade finds the service date",
+        "body": "Willem asks Marmalade when the oven was last serviced. Marmalade answers from the service letters Willem connected to Companion Memory (beta); Willem checks the date himself.",
+        "chips": [
+          "Companion Memory"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "film": true
+    },
+    {
+      "id": "dining-insurance",
+      "chapter": "dining",
+      "member": "willem",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "monetr",
+        "replaces": [
+          "YNAB"
+        ]
+      },
+      "capability": "budget around recurring expenses by setting money aside for upcoming bills and goals",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Willem saves for spring's bill",
+        "body": "The house insurance falls due in spring, so Willem sets money aside each month in monetr. He types the figures himself, and no bank is linked.",
+        "chips": [
+          "monetr",
+          "replaces YNAB"
+        ]
+      }
+    },
+    {
+      "id": "garden-seeds",
+      "chapter": "garden",
+      "member": "greet",
+      "agent": "greet",
+      "approval": "greet",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser that fills in web forms",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "patio-seat"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sweet peas go in the basket",
+        "body": "On the deck, Greet lists the sweet peas and beans she wants. Parsley fills a seed basket in its own browser; Greet checks it and pays for it herself.",
+        "chips": [
+          "OpenClaw"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      }
+    },
+    {
+      "id": "garden-beds",
+      "chapter": "garden",
+      "member": "joris",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds",
+      "anchor": {
+        "role": "garden",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Joris pots a rosemary cutting",
+        "body": "On Saturday morning, Joris pots a rosemary cutting in the deck planter and photographs it for HortusFox. Greet adds a care note, and the journal sits on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-pool",
+      "chapter": "garden",
+      "member": "willem",
+      "agent": "willem",
+      "approval": "willem",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "pool",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Willem sends the pool note himself",
+        "body": "By the pool, Willem asks Marmalade to draft a note to the pool service about the autumn cover. Willem reads it and sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Three people share one shelf",
+        "body": "The loaf cools, the bee notes are written and the receipts are filed, on one shared Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your paperwork, pictures and recipes can live on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "No TV and no desk in this home: the media beats sit on the couch (Immich, Nextcloud contacts, Audiobookshelf), and Willem works at the dining table. The guest bedroom has a bed, a wall hanging and a chest, no desk.",
+    "Joris has no companion and no agent chat: his beats are Kiwix, LibreTranslate and Obsidian only. The tablet is never named; Joris is simply on the bed.",
+    "Companion Memory (beta) is first named in dining-service, a film beat; ftue-pick does not name it. Marmalade is Hermes with memory true; the chat-service note rides on every Hermes beat.",
+    "garden-seeds: Parsley (OpenClaw) fills a basket, Greet checks and pays for it herself; carries the OpenClaw website note; no key or model is mentioned.",
+    "monetr: Willem types the figures himself, no bank link, no advice. Immich beat carries the slow first start. Crash reports are not mentioned; no beat says nothing leaves the Core.",
+    "ntfy (kitchen-loaf) is a Core timer Willem set, sent to Greet's phone, no iOS relay claim. The exact tail sits on the Core, not in a rented X is used once (dining-receipts); the photo cloud line once."
+  ]
+}

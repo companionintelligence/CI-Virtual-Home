@@ -1,0 +1,931 @@
+{
+  "schema": "family/v1",
+  "slug": "adeniran",
+  "house": "asymmetry",
+  "fictional": true,
+  "family": {
+    "surname": "Adeniran",
+    "tagline": "A tall lakeside house, four people and one Companion Core on a credenza.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Folake keeps her clients’ books from the living room. Kunle writes firmware at his bench in the garage. Tobi, seventeen, has the loft at the top of the house. Ife, fifteen, has the green bedroom on the main floor. One Companion Core on a credenza is shared by the household.",
+    "address": {
+      "line": "14 Sedgewater Row",
+      "place": "Kestrel Bay"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "folake",
+      "name": "Folake",
+      "age": 47,
+      "role": "parent",
+      "work": "bookkeeper with her own practice",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Marlow",
+        "runtime": "Hermes",
+        "job": "Drafts reminders and replies to Folake’s clients from the notes she sends.",
+        "personality": [
+          "calm",
+          "exact",
+          "kind"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Folake asks for drafts, reads each one and sends it herself."
+      }
+    },
+    {
+      "id": "kunle",
+      "name": "Kunle",
+      "age": 49,
+      "role": "parent",
+      "work": "firmware contractor",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Tilly",
+        "runtime": "Hermes",
+        "job": "Drafts Kunle’s questions and notes to his client from what he types.",
+        "personality": [
+          "wry",
+          "quick",
+          "tidy"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Kunle asks for drafts, reads every line and sends it himself."
+      }
+    },
+    {
+      "id": "tobi",
+      "name": "Tobi",
+      "age": 17,
+      "role": "teen",
+      "work": "sixth form",
+      "colour": "chart-3",
+      "archetype": "gamer"
+    },
+    {
+      "id": "ife",
+      "name": "Ife",
+      "age": 15,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-4",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "green",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Ife’s green bedroom"
+    },
+    {
+      "id": "loft",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Tobi’s loft"
+    },
+    {
+      "id": "garage",
+      "kind": "room",
+      "room": "garage",
+      "title": "Kunle’s garage bench"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out front"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel waits at the top",
+        "body": "A parcel waits at the top of the timber steps. Kunle carries it in, and Folake clears the credenza."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Ife reads the guide aloud while Tobi lifts the Core out."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Tobi plugs in the cable, and Folake presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Join it from a phone",
+        "body": "On the couch, Kunle joins the Core’s own network from his phone’s Wi-Fi settings, then picks the home network.",
+        "kind": "phone",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "paperless",
+        "gitea"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Folake picks Hermes and Paperless-ngx, and Kunle adds Gitea. Then the family walks away.",
+        "note": "Installing apps uses the internet.",
+        "kind": "phone",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Paperless-ngx, Gitea"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "folake",
+      "agent": "folake",
+      "approval": "folake",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Marlow says hello",
+        "body": "Folake messages the agent she named Marlow, through her chat service. The answer comes from the Core.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "folake",
+        "text": "Hello, Folake. I am Marlow. What shall we write first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-books",
+      "chapter": "living",
+      "member": "folake",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Folake closes the month",
+        "body": "Month end is Thursday, so Folake raises her clients’ invoices from the couch. Those books are other people’s, and sit on the Core beside her.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-music",
+      "chapter": "living",
+      "member": "kunle",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Kunle plays the choir album",
+        "body": "Saturday afternoon, Kunle stretches along the couch with his phone. He plays the album Folake’s choir recorded years ago, and Navidrome serves the files from the Core.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "living-paper",
+      "chapter": "living",
+      "member": "folake",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Folake empties a shoebox",
+        "body": "A client drops off a shoebox of till receipts. Folake scans the stack. Paperless-ngx on the Core reads and tags each page, so she finds one by its words.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "living-marlow",
+      "chapter": "living",
+      "member": "folake",
+      "agent": "folake",
+      "approval": "folake",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "behind",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Marlow drafts a client reply",
+        "body": "A client asks when the year end figures will be ready. Folake tells Marlow the date, and Marlow drafts the reply. Folake reads it and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "folake",
+        "text": "Here is the reply. Please read it, then send it yourself."
+      }
+    },
+    {
+      "id": "kitchen-fridge",
+      "chapter": "kitchen",
+      "member": "ife",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "OurHome"
+        ]
+      },
+      "capability": "a shared household hub with shopping, chores, a recipe book and an expiry tracker",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Ife dates the leftover chicken",
+        "body": "A tray of baked chicken goes into the fridge on Tuesday. Ife enters it in the HomeHub expiry tracker, so Wednesday’s lunch gets eaten before it turns.",
+        "chips": [
+          "HomeHub",
+          "replaces OurHome"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-market",
+      "chapter": "kitchen",
+      "member": "tobi",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub with shopping, chores, a recipe book and an expiry tracker",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Tobi adds the missing ingredient",
+        "body": "At the kitchen island, Tobi opens his gran’s egusi in the HomeHub recipe book. He adds the missing melon seeds to the shopping list, and everyone at home sees it.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-hours",
+      "chapter": "kitchen",
+      "member": "folake",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kunle hands over a receipt",
+        "body": "Over breakfast, Kunle hands Folake the receipt for a new oscilloscope probe. She enters the expense in Akaunting at the kitchen island, against his contract work.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "green-revision",
+      "chapter": "green",
+      "member": "ife",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "with": [
+        "anything-llm"
+      ],
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ife gets unstuck in chemistry",
+        "body": "Sunday afternoon, Ife keeps one Obsidian note per chemistry topic, as plain files. Stuck on moles, she asks AnythingLLM to explain, and the model answering runs on the Core.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "green-lookup",
+      "chapter": "green",
+      "member": "ife",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ife looks up the lake",
+        "body": "Why does the lake rise after rain? Ife looks it up in Kiwix, which serves a Wikipedia file downloaded once, and no search engine is asked.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "green-translate",
+      "chapter": "green",
+      "member": "ife",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ife translates her postcard back",
+        "body": "Ife writes a postcard in German, then translates it back in LibreTranslate to see what it says. The models were downloaded once, and the words are translated on the Core.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "loft-play",
+      "chapter": "loft",
+      "member": "tobi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "steam-headless",
+        "replaces": [
+          "GeForce Now"
+        ]
+      },
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind"
+      },
+      "popup": {
+        "title": "Tobi opens Steam on the Core",
+        "body": "After lessons, Tobi opens Steam in a browser on his laptop. Steam Headless runs the session on the Core, and his Valve account keeps the library.",
+        "chips": [
+          "Steam Headless",
+          "replaces GeForce Now"
+        ],
+        "note": "Steam needs a Valve account."
+      },
+      "film": true
+    },
+    {
+      "id": "loft-photos",
+      "chapter": "loft",
+      "member": "tobi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Tobi finds the lake pictures",
+        "body": "His aunt asks to see last summer at the lake. Tobi finds the pictures by searching Immich, which sorted them on the Core.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "garage-repos",
+      "chapter": "garage",
+      "member": "kunle",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Kunle files a bug against himself",
+        "body": "At the garage bench, Kunle files a bug in his own test script as a Gitea issue. The issue and the code sit together on the Core.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garage-tilly",
+      "chapter": "garage",
+      "member": "kunle",
+      "agent": "kunle",
+      "approval": "kunle",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Tilly drafts a client question",
+        "body": "Friday, a test fails twice on the bench. Kunle types what happened to Tilly, and Tilly drafts a short question for the client. Kunle reads it and sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "kunle",
+        "text": "The question is drafted. Read it first, then send it yourself."
+      }
+    },
+    {
+      "id": "garage-ride",
+      "chapter": "garage",
+      "member": "kunle",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "wingfit",
+        "replaces": []
+      },
+      "capability": "log workouts: sets, reps, weights, distances and personal records",
+      "anchor": {
+        "role": "bicycle",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kunle logs the morning ride",
+        "body": "Back from a lake ride, Kunle leans his bicycle on the wall and enters the distance in Wingfit. Its log of rides runs on the Core.",
+        "chips": [
+          "Wingfit"
+        ]
+      }
+    },
+    {
+      "id": "garden-planters",
+      "chapter": "garden",
+      "member": "ife",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds",
+      "anchor": {
+        "role": "garden",
+        "nth": 5
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Ife waters the lavender",
+        "body": "Before school on Wednesday, Ife waters the lavender in the planters by the door. She adds the watering to HortusFox, where the lavender has a care history of its own.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-drive",
+      "chapter": "garden",
+      "member": "kunle",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Kunle replays the cat clips",
+        "body": "A neighbour’s cat keeps crossing the gravel drive at breakfast. Frigate, watching the family’s drive camera, tags the visits, and Kunle plays the clips from the Core.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A tall house, one Core",
+        "body": "Four people, one Companion Core in the living room: invoices, test scripts, games and homework share it."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your invoices, code and homework can live on a Companion Core in your own home. Start in the Companion Hub store, and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "No QA-screenshot gaps: every app named has a screenshot on origin/main. Nothing is added to reviewed.json.",
+    "The house has no TV: the media beat at the couch is Navidrome (living-music, Folake’s choir album). Tobi plays in a browser on his laptop in the Loft Bedroom, which has no desk or screen; his anchors are the bed and the room.",
+    "The Core stands on a credenza in the Living room (no study in the house). Folake works from the couch; Kunle from the Garage bench (anchor room:garage, bicycle for Wingfit).",
+    "Both companions are Hermes. Messages pass through the chat service the family picks: the note rides on ftue-hello, living-marlow and garage-tilly. People read and send every message.",
+    "AnythingLLM is named only in green-revision as a with app (its chip replaces ChatGPT would trip cap-parity). Steam Headless carries the Valve account note and no frame rate or title.",
+    "Frigate: the drive camera records the family property; the cat is the subject. No claim of prevention. Wingfit logs distances only."
+  ]
+}

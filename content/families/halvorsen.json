@@ -1,0 +1,790 @@
+{
+  "schema": "family/v1",
+  "slug": "halvorsen",
+  "house": "aurora",
+  "fictional": true,
+  "family": {
+    "surname": "Halvorsen",
+    "tagline": "Two studies, two small businesses and one Companion Core.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Ingrid runs an events consultancy from the study beside the front door, where the Companion Core sits. Mats writes backend code for his own clients in the study upstairs. One Core holds the files, code and hours of both businesses.",
+    "address": {
+      "line": "8 Saltbarge Quay",
+      "place": "Linden Reach"
+    },
+    "narrator": "v-deep-m"
+  },
+  "members": [
+    {
+      "id": "ingrid",
+      "name": "Ingrid",
+      "age": 38,
+      "role": "partner",
+      "work": "runs an events consultancy",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Rosemary",
+        "runtime": "OpenClaw",
+        "job": "Opens Twenty in its own browser and edits the deals Ingrid lists.",
+        "personality": [
+          "calm",
+          "exact",
+          "kind"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Edits deals only. Ingrid checks every field before it stands."
+      }
+    },
+    {
+      "id": "mats",
+      "name": "Mats",
+      "age": 41,
+      "role": "partner",
+      "work": "freelance backend developer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Thyme",
+        "runtime": "OpenClaw",
+        "job": "Opens Kimai in its own browser and enters the hours Mats lists.",
+        "personality": [
+          "curious",
+          "gentle",
+          "bright"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Enters hours only. Mats reads every line before he invoices."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "office",
+      "kind": "room",
+      "room": "office",
+      "title": "Ingrid’s ground-floor study"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "upstairs",
+      "kind": "room",
+      "room": "office",
+      "title": "Mats in the upstairs study"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out by the pool"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Mats carries the parcel in",
+        "body": "A parcel waits by the front door. Mats carries it in while Ingrid clears her desk for the Companion Core."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Ingrid lifts out the Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Ingrid sets the Core on her desk, in sight of the door."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Mats plugs in the cable, and Ingrid presses the button. The Companion Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Ingrid joins from her phone",
+        "body": "On her phone, Ingrid opens the Wi-Fi settings and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "twenty",
+        "kimai"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Two agents get their names",
+        "body": "In the Companion Hub store, Ingrid and Mats pick OpenClaw, and Ingrid approves its link to Companion Memory (beta). The family names the agents Rosemary and Thyme.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Twenty, Kimai"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "ingrid",
+      "agent": "ingrid",
+      "approval": "ingrid",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Rosemary says hello",
+        "body": "Ingrid greets Rosemary, the agent the family named. Rosemary answers from the Core on Ingrid’s desk.",
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "ingrid",
+        "text": "I am Rosemary. What comes first today?"
+      },
+      "film": true
+    },
+    {
+      "id": "office-deal",
+      "chapter": "office",
+      "member": "ingrid",
+      "agent": "ingrid",
+      "approval": "ingrid",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A walkthrough changes the deal",
+        "body": "The venue walkthrough moves a client’s date and headcount. Ingrid lists the changes. Rosemary edits the deal in Twenty on the Core, and Ingrid checks each field before it stands.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ],
+        "note": "Companion Agents are in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "office-hold",
+      "chapter": "office",
+      "member": "ingrid",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ingrid picks which client goes first",
+        "body": "Two clients want the same Saturday. Ingrid gives the morning to the first walkthrough. Companion Planning holds the second client’s follow-ups, in one local file on the Core.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "office-pack",
+      "chapter": "office",
+      "member": "ingrid",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The venue wants one file",
+        "body": "The venue manager asks for one file. Ingrid merges the run sheet, floor plan and supplier list in Stirling-PDF on her Core. Then she prints a copy.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "office-guests",
+      "chapter": "office",
+      "member": "ingrid",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ingrid files the anniversary guest list",
+        "body": "The anniversary guest list holds names, addresses and seating notes. Ingrid keeps it in Twenty, on the Core, where a hosted CRM would have held it.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      }
+    },
+    {
+      "id": "living-week",
+      "chapter": "living",
+      "member": "mats",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping and meals",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The week fits on one calendar",
+        "body": "Sunday morning on the sofa, Ingrid and Mats put her site visits and his client calls into one Yuvomi calendar. The calendar lives in a database on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "living-scene",
+      "chapter": "living",
+      "member": "mats",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mats gives the lamps a scene",
+        "body": "Saturday afternoon, Mats picks one Home Assistant scene before the film, and the pendant lamps by the TV dim. Home Assistant runs it from the Core, with no cloud account.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-dinner",
+      "chapter": "kitchen",
+      "member": "mats",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping and meals",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Wednesday’s dinner needs dill",
+        "body": "The herb pots hold rosemary and thyme but no dill. Mats, cooking on Wednesday, adds it to the shared Yuvomi list, and Ingrid adds lemons from her study.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-crew",
+      "chapter": "kitchen",
+      "member": "ingrid",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "spliit",
+        "replaces": [
+          "Splitwise"
+        ]
+      },
+      "capability": "split shared costs and settle up with the fewest payments",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ingrid settles the crew lunch",
+        "body": "Back home after set-up day, Ingrid enters the crew lunch in Spliit at the breakfast bar. It works out the fewest payments to settle up.",
+        "chips": [
+          "Spliit",
+          "replaces Splitwise"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "up-push",
+      "chapter": "upstairs",
+      "member": "mats",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own Git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A fix goes up before lunch",
+        "body": "A bug fix is ready before lunch, so Mats pushes it to Forgejo. The repository and its issues sit on the Core, not on a rented code host.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      }
+    },
+    {
+      "id": "up-model",
+      "chapter": "upstairs",
+      "member": "mats",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "with": [
+        "open-webui"
+      ],
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mats asks about a failing test",
+        "body": "A test fails and Mats cannot see why. He reruns it in JupyterLab, then asks a model on the Core through Open WebUI. The chat stays there by default.",
+        "chips": [
+          "JupyterLab"
+        ]
+      }
+    },
+    {
+      "id": "up-issue",
+      "chapter": "upstairs",
+      "member": "ingrid",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own Git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A request comes up the stairs",
+        "body": "Ingrid calls up the stairs that her seating plans should print on one sheet. Mats opens an issue in Forgejo, and it waits on the Core beside the code.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "up-hours",
+      "chapter": "upstairs",
+      "member": "mats",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "kimai",
+        "replaces": []
+      },
+      "capability": "track time per project and client, with reports",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Monday starts with a timer",
+        "body": "Monday morning, Mats starts a Kimai timer before the first ticket. His hours are grouped by client, so the report is ready when he writes the invoice.",
+        "chips": [
+          "Kimai"
+        ]
+      }
+    },
+    {
+      "id": "up-thyme",
+      "chapter": "upstairs",
+      "member": "mats",
+      "agent": "mats",
+      "approval": "mats",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "kimai",
+        "replaces": []
+      },
+      "capability": "track time per project and client, with reports",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Thyme fills in the forgotten hours",
+        "body": "On Thursday Mats forgets the timer. He lists the afternoon’s tasks, and Thyme opens Kimai in its own browser and enters the hours. Mats reads them before he invoices.",
+        "chips": [
+          "Kimai"
+        ],
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "mats",
+        "text": "The hours are entered. Please read every line."
+      }
+    },
+    {
+      "id": "garden-plants",
+      "chapter": "garden",
+      "member": "ingrid",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally, without a cloud account",
+      "anchor": {
+        "role": "garden",
+        "nth": 4
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The planters get a morning timer",
+        "body": "Beside the front door, a Wi-Fi plug now powers the planters’ drip pump. Ingrid sets a seven o’clock start, and Home Assistant runs it from the Core.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "garden-pool",
+      "chapter": "garden",
+      "member": "mats",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping and meals",
+      "anchor": {
+        "role": "pool",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Pool day goes on the board",
+        "body": "Pool day is Saturday, and skimming is the first card on the shared Yuvomi board. Mats ticks it off once the water is clear.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core serves both studies",
+        "body": "Ingrid works below and Mats above, and both studies share one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Two studies, two businesses and one household can share a Companion Core at home. Start in the Companion Hub store.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The ground-floor Study has no desk item in the spec: the Core stands on its own desk there. Ingrid's beats anchor on the core, the bookshelf and the room; Mats's use the writing desk and the dual-monitor arm upstairs.",
+    "up-model uses JupyterLab as the beat app with Open WebUI in with: the Open WebUI replaces ChatGPT chip trips cap-parity. No cloud key is mentioned; the model is the one on the Core.",
+    "Both agents are OpenClaw and work only in Twenty and Kimai, apps on the Core with a web interface; no beat opens an outside website, so the OpenClaw website note is not carried.",
+    "garden-plants assumes a Wi-Fi plug on a drip line for the forecourt planters; it is not in the 3D scene. Home Assistant is network devices only, no Zigbee stick.",
+    "Sleeping is never told. Nobody is shown asleep and no beat frames the bed."
+  ]
+}

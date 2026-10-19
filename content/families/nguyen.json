@@ -1,0 +1,922 @@
+{
+  "schema": "family/v1",
+  "slug": "nguyen",
+  "house": "modernhome-nora",
+  "fictional": true,
+  "family": {
+    "surname": "Nguyen",
+    "tagline": "Two parents, two children, and one Companion Core on the credenza.",
+    "household": "young-family",
+    "business": false,
+    "story": "Linh schedules shifts at a hospital, and Duc builds cloud systems for a living. Mai, eleven, and Bao, eight, share the bunk room upstairs. One Companion Core on the living-room credenza serves all four.",
+    "address": {
+      "line": "17 Tarnwick Close",
+      "place": "Dunmere"
+    },
+    "narrator": "v-bright-f"
+  },
+  "members": [
+    {
+      "id": "linh",
+      "name": "Linh",
+      "age": 39,
+      "role": "parent",
+      "work": "hospital scheduler",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Cricket",
+        "runtime": "OpenClaw",
+        "job": "Fills in school and club forms from the details Linh gives it.",
+        "personality": [
+          "quick",
+          "tidy",
+          "cheerful"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Prepares forms only. Linh reads each one and sends it."
+      }
+    },
+    {
+      "id": "duc",
+      "name": "Duc",
+      "age": 41,
+      "role": "parent",
+      "work": "cloud engineer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Ember",
+        "runtime": "Hermes",
+        "job": "Drafts short notes from the details Duc messages to it.",
+        "personality": [
+          "steady",
+          "dry",
+          "careful"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Drafts only. Duc reads every word before he sends it."
+      }
+    },
+    {
+      "id": "mai",
+      "name": "Mai",
+      "age": 11,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-3",
+      "archetype": "learner"
+    },
+    {
+      "id": "bao",
+      "name": "Bao",
+      "age": 8,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-4",
+      "archetype": "maker"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "garage",
+      "kind": "room",
+      "room": "garage",
+      "title": "Duc in the garage"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Kitchen and dining"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "The bunk room"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Duc carries the parcel in",
+        "body": "A parcel waits on the timber steps. Inside is a Companion Core, and Duc carries it past the kitchen to the credenza."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Mai reads the guide aloud, and Bao holds the cable."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "At the credenza, Bao presses the button while Duc steadies the cable. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "On her phone, Linh opens the Wi-Fi settings and joins the Core's own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "homehub",
+        "vaultwarden",
+        "gitea"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Choosing the first agents and apps",
+        "body": "In the Companion Hub store, Linh picks OpenClaw and Duc picks Hermes. They add HomeHub, VaultWarden and Gitea, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: OpenClaw, Hermes",
+            "Apps: HomeHub, VaultWarden, Gitea"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "linh",
+      "agent": "linh",
+      "approval": "linh",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Cricket says good morning",
+        "body": "Cricket, the agent Linh named, answers her first greeting from the credenza. The Core is running.",
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "linh",
+        "text": "Good morning, Linh. I am Cricket. What comes first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-music",
+      "chapter": "living",
+      "member": "duc",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Duc picks the afternoon's music",
+        "body": "Afternoon light crosses the west glass. Duc picks an album from the family's own music files, and Navidrome plays it from the Core to his phone.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "living-album",
+      "chapter": "living",
+      "member": "bao",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Bao finds the best ferry picture",
+        "body": "Bao finds last summer's best ferry picture. The family's photos sit in Immich on the Core, not in a photo cloud. The first start took a while.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "garage-repo",
+      "chapter": "garage",
+      "member": "duc",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "bicycle",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Duc pushes the bike script",
+        "body": "Duc builds cloud systems by day. On Saturday he pushes his bike script to Gitea. The repository sits on the Core, not on a rented code host.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garage-roller",
+      "chapter": "garage",
+      "member": "duc",
+      "agent": "duc",
+      "approval": "duc",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick, from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ember drafts the landlord note",
+        "body": "The garage door sticks. Duc messages Ember the details. Ember drafts a note for the landlord on the Core's local model. Duc reads it and sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "duc",
+        "text": "Here it is, short and polite. You decide whether it goes."
+      }
+    },
+    {
+      "id": "garage-ping",
+      "chapter": "garage",
+      "member": "duc",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "ntfy",
+        "replaces": []
+      },
+      "with": [
+        "n8n"
+      ],
+      "capability": "send a push notification to your phone from any script or automation",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "close",
+        "from": "behind",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Duc stops forgetting the bins",
+        "body": "Duc forgets the bins every Thursday morning. Now an n8n workflow on the Core sends a ntfy message to his phone the afternoon before.",
+        "chips": [
+          "ntfy"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-chores",
+      "chapter": "kitchen",
+      "member": "mai",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for shopping, chores and a recipe book",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Mai trades dishes for the table",
+        "body": "Beside the fridge, Mai swaps her dish-drying chore with Bao's table-laying one. The shared chore list in HomeHub lives on the Core, where both parents can read it.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "bao",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for shopping, chores and a recipe book",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Bao adds eggs to the list",
+        "body": "The eggs have run out. At the breakfast bar, Bao adds them to the HomeHub shopping list, and Mai adds oranges. The list is served from the Core.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "dining-week",
+      "chapter": "kitchen",
+      "member": "linh",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Linh's shifts move the whole week",
+        "body": "A new hospital rota lands on Monday. At the oval table, Linh fits the school concert around it in Companion Planning, one local file on the Core.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "dining-form",
+      "chapter": "kitchen",
+      "member": "linh",
+      "agent": "linh",
+      "approval": "linh",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Cricket gets the trip form ready",
+        "body": "The school trip form is due. Linh asks Cricket to fill it in, and Cricket prepares it in its own browser. Linh reads every line before she presses send.",
+        "chips": [
+          "OpenClaw WebCLI"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "linh",
+        "text": "The form is ready. Please read it before you send it."
+      }
+    },
+    {
+      "id": "dining-vault",
+      "chapter": "kitchen",
+      "member": "linh",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Linh finds the forgotten password",
+        "body": "Mai forgets her reading-site password. Linh finds it in VaultWarden, a vault the family hosts on the Core. It works with the Bitwarden apps.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-tides",
+      "chapter": "kids",
+      "member": "mai",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Mai asks why the tide turns",
+        "body": "Why does the tide come twice a day? Mai looks it up in Kiwix. The Wikipedia file was downloaded once, so no search engine sees her question.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "kids-bridge",
+      "chapter": "kids",
+      "member": "bao",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "a whiteboard with a hand-drawn look to sketch ideas together",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Bao draws the marble run first",
+        "body": "For the school fair, Bao draws his marble run, ramps first. Mai adds the labels, and the whiteboard runs on the Core.",
+        "chips": [
+          "Excalidraw",
+          "replaces Miro"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-welcome",
+      "chapter": "kids",
+      "member": "mai",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "kids",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mai checks a welcome sign",
+        "body": "A new classmate speaks Portuguese. Mai writes a welcome sign and checks it in LibreTranslate on the Core, whose language models were downloaded once.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-photo",
+      "chapter": "kids",
+      "member": "bao",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "pairdrop",
+        "replaces": [
+          "AirDrop"
+        ]
+      },
+      "capability": "send files between phones and laptops on the same Wi-Fi",
+      "anchor": {
+        "role": "room",
+        "room": "kids"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "above",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The marble run crosses the Wi-Fi",
+        "body": "The cardboard marble run is finished. Bao takes its picture on Linh's phone, then sends it to the family laptop with PairDrop, across the home Wi-Fi.",
+        "chips": [
+          "PairDrop",
+          "replaces AirDrop"
+        ]
+      }
+    },
+    {
+      "id": "kids-fractions",
+      "chapter": "kids",
+      "member": "mai",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "open-webui",
+        "replaces": [
+          "ChatGPT"
+        ]
+      },
+      "capability": "chat with models running on your own Core, from any browser",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "kids",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mai learns it to teach Bao",
+        "body": "Bao asks why volcanoes erupt, and Mai is not sure. She asks the model on the Core, through Open WebUI, then explains it in her own words.",
+        "chips": [
+          "Open WebUI",
+          "replaces ChatGPT"
+        ]
+      }
+    },
+    {
+      "id": "kids-reading",
+      "chapter": "kids",
+      "member": "mai",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "kids",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "above",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The reading log gets a line",
+        "body": "At the laptop, Mai adds a line to her reading log: one note for each book she finishes. Obsidian saves each note as a plain Markdown file on the Core.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "garden-hydrangea",
+      "chapter": "garden",
+      "member": "linh",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Linh finds last year's trim date",
+        "body": "Last year's journal note says the low front hedge was trimmed in spring. Linh checks it in HortusFox, trims the hedge again and adds a picture.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Four people, one Companion Core",
+        "body": "Passwords, code, forms and homework find a place on one Companion Core. It sits on the credenza, and the family walks past it."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your family's lists, passwords and homework can live on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "This home has no TV, bookshelf or office. The media beat sits at the couch with Navidrome and Immich on phones; Linh works at the dining table and Duc in the garage, anchored on the bicycle and the room.",
+    "Duc's garage has a workbench, cube storage and a bicycle but no laptop or desk (the only laptop is on the bunk room desk), so no beat puts a laptop in the garage.",
+    "OpenClaw (Cricket) prepares the trip form in its own browser; Linh reads it and presses send. The OpenClaw website note rides on dining-form.",
+    "Ember is Hermes: the first Hermes beat is garage-roller and carries the chat-service note. Duc sends the landlord note himself.",
+    "Companion Planning, OpenClaw and Hermes send crash reports to Companion Intelligence unless switched off. No beat says nothing leaves the Core.",
+    "Kiwix and LibreTranslate beats carry downloaded once. Immich carries the slow first start. VaultWarden is named as working with the Bitwarden apps.",
+    "ntfy: iOS push can use an upstream relay, so garage-ping makes no claim about where the message travels."
+  ]
+}

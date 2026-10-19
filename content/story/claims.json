@@ -1,0 +1,2749 @@
+{
+  "$comment": "Machine-readable claims for the Uncloud family-homes validator. Built by build-claims.cjs from CAMPAIGN.md/COPY.md (CI-Common, read 2026-10-01), the voice canon and cross-checks against code. Validator contract in STORY-BIBLE.md section 13.",
+  "version": "1.0.0",
+  "generated": "2026-10-01",
+  "validator": {
+    "appliesTo": "every user-facing string: titles, headings, popups, captions, narration scripts, alt text, aria-labels, og/meta tags, share pages, README for the site. Skip code identifiers, URLs, file names and JSON keys.",
+    "severity": {
+      "error": "fail the build",
+      "review": "fail unless the exact string is on the reviewed allow-list with an owner initial",
+      "warn": "report"
+    },
+    "flags": "Patterns are JS RegExp sources; use the given flags. Strip HTML tags first. Normalise curly quotes.",
+    "disclosureCheck": "For each disclosure with required:true, the page/film must contain its text (or the long form with the family name) in the place listed under where.",
+    "appCheck": "Every Hub app named in a story must match apps[].display or storeName (case-insensitive) and the story must stay inside mayDescribeAs and caveats. Unknown app names fail.",
+    "sourceTags": {
+      "V": "verified against the campaign source",
+      "E": "estimate: must be visibly labelled",
+      "BETA": "ships but disclosed as beta",
+      "hold": "conflicted or unsigned: do not print until the owner rules"
+    }
+  },
+  "sources": [
+    "CI-Common/generated/infographics/companion-core/CAMPAIGN.md (fact sheet)",
+    "CI-Common/generated/infographics/companion-core/COPY.md (copy deck)",
+    "CI-Common/content/voice/brand-voice.md; content/skills/uncloud-voice/SKILL.md; packages/video-kit/MESSAGING.md",
+    "CI-Common/generated/infographics/reference/ALTERNATIVES.md and CAUTIONS.md",
+    "HUB/CI-Marketplace@dev 8b6c0ebd (apps/*/config.json); CI-Portal origin/dev alternatives.json (113 pairs)",
+    "CI-OS core/headless (setup hotspot); CI-Docs getting-started and portal pages"
+  ],
+  "bannedPhrases": [
+    {
+      "id": "dash-em-en",
+      "pattern": "[—–‒―]",
+      "flags": "",
+      "severity": "error",
+      "why": "Voice rule: never an em or en dash in user-facing copy. Use a comma, semicolon or period.",
+      "fix": "Rewrite with a comma, semicolon or full stop."
+    },
+    {
+      "id": "dash-double-hyphen",
+      "pattern": "\\s--\\s|\\w--\\w",
+      "flags": "",
+      "severity": "error",
+      "why": "A typed double hyphen is an em dash in disguise.",
+      "fix": "Use a comma or a period."
+    },
+    {
+      "id": "dash-spaced-hyphen",
+      "pattern": "\\s-\\s",
+      "flags": "",
+      "severity": "warn",
+      "why": "A spaced hyphen reads as a dash.",
+      "fix": "Use a comma or a period."
+    },
+    {
+      "id": "exclamation",
+      "pattern": "!",
+      "flags": "",
+      "severity": "error",
+      "why": "MESSAGING.md: no exclamation marks. Success is grounded, not gushing.",
+      "fix": "End with a full stop."
+    },
+    {
+      "id": "emoji",
+      "pattern": "\\p{Extended_Pictographic}",
+      "flags": "u",
+      "severity": "error",
+      "why": "No emoji in product copy.",
+      "fix": "Remove."
+    },
+    {
+      "id": "ellipsis-hype",
+      "pattern": "\\.\\.\\.|…",
+      "flags": "",
+      "severity": "warn",
+      "why": "Trailing ellipsis is suspense, not the Uncloud voice.",
+      "fix": "Finish the sentence."
+    },
+    {
+      "id": "buzz-core",
+      "pattern": "\\b(seamless(ly)?|leverag(e|es|ed|ing)|best[- ]in[- ]class|world[- ]class|revolutionary|revolutionize[sd]?|cutting[- ]edge|state[- ]of[- ]the[- ]art|game[- ]chang(er|ing)|next[- ]gen(eration)?|unleash(es|ed|ing)?|supercharg(e|es|ed|ing)|democrati[sz](e|es|ed|ing)|effortless(ly)?|magic(al|ally)?|future[- ]proof|enterprise[- ]grade|turn[- ]?key|synerg\\w+|unlock(s|ed|ing)? the power|10x|delight(s|ed|ful)?)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Banned buzzword list (brand-voice.md Part I, uncloud-voice SKILL, COPY.md section 0, MESSAGING.md).",
+      "fix": "Name the fact instead of the adjective."
+    },
+    {
+      "id": "buzz-ai-powered",
+      "pattern": "\\bAI[- ]powered\\b|\\bAI[- ]driven\\b|\\bAI[- ]enabled\\b|\\bpowered by AI\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "\"AI-powered solution\" is the corporate SaaS framing CI opposes.",
+      "fix": "Say what the agent does."
+    },
+    {
+      "id": "buzz-for-everyone",
+      "pattern": "\\bfor everyone\\b|\\bbuilt for everyone\\b|\\beveryone (can|should|needs)\\b|\\banyone can\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Platitude. This stack is not for everyone and saying so is a landmine.",
+      "fix": "Say who it is for: individuals, families and small teams who want powerful AI without cloud dependency."
+    },
+    {
+      "id": "buzz-unlimited",
+      "pattern": "\\bunlimited\\b",
+      "flags": "i",
+      "severity": "warn",
+      "why": "Vocabulary: \"no rate limits\", not \"unlimited\" (sounds like a SaaS upsell).",
+      "fix": "Say \"no rate limits\" only where the sheet allows it, or name the fact."
+    },
+    {
+      "id": "buzz-simple-claims",
+      "pattern": "\\b(easy|easily|simple|simply|just works|zero[- ]config|zero[- ]effort|hassle[- ]free|no[- ]brainer|plug[- ]and[- ]play)\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "Ease claims are unmeasured. The only sanctioned ease line is \"Plug it in, pair it over Wi-Fi, and walk away.\"",
+      "fix": "Show the steps instead of calling them easy."
+    },
+    {
+      "id": "vocab-log-in",
+      "pattern": "\\blog(?:\\s|-)?in\\b|\\blogin\\b|\\blog(?:\\s|-)?out\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Vocabulary: \"sign in\", not \"log in\".",
+      "fix": "Sign in / sign out."
+    },
+    {
+      "id": "vocab-chatbot",
+      "pattern": "\\bchat[- ]?bots?\\b|\\bbots?\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Vocabulary: OpenClaw and Hermes are agents, never chatbots.",
+      "fix": "Say agent, or name OpenClaw or Hermes."
+    },
+    {
+      "id": "vocab-assistant",
+      "pattern": "\\b(?:AI|digital|virtual|personal|smart|voice) assistants?\\b|(?<!Home )\\bassistants?\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Vocabulary: agent, not assistant. (Marketplace manifests say \"assistant\"; our copy does not.)",
+      "fix": "Say agent."
+    },
+    {
+      "id": "vocab-home-server",
+      "pattern": "\\bhome[- ]?servers?\\b|\\bNAS\\b|\\bmini[- ]?PC\\b|\\bAI (server|box|appliance)\\b|\\bappliance\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Vocabulary: say Companion Core, not home server, NAS, box or appliance.",
+      "fix": "Companion Core, or \"your Core\" after first mention."
+    },
+    {
+      "id": "vocab-box",
+      "pattern": "\\b(the|a|your|this|that) (little |small |black |white )?box\\b",
+      "flags": "i",
+      "severity": "warn",
+      "why": "\"Box\" is allowed only to mean the Core (\"One box. No subscription.\").",
+      "fix": "Say your Core."
+    },
+    {
+      "id": "vocab-app-store",
+      "pattern": "\\bapp[- ]?stores?\\b|\\bmarket[- ]?place\\b|\\bplay ?store\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Vocabulary: \"the Companion Hub store\" (the sheet's phrase). Not app store or marketplace.",
+      "fix": "the Companion Hub store."
+    },
+    {
+      "id": "vocab-knowledge-base",
+      "pattern": "\\bknowledge[- ]base\\b|\\bmemory system\\b|\\bsecond brain\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Vocabulary: Companion Memory.",
+      "fix": "Companion Memory."
+    },
+    {
+      "id": "vocab-digital-memory",
+      "pattern": "\\bDigital Memory\\b",
+      "flags": "",
+      "severity": "error",
+      "why": "The Kickstarter draft says Digital Memory; the product name is Companion Memory.",
+      "fix": "Companion Memory."
+    },
+    {
+      "id": "vocab-portal",
+      "pattern": "\\b(CI|Companion) Portal\\b|\\bPortal\\b|\\bCI Account\\b|\\bCI-?Account\\b",
+      "flags": "",
+      "severity": "error",
+      "why": "User-facing name is \"Companion account\", never Portal or CI Account.",
+      "fix": "Companion account."
+    },
+    {
+      "id": "vocab-repo-names",
+      "pattern": "\\bCI-(Hub|Server|Core|Portal|OS|Common|Marketplace|Hermes|OpenClaw)\\b|\\bCI Hub\\b|\\bCI Memory\\b|\\bCI-OS\\b",
+      "flags": "",
+      "severity": "error",
+      "why": "Repo and wizard-label names are engineering surfaces. Use product names. (The Hub wizard labels Companion Memory \"CI Memory\"; do not copy that.)",
+      "fix": "Companion Hub, Companion Memory, Companion OS."
+    },
+    {
+      "id": "vocab-degoogle",
+      "pattern": "\\bde-?google\\b|\\bon[- ]prem(ise|ises)?\\b|\\bmigrat(e|ion) off the cloud\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Vocabulary: uncloud, local-first.",
+      "fix": "uncloud / local-first."
+    },
+    {
+      "id": "vocab-casing",
+      "pattern": "\\b[Cc]ompanion (?:[Cc]ore|[Hh]ub|[Mm]emory|OS|os)\\b(?<!Companion (?:Core|Hub|Memory|OS))",
+      "flags": "",
+      "severity": "error",
+      "why": "Product nouns are Title Case: Companion Core, Companion Hub, Companion Memory, Companion OS. Only \"account\" stays lower case: Companion account.",
+      "fix": "Capitalise the product noun."
+    },
+    {
+      "id": "vocab-casing-account",
+      "pattern": "\\bCompanion Account\\b",
+      "flags": "",
+      "severity": "error",
+      "why": "\"Companion account\" has a lower-case a.",
+      "fix": "Companion account."
+    },
+    {
+      "id": "vocab-casing-agents",
+      "pattern": "\\b(?:[Oo]pen ?[Cc]law|OPENCLAW|HERMES|hermes)\\b(?<!OpenClaw)",
+      "flags": "",
+      "severity": "error",
+      "why": "Spell OpenClaw and Hermes exactly.",
+      "fix": "OpenClaw, Hermes."
+    },
+    {
+      "id": "vocab-retired-names",
+      "pattern": "\\b(Companion Core Subscription|Core Subscription|Import Tools|Memory Import Tools|Companion Earth|Companion Atlas|Spatial Atlas)\\b",
+      "flags": "",
+      "severity": "error",
+      "why": "Retired or mistitled names (CAMPAIGN.md 2c, PLATFORM-VISION cautions). Import is built into Companion Memory.",
+      "fix": "Remove, or say Companion Memory imports your data."
+    },
+    {
+      "id": "vocab-sign-off",
+      "pattern": "\\bUn-?cloud your life\\b(?<!UnCloud your life)",
+      "flags": "i",
+      "severity": "warn",
+      "why": "Sign-off is exactly \"UnCloud your life.\" with that capitalisation.",
+      "fix": "UnCloud your life."
+    },
+    {
+      "id": "num-dollar",
+      "pattern": "[$€£]\\s?\\d|\\b\\d[\\d,.]*\\s?(USD|dollars?|euros?|pounds?|bucks)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No prices anywhere on the site. The Kickstarter ladder was re-priced repeatedly between 8 and 23 Sep (CAMPAIGN.md 2b to 2e), the shop and the campaign disagree, and copy.json holds a third set. Link to the campaign page instead.",
+      "fix": "Remove the number; link to the campaign page."
+    },
+    {
+      "id": "num-savings",
+      "pattern": "\\b(?:save[sd]?|saving|savings|cheaper|pays? for itself|payback|break[- ]even|ROI|return on investment|per (?:month|year)|a (?:month|year))\\b.{0,40}\\b(?:\\d+|thousands?|hundreds?)\\b|\\b\\d+\\s?%\\s?(?:off|cheaper|less|savings?|saved)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No savings or payback figures. They depend on the rented-stack table and its caveat; the sheet (about ten months) and copy.json (about 26 months) disagree; the 75% and 95% figures are marketing math.",
+      "fix": "Describe the app, not the arithmetic."
+    },
+    {
+      "id": "num-time-saved",
+      "pattern": "\\b(?:saves?|saved|saving|gives? back|frees? up)\\b\\s+(?:\\w+\\s+){0,3}(?:hours?|minutes?|days?|weeks?)\\b|\\b\\d+\\s+hours?\\s+(?:a|per|each)\\s+(?:week|day|month)\\b|\\b(?:twice|three times|\\d+x)\\s+as\\s+(?:fast|productive)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No productivity or time-saved figure exists. \"Get more done\" must be shown as a concrete task, never as a number.",
+      "fix": "Show the task the agent did."
+    },
+    {
+      "id": "num-tokens",
+      "pattern": "\\b(tok(en)?s?(\\/| per )(s|sec|second)|tps|latency|milliseconds?|\\d+\\s?ms)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Companion has published no tok/s for any model on any tier (CAMPAIGN.md 4). Geerling figures are third-party and not ours.",
+      "fix": "Remove."
+    },
+    {
+      "id": "num-db-unqualified",
+      "pattern": "\\b\\d+\\s?dB(?!\\s*(\\(A\\)\\s*)?at idle)",
+      "flags": "i",
+      "severity": "error",
+      "why": "Only \"19 dB at idle\" is measured. An unqualified acoustic number is what Design and Technology review picks at.",
+      "fix": "19 dB at idle."
+    },
+    {
+      "id": "num-unmeasured-hw",
+      "pattern": "\\b(power draw|watts? (idle|typical|at load|peak)|electricity (cost|bill)|pennies a day|energy[- ]efficient|low[- ]power|sustained temperature|runs cool|stays cool|weighs?|(?<!open[- ])weight|\\d+\\s?(kg|lbs?|pounds)|operating temperature|input voltage|FCC|UKCA|CE[- ]marked|RoHS|WEEE|Energy Star|FlexATX|SFX|ROCm\\s?\\d|CUDA)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Not measured or not confirmed (CAMPAIGN.md 4, 6): power draw, load noise, temperature, weight, voltage, certifications, PSU form factor, ROCm version.",
+      "fix": "Remove."
+    },
+    {
+      "id": "num-silent",
+      "pattern": "\\b(silent(ly)?|inaudible|noiseless|fanless|dead quiet|completely quiet|whisper[- ]quiet(?!\\s+(when|at)\\s+idle))\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "The Core has a Noctua fan. The measured fact is 19 dB at idle; there is no load figure.",
+      "fix": "Quiet at idle: 19 dB at idle."
+    },
+    {
+      "id": "num-fps",
+      "pattern": "\\b\\d+\\s?(fps|frames? (per|a|\\/) ?(second|sec|s)|hz)\\b|\\b(fps|frame[- ]?rates?|refresh rates?)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No frame-rate, fps or refresh figure exists for Steam Headless on a Core: it depends on the GPU the Core has, the game and the network, and Companion has published none (same footing as num-tokens).",
+      "fix": "Say what the family plays and where it streams to, with no figure."
+    },
+    {
+      "id": "cap-lag-free",
+      "pattern": "\\b(lag[- ]?free|lagless|zero[- ]lag|no[- ]lag|without (any )?lag|no (input )?delay|instant(ly)? responsive)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "An unmeasured performance claim: streaming a game over the home network can lag. (A \"zero latency\" claim is already caught by num-tokens.)",
+      "fix": "Leave performance out; say where the game runs."
+    },
+    {
+      "id": "num-app-counts",
+      "pattern": "\\b(?!300\\+ apps and agents available in the Companion Hub store)\\d[\\d,]*\\+?\\s+(?:free\\s+|one[- ]click\\s+|open[- ]source\\s+|self[- ]hosted\\s+)*(apps?|agents?|integrations?|services|tools|plugins|connectors|models|importers)\\b|\\ball (of )?(the )?\\d+\\b|\\bevery app\\b|\\bany app\\b|\\bthousands of apps\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "The only app count is \"300+ apps and agents available in the Companion Hub store.\" (owner ruling 22 Sep 2026). 84 integrations, 250+, 200+, 1,296 and 814 are all banned (cautions: 84 has no source; 1,296 is a directory count).",
+      "fix": "Use the sanctioned sentence or no number."
+    },
+    {
+      "id": "num-field-units",
+      "pattern": "\\b(more than |over )?(twenty|20)\\+? (units|machines|customers)\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "Founder-letter number, not yet on the fact sheet (COPY.md 12.9).",
+      "fix": "Remove unless the owner adds it to the sheet."
+    },
+    {
+      "id": "num-minutes",
+      "pattern": "\\b(in|within|under|just|takes?|only)\\s+(a few |\\d+|one|two|three|five|ten|fifteen)\\s+(minutes?|mins?|seconds?|hours?)\\b|\\binstalls? in minutes\\b|\\bminutes to\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No measured setup or install time exists. \"Installs in minutes\" is a house pitch line but not on the campaign sheet.",
+      "fix": "Show the steps; give no duration."
+    },
+    {
+      "id": "num-model-names",
+      "pattern": "\\b(gemma4-?(300b|800b|3t)|qwen3-?6-?200b|kimi-?k2-?6|deepseek-?v4-?pro|mistral[- ]medium[- ]3\\.5|hermes-?4|seed-?oss|ernie-?4\\.5|glm-?5\\.3|qwen3\\.8)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Fabrication-guard model names (HUB-MODELS cautions).",
+      "fix": "Do not name models in stories."
+    },
+    {
+      "id": "campaign-terms",
+      "pattern": "\\b(Early Bird|MSRP|pledge[sd]?|backers?|reward tiers?|stretch goal|Hub Pro|Core\\s?(32|64\\+?|128|192)|Duo|Barebone|Q[1-4] 2027|ships? (?:in|by)\\b|import duty|customs|funded|crowdfund\\w*)\\b|\\bwarranty\\b(?=[^.]{0,30}\\b(?:year|years|parts|labou?r|cover\\w*)\\b)|\\b(?:year|years)\\b[^.]{0,20}\\bwarranty\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "Campaign economics are not retail facts and moved weekly. Terms belong on the Kickstarter page. Stories name no tier, price, ship date, warranty or backer perk.",
+      "fix": "Link to the campaign page."
+    },
+    {
+      "id": "no-subscription",
+      "pattern": "\\bno (monthly |software |recurring )?(subscriptions?|fees?|bills?|payments?)\\b|\\bsubscription[- ]free\\b|\\bfree forever\\b|\\bone[- ]time (price|payment|purchase|cost)\\b|\\bpay once\\b|\\bnever pay again\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "A year of Hub Pro (Companion Memory included) ships with a Core and renewal exists after it. \"No cloud, no telemetry, no subscription\" is a verbatim hero line on the sheet; in a story it needs the qualifier. \"No API bill\" is the safe line.",
+      "fix": "Say \"no API bill\"."
+    },
+    {
+      "id": "sec-absolute",
+      "pattern": "\\b(unhackable|hack[- ]proof|unbreakable|impenetrable|bullet[- ]?proof|military[- ]grade|bank[- ]grade|zero[- ]knowledge|end[- ]to[- ]end encrypt\\w*|fully encrypted|encrypted by default|100%\\s+(secure|private|safe|protected)|completely\\s+(secure|safe|private|protected)|totally (safe|secure|private)|perfectly (safe|secure|private)|total privacy|absolute privacy|guarantee[sd]?|guaranteed|can(not|'t) be (hacked|breached|accessed|seen|read)|nobody (can|will) (see|read|access|get)|no one (can|will) (see|read|access|get))\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No security or privacy guarantee. The sheet supports \"Full-disk encryption is supported. Your keys.\" (supported, not default) and \"Local by default\". Absolute wording needs legal review (MEMORY-PAGE cautions).",
+      "fix": "State where the data sits, not that it is unbreakable."
+    },
+    {
+      "id": "sec-never-leaves",
+      "pattern": "\\b(nothing|never|no data)\\s+(ever\\s+)?(leaves?|leaving|goes? (out|online|to the cloud)|phones? home|reaches? the cloud)\\b|\\bnever phones? home\\b|\\bzero (cloud )?telemetry\\b|\\bno tracking\\b|\\bnever (sees|sees your) (your )?data\\b|\\b(?:your|their|his|her|the family.s) (?:code|repos?|questions?|prompts?|homework|essays?|files?|photos?|games?|data)\\s+(?:does(?:n.t| not)|do(?:n.t| not)|will not|won.t|can(?:not|.t))\\s+(?:leave|go (?:out|online)|reach(?:es)? the cloud)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Not supportable: Hub is Portal-connected by default, store browsing and installs use the internet, crash reporting has been opt-out (PLATFORM-VISION cautions). The sheet's FAQ line is narrower: \"No usage data is collected from your machine.\"",
+      "fix": "Say \"stays on your Core by default\" or the FAQ line."
+    },
+    {
+      "id": "sec-offline",
+      "pattern": "\\b(works?|runs?|working)\\s+(fully |entirely |completely |100% )?(offline|without (the )?(internet|cloud|Wi-?Fi|a connection))\\b|\\boff[- ]grid\\b|\\bair[- ]gapped\\b|\\bno internet (needed|required)\\b|\\bzero cloud\\b|\\bnever (touches|needs) the (cloud|internet)\\b|\\bcloud[- ]free\\b|\\b(?:code[sd]?|coding|programs?|programming|stud(?:y|ies|ied|ying)|learn(?:s|ed|ing)?|revis(?:e[sd]?|ing)|read(?:s|ing)?|translat(?:e[sd]?|ing)|writ(?:e|es|ing)|wrote)\\s+(?:fully |entirely |completely )?(?:offline|without (?:the )?(?:internet|cloud|Wi-?Fi|a connection))\\b|\\boffline\\s+(?:code|coding|coder|study|studying|tutor|tutoring|homework|learning|revision|agent|model|AI|programming)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "The Companion Hub store, app installs, the alternatives view and any messaging or web agent need the internet. The sheet claims only that no internet connection is required to use the machine you bought.",
+      "fix": "Say which step uses the internet."
+    },
+    {
+      "id": "sec-compliance",
+      "pattern": "\\b(HIPAA|GDPR|CCPA|PECR|COPPA|FERPA|SOC ?2|PCI([- ]DSS)?|ISO ?27001|FedRAMP|21 CFR|GLP|compliant|compliance|certified|accredited|audited)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No compliance, certification or audit claim is supportable. OpenEMR in the catalogue is not HIPAA; Plausible's own listing says \"GDPR\" and we do not repeat it.",
+      "fix": "Remove."
+    },
+    {
+      "id": "sec-medical",
+      "pattern": "\\b(cure[sd]?|heal(s|ing)?|diagnos\\w+|clinical(ly)?|therap(y|ies|eutic)|medical (advice|records? are)|prevents? (illness|disease|falls?)|medication (reminders?|advice)|dosage)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No medical claim. Fitness and recipe apps are record-keeping apps.",
+      "fix": "Describe record-keeping only."
+    },
+    {
+      "id": "sec-safety-people",
+      "pattern": "\\bkeeps? (\\w+ ){0,3}safe\\b|\\bprotects? (\\w+ ){0,3}(kids|children|family|families|loved ones|parents|grandparents|elderly)\\b|\\bparental controls?\\b|\\bchild[- ]safe\\b|\\bsafe for (kids|children)\\b|\\b(block|filter)s? (adult|porn|inappropriate|harmful) (content|sites)\\b|\\bpeace of mind guarantee\\b|\\bburglar\\w*|\\bintruders?\\b|\\bcatch(es)? (thieves|burglars|intruders)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No safety guarantee. Pi-hole blocks ad and tracker domains; it is not parental control. Frigate records and detects objects; it does not guarantee a break-in is caught.",
+      "fix": "Describe what the app records or blocks, in its own terms."
+    },
+    {
+      "id": "legal-claims",
+      "pattern": "\\b(legally (binding|valid|enforceable)|legal(ly)? (advice|compliant)|admissible|court[- ]ready|tax (advice|ready|deductible)|file your taxes|audit[- ]proof|investment advice|financial advice|guaranteed returns?)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No legal, tax or financial claim. DocuSeal and Documenso sign documents; whether a signature is valid is not our statement.",
+      "fix": "Describe the document workflow only."
+    },
+    {
+      "id": "sec-fear",
+      "pattern": "\\b(you (could|may|might) be (hacked|spied|at risk|exposed)|hackers?|stalk\\w*|predators?|identity theft|data breach(es)?|before it'?s too late|they are watching|watching you|spying|spies on|danger(ous)?|terrif\\w+|scary|nightmare|panic|victims?)\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "Empower, do not frighten. Name the mechanism calmly; do not threaten the reader or show a family in danger.",
+      "fix": "State the mechanism as a fact (where the data sits) and what the reader can do."
+    },
+    {
+      "id": "incumbent-attack",
+      "pattern": "\\b(Google|Alphabet|Amazon|Alexa|Ring|Apple|iCloud|Siri|Meta|Facebook|Instagram|WhatsApp|Microsoft|OpenAI|ChatGPT|Anthropic|Zoom|Dropbox|Slack|Spotify|Netflix|Nest|Samsung|Adobe|Notion|Evernote|LastPass|1Password|Salesforce|Shopify|Mailchimp|GeForce Now|Xbox Cloud|Stadia)\\b.{0,70}\\b(spies?|spying|steals?|stole|sells? (your|the) data|selling (your|the) data|harvests?|mines? your|snoops?|exploits?|listens? (to|in on)|watching you|stalks?|lies|lying|abuses?|scams?|extorts?|holds? (you|your \\w+) hostage|train(s|ed|ing)? (on|its models on) your)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "No unsourced factual claim about a named company. The CI-Common matrix of such judgements is uncited. A Kickstarter-adjacent page is commercial speech; escalate comparative use to counsel.",
+      "fix": "Say what the catalogue app does. Pair names only as \"instead of X\" in the Alternatives table sense."
+    },
+    {
+      "id": "logo-trademark",
+      "pattern": "<img[^>]+(google|apple|amazon|microsoft|openai|dropbox|slack|zoom|spotify|netflix)[^>]*>",
+      "flags": "i",
+      "severity": "error",
+      "why": "Third-party software is named in text only, never as a logo (CAMPAIGN.md 6c).",
+      "fix": "Text only."
+    },
+    {
+      "id": "cap-parity",
+      "pattern": "\\b(as (smart|good|capable|powerful|fast) as|on par with|matches|equals?|beats|outperforms?|better than|faster than|smarter than|replaces?|rival[sd]?|competes? with|frontier|state[- ]of[- ]the[- ]art model)\\b.{0,50}\\b(ChatGPT|GPT\\S*|Claude|Gemini|OpenAI|Anthropic|cloud AI|the cloud|frontier|Copilot|Siri|Alexa)\\b|\\b(ChatGPT|GPT\\S*|Claude|Gemini|OpenAI|Copilot)[- ](level|grade|class|quality|like|smart|good)\\b|\\bas (smart|intelligent|clever) as\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "The sheet concedes this: a Core runs a very good open-weight model, not the best model in the world this month. Never imply parity.",
+      "fix": "Say \"a capable model that is yours\"."
+    },
+    {
+      "id": "cap-omniscient",
+      "pattern": "\\b(knows|remembers|reads|tracks|understands|sees) (everything|all)\\b|\\bnever forgets?\\b|\\breads your mind\\b|\\bpredicts? (your|what you)\\b|\\banticipat\\w+\\b|\\bproactive(ly)?\\b|\\bnotices what you'?ve dropped\\b|\\bknows you better\\b|\\bperfect (recall|memory)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Companion Memory is in beta. Proactive forecasting cards (\"Your week, taking shape\", \"It notices what you've dropped\") carry a Rolling out pill upstream. Today it supplies individual context to OpenClaw and Hermes.",
+      "fix": "Say what the agent was asked to do and what it pulled from Companion Memory."
+    },
+    {
+      "id": "cap-autonomy",
+      "pattern": "\\b(books?|orders?|buys?|pays?|purchases?|negotiates?|cancels?|calls?|emails?|texts?|schedules?|files?|submits?)\\b.{0,30}\\b(for you|on your behalf|automatically|by itself|on its own|without (asking|you))\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "Agents act inside permissions the family sets. No story may show an agent spending money, contacting a third party or cancelling something without the person approving.",
+      "fix": "Show the agent preparing the action and the person approving it."
+    },
+    {
+      "id": "cap-cloud-model",
+      "pattern": "\\b(OpenAI|Anthropic|Gemini|Claude|GPT\\S*)\\s+(API|key|keys|account)\\b|\\bAPI keys?\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "OpenClaw and Hermes can be pointed at cloud model providers. A \"private agent\" scene is private only on the Core's local model; never show or mention a cloud key.",
+      "fix": "Say the agent runs on the Core's local model."
+    },
+    {
+      "id": "cap-messaging-private",
+      "pattern": "\\b(WhatsApp|Telegram|Slack|Discord|Signal|iMessage|SMS|Gmail|Outlook)\\b.{0,60}\\b(private|stays? (home|local|on your Core)|never leaves)\\b|\\b(private|local)\\b.{0,60}\\b(WhatsApp|Telegram|Slack|Discord|iMessage|SMS)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Hermes reaches you through messengers that are someone else's servers. The message travels through them.",
+      "fix": "Say the agent runs at home and the messenger is the messenger."
+    },
+    {
+      "id": "cap-remote-access",
+      "pattern": "\\b(from anywhere|anywhere in the world|on the road|on holiday|while (you('| a)re |they('| a)re )?(away|travell?ing|out)|remote(ly)?( access)?|access (it|your \\w+|your Core) (from|when|while)|away from home|from (your|the) (office|car|airport|hotel|train)|VPN|Tailscale|Cloudflare|tunnels?|public (URL|link|web|site)|share (a|the) link|reach(able)? (it )?(from|over) the (internet|web))\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "CAMPAIGN.md 13: remote access is NOT finalised ([x]). Docs describe Tailscale and Cloudflare, the sheet does not, and whether a relay or account is involved is unanswered. Keep every scene inside the home network.",
+      "fix": "Set the scene at home, on the home Wi-Fi."
+    },
+    {
+      "id": "cap-mobile-app",
+      "pattern": "\\b(Companion|CI) (mobile )?app\\b|\\bmobile app\\b|\\bTestFlight\\b|\\b(iOS|Android|iPhone|iPad) app\\b|\\bApp Store\\b|\\bGoogle Play\\b|\\bdownload on\\b|\\bQR code\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Mobile is closed preview; no store listing exists. In the FTUE the phone uses its browser/Wi-Fi settings only. (Third-party apps such as Immich have their own phone apps; do not show store badges.)",
+      "fix": "Say \"your phone\"."
+    },
+    {
+      "id": "cap-multi-user",
+      "pattern": "\\bmulti[- ]?user\\b|\\b(each|every) (family )?(member|person|one|of them) (gets?|has|keeps?|owns?) (their|a|an|his|her) (own )?(private|separate|isolated|secure|personal)\\b|\\bseparate (private )?(profiles?|accounts?|spaces?|vaults?|memor(y|ies))\\b|\\bprivate (space|memory|vault|agent) for (each|every)\\b|\\b(mom|dad|parents?|kids?|children|teens?|teenagers?|roommates?|partner|spouse)\\b.{0,30}\\bcan(not|'t) (see|read|access|open)\\b|\\b(user|family) (profiles|permissions|roles)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Founder letter: \"Multi-user operation is on the roadmap, but not on the box.\" Per-app multi-user (Immich, Nextcloud, Vaultwarden) is that app's feature; platform-level separation of one person's memory or agent from another's is not claimed. (CI-Docs says each person uses their own Companion account via Organizations; that conflicts, hold.)",
+      "fix": "One household, one Core. Each person names and talks to their own agent; say nothing about isolation."
+    },
+    {
+      "id": "cap-open-source-companion",
+      "pattern": "\\bCompanion (Core|Hub|OS|Memory|Intelligence)\\b[^.]{0,80}\\b(open[- ]source|open source|source[- ]available|fully open|inspect(able)?|auditable|transparent code)\\b|\\b(open[- ]source|fully open|inspect(able)?|auditable)\\b[^.]{0,60}\\bCompanion (Core|Hub|OS|Memory)\\b|\\bopen the core\\b|\\beverything is inspectable\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "The open-source position is [x] unanswered (CAMPAIGN.md 16). No Companion component may be called open-source or inspectable until the component-by-component answer is published. The third-party apps in the catalogue may be called open-source (their manifests say so).",
+      "fix": "Say the app is open source (if it is) or say nothing."
+    },
+    {
+      "id": "cap-own-apps",
+      "pattern": "\\bown(s|ed)?\\b[^.]{0,20}\\b(the )?(apps?|software|agents?|models?|the tools)\\b|\\bown outright\\b|\\bowned (outright|forever)\\b|\\byours forever\\b|\\byours to keep\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Owner ruling 22 Sep 2026: \"Own outright\" is retired. Users do not own the apps. \"No API bill\" is the accurate line. (\"The AI That You Own\" is the sanctioned tagline, used verbatim only.)",
+      "fix": "Say your Core, your data, no API bill."
+    },
+    {
+      "id": "cap-gaming",
+      "pattern": "\\bgaming (PCs?|rigs?|computers?|machines?|desktops?|boxe?s?)\\b|\\bconsole[- ](replac\\w+|killer|beater)\\b|\\b(replaces?|replacing|ditch(es)?|retire[sd]?|instead of) (your |the |a |every )?(console|PlayStation|Xbox|Switch)\\b|\\bplay (it |games |anything )?(anywhere|on any device)\\b|\\b(?:no|without (?:a |an |any )?)\\s?(?:Steam|Valve) account\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Steam Headless needs the family's own Valve account and a GPU the Core may not have; it streams inside the home network only (CAMPAIGN.md 13: no remote access claim). It is not a gaming PC or a console replacement, and it does not play anywhere or skip the Steam account.",
+      "fix": "Say Steve plays his own Steam library, streamed from the Core to the screen in his room."
+    },
+    {
+      "id": "cap-made-in",
+      "pattern": "\\b(designed (and|&) (built|assembled|made)|designed in|built in (California|the USA|America)|made in (the )?(USA|America|California)|American[- ]made|handmade in|hand[- ]built|Silicon Valley (built|made))\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Owner ruling 22 Sep 2026: only \"Assembled, configured and burn-in tested in California; mainboards from Framework.\" \"Designed\" is nowhere on the sheet and country-of-origin wording is regulated.",
+      "fix": "Use the ruled sentence."
+    },
+    {
+      "id": "cap-uptime",
+      "pattern": "\\b(never (crash|crashes|fail|fails|goes down|breaks?|needs? (updates|maintenance|attention))|always works?|100% uptime|zero downtime|maintenance[- ]free|zero maintenance|set it and forget it|fire and forget|runs forever|lasts forever)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Unmeasured reliability claims. The sheet says \"without you babysitting it\" and \"walk away\" and discloses beta.",
+      "fix": "Use the sheet's own phrases."
+    },
+    {
+      "id": "cap-camera-capture",
+      "pattern": "\\b(records?|captures?|listens? to|transcribes?)\\b.{0,30}\\b(everything|all day|every conversation|your (kids|children|partner|spouse|parents|guests|visitors)|the (kids|children|family|guests))\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "Never present covert or blanket recording of family members or guests. Companion Capture records the user's own machine; Frigate records the family's own cameras on their own property. Neither is for monitoring people who have not agreed.",
+      "fix": "Show consent explicitly or leave it out."
+    },
+    {
+      "id": "fake-social-proof",
+      "pattern": "\\b(testimonials?|customer stor(y|ies)|real (families|family|customers?|people|users)|actual (customers?|users|families)|our (customers|users|backers|families) (say|love|tell|report)|as seen (on|in)|rated|five[- ]stars?|\\d(?:\\.\\d)? stars?|(?:customer|user|five[- ]star|\\d+) reviews?|reviews? (?:from|by|say)|trusted by|used by (millions|thousands|hundreds|families)|\\d+ (customers|users|families|backers|households)|case stud(y|ies)|success stor(y|ies)|before and after)\\b",
+      "flags": "i",
+      "severity": "error",
+      "why": "The families are fiction (see disclosures). Nothing may read as a testimonial, review, case study or usage count. CAMPAIGN.md 17: never present any person as a customer or team member.",
+      "fix": "Say \"story\" or \"scene\" and keep the fictional disclosure in view."
+    },
+    {
+      "id": "fake-photo",
+      "pattern": "\\b(photograph(ed|s)? of|photo of|filmed (in|at)|shot (in|at|on)|real footage|screen recording|recorded (live|on)|live demo|unedited|actual (product|machine|unit))\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "No simulated capability. A scripted scene is not a recording. Only say \"photograph\" or \"recording\" for a real photograph or session on real hardware.",
+      "fix": "Say \"scene\" or \"drawing\"."
+    },
+    {
+      "id": "fake-render",
+      "pattern": "\\b(render(ed|ing|s)?|3D model of the Core|photoreal\\w*|product shot|hero shot)\\b.{0,40}\\b(Core|Companion Core)\\b|\\b(Core|Companion Core)\\b.{0,40}\\b(render(ed|ing|s)?|photoreal\\w*|product shot)\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "Kickstarter forbids photoreal renders of the product. The Core is drawn stylised, line-drawing style, never as a finished-product render.",
+      "fix": "Say \"drawing\"."
+    },
+    {
+      "id": "fake-address-real",
+      "pattern": "\\b\\d{1,5} (N\\.?|S\\.?|E\\.?|W\\.?|North|South|East|West)?\\s?[A-Z][a-z]+ (Street|St|Avenue|Ave|Road|Rd|Lane|Ln|Drive|Dr|Court|Ct|Way|Boulevard|Blvd)\\b.{0,40}\\b(CA|NY|TX|WA|OR|FL|IL|MA|CO|AZ|[A-Z]{2}) \\d{5}\\b",
+      "flags": "",
+      "severity": "review",
+      "why": "A fictional address must not be a real person's address. A street number plus a real ZIP is exactly that. Use invented street names, no ZIP, or a place that cannot resolve.",
+      "fix": "Invent a street; omit the ZIP."
+    },
+    {
+      "id": "internal-ids",
+      "pattern": "\\b(?:bghouse-olcia|familyhouse-nora|modernhome-nora|modernhouse-nora|modernhouse1|bgfamily|starter18k|palnknoll|payorote|cutestarter|flowerycottage|gardennook|lakecabin|mesamariposa|neweco|newcrest|onestory|sunnyhome|valleyview|familyhome)\\b|\\bSims ?4?\\b|\\bolcia\\b|-nora\\b|\\bhouse-?id\\b|[?&]house=",
+      "flags": "i",
+      "severity": "error",
+      "why": "Internal house ids, Sims-creator names and the ?house= URL form must not appear on any public surface, link or displayed string (old ?house=<id> keeps working but is never displayed or linked).",
+      "fix": "Use the public family slug (/family/<slug>)."
+    },
+    {
+      "id": "internal-ids-ordinary",
+      "pattern": "\\b(?:asymmetry|aurora|cocoon|epiphany|mirage|palms|riverbend|seraphine|vanilla|mediterranean)\\b",
+      "flags": "i",
+      "severity": "review",
+      "why": "Ordinary words that are also internal house ids. Fine in prose; never in a URL, slug, file name, data attribute, og:image path or alt text that names the house.",
+      "fix": "Check that the hit is prose, not an identifier."
+    }
+  ],
+  "requiredVocabulary": [
+    {
+      "term": "Companion Core",
+      "rule": "Title Case. First mention per page/film is the full name; \"your Core\" or \"the Core\" after. Never home server, NAS, box (except the sanctioned \"One box.\" line), appliance."
+    },
+    {
+      "term": "Companion Hub",
+      "rule": "Title Case. The platform and the store: \"the Companion Hub store\" is the sheet's phrase. Never app store, marketplace, CI-Hub."
+    },
+    {
+      "term": "Companion Memory",
+      "rule": "Title Case. First mention in a page or film carries \"(beta)\". Never Digital Memory, CI Memory, knowledge base, memory system."
+    },
+    {
+      "term": "Companion OS",
+      "rule": "Title Case. In beta; say so wherever it is named in a hero or end card."
+    },
+    {
+      "term": "Companion account",
+      "rule": "Lower-case \"account\". The user-facing name for Portal / CI Account. Say it only if the owner settles the pairing question (see STORY-BIBLE 8)."
+    },
+    {
+      "term": "OpenClaw",
+      "rule": "Exact spelling. An agent. The sheet: \"OpenClaw for browser automation\". Attribute to the OpenClaw Foundation on credits. The catalogue lists the Companion edition as \"OpenClaw WebCLI\"."
+    },
+    {
+      "term": "Hermes",
+      "rule": "Exact spelling. An agent. The sheet: \"Hermes for messaging\". Attribute to Nous Research on credits."
+    },
+    {
+      "term": "agent",
+      "rule": "The word for OpenClaw and Hermes. Never chatbot, bot, AI assistant, assistant."
+    },
+    {
+      "term": "local-first",
+      "rule": "Hyphenated. Never on-premise."
+    },
+    {
+      "term": "uncloud",
+      "rule": "Verb, lower-case in running text. The sign-off is exactly \"UnCloud your life.\""
+    },
+    {
+      "term": "sign in",
+      "rule": "Verb \"sign in\"; never \"log in\". Noun: \"sign-in\"."
+    },
+    {
+      "term": "no rate limits",
+      "rule": "Allowed instead of \"unlimited\", only where the sheet supports it. \"No API bill\" is the sheet's accurate line."
+    },
+    {
+      "term": "the Companion Hub store",
+      "rule": "With \"available\": \"300+ apps and agents available in the Companion Hub store.\" is the only count."
+    }
+  ],
+  "allowedClaims": [
+    {
+      "id": "headline",
+      "text": "Your AI should answer to you.",
+      "source": "CAMPAIGN.md 1",
+      "tag": "V",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "signoff",
+      "text": "UnCloud your life.",
+      "source": "CAMPAIGN.md 1",
+      "tag": "V",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "who-for",
+      "text": "Companion Intelligence builds private, personal AI infrastructure for individuals, families and small teams who want powerful AI without cloud dependency.",
+      "source": "CAMPAIGN.md 15",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "This sentence is what licenses a families-and-small-business site."
+    },
+    {
+      "id": "problem",
+      "text": "Every cloud-based AI you use is someone else's agent. You are renting intelligence, and paying for it with the raw material of your life: your files, your correspondence, your half-finished ideas, your questions at 2am.",
+      "source": "CAMPAIGN.md 1",
+      "tag": "V",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "turn",
+      "text": "Core is the other option. A quiet, 24/7-ready machine, smaller than a sheet of paper, that holds local models in unified memory and answers only to the person in the room.",
+      "source": "CAMPAIGN.md 1",
+      "tag": "V",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "lede-live-in-your-house",
+      "text": "The intelligence that knows the most about you should live in your house.",
+      "source": "COPY.md 1 (hero lede); sign-off ledger row 1",
+      "tag": "E",
+      "status": "hold",
+      "note": "Adapted from the founder letter and awaiting owner sign-off in COPY.md 13."
+    },
+    {
+      "id": "plug-pair-walk",
+      "text": "Plug it in, pair it over Wi-Fi, and walk away.",
+      "source": "COPY.md 1 (hero lede)",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "The sheet's only setup sentence. See the FTUE table."
+    },
+    {
+      "id": "agents-double",
+      "text": "Other agents are double agents. They serve a company whose interests are not yours, and they take your context with them. These do not.",
+      "source": "CAMPAIGN.md 10; MESSAGING.md",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "The sharpest line the company has. Use once, verbatim."
+    },
+    {
+      "id": "not-frontier",
+      "text": "A local machine does not run a frontier model. It runs a very good open-weight one. What a Core buys is a capable model that is yours: resident, private, and not subject to anyone else's roadmap.",
+      "source": "COPY.md 2 (plate 01 limit)",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "The honesty clause. It must appear once on the site."
+    },
+    {
+      "id": "core-size",
+      "text": "Companion Core is a 4.3 litre computer, about three quarters the footprint of a sheet of paper.",
+      "source": "CAMPAIGN.md 6 (232 x 205 x 90 mm, 4.3 L, 0.762 of a sheet)",
+      "tag": "V",
+      "status": "ok"
+    },
+    {
+      "id": "core-quiet",
+      "text": "19 dB at idle.",
+      "source": "CAMPAIGN.md 1, 6",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "Always \"at idle\". No load figure exists."
+    },
+    {
+      "id": "core-assembled",
+      "text": "Assembled, configured and burn-in tested in California, with mainboards from Framework.",
+      "source": "CAMPAIGN.md 15; owner ruling 22 Sep 2026",
+      "tag": "V",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "core-standard",
+      "text": "Standard Mini-ITX hardware in a steel case, with two M.2 slots that stay yours. Memory is soldered and cannot be upgraded.",
+      "source": "CAMPAIGN.md 6; COPY.md plate 11",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "Claim and limit travel together."
+    },
+    {
+      "id": "core-finish",
+      "text": "Charcoal or Chalk.",
+      "source": "CAMPAIGN.md 6",
+      "tag": "V",
+      "status": "ok"
+    },
+    {
+      "id": "core-in-box",
+      "text": "In the box: Companion Core, assembled, burned in and tested; a power cable for your region; a quick-start guide with a warranty card; a Companion OS recovery USB; access to docs.ci.computer and the community.",
+      "source": "CAMPAIGN.md 14",
+      "tag": "V",
+      "status": "ok",
+      "note": "The unboxing scene may show exactly these objects and no others. The year of Hub Pro is a licence, not an object, and is left out of the story (campaign terms)."
+    },
+    {
+      "id": "core-drive-fitted",
+      "text": "Every machine ships with a drive fitted and Companion OS already on it.",
+      "source": "CAMPAIGN.md 3, 14",
+      "tag": "V",
+      "status": "ok"
+    },
+    {
+      "id": "core-no-activation",
+      "text": "No first-boot activation, no vendor account and no internet connection required to use the machine you just bought.",
+      "source": "CAMPAIGN.md 13; COPY.md plate 15",
+      "tag": "V",
+      "status": "hold",
+      "note": "CONFLICT: CI-OS setup portal asks for a pairing code and CI-Docs says a CI Account is required to pair. Do not print until the owner settles which is true (STORY-BIBLE 8)."
+    },
+    {
+      "id": "os-job",
+      "text": "Companion OS is a Linux distribution built for one job: running local models reliably for months at a time, without you babysitting it.",
+      "source": "CAMPAIGN.md 7",
+      "tag": "V BETA",
+      "status": "ok-verbatim",
+      "note": "Beta chip required nearby."
+    },
+    {
+      "id": "os-recovery",
+      "text": "Companion OS includes monitoring and recovery tooling, designed for a machine that lives in a closet. Updates are yours to take.",
+      "source": "CAMPAIGN.md 7",
+      "tag": "V BETA",
+      "status": "ok"
+    },
+    {
+      "id": "hub-what",
+      "text": "Companion Hub runs on your hardware. Install apps in one click. Everything stays local; your data only leaves when you want it to.",
+      "source": "CAMPAIGN.md 8 (ci.computer/hub)",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "Cautions: Hub is Portal-connected by default and installs use the internet. Use with the data-flow disclosure."
+    },
+    {
+      "id": "hub-count",
+      "text": "300+ apps and agents available in the Companion Hub store.",
+      "source": "CAMPAIGN.md 6c; owner ruling 22 Sep 2026",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "Always \"available\", always \"the Companion Hub store\". Never add the 84 integrations."
+    },
+    {
+      "id": "hub-no-api-bill",
+      "text": "One click installs the app, and there is no API bill.",
+      "source": "COPY.md plate 07; owner ruling 22 Sep 2026",
+      "tag": "V",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "hub-alternatives",
+      "text": "Local-first alternatives to popular cloud tools.",
+      "source": "CAMPAIGN.md 8",
+      "tag": "V",
+      "status": "ok"
+    },
+    {
+      "id": "hub-sandboxed",
+      "text": "Sandboxed agents with permission controls.",
+      "source": "CAMPAIGN.md 8",
+      "tag": "V",
+      "status": "ok"
+    },
+    {
+      "id": "hub-firstparty",
+      "text": "First-party apps on the Hub include Companion Memory, Hermes for messaging, OpenClaw for browser automation and Photo Time Machine.",
+      "source": "CAMPAIGN.md 8; COPY.md plate 07",
+      "tag": "V",
+      "status": "ok",
+      "note": "Import Tools is retired. Attribute Hermes (Nous Research) and OpenClaw (OpenClaw Foundation) in credits."
+    },
+    {
+      "id": "hub-third-party-text-only",
+      "text": "Third-party software is named in text and never shown as a logo.",
+      "source": "CAMPAIGN.md 6c",
+      "tag": "V",
+      "status": "ok",
+      "note": "This is a rule for us, not copy."
+    },
+    {
+      "id": "memory-file",
+      "text": "Companion Memory is not a cloud profile and not an advertising or personalisation engine. It is a file on your disk that happens to know you.",
+      "source": "CAMPAIGN.md 9",
+      "tag": "V BETA",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "memory-graph",
+      "text": "Companion Memory builds a knowledge graph of your own life: people, places, things, content, events and spaces.",
+      "source": "CAMPAIGN.md 9",
+      "tag": "V BETA",
+      "status": "ok"
+    },
+    {
+      "id": "memory-optin",
+      "text": "Every Companion Memory integration is opt-in and revocable. Nothing is connected by default.",
+      "source": "CAMPAIGN.md 9",
+      "tag": "V BETA",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "memory-agents",
+      "text": "Companion Memory works with OpenClaw and Hermes to give them individual context that improves their results.",
+      "source": "CAMPAIGN.md 9b",
+      "tag": "V BETA",
+      "status": "ok",
+      "note": "Today's capability, stated as today's capability. Also reachable by other agents over MCP."
+    },
+    {
+      "id": "memory-camera-saved",
+      "text": "Companion Camera captures documents, notes and real-world context into the timeline. Saved Searches keep collecting a topic in the background.",
+      "source": "CAMPAIGN.md 9",
+      "tag": "V BETA",
+      "status": "ok"
+    },
+    {
+      "id": "memory-never-revoked",
+      "text": "Your memory is never revoked. If you stop subscribing, functionality freezes where it is. Nothing is deleted, nothing is locked.",
+      "source": "CAMPAIGN.md 9",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "Mention \"subscribing\" only if the story needs it; do not add a term or a price."
+    },
+    {
+      "id": "agents-local",
+      "text": "Agents operate on your local memory by default and work only on your behalf.",
+      "source": "CAMPAIGN.md 10",
+      "tag": "V BETA",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "agents-inspectable",
+      "text": "Everything is inspectable. Nothing phones home.",
+      "source": "CAMPAIGN.md 10",
+      "tag": "V",
+      "status": "hold",
+      "note": "CONFLICTS: open-source position is unanswered (so \"inspectable\" is unproven) and cautions say \"phones home\" is not supportable for Hub. Banned in copy until the owner rules."
+    },
+    {
+      "id": "local-by-default",
+      "text": "Local by default: inference, memory and agents run on your hardware.",
+      "source": "CAMPAIGN.md 13",
+      "tag": "V",
+      "status": "ok-verbatim"
+    },
+    {
+      "id": "no-usage-data",
+      "text": "No usage data is collected from your machine.",
+      "source": "COPY.md 18 FAQ; CAMPAIGN.md 13",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "Do not widen to \"zero telemetry\" or \"never phones home\"."
+    },
+    {
+      "id": "fde",
+      "text": "Full-disk encryption is supported, with your keys.",
+      "source": "CAMPAIGN.md 13",
+      "tag": "V",
+      "status": "ok-verbatim",
+      "note": "\"Supported\", not \"on by default\"."
+    },
+    {
+      "id": "nothing-stops",
+      "text": "There is no signed bootloader, no first-boot activation, and nothing that stops working when a company changes direction.",
+      "source": "CAMPAIGN.md 5 (the concession paragraph)",
+      "tag": "V",
+      "status": "hold",
+      "note": "The same paragraph says \"no vendor account\", which is in conflict. Quote the sentence only without that clause, after owner sign-off."
+    },
+    {
+      "id": "promise-small-team",
+      "text": "Companion Intelligence builds for individuals, families and small teams.",
+      "source": "CAMPAIGN.md 15",
+      "tag": "V",
+      "status": "ok"
+    },
+    {
+      "id": "launch-month",
+      "text": "Companion Core launches on Kickstarter in October 2026.",
+      "source": "CAMPAIGN.md 2",
+      "tag": "V",
+      "status": "ok",
+      "volatile": true,
+      "note": "Re-check on publish day. The founder letter says Tuesday 6 October but that is unconfirmed (COPY.md 12.3). Say \"October 2026\" only."
+    }
+  ],
+  "forbiddenClaims": [
+    {
+      "id": "f-prices",
+      "category": "money",
+      "why": "No dollar figure anywhere. See banned num-dollar.",
+      "pattern": "$ amounts, tiers, financing, add-ons"
+    },
+    {
+      "id": "f-savings",
+      "category": "money",
+      "why": "No savings, payback, ROI or \"replaces $X a month\". No such figure exists in any app listing; 75% and 95% are marketing math; the sheet says about ten months, copy.json says about 26.",
+      "pattern": "any savings or payback sentence"
+    },
+    {
+      "id": "f-tiers-ship",
+      "category": "campaign",
+      "why": "No Core tier, ship quarter, pledge, Early Bird, warranty, shipping or duty statement. The campaign page owns these.",
+      "pattern": "Core 64/128/192, Q1-Q3 2027, backer"
+    },
+    {
+      "id": "f-unmeasured",
+      "category": "performance",
+      "why": "No tok/s, latency, load noise, power draw, temperature, weight, certifications, PSU form factor, ROCm version, agent build number, benchmark score (Agentic Memory-System Benchmark).",
+      "pattern": "see num-* banned phrases"
+    },
+    {
+      "id": "f-parity",
+      "category": "performance",
+      "why": "No parity or superiority claim against cloud models.",
+      "pattern": "as smart as ChatGPT"
+    },
+    {
+      "id": "f-duration",
+      "category": "performance",
+      "why": "No setup or install duration (minutes, hours).",
+      "pattern": "set up in five minutes"
+    },
+    {
+      "id": "f-security-guarantee",
+      "category": "security",
+      "why": "No unhackable, guaranteed, end-to-end, bank-grade, nobody-can-see wording.",
+      "pattern": "see sec-absolute"
+    },
+    {
+      "id": "f-never-leaves",
+      "category": "security",
+      "why": "No \"nothing ever leaves\", \"never phones home\", \"zero telemetry\", \"works offline\", \"air-gapped\".",
+      "pattern": "see sec-never-leaves, sec-offline"
+    },
+    {
+      "id": "f-compliance",
+      "category": "legal",
+      "why": "No HIPAA, GDPR, CCPA, SOC 2, PCI, certified, compliant, audited. A listing in the catalogue is not a compliance statement.",
+      "pattern": "see sec-compliance"
+    },
+    {
+      "id": "f-medical-care",
+      "category": "legal",
+      "why": "No medical, caregiving, safety-of-people or child-safety claim (eldercare, medication, parental control).",
+      "pattern": "see sec-medical, sec-safety-people"
+    },
+    {
+      "id": "f-legal-tax-fin",
+      "category": "legal",
+      "why": "No legal validity of signatures, tax or financial advice, investment advice, \"budget app saves you money\".",
+      "pattern": "see legal-claims"
+    },
+    {
+      "id": "f-open-source-companion",
+      "category": "brand",
+      "why": "Companion's own components are not yet declared open source. Third-party catalogue apps may be called open source.",
+      "pattern": "see cap-open-source-companion"
+    },
+    {
+      "id": "f-own-apps",
+      "category": "brand",
+      "why": "\"Own outright\" retired; users do not own the apps.",
+      "pattern": "see cap-own-apps"
+    },
+    {
+      "id": "f-made-in",
+      "category": "brand",
+      "why": "Country-of-origin wording is regulated; only the ruled sentence.",
+      "pattern": "see cap-made-in"
+    },
+    {
+      "id": "f-remote-access",
+      "category": "unshipped",
+      "why": "Remote access is not finalised. No \"from anywhere\", VPN, tunnel, public link or \"while you travel\".",
+      "pattern": "see cap-remote-access"
+    },
+    {
+      "id": "f-mobile-app",
+      "category": "unshipped",
+      "why": "Mobile is closed preview. No Companion app, no store badges, no QR.",
+      "pattern": "see cap-mobile-app"
+    },
+    {
+      "id": "f-multi-user",
+      "category": "unshipped",
+      "why": "Platform multi-user is on the roadmap, not on the box. No per-person isolation of memory, agents or files.",
+      "pattern": "see cap-multi-user"
+    },
+    {
+      "id": "f-proactive",
+      "category": "unshipped",
+      "why": "Proactive forecasts and \"it notices\" features are rolling out upstream. No omniscient, predictive or proactive agent.",
+      "pattern": "see cap-omniscient"
+    },
+    {
+      "id": "f-box-to-box",
+      "category": "unshipped",
+      "why": "Box-to-box Asks, payments or entitlement nodes, OCR for scanned PDFs, app-declared intents, speculative inference are roadmap. Do not show them working. Import Tools and Companion Earth are retired.",
+      "pattern": "Asks between two Cores"
+    },
+    {
+      "id": "f-devices",
+      "category": "unshipped",
+      "why": "Pendants and glasses (OMI, Mentra, Even Realities, MaixCAM, Pebble) feeding Companion Memory: the capture-to-memory chain is documented as broken at most joints. Companion Glasses Bridge is available:false. Do not draw or narrate wearables feeding the Core.",
+      "pattern": "smart glasses remember my day"
+    },
+    {
+      "id": "f-agent-autonomy",
+      "category": "honesty",
+      "why": "No agent spends money, contacts a third party or cancels a service without the person approving.",
+      "pattern": "see cap-autonomy"
+    },
+    {
+      "id": "f-cloud-model",
+      "category": "honesty",
+      "why": "OpenClaw and Hermes can be pointed at cloud model providers. Never imply an agent is private if it is pointed at one; never show an API key.",
+      "pattern": "see cap-cloud-model"
+    },
+    {
+      "id": "f-messenger-private",
+      "category": "honesty",
+      "why": "A message sent through WhatsApp, Telegram, Slack, Discord, SMS or email passes through that service. Hermes at home does not make the messenger local.",
+      "pattern": "see cap-messaging-private"
+    },
+    {
+      "id": "f-testimonial",
+      "category": "honesty",
+      "why": "The families are fiction. No testimonial, review, case study, rating, user count, \"real family\".",
+      "pattern": "see fake-social-proof"
+    },
+    {
+      "id": "f-real-person",
+      "category": "honesty",
+      "why": "No named real person, no founder photo or bio, no team photo. A founder name exists (Liam Broza) but no bio or photo may appear in a family story. Fictional characters must not share a name with a real, identifiable person at a real address.",
+      "pattern": "Liam, Lex Hartman, Jeff Geerling in a story"
+    },
+    {
+      "id": "f-photoreal-core",
+      "category": "honesty",
+      "why": "The Core is a stylised line drawing, never a photoreal render. No UI that is not built. No benchmark that is not measured.",
+      "pattern": "see fake-render"
+    },
+    {
+      "id": "f-surveillance",
+      "category": "honesty",
+      "why": "No blanket recording of family members or guests. Cameras are the family's own, on their own property, with the household aware.",
+      "pattern": "see cap-camera-capture"
+    },
+    {
+      "id": "f-incumbent-claims",
+      "category": "legal",
+      "why": "No unsourced factual allegation about a named company. Pair names only as the catalogue \"replaces\" table does.",
+      "pattern": "see incumbent-attack"
+    },
+    {
+      "id": "f-prod-names-wrong",
+      "category": "brand",
+      "why": "Wrong product names: CI Account, Portal, CI Memory, Digital Memory, Companion Core Subscription, Core Subscription, Import Tools.",
+      "pattern": "see vocab-*"
+    }
+  ],
+  "disclosures": [
+    {
+      "id": "fictional-family",
+      "text": "Fictional family. Real software.",
+      "long": "{family} is a fictional family. The software they use is real.",
+      "where": [
+        "landing hero, visible without scrolling",
+        "every family page header and the player chrome (a persistent chip that stays during popups and voice-over)",
+        "first 2 seconds and last card of every film, plus a persistent corner mark",
+        "share pages and og:description"
+      ],
+      "required": true,
+      "notes": "Owner-specified wording. Never styled as small print; contrast per canon (4.5:1)."
+    },
+    {
+      "id": "scripted-scenes",
+      "text": "Scenes are written for this site. They show what the listed apps do. They are not recordings of a real session.",
+      "where": [
+        "family page footer",
+        "film end card",
+        "About page"
+      ],
+      "required": true,
+      "notes": "Sheet rule 3: no simulated capability. An agent line on screen is scripted, not captured."
+    },
+    {
+      "id": "beta-short",
+      "text": "Companion OS, Companion Memory and Companion Agents are in beta.",
+      "where": [
+        "landing hero (a chip in the first screen, per COPY.md 1 note)",
+        "every film end card",
+        "every page that names any of the three"
+      ],
+      "required": true,
+      "notes": "First mention of Companion Memory in a page or film also carries \"(beta)\"."
+    },
+    {
+      "id": "beta-full",
+      "text": "Companion OS, Companion Agents and Companion Memory are in beta. They run on units in the field today. Some of what we want them to do is not built yet. We will tell you which is which in the updates rather than in the marketing. Companion Hub is shipping.",
+      "where": [
+        "About / footer, once"
+      ],
+      "required": true,
+      "hold": "The sheet's widened disclosure (CAMPAIGN.md 2d-i) contains the clause \"and everything shown in our video runs on software you will receive\". That is true only if every scene is faithful to real software. Dropped here; the owner decides whether to restore it."
+    },
+    {
+      "id": "not-frontier",
+      "text": "A Core runs capable open models, not the largest frontier models. If you need the best model in the world this month, a subscription buys that.",
+      "where": [
+        "About / what a Core is not",
+        "FAQ"
+      ],
+      "required": true,
+      "notes": "Honesty clause; the sheet's argument \"stops where it should\"."
+    },
+    {
+      "id": "internet-steps",
+      "text": "Some steps use the internet: installing apps from the Companion Hub store, and any website or messaging service your agent talks to.",
+      "where": [
+        "FTUE page and the setup film",
+        "any scene where Hermes or OpenClaw reaches outside the house"
+      ],
+      "required": true
+    },
+    {
+      "id": "launch-not-offer",
+      "text": "Companion Core launches on Kickstarter in October 2026. This site is not an offer for sale. Campaign terms are on the campaign page.",
+      "where": [
+        "footer",
+        "About"
+      ],
+      "required": true,
+      "volatile": true
+    },
+    {
+      "id": "stylised-art",
+      "text": "The Companion Core is drawn as a stylised illustration, not a photograph.",
+      "where": [
+        "family page footer",
+        "film end card"
+      ],
+      "required": true
+    },
+    {
+      "id": "synthetic-voice",
+      "text": "Narration is generated locally with an open text-to-speech model. It is not a recording of a person.",
+      "where": [
+        "family page near the audio control",
+        "film end card"
+      ],
+      "required": true,
+      "notes": "Name the model (Kokoro-82M, Apache-2.0, or whatever the build uses) in THIRD_PARTY.md; never a cloud voice."
+    },
+    {
+      "id": "names-owners",
+      "text": "Product names belong to their owners. They are used to say what each app replaces. No endorsement is implied.",
+      "where": [
+        "footer"
+      ],
+      "required": true,
+      "notes": "Counsel should review comparative use."
+    },
+    {
+      "id": "attribution-agents",
+      "text": "Hermes is from Nous Research. OpenClaw is from the OpenClaw Foundation. Companion Hub packages both.",
+      "where": [
+        "credits page",
+        "film end card when either agent is named"
+      ],
+      "required": true,
+      "notes": "ci-market-apps clone wrongly attributes both to Companion Intelligence; do not copy from it."
+    },
+    {
+      "id": "apps-availability",
+      "text": "Apps shown are in the Companion Hub store at the time of writing. Availability can change.",
+      "where": [
+        "credits page",
+        "FAQ"
+      ],
+      "required": true
+    },
+    {
+      "id": "third-party-apps",
+      "text": "The other apps in these stories are open-source projects by other people. Companion Intelligence did not make them.",
+      "where": [
+        "credits page"
+      ],
+      "required": true,
+      "notes": "Do not call them \"our apps\". Sixteen apps carry the companion-intelligence category; the rest are community packages."
+    },
+    {
+      "id": "site-practises",
+      "text": "This site makes no third-party requests, sets no cookies and runs no analytics.",
+      "where": [
+        "footer (only if build-portal and test-portal assert it)"
+      ],
+      "required": false,
+      "notes": "Say it only if true and tested; a privacy site that loads Google Fonts or a tracker is the worst possible own goal."
+    }
+  ],
+  "apps": [
+    {
+      "id": "ci-memory",
+      "display": "Companion Memory",
+      "storeName": "Companion Memory",
+      "segment": "both",
+      "jobs": [
+        "memory"
+      ],
+      "mayDescribeAs": "builds a knowledge graph of your life on your own disk and gives OpenClaw and Hermes individual context",
+      "replacesPerCatalogue": [],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Beta. First mention carries (beta).",
+        "Never priced; included with Hub Pro, which is campaign terms and stays out of stories.",
+        "No benchmark score; no integration count; no proactive forecasts.",
+        "Imports are opt-in and revocable; nothing connected by default."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/ci-memory/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "ci-hermes",
+      "display": "Hermes",
+      "storeName": "Hermes",
+      "segment": "both",
+      "jobs": [
+        "agent",
+        "messaging"
+      ],
+      "mayDescribeAs": "an agent built for messaging: it connects to chat apps, email and more from one self-hosted app",
+      "replacesPerCatalogue": [],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Attribute to Nous Research.",
+        "Reaches you through messengers (Slack, Discord, Telegram, WhatsApp, email, SMS). Those carry the message; the messenger is not local.",
+        "Can be pointed at cloud model providers. Private only on the Core's local model.",
+        "Beta (Companion Agents). Do not show an API key or a setup dialog that does not exist."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/ci-hermes/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "ci-openclaw",
+      "display": "OpenClaw",
+      "storeName": "OpenClaw WebCLI",
+      "segment": "both",
+      "jobs": [
+        "agent",
+        "browser"
+      ],
+      "mayDescribeAs": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "replacesPerCatalogue": [],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Catalogue name is \"OpenClaw WebCLI\"; attribute to the OpenClaw Foundation.",
+        "Browsing the web touches websites; that traffic is not private from them.",
+        "Can connect to cloud providers; private only on the Core's local model.",
+        "Phone apps exist upstream; no store badges.",
+        "Beta (Companion Agents)."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/ci-openclaw/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "ci-planning",
+      "display": "Companion Planning",
+      "storeName": "Companion Planning",
+      "segment": "both",
+      "jobs": [
+        "planner",
+        "tasks"
+      ],
+      "mayDescribeAs": "a local-first planner for tasks, time blocks and calendar sync, with optional briefings from a local model",
+      "replacesPerCatalogue": [],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Google Calendar sync is off by default and, when on, talks to Google.",
+        "Not on the sheet's first-party list; it is in the catalogue under companion-intelligence."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/ci-planning/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "ci-ha-voice",
+      "display": "Home Assistant Voice",
+      "storeName": "Home Assistant Voice",
+      "segment": "consumer",
+      "jobs": [
+        "voice",
+        "smart-home"
+      ],
+      "mayDescribeAs": "lets a Home Assistant Voice Preview Edition speaker talk to your Core's local model and your Companion Memory",
+      "replacesPerCatalogue": [],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "The speaker is a third-party product; draw it generically.",
+        "Speech-to-text and text-to-speech use a speech server you choose; do not claim fully offline voice.",
+        "Needs Home Assistant."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/ci-ha-voice/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "ci-photo-time-machine",
+      "display": "Photo Time Machine",
+      "storeName": "Photo Time Machine",
+      "segment": "consumer",
+      "jobs": [
+        "photos"
+      ],
+      "mayDescribeAs": "organises and explores your visual history as locally hosted 4D Gaussian splats",
+      "replacesPerCatalogue": [],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Niche; promise no result from ordinary phone photos.",
+        "On the sheet's first-party list."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/ci-photo-time-machine/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "immich",
+      "display": "Immich",
+      "storeName": "Immich",
+      "segment": "consumer",
+      "jobs": [
+        "photos"
+      ],
+      "mayDescribeAs": "backs up, organises and searches your photos and videos on your own server",
+      "replacesPerCatalogue": [
+        "Google Photos",
+        "iCloud Photos"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "photography",
+      "caveats": [
+        "Phone backup needs the Immich phone app on the home network; no away-from-home claim; no store badge.",
+        "No face-recognition or \"AI sorts your photos\" claim (not in the listing)."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/immich/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "immich-kiosk",
+      "display": "Immich Kiosk",
+      "storeName": "Immich Kiosk",
+      "segment": "consumer",
+      "jobs": [
+        "photos",
+        "tv"
+      ],
+      "mayDescribeAs": "turns any screen with a browser into a slideshow of photos from your Immich server",
+      "replacesPerCatalogue": [],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Needs Immich. Good for the living-room TV or a hallway tablet."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/immich-kiosk/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "photoprism",
+      "display": "PhotoPrism",
+      "storeName": "PhotoPrism",
+      "segment": "consumer",
+      "jobs": [
+        "photos"
+      ],
+      "mayDescribeAs": "a privately hosted app for browsing, organising and sharing your photo collection",
+      "replacesPerCatalogue": [
+        "Google Photos",
+        "iCloud Photos"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "photography",
+      "caveats": [
+        "Pick Immich or PhotoPrism per family; do not use both in one home."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/photoprism/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "home-assistant",
+      "display": "Home Assistant",
+      "storeName": "Home Assistant",
+      "segment": "consumer",
+      "jobs": [
+        "smart-home",
+        "iot"
+      ],
+      "mayDescribeAs": "open-source home automation that controls and monitors smart devices from one local interface",
+      "replacesPerCatalogue": [
+        "Google Home",
+        "Amazon Alexa",
+        "Apple HomeKit"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "automation",
+      "caveats": [
+        "In the Hub package, host USB, Bluetooth, GPIO and D-Bus integrations are off by default. Use devices reachable over the home network (lights, plugs, thermostats on Wi-Fi or Ethernet), never a Zigbee or Z-Wave stick plugged into the Core.",
+        "Some brands' integrations are themselves cloud services; claim \"local\" only for network-local devices."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/home-assistant/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "frigate",
+      "display": "Frigate",
+      "storeName": "Frigate",
+      "segment": "consumer",
+      "jobs": [
+        "cameras"
+      ],
+      "mayDescribeAs": "a local network video recorder with object detection for IP cameras",
+      "replacesPerCatalogue": [
+        "Ring",
+        "Nest Cam",
+        "Arlo"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "security",
+      "caveats": [
+        "Needs IP cameras (RTSP). No detection-speed claim; no \"catches intruders\"; no safety guarantee.",
+        "The family's own cameras on their own property only."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/frigate/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "pi-hole",
+      "display": "Pi-hole",
+      "storeName": "Pi-hole",
+      "segment": "consumer",
+      "jobs": [
+        "network",
+        "ads"
+      ],
+      "mayDescribeAs": "blocks ads, trackers and malicious domains for devices on your network at the DNS level",
+      "replacesPerCatalogue": [
+        "AdGuard",
+        "NextDNS"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "security",
+      "caveats": [
+        "Not parental control, not a security guarantee, not \"stops tracking\". Needs the router or devices to use it for DNS."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/pi-hole/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "adguardhome",
+      "display": "AdGuard Home",
+      "storeName": "AdGuard Home",
+      "segment": "consumer",
+      "jobs": [
+        "network",
+        "ads"
+      ],
+      "mayDescribeAs": "a network-wide DNS server that blocks ads, trackers and malicious domains",
+      "replacesPerCatalogue": [
+        "NextDNS",
+        "AdGuard DNS"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Same limits as Pi-hole. Use one, not both."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/adguardhome/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "vaultwarden",
+      "display": "Vaultwarden",
+      "storeName": "VaultWarden",
+      "segment": "both",
+      "jobs": [
+        "passwords"
+      ],
+      "mayDescribeAs": "a password manager server that works with the official Bitwarden apps",
+      "replacesPerCatalogue": [
+        "LastPass",
+        "1Password"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "security",
+      "caveats": [
+        "It is an unofficial Bitwarden-compatible server; say \"works with Bitwarden apps\". No security superlative.",
+        "Phone use away from home needs remote access (held); keep the scene at home."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/vaultwarden/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "nextcloud",
+      "display": "Nextcloud",
+      "storeName": "Nextcloud",
+      "segment": "both",
+      "jobs": [
+        "files"
+      ],
+      "mayDescribeAs": "file hosting and sync on your own server",
+      "replacesPerCatalogue": [
+        "Google Drive",
+        "Dropbox",
+        "OneDrive",
+        "iCloud"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "data",
+      "caveats": [
+        "Away-from-home sync is a remote-access claim (held)."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/nextcloud/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "syncthing",
+      "display": "Syncthing",
+      "storeName": "Syncthing",
+      "segment": "consumer",
+      "jobs": [
+        "files"
+      ],
+      "mayDescribeAs": "keeps folders in sync between your devices, peer to peer",
+      "replacesPerCatalogue": [
+        "Dropbox",
+        "Resilio Sync"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Peer-to-peer sync across the internet is a remote-access claim; keep to the home network."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/syncthing/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "jellyfin",
+      "display": "Jellyfin",
+      "storeName": "Jellyfin",
+      "segment": "consumer",
+      "jobs": [
+        "tv",
+        "media"
+      ],
+      "mayDescribeAs": "streams the movies, TV and music you already have to the devices in your home",
+      "replacesPerCatalogue": [
+        "Plex",
+        "Netflix"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Your own library only. Do not imply streaming-service content, and never imply pirated content."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/jellyfin/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "navidrome",
+      "display": "Navidrome",
+      "storeName": "Navidrome",
+      "segment": "consumer",
+      "jobs": [
+        "music"
+      ],
+      "mayDescribeAs": "serves your own music collection to your devices",
+      "replacesPerCatalogue": [
+        "Spotify",
+        "Apple Music"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Your own collection only."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/navidrome/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "audiobookshelf",
+      "display": "Audiobookshelf",
+      "storeName": "Audiobookshelf",
+      "segment": "consumer",
+      "jobs": [
+        "books"
+      ],
+      "mayDescribeAs": "organises audiobooks and podcasts and remembers where each listener stopped",
+      "replacesPerCatalogue": [
+        "Audible",
+        "Apple Podcasts"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Per-user progress is this app's feature."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/audiobookshelf/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "koodo-reader",
+      "display": "Koodo Reader",
+      "storeName": "Koodo Reader",
+      "segment": "consumer",
+      "jobs": [
+        "books"
+      ],
+      "mayDescribeAs": "an ebook reader in your browser with notes and highlights, and a library on your Core",
+      "replacesPerCatalogue": [
+        "Amazon Kindle",
+        "Apple Books"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "media",
+      "caveats": [
+        "Instead of Kindle / Apple Books per the catalogue; do not say it reads DRM-protected store purchases."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/koodo-reader/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "mealie",
+      "display": "Mealie",
+      "storeName": "Mealie",
+      "segment": "consumer",
+      "jobs": [
+        "food"
+      ],
+      "mayDescribeAs": "a recipe manager, meal planner and shopping list; paste a recipe URL and it fetches the ingredients and steps",
+      "replacesPerCatalogue": [
+        "Paprika",
+        "AnyList"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Fetching a recipe URL uses the internet."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/mealie/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "grocy",
+      "display": "Grocy",
+      "storeName": "Grocy",
+      "segment": "consumer",
+      "jobs": [
+        "food",
+        "home"
+      ],
+      "mayDescribeAs": "tracks pantry stock, shopping lists, recipes, chores and household habits",
+      "replacesPerCatalogue": [
+        "AnyList",
+        "OurGroceries"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/grocy/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "spliit",
+      "display": "Spliit",
+      "storeName": "Spliit",
+      "segment": "consumer",
+      "jobs": [
+        "money",
+        "home"
+      ],
+      "mayDescribeAs": "splits shared expenses among friends, housemates and family and shows who owes whom",
+      "replacesPerCatalogue": [
+        "Splitwise",
+        "Tricount"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "finance",
+      "caveats": [
+        "It does not move money."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/spliit/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "wallos",
+      "display": "Wallos",
+      "storeName": "Wallos",
+      "segment": "consumer",
+      "jobs": [
+        "money"
+      ],
+      "mayDescribeAs": "tracks the subscriptions you still pay for",
+      "replacesPerCatalogue": [
+        "Rocket Money",
+        "YNAB"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "finance",
+      "caveats": [
+        "No savings promise, no \"cancels for you\"."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/wallos/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "actual",
+      "display": "Actual Budget",
+      "storeName": "Actual Budget",
+      "segment": "consumer",
+      "jobs": [
+        "money"
+      ],
+      "mayDescribeAs": "local-first personal budgeting",
+      "replacesPerCatalogue": [
+        "YNAB",
+        "Mint",
+        "Monarch Money"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "No financial advice; no bank-sync claim."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/actual/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "fireflyiii",
+      "display": "Firefly III",
+      "storeName": "Firefly III",
+      "segment": "consumer",
+      "jobs": [
+        "money"
+      ],
+      "mayDescribeAs": "a personal finance manager for budgets, bills and net worth",
+      "replacesPerCatalogue": [
+        "Mint",
+        "YNAB"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "No financial advice."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/fireflyiii/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "wger",
+      "display": "wger",
+      "storeName": "wger",
+      "segment": "consumer",
+      "jobs": [
+        "fitness"
+      ],
+      "mayDescribeAs": "a fitness, workout and nutrition tracker",
+      "replacesPerCatalogue": [
+        "MyFitnessPal"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Record-keeping only. No medical or weight-loss claim."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/wger/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "homebox",
+      "display": "HomeBox",
+      "storeName": "HomeBox",
+      "segment": "consumer",
+      "jobs": [
+        "home"
+      ],
+      "mayDescribeAs": "a home inventory: items, locations, categories and photos",
+      "replacesPerCatalogue": [
+        "Sortly"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Do not say it tracks warranties unless the listing is re-read (the manifest text was cut)."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/homebox/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "vikunja",
+      "display": "Vikunja",
+      "storeName": "Vikunja",
+      "segment": "both",
+      "jobs": [
+        "tasks"
+      ],
+      "mayDescribeAs": "a to-do app with list, Kanban, Gantt and table views, shared with teammates or family",
+      "replacesPerCatalogue": [
+        "Todoist",
+        "Asana"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/vikunja/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "joplin",
+      "display": "Joplin Server",
+      "storeName": "Joplin Server",
+      "segment": "consumer",
+      "jobs": [
+        "notes"
+      ],
+      "mayDescribeAs": "private note taking with sync",
+      "replacesPerCatalogue": [
+        "Evernote"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/joplin/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "logseq",
+      "display": "Logseq",
+      "storeName": "Logseq",
+      "segment": "consumer",
+      "jobs": [
+        "notes"
+      ],
+      "mayDescribeAs": "a notes app built on plain-text Markdown files on your own disk",
+      "replacesPerCatalogue": [
+        "Notion"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [
+        "Say \"notes\", not \"knowledge base\", in our own voice."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/logseq/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "adventurelog",
+      "display": "AdventureLog",
+      "storeName": "AdventureLog",
+      "segment": "consumer",
+      "jobs": [
+        "travel"
+      ],
+      "mayDescribeAs": "a self-hostable travel tracker and trip planner",
+      "replacesPerCatalogue": [
+        "Polarsteps",
+        "TripIt",
+        "Wanderlog"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/adventurelog/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "excalidraw",
+      "display": "Excalidraw",
+      "storeName": "Excalidraw",
+      "segment": "both",
+      "jobs": [
+        "whiteboard"
+      ],
+      "mayDescribeAs": "a hand-drawn style virtual whiteboard for diagrams and sketches",
+      "replacesPerCatalogue": [
+        "Miro",
+        "Mural"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "media",
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/excalidraw/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "searxng",
+      "display": "SearXNG",
+      "storeName": "SearXNG",
+      "segment": "consumer",
+      "jobs": [
+        "search"
+      ],
+      "mayDescribeAs": "a metasearch engine that aggregates results from other search services without tracking or profiling its users",
+      "replacesPerCatalogue": [
+        "Google Search",
+        "Bing"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [
+        "Queries still go to the upstream engines. Do not say \"private search nobody sees\"."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/searxng/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "element",
+      "display": "Element",
+      "storeName": "Element",
+      "segment": "consumer",
+      "jobs": [
+        "chat"
+      ],
+      "mayDescribeAs": "a Matrix chat app you can connect to a Synapse server on your Core",
+      "replacesPerCatalogue": [
+        "Slack",
+        "Discord"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "social",
+      "caveats": [
+        "Chatting with people outside the house is a remote-access claim (held)."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/element/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "synapse",
+      "display": "Synapse",
+      "storeName": "Synapse",
+      "segment": "consumer",
+      "jobs": [
+        "chat"
+      ],
+      "mayDescribeAs": "a Matrix chat server for owning your real-time chat history",
+      "replacesPerCatalogue": [
+        "Slack",
+        "Discord"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Pair with Element. Same remote-access hold."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/synapse/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "mattermost",
+      "display": "Mattermost",
+      "storeName": "Mattermost",
+      "segment": "smb",
+      "jobs": [
+        "chat"
+      ],
+      "mayDescribeAs": "team chat on your own server",
+      "replacesPerCatalogue": [
+        "Slack",
+        "Discord"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "social",
+      "caveats": [
+        "Instead of Slack per the catalogue."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/mattermost/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "jitsi",
+      "display": "Jitsi Meet",
+      "storeName": "Jitsi Meet",
+      "segment": "both",
+      "jobs": [
+        "calls"
+      ],
+      "mayDescribeAs": "video conferences on your own server",
+      "replacesPerCatalogue": [
+        "Zoom",
+        "Microsoft Teams"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "social",
+      "caveats": [
+        "Calls with people outside the house need the server reachable from the internet, which is held. Keep calls between rooms of the house or say nothing about guests."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/jitsi/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "n8n",
+      "display": "n8n",
+      "storeName": "n8n",
+      "segment": "smb",
+      "jobs": [
+        "automation"
+      ],
+      "mayDescribeAs": "workflow automation: connect steps and apps into flows",
+      "replacesPerCatalogue": [
+        "Zapier",
+        "Make"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "automation",
+      "caveats": [
+        "Do not repeat \"400+ integrations\"; many call cloud services."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/n8n/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "open-webui",
+      "display": "Open WebUI",
+      "storeName": "Open WebUI",
+      "segment": "both",
+      "jobs": [
+        "chat",
+        "models"
+      ],
+      "mayDescribeAs": "chat with models running on your own device through Ollama, vLLM or Lemonade",
+      "replacesPerCatalogue": [
+        "ChatGPT",
+        "Claude"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "ai",
+      "caveats": [
+        "It can also connect to cloud models; show only the local path."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/open-webui/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "anything-llm",
+      "display": "AnythingLLM",
+      "storeName": "AnythingLLM",
+      "segment": "both",
+      "jobs": [
+        "chat",
+        "documents"
+      ],
+      "mayDescribeAs": "chat with your own documents using a local model",
+      "replacesPerCatalogue": [
+        "ChatGPT",
+        "Claude"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "ai",
+      "caveats": [
+        "It can also connect to cloud models; show only the local path."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/anything-llm/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "ollama",
+      "display": "Ollama",
+      "storeName": "Ollama",
+      "segment": "both",
+      "jobs": [
+        "models"
+      ],
+      "mayDescribeAs": "runs open-weight language models on your own machine",
+      "replacesPerCatalogue": [
+        "OpenAI",
+        "ChatGPT"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Name no model."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/ollama/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "odoo",
+      "display": "Odoo",
+      "storeName": "Odoo",
+      "segment": "smb",
+      "jobs": [
+        "crm",
+        "erp"
+      ],
+      "mayDescribeAs": "a business suite on one platform",
+      "replacesPerCatalogue": [
+        "Salesforce"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "data",
+      "caveats": [
+        "The listing is one line long; say little."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/odoo/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "twenty",
+      "display": "Twenty",
+      "storeName": "Twenty",
+      "segment": "smb",
+      "jobs": [
+        "crm"
+      ],
+      "mayDescribeAs": "a CRM for managing customer relationships",
+      "replacesPerCatalogue": [
+        "Salesforce"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "data",
+      "caveats": [
+        "Instead of Salesforce per the catalogue."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/twenty/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "espocrm",
+      "display": "EspoCRM",
+      "storeName": "EspoCRM",
+      "segment": "smb",
+      "jobs": [
+        "crm"
+      ],
+      "mayDescribeAs": "an open-source CRM for contacts, sales pipelines and support cases",
+      "replacesPerCatalogue": [
+        "Salesforce"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "data",
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/espocrm/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "invoice-ninja",
+      "display": "Invoice Ninja",
+      "storeName": "Invoice Ninja",
+      "segment": "smb",
+      "jobs": [
+        "invoicing"
+      ],
+      "mayDescribeAs": "invoices, quotes, expenses and time tracking",
+      "replacesPerCatalogue": [
+        "FreshBooks",
+        "QuickBooks"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Taking card payments uses third-party payment gateways; claim no private payments."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/invoice-ninja/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "akaunting",
+      "display": "Akaunting",
+      "storeName": "Akaunting",
+      "segment": "smb",
+      "jobs": [
+        "accounting"
+      ],
+      "mayDescribeAs": "accounting, invoicing and expense tracking for small businesses",
+      "replacesPerCatalogue": [
+        "QuickBooks",
+        "Xero",
+        "FreshBooks"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "No tax or accounting-advice claim."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/akaunting/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "kimai",
+      "display": "Kimai",
+      "storeName": "Kimai",
+      "segment": "smb",
+      "jobs": [
+        "time"
+      ],
+      "mayDescribeAs": "time tracking for freelancers and project teams",
+      "replacesPerCatalogue": [],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/kimai/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "chatwoot",
+      "display": "Chatwoot",
+      "storeName": "Chatwoot",
+      "segment": "smb",
+      "jobs": [
+        "support"
+      ],
+      "mayDescribeAs": "a shared inbox for customer support",
+      "replacesPerCatalogue": [
+        "Intercom",
+        "Zendesk"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "social",
+      "caveats": [
+        "Website live chat and messaging channels reach customers outside the house; that is a remote-access claim (held). Use the shared inbox only."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/chatwoot/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "docuseal",
+      "display": "DocuSeal",
+      "storeName": "Docuseal",
+      "segment": "smb",
+      "jobs": [
+        "esign"
+      ],
+      "mayDescribeAs": "fill and sign PDF forms online",
+      "replacesPerCatalogue": [
+        "DocuSign"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [
+        "No claim that a signature is legally valid."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/docuseal/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "documenso",
+      "display": "Documenso",
+      "storeName": "Documenso",
+      "segment": "smb",
+      "jobs": [
+        "esign"
+      ],
+      "mayDescribeAs": "open-source document signing",
+      "replacesPerCatalogue": [
+        "DocuSign"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [
+        "Same."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/documenso/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "stirling-pdf",
+      "display": "Stirling PDF",
+      "storeName": "Stirling-PDF",
+      "segment": "both",
+      "jobs": [
+        "pdf"
+      ],
+      "mayDescribeAs": "a locally hosted tool to split, merge, convert, rotate and compress PDFs",
+      "replacesPerCatalogue": [
+        "Adobe Acrobat",
+        "Smallpdf"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/stirling-pdf/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "listmonk",
+      "display": "Listmonk",
+      "storeName": "Listmonk",
+      "segment": "smb",
+      "jobs": [
+        "newsletter"
+      ],
+      "mayDescribeAs": "a self-hosted newsletter and mailing list manager",
+      "replacesPerCatalogue": [
+        "Mailchimp",
+        "ConvertKit"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "social",
+      "caveats": [
+        "Sending reaches inboxes through an outgoing mail provider; do not claim a private send."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/listmonk/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "keila",
+      "display": "Keila",
+      "storeName": "Keila",
+      "segment": "smb",
+      "jobs": [
+        "newsletter"
+      ],
+      "mayDescribeAs": "an open-source newsletter and email campaign tool",
+      "replacesPerCatalogue": [
+        "Mailchimp",
+        "ConvertKit"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "social",
+      "caveats": [
+        "Same."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/keila/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "plausible",
+      "display": "Plausible Analytics",
+      "storeName": "Plausible Analytics",
+      "segment": "smb",
+      "jobs": [
+        "analytics"
+      ],
+      "mayDescribeAs": "lightweight web analytics",
+      "replacesPerCatalogue": [
+        "Google Analytics"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "data",
+      "caveats": [
+        "Needs a public website, which is held. Do NOT repeat the listing's GDPR/CCPA/PECR wording."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/plausible/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "umami",
+      "display": "Umami",
+      "storeName": "Umami",
+      "segment": "smb",
+      "jobs": [
+        "analytics"
+      ],
+      "mayDescribeAs": "simple web analytics that keeps visitor data on your server",
+      "replacesPerCatalogue": [
+        "Google Analytics"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "data",
+      "caveats": [
+        "Needs a public website (held)."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/umami/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "ghost",
+      "display": "Ghost",
+      "storeName": "Ghost",
+      "segment": "smb",
+      "jobs": [
+        "web",
+        "newsletter"
+      ],
+      "mayDescribeAs": "a publishing platform for blogs and newsletters",
+      "replacesPerCatalogue": [
+        "Squarespace",
+        "Wix",
+        "Medium",
+        "Mailchimp",
+        "ConvertKit"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "social",
+      "caveats": [
+        "Publishing to the public needs remote access (held). Use for drafting or an internal site only."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/ghost/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "wordpress",
+      "display": "WordPress",
+      "storeName": "WordPress",
+      "segment": "smb",
+      "jobs": [
+        "web"
+      ],
+      "mayDescribeAs": "a content management system for websites and blogs",
+      "replacesPerCatalogue": [
+        "Squarespace",
+        "Wix",
+        "Medium"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "social",
+      "caveats": [
+        "Same hold."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/wordpress/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "medusa",
+      "display": "Medusa",
+      "storeName": "Medusa",
+      "segment": "smb",
+      "jobs": [
+        "commerce"
+      ],
+      "mayDescribeAs": "a headless commerce platform for carts, orders, payments and fulfilment",
+      "replacesPerCatalogue": [
+        "Shopify"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "finance",
+      "caveats": [
+        "Developer-oriented; needs a storefront built on top. Payments use third-party gateways. Prefer Invoice Ninja for a small shop story."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/medusa/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "penpot",
+      "display": "Penpot",
+      "storeName": "Penpot",
+      "segment": "smb",
+      "jobs": [
+        "design"
+      ],
+      "mayDescribeAs": "design and prototyping in the browser",
+      "replacesPerCatalogue": [
+        "Figma",
+        "Sketch"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "media",
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/penpot/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "opencut",
+      "display": "OpenCut",
+      "storeName": "OpenCut",
+      "segment": "both",
+      "jobs": [
+        "video"
+      ],
+      "mayDescribeAs": "a browser video editor whose footage stays in browser storage on your own machine",
+      "replacesPerCatalogue": [
+        "CapCut",
+        "Clipchamp"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "media",
+      "caveats": [
+        "Instead of CapCut per the catalogue."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/opencut/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "uptime-kuma",
+      "display": "Uptime Kuma",
+      "storeName": "Uptime Kuma",
+      "segment": "smb",
+      "jobs": [
+        "monitoring"
+      ],
+      "mayDescribeAs": "a self-hosted uptime monitor",
+      "replacesPerCatalogue": [
+        "Datadog",
+        "New Relic"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "development",
+      "caveats": [
+        "Monitors targets; does not prevent outages."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/uptime-kuma/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "docmost",
+      "display": "Docmost",
+      "storeName": "Docmost",
+      "segment": "smb",
+      "jobs": [
+        "wiki"
+      ],
+      "mayDescribeAs": "a collaborative wiki and documentation platform",
+      "replacesPerCatalogue": [
+        "Confluence",
+        "Notion"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/docmost/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "bookstack",
+      "display": "BookStack",
+      "storeName": "BookStack",
+      "segment": "smb",
+      "jobs": [
+        "wiki"
+      ],
+      "mayDescribeAs": "a wiki with a book, chapter and page structure",
+      "replacesPerCatalogue": [
+        "Confluence",
+        "Notion"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/bookstack/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "farmos",
+      "display": "farmOS",
+      "storeName": "farmOS",
+      "segment": "smb",
+      "jobs": [
+        "farm"
+      ],
+      "mayDescribeAs": "farm management, planning and record keeping",
+      "replacesPerCatalogue": [
+        "Granular"
+      ],
+      "inAlternativesTable": false,
+      "alternativesCategory": null,
+      "caveats": [
+        "Record keeping only."
+      ],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/farmos/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "libreoffice",
+      "display": "LibreOffice",
+      "storeName": "LibreOffice",
+      "segment": "both",
+      "jobs": [
+        "office"
+      ],
+      "mayDescribeAs": "an office suite for documents, spreadsheets and slides",
+      "replacesPerCatalogue": [
+        "Microsoft Office",
+        "Google Workspace"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/libreoffice/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "onlyoffice",
+      "display": "ONLYOFFICE",
+      "storeName": "ONLYOFFICE Desktop Editors",
+      "segment": "smb",
+      "jobs": [
+        "office"
+      ],
+      "mayDescribeAs": "an office suite in your browser",
+      "replacesPerCatalogue": [
+        "Microsoft Office",
+        "Google Workspace"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/onlyoffice/config.json @ dev 8b6c0ebd"
+    },
+    {
+      "id": "collabora-online",
+      "display": "Collabora Online",
+      "storeName": "Collabora Online",
+      "segment": "smb",
+      "jobs": [
+        "office"
+      ],
+      "mayDescribeAs": "collaborative office documents on your server",
+      "replacesPerCatalogue": [
+        "Microsoft Office",
+        "Google Workspace"
+      ],
+      "inAlternativesTable": true,
+      "alternativesCategory": "utilities",
+      "caveats": [],
+      "available": true,
+      "source": "HUB/CI-Marketplace/apps/collabora-online/config.json @ dev 8b6c0ebd"
+    }
+  ],
+  "personaModel": {
+    "status": "Defined by r-facts. No user-facing agent persona exists in Companion Hub, the marketplace manifests or CI-Docs (see STORY-BIBLE 9).",
+    "fields": [
+      "member",
+      "agentName",
+      "job",
+      "personality",
+      "poweredBy",
+      "memoryUse",
+      "sampleCaption",
+      "limits"
+    ],
+    "rules": [
+      "The family gives the agent a name; that is story, not a product setting. Never say Hub has a persona or personality setting.",
+      "poweredBy is one or more of ci-hermes (messaging), ci-openclaw (browser automation and tool use), plus ci-memory for context.",
+      "job is one sentence naming tasks the listed apps can really do. personality is three plain words, shown as tone of the caption, never as a capability.",
+      "Captions describe the agent in the third person (\"Juniper files the school forms in Nextcloud\"). If a quoted agent line is shown it is labelled scripted and is short.",
+      "No agent acts without the person approving anything that costs money or reaches a third party.",
+      "No persona claims to remember \"everything\". It pulls from Companion Memory what that person connected, opt-in.",
+      "One household, one Core. Do not suggest isolation between people."
+    ]
+  },
+  "style": {
+    "note": "r-facts recommendations, not CI-Common canon. Tune with the narrator.",
+    "maxSentenceWords": 20,
+    "avgSentenceWordsTarget": 12,
+    "popupHeadlineMaxWords": 6,
+    "popupBodyMaxWords": 30,
+    "captionMaxCharsPerLine": 42,
+    "captionMaxLines": 2,
+    "ttsWordsPerMinute": 150,
+    "buttonCase": "sentence",
+    "headingCase": "sentence",
+    "productNounCase": "Title",
+    "secondPerson": true,
+    "signOff": "UnCloud your life.",
+    "contrast": {
+      "normalText": 4.5,
+      "largeText": 3,
+      "focusRingAndControls": 3,
+      "gate": "WCAG 2.1 AA (UI-STYLE-GUIDE 3.5)"
+    },
+    "fonts": "Manrope 400/500/600/700, bundled in assets/fonts (no Google Fonts request). Archivo Black for display only.",
+    "primary": {
+      "light": "#0a6358",
+      "dark": "#c5e8dc"
+    },
+    "motion": "Respect prefers-reduced-motion (UI-STYLE-GUIDE 10). Transitions <= 200 ms."
+  },
+  "publicNames": {
+    "sanctionedTaglines": [
+      "Your AI should answer to you.",
+      "UnCloud your life.",
+      "The AI That You Own",
+      "Uncloud Your Life"
+    ],
+    "note": "\"The AI That You Own\" is a house tagline (copy.json) and is used verbatim only; it does not license \"you own the apps\"."
+  }
+}

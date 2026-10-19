@@ -1,4 +1,4 @@
-// Visibility — what the editor and a shot show of a house: the wall modes (up / cutaway / down, and the Sims rule
+// Visibility — what the editor and a shot show of a house: the wall modes (up / cutaway / down, and the rule
 // that cuts per wall, per frame), the roof and ceiling registries and the shot's roof fade, the floor-layer filter,
 // the shotHidden() and shotPose() hooks, and the isometric camera's placement.
 //
@@ -74,7 +74,7 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
     applyWallModeToMesh(obj, wallMode());
   }
 
-  // Roofs are hidden unless walls are fully up (Sims-style cutaway removes the roof).
+  // Roofs are hidden unless walls are fully up (a per-wall cutaway removes the roof).
   const trackedRoofs = [];
   // Ceilings (one per storey with nothing above it) show with the roofs in 'up' mode; during a shot each is
   // visible only while the eye is below it, so a descent from above never lands on it.
@@ -104,7 +104,7 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
 
   // mode: 'up' | 'cutaway' | 'down' — the editor's global modes, where 'cutaway' means the south/east/
   // partition convention — or 'cut' | 'keep', where the caller has already decided about THIS wall (the
-  // Sims rule below picks them per wall, per frame).
+  // the per-wall rule below picks them per wall, per frame).
   function applyWallModeToMesh(mesh, mode) {
     if (!mesh || !mesh.userData) return;
     const ori = mesh.userData.orientation;
@@ -173,7 +173,7 @@ export function createVisibility({ THREE, placedItems, FLOOR2_THRESHOLD, wallMod
     }
     return false;
   }
-  // ---- Sims rule ---------------------------------------------------------------------------------
+  // ---- per-wall rule ---------------------------------------------------------------------------------
   // A shot can dress its exterior walls the way the game does: cut only the walls the eye is actually
   // looking through. A wall is cut when the eye stands on its outward side AND either the eye is above
   // the cut line (looking down into the plan) or the shot is aimed at something indoors. Interior

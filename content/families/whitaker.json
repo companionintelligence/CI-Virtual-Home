@@ -1,0 +1,914 @@
+{
+  "schema": "family/v1",
+  "slug": "whitaker",
+  "house": "familyhome",
+  "fictional": true,
+  "family": {
+    "surname": "Whitaker",
+    "tagline": "Two parents, two small children and one Companion Core in a yellow house.",
+    "household": "young-family",
+    "business": true,
+    "story": "Hannah keeps the books for small local businesses at the dining table. Callum is at home with Alfie, who is one, and Nell, seven, asks her questions upstairs. One Companion Core holds the invoices, the photos and the shopping list.",
+    "address": {
+      "line": "17 Thistledown Row",
+      "place": "Cobblesby"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "hannah",
+      "name": "Hannah",
+      "age": 35,
+      "role": "parent",
+      "work": "self-employed bookkeeper",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Biscotti",
+        "runtime": "Hermes",
+        "job": "Drafts payment reminders to Hannah's clients from the details she gives it.",
+        "personality": [
+          "cheerful",
+          "curious",
+          "tidy"
+        ],
+        "voice": "v-bright-f",
+        "memory": false,
+        "limits": "Drafts only. Hannah reads and sends every message herself."
+      }
+    },
+    {
+      "id": "callum",
+      "name": "Callum",
+      "age": 37,
+      "role": "parent",
+      "work": "at home with Alfie",
+      "colour": "chart-2",
+      "archetype": "host",
+      "companion": {
+        "name": "Mallow",
+        "runtime": "Hermes",
+        "job": "Drafts the invitations and notes Callum sends to family and friends.",
+        "personality": [
+          "gentle",
+          "bright",
+          "unhurried"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Drafts only. Callum reads every message and sends it himself."
+      }
+    },
+    {
+      "id": "nell",
+      "name": "Nell",
+      "age": 7,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-3",
+      "archetype": "learner"
+    },
+    {
+      "id": "alfie",
+      "name": "Alfie",
+      "age": 1,
+      "role": "baby",
+      "colour": "chart-4"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Callum in the kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "Hannah at the dining table"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Nell and Alfie upstairs"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Callum brings the Core inside",
+        "body": "Callum climbs the front steps with a parcel under one arm and Alfie on the other. It holds the new Companion Core."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Nell reads the guide aloud",
+        "body": "Inside are the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Nell reads the guide aloud while Hannah lifts out the Core."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Nell presses the button",
+        "body": "Hannah plugs it in and Nell presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Hannah joins it from her phone",
+        "body": "Hannah opens the Wi-Fi settings on her phone and joins the Core's own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "paperless",
+        "kitchenowl"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "The family picks its first apps",
+        "body": "In the Companion Hub store, Hannah picks Hermes, and the family adds Paperless-ngx and KitchenOwl. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Paperless-ngx, KitchenOwl"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "hannah",
+      "agent": "hannah",
+      "approval": "hannah",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that runs on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Biscotti says hello",
+        "body": "Hannah messages the agent she named Biscotti, and Biscotti answers from the Core in the living room.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "hannah",
+        "text": "Hello, Hannah. I am Biscotti. Where shall we begin?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-week",
+      "chapter": "living",
+      "member": "hannah",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Monday coffee settles the week",
+        "body": "Over Monday coffee on the sofa, Hannah and Callum sort the week. Yuvomi gives the household one calendar and one task board, so both parents see the same plans.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "living-photos",
+      "chapter": "living",
+      "member": "callum",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Alfie walks to the loveseat",
+        "body": "Alfie takes his first steps across the rug while Callum films. The clip backs up to Immich on the Core, not to a photo cloud.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-pdf",
+      "chapter": "living",
+      "member": "hannah",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "crib",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 1
+          },
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Hannah splits a year into months",
+        "body": "While Alfie naps in the crib, Hannah splits a client's bank statements into months. Stirling-PDF cuts the file on the Core, so she can send just one month.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "callum",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Nell calls out bananas",
+        "body": "At the breakfast bar, Nell calls out for bananas, and Callum adds them. Everyone at home adds to the same KitchenOwl list, kept on the Core.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-vault",
+      "chapter": "kitchen",
+      "member": "hannah",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host; works with the Bitwarden apps",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Hannah finds the dentist's password",
+        "body": "Callum cannot remember the password for the dentist's website. Hannah finds it in the family's VaultWarden vault on the Core, through the Bitwarden apps on her phone.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-lunch",
+      "chapter": "kitchen",
+      "member": "callum",
+      "agent": "callum",
+      "approval": "callum",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that runs on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mallow drafts, Callum sends",
+        "body": "While the pasta water heats, Callum tells Mallow the plan for Sunday lunch. Mallow drafts the invitation to his parents, and Callum reads it and sends it himself.",
+        "chips": [
+          "Hermes"
+        ]
+      },
+      "say": {
+        "speaker": "callum",
+        "text": "Here is the invitation. Please read it before you send it."
+      }
+    },
+    {
+      "id": "kitchen-meals",
+      "chapter": "kitchen",
+      "member": "callum",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner for the household",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Alfie's first foods get a page",
+        "body": "Callum saves a mashed carrot recipe for Alfie in KitchenOwl and adds it to the week's meals. Then he adds the carrots to the shared list for whoever shops next.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "dining-invoice",
+      "chapter": "dining",
+      "member": "hannah",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Hannah invoices the bakery",
+        "body": "Hannah keeps books for small shops. At the trestle table she raises her invoice to a bakery client, in Akaunting on the Core.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "dining-reminder",
+      "chapter": "dining",
+      "member": "hannah",
+      "agent": "hannah",
+      "approval": "hannah",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that runs on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Biscotti drafts three reminders",
+        "body": "Three clients are late paying. Hannah gives Biscotti the amounts, and Biscotti drafts a reminder for each. Hannah reads them and sends each herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "hannah",
+        "text": "The reminders are drafted. Please check each amount, then send them."
+      }
+    },
+    {
+      "id": "dining-receipt",
+      "chapter": "dining",
+      "member": "callum",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "room",
+        "room": "dining"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left"
+      },
+      "popup": {
+        "title": "The missing receipt turns up",
+        "body": "Hannah needs a florist's receipt, and Callum finds it by searching the shop's name in Paperless-ngx. He scanned it on Tuesday, and the scans stay on the Core by default.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "dining-folder",
+      "chapter": "dining",
+      "member": "hannah",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "room",
+        "room": "dining"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "A client asks for a month",
+        "body": "A client asks for last March's statements again. Hannah opens the client's Nextcloud folder. The split months sit in order on the Core, not in a rented drive.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "dining-quarter",
+      "chapter": "dining",
+      "member": "hannah",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "capability": "the LibreOffice suite in your browser",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Hannah writes while Nell colours",
+        "body": "Nell colours at the trestle table while Hannah writes a client's quarterly summary in LibreOffice. The draft is a file on the Core until Hannah sends it.",
+        "chips": [
+          "LibreOffice",
+          "replaces Microsoft Office"
+        ]
+      }
+    },
+    {
+      "id": "garden-bed",
+      "chapter": "garden",
+      "member": "nell",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Nell finds the first strawberry",
+        "body": "On Saturday, Nell finds the first strawberry in the raised bed. Callum photographs it and dates it in HortusFox, whose plant journal sits on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-fan",
+      "chapter": "garden",
+      "member": "callum",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "garden",
+        "nth": 4
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Callum gives the greenhouse a rule",
+        "body": "On warm mornings the greenhouse heats up, so Callum sets a rule: its fan starts at ten. Home Assistant runs the rule from the Core and needs no cloud account.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "kids-lookup",
+      "chapter": "kids",
+      "member": "nell",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nell asks how a rainbow forms",
+        "body": "Nell sees a rainbow and asks how it forms. Callum looks it up with her in Kiwix. Its Wikipedia file was downloaded once, so no search engine hears her ask.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-story",
+      "chapter": "kids",
+      "member": "nell",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser; your library lives on your Core",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "kids",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Nell reads to her teddy bear",
+        "body": "On Sunday morning, Nell reads a chapter to her teddy bear. Koodo Reader keeps the family's ebooks on the Core, and it saves her place in the chapter.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "kids-lullaby",
+      "chapter": "kids",
+      "member": "alfie",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "crib",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nell picks Alfie's nap song",
+        "body": "Before Alfie's nap, Nell picks a song and Callum plays it beside the crib. Navidrome sends the family's own music from the Core to Callum's phone.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A yellow house with one Core",
+        "body": "Hannah's books, Nell's questions and Alfie's first steps share one Companion Core in the yellow house."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your invoices, photos, shopping lists and family books can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Hannah keeps books for small clients: the Akaunting beat gives no accounting, tax or legal advice (catalog caveat). No beat presents anyone as a customer.",
+    "This house has no office, no study and no TV. Hannah sits at the Dining Room trestle table; the media beat at the couch is Immich; no beat says TV or screen.",
+    "Alfie is a baby with no archetype and no companion. The validator wants one beat for any member under 13, so kids-lullaby carries member alfie; Callum acts in it.",
+    "The Living Room has a crib, a sofa and a loveseat (couch nth 0 and 1). The Nursery crib is crib in kids nth 0; Playroom is also a kids room, so rooms in kids nth 2 is the Nursery.",
+    "Both companions are Hermes. The chat-service note rides on ftue-hello. Hannah and Callum read and send every message themselves. Companion Memory is not named.",
+    "The greenhouse has no anchor role of its own; garden-fan uses the garden bed nearest it (nth 4). HortusFox and Home Assistant both have QA screenshots; no review items expected."
+  ]
+}

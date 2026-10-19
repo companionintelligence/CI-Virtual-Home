@@ -1,0 +1,865 @@
+{
+  "schema": "family/v1",
+  "slug": "whitlock-mensah",
+  "house": "epiphany",
+  "fictional": true,
+  "family": {
+    "surname": "Whitlock-Mensah",
+    "tagline": "Gardens by day, violin in the evening, quotes on the Core.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Kwame designs and builds gardens, and his crew starts at seven. Imogen teaches violin in the lounge in the evenings. The jobs, the quotes and the lesson calendar all live in one house.",
+    "address": {
+      "line": "140 Alder Furrow Way",
+      "place": "Kestrel Hollow"
+    },
+    "narrator": "v-deep-m"
+  },
+  "members": [
+    {
+      "id": "kwame",
+      "name": "Kwame",
+      "age": 46,
+      "role": "partner",
+      "work": "landscape designer and owner",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Efua",
+        "runtime": "Hermes",
+        "job": "Drafts quotes and client emails from the site notes Kwame texts it.",
+        "personality": [
+          "warm",
+          "patient",
+          "sharp"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Kwame reads and sends every quote."
+      }
+    },
+    {
+      "id": "imogen",
+      "name": "Imogen",
+      "age": 44,
+      "role": "partner",
+      "work": "violin teacher",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Corin",
+        "runtime": "OpenClaw",
+        "job": "Opens AudioMass in its own browser and trims the practice recording Imogen names.",
+        "personality": [
+          "quick",
+          "wry",
+          "bright"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Trims a copy. Imogen keeps the original."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Before seven, the kitchen"
+    },
+    {
+      "id": "garage",
+      "kind": "room",
+      "room": "garage",
+      "title": "The garage at seven"
+    },
+    {
+      "id": "den",
+      "kind": "room",
+      "room": "office",
+      "title": "The Den, mid-morning"
+    },
+    {
+      "id": "lounge",
+      "kind": "room",
+      "room": "living",
+      "title": "The lounge after lessons"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The back garden at dusk"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel for the farthest room",
+        "body": "The Den is the farthest room from the front door. Kwame carries the parcel there anyway, past the stair hall, the dining room and the kitchen."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "What is in the parcel",
+        "body": "Imogen unpacks four things: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core's footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Kwame plugs the cable in beside his laptop and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Imogen joins the Core's own network from her phone. Then she chooses the home network and types its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "twenty",
+        "planka",
+        "navidrome"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Kwame picks Hermes and Imogen picks OpenClaw. They add Twenty, Planka and Navidrome. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Twenty, Planka, Navidrome"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "kwame",
+      "agent": "kwame",
+      "approval": "kwame",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Efua says good morning",
+        "body": "Kwame texts the agent he named Efua. She answers before the coffee cools, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "kwame",
+        "text": "Morning, Kwame. I am Efua. What is first?"
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-board",
+      "chapter": "kitchen",
+      "member": "kwame",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "planka",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "capability": "a real-time Kanban board for a team or a family project",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The week's jobs, with coffee",
+        "body": "Before seven, Kwame sets the week's jobs on a Planka board. The crew reads it at the kitchen island, coffee in hand.",
+        "chips": [
+          "Planka",
+          "replaces Trello"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "member": "imogen",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A rainy day, a hungry crew",
+        "body": "Rain stops the work, so the crew stays for lunch. Imogen checks the pantry list in Grocy and adds what the cupboards lack.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "garage-lights",
+      "chapter": "garage",
+      "member": "kwame",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "Lights on before the crew",
+        "body": "At six-thirty the garage lights come on from a Home Assistant schedule. The Core runs the schedule and reaches the lights over the home Wi-Fi.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "garage-hours",
+      "chapter": "garage",
+      "member": "kwame",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "kimai",
+        "replaces": []
+      },
+      "capability": "track time per project and client, with reports",
+      "anchor": {
+        "role": "counter",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Hours by job, not by guess",
+        "body": "As the trucks leave, Kwame starts a Kimai timer for each job. At the end of the week the report shows the hours per job.",
+        "chips": [
+          "Kimai"
+        ]
+      }
+    },
+    {
+      "id": "garage-photos",
+      "chapter": "garage",
+      "member": "kwame",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "photoprism",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "browse and share your photo library, with automatic tagging, without uploading it anywhere",
+      "anchor": {
+        "role": "counter",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Site photos, filed on the Core",
+        "body": "At day's end the crew's site photos go into PhotoPrism over the home Wi-Fi. It tags them automatically, and Kwame finds a job by its pictures.",
+        "chips": [
+          "PhotoPrism",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "den-leads",
+      "chapter": "den",
+      "member": "kwame",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "core",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A new client, filed before lunch",
+        "body": "A client calls about a hedge and a patio. Kwame adds the address and the site notes to Twenty, the CRM on the Core, before he forgets.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      }
+    },
+    {
+      "id": "den-quote",
+      "chapter": "den",
+      "member": "kwame",
+      "agent": "kwame",
+      "approval": "kwame",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Efua drafts the quote",
+        "body": "Kwame texts Efua the site measurements. Efua drafts the quote. Kwame checks every line and sends it himself."
+      },
+      "say": {
+        "speaker": "kwame",
+        "text": "Here is the draft quote. Please check each line."
+      },
+      "film": true
+    },
+    {
+      "id": "den-invoice",
+      "chapter": "den",
+      "member": "kwame",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "invoice-ninja",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "send invoices and quotes, track expenses and time",
+      "anchor": {
+        "role": "core",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "The quote becomes an invoice",
+        "body": "When the patio is finished, Kwame turns the accepted quote into an invoice in Invoice Ninja. He tracks the expenses beside it.",
+        "chips": [
+          "Invoice Ninja",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "den-vault",
+      "chapter": "den",
+      "member": "kwame",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host; works with the Bitwarden apps",
+      "anchor": {
+        "role": "core",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Sign-ins stay on the Core",
+        "body": "Supplier and client sign-ins live in a VaultWarden vault on the Core. Kwame reaches it from his phone with the Bitwarden apps, over the home Wi-Fi.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "lounge-calendar",
+      "chapter": "lounge",
+      "member": "imogen",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "a small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Lesson calendar, kept at home",
+        "body": "Imogen keeps her lesson calendar and her students' contacts in Baikal. Her phone and her laptop read the same calendar from the Core.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      }
+    },
+    {
+      "id": "lounge-handout",
+      "chapter": "lounge",
+      "member": "imogen",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "bentopdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "a PDF toolkit that runs in your browser; nothing is uploaded",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Two pieces, one handout",
+        "body": "Imogen merges two scores into one handout with BentoPDF. It runs in her browser, and nothing is uploaded.",
+        "chips": [
+          "BentoPDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "lounge-notes",
+      "chapter": "lounge",
+      "member": "imogen",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "logseq",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "write notes and a daily journal in plain Markdown files",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Lesson notes in plain files",
+        "body": "Imogen writes each student's lesson notes in Logseq, as plain Markdown files on the Core. Next week's page opens beside the last one.",
+        "chips": [
+          "Logseq",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "lounge-trim",
+      "chapter": "lounge",
+      "member": "imogen",
+      "agent": "imogen",
+      "approval": "imogen",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "Adobe Audition"
+        ]
+      },
+      "capability": "edit audio in a browser tab: cut, fade, normalise, export",
+      "anchor": {
+        "role": "music",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Corin trims the practice run",
+        "body": "Imogen names her latest practice recording. Corin opens AudioMass in its own browser and trims the silence from a copy. Imogen keeps the original.",
+        "chips": [
+          "AudioMass",
+          "replaces Adobe Audition"
+        ]
+      },
+      "say": {
+        "speaker": "imogen",
+        "text": "The copy is trimmed. The original is where you left it."
+      }
+    },
+    {
+      "id": "lounge-records",
+      "chapter": "lounge",
+      "member": "imogen",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "After lessons, her own music",
+        "body": "When the last student leaves, Imogen plays her own music from Navidrome. The lounge goes back to being a lounge.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-beds",
+      "chapter": "garden",
+      "member": "kwame",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The one job he never quoted",
+        "body": "Kwame logs his own garden in HortusFox. It is the one job he has never quoted.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-book",
+      "chapter": "garden",
+      "member": "kwame",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A book that keeps his place",
+        "body": "While the sprinkler runs, Kwame listens to a book about hedges in Audiobookshelf. It keeps his place when he goes back inside.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "garden-plan",
+      "chapter": "garden",
+      "member": "kwame",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A planting plan, drawn outside",
+        "body": "On the deck, Kwame draws a client's planting plan as vector line art in Inkscape. The drawing goes into the quote.",
+        "chips": [
+          "Inkscape",
+          "replaces Adobe Illustrator"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Two businesses, one Core",
+        "body": "Quotes, photos, lessons and a garden journal. The Whitlock-Mensah household runs them all from one Companion Core in the Den."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your jobs, quotes and site photos can run from one Companion Core in the room where you already work. Start the morning with the board.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Chapters follow one working day (kitchen at six forty-five, garage, Den, lounge, garden) instead of the usual living-room-first order. The validator accepts it; showrunner may reorder.",
+    "No Companion Memory in this family (cast memory false), so there is no Memory mention.",
+    "Den beats anchor on core: the Den has no desk item, the Core sits on the Den desk surface. Fallback is room office.",
+    "The seasonal crew (two workers in the cast) appear only as 'the crew', not as members. Payroll is a catalog gap, so Kimai shows hours per job only.",
+    "Town Kestrel Hollow and street Alder Furrow Way are invented; still needs the human map check."
+  ]
+}

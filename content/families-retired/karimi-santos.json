@@ -1,0 +1,848 @@
+{
+  "schema": "family/v1",
+  "slug": "karimi-santos",
+  "house": "mediterranean",
+  "fictional": true,
+  "family": {
+    "surname": "Karimi-Santos",
+    "tagline": "Three generations, one restaurant, and the recipes kept at home.",
+    "household": "grandparents",
+    "business": true,
+    "story": "Parisa founded The Quince Door and still cooks Sunday dinner. Her son Reza runs the kitchen, and Luiza keeps the books from the games den. Seventeen-year-old Dario plays the piano and wants the recipes.",
+    "address": {
+      "line": "205 Lantern Quince Street",
+      "place": "Marigold Ferry"
+    },
+    "narrator": "v-storyteller-m"
+  },
+  "members": [
+    {
+      "id": "parisa",
+      "name": "Parisa",
+      "age": 78,
+      "role": "grandparent",
+      "work": "retired founder, cooks Sunday dinner",
+      "colour": "chart-1"
+    },
+    {
+      "id": "reza",
+      "name": "Reza",
+      "age": 47,
+      "role": "parent",
+      "work": "restaurant owner and chef",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Saffi",
+        "runtime": "OpenClaw",
+        "job": "Opens a supplier's web page in its own browser and saves the prices to Baserow.",
+        "personality": [
+          "cheerful",
+          "curious",
+          "playful"
+        ],
+        "voice": "v-bright-f",
+        "memory": false,
+        "limits": "Saves the prices. Reza decides every order."
+      }
+    },
+    {
+      "id": "luiza",
+      "name": "Luiza",
+      "age": 45,
+      "role": "parent",
+      "work": "runs the books and the staff rota",
+      "colour": "chart-3",
+      "companion": {
+        "name": "Carmo",
+        "runtime": "Hermes",
+        "job": "Drafts the weekly staff rota and supplier notes from what Luiza texts it.",
+        "personality": [
+          "steady",
+          "practical",
+          "patient"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Drafts only. Luiza checks and posts the rota herself."
+      }
+    },
+    {
+      "id": "dario",
+      "name": "Dario",
+      "age": 17,
+      "role": "teen",
+      "work": "student, plays piano in the stair hall",
+      "colour": "chart-4"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The salon and TV room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Parisa's kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "Sunday at the table"
+    },
+    {
+      "id": "den",
+      "kind": "room",
+      "room": "office",
+      "title": "The games den"
+    },
+    {
+      "id": "bedrooms",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The bedrooms"
+    },
+    {
+      "id": "pool",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The pool terrace"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "parisa",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel through the arch",
+        "body": "The parcel arrives through the arched entry. Dario carries it past the stair hall and the dining room to the salon, where Parisa has chosen the shelf."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "luiza",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Four things in the parcel",
+        "body": "Luiza lays out the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core's footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "dario",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Dario plugs in the cable. Reza presses the button, and the Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "luiza",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Luiza joins the Core's own network from her phone. Then she picks the home network and types its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "reza",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "kitchenowl",
+        "planka",
+        "baserow"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Reza picks OpenClaw and Luiza picks Hermes. They add KitchenOwl, Planka and Baserow, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: KitchenOwl, Planka, Baserow"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "luiza",
+      "agent": "luiza",
+      "approval": "luiza",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Carmo says hello",
+        "body": "Luiza texts the agent she named Carmo. Carmo answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "luiza",
+        "text": "Good evening, Luiza. Carmo here."
+      },
+      "film": true
+    },
+    {
+      "id": "living-cards",
+      "chapter": "living",
+      "member": "parisa",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Grandmother's cards, typed once",
+        "body": "Parisa reads her stained recipe cards aloud from the salon couch. Dario types each one into KitchenOwl, and the family recipe book begins.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-films",
+      "chapter": "living",
+      "member": "parisa",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sunday videos from the family archive",
+        "body": "After Sunday dinner the family watches old videos of the restaurant's first year. Jellyfin plays the files from the Core to the TV room.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "living-habit",
+      "chapter": "living",
+      "member": "dario",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "habitica",
+        "replaces": [
+          "Habitify"
+        ]
+      },
+      "capability": "turn habits and chores into a game with levels and quests",
+      "anchor": {
+        "role": "music",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Practice becomes a quest",
+        "body": "Dario turns piano practice into a Habitica quest. Every finished scale earns a level, and Parisa listens from the stair hall.",
+        "chips": [
+          "Habitica",
+          "replaces Habitify"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-sunday",
+      "chapter": "kitchen",
+      "member": "dario",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Sunday dinner, from the card",
+        "body": "On Sunday Dario cooks his grandmother's dish at the range. The recipe sits in the KitchenOwl planner, and Parisa tastes.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-prep",
+      "chapter": "kitchen",
+      "member": "reza",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "planka",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "capability": "a real-time Kanban board for a team or a family project",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Tomorrow's prep, card by card",
+        "body": "Reza sets tomorrow's prep list on a Planka board at the counter. Luiza moves the finished cards across as the afternoon goes.",
+        "chips": [
+          "Planka",
+          "replaces Trello"
+        ]
+      }
+    },
+    {
+      "id": "dining-photos",
+      "chapter": "dining",
+      "member": "parisa",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "librephotos",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "find photos by face, object and place, with albums built by date and location",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "One album page per week",
+        "body": "Someone photographs the table every Sunday. LibrePhotos builds an album by date, and Parisa scrolls back through the Sundays at the farmhouse table.",
+        "chips": [
+          "LibrePhotos",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "den-rota",
+      "chapter": "den",
+      "member": "luiza",
+      "agent": "luiza",
+      "approval": "luiza",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "fireplace",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Carmo drafts the staff rota",
+        "body": "Luiza texts Carmo the week's shift changes. Carmo drafts the staff rota. Luiza reads it, fixes a name and prints it for the restaurant wall."
+      },
+      "say": {
+        "speaker": "luiza",
+        "text": "Rota drafted. Please check the names."
+      },
+      "film": true
+    },
+    {
+      "id": "den-books",
+      "chapter": "den",
+      "member": "luiza",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "fireplace",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The restaurant's books, at home",
+        "body": "Luiza enters the week's takings and supplier bills in Akaunting. The restaurant's profit and loss sits on the Core, ready when she needs it.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "den-invoices",
+      "chapter": "den",
+      "member": "luiza",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Supplier paper, filed and searchable",
+        "body": "Supplier invoices go through Paperless-ngx. It reads every page, tags it and makes the pile searchable, so Luiza finds a bill by its words.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "den-prices",
+      "chapter": "den",
+      "member": "reza",
+      "agent": "reza",
+      "approval": "reza",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "baserow",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "build a no-code database for orders, inventory or projects",
+      "anchor": {
+        "role": "fireplace",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Saffi reads the price page",
+        "body": "Reza names a produce supplier. Saffi opens the supplier's web page in its own browser and saves the prices to a Baserow table. Reza decides the order.",
+        "chips": [
+          "Baserow",
+          "replaces Airtable"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "reza",
+        "text": "Prices saved. The order is yours."
+      }
+    },
+    {
+      "id": "den-dns",
+      "chapter": "den",
+      "member": "dario",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "NextDNS"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "Ad blocking for the whole house",
+        "body": "Dario sets up Pi-hole on the Core. Ads and trackers are blocked at the DNS level for every device on the home network.",
+        "chips": [
+          "Pi-hole",
+          "replaces NextDNS"
+        ]
+      }
+    },
+    {
+      "id": "guest-reader",
+      "chapter": "bedrooms",
+      "member": "parisa",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "A good book, read aloud",
+        "body": "In her ground-floor bedroom, Parisa reads in Koodo Reader. When her eyes tire, she turns on text-to-speech. The library lives on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "front-study",
+      "chapter": "bedrooms",
+      "member": "dario",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Homework from the home library",
+        "body": "Dario researches a history essay at his desk. Kiwix serves the reference pages from the Core, so he reads without leaving the home network.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "pool-lights",
+      "chapter": "pool",
+      "member": "dario",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "glasshome",
+        "replaces": []
+      },
+      "with": [
+        "home-assistant"
+      ],
+      "capability": "design a Home Assistant dashboard by dragging widgets, with no YAML",
+      "anchor": {
+        "role": "pool",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Pool lights, one dashboard",
+        "body": "Dario drags widgets into a GlassHome dashboard for the pergola and pool lights. It reads Home Assistant, and the data stays on the home network.",
+        "chips": [
+          "GlassHome"
+        ]
+      }
+    },
+    {
+      "id": "pool-herbs",
+      "chapter": "pool",
+      "member": "reza",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Herbs by the fountain, logged",
+        "body": "Reza logs the restaurant herbs in HortusFox. He notes what grows by the fountain, when he watered it and which bed to cut next.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "pool-menu",
+      "chapter": "pool",
+      "member": "dario",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "capability": "design and prototype in a web-based design tool you host",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A menu card, designed at home",
+        "body": "Dario designs next season's menu card in Penpot at the outdoor table. The design file is hosted on the Core.",
+        "chips": [
+          "Penpot",
+          "replaces Figma"
+        ]
+      }
+    },
+    {
+      "id": "outro-villa",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Three generations, one Core",
+        "body": "Recipes, rotas, receipts and a pool at dusk. The Karimi-Santos household runs it all from one Companion Core in the salon."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your family's recipes can live on a Companion Core at home. Type one card into KitchenOwl on Sunday, and the grandchildren can cook it.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Cast suggested Mealie for the recipe cards. Mealie has no QA screenshot and reviewed.json is empty, so KitchenOwl (recipe book, screenshot QA) carries the story. Swap in one line if the owner reviews Mealie.",
+    "Saffi's cast job (Mealie) was changed to saving supplier prices to Baserow, with the OpenClaw web note on den-prices. Heritage is not shown anywhere in the text.",
+    "The Quince Door is a made-up name; check it against real businesses. Rota is printed for the restaurant wall because staff access from outside the home is not claimed.",
+    "Town Marigold Ferry and street Lantern Quince Street are invented; still needs the human map check."
+  ]
+}

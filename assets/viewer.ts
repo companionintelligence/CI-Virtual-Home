@@ -1,6 +1,7 @@
 // The portal's player: room-creator.html?mode=view.
 //
 //   room-creator.html?mode=view&house=<id>[&shot=<shot>][&t=<0…1>][&tod=day|golden|dusk|night][&play=1|0]
+//   ... &family=<slug>[&beat=<id>]   the narrated tour of the family that lives in the house (assets/story/), loaded only for this parameter
 //
 // A link without shot opens on the house's Orbit. A link without t plays the shot from the start; one with t opens
 // paused there. play=1 or play=0 says so outright, except that nothing starts moving by itself for a visitor whose
@@ -35,7 +36,7 @@
 // (fitFov: halfway, in log terms, between keeping the vertical and keeping the horizontal field), after the page's
 // applySplineFrame has set the shot's own. The eye path is the shot's; only how much of it the lens takes in
 // changes, so a phone sees the house at the door and the Core with its desk at the end.
-import { displayName, buildCredit } from './home-names.js';
+import { displayName } from './home-names.js';
 import { createGlassSwap } from './viewer-glass.js';
 import { bakeStatic, restoreStatic } from './viewer-batch.js';
 
@@ -56,7 +57,7 @@ type Api = {
   render: (hq: boolean) => void;
 };
 
-type IndexEntry = { id: string; name: string; author?: string; style?: string; storeys?: number; areaSqm?: number; source?: string };
+type IndexEntry = { id: string; name: string; style?: string; storeys?: number; areaSqm?: number };
 type Shot = { key: string; type: string; preset: any; label: string };
 
 const ICONS: Record<string, string> = {
@@ -132,6 +133,8 @@ function fitFov(fov: number, aspect: number): number {
   return Math.min(80, (2 * Math.atan(Math.tan((fov * Math.PI) / 360) * k) * 180) / Math.PI);
 }
 const FLY_KEYS = new Set(['w', 'a', 's', 'd', 'q', 'e', 'arrowup', 'arrowdown']);
+// the parameters the player and the tour write themselves; any other one in the address is kept by url() (assets/story/url.ts OWN_PARAMS is the same list)
+const OWN_PARAMS = new Set(['mode', 'house', 'family', 'shot', 't', 'tod', 'play', 'beat', 'member']);
 const titleCase = (k: string): string => k.replace(/[-_]+/g, ' ').replace(/^\w/, c => c.toUpperCase());
 function shotLabel(key: string, preset: any): string {
   const type = preset.type || key;
@@ -146,6 +149,11 @@ export function mountViewer(api: Api) {
   const params = new URLSearchParams(location.search);
   // ?no=glass,adapt kills a live-only performance feature for A/B timing (each one falls back to what the player did before it)
   const no = new Set((params.get('no') || '').split(',').filter(Boolean));
+  // The tour (assets/story/, the family that lives in the house): a lazy chunk that only a link with ?family= asks for, so the gallery,
+  // the homes' pages and a plain player link weigh what they did before it. ?no=story is the kill switch. onHouse() lets it register its
+  // camera track as the house's `story` shot before the shots are listed; the player's own loop, scrubber and fly camera play that shot.
+  const storyP: Promise<any> | null = params.has('family') && !no.has('story') ? import('./story/mount.js').catch(() => null) : null;
+  const storyFamily = (): string => (storyP ? document.documentElement.dataset.storyFamily || '' : '');   // the family whose tour is up now (mount.ts)
   const coarse = matchMedia('(pointer: coarse)').matches;
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // the About panel: what the Companion Core is and where to find it, then (for a keyboard) the shortcuts
@@ -426,13 +434,13 @@ export function mountViewer(api: Api) {
   // ------------------------------------------------------------------ helpers over the page
   const shotDuration = (): number => (shot && shot.preset.duration) || 10;
   const houseEntry = (id: string): IndexEntry | undefined => index.find(h => h.id === id);
-  function metaParts(e: { author?: string; storeys?: number; areaSqm?: number }): [string, string] {
+  // the facts line under a home's name: its storeys and floor area
+  function metaLine(e: { storeys?: number; areaSqm?: number }): string {
     const facts: string[] = [];
     if (e.storeys) facts.push(`${e.storeys} ${e.storeys === 1 ? 'storey' : 'storeys'}`);
     if (e.areaSqm) facts.push(`${e.areaSqm} m²`);
-    return [e.author ? `By ${e.author}` : '', facts.join(' · ')];
+    return facts.join(' · ');
   }
-  const metaLine = (e: { author?: string; storeys?: number; areaSqm?: number }): string => metaParts(e).filter(Boolean).join(' · ');
   function listShots(): Shot[] {
     const h = api.house(); if (!h) return [];
     const seen = new Set<any>(), out: Shot[] = [];
@@ -454,9 +462,14 @@ export function mountViewer(api: Api) {
   function url(withT: boolean): string {
     const q = new URLSearchParams();
     q.set('mode', 'view'); q.set('house', houseId);
+    if (storyFamily()) q.set('family', storyFamily());
     if (shot) q.set('shot', shot.key);
     if (withT) q.set('t', t.toFixed(3));
     q.set('tod', tod || api.lighting());
+    // The address bar is rewritten from the player's own state, which used to drop everything else: a campaign's tags (utm_*, fbclid, ttclid,
+    // gclid, msclkid) and any other parameter a link carried are kept, in the order they came. Not in a share link (withT): that is not the
+    // visitor's own ad click. OWN_PARAMS is the player's and the tour's (`beat` and `member` are the tour's: assets/story/url.ts keeps its own copy of this list).
+    if (!withT) new URLSearchParams(location.search).forEach((v, k) => { if (!OWN_PARAMS.has(k)) q.append(k, v); });
     return `${location.pathname}?${q.toString()}`;
   }
   const syncUrl = () => { try { history.replaceState(null, '', url(false)); } catch { /* sandboxed */ } };
@@ -468,6 +481,14 @@ export function mountViewer(api: Api) {
   // shares this page's own URL.
   const sharePages = (document.querySelector('meta[name="vh-share"]') as HTMLMetaElement | null)?.content || '';
   function shareUrl(): string {
+    const fam = storyFamily();
+    if (fam) {   // a tour goes out by the family's own page (link previews read it; it forwards a moment to the tour)
+      const q = new URLSearchParams(new URL(url(true), location.href).search);
+      q.delete('mode'); q.delete('house'); q.delete('family');
+      const beat = new URLSearchParams(location.search).get('beat');   // (the tour keeps it current in the address bar)
+      if (beat) q.set('beat', beat);
+      return new URL(`./family/${encodeURIComponent(fam)}?${q.toString()}`, location.href).href;
+    }
     if (!sharePages || !/^[a-z0-9-]+\/$/.test(sharePages)) return new URL(url(true), location.href).href;
     const q = new URLSearchParams(new URL(url(true), location.href).search);
     q.delete('mode'); q.delete('house');
@@ -828,7 +849,7 @@ export function mountViewer(api: Api) {
   // While flying the house is dressed for where you are, not for the shot's moment: walls up, the roof on from
   // outside and off once you are under it (ceilings show only while you are below them, as in a shot). The
   // cutaway opens it the way the game does, to see a path threaded through it: roofs off, and each exterior
-  // wall you are looking through cut down (the page's own Sims rule, decided per wall per frame).
+  // wall you are looking through cut down (the page's own per-wall rule, decided per wall per frame).
   let cutaway = false;
   function setCutaway(on: boolean) {
     cutaway = on;
@@ -859,8 +880,9 @@ export function mountViewer(api: Api) {
   const renderer = api.renderer;
   let pixelRatio = renderer.getPixelRatio(), perfTime = 0, perfFrames = 0, trial: { fps: number; pr: number } | null = null, settled = false;
   let stepped: number | null = null, upSpent = 0, upTrial: number | null = null, upDone = false;   // the ratio left by the accepted step down; seconds at ≥ upFps; the ratio being tried again
-  const stats = { fps: 0, pixelRatio, settled };
+  const stats: Record<string, any> = { fps: 0, pixelRatio, settled };
   (window as any).__houseViewer = stats;
+  stats.control = { seek, setPlaying, selectShot, toast, enterFly, exitFly };   // what the tour drives (assets/story/director.ts)
   function setPixelRatio(pr: number) {
     pixelRatio = pr; stats.pixelRatio = pr;
     renderer.setPixelRatio(pr);
@@ -909,6 +931,7 @@ export function mountViewer(api: Api) {
   // the shot's field of view, widened for a narrow window (fitFov); applySplineFrame puts the shot's own back
   // on every frame, so this never compounds
   function fitCamera() {
+    if (shot && shot.preset.fovFitted) return;   // the tour's track already widens its own lens
     const f = fitFov(camera.fov, camera.aspect);
     if (Math.abs(f - camera.fov) > 0.01) { camera.fov = f; camera.updateProjectionMatrix(); }
   }
@@ -968,6 +991,7 @@ export function mountViewer(api: Api) {
     // with the path showing, a ring marks what the shot is looking at right now (flying, the ghost's ray does)
     nowTarget.visible = showPath && !flying;
     if (nowTarget.visible && dirty) { const p = nowTarget.geometry.attributes.position; p.setXYZ(0, controls.target.x, controls.target.y, controls.target.z); p.needsUpdate = true; }
+    stats.t = t; stats.playing = playing;   // the tour reads the clock from here
     if (dirty) { render(); dirty = false; }
     if (shownEndCard && !endPlaced) placeEndCard();
   }
@@ -1044,18 +1068,14 @@ export function mountViewer(api: Api) {
     const token = loadToken;
     const h = api.house();
     batchHouse(h);
+    if (storyP) await (await storyP)?.prepare(api, h);   // registers the tour's shot before the shots are listed
     houseId = h.id;
     const e = houseEntry(h.id);
-    // the portal's name for the home (home-names.ts); the build's own title is in the tooltip, with the credit
-    const own = { id: h.id, name: h.spec.name || (e && e.name) || h.id, author: h.spec.author || (e && e.author) };
-    const name = displayName(own);
+    // the portal's name for the home (home-names.ts), then its facts
+    const name = displayName({ id: h.id, name: h.spec.name || (e && e.name) || h.id });
     el.name.textContent = name;
-    // the credit, then the facts (which a phone's narrow bar drops)
-    const [by, facts] = metaParts({ author: own.author, storeys: (e && e.storeys) || (h.spec.levels || []).length, areaSqm: h.spec.areaSqm || (e && e.areaSqm) });
-    const factsEl = document.createElement('span'); factsEl.className = 'vh-meta-facts'; factsEl.textContent = by && facts ? ` · ${facts}` : facts;
-    el.meta.replaceChildren(by, factsEl);
-    el.name.title = [h.spec.style, buildCredit(own)].filter(Boolean).join('\n');
-    el.meta.title = buildCredit(own);
+    el.meta.textContent = metaLine({ storeys: (e && e.storeys) || (h.spec.levels || []).length, areaSqm: h.spec.areaSqm || (e && e.areaSqm) });
+    el.name.title = h.spec.style || '';
     document.title = `${name} · Virtual homes`;
     if (tod) api.setLighting(tod);   // a building resets the hour to the spec's; keep the viewer's choice
     if (!hq) glass.apply();          // before the first frame of this house, so the transmission programs never compile in the plain path
@@ -1063,13 +1083,13 @@ export function mountViewer(api: Api) {
     renderShots();
     // A home opens on its Orbit: the whole house from above, which reads on every screen. Door to Core spends its
     // middle in doorways and stairwells, framed a metre from a wall, and is one tap away (and a link can ask for it).
-    const s = findShot(shotKey) || findShot(DEFAULT_SHOT) || findShot('door-to-core') || shots[0];
+    const s = findShot(shotKey) || (storyP && findShot('story')) || findShot(DEFAULT_SHOT) || findShot('door-to-core') || shots[0];
     if (!s) { showError('This home has no camera shots.'); return; }
     await precompile(s, at);
     if (token !== loadToken) return;   // another home was asked for meanwhile: its own onHouse takes over
     ready = true;
     if (flying) exitFly();
-    selectShot(s, { play, at });
+    selectShot(s, { play: play && s.key !== 'story', at });   // (the tour waits for its start card)
     root.dataset.state = 'ready';
     html.dataset.viewer = 'ready';
     canvas.setAttribute('aria-label', `${name}, 3D view`);
@@ -1289,7 +1309,7 @@ export function mountViewer(api: Api) {
       showError(`There is no home called “${want}”. Pick one from the gallery.`);
       return;
     }
-    showLoading(want);   // again, now with the name and the credit
+    showLoading(want);   // again, now with the name and the facts
     await api.ready;
     const h = api.house();
     if (!h) { showError(houseEntry(want) ? 'This home did not load. Check the connection and try again.' : `There is no home called “${want}”. Pick one from the gallery.`); return; }

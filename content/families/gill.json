@@ -1,0 +1,878 @@
+{
+  "schema": "family/v1",
+  "slug": "gill",
+  "house": "valleyview",
+  "fictional": true,
+  "family": {
+    "surname": "Gill",
+    "tagline": "A retired couple, one Companion Core, and a table that fills most weekends.",
+    "household": "solo-or-couple",
+    "business": false,
+    "story": "Harpreet, a retired electrician, cooks for friends most weekends. Jaswinder, a retired pharmacist, keeps the papers, plans and trips in order from the Reading Lounge. One Companion Core serves them both.",
+    "address": {
+      "line": "4 Kingfisher Reach",
+      "place": "Stonebeck"
+    },
+    "narrator": "v-deep-m"
+  },
+  "members": [
+    {
+      "id": "harpreet",
+      "name": "Harpreet",
+      "age": 61,
+      "role": "partner",
+      "work": "retired electrician who hosts and cooks",
+      "colour": "chart-1",
+      "archetype": "host",
+      "companion": {
+        "name": "Cardamom",
+        "runtime": "Hermes",
+        "job": "Drafts Harpreet’s group messages to friends from the notes he types.",
+        "personality": [
+          "warm",
+          "patient",
+          "unhurried"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Harpreet reads and sends every message himself."
+      }
+    },
+    {
+      "id": "jaswinder",
+      "name": "Jaswinder",
+      "age": 63,
+      "role": "partner",
+      "work": "retired pharmacist",
+      "colour": "chart-2",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Cumin",
+        "runtime": "Hermes",
+        "job": "Drafts replies to Jaswinder’s letters and emails from the points she gives.",
+        "personality": [
+          "precise",
+          "dry",
+          "careful"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Drafts only. Jaswinder reads every word and sends it herself."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The salon and reading lounge"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining hall"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Harpreet’s kitchen"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out by the water"
+    },
+    {
+      "id": "suite",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Upstairs, the primary suite"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Harpreet carries the Core inside",
+        "body": "The Companion Core waits in a parcel at the top of the front steps. Harpreet carries it to the Hearth Salon credenza."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Jaswinder reads the guide aloud while Harpreet lifts the Core out."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Harpreet plugs in the cable, and Jaswinder presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "On the sofa, Jaswinder joins the Core’s own network from her phone’s Wi-Fi settings, then picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "immich",
+        "kitchenowl"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Jaswinder picks Hermes, and the couple add Immich and KitchenOwl. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Immich, KitchenOwl"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "jaswinder",
+      "agent": "jaswinder",
+      "approval": "jaswinder",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Cumin says hello",
+        "body": "Jaswinder messages the agent she named Cumin. The answer comes back through her chat, worked out on the Core.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "jaswinder",
+        "text": "Hello, Jaswinder. I am Cumin. What shall we start with?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-parade",
+      "chapter": "living",
+      "member": "harpreet",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The spring parade plays again",
+        "body": "A visiting friend missed the spring parade, so Harpreet plays his own video. Jellyfin serves it from the Core to the tablet in his hand.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "reading-contacts",
+      "chapter": "living",
+      "member": "harpreet",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "iCloud"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Harpreet looks up three addresses",
+        "body": "Cards for three autumn anniversaries need addresses. At the coffee table, Harpreet looks them up in the shared Nextcloud contacts Jaswinder keeps. The Core serves them to his phone.",
+        "chips": [
+          "Nextcloud",
+          "replaces iCloud"
+        ]
+      }
+    },
+    {
+      "id": "reading-papers",
+      "chapter": "living",
+      "member": "jaswinder",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Jaswinder scans the certificate",
+        "body": "Jaswinder takes Harpreet’s apprenticeship certificate off the shelf and scans it. Paperless-ngx reads and tags the scan on the Core, so she finds it later by a word on it.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "reading-lamp",
+      "chapter": "living",
+      "member": "harpreet",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A lamp warms before she reads",
+        "body": "Jaswinder reads at nine each morning. Harpreet sets a Home Assistant rule on the Core, so the floor lamp’s Wi-Fi bulb comes on before she sits.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "reading-cumin",
+      "chapter": "living",
+      "member": "jaswinder",
+      "agent": "jaswinder",
+      "approval": "jaswinder",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Jaswinder answers the council",
+        "body": "The council’s river path letter needs an answer. Jaswinder gives Cumin three points, and Cumin drafts it on the Core’s local model. Jaswinder reads it, then sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "jaswinder",
+        "text": "The draft is ready. Please read every line before you send it."
+      }
+    },
+    {
+      "id": "reading-vault",
+      "chapter": "living",
+      "member": "jaswinder",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host; works with the Bitwarden apps",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 3
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One sign-in reaches both phones",
+        "body": "Jaswinder saves the plumber’s sign-in in VaultWarden. Harpreet finds it on his phone through the Bitwarden apps. The vault runs on the Core.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-week",
+      "chapter": "living",
+      "member": "jaswinder",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Jaswinder blocks out her week",
+        "body": "Morning light fills the Garden Room while Jaswinder sets time aside for each of the week’s tasks in Companion Planning. The plan is one local file on the Core.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "dining-ledger",
+      "chapter": "dining",
+      "member": "jaswinder",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "firefly-iii",
+        "replaces": [
+          "Mint"
+        ]
+      },
+      "capability": "track accounts, budgets, bills and savings goals, with rules that sort your transactions",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The water bill finds its line",
+        "body": "On the first of the month, bills cover the oval table. Jaswinder types the water bill into Firefly III on the Core, and a rule sorts it.",
+        "chips": [
+          "Firefly III",
+          "replaces Mint"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "harpreet",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Eight for lunch needs one list",
+        "body": "Eight friends are coming on Sunday. KitchenOwl on the Core holds the list: Harpreet writes it at the breakfast bar, and Jaswinder adds mint.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-recipe",
+      "chapter": "kitchen",
+      "member": "harpreet",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "counter",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "left",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The dal he never wrote down",
+        "body": "Harpreet has cooked his dal by feel for decades. At the counter he measures each spice and types the steps into the KitchenOwl recipe book. Now Jaswinder can cook it.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-fridge",
+      "chapter": "kitchen",
+      "member": "jaswinder",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Jaswinder clears the fridge door",
+        "body": "Jaswinder retires three paper calendars from the fridge door. One Yuvomi calendar now holds the window cleaner and the weekend guests, in a database on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-range",
+      "chapter": "kitchen",
+      "member": "harpreet",
+      "agent": "harpreet",
+      "approval": "harpreet",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter"
+          },
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Cardamom drafts while the pot simmers",
+        "body": "Between stirs, Harpreet types Cardamom a note on who is bringing what. Cardamom drafts the group message on the Core’s local model, and Harpreet reads it and sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "harpreet",
+        "text": "The message is ready. Read it first, then send it yourself."
+      }
+    },
+    {
+      "id": "garden-planters",
+      "chapter": "garden",
+      "member": "harpreet",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Harpreet writes down the watering",
+        "body": "Tuesday morning, Harpreet waters the planters. In the HortusFox journal on the Core, he adds the date and a photo.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-cabana",
+      "chapter": "garden",
+      "member": "jaswinder",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "patio-seat",
+        "nth": 5,
+        "fallback": [
+          {
+            "role": "garden",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Harpreet peels while she listens",
+        "body": "On the cabana sofa, Jaswinder follows the book club novel while Harpreet peels garlic beside her. Audiobookshelf, running on the Core, remembers her place.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "bedroom-trip",
+      "chapter": "suite",
+      "member": "jaswinder",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "airtrail",
+        "replaces": [
+          "Flighty"
+        ]
+      },
+      "capability": "log your flights and see your whole travel history on a world map",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Jaswinder logs flights to her sister",
+        "body": "At the Dressing Room vanity, Jaswinder logs last year’s flights to her sister. Each one joins the travel history AirTrail keeps on the Core.",
+        "chips": [
+          "AirTrail",
+          "replaces Flighty"
+        ]
+      }
+    },
+    {
+      "id": "bedroom-prints",
+      "chapter": "suite",
+      "member": "harpreet",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The wedding album goes in once",
+        "body": "The wedding album is coming apart at the spine, so Harpreet scans its pages into Immich. The scans sit on the Core, where he can search them.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ],
+        "note": "The first start takes a while."
+      },
+      "film": true
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core runs a river house",
+        "body": "Photographs, passwords, plans and recipes run on one Companion Core, in a villa beside the river."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your albums, bills and recipes can live on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "No TV or screen is written: the house is flagged hall-only. The media beat at the couch is living-parade, Jellyfin to a tablet in Harpreet’s hand, no TV implied. Audiobookshelf sits at the cabana sofa (patio-seat nth 5).",
+    "Anchors: couch nth 0 Hearth Salon sofa, nth 1 Garden Room sectional, nth 2 Reading Lounge chaise; room living nth 1 Hearth Salon, nth 2 Reading Lounge, nth 3 Bay Seat; desk bedroom nth 0 Dressing Room vanity.",
+    "Both companions are Hermes. Chat note rides on ftue-hello, reading-cumin and kitchen-range; people read and send every message. No Companion Memory is named.",
+    "Firefly III: bookkeeping only, no bank import named, no advice. AirTrail and Firefly III chips use catalog replaces names (Flighty, Mint).",
+    "Immich beat names the Core and no photo cloud; the first-start caveat rides as a note on bedroom-prints and ftue-pick.",
+    "No beat is a small-business beat; no QA-screenshot gap: every app named has a screenshot, nothing is added to reviewed.json."
+  ]
+}

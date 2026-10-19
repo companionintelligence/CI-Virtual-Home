@@ -1,0 +1,569 @@
+{
+ "v": 1,
+ "note": "Test fixture world for scripts/test-stories.mts: NOT the shipped casting. vance-takahashi and eriksen-bautista are real-shaped (rooms from the old casting, roles re-derived from the fixture houses); the rest are bare stubs so fleet tests have slugs. brennan-* are flagship stubs.",
+ "households": {
+  "solo-or-couple": "Solo, couple, no children at home",
+  "young-family": "Young family (children under 13)",
+  "older-kids": "Teens or adult children at home",
+  "grandparents": "Grandparents and grandchildren"
+ },
+ "families": [
+  {
+   "slug": "vance-takahashi",
+   "house": "aurora",
+   "household": "solo-or-couple",
+   "business": true,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "storeys": 3,
+   "areaSqm": 340,
+   "homeStyle": "Layered white modern villa: picture-frame boxes with charcoal and taupe infill, a floating roof slab over two dark pavilions, a carport terrace, a front balcony and a pool forecourt on a canal",
+   "lotGround": "waterfront",
+   "household_text": "Couple, early 40s, no children; both work from home",
+   "members": [
+    {
+     "id": "elias",
+     "name": "Elias",
+     "role": "partner",
+     "age": "42",
+     "work": "freelance photographer (portraits and small-business shoots); upstairs study is the editing room",
+     "companion": "Marlo"
+    },
+    {
+     "id": "mika",
+     "name": "Mika",
+     "role": "partner",
+     "age": "40",
+     "work": "operations consultant; ground-floor study is her office",
+     "companion": "Odette"
+    }
+   ],
+   "businessText": "photography studio of one",
+   "categoryHints": [
+    "photos and media",
+    "files and client delivery",
+    "productivity",
+    "smart home",
+    "food"
+   ],
+   "care": "Client photos are other people's faces: say they stay on the Core, no legal claims.",
+   "signatureApps": [
+    "immich",
+    "twenty",
+    "paperless",
+    "home-assistant",
+    "kitchenowl"
+   ],
+   "coreSpot": {
+    "room": "Study",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 5.42,
+    "roomsPassed": [
+     "Foyer",
+     "Dining",
+     "Study"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 35.72
+    },
+    {
+     "name": "Dining",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 29.92
+    },
+    {
+     "name": "Foyer",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 8.64
+    },
+    {
+     "name": "Study",
+     "level": "l1",
+     "kinds": [
+      "office"
+     ],
+     "areaSqm": 19.04
+    },
+    {
+     "name": "Living",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 56.76
+    },
+    {
+     "name": "Laundry & Mudroom",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 21.32
+    },
+    {
+     "name": "Guest Bath",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 11.44
+    },
+    {
+     "name": "Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 31.2
+    },
+    {
+     "name": "Study",
+     "level": "l2",
+     "kinds": [
+      "office"
+     ],
+     "areaSqm": 17.16
+    },
+    {
+     "name": "Shower Room",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 11.96
+    },
+    {
+     "name": "Dressing Room",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 14.72
+    },
+    {
+     "name": "Guest Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 19.32
+    },
+    {
+     "name": "Bath",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 17.48
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "tv": 2,
+    "bookshelf": 2,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 5,
+    "desk": 3,
+    "laundry": 2,
+    "easel": 1,
+    "patio-seat": 5,
+    "garden": 2,
+    "driveway": 1,
+    "pool": 1,
+    "deck": 2
+   },
+   "homeFlags": [],
+   "anchorsToUse": [
+    "core",
+    "breakfast-bar/kitchen/1",
+    "tv-stand/living/1",
+    "zone/pool/1",
+    "zone/patio/1"
+   ],
+   "eyelessAnchors": [
+    "zone/roof-terrace/1"
+   ],
+   "surname": "Vance-Takahashi",
+   "place": "Marlow Bend"
+  },
+  {
+   "slug": "eriksen-bautista",
+   "house": "familyhome",
+   "household": "young-family",
+   "business": true,
+   "narrator": "v-light-m",
+   "tenure": "owner",
+   "storeys": 2,
+   "areaSqm": 179,
+   "homeStyle": "Two-storey sage-yellow lap-siding family home: hipped roof with two overlapping street gables, one-storey gabled west wing, gabled entry portico and picket-railed wrap veranda, warm cream living room with a garden bay, and a backyard homestead (lily pond gazebo, greenhouse, raised beds, monkey bars)",
+   "lotGround": "lawn",
+   "household_text": "Homesteading family of five with a plant and seed nursery in the back yard",
+   "members": [
+    {
+     "role": "parent",
+     "age": "36",
+     "work": "runs the online seed and seedling shop from the greenhouse"
+    },
+    {
+     "role": "parent",
+     "age": "38",
+     "work": "electrician, on call"
+    },
+    {
+     "role": "child",
+     "age": "8",
+     "work": "school; single bed in the Kids' Bedroom, easel in the playroom"
+    },
+    {
+     "role": "child",
+     "age": "2",
+     "work": "crib in the Nursery"
+    },
+    {
+     "role": "child",
+     "age": "6 months",
+     "work": "second crib"
+    }
+   ],
+   "businessText": "seed and seedling nursery",
+   "categoryHints": [
+    "small business (shop, orders, newsletter)",
+    "garden and food",
+    "photos",
+    "kids privacy"
+   ],
+   "care": "No TV in the scene: write it as a choice, not a gap. There is no TV: a choice, not a gap. Use the playroom and the nursery.",
+   "signatureApps": [
+    "hortusfox",
+    "grist",
+    "listmonk",
+    "yuvomi",
+    "vikunja"
+   ],
+   "coreSpot": {
+    "room": "Living Bay",
+    "level": "l1",
+    "surface": "desk",
+    "pose": "prone"
+   },
+   "frontDoor": {
+    "side": "S",
+    "aboveGround": false
+   },
+   "coreWalk": {
+    "metres": 8.37,
+    "roomsPassed": [
+     "Entry & Stair Hall",
+     "Living Room"
+    ],
+    "seenFromDoor": true,
+    "awkwardScore": 0
+   },
+   "rooms": [
+    {
+     "name": "Entry & Stair Hall",
+     "level": "l1",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 13.5
+    },
+    {
+     "name": "Living Room",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 20
+    },
+    {
+     "name": "Living Bay",
+     "level": "l1",
+     "kinds": [
+      "living"
+     ],
+     "areaSqm": 2.52
+    },
+    {
+     "name": "Kitchen",
+     "level": "l1",
+     "kinds": [
+      "kitchen"
+     ],
+     "areaSqm": 16
+    },
+    {
+     "name": "Dining Room",
+     "level": "l1",
+     "kinds": [
+      "dining"
+     ],
+     "areaSqm": 19.6
+    },
+    {
+     "name": "Playroom",
+     "level": "l1",
+     "kinds": [
+      "play"
+     ],
+     "areaSqm": 20.7
+    },
+    {
+     "name": "Mudroom",
+     "level": "l1",
+     "kinds": [
+      "utility"
+     ],
+     "areaSqm": 5
+    },
+    {
+     "name": "Powder Room",
+     "level": "l1",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 4
+    },
+    {
+     "name": "Kids' Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 10.32
+    },
+    {
+     "name": "Nursery",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 10.08
+    },
+    {
+     "name": "Family Bathroom",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 6.76
+    },
+    {
+     "name": "Upper Hall",
+     "level": "l2",
+     "kinds": [
+      "circulation"
+     ],
+     "areaSqm": 15.34
+    },
+    {
+     "name": "Primary Bedroom",
+     "level": "l2",
+     "kinds": [
+      "bedroom"
+     ],
+     "areaSqm": 25.2
+    },
+    {
+     "name": "Primary Ensuite",
+     "level": "l2",
+     "kinds": [
+      "bath"
+     ],
+     "areaSqm": 10.4
+    }
+   ],
+   "roles": {
+    "couch": 2,
+    "bookshelf": 2,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 5,
+    "desk": 3,
+    "laundry": 2,
+    "easel": 1,
+    "patio-seat": 5,
+    "garden": 2,
+    "driveway": 1,
+    "pool": 1,
+    "deck": 2
+   },
+   "homeFlags": [
+    {
+     "no": "tv",
+     "status": "none",
+     "say": "Do not write a TV or a screen in this home. Tell the media beat at the couch or the music item (a record player, a piano, speakers on the shelf), with Navidrome, Audiobookshelf, Koodo Reader or Immich on a phone. A TV only in a bedroom or hall is not the living-room TV."
+    },
+    {
+     "no": "kitchen-island",
+     "status": "none",
+     "say": "No island or breakfast bar: anchor the kitchen beat on the counter, range or fridge (roles counter, range, fridge) and say \"the counter\", never \"the island\"."
+    }
+   ],
+   "anchorsToUse": [
+    "core",
+    "easel/playroom/1",
+    "crib/nursery/1",
+    "umbrella-table/outside/1",
+    "zone/gazebo/1",
+    "zone/pond/1",
+    "zone/garden/1"
+   ],
+   "eyelessAnchors": [
+    "room/powder-room",
+    "zone/garden/3",
+    "zone/porch/1",
+    "zone/trees/1"
+   ]
+  },
+  {
+   "slug": "nowak-pillai",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": []
+  },
+  {
+   "slug": "okonkwo-reid",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": []
+  },
+  {
+   "slug": "keane",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": []
+  },
+  {
+   "slug": "ashworth",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": []
+  },
+  {
+   "slug": "dufresne",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": []
+  },
+  {
+   "slug": "castellanos",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": []
+  },
+  {
+   "slug": "adeyemi-castro",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": []
+  },
+  {
+   "slug": "brennan-one",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": [],
+   "flagship": true
+  },
+  {
+   "slug": "brennan-two",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": [],
+   "flagship": true
+  },
+  {
+   "slug": "brennan-three",
+   "house": "none",
+   "household": "solo-or-couple",
+   "business": false,
+   "narrator": "v-clear-f",
+   "tenure": "owner",
+   "rooms": [],
+   "roles": {},
+   "homeFlags": [],
+   "signatureApps": [],
+   "flagship": true
+  }
+ ]
+}

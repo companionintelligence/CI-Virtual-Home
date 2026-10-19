@@ -27,3 +27,25 @@ https://:project.pages.dev/*
 
 https://:version.:project.pages.dev/*
   X-Robots-Tag: noindex
+
+# The family tour's files are named by a hash of their bytes (<name>.<hash10>.<ext>, scripts/story/site.mts: the voice-over clips, the
+# films' posters and captions, the link-preview pictures, the font and the families' card data), so a stale copy is harmless and they can
+# be kept for a year. Everything else, story/manifest.json included, keeps the rule above and is revalidated. The homes' own files
+# (portal/thumbs, portal/previews, content/houses) are named by house id and are NOT hashed: they stay on the rule above.
+# (`! Cache-Control` takes the revalidate rule off these paths first: Pages joins the values of every rule that matches, and
+# "max-age=0, ..., max-age=31536000" would be a contradiction.)
+/audio/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+/film/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+/portal/og/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+/portal/fonts/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+/story/families.*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable

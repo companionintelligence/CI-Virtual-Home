@@ -1,0 +1,812 @@
+{
+  "schema": "family/v1",
+  "slug": "mbatha",
+  "house": "vanilla",
+  "fictional": true,
+  "family": {
+    "surname": "Mbatha",
+    "tagline": "A plant nursery, a web shop and one Companion Core.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Thandi grows and sells plants from the greenhouse. Sipho, a backend engineer, builds the small web shop that takes the orders. One Companion Core in the Library keeps the shop’s code, its books and the plant journal.",
+    "address": {
+      "line": "6 Hazelwick Lane",
+      "place": "Fernlea"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "thandi",
+      "name": "Thandi",
+      "age": 44,
+      "role": "partner",
+      "work": "grows and sells plants",
+      "colour": "chart-1",
+      "archetype": "host",
+      "companion": {
+        "name": "Fern",
+        "runtime": "OpenClaw",
+        "job": "Fills in courier and supplier web forms from Thandi’s notes.",
+        "personality": [
+          "warm",
+          "patient",
+          "careful"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Prepares only. Thandi checks each form and sends it herself."
+      }
+    },
+    {
+      "id": "sipho",
+      "name": "Sipho",
+      "age": 46,
+      "role": "partner",
+      "work": "backend engineer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Acorn",
+        "runtime": "OpenClaw",
+        "job": "Opens courier tracking pages and lists the late parcels for Sipho.",
+        "personality": [
+          "curious",
+          "gentle",
+          "bright"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Lists only. Sipho reads each list and writes any email himself."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "library",
+      "kind": "room",
+      "room": "office",
+      "title": "Sipho in the library"
+    },
+    {
+      "id": "greenhouse",
+      "kind": "room",
+      "room": "living",
+      "title": "Thandi in the greenhouse"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining table"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Sipho carries the parcel in",
+        "body": "A parcel waits on the front step. Sipho carries it to the Library, where Thandi has cleared the desk."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Thandi lifts the Core out",
+        "body": "Thandi lifts the Companion Core onto the desk. Sipho finds a power cable, a quick-start guide and a recovery USB drive."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "The cable goes in beside the monitor. Thandi presses the button, and the Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "On her phone, Thandi opens the Wi-Fi settings and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "gitea",
+        "hortusfox"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Thandi picks OpenClaw as the first agent. Sipho adds Gitea and HortusFox, and then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: OpenClaw",
+            "Apps: Gitea, HortusFox"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "thandi",
+      "agent": "thandi",
+      "approval": "thandi",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser, running in its own sandbox",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Fern says hello",
+        "body": "At the Library desk, Thandi types a first hello to the agent she named Fern. Fern answers from the Core beside her.",
+        "chips": [
+          "OpenClaw WebCLI"
+        ],
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "thandi",
+        "text": "Hello, Thandi. I am Fern. Where shall we begin?"
+      },
+      "film": true
+    },
+    {
+      "id": "lib-repo",
+      "chapter": "library",
+      "member": "sipho",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sipho pushes the postcode fix",
+        "body": "A buyer’s postcode keeps failing, so Sipho pushes a fix to Gitea. The code and its history sit on the Core, not on a rented code host.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ],
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "lib-issue",
+      "chapter": "library",
+      "member": "thandi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Thandi’s request becomes an issue",
+        "body": "From a club chair, Thandi asks for pot sizes on the plant pages. Sipho types it up as a Gitea issue, so the request sits beside the code.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      }
+    },
+    {
+      "id": "lib-late",
+      "chapter": "library",
+      "member": "sipho",
+      "agent": "sipho",
+      "approval": "sipho",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser, running in its own sandbox",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Acorn finds the late parcels",
+        "body": "Before packing starts, Sipho asks Acorn to open the courier’s tracking pages. Acorn lists the late parcels, and Sipho decides who gets an email.",
+        "chips": [
+          "OpenClaw WebCLI"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "sipho",
+        "text": "Here are the late parcels. Please read the list before you write."
+      }
+    },
+    {
+      "id": "lib-crm",
+      "chapter": "library",
+      "member": "sipho",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sipho copies each buyer into Twenty",
+        "body": "When a new order lands, Sipho’s script adds the buyer to Twenty. Thandi finds an address there before a delivery, and the customer list is hosted at home.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      }
+    },
+    {
+      "id": "green-journal",
+      "chapter": "greenhouse",
+      "member": "thandi",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Thandi repots the jade plant",
+        "body": "Among the birds of paradise, Thandi repots a jade plant and saves its photo and date in HortusFox. The care history lives on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "green-buyer",
+      "chapter": "greenhouse",
+      "member": "sipho",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sipho logs Thandi’s promise",
+        "body": "Soil on her hands, Thandi tells Sipho what to promise a garden centre. He adds it to the garden centre’s row in Twenty, beside last spring’s order on the Core.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      }
+    },
+    {
+      "id": "green-lamps",
+      "chapter": "greenhouse",
+      "member": "thandi",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The lamps come on before Thandi",
+        "body": "On autumn mornings the two pendant lamps switch on just before Thandi opens up. Home Assistant runs the routine from the Core, with no cloud account.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "green-courier",
+      "chapter": "greenhouse",
+      "member": "thandi",
+      "agent": "thandi",
+      "approval": "thandi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser, running in its own sandbox",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Fern readies the courier booking",
+        "body": "At the console table, Thandi wraps aloes for Monday’s wholesale order. Fern fills in the courier’s booking form, and Thandi checks the slot and sends it herself.",
+        "chips": [
+          "OpenClaw WebCLI"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "thandi",
+        "text": "Here is the booking, filled in. Please check the slot first."
+      }
+    },
+    {
+      "id": "living-week",
+      "chapter": "living",
+      "member": "sipho",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "couch",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Thandi and Sipho split market jobs",
+        "body": "On the sectional, Thandi and Sipho split Saturday’s market jobs. Crates and labels go to Thandi, the stall table to Sipho, and Yuvomi keeps one task board.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "living-film",
+      "chapter": "living",
+      "member": "thandi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The time-lapse plays again",
+        "body": "The time-lapse of the greenhouse going up plays on the TV, and Thandi and Sipho watch it together. Jellyfin plays their own video files from the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "dining-books",
+      "chapter": "dining",
+      "member": "thandi",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Thandi raises a garden centre invoice",
+        "body": "After Saturday’s market, Thandi raises the garden centre’s invoice in Akaunting. Takings, invoices and customers share one set of books at home, on the Core.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ],
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "dining-photos",
+      "chapter": "dining",
+      "member": "sipho",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sipho picks the lead pictures",
+        "body": "At the dining table, Sipho picks a lead picture for each plant page. Thandi’s plant photos back up to Immich, so the originals stay in a library at home.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-meals",
+      "chapter": "kitchen",
+      "member": "sipho",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Thursday’s lunch starts with chives",
+        "body": "Chives from the greenhouse sit on the breakfast bar, and Sipho plans Thursday’s lunch around them in Yuvomi. He adds the rest to the shared list on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-ping",
+      "chapter": "kitchen",
+      "member": "thandi",
+      "category": "iot",
+      "segment": "small-business",
+      "app": {
+        "id": "ntfy",
+        "replaces": []
+      },
+      "capability": "send a push notification to your phone from any script or automation",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A new order pings Thandi’s phone",
+        "body": "While a pot simmers, Thandi’s phone buzzes once. A script Sipho runs posts each new web order to ntfy on the Core, which sends the push notification.",
+        "chips": [
+          "ntfy"
+        ]
+      }
+    },
+    {
+      "id": "garden-beds",
+      "chapter": "garden",
+      "member": "thandi",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Thandi cuts back the lavender",
+        "body": "Beside the lap pool, Thandi cuts back the lavender. She adds a note to its HortusFox page about how hard she cut, so next autumn the note is there.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-deck",
+      "chapter": "garden",
+      "member": "sipho",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "open-webui",
+        "replaces": [
+          "ChatGPT"
+        ]
+      },
+      "with": [
+        "jupyterlab"
+      ],
+      "capability": "ask a model that runs on your Core, from the browser",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left",
+        "eye": "seated"
+      },
+      "popup": {
+        "title": "Sipho asks a model about stock",
+        "body": "On the loungers, Sipho chases a drifting stock count in a JupyterLab notebook. He asks a model on the Core through Open WebUI, and the question stays there by default.",
+        "chips": [
+          "Open WebUI",
+          "replaces ChatGPT"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A greenhouse, a shop, one Core",
+        "body": "One Companion Core in the Library, beside the greenhouse, keeps the plant journal, code, books and customer list."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your customer list, invoices and plant notes can live on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Library has no desk item in the spec (the only desk role is a kids desk upstairs); the Core stands on the hero desk, so Sipho's desk beats anchor on core and room:office.",
+    "The Greenhouse has no role furniture: its beats anchor on room:living nth 2 (Living & Dining and the Library come first, bigger rooms first).",
+    "Both companions are OpenClaw (browser errands). Neither has Companion Memory connected, so no beat names it.",
+    "No beat claims the web shop runs on the Core: Sipho's script copies buyers into Twenty and posts new orders to ntfy; no beat says how the shop reaches the Core or that the ping stays local.",
+    "Home Assistant: the two pendant lamps stand for network lights; no Zigbee or Bluetooth stick is implied."
+  ]
+}

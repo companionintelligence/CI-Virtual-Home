@@ -1,0 +1,851 @@
+{
+  "schema": "family/v1",
+  "slug": "dufresne",
+  "house": "bghouse-olcia",
+  "fictional": true,
+  "family": {
+    "surname": "Dufresne",
+    "tagline": "A bike shop in the garage, with its customer list at home.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Solange runs a bicycle and e-bike repair shop out of the garage, and her son Mathis turns the wrenches. Every customer and every repair is written down in the house at the top of a long white stair. One Companion Core on a study shelf holds the lot.",
+    "address": {
+      "line": "31 Chemin Ormeau",
+      "place": "Saint Aubrelle"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "solange",
+      "name": "Solange",
+      "age": 56,
+      "role": "parent",
+      "work": "shop owner, customers and books",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Margaux",
+        "runtime": "Hermes",
+        "job": "Drafts pickup notes and parts orders from what Solange texts it.",
+        "personality": [
+          "brisk",
+          "precise",
+          "direct"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Drafts only. Solange sends every message."
+      }
+    },
+    {
+      "id": "mathis",
+      "name": "Mathis",
+      "age": 26,
+      "role": "adult-child",
+      "work": "bicycle and e-bike mechanic",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Remy",
+        "runtime": "OpenClaw",
+        "job": "Opens Baserow in its own browser and logs parts as they arrive.",
+        "personality": [
+          "curious",
+          "bright",
+          "quick"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Logs what Mathis reads out. He checks the list."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "Solange's study"
+    },
+    {
+      "id": "garage",
+      "kind": "room",
+      "room": "garage",
+      "title": "The shop in the garage"
+    },
+    {
+      "id": "outside",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The drive and the beds"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "mathis",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel below the long stair",
+        "body": "A parcel waits at the foot of the long front stair. Mathis carries it up, through the entry hall, to the study. Solange clears a shelf."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "solange",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "The parcel, unpacked on the shelf",
+        "body": "Solange sets out the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Its footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "mathis",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Cable in, button pressed",
+        "body": "Mathis plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "solange",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Her phone joins the Core",
+        "body": "Solange joins the Core's own Wi-Fi network from her phone. Then she chooses the home network and types its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "mathis",
+      "with": [
+        "espocrm",
+        "baserow"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Hermes, OpenClaw, two apps",
+        "body": "In Companion Hub, Solange picks Hermes and Mathis picks OpenClaw. They add EspoCRM and Baserow, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: EspoCRM, Baserow"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "solange",
+      "agent": "solange",
+      "approval": "solange",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Margaux says hello",
+        "body": "Solange texts the agent she named Margaux. Margaux answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "solange",
+        "text": "Hello, Solange. I am Margaux. Which note first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "mathis",
+      "app": {
+        "id": "librephotos",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "Find photos by face, object and place, with albums built by date and location",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Search the photos for bicycles",
+        "body": "Mathis types bicycle into LibrePhotos on the living-room TV. It finds photos by object, and the whole library sits on the Core.",
+        "chips": [
+          "LibrePhotos",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "solange",
+      "app": {
+        "id": "booklore",
+        "replaces": [
+          "Kindle"
+        ]
+      },
+      "capability": "Manage and read books, comics and PDFs",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The manual, read on the couch",
+        "body": "Solange reads a service manual in BookLore on the couch. It keeps her books and PDFs on the Core, ready for the next e-bike.",
+        "chips": [
+          "BookLore",
+          "replaces Kindle"
+        ]
+      }
+    },
+    {
+      "id": "living-pair",
+      "chapter": "living",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "mathis",
+      "app": {
+        "id": "pairdrop",
+        "replaces": [
+          "AirDrop"
+        ]
+      },
+      "capability": "Send files between phones and laptops on the same Wi-Fi",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A cracked frame, sent across",
+        "body": "At dinner, Mathis photographs a cracked frame and sends it to his mother's laptop with PairDrop. It crosses the home Wi-Fi in one tap.",
+        "chips": [
+          "PairDrop",
+          "replaces AirDrop"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-soup",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "solange",
+      "app": {
+        "id": "homehub",
+        "replaces": []
+      },
+      "capability": "A shared household hub with a recipe book and an expiry tracker",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Her mother's pea soup, kept",
+        "body": "Solange types her mother's pea soup into the HomeHub recipe book. Its expiry tracker lists what to use first.",
+        "chips": [
+          "HomeHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-chores",
+      "chapter": "kitchen",
+      "category": "home",
+      "segment": "consumer",
+      "member": "mathis",
+      "app": {
+        "id": "donetick",
+        "replaces": [
+          "OurHome",
+          "Tody"
+        ]
+      },
+      "capability": "Assign and track household chores and recurring tasks, with NFC tag completion",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Dishes done, one tap",
+        "body": "Mathis taps a tag on the fridge when the dishes are done. Donetick closes the chore and keeps the household list.",
+        "chips": [
+          "Donetick",
+          "replaces OurHome",
+          "replaces Tody"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-budget",
+      "chapter": "kitchen",
+      "category": "money",
+      "segment": "consumer",
+      "member": "solange",
+      "app": {
+        "id": "firefly-iii",
+        "replaces": [
+          "Mint",
+          "YNAB"
+        ]
+      },
+      "capability": "Track accounts, budgets, bills and savings goals, with rules that sort your transactions",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The statement, sorted by rules",
+        "body": "At the counter, Solange imports the month's statement as a CSV file into Firefly III. Its rules sort the transactions.",
+        "chips": [
+          "Firefly III",
+          "replaces Mint",
+          "replaces YNAB"
+        ]
+      }
+    },
+    {
+      "id": "study-draft",
+      "chapter": "study",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "solange",
+      "agent": "solange",
+      "approval": "solange",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Pickup notes, drafted",
+        "body": "Solange texts Margaux which bikes are ready. Margaux drafts a pickup note for each customer, and Solange reads and sends every one."
+      },
+      "say": {
+        "speaker": "solange",
+        "text": "These are drafts. Please read each one before you send it."
+      },
+      "film": true
+    },
+    {
+      "id": "study-invoice",
+      "chapter": "study",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "solange",
+      "app": {
+        "id": "invoice-ninja",
+        "replaces": [
+          "FreshBooks",
+          "QuickBooks"
+        ]
+      },
+      "capability": "Send invoices and quotes, track expenses and time",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The invoice, drawn up at home",
+        "body": "Solange writes an e-bike service invoice in Invoice Ninja. The quote and the invoice sit on the Core, beside the customer's record.",
+        "chips": [
+          "Invoice Ninja",
+          "replaces FreshBooks",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "study-vault",
+      "chapter": "study",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "solange",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "Store every password in a vault you host. Works with the Bitwarden apps",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Supplier sign-ins off the sticky notes",
+        "body": "Solange moves the supplier sign-ins from sticky notes into VaultWarden. The vault works with the Bitwarden apps and lives on the Core.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "study-calendar",
+      "chapter": "study",
+      "category": "productivity",
+      "segment": "small-business",
+      "member": "solange",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "A small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "One calendar for shop hours",
+        "body": "E-bike fittings and shop hours go into one Baikal calendar. Solange and Mathis see the same week on their phones.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      }
+    },
+    {
+      "id": "garage-ticket",
+      "chapter": "garage",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "mathis",
+      "app": {
+        "id": "espocrm",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "Manage customers, sales pipelines, campaigns and support cases in a CRM you host",
+      "anchor": {
+        "role": "counter",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Her bike's history, at the counter",
+        "body": "A customer waits at the garage counter. Mathis opens her record in EspoCRM and finds a case for every past repair.",
+        "chips": [
+          "EspoCRM",
+          "replaces Salesforce"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garage-parts",
+      "chapter": "garage",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "mathis",
+      "agent": "mathis",
+      "approval": "mathis",
+      "app": {
+        "id": "baserow",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "Build a no-code database for orders, inventory or projects",
+      "anchor": {
+        "role": "bicycle",
+        "room": "garage",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Remy logs the brake pads",
+        "body": "A pallet of brake pads arrives. Mathis reads out the part numbers, and Remy logs each one in Baserow in its own browser. Mathis checks the list.",
+        "chips": [
+          "Baserow",
+          "replaces Airtable"
+        ]
+      },
+      "say": {
+        "speaker": "mathis",
+        "text": "Brake pads logged. Please check the list."
+      }
+    },
+    {
+      "id": "garage-pdf",
+      "chapter": "garage",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "mathis",
+      "app": {
+        "id": "bentopdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "A PDF toolkit that runs in your browser. Nothing is uploaded",
+      "anchor": {
+        "role": "counter",
+        "room": "garage",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Warranty and job sheet, one file",
+        "body": "Mathis merges the warranty form and the job sheet into one PDF with BentoPDF. The work happens in his browser, and nothing is uploaded.",
+        "chips": [
+          "BentoPDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "garden-drive",
+      "chapter": "outside",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "mathis",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "A local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "front-door"
+          },
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Clips from the drive stay home",
+        "body": "The family's IP camera watches the drive. Frigate keeps the clips on the Core, and Mathis plays them back on the home Wi-Fi.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "garden-beds",
+      "chapter": "outside",
+      "category": "home",
+      "segment": "consumer",
+      "member": "solange",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A journal for the cypress",
+        "body": "Solange logs the new arborvitae in HortusFox. She notes when she watered it and adds a photo to the garden journal.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-ride",
+      "chapter": "outside",
+      "category": "home",
+      "segment": "consumer",
+      "member": "mathis",
+      "app": {
+        "id": "wanderer",
+        "replaces": []
+      },
+      "capability": "Plan, map and share hiking and biking routes from GPX files",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Saturday ride, planned on the patio",
+        "body": "On the patio, Mathis loads a GPX file into Wanderer and plans the Saturday ride. The map and the route stay on the Core.",
+        "chips": [
+          "Wanderer"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one bike shop",
+        "body": "From the garage to the study, the Dufresne household runs the shop and the house from one Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your customers, your repair history and your parts list can run on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "Remy's job in cast.json named HomeBox, which has no QA screenshot (a review item). The job now names Baserow, which keeps the parts-bin story and has a screenshot. HomeBox is not used.",
+    "garden-drive assumes the family owns an IP camera (not in the Core parcel, not in the 3D scene). No claim that it prevents anything. Viewing away from home is not shown.",
+    "The shop is the garage, but customers come to the house: the counter beat shows a customer at the garage counter, never a public website or a booking page.",
+    "Invented place and street: check Saint Aubrelle and Chemin Ormeau against a map."
+  ]
+}

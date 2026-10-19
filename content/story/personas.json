@@ -1,0 +1,64 @@
+{
+  "$comment": "The machine-readable archetype table of reference/story/personas.md (the contract). Read by the validator (scripts/story/lib/persona.mts: persona-cover) and mirrored by member.archetype in the schema and ARCHETYPES in assets/story/types.ts; a test keeps all three equal. `rooms` are room roles (schema roomRole); `anchorRoles` are role ids (roles.json). The app pools are a starting point: the catalog (catalog-apps.json) decides what may be named at all.",
+  "v": 1,
+  "archetypes": {
+    "organiser": {
+      "label": "Organiser",
+      "description": "Runs the household and often a small business from a home office: planning, files and paperwork.",
+      "example": "Sally",
+      "rooms": ["office"],
+      "fallbackRooms": ["dining", "living", "bedroom"],
+      "anchorRoles": ["desk"],
+      "fallbackAnchorRoles": ["dining-table", "couch", "room"],
+      "apps": ["ci-planning", "nextcloud", "libreoffice", "paperless", "stirling-pdf", "vaultwarden", "joplin", "bookstack", "n8n", "yuvomi"]
+    },
+    "builder": {
+      "label": "Builder",
+      "description": "Writes software for a living, laptop on the desk: the code and a local model both live on the Core.",
+      "example": "John",
+      "rooms": ["office", "bedroom", "living"],
+      "fallbackRooms": ["dining", "kids"],
+      "anchorRoles": ["desk"],
+      "fallbackAnchorRoles": ["dining-table", "room"],
+      "apps": ["code-server", "forgejo", "gitea", "ollama", "open-webui", "ci-openclaw", "jupyterlab", "n8n"]
+    },
+    "gamer": {
+      "label": "Gamer",
+      "description": "Plays on the Core from the couch or the bedroom: Steam Headless streams to a screen in the house.",
+      "example": "Steve",
+      "rooms": ["kids", "bedroom", "living"],
+      "fallbackRooms": ["dining", "office"],
+      "anchorRoles": ["tv", "bed", "desk"],
+      "fallbackAnchorRoles": ["couch", "room"],
+      "apps": ["steam-headless", "jellyfin", "immich"]
+    },
+    "learner": {
+      "label": "Learner",
+      "description": "Studies and reads: homework, languages and exams with local tools.",
+      "example": "Jean",
+      "rooms": ["kids", "bedroom", "office"],
+      "fallbackRooms": ["living", "dining"],
+      "anchorRoles": ["desk", "bookshelf"],
+      "fallbackAnchorRoles": ["couch", "room"],
+      "apps": ["open-webui", "kiwix", "calibre-web", "libretranslate", "obsidian", "jupyterlab", "ci-spellbook"]
+    },
+    "maker": {
+      "label": "Maker",
+      "description": "Paints, photographs, writes or plays; the household's creative work lives on the Core.",
+      "rooms": ["office", "living", "bedroom", "kids", "garden", "patio"],
+      "fallbackRooms": ["dining"],
+      "anchorRoles": ["easel", "music", "desk"],
+      "fallbackAnchorRoles": ["couch", "room"],
+      "apps": ["immich", "ci-planning", "obsidian", "jellyfin"]
+    },
+    "host": {
+      "label": "Host",
+      "description": "Feeds, ferries, waters and tidies the house: the household's shared beats.",
+      "rooms": ["kitchen", "dining", "garden", "patio", "living"],
+      "fallbackRooms": [],
+      "anchorRoles": ["kitchen-island", "fridge", "range", "garden", "couch", "tv"],
+      "fallbackAnchorRoles": ["counter", "room"],
+      "apps": ["immich", "jellyfin", "home-assistant", "mealie", "kitchenowl", "hortusfox", "yuvomi"]
+    }
+  }
+}

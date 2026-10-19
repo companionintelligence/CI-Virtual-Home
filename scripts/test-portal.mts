@@ -4,13 +4,17 @@
 // @check-house skip — it tests dist/, which `pnpm run portal:build` makes; run `pnpm run portal:test` after portal work
 //
 //   pnpm run build && pnpm run portal:build && pnpm run portal:test [--dir dist] [--base /ci-virtual-home/]
-//        [--house aurora,lakecabin,mirage] [--shots test/portal] [--headed]
+//        [--house aurora,lakecabin,mirage] [--shots test/portal] [--headed] [--only gallery,pages,previews,caching,player,motion,failures,editor,campaign,hooks,webkit]
 //
 //   gallery   30 cards, every thumbnail decoded, the static hero figures match the data, no link forces
-//             autoplay, card names carry no Sims jargon and are distinct, hovering a card warms the player (not
+//             autoplay, card names carry no pack-tag jargon and are distinct, hovering a card warms the player (not
 //             room-creator.html itself), search / storeys / tag filters narrow and clear (and the tag counts follow
-//             the storeys filter), the footer credits every build by its own title, a card opens the player; the
-//             built pages' link previews are the site's, with absolute JPEG images; 1440 × 900 and 390 × 844
+//             the storeys filter), no card or footer credits a builder or names a build (and the footer has only the brand
+//             line, the company links, every home's page and the copyright), a card opens the player; the
+//             built pages' link previews are the site's, with absolute JPEG images; 1440 × 900 and 390 × 844. (Front page: a card is a
+//             family's, with its home, its people as monogram discs with their jobs and the apps that tell the story, and opens the
+//             family's page; the hero's "Take the tour" opens the player; the persona filter (?persona=) and the other filters keep
+//             the address's other parameters; a phone's hero picture is the 640 px thumbnail)
 //   player    for each --house: builds, opens on the Orbit, lists its shots from the presets, plays (t advances),
 //             pauses (Space),
 //             Space on a focused button presses that button, scrubs (a click on the scrubber lands there),
@@ -28,16 +32,25 @@
 //             module that does not download (viewer.js, house-builder.js) and a browser with WebGL 1 only: a
 //             card that says so, with a way back, instead of an endless loader; the names module
 //             (home-names.js) not downloading: the gallery still lists the homes, and the player's tab never
-//             shows a spec's Sims title
+//             shows a title with the pack tag
 //   pages     the built site's own pages, without a browser's help: the gallery lists its 30 homes in the HTML itself (each
 //             linking its page), a home's page names and shows the home and offers the player, a shared moment forwards
 //             to the player, /robots.txt is text/plain, /sitemap.xml lists the gallery and every home, an unknown path
 //             answers 404 with the 404 page, the icons and the manifest are served, and every page carries the Companion
-//             Core, download, docs and main-site links
+//             Core, download, docs and main-site links; no page, spec, list or script carries a credit: the shipped specs
+//             have no author or source, and the credit guard (scripts/portal-redact.mts) finds nothing in dist/
 //   caching   dist/_headers revalidates every file (max-age=0, must-revalidate), and the pages name every module and
 //             stylesheet by a hash of its content (import map + ?v=): the player pulls each module by its hash, and with
 //             every un-hashed module URL poisoned (an old build in the browser's cache) it still starts
 //   editor    room-creator.html without ?mode=view still shows the editor and never mounts the player
+//   campaign  (front page) an ad's tags (utm_source, utm_medium, utm_campaign, utm_content, utm_term, fbclid, ttclid, gclid, msclkid) in the address
+//             are kept for the visit (sessionStorage "ci-campaign") and put, in the browser only, on the links to ci.computer, /core and
+//             /download and on the links marked data-campaign: the hero's tour, the family cards, a family's page, a home's page and the 404;
+//             not on the docs, privacy or terms; with storage blocked they still ride on the page's links; an organic visit changes nothing
+//   hooks     every scripts/story/portal-tests/*.mts (scripts/story/hooks.ts): the family pages (the four links, the home's name in the fine print and no credit, the
+//             copy lint, the tour link and a shared moment forwarding to the player) and the narrated tour (popup placement,
+//             keyboard and accessibility, audio and the gesture rule, the address bar, next home). A build with no current family
+//             has nothing to test there and says so. The story's pages are checked at build time too (portal:build, step 7)
 //   webkit    Safari's engine, when Playwright's WebKit for the pinned version is installed: the gallery, the player
 //             (plays, pauses, scrubs) and the editor (builds a home, hooks there), with no console error. Skipped with
 //             a line saying so when it is not (pnpm exec playwright install webkit); required with --webkit
@@ -48,13 +61,20 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { ROOT, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
+import { TEST_GLOB } from './story/hooks.ts';
+import { builderHandles, guardOutput } from './portal-redact.mts';
+import type { TestCtx, TestFn } from './story/hooks.ts';
 
 const args = parseArgs(process.argv.slice(2));
 const DIR = path.resolve(args.dir || path.join(ROOT, 'dist'));
 const BASE = args.base || '/ci-virtual-home/';
 const HOUSES = (args.house || 'aurora,lakecabin,mirage').split(',').filter(Boolean);
 const SHOTS = path.resolve(args.shots || path.join(ROOT, 'test', 'portal'));
+// --only <legs>: run just those (the whole run is the default)
+const ONLY = args.only && args.only !== 'true' ? new Set(args.only.split(',').filter(Boolean)) : null;
+const wants = (leg: string): boolean => !ONLY || ONLY.has(leg);
 if (!fs.existsSync(path.join(DIR, 'index.html'))) { console.error(`no portal in ${DIR}: pnpm run portal:build`); process.exit(2); }
 fs.mkdirSync(SHOTS, { recursive: true });
 
@@ -64,7 +84,7 @@ const browser = await pw.chromium.launch({ headless: args.headed !== 'true', arg
 
 let failures = 0, passes = 0;
 const ok = (cond: unknown, what: string): void => { if (cond) { passes++; console.log(`  \x1b[32m✓\x1b[0m ${what}`); } else { failures++; console.log(`  \x1b[31m✗ ${what}\x1b[0m`); } };
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms));
 
 type Ctx = { page: any; errors: string[]; thirdParty: string[]; requests: string[]; close: () => Promise<void> };
 async function open(viewport: { width: number; height: number }, mobile = false, extra: Record<string, unknown> = {}, b: any = browser): Promise<Ctx> {
@@ -121,22 +141,76 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   console.log(`\ngallery ${label}`);
   const { page, errors, thirdParty, requests, close } = await open(viewport, mobile);
   // the hero figures a visitor without JavaScript (or a crawler) reads, before gallery.js replaces them
-  const staticStats = await (await fetch(srv.url('index.html'))).text().then(t => ['homes', 'builders', 'area'].map(k => (t.match(new RegExp(`data-stat="${k}">([^<]*)<`)) || [])[1]));
+  const staticStats = await (await fetch(srv.url('index.html'))).text().then(t => ['homes', 'area'].map(k => (t.match(new RegExp(`data-stat="${k}">([^<]*)<`)) || [])[1]));
   await page.goto(srv.url('index.html'));
   await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
   const cards = await page.$$eval('#grid .card', (els: Element[]) => els.length);
   ok(cards === 30, `${cards} cards`);
   const liveStats = await page.$$eval('[data-stat]', (els: Element[]) => els.map(e => e.textContent));
   ok(JSON.stringify(liveStats) === JSON.stringify(staticStats), `the static hero figures are the data's (${staticStats.join(' / ')})`);
-  const titles: string[] = await page.$$eval('#grid .card h3', (els: Element[]) => els.map(e => e.textContent || ''));
-  ok(titles.length === 30 && !titles.some(t => /base\s*game|basegame|\bBG\b/i.test(t)) && new Set(titles).size === 30, `card names carry no Sims jargon and are all distinct (${titles.slice(0, 3).join(', ')}, …)`);
+  // ---- front page ---- a family's card is headed by the family ("The Brennan family", which the three flagship homes share) and names its
+  // home on the line under it, so the names that must be distinct and clean are the HOMES': that line for a family's card, the heading for a home's own
+  const titles: string[] = await page.$$eval('#grid .card', (els: HTMLElement[]) => els.map(e => ((e.querySelector('.home-line')?.textContent || '').split(' · ')[0]) || e.querySelector('h3')!.textContent || ''));
+  const headings: string[] = await page.$$eval('#grid .card h3', (els: Element[]) => els.map(e => e.textContent || ''));
+  ok(titles.length === 30 && headings.length === 30 && ![...titles, ...headings].some(t => /base\s*game|basegame|\bBG\b/i.test(t)) && new Set(titles).size === 30, `the homes' names on the cards carry no Sims jargon and are all distinct (${titles.slice(0, 3).join(', ')}, …)`);
   const storeysLabels = await page.$$eval('#storeys button', (els: Element[]) => els.map(e => e.textContent));
   ok(storeysLabels.join('|') === 'Any|1|2|3+', `the storeys filter reads ${storeysLabels.join(' · ')}`);
-  const credits: string[] = await page.$$eval('#builds-list li', (els: Element[]) => els.map(e => e.textContent || ''));
-  ok(credits.length === 30 && credits.some(c => /after “Base Game Modern Home” by SimsWithNora/.test(c)), `the footer credits every build by its own title (${credits.find(c => /Base Game Modern Home”/.test(c)) || credits[0]})`);
+  // no builder is credited anywhere: no credit line on a card, no builds list, no credits block, no hero figure about builders, and not
+  // the word "by" on a card; the footer is the brand line, the company links, every home's page and the copyright
+  const credited = await page.evaluate(() => ({
+    spans: document.querySelectorAll('.credit, #builds, #builds-list, .builds, [data-stat="builders"]').length,
+    cardText: Array.from(document.querySelectorAll('#grid .card .facts')).map(c => c.textContent || '').filter(t => /\bby\b/i.test(t)).length,
+    titles: Array.from(document.querySelectorAll('#grid .card [title], #grid .card [aria-label]')).map(e => `${e.getAttribute('title') || ''} ${e.getAttribute('aria-label') || ''}`).filter(t => /\bsims\b|credit/i.test(t)).length,
+    foot: (document.querySelector('.site-foot') as HTMLElement).innerText,
+    search: (document.querySelector('#q') as HTMLInputElement).placeholder,
+  }));
+  ok(credited.spans === 0 && credited.cardText === 0 && credited.titles === 0, `no card, tooltip or footer list credits a builder (${credited.spans} credit elements, ${credited.cardText} fact rows with "by", ${credited.titles} tooltips)`);
+  ok(!/credit|builder|sims|every frame is drawn|three\.js|webgl/i.test(credited.foot) && /© 2026 LifeScope Inc\., DBA Companion Intelligence\./.test(credited.foot) && !/builder/i.test(credited.search), `the footer has no credits block and no blurb, and keeps the copyright; the search says "${credited.search}"`);
+  const footHeads = await page.$$eval('.site-foot .foot-links p, .site-foot .foot-links b', (els: Element[]) => els.length);
+  const footLinks: string[] = await page.$$eval('.site-foot .foot-links a', (els: HTMLAnchorElement[]) => els.map(a => a.href));
+  ok(footHeads === 0 && ['https://ci.computer/', 'https://ci.computer/core', 'https://ci.computer/download', 'https://docs.ci.computer/docs/apps-available/first-party-apps', 'https://ci.computer/privacy-policy', 'https://ci.computer/terms-of-service'].every(l => footLinks.includes(l)) && (await page.isVisible('.site-foot .foot-brand')), `the footer's company links are all there, with no heading above them (${footLinks.length} links), under the brand line`);
+  // searching a builder's handle (read from the specs, not listed here) finds no home: the search reads the name, the style and the id
+  const found: string[] = [];
+  for (const handle of builderHandles(ROOT)) {
+    await page.fill('#q', handle);
+    await sleep(220);
+    if ((await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) > 0) found.push(handle);
+  }
+  await page.fill('#q', '');
+  await sleep(220);
+  ok(found.length === 0 && (await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) === 30, `no search finds a home by its builder's handle${found.length ? ` (found: ${found.join(', ')})` : ''}`);
   const hrefs: string[] = await page.$$eval('#grid .card a, #hero-play, #hero-media', (els: HTMLAnchorElement[]) => els.map(a => a.href));
   ok(hrefs.length === 32 && hrefs.every(h => !new URL(h).searchParams.has('play')), 'no gallery link forces autoplay (the player decides, and honours reduced motion)');
-  // the cards go to the player; the homes' own pages are linked from the footer, in the rendered DOM a crawler that runs the page reads
+  // ---- front page ---- the people on the cards, the jobs they filter by, the label, the hero's picture and the campaign
+  const front = await page.evaluate(() => ({
+    families: document.querySelectorAll('#grid .card-family').length,
+    discs: document.querySelectorAll('#grid .card-family .cast .disc').length,
+    jobs: Array.from(document.querySelectorAll('#grid .card-family .cast .who span')).map(e => e.textContent || ''),
+    apps: Array.from(document.querySelectorAll('#grid .card-family .apps li')).every(li => /^.+ replaces .+$/.test(li.textContent || '')),
+    cta: Array.from(document.querySelectorAll('#grid .card-family .go')).every(e => (e.textContent || '').trim() === 'Take the tour'),
+    label: (document.querySelector('.fiction-label') as HTMLElement | null)?.innerText || '',
+    labelShown: !!document.querySelector('.fiction-label') && (document.querySelector('.fiction-label') as HTMLElement).getBoundingClientRect().height > 0,
+    persona: Array.from(document.querySelectorAll('#personas .persona')).map(b => `${(b as HTMLElement).dataset.persona}:${b.querySelector('small')!.textContent}`),
+    heroSrc: (document.querySelector('.hero-media img') as HTMLImageElement).currentSrc,
+    heroName: (document.querySelector('#hero-media') as HTMLAnchorElement).getAttribute('aria-label'),
+  }));
+  const manifestFamilies = Object.keys(JSON.parse(fs.readFileSync(path.join(DIR, 'story', 'manifest.json'), 'utf8')).byFamily || {}).length;
+  ok(front.families === manifestFamilies && front.discs >= front.families * 2 && front.apps && front.cta, `${front.families} family cards (one for each family with a page), ${front.discs} people on them as monogram discs, each app line "<app> replaces <service>", each card ends "Take the tour"`);
+  ok(front.jobs.length > 0 && front.jobs.every(j => /^[a-z ]+$/.test(j)) && front.jobs.some(j => j === 'organiser') && front.jobs.some(j => j === 'builder'), `each person's job is in words under the name (${[...new Set(front.jobs)].join(', ')})`);
+  ok(front.persona.length >= 2 && front.persona.every(x => !x.endsWith(':')), `the persona buttons count the families (${front.persona.join(', ')})`);
+  ok(front.label === 'Fictional family. Real software.' && front.labelShown, `"${front.label}" is on screen in the hero`);
+  ok(mobile ? /portal\/thumbs\/[a-z0-9-]+\.webp$/.test(front.heroSrc) : /portal\/previews\/[a-z0-9-]+\.jpg$/.test(front.heroSrc), `the hero's picture is ${front.heroSrc.replace(srv.origin + BASE, '')} (a phone gets the 640 px one, not the 1600 px hero.webp that drove the LCP to 3.5 s)`);
+  if (mobile) {
+    const bytes = (await (await fetch(front.heroSrc)).arrayBuffer()).byteLength;
+    ok(bytes < 80 * 1024, `and it is ${Math.round(bytes / 1024)} KB`);
+  }
+  // the persona filter: the address carries it (and keeps every other parameter), the cards narrow, and clearing puts it back
+  await page.click('#personas .persona[data-persona="builder"]');
+  const builders = await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length);
+  ok(builders > 0 && builders < 30 && (await page.evaluate(() => location.search)).includes('persona=builder'), `Code narrows to ${builders} and the address says persona=builder`);
+  await page.click('#personas .persona[data-persona="builder"]');
+  ok((await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) === 30 && !(await page.evaluate(() => location.search)).includes('persona'), 'pressing it again lets it go');
+  // the cards go to their family's page; the homes' own pages are linked from the footer, in the rendered DOM a crawler that runs the page reads
   const pageLinks: string[] = await page.$$eval('a[href*="homes/"]', (els: HTMLAnchorElement[]) => els.map(a => new URL(a.href).pathname));
   ok(pageLinks.length === 30 && new Set(pageLinks).size === 30 && pageLinks.every(h => h.startsWith(`${BASE}homes/`)), `once gallery.js has run, the page links all ${new Set(pageLinks).size} homes' own pages (the footer's list: ${pageLinks[0].replace(BASE, '')} … ${pageLinks[29].replace(BASE, '')})`);
   // load every thumbnail (lazy ones too) and check each decoded
@@ -152,13 +226,20 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
     // a pointer over a card warms three.js, the engine and that home's spec — never room-creator.html, whose player URL
     // carries a query and so could never be served from that request. They are ordinary fetches (a prefetch is refused with
     // a 503 by the live zone), and the engine's modules are asked for by the hash the player will use
+    // ---- front page ---- a family's card goes to its page, a light one: hovering it warms nothing; the link that opens the player (the
+    // hero's tour, or a home's own card) warms the engine and that home's spec
     const before = requests.length;
     await page.hover('#grid .card:nth-child(5) a');
+    await sleep(800);
+    const coldAsks = requests.slice(before).map((u: string) => u.replace(srv.origin, '')).filter((u: string) => /\/(assets|content)\//.test(u));
+    ok(coldAsks.length === 0, `hovering a family's card (it opens its page) warms nothing${coldAsks.length ? `: ${coldAsks.slice(0, 3).join(', ')}` : ''}`);
+    const before2 = requests.length;
+    await page.hover('#hero-play');
     await sleep(1500);
-    const warmed: string[] = requests.slice(before).map((u: string) => u.replace(srv.origin, '')).filter((u: string) => /\/(assets|content)\//.test(u));
-    const id5 = await page.$eval('#grid .card:nth-child(5)', (e: HTMLElement) => e.dataset.id);
+    const warmed: string[] = requests.slice(before2).map((u: string) => u.replace(srv.origin, '')).filter((u: string) => /\/(assets|content)\//.test(u));
+    const idHero = new URL(await page.$eval('#hero-play', (a: HTMLAnchorElement) => a.href)).searchParams.get('house');
     const viewerUrl = await page.evaluate(() => JSON.parse(document.querySelector('script[type="importmap"]')!.textContent!).imports['./assets/viewer.js']);
-    ok(warmed.some(u => u.includes('assets/vendor/three/three.module.min.js')) && warmed.some(u => u.includes(`content/houses/${id5}.json`)) && warmed.some(u => u.endsWith(viewerUrl.replace(/^\.\//, ''))) && !warmed.some(u => u.includes('room-creator')), `hovering a card warms ${warmed.length} files (the engine by its hash), not the page`);
+    ok(warmed.some(u => u.includes('assets/vendor/three/three.module.min.js')) && warmed.some(u => u.includes(`content/houses/${idHero}.json`)) && warmed.some(u => u.endsWith(viewerUrl.replace(/^\.\//, ''))) && !warmed.some(u => u.includes('room-creator')), `hovering the tour link warms ${warmed.length} files (the engine by its hash), not the page`);
     ok(await page.$$eval('link[rel="prefetch"]', (ls: Element[]) => ls.length) === 0, 'and with plain fetches: no <link rel="prefetch"> (the live zone refuses those with a 503)');
   }
   await page.fill('#q', 'brick');
@@ -169,6 +250,8 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   await page.fill('#q', '');
   await sleep(250);   // the search input is debounced: let the cleared query land before the next filter
   const tagCounts = () => page.$$eval('#tags .tag', (els: HTMLElement[]) => els.map(e => `${e.dataset.tag} ${e.querySelector('small')!.textContent}${(e as HTMLButtonElement).disabled ? ' off' : ''}`).join(', '));
+  // ---- front page ---- the style and storeys filters sit in a <details>: open on a wide screen, closed on a phone (open it as a visitor would)
+  if (!(await page.evaluate(() => (document.getElementById('more-filters') as HTMLDetailsElement).open))) await page.click('.more-filters summary');
   const countsAll = await tagCounts();
   await page.click('#storeys button[data-storeys="1"]');
   const one = await visible();
@@ -196,13 +279,18 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   await page.click('.core-more');
   await sleep(200);
   ok(await page.evaluate(() => location.hash === '#core' && document.getElementById('core')!.matches('.cta-band')), 'the hero\'s "What is the Companion Core?" goes to the band that says');
-  // a card opens the player
+  // ---- front page ---- a family's card opens that family's page (which goes on to the tour), and the hero's tour opens the player
   await page.click('#grid .card:nth-child(2) a');
+  await page.waitForURL(/\/family\/[a-z-]+$/, { waitUntil: 'commit', timeout: 30000 });
+  ok(true, `a family's card opens its page (${new URL(page.url()).pathname.replace(BASE, '')})`);
+  await page.goBack();
+  await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
+  await page.click('#hero-play');
   // the navigation, not its load event (three.js and the engine are part of that, and a loaded machine takes a
   // while over them); viewerReady below waits for the player itself
   await page.waitForURL(/room-creator\?mode=view/, { waitUntil: 'commit', timeout: 30000 });
   await viewerReady(page);
-  ok(true, `a card opens the player (${new URL(page.url()).searchParams.get('house')})`);
+  ok(true, `the hero's "Take the tour" opens the player (${new URL(page.url()).searchParams.get('house')}, ${new URL(page.url()).searchParams.get('family') || 'no tour'})`);
   ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
   ok(thirdParty.length === 0, `the gallery and the player ask no third party for anything${thirdParty.length ? ': ' + thirdParty.join(' | ') : ''}`);
   await close();
@@ -218,8 +306,17 @@ async function pages() {
 
   // the gallery's HTML, as a crawler or a visitor without JavaScript gets it
   const gallery = await get('index.html');
-  const listed = [...gallery.text.matchAll(/<li class="card" data-id="([^"]+)"><a href="\.\/homes\/([^"]+)"/g)];
-  ok(listed.length === ids.length && listed.every(m => m[1] === m[2]) && listed.map(m => m[1]).join() === ids.join(), `the gallery's HTML lists all ${listed.length} homes, each linking its page (./homes/<id>)`);
+  // ---- front page ---- the HTML has a static card for each family with a page (linking family/<slug>) and, for each home with none, the home's
+  // card linking its page (./homes/<id>): every home once, so a crawler and a visitor without JavaScript see all of them
+  const storyManifest = JSON.parse(fs.readFileSync(path.join(DIR, 'story', 'manifest.json'), 'utf8'));
+  const byFamily: Record<string, { house: string }> = storyManifest.byFamily || {};
+  const chunks = gallery.text.slice(gallery.text.indexOf('<ul class="grid"'), gallery.text.indexOf('<div class="empty" id="empty"')).split(/(?=<li class="card)/).slice(1);
+  const famCards = chunks.filter(c => c.startsWith('<li class="card card-family"')).map(c => ({ house: (c.match(/data-id="([^"]+)"/) || [])[1], slug: (c.match(/data-slug="([^"]+)"/) || [])[1], href: (c.match(/<h3><a href="\.\/family\/([^"?#]+)" data-campaign aria-label="[^"]+">[^<]+<\/a><\/h3>/) || [])[1], discs: (c.match(/<span class="disc"/g) || []).length, replaces: / replaces /.test(c), home: /<p class="home-line">[^<]+<\/p>/.test(c) }));
+  ok(famCards.length === Object.keys(byFamily).length && famCards.every(c => c.slug === c.href && byFamily[c.slug]?.house === c.house) && famCards.map(c => c.slug).join() === Object.keys(byFamily).join(), `the gallery's HTML has a static card for each of the ${famCards.length} families with a page, in the story's order, each linking ./family/<slug>`);
+  const homeCards = chunks.filter(c => c.startsWith('<li class="card" ')).map(c => c.match(/^<li class="card" data-id="([^"]+)"><a href="\.\/homes\/([^"]+)"/)).filter(Boolean) as RegExpMatchArray[];
+  ok(homeCards.every(m => m[1] === m[2]) && [...famCards.map(c => c.house), ...homeCards.map(m => m[1])].sort().join() === [...ids].sort().join(), `and a card linking its page (./homes/<id>) for each of the ${homeCards.length} homes with no family: every one of the ${ids.length} homes is there once`);
+  ok(famCards.every(c => c.discs >= 2 && c.replaces && c.home), 'each family card has its home, its people (monogram discs, each with a job) and the apps that tell the story');
+  ok(/<div class="personas"[^>]*>\s*<button[^>]*data-persona="(organiser|builder|gamer|learner|maker|host)"/.test(gallery.text) && /name="vh-clean-urls"/.test(gallery.text), 'and the persona buttons for the jobs the families do');
   ok(links.every(l => gallery.text.includes(`href="${l}"`)) && gallery.text.includes('href="https://ci.computer/privacy-policy"') && gallery.text.includes('href="https://ci.computer/terms-of-service"'), 'and carries the main site, /core, /download, the docs, privacy and terms');
   // one callout, not four: the header, the band and the footer offer Buy and Download (the hero only says what the Core is, and
   // points at the band), the main site is linked from the header and the footer, and no sentence is said twice
@@ -227,8 +324,39 @@ async function pages() {
   ok(count(gallery.text, links[1]) === 3 && count(gallery.text, links[2]) === 3 && count(gallery.text, links[0]) === 2, `the gallery offers Buy Companion Core ${count(gallery.text, links[1])}×, Download ${count(gallery.text, links[2])}× and links ci.computer ${count(gallery.text, links[0])}×`);
   const sentences = [...gallery.text.matchAll(/The small computer on (?:your|the) desk/g)].length;
   ok(sentences === 1, `"The small computer on your desk …" is said once on the gallery (${sentences})`);
-  const heroLinks = [...gallery.text.matchAll(/id="hero-(?:play|media)" href="([^"]+)"/g)].map(m => m[1]);
-  ok(heroLinks.length === 2 && heroLinks.every(h => h.startsWith('./room-creator?mode=view')), 'its hero links go to the player without .html');
+  const heroLinks = [...gallery.text.matchAll(/id="hero-(?:play|media)"[^>]*? href="([^"]+)"/g)].map(m => m[1]);
+  ok(heroLinks.length === 2 && heroLinks.every(h => h.startsWith('./room-creator?mode=view') && !h.includes('.html')), 'its hero links go to the player without .html');
+  // ---- front page ---- the hero tours the flagship family when that family has a page; one h1 that says "thirty"; the label; no price, no logo
+  const heroFamily = heroLinks[0].includes('&amp;family=') ? new URL(heroLinks[0].replace(/&amp;/g, '&'), 'http://x/').searchParams.get('family') : null;
+  ok(!heroFamily || !!byFamily[heroFamily], `the hero's "Take the tour" plays ${heroFamily ? `the ${heroFamily} family's tour` : 'a home'}`);
+  const h1s = [...gallery.text.matchAll(/<h1[^>]*>([^<]*)<\/h1>/g)].map(m => m[1]);
+  ok(h1s.length === 1 && /\bthirty\b/i.test(h1s[0]) && gallery.text.includes('>Fictional family. Real software.<') && gallery.text.includes('Companion OS is in beta.') && !/[$€£]\s?\d|<img[^>]+(google|apple|github|nextcloud|steam)/i.test(gallery.text), `one <h1> ("${h1s[0]}"), the label, the beta line, no price and no logo of a third party's`);
+  // every string of the front page the story's copy rules cover (scripts/story/check-copy.mts's banned phrases, headings in sentence case)
+  {
+    const claims = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'claims.json'), 'utf8'));
+    const errs = (claims.bannedPhrases as { id: string; pattern: string; flags?: string; severity: string }[]).filter(b => b.severity === 'error').map(b => ({ id: b.id, re: new RegExp(b.pattern, b.flags ?? 'i') }));
+    // (the line under a family's name names its home, by its display name: the one place the story's own rules let a home be named, as the fine print on a family's page)
+    const body = gallery.text.replace(/<head[\s\S]*?<\/head>/, '').replace(/<p class="home-line">[\s\S]*?<\/p>/g, ' ').replace(/<script[\s\S]*?<\/script>/g, ' ').replace(/<style[\s\S]*?<\/style>/g, ' ').replace(/<svg[\s\S]*?<\/svg>/g, ' ').replace(/<!--[\s\S]*?-->/g, ' ');
+    // what a visitor reads: the hero, the filters and the cards (the Core band and the footer are main's wording, which says "your own AI, apps and memory")
+    const read = body.slice(body.indexOf('<main>'), body.indexOf('<section class="cta-band"')).replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/\s+/g, ' ');
+    const hits = errs.filter(r => r.re.test(read)).map(r => r.id);
+    ok(hits.length === 0 && !/[—–]/.test(read) && !/!/.test(read) && !/\blog ?in\b/i.test(read), `the hero, the filters and the cards pass the story's banned-phrase rules${hits.length ? ` (hit: ${hits.join(', ')})` : ''}`);
+  }
+  // the family and home pages and the 404 load the campaign script; the family pages' tag is the family build's, held here too
+  const camp = /<script src="[^"]*portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/;
+  const campaignMissing: string[] = [];
+  for (const [name, text] of [['index.html', gallery.text], ['404', (await get('no-such-page')).text], ...(await Promise.all([...ids, ...Object.keys(byFamily).map(f => `family/${f}`)].map(async id => [id.startsWith('family/') ? id : `homes/${id}`, (await get(id.startsWith('family/') ? id : `homes/${id}`)).text] as [string, string])))] as [string, string][]) if (!camp.test(text)) campaignMissing.push(name);
+  ok(campaignMissing.length === 0, `the gallery, the 404, the ${ids.length} homes' pages and the ${Object.keys(byFamily).length} family pages load portal/campaign.js (with its hash, defer and data-cfasync="false")${campaignMissing.length ? `: missing on ${campaignMissing.slice(0, 4).join(', ')}` : ''}`);
+  // "Meet the family": on the page of a home a current family lives in, linking family/<slug>; a home with none has no block and no marker
+  {
+    const withFamily = Object.entries(byFamily)[0];
+    const without = ids.find(id => !Object.values(byFamily).some(f => f.house === id));
+    if (withFamily) {
+      const t = (await get(`homes/${withFamily[1].house}`)).text;
+      ok(/<section class="family-block"[\s\S]*?<h2 id="family-title">Meet the family<\/h2>[\s\S]*?Fictional family\. Real software\.[\s\S]*?href="\.\.\/family\/[^"?#]+" data-campaign/.test(t) && t.includes(`href="../family/${withFamily[0]}"`) && !t.includes('meet-family:'), `/homes/${withFamily[1].house} has "Meet the family", linking ../family/${withFamily[0]}`);
+    }
+    if (without) { const t = (await get(`homes/${without}`)).text; ok(!t.includes('family-block') && !t.includes('meet-family:'), `/homes/${without} has no family and no block`); }
+  }
 
   // a home's own page
   const aurora = await get('homes/aurora');
@@ -243,6 +371,18 @@ async function pages() {
   const direct = await get('homes/aurora.html');
   ok(direct.status === 200, '… and homes/aurora.html is served too (Pages answers it with a 308 to the address above)');
 
+  // no builder is credited and no build is named in anything the site serves: the pages carry no credit line or block (the home's page
+  // says only that it is built live from one spec file), the shipped specs and the list have no `author` and no `source`, and the guard
+  // portal:build runs over the whole output (the handles are read from the specs; the words are "Sims", "Base Game" and "BG ") finds nothing
+  const missing404 = await get('no-such-page');
+  const credited = [gallery, aurora, missing404].filter(p => /class="credit"|class="home-credit"|data-stat="builders"|id="builds|<b>Credits<\/b>|Credit:|Every frame is drawn on your device/.test(p.text));
+  ok(credited.length === 0 && /<p class="home-note">Built live in your browser from one spec file\.<\/p>/.test(aurora.text) && !/<p><b>Companion Intelligence<\/b><\/p>/.test(gallery.text + aurora.text), 'the gallery, a home\'s page and the 404 page have no credit line, no credits block, no builders figure and no footer blurb or heading above the company links');
+  const specs = ids.map(id => JSON.parse(fs.readFileSync(path.join(DIR, 'content', 'houses', `${id}.json`), 'utf8')));
+  ok(specs.every(s => !('author' in s) && !('source' in s)) && index.houses.every((h: any) => !('author' in h) && !('source' in h)), `the ${specs.length} shipped specs and the list carry no author and no source`);
+  ok(index.houses.every((h: any, i: number) => specs[i].name === h.name && !/base\s*game|basegame|\bBG\b|\bfix\b|\d+k\b/i.test(h.name)), 'and their name is the portal\'s name for the home, the one the cards and the player show');
+  const guard = guardOutput(DIR, ROOT);
+  ok(guard.problems.length === 0, `the credit guard reads ${guard.files} files of the output for ${guard.handles} builder handles, "Sims", "Base Game" and "BG " and finds ${guard.problems.length ? guard.problems.slice(0, 3).join(' | ') : 'nothing'}`);
+
   // the player and the editor are one file: out of the index in its own HTML, with the four links where JavaScript is off
   const rc = await get('room-creator.html');
   ok(links.every(l => rc.text.includes(`href="${l}"`)) && /<noscript>/.test(rc.text), 'room-creator.html (the player and the editor) carries the four links in its own HTML, in a <noscript> for a visitor without JavaScript');
@@ -253,7 +393,9 @@ async function pages() {
   ok(robots.status === 200 && /^text\/plain/.test(robots.type) && /^Sitemap: https:\/\/\S+\/sitemap\.xml$/m.test(robots.text), `robots.txt is text/plain and names the sitemap`);
   const sitemap = await get('sitemap.xml');
   const locs = [...sitemap.text.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
-  ok(sitemap.status === 200 && locs.length === ids.length + 1 && ids.every(id => locs.some(l => l.endsWith(`/homes/${id}`))) && !locs.some(l => /\.html$/.test(l)), `sitemap.xml lists the gallery and ${locs.length - 1} homes, none with .html`);
+  // (and a page for each family the story build found current: story/manifest.json lists them)
+  const families = Object.keys(JSON.parse(fs.readFileSync(path.join(DIR, 'story', 'manifest.json'), 'utf8')).byFamily || {});
+  ok(sitemap.status === 200 && locs.length === ids.length + 1 + families.length && ids.every(id => locs.some(l => l.endsWith(`/homes/${id}`))) && families.every(f => locs.some(l => l.endsWith(`/family/${f}`))) && !locs.some(l => /\.html$/.test(l)), `sitemap.xml lists the gallery, ${ids.length} homes and ${families.length} famil${families.length === 1 ? 'y' : 'ies'}, none with .html`);
   const missing = await get('no-such-page');
   ok(missing.status === 404 && /<title>Page not found/.test(missing.text) && /<h1>Page not found<\/h1>/.test(missing.text) && links.every(l => missing.text.includes(`href="${l}"`)), 'an unknown path answers 404 with the 404 page, which links the four');
   ok(['og:url', 'og:image:width', 'og:image:height', 'og:image:alt'].every(p => missing.text.includes(`property="${p}"`)) && missing.text.includes('name="twitter:image:alt"') && gallery.text.includes('name="twitter:image:alt"'), 'the 404 page and the gallery carry og:url (the 404), the image\'s size and alt, and twitter:image:alt');
@@ -326,9 +468,21 @@ async function caching() {
   ok(fs.existsSync(file), 'dist/_headers is there (Cloudflare Pages reads it from the site root)');
   if (fs.existsSync(file)) {
     const lines = fs.readFileSync(file, 'utf8').split('\n').filter(l => l.trim() && !l.trim().startsWith('#'));
-    const rules = lines.filter(l => !/^\s/.test(l)), values = lines.filter(l => /^\s+cache-control\s*:/i.test(l)).map(l => l.split(':').slice(1).join(':').trim());
+    const rules = lines.filter(l => !/^\s/.test(l));
     ok(rules.includes('/*'), 'a rule for every path (/*)');
-    ok(values.length > 0 && values.every(v => /(^|[ ,])max-age=0([ ,]|$)/.test(v) && /must-revalidate/.test(v)), `every Cache-Control rule is max-age=0, must-revalidate (${values.join(' | ') || 'none'})`);
+    // the rule for every path revalidates; the only other Cache-Control rules are the story's hashed folders, which are kept for a year
+    const cc: { rule: string; value: string }[] = [];
+    let cur = '';
+    for (const l of lines) { if (!/^\s/.test(l)) cur = l.trim(); else if (/^\s+cache-control\s*:/i.test(l)) cc.push({ rule: cur, value: l.split(':').slice(1).join(':').trim() }); }
+    const root = cc.filter(c => c.rule === '/*'), rest = cc.filter(c => c.rule !== '/*');
+    ok(root.length > 0 && root.every(c => /(^|[ ,])max-age=0([ ,]|$)/.test(c.value) && /must-revalidate/.test(c.value)), `the rule for every path is max-age=0, must-revalidate (${root.map(c => c.value).join(' | ') || 'none'})`);
+    // each long rule names a folder whose files all carry a content hash (<name>.<hash10>.<ext>), so a stale copy is harmless
+    const all = (fs.readdirSync(DIR, { recursive: true }) as string[]).map(String).filter(n => fs.statSync(path.join(DIR, n)).isFile()).map(n => n.split(path.sep).join('/'));
+    const unhashed = rest.flatMap(c => {
+      const re = new RegExp(`^${c.rule.replace(/^\//, '').replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}$`);
+      return all.filter(n => re.test(n) && !/\.[0-9a-f]{10}\.[a-z0-9]+$/.test(n)).map(n => `${c.rule} ${n}`);
+    });
+    ok(rest.every(c => /max-age=31536000/.test(c.value) && /immutable/.test(c.value)) && unhashed.length === 0, `the ${rest.length} other Cache-Control rules keep only files named by a content hash for a year${unhashed.length ? ` (unhashed: ${unhashed.slice(0, 3).join(', ')})` : ''}`);
   }
 
   const hash = (rel: string): string => crypto.createHash('sha256').update(fs.readFileSync(path.join(DIR, rel))).digest('hex').slice(0, 10);
@@ -405,6 +559,9 @@ async function player(id: string, viewport: { width: number; height: number }, m
   ok(new URL(page.url()).searchParams.get('shot') === 'orbit' && (await page.getAttribute('.vh-shots .vh-chip[data-shot="orbit"]', 'aria-pressed')) === 'true', 'a link without shot= opens on the Orbit');
   const shownName = ((await page.textContent('.vh-name')) || '').trim();
   ok(!/base\s*game|basegame|\bBG\b/i.test(shownName) && (await page.title()) === `${shownName} · Virtual homes`, `the player names the home "${shownName}" (tab: ${await page.title()})`);
+  const metaText = ((await page.textContent('.vh-meta')) || '').trim();
+  const tips = await page.$$eval('.vh-name, .vh-meta', (els: HTMLElement[]) => els.map(e => e.title || '').join(' '));
+  ok(!/\bby\b/i.test(metaText) && !/credit|sims/i.test(`${metaText} ${tips}`) && /storey/.test(metaText), `the line under the name is the home's facts, with no credit (${metaText})`);
   const seekH = await page.$eval('.vh-scrub input', (e: HTMLElement) => e.getBoundingClientRect().height);
   ok(seekH >= (mobile ? 44 : 32), `the seek bar is a ${Math.round(seekH)} px target`);
   ok(await page.$eval('.vh-flybar', (e: any) => e.inert && getComputedStyle(e).visibility === 'hidden'), 'the free-camera bar is inert and hidden until flying');
@@ -633,10 +790,11 @@ async function motion(id: string) {
   const { page, errors, close } = await open({ width: 1440, height: 900 }, false, { reducedMotion: 'reduce' });
   await page.goto(srv.url('index.html'));
   await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
-  await page.click(`#grid .card[data-id="${id}"] a`);
+  // ---- front page ---- the gallery's way into the player is the hero's tour (a family's card goes to its page first)
+  await page.click('#hero-play');
   await viewerReady(page);
   const a = await scrubT(page); await sleep(900); const b = await scrubT(page);
-  ok((await page.getAttribute('.vh', 'data-playing')) === '0' && a === 0 && b === 0, 'a home opened from the gallery holds still');
+  ok((await page.getAttribute('.vh', 'data-playing')) === '0' && a === 0 && b === 0, 'a tour opened from the gallery holds still');
   await page.goto(srv.url(`room-creator.html?mode=view&house=${id}&play=1`));
   await viewerReady(page);
   await sleep(600);
@@ -728,6 +886,94 @@ async function editor() {
   await close();
 }
 
+// ------------------------------------------------------------------ ---- front page ---- the campaign's tags, in a browser
+// portal/campaign.js (scripts/test-campaign.mts runs it in a stub; this is the real thing in Chromium): an ad's tags are kept for the visit and
+// put back, at run time only, on the links that leave for ci.computer and on the ones marked data-campaign.
+async function campaign() {
+  console.log('\ncampaign');
+  const tags = 'utm_source=meta&utm_campaign=test';
+  {
+    const { page, errors, close } = await open({ width: 1440, height: 900 });
+    await page.goto(srv.url(`index.html?${tags}&fbclid=AbC_123-xyz%2B&persona=builder`));
+    await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
+    const hrefs = async (sel: string): Promise<string[]> => page.$$eval(sel, (as: HTMLAnchorElement[]) => as.map(a => a.getAttribute('href') || ''));
+    const core = await hrefs('a[href^="https://ci.computer/core"]'), dl = await hrefs('a[href^="https://ci.computer/download"]'), site = await hrefs('a[href^="https://ci.computer?"], a[href="https://ci.computer"]');
+    ok(core.length === 3 && core.every(h => h.startsWith(`https://ci.computer/core?${tags}`)) && dl.length === 3 && dl.every(h => h.startsWith(`https://ci.computer/download?${tags}`)) && site.length === 2 && site.every(h => h.includes(tags)), `the 3 links to /core, the 3 to /download and the 2 to ci.computer carry the tags (${core[0]})`);
+    const clean = await hrefs('a[href^="https://docs.ci.computer"], a[href*="privacy-policy"], a[href*="terms-of-service"]');
+    ok(clean.length >= 3 && clean.every(h => !h.includes('utm_') && !h.includes('fbclid')), 'the docs, privacy and terms links do not');
+    const tour = await hrefs('#hero-play, #hero-media, #grid .card h3 a');
+    ok(tour.length > 2 && tour.every(h => h.includes(tags)) && tour[0].includes('&fbclid=AbC_123-xyz%2B'), `the hero's tour and every card carry them into the player and the family pages (${tour[0]})`);
+    const stored = await page.evaluate(() => JSON.parse(sessionStorage.getItem('ci-campaign') || '{}'));
+    ok(Object.keys(stored).join() === 'utm_source,utm_campaign,fbclid' && stored.fbclid === 'AbC_123-xyz+', `sessionStorage "ci-campaign" holds only the listed tags (${Object.keys(stored).join(', ')})`);
+    ok((await page.evaluate(() => location.search)) === `?${tags}&fbclid=AbC_123-xyz%2B&persona=builder` && (await page.getAttribute('#personas [data-persona="builder"]', 'aria-pressed')) === 'true', 'the address keeps the tags byte for byte beside the filter');
+    await page.click('#personas [data-persona="gamer"]');
+    ok((await page.evaluate(() => location.search)) === `?${tags}&fbclid=AbC_123-xyz%2B&persona=gamer`, 'a filter changes only its own parameter');
+    // the campaign survives a click from the front page to a family's page, and from there to ci.computer and a home's page
+    await page.click('#grid .card:not([hidden]) h3 a');
+    await page.waitForURL(/\/family\/[a-z-]+\?/, { waitUntil: 'commit', timeout: 30000 });
+    await sleep(500);
+    const onFamily = await hrefs('a[href^="https://ci.computer/core"], a[href^="https://ci.computer/download"], a[href*="room-creator?mode=view"]');
+    ok(new URL(page.url()).searchParams.get('utm_campaign') === 'test' && onFamily.length >= 3 && onFamily.every(h => h.includes(tags)), `a family's page: the address and its links to ci.computer and the tour carry them (${onFamily.length} links)`);
+    ok(errors.length === 0, `no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
+    await close();
+  }
+  {
+    // storage blocked (a private window, some in-app browsers): the page works, and the address's tags still ride on its links
+    const { page, errors, close } = await open({ width: 390, height: 844 }, true);
+    await page.addInitScript("Object.defineProperty(window, 'sessionStorage', { get() { throw new DOMException('blocked', 'SecurityError'); } });");
+    await page.goto(srv.url(`index.html?${tags}`));
+    await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
+    const core = await page.$$eval('a[href^="https://ci.computer/core"]', (as: HTMLAnchorElement[]) => as.map(a => a.getAttribute('href')));
+    ok(core.length === 3 && core.every(h => h === `https://ci.computer/core?${tags}`), 'with sessionStorage blocked the links still carry the address\'s tags');
+    ok(errors.length === 0, `and the page raises no console error${errors.length ? ': ' + errors.join(' | ') : ''}`);
+    await close();
+  }
+  {
+    // an organic visit: not one link is touched
+    const { page, close } = await open({ width: 1440, height: 900 });
+    await page.goto(srv.url('index.html'));
+    await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
+    const all = await page.$$eval('a[href]', (as: HTMLAnchorElement[]) => as.map(a => a.getAttribute('href') || ''));
+    ok(!all.some(h => /utm_|fbclid|gclid|ttclid|msclkid/.test(h)) && all.includes('https://ci.computer/core') && all.includes('https://ci.computer/download'), 'without tags in the address no link is changed');
+    await close();
+  }
+  {
+    // a home's page and the 404 (served at any depth: its script is the site's own absolute address, which this test serves from the build)
+    const { page, close } = await open({ width: 1280, height: 800 });
+    await page.goto(srv.url(`homes/aurora?${tags}`));
+    await sleep(500);
+    const links = await page.$$eval('.brand-title, .nav-homes, .hero-cta a, .crumbs a, .family-block a, a[href^="https://ci.computer/core"]', (as: HTMLAnchorElement[]) => as.map(a => a.getAttribute('href') || ''));
+    ok(links.length >= 6 && links.every(h => h.includes(tags)), `a home's page: its way into the player, the gallery, its family and the Core carry the tags (${links.length} links)`);
+    await page.route('https://homes.ci.computer/portal/campaign.js*', (r: any) => r.fulfill({ status: 200, contentType: 'text/javascript', body: fs.readFileSync(path.join(DIR, 'portal', 'campaign.js'), 'utf8') }));
+    await page.goto(srv.url(`no-such-page?${tags}`));
+    await sleep(500);
+    const missing = await page.$$eval('a[href^="https://ci.computer"]', (as: HTMLAnchorElement[]) => as.map(a => a.getAttribute('href') || ''));
+    ok(missing.length === 3 && missing.every(h => h.includes(tags)), `the 404 page: its three links to ci.computer carry them (${missing.join(' | ')})`);
+    await close();
+  }
+}
+
+// ------------------------------------------------------------------ the story's hooks (scripts/story/portal-tests/*.mts)
+// Each file's default export gets a TestCtx (scripts/story/hooks.ts) and adds its own checks; this file only calls it. A hook that
+// throws fails the run, and the ones after it still run.
+async function hooks() {
+  console.log('\nhooks');
+  const dir = path.join(ROOT, TEST_GLOB);
+  const names = fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => f.endsWith('.mts')).sort() : [];
+  const mp = path.join(DIR, 'story', 'manifest.json');
+  if (!names.length || !fs.existsSync(mp)) { console.log('  nothing to run'); return; }
+  const manifest = JSON.parse(fs.readFileSync(mp, 'utf8'));
+  const familiesIndex = JSON.parse(fs.readFileSync(path.join(DIR, manifest.families), 'utf8'));
+  const ctx: TestCtx = {
+    ROOT, OUT: DIR, base: srv.url(), url: (p = '') => srv.url(p), browser, pw, families: familiesIndex, manifest,
+    open: (viewport, mobile, extra) => open(viewport, mobile, extra), check: ok, shot, sleep,
+  };
+  for (const f of names) {
+    try { await ((await import(pathToFileURL(path.join(dir, f)).href)).default as TestFn)(ctx); }
+    catch (err) { ok(false, `${TEST_GLOB}/${f} threw: ${((err as Error).stack || String(err)).split('\n').slice(0, 3).join(' | ')}`); }
+  }
+}
+
 // ------------------------------------------------------------------ WebKit
 // The portal is public, and Safari is where WebGL, touch and video differ most from Chromium. Playwright's WebKit must
 // be the revision the pinned Playwright expects (another revision does not start), so this runs when that build is
@@ -785,17 +1031,20 @@ async function webkit() {
 }
 
 try {
-  await gallery({ width: 1440, height: 900 }, false, '1440');
-  await gallery({ width: 390, height: 844 }, true, '390');
-  await pages();
-  await previews();
-  await caching();
-  for (const [i, id] of HOUSES.entries()) await player(id, { width: 1440, height: 900 }, false, '1440', i === 0);
-  await player(HOUSES[0], { width: 390, height: 844 }, true, '390', false);
-  await motion(HOUSES[0]);
-  await failureCases();
-  await editor();
-  await webkit();
+  if (wants('gallery')) { await gallery({ width: 1440, height: 900 }, false, '1440'); await gallery({ width: 390, height: 844 }, true, '390'); }
+  if (wants('pages')) await pages();
+  if (wants('previews')) await previews();
+  if (wants('caching')) await caching();
+  if (wants('player')) {
+    for (const [i, id] of HOUSES.entries()) await player(id, { width: 1440, height: 900 }, false, '1440', i === 0);
+    await player(HOUSES[0], { width: 390, height: 844 }, true, '390', false);
+  }
+  if (wants('motion')) await motion(HOUSES[0]);
+  if (wants('failures')) await failureCases();
+  if (wants('editor')) await editor();
+  if (wants('campaign')) await campaign();
+  if (wants('hooks')) await hooks();
+  if (wants('webkit')) await webkit();
 } catch (err) {
   failures++;
   console.error(`\n\x1b[31m${(err as Error).stack || err}\x1b[0m`);

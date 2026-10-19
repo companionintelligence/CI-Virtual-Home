@@ -1,0 +1,887 @@
+{
+  "schema": "family/v1",
+  "slug": "delgado-park",
+  "house": "mesamariposa",
+  "fictional": true,
+  "family": {
+    "surname": "Delgado-Park",
+    "tagline": "Farm calls all week, and the records come home with them.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Javier is a mobile large-animal veterinarian, and his truck is the clinic. Minseo teaches high-school art. With Ana and Theo, they keep the animal records and the home calendar on one Companion Core.",
+    "address": {
+      "line": "48 Ocotillo Wash Road",
+      "place": "Copper Mallow"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "javier",
+      "name": "Javier",
+      "age": 42,
+      "role": "parent",
+      "work": "mobile large-animal veterinarian",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Hank",
+        "runtime": "OpenClaw",
+        "job": "Opens Baserow in its own browser and logs each farm call and visit.",
+        "personality": [
+          "practical",
+          "steady",
+          "patient"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Logs what Javier reads out. He checks each row."
+      }
+    },
+    {
+      "id": "minseo",
+      "name": "Minseo",
+      "age": 40,
+      "role": "parent",
+      "work": "high-school art teacher",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Mina",
+        "runtime": "Hermes",
+        "job": "Drafts lesson notes and gallery-night flyers from what Minseo texts it.",
+        "personality": [
+          "gentle",
+          "calm",
+          "patient"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Minseo sends and prints them."
+      }
+    },
+    {
+      "id": "ana",
+      "name": "Ana",
+      "age": 13,
+      "role": "teen",
+      "work": "school",
+      "colour": "chart-3"
+    },
+    {
+      "id": "theo",
+      "name": "Theo",
+      "age": 9,
+      "role": "child",
+      "work": "school, the Kids Room",
+      "colour": "chart-4"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Before the first call"
+    },
+    {
+      "id": "garage",
+      "kind": "room",
+      "room": "garage",
+      "title": "The supply garage"
+    },
+    {
+      "id": "table",
+      "kind": "room",
+      "room": "dining",
+      "title": "Minseo's long table"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "The kids' room"
+    },
+    {
+      "id": "terrace",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The pool terrace"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "The glovebox is empty"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel while Javier is out",
+        "body": "The parcel waits in the entry while Javier is out on a call. Minseo carries it through the kitchen to the shelf in the living room."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "theo",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Theo opens the parcel",
+        "body": "Theo opens the parcel. Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "The Core wakes up",
+        "body": "Javier sets the Core on the shelf and plugs it in. One press of the button, and it opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "ana",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Ana takes the phone",
+        "body": "Ana joins the Core's own Wi-Fi from her phone. Javier reads out the home network's password, and she types it in.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "baserow",
+        "baikal",
+        "kiwix"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Agents and apps, picked together",
+        "body": "In Companion Hub, Javier picks OpenClaw and Minseo picks Hermes. They add Baserow, Baikal and Kiwix. Companion Memory (beta) comes too, with nothing connected yet. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: OpenClaw, Hermes",
+            "Apps: Baserow, Baikal, Kiwix",
+            "Companion Memory (beta)"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "minseo",
+      "agent": "minseo",
+      "approval": "minseo",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Mina says hello",
+        "body": "Minseo sends the first message of the evening. Mina, the agent she named, answers.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "minseo",
+        "text": "Hello, Minseo. I am Mina. What are we making?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-playlist",
+      "chapter": "living",
+      "member": "ana",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "Stream your own music collection to any device",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Ana builds the road-trip playlist",
+        "body": "Ana builds Saturday's drive playlist in Navidrome from the couch. The songs stream from the Core to the family's phones.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-vault",
+      "chapter": "living",
+      "member": "minseo",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "Store every password in a vault you host",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Passwords kept on the Core",
+        "body": "Minseo keeps the family's passwords in VaultWarden. The vault lives on the Core, on the shelf in the living room, and it works with the Bitwarden apps.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "living-fire",
+      "chapter": "living",
+      "member": "minseo",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "booklore",
+        "replaces": [
+          "Kindle"
+        ]
+      },
+      "capability": "Manage and read books, comics and PDFs with automatic covers and metadata",
+      "anchor": {
+        "role": "fireplace",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Art books by the fire",
+        "body": "Minseo browses her art books in BookLore beside the fireplace. Covers and details fill in automatically, and the library lives on the Core.",
+        "chips": [
+          "BookLore",
+          "replaces Kindle"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-calls",
+      "chapter": "kitchen",
+      "member": "javier",
+      "agent": "javier",
+      "approval": "javier",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "baserow",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "Build a no-code database for orders, inventory or projects",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Yesterday's calls, logged",
+        "body": "The notes used to ride in the glovebox. Javier reads out yesterday's calls, and Hank logs each one in Baserow, in its own browser. Javier checks every row.",
+        "chips": [
+          "Baserow",
+          "replaces Airtable"
+        ]
+      },
+      "say": {
+        "speaker": "javier",
+        "text": "Rows added. Please check each one."
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-calendar",
+      "chapter": "kitchen",
+      "member": "javier",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "A small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "counter",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Farm calls and classes, one calendar",
+        "body": "Javier's farm calls and Minseo's classes share one calendar through Baikal. It lives on the Core and syncs to both phones.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-supper",
+      "chapter": "kitchen",
+      "member": "minseo",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "A family planner with a shared calendar, tasks, shopping, meals, notes, contacts and budget in one",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sunday supper, planned",
+        "body": "Minseo plans Sunday supper for four in Yuvomi's meal planner. Ana adds the dessert, and the shopping list updates on every phone.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "garage-stock",
+      "chapter": "garage",
+      "member": "javier",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "baserow",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "Build a no-code database for orders, inventory or projects",
+      "anchor": {
+        "role": "bicycle",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Supply shelves, counted",
+        "body": "Javier counts the supply shelves into a second Baserow table, so the reorder list sits beside the call log. Both live on the Core.",
+        "chips": [
+          "Baserow",
+          "replaces Airtable"
+        ]
+      }
+    },
+    {
+      "id": "garage-truck",
+      "chapter": "garage",
+      "member": "javier",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "lubelogger",
+        "replaces": [
+          "Fuelly"
+        ]
+      },
+      "capability": "Keep a service history, fuel log and reminders for every vehicle",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The truck gets a logbook",
+        "body": "The truck is the clinic, so it keeps a logbook. Javier records each service and fill-up in LubeLogger, which reminds him before the next one.",
+        "chips": [
+          "LubeLogger",
+          "replaces Fuelly"
+        ]
+      }
+    },
+    {
+      "id": "garage-camera",
+      "chapter": "garage",
+      "member": "javier",
+      "category": "iot",
+      "segment": "small-business",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "A local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "The supply room, recorded at home",
+        "body": "An IP camera over the supply shelves streams to Frigate. The recordings stay on the Core, and Javier reviews clips on the home network.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "table-flyer",
+      "chapter": "table",
+      "member": "minseo",
+      "agent": "minseo",
+      "approval": "minseo",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "inkscape"
+      ],
+      "capability": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mina drafts the gallery flyer",
+        "body": "Gallery night is Friday. Minseo texts Mina the details, and Mina drafts the flyer text. Minseo lays it out in Inkscape and prints it herself."
+      },
+      "say": {
+        "speaker": "minseo",
+        "text": "Flyer text drafted. Please read it before you print."
+      }
+    },
+    {
+      "id": "table-lesson",
+      "chapter": "table",
+      "member": "ana",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "tldraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "A shared whiteboard on an infinite canvas",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A lesson, drawn together",
+        "body": "Minseo sketches next week's lesson on a tldraw whiteboard. Ana adds a few lines of her own, and the board stays on the Core.",
+        "chips": [
+          "tldraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "table-paper",
+      "chapter": "table",
+      "member": "javier",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "Scan and file your paperwork",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Signed estimates, filed once",
+        "body": "After a long day, Javier scans the signed estimates at the table. Paperless-ngx reads every page, tags it and files it.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "kids-bedtime",
+      "chapter": "kids",
+      "member": "theo",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "Read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "low"
+      },
+      "popup": {
+        "title": "Bedtime, one chapter further",
+        "body": "Theo reads the next chapter of his adventure book in Koodo Reader at bedtime, and highlights his favorite line.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-owls",
+      "chapter": "kids",
+      "member": "ana",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "Read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "room",
+        "room": "kids"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A school project on owls",
+        "body": "Ana researches desert owls for a school project. Kiwix keeps Wikipedia on the Core, so she reads it from her room.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "kids-quests",
+      "chapter": "kids",
+      "member": "theo",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "habitica",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "Turn habits and chores into a game with levels and quests",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Tidying the toy box, for points",
+        "body": "Theo tidies the toy box and ticks it off in Habitica. Chores become quests, with levels, and the game runs on the Core.",
+        "chips": [
+          "Habitica",
+          "replaces Todoist"
+        ]
+      }
+    },
+    {
+      "id": "terrace-trip",
+      "chapter": "terrace",
+      "member": "minseo",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "trip",
+        "replaces": []
+      },
+      "capability": "Save places on a map and plan multi-day trips with a budget",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The summer trip, mapped",
+        "body": "Under the terrace shade, Minseo saves places on a map in TRIP and plans the summer trip day by day.",
+        "chips": [
+          "TRIP"
+        ]
+      }
+    },
+    {
+      "id": "terrace-fire",
+      "chapter": "terrace",
+      "member": "javier",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "Back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Photos backed up by the fire",
+        "body": "Around the firepit, Javier backs up the day's photos to Immich. Ana picks the ones that go in the family album.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Records at home, not the truck",
+        "body": "Farm calls all day, and the records come home. The Delgado-Park family keeps them on one Companion Core, not in the glovebox."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your records, your calendar and your stock counts can live on a Companion Core at home instead of the glovebox.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner-specified hotspot flow; the fact sheet says only \"plug it in, pair it over Wi-Fi, and walk away\". Owner sign-off open.",
+    "No living-room TV and no kitchen island in this house: the media beats are at the couch and the fireplace; the kitchen beats say the counter. The Core stands on a shelf, so there is no desk beat.",
+    "Animals only: no beat makes a claim about anyone's health. garage-camera assumes an IP camera owned by the family (not in the parcel, not in the 3D scene).",
+    "The render does not show a desert; the setting is never described beyond the house and the pool terrace. Apps picked to leave the busiest store apps to other families.",
+    "Motif: the glovebox. Beats kitchen-calls, garage-truck, outro-street, closing."
+  ]
+}

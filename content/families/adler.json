@@ -1,0 +1,851 @@
+{
+  "schema": "family/v1",
+  "slug": "adler",
+  "house": "sunnyhome",
+  "fictional": true,
+  "family": {
+    "surname": "Adler",
+    "tagline": "A design agency, a rover in progress and one Companion Core.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Ruth runs a small design agency from the library lounge, and Noam writes robotics software at a standing desk upstairs. At weekends he builds a rover for the garden. One Companion Core on the credenza serves them both.",
+    "address": {
+      "line": "11 Reedmace Row",
+      "place": "Meadowfen"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "ruth",
+      "name": "Ruth",
+      "age": 39,
+      "role": "partner",
+      "work": "runs a small design agency",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Dahlia",
+        "runtime": "Hermes",
+        "job": "Drafts replies to Ruth’s clients from the short notes she sends it.",
+        "personality": [
+          "calm",
+          "warm",
+          "precise"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Ruth reads and sends every message."
+      }
+    },
+    {
+      "id": "noam",
+      "name": "Noam",
+      "age": 41,
+      "role": "partner",
+      "work": "robotics software engineer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Lupin",
+        "runtime": "OpenClaw",
+        "job": "Fills in supplier order forms in its own browser from Noam’s parts lists.",
+        "personality": [
+          "steady",
+          "exact",
+          "dry"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Fills in the form only. Noam checks it and places the order."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The sofa and the Core"
+    },
+    {
+      "id": "ruth",
+      "kind": "room",
+      "room": "office",
+      "title": "Ruth in the library lounge"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The trestle table"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen counter"
+    },
+    {
+      "id": "landing",
+      "kind": "room",
+      "room": "office",
+      "title": "Noam at the standing desk"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The parcel crosses the kitchen",
+        "body": "A parcel waits at the front door. Noam carries the Companion Core through the kitchen to its credenza in the lounge."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Ruth empties the parcel",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Ruth lays them out beside the credenza."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "One press wakes the Core",
+        "body": "Noam plugs in the cable and Ruth presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Ruth joins on her phone",
+        "body": "On her phone, Ruth opens the Wi-Fi settings and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "nextcloud",
+        "gitea"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Ruth picks Hermes, Noam OpenClaw",
+        "body": "In the Companion Hub store, Ruth picks Hermes and Noam picks OpenClaw. They add Nextcloud and Gitea, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Nextcloud, Gitea"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "ruth",
+      "agent": "ruth",
+      "approval": "ruth",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Dahlia says hello",
+        "body": "Ruth messages the agent she named Dahlia. Dahlia answers from the Core across the room.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "ruth",
+        "text": "Hello, Ruth. I am Dahlia. What is first on the list?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-music",
+      "chapter": "living",
+      "member": "ruth",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The old CDs play again",
+        "body": "Sun reaches the rug while Ruth plays albums she ripped from old CDs. Navidrome streams them from the Core to her phone over the home Wi-Fi.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "member": "noam",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains at the DNS level",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A slow page loses its banners",
+        "body": "A slow weather page is all banners, so Noam points the router’s DNS at Pi-hole. It blocks known ad and tracker domains for devices that use it for DNS.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "ruth-pipeline",
+      "chapter": "ruth",
+      "member": "ruth",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "espocrm",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "manage customers, sales pipelines, campaigns and support cases in a CRM you host",
+      "anchor": {
+        "role": "couch",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ruth turns down one enquiry",
+        "body": "Monday morning, two enquiries arrive and only one fits the month. Ruth quotes one and declines the other. EspoCRM keeps both records on the Core for next time.",
+        "chips": [
+          "EspoCRM",
+          "replaces Salesforce"
+        ]
+      }
+    },
+    {
+      "id": "ruth-clients",
+      "chapter": "ruth",
+      "member": "ruth",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The bakery’s label files arrive",
+        "body": "Before lunch a bakery’s label files arrive, and Ruth files them in Nextcloud. The originals sit on the Core, not in a rented drive.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "ruth-flow",
+      "chapter": "ruth",
+      "member": "noam",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "n8n",
+        "replaces": [
+          "Zapier"
+        ]
+      },
+      "with": [
+        "nextcloud"
+      ],
+      "capability": "connect your apps with workflows, with the data staying on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "A shortcut for Ruth’s briefs",
+        "body": "Ruth copies each new client’s details into a folder by hand, so Noam builds her an n8n workflow. When a brief arrives, it opens the Nextcloud folder on the Core.",
+        "chips": [
+          "n8n",
+          "replaces Zapier"
+        ]
+      }
+    },
+    {
+      "id": "ruth-draft",
+      "chapter": "ruth",
+      "member": "ruth",
+      "agent": "ruth",
+      "approval": "ruth",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "couch",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Dahlia drafts the delay note",
+        "body": "The print shop runs a day late. Ruth messages Dahlia the new date. Dahlia drafts the bakery note on the Core’s local model, and Ruth reads and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "ruth",
+        "text": "Here is the bakery note. Please read it before you send it."
+      }
+    },
+    {
+      "id": "ruth-vault",
+      "chapter": "ruth",
+      "member": "ruth",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host, working with the Bitwarden apps",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ruth lets the vault choose",
+        "body": "A client portal wants a new password, so Ruth has VaultWarden make one. It is saved in the household’s vault on the Core and works with the Bitwarden apps.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "ruth-print",
+      "chapter": "dining",
+      "member": "ruth",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "above",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Two files become one print file",
+        "body": "The print shop wants one file, not two. At the trestle table, Ruth merges the artwork and its spec sheet in Stirling-PDF, on the Core itself.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-lemons",
+      "chapter": "kitchen",
+      "member": "noam",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The olive oil runs low",
+        "body": "Chickpeas simmer on the range and the oil runs low. Noam adds a bottle to the shopping list in Yuvomi, and Ruth sees it on her phone.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-receipts",
+      "chapter": "kitchen",
+      "member": "ruth",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "counter",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The oven warranty turns up",
+        "body": "Thursday afternoon, Ruth feeds a month of receipts through Paperless-ngx on the Core. Every page is read and tagged, so the oven warranty is one search away.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-visit",
+      "chapter": "kitchen",
+      "member": "ruth",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ruth makes room for a visitor",
+        "body": "Noam’s sister visits on Saturday. Ruth adds the visit to the household calendar in Yuvomi. She moves a proof check to Friday, and Noam sees both there.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "landing-notebook",
+      "chapter": "landing",
+      "member": "noam",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "with": [
+        "open-webui"
+      ],
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "bookshelf",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Why does the rover drift left?",
+        "body": "The rover drifts left on gravel, so Noam plots its wheel data in JupyterLab. Then he asks a model on the Core why, through Open WebUI.",
+        "chips": [
+          "JupyterLab"
+        ]
+      }
+    },
+    {
+      "id": "landing-repo",
+      "chapter": "landing",
+      "member": "noam",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "desk",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The steering fix goes to Gitea",
+        "body": "At the standing desk, Noam pushes a steering fix for his rover to Gitea. The repository sits on the Core, not on a rented code host.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "landing-lupin",
+      "chapter": "landing",
+      "member": "noam",
+      "agent": "noam",
+      "approval": "noam",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and coding tools, running in its own sandbox",
+      "anchor": {
+        "role": "couch",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Lupin fills in the parts order",
+        "body": "Noam hands his agent Lupin a list of motor parts. Lupin fills in the supplier’s order form in its own browser. Noam reads it and places the order himself.",
+        "chips": [
+          "OpenClaw"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "film": true
+    },
+    {
+      "id": "garden-deck",
+      "chapter": "garden",
+      "member": "ruth",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "capability": "design and prototype in a web-based design tool you host",
+      "anchor": {
+        "role": "patio-seat",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The logo moves to the deck",
+        "body": "Afternoon light reaches the deck table, so Ruth takes her laptop out. She reworks a logo in Penpot, saved to the Core in the lounge.",
+        "chips": [
+          "Penpot",
+          "replaces Figma"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-border",
+      "chapter": "garden",
+      "member": "ruth",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history, with photos and a garden journal",
+      "anchor": {
+        "role": "garden",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The orange daisies get a note",
+        "body": "The orange daisies on the front lawn are still in flower. Ruth adds a photo and a note in HortusFox, so next year she knows how long they last.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-rover",
+      "chapter": "garden",
+      "member": "noam",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "garden",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Noam photographs the rover’s wiring",
+        "body": "Noam props the rover on the lawn and photographs its wiring. His phone backs the photos up to Immich over the home Wi-Fi, into the household’s library.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Two gables, one Core",
+        "body": "Client files, code and the shopping list run on one Companion Core, under the two glazed gables."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your client files and parts lists can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Library Lounge has no desk and no bookshelf in the spec: Ruth works from the sofa and the trunk coffee table. Her anchors are the couch, the room and the Core (on a credenza). The print merge is at the Dining trestle table.",
+    "No TV and no kitchen island in this house (homeFlags). The media beat is Navidrome from a phone at the couch; kitchen beats say the counter, the range and the fridge.",
+    "Noam's beats sit on the Upper Landing standing desk; lupin uses the loft sofa (couch nth 1), notebook the landing bookshelf (nth 1). ruth-flow is Noam's beat in Ruth's chapter, anchored on the room.",
+    "Dahlia is Hermes (first Hermes beat is ftue-hello, both Hermes beats carry the chat-service note). Lupin is OpenClaw and carries the websites note. No cloud key, no Companion Memory in this file.",
+    "The rover is Noam's weekend hobby, not work code. The garden role resolves to the two daisy beds on the front lawn; the deck beat uses patio-seat nth 1, the Deck Dining outdoor table.",
+    "Open WebUI sits in with on landing-notebook, never as a beat app: its replaces chip would trip cap-parity. The Pi-hole beat says devices that use it for DNS, and one household instance."
+  ]
+}

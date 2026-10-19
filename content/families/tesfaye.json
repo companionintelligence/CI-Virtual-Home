@@ -1,0 +1,885 @@
+{
+  "schema": "family/v1",
+  "slug": "tesfaye",
+  "house": "mirage",
+  "fictional": true,
+  "family": {
+    "surname": "Tesfaye",
+    "tagline": "A lake house, four people, and one Companion Core in the kitchen.",
+    "household": "older-kids",
+    "business": false,
+    "story": "Hana keeps the household running from the den, and Dawit writes code at the kitchen table. Selam, fifteen, reads in the loft at the top of the house. Bruk, nineteen, photographs and plays piano in the living salon.",
+    "address": {
+      "line": "12 Teasel Bank",
+      "place": "Quillhaven"
+    },
+    "narrator": "v-young-f"
+  },
+  "members": [
+    {
+      "id": "hana",
+      "name": "Hana",
+      "age": 49,
+      "role": "parent",
+      "work": "hospital operations manager",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Fennel",
+        "runtime": "Hermes",
+        "job": "Finds saved notes and drafts replies from what Hana chose to save.",
+        "personality": [
+          "calm",
+          "careful",
+          "warm"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Finds and drafts. Hana reads and sends every message."
+      }
+    },
+    {
+      "id": "dawit",
+      "name": "Dawit",
+      "age": 51,
+      "role": "parent",
+      "work": "systems engineer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Bramble",
+        "runtime": "OpenClaw",
+        "job": "Opens a web page in its own browser and fills in the form Dawit names.",
+        "personality": [
+          "dry",
+          "steady",
+          "thorough"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Fills in forms only. Dawit reads and sends every one."
+      }
+    },
+    {
+      "id": "selam",
+      "name": "Selam",
+      "age": 15,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-3",
+      "archetype": "learner"
+    },
+    {
+      "id": "bruk",
+      "name": "Bruk",
+      "age": 19,
+      "role": "adult-child",
+      "work": "photography student",
+      "colour": "chart-4",
+      "archetype": "maker"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "loggia",
+      "kind": "room",
+      "room": "dining",
+      "title": "The loggia table"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out on the balcony"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "Bruk's living salon"
+    },
+    {
+      "id": "den",
+      "kind": "room",
+      "room": "office",
+      "title": "Hana's den"
+    },
+    {
+      "id": "loft",
+      "kind": "room",
+      "room": "living",
+      "title": "Selam's reading loft"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel climbs the tower",
+        "body": "A parcel with the Companion Core waits at the front door. Bruk carries it up the glass stair tower to the kitchen counter."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Selam unpacks the Core",
+        "body": "Selam lifts the Companion Core out of its carton. Bruk lays out the power cable, the quick-start guide and the recovery USB drive."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "The cable goes in, Hana presses the button, and the Core wakes. It opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "In her phone's Wi-Fi settings, Hana joins the Core's own network, then picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "vikunja",
+        "gitea"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agents and apps",
+        "body": "In the Companion Hub store, Hana picks Hermes and Dawit picks OpenClaw, and Companion Memory (beta) comes along. The family adds Vikunja and Gitea, then walks away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Vikunja, Gitea"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "hana",
+      "agent": "hana",
+      "approval": "hana",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Fennel answers the first message",
+        "body": "At the counter, Hana sends her first message to the agent she named Fennel. It runs on the Core beside her.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "hana",
+        "text": "Hello, Hana. I am Fennel. Where shall we begin?"
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-gitea",
+      "chapter": "kitchen",
+      "member": "dawit",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Dawit gives the rota a history",
+        "body": "Dawit pushes the lake club's boat rota to Gitea from the round table. The repository sits on the Core, not on a rented code host.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-paper",
+      "chapter": "kitchen",
+      "member": "hana",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "counter",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One word finds the boiler letter",
+        "body": "A boiler service letter and a school trip form go through Paperless-ngx on the Core. Every page is read and tagged, so either turns up by a word on it.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-errand",
+      "chapter": "kitchen",
+      "member": "dawit",
+      "agent": "dawit",
+      "approval": "dawit",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser, running in its own sandbox on your Core",
+      "anchor": {
+        "role": "counter",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Bramble fills in the slot form",
+        "body": "In its own browser, Bramble opens the lake club's booking page and fills in Saturday's boat slot. Dawit reads every field and sends the form himself.",
+        "chips": [
+          "OpenClaw WebCLI"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "dawit",
+        "text": "The form is filled in. Please read each field before you send it."
+      }
+    },
+    {
+      "id": "kitchen-model",
+      "chapter": "kitchen",
+      "member": "dawit",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "with": [
+        "open-webui"
+      ],
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The rota slips by a week",
+        "body": "The rota script slips a week at new year. Dawit asks a model on the Core through Open WebUI, where the chat stays by default. The fix goes into Gitea.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      }
+    },
+    {
+      "id": "loggia-meals",
+      "chapter": "loggia",
+      "member": "hana",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book and meal planner for the household",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Teff flour joins the list",
+        "body": "At the long loggia table on Saturday morning, Hana plans the week's dinners in KitchenOwl. Dawit adds teff flour and lentils to the one list, which sits on the Core.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "garden-herbs",
+      "chapter": "garden",
+      "member": "dawit",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "vikunja",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "lists, boards and calendars for tasks, with reminders and recurring jobs",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Dawit sows the balcony herbs",
+        "body": "On the balcony off the primary bedroom, Dawit sows herbs in the planter. He sets a fortnightly watering job in Vikunja, and it comes back on the family board.",
+        "chips": [
+          "Vikunja",
+          "replaces Todoist"
+        ]
+      }
+    },
+    {
+      "id": "living-photos",
+      "chapter": "living",
+      "member": "bruk",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "photoprism",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "browse and share your photo library, with automatic tagging, without uploading it anywhere",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Bruk picks his best frame",
+        "body": "Contact sheets cover the coffee table as Bruk picks his best frame. PhotoPrism tags and sorts the originals on the Core, without uploading them anywhere.",
+        "chips": [
+          "PhotoPrism",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-scene",
+      "chapter": "living",
+      "member": "dawit",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A scene for Bruk's practice hour",
+        "body": "Before Bruk's practice, Dawit saves the pendant lamp and the floor lamp as one scene in Home Assistant. Home Assistant runs on the Core and needs no cloud account.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "living-takes",
+      "chapter": "living",
+      "member": "bruk",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "music",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Bruk saves a rough take",
+        "body": "After Thursday's practice at the upright piano, Bruk saves the takes to the music folder, and Navidrome lists them. Hana plays one back from the kitchen.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "living-crit",
+      "chapter": "living",
+      "member": "bruk",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "behind"
+      },
+      "popup": {
+        "title": "Bruk writes down the critique",
+        "body": "After critique day, Bruk types his tutor's comments on the portfolio into Obsidian. It runs in a browser session, and the notes are Markdown files on the Core.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "den-tasks",
+      "chapter": "den",
+      "member": "hana",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "vikunja",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "lists, boards and calendars for tasks, with reminders and recurring jobs",
+      "anchor": {
+        "role": "couch",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The airport run changes hands",
+        "body": "On the den sofa, Hana gives Dawit the airport run for her mother's flight. Vikunja holds the board on the Core, so nothing needs chasing.",
+        "chips": [
+          "Vikunja",
+          "replaces Todoist"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "den-pad",
+      "chapter": "den",
+      "member": "bruk",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "cryptpad",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "capability": "write, draw and plan together",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Two people, one paragraph",
+        "body": "Hana and Bruk edit one paragraph of his exhibition statement together. The CryptPad pad lives on the Core, so there is only one copy and nothing to send.",
+        "chips": [
+          "CryptPad",
+          "replaces Microsoft Office"
+        ]
+      }
+    },
+    {
+      "id": "den-memory",
+      "chapter": "den",
+      "member": "hana",
+      "agent": "hana",
+      "approval": "hana",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk, so your agents know your context",
+      "anchor": {
+        "role": "couch",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Fennel finds the regatta date",
+        "body": "Hana cannot recall the regatta date, so she asks Fennel. Fennel finds it in notes Hana saved to Companion Memory (beta) on the Core. Hana reads the note herself.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "hana",
+        "text": "Here is the regatta date. Please check the note."
+      }
+    },
+    {
+      "id": "loft-coots",
+      "chapter": "loft",
+      "member": "selam",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "telescope",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "bookshelf",
+            "room": "living"
+          },
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Selam tallies coots from the loft",
+        "body": "On a holiday morning, Selam trains the telescope on the pond and tallies the coots for biology. Each tally goes into a JupyterLab notebook that runs on the Core.",
+        "chips": [
+          "JupyterLab"
+        ]
+      }
+    },
+    {
+      "id": "loft-lookup",
+      "chapter": "loft",
+      "member": "selam",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Who wrote this poem?",
+        "body": "For Spanish class, Selam looks up her poem's author in Kiwix. The Wikipedia file was downloaded once, so the Core serves it, and no search engine is asked.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "loft-poem",
+      "chapter": "loft",
+      "member": "selam",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A line of poetry stumps Selam",
+        "body": "A line of the Spanish poem still stumps Selam. LibreTranslate translates it on the Core, its language models downloaded once, and she writes her own version.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core above the lily pond",
+        "body": "Tasks, photos, code and questions, all on one Companion Core above the lily pond."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your tasks, photos, code and questions can live on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The house has no TV, no desk and no kitchen island or breakfast bar. The Core stands on the kitchen counter; the media beat is at the sofa, with the piano and the loft daybed beside it.",
+    "Chapter order is the walk: kitchen, loggia, the balcony planter off the primary bedroom, then salon, den and the loft. The garden anchor is the bedroom-floor balcony, not the pool terrace.",
+    "Open WebUI sits in with, never as the beat app: its chip replaces ChatGPT trips cap-parity. Gitea carries the replaces chip in kitchen-model.",
+    "Fennel is Hermes with Companion Memory connected; Bramble is OpenClaw. No cloud key anywhere. Dawit's boat rota is a lake club side project, never employer code.",
+    "Home Assistant: the lamps are network devices only; no Zigbee, no energy claim. Kiwix and LibreTranslate beats carry downloaded once. Navidrome scans a music folder; it has no upload.",
+    "Film (eight beats): delivery, plug-in, hello, kitchen-gitea, living-photos, den-tasks, loft-lookup, outro. Companion Memory is not named in the film. Obsidian is Bruk's only; Selam's reading-list beat was cut."
+  ]
+}

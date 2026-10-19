@@ -1,7 +1,7 @@
 // The pages scripts/build-portal.mts writes itself (a home's own page, the 404, the gallery's static list of homes) and the
 // pieces they share with the hand-written index.html: where the site sends a visitor, the structured data, the number written out.
 // Pure functions of index.json and the site's address, so a rebuild is byte-identical.
-import { displayName, buildCredit } from '../assets/home-names.js';
+import { displayName } from '../assets/home-names.js';
 
 // Where this site sends a visitor. Exactly these addresses, on every page and in the player (assets/viewer.ts has the same
 // four): /core redirects to the product page and is still the address to link; the docs have no page for the virtual homes
@@ -24,7 +24,10 @@ export const PLAYER_TITLE = 'Virtual homes player · Companion Intelligence';
 // what the gallery's hero picture (portal/hero.jpg, the site's link-preview image) shows: index.html's og:image:alt says the same
 export const HERO_ALT = 'An aerial view of a two-storey white modern villa with a plunge pool, rendered in the browser.';
 
-export type House = { id: string; name?: string; author?: string; style?: string; storeys?: number; areaSqm?: number; source?: string };
+// where portal:build writes the "Meet the family" block of a home whose family is current (scripts/portal-front.mts meetFamily); it removes the marker otherwise
+export const MEET_MARKER = '<!-- meet-family: scripts/build-portal.mts writes the family that lives here, when one is current -->';
+
+export type House = { id: string; name?: string; style?: string; storeys?: number; areaSqm?: number };
 
 export const esc = (v: unknown): string => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 export const nf = new Intl.NumberFormat('en');
@@ -44,7 +47,6 @@ export function numberWord(n: number): string {
 export const capital = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 
 // a link-preview description fits a search result: one sentence on the style, one on what the page does, under 160 characters.
-// The Sims build's own title and its builder are credited in the page's body, not here.
 export function homeDescription(h: House): string {
   const tail = 'Built live in 3D in your browser: fly its camera paths and change the hour.';
   let style = shortStyle(h.style);
@@ -62,10 +64,10 @@ export const homeTitle = (h: House): string => {
 
 export const homeUrl = (site: string, id: string): string => new URL(`homes/${id}`, site).href;
 
-// ---- structured data. Escaped so that no "<" can close the script tag.
-const ldScript = (graph: object[]): string => `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c')}</script>`;
-const orgLd = (site: string): object => ({ '@type': 'Organization', '@id': `${site}#organization`, name: SITE_NAME, url: LINKS.site, logo: new URL('portal/icons/icon-512.png', site).href, sameAs: SAME_AS });
-const siteLd = (site: string): object => ({ '@type': 'WebSite', '@id': `${site}#website`, name: 'Virtual homes', url: site, inLanguage: 'en', publisher: { '@id': `${site}#organization` } });
+// ---- structured data. Escaped so that no "<" can close the script tag. (ldScript, orgLd and siteLd are exported for scripts/story/pages.mts: a family's page carries the same publisher and site.)
+export const ldScript = (graph: object[]): string => `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c')}</script>`;
+export const orgLd = (site: string): object => ({ '@type': 'Organization', '@id': `${site}#organization`, name: SITE_NAME, url: LINKS.site, logo: new URL('portal/icons/icon-512.png', site).href, sameAs: SAME_AS });
+export const siteLd = (site: string): object => ({ '@type': 'WebSite', '@id': `${site}#website`, name: 'Virtual homes', url: site, inLanguage: 'en', publisher: { '@id': `${site}#organization` } });
 // the gallery: the site, its publisher and the list of homes
 export function galleryLd(site: string, houses: House[], title: string, desc: string): string {
   return ldScript([orgLd(site), siteLd(site), {
@@ -93,13 +95,11 @@ export const playerLd = (site: string): string => ldScript([orgLd(site), siteLd(
 export function galleryCards(houses: House[]): string {
   return houses.map((h, i) => {
     const name = displayName(h), storeys = h.storeys || 1;
-    const tip = [buildCredit(h), h.source].filter(Boolean).join(', ');
     return `<li class="card" data-id="${esc(h.id)}"><a href="./homes/${esc(encodeURIComponent(h.id))}" aria-label="${esc(`${name}. ${shortStyle(h.style)}. Open its page`)}">`
       + `<div class="thumb"><img src="./portal/thumbs/${esc(encodeURIComponent(h.id))}.webp" alt="" width="640" height="360" decoding="async"${i > 5 ? ' loading="lazy"' : ''}>`
       + `<span class="thumb-play"><svg class="i i-fill"><use href="#i-play"/></svg>Play in 3D</span></div>`
       + `<div class="card-body"><h3>${esc(name)}</h3><p class="style" title="${esc(h.style || '')}">${esc(shortStyle(h.style))}</p>`
-      + `<p class="facts"><span class="fact">${storeys} ${storeys === 1 ? 'storey' : 'storeys'}</span>${h.areaSqm ? `<span class="fact">${nf.format(h.areaSqm)} m²</span>` : ''}`
-      + `<span class="credit" title="${esc(tip)}">${h.author ? `by <b>${esc(h.author)}</b>` : ''}</span></p></div></a></li>`;
+      + `<p class="facts"><span class="fact">${storeys} ${storeys === 1 ? 'storey' : 'storeys'}</span>${h.areaSqm ? `<span class="fact">${nf.format(h.areaSqm)} m²</span>` : ''}</p></div></a></li>`;
   }).join('\n        ');
 }
 
@@ -121,6 +121,7 @@ export function galleryHomeIndex(houses: House[]): string {
 const SPRITE = `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
     <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
     <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
   </defs></svg>`;
 
 // the header and footer of the pages in homes/, which sit one level down (../ reaches the site's root)
@@ -128,10 +129,10 @@ const header = (): string => `<header class="site-head">
     <div class="brand">
       <a class="brand-ci" href="${LINKS.site}" aria-label="${SITE_NAME}"><img src="../assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><span>${SITE_NAME}</span></a>
       <span class="brand-sep" aria-hidden="true">/</span>
-      <a class="brand-title" href="../">Virtual homes</a>
+      <a class="brand-title" href="../" data-campaign>Virtual homes</a>
     </div>
     <nav class="site-nav" aria-label="Site">
-      <a class="nav-homes" href="../#homes">Homes</a>
+      <a class="nav-homes" href="../#homes" data-campaign>Homes</a>
       <a class="nav-docs" href="${LINKS.docs}">Docs</a>
       <a class="nav-download" href="${LINKS.download}">Download Companion</a>
       <a class="nav-buy" href="${LINKS.core}"><span class="nav-long">Buy Companion Core</span><span class="nav-short">Buy Core</span></a>
@@ -141,6 +142,7 @@ const ctaBand = (): string => `<section class="cta-band" id="core" aria-labelled
       <div class="cta-copy">
         <h2 id="cta-title">Meet the Companion Core.</h2>
         <p>The small computer on your desk runs your own AI, apps and memory at home, not in someone else's cloud.</p>
+        <p class="cta-note">Companion OS is in beta.</p>
       </div>
       <div class="cta-actions">
         <a class="btn btn-buy" href="${LINKS.core}">Buy Companion Core</a>
@@ -152,10 +154,8 @@ const footer = (): string => `<footer class="site-foot">
     <div class="foot-grid">
       <div>
         <p class="foot-brand"><img src="../assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>${SITE_NAME}</b></p>
-        <p>Every frame is drawn on your device, with three.js and WebGL. Nothing is streamed: your browser builds each home from its spec.</p>
       </div>
       <nav class="foot-links" aria-label="${SITE_NAME}">
-        <p><b>${SITE_NAME}</b></p>
         <ul>
           <li><a href="${LINKS.site}">ci.computer</a></li>
           <li><a href="${LINKS.core}">Buy Companion Core</a></li>
@@ -165,10 +165,6 @@ const footer = (): string => `<footer class="site-foot">
           <li><a href="${LINKS.terms}">Terms</a></li>
         </ul>
       </nav>
-      <div>
-        <p><b>Credits</b></p>
-        <p>Each home is a HouseSpec written by hand from a Sims 4 gallery build, and each card names its builder. No files, textures or screenshots from those builds or from The Sims are used.</p>
-      </div>
     </div>
     <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence.</p>
   </footer>`;
@@ -178,7 +174,6 @@ export function homePage(h: House, site: string): string {
   const image = new URL(`portal/previews/${id}.jpg`, site).href;
   const player = `../room-creator?mode=view&house=${id}`;
   const storeys = h.storeys || 1;
-  const credit = buildCredit(h);
   const alt = `An aerial view of ${name}, rendered in the browser.`;
   return `<!DOCTYPE html>
 <html lang="en">
@@ -207,6 +202,8 @@ export function homePage(h: House, site: string): string {
   <link rel="apple-touch-icon" href="../portal/icons/apple-touch-icon.png">
   <link rel="manifest" href="../portal/site.webmanifest">
   <link rel="stylesheet" href="../portal/gallery.css">
+  <!-- portal/campaign.js: an ad's utm_ and click-id tags, kept for the visit and put back on the links that leave for ci.computer and on links marked data-campaign -->
+  <script src="../portal/campaign.js" defer data-cfasync="false"></script>
   <!-- a shared moment (the player's share button adds shot, t and tod) opens in the player; the page itself is for everyone else.
        data-cfasync="false": Cloudflare's Rocket Loader would otherwise run this late, after the page had painted -->
   <script data-cfasync="false">if (/[?&](shot|t|tod|play)=/.test(location.search)) location.replace(${JSON.stringify(player)} + '&' + location.search.slice(1) + location.hash);</script>
@@ -217,7 +214,7 @@ export function homePage(h: House, site: string): string {
   ${header()}
 
   <main id="main" class="home-page">
-    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../">Virtual homes</a></li><li><span aria-current="page">${esc(name)}</span></li></ol></nav>
+    <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../" data-campaign>Virtual homes</a></li><li><span aria-current="page">${esc(name)}</span></li></ol></nav>
     <section class="hero" aria-labelledby="home-title">
       <div class="hero-copy">
         <p class="eyebrow">Virtual home</p>
@@ -227,17 +224,19 @@ export function homePage(h: House, site: string): string {
           <li class="fact">${storeys} ${storeys === 1 ? 'storey' : 'storeys'}</li>${h.areaSqm ? `\n          <li class="fact">${nf.format(h.areaSqm)} m²</li>` : ''}
         </ul>
         <div class="hero-cta">
-          <a class="btn btn-primary" href="${esc(player)}"><svg class="i i-fill" aria-hidden="true"><use href="#i-play"/></svg><span>Open ${esc(name)} in 3D</span></a>
-          <a class="btn btn-ghost" href="../#homes"><span>All homes</span></a>
+          <a class="btn btn-primary" href="${esc(player)}" data-campaign><svg class="i i-fill" aria-hidden="true"><use href="#i-play"/></svg><span>Open ${esc(name)} in 3D</span></a>
+          <a class="btn btn-ghost" href="../#homes" data-campaign><span>All homes</span></a>
         </div>
-        <p class="home-credit">Built live in your browser from one spec file${credit ? `. Credit: ${esc(credit)}` : ''}. No files, textures or screenshots from that build or from The Sims are used.</p>
+        <p class="home-note">Built live in your browser from one spec file.</p>
       </div>
-      <a class="hero-media" href="${esc(player)}" aria-label="Open ${esc(name)} in 3D">
+      <a class="hero-media" href="${esc(player)}" data-campaign aria-label="Open ${esc(name)} in 3D">
         <img src="../portal/previews/${esc(id)}.jpg" alt="${esc(alt)}" width="1200" height="630" fetchpriority="high">
         <span class="hero-badge"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg>Interactive 3D</span>
         <span class="hero-play" aria-hidden="true"><svg class="i i-fill"><use href="#i-play"/></svg></span>
       </a>
     </section>
+
+    ${MEET_MARKER}
 
     ${ctaBand()}
   </main>
@@ -281,6 +280,8 @@ export function notFoundPage(site: string, word: string): string {
   <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="${esc(new URL('assets/brand/ci-logo-mark.svg', site).href)}" type="image/svg+xml">
+  <!-- served at any depth, so the script is the site's own absolute address (portal:build adds ?v=<hash>): an ad's tags ride on the links to ci.computer -->
+  <script src="${esc(new URL('portal/campaign.js', site).href)}" defer data-cfasync="false"></script>
   <style>
     :root { color-scheme: light dark; --bg: #f3faf7; --fg: #0a222e; --muted: #3a524b; --primary: #0a6358; --on-primary: #f0fdf4; --line: rgba(10, 34, 46, 0.14); }
     @media (prefers-color-scheme: dark) { :root { --bg: #041620; --fg: #e8f2f4; --muted: #a3babf; --primary: #c5e8dc; --on-primary: #041620; --line: rgba(232, 242, 244, 0.18); } }
@@ -303,7 +304,7 @@ export function notFoundPage(site: string, word: string): string {
     <h1>Page not found</h1>
     <p>${esc(desc)}</p>
     <div class="actions">
-      <a class="btn" href="${esc(site)}">See the virtual homes</a>
+      <a class="btn" href="${esc(site)}" data-campaign>See the virtual homes</a>
       <a class="btn ghost" href="${LINKS.core}">Buy Companion Core</a>
       <a class="btn ghost" href="${LINKS.download}">Download Companion</a>
     </div>
