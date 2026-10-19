@@ -30,7 +30,8 @@
 //   motion    with the system set to reduce motion, a home opened from the gallery (or with play=1) holds still
 //   failures  an id no home has: the error card at once, no spec request, no editor scene built behind it; a
 //             module that does not download (viewer.js, house-builder.js) and a browser with WebGL 1 only: a
-//             card that says so, with a way back, instead of an endless loader; the names module
+//             card that says so, with a way back, instead of an endless loader; a refused third-party tag (the
+//             analytics) or a missing script the player outlives: no card over a home that plays; the names module
 //             (home-names.js) not downloading: the gallery still lists the homes, and the player's tab never
 //             shows a title with the pack tag
 //   pages     the built site's own pages, without a browser's help: the gallery lists its 30 homes in the HTML itself (each
@@ -835,6 +836,33 @@ async function failureCases() {
     ok(!!card && state === 'failed' && (await page.isVisible('.vh-fail a[href="./"]')) && (await page.isVisible('.vh-fail button')), `${file} not downloading: a card with Try again and See all homes (${state})`);
     ok(!/Room Creator|SimsTree/.test(await page.title()) && await page.isVisible('.vh-boot-back'), `the tab says "${await page.title()}", and a back arrow shows`);
     await shot(page, `failure-${file.replace('.js', '')}`);
+    await close();
+  }
+  // A <script> that fails to download fires its error at the window, whoever's script it is, and the head script
+  // listens for it. The production page carries two third-party tags (Google's gtag, which the deploy injects, and
+  // Cloudflare's beacon, which the zone does; neither is in dist/), and a content blocker, a DNS filter or a work
+  // profile refuses them. That is not the player failing, and a card over a home that plays ("This home could not
+  // be opened", on every home) is the bug. Both cases hold the player's mount back (viewer.js answers 1.5 s late) so
+  // the error is certain to come before it.
+  for (const c of [
+    // never: the card must not appear even for a moment (the player's own mount would clear a stale one, and that is the second case)
+    { name: 'a refused third-party tag (googletagmanager.com)', src: 'https://www.googletagmanager.com/gtag/js?id=G-TEST0000', abort: true, never: true },
+    { name: 'a missing script of the site\'s own, which the player outlives', src: './assets/__missing-for-test.js', abort: false, never: false },
+  ]) {
+    const { page, close } = await open({ width: 1440, height: 900 });
+    if (c.abort) await page.route((u: URL) => u.hostname === 'www.googletagmanager.com', (r: any) => r.abort());
+    await page.route((u: URL) => u.pathname.endsWith('/assets/viewer.js'), async (r: any) => { await sleep(1500); await r.continue(); });
+    await page.addInitScript((src: string) => {
+      new MutationObserver(() => { if (document.querySelector('.vh-fail')) (window as any).__cardSeen = true; }).observe(document, { childList: true, subtree: true });
+      document.addEventListener('DOMContentLoaded', () => { const s = document.createElement('script'); s.async = true; s.src = src; document.head.appendChild(s); });
+    }, c.src);
+    await page.goto(srv.url('room-creator.html?mode=view&house=aurora'));
+    await viewerReady(page);
+    await sleep(500);
+    const cards = await page.$$eval('.vh-fail', (els: Element[]) => els.length);
+    const seen = await page.evaluate(() => !!(window as any).__cardSeen);
+    ok(cards === 0 && (!c.never || !seen) && (await page.isVisible('.vh-scrub')), `${c.name}: the player mounts and plays with no failure card (${cards} card${cards === 1 ? '' : 's'}${c.never ? `, ${seen ? 'one showed on the way' : 'none on the way'}` : ''})`);
+    await shot(page, `failure-script-${c.src.startsWith('http') ? 'third-party' : 'own-missing'}`);
     await close();
   }
   {

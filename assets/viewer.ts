@@ -270,6 +270,8 @@ export function mountViewer(api: Api) {
       <p class="vh-help-legend"><span class="vh-help-tick" aria-hidden="true"></span>The orange tick on the timeline is where the Companion Core wakes.</p>
     </div>`;
   host.appendChild(root);
+  // a card the head script raised before this mounted is stale now: the player is here (its own guard raises no second one)
+  if (html.dataset.viewer === 'failed') document.querySelector('.vh-fail')?.remove();
   html.dataset.viewer = 'mounted';
 
   const $ = <T extends Element = HTMLElement>(sel: string): T => root.querySelector(sel) as T;

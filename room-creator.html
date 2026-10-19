@@ -114,8 +114,14 @@
       addEventListener('error', function (e) {
         if (d.dataset.viewer) return;   // mounted (the player shows its own errors), or already said
         var t = e.target;
-        if (t && t.tagName === 'SCRIPT') fail('Part of the player did not download. Check the connection and try again.');
-        else if (t === window && !booted) fail(/webgl/i.test(e.message || '')
+        if (t && t.tagName === 'SCRIPT') {
+          // only the site's own scripts are the player. A third party's tag that a content blocker, a DNS filter or a
+          // work profile refuses (the analytics the deploy adds: googletagmanager.com, Cloudflare's beacon) fires the
+          // same error, and the player is fine without it: a card here would sit over a home that plays
+          var own = true;
+          try { own = new URL(t.src || location.href).origin === location.origin; } catch (x) { /* an address that will not parse is not a tag's */ }
+          if (own) fail('Part of the player did not download. Check the connection and try again.');
+        } else if (t === window && !booted) fail(/webgl/i.test(e.message || '')
           ? 'This browser could not start 3D (WebGL 2 would not open). Try a recent Chrome, Edge, Firefox or Safari, with hardware acceleration on.'
           : 'The player stopped while starting. Try again, or pick another home.');
       }, true);

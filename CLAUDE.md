@@ -81,7 +81,10 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   renderer's it changes for its own frame (it puts `shadowMap.autoUpdate` back after each one).
 - Until the player mounts, `room-creator.html`'s head script (view mode only) is the player: poster, loader and
   the failure card. Anything that can stop the page before `mountViewer` must end on that card, never on an
-  endless loader.
+  endless loader. Only the page's own scripts are the player's: a refused third-party tag (the gtag the deploy
+  injects, Cloudflare's beacon the zone injects; a blocker, a DNS filter or a work profile stops them) fires the
+  same `error` and must never raise the card, and a card raised before the mount is removed by it (`portal:test`,
+  failures).
 - `portal:build` writes more than copies: `dist/homes/<id>.html` share pages, `dist/family/<slug>.html` family pages and the tour's data
   (below), one `<meta name="vh-share">` in `dist/room-creator.html` that tells the player they exist, the site's title and preview tags in
   place of that page's static (editor) head, and absolute preview-image URLs (`--site-url`, default `https://homes.ci.computer/`).
