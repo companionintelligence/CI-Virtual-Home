@@ -1,0 +1,816 @@
+{
+  "schema": "family/v1",
+  "slug": "nwachukwu",
+  "house": "cutestarter",
+  "fictional": true,
+  "family": {
+    "surname": "Nwachukwu",
+    "tagline": "Two grandparents, one grandchild and one Companion Core in a small cottage.",
+    "household": "grandparents",
+    "business": false,
+    "story": "Ngozi keeps the household papers, Emeka cooks and grows tomatoes, and eight-year-old Chidi reads in his corner. One Companion Core in the living room serves all three.",
+    "address": {
+      "line": "7 Linnet Row",
+      "place": "Pellam Green"
+    },
+    "narrator": "v-storyteller-m"
+  },
+  "members": [
+    {
+      "id": "ngozi",
+      "name": "Ngozi",
+      "age": 67,
+      "role": "grandparent",
+      "work": "retired church treasurer",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Gingersnap",
+        "runtime": "Hermes",
+        "job": "Drafts Ngozi’s replies to the hall committee and her sister from short notes.",
+        "personality": [
+          "gentle",
+          "warm",
+          "patient"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Ngozi reads each draft and sends it herself."
+      }
+    },
+    {
+      "id": "emeka",
+      "name": "Emeka",
+      "age": 70,
+      "role": "grandparent",
+      "work": "retired bus driver, cooks and grows tomatoes",
+      "colour": "chart-2",
+      "archetype": "host",
+      "companion": {
+        "name": "Crumpet",
+        "runtime": "Hermes",
+        "job": "Turns Emeka’s quick notes into short messages for the neighbours and the parish council.",
+        "personality": [
+          "steady",
+          "practical",
+          "cheerful"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Drafts only. Emeka reads each draft and sends it himself."
+      }
+    },
+    {
+      "id": "chidi",
+      "name": "Chidi",
+      "age": 8,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-3",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "corner",
+      "kind": "room",
+      "room": "kids",
+      "title": "Chidi’s corner"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Emeka’s kitchen"
+    },
+    {
+      "id": "table",
+      "kind": "room",
+      "room": "dining",
+      "title": "Papers at the table"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out the back door"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Emeka carries the parcel in",
+        "body": "A parcel waits on the top step. Emeka carries the Companion Core to the shelf Ngozi has cleared."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Chidi reads the guide aloud",
+        "body": "Inside the carton, Chidi finds the Companion Core, a power cable, a quick-start guide and a recovery USB drive. He reads the guide aloud while Emeka lifts out the Core."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "The Core wakes up",
+        "body": "Ngozi plugs in the cable, and Chidi presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Ngozi joins it from her phone",
+        "body": "Ngozi opens the Wi-Fi settings on her phone and joins the Core’s own network. Then she picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "papra",
+        "kitchenowl",
+        "audiobookshelf"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "The grandparents pick the first apps",
+        "body": "In the Companion Hub store, Ngozi picks Hermes and Papra, and Emeka adds KitchenOwl and Audiobookshelf. Then the family walks away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Papra, KitchenOwl, Audiobookshelf"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "ngozi",
+      "agent": "ngozi",
+      "approval": "ngozi",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Gingersnap says hello",
+        "body": "From the loveseat, Ngozi sends her first message to the agent she named Gingersnap. The reply comes from the Core nearby.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "ngozi",
+        "text": "Good morning, Ngozi. This is Gingersnap. Where shall we begin?"
+      },
+      "film": true
+    },
+    {
+      "id": "kids-lookup",
+      "chapter": "corner",
+      "member": "chidi",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A biscuit rides on a whale",
+        "body": "Chidi bets Grandpa a biscuit that a whale is longer than his old bus. Kiwix settles it from a Wikipedia file, downloaded once, so no search engine sees it.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-reader",
+      "chapter": "corner",
+      "member": "chidi",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with text-to-speech; your library lives on your Core",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "bookshelf",
+            "room": "kids"
+          },
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Chidi hears the chapter read aloud",
+        "body": "On the rug by the toy box, Chidi settles into a chapter, and Koodo Reader reads it aloud. The family’s ebooks sit in one library on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "kids-stories",
+      "chapter": "corner",
+      "member": "chidi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "bookshelf",
+            "room": "kids"
+          },
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Grandpa’s tortoise stories play again",
+        "body": "After school, Chidi lies on his bed and plays the tortoise stories Emeka recorded himself. Audiobookshelf serves them from the Core and picks up where the story stopped.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "living-backup",
+      "chapter": "living",
+      "member": "ngozi",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "duplicati",
+        "replaces": [
+          "Backblaze"
+        ]
+      },
+      "capability": "back up your files with encryption before they leave your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A local disk takes the copy",
+        "body": "On the first Saturday, Ngozi points Duplicati at a local disk. It encrypts the family’s files before copying them across, and the copy stays in the house.",
+        "chips": [
+          "Duplicati",
+          "replaces Backblaze"
+        ]
+      }
+    },
+    {
+      "id": "living-draft",
+      "chapter": "living",
+      "member": "ngozi",
+      "agent": "ngozi",
+      "approval": "ngozi",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ngozi reads the draft first",
+        "body": "On the loveseat, Ngozi types three lines about a changed hall booking. Gingersnap drafts the reply on the Core’s local model. Ngozi reads it and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "ngozi",
+        "text": "The draft reply is ready. Please read it through before you send it."
+      }
+    },
+    {
+      "id": "living-photos",
+      "chapter": "living",
+      "member": "chidi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Grandma turns up in the prints",
+        "body": "Among the scanned prints, Chidi finds Ngozi as a girl. Immich keeps the scans on the Core, not in a photo cloud, and the first sort takes a while.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "living-week",
+      "chapter": "living",
+      "member": "emeka",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The school run follows sports day",
+        "body": "At the loveseat, Emeka blocks out Chidi’s sports day on Wednesday and shifts the school run to fit. Companion Planning keeps the week in one local file on the Core.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "emeka",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Plantain goes on the shared list",
+        "body": "By the fridge, Emeka adds plantain to the grocery list in KitchenOwl. Ngozi adds tomato paste from the loveseat. Both land on one list, on the Core.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-reply",
+      "chapter": "kitchen",
+      "member": "emeka",
+      "agent": "emeka",
+      "approval": "emeka",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Emeka sends the bench note himself",
+        "body": "At the counter, Emeka tells Crumpet the bus shelter has lost its bench. Crumpet drafts a note to the parish council, and Emeka reads it and sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "emeka",
+        "text": "The note is short and polite. Change a word if you like, then send it."
+      }
+    },
+    {
+      "id": "kitchen-music",
+      "chapter": "kitchen",
+      "member": "emeka",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Emeka cooks to his own music",
+        "body": "While the stew simmers on the range, Emeka plays highlife albums from his own collection. Jellyfin serves them from the Core to the phone beside the kettle.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "table-papers",
+      "chapter": "table",
+      "member": "ngozi",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The warranty is found in time",
+        "body": "The kettle breaks on the last day of its warranty. Ngozi finds the receipt in Papra, kept on the Core, not in a rented drive.",
+        "chips": [
+          "Papra",
+          "replaces Google Drive"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "table-budget",
+      "chapter": "table",
+      "member": "ngozi",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "firefly-iii",
+        "replaces": [
+          "YNAB"
+        ]
+      },
+      "capability": "track accounts, budgets, bills and savings goals, with rules that sort your transactions",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The month’s bills find their budgets",
+        "body": "Ngozi, once the church treasurer, types the month’s bills into Firefly III and sorts them into budgets. The ledger stays in the house, with no budgeting service holding it.",
+        "chips": [
+          "Firefly III",
+          "replaces YNAB"
+        ]
+      }
+    },
+    {
+      "id": "table-agenda",
+      "chapter": "table",
+      "member": "ngozi",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "capability": "the LibreOffice suite in your browser",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The hall agenda is typed up",
+        "body": "Before the hall committee meets, Ngozi types the agenda in LibreOffice, in her browser. The document is saved on the Core.",
+        "chips": [
+          "LibreOffice",
+          "replaces Microsoft Office"
+        ]
+      }
+    },
+    {
+      "id": "garden-journal",
+      "chapter": "garden",
+      "member": "chidi",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "deck",
+        "room": "patio",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Chidi counts the green tomatoes",
+        "body": "By the patio, Chidi counts the green tomatoes while Emeka writes each count into HortusFox. The plant journal, with its photos and watering dates, is kept on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-camera",
+      "chapter": "garden",
+      "member": "emeka",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "deck",
+        "room": "patio",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Emeka solves the tomato mystery",
+        "body": "Something keeps taking the ripe tomatoes, so Emeka points an IP camera at the border. Frigate records on the Core, and the footage shows a squirrel.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Three people share one Core",
+        "body": "Two grandparents and their grandson keep papers, music and stories on one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your receipts, recipes and photographs can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The living room has a loveseat and no TV; the only TV item is in the Bedroom. No beat says TV or screen. The media beat at the couch is Immich (a name the casting flag lists), told without any device screen.",
+    "Ngozi's office is the loveseat and the trestle table (no desk). Her room chapter is the living room; papers, budget and the hall agenda are told at the dining table, which the house has.",
+    "Chapter order is the walk: Core, Kids Corner (open to the living room, on the Core's side), back to the Core and the loveseat, kitchen, dining table by the back door, garden patio, street.",
+    "Frigate needs an IP camera the family has bought (catalog hardware caveat); the beat body says an IP camera and points it at the border, never at a person.",
+    "Duplicati beat names a local disk as the destination, never a cloud provider. Firefly III beat has the bills typed in; no bank import service or Data Importer is claimed.",
+    "Hermes beats carry the chat-service note; both agents draft and the person reads and sends. No Companion Memory is mentioned or connected.",
+    "Chidi uses no agent. His Kiwix, Koodo Reader and Audiobookshelf beats are an adult-supervised child tour: no profile of him, no question log. The reader beat sits on the toy box rug, with no device or screen described."
+  ]
+}

@@ -1,0 +1,803 @@
+{
+  "schema": "family/v1",
+  "slug": "cardoso",
+  "house": "starter18k",
+  "fictional": true,
+  "family": {
+    "surname": "Cardoso",
+    "tagline": "Two parents, a six-year-old and one Companion Core in a small cottage.",
+    "household": "young-family",
+    "business": false,
+    "story": "Beatriz coordinates a local charity from the desk in the family bedroom. Tiago stays home with Leo, who is six. One Companion Core serves the whole cottage.",
+    "address": {
+      "line": "7 Alderwick Close",
+      "place": "Lowmere"
+    },
+    "narrator": "v-bright-f"
+  },
+  "members": [
+    {
+      "id": "beatriz",
+      "name": "Beatriz",
+      "age": 33,
+      "role": "parent",
+      "work": "charity coordinator",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Tuppence",
+        "runtime": "Hermes",
+        "job": "Drafts emails to the charity’s volunteers from Beatriz’s notes.",
+        "personality": [
+          "brisk",
+          "tidy",
+          "clear"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Drafts only. Beatriz reads and sends every message."
+      }
+    },
+    {
+      "id": "tiago",
+      "name": "Tiago",
+      "age": 35,
+      "role": "parent",
+      "work": "at home with Leo",
+      "colour": "chart-2",
+      "archetype": "host",
+      "companion": {
+        "name": "Dumpling",
+        "runtime": "Hermes",
+        "job": "Drafts Tiago’s replies to school and playdate messages.",
+        "personality": [
+          "gentle",
+          "curious",
+          "bright"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Drafts only. Tiago reads and sends every reply."
+      }
+    },
+    {
+      "id": "leo",
+      "name": "Leo",
+      "age": 6,
+      "role": "child",
+      "work": "infant school",
+      "colour": "chart-3",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "bedroom",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The family bedroom"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Leo’s play zone"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Tiago finds the parcel waiting",
+        "body": "Up the cottage steps, a Companion Core waits by the door. Tiago carries it to the bedroom, where Beatriz clears the desk."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Leo carries the quick-start guide",
+        "body": "The parcel holds the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Leo carries the guide, and Tiago lifts out the Core."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Leo presses the button",
+        "body": "Beatriz plugs the cable in at the desk, and Leo presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Tiago opens the Wi-Fi settings on his phone and joins the Core’s own network. Then he chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "yuvomi",
+        "kitchenowl"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Beatriz picks Hermes, and the family adds Yuvomi and KitchenOwl. Then the family walks away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Yuvomi, KitchenOwl"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "beatriz",
+      "agent": "beatriz",
+      "approval": "beatriz",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick, on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Tuppence says hello",
+        "body": "Beatriz messages the agent she named Tuppence. Tuppence answers from the Core beside her.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "beatriz",
+        "text": "Hello, Beatriz. I am Tuppence. Where shall we begin?"
+      },
+      "film": true
+    },
+    {
+      "id": "bedroom-rota",
+      "chapter": "bedroom",
+      "member": "beatriz",
+      "agent": "beatriz",
+      "approval": "beatriz",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick, on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Beatriz reads the draft, then sends",
+        "body": "A volunteer drops out of Thursday’s rota. Beatriz jots two lines and Tuppence drafts the email on the Core’s local model. Beatriz reads it, then sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "beatriz",
+        "text": "Draft ready. Check the names before you send it."
+      }
+    },
+    {
+      "id": "bedroom-story",
+      "chapter": "bedroom",
+      "member": "leo",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The story starts where it stopped",
+        "body": "After lunch, Leo climbs the loft bed for story time. Audiobookshelf starts the next chapter where he stopped, from audiobooks kept on the Core.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "bedroom-forms",
+      "chapter": "bedroom",
+      "member": "beatriz",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "bentopdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "a PDF toolkit that runs in your browser",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Three scans become one form",
+        "body": "On the edge of the bed, Beatriz joins the swimming lesson form’s three scans into one file. BentoPDF runs in her browser, from the Core.",
+        "chips": [
+          "BentoPDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "bedroom-renewals",
+      "chapter": "bedroom",
+      "member": "beatriz",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The broadband renewal gets a reminder",
+        "body": "Before the broadband renews, Wallos on the Core sends Beatriz a reminder. She typed the household’s renewals in herself, so she decides what stays.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-snail",
+      "chapter": "kids",
+      "member": "leo",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Leo asks where snails go",
+        "body": "After school, Leo asks where snails go in the rain. Tiago looks it up in Kiwix, whose Wikipedia file was downloaded once, so no search engine sees the question.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-lamps",
+      "chapter": "kids",
+      "member": "leo",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The puzzle gets better light",
+        "body": "On a grey afternoon, Leo says his puzzle needs more light. Tiago brings the floor lamp and the table lamp up as one scene in Home Assistant on the Core.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "living-cartoon",
+      "chapter": "living",
+      "member": "tiago",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains on your network at the DNS level",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Tiago points the router at Pi-hole",
+        "body": "Saturday morning, Leo watches a nature programme from the couch. Tiago has set the router to ask Pi-hole first, which blocks ad and tracker domains for devices that use it.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "living-film",
+      "chapter": "living",
+      "member": "leo",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Leo watches himself learn to walk",
+        "body": "On Sunday, Beatriz sits down beside Leo. Jellyfin plays the family’s home videos from the Core to the TV, starting with Leo learning to walk.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "tiago",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "The milk goes on the list",
+        "body": "The milk is nearly gone, so Tiago adds it in KitchenOwl. Beatriz adds oat biscuits from the desk, and the one shared list lives on the Core.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-week",
+      "chapter": "kitchen",
+      "member": "tiago",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The school trip moves shopping day",
+        "body": "Beatriz puts the school trip in Yuvomi, the family calendar on the Core. At the breakfast bar, Tiago moves the shopping day to Wednesday.",
+        "chips": [
+          "Yuvomi"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-vault",
+      "chapter": "kitchen",
+      "member": "beatriz",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host; works with the Bitwarden apps",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The school sign-in joins the vault",
+        "body": "The school portal wants a new sign-in. Beatriz saves it in the VaultWarden vault on the Core. Tiago finds it through the Bitwarden apps on his phone.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-reply",
+      "chapter": "kitchen",
+      "member": "tiago",
+      "agent": "tiago",
+      "approval": "tiago",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick, on your Core",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Tiago chooses which playdate to accept",
+        "body": "Two playdate invitations land for one Friday. Tiago tells Dumpling which to accept, and Dumpling drafts both replies on the Core’s local model. Tiago reads both, then sends them himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "tiago",
+        "text": "Both replies are ready. Shall I make either one warmer?"
+      }
+    },
+    {
+      "id": "kitchen-recipe",
+      "chapter": "kitchen",
+      "member": "leo",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Leo chooses supper from the book",
+        "body": "On Tuesday, Leo chooses bean chilli from the recipe book in KitchenOwl on the Core. Tiago reads the steps while the hob warms, and Leo hands him the tins.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "garden-snail",
+      "chapter": "garden",
+      "member": "tiago",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A snail gets its picture taken",
+        "body": "Leo finds a snail on the path, and Tiago takes its picture. The photo backs up to Immich on the Core, not to a photo cloud.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-water",
+      "chapter": "garden",
+      "member": "leo",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds",
+      "anchor": {
+        "role": "deck",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Leo finds the fern a corner",
+        "body": "After the rain, a new fern comes home in a pot. Leo picks the shady corner by the fence, and Tiago logs the spot in HortusFox on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One cottage, one Core",
+        "body": "Rotas, renewals, shopping lists and snail questions run on one Companion Core in a small cottage."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your calendar, shopping list and sign-ins can run on a Companion Core at home. Browse the Companion Hub store for your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The only desk is the Core’s own, in the family bedroom. Beatriz’s desk beats anchor on the Core; the bed beats use the double bed and the loft bed. No second desk, no bookshelf, no fireplace.",
+    "Leo has no screen of his own: his beats sit at the play tent, the kids table and the loft bed, and an adult does the lookup with him. No agent for a six-year-old.",
+    "Both companions are Hermes. Beatriz and Tiago message the agent through the chat service the family picks; the note rides on the ftue and on each agent beat.",
+    "BentoPDF runs in the browser (listing: nothing is uploaded). The beat says it runs from the Core and never claims the saved file lands anywhere.",
+    "Wallos fetches logos from outside (catalog caveat); no beat says nothing leaves the Core and no beat promises savings.",
+    "Pi-hole covers only devices that use it for DNS; the beat says so and does not call it parental control.",
+    "kids-lamps: the Kids Zone has a floor lamp and a table lamp. Home Assistant controls network devices only (no Zigbee claim, no cloud-account claim about the lamps).",
+    "garden-snail and garden-water anchor on the back patios (role deck), beside the stepping path, the fern and hosta borders and the privacy fence; the front beds are only the fallback."
+  ]
+}

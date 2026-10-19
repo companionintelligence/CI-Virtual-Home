@@ -1,22 +1,24 @@
-// The portal's gallery (index.html): lists content/houses/index.json as cards with the committed thumbnails
-// (portal/thumbs/<id>.webp, scripts/build-thumbs.mts), with search, a storeys filter and style tags. A card
-// opens the live player, room-creator.html?mode=view. No WebGL, no framework, relative URLs only (the site is
-// served under a sub-path by portal:test). The filters live in the URL (?q=&storeys=&tag=) so a filtered view
-// can be linked. A home's name is assets/home-names.js's displayName (the Sims build's own title is the credit).
+// The portal's front page (index.html): the families and their homes, with the committed thumbnails
+// (portal/thumbs/<id>.webp, scripts/build-thumbs.mts), search, a persona filter (what they do: work from home, code, play,
+// study, make, host), a storeys filter and style tags. No WebGL, no framework, relative URLs only (the site is served under
+// a sub-path by portal:test). The filters live in the URL (?q=&persona=&storeys=&tag=) so a filtered view can be linked; any
+// other parameter in the address (an ad's utm_ tags, a click id) is kept as it is. A home's name is assets/home-names.js's
+// displayName.
+//
+// The family cards are in the built page as static HTML (scripts/portal-front.mts, written by scripts/build-portal.mts), so a
+// crawler, a visitor without JavaScript and an in-app browser with a slow script see them. This script ADOPTS them (it keeps
+// the elements, reads data-persona and data-find off them) and draws a card only for a home with no family, as it always did:
+// that card opens the live player, room-creator.html?mode=view. A family's card opens its page (family/<slug>), which opens
+// the tour. A checkout served as it is has no family cards and lists the homes.
 //
 // The names are imported when the page runs, not statically: if that one file does not come (a partial deploy, a
-// dropped request), the gallery still lists the homes, under the spec's title with the Sims pack's name taken out
-// (most of what displayName does), instead of never running and leaving the placeholder cards up for good.
+// dropped request), the gallery still lists the homes, under the name the list carries, instead of never running and
+// leaving the placeholder cards up for good.
 const FALLBACK_NAMES = {
-  buildName: h => (h.name || h.id || '').trim(),
-  displayName: h => (h.name || '').replace(/\(?\b(base\s*game|basegame|bg)\b\)?/gi, ' ').replace(/\s{2,}/g, ' ').trim() || h.id,
-  buildCredit: () => '',
+  displayName: h => (h.name || '').trim() || h.id,
 };
 const namesReady = import('../assets/home-names.js').catch(err => { console.warn('gallery: the names did not load', err); return FALLBACK_NAMES; });
 let names = FALLBACK_NAMES;
-
-// The home the hero plays. scripts/build-thumbs.mts renders portal/hero.webp from the same house (--hero).
-const HERO = 'aurora';
 
 // Style tags: the words a visitor would filter by, matched against each spec's one-paragraph `style`. A tag is
 // shown when it matches three or more homes and no more than half of them (a tag that fits most homes, like
@@ -49,33 +51,38 @@ const shortStyle = s => (s || '').split(/[:;,(]| with | over | under /)[0].trim(
 const nf = new Intl.NumberFormat('en');
 
 let homes = [];
+let items = [];          // one per card in the grid: { li, h (the home), persona: [archetypes], find: 'words the search reads' }
 let shownTags = [];
-const state = { q: '', storeys: '', tag: '' };
+const state = { q: '', storeys: '', tag: '', persona: '' };
+const MANAGED = ['q', 'storeys', 'tag', 'persona'];
 
 function readUrl() {
   const q = new URLSearchParams(location.search);
   state.q = q.get('q') || '';
   state.storeys = q.get('storeys') || '';
   state.tag = q.get('tag') || '';
+  state.persona = /^[a-z]{1,16}$/.test(q.get('persona') || '') ? q.get('persona') : '';
 }
+// The address keeps every parameter that is not one of ours, byte for byte (an ad's utm_ tags and a click id: portal/campaign.js reads
+// them, and a platform may check the id as it was sent), and ours are written after them.
 function writeUrl() {
-  const q = new URLSearchParams();
-  if (state.q) q.set('q', state.q);
-  if (state.storeys) q.set('storeys', state.storeys);
-  if (state.tag) q.set('tag', state.tag);
-  const s = q.toString();
-  try { history.replaceState(null, '', s ? `?${s}${location.hash}` : `${location.pathname}${location.hash}`); } catch { /* file:// or sandboxed */ }
+  const others = location.search.replace(/^\?/, '').split('&').filter(p => p && !MANAGED.includes(p.split('=')[0]));
+  const ours = MANAGED.filter(k => state[k]).map(k => `${k}=${encodeURIComponent(state[k])}`);
+  const s = [...others, ...ours].join('&');
+  try { history.replaceState(null, '', `${location.pathname}${s ? `?${s}` : ''}${location.hash}`); } catch { /* file:// or sandboxed */ }
 }
 
 // each filter on its own, so a tag's count can be taken against the others
 const storeysOk = h => !state.storeys || String(h.storeys || 1) === state.storeys || (state.storeys === '3' && (h.storeys || 1) >= 3);
 const tagOk = h => !state.tag || h.tags.includes(state.tag);
-function queryOk(h) {
+const personaOk = it => !state.persona || it.persona.includes(state.persona);
+// the search reads the home's name, style and id, and for a family its name, its people, their jobs, every app and what it replaces
+function queryOk(it) {
   if (!state.q) return true;
-  const hay = `${h.display} ${h.name} ${h.style || ''} ${h.author || ''} ${h.source || ''} ${h.id}`.toLowerCase();
+  const hay = `${it.h.display} ${it.h.style || ''} ${it.h.id} ${it.find}`.toLowerCase();
   return state.q.toLowerCase().split(/\s+/).filter(Boolean).every(w => hay.includes(w));
 }
-const matches = h => storeysOk(h) && tagOk(h) && queryOk(h);
+const matches = it => storeysOk(it.h) && tagOk(it.h) && personaOk(it) && queryOk(it);
 
 // A thumbnail that will not load: the home's initial and name on a tinted tile, so the card still says what it is
 function missingThumb(thumb, h) {
@@ -95,6 +102,7 @@ function card(h, i) {
   li.dataset.id = h.id;
   const a = document.createElement('a');
   a.href = viewerHref(h.id);
+  a.setAttribute('data-campaign', '');   // portal/campaign.js carries an ad's tags into the player
   a.setAttribute('aria-label', `${h.display}. ${shortStyle(h.style)}. Play in 3D`);
 
   const thumb = document.createElement('div');
@@ -121,11 +129,6 @@ function card(h, i) {
   const storeys = h.storeys || 1;
   facts.append(fact(`${storeys} ${storeys === 1 ? 'storey' : 'storeys'}`));
   if (h.areaSqm) facts.append(fact(`${nf.format(h.areaSqm)} m²`));
-  // the builder's credit; its tooltip names the build the spec was written from, by its own title
-  const credit = document.createElement('span'); credit.className = 'credit';
-  credit.title = [names.buildCredit(h), h.source].filter(Boolean).join(', ');
-  if (h.author) { credit.append('by '); const b = document.createElement('b'); b.textContent = h.author; credit.append(b); }
-  facts.append(credit);
   body.append(h3, style, facts);
 
   a.append(thumb, body);
@@ -150,58 +153,40 @@ function renderTags() {
 
 function apply() {
   let n = 0;
-  for (const li of $('#grid').children) {
-    const h = homes.find(x => x.id === li.dataset.id);
-    if (!h) continue;
-    const on = matches(h);
-    li.hidden = !on;
+  for (const it of items) {
+    const on = matches(it);
+    it.li.hidden = !on;
     if (on) n++;
   }
-  $('.count').textContent = n === homes.length ? String(homes.length) : `${n} of ${homes.length}`;
+  $('.count').textContent = n === items.length ? String(items.length) : `${n} of ${items.length}`;
   $('#empty').hidden = n !== 0;
   for (const b of document.querySelectorAll('#storeys button')) b.setAttribute('aria-pressed', String(b.dataset.storeys === state.storeys));
-  // a tag's count is the homes it would show with the search and storeys as they are; a tag that would show
-  // none is greyed out (the pressed one stays pressable, so it can be let go)
-  for (const b of document.querySelectorAll('#tags .tag')) {
-    const name = b.dataset.tag, on = name === state.tag;
-    const c = homes.filter(h => h.tags.includes(name) && storeysOk(h) && queryOk(h)).length;
+  // a button's count is the cards it would show with the search and the other filters as they are; one that would show none is
+  // greyed out (the pressed one stays pressable, so it can be let go)
+  const count = (b, label, c, on) => {
     b.querySelector('small').textContent = String(c);
     b.setAttribute('aria-pressed', String(on));
     b.disabled = c === 0 && !on;
-    b.setAttribute('aria-label', `${name}, ${c} ${c === 1 ? 'home' : 'homes'}`);
+    b.setAttribute('aria-label', `${label}, ${c} ${c === 1 ? 'home' : 'homes'}`);
+  };
+  for (const b of document.querySelectorAll('#tags .tag')) {
+    const name = b.dataset.tag;
+    count(b, name, items.filter(it => it.h.tags.includes(name) && storeysOk(it.h) && personaOk(it) && queryOk(it)).length, name === state.tag);
+  }
+  for (const b of document.querySelectorAll('#personas .persona')) {
+    const id = b.dataset.persona;
+    const c = items.filter(it => it.persona.includes(id) && storeysOk(it.h) && tagOk(it.h) && queryOk(it)).length;
+    count(b, b.firstChild.textContent, c, id === state.persona);
+    b.setAttribute('aria-label', `${b.firstChild.textContent}, ${c} ${c === 1 ? 'family' : 'families'}`);
   }
   if ($('#q').value !== state.q) $('#q').value = state.q;
   writeUrl();
 }
 
 function stats() {
-  const builders = new Set(homes.map(h => h.author).filter(Boolean));
   const area = homes.reduce((a, h) => a + (h.areaSqm || 0), 0);
   $('[data-stat="homes"]').textContent = String(homes.length);
-  $('[data-stat="builders"]').textContent = String(builders.size);
   $('[data-stat="area"]').textContent = nf.format(Math.round(area / 10) * 10);
-  const hero = homes.find(h => h.id === HERO);
-  if (hero) {
-    for (const el of document.querySelectorAll('[data-hero-name]')) el.textContent = hero.display;
-    $('#hero-play').href = viewerHref(HERO);
-    $('#hero-media').href = viewerHref(HERO);
-    $('#hero-media').setAttribute('aria-label', `Play ${hero.display} in 3D`);
-  }
-}
-
-// The footer's credits: every home against the build it was written from, by that build's own title and its
-// builder. The cards carry only the portal's name and the builder (a title's tooltip is out of reach on a touch
-// screen and to most screen readers), so this is where a home is tied to the build it credits.
-function credits() {
-  const list = $('#builds-list');
-  if (!list) return;
-  list.replaceChildren(...homes.map(h => {
-    const li = document.createElement('li');
-    const b = document.createElement('b'); b.textContent = h.display;
-    li.append(b, ` after “${h.name}”${h.author ? ` by ${h.author}` : ''}`);
-    return li;
-  }));
-  $('#builds').hidden = !homes.length;
 }
 
 // The list did not load: say so where the homes would be, with a way to try again, and put the filters away
@@ -210,8 +195,10 @@ function failed(on) {
   $('#failed').hidden = !on;
   $('#grid').hidden = on;
   $('#tags').hidden = on;
+  $('#more-filters').hidden = on;
+  $('#personas').hidden = on || !document.querySelector('#personas .persona');
   $('#filters').classList.toggle('off', on);
-  for (const c of document.querySelectorAll('#filters input, #filters button')) c.disabled = on;
+  for (const c of document.querySelectorAll('#filters input, #filters button, #personas button, #more-filters button')) c.disabled = on;
   $('#grid').setAttribute('aria-busy', String(!on && !homes.length));
 }
 
@@ -230,12 +217,28 @@ async function load() {
   // Anything that throws from here on (a record the page did not expect) ends on the same card, with the same way to
   // try again, as a list that did not download: a gallery never stays on its placeholders.
   try {
-    homes = (index.houses || []).map(h => ({ ...h, name: names.buildName(h), display: names.displayName(h), tags: TAGS.filter(([, re]) => re.test(h.style || '')).map(([name]) => name) }));
+    homes = (index.houses || []).map(h => ({ ...h, display: names.displayName(h), tags: TAGS.filter(([, re]) => re.test(h.style || '')).map(([name]) => name) }));
     stats();
     renderTags();
-    credits();
-    $('#grid').replaceChildren(...homes.map(card));
+    // the family cards in the page are kept as they are; a card is drawn only for a home with no family card (the plain list, the
+    // source page without a build, a home whose family is not current), after the families', and a family card whose home is not in the list goes
+    const byId = new Map(homes.map(h => [h.id, h]));
+    const families = [...$('#grid').querySelectorAll(':scope > li.card-family')].filter(li => byId.has(li.dataset.id));
+    const withFamily = new Set(families.map(li => li.dataset.id));
+    const plain = homes.filter(h => !withFamily.has(h.id)).map((h, i) => card(h, families.length + i));
+    $('#grid').replaceChildren(...families, ...plain);
+    items = [...$('#grid').children].map(li => ({
+      li, h: byId.get(li.dataset.id),
+      persona: (li.dataset.persona || '').split(' ').filter(Boolean),
+      find: li.dataset.find || '',
+    }));
     $('#grid').setAttribute('aria-busy', 'false');
+    // the persona buttons the build wrote: only the jobs a current family does; a state in the address that no card has is dropped
+    const personas = [...document.querySelectorAll('#personas .persona')];
+    $('#personas').hidden = !personas.length;
+    if (state.persona && !personas.some(b => b.dataset.persona === state.persona)) state.persona = '';
+    // the style and storeys filters are for browsing homes: open on a wide screen, and wherever the address already uses one
+    if (matchMedia('(min-width: 901px)').matches || state.storeys || state.tag) $('#more-filters').open = true;
     apply();
   } catch (err) {
     console.warn('gallery: the list could not be shown', err);
@@ -273,9 +276,11 @@ function wire() {
     if (e.pointerType === 'touch') return;
     const a = e.target.closest && e.target.closest('.card a, #hero-play, #hero-media');
     if (!a) return;
+    // only a link that opens the player (it names a house): a family's card goes to its page first, which is a light page
     const id = new URL(a.href).searchParams.get('house');
+    if (!id) return;
     const urls = warmed ? [] : ['./assets/vendor/three/three.module.min.js', './assets/house-builder.js', './assets/viewer.js'];
-    if (id) urls.push(`./content/houses/${encodeURIComponent(id)}.json`);
+    urls.push(`./content/houses/${encodeURIComponent(id)}.json`);
     warmed = true;
     for (const href of urls) fetchLow(href);
   };
@@ -284,7 +289,8 @@ function wire() {
   let typing = 0;
   $('#q').addEventListener('input', e => { clearTimeout(typing); typing = setTimeout(() => { state.q = e.target.value.trim(); apply(); }, 80); });
   for (const b of document.querySelectorAll('#storeys button')) b.addEventListener('click', () => { state.storeys = b.dataset.storeys; apply(); });
-  $('#clear').addEventListener('click', () => { state.q = ''; state.storeys = ''; state.tag = ''; apply(); $('#q').focus(); });
+  for (const b of document.querySelectorAll('#personas .persona')) b.addEventListener('click', () => { state.persona = state.persona === b.dataset.persona ? '' : b.dataset.persona; apply(); });
+  $('#clear').addEventListener('click', () => { state.q = ''; state.storeys = ''; state.tag = ''; state.persona = ''; apply(); $('#q').focus(); });
   window.addEventListener('keydown', e => {
     if (!homes.length) return;
     if (e.key === '/' && document.activeElement !== $('#q') && !e.metaKey && !e.ctrlKey) { e.preventDefault(); $('#q').focus(); }

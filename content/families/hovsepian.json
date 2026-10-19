@@ -1,0 +1,833 @@
+{
+  "schema": "family/v1",
+  "slug": "hovsepian",
+  "house": "bghouse-olcia",
+  "fictional": true,
+  "family": {
+    "surname": "Hovsepian",
+    "tagline": "Two grandparents, one grandchild and a Companion Core in the study.",
+    "household": "grandparents",
+    "business": true,
+    "story": "Araxi, a retired teacher, writes the parish newsletter from the study. Hagop, a retired developer, still keeps two consulting clients. Nare, eleven, studies in the small guest bedroom, and one Companion Core in the study serves the household.",
+    "address": {
+      "line": "14 Marlpit Lane",
+      "place": "Alderwick"
+    },
+    "narrator": "v-storyteller-m"
+  },
+  "members": [
+    {
+      "id": "araxi",
+      "name": "Araxi",
+      "age": 67,
+      "role": "grandparent",
+      "work": "retired teacher, runs the parish newsletter",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Saffron",
+        "runtime": "Hermes",
+        "job": "Drafts the parish newsletter from the notices Araxi messages to it.",
+        "personality": [
+          "tidy",
+          "cheerful",
+          "exact"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Araxi reads every line and sends the newsletter herself."
+      }
+    },
+    {
+      "id": "hagop",
+      "name": "Hagop",
+      "age": 70,
+      "role": "grandparent",
+      "work": "retired developer, two consulting clients",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Walnut",
+        "runtime": "Hermes",
+        "job": "Drafts progress notes for Hagop’s two clients from the points he sends.",
+        "personality": [
+          "dry",
+          "steady",
+          "thorough"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Drafts only. Hagop reads each note and sends it himself."
+      }
+    },
+    {
+      "id": "nare",
+      "name": "Nare",
+      "age": 11,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-3",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "office",
+      "kind": "room",
+      "room": "office",
+      "title": "Araxi in the study"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Beside the bread bin"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "Hagop in the family room"
+    },
+    {
+      "id": "nare",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Nare’s room"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out by the drive"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Nare holds every door open",
+        "body": "Up the long brick stair, Hagop carries a parcel with a Companion Core inside. Nare runs ahead to hold each door."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Nare lines them up while Araxi sets the Core on the desk."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Hagop plugs in the cable and steps back. Nare presses the button, and the Core wakes with a Wi-Fi network of its own.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "In the study doorway, Hagop joins the Core’s own network from his phone, then picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "joplin",
+        "forgejo"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Araxi picks Hermes and Joplin Server, and Hagop adds Forgejo. Then the two of them walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Joplin Server, Forgejo"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "araxi",
+      "agent": "araxi",
+      "approval": "araxi",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Saffron says hello",
+        "body": "Araxi messages the agent she named after her favourite spice, and Saffron answers from the Core.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "araxi",
+        "text": "Hello, Araxi. I am Saffron. Where shall we start?"
+      },
+      "film": true
+    },
+    {
+      "id": "office-notes",
+      "chapter": "office",
+      "member": "araxi",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "joplin",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "take notes and keep to-dos that sync across your devices through your own server",
+      "anchor": {
+        "role": "couch",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A choir notice joins the notebook",
+        "body": "A call from the choir leader moves Thursday’s practice to the afternoon. Araxi adds it to the parish notebook in Joplin Server, which syncs her devices through the Core.",
+        "chips": [
+          "Joplin Server",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "office-newsletter",
+      "chapter": "office",
+      "member": "araxi",
+      "agent": "araxi",
+      "approval": "araxi",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Araxi reads the draft first",
+        "body": "On Friday morning Araxi messages Saffron the week’s notices. Saffron drafts the newsletter on the Core’s local model, and Araxi reads it and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "araxi",
+        "text": "Your five notices are in, in order. Please read them before you send the newsletter."
+      }
+    },
+    {
+      "id": "office-contract",
+      "chapter": "office",
+      "member": "araxi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Araxi calls the renewal date down",
+        "body": "Hagop calls up the stairs for a client’s renewal date. Araxi types one word into Paperless-ngx, which read the scanned pages on the Core, and calls it down.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Google Drive"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "office-invoice",
+      "chapter": "office",
+      "member": "araxi",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "with": [
+        "kimai"
+      ],
+      "capability": "the LibreOffice suite (Writer, Calc and more) in your browser",
+      "anchor": {
+        "role": "couch",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The month’s hours become an invoice",
+        "body": "At month’s end Araxi takes the hours from Kimai and writes the invoice in LibreOffice, in her browser. The finished invoice is saved on the Core.",
+        "chips": [
+          "LibreOffice",
+          "replaces Microsoft Office"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-dinners",
+      "chapter": "kitchen",
+      "member": "araxi",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Dinners fit around Hagop’s calls",
+        "body": "At the kitchen island, Araxi plans the week’s dinners around Hagop’s client calls. Yuvomi keeps the calendar and the meal plan in one database on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-pudding",
+      "chapter": "kitchen",
+      "member": "nare",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "A pudding sends Hagop shopping",
+        "body": "Friday’s pudding needs apricots, so Nare adds them to the household list in Yuvomi. Hagop picks the list up on his way out to the shop.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "living-repo",
+      "chapter": "living",
+      "member": "hagop",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The loveseat doubles as a desk",
+        "body": "By noon a client wants Hagop’s reporting scripts. He pushes them to Forgejo from the loveseat. The repository sits on the Core, not on a rented code host.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-hours",
+      "chapter": "living",
+      "member": "hagop",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "kimai",
+        "replaces": []
+      },
+      "capability": "track time per project and client, with reports",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Hagop counts an hour before lunch",
+        "body": "When a call with his smaller client ends, Hagop adds the hour to Kimai. A hosted timer would hold his client list. Here it stays on the Core.",
+        "chips": [
+          "Kimai"
+        ]
+      }
+    },
+    {
+      "id": "nare-reads",
+      "chapter": "living",
+      "member": "nare",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "booklore",
+        "replaces": [
+          "Kindle"
+        ]
+      },
+      "capability": "manage and read books, comics and PDFs",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nare reads beside Hagop",
+        "body": "After school Nare reads her class novel in BookLore on the loveseat, while Hagop reads his own book beside her. The family’s shelf of books is served from the Core.",
+        "chips": [
+          "BookLore",
+          "replaces Kindle"
+        ]
+      }
+    },
+    {
+      "id": "living-walnut",
+      "chapter": "living",
+      "member": "hagop",
+      "agent": "hagop",
+      "approval": "hagop",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Walnut leaves one date for Hagop",
+        "body": "Hagop messages Walnut three points for a client. Walnut drafts the note on the Core’s local model and leaves one date blank. Hagop fills it in and sends it himself.",
+        "chips": [
+          "Hermes"
+        ]
+      },
+      "say": {
+        "speaker": "hagop",
+        "text": "Three points, three paragraphs. One date is blank, so please fill it in before sending."
+      }
+    },
+    {
+      "id": "living-tapes",
+      "chapter": "living",
+      "member": "nare",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nare picks the next clip",
+        "body": "On Saturday morning Nare picks a clip from Hagop’s digitised holiday tapes. Jellyfin plays it from the Core to the family room TV.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "nare-lookup",
+      "chapter": "nare",
+      "member": "nare",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Nare looks up a lighthouse lens",
+        "body": "On her bed, Nare looks up how a lighthouse lens turns. Kiwix answers from a Wikipedia file the Core holds, so no search engine is asked.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ],
+        "note": "The Wikipedia file is downloaded once."
+      },
+      "film": true
+    },
+    {
+      "id": "nare-fractions",
+      "chapter": "nare",
+      "member": "araxi",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "open-webui",
+        "replaces": [
+          "ChatGPT"
+        ]
+      },
+      "with": [
+        "obsidian"
+      ],
+      "capability": "chat with models running on your own Core, from any browser",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Araxi reads the ice answer",
+        "body": "Nare asks Open WebUI why ice floats, and the model runs on the Core. Araxi reads the answer with her, and Nare writes it up in Obsidian.",
+        "chips": [
+          "Open WebUI",
+          "replaces ChatGPT"
+        ]
+      }
+    },
+    {
+      "id": "nare-letter",
+      "chapter": "nare",
+      "member": "nare",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nare writes first and checks after",
+        "body": "Nare writes her Spanish pen-pal letter herself, then checks a few sentences in LibreTranslate. The Core does the translating, not a translation website.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ],
+        "note": "Language models are downloaded once."
+      }
+    },
+    {
+      "id": "garden-drive",
+      "chapter": "garden",
+      "member": "hagop",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Hagop checks whether the lorry came",
+        "body": "Araxi and Hagop disagree about whether the recycling lorry came on Tuesday. Hagop checks the drive camera’s clip in Frigate, which keeps it on the Core.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Two generations, one Core",
+        "body": "Two grandparents, one grandchild and one Companion Core, behind the periwinkle siding."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your newsletter, client files, old films and homework can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Study has no desk item in the spec; the Core stands on its own desk there. Araxi anchors on the sofa, the room and the Core, and no beat names a second desk.",
+    "The Family Room has a loveseat, a wall TV and a ladder shelf but no desk: Hagop works from the loveseat, and Nare reads there in one beat. His other anchors are the shelf and the room. The TV beat is the Family Room TV.",
+    "The Guest Bedroom has a bed and a chest of drawers only: Nare anchors on the bed and the room, and no beat names a desk or a screen there. She is never shown asleep.",
+    "Both agents are Hermes. The chat-service note rides on ftue-hello, the first Hermes beat. Companion Memory is not named anywhere.",
+    "living-tapes assumes old holiday tapes digitised to files by the family: Jellyfin plays the family’s own files only. garden-drive assumes an IP camera the family owns (not part of the Core).",
+    "BookLore fetches covers and metadata from outside (catalog caveat), so nare-reads says the books sit on the Core and claims no more."
+  ]
+}

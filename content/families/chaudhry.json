@@ -1,0 +1,818 @@
+{
+  "schema": "family/v1",
+  "slug": "chaudhry",
+  "house": "lakecabin",
+  "fictional": true,
+  "family": {
+    "surname": "Chaudhry",
+    "tagline": "Two parents, one baby and one Companion Core in a house on the lake.",
+    "household": "young-family",
+    "business": false,
+    "story": "Noor writes code from the study, where the Companion Core sits on her desk. Imran is home with Zara, who is one, and keeps the kitchen. The house stands over a lake.",
+    "address": {
+      "line": "12 Moorhen Bank",
+      "place": "Halden Water"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "noor",
+      "name": "Noor",
+      "age": 36,
+      "role": "parent",
+      "work": "backend developer, works from home",
+      "colour": "chart-1",
+      "archetype": "builder",
+      "companion": {
+        "name": "Sparrowhawk",
+        "runtime": "OpenClaw",
+        "job": "Opens Gitea in its own browser and labels the issues Noor lists.",
+        "personality": [
+          "alert",
+          "dry",
+          "exact"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Labels issues only. Noor reads every label before it stays."
+      }
+    },
+    {
+      "id": "imran",
+      "name": "Imran",
+      "age": 38,
+      "role": "parent",
+      "work": "at home with the baby",
+      "colour": "chart-2",
+      "archetype": "host",
+      "companion": {
+        "name": "Pebble",
+        "runtime": "OpenClaw",
+        "job": "Opens the grocer's website and fills a basket from the KitchenOwl list.",
+        "personality": [
+          "patient",
+          "calm",
+          "steady"
+        ],
+        "voice": "v-steady-m",
+        "memory": true,
+        "limits": "Fills the basket only. Imran checks it and places the order."
+      }
+    },
+    {
+      "id": "zara",
+      "name": "Zara",
+      "age": 1,
+      "role": "baby",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "Noor in the study"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out on the deck"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Imran in the kitchen"
+    },
+    {
+      "id": "nursery",
+      "kind": "room",
+      "room": "kids",
+      "title": "Zara's nursery"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The parcel climbs the front steps",
+        "body": "A parcel waits at the top of the front steps. Noor carries it in, and Imran holds the door, Zara on his hip."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Noor sets the Core on the study desk, and Zara takes the empty carton."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Noor plugs the cable in, and Imran presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      }
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "On his phone, Imran joins the Core's own network, then chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "with": [
+        "gitea",
+        "kitchenowl"
+      ],
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agents and apps",
+        "body": "In the Companion Hub store, Noor picks OpenClaw and Gitea, and Imran adds KitchenOwl. The agents are Sparrowhawk and Pebble. Imran connects Companion Memory (beta) to Pebble.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Gitea, KitchenOwl"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "member": "noor",
+      "agent": "noor",
+      "approval": "noor",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Sparrowhawk says hello",
+        "body": "Noor greets the agent she named Sparrowhawk, and it answers from the Core on her desk.",
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "noor",
+        "text": "Hello, Noor. I am Sparrowhawk. What is the first job?"
+      }
+    },
+    {
+      "id": "study-repo",
+      "chapter": "study",
+      "category": "productivity",
+      "segment": "consumer",
+      "film": true,
+      "member": "noor",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Zara waves as Noor merges",
+        "body": "Zara waves from the doorway as Noor reads her own pull request in Gitea, then merges it. The repository and its history sit on the Core.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      }
+    },
+    {
+      "id": "study-model",
+      "chapter": "study",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "noor",
+      "app": {
+        "id": "open-webui",
+        "replaces": [
+          "ChatGPT"
+        ]
+      },
+      "with": [
+        "gitea"
+      ],
+      "capability": "chat with models running on your own Core, from any browser",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Noor asks about a slow query",
+        "body": "A query drags, so Noor asks a model on the Core through Open WebUI. The chat stays on the Core by default, and the fix goes into Gitea.",
+        "chips": [
+          "Open WebUI",
+          "replaces ChatGPT"
+        ]
+      }
+    },
+    {
+      "id": "study-weekend",
+      "chapter": "study",
+      "category": "home",
+      "segment": "consumer",
+      "member": "imran",
+      "app": {
+        "id": "foldergram",
+        "replaces": []
+      },
+      "with": [
+        "gitea"
+      ],
+      "capability": "turn a folder of photos and videos into a feed with albums and a timeline",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Noor writes Imran a sorting script",
+        "body": "On a rainy Saturday, Imran asks Noor for a way to sort Zara's pictures. Noor writes a script, commits it to Gitea and sorts the folders for Foldergram.",
+        "chips": [
+          "Foldergram"
+        ]
+      }
+    },
+    {
+      "id": "study-easel",
+      "chapter": "study",
+      "category": "creative",
+      "segment": "consumer",
+      "member": "noor",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "easel",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Thursday's design starts on the easel",
+        "body": "Thursday's design for her own project starts as boxes and arrows on the study easel. Then Noor types it into a Gitea issue, so the plan sits with the code.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      }
+    },
+    {
+      "id": "study-triage",
+      "chapter": "study",
+      "category": "productivity",
+      "segment": "consumer",
+      "film": true,
+      "member": "noor",
+      "agent": "noor",
+      "approval": "noor",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sparrowhawk labels, Noor decides",
+        "body": "Monday morning, Noor lists the stale issues. Sparrowhawk opens Gitea in its own browser and labels them. Noor reads every label before it stays.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ],
+        "note": "Companion Agents are in beta."
+      }
+    },
+    {
+      "id": "garden-camera",
+      "chapter": "garden",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "noor",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Nest Cam"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A camera faces the water",
+        "body": "Noor sets an IP camera beside the telescope, aimed at the water. Frigate records its clips on the Core, in the house.",
+        "chips": [
+          "Frigate",
+          "replaces Nest Cam"
+        ]
+      }
+    },
+    {
+      "id": "garden-heron",
+      "chapter": "garden",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "imran",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Nest Cam"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "telescope",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Imran shows Zara the swans",
+        "body": "Swans crossed the water this morning, and Frigate kept the deck camera's clip on the Core. Imran plays it for Zara, then points the telescope at the real swans.",
+        "chips": [
+          "Frigate",
+          "replaces Nest Cam"
+        ]
+      }
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "imran",
+      "app": {
+        "id": "foldergram",
+        "replaces": []
+      },
+      "capability": "turn a folder of photos and videos into a feed with albums and a timeline",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Imran opens Zara's year on TV",
+        "body": "On Sunday afternoon, Imran opens Zara's folder in Foldergram in the TV's browser. He and Noor scroll the timeline from the sofa, and the Core serves the pictures.",
+        "chips": [
+          "Foldergram"
+        ]
+      }
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "category": "home",
+      "segment": "consumer",
+      "member": "noor",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Coffee beans join the list",
+        "body": "Noor finishes early on Friday and settles on the sofa with her laptop. She adds coffee beans to the KitchenOwl list, and Imran reads the same list in the kitchen.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-week",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "imran",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Dinners are planned a day ahead",
+        "body": "Tuesday's order is a day away, so Imran plans the week's dinners in KitchenOwl. Noor opens the same plan from the study, and the shopping list sits beside it.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-swap",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "imran",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "with": [
+        "open-webui"
+      ],
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Imran finds a buttermilk swap",
+        "body": "Halfway through the pancakes, the buttermilk is gone. Imran asks Open WebUI, and a model on the Core suggests yoghurt. He adds buttermilk to KitchenOwl for next time.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-playlist",
+      "chapter": "kitchen",
+      "category": "media",
+      "segment": "consumer",
+      "member": "noor",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Noor starts lunch with a playlist",
+        "body": "On her lunch break, Noor starts a playlist in Navidrome at the kitchen counter. The tracks come from the family's own collection, served from the Core.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-pebble",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "film": true,
+      "member": "imran",
+      "agent": "imran",
+      "approval": "imran",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Imran checks the basket before ordering",
+        "body": "A long list waits, so Pebble opens the grocer's website and fills a basket from KitchenOwl. Imran checks every line, then places the order himself.",
+        "chips": [
+          "KitchenOwl"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      }
+    },
+    {
+      "id": "kitchen-spend",
+      "chapter": "kitchen",
+      "category": "money",
+      "segment": "consumer",
+      "member": "imran",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The delivery arrives a tin short",
+        "body": "The grocery delivery arrives a tin short. Imran enters the total at the breakfast bar, and KitchenOwl adds it to the household's expenses beside the lists.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "nursery-lullaby",
+      "chapter": "nursery",
+      "category": "kids",
+      "segment": "consumer",
+      "film": true,
+      "member": "imran",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "crib",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Imran picks the nap lullaby",
+        "body": "Before the afternoon nap, Imran picks a lullaby from the family's own collection. Navidrome serves it from the Core, not from a music service.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "nursery-album",
+      "chapter": "nursery",
+      "category": "media",
+      "segment": "consumer",
+      "member": "zara",
+      "app": {
+        "id": "foldergram",
+        "replaces": []
+      },
+      "capability": "turn a folder of photos and videos into a feed with albums and a timeline",
+      "anchor": {
+        "role": "toys",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Imran gives each month its album",
+        "body": "Imran drops a month of pictures into Zara's folder on the Core. Foldergram turns the folder into albums and a timeline, so each month has its place.",
+        "chips": [
+          "Foldergram"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core beside the water",
+        "body": "A pull request, a playlist and a grocery basket share one Companion Core, by the lake."
+      }
+    }
+  ],
+  "closing": {
+    "body": "Your repositories, your family's music and a baby's first year can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The study has no desk item in the spec (the Core's own walnut desk is the only one), so Noor's beats anchor on the core, the study bookshelf, the easel and the room.",
+    "The house has a tv-stand and a sofa in the Living Room, a breakfast bar (kitchen-island role), a crib and blocks in the Nursery, a telescope on the Lake Deck. The deck has no rail. No fireplace is told.",
+    "Both agents run OpenClaw (casting signature ci-openclaw). kitchen-pebble opens a grocer's website, so it carries the OpenClaw website note; Imran checks the basket and places the order himself.",
+    "garden-camera assumes the family owns an IP camera: it is not in the Core box and not in the 3D scene. Frigate faces the water, not people.",
+    "Pebble has Companion Memory connected, by Imran's choice; the first mention is ftue-pick (not a film beat) and reads Companion Memory (beta). Sparrowhawk has no memory.",
+    "Zara is a baby: the one beat labelled hers (nursery-album) is told through Imran, because the validator wants a beat for every member under thirteen. Nap time is told in daylight, nobody is shown asleep.",
+    "Chapter order follows the walk: the study, the deck beside it, then the living room and kitchen, up the stair to the nursery."
+  ]
+}

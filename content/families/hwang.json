@@ -1,0 +1,872 @@
+{
+  "schema": "family/v1",
+  "slug": "hwang",
+  "house": "palnknoll",
+  "fictional": true,
+  "family": {
+    "surname": "Hwang",
+    "tagline": "Three people, one Companion Core, and a house on a knoll above the water.",
+    "household": "young-family",
+    "business": false,
+    "story": "Minjung keeps the household running from the dining table, and Jiho builds apps in the little study. Yuna, eight, reads in her room upstairs. One Companion Core sits in the living room.",
+    "address": {
+      "line": "17 Quillmere Rise",
+      "place": "Sorrelby"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "minjung",
+      "name": "Minjung",
+      "age": 40,
+      "role": "parent",
+      "work": "school administrator",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Poppy",
+        "runtime": "Hermes",
+        "job": "Drafts replies to the piano teacher and the swimming club from Minjung’s short notes.",
+        "personality": [
+          "cheerful",
+          "tidy",
+          "patient"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Minjung reads and sends every message."
+      }
+    },
+    {
+      "id": "jiho",
+      "name": "Jiho",
+      "age": 42,
+      "role": "parent",
+      "work": "mobile developer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Linnet",
+        "runtime": "Hermes",
+        "job": "Drafts changelogs and commit notes from Jiho’s rough fix notes.",
+        "personality": [
+          "curious",
+          "gentle",
+          "wry"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Drafts only. Jiho reads every word before it is used."
+      }
+    },
+    {
+      "id": "yuna",
+      "name": "Yuna",
+      "age": 8,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-3",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining room"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out by the pools"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "The study"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "Yuna’s room"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Jiho and Yuna carry it in",
+        "body": "A courier leaves the parcel on the stone stoop. Jiho and Yuna carry it in to the credenza in the living room."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Yuna lays out the contents",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Yuna lays the pieces out in a row."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Jiho plugs in the cable and Minjung presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Minjung joins from her phone",
+        "body": "On her phone, Minjung opens the Wi-Fi settings and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "forgejo",
+        "bookstack"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Minjung picks the first agent",
+        "body": "In the Companion Hub store, Minjung picks Hermes. The family adds Forgejo and BookStack, and then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Forgejo, BookStack"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "minjung",
+      "agent": "minjung",
+      "approval": "minjung",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Poppy says hello",
+        "body": "Minjung sends her first message to the agent she named Poppy. Poppy answers from the Core, which sits in the living room.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "minjung",
+        "text": "Hello, Minjung. I am Poppy. Where shall we begin?"
+      }
+    },
+    {
+      "id": "living-music",
+      "chapter": "living",
+      "member": "jiho",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection from your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Jiho queues the weekend playlist",
+        "body": "Saturday morning light crosses the grand piano as Jiho chooses the weekend playlist from the sofa. Navidrome plays the family’s own music files from the Core.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "member": "jiho",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "AdGuard"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains at the DNS level",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Jiho points the router at Pi-hole",
+        "body": "From the loveseat, Jiho sets the router to ask Pi-hole for web addresses. Pi-hole on the Core blocks ad and tracker domains for devices that use it for DNS.",
+        "chips": [
+          "Pi-hole",
+          "replaces AdGuard"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "member": "minjung",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes and chores",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Minjung adds rice to the list",
+        "body": "Tuesday afternoon, the rice runs low. Minjung marks it at the breakfast bar in Grocy, which keeps the pantry stock and shopping list on the Core.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-chores",
+      "chapter": "kitchen",
+      "member": "yuna",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "donetick",
+        "replaces": [
+          "OurHome"
+        ]
+      },
+      "capability": "assign and track household chores, with NFC tag completion",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Yuna ticks off the fruit bowl",
+        "body": "Setting out the fruit bowl is Yuna’s Wednesday job. She holds the family phone to a tag on the fridge. The Donetick rota on the Core marks it done.",
+        "chips": [
+          "Donetick",
+          "replaces OurHome"
+        ]
+      }
+    },
+    {
+      "id": "dining-manual",
+      "chapter": "dining",
+      "member": "minjung",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "write a wiki or a set of manuals in books, chapters and pages",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Minjung starts with the pump",
+        "body": "For the guests, the water shutoff and pool pump restart go on page one. Minjung writes the manual in BookStack, which keeps it on the Core.",
+        "chips": [
+          "BookStack",
+          "replaces Notion"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "dining-poppy",
+      "chapter": "dining",
+      "member": "minjung",
+      "agent": "minjung",
+      "approval": "minjung",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "dining"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Poppy drafts the reply",
+        "body": "The piano teacher asks to move Thursday’s lesson. Poppy drafts the reply on the Core’s local model. Minjung reads it, changes one word and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "minjung",
+        "text": "Here is a draft reply. Please read it before you send it."
+      }
+    },
+    {
+      "id": "dining-paper",
+      "chapter": "dining",
+      "member": "minjung",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Minjung scans the mooring letter",
+        "body": "A mooring fee letter and a swimming form get scanned at the dining table. Paperless-ngx reads them on the Core, and Minjung finds the letter later by a word.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "dining-backup",
+      "chapter": "dining",
+      "member": "jiho",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "duplicati",
+        "replaces": [
+          "Backblaze"
+        ]
+      },
+      "capability": "back up your files with encryption before they leave your Core",
+      "anchor": {
+        "role": "room",
+        "room": "dining"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Jiho backs up the manual",
+        "body": "Jiho sets a weekly backup of Minjung’s manual and scans. Duplicati encrypts them before they leave the Core, and the copy lands on a disk plugged into it.",
+        "chips": [
+          "Duplicati",
+          "replaces Backblaze"
+        ]
+      }
+    },
+    {
+      "id": "garden-otter",
+      "chapter": "garden",
+      "member": "jiho",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "pool",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Jiho checks the terrace camera",
+        "body": "A cushion keeps ending up in the upper pool, so Jiho checks the terrace camera. Frigate recorded an otter, and the clip stays on the Core.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-pump",
+      "chapter": "garden",
+      "member": "minjung",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "garden",
+        "room": "garden",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Minjung sets the pump timer",
+        "body": "Friday morning, Minjung plugs the pool pump into a smart plug. Home Assistant on the Core runs the timer, and Home Assistant itself needs no cloud account.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "study-forge",
+      "chapter": "study",
+      "member": "jiho",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One bug left before lunch",
+        "body": "One tide table bug is left, so Jiho pushes the fix before lunch. Forgejo keeps the code and issues on the Core, not on a rented code host.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "study-linnet",
+      "chapter": "study",
+      "member": "jiho",
+      "agent": "jiho",
+      "approval": "jiho",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "forgejo"
+      ],
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Linnet drafts the changelog",
+        "body": "Jiho types his fix notes to Linnet in his browser. Linnet drafts the changelog on the Core’s local model, and Jiho reads it before he pastes it into Forgejo himself.",
+        "chips": [
+          "Hermes"
+        ]
+      },
+      "say": {
+        "speaker": "jiho",
+        "text": "Here is the changelog. Please read it before you paste it."
+      }
+    },
+    {
+      "id": "study-notebook",
+      "chapter": "study",
+      "member": "jiho",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "with": [
+        "open-webui"
+      ],
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Jiho hunts a late tide table",
+        "body": "One tide table comes out an hour late. Jiho reruns the sums in JupyterLab, then asks a model on the Core, through Open WebUI, what he missed.",
+        "chips": [
+          "JupyterLab"
+        ]
+      }
+    },
+    {
+      "id": "kids-otter",
+      "chapter": "kids",
+      "member": "yuna",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Yuna asks what otters eat",
+        "body": "Yuna checks Kiwix to learn what an otter eats. Its Wikipedia file was downloaded once, and the Core serves it, so no search engine is asked.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kids-korean",
+      "chapter": "kids",
+      "member": "yuna",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "kids"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Yuna writes the card first",
+        "body": "For her grandmother’s birthday, Yuna writes a card in Korean, then checks it in LibreTranslate. Its language models were downloaded once, and the Core does the translating.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "kids-shelf",
+      "chapter": "kids",
+      "member": "yuna",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Yuna has the page read aloud",
+        "body": "Beside the low bookshelf, Yuna opens the family’s own ebooks in Koodo Reader and has it read the page aloud. The library lives on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core on the knoll",
+        "body": "A manual, a camera, code and a child’s questions, on one Companion Core on the knoll."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your house manual, camera clips, code and a child’s questions can sit on a Companion Core. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Walk order: ftue and living (Core on the credenza), kitchen and dining on the entry level, the garden terrace and pools, then upstairs to the study and Yuna's room, then the street. Garden sits before the stairs on purpose.",
+    "No TV in this house: living-music is the couch media beat (Navidrome). The grand piano is named only as a piano. The Living Room has no laptop or screen, so the Pi-hole beat is a router setting from the loveseat.",
+    "The Study has a desk and a laptop only; no monitor or screen is named. The Kids Room has a bookshelf and no desk: Yuna's beats anchor the bookshelf or the room.",
+    "Both companions are Hermes. Memory is not connected, so Companion Memory is never named. Poppy and Linnet only draft; Minjung sends, Jiho pastes.",
+    "Pi-hole covers only the devices that use it for DNS; the beat says so and is not parental control. Frigate: the camera is the family's own, over their own terrace.",
+    "Kiwix and LibreTranslate beats carry downloaded once. Donetick is told without its Telegram or Pushover notifications. Home Assistant needs a network smart plug for the pump; no Zigbee stick is implied.",
+    "Duplicati names a local disk as the destination. Paperless-ngx is scans only.",
+    "Jiho's tide table app is a personal project: no employer code is implied."
+  ]
+}

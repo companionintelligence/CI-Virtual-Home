@@ -1,0 +1,831 @@
+{
+  "schema": "family/v1",
+  "slug": "ashworth",
+  "house": "flowerycottage",
+  "fictional": true,
+  "family": {
+    "surname": "Ashworth",
+    "tagline": "Forty years of paintings, kept where she can find them.",
+    "household": "grandparents",
+    "business": true,
+    "story": "Hester is a painter and printmaker who sells prints and cards from her lakeside cottage. Her grandchildren Anika and Rohan spend summer days by the creek. One Companion Core in the study keeps forty years of paintings in order.",
+    "address": {
+      "line": "3 Lowwater Lane",
+      "place": "Skelmire Beck"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "hester",
+      "name": "Hester",
+      "age": 73,
+      "role": "grandparent",
+      "work": "painter and printmaker",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Alma",
+        "runtime": "Hermes",
+        "job": "Drafts print descriptions and replies to card orders from what Hester texts it.",
+        "personality": [
+          "gentle",
+          "patient",
+          "warm"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Drafts only. Hester sends every reply."
+      }
+    },
+    {
+      "id": "anika",
+      "name": "Anika",
+      "age": 11,
+      "role": "visitor",
+      "work": "granddaughter, day visits",
+      "colour": "chart-2"
+    },
+    {
+      "id": "rohan",
+      "name": "Rohan",
+      "age": 8,
+      "role": "visitor",
+      "work": "grandson, day visits",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining room"
+    },
+    {
+      "id": "studio",
+      "kind": "room",
+      "room": "living",
+      "title": "The sunroom studio"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "The study"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The garden and the creek"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "hester",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel at the cottage door",
+        "body": "A parcel waits at the cottage door. Hester carries it the length of the house, through the living room, to the study."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "anika",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Anika counts the contents",
+        "body": "Anika counts as Hester unpacks: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "rohan",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Rohan presses the button",
+        "body": "Hester plugs in the cable, and Rohan presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "hester",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Anika reads out the steps",
+        "body": "Hester joins the Core's own Wi-Fi network from her phone while Anika reads out the steps. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "hester",
+      "with": [
+        "ci-memory",
+        "librephotos",
+        "inkscape"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Hester picks her first few",
+        "body": "In Companion Hub, Hester picks Hermes and Companion Memory (beta). She adds LibrePhotos and Inkscape, then goes to put the kettle on.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Companion Memory (beta)",
+            "Apps: LibrePhotos, Inkscape"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "hester",
+      "agent": "hester",
+      "approval": "hester",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Alma says hello",
+        "body": "Hester texts the agent she named Alma. Alma answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "hester",
+        "text": "Hello, Hester. I am Alma. Shall we begin with the paintings?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "rohan",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "Stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Rohan picks the rainy-day film",
+        "body": "On a wet afternoon, Rohan picks a film from the family's own library on the living-room TV. Jellyfin plays it from the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "anika",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "Read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A book, read or listened to",
+        "body": "Anika curls up on the couch with an ebook in Koodo Reader. When she wants to listen instead, she turns on text-to-speech.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-lunch",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "hester",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "A shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Summer lunches, planned",
+        "body": "At the counter, Hester plans the grandchildren's summer lunches in the KitchenOwl meal planner. Rohan adds blackberry crumble to the recipe book.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-feed",
+      "chapter": "kitchen",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "hester",
+      "app": {
+        "id": "freshrss",
+        "replaces": []
+      },
+      "capability": "Read the sites you follow in one feed, on your own Core",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Morning tea and one feed",
+        "body": "Over morning tea at the counter, Hester reads the art journals she follows in FreshRSS. One feed, kept on the Core.",
+        "chips": [
+          "FreshRSS"
+        ]
+      }
+    },
+    {
+      "id": "dining-translate",
+      "chapter": "dining",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "anika",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "Translate text and documents on your own Core",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A birthday note for nani",
+        "body": "Anika writes a birthday note for her nani in English. LibreTranslate turns it into Hindi, and Anika checks each line.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "dining-herons",
+      "chapter": "dining",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "anika",
+      "app": {
+        "id": "memos",
+        "replaces": [
+          "Google Keep"
+        ]
+      },
+      "capability": "Capture quick notes and journal entries in Markdown",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          },
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A heron diary, note by note",
+        "body": "Anika keeps a heron diary in Memos at the dining table. Each sighting is a dated note, saved on the Core.",
+        "chips": [
+          "Memos",
+          "replaces Google Keep"
+        ]
+      }
+    },
+    {
+      "id": "studio-catalog",
+      "chapter": "studio",
+      "category": "creative",
+      "segment": "small-business",
+      "member": "hester",
+      "app": {
+        "id": "librephotos",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "Find photos by face, object and place, with albums built by date and location",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Forty years of paintings, in order",
+        "body": "Hester has photographed every painting she made. LibrePhotos builds albums by date, so the catalog in the sunroom stays in order.",
+        "chips": [
+          "LibrePhotos",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "studio-card",
+      "chapter": "studio",
+      "category": "creative",
+      "segment": "small-business",
+      "member": "hester",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "Draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A heron drawn for the cards",
+        "body": "Hester draws a heron in Inkscape for this year's card. It is line art in her browser, and the file stays on the Core.",
+        "chips": [
+          "Inkscape",
+          "replaces Adobe Illustrator"
+        ]
+      }
+    },
+    {
+      "id": "studio-reply",
+      "chapter": "studio",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "hester",
+      "agent": "hester",
+      "approval": "hester",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "runs in its own sandbox on your Core and talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Alma drafts the reply",
+        "body": "A buyer asks about a print. Hester texts Alma, who drafts a reply from the catalog notes in Companion Memory (beta). Hester sends it herself."
+      },
+      "say": {
+        "speaker": "hester",
+        "text": "This is only a draft. The reply is yours to send."
+      },
+      "film": true
+    },
+    {
+      "id": "studio-whiteboard",
+      "chapter": "studio",
+      "category": "creative",
+      "segment": "consumer",
+      "member": "rohan",
+      "app": {
+        "id": "tldraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "A shared whiteboard on an infinite canvas",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "right",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Two pens, one whiteboard",
+        "body": "Rohan sketches a heron on a tldraw whiteboard while Hester paints at the easel. They trade pens until the wings look right.",
+        "chips": [
+          "tldraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "study-books",
+      "chapter": "study",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "hester",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "Invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The month's sales, in one place",
+        "body": "Hester logs a month of print and card sales in Akaunting. Invoices, expenses and customers sit together on the Core.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "study-receipts",
+      "chapter": "study",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "hester",
+      "app": {
+        "id": "papra",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "Archive the receipts, warranties and contracts you rarely look at, until you need them",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The frame maker's receipt, filed",
+        "body": "Hester files the frame maker's receipt in Papra. Receipts and warranties wait there until she needs one.",
+        "chips": [
+          "Papra",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "study-vault",
+      "chapter": "study",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "hester",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "1Password"
+        ]
+      },
+      "capability": "Store every password in a vault you host. Works with the Bitwarden apps",
+      "anchor": {
+        "role": "fireplace",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The paper supplier, signed in",
+        "body": "Hester keeps her paper supplier's sign-in in VaultWarden. The vault sits on the Core, beside the study fireplace.",
+        "chips": [
+          "VaultWarden",
+          "replaces 1Password"
+        ]
+      }
+    },
+    {
+      "id": "study-backup",
+      "chapter": "study",
+      "category": "home",
+      "segment": "consumer",
+      "member": "hester",
+      "app": {
+        "id": "duplicati",
+        "replaces": [
+          "Backblaze"
+        ]
+      },
+      "capability": "Back up your files before they leave your Core; the destination can be a local disk",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A second copy of the paintings",
+        "body": "Hester points Duplicati at a disk in the study. Forty years of paintings now have a second copy.",
+        "chips": [
+          "Duplicati",
+          "replaces Backblaze"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-lights",
+      "chapter": "garden",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "hester",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "Control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "garden",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Jetty lights on a schedule",
+        "body": "Hester sets the jetty lights to come on at eight, on a Home Assistant schedule. The schedule runs on the Core, and the lights answer over the home Wi-Fi.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "garden-bee",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "rohan",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "Track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The first bee gets a date",
+        "body": "Rohan photographs the first bee in the foxgloves. Hester adds it to the cottage garden journal in HortusFox, with the date.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one painter",
+        "body": "The Ashworth cottage keeps forty years of paintings, a card business and two summer visitors on one Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your whole catalog of work can sit in order on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "No bedroom in the model: the grandchildren visit by day, there is no night scene and no overnight stay. Hester is shown as capable and independent, never as frail.",
+    "The Hindi birthday note (dining-translate) assumes the grandchildren have a grandmother they call nani. Names and heritage are invented; confirm the tone with the owner.",
+    "study-backup says only \"a disk in the study\": the Core parcel lists no ports and the sheet names no backup disk. Duplicati can point at a local disk or a share per its catalog caveat.",
+    "Alma has memory true (cast): the only Companion Memory (beta) mentions are ftue-pick and studio-reply, where the catalog notes are the opt-in context.",
+    "Invented place and street: check Skelmire Beck and Lowwater Lane against a map."
+  ]
+}

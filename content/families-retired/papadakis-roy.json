@@ -1,0 +1,887 @@
+{
+  "schema": "family/v1",
+  "slug": "papadakis-roy",
+  "house": "newcrest",
+  "fictional": true,
+  "family": {
+    "surname": "Papadakis-Roy",
+    "tagline": "Sourdough upstairs, a baby downstairs, orders on the Core.",
+    "household": "young-family",
+    "business": true,
+    "story": "Eleni bakes sourdough for weekend pre-orders in the big upstairs kitchen. Marcus works from home in logistics and keeps the order table in line. Their baby, Ari, sleeps one flight down.",
+    "address": {
+      "line": "54 Ledgewater Street",
+      "place": "Spindle Cove"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "eleni",
+      "name": "Eleni",
+      "age": 37,
+      "role": "parent",
+      "work": "home baker, pre-order sourdough",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Iris",
+        "runtime": "Hermes",
+        "job": "Drafts the weekly pre-order menu and customer notes from what Eleni texts it.",
+        "personality": [
+          "cheerful",
+          "playful",
+          "curious"
+        ],
+        "voice": "v-bright-f",
+        "memory": false,
+        "limits": "Drafts only. Eleni sends the menu."
+      }
+    },
+    {
+      "id": "marcus",
+      "name": "Marcus",
+      "age": 39,
+      "role": "parent",
+      "work": "logistics coordinator, works from home",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Walt",
+        "runtime": "OpenClaw",
+        "job": "Opens NocoDB in its own browser and updates the weekend order table.",
+        "personality": [
+          "gentle",
+          "thoughtful",
+          "patient"
+        ],
+        "voice": "v-storyteller-m",
+        "memory": false,
+        "limits": "Updates rows Marcus names. He checks the table."
+      }
+    },
+    {
+      "id": "ari",
+      "name": "Ari",
+      "age": 0,
+      "role": "baby",
+      "work": "baby, eight months",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Thursday, the kitchen"
+    },
+    {
+      "id": "table",
+      "kind": "room",
+      "room": "dining",
+      "title": "Friday, the order table"
+    },
+    {
+      "id": "fire",
+      "kind": "room",
+      "room": "living",
+      "title": "Friday night, by the fire"
+    },
+    {
+      "id": "floor",
+      "kind": "room",
+      "room": "living",
+      "title": "Saturday, the garden floor"
+    },
+    {
+      "id": "nursery",
+      "kind": "room",
+      "room": "kids",
+      "title": "Overnight, the nursery"
+    },
+    {
+      "id": "water",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Sunday, by the water"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "marcus",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel, one flight up",
+        "body": "The parcel lands at the garden-floor door. Marcus carries it through the family room and the dining room, then up the stair to the kitchen."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "eleni",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Four things in the parcel",
+        "body": "Eleni lays out the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Its footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "marcus",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Marcus plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "eleni",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it while the loaf proofs",
+        "body": "While a loaf proofs, Eleni joins the Core's own network from her phone. Then she picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "marcus",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "nocodb",
+        "kitchenowl",
+        "akaunting",
+        "listmonk"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Marcus picks Hermes for Eleni and OpenClaw for himself. He adds NocoDB, KitchenOwl, Akaunting and Listmonk, then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: NocoDB, KitchenOwl",
+            "Apps: Akaunting, Listmonk"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "eleni",
+      "agent": "eleni",
+      "approval": "eleni",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Iris says good morning",
+        "body": "Eleni texts the agent she named Iris. Iris answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "eleni",
+        "text": "Good morning, Eleni. Iris here. What are we baking?"
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-cards",
+      "chapter": "kitchen",
+      "member": "eleni",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner and expense tracker for the household",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Index cards become a recipe book",
+        "body": "Eleni types her first stained sourdough card into KitchenOwl at the island, and the recipe book begins.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-formulas",
+      "chapter": "kitchen",
+      "member": "eleni",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "grist",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "a spreadsheet-database with real Python formulas, stored as a SQLite file you can copy",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Dough math that recalculates",
+        "body": "Eleni keeps her baker's percentages in a Grist table. Change the loaf count, and the flour and water weights recalculate.",
+        "chips": [
+          "Grist",
+          "replaces Airtable"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-handbook",
+      "chapter": "kitchen",
+      "member": "eleni",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "The starter handbook, written down",
+        "body": "Eleni writes the starter handbook in BookStack: how to feed it, when to shape, which shelf runs hot. A Saturday helper can read it at the counter.",
+        "chips": [
+          "BookStack",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-menu",
+      "chapter": "kitchen",
+      "member": "eleni",
+      "agent": "eleni",
+      "approval": "eleni",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "listmonk"
+      ],
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "kitchen-island",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Iris drafts the weekend menu",
+        "body": "Eleni texts Iris this weekend's loaves. Iris drafts the menu note. Eleni sends it from Listmonk herself."
+      },
+      "say": {
+        "speaker": "eleni",
+        "text": "Draft ready. Please read it before you send it."
+      },
+      "film": true
+    },
+    {
+      "id": "table-orders",
+      "chapter": "table",
+      "member": "marcus",
+      "agent": "marcus",
+      "approval": "marcus",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nocodb",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "turn a database into a spreadsheet-style app without writing code",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "Walt keeps the order table",
+        "body": "Marcus tells Walt which sourdough customers confirmed. Walt opens NocoDB in its own browser and updates the order table. Marcus checks every row.",
+        "chips": [
+          "NocoDB",
+          "replaces Airtable"
+        ]
+      },
+      "say": {
+        "speaker": "marcus",
+        "text": "Rows updated. Please check them."
+      },
+      "film": true
+    },
+    {
+      "id": "table-books",
+      "chapter": "table",
+      "member": "eleni",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The bakehouse books, at the table",
+        "body": "Eleni enters the week's flour bills and pre-order takings in Akaunting. The bakehouse's expenses and profit and loss stay on the Core.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "table-sheets",
+      "chapter": "table",
+      "member": "marcus",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "dining"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Pickup sheets, merged into one",
+        "body": "Marcus merges the weekend pickup sheets into one PDF with Stirling-PDF. The merging runs on the Core, and he prints a single file.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "fire-reply",
+      "chapter": "fire",
+      "member": "eleni",
+      "agent": "eleni",
+      "approval": "eleni",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "couch",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A regular asks for a swap",
+        "body": "A regular wants rye in place of her usual loaf. Eleni texts Iris from the couch. Iris drafts a reply, and Eleni sends it."
+      }
+    },
+    {
+      "id": "fire-vault",
+      "chapter": "fire",
+      "member": "marcus",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host",
+      "anchor": {
+        "role": "fireplace",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Supplier logins, kept in a vault",
+        "body": "Marcus moves the supplier logins into VaultWarden by the fireplace. The vault runs on the Core and works with the Bitwarden apps.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "fire-calendar",
+      "chapter": "fire",
+      "member": "marcus",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "a small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "desk",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "One pickup calendar, two phones",
+        "body": "Marcus sets up Baikal at the writing desk. Eleni's phone and his read the same pickup calendar, so both see the same Saturday slots.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      }
+    },
+    {
+      "id": "floor-camera",
+      "chapter": "floor",
+      "member": "marcus",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The pickup door, recorded at home",
+        "body": "Customers collect their loaves at the garden-floor door. Marcus points the family's IP camera at it. Frigate records the doorway, and the video stays on the Core.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "floor-tv",
+      "chapter": "floor",
+      "member": "marcus",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "foldergram",
+        "replaces": []
+      },
+      "capability": "turn a folder of photos and videos into a private feed with albums and a timeline",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Loaf photos on the TV",
+        "body": "Saturday's loaves are sold. Marcus opens Foldergram on the TV, and the week's loaf photos scroll by as a private feed with a timeline.",
+        "chips": [
+          "Foldergram"
+        ]
+      }
+    },
+    {
+      "id": "floor-chores",
+      "chapter": "floor",
+      "member": "eleni",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "donetick",
+        "replaces": [
+          "OurHome"
+        ]
+      },
+      "capability": "assign and track household chores and recurring tasks",
+      "anchor": {
+        "role": "laundry",
+        "room": "laundry",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "laundry"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right"
+      },
+      "popup": {
+        "title": "A chore wheel for two",
+        "body": "Eleni and Marcus assign the laundry, the dishes and the flour run in Donetick. Recurring chores come back on schedule.",
+        "chips": [
+          "Donetick",
+          "replaces OurHome"
+        ]
+      }
+    },
+    {
+      "id": "nursery-photos",
+      "chapter": "nursery",
+      "member": "ari",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "crib",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Ari's first months, kept at home",
+        "body": "Marcus adds the week's photos of Ari to Immich. The family library sits on the Core, backed up and searchable.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "nursery-audio",
+      "chapter": "nursery",
+      "member": "eleni",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off on any device",
+      "anchor": {
+        "role": "room",
+        "room": "kids"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A quiet audiobook for night feeds",
+        "body": "During the night feed, Eleni plays an audiobook in Audiobookshelf, turned low. It remembers her place, so the next night starts where this one ended.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "water-photo",
+      "chapter": "water",
+      "member": "eleni",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "mazanoke",
+        "replaces": []
+      },
+      "capability": "resize and compress images in the browser",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A loaf photo for the menu",
+        "body": "Eleni shoots the week's loaf on the patio and shrinks the photo for the menu in Mazanoke. Nothing is uploaded.",
+        "chips": [
+          "Mazanoke"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "water-walk",
+      "chapter": "water",
+      "member": "marcus",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "wanderer",
+        "replaces": []
+      },
+      "capability": "plan, map and share hiking and biking routes from GPX files",
+      "anchor": {
+        "role": "deck",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A slow walk, mapped at home",
+        "body": "On Sunday, Marcus plans a stroller route along the water in Wanderer. He loads a GPX file, and the saved route lives on the Core.",
+        "chips": [
+          "Wanderer"
+        ]
+      }
+    },
+    {
+      "id": "outro-house",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One flight up, one Core",
+        "body": "Sourdough upstairs, a baby downstairs. The Papadakis-Roy family runs it all from one Companion Core."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your sourdough, your orders and your evenings can live on a Companion Core at home. Start with one recipe card in KitchenOwl.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "Cast suggested Mealie for the recipe cards. Mealie has no QA screenshot and reviewed.json is empty, so KitchenOwl (recipe book, screenshot QA) carries the story. Swap in one line if the owner reviews Mealie.",
+    "Cottage-food rules differ by place: the story says nothing about licences, permits or food regulations, as the care note asks.",
+    "Listmonk needs an SMTP provider to send at volume (catalog caveat). The story only says Eleni writes and sends the note herself, with no delivery claim.",
+    "floor-camera: Frigate on the pickup door records customers collecting loaves. Check that the owner is comfortable with a camera on a door that customers use. No \"prevents\" or viewing-away claim is made.",
+    "water-walk: Wanderer plans routes from a GPX file; map tiles may come from outside the house. The text claims only that the saved route lives on the Core.",
+    "Upstairs Bakehouse is not named in the text; the casting business name is invented. Voice-over lexicon: Papadakis, Eleni, Iris, Walt, Grist, Foldergram, Mazanoke, Wanderer, Donetick, Listmonk.",
+    "Town Spindle Cove and street Ledgewater Street are invented; still needs the human map check."
+  ]
+}

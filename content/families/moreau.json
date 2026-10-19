@@ -1,0 +1,907 @@
+{
+  "schema": "family/v1",
+  "slug": "moreau",
+  "house": "modernhouse1",
+  "fictional": true,
+  "family": {
+    "surname": "Moreau",
+    "tagline": "One Companion Core in the library lounge, and four people who use it.",
+    "household": "older-kids",
+    "business": false,
+    "story": "Claire is a hospital administrator, and Etienne writes game-engine code from the garden room. Hugo, seventeen, plays upstairs, and Lea, twelve, reads and studies in her room. All four share one Companion Core.",
+    "address": {
+      "line": "9 Millrace Lane",
+      "place": "Pennard Mill"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "claire",
+      "name": "Claire",
+      "age": 46,
+      "role": "parent",
+      "work": "hospital administrator",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Tansy",
+        "runtime": "Hermes",
+        "job": "Drafts Claire’s replies to the school office and the dentist from her notes.",
+        "personality": [
+          "warm",
+          "calm",
+          "patient"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Claire reads each one and sends it herself."
+      }
+    },
+    {
+      "id": "etienne",
+      "name": "Etienne",
+      "age": 48,
+      "role": "parent",
+      "work": "game-engine programmer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Sparrow",
+        "runtime": "Hermes",
+        "job": "Drafts Etienne’s messages to his playtesters from his rough notes.",
+        "personality": [
+          "curious",
+          "bright",
+          "gentle"
+        ],
+        "voice": "v-light-m",
+        "memory": false,
+        "limits": "Drafts only. Etienne reads each message and sends it himself."
+      }
+    },
+    {
+      "id": "hugo",
+      "name": "Hugo",
+      "age": 17,
+      "role": "teen",
+      "work": "sixth form",
+      "colour": "chart-3",
+      "archetype": "gamer"
+    },
+    {
+      "id": "lea",
+      "name": "Lea",
+      "age": 12,
+      "role": "child",
+      "work": "secondary school",
+      "colour": "chart-4",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "lounge",
+      "kind": "room",
+      "room": "living",
+      "title": "The Library Lounge"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "gardenroom",
+      "kind": "room",
+      "room": "office",
+      "title": "Etienne in the Garden Room"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "In the front garden"
+    },
+    {
+      "id": "hugo",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Hugo’s room"
+    },
+    {
+      "id": "lea",
+      "kind": "room",
+      "room": "kids",
+      "title": "Lea’s room"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Etienne carries the parcel in",
+        "body": "A parcel waits on the tiled porch. Etienne carries the Companion Core to the Library Lounge, where Claire clears a shelf."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Lea reads the guide aloud while Hugo lifts the Core out."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Hugo plugs in the cable and Lea presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Etienne opens the Wi-Fi settings on his phone, joins the Core’s own network, and then chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "paperless",
+        "forgejo"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Claire picks Hermes, and the family adds Paperless-ngx and Forgejo. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Paperless-ngx, Forgejo"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "claire",
+      "agent": "claire",
+      "approval": "claire",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Claire’s agent answers to Tansy",
+        "body": "Claire messages the agent she named Tansy. The reply comes back from the Core on its shelf.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "claire",
+        "text": "Good morning, Claire. This is Tansy. Where shall we start?"
+      },
+      "film": true
+    },
+    {
+      "id": "lounge-forms",
+      "chapter": "lounge",
+      "member": "claire",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The morning post gets scanned",
+        "body": "Claire scans the morning post. Paperless-ngx reads and tags every page on the Core, not in a rented drive, so one word finds the invoice.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Google Drive"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "lounge-reading",
+      "chapter": "lounge",
+      "member": "lea",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with notes and highlights; your library lives on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Lea and Claire share a novel",
+        "body": "After school, Lea and Claire share the chesterfield and one novel. Koodo Reader opens the family’s ebooks in a browser, and the highlights Lea makes stay on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "lounge-tansy",
+      "chapter": "lounge",
+      "member": "claire",
+      "agent": "claire",
+      "approval": "claire",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The dentist gets an answer",
+        "body": "The dentist asks Claire to confirm a time. She tells Tansy yes, and Tansy writes the reply on the Core’s local model. Claire reads it, then sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose. Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "claire",
+        "text": "Here is the draft for the dentist. Please read it first."
+      }
+    },
+    {
+      "id": "lounge-week",
+      "chapter": "lounge",
+      "member": "claire",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The plan bends around a meeting",
+        "body": "When the staff rota meeting moves to Monday, Claire gives the review a new block in Companion Planning. The plan is one local file on the Core.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-budget",
+      "chapter": "kitchen",
+      "member": "claire",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "firefly-iii",
+        "replaces": [
+          "YNAB"
+        ]
+      },
+      "capability": "track accounts, budgets, bills and savings goals, with rules that sort your transactions",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Claire teaches the ledger a rule",
+        "body": "On Sunday morning at the kitchen island, Claire writes one rule in Firefly III. Lunch transactions now sort into the lunches budget, in a ledger Claire keeps on the Core.",
+        "chips": [
+          "Firefly III",
+          "replaces YNAB"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-dns",
+      "chapter": "kitchen",
+      "member": "etienne",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "NextDNS"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains at the DNS level for devices on your network",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kitchen",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Etienne explains the quieter recipe page",
+        "body": "Lea asks why her tablet’s cake recipe shows fewer ads. Etienne says the tablet asks Pi-hole on the Core first, and domains on its block lists get no answer.",
+        "chips": [
+          "Pi-hole",
+          "replaces NextDNS"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "hugo",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book and meal planner for the household",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "The pesto jar joins the list",
+        "body": "The pesto jar is empty again. Hugo adds it to the family’s KitchenOwl list, and Claire sees the new line before she leaves for the shops.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "gardenroom-repos",
+      "chapter": "gardenroom",
+      "member": "etienne",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The chaise is Etienne’s desk",
+        "body": "On the chaise, Etienne opens an issue for the stuck door a playtester found. Forgejo keeps the issue and the fix on the Core, not on a rented code host.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "gardenroom-sparrow",
+      "chapter": "gardenroom",
+      "member": "etienne",
+      "agent": "etienne",
+      "approval": "etienne",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sparrow’s draft needs one change",
+        "body": "At the potting bench, Etienne leaves Sparrow two lines for playtesters. Sparrow drafts it on the Core’s local model, and Etienne reads it, fixes a line, then sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "etienne",
+        "text": "The playtest note is ready. Please read it, then send it."
+      }
+    },
+    {
+      "id": "gardenroom-model",
+      "chapter": "gardenroom",
+      "member": "etienne",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Etienne finds three seeds for Hugo",
+        "body": "Etienne tries a cave generator in a JupyterLab notebook, and three seeds come out worth showing Hugo. The notebook runs its code on the Core.",
+        "chips": [
+          "JupyterLab"
+        ]
+      }
+    },
+    {
+      "id": "garden-plants",
+      "chapter": "garden",
+      "member": "etienne",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "garden",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Watering joins the household board",
+        "body": "In the front garden, Etienne adds the planters to the household board in Yuvomi. Hugo ticks off the watering after school, and Claire sees it done.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "hugo-play",
+      "chapter": "hugo",
+      "member": "hugo",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "steam-headless",
+        "replaces": [
+          "GeForce Now"
+        ]
+      },
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind"
+      },
+      "popup": {
+        "title": "The games live on the Core",
+        "body": "Saturday morning on his bed, Hugo opens his Steam library in a browser. Steam Headless runs the session on the Core, and the games install there.",
+        "chips": [
+          "Steam Headless",
+          "replaces GeForce Now"
+        ],
+        "note": "Steam needs a Valve account. A Core may lack the graphics power a game wants."
+      },
+      "film": true
+    },
+    {
+      "id": "hugo-model",
+      "chapter": "hugo",
+      "member": "hugo",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "blockbench",
+        "replaces": [
+          "MagicaVoxel"
+        ]
+      },
+      "capability": "model low-poly 3D art in your browser",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Hugo models the game’s lantern",
+        "body": "Cross-legged on the platform bed, Hugo shapes a low-poly lantern in Blockbench for his father’s game. The Core serves the editor, which opens in his browser.",
+        "chips": [
+          "Blockbench",
+          "replaces MagicaVoxel"
+        ]
+      }
+    },
+    {
+      "id": "hugo-handoff",
+      "chapter": "hugo",
+      "member": "hugo",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The lantern goes to his father",
+        "body": "Hugo exports the lantern and opens a pull request in Forgejo. Etienne reviews it from the Garden Room, then merges it before lunch.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      }
+    },
+    {
+      "id": "lea-notes",
+      "chapter": "lea",
+      "member": "lea",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Lea writes the last line herself",
+        "body": "Stuck on a poem’s last line, Lea tries three endings in Obsidian and keeps the one that rhymes. Her notes are plain Markdown files on the Core.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "lea-lookup",
+      "chapter": "lea",
+      "member": "lea",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The balloon question gets answered",
+        "body": "Lea looks up how a hot-air balloon rises in Kiwix. The Wikipedia file was downloaded once, so the Core answers and no search engine sees the question.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "lea-menu",
+      "chapter": "lea",
+      "member": "lea",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Lea checks her dinner menu",
+        "body": "On her bed, Lea writes Saturday’s dinner menu in Italian for the family, then checks it in LibreTranslate. Its language models were downloaded once, and the Core does the work.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Four people share one Core",
+        "body": "Letters, code, games and schoolwork share one Companion Core in the Library Lounge."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your paperwork, code and homework questions can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Library Lounge and the Garden Room both answer living and office. Every beat that names a room sets nth: the Library Lounge is first (larger), the Garden Room second.",
+    "The Library Lounge has no desk or TV. Claire anchors on the Core, the chesterfield and the room; the media beat is Koodo Reader at the chesterfield. No beat says TV, screen or desk there.",
+    "The Garden Room has a chaise, a potting bench and an armchair, no desk. Etienne anchors on the chaise (couch, second instance) and the room; the text names only the chaise and the potting bench.",
+    "Hugo’s room has a platform bed and no screen. Beats say laptop and browser, never a screen. Steam carries the Valve-account and graphics-power note.",
+    "Blockbench is told as the Core serving a browser editor; no beat says where its files are saved. Hugo’s export then goes to Forgejo, so its home is the repository.",
+    "Neither companion has Companion Memory connected, so no beat names it. Both agents are Hermes; each beat names who reads and who sends. The Companion Agents beta line sits on Claire’s second Hermes beat.",
+    "Pi-hole is told as one household resolver the router points at, covering only devices that use it for DNS. No parental-control wording."
+  ]
+}

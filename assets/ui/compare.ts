@@ -10,7 +10,7 @@
 
 import { bindGridKeys } from './gallery.js';
 
-export type CompareHome = { id: string; name: string; credit?: string };
+export type CompareHome = { id: string; name: string };
 export type CompareOpts = { shot: string; t: number; lighting: string };
 export type CompareHooks = {
   homes: () => CompareHome[];
@@ -74,7 +74,7 @@ export function createCompare(dialog: HTMLDialogElement, hooks: CompareHooks) {
     const b = document.createElement('button'); b.type = 'button'; b.className = 'rc-home-card rc-compare-card';
     const has = cache.has(posterKey(h.id, o)), url = cache.get(posterKey(h.id, o));
     b.dataset.state = has ? (url ? 'done' : 'none') : 'pending';
-    b.innerHTML = `<span class="rc-compare-poster">${url ? `<img src="${url}" alt="" width="640" height="360">` : `<span class="rc-compare-wait">${has ? 'No such shot' : ''}</span>`}</span><span class="rc-home-name">${esc(h.name)}</span>${h.credit ? `<span class="rc-home-meta">${esc(h.credit)}</span>` : ''}`;
+    b.innerHTML = `<span class="rc-compare-poster">${url ? `<img src="${url}" alt="" width="640" height="360">` : `<span class="rc-compare-wait">${has ? 'No such shot' : ''}</span>`}</span><span class="rc-home-name">${esc(h.name)}</span>`;
     b.setAttribute('aria-label', `${h.name}: open it at this moment`);
     b.addEventListener('click', () => { if (running) return; dialog.close(); hooks.open(h.id, opts()); });   // (a home opened mid-set would be rebuilt over by the restore)
     wrap.appendChild(b);

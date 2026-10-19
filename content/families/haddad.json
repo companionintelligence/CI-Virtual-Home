@@ -1,0 +1,816 @@
+{
+  "schema": "family/v1",
+  "slug": "haddad",
+  "house": "epiphany",
+  "fictional": true,
+  "family": {
+    "surname": "Haddad",
+    "tagline": "A visualisation studio, three people and one Companion Core in the Den.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Dalia runs an architectural visualisation studio from the Den, and Samir is its technical lead. Their daughter Yasmin studies geography upstairs. One Companion Core serves all three.",
+    "address": {
+      "line": "17 Hawkmoor Row",
+      "place": "Thistlemere"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "dalia",
+      "name": "Dalia",
+      "age": 46,
+      "role": "parent",
+      "work": "runs a visualisation studio",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Pippin",
+        "runtime": "OpenClaw",
+        "job": "Fills in Twenty and supplier forms in its own browser from what Dalia tells it.",
+        "personality": [
+          "cheerful",
+          "curious",
+          "tidy"
+        ],
+        "voice": "v-bright-f",
+        "memory": false,
+        "limits": "Prepares entries only. Dalia checks every field and presses send."
+      }
+    },
+    {
+      "id": "samir",
+      "name": "Samir",
+      "age": 48,
+      "role": "parent",
+      "work": "technical lead at the studio",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Nutmeg",
+        "runtime": "OpenClaw",
+        "job": "Reads release notes in its own browser and lists the changes Samir asks about.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Reads and lists only. Samir decides what to update."
+      }
+    },
+    {
+      "id": "yasmin",
+      "name": "Yasmin",
+      "age": 20,
+      "role": "adult-child",
+      "work": "university student",
+      "colour": "chart-3",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "den",
+      "kind": "room",
+      "room": "office",
+      "title": "The Den"
+    },
+    {
+      "id": "lounge",
+      "kind": "room",
+      "room": "living",
+      "title": "The lounge"
+    },
+    {
+      "id": "garage",
+      "kind": "room",
+      "room": "garage",
+      "title": "The garage"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "At the dining table"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "bedroom",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Yasmin upstairs"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "The front garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Samir carries the parcel in",
+        "body": "On Tuesday morning a parcel waits on the timber step. Samir carries it to the Den, where Dalia clears the desk for the Companion Core."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Dalia lifts out the Core",
+        "body": "Dalia lifts the Companion Core out first. Under it lie the power cable, the quick-start guide and the recovery USB drive, and Yasmin reads the guide."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "The Core wakes on the desk",
+        "body": "Samir plugs in the cable, and Dalia presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Yasmin joins from her phone",
+        "body": "Yasmin opens the Wi-Fi settings on her phone and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "nextcloud",
+        "twenty"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Dalia picks the first agent",
+        "body": "In the Companion Hub store, Dalia picks OpenClaw, and the family adds Nextcloud and Twenty. Then the three of them walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: OpenClaw",
+            "Apps: Nextcloud, Twenty"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "dalia",
+      "agent": "dalia",
+      "approval": "dalia",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and tools, running in its own sandbox",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Pippin says hello",
+        "body": "Dalia types a first message to the agent she named Pippin. Pippin answers from the Core beside her.",
+        "chips": [
+          "OpenClaw"
+        ]
+      },
+      "say": {
+        "speaker": "dalia",
+        "text": "Morning, Dalia. Pippin here. What is first on the list?"
+      },
+      "film": true
+    },
+    {
+      "id": "den-enquiry",
+      "chapter": "den",
+      "member": "dalia",
+      "agent": "dalia",
+      "approval": "dalia",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Dalia checks Pippin’s entries",
+        "body": "An architect writes about a courtyard house. Pippin opens Twenty on the Core and enters the contact and the deal. Dalia checks every field.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "den-pipeline",
+      "chapter": "den",
+      "member": "samir",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "drawio",
+        "replaces": [
+          "Lucidchart"
+        ]
+      },
+      "capability": "draw flowcharts, floor plans and network maps in the browser",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The delivery steps get redrawn",
+        "body": "Samir opens draw.io from the Core on his laptop and draws the delivery steps. Dalia moves one box, and he saves the diagram as a file on the laptop.",
+        "chips": [
+          "draw.io",
+          "replaces Lucidchart"
+        ]
+      }
+    },
+    {
+      "id": "den-brief",
+      "chapter": "den",
+      "member": "dalia",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Dropbox"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The brief gets its own folder",
+        "body": "Beside the bookshelf, Dalia drops the brief and site photographs into a project folder in Nextcloud. A cloud drive would have held them; here they sit on the Core.",
+        "chips": [
+          "Nextcloud",
+          "replaces Dropbox"
+        ]
+      }
+    },
+    {
+      "id": "lounge-repo",
+      "chapter": "lounge",
+      "member": "samir",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Samir tags the export script",
+        "body": "Friday afternoon, the export script runs clean. Samir tags it and pushes it to Forgejo from the sofa. The history stays on the Core.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "lounge-read",
+      "chapter": "lounge",
+      "member": "dalia",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with notes and highlights, from a library on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Dalia finishes her novel",
+        "body": "Saturday afternoon, Dalia curls into the corner of the sofa with a novel from the family’s own library. Koodo Reader serves that library from the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "lounge-errand",
+      "chapter": "lounge",
+      "member": "samir",
+      "agent": "samir",
+      "approval": "samir",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and tools, running in its own sandbox",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nutmeg reads the release notes",
+        "body": "The studio’s render plug-in has a new release. Samir’s agent Nutmeg reads the notes in its own browser and lists the changes. Samir decides whether to update.",
+        "chips": [
+          "OpenClaw"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "samir",
+        "text": "That is the list of changes. Whether to update is your decision."
+      }
+    },
+    {
+      "id": "garage-plotter",
+      "chapter": "garage",
+      "member": "samir",
+      "category": "iot",
+      "segment": "small-business",
+      "app": {
+        "id": "uptime-kuma",
+        "replaces": [
+          "Datadog"
+        ]
+      },
+      "capability": "watch your services and get an alert when one goes down",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Samir sets up the checks",
+        "body": "Before a client review, Samir stands at the garage workbench and adds the Core’s apps to Uptime Kuma. The checks run from the Core, inside the home network.",
+        "chips": [
+          "Uptime Kuma",
+          "replaces Datadog"
+        ]
+      }
+    },
+    {
+      "id": "dining-week",
+      "chapter": "dining",
+      "member": "yasmin",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "iCloud"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Exam dates join the studio calendar",
+        "body": "Sunday lunch ends at the glass table, and the week gets settled. Yasmin adds her exam dates to the Nextcloud calendar the Core serves, beside the studio’s review days.",
+        "chips": [
+          "Nextcloud",
+          "replaces iCloud"
+        ]
+      }
+    },
+    {
+      "id": "dining-renewal",
+      "chapter": "dining",
+      "member": "dalia",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "room",
+        "room": "dining"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Dalia asks Samir about a renewal",
+        "body": "Wallos, running on the Core, reminds Dalia a week before the studio’s texture library renews. She asks Samir whether anyone still opens it, and they decide together.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-supper",
+      "chapter": "kitchen",
+      "member": "yasmin",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "OurHome"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses, with a recipe book",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Yasmin takes the supper shift",
+        "body": "On Thursday Yasmin takes the kitchen island for supper. She opens a squash curry in the HomeHub recipe book on the Core and adds limes to the list.",
+        "chips": [
+          "HomeHub",
+          "replaces OurHome"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-expiry",
+      "chapter": "kitchen",
+      "member": "dalia",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub with a recipe book and an expiry tracker",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Dalia rescues the cream",
+        "body": "At the fridge, Dalia finds the cream a day from its date. She noted it in HomeHub on the Core, and it goes into the lunch sauce.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "bed-lookup",
+      "chapter": "bedroom",
+      "member": "yasmin",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Yasmin looks up the delta",
+        "body": "Propped against the headboard, Yasmin needs a river delta’s population. Kiwix answers from a Wikipedia file the Core downloaded once, so no search engine sees the question.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "bed-translate",
+      "chapter": "bedroom",
+      "member": "yasmin",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A planning report gets read",
+        "body": "On the rug beside the bed, Yasmin works through a Dutch planning report. LibreTranslate does the translating on the Core, and its language models were downloaded once.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "bed-stats",
+      "chapter": "bedroom",
+      "member": "yasmin",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "with": [
+        "open-webui"
+      ],
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Yasmin untangles a date column",
+        "body": "A column of dates will not parse in her JupyterLab notebook. Yasmin asks a model on the Core through Open WebUI, then fixes the line herself.",
+        "chips": [
+          "JupyterLab"
+        ]
+      }
+    },
+    {
+      "id": "garden-topiary",
+      "chapter": "garden",
+      "member": "samir",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Saturday’s trim goes in the journal",
+        "body": "On Saturday morning, Samir clips the round topiary in the front bed. He writes the date in the HortusFox journal on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Under one bronze roof",
+        "body": "One Companion Core serves client files, code and coursework for three people."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your client files, scripts and ebooks can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Den has no desk item: the only desk is the Core's own. Dalia's beats anchor on the Core, the bookshelf and the room. Samir works at the sofa group, Yasmin on the bed and rug of Bedroom Two (no desk).",
+    "No TV in the house: the media beat is lounge-read at the couch (Koodo Reader). No text says TV, screen or fireplace. The Foyer fireplace is never mentioned.",
+    "The one beat that opens an outside page (lounge-errand) carries the OpenClaw website note; Pippin prepares and Dalia presses send.",
+    "Open WebUI sits in with on bed-stats; no beat compares a local model with a hosted one, and none mentions a key.",
+    "Extra apps beyond the plan: Koodo Reader (media at the couch), HortusFox (garden beat), JupyterLab (Yasmin). The Garage has a bicycle and a workbench only: the checks beat anchors on the room and names only the workbench.",
+    "Chapter order is the physical walk: Den, Lounge, Garage (through the link hall), Dining Room, Kitchen, then up the stair to Bedroom Two, down again to the front garden and the street."
+  ]
+}

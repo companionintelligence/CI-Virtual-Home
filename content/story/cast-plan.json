@@ -1,0 +1,631 @@
+{
+ "v": 1,
+ "generated": "2026-10-15",
+ "note": "Authored casting for the 30 persona homes (reference/story/personas.md). Names, places and companion names are invented and reserved here so the fleet's uniqueness rules hold by design; a writer may change one if it stays unique (cast-lint keeps the reservation). Everything derived from the house files (rooms, roles, Core room, anchors) is produced by scripts/story/build-casting.mts into content/story/casting.json: never edit that file by hand.",
+ "households": {"solo-or-couple": "Solo, couple, no children at home", "young-family": "Young family (children under 13)", "older-kids": "Teens or adult children at home", "grandparents": "Grandparents and grandchildren"},
+ "retiredSlugs": ["lindqvist-abara", "vance-takahashi", "nowak-pillai", "dufresne", "oyelaran-brandt", "castellanos", "whitlock-mensah", "eriksen-bautista", "kowalczyk-ferreira", "ashworth", "nakamura-oduya", "ibarra-holm", "karimi-santos", "delgado-park", "chowdhury-osei", "aguirre-lund", "okonkwo-reid", "tran-mcallister", "papadakis-roy", "vasquez-nilsen", "bellamy-nwosu", "ferrante-oyelowo", "adeyemi-castro", "keane", "mbeki-fontaine", "lacroix-adebayo", "ramos-whitfield", "yilmaz-hartmann", "mahlangu-engstrom", "ochieng-sorensen"],
+ "families": [
+  {
+   "slug": "brennan",
+   "house": "seraphine",
+   "surname": "Brennan",
+   "place": "Wrenfield",
+   "flagship": true,
+   "household": "older-kids",
+   "business": true,
+   "businessText": "Sally's small consultancy",
+   "tenure": "owner",
+   "narrator": "v-clear-f",
+   "reason": "Native fit for all four: two kids' rooms with a desk each, a Library for the Core, a Master Suite with a laptop desk; the Nursery is a spare room and is never a stage.",
+   "household_text": "Two parents and two teens: the flagship family in the house that suits them best.",
+   "care": "Jean's questions to a local model stay on the Core, told without fear.",
+   "reviewNeeded": ["code-server"],
+   "signatureApps": ["ci-hermes", "ci-planning", "nextcloud", "code-server", "open-webui", "steam-headless", "kiwix"],
+   "beatApps": {"iot": "home-assistant", "food": "yuvomi"},
+   "members": [
+    {"id": "sally", "name": "Sally", "age": 43, "role": "parent", "archetype": "organiser", "work": "consultant, runs her own small practice", "room": "Library", "sleepsIn": "Master Suite", "companion": "Juniper"},
+    {"id": "john", "name": "John", "age": 45, "role": "parent", "archetype": "builder", "work": "software engineer", "room": "Master Suite", "sleepsIn": "Master Suite", "roomLabel": "Primary suite", "companion": "Quill"},
+    {"id": "steve", "name": "Steve", "age": 16, "role": "teen", "archetype": "gamer", "work": "secondary school", "room": "Boy's Room", "sleepsIn": "Boy's Room", "roomLabel": "Steve's room"},
+    {"id": "jean", "name": "Jean", "age": 14, "role": "teen", "archetype": "learner", "work": "secondary school", "room": "Girl's Room", "sleepsIn": "Girl's Room", "roomLabel": "Jean's room"}
+   ]
+  },
+  {
+   "slug": "brennan-hollin",
+   "house": "bgfamily",
+   "surname": "Brennan",
+   "place": "Hollin Cross",
+   "flagship": true,
+   "household": "older-kids",
+   "business": true,
+   "businessText": "Sally's small consultancy",
+   "tenure": "owner",
+   "narrator": "v-steady-m",
+   "reason": "Front Study is a true office (two desks, bookshelves); the Study with the Core holds the builder; the Living Room TV and sectional host the gamer; the Kids Room has the only writing desk upstairs. Every child room is dressed for a toddler, so the beats never frame a crib or a toddler bed.",
+   "household_text": "Two parents and two teens in a family house dressed for smaller children.",
+   "care": "Sally's client files sit on the Core, not in a rented drive.",
+   "fitNote": "Sleeping is not told: the only beds are a double bed, a toddler bed and a crib. Steve and Jean are never shown asleep.",
+   "reviewNeeded": ["code-server"],
+   "signatureApps": ["ci-openclaw", "yuvomi", "libreoffice", "forgejo", "code-server", "steam-headless", "obsidian"],
+   "beatApps": {"iot": "frigate"},
+   "members": [
+    {"id": "sally", "name": "Sally", "age": 43, "role": "parent", "archetype": "organiser", "work": "consultant, runs her own small practice", "room": "Front Study", "sleepsIn": "Primary Bedroom", "companion": "Juniper"},
+    {"id": "john", "name": "John", "age": 45, "role": "parent", "archetype": "builder", "work": "software engineer", "room": "Study", "sleepsIn": "Primary Bedroom", "roomLabel": "Study", "companion": "Quill"},
+    {"id": "steve", "name": "Steve", "age": 16, "role": "teen", "archetype": "gamer", "work": "secondary school", "room": "Living Room", "sleepsIn": "Study", "roomLabel": "Living room"},
+    {"id": "jean", "name": "Jean", "age": 14, "role": "teen", "archetype": "learner", "work": "secondary school", "room": "Kids Room", "sleepsIn": "Kids Room", "roomLabel": "Jean's room"}
+   ]
+  },
+  {
+   "slug": "brennan-merrow",
+   "house": "familyhouse-nora",
+   "surname": "Brennan",
+   "place": "Merrow Ford",
+   "flagship": true,
+   "household": "older-kids",
+   "business": true,
+   "businessText": "Sally's small consultancy",
+   "tenure": "owner",
+   "narrator": "v-warm-f",
+   "reason": "Craft Room (standing desk, easel, shelves) is Sally's office; the 60 m2 Den with the TV is Steve's; the Garage workbench is John's; the siblings share the Kids Bedroom with two single beds and a desk; the Core stands in the Kitchen and Dining room beside the whiteboard.",
+   "household_text": "Two parents and two teens who share a bedroom: the flagship family in the house with the Den.",
+   "care": "The family planner on the Kitchen whiteboard has its twin on the Core, not in a calendar service.",
+   "reviewNeeded": ["code-server"],
+   "signatureApps": ["ci-memory", "joplin", "vaultwarden", "gitea", "code-server", "steam-headless", "ci-spellbook"],
+   "beatApps": {"iot": "pi-hole", "food": "yuvomi"},
+   "members": [
+    {"id": "sally", "name": "Sally", "age": 43, "role": "parent", "archetype": "organiser", "work": "consultant, runs her own small practice", "room": "Craft Room", "sleepsIn": "Primary Bedroom", "companion": "Juniper"},
+    {"id": "john", "name": "John", "age": 45, "role": "parent", "archetype": "builder", "work": "software engineer", "room": "Garage", "sleepsIn": "Primary Bedroom", "companion": "Quill"},
+    {"id": "steve", "name": "Steve", "age": 16, "role": "teen", "archetype": "gamer", "work": "secondary school", "room": "Den", "sleepsIn": "Kids Bedroom", "roomLabel": "Den"},
+    {"id": "jean", "name": "Jean", "age": 14, "role": "teen", "archetype": "learner", "work": "secondary school", "room": "Kids Bedroom", "sleepsIn": "Kids Bedroom", "roomLabel": "Kids bedroom"}
+   ]
+  },
+  {
+   "slug": "adeniran",
+   "house": "asymmetry",
+   "surname": "Adeniran",
+   "place": "Kestrel Bay",
+   "household": "older-kids",
+   "business": true,
+   "businessText": "bookkeeping practice",
+   "tenure": "owner",
+   "narrator": "v-clear-f",
+   "reason": "Three bedrooms on a four-level plan: the teens take the Loft Bedroom and the Green Bedroom (the only writing desk); the parents work from the Living room with the Core and from the Garage bench because the house has no study.",
+   "household_text": "Two working parents and two teens in the tall house with no study.",
+   "care": "Her clients' books sit on the Core, not in a rented accounting service.",
+   "signatureApps": ["ci-hermes", "akaunting", "paperless", "gitea", "steam-headless", "anything-llm", "wingfit"],
+   "beatApps": {"iot": "frigate", "food": "homehub"},
+   "members": [
+    {"id": "folake", "name": "Folake", "age": 47, "role": "parent", "archetype": "organiser", "work": "bookkeeper with her own practice", "room": "Living", "sleepsIn": "Primary Bedroom", "roomLabel": "Living room", "companion": "Marlow"},
+    {"id": "kunle", "name": "Kunle", "age": 49, "role": "parent", "archetype": "builder", "work": "firmware contractor", "room": "Garage", "sleepsIn": "Primary Bedroom", "companion": "Tilly"},
+    {"id": "tobi", "name": "Tobi", "age": 17, "role": "teen", "archetype": "gamer", "work": "sixth form", "room": "Loft Bedroom", "sleepsIn": "Loft Bedroom"},
+    {"id": "ife", "name": "Ife", "age": 15, "role": "teen", "archetype": "learner", "work": "secondary school", "room": "Green Bedroom", "sleepsIn": "Green Bedroom"}
+   ]
+  },
+  {
+   "slug": "kovacs",
+   "house": "mediterranean",
+   "surname": "Kovacs",
+   "place": "Ashby Dene",
+   "household": "older-kids",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-clear-f",
+   "reason": "Four bedrooms and four distinct stages: the Salon holds the Core and the parent who runs the household, the Games Den the builder, the TV Room the gamer and the West Bedroom (bookshelf) the learner.",
+   "household_text": "Two parents and two teens with a room each.",
+   "care": "A teenager's homework questions stay on the Core.",
+   "signatureApps": ["ci-hermes", "libreoffice", "yuvomi", "jupyterlab", "steam-headless", "obsidian", "pi-hole"],
+   "members": [
+    {"id": "eszter", "name": "Eszter", "age": 49, "role": "parent", "archetype": "organiser", "work": "school business manager", "room": "Salon", "sleepsIn": "Primary Suite", "companion": "Basil"},
+    {"id": "gabor", "name": "Gabor", "age": 51, "role": "parent", "archetype": "builder", "work": "embedded software engineer", "room": "Games Den", "sleepsIn": "Primary Suite", "companion": "Sorrel"},
+    {"id": "bence", "name": "Bence", "age": 16, "role": "teen", "archetype": "gamer", "work": "secondary school", "room": "TV Room", "sleepsIn": "East Bedroom"},
+    {"id": "reka", "name": "Reka", "age": 13, "role": "teen", "archetype": "learner", "work": "secondary school", "room": "West Bedroom", "sleepsIn": "West Bedroom"}
+   ]
+  },
+  {
+   "slug": "haddad",
+   "house": "epiphany",
+   "surname": "Haddad",
+   "place": "Thistlemere",
+   "household": "older-kids",
+   "business": true,
+   "businessText": "architectural visualisation studio",
+   "tenure": "owner",
+   "narrator": "v-clear-f",
+   "reason": "Three adult-size bedrooms and no children's decor: two parents who run a studio from the Den and the Lounge, and an adult child studying from Bedroom Two. No TV in the house, so there is no gamer.",
+   "household_text": "Two parents who run a studio and an adult child studying at home.",
+   "care": "The studio's client files stay on the Core.",
+   "signatureApps": ["ci-openclaw", "twenty", "nextcloud", "forgejo", "open-webui", "wallos", "drawio"],
+   "beatApps": {"iot": "uptime-kuma", "food": "homehub"},
+   "members": [
+    {"id": "dalia", "name": "Dalia", "age": 46, "role": "parent", "archetype": "organiser", "work": "runs a visualisation studio", "room": "Den", "sleepsIn": "Primary Suite", "companion": "Pippin"},
+    {"id": "samir", "name": "Samir", "age": 48, "role": "parent", "archetype": "builder", "work": "technical lead at the studio", "room": "Lounge", "sleepsIn": "Primary Suite", "companion": "Nutmeg"},
+    {"id": "yasmin", "name": "Yasmin", "age": 20, "role": "adult-child", "archetype": "learner", "work": "university student", "room": "Bedroom Two", "sleepsIn": "Bedroom Two"}
+   ]
+  },
+  {
+   "slug": "iyer",
+   "house": "mesamariposa",
+   "surname": "Iyer",
+   "place": "Tarrow Heights",
+   "household": "older-kids",
+   "business": true,
+   "businessText": "translation and tutoring agency",
+   "tenure": "owner",
+   "narrator": "v-young-f",
+   "reason": "Primary Bedroom has the record player (maker), the Kids' Room has the easel and a kids desk (learner), the Guest Bedroom is the teen's, and the Conservatory Dining table is the office.",
+   "household_text": "Two parents, a teenager and a ten-year-old in the villa with a record player.",
+   "care": "A client's contract and a child's homework both stay on the Core.",
+   "signatureApps": ["ci-hermes", "onlyoffice", "libretranslate", "navidrome", "audiomass", "steam-headless", "kiwix"],
+   "beatApps": {"iot": "ntfy", "food": "homehub", "privacy": "vaultwarden"},
+   "members": [
+    {"id": "meenakshi", "name": "Meenakshi", "age": 45, "role": "parent", "archetype": "organiser", "work": "translator, runs a small agency", "room": "Conservatory Dining", "sleepsIn": "Primary Bedroom", "companion": "Clover"},
+    {"id": "ravi", "name": "Ravi", "age": 47, "role": "parent", "archetype": "maker", "work": "sound designer", "room": "Primary Bedroom", "sleepsIn": "Primary Bedroom", "companion": "Maple"},
+    {"id": "arjun", "name": "Arjun", "age": 15, "role": "teen", "archetype": "gamer", "work": "secondary school", "room": "Guest Bedroom", "sleepsIn": "Guest Bedroom"},
+    {"id": "kavya", "name": "Kavya", "age": 10, "role": "child", "archetype": "learner", "work": "primary school", "room": "Kids' Room", "sleepsIn": "Kids' Room"}
+   ]
+  },
+  {
+   "slug": "tesfaye",
+   "house": "mirage",
+   "surname": "Tesfaye",
+   "place": "Quillhaven",
+   "household": "older-kids",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-young-f",
+   "reason": "Tall four-level house with no TV and no desk: the learner has the Reading Loft (bookshelves, telescope), the maker the Living Salon, the parents the Den and the Kitchen with the Core.",
+   "household_text": "Two parents, a teenager and a young adult in the tower with the reading loft.",
+   "care": "A teenager's reading list and a young adult's photographs both stay on the Core.",
+   "signatureApps": ["ci-memory", "vikunja", "cryptpad", "gitea", "jupyterlab", "photoprism", "home-assistant"],
+   "beatApps": {"food": "kitchenowl"},
+   "members": [
+    {"id": "hana", "name": "Hana", "age": 49, "role": "parent", "archetype": "organiser", "work": "hospital operations manager", "room": "Den", "sleepsIn": "Primary Bedroom", "companion": "Fennel"},
+    {"id": "dawit", "name": "Dawit", "age": 51, "role": "parent", "archetype": "builder", "work": "systems engineer", "room": "Kitchen", "sleepsIn": "Primary Bedroom", "companion": "Bramble"},
+    {"id": "selam", "name": "Selam", "age": 15, "role": "teen", "archetype": "learner", "work": "secondary school", "room": "Reading Loft", "sleepsIn": "Reading Loft"},
+    {"id": "bruk", "name": "Bruk", "age": 19, "role": "adult-child", "archetype": "maker", "work": "photography student", "room": "Living Salon", "sleepsIn": "Bedroom Two"}
+   ]
+  },
+  {
+   "slug": "moreau",
+   "house": "modernhouse1",
+   "surname": "Moreau",
+   "place": "Pennard Mill",
+   "household": "older-kids",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-clear-f",
+   "reason": "Library Lounge (with the Core) and the Garden Room are the two quiet rooms for the parents; the Guest Bedroom reads as a teen's room; the Kids Room has the desk and the shelf.",
+   "household_text": "Two parents, a teenager and a twelve-year-old in the studio house with the library.",
+   "care": "A twelve-year-old's reading and a teenager's play both stay inside the home network.",
+   "signatureApps": ["ci-hermes", "firefly-iii", "paperless", "forgejo", "steam-headless", "koodo-reader", "blockbench"],
+   "beatApps": {"iot": "pi-hole", "food": "kitchenowl"},
+   "members": [
+    {"id": "claire", "name": "Claire", "age": 46, "role": "parent", "archetype": "organiser", "work": "hospital administrator", "room": "Library Lounge", "sleepsIn": "Primary Bedroom", "companion": "Tansy"},
+    {"id": "etienne", "name": "Etienne", "age": 48, "role": "parent", "archetype": "builder", "work": "game-engine programmer", "room": "Garden Room", "sleepsIn": "Primary Bedroom", "companion": "Sparrow"},
+    {"id": "hugo", "name": "Hugo", "age": 17, "role": "teen", "archetype": "gamer", "work": "sixth form", "room": "Guest Bedroom", "sleepsIn": "Guest Bedroom"},
+    {"id": "lea", "name": "Lea", "age": 12, "role": "child", "archetype": "learner", "work": "secondary school", "room": "Kids Room", "sleepsIn": "Kids Room"}
+   ]
+  },
+  {
+   "slug": "quintero",
+   "house": "cocoon",
+   "surname": "Quintero",
+   "place": "Corran Hill",
+   "household": "young-family",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-warm-f",
+   "reason": "Two kids' bedrooms with different furniture: the Kids Room has the desk (learner), the Kids Bedroom has the easel (maker); the Dining Room table is the office and the Den the builder's.",
+   "household_text": "Two parents and two children under eleven in the house with two kids rooms.",
+   "care": "The children's drawings and homework sit on the Core.",
+   "signatureApps": ["ci-hermes", "yuvomi", "uptime-kuma", "pi-hole", "kiwix", "blockbench", "librephotos"],
+   "members": [
+    {"id": "marisol", "name": "Marisol", "age": 38, "role": "parent", "archetype": "organiser", "work": "clinic office manager", "room": "Dining Room", "sleepsIn": "Primary Bedroom", "companion": "Willow"},
+    {"id": "andres", "name": "Andres", "age": 40, "role": "parent", "archetype": "builder", "work": "devops engineer", "room": "Den", "sleepsIn": "Primary Bedroom", "companion": "Thimble"},
+    {"id": "camila", "name": "Camila", "age": 10, "role": "child", "archetype": "learner", "work": "primary school", "room": "Kids Room", "sleepsIn": "Kids Room"},
+    {"id": "mateo", "name": "Mateo", "age": 7, "role": "child", "archetype": "maker", "work": "primary school", "room": "Kids Bedroom", "sleepsIn": "Kids Bedroom"}
+   ]
+  },
+  {
+   "slug": "nguyen",
+   "house": "modernhome-nora",
+   "surname": "Nguyen",
+   "place": "Dunmere",
+   "household": "young-family",
+   "business": false,
+   "tenure": "renter",
+   "narrator": "v-bright-f",
+   "reason": "Two siblings share the bunk room that has the only desk and laptop in the house; the parents take the Kitchen and Dining room and the Garage; there is no TV, so no gamer.",
+   "household_text": "Two parents and two children who share a bunk room.",
+   "care": "Two children's school work sits on the Core, not in a school platform's cloud.",
+   "signatureApps": ["ci-openclaw", "homehub", "vaultwarden", "gitea", "excalidraw", "libretranslate", "pairdrop"],
+   "beatApps": {"iot": "ntfy"},
+   "members": [
+    {"id": "linh", "name": "Linh", "age": 39, "role": "parent", "archetype": "organiser", "work": "hospital scheduler", "room": "Kitchen & Dining", "sleepsIn": "Primary Bedroom", "companion": "Cricket"},
+    {"id": "duc", "name": "Duc", "age": 41, "role": "parent", "archetype": "builder", "work": "cloud engineer", "room": "Garage & Utility", "sleepsIn": "Primary Bedroom", "companion": "Ember"},
+    {"id": "mai", "name": "Mai", "age": 11, "role": "child", "archetype": "learner", "work": "primary school", "room": "Kids' Room", "sleepsIn": "Kids' Room"},
+    {"id": "bao", "name": "Bao", "age": 8, "role": "child", "archetype": "maker", "work": "primary school", "room": "Kids' Room", "sleepsIn": "Kids' Room"}
+   ]
+  },
+  {
+   "slug": "hwang",
+   "house": "palnknoll",
+   "surname": "Hwang",
+   "place": "Sorrelby",
+   "household": "young-family",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-steady-m",
+   "reason": "The 6 m2 Study with a desk and a gaming chair is the builder's cubby; the Dining room is the organiser's; the Kids Room has the shelf; the house has no TV.",
+   "household_text": "Two parents and an eight-year-old in the house on the knoll.",
+   "care": "An eight-year-old's reading stays on the Core.",
+   "signatureApps": ["ci-hermes", "donetick", "bookstack", "forgejo", "kiwix", "frigate", "duplicati"],
+   "beatApps": {"food": "grocy"},
+   "members": [
+    {"id": "minjung", "name": "Minjung", "age": 40, "role": "parent", "archetype": "organiser", "work": "school administrator", "room": "Dining", "sleepsIn": "Primary Suite", "companion": "Poppy"},
+    {"id": "jiho", "name": "Jiho", "age": 42, "role": "parent", "archetype": "builder", "work": "mobile developer", "room": "Study", "sleepsIn": "Primary Suite", "companion": "Linnet"},
+    {"id": "yuna", "name": "Yuna", "age": 8, "role": "child", "archetype": "learner", "work": "primary school", "room": "Kids Room", "sleepsIn": "Kids Room"}
+   ]
+  },
+  {
+   "slug": "kamau",
+   "house": "gardennook",
+   "surname": "Kamau",
+   "place": "Orrin Vale",
+   "household": "young-family",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-warm-f",
+   "reason": "One bedroom shared with the baby, a Playroom and a 4 m2 Garden Nook: a baby, a parent at home who tends the garden, a parent who works in the nook.",
+   "household_text": "Two parents and a baby in the small house with the garden nook.",
+   "care": "The baby's photographs stay on the Core.",
+   "signatureApps": ["ci-hermes", "hortusfox", "home-assistant", "n8n", "immich", "audiobookshelf", "kitchenowl"],
+   "beatApps": {"privacy": "duplicati"},
+   "members": [
+    {"id": "wanjiru", "name": "Wanjiru", "age": 34, "role": "parent", "archetype": "builder", "work": "software developer, remote", "room": "Garden Nook", "sleepsIn": "Bedroom & Nursery", "companion": "Rowan"},
+    {"id": "juma", "name": "Juma", "age": 36, "role": "parent", "archetype": "host", "work": "at home with the baby, grows vegetables", "room": "Kitchen", "sleepsIn": "Bedroom & Nursery", "companion": "Biscuit"},
+    {"id": "zuri", "name": "Zuri", "age": 0, "role": "baby", "archetype": null, "room": "Bedroom & Nursery", "sleepsIn": "Bedroom & Nursery"}
+   ]
+  },
+  {
+   "slug": "chaudhry",
+   "house": "lakecabin",
+   "surname": "Chaudhry",
+   "place": "Halden Water",
+   "household": "young-family",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-warm-f",
+   "reason": "A 30 m2 Nursery and a Master Bedroom: a baby, a parent who works in the Study (the Core desk) and a parent at home in the Kitchen.",
+   "household_text": "Two parents and a baby in the cabin with the study.",
+   "care": "The baby's first year of photographs stays on the Core.",
+   "signatureApps": ["ci-openclaw", "gitea", "open-webui", "navidrome", "kitchenowl", "frigate", "foldergram"],
+   "members": [
+    {"id": "noor", "name": "Noor", "age": 36, "role": "parent", "archetype": "builder", "work": "backend developer, remote", "room": "Study", "sleepsIn": "Master Bedroom", "companion": "Sparrowhawk"},
+    {"id": "imran", "name": "Imran", "age": 38, "role": "parent", "archetype": "host", "work": "at home with the baby", "room": "Kitchen", "sleepsIn": "Master Bedroom", "companion": "Pebble"},
+    {"id": "zara", "name": "Zara", "age": 1, "role": "baby", "archetype": null, "room": "Nursery", "sleepsIn": "Nursery"}
+   ]
+  },
+  {
+   "slug": "petrov",
+   "house": "newcrest",
+   "surname": "Petrov",
+   "place": "Highmoor Cross",
+   "household": "young-family",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-warm-f",
+   "reason": "A 16 m2 Nursery with a crib, a 56 m2 Kitchen with the Core and a 65 m2 Loft with a writing desk: a baby, a parent at the Loft desk and a parent in the Kitchen.",
+   "household_text": "Two parents and a baby in the three-level house with the loft.",
+   "care": "The household budget stays on the Core.",
+   "signatureApps": ["ci-memory", "ci-planning", "wallos", "kitchenowl", "home-assistant", "hortusfox", "immich"],
+   "members": [
+    {"id": "elena", "name": "Elena", "age": 34, "role": "parent", "archetype": "organiser", "work": "project manager", "room": "Loft", "sleepsIn": "Primary Bedroom", "companion": "Nettle"},
+    {"id": "nikolai", "name": "Nikolai", "age": 36, "role": "parent", "archetype": "host", "work": "at home with the baby", "room": "Kitchen", "sleepsIn": "Primary Bedroom", "companion": "Barley"},
+    {"id": "mila", "name": "Mila", "age": 1, "role": "baby", "archetype": null, "room": "Nursery", "sleepsIn": "Nursery"}
+   ]
+  },
+  {
+   "slug": "cardoso",
+   "house": "starter18k",
+   "surname": "Cardoso",
+   "place": "Lowmere",
+   "household": "young-family",
+   "business": false,
+   "tenure": "renter",
+   "narrator": "v-bright-f",
+   "reason": "One bedroom shared by all three (a double bed and a loft bed) and a Kids Zone for play: a six-year-old, a parent at the Core desk in the bedroom and a parent in the Kitchen.",
+   "household_text": "Two parents and a six-year-old in the small cottage.",
+   "care": "A child's picture books stay on the Core.",
+   "signatureApps": ["ci-hermes", "yuvomi", "wallos", "kitchenowl", "audiobookshelf", "immich", "bentopdf"],
+   "beatApps": {"iot": "pi-hole", "privacy": "vaultwarden"},
+   "members": [
+    {"id": "beatriz", "name": "Beatriz", "age": 33, "role": "parent", "archetype": "organiser", "work": "charity coordinator", "room": "Family Bedroom", "sleepsIn": "Family Bedroom", "companion": "Tuppence"},
+    {"id": "tiago", "name": "Tiago", "age": 35, "role": "parent", "archetype": "host", "work": "at home with Leo", "room": "Kitchen", "sleepsIn": "Family Bedroom", "companion": "Dumpling"},
+    {"id": "leo", "name": "Leo", "age": 6, "role": "child", "archetype": "learner", "work": "infant school", "room": "Kids Zone", "sleepsIn": "Family Bedroom"}
+   ]
+  },
+  {
+   "slug": "whitaker",
+   "house": "familyhome",
+   "surname": "Whitaker",
+   "place": "Cobblesby",
+   "household": "young-family",
+   "business": true,
+   "businessText": "self-employed bookkeeping",
+   "tenure": "owner",
+   "narrator": "v-warm-f",
+   "reason": "A Nursery, a Kids' Bedroom with a kids desk and a 21 m2 Playroom: a baby, a seven-year-old, a parent who keeps books at the Dining Room table and a parent at home in the Kitchen. No TV and no study.",
+   "household_text": "Two parents, a seven-year-old and a baby in the yellow house.",
+   "care": "A small client's invoices stay on the Core.",
+   "signatureApps": ["ci-hermes", "akaunting", "paperless", "kitchenowl", "home-assistant", "koodo-reader", "immich"],
+   "members": [
+    {"id": "hannah", "name": "Hannah", "age": 35, "role": "parent", "archetype": "organiser", "work": "self-employed bookkeeper", "room": "Dining Room", "sleepsIn": "Primary Bedroom", "companion": "Biscotti"},
+    {"id": "callum", "name": "Callum", "age": 37, "role": "parent", "archetype": "host", "work": "at home with Alfie", "room": "Kitchen", "sleepsIn": "Primary Bedroom", "companion": "Mallow"},
+    {"id": "nell", "name": "Nell", "age": 7, "role": "child", "archetype": "learner", "work": "primary school", "room": "Kids' Bedroom", "sleepsIn": "Kids' Bedroom"},
+    {"id": "alfie", "name": "Alfie", "age": 1, "role": "baby", "archetype": null, "room": "Nursery", "sleepsIn": "Nursery"}
+   ]
+  },
+  {
+   "slug": "hovsepian",
+   "house": "bghouse-olcia",
+   "surname": "Hovsepian",
+   "place": "Alderwick",
+   "household": "grandparents",
+   "business": true,
+   "businessText": "two consulting clients",
+   "tenure": "owner",
+   "narrator": "v-storyteller-m",
+   "reason": "Two bedrooms and a Study with the Core: two grandparents (one still consults) and an eleven-year-old grandchild in the small Guest Bedroom; the Family Room TV is the couch.",
+   "household_text": "Two grandparents and their eleven-year-old grandchild.",
+   "care": "A retired engineer's client files stay on the Core.",
+   "signatureApps": ["ci-hermes", "kimai", "joplin", "forgejo", "jellyfin", "booklore", "frigate"],
+   "beatApps": {"food": "yuvomi"},
+   "members": [
+    {"id": "araxi", "name": "Araxi", "age": 67, "role": "grandparent", "archetype": "organiser", "work": "retired teacher, runs the parish newsletter", "room": "Study", "sleepsIn": "Primary Bedroom", "companion": "Saffron"},
+    {"id": "hagop", "name": "Hagop", "age": 70, "role": "grandparent", "archetype": "builder", "work": "retired developer, two consulting clients", "room": "Family Room", "sleepsIn": "Primary Bedroom", "companion": "Walnut"},
+    {"id": "nare", "name": "Nare", "age": 11, "role": "child", "archetype": "learner", "work": "primary school", "room": "Guest Bedroom", "sleepsIn": "Guest Bedroom"}
+   ]
+  },
+  {
+   "slug": "nwachukwu",
+   "house": "cutestarter",
+   "surname": "Nwachukwu",
+   "place": "Pellam Green",
+   "household": "grandparents",
+   "business": false,
+   "tenure": "renter",
+   "narrator": "v-storyteller-m",
+   "reason": "A 78 m2 cottage with a Bedroom and a Kids Corner: two grandparents and an eight-year-old grandchild; the Living Room loveseat is the office.",
+   "household_text": "Two grandparents and their eight-year-old grandchild in the smallest house.",
+   "care": "A child's bedtime stories stay on the Core.",
+   "signatureApps": ["ci-hermes", "papra", "firefly-iii", "kitchenowl", "hortusfox", "jellyfin", "audiobookshelf"],
+   "beatApps": {"iot": "frigate", "privacy": "duplicati"},
+   "members": [
+    {"id": "ngozi", "name": "Ngozi", "age": 67, "role": "grandparent", "archetype": "organiser", "work": "retired church treasurer", "room": "Living Room", "sleepsIn": "Bedroom", "companion": "Gingersnap"},
+    {"id": "emeka", "name": "Emeka", "age": 70, "role": "grandparent", "archetype": "host", "work": "retired bus driver, cooks and grows tomatoes", "room": "Kitchen", "sleepsIn": "Bedroom", "companion": "Crumpet"},
+    {"id": "chidi", "name": "Chidi", "age": 8, "role": "child", "archetype": "learner", "work": "primary school", "room": "Kids Corner", "sleepsIn": "Kids Corner"}
+   ]
+  },
+  {
+   "slug": "dekker",
+   "house": "onestory",
+   "surname": "Dekker",
+   "place": "Verrin Park",
+   "household": "grandparents",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-storyteller-m",
+   "reason": "One floor, two bedrooms and a Fireside Nook: two grandparents and a ten-year-old grandchild in the 10 m2 Guest Bedroom.",
+   "household_text": "Two grandparents and their ten-year-old grandchild on one floor.",
+   "care": "A retired accountant's paperwork stays on the Core.",
+   "signatureApps": ["ci-memory", "paperless", "monetr", "vaultwarden", "kitchenowl", "hortusfox", "kiwix"],
+   "beatApps": {"iot": "ntfy"},
+   "members": [
+    {"id": "willem", "name": "Willem", "age": 71, "role": "grandparent", "archetype": "organiser", "work": "retired accountant", "room": "Dining Room", "sleepsIn": "Primary Bedroom", "companion": "Marmalade"},
+    {"id": "greet", "name": "Greet", "age": 69, "role": "grandparent", "archetype": "host", "work": "cooks, keeps the garden", "room": "Kitchen", "sleepsIn": "Primary Bedroom", "companion": "Parsley"},
+    {"id": "joris", "name": "Joris", "age": 10, "role": "child", "archetype": "learner", "work": "primary school", "room": "Guest Bedroom", "sleepsIn": "Guest Bedroom"}
+   ]
+  },
+  {
+   "slug": "watanabe",
+   "house": "riverbend",
+   "surname": "Watanabe",
+   "place": "Ellsworth Green",
+   "household": "grandparents",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-storyteller-m",
+   "reason": "Five bedrooms: two grandparents, their daughter at the Bedroom Two desk, a nine-year-old and a baby in the Nursery; the Family Room has the record player.",
+   "household_text": "Two grandparents, their daughter, a nine-year-old grandchild and a baby.",
+   "care": "Three generations of family photographs stay on one Core.",
+   "signatureApps": ["ci-hermes", "homehub", "navidrome", "gitea", "immich", "kiwix", "frigate"],
+   "members": [
+    {"id": "yoshiko", "name": "Yoshiko", "age": 67, "role": "grandparent", "archetype": "host", "work": "cooks for the whole house", "room": "Kitchen", "sleepsIn": "Primary Suite", "companion": "Cinnamon"},
+    {"id": "haruo", "name": "Haruo", "age": 70, "role": "grandparent", "archetype": "maker", "work": "retired surveyor, keeps a record collection", "room": "Family Room", "sleepsIn": "Primary Suite", "companion": "Sesame"},
+    {"id": "emi", "name": "Emi", "age": 38, "role": "parent", "archetype": "builder", "work": "backend developer, remote", "room": "Bedroom Two", "sleepsIn": "Bedroom Two", "companion": "Chestnut"},
+    {"id": "kenji", "name": "Kenji", "age": 9, "role": "child", "archetype": "learner", "work": "primary school", "room": "Bedroom Three", "sleepsIn": "Bedroom Three"},
+    {"id": "sora", "name": "Sora", "age": 0, "role": "baby", "archetype": null, "room": "Nursery", "sleepsIn": "Nursery"}
+   ]
+  },
+  {
+   "slug": "halvorsen",
+   "house": "aurora",
+   "surname": "Halvorsen",
+   "place": "Linden Reach",
+   "household": "solo-or-couple",
+   "business": true,
+   "businessText": "events consultancy and freelance development",
+   "tenure": "owner",
+   "narrator": "v-deep-m",
+   "reason": "Two Studies, one with the Core desk and one with dual monitors: the best two-desk home in the fleet for a couple who both work from home.",
+   "household_text": "A couple who both work from home, each with their own study.",
+   "care": "Two businesses' client files stay on one Core.",
+   "signatureApps": ["ci-openclaw", "twenty", "kimai", "stirling-pdf", "forgejo", "home-assistant", "spliit"],
+   "beatApps": {"food": "yuvomi"},
+   "members": [
+    {"id": "ingrid", "name": "Ingrid", "age": 38, "role": "partner", "archetype": "organiser", "work": "runs an events consultancy", "room": "Study@l1", "sleepsIn": "Primary Bedroom", "roomLabel": "Study", "companion": "Rosemary"},
+    {"id": "mats", "name": "Mats", "age": 41, "role": "partner", "archetype": "builder", "work": "freelance backend developer", "room": "Study@l2", "sleepsIn": "Primary Bedroom", "roomLabel": "Upstairs study", "companion": "Thyme"}
+   ]
+  },
+  {
+   "slug": "rahimi",
+   "house": "modernhouse-nora",
+   "surname": "Rahimi",
+   "place": "Sandover",
+   "household": "solo-or-couple",
+   "business": true,
+   "businessText": "online music school",
+   "tenure": "owner",
+   "narrator": "v-light-m",
+   "reason": "The Core's room is an honest hallway office (Desk Hall); the Primary Bedroom has a guitar stand: an organiser who runs the school and a maker who teaches.",
+   "household_text": "A couple who run an online music school from a small pavilion.",
+   "care": "Lesson recordings stay on the Core.",
+   "signatureApps": ["ci-hermes", "ci-planning", "opnform", "navidrome", "audiomass", "baikal", "vaultwarden"],
+   "beatApps": {"iot": "ntfy", "food": "homehub"},
+   "members": [
+    {"id": "parisa", "name": "Parisa", "age": 41, "role": "partner", "archetype": "organiser", "work": "runs an online music school", "room": "Desk Hall", "sleepsIn": "Primary Bedroom", "companion": "Quince"},
+    {"id": "kian", "name": "Kian", "age": 43, "role": "partner", "archetype": "maker", "work": "guitarist and teacher", "room": "Primary Bedroom", "sleepsIn": "Primary Bedroom", "companion": "Plum"}
+   ]
+  },
+  {
+   "slug": "salazar",
+   "house": "payorote",
+   "surname": "Salazar",
+   "place": "Brindle Cross",
+   "household": "solo-or-couple",
+   "business": true,
+   "businessText": "art sales and freelance development",
+   "tenure": "renter",
+   "narrator": "v-deep-m",
+   "reason": "An 82 m2 treehouse for two with a studio loft (easel, desk) and a Nook with the Core desk: a painter and a developer.",
+   "household_text": "A couple in a treehouse: one paints, one codes.",
+   "care": "Both their incomes run from one small Core.",
+   "signatureApps": ["ci-openclaw", "forgejo", "inkscape", "wordpress", "mazanoke", "home-assistant", "wanderer"],
+   "beatApps": {"food": "grocy"},
+   "members": [
+    {"id": "valeria", "name": "Valeria", "age": 36, "role": "partner", "archetype": "maker", "work": "painter, sells prints", "room": "Dressing Loft", "sleepsIn": "Tree Bedroom", "roomLabel": "Studio loft", "companion": "Hazel"},
+    {"id": "rafael", "name": "Rafael", "age": 38, "role": "partner", "archetype": "builder", "work": "freelance developer", "room": "Sleeping Nook & Study", "sleepsIn": "Tree Bedroom", "roomLabel": "Study nook", "companion": "Aspen"}
+   ]
+  },
+  {
+   "slug": "adler",
+   "house": "sunnyhome",
+   "surname": "Adler",
+   "place": "Meadowfen",
+   "household": "solo-or-couple",
+   "business": true,
+   "businessText": "small design agency",
+   "tenure": "owner",
+   "narrator": "v-clear-f",
+   "reason": "A Library Lounge with the Core and an Upper Landing with a standing desk: a couple who run a design agency and write robotics software.",
+   "household_text": "A couple who run a design agency from the sunny house.",
+   "care": "Client work stays on the Core.",
+   "signatureApps": ["ci-openclaw", "nextcloud", "espocrm", "n8n", "gitea", "vaultwarden", "penpot"],
+   "beatApps": {"iot": "pi-hole", "food": "yuvomi"},
+   "members": [
+    {"id": "ruth", "name": "Ruth", "age": 39, "role": "partner", "archetype": "organiser", "work": "runs a small design agency", "room": "Library Lounge", "sleepsIn": "Primary Bedroom", "companion": "Dahlia"},
+    {"id": "noam", "name": "Noam", "age": 41, "role": "partner", "archetype": "builder", "work": "robotics software engineer", "room": "Upper Landing", "sleepsIn": "Primary Bedroom", "roomLabel": "Upstairs desk", "companion": "Lupin"}
+   ]
+  },
+  {
+   "slug": "banerjee",
+   "house": "palms",
+   "surname": "Banerjee",
+   "place": "Wexcombe",
+   "household": "solo-or-couple",
+   "business": true,
+   "businessText": "product design studio",
+   "tenure": "owner",
+   "narrator": "v-steady-m",
+   "reason": "A Stair Study with a laptop and a writing desk plus the Core's own desk and monitor in the Living Room: a desk each, on the same floor.",
+   "household_text": "A couple who run a product design studio and write software.",
+   "care": "Prototype files stay on the Core.",
+   "signatureApps": ["ci-openclaw", "ci-planning", "planka", "forgejo", "open-webui", "tldraw", "jellyfin"],
+   "beatApps": {"iot": "uptime-kuma", "food": "grocy"},
+   "members": [
+    {"id": "ananya", "name": "Ananya", "age": 40, "role": "partner", "archetype": "organiser", "work": "runs a product design studio", "room": "Living Room", "sleepsIn": "Primary Bedroom", "companion": "Sorbet"},
+    {"id": "rohan", "name": "Rohan", "age": 42, "role": "partner", "archetype": "builder", "work": "indie software developer", "room": "Stair Study", "sleepsIn": "Primary Bedroom", "companion": "Nibs"}
+   ]
+  },
+  {
+   "slug": "jankowski",
+   "house": "neweco",
+   "surname": "Jankowski",
+   "place": "Oakenholt",
+   "household": "solo-or-couple",
+   "business": true,
+   "businessText": "bookkeeping and HR service",
+   "tenure": "owner",
+   "narrator": "v-steady-m",
+   "reason": "Bedroom 2 has the writing desk and 30 m2: the organiser's office; the sunlit Sunroom Lounge with the Core is the builder's; two bedrooms only.",
+   "household_text": "A couple who run a small service business and an IoT consultancy.",
+   "care": "Clients' payroll files stay on the Core.",
+   "signatureApps": ["ci-openclaw", "nextcloud", "twenty", "docuseal", "home-assistant", "frigate", "activepieces"],
+   "beatApps": {"food": "homehub"},
+   "members": [
+    {"id": "agnieszka", "name": "Agnieszka", "age": 42, "role": "partner", "archetype": "organiser", "work": "runs a bookkeeping and HR service", "room": "Bedroom 2", "sleepsIn": "Primary Bedroom", "companion": "Truffle"},
+    {"id": "tomasz", "name": "Tomasz", "age": 44, "role": "partner", "archetype": "builder", "work": "IoT consultant", "room": "Sunroom Lounge", "sleepsIn": "Primary Bedroom", "companion": "Gadget"}
+   ]
+  },
+  {
+   "slug": "tuala",
+   "house": "flowerycottage",
+   "surname": "Tuala",
+   "place": "Rookbeck",
+   "household": "solo-or-couple",
+   "business": true,
+   "businessText": "botanical prints and freelance web work",
+   "tenure": "renter",
+   "narrator": "v-light-m",
+   "reason": "Seven day rooms and no bedroom: a studio cottage for two. The Sunroom has the easel and the Study the desk; sleeping is never told.",
+   "household_text": "A couple who work from a studio cottage by day.",
+   "care": "Print orders and client sites run from one Core.",
+   "fitNote": "The spec has no bedroom: the stories are daytime only and never show anyone asleep.",
+   "signatureApps": ["ci-memory", "inkscape", "immich", "n8n", "wordpress", "open-webui", "wallos"],
+   "beatApps": {"iot": "glasshome", "food": "grocy"},
+   "members": [
+    {"id": "malia", "name": "Malia", "age": 44, "role": "partner", "archetype": "maker", "work": "botanical illustrator", "room": "Sunroom", "sleepsIn": null, "companion": "Marigold"},
+    {"id": "sione", "name": "Sione", "age": 46, "role": "partner", "archetype": "builder", "work": "freelance web developer", "room": "Study", "sleepsIn": null, "companion": "Chai"}
+   ]
+  },
+  {
+   "slug": "gill",
+   "house": "valleyview",
+   "surname": "Gill",
+   "place": "Stonebeck",
+   "household": "solo-or-couple",
+   "business": false,
+   "tenure": "owner",
+   "narrator": "v-deep-m",
+   "reason": "One bedroom and many lounging rooms: a retired couple who host, with a Reading Lounge and a Kitchen with two islands.",
+   "household_text": "A retired couple who host their friends.",
+   "care": "Decades of family photographs stay on the Core.",
+   "signatureApps": ["ci-hermes", "immich", "jellyfin", "home-assistant", "hortusfox", "airtrail", "firefly-iii"],
+   "beatApps": {"food": "kitchenowl", "privacy": "vaultwarden"},
+   "members": [
+    {"id": "harpreet", "name": "Harpreet", "age": 61, "role": "partner", "archetype": "host", "work": "retired electrician, hosts and cooks for friends", "room": "Kitchen", "sleepsIn": "Primary Suite", "companion": "Cardamom"},
+    {"id": "jaswinder", "name": "Jaswinder", "age": 63, "role": "partner", "archetype": "organiser", "work": "retired pharmacist", "room": "Reading Lounge", "sleepsIn": "Primary Suite", "companion": "Cumin"}
+   ]
+  },
+  {
+   "slug": "mbatha",
+   "house": "vanilla",
+   "surname": "Mbatha",
+   "place": "Fernlea",
+   "household": "solo-or-couple",
+   "business": true,
+   "businessText": "plant nursery and web shop",
+   "tenure": "owner",
+   "narrator": "v-steady-m",
+   "reason": "A 24 m2 Greenhouse and a Library with the Core desk: a grower who runs a plant business and a developer.",
+   "household_text": "A couple who sell plants from their greenhouse.",
+   "care": "Customer orders stay on the Core.",
+   "signatureApps": ["ci-openclaw", "hortusfox", "gitea", "akaunting", "twenty", "home-assistant", "ntfy"],
+   "beatApps": {"food": "yuvomi"},
+   "members": [
+    {"id": "thandi", "name": "Thandi", "age": 44, "role": "partner", "archetype": "host", "work": "grows and sells plants", "room": "Greenhouse", "sleepsIn": "Primary Bedroom", "companion": "Fern"},
+    {"id": "sipho", "name": "Sipho", "age": 46, "role": "partner", "archetype": "builder", "work": "backend engineer", "room": "Library", "sleepsIn": "Primary Bedroom", "companion": "Acorn"}
+   ]
+  }
+ ]
+}

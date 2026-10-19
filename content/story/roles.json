@@ -1,0 +1,96 @@
+{
+  "v": 1,
+  "$comment": "Closed set of semantic anchor roles. Owner of the type lists: story-bake (assets/story/roles.ts + anchors.ts resolve them, in Node and in the page). The role NAMES are a contract (schema enum, ROLE_IDS in assets/story/types.ts): adding or renaming one is a showrunner decision (reference/story/bake.md, 'Adding a role'). story-validator reads this file through anchors.ts to check that a beat's anchor (or one of its fallbacks) resolves in the beat's house. `items` are HouseSpec rooms[].items[].type values (the room's furniture); `siteItems` are lot items (spec.site[].type) that also answer an item role; `zones` are spec.site[].type values that answer a zone role. Every list is in preference order: the first type that exists in the house wins, then the next. The story-bake revision (same v: 1, additive) fixes the zone lists to the real spec vocabulary (the v1 seed named `garden` and `drive`, which no spec uses) and adds kindNames, home, siteItems and zoneRooms.",
+  "builtin": {
+    "street": "The public street in front of the lot. Always resolves (lot frontage).",
+    "front-door": "The front door of the house. Always resolves (spec.entry / frontDoor).",
+    "core": "The Companion Core (spec.hero). Always resolves. Its surface is a shelf or a desk; its room varies (see casting.json coreSpot).",
+    "room": "The centre of the beat's room (use with anchor.room)."
+  },
+  "items": {
+    "couch": ["sofa", "chesterfield-sofa", "mid-century-sofa", "slipcover-sofa", "tuxedo-sofa", "l-sectional", "modular-sectional", "loveseat", "daybed", "chaise-lounge"],
+    "tv": ["tv-stand", "wall-tv"],
+    "fireplace": ["fireplace"],
+    "bookshelf": ["bookshelf", "low-bookshelf", "ladder-shelf", "open-shelving"],
+    "fridge": ["fridge"],
+    "range": ["range", "range-hood"],
+    "kitchen-island": ["kitchen-island", "breakfast-bar"],
+    "counter": ["counter-run", "sink-run"],
+    "dining-table": ["farmhouse-table", "round-dining-table", "octagonal-table", "bar-table", "trestle-table", "glass-dining-table", "pedestal-dining-table", "oval-dining-table"],
+    "desk": ["writing-desk", "standing-desk", "vanity-desk", "dual-monitor-arm", "laptop", "kids-desk"],
+    "bed": ["headboard-bed", "four-poster-bed", "platform-bed", "canopy-bed", "single-bed", "bunk-bed", "loft-bed", "toddler-bed", "mattress-on-floor", "upholstered-bed", "sleigh-bed", "house-bed"],
+    "crib": ["crib"],
+    "toys": ["toy-box", "play-kitchen", "play-tent", "building-blocks", "rocking-horse", "kids-table"],
+    "music": ["keyboard-piano", "guitar-stand", "record-player", "drum-kit", "grand-piano", "upright-piano"],
+    "laundry": ["washing-machine", "dryer"],
+    "bicycle": ["bicycle"],
+    "easel": ["easel"],
+    "telescope": ["telescope"],
+    "patio-seat": ["patio-set", "outdoor-sofa", "lounger-set", "sun-lounger", "bistro-table", "umbrella-table", "outdoor-table", "picnic-table", "bench"]
+  },
+  "siteItems": {
+    "patio-seat": ["loungers", "bench", "firepit", "gazebo", "hottub"],
+    "toys": ["monkeybars", "turtle-pool"]
+  },
+  "zones": {
+    "garden": ["garden-beds", "greenhouse", "bed", "planter", "flowers", "garden-fountain", "grove", "shrub"],
+    "driveway": ["driveway", "drive"],
+    "pool": ["pool", "hottub", "turtle-pool"],
+    "deck": ["deck", "porch", "patio", "terrace", "roof-terrace"]
+  },
+  "zoneRooms": {
+    "deck": "terrace|deck|porch|balcony|patio"
+  },
+  "rooms": {
+    "entry": { "names": "entry|foyer|mudroom|porch|vestibule" },
+    "living": { "kinds": ["living", "lounge"] },
+    "kitchen": { "kinds": ["kitchen"] },
+    "dining": { "kinds": ["dining"] },
+    "office": { "kinds": ["office"] },
+    "bedroom": { "kinds": ["bedroom"] },
+    "kids": { "names": "kid|nursery|play|child|girl|boy|bunk" },
+    "garage": { "kinds": ["garage", "workshop"] },
+    "laundry": { "kinds": ["utility"], "names": "laundry|mudroom" },
+    "bath": { "kinds": ["bath"] },
+    "garden": { "zones": ["garden"] },
+    "patio": { "zones": ["deck", "pool"] },
+    "street": { "builtin": true }
+  },
+  "kindNames": {
+    "circulation": "hall|landing|passage|foyer|entry|vestibule|lobby|stair|atrium|gallery|corridor",
+    "living": "living|lounge|family(?! bath)|salon|sunroom|reading|tv room|hearth|fireside|window bay|bay window|bay seat|picture window|\\bden\\b|^loft$|library|games|garden nook|garden room|conservatory|greenhouse",
+    "lounge": "lounge|cellar|chess|\\bbar\\b",
+    "kitchen": "kitchen|pantry",
+    "dining": "dining|breakfast",
+    "bedroom": "bed|dressing|nursery|sleeping|\\bsuite|girl|boy|kids|guest room",
+    "bath": "bath|shower|\\bwc\\b|ensuite|powder",
+    "office": "study|office|\\bden\\b|^loft$|craft|library|games|garden nook|garden room|\\bdesk",
+    "garage": "garage",
+    "workshop": "workshop",
+    "utility": "laundry|mudroom|storage|closet|utility",
+    "play": "playroom|kids corner|\\bplay"
+  },
+  "home": {
+    "couch": ["living"],
+    "tv": ["living"],
+    "fireplace": ["living", "dining"],
+    "bookshelf": ["living", "office"],
+    "fridge": ["kitchen"],
+    "range": ["kitchen"],
+    "kitchen-island": ["kitchen", "dining"],
+    "counter": ["kitchen"],
+    "dining-table": ["dining", "kitchen"],
+    "desk": ["office", "bedroom"],
+    "bed": ["bedroom"],
+    "crib": ["bedroom", "kids"],
+    "toys": ["kids", "living"],
+    "music": ["living"],
+    "laundry": ["laundry", "garage"],
+    "bicycle": ["garage", "entry"],
+    "easel": ["office", "living", "kids"],
+    "telescope": ["living", "bedroom"],
+    "patio-seat": ["patio", "garden"]
+  },
+  "universal": ["street", "front-door", "core", "room", "couch", "counter", "garden"],
+  "universalNote": "These resolve in all 30 homes. Every other role needs a fallback chain that ends in one of these, or the beat's house must be named in casting.json as having it. The validator fails a beat whose anchor and fallbacks all miss. `room` additionally needs anchor.room (and that room kind to exist in the house)."
+}

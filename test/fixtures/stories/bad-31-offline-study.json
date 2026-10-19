@@ -1,0 +1,817 @@
+{
+  "schema": "family/v1",
+  "slug": "vance-takahashi",
+  "house": "aurora",
+  "fictional": true,
+  "family": {
+    "surname": "Vance-Takahashi",
+    "tagline": "Two studios under one roof, and one Core in the study.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Elias is a portrait photographer. Mika is an operations consultant. Both work from home, in a white house by the canal. Their clients' files sit on one Companion Core.",
+    "address": {
+      "line": "14 Larkfield Lane",
+      "place": "Marlow Bend"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "elias",
+      "name": "Elias",
+      "age": 42,
+      "role": "partner",
+      "work": "portrait and small-business photographer",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Marlo",
+        "runtime": "OpenClaw",
+        "job": "Opens Twenty and other web pages in its own browser and fills in the forms Elias asks for.",
+        "personality": [
+          "patient",
+          "precise",
+          "curious"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "One task at a time. Elias checks every result."
+      }
+    },
+    {
+      "id": "mika",
+      "name": "Mika",
+      "age": 40,
+      "role": "partner",
+      "work": "operations consultant",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Odette",
+        "runtime": "Hermes",
+        "job": "Drafts replies and answers questions for Mika's clients, using the context she connected.",
+        "personality": [
+          "calm",
+          "dry",
+          "quick"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Drafts only. Mika reads and sends every message."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "office",
+      "kind": "room",
+      "room": "office",
+      "title": "Mika's office"
+    },
+    {
+      "id": "studio",
+      "kind": "room",
+      "room": "office",
+      "title": "Elias's studio"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out by the pool"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel at the door",
+        "body": "A parcel waits at the Vance-Takahashi front door. Elias carries it through the dining room to the study, where Mika clears a space on the desk."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core's footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Mika plugs in the power cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      }
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Elias opens the Wi-Fi settings on his phone and joins the Core's own network. Then he chooses the home network from the list.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "with": [
+        "immich",
+        "nextcloud"
+      ],
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Mika picks Hermes, Elias picks OpenClaw, and they add Immich and Nextcloud. Companion Memory (beta) comes along. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Immich, Nextcloud"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "member": "mika",
+      "agent": "mika",
+      "approval": "mika",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Odette says hello",
+        "body": "Mika messages the agent she named Odette. Odette answers, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "mika",
+        "text": "Hello, Mika. I am Odette. What should we do first?"
+      }
+    },
+    {
+      "id": "living-photos",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "elias",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Photos land on the Core",
+        "body": "Elias backs up the weekend's photos to Immich from the couch. They land on the Core, ready to search and organize.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "mika",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Film night, from the Core",
+        "body": "Friday is film night. Jellyfin streams Mika's own collection of movies to the living-room TV, straight from the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-lights",
+      "chapter": "living",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "elias",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "Lights on a schedule",
+        "body": "At ten, the living-room lights dim on a Home Assistant schedule. It runs on the Core and reaches the lights over the home Wi-Fi.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "mika",
+      "film": true,
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One list, two phones",
+        "body": "Elias and Mika share the grocery list in KitchenOwl. Oat milk added at the counter shows up on the other's phone.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-recipe",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "elias",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book, meal planner",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Grandma's soup, kept",
+        "body": "Elias types his grandmother's soup recipe into KitchenOwl once. Now it sits in the family recipe book, beside the meal planner.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-wallos",
+      "chapter": "kitchen",
+      "category": "money",
+      "segment": "consumer",
+      "member": "mika",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "counter"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Every subscription, in one list",
+        "body": "Mika opens Wallos at the counter. It lists every subscription the household still pays for, with a reminder before each one renews.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      }
+    },
+    {
+      "id": "office-reply",
+      "chapter": "office",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "mika",
+      "agent": "mika",
+      "approval": "mika",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A draft, never sent alone",
+        "body": "A client asks a tricky question. Mika texts Odette, and Odette drafts a reply using the context Mika connected to Companion Memory (beta). Mika reads it and sends it herself."
+      },
+      "say": {
+        "speaker": "mika",
+        "text": "Here is a draft. Please read it before you send it."
+      }
+    },
+    {
+      "id": "office-paper",
+      "chapter": "office",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "mika",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Paper in, searchable out",
+        "body": "Mika scans a supplier invoice. Paperless-ngx reads every page, tags it and files it, so a search finds it later.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "office-vault",
+      "chapter": "office",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "mika",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "a password vault you host that works with the Bitwarden apps",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Passwords stay in the house",
+        "body": "Mika opens VaultWarden, the password vault for the household. It works with the Bitwarden apps, and the vault itself lives on the Core.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "office-calendar",
+      "chapter": "office",
+      "category": "productivity",
+      "segment": "small-business",
+      "member": "mika",
+      "app": {
+        "id": "nextcloud",
+        "replaces": []
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide"
+      },
+      "popup": {
+        "title": "One calendar for both of them",
+        "body": "Shoots and client calls land in one Nextcloud calendar. Mika and Elias see the same week on their phones.",
+        "chips": [
+          "Nextcloud"
+        ]
+      }
+    },
+    {
+      "id": "studio-edit",
+      "chapter": "studio",
+      "category": "creative",
+      "segment": "small-business",
+      "member": "elias",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "capability": "design and prototype in a web-based design tool you host",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "easel"
+          },
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "An album, laid out at home",
+        "body": "Elias studies offline with Marlo, and his layout notes do not leave the Core. His code never leaves the house.",
+        "chips": [
+          "Penpot",
+          "replaces Figma"
+        ]
+      }
+    },
+    {
+      "id": "studio-lead",
+      "chapter": "studio",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "elias",
+      "film": true,
+      "agent": "elias",
+      "approval": "elias",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Marlo logs a new enquiry",
+        "body": "A new portrait enquiry arrives. Elias asks Marlo, and Marlo opens Twenty in its own browser to add the lead. Elias checks every field.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      },
+      "say": {
+        "speaker": "elias",
+        "text": "Lead added. Please check the details."
+      }
+    },
+    {
+      "id": "studio-pdf",
+      "chapter": "studio",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "elias",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Quote and contract, one file",
+        "body": "Elias merges a quote and a contract into a single PDF with Stirling-PDF. The merge runs on the Core.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "garden-cameras",
+      "chapter": "garden",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "driveway",
+        "fallback": [
+          {
+            "role": "front-door"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "The drive, recorded at home",
+        "body": "An IP camera on the drive streams to Frigate. The recordings stay on the Core, and the clips play on the home network.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "garden-plants",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "mika",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The new hedge has a journal",
+        "body": "Mika logs the new hedge in HortusFox. She notes where it grows, when she watered it, and adds a photo for the journal.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "garden-music",
+      "chapter": "garden",
+      "category": "media",
+      "segment": "consumer",
+      "member": "elias",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Music by the pool",
+        "body": "Elias plays his own music collection from Navidrome on the patio. It streams from the Core to his phone.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "film": true,
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, a whole household",
+        "body": "Photos, paperwork, lights, cameras and two agents. The Vance-Takahashi household runs it all from one Companion Core in the study."
+      }
+    }
+  ],
+  "closing": {
+    "body": "Your photos, your paperwork and your agents can run on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Exemplar written by the showrunner. FTUE beats follow the owner's hotspot flow (STORY-BIBLE section 8); owner sign-off against the fact sheet is open.",
+    "ftue-hello and office-reply show Hermes over a chat service; the disclosure note is on the first Hermes beat.",
+    "garden-cameras assumes the family owns an IP camera: it is not in the Core box and not in the 3D scene."
+  ]
+}

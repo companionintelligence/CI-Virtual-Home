@@ -32,9 +32,9 @@ Every new field is optional: a spec that uses none of them keeps today's look, a
 {
   "$schema": "house-spec/v1",
   "id": "aurora",                       // kebab-case, matches file name
-  "name": "Base Game Aurora",
-  "author": "Ornilia",                  // SimsTree build author (credit)
-  "source": "SimsTree slide 02",
+  "name": "Base Game Aurora",           // the title it was filed under: an internal record (the site shows displayName)
+  "author": "Ornilia",                  // who built it: an internal record, never shown or shipped (portal:build redacts it)
+  "source": "SimsTree slide 02",        // where it came from: the same
   "style": "Two-storey white modern, flat roofs, front pool",  // one line
   "emoji": "🏢",
   "lot":  { "w": 30, "d": 24, "ground": "lawn" },   // ground: lawn | desert | forest | urban | waterfront (lawn, and

@@ -154,9 +154,19 @@ kbd {
   font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--primary);
 }
+/* "Fictional family. Real software.": on the front page and a home's page it is always on screen, on a phone too (the ad rules) */
+.fiction-label {
+  display: inline-flex; align-items: center;
+  min-height: 28px; margin: 0 0 12px; padding: 0 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 28%, transparent);
+  color: var(--primary);
+  font-size: 13px; font-weight: 700; letter-spacing: 0.01em;
+}
 .hero h1 {
   margin: 0;
-  font-size: clamp(38px, 4.8vw, 56px);
+  font-size: clamp(36px, 4.3vw, 52px);
   line-height: 1.02;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -190,6 +200,7 @@ kbd {
 .core-line .i { width: 18px; height: 18px; margin-top: 2px; color: var(--primary); }
 .core-line b { color: var(--foreground); font-weight: 700; }
 .core-actions { margin: 4px 0 0 28px; }
+.core-fine { margin: 2px 0 0 28px; font-size: 12.5px; color: var(--muted-foreground); }
 .core-more { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; font-weight: 600; font-size: 14px; text-underline-offset: 3px; }
 .core-more .i { width: 15px; height: 15px; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -226,6 +237,7 @@ kbd {
   box-shadow: var(--shadow-lg), 0 30px 60px -30px rgba(4, 22, 32, 0.35);
   isolation: isolate;
 }
+.hero-media picture { display: block; width: 100%; height: 100%; }
 .hero-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1); }
 .hero-media:hover img { transform: scale(1.025); }
 .hero-media::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12); pointer-events: none; }
@@ -270,7 +282,7 @@ kbd {
 .filters { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 .search {
   display: flex; align-items: center; gap: 8px;
-  height: 40px; width: 300px; padding: 0 10px 0 14px;
+  height: 40px; width: 340px; padding: 0 10px 0 14px;
   border-radius: 999px;
   background: var(--pg-surface);
   box-shadow: inset 0 0 0 1px var(--pg-hairline), var(--shadow-sm);
@@ -321,11 +333,33 @@ kbd {
 .tag:disabled { cursor: default; color: color-mix(in srgb, var(--muted-foreground) 55%, transparent); }
 .tag:disabled small { color: inherit; }
 .filters.off { opacity: 0.45; }
+/* what they do: the filter a story visitor reaches for first (work from home, code, play, study, make, host), above the home style row */
+.personas { display: flex; flex-wrap: wrap; gap: 0 8px; padding: 10px 0 0; }
+.personas .tag { font-size: 14px; color: var(--foreground); padding: 0 15px; }
+.personas .tag small { font-size: 12px; }
+.personas .tag:disabled { color: color-mix(in srgb, var(--muted-foreground) 55%, transparent); }
+/* the style and storeys filters are for browsing homes: one line that opens them (the script opens it on a wide screen) */
+.more-filters { margin-top: 2px; }
+.more-filters summary {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 4px;
+  cursor: pointer; list-style: none; border-radius: 8px;
+  font-size: 13.5px; font-weight: 600; color: var(--muted-foreground);
+}
+.more-filters summary::-webkit-details-marker { display: none; }
+.more-filters summary::before {
+  content: ""; width: 7px; height: 7px; margin: 0 3px 3px 1px;
+  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg); transition: transform 0.15s ease;
+}
+.more-filters[open] summary::before { transform: rotate(45deg); margin-bottom: 5px; }
+.more-filters summary:hover { color: var(--foreground); }
+.more-body { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; padding-bottom: 4px; }
+.more-body .tags { flex: 1 1 280px; min-width: 0; padding-top: 0; }
 
 .grid {
   list-style: none; margin: 0; padding: 16px 0 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 272px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
   gap: 34px 26px;
 }
 .card a { display: block; color: inherit; text-decoration: none; border-radius: 16px; }
@@ -378,12 +412,46 @@ kbd {
 }
 .card .facts { margin: 10px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12.5px; }
 .fact { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 999px; background: var(--secondary); color: var(--foreground); font-weight: 600; font-variant-numeric: tabular-nums; }
-.credit { margin-left: auto; color: var(--muted-foreground); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
-.credit b { font-weight: 600; color: var(--foreground); }
 .empty { text-align: center; padding: 56px 16px; color: var(--muted-foreground); }
 .empty p { margin: 0 0 16px; }
 .empty b { color: var(--foreground); }
 .empty .btn-primary .i { width: 16px; height: 16px; }
+
+/* a family's card (scripts/portal-front.mts familyCard): the home's picture, the family and its home, who lives there and the job each
+   does, the apps that tell the story. The family's name is the link, stretched over the card, so the text stays a heading and two
+   lists; the picture and the rest are not links of their own. */
+.card-family { position: relative; display: flex; flex-direction: column; }
+.card-family .card-body { flex: 1; display: flex; flex-direction: column; padding: 14px 2px 0; }
+.card-family h3 { font-size: 18px; }
+.card-family h3 a { display: block; color: inherit; text-decoration: none; }
+.card-family h3 a::after { content: ""; position: absolute; inset: 0; border-radius: 16px; }
+.card-family h3 a:focus-visible { outline: none; }
+.card-family:has(h3 a:focus-visible) { outline: 2px solid var(--ring); outline-offset: 6px; border-radius: 16px; }
+.card-family:hover .thumb, .card-family:focus-within .thumb { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+.card-family:hover .thumb img { transform: scale(1.035); }
+.card-family:hover .thumb-play, .card-family:focus-within .thumb-play { opacity: 1; transform: none; }
+.home-line { margin: 3px 0 0; font-size: 13.5px; color: var(--muted-foreground); }
+.cast { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 10px 12px; }
+.cast li { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.disc {
+  flex: none; display: grid; place-items: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 14%, var(--card));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 26%, transparent);
+  color: var(--primary); font-size: 15px; font-weight: 700; line-height: 1;
+}
+.who { display: flex; flex-direction: column; min-width: 0; font-size: 12.5px; line-height: 1.25; color: var(--muted-foreground); }
+.who b { color: var(--foreground); font-size: 13.5px; font-weight: 600; }
+.apps {
+  list-style: none; margin: 14px 0 0; padding: 12px 0 0;
+  display: grid; gap: 3px;
+  border-top: 1px solid var(--pg-hairline);
+  font-size: 13px; color: var(--muted-foreground);
+}
+.apps b { color: var(--foreground); font-weight: 600; }
+.go { margin: auto 0 0; padding-top: 14px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
+.go .i { width: 15px; height: 15px; transition: transform 0.2s ease; }
+.card-family:hover .go .i { transform: translateX(3px); }
 
 /* placeholder cards while index.json loads */
 .skel .thumb { box-shadow: none; }
@@ -407,6 +475,7 @@ kbd {
 .cta-copy { flex: 1 1 320px; max-width: 40em; }
 .cta-copy h2 { margin: 0 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
 .cta-copy p { margin: 0; color: var(--muted-foreground); text-wrap: pretty; }
+.cta-copy .cta-note { margin-top: 6px; font-size: 13px; }
 .cta-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
 .cta-docs { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; font-weight: 600; font-size: 14.5px; text-underline-offset: 3px; }
 
@@ -419,21 +488,12 @@ kbd {
   color: var(--muted-foreground);
   font-size: 13px;
 }
-.foot-grid { display: grid; grid-template-columns: 1.15fr 0.8fr 1.15fr; gap: 24px 48px; }
+.foot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 48px; }
 .foot-grid p { margin: 0 0 6px; max-width: 46em; }
 .foot-grid b { color: var(--foreground); font-weight: 700; }
 .foot-brand { display: flex; align-items: center; gap: 8px; min-height: 28px; color: var(--foreground); }
 .foot-links ul { list-style: none; margin: 0; padding: 0; }
 .foot-links a { display: inline-flex; align-items: center; min-height: 28px; font-weight: 600; text-underline-offset: 3px; }
-/* every home against the build it was written from (gallery.js credits()) */
-.builds { margin-top: 8px; }
-.builds summary { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; cursor: pointer; color: var(--foreground); font-weight: 600; list-style: none; }
-.builds summary::-webkit-details-marker { display: none; }
-.builds summary::before { content: ""; width: 6px; height: 6px; margin: 0 3px 0 1px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(-45deg); transition: transform 0.15s ease; }
-.builds[open] summary::before { transform: rotate(45deg); }
-.builds ul { margin: 8px 0 0; padding: 0; list-style: none; columns: 2 220px; column-gap: 28px; font-size: 12.5px; line-height: 1.45; }
-.builds li { break-inside: avoid; margin: 0 0 5px; }
-.builds li b { color: var(--foreground); font-weight: 600; }
 /* every home's own page (scripts/portal-pages.mts galleryHomeIndex) */
 .foot-homes { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--pg-hairline); }
 .foot-homes p { margin: 0 0 6px; }
@@ -453,7 +513,17 @@ kbd {
 .home-page .hero-media { aspect-ratio: 1200 / 630; }
 .home-facts { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .home-facts .fact { height: 28px; padding: 0 12px; font-size: 13px; }
-.home-credit { margin: 14px 0 0; max-width: 34em; font-size: 13.5px; color: var(--muted-foreground); text-wrap: pretty; }
+.family-block {
+  width: min(calc(100% - 2 * var(--pg-gutter)), calc(var(--pg-wide) - 2 * var(--pg-gutter)));
+  margin: 0 auto 28px; padding: clamp(20px, 3vw, 32px);
+  border-radius: 22px; background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--pg-hairline), var(--shadow-sm);
+}
+.family-block h2 { margin: 0 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+.family-block p { margin: 0; max-width: 40em; color: var(--muted-foreground); text-wrap: pretty; }
+.family-block .fiction-label { margin: 14px 0 0; }
+.family-block .hero-cta { margin-top: 16px; }
+.home-note { margin: 14px 0 0; max-width: 34em; font-size: 13.5px; color: var(--muted-foreground); text-wrap: pretty; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
@@ -486,8 +556,8 @@ kbd {
   .filters { width: 100%; justify-content: flex-start; }
 }
 /* Phones: the hero keeps the picture, the headline, the Core line and one button (the stats and the second
-   button are for wider screens), the filters sit in two rows, and the homes go two to a row, compact: name,
-   picture and builder, so the first homes show on the first screen. */
+   button are for wider screens), the filters sit in two rows, and the homes go two to a row, compact: name
+   and picture, so the first homes show on the first screen. */
 @media (max-width: 520px) {
   .site-head { padding-top: 10px; padding-bottom: 8px; }
   .nav-long { display: none; }
@@ -519,18 +589,25 @@ kbd {
   .card-body { padding-top: 8px; }
   .card h3 { font-size: 14px; line-height: 1.25; }
   .card .style { display: none; }
-  .card .facts { margin-top: 4px; }
-  .card .fact { display: none; }
-  .credit { margin-left: 0; max-width: 100%; font-size: 12px; }
+  .card .facts { display: none; }
   /* on a two-up card the pill is only its play mark */
   .thumb-play { right: 6px; bottom: 6px; width: 28px; height: 28px; padding: 0; justify-content: center; font-size: 0; gap: 0; }
   .thumb-play .i { width: 11px; height: 11px; margin-left: 2px; }
   .thumb-missing b { font-size: 28px; }
   .thumb-missing span { font-size: 11.5px; }
+  /* a family's card is one to a row on a phone, with its people and apps; the homes with no family stay two to a row after them */
+  .card-family { grid-column: 1 / -1; }
+  .card-family .card-body { padding-top: 12px; }
+  .card-family h3 { font-size: 18px; line-height: 1.3; }
+  .card-family .thumb-play { right: 10px; bottom: 10px; width: auto; height: 30px; padding: 0 12px 0 10px; justify-content: flex-start; gap: 6px; font-size: 12px; }
+  .card-family .thumb-play .i { width: 12px; height: 12px; margin-left: 0; }
+  .personas { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--pg-gutter)); padding: 10px var(--pg-gutter) 0; }
+  .personas::-webkit-scrollbar { display: none; }
+  .personas .tag { flex: none; }
 }
 @media (pointer: coarse) {
   .search { height: 44px; }
-  .site-nav a, .brand a, .builds summary, .foot-links a, .core-more { min-height: 44px; }
+  .site-nav a, .brand a, .foot-links a, .core-more { min-height: 44px; }
   .foot-homes a { min-height: 36px; }
 }
 @media (hover: none) {

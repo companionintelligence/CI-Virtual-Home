@@ -1,0 +1,832 @@
+{
+  "schema": "family/v1",
+  "slug": "banerjee",
+  "house": "palms",
+  "fictional": true,
+  "family": {
+    "surname": "Banerjee",
+    "tagline": "A product design studio and an indie app share one Companion Core.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Ananya runs a product design studio from the desk in the living room. Rohan builds apps of his own in the stair study, with the grand piano across the room. One Companion Core holds the studio’s drawings and his code.",
+    "address": {
+      "line": "9 Ashlar Court",
+      "place": "Wexcombe"
+    },
+    "narrator": "v-steady-m"
+  },
+  "members": [
+    {
+      "id": "ananya",
+      "name": "Ananya",
+      "age": 40,
+      "role": "partner",
+      "work": "runs a product design studio",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Sorbet",
+        "runtime": "OpenClaw",
+        "job": "Opens a supplier’s website in its own browser and fills in the forms Ananya lists.",
+        "personality": [
+          "bright",
+          "quick",
+          "tidy"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Fills in forms only. Ananya reads every field and sends it herself."
+      }
+    },
+    {
+      "id": "rohan",
+      "name": "Rohan",
+      "age": 42,
+      "role": "partner",
+      "work": "indie software developer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Nibs",
+        "runtime": "Hermes",
+        "job": "Drafts release notes from the list of fixes Rohan messages it.",
+        "personality": [
+          "dry",
+          "calm",
+          "exact"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Drafts only. Rohan reads each note and pastes it himself."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "Rohan’s stair study"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "laundry",
+      "kind": "room",
+      "room": "laundry",
+      "title": "The laundry"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Rohan carries the Core indoors",
+        "body": "A parcel waits at the top of the steps. Rohan carries the Companion Core to the living-room desk."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Ananya lifts the Core out and sets it on the desk."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Rohan plugs in the cable, and Ananya presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Ananya opens the Wi-Fi settings on her phone and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "planka",
+        "forgejo"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agents and apps",
+        "body": "In the Companion Hub store, Ananya picks OpenClaw and Rohan picks Hermes. They add Planka and Forgejo, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: OpenClaw, Hermes",
+            "Apps: Planka, Forgejo"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "ananya",
+      "agent": "ananya",
+      "approval": "ananya",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Sorbet answers the first greeting",
+        "body": "Ananya greets Sorbet, the agent she named for the studio’s forms. Sorbet answers, and the Core is running.",
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "ananya",
+        "text": "Good morning, Ananya. Sorbet here. Which form comes first?"
+      },
+      "film": true
+    },
+    {
+      "id": "study-tag",
+      "chapter": "study",
+      "member": "rohan",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own Git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Rohan tags the release",
+        "body": "Rohan’s rain-gauge app is ready for release. He tags it at his stair-study desk. Forgejo keeps the code on the Core, not on a rented code host.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "study-notes",
+      "chapter": "study",
+      "member": "rohan",
+      "agent": "rohan",
+      "approval": "rohan",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "forgejo"
+      ],
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Nibs drafts the release notes",
+        "body": "With the fixes done, Rohan messages Nibs the list. Nibs drafts the release notes on the Core’s local model. Rohan reads them and pastes them into Forgejo himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "rohan",
+        "text": "Draft done. Read it through, then paste it yourself."
+      }
+    },
+    {
+      "id": "study-notebook",
+      "chapter": "study",
+      "member": "rohan",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "music",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Rohan tries a chord mid-run",
+        "body": "A notebook of rain-gauge readings runs in JupyterLab on the Core. While it finishes, Rohan tries a chord on the grand piano across the room.",
+        "chips": [
+          "JupyterLab"
+        ]
+      }
+    },
+    {
+      "id": "living-quiet",
+      "chapter": "living",
+      "member": "ananya",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ananya clears Rohan’s release day",
+        "body": "Rohan’s release is due on Thursday. Ananya moves her review to Friday in Companion Planning, so his day stays clear. It is one local file on the Core.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "living-film",
+      "chapter": "living",
+      "member": "rohan",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Rohan plays the stop-motion",
+        "body": "On Saturday, Rohan puts Ananya’s stop-motion of a strap design on the TV. Jellyfin plays it from the Core, and Ananya, on the sectional, spots a loose stitch.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "living-brief",
+      "chapter": "living",
+      "member": "ananya",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "with": [
+        "open-webui"
+      ],
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ananya files a long client brief",
+        "body": "Ananya saves a long client brief in Nextcloud, beside the drawings. She pastes it to a model on the Core, through Open WebUI, and asks what it requires.",
+        "chips": [
+          "Nextcloud",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "living-watch",
+      "chapter": "living",
+      "member": "rohan",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "uptime-kuma",
+        "replaces": [
+          "Datadog"
+        ]
+      },
+      "capability": "watch your sites and services and get an alert when one goes down",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Rohan checks before the client call",
+        "body": "A router update just finished, and a client call is close. Rohan has Uptime Kuma watch the studio’s board from the Core, and an alert reaches him if it stops.",
+        "chips": [
+          "Uptime Kuma",
+          "replaces Datadog"
+        ]
+      }
+    },
+    {
+      "id": "living-strap",
+      "chapter": "living",
+      "member": "ananya",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "tldraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "a shared whiteboard on an infinite canvas",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ananya redraws the strap joint",
+        "body": "Ananya redraws the strap joint on a tldraw board, from the sectional. Rohan asks about the buckle, and she moves one line. The board stays on the Core.",
+        "chips": [
+          "tldraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "living-board",
+      "chapter": "living",
+      "member": "ananya",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "planka",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "capability": "a real-time Kanban board for a team or a family project",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ananya moves the strap to prototype",
+        "body": "A client approves a leather strap, so Ananya moves its card to prototype on the studio’s Planka board. The cards stay on the Core.",
+        "chips": [
+          "Planka",
+          "replaces Trello"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-sample",
+      "chapter": "living",
+      "member": "ananya",
+      "agent": "ananya",
+      "approval": "ananya",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Ananya sends the sample request herself",
+        "body": "The studio needs leather samples. Sorbet opens the supplier’s website in its own browser and fills in the request form. Ananya checks the quantities, then presses send herself.",
+        "chips": [
+          "OpenClaw"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "ananya",
+        "text": "Filled in and tidy. Check the quantities, then send it yourself."
+      }
+    },
+    {
+      "id": "kitchen-pantry",
+      "chapter": "kitchen",
+      "member": "rohan",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "counter",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "fridge"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Rohan descales the coffee maker",
+        "body": "Rohan descales the coffee maker because Grocy lists it as due. He ticks the chore off, then adds beans to the shopping list on the Core.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-receipts",
+      "chapter": "kitchen",
+      "member": "ananya",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The accountant wants the invoices",
+        "body": "The accountant asks for last spring’s print invoices. Ananya types the print shop’s name at the island, and Paperless-ngx pulls up the pages it filed on the Core.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-vault",
+      "chapter": "kitchen",
+      "member": "rohan",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Rohan saves the new sign-in",
+        "body": "A domain renewal arrives, so Rohan saves the new sign-in at the glass table. VaultWarden hosts the vault on the Core and works with the Bitwarden apps.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "laundry-bedding",
+      "chapter": "laundry",
+      "member": "rohan",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "laundry",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "laundry"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Rohan takes over the bedding",
+        "body": "With Ananya on a deadline, Rohan takes her turn at the bedding. He starts the machine, then marks the empty detergent used up in Grocy on the Core.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "garden-swatches",
+      "chapter": "garden",
+      "member": "ananya",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "pool",
+        "fallback": [
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Ananya takes the swatches outside",
+        "body": "For the afternoon daylight, Ananya carries the leather swatches to the pool. Her phone backs the photos up to Immich on the Core, not to a photo cloud.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-court",
+      "chapter": "garden",
+      "member": "rohan",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Rohan notes the court’s new flowers",
+        "body": "New flowers have opened in the planted court. Rohan adds them to the HortusFox journal on the Core, with photos alongside.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "Two desks share one Core",
+        "body": "A board, code, a pantry list and photos run on one Companion Core, from two desks in one house."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your boards, code, lists and photos can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Core stands on its own desk in the Living Room, which has no desk item in the spec: Ananya’s beats anchor on the core and the room. Rohan’s desk beats use the Stair Study writing desk and laptop.",
+    "Sorbet is OpenClaw and opens a supplier website: living-sample carries the website note. Nibs is Hermes: ftue-pick is the first Hermes mention and study-notes carries the chat-service note. Each person sends.",
+    "Open WebUI sits in with at living-brief (the app is Nextcloud) so the ChatGPT chip never meets cap-parity. JupyterLab is the beat app for the notebook; neither beat shows a model chip.",
+    "garden-swatches assumes a phone camera and the Immich phone app; no store badge is shown. Forgejo ships no CI runner, so study-tag shows a release tag only. Rohan’s app is invented, with no employer code.",
+    "The pool, loungers and planted court are real site items; the spec has no hot tub or spa, so none is told. Sleeping is never told: both partners sleep upstairs and no beat goes there."
+  ]
+}

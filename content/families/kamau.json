@@ -1,0 +1,794 @@
+{
+  "schema": "family/v1",
+  "slug": "kamau",
+  "house": "gardennook",
+  "fictional": true,
+  "family": {
+    "surname": "Kamau",
+    "tagline": "A baby, two parents and one Companion Core in a cottage with a garden nook.",
+    "household": "young-family",
+    "business": false,
+    "story": "Wanjiru writes software from the glass garden nook beside the living room. Juma stays home with baby Zuri and grows vegetables outside. One Companion Core on the living-room shelf keeps their code, lists, pictures and plants.",
+    "address": {
+      "line": "8 Lanterwick Close",
+      "place": "Orrin Vale"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "wanjiru",
+      "name": "Wanjiru",
+      "age": 34,
+      "role": "parent",
+      "work": "software developer, works from home",
+      "colour": "chart-1",
+      "archetype": "builder",
+      "companion": {
+        "name": "Rowan",
+        "runtime": "Hermes",
+        "job": "Drafts talk outlines from the bullet notes Wanjiru sends it.",
+        "personality": [
+          "brisk",
+          "precise",
+          "dry"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Drafts only. Wanjiru rewrites every outline in her own words."
+      }
+    },
+    {
+      "id": "juma",
+      "name": "Juma",
+      "age": 36,
+      "role": "parent",
+      "work": "at home with Zuri, grows vegetables",
+      "colour": "chart-2",
+      "archetype": "host",
+      "companion": {
+        "name": "Biscuit",
+        "runtime": "Hermes",
+        "job": "Drafts Juma’s posts for the neighbourhood seedling swap.",
+        "personality": [
+          "patient",
+          "gentle",
+          "practical"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Drafts only. Juma reads each post and sends it himself."
+      }
+    },
+    {
+      "id": "zuri",
+      "name": "Zuri",
+      "age": 0,
+      "role": "baby",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "nook",
+      "kind": "room",
+      "room": "office",
+      "title": "Wanjiru in the garden nook"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "The dining table"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "nursery",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "The bedroom and nursery"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Wanjiru carries the parcel in",
+        "body": "A parcel with a Companion Core waits at the foot of the porch steps. Wanjiru carries it in, and Juma clears the living-room shelf."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Juma reads the guide aloud while Zuri crumples the packing paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Wanjiru plugs in the cable. Juma presses the button, and the Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "On his phone, Juma joins the Core’s own network, then chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "gitea",
+        "home-assistant"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agents and apps",
+        "body": "In the Companion Hub store, Juma picks Hermes. Wanjiru adds Gitea and Home Assistant. Wanjiru and Juma name the agents Rowan and Biscuit, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Gitea, Home Assistant"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "juma",
+      "agent": "juma",
+      "approval": "juma",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Juma says hello to Biscuit",
+        "body": "From the loveseat, Juma messages the agent he named Biscuit. It answers from the Core, and the first job is seeds.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "juma",
+        "text": "Hello, Juma. I am Biscuit. Shall we start with seeds?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-album",
+      "chapter": "living",
+      "member": "juma",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Both camera rolls become one album",
+        "body": "Zuri’s first months sit on two phones. On the loveseat, Juma and Wanjiru gather them into one Immich album on the Core.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ],
+        "note": "The first start takes a while."
+      },
+      "film": true
+    },
+    {
+      "id": "living-backup",
+      "chapter": "living",
+      "member": "wanjiru",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "duplicati",
+        "replaces": [
+          "Backblaze"
+        ]
+      },
+      "capability": "back up your files with encryption, to a local disk beside your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A deleted folder comes back",
+        "body": "Wanjiru deletes the wrong folder by mistake. The encrypted copy Duplicati keeps on a disk beside the Core brings it back.",
+        "chips": [
+          "Duplicati",
+          "replaces Backblaze"
+        ]
+      }
+    },
+    {
+      "id": "living-out",
+      "chapter": "living",
+      "member": "juma",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "room",
+        "room": "living"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "One tap before the afternoon walk",
+        "body": "Pram ready, Juma taps one scene. The lamps and the kettle plug go off together. Home Assistant, which needs no cloud account, runs the scene from the Core.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "nook-repos",
+      "chapter": "nook",
+      "member": "wanjiru",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right",
+        "eye": "seated"
+      },
+      "popup": {
+        "title": "Naptime is code time",
+        "body": "While Zuri naps, Wanjiru merges her talk demo branch in Gitea. Its issues and pull requests sit with the code on the Core.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "nook-flow",
+      "chapter": "nook",
+      "member": "wanjiru",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "n8n",
+        "replaces": [
+          "Zapier"
+        ]
+      },
+      "with": [
+        "home-assistant"
+      ],
+      "capability": "connect your apps with workflows, with the data staying on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The nook lamp keeps office hours",
+        "body": "Each weekday at nine, Wanjiru’s n8n workflow lights the nook lamp through Home Assistant. It runs on the Core, so the data does not pass through a connector service.",
+        "chips": [
+          "n8n",
+          "replaces Zapier"
+        ]
+      }
+    },
+    {
+      "id": "nook-rowan",
+      "chapter": "nook",
+      "member": "wanjiru",
+      "agent": "wanjiru",
+      "approval": "wanjiru",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Wanjiru rewrites Rowan’s outline",
+        "body": "Wanjiru messages Rowan her bullet notes for a meetup talk. Rowan drafts an outline on the Core’s local model, and Wanjiru rewrites it in her own words.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Companion Agents are in beta. Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "wanjiru",
+        "text": "Outline done. Cut what you like, then write it your way."
+      }
+    },
+    {
+      "id": "dining-note",
+      "chapter": "dining",
+      "member": "wanjiru",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "joplin",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "take notes and keep to-dos that sync across your devices through your own server",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A note holds the colour code",
+        "body": "A scuff in the hall needs touch-up paint. Wanjiru finds the colour code in an old note at the trestle table. Her notes sync to Joplin Server on the Core.",
+        "chips": [
+          "Joplin Server",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "dining-plant",
+      "chapter": "dining",
+      "member": "juma",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history, with photos and a garden journal",
+      "anchor": {
+        "role": "room",
+        "room": "dining"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right",
+        "eye": "low"
+      },
+      "popup": {
+        "title": "The brown leaf has a history",
+        "body": "A leaf on the peace lily has browned. Juma checks its HortusFox page: last watered ten days ago. He fills the can and logs the date.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "juma",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book and meal planner for the household",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The paper list leaves the fridge",
+        "body": "Juma copies the paper list from the fridge door into KitchenOwl: rice, cardamom, nappies. The same list reaches Wanjiru’s phone from the Core.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-plan",
+      "chapter": "kitchen",
+      "member": "juma",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "kitchenowl",
+        "replaces": []
+      },
+      "capability": "a shared grocery list, recipe book and meal planner for the household",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Wednesday’s greens come from the garden",
+        "body": "For Wednesday, Juma puts sukuma wiki on the meal plan in KitchenOwl. The greens come from the garden, so he leaves them off the shopping list.",
+        "chips": [
+          "KitchenOwl"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-swap",
+      "chapter": "kitchen",
+      "member": "juma",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "iCloud"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Thursday’s call moves lunch to Juma",
+        "body": "Wanjiru adds a Thursday call to the family calendar in Nextcloud. Juma sees it on his phone, served from the Core, and takes over the lunch job.",
+        "chips": [
+          "Nextcloud",
+          "replaces iCloud"
+        ]
+      }
+    },
+    {
+      "id": "nursery-rhymes",
+      "chapter": "nursery",
+      "member": "zuri",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Apple Podcasts"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
+      "anchor": {
+        "role": "crib",
+        "fallback": [
+          {
+            "role": "bed"
+          },
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Zuri sleeps halfway through a rhyme",
+        "body": "After the morning feed, Zuri falls asleep in the glider halfway through a rhyme podcast. Audiobookshelf keeps the place, and the episodes are downloaded to the Core.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Apple Podcasts"
+        ]
+      }
+    },
+    {
+      "id": "garden-beans",
+      "chapter": "garden",
+      "member": "juma",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history, with photos and a garden journal",
+      "anchor": {
+        "role": "deck",
+        "nth": 3,
+        "fallback": [
+          {
+            "role": "garden",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Last year’s journal picks the spot",
+        "body": "Beside the pergola deck, Juma checks last year’s HortusFox journal to choose where the beans climb. The journal stays on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-read",
+      "chapter": "garden",
+      "member": "wanjiru",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Amazon Kindle"
+        ]
+      },
+      "capability": "read ebooks in your browser, with notes and highlights; your library lives on your Core",
+      "anchor": {
+        "role": "deck",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "garden",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right",
+        "eye": "seated"
+      },
+      "popup": {
+        "title": "Wanjiru reads on the patio",
+        "body": "At lunch on a patio lounger, Wanjiru reads a programming book from her own library in Koodo Reader. The library is stored on the Core.",
+        "chips": [
+          "Koodo Reader",
+          "replaces Amazon Kindle"
+        ]
+      }
+    },
+    {
+      "id": "garden-seeds",
+      "chapter": "garden",
+      "member": "juma",
+      "agent": "juma",
+      "approval": "juma",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "garden",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Juma posts the seedling swap himself",
+        "body": "Juma messages Biscuit the seedlings he has spare. Biscuit drafts a post for the neighbourhood swap on the Core’s local model. Juma reads it and posts it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Companion Agents are in beta. Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "juma",
+        "text": "Here is the swap post. Read it, then post it when you are ready."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core in the garden cottage",
+        "body": "Code, lists, plants and a baby’s first months sit on one Companion Core in a small garden cottage."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your code, shopping lists, pictures and plants can sit on one Companion Core at home. Browse the Companion Hub store, and pick the first apps for your house.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Garden Nook has no desk item. Wanjiru's beats anchor on room:office and the text names what the nook has: a rattan armchair, a lamp, a bird of paradise.",
+    "No TV and no kitchen island in this home. The couch media beat is the Immich album on the loveseat; the kitchen beats anchor on the fridge, the range and the counter.",
+    "The validator wants one beat for a member under thirteen, so Zuri owns nursery-rhymes; she is otherwise seen through her parents' beats.",
+    "Duplicati names a disk beside the Core (catalog cloud-link caveat: name a local disk). The restore is told as the point of a backup, with no reliability claim.",
+    "Both companions are Hermes. All three Hermes beats carry the chat-service note; the two later ones add the Companion Agents beta line.",
+    "Garden walk: the pergola deck at the rear, the east patio loungers, then the front shrub bed beside the street.",
+    "Code Server and Ollama have no QA screenshot and are not used. Open WebUI, Paperless-ngx, VaultWarden and Yuvomi are left out: the fleet already names them in over 40 percent of families.",
+    "The phone popups (ftue-join, ftue-pick) are not in the film."
+  ]
+}

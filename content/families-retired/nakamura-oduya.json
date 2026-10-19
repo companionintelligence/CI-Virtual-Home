@@ -1,0 +1,845 @@
+{
+  "schema": "family/v1",
+  "slug": "nakamura-oduya",
+  "house": "gardennook",
+  "fictional": true,
+  "family": {
+    "surname": "Nakamura-Oduya",
+    "tagline": "Cut flowers, a new baby, and an order list on the shelf.",
+    "household": "young-family",
+    "business": true,
+    "story": "Ren grows cut flowers for the Saturday market and a flower-share list. Kemi designs for clients from a glass nook beside the beds. Their baby, Haru, sleeps through most of it.",
+    "address": {
+      "line": "19 Orchard Moth Road",
+      "place": "Whistling Flat"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "ren",
+      "name": "Ren",
+      "age": 31,
+      "role": "partner",
+      "work": "flower grower, markets and subscriptions",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Hana",
+        "runtime": "OpenClaw",
+        "job": "Opens HortusFox in its own browser and logs each bed's sowing dates.",
+        "personality": [
+          "cheerful",
+          "curious",
+          "playful"
+        ],
+        "voice": "v-bright-f",
+        "memory": false,
+        "limits": "Logs what Ren reads out. Ren checks the entry."
+      }
+    },
+    {
+      "id": "kemi",
+      "name": "Kemi",
+      "age": 33,
+      "role": "partner",
+      "work": "graphic designer, works from home",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Bisi",
+        "runtime": "Hermes",
+        "job": "Drafts the weekly flower-share note from what Kemi texts it.",
+        "personality": [
+          "quick",
+          "wry",
+          "bright"
+        ],
+        "voice": "v-young-f",
+        "memory": false,
+        "limits": "Drafts only. Kemi sends the note."
+      }
+    },
+    {
+      "id": "haru",
+      "name": "Haru",
+      "age": 0,
+      "role": "baby",
+      "work": "baby, ten months",
+      "colour": "chart-3"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "Before light, the kitchen"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Dawn, the beds"
+    },
+    {
+      "id": "nook",
+      "kind": "room",
+      "room": "office",
+      "title": "Morning, the garden nook"
+    },
+    {
+      "id": "nursery",
+      "kind": "room",
+      "room": "kids",
+      "title": "Naptime, Haru's room"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "Afternoon, the dining table"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "Evening, by the fire"
+    },
+    {
+      "id": "deck",
+      "kind": "outside",
+      "room": "patio",
+      "title": "Dusk, the deck"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "member": "ren",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel by the porch column",
+        "body": "A parcel leans against the white porch column. Ren carries it through the entry and the dining room to the shelf in the living room."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "member": "kemi",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Four things in the parcel",
+        "body": "Kemi unpacks the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The footprint is about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "member": "ren",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "While Haru naps, Ren plugs in the cable and presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "member": "kemi",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Kemi joins from her phone",
+        "body": "Kemi joins the Core's own network from her phone. She picks the home network from the list and enters its password.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "member": "ren",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "hortusfox",
+        "nocodb",
+        "listmonk"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick your first agents and apps",
+        "body": "In Companion Hub, Ren picks OpenClaw and Kemi picks Hermes. They add HortusFox, NocoDB and Listmonk, then go to make tea.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: HortusFox, NocoDB",
+            "Apps: Listmonk"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "kemi",
+      "agent": "kemi",
+      "approval": "kemi",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Bisi says good morning",
+        "body": "Kemi texts the agent she named Bisi. Bisi replies, and the Core is running.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "kemi",
+        "text": "Morning, Kemi. Bisi here. Your move."
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-orders",
+      "chapter": "kitchen",
+      "member": "ren",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nocodb",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "turn a database into a spreadsheet-style app without writing code",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Every subscriber is a row",
+        "body": "Before dawn, Ren opens the order sheet in NocoDB at the counter. Each flower-share subscriber is a row, and he ticks off the bunches as they are cut.",
+        "chips": [
+          "NocoDB",
+          "replaces Airtable"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-note",
+      "chapter": "kitchen",
+      "member": "kemi",
+      "agent": "kemi",
+      "approval": "kemi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "listmonk"
+      ],
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Bisi drafts the flower-share note",
+        "body": "Kemi texts Bisi this week's blooms. Bisi drafts the subscriber note. Kemi reads it and sends it from Listmonk herself."
+      },
+      "say": {
+        "speaker": "kemi",
+        "text": "Draft ready. Please read it before you send it."
+      }
+    },
+    {
+      "id": "kitchen-meals",
+      "chapter": "kitchen",
+      "member": "kemi",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals, notes and contacts",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "The week's dinners, planned",
+        "body": "Kemi plans the week's dinners in Yuvomi at the range. The shopping list sits in the same app, so Ren shops from his phone.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "garden-sowing",
+      "chapter": "garden",
+      "member": "ren",
+      "agent": "ren",
+      "approval": "ren",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Hana logs the sowing dates",
+        "body": "Ren reads out the dahlia bed's sowing dates. Hana opens HortusFox in its own browser and logs each one. Ren checks the entry.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "say": {
+        "speaker": "ren",
+        "text": "Dates logged. Please check the entry."
+      },
+      "film": true
+    },
+    {
+      "id": "garden-photos",
+      "chapter": "garden",
+      "member": "kemi",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "mazanoke",
+        "replaces": []
+      },
+      "capability": "resize and compress images in the browser; nothing is uploaded",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "Bouquet photos, shrunk to fit",
+        "body": "On the deck, Kemi shrinks the morning's bouquet photos in Mazanoke so they fit the flower-share note. Nothing is uploaded.",
+        "chips": [
+          "Mazanoke"
+        ]
+      }
+    },
+    {
+      "id": "nook-label",
+      "chapter": "nook",
+      "member": "kemi",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "penpot",
+        "replaces": [
+          "Figma"
+        ]
+      },
+      "capability": "design and prototype in a web-based design tool you host",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A label drawn at home",
+        "body": "Kemi lays out the new flower-share label in Penpot, a design tool hosted on the Core. She works in the glass nook, beside the beds.",
+        "chips": [
+          "Penpot",
+          "replaces Figma"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "nook-files",
+      "chapter": "nook",
+      "member": "kemi",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Dropbox"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Client files, synced from the nook",
+        "body": "Kemi keeps her design clients' files in Nextcloud on the Core. The nook laptop and her phone sync the same folders.",
+        "chips": [
+          "Nextcloud",
+          "replaces Dropbox"
+        ]
+      }
+    },
+    {
+      "id": "nook-calendar",
+      "chapter": "nook",
+      "member": "ren",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "a small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "room",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "One calendar for stall days",
+        "body": "Ren and Kemi share the market calendar in Baikal: stall days, delivery days and wedding dates. Both phones read the same calendar.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      }
+    },
+    {
+      "id": "nursery-photos",
+      "chapter": "nursery",
+      "member": "haru",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "crib",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Haru's first year, kept here",
+        "body": "Ren adds Haru's ten-month photos to Immich beside the crib. The first-year album grows on the Core, next to the flower pictures.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "dining-wedding",
+      "chapter": "dining",
+      "member": "ren",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A wedding enquiry, logged",
+        "body": "A wedding planner asks for September bunches. Ren adds the enquiry to Twenty at the dining table, with her color list.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      }
+    },
+    {
+      "id": "dining-quote",
+      "chapter": "dining",
+      "member": "kemi",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "invoice-ninja",
+        "replaces": [
+          "FreshBooks"
+        ]
+      },
+      "capability": "send invoices and quotes, track expenses and time",
+      "anchor": {
+        "role": "dining-table",
+        "room": "dining",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The quote, checked against orders",
+        "body": "Kemi writes the wedding quote in Invoice Ninja. Ren checks the bunches against the order sheet before it is sent.",
+        "chips": [
+          "Invoice Ninja",
+          "replaces FreshBooks"
+        ]
+      }
+    },
+    {
+      "id": "living-music",
+      "chapter": "living",
+      "member": "kemi",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "couch"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A lullaby folder on the couch",
+        "body": "As Haru drifts off, Kemi plays the lullaby folder from Navidrome on her phone. It streams from the Core, and the room goes quiet.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-takings",
+      "chapter": "living",
+      "member": "ren",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "grist",
+        "replaces": [
+          "Airtable"
+        ]
+      },
+      "capability": "a spreadsheet-database with real Python formulas, stored as a SQLite file you can copy",
+      "anchor": {
+        "role": "fireplace",
+        "room": "living",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The week's takings, added up",
+        "body": "By the fire, Ren totals the week's stall takings in Grist. Its formulas add up each market day, and the table is a SQLite file he can copy.",
+        "chips": [
+          "Grist",
+          "replaces Airtable"
+        ]
+      }
+    },
+    {
+      "id": "living-backup",
+      "chapter": "living",
+      "member": "ren",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "duplicati",
+        "replaces": [
+          "Backblaze"
+        ]
+      },
+      "capability": "back up your files with encryption before they leave your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A copy on a local disk",
+        "body": "Ren points Duplicati at a local disk beside the Core. It backs up the order sheet and Haru's photos, with encryption before they leave the Core.",
+        "chips": [
+          "Duplicati",
+          "replaces Backblaze"
+        ]
+      }
+    },
+    {
+      "id": "living-watch",
+      "chapter": "living",
+      "member": "ren",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "uptime-kuma",
+        "replaces": []
+      },
+      "capability": "watch your sites and services and get an alert when one goes down",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A status page for the farm",
+        "body": "Ren adds the order sheet and the photo library to Uptime Kuma. If either goes down, it alerts him.",
+        "chips": [
+          "Uptime Kuma"
+        ]
+      }
+    },
+    {
+      "id": "deck-card",
+      "chapter": "deck",
+      "member": "kemi",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "A reply for Ren's mother",
+        "body": "Kemi writes a reply to Ren's mother in English. LibreTranslate turns it into Japanese on the Core, and Ren checks the wording before it goes.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one shelf, one farm",
+        "body": "A grower, a designer and a baby, with a farm to run. The Nakamura-Oduya family keeps it on one Companion Core in the living room."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your orders, your photos and your seasons can live on a Companion Core at home. Start with one order sheet in NocoDB.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "Owner sign-off open: the FTUE hotspot flow is written as the owner specified and is not on the fact sheet (STORY-BIBLE section 15, item 1).",
+    "No TV in this home: the media beat is Navidrome at the couch and the text never says TV or screen. The Core stands on the living room shelf; there is no desk, so office beats use room:office (the Garden Nook) with the couch as fallback.",
+    "living-watch is the iot beat: Uptime Kuma carries the catalog's IoT tag and watches services on the Core. Home Assistant was dropped because the fleet is over its cap. It makes no uptime promise.",
+    "living-backup: Duplicati's catalog caveat says name a local disk, which the text does. The words \"with encryption before they leave the Core\" copy the listing; no stronger security claim is made.",
+    "deck-card: LibreTranslate turns the reply into Japanese; check that Japanese is among the language models a Core installs (Yoruba was deliberately not used). Ren, not the app, confirms the wording.",
+    "kitchen-note: Listmonk needs an SMTP provider to send at volume (catalog caveat); the text claims no delivery. HortusFox runs under OpenClaw's own browser on the Core, so no website note is needed.",
+    "Voice-over lexicon: Nakamura, Oduya, Ren, Kemi, Haru, Hana, Bisi, Whistling Flat, HortusFox, NocoDB, Listmonk, Mazanoke, Penpot, Duplicati, LibreTranslate, Navidrome, Grist.",
+    "Street Orchard Moth Road and town Whistling Flat are invented; the human map check is still open."
+  ]
+}

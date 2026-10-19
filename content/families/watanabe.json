@@ -1,0 +1,938 @@
+{
+  "schema": "family/v1",
+  "slug": "watanabe",
+  "house": "riverbend",
+  "fictional": true,
+  "family": {
+    "surname": "Watanabe",
+    "tagline": "Three generations, one Companion Core and a river behind the house.",
+    "household": "grandparents",
+    "business": false,
+    "story": "Yoshiko cooks for the whole house, and Haruo, a retired surveyor, keeps his record collection and his photographs. Their daughter Emi writes software upstairs, nine-year-old Kenji studies down the hall, and baby Sora sleeps in the nursery. One Companion Core sits on a credenza in the Family Room.",
+    "address": {
+      "line": "18 Sedgewater Lane",
+      "place": "Ellsworth Green"
+    },
+    "narrator": "v-storyteller-m"
+  },
+  "members": [
+    {
+      "id": "yoshiko",
+      "name": "Yoshiko",
+      "age": 67,
+      "role": "grandparent",
+      "work": "cooks for the whole house",
+      "colour": "chart-1",
+      "archetype": "host",
+      "companion": {
+        "name": "Cinnamon",
+        "runtime": "Hermes",
+        "job": "Drafts recipe cards from the steps Yoshiko messages to it.",
+        "personality": [
+          "gentle",
+          "tidy",
+          "warm"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Yoshiko reads every card and saves it herself."
+      }
+    },
+    {
+      "id": "haruo",
+      "name": "Haruo",
+      "age": 70,
+      "role": "grandparent",
+      "work": "retired surveyor, keeps a record collection",
+      "colour": "chart-2",
+      "archetype": "maker",
+      "companion": {
+        "name": "Sesame",
+        "runtime": "Hermes",
+        "job": "Drafts captions for Haruo’s photographs from the notes he sends.",
+        "personality": [
+          "dry",
+          "calm",
+          "exact"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Drafts only. Haruo reads every caption and adds it himself."
+      }
+    },
+    {
+      "id": "emi",
+      "name": "Emi",
+      "age": 38,
+      "role": "parent",
+      "work": "backend developer, works from home",
+      "colour": "chart-3",
+      "archetype": "builder",
+      "companion": {
+        "name": "Chestnut",
+        "runtime": "Hermes",
+        "job": "Drafts issue write-ups from the errors and notes Emi sends.",
+        "personality": [
+          "brisk",
+          "precise",
+          "patient"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Drafts only. Emi reads each write-up and files it herself."
+      }
+    },
+    {
+      "id": "kenji",
+      "name": "Kenji",
+      "age": 9,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-4",
+      "archetype": "learner"
+    },
+    {
+      "id": "sora",
+      "name": "Sora",
+      "age": 0,
+      "role": "baby",
+      "colour": "chart-5"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The Family Room"
+    },
+    {
+      "id": "kenji",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Kenji’s room"
+    },
+    {
+      "id": "nursery",
+      "kind": "room",
+      "room": "kids",
+      "title": "The nursery"
+    },
+    {
+      "id": "emi",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Emi’s room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out by the pond"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Kenji holds the door for Haruo",
+        "body": "A Companion Core arrives in a parcel at the top of three stone steps. Haruo carries it inside, and Kenji holds the door."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Yoshiko clears the credenza, and Emi lifts the Core out."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Haruo plugs in the cable, and Kenji presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Emi opens the Wi-Fi settings on her phone and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "homehub",
+        "immich"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Yoshiko picks Hermes, and the family adds HomeHub and Immich. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: HomeHub, Immich"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "yoshiko",
+      "agent": "yoshiko",
+      "approval": "yoshiko",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick, on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Cinnamon answers the first message",
+        "body": "Yoshiko messages the agent she named Cinnamon. Cinnamon answers from the Core on the credenza.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "yoshiko",
+        "text": "Good morning, Yoshiko. I am Cinnamon. Which recipe comes first?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-scratch",
+      "chapter": "living",
+      "member": "haruo",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "music",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 2
+          },
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Haruo plays the clean copy",
+        "body": "Side two of his favourite record skips. Haruo plays the copy he digitised himself, served by Navidrome from his own collection on the Core.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-chapter",
+      "chapter": "living",
+      "member": "kenji",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "audiobookshelf",
+        "replaces": [
+          "Audible"
+        ]
+      },
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kenji picks up where he stopped",
+        "body": "After school Kenji settles on the sofa and presses play. The family’s own audiobooks come from the Core, and Audiobookshelf keeps his place.",
+        "chips": [
+          "Audiobookshelf",
+          "replaces Audible"
+        ]
+      }
+    },
+    {
+      "id": "living-field",
+      "chapter": "living",
+      "member": "haruo",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Haruo types up the field books",
+        "body": "Old survey field books fill the low shelf. Haruo types them into BookStack, one book for each survey, and the wiki sits on the Core, with search.",
+        "chips": [
+          "BookStack",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "living-caption",
+      "chapter": "living",
+      "member": "haruo",
+      "agent": "haruo",
+      "approval": "haruo",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick, on your Core",
+      "anchor": {
+        "role": "toys",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Haruo corrects Sesame’s caption",
+        "body": "The willow photograph has no caption yet. Haruo messages Sesame the date and light, and Sesame drafts one on the Core. Haruo corrects the lens and adds it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "haruo",
+        "text": "Here is the caption. Please read it and correct what is wrong."
+      }
+    },
+    {
+      "id": "kenji-river",
+      "chapter": "kenji",
+      "member": "kenji",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Kenji looks up a river word",
+        "body": "Haruo says rivers meander, and Kenji wants the word explained. Kiwix serves the article from a Wikipedia file downloaded once, so no search engine sees his question.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kenji-bridge",
+      "chapter": "kenji",
+      "member": "kenji",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "a whiteboard with a hand-drawn look; sketch ideas together",
+      "anchor": {
+        "role": "toys",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "bed",
+            "room": "bedroom",
+            "nth": 3
+          },
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kenji sketches a water wheel",
+        "body": "Beside the toy box, Kenji sketches a school water wheel in Excalidraw. Haruo, a retired surveyor, adds the measurements, and the board is served from the Core.",
+        "chips": [
+          "Excalidraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "nursery-light",
+      "chapter": "nursery",
+      "member": "yoshiko",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "crib",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Yoshiko sets the morning lamp",
+        "body": "Yoshiko sets the nursery globe lamp to come up warm at seven each morning. Home Assistant runs the rule from the Core, and the app needs no cloud account.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ]
+      }
+    },
+    {
+      "id": "nursery-list",
+      "chapter": "nursery",
+      "member": "sora",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses, with a recipe book",
+      "anchor": {
+        "role": "room",
+        "room": "kids",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Emi adds nappies to the list",
+        "body": "Nappies run low on the changing table. Emi adds them to the HomeHub shopping list, and Yoshiko sees the line before her market run.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "emi-hours",
+      "chapter": "emi",
+      "member": "emi",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Emi plans around the nap",
+        "body": "Between calls, Emi blocks Tuesday’s quiet work hours around Sora’s nap. Companion Planning stores the week as a local file on the Core.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "emi-quiz",
+      "chapter": "emi",
+      "member": "emi",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "gitea",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host private Git repositories, pull requests and issues on your Core",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "bedroom",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Emi commits Kenji’s first quiz",
+        "body": "Emi and Kenji code a river quiz on her bed, and she commits it to Gitea. The history sits on the Core, not on a rented code host.",
+        "chips": [
+          "Gitea",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "emi-issue",
+      "chapter": "emi",
+      "member": "emi",
+      "agent": "emi",
+      "approval": "emi",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick, on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Emi files the issue herself",
+        "body": "At her writing desk, Emi sends Chestnut an error and her notes. Chestnut drafts the write-up on the Core’s local model. Emi reads it, then files it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "emi",
+        "text": "Here is the issue. Please read it before you file it."
+      }
+    },
+    {
+      "id": "kitchen-pickles",
+      "chapter": "kitchen",
+      "member": "yoshiko",
+      "agent": "yoshiko",
+      "approval": "yoshiko",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "talks to you through the messaging platform you pick, on your Core",
+      "anchor": {
+        "role": "range",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter",
+            "room": "kitchen",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Yoshiko writes down her mother’s pickles",
+        "body": "Stirring brine at the range, Yoshiko messages Cinnamon the steps as she remembers them. Cinnamon drafts a recipe card, and Yoshiko corrects the salt and saves it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "yoshiko",
+        "text": "Here is the card. Please check the salt and the steps."
+      }
+    },
+    {
+      "id": "kitchen-split",
+      "chapter": "kitchen",
+      "member": "yoshiko",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses, with a recipe book",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Yoshiko enters the market bill",
+        "body": "The week’s market receipt lands on the counter. Yoshiko enters it in the HomeHub expense tracker, and Emi reads the spending on the Core.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-boiler",
+      "chapter": "kitchen",
+      "member": "yoshiko",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub for notes, shopping, chores and expenses, with a recipe book",
+      "anchor": {
+        "role": "fridge",
+        "room": "kitchen",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "counter",
+            "room": "kitchen",
+            "nth": 2
+          },
+          {
+            "role": "room",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Haruo finds the boiler steps",
+        "body": "The boiler stops one cold morning, and Haruo finds the reset steps in the HomeHub notes. Yoshiko typed them from the curling paper note by the fridge.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "garden-willow",
+      "chapter": "garden",
+      "member": "haruo",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "anchor": {
+        "role": "garden",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "wide",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Haruo photographs the willow again",
+        "body": "Each month Haruo photographs the same willow from the same spot, like a survey. Immich keeps each month’s picture in one timeline, from a library on the Core.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ],
+        "note": "Immich sorts the pictures, so its first start takes a while."
+      }
+    },
+    {
+      "id": "garden-geese",
+      "chapter": "garden",
+      "member": "yoshiko",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "garden",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "right",
+        "eye": "low"
+      },
+      "popup": {
+        "title": "Yoshiko checks when the geese came",
+        "body": "On Wednesday morning, Yoshiko scrolls the lawn camera’s Frigate clips to see when the geese came back. The camera is the family’s own, and the clips sit on the Core.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core for three generations",
+        "body": "Records, recipes, code and homework share one Companion Core in the brick house beside the river."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your records, recipes, photographs and code can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The house has no TV, kitchen island or fireplace. The couch media beat is Kenji’s audiobook on the Family Room sofa; Haruo’s record beat anchors on the record player.",
+    "Sora is a baby: no archetype, no companion. The validator needs one beat with member sora, so nursery-list is hers; Emi acts in it. She also appears in the planning beat.",
+    "garden-geese assumes an IP camera the family owns on the lawn (not part of the Core); nothing shows a person.",
+    "Home Assistant runs the nursery lamp only if the bulb is a network device; no hub stick is implied. The no-cloud-account line is about the app, not the lamp.",
+    "All three companions are Hermes. The chat-service note rides on every Hermes beat; Companion Memory is not named.",
+    "Immich first-start caveat rides in the note of garden-willow. Excalidraw is amd64 only (catalog caveat). BookStack and Excalidraw were picked because HortusFox, Open WebUI and Obsidian are already over the fleet cap.",
+    "Chapters follow the walk: Family Room (east, ground floor), Bedroom Three, the Nursery, Bedroom Two, then down to the Kitchen and out to the pond lawn."
+  ]
+}

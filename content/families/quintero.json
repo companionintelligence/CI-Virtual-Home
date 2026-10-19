@@ -1,0 +1,912 @@
+{
+  "schema": "family/v1",
+  "slug": "quintero",
+  "house": "cocoon",
+  "fictional": true,
+  "family": {
+    "surname": "Quintero",
+    "tagline": "Two parents, two children and one Companion Core on the living room mantel.",
+    "household": "young-family",
+    "business": false,
+    "story": "Marisol manages a clinic office and Andres works in devops. Camila, ten, and Mateo, seven, each have a room upstairs. One Companion Core on the living room mantel serves all four.",
+    "address": {
+      "line": "27 Marram Lane",
+      "place": "Corran Hill"
+    },
+    "narrator": "v-warm-f"
+  },
+  "members": [
+    {
+      "id": "marisol",
+      "name": "Marisol",
+      "age": 38,
+      "role": "parent",
+      "work": "clinic office manager",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Willow",
+        "runtime": "Hermes",
+        "job": "Drafts Marisol’s replies to the school and the swim club from her notes.",
+        "personality": [
+          "calm",
+          "precise",
+          "kind"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Drafts only. Marisol reads every message and sends it herself."
+      }
+    },
+    {
+      "id": "andres",
+      "name": "Andres",
+      "age": 40,
+      "role": "parent",
+      "work": "devops engineer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Thimble",
+        "runtime": "Hermes",
+        "job": "Drafts Andres’s weekly change notes for the family from his short messages.",
+        "personality": [
+          "steady",
+          "dry",
+          "practical"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Drafts only. Andres reads each note and sends it himself."
+      }
+    },
+    {
+      "id": "camila",
+      "name": "Camila",
+      "age": 10,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-3",
+      "archetype": "learner"
+    },
+    {
+      "id": "mateo",
+      "name": "Mateo",
+      "age": 7,
+      "role": "child",
+      "work": "primary school",
+      "colour": "chart-4",
+      "archetype": "maker"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "Living and family rooms"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "At the dining table"
+    },
+    {
+      "id": "camila",
+      "kind": "room",
+      "room": "kids",
+      "title": "Camila’s room"
+    },
+    {
+      "id": "mateo",
+      "kind": "room",
+      "room": "kids",
+      "title": "Mateo’s room"
+    },
+    {
+      "id": "den",
+      "kind": "room",
+      "room": "office",
+      "title": "Andres in the den"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel on the front step",
+        "body": "A parcel waits on the front step. Andres carries the Companion Core through the foyer to the living room."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Marisol lifts the Core out and sets it on the mantel."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Andres plugs in the cable and Mateo presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Marisol opens the Wi-Fi settings on her phone and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "yuvomi",
+        "kiwix"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Marisol picks Hermes, and the family adds Yuvomi and Kiwix. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Yuvomi, Kiwix"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "marisol",
+      "agent": "marisol",
+      "approval": "marisol",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Willow says hello",
+        "body": "Marisol messages Willow, the agent she named. Willow answers from the Core on the mantel beside her.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "marisol",
+        "text": "Good morning. I am Willow. What shall we start with?"
+      },
+      "film": true
+    },
+    {
+      "id": "living-plan",
+      "chapter": "living",
+      "member": "marisol",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Marisol blocks out her shifts",
+        "body": "On Saturday morning, from the chesterfield, Marisol blocks out her clinic shifts. Companion Planning keeps the time blocks in one local file on the Core.",
+        "chips": [
+          "Companion Planning"
+        ]
+      }
+    },
+    {
+      "id": "living-film",
+      "chapter": "living",
+      "member": "mateo",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Hers before lunch, his after",
+        "body": "Camila and Mateo take turns choosing: hers before lunch, his after. Jellyfin plays both from the family’s own files on the Core to the family room TV.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-bar",
+      "chapter": "kitchen",
+      "member": "andres",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Basil goes on the shopping list",
+        "body": "The herb pots by the window need basil, so Andres adds it to the shopping list in Yuvomi. The family shares that list, and its data sits on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-fridge",
+      "chapter": "kitchen",
+      "member": "marisol",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "The fee moves off the fridge",
+        "body": "A recorder-lesson fee is due on Friday, pinned to the fridge by a magnet. Marisol enters it in the budget in Yuvomi, and the figures sit on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "dining-forms",
+      "chapter": "dining",
+      "member": "marisol",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Marisol clears the table of forms",
+        "body": "School forms and bills crowd the farmhouse table. Marisol scans each one into Paperless-ngx on the Core, where every page is read and tagged.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "dining-thimble",
+      "chapter": "dining",
+      "member": "andres",
+      "agent": "andres",
+      "approval": "andres",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Three lines become a family note",
+        "body": "Andres types three scrappy lines to Thimble about what changed on the Core. Thimble turns them into a note Marisol can read, and Andres edits it and sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "andres",
+        "text": "Plain version is here. Cut whatever reads like a pipeline."
+      }
+    },
+    {
+      "id": "dining-vault",
+      "chapter": "dining",
+      "member": "marisol",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host; works with the Bitwarden apps",
+      "anchor": {
+        "role": "room",
+        "room": "dining"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Where the library password lives",
+        "body": "A password service would have held the school, library and swim club passwords. Marisol keeps them in one VaultWarden vault on the Core. VaultWarden works with the Bitwarden apps.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "dining-willow",
+      "chapter": "dining",
+      "member": "marisol",
+      "agent": "marisol",
+      "approval": "marisol",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A missed swim lesson, explained",
+        "body": "Marisol messages Willow about a missed swim lesson. Willow drafts the note to the coach on the Core’s local model. Marisol reads it and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "marisol",
+        "text": "Draft is ready, Marisol. Read it and change what you like."
+      }
+    },
+    {
+      "id": "camila-kiwix",
+      "chapter": "camila",
+      "member": "camila",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A bee project full of questions",
+        "body": "A bee project gives Camila a question every few minutes. Kiwix answers from a Wikipedia file the Core downloaded once, so no search engine is asked.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "camila-card",
+      "chapter": "camila",
+      "member": "camila",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Camila reads the newsletter aloud",
+        "body": "Grandmother reads Spanish, and the school newsletter is in English. Camila pastes one paragraph into LibreTranslate, which translates on the Core, and reads it out. Its models were downloaded once.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ]
+      }
+    },
+    {
+      "id": "camila-moon",
+      "chapter": "camila",
+      "member": "camila",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Camila maps the moon’s phases",
+        "body": "After school, Camila draws the moon’s phases in her Obsidian notes and labels each one. The notes are plain Markdown files on the Core.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "mateo-paint",
+      "chapter": "mateo",
+      "member": "mateo",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "librephotos",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "find photos by face, object and place, with albums built by date and location",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Mateo finishes a dragon",
+        "body": "At his easel, Mateo finishes a dragon, and Marisol photographs it. LibrePhotos builds albums by date on the Core, not in a photo cloud.",
+        "chips": [
+          "LibrePhotos",
+          "replaces Google Photos"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "mateo-blocks",
+      "chapter": "mateo",
+      "member": "mateo",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "blockbench",
+        "replaces": [
+          "MagicaVoxel"
+        ]
+      },
+      "capability": "model low-poly 3D art and Minecraft-style models in your browser",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One dragon, built twice",
+        "body": "On the floor cushion by the toy box, Mateo rebuilds the dragon in Blockbench, block by block. The Core serves the editor, and he saves the model himself.",
+        "chips": [
+          "Blockbench",
+          "replaces MagicaVoxel"
+        ]
+      }
+    },
+    {
+      "id": "den-repo",
+      "chapter": "den",
+      "member": "andres",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "couch",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The house scripts get a repository",
+        "body": "A devops engineer, Andres gives the house scripts a repository of their own. Forgejo keeps it, with its issues, on the Core, not on a rented code host.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "den-watch",
+      "chapter": "den",
+      "member": "andres",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "uptime-kuma",
+        "replaces": [
+          "Datadog"
+        ]
+      },
+      "capability": "watch your sites and services and get an alert when one goes down",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Andres watches the house’s apps",
+        "body": "On Sunday afternoon, Andres points Uptime Kuma at the family’s apps, and the checks run on the Core. When one stops answering, he gets an alert.",
+        "chips": [
+          "Uptime Kuma",
+          "replaces Datadog"
+        ]
+      }
+    },
+    {
+      "id": "den-dns",
+      "chapter": "den",
+      "member": "andres",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "NextDNS"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains for devices on your network at the DNS level",
+      "anchor": {
+        "role": "tv",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Andres changes who the TV asks",
+        "body": "In the den, Andres sets the TV to ask the Core for DNS. Pi-hole then blocks ad and tracker domains for it, and for any device that uses it.",
+        "chips": [
+          "Pi-hole",
+          "replaces NextDNS"
+        ]
+      }
+    },
+    {
+      "id": "garden-beans",
+      "chapter": "garden",
+      "member": "camila",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Whose row of beans is winning?",
+        "body": "Each child planted a row of beans in the garden beds. Camila logs the sprouts in HortusFox, a journal on the Core, while Mateo insists his row is winning.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, a busy house",
+        "body": "Forms, photos, code and one dragon live on a Companion Core, on the living room mantel."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your family’s forms, photos, repositories and homework can live on a Companion Core at home. Browse the Companion Hub store and choose your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Den has a sofa, an ottoman and nesting tables but no desk: Andres works from the sofa. His den beats anchor on the Den sofa and the Den TV, with room office as the tail; his Thimble beat sits at the dining table.",
+    "The living chapter spans the Living Room (couch beat, chesterfield is couch nth 2 in living) and the Family Room (tv nth 0, tv-stand); the Den TV (wall-tv) is used only in den-dns.",
+    "Mateo (maker) has Jellyfin as his persona-pool app in living-film. LibrePhotos and Blockbench are signature apps outside the maker pool. Blockbench is a static web build: the beat says he saves the model himself.",
+    "No code-server, Calibre-Web, Ollama, Open WebUI or Mealie: none needs a reviewed.json entry. Open WebUI was dropped from camila-moon to keep the fleet under its app cap.",
+    "Hermes beats carry the chat-service note. Pi-hole is told as one household instance for devices that use it for DNS. No Companion Memory is named. Companion Planning is told as Marisol's own planner; Yuvomi carries the household planning.",
+    "Kids rooms: room kids nth 0 is the Kids Room (desk, single bed), nth 1 the Kids Bedroom (easel, house bed, toy box). Nobody is shown asleep.",
+    "The hero Core sits at the fireplace mantel in the Living Room, so the copy says mantel; casting's coreSpot says shelf."
+  ]
+}

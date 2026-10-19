@@ -1,0 +1,920 @@
+{
+  "schema": "family/v1",
+  "slug": "kowalczyk-ferreira",
+  "house": "familyhouse-nora",
+  "fictional": true,
+  "family": {
+    "surname": "Kowalczyk-Ferreira",
+    "tagline": "Drums in the den, chisels in the workshop, files at home.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Wojtek restores furniture in the workshop on the lower level. Beatriz manages a dental office and the family calendar. Three kids, a drum kit and one Companion Core fill the house.",
+    "address": {
+      "line": "412 Tamarack Court",
+      "place": "Brindle Falls"
+    },
+    "narrator": "v-deep-m"
+  },
+  "members": [
+    {
+      "id": "wojtek",
+      "name": "Wojtek",
+      "age": 47,
+      "role": "parent",
+      "work": "furniture restorer",
+      "colour": "chart-1",
+      "companion": {
+        "name": "Bartek",
+        "runtime": "OpenClaw",
+        "job": "Opens Twenty in its own browser and logs each new commission.",
+        "personality": [
+          "practical",
+          "patient",
+          "steady"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Logs what Wojtek dictates. He reviews the entry."
+      }
+    },
+    {
+      "id": "beatriz",
+      "name": "Beatriz",
+      "age": 45,
+      "role": "parent",
+      "work": "dental office manager, hybrid",
+      "colour": "chart-2",
+      "companion": {
+        "name": "Lia",
+        "runtime": "Hermes",
+        "job": "Drafts the family calendar and appointment notes from what Beatriz texts it.",
+        "personality": [
+          "organized",
+          "brisk",
+          "clear"
+        ],
+        "voice": "v-clear-f",
+        "memory": true,
+        "limits": "Drafts only. Beatriz confirms every date."
+      }
+    },
+    {
+      "id": "davi",
+      "name": "Davi",
+      "age": 16,
+      "role": "teen",
+      "work": "drummer, practices in the Den",
+      "colour": "chart-3"
+    },
+    {
+      "id": "rafa",
+      "name": "Rafa",
+      "age": 12,
+      "role": "child",
+      "work": "school, bike",
+      "colour": "chart-4"
+    },
+    {
+      "id": "zofia",
+      "name": "Zofia",
+      "age": 8,
+      "role": "child",
+      "work": "school, shares a kids bedroom",
+      "colour": "chart-5"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen and dining room"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room and den"
+    },
+    {
+      "id": "workshop",
+      "kind": "room",
+      "room": "garage",
+      "title": "The workshop below"
+    },
+    {
+      "id": "kids",
+      "kind": "room",
+      "room": "kids",
+      "title": "The kids' bedroom"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Stoop, terrace and garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "wojtek",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel at the stoop",
+        "body": "A parcel waits at the top of the stoop. Wojtek has carried worse up it. He takes this one through the foyer and living room to the kitchen shelf."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "zofia",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unpacking the parcel",
+        "body": "Zofia unpacks the parcel: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. The Core covers about three quarters of a sheet of paper."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "davi",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "A cable, a button, a Core",
+        "body": "Davi plugs in the cable and presses the button. The Core wakes and opens a Wi-Fi network of its own.",
+        "note": "Companion OS is in beta."
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "wojtek",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "The phone finds the Core",
+        "body": "On his phone, Wojtek joins the Core's own Wi-Fi network, then picks the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "beatriz",
+      "with": [
+        "twenty",
+        "photoprism"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "First agents, first apps",
+        "body": "In Companion Hub, Beatriz picks Hermes and Wojtek picks OpenClaw. They add Companion Memory (beta), Twenty and PhotoPrism, then leave it to work.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Companion Memory (beta)",
+            "Apps: Twenty, PhotoPrism"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "member": "wojtek",
+      "agent": "wojtek",
+      "approval": "wojtek",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with its own browser and coding tools, running in its own sandbox",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Bartek reports for work",
+        "body": "Wojtek sends the first message to Bartek, the agent he named. Bartek answers, and the Core is running."
+      },
+      "say": {
+        "speaker": "wojtek",
+        "text": "Good morning, Wojtek. I am Bartek. What is the first job?"
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-lia",
+      "chapter": "kitchen",
+      "category": "productivity",
+      "segment": "consumer",
+      "member": "beatriz",
+      "agent": "beatriz",
+      "approval": "beatriz",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "baikal"
+      ],
+      "capability": "talks to you through the messaging platform you pick",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Lia drafts the week",
+        "body": "Beatriz texts Lia the week's appointments. Lia drafts the calendar, and Beatriz confirms every date in Baikal.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "beatriz",
+        "text": "Here is the week as a draft. Please check each date."
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-memory",
+      "chapter": "kitchen",
+      "category": "privacy",
+      "segment": "consumer",
+      "member": "beatriz",
+      "app": {
+        "id": "ci-memory",
+        "replaces": []
+      },
+      "capability": "keeps your digital life on your own disk; imports are opt-in",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Beatriz chooses what to connect",
+        "body": "Beatriz opens Companion Memory and chooses what to connect. Nothing is connected by default, and she can remove a source later."
+      }
+    },
+    {
+      "id": "kitchen-dinner",
+      "chapter": "kitchen",
+      "category": "food",
+      "segment": "consumer",
+      "member": "wojtek",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a recipe book and an expiry tracker",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "left"
+      },
+      "popup": {
+        "title": "Sunday dinner, with an expiry date",
+        "body": "Wojtek puts Sunday's dinner in the HomeHub recipe book. Beatriz checks the expiry tracker first, so the oldest vegetables get cooked first.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "den-share",
+      "chapter": "living",
+      "category": "home",
+      "segment": "consumer",
+      "member": "davi",
+      "app": {
+        "id": "pairdrop",
+        "replaces": [
+          "AirDrop"
+        ]
+      },
+      "capability": "send files between phones and laptops on the same Wi-Fi",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "From his phone to the laptop",
+        "body": "Davi sends last night's drum take from his phone to the family laptop with PairDrop. The file travels over the home Wi-Fi.",
+        "chips": [
+          "PairDrop",
+          "replaces AirDrop"
+        ]
+      }
+    },
+    {
+      "id": "den-drums",
+      "chapter": "living",
+      "category": "creative",
+      "segment": "consumer",
+      "member": "davi",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "Adobe Audition"
+        ]
+      },
+      "capability": "edit audio in a browser tab. Cut, fade, normalise, export",
+      "anchor": {
+        "role": "music",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A drum take, trimmed",
+        "body": "Davi cuts and fades the take in AudioMass, an audio editor in a browser tab. The drums stay in the Den.",
+        "chips": [
+          "AudioMass",
+          "replaces Adobe Audition"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "rafa",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Choosing takes longer than watching",
+        "body": "Rafa takes a long time to choose a film in Jellyfin. The Den TV plays it from the family's library on the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "living-couch",
+      "chapter": "living",
+      "category": "media",
+      "segment": "consumer",
+      "member": "davi",
+      "app": {
+        "id": "mstream",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music from your Core to a browser or an app",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Playback on the couch",
+        "body": "On the couch, Davi plays last night's takes back through mStream. It streams his music from the Core to his phone.",
+        "chips": [
+          "mStream",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "workshop-commission",
+      "chapter": "workshop",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "wojtek",
+      "agent": "wojtek",
+      "approval": "wojtek",
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "desk",
+        "room": "garage",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Bartek logs the sideboard",
+        "body": "A walnut sideboard arrives. Wojtek dictates the job, and Bartek opens Twenty in its own browser to log it. Wojtek reviews the entry.",
+        "chips": [
+          "Twenty",
+          "replaces Salesforce"
+        ]
+      },
+      "say": {
+        "speaker": "wojtek",
+        "text": "Commission logged. Please check the entry."
+      },
+      "film": true
+    },
+    {
+      "id": "workshop-photos",
+      "chapter": "workshop",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "wojtek",
+      "app": {
+        "id": "photoprism",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "browse and share your photo library, with automatic tagging",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The sideboard gets a photo album",
+        "body": "Wojtek adds the day's pictures of the sideboard to PhotoPrism. It tags them automatically, without uploading them anywhere.",
+        "chips": [
+          "PhotoPrism",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "workshop-board",
+      "chapter": "workshop",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "wojtek",
+      "app": {
+        "id": "planka",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "capability": "a real-time Kanban board for a team or a family project",
+      "anchor": {
+        "role": "desk",
+        "room": "garage",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The job board moves a card",
+        "body": "Wojtek drags the sideboard's card from Stripping to Finishing on a Planka board. Beatriz sees the same board on her phone.",
+        "chips": [
+          "Planka",
+          "replaces Trello"
+        ]
+      }
+    },
+    {
+      "id": "workshop-quote",
+      "chapter": "workshop",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "beatriz",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "desk",
+        "room": "garage",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Quote and terms in one PDF",
+        "body": "Beatriz merges the sideboard's quote and terms into one PDF with Stirling-PDF. The merge runs on the Core.",
+        "chips": [
+          "Stirling-PDF",
+          "replaces Adobe Acrobat"
+        ]
+      }
+    },
+    {
+      "id": "workshop-invoice",
+      "chapter": "workshop",
+      "category": "small-business",
+      "segment": "small-business",
+      "member": "beatriz",
+      "app": {
+        "id": "akaunting",
+        "replaces": [
+          "QuickBooks"
+        ]
+      },
+      "capability": "invoicing, expenses, customers and profit and loss for a small business",
+      "anchor": {
+        "role": "desk",
+        "room": "garage",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Friday means invoices",
+        "body": "On Friday, Beatriz writes the sideboard's invoice in Akaunting. The invoice, the customer and the books all sit on the Core.",
+        "chips": [
+          "Akaunting",
+          "replaces QuickBooks"
+        ]
+      }
+    },
+    {
+      "id": "garage-bike",
+      "chapter": "workshop",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "rafa",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites",
+      "anchor": {
+        "role": "bicycle",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "garage"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "low"
+      },
+      "popup": {
+        "title": "A bike repair with a reference",
+        "body": "Rafa looks up how a bike gear works in Kiwix, the bicycle upside down in the garage. The reference pages sit on the Core.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ]
+      }
+    },
+    {
+      "id": "kids-quest",
+      "chapter": "kids",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "rafa",
+      "app": {
+        "id": "habitica",
+        "replaces": [
+          "Habitify"
+        ]
+      },
+      "capability": "turn habits and chores into a game with levels and quests",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Chores become a quest",
+        "body": "The chore list is a quest now. Rafa beats the laundry dragon in Habitica, which turns habits and chores into levels.",
+        "chips": [
+          "Habitica",
+          "replaces Habitify"
+        ]
+      }
+    },
+    {
+      "id": "kids-dragon",
+      "chapter": "kids",
+      "category": "kids",
+      "segment": "consumer",
+      "member": "zofia",
+      "app": {
+        "id": "excalidraw",
+        "replaces": [
+          "Miro"
+        ]
+      },
+      "capability": "a whiteboard with a hand-drawn look. Sketch ideas together",
+      "anchor": {
+        "role": "toys",
+        "room": "kids",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The dragon gets drawn",
+        "body": "Zofia sketches the laundry dragon on an Excalidraw whiteboard. The hand-drawn look suits a creature with five legs.",
+        "chips": [
+          "Excalidraw",
+          "replaces Miro"
+        ]
+      }
+    },
+    {
+      "id": "garden-stoop",
+      "chapter": "garden",
+      "category": "iot",
+      "segment": "consumer",
+      "member": "wojtek",
+      "app": {
+        "id": "frigate",
+        "replaces": [
+          "Ring"
+        ]
+      },
+      "capability": "a local video recorder with object detection for your IP cameras",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "The stoop camera files its clips",
+        "body": "Wojtek mounts an IP camera at the top of the stoop. It streams to Frigate, and the clips stay on the Core.",
+        "chips": [
+          "Frigate",
+          "replaces Ring"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "garden-terrace",
+      "chapter": "garden",
+      "category": "home",
+      "segment": "consumer",
+      "member": "beatriz",
+      "app": {
+        "id": "trip",
+        "replaces": []
+      },
+      "capability": "save places on a map and plan multi-day trips with a budget",
+      "anchor": {
+        "role": "patio-seat",
+        "fallback": [
+          {
+            "role": "deck"
+          },
+          {
+            "role": "garden"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The summer trip, planned outside",
+        "body": "On the terrace, Beatriz plans the summer trip in TRIP: places pinned on a map and days put in order.",
+        "chips": [
+          "TRIP"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "garden",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A loud house, one calm Core",
+        "body": "The Kowalczyk-Ferreira household of five runs its commissions, calendars and drum takes from one Core on a kitchen shelf."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your next commission, its photos and its invoice can live on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "FTUE follows the owner's hotspot flow (STORY-BIBLE section 7); owner sign-off against the fact sheet is still open.",
+    "ftue-hello uses OpenClaw (Bartek), so the Hermes disclosure note sits on kitchen-lia, the first Hermes beat.",
+    "garden-stoop assumes the family owns an IP camera: it is not in the Core parcel and not in the 3D scene. No claim that it prevents anything.",
+    "The front door is above ground (a stoop up through terraced planters); ftue-delivery tells the carry to the kitchen shelf.",
+    "Davi's takes: no claim about who can or cannot open them. Invented place and street: check Brindle Falls and Tamarack Court against a map."
+  ]
+}

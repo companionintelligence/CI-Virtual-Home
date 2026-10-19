@@ -1,0 +1,435 @@
+// The HTML the story build writes: a family's page, which is the landing page for that household. It shares its chrome with the homes' own
+// pages (the four company links, the privacy and terms links, the footer). Pure functions of the data; scripts/story/site.mts calls them.
+// Every string a visitor reads is in the Uncloud voice (no dashes, sentence case headings) and every claim is on the fact sheet, in
+// claims.json or in the family's own file; scripts/story/check-copy.mts lints the built pages.
+//
+// THE PAGE (an ad's landing page: it reads with no JavaScript and no WebGL, in an in-app browser too; the tour is an enhancement):
+//   above the fold   the family's name, the tagline, a picture of the home, "Take the tour" (the player) and "See Companion Core"
+//                    (https://ci.computer/core, awareness, not "Buy"), one honest line about the 3D, and the disclosure strip
+//   the family       one section per person (id = the member's id, so family/<slug>#sally is a link): who they are, the archetype word, the
+//                    room they use, their moments (title, words, the apps with what each replaces, "Watch this moment" into the tour at
+//                    that beat) and "Start with <name>" (the tour at the first beat of their room)
+//   the Core         the distinct apps, each with what it replaces and its Companion Hub store page
+//   the close        how the Core starts, the next family, the one call to action
+// The ad rules bind it (CI-Common ADS.md section 9 and "Still absolute", reference/story/personas.md "Ads"): the label, no UI mockup or
+// invented app screen, nobody a customer, daylight and warm light only, the beta line, no price, third-party software named in text only.
+//
+// A family page obeys the homes' pages' rules (scripts/build-portal.mts step 7 holds it to them): relative URLs, links without ".html",
+// one <h1> and one <main>, a title of at most 60 characters (and unique) and a description of at most 160, the four links and privacy and
+// terms, data-cfasync="false" on every script. The chrome keeps the site's labels (Buy Companion Core, Download Companion); the story's
+// own calls to action say "See Companion Core". Its fine print names the home it is set in, by its display name (assets/home-names.ts
+// displayName), and links the home's own page (homes/<id>); it carries no credit and no builder. The story's own copy never names a home or a
+// builder (the validator and scripts/story/check-leaks.mts); that line is the one place that names a home.
+//
+// The salvage's landing, credits page and sitemap writers (a families-first front page) are NOT here: git show
+// origin/salvage/2026-10-03-feat-story-site:scripts/story/pages.mts has them.
+import type { Story, Beat, Member, CastingFamily } from '../../assets/story/types.ts';
+import { FICTIONAL_LINE, BETA_LINE, SIGNOFF } from '../../assets/story/types.ts';
+import { memberChapter } from '../../assets/story/url.ts';
+import { displayName } from '../../assets/home-names.js';
+import { LINKS, SITE_NAME, TITLE_MAX, TWITTER_SITE, ldScript, orgLd, siteLd } from '../portal-pages.mts';
+import type { House } from '../portal-pages.mts';
+import type { Loaded, Card } from './site-lib.mts';
+import { esc, addressLine, disclosure } from './site-lib.mts';
+
+export const PRODUCT = 'Companion Core';
+export const HUB_URL = 'https://hub.ci.computer/store';
+/** the one honest line next to the tour button: what the tour is made of (it is drawn in the visitor's browser, so it needs WebGL; the page does not) */
+export const TOUR_NOTE = 'The tour draws the home in 3D in your browser.';
+
+const MEMBER_ROLE: Record<string, string> = { parent: 'Parent', partner: 'Partner', 'adult-child': 'Adult child', teen: 'Teen', child: 'Child', baby: 'Baby', grandparent: 'Grandparent', housemate: 'Housemate', visitor: 'Visitor' };
+const capitalise = (t: string): string => t.charAt(0).toUpperCase() + t.slice(1);
+
+// Lucide path data (ISC, see THIRD_PARTY.md), the subset the static pages use.
+const SPRITE: Record<string, string> = {
+  play: '<polygon points="6 3 20 12 6 21 6 3"/>',
+  out: '<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
+  next: '<path d="m9 18 6-6-6-6"/>',
+  prev: '<path d="m15 18-6-6 6-6"/>',
+  menu: '<line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>',
+  film: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>',
+  box: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  arrow: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+};
+export function sprite(ids: string[]): string {
+  return `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>${ids.map(i => `<symbol id="i-${i}" viewBox="0 0 24 24">${SPRITE[i]}</symbol>`).join('')}</defs></svg>`;
+}
+export const icon = (name: string, cls = ''): string => `<svg class="i${cls ? ' ' + cls : ''}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+
+/** Keep a catalog sentence out of the page when it breaks a copy rule (the catalog is not written in our voice). */
+export function plainCatalog(text: string | undefined, rules: RegExp[]): string {
+  if (!text) return '';
+  const t = text.replace(/\s+/g, ' ').trim();
+  return rules.some(r => r.test(t)) ? '' : t;
+}
+export function errorRules(claims: any): RegExp[] {
+  return (claims.bannedPhrases as { pattern: string; flags?: string; severity: string }[]).filter(b => b.severity === 'error').map(b => new RegExp(b.pattern, b.flags ?? 'i'));
+}
+
+// ---------------------------------------------------------------------------------------------------- chrome (the page sits in family/, so ../ is the site's root)
+const rel = '../';
+/** The site's header: the chrome keeps the site's labels on every page (Buy Companion Core, Download Companion); the story's own "See Companion Core" is the hero's and the close's. */
+export function header(): string {
+  return `<a class="skip" href="#main">Skip to the family</a>
+  <header class="site-head">
+    <a class="brand" href="${rel}" aria-label="Virtual homes, ${SITE_NAME}"><img src="${rel}assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><span class="brand-text"><b>Virtual homes</b><span>${SITE_NAME}</span></span></a>
+    <nav class="site-nav" aria-label="Site" id="site-nav">
+      <a href="${rel}#homes">Homes</a>
+      <a href="${LINKS.docs}">Docs</a>
+      <a href="${LINKS.download}">Download Companion</a>
+      <a class="nav-buy" href="${LINKS.core}">Buy ${PRODUCT}</a>
+    </nav>
+    <button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">${icon('menu')}</button>
+  </header>`;
+}
+
+/** The home a family lives in: a fine-print line that names it by its display name (assets/home-names.ts) and links its page. No credit, no builder. */
+export function homeNote(h: House): string {
+  return `<p class="home-note">The home is <a href="${rel}homes/${esc(encodeURIComponent(h.id))}">${esc(displayName(h))}</a>.</p>`;
+}
+
+/** `agents`: a member's companion is named on the page, so the attribution the fact sheet asks for goes with it (claims.json attribution-agents). */
+export function footer(claims: any, house: House, o: { agents?: boolean; narration?: boolean } = {}): string {
+  const d = (id: string) => esc(disclosure(claims, id));
+  // (site-practises, "no third-party requests, no cookies, no analytics", is not said here: the deployed site adds Google Analytics, so the line would be false there)
+  return `<footer class="site-foot">
+    <div class="foot-grid">
+      <div>
+        <p class="foot-brand"><img src="${rel}assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>${SITE_NAME}</b></p>
+        <nav class="foot-links" aria-label="${SITE_NAME}">
+          <a href="${LINKS.site}">ci.computer</a>
+          <a href="${LINKS.core}">Buy ${PRODUCT}</a>
+          <a href="${LINKS.download}">Download Companion</a>
+          <a href="${LINKS.docs}">Docs</a>
+          <a href="${HUB_URL}">Companion Hub store</a>
+          <a href="${LINKS.privacy}">Privacy</a>
+          <a href="${LINKS.terms}">Terms</a>
+        </nav>
+      </div>
+      <div class="foot-notes">
+        <p><b>${esc(FICTIONAL_LINE)}</b> The families on this site are made up. They are not customers.</p>
+        <p>${esc(BETA_LINE)} ${d('apps-availability')}</p>
+        ${o.narration ? `<p>${d('synthetic-voice')}</p>` : ''}
+        ${o.agents ? `<p>${d('attribution-agents')}</p>` : ''}
+        <p>${d('names-owners')}</p>
+      </div>
+    </div>
+    ${homeNote(house)}
+    <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence.</p>
+  </footer>`;
+}
+
+// ---------------------------------------------------------------------------------------------------- the family page
+/** What a search result and a link preview show: the family, the site's section and the brand; a name too long for all three keeps the first two, then the first alone. */
+export function familyPageTitle(title: string): string {
+  return [`${title} · Virtual homes · ${SITE_NAME}`, `${title} · Virtual homes`].find(t => t.length <= TITLE_MAX) || title;
+}
+/** The tagline and the label, under 160 characters (a long tagline is cut at a word and says so with an ellipsis). */
+export function familyDescription(tagline: string): string {
+  const room = 155 - FICTIONAL_LINE.length - 1;
+  const t = tagline.replace(/\s+/g, ' ').trim();
+  return `${t.length > room ? `${t.slice(0, room - 1).replace(/\s+\S*$/, '')}…` : t} ${FICTIONAL_LINE}`;
+}
+export const familyUrl = (site: string, slug: string): string => new URL(`family/${slug}`, site).href;
+
+/**
+ * A name for each family that no other family shares: the card's title ("The Brennan family") when it is the only one, else the title and
+ * the place of its address ("The Brennan family of Wrenfield"). The three flagship homes carry one family name; a page's <title>, its heading's
+ * place line and the links to its neighbours must tell them apart (the build fails on two pages with one title).
+ */
+export function uniqueLabels(cards: { slug: string; title: string }[], places: Record<string, string>): Record<string, string> {
+  const count = new Map<string, number>();
+  for (const c of cards) count.set(c.title, (count.get(c.title) || 0) + 1);
+  return Object.fromEntries(cards.map(c => [c.slug, (count.get(c.title) || 0) > 1 && places[c.slug] ? `${c.title} of ${places[c.slug]}` : c.title]));
+}
+
+export type FamilyFilm = { src169?: string; src916?: string; vtt?: string; poster?: string; durationMs: number; bytes: number };
+export type FamilyPageCtx = {
+  s: Story; card: Card; prev: Card; next: Card; site: string; claims: Loaded['claims']; catalog: Loaded['catalog']; house: House;
+  /** the picture under the tour: relative to the site root (portal/previews/<house>.jpg) */
+  poster: string;
+  /** the link-preview image, absolute */
+  og: string; film?: FamilyFilm;
+  /** this family's line of content/story/casting.json: the room each person uses */
+  casting?: CastingFamily;
+  /** the family's name where no other family has it (uniqueLabels), and the neighbours'; the card's title when absent */
+  label?: string; prevLabel?: string; nextLabel?: string;
+  /** the tour has a voice (the manifest's `narration`): only then does the page say the voice is synthetic */
+  narration?: boolean;
+  /** portal/campaign.js exists in this build: the page loads it (the page is written the same without it) */
+  campaign?: boolean;
+};
+const memberName = (s: Story, id?: string): string => (id && s.members.find(m => m.id === id)?.name) || '';
+const initial = (n: string): string => n.trim().charAt(0).toUpperCase();
+const sentence = (t: string): string => t.replace(/\s+/g, ' ').trim();
+/** a film the site hosts is a path from the root; one a host serves (FILM_BASE_URL) is an address of its own */
+const fileUrl = (u: string): string => (/^https?:\/\//.test(u) ? u : `${rel}${u}`);
+
+/** The player's address for this family: the house it is set in, the family, and a beat or a member. Extensionless, as the site links everything. */
+export const playerHref = (house: string, slug: string, extra = ''): string => `${rel}room-creator?mode=view&amp;house=${esc(encodeURIComponent(house))}&amp;family=${esc(slug)}${extra}`;
+/** (data-campaign: portal/campaign.js puts the visit's ad tags on the link, so a campaign survives a click into the tour) */
+const tourLink = (house: string, slug: string, extra: string, cls: string, inner: string, label = ''): string => `<a class="${cls}" href="${playerHref(house, slug, extra)}" data-campaign${label ? ` aria-label="${esc(label)}"` : ''}>${inner}</a>`;
+
+/** What the page calls a room: the casting's label, else the house's own name for it in sentence case ("Master Suite" is "Master suite"). */
+function roomWord(c: CastingFamily | undefined, id: string): string {
+  const m = c && (c.members || []).find(x => x.id === id);
+  if (!m) return '';
+  const t = (m.roomLabel || m.room || '').replace(/\s+/g, ' ').trim();
+  return m.roomLabel ? t : t.replace(/^(\S+)(.*)$/, (_a, first: string, rest: string) => first + rest.toLowerCase());
+}
+
+/** A beat that is not first-run or the closing, and whose person it is (or none): the page tells these, the tour tells the rest. */
+function momentsOf(s: Story): { own: Map<string, Beat[]>; shared: Beat[] } {
+  const kind = new Map(s.chapters.map(c => [c.id, c.kind]));
+  const told = s.beats.filter(b => kind.get(b.chapter) !== 'ftue' && kind.get(b.chapter) !== 'outro');
+  const ids = new Set(s.members.map(m => m.id));
+  return { own: new Map(s.members.map(m => [m.id, told.filter(b => b.member === m.id)])), shared: told.filter(b => !b.member || !ids.has(b.member)) };
+}
+
+/** The chips of a moment: the authored ones (the app, then what it replaces), or the app's own name when the beat wrote none. Text, not links: the store pages are the next-to-last section's. */
+export function chipsHtml(b: Beat, catalog: Loaded['catalog']): string {
+  const app = b.app ? catalog[b.app.id] : null;
+  const text = b.popup.chips && b.popup.chips.length ? b.popup.chips : app ? [app.name, ...(b.app!.replaces.length ? [`replaces ${b.app!.replaces.join(', ')}`] : [])] : [];
+  return text.map(c => `<span class="chip${/^replaces /i.test(c) ? ' chip-quiet' : ''}">${esc(c)}</span>`).join('');
+}
+
+/** One moment of a person's story: what happens, the apps (and what each replaces), and a link to watch it in the tour. */
+export function momentHtml(s: Story, b: Beat, catalog: Loaded['catalog'], o: { room?: string } = {}): string {
+  const chips = chipsHtml(b, catalog);
+  const say = b.say ? s.members.find(m => m.id === b.say!.speaker)?.companion : null;
+  return `<li class="moment" id="b-${esc(b.id)}">
+            ${o.room ? `<p class="moment-room">${esc(o.room)}</p>` : ''}
+            <h3>${esc(b.popup.title)}</h3>
+            <p class="moment-body">${esc(b.popup.body)}</p>
+            ${chips ? `<p class="chips">${chips}</p>` : ''}
+            ${b.say && say ? `<p class="say"><span class="tag-scripted">Scripted</span> ${esc(say.name)}: “${esc(b.say.text)}”</p>` : ''}
+            ${b.popup.note ? `<p class="note">${esc(b.popup.note)}</p>` : ''}
+            ${tourLink(s.house, s.slug, `&amp;beat=${esc(b.id)}`, 'play-from', `Watch this moment${icon('play', 'i-fill')}`, `Watch this moment, ${b.popup.title}`)}
+          </li>`;
+}
+
+/** A person's section: id is the member's id (family/<slug>#sally), then who they are, their moments, and a way into the tour at their room. */
+export function memberSectionHtml(s: Story, m: Member, beats: Beat[], c: { catalog: Loaded['catalog']; casting?: CastingFamily }): string {
+  const own = memberChapter(s.chapters, s.beats, m.id);
+  const room = roomWord(c.casting, m.id) || (own ? own.title : '');
+  const companion = m.companion;
+  const facts = [m.archetype ? capitalise(m.archetype) : MEMBER_ROLE[m.role] || m.role, `Age ${m.age}`, room].filter(Boolean);
+  const title = new Map(s.chapters.map(ch => [ch.id, ch.title]));
+  return `<section class="who" id="${esc(m.id)}" aria-labelledby="${esc(m.id)}-h">
+      <header class="who-head">
+        <span class="avatar" style="--disc:var(--${esc(m.colour)})" aria-hidden="true">${esc(initial(m.name))}</span>
+        <div class="who-id">
+          <h2 id="${esc(m.id)}-h">${esc(m.name)}</h2>
+          <p class="who-facts">${facts.map(f => `<span>${esc(f)}</span>`).join('')}</p>
+        </div>
+        ${beats.length ? tourLink(s.house, s.slug, `&amp;member=${esc(m.id)}`, 'btn btn-ghost btn-sm who-start', `<span>Start with ${esc(m.name)}</span>${icon('arrow')}`) : ''}
+      </header>
+      ${m.work ? `<p class="who-work">${esc(capitalise(sentence(m.work)))}.</p>` : ''}
+      ${companion ? `<p class="agent"><b>${esc(companion.name)}</b> is ${esc(m.name)}’s ${companion.runtime === 'Hermes' ? 'Hermes' : 'OpenClaw'} agent. ${esc(sentence(companion.job))} <span class="limits">${esc(sentence(companion.limits))}</span></p>` : ''}
+      ${beats.length ? `<ol class="moments">
+          ${beats.map(b => momentHtml(s, b, c.catalog, { room: own && b.chapter === own.id ? '' : title.get(b.chapter) || '' })).join('\n          ')}
+        </ol>` : ''}
+    </section>`;
+}
+
+export function familyPage(c: FamilyPageCtx): string {
+  const { s, card, claims, catalog, house } = c;
+  const url = familyUrl(c.site, s.slug);
+  const label = c.label || card.title;
+  const title = familyPageTitle(label);
+  const desc = familyDescription(s.family.tagline);
+  const alt = `An aerial view of the ${s.family.surname} family home, rendered in the browser. ${FICTIONAL_LINE}`;
+  const d = (id: string) => esc(disclosure(claims, id));
+  const { own, shared } = momentsOf(s);
+  const agents = s.members.some(m => m.companion);
+  const apps = card.apps.map(a => {
+    const cat = catalog[a.id];
+    const inst = a.replaces.length ? `<span class="instead">Replaces ${esc(a.replaces.join(', '))}</span>` : `<span class="instead instead-none">First party</span>`;
+    return `<li class="app"><a class="app-name" href="${esc((cat && cat.storeUrl) || HUB_URL)}" target="_blank" rel="noopener">${esc(a.name)}${icon('out', 'i-out')}</a>${a.replaces.length || (cat && cat.kind === 'first-party') ? inst : ''}</li>`;
+  }).join('\n          ');
+  const hasFilm = !!(c.film && (c.film.src169 || c.film.src916));
+  const filmBlock = hasFilm ? `
+      <div class="film" id="film" hidden>
+        <video controls preload="none" playsinline poster="${esc(fileUrl(c.film!.poster || c.poster))}" ${c.film!.src169 ? `src="${esc(fileUrl(c.film!.src169))}"` : ''}>
+          ${c.film!.vtt ? `<track kind="captions" srclang="en" label="English" src="${esc(fileUrl(c.film!.vtt))}">` : ''}
+        </video>
+        <p class="film-note">${c.narration === false ? '' : d('synthetic-voice')}</p>
+      </div>` : '';
+  const image = new URL(c.poster, c.site).href;
+  const filmSrc = hasFilm ? (c.film!.src169 || c.film!.src916 || '') : '';
+  const ld = ldScript([orgLd(c.site), siteLd(c.site), {
+    '@type': 'WebPage', '@id': `${url}#webpage`, url, name: title, description: desc, inLanguage: 'en', isPartOf: { '@id': `${c.site}#website` },
+    primaryImageOfPage: { '@type': 'ImageObject', url: image, width: 1200, height: 630 }, breadcrumb: { '@id': `${url}#breadcrumb` },
+    ...(hasFilm ? { video: { '@type': 'VideoObject', name: `${card.title}, a short film`, description: desc, thumbnailUrl: new URL(c.film!.poster || c.poster, c.site).href, uploadDate: new Date().toISOString().slice(0, 10), duration: `PT${Math.round(c.film!.durationMs / 1000)}S`, contentUrl: /^https?:\/\//.test(filmSrc) ? filmSrc : new URL(filmSrc, c.site).href } } : {}),
+  }, {
+    '@type': 'BreadcrumbList', '@id': `${url}#breadcrumb`,
+    itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Virtual homes', item: c.site }, { '@type': 'ListItem', position: 2, name: label, item: url }],
+  }]);
+  // A shared moment (?t= ?shot= ?tod= ?play= ?beat= ?member=) goes straight to the tour, as a home's own page forwards to the player; the
+  // plain page needs no script at all. data-cfasync="false": Cloudflare's Rocket Loader would otherwise run this after the first paint.
+  const player = `${rel}room-creator?mode=view&house=${encodeURIComponent(s.house)}&family=${s.slug}`;
+  const tour = (cls: string, inner: string, extra = ''): string => tourLink(s.house, s.slug, extra, cls, inner);
+  const people = s.members.map(m => ({ m, beats: own.get(m.id) || [] }));
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${esc(title)}</title>
+  <meta name="description" content="${esc(desc)}">
+  <link rel="canonical" href="${esc(url)}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="${esc(SITE_NAME)}">
+  <meta property="og:title" content="${esc(title)}">
+  <meta property="og:description" content="${esc(desc)}">
+  <meta property="og:url" content="${esc(url)}">
+  <meta property="og:image" content="${esc(c.og)}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${esc(alt)}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="${TWITTER_SITE}">
+  <meta name="twitter:title" content="${esc(title)}">
+  <meta name="twitter:description" content="${esc(desc)}">
+  <meta name="twitter:image" content="${esc(c.og)}">
+  <meta name="twitter:image:alt" content="${esc(alt)}">
+  <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="${rel}assets/brand/ci-logo-mark.svg" type="image/svg+xml">
+  <link rel="icon" href="${rel}portal/icons/favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon" href="${rel}portal/icons/apple-touch-icon.png">
+  <link rel="manifest" href="${rel}portal/site.webmanifest">
+  <link rel="preload" href="${rel}assets/fonts/manrope-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="${rel}portal/site.css">
+  <link rel="stylesheet" href="${rel}portal/family.css">
+  ${c.campaign ? `<script src="${rel}portal/campaign.js" defer data-cfasync="false"></script>\n  ` : ''}<script data-cfasync="false">if (/[?&](t|shot|tod|play|beat|member)=/.test(location.search)) location.replace(${JSON.stringify(player)} + '&' + location.search.slice(1) + location.hash);</script>
+  <script type="module" src="${rel}portal/site.js" data-cfasync="false"></script>
+  ${ld}
+</head>
+<body class="page-family">
+  ${sprite(['out', 'play', 'next', 'prev', 'menu', 'film', 'box', 'arrow'])}
+  ${header()}
+  <main id="main">
+    <section class="hero" aria-labelledby="family-h">
+      <div class="hero-copy">
+        <p class="disclosure"><strong>${esc(FICTIONAL_LINE)}</strong></p>
+        <h1 id="family-h">${esc(card.title)}</h1>
+        <p class="tagline">${esc(s.family.tagline)}</p>
+        <p class="address">${esc(addressLine(s))}</p>
+      </div>
+      <a class="poster" href="${playerHref(s.house, s.slug)}" data-campaign aria-label="Take the tour of the ${esc(s.family.surname)} family home, in 3D">
+        <img src="${rel}${esc(c.poster)}" alt="${esc(alt)}" width="1200" height="630" fetchpriority="high">
+        <span class="poster-badge">${icon('box')}Interactive 3D tour</span>
+        <span class="poster-play" aria-hidden="true">${icon('play', 'i-fill')}</span>
+      </a>
+      <div class="hero-actions" id="hero-actions">
+        ${tour('btn btn-primary', `${icon('play', 'i-fill')}<span>Take the tour</span>`)}
+        <a class="btn btn-ghost" href="${LINKS.core}" data-campaign>See ${PRODUCT}</a>
+        ${hasFilm ? `<button type="button" class="btn btn-ghost" id="film-open" aria-controls="film" aria-expanded="false">${icon('film')}<span>Watch the film</span></button>` : ''}
+        <p class="hero-note">${esc(TOUR_NOTE)}</p>
+      </div>${filmBlock}
+    </section>
+
+    <section class="strip" aria-label="What this page is">
+      <ul>
+        <li class="strip-label"><strong>${d('fictional-family')}</strong></li>
+        <li>${d('beta-short')}</li>
+        <li>${d('scripted-scenes')}</li>
+        <li>${d('stylised-art')}</li>
+      </ul>
+    </section>
+
+    <section class="block" aria-labelledby="meet">
+      <h2 id="meet">Meet the family</h2>
+      <p class="lead">${esc(s.family.story)}</p>
+      <nav class="who-nav" aria-label="The family">
+        <ul>
+          ${people.map(({ m }) => `<li><a href="#${esc(m.id)}"><span class="avatar" style="--disc:var(--${esc(m.colour)})" aria-hidden="true">${esc(initial(m.name))}</span><span class="who-nav-text"><b>${esc(m.name)}</b><small>${esc(m.archetype ? capitalise(m.archetype) : MEMBER_ROLE[m.role] || m.role)}</small></span></a></li>`).join('\n          ')}
+        </ul>
+      </nav>
+    </section>
+
+    ${people.map(({ m, beats }) => memberSectionHtml(s, m, beats, { catalog, casting: c.casting })).join('\n\n    ')}
+    ${shared.length ? `
+    <section class="who who-shared" id="home" aria-labelledby="home-h">
+      <header class="who-head"><div class="who-id"><h2 id="home-h">Around the house</h2></div></header>
+      <ol class="moments">
+        ${shared.map(b => momentHtml(s, b, catalog, { room: s.chapters.find(ch => ch.id === b.chapter)?.title || '' })).join('\n        ')}
+      </ol>
+    </section>` : ''}
+
+    <section class="block" aria-labelledby="firstrun">
+      <h2 id="firstrun">How the Core starts</h2>
+      <ol class="steps steps-compact">
+          ${stepsHtml(true)}
+      </ol>
+    </section>
+
+    <section class="block" id="apps" aria-labelledby="apps-h">
+      <h2 id="apps-h">What runs on the Core</h2>
+      <p class="lead">One Companion Core in the house runs these apps. Each is in the Companion Hub store. Other software is named in text, for what it replaces.</p>
+      <ul class="apps">
+          ${apps}
+      </ul>
+      <p class="note">${d('third-party-apps')}</p>
+    </section>
+
+    <nav class="siblings" aria-label="Other families">
+      <a class="sib" rel="prev" href="./${esc(c.prev.slug)}">${icon('prev')}<span><small>Previous family</small><b>${esc(c.prevLabel || c.prev.title)}</b></span></a>
+      <a class="sib sib-next" rel="next" href="./${esc(c.next.slug)}"><span><small>Next family</small><b>${esc(c.nextLabel || c.next.title)}</b></span>${icon('next')}</a>
+    </nav>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <h2 id="closing-title">${esc(SIGNOFF)}</h2>
+      <p>${esc(s.closing.body)}</p>
+      <p><a class="btn btn-primary" href="${esc(s.closing.cta.url)}">${esc(s.closing.cta.label)}</a></p>
+    </section>
+  </main>
+  <div class="tourbar" id="tourbar" hidden>${tour('btn btn-primary', `${icon('play', 'i-fill')}<span>Take the tour</span>`)}</div>
+  ${footer(claims, house, { agents, narration: c.narration })}
+  <script data-cfasync="false">
+    (function () {
+      // the page is whole without this. It adds the film's own button (when the film is hosted) and, on a phone, the tour button that stays
+      // in reach once the first screen has gone by and goes again at the close.
+      var b = document.getElementById('film-open'), f = document.getElementById('film');
+      if (b && f) {
+        f.hidden = true;
+        b.addEventListener('click', function () {
+          var open = f.hidden; f.hidden = !open; b.setAttribute('aria-expanded', String(open));
+          var v = f.querySelector('video'); if (open) { document.body.classList.add('film-on'); f.scrollIntoView({ block: 'nearest' }); } else { document.body.classList.remove('film-on'); if (v) v.pause(); }
+        });
+      }
+      var bar = document.getElementById('tourbar'), hero = document.getElementById('hero-actions'), close = document.querySelector('.closing');
+      if (bar && hero && 'IntersectionObserver' in window) {
+        var past = false, end = false;
+        var show = function () { bar.hidden = !(past && !end); };
+        new IntersectionObserver(function (es) { var e = es[es.length - 1]; past = !e.isIntersecting && e.boundingClientRect.top < 0; show(); }).observe(hero);
+        if (close) new IntersectionObserver(function (es) { end = es[es.length - 1].isIntersecting; show(); }).observe(close);
+      }
+    })();
+  </script>
+</body>
+</html>
+`;
+}
+
+// The first run, as the owner specified it (STORY-BIBLE section 7). Stylised line drawings, never a product render.
+const DRAW: Record<string, string> = {
+  plug: '<rect x="14" y="30" width="64" height="26" rx="6"/><circle cx="66" cy="43" r="3"/><path d="M14 43H6"/><path d="M78 43c14 0 14-16 26-16"/><path d="M104 21v12"/><path d="M110 21v12"/><path d="M101 27h12"/>',
+  wifi: '<rect x="44" y="14" width="32" height="58" rx="6"/><path d="M56 64h8"/><path d="M52 34a12 12 0 0 1 16 0"/><path d="M48 28a18 18 0 0 1 24 0"/><circle cx="60" cy="40" r="1.5"/><rect x="6" y="52" width="26" height="16" rx="4"/><rect x="88" y="52" width="26" height="16" rx="4"/>',
+  apps: '<rect x="18" y="14" width="24" height="24" rx="6"/><rect x="48" y="14" width="24" height="24" rx="6"/><rect x="78" y="14" width="24" height="24" rx="6"/><rect x="18" y="44" width="24" height="24" rx="6"/><rect x="48" y="44" width="24" height="24" rx="6"/><path d="M84 56l6 6 12-14"/>',
+};
+export const STEPS: { n: number; title: string; body: string; draw: string }[] = [
+  { n: 1, title: 'Plug it in.', body: 'The parcel holds the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Companion OS is already on its drive. Plug it in and press the button.', draw: 'plug' },
+  { n: 2, title: 'Join its Wi-Fi.', body: 'The Core opens its own Wi-Fi network. Join it from a phone, choose your home network from the list and enter its password.', draw: 'wifi' },
+  { n: 3, title: 'Pick your apps and run.', body: 'In the Companion Hub store, pick your first agents and apps. Then walk away. Installing apps uses the internet.', draw: 'apps' },
+];
+export function stepsHtml(compact = false): string {
+  return STEPS.map(t => `<li class="step">
+            <span class="step-n" aria-hidden="true">${t.n}</span>
+            ${compact ? '' : `<svg class="step-draw" viewBox="0 0 120 80" role="img" aria-label="" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${DRAW[t.draw]}</svg>`}
+            <h3>${esc(t.title)}</h3>
+            <p>${esc(t.body)}</p>
+          </li>`).join('\n          ');
+}

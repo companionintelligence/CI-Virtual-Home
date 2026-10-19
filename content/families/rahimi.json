@@ -1,0 +1,837 @@
+{
+  "schema": "family/v1",
+  "slug": "rahimi",
+  "house": "modernhouse-nora",
+  "fictional": true,
+  "family": {
+    "surname": "Rahimi",
+    "tagline": "Two teachers, one guitar and a Companion Core in the hall.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Parisa runs an online music school from a desk in the hall. Her partner Kian teaches guitar in the room upstairs. Their timetable, forms and music library sit on one Companion Core.",
+    "address": {
+      "line": "8 Kingcup Row",
+      "place": "Sandover"
+    },
+    "narrator": "v-light-m"
+  },
+  "members": [
+    {
+      "id": "parisa",
+      "name": "Parisa",
+      "age": 41,
+      "role": "partner",
+      "work": "runs an online music school",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Quince",
+        "runtime": "Hermes",
+        "job": "Drafts lesson notices and reschedule messages from what Parisa sends it.",
+        "personality": [
+          "precise",
+          "brisk",
+          "kind"
+        ],
+        "voice": "v-clear-f",
+        "memory": false,
+        "limits": "Drafts only. Parisa reads and sends every message."
+      }
+    },
+    {
+      "id": "kian",
+      "name": "Kian",
+      "age": 43,
+      "role": "partner",
+      "work": "guitarist and teacher",
+      "colour": "chart-2",
+      "archetype": "maker",
+      "companion": {
+        "name": "Plum",
+        "runtime": "OpenClaw",
+        "job": "Opens websites in its own browser and fills in the forms Kian asks for.",
+        "personality": [
+          "gentle",
+          "thoughtful",
+          "patient"
+        ],
+        "voice": "v-storyteller-m",
+        "memory": false,
+        "limits": "Fills in forms only. Kian checks and sends every one."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "office",
+      "kind": "room",
+      "room": "office",
+      "title": "Parisa's hall desk"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out by the pool"
+    },
+    {
+      "id": "bedroom",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Kian and the guitar stand"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Kian carries the parcel inside",
+        "body": "A parcel waits on the porch steps. Kian carries the Companion Core to the Desk Hall, where Parisa clears the desk."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Parisa lays out the pieces",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Parisa lays each piece on the desk while Kian unfolds the guide."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "The Core wakes in the hall",
+        "body": "Kian plugs in the cable and Parisa presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Parisa joins it from her phone",
+        "body": "On her phone's Wi-Fi settings, Parisa joins the Core's own network. Then she chooses the home network from the list.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core's own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "baikal",
+        "navidrome"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Parisa and Kian pick their apps",
+        "body": "In the Companion Hub store, Parisa picks Hermes and Kian picks OpenClaw. They add Baikal and Navidrome, then walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Baikal, Navidrome"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "parisa",
+      "agent": "parisa",
+      "approval": "parisa",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Quince says good morning",
+        "body": "From the hall desk, Parisa messages the agent she named Quince. Quince answers from the Core beside her, and the day's lessons begin.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "parisa",
+        "text": "Good morning, Parisa. Quince here. Which student first?"
+      },
+      "film": true
+    },
+    {
+      "id": "office-slots",
+      "chapter": "office",
+      "member": "parisa",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "baikal",
+        "replaces": [
+          "Google Calendar"
+        ]
+      },
+      "capability": "a small CalDAV and CardDAV server for your calendars and contacts",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Parisa moves two lessons",
+        "body": "Two students swap their Thursday slots, and Parisa moves both lessons in her calendar app. Baikal serves the timetable and contacts from the Core.",
+        "chips": [
+          "Baikal",
+          "replaces Google Calendar"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "office-quince",
+      "chapter": "office",
+      "member": "parisa",
+      "agent": "parisa",
+      "approval": "parisa",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Quince drafts the holiday notices",
+        "body": "Three lessons move for a holiday. Parisa messages Quince the new times, and Quince drafts a note for each student. Parisa reads each one and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "parisa",
+        "text": "Three drafts, one for each student. Each is yours to read and send."
+      }
+    },
+    {
+      "id": "office-vault",
+      "chapter": "office",
+      "member": "parisa",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "vaultwarden",
+        "replaces": [
+          "LastPass"
+        ]
+      },
+      "capability": "store every password in a vault you host",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sign-ins leave the paper notebook",
+        "body": "While Kian reads the sign-ins aloud from a paper notebook, Parisa saves each one in VaultWarden. The vault runs on the Core and works with the Bitwarden apps.",
+        "chips": [
+          "VaultWarden",
+          "replaces LastPass"
+        ]
+      }
+    },
+    {
+      "id": "living-photos",
+      "chapter": "living",
+      "member": "parisa",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Parisa searches for the sea",
+        "body": "On the couch after lunch, Parisa searches Immich for the sea, and the holiday appears. Immich sorted the pictures on the Core, where both their phones back them up.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ],
+        "note": "The first start takes a while, because Immich sorts the photos."
+      }
+    },
+    {
+      "id": "living-tv",
+      "chapter": "living",
+      "member": "kian",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kian picks a concert film",
+        "body": "On a slow Sunday afternoon, Kian picks a concert film from their own collection. Jellyfin plays it from the Core to the living-room TV.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-intake",
+      "chapter": "kitchen",
+      "member": "parisa",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "opnform",
+        "replaces": [
+          "Typeform"
+        ]
+      },
+      "capability": "build forms with logic and file uploads, then collect the answers",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kitchen"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Parisa builds the trial lesson form",
+        "body": "At the kitchen counter, Parisa builds a trial lesson form in OpnForm, with a question for each instrument. The answers are collected on the Core.",
+        "chips": [
+          "OpnForm",
+          "replaces Typeform"
+        ],
+        "note": "A form shared with the public needs outside access to the Core."
+      }
+    },
+    {
+      "id": "kitchen-stew",
+      "chapter": "kitchen",
+      "member": "kian",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub with a recipe book and an expiry tracker",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Kian writes down his aunt's stew",
+        "body": "His aunt never wrote the herb stew down. Kian types it into the HomeHub recipe book. The Core keeps it beside the shopping list.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-papers",
+      "chapter": "kitchen",
+      "member": "parisa",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Parisa files the insurer's letter",
+        "body": "At the round table, Parisa scans the insurer's letter and a repair receipt into Paperless-ngx. The Core reads and tags both, so next year one word finds them.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Google Drive"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-fridge",
+      "chapter": "kitchen",
+      "member": "parisa",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "homehub",
+        "replaces": [
+          "Cozi"
+        ]
+      },
+      "capability": "a shared household hub with a recipe book and an expiry tracker",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Parisa plans meals around spinach",
+        "body": "Spinach and two tubs of yoghurt are nearly out of date. Parisa spots them on the HomeHub expiry list, kept on the Core, and plans the week's meals around them.",
+        "chips": [
+          "HomeHub",
+          "replaces Cozi"
+        ]
+      }
+    },
+    {
+      "id": "garden-ntfy",
+      "chapter": "garden",
+      "member": "parisa",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "ntfy",
+        "replaces": []
+      },
+      "capability": "send a push notification to your phone from any script or automation",
+      "anchor": {
+        "role": "deck",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "garden",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "A note arrives before the lesson",
+        "body": "Coffee in hand on the deck, Parisa feels her phone buzz with a ntfy note. A small script on the Core sends one ahead of each lesson.",
+        "chips": [
+          "ntfy"
+        ],
+        "note": "On an iPhone, ntfy relays the push through an upstream server."
+      }
+    },
+    {
+      "id": "garden-flowers",
+      "chapter": "garden",
+      "member": "kian",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history, with a garden journal",
+      "anchor": {
+        "role": "garden",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "deck"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Kian keeps a flower journal",
+        "body": "Between two Saturday lessons, Kian waters the orange flowers by the back deck and notes it in HortusFox. Each watering goes into a journal on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      }
+    },
+    {
+      "id": "bed-demo",
+      "chapter": "bedroom",
+      "member": "kian",
+      "category": "creative",
+      "segment": "small-business",
+      "app": {
+        "id": "audiomass",
+        "replaces": [
+          "Adobe Audition"
+        ]
+      },
+      "capability": "edit audio in a browser tab: cut, fade, normalise, export",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Kian trims the chord change",
+        "body": "Morning light reaches the guitar stand. Kian records a chord change for Friday's lesson. He trims it in AudioMass, served from the Core in a browser tab.",
+        "chips": [
+          "AudioMass",
+          "replaces Adobe Audition"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "bed-notes",
+      "chapter": "bedroom",
+      "member": "kian",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom"
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Kian plans a week of lessons",
+        "body": "From the lounge chair, Kian writes next week's lesson plan in Obsidian. It runs in a browser session, and the notes are plain Markdown files on the Core.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "bed-term",
+      "chapter": "bedroom",
+      "member": "parisa",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-planning",
+        "replaces": []
+      },
+      "capability": "plan tasks and time blocks in one local file on your Core",
+      "anchor": {
+        "role": "room",
+        "room": "bedroom"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Parisa gives admin its own blocks",
+        "body": "Seated on the cushioned bench, Parisa blocks out the term's admin hours in Companion Planning. It is one local file on the Core. Reports and enrolment each get a slot.",
+        "chips": [
+          "Companion Planning"
+        ],
+        "note": "Crash reports go to Companion Intelligence unless switched off."
+      }
+    },
+    {
+      "id": "bed-backing",
+      "chapter": "bedroom",
+      "member": "kian",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Kian warms up on the bed",
+        "body": "Before the first student, Kian sits on the bed and plays along to a backing track. Navidrome streams his own music folder from the Core to his phone.",
+        "chips": [
+          "Navidrome",
+          "replaces Spotify"
+        ]
+      }
+    },
+    {
+      "id": "bed-strings",
+      "chapter": "bedroom",
+      "member": "kian",
+      "agent": "kian",
+      "approval": "kian",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "errands and browser automation on your Core, prepared for you to approve",
+      "anchor": {
+        "role": "music",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Plum fills in the string order",
+        "body": "The old strings have gone dull. Kian asks Plum to open the supplier's website and fill in the order form. He checks every field and sends it himself.",
+        "chips": [
+          "OpenClaw"
+        ],
+        "note": "OpenClaw reaches websites over your home internet."
+      },
+      "say": {
+        "speaker": "kian",
+        "text": "The order form is filled in. The address is the field to check."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "One Core, one small school",
+        "body": "Timetable, forms, drafts and music run on one Companion Core, in the hall of a modern house."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your lesson calendar, forms and music can run on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The Core stands on the only desk, in the Desk Hall. Parisa's office beats anchor on the Core or the hall; no second desk is named. Kian's room has a guitar stand, bed, cushioned bench and lounge chair; no screen, so no beat names one.",
+    "kitchen-intake: OpnForm carries the public-access caveat as a note. The beat never says how students reach the form, and no remote access is claimed.",
+    "Hermes (Quince) is Parisa's; OpenClaw (Plum) is Kian's. Every agent beat has the person read and send. The OpenClaw website note rides on bed-strings.",
+    "Companion Planning and the two agents send crash reports to Companion Intelligence unless switched off; office-term carries that note and nothing says that nothing leaves the Core.",
+    "garden-ntfy: the iPhone relay caveat from the ntfy listing is in the note. The reminder script is a small script on the Core, not an app feature the listing promises.",
+    "No Companion Memory, no Steam, no code host. AudioMass is described only as a browser-tab editor served from the Core; no beat says recordings are stored on the Core. Film: eight beats, both members, six chapters, one small-business beat."
+  ]
+}

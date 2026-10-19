@@ -1,0 +1,921 @@
+{
+  "schema": "family/v1",
+  "slug": "kovacs",
+  "house": "mediterranean",
+  "fictional": true,
+  "family": {
+    "surname": "Kovacs",
+    "tagline": "Four rooms of their own, one Companion Core, and a fountain out front.",
+    "household": "older-kids",
+    "business": false,
+    "story": "Eszter runs the household from the Salon, and Gabor builds a weather station in the Games Den. Bence, sixteen, has the TV Room, and Reka, thirteen, studies in the West Bedroom. One Companion Core on the Salon shelf serves all four.",
+    "address": {
+      "line": "6 Cypress Court",
+      "place": "Ashby Dene"
+    },
+    "narrator": "v-clear-f"
+  },
+  "members": [
+    {
+      "id": "eszter",
+      "name": "Eszter",
+      "age": 49,
+      "role": "parent",
+      "work": "school business manager",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Basil",
+        "runtime": "Hermes",
+        "job": "Drafts Eszter’s letters and replies from the notes she messages it.",
+        "personality": [
+          "warm",
+          "exact",
+          "patient"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Drafts only. Eszter reads and sends every reply."
+      }
+    },
+    {
+      "id": "gabor",
+      "name": "Gabor",
+      "age": 51,
+      "role": "parent",
+      "work": "embedded software engineer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Sorrel",
+        "runtime": "Hermes",
+        "job": "Drafts Gabor’s notes to suppliers from the part names he sends it.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Drafts only. Gabor reads and sends every note."
+      }
+    },
+    {
+      "id": "bence",
+      "name": "Bence",
+      "age": 16,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-3",
+      "archetype": "gamer"
+    },
+    {
+      "id": "reka",
+      "name": "Reka",
+      "age": 13,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-4",
+      "archetype": "learner"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "salon",
+      "kind": "room",
+      "room": "living",
+      "title": "In the Salon"
+    },
+    {
+      "id": "den",
+      "kind": "room",
+      "room": "office",
+      "title": "Gabor in the Games Den"
+    },
+    {
+      "id": "tv",
+      "kind": "room",
+      "room": "living",
+      "title": "Bence in the TV Room"
+    },
+    {
+      "id": "west",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "Reka in the West Bedroom"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "By the fountain"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "The parcel reaches the top step",
+        "body": "A Companion Core waits on the top step, under the geranium window boxes. Bence and Reka carry it through the stair hall to the Salon."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Reka reads the guide aloud while Gabor lifts the Core out."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Gabor plugs the Core in, and Bence presses the button. It wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "Standing by the shelf, Eszter opens the Wi-Fi settings on her phone and joins the Core’s own network. Then she chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "yuvomi",
+        "libreoffice"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Eszter picks Hermes, and the family adds Yuvomi and LibreOffice. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Yuvomi, LibreOffice"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "eszter",
+      "agent": "eszter",
+      "approval": "eszter",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Basil says hello",
+        "body": "Eszter types a first message to Basil, the agent she named. Basil answers from the Core.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "eszter",
+        "text": "Hello, Eszter. This is Basil. What shall we do first?"
+      },
+      "film": true
+    },
+    {
+      "id": "salon-warranty",
+      "chapter": "salon",
+      "member": "eszter",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Eszter finds the pump invoice",
+        "body": "The pool pump coughs on a warm Tuesday, and the installer’s invoice is somewhere in last year’s paper. One word typed into Paperless-ngx on the Core finds the tagged scan.",
+        "chips": [
+          "Paperless-ngx",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "salon-dns",
+      "chapter": "salon",
+      "member": "gabor",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "NextDNS"
+        ]
+      },
+      "capability": "block ads, trackers and bad domains at the DNS level for devices that use it",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Gabor stops the banner ads",
+        "body": "Gabor’s tablet loads a weather forum with fewer banner ads. The router now sends lookups to Pi-hole on the Core, which drops ad and tracker domains for devices using it.",
+        "chips": [
+          "Pi-hole",
+          "replaces NextDNS"
+        ]
+      }
+    },
+    {
+      "id": "salon-docs",
+      "chapter": "salon",
+      "member": "eszter",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "capability": "the LibreOffice suite (Writer, Calc and more) in your browser",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Eszter writes up the half-term plan",
+        "body": "Half-term needs a plan, so Eszter writes it in LibreOffice. It runs on the Core, shows in her browser and saves there.",
+        "chips": [
+          "LibreOffice",
+          "replaces Microsoft Office"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "salon-draft",
+      "chapter": "salon",
+      "member": "eszter",
+      "agent": "eszter",
+      "approval": "eszter",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Basil drafts the stonemason’s reply",
+        "body": "Eszter asks Basil to answer the stonemason’s quote. Basil drafts it on the Core’s local model, using dates she connected to Companion Memory (beta). Eszter reads and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "eszter",
+        "text": "Here is the draft reply to the stonemason. Please read it, then send it."
+      }
+    },
+    {
+      "id": "den-repos",
+      "chapter": "den",
+      "member": "gabor",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A breeze fools the rain gauge",
+        "body": "A breeze fools the rooftop rain gauge, so Gabor opens an issue and merges the fix in Forgejo. The code and issues stay on the Core.",
+        "chips": [
+          "Forgejo",
+          "replaces GitHub"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "den-notebook",
+      "chapter": "den",
+      "member": "gabor",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "counter",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Gabor plots a drifting sensor",
+        "body": "At the counter with the two stools, Gabor plots a week of rooftop readings and spots a drifting sensor. The JupyterLab notebook runs its code on the Core.",
+        "chips": [
+          "JupyterLab"
+        ]
+      }
+    },
+    {
+      "id": "den-sorrel",
+      "chapter": "den",
+      "member": "gabor",
+      "agent": "gabor",
+      "approval": "gabor",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "fireplace",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sorrel drafts the supplier enquiry",
+        "body": "A sensor board has failed. Gabor messages Sorrel the part name, and Sorrel drafts a supplier note on the Core’s local model. Gabor reads it and sends it himself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "gabor",
+        "text": "The supplier note is ready. Read it first, and send it when it looks right."
+      }
+    },
+    {
+      "id": "tv-steam",
+      "chapter": "tv",
+      "member": "bence",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "steam-headless",
+        "replaces": [
+          "GeForce Now"
+        ]
+      },
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 2
+          },
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind"
+      },
+      "popup": {
+        "title": "A game starts from the sectional",
+        "body": "After school, Bence signs in with his own Valve account. Steam Headless runs Steam on the Core, and a browser on the TV shows it.",
+        "chips": [
+          "Steam Headless",
+          "replaces GeForce Now"
+        ],
+        "note": "Steam needs a Valve account. A Core may lack the graphics power a game wants."
+      },
+      "film": true
+    },
+    {
+      "id": "tv-films",
+      "chapter": "tv",
+      "member": "bence",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The school concert plays again",
+        "body": "Before lunch, Bence puts on the film Gabor made at Reka’s school concert. Jellyfin plays it from the Core to the TV, from the family’s own files.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "tv-photos",
+      "chapter": "tv",
+      "member": "bence",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Bence clears a full phone",
+        "body": "After the tournament weekend, Bence’s phone says it is full. Immich copies his photos to the Core and sorts them by date, so he can clear space on the phone.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ],
+        "note": "The first start takes a while."
+      }
+    },
+    {
+      "id": "west-kiwix",
+      "chapter": "west",
+      "member": "reka",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "kiwix",
+        "replaces": [
+          "Google Search"
+        ]
+      },
+      "capability": "read Wikipedia and other reference sites offline",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Reka looks up an aqueduct",
+        "body": "A history question asks how aqueducts carried water. Reka looks it up in Kiwix, whose Wikipedia file sits on the Core. No search engine is asked.",
+        "chips": [
+          "Kiwix",
+          "replaces Google Search"
+        ],
+        "note": "The Wikipedia file is downloaded once."
+      },
+      "film": true
+    },
+    {
+      "id": "west-notes",
+      "chapter": "west",
+      "member": "reka",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "bed",
+        "room": "bedroom",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Reka writes about a character",
+        "body": "On Saturday morning, Reka sits on the canopy bed and writes a character note for her class’s play. Obsidian keeps each note as a file on the Core.",
+        "chips": [
+          "Obsidian",
+          "replaces Notion"
+        ]
+      }
+    },
+    {
+      "id": "west-homework",
+      "chapter": "west",
+      "member": "reka",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "open-webui",
+        "replaces": [
+          "ChatGPT"
+        ]
+      },
+      "capability": "chat with models running on your own Core, from any browser",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "bedroom",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Reka checks her own working",
+        "body": "Reka solves a ratio problem herself, then asks a model on the Core to check her working in Open WebUI. The chat stays on the Core by default.",
+        "chips": [
+          "Open WebUI",
+          "replaces ChatGPT"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-supper",
+      "chapter": "kitchen",
+      "member": "bence",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Goulash moves a day later",
+        "body": "Training moves to Thursday, so Bence slides the goulash to Friday in Yuvomi, and the shopping list follows. One planner on the Core keeps the meal plan and the list.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-card",
+      "chapter": "kitchen",
+      "member": "reka",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Reka reads her grandmother’s card",
+        "body": "A card from Reka’s grandmother leans by the range, with a German line Reka cannot place. LibreTranslate translates it on the Core, and Reka writes her reply by hand.",
+        "chips": [
+          "LibreTranslate",
+          "replaces Google Translate"
+        ],
+        "note": "Language models are downloaded once."
+      }
+    },
+    {
+      "id": "kitchen-budget",
+      "chapter": "kitchen",
+      "member": "eszter",
+      "category": "money",
+      "segment": "consumer",
+      "app": {
+        "id": "yuvomi",
+        "replaces": []
+      },
+      "capability": "a family planner with a shared calendar, tasks, shopping, meals, notes, contacts and budget",
+      "anchor": {
+        "role": "counter",
+        "room": "kitchen",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The month’s budget gets sorted",
+        "body": "On Sunday afternoon Eszter sorts the month’s spending into Yuvomi’s budget. Gabor reads the same budget, because the household shares one planner on the Core.",
+        "chips": [
+          "Yuvomi"
+        ]
+      }
+    },
+    {
+      "id": "garden-fountain",
+      "chapter": "garden",
+      "member": "bence",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Bence builds a welcome for cousins",
+        "body": "Cousins arrive on Saturday, so Bence builds a welcome scene in Home Assistant. One tap starts the fountain and the hall lantern together, and the Core runs it.",
+        "chips": [
+          "Home Assistant",
+          "replaces Google Home"
+        ],
+        "note": "Home Assistant needs no cloud account."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A villa, four rooms, one Core",
+        "body": "One Companion Core on the Salon shelf serves four people, behind a fountain and cypress trees."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your documents, code, films and homework can run on a Companion Core at home. Browse the Companion Hub store and choose your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "No beat uses an app without a QA screenshot (Code Server, Ollama, Calibre-Web and Mealie left out), so reviewed.json needs no kovacs entry. The household suite is LibreOffice, one suite per household.",
+    "The house has no desk, only the Core shelf. Gabor works at the Games Den trestle table, the counter with two stools and the fireplace; the text never says desk.",
+    "In the resolver the Salon, Games Den and TV Room are living rooms by area: room living nth 0 is the Salon, nth 2 the TV Room. Couch nth 0 and 1 are the Salon sofas, nth 2 the sectional.",
+    "bed nth 2 with room bedroom is the West Bedroom canopy bed. The garden role resolves to the forecourt fountain, so the garden beat stands at the front after the kitchen.",
+    "Both agents run Hermes: the chat note rides on ftue-hello, salon-draft and den-sorrel. The only Companion Memory mention reads (beta), in salon-draft. In every agent beat the person reads and sends.",
+    "Steam Headless: Valve account named, no frame rate, no title, home network only. west-homework uses the replaces ChatGPT chip; the text names a model on the Core and never a cloud key.",
+    "Pi-hole covers only devices that use it for DNS, one household instance set up by Gabor. Home Assistant needs no cloud account of its own; the fountain pump and hall lantern sit on network devices."
+  ]
+}

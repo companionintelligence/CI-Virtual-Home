@@ -1,0 +1,797 @@
+{
+  "schema": "family/v1",
+  "slug": "tuala",
+  "house": "flowerycottage",
+  "fictional": true,
+  "family": {
+    "surname": "Tuala",
+    "tagline": "Two people, one Companion Core, and a cottage full of drawings.",
+    "household": "solo-or-couple",
+    "business": true,
+    "story": "Malia draws botanical prints in the sunroom, and Sione builds websites for clients from the study. The print shop and the web work share one Companion Core in a cottage at Rookbeck.",
+    "address": {
+      "line": "6 Millrace Lane",
+      "place": "Rookbeck"
+    },
+    "narrator": "v-light-m"
+  },
+  "members": [
+    {
+      "id": "malia",
+      "name": "Malia",
+      "age": 44,
+      "role": "partner",
+      "work": "botanical illustrator",
+      "colour": "chart-1",
+      "archetype": "maker",
+      "companion": {
+        "name": "Marigold",
+        "runtime": "Hermes",
+        "job": "Drafts replies to print customers from the notes Malia sends it.",
+        "personality": [
+          "gentle",
+          "patient",
+          "warm"
+        ],
+        "voice": "v-warm-f",
+        "memory": true,
+        "limits": "Drafts only. Malia reads and sends every message."
+      }
+    },
+    {
+      "id": "sione",
+      "name": "Sione",
+      "age": 46,
+      "role": "partner",
+      "work": "freelance web developer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Chai",
+        "runtime": "OpenClaw",
+        "job": "Walks the pages of Sione’s draft sites and lists what needs fixing.",
+        "personality": [
+          "dry",
+          "calm",
+          "wry"
+        ],
+        "voice": "v-deep-m",
+        "memory": false,
+        "limits": "Lists only. Sione reads every list and makes the changes."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "Sione at the writing desk"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "dining",
+      "kind": "room",
+      "room": "dining",
+      "title": "Around the farmhouse table"
+    },
+    {
+      "id": "sunroom",
+      "kind": "room",
+      "room": "living",
+      "title": "Malia in the sunroom"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Malia clears the writing desk",
+        "body": "The Companion Core arrives as a parcel on the stone steps. Sione carries it to the Study, where Malia clears the writing desk."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Malia sets the Core on the desk while Sione reads the guide."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Sione plugs in the cable, and Malia presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        },
+        "title": "Join it from a phone",
+        "body": "On his phone, Sione joins the Core’s own network, then chooses the home network."
+      }
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "inkscape",
+        "wordpress"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agents: Hermes, OpenClaw",
+            "Apps: Inkscape, WordPress"
+          ]
+        },
+        "title": "Pick the first agents and apps",
+        "body": "In the Companion Hub store, Malia and Sione pick Hermes and OpenClaw, then add Inkscape and WordPress. They name the agents Marigold and Chai.",
+        "note": "Installing apps uses the internet."
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "sione",
+      "agent": "sione",
+      "approval": "sione",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Chai says hello",
+        "body": "Sione greets Chai, the agent he named. Chai answers from the Core on the desk.",
+        "note": "Companion Agents are in beta."
+      },
+      "say": {
+        "speaker": "sione",
+        "text": "Good morning, Sione. This is Chai. What shall we open first?"
+      },
+      "film": true
+    },
+    {
+      "id": "study-site",
+      "chapter": "study",
+      "member": "sione",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "wordpress",
+        "replaces": [
+          "Squarespace"
+        ]
+      },
+      "capability": "run a website or blog on your own Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sione shapes a cheesemaker’s pages",
+        "body": "A cheesemaker wants new pages by Friday, so Sione builds them in WordPress on the Core. Pictures and drafts sit there while he works.",
+        "chips": [
+          "WordPress",
+          "replaces Squarespace"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "study-model",
+      "chapter": "study",
+      "member": "sione",
+      "category": "privacy",
+      "segment": "small-business",
+      "app": {
+        "id": "open-webui",
+        "replaces": [
+          "ChatGPT"
+        ]
+      },
+      "with": [
+        "grist"
+      ],
+      "capability": "chat with models running on your own Core, from any browser",
+      "anchor": {
+        "role": "room",
+        "room": "office"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sione asks the model for help",
+        "body": "One Grist formula in a client’s price list will not add up. Sione asks a model on the Core, through Open WebUI, and the question stays there by default.",
+        "chips": [
+          "Open WebUI",
+          "replaces ChatGPT"
+        ]
+      }
+    },
+    {
+      "id": "study-chai",
+      "chapter": "study",
+      "member": "sione",
+      "agent": "sione",
+      "approval": "sione",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-openclaw",
+        "replaces": []
+      },
+      "with": [
+        "wordpress"
+      ],
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Chai finds the loose ends",
+        "body": "Pictures without a description turn up on the cheesemaker’s draft pages. Chai walks them in WordPress and lists the gaps, and Sione reads the list before he changes anything.",
+        "chips": [
+          "OpenClaw"
+        ]
+      },
+      "say": {
+        "speaker": "sione",
+        "text": "Here is the list. Please read it before you change a page."
+      }
+    },
+    {
+      "id": "study-renewals",
+      "chapter": "study",
+      "member": "sione",
+      "category": "money",
+      "segment": "small-business",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "fireplace",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Malia asks about the font licence",
+        "body": "Malia asks when the font licence renews. Sione looks it up in Wallos by the fireplace. The date sits on the Core, with a reminder before it.",
+        "chips": [
+          "Wallos",
+          "replaces Rocket Money"
+        ]
+      }
+    },
+    {
+      "id": "living-lights",
+      "chapter": "living",
+      "member": "sione",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "glasshome",
+        "replaces": []
+      },
+      "capability": "design a Home Assistant dashboard by dragging widgets, with no YAML",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Sione joins two rooms of lights",
+        "body": "Rain sends Sione to the sofa. He drags the sunroom lights and the living-room floor lamp onto one GlassHome dashboard. The data stays on the home network.",
+        "chips": [
+          "GlassHome"
+        ]
+      }
+    },
+    {
+      "id": "living-notes",
+      "chapter": "living",
+      "member": "malia",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "joplin",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "take notes and keep to-dos that sync across your devices through your own server",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Malia notes when the ferns unfurl",
+        "body": "Tea beside her, Malia writes down when the ferns unfurled. The notes sync to Joplin Server on the Core, so her other devices find them there.",
+        "chips": [
+          "Joplin Server",
+          "replaces Evernote"
+        ]
+      }
+    },
+    {
+      "id": "living-film",
+      "chapter": "living",
+      "member": "malia",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Malia puts summer on the TV",
+        "body": "Last summer’s rowboat videos fill the TV while Malia and Sione share the sofa. Jellyfin plays them from a folder on the Core.",
+        "chips": [
+          "Jellyfin",
+          "replaces Plex"
+        ]
+      }
+    },
+    {
+      "id": "kitchen-stock",
+      "chapter": "kitchen",
+      "member": "malia",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "counter",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Malia adds jasmine to the list",
+        "body": "The tea canister is nearly empty, so Malia adds jasmine tea to the list in Grocy. The pantry count stays on the Core by default.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "kitchen-dinner",
+      "chapter": "kitchen",
+      "member": "sione",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "range",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Sione checks the flour first",
+        "body": "Before he bakes coconut buns at the range, Sione checks the flour count in Grocy. The count lives on the Core, next to the recipe.",
+        "chips": [
+          "Grocy",
+          "replaces AnyList"
+        ]
+      }
+    },
+    {
+      "id": "dining-plan",
+      "chapter": "dining",
+      "member": "malia",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "vikunja",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "lists, boards and calendars for tasks, with reminders and recurring jobs",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Malia and Sione plan studio day",
+        "body": "The open studio is Saturday, so Malia and Sione plan it on a Vikunja board at the farmhouse table. Vikunja keeps the jobs and their reminders on the Core.",
+        "chips": [
+          "Vikunja",
+          "replaces Todoist"
+        ]
+      }
+    },
+    {
+      "id": "dining-orders",
+      "chapter": "dining",
+      "member": "sione",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "n8n",
+        "replaces": [
+          "Zapier"
+        ]
+      },
+      "capability": "connect your apps with workflows, with the data staying on your Core",
+      "anchor": {
+        "role": "dining-table",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "dining"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Sione’s workflow writes the packing list",
+        "body": "Prints wait on the farmhouse table, and the packing list is already written. Sione’s n8n workflow turns order emails into lines on the Core, with no connector service between.",
+        "chips": [
+          "n8n",
+          "replaces Zapier"
+        ]
+      }
+    },
+    {
+      "id": "sunroom-line",
+      "chapter": "sunroom",
+      "member": "malia",
+      "category": "creative",
+      "segment": "consumer",
+      "app": {
+        "id": "inkscape",
+        "replaces": [
+          "Adobe Illustrator"
+        ]
+      },
+      "capability": "draw logos, diagrams and line art as vector graphics, in your browser",
+      "anchor": {
+        "role": "easel",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Malia inks a pencil fern",
+        "body": "A pencil fern on the easel becomes clean lines in Inkscape. Malia saves the file to a folder on the Core, beside her earlier prints.",
+        "chips": [
+          "Inkscape",
+          "replaces Adobe Illustrator"
+        ]
+      },
+      "film": true
+    },
+    {
+      "id": "sunroom-shop",
+      "chapter": "sunroom",
+      "member": "malia",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "wordpress",
+        "replaces": [
+          "Wix"
+        ]
+      },
+      "capability": "run a website or blog on your own Core",
+      "anchor": {
+        "role": "patio-seat",
+        "room": "living",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Malia captions the columbines",
+        "body": "The columbines on the catalogue page still need captions. Malia types them at the bistro table in WordPress, and the draft waits on the Core until she is happy.",
+        "chips": [
+          "WordPress",
+          "replaces Wix"
+        ]
+      }
+    },
+    {
+      "id": "sunroom-reply",
+      "chapter": "sunroom",
+      "member": "malia",
+      "agent": "malia",
+      "approval": "malia",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "ci-memory"
+      ],
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Marigold drafts, Malia sends",
+        "body": "A customer asks which print suits a narrow hall. Marigold drafts a reply from the notes Malia connected to Companion Memory (beta). Malia reads it and sends it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "film": true
+    },
+    {
+      "id": "garden-alliums",
+      "chapter": "garden",
+      "member": "malia",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Malia photographs the garden beds",
+        "body": "A new planting fills the garden beds, and Malia photographs it for her next print. Immich backs the pictures up to the Core and sorts them, slowly at first.",
+        "chips": [
+          "Immich",
+          "replaces Google Photos"
+        ]
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "The cottage shares one Companion Core",
+        "body": "Drawings, draft sites and the pantry list sit on one Companion Core in the cottage."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your drawings, draft sites and shopping list can run on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "The spec has no bedroom: nobody is shown asleep, every beat is daytime.",
+    "The Study has no desk item in the spec (the Core stands on its own writing desk), so Sione’s desk beats anchor on the core, the room and the fireplace.",
+    "WordPress beats stay on the Core and the home network: no beat says a client or customer can reach a site from outside, and no beat sells from a shop page.",
+    "Hermes (Marigold) is the first Hermes beat at sunroom-reply and carries the chat-service note; Chai is OpenClaw and opens only apps on the Core.",
+    "Companion Memory (beta) is named once, in the film beat sunroom-reply; only the notes Malia connected are claimed, nothing else.",
+    "Every app used has a QA screenshot, so reviewed.json needs no entry for tuala.",
+    "GlassHome and Jellyfin stay on the home network; no beat says the lights or the TV need no cloud account.",
+    "The garden beds hold no alliums in the spec (they are on the sunroom roof), so the garden beat says only a new planting."
+  ]
+}

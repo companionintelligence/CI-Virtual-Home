@@ -41,6 +41,7 @@ const MIME: Record<string, string> = {
   '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2', '.txt': 'text/plain; charset=utf-8',
   '.glb': 'model/gltf-binary', '.ico': 'image/x-icon', '.md': 'text/markdown; charset=utf-8',
   '.xml': 'application/xml', '.webmanifest': 'application/manifest+json',
+  '.m4a': 'audio/mp4', '.mp4': 'video/mp4', '.vtt': 'text/vtt; charset=utf-8',   // (the family tour's voice-over, film and captions)
 };
 export const FONT_FILES: Record<string, string> = { manrope: 'manrope-latin-var.woff2', 'jetbrains-mono': 'jetbrains-mono-latin-var.woff2' };
 
@@ -66,7 +67,7 @@ export async function serve(dir: string, base = '/', listenPort = 0): Promise<Se
       file = path.join(root, pathname.slice(base.length));
       if (!file.startsWith(root)) file = null;
       else if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
-      else if (!fs.existsSync(file) && !path.extname(file) && fs.existsSync(`${file}.html`)) file = `${file}.html`;
+      else if (!fs.existsSync(file) && !path.extname(file) && fs.existsSync(`${file}.html`)) file = `${file}.html`;   // (family/<slug> is family/<slug>.html, as for homes/<id>)
     }
     if (!file || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
       const notFound = path.join(root, '404.html');
