@@ -41,7 +41,7 @@ function makeSite(opts: { v3?: boolean; chips?: string[]; homeName?: string; ban
   write('story/okafor.bbbb.json', JSON.stringify({ v: 1, slug: 'okafor', family: { surname: 'Okafor', tagline: 'Four people, one quiet computer.', story: 'A family.', address: { line: '4 Elm Lane', place: 'Ashby' } }, members: [{ id: 'ada', name: 'Ada', work: 'Nurse' }], chapters: [{ id: 'kitchen', title: 'The kitchen' }], beats: [beat], closing: { body: 'That is the day.', cta: { label: 'Start again' } }, media: {} }));
   write('story/manifest.json', JSON.stringify({ v: 1, families: 'story/families.aaaa.json', byFamily: { okafor: { house: 'newcrest', story: 'story/okafor.bbbb.json', audio: {}, narration: false } } }));
   const foot = `<footer>Product names belong to their owners. ${say('launch-not-offer')} ${say('beta-full')} © 2026</footer>`;
-  write('index.html', `<!doctype html><html><head><title>Thirty homes</title><meta name="description" content="A home for every family."></head><body><main><h1>Thirty homes. ${FICTIONAL_LINE}</h1><p>${BETA_LINE}</p><p>${say('beta-short')}</p><ul><li>${homeName} · 2 storeys</li></ul></main><section class="cta-band"><p>${opts.bandText ?? 'A Companion Core is a small personal server.'}</p></section>${foot}</body></html>`);
+  write('index.html', `<!doctype html><html><head><title>Thirty homes</title><meta name="description" content="A home for every family."></head><body><main><h1>Thirty homes. ${FICTIONAL_LINE}</h1><p>${BETA_LINE}</p><p>${say('beta-short')}</p><ul><li>${homeName} · 2 storeys</li></ul></main><section class="cta-band"><p>${opts.bandText ?? 'A Companion Core is a small personal server.'}</p></section>${['scripted-scenes', 'stylised-art', 'not-frontier', 'names-logos-owners', 'third-party-apps'].map((id) => `<p>${say(id)}</p>`).join('')}${foot}</body></html>`);
   write('404.html', `<!doctype html><html><head><title>Not found</title></head><body><main><h1>That page is not here</h1></main>${foot}</body></html>`);
   write('homes/newcrest.html', `<!doctype html><html><head><title>${homeName}</title></head><body><main><h1>${homeName}</h1><p>${FICTIONAL_LINE}</p><p>${say('beta-short')}</p><section class="family-block"><a href="../family/okafor">Meet the family</a></section></main>${foot}</body></html>`);
   const strip = [FICTIONAL_LINE, BETA_LINE, say('beta-short'), say('scripted-scenes'), say('stylised-art'), say('names-owners')].map((t) => `<p>${t}</p>`).join('');
@@ -134,11 +134,11 @@ test('the disclosures: one printed today is an error when missing, one nobody pr
     assert.deepEqual(ok.errors, []);
     assert.deepEqual(ok.pending, [], 'every row is enforced today: nothing is pending');
     // a row marked pending (a disclosure claims.json owes and nothing prints yet) is listed, not failed, until --strict
-    DISCLOSURES.push({ id: 'not-frontier', surface: 'gallery', level: 'pending' });
+    DISCLOSURES.push({ id: 'synthetic-voice', surface: 'gallery', level: 'pending' });
     try {
-      assert.ok(lint(s).pending.some((p) => p.startsWith('not-frontier on gallery')), 'owed and not printed: pending');
+      assert.ok(lint(s).pending.some((p) => p.startsWith('synthetic-voice on gallery')), 'owed and not printed: pending');
       assert.deepEqual(lint(s).errors, []);
-      assert.ok(lint(s, true).errors.some((e) => e.startsWith('not-frontier on gallery')), '--strict makes it an error');
+      assert.ok(lint(s, true).errors.some((e) => e.startsWith('synthetic-voice on gallery')), '--strict makes it an error');
     } finally { DISCLOSURES.pop(); }
     // printed today on every kind of page, so a page without it is an error
     for (const rel of ['index.html', '404.html', 'homes/newcrest.html', 'family/okafor.html']) {

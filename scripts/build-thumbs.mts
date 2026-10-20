@@ -7,6 +7,13 @@
 //                    the pictures are the same frames. Without it the launch is the committed one (Metal on a Mac, SwiftShader elsewhere), so the
 //                    look of the pictures already committed never depends on the flag. For one new home: --house <id> --no-hero
 //
+//   pnpm run portal:thumbs -- --stage [--house seraphine] [--frame 240] [--tod day] [--gl default]
+//     --stage        instead of the gallery's pictures, the Core's own picture for the front page's band (reference/story/lander.md): frame <--frame> of the
+//                    committed core-orbit shot (the product orbit the goldens hold; frame 240 is the side-on view with the Core's front panel to the camera) in daylight, through the same composer, written to
+//                    portal/stage/<house>/core-0-1200.webp (1200 × 675, ≤ 70 KB) and core-0-640.webp (640 × 360, ≤ 28 KB). The house is the plan's hero's
+//                    (content/story/lander.json) unless --house names one. It is drawn stylised, never a photograph: the page prints the claims.json line
+//                    `stylised-art` beside it.
+//
 //   portal/thumbs/<id>.webp     640 × 360, ≤ --max-kb (quality stepped down until it fits)
 //   portal/hero.webp            1600 × 900 of --hero (default aurora, the house index.html's hero plays), ≤ 190 KB
 //   portal/previews/<id>.jpg    1200 × 630 JPEG, ≤ 110 KB: the link-preview image of the home's share page
@@ -50,6 +57,48 @@ fs.mkdirSync(PREVIEWS, { recursive: true });
 const srv = await serve(ROOT, '/');
 const pw = await loadPlaywright();
 const browser = await pw.chromium.launch({ headless: true, args: args.gl === 'default' && process.platform !== 'darwin' ? ['--use-gl=angle', '--use-angle=default', '--ignore-gpu-blocklist', '--enable-gpu-rasterization', '--no-sandbox'] : LAUNCH_ARGS });
+
+// ---- --stage: the Core's own picture, in daylight (see the header) ----------------------------------------------------------------------------------------------
+async function stage(id: string): Promise<void> {
+  const frame = Number(args.frame || 240), tod = args.tod || 'day';
+  const dir = path.join(ROOT, 'portal', 'stage', id);
+  fs.mkdirSync(dir, { recursive: true });
+  const ctx = await browser.newContext({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
+  const page = await ctx.newPage();
+  page.on('pageerror', (e: Error) => console.error(`  ${id}: page error: ${e.message.split('\n')[0]}`));
+  await stubGoogleFonts(page, srv.origin);
+  try {
+    await page.goto(srv.url(`room-creator.html?house=${encodeURIComponent(id)}`), { waitUntil: 'domcontentloaded' });
+    await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, id, { timeout: 120000 });
+    await page.evaluate(() => document.fonts.ready);
+    const jpeg: string = await page.evaluate(async ({ frame, tod }: { frame: number; tod: string }) => {
+      const W = window as any;
+      if (W.__houseLighting?.preset !== tod) W.__houseSetLighting(tod);
+      await W.__houseComposerWarm({ res: '1080' });
+      const r = W.__houseRenderBegin({ shot: 'core-orbit', res: '1080', fps: 60 });
+      const [f] = W.__houseRenderFrames(Math.min(frame, r.frames - 1), 1, 1.0);
+      W.__houseRenderEnd();
+      return `data:image/jpeg;base64,${f}`;
+    }, { frame, tod });
+    for (const [w, h, maxKb] of [[1200, 675, 70], [640, 360, 28]]) {
+      const out: { url: string; q: number } = await page.evaluate(async ({ jpeg, w, h, maxKb }: { jpeg: string; w: number; h: number; maxKb: number }) => {
+        const img = new Image(); img.src = jpeg; await img.decode();
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const g = c.getContext('2d')!; g.imageSmoothingQuality = 'high'; g.drawImage(img, 0, 0, img.width, img.height, 0, 0, w, h);
+        let q = 0.86, url = '';
+        for (; q >= 0.3; q -= 0.04) { url = c.toDataURL('image/webp', q); if ((url.length - 23) * 0.75 <= maxKb * 1024) break; }
+        return { url, q: +q.toFixed(2) };
+      }, { jpeg, w, h, maxKb });
+      if (!out.url.startsWith('data:image/webp')) throw new Error('this Chromium cannot encode webp');
+      const buf = Buffer.from(out.url.slice(out.url.indexOf(',') + 1), 'base64');
+      const file = path.join(dir, `core-0-${w}.webp`);
+      fs.writeFileSync(file, buf);
+      console.log(`  ${path.relative(ROOT, file)}  ${(buf.length / 1024).toFixed(1)} KB  q ${out.q}${buf.length > maxKb * 1024 ? '  OVER BUDGET' : ''}`);
+    }
+  } finally {
+    await ctx.close();
+  }
+}
 
 type Shot = { res: string; w: number; h: number; maxKb: number; file: string; tod?: string | null; tight?: number; lookY?: number; type?: 'webp' | 'jpeg' };
 async function render(id: string, shots: Shot[]): Promise<void> {
@@ -114,6 +163,14 @@ const heroShots = (): Shot[] => [
   { res: '1080', w: 1200, h: 630, maxKb: 170, file: path.join(ROOT, 'portal', 'hero.jpg'), tod: HERO_TOD, tight: 1.08, type: 'jpeg' },
 ];
 let failed = 0;
+if (args.stage === 'true') {
+  const heroHouse: string = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'lander.json'), 'utf8')).hero.house;
+  try { await stage(args.house ? HOUSES[0] : heroHouse); } catch (err) { failed++; console.error(`  stage: ${(err as Error).message}`); }
+  await browser.close();
+  await srv.close();
+  console.log(failed ? 'the stage picture failed' : 'the stage picture written');
+  process.exit(failed ? 1 : 0);
+}
 for (const id of HOUSES) {
   const frame = FRAME[id] || {};
   const shots: Shot[] = [{ res: '360', w: 640, h: 360, maxKb: MAX_KB, file: path.join(OUT, `${id}.webp`), ...frame }];

@@ -22,7 +22,7 @@ import path from 'node:path';
 import { ROOT, loadAll, cardOf, storyFiles, readJson } from './story/site-lib.mts';
 import * as pg from './story/pages.mts';
 import { needles, storyCopyLeaks } from './story/check-leaks.mts';
-import { LINKS, TITLE_MAX } from './portal-pages.mts';
+import { LINKS, TITLE_MAX, galleryCards } from './portal-pages.mts';
 import { memberBeat, memberChapter } from '../assets/story/url.ts';
 import { displayName } from '../assets/home-names.js';
 import { builderHandles, guardTerms, scanText } from './portal-redact.mts';
@@ -31,7 +31,8 @@ import type { Story } from '../assets/story/types.ts';
 import { readMedia, appCaption, appMedia, checkPageImages, MANIFEST } from './story/lib/media.mts';
 import type { MediaManifest } from './story/lib/media.mts';
 import { readPlan, placePins, levelSvg, roomLabel, roomNames, labelFor, aspect, levelLabel } from './story/lib/plan-map.mts';
-import { readFamilies, fleetOf, archSwap, pickPerson, logoWall, runsBand, familyCard, PICK } from './portal-front.mts';
+import { readFamilies, readStories, landerFamilies, frontCards, cardPairs, appsNamed } from './portal-front.mts';
+import { computeLander } from './story/lib/lander.mts';
 import type { FrontFamily } from './portal-front.mts';
 import { firstSentence } from '../assets/story/popup.ts';
 
@@ -458,42 +459,58 @@ const front = (): { fams: FrontFamily[]; stories: Story[] } => {
   return { fams, stories };
 };
 
-test('the front page: the fleet is counted the same way twice, the cards come in order, the wall is alphabetical and links nothing', () => {
+const lander = (): { fams: FrontFamily[]; data: ReturnType<typeof computeLander> } => {
   const { fams, stories } = front();
-  assert.equal(fams.length, stories.length);
-  assert.deepEqual(fleetOf(fams), fleetOf(front().fams), 'deterministic');
-  const fleet = fleetOf(fams);
-  // a family counts once for an archetype; the counts are of the families that have one
-  for (const [a, f] of Object.entries(fleet.byArch)) {
-    assert.equal(f.families, fams.filter(x => x.personas.includes(a)).length, `${a}: the families that have one`);
-    assert.ok(f.apps.every((x, i) => i === 0 || f.apps[i - 1].count >= x.count), `${a}: the most used app first`);
-    assert.ok(f.apps.every(x => x.count <= f.families), `${a}: no app is used by more families than there are`);
+  return { fams, data: computeLander({ root: ROOT, stories: readStories({ dir: FAMILIES_DIR, built: stories }), families: landerFamilies(fams), houses }) };
+};
+
+test('the front page: the cards come in the plan\'s order, in text, with "alternative to" and no held pair, and the apps list is alphabetical and links nothing', () => {
+  const { fams, data } = lander();
+  assert.equal(fams.length, loadAll(ROOT, FAMILIES_DIR).stories.length);
+  const { featured, rest } = frontCards(houses, fams, data, galleryCards);
+  const slugs = (html: string): string[] => [...html.matchAll(/<li class="card card-family[^"]*" data-id="[^"]+" data-slug="([^"]+)"/g)].map(m => m[1]);
+  assert.deepEqual(slugs(featured), data.featured.slugs, 'the featured list is the plan\'s, in its order');
+  assert.deepEqual(slugs(rest), fams.map(f => f.slug).filter(s => !data.featured.slugs.includes(s)), 'every other family follows, in the story\'s order');
+  const without = houses.filter(h => !fams.some(f => f.house === h.id));
+  assert.equal((rest.match(/class="card card-plain"/g) || []).length, without.length, 'a plain card for each home with no family');
+  for (const html of [featured, rest]) {
+    assert.ok(!/\breplaces\b/i.test(html.replace(/<[^>]+>/g, ' ')), 'the wording is "alternative to"');
+    assert.ok(!/<img[^>]*class="logo"/.test(html), 'text only: no logo');
+    for (const h of data.plan.hold) { const [sv, ap] = h.split('|'); assert.ok(!html.includes(`data-service="${sv}"`) || data.index.shown.some(p => p.service.id === sv), `${h}: a held pair's service is on a card only through a pair that may show`); }
   }
-  const html = pickPerson(fams, media);
-  const cards = [...html.matchAll(/<li class="arch" data-persona="([a-z]+)">/g)].map(m => m[1]);
-  assert.deepEqual(cards, PICK.filter(a => fleet.byArch[a]), 'organiser, builder, gamer and learner, in that order');
-  assert.equal((html.match(/class="arch-panel"/g) || []).length, Object.keys(fleet.byArch).filter(a => archSwap(fleet, a).before.length).length, 'a list for each archetype that has services to name');
-  assert.ok(!html.includes('<a '), 'nothing in it is a link: the buttons are the controls');
-  if (media) assert.ok((html.match(/<img class="logo"/g) || []).length >= cards.length * 3, 'three logos on a card at least');
-  else assert.ok(!/<img/.test(html), 'no manifest, no image');
-  const wall = logoWall(fams, media);
-  if (media) {
-    const names = [...wall.matchAll(/<li class="wall-app" data-by="[^"]*"><img[^>]*><span>([^<]+)<\/span>/g)].map(m => m[1]);
-    assert.ok(names.length > 20 && new Set(names).size === names.length);
-    assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })), 'alphabetical');
-    assert.ok(!/<a\b/.test(wall), 'text only: it links nothing');
-  } else assert.equal(wall, '');
-  assert.ok(/^<section class="runs-band"/.test(runsBand(media)) && runsBand(null).includes('Companion Hub is where you install apps'), 'the band reads without images too');
+  // featured cards show two lines at most, and no pair is on more than three of them
+  const pairs = cardPairs(data, fams.map(f => f.slug), data.featured.slugs), used = new Map<string, number>();
+  for (const slug of data.featured.slugs) {
+    const lines = pairs.get(slug)!;
+    assert.ok(lines.filter(l => l.shown).length <= 2, `${slug}: two lines`);
+    for (const l of lines.filter(x => x.shown)) used.set(`${l.pair.service.id}|${l.pair.app.id}`, (used.get(`${l.pair.service.id}|${l.pair.app.id}`) ?? 0) + 1);
+  }
+  for (const [k, n] of used) assert.ok(n <= 3, `${k} is on ${n} featured cards`);
+  const apps = appsNamed(fams);
+  const names = [...apps.matchAll(/<li>([^<]+)<\/li>/g)].map(m => decode(m[1]));
+  assert.ok(names.length > 20 && new Set(names).size === names.length, `${names.length} apps`);
+  assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })), 'alphabetical');
+  assert.ok(!/<a\b|<img/.test(apps), 'text only: no link, no logo');
 });
 
-test('a family card shows up to four app lines with their logos; a first sentence is one sentence', () => {
-  const { fams } = front();
-  const f = fams.find(x => x.apps.length >= 3) || fams[0];
-  const h = houses.find(x => x.id === f.house)!;
-  const t = familyCard(f, h, 0, media);
-  const lines = (t.match(/<ul class="apps"[\s\S]*?<\/ul>/) || [''])[0].match(/<li>[\s\S]*?<\/li>/g) || [];
-  assert.ok(lines.length >= 1 && lines.length <= 4);
-  for (const li of lines) assert.ok(/replaces/.test(li.replace(/<[^>]+>/g, ' ')) && (media ? /<img class="logo"[^>]*alt="[^"]+ logo"/.test(li) : !/<img/.test(li)));
+test('a family card is text: two pair lines show and the others wait hidden for a chip, it says "Meet the family" and never promises the tour, and the hero\'s card names its other homes', () => {
+  const { fams, data } = lander();
+  const { featured } = frontCards(houses, fams, data, galleryCards);
+  const hero = featured.split('\n        ')[0];   // (the cards are joined by this, so the first is the hero's)
+  assert.ok(hero.includes(`data-slug="${data.plan.hero.slug}"`), 'the hero\'s card leads');
+  const list = (hero.match(/<ul class="pairs-lines"[\s\S]*?<\/ul>/) || [''])[0];
+  const items = list.match(/<li data-service="[^"]+"[^>]*>[^<]+<\/li>/g) || [];
+  assert.ok(items.length >= 2, 'the family\'s cleared pairs are all there');
+  assert.equal(items.filter(x => !/ hidden>/.test(x)).length, 2, 'two show');
+  for (const li of items) assert.match(li.replace(/<[^>]+>/g, ''), /^[^,]+, alternative to [^,]+$/);
+  assert.ok(/Meet the family/.test(hero) && !/Take the tour/.test(hero), 'a card goes to the family\'s page, not the tour');
+  const heroFam = fams.find(f => f.slug === data.plan.hero.slug)!;
+  const sibs = fams.filter(f => f.surname === heroFam.surname && f.slug !== heroFam.slug);
+  if (sibs.length) {
+    assert.match(hero, /Same people, a different house:/);
+    for (const s of sibs) assert.ok(hero.includes(`<a href="./family/${s.slug}" data-campaign>`), `${s.slug} is linked from the grouped card`);
+  }
+  assert.ok(!/<img[^>]*class="logo"/.test(hero));
   assert.equal(firstSentence('Two storeys of brick. The ground floor is open. Behind it, a pool.'), 'Two storeys of brick.');
   assert.equal(firstSentence('One sentence only'), 'One sentence only');
   assert.equal(firstSentence('  Spaced   out.  Next. '), 'Spaced out.');

@@ -183,28 +183,6 @@ kbd {
   color: var(--muted-foreground);
   text-wrap: pretty;
 }
-/* The Companion Core callout under the hero's buttons: a card of its own, so the one-line product explainer and its
-   two ways in (buy, download) read as a unit and Watch stays the page's first action */
-.core-card {
-  margin-top: 18px; max-width: 34em;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: var(--card);
-  box-shadow: inset 0 0 0 1px var(--pg-hairline);
-}
-.core-line {
-  margin: 0;
-  display: flex; align-items: flex-start; gap: 10px;
-  font-size: 14.5px; line-height: 1.55;
-  color: var(--muted-foreground);
-  text-wrap: pretty;
-}
-.core-line .i { width: 18px; height: 18px; margin-top: 2px; color: var(--primary); }
-.core-line b { color: var(--foreground); font-weight: 700; }
-.core-actions { margin: 4px 0 0 28px; }
-.core-fine { margin: 2px 0 0 28px; font-size: 12.5px; color: var(--muted-foreground); }
-.core-more { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; font-weight: 600; font-size: 14px; text-underline-offset: 3px; }
-.core-more .i { width: 15px; height: 15px; }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
@@ -220,15 +198,6 @@ kbd {
 .btn-primary:hover, .btn-buy:hover { background: var(--phthalo-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
 .btn-ghost { background: transparent; color: var(--foreground); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
 .btn-ghost:hover { background: var(--pg-hairline); }
-.stats {
-  display: flex; flex-wrap: wrap; gap: 12px 36px;
-  margin: 24px 0 0; padding: 16px 0 0;
-  border-top: 1px solid var(--pg-hairline);
-}
-.stats div { display: flex; flex-direction: column-reverse; }
-.stats dt { font-size: 12.5px; color: var(--muted-foreground); font-weight: 500; }
-.stats dd { margin: 0; font-size: 32px; line-height: 1.1; font-weight: 200; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-
 .hero-media {
   position: relative;
   display: block;
@@ -281,7 +250,6 @@ kbd {
 }
 .homes h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 10px; }
 .count { font-size: 14px; font-weight: 500; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
-.filters { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 .search {
   display: flex; align-items: center; gap: 8px;
   height: 40px; width: 340px; padding: 0 10px 0 14px;
@@ -315,7 +283,6 @@ kbd {
 }
 .seg button:hover { color: var(--foreground); }
 .seg button[aria-pressed="true"] { background-color: var(--primary); color: var(--primary-foreground); }
-.tags { display: flex; flex-wrap: wrap; gap: 0 6px; padding: 6px 0 0; }
 .tag {
   height: 44px; padding: 0 13px;
   border: 0; border-block: 6px solid transparent; background-clip: padding-box;
@@ -334,30 +301,8 @@ kbd {
 .tag[aria-pressed="true"] small { color: inherit; }
 .tag:disabled { cursor: default; color: color-mix(in srgb, var(--muted-foreground) 55%, transparent); }
 .tag:disabled small { color: inherit; }
-.filters.off { opacity: 0.45; }
 /* what they do: the filter a story visitor reaches for first (work from home, code, play, study, make, host), above the home style row */
-.personas { display: flex; flex-wrap: wrap; gap: 0 8px; padding: 10px 0 0; }
-.personas .tag { font-size: 14px; color: var(--foreground); padding: 0 15px; }
-.personas .tag small { font-size: 12px; }
-.personas .tag:disabled { color: color-mix(in srgb, var(--muted-foreground) 55%, transparent); }
 /* the style and storeys filters are for browsing homes: one line that opens them (the script opens it on a wide screen) */
-.more-filters { margin-top: 2px; }
-.more-filters summary {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 4px;
-  cursor: pointer; list-style: none; border-radius: 8px;
-  font-size: 13.5px; font-weight: 600; color: var(--muted-foreground);
-}
-.more-filters summary::-webkit-details-marker { display: none; }
-.more-filters summary::before {
-  content: ""; width: 7px; height: 7px; margin: 0 3px 3px 1px;
-  border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
-  transform: rotate(-45deg); transition: transform 0.15s ease;
-}
-.more-filters[open] summary::before { transform: rotate(45deg); margin-bottom: 5px; }
-.more-filters summary:hover { color: var(--foreground); }
-.more-body { display: flex; flex-wrap: wrap; align-items: center; gap: 0 14px; padding-bottom: 4px; }
-.more-body .tags { flex: 1 1 280px; min-width: 0; padding-top: 0; }
-
 .grid {
   list-style: none; margin: 0; padding: 16px 0 0;
   display: grid;
@@ -537,7 +482,6 @@ kbd {
 /* a short desktop screen (a 1280 × 800 laptop, a 1024 × 768 tablet on its side): the eyebrow and the figures go,
    so the homes start on the first screen */
 @media (min-width: 901px) and (max-height: 860px) {
-  .eyebrow, .stats { display: none; }
 }
 
 /* ---------------- narrow ---------------- */
@@ -550,17 +494,14 @@ kbd {
   .brand-ci span { display: none; }
   .hero { grid-template-columns: 1fr; gap: 20px; }
   .hero-media { order: -1; aspect-ratio: 21 / 9; border-radius: 18px; }
-  .eyebrow, .lede-more, .stats { display: none; }
   .search { flex: 1 1 220px; width: auto; }
   .search kbd { display: none; }
-  .filters { flex: 1 1 auto; justify-content: flex-end; }
   .foot-grid { grid-template-columns: 1fr; }
   .foot-links ul { columns: 2 180px; column-gap: 28px; }
 }
 @media (max-width: 700px) {
   .site-nav .nav-docs, .site-nav .nav-download { display: none; }
   .homes-head { align-items: stretch; flex-direction: column; }
-  .filters { width: 100%; justify-content: flex-start; }
 }
 /* Phones: the hero keeps the picture, the headline, the Core line and one button (the stats and the second
    button are for wider screens), the filters sit in two rows, and the homes go two to a row, compact: name
@@ -574,22 +515,16 @@ kbd {
   .hero-media { aspect-ratio: 16 / 9; }
   .hero-play { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
   .hero-play .i { width: 22px; height: 22px; }
-  .eyebrow, .lede-more { display: none; }
   .hero h1 { font-size: 34px; }
   .lede { font-size: 15.5px; margin-top: 10px; }
-  .core-card { margin-top: 14px; padding: 12px; }
-  .core-line { font-size: 14px; }
   .cta-actions .btn { flex: 1 1 auto; }
   .hero-cta { margin-top: 18px; }
   .hero-cta .btn { flex: 1 1 auto; }
-  .hero-browse, .stats { display: none; }
   .homes-head { gap: 10px; padding-bottom: 12px; }
   .search { height: 44px; }
   .search kbd { display: none; }
   .seg { width: 100%; }
   .seg button { flex: 1; padding: 0 6px; }
-  .tags { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--pg-gutter)); padding: 4px var(--pg-gutter) 0; }
-  .tags::-webkit-scrollbar { display: none; }
   .tag { flex: none; }
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; padding-top: 14px; }
   .thumb { border-radius: 11px; }
@@ -602,19 +537,10 @@ kbd {
   .thumb-play .i { width: 11px; height: 11px; margin-left: 2px; }
   .thumb-missing b { font-size: 28px; }
   .thumb-missing span { font-size: 11.5px; }
-  /* a family's card is one to a row on a phone, with its people and apps; the homes with no family stay two to a row after them */
-  .card-family { grid-column: 1 / -1; }
-  .card-family .card-body { padding-top: 12px; }
-  .card-family h3 { font-size: 18px; line-height: 1.3; }
-  .card-family .thumb-play { right: 10px; bottom: 10px; width: auto; height: 30px; padding: 0 12px 0 10px; justify-content: flex-start; gap: 6px; font-size: 12px; }
-  .card-family .thumb-play .i { width: 12px; height: 12px; margin-left: 0; }
-  .personas { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--pg-gutter)); padding: 10px var(--pg-gutter) 0; }
-  .personas::-webkit-scrollbar { display: none; }
-  .personas .tag { flex: none; }
 }
 @media (pointer: coarse) {
   .search { height: 44px; }
-  .site-nav a, .brand a, .foot-links a, .core-more { min-height: 44px; }
+  .site-nav a, .brand a, .foot-links a { min-height: 44px; }
   .foot-homes a { min-height: 36px; }
 }
 @media (hover: none) {
@@ -625,60 +551,195 @@ kbd {
   *, *::before, *::after { transition: none !important; }
 }
 
-/* ===================================================== story v2: pick a person, the wall of apps, how it runs ===================================================== */
-/* "Pick a person": a card for an archetype (its story line, the three apps its families use most with their logos, in how many families it is). The card's one
-   control is a stretched button: choosing it is the persona filter (portal/gallery.js). The list under the cards is shown for the archetype chosen. */
-.pick { max-width: var(--pg-wide); margin: 0 auto; padding: 4px var(--pg-gutter) 40px; }
-.pick-head h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
-.pick-head p { margin: 6px 0 0; max-width: 42em; color: var(--muted-foreground); text-wrap: pretty; }
-.pick-grid { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-.arch { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 18px 18px 8px; border-radius: 18px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); transition: box-shadow 0.2s ease, transform 0.2s ease; }
-.arch:hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 45%, transparent), var(--shadow-md); }
-.arch.on { box-shadow: inset 0 0 0 2px var(--primary), var(--shadow-md); }
-.arch h3 { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.25; }
-.arch-line { margin: 0 0 auto; font-size: 14.5px; line-height: 1.5; color: var(--muted-foreground); text-wrap: pretty; }
-.arch-apps { list-style: none; margin: 6px 0 0; padding: 12px 0 0; display: grid; gap: 8px; border-top: 1px solid var(--pg-hairline); }
-.arch-apps li { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; min-height: 28px; }
-.arch-apps .logo { width: 28px; height: 28px; }
-.arch-count { margin: 0; padding-top: 4px; font-size: 12.5px; color: var(--muted-foreground); }
-.arch-btn { position: static; display: flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; color: var(--primary); font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; }
-.arch-btn::after { content: ""; position: absolute; inset: 0; border-radius: 18px; }
-.arch-btn:focus-visible { outline: none; }
-.arch:has(.arch-btn:focus-visible) { outline: 2px solid var(--ring); outline-offset: 3px; }
-.arch-on { display: none; }
-.arch-btn[aria-pressed="true"] .arch-on { display: inline; }
-.arch-btn[aria-pressed="true"] .arch-off { display: none; }
-.arch-btn:disabled { cursor: default; opacity: 0.55; }
-.arch-panels { margin-top: 18px; }
-.arch-panel { display: none; }
-.arch-panel.on { display: block; }
-.arch-panel-lead { margin: 0; font-size: 14px; color: var(--muted-foreground); }
-.arch-panel .swap { max-width: none; margin-top: 10px; }
+/* ===================================================== the lander (reference/story/lander.md) ===================================================== */
+/* The header is sticky, so Buy and Download are in reach at every scroll position, on a phone too. The bar spans the page; its content keeps the column. */
+html { scroll-padding-top: 72px; }
+.site-head {
+  position: sticky; top: 0; z-index: 30;
+  max-width: none; margin: 0;
+  padding: 8px max(var(--pg-gutter), calc((100% - var(--pg-wide)) / 2 + var(--pg-gutter)));
+  background: color-mix(in srgb, var(--background) 94%, transparent);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 1px 0 var(--pg-hairline);
+}
+#argument, #proof, #core, #swap, #homes { scroll-margin-top: 72px; }
+#cta-title:focus { outline: none; }
 
-/* "What the families run": every app the stories name, its logo beside its name. Text only; dimmed to the archetype chosen. */
-.wall { max-width: var(--pg-wide); margin: 0 auto; padding: 8px var(--pg-gutter) 52px; }
-.wall h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
-.wall-lead { margin: 6px 0 0; max-width: 46em; color: var(--muted-foreground); text-wrap: pretty; }
-.wall-list { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px 12px; }
-.wall-app { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 12px 6px 8px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); font-size: 14px; font-weight: 600; transition: background-color 0.2s ease; }
-.wall-app .logo { width: 32px; height: 32px; }
-.wall-app.dim { background: transparent; color: var(--muted-foreground); font-weight: 500; }
-.wall-app.dim .logo { opacity: 0.4; filter: grayscale(1); }
-.wall-note { margin: 14px 0 0; max-width: 52em; font-size: 12.5px; color: var(--muted-foreground); }
+/* hero: two chips (the fiction label and the beta line), the message, what a Core is, one action */
+.hero { align-items: start; padding-top: clamp(20px, 3vw, 40px); }
+.hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.hero-chips .fiction-label { margin: 0; }
+.beta-chip {
+  margin: 0; display: inline-flex; align-items: center; min-height: 28px; padding: 4px 12px; border-radius: 14px;
+  background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline);
+  color: var(--muted-foreground); font-size: 13px; font-weight: 600; line-height: 1.3;
+}
+.hero h1 { font-size: clamp(36px, 4.6vw, 60px); line-height: 1.02; }
+.hero .lede { margin-top: 18px; max-width: 30em; font-size: clamp(16.5px, 1.5vw, 19px); color: var(--foreground); }
+.lede-families { margin: 10px 0 0; max-width: 30em; font-size: 15.5px; line-height: 1.55; color: var(--muted-foreground); text-wrap: pretty; }
+.hero-cta { align-items: center; gap: 4px 22px; margin-top: 24px; }
+.hero-pointer { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 600; font-size: 15px; color: var(--foreground); text-underline-offset: 3px; }
+.hero-pointer .i { width: 16px; height: 16px; }
+.hero-hint { margin: 8px 0 0; font-size: 13.5px; color: var(--muted-foreground); }
+.hero-noscript { margin: 12px 0 0; font-size: 14px; color: var(--muted-foreground); }
 
-/* "How it runs": a band like the Core's, with a real screenshot of Companion Hub and of the Companion account page */
-.runs-band { width: min(calc(100% - 2 * var(--pg-gutter)), calc(var(--pg-wide) - 2 * var(--pg-gutter))); margin: 0 auto 40px; padding: clamp(20px, 3vw, 32px); border-radius: 22px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline), var(--shadow-sm); }
-.runs-band h2 { margin: 0 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
-.runs-band .lead { margin: 0; max-width: 40em; color: var(--muted-foreground); }
-.runs-band .run h3 { margin: 0; }
-.runs-band .run > p { margin: 6px 0 0; }
+/* the blocks after the hero share one column and one rhythm */
+.argument, .proof, .swap { max-width: var(--pg-wide); margin: 0 auto; padding-left: var(--pg-gutter); padding-right: var(--pg-gutter); }
+.argument h2, .proof h2, .swap h2 { margin: 0; font-size: clamp(24px, 2.6vw, 32px); font-weight: 700; letter-spacing: -0.015em; line-height: 1.15; }
+.argument { padding-top: clamp(8px, 2vw, 24px); padding-bottom: clamp(32px, 4.5vw, 56px); }
+.argument-steps { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: step; }
+.argument-steps > li { counter-increment: step; padding: 22px 22px 20px; border-radius: 18px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
+.argument-steps h3 { margin: 0 0 12px; display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; }
+.argument-steps h3::before {
+  content: counter(step); flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--primary); color: var(--primary-foreground); font-size: 14px; font-weight: 700;
+}
+.argument-steps p { margin: 0 0 10px; color: var(--muted-foreground); line-height: 1.6; text-wrap: pretty; }
+.argument-steps p:last-child { margin-bottom: 0; }
+.argument-more a { display: inline-flex; align-items: center; min-height: 32px; font-weight: 600; text-underline-offset: 3px; }
 
-@media (prefers-reduced-motion: no-preference) { .arch:hover { transform: translateY(-2px); } }
-@media (max-width: 1000px) { .pick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 600px) {
-  .pick { padding-bottom: 28px; }
-  .pick-grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--pg-gutter); margin: 16px calc(-1 * var(--pg-gutter)) 0; padding: 4px var(--pg-gutter) 10px; scrollbar-width: thin; }
-  .arch { flex: 0 0 min(80%, 300px); scroll-snap-align: start; }
-  .wall-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .wall-app { padding-right: 8px; font-size: 13px; }
+/* one pair, in full: the service rented, the app that is an alternative, the honest limit, a way into that very moment of the tour */
+.proof { padding-bottom: clamp(32px, 4.5vw, 56px); }
+.proof-eyebrow { margin: 0 0 6px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
+.proof-pair { margin: 20px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.proof-pair > div { position: relative; padding: 20px 22px; border-radius: 18px; }
+.proof-before { background: var(--muted); }
+.proof-after { background: color-mix(in srgb, var(--primary) 9%, var(--card)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 32%, transparent); }
+.proof-after::before {
+  content: ""; position: absolute; left: -17px; top: 50%; width: 12px; height: 12px; margin-top: -6px;
+  border-top: 2px solid var(--primary); border-right: 2px solid var(--primary); transform: rotate(45deg);
+}
+.proof-pair dt { margin: 0 0 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-foreground); }
+.proof-after dt { color: var(--primary); }
+.proof-pair dd { margin: 0; font-size: 17px; line-height: 1.55; text-wrap: pretty; }
+.proof-before dd { color: var(--muted-foreground); }
+.proof-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; }
+.chip { display: inline-flex; align-items: center; min-height: 30px; padding: 0 12px; border-radius: 999px; font-size: 13.5px; font-weight: 600; background: var(--pg-surface); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
+.proof-chips .chip:first-child { color: var(--primary); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 42%, transparent); }
+.proof-limit { margin: 12px 0 0; font-size: 14px; color: var(--muted-foreground); }
+.proof-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; margin: 20px 0 0; }
+.proof-family { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-underline-offset: 3px; }
+
+/* the Core: what it is (claims.json's words), its picture, the offer, what it is not */
+.cta-band { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 20px 40px; margin-bottom: clamp(32px, 4.5vw, 56px); }
+.cta-band.has-fig { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); }
+.cta-band .cta-copy { max-width: none; }
+.cta-copy h2 { margin: 0 0 12px; font-size: clamp(24px, 2.6vw, 32px); letter-spacing: -0.015em; line-height: 1.15; }
+.cta-copy .cta-lead { margin: 0; font-size: clamp(18px, 1.9vw, 22px); line-height: 1.45; color: var(--foreground); text-wrap: pretty; }
+.cta-facts { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; color: var(--muted-foreground); }
+.cta-facts li { position: relative; padding-left: 20px; line-height: 1.5; }
+.cta-facts li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+.cta-band .cta-actions { margin-top: 22px; }
+.core-fig { margin: 0; grid-column: 2; grid-row: 1; }
+.core-fig picture, .core-fig img { display: block; width: 100%; height: auto; }
+.core-fig img { border-radius: 16px; box-shadow: var(--shadow-md); }
+.core-fig figcaption { margin-top: 8px; font-size: 12.5px; color: var(--muted-foreground); }
+.cta-limits { grid-column: 1 / -1; display: grid; gap: 6px; padding-top: 16px; border-top: 1px solid var(--pg-hairline); }
+.cta-limits p, .cta-copy .cta-limits p { margin: 0; max-width: 62em; font-size: 13.5px; line-height: 1.5; color: var(--muted-foreground); }
+
+/* "What do you rent today?": the chooser. One chip for each service (the service, the app that is an alternative under it), the jobs, a search */
+.swap { padding-bottom: clamp(28px, 3.5vw, 44px); }
+.swap-lead { margin: 8px 0 0; color: var(--muted-foreground); line-height: 1.55; }
+.swap .search { width: min(100%, 540px); margin-top: 18px; }
+.pairs { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 10px; }
+.pair {
+  width: 100%; min-height: 58px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; padding: 8px 14px;
+  border: 0; border-radius: 14px; cursor: pointer; text-align: left; font: inherit; color: var(--foreground);
+  background: var(--pg-surface); box-shadow: inset 0 0 0 1px var(--pg-hairline), var(--shadow-sm);
+  transition: box-shadow 0.15s ease, background-color 0.15s ease;
+}
+.pair b { font-size: 15px; font-weight: 700; }
+.pair span { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--primary); }
+.pair .i { width: 13px; height: 13px; }
+.pair:hover:not(:disabled) { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 45%, transparent), var(--shadow-md); }
+.pair[aria-pressed="true"] { background: color-mix(in srgb, var(--primary) 8%, var(--pg-surface)); box-shadow: inset 0 0 0 2px var(--primary), var(--shadow-md); }
+.pair:disabled { cursor: default; opacity: 0.5; }
+html:not([data-gallery]) .pair:disabled, html:not([data-gallery]) .search input:disabled { opacity: 1; }
+.jobs { display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; margin-top: 18px; }
+.jobs-label { margin-right: 6px; font-size: 13px; font-weight: 600; color: var(--muted-foreground); }
+.jobs .tag { font-size: 14px; color: var(--foreground); padding: 0 15px; }
+.jobs .tag[aria-pressed="true"] { color: var(--primary); }
+.swap .types { margin-top: 14px; }
+.swap-note { margin: 14px 0 0; font-size: 14px; color: var(--muted-foreground); }
+
+/* the families: a count in words, what the filter shows, six cards, then every family and every home behind a native disclosure */
+.homes { padding-top: 4px; }
+.homes-head { justify-content: flex-start; align-items: baseline; }
+.homes-count { margin: 0; font-size: 15px; color: var(--muted-foreground); }
+.homes-live { margin: 0; font-size: 14px; font-weight: 600; color: var(--primary); }
+.homes-live:empty { display: none; }
+.homes-head #clear { margin-left: auto; }
+.btn-small { height: 36px; padding: 0 14px; font-size: 14px; }
+.all-homes { margin-top: 30px; }
+.all-homes > summary {
+  list-style: none; display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 20px;
+  border-radius: 999px; cursor: pointer; font-weight: 700; font-size: 15px; background: var(--pg-surface); box-shadow: inset 0 0 0 1px var(--pg-hairline), var(--shadow-sm);
+}
+.all-homes > summary::-webkit-details-marker { display: none; }
+.all-homes > summary::after { content: ""; width: 8px; height: 8px; margin-top: -4px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform 0.2s ease; }
+.all-homes[open] > summary::after { margin-top: 2px; transform: rotate(-135deg); }
+.grid-rest { padding-top: 28px; }
+.card-family .pairs-lines { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 4px; font-size: 13px; line-height: 1.4; color: var(--muted-foreground); }
+.pairs-lines li[hidden] { display: none; }
+.pairs-lines li.hit { order: -1; color: var(--primary); font-weight: 600; }
+.siblings { position: relative; z-index: 2; margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--muted-foreground); }
+.siblings a { display: inline; font-weight: 600; text-underline-offset: 3px; }
+.no-family { margin: 3px 0 0; font-size: 13.5px; font-weight: 600; color: var(--muted-foreground); }
+.card-family .thumb-play span { display: inline; }
+
+/* footer: the sign-off, the fine print, the apps the stories name */
+.foot-signoff { margin: 10px 0 0; font-size: 17px; font-weight: 700; color: var(--foreground); }
+.foot-apps { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--pg-hairline); }
+.foot-apps summary { display: inline-flex; align-items: center; min-height: 36px; cursor: pointer; font-weight: 600; color: var(--foreground); text-underline-offset: 3px; }
+.apps-named { list-style: none; margin: 8px 0 0; padding: 0; columns: 4 170px; column-gap: 24px; font-size: 13px; }
+.apps-named li { break-inside: avoid; padding: 2px 0; }
+
+@media (max-width: 900px) {
+  .hero-media { order: 0; }
+  .argument-steps { grid-template-columns: 1fr; }
+  .proof-pair { grid-template-columns: 1fr; gap: 22px; }
+  .proof-after::before { left: 50%; top: -17px; margin: 0 0 0 -6px; transform: rotate(135deg); }
+  .cta-band.has-fig { grid-template-columns: minmax(0, 1fr); }
+  .core-fig { grid-column: 1; grid-row: auto; }
+}
+@media (max-width: 700px) {
+  .site-nav .nav-docs { display: none; }
+  .site-nav .nav-download { display: inline-flex; }
+  .homes-head { flex-direction: row; align-items: baseline; }
+}
+@media (max-width: 520px) {
+  .site-head { padding-top: 8px; padding-bottom: 8px; }
+  .brand-title, .brand-sep { display: none; }
+  .hero { padding-top: 14px; gap: 22px; }
+  .hero-media { aspect-ratio: 16 / 9; }
+  .hero h1 { font-size: 34px; line-height: 1.04; }
+  .hero-cta { gap: 2px 16px; }
+  .hero-cta .btn { flex: 1 1 100%; height: 48px; }
+  .pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .pair { padding: 8px 12px; }
+  .jobs { flex-wrap: nowrap; overflow-x: auto; margin: 16px calc(-1 * var(--pg-gutter)) 0; padding: 0 var(--pg-gutter); scroll-padding-inline: var(--pg-gutter); scrollbar-width: none; scroll-snap-type: x proximity; }
+  .jobs::-webkit-scrollbar { display: none; }
+  .jobs-label, .jobs .tag { flex: none; scroll-snap-align: start; }
+  .cta-band .cta-actions .btn { flex: 1 1 100%; height: 48px; }
+  .homes-head #clear { margin-left: 0; }
+  .all-homes > summary { width: 100%; }
+  .card-family .pairs-lines { font-size: 12.5px; }
+  .apps-named { columns: 2 140px; }
+  /* compact cards, two to a row on a phone (the picture and the name, then who lives there and the pairs on the family's own page), so the six featured families are
+     about three rows; the first card, the one that names the same people's other homes, takes the row */
+  .card-family .card-body { padding-top: 8px; }
+  .card-family .cast, .card-family .pairs-lines, .card-family .go { display: none; }
+  .card-family .home-line { font-size: 12.5px; }
+  #grid > .card-family:first-child { grid-column: 1 / -1; }
+  #grid > .card-family:first-child h3 { font-size: 18px; line-height: 1.3; }
+  #grid > .card-family:first-child .go { display: inline-flex; }
+  .card-family .thumb-play span { display: none; }
+  .homes { padding-bottom: 40px; }
+  .hero { padding-bottom: 20px; }
+  .site-foot { padding-bottom: 32px; }
+  .argument-steps > li { padding: 18px 18px 16px; }
+}
+@media (pointer: coarse) {
+  .hero-pointer, .proof-family, .argument-more a { min-height: 44px; }
+  .foot-apps summary { min-height: 44px; }
 }

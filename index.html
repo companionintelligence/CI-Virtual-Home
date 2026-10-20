@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Virtual homes · Companion Intelligence</title>
-  <meta name="description" content="Thirty-six homes, each with a Companion Core and most with a fictional family. Take a tour and see their planner, code, games and homework. Fictional family. Real software.">
-  <!-- link previews: scripts/build-portal.mts makes og:image and og:url absolute for the deployed site -->
+  <meta name="description" content="Fictional families show the service each Companion Hub app is an alternative to, on one Companion Core in their home. Fictional family. Real software.">
+  <!-- link previews: scripts/build-portal.mts writes the title and the description (the H1's claim, the Core, the count in words) and makes og:image and og:url absolute for the deployed site -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Companion Intelligence">
   <meta property="og:title" content="Virtual homes · Companion Intelligence">
-  <meta property="og:description" content="Thirty-six homes, each with a Companion Core and most with a fictional family. Take a tour and see their planner, code, games and homework. Fictional family. Real software.">
+  <meta property="og:description" content="Fictional families show the service each Companion Hub app is an alternative to, on one Companion Core in their home. Fictional family. Real software.">
   <meta property="og:image" content="./portal/hero.jpg">
   <meta property="og:image:type" content="image/jpeg">
   <meta property="og:image:width" content="1200">
@@ -21,15 +21,15 @@
   <meta name="theme-color" content="#f3faf7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#041620" media="(prefers-color-scheme: dark)">
   <!--
-    The portal's front page: the families and their homes. Static and fast: it reads content/houses/index.json and shows the
-    committed thumbnails in portal/thumbs/ (scripts/build-thumbs.mts); there is no WebGL on this page. A family's card opens its
-    page (family/<slug>), which opens the narrated tour in the live player, room-creator.html?mode=view (assets/viewer.ts); a home
-    with no family opens the player. scripts/build-portal.mts writes the family cards into the grid as static HTML (a crawler, a
-    visitor without JavaScript and an in-app browser with a slow script see them), and portal/gallery.js filters them. Every URL
-    here is relative, so the site works at any host's
-    root and under a sub-path (portal:test serves it at /ci-virtual-home/). Fonts are the repo's own woff2, so
-    the source page makes no third-party requests; the deployed site adds Google Analytics at deploy time
-    (.github/workflows/deploy.yml), which is the only third party it talks to.
+    The portal's front page, the Companion Core's lander (reference/story/lander.md): the argument, one pair in full, the Core and its offer, a chooser by
+    the service you rent, and the families and their homes. Static and fast: there is no WebGL on this page. Everything that argues, proves and offers is
+    in the built HTML (a crawler, a visitor without JavaScript and an in-app browser with a slow script read all of it); portal/gallery.js only makes the
+    chooser filter. Its words come from three places and never from here: a claim is claims.json's (the claim markers), the fine print is
+    claims.json's through scripts/story/lib/fine-print.mts (the fine markers), and the lists are the families' and the plan's
+    (content/story/lander.json; the lander markers, scripts/portal-front.mts). What is typed below is the page's own connecting copy, held by
+    the copy lint (pnpm run story:copy -- dist). A family's card goes to its page (family/<slug>), which goes on to the tour; a home with no family opens the
+    player. Every URL here is relative, so the site works at any host's root and under a sub-path (portal:test serves it at /ci-virtual-home/). Fonts are the repo's
+    own woff2, so the source page makes no third-party requests; the deployed site adds Google Analytics at deploy time (.github/workflows/deploy.yml).
   -->
   <link rel="icon" href="./assets/brand/ci-logo-mark.svg" type="image/svg+xml">
   <link rel="icon" href="./portal/icons/favicon.ico" sizes="48x48">
@@ -38,17 +38,15 @@
   <link rel="preload" href="./assets/fonts/manrope-latin-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./content/houses/index.json" as="fetch" crossorigin>
   <link rel="stylesheet" href="./portal/gallery.css">
-  <link rel="stylesheet" href="./portal/media.css">
   <!-- gallery.js imports the portal's names when it runs, and lists the homes without them if they fail to come. The built page
        has its import map just above the first module (scripts/build-portal.mts), after this head's title and preview tags -->
   <link rel="modulepreload" href="./assets/home-names.js">
-  <noscript><style>.skel, .filters, .personas, .more-filters, .arch-btn { display: none; } .arch-panel { display: block; }</style></noscript>
+  <noscript><style>.search, .jobs, .seg, .swap-note, .homes-live, #clear, .skel { display: none; }</style></noscript>
   <!-- data-cfasync="false": Cloudflare's Rocket Loader would otherwise hold the script back and rewrite its type.
        campaign.js (an ad's utm_ and click-id tags kept for the visit, put back on the links that leave for ci.computer and on
        links marked data-campaign) goes first, so it reads the address before gallery.js can touch it -->
   <script src="./portal/campaign.js" defer data-cfasync="false"></script>
   <script type="module" src="./portal/gallery.js" data-cfasync="false"></script>
-  <script src="./portal/shots.js" defer data-cfasync="false"></script>
 </head>
 <body>
   <!-- Icons: Lucide (lucide-react 0.469.0, ISC; see THIRD_PARTY.md). Use as <svg class="i"><use href="#i-name"/></svg>. -->
@@ -64,9 +62,7 @@
       <symbol id="i-retry" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></symbol>
     </defs>
   </svg>
-
-  <a class="skip" href="#homes">Skip to the homes</a>
-
+  <a class="skip" href="#swap">Skip to the chooser</a>
   <header class="site-head">
     <div class="brand">
       <a class="brand-ci" href="https://ci.computer" aria-label="Companion Intelligence"><img src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28"><span>Companion Intelligence</span></a>
@@ -74,32 +70,24 @@
       <a class="brand-title" href="./">Virtual homes</a>
     </div>
     <nav class="site-nav" aria-label="Site">
-      <a class="nav-homes" href="#homes">Homes</a>
-      <a class="nav-docs" href="https://docs.ci.computer/docs/apps-available/first-party-apps">Docs</a>
-      <a class="nav-download" href="https://ci.computer/download">Download Companion</a>
-      <a class="nav-buy" href="https://ci.computer/core"><span class="nav-long">Buy Companion Core</span><span class="nav-short">Buy Core</span></a>
+      <a class="nav-docs" data-cta="docs" href="https://docs.ci.computer/docs/apps-available/first-party-apps">Docs</a>
+      <a class="nav-download" data-cta="download" href="https://ci.computer/download"><span class="nav-long">Download Companion</span><span class="nav-short">Download</span></a>
+      <a class="nav-buy" data-cta="buy" href="https://ci.computer/core"><span class="nav-long">Buy Companion Core</span><span class="nav-short">Buy Core</span></a>
     </nav>
   </header>
-
   <main>
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="fiction-label">Fictional family. Real software.</p>
-        <h1 id="hero-title">Thirty-six homes. Each family's life, on one Companion Core.</h1>
-        <p class="lede">Sally's planner, John's code, Steve's games, Jean's homework. The Brennan family keeps all four on the one Companion Core in the house.<span class="lede-more"> Take the tour to see which Companion Hub store app does each job, and which cloud service it replaces.</span></p>
+        <!-- fine-hero: -->
+        <h1 id="hero-title" data-claim="rent-line"><!-- claim:rent-line --></h1>
+        <p class="lede">A Companion Core is a small personal server that runs your household's apps and local AI at home.</p>
+        <p class="lede-families"><!-- lander-hero-count: --></p>
         <div class="hero-cta">
-          <a class="btn btn-primary" id="hero-play" data-campaign href="./room-creator.html?mode=view&amp;house=seraphine&amp;family=brennan"><svg class="i i-fill" aria-hidden="true"><use href="#i-play"/></svg><span>Take the tour</span></a>
-          <a class="btn btn-ghost hero-browse" href="#homes"><span>Meet the families</span><svg class="i" aria-hidden="true"><use href="#i-down"/></svg></a>
+          <a class="btn btn-primary" id="hero-play" data-campaign data-cta="tour-hero" href="./room-creator.html?mode=view&amp;house=seraphine&amp;family=brennan"><svg class="i i-fill" aria-hidden="true"><use href="#i-play"/></svg><span>Take the tour</span></a>
+          <a class="hero-pointer" data-cta="see-core" href="#core"><span>See Companion Core</span><svg class="i" aria-hidden="true"><use href="#i-down"/></svg></a>
         </div>
-        <div class="core-card">
-          <p class="core-line"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg><span>Every home has a <b>Companion Core</b> in it. Take a tour to find it.</span></p>
-          <p class="core-actions"><a class="core-more" href="#core"><span>See Companion Core</span><svg class="i" aria-hidden="true"><use href="#i-down"/></svg></a></p>
-          <!-- fine-hero: scripts/build-portal.mts writes the beta line here, from content/story/claims.json (beta-short), scripts/story/lib/fine-print.mts -->
-        </div>
-        <dl class="stats" aria-label="The collection">
-          <div><dt>Homes</dt><dd data-stat="homes">36</dd></div>
-          <div><dt>Square metres of floor</dt><dd data-stat="area">8,310</dd></div>
-        </dl>
+        <p class="hero-hint">The tour draws the home in 3D in your browser.</p>
+        <noscript><p class="hero-noscript">The tour needs JavaScript. You can read the family's story instead. <a href="./family/brennan">Read the Brennan family's story</a></p></noscript>
       </div>
       <a class="hero-media" id="hero-media" data-campaign href="./room-creator.html?mode=view&amp;house=seraphine&amp;family=brennan" aria-label="Take the Brennan family's tour in 3D">
         <picture>
@@ -111,39 +99,56 @@
         <span class="hero-play" aria-hidden="true"><svg class="i i-fill"><use href="#i-play"/></svg></span>
       </a>
     </section>
-
-    <!-- pick-person: scripts/build-portal.mts writes "Pick a person" here (a card for the organiser, builder, gamer and learner, and the list "Rented before, on the
-         Core now" for the archetype chosen: scripts/portal-front.mts pickPerson). portal/gallery.js turns a card's button into the persona filter. -->
-
-    <section class="homes" id="homes" aria-labelledby="homes-title">
-      <div class="homes-head">
-        <h2 id="homes-title">Meet the families <span class="count" aria-live="polite"></span></h2>
-        <div class="filters" id="filters">
-          <label class="search">
-            <svg class="i"><use href="#i-search"/></svg>
-            <input type="search" id="q" placeholder="Search a family, an app or a home" aria-label="Search the families and homes" autocomplete="off" spellcheck="false">
-            <kbd aria-hidden="true">/</kbd>
-          </label>
+    <section class="argument" id="argument" aria-labelledby="argument-title">
+      <h2 id="argument-title">From rented to kept</h2>
+      <ol class="argument-steps">
+        <li>
+          <h3>Rent</h3>
+          <p data-claim="problem"><!-- claim:problem --></p>
+        </li>
+        <li>
+          <h3>Move home</h3>
+          <p>Each job gets an app that is an alternative to the service you rent for it.</p>
+          <p data-claim="plug-pair-walk"><!-- claim:plug-pair-walk --></p>
+        </li>
+        <li>
+          <h3>Keep it</h3>
+          <p data-claim="local-by-default"><!-- claim:local-by-default --></p>
+          <p data-claim="hub-no-api-bill"><!-- claim:hub-no-api-bill --></p>
+          <p class="argument-more"><a href="#core-limits">What a Core is not</a></p>
+        </li>
+      </ol>
+    </section>
+    <!-- lander-proof: scripts/build-portal.mts writes "One pair, in full" here: the first pair the plan names that may show, in the family's own words (portal-front.mts proofBlock) -->
+    <section class="cta-band" id="core" aria-labelledby="cta-title">
+      <div class="cta-copy">
+        <h2 id="cta-title" tabindex="-1">Meet the Companion Core.</h2>
+        <p class="cta-lead" data-claim="core-size"><!-- claim:core-size --></p>
+        <ul class="cta-facts">
+          <li data-claim="core-assembled"><!-- claim:core-assembled --></li>
+          <li data-claim="hub-count"><!-- claim:hub-count --></li>
+        </ul>
+        <div class="cta-actions">
+          <a class="btn btn-buy" data-cta="buy" href="https://ci.computer/core">Buy Companion Core</a>
+          <a class="btn btn-ghost" data-cta="download" href="https://ci.computer/download">Download Companion</a>
+          <a class="cta-docs" data-cta="docs" href="https://docs.ci.computer/docs/apps-available/first-party-apps">Read the docs</a>
         </div>
       </div>
-      <!-- personas: scripts/build-portal.mts writes the buttons for the jobs the current families do (organiser, builder, gamer, learner,
-           maker, host: portal-front.mts PERSONAS); portal/gallery.js counts and filters them. The filter is ?persona=<archetype>. -->
-      <div class="personas" role="group" aria-label="What they do" id="personas" hidden></div>
-      <details class="more-filters" id="more-filters">
-        <summary>Home style and storeys</summary>
-        <div class="more-body">
-          <div class="seg" role="group" aria-label="Storeys" id="storeys">
-            <span class="seg-label" aria-hidden="true">Storeys</span>
-            <button type="button" data-storeys="" aria-pressed="true" aria-label="Any number of storeys">Any</button>
-            <button type="button" data-storeys="1" aria-pressed="false" aria-label="1 storey">1</button>
-            <button type="button" data-storeys="2" aria-pressed="false" aria-label="2 storeys">2</button>
-            <button type="button" data-storeys="3" aria-pressed="false" aria-label="3 or more storeys">3+</button>
-          </div>
-          <div class="tags" role="group" aria-label="Style" id="tags"></div>
-        </div>
-      </details>
-      <!-- placeholder cards until index.json is in: the grid holds its place, so nothing jumps (the built page has the families here, as static HTML) -->
-      <ul class="grid" id="grid" aria-busy="true">
+      <!-- lander-core-fig: the Core's own stylised picture with its caption (portal-front.mts coreFigure), when the frames are committed -->
+      <aside class="cta-limits" id="core-limits" aria-label="What a Core is not">
+        <!-- fine-core: -->
+      </aside>
+    </section>
+    <!-- lander-swap: scripts/build-portal.mts writes "What do you rent today?" here: the chooser (portal-front.mts swapBlock) -->
+    <section class="homes" id="homes" aria-labelledby="homes-title">
+      <div class="homes-head">
+        <h2 id="homes-title">Meet the families</h2>
+        <p class="homes-count" id="homes-count"><!-- lander-count: --></p>
+        <p class="homes-live" id="homes-live" role="status" aria-live="polite"></p>
+        <button type="button" class="btn btn-ghost btn-small" id="clear" hidden>Clear filters</button>
+      </div>
+      <!-- the featured families' cards: scripts/build-portal.mts writes them as static HTML (the placeholders stay in the source: the grid holds its place, so nothing jumps) -->
+      <ul class="grid" id="grid" aria-label="Families" aria-busy="true">
         <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
         <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
         <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
@@ -151,40 +156,26 @@
         <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
         <li class="card skel" aria-hidden="true"><div class="thumb"></div><div class="card-body"><i></i><i></i><i></i></div></li>
       </ul>
+      <details class="all-homes" id="all-homes">
+        <summary>Show every family and home</summary>
+        <ul class="grid grid-rest" id="grid-rest" aria-label="Every other family and home"></ul>
+      </details>
       <div class="empty" id="empty" hidden>
         <p><b>No families match.</b> Try fewer words, or clear the filters.</p>
-        <button type="button" class="btn btn-ghost" id="clear">Clear filters</button>
+        <button type="button" class="btn btn-ghost" id="clear-empty">Clear filters</button>
       </div>
       <div class="empty" id="failed" role="alert" hidden>
         <p><b>The list of homes did not load.</b> Check the connection and try again.</p>
         <button type="button" class="btn btn-primary" id="retry"><svg class="i"><use href="#i-retry"/></svg><span>Try again</span></button>
       </div>
-      <noscript><p class="empty">Search and the filters need JavaScript. The families and homes are listed above.</p></noscript>
-    </section>
-
-    <!-- logo-wall: scripts/build-portal.mts writes "What the families run" here (every app the stories name, its real logo beside its name: portal-front.mts logoWall) -->
-
-    <!-- how-it-runs: scripts/build-portal.mts writes "How it runs" here (what Companion Hub and the Companion account do, a real screenshot of each, labelled: portal-front.mts runsBand) -->
-
-    <section class="cta-band" id="core" aria-labelledby="cta-title">
-      <div class="cta-copy">
-        <h2 id="cta-title">Meet the Companion Core.</h2>
-        <!-- core-line: scripts/build-portal.mts writes what the Core is here, from content/story/claims.json (local-by-default), scripts/story/lib/fine-print.mts -->
-        <p class="cta-note">Companion OS is in beta.</p>
-        <!-- fine-core: scripts/build-portal.mts writes what a Core is not here (not-frontier), from content/story/claims.json -->
-      </div>
-      <div class="cta-actions">
-        <a class="btn btn-buy" href="https://ci.computer/core">Buy Companion Core</a>
-        <a class="btn btn-ghost" href="https://ci.computer/download">Download Companion</a>
-        <a class="cta-docs" href="https://docs.ci.computer/docs/apps-available/first-party-apps">Read the docs</a>
-      </div>
+      <noscript><p class="empty">Search and the filters need JavaScript. Every family and home is listed here.</p></noscript>
     </section>
   </main>
-
   <footer class="site-foot">
     <div class="foot-grid">
       <div>
         <p class="foot-brand"><img src="./assets/brand/ci-logo-mark.svg" alt="" width="20" height="20"><b>Companion Intelligence</b></p>
+        <p class="foot-signoff" data-claim="signoff"><!-- claim:signoff --></p>
       </div>
       <nav class="foot-links" aria-label="Companion Intelligence">
         <ul>
@@ -197,7 +188,11 @@
         </ul>
       </nav>
     </div>
-    <!-- fine-foot: scripts/build-portal.mts writes the footer's fine print here (launch-not-offer, beta-full, names-logos-owners), from content/story/claims.json -->
+    <!-- fine-foot: -->
+    <details class="foot-apps">
+      <summary>Apps named in these stories</summary>
+      <!-- lander-apps: the apps the stories name, alphabetical, text only (portal-front.mts appsNamed) -->
+    </details>
     <!-- foot-homes: scripts/build-portal.mts writes the list of every home's own page here (the pages are build output, so a
          checkout served as it is has none) -->
     <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence.</p>

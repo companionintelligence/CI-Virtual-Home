@@ -53,7 +53,7 @@
 //             keyboard and accessibility, audio and the gesture rule, the address bar, next home). A build with no current family
 //             has nothing to test there and says so. The story's pages are checked at build time too (portal:build, step 7)
 //             ---- story v2 ---- family-v2.mts (the family page's sticky person nav, details, screenshot dialog, floor plan, contrast, layout shift),
-//             front-v2.mts (Pick a person, the logo wall, How it runs, the family cards' logos) and player-more.mts (the tour card's logo, its "More" toggle and
+//             lander.mts (the front page's fold, depth, chooser, no-JavaScript and failure cases) and player-more.mts (the tour card's logo, its "More" toggle and
 //             where the card goes when it is open) ---- end story v2 ----
 //   webkit    Safari's engine, when Playwright's WebKit for the pinned version is installed: the gallery, the player
 //             (plays, pauses, scrubs) and the editor (builds a home, hooks there), with no console error. Skipped with
@@ -148,27 +148,27 @@ const coreCover = (page: any): Promise<number> => page.evaluate(() => {
 async function gallery(viewport: { width: number; height: number }, mobile: boolean, label: string) {
   console.log(`\ngallery ${label}`);
   const { page, errors, thirdParty, requests, close } = await open(viewport, mobile);
-  // the hero figures a visitor without JavaScript (or a crawler) reads, before gallery.js replaces them
-  const staticStats = await (await fetch(srv.url('index.html'))).text().then(t => ['homes', 'area'].map(k => (t.match(new RegExp(`data-stat="${k}">([^<]*)<`)) || [])[1]));
   await page.goto(srv.url('index.html'));
   await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
-  const cards = await page.$$eval('#grid .card', (els: Element[]) => els.length);
+  // ---- the lander ---- six featured cards, then every other family and home in a native <details> (reference/story/lander.md): the cards are in two lists
+  const CARDS = '#grid .card, #grid-rest .card';
+  const cards = await page.$$eval(CARDS, (els: Element[]) => els.length);
   ok(cards === HOMES, `${cards} cards`);
-  const liveStats = await page.$$eval('[data-stat]', (els: Element[]) => els.map(e => e.textContent));
-  ok(JSON.stringify(liveStats) === JSON.stringify(staticStats), `the static hero figures are the data's (${staticStats.join(' / ')})`);
-  // ---- front page ---- a family's card is headed by the family ("The Brennan family", which the three flagship homes share) and names its
-  // home on the line under it, so the names that must be distinct and clean are the HOMES': that line for a family's card, the heading for a home's own
-  const titles: string[] = await page.$$eval('#grid .card', (els: HTMLElement[]) => els.map(e => ((e.querySelector('.home-line')?.textContent || '').split(' · ')[0]) || e.querySelector('h3')!.textContent || ''));
-  const headings: string[] = await page.$$eval('#grid .card h3', (els: Element[]) => els.map(e => e.textContent || ''));
+  const featured = await page.$$eval('#grid .card', (els: Element[]) => els.length);
+  ok(featured >= 1 && featured <= 6, `${featured} featured cards in the first list, every other family and home behind "Show every family and home"`);
+  // a family's card is headed by the family ("The Brennan family of Wrenfield": the three flagship homes share a name) and names its home on the line under it, so the
+  // names that must be distinct and clean are the HOMES': that line for a family's card, the heading for a home's own
+  const titles: string[] = await page.$$eval(CARDS, (els: HTMLElement[]) => els.map(e => ((e.querySelector('.home-line')?.textContent || '').split(' · ')[0]) || e.querySelector('h3')!.textContent || ''));
+  const headings: string[] = await page.$$eval('.card h3', (els: Element[]) => els.map(e => e.textContent || ''));
   ok(titles.length === HOMES && headings.length === HOMES && ![...titles, ...headings].some(t => /base\s*game|basegame|\bBG\b/i.test(t)) && new Set(titles).size === HOMES, `the homes' names on the cards carry no Sims jargon and are all distinct (${titles.slice(0, 3).join(', ')}, …)`);
-  const storeysLabels = await page.$$eval('#storeys button', (els: Element[]) => els.map(e => e.textContent));
-  ok(storeysLabels.join('|') === 'Any|1|2|3+', `the storeys filter reads ${storeysLabels.join(' · ')}`);
-  // no builder is credited anywhere: no credit line on a card, no builds list, no credits block, no hero figure about builders, and not
-  // the word "by" on a card; the footer is the brand line, the company links, every home's page and the copyright
+  const familyHeads: string[] = await page.$$eval('.card-family h3', (els: Element[]) => els.map(e => e.textContent || ''));
+  ok(new Set(familyHeads).size === familyHeads.length, `every family's heading is its own, the three Brennan homes told apart (${familyHeads.slice(0, 2).join(' | ')} …)`);
+  // no builder is credited anywhere: no credit line on a card, no builds list, no credits block, and not the word "by" on a card; the footer is the brand line, the sign-off,
+  // the company links, the fine print, every home's page and the copyright
   const credited = await page.evaluate(() => ({
     spans: document.querySelectorAll('.credit, #builds, #builds-list, .builds, [data-stat="builders"]').length,
-    cardText: Array.from(document.querySelectorAll('#grid .card .facts')).map(c => c.textContent || '').filter(t => /\bby\b/i.test(t)).length,
-    titles: Array.from(document.querySelectorAll('#grid .card [title], #grid .card [aria-label]')).map(e => `${e.getAttribute('title') || ''} ${e.getAttribute('aria-label') || ''}`).filter(t => /\bsims\b|credit/i.test(t)).length,
+    cardText: Array.from(document.querySelectorAll('.card .facts')).map(c => c.textContent || '').filter(t => /\bby\b/i.test(t)).length,
+    titles: Array.from(document.querySelectorAll('.card [title], .card [aria-label]')).map(e => `${e.getAttribute('title') || ''} ${e.getAttribute('aria-label') || ''}`).filter(t => /\bsims\b|credit/i.test(t)).length,
     foot: (document.querySelector('.site-foot') as HTMLElement).innerText,
     search: (document.querySelector('#q') as HTMLInputElement).placeholder,
   }));
@@ -176,68 +176,68 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   ok(!/credit|builder|sims|every frame is drawn|three\.js|webgl/i.test(credited.foot) && /© 2026 LifeScope Inc\., DBA Companion Intelligence\./.test(credited.foot) && !/builder/i.test(credited.search), `the footer has no credits block and no blurb, and keeps the copyright; the search says "${credited.search}"`);
   const footHeads = await page.$$eval('.site-foot .foot-links p, .site-foot .foot-links b', (els: Element[]) => els.length);
   const footLinks: string[] = await page.$$eval('.site-foot .foot-links a', (els: HTMLAnchorElement[]) => els.map(a => a.href));
-  ok(footHeads === 0 && ['https://ci.computer/', 'https://ci.computer/core', 'https://ci.computer/download', 'https://docs.ci.computer/docs/apps-available/first-party-apps', 'https://ci.computer/privacy-policy', 'https://ci.computer/terms-of-service'].every(l => footLinks.includes(l)) && (await page.isVisible('.site-foot .foot-brand')), `the footer's company links are all there, with no heading above them (${footLinks.length} links), under the brand line`);
+  ok(footHeads === 0 && ['https://ci.computer/', 'https://ci.computer/core', 'https://ci.computer/download', 'https://docs.ci.computer/docs/apps-available/first-party-apps', 'https://ci.computer/privacy-policy', 'https://ci.computer/terms-of-service'].every(l => footLinks.includes(l)) && (await page.$$eval('.site-foot .foot-links a', (els: Element[]) => els.length)) === 6, `the footer's company links are all there, with no heading above them (${footLinks.length} links), under the brand line`);
   // searching a builder's handle (read from the specs, not listed here) finds no home: the search reads the name, the style and the id
+  const visible = () => page.$$eval(CARDS, (els: HTMLElement[]) => els.filter(e => !e.hidden).length);
   const found: string[] = [];
   for (const handle of builderHandles(ROOT)) {
     await page.fill('#q', handle);
     await sleep(220);
-    if ((await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) > 0) found.push(handle);
+    if ((await visible()) > 0) found.push(handle);
   }
   await page.fill('#q', '');
   await sleep(220);
-  ok(found.length === 0 && (await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) === HOMES, `no search finds a home by its builder's handle${found.length ? ` (found: ${found.join(', ')})` : ''}`);
-  const hrefs: string[] = await page.$$eval('#grid .card a, #hero-play, #hero-media', (els: HTMLAnchorElement[]) => els.map(a => a.href));
+  ok(found.length === 0 && (await visible()) === HOMES, `no search finds a home by its builder's handle${found.length ? ` (found: ${found.join(', ')})` : ''}`);
+  // every card is a link, and none of them forces autoplay
+  const hrefs: string[] = await page.$$eval('#grid .card h3 a, #grid-rest .card h3 a, #grid-rest .card-plain > a, #hero-play, #hero-media', (els: HTMLAnchorElement[]) => els.map(a => a.href));
   ok(hrefs.length === HOMES + 2 && hrefs.every(h => !new URL(h).searchParams.has('play')), 'no gallery link forces autoplay (the player decides, and honours reduced motion)');
-  // ---- front page ---- the people on the cards, the jobs they filter by, the label, the hero's picture and the campaign
+  // the people on the cards, the pairs in words, the label, the hero's picture and the campaign
   const front = await page.evaluate(() => ({
-    families: document.querySelectorAll('#grid .card-family').length,
-    discs: document.querySelectorAll('#grid .card-family .cast .disc').length,
-    jobs: Array.from(document.querySelectorAll('#grid .card-family .cast .who span')).map(e => e.textContent || ''),
-    apps: Array.from(document.querySelectorAll('#grid .card-family .apps li')).every(li => /^.+ replaces .+$/.test(li.textContent || '')),
-    cta: Array.from(document.querySelectorAll('#grid .card-family .go')).every(e => (e.textContent || '').trim() === 'Take the tour'),
+    families: document.querySelectorAll('.card-family').length,
+    discs: document.querySelectorAll('.card-family .cast .disc').length,
+    jobs: Array.from(document.querySelectorAll('.card-family .cast .who span')).map(e => e.textContent || ''),
+    pairs: Array.from(document.querySelectorAll('.card-family .pairs-lines li')).every(li => /^.+, alternative to .+$/.test(li.textContent || '')),
+    shown: Array.from(document.querySelectorAll('.card-family')).every(c => c.querySelectorAll('.pairs-lines li:not([hidden])').length <= 2),
+    cta: Array.from(document.querySelectorAll('.card-family .go')).every(e => (e.textContent || '').trim() === 'Meet the family'),
     label: (document.querySelector('.fiction-label') as HTMLElement | null)?.innerText || '',
     labelShown: !!document.querySelector('.fiction-label') && (document.querySelector('.fiction-label') as HTMLElement).getBoundingClientRect().height > 0,
-    persona: Array.from(document.querySelectorAll('#personas .persona')).map(b => `${(b as HTMLElement).dataset.persona}:${b.querySelector('small')!.textContent}`),
     heroSrc: (document.querySelector('.hero-media img') as HTMLImageElement).currentSrc,
-    heroName: (document.querySelector('#hero-media') as HTMLAnchorElement).getAttribute('aria-label'),
   }));
   const manifestFamilies = Object.keys(JSON.parse(fs.readFileSync(path.join(DIR, 'story', 'manifest.json'), 'utf8')).byFamily || {}).length;
-  ok(front.families === manifestFamilies && front.discs >= front.families * 2 && front.apps && front.cta, `${front.families} family cards (one for each family with a page), ${front.discs} people on them as monogram discs, each app line "<app> replaces <service>", each card ends "Take the tour"`);
+  ok(front.families === manifestFamilies && front.discs >= front.families * 2 && front.pairs && front.shown && front.cta, `${front.families} family cards (one for each family with a page), ${front.discs} people on them as monogram discs, each pair line "<app>, alternative to <service>" and at most two showing, each card ends "Meet the family"`);
   ok(front.jobs.length > 0 && front.jobs.every(j => /^[a-z ]+$/.test(j)) && front.jobs.some(j => j === 'organiser') && front.jobs.some(j => j === 'builder'), `each person's job is in words under the name (${[...new Set(front.jobs)].join(', ')})`);
-  ok(front.persona.length >= 2 && front.persona.every(x => !x.endsWith(':')), `the persona buttons count the families (${front.persona.join(', ')})`);
   ok(front.label === 'Fictional family. Real software.' && front.labelShown, `"${front.label}" is on screen in the hero`);
   ok(mobile ? /portal\/thumbs\/[a-z0-9-]+\.webp$/.test(front.heroSrc) : /portal\/previews\/[a-z0-9-]+\.jpg$/.test(front.heroSrc), `the hero's picture is ${front.heroSrc.replace(srv.origin + BASE, '')} (a phone gets the 640 px one, not the 1600 px hero.webp that drove the LCP to 3.5 s)`);
   if (mobile) {
     const bytes = (await (await fetch(front.heroSrc)).arrayBuffer()).byteLength;
     ok(bytes < 80 * 1024, `and it is ${Math.round(bytes / 1024)} KB`);
   }
-  // the persona filter (a chip is a category of content/story/categories.json): the address carries it (and keeps every other parameter), the cards narrow, and clearing puts it back
+  // the job chips (a chip is a category of content/story/categories.json): the address carries the choice (and keeps every other parameter), the families narrow with the
+  // details open, and a second press lets go
   await page.click('#personas .persona[data-persona="code"]');
-  const builders = await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length);
-  ok(builders > 0 && builders < HOMES && (await page.evaluate(() => location.search)).includes('persona=code'), `Code narrows to ${builders} and the address says persona=code`);
+  const builders = await visible();
+  ok(builders > 0 && builders < HOMES && (await page.evaluate(() => location.search)).includes('persona=code') && await page.evaluate(() => (document.getElementById('all-homes') as HTMLDetailsElement).open), `Code narrows to ${builders}, the address says persona=code and every match shows`);
   await page.click('#personas .persona[data-persona="code"]');
-  ok((await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) === HOMES && !(await page.evaluate(() => location.search)).includes('persona'), 'pressing it again lets it go');
+  ok((await visible()) === HOMES && !(await page.evaluate(() => location.search)).includes('persona'), 'pressing it again lets it go');
   // the cards go to their family's page; the homes' own pages are linked from the footer, in the rendered DOM a crawler that runs the page reads
   const pageLinks: string[] = await page.$$eval('a[href*="homes/"]', (els: HTMLAnchorElement[]) => els.map(a => new URL(a.href).pathname));
   ok(pageLinks.length === HOMES && new Set(pageLinks).size === HOMES && pageLinks.every(h => h.startsWith(`${BASE}homes/`)), `once gallery.js has run, the page links all ${new Set(pageLinks).size} homes' own pages (the footer's list: ${pageLinks[0].replace(BASE, '')} … ${pageLinks[pageLinks.length - 1].replace(BASE, '')})`);
-  // load every thumbnail (lazy ones too) and check each decoded
-  await page.$$eval('#grid img', (imgs: HTMLImageElement[]) => imgs.forEach(i => { i.loading = 'eager'; }));
-  await page.waitForFunction(() => Array.from(document.querySelectorAll<HTMLImageElement>('#grid img')).every(i => i.complete), null, { timeout: 20000 });
-  const decoded = await page.$$eval('#grid img', (imgs: HTMLImageElement[]) => imgs.filter(i => i.naturalWidth === 640 && i.naturalHeight === 360).length);
+  // load every thumbnail (lazy ones too, and the ones behind the disclosure) and check each decoded
+  await page.evaluate(() => { (document.getElementById('all-homes') as HTMLDetailsElement).open = true; });
+  await page.$$eval('.card img', (imgs: HTMLImageElement[]) => imgs.forEach(i => { i.loading = 'eager'; }));
+  await page.waitForFunction(() => Array.from(document.querySelectorAll<HTMLImageElement>('.card img')).every(i => i.complete), null, { timeout: 20000 });
+  const decoded = await page.$$eval('.card img', (imgs: HTMLImageElement[]) => imgs.filter(i => i.naturalWidth === 640 && i.naturalHeight === 360).length);
   ok(decoded === HOMES, `${decoded} of ${HOMES} thumbnails decoded at 640 × 360`);
-  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.evaluate(() => { (document.getElementById('all-homes') as HTMLDetailsElement).open = false; window.scrollTo(0, 0); });
   await sleep(300);
   await shot(page, `gallery-${label}`);
-  const visible = () => page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length);
   if (!mobile) {
     // a pointer over a card warms three.js, the engine and that home's spec — never room-creator.html, whose player URL
     // carries a query and so could never be served from that request. They are ordinary fetches (a prefetch is refused with
     // a 503 by the live zone), and the engine's modules are asked for by the hash the player will use
-    // ---- front page ---- a family's card goes to its page, a light one: hovering it warms nothing; the link that opens the player (the
-    // hero's tour, or a home's own card) warms the engine and that home's spec
+    // a family's card goes to its page, a light one: hovering it warms nothing; the link that opens the player (the hero's tour) warms the engine and that home's spec
     const before = requests.length;
-    await page.hover('#grid .card:nth-child(5) a');
+    await page.hover('#grid .card:nth-child(5) h3 a');
     await sleep(800);
     const coldAsks = requests.slice(before).map((u: string) => u.replace(srv.origin, '')).filter((u: string) => /\/(assets|content)\//.test(u));
     ok(coldAsks.length === 0, `hovering a family's card (it opens its page) warms nothing${coldAsks.length ? `: ${coldAsks.slice(0, 3).join(', ')}` : ''}`);
@@ -247,31 +247,28 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
     const warmed: string[] = requests.slice(before2).map((u: string) => u.replace(srv.origin, '')).filter((u: string) => /\/(assets|content)\//.test(u));
     const idHero = new URL(await page.$eval('#hero-play', (a: HTMLAnchorElement) => a.href)).searchParams.get('house');
     const viewerUrl = await page.evaluate(() => JSON.parse(document.querySelector('script[type="importmap"]')!.textContent!).imports['./assets/viewer.js']);
-    ok(warmed.some(u => u.includes('assets/vendor/three/three.module.min.js')) && warmed.some(u => u.includes(`content/houses/${idHero}.json`)) && warmed.some(u => u.endsWith(viewerUrl.replace(/^\.\//, ''))) && !warmed.some(u => u.includes('room-creator')), `hovering the tour link warms ${warmed.length} files (the engine by its hash), not the page`);
+    ok(warmed.some(u => u.includes('assets/vendor/three/three.module.min.js')) && warmed.some(u => u.includes(`content/houses/${idHero}.json`)) && warmed.some(u => u.endsWith(viewerUrl.replace(/^\.\//, ''))) && !warmed.some(u => u.includes('room-creator')), `hovering the tour link warms ${warmed.length} files: three.js, the engine and ${idHero}'s spec`);
     ok(await page.$$eval('link[rel="prefetch"]', (ls: Element[]) => ls.length) === 0, 'and with plain fetches: no <link rel="prefetch"> (the live zone refuses those with a 503)');
   }
   await page.fill('#q', 'brick');
   await sleep(250);
   const brick = await visible();
   ok(brick > 0 && brick < HOMES, `search "brick" narrows to ${brick}`);
-  ok((await page.evaluate(() => location.search)).includes('q=brick'), 'the search is in the URL');
+  ok((await page.evaluate(() => location.search)).includes('q=brick'), 'the search is in the URL (it found something)');
   await page.fill('#q', '');
   await sleep(250);   // the search input is debounced: let the cleared query land before the next filter
-  const tagCounts = () => page.$$eval('#tags .tag', (els: HTMLElement[]) => els.map(e => `${e.dataset.tag} ${e.querySelector('small')!.textContent}${(e as HTMLButtonElement).disabled ? ' off' : ''}`).join(', '));
-  // ---- front page ---- the style and storeys filters sit in a <details>: open on a wide screen, closed on a phone (open it as a visitor would)
-  if (!(await page.evaluate(() => (document.getElementById('more-filters') as HTMLDetailsElement).open))) await page.click('.more-filters summary');
-  const countsAll = await tagCounts();
-  await page.click('#storeys button[data-storeys="1"]');
-  const one = await visible();
-  ok(one > 0 && one < HOMES, `1 storey narrows to ${one}`);
-  const countsOne = await tagCounts();
-  ok(countsOne !== countsAll, `the style tags count what the storeys filter leaves (${countsOne})`);
-  await page.click('#storeys button[data-storeys=""]');
-  const tag = await page.$('#tags .tag');
-  if (tag) { await tag.click(); const n = await visible(); ok(n > 0 && n < HOMES, `a style tag narrows to ${n}`); await tag.click(); }
+  // the kind of place: apartments are the six homes of that type, and Any lets go
+  if (await page.$('#types')) {
+    await page.click('#types button[data-type="apartment"]');
+    const apartments = await visible(), want = await page.$$eval('.card[data-type="apartment"]', (els: Element[]) => els.length);
+    ok(apartments === want && want > 0 && apartments < HOMES, `"Apartments" shows the ${apartments} apartments`);
+    await page.click('#types button[data-type=""]');
+    ok((await visible()) === HOMES, '"Any" shows all of them again');
+  }
   await page.fill('#q', 'zzzz-no-such-home');
   await sleep(250);
   ok(await page.isVisible('#empty'), 'no match shows the empty state');
+  ok(!(await page.evaluate(() => location.search)).includes('q='), 'and the typed text is not in the address (it found nothing)');
   await page.click('#clear');
   ok((await visible()) === HOMES, `clear filters shows all ${HOMES}`);
   if (!mobile) {
@@ -283,12 +280,12 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
     await sleep(400);
     await shot(page, `gallery-${label}-scrolled`);
   }
-  // the hero's Core line points at the band that says what it is
-  await page.click('.core-more');
-  await sleep(200);
-  ok(await page.evaluate(() => location.hash === '#core' && document.getElementById('core')!.matches('.cta-band')), 'the hero\'s "What is the Companion Core?" goes to the band that says');
-  // ---- front page ---- a family's card opens that family's page (which goes on to the tour), and the hero's tour opens the player
-  await page.click('#grid .card:nth-child(2) a');
+  // the hero's "See Companion Core" points at the band that says what it is, and puts focus on its heading
+  await page.click('[data-cta="see-core"]');
+  await sleep(300);
+  ok(await page.evaluate(() => location.hash === '#core' && document.getElementById('core')!.matches('.cta-band') && document.activeElement?.id === 'cta-title'), 'the hero\'s "See Companion Core" goes to the band that says, and focus is on its heading');
+  // a family's card opens that family's page (which goes on to the tour), and the hero's tour opens the player
+  await page.click('#grid .card:nth-child(2) h3 a');
   await page.waitForURL(/\/family\/[a-z-]+$/, { waitUntil: 'commit', timeout: 30000 });
   ok(true, `a family's card opens its page (${new URL(page.url()).pathname.replace(BASE, '')})`);
   await page.goBack();
@@ -318,20 +315,24 @@ async function pages() {
   // card linking its page (./homes/<id>): every home once, so a crawler and a visitor without JavaScript see all of them
   const storyManifest = JSON.parse(fs.readFileSync(path.join(DIR, 'story', 'manifest.json'), 'utf8'));
   const byFamily: Record<string, { house: string }> = storyManifest.byFamily || {};
+  const heroSlug: string = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'lander.json'), 'utf8')).hero.slug;
   const chunks = gallery.text.slice(gallery.text.indexOf('<ul class="grid"'), gallery.text.indexOf('<div class="empty" id="empty"')).split(/(?=<li class="card)/).slice(1);
-  const famCards = chunks.filter(c => c.startsWith('<li class="card card-family"')).map(c => ({ house: (c.match(/data-id="([^"]+)"/) || [])[1], slug: (c.match(/data-slug="([^"]+)"/) || [])[1], href: (c.match(/<h3><a href="\.\/family\/([^"?#]+)" data-campaign aria-label="[^"]+">[^<]+<\/a><\/h3>/) || [])[1], discs: (c.match(/<span class="disc"/g) || []).length, replaces: / replaces /.test(c), home: /<p class="home-line">[^<]+<\/p>/.test(c) }));
-  ok(famCards.length === Object.keys(byFamily).length && famCards.every(c => c.slug === c.href && byFamily[c.slug]?.house === c.house) && famCards.map(c => c.slug).join() === Object.keys(byFamily).join(), `the gallery's HTML has a static card for each of the ${famCards.length} families with a page, in the story's order, each linking ./family/<slug>`);
-  const homeCards = chunks.filter(c => c.startsWith('<li class="card" ')).map(c => c.match(/^<li class="card" data-id="([^"]+)"><a href="\.\/homes\/([^"]+)"/)).filter(Boolean) as RegExpMatchArray[];
+  const famCards = chunks.filter(c => c.startsWith('<li class="card card-family')).map(c => ({ house: (c.match(/data-id="([^"]+)"/) || [])[1], slug: (c.match(/data-slug="([^"]+)"/) || [])[1], href: (c.match(/<h3><a href="\.\/family\/([^"?#]+)" data-campaign aria-label="[^"]+">[^<]+<\/a><\/h3>/) || [])[1], discs: (c.match(/<span class="disc"/g) || []).length, replaces: /, alternative to /.test(c) && !/\breplaces\b/i.test(c.replace(/<[^>]+>/g, ' ')), home: /<p class="home-line">[^<]+<\/p>/.test(c) }));
+  ok(famCards.length === Object.keys(byFamily).length && famCards.every(c => c.slug === c.href && byFamily[c.slug]?.house === c.house) && famCards.map(c => c.slug).sort().join() === Object.keys(byFamily).sort().join(), `the gallery's HTML has a static card for each of the ${famCards.length} families with a page (the featured ones first, then the rest in the story's order), each linking ./family/<slug>`);
+  ok(famCards[0]?.slug === heroSlug, `the first card is the hero family's (${famCards[0]?.slug})`);
+  const homeCards = chunks.filter(c => c.startsWith('<li class="card card-plain" ')).map(c => c.match(/^<li class="card card-plain" data-id="([^"]+)" data-type="[^"]*" data-find="[^"]*"><a href="\.\/homes\/([^"]+)"/)).filter(Boolean) as RegExpMatchArray[];
   ok(homeCards.every(m => m[1] === m[2]) && [...famCards.map(c => c.house), ...homeCards.map(m => m[1])].sort().join() === [...ids].sort().join(), `and a card linking its page (./homes/<id>) for each of the ${homeCards.length} homes with no family: every one of the ${ids.length} homes is there once`);
-  ok(famCards.every(c => c.discs >= 2 && c.replaces && c.home), 'each family card has its home, its people (monogram discs, each with a job) and the apps that tell the story');
-  ok(/<div class="personas"[^>]*>\s*<button[^>]*data-persona="[a-z][a-z-]*"/.test(gallery.text) && /name="vh-clean-urls"/.test(gallery.text), 'and the persona buttons for the jobs the families do');
+  ok(famCards.every(c => c.discs >= 2 && c.replaces && c.home), 'each family card has its home, its people (monogram discs, each with a job) and its pairs, in words: "<app>, alternative to <service>"');
+  ok(/<div class="jobs" id="personas"[^>]*>[\s\S]*?<button[^>]*data-persona="[a-z][a-z-]*"/.test(gallery.text) && /name="vh-clean-urls"/.test(gallery.text), 'and the chips for the jobs the families do');
   ok(links.every(l => gallery.text.includes(`href="${l}"`)) && gallery.text.includes('href="https://ci.computer/privacy-policy"') && gallery.text.includes('href="https://ci.computer/terms-of-service"'), 'and carries the main site, /core, /download, the docs, privacy and terms');
   // one callout, not four: the header, the band and the footer offer Buy and Download (the hero only says what the Core is, and
   // points at the band), the main site is linked from the header and the footer, and no sentence is said twice
   const count = (t: string, url: string) => t.split(`href="${url}"`).length - 1;
   ok(count(gallery.text, links[1]) === 3 && count(gallery.text, links[2]) === 3 && count(gallery.text, links[0]) === 2, `the gallery offers Buy Companion Core ${count(gallery.text, links[1])}×, Download ${count(gallery.text, links[2])}× and links ci.computer ${count(gallery.text, links[0])}×`);
-  const sentences = [...gallery.text.matchAll(/The small computer on (?:your|the) desk/g)].length;
-  ok(sentences === 1, `"The small computer on your desk …" is said once on the gallery (${sentences})`);
+  const claimsFile = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'claims.json'), 'utf8'));
+  const claimText = (id: string): string => claimsFile.allowedClaims.find((c: { id: string }) => c.id === id).text;
+  const coreSize = gallery.text.split(claimText('core-size')).length - 1;
+  ok(coreSize === 1, `what the Core is (claims.json core-size) is said once on the gallery (${coreSize}); every sentence of the band is claims.json's`);
   const heroLinks = [...gallery.text.matchAll(/id="hero-(?:play|media)"[^>]*? href="([^"]+)"/g)].map(m => m[1]);
   ok(heroLinks.length === 2 && heroLinks.every(h => h.startsWith('./room-creator?mode=view') && !h.includes('.html')), 'its hero links go to the player without .html');
   // ---- front page ---- the hero tours the flagship family when that family has a page; one h1 that says the number of homes in words; the label; no price, no logo
@@ -339,8 +340,8 @@ async function pages() {
   ok(!heroFamily || !!byFamily[heroFamily], `the hero's "Take the tour" plays ${heroFamily ? `the ${heroFamily} family's tour` : 'a home'}`);
   const h1s = [...gallery.text.matchAll(/<h1[^>]*>([^<]*)<\/h1>/g)].map(m => m[1]);
   // ---- story v2 ---- (the owner asked for real logos and screenshots: the front page now carries those of content/story/app-media.json, each beside the name it identifies, with alt
-  // text, its size and lazy loading: the hook scripts/story/portal-tests/front-v2.mts holds them to that. What is still never there: a logo or picture fetched from anywhere else.)
-  ok(h1s.length === 1 && new RegExp(`\\b${numberWord(HOMES)}\\b`, 'i').test(h1s[0]) && gallery.text.includes('>Fictional family. Real software.<') && gallery.text.includes('Companion OS is in beta.') && !/[$€£]\s?\d|<img[^>]+src="(?:https?:)?\/\//i.test(gallery.text), `one <h1> ("${h1s[0]}"), the label, the beta line, no price and no image from anywhere but the site (the real logos and screenshots are the site's own files)`);
+  // text, its size and lazy loading: the family pages' hooks hold them to that. What is still never there: a logo or picture fetched from anywhere else.)
+  ok(h1s.length === 1 && h1s[0] === claimText('rent-line') && gallery.text.includes('Fictional family. Real software.') && gallery.text.includes('Companion OS, Companion Memory and Companion Agents are in beta.') && !/[$€£]\s?\d|<img[^>]+src="(?:https?:)?\/\//i.test(gallery.text), `one <h1> ("${h1s[0]}"), the label, the beta line, no price and no image from anywhere but the site (the real logos and screenshots are the site's own files)`);
   // ---- end story v2 ----
   // every word of the front page, the Core band and the footer included, goes through claims.json's rules (scripts/story/lib/site-copy.mts: banned phrases at their
   // severity, headings in sentence case, the disclosures the page owes). This block used to stop at the band ("main's wording, which says your own AI, apps and memory"),
@@ -880,8 +881,8 @@ async function failureCases() {
     await page.route((u: URL) => u.pathname.endsWith('/assets/home-names.js'), (r: any) => r.fulfill({ status: 404, contentType: 'text/plain', body: 'not found' }));
     await page.goto(srv.url('index.html'));
     const listed = await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 }).then(() => true).catch(() => false);
-    const cards = await page.$$eval('#grid .card:not(.skel)', (els: Element[]) => els.length);
-    const jargon = await page.$$eval('#grid .card h3', (els: Element[]) => els.filter(e => /base\s*game|basegame|\bBG\b/i.test(e.textContent || '')).length);
+    const cards = await page.$$eval('#grid .card:not(.skel), #grid-rest .card', (els: Element[]) => els.length);
+    const jargon = await page.$$eval('.card h3', (els: Element[]) => els.filter(e => /base\s*game|basegame|\bBG\b/i.test(e.textContent || '')).length);
     ok(listed && cards === HOMES && jargon === 0, `home-names.js not downloading: the gallery still lists ${cards} homes (${jargon} with Sims jargon)`);
     await shot(page, 'failure-names-gallery');
     await page.goto(srv.url('room-creator.html?mode=view&house=cocoon'));

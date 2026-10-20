@@ -40,7 +40,7 @@ export interface StoryFull {
     popup?: { title?: string; chips?: string[]; note?: string }; detail?: { before?: string; after?: string } }[];
 }
 export interface ClaimLite { id: string; text: string; status?: string }
-export interface ClaimsLite { allowedClaims: ClaimLite[]; bannedPhrases: { id: string; pattern: string; flags?: string; severity: string }[] }
+export interface ClaimsLite { allowedClaims: ClaimLite[]; bannedPhrases: { id: string; pattern: string; flags?: string; severity: string }[]; disclosures: { id: string; text: string }[] }
 export interface FamilyLite { slug: string; house: string; surname: string; title: string; /** the archetypes present */ personas: string[] }
 
 export const planPath = (root: string = ROOT): string => path.join(root, 'content', 'story', 'lander.json');

@@ -6,7 +6,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { validate } from './validate-house-spec.mts';
 import { rectArea } from '../assets/house-geometry.js';
-import { galleryCountCopy } from './portal-pages.mts';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const dir = path.join(ROOT, 'content', 'houses');
@@ -25,11 +24,5 @@ for (const f of files) {
 }
 fs.writeFileSync(path.join(dir, 'index.json'), JSON.stringify({ generated: new Date().toISOString(), houses }, null, 2) + '\n');
 console.log(`\n${houses.length} houses indexed${bad ? `, ${bad} excluded` : ''} → ${rel}/index.json`);
-// the number of homes is also written, by hand, into the gallery's copy (the heading's and the descriptions' count in words, the hero's two figures):
-// index.html is a source, so it is kept to the list here rather than found out by the portal build
-const page = path.join(ROOT, 'index.html');
-if (fs.existsSync(page)) {
-  const html = fs.readFileSync(page, 'utf8'), synced = galleryCountCopy(html, houses);
-  if (synced !== html) { fs.writeFileSync(page, synced); console.log(`index.html: the count copy now says ${houses.length} homes (the heading, the descriptions, the hero's figures)`); }
-}
+// (the front page holds no count: scripts/portal-front.mts writes the families word and the count line in words from this list when the portal is built)
 process.exit(bad ? 1 : 0);

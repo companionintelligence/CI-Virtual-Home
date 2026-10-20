@@ -38,33 +38,14 @@ export const shortStyle = (s?: string): string => (s || '').split(/[:;,(]| with 
 
 const ONES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-// 36 → "thirty-six": the copy says "thirty-six homes" in words; this is what the data's count reads as. galleryCountCopy (below) writes it into
-// index.html (pnpm run index), and a page that still says another number is found by the build (build-portal.mts checks index.html's hand-written copy)
+// 36 → "thirty-six": the copy says a count in words; this is what the data's count reads as. The front page's words are written from the data when the portal
+// is built (scripts/portal-front.mts, scripts/story/lib/lander.mts countLine), and the build refuses a count typed in index.html
 export function numberWord(n: number): string {
   if (!Number.isInteger(n) || n < 0 || n > 99) return String(n);
   if (n < 20) return ONES[n];
   return TENS[Math.floor(n / 10)] + (n % 10 ? `-${ONES[n % 10]}` : '');
 }
 export const capital = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
-
-/**
- * index.html's hand-written copy that carries the NUMBER of homes, written as the data says it: the hero's two figures
- * (`data-stat="homes"` and `"area"`, which gallery.js recomputes from index.json), the count in words that opens the heading
- * ("Thirty-six homes.") and the descriptions ("Thirty-six homes, ..."). `pnpm run index` writes it into index.html (scripts/build-house-index.mts)
- * so adding a home never means finding the word by hand; `portal:build` (step 5b) holds the file to it and says to run the command when it
- * is not. A page that has no such copy is returned as it is (the build says so in its own words).
- */
-export function galleryCountCopy(html: string, houses: House[]): string {
-  const word = capital(numberWord(houses.length));
-  const area = nf.format(Math.round(houses.reduce((a, h) => a + (h.areaSqm || 0), 0) / 10) * 10);
-  const lead = '[A-Za-z0-9]+(?:-[a-z]+)?';   // "Thirty", "Thirty-six", or digits past ninety-nine
-  return html
-    .replace(/(data-stat="homes">)[^<]*(<)/, (_m, a: string, z: string) => `${a}${houses.length}${z}`)
-    .replace(/(data-stat="area">)[^<]*(<)/, (_m, a: string, z: string) => `${a}${area}${z}`)
-    .replace(new RegExp(`(<h1 id="hero-title">)${lead}( homes\\.)`), (_m, a: string, z: string) => `${a}${word}${z}`)
-    .replace(new RegExp(`(<meta name="description" content=")${lead}( homes,)`), (_m, a: string, z: string) => `${a}${word}${z}`)
-    .replace(new RegExp(`(<meta property="og:description" content=")${lead}( homes,)`), (_m, a: string, z: string) => `${a}${word}${z}`);
-}
 
 // a link-preview description fits a search result: one sentence on the style, one on what the page does, under 160 characters.
 export function homeDescription(h: House): string {
@@ -88,11 +69,12 @@ export const homeUrl = (site: string, id: string): string => new URL(`homes/${id
 export const ldScript = (graph: object[]): string => `<script type="application/ld+json">${JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c')}</script>`;
 export const orgLd = (site: string): object => ({ '@type': 'Organization', '@id': `${site}#organization`, name: SITE_NAME, url: LINKS.site, logo: new URL('portal/icons/icon-512.png', site).href, sameAs: SAME_AS });
 export const siteLd = (site: string): object => ({ '@type': 'WebSite', '@id': `${site}#website`, name: 'Virtual homes', url: site, inLanguage: 'en', publisher: { '@id': `${site}#organization` } });
-// the gallery: the site, its publisher and the list of homes
-export function galleryLd(site: string, houses: House[], title: string, desc: string): string {
+// the front page: the site, its publisher and the pages it features (the featured families' pages, absolute and extensionless; every home's page is linked
+// from the footer). No SearchAction, Product, Review, AggregateRating or FAQPage.
+export function galleryLd(site: string, items: { url: string; name: string }[], title: string, desc: string): string {
   return ldScript([orgLd(site), siteLd(site), {
     '@type': 'CollectionPage', '@id': `${site}#collection`, url: site, name: title, description: desc, isPartOf: { '@id': `${site}#website` },
-    mainEntity: { '@type': 'ItemList', numberOfItems: houses.length, itemListElement: houses.map((h, i) => ({ '@type': 'ListItem', position: i + 1, url: homeUrl(site, h.id), name: displayName(h) })) },
+    mainEntity: { '@type': 'ItemList', numberOfItems: items.length, itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, url: it.url, name: it.name })) },
   }]);
 }
 // a home's page: the site, its publisher, the page with its picture, and where it sits
@@ -112,13 +94,14 @@ export const playerLd = (site: string): string => ldScript([orgLd(site), siteLd(
 // ---- the gallery's list of homes, written into index.html so a visitor without JavaScript, and a crawler that does not run it,
 // see the homes and can follow each to its page. portal/gallery.js replaces them with the same cards, whose links go straight to
 // the player (same markup as its card(): a swap that does not move anything).
-export function galleryCards(houses: House[]): string {
-  return houses.map((h, i) => {
+export function galleryCards(houses: House[], types: Record<string, string> = {}): string {
+  return houses.map((h) => {
     const name = displayName(h), storeys = h.storeys || 1;
-    return `<li class="card" data-id="${esc(h.id)}"><a href="./homes/${esc(encodeURIComponent(h.id))}" aria-label="${esc(`${name}. ${shortStyle(h.style)}. Open its page`)}">`
-      + `<div class="thumb"><img src="./portal/thumbs/${esc(encodeURIComponent(h.id))}.webp" alt="" width="640" height="360" decoding="async"${i > 5 ? ' loading="lazy"' : ''}>`
-      + `<span class="thumb-play"><svg class="i i-fill"><use href="#i-play"/></svg>Play in 3D</span></div>`
-      + `<div class="card-body"><h3>${esc(name)}</h3><p class="style" title="${esc(h.style || '')}">${esc(shortStyle(h.style))}</p>`
+    const find = [name, h.style || '', h.id].join(' ').toLowerCase().replace(/\s+/g, ' ').trim();
+    return `<li class="card card-plain" data-id="${esc(h.id)}" data-type="${esc(types[h.id] || 'home')}" data-find="${esc(find)}"><a href="./homes/${esc(encodeURIComponent(h.id))}" aria-label="${esc(`${name}. No family yet. Open its page`)}">`
+      + `<div class="thumb"><img src="./portal/thumbs/${esc(encodeURIComponent(h.id))}.webp" alt="" width="640" height="360" decoding="async" loading="lazy">`
+      + `<span class="thumb-play"><svg class="i i-fill"><use href="#i-play"/></svg>Look around in 3D</span></div>`
+      + `<div class="card-body"><h3>${esc(name)}</h3><p class="no-family">No family yet.</p><p class="style" title="${esc(h.style || '')}">${esc(shortStyle(h.style))}</p>`
       + `<p class="facts"><span class="fact">${storeys} ${storeys === 1 ? 'storey' : 'storeys'}</span>${h.areaSqm ? `<span class="fact">${nf.format(h.areaSqm)} m²</span>` : ''}</p></div></a></li>`;
   }).join('\n        ');
 }

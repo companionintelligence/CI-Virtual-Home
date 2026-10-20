@@ -49,7 +49,7 @@ test('a surface\'s rows follow the `where` of claims.json', () => {
     'family-fold': /header|every page that names|landing hero/, 'family-start': /ftue|hermes or openclaw/,
     'family-footer': /footer|about|credits|faq|audio|film end card/, 'home-band': /every page that names/, 'home-footer': /footer|about/, 'not-found': /footer/,
     'player-about': /about|footer|player chrome|film end card|credits/, 'player-end': /every page that names|film end card/, 'tour-start': /footer|audio|film end card|every page that names/,
-    'lander-hero': /landing hero|header|every page that names/, 'lander-core': /every page that names|about/, 'lander-footer': /footer|about/,
+    'lander-hero': /landing hero|header|every page that names/, 'lander-core': /every page that names|about|landing page/, 'lander-footer': /footer|about/,
   };
   for (const s of SURFACE_IDS) {
     assert.ok(fits[s], `a row for ${s} in this test`);
@@ -167,7 +167,8 @@ test('the player\'s About panel and end card print the fine print from the table
 
 test('what the lander must print is a row of the table (its package reads it from here)', () => {
   assert.deepEqual(owed('lander-hero'), ['fictional-family', 'beta-short']);
-  assert.ok(owed('lander-core').includes('not-frontier') && owed('lander-footer').includes('launch-not-offer') && owed('lander-footer').includes('names-logos-owners'));
+  assert.deepEqual(owed('lander-core'), ['beta-short', 'not-frontier', 'stylised-art'], 'the band, and the line beside the Core picture');
+  assert.deepEqual(owed('lander-footer'), ['launch-not-offer', 'beta-full', 'scripted-scenes', 'names-logos-owners', 'third-party-apps'], 'the page quotes a written scene and names apps');
   for (const s of ['lander-hero', 'lander-core', 'lander-footer'] as Surface[]) assert.ok(s in SURFACES);
 });
 

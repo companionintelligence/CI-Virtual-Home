@@ -103,7 +103,11 @@ export const DISCLOSURES: Owed[] = [
   { id: 'launch-not-offer', surface: 'family', level: 'enforced' },
   { id: 'launch-not-offer', surface: 'notfound', level: 'enforced' },
   { id: 'launch-not-offer', surface: 'player', level: 'enforced' },
-  { id: 'names-logos-owners', surface: 'gallery', level: 'enforced', when: 'logos' },
+  { id: 'names-logos-owners', surface: 'gallery', level: 'enforced' },
+  { id: 'scripted-scenes', surface: 'gallery', level: 'enforced' },
+  { id: 'stylised-art', surface: 'gallery', level: 'enforced' },
+  { id: 'not-frontier', surface: 'gallery', level: 'enforced' },
+  { id: 'third-party-apps', surface: 'gallery', level: 'enforced' },
   { id: 'names-logos-owners', surface: 'family', level: 'enforced', when: 'logos' },
   { id: 'names-logos-owners', surface: 'player', level: 'enforced' },
   { id: 'scripted-scenes', surface: 'player', level: 'enforced' },
@@ -206,7 +210,8 @@ export function siteCopy(opts: SiteCopyOptions): SiteCopyResult {
       family: /class="family-block"|meet-family|family\//.test(html) && surface === 'home' && /Fictional family\. Real software\./.test(r.text),
     });
     // (the short beta line stands apart from claims.json's beta-short: it is the one line every page of the story carries, see assets/story/types.ts)
-    if (surface === 'family' || surface === 'gallery') for (const line of [FICTIONAL_LINE, BETA_LINE]) if (!r.text.includes(line)) res.errors.push(`${p}: the line is missing: "${line}"`);
+    // (the front page prints the full beta-short in its first screen, which DISCLOSURES holds it to; a family page keeps the OS-only line beside its strip)
+    if (surface === 'family' || surface === 'gallery') for (const line of surface === 'gallery' ? [FICTIONAL_LINE] : [FICTIONAL_LINE, BETA_LINE]) if (!r.text.includes(line)) res.errors.push(`${p}: the line is missing: "${line}"`);
   }
 
   // ---- the player's HTML: title, meta, <noscript>, the head script's strings (the loader and the failure card)

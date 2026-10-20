@@ -41,10 +41,10 @@ export const SURFACES = {
   'player-end': [r('beta-short')],
   /** the tour's start card (assets/story/popup.ts FINE_PRINT is these four, in this order) */
   'tour-start': [r('scripted-scenes'), r('synthetic-voice', 'narration'), r('stylised-art'), r('beta-short')],
-  /** THE LANDER (index.html, scripts/portal-front.mts): the hero chip, the Core band with what a Core is not, the footer. Printed by the lander's package from this row. */
+  /** THE LANDER (index.html, scripts/portal-front.mts): the hero's two chips, the Core band (what a Core is not, and the line beside its picture) and the footer (the page quotes a written scene and names apps). */
   'lander-hero': [r('fictional-family'), r('beta-short')],
-  'lander-core': [r('beta-short'), r('not-frontier')],
-  'lander-footer': [r('launch-not-offer'), r('beta-full'), r('names-logos-owners')],
+  'lander-core': [r('beta-short'), r('not-frontier'), r('stylised-art')],
+  'lander-footer': [r('launch-not-offer'), r('beta-full'), r('scripted-scenes'), r('names-logos-owners'), r('third-party-apps')],
 } as const satisfies Record<string, readonly Rule[]>;
 export type Surface = keyof typeof SURFACES;
 export const SURFACE_IDS = Object.keys(SURFACES) as Surface[];
