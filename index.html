@@ -94,7 +94,7 @@
         <div class="core-card">
           <p class="core-line"><svg class="i" aria-hidden="true"><use href="#i-box"/></svg><span>Every home has a <b>Companion Core</b> in it. Take a tour to find it.</span></p>
           <p class="core-actions"><a class="core-more" href="#core"><span>See Companion Core</span><svg class="i" aria-hidden="true"><use href="#i-down"/></svg></a></p>
-          <p class="core-fine">Companion OS is in beta.</p>
+          <!-- fine-hero: scripts/build-portal.mts writes the beta line here, from content/story/claims.json (beta-short), scripts/story/lib/fine-print.mts -->
         </div>
         <dl class="stats" aria-label="The collection">
           <div><dt>Homes</dt><dd data-stat="homes">30</dd></div>
@@ -169,8 +169,9 @@
     <section class="cta-band" id="core" aria-labelledby="cta-title">
       <div class="cta-copy">
         <h2 id="cta-title">Meet the Companion Core.</h2>
-        <p>The small computer on your desk runs your own AI, apps and memory at home, not in someone else's cloud.</p>
+        <!-- core-line: scripts/build-portal.mts writes what the Core is here, from content/story/claims.json (local-by-default), scripts/story/lib/fine-print.mts -->
         <p class="cta-note">Companion OS is in beta.</p>
+        <!-- fine-core: scripts/build-portal.mts writes what a Core is not here (not-frontier), from content/story/claims.json -->
       </div>
       <div class="cta-actions">
         <a class="btn btn-buy" href="https://ci.computer/core">Buy Companion Core</a>
@@ -196,6 +197,7 @@
         </ul>
       </nav>
     </div>
+    <!-- fine-foot: scripts/build-portal.mts writes the footer's fine print here (launch-not-offer, beta-full, names-logos-owners), from content/story/claims.json -->
     <!-- foot-homes: scripts/build-portal.mts writes the list of every home's own page here (the pages are build output, so a
          checkout served as it is has none) -->
     <p class="legal">© 2026 LifeScope Inc., DBA Companion Intelligence.</p>

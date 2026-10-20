@@ -7,6 +7,7 @@
 import type { Story } from '../../../assets/story/types.ts';
 import type { Ctx } from './context.mts';
 import type { Report } from './report.mts';
+import { isV3Story } from './v3.mts';
 
 /** Strip HTML tags and fold typographic quotes, as claims.json validator.flags asks. */
 export const plain = (s: string): string => s.replace(/<[^>]*>/g, ' ').replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
@@ -54,15 +55,18 @@ export function userStrings(story: Story): Str[] {
  * allow-list, warn prints.
  */
 export function checkBannedPhrases(story: Story, ctx: Ctx, out: Report): void {
+  const v3 = isV3Story(story);
   for (const [at, raw] of userStrings(story)) {
-    // A "replaces <X>" chip is the sanctioned uncloud pattern: X is a name from the catalog (the `app-replaces` and
-    // `chips` rules check it), so the parity and gaming phrases must not read it as a claim ("replaces ChatGPT").
-    if (/\.chip\d+$/.test(at) && /^replaces /i.test(raw)) continue;
+    // A pass 1 "replaces <X>" chip is the old uncloud pattern: X is a name from the catalog (the `app-replaces` and `chips` rules check it).
+    // It used to be skipped here, which let "Open WebUI replaces ChatGPT" (cap-parity) ship in seven tours. Now it runs through every rule:
+    // in a v3 family (the chip is "alternative to <Service>") at the rule's own severity, in a family not yet rewritten as a warning, the
+    // phase-in device of v3.mts, so the fleet stays valid until each family is told again. The warning says what the rule would have said.
+    const legacyChip = /\.chip\d+$/.test(at) && /^replaces /i.test(raw) && !v3;
     const s = plain(raw);
     for (const b of ctx.bans) {
       if (!b.re.test(s)) continue;
       const shown = s.length > 70 ? `${s.slice(0, 70)}...` : s;
-      out.add(b.severity, b.id, at, `"${shown}" ${b.why}`, b.fix);
+      out.add(legacyChip ? 'warn' : b.severity, b.id, at, `"${shown}" ${b.why}`, legacyChip ? `${b.fix} (A pass 1 chip is a warning until the family is told in the v3 shape.)` : b.fix);
     }
   }
 }

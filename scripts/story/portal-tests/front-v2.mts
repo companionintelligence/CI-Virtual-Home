@@ -128,18 +128,14 @@ export default async function frontV2(ctx: TestCtx): Promise<void> {
       const total = await page.$$eval('#grid .card', (e: HTMLElement[]) => e.filter(x => !x.hidden).length);
       await page.click(builder);
       await sleep(250);
-      const on = await page.evaluate(() => ({ pressed: document.querySelector('.arch-btn[data-persona="builder"]')!.getAttribute('aria-pressed'), card: document.querySelector('.arch[data-persona="builder"]')!.classList.contains('on'), panel: (() => { const p = document.querySelector<HTMLElement>('.arch-panel[data-persona="builder"]')!; return p.classList.contains('on') && p.getBoundingClientRect().height > 40; })(), others: document.querySelectorAll('.arch-panel.on').length, q: location.search, cards: Array.from(document.querySelectorAll<HTMLElement>('#grid .card')).filter(x => !x.hidden).length, dim: document.querySelectorAll('.wall-app.dim').length, lit: Array.from(document.querySelectorAll<HTMLElement>('.wall-app:not(.dim)')).every(e => (e.dataset.by || '').split(' ').includes('builder')), persona: document.querySelector('#personas .persona[data-persona="builder"]')!.getAttribute('aria-pressed') }));
-      ok(on.pressed === 'true' && on.card && on.panel && on.others === 1 && on.q.includes('persona=builder') && on.cards > 0 && on.cards < total && on.persona === 'true', `${tag}: choosing the builder card narrows the grid to ${on.cards} of ${total}, puts persona=builder in the address, shows its list, and presses the filter button too`);
+      const on = await page.evaluate(() => ({ pressed: document.querySelector('.arch-btn[data-persona="builder"]')!.getAttribute('aria-pressed'), card: document.querySelector('.arch[data-persona="builder"]')!.classList.contains('on'), panel: (() => { const p = document.querySelector<HTMLElement>('.arch-panel[data-persona="builder"]')!; return p.classList.contains('on') && p.getBoundingClientRect().height > 40; })(), others: document.querySelectorAll('.arch-panel.on').length, q: location.search, cards: Array.from(document.querySelectorAll<HTMLElement>('#grid .card')).filter(x => !x.hidden).length, dim: document.querySelectorAll('.wall-app.dim').length, lit: Array.from(document.querySelectorAll<HTMLElement>('.wall-app:not(.dim)')).every(e => (e.dataset.by || '').split(' ').includes('builder')) }));
+      ok(on.pressed === 'true' && on.card && on.panel && on.others === 1 && on.q.includes('persona=builder') && on.cards > 0 && on.cards < total, `${tag}: choosing the builder card narrows the grid to ${on.cards} of ${total}, puts persona=builder in the address and shows its list`);
       ok(on.dim > 0 && on.lit, `${tag}: and dims ${on.dim} apps on the wall that no builder uses (the others are the ones the builders' stories name)`);
       await page.click(builder);
       await sleep(250);
       const off = await page.evaluate(() => ({ pressed: document.querySelector('.arch-btn[data-persona="builder"]')!.getAttribute('aria-pressed'), panels: document.querySelectorAll('.arch-panel.on').length, dim: document.querySelectorAll('.wall-app.dim').length, q: location.search, cards: Array.from(document.querySelectorAll<HTMLElement>('#grid .card')).filter(x => !x.hidden).length }));
       ok(off.pressed === 'false' && off.panels === 0 && off.dim === 0 && !off.q.includes('persona') && off.cards === total, `${tag}: choosing it again lets it go (the grid, the list, the wall and the address are as they were)`);
-      // the maker and the host are reached by the filter and have a list, though they have no card
-      await page.click('#personas .persona[data-persona="maker"]');
-      await sleep(250);
-      ok(await page.evaluate(() => { const p = document.querySelector<HTMLElement>('.arch-panel[data-persona="maker"]'); return !!p && p.classList.contains('on') && p.getBoundingClientRect().height > 40 && !document.querySelector('.arch[data-persona="maker"]'); }), `${tag}: the maker has no card, and the filter shows its list`);
-      await page.click('#personas .persona[data-persona="maker"]');
+      // (the filter buttons are the six categories now, code to care; the archetype lists are reached by the four cards above)
       // the logos on the family cards: 20 px, with their alt text and size set
       const cl = await page.evaluate(() => Array.from(document.querySelectorAll<HTMLImageElement>('#grid .card-family .apps img.logo')).map(i => { const r = i.getBoundingClientRect(); return { w: Math.round(r.width), alt: i.alt, lazy: i.loading, attrs: !!i.getAttribute('width') && !!i.getAttribute('height'), name: (i.parentElement!.querySelector('b')!.textContent || '') }; }));
       ok(cl.length >= 30 && cl.every((x: any) => x.w === 20 && x.alt === `${x.name} logo` && x.lazy === 'lazy' && x.attrs), `${tag}: the ${cl.length} logos on the family cards are 20 px, lazy, with width and height and the alt text "<app> logo"`);
@@ -171,12 +167,12 @@ export default async function frontV2(ctx: TestCtx): Promise<void> {
       await close();
     }
   }
-  // the address carries the choice: a link to ?persona=gamer opens with the card pressed and the list shown
+  // the address carries the choice: a link to ?persona=code opens with the filter pressed and the ad tag kept (the archetype cards are a way into the same filter, not a link target now)
   {
     const { page, close } = await ctx.open({ width: 1280, height: 800 });
-    await page.goto(ctx.url('?persona=gamer&utm_source=meta'));
+    await page.goto(ctx.url('?persona=code&utm_source=meta'));
     await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
-    ok(await page.evaluate(() => document.querySelector('.arch-btn[data-persona="gamer"]')!.getAttribute('aria-pressed') === 'true' && document.querySelector('.arch-panel[data-persona="gamer"]')!.classList.contains('on') && location.search.includes('utm_source=meta')), '?persona=gamer opens with the gamer card pressed and its list shown, and the ad tag stays in the address');
+    ok(await page.evaluate(() => document.querySelector('#personas .persona[data-persona="code"]')!.getAttribute('aria-pressed') === 'true' && location.search.includes('utm_source=meta') && location.search.includes('persona=code')), '?persona=code opens with the Code filter pressed, and the ad tag stays in the address');
     await close();
   }
   // reduced motion: the card does not move or fade on hover, and nothing slides by itself

@@ -30,6 +30,7 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `portal/apps/<id>/*.webp`, `portal/ci/*.webp`, `content/story/app-media.json` | `pnpm run story:media` (real logos and screenshots, from the sibling repos' git objects at the manifest's pinned commits; `-- --check` fails when stale) |
 | `content/story/services.json` (the derived columns: `apps`, `storyApps`, `storyStatus`, `incumbentNameList`, `fleetHomes`, `rank`, `top80`) | `pnpm run story:services` (from `catalog-apps.json`, `claims.json` and `content/families`; the facts in the file are authored; `story:services:check` fails when stale and is part of `pnpm run test`; [`reference/story/story-v3.md`](reference/story/story-v3.md)) |
 | `content/families/films.json`, `content/families/<slug>/film/` | `pnpm run story:film -- <slug>` |
+| the `CLAIMS_SNAPSHOT` block in `assets/story/fine-print.ts` (the player's mirror of `content/story/claims.json`'s disclosures; the fine print each page owes is `reference/story/fine-print.md`) | `node --experimental-strip-types scripts/story/lib/fine-print.mts --write` after a change to `claims.json`; `scripts/test-fine-print.mts` fails until it is done |
 | `dist/` (gitignored) | `pnpm run portal:build` |
 
 Edit `assets/*.ts`, never the compiled `.js` beside it. `assets/vendor/` is third-party: do not edit it (the
@@ -121,12 +122,15 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 - The homes' own pages are linked by the footer's "Every home, on its own page" list, which `portal:build` writes at the `<!-- foot-homes: -->` marker in
   `index.html` and `gallery.js` leaves alone, so the rendered DOM links them and not only the sitemap does. A home's page carries "Meet the family" when a
   current family lives there (`<!-- meet-family: -->`, written by the same step).
+- The lander's Core sentence and fine print are `claims.json`'s words, never retyped in `index.html`: `portal:build` writes them at the `<!-- fine-hero: -->`,
+  `<!-- core-line: -->`, `<!-- fine-core: -->` and `<!-- fine-foot: -->` markers from `scripts/story/lib/fine-print.mts` (surfaces `lander-hero`, `lander-core`,
+  `lander-footer`; `reference/story/fine-print.md`). Every row of `DISCLOSURES` in `scripts/story/lib/site-copy.mts` is enforced, so `story:copy` fails a page that drops one.
 - **Campaign passthrough** (`portal/campaign.js`, plain script, no imports): the ad's tags (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`,
   `utm_term`, `fbclid`, `ttclid`, `gclid`, `msclkid`) are kept in `sessionStorage` (`ci-campaign`) and added, **at run time only**, to every link to
   `https://ci.computer`, `/core` and `/download` and to every relative link marked `data-campaign`. The built hrefs never carry a query (step 7 fails on
   one), no page may rewrite them in the HTML, and the docs, privacy and terms links never get tags. Every page of the site loads it
   (`<script src="./portal/campaign.js" defer data-cfasync="false"></script>`, `../portal/` one level down, before any script that writes the address); a
-  script that rewrites the address keeps the parameters that are not its own (gallery.js does; the player's `url()` does not yet). `scripts/test-campaign.mts`
+  script that rewrites the address keeps the parameters that are not its own (gallery.js does, and so does the player's `url()`: `OWN_PARAMS` in `assets/viewer.ts` and `assets/story/url.ts` is the one list of what is the player's own, and `family-pages.mts` asserts it). `scripts/test-campaign.mts`
   (`pnpm run test:campaign`, quick) and the `campaign` leg of `portal:test` check it.
 <!-- end front page -->
 - Every executable `<script>` in the built pages has `data-cfasync="false"` (Cloudflare's Rocket Loader is on for the zone and would
@@ -179,7 +183,8 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   there (the production deploy). `--stale-report` prints every reason.
 - Copy on the site follows the Uncloud voice (CI-Common `uncloud-voice`): no em or en dashes, sentence case, no price or performance number
   that is not on the fact sheet, "Fictional family. Real software." wherever a family is, Companion OS is in beta.
-  `scripts/story/check-copy.mts` lints the built family pages against `content/story/claims.json` (`portal:test`'s hooks leg).
+  `scripts/story/check-copy.mts` (`pnpm run story:copy -- dist`, in CI after `portal:build` and in `portal:test`'s `gallery` and `hooks` legs) lints every built page and data file a visitor reads
+  (the front page and its band and footer, the homes' pages, the family pages, the 404, the player's HTML, the tours' data, the cards, the ad plan and the player's strings) against `content/story/claims.json`; a disclosure the claims owe a page that nothing prints yet is listed as pending, never silently skipped (`--strict` fails on it).
 - **The voice-over is generated locally** (`pnpm run story:voice`, Kokoro-82M, Apache-2.0, CPU, no network at run time). No cloud
   text-to-speech service, no API key, ever; macOS `say` is a labelled last resort only. Nothing in the pipeline is shipped but its
   output: the AAC clips, which are content-hashed (`<clip>.<hash10>.m4a`), loaded per beat and only after the viewer chooses
@@ -273,14 +278,17 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `<main>` because `<main>` goes inert while a drawer is open.
 - `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
 
-**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph and story-validator tests (`pnpm run test`) and the 31 quick
-Node tests (`pnpm run test:node`) and assembles the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
+**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph and story-validator tests (`pnpm run test`), the story gates
+(`story:validate` on every family, `story:cast -- --check`, `story:cast-lint`, `story:services:check`, `story:bake -- --check --all`; `story:validate -- --complete` and
+`story:ads -- --check` run but do not block yet), the quick Node tests (`pnpm run test:node`: every `scripts/test-*.mts` marked `@check-house quick`, found by glob, so no
+count is written here), assembles the portal (`portal:build`'s link and staleness checks; strict about families on a push) and lints every word of it (`pnpm run story:copy -- dist`);
+`portal:test`'s browser legs run too but do not block yet (`.github/workflows/ci.yml` says which). Once the owner has set up deploys, a merge to `main` that
 passes those goes live on its own. The render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
 pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (150 / 150)
-pnpm run check:quick    # while iterating: assets + specs + shots + the 31 quick tests
+pnpm run check:quick    # while iterating: assets + specs + shots + the quick tests
 ```
 
 A clean run has 0 shot errors and 0 scene errors (warnings are reported but do not fail — compare their count

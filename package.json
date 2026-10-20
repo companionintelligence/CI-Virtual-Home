@@ -48,6 +48,7 @@
     "story:validate": "node --experimental-strip-types scripts/validate-stories.mts",
     "story:cast": "node --experimental-strip-types scripts/story/build-casting.mts",
     "story:cast-lint": "node --experimental-strip-types scripts/story/cast-lint.mts",
+    "story:copy": "node --experimental-strip-types scripts/story/check-copy.mts",
     "story:services": "node --experimental-strip-types scripts/story/build-services.mts",
     "story:services:check": "node --experimental-strip-types scripts/story/build-services.mts --check",
     "story:bake": "node --experimental-strip-types scripts/story-bake.mts",
