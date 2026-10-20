@@ -433,6 +433,17 @@ test('a swap leaves out a pair the copy rules stop, and a chip wears a logo only
   }
 });
 
+test('the story v3 pair chip "alternative to <Service>" is the quiet chip, like the pass 1 "replaces <X>"', () => {
+  const s: Story = fs.existsSync(BRENNAN) ? readJson(BRENNAN) : L.stories[0];
+  const b = s.beats.find(x => x.app && x.app.replaces.length)!;
+  const name = L.catalog[b.app!.id].name;
+  const chips = pg.chipsHtml({ ...b, popup: { ...b.popup, chips: [name, `alternative to ${b.app!.replaces[0]}`] } }, L.catalog, null);
+  assert.match(chips, /<span class="chip chip-quiet">alternative to /, 'the pair chip is the quiet chip');
+  assert.ok(!/chip-quiet">\s*<img/.test(chips), 'a pair chip has no logo');
+  const stopped = pg.chipsHtml({ ...b, popup: { ...b.popup, chips: [name, 'alternative to ChatGPT'] } }, L.catalog, null, [new RegExp(`${name} alternative to ChatGPT`)]);
+  assert.ok(!/ChatGPT/.test(stopped), 'a pair line the copy rules stop is not printed in the v3 form either');
+});
+
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // story v2, the front page's pieces (scripts/portal-front.mts): pure functions of the families, the manifest and the home list
 // ---------------------------------------------------------------------------------------------------------------------------------------------

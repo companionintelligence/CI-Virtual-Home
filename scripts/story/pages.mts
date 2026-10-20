@@ -227,8 +227,10 @@ export function chipsHtml(b: Beat, catalog: Loaded['catalog'], media: MediaManif
   const ids = new Map<string, string>();
   for (const id of [b.app?.id, ...(b.with || [])]) if (id) ids.set(appName(catalog, id).toLowerCase(), id);
   // (a "replaces <service>" line the copy rules stop, such as "Open WebUI replaces ChatGPT", is not printed: the page says what the app is, and the card's list does not carry it either)
-  return text.filter(c => !(/^replaces /i.test(c) && app && rules.some(r => r.test(`${app.name} ${c}`)))).map(c => {
-    if (/^replaces /i.test(c)) return `<span class="chip chip-quiet">${esc(c)}</span>`;
+  // the pair chip is "replaces <X>" (pass 1) or "alternative to <Service>" (story v3, reference/story/story-v3.md); both are the quiet chip
+  const pairChip = (c: string): boolean => /^(replaces|alternative to) /i.test(c);
+  return text.filter(c => !(pairChip(c) && app && rules.some(r => r.test(`${app.name} ${c}`)))).map(c => {
+    if (pairChip(c)) return `<span class="chip chip-quiet">${esc(c)}</span>`;
     const id = ids.get(c.trim().toLowerCase()), logo = id ? logoImg(appMedia(media, id), { depth: DEPTH, className: 'logo' }) : '';
     return `<span class="chip${logo ? ' chip-app' : ''}">${logo}${esc(c)}</span>`;
   }).join('');

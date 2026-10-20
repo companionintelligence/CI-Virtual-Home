@@ -106,7 +106,8 @@ export class BeatCard {
     if (b.popup.chips && b.popup.chips.length) {
       const ul = hide(el('ul', 'st-chips'));
       for (const t of b.popup.chips) {
-        const replaces = /^replaces /i.test(t), logo = replaces ? null : logoOf(rs, b, t);
+        // the pair chip is the quiet one: story v3 writes "alternative to <Service>" (reference/story/story-v3.md), pass 1 wrote "replaces <X>"
+        const replaces = /^(replaces|alternative to) /i.test(t), logo = replaces ? null : logoOf(rs, b, t);
         const li = el('li', replaces ? 'st-chip st-chip-replaces' : logo ? 'st-chip st-chip-app' : 'st-chip');
         if (logo) li.append(logoImg(logo));
         li.append(t);
