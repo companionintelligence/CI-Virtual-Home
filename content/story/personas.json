@@ -139,6 +139,122 @@
       "anchorRoles": ["dining-table", "desk", "bookshelf", "kitchen-island"],
       "fallbackAnchorRoles": ["easel", "couch", "room"],
       "apps": ["open-webui", "paperless", "nextcloud", "libreoffice", "libretranslate", "joplin", "stirling-pdf", "vaultwarden", "razzia", "excalidraw", "ci-planning", "radicale", "calibre-web"]
+    },
+    "money-keeper": {
+      "label": "Money keeper",
+      "description": "Owns the household ledger: bills, subscriptions, shared costs and the receipts behind them.",
+      "example": "Padma",
+      "rooms": ["dining", "office", "kitchen", "living"],
+      "fallbackRooms": ["bedroom", "laundry"],
+      "anchorRoles": ["dining-table", "desk", "kitchen-island", "bookshelf"],
+      "fallbackAnchorRoles": ["counter", "fridge", "couch", "laundry", "room"],
+      "apps": ["firefly-iii", "wallos", "spliit", "monetr", "papra", "grist", "homebox", "vaultwarden"]
+    },
+    "housemate": {
+      "label": "Housemate",
+      "description": "Shares a rented flat on one Core: the bills, the chores, the shelf and the telly.",
+      "example": "Tamsin",
+      "rooms": ["kitchen", "living", "dining"],
+      "fallbackRooms": ["entry", "laundry", "bedroom"],
+      "anchorRoles": ["fridge", "kitchen-island", "dining-table", "couch", "tv"],
+      "fallbackAnchorRoles": ["counter", "bookshelf", "bicycle", "laundry", "desk", "room"],
+      "apps": ["spliit", "donetick", "wallos", "pairdrop", "jellyfin", "kitchenowl", "homebox"]
+    },
+    "carer": {
+      "label": "Carer",
+      "description": "Keeps the post, the calendar and the notes for a parent, partner or relative they look after, with that person's say.",
+      "example": "Idris",
+      "rooms": ["dining", "office", "kitchen"],
+      "fallbackRooms": ["living", "entry"],
+      "anchorRoles": ["dining-table", "desk", "counter", "fridge", "bookshelf"],
+      "fallbackAnchorRoles": ["couch", "front-door", "room"],
+      "apps": ["radicale", "homehub", "paperless", "donetick", "audiobookshelf", "immich", "vaultwarden", "medikeep"]
+    },
+    "community-lead": {
+      "label": "Community lead",
+      "description": "Runs a club, choir, tenants' group or committee from the kitchen table: roll, minutes, rota and small budget.",
+      "rooms": ["dining", "kitchen", "office", "living"],
+      "fallbackRooms": ["entry", "bedroom"],
+      "anchorRoles": ["dining-table", "desk", "bookshelf", "counter", "fridge"],
+      "fallbackAnchorRoles": ["kitchen-island", "couch", "room"],
+      "apps": ["grist", "radicale", "bookstack", "vikunja", "planka", "akaunting", "papra", "nextcloud"]
+    },
+    "researcher": {
+      "label": "Researcher",
+      "description": "Reads, cites and writes up from sources: papers, archives and translated texts, with the reading, the notes and the drafts kept on the Core.",
+      "rooms": ["office", "dining", "living", "bedroom"],
+      "fallbackRooms": ["kitchen"],
+      "anchorRoles": ["desk", "bookshelf", "dining-table"],
+      "fallbackAnchorRoles": ["couch", "kitchen-island", "room"],
+      "apps": ["linkwarden", "readeck", "logseq", "obsidian", "libretranslate", "paperless", "anything-llm", "grist", "jupyterlab"]
+    },
+    "seller": {
+      "label": "Seller",
+      "description": "Sells what they make or find at a stall and by message, and keeps the stock, photos and invoices at home.",
+      "example": "Wren",
+      "rooms": ["dining", "office", "garage", "kitchen"],
+      "fallbackRooms": ["living", "bedroom", "entry"],
+      "anchorRoles": ["dining-table", "desk", "bookshelf", "room"],
+      "fallbackAnchorRoles": ["counter", "kitchen-island", "couch"],
+      "apps": ["baserow", "homebox", "invoice-ninja", "invio", "photoview", "immich", "activepieces", "vaultwarden"]
+    },
+    "translator": {
+      "label": "Translator",
+      "description": "A freelance translator or subtitler: the draft, the notes and the client's PDFs sit on the Core, and every line is rewritten by hand.",
+      "example": "Noa",
+      "rooms": ["office", "bedroom", "dining", "living"],
+      "fallbackRooms": ["kitchen"],
+      "anchorRoles": ["desk", "bookshelf", "dining-table"],
+      "fallbackAnchorRoles": ["couch", "kitchen-island", "room"],
+      "apps": ["libretranslate", "stirling-pdf", "solidtime", "invio", "joplin", "akaunting", "paperless", "libreoffice", "whisper-webui", "kokoro"]
+    },
+    "archivist": {
+      "label": "Archivist",
+      "description": "Scans and files the family's slides, letters and home films, and keeps them where the family's later readers can find them.",
+      "example": "Odalys",
+      "rooms": ["dining", "living", "office", "bedroom"],
+      "fallbackRooms": ["kitchen", "garage"],
+      "anchorRoles": ["dining-table", "bookshelf", "desk", "music"],
+      "fallbackAnchorRoles": ["tv", "couch", "room"],
+      "apps": ["photoprism", "librephotos", "papra", "duplicati", "archivebox", "memos", "navidrome", "jellyfin", "immich", "paperless"]
+    },
+    "traveller": {
+      "label": "Traveller",
+      "description": "Plans trips at the table and files the itinerary, the flight log and the photos once home.",
+      "example": "Rune",
+      "rooms": ["dining", "living", "office", "bedroom"],
+      "fallbackRooms": ["kitchen", "entry"],
+      "anchorRoles": ["dining-table", "bookshelf", "desk"],
+      "fallbackAnchorRoles": ["couch", "counter", "room"],
+      "apps": ["airtrail", "spliit", "adventurelog", "trip", "libretranslate", "vaultwarden", "paperless", "immich"]
+    },
+    "athlete": {
+      "label": "Athlete",
+      "description": "Trains most days, as a runner, a cyclist, a swimmer or a lifter: the runs, rides and sessions, the routes, the daily habits and the music sit on the Core.",
+      "example": "Ilse",
+      "rooms": ["garage", "entry", "bedroom", "living", "patio"],
+      "fallbackRooms": ["garden", "laundry", "dining"],
+      "anchorRoles": ["bicycle", "pool", "front-door", "bed"],
+      "fallbackAnchorRoles": ["desk", "couch", "patio-seat", "room"],
+      "apps": ["endurain", "wingfit", "wanderer", "habitica", "navidrome", "immich"]
+    },
+    "collector": {
+      "label": "Collector",
+      "description": "Keeps a library of books, comics, records and films and knows where every one is: the files and the catalogue sit on the Core.",
+      "rooms": ["living", "office", "bedroom"],
+      "fallbackRooms": ["dining", "kids"],
+      "anchorRoles": ["bookshelf", "music", "tv"],
+      "fallbackAnchorRoles": ["couch", "desk", "bed", "dining-table", "room"],
+      "apps": ["booklore", "calibre-web", "audiobookshelf", "navidrome", "jellyfin", "homebox", "komga", "dvinyl"]
+    },
+    "shift-worker": {
+      "label": "Shift worker",
+      "description": "Works early, late or rotating shifts that do not match the household's day, and keeps one shared week across different clocks.",
+      "rooms": ["kitchen", "dining", "entry", "living"],
+      "fallbackRooms": ["laundry", "bedroom", "patio", "garden"],
+      "anchorRoles": ["counter", "fridge", "dining-table", "front-door", "couch"],
+      "fallbackAnchorRoles": ["kitchen-island", "laundry", "tv", "desk", "patio-seat", "room"],
+      "apps": ["radicale", "donetick", "vikunja", "homehub", "audiobookshelf", "jellyfin", "mealie"]
     }
   }
 }

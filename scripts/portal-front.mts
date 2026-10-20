@@ -18,22 +18,47 @@ import path from 'node:path';
 import { displayName } from '../assets/home-names.js';
 import { esc, nf, MEET_MARKER } from './portal-pages.mts';
 import type { House } from './portal-pages.mts';
+import { loadCategories } from './story/lib/categories.mts';
+import type { Category, TypeFilter } from './story/lib/categories.mts';
 import { appMedia, logoImg, readMedia } from './story/lib/media.mts';
 import type { MediaManifest } from './story/lib/media.mts';
 import { runsInner, swapHtml, SHOT_DIALOG } from './story/pages.mts';
 import type { Swap } from './story/pages.mts';
 
-/** The jobs a member does on the family's one Companion Core (reference/story/personas.md), with the words a visitor would choose to filter by. */
-export const PERSONAS = [
-  { archetype: 'organiser', filter: 'Work from home' },
-  { archetype: 'builder', filter: 'Code' },
-  { archetype: 'gamer', filter: 'Play' },
-  { archetype: 'learner', filter: 'Study' },
-  { archetype: 'maker', filter: 'Make' },
-  { archetype: 'host', filter: 'Host' },
-] as const;
-export type Archetype = (typeof PERSONAS)[number]['archetype'];
+/**
+ * The front page's categories (content/story/categories.json, checked by story:validate): the chips a visitor filters by, each holding the archetypes of
+ * content/story/personas.json it stands for. Nothing here is a list in code: add an archetype to personas.json and a category, and the chips, the
+ * cards' filter tokens and the picker data follow.
+ */
+const REPO = path.resolve(import.meta.dirname, '..');
+export const CATEGORIES: Category[] = loadCategories(REPO).categories;
+/** The second filter, the kind of place (Homes, Apartments, Offices). Data only for now: the markup for it is a later package's. */
+export const TYPE_FILTERS: TypeFilter[] = loadCategories(REPO).typeFilters;
+/**
+ * The jobs a member does on the family's one Companion Core (reference/story/personas.md): one row for each archetype of personas.json, in its order,
+ * with the category it is in and the label of that category (the words a visitor would choose to filter by) as `filter`.
+ */
+export const PERSONAS: { archetype: string; /** the category id */ category: string; filter: string; /** the archetype's own label */ label: string }[] =
+  Object.entries(JSON.parse(fs.readFileSync(path.join(REPO, 'content', 'story', 'personas.json'), 'utf8')).archetypes as Record<string, { label: string }>)
+    .map(([archetype, def]) => {
+      const c = CATEGORIES.find(x => x.personas.includes(archetype));
+      if (!c) throw new Error(`portal-front: the archetype ${archetype} is in no category of content/story/categories.json (pnpm run story:validate says so)`);
+      return { archetype, category: c.id, filter: c.label, label: def.label };
+    });
+export type Archetype = string;
 const ARCHETYPES: readonly string[] = PERSONAS.map(p => p.archetype);
+/** The category id of an archetype ('' for one that is not in personas.json). */
+const categoryOf = (archetype: string): string => PERSONAS.find(p => p.archetype === archetype)?.category || '';
+/** An archetype's own words, lower case ("organiser", "money keeper"): what a card says under a name. */
+const archWord = (archetype: string): string => (PERSONAS.find(p => p.archetype === archetype)?.label || archetype).toLowerCase();
+/**
+ * What a card's data-persona says (portal/gallery.js filters by it): the archetypes the family has, then the categories they are in. A chip filters by a
+ * category and the "Pick a person" cards by an archetype, so a card carries both; no category id is an archetype id (story:validate).
+ */
+export const filterTokens = (archetypes: readonly string[]): string[] => {
+  const cats = new Set(archetypes.map(categoryOf).filter(Boolean));
+  return [...archetypes, ...CATEGORIES.map(c => c.id).filter(id => cats.has(id))];
+};
 
 /**
  * The homes the cast plan says have no family (yet): house id → why (content/story/cast-plan.json `homesWithoutFamily`; the six apartments).
@@ -109,7 +134,7 @@ export function readFamilies(o: { ROOT: string; dir: string; built: BuiltLike[];
     const members: FrontMember[] = story.members.map(m => {
       const c = cast.find(x => (x.id && x.id === m.id) || x.name === m.name);
       const a = ARCHETYPES.includes(m.archetype || '') ? m.archetype! : ARCHETYPES.includes(c?.archetype || '') ? c!.archetype! : '';
-      return { name: m.name, archetype: a, word: a || ROLE_WORD[m.role] || m.role };
+      return { name: m.name, archetype: a, word: (a && archWord(a)) || ROLE_WORD[m.role] || m.role };
     });
     const appName = new Map(card.apps.map(a => [a.id, a.name]));
     const apps: FrontApp[] = [];
@@ -157,7 +182,7 @@ export function familyCard(f: FrontFamily, h: House, i: number, media: MediaMani
   const cast = f.members.map(m => `<li><span class="disc" aria-hidden="true">${esc(initial(m.name))}</span><span class="who"><b>${esc(m.name)}</b><span>${esc(m.word)}</span></span></li>`).join('');
   // (story v2: the app's real logo, 20 px, beside its name; the line itself is the same "<app> replaces <service>")
   const apps = f.apps.map(a => `<li>${logoImg(appMedia(media, a.id), { depth: 0, className: 'logo' })}<span><b>${esc(a.name)}</b> replaces ${esc(a.replaces)}</span></li>`).join('');
-  return `<li class="card card-family" data-id="${esc(h.id)}" data-slug="${esc(f.slug)}" data-persona="${esc(f.personas.join(' '))}" data-find="${esc(f.find)}">`
+  return `<li class="card card-family" data-id="${esc(h.id)}" data-slug="${esc(f.slug)}" data-persona="${esc(filterTokens(f.personas).join(' '))}" data-find="${esc(f.find)}">`
     + `<div class="thumb"><img src="./portal/thumbs/${esc(encodeURIComponent(h.id))}.webp" alt="" width="640" height="360" decoding="async"${i > 5 ? ' loading="lazy"' : ''}>`
     + `<span class="thumb-play"><svg class="i i-fill"><use href="#i-play"/></svg>Take the tour</span></div>`
     + `<div class="card-body"><h3><a href="./family/${esc(f.slug)}" data-campaign aria-label="${esc(`${f.title}, in ${name}. Take the tour`)}">${esc(f.title)}</a></h3>`
@@ -180,10 +205,13 @@ export function frontCards(houses: House[], families: FrontFamily[], plain: (res
   return [...cards, ...(rest ? [rest] : [])].join('\n        ');
 }
 
-/** The persona buttons: one for each job some current family does, in PERSONAS order. gallery.js counts them against the other filters. */
+/**
+ * The filter buttons: one for each category some current family has an archetype of (a chip with no family is not drawn), in the categories' order.
+ * The button's value is the category id; gallery.js counts the cards that carry it and filters by it.
+ */
 export function personaButtons(families: FrontFamily[]): string {
-  return PERSONAS.filter(p => families.some(f => f.personas.includes(p.archetype)))
-    .map(p => `<button type="button" class="tag persona" data-persona="${p.archetype}" aria-pressed="false">${esc(p.filter)}<small></small></button>`)
+  return CATEGORIES.filter(c => families.some(f => f.personas.some(a => c.personas.includes(a))))
+    .map(c => `<button type="button" class="tag persona" data-persona="${esc(c.id)}" aria-pressed="false">${esc(c.label)}<small></small></button>`)
     .join('\n        ');
 }
 
@@ -281,8 +309,8 @@ export function pickPerson(fams: FrontFamily[], media: MediaManifest | null = nu
   }).join('\n        ');
   const panels = PERSONAS.map(p => p.archetype as string).filter(a => fleet.byArch[a]).map(a => {
     const swap = swapHtml(`arch-${a}`, archSwap(fleet, a), media, 0);
-    return swap ? `<div class="arch-panel" data-persona="${a}" role="region" aria-label="${esc(`${ARCH[a].name}: rented before, on the Core now`)}">
-        <p class="arch-panel-lead">${esc(`The services these ${a} families replace, and the apps that do the job.`)}</p>
+    return swap ? `<div class="arch-panel" data-persona="${a}" role="region" aria-label="${esc(`${ARCH[a]?.name ?? PERSONAS.find(p => p.archetype === a)!.label}: rented before, on the Core now`)}">
+        <p class="arch-panel-lead">${esc(`The services these ${archWord(a)} families replace, and the apps that do the job.`)}</p>
         ${swap}
       </div>` : '';
   }).join('\n      ');

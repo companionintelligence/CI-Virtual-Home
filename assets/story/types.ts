@@ -14,8 +14,12 @@ export const MEMBER_ROLES = ['parent', 'partner', 'adult-child', 'teen', 'child'
 export const CHAPTER_KINDS = ['ftue', 'room', 'outside', 'outro'] as const;
 export const COLOURS = ['chart-1', 'chart-2', 'chart-3', 'chart-4', 'chart-5'] as const;
 export const RUNTIMES = ['Hermes', 'OpenClaw'] as const;
-/** The job a member does on the family's one Companion Core (reference/story/personas.md; content/story/personas.json). */
-export const ARCHETYPES = ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host', 'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator'] as const;
+/**
+ * The job a member does on the family's one Companion Core (reference/story/personas.md; content/story/personas.json). The first six are the original cast,
+ * the next eight are story v3, the last twelve are the persona expansion (reference/story/personas/index.md). Which front-page category each belongs to
+ * is content/story/categories.json.
+ */
+export const ARCHETYPES = ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host', 'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator', 'money-keeper', 'housemate', 'carer', 'community-lead', 'researcher', 'seller', 'translator', 'archivist', 'traveller', 'athlete', 'collector', 'shift-worker'] as const;
 /** Story v2 (reference/story/story-v2.md): the parts of the day a `family.day` entry can be at, daylight only, in this order. */
 export const DAY_PARTS = ['morning', 'midday', 'afternoon', 'after-school', 'weekend'] as const;
 /**

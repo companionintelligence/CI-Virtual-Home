@@ -2,6 +2,8 @@
 
 Reference book for improving the shots and scripts of the 36 virtual homes. Fourteen personas, researched read-only on 2026-10-19 for Companion Intelligence. Companion OS, Companion Agents and Companion Memory are in beta. Data twin: `persona-bible.json`.
 
+The book covers the first fourteen. Twelve more archetypes and the eight front-page categories that hold all twenty-six are listed in [personas/index.md](personas/index.md).
+
 ## 0. How to use this book
 
 **Who reads what.** Writers: chapter 3 (Talk, Scripts) and section 4. Cinematographers: chapter 3 (Home fit, Shots), table 2.3 and section 4. Casting and schema: section 5. The owner: sections 1, 5.3 and 6. Everyone: this section and Appendix B first.

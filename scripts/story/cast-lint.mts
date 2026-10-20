@@ -7,7 +7,7 @@
 // What it checks (the numbers are validator.md "Fleet", reference/story/personas.md and the schema):
 //   shape        slugs, surnames, names, ages, roles, archetypes, rooms by exact name, schema patterns and enums
 //   fit          who can sleep where, a nursery means a baby, a baby means a crib, nobody under 16 has a companion (age rule 16),
-//                a couple has an adult with a job archetype (organiser, builder or one of the eight story v3 archetypes), the household type matches the ages
+//                a couple has an adult with a job archetype (organiser, builder, one of the eight story v3 archetypes or one of researcher, seller, translator, shift-worker), the household type matches the ages
 //   flagship     Sally, John, Steve and Jean (Brennan) in seraphine, bgfamily and familyhouse-nora only
 //   fleet        at least 70 distinct apps, no third-party app in more than 12 of 30 families, the 14 story-rich apps in at
 //                least three, each of the ten topics possible in at least ten, small-business share reachable, gamer in at
@@ -54,7 +54,10 @@ const FLAG = {
 } as const;
 const ROLE_ENUM = ['parent', 'partner', 'adult-child', 'teen', 'child', 'baby', 'grandparent', 'housemate', 'visitor'];
 const HOUSEHOLDS = Object.keys(plan.households);
-const POOLS: Record<Archetype, Set<string>> = {
+/** the twelve archetypes added after story v3's fourteen (reference/story/personas/index.md), in personas.json's order */
+const NEW_ARCHETYPES = ARCHETYPES.slice(14);
+const PERSONAS = J('content', 'story', 'personas.json') as { archetypes: Record<string, { apps: string[] }> };
+const POOLS = {
   organiser: new Set('ci-planning nextcloud libreoffice onlyoffice collabora-online cryptpad paperless papra stirling-pdf bentopdf vaultwarden joplin bookstack n8n yuvomi homehub akaunting invoice-ninja invio twenty espocrm kimai docuseal opnform nocodb wordpress wallos firefly-iii monetr spliit vikunja planka donetick baikal'.split(' ')),
   builder: new Set('code-server forgejo gitea open-webui ci-openclaw jupyterlab n8n activepieces opencode aider uptime-kuma pi-hole'.split(' ')),
   gamer: new Set('steam-headless jellyfin immich'.split(' ')),
@@ -70,11 +73,14 @@ const POOLS: Record<Archetype, Set<string>> = {
   lawyer: new Set('paperless nextcloud docuseal open-webui libreoffice vaultwarden stirling-pdf cryptgeon ollama whisper-webui radicale solidtime invoice-ninja bookstack twenty ci-memory'.split(' ')),
   journalist: new Set('whisper-webui paperless obsidian open-webui nextcloud vaultwarden ci-memory stirling-pdf libretranslate linkwarden libreoffice cryptgeon joplin anything-llm miniflux element'.split(' ')),
   educator: new Set('open-webui paperless nextcloud libreoffice libretranslate joplin stirling-pdf vaultwarden razzia excalidraw ci-planning radicale calibre-web'.split(' ')),
-};
+  // the persona expansion (reference/story/personas/index.md): the pool is the persona row, read from content/story/personas.json so the two cannot drift
+  ...Object.fromEntries(NEW_ARCHETYPES.map((a) => [a, new Set<string>(PERSONAS.archetypes[a].apps)])),
+} as Record<Archetype, Set<string>>;
 /** the archetypes that are a job (a couple needs one adult who does one; a business family needs one who runs it) */
-const JOBS = new Set<Archetype>(['organiser', 'builder', 'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator']);
-/** a family that is a business keeps at least one of these (decisions of 2026-10-19: organiser, builder or business-owner) */
-const BUSINESS_LEADS = new Set<Archetype>(['organiser', 'builder', 'business-owner']);
+const JOBS = new Set<Archetype>(['organiser', 'builder', 'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator',
+  'researcher', 'seller', 'translator', 'shift-worker']);
+/** a family that is a business keeps at least one of these (decisions of 2026-10-19: organiser, builder or business-owner; the seller runs a stall as a business of one) */
+const BUSINESS_LEADS = new Set<Archetype>(['organiser', 'builder', 'business-owner', 'seller']);
 /** apps the story pools dropped (storySafe avoid) that the cast plan's unrewritten rows still list: warnings, not errors, until each family is recast */
 const UNTIL_RECAST = new Set<string>(['kiwix']);
 /** age rule 16 (v3-decisions "Age rule"): no agent companion under this age */
@@ -202,7 +208,7 @@ for (const f of fams) {
   if (f.household === 'solo-or-couple') {
     if (minors.length) E(at, 'solo-or-couple has no child at home');
     if (ms.length > 2) E(at, 'solo-or-couple is one or two people');
-    if (![...archs].some((a) => JOBS.has(a as Archetype))) E(at, 'a couple needs an adult with a job archetype (organiser, builder, tech-family, business-owner, creative, contractor, marketer, lawyer, journalist or educator)');
+    if (![...archs].some((a) => JOBS.has(a as Archetype))) E(at, 'a couple needs an adult with a job archetype (organiser, builder, tech-family, business-owner, creative, contractor, marketer, lawyer, journalist, educator, researcher, seller, translator or shift-worker)');
     if (!ms.every((m) => m.role === 'partner')) W(at, 'couple members are partners');
   }
   if (f.household === 'young-family' && !small.length) E(at, 'young-family needs a child under 13');
@@ -276,7 +282,7 @@ for (const f of fams) {
   const tp = topicsPossible(f);
   const lacking = REQUIRED_TOPICS.filter((t) => !tp.includes(t));
   if (lacking.length) E(at, `no signature or beat app covers ${lacking.join(', ')}: name one in beatApps`);
-  if (f.business && !ms.some((m) => BUSINESS_LEADS.has(m.archetype as Archetype))) E(at, 'a business family has an organiser, a builder or a business-owner');
+  if (f.business && !ms.some((m) => BUSINESS_LEADS.has(m.archetype as Archetype))) E(at, 'a business family has an organiser, a builder, a business-owner or a seller');
 }
 
 // ---- flagship ---------------------------------------------------------------------------------------------------------------------------------
