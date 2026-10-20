@@ -417,7 +417,7 @@
       "incumbentNameList": true,
       "apps": ["booklore", "calibre", "calibre-web", "koodo-reader"],
       "storyApps": ["booklore", "calibre-web", "koodo-reader"],
-      "fleetHomes": ["brennan", "haddad", "hovsepian", "hwang", "jankowski", "kamau", "moreau", "nwachukwu", "whitaker"],
+      "fleetHomes": ["brennan", "haddad", "hovsepian", "hwang", "jankowski", "kamau", "kovacs", "moreau", "nguyen", "nwachukwu", "tesfaye", "whitaker"],
       "rank": 22,
       "top80": true
     },
@@ -778,7 +778,7 @@
       "incumbentNameList": true,
       "apps": ["degoog", "kiwix", "searxng"],
       "storyApps": ["searxng"],
-      "fleetHomes": ["adeniran", "cardoso", "dekker", "haddad", "hovsepian", "hwang", "iyer", "kovacs", "moreau", "nguyen", "nwachukwu", "quintero", "tesfaye", "watanabe", "whitaker"],
+      "fleetHomes": [],
       "rank": 51,
       "top80": true
     },
@@ -1538,7 +1538,7 @@
       "incumbentNameList": false,
       "apps": ["archivebox", "readeck"],
       "storyApps": ["archivebox", "readeck"],
-      "fleetHomes": [],
+      "fleetHomes": ["adeniran", "moreau"],
       "rank": 74,
       "top80": true
     },
@@ -1614,7 +1614,7 @@
       "incumbentNameList": false,
       "apps": ["karakeep", "linkwarden"],
       "storyApps": ["karakeep", "linkwarden"],
-      "fleetHomes": ["brennan"],
+      "fleetHomes": ["brennan", "haddad", "quintero"],
       "rank": 80,
       "top80": true
     },

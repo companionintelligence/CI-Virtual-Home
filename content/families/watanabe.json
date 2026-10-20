@@ -460,12 +460,10 @@
       "category": "privacy",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
-        "replaces": [
-          "Google Search"
-        ]
+        "id": "kokoro",
+        "replaces": []
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "turn text into natural speech on your own Core",
       "anchor": {
         "role": "desk",
         "room": "bedroom",
@@ -482,11 +480,10 @@
         "side": "right"
       },
       "popup": {
-        "title": "Kenji looks up a river word",
-        "body": "Haruo says rivers meander, and Kenji wants the word explained. Kiwix serves the article from a Wikipedia file downloaded once, so no search engine sees his question.",
+        "title": "Kenji hears his river line",
+        "body": "Haruo says rivers meander, so Kenji writes a line about one. He types it into Kokoro, hears the Core turn it into speech, then reads it to Haruo.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Kokoro"
         ]
       },
       "film": true

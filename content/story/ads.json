@@ -101,7 +101,7 @@
             }
           },
           "notes": [],
-          "hash": "522fc411e98e9d22963ca6a2c4ea8c3abd56f0c195aff67ba92605f0f4f6f385"
+          "hash": "5ef140e119507b30b62c511f1f08e2b2b251dbe6ca0b6935f50f44b3bd6dcf87"
         },
         {
           "id": "adeniran-kunle",
@@ -163,8 +163,8 @@
                 "narrEnd": 12.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 244.036,
-                  "to": 255.684
+                  "from": 243.636,
+                  "to": 255.284
                 }
               }
             ],
@@ -182,7 +182,7 @@
             }
           },
           "notes": [],
-          "hash": "f3c1f377765d3e589c2ce2b427f0c6b4655d03113b0105c65d972a46a839a440"
+          "hash": "21e4edf63cdf28fe547e06606eef8655a51a0488fcd18475073a7c287be2360a"
         },
         {
           "id": "adeniran-tobi",
@@ -244,8 +244,8 @@
                 "narrEnd": 12.4,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 219.248,
-                  "to": 230.846
+                  "from": 218.848,
+                  "to": 230.446
                 }
               }
             ],
@@ -263,7 +263,7 @@
             }
           },
           "notes": [],
-          "hash": "e4032ed72b2d7fad478e225d0a622b6930cf6b238a8008dcd01d62860bb7b083"
+          "hash": "beabcc42bfa3b6002267e801af516c69fb900bf19b188eee1f74b3baf8eb6732"
         },
         {
           "id": "adeniran-ife",
@@ -274,24 +274,24 @@
           "hook": {
             "beat": "green-lookup",
             "kind": "title",
-            "text": "Ife looks up the lake",
+            "text": "Ife reads a saved article",
             "rule": "flagged"
           },
           "beats": [
             "green-lookup"
           ],
           "captions": [
-            "Why does the lake rise after rain? Ife looks it up in Kiwix, which serves a Wikipedia file downloaded once, and no search engine is asked."
+            "Ife saved an article on why the lake rises after rain. At her desk she reads it in Readeck, which keeps it on the Core."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Readeck",
+            "replaces Instapaper"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "readeck",
               "replaces": [
-                "Google Search"
+                "Instapaper"
               ]
             }
           ],
@@ -312,39 +312,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.066666666666666,
-          "frames": 512,
+          "durationS": 16.666666666666668,
+          "frames": 500,
           "timeline": {
             "parts": [
               {
                 "beat": "green-lookup",
                 "kind": "hook",
                 "at": 0,
-                "end": 13.2,
+                "end": 12.8,
                 "narrAt": 2,
-                "narrEnd": 12.4,
+                "narrEnd": 12,
                 "sentences": "2/2",
                 "tour": {
                   "from": 195.148,
-                  "to": 206.396
+                  "to": 205.996
                 }
               }
             ],
             "pads": [
               {
-                "t0": 13.2,
-                "t1": 13.55,
+                "t0": 12.8,
+                "t1": 13.15,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 13.55,
-              "t1": 17.067,
-              "panelAt": 13.75
+              "t0": 13.15,
+              "t1": 16.667,
+              "panelAt": 13.35
             }
           },
           "notes": [],
-          "hash": "1cadb626ac0749e0c46bcc58f0f117cd94c19a50676cf20c46814659aa4e1846"
+          "hash": "93740141668e28c6dc1eb17bb9de601acc4e9a50fa91bd7789891cf0e0ca7b7e"
         }
       ]
     },
@@ -692,26 +692,26 @@
           "archetype": "organiser",
           "status": "ready",
           "hook": {
-            "beat": "office-contracts",
+            "beat": "office-split",
             "kind": "title",
-            "text": "The contract stays on the Core",
+            "text": "A double scan, split before sending",
             "rule": "flagged"
           },
           "beats": [
-            "office-contracts"
+            "office-split"
           ],
           "captions": [
-            "A client sends the signed contract. Sally files it in Nextcloud, and it sits on the Core, not in a rented drive."
+            "One scan holds two clients’ papers. Sally splits it in Stirling-PDF on the Core, so each client gets only their own pages."
           ],
           "chips": [
-            "Nextcloud",
-            "replaces Google Drive"
+            "Stirling-PDF",
+            "alternative to Smallpdf"
           ],
           "apps": [
             {
-              "id": "nextcloud",
+              "id": "stirling-pdf",
               "replaces": [
-                "Google Drive"
+                "Smallpdf"
               ]
             }
           ],
@@ -737,7 +737,7 @@
           "timeline": {
             "parts": [
               {
-                "beat": "office-contracts",
+                "beat": "office-split",
                 "kind": "hook",
                 "at": 0,
                 "end": 11.6,
@@ -745,8 +745,8 @@
                 "narrEnd": 10.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 132.87,
-                  "to": 142.768
+                  "from": 69.633,
+                  "to": 79.281
                 }
               }
             ],
@@ -764,7 +764,7 @@
             }
           },
           "notes": [],
-          "hash": "c98cecd4a5545dd33c07c59040ae249ae08b74f61c4759f4ebc04e5c9e7ddd7d"
+          "hash": "6fb9907347eacb3acb04e710be7e3ba9e2b11b33bbc8ccc3782e2300ce9a9f32"
         },
         {
           "id": "brennan-john",
@@ -775,18 +775,18 @@
           "hook": {
             "beat": "suite-code",
             "kind": "title",
-            "text": "The editor is already there",
+            "text": "The editor follows John around",
             "rule": "flagged"
           },
           "beats": [
             "suite-code"
           ],
           "captions": [
-            "John opens his laptop, and the editor is waiting. Code Server runs on the Core, so his files sit at home, not in a cloud editor."
+            "John’s book catalogue no longer lives on one laptop. Code Server keeps it on the Core, so the editor tab follows him to the loveseat."
           ],
           "chips": [
             "Code Server",
-            "replaces Cursor"
+            "alternative to Cursor"
           ],
           "apps": [
             {
@@ -813,39 +813,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.066666666666666,
-          "frames": 512,
+          "durationS": 16.666666666666668,
+          "frames": 500,
           "timeline": {
             "parts": [
               {
                 "beat": "suite-code",
                 "kind": "hook",
                 "at": 0,
-                "end": 13.2,
+                "end": 12.8,
                 "narrAt": 2,
-                "narrEnd": 12.4,
+                "narrEnd": 12,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 233.916,
-                  "to": 245.414
+                  "from": 231.002,
+                  "to": 242.1
                 }
               }
             ],
             "pads": [
               {
-                "t0": 13.2,
-                "t1": 13.55,
+                "t0": 12.8,
+                "t1": 13.15,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 13.55,
-              "t1": 17.067,
-              "panelAt": 13.75
+              "t0": 13.15,
+              "t1": 16.667,
+              "panelAt": 13.35
             }
           },
           "notes": [],
-          "hash": "bfbf87122ea33b609bf398ca3e1e42d98a7c80e688eedb917915cefe3026250c"
+          "hash": "18393c0990363f02fd100d881f60426d376f173bae02baa6a8e24d913bb4f519"
         },
         {
           "id": "brennan-steve",
@@ -854,20 +854,20 @@
           "archetype": "gamer",
           "status": "ready",
           "hook": {
-            "beat": "steve-play",
+            "beat": "steve-session",
             "kind": "title",
-            "text": "The game runs a floor below",
+            "text": "The session runs in the library",
             "rule": "flagged"
           },
           "beats": [
-            "steve-play"
+            "steve-session"
           ],
           "captions": [
-            "Steve opens his Steam library in a browser in his room. Steam Headless runs his session a floor below, on the Core, not on a cloud gaming service."
+            "Upstairs, Steve signs in to his own Valve account. The session itself runs on the Core in the library, and he plays it in a browser."
           ],
           "chips": [
             "Steam Headless",
-            "replaces GeForce Now"
+            "alternative to GeForce Now"
           ],
           "apps": [
             {
@@ -894,39 +894,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.866666666666667,
-          "frames": 536,
+          "durationS": 17.066666666666666,
+          "frames": 512,
           "timeline": {
             "parts": [
               {
-                "beat": "steve-play",
+                "beat": "steve-session",
                 "kind": "hook",
                 "at": 0,
-                "end": 14,
+                "end": 13.2,
                 "narrAt": 2,
-                "narrEnd": 13.2,
+                "narrEnd": 12.4,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 287.815,
-                  "to": 300.013
+                  "from": 305.547,
+                  "to": 317.045
                 }
               }
             ],
             "pads": [
               {
-                "t0": 14,
-                "t1": 14.35,
+                "t0": 13.2,
+                "t1": 13.55,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 14.35,
-              "t1": 17.867,
-              "panelAt": 14.55
+              "t0": 13.55,
+              "t1": 17.067,
+              "panelAt": 13.75
             }
           },
           "notes": [],
-          "hash": "a44baba0f720465eaa040b2018ff3d1009b83f9708b48a2a0d7871543be3ae5c"
+          "hash": "ee469ee7e9304d0fbde5c5a96d315876368d38a9fee1228566b105f841e2f561"
         },
         {
           "id": "brennan-jean",
@@ -935,26 +935,26 @@
           "archetype": "learner",
           "status": "ready",
           "hook": {
-            "beat": "jean-lookup",
+            "beat": "jean-sources",
             "kind": "title",
-            "text": "Wikipedia without a search engine",
+            "text": "The page as Jean read it",
             "rule": "flagged"
           },
           "beats": [
-            "jean-lookup"
+            "jean-sources"
           ],
           "captions": [
-            "For her history essay, Jean looks up a date in Kiwix. Its Wikipedia file was downloaded once and is served from the Core, so no search engine is asked."
+            "The page Jean quoted has changed since she read it. Her Linkwarden copy, a screenshot and a PDF, is the page as she read it."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Linkwarden",
+            "alternative to Raindrop.io"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "linkwarden",
               "replaces": [
-                "Google Search"
+                "Raindrop.io"
               ]
             }
           ],
@@ -975,39 +975,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 18.266666666666666,
-          "frames": 548,
+          "durationS": 16.666666666666668,
+          "frames": 500,
           "timeline": {
             "parts": [
               {
-                "beat": "jean-lookup",
+                "beat": "jean-sources",
                 "kind": "hook",
                 "at": 0,
-                "end": 14.4,
+                "end": 12.8,
                 "narrAt": 2,
-                "narrEnd": 13.6,
+                "narrEnd": 12,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 348.57,
-                  "to": 361.268
+                  "from": 364.579,
+                  "to": 375.677
                 }
               }
             ],
             "pads": [
               {
-                "t0": 14.4,
-                "t1": 14.75,
+                "t0": 12.8,
+                "t1": 13.15,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 14.75,
-              "t1": 18.267,
-              "panelAt": 14.95
+              "t0": 13.15,
+              "t1": 16.667,
+              "panelAt": 13.35
             }
           },
           "notes": [],
-          "hash": "aa1b58966ec0710a3fabd4c3dbc886e251a3240177f15ec1d2cc876419511436"
+          "hash": "773feded907b33d1910ab210bdd5541021a5ae3d7e1a068b5a0fa4d9a839a7cc"
         }
       ]
     },
@@ -1021,26 +1021,26 @@
           "archetype": "organiser",
           "status": "ready",
           "hook": {
-            "beat": "office-draft",
+            "beat": "office-follow",
             "kind": "title",
-            "text": "Juniper files, Sally checks first",
+            "text": "Juniper drafts the client's follow-ups",
             "rule": "flagged"
           },
           "beats": [
-            "office-draft"
+            "office-follow"
           ],
           "captions": [
-            "A client sends new papers. Juniper opens Nextcloud and files them in the client's folder on the Core. Sally decides what the client sees."
+            "Juniper drafts three follow-ups in the client's record in Twenty, and Sally reads each one. The record sits on the Core, not in a hosted CRM."
           ],
           "chips": [
-            "Nextcloud",
-            "replaces Google Drive"
+            "Twenty",
+            "alternative to Salesforce"
           ],
           "apps": [
             {
-              "id": "nextcloud",
+              "id": "twenty",
               "replaces": [
-                "Google Drive"
+                "Salesforce"
               ]
             }
           ],
@@ -1062,39 +1062,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 16.266666666666666,
-          "frames": 488,
+          "durationS": 17.066666666666666,
+          "frames": 512,
           "timeline": {
             "parts": [
               {
-                "beat": "office-draft",
+                "beat": "office-follow",
                 "kind": "hook",
                 "at": 0,
-                "end": 12.4,
+                "end": 13.2,
                 "narrAt": 2,
-                "narrEnd": 11.6,
-                "sentences": "3/3",
+                "narrEnd": 12.4,
+                "sentences": "2/2",
                 "tour": {
-                  "from": 263.529,
-                  "to": 273.977
+                  "from": 210.272,
+                  "to": 223.472
                 }
               }
             ],
             "pads": [
               {
-                "t0": 12.4,
-                "t1": 12.75,
+                "t0": 13.2,
+                "t1": 13.55,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 12.75,
-              "t1": 16.267,
-              "panelAt": 12.95
+              "t0": 13.55,
+              "t1": 17.067,
+              "panelAt": 13.75
             }
           },
           "notes": [],
-          "hash": "7df4196c1f1aa7044ac6669bea5c1d883c2dd1e8188a1be0205d58582ebfea49"
+          "hash": "f0c6e75251bc16ddda10e40391f82c53d5507159773b774c2a0f4a63e7a07157"
         },
         {
           "id": "brennan-hollin-john",
@@ -1103,26 +1103,26 @@
           "archetype": "builder",
           "status": "ready",
           "hook": {
-            "beat": "study-repos",
+            "beat": "study-code",
             "kind": "title",
-            "text": "John's code lives on his desk",
+            "text": "The project left the laptop",
             "rule": "flagged"
           },
           "beats": [
-            "study-repos"
+            "study-code"
           ],
           "captions": [
-            "John pushes the day's work to Forgejo. The repositories sit on the Core beside him, not on a rented code host."
+            "John's last laptop died with a side project's only copy on it. Code Server puts VS Code in a browser tab, with the files on the Core."
           ],
           "chips": [
-            "Forgejo",
-            "replaces GitHub"
+            "Code Server",
+            "alternative to VS Code"
           ],
           "apps": [
             {
-              "id": "forgejo",
+              "id": "code-server",
               "replaces": [
-                "GitHub"
+                "VS Code (Proprietary)"
               ]
             }
           ],
@@ -1143,39 +1143,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 15.066666666666666,
-          "frames": 452,
+          "durationS": 17.466666666666665,
+          "frames": 524,
           "timeline": {
             "parts": [
               {
-                "beat": "study-repos",
+                "beat": "study-code",
                 "kind": "hook",
                 "at": 0,
-                "end": 11.2,
+                "end": 13.6,
                 "narrAt": 2,
-                "narrEnd": 10.4,
+                "narrEnd": 12.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 77.961,
-                  "to": 87.257
+                  "from": 262.78,
+                  "to": 274.428
                 }
               }
             ],
             "pads": [
               {
-                "t0": 11.2,
-                "t1": 11.55,
+                "t0": 13.6,
+                "t1": 13.95,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 11.55,
-              "t1": 15.067,
-              "panelAt": 11.75
+              "t0": 13.95,
+              "t1": 17.467,
+              "panelAt": 14.15
             }
           },
           "notes": [],
-          "hash": "a48a3c2e365b82a58906b04bc60487a61f9fa01dbe430ae668585ceae1b44e74"
+          "hash": "37adc2da2c4d48081c06a130f65741a1897542395aa995e333a7c2cbed86a436"
         },
         {
           "id": "brennan-hollin-steve",
@@ -1184,20 +1184,20 @@
           "archetype": "gamer",
           "status": "ready",
           "hook": {
-            "beat": "living-tv",
+            "beat": "living-session",
             "kind": "title",
-            "text": "Steve's Steam session runs at home",
+            "text": "A plan ends, the library stays",
             "rule": "flagged"
           },
           "beats": [
-            "living-tv"
+            "living-session"
           ],
           "captions": [
-            "Steve starts a session from the sectional. Steam Headless runs it on the Core and shows it in a browser on the living-room screen."
+            "When Steve cancelled his cloud gaming plan, his library stayed put on his Valve account. Steam Headless now runs the session on the Core in the Study."
           ],
           "chips": [
             "Steam Headless",
-            "replaces GeForce Now"
+            "alternative to GeForce Now"
           ],
           "apps": [
             {
@@ -1224,39 +1224,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 16.266666666666666,
-          "frames": 488,
+          "durationS": 17.466666666666665,
+          "frames": 524,
           "timeline": {
             "parts": [
               {
-                "beat": "living-tv",
+                "beat": "living-session",
                 "kind": "hook",
                 "at": 0,
-                "end": 12.4,
+                "end": 13.6,
                 "narrAt": 2,
-                "narrEnd": 11.6,
+                "narrEnd": 12.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 127.119,
-                  "to": 137.817
+                  "from": 75.813,
+                  "to": 87.711
                 }
               }
             ],
             "pads": [
               {
-                "t0": 12.4,
-                "t1": 12.75,
+                "t0": 13.6,
+                "t1": 13.95,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 12.75,
-              "t1": 16.267,
-              "panelAt": 12.95
+              "t0": 13.95,
+              "t1": 17.467,
+              "panelAt": 14.15
             }
           },
           "notes": [],
-          "hash": "db61f0befdd98f4be3388b8ed141d514b133cc12f2aa7862ed4733ebb873744d"
+          "hash": "5a976ec25f76168ee675025b8b2f3ece2785a629da9b13703d03adf8fd13071d"
         },
         {
           "id": "brennan-hollin-jean",
@@ -1265,26 +1265,26 @@
           "archetype": "learner",
           "status": "ready",
           "hook": {
-            "beat": "kids-lookup",
+            "beat": "kids-notes",
             "kind": "title",
-            "text": "No search engine sees Jean's question",
+            "text": "Three years of notes, as files",
             "rule": "flagged"
           },
           "beats": [
-            "kids-lookup"
+            "kids-notes"
           ],
           "captions": [
-            "A geography project is due. Jean looks up glaciers in Kiwix, which serves Wikipedia from the Core, so no search engine sees the question."
+            "Three years of Jean's school notes leave a hosted notes app for Obsidian. They are plain Markdown files on the Core now."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Obsidian",
+            "alternative to Notion"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "obsidian",
               "replaces": [
-                "Google Search"
+                "Notion"
               ]
             }
           ],
@@ -1305,39 +1305,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 16.266666666666666,
-          "frames": 488,
+          "durationS": 15.466666666666667,
+          "frames": 464,
           "timeline": {
             "parts": [
               {
-                "beat": "kids-lookup",
+                "beat": "kids-notes",
                 "kind": "hook",
                 "at": 0,
-                "end": 12.4,
+                "end": 11.6,
                 "narrAt": 2,
-                "narrEnd": 11.6,
+                "narrEnd": 10.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 320.458,
-                  "to": 331.256
+                  "from": 126.732,
+                  "to": 136.38
                 }
               }
             ],
             "pads": [
               {
-                "t0": 12.4,
-                "t1": 12.75,
+                "t0": 11.6,
+                "t1": 11.95,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 12.75,
-              "t1": 16.267,
-              "panelAt": 12.95
+              "t0": 11.95,
+              "t1": 15.467,
+              "panelAt": 12.15
             }
           },
           "notes": [],
-          "hash": "03e0d037744d34729bc9a09f2e62c59a70343d96ce471bcd3f719fdc4dbb0832"
+          "hash": "5ee846d012aa1b1f52ae1ef88a623bca5a7f1e02de99ab3b601196fab3f12942"
         }
       ]
     },
@@ -1353,19 +1353,21 @@
           "hook": {
             "beat": "office-draft",
             "kind": "title",
-            "text": "Juniper drafts, Sally sends",
+            "text": "Juniper drafts the renewal, Sally checks",
             "rule": "flagged"
           },
           "beats": [
             "office-draft"
           ],
           "captions": [
-            "A client wants a proposal by lunch. Juniper, her agent on the Core, drafts it from context in Companion Memory (beta). Sally reads it and sends it herself."
+            "Juniper drafts a renewal reply from last spring's thread, which Sally connected to Companion Memory (beta). Sally checks the figures, then sends it herself."
           ],
-          "chips": [],
+          "chips": [
+            "Companion Memory"
+          ],
           "apps": [
             {
-              "id": "ci-hermes",
+              "id": "ci-memory",
               "replaces": []
             }
           ],
@@ -1386,39 +1388,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.866666666666667,
-          "frames": 536,
+          "durationS": 16.266666666666666,
+          "frames": 488,
           "timeline": {
             "parts": [
               {
                 "beat": "office-draft",
                 "kind": "hook",
                 "at": 0,
-                "end": 14,
+                "end": 12.4,
                 "narrAt": 2,
-                "narrEnd": 13.2,
-                "sentences": "3/3",
+                "narrEnd": 11.6,
+                "sentences": "2/2",
                 "tour": {
-                  "from": 247.861,
-                  "to": 260.159
+                  "from": 273.185,
+                  "to": 283.883
                 }
               }
             ],
             "pads": [
               {
-                "t0": 14,
-                "t1": 14.35,
+                "t0": 12.4,
+                "t1": 12.75,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 14.35,
-              "t1": 17.867,
-              "panelAt": 14.55
+              "t0": 12.75,
+              "t1": 16.267,
+              "panelAt": 12.95
             }
           },
           "notes": [],
-          "hash": "f455277335a71f0b47f2e0fc6ec7de8e77cc805233924394c68ff232ebc804e3"
+          "hash": "61949df00b1a1d624606378ef5a5964ff0bc9db83de4a06dbf4c9cc8b399a84a"
         },
         {
           "id": "brennan-merrow-john",
@@ -1429,18 +1431,18 @@
           "hook": {
             "beat": "garage-repos",
             "kind": "title",
-            "text": "John pushes the last branch",
+            "text": "Shelf-jig lands in Gitea",
             "rule": "flagged"
           },
           "beats": [
             "garage-repos"
           ],
           "captions": [
-            "At the workbench, John pushes the day's last branch to Gitea. Its pull requests and issues sit on the family's Companion Core, not on a rented code host."
+            "John's last push today, a branch called shelf-jig, lands in Gitea on the Core, issues and pull requests beside it."
           ],
           "chips": [
             "Gitea",
-            "replaces GitHub"
+            "alternative to GitHub"
           ],
           "apps": [
             {
@@ -1467,39 +1469,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.866666666666667,
-          "frames": 536,
+          "durationS": 15,
+          "frames": 450,
           "timeline": {
             "parts": [
               {
                 "beat": "garage-repos",
                 "kind": "hook",
                 "at": 0,
-                "end": 14,
+                "end": 10.8,
                 "narrAt": 2,
-                "narrEnd": 13.2,
-                "sentences": "2/2",
+                "narrEnd": 10,
+                "sentences": "1/1",
                 "tour": {
-                  "from": 317.721,
-                  "to": 330.019
+                  "from": 343.468,
+                  "to": 352.566
                 }
               }
             ],
             "pads": [
               {
-                "t0": 14,
-                "t1": 14.35,
+                "t0": 10.8,
+                "t1": 11.15,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 14.35,
-              "t1": 17.867,
-              "panelAt": 14.55
+              "t0": 11.15,
+              "t1": 15,
+              "panelAt": 11.35
             }
           },
           "notes": [],
-          "hash": "8a0e8efac6f567bb25f2957a5dbb137293544412ad7e68a6d589b4263c00549c"
+          "hash": "9b93c9bad1572f11b03929e6ed1b5237662ed4c5be507c116e5ef044678564ef"
         },
         {
           "id": "brennan-merrow-steve",
@@ -1508,20 +1510,20 @@
           "archetype": "gamer",
           "status": "ready",
           "hook": {
-            "beat": "den-session",
+            "beat": "den-steam",
             "kind": "title",
-            "text": "Steve's game runs in the house",
+            "text": "The game runs by the whiteboard",
             "rule": "flagged"
           },
           "beats": [
-            "den-session"
+            "den-steam"
           ],
           "captions": [
-            "After school, Steve signs in with his own Valve account. Steam Headless runs the session on the Core at home and shows it in a browser on the Den TV."
+            "Steve's game runs on the Core, beside the kitchen whiteboard. He signs in with his own Valve account, and the den TV shows it."
           ],
           "chips": [
             "Steam Headless",
-            "replaces GeForce Now"
+            "alternative to GeForce Now"
           ],
           "apps": [
             {
@@ -1548,39 +1550,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 18.666666666666668,
-          "frames": 560,
+          "durationS": 16.266666666666666,
+          "frames": 488,
           "timeline": {
             "parts": [
               {
-                "beat": "den-session",
+                "beat": "den-steam",
                 "kind": "hook",
                 "at": 0,
-                "end": 14.8,
+                "end": 12.4,
                 "narrAt": 2,
-                "narrEnd": 14,
+                "narrEnd": 11.6,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 354.266,
-                  "to": 367.364
+                  "from": 390.61,
+                  "to": 401.308
                 }
               }
             ],
             "pads": [
               {
-                "t0": 14.8,
-                "t1": 15.15,
+                "t0": 12.4,
+                "t1": 12.75,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 15.15,
-              "t1": 18.667,
-              "panelAt": 15.35
+              "t0": 12.75,
+              "t1": 16.267,
+              "panelAt": 12.95
             }
           },
           "notes": [],
-          "hash": "3c2a75a03f037d4a07afe890cc1947bc0be7483c15191695845a0f42125c6a3b"
+          "hash": "b96a26ba1579eebc04b1b5e0ee47f34fea72af0295bde152178c9bf0f0ed901e"
         },
         {
           "id": "brennan-merrow-jean",
@@ -1589,26 +1591,26 @@
           "archetype": "learner",
           "status": "ready",
           "hook": {
-            "beat": "kids-lookup",
+            "beat": "kids-floorplan",
             "kind": "title",
-            "text": "A biology question, asked at home",
+            "text": "The shared room, drawn to scale",
             "rule": "flagged"
           },
           "beats": [
-            "kids-lookup"
+            "kids-floorplan"
           ],
           "captions": [
-            "Jean checks how a cell divides in Kiwix, which serves Wikipedia from the Core. No search engine sees her question."
+            "Jean measures her shared room for a maths scale drawing. draw.io opens from the Core, and she draws the beds, the desk and the shelf."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "draw.io",
+            "alternative to Lucidchart"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "drawio",
               "replaces": [
-                "Google Search"
+                "Lucidchart"
               ]
             }
           ],
@@ -1629,39 +1631,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 15,
-          "frames": 450,
+          "durationS": 16.666666666666668,
+          "frames": 500,
           "timeline": {
             "parts": [
               {
-                "beat": "kids-lookup",
+                "beat": "kids-floorplan",
                 "kind": "hook",
                 "at": 0,
-                "end": 10.8,
+                "end": 12.8,
                 "narrAt": 2,
-                "narrEnd": 10,
+                "narrEnd": 12,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 139.033,
-                  "to": 148.131
+                  "from": 184.627,
+                  "to": 195.725
                 }
               }
             ],
             "pads": [
               {
-                "t0": 10.8,
-                "t1": 11.15,
+                "t0": 12.8,
+                "t1": 13.15,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 11.15,
-              "t1": 15,
-              "panelAt": 11.35
+              "t0": 13.15,
+              "t1": 16.667,
+              "panelAt": 13.35
             }
           },
           "notes": [],
-          "hash": "d873f88678cc94b4365d1d062084c47274fda656a62caf28a5302df7a1fd00c9"
+          "hash": "1f135ae7681bf6b2fbaf180a7474dffb762ba8321b0a027345ee5b4affdacd64"
         }
       ]
     },
@@ -1747,7 +1749,7 @@
             }
           },
           "notes": [],
-          "hash": "594506537354615101d511086ad7ba0bd4bab5f120f01e200a507bee949f167c"
+          "hash": "c3c9561ff6b3df3cac5f7e701a8200614314956be91c2acb62ce3378f47e07bc"
         },
         {
           "id": "cardoso-tiago",
@@ -1824,7 +1826,7 @@
             }
           },
           "notes": [],
-          "hash": "5a93dcddb0e5e00942d082177414a3c78a0a12da717077d465846dcb8a73ac66"
+          "hash": "174a67ae3149c4bc042b716e5bc8f82aa26fadc902fc358ee9cc095d0e3b30b0"
         },
         {
           "id": "cardoso-leo",
@@ -1835,33 +1837,29 @@
           "hook": {
             "beat": "kids-snail",
             "kind": "title",
-            "text": "Leo asks where snails go",
+            "text": "Leo hears the snail story",
             "rule": "flagged"
           },
           "beats": [
             "kids-snail"
           ],
           "captions": [
-            "After school, Leo asks where snails go in the rain. Tiago looks it up in Kiwix, whose Wikipedia file was downloaded once, so no search engine sees the question."
+            "After school, Leo asks for the snail story Tiago made up at breakfast. Tiago typed it, and Kokoro on the Core speaks it while Leo plays in the tent."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Kokoro"
           ],
           "apps": [
             {
-              "id": "kiwix",
-              "replaces": [
-                "Google Search"
-              ]
+              "id": "kokoro",
+              "replaces": []
             }
           ],
           "disclosures": [
             "fictional-family",
             "beta-short",
             "scripted-scenes",
-            "stylised-art",
-            "names-owners"
+            "stylised-art"
           ],
           "cta": {
             "label": "See Companion Core",
@@ -1905,7 +1903,7 @@
             }
           },
           "notes": [],
-          "hash": "15d8d1b8c81e1e9981f7361d70f9b76cb5f3df28b841e179ccb5bbfa8ef7aced"
+          "hash": "5625e461237fda4f257f3df3419abbc51ee0dcc0f04a596c9c3d7c8bd14a285a"
         }
       ]
     },
@@ -2136,8 +2134,8 @@
                 "narrEnd": 13.6,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 192.036,
-                  "to": 204.734
+                  "from": 192.436,
+                  "to": 205.134
                 }
               }
             ],
@@ -2155,7 +2153,7 @@
             }
           },
           "notes": [],
-          "hash": "c24cb5c9080e68b9436d3cea28c901f29e1c95cd929c24a13b9fcdbbdc495efa"
+          "hash": "847d29ba60c3857846b6aa0816010c71871fec07980891606ede65fd8f64f5c7"
         },
         {
           "id": "dekker-greet",
@@ -2236,7 +2234,7 @@
             }
           },
           "notes": [],
-          "hash": "8bbdb8b494d38d4dffa5d544477044419df9aedb719fa2760551f6071f60e19e"
+          "hash": "c6d020e82e86832bfd0208904b8d4d98f303b02e6ece1a12f42eb69b117b9218"
         },
         {
           "id": "dekker-joris",
@@ -2247,24 +2245,24 @@
           "hook": {
             "beat": "joris-windmill",
             "kind": "title",
-            "text": "Joris asks how a rainbow forms",
+            "text": "Joris starts a windmill story",
             "rule": "flagged"
           },
           "beats": [
             "joris-windmill"
           ],
           "captions": [
-            "On the guest bed, Joris looks up how a rainbow forms in Kiwix. The Wikipedia file was downloaded once, so no search engine sees the question."
+            "On the guest bed, Joris starts the windmill adventure Greet chose for him. Audiobookshelf keeps the book on the Core and saves his place for next time."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Audiobookshelf",
+            "replaces Audible"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "audiobookshelf",
               "replaces": [
-                "Google Search"
+                "Audible"
               ]
             }
           ],
@@ -2285,39 +2283,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.066666666666666,
-          "frames": 512,
+          "durationS": 17.466666666666665,
+          "frames": 524,
           "timeline": {
             "parts": [
               {
                 "beat": "joris-windmill",
                 "kind": "hook",
                 "at": 0,
-                "end": 13.2,
+                "end": 13.6,
                 "narrAt": 2,
-                "narrEnd": 12.4,
+                "narrEnd": 12.8,
                 "sentences": "2/2",
                 "tour": {
                   "from": 108.405,
-                  "to": 119.903
+                  "to": 120.303
                 }
               }
             ],
             "pads": [
               {
-                "t0": 13.2,
-                "t1": 13.55,
+                "t0": 13.6,
+                "t1": 13.95,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 13.55,
-              "t1": 17.067,
-              "panelAt": 13.75
+              "t0": 13.95,
+              "t1": 17.467,
+              "panelAt": 14.15
             }
           },
           "notes": [],
-          "hash": "2672424a462a827c18dc7be68f8af044a2ac3386563e844367308c3e5a4db47f"
+          "hash": "60a1ef9a73f582df08aa278ebec0502d435aa223fbbe8685bd9b8c61651ec6ab"
         }
       ]
     },
@@ -2567,7 +2565,7 @@
             }
           },
           "notes": [],
-          "hash": "fdf6a5236b7b9960528ea254b2b941e006cf16ed0c3007c4745093ae76ed6566"
+          "hash": "11f17720208ad18a0dc95252dc9f98db574b4af196bd74c3cd47e9f1fa961074"
         },
         {
           "id": "haddad-samir",
@@ -2648,7 +2646,7 @@
             }
           },
           "notes": [],
-          "hash": "904a38b2c784030803fb4e047421507f6d2d6271487c8c19da1b3f8514565f38"
+          "hash": "2592059595517ea8d2f79136520d4a4a4671087d42b6aa32e31aaeee3290c836"
         },
         {
           "id": "haddad-yasmin",
@@ -2659,24 +2657,24 @@
           "hook": {
             "beat": "bed-lookup",
             "kind": "title",
-            "text": "Yasmin looks up the delta",
+            "text": "A cited page goes missing",
             "rule": "flagged"
           },
           "beats": [
             "bed-lookup"
           ],
           "captions": [
-            "Propped against the headboard, Yasmin needs a river delta’s population. Kiwix answers from a Wikipedia file the Core downloaded once, so no search engine sees the question."
+            "Propped against the headboard, Yasmin finds a page her essay cites has vanished. The copy she saved in Linkwarden, a screenshot and a PDF, still opens from the Core."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Linkwarden",
+            "replaces Raindrop.io"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "linkwarden",
               "replaces": [
-                "Google Search"
+                "Raindrop.io"
               ]
             }
           ],
@@ -2697,39 +2695,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.466666666666665,
-          "frames": 524,
+          "durationS": 18.266666666666666,
+          "frames": 548,
           "timeline": {
             "parts": [
               {
                 "beat": "bed-lookup",
                 "kind": "hook",
                 "at": 0,
-                "end": 13.6,
+                "end": 14.4,
                 "narrAt": 2,
-                "narrEnd": 12.8,
+                "narrEnd": 13.6,
                 "sentences": "2/2",
                 "tour": {
                   "from": 259.888,
-                  "to": 271.536
+                  "to": 272.336
                 }
               }
             ],
             "pads": [
               {
-                "t0": 13.6,
-                "t1": 13.95,
+                "t0": 14.4,
+                "t1": 14.75,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 13.95,
-              "t1": 17.467,
-              "panelAt": 14.15
+              "t0": 14.75,
+              "t1": 18.267,
+              "panelAt": 14.95
             }
           },
           "notes": [],
-          "hash": "b6883a1d788b5da30c54efdec0e4a67a86e4c1525e16bdab68049945c383c60c"
+          "hash": "aefd879c840ee10575775573fa8fc8ab5bf65e46f7c89c30c2dd3aa6027c784e"
         }
       ]
     },
@@ -2983,7 +2981,7 @@
             }
           },
           "notes": [],
-          "hash": "60db83049014b928d224e159d0f3807823d588dfc281c1aa64f0d3fa099fa858"
+          "hash": "2c4900e596caca72b7770fd5e1a8cea223f7722eca08a9d11773b5b37d5d1787"
         },
         {
           "id": "hovsepian-hagop",
@@ -3064,7 +3062,7 @@
             }
           },
           "notes": [],
-          "hash": "10145c5f33c9e855530ea7a72e522196f04f9f27ce75c9577eb372dc96529bf2"
+          "hash": "2e6018dc6fceee1d17e24afb4e5e245d66ddc5c5e7f33157b624d3a31835c508"
         },
         {
           "id": "hovsepian-nare",
@@ -3145,7 +3143,7 @@
             }
           },
           "notes": [],
-          "hash": "76107d224dee5162d2deed1a617d6c11f7f93657e9f7fd848a7d6ef6fe7f3910"
+          "hash": "c4bf80ec9b007d14f2b0f98c0df659d85e0a6a0112173735735e9ca6af886c6f"
         }
       ]
     },
@@ -3231,7 +3229,7 @@
             }
           },
           "notes": [],
-          "hash": "a2589c675ebc2c4ccd02062f1e64ce589d7f2dc2bef2b0222e3266d64eee03af"
+          "hash": "98586c0415aede7132b971f06844366ff843678800c8a1f12f84b0efc7c0a0cd"
         },
         {
           "id": "hwang-jiho",
@@ -3312,7 +3310,7 @@
             }
           },
           "notes": [],
-          "hash": "6554aa851350eb761a2e84c48a56961ecb7824f26da6fe3da85c4e736d4f0153"
+          "hash": "c1d62c9c3b1672c0cabf100046d26b1759351225a5cbe1dd917e98a2fff17374"
         },
         {
           "id": "hwang-yuna",
@@ -3323,33 +3321,29 @@
           "hook": {
             "beat": "kids-otter",
             "kind": "title",
-            "text": "Yuna asks what otters eat",
+            "text": "Yuna hears her otter story",
             "rule": "flagged"
           },
           "beats": [
             "kids-otter"
           ],
           "captions": [
-            "Yuna checks Kiwix to learn what an otter eats. Its Wikipedia file was downloaded once, and the Core serves it, so no search engine is asked."
+            "Yuna types three lines about the otter on the terrace. Kokoro on the Core speaks them back, and she fixes the funniest sentence."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Kokoro"
           ],
           "apps": [
             {
-              "id": "kiwix",
-              "replaces": [
-                "Google Search"
-              ]
+              "id": "kokoro",
+              "replaces": []
             }
           ],
           "disclosures": [
             "fictional-family",
             "beta-short",
             "scripted-scenes",
-            "stylised-art",
-            "names-owners"
+            "stylised-art"
           ],
           "cta": {
             "label": "See Companion Core",
@@ -3361,39 +3355,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.066666666666666,
-          "frames": 512,
+          "durationS": 15.866666666666667,
+          "frames": 476,
           "timeline": {
             "parts": [
               {
                 "beat": "kids-otter",
                 "kind": "hook",
                 "at": 0,
-                "end": 13.2,
+                "end": 12,
                 "narrAt": 2,
-                "narrEnd": 12.4,
+                "narrEnd": 11.2,
                 "sentences": "2/2",
                 "tour": {
                   "from": 298.65,
-                  "to": 310.148
+                  "to": 308.948
                 }
               }
             ],
             "pads": [
               {
-                "t0": 13.2,
-                "t1": 13.55,
+                "t0": 12,
+                "t1": 12.35,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 13.55,
-              "t1": 17.067,
-              "panelAt": 13.75
+              "t0": 12.35,
+              "t1": 15.867,
+              "panelAt": 12.55
             }
           },
           "notes": [],
-          "hash": "030437f9b24a74292f74d7cf77afb557b605599a9992e67479cf78823f5bb547"
+          "hash": "c89efbcd96a8e240210ffb6db00378bb5547fd6fdbf2dde22738da6998fcd144"
         }
       ]
     },
@@ -3479,7 +3473,7 @@
             }
           },
           "notes": [],
-          "hash": "d34ab28440a1998b8fcd618d7c27288275174a186fe8687c51eec7d6cb7a6004"
+          "hash": "3b1e456190cdafa62086d91833cbb24dc41e4be19b5b530e4bfbf3878275af0c"
         },
         {
           "id": "iyer-ravi",
@@ -3560,7 +3554,7 @@
             }
           },
           "notes": [],
-          "hash": "9971497da6dc52dfa117ad4e960bd21c9fed4e29a25a4b182dc1a8a45e24e49e"
+          "hash": "8be0e5c8c824fa46640e0b6d363b0e493370e453af878fd76a1f9dcfb944aaec"
         },
         {
           "id": "iyer-arjun",
@@ -3641,7 +3635,7 @@
             }
           },
           "notes": [],
-          "hash": "36ef61a2490a8f1ee7ca49f21948050d70861f1287a078d5eaadf137f8116ece"
+          "hash": "f485840e0f11ad463e3ae345c1e4edb1fdf525767d44945b1659e617b1831818"
         },
         {
           "id": "iyer-kavya",
@@ -3652,33 +3646,29 @@
           "hook": {
             "beat": "kids-tortoise",
             "kind": "title",
-            "text": "Kavya and Arjun settle an argument",
+            "text": "Kavya and Arjun settle it",
             "rule": "flagged"
           },
           "beats": [
             "kids-tortoise"
           ],
           "captions": [
-            "Kavya and Arjun disagree about how long a tortoise lives. Kiwix settles it from a Wikipedia file downloaded once, so no search engine hears the question."
+            "Kavya and Arjun argue over who knows more. She sets questions in Razzia, and he answers from his own device, with the Core serving the quiz."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Razzia"
           ],
           "apps": [
             {
-              "id": "kiwix",
-              "replaces": [
-                "Google Search"
-              ]
+              "id": "razzia",
+              "replaces": []
             }
           ],
           "disclosures": [
             "fictional-family",
             "beta-short",
             "scripted-scenes",
-            "stylised-art",
-            "names-owners"
+            "stylised-art"
           ],
           "cta": {
             "label": "See Companion Core",
@@ -3722,7 +3712,7 @@
             }
           },
           "notes": [],
-          "hash": "2df337367e2ac5dc8eba15d67519a1123c840aa37678709a4f19611a35ab6430"
+          "hash": "3f1211c790510cd89201ed2f57d893bcfc9a88b6c72cd1041e044f390d70c0f7"
         }
       ]
     },
@@ -4142,7 +4132,7 @@
             }
           },
           "notes": [],
-          "hash": "825c1651847c4b391fa02934a43f5a3eace3f8e4c0e203feea247938318c4219"
+          "hash": "dd463001004b3de19155e59942f540165db0c2685b9cccff672857fd0df5ece5"
         },
         {
           "id": "kovacs-gabor",
@@ -4223,7 +4213,7 @@
             }
           },
           "notes": [],
-          "hash": "7fb94b94a53a39a33847467b3fd22d290fe03a9235ef8c8fc2adabca3e99e3dd"
+          "hash": "cdca20e105fa45a8594001c137c18a2af0c593ffdf51f330048e7c375c7c2fa7"
         },
         {
           "id": "kovacs-bence",
@@ -4304,7 +4294,7 @@
             }
           },
           "notes": [],
-          "hash": "e0acc5ea0ddcac31ce10f3de3fba4523f31233ee3334ee58d4bdc5bce1299b70"
+          "hash": "b957e9665c103279f3b00255d5a931ff0e4339ad95d084123d81d02151abe5cc"
         },
         {
           "id": "kovacs-reka",
@@ -4313,26 +4303,26 @@
           "archetype": "learner",
           "status": "ready",
           "hook": {
-            "beat": "west-kiwix",
+            "beat": "west-reading",
             "kind": "title",
-            "text": "Reka looks up an aqueduct",
+            "text": "Reka opens the history chapter",
             "rule": "flagged"
           },
           "beats": [
-            "west-kiwix"
+            "west-reading"
           ],
           "captions": [
-            "A history question asks how aqueducts carried water. Reka looks it up in Kiwix, whose Wikipedia file sits on the Core. No search engine is asked."
+            "Reka’s teacher shared the term’s history reader as a PDF. She reads the next chapter in BookLore, and the file sits on the Core with the family’s books."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "BookLore",
+            "replaces Kindle"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "booklore",
               "replaces": [
-                "Google Search"
+                "Kindle"
               ]
             }
           ],
@@ -4353,39 +4343,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.066666666666666,
-          "frames": 512,
+          "durationS": 17.866666666666667,
+          "frames": 536,
           "timeline": {
             "parts": [
               {
-                "beat": "west-kiwix",
+                "beat": "west-reading",
                 "kind": "hook",
                 "at": 0,
-                "end": 13.2,
+                "end": 14,
                 "narrAt": 2,
-                "narrEnd": 12.4,
-                "sentences": "3/3",
+                "narrEnd": 13.2,
+                "sentences": "2/2",
                 "tour": {
                   "from": 222.411,
-                  "to": 234.009
+                  "to": 235.209
                 }
               }
             ],
             "pads": [
               {
-                "t0": 13.2,
-                "t1": 13.55,
+                "t0": 14,
+                "t1": 14.35,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 13.55,
-              "t1": 17.067,
-              "panelAt": 13.75
+              "t0": 14.35,
+              "t1": 17.867,
+              "panelAt": 14.55
             }
           },
           "notes": [],
-          "hash": "e32964f19389c7afadadd4018958162f674769637479786c994b7d91378c7d76"
+          "hash": "2723d7ad15eeaff2a30b0b8b8248ab3b100e4a0e73929e2f1e5d622ccc5b88fd"
         }
       ]
     },
@@ -4634,7 +4624,7 @@
             }
           },
           "notes": [],
-          "hash": "6798b757a6feca3df29065523fa72e55fc35efe450f88f0a28d007981e4142d8"
+          "hash": "769d18cca8a09ecdac90d5ac97d513c22c2fe7258f5297228e1de3a3024da137"
         },
         {
           "id": "moreau-etienne",
@@ -4696,8 +4686,8 @@
                 "narrEnd": 14,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 178.955,
-                  "to": 192.053
+                  "from": 178.555,
+                  "to": 191.653
                 }
               }
             ],
@@ -4715,7 +4705,7 @@
             }
           },
           "notes": [],
-          "hash": "e315c8e073c2c9d60b17b4a369912cb298de2452f16f5ea33f616ddafb583b2c"
+          "hash": "28bcd4953e13ee63a6b9e8ca0b22bf0830045642577dfd581b5a0cef533965c6"
         },
         {
           "id": "moreau-hugo",
@@ -4777,8 +4767,8 @@
                 "narrEnd": 12.4,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 232.068,
-                  "to": 245.268
+                  "from": 231.668,
+                  "to": 244.868
                 }
               }
             ],
@@ -4796,7 +4786,7 @@
             }
           },
           "notes": [],
-          "hash": "5db60bae1f05a32b9229509e25e99ffccf8a3b3be67fd49ac3e14f09b82ef2d8"
+          "hash": "85a7dbfdf1bb742b9662b31468b2d4e15eafaa2c0f2abd3160def7941ba8293d"
         },
         {
           "id": "moreau-lea",
@@ -4805,26 +4795,26 @@
           "archetype": "learner",
           "status": "ready",
           "hook": {
-            "beat": "lea-lookup",
+            "beat": "lea-saved-article",
             "kind": "title",
-            "text": "The balloon question gets answered",
+            "text": "Lea finds the article she saved",
             "rule": "flagged"
           },
           "beats": [
-            "lea-lookup"
+            "lea-saved-article"
           ],
           "captions": [
-            "Lea looks up how a hot-air balloon rises in Kiwix. The Wikipedia file was downloaded once, so the Core answers and no search engine sees the question."
+            "Lea’s science homework asks how a hot-air balloon rises. Readeck kept the readable text of the article she saved earlier, and the copy sits on the Core."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Readeck",
+            "replaces Instapaper"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "readeck",
               "replaces": [
-                "Google Search"
+                "Instapaper"
               ]
             }
           ],
@@ -4850,7 +4840,7 @@
           "timeline": {
             "parts": [
               {
-                "beat": "lea-lookup",
+                "beat": "lea-saved-article",
                 "kind": "hook",
                 "at": 0,
                 "end": 13.6,
@@ -4858,8 +4848,8 @@
                 "narrEnd": 12.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 295.195,
-                  "to": 307.093
+                  "from": 294.795,
+                  "to": 306.693
                 }
               }
             ],
@@ -4877,7 +4867,7 @@
             }
           },
           "notes": [],
-          "hash": "4a32682075d7621dcd1210d042cd9f3768fcbd73ef20808b15ff0f38b288768d"
+          "hash": "a332b4c2ac669f099473f0fccc923c1826b9942f58108aaebbfc7812411388ee"
         }
       ]
     },
@@ -4963,7 +4953,7 @@
             }
           },
           "notes": [],
-          "hash": "870421fa6f03d4c249619d3b5bdb05dc2bbc8413d03981bb2fb5264b84a5d43a"
+          "hash": "5d408ab2704a458f6cbcf9b80b13b0f6b43ff199d26ee56d59c5431167236edf"
         },
         {
           "id": "nguyen-duc",
@@ -5044,7 +5034,7 @@
             }
           },
           "notes": [],
-          "hash": "d44ad1f25adb0029ffb2ab47ff297890563834de5363542004423a45db652765"
+          "hash": "edf7fcb1c1fa89e26227a71c8eed3d8151f3769584e1a3ae97602ac24689ef60"
         },
         {
           "id": "nguyen-mai",
@@ -5106,8 +5096,8 @@
                 "narrEnd": 11.6,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 246.221,
-                  "to": 256.919
+                  "from": 246.621,
+                  "to": 257.319
                 }
               }
             ],
@@ -5125,7 +5115,7 @@
             }
           },
           "notes": [],
-          "hash": "add346bbd91591f56d13ede5fdaac8e6b3872ed490b847f91905f3a32b5e027f"
+          "hash": "50c2aa092f9edc2ea05073da760948f0544fb699c03379742caef31f8cd8c212"
         },
         {
           "id": "nguyen-bao",
@@ -5187,8 +5177,8 @@
                 "narrEnd": 10.8,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 235.621,
-                  "to": 245.519
+                  "from": 236.021,
+                  "to": 245.919
                 }
               }
             ],
@@ -5206,7 +5196,7 @@
             }
           },
           "notes": [],
-          "hash": "3ef4f008603cf4d00a431b2ba024f8694fd0496392c03cba5d2833be194df67a"
+          "hash": "4d6d1aac455679c87f0ea4b6c83b22286e0e3368fd2c5ce74aa9e4e1f64d9ccb"
         }
       ]
     },
@@ -5273,8 +5263,8 @@
                 "narrEnd": 12,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 253.603,
-                  "to": 264.701
+                  "from": 252.403,
+                  "to": 263.501
                 }
               }
             ],
@@ -5292,7 +5282,7 @@
             }
           },
           "notes": [],
-          "hash": "8c7c202fbe64bfbe122793f4e9e0ab4faf01cb65d88a8d307870b31b2b5e542d"
+          "hash": "b97202dd7a1c1428ca14a3aa69869586841c9ee95a6bda15b5735be60126ce06"
         },
         {
           "id": "nwachukwu-emeka",
@@ -5350,8 +5340,8 @@
                 "narrEnd": 12.8,
                 "sentences": "3/3",
                 "tour": {
-                  "from": 204.303,
-                  "to": 216.201
+                  "from": 203.103,
+                  "to": 215.001
                 }
               }
             ],
@@ -5369,7 +5359,7 @@
             }
           },
           "notes": [],
-          "hash": "888f2e12552fe8fb6a4beb4768bc47d8ff9c6262cc03f909e8176d9e56c8dd2b"
+          "hash": "784dc59702a3c7cdd2c7075c1c18a4e1d2693699f9527355d84f74e7349abcd6"
         },
         {
           "id": "nwachukwu-chidi",
@@ -5387,17 +5377,17 @@
             "kids-lookup"
           ],
           "captions": [
-            "Chidi bets Grandpa a biscuit that a whale is longer than his old bus. Kiwix settles it from a Wikipedia file, downloaded once, so no search engine sees it."
+            "At the bookshelf, Chidi bets Grandpa a biscuit that he can finish the whale audiobook before the weekend. Audiobookshelf keeps the family’s audiobooks on the Core."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Audiobookshelf",
+            "replaces Audible"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "audiobookshelf",
               "replaces": [
-                "Google Search"
+                "Audible"
               ]
             }
           ],
@@ -5418,39 +5408,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 18.266666666666666,
-          "frames": 548,
+          "durationS": 17.066666666666666,
+          "frames": 512,
           "timeline": {
             "parts": [
               {
                 "beat": "kids-lookup",
                 "kind": "hook",
                 "at": 0,
-                "end": 14.4,
+                "end": 13.2,
                 "narrAt": 2,
-                "narrEnd": 13.6,
+                "narrEnd": 12.4,
                 "sentences": "2/2",
                 "tour": {
                   "from": 65.65,
-                  "to": 78.348
+                  "to": 77.148
                 }
               }
             ],
             "pads": [
               {
-                "t0": 14.4,
-                "t1": 14.75,
+                "t0": 13.2,
+                "t1": 13.55,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 14.75,
-              "t1": 18.267,
-              "panelAt": 14.95
+              "t0": 13.55,
+              "t1": 17.067,
+              "panelAt": 13.75
             }
           },
           "notes": [],
-          "hash": "590328caf364d73ee9f60b4cea8f7dad3d4610dc96eae885539f52e543daff93"
+          "hash": "703f49f51d06755c8e914f52df32abf0482264e457513fa51bb2954ab6651efe"
         }
       ]
     },
@@ -5703,7 +5693,7 @@
             }
           },
           "notes": [],
-          "hash": "dffdca72ac784ec8b3733bab2d129b5038da3b7f7ef2f7cf97f6e60b54212ba1"
+          "hash": "fce2d3a61b2e5a17d35ed43a353b6f05445aa39deac98aef63a4980762e93bd2"
         },
         {
           "id": "quintero-andres",
@@ -5765,8 +5755,8 @@
                 "narrEnd": 13.2,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 300.231,
-                  "to": 312.529
+                  "from": 301.431,
+                  "to": 313.729
                 }
               }
             ],
@@ -5784,7 +5774,7 @@
             }
           },
           "notes": [],
-          "hash": "296660e5175d09e358ddea7d05171592479ef74557423c54fef451109ef3c185"
+          "hash": "608cdcb158c87f01fee9ee967db2c493e52bd779d821a3f75939c232d42c1bd1"
         },
         {
           "id": "quintero-camila",
@@ -5793,26 +5783,26 @@
           "archetype": "learner",
           "status": "ready",
           "hook": {
-            "beat": "camila-kiwix",
+            "beat": "camila-pages",
             "kind": "title",
-            "text": "A bee project full of questions",
+            "text": "Camila tags her bee pages",
             "rule": "flagged"
           },
           "beats": [
-            "camila-kiwix"
+            "camila-pages"
           ],
           "captions": [
-            "A bee project gives Camila a question every few minutes. Kiwix answers from a Wikipedia file the Core downloaded once, so no search engine is asked."
+            "For her bee project, Camila saves pages into a Linkwarden collection, tagged hive, queen or flowers. Linkwarden keeps each page on the Core, with a PDF copy beside it."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Linkwarden",
+            "replaces Raindrop.io"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "linkwarden",
               "replaces": [
-                "Google Search"
+                "Raindrop.io"
               ]
             }
           ],
@@ -5833,39 +5823,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.066666666666666,
-          "frames": 512,
+          "durationS": 18.266666666666666,
+          "frames": 548,
           "timeline": {
             "parts": [
               {
-                "beat": "camila-kiwix",
+                "beat": "camila-pages",
                 "kind": "hook",
                 "at": 0,
-                "end": 13.2,
+                "end": 14.4,
                 "narrAt": 2,
-                "narrEnd": 12.4,
+                "narrEnd": 13.6,
                 "sentences": "2/2",
                 "tour": {
                   "from": 216.073,
-                  "to": 227.571
+                  "to": 228.771
                 }
               }
             ],
             "pads": [
               {
-                "t0": 13.2,
-                "t1": 13.55,
+                "t0": 14.4,
+                "t1": 14.75,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 13.55,
-              "t1": 17.067,
-              "panelAt": 13.75
+              "t0": 14.75,
+              "t1": 18.267,
+              "panelAt": 14.95
             }
           },
           "notes": [],
-          "hash": "eacbd3c6eca360e022453e01e765f9823495576b9851cbf50139c3ef8d224fe9"
+          "hash": "0de3650ca9cb0b74ad7205ccc54e06762e3074b2c349f55e17e392618b5db824"
         },
         {
           "id": "quintero-mateo",
@@ -5927,8 +5917,8 @@
                 "narrEnd": 11.6,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 261.797,
-                  "to": 272.495
+                  "from": 262.997,
+                  "to": 273.695
                 }
               }
             ],
@@ -5946,7 +5936,7 @@
             }
           },
           "notes": [],
-          "hash": "06669da306576a76a15adff9d3ca22cea31b2feab5f0b42c78b4cb54a9769679"
+          "hash": "ef945ebe42ba6e44a53d1c1dc0c7c406b1bf89b27e2e649c30247f44baf404bb"
         }
       ]
     },
@@ -6366,7 +6356,7 @@
             }
           },
           "notes": [],
-          "hash": "735ab47baac3df34ef1861442d1e780f56dcc0ef631ac15079ff6581b5ae7d47"
+          "hash": "4e8ec7d2c4dbe6aaa4add00e74f5ef596b1c94bc2a3c8e2b78ed9badafe4f8b7"
         },
         {
           "id": "tesfaye-dawit",
@@ -6447,7 +6437,7 @@
             }
           },
           "notes": [],
-          "hash": "97fe6ac8ad47ff6ea9ee8e28f32a571304d39054547e476518c37adbde06901f"
+          "hash": "6ce8246ecdd7c0b1fb33b575829fd4e1758c8765702e5808d07f8bac36038832"
         },
         {
           "id": "tesfaye-selam",
@@ -6458,24 +6448,24 @@
           "hook": {
             "beat": "loft-lookup",
             "kind": "title",
-            "text": "Who wrote this poem?",
+            "text": "Selam opens her poetry book",
             "rule": "flagged"
           },
           "beats": [
             "loft-lookup"
           ],
           "captions": [
-            "For Spanish class, Selam looks up her poem's author in Kiwix. The Wikipedia file was downloaded once, so the Core serves it, and no search engine is asked."
+            "Selam's Spanish poem is due on Friday. She opens the poetry collection in BookLore and turns to the poem's page. BookLore keeps the books on the Core."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "BookLore",
+            "replaces Kindle"
           ],
           "apps": [
             {
-              "id": "kiwix",
+              "id": "booklore",
               "replaces": [
-                "Google Search"
+                "Kindle"
               ]
             }
           ],
@@ -6496,39 +6486,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.866666666666667,
-          "frames": 536,
+          "durationS": 17.466666666666665,
+          "frames": 524,
           "timeline": {
             "parts": [
               {
                 "beat": "loft-lookup",
                 "kind": "hook",
                 "at": 0,
-                "end": 14,
+                "end": 13.6,
                 "narrAt": 2,
-                "narrEnd": 13.2,
-                "sentences": "2/2",
+                "narrEnd": 12.8,
+                "sentences": "3/3",
                 "tour": {
                   "from": 315.259,
-                  "to": 327.557
+                  "to": 327.157
                 }
               }
             ],
             "pads": [
               {
-                "t0": 14,
-                "t1": 14.35,
+                "t0": 13.6,
+                "t1": 13.95,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 14.35,
-              "t1": 17.867,
-              "panelAt": 14.55
+              "t0": 13.95,
+              "t1": 17.467,
+              "panelAt": 14.15
             }
           },
           "notes": [],
-          "hash": "fe4b0b043cf3765537163cb77f2f985cddfd0abf560562ef4aab1ab34dfa467e"
+          "hash": "90044328c228ed3938ac3a10ab4bc7e41494ad44d8e3b4aefa066d84ac7adcb2"
         },
         {
           "id": "tesfaye-bruk",
@@ -6609,7 +6599,7 @@
             }
           },
           "notes": [],
-          "hash": "752b14172a969b579292e6dbf41071b4fcb3e9dfb9a3bf8f71a83dc1d0901f68"
+          "hash": "914bde91269f1e345903237b19bd94aadd514d110cf250f8ec0b184a370dbf3d"
         }
       ]
     },
@@ -6843,8 +6833,8 @@
                 "narrEnd": 11.6,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 297.185,
-                  "to": 307.883
+                  "from": 297.585,
+                  "to": 308.283
                 }
               }
             ],
@@ -6862,7 +6852,7 @@
             }
           },
           "notes": [],
-          "hash": "376f4fa0120952bb6cecad3714bb8c8d05160ab3ace40b478eb12e09425e7bab"
+          "hash": "1079fb03d6a2b92a3b4c3fed14a9540eb9b875ee63c177ecf606697cfe9d1e86"
         },
         {
           "id": "watanabe-haruo",
@@ -6943,7 +6933,7 @@
             }
           },
           "notes": [],
-          "hash": "e5000a4be39e3c6e3e395f2cb4c3be5777f1ac74f9aa08bd5b7b99ddc2fdaf58"
+          "hash": "d61dacfba4dcff70192eb0dbdf787198dc4364f1e6a892957de0a1da26a601d4"
         },
         {
           "id": "watanabe-emi",
@@ -7005,8 +6995,8 @@
                 "narrEnd": 13.2,
                 "sentences": "2/2",
                 "tour": {
-                  "from": 247.52,
-                  "to": 259.568
+                  "from": 247.92,
+                  "to": 259.968
                 }
               }
             ],
@@ -7024,7 +7014,7 @@
             }
           },
           "notes": [],
-          "hash": "3c5562f8c51f5e43a647a1603c1154d0ec16d29047754d63ec2aa4c76f479b53"
+          "hash": "d53a1546e09965bda7df8589173037f5ab25c01c8542dab63ab1c662b02842f9"
         },
         {
           "id": "watanabe-kenji",
@@ -7035,33 +7025,29 @@
           "hook": {
             "beat": "kenji-river",
             "kind": "title",
-            "text": "Kenji looks up a river word",
+            "text": "Kenji hears his river line",
             "rule": "flagged"
           },
           "beats": [
             "kenji-river"
           ],
           "captions": [
-            "Haruo says rivers meander, and Kenji wants the word explained. Kiwix serves the article from a Wikipedia file downloaded once, so no search engine sees his question."
+            "Haruo says rivers meander, so Kenji writes a line about one. He types it into Kokoro, hears the Core turn it into speech, then reads it to Haruo."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Kokoro"
           ],
           "apps": [
             {
-              "id": "kiwix",
-              "replaces": [
-                "Google Search"
-              ]
+              "id": "kokoro",
+              "replaces": []
             }
           ],
           "disclosures": [
             "fictional-family",
             "beta-short",
             "scripted-scenes",
-            "stylised-art",
-            "names-owners"
+            "stylised-art"
           ],
           "cta": {
             "label": "See Companion Core",
@@ -7073,39 +7059,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 17.466666666666665,
-          "frames": 524,
+          "durationS": 17.866666666666667,
+          "frames": 536,
           "timeline": {
             "parts": [
               {
                 "beat": "kenji-river",
                 "kind": "hook",
                 "at": 0,
-                "end": 13.6,
+                "end": 14,
                 "narrAt": 2,
-                "narrEnd": 12.8,
+                "narrEnd": 13.2,
                 "sentences": "2/2",
                 "tour": {
                   "from": 159.382,
-                  "to": 171.28
+                  "to": 171.68
                 }
               }
             ],
             "pads": [
               {
-                "t0": 13.6,
-                "t1": 13.95,
+                "t0": 14,
+                "t1": 14.35,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 13.95,
-              "t1": 17.467,
-              "panelAt": 14.15
+              "t0": 14.35,
+              "t1": 17.867,
+              "panelAt": 14.55
             }
           },
           "notes": [],
-          "hash": "c0d39e1217fa63f8956f407671846c46cd6d33a286b442535ac9cc63130f8303"
+          "hash": "1af2075bca9bcc81ea52cb97e2ca35475a18f0c4634f52133c594191364af880"
         }
       ]
     },
@@ -7191,7 +7177,7 @@
             }
           },
           "notes": [],
-          "hash": "aa8647084e8de4f746cde3b4b522b224287085419cb220227c16720460ef464b"
+          "hash": "5372a7221a855286f7830252d73a65ebc37421530caf5993b3b1397d7ec17709"
         },
         {
           "id": "whitaker-callum",
@@ -7272,7 +7258,7 @@
             }
           },
           "notes": [],
-          "hash": "0531b25bbe8795f7558f20d94bbbf29d27729197ddbe32731f058529c0976624"
+          "hash": "ab71d7d360bb12b74369a5a15b48333d41ddbe0967b3ff034d4777a75de8de6b"
         },
         {
           "id": "whitaker-nell",
@@ -7283,33 +7269,29 @@
           "hook": {
             "beat": "kids-lookup",
             "kind": "title",
-            "text": "Nell asks how a rainbow forms",
+            "text": "Nell hears her spelling words",
             "rule": "flagged"
           },
           "beats": [
             "kids-lookup"
           ],
           "captions": [
-            "Nell sees a rainbow and asks how it forms. Callum looks it up with her in Kiwix. Its Wikipedia file was downloaded once, so no search engine hears her ask."
+            "Nell has a card of spelling words for Friday. Callum types each into Kokoro, which makes the speech on the Core, and Nell says every word back."
           ],
           "chips": [
-            "Kiwix",
-            "replaces Google Search"
+            "Kokoro"
           ],
           "apps": [
             {
-              "id": "kiwix",
-              "replaces": [
-                "Google Search"
-              ]
+              "id": "kokoro",
+              "replaces": []
             }
           ],
           "disclosures": [
             "fictional-family",
             "beta-short",
             "scripted-scenes",
-            "stylised-art",
-            "names-owners"
+            "stylised-art"
           ],
           "cta": {
             "label": "See Companion Core",
@@ -7321,39 +7303,39 @@
             "4x5",
             "16x9"
           ],
-          "durationS": 18.666666666666668,
-          "frames": 560,
+          "durationS": 17.466666666666665,
+          "frames": 524,
           "timeline": {
             "parts": [
               {
                 "beat": "kids-lookup",
                 "kind": "hook",
                 "at": 0,
-                "end": 14.8,
+                "end": 13.6,
                 "narrAt": 2,
-                "narrEnd": 14,
-                "sentences": "3/3",
+                "narrEnd": 12.8,
+                "sentences": "2/2",
                 "tour": {
                   "from": 292.798,
-                  "to": 305.646
+                  "to": 304.446
                 }
               }
             ],
             "pads": [
               {
-                "t0": 14.8,
-                "t1": 15.15,
+                "t0": 13.6,
+                "t1": 13.95,
                 "to": "end"
               }
             ],
             "end": {
-              "t0": 15.15,
-              "t1": 18.667,
-              "panelAt": 15.35
+              "t0": 13.95,
+              "t1": 17.467,
+              "panelAt": 14.15
             }
           },
           "notes": [],
-          "hash": "3b4d61dd1d6248511c941e31923da548451580f61f6f91f2eee59115e4ccfc76"
+          "hash": "117541f643b7921ccc2184397ab733f60e8324d82870a118ff1d3c692c6953f6"
         }
       ]
     }

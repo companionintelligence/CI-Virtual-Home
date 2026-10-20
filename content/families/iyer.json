@@ -694,12 +694,10 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
-        "replaces": [
-          "Google Search"
-        ]
+        "id": "razzia",
+        "replaces": []
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "run a quiz night for a small group on your own Core",
       "anchor": {
         "role": "desk",
         "room": "kids",
@@ -717,11 +715,10 @@
         "side": "right"
       },
       "popup": {
-        "title": "Kavya and Arjun settle an argument",
-        "body": "Kavya and Arjun disagree about how long a tortoise lives. Kiwix settles it from a Wikipedia file downloaded once, so no search engine hears the question.",
+        "title": "Kavya and Arjun settle it",
+        "body": "Kavya and Arjun argue over who knows more. She sets questions in Razzia, and he answers from his own device, with the Core serving the quiz.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Razzia"
         ]
       },
       "film": true
@@ -977,6 +974,7 @@
     "LibreTranslate beats carry the models-downloaded line and the Core does the work. Spanish appears in two LibreTranslate beats; the listing says dozens of languages and persona-apps uses French as the example.",
     "Steam Headless: Valve account note, no title, no frame rate, home network only. guest-vault names the Valve sign-in but not the app, so no with entry.",
     "ntfy iOS push uses an upstream relay; kitchen-bell says only that the ntfy server runs on the Core. AudioMass exports by browser download, so no file-storage claim. No Companion Memory beat; memory flags are false.",
-    "Starts at the Core (living room), then the conservatory beside it, kitchen, upstairs east to west (Arjun, Kavya, Ravi), the pool garden, the street."
+    "Starts at the Core (living room), then the conservatory beside it, kitchen, upstairs east to west (Arjun, Kavya, Ravi), the pool garden, the street.",
+    "kids-tortoise is a Razzia quiz (one manager password set at install, no account per player; no replaces chip). The id is kept so the ads file still points at it."
   ]
 }

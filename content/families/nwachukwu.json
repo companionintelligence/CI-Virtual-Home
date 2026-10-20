@@ -268,12 +268,12 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "audiobookshelf",
         "replaces": [
-          "Google Search"
+          "Audible"
         ]
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
       "anchor": {
         "role": "bookshelf",
         "room": "kids",
@@ -290,10 +290,10 @@
       },
       "popup": {
         "title": "A biscuit rides on a whale",
-        "body": "Chidi bets Grandpa a biscuit that a whale is longer than his old bus. Kiwix settles it from a Wikipedia file, downloaded once, so no search engine sees it.",
+        "body": "At the bookshelf, Chidi bets Grandpa a biscuit that he can finish the whale audiobook before the weekend. Audiobookshelf keeps the family’s audiobooks on the Core.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Audiobookshelf",
+          "replaces Audible"
         ]
       },
       "film": true
@@ -811,6 +811,6 @@
     "Frigate needs an IP camera the family has bought (catalog hardware caveat); the beat body says an IP camera and points it at the border, never at a person.",
     "Duplicati beat names a local disk as the destination, never a cloud provider. Firefly III beat has the bills typed in; no bank import service or Data Importer is claimed.",
     "Hermes beats carry the chat-service note; both agents draft and the person reads and sends. No Companion Memory is mentioned or connected.",
-    "Chidi uses no agent. His Kiwix, Koodo Reader and Audiobookshelf beats are an adult-supervised child tour: no profile of him, no question log. The reader beat sits on the toy box rug, with no device or screen described."
+    "Chidi uses no agent. His two Audiobookshelf beats and his Koodo Reader beat are an adult-supervised child tour: no profile of him, no listening log. The reader beat sits on the toy box rug, with no device or screen described."
   ]
 }

@@ -624,15 +624,15 @@
       "id": "kids-tides",
       "chapter": "kids",
       "member": "mai",
-      "category": "privacy",
+      "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "koodo-reader",
         "replaces": [
-          "Google Search"
+          "Amazon Kindle"
         ]
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "read ebooks in your browser, with bookmarks and notes, from a library on your Core",
       "anchor": {
         "role": "desk",
         "room": "kids",
@@ -650,11 +650,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "Mai asks why the tide turns",
-        "body": "Why does the tide come twice a day? Mai looks it up in Kiwix. The Wikipedia file was downloaded once, so no search engine sees her question.",
+        "title": "Mai bookmarks the tides chapter",
+        "body": "Mai reads the tides chapter of a sea book in Koodo Reader and bookmarks the page for class. The book comes from the family's library on the Core.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Koodo Reader",
+          "replaces Amazon Kindle"
         ]
       }
     },
@@ -916,7 +916,7 @@
     "OpenClaw (Cricket) prepares the trip form in its own browser; Linh reads it and presses send. The OpenClaw website note rides on dining-form.",
     "Ember is Hermes: the first Hermes beat is garage-roller and carries the chat-service note. Duc sends the landlord note himself.",
     "Companion Planning, OpenClaw and Hermes send crash reports to Companion Intelligence unless switched off. No beat says nothing leaves the Core.",
-    "Kiwix and LibreTranslate beats carry downloaded once. Immich carries the slow first start. VaultWarden is named as working with the Bitwarden apps.",
+    "LibreTranslate carries downloaded once. Koodo Reader (kids-tides): reading and a bookmark only; no look-up claim. Immich carries the slow first start. VaultWarden works with the Bitwarden apps.",
     "ntfy: iOS push can use an upstream relay, so garage-ping makes no claim about where the message travels."
   ]
 }

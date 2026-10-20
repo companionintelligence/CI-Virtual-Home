@@ -308,7 +308,7 @@
       "id": "salon-dns",
       "chapter": "salon",
       "member": "gabor",
-      "category": "iot",
+      "category": "privacy",
       "segment": "consumer",
       "app": {
         "id": "pi-hole",
@@ -645,18 +645,18 @@
       }
     },
     {
-      "id": "west-kiwix",
+      "id": "west-reading",
       "chapter": "west",
       "member": "reka",
-      "category": "privacy",
+      "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "booklore",
         "replaces": [
-          "Google Search"
+          "Kindle"
         ]
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "manage and read books, comics and PDFs",
       "anchor": {
         "role": "bookshelf",
         "room": "bedroom",
@@ -673,13 +673,13 @@
         "side": "right"
       },
       "popup": {
-        "title": "Reka looks up an aqueduct",
-        "body": "A history question asks how aqueducts carried water. Reka looks it up in Kiwix, whose Wikipedia file sits on the Core. No search engine is asked.",
+        "title": "Reka opens the history chapter",
+        "body": "Reka’s teacher shared the term’s history reader as a PDF. She reads the next chapter in BookLore, and the file sits on the Core with the family’s books.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "BookLore",
+          "replaces Kindle"
         ],
-        "note": "The Wikipedia file is downloaded once."
+        "note": "BookLore fetches covers and details from the internet."
       },
       "film": true
     },
@@ -916,6 +916,7 @@
     "bed nth 2 with room bedroom is the West Bedroom canopy bed. The garden role resolves to the forecourt fountain, so the garden beat stands at the front after the kitchen.",
     "Both agents run Hermes: the chat note rides on ftue-hello, salon-draft and den-sorrel. The only Companion Memory mention reads (beta), in salon-draft. In every agent beat the person reads and sends.",
     "Steam Headless: Valve account named, no frame rate, no title, home network only. west-homework uses the replaces ChatGPT chip; the text names a model on the Core and never a cloud key.",
-    "Pi-hole covers only devices that use it for DNS, one household instance set up by Gabor. Home Assistant needs no cloud account of its own; the fountain pump and hall lantern sit on network devices."
+    "Pi-hole covers only devices that use it for DNS, one household instance set up by Gabor. Home Assistant needs no cloud account of its own; the fountain pump and hall lantern sit on network devices.",
+    "west-reading carries the BookLore cloud-link note (covers and details come from outside). salon-dns carries the privacy topic."
   ]
 }

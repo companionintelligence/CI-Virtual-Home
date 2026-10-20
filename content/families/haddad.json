@@ -648,15 +648,15 @@
       "id": "bed-lookup",
       "chapter": "bedroom",
       "member": "yasmin",
-      "category": "privacy",
+      "category": "productivity",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "linkwarden",
         "replaces": [
-          "Google Search"
+          "Raindrop.io"
         ]
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "save web pages with a screenshot and PDF so they survive link rot",
       "anchor": {
         "role": "bed",
         "room": "bedroom",
@@ -674,11 +674,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "Yasmin looks up the delta",
-        "body": "Propped against the headboard, Yasmin needs a river delta’s population. Kiwix answers from a Wikipedia file the Core downloaded once, so no search engine sees the question.",
+        "title": "A cited page goes missing",
+        "body": "Propped against the headboard, Yasmin finds a page her essay cites has vanished. The copy she saved in Linkwarden, a screenshot and a PDF, still opens from the Core.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Linkwarden",
+          "replaces Raindrop.io"
         ]
       },
       "film": true
@@ -811,6 +811,7 @@
     "The one beat that opens an outside page (lounge-errand) carries the OpenClaw website note; Pippin prepares and Dalia presses send.",
     "Open WebUI sits in with on bed-stats; no beat compares a local model with a hosted one, and none mentions a key.",
     "Extra apps beyond the plan: Koodo Reader (media at the couch), HortusFox (garden beat), JupyterLab (Yasmin). The Garage has a bicycle and a workbench only: the checks beat anchors on the room and names only the workbench.",
-    "Chapter order is the physical walk: Den, Lounge, Garage (through the link hall), Dining Room, Kitchen, then up the stair to Bedroom Two, down again to the front garden and the street."
+    "Chapter order is the physical walk: Den, Lounge, Garage (through the link hall), Dining Room, Kitchen, then up the stair to Bedroom Two, down again to the front garden and the street.",
+    "Linkwarden saves a page only while the internet reaches it; bed-lookup shows the copy saved earlier, and claims no more than the screenshot and PDF."
   ]
 }

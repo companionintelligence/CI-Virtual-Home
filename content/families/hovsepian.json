@@ -264,7 +264,7 @@
       "id": "office-notes",
       "chapter": "office",
       "member": "araxi",
-      "category": "productivity",
+      "category": "privacy",
       "segment": "consumer",
       "app": {
         "id": "joplin",
@@ -652,15 +652,13 @@
       "id": "nare-lookup",
       "chapter": "nare",
       "member": "nare",
-      "category": "privacy",
+      "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
-        "replaces": [
-          "Google Search"
-        ]
+        "id": "razzia",
+        "replaces": []
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "run a quiz night for a small group on your own Core",
       "anchor": {
         "role": "bed",
         "room": "bedroom",
@@ -678,13 +676,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "Nare looks up a lighthouse lens",
-        "body": "On her bed, Nare looks up how a lighthouse lens turns. Kiwix answers from a Wikipedia file the Core holds, so no search engine is asked.",
+        "title": "Nare quizzes her grandparents",
+        "body": "On her bed, Nare writes a lighthouse quiz in Razzia. The Core runs the game, and Araxi and Hagop answer from their own devices.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
-        ],
-        "note": "The Wikipedia file is downloaded once."
+          "Razzia"
+        ]
       },
       "film": true
     },
@@ -828,6 +824,7 @@
     "The Guest Bedroom has a bed and a chest of drawers only: Nare anchors on the bed and the room, and no beat names a desk or a screen there. She is never shown asleep.",
     "Both agents are Hermes. The chat-service note rides on ftue-hello, the first Hermes beat. Companion Memory is not named anywhere.",
     "living-tapes assumes old holiday tapes digitised to files by the family: Jellyfin plays the family’s own files only. garden-drive assumes an IP camera the family owns (not part of the Core).",
-    "BookLore fetches covers and metadata from outside (catalog caveat), so nare-reads says the books sit on the Core and claims no more."
+    "BookLore fetches covers and metadata from outside (catalog caveat), so nare-reads says the books sit on the Core and claims no more.",
+    "nare-lookup is a Razzia quiz (one manager login, no account per person; no replaces chip). The family already reads books in BookLore (nare-reads), so no second ebook app appears. office-notes carries the privacy topic."
   ]
 }

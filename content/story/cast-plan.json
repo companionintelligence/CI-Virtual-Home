@@ -154,7 +154,7 @@
    "reason": "Primary Bedroom has the record player (maker), the Kids' Room has the easel and a kids desk (learner), the Guest Bedroom is the teen's, and the Conservatory Dining table is the office.",
    "household_text": "Two parents, a teenager and a ten-year-old in the villa with a record player.",
    "care": "A client's contract and a child's homework both stay on the Core.",
-   "signatureApps": ["ci-hermes", "onlyoffice", "libretranslate", "navidrome", "audiomass", "steam-headless", "kiwix"],
+   "signatureApps": ["ci-hermes", "onlyoffice", "libretranslate", "navidrome", "audiomass", "steam-headless", "razzia"],
    "beatApps": {"iot": "ntfy", "food": "homehub", "privacy": "vaultwarden"},
    "members": [
     {"id": "meenakshi", "name": "Meenakshi", "age": 45, "role": "parent", "archetype": "organiser", "work": "translator, runs a small agency", "room": "Conservatory Dining", "sleepsIn": "Primary Bedroom", "companion": "Clover"},
@@ -217,7 +217,7 @@
    "reason": "Two kids' bedrooms with different furniture: the Kids Room has the desk (learner), the Kids Bedroom has the easel (maker); the Dining Room table is the office and the Den the builder's.",
    "household_text": "Two parents and two children under eleven in the house with two kids rooms.",
    "care": "The children's drawings and homework sit on the Core.",
-   "signatureApps": ["ci-hermes", "yuvomi", "uptime-kuma", "pi-hole", "kiwix", "blockbench", "librephotos"],
+   "signatureApps": ["ci-hermes", "yuvomi", "uptime-kuma", "pi-hole", "linkwarden", "blockbench", "librephotos"],
    "members": [
     {"id": "marisol", "name": "Marisol", "age": 38, "role": "parent", "archetype": "organiser", "work": "clinic office manager", "room": "Dining Room", "sleepsIn": "Primary Bedroom", "companion": "Willow"},
     {"id": "andres", "name": "Andres", "age": 40, "role": "parent", "archetype": "builder", "work": "devops engineer", "room": "Den", "sleepsIn": "Primary Bedroom", "companion": "Thimble"},
@@ -258,7 +258,7 @@
    "reason": "The 6 m2 Study with a desk and a gaming chair is the builder's cubby; the Dining room is the organiser's; the Kids Room has the shelf; the house has no TV.",
    "household_text": "Two parents and an eight-year-old in the house on the knoll.",
    "care": "An eight-year-old's reading stays on the Core.",
-   "signatureApps": ["ci-hermes", "donetick", "bookstack", "forgejo", "kiwix", "frigate", "duplicati"],
+   "signatureApps": ["ci-hermes", "donetick", "bookstack", "forgejo", "kokoro", "frigate", "duplicati"],
    "beatApps": {"food": "grocy"},
    "members": [
     {"id": "minjung", "name": "Minjung", "age": 40, "role": "parent", "archetype": "organiser", "work": "school administrator", "room": "Dining", "sleepsIn": "Primary Suite", "companion": "Poppy"},
@@ -418,7 +418,7 @@
    "reason": "One floor, two bedrooms and a Fireside Nook: two grandparents and a ten-year-old grandchild in the 10 m2 Guest Bedroom.",
    "household_text": "Two grandparents and their ten-year-old grandchild on one floor.",
    "care": "A retired accountant's paperwork stays on the Core.",
-   "signatureApps": ["ci-memory", "paperless", "monetr", "vaultwarden", "kitchenowl", "hortusfox", "kiwix"],
+   "signatureApps": ["ci-memory", "paperless", "monetr", "vaultwarden", "kitchenowl", "hortusfox", "audiobookshelf"],
    "beatApps": {"iot": "ntfy"},
    "members": [
     {"id": "willem", "name": "Willem", "age": 71, "role": "grandparent", "archetype": "organiser", "work": "retired accountant", "room": "Dining Room", "sleepsIn": "Primary Bedroom", "companion": "Marmalade"},
@@ -438,7 +438,7 @@
    "reason": "Five bedrooms: two grandparents, their daughter at the Bedroom Two desk, a nine-year-old and a baby in the Nursery; the Family Room has the record player.",
    "household_text": "Two grandparents, their daughter, a nine-year-old grandchild and a baby.",
    "care": "Three generations of family photographs stay on one Core.",
-   "signatureApps": ["ci-hermes", "homehub", "navidrome", "gitea", "immich", "kiwix", "frigate"],
+   "signatureApps": ["ci-hermes", "homehub", "navidrome", "gitea", "immich", "kokoro", "frigate"],
    "members": [
     {"id": "yoshiko", "name": "Yoshiko", "age": 67, "role": "grandparent", "archetype": "host", "work": "cooks for the whole house", "room": "Kitchen", "sleepsIn": "Primary Suite", "companion": "Cinnamon"},
     {"id": "haruo", "name": "Haruo", "age": 70, "role": "grandparent", "archetype": "maker", "work": "retired surveyor, keeps a record collection", "room": "Family Room", "sleepsIn": "Primary Suite", "companion": "Sesame"},

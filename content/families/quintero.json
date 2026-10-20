@@ -228,7 +228,7 @@
       "segment": "consumer",
       "with": [
         "yuvomi",
-        "kiwix"
+        "linkwarden"
       ],
       "anchor": {
         "role": "core"
@@ -240,13 +240,13 @@
       "popup": {
         "kind": "phone",
         "title": "Pick the first agent and apps",
-        "body": "In the Companion Hub store, Marisol picks Hermes, and the family adds Yuvomi and Kiwix. Then they walk away.",
+        "body": "In the Companion Hub store, Marisol picks Hermes, and the family adds Yuvomi and Linkwarden. Then they walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agent: Hermes",
-            "Apps: Yuvomi, Kiwix"
+            "Apps: Yuvomi, Linkwarden"
           ]
         }
       }
@@ -553,18 +553,18 @@
       }
     },
     {
-      "id": "camila-kiwix",
+      "id": "camila-pages",
       "chapter": "camila",
       "member": "camila",
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "linkwarden",
         "replaces": [
-          "Google Search"
+          "Raindrop.io"
         ]
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "save web pages with a screenshot and a PDF so they survive link rot",
       "anchor": {
         "role": "desk",
         "room": "kids",
@@ -582,11 +582,11 @@
         "side": "right"
       },
       "popup": {
-        "title": "A bee project full of questions",
-        "body": "A bee project gives Camila a question every few minutes. Kiwix answers from a Wikipedia file the Core downloaded once, so no search engine is asked.",
+        "title": "Camila tags her bee pages",
+        "body": "For her bee project, Camila saves pages into a Linkwarden collection, tagged hive, queen or flowers. Linkwarden keeps each page on the Core, with a PDF copy beside it.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Linkwarden",
+          "replaces Raindrop.io"
         ]
       },
       "film": true

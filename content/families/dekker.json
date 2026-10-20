@@ -362,12 +362,12 @@
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "audiobookshelf",
         "replaces": [
-          "Google Search"
+          "Audible"
         ]
       },
-      "capability": "read Wikipedia and other reference sites offline",
+      "capability": "listen to your audiobooks and podcasts, and pick up where you left off",
       "anchor": {
         "role": "bed",
         "room": "bedroom",
@@ -385,11 +385,11 @@
         "from": "behind"
       },
       "popup": {
-        "title": "Joris asks how a rainbow forms",
-        "body": "On the guest bed, Joris looks up how a rainbow forms in Kiwix. The Wikipedia file was downloaded once, so no search engine sees the question.",
+        "title": "Joris starts a windmill story",
+        "body": "On the guest bed, Joris starts the windmill adventure Greet chose for him. Audiobookshelf keeps the book on the Core and saves his place for next time.",
         "chips": [
-          "Kiwix",
-          "replaces Google Search"
+          "Audiobookshelf",
+          "replaces Audible"
         ]
       },
       "film": true
@@ -820,10 +820,11 @@
   },
   "notes": [
     "No TV and no desk in this home: the media beats sit on the couch (Immich, Nextcloud contacts, Audiobookshelf), and Willem works at the dining table. The guest bedroom has a bed, a wall hanging and a chest, no desk.",
-    "Joris has no companion and no agent chat: his beats are Kiwix, LibreTranslate and Obsidian only. The tablet is never named; Joris is simply on the bed.",
+    "Joris has no companion and no agent chat: his beats are Audiobookshelf, LibreTranslate and Obsidian only. The tablet is never named; Joris is simply on the bed.",
     "Companion Memory (beta) is first named in dining-service, a film beat; ftue-pick does not name it. Marmalade is Hermes with memory true; the chat-service note rides on every Hermes beat.",
     "garden-seeds: Parsley (OpenClaw) fills a basket, Greet checks and pays for it herself; carries the OpenClaw website note; no key or model is mentioned.",
     "monetr: Willem types the figures himself, no bank link, no advice. Immich beat carries the slow first start. Crash reports are not mentioned; no beat says nothing leaves the Core.",
-    "ntfy (kitchen-loaf) is a Core timer Willem set, sent to Greet's phone, no iOS relay claim. The exact tail sits on the Core, not in a rented X is used once (dining-receipts); the photo cloud line once."
+    "ntfy (kitchen-loaf) is a Core timer Willem set, sent to Greet's phone, no iOS relay claim. The exact tail sits on the Core, not in a rented X is used once (dining-receipts); the photo cloud line once.",
+    "joris-windmill: Audiobookshelf, replaces Audible only. Willem's living-audio beat resumes a book; Joris's starts a new one. The family's own audiobook files, one place kept per book, nothing about podcasts or accounts."
   ]
 }
