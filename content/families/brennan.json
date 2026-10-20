@@ -323,7 +323,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Picking the first agent and apps",
+        "title": "Hermes first, then two apps",
         "body": "Sally browses the Companion Hub store from the writing desk and picks Hermes. The family adds Companion Planning and Nextcloud, then walks away.",
         "note": "Installing apps uses the internet.",
         "phone": {
@@ -359,7 +359,7 @@
         "text": "Hello, Sally. I am Juniper. Where shall we begin?"
       },
       "detail": {
-        "before": "Without an agent, Sally wrote every reply and every reminder herself, one app at a time.",
+        "before": "Sally typed each reply to a client herself, and kept the reminders in her head.",
         "after": "Juniper runs in its own sandbox on the Core. Sally texts it a few lines and reads the draft that comes back.",
         "steps": [
           "Pick Hermes in the Companion Hub store",
@@ -367,6 +367,47 @@
           "Send it a first message"
         ],
         "fact": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+      },
+      "film": true
+    },
+    {
+      "id": "office-split",
+      "chapter": "office",
+      "member": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Smallpdf"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "service": "smallpdf",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A double scan, split before sending",
+        "body": "One scan holds two clients’ papers. Sally splits it in Stirling-PDF on the Core, so each client gets only their own pages.",
+        "chips": [
+          "Stirling-PDF",
+          "alternative to Smallpdf"
+        ]
+      },
+      "detail": {
+        "before": "Splitting a scan meant uploading the whole stack to Smallpdf, including the pages that belonged to the other client.",
+        "after": "Stirling-PDF splits the scan on the Core. Each client’s pages become their own file before anything is sent.",
+        "steps": [
+          "Open the scan in Stirling-PDF",
+          "Split it where the second client starts",
+          "Save one file per client"
+        ],
+        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
       },
       "film": true
     },
@@ -454,47 +495,6 @@
       }
     },
     {
-      "id": "office-split",
-      "chapter": "office",
-      "member": "sally",
-      "category": "small-business",
-      "segment": "small-business",
-      "app": {
-        "id": "stirling-pdf",
-        "replaces": [
-          "Smallpdf"
-        ]
-      },
-      "capability": "merge, split, compress and convert PDFs on your own Core",
-      "service": "smallpdf",
-      "anchor": {
-        "role": "core"
-      },
-      "camera": {
-        "framing": "close",
-        "side": "right"
-      },
-      "popup": {
-        "title": "A double scan, split before sending",
-        "body": "One scan holds two clients’ papers, so Sally splits it before sending. Stirling-PDF does it on the Core, not on a PDF website.",
-        "chips": [
-          "Stirling-PDF",
-          "alternative to Smallpdf"
-        ]
-      },
-      "detail": {
-        "before": "Splitting a scan meant uploading the whole stack to Smallpdf, including the pages that belonged to the other client.",
-        "after": "Stirling-PDF splits the scan on the Core. Each client’s pages become their own file before anything is sent.",
-        "steps": [
-          "Open the scan in Stirling-PDF",
-          "Split it where the second client starts",
-          "Save one file per client"
-        ],
-        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
-      },
-      "film": true
-    },
-    {
       "id": "office-tuning",
       "chapter": "office",
       "category": "home",
@@ -527,7 +527,7 @@
       },
       "popup": {
         "title": "One word finds the piano’s receipts",
-        "body": "One word, tuning, brings up the grand piano’s receipts. Paperless-ngx reads and tags each page as it is scanned, so the whole lot is searchable.",
+        "body": "One word, tuning, brings up the grand piano’s receipts. Paperless-ngx reads and tags each page, so the whole lot is searchable.",
         "chips": [
           "Paperless-ngx",
           "alternative to Evernote"
@@ -673,7 +673,7 @@
       },
       "popup": {
         "title": "Saturday’s film stars the family",
-        "body": "Steve picks Saturday’s film from the family’s own files: John’s lake video from four summers back. Both chesterfields fill, and Jellyfin streams the file to the TV from the Core.",
+        "body": "Saturday’s film is John’s lake video from four summers back. Steve picks it from a list of nothing but the family’s own files, and Jellyfin streams it from the Core.",
         "chips": [
           "Jellyfin",
           "alternative to Plex"
@@ -758,7 +758,7 @@
       },
       "popup": {
         "title": "Bin day is a quest now",
-        "body": "Steve takes the bins out because bin day is a quest with a reward. Habitica, running on the Core, turns the chore list into a game.",
+        "body": "Steve takes the bins out because bin day is a quest he set up himself. Habitica, running on the Core, turns the chore list into a game.",
         "chips": [
           "Habitica",
           "alternative to Todoist"
@@ -862,7 +862,7 @@
       },
       "popup": {
         "title": "Where John’s stack trace goes",
-        "body": "A stack trace from John’s book catalogue goes to a model on the Core, not a hosted chat. John reads the answer in Open WebUI before he changes a line.",
+        "body": "A test fails in John’s book catalogue, so he pastes the trace into Open WebUI. The model on the Core answers, and he reads it before changing a line.",
         "chips": [
           "Open WebUI",
           "alternative to ChatGPT"
@@ -966,7 +966,7 @@
       },
       "popup": {
         "title": "The session runs in the library",
-        "body": "Steam Headless runs Steve’s session on the Core in the library, not on a cloud server. Upstairs, he signs in to his own Valve account.",
+        "body": "Upstairs, Steve signs in to his own Valve account. The session itself runs on the Core in the library, and he plays it in a browser.",
         "chips": [
           "Steam Headless",
           "alternative to GeForce Now"
@@ -1017,14 +1017,14 @@
       },
       "popup": {
         "title": "Steve’s pictures join everyone else’s",
-        "body": "Steve’s lake pictures used to sit on his phone and in a photo cloud. Now they land in Immich on the Core, beside everyone else’s.",
+        "body": "Steve’s phone sent every picture to Google Photos. Now, on the home Wi-Fi, they back up to Immich on the Core, beside everyone else’s.",
         "chips": [
           "Immich",
           "alternative to Google Photos"
         ]
       },
       "detail": {
-        "before": "Steve’s phone uploaded every picture to Google Photos, and the lake summer sat in that account.",
+        "before": "Steve’s phone uploaded every picture to Google Photos, and the whole summer sat in that account.",
         "after": "Immich takes the pictures onto the Core and gathers them into one family collection. Its first start takes a while.",
         "steps": [
           "Install Immich from the Companion Hub store",
@@ -1066,7 +1066,7 @@
       },
       "popup": {
         "title": "The check comes after the writing",
-        "body": "Jean writes the lake paragraph in French herself, then checks it in LibreTranslate. The translating happens on the Core, not on a translation website.",
+        "body": "Jean writes the lake paragraph in French herself. Then she pastes it into LibreTranslate on the Core and compares the result with what she meant.",
         "chips": [
           "LibreTranslate",
           "alternative to Google Translate"
@@ -1258,7 +1258,7 @@
       },
       "popup": {
         "title": "John reads the pump rule first",
-        "body": "The pool pump’s plug had two timers, in two apps. Now Quill drafts one rule, and John reads and saves it in Home Assistant on the Core.",
+        "body": "The pool pump’s plug had two timers, in two apps. John’s agent, Quill, drafts one rule, and John reads and saves it in Home Assistant on the Core.",
         "chips": [
           "Home Assistant",
           "alternative to Google Home"
@@ -1340,13 +1340,13 @@
       },
       "popup": {
         "title": "One Core among the books",
-        "body": "One Companion Core holds the plans, folders, photos, code and homework, in a house still lined with books."
+        "body": "From the library to the pool, one Companion Core serves the house, and the shelves are still lined with books."
       },
       "film": true
     }
   ],
   "closing": {
-    "body": "Your plans, folders and homework can sit on a Companion Core at home. Browse the Companion Hub store and choose your first apps.",
+    "body": "Sally’s client folders, John’s code and Jean’s sources sit on a Companion Core at home. Browse the Companion Hub store and choose your first apps.",
     "cta": {
       "label": "See Companion Core",
       "url": "https://ci.computer/core"

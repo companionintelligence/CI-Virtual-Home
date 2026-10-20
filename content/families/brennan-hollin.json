@@ -140,7 +140,7 @@
         "limits": "Files issues only. John reads each one before it stands."
       },
       "profile": {
-        "bio": "John writes software from the Study, where the Core sits. His editor and repositories run on the Core, Quill files the issues he lists, and he builds the workflows and formulas Sally asks for."
+        "bio": "John writes software from the Study, where the Core sits. His editor and repositories run on the Core, and Quill files the issues he lists."
       }
     },
     {
@@ -175,18 +175,6 @@
       "title": "First run"
     },
     {
-      "id": "study",
-      "kind": "room",
-      "room": "office",
-      "title": "John's study"
-    },
-    {
-      "id": "front-study",
-      "kind": "room",
-      "room": "office",
-      "title": "Sally's front study"
-    },
-    {
       "id": "living",
       "kind": "room",
       "room": "living",
@@ -199,16 +187,22 @@
       "title": "The kitchen"
     },
     {
+      "id": "front-study",
+      "kind": "room",
+      "room": "office",
+      "title": "Sally's front study"
+    },
+    {
+      "id": "study",
+      "kind": "room",
+      "room": "office",
+      "title": "John's study"
+    },
+    {
       "id": "dining",
       "kind": "room",
       "room": "dining",
       "title": "The dining table"
-    },
-    {
-      "id": "kids",
-      "kind": "room",
-      "room": "kids",
-      "title": "Jean's room"
     },
     {
       "id": "front",
@@ -247,8 +241,8 @@
         "from": "front"
       },
       "popup": {
-        "title": "A parcel under the wisteria",
-        "body": "The courier leaves a parcel on the porch, under the wisteria. Jean holds the front door, and John carries it past the living room to the Study."
+        "title": "A package on the porch",
+        "body": "The courier leaves the package on the porch. Jean holds the front door, and John carries it past the living room to the Study."
       }
     },
     {
@@ -265,7 +259,7 @@
       },
       "popup": {
         "title": "Unbox the Companion Core",
-        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Steve reads the guide aloud while John clears the Study desk."
+        "body": "The Companion Core is a small computer for the home. Inside the package: the Core, a power cable, a quick-start guide and a recovery USB drive."
       }
     },
     {
@@ -288,7 +282,7 @@
       },
       "popup": {
         "title": "Plug it in",
-        "body": "John plugs it in, and Steve presses the button. The Core wakes and opens its own Wi-Fi network.",
+        "body": "John plugs it in, and Steve presses the button. The Core wakes and opens a Wi-Fi network of its own.",
         "note": "Companion OS is in beta."
       }
     },
@@ -307,8 +301,8 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Join it from a phone",
-        "body": "At the Core, Sally joins its own network on her phone, then picks the home network.",
+        "title": "Sally's phone finds the Core",
+        "body": "Sally joins the network the Core opened from her phone's Wi-Fi settings. Next she chooses the home network.",
         "phone": {
           "header": "Wi-Fi",
           "rows": [
@@ -337,7 +331,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Pick your first agents and apps",
+        "title": "Two agents, two apps to start",
         "body": "In the Companion Hub store, Sally and John each pick an OpenClaw agent, naming them Juniper and Quill. The family adds Yuvomi and LibreOffice, then walks away.",
         "note": "Installing apps uses the internet.",
         "phone": {
@@ -389,366 +383,6 @@
         "speaker": "sally",
         "text": "Good morning, Sally. Juniper here. What first?"
       }
-    },
-    {
-      "id": "study-code",
-      "chapter": "study",
-      "member": "john",
-      "category": "productivity",
-      "segment": "consumer",
-      "film": true,
-      "app": {
-        "id": "code-server",
-        "replaces": [
-          "VS Code (Proprietary)"
-        ]
-      },
-      "capability": "write code in VS Code in your browser, with the editor and your files on your Core",
-      "anchor": {
-        "role": "core"
-      },
-      "camera": {
-        "framing": "medium",
-        "side": "left"
-      },
-      "popup": {
-        "title": "The project left the laptop",
-        "body": "John's last laptop died with a side project's only copy on it. Now the files sit on the Core, and Code Server opens the editor in a browser.",
-        "chips": [
-          "Code Server",
-          "alternative to VS Code"
-        ],
-        "note": "Installing extensions uses the internet."
-      },
-      "detail": {
-        "before": "John wrote code in VS Code on one laptop, with the project folder on that laptop and nowhere else.",
-        "after": "Code Server opens the editor in a browser tab. The editor and the project files sit on the Core, so the laptop holds neither.",
-        "steps": [
-          "Open the editor in the laptop's browser",
-          "Open the project folder from the Core",
-          "Write code as usual"
-        ],
-        "fact": "Code Server lets you write code in VS Code in your browser, with the editor and your files on your Core."
-      },
-      "service": "vs-code"
-    },
-    {
-      "id": "study-quill",
-      "chapter": "study",
-      "member": "john",
-      "agent": "john",
-      "approval": "john",
-      "category": "productivity",
-      "segment": "consumer",
-      "app": {
-        "id": "forgejo",
-        "replaces": [
-          "GitHub"
-        ]
-      },
-      "capability": "host your own Git repositories, issues and pull requests on your Core",
-      "anchor": {
-        "role": "core"
-      },
-      "camera": {
-        "framing": "close",
-        "side": "left"
-      },
-      "popup": {
-        "title": "Quill files, John corrects one",
-        "body": "John's bug list once became issues on a rented code host; now Quill files them in Forgejo on the Core. John fixes the second title before it stands.",
-        "chips": [
-          "Forgejo",
-          "alternative to GitHub"
-        ],
-        "note": "Companion Agents are in beta."
-      },
-      "detail": {
-        "before": "After a test pass, John typed every bug into GitHub himself, one issue at a time.",
-        "after": "Quill opens Forgejo in its own browser and files each bug from John's list. John reads every issue, fixes what is wrong and lets the rest stand.",
-        "steps": [
-          "List the bugs from the test pass",
-          "Quill files each one in Forgejo",
-          "Read every issue before it stands"
-        ],
-        "fact": "Forgejo hosts your own Git repositories, issues and pull requests on your Core."
-      },
-      "say": {
-        "speaker": "john",
-        "text": "Three issues are drafted. Please read each before it stands."
-      },
-      "service": "github"
-    },
-    {
-      "id": "study-board",
-      "chapter": "study",
-      "member": "john",
-      "category": "home",
-      "segment": "consumer",
-      "app": {
-        "id": "planka",
-        "replaces": [
-          "Trello"
-        ]
-      },
-      "capability": "a real-time Kanban board for a team or a family project",
-      "anchor": {
-        "role": "bookshelf",
-        "room": "office",
-        "nth": 0,
-        "fallback": [
-          {
-            "role": "core"
-          }
-        ]
-      },
-      "camera": {
-        "framing": "medium"
-      },
-      "popup": {
-        "title": "House jobs leave the pin-board",
-        "body": "From the wisteria prune to the fence paint, John's pin-board of house jobs becomes one Planka board on the Core. Anyone in the house can move a card.",
-        "chips": [
-          "Planka",
-          "alternative to Trello"
-        ]
-      },
-      "detail": {
-        "before": "House jobs lived as sticky notes on a pin-board that only John walked past, so nobody else knew which were done.",
-        "after": "On the Core, Planka holds the same jobs as cards on a board, and anyone in the house can move one.",
-        "steps": [
-          "Copy each sticky note to a card",
-          "Sort the cards into jobs to do and jobs done",
-          "Move a card when the job is finished"
-        ],
-        "fact": "Planka is a real-time Kanban board for a team or a family project."
-      },
-      "service": "trello"
-    },
-    {
-      "id": "office-desks",
-      "chapter": "front-study",
-      "member": "sally",
-      "category": "productivity",
-      "segment": "small-business",
-      "app": {
-        "id": "libreoffice",
-        "replaces": [
-          "Microsoft Office"
-        ]
-      },
-      "capability": "the LibreOffice suite (Writer, Calc and more) in your browser",
-      "anchor": {
-        "role": "desk",
-        "room": "office",
-        "nth": 0,
-        "fallback": [
-          {
-            "role": "desk",
-            "room": "office",
-            "nth": 1
-          },
-          {
-            "role": "room",
-            "room": "office",
-            "nth": 1
-          }
-        ]
-      },
-      "camera": {
-        "framing": "wide",
-        "side": "left"
-      },
-      "popup": {
-        "title": "Two desks, one proposal file",
-        "body": "A proposal used to live on two machines at once, and Sally mailed herself the newer copy. Now both desks open one LibreOffice file, and it sits on the Core.",
-        "chips": [
-          "LibreOffice",
-          "alternative to Microsoft Office"
-        ]
-      },
-      "detail": {
-        "before": "In Microsoft Office, Sally's proposal was a file on one machine, mailed to herself to finish on the other.",
-        "after": "LibreOffice opens the proposal in her browser at either desk. One file sits on the Core, so there is one version to edit.",
-        "steps": [
-          "Draft the proposal in Writer",
-          "Price the fees in Calc",
-          "Open the same file at the other desk"
-        ],
-        "fact": "LibreOffice is an office suite with Writer, Calc and more, running in your browser."
-      },
-      "service": "microsoft-office"
-    },
-    {
-      "id": "office-follow",
-      "chapter": "front-study",
-      "member": "sally",
-      "agent": "sally",
-      "approval": "sally",
-      "category": "small-business",
-      "segment": "small-business",
-      "film": true,
-      "app": {
-        "id": "twenty",
-        "replaces": [
-          "Salesforce"
-        ]
-      },
-      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
-      "anchor": {
-        "role": "desk",
-        "room": "office",
-        "nth": 1,
-        "fallback": [
-          {
-            "role": "desk",
-            "room": "office",
-            "nth": 0
-          },
-          {
-            "role": "room",
-            "room": "office",
-            "nth": 1
-          }
-        ]
-      },
-      "camera": {
-        "framing": "medium",
-        "side": "right"
-      },
-      "popup": {
-        "title": "Follow-ups land in the client's record",
-        "body": "Juniper adds three follow-ups to the client's record in Twenty, and Sally reads each one. The record sits on the Core, not in a rented CRM.",
-        "chips": [
-          "Twenty",
-          "alternative to Salesforce"
-        ],
-        "note": "Companion Agents are in beta."
-      },
-      "detail": {
-        "before": "After each call, Sally typed the follow-ups into a Salesforce record by hand.",
-        "after": "Juniper opens Twenty in its own browser and adds the follow-ups from Sally's list. Sally reads each one, and the record stays on the Core.",
-        "steps": [
-          "List the follow-ups after the call",
-          "Juniper adds each to the client's record",
-          "Read every entry before it stands"
-        ],
-        "fact": "Twenty keeps customers, deals and custom fields in a CRM you host yourself."
-      },
-      "say": {
-        "speaker": "sally",
-        "text": "Drafted. Please read each first."
-      },
-      "service": "salesforce"
-    },
-    {
-      "id": "office-intake",
-      "chapter": "front-study",
-      "member": "sally",
-      "category": "small-business",
-      "segment": "small-business",
-      "app": {
-        "id": "n8n",
-        "replaces": [
-          "Zapier"
-        ]
-      },
-      "capability": "connect your apps with workflows, with the data staying on your Core",
-      "anchor": {
-        "role": "desk",
-        "room": "office",
-        "nth": 0,
-        "fallback": [
-          {
-            "role": "desk",
-            "room": "office",
-            "nth": 1
-          },
-          {
-            "role": "room",
-            "room": "office",
-            "nth": 1
-          }
-        ]
-      },
-      "camera": {
-        "framing": "medium",
-        "side": "left"
-      },
-      "popup": {
-        "title": "A checklist becomes a workflow",
-        "body": "The new-client checklist taped to Sally's writing desk is now one n8n workflow John built. It runs on the Core, so client details do not pass through a connector service.",
-        "chips": [
-          "n8n",
-          "alternative to Zapier"
-        ]
-      },
-      "detail": {
-        "before": "Sally ran the new-client checklist by hand, and the steps she had automated ran through Zapier.",
-        "after": "n8n runs the same steps as one workflow on the Core, so they do not pass through a connector service.",
-        "steps": [
-          "John builds the workflow once",
-          "Sally starts it for a new client",
-          "Check that every step ran"
-        ],
-        "fact": "n8n connects your apps with workflows, with the data staying on your Core."
-      },
-      "service": "zapier"
-    },
-    {
-      "id": "office-renewals",
-      "chapter": "front-study",
-      "member": "sally",
-      "category": "small-business",
-      "segment": "small-business",
-      "app": {
-        "id": "wallos",
-        "replaces": [
-          "Rocket Money"
-        ]
-      },
-      "capability": "track every subscription you pay for and get a reminder before it renews",
-      "anchor": {
-        "role": "bookshelf",
-        "room": "office",
-        "nth": 1,
-        "fallback": [
-          {
-            "role": "desk",
-            "room": "office",
-            "nth": 0
-          },
-          {
-            "role": "room",
-            "room": "office",
-            "nth": 1
-          }
-        ]
-      },
-      "camera": {
-        "framing": "medium",
-        "side": "right"
-      },
-      "popup": {
-        "title": "One list of what still renews",
-        "body": "A domain renewal nearly slips past Sally, so she lists every tool her practice still rents. Wallos holds the list on the Core and reminds her before each renewal.",
-        "chips": [
-          "Wallos",
-          "alternative to Rocket Money"
-        ],
-        "note": "Wallos fetches service logos from outside."
-      },
-      "detail": {
-        "before": "Sally's renewals were tracked in Rocket Money, one more service on the list.",
-        "after": "The list of renewals sits in Wallos on the Core, with a reminder before each one. The tools Sally has not moved yet stay on it.",
-        "steps": [
-          "List every tool the practice still rents",
-          "Add each renewal date",
-          "Read the reminders before they fall due"
-        ],
-        "fact": "Wallos tracks every subscription you pay for and reminds you before it renews."
-      },
-      "service": "rocket-money"
     },
     {
       "id": "living-session",
@@ -827,7 +461,7 @@
       },
       "popup": {
         "title": "Steve builds the porch in blocks",
-        "body": "Steve builds a low-poly model of the wisteria porch, block by block. Blockbench runs in a browser tab from the Core, on any laptop in the house.",
+        "body": "Steve's model of the wisteria porch sat in a MagicaVoxel file on one PC. Now he builds it block by block in Blockbench, in a browser tab.",
         "chips": [
           "Blockbench",
           "alternative to MagicaVoxel"
@@ -835,7 +469,7 @@
       },
       "detail": {
         "before": "Steve's models were files in MagicaVoxel, a program installed on one PC.",
-        "after": "Blockbench runs in a browser tab from the Core, so the same editor opens on any laptop in the house.",
+        "after": "Blockbench opens in a browser tab served from the Core, so there is nothing to install on the PC.",
         "steps": [
           "Open Blockbench in a browser tab",
           "Block out the porch posts and rails",
@@ -873,15 +507,15 @@
         "side": "left"
       },
       "popup": {
-        "title": "Jean designs the fair poster",
-        "body": "Jean is on her third poster draft, made in Penpot at the glass lounge's nesting tables. Penpot is hosted on the Core, so the design file lives at home.",
+        "title": "Jean designs the school fair poster",
+        "body": "Jean is on her third poster draft, made in Penpot at the glass lounge's nesting tables. The family hosts Penpot on the Core, so the poster file sits there.",
         "chips": [
           "Penpot",
           "alternative to Figma"
         ]
       },
       "detail": {
-        "before": "Jean's first posters were Figma files, kept in Figma's online workspace.",
+        "before": "Jean's first posters were Figma files.",
         "after": "Penpot is a design tool the family hosts. Jean opens it in a browser, and her design files live on the Core.",
         "steps": [
           "Open Penpot in a browser tab",
@@ -891,6 +525,55 @@
         "fact": "Penpot is a web-based design tool you host, for designing and prototyping."
       },
       "service": "figma"
+    },
+    {
+      "id": "kids-notes",
+      "chapter": "living",
+      "member": "jean",
+      "category": "kids",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "room",
+        "room": "living",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Three years of notes, as files",
+        "body": "Three years of Jean's school notes leave a hosted notes app for Obsidian. They are plain Markdown files on the Core now.",
+        "chips": [
+          "Obsidian",
+          "alternative to Notion"
+        ]
+      },
+      "detail": {
+        "before": "Three years of Jean's school notes lived as pages inside Notion.",
+        "after": "Obsidian runs in a browser session on the Core. Her notes are plain Markdown files in a folder, and any text editor opens them.",
+        "steps": [
+          "Move the notes into the vault folder",
+          "Open the vault in Obsidian",
+          "Find a note from the first year"
+        ],
+        "fact": "Obsidian is a note app in your browser. Your notes stay as local Markdown files."
+      },
+      "service": "notion"
     },
     {
       "id": "kitchen-calendar",
@@ -959,7 +642,7 @@
       },
       "popup": {
         "title": "John's old demo plays at lunch",
-        "body": "Steve finds a demo from John's college band, a file no streaming catalogue ever carried. mStream plays it in the kitchen, and John hears his guitar from the Study.",
+        "body": "Steve finds a demo disc from John's college band, music no streaming catalogue carried. Ripped, it plays through mStream in the kitchen, and John hears it from the Study.",
         "chips": [
           "mStream",
           "alternative to Apple Music"
@@ -976,6 +659,411 @@
         "fact": "mStream streams your own music from your Core to a browser or an app."
       },
       "service": "apple-music"
+    },
+    {
+      "id": "office-desks",
+      "chapter": "front-study",
+      "member": "sally",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "libreoffice",
+        "replaces": [
+          "Microsoft Office"
+        ]
+      },
+      "capability": "the LibreOffice suite (Writer, Calc and more) in your browser",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 1
+          },
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Two desks, one proposal file",
+        "body": "A proposal lived on two machines, and Sally mailed herself the newer copy. Now both desks open one LibreOffice file, so there is one version to edit.",
+        "chips": [
+          "LibreOffice",
+          "alternative to Microsoft Office"
+        ]
+      },
+      "detail": {
+        "before": "In Microsoft Office, Sally's proposal was a file on one machine, mailed to herself to finish on the other.",
+        "after": "LibreOffice opens the proposal in her browser at either desk. One file sits on the Core, so there is one version to edit.",
+        "steps": [
+          "Draft the proposal in Writer",
+          "Set the fees in Calc",
+          "Open the same file at the other desk"
+        ],
+        "fact": "LibreOffice is an office suite with Writer, Calc and more, running in your browser."
+      },
+      "service": "microsoft-office"
+    },
+    {
+      "id": "office-follow",
+      "chapter": "front-study",
+      "member": "sally",
+      "agent": "sally",
+      "approval": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "film": true,
+      "app": {
+        "id": "twenty",
+        "replaces": [
+          "Salesforce"
+        ]
+      },
+      "capability": "keep customers, deals and custom fields in a CRM you host yourself",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Juniper drafts the client's follow-ups",
+        "body": "Juniper drafts three follow-ups in the client's record in Twenty, and Sally reads each one. The record sits on the Core, not in a hosted CRM.",
+        "chips": [
+          "Twenty",
+          "alternative to Salesforce"
+        ],
+        "note": "Companion Agents are in beta."
+      },
+      "detail": {
+        "before": "After each call, Sally typed the follow-ups into a Salesforce record by hand.",
+        "after": "Juniper opens Twenty in its own browser and drafts the follow-ups from Sally's list. Sally reads each before it stands, and the record stays on the Core.",
+        "steps": [
+          "List the follow-ups after the call",
+          "Juniper adds each to the client's record",
+          "Read every entry before it stands"
+        ],
+        "fact": "Twenty keeps customers, deals and custom fields in a CRM you host yourself."
+      },
+      "say": {
+        "speaker": "sally",
+        "text": "Drafted. Please read each first."
+      },
+      "service": "salesforce"
+    },
+    {
+      "id": "office-intake",
+      "chapter": "front-study",
+      "member": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "n8n",
+        "replaces": [
+          "Zapier"
+        ]
+      },
+      "capability": "connect your apps with workflows, with the data staying on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 1
+          },
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A checklist becomes a workflow",
+        "body": "The new-client checklist taped to Sally's writing desk is now one n8n workflow Sally built. It runs on the Core, and she starts it for each new client.",
+        "chips": [
+          "n8n",
+          "alternative to Zapier"
+        ]
+      },
+      "detail": {
+        "before": "Sally ran the new-client checklist by hand, and the steps she had automated ran through Zapier.",
+        "after": "n8n runs the same steps as one workflow on the Core.",
+        "steps": [
+          "Sally builds the workflow once",
+          "Sally starts it for a new client",
+          "Check that every step ran"
+        ],
+        "fact": "n8n connects your apps with workflows, with the data staying on your Core."
+      },
+      "service": "zapier"
+    },
+    {
+      "id": "office-renewals",
+      "chapter": "front-study",
+      "member": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "wallos",
+        "replaces": [
+          "Rocket Money"
+        ]
+      },
+      "capability": "track every subscription you pay for and get a reminder before it renews",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "One list of what still renews",
+        "body": "A domain renewal nearly slips past Sally, so she lists every tool her practice still pays for. Wallos holds the list and reminds her before each renewal.",
+        "chips": [
+          "Wallos",
+          "alternative to Rocket Money"
+        ],
+        "note": "Wallos fetches service logos from outside."
+      },
+      "detail": {
+        "before": "Sally's renewals were tracked in Rocket Money, one more service on the list.",
+        "after": "The list of renewals sits in Wallos on the Core, with a reminder before each one. The tools Sally has not moved yet stay on it.",
+        "steps": [
+          "List every tool the practice still pays for",
+          "Add each renewal date",
+          "Read the reminders before they fall due"
+        ],
+        "fact": "Wallos tracks every subscription you pay for and reminds you before it renews."
+      },
+      "service": "rocket-money"
+    },
+    {
+      "id": "kids-photos",
+      "chapter": "front-study",
+      "member": "jean",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "mazanoke",
+        "replaces": []
+      },
+      "capability": "resize and compress images in the browser; nothing is uploaded",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Smaller pictures, nothing uploaded",
+        "body": "The school portal rejects Jean's art-project photos as too large, so Mazanoke shrinks them in her browser. No compressor site gets them.",
+        "chips": [
+          "Mazanoke"
+        ]
+      },
+      "detail": {
+        "before": "A photo the portal refused went to an online compressor, which meant uploading it to another website.",
+        "after": "In the browser, from the Core, Mazanoke resizes and compresses the photos. Nothing is uploaded.",
+        "steps": [
+          "Drop the photos into Mazanoke",
+          "Pick the smaller size",
+          "Send the small copies to the school portal"
+        ],
+        "fact": "Mazanoke resizes and compresses images in the browser. Nothing is uploaded."
+      }
+    },
+    {
+      "id": "study-code",
+      "chapter": "study",
+      "member": "john",
+      "category": "productivity",
+      "segment": "consumer",
+      "film": true,
+      "app": {
+        "id": "code-server",
+        "replaces": [
+          "VS Code (Proprietary)"
+        ]
+      },
+      "capability": "write code in VS Code in your browser, with the editor and your files on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The project left the laptop",
+        "body": "John's last laptop died with a side project's only copy on it. Code Server puts VS Code in a browser tab, with the files on the Core.",
+        "chips": [
+          "Code Server",
+          "alternative to VS Code"
+        ],
+        "note": "Installing extensions uses the internet."
+      },
+      "detail": {
+        "before": "John wrote code in VS Code on one laptop, with the project folder on that laptop and nowhere else.",
+        "after": "Code Server opens the editor in a browser tab. The editor and the project files sit on the Core, so the laptop holds neither.",
+        "steps": [
+          "Open the editor in the laptop's browser",
+          "Open the project folder from the Core",
+          "Write code as usual"
+        ],
+        "fact": "Code Server lets you write code in VS Code in your browser, with the editor and your files on your Core."
+      },
+      "service": "vs-code"
+    },
+    {
+      "id": "study-quill",
+      "chapter": "study",
+      "member": "john",
+      "agent": "john",
+      "approval": "john",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own Git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Quill files, John corrects one",
+        "body": "John's bug list once became issues on a hosted code service; now Quill files them in Forgejo on the Core. John fixes the second title before it stands.",
+        "chips": [
+          "Forgejo",
+          "alternative to GitHub"
+        ],
+        "note": "Companion Agents are in beta."
+      },
+      "detail": {
+        "before": "After a test pass, John typed every bug into GitHub himself, one issue at a time.",
+        "after": "Quill opens Forgejo in its own browser and files each bug from John's list. John reads every issue, fixes what is wrong and lets the rest stand.",
+        "steps": [
+          "List the bugs from the test pass",
+          "Quill files each one in Forgejo",
+          "Read every issue before it stands"
+        ],
+        "fact": "Forgejo hosts your own Git repositories, issues and pull requests on your Core."
+      },
+      "say": {
+        "speaker": "john",
+        "text": "Three issues are drafted. Please read each before it stands."
+      },
+      "service": "github"
+    },
+    {
+      "id": "study-board",
+      "chapter": "study",
+      "member": "john",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "planka",
+        "replaces": [
+          "Trello"
+        ]
+      },
+      "capability": "a real-time Kanban board for a team or a family project",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "core"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "House jobs get one board",
+        "body": "House jobs, from the wisteria prune to the fence paint, sat on a Trello board only John opened. One Planka board on the Core holds them now.",
+        "chips": [
+          "Planka",
+          "alternative to Trello"
+        ]
+      },
+      "detail": {
+        "before": "House jobs lived on a Trello board that only John opened, so nobody else knew which were done.",
+        "after": "On the Core, Planka holds the same jobs as cards on a board, and anyone in the house can move one.",
+        "steps": [
+          "Copy each job to a card",
+          "Sort the cards into jobs to do and jobs done",
+          "Move a card when the job is finished"
+        ],
+        "fact": "Planka is a real-time Kanban board for a team or a family project."
+      },
+      "service": "trello"
     },
     {
       "id": "dining-quiz",
@@ -1004,114 +1092,20 @@
       },
       "popup": {
         "title": "Jean writes the family quiz",
-        "body": "Jean types every question for the family quiz, because writing a question is revising the answer. Razzia runs on the Core, and the family plays at the dining table.",
+        "body": "Jean writes the family quiz herself, one question per fact she keeps missing. Razzia hosts it on the Core, and everyone plays at the dining table.",
         "chips": [
           "Razzia"
         ]
       },
       "detail": {
-        "before": "Revision meant rereading notes, and a quiz meant waiting for someone else to write one.",
-        "after": "Jean writes the questions herself, and Razzia runs the quiz for the family from the Core.",
+        "before": "A family quiz meant waiting for someone else to write one.",
+        "after": "Jean writes one question per fact she keeps missing, and Razzia runs the quiz for the family from the Core.",
         "steps": [
           "Type the questions for the topic",
           "Start the quiz at the dining table",
           "Check the answers together"
         ],
         "fact": "Razzia runs a quiz night for a small group on your own Core."
-      }
-    },
-    {
-      "id": "kids-notes",
-      "chapter": "kids",
-      "member": "jean",
-      "category": "kids",
-      "segment": "consumer",
-      "film": true,
-      "app": {
-        "id": "obsidian",
-        "replaces": [
-          "Notion"
-        ]
-      },
-      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
-      "anchor": {
-        "role": "desk",
-        "room": "kids",
-        "fallback": [
-          {
-            "role": "room",
-            "room": "kids",
-            "nth": 1
-          }
-        ]
-      },
-      "camera": {
-        "framing": "medium",
-        "side": "right",
-        "from": "front"
-      },
-      "popup": {
-        "title": "Three years of notes, as files",
-        "body": "Three years of Jean's school notes leave a hosted notes app for Obsidian. They are plain Markdown files on the Core now.",
-        "chips": [
-          "Obsidian",
-          "alternative to Notion"
-        ]
-      },
-      "detail": {
-        "before": "Three years of Jean's school notes lived as pages inside Notion.",
-        "after": "Obsidian runs in a browser session on the Core. Her notes are plain Markdown files in a folder, and any text editor opens them.",
-        "steps": [
-          "Move the notes into the vault folder",
-          "Open the vault in Obsidian",
-          "Find a note from the first year"
-        ],
-        "fact": "Obsidian is a note app in your browser. Your notes stay as local Markdown files."
-      },
-      "service": "notion"
-    },
-    {
-      "id": "kids-photos",
-      "chapter": "kids",
-      "member": "jean",
-      "category": "kids",
-      "segment": "consumer",
-      "app": {
-        "id": "mazanoke",
-        "replaces": []
-      },
-      "capability": "resize and compress images in the browser; nothing is uploaded",
-      "anchor": {
-        "role": "desk",
-        "room": "kids",
-        "fallback": [
-          {
-            "role": "room",
-            "room": "kids",
-            "nth": 1
-          }
-        ]
-      },
-      "camera": {
-        "framing": "close",
-        "side": "left"
-      },
-      "popup": {
-        "title": "Smaller pictures, nothing uploaded",
-        "body": "The school portal rejects Jean's art-project photos as too large, so Mazanoke shrinks them in her browser. No compressor site gets them.",
-        "chips": [
-          "Mazanoke"
-        ]
-      },
-      "detail": {
-        "before": "A photo the portal refused went to an online compressor, which meant uploading it to another website.",
-        "after": "In the browser, from the Core, Mazanoke resizes and compresses the photos. Nothing is uploaded.",
-        "steps": [
-          "Drop the photos into Mazanoke",
-          "Pick the smaller size",
-          "Send the small copies to the school portal"
-        ],
-        "fact": "Mazanoke resizes and compresses images in the browser. Nothing is uploaded."
       }
     },
     {
@@ -1233,8 +1227,8 @@
         "side": "left"
       },
       "popup": {
-        "title": "Steve logs the first oil check",
-        "body": "Steve checks the car's oil on the gravel drive, with John beside him, and logs it. LubeLogger keeps every service, fuel stop and reminder on the Core.",
+        "title": "Steve logs the oil check",
+        "body": "Steve checks the car's oil on the gravel drive, with John beside him, and logs it. LubeLogger keeps every service, fuel stop and reminder where John can read them too.",
         "chips": [
           "LubeLogger",
           "alternative to Drivvo"
@@ -1283,18 +1277,18 @@
       },
       "popup": {
         "title": "A tracker that is one file",
-        "body": "By the pool, Sally reviews the quarter in a Grist tracker with a Python formula John wrote. The database is one file on the Core, and she can copy it.",
+        "body": "In Grist on the Core, Sally reviews the quarter by the pool, with a day-rate formula in Python. The database is one file, and she can copy it.",
         "chips": [
           "Grist",
           "alternative to Airtable"
         ]
       },
       "detail": {
-        "before": "Sally kept the tracker as a base in Airtable, with the data on the vendor's servers.",
+        "before": "Sally kept the tracker as a base in Airtable.",
         "after": "The tracker is a SQLite file on the Core, kept in Grist. It takes real Python formulas, and the file can be copied like any other.",
         "steps": [
           "Rebuild the tracker's tables in Grist",
-          "Ask John for the day-rate formula",
+          "Write the day-rate formula in Python",
           "Copy the file when the quarter closes"
         ],
         "fact": "Grist is a spreadsheet-database with real Python formulas, stored as a SQLite file you can copy."
@@ -1317,7 +1311,7 @@
       },
       "popup": {
         "title": "One Core behind the picket fence",
-        "body": "Client records, code, music and homework run on one Companion Core, behind the picket fence and the wisteria."
+        "body": "Client records, code, music and homework run on one Companion Core, in a cottage with two studies."
       }
     }
   ],

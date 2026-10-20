@@ -248,7 +248,7 @@
       },
       "popup": {
         "title": "Four things in the parcel",
-        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Jean reads the guide aloud while Steve cuts the tape."
+        "body": "Steve cuts the tape. Jean lifts out the Companion Core, a power cable, a quick-start guide and a recovery USB drive. She reads the guide aloud."
       }
     },
     {
@@ -287,7 +287,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Join it from a phone",
+        "title": "Join it from John's phone",
         "body": "John joins the Core's own network from his phone, then picks the home network.",
         "phone": {
           "header": "Wi-Fi",
@@ -320,7 +320,7 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Pick the first agents and apps",
+        "title": "Sally and John choose their agents",
         "body": "In the Companion Hub store, Sally picks Hermes and John picks OpenClaw. Companion Memory (beta) comes along, with Yuvomi, Joplin Server and Gitea. Then they walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
@@ -453,8 +453,8 @@
         "side": "left"
       },
       "popup": {
-        "title": "The hood's warranty was waiting",
-        "body": "When the range hood stops humming, the warranty filed last spring is waiting in Papra. The family's receipts, warranties and contracts are archived there, on the Core.",
+        "title": "The range hood hums its last",
+        "body": "When the range hood stops humming, the warranty is in Papra, added from the old Drive folder. The family's receipts, warranties and contracts are archived there, on the Core.",
         "chips": [
           "Papra",
           "alternative to Google Drive"
@@ -499,7 +499,7 @@
         "side": "left"
       },
       "popup": {
-        "title": "A note for every missed word",
+        "title": "A note for every vocab test",
         "body": "At the glass table, Jean writes a note for each French test, with the words she missed. Memos keeps them as Markdown on the Core, not in a notes service.",
         "chips": [
           "Memos",
@@ -594,7 +594,7 @@
       },
       "popup": {
         "title": "Headphones on, the shared room quiet",
-        "body": "Steve streams the family's music from the Core to his phone, and his headphones keep the room quiet for Jean. Navidrome plays only the files the family holds.",
+        "body": "Steve streams the albums the family owns from the Core to his phone. His headphones keep the room quiet for Jean. Navidrome plays only the files the family holds.",
         "chips": [
           "Navidrome",
           "alternative to Spotify"
@@ -643,7 +643,7 @@
       },
       "popup": {
         "title": "Three paces from bed to desk",
-        "body": "The video of Jean's school concert is too big for the family chat. Steve sends it past the old rocking horse to her laptop with PairDrop, over the home Wi-Fi.",
+        "body": "Jean's school concert video is too big for the family chat. Steve sends it past the old rocking horse with PairDrop, served by the Core, over the home Wi-Fi.",
         "chips": [
           "PairDrop",
           "alternative to AirDrop"
@@ -692,7 +692,7 @@
       },
       "popup": {
         "title": "The shared room, drawn to scale",
-        "body": "Jean measures the room she shares with Steve for a maths scale drawing. In draw.io she draws the beds, the desk and the shelf.",
+        "body": "Jean measures her shared room for a maths scale drawing. draw.io opens from the Core, and she draws the beds, the desk and the shelf.",
         "chips": [
           "draw.io",
           "alternative to Lucidchart"
@@ -739,20 +739,20 @@
         "side": "right"
       },
       "popup": {
-        "title": "A shortlist for the school fair",
-        "body": "Jean browses Spellbook on the Core, a catalog of local-AI and self-hosting tools, for a school-fair project. She writes down three names to show John.",
+        "title": "Three names for John",
+        "body": "Jean searches Spellbook on the Core for a computing club project. She copies three tool names onto a card for John to read at dinner.",
         "chips": [
           "Spellbook"
         ],
         "note": "Crash reports go to Companion Intelligence unless switched off."
       },
       "detail": {
-        "before": "A project idea meant a search engine and a dozen open tabs.",
-        "after": "Spellbook is a searchable catalog on the Core. Jean reads a few entries and writes down the three she likes.",
+        "before": "A project idea meant a search engine, a dozen open tabs and no list to hand John.",
+        "after": "Spellbook is a searchable catalog on the Core. Jean reads three entries and copies the names for John.",
         "steps": [
           "Search the catalog for a topic",
-          "Read a few entries",
-          "Write down three names for John"
+          "Read three entries",
+          "Copy the names onto a card for John"
         ],
         "fact": "Spellbook is a searchable catalog of local-AI and self-hosting tools."
       }
@@ -790,7 +790,7 @@
       },
       "popup": {
         "title": "The set text joins the library",
-        "body": "The school sends the set text as a file. Jean keeps it in a Koodo Reader library on the Core. She reads on the beanbag in the old playroom.",
+        "body": "The school sends the set text as a file. Jean keeps it in a Koodo Reader library on the Core. She reads it on the beanbag by the shelf.",
         "chips": [
           "Koodo Reader",
           "alternative to Apple Books"
@@ -799,7 +799,7 @@
       },
       "detail": {
         "before": "Jean read her set texts in Apple Books, with her notes kept in that app.",
-        "after": "Koodo Reader opens the school's file in a browser, from a library on the Core. Jean's notes sit there with it.",
+        "after": "Koodo Reader opens the school's file in a browser, from a library on the Core. Jean highlights the lines she wants in the same app.",
         "steps": [
           "Put the school's file in the library",
           "Open it in Koodo Reader",
@@ -840,7 +840,7 @@
       },
       "popup": {
         "title": "Last week's calls, this week's list",
-        "body": "Sally keeps four years of client notes in Joplin Server on the Core. On Monday she turns Friday's calls into the week's to-do list.",
+        "body": "Sally has moved four years of client notes into Joplin Server on the Core. At the standing desk on Monday, she turns Friday's calls into the week's to-do list.",
         "chips": [
           "Joplin Server",
           "alternative to Evernote"
@@ -991,8 +991,8 @@
         "side": "right"
       },
       "popup": {
-        "title": "The month's hours become invoices",
-        "body": "On the last Friday of the month, Sally turns her tracked hours into invoices in Invoice Ninja. Clients, quotes and invoices sit on the Core, not in a bookkeeping service.",
+        "title": "Invoice day reuses an old quote",
+        "body": "On the last Friday, Sally turns her tracked hours into invoices in Invoice Ninja. March's quote is there too, so she copies its rate into the new one.",
         "chips": [
           "Invoice Ninja",
           "alternative to FreshBooks"
@@ -1084,7 +1084,7 @@
       },
       "popup": {
         "title": "One extension comes from outside",
-        "body": "John writes a cut-list script in Code Server, and its folder sits on the Core. The one extension he adds comes from an outside registry.",
+        "body": "John writes a cut-list script in Code Server at the workbench, and its folder sits on the Core. The one extension he adds comes from an outside registry.",
         "chips": [
           "Code Server",
           "alternative to Cursor"
@@ -1214,7 +1214,7 @@
       },
       "popup": {
         "title": "The spare lives in the garage",
-        "body": "Duplicati backs up the Core's folders, with encryption, to a labelled drive. John keeps the drive in the garage, a floor away from the Core.",
+        "body": "Duplicati backs up the Core's folders, with encryption, to a local disk John has labelled. He keeps the disk in the garage cube storage, a floor away from the Core.",
         "chips": [
           "Duplicati",
           "alternative to Carbonite"
@@ -1353,7 +1353,7 @@
       },
       "popup": {
         "title": "Same stone, same lavender, three summers",
-        "body": "Every August Jean takes one picture of the lavender from the same stepping stone. PhotoPrism keeps all three summers side by side on the Core, without uploading them anywhere.",
+        "body": "Every August Jean takes one picture of the lavender from the same stepping stone. PhotoPrism lines the three summers up on the Core, and adding the next one uploads nothing.",
         "chips": [
           "PhotoPrism",
           "alternative to iCloud Photos"
@@ -1386,7 +1386,7 @@
       },
       "popup": {
         "title": "One Core, four different days",
-        "body": "A whiteboard, a workbench, a den and a shared bedroom, on one Companion Core."
+        "body": "A craft room, a workbench, a den and a shared bedroom, on one Companion Core."
       },
       "film": true
     }
