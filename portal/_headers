@@ -49,3 +49,12 @@ https://:version.:project.pages.dev/*
 /story/families.*
   ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable
+# The apps' real logos and screenshots, and Companion Hub's and the account page's (scripts/story/build-app-media.mts, `pnpm run story:media`): every
+# file is named <name>.<hash10>.webp, and portal:build ships only the files content/story/app-media.json names, so these two folders hold
+# nothing un-hashed.
+/portal/apps/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+/portal/ci/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable

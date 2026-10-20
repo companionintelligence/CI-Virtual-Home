@@ -1,8 +1,9 @@
 // The interactive tour, in a browser (scripts/test-portal.mts loads this file: every scripts/story/portal-tests/*.mts is a hook).
 // @check-house skip — it tests dist/, which `pnpm run portal:build` makes; run `pnpm run portal:test` (or `-- --only hooks`) after player work
 //
+//   (story v2: the card's words, not the card, are aria-hidden: it can hold the "More" control; the logo on a chip, the toggle and the open card are player-more.mts)
 //   T6  popup placement: at 1440 and 390, for every beat of one family, the card never covers the thing the beat is about (under 2 %),
-//       never touches the top bar or the dock, sits in the window, and (600 px and under) is a sheet of at most 38 % of the height;
+//       never touches the top bar or the dock, sits in the window, and (under 768 px) is a sheet of at most 55 % of the height (it was 38 % before the type grew; live pass 3);
 //       the chapters list has one button per beat; the live text is the beat's text; the end card covers under 5 % of the Core
 //   T7  keyboard and accessibility: Space, arrows, Shift+arrows, M, digits, C, Esc in the order the plan gives; focus is never taken on
 //       a beat change and never trapped; one polite live region; the canvas is an image with a label; captions are on screen whenever
@@ -16,7 +17,7 @@
 import type { TestCtx } from '../hooks.ts';
 
 type Page = any;
-const MAX_OVERLAP = 0.02, SHEET_MAX = 0.38, CORE_MAX = 0.05;
+const MAX_OVERLAP = 0.02, SHEET_MAX = 0.55, CORE_MAX = 0.05, PHONE_BELOW = 768;   // a phone is a window under 768 px wide: it takes the bottom sheet
 
 export default async function player(ctx: TestCtx): Promise<void> {
   const { check: ok, sleep, base, url } = ctx;
@@ -139,12 +140,12 @@ export default async function player(ctx: TestCtx): Promise<void> {
       if (m.overlapLive > MAX_OVERLAP) bad.push(`${b.id}: the card covers ${(m.overlapLive * 100).toFixed(1)} % of what it is about`);
       if (m.overlapBars > 0.5) bad.push(`${b.id}: the card touches the bars (${Math.round(m.overlapBars)} px2)`);
       if (m.card.x < -0.5 || m.card.y < -0.5 || m.card.x + m.card.w > m.vw + 0.5 || m.card.y + m.card.h > m.vh + 0.5) bad.push(`${b.id}: the card leaves the window (${[m.card.x, m.card.y, m.card.w, m.card.h].map(Math.round)})`);
-      if (vw <= 600 && (m.mode !== 'sheet' || m.card.h > m.vh * SHEET_MAX + 1)) bad.push(`${b.id}: a phone gets a sheet of at most 38 % (${m.mode}, ${(m.card.h / m.vh * 100).toFixed(0)} %)`);
+      if (vw < PHONE_BELOW && (m.mode !== 'sheet' || m.card.h > m.vh * SHEET_MAX + 1)) bad.push(`${b.id}: a phone gets a sheet of at most 55 % (${m.mode}, ${(m.card.h / m.vh * 100).toFixed(0)} %)`);
       const text: string = await page.$eval('.st-card .st-body', (e: HTMLElement) => e.textContent || '');
       if (text.replace(/\s+/g, ' ').trim() !== b.body.replace(/\s+/g, ' ').trim()) bad.push(`${b.id}: the card's words are not the beat's`);
     }
-    ok(bad.length === 0, `all ${story.beats.length} beats: the card is ${vw <= 600 ? 'a bottom sheet' : 'placed'}, never over the subject (worst ${(worstOverlap * 100).toFixed(2)} %), off the bars, in the window${bad.length ? ': ' + bad.slice(0, 4).join(' | ') : ''}`);
-    if (vw <= 600) ok(worstH <= SHEET_MAX + 0.003, `no sheet above 38 % of the height (tallest ${(worstH * 100).toFixed(1)} %)`);
+    ok(bad.length === 0, `all ${story.beats.length} beats: the card is ${vw < PHONE_BELOW ? 'a bottom sheet' : 'placed'}, never over the subject (worst ${(worstOverlap * 100).toFixed(2)} %), off the bars, in the window${bad.length ? ': ' + bad.slice(0, 4).join(' | ') : ''}`);
+    if (vw < PHONE_BELOW) ok(worstH <= SHEET_MAX + 0.003, `no sheet above 55 % of the height (tallest ${(worstH * 100).toFixed(1)} %)`);
     else ok(modes.size >= 1 && nSheet === 0, `the card floats at ${label} (${[...modes].join(', ')})`);
     // the chapters list has a button for every beat and the live text is the beat's
     await page.keyboard.press('c'); await sleep(300);
@@ -305,7 +306,8 @@ export default async function player(ctx: TestCtx): Promise<void> {
     const story = await rs(page);
     const tr = await page.evaluate(() => ({ summary: document.querySelector('.st-transcript summary')?.textContent, h3: document.querySelectorAll('.st-tr-body h3').length }));
     ok(tr.summary === 'Transcript' && tr.h3 === story.chapters.length, `the Transcript lists every chapter as a heading (${tr.h3})`);
-    ok(await page.evaluate(() => document.querySelector('.st-leader')!.getAttribute('aria-hidden') === 'true' && document.querySelector('.st-card')!.getAttribute('aria-hidden') === 'true'), 'the pins, the leader and the karaoke card are aria-hidden (the live region and the transcript carry the words once)');
+    // (story v2: the card itself is not hidden, because it can hold the "More" control, which is a control and must not be; its WORDS are: the kicker, the title, the karaoke body and the chips. player-more.mts holds the control.)
+    ok(await page.evaluate(() => document.querySelector('.st-leader')!.getAttribute('aria-hidden') === 'true' && ['.st-kicker', '.st-title', '.st-body', '.st-chips'].every(sel => { const e = document.querySelector(`.st-card ${sel}`); return !e || e.closest('[aria-hidden="true"]'); })), 'the pins, the leader and the karaoke card\'s words are aria-hidden (the live region and the transcript carry the words once)');
     ok(await page.evaluate(() => { const i = document.querySelector('.vh-scrub input'); return !!i && getComputedStyle(i).display !== 'none'; }) && (await page.$$eval('.st-tick', (e: Element[]) => e.length)) === story.chapters.length - 1, 'the timeline carries a tick for each chapter');
     await close();
   }
@@ -376,6 +378,8 @@ export default async function player(ctx: TestCtx): Promise<void> {
     ok(!(await page.evaluate(() => (window as any).__houseViewer.playing)), 'and nothing is playing: the tour waits for the start card');
     ok(!requests.some((u: string) => /\.m4a/.test(u)), 'and no narration file has been requested');
     await startSilent(page); await sleep(2500);
+    // (the first play of a cold GPU stalls the page for a few seconds while the first frame compiles its programs: the card follows the clock, so wait for it, up to 30 s, before judging whether the tour plays)
+    await page.waitForFunction(() => !!document.querySelector('.st-card:not([hidden])'), null, { timeout: 30000 }).catch(() => {});
     const sil = await page.evaluate(() => { const w = window as any; return { ac: w.__ac, src: w.__src, play: w.__play, playing: w.__houseViewer.playing, shown: !!document.querySelector('.st-card:not([hidden])'), toast: document.querySelector('.vh-toast')?.textContent || '' }; });
     ok(sil.ac === 0 && sil.src === 0 && sil.play === 0 && !(await state(page)).audioCreated, '"Start without sound" never creates an AudioContext or starts a source');
     ok(!requests.some((u: string) => /\.m4a/.test(u)), 'and costs no audio bytes (no .m4a request)');

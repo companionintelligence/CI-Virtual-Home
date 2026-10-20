@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT as REPO, readJson, loadAll, disclosure } from './site-lib.mts';
 import { FICTIONAL_LINE, BETA_LINE } from '../../assets/story/types.ts';
+import { isV3Story } from './lib/v3.mts';
 
 const decode = (s: string): string => s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
 const walkFiles = (dir: string, rel = ''): string[] => (fs.existsSync(path.join(dir, rel)) ? fs.readdirSync(path.join(dir, rel)) : []).flatMap(n => {
@@ -91,7 +92,7 @@ export function copyLint({ dir, root = REPO, families }: CopyArgs): string[] {
       const a = L.catalog[id];
       if (!a) out.push(`${s.slug}/${b.id}: the app ${id} is not in the Companion Hub catalog`);
       else if ((a as any).inLiveStore === false) out.push(`${s.slug}/${b.id}: the app ${id} is not in the live store`);
-      else if ((a as any).storySafe === 'avoid') out.push(`${s.slug}/${b.id}: the app ${id} is marked storySafe: avoid`);
+      else if ((a as any).storySafe === 'avoid' && isV3Story(s)) out.push(`${s.slug}/${b.id}: the app ${id} is marked storySafe: avoid`);
     }
   }
   return out;

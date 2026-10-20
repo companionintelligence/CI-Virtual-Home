@@ -2,10 +2,11 @@
 // Core, in the rooms that job happens in, with the store apps that do it, and says what each app replaces. The same file
 // feeds the lander and the ad cuts, so the ad rules (CI-Common ADS.md) are checked here too: the story is told, never
 // shown as an app screen. Members without an archetype are not held to the persona rules, so a legacy family is unaffected.
-import type { Beat, Member, Story } from '../../../assets/story/types.ts';
+import { ARCHETYPES, type Beat, type Member, type Story } from '../../../assets/story/types.ts';
 import type { Ctx } from './context.mts';
 import type { Report } from './report.mts';
 import { plain } from './text.mts';
+import { v3Severity } from './v3.mts';
 
 /**
  * Wording that describes what an app's screen looks like. ADS.md: no UI mockups, no screen recordings, no invented app
@@ -49,7 +50,10 @@ function checkMember(story: Story, m: Member, ctx: Ctx, out: Report): void {
   // ---- a beat whose app is one the archetype draws on
   const pool = new Set<string>(def.apps);
   if (!mine.some((b) => [...(b.app ? [b.app.id] : []), ...(b.with || [])].some((id) => pool.has(id)))) {
-    out.E('persona-cover', `${m.id}.apps`,
+    // A beat on an app the catalog now marks avoid (Kiwix was a learner pool app) is the member's old pool beat: a warning in a family that is not
+    // v3 (app-avoid is the one that names the app), an error in a v3 family, so the families written before v3 stay valid until each is rewritten.
+    const oldPool = mine.some((b) => [...(b.app ? [b.app.id] : []), ...(b.with || [])].some((id) => ctx.apps.get(id)?.storySafe === 'avoid'));
+    out.add(oldPool ? v3Severity(story) : 'error', 'persona-cover', `${m.id}.apps`,
       `${m.name} is the family's ${m.archetype} but no beat of theirs uses an app from that pool`,
       `Use one of: ${def.apps.join(', ')}.`);
   }
@@ -58,7 +62,7 @@ function checkMember(story: Story, m: Member, ctx: Ctx, out: Report): void {
   for (const b of mine) {
     const app = b.app ? ctx.apps.get(b.app.id) : undefined;
     if (!app || !app.replaces.length) continue;
-    if (!(b.popup.chips || []).some((c) => /^replaces /.test(c))) {
+    if (!(b.popup.chips || []).some((c) => /^(replaces|alternative to) /.test(c))) {
       out.W('persona-replaces', b.id, `${app.name} replaces ${app.replaces.join(', ')} in the catalog but the chips do not say what it replaces`,
         `Chips: "${app.name}", "replaces ${app.replaces[0]}" (and set app.replaces to ["${app.replaces[0]}"]).`);
     }
@@ -69,14 +73,15 @@ export function checkPersonas(story: Story, ctx: Ctx, out: Report): void {
   const typed = story.members.filter((m) => m.archetype);
   if (typed.length) {
     const kinds = new Set(typed.map((m) => m.archetype));
-    if (kinds.size < 2) out.E('persona-spread', 'archetype', `the family covers ${kinds.size} archetype (${[...kinds].join(', ')}); at least two`, 'Give another member a different archetype: organiser, builder, gamer, learner, maker or host.');
+    if (kinds.size < 2) out.E('persona-spread', 'archetype', `the family covers ${kinds.size} archetype (${[...kinds].join(', ')}); at least two`, `Give another member a different archetype: ${ARCHETYPES.join(', ').replace(/, ([^,]+)$/, ' or $1')}.`);
     for (const m of typed) checkMember(story, m, ctx, out);
   }
   out.stats.archetypes = [...new Set(typed.map((m) => m.archetype))];
 
   // ---- ADS.md: told, not shown. Applies to every beat, persona or not: the film and the lander show the same words.
   for (const b of story.beats) {
-    for (const [field, raw] of [['title', b.popup.title], ['body', b.popup.body], ['say', b.say?.text ?? '']] as const) {
+    const detail = b.detail ? ([['detail.before', b.detail.before], ['detail.after', b.detail.after], ...b.detail.steps.map((x, i) => [`detail.step${i}`, x]), ['detail.fact', b.detail.fact]] as const) : [];
+    for (const [field, raw] of [['title', b.popup.title], ['body', b.popup.body], ['say', b.say?.text ?? ''], ...detail] as readonly (readonly [string, string])[]) {
       const m = raw ? plain(raw).match(UI_DESCRIPTION) : null;
       if (m) out.R('persona-no-ui', `${b.id}.${field}`, `describes an app's screen ("${m[0]}"); the ad rules allow no UI mockups or invented app screens`, 'Tell what the person does and where the data lives, not what the screen looks like.');
     }

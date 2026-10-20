@@ -11,6 +11,9 @@ import { checkApps } from './apps.mts';
 import { checkAnchors } from './anchors.mts';
 import { checkQuotas } from './quotas.mts';
 import { checkPersonas } from './persona.mts';
+import { checkV2 } from './v2.mts';
+import { checkAgeChat } from './v3.mts';
+import { checkServices } from './services.mts';
 
 export function validateStory(data: unknown, ctx: Ctx): Report {
   const slug = typeof (data as any)?.slug === 'string' ? (data as any).slug : '(no slug)';
@@ -26,10 +29,13 @@ export function validateStory(data: unknown, ctx: Ctx): Report {
   checkShape(story, ctx, out);
   checkFtue(story, ctx, out);
   checkAgents(story, ctx, out, members);
+  checkAgeChat(story, ctx, members, out);
+  checkServices(story, ctx, out, members);
   checkApps(story, ctx, out);
   checkAnchors(story, ctx, out);
   checkQuotas(story, ctx, out);
   checkPersonas(story, ctx, out);
+  checkV2(story, ctx, out);
 
   for (const k of out.unusedReviewed()) out.W('reviewed', k, 'this allow-list entry matched no finding; remove it from content/story/reviewed.json');
   return out;

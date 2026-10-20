@@ -15,11 +15,11 @@
 import type { RuntimeStory, RuntimeBeat } from './runtime.js';
 import { beatIndexAt } from './runtime.js';
 import { trackFrameAt } from './track.js';
-import { focusRect, placePopup, placeEndCard, leaderTo, inter, PHONE_MAX_WIDTH, type Rect } from './place.js';
+import { focusRect, placePopup, placeSheet, placeEndCard, leaderTo, panelWidths, sheetLayout, typeFloor, SHEET_MAX_FRAC, type Rect, type CardSize, type SheetVariant } from './place.js';
 import { Narrator } from './audio.js';
 import { BeatCard, StartCard, EndCard, el, type StartChoice, type StartMember } from './popup.js';
 import { Chapters } from './chapters.js';
-import { Announcer, beatAnnouncement, labelCanvas, focusEl } from './a11y.js';
+import { Announcer, beatAnnouncement, labelCanvas, focusEl, hasFocus } from './a11y.js';
 import { bindKeys } from './keys.js';
 import { writeBeat, beatInUrl, familyPageUrl, beatFromQuery, memberFromQuery, memberBeat, tourHref } from './url.js';
 
@@ -72,7 +72,7 @@ export class Director {
   private stepSpeaking = false;
   private stepBeat = -1;         // reduced motion: the beat the person stepped to
   private endMode = false;
-  private place_: { rect: Rect; mode: 'card' | 'sheet'; subject: Rect | null; ok: boolean; overlapFocus: number } | null = null;
+  private place_: { rect: Rect; mode: 'card' | 'sheet'; subject: Rect | null; ok: boolean; overlapFocus: number; slot: string; variant: number; scrolls: boolean; type: number; refused: number } | null = null;
   private placedFor = '';
   private subject: Subject | null = null;
   private lastPlaying = false;
@@ -109,6 +109,8 @@ export class Director {
     }
 
     this.card = new BeatCard(host);
+    // story v2: "More" makes the card taller (or shorter): its place is solved again for the new size, and opening it pauses the tour, so the card does not change under a reader
+    this.card.onMore = open => this.moreChanged(open);
     const endTimings = rs.audio?.closing;
     this.end = new EndCard(host, rs, {
       timings: endTimings ? endTimings.words : null, durMs: endTimings ? endTimings.durationMs : 9000, hasNext: !!env.next,
@@ -148,6 +150,7 @@ export class Director {
       togglePlay: () => this.togglePlay(), step: (d, ch) => this.step(d, ch), toggleMute: () => this.toggleSound(),
       chapter: n => this.userGoChapter(n), toggleChapters: () => this.chapters.toggle(this.btnChapters, true),
       chaptersOpen: () => this.chapters.isOpen, closeChapters: () => this.chapters.close(true),
+      moreOpen: () => this.card.expanded, closeMore: () => { const had = hasFocus(this.card.el); this.card.setMore(false); if (had) this.card.focusMore(); },
       helpOpen: () => { const h = env.root.querySelector<HTMLElement>('.vh-help'); return !!h && !h.hidden; },
       flying: () => this.flying, leaveFreeLook: () => this.leaveFreeLook(),
     });
@@ -212,6 +215,11 @@ export class Director {
       input?.addEventListener('input', scrubbing);
     }
     this.env.root.dataset.story = '1';
+  }
+  /** The card's "More" opened or closed: the card is a different size, so it is placed again (against the same rest pose, so it still keeps off the subject). */
+  private moreChanged(open: boolean): void {
+    this.placedFor = ''; this.replace();
+    if (open && !this.stepMode && this.playing) this.env.control.setPlaying(false);
   }
   private onChapters(open: boolean): void {
     this.btnChapters.setAttribute('aria-expanded', String(open));
@@ -414,12 +422,18 @@ export class Director {
     const x0 = Math.max(0, cx - side / 2), y0 = Math.max(0, cy - side / 2), x1 = Math.min(w, cx + side / 2), y1 = Math.min(h, cy + side / 2);
     return x1 > x0 && y1 > y0 ? { x: x0, y: y0, w: x1 - x0, h: y1 - y0 } : null;
   }
-  /** Solve the card for the current beat against the beat's rest pose. Once per beat (and again when the window or the panels change). */
+  /**
+   * Solve the card for the current beat against the beat's rest pose. Once per beat (and again when the window or the panels change).
+   * A wide window gets a card of clamp(420 px, 32 vw, 560 px) (28 to 34 % of its width: a narrower and taller one, or one with tighter padding, when the full one would
+   * cover the subject), as tall as its content needs up to the room between the top bar and the dock and scrolling inside beyond that, on the side the subject leaves free;
+   * a phone, and a tablet held upright, gets a full-width sheet of up to 55 % of the height. Either way the type is the floor (portal/viewer.css --st-min: 1.5rem, 25.5 px, or
+   * clamp(20px, 5.4vw, 25.5px) on a phone) and is never shrunk to fit: the solver is offered variants of the card and refuses one whose type is under it (place.ts).
+   */
   private replace(): void {
     const i = this.beat; if (i < 0) return;
     const b = this.rs.beats[i], o = this.rect();
     if (o.w < 50) return;
-    const key = `${b.id}:${Math.round(o.w)}x${Math.round(o.h)}:${this.chapters.isOpen ? 1 : 0}`;
+    const key = `${b.id}:${Math.round(o.w)}x${Math.round(o.h)}:${this.chapters.isOpen ? 1 : 0}:${this.card.expanded ? 'more' : ''}`;
     if (key === this.placedFor) return;
     this.placedFor = key;
     const aspect = o.w / o.h, fr = trackFrameAt(this.rs.track, b.rest, aspect);
@@ -427,48 +441,52 @@ export class Director {
     const focus = this.subjectIn(fr, sub, o.w, o.h);
     const coreBox = this.rs.track.core;
     const core = coreBox && (b.chapter === this.rs.chapters[0].id) ? focusRect(fr.eye, fr.target, fr.fov, coreBox, o.w, o.h) : null;
-    const phone = o.w <= PHONE_MAX_WIDTH;
-    const width = phone ? o.w - 16 : o.w >= 1100 ? 360 : 320;
     const bars = this.barRects();
-    const maxH = phone ? o.h * 0.38 : Math.max(120, o.h - 24);
-    let out: ReturnType<typeof placePopup>;
-    if (phone) out = this.placeSheet(o, focus, core, bars, width, maxH);
-    else {
-      this.card.setCompact(false);
-      out = placePopup({ vw: o.w, vh: o.h, focus, core, bars, card: this.card.measure(width, maxH), phone: false, safe: { top: 12, right: 12, bottom: 12, left: 12 } });
-    }
+    const out = sheetLayout(o.w, o.h) ? this.placeSheetFor(o, focus, core, bars) : this.placePanelFor(o, focus, core, bars);
     this.card.put(out.rect, out.mode);
-    this.place_ = { rect: out.rect, mode: out.mode, subject: focus, ok: out.ok, overlapFocus: out.overlapFocus };
+    this.place_ = { rect: out.rect, mode: out.mode, subject: focus, ok: out.ok, overlapFocus: out.overlapFocus, slot: out.slot, variant: out.variant, scrolls: out.scrolls, type: out.type, refused: out.refused };
   }
-
+  /** the room between the top bar and the dock: where a card or a panel may stand (px, relative to the player) */
+  private roomFor(o: { w: number; h: number }, bars: Rect[]): { top: number; bottom: number } {
+    // (the top bar's items only: a tall panel that starts high, the chapters drawer, is something the card keeps off, not the top of the room)
+    const top = Math.max(12, bars.filter(x => x.y < o.h * 0.4 && x.h <= o.h * 0.25).reduce((m, x) => Math.max(m, x.y + x.h), 0) + 8);
+    const dock = bars.filter(x => x.y > o.h * 0.5 && x.w >= o.w * 0.6).reduce((m, x) => Math.min(m, x.y), o.h - 12);
+    return { top, bottom: dock - 8 };
+  }
   /**
-   * A phone's card is a sheet. place.ts puts it above the dock; when that covers the subject (a close shot of the Core sits low in a tall frame)
-   * there are three more things to try, in this order: the same sheet under the top bar, then the card without its phone drawing (the
-   * narration says what the drawing shows, and the transcript keeps its rows) at the bottom and at the top. The first that clears the
-   * subject, the Core and the bars wins; if none does the least bad is used (and `ok` says so, which the placement test reports).
+   * A wide window's card: the card at clamp(420 px, 32 vw, 560 px), then the same with tighter padding (padding may shrink, type may not), then a narrower one (90 and 80 % of
+   * that width, never under 360 px) with each padding: the first that keeps off the subject and shows the most of itself wins, each as tall as its content up to the room above
+   * the dock. The type is the same in all of them: a narrower card is a taller card, never a smaller one.
    */
-  private placeSheet(o: { w: number; h: number }, focus: Rect | null, core: Rect | null, bars: Rect[], width: number, maxH: number): ReturnType<typeof placePopup> {
-    const topEdge = bars.filter(b => b.y < o.h * 0.4).reduce((m, b) => Math.max(m, b.y + b.h), 0) + 8;
-    const area = (r: Rect) => Math.max(1, r.w * r.h);
-    let best: ReturnType<typeof placePopup> | null = null, bestCompact = false, bestCost = Infinity;
-    for (const compact of [false, true]) {
-      this.card.setCompact(compact);
-      const size = this.card.measure(width, maxH);
-      const bottom = placePopup({ vw: o.w, vh: o.h, focus, core, bars, card: size, phone: true, safe: { top: 12, right: 12, bottom: 12, left: 12 } });
-      const h = Math.min(size.h, o.h * 0.38);
-      const rt: Rect = { x: bottom.rect.x, y: topEdge, w: bottom.rect.w, h };
-      const top = (() => {
-        const fo = focus ? inter(rt, focus) / area(focus) : 0, co = core ? inter(rt, core) / area(core) : 0, bo = bars.reduce((a, b) => a + inter(rt, b), 0);
-        return { ...bottom, rect: rt, overlapFocus: fo, overlapCore: co, overlapBars: bo / area(rt), ok: fo < 0.02 && co < 0.02 && bo === 0 } as ReturnType<typeof placePopup>;
-      })();
-      for (const c of [bottom, top]) {
-        if (c.ok) { this.card.setCompact(compact); return c; }
-        const cost = c.overlapFocus + c.overlapCore + c.overlapBars * 10 + (compact ? 0.001 : 0);
-        if (cost < bestCost) { best = c; bestCompact = compact; bestCost = cost; }
-      }
+  private placePanelFor(o: { w: number; h: number }, focus: Rect | null, core: Rect | null, bars: Rect[]): ReturnType<typeof placePopup> & { type: number } {
+    this.card.setCompact(false);
+    const room = this.roomFor(o, bars), availH = Math.max(160, room.bottom - room.top);
+    const specs = panelWidths(o.w).flatMap((w, k) => [{ w, tight: false, cost: k * 0.4 }, { w, tight: true, cost: k * 0.4 + 0.1 }]);
+    const variants: CardSize[] = specs.map(sp => { this.card.setTight(sp.tight); const m = this.card.measure(sp.w, availH); return { w: m.w, h: m.h, full: m.full, type: m.type, cost: sp.cost, tag: `${Math.round(sp.w / o.w * 100)}%${sp.tight ? ' tight' : ''}` }; });
+    const out = placePopup({ vw: o.w, vh: o.h, focus, core, bars, card: variants[0], variants, floor: typeFloor(o.w), phone: false, gap: 18, safe: { top: room.top, right: 12, bottom: 12, left: 12 } });
+    this.card.setTight(specs[out.variant].tight);
+    return { ...out, type: variants[out.variant].type ?? 0 };
+  }
+  /**
+   * A phone's card (and a tablet held upright): a full-width sheet of up to 55 % of the height. It takes the room under the subject down to the dock, or the room under the top bar,
+   * whichever shows more of the card, and scrolls inside beyond that; it never covers the subject, the Core or a bar. The ways to set it, tried in this order, change the layout
+   * and never the type: the card with its phone drawing, without the drawing (the narration says what it shows, and the transcript keeps its rows), with the padding and gaps
+   * tighter, and both. place.ts's placeSheet picks the one that shows the most of the card without covering anything.
+   */
+  private placeSheetFor(o: { w: number; h: number }, focus: Rect | null, core: Rect | null, bars: Rect[]): ReturnType<typeof placeSheet> & { type: number } {
+    const width = o.w - 16, flags = [{ compact: false, tight: false }, { compact: true, tight: false }, { compact: false, tight: true }, { compact: true, tight: true }];
+    const maxH = o.h * SHEET_MAX_FRAC;
+    const variants: SheetVariant[] = [];
+    let type = 0;
+    for (const f of flags) {
+      this.card.setCompact(f.compact); this.card.setTight(f.tight);
+      const m = this.card.measure(width, maxH);
+      variants.push({ full: m.full, type: m.type, tag: `${f.compact ? 'compact ' : ''}${f.tight ? 'tight' : ''}`.trim() || 'full' });
+      if (!type || m.type < type) type = m.type;
     }
-    this.card.setCompact(bestCompact);
-    return best!;
+    const out = placeSheet({ vw: o.w, vh: o.h, focus, core, bars, variants, floor: typeFloor(o.w) });
+    const f = flags[out.variant]; this.card.setCompact(f.compact); this.card.setTight(f.tight);
+    return { ...out, type: variants[out.variant].type ?? type };
   }
 
   /** the subject's rectangle through the camera as it is right now (px, relative to the player), or null when it is behind it */
@@ -619,16 +637,29 @@ export class Director {
   }
 
   private showEnd(): void {
-    const o = this.rect(), phone = o.w <= PHONE_MAX_WIDTH;
-    const width = phone ? o.w - 16 : Math.min(460, o.w - 24);
-    const size = this.end.measure(width);
+    const o = this.rect(), bars = this.barRects(), room = this.roomFor(o, bars);
     const fr = trackFrameAt(this.rs.track, this.T, o.w / o.h);
     const core = this.rs.track.core ? focusRect(fr.eye, fr.target, fr.fov, this.rs.track.core, o.w, o.h) : null;
-    const bars = this.barRects();
-    const r = phone
-      ? { x: 8, y: Math.max(60, Math.min(...bars.filter(x => x.y > o.h * 0.5).map(x => x.y), o.h - 8) - size.h - 8), w: width, h: size.h }
-      : placeEndCard({ vw: o.w, vh: o.h, card: size, core, bars }).rect;
-    this.end.put({ ...r, w: width, h: size.h });
+    let r: Rect;
+    if (sheetLayout(o.w, o.h)) {
+      // a phone: a sheet above the dock, up to 55 % of the height, scrolling inside beyond that, in the room the Core leaves (as a beat's sheet takes the room under or over its subject:
+      // the end frame's camera composes the Core for a smaller sheet, so a taller one goes under the Core or over it, never on it; tighter padding before a scroll)
+      const width = o.w - 16, cap = o.h * SHEET_MAX_FRAC;
+      const flags = [false, true], variants: SheetVariant[] = flags.map(tight => { this.end.setTight(tight); const m = this.end.measure(width, cap); return { full: m.full, type: m.type, tag: tight ? 'tight' : 'full' }; });
+      const placed = placeSheet({ vw: o.w, vh: o.h, focus: core, core: null, bars, variants, floor: typeFloor(o.w) });
+      this.end.setTight(flags[placed.variant]);
+      r = placed.rect;
+    } else {
+      // a wide window: the end card is a panel like the beat's, at the width that keeps it off the Core
+      const availH = Math.max(160, room.bottom - room.top);
+      // (the end card says more than a beat's card: the width as wanted, then the same with tighter padding, then narrower and taller; the type is the same in all of them)
+      const specs = panelWidths(o.w).flatMap((w, k) => [{ w, tight: false, cost: k * 0.3 }, { w, tight: true, cost: k * 0.3 + 0.05 }]);
+      const variants: CardSize[] = specs.map(sp => { this.end.setTight(sp.tight); const m = this.end.measure(sp.w, availH); return { w: m.w, h: m.h, full: m.full, type: m.type, cost: sp.cost }; });
+      const placed = placeEndCard({ vw: o.w, vh: o.h, card: variants[0], variants, floor: typeFloor(o.w), core, bars, safe: { top: room.top, right: 12, bottom: o.h - room.bottom, left: 12 } });
+      this.end.setTight(specs[placed.variant].tight);
+      r = placed.rect;
+    }
+    this.end.put(r);
     this.end.show(true);
     this.closingDone = false;
     this.card.show(false);
@@ -654,7 +685,7 @@ export class Director {
         const inter = (a: Rect, b: Rect) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
         const c: Rect = { x: card.left - o.x, y: card.top - o.y, w: card.width, h: card.height };
         const bars = self.barRects().map(r => inter(c, r));
-        return { beat: self.beat, mode: self.place_?.mode, card: c, live, vw: o.w, vh: o.h, visible: self.card.visible, hidden: self.card.el.hidden, overlapLive: live ? inter(c, live) / Math.max(1, live.w * live.h) : 0, overlapBars: bars.reduce((a, b) => a + b, 0), planned: self.place_ ? { ok: self.place_.ok, overlapFocus: self.place_.overlapFocus } : null };
+        return { beat: self.beat, expanded: self.card.expanded, hasMore: self.card.hasMore, mode: self.place_?.mode, card: c, live, vw: o.w, vh: o.h, visible: self.card.visible, hidden: self.card.el.hidden, overlapLive: live ? inter(c, live) / Math.max(1, live.w * live.h) : 0, overlapBars: bars.reduce((a, b) => a + b, 0), planned: self.place_ ? { ok: self.place_.ok, overlapFocus: self.place_.overlapFocus, slot: self.place_.slot, variant: self.place_.variant, scrolls: self.place_.scrolls, type: self.place_.type, refused: self.place_.refused } : null };
       },
       /** Go to the end card (paused), and report where it sits and how much of the Core, as the camera sees it now, it covers. */
       async measureEnd() {
@@ -667,6 +698,13 @@ export class Director {
         return { visible: self.end.visible, card: c, core, vw: o.w, vh: o.h, overlapCore: core ? (x * y) / Math.max(1, core.w * core.h) : 0, bars: self.barRects().reduce((a, r) => a + Math.max(0, Math.min(c.x + c.w, r.x + r.w) - Math.max(c.x, r.x)) * Math.max(0, Math.min(c.y + c.h, r.y + r.h) - Math.max(c.y, r.y)), 0) };
       },
       goBeat: (i: number) => self.goBeat(i),
+      /** story v2: open or close the card's "More" and wait for the card to be placed again; false when the beat has none */
+      async setMore(open: boolean) {
+        if (!self.card.hasMore) return false;
+        self.card.setMore(open);
+        for (let k = 0; k < 4; k++) await new Promise(r => requestAnimationFrame(r));
+        return true;
+      },
       start: (c: StartChoice, at?: number) => self.begin(c, at),
     };
   }

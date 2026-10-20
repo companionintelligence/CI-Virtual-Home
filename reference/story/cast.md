@@ -7,7 +7,7 @@ a writer may change one if it stays unique. Rooms are the spec's own names (a na
 
 ## The fleet at a glance
 
-- Families with each archetype: organiser 24, builder 22, gamer 7, learner 18, maker 8, host 10.
+- Families with each archetype: organiser 24, builder 22, gamer 7, learner 18, maker 8, host 10, tech-family 0, business-owner 0, creative 0, contractor 0, marketer 0, lawyer 0, journalist 0, educator 0.
 - Households: solo-or-couple 9, young-family 8, older-kids 9, grandparents 4.
 - Business families: 16 of 30.
 - Narrators: v-bright-f 2, v-clear-f 6, v-deep-m 3, v-light-m 2, v-steady-m 5, v-storyteller-m 4, v-warm-f 6, v-young-f 2.

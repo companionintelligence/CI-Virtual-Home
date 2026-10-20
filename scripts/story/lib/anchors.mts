@@ -57,13 +57,17 @@ const TEXT_ROLES: { role: string; flag: string; re: (t: string) => boolean; what
 ];
 
 function checkTextRoles(story: Story, ctx: Ctx, out: Report, facts: HouseFacts | null, cast: ReturnType<Ctx['castBySlug']['get']> | null): void {
+  checkTextRoleStrings(story, ctx, out, story.beats.map((b): [string, string] => [b.id, beatText(b)]), facts, cast);
+}
+
+/** The text-role rule over any [place, text] pairs: the beats, and (story v2) the house lede, the spot lines, the day and the profiles. */
+export function checkTextRoleStrings(story: Story, ctx: Ctx, out: Report, items: [at: string, text: string][], facts: HouseFacts | null = ctx.house(story.house), cast: ReturnType<Ctx['castBySlug']['get']> | null = ctx.castBySlug.get(story.slug) ?? null): void {
   const flagged = new Set((cast?.homeFlags ?? []).map((f) => f.no as string));
-  for (const b of story.beats) {
-    const t = beatText(b);
+  for (const [at, t] of items) {
     for (const r of TEXT_ROLES) {
       if (!r.re(t)) continue;
       const missing = flagged.has(r.flag) || (facts ? !facts.roles.has(r.role) : (cast?.roles[r.role] || 0) === 0);
-      if (missing) out.E('text-role', b.id, `the text says ${r.what} but ${story.slug}'s house has none (see casting homeFlags)`, 'Tell the moment at the couch, the counter or another thing the house has. Never add furniture.');
+      if (missing) out.E('text-role', at, `the text says ${r.what} but ${story.slug}'s house has none (see casting homeFlags)`, 'Tell the moment at the couch, the counter or another thing the house has. Never add furniture.');
     }
   }
 }

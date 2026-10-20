@@ -45,7 +45,7 @@ const MIME: Record<string, string> = {
 };
 export const FONT_FILES: Record<string, string> = { manrope: 'manrope-latin-var.woff2', 'jetbrains-mono': 'jetbrains-mono-latin-var.woff2' };
 
-export type Served = { port: number; origin: string; base: string; url: (p?: string) => string; close: () => Promise<void>; requests: string[] };
+export type Served = { port: number; origin: string; base: string; url: (p?: string) => string; close: () => Promise<void>; requests: string[]; also: string[] };
 
 // Serve `dir` at `base` (e.g. '/ci-virtual-home/'). Anything outside `base` is a 404, so a URL that
 // escapes the sub-path (a leading-slash href) fails the test instead of quietly working. A directory serves its
@@ -53,7 +53,9 @@ export type Served = { port: number; origin: string; base: string; url: (p?: str
 // homes/aurora.html (the live site answers the .html address with a 308 to those; here both are served, so a test can
 // follow either). A path that is no file answers 404 with the site's 404.html, as Pages does. /__fonts/<name> serves
 // assets/fonts/ for the Google Fonts stub.
-export async function serve(dir: string, base = '/', listenPort = 0): Promise<Served> {
+// ---- tailscale ---- `extraHosts` are further addresses (for the preview: this machine's Tailscale address, see tailscaleAddress) to listen on, with the same
+// port as the first (127.0.0.1). The tests never pass any, so they listen on the loopback address only, as before.
+export async function serve(dir: string, base = '/', listenPort = 0, extraHosts: string[] = []): Promise<Served> {
   const root = path.resolve(dir);
   if (!base.endsWith('/')) base += '/';
   const requests: string[] = [];
@@ -80,12 +82,33 @@ export async function serve(dir: string, base = '/', listenPort = 0): Promise<Se
   await new Promise<void>(r => server.listen(listenPort, '127.0.0.1', () => r()));
   const port = (server.address() as AddressInfo).port;
   const origin = `http://127.0.0.1:${port}`;
+  // one more server for each extra address, answering with the same handler (an address that cannot be bound stops the preview with its error)
+  const more: http.Server[] = [];
+  for (const host of extraHosts) {
+    const s2 = http.createServer(server.listeners('request')[0] as http.RequestListener);
+    await new Promise<void>((res, rej) => { s2.once('error', rej); s2.listen(port, host, () => res()); });
+    more.push(s2);
+  }
   return {
-    port, origin, base, requests,
+    port, origin, base, requests, also: extraHosts.map(h => `http://${h}:${port}`),
     url: (p = '') => `${origin}${base}${p.replace(/^\//, '')}`,
-    close: () => new Promise<void>(r => server.close(() => r())),
+    close: () => Promise.all([server, ...more].map(x => new Promise<void>(r => x.close(() => r())))).then(() => undefined),
   };
 }
+
+// This machine's Tailscale IPv4 address and MagicDNS name, read from the `tailscale` command (null when it is not installed, not running or has no address).
+// `pnpm run portal:preview -- --tailscale` listens on that one address as well as the loopback one: other devices on the same tailnet reach the preview,
+// the local network does not (the preview is never bound to 0.0.0.0).
+export async function tailscaleAddress(): Promise<{ ip: string; dns: string | null } | null> {
+  const { execFileSync } = await import('node:child_process');
+  const run = (a: string[]): string => { try { return execFileSync('tailscale', a, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 10000 }).trim(); } catch { return ''; } };
+  const ip = run(['ip', '-4']).split('\n')[0].trim();
+  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) return null;
+  let dns: string | null = null;
+  try { dns = (JSON.parse(run(['status', '--json'])).Self?.DNSName || '').replace(/\.$/, '') || null; } catch { /* no name */ }
+  return { ip, dns };
+}
+// ---- end tailscale ----
 
 // room-creator.html links Google Fonts; captures serve the repo's own woff2 instead (as test-goldens.mts does),
 // so a thumbnail never depends on the network. The stylesheet is fulfilled at Google's origin, hence absolute URLs.

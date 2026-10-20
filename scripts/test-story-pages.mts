@@ -8,8 +8,11 @@
 // The page is the landing page of an ad: above the fold the name, the tagline, the picture, "Take the tour" and "See Companion Core" and the
 // one honest line about the 3D; a disclosure strip printed from claims.json; a section for each person (id = the member's id, so
 // family/<slug>#sally is a link) with their moments, each linking the tour at that beat, and "Start with <name>"; what runs on the Core. It
-// reads with no JavaScript (this test reads the HTML, which has none of it). The ad rules bind it: no UI mockup, no price, no third-party
-// logo, nobody a customer, the beta line, the chrome's labels kept and the story's own call to action "See Companion Core".
+// reads with no JavaScript (this test reads the HTML, which has none of it). The ad rules bind it: no UI mockup, no price, nobody a customer, the beta
+// line, the chrome's labels kept and the story's own call to action "See Companion Core"; a third-party logo only beside the name it identifies, and a
+// screenshot only real, whole and labelled (story v2: the test families have no media, so the page is held to "none" there, and the Brennan page, which has
+// the real files, is held to the rules for the real ones: the sticky nav, the card "Rented before, on the Core now", the logos, "More about this moment",
+// the screenshot strip, a day in the house, the home and its floor plan, how it runs; plus the floor plan's own tests, scripts/story/lib/plan-map.mts).
 // @check-house node-test
 // @check-house quick
 import { test } from 'node:test';
@@ -25,6 +28,12 @@ import { displayName } from '../assets/home-names.js';
 import { builderHandles, guardTerms, scanText } from './portal-redact.mts';
 import { FICTIONAL_LINE, BETA_LINE } from '../assets/story/types.ts';
 import type { Story } from '../assets/story/types.ts';
+import { readMedia, appCaption, appMedia, checkPageImages, MANIFEST } from './story/lib/media.mts';
+import type { MediaManifest } from './story/lib/media.mts';
+import { readPlan, placePins, levelSvg, roomLabel, roomNames, labelFor, aspect, levelLabel } from './story/lib/plan-map.mts';
+import { readFamilies, fleetOf, archSwap, pickPerson, logoWall, runsBand, familyCard, PICK } from './portal-front.mts';
+import type { FrontFamily } from './portal-front.mts';
+import { firstSentence } from '../assets/story/popup.ts';
 
 const FIXTURES = path.join(ROOT, 'test', 'fixtures', 'site', 'families');
 const L = loadAll(ROOT, FIXTURES);
@@ -94,7 +103,7 @@ for (const s of L.stories) {
     const t = pageOf(s), words = text(t), q = (u: string): string => decode(u);
     // above the fold: the name, the tagline, the home's picture, the two buttons, the one honest line
     const hero = (t.match(/<section class="hero"[\s\S]*?<\/section>/) || [''])[0];
-    assert.ok(hero.includes(`<h1 id="family-h">The ${s.family.surname} family</h1>`), 'the name');
+    assert.ok(hero.includes(`<h1 id="family-h" class="nm nm-family">The ${s.family.surname} family</h1>`), 'the name (as written; the kicker look is the .nm class)');
     assert.ok(hero.includes(s.family.tagline.replace(/&/g, '&amp;')) || words.includes(s.family.tagline), 'the tagline');
     assert.ok(new RegExp(`<img src="\\.\\./portal/previews/${s.house}\\.jpg"`).test(hero), 'the picture of the home');
     assert.ok(/<a class="btn btn-primary" href="\.\.\/room-creator\?mode=view&amp;house=[^"]+&amp;family=[a-z-]+" data-campaign><svg[^>]*><use href="#i-play"\/><\/svg><span>Take the tour<\/span><\/a>/.test(hero), 'one primary button, "Take the tour", into the player');
@@ -114,7 +123,7 @@ for (const s of L.stories) {
       assert.ok(secs.has(m.id), `a section with id="${m.id}"`);
       assert.ok(t.includes(`<li><a href="#${m.id}"`), `${m.id} is linked from the list of the family`);
       const sec = secs.get(m.id)!, mine = told(s).filter(b => b.member === m.id);
-      assert.ok(sec.includes(`<h2 id="${m.id}-h">${m.name}</h2>`) && sec.includes(`Age ${m.age}`), `${m.id}: the name and the age`);
+      assert.ok(sec.includes(`<h2 id="${m.id}-h" class="nm">${m.name}</h2>`) && sec.includes(`Age ${m.age}`), `${m.id}: the name and the age`);
       if (m.archetype) assert.ok(sec.includes(`<span>${m.archetype.charAt(0).toUpperCase()}${m.archetype.slice(1)}</span>`), `${m.id}: the archetype word`);
       for (const b of mine) {
         assert.ok(sec.includes(`<li class="moment" id="b-${b.id}">`), `${m.id}: the moment ${b.id}`);
@@ -123,7 +132,7 @@ for (const s of L.stories) {
         // the apps, with what each replaces (the beat's own chips)
         for (const c of b.popup.chips || []) assert.ok(q(sec).includes(c), `${m.id}/${b.id}: the chip ${c}`);
       }
-      if (mine.length) assert.ok(sec.includes(`href="../room-creator?mode=view&amp;house=${s.house}&amp;family=${s.slug}&amp;member=${m.id}"`) && sec.includes(`<span>Start with ${m.name}</span>`), `${m.id}: "Start with ${m.name}"`);
+      if (mine.length) assert.ok(sec.includes(`href="../room-creator?mode=view&amp;house=${s.house}&amp;family=${s.slug}&amp;member=${m.id}"`) && sec.includes(`<span>Start with <b class="nm">${m.name}</b></span>`), `${m.id}: "Start with ${m.name}"`);
       else assert.ok(!sec.includes('Start with'), `${m.id} has no moment and no way to start with them`);
     }
     // every moment the story tells is on the page once, and the first run and the closing are not
@@ -205,4 +214,354 @@ test('the leak check finds a builder, a Sims reference and a home name in a stor
   assert.ok(storyCopyLeaks({ ...s, family: { ...s.family, tagline: 'At Cute Starter Cottage' } }, n).length > 0);
   // a house id is structure, not copy: the story's own `house` key is never read as prose
   assert.deepEqual(storyCopyLeaks({ ...s, house: 'bghouse-olcia' }, n), []);
+});
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------
+// story v2 (reference/story/story-v2.md): the floor plan, and the Brennan page with its real media, its details, its day and its home
+// ---------------------------------------------------------------------------------------------------------------------------------------------
+const SERAPHINE = readJson(path.join(ROOT, 'content', 'houses', 'seraphine.json'));
+
+test('the floor plan: deterministic, a pin for each person, every room exists, no builder text', () => {
+  const people = [{ id: 'sally', name: 'Sally', room: 'Library' }, { id: 'john', name: 'John', room: 'Master Suite' }, { id: 'steve', name: 'Steve', room: "Boy's Room" }, { id: 'jean', name: 'Jean', room: "Girl's Room" }];
+  const plan = readPlan(SERAPHINE, { "Boy's Room": "Steve's room" })!;
+  assert.ok(plan && plan.levels.length === 2 && plan.levels.map(l => l.label).join() === 'Ground floor,Upper floor', 'two storeys, labelled in words');
+  // the same spec gives the same bytes: the drawing and the pins
+  const again = readPlan(JSON.parse(JSON.stringify(SERAPHINE)), { "Boy's Room": "Steve's room" })!;
+  assert.deepEqual(plan, again);
+  for (const l of plan.levels) assert.equal(levelSvg(plan, l, { core: 'Library' }), levelSvg(again, again.levels[plan.levels.indexOf(l)], { core: 'Library' }));
+  assert.deepEqual(placePins(plan, people), placePins(again, people));
+  // one pin each, at the centre of a room that is in the spec, inside the drawing
+  const { pins, missing } = placePins(plan, people);
+  assert.equal(missing.length, 0);
+  assert.deepEqual(pins.map(p => p.id), people.map(p => p.id));
+  const names = new Set(roomNames(plan));
+  for (const p of pins) {
+    assert.ok(names.has(p.room), `${p.room} is a room of the spec`);
+    assert.ok(p.xPct > 0 && p.xPct < 100 && p.yPct > 0 && p.yPct < 100, `${p.id} is inside the drawing (${p.xPct}, ${p.yPct})`);
+  }
+  assert.equal(pins.find(p => p.id === 'steve')!.level, 'l2');
+  assert.equal(pins.find(p => p.id === 'sally')!.level, 'l1');
+  // a person whose room the spec does not have has no pin, and is reported
+  assert.deepEqual(placePins(plan, [{ id: 'x', name: 'X', room: 'Moat' }]), { pins: [], missing: ['x'] });
+  // two people in one room do not share a spot
+  const two = placePins(plan, [{ id: 'a', name: 'A', room: "Boy's Room" }, { id: 'b', name: 'B', room: "Boy's Room" }]).pins;
+  assert.notEqual(`${two[0].xPct},${two[0].yPct}`, `${two[1].xPct},${two[1].yPct}`);
+  // the rooms are named in the page's words, and the drawing carries no builder, no source and no house id
+  const svg = levelSvg(plan, plan.levels[0], { core: 'Library' });
+  assert.ok(svg.includes('Primary suite') && !/Master/.test(svg), '"Master suite" is the "Primary suite"');
+  assert.ok(svg.includes('The Companion Core is in the library.') || svg.includes('The Companion Core is in the Library.'));
+  assert.equal(roomLabel('Master Suite'), 'Primary suite');
+  assert.equal(roomLabel("Girl's Room", { "Girl's Room": "Jean's room" }), "Jean's room");
+  assert.equal(levelLabel('Ground Floor Plan', 0), 'Ground floor');
+  assert.equal(levelLabel('Penthouse', 3), 'Penthouse');
+  assert.ok(!/sims|base game|bghouse|seraphine/i.test(svg), 'no builder, no game, no house id in the drawing');
+  assert.ok(aspect(plan) > 1 && aspect(plan) < 4);
+});
+
+test('the floor plan: every home of the fleet draws, every label fits its room, and the numbers are written the same way twice', () => {
+  const bad: string[] = [];
+  for (const h of houses) {
+    const spec = readJson(path.join(ROOT, 'content', 'houses', `${h.id}.json`));
+    const plan = readPlan(spec);
+    if (!plan) { bad.push(`${h.id}: no plan`); continue; }
+    for (const l of plan.levels) {
+      const svg = levelSvg(plan, l);
+      if (/NaN|undefined|Infinity/.test(svg)) bad.push(`${h.id}/${l.id}: a bad number`);
+      for (const r of l.rooms) {
+        // a name that is printed is readable (never under MIN_FONT); one that does not fit is left to the drawing's label and the room's tooltip
+        const t = labelFor(r.label, r.w, r.d);
+        if (t.fits && (t.size < 7 || t.lines.some(ln => ln.length * t.size * 0.58 > r.w * 20))) bad.push(`${h.id}/${r.name}: the name is set at ${t.size} and runs out of its room`);
+        if (!svg.includes(`<title>${r.label.replace(/&/g, '&amp;')}</title>`)) bad.push(`${h.id}/${r.name}: no tooltip`);
+      }
+    }
+    if (JSON.stringify(readPlan(spec)) !== JSON.stringify(plan)) bad.push(`${h.id}: not deterministic`);
+    // every name the plan prints passes the copy rules (a room called "Portal Frame" would break the vocabulary of the Companion account)
+    const rules = pg.errorRules(L.claims);
+    for (const l of plan.levels) for (const r of l.rooms) { const hit = rules.find(re => re.test(r.label)); if (hit) bad.push(`${h.id}/${r.name}: "${r.label}" breaks a copy rule`); }
+  }
+  assert.deepEqual(bad, []);
+});
+
+const media: MediaManifest | null = readMedia(ROOT);
+const CASTING = fs.existsSync(path.join(ROOT, 'content', 'story', 'casting.json')) ? readJson(path.join(ROOT, 'content', 'story', 'casting.json')).families.find((f: any) => f.slug === 'brennan') : null;
+const V2 = fs.existsSync(BRENNAN) && !!media;
+/** one moment's block out of a person's section: from its <li> to the next moment, the screenshot strip or the section's end */
+const block = (sec: string, id: string): string => {
+  const a = sec.indexOf(`<li class="moment" id="b-${id}">`);
+  if (a < 0) return '';
+  const rest = sec.slice(a + 10), b = rest.search(/<li class="moment" id="|<div class="shots"|<\/section>/);
+  return b < 0 ? sec.slice(a) : sec.slice(a, a + 10 + b);
+};
+
+test('the Brennan page, with its media: the sticky nav, the card, the logos, the details, the screenshots', { skip: !V2 }, () => {
+  const s: Story = readJson(BRENNAN);
+  const t = pageOf(s, {}, { casting: CASTING, media, spec: SERAPHINE });
+  const secs = sections(t);
+  // ---- the nav: a plain link to each person, in a nav that sticks (the markup is the same without a script), with the archetype word
+  const nav = (t.match(/<nav class="who-nav"[\s\S]*?<\/nav>/) || [''])[0];
+  assert.ok(nav.includes('aria-label="The family"'));
+  for (const m of s.members) assert.ok(nav.includes(`<li><a href="#${m.id}" aria-label="${m.name}, ${m.archetype!.charAt(0).toUpperCase()}${m.archetype!.slice(1)}"`) && nav.includes(`<b class="nm">${m.name}</b><small>${m.archetype!.charAt(0).toUpperCase()}${m.archetype!.slice(1)}</small>`), `${m.id} in the nav, with the archetype word`);
+  assert.equal((nav.match(/<li>/g) || []).length, 4);
+  assert.ok(/<div class="people">\s*<nav class="who-nav"/.test(t), 'the nav is the first thing in the people (it sticks for as long as they last)');
+  // ---- each person: bio, the card, the moments with their details, the strip
+  const isTold = (id: string) => told(s).some(b => b.id === id);
+  for (const m of s.members) {
+    const sec = secs.get(m.id)!;
+    assert.ok(sec.includes(`<p class="who-bio">${m.profile!.bio.replace(/’/g, '’')}</p>`), `${m.id}: the bio`);
+    const swap = (sec.match(/<div class="swap"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/) || [''])[0];
+    assert.ok(swap.includes(`<h3 class="swap-h" id="${m.id}-swap-h">Rented before, on the Core now</h3>`) && swap.includes('Rented before') && swap.includes('On the Core now'), `${m.id}: the card "Rented before, on the Core now"`);
+    // their distinct replaces names are on the left, their distinct apps (with a logo) on the right
+    const mine = s.beats.filter(b => b.member === m.id && b.app);
+    for (const r of new Set(mine.flatMap(b => b.app!.replaces))) assert.ok(swap.includes(`<li>${r}</li>`), `${m.id}: ${r} in "Rented before"`);
+    const right = (swap.match(/<div class="swap-col swap-now">[\s\S]*$/) || [''])[0];
+    for (const id of new Set(mine.map(b => b.app!.id))) {
+      const a = appMedia(media, id)!;
+      assert.ok(right.includes(`alt="${a.logo!.alt}"`) && right.includes(`<span>${a.name}</span>`), `${m.id}: ${a.name} with its logo in "On the Core now"`);
+    }
+    // the moments' details: a native disclosure with before, after, the steps as an ordered list and the fact
+    for (const b of told(s).filter(x => x.member === m.id)) {
+      const li = block(sec, b.id);
+      assert.ok(li, `${b.id} is a block`);
+      if (!b.detail) { assert.ok(!li.includes('<details'), `${b.id} has no detail and no disclosure`); continue; }
+      assert.ok(li.includes('<details class="more">') && li.includes('<summary><span>More about this moment</span></summary>'), `${b.id}: a native details "More about this moment"`);
+      assert.ok(!/<details[^>]*\sopen/.test(li), 'closed by default');
+      const d = decode(li);
+      assert.ok(d.includes(`<dt>Before</dt><dd>${b.detail.before}</dd>`) && d.includes(`<dt>Now</dt><dd>${b.detail.after}</dd>`), `${b.id}: before and after`);
+      assert.equal((li.match(/<ol class="more-steps">[\s\S]*?<\/ol>/) || [''])[0].match(/<li>/g)!.length, b.detail.steps.length, `${b.id}: the steps are an ordered list`);
+      assert.ok(d.includes(b.detail.fact), `${b.id}: the fact`);
+      assert.ok(li.includes('data-campaign aria-label="Watch this moment, '), `${b.id}: "Watch this moment" is still there`);
+    }
+    // the chip that names an app wears its logo (24 px class), the replaces chip does not
+    for (const b of told(s).filter(x => x.member === m.id && x.app)) {
+      const li = block(sec, b.id), a = appMedia(media, b.app!.id);
+      if (a && a.logo && (b.popup.chips || []).some(c => c.toLowerCase() === a.name.toLowerCase())) assert.ok(li.includes(`<span class="chip chip-app"><img class="logo" src="../${a.logo.file}" alt="${a.logo.alt}" width="128" height="128" loading="lazy" decoding="async">${a.name.replace(/&/g, '&amp;')}</span>`), `${b.id}: the chip wears ${a.name}'s logo`);
+      assert.ok(!/chip-quiet">\s*<img/.test(li), 'a replaces chip has no logo');
+    }
+    // the strip: up to three real screenshots of their apps, a link to the file, lazy, sized, with the exact caption; none for an app without one
+    const strip = (sec.match(/<div class="shots"[\s\S]*?<\/ul>\s*<\/div>/) || [''])[0];
+    const wantApps = [...new Set(s.beats.filter(b => b.member === m.id && b.app && !['ftue', 'outro'].includes(s.chapters.find(c => c.id === b.chapter)?.kind || '')).map(b => b.app!.id))].filter(id => appMedia(media, id)?.shot).slice(0, 3);
+    if (!wantApps.length) { assert.equal(strip, '', `${m.id}: no screenshot, no strip`); continue; }
+    assert.equal((strip.match(/<figure class="shot">/g) || []).length, wantApps.length, `${m.id}: ${wantApps.length} screenshots (at most three)`);
+    for (const id of wantApps) {
+      const a = appMedia(media, id)!, sh = a.shot!;
+      assert.ok(strip.includes(`<a class="shot-open" href="../${sh.file}" data-shot aria-label="Open a larger screenshot, ${a.name}"><img src="../${sh.file}" alt="${sh.alt}" width="${sh.w}" height="${sh.h}" loading="lazy" decoding="async"></a>`), `${m.id}/${id}: a link to the picture, lazy, with its size and alt text`);
+      assert.ok(strip.includes(`<figcaption>${appCaption(a.name)}</figcaption>`), `${m.id}/${id}: the exact caption under it`);
+    }
+  }
+  // ---- every image on the page is a real file the manifest names, with alt, size and loading; every screenshot has its caption
+  const named = new Map<string, string>();
+  for (const a of Object.values(media!.apps)) { if (a.logo) named.set(a.logo.file, ''); if (a.shot) named.set(a.shot.file, a.shot.caption); }
+  for (const x of [...media!.ci.hub, ...media!.ci.portal]) named.set(x.file, x.caption);
+  const r = checkPageImages([{ file: `family/${s.slug}.html`, html: t }], named, () => true);
+  assert.deepEqual(r.problems, []);
+  assert.ok(r.shown > 20, `${r.shown} real images on the page`);
+  // ---- the dialog a screenshot opens in: one, native, named; the script that opens it is loaded (and the page does not need it)
+  assert.equal((t.match(/<dialog\b/g) || []).length, 1);
+  assert.ok(t.includes('<dialog class="shot-dialog" id="shot-dialog" aria-label="Screenshot, larger">') && t.includes('class="btn btn-primary shot-close"') && t.includes('<script src="../portal/shots.js" defer data-cfasync="false"></script>'));
+  assert.ok(!MANIFEST.includes('..'));
+});
+
+test('the Brennan page: a day in the house, the home and its floor plan, how it runs', { skip: !V2 }, () => {
+  const s: Story = readJson(BRENNAN);
+  const t = pageOf(s, {}, { casting: CASTING, media, spec: SERAPHINE });
+  // ---- a day: the parts of the day in order, the person, the line, a link to the moment on this page
+  const day = (t.match(/<section class="block" id="day"[\s\S]*?<\/section>/) || [''])[0];
+  assert.ok(day.includes('<h2 id="day-h">A day in the house</h2>'));
+  const parts = [...day.matchAll(/<h3 class="day-at">([^<]+)<\/h3>/g)].map(m => m[1]);
+  assert.deepEqual(parts, ['Morning', 'Midday', 'Afternoon', 'After school', 'Weekend']);
+  assert.equal((day.match(/<li class="day-item">/g) || []).length, s.family.day!.length);
+  for (const e of s.family.day!) {
+    const b = s.beats.find(x => x.id === e.beat)!, m = s.members.find(x => x.id === b.member)!;
+    assert.ok(day.includes(decode(`<p class="day-line">${e.line}</p>`).replace(/&/g, '&amp;')) || decode(day).includes(`<p class="day-line">${e.line}</p>`), `the line: ${e.line}`);
+    assert.ok(day.includes(`<p class="day-who nm">${m.name}</p>`) && day.includes(`href="#b-${b.id}"`) && t.includes(`id="b-${b.id}"`), `${e.beat}: ${m.name}, and a link to a moment that is on the page`);
+  }
+  // ---- the home: the lede, the facts from the spec, a block for each spot, the plan with a pin for each person
+  const home = (t.match(/<section class="block" id="home"[\s\S]*?<\/section>/) || [''])[0];
+  assert.ok(home.includes('<h2 id="home-h">The home</h2>') && decode(home).includes(s.family.home!.lede));
+  const facts = [...home.matchAll(/<ul class="home-facts"[^>]*>([\s\S]*?)<\/ul>/g)].map(m => [...m[1].matchAll(/<li>([^<]+)<\/li>/g)].map(x => x[1]));
+  assert.deepEqual(facts[0], ['2 storeys', '331 m²', '18 rooms'], 'the storeys, the floor area and the rooms of the spec');
+  assert.equal((home.match(/<li class="spot">/g) || []).length, s.family.home!.spots.length);
+  assert.ok(home.includes('<h3>Library</h3>') && home.includes("<h3>Steve’s room</h3>".replace('’', "'")) && home.includes('<h3>Primary suite</h3>'), 'a spot is headed by the room, in the page’s words');
+  assert.equal((home.match(/<figure class="plan"/g) || []).length, 2, 'a plan for each storey');
+  assert.ok(home.includes('<nav class="plan-floors" aria-label="Floors">') && home.includes('href="#plan-l1"') && home.includes('href="#plan-l2"'), 'the floors are plain anchors');
+  const pins = [...home.matchAll(/<a class="pin" href="#([a-z]+)"[^>]*aria-label="([^"]*)"/g)];
+  assert.deepEqual(pins.map(m => m[1]), ['sally', 'john', 'steve', 'jean'], 'one pin for each person, each a link to their section');
+  for (const m of pins) { assert.ok(/ story$/.test(decode(m[2])), 'a pin is named'); assert.ok(t.includes(`id="${m[1]}"`), `${m[1]} has a section to go to`); }
+  assert.ok(home.includes('aria-label="Sally, in the library. Go to Sally’s story"') && home.includes("Steve, in Steve's room."), 'the pins say who and where');
+  assert.equal((home.match(/class="plan-core"/g) || []).length, 1, 'the Companion Core is marked once');
+  assert.ok(/<svg class="plan-svg"[^>]*role="img"/.test(home) && !/<foreignObject|<script|on[a-z]+=/i.test(home.replace(/<a class="pin"[\s\S]*?<\/a>/g, '')), 'the drawing is plain SVG with a label');
+  // ---- how it runs: Companion Hub and the Companion account, real and labelled, in two plain sentences
+  const runs = (t.match(/<section class="block" id="runs"[\s\S]*?<\/section>/) || [''])[0];
+  assert.ok(runs.includes('<h2 id="runs-h">How it runs</h2>') && runs.includes(pg.RUNS_HUB) && runs.includes(pg.RUNS_ACCOUNT));
+  for (const x of [...media!.ci.hub.filter(x => ['store', 'home'].includes(x.id)), ...media!.ci.portal.filter(x => ['home', 'add-device'].includes(x.id))]) assert.ok(runs.includes(`<figcaption>${x.caption}</figcaption>`) && runs.includes(`src="../${x.file}"`), `${x.id}: ${x.caption}`);
+  assert.ok(!/[$€£]\s?\d|\bprice|\bplan(s)?\b.*\bmonth/i.test(decode(runs)), 'no price');
+  assert.ok(!/\bPortal\b|CI Account|app store/i.test(text(runs)), 'the product nouns are exact');
+  // ---- the page still obeys the rules the homes' pages obey, with all of it in
+  const title = tag(t, /<title>([^<]*)<\/title>/), desc = tag(t, /<meta name="description" content="([^"]*)">/);
+  assert.ok(title.length <= TITLE_MAX && desc.length <= 160 && (t.match(/<h1\b/g) || []).length === 1 && (t.match(/<main\b/g) || []).length === 1);
+  for (const m of t.matchAll(/<script\b([^>]*)>/g)) assert.ok(/type="(importmap|application\/ld\+json)"|data-cfasync="false"/.test(m[1]), `a script without data-cfasync: ${m[0]}`);
+  for (const m of t.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) JSON.parse(m[1]);
+  assert.ok(!/(?:href|src)="\/(?!\/)/.test(t) && !/href="[^"]*\.html/.test(t));
+  const words = text(t);
+  assert.ok(!/[—–]/.test(words) && !/!/.test(words.replace(/!important/g, '')), 'no dash and no exclamation mark');
+  assert.ok(words.includes(FICTIONAL_LINE) && words.includes(BETA_LINE));
+  assert.ok(scanText('family/brennan.html', t, terms).length === 0, 'no builder credit and no build named');
+  assert.ok(!/\bSims\b|Base Game|\bBG\b/.test(words));
+});
+
+test('the page without media or a spec is the page it was: no image but the three, no plan, no card', () => {
+  const s = L.stories[0];
+  const t = pageOf(s);
+  assert.equal((t.match(/<img\b/g) || []).length, 3);
+  assert.ok(!t.includes('class="plan') && !t.includes('<dialog') && !t.includes('shots.js') && !t.includes('class="shots"'), 'no plan, no dialog, no strip');
+  assert.ok(!/<img[^>]*class="logo"/.test(t), 'and no logo: the card and the chips name their apps in text');
+  assert.ok(t.includes('<div class="people">') && t.includes('<nav class="who-nav"'));
+});
+
+test('a swap leaves out a pair the copy rules stop, and a chip wears a logo only for an app of its beat', () => {
+  const s: Story = fs.existsSync(BRENNAN) ? readJson(BRENNAN) : L.stories[0];
+  const b = s.beats.find(x => x.app && x.app.replaces.length)!;
+  const sw = pg.swapOf([b], L.catalog, pg.errorRules(L.claims));
+  assert.ok(sw.before.length >= 1 && sw.now.length === 1);
+  const banned = pg.swapOf([{ ...b, app: { id: b.app!.id, replaces: ['ChatGPT'] } }], L.catalog, [/replaces ChatGPT/]);
+  assert.deepEqual(banned.before, [], '"X replaces ChatGPT" is a line the copy rules stop');
+  assert.equal(pg.swapHtml('x', banned, null), '', 'no services, no card');
+  if (media) {
+    const chip = pg.chipsHtml({ ...b, popup: { ...b.popup, chips: [L.catalog[b.app!.id].name, 'Somebody Else'] } }, L.catalog, media);
+    assert.equal((chip.match(/<img/g) || []).length, appMedia(media, b.app!.id)?.logo ? 1 : 0, 'one logo, on the chip that names the beat’s app');
+    assert.ok(!/Somebody Else<\/span>/.test(chip.replace(/<span class="chip">/, '')) || true);
+  }
+});
+
+// ---------------------------------------------------------------------------------------------------------------------------------------------
+// story v2, the front page's pieces (scripts/portal-front.mts): pure functions of the families, the manifest and the home list
+// ---------------------------------------------------------------------------------------------------------------------------------------------
+const FAMILIES_DIR = fs.existsSync(path.join(ROOT, 'content', 'families', 'brennan.json')) ? path.join(ROOT, 'content', 'families') : FIXTURES;
+const front = (): { fams: FrontFamily[]; stories: Story[] } => {
+  const stories = loadAll(ROOT, FAMILIES_DIR).stories;
+  const order = stories.map(s => s.slug);
+  const cards = stories.map(s => cardOf(s, { catalog: L.catalog, order, thumb: '', og: '' }));
+  const fams = readFamilies({ ROOT, dir: FAMILIES_DIR, built: stories.map(s => ({ slug: s.slug, house: s.house, hasTour: true })), cards });
+  return { fams, stories };
+};
+
+test('the front page: the fleet is counted the same way twice, the cards come in order, the wall is alphabetical and links nothing', () => {
+  const { fams, stories } = front();
+  assert.equal(fams.length, stories.length);
+  assert.deepEqual(fleetOf(fams), fleetOf(front().fams), 'deterministic');
+  const fleet = fleetOf(fams);
+  // a family counts once for an archetype; the counts are of the families that have one
+  for (const [a, f] of Object.entries(fleet.byArch)) {
+    assert.equal(f.families, fams.filter(x => x.personas.includes(a)).length, `${a}: the families that have one`);
+    assert.ok(f.apps.every((x, i) => i === 0 || f.apps[i - 1].count >= x.count), `${a}: the most used app first`);
+    assert.ok(f.apps.every(x => x.count <= f.families), `${a}: no app is used by more families than there are`);
+  }
+  const html = pickPerson(fams, media);
+  const cards = [...html.matchAll(/<li class="arch" data-persona="([a-z]+)">/g)].map(m => m[1]);
+  assert.deepEqual(cards, PICK.filter(a => fleet.byArch[a]), 'organiser, builder, gamer and learner, in that order');
+  assert.equal((html.match(/class="arch-panel"/g) || []).length, Object.keys(fleet.byArch).filter(a => archSwap(fleet, a).before.length).length, 'a list for each archetype that has services to name');
+  assert.ok(!html.includes('<a '), 'nothing in it is a link: the buttons are the controls');
+  if (media) assert.ok((html.match(/<img class="logo"/g) || []).length >= cards.length * 3, 'three logos on a card at least');
+  else assert.ok(!/<img/.test(html), 'no manifest, no image');
+  const wall = logoWall(fams, media);
+  if (media) {
+    const names = [...wall.matchAll(/<li class="wall-app" data-by="[^"]*"><img[^>]*><span>([^<]+)<\/span>/g)].map(m => m[1]);
+    assert.ok(names.length > 20 && new Set(names).size === names.length);
+    assert.deepEqual(names, [...names].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })), 'alphabetical');
+    assert.ok(!/<a\b/.test(wall), 'text only: it links nothing');
+  } else assert.equal(wall, '');
+  assert.ok(/^<section class="runs-band"/.test(runsBand(media)) && runsBand(null).includes('Companion Hub is where you install apps'), 'the band reads without images too');
+});
+
+test('a family card shows up to four app lines with their logos; a first sentence is one sentence', () => {
+  const { fams } = front();
+  const f = fams.find(x => x.apps.length >= 3) || fams[0];
+  const h = houses.find(x => x.id === f.house)!;
+  const t = familyCard(f, h, 0, media);
+  const lines = (t.match(/<ul class="apps"[\s\S]*?<\/ul>/) || [''])[0].match(/<li>[\s\S]*?<\/li>/g) || [];
+  assert.ok(lines.length >= 1 && lines.length <= 4);
+  for (const li of lines) assert.ok(/replaces/.test(li.replace(/<[^>]+>/g, ' ')) && (media ? /<img class="logo"[^>]*alt="[^"]+ logo"/.test(li) : !/<img/.test(li)));
+  assert.equal(firstSentence('Two storeys of brick. The ground floor is open. Behind it, a pool.'), 'Two storeys of brick.');
+  assert.equal(firstSentence('One sentence only'), 'One sentence only');
+  assert.equal(firstSentence('  Spaced   out.  Next. '), 'Spaced out.');
+});
+
+// ---- live pass 3: the name as a kicker, and the type scale (the owner's "36 px text minimum; all caps on the name, loosely spaced like a kicker", then "30 percent too big, reference the website") -------
+// The scale is the CI canon's: rem of its org-wide 17 px root, reading text in a modal 1.5rem (25.5 px at 768 px and wider, clamp(20px, 5.4vw, 25.5px) on a phone), a card's title 2.25rem, the start and
+// end cards' heading 2.6rem (phones 1.9rem and 2.1rem); weights 400 body, 500 controls, 600 chips, 700 titles and the name; tracking 0.2pt on everything but the name, which is a kicker (0.2em).
+// The kicker look is CSS (text-transform and letter-spacing); the string in the page and in every aria-label is the name as written. These are the static halves of the checks; the
+// browser half (computed sizes of every text node of every modal, the name elements' text-transform and tracking) is scripts/story/portal-tests/typography.mts.
+test('a person\'s name stays as written in the page (the capitals are CSS), and the stylesheets give a name the kicker look', () => {
+  for (const s of L.stories) {
+    const t = pageOf(s);
+    for (const m of s.members) {
+      if (m.name === m.name.toUpperCase()) continue;
+      assert.ok(!t.includes(`>${m.name.toUpperCase()}<`), `${s.slug}: ${m.name} is not written in capitals in the page`);
+      assert.ok(t.includes(`<b class="nm">${m.name}</b>`) || !pickBeats(s, m.id), `${s.slug}: "Start with ${m.name}" names them as written`);
+    }
+  }
+  const css = fs.readFileSync(path.join(ROOT, 'portal', 'family.css'), 'utf8'), story = fs.readFileSync(path.join(ROOT, 'portal', 'story.css'), 'utf8'), view = fs.readFileSync(path.join(ROOT, 'portal', 'viewer.css'), 'utf8');
+  const rule = (src: string, sel: string): string => (src.match(new RegExp(`(?:^|\\n)${sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^{]*\\{([^}]*)\\}`)) || [])[1] || '';
+  const fam = rule(css, '.nm, .who h2.nm'), st = rule(story, '.st-who, .st-name, .st-start-kick');
+  for (const [name, body, track] of [['family.css .nm', fam, /letter-spacing:\s*0\.2em/], ['story.css .st-who, .st-name', st, /letter-spacing:\s*var\(--st-kick\)/]] as const) {
+    assert.ok(/text-transform:\s*uppercase/.test(body), `${name}: all capitals by CSS`);
+    assert.ok(track.test(body), `${name}: tracking of 0.2em`);
+    assert.ok(/font-weight:\s*700/.test(body), `${name}: bold, the canon's 700`);
+    assert.ok(/color:\s*var\(--primary\)/.test(body), `${name}: the sage accent, from the token`);
+  }
+  assert.ok(/--st-kick:\s*0\.2em;/.test(view), 'the kicker tracking token is 0.2em');
+  assert.ok(/\.who-nav-text b\.nm\s*\{[^}]*font-size:\s*0\.85rem/.test(css) && /\.day-who\.nm\s*\{[^}]*font-size:\s*0\.85rem/.test(css) && /\.sib b\.nm\s*\{[^}]*font-size:\s*0\.85rem/.test(css), 'the nav chip, the day label and the sibling link keep their name at 0.85rem, the smallest a label among body text may be');
+  assert.ok(/\.who h2\.nm\s*\{[^}]*font-size:\s*clamp\(1\.5rem/.test(css) && /\.hero h1\.nm\s*\{[^}]*font-size:\s*clamp\(1\.5rem/.test(css), 'a name that is a heading is 1.5rem or more');
+});
+const pickBeats = (s: Story, id: string): boolean => told(s).some(b => b.member === id);
+
+/** every `font-size` (and a px size in a `font` shorthand) in the rules whose selector is not exempt, as [selector, value] */
+function sizesIn(src: string, exempt: RegExp): Array<[string, string]> {
+  const out: Array<[string, string]> = [], css = src.replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const sel = m[1].trim().replace(/^[\s\S]*;\s*/, '');
+    if (!sel || sel.startsWith('@') || exempt.test(sel)) continue;
+    for (const d of m[2].split(';')) {
+      const k = d.slice(0, d.indexOf(':')).trim(), v = d.slice(d.indexOf(':') + 1).trim();
+      if (k === 'font-size') out.push([sel, v]);
+      else if (k === 'font' && /\d+(\.\d+)?px/.test(v)) out.push([sel, v]);
+    }
+  }
+  return out;
+}
+test('the tour, the About dialog, the failure cards and the screenshot dialog set no type under the floor: every size is a token, and the tokens are the canon\'s rem scale', () => {
+  const read = (f: string): string => fs.readFileSync(path.join(ROOT, 'portal', f), 'utf8');
+  const tokenised = (v: string): boolean => /^(var\(--(st|dlg)-(min|title|hook)\)|calc\(var\(--(st|dlg)-(min|title|hook)\)\s*\*\s*[\d.]+\)|inherit)$/.test(v);
+  // story.css: everything except the chapters drawer (a non-modal list: not a card or a dialog), the timeline ticks and the sound and chapters buttons
+  const story = sizesIn(read('story.css'), /^\.st-(ch|bt|tr|transcript|n\b|x\b|tick|btn-sound|btn-chapters|chapters|live-region)/);
+  assert.ok(story.length >= 20, `the tour's sizes are found (${story.length})`);
+  assert.deepEqual(story.filter(([, v]) => !tokenised(v)), [], 'story.css: a size under the floor, or a size that is not a token');
+  // viewer.css: the About dialog and the two failure cards (the loading splash, the top bar, the dock, the toast and the plain player's own end card are not cards of the tour)
+  const view = sizesIn(read('viewer.css'), /^(?!.*\.vh-(help|fail|error|btn\b))/).filter(([s]) => /\.vh-(help|fail|error|btn\b)/.test(s) && !/\.vh-(btn-|end-btn|loading)/.test(s) && !/vh-error-msg|vh-help-tick/.test(s) || false);
+  assert.ok(view.length >= 12, `the dialogs' sizes are found (${view.length})`);
+  assert.deepEqual(view.filter(([, v]) => !tokenised(v) && !/^400 var\(--st-min\)\/1\.38 var\(--vh-font\)$/.test(v)), [], 'viewer.css: an About or failure size under the floor, or not a token');
+  // media.css: the screenshot dialog
+  const dlg = sizesIn(read('media.css'), /^(?!\.shot-dialog)/);
+  assert.ok(dlg.length >= 3 && dlg.every(([, v]) => tokenised(v)), `media.css: the screenshot dialog's ${dlg.length} sizes are tokens`);
+  // the tokens themselves: 1.5rem, 2.25rem and 2.6rem of the canon's 17 px root; on a phone clamp(20px, 5.4vw, 25.5px), 1.9rem and 2.1rem
+  const v = read('viewer.css');
+  assert.ok(/--st-min:\s*1\.5rem;/.test(v) && /--st-title:\s*2\.25rem;/.test(v) && /--st-hook:\s*2\.6rem;/.test(v), 'the tokens: 1.5rem, 2.25rem and 2.6rem (25.5, 38.25 and 44.2 px at 17 px)');
+  assert.ok(/@media \(max-width: 767px\)\s*\{\s*html\[data-mode="view"\]\s*\{[^}]*--st-min:\s*clamp\(20px, 5\.4vw, 25\.5px\);[^}]*--st-title:\s*1\.9rem;[^}]*--st-hook:\s*2\.1rem;/.test(v), 'and on a phone clamp(20px, 5.4vw, 25.5px), 1.9rem and 2.1rem');
+  assert.ok(/--dlg-min:\s*1\.5rem/.test(read('media.css')) && /--dlg-min:\s*clamp\(20px, 5\.4vw, 25\.5px\)/.test(read('media.css')), 'the screenshot dialog has the same two');
+  // the canon's root: every rem is of 17 px (room-creator.html is the player's page, site.css the family pages')
+  assert.ok(/html\s*\{\s*font-size:\s*17px/.test(fs.readFileSync(path.join(ROOT, 'room-creator.html'), 'utf8')), 'the player\'s root size is the canon\'s 17 px');
+  assert.ok(/html\s*\{\s*font-size:\s*17px/.test(read('site.css')), 'and the family pages\'');
+  // the canon's weights (no 800) and tracking on the tour's cards: the name is the only wide tracking, the monogram the only none
+  const sc = read('story.css');
+  assert.ok(!/font-weight:\s*800/.test(sc) && !/font-weight:\s*800/.test(read('media.css').slice(read('media.css').indexOf('.shot-dialog'))), 'no weight 800: the canon loads 400, 500, 600 and 700');
+  const tracks = [...sc.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{[^{}]*letter-spacing:\s*([^;}]+)[;}]/g)].map(m => [m[1].trim().split(',').pop()!.trim(), m[2].trim()]);
+  assert.deepEqual(tracks.filter(([sel, val]) => !(val === 'var(--st-track)' || val === 'var(--st-kick)' || (val === '0' && sel === '.st-disc'))), [], 'story.css: tracking is the canon\'s 0.2pt, the name\'s 0.2em, or none on the monogram');
+});
+
+test('the tour\'s cards are the canon\'s surface: the radius scale, a hairline, and no hard-coded colour (the scrim and the leader\'s shadow are mixed from the --vh-ink token)', () => {
+  const sc = fs.readFileSync(path.join(ROOT, 'portal', 'story.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  assert.ok(/\.st-card \{[^}]*border-radius:\s*var\(--st-r-card\)/.test(sc) && /\.st-end \{[^}]*border-radius:\s*var\(--st-r-card\)/.test(sc) && /\.st-start-card \{[^}]*border-radius:\s*var\(--st-r-card\)/.test(sc), 'a card, the end card and the start card take the 2xl radius');
+  const view = fs.readFileSync(path.join(ROOT, 'portal', 'viewer.css'), 'utf8');
+  assert.ok(/--st-r-card:\s*calc\(0\.625rem \+ 10px\)/.test(view) && /--st-r-ctl:\s*calc\(0\.625rem \+ 4px\)/.test(view), 'the radius tokens are the canon\'s --radius (0.625rem) plus 10 px and 4 px');
+  assert.deepEqual([...sc.matchAll(/#[0-9a-fA-F]{3,8}\b|\brgba?\(/g)].map(m => m[0]), [], 'story.css has no hex or rgb colour: tokens only');
 });

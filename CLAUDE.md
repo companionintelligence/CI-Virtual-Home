@@ -27,6 +27,8 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 | `content/families/<slug>.voice.json`, `content/families/<slug>/audio/*.m4a` | `pnpm run story:voice -- <slug>` (local Kokoro; after the story text changed: `--stale`) |
 | `content/families/<slug>.bake.json` | `pnpm run story:bake -- <slug>` (after the voice, after a story or a role-table change) |
 | `portal/og/*.jpg`, `portal/og/manifest.json` | `pnpm run portal:og` (after a family's text or its preview picture changed) |
+| `portal/apps/<id>/*.webp`, `portal/ci/*.webp`, `content/story/app-media.json` | `pnpm run story:media` (real logos and screenshots, from the sibling repos' git objects at the manifest's pinned commits; `-- --check` fails when stale) |
+| `content/story/services.json` (the derived columns: `apps`, `storyApps`, `storyStatus`, `incumbentNameList`, `fleetHomes`, `rank`, `top80`) | `pnpm run story:services` (from `catalog-apps.json`, `claims.json` and `content/families`; the facts in the file are authored; `story:services:check` fails when stale and is part of `pnpm run test`; [`reference/story/story-v3.md`](reference/story/story-v3.md)) |
 | `content/families/films.json`, `content/families/<slug>/film/` | `pnpm run story:film -- <slug>` |
 | `dist/` (gitignored) | `pnpm run portal:build` |
 
@@ -112,7 +114,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   plain card, which goes to the player. The family cards are **static HTML in the built `index.html`** (`gallery.js` adopts them and does not draw them
   again), so a crawler, a visitor without JavaScript and an in-app browser with a slow script see them. The hero says "Fictional family. Real software.",
   `Take the tour` is its one action (the Brennans' tour, `HERO` in `portal-front.mts`), `See Companion Core` only points at the one Core band, and the
-  band, the header and the footer keep `Buy Companion Core` and `Download Companion`: say it once. No UI mockup, no third-party logo, no price, daylight
+  band, the header and the footer keep `Buy Companion Core` and `Download Companion`: say it once. No UI mockup, no invented screen (the real, labelled app media of the block below is the only third-party image), no price, daylight
   only, the beta line with every software claim, and a card's app line is `<app> replaces <service>` from the story, never a line `claims.json` stops.
   A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). The hero's "thirty" and the description's "Thirty homes" are
   checked against the number of homes (step 5b).
@@ -209,6 +211,44 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   that parses (never hand-edit; `story:ads -- --check` says when it is stale); the videos are under `video/ads/` (gitignored: videos never ship in git or on Pages). The GPU path is `--gl default`
   (`PERSONA_CUT_GL`; the machine's own GPU through ANGLE; `software` is SwiftShader, hours a cut; never `--use-angle=vulkan`, it draws blank frames). `story:film`'s files and exports are not changed by it.
 <!-- ---- end ad kit ---- -->
+<!-- ---- app media ---- -->
+- **App media** (`pnpm run story:media`, `scripts/story/build-app-media.mts`, `scripts/story/lib/media.mts`, contract `reference/story/story-v2.md` "App media"): real logos and real
+  screenshots of the apps the families use, of Companion Hub and of the Companion account page, as content-hashed WebP under `portal/apps/<id>/` and `portal/ci/` and the manifest
+  `content/story/app-media.json` (sorted keys, no timestamps; all generated and committed, never hand-edited). The rule: a **logo identifies the app named beside it** (alt text
+  "<Name> logo"; 128 px, at most 12 KB; also allowed inside a chip of an ad cut, never alone); a **screenshot is real, unedited, whole and labelled** ("Real screenshot of <Name> from a
+  Companion Hub QA run. Not a recording of this family."; 960 px wide, at most 90 KB) and is never composited into a scene, the tour or a cut (a cut inset stays off unless the owner says so).
+  Sources are read with `git cat-file` from the sibling repos at the commits the manifest pins, never from a working tree; each screenshot that ships was looked at by eye and its git
+  blob id is in `VETTED` (a changed source stops the build until someone looks again), and every candidate left out is in `rejected` with its reason (a person's name, an email, a login
+  secret, a token, an internal host or address, a payment detail, an error page, a blank page, a different product, a claim the site does not make). Only ffmpeg with libwebp makes the
+  files (no image library, none may be added); a rerun on the same ffmpeg gives the same bytes. Page generators read the manifest through `scripts/story/lib/media.mts` (`logoImg`,
+  `shotFigure`: lazy, width and height set, alt text, the caption; the front page loads none above the fold). `portal:build` (the `app media` blocks of `scripts/build-portal.mts`)
+  ships only the files the manifest names, fails on a manifest or page that names a missing file, an image without alt text, size or loading, or a screenshot without its caption,
+  warns with the list of apps a family uses that have no entry, and scans the manifest's words with the credit guard; `portal/_headers` keeps `/portal/apps/*` and `/portal/ci/*`
+  for a year. `pnpm run story:media:test` (quick, in `test:node`) holds all of it. Each source is a THIRD_PARTY.md row. A new app a family uses: `story:media`; a screenshot that
+  should ship is added to `SHOT_SHOWS` and `VETTED` only after looking at it.
+<!-- ---- end app media ---- -->
+<!-- ---- layout (story v2) ---- -->
+- **The layout of the story pages** (`scripts/story/pages.mts`, `scripts/story/lib/plan-map.mts`, `scripts/portal-front.mts`, `portal/family.css`, `portal/media.css`, `portal/gallery.css`; `assets/story/popup.ts` for the card): everything
+  a visitor reads is in the built HTML. A family page's people live in `<div class="people">`, whose first child is the sticky `nav.who-nav` (portal/family.js marks the person being read with `aria-current`; a chip never changes size);
+  a person's section holds, in order, the bio (`member.profile`, else their `work`), the card "Rented before, on the Core now" (`swapOf`/`swapHtml`: a pair the story's copy rules stop, such as "replaces ChatGPT", is left out here and
+  on the cards), the moments (the chip that names an app wears its real 24 px logo; a beat's `detail` is a native `<details class="more">`) and up to three real screenshots of their apps (a link to the picture,
+  `data-shot`, with the manifest's exact caption; `portal/shots.js` opens it in the page's one `<dialog>`). After the people: "A day in the house" (`family.day`), "The home" (`family.home`, and from the spec: storeys, floor
+  area, rooms and the floor plan, one SVG for each storey in one shared view box with a 44 px pin for each person as an HTML link laid over it by percentage; a room's name is the spec's in sentence case, "Master" is "Primary",
+  "Portal" is "Archway", and a name that does not fit its room at 7 units is a tooltip only), the apps with their logos, "How it runs" and how the Core starts. The **plan is a diagram** (it says so): never a plan of walls, doors or
+  stairs, and the pin is where the casting puts the person. The front page's "Pick a person", logo wall and "How it runs" band are written at three markers in `index.html` by the `story v2` block of `scripts/build-portal.mts`
+  (a card's button is the persona filter; the lists, the dimming and the cards are CSS and `aria-pressed`; with no script the cards and the lists read). Real media is lazy and sized (`checkPageImages` in the build); the
+  front page requests no media image in its first screen. In the tour the card's "More" button takes no height (negative margins on a 44 px box), pauses the tour when it opens, and on a phone a sheet (up to 55 % of the height) never grows into the
+  subject. Never put a screenshot in the tour, a scene or an ad cut; never an app's logo without its name beside it. Tests: `pnpm run test:node` (`test-story-pages.mts`) and `portal:test -- --only hooks`.
+<!-- ---- end layout (story v2) ---- -->
+<!-- ---- type scale (live pass 3) ---- -->
+- **The tour's cards and dialogs are set in the CI canon's type scale** (the owner asked for a 36 px minimum and, seeing it, for 30 percent less, "reference the website"): rem of the canon's 17 px root, reading text in a
+  modal (card, start and end cards, About, failure card, the family page's screenshot dialog) **1.5rem = 25.5 px at 768 px and wider, `clamp(20px, 5.4vw, 25.5px)` on a phone**, a card's title 2.25rem, the start and end cards'
+  heading 2.6rem; Manrope 400 body, 500 controls, 600 chips, 700 titles and names (no 800), 0.2pt tracking. The tokens are `--st-min`, `--st-title` and `--st-hook` in `portal/viewer.css`; every size in the tour's CSS is one of them.
+  A card is `clamp(420px, 32vw, 560px)` wide, a phone's sheet up to 55 % of the height; the placement solver (`assets/story/place.ts`) may shrink padding, choose another slot or a narrower and taller card, and never shrinks type.
+  **A person's name is a kicker** on every card, dialog and family-page label: all capitals by CSS (the text and aria-labels stay as written), 700, 0.2em of tracking, in the accent; "THE BRENNAN FAMILY" the same. Film and ad
+  canvases keep 36 design px (a canvas is shown scaled down). Details and the table: `reference/story/player.md`, "Type and size". Tests: `scripts/test-story-place.mts`, `scripts/test-story-pages.mts`, `typography.mts`
+  (`pnpm run portal:test -- --only hooks`).
+<!-- ---- end type scale (live pass 3) ---- -->
 - The engine's modules are not fingerprinted by file name, so `portal:build` names each one by a content hash in the page's
   import map (and `?v=` on the `<script>`/`<link>` tags), and `portal/_headers` asks every file to revalidate. Never give an
   un-hashed file a long cache time or load a module around the build's rewriting: after a deploy a returning visitor would

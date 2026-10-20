@@ -204,10 +204,10 @@ test('a popup never covers the focus subject, the Core or the bars', () => {
   assert.deepEqual(placePopup({ vw: 1440, vh: 900, focus: R(560, 300, 320, 260), bars, card }), placePopup({ vw: 1440, vh: 900, focus: R(560, 300, 320, 260), bars, card }));
 });
 
-test('on a phone the card is a bottom sheet of at most 38% of the height, above the dock', () => {
+test('on a phone the card is a bottom sheet of at most 55% of the height, above the dock (it was 38% before the type grew: live pass 3; scripts/test-story-place.mts holds the rest)', () => {
   const p = placePopup({ vw: 390, vh: 844, focus: { x: 90, y: 150, w: 210, h: 220 }, bars: [{ x: 0, y: 0, w: 390, h: 56 }, { x: 0, y: 764, w: 390, h: 80 }], card: { w: 380, h: 420 } });
   assert.equal(p.mode, 'sheet'); assert.equal(p.slot, 'sheet');
-  assert.ok(p.rect.h <= 844 * 0.38 + 1e-6 && p.rect.y + p.rect.h <= 764, `${JSON.stringify(p.rect)}`);
+  assert.ok(p.rect.h <= 844 * 0.55 + 1e-6 && p.rect.y + p.rect.h <= 764, `${JSON.stringify(p.rect)}`);
   assert.ok(p.ok, 'the camera put the anchor above the sheet');
   const e = placeEndCard({ vw: 1440, vh: 900, card: { w: 520, h: 300 }, core: { x: 560, y: 350, w: 320, h: 200 } });
   assert.ok(e.ok && e.overlapCore < 0.05, 'the end card clears the Core');

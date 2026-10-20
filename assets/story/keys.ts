@@ -7,8 +7,8 @@
 //   M                narration on or off (turning it on is a gesture: it is what makes the audio context)
 //   1 to 9           chapter n
 //   C                the chapters panel (in free-look C stays the player's cutaway toggle)
-//   Esc              closes, in this order: the shortcuts panel (the player's), the chapters panel, then free-look (back to the tour) and
-//                    at last the player's own fly exit
+//   Esc              closes, in this order: the shortcuts panel (the player's), the chapters panel, the card's "More" (focus goes back to its
+//                    button when it was inside the card), then free-look (back to the tour) and at last the player's own fly exit
 //   [ and ]          the previous and next family (the player's; not taken here)
 //   ?                the shortcuts panel (the player's; mount.ts rewrites its text for the tour)
 //
@@ -24,6 +24,9 @@ export interface KeyActions {
   toggleChapters(): void;
   chaptersOpen(): boolean;
   closeChapters(): void;
+  /** the beat card's "More" is open (story v2): Esc closes it before it leaves free-look */
+  moreOpen(): boolean;
+  closeMore(): void;
   helpOpen(): boolean;
   flying(): boolean;
   leaveFreeLook(): void;
@@ -55,6 +58,7 @@ export function bindKeys(a: KeyActions): () => void {
     if (k === 'Escape') {
       if (a.helpOpen()) return;                              // the player closes it
       if (a.chaptersOpen()) { take(); a.closeChapters(); return; }
+      if (a.moreOpen()) { take(); a.closeMore(); return; }
       if (a.flying()) { take(); a.leaveFreeLook(); return; }
       return;
     }

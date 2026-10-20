@@ -1,11 +1,19 @@
-// The tour's surfaces: the beat card (a floating card, or a bottom sheet at 600 px and under), the leader from the card to the thing it
-// is about, the start card and the end card. Pure DOM; the director decides when and where (place.ts decides where, once per beat).
+// The tour's surfaces: the beat card (a card or side panel of clamp(420px, 32vw, 560px), or a full-width bottom sheet under 768 px), the leader
+// from the card to the thing it is about, the start card and the end card. Pure DOM; the director decides when and where (place.ts decides where, once per beat).
+//
+// Type (live pass 3, the owner's "36 px text minimum" and then "30 percent too big, reference the website"): every line of text on these surfaces is set from the
+// tokens --st-min (1.5rem of the canon's 17 px root = 25.5 px at 768 px and wider, clamp(20px, 5.4vw, 25.5px) on a phone), --st-title (2.25rem) and --st-hook (2.6rem),
+// defined in portal/viewer.css and used by portal/story.css. Nothing here sets a size; a card that is taller than its room scrolls inside (and keeps the word being
+// spoken in view), it never shrinks its type. A person's name is kept as the person wrote it in the DOM and in every aria-label; the kicker look (all caps, 0.2em
+// tracking, bold, the sage accent) is CSS on `.st-name`.
 //
 // One surface for the words. The card shows the kicker (who, with which companion), the title, the beat's text lit word by word as it is
-// spoken (captions.ts), the apps as chips, the agent's scripted line when it comes, the note and a "Fictional" footer. The bottom sheet is
-// the same card re-laid-out, not a second component. Everything on it is aria-hidden: a screen reader gets the beat from the live region
-// (a11y.ts) and the transcript (chapters.ts), once.
-import type { RuntimeStory, RuntimeBeat } from './runtime.js';
+// spoken (captions.ts), the apps as chips (the chip that names an app wears its real logo, 1.3 times the type: story v2, `rs.media`), a "More" toggle when
+// the beat has a `detail` (at the right of the kicker, where it takes no height; it opens the beat's `before` and `after` in the card, and the
+// director solves the card's place again for the taller card; no screenshot is ever in the tour), the agent's scripted line when it comes, the note and a "Fictional" footer. The bottom sheet is
+// the same card re-laid-out, not a second component. The words on it are aria-hidden: a screen reader gets the beat from the live region
+// (a11y.ts) and the transcript (chapters.ts), once. The "More" button and what it opens are controls, so they are not hidden.
+import type { RuntimeStory, RuntimeBeat, RuntimeLogo } from './runtime.js';
 import type { Member } from './types.js';
 import { FICTIONAL_LINE, SIGNOFF } from './types.js';
 import { Karaoke } from './captions.js';
@@ -46,7 +54,13 @@ export class BeatCard {
   private sayText!: HTMLElement;
   private narration: Karaoke | null = null;
   private sayLine: Karaoke | null = null;
+  private more: HTMLButtonElement | null = null;
+  private morePanel: HTMLElement | null = null;
+  private touched = 0;                     // the last time a person scrolled or pressed in the card (the card then stops following the lit word for a while)
+  private litNow: Element | null = null;
   beatId: string | null = null;
+  /** the "More" toggle was pressed (or Esc closed it): the director solves the card's place again and, on opening, pauses the tour */
+  onMore: (open: boolean) => void = () => {};
   constructor(host: HTMLElement) {
     this.leader = svg('svg', { class: 'st-leader', 'aria-hidden': 'true', focusable: 'false' }) as SVGSVGElement;
     this.line = svg('line', { class: 'st-leader-line' });
@@ -54,36 +68,70 @@ export class BeatCard {
     this.pin.append(svg('circle', { class: 'st-pin-ring', r: 9 }), svg('circle', { class: 'st-pin-dot', r: 4 }));
     this.leader.append(this.line, this.pin);
     this.el = el('div', 'st-card');
-    this.el.hidden = true; this.el.setAttribute('aria-hidden', 'true');
+    this.el.hidden = true;
+    for (const ev of ['wheel', 'touchstart', 'pointerdown', 'keydown'] as const) this.el.addEventListener(ev, () => { this.touched = Date.now(); }, { passive: true });
     host.append(this.leader, this.el);
     this.leader.style.display = 'none';
   }
 
   /** Build the card for a beat. The narration's word timings are the lock's (null: pace by length). */
   fill(rs: RuntimeStory, b: RuntimeBeat, chapterTitle: string, timings: { narration: [string, number, number][] | null; say: [string, number, number][] | null }, durMs: { narration: number; say: number }): void {
-    this.beatId = b.id;
     const c = this.el;
+    // (the card is rebuilt for each beat: a "More" button that had focus is replaced by the next beat's, so focus is not lost from the keyboard)
+    const keepFocus = !!c.querySelector('.st-more-btn:focus');
+    this.beatId = b.id;
     c.textContent = '';
+    c.classList.remove('st-open');
+    c.scrollTop = 0; this.litNow = null;
+    this.more = null; this.morePanel = null;
     c.dataset.kind = b.popup.kind === 'phone' ? 'phone' : 'card';
     c.dataset.beat = b.id;
     const member = b.member ? rs.members.find(m => m.id === b.member) : undefined;
     const agentOwner = b.agent ? rs.members.find(m => m.id === b.agent) : undefined;
-    const kick = el('div', 'st-kicker');
+    const kick = hide(el('div', 'st-kicker'));
     if (member) {
-      kick.append(disc(member), el('span', 'st-who', member.name));
+      kick.append(disc(member), el('span', 'st-who st-name', member.name));
       if (agentOwner?.companion) kick.append(el('span', 'st-with', `with ${agentOwner.companion.name}`));
     } else kick.append(el('span', 'st-who', chapterTitle));
-    const title = el('h3', 'st-title', b.popup.title);
-    this.body = el('p', 'st-body');
+    // the top line: who, and (when the beat has a detail) the "More" toggle at its right
+    const head = el('div', 'st-head');
+    head.append(kick);
+    const title = hide(el('h3', 'st-title', b.popup.title));
+    this.body = hide(el('p', 'st-body'));
     this.narration = new Karaoke(this.body, b.popup.body, timings.narration, durMs.narration);
-    c.append(kick, title, this.body);
-    if (b.popup.kind === 'phone' && b.popup.phone) c.append(phoneDrawing(b.popup.phone.header, b.popup.phone.rows));
+    c.append(head, title, this.body);
+    if (b.popup.kind === 'phone' && b.popup.phone) c.append(hide(phoneDrawing(b.popup.phone.header, b.popup.phone.rows)));
+    // the chips
+    const row = el('div', 'st-row');
     if (b.popup.chips && b.popup.chips.length) {
-      const ul = el('ul', 'st-chips');
-      for (const t of b.popup.chips) ul.append(el('li', /^replaces /i.test(t) ? 'st-chip st-chip-replaces' : 'st-chip', t));
-      c.append(ul);
+      const ul = hide(el('ul', 'st-chips'));
+      for (const t of b.popup.chips) {
+        const replaces = /^replaces /i.test(t), logo = replaces ? null : logoOf(rs, b, t);
+        const li = el('li', replaces ? 'st-chip st-chip-replaces' : logo ? 'st-chip st-chip-app' : 'st-chip');
+        if (logo) li.append(logoImg(logo));
+        li.append(t);
+        ul.append(li);
+      }
+      row.append(ul);
     }
-    this.say = el('div', 'st-say');
+    if (b.detail) {
+      const id = `st-more-${b.id}`;
+      const btn = el('button', 'st-more-btn'); btn.type = 'button';
+      btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', id); btn.setAttribute('aria-label', 'More about this moment');
+      btn.append(el('span', 'st-more-label', 'More'));
+      btn.insertAdjacentHTML('beforeend', '<svg class="st-more-i" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>');
+      btn.addEventListener('click', () => this.setMore(!this.expanded, true));
+      const panel = el('div', 'st-more'); panel.id = id; panel.hidden = true;
+      panel.setAttribute('role', 'group'); panel.setAttribute('aria-label', 'More about this moment');
+      for (const [k, v] of [['Before', b.detail.before], ['Now', b.detail.after]] as const) {
+        const p = el('p', 'st-more-row'); p.append(el('b', '', k), ' ', v); panel.append(p);
+      }
+      this.more = btn; this.morePanel = panel;
+      head.append(btn);
+    }
+    if (row.childNodes.length) c.append(row);
+    if (this.morePanel) c.append(this.morePanel);
+    this.say = hide(el('div', 'st-say'));
     this.sayText = el('p', 'st-say-text');
     this.sayLine = null;
     if (b.say) {
@@ -92,29 +140,66 @@ export class BeatCard {
       this.say.append(el('span', 'st-say-who', speaker), this.sayText);
       c.append(this.say);
     }
-    if (b.popup.note) c.append(el('p', 'st-note', b.popup.note));
-    c.append(el('p', 'st-foot', FICTIONAL_LINE));
+    if (b.popup.note) c.append(hide(el('p', 'st-note', b.popup.note)));
+    c.append(hide(el('p', 'st-foot', FICTIONAL_LINE)));
     this.setSayVisible(false);
+    if (keepFocus && this.more) { try { this.more.focus({ preventScroll: true }); } catch { /* the card is not showing yet */ } }
   }
+  /** is the detail open */
+  get expanded(): boolean { return !!this.more && this.more.getAttribute('aria-expanded') === 'true'; }
+  get hasMore(): boolean { return !!this.more; }
+  /** Open or close the detail. `user`: a press of the button (the tour is paused when it opens, and the opened text is brought into view in a card that scrolls). */
+  setMore(open: boolean, user = false): void {
+    if (!this.more || !this.morePanel || open === this.expanded) return;
+    this.more.setAttribute('aria-expanded', String(open));
+    this.morePanel.hidden = !open;
+    this.el.classList.toggle('st-open', open);
+    this.onMore(open);
+    if (open && user) requestAnimationFrame(() => { const c = this.el, p = this.morePanel, h = c.querySelector<HTMLElement>('.st-head'); if (p && c.scrollHeight > c.clientHeight + 1) c.scrollTop = Math.max(0, p.offsetTop - (h ? h.offsetHeight : 0) - 8); });
+    if (!open) this.el.scrollTop = 0;
+  }
+  /** the "More" button, to give focus back to it when Esc has closed the detail */
+  focusMore(): void { try { this.more?.focus({ preventScroll: true }); } catch { /* gone */ } }
   /** a phone's card without its drawing of the phone's screen (the placer asks for it when the full card would cover the subject) */
   setCompact(on: boolean): void { this.el.classList.toggle('st-compact', on); }
+  /** a card with its padding and gaps a little tighter, on a phone's sheet or a wide window's card (the type is not touched: it never goes under the floor; every word, chip and the footer stay) */
+  setTight(on: boolean): void { this.el.classList.toggle('st-tight', on); }
   setSayVisible(on: boolean): void { this.say.classList.toggle('st-on', on); }
   /** light the narration at `ms` into its clip (null: plain text) */
-  setNarration(ms: number | null): void { this.narration?.set(ms); }
-  setSay(ms: number | null): void { this.sayLine?.set(ms); }
+  setNarration(ms: number | null): void { this.narration?.set(ms); if (ms !== null) this.keepLit(this.body); }
+  setSay(ms: number | null): void { this.sayLine?.set(ms); if (ms !== null) this.keepLit(this.sayText); }
   get hasSay(): boolean { return !!this.sayLine; }
+  /**
+   * A card whose content is taller than its room scrolls inside; the word being spoken stays in view while it plays (unless the person has scrolled
+   * the card themselves in the last few seconds, or the card is not showing). Instant with reduced motion.
+   */
+  private keepLit(line: HTMLElement): void {
+    const c = this.el, w = line.querySelector('.st-now');
+    if (!w || w === this.litNow) return;
+    this.litNow = w;
+    if (c.hidden || c.scrollHeight <= c.clientHeight + 1 || Date.now() - this.touched < 4000) return;
+    const cr = c.getBoundingClientRect(), wr = w.getBoundingClientRect(), head = c.querySelector<HTMLElement>('.st-head'), stuck = c.classList.contains('st-open') && head ? head.offsetHeight : 0;
+    const margin = 28, top = cr.top + stuck + margin, bottom = cr.bottom - margin;
+    let to = c.scrollTop;
+    if (wr.top < top) to -= top - wr.top; else if (wr.bottom > bottom) to += wr.bottom - bottom; else return;
+    c.scrollTo({ top: Math.max(0, to), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }
 
-  /** the card's size at this width, for the placer (it is laid out hidden, then shown where it goes) */
-  measure(width: number, maxH: number): { w: number; h: number } {
+  /** the card's size at this width, for the placer (it is laid out hidden, then shown where it goes): `full` is the height its content needs, `h` that or `maxH` */
+  measure(width: number, maxH: number, collapsed = false): { w: number; h: number; full: number; type: number } {
     const c = this.el;
     c.style.width = `${Math.round(width)}px`; c.style.maxHeight = `${Math.round(maxH)}px`; c.style.height = '';
     const was = c.hidden, vis = c.style.visibility;
+    // (`collapsed`: the size the card has with its "More" closed, whichever way it is now)
+    const panel = this.morePanel, panelWas = panel ? panel.hidden : true;
+    if (collapsed && panel) panel.hidden = true;
     c.hidden = false; c.style.visibility = 'hidden';
     this.setSayReserve(true);
-    const h = Math.min(maxH, c.scrollHeight);
+    const full = Math.ceil(c.scrollHeight), h = Math.min(maxH, full), type = minTypePx(c);
     this.setSayReserve(false);
     c.hidden = was; c.style.visibility = vis;
-    return { w: Math.round(width), h: Math.ceil(h) };
+    if (panel) panel.hidden = panelWas;
+    return { w: Math.round(width), h: Math.ceil(h), full, type };
   }
   /** the agent's line takes its room from the start (so the card never grows when it appears) */
   private setSayReserve(on: boolean): void { this.el.classList.toggle('st-reserve', on); }
@@ -122,6 +207,8 @@ export class BeatCard {
     const c = this.el;
     c.dataset.mode = mode;
     c.style.left = `${Math.round(r.x)}px`; c.style.top = `${Math.round(r.y)}px`; c.style.width = `${Math.round(r.w)}px`; c.style.height = `${Math.round(r.h)}px`; c.style.maxHeight = '';
+    // a card whose content is taller than its box scrolls inside it, so it takes the pointer (one that fits leaves the picture to the pointer)
+    c.dataset.scroll = c.scrollHeight > Math.round(r.h) + 1 ? '1' : '0';
   }
   show(on: boolean): void {
     const c = this.el;
@@ -149,6 +236,39 @@ export class BeatCard {
   destroy(): void { this.el.remove(); this.leader.remove(); }
 }
 
+/**
+ * The smallest font size (px) of any text in a laid-out surface: what the placement solver is told so it can refuse a card that would set its type under the floor.
+ * Text inside a hidden element, or with no box, is not judged. Call it while the surface is laid out (BeatCard.measure does).
+ */
+export function minTypePx(root: HTMLElement): number {
+  let min = Infinity;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let n = w.nextNode(); n; n = w.nextNode()) {
+    if (!(n.textContent || '').trim()) continue;
+    const e = n.parentElement; if (!e || e.closest('[hidden]')) continue;
+    const cs = getComputedStyle(e); if (cs.display === 'none') continue;
+    min = Math.min(min, parseFloat(cs.fontSize));
+  }
+  return Number.isFinite(min) ? min : 0;
+}
+/** a part of the card that is only for the eye: a screen reader has the beat from the live region */
+function hide<T extends HTMLElement>(e: T): T { e.setAttribute('aria-hidden', 'true'); return e; }
+/** the real logo of the app a chip names (the beat's `app` or one of its `with`), when the shipped story carries one */
+function logoOf(rs: RuntimeStory, b: RuntimeBeat, chip: string): RuntimeLogo | null {
+  const want = chip.trim().toLowerCase();
+  for (const id of [b.app?.id, ...(b.with || [])]) {
+    const m = id && rs.media ? rs.media[id] : null;
+    if (m && m.logo && m.name.toLowerCase() === want) return m.logo;
+  }
+  return null;
+}
+function logoImg(l: RuntimeLogo): HTMLImageElement {
+  const i = document.createElement('img');
+  i.className = 'st-logo'; i.alt = l.alt; i.width = l.w; i.height = l.h; i.decoding = 'async';
+  i.src = new URL(l.file, location.href).href;
+  return i;
+}
+
 function disc(m: Member): HTMLElement {
   const d = el('span', 'st-disc', m.name.slice(0, 1).toUpperCase());
   d.dataset.colour = m.colour;
@@ -164,6 +284,12 @@ function phoneDrawing(header: string, rows: string[]): HTMLElement {
   rows.forEach((r, i) => { const li = el('li', '', r); li.style.setProperty('--i', String(i)); ul.append(li); });
   p.append(ul);
   return p;
+}
+
+/** the first sentence of a text ("Two storeys of brick under a dark shingle roof. The ground floor ..." gives the first); the whole text when it has one */
+export function firstSentence(t: string): string {
+  const m = t.replace(/\s+/g, ' ').trim().match(/^.*?[.!?](?=\s|$)/);
+  return m ? m[0] : t.trim();
 }
 
 // ---- the start card -----------------------------------------------------------------------------------------------------------------------
@@ -182,20 +308,22 @@ export class StartCard {
     members?: StartMember[];
     onChoose: (c: StartChoice, at?: number) => void;
   }) {
-    // the outer element is the scrim, the inner one the dialog
+    // the outer element is the scrim, the inner one the dialog. Two columns on a wide screen (the copy and the buttons; the family and the fine print), one below.
     const wrap = (this.el = el('div', 'st-start'));
     const c = el('div', 'st-start-card');
     c.setAttribute('role', 'dialog'); c.setAttribute('aria-labelledby', 'st-start-h'); c.setAttribute('aria-describedby', 'st-start-p');
     wrap.append(c);
+    const copy = el('div', 'st-start-copy'), more = el('div', 'st-start-more');
+    c.append(copy, more);
     const shared = opts.shared;
     const mins = Math.max(1, Math.round(rs.duration / 60));
-    c.append(el('p', 'st-start-kick', shared ? 'A shared moment' : opts.member ? `Starting with ${opts.member.name}` : 'Interactive tour'));
+    // (the kicker line is all caps with wide tracking in the sage accent, and "Starting with John" is a person's name: the string stays as written, CSS makes the capitals)
+    copy.append(el('p', 'st-start-kick', shared ? 'A shared moment' : opts.member ? `Starting with ${opts.member.name}` : 'Interactive tour'));
     const h = el('h2', '', shared ? shared.popup.title : `The ${rs.family.surname} family home`);
     h.id = 'st-start-h';
     const p = el('p', 'st-start-p', shared ? `From the ${rs.family.surname} family tour. ${rs.family.tagline}` : rs.family.tagline);
     p.id = 'st-start-p';
-    c.append(h, p);
-    c.append(el('p', 'st-start-meta', `${rs.beats.length} stops, about ${mins} minute${mins === 1 ? '' : 's'}. ${FICTIONAL_LINE}`));
+    copy.append(h, p, el('p', 'st-start-meta', `${rs.beats.length} stops, about ${mins} minute${mins === 1 ? '' : 's'}. ${FICTIONAL_LINE}`));
     const acts = el('div', 'st-actions');
     this.primary = el('button', 'st-btn st-primary', shared ? 'Play from here' : opts.audio ? 'Start with narration' : 'Start the tour');
     this.primary.type = 'button'; this.primary.dataset.start = opts.audio ? 'sound' : 'silent';
@@ -205,7 +333,10 @@ export class StartCard {
     this.secondary.addEventListener('click', () => opts.onChoose('silent'));
     acts.append(this.primary);
     if (opts.audio) acts.append(this.secondary);
-    c.append(acts);
+    copy.append(acts);
+    // story v2: the home in one line (the first sentence of the family's `home.lede`, which is true to the house's spec)
+    const lede = rs.family.home?.lede ? firstSentence(rs.family.home.lede) : '';
+    if (lede) copy.append(el('p', 'st-start-home', lede));
     // the family: a way in at one person's room. It starts without sound (a person who chose a name did not choose a voice; M turns narration on).
     const members = (opts.members || []).filter(m => m.beat >= 0);
     if (members.length) {
@@ -216,16 +347,16 @@ export class StartCard {
         const li = el('li'), b = el('button', 'st-member'); b.type = 'button'; b.dataset.member = m.id;
         b.setAttribute('aria-label', `Start with ${m.name}${m.archetype ? `, ${m.archetype}` : ''}`);
         const d = el('span', 'st-disc', m.name.slice(0, 1).toUpperCase()); d.dataset.colour = m.colour; d.setAttribute('aria-hidden', 'true');
-        b.append(d, el('span', 'st-member-name', m.name));
+        b.append(d, el('span', 'st-member-name st-name', m.name));
         if (m.archetype) b.append(el('span', 'st-member-role', m.archetype));
         b.addEventListener('click', () => opts.onChoose('silent', m.beat));
         li.append(b); ul.append(li);
       }
-      g.append(gh, ul); c.append(g);
+      g.append(gh, ul); more.append(g);
     }
     const fine = el('ul', 'st-fine');
     for (const t of FINE_PRINT) if (opts.audio || t !== SYNTHETIC_VOICE_LINE) fine.append(el('li', '', t));
-    c.append(fine);
+    more.append(fine);
     host.append(wrap);
   }
   focus(): void { this.primary.focus({ preventScroll: true }); }
@@ -246,26 +377,29 @@ export class EndCard {
     c.append(h, el('p', 'st-end-lead', 'This family is fictional. The software is real.'));
     this.body = el('p', 'st-body st-end-body');
     this.karaoke = new Karaoke(this.body, `${rs.closing.body} ${SIGNOFF}`, opts.timings, opts.durMs);
-    c.append(this.body);
     const acts = el('div', 'st-actions');
     const link = (label: string, href: string, cls: string) => { const a = el('a', cls, label) as HTMLAnchorElement; a.href = href; a.target = '_blank'; a.rel = 'noopener'; return a; };
     const cta = link(rs.closing.cta.label, rs.closing.cta.url, 'st-btn st-primary');
     const mk = (label: string, fn: () => void) => { const b = el('button', 'st-btn', label); b.type = 'button'; b.addEventListener('click', fn); return b; };
-    // (the one story call to action, the one download link, then the ways on inside the site)
+    // (the one story call to action, the one download link, then the ways on inside the site. At this size the buttons are tall, so they come before the closing words: a card
+    // that scrolls shows the way on first and the words, which the voice also says, after them)
     acts.append(cta, link('Download Companion', DOWNLOAD_URL, 'st-btn'), mk('Replay', opts.onReplay));
     if (opts.hasNext) acts.append(mk('Next family', opts.onNext));
     acts.append(mk('Share this family', opts.onShare));
-    c.append(acts, el('p', 'st-note', 'Companion OS is in beta.'));
+    c.append(acts, this.body, el('p', 'st-note', 'Companion OS is in beta.'));
     host.append(c);
   }
   setNarration(ms: number | null): void { this.karaoke.set(ms); }
-  put(r: Rect): void { const c = this.el; c.style.left = `${Math.round(r.x)}px`; c.style.top = `${Math.round(r.y)}px`; c.style.width = `${Math.round(r.w)}px`; }
-  measure(width: number): { w: number; h: number } {
+  /** the card with its padding and gaps tighter (the type is never touched): for a window too short for the card at its full padding */
+  setTight(on: boolean): void { this.el.classList.toggle('st-tight', on); }
+  put(r: Rect): void { const c = this.el; c.style.left = `${Math.round(r.x)}px`; c.style.top = `${Math.round(r.y)}px`; c.style.width = `${Math.round(r.w)}px`; c.style.height = `${Math.round(r.h)}px`; c.style.maxHeight = ''; }
+  /** the card's size at this width: `full` is the height its content needs, `h` that or `maxH` (a taller one scrolls inside) */
+  measure(width: number, maxH = Infinity): { w: number; h: number; full: number; type: number } {
     const c = this.el, was = c.hidden, vis = c.style.visibility;
-    c.style.width = `${Math.round(width)}px`; c.hidden = false; c.style.visibility = 'hidden';
-    const h = c.offsetHeight;
+    c.style.width = `${Math.round(width)}px`; c.style.height = ''; c.style.maxHeight = Number.isFinite(maxH) ? `${Math.round(maxH)}px` : ''; c.hidden = false; c.style.visibility = 'hidden';
+    const full = Math.ceil(c.scrollHeight), type = minTypePx(c);
     c.hidden = was; c.style.visibility = vis;
-    return { w: Math.round(width), h };
+    return { w: Math.round(width), h: Math.min(Math.ceil(maxH), full), full, type };
   }
   show(on: boolean): void { this.el.hidden = !on; if (on) { void this.el.offsetWidth; this.el.classList.add('st-in'); } else this.el.classList.remove('st-in'); }
   get visible(): boolean { return !this.el.hidden; }

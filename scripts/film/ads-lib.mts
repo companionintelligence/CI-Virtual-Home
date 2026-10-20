@@ -10,6 +10,7 @@ import crypto from 'node:crypto';
 import { joinRuntime, type RuntimeStory } from '../../assets/story/runtime.js';
 import type { Story, BakeLock } from '../../assets/story/types.js';
 import { CUT, CUT_KEYS, DESIGN, planFamilyCuts, type CutPlan, type CutKey, type BeatTimes } from '../../assets/story/film/cut/plan.js';
+import { CANVAS_TYPE_MIN } from '../../assets/story/place.js';
 import os from 'node:os';
 import { ROOT, familiesDir, sha256, readJson, loadClaims, type Claims } from './lib.mts';
 import { LAUNCH_ARGS } from '../portal-lib.mts';
@@ -21,10 +22,11 @@ export const adsJsonPath = (): string => process.env.CI_ADS_MANIFEST ? path.reso
 export const adsOutDir = (): string => process.env.CI_ADS_OUT ? path.resolve(process.env.CI_ADS_OUT) : path.join(ROOT, 'video', 'ads');
 export const rendersPath = (): string => path.join(adsOutDir(), 'renders.json');
 
-/** the ad's defaults, in the manifest: what a cut is rendered with unless a flag says otherwise */
+/** the ad's defaults, in the manifest: what a cut is rendered with unless a flag says otherwise. `typeFloorPx` is the smallest type any line of reading text in a cut is set in, in design px at the
+ *  1080 px short edge (a cut is shown scaled down, so it keeps the 36 px of the owner's first ask while the live modals took the canon's 25.5: reference/story/ads.md); a change to it makes every cut stale. */
 export const DEFAULTS = {
   fps: CUT.fps, aspects: CUT_KEYS, lighting: 'day', audio: 'none', hookS: CUT.hookS, minS: CUT.minS, maxS: CUT.maxS,
-  codec: 'h264 high yuv420p, crf 18, maxrate 12M', label: 'Fictional family. Real software.',
+  codec: 'h264 high yuv420p, crf 18, maxrate 12M', label: 'Fictional family. Real software.', typeFloorPx: CANVAS_TYPE_MIN,
 } as const;
 
 // ---- reading a family -------------------------------------------------------------------------------------------------------------------

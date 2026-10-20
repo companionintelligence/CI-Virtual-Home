@@ -5,6 +5,10 @@
 // other parameter in the address (an ad's utm_ tags, a click id) is kept as it is. A home's name is assets/home-names.js's
 // displayName.
 //
+// "Pick a person" (the cards of the organiser, builder, gamer and learner, scripts/portal-front.mts pickPerson) is the same filter as the persona buttons: a card's
+// button sets and clears state.persona, the list "Rented before, on the Core now" for that archetype is shown, and the wall of the apps the families run dims the apps
+// that archetype does not use. All of it is static HTML in the built page; this file only toggles classes and aria-pressed.
+//
 // The family cards are in the built page as static HTML (scripts/portal-front.mts, written by scripts/build-portal.mts), so a
 // crawler, a visitor without JavaScript and an in-app browser with a slow script see them. This script ADOPTS them (it keeps
 // the elements, reads data-persona and data-find off them) and draws a card only for a home with no family, as it always did:
@@ -179,6 +183,24 @@ function apply() {
     count(b, b.firstChild.textContent, c, id === state.persona);
     b.setAttribute('aria-label', `${b.firstChild.textContent}, ${c} ${c === 1 ? 'family' : 'families'}`);
   }
+  // story v2: the archetype cards (pressed = the filter), the list for the archetype chosen and the wall dimmed to the apps it uses
+  for (const b of document.querySelectorAll('#pick .arch-btn')) {
+    const on = b.dataset.persona === state.persona;
+    b.setAttribute('aria-pressed', String(on));
+    b.closest('.arch').classList.toggle('on', on);
+  }
+  for (const p of document.querySelectorAll('#pick .arch-panel')) p.classList.toggle('on', p.dataset.persona === state.persona);
+  // on a phone the cards are a row that scrolls sideways: bring the chosen one into the middle of it (the row only; the page is not moved)
+  const chosen = document.querySelector('#pick .arch.on'), row = document.querySelector('#pick .pick-grid');
+  if (chosen && row && row.scrollWidth > row.clientWidth + 1) {
+    const left = Math.max(0, chosen.getBoundingClientRect().left - row.getBoundingClientRect().left + row.scrollLeft - (row.clientWidth - chosen.offsetWidth) / 2);
+    try { row.scrollTo({ left, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); } catch { row.scrollLeft = left; }
+  }
+  const wall = document.getElementById('wall');
+  if (wall) {
+    wall.classList.toggle('filtered', !!state.persona);
+    for (const li of wall.querySelectorAll('.wall-app')) li.classList.toggle('dim', !!state.persona && !(li.dataset.by || '').split(' ').includes(state.persona));
+  }
   if ($('#q').value !== state.q) $('#q').value = state.q;
   writeUrl();
 }
@@ -198,7 +220,7 @@ function failed(on) {
   $('#more-filters').hidden = on;
   $('#personas').hidden = on || !document.querySelector('#personas .persona');
   $('#filters').classList.toggle('off', on);
-  for (const c of document.querySelectorAll('#filters input, #filters button, #personas button, #more-filters button')) c.disabled = on;
+  for (const c of document.querySelectorAll('#filters input, #filters button, #personas button, #more-filters button, #pick .arch-btn')) c.disabled = on;
   $('#grid').setAttribute('aria-busy', String(!on && !homes.length));
 }
 
@@ -290,6 +312,8 @@ function wire() {
   $('#q').addEventListener('input', e => { clearTimeout(typing); typing = setTimeout(() => { state.q = e.target.value.trim(); apply(); }, 80); });
   for (const b of document.querySelectorAll('#storeys button')) b.addEventListener('click', () => { state.storeys = b.dataset.storeys; apply(); });
   for (const b of document.querySelectorAll('#personas .persona')) b.addEventListener('click', () => { state.persona = state.persona === b.dataset.persona ? '' : b.dataset.persona; apply(); });
+  // story v2: a card of "Pick a person" is the same filter
+  for (const b of document.querySelectorAll('#pick .arch-btn')) b.addEventListener('click', () => { state.persona = state.persona === b.dataset.persona ? '' : b.dataset.persona; apply(); });
   $('#clear').addEventListener('click', () => { state.q = ''; state.storeys = ''; state.tag = ''; state.persona = ''; apply(); $('#q').focus(); });
   window.addEventListener('keydown', e => {
     if (!homes.length) return;

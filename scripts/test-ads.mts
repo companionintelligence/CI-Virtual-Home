@@ -8,6 +8,9 @@
 //   * the manifest: well formed, deterministic, the hash moves with the words, nothing absolute or timestamped, a family in progress is skipped and never fatal
 //   * the words: no builder or Sims text, the Uncloud voice, the claims.json rules; daylight only (the lighting override, no vulkan, the light canon's tokens)
 //   * the encode: silent by default (no audio stream), the flags that make the same frames give the same bytes
+//   * the canvas type floor (live pass 3): nothing a cut prints to be read is under 36 design px at the 1080 px short edge (the live modals took the canon's 25.5 px, a cut is shown scaled
+//     down so it keeps 36), the name is a kicker by drawing only, a card is offered as variants and never in smaller type, the solver refuses a variant under the floor; the browser half
+//     of it (what was really painted, in every cut of every family) is scripts/film/canvas-fit.mts
 // Needs `pnpm run build` (the assets compile to .js), content/families/brennan.json and its bake lock, and content/story/claims.json.
 // @check-house node-test
 // @check-house quick
@@ -22,7 +25,10 @@ import {
   CUT, CUT_KEYS, CUT_RES, DESIGN, cutFormat, cutCaptionBox, cutBadgeBox, cutCues, cutCaptionChars, placeForCut, sceneAt, tourIn, hookAlpha, planFamilyCuts, pickHookBeat, pickExtension, memberBeats, sentencesOf, wordTimes,
   type CutPlan, type CutKey,
 } from '../assets/story/film/cut/plan.js';
-import { PAL } from '../assets/story/film/cut/draw.js';
+import { PAL, hookSizes } from '../assets/story/film/cut/draw.js';
+import { TYPE, DISC_D, CHIP_PAD, CHIP_H, KICK_EM, FLOOR, caps } from '../assets/story/film/cards.js';
+import { canvasCardWidth, canvasCardWidths, canvasVariants, placeCanvasCard, COST_TIGHT, COST_NARROWER, COST_BARE } from '../assets/story/film/layout.js';
+import { CANVAS_TYPE_MIN, TYPE_MIN } from '../assets/story/place.js';
 import {
   ROOT, loadAdFamily, isFamily, buildPlans, buildManifest, manifestProblems, manifestDrift, manifestText, cutHash, toolSha, endModelOf, badgeOf, copyProblems, canon, readManifest, adsJsonPath, DEFAULTS,
   glArgs, glMode, chromiumFor, outName, renderKey, renderState, timesOf, type AdFamily, type Manifest,
@@ -279,12 +285,14 @@ test('the four frames: the file as delivered, what the page renders, the crop (4
 test('the card, the hook and the captions stay inside the safe area and off each other; a card that covers the subject goes under the corner mark', () => {
   const inside = (f: ReturnType<typeof cutFormat>, r: { x: number; y: number; w: number; h: number }) => r.x >= f.safe.left - 1 && r.y >= f.safe.top - 1 && r.x + r.w <= f.w - f.safe.right + 1 && r.y + r.h <= f.h - f.safe.bottom + 1;
   for (const key of CUT_KEYS) for (const res of [540, 1080]) {
-    const f = cutFormat(key, res), cap = cutCaptionBox(f), badge = cutBadgeBox(f, 520 * f.k);
+    const f = cutFormat(key, res), cap = cutCaptionBox(f), badge = cutBadgeBox(f, 640 * f.k);
     assert.ok(inside(f, cap), `${key} ${res}: captions`);
+    assert.ok(badge.font >= CANVAS_TYPE_MIN * f.k - 1e-9, `${key} ${res}: the corner mark is ${badge.font} px, the floor ${CANVAS_TYPE_MIN * f.k}`);
+    assert.ok(cap.font >= CANVAS_TYPE_MIN * f.k, `${key} ${res}: the caption type`);
     assert.ok(badge.x >= f.safe.left - 1 && badge.y >= f.safe.top - 1 && badge.y + badge.h < cap.y, `${key} ${res}: the corner mark`);
     // a subject low in the frame
     for (const focus of [{ x: f.w * 0.3, y: f.h * 0.15, w: f.w * 0.3, h: f.h * 0.2 }, null, { x: f.w * 0.35, y: f.h * 0.55, w: f.w * 0.3, h: f.h * 0.2 }]) {
-      const card = { w: f.sheet ? f.w - f.safe.left - f.safe.right : 600 * f.k, h: 260 * f.k };
+      const card = { w: f.sheet ? f.w - f.safe.left - f.safe.right : canvasCardWidth(f), h: 340 * f.k };
       const p = placeForCut(f, { focus, core: null, card });
       assert.ok(inside(f, p.rect), `${key} ${res}: card ${JSON.stringify(p.rect)} in ${f.w}x${f.h} safe ${JSON.stringify(f.safe)}`);
       assert.ok(p.overlapBars === 0 || !p.ok, 'a card that touches the captions is not ok');
@@ -296,6 +304,99 @@ test('the card, the hook and the captions stay inside the safe area and off each
   const f = cutFormat('9x16', 1080), focus = { x: 200, y: 1150, w: 600, h: 300 };
   const p = placeForCut(f, { focus, core: null, card: { w: 936, h: 400 } });
   assert.equal(p.alt, 'top'); assert.ok(p.rect.y < 500);
+});
+
+// ---- the canvas type floor ---------------------------------------------------------------------------------------------------------------------
+test('the floor is 36 design px at the 1080 short edge, kept in the manifest, and every size the overlay is built from is at or above it', () => {
+  assert.equal(CANVAS_TYPE_MIN, 36); assert.equal(FLOOR, 36); assert.equal(DEFAULTS.typeFloorPx, 36);
+  assert.ok(TYPE_MIN < CANVAS_TYPE_MIN, 'the live modals took the canon\'s 25.5 px; the canvases keep 36 (a canvas is shown scaled down)');
+  assert.ok(TYPE.read >= FLOOR && TYPE.title >= 52 && TYPE.title <= 60, 'the card title is about 56');
+  assert.ok(TYPE.titleHead.every(s => s >= FLOOR) && TYPE.address >= FLOOR && TYPE.tagline >= FLOOR && TYPE.signoff >= FLOOR && TYPE.url >= FLOOR);
+  assert.ok(DISC_D * 1.2 >= FLOOR, 'the monogram\'s letter is at the floor too');
+  assert.ok(CHIP_PAD > 0 && CHIP_H >= 1.4 && KICK_EM === 0.2);
+  for (const key of CUT_KEYS) for (const res of CUT_RES) {
+    const f = cutFormat(key, res), k = f.k;
+    assert.ok(cutBadgeBox(f, 0).font >= FLOOR * k - 1e-9, `${key} ${res}: the corner mark`);
+    assert.ok(cutCaptionBox(f).font >= FLOOR * k, `${key} ${res}: the caption`);
+    assert.ok(hookSizes(f).every(s => s >= FLOOR * k - 1e-9), `${key} ${res}: every size of the hook`);
+  }
+  // the manifest the cuts are planned against says it
+  const m = readManifest(); if (m) assert.equal((m.defaults as any).typeFloorPx, 36);
+  // no size is written under the floor in the drawing code, and none is a share of another size (the old caption's 0.62 and 0.5 of its type were under it)
+  for (const file of ['assets/story/film/cut/draw.ts', 'assets/story/film/cards.ts', 'assets/story/film/overlay.ts']) {
+    const src = fs.readFileSync(path.join(ROOT, file), 'utf8').replace(/\/\/[^\n]*|\/\*[\s\S]*?\*\//g, '');
+    for (const m2 of src.matchAll(/font\(\d+,\s*(\d+(?:\.\d+)?)\s*\*\s*(?:k|u|f\.k)\b/g)) assert.ok(+m2[1] >= FLOOR, `${file}: font size ${m2[1]} is under ${FLOOR}`);
+    assert.ok(!/font\(\d+,\s*px\s*\*\s*0?\.\d+\)/.test(src), `${file}: a size that is a share of another size`);
+  }
+});
+
+test('the name is a kicker by drawing only: capitals when drawn, the plan keeps the name as written', () => {
+  assert.equal(caps('Sally'), 'SALLY'); assert.equal(caps('Étienne'), 'ÉTIENNE'); assert.equal(caps('The Brennan family'), 'THE BRENNAN FAMILY');
+  for (const c of BRENNAN) { assert.equal(c.name, c.member[0].toUpperCase() + c.member.slice(1), `${c.id}: the plan says ${c.name}`); assert.notEqual(c.name, caps(c.name)); }
+  assert.ok(!/toUpperCase\(\)|toLocaleUpperCase/.test(fs.readFileSync(path.join(ROOT, 'assets/story/film/cut/plan.ts'), 'utf8').replace(/\/\/[^\n]*/g, '')), 'the plan never uppercases a name');
+  assert.equal(KICK_EM, 0.2, 'tracked 0.2em, like the live card');
+});
+
+test('a render fails on what was painted: both renderers audit every fillText against the floor and keep the result in the report', () => {
+  for (const [file, call] of [['scripts/render-persona-cuts.mts', '__cut.typeAudit()'], ['scripts/render-family-film.mts', '__film.typeAudit()']]) {
+    const src = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    assert.ok(src.includes(call) && /CANVAS_TYPE_MIN - 0\.01/.test(src) && src.includes('typePainted') && src.includes('info.tracking'), file);
+  }
+  for (const file of ['assets/story/film/cut/page.ts', 'assets/story/film/index.ts']) assert.ok(/auditType\(g, f\.k\)/.test(fs.readFileSync(path.join(ROOT, file), 'utf8')), `${file} wraps its context`);
+  assert.ok(/unsafe/.test(fs.readFileSync(path.join(ROOT, 'assets/story/film/index.ts'), 'utf8')), 'the film refuses a layout outside the safe area as the cut does');
+});
+
+test('the card is as wide as the live card is (a third of the canvas, 18 em of the floor at least), and narrower and taller ways to set it stop at 12.5 em', () => {
+  for (const key of ['16x9', '1x1'] as CutKey[]) for (const res of [540, 1080]) {
+    const f = cutFormat(key, res), w0 = canvasCardWidth(f), ws = canvasCardWidths(f);
+    assert.ok(w0 >= 18 * FLOOR * f.k - 1 && w0 >= 0.32 * f.w - 1, `${key} ${res}: ${w0}`);
+    assert.equal(ws[0], w0); assert.ok(ws.length >= 4 && ws.every((w, i) => !i || w < ws[i - 1]), `${key} ${res}: widths fall`);
+    assert.ok(ws.every(w => w >= 12.5 * FLOOR * f.k - 1), `${key} ${res}: none narrower than 12.5 em`);
+  }
+  assert.equal(canvasCardWidth(cutFormat('16x9', 1080)), 648); assert.equal(canvasCardWidth(cutFormat('16x9', 540)), 324, 'a 540 render is the same picture');
+});
+
+test('canvasVariants: the card as designed first, tighter padding at a small cost, narrower more, the phone left out most; a width that cannot hold a chip is dropped', () => {
+  const m = (w: number, tight: boolean, bare: boolean) => ({ w, h: 400 - (tight ? 30 : 0) + (bare ? -60 : 0), type: 36, bad: w < 500 && !tight && !bare });
+  const v = canvasVariants([648, 560, 480], m, { bare: true });
+  assert.equal(v[0].size.cost, 0); assert.equal(v[1].size.cost, COST_TIGHT); assert.equal(v[2].size.cost, COST_NARROWER);
+  const plain = v.filter(x => !x.size.tag!.includes('bare')).map(x => x.size.cost!);
+  assert.deepEqual(plain, [...plain].sort((a, b) => a - b), 'in order of what each costs'); assert.ok(v.some(x => x.size.cost! >= COST_BARE), 'the phone left out costs the most');
+  assert.ok(v.every(x => !x.layout.bad), 'a layout with a chip wider than its column is not offered (480 as designed); tighter at 480 is');
+  assert.ok(v.some(x => x.layout.w === 480) && !v.some(x => x.layout.w === 480 && !x.size.tag!.includes('tight') && !x.size.tag!.includes('bare')));
+  assert.equal(canvasVariants([648, 560], m).length, 4); assert.ok(canvasVariants([648], m, { bare: true }).length === 4);
+  // the first is kept even when bad, so a card always has one way to be set
+  assert.equal(canvasVariants([400], () => ({ w: 400, h: 300, type: 36, bad: true })).length, 1);
+});
+
+test('the solver refuses a variant under the floor, and a card too tall for its room is not ok (a canvas cannot scroll)', () => {
+  for (const key of ['9x16', '16x9', '1x1'] as CutKey[]) {
+    const f = cutFormat(key, 1080), k = f.k, w = f.sheet ? f.w - f.safe.left - f.safe.right : canvasCardWidth(f), focus = { x: f.w * 0.1, y: f.h * 0.3, w: f.w * 0.15, h: f.h * 0.1 };
+    const under = placeForCut(f, { focus, core: null, card: { w, h: 300 * k }, variants: [{ w, h: 300 * k, type: 30 * k }, { w, h: 340 * k, type: 36 * k, cost: 1 }] });
+    assert.equal(under.variant, 1, `${key}: the 30 px variant is refused`); assert.equal(under.refused, 1);
+    const all = placeForCut(f, { focus, core: null, card: { w, h: 300 * k }, variants: [{ w, h: 300 * k, type: 30 * k }] });
+    assert.equal(all.ok, false, `${key}: every variant under the floor is not ok`); assert.equal(all.refused, 1);
+    const tall = placeForCut(f, { focus, core: null, card: { w, h: f.h }, variants: [{ w, h: f.h, type: 36 * k }] });
+    assert.equal(tall.ok, false, `${key}: a card as tall as the frame does not fit`);
+  }
+});
+
+test('a sheet takes tighter padding before it takes another place, and the bottom before the top', () => {
+  const f = cutFormat('9x16', 1080), k = f.k, cap = cutCaptionBox(f), w = f.w - f.safe.left - f.safe.right, bottom = cap.y - 16 * k;
+  const variants = [{ w, h: 440, type: 36 * k }, { w, h: 400, type: 36 * k, cost: COST_TIGHT }];
+  // a subject that ends 420 above the sheet's bottom edge: the card as designed (440 tall) reaches into it, the tight one (400) does not
+  const sub = { x: 100, y: bottom - 460, w: 800, h: 40 };
+  const p = placeForCut(f, { focus: sub, core: null, card: variants[0], variants });
+  assert.equal(p.variant, 1, 'the tight card clears the subject'); assert.equal(p.alt, null); assert.ok(p.ok); assert.equal(p.rect.y + p.rect.h, bottom); assert.equal(p.rect.h, 400);
+  // a subject in the bottom room that neither card clears: the card goes under the corner mark
+  const low = { x: 100, y: 900, w: 800, h: 400 };
+  const t = placeForCut(f, { focus: low, core: null, card: variants[0], variants });
+  assert.equal(t.alt, 'top'); assert.ok(t.ok); assert.ok(t.rect.y >= f.safe.top + cutBadgeBox(f, 0).h);
+  // nothing in the way: the bottom, the card as designed
+  const clear = placeForCut(f, { focus: { x: 100, y: 300, w: 800, h: 200 }, core: null, card: variants[0], variants });
+  assert.equal(clear.variant, 0); assert.equal(clear.alt, null); assert.ok(clear.ok);
+  // the same function the film uses
+  assert.equal(typeof placeCanvasCard, 'function');
 });
 
 // ---- the manifest ---------------------------------------------------------------------------------------------------------------------------

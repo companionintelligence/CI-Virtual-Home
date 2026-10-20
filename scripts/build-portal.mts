@@ -2,7 +2,8 @@
 // Assembles the web portal for Cloudflare Pages: exactly the files the site loads, nothing else.
 //
 //   pnpm run build && pnpm run portal:build [--out dist] [--site-url https://homes.ci.computer/] [--families <dir>] [--strict-families] [--stale-report]
-//   pnpm run portal:preview [--port 8081]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
+//   pnpm run portal:preview [--port 8081] [--tailscale | --host <ipv4>]   build, then serve <out> at http://127.0.0.1:8081/ci-virtual-home/
+//                                         (--tailscale: also on this machine's Tailscale address, so other devices on the tailnet can open it; never 0.0.0.0)
 //
 //   <out>/index.html                 the front page: the families and their homes (portal/gallery.css + gallery.js + campaign.js,
 //                                    portal/thumbs/, the hero's picture), its link-preview image (portal/hero.jpg) and URL made absolute
@@ -65,14 +66,14 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, parseArgs, serve } from './portal-lib.mts';
+import { ROOT, parseArgs, serve, tailscaleAddress } from './portal-lib.mts';
 import { redactIndex, redactSpecText, guardOutput, GUARD_ALLOW } from './portal-redact.mts';
 import {
   type House, LINKS, SITE_NAME, PLAYER_TITLE, HERO_ALT, TITLE_MAX, TWITTER_SITE, esc, numberWord, capital, galleryCards, galleryHomeIndex, galleryLd, homeDescription, homeLd, homePage, homeTitle, homeUrl, notFoundPage, playerLd,
 } from './portal-pages.mts';
 import { buildStorySite } from './story/site.mts';
 // ---- front page ----
-import { HERO, readFamilies, frontCards, personaButtons, meetFamily } from './portal-front.mts';
+import { HERO, readFamilies, frontCards, personaButtons, meetFamily, pickPerson, logoWall, runsBand } from './portal-front.mts';
 import { MEET_MARKER } from './portal-pages.mts';
 import { displayName } from '../assets/home-names.js';
 
@@ -124,6 +125,32 @@ copy(path.join('portal', 'icons', 'apple-touch-icon.png'), 'apple-touch-icon.png
 // 3. portal: styles, script, the hero, the thumbnails, the icons and the manifest. (portal/og/ and portal/fonts/ are the story's:
 //    scripts/story/site.mts ships them under a hash of their content, which _headers lets a cache keep for a year)
 for (const f of walk('portal', f => /\.(css|js|webp|jpg|png|ico|webmanifest)$/.test(f) && !f.startsWith(path.join('portal', 'og') + path.sep))) copy(f);
+
+// ---- app media ---- (scripts/story/lib/media.mts, scripts/story/build-app-media.mts, reference/story/story-v2.md "App media")
+// The real logos and screenshots under portal/apps/ and portal/ci/, every one named <name>.<hash10>.webp. Step 3's walk copied every .webp under portal/,
+// these two folders included, so what it copied is taken back out and only the files content/story/app-media.json names are shipped (portal/_headers keeps
+// these two folders for a year: nothing un-hashed may be in them). The manifest is held to its rules here (the files exist, are named by their hash,
+// fit their budgets, carry alt text and the exact captions), and an app a family uses that has no entry is a warning that lists the apps.
+const appMedia = await (async () => {
+  const media = await import('./story/lib/media.mts');
+  const left = (d: string): string[] => fs.existsSync(d) ? fs.readdirSync(d).flatMap(n => { const f = path.join(d, n); return fs.statSync(f).isDirectory() ? left(f) : [f]; }) : [];
+  for (const d of ['apps', 'ci']) {
+    for (const f of left(path.join(OUT, 'portal', d))) { files--; bytes -= fs.statSync(f).size; }
+    fs.rmSync(path.join(OUT, 'portal', d), { recursive: true, force: true });
+  }
+  const manifest = media.readMedia(ROOT);
+  if (!manifest) { console.log(`app media: no ${media.MANIFEST} (pnpm run story:media): the pages show no logos or screenshots`); return { media, manifest, named: new Map<string, string>() }; }
+  problems.push(...media.checkManifest(manifest, ROOT).map(p => `app media: ${p}`));
+  // the files the manifest names, and what each one is (the page check below needs the caption of a screenshot)
+  const named = new Map<string, string>();
+  for (const a of Object.values(manifest.apps)) { if (a.logo) named.set(a.logo.file, ''); if (a.shot) named.set(a.shot.file, a.shot.caption); }
+  for (const s of [...manifest.ci.hub, ...manifest.ci.portal]) named.set(s.file, s.caption);
+  for (const rel of named.keys()) copy(rel);
+  const stale = media.staleApps(manifest, ROOT);
+  console.log(`app media: ${named.size} files shipped (${manifest.rejected.length} candidates rejected, see ${media.MANIFEST})${stale.length ? `\n  warning: ${stale.length} app${stale.length === 1 ? '' : 's'} a family uses ${stale.length === 1 ? 'has' : 'have'} no entry in ${media.MANIFEST} (pnpm run story:media): ${stale.join(', ')}` : ''}`);
+  return { media, manifest, named };
+})();
+// ---- end app media ----
 
 // 4. the engine: compiled modules, three.js (whole vendored tree: modules plus LICENSE), fonts, brand
 for (const f of sources) copy(f.replace(/\.ts$/, '.js'));
@@ -252,6 +279,19 @@ console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on 
   if (!gallery.includes(`house=${HERO.house}&amp;family=${HERO.slug}"`)) problems.push(`index.html: the hero's tour link is not house=${HERO.house}&family=${HERO.slug} (portal-front.mts HERO)`);
   else if (!heroFamily) gallery = gallery.split(`&amp;family=${HERO.slug}"`).join('"');
   // ---- end front page ----
+  // ---- story v2 ---- (reference/story/story-v2.md; scripts/portal-front.mts): "Pick a person", the wall of the apps the families run and "How it runs", written at their
+  // markers in index.html. The real logos and screenshots are the manifest's (the `app media` blocks above); with no manifest the cards and the band still read, without images.
+  {
+    const mediaNow = appMedia.manifest;
+    const at = (marker: RegExp, html: string, what: string): void => {
+      if (!marker.test(gallery)) problems.push(`index.html: no <!-- ${what}: --> marker to write ${what} at`);
+      else gallery = gallery.replace(marker, () => html);
+    };
+    at(/<!-- pick-person:[\s\S]*?-->/, front.length ? pickPerson(front, mediaNow) : '', 'pick-person');
+    at(/<!-- logo-wall:[\s\S]*?-->/, front.length ? logoWall(front, mediaNow) : '', 'logo-wall');
+    at(/<!-- how-it-runs:[\s\S]*?-->/, front.length ? runsBand(mediaNow) : '', 'how-it-runs');
+  }
+  // ---- end story v2 ----
   // every home's own page, linked from the footer (the cards go to the player; gallery.js leaves this list as it is)
   const marker = /<!-- foot-homes:[\s\S]*?-->/;
   if (!marker.test(gallery)) problems.push('index.html: no <!-- foot-homes: --> marker to write the list of the homes\' pages at');
@@ -576,6 +616,23 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...familyPages
   for (const f of ['index.html', 'room-creator.html']) { const t = tag(read(f), /<title>([^<]*)<\/title>/); if (titles.has(t)) problems.push(`${f}: its title "${t}" is also ${titles.get(t)}'s`); titles.set(t, f); }
 }
 
+// ---- app media ---- what the built pages do with the media: every <img> of a file under portal/apps/ or portal/ci/ names a file the manifest
+// shipped and that is in the output, has alt text, its width and height and a loading attribute (lazy on the front page, which loads none above the
+// fold), and a screenshot's page carries its caption; and the manifest's own words (alt text, captions, reasons) pass the credit guard.
+{
+  const { media, manifest, named } = appMedia;
+  if (manifest) {
+    const red = await import('./portal-redact.mts');
+    problems.push(...red.scanText(media.MANIFEST, fs.readFileSync(path.join(ROOT, media.MANIFEST), 'utf8'), red.guardTerms(red.builderHandles(ROOT))).map(p => `credit guard: ${p}`));
+    const pages = ['index.html', ...homePages, ...familyPages, '404.html'].filter(p => fs.existsSync(path.join(OUT, p))).map(p => ({ file: p.split(path.sep).join('/'), html: fs.readFileSync(path.join(OUT, p), 'utf8') }));
+    const checked = media.checkPageImages(pages, named, f => fs.existsSync(path.join(OUT, f)));
+    problems.push(...checked.problems);
+    const shown = checked.shown;
+    console.log(`app media: ${shown} image${shown === 1 ? '' : 's'} on the built pages, each checked for alt, size, loading and caption`);
+  }
+}
+// ---- end app media ----
+
 // 8. nothing in the output credits a builder or names the build a home was written from (scripts/portal-redact.mts has the rule and
 // the guard): every text file of the output, the shipped specs and the family and story JSON included, is read for the builders'
 // handles (derived from the specs' `author` fields, never listed), the word "Sims", "Base Game" and "BG ". The allowlist is empty.
@@ -590,6 +647,13 @@ console.log(`portal: ${files} files, ${(bytes / 1024 / 1024).toFixed(1)} MB → 
 
 // --serve: preview the tree under a sub-path, which proves every URL in it is relative
 if (args.serve === 'true') {
-  const srv = await serve(OUT, '/ci-virtual-home/', Number(args.port || 8081));
+  // ---- tailscale ---- `--tailscale` also listens on this machine's Tailscale address (and only that one besides the loopback), so a phone or laptop on the
+  // same tailnet opens the preview; `--host <ipv4>` listens on that one address instead. Without either, the loopback address only, as before.
+  const ts = args.tailscale === 'true' ? await tailscaleAddress() : null;
+  if (args.tailscale === 'true' && !ts) { console.error('preview: --tailscale needs the tailscale command, running, with an IPv4 address (tailscale ip -4)'); process.exit(1); }
+  const extra = ts ? [ts.ip] : (args.host && args.host !== 'true' ? [args.host] : []);
+  const srv = await serve(OUT, '/ci-virtual-home/', Number(args.port || 8081), extra);
   console.log(`preview: ${srv.url()}  (Ctrl-C to stop)`);
+  for (const o of srv.also) console.log(`preview on the tailnet: ${o}${srv.base}${ts?.dns ? `   or   http://${ts.dns}:${srv.port}${srv.base}` : ''}`);
+  // ---- end tailscale ----
 }

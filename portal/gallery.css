@@ -41,6 +41,8 @@
     radial-gradient(900px circle at 80% 0%, rgba(10, 99, 88, 0.04), transparent 45%);
   /* page */
   --pg-surface: #ffffff;
+  --pg-ink: #041620;                                   /* canon dark --background: the dialog's backdrop in both themes */
+  --pg-logo-bg: #ffffff;                               /* a real logo sits on a white tile in both themes, so a dark mark stays visible */
   --pg-hairline: color-mix(in srgb, var(--foreground) 9%, transparent);
   --pg-thumb-bg: var(--secondary);
   --pg-wide: 1240px;
@@ -449,6 +451,9 @@ kbd {
   font-size: 13px; color: var(--muted-foreground);
 }
 .apps b { color: var(--foreground); font-weight: 600; }
+/* story v2: the app's real logo, 20 px, beside its line (the tile is portal/media.css's .logo) */
+.apps li { display: flex; align-items: center; gap: 8px; }
+.apps .logo { width: 20px; height: 20px; padding: 1px; border-radius: 5px; }
 .go { margin: auto 0 0; padding-top: 14px; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--primary); }
 .go .i { width: 15px; height: 15px; transition: transform 0.2s ease; }
 .card-family:hover .go .i { transform: translateX(3px); }
@@ -616,4 +621,62 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
+}
+
+/* ===================================================== story v2: pick a person, the wall of apps, how it runs ===================================================== */
+/* "Pick a person": a card for an archetype (its story line, the three apps its families use most with their logos, in how many families it is). The card's one
+   control is a stretched button: choosing it is the persona filter (portal/gallery.js). The list under the cards is shown for the archetype chosen. */
+.pick { max-width: var(--pg-wide); margin: 0 auto; padding: 4px var(--pg-gutter) 40px; }
+.pick-head h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+.pick-head p { margin: 6px 0 0; max-width: 42em; color: var(--muted-foreground); text-wrap: pretty; }
+.pick-grid { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.arch { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 18px 18px 8px; border-radius: 18px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); transition: box-shadow 0.2s ease, transform 0.2s ease; }
+.arch:hover { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 45%, transparent), var(--shadow-md); }
+.arch.on { box-shadow: inset 0 0 0 2px var(--primary), var(--shadow-md); }
+.arch h3 { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.25; }
+.arch-line { margin: 0 0 auto; font-size: 14.5px; line-height: 1.5; color: var(--muted-foreground); text-wrap: pretty; }
+.arch-apps { list-style: none; margin: 6px 0 0; padding: 12px 0 0; display: grid; gap: 8px; border-top: 1px solid var(--pg-hairline); }
+.arch-apps li { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 600; min-height: 28px; }
+.arch-apps .logo { width: 28px; height: 28px; }
+.arch-count { margin: 0; padding-top: 4px; font-size: 12.5px; color: var(--muted-foreground); }
+.arch-btn { position: static; display: flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; color: var(--primary); font-size: 14px; font-weight: 700; text-align: left; cursor: pointer; }
+.arch-btn::after { content: ""; position: absolute; inset: 0; border-radius: 18px; }
+.arch-btn:focus-visible { outline: none; }
+.arch:has(.arch-btn:focus-visible) { outline: 2px solid var(--ring); outline-offset: 3px; }
+.arch-on { display: none; }
+.arch-btn[aria-pressed="true"] .arch-on { display: inline; }
+.arch-btn[aria-pressed="true"] .arch-off { display: none; }
+.arch-btn:disabled { cursor: default; opacity: 0.55; }
+.arch-panels { margin-top: 18px; }
+.arch-panel { display: none; }
+.arch-panel.on { display: block; }
+.arch-panel-lead { margin: 0; font-size: 14px; color: var(--muted-foreground); }
+.arch-panel .swap { max-width: none; margin-top: 10px; }
+
+/* "What the families run": every app the stories name, its logo beside its name. Text only; dimmed to the archetype chosen. */
+.wall { max-width: var(--pg-wide); margin: 0 auto; padding: 8px var(--pg-gutter) 52px; }
+.wall h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+.wall-lead { margin: 6px 0 0; max-width: 46em; color: var(--muted-foreground); text-wrap: pretty; }
+.wall-list { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px 12px; }
+.wall-app { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 12px 6px 8px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); font-size: 14px; font-weight: 600; transition: background-color 0.2s ease; }
+.wall-app .logo { width: 32px; height: 32px; }
+.wall-app.dim { background: transparent; color: var(--muted-foreground); font-weight: 500; }
+.wall-app.dim .logo { opacity: 0.4; filter: grayscale(1); }
+.wall-note { margin: 14px 0 0; max-width: 52em; font-size: 12.5px; color: var(--muted-foreground); }
+
+/* "How it runs": a band like the Core's, with a real screenshot of Companion Hub and of the Companion account page */
+.runs-band { width: min(calc(100% - 2 * var(--pg-gutter)), calc(var(--pg-wide) - 2 * var(--pg-gutter))); margin: 0 auto 40px; padding: clamp(20px, 3vw, 32px); border-radius: 22px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline), var(--shadow-sm); }
+.runs-band h2 { margin: 0 0 6px; font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+.runs-band .lead { margin: 0; max-width: 40em; color: var(--muted-foreground); }
+.runs-band .run h3 { margin: 0; }
+.runs-band .run > p { margin: 6px 0 0; }
+
+@media (prefers-reduced-motion: no-preference) { .arch:hover { transform: translateY(-2px); } }
+@media (max-width: 1000px) { .pick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .pick { padding-bottom: 28px; }
+  .pick-grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--pg-gutter); margin: 16px calc(-1 * var(--pg-gutter)) 0; padding: 4px var(--pg-gutter) 10px; scrollbar-width: thin; }
+  .arch { flex: 0 0 min(80%, 300px); scroll-snap-align: start; }
+  .wall-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .wall-app { padding-right: 8px; font-size: 13px; }
 }

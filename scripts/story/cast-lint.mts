@@ -6,8 +6,8 @@
 //
 // What it checks (the numbers are validator.md "Fleet", reference/story/personas.md and the schema):
 //   shape        slugs, surnames, names, ages, roles, archetypes, rooms by exact name, schema patterns and enums
-//   fit          who can sleep where, a nursery means a baby, a baby means a crib, children under 13 have no companion,
-//                a couple is organiser plus builder or maker, the household type matches the ages
+//   fit          who can sleep where, a nursery means a baby, a baby means a crib, nobody under 16 has a companion (age rule 16),
+//                a couple has an adult with a job archetype (organiser, builder or one of the eight story v3 archetypes), the household type matches the ages
 //   flagship     Sally, John, Steve and Jean (Brennan) in seraphine, bgfamily and familyhouse-nora only
 //   fleet        at least 70 distinct apps, no third-party app in more than 12 of 30 families, the 14 story-rich apps in at
 //                least three, each of the ten topics possible in at least ten, small-business share reachable, gamer in at
@@ -58,10 +58,27 @@ const POOLS: Record<Archetype, Set<string>> = {
   organiser: new Set('ci-planning nextcloud libreoffice onlyoffice collabora-online cryptpad paperless papra stirling-pdf bentopdf vaultwarden joplin bookstack n8n yuvomi homehub akaunting invoice-ninja invio twenty espocrm kimai docuseal opnform nocodb wordpress wallos firefly-iii monetr spliit vikunja planka donetick baikal'.split(' ')),
   builder: new Set('code-server forgejo gitea open-webui ci-openclaw jupyterlab n8n activepieces opencode aider uptime-kuma pi-hole'.split(' ')),
   gamer: new Set('steam-headless jellyfin immich'.split(' ')),
-  learner: new Set('open-webui anything-llm kiwix libretranslate obsidian logseq jupyterlab ci-spellbook koodo-reader booklore audiobookshelf calibre-web'.split(' ')),
+  learner: new Set('open-webui anything-llm libretranslate obsidian logseq jupyterlab ci-spellbook koodo-reader booklore audiobookshelf calibre-web kokoro razzia readeck linkwarden'.split(' ')),
   maker: new Set('immich ci-planning obsidian jellyfin penpot inkscape excalidraw tldraw drawio blockbench audiomass navidrome mstream photoprism librephotos foldergram wordpress'.split(' ')),
   host: new Set('immich jellyfin home-assistant kitchenowl mealie hortusfox yuvomi homehub frigate navidrome audiobookshelf wanderer airtrail ntfy wallos ci-planning'.split(' ')),
+  // story v3 (reference/story/persona-bible.md 5.3; the same pools as content/story/personas.json)
+  'tech-family': new Set('home-assistant pi-hole forgejo ntfy uptime-kuma open-webui ollama vaultwarden n8n syncthing'.split(' ')),
+  'business-owner': new Set('nextcloud invoice-ninja paperless docuseal akaunting twenty vaultwarden anything-llm solidtime grist bookstack baikal libreoffice stirling-pdf whisper-webui ci-memory'.split(' ')),
+  creative: new Set('immich nextcloud penpot inkscape open-webui invoice-ninja vaultwarden whisper-webui docuseal freecut audiomass photoview pingvin-share syncthing navidrome'.split(' ')),
+  contractor: new Set('invoice-ninja immich homebox lubelogger paperless docuseal solidtime vaultwarden nextcloud radicale stirling-pdf open-webui planka akaunting'.split(' ')),
+  marketer: new Set('open-webui ci-memory nextcloud ghost penpot vaultwarden twenty whisper-webui listmonk plausible n8n inkscape freecut mixpost solidtime grist'.split(' ')),
+  lawyer: new Set('paperless nextcloud docuseal open-webui libreoffice vaultwarden stirling-pdf cryptgeon ollama whisper-webui radicale solidtime invoice-ninja bookstack twenty ci-memory'.split(' ')),
+  journalist: new Set('whisper-webui paperless obsidian open-webui nextcloud vaultwarden ci-memory stirling-pdf libretranslate linkwarden libreoffice cryptgeon joplin anything-llm miniflux element'.split(' ')),
+  educator: new Set('open-webui paperless nextcloud libreoffice libretranslate joplin stirling-pdf vaultwarden razzia excalidraw ci-planning radicale calibre-web'.split(' ')),
 };
+/** the archetypes that are a job (a couple needs one adult who does one; a business family needs one who runs it) */
+const JOBS = new Set<Archetype>(['organiser', 'builder', 'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator']);
+/** a family that is a business keeps at least one of these (decisions of 2026-10-19: organiser, builder or business-owner) */
+const BUSINESS_LEADS = new Set<Archetype>(['organiser', 'builder', 'business-owner']);
+/** apps the story pools dropped (storySafe avoid) that the cast plan's unrewritten rows still list: warnings, not errors, until each family is recast */
+const UNTIL_RECAST = new Set<string>(['kiwix']);
+/** age rule 16 (v3-decisions "Age rule"): no agent companion under this age */
+const COMPANION_AGE = 16;
 const REQUIRED_TOPICS = ['home', 'food', 'iot', 'productivity', 'privacy'] as const;
 
 // ---- shape: only known keys ---------------------------------------------------------------------------------------------------
@@ -146,13 +163,13 @@ for (const f of fams) {
     else if (!ARCHETYPES.includes(m.archetype)) E(mat, `archetype ${m.archetype}`);
     if (m.role === 'baby' && m.age > 2) E(mat, 'a baby is under 3');
     if (m.age < 13 && m.archetype && !['learner', 'maker'].includes(m.archetype)) E(mat, `a child under 13 is a learner or a maker (Steam needs an adult Valve account), not ${m.archetype}`);
-    if (['organiser', 'builder'].includes(m.archetype ?? '') && m.age < 18 && !f.flagship) W(mat, `a ${m.archetype} under 18`);
+    if (JOBS.has(m.archetype as Archetype) && m.age < 18 && !f.flagship) W(mat, `a ${m.archetype} under 18`);
     const k = m.name.toLowerCase();
     if (!firstNames.has(k)) firstNames.set(k, []);
     firstNames.get(k)!.push(f.slug);
     if (m.companion) {
       companions++;
-      if (m.age < 13 || ['baby', 'child', 'visitor'].includes(m.role)) E(mat, 'children, babies and visitors have no companion');
+      if (m.age < COMPANION_AGE || ['baby', 'child', 'visitor'].includes(m.role)) E(mat, `children, babies, visitors and anyone under ${COMPANION_AGE} have no companion (age rule 16)`);
       if (!/^[A-Z][a-z]{2,13}$/.test(m.companion)) E(mat, `companion name "${m.companion}" does not match the schema`);
       if (catalogWords.has(m.companion.toLowerCase())) E(mat, `companion name ${m.companion} is a catalog app name`);
       if (!f.flagship) { if (companionFleet.has(m.companion)) E(mat, `companion name ${m.companion} is also in ${companionFleet.get(m.companion)}`); companionFleet.set(m.companion, f.slug); }
@@ -176,7 +193,7 @@ for (const f of fams) {
   if (f.household === 'solo-or-couple') {
     if (minors.length) E(at, 'solo-or-couple has no child at home');
     if (ms.length > 2) E(at, 'solo-or-couple is one or two people');
-    if (!archs.has('organiser') && !archs.has('builder')) E(at, 'a couple needs an organiser or a builder');
+    if (![...archs].some((a) => JOBS.has(a as Archetype))) E(at, 'a couple needs an adult with a job archetype (organiser, builder, tech-family, business-owner, creative, contractor, marketer, lawyer, journalist or educator)');
     if (!ms.every((m) => m.role === 'partner')) W(at, 'couple members are partners');
   }
   if (f.household === 'young-family' && !small.length) E(at, 'young-family needs a child under 13');
@@ -223,7 +240,8 @@ for (const f of fams) {
   for (const id of sig) {
     const a = apps.get(id);
     if (!a) { E(at, `signature app ${id} is not in the catalog`); continue; }
-    if (a.storySafe === 'avoid') E(at, `${id} is marked avoid`);
+    // Kiwix is storySafe avoid (it ships an empty library) but six rows of the unrewritten plan still list it: a warning until the recast replaces it
+    if (a.storySafe === 'avoid') (UNTIL_RECAST.has(id) ? W : E)(at, `${id} is marked avoid${UNTIL_RECAST.has(id) ? ' (still in the plan: the recast replaces it)' : ''}`);
     if (a.qa === 'not-boot-tested') E(at, `${id} was not boot-tested`);
     if (a.qa === 'no-screenshot' && !(f.reviewNeeded ?? []).includes(id)) E(at, `${id} has no QA screenshot (the validator asks for a reviewed.json entry per beat); pick another or list it in reviewNeeded`);
     if (a.inLiveStore === false) E(at, `${id} is not in the live store`);
@@ -240,12 +258,16 @@ for (const f of fams) {
   }
   for (const m of ms) {
     if (!m.archetype) continue;
-    if (!sig.some((a) => POOLS[m.archetype!].has(a))) E(`${at}/${m.id}`, `no signature app from the ${m.archetype} pool (${[...POOLS[m.archetype]].slice(0, 6).join(', ')} ...)`);
+    if (!sig.some((a) => POOLS[m.archetype!].has(a))) {
+      // the only pool app an unrewritten row has is one the pool has since dropped (kiwix): a warning until the recast
+      const dropped = sig.some((a) => UNTIL_RECAST.has(a));
+      (dropped ? W : E)(`${at}/${m.id}`, `no signature app from the ${m.archetype} pool (${[...POOLS[m.archetype]].slice(0, 6).join(', ')} ...)${dropped ? '; the plan still lists a dropped app: the recast replaces it' : ''}`);
+    }
   }
   const tp = topicsPossible(f);
   const lacking = REQUIRED_TOPICS.filter((t) => !tp.includes(t));
   if (lacking.length) E(at, `no signature or beat app covers ${lacking.join(', ')}: name one in beatApps`);
-  if (f.business && !ms.some((m) => m.archetype === 'organiser' || m.archetype === 'builder')) E(at, 'a business family has an organiser or a builder');
+  if (f.business && !ms.some((m) => BUSINESS_LEADS.has(m.archetype as Archetype))) E(at, 'a business family has an organiser, a builder or a business-owner');
 }
 
 // ---- flagship ---------------------------------------------------------------------------------------------------------------------------------

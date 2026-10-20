@@ -15,15 +15,21 @@ export const sentences = (s: string): string[] => s.split(/(?<=[.!?])\s+/).filte
 
 export type Str = [at: string, text: string];
 
+/** The strings of a beat's `detail` (story v2), in reading order; empty when the beat has none. */
+export const detailStrings = (b: { detail?: { before: string; after: string; steps: string[]; fact: string } }): string[] => (b.detail ? [b.detail.before, b.detail.after, ...b.detail.steps, b.detail.fact] : []);
+
 /** Every user-facing string of a story, with the location a finding should point at. */
 export function userStrings(story: Story): Str[] {
   const out: Str[] = [];
   const S = (at: string, s?: string): void => { if (s) out.push([at, s]); };
   const f = story.family;
   S('family.surname', f.surname); S('family.tagline', f.tagline); S('family.story', f.story); S('family.address', `${f.address.line}, ${f.address.place}`);
+  // ---- story v2 (reference/story/story-v2.md): the house, the day, the profiles and the beat details are read like any other copy
+  if (f.home) { S('family.home.lede', f.home.lede); f.home.spots.forEach((s, i) => S(`family.home.spot${i}`, s.line)); }
+  (f.day || []).forEach((d, i) => S(`family.day${i}`, d.line));
   story.chapters.forEach((c) => S(`chapter ${c.id}`, c.title));
   story.members.forEach((m) => {
-    S(`member ${m.id}.name`, m.name); S(`member ${m.id}.work`, m.work);
+    S(`member ${m.id}.name`, m.name); S(`member ${m.id}.work`, m.work); S(`member ${m.id}.profile`, m.profile?.bio);
     if (m.companion) {
       S(`member ${m.id}.companion.name`, m.companion.name); S(`member ${m.id}.companion.job`, m.companion.job);
       S(`member ${m.id}.companion.personality`, m.companion.personality.join(', ')); S(`member ${m.id}.companion.limits`, m.companion.limits);
@@ -36,6 +42,7 @@ export function userStrings(story: Story): Str[] {
     S(`${b.id}.note`, p.note);
     if (p.phone) { S(`${b.id}.phone.header`, p.phone.header); p.phone.rows.forEach((r, i) => S(`${b.id}.phone.row${i}`, r)); }
     if (b.say) S(`${b.id}.say`, b.say.text);
+    if (b.detail) { S(`${b.id}.detail.before`, b.detail.before); S(`${b.id}.detail.after`, b.detail.after); b.detail.steps.forEach((x, i) => S(`${b.id}.detail.step${i}`, x)); S(`${b.id}.detail.fact`, b.detail.fact); }
   });
   S('closing.body', story.closing.body); S('closing.cta', story.closing.cta.label);
   return out;

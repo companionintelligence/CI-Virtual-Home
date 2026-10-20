@@ -40,7 +40,7 @@
       "fallbackRooms": ["living", "dining"],
       "anchorRoles": ["desk", "bookshelf"],
       "fallbackAnchorRoles": ["couch", "room"],
-      "apps": ["open-webui", "kiwix", "calibre-web", "libretranslate", "obsidian", "jupyterlab", "ci-spellbook"]
+      "apps": ["open-webui", "calibre-web", "libretranslate", "obsidian", "jupyterlab", "ci-spellbook", "koodo-reader", "booklore", "kokoro", "razzia", "readeck", "linkwarden"]
     },
     "maker": {
       "label": "Maker",
@@ -59,6 +59,86 @@
       "anchorRoles": ["kitchen-island", "fridge", "range", "garden", "couch", "tv"],
       "fallbackAnchorRoles": ["counter", "room"],
       "apps": ["immich", "jellyfin", "home-assistant", "mealie", "kitchenowl", "hortusfox", "yuvomi"]
+    },
+    "tech-family": {
+      "label": "Tech family",
+      "description": "The household lead of a family that already runs its own network, lamp rules and a few apps: the rest of the family is the acceptance test.",
+      "example": "Andres",
+      "rooms": ["garage", "office", "entry", "living"],
+      "fallbackRooms": ["bedroom", "dining"],
+      "anchorRoles": ["room", "desk", "core", "counter"],
+      "fallbackAnchorRoles": ["couch", "tv", "kitchen-island", "bookshelf"],
+      "apps": ["home-assistant", "pi-hole", "forgejo", "ntfy", "uptime-kuma", "open-webui", "ollama", "vaultwarden", "n8n", "syncthing"]
+    },
+    "business-owner": {
+      "label": "Business owner",
+      "description": "Runs a shop, studio, agency or practice of one to fifteen people: quotes, invoices, contracts and the customer list.",
+      "example": "Ruth",
+      "rooms": ["office", "dining", "living", "kitchen"],
+      "fallbackRooms": ["bedroom", "entry"],
+      "anchorRoles": ["desk", "dining-table", "counter", "bookshelf"],
+      "fallbackAnchorRoles": ["kitchen-island", "couch", "room"],
+      "apps": ["nextcloud", "invoice-ninja", "paperless", "docuseal", "akaunting", "twenty", "vaultwarden", "anything-llm", "solidtime", "grist", "bookstack", "baikal", "libreoffice", "stirling-pdf", "whisper-webui", "ci-memory"]
+    },
+    "creative": {
+      "label": "Creative",
+      "description": "A working designer, photographer, filmmaker, illustrator or musician: client work, an archive that outlives the job, and a brief that is confidential.",
+      "example": "Dalia",
+      "rooms": ["office", "living", "bedroom", "garage", "dining"],
+      "fallbackRooms": ["kids"],
+      "anchorRoles": ["easel", "desk", "music", "bookshelf"],
+      "fallbackAnchorRoles": ["dining-table", "tv", "couch", "room"],
+      "apps": ["immich", "nextcloud", "penpot", "inkscape", "open-webui", "invoice-ninja", "vaultwarden", "whisper-webui", "docuseal", "freecut", "audiomass", "photoview", "pingvin-share", "syncthing", "navidrome"]
+    },
+    "contractor": {
+      "label": "Contractor",
+      "description": "A self-employed tradesperson or small building contractor: the quote, the site photos, the tools and the warranty cards, run from the garage bench.",
+      "example": "Kunle",
+      "rooms": ["garage", "office", "entry", "laundry"],
+      "fallbackRooms": ["dining", "kitchen", "living"],
+      "anchorRoles": ["room", "desk", "driveway", "laundry"],
+      "fallbackAnchorRoles": ["bookshelf", "kitchen-island", "dining-table", "core"],
+      "apps": ["invoice-ninja", "immich", "homebox", "lubelogger", "paperless", "docuseal", "solidtime", "vaultwarden", "nextcloud", "radicale", "stirling-pdf", "open-webui", "planka", "akaunting"]
+    },
+    "marketer": {
+      "label": "Marketer",
+      "description": "A freelance or in-house digital marketer: the client's list, files and briefs sit at home and the drafting model runs on the Core.",
+      "example": "Elena",
+      "rooms": ["office", "living", "dining", "kitchen"],
+      "fallbackRooms": ["bedroom"],
+      "anchorRoles": ["desk", "kitchen-island", "counter", "dining-table"],
+      "fallbackAnchorRoles": ["bookshelf", "couch", "room"],
+      "apps": ["open-webui", "ci-memory", "nextcloud", "ghost", "penpot", "vaultwarden", "twenty", "whisper-webui", "listmonk", "plausible", "n8n", "inkscape", "freecut", "mixpost", "solidtime", "grist"]
+    },
+    "lawyer": {
+      "label": "Lawyer",
+      "description": "A solo or small-firm attorney: the client file, the engagement letter and a first-pass summary she checks line by line.",
+      "example": "Ingrid",
+      "rooms": ["office", "dining", "living"],
+      "fallbackRooms": ["bedroom", "kitchen"],
+      "anchorRoles": ["desk", "bookshelf", "dining-table"],
+      "fallbackAnchorRoles": ["couch", "kitchen-island", "room"],
+      "apps": ["paperless", "nextcloud", "docuseal", "open-webui", "libreoffice", "vaultwarden", "stirling-pdf", "cryptgeon", "ollama", "whisper-webui", "radicale", "solidtime", "invoice-ninja", "bookstack", "twenty", "ci-memory"]
+    },
+    "journalist": {
+      "label": "Journalist",
+      "description": "A reporter, writer or researcher: the tape, the notes and the records sit on the Core and every quote is checked against the audio.",
+      "example": "Noor",
+      "rooms": ["office", "dining", "kitchen", "living"],
+      "fallbackRooms": ["bedroom"],
+      "anchorRoles": ["desk", "bookshelf", "dining-table"],
+      "fallbackAnchorRoles": ["couch", "kitchen-island", "room"],
+      "apps": ["whisper-webui", "paperless", "obsidian", "open-webui", "nextcloud", "vaultwarden", "ci-memory", "stirling-pdf", "libretranslate", "linkwarden", "libreoffice", "cryptgeon", "joplin", "anything-llm", "miniflux", "element"]
+    },
+    "educator": {
+      "label": "Educator",
+      "description": "A teacher, tutor, lecturer or homeschooling parent: lesson folders, handouts and report comments the teacher rewrites by hand.",
+      "example": "Eszter",
+      "rooms": ["dining", "office", "living", "kitchen", "kids"],
+      "fallbackRooms": ["bedroom"],
+      "anchorRoles": ["dining-table", "desk", "bookshelf", "kitchen-island"],
+      "fallbackAnchorRoles": ["easel", "couch", "room"],
+      "apps": ["open-webui", "paperless", "nextcloud", "libreoffice", "libretranslate", "joplin", "stirling-pdf", "vaultwarden", "razzia", "excalidraw", "ci-planning", "radicale", "calibre-web"]
     }
   }
 }

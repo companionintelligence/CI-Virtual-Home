@@ -26,6 +26,7 @@ import crypto from 'node:crypto';
 import { spawn, spawnSync } from 'node:child_process';
 import { ROOT, loadPlaywright, serve, stubGoogleFonts, type Served } from './portal-lib.mts';
 import { cutFormat, CUT_KEYS, CUT_RES, type CutKey, type CutPlan } from '../assets/story/film/cut/plan.js';
+import { CANVAS_TYPE_MIN } from '../assets/story/place.js';
 import {
   buildPlans, buildManifest, readManifest, writeManifest, manifestDrift, manifestText, adsJsonPath, adsOutDir, cutHash, toolSha, endModelOf, badgeOf, loadClaims, DEFAULTS,
   readRenders, writeRenders, renderKey, renderState, outName, glArgs, glMode, chromiumFor, type AdFamily, type GlMode, type RenderRecord,
@@ -148,6 +149,7 @@ async function encode(page: any, j: Job, f: ReturnType<typeof cutFormat>, info: 
   // (a dead ffmpeg ends the wait with its own error: its stdin never drains again)
   const write = (buf: Buffer): Promise<void> => (ff.stdin.write(buf) ? Promise.resolve() : Promise.race([new Promise<void>(r => ff.stdin.once('drain', () => r())), ffDone.then(() => { throw new Error('ffmpeg ended before the frames did'); })]));
   const digest = crypto.createHash('sha256'), spread: Array<[number, number]> = [];
+  let audit: { min: number; text: string; sizes: Record<string, number>; drawn: number } | null = null;
   try {
     for (let from = 0; from < info.frames; from += FRAMES_PER_CALL) {
       const out: { jpgs: string[]; st: Array<[number, number]> } = await page.evaluate(([a, n, q, total]: number[]) => {
@@ -161,6 +163,9 @@ async function encode(page: any, j: Job, f: ReturnType<typeof cutFormat>, info: 
       if (from === 0 && out.st[0][1] < BLANK_STD) throw new Error(`the first frame is blank (room spread ${out.st[0][1]}): the GPU path draws nothing (--gl default uses ${renderer}; never use --use-angle=vulkan)`);
       if (from % (FRAMES_PER_CALL * 10) === 0) process.stdout.write(`\r  ${j.plan.id} ${j.aspect}: frame ${Math.min(info.frames, from + FRAMES_PER_CALL)} / ${info.frames}   `);
     }
+    // the floor is a statement about the pixels: the smallest type the overlay really painted in every frame of this cut, in design px at the 1080 short edge
+    audit = await page.evaluate(() => (window as any).__cut.typeAudit());
+    if (audit!.min < CANVAS_TYPE_MIN - 0.01) throw new Error(`type under the ${CANVAS_TYPE_MIN} design px floor: ${audit!.min.toFixed(2)} painted for "${audit!.text}"`);
     ff.stdin.end(); await ffDone; process.stdout.write('\n');
   } catch (e) { ff.kill('SIGKILL'); fs.rmSync(tmp, { force: true }); throw e; }
   const blanks = spread.filter(s => s[1] < BLANK_STD).length;
@@ -177,7 +182,7 @@ async function encode(page: any, j: Job, f: ReturnType<typeof cutFormat>, info: 
   const bytes = fs.readFileSync(final), sha = crypto.createHash('sha256').update(bytes).digest('hex'), wall = (Date.now() - tj) / 1000;
   const rec: RenderRecord = { hash: j.hash, tool: TOOL, file: name, sha256: sha, bytes: bytes.length, width: f.out.w, height: f.out.h, durationS: +rep.probe.duration.toFixed(3), frames: info.frames, res: RES, lighting: LIGHTING, audio: AUDIO, gl: GL, renderer, wallSeconds: +wall.toFixed(1), frameDigest: digest.digest('hex') };
   const all = readRenders(); all.renders[j.key] = rec; writeRenders(all);
-  fs.writeFileSync(path.join(outDir, name.replace(/\.mp4$/, '.report.json')), JSON.stringify({ cut: j.plan.id, aspect: j.aspect, hash: j.hash, record: rec, gates: rep, cards: info.cards, hook: info.hook, endCard: info.end, captions: info.captions, spreadMin: Math.min(...spread.map(s => s[1])), blankFrames: blanks, browser: cr.note }, null, 1));
+  fs.writeFileSync(path.join(outDir, name.replace(/\.mp4$/, '.report.json')), JSON.stringify({ cut: j.plan.id, aspect: j.aspect, hash: j.hash, record: rec, gates: rep, cards: info.cards, hook: info.hook, endCard: info.end, captions: info.captions, tracking: info.tracking, typeFloor: CANVAS_TYPE_MIN, typePainted: audit, spreadMin: Math.min(...spread.map(s => s[1])), blankFrames: blanks, browser: cr.note }, null, 1));
   doneN++;
   log(`  ${j.plan.id} ${j.aspect}: ${f.out.w}x${f.out.h}, ${(bytes.length / 1048576).toFixed(1)} MiB, ${rep.probe.duration.toFixed(2)} s, ${wall.toFixed(0)} s wall (${(wall / (info.frames / info.fps)).toFixed(1)} s per second of film)`);
 }
@@ -194,7 +199,9 @@ async function stills(page: any, j: Job, info: any) {
     const jpg: string = await page.evaluate(([n]: number[]) => (window as any).__cut.frame(n, 0.92), [i]);
     fs.writeFileSync(path.join(out, `${j.aspect}.t${String(Math.round(s * 100)).padStart(5, '0')}.jpg`), Buffer.from(jpg, 'base64'));
   }
-  fs.writeFileSync(path.join(out, `${j.aspect}.cards.json`), JSON.stringify({ plan: P, ...info, cues: undefined }, null, 1));
+  const audit = await page.evaluate(() => (window as any).__cut.typeAudit());
+  fs.writeFileSync(path.join(out, `${j.aspect}.cards.json`), JSON.stringify({ plan: P, ...info, cues: undefined, typeFloor: CANVAS_TYPE_MIN, typePainted: audit }, null, 1));
+  if (audit.min < CANVAS_TYPE_MIN - 0.01) throw new Error(`type under the ${CANVAS_TYPE_MIN} design px floor: ${audit.min.toFixed(2)} painted for "${audit.text}"`);
   log(`  ${j.plan.id} ${j.aspect}: ${secs.length} stills in ${path.relative(process.cwd(), out)} (${secs.map(s => s.toFixed(2)).join(', ')} s)`);
 }
 

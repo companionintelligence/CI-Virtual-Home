@@ -6,7 +6,8 @@
 //   content/story/*                  casting, claims, catalog, roles, voices, lexicon
 //   portal/previews, portal/og       the homes' pictures (the family page's poster) and the committed link-preview images
 //
-//   -> <out>/family/<slug>.html                      a family's page (scripts/story/pages.mts), keyed by the FAMILY's slug
+//   -> <out>/family/<slug>.html                      a family's page (scripts/story/pages.mts), keyed by the FAMILY's slug. It reads the app media
+//                                                    manifest (real logos and screenshots) and its home's room bounds (the floor plan)
 //      <out>/story/manifest.json                     the one un-hashed data file (type SiteManifest, plus `house` per family). `narration: false` on a family
 //                                                    with a tour and no voice lock: a captions-only tour from reading-time durations (ship/player.mts)
 //      <out>/story/families.<hash10>.json            the family cards (type FamiliesIndex): what a families front page reads
@@ -44,6 +45,7 @@ import { SHIP_GLOB } from './hooks.ts';
 import { hash10, readJson, slugProblem, loadAll, storyFiles, cardOf, ogKey, ogText } from './site-lib.mts';
 import type { Card } from './site-lib.mts';
 import * as pg from './pages.mts';
+import { readMedia } from './lib/media.mts';
 import { needles, storyCopyLeaks } from './check-leaks.mts';
 import type { House } from '../portal-pages.mts';
 
@@ -200,6 +202,10 @@ export async function buildStorySite(o: { ROOT: string; OUT: string; SITE: strin
   // ---- the pages
   // (portal/campaign.js is the front page's: a family's page loads it when it is in the tree and is written the same without it)
   const campaign = fs.existsSync(pic(path.join('portal', 'campaign.js')));
+  // story v2: the real logos and screenshots (content/story/app-media.json, `pnpm run story:media`; absent: the pages show none) and each home's spec, whose
+  // room bounds draw the floor plan. The source spec is read (not the shipped copy), but only its storeys and rooms are used: nothing of its identity.
+  const media = readMedia(ROOT);
+  const specOf = (id: string): any => { const f = pic(path.join('content', 'houses', `${id}.json`)); try { return fs.existsSync(f) ? readJson(f) : null; } catch { return null; } };
   const labels = pg.uniqueLabels(cards, Object.fromEntries(sorted.map(s => [s.slug, s.family.address.place])));
   const built: BuiltFamily[] = [];
   for (let i = 0; i < sorted.length; i++) {
@@ -213,6 +219,7 @@ export async function buildStorySite(o: { ROOT: string; OUT: string; SITE: strin
       s, card: cardBy[s.slug], prev, next, site: SITE, claims, catalog,
       house, poster: posterOf(s.house), og: new URL(og, SITE).href, film,
       casting: casting[s.slug], label: labels[s.slug], prevLabel: labels[prev.slug], nextLabel: labels[next.slug], narration, campaign,
+      media, spec: specOf(s.house),
     });
     const file = put(path.join('family', `${s.slug}.html`), html);
     built.push({ slug: s.slug, house: s.house, title: cardBy[s.slug].title, label: labels[s.slug], file, url: pg.familyUrl(SITE, s.slug), poster: posterOf(s.house), og: m.og, hasTour: !!m.story, narration });

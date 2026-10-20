@@ -1,0 +1,1350 @@
+{
+  "schema": "family/v1",
+  "slug": "brennan",
+  "house": "seraphine",
+  "fictional": true,
+  "family": {
+    "surname": "Brennan",
+    "tagline": "Four people, one Companion Core, and a house full of books.",
+    "household": "older-kids",
+    "business": true,
+    "story": "Sally runs a small consultancy from the library, and John writes software in the primary suite. Steve, sixteen, plays upstairs, and Jean, fourteen, studies at her desk. One Companion Core serves all four.",
+    "address": {
+      "line": "21 Thornwick Rise",
+      "place": "Wrenfield"
+    },
+    "narrator": "v-clear-f",
+    "home": {
+      "lede": "Two storeys of brick under a dark shingle roof, with twin chimneys and a white-columned porch at the front. The ground floor is open and lined with books. Behind the house, a pool garden runs down to the lake.",
+      "spots": [
+        {
+          "room": "Library",
+          "line": "A grand piano, shelves of books and the Core on its desk."
+        },
+        {
+          "room": "Kitchen",
+          "line": "A breakfast bar with three stools, where the week's dinners get planned."
+        },
+        {
+          "room": "Living Room",
+          "line": "Two chesterfield sofas face the TV on its stand."
+        },
+        {
+          "room": "Girl's Room",
+          "line": "Jean studies at her own desk, under the lamp."
+        },
+        {
+          "room": "Boy's Room",
+          "line": "Steve's room is upstairs, with a desk, a bed and a lamp."
+        }
+      ]
+    },
+    "day": [
+      {
+        "at": "morning",
+        "beat": "office-plan",
+        "line": "Sally writes up yesterday's client call before the next one begins."
+      },
+      {
+        "at": "morning",
+        "beat": "suite-code",
+        "line": "John starts work at the desk in the primary suite."
+      },
+      {
+        "at": "midday",
+        "beat": "office-paper",
+        "line": "The receipts from the shelf are filed before lunch."
+      },
+      {
+        "at": "midday",
+        "beat": "kitchen-list",
+        "line": "Over lunch, the pantry is checked and the shopping list is made."
+      },
+      {
+        "at": "afternoon",
+        "beat": "suite-repos",
+        "line": "John pushes the day's branch and closes the laptop."
+      },
+      {
+        "at": "after-school",
+        "beat": "jean-homework",
+        "line": "Jean opens her maths homework as soon as she is in."
+      },
+      {
+        "at": "after-school",
+        "beat": "steve-play",
+        "line": "Steve drops his bag and starts a session in his room."
+      },
+      {
+        "at": "weekend",
+        "beat": "garden-beds",
+        "line": "Saturday watering by the pool, noted in the plant journal."
+      }
+    ]
+  },
+  "members": [
+    {
+      "id": "sally",
+      "name": "Sally",
+      "age": 43,
+      "role": "parent",
+      "work": "consultant, runs her own small practice",
+      "colour": "chart-1",
+      "archetype": "organiser",
+      "companion": {
+        "name": "Juniper",
+        "runtime": "Hermes",
+        "job": "Drafts replies to Sally’s clients from the notes she sends it.",
+        "personality": [
+          "calm",
+          "warm",
+          "precise"
+        ],
+        "voice": "v-warm-f",
+        "memory": false,
+        "limits": "Drafts only. Sally reads and sends every message."
+      },
+      "profile": {
+        "bio": "Sally runs a small consultancy from the library. She keeps client files, receipts and the week's plan on the Core, and asks Juniper for drafts that she reads before sending."
+      }
+    },
+    {
+      "id": "john",
+      "name": "John",
+      "age": 45,
+      "role": "parent",
+      "work": "software engineer",
+      "colour": "chart-2",
+      "archetype": "builder",
+      "companion": {
+        "name": "Quill",
+        "runtime": "Hermes",
+        "job": "Drafts pull request descriptions from the notes John types to it.",
+        "personality": [
+          "steady",
+          "practical",
+          "patient"
+        ],
+        "voice": "v-steady-m",
+        "memory": false,
+        "limits": "Drafts only. John reads every word before it is used."
+      },
+      "profile": {
+        "bio": "John writes software for work from the primary suite. His editor and repositories run on the Core, and Quill drafts his notes on the Core's local model."
+      }
+    },
+    {
+      "id": "steve",
+      "name": "Steve",
+      "age": 16,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-3",
+      "archetype": "gamer",
+      "profile": {
+        "bio": "Steve plays games that run on the Core, from his room upstairs. His phone photos back up to Immich, and he swaps bin day with Jean."
+      }
+    },
+    {
+      "id": "jean",
+      "name": "Jean",
+      "age": 14,
+      "role": "teen",
+      "work": "secondary school",
+      "colour": "chart-4",
+      "archetype": "learner",
+      "profile": {
+        "bio": "Jean studies at her own desk: maths in JupyterLab, French with LibreTranslate and notes in Obsidian. Her sources for an essay are saved in Linkwarden."
+      }
+    }
+  ],
+  "chapters": [
+    {
+      "id": "ftue",
+      "kind": "ftue",
+      "title": "First run"
+    },
+    {
+      "id": "office",
+      "kind": "room",
+      "room": "office",
+      "title": "Sally in the library"
+    },
+    {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
+      "id": "kitchen",
+      "kind": "room",
+      "room": "kitchen",
+      "title": "The kitchen"
+    },
+    {
+      "id": "suite",
+      "kind": "room",
+      "room": "bedroom",
+      "title": "John in the primary suite"
+    },
+    {
+      "id": "steve",
+      "kind": "room",
+      "room": "kids",
+      "title": "Steve’s room"
+    },
+    {
+      "id": "jean",
+      "kind": "room",
+      "room": "kids",
+      "title": "Jean’s room"
+    },
+    {
+      "id": "garden",
+      "kind": "outside",
+      "room": "garden",
+      "title": "Out in the garden"
+    },
+    {
+      "id": "outro",
+      "kind": "outro",
+      "title": "Your turn"
+    }
+  ],
+  "beats": [
+    {
+      "id": "ftue-delivery",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "front-door",
+        "fallback": [
+          {
+            "role": "street"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front"
+      },
+      "popup": {
+        "title": "A parcel at the door",
+        "body": "A parcel waits at the top of the front steps. John carries it through the chess hall and the living room to the library, where Sally clears the desk."
+      }
+    },
+    {
+      "id": "ftue-unbox",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Unbox the Companion Core",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Steve lifts the Core out, and Jean unpacks the guide."
+      }
+    },
+    {
+      "id": "ftue-plug-in",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "emphasis": {
+        "ring": true,
+        "wake": true
+      },
+      "popup": {
+        "title": "Plug it in",
+        "body": "Steve plugs in the cable. Jean presses the button, and the Core wakes and opens its own Wi-Fi network.",
+        "note": "Companion OS is in beta."
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-join",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Join it from a phone",
+        "body": "John opens the Wi-Fi settings on his phone and joins the Core’s own network. Then he chooses the home network.",
+        "phone": {
+          "header": "Wi-Fi",
+          "rows": [
+            "Join the Core’s own network",
+            "Choose your home network",
+            "Enter its password"
+          ]
+        }
+      },
+      "film": true
+    },
+    {
+      "id": "ftue-pick",
+      "chapter": "ftue",
+      "category": "setup",
+      "segment": "consumer",
+      "with": [
+        "nextcloud",
+        "open-webui"
+      ],
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "kind": "phone",
+        "title": "Pick the first agent and apps",
+        "body": "In the Companion Hub store, Sally picks Hermes, and the family adds Nextcloud and Open WebUI. Then they walk away.",
+        "note": "Installing apps uses the internet.",
+        "phone": {
+          "header": "Companion Hub",
+          "rows": [
+            "Agent: Hermes",
+            "Apps: Nextcloud, Open WebUI"
+          ]
+        }
+      }
+    },
+    {
+      "id": "ftue-hello",
+      "chapter": "ftue",
+      "member": "sally",
+      "agent": "sally",
+      "approval": "sally",
+      "category": "setup",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium"
+      },
+      "popup": {
+        "title": "Juniper says hello",
+        "body": "Sally messages the agent she named Juniper from the library. Juniper answers from the Core beside her.",
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "sally",
+        "text": "Hello, Sally. I am Juniper. What shall we start with?"
+      },
+      "film": true,
+      "detail": {
+        "before": "Without an agent of her own, Sally wrote every reply and every reminder herself, one app at a time.",
+        "after": "Juniper runs in its own sandbox on the Core and answers in the messaging app Sally picked. Messages pass through that chat service.",
+        "steps": [
+          "Pick Hermes in the Companion Hub store",
+          "Give the agent a name",
+          "Send it a first message"
+        ],
+        "fact": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
+      }
+    },
+    {
+      "id": "office-plan",
+      "chapter": "office",
+      "member": "sally",
+      "category": "productivity",
+      "segment": "small-business",
+      "app": {
+        "id": "bookstack",
+        "replaces": [
+          "Confluence"
+        ]
+      },
+      "capability": "write a wiki or a set of manuals in books, chapters and pages, with search and history",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Client notes, in books and pages",
+        "body": "Sally writes the week's client notes in BookStack on the Core, as books, chapters and pages. Search finds a phrase from any page, and every page keeps its history.",
+        "chips": [
+          "BookStack",
+          "alternative to Confluence"
+        ]
+      },
+      "detail": {
+        "before": "Client notes lived as pages in Confluence, and last month’s decisions were found by scrolling.",
+        "after": "BookStack keeps the notes as books, chapters and pages on the Core. Sally searches a phrase and opens the page's history.",
+        "steps": [
+          "Start a book for the client",
+          "Write the week's notes as pages",
+          "Search a phrase later"
+        ],
+        "fact": "BookStack is a wiki with a book, chapter and page structure, with search and page history."
+      },
+      "service": "confluence"
+    },
+    {
+      "id": "office-paper",
+      "chapter": "office",
+      "member": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "paperless",
+        "replaces": [
+          "Evernote"
+        ]
+      },
+      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Receipts and school forms, filed",
+        "body": "A stack of receipts and school forms leaves the shelf for Paperless-ngx on the Core. Every page is read and searchable, and Sally finds last year’s invoice by one word.",
+        "chips": [
+          "Paperless-ngx",
+          "alternative to Evernote"
+        ]
+      },
+      "detail": {
+        "before": "Receipts sat in a shoebox, then as photos in Evernote that Sally could only find by remembering the title.",
+        "after": "Paperless-ngx reads each page on the Core, tags it and files it, so Sally finds an invoice by one word.",
+        "steps": [
+          "Scan the stack",
+          "Check the tags Paperless-ngx chose",
+          "Search by one word"
+        ],
+        "fact": "Paperless-ngx reads every page, tags it and makes the whole archive searchable."
+      },
+      "service": "evernote"
+    },
+    {
+      "id": "office-draft",
+      "chapter": "office",
+      "member": "sally",
+      "agent": "sally",
+      "approval": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "music",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "bookshelf",
+            "room": "office"
+          },
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "A reply, drafted at the piano",
+        "body": "From the piano stool, Sally messages Juniper three lines about a moved deadline. Juniper drafts the reply on the Core’s local model, and Sally reads it before sending it herself.",
+        "chips": [
+          "Hermes"
+        ],
+        "note": "Messages pass through the chat service you choose."
+      },
+      "say": {
+        "speaker": "sally",
+        "text": "Here is the draft reply. Please check it before it goes."
+      },
+      "detail": {
+        "before": "A reply to a client meant opening the mail app, finding the thread and writing it from scratch.",
+        "after": "Sally texts Juniper three lines. Juniper drafts the reply on the Core's local model, and Sally reads it and sends it herself.",
+        "steps": [
+          "Text the agent three lines",
+          "Read the draft",
+          "Send it"
+        ],
+        "fact": "Hermes is an agent built for messaging: it connects to chat apps, email and more from one self-hosted app."
+      }
+    },
+    {
+      "id": "office-pdf",
+      "chapter": "office",
+      "member": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "stirling-pdf",
+        "replaces": [
+          "Adobe Acrobat"
+        ]
+      },
+      "capability": "merge, split, compress and convert PDFs on your own Core",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A heavy scan, made small",
+        "body": "A client’s scanned report is too big to email. Sally shrinks it with Stirling-PDF on the Core, so the file does not go to a PDF website.",
+        "chips": [
+          "Stirling-PDF",
+          "alternative to Adobe Acrobat"
+        ]
+      },
+      "detail": {
+        "before": "A scan too big to email went to a PDF website, or through Adobe Acrobat.",
+        "after": "Stirling-PDF compresses the scan on the Core. The file does not pass through a PDF website on the way.",
+        "steps": [
+          "Open the scan in Stirling-PDF",
+          "Choose compress",
+          "Save the smaller file"
+        ],
+        "fact": "Stirling-PDF merges, splits, compresses and converts PDFs on your own Core."
+      },
+      "service": "adobe-acrobat"
+    },
+    {
+      "id": "office-contracts",
+      "chapter": "office",
+      "member": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "nextcloud",
+        "replaces": [
+          "Google Drive"
+        ]
+      },
+      "capability": "your files, calendar and contacts on your own Core, synced to your devices",
+      "anchor": {
+        "role": "core"
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The contract stays on the Core",
+        "body": "A client sends the signed contract. Sally files it in Nextcloud, and it sits on the Core, not in a rented drive.",
+        "chips": [
+          "Nextcloud",
+          "alternative to Google Drive"
+        ]
+      },
+      "film": true,
+      "detail": {
+        "before": "A signed contract went into Google Drive, and the file lived on a company's servers.",
+        "after": "Sally files the contract in Nextcloud. The file sits on the Core and syncs to her devices.",
+        "steps": [
+          "Save the signed contract",
+          "Pick the client's folder",
+          "Open it from a phone or a laptop"
+        ],
+        "fact": "Nextcloud keeps your files, calendar and contacts on your own Core, synced to your devices."
+      },
+      "service": "google-drive"
+    },
+    {
+      "id": "living-scene",
+      "chapter": "living",
+      "member": "john",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "home-assistant",
+        "replaces": [
+          "Google Home"
+        ]
+      },
+      "capability": "control and automate your smart home from one place, locally",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front"
+      },
+      "popup": {
+        "title": "Hall lights and TV, one scene",
+        "body": "John builds one scene in Home Assistant on the Core. The hall lights and the TV switch together, and the scene runs from the Core with no cloud account.",
+        "chips": [
+          "Home Assistant",
+          "alternative to Google Home"
+        ]
+      },
+      "detail": {
+        "before": "The hall lights lived in the Google Home app, and the television answered to a separate handset.",
+        "after": "John builds one scene in Home Assistant. It runs on the Core and switches the hall lights and the TV together.",
+        "steps": [
+          "Add the lights and the TV",
+          "Group them in one scene",
+          "Run the scene from the hall"
+        ],
+        "fact": "Home Assistant controls and automates your smart home from one place, locally, without a cloud account."
+      },
+      "service": "google-home"
+    },
+    {
+      "id": "living-film",
+      "chapter": "living",
+      "member": "steve",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "jellyfin",
+        "replaces": [
+          "Plex"
+        ]
+      },
+      "capability": "stream your own movies, shows and music to every screen in the house",
+      "anchor": {
+        "role": "tv",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 1
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Friday’s film, from the collection",
+        "body": "The family fills the two chesterfields, and Steve picks the film from their own collection. Jellyfin plays it from the Core to the TV.",
+        "chips": [
+          "Jellyfin",
+          "alternative to Plex"
+        ]
+      },
+      "detail": {
+        "before": "Films from the family collection played through Plex on the television.",
+        "after": "Jellyfin streams the family's own collection from the Core to the TV, and everyone picks from the same list.",
+        "steps": [
+          "Open Jellyfin on the TV",
+          "Pick a film from the collection",
+          "Press play"
+        ],
+        "fact": "Jellyfin streams the movies, TV and music you already have to the devices in your home."
+      },
+      "service": "plex"
+    },
+    {
+      "id": "kitchen-list",
+      "chapter": "kitchen",
+      "member": "sally",
+      "category": "food",
+      "segment": "consumer",
+      "app": {
+        "id": "grocy",
+        "replaces": [
+          "AnyList"
+        ]
+      },
+      "capability": "track the pantry, shopping lists, recipes, chores and household habits in one place",
+      "anchor": {
+        "role": "kitchen-island",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Dinners and one shopping list",
+        "body": "At the breakfast bar, Sally checks the pantry stock in Grocy on the Core. John adds what is missing to the shopping list, and the list is kept there too.",
+        "chips": [
+          "Grocy",
+          "alternative to AnyList"
+        ]
+      },
+      "detail": {
+        "before": "The shopping list lived in AnyList, and nobody could say what was left in the pantry.",
+        "after": "Grocy tracks pantry stock and shopping lists on the Core, so Sally and John add to and read the same list.",
+        "steps": [
+          "Check the pantry stock",
+          "Add what is missing to the list",
+          "Tick items off at the shop"
+        ],
+        "fact": "Grocy tracks pantry stock, shopping lists, recipes, chores and household habits in one place."
+      },
+      "service": "anylist"
+    },
+    {
+      "id": "kitchen-rota",
+      "chapter": "kitchen",
+      "member": "steve",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "habitica",
+        "replaces": [
+          "Todoist"
+        ]
+      },
+      "capability": "turn habits and chores into a game with levels and quests",
+      "anchor": {
+        "role": "fridge",
+        "fallback": [
+          {
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close"
+      },
+      "popup": {
+        "title": "Bin day earns a level",
+        "body": "Steve swaps bin day with Jean in Habitica. Each finished chore adds to a level, and the game runs on the Core.",
+        "chips": [
+          "Habitica",
+          "alternative to Todoist"
+        ]
+      },
+      "detail": {
+        "before": "Chores were swapped by text message and forgotten by Thursday.",
+        "after": "Steve and Jean swap bin day in Habitica, and each finished chore adds to a level.",
+        "steps": [
+          "Open the chore list",
+          "Move bin day to Jean",
+          "Tick it off when it is done"
+        ],
+        "fact": "Habitica turns habits and chores into a game with levels and quests."
+      },
+      "service": "todoist"
+    },
+    {
+      "id": "suite-code",
+      "chapter": "suite",
+      "member": "john",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "code-server",
+        "replaces": [
+          "Cursor"
+        ]
+      },
+      "capability": "write code in VS Code in your browser, with the editor and your files on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The editor is already there",
+        "body": "John opens his laptop, and the editor is waiting. Code Server runs on the Core, so his files sit at home, not in a cloud editor.",
+        "chips": [
+          "Code Server",
+          "alternative to Cursor"
+        ]
+      },
+      "film": true,
+      "detail": {
+        "before": "John coded in Cursor on his laptop, with the project folder on that one machine.",
+        "after": "Code Server gives John the same kind of editor in a browser tab. The editor and his files are on the Core.",
+        "steps": [
+          "Open the editor in a browser",
+          "Open the project folder",
+          "Write code as usual"
+        ],
+        "fact": "Code Server runs VS Code in your browser, with the editor and your files on your Core."
+      },
+      "service": "cursor"
+    },
+    {
+      "id": "suite-repos",
+      "chapter": "suite",
+      "member": "john",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "forgejo",
+        "replaces": [
+          "GitHub"
+        ]
+      },
+      "capability": "host your own git repositories, issues and pull requests on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "bedroom",
+        "nth": 2,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The day’s branch goes home",
+        "body": "John pushes the day’s branch to Forgejo from the laptop on his desk. The repository sits in the house, on the Core, with its issues and pull requests beside it.",
+        "chips": [
+          "Forgejo",
+          "alternative to GitHub"
+        ]
+      },
+      "detail": {
+        "before": "The day's branch went to GitHub, with the issues and pull requests kept there.",
+        "after": "Forgejo hosts the repository on the Core, with its issues and pull requests beside it.",
+        "steps": [
+          "Point the repository at Forgejo",
+          "Push the branch",
+          "Open a pull request in Forgejo"
+        ],
+        "fact": "Forgejo hosts your own Git repositories, issues and pull requests on your Core."
+      },
+      "service": "github"
+    },
+    {
+      "id": "suite-quill",
+      "chapter": "suite",
+      "member": "john",
+      "agent": "john",
+      "approval": "john",
+      "category": "productivity",
+      "segment": "consumer",
+      "app": {
+        "id": "ci-hermes",
+        "replaces": []
+      },
+      "with": [
+        "forgejo"
+      ],
+      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "anchor": {
+        "role": "couch",
+        "room": "bedroom",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "bedroom",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "bedroom",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Quill drafts the pull request",
+        "body": "From the loveseat, John types his notes to Quill in his browser. Quill drafts the description on the Core’s local model, and John reads it before pasting it into Forgejo.",
+        "chips": [
+          "Hermes"
+        ]
+      },
+      "say": {
+        "speaker": "john",
+        "text": "Here is the description. Please read it before you paste it."
+      },
+      "detail": {
+        "before": "Describing a change meant writing the pull request text by hand after a long day.",
+        "after": "Quill drafts the description on the Core's local model. John reads it, edits it and pastes it into Forgejo himself.",
+        "steps": [
+          "Type the notes to Quill",
+          "Read the draft",
+          "Paste it into Forgejo"
+        ],
+        "fact": "Hermes is an agent built for messaging: it connects to chat apps, email and more from one self-hosted app."
+      }
+    },
+    {
+      "id": "steve-play",
+      "chapter": "steve",
+      "member": "steve",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "steam-headless",
+        "replaces": [
+          "GeForce Now"
+        ]
+      },
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "kids",
+            "nth": 1
+          },
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "behind"
+      },
+      "popup": {
+        "title": "The game runs a floor below",
+        "body": "Steve opens his Steam library in a browser in his room. Steam Headless runs his session a floor below, on the Core, not on a cloud gaming service.",
+        "chips": [
+          "Steam Headless",
+          "alternative to GeForce Now"
+        ],
+        "note": "Steam needs a Valve account."
+      },
+      "film": true,
+      "detail": {
+        "before": "A cloud gaming service such as GeForce Now runs the session in a data centre and streams it to the player.",
+        "after": "Steam Headless runs the session on the Core, and Steve plays it in a browser in his room.",
+        "steps": [
+          "Sign in to Steam",
+          "Open the library in the browser",
+          "Pick a game"
+        ],
+        "fact": "Steam Headless runs Steam on your Core and plays it in a browser on a screen in the house."
+      },
+      "service": "geforce-now"
+    },
+    {
+      "id": "steve-session",
+      "chapter": "steve",
+      "member": "steve",
+      "category": "privacy",
+      "segment": "consumer",
+      "app": {
+        "id": "steam-headless",
+        "replaces": [
+          "GeForce Now"
+        ]
+      },
+      "capability": "run Steam on your Core and play it in a browser on a screen in the house",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "bed",
+            "room": "kids",
+            "nth": 1
+          },
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 2
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Where the session runs",
+        "body": "A cloud gaming service would run the session on its servers. Here it runs on the Core, in the house. Valve keeps the account and the library.",
+        "chips": [
+          "Steam Headless",
+          "alternative to GeForce Now"
+        ]
+      },
+      "detail": {
+        "before": "GeForce Now runs the game on its own servers, so the session lives there.",
+        "after": "On the Core the session runs in the house. Valve still keeps the account and the library.",
+        "steps": [
+          "Start the session on the Core",
+          "Play in the browser",
+          "Close it when done"
+        ],
+        "fact": "Steam needs a Valve account to sign in. The game library and the purchases are Valve's, and the Core runs the session."
+      },
+      "service": "geforce-now"
+    },
+    {
+      "id": "steve-photos",
+      "chapter": "steve",
+      "member": "steve",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "immich",
+        "replaces": [
+          "Google Photos"
+        ]
+      },
+      "capability": "back up, search and organise your family photos and videos",
+      "anchor": {
+        "role": "room",
+        "room": "kids",
+        "nth": 2
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Steve’s photos land on the Core",
+        "body": "A summer of photos from Steve’s phone backs up to Immich on the Core, not to a photo cloud. The first start takes a while, because Immich sorts the pictures.",
+        "chips": [
+          "Immich",
+          "alternative to Google Photos"
+        ]
+      },
+      "detail": {
+        "before": "Steve's phone photos backed up to Google Photos and sat in a company's cloud.",
+        "after": "Immich backs them up to the Core instead. It sorts the pictures, so the first start takes a while.",
+        "steps": [
+          "Install Immich from the Companion Hub store",
+          "Sign in on the phone",
+          "Let the first backup finish"
+        ],
+        "fact": "Immich backs up, organises and searches your family photos and videos on your own Core."
+      },
+      "service": "google-photos"
+    },
+    {
+      "id": "jean-homework",
+      "chapter": "jean",
+      "member": "jean",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "jupyterlab",
+        "replaces": []
+      },
+      "capability": "write and run notebooks, code and data in a browser, on your Core",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Maths homework, worked in code",
+        "body": "Jean works her maths homework in a JupyterLab notebook on the Core. She tries each problem in code, then checks it against her own answer.",
+        "chips": [
+          "JupyterLab"
+        ]
+      },
+      "detail": {
+        "before": "A stuck homework question went to a search engine or a hosted chat tool.",
+        "after": "Jean runs her notebook in JupyterLab on the Core and checks each answer against her own working.",
+        "steps": [
+          "Open the notebook in the browser",
+          "Work the problem in code",
+          "Check it against her answer"
+        ],
+        "fact": "JupyterLab writes and runs notebooks, code and data in a browser, on your Core."
+      }
+    },
+    {
+      "id": "jean-lookup",
+      "chapter": "jean",
+      "member": "jean",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "linkwarden",
+        "replaces": [
+          "Pocket"
+        ]
+      },
+      "capability": "save web pages with a screenshot and PDF so they survive link rot",
+      "anchor": {
+        "role": "desk",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "side": "left"
+      },
+      "popup": {
+        "title": "Pages saved for the essay",
+        "body": "For her history essay, Jean saves each source page in Linkwarden. It keeps a screenshot and a PDF on the Core, so the page survives if the link dies.",
+        "chips": [
+          "Linkwarden",
+          "alternative to Pocket"
+        ]
+      },
+      "film": true,
+      "detail": {
+        "before": "Sources for an essay were saved as bookmarks in Pocket, and the page itself stayed out on the web.",
+        "after": "Linkwarden saves each page with a screenshot and a PDF on the Core, so Jean can still read it if the link dies.",
+        "steps": [
+          "Open the source page",
+          "Save it in Linkwarden",
+          "Open the saved copy later"
+        ],
+        "fact": "Linkwarden saves web pages with a screenshot and PDF so they survive link rot."
+      },
+      "service": "pocket"
+    },
+    {
+      "id": "jean-translate",
+      "chapter": "jean",
+      "member": "jean",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "libretranslate",
+        "replaces": [
+          "Google Translate"
+        ]
+      },
+      "capability": "translate text and documents on your own Core",
+      "anchor": {
+        "role": "room",
+        "room": "kids",
+        "nth": 0
+      },
+      "camera": {
+        "framing": "wide",
+        "side": "left"
+      },
+      "popup": {
+        "title": "French first, then checked",
+        "body": "Jean writes her French paragraph herself, then checks it in LibreTranslate. Its language models were downloaded once, and the Core does the translating, not a translation website.",
+        "chips": [
+          "LibreTranslate",
+          "alternative to Google Translate"
+        ]
+      },
+      "detail": {
+        "before": "Checking a French paragraph meant pasting it into Google Translate.",
+        "after": "LibreTranslate runs on the Core with language models the family downloaded once. Jean pastes her paragraph there instead.",
+        "steps": [
+          "Write the paragraph first",
+          "Paste it into LibreTranslate",
+          "Compare it with her own version"
+        ],
+        "fact": "LibreTranslate translates text and documents on your own Core."
+      },
+      "service": "google-translate"
+    },
+    {
+      "id": "jean-notes",
+      "chapter": "jean",
+      "member": "jean",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "obsidian",
+        "replaces": [
+          "Notion"
+        ]
+      },
+      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "kids",
+            "nth": 0
+          },
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "side": "right"
+      },
+      "popup": {
+        "title": "Study notes as plain files",
+        "body": "Cross-legged on her bed, Jean types up the day’s study notes in Obsidian. It runs in a browser session, and the notes are plain Markdown files on the Core.",
+        "chips": [
+          "Obsidian",
+          "alternative to Notion"
+        ]
+      },
+      "detail": {
+        "before": "Study notes lived as pages inside Notion.",
+        "after": "Obsidian runs in a browser session on the Core. The notes are plain Markdown files that any text editor can open.",
+        "steps": [
+          "Open the vault in the browser",
+          "Type the day's notes",
+          "Link them to earlier pages"
+        ],
+        "fact": "Obsidian is a note app in your browser. Your notes stay as local Markdown files."
+      },
+      "service": "notion"
+    },
+    {
+      "id": "garden-beds",
+      "chapter": "garden",
+      "member": "jean",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "hortusfox",
+        "replaces": []
+      },
+      "capability": "track your plants, watering and care history across rooms and beds, with photos and a garden journal",
+      "anchor": {
+        "role": "garden"
+      },
+      "camera": {
+        "framing": "medium",
+        "eye": "standing"
+      },
+      "popup": {
+        "title": "Saturday watering, noted in the garden",
+        "body": "On Saturday, Jean records the watering of the garden beds by the pool in HortusFox. The plant journal sits on the Core.",
+        "chips": [
+          "HortusFox"
+        ]
+      },
+      "detail": {
+        "before": "Watering was remembered, or forgotten, with no record of which bed got what.",
+        "after": "Jean logs each watering in HortusFox. The journal of beds, dates and photos sits on the Core.",
+        "steps": [
+          "Pick the bed",
+          "Log the watering",
+          "Add a photo"
+        ],
+        "fact": "HortusFox tracks your plants, watering and care history across rooms and beds, with photos and a garden journal."
+      }
+    },
+    {
+      "id": "outro-street",
+      "chapter": "outro",
+      "category": "setup",
+      "segment": "consumer",
+      "anchor": {
+        "role": "street"
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "eye": "aerial"
+      },
+      "popup": {
+        "title": "A house of books, one Core",
+        "body": "Planner, files, code, games and homework run on one Companion Core, among the library’s books."
+      },
+      "film": true
+    }
+  ],
+  "closing": {
+    "body": "Your calendar, contracts, code and homework can sit on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "cta": {
+      "label": "See Companion Core",
+      "url": "https://ci.computer/core"
+    }
+  },
+  "notes": [
+    "suite-code uses code-server, which has no QA screenshot: the app-qa-screenshot review item has an owner entry in content/story/reviewed.json (slug brennan, at suite-code).",
+    "Told in the v3 shape: sixteen pair beats name a service from content/story/services.json; the four pair-less beats are two Hermes drafts, JupyterLab and HortusFox.",
+    "Jean is fourteen and has no chat model in her own beats (age rule 16); Open WebUI is only named in the first-install list, which has no member.",
+    "Steam Headless: Valve account named, no frame rate, no title, home network only. Steve is never shown asleep."
+  ]
+}

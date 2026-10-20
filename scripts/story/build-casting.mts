@@ -29,8 +29,11 @@ const S = (...p: string[]): string => path.join(ROOT, 'content', 'story', ...p);
 const readJson = (p: string): any => JSON.parse(fs.readFileSync(p, 'utf8'));
 
 // ---- the plan ---------------------------------------------------------------------------------------------------------
-export type Archetype = 'organiser' | 'builder' | 'gamer' | 'learner' | 'maker' | 'host';
-export const ARCHETYPES: Archetype[] = ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host'];
+// The fourteen archetypes of content/story/personas.json (the first six are the original cast; the other eight are story v3, in the owner's order).
+export type Archetype = 'organiser' | 'builder' | 'gamer' | 'learner' | 'maker' | 'host'
+  | 'tech-family' | 'business-owner' | 'creative' | 'contractor' | 'marketer' | 'lawyer' | 'journalist' | 'educator';
+export const ARCHETYPES: Archetype[] = ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host',
+  'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator'];
 export interface PlanMember {
   id: string; name: string; age: number; role: string; archetype: Archetype | null; work?: string;
   room: string; sleepsIn: string | null; roomLabel?: string; companion?: string;
@@ -51,6 +54,15 @@ export const PREFS: Record<Archetype, string[]> = {
   gamer: ['tv', 'bed', 'desk', 'couch'],
   learner: ['desk', 'bookshelf', 'couch'],
   maker: ['easel', 'music', 'desk'],
+  // story v3 (reference/story/persona-bible.md 5.3): item roles only; `room` and `core` are not furniture and a zone (`driveway`) is never in a room
+  'tech-family': ['desk', 'counter', 'couch', 'tv'],
+  'business-owner': ['desk', 'dining-table', 'counter', 'bookshelf'],
+  creative: ['easel', 'desk', 'music', 'bookshelf'],
+  contractor: ['desk', 'laundry', 'bookshelf'],
+  marketer: ['desk', 'kitchen-island', 'counter', 'dining-table'],
+  lawyer: ['desk', 'bookshelf', 'dining-table'],
+  journalist: ['desk', 'bookshelf', 'dining-table'],
+  educator: ['dining-table', 'desk', 'bookshelf', 'kitchen-island'],
   host: ['kitchen-island', 'fridge', 'range', 'garden', 'couch', 'tv'],
 };
 /** the room role a member's chapter is set in, most fitting first, per archetype */
@@ -60,6 +72,14 @@ const ROOM_PREF: Record<Archetype, string[]> = {
   gamer: ['living', 'kids', 'bedroom'],
   learner: ['kids', 'bedroom', 'office', 'living'],
   maker: ['office', 'living', 'bedroom', 'kids'],
+  'tech-family': ['garage', 'office', 'entry', 'living', 'bedroom', 'dining'],
+  'business-owner': ['office', 'dining', 'living', 'kitchen', 'bedroom', 'entry'],
+  creative: ['office', 'living', 'bedroom', 'garage', 'dining', 'kids'],
+  contractor: ['garage', 'office', 'entry', 'laundry', 'dining', 'kitchen', 'living'],
+  marketer: ['office', 'living', 'dining', 'kitchen', 'bedroom'],
+  lawyer: ['office', 'dining', 'living', 'bedroom', 'kitchen'],
+  journalist: ['office', 'dining', 'kitchen', 'living', 'bedroom'],
+  educator: ['dining', 'office', 'living', 'kitchen', 'kids', 'bedroom'],
   host: ['kitchen', 'living', 'dining', 'garden'],
 };
 /** furniture the specs place that roles.json does not list under the role it plainly serves (reported, never used in a chain) */
@@ -84,7 +104,7 @@ export const APP_TOPICS: Record<Topic, Set<string>> = {
   productivity: new Set(T('nextcloud libreoffice onlyoffice collabora-online cryptpad ci-planning joplin bookstack obsidian n8n activepieces stirling-pdf vikunja super-productivity baikal planka forgejo gitea jupyterlab code-server open-webui ci-openclaw ci-hermes ci-memory logseq docmost')),
   money: new Set(T('wallos firefly-iii monetr spliit akaunting invio invoice-ninja taxhacker ghostfolio wealthfolio')),
   privacy: new Set(T('vaultwarden pi-hole adguardhome searxng simplelogin cryptgeon privatebin duplicati syncthing open-webui ci-memory forgejo gitea nextcloud paperless netbird')),
-  kids: new Set(T('kiwix libretranslate ci-spellbook koodo-reader steam-headless audiobookshelf jupyterlab habitica donetick obsidian')),
+  kids: new Set(T('libretranslate ci-spellbook koodo-reader booklore kokoro razzia readeck linkwarden steam-headless audiobookshelf jupyterlab habitica donetick obsidian')),
   media: new Set(T('immich photoprism librephotos foldergram jellyfin navidrome mstream audiobookshelf koodo-reader booklore freshrss music-assistant steam-headless')),
   creative: new Set(T('penpot inkscape excalidraw tldraw drawio audiomass blockbench comfyui opencut freecut mazanoke rembg remotion-studio')),
   'small-business': new Set(T('twenty espocrm odoo invoice-ninja invio akaunting kimai solidtime docuseal documenso listmonk keila ghost wordpress nocodb baserow grist metabase opnform formbricks chatwoot papercups postiz mixpost plausible umami matomo medusa prestashop hi-events linkstack n8n activepieces')),

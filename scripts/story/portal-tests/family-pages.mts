@@ -13,7 +13,8 @@
 //             whose id is theirs, "Start with <name>" (&member=) and, for each of their moments, "Watch this moment" (&beat=); what runs on
 //             the Core; the chrome's own labels (Buy Companion Core, Download Companion) and the story's calls (See Companion Core); every
 //             link into the player carries data-campaign, and portal/campaign.js loads first when the build has it; no price, no customer, no
-//             third-party logo; the manifest's `narration` flag matches the voice; valid JSON-LD
+//             third-party image that is not a real logo or screenshot of the manifest (story v2: alt, size, lazy, caption: the build checks it, this
+//             checks each page's sections); the manifest's `narration` flag matches the voice; valid JSON-LD
 //   browser   a family page at 1440 and 390 with no console error and no third-party request; the first screen of a phone holds the name, the
 //             picture and both buttons; no sideways scroll; touch targets of 44 px; with JavaScript off the page is whole and a member's
 //             #anchor lands on their section; light and dark; a campaign's tags ride from the page to the tour's address; the tour button, a
@@ -100,14 +101,16 @@ export default async function familyPages(ctx: TestCtx): Promise<void> {
     for (const id of ['fictional-family', 'beta-short', 'scripted-scenes', 'stylised-art']) need(words.includes(claim(id)), `the strip's ${id} line, from claims.json`);
     for (const m of s.members) {
       const sec = (t.match(new RegExp(`<section class="who[^"]*" id="${m.id}"[\\s\\S]*?</section>`)) || [''])[0];
-      need(sec && sec.includes(`<h2 id="${m.id}-h">${m.name}</h2>`) && sec.includes(`Age ${m.age}`), `${m.id}: a section with their id, their name and age`);
+      need(sec && sec.includes(`<h2 id="${m.id}-h" class="nm">${m.name}</h2>`) && sec.includes(`Age ${m.age}`), `${m.id}: a section with their id, their name (as written: the kicker's capitals are CSS) and age`);
       const mine = s.beats.filter(b => b.member === m.id && !['ftue', 'outro'].includes(s.chapters.find(c => c.id === b.chapter)?.kind || ''));
       if (mine.length) need(sec.includes(`&amp;family=${s.slug}&amp;member=${m.id}"`), `${m.id}: "Start with ${m.name}" (&member=${m.id})`);
       for (const b of mine) need(sec.includes(`id="b-${b.id}"`) && sec.includes(`&amp;family=${s.slug}&amp;beat=${b.id}" data-campaign`), `${m.id}: ${b.id} is a block with "Watch this moment" (&beat=${b.id})`);
     }
     need(/id="apps"/.test(t) && /What runs on the Core/.test(t) && /hub\.ci\.computer\/store\//.test(t), 'what runs on the Core, with the Companion Hub store pages');
     need(/>Buy Companion Core</.test(head) && />Buy Companion Core</.test(foot) && />Download Companion</.test(head) && !/Buy Companion Core/.test(main), 'the chrome keeps "Buy Companion Core" and "Download Companion"; the story says "See Companion Core"');
-    need(!/<img[^>]+(google|apple|amazon|microsoft|openai|dropbox|slack|zoom|spotify|netflix)/i.test(t) && (t.match(/<img\b/g) || []).length === 3, 'no logo, screenshot or mockup (three images: the brand mark twice and the home)');
+    // (story v2: the real, labelled files of content/story/app-media.json are the only third-party images. Every other image is the brand mark twice and the home's picture.)
+    const imgs = (t.match(/<img\b[^>]*>/g) || []).filter(i => !/src="\.\.\/portal\/(apps|ci)\//.test(i));
+    need(imgs.length === 3, `no third-party image that is not a real logo or screenshot of the manifest (three others: the brand mark twice and the home), got ${imgs.length}`);
     need(!/[$€£]\s?\d|\b\d[\d,.]*\s?(USD|dollars?|euros?|pounds?)\b/i.test(words), 'no price (an amount of money)');
     need(!/analytics|no cookies|no third-party/i.test(words), 'no claim about analytics, cookies or third parties (the deployed site adds Google Analytics)');
     for (const a of t.match(/<a\b[^>]*href="\.\.\/room-creator[^"]*"[^>]*>/g) || []) need(/ data-campaign/.test(a), `a link into the player has no data-campaign: ${a.slice(0, 80)}`);
@@ -163,7 +166,8 @@ export default async function familyPages(ctx: TestCtx): Promise<void> {
       const worst = (sel: string) => Math.min(...Array.from(document.querySelectorAll(sel)).map(e => ratio(rgb(getComputedStyle(e).color), bg)));
       return { bg, body: ratio(rgb(getComputedStyle(document.body).color), bg), h1: worst('.hero h1'), muted: worst('.tagline, .who-facts, .hero-note'), link: worst('.play-from') };
     });
-    ok(c.body >= 7 && c.h1 >= 7 && c.muted >= 4.5 && c.link >= 4.5, `${scheme}: the text is readable on the page's own background (body ${c.body.toFixed(1)}, muted ${c.muted.toFixed(1)}, links ${c.link.toFixed(1)})`);
+    // (the page's one heading is the family's name as a kicker, in the accent: large bold text, so the 4.5:1 that is AAA for it; the accent is 6.7:1 on the light set, like the links)
+    ok(c.body >= 7 && c.h1 >= 4.5 && c.muted >= 4.5 && c.link >= 4.5, `${scheme}: the text is readable on the page's own background (body ${c.body.toFixed(1)}, heading ${c.h1.toFixed(1)}, muted ${c.muted.toFixed(1)}, links ${c.link.toFixed(1)})`);
     await ctx.shot(page, `family-${scheme}-390`);
     ok(errors.length === 0, `${scheme}: no console errors`);
     await close();

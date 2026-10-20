@@ -38,15 +38,17 @@
   <link rel="preload" href="./assets/fonts/manrope-latin-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./content/houses/index.json" as="fetch" crossorigin>
   <link rel="stylesheet" href="./portal/gallery.css">
+  <link rel="stylesheet" href="./portal/media.css">
   <!-- gallery.js imports the portal's names when it runs, and lists the homes without them if they fail to come. The built page
        has its import map just above the first module (scripts/build-portal.mts), after this head's title and preview tags -->
   <link rel="modulepreload" href="./assets/home-names.js">
-  <noscript><style>.skel, .filters, .personas, .more-filters { display: none; }</style></noscript>
+  <noscript><style>.skel, .filters, .personas, .more-filters, .arch-btn { display: none; } .arch-panel { display: block; }</style></noscript>
   <!-- data-cfasync="false": Cloudflare's Rocket Loader would otherwise hold the script back and rewrite its type.
        campaign.js (an ad's utm_ and click-id tags kept for the visit, put back on the links that leave for ci.computer and on
        links marked data-campaign) goes first, so it reads the address before gallery.js can touch it -->
   <script src="./portal/campaign.js" defer data-cfasync="false"></script>
   <script type="module" src="./portal/gallery.js" data-cfasync="false"></script>
+  <script src="./portal/shots.js" defer data-cfasync="false"></script>
 </head>
 <body>
   <!-- Icons: Lucide (lucide-react 0.469.0, ISC; see THIRD_PARTY.md). Use as <svg class="i"><use href="#i-name"/></svg>. -->
@@ -110,6 +112,9 @@
       </a>
     </section>
 
+    <!-- pick-person: scripts/build-portal.mts writes "Pick a person" here (a card for the organiser, builder, gamer and learner, and the list "Rented before, on the
+         Core now" for the archetype chosen: scripts/portal-front.mts pickPerson). portal/gallery.js turns a card's button into the persona filter. -->
+
     <section class="homes" id="homes" aria-labelledby="homes-title">
       <div class="homes-head">
         <h2 id="homes-title">Meet the families <span class="count" aria-live="polite"></span></h2>
@@ -156,6 +161,10 @@
       </div>
       <noscript><p class="empty">Search and the filters need JavaScript. The families and homes are listed above.</p></noscript>
     </section>
+
+    <!-- logo-wall: scripts/build-portal.mts writes "What the families run" here (every app the stories name, its real logo beside its name: portal-front.mts logoWall) -->
+
+    <!-- how-it-runs: scripts/build-portal.mts writes "How it runs" here (what Companion Hub and the Companion account do, a real screenshot of each, labelled: portal-front.mts runsBand) -->
 
     <section class="cta-band" id="core" aria-labelledby="cta-title">
       <div class="cta-copy">

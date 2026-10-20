@@ -52,6 +52,9 @@
 //             copy lint, the tour link and a shared moment forwarding to the player) and the narrated tour (popup placement,
 //             keyboard and accessibility, audio and the gesture rule, the address bar, next home). A build with no current family
 //             has nothing to test there and says so. The story's pages are checked at build time too (portal:build, step 7)
+//             ---- story v2 ---- family-v2.mts (the family page's sticky person nav, details, screenshot dialog, floor plan, contrast, layout shift),
+//             front-v2.mts (Pick a person, the logo wall, How it runs, the family cards' logos) and player-more.mts (the tour card's logo, its "More" toggle and
+//             where the card goes when it is open) ---- end story v2 ----
 //   webkit    Safari's engine, when Playwright's WebKit for the pinned version is installed: the gallery, the player
 //             (plays, pauses, scrubs) and the editor (builds a home, hooks there), with no console error. Skipped with
 //             a line saying so when it is not (pnpm exec playwright install webkit); required with --webkit
@@ -331,7 +334,10 @@ async function pages() {
   const heroFamily = heroLinks[0].includes('&amp;family=') ? new URL(heroLinks[0].replace(/&amp;/g, '&'), 'http://x/').searchParams.get('family') : null;
   ok(!heroFamily || !!byFamily[heroFamily], `the hero's "Take the tour" plays ${heroFamily ? `the ${heroFamily} family's tour` : 'a home'}`);
   const h1s = [...gallery.text.matchAll(/<h1[^>]*>([^<]*)<\/h1>/g)].map(m => m[1]);
-  ok(h1s.length === 1 && /\bthirty\b/i.test(h1s[0]) && gallery.text.includes('>Fictional family. Real software.<') && gallery.text.includes('Companion OS is in beta.') && !/[$€£]\s?\d|<img[^>]+(google|apple|github|nextcloud|steam)/i.test(gallery.text), `one <h1> ("${h1s[0]}"), the label, the beta line, no price and no logo of a third party's`);
+  // ---- story v2 ---- (the owner asked for real logos and screenshots: the front page now carries those of content/story/app-media.json, each beside the name it identifies, with alt
+  // text, its size and lazy loading: the hook scripts/story/portal-tests/front-v2.mts holds them to that. What is still never there: a logo or picture fetched from anywhere else.)
+  ok(h1s.length === 1 && /\bthirty\b/i.test(h1s[0]) && gallery.text.includes('>Fictional family. Real software.<') && gallery.text.includes('Companion OS is in beta.') && !/[$€£]\s?\d|<img[^>]+src="(?:https?:)?\/\//i.test(gallery.text), `one <h1> ("${h1s[0]}"), the label, the beta line, no price and no image from anywhere but the site (the real logos and screenshots are the site's own files)`);
+  // ---- end story v2 ----
   // every string of the front page the story's copy rules cover (scripts/story/check-copy.mts's banned phrases, headings in sentence case)
   {
     const claims = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'claims.json'), 'utf8'));

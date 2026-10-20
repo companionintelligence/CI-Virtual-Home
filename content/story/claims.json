@@ -434,15 +434,16 @@
       "flags": "i",
       "severity": "error",
       "why": "No unsourced factual claim about a named company. The CI-Common matrix of such judgements is uncited. A Kickstarter-adjacent page is commercial speech; escalate comparative use to counsel.",
-      "fix": "Say what the catalogue app does. Pair names only as \"instead of X\" in the Alternatives table sense."
+      "fix": "Say what the catalogue app does. Name the service only in the comparative form \"<App> is an alternative to <Service>\" (the second chip of a pair reads \"alternative to <Service>\"), and never in a sentence that says what the company does to you."
     },
     {
       "id": "logo-trademark",
       "pattern": "<img[^>]+(google|apple|amazon|microsoft|openai|dropbox|slack|zoom|spotify|netflix)[^>]*>",
       "flags": "i",
       "severity": "error",
-      "why": "Third-party software is named in text only, never as a logo (CAMPAIGN.md 6c).",
-      "fix": "Text only."
+      "why": "The logo of a service the Core replaces (Google, Apple, Amazon, Microsoft and the like) is never shown in authored text (CAMPAIGN.md 6c). An app's own real logo stands beside its name.",
+      "fix": "Name the service in text.",
+      "scope": "Authored text always. In page output an <img> under portal/services/ is allowed only for a service whose registry mark (content/story/services.json) has mode logo, logoAllowed and cleared set by the owner, together with the names-logos-owners disclosure; the page test applies that exception, this pattern does not."
     },
     {
       "id": "cap-parity",
@@ -1242,6 +1243,15 @@
       "notes": "Counsel should review comparative use."
     },
     {
+      "id": "names-logos-owners",
+      "text": "Product names, logos and brands are the property of their owners. Naming them does not imply endorsement.",
+      "where": [
+        "footer text of footer(), on any page that shows a service logo or an app logo"
+      ],
+      "required": true,
+      "notes": "Story v3 wording, for counsel. Supersedes names-owners once the pages say \"alternative to\" instead of \"replaces\" (the page stage); until then both stand. A service is shown by a neutral badge and its name unless the owner has cleared its logo."
+    },
+    {
       "id": "attribution-agents",
       "text": "Hermes is from Nous Research. OpenClaw is from the OpenClaw Foundation. Companion Hub packages both.",
       "where": [
@@ -1262,12 +1272,12 @@
     },
     {
       "id": "third-party-apps",
-      "text": "The other apps in these stories are open-source projects by other people. Companion Intelligence did not make them.",
+      "text": "The other apps in these stories are made by other people, most of them open-source projects. Companion Intelligence did not make them.",
       "where": [
         "credits page"
       ],
       "required": true,
-      "notes": "Do not call them \"our apps\". Sixteen apps carry the companion-intelligence category; the rest are community packages."
+      "notes": "Do not call them \"our apps\". Sixteen apps carry the companion-intelligence category; the rest are community packages. Not all of them are open source: the catalog says Obsidian is not, n8n is fair-code, and Joplin Server, Invoice Ninja, Akaunting and monetr carry licences with limits. The earlier text (\"are open-source projects by other people\") was false for those."
     },
     {
       "id": "site-practises",

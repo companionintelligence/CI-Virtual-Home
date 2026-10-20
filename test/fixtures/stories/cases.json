@@ -290,5 +290,265 @@
     "expect": [
       "casting"
     ]
+  },
+  {
+    "name": "ok-7-story-v2",
+    "file": "ok-7-story-v2.json",
+    "expect": [],
+    "absent": [
+      "detail-len",
+      "detail-replaces",
+      "detail-fact",
+      "detail-missing",
+      "home-lede",
+      "home-spots",
+      "day",
+      "profile",
+      "digits",
+      "text-role"
+    ]
+  },
+  {
+    "name": "bad-34-detail-len",
+    "file": "bad-34-detail-len.json",
+    "expect": [
+      "detail-len"
+    ]
+  },
+  {
+    "name": "bad-35-detail-copy",
+    "file": "bad-35-detail-copy.json",
+    "expect": [
+      "dash-em-en",
+      "exclamation",
+      "num-dollar",
+      "digits",
+      "sec-never-leaves"
+    ]
+  },
+  {
+    "name": "bad-36-detail-replaces",
+    "file": "bad-36-detail-replaces.json",
+    "expect": [
+      "detail-replaces"
+    ]
+  },
+  {
+    "name": "ok-8-detail-services-allowed",
+    "file": "ok-8-detail-services-allowed.json",
+    "expect": [],
+    "absent": [
+      "detail-replaces"
+    ]
+  },
+  {
+    "name": "bad-37-detail-fact",
+    "file": "bad-37-detail-fact.json",
+    "expect": [],
+    "warn": [
+      "detail-fact"
+    ]
+  },
+  {
+    "name": "bad-38-detail-missing",
+    "file": "bad-38-detail-missing.json",
+    "expect": [],
+    "warn": [
+      "detail-missing"
+    ]
+  },
+  {
+    "name": "bad-39-detail-apps-and-ui",
+    "file": "bad-39-detail-apps-and-ui.json",
+    "expect": [
+      "app-undeclared",
+      "persona-no-ui"
+    ]
+  },
+  {
+    "name": "bad-40-home-lede",
+    "file": "bad-40-home-lede.json",
+    "expect": [
+      "home-lede"
+    ]
+  },
+  {
+    "name": "bad-41-home-lede-furniture",
+    "file": "bad-41-home-lede-furniture.json",
+    "expect": [
+      "text-role"
+    ]
+  },
+  {
+    "name": "bad-42-home-spots",
+    "file": "bad-42-home-spots.json",
+    "expect": [
+      "home-spots"
+    ]
+  },
+  {
+    "name": "bad-43-day",
+    "file": "bad-43-day.json",
+    "expect": [
+      "day"
+    ]
+  },
+  {
+    "name": "bad-44-day-member",
+    "file": "bad-44-day-member.json",
+    "expect": [],
+    "warn": [
+      "day"
+    ]
+  },
+  {
+    "name": "bad-45-profile",
+    "file": "bad-45-profile.json",
+    "expect": [
+      "profile"
+    ]
+  },
+  {
+    "name": "bad-46-age-chat",
+    "file": "bad-46-age-chat.json",
+    "expect": [
+      "age-chat"
+    ]
+  },
+  {
+    "name": "bad-47-age-companion",
+    "file": "bad-47-age-companion.json",
+    "expect": [
+      "age-companion"
+    ]
+  },
+  {
+    "name": "ok-9-v3-adults",
+    "file": "ok-9-v3-adults.json",
+    "expect": [],
+    "absent": [
+      "age-chat",
+      "age-companion",
+      "app-avoid"
+    ],
+    "tolerate": [
+      "service-missing",
+      "chips",
+      "chips-legacy",
+      "household-beats",
+      "household-doer",
+      "persona-band",
+      "pair-share",
+      "pair-budget"
+    ]
+  },
+  {
+    "name": "bad-48-service-unknown",
+    "file": "bad-48-service-unknown.json",
+    "expect": [
+      "service-unknown"
+    ]
+  },
+  {
+    "name": "bad-49-service-app",
+    "file": "bad-49-service-app.json",
+    "expect": [
+      "service-app"
+    ]
+  },
+  {
+    "name": "bad-50-service-stale",
+    "file": "bad-50-service-stale.json",
+    "expect": [
+      "service-status"
+    ],
+    "absent": [
+      "service-app"
+    ]
+  },
+  {
+    "name": "bad-51-service-blocked",
+    "file": "bad-51-service-blocked.json",
+    "expect": [
+      "service-status"
+    ]
+  },
+  {
+    "name": "bad-52-service-missing",
+    "file": "bad-52-service-missing.json",
+    "expect": [
+      "service-missing",
+      "chips"
+    ]
+  },
+  {
+    "name": "bad-53-service-no-replaces",
+    "file": "bad-53-service-no-replaces.json",
+    "expect": [
+      "service-missing"
+    ]
+  },
+  {
+    "name": "bad-54-chips-alternative",
+    "file": "bad-54-chips-alternative.json",
+    "expect": [
+      "chips"
+    ]
+  },
+  {
+    "name": "bad-55-chips-legacy",
+    "file": "bad-55-chips-legacy.json",
+    "expect": [],
+    "warn": [
+      "chips-legacy",
+      "service-missing"
+    ]
+  },
+  {
+    "name": "bad-56-persona-band",
+    "file": "bad-56-persona-band.json",
+    "expect": [
+      "persona-band"
+    ]
+  },
+  {
+    "name": "bad-57-household-beats",
+    "file": "bad-57-household-beats.json",
+    "expect": [
+      "household-beats"
+    ]
+  },
+  {
+    "name": "bad-58-household-kind",
+    "file": "bad-58-household-kind.json",
+    "expect": [],
+    "warn": [
+      "household-kind"
+    ]
+  },
+  {
+    "name": "bad-59-household-doer",
+    "file": "bad-59-household-doer.json",
+    "expect": [
+      "household-doer"
+    ]
+  },
+  {
+    "name": "bad-60-pair-share",
+    "file": "bad-60-pair-share.json",
+    "expect": [
+      "pair-share",
+      "pair-budget"
+    ],
+    "absent": [
+      "service-missing"
+    ]
+  },
+  {
+    "name": "bad-61-detail-service",
+    "file": "bad-61-detail-service.json",
+    "expect": [
+      "detail-replaces"
+    ]
   }
 ]

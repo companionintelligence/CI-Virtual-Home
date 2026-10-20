@@ -3862,11 +3862,14 @@
           return g;
         };
 
-        // --- front, from the product photos: one row at mid-height in the right half — 2 × USB-A · 2 × 3.5 mm ·
-        // the chrome power button at ~85 % of the width. (Chassis sheet: 2 × USB 2.0, 3.0 optional, 2 × audio,
-        // power button. CAUTIONS.md says not to print a front-panel port list; this is the prop's face.)
+        // --- front, from the product photos (ci.computer/core: the chalk and charcoal front-on shots and the upright
+        // chalk shot): one row high on the face, in the top-right corner of the box — 2 × USB-A · 2 × 3.5 mm · the
+        // chrome power button last, at ~86 % of the width. The row's centre line sits ~22 % of the height below the
+        // top edge (about 20 mm of the 90 mm), not at mid-height: every photo shows the same corner. (Chassis sheet:
+        // 2 × USB 2.0, 3.0 optional, 2 × audio, power button. CAUTIONS.md says not to print a front-panel port list;
+        // this is the prop's face.)
         // Stood on its left side (upright) the row runs top to bottom with the button at the top.
-        const fz = D / 2 + 0.0008, rowY = H / 2, btnX = W * 0.35, btnY = rowY;
+        const fz = D / 2 + 0.0008, rowY = H * 0.78, btnX = W * 0.36, btnY = rowY;
         port('usb-a2', W * 0.045, rowY, fz);
         port('usb-a2', W * 0.125, rowY, fz);
         port('audio', W * 0.205, rowY, fz);

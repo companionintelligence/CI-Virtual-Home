@@ -75,15 +75,18 @@ the portal's gallery, `./` (Cloudflare Pages answers `./index.html` with a 308);
 | `pnpm run portal:icons` | Render the site's raster icons (`portal/icons/`: `favicon.ico`, the manifest's 192 and 512 px PNGs, the 180 px apple-touch-icon) from the brand mark with Chromium. Commit the output. |
 | `pnpm run story:validate` | The family stories (`content/families/<slug>.json`) against the schema, the Uncloud voice, `claims.json`, the app catalog, the persona rules, the cast plan (the people, their archetypes and companions, the planned apps) and each beat's own house. `-- <slug>` for one, `-- --complete` for the whole set of thirty and the fleet counts. No GPU. See [`reference/story/validator.md`](reference/story/validator.md). |
 | `pnpm run story:cast` / `story:cast-lint` | Who lives where: `content/story/cast-plan.json` (the authored decisions: 30 families, members, archetypes, rooms, signature apps) plus the house files and `roles.json` give `content/story/casting.json` and `reference/story/cast.md` (`story:cast --check` fails when either is stale). The lint holds the plan to the fleet rules (the Brennan flagship, unique names, at least 70 apps, no app in more than 12 of 30 families). No GPU. [`reference/story/cast.md`](reference/story/cast.md) |
+| `pnpm run story:services` / `story:services:check` | The registry of the services the stories' apps are the alternative to (`content/story/services.json`): recompute its derived columns from the catalog and the families, or fail when they are stale or an invariant breaks. No network. [`reference/story/story-v3.md`](reference/story/story-v3.md) |
 | `pnpm run story:bake` | Each family's camera: a safe pose per beat, the walks between them and the tour's track → `content/families/<slug>.bake.json` (`-- <slug>`, `-- --all`, `--check`, `--stills <dir>` renders contact sheets on one GPU process). Run it after the voice, so the durations are the voice's. [`reference/story/bake.md`](reference/story/bake.md) |
 | `pnpm run story:voice` | The narration, generated **locally** with Kokoro-82M (no cloud service, no key) → `content/families/<slug>.voice.json` and `<slug>/audio/<clip>.<hash10>.m4a` (`-- <slug>`, `-- --all`, `--stale`, `--dry-run`, `--sheet`). [`reference/story/voice.md`](reference/story/voice.md) |
 | `pnpm run test:voiceover` | Every committed voice lock: clips hashed and intact, loudness, word timings, the family budget. Also part of `check:quick`. |
 | `pnpm run story:film` | One film per family in 16:9 and 9:16, from the tour's own camera and voice (`-- <slug>`, `-- --all`, `--dry-run`, `--stills <dir>`). One GPU process; the films are hosted outside Pages. [`reference/story/film.md`](reference/story/film.md) |
 | `pnpm run story:ads` | The persona ad cuts: one member's story as a silent 15 to 25 s vertical ad (also 1:1, 4:5, 16:9) from the family's story and bake lock; refreshes `content/story/ads.json` (`--manifest`, `--check`, `--dry-run`, `--stills <dir>`, `--family`, `--member`, `--aspect`, `--res`, `--gl default\|software`). Videos go to `video/ads/` (gitignored). [`reference/story/ads.md`](reference/story/ads.md) |
 | `pnpm run story:ads:test` | The ad kit's pure-Node tests (the plan, the manifest, the safe areas, the encode flags). Also part of `test:node`. |
+| `pnpm run story:media` | The real app logos (128 px) and screenshots (960 px wide) of the apps the families use, of Companion Hub and of the Companion account page → `portal/apps/<id>/` and `portal/ci/` (content-hashed WebP) and `content/story/app-media.json`, read with `git cat-file` from CI-Marketplace, CI-Hub and CI-Portal beside this repo at the commits the manifest pins; ffmpeg with libwebp only (`--check`, `--update-sources`, `--fetch`, `--apps`, `--out`, `--verbose`). Commit the output. [`reference/story/story-v2.md`](reference/story/story-v2.md) |
+| `pnpm run story:media:test` | The media's quick Node test (the manifest, hashes, sizes, captions, rejections, the tree, the page rules, the encoder and, where the sibling repos are, a build twice into temp dirs). Also part of `test:node`. |
 | `pnpm run portal:og` | Draw the families' link-preview images → `portal/og/<slug>.jpg`, with `portal/og/manifest.json` (Chromium's 2D canvas, no GPU; `--only`, `--families`). Re-run it when a family's text or its preview picture changes: a stale one is not shipped (that page uses its home's own picture) and is an error with `--strict-families`. Commit the output. |
 | `pnpm run portal:build` | Assemble the site in `dist/` (only what it loads, the specs redacted: no author, no source) and check its links and that nothing credits a builder ([Credits](#credits-none-on-the-site)). Needs `build`. `--families <dir>` reads other family files; `--strict-families` makes a stale family an error (see [The family stories](#the-family-stories)); `--stale-report` lists every reason. |
-| `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). |
+| `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). `-- --tailscale` also listens on this machine's Tailscale address (the one `tailscale ip -4` prints), so a phone or laptop on the same tailnet opens `http://<that address>:<port>/ci-virtual-home/` (the command prints it and the MagicDNS name); never on `0.0.0.0`, so the local network does not see it. `-- --host <ipv4>` listens on that one address instead. The preview stops with Ctrl-C. |
 | `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`, `--only <legs>`), the campaign's tags (the `campaign` leg), the family pages and the narrated tour (the `hooks` leg, `scripts/story/portal-tests/`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
 | `pnpm run test:campaign` | `portal/campaign.js` run in a tiny DOM stub, and the pages that load it (no browser): the tags captured, only the listed ones, the right links rewritten and no others, no double append, storage blocked, links added later, an organic visit. A quick Node test. |
 | `pnpm run ui:test` | Drive the editor end to end (layout at four sizes in both schemes, contrast, the top bar, the checks, the timeline, the tree, the catalog, Compare, stills at 4K, a recorded MP4 checked with ffprobe and by PSNR) — `--only <sections>`, `--shots <dir>`. Needs a GPU and ffmpeg. |
@@ -110,8 +113,8 @@ portal/                    the portal's styles and scripts, thumbs/<id>.webp and
                            page), story.css (the tour), fonts/ (Archivo Black), og/ (the families' link previews, derived, committed)
 content/families/          the authored stories, <slug>.json (the writers' files; the voice and bake locks sit beside them)
 content/story/             cast-plan.json (who lives where; casting.json, slug <-> house, is derived from it), personas.json, claims.json,
-                           catalog-apps.json, the schema: the story system's inputs
-reference/story/           personas.md (the contract), cast.md (derived), validator.md, bake.md, voice.md, player.md, film.md
+                           catalog-apps.json, services.json (the replaced services), the schema: the story system's inputs
+reference/story/           personas.md (the contract), story-v3.md (the services and pairs), cast.md (derived), validator.md, bake.md, voice.md, player.md, film.md
 scripts/story/             site.mts (the story part of portal:build), pages.mts (a family's page), check-leaks.mts, check-copy.mts,
                            build-og.mts, hooks.ts (the seams: ship/*.mts at build, portal-tests/*.mts at test), lib/ (the validator)
 assets/story/              the narrated tour: director, popups, captions, audio, the baked camera track (loaded only for ?family=)
@@ -341,7 +344,7 @@ compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
 ### The family stories
 
 <a id="the-family-stories"></a>Every one of the thirty homes is lived in by a **fictional family**: two to six people, each with an archetype, the job they
-do on the family's one Companion Core (organiser, builder, gamer, learner, maker, host). A room tells that member's story: what they
+do on the family's one Companion Core (organiser, builder, gamer, learner, maker, host, tech-family, business-owner, creative, contractor, marketer, lawyer, journalist, educator). A room tells that member's story: what they
 do there, which Companion Hub store app does it and which cloud service it replaces. The tour is the argument for uncloud: the same life,
 on your own hardware. The contract for the writers, the validator and the film is
 [`reference/story/personas.md`](reference/story/personas.md); the label is "Fictional family. Real software." and the campaign's rules
@@ -377,6 +380,32 @@ on your own hardware. The contract for the writers, the validator and the film i
   (`?lighting=day` on the editor page: the houses' own dusk is never used), the overlay is the canon's light set, and the GPU is the machine's own through ANGLE (`--gl default`, `PERSONA_CUT_GL`). Hook rule, aspects,
   safe areas, disclosures, determinism, hosting and the open items: [`reference/story/ads.md`](reference/story/ads.md).
 <!-- ---- end ad kit ---- -->
+<!-- ---- app media ---- -->
+- **App media** are the real logos and screenshots the pages may show (`pnpm run story:media`; the manifest is `content/story/app-media.json`, the files `portal/apps/<id>/` and `portal/ci/`). A logo
+  stands beside the app it names; a screenshot is real, unedited, shown whole with its label ("Real screenshot of <Name> from a Companion Hub QA run. Not a recording of this family.") and never put
+  into a scene, the tour or an ad cut. Each screenshot was looked at by eye; the ones left out, and why, are the manifest's `rejected` list. `portal:build` ships only what the manifest names, fails
+  on a missing file, missing alt text or a missing caption, and warns when an app a family uses has no entry. Licence rows: [THIRD_PARTY.md](THIRD_PARTY.md) "Story site: app media".
+<!-- ---- end app media ---- -->
+<!-- ---- layout (story v2) ---- -->
+- **The layout of the story's pages (story v2)** puts the new fields and the real media to work, build-time static HTML first and a few lines of script on top (nothing needs it to be read). A **family's page**
+  has a sticky nav of its people (a chip each: monogram, name, archetype word; the one being read gets `aria-current`), then for each person their bio, the card "Rented before, on the Core now" (the services
+  their moments replace against the apps that do the job, with the apps' real logos), their moments with "More about this moment" (a native `<details>`: before, now, the steps, one fact about the app),
+  a strip of up to three real screenshots of their apps (each opens larger in a native `<dialog>`: `portal/shots.js`), then "A day in the house" (`family.day` as a timeline), "The home" (the lede, the spots,
+  the storeys, the floor area and the rooms from the spec, and a schematic floor plan with a pin for each person: `scripts/story/lib/plan-map.mts`) and "How it runs" (real Companion Hub and Companion
+  account screenshots). The **front page** adds "Pick a person" (a card for the organiser, builder, gamer and learner: the persona filter), the list "Rented before, on the Core now" for the one chosen, a
+  logo wall of the apps the families run (dimmed to the one chosen), the families' cards with their logos, and the "How it runs" band. The **tour's card** wears the app's logo on its chip and has a "More"
+  toggle that opens the beat's before and after (`reference/story/player.md`). The Brennan family (`content/families/brennan.json`) is the showcase and the model for the other families' details, home, day and bios.
+  Node tests: `scripts/test-story-pages.mts` (the page writer and the plan); browser tests: `family-v2.mts`, `front-v2.mts` and `player-more.mts` in `scripts/story/portal-tests/` (`pnpm run portal:test -- --only hooks`).
+<!-- ---- end layout (story v2) ---- -->
+<!-- ---- type scale (live pass 3) ---- -->
+- **The tour's cards and dialogs are set in the CI canon's type scale** (the owner asked for a 36 px minimum and, seeing it, for 30 percent less, "reference the website"): rem of the canon's 17 px root, reading text in a
+  modal (card, start and end cards, About, failure card, the family page's screenshot dialog) **1.5rem = 25.5 px at 768 px and wider, `clamp(20px, 5.4vw, 25.5px)` on a phone**, a card's title 2.25rem, the start and end cards'
+  heading 2.6rem; Manrope 400 body, 500 controls, 600 chips, 700 titles and names (no 800), 0.2pt tracking. The tokens are `--st-min`, `--st-title` and `--st-hook` in `portal/viewer.css`; every size in the tour's CSS is one of them.
+  A card is `clamp(420px, 32vw, 560px)` wide, a phone's sheet up to 55 % of the height; the placement solver (`assets/story/place.ts`) may shrink padding, choose another slot or a narrower and taller card, and never shrinks type.
+  **A person's name is a kicker** on every card, dialog and family-page label: all capitals by CSS (the text and aria-labels stay as written), 700, 0.2em of tracking, in the accent; "THE BRENNAN FAMILY" the same. Film and ad
+  canvases keep 36 design px (a canvas is shown scaled down). Details and the table: `reference/story/player.md`, "Type and size". Tests: `scripts/test-story-place.mts`, `scripts/test-story-pages.mts`, `typography.mts`
+  (`pnpm run portal:test -- --only hooks`).
+<!-- ---- end type scale (live pass 3) ---- -->
 - **Stale families.** A family is shipped only when it is current: in the casting, in a house that exists, its apps in the live store, the validator clean,
   its words clean. A family written for a house that has since been re-laid, or one the casting no longer names, is stale: no page, no tour, and the build
   names it with its first reason (`--stale-report` lists them all) and carries on. A tour whose lock no longer matches (a bake or voice recorded from older

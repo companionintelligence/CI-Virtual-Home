@@ -1,0 +1,1687 @@
+{
+  "apps": {
+    "activepieces": {
+      "logo": {
+        "alt": "Activepieces logo",
+        "file": "portal/apps/activepieces/logo.a1b3bb658e.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/activepieces/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Activepieces",
+      "shot": null
+    },
+    "airtrail": {
+      "logo": {
+        "alt": "AirTrail logo",
+        "file": "portal/apps/airtrail/logo.61676e3cdb.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/airtrail/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "AirTrail",
+      "shot": null
+    },
+    "akaunting": {
+      "logo": {
+        "alt": "Akaunting logo",
+        "file": "portal/apps/akaunting/logo.28702fca8d.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/akaunting/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Akaunting",
+      "shot": null
+    },
+    "anything-llm": {
+      "logo": {
+        "alt": "AnythingLLM logo",
+        "file": "portal/apps/anything-llm/logo.562a60c4eb.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/anything-llm/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "AnythingLLM",
+      "shot": {
+        "alt": "AnythingLLM empty chat page in a browser",
+        "caption": "Real screenshot of AnythingLLM from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/anything-llm/shot.3b58726eae.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/anything-llm.png@e94772196695",
+        "w": 960
+      }
+    },
+    "audiobookshelf": {
+      "logo": {
+        "alt": "Audiobookshelf logo",
+        "file": "portal/apps/audiobookshelf/logo.8a12989280.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/audiobookshelf/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Audiobookshelf",
+      "shot": null
+    },
+    "audiomass": {
+      "logo": {
+        "alt": "AudioMass logo",
+        "file": "portal/apps/audiomass/logo.9269b5a53c.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/audiomass/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "AudioMass",
+      "shot": null
+    },
+    "baikal": {
+      "logo": {
+        "alt": "Baikal logo",
+        "file": "portal/apps/baikal/logo.9636e51552.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/baikal/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Baikal",
+      "shot": null
+    },
+    "bentopdf": {
+      "logo": {
+        "alt": "BentoPDF logo",
+        "file": "portal/apps/bentopdf/logo.4e804c84b1.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/bentopdf/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "BentoPDF",
+      "shot": null
+    },
+    "blockbench": {
+      "logo": {
+        "alt": "Blockbench logo",
+        "file": "portal/apps/blockbench/logo.19bf0735ed.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/blockbench/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Blockbench",
+      "shot": null
+    },
+    "booklore": {
+      "logo": {
+        "alt": "BookLore logo",
+        "file": "portal/apps/booklore/logo.f75e79bdbf.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/booklore/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "BookLore",
+      "shot": null
+    },
+    "bookstack": {
+      "logo": {
+        "alt": "BookStack logo",
+        "file": "portal/apps/bookstack/logo.95c2218220.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/bookstack/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "BookStack",
+      "shot": null
+    },
+    "calibre-web": {
+      "logo": {
+        "alt": "Calibre-Web logo",
+        "file": "portal/apps/calibre-web/logo.e0231c28a3.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/calibre-web/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Calibre-Web",
+      "shot": null
+    },
+    "ci-hermes": {
+      "logo": {
+        "alt": "Hermes logo",
+        "file": "portal/apps/ci-hermes/logo.d1f4825e19.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/ci-hermes/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Hermes",
+      "shot": null
+    },
+    "ci-memory": {
+      "logo": {
+        "alt": "Companion Memory logo",
+        "file": "portal/apps/ci-memory/logo.7559f80162.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/ci-memory/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Companion Memory",
+      "shot": null
+    },
+    "ci-openclaw": {
+      "logo": {
+        "alt": "OpenClaw WebCLI logo",
+        "file": "portal/apps/ci-openclaw/logo.4f678244d9.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/ci-openclaw/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "OpenClaw WebCLI",
+      "shot": null
+    },
+    "ci-planning": {
+      "logo": {
+        "alt": "Companion Planning logo",
+        "file": "portal/apps/ci-planning/logo.9543565331.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/ci-planning/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Companion Planning",
+      "shot": {
+        "alt": "Companion Planning Today view in a browser",
+        "caption": "Real screenshot of Companion Planning from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/ci-planning/shot.38ce72ab43.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/ci-planning.png@e94772196695",
+        "w": 960
+      }
+    },
+    "ci-spellbook": {
+      "logo": {
+        "alt": "Spellbook logo",
+        "file": "portal/apps/ci-spellbook/logo.bf5fcd1db7.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/ci-spellbook/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Spellbook",
+      "shot": {
+        "alt": "Spellbook prompt library home in a browser",
+        "caption": "Real screenshot of Spellbook from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/ci-spellbook/shot.e661c080b7.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/ci-spellbook.png@e94772196695",
+        "w": 960
+      }
+    },
+    "code-server": {
+      "logo": {
+        "alt": "Code Server logo",
+        "file": "portal/apps/code-server/logo.e3f3a6368f.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/code-server/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Code Server",
+      "shot": null
+    },
+    "cryptpad": {
+      "logo": {
+        "alt": "CryptPad logo",
+        "file": "portal/apps/cryptpad/logo.a81001455e.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/cryptpad/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "CryptPad",
+      "shot": null
+    },
+    "docuseal": {
+      "logo": {
+        "alt": "Docuseal logo",
+        "file": "portal/apps/docuseal/logo.9caccfa761.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/docuseal/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Docuseal",
+      "shot": null
+    },
+    "donetick": {
+      "logo": {
+        "alt": "Donetick logo",
+        "file": "portal/apps/donetick/logo.a802deaa99.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/donetick/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Donetick",
+      "shot": null
+    },
+    "drawio": {
+      "logo": {
+        "alt": "draw.io logo",
+        "file": "portal/apps/drawio/logo.13ff0f6299.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/drawio/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "draw.io",
+      "shot": {
+        "alt": "draw.io empty diagram editor in a browser",
+        "caption": "Real screenshot of draw.io from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/drawio/shot.e7f9c2ae32.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/drawio.png@e94772196695",
+        "w": 960
+      }
+    },
+    "duplicati": {
+      "logo": {
+        "alt": "Duplicati logo",
+        "file": "portal/apps/duplicati/logo.cb3059921a.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/duplicati/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Duplicati",
+      "shot": null
+    },
+    "espocrm": {
+      "logo": {
+        "alt": "EspoCRM logo",
+        "file": "portal/apps/espocrm/logo.3f9c2f005b.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/espocrm/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "EspoCRM",
+      "shot": null
+    },
+    "excalidraw": {
+      "logo": {
+        "alt": "Excalidraw logo",
+        "file": "portal/apps/excalidraw/logo.b531f7a913.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/excalidraw/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Excalidraw",
+      "shot": {
+        "alt": "Excalidraw empty whiteboard in a browser",
+        "caption": "Real screenshot of Excalidraw from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/excalidraw/shot.0093eb0bb4.webp",
+        "h": 540,
+        "source": "CI-Marketplace e2e/screenshots/excalidraw.png@e94772196695",
+        "w": 960
+      }
+    },
+    "firefly-iii": {
+      "logo": {
+        "alt": "Firefly III logo",
+        "file": "portal/apps/firefly-iii/logo.3cd083d43e.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/firefly-iii/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Firefly III",
+      "shot": null
+    },
+    "foldergram": {
+      "logo": {
+        "alt": "Foldergram logo",
+        "file": "portal/apps/foldergram/logo.0a719ad729.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/foldergram/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Foldergram",
+      "shot": null
+    },
+    "forgejo": {
+      "logo": {
+        "alt": "Forgejo logo",
+        "file": "portal/apps/forgejo/logo.eb4ee0849b.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/forgejo/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Forgejo",
+      "shot": {
+        "alt": "Forgejo home page in a browser",
+        "caption": "Real screenshot of Forgejo from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/forgejo/shot.86a843c9ca.webp",
+        "h": 540,
+        "source": "CI-Marketplace e2e/screenshots/forgejo.png@e94772196695",
+        "w": 960
+      }
+    },
+    "frigate": {
+      "logo": {
+        "alt": "Frigate logo",
+        "file": "portal/apps/frigate/logo.9ee6aedcbe.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/frigate/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Frigate",
+      "shot": null
+    },
+    "gitea": {
+      "logo": {
+        "alt": "Gitea logo",
+        "file": "portal/apps/gitea/logo.b4c29d8286.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/gitea/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Gitea",
+      "shot": null
+    },
+    "glasshome": {
+      "logo": {
+        "alt": "GlassHome logo",
+        "file": "portal/apps/glasshome/logo.334ea2cef3.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/glasshome/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "GlassHome",
+      "shot": {
+        "alt": "GlassHome dashboard welcome screen in a browser",
+        "caption": "Real screenshot of GlassHome from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/glasshome/shot.fc17ef1c0b.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/glasshome.png@e94772196695",
+        "w": 960
+      }
+    },
+    "grist": {
+      "logo": {
+        "alt": "Grist logo",
+        "file": "portal/apps/grist/logo.5cb45b6144.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/grist/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Grist",
+      "shot": {
+        "alt": "Grist welcome page in a browser",
+        "caption": "Real screenshot of Grist from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/grist/shot.7f4f295121.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/grist.png@e94772196695",
+        "w": 960
+      }
+    },
+    "grocy": {
+      "logo": {
+        "alt": "Grocy logo",
+        "file": "portal/apps/grocy/logo.296d9ed929.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/grocy/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Grocy",
+      "shot": null
+    },
+    "home-assistant": {
+      "logo": {
+        "alt": "Home Assistant logo",
+        "file": "portal/apps/home-assistant/logo.c12d783695.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/home-assistant/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Home Assistant",
+      "shot": {
+        "alt": "Home Assistant welcome page in a browser",
+        "caption": "Real screenshot of Home Assistant from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/home-assistant/shot.600b8a9817.webp",
+        "h": 540,
+        "source": "CI-Marketplace e2e/screenshots/home-assistant.png@e94772196695",
+        "w": 960
+      }
+    },
+    "homehub": {
+      "logo": {
+        "alt": "HomeHub logo",
+        "file": "portal/apps/homehub/logo.39f4cc777d.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/homehub/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "HomeHub",
+      "shot": null
+    },
+    "hortusfox": {
+      "logo": {
+        "alt": "HortusFox logo",
+        "file": "portal/apps/hortusfox/logo.d52dddd6a7.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/hortusfox/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "HortusFox",
+      "shot": {
+        "alt": "HortusFox dashboard in a browser",
+        "caption": "Real screenshot of HortusFox from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/hortusfox/shot.18899f1dcf.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/hortusfox.png@e94772196695",
+        "w": 960
+      }
+    },
+    "immich": {
+      "logo": {
+        "alt": "Immich logo",
+        "file": "portal/apps/immich/logo.f34cee3d47.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/immich/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Immich",
+      "shot": {
+        "alt": "Immich photo library welcome page in a browser",
+        "caption": "Real screenshot of Immich from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/immich/shot.5c808ba26b.webp",
+        "h": 540,
+        "source": "CI-Marketplace e2e/screenshots/immich.png@e94772196695",
+        "w": 960
+      }
+    },
+    "inkscape": {
+      "logo": {
+        "alt": "Inkscape logo",
+        "file": "portal/apps/inkscape/logo.69f2a1b3a3.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/inkscape/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Inkscape",
+      "shot": {
+        "alt": "Inkscape welcome dialog in a browser",
+        "caption": "Real screenshot of Inkscape from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/inkscape/shot.4636310ff7.webp",
+        "h": 540,
+        "source": "CI-Marketplace e2e/screenshots/inkscape.png@e94772196695",
+        "w": 960
+      }
+    },
+    "jellyfin": {
+      "logo": {
+        "alt": "Jellyfin logo",
+        "file": "portal/apps/jellyfin/logo.38e8ccd2e3.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/jellyfin/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Jellyfin",
+      "shot": null
+    },
+    "joplin": {
+      "logo": {
+        "alt": "Joplin Server logo",
+        "file": "portal/apps/joplin/logo.db6c51e579.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/joplin/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Joplin Server",
+      "shot": null
+    },
+    "jupyterlab": {
+      "logo": {
+        "alt": "JupyterLab logo",
+        "file": "portal/apps/jupyterlab/logo.a114da21f8.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/jupyterlab/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "JupyterLab",
+      "shot": null
+    },
+    "kimai": {
+      "logo": {
+        "alt": "Kimai logo",
+        "file": "portal/apps/kimai/logo.02f16ba52a.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/kimai/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Kimai",
+      "shot": null
+    },
+    "kitchenowl": {
+      "logo": {
+        "alt": "KitchenOwl logo",
+        "file": "portal/apps/kitchenowl/logo.025e96df88.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/kitchenowl/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "KitchenOwl",
+      "shot": null
+    },
+    "kiwix": {
+      "logo": {
+        "alt": "Kiwix logo",
+        "file": "portal/apps/kiwix/logo.eb0edf2615.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/kiwix/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Kiwix",
+      "shot": null
+    },
+    "koodo-reader": {
+      "logo": {
+        "alt": "Koodo Reader logo",
+        "file": "portal/apps/koodo-reader/logo.90a6e31813.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/koodo-reader/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Koodo Reader",
+      "shot": null
+    },
+    "libreoffice": {
+      "logo": {
+        "alt": "LibreOffice logo",
+        "file": "portal/apps/libreoffice/logo.ab8cc7b674.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/libreoffice/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "LibreOffice",
+      "shot": {
+        "alt": "LibreOffice start centre in a browser",
+        "caption": "Real screenshot of LibreOffice from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/libreoffice/shot.9708426139.webp",
+        "h": 540,
+        "source": "CI-Marketplace e2e/screenshots/libreoffice.png@e94772196695",
+        "w": 960
+      }
+    },
+    "librephotos": {
+      "logo": {
+        "alt": "LibrePhotos logo",
+        "file": "portal/apps/librephotos/logo.fa90807598.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/librephotos/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "LibrePhotos",
+      "shot": null
+    },
+    "libretranslate": {
+      "logo": {
+        "alt": "LibreTranslate logo",
+        "file": "portal/apps/libretranslate/logo.793aee6cee.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/libretranslate/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "LibreTranslate",
+      "shot": null
+    },
+    "mazanoke": {
+      "logo": {
+        "alt": "Mazanoke logo",
+        "file": "portal/apps/mazanoke/logo.d4cfadefaa.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/mazanoke/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Mazanoke",
+      "shot": {
+        "alt": "Mazanoke image upload page in a browser",
+        "caption": "Real screenshot of Mazanoke from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/mazanoke/shot.5969dda97a.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/mazanoke.png@e94772196695",
+        "w": 960
+      }
+    },
+    "mealie": {
+      "logo": {
+        "alt": "Mealie logo",
+        "file": "portal/apps/mealie/logo.7f59d79121.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/mealie/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Mealie",
+      "shot": null
+    },
+    "monetr": {
+      "logo": {
+        "alt": "monetr logo",
+        "file": "portal/apps/monetr/logo.316f26ee21.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/monetr/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "monetr",
+      "shot": null
+    },
+    "n8n": {
+      "logo": {
+        "alt": "n8n logo",
+        "file": "portal/apps/n8n/logo.a0e202a384.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/n8n/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "n8n",
+      "shot": null
+    },
+    "navidrome": {
+      "logo": {
+        "alt": "Navidrome logo",
+        "file": "portal/apps/navidrome/logo.db1b15c015.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/navidrome/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Navidrome",
+      "shot": null
+    },
+    "nextcloud": {
+      "logo": {
+        "alt": "Nextcloud logo",
+        "file": "portal/apps/nextcloud/logo.b48712b768.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/nextcloud/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Nextcloud",
+      "shot": null
+    },
+    "ntfy": {
+      "logo": {
+        "alt": "ntfy logo",
+        "file": "portal/apps/ntfy/logo.5967e60870.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/ntfy/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "ntfy",
+      "shot": null
+    },
+    "obsidian": {
+      "logo": {
+        "alt": "Obsidian logo",
+        "file": "portal/apps/obsidian/logo.4aaa93c708.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/obsidian/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Obsidian",
+      "shot": null
+    },
+    "ollama": {
+      "logo": {
+        "alt": "Ollama logo",
+        "file": "portal/apps/ollama/logo.d82c71aa47.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/ollama/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Ollama",
+      "shot": null
+    },
+    "onlyoffice": {
+      "logo": {
+        "alt": "ONLYOFFICE Desktop Editors logo",
+        "file": "portal/apps/onlyoffice/logo.e5ade902e1.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/onlyoffice/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "ONLYOFFICE Desktop Editors",
+      "shot": null
+    },
+    "open-webui": {
+      "logo": {
+        "alt": "Open WebUI logo",
+        "file": "portal/apps/open-webui/logo.1ce45fb8ae.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/open-webui/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Open WebUI",
+      "shot": null
+    },
+    "opnform": {
+      "logo": {
+        "alt": "OpnForm logo",
+        "file": "portal/apps/opnform/logo.caeab45869.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/opnform/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "OpnForm",
+      "shot": null
+    },
+    "pairdrop": {
+      "logo": {
+        "alt": "PairDrop logo",
+        "file": "portal/apps/pairdrop/logo.d41143e6fd.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/pairdrop/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "PairDrop",
+      "shot": {
+        "alt": "PairDrop device discovery page in a browser",
+        "caption": "Real screenshot of PairDrop from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/pairdrop/shot.99718a9a42.webp",
+        "h": 540,
+        "source": "CI-Marketplace e2e/screenshots/pairdrop.png@e94772196695",
+        "w": 960
+      }
+    },
+    "paperless": {
+      "logo": {
+        "alt": "Paperless-ngx logo",
+        "file": "portal/apps/paperless/logo.e21e2d7aef.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/paperless/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Paperless-ngx",
+      "shot": null
+    },
+    "papra": {
+      "logo": {
+        "alt": "Papra logo",
+        "file": "portal/apps/papra/logo.3ae7662074.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/papra/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Papra",
+      "shot": null
+    },
+    "penpot": {
+      "logo": {
+        "alt": "Penpot logo",
+        "file": "portal/apps/penpot/logo.1a66cab748.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/penpot/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Penpot",
+      "shot": null
+    },
+    "photoprism": {
+      "logo": {
+        "alt": "PhotoPrism logo",
+        "file": "portal/apps/photoprism/logo.2f9a47825c.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/photoprism/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "PhotoPrism",
+      "shot": null
+    },
+    "pi-hole": {
+      "logo": {
+        "alt": "Pi-hole logo",
+        "file": "portal/apps/pi-hole/logo.913d289ecc.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/pi-hole/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Pi-hole",
+      "shot": {
+        "alt": "Pi-hole sign-in page in a browser",
+        "caption": "Real screenshot of Pi-hole from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/pi-hole/shot.e9fd9087b7.webp",
+        "h": 540,
+        "source": "CI-Marketplace e2e/screenshots/pi-hole.png@e94772196695",
+        "w": 960
+      }
+    },
+    "planka": {
+      "logo": {
+        "alt": "Planka logo",
+        "file": "portal/apps/planka/logo.40e04c8ee8.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/planka/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Planka",
+      "shot": null
+    },
+    "spliit": {
+      "logo": {
+        "alt": "Spliit logo",
+        "file": "portal/apps/spliit/logo.5f0db7fac9.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/spliit/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Spliit",
+      "shot": null
+    },
+    "steam-headless": {
+      "logo": {
+        "alt": "Steam Headless logo",
+        "file": "portal/apps/steam-headless/logo.719b09d0d7.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/steam-headless/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Steam Headless",
+      "shot": null
+    },
+    "stirling-pdf": {
+      "logo": {
+        "alt": "Stirling-PDF logo",
+        "file": "portal/apps/stirling-pdf/logo.f4393db9b2.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/stirling-pdf/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Stirling-PDF",
+      "shot": null
+    },
+    "tldraw": {
+      "logo": {
+        "alt": "tldraw logo",
+        "file": "portal/apps/tldraw/logo.b5e55730f8.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/tldraw/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "tldraw",
+      "shot": null
+    },
+    "twenty": {
+      "logo": {
+        "alt": "Twenty logo",
+        "file": "portal/apps/twenty/logo.c4c68f97d5.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/twenty/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Twenty",
+      "shot": null
+    },
+    "uptime-kuma": {
+      "logo": {
+        "alt": "Uptime Kuma logo",
+        "file": "portal/apps/uptime-kuma/logo.c9725b9a53.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/uptime-kuma/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Uptime Kuma",
+      "shot": null
+    },
+    "vaultwarden": {
+      "logo": {
+        "alt": "VaultWarden logo",
+        "file": "portal/apps/vaultwarden/logo.f0f9f972d9.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/vaultwarden/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "VaultWarden",
+      "shot": null
+    },
+    "vikunja": {
+      "logo": {
+        "alt": "Vikunja logo",
+        "file": "portal/apps/vikunja/logo.cbcd1b0f5f.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/vikunja/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Vikunja",
+      "shot": null
+    },
+    "wallos": {
+      "logo": {
+        "alt": "Wallos logo",
+        "file": "portal/apps/wallos/logo.0708fa4dbd.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/wallos/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Wallos",
+      "shot": null
+    },
+    "wanderer": {
+      "logo": {
+        "alt": "Wanderer logo",
+        "file": "portal/apps/wanderer/logo.2afafd8aba.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/wanderer/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Wanderer",
+      "shot": {
+        "alt": "Wanderer welcome page in a browser",
+        "caption": "Real screenshot of Wanderer from a Companion Hub QA run. Not a recording of this family.",
+        "file": "portal/apps/wanderer/shot.aa8e75c144.webp",
+        "h": 600,
+        "source": "CI-Marketplace e2e/screenshots/wanderer.png@e94772196695",
+        "w": 960
+      }
+    },
+    "wingfit": {
+      "logo": {
+        "alt": "Wingfit logo",
+        "file": "portal/apps/wingfit/logo.dcc1ca48e3.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/wingfit/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Wingfit",
+      "shot": null
+    },
+    "wordpress": {
+      "logo": {
+        "alt": "WordPress logo",
+        "file": "portal/apps/wordpress/logo.f938ff9822.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/wordpress/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "WordPress",
+      "shot": null
+    },
+    "yuvomi": {
+      "logo": {
+        "alt": "Yuvomi logo",
+        "file": "portal/apps/yuvomi/logo.0700db6129.webp",
+        "h": 128,
+        "source": "CI-Marketplace apps/yuvomi/metadata/logo.png@e94772196695",
+        "w": 128
+      },
+      "name": "Yuvomi",
+      "shot": null
+    }
+  },
+  "ci": {
+    "hub": [
+      {
+        "alt": "Companion Hub store showing the Featured apps",
+        "caption": "Real screenshot of Companion Hub from a product tutorial capture. Not a recording of this family.",
+        "file": "portal/ci/hub-store.dfac5282a2.webp",
+        "h": 540,
+        "id": "store",
+        "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-store-featured.png@860b47a7a84c",
+        "w": 960
+      },
+      {
+        "alt": "Companion Hub store page for Immich with an Install button",
+        "caption": "Real screenshot of Companion Hub from a product tutorial capture. Not a recording of this family.",
+        "file": "portal/ci/hub-app-detail.4d6521374e.webp",
+        "h": 540,
+        "id": "app-detail",
+        "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-app-details-immich.png@860b47a7a84c",
+        "w": 960
+      },
+      {
+        "alt": "Companion Hub setup screen while an app installs",
+        "caption": "Real screenshot of Companion Hub from a product tutorial capture, with sample data. Not a recording of this family.",
+        "file": "portal/ci/hub-installing.dbdd7532cb.webp",
+        "h": 540,
+        "id": "installing",
+        "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-onboarding-installing.png@860b47a7a84c",
+        "w": 960
+      },
+      {
+        "alt": "Companion Hub home with five installed apps and three system meters",
+        "caption": "Real screenshot of Companion Hub from a product tutorial capture, with sample data. The disk, CPU and memory figures are the capture machine's, not a Companion Core spec. Not a recording of this family.",
+        "file": "portal/ci/hub-home.f749764c1c.webp",
+        "h": 540,
+        "id": "home",
+        "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-home-dashboard.png@860b47a7a84c",
+        "w": 960
+      }
+    ],
+    "portal": [
+      {
+        "alt": "Companion account store with its list of apps, signed out",
+        "caption": "Real screenshot of the Companion account page from a product tutorial capture. Not a recording of this family.",
+        "file": "portal/ci/portal-store.8364e2bfa4.webp",
+        "h": 540,
+        "id": "store",
+        "source": "CI-Hub videos/ci-tutorial-video/public/screens/portal-store-public-top.png@860b47a7a84c",
+        "w": 960
+      },
+      {
+        "alt": "Companion account dialog that names a new device",
+        "caption": "Real screenshot of the Companion account page from a product tutorial capture, with sample data. Not a recording of this family.",
+        "file": "portal/ci/portal-add-device.4792040573.webp",
+        "h": 540,
+        "id": "add-device",
+        "source": "CI-Hub videos/ci-tutorial-video/public/screens/portal-add-device-dialog.png@860b47a7a84c",
+        "w": 960
+      },
+      {
+        "alt": "Companion account home with one device and one app",
+        "caption": "Real screenshot of the Companion account page from a product tutorial capture, with sample data. Not a recording of this family.",
+        "file": "portal/ci/portal-home.2f68bb511e.webp",
+        "h": 540,
+        "id": "home",
+        "source": "CI-Hub videos/ci-tutorial-video/public/screens/portal-home-with-device.png@860b47a7a84c",
+        "w": 960
+      }
+    ]
+  },
+  "noMedia": [],
+  "rejected": [
+    {
+      "id": "docs/app",
+      "kind": "ci",
+      "reason": "A Runtipi page for Nextcloud: a different product, not Companion Hub.",
+      "source": "CI-Docs public/images/app.webp@98b6ae3be36d"
+    },
+    {
+      "id": "docs/appstore",
+      "kind": "ci",
+      "reason": "Shows broken image icons with their alt text where app icons should be.",
+      "source": "CI-Docs public/images/appstore.webp@98b6ae3be36d"
+    },
+    {
+      "id": "docs/home-hub-store-light",
+      "kind": "ci",
+      "reason": "A phone held in a hand over a coloured background: a composite, not a capture.",
+      "source": "CI-Docs public/images/social-core/home-hub-store-light.webp@98b6ae3be36d"
+    },
+    {
+      "id": "hub/01-signin",
+      "kind": "ci",
+      "reason": "An older capture of the account sign-in page, replaced by a newer one.",
+      "source": "CI-Hub docs/ci-portal/01-signin.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/02-signup",
+      "kind": "ci",
+      "reason": "An older capture of the account sign-up form, replaced by a newer one.",
+      "source": "CI-Hub docs/ci-portal/02-signup.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/03-home",
+      "kind": "ci",
+      "reason": "An older capture with invented data: placeholder letter icons and red Cloudflare status labels.",
+      "source": "CI-Hub docs/ci-portal/03-home.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/04-store",
+      "kind": "ci",
+      "reason": "An older capture with invented data: placeholder letter icons and invented ratings.",
+      "source": "CI-Hub docs/ci-portal/04-store.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/05-add-device",
+      "kind": "ci",
+      "reason": "An older capture whose background is the invented device list with red Cloudflare status labels.",
+      "source": "CI-Hub docs/ci-portal/05-add-device.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/app-immich-live",
+      "kind": "ci",
+      "reason": "A branded placeholder slate (\"capture pending\"), not a capture.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/app-immich-live.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/app-immich-live-mobile",
+      "kind": "ci",
+      "reason": "A branded placeholder slate (\"capture pending\"), not a capture.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/app-immich-live-mobile.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/appstore",
+      "kind": "ci",
+      "reason": "Shows Runtipi's own Tipi app store in a macOS browser frame: a different product, not Companion Hub.",
+      "source": "CI-Hub screenshots/appstore.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/darkmode",
+      "kind": "ci",
+      "reason": "Shows Runtipi's own Tipi app store in a macOS browser frame: a different product, not Companion Hub.",
+      "source": "CI-Hub screenshots/darkmode.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-app-install-progress-immich",
+      "kind": "ci",
+      "reason": "A branded placeholder slate (\"capture pending\"), not a capture.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-app-install-progress-immich.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-app-installing-immich",
+      "kind": "ci",
+      "reason": "A branded placeholder slate (\"capture pending\"), not a capture.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-app-installing-immich.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-app-running-immich",
+      "kind": "ci",
+      "reason": "A branded placeholder slate (\"capture pending\"), not a capture.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-app-running-immich.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-app-running-immich-mobile",
+      "kind": "ci",
+      "reason": "A branded placeholder slate (\"capture pending\"), not a capture.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-app-running-immich-mobile.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-device-registration-complete",
+      "kind": "ci",
+      "reason": "A branded placeholder slate (\"capture pending\"), not a capture.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-device-registration-complete.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-device-registration-empty",
+      "kind": "ci",
+      "reason": "Shows test values (a device id \"test-device-id\" and the code \"ABC123\").",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-device-registration-empty.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-device-registration-mobile-code",
+      "kind": "ci",
+      "reason": "Shows test values (a device id \"test-device-id\" and a pairing code).",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-device-registration-mobile-code.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-device-registration-mobile-provisioning",
+      "kind": "ci",
+      "reason": "Says it is turning on \"your public connection\" and waiting for DNS propagation, a remote access claim the site does not make.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-device-registration-mobile-provisioning.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-device-registration-provisioning",
+      "kind": "ci",
+      "reason": "Says the Hub is being made \"reachable on the web\", which claims remote access that the site does not.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-device-registration-provisioning.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-install-dialog-immich",
+      "kind": "ci",
+      "reason": "Shows \"Public Web\" preselected and a host path (/nfs/tipi/immich), which claim remote access and carry the old product's name.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-install-dialog-immich.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-onboarding-form",
+      "kind": "ci",
+      "reason": "A full-page strip (3840 x 10806) with a no-GPU warning, a Tailscale sign-in and cloud API key fields.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-onboarding-form.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-register",
+      "kind": "ci",
+      "reason": "A branded placeholder slate (\"capture pending\"), not a capture.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-register.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-resource-monitor",
+      "kind": "ci",
+      "reason": "Shows an untranslated string key (COMMON_APP) as a column heading.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-resource-monitor.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/hub-settings-overview",
+      "kind": "ci",
+      "reason": "Shows \"Allow anonymous error monitoring\" switched on, which contradicts a story that names where data goes.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/hub-settings-overview.png@860b47a7a84c"
+    },
+    {
+      "id": "hub/portal-login",
+      "kind": "ci",
+      "reason": "A branded placeholder slate (\"capture pending\"), not a capture.",
+      "source": "CI-Hub videos/ci-tutorial-video/public/screens/portal-login.png@860b47a7a84c"
+    },
+    {
+      "id": "portal/03-home",
+      "kind": "ci",
+      "reason": "An empty workspace (\"No hosted apps yet\") under a demo organisation name.",
+      "source": "CI-Portal docs/screenshots/03-home.png@ff8777c62376"
+    },
+    {
+      "id": "portal/04-store",
+      "kind": "ci",
+      "reason": "An empty store (\"No apps found\").",
+      "source": "CI-Portal docs/screenshots/04-store.png@ff8777c62376"
+    },
+    {
+      "id": "portal/home-pairing-code",
+      "kind": "ci",
+      "reason": "Shows a pairing code.",
+      "source": "CI-Portal video/assets/shots/home-pairing-code.png@ff8777c62376"
+    },
+    {
+      "id": "portal/home-workspace",
+      "kind": "ci",
+      "reason": "The capture stage stubs the store and the devices (video/capture.config.mjs), so the data is made up: an invented workspace with generic icons.",
+      "source": "CI-Portal video/assets/shots/home-workspace.png@ff8777c62376"
+    },
+    {
+      "id": "portal/portal-dark",
+      "kind": "ci",
+      "reason": "A loading skeleton with no content (portal-store-dark.png is the same file).",
+      "source": "CI-Portal docs/ui/portal-dark.png@ff8777c62376"
+    },
+    {
+      "id": "portal/portal-light",
+      "kind": "ci",
+      "reason": "A loading skeleton with no content (portal-store-light.png is the same file).",
+      "source": "CI-Portal docs/ui/portal-light.png@ff8777c62376"
+    },
+    {
+      "id": "portal/portal-login-light",
+      "kind": "ci",
+      "reason": "A clean sign-in page, but its own line calls passkey sign-in the \"most secure\", a security claim this site does not make. Owner may overrule: it is otherwise the best account page shot.",
+      "source": "CI-Portal docs/ui/portal-login-light.png@ff8777c62376"
+    },
+    {
+      "id": "portal/store-alternatives",
+      "kind": "ci",
+      "reason": "The capture stage stubs the store and the devices (video/capture.config.mjs), so the data is made up: \"Soon\" badges beside competitor product names.",
+      "source": "CI-Portal video/assets/shots/store-alternatives.png@ff8777c62376"
+    },
+    {
+      "id": "portal/store-app-detail",
+      "kind": "ci",
+      "reason": "The capture stage stubs the store and the devices (video/capture.config.mjs), so the data is made up: an invented workspace name sits in the header.",
+      "source": "CI-Portal video/assets/shots/store-app-detail.png@ff8777c62376"
+    },
+    {
+      "id": "portal/store-home",
+      "kind": "ci",
+      "reason": "The capture stage stubs the store and the devices (video/capture.config.mjs), so the data is made up, with placeholder letter icons.",
+      "source": "CI-Portal video/assets/shots/store-home.png@ff8777c62376"
+    },
+    {
+      "id": "portal/store-install-device",
+      "kind": "ci",
+      "reason": "Shows \"Public Web\" preselected (\"Accessible from anywhere via a secure public URL\") and device codes, which claim remote access.",
+      "source": "CI-Portal video/assets/shots/store-install-device.png@ff8777c62376"
+    },
+    {
+      "id": "activepieces",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: sign-up form (login wall)",
+      "source": "CI-Marketplace e2e/screenshots/activepieces.png@e94772196695"
+    },
+    {
+      "id": "airtrail",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: QA capture is the empty owner-account setup form (username, password, display name): shows nothing of the app.",
+      "source": "CI-Marketplace e2e/screenshots/airtrail.png@e94772196695"
+    },
+    {
+      "id": "akaunting",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Login wall.",
+      "source": "CI-Marketplace e2e/screenshots/akaunting.png@e94772196695"
+    },
+    {
+      "id": "audiobookshelf",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Initial server setup form (create root user). No library.",
+      "source": "CI-Marketplace e2e/screenshots/audiobookshelf.png@e94772196695"
+    },
+    {
+      "id": "audiomass",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Dark empty editor behind a welcome dialog; shows nothing of the app at work.",
+      "source": "CI-Marketplace e2e/screenshots/audiomass.png@e94772196695"
+    },
+    {
+      "id": "baikal",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: The install wizard (empty admin password fields, Europe/Paris time zone), not the product working. The catalog marks QA as screenshot; the screenshot shows setup only.",
+      "source": "CI-Marketplace e2e/screenshots/baikal.png@e94772196695"
+    },
+    {
+      "id": "bentopdf",
+      "kind": "shot",
+      "reason": "Shows a row of third-party brand logos (Google, Microsoft, Reddit, Amazon, Apple) under \"Used by companies and people working at\".",
+      "source": "CI-Marketplace e2e/screenshots/bentopdf.png@e94772196695"
+    },
+    {
+      "id": "blockbench",
+      "kind": "shot",
+      "reason": "Its splash art credits two named creators, and the page offers Minecraft project types: a third-party brand and personal names on the page.",
+      "source": "CI-Marketplace e2e/screenshots/blockbench.png@e94772196695"
+    },
+    {
+      "id": "booklore",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Admin account setup form. No library.",
+      "source": "CI-Marketplace e2e/screenshots/booklore.png@e94772196695"
+    },
+    {
+      "id": "bookstack",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Login wall.",
+      "source": "CI-Marketplace e2e/screenshots/bookstack.png@e94772196695"
+    },
+    {
+      "id": "calibre-web",
+      "kind": "shot",
+      "reason": "The source has none: e2e/screenshots/calibre-web.png does not exist.",
+      "source": "CI-Marketplace e2e/screenshots/calibre-web.png@e94772196695"
+    },
+    {
+      "id": "ci-hermes",
+      "kind": "shot",
+      "reason": "The upstream project's own website, with an install command for another machine: not the app running on a Core.",
+      "source": "CI-Marketplace e2e/screenshots/ci-hermes.png@e94772196695"
+    },
+    {
+      "id": "ci-memory",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Companion login landing page with a Log In button and the words \"personal assistant\": login wall and banned vocabulary.",
+      "source": "CI-Marketplace e2e/screenshots/ci-memory.png@e94772196695"
+    },
+    {
+      "id": "ci-openclaw",
+      "kind": "shot",
+      "reason": "The upstream project's own website, with install commands for another machine: not the app running on a Core.",
+      "source": "CI-Marketplace e2e/screenshots/ci-openclaw.png@e94772196695"
+    },
+    {
+      "id": "code-server",
+      "kind": "shot",
+      "reason": "The source has none: e2e/screenshots/code-server.png does not exist.",
+      "source": "CI-Marketplace e2e/screenshots/code-server.png@e94772196695"
+    },
+    {
+      "id": "cryptpad",
+      "kind": "shot",
+      "reason": "Shows a localhost address and port (localhost:19024) as the instance name.",
+      "source": "CI-Marketplace e2e/screenshots/cryptpad.png@e94772196695"
+    },
+    {
+      "id": "docuseal",
+      "kind": "shot",
+      "reason": "Shows a localhost address and port (localhost:5341) in its App URL field.",
+      "source": "CI-Marketplace e2e/screenshots/docuseal.png@e94772196695"
+    },
+    {
+      "id": "donetick",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: QA capture is the sign-in screen (cute mascot, username, password).",
+      "source": "CI-Marketplace e2e/screenshots/donetick.png@e94772196695"
+    },
+    {
+      "id": "duplicati",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: QA capture is the Duplicati login box.",
+      "source": "CI-Marketplace e2e/screenshots/duplicati.png@e94772196695"
+    },
+    {
+      "id": "espocrm",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Login wall.",
+      "source": "CI-Marketplace e2e/screenshots/espocrm.png@e94772196695"
+    },
+    {
+      "id": "firefly-iii",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Register-a-new-account form.",
+      "source": "CI-Marketplace e2e/screenshots/firefly-iii.png@e94772196695"
+    },
+    {
+      "id": "foldergram",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Empty state: \"No folders found yet\".",
+      "source": "CI-Marketplace e2e/screenshots/foldergram.png@e94772196695"
+    },
+    {
+      "id": "frigate",
+      "kind": "shot",
+      "reason": "An error state: \"No frames have been received, check error logs\".",
+      "source": "CI-Marketplace e2e/screenshots/frigate.png@e94772196695"
+    },
+    {
+      "id": "gitea",
+      "kind": "shot",
+      "reason": "Shows an internal host name (gitea-db:5432) and a masked database password field.",
+      "source": "CI-Marketplace e2e/screenshots/gitea.png@e94772196695"
+    },
+    {
+      "id": "grocy",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: QA capture is the login form.",
+      "source": "CI-Marketplace e2e/screenshots/grocy.png@e94772196695"
+    },
+    {
+      "id": "homehub",
+      "kind": "shot",
+      "reason": "Shows first names in its \"Who is home\" widget (Mom, Dad, Vivek, India) and a user picker.",
+      "source": "CI-Marketplace e2e/screenshots/homehub.png@e94772196695"
+    },
+    {
+      "id": "jellyfin",
+      "kind": "shot",
+      "reason": "Shows a container id (addea8c7324a) as the server name.",
+      "source": "CI-Marketplace e2e/screenshots/jellyfin.png@e94772196695"
+    },
+    {
+      "id": "joplin",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Login wall.",
+      "source": "CI-Marketplace e2e/screenshots/joplin.png@e94772196695"
+    },
+    {
+      "id": "jupyterlab",
+      "kind": "shot",
+      "reason": "Shows a localhost address, an example token and a local path in its help text.",
+      "source": "CI-Marketplace e2e/screenshots/jupyterlab.png@e94772196695"
+    },
+    {
+      "id": "kimai",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: QA capture is the login form.",
+      "source": "CI-Marketplace e2e/screenshots/kimai.png@e94772196695"
+    },
+    {
+      "id": "kitchenowl",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Create-a-user form.",
+      "source": "CI-Marketplace e2e/screenshots/kitchenowl.png@e94772196695"
+    },
+    {
+      "id": "kiwix",
+      "kind": "shot",
+      "reason": "An empty library (\"No result. Would you like to reset filter?\"), not a working Kiwix.",
+      "source": "CI-Marketplace e2e/screenshots/kiwix.png@e94772196695"
+    },
+    {
+      "id": "koodo-reader",
+      "kind": "shot",
+      "reason": "An empty library behind a dimmed data-loss warning, with a \"Pro version\" link.",
+      "source": "CI-Marketplace e2e/screenshots/koodo-reader.png@e94772196695"
+    },
+    {
+      "id": "librephotos",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Login page.",
+      "source": "CI-Marketplace e2e/screenshots/librephotos.png@e94772196695"
+    },
+    {
+      "id": "libretranslate",
+      "kind": "shot",
+      "reason": "Not a QA run capture: its size (1399 x 576) and rendering are not the harness's, so the \"Companion Hub QA run\" caption would not be true.",
+      "source": "CI-Marketplace e2e/screenshots/libretranslate.png@e94772196695"
+    },
+    {
+      "id": "mealie",
+      "kind": "shot",
+      "reason": "The source has none: e2e/screenshots/mealie.png does not exist.",
+      "source": "CI-Marketplace e2e/screenshots/mealie.png@e94772196695"
+    },
+    {
+      "id": "monetr",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Sign-in form.",
+      "source": "CI-Marketplace e2e/screenshots/monetr.png@e94772196695"
+    },
+    {
+      "id": "n8n",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: owner setup form (login wall)",
+      "source": "CI-Marketplace e2e/screenshots/n8n.png@e94772196695"
+    },
+    {
+      "id": "navidrome",
+      "kind": "shot",
+      "reason": "Not a QA run capture: the project's own demo shot in a macOS window, with commercial album covers and a person's first name in the header.",
+      "source": "CI-Marketplace e2e/screenshots/navidrome.png@e94772196695"
+    },
+    {
+      "id": "nextcloud",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Install form (create admin account) carrying the vendor slogan \"a safe home for all your data\", a claim the site must not make.",
+      "source": "CI-Marketplace e2e/screenshots/nextcloud.png@e94772196695"
+    },
+    {
+      "id": "ntfy",
+      "kind": "shot",
+      "reason": "Shows a \"Notifications are blocked\" warning, which reads as a fault.",
+      "source": "CI-Marketplace e2e/screenshots/ntfy.png@e94772196695"
+    },
+    {
+      "id": "obsidian",
+      "kind": "shot",
+      "reason": "Shows the remote desktop viewer's panel and brand over the app.",
+      "source": "CI-Marketplace e2e/screenshots/obsidian.png@e94772196695"
+    },
+    {
+      "id": "ollama",
+      "kind": "shot",
+      "reason": "The source has none: e2e/screenshots/ollama.png does not exist.",
+      "source": "CI-Marketplace e2e/screenshots/ollama.png@e94772196695"
+    },
+    {
+      "id": "onlyoffice",
+      "kind": "shot",
+      "reason": "Shows a container id and a docker command that prints the JWT secret.",
+      "source": "CI-Marketplace e2e/screenshots/onlyoffice.png@e94772196695"
+    },
+    {
+      "id": "open-webui",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Dark splash \"Chart new frontiers wherever you are\" with a Get started button: no app UI.",
+      "source": "CI-Marketplace e2e/screenshots/open-webui.png@e94772196695"
+    },
+    {
+      "id": "opnform",
+      "kind": "shot",
+      "reason": "Not a capture: marketing artwork with stock photography.",
+      "source": "CI-Marketplace e2e/screenshots/opnform.png@e94772196695"
+    },
+    {
+      "id": "paperless",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Login wall.",
+      "source": "CI-Marketplace e2e/screenshots/paperless.png@e94772196695"
+    },
+    {
+      "id": "papra",
+      "kind": "shot",
+      "reason": "Its email field shows an example address on the app's own domain.",
+      "source": "CI-Marketplace e2e/screenshots/papra.png@e94772196695"
+    },
+    {
+      "id": "penpot",
+      "kind": "shot",
+      "reason": "Its login illustration carries three personal names on cursor labels, which may be real people.",
+      "source": "CI-Marketplace e2e/screenshots/penpot.png@e94772196695"
+    },
+    {
+      "id": "photoprism",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Login wall.",
+      "source": "CI-Marketplace e2e/screenshots/photoprism.png@e94772196695"
+    },
+    {
+      "id": "planka",
+      "kind": "shot",
+      "reason": "Half the page is a stock photograph that carries third-party brand marks.",
+      "source": "CI-Marketplace e2e/screenshots/planka.png@e94772196695"
+    },
+    {
+      "id": "spliit",
+      "kind": "shot",
+      "reason": "Its footer names the app's author, a real person.",
+      "source": "CI-Marketplace e2e/screenshots/spliit.png@e94772196695"
+    },
+    {
+      "id": "steam-headless",
+      "kind": "shot",
+      "reason": "A blank page.",
+      "source": "CI-Marketplace e2e/screenshots/steam-headless.png@e94772196695"
+    },
+    {
+      "id": "stirling-pdf",
+      "kind": "shot",
+      "reason": "Shows the default login credentials (a username and a password).",
+      "source": "CI-Marketplace e2e/screenshots/stirling-pdf.png@e94772196695"
+    },
+    {
+      "id": "tldraw",
+      "kind": "shot",
+      "reason": "A blank canvas with a license watermark and a test room id.",
+      "source": "CI-Marketplace e2e/screenshots/tldraw.png@e94772196695"
+    },
+    {
+      "id": "twenty",
+      "kind": "shot",
+      "reason": "Shows third-party company brands and street addresses in its demo rows.",
+      "source": "CI-Marketplace e2e/screenshots/twenty.png@e94772196695"
+    },
+    {
+      "id": "uptime-kuma",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Create admin set-up form",
+      "source": "CI-Marketplace e2e/screenshots/uptime-kuma.png@e94772196695"
+    },
+    {
+      "id": "vaultwarden",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Login wall (shows the Bitwarden trademark line).",
+      "source": "CI-Marketplace e2e/screenshots/vaultwarden.png@e94772196695"
+    },
+    {
+      "id": "vikunja",
+      "kind": "shot",
+      "reason": "Shows the local address 127.0.0.1:19997.",
+      "source": "CI-Marketplace e2e/screenshots/vikunja.png@e94772196695"
+    },
+    {
+      "id": "wallos",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: Create-an-account form.",
+      "source": "CI-Marketplace e2e/screenshots/wallos.png@e94772196695"
+    },
+    {
+      "id": "wingfit",
+      "kind": "shot",
+      "reason": "Shows an error toast (\"You must be authenticated\"), a photograph of people and a personal GitHub handle.",
+      "source": "CI-Marketplace e2e/screenshots/wingfit.png@e94772196695"
+    },
+    {
+      "id": "wordpress",
+      "kind": "shot",
+      "reason": "The install language list, with the WordPress logo cut off at the top.",
+      "source": "CI-Marketplace e2e/screenshots/wordpress.png@e94772196695"
+    },
+    {
+      "id": "yuvomi",
+      "kind": "shot",
+      "reason": "Rejected by the v3 media review: administrator set-up form",
+      "source": "CI-Marketplace e2e/screenshots/yuvomi.png@e94772196695"
+    }
+  ],
+  "sources": {
+    "hub": "860b47a7a84c53d305be8b7696fc390463fcbb96",
+    "marketplace": "e947721966952d762deec382e64fd55a8f2db3fb",
+    "portal": "ff8777c623760ca471ebd89a7881b0aa0f6018e7"
+  },
+  "v": 1
+}

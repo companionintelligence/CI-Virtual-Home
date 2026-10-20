@@ -3,7 +3,11 @@
  * shared chrome (header, buttons, chips, discs, footer) are in site.css; nothing here is a literal colour.
  *
  * Above the fold: the name, the tagline, the home's picture, "Take the tour" and "See Companion Core", one honest line about the 3D.
- * Then the disclosure strip, one section per person, the apps, how the Core starts, the next family and the close.
+ * Then the disclosure strip, one section per person (a sticky nav of the people, the card "Rented before, on the Core now", the moments with their
+ * "More about this moment", a strip of real screenshots), a day in the house, the home and its floor plan, the apps with their real logos, how it runs
+ * (real screenshots of Companion Hub and of the Companion account page), how the Core starts, the next family and the close.
+ * Real logos sit on a white tile (--pg-logo-bg) in both themes, so a dark mark stays visible. Hover and reveal effects are CSS only and the site's
+ * prefers-reduced-motion rule (site.css) turns every transition off.
  * Daylight only: the page takes the canon's light set and, when the system asks for it, its dark set (the tokens switch in site.css).
  * ------------------------------------------------------------------------------------------------------------- */
 
@@ -51,16 +55,24 @@
 .block .lead { margin-top: 10px; max-width: 40em; font-size: 16.5px; color: var(--muted-foreground); text-wrap: pretty; }
 .block p.note { margin-top: 14px; font-size: 13.5px; color: var(--muted-foreground); max-width: 46em; }
 
-/* the people, as links to their sections (and so to family/<slug>#sally) */
-.who-nav ul { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-.who-nav a { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 18px 6px 8px; border-radius: 999px; color: inherit; text-decoration: none; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
+/* the people, as links to their sections (and so to family/<slug>#sally). The nav sticks under the site header while the people are read, and lets go at
+   the end of them (it lives in .people, which ends with the last person); portal/family.js marks the one on screen with aria-current. A chip changes
+   colour only, never size, so nothing shifts as it follows the scroll. Without the script it is the same row of plain links. */
+.people { margin-top: 26px; }
+.who-nav { position: sticky; top: 56px; z-index: 12; margin: 0 calc(-1 * var(--pg-gutter)); padding: 8px var(--pg-gutter); background: color-mix(in srgb, var(--background) 92%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--pg-hairline); }
+.who-nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.who-nav ul::-webkit-scrollbar { display: none; }
+.who-nav li { flex: none; }
+.who-nav a { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 18px 6px 8px; border-radius: 999px; color: inherit; text-decoration: none; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); transition: background-color 0.15s ease, box-shadow 0.15s ease; }
 .who-nav a:hover { background: var(--secondary); }
+.who-nav a[aria-current] { background: color-mix(in srgb, var(--primary) 13%, var(--card)); box-shadow: inset 0 0 0 2px var(--primary); }
 .who-nav-text { display: flex; flex-direction: column; line-height: 1.2; }
 .who-nav-text b { font-size: 15px; font-weight: 700; }
 .who-nav-text small { font-size: 12.5px; font-weight: 500; color: var(--muted-foreground); }
 
 /* one person */
-.who { margin-top: clamp(36px, 5vw, 60px); padding-top: 28px; border-top: 1px solid var(--pg-hairline); scroll-margin-top: 72px; }
+.who { margin-top: clamp(30px, 4.5vw, 52px); padding-top: 28px; border-top: 1px solid var(--pg-hairline); scroll-margin-top: 64px; }
+.people > .who:first-of-type { margin-top: 22px; border-top: 0; padding-top: 12px; }
 .who-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
 .who-head .avatar { width: 48px; height: 48px; font-size: 19px; box-shadow: none; }
 .who-id { flex: 1 1 220px; min-width: 0; }
@@ -68,13 +80,13 @@
 .who-facts { display: flex; flex-wrap: wrap; margin-top: 4px; font-size: 14px; font-weight: 600; color: var(--muted-foreground); }
 .who-facts span + span::before { content: "\00b7"; margin: 0 9px; opacity: 0.6; }
 .who-start .i { width: 15px; height: 15px; }
-.who-work { margin-top: 14px; max-width: 40em; font-size: 16px; }
+.who-work, .who-bio { margin-top: 14px; max-width: 42em; font-size: 16px; text-wrap: pretty; }
 .agent { margin-top: 8px; max-width: 42em; font-size: 14.5px; color: var(--muted-foreground); }
 .agent b { color: var(--foreground); font-weight: 700; }
 .agent .limits { display: block; margin-top: 2px; font-size: 13.5px; }
 
-.moments { list-style: none; padding: 0; margin: 20px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-.moment { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 18px 20px 12px; border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); scroll-margin-top: 80px; }
+.moments { list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.moment { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 18px 20px 12px; border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); scroll-margin-top: 72px; }
 .moment:target { box-shadow: inset 0 0 0 2px var(--primary); }
 .moment-room { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--muted-foreground); }
 .moment h3 { font-size: 17.5px; font-weight: 700; line-height: 1.3; }
@@ -90,7 +102,7 @@
 /* ---------------- the apps ---------------- */
 .apps { list-style: none; padding: 0; margin: 20px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; }
 .app { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
-.app-name { font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; min-height: 36px; }
+.app-name { font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; min-height: 36px; }
 @media (pointer: coarse) { .app-name, .sib, .who-nav a { min-height: 44px; } }
 .app-name:hover { text-decoration: underline; }
 .instead { font-size: 13px; font-weight: 600; color: var(--muted-foreground); }
@@ -144,3 +156,100 @@
   .apps { grid-template-columns: 1fr; }
 }
 @media (hover: none) { .poster:hover img { transform: none; } }
+
+/* ===================================================== story v2: the card, the details, the screenshots, a day, the home, how it runs ===================================================== */
+
+/* a real logo in a chip or beside an app's name (the tile and the size are portal/media.css's) */
+.chip-app { padding-left: 3px; }
+.chip-app .logo { width: 24px; height: 24px; padding: 2px; border-radius: 6px; }
+.app-name .logo { width: 32px; height: 32px; }
+
+/* "More about this moment": a native disclosure under a moment */
+.more { align-self: stretch; margin-top: 4px; border-top: 1px solid var(--pg-hairline); }
+.more summary { display: flex; align-items: center; gap: 9px; min-height: 44px; cursor: pointer; list-style: none; font-size: 14px; font-weight: 700; color: var(--primary); }
+.more summary::-webkit-details-marker { display: none; }
+.more summary::before { content: ""; flex: none; width: 7px; height: 7px; margin: 0 4px 3px 2px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform 0.15s ease; }
+.more[open] summary::before { transform: rotate(45deg); margin-bottom: 5px; }
+.more summary:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.more-body { display: grid; gap: 12px; padding: 2px 0 12px; font-size: 14.5px; }
+.more-ba { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.more-ba > div { padding: 10px 12px; border-radius: 12px; background: var(--secondary); }
+.more-ba dt { margin-bottom: 3px; font-size: 12.5px; font-weight: 700; color: var(--muted-foreground); }
+.more-ba dd { margin: 0; text-wrap: pretty; }
+.more-cap { margin: 0 0 -4px; font-size: 12.5px; font-weight: 700; color: var(--muted-foreground); }
+.more-steps { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+.more-steps li::marker { color: var(--primary); font-weight: 700; }
+.more-fact { margin: 0; padding-left: 10px; border-left: 2px solid var(--primary); color: var(--muted-foreground); text-wrap: pretty; }
+.more-fact b { color: var(--foreground); font-weight: 700; }
+
+/* a day in the house: a rail with the parts of the day on it, and an entry for each moment */
+.day { list-style: none; margin: 22px 0 0; padding: 0; display: grid; gap: 26px; }
+.day-part { display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 0 18px; }
+.day-at { padding-top: 14px; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--primary); }
+.day-list { list-style: none; margin: 0; padding: 0 0 0 26px; display: grid; gap: 10px; border-left: 2px solid var(--pg-hairline); }
+.day-item { position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px 6px 14px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
+.day-item::before { content: ""; position: absolute; left: -33px; top: 22px; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 4px var(--background); }
+.day-item .avatar { margin-top: 2px; box-shadow: none; }
+.day-text { min-width: 0; }
+.day-who { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--muted-foreground); }
+.day-line { margin: 1px 0 0; font-size: 15.5px; text-wrap: pretty; }
+.day-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 700; text-decoration: none; }
+.day-link:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.day-link .i { width: 14px; height: 14px; }
+
+/* the home: the lede, the facts, a block for each spot, and the floor plan */
+.home-facts { list-style: none; margin: 16px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.home-facts li { display: inline-flex; align-items: center; min-height: 32px; padding: 0 14px; border-radius: 999px; background: var(--secondary); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.spots { list-style: none; margin: 18px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
+.spot { padding: 14px 16px 16px; border-radius: 14px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); }
+.spot h3 { font-size: 15px; font-weight: 700; }
+.spot p { margin-top: 4px; font-size: 14.5px; color: var(--muted-foreground); text-wrap: pretty; }
+.plan-block { margin-top: 28px; }
+.plan-floors ul { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.plan-floors a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; color: inherit; font-size: 14px; font-weight: 700; text-decoration: none; box-shadow: inset 0 0 0 1px var(--pg-hairline); }
+.plan-floors a:hover { background: var(--secondary); }
+.plan-levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 18px; }
+.plan { padding: 14px 14px 12px; border-radius: 18px; background: var(--card); box-shadow: inset 0 0 0 1px var(--pg-hairline); scroll-margin-top: 4px; }
+.plan-cap { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 13.5px; color: var(--muted-foreground); }
+.plan-cap b { font-size: 15px; color: var(--foreground); }
+.plan-hint { display: none; margin: 4px 0 0; font-size: 12.5px; color: var(--muted-foreground); }
+.plan-scroll { margin-top: 10px; overflow-x: auto; border-radius: 12px; }
+.plan-box { position: relative; min-width: 520px; width: 100%; }
+.plan-svg { display: block; width: 100%; height: 100%; }
+.plan-foot { fill: var(--secondary); stroke: var(--muted-foreground); stroke-opacity: 0.35; stroke-width: 1; }
+.plan-room { fill: var(--background); stroke: var(--muted-foreground); stroke-opacity: 0.6; stroke-width: 0.8; }
+.plan-name { fill: var(--foreground); font-family: var(--font-sans); font-weight: 600; letter-spacing: 0; word-spacing: 0; }
+.plan-core rect { fill: var(--primary); }
+.plan-core circle { fill: var(--primary-foreground); }
+.pin { position: absolute; z-index: 2; display: grid; place-items: center; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; text-decoration: none; }
+.pin .avatar { width: 30px; height: 30px; box-shadow: 0 0 0 3px var(--background), var(--shadow-md); transition: transform 0.15s ease; }
+.pin:focus-visible { outline-offset: -4px; }
+@media (prefers-reduced-motion: no-preference) { .pin:hover .avatar, .pin:focus-visible .avatar { transform: scale(1.14); } }
+
+@media (max-width: 700px) {
+  .day-part { grid-template-columns: 1fr; gap: 8px; }
+  .day-at { padding-top: 0; }
+  .plan-hint { display: block; }
+  .more-ba { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .who-nav a { padding-right: 14px; }
+  .plan { padding: 12px 10px 10px; }
+}
+
+/* ===================================================== a name, as a kicker (live pass 3) =====================================================
+   The owner's words: "Use all caps on the name and loosely space the name text like a kicker." A person's name wherever it labels something on a family page, and the family's name
+   ("THE BRENNAN FAMILY") the same way: all capitals by CSS (the text in the page, and every aria-label, is the name as written), bold (the canon's 700), tracking of 0.2em, in the
+   sage accent (--primary: phthalo on the light set, sage on the dark one). The monogram discs stay. At the card's reading size (1.5rem, 25.5 px) where the name stands alone as a
+   heading; in the people nav, in the day's entries and on the previous and next family links the name is a label among body text, so it is 0.85rem (14.45 px) and no smaller.
+   Tokens only. */
+.nm, .who h2.nm, .who-nav-text b.nm, .day-who.nm, .sib b.nm { text-transform: uppercase; letter-spacing: 0.2em; font-weight: 700; color: var(--primary); }
+.who-nav-text b.nm { font-size: 0.85rem; line-height: 1.25; }
+.day-who.nm { font-size: 0.85rem; line-height: 1.3; }
+.who h2.nm { font-size: clamp(1.5rem, 3vw, 2rem); line-height: 1.15; }
+.who-start .nm { color: inherit; letter-spacing: 0.2em; font-size: 0.85rem; }
+.sib b.nm { font-size: 0.85rem; line-height: 1.3; letter-spacing: 0.2em; }
+/* the hero's family name is the page's one heading: the kicker look at a size that wraps in the copy column; the tagline under it carries the sentence */
+.hero h1.nm { font-size: clamp(1.5rem, 3.4vw, 2.6rem); line-height: 1.18; letter-spacing: 0.2em; text-wrap: balance; }
+.hero .tagline { font-size: clamp(20px, 2.2vw, 28px); font-weight: 600; color: var(--foreground); max-width: 22em; }
+.who-nav a { gap: 12px; }

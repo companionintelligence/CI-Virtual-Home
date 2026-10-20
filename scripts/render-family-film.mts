@@ -29,6 +29,7 @@ import {
 } from './film/lib.mts';
 import { buildAudio, encodeArgs } from './film/mux.mts';
 import { gate } from './film/qa.mts';
+import { CANVAS_TYPE_MIN } from '../assets/story/place.js';
 
 const FRAMES_PER_CALL = 12;
 const JPEG_QUALITY = 0.95;
@@ -105,9 +106,10 @@ async function renderFamily(browser: any, srv: Served, slug: string): Promise<Re
         const info = await page.evaluate(async (a: any) => { // @ts-ignore (a URL in the page, not a module of this script)
           const F = await import('/assets/story/film/index.js'); (window as any).__film = F; return F.prepare(a); },
           { rs: fam.rs, format: key, res: RES, title: P.text.title, end: P.text.end, badge: P.text.badge });
+        if (info.unsafe.length) throw new Error(`${slug} ${key}: outside the safe area: ${info.unsafe.join(', ')}`);
         if (flags.stills) { await stills(page, slug, key, info, flags.stills); await page.evaluate(() => (window as any).__film.end()); continue; }
         const tmpWeb = path.join(scratch, `${key}.web.mp4`), tmpMaster = flags.master === 'true' ? path.join(scratch, `${key}.master.mp4`) : null;
-        let posterJpg: Buffer | null = null;
+        let posterJpg: Buffer | null = null, audit: { min: number; text: string; sizes: Record<string, number>; drawn: number } | null = null;
         const ff = spawn('ffmpeg', encodeArgs({ wav, fps: info.fps, web: tmpWeb, master: tmpMaster }), { stdio: ['pipe', 'ignore', 'pipe'] });
         let ffErr = ''; ff.stderr.on('data', (d: any) => (ffErr += d));
         const ffDone = new Promise<void>((resolve, reject) => { ff.on('error', reject); ff.on('close', (code, sig) => (code === 0 ? resolve() : reject(new Error(`ffmpeg exited ${code ?? sig}: ${ffErr.trim()}`)))); });
@@ -126,6 +128,9 @@ async function renderFamily(browser: any, srv: Served, slug: string): Promise<Re
             for (const j of out.jpgs) await write(Buffer.from(j, 'base64'));
             if (from % (FRAMES_PER_CALL * 20) === 0) process.stdout.write(`\r  ${key}: frame ${Math.min(info.frames, from + FRAMES_PER_CALL)} / ${info.frames}   `);
           }
+          // the floor is a statement about the pixels: the smallest type the overlay really painted in this film, in design px at the 1080 short edge
+          audit = await page.evaluate(() => (window as any).__film.typeAudit());
+          if (audit!.min < CANVAS_TYPE_MIN - 0.01) throw new Error(`type under the ${CANVAS_TYPE_MIN} design px floor: ${audit!.min.toFixed(2)} painted for "${audit!.text}"`);
           ff.stdin.end(); await ffDone; process.stdout.write('\n');
         } catch (e) { ff.kill('SIGKILL'); throw e; }
         await page.evaluate(() => (window as any).__film.end());
@@ -149,7 +154,7 @@ async function renderFamily(browser: any, srv: Served, slug: string): Promise<Re
         // recorded as soon as THIS shape is done, so a later failure keeps it (a film is only ever listed with the inputs it was made from)
         { const fl = readFilms(), cur = fl.families[slug]; const keep = cur && cur.inputsSha === inputsSha ? cur.aspects : {};
           fl.families[slug] = { durationMs: Math.round(P.clock.duration * 1000), inputsSha, vtt: `film/${vName}`, aspects: { ...keep, [key]: aspects[key] } }; writeFilms(fl); }
-        fs.writeFileSync(path.join(vdir, `${slug}.${key}.report.json`), JSON.stringify({ gates: rep, cards: info.cards, placements: info.placements, wallSeconds: res.seconds[key] }, null, 1));
+        fs.writeFileSync(path.join(vdir, `${slug}.${key}.report.json`), JSON.stringify({ gates: rep, cards: info.cards, placements: info.placements, tracking: info.tracking, typeFloor: CANVAS_TYPE_MIN, typePainted: audit, wallSeconds: res.seconds[key] }, null, 1));
         log(slug, `  ${key}: ${(bytes.length / 1048576).toFixed(1)} MiB, ${rep.probe.duration.toFixed(1)} s, ${rep.loudness!.I.toFixed(1)} LUFS / ${rep.loudness!.TP.toFixed(1)} dBTP, ${(res.seconds[key]).toFixed(0)} s wall`);
       }
       if (flags.stills) return { ...res, ok: true };
