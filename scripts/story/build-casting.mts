@@ -44,7 +44,8 @@ export interface PlanFamily {
   reason: string; household_text: string; care: string; fitNote?: string; reviewNeeded?: string[];
   signatureApps: string[]; beatApps?: Partial<Record<Topic, string>>; members: PlanMember[];
 }
-export interface Plan { v: number; generated: string; note: string; households: Record<string, string>; retiredSlugs: string[]; families: PlanFamily[] }
+/** `homesWithoutFamily`: house id → why no family lives there (yet). A home is allowed none only when it is listed (cast-lint.mts): the apartments, reference/APARTMENTS.md. */
+export interface Plan { v: number; generated: string; note: string; households: Record<string, string>; retiredSlugs: string[]; homesWithoutFamily?: Record<string, string>; families: PlanFamily[] }
 
 // ---- anchor preferences per archetype (reference/story/personas.md) -------------------------------------------------------
 /** item roles an archetype stands at, in preference order. The chain always ends in a room role or a universal role. */
@@ -436,6 +437,17 @@ function renderMd(plan: Plan, casting: any, houses: Map<string, HouseInfo>): str
   L.push('', '## Why each home', '');
   for (const f of fams) {
     L.push(`- \`${f.house}\` (${f.slug}, ${f.household}${f.business ? ', business' : ''}): ${f.reason}${f.fitNote ? ` ${f.fitNote}` : ''}`);
+  }
+  // the homes that are allowed to have no family: the plan lists them (cast-lint.mts holds the list to the homes), and the site gives each a plain card and its own page
+  const without = Object.entries(plan.homesWithoutFamily ?? {}).sort((a, b) => a[0].localeCompare(b[0]));
+  if (without.length) {
+    L.push('', '## Homes without a family', '');
+    L.push(`${without.length} home${without.length === 1 ? '' : 's'} of the gallery have no family yet. The site shows each with a plain card that opens the player, and a page of its own, and no tour; adding a family means a plan entry above and removing the home from \`homesWithoutFamily\` in the plan.`, '');
+    for (const [id, why] of without) {
+      let name = id;
+      try { name = displayName({ id, name: readJson(path.join(ROOT, 'content', 'houses', `${id}.json`)).name }); } catch { /* a listed home with no spec is cast-lint's error, not this file's */ }
+      L.push(`- \`${id}\` (${name}): ${why}`);
+    }
   }
   L.push('');
   return L.join('\n');

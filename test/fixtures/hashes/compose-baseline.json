@@ -102,6 +102,22 @@
         "l2/Study": "86aaf1e9126e4a46"
       }
     },
+    "city-one-bed": {
+      "rooms": 9,
+      "items": 44,
+      "sha256": "390c59ba4b372db467e3f879931578d70e31c5268ea63ef541cdc74a8464fa03",
+      "roomHashes": {
+        "l1/Entrance Lobby": "d47a08d2ae19445f",
+        "l2/Bedroom": "ce23a8d3119f13d9",
+        "l2/Laundry Closet": "dc3458ef87c38d97",
+        "l2/Bath": "1be083fee5eb9627",
+        "l2/Entry Hall": "96ead2de56e43d54",
+        "l2/Kitchen": "703440fd3e065a06",
+        "l2/Living Room": "c7a5537306b334a3",
+        "l2/Desk Nook": "3e3e7267166a65cb",
+        "l2/Street Balcony": "cc86155e7c3fa6f7"
+      }
+    },
     "cocoon": {
       "rooms": 16,
       "items": 118,
@@ -123,6 +139,28 @@
         "l2/Hall Bath": "d3b71440383be76a",
         "l2/Kids Bedroom": "3b486db93110d640",
         "l2/Kids Room": "c783a87e656ab577"
+      }
+    },
+    "corner-penthouse": {
+      "rooms": 15,
+      "items": 90,
+      "sha256": "c8f9269508ae9bc46b3d6bf1c94d8742be3a67db52e12350fc3626c77118bc87",
+      "roomHashes": {
+        "l1/Entrance Lobby": "db6929f87e97c23e",
+        "l2/Upper Stair Hall": "dd6cef484eee676f",
+        "l3/Primary Suite": "95f127c07d91fda3",
+        "l3/Ensuite": "43cfe83f066ed037",
+        "l3/Bedroom Two": "c3b3ee46a742f540",
+        "l3/Family Bath": "6591d86c3ed94599",
+        "l3/Office": "2622d779b8f748e8",
+        "l3/Bedroom Three": "94083fdfa75b3195",
+        "l3/Gallery": "a27494b061117fdc",
+        "l3/Living Room": "4f00bd2c2aa7bc1d",
+        "l3/Library Nook": "d1345ecd21bbf59e",
+        "l3/Entry Hall": "a484014dc596bf74",
+        "l3/Kitchen": "49795983075a445e",
+        "l3/Stair Hall": "69136ec4e5bf6e3b",
+        "l3/Terrace": "91a6dcf9a7a19997"
       }
     },
     "cutestarter": {
@@ -220,6 +258,25 @@
         "l1/Kitchen": "e119ca5f0db10b4d",
         "l1/Sunroom": "e40a22b6cede7595",
         "l2/Entry Landing": "b5036d4d97291d25"
+      }
+    },
+    "garden-flat": {
+      "rooms": 12,
+      "items": 74,
+      "sha256": "e6047f1e479eede95477c6b560ef40777ba104e50b2953f192f0a147fbf89a63",
+      "roomHashes": {
+        "l1/Living & Dining": "5a10dad7610ec22f",
+        "l1/Kitchen": "53d85f99e361ec16",
+        "l1/Entry Hall": "5e721722f49e409f",
+        "l1/Passage": "5ad939390053dda5",
+        "l1/Study": "93250ec597c8e8fb",
+        "l1/Utility": "fad18e88be27c9ae",
+        "l1/Bathroom": "9f333904aba3c046",
+        "l1/Grandchild's Bedroom": "9ba2c4f46a9bf172",
+        "l1/Primary Bedroom": "b25025faa14135d4",
+        "l1/Garden Terrace": "54f4dea609287ab7",
+        "l1/Core Hall": "63df0a1e2d422b5e",
+        "l2/Upper Landing": "2e7b849a79033514"
       }
     },
     "gardennook": {
@@ -562,6 +619,22 @@
         "l1/Kids Zone": "65c05a1a39e62310"
       }
     },
+    "studio-loft": {
+      "rooms": 9,
+      "items": 55,
+      "sha256": "f502b8a895fc65b500d0dd81ff88fc17f32c4c3cb266752ac287fdbd16a2fe36",
+      "roomHashes": {
+        "l1/Living Loft": "1b146a49f6b1b42a",
+        "l1/Desk & Workshop": "61602910f90fb017",
+        "l1/Kitchen": "d8a43a417b8d1e01",
+        "l1/Bath": "b3d7bf71bf2cd11c",
+        "l1/Stair Hall": "5b422afe38634b45",
+        "l2/Sleeping Platform": "b6bf2a6d2ddcd5e3",
+        "l2/Back Balcony": "94f643842cb9af40",
+        "l2/Upper Stair Hall": "9e85f34713827754",
+        "l3/Top Stair Hall": "fe36a326280324f8"
+      }
+    },
     "sunnyhome": {
       "rooms": 9,
       "items": 68,
@@ -576,6 +649,27 @@
         "l1/Primary Bedroom": "6e39464f4488e5cc",
         "l1/Deck Dining": "f31da110997b245c",
         "l2/Upper Landing": "26a5c83801905907"
+      }
+    },
+    "two-bed-flat": {
+      "rooms": 14,
+      "items": 64,
+      "sha256": "15315f70003a3ad5a16794bac916857973f4d39bcadb04af114c777d5c69e62d",
+      "roomHashes": {
+        "l1/Stair Lobby": "e64aa1d4ad3b2cf0",
+        "l2/Entry Hall": "2b27894c9591bde0",
+        "l2/Passage": "65892848a32e500c",
+        "l2/Study Alcove": "1fc8b6077bfdc750",
+        "l2/Living Room": "5655d226bc58ae65",
+        "l2/Dining Room": "5e251cc7ad1a4ba4",
+        "l2/Kitchen": "12547e4aa46b890d",
+        "l2/Primary Bedroom": "3fa812f08015ccde",
+        "l2/Kids' Room": "fd1a615182a3da37",
+        "l2/Bathroom": "f2247dd0198a1272",
+        "l2/Laundry": "d714a66293c36259",
+        "l2/Front Balcony": "182eba0052fa7d50",
+        "l2/Landing": "0e796a904c5c59b3",
+        "l3/Top Landing": "f71bb4d795fedb07"
       }
     },
     "valleyview": {
@@ -619,12 +713,35 @@
         "l2/Family Bathroom": "692ae1844e44d12b",
         "l2/Bedroom Three": "555d9177c85dda84"
       }
+    },
+    "walkup-duplex": {
+      "rooms": 16,
+      "items": 91,
+      "sha256": "8a9ea48e24f27c0c1f165a6e32e66a4d6ba0863dc33dfc4b47ea3f25b27742bd",
+      "roomHashes": {
+        "l1/Tower Lobby": "9c77937398a77834",
+        "l2/Entry": "1f44de7b89928d2a",
+        "l2/Stair Hall": "54909b2ef20e95d0",
+        "l2/Living Room": "d37734bfe529571c",
+        "l2/Kitchen & Dining": "5ebf96f298491104",
+        "l2/Powder Room": "97c8c4af2c844729",
+        "l2/Back Balcony": "94f643842cb9af40",
+        "l2/Tower Gallery Hall": "97e61cf6457b4071",
+        "l3/Primary Bedroom": "1acbb8cafc6d2a20",
+        "l3/Bedroom Three": "4cb92137cfc62a6a",
+        "l3/Upper Hall": "13a784b571498b2a",
+        "l3/Bedroom Two": "01aa3d55fd63b65d",
+        "l3/Family Bath": "b132671344d148d0",
+        "l3/Study Landing": "8e4611a579ea9111",
+        "l3/Tower Upper Hall": "42e91cd2f110d2bb",
+        "l4/Tower Top Hall": "64d1eefba3e731b2"
+      }
     }
   },
   "fleet": {
-    "houses": 30,
-    "rooms": 407,
-    "items": 2806,
-    "sha256": "828b9bfa1f70a5442302e7ca2e0f6aca3ccd39a516ad88e2bd44a2f54c9466dd"
+    "houses": 36,
+    "rooms": 482,
+    "items": 3224,
+    "sha256": "4bffb447f500dc928f595861d6954b9d8dc9ab8dd70df00285339d6c1450780e"
   }
 }

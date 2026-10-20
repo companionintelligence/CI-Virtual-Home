@@ -15,7 +15,7 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 |---|---|
 | `assets/**/*.js` (gitignored) | `pnpm run build` |
 | `content/houses/<id>.plan.json` | `pnpm run plans` |
-| `content/houses/index.json` | `pnpm run index` |
+| `content/houses/index.json`, and the count copy in `index.html` (the heading's and the descriptions' "Thirty-six homes", the hero's two figures) | `pnpm run index` (`galleryCountCopy`, `scripts/portal-pages.mts`; `portal:build` fails when `index.html` disagrees) |
 | `content/house-catalog.json`, `assets/props/measured.ts` | `pnpm run catalog` |
 | `assets/site-species-masks.ts` (what each planting species hides of the mulch, and its triangle cost) | `node --experimental-strip-types scripts/measure-species.mts --write` — after a change to a species' geometry (`assets/site-species.ts`, the flower heads and grass tuft in `assets/site.ts`), then `pnpm run build`; `scripts/test-site-species.mts` fails until it is done |
 | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` | `pnpm run iso` |
@@ -48,7 +48,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 - The Python generators are deterministic too (`random.Random(spec id)`); re-running one on an unchanged tree
   must leave `git status` clean.
 
-**The public site.** The gallery of thirty homes (`index.html`), a home's own page (`homes/<id>`), a fictional family's page
+**The public site.** The gallery of 36 homes (`index.html`), a home's own page (`homes/<id>`), a fictional family's page
 (`family/<slug>`, one per current family) and the player (`room-creator.html?mode=view&house=<id>`, `assets/viewer.ts`; with
 `&family=<slug>` it plays that family's narrated tour) are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 
@@ -116,8 +116,10 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `Take the tour` is its one action (the Brennans' tour, `HERO` in `portal-front.mts`), `See Companion Core` only points at the one Core band, and the
   band, the header and the footer keep `Buy Companion Core` and `Download Companion`: say it once. No UI mockup, no invented screen (the real, labelled app media of the block below is the only third-party image), no price, daylight
   only, the beta line with every software claim, and a card's app line is `<app> replaces <service>` from the story, never a line `claims.json` stops.
-  A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). The hero's "thirty" and the description's "Thirty homes" are
-  checked against the number of homes (step 5b).
+  A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). The hero's count in words ("Thirty-six homes.") and the description's are
+  checked against the number of homes (step 5b) and written by `pnpm run index`, never by hand. A home with no current family keeps its plain card and its page:
+  the six apartments are declared so in `content/story/cast-plan.json` (`homesWithoutFamily`; `portal:build` names them, `story:cast-lint` holds the list to the homes,
+  `--strict-families` errors on a home that is neither current nor declared), so the copy never says every home has a family.
 - The homes' own pages are linked by the footer's "Every home, on its own page" list, which `portal:build` writes at the `<!-- foot-homes: -->` marker in
   `index.html` and `gallery.js` leaves alone, so the rendered DOM links them and not only the sitemap does. A home's page carries "Meet the family" when a
   current family lives there (`<!-- meet-family: -->`, written by the same step).
@@ -141,6 +143,9 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   fails the build if any text file under `dist/` contains a builder handle (derived from the `author` fields, never listed), the word
   "Sims", "Base Game" or "BG " (the allowlist, `GUARD_ALLOW`, is empty: keep it so). A new surface that wants a name uses
   `displayName` and credits no one; never read `author`, `source` or the spec's `name` in a page, a script that ships or the player.
+  The one author that is not a handle is the company's own name, `Companion Intelligence` (`scripts/own-authors.mts`, matched whole: a home it wrote itself, the apartments of
+  `reference/APARTMENTS.md`, is credited to it, and it is on every page); the credit guard and the story's leak scan both skip it, `GUARD_ALLOW` stays empty, and every other value is still a handle.
+  A home's display name must not be a phrase a family's words contain (`check-leaks.mts`: the loft is "Warehouse Loft" because a family's story has a "studio loft").
   `THIRD_PARTY.md` and `ATTRIBUTION.md` are internal licence records for dependencies and models: leave them.
 - **The homes portal names its homes**, by `displayName`, and nothing else about where they came from. The salvage branch's rule that no home
   or house id is ever public (sanitised specs, a stub of `home-names`) is NOT adopted. What holds of it: a STORY's words never name a home,
@@ -150,7 +155,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 - **The story system** (`content/families/<slug>.json`, `content/story/`, `reference/story/`, `assets/story/`, `scripts/story/`). The families are
   fictional, two to six members each with an archetype, told as the argument for uncloud: the contract is `reference/story/personas.md`
   (read it first; the validator, the bake, the voice and the film follow it). Who lives where is `content/story/cast-plan.json`
-  (`reference/story/cast.md` is the readable table of it). One file per family is the one source of every word: the page,
+  (`reference/story/cast.md` is the readable table of it). A home that has no family yet is listed there under `homesWithoutFamily` with a reason (the six apartments); `story:cast-lint` fails a home that is in neither place, and one that is in both. One file per family is the one source of every word: the page,
   the popups, the captions, the voice-over and the film are all made from it. The order after an edit: `pnpm run story:validate -- <slug>`,
   `story:voice -- <slug> --stale`, `story:bake -- <slug>`, `portal:og`, then `portal:build` and `portal:test`. The `.voice.json`,
   `.bake.json`, audio and link-preview images are generated and committed; never hand-edit them. Every app a story names must be in
@@ -273,18 +278,18 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `<main>` because `<main>` goes inert while a drawer is open.
 - `pnpm run ui:test` after editor work (a GPU, and ffmpeg for the recording); it also runs in `pnpm run check`.
 
-**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph and story-validator tests (`pnpm run test`) and the 31 quick
+**Verify before you push.** CI only builds, typechecks, validates, runs the floor-plan-graph and story-validator tests (`pnpm run test`) and the 35 quick
 Node tests (`pnpm run test:node`) and assembles the portal (`portal:build`'s link and staleness checks); once the owner has set up deploys, a merge to `main` that
 passes those goes live on its own. The render gate needs a GPU and runs here:
 
 ```bash
 pnpm run build && pnpm run typecheck
-pnpm run check          # assets, specs, shots (120 / 0 errors), determinism, goldens (150 / 150)
-pnpm run check:quick    # while iterating: assets + specs + shots + the 31 quick tests
+pnpm run check          # assets, specs, shots (144 / 0 errors), determinism, goldens (150 / 150; the six apartments are named as without a baseline until `goldens:update --house` is run on the Mac)
+pnpm run check:quick    # while iterating: assets + specs + shots + the 35 quick tests
 ```
 
 A clean run has 0 shot errors and 0 scene errors (warnings are reported but do not fail — compare their count
-with the previous run by hand; the full list is in `test/qa/qa.json`), `deterministic`, and 150 goldens passing.
+with the previous run by hand; the full list is in `test/qa/qa.json`), `deterministic`, and the goldens passing (150 frames today, 180 once the six apartments are blessed).
 After a spec change also re-run `plans`, `iso` and `floorplans` and commit their output with the spec.
 
 **Pass 4 works in streams** (S0 seams, then S1 kit, S2 architecture, S3 compose, S4 site, S5 shot, S6 ui, each on
@@ -303,7 +308,7 @@ your stream's `test/goldens/expected-diffs/<stream>.json` and record what it mov
 <stream>`, and `fixtures --record <stream>` for another stream's fixture). The integration re-blesses once and
 empties that ledger.
 
-**The interior layers (LIGHT, SOFT, SMALL, DRESS, BAKE, README → The interior layers).** The 30 houses carry their dress items baked in (`src: 'dress@1'`, a `dk` seed key): never
+**The interior layers (LIGHT, SOFT, SMALL, DRESS, BAKE, README → The interior layers).** The 36 homes carry their dress items baked in (`src: 'dress@1'`, a `dk` seed key): never
 hand-edit one and never add a `dress` field (a live opt-in) to a shipped house; after a layout re-bake run `node --experimental-strip-types scripts/compose-house.mts --house <id>
 --dress --write` (`test-dress-phase` S fails on a stale bake; `--undress` restores the bytes). A lamp placed by the dress phase is lit by LIGHT's room pool, so a recipe or a host
 change that moves lamps moves night frames: check `pnpm run test:light -- --bench` (19 rows) and `-- --lamps`. A change to how rooms look is judged with the review rig

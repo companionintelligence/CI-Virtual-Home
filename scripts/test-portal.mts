@@ -6,7 +6,7 @@
 //   pnpm run build && pnpm run portal:build && pnpm run portal:test [--dir dist] [--base /ci-virtual-home/]
 //        [--house aurora,lakecabin,mirage] [--shots test/portal] [--headed] [--only gallery,pages,previews,caching,player,motion,failures,editor,campaign,hooks,webkit]
 //
-//   gallery   30 cards, every thumbnail decoded, the static hero figures match the data, no link forces
+//   gallery   a card for every home, every thumbnail decoded, the static hero figures match the data, no link forces
 //             autoplay, card names carry no pack-tag jargon and are distinct, hovering a card warms the player (not
 //             room-creator.html itself), search / storeys / tag filters narrow and clear (and the tag counts follow
 //             the storeys filter), no card or footer credits a builder or names a build (and the footer has only the brand
@@ -34,7 +34,7 @@
 //             analytics) or a missing script the player outlives: no card over a home that plays; the names module
 //             (home-names.js) not downloading: the gallery still lists the homes, and the player's tab never
 //             shows a title with the pack tag
-//   pages     the built site's own pages, without a browser's help: the gallery lists its 30 homes in the HTML itself (each
+//   pages     the built site's own pages, without a browser's help: the gallery lists its homes in the HTML itself (each
 //             linking its page), a home's page names and shows the home and offers the player, a shared moment forwards
 //             to the player, /robots.txt is text/plain, /sitemap.xml lists the gallery and every home, an unknown path
 //             answers 404 with the 404 page, the icons and the manifest are served, and every page carries the Companion
@@ -69,6 +69,7 @@ import { pathToFileURL } from 'node:url';
 import { ROOT, parseArgs, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
 import { TEST_GLOB } from './story/hooks.ts';
 import { builderHandles, guardOutput } from './portal-redact.mts';
+import { numberWord } from './portal-pages.mts';
 import type { TestCtx, TestFn } from './story/hooks.ts';
 
 const args = parseArgs(process.argv.slice(2));
@@ -81,6 +82,8 @@ const ONLY = args.only && args.only !== 'true' ? new Set(args.only.split(',').fi
 const wants = (leg: string): boolean => !ONLY || ONLY.has(leg);
 if (!fs.existsSync(path.join(DIR, 'index.html'))) { console.error(`no portal in ${DIR}: pnpm run portal:build`); process.exit(2); }
 fs.mkdirSync(SHOTS, { recursive: true });
+// the number of homes in the gallery is the built list's, not a number written here: a home added to the collection changes it
+const HOMES: number = JSON.parse(fs.readFileSync(path.join(DIR, 'content', 'houses', 'index.json'), 'utf8')).houses.length;
 
 const srv = await serve(DIR, BASE);
 const pw = await loadPlaywright();
@@ -149,14 +152,14 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   await page.goto(srv.url('index.html'));
   await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
   const cards = await page.$$eval('#grid .card', (els: Element[]) => els.length);
-  ok(cards === 30, `${cards} cards`);
+  ok(cards === HOMES, `${cards} cards`);
   const liveStats = await page.$$eval('[data-stat]', (els: Element[]) => els.map(e => e.textContent));
   ok(JSON.stringify(liveStats) === JSON.stringify(staticStats), `the static hero figures are the data's (${staticStats.join(' / ')})`);
   // ---- front page ---- a family's card is headed by the family ("The Brennan family", which the three flagship homes share) and names its
   // home on the line under it, so the names that must be distinct and clean are the HOMES': that line for a family's card, the heading for a home's own
   const titles: string[] = await page.$$eval('#grid .card', (els: HTMLElement[]) => els.map(e => ((e.querySelector('.home-line')?.textContent || '').split(' · ')[0]) || e.querySelector('h3')!.textContent || ''));
   const headings: string[] = await page.$$eval('#grid .card h3', (els: Element[]) => els.map(e => e.textContent || ''));
-  ok(titles.length === 30 && headings.length === 30 && ![...titles, ...headings].some(t => /base\s*game|basegame|\bBG\b/i.test(t)) && new Set(titles).size === 30, `the homes' names on the cards carry no Sims jargon and are all distinct (${titles.slice(0, 3).join(', ')}, …)`);
+  ok(titles.length === HOMES && headings.length === HOMES && ![...titles, ...headings].some(t => /base\s*game|basegame|\bBG\b/i.test(t)) && new Set(titles).size === HOMES, `the homes' names on the cards carry no Sims jargon and are all distinct (${titles.slice(0, 3).join(', ')}, …)`);
   const storeysLabels = await page.$$eval('#storeys button', (els: Element[]) => els.map(e => e.textContent));
   ok(storeysLabels.join('|') === 'Any|1|2|3+', `the storeys filter reads ${storeysLabels.join(' · ')}`);
   // no builder is credited anywhere: no credit line on a card, no builds list, no credits block, no hero figure about builders, and not
@@ -182,9 +185,9 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   }
   await page.fill('#q', '');
   await sleep(220);
-  ok(found.length === 0 && (await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) === 30, `no search finds a home by its builder's handle${found.length ? ` (found: ${found.join(', ')})` : ''}`);
+  ok(found.length === 0 && (await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) === HOMES, `no search finds a home by its builder's handle${found.length ? ` (found: ${found.join(', ')})` : ''}`);
   const hrefs: string[] = await page.$$eval('#grid .card a, #hero-play, #hero-media', (els: HTMLAnchorElement[]) => els.map(a => a.href));
-  ok(hrefs.length === 32 && hrefs.every(h => !new URL(h).searchParams.has('play')), 'no gallery link forces autoplay (the player decides, and honours reduced motion)');
+  ok(hrefs.length === HOMES + 2 && hrefs.every(h => !new URL(h).searchParams.has('play')), 'no gallery link forces autoplay (the player decides, and honours reduced motion)');
   // ---- front page ---- the people on the cards, the jobs they filter by, the label, the hero's picture and the campaign
   const front = await page.evaluate(() => ({
     families: document.querySelectorAll('#grid .card-family').length,
@@ -211,17 +214,17 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   // the persona filter: the address carries it (and keeps every other parameter), the cards narrow, and clearing puts it back
   await page.click('#personas .persona[data-persona="builder"]');
   const builders = await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length);
-  ok(builders > 0 && builders < 30 && (await page.evaluate(() => location.search)).includes('persona=builder'), `Code narrows to ${builders} and the address says persona=builder`);
+  ok(builders > 0 && builders < HOMES && (await page.evaluate(() => location.search)).includes('persona=builder'), `Code narrows to ${builders} and the address says persona=builder`);
   await page.click('#personas .persona[data-persona="builder"]');
-  ok((await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) === 30 && !(await page.evaluate(() => location.search)).includes('persona'), 'pressing it again lets it go');
+  ok((await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) === HOMES && !(await page.evaluate(() => location.search)).includes('persona'), 'pressing it again lets it go');
   // the cards go to their family's page; the homes' own pages are linked from the footer, in the rendered DOM a crawler that runs the page reads
   const pageLinks: string[] = await page.$$eval('a[href*="homes/"]', (els: HTMLAnchorElement[]) => els.map(a => new URL(a.href).pathname));
-  ok(pageLinks.length === 30 && new Set(pageLinks).size === 30 && pageLinks.every(h => h.startsWith(`${BASE}homes/`)), `once gallery.js has run, the page links all ${new Set(pageLinks).size} homes' own pages (the footer's list: ${pageLinks[0].replace(BASE, '')} … ${pageLinks[29].replace(BASE, '')})`);
+  ok(pageLinks.length === HOMES && new Set(pageLinks).size === HOMES && pageLinks.every(h => h.startsWith(`${BASE}homes/`)), `once gallery.js has run, the page links all ${new Set(pageLinks).size} homes' own pages (the footer's list: ${pageLinks[0].replace(BASE, '')} … ${pageLinks[pageLinks.length - 1].replace(BASE, '')})`);
   // load every thumbnail (lazy ones too) and check each decoded
   await page.$$eval('#grid img', (imgs: HTMLImageElement[]) => imgs.forEach(i => { i.loading = 'eager'; }));
   await page.waitForFunction(() => Array.from(document.querySelectorAll<HTMLImageElement>('#grid img')).every(i => i.complete), null, { timeout: 20000 });
   const decoded = await page.$$eval('#grid img', (imgs: HTMLImageElement[]) => imgs.filter(i => i.naturalWidth === 640 && i.naturalHeight === 360).length);
-  ok(decoded === 30, `${decoded} of 30 thumbnails decoded at 640 × 360`);
+  ok(decoded === HOMES, `${decoded} of ${HOMES} thumbnails decoded at 640 × 360`);
   await page.evaluate(() => window.scrollTo(0, 0));
   await sleep(300);
   await shot(page, `gallery-${label}`);
@@ -249,7 +252,7 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   await page.fill('#q', 'brick');
   await sleep(250);
   const brick = await visible();
-  ok(brick > 0 && brick < 30, `search "brick" narrows to ${brick}`);
+  ok(brick > 0 && brick < HOMES, `search "brick" narrows to ${brick}`);
   ok((await page.evaluate(() => location.search)).includes('q=brick'), 'the search is in the URL');
   await page.fill('#q', '');
   await sleep(250);   // the search input is debounced: let the cleared query land before the next filter
@@ -259,17 +262,17 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
   const countsAll = await tagCounts();
   await page.click('#storeys button[data-storeys="1"]');
   const one = await visible();
-  ok(one > 0 && one < 30, `1 storey narrows to ${one}`);
+  ok(one > 0 && one < HOMES, `1 storey narrows to ${one}`);
   const countsOne = await tagCounts();
   ok(countsOne !== countsAll, `the style tags count what the storeys filter leaves (${countsOne})`);
   await page.click('#storeys button[data-storeys=""]');
   const tag = await page.$('#tags .tag');
-  if (tag) { await tag.click(); const n = await visible(); ok(n > 0 && n < 30, `a style tag narrows to ${n}`); await tag.click(); }
+  if (tag) { await tag.click(); const n = await visible(); ok(n > 0 && n < HOMES, `a style tag narrows to ${n}`); await tag.click(); }
   await page.fill('#q', 'zzzz-no-such-home');
   await sleep(250);
   ok(await page.isVisible('#empty'), 'no match shows the empty state');
   await page.click('#clear');
-  ok((await visible()) === 30, 'clear filters shows all 30');
+  ok((await visible()) === HOMES, `clear filters shows all ${HOMES}`);
   if (!mobile) {
     await page.evaluate(() => document.getElementById('homes')!.scrollIntoView());
     await sleep(400);
@@ -330,13 +333,13 @@ async function pages() {
   ok(sentences === 1, `"The small computer on your desk …" is said once on the gallery (${sentences})`);
   const heroLinks = [...gallery.text.matchAll(/id="hero-(?:play|media)"[^>]*? href="([^"]+)"/g)].map(m => m[1]);
   ok(heroLinks.length === 2 && heroLinks.every(h => h.startsWith('./room-creator?mode=view') && !h.includes('.html')), 'its hero links go to the player without .html');
-  // ---- front page ---- the hero tours the flagship family when that family has a page; one h1 that says "thirty"; the label; no price, no logo
+  // ---- front page ---- the hero tours the flagship family when that family has a page; one h1 that says the number of homes in words; the label; no price, no logo
   const heroFamily = heroLinks[0].includes('&amp;family=') ? new URL(heroLinks[0].replace(/&amp;/g, '&'), 'http://x/').searchParams.get('family') : null;
   ok(!heroFamily || !!byFamily[heroFamily], `the hero's "Take the tour" plays ${heroFamily ? `the ${heroFamily} family's tour` : 'a home'}`);
   const h1s = [...gallery.text.matchAll(/<h1[^>]*>([^<]*)<\/h1>/g)].map(m => m[1]);
   // ---- story v2 ---- (the owner asked for real logos and screenshots: the front page now carries those of content/story/app-media.json, each beside the name it identifies, with alt
   // text, its size and lazy loading: the hook scripts/story/portal-tests/front-v2.mts holds them to that. What is still never there: a logo or picture fetched from anywhere else.)
-  ok(h1s.length === 1 && /\bthirty\b/i.test(h1s[0]) && gallery.text.includes('>Fictional family. Real software.<') && gallery.text.includes('Companion OS is in beta.') && !/[$€£]\s?\d|<img[^>]+src="(?:https?:)?\/\//i.test(gallery.text), `one <h1> ("${h1s[0]}"), the label, the beta line, no price and no image from anywhere but the site (the real logos and screenshots are the site's own files)`);
+  ok(h1s.length === 1 && new RegExp(`\\b${numberWord(HOMES)}\\b`, 'i').test(h1s[0]) && gallery.text.includes('>Fictional family. Real software.<') && gallery.text.includes('Companion OS is in beta.') && !/[$€£]\s?\d|<img[^>]+src="(?:https?:)?\/\//i.test(gallery.text), `one <h1> ("${h1s[0]}"), the label, the beta line, no price and no image from anywhere but the site (the real logos and screenshots are the site's own files)`);
   // ---- end story v2 ----
   // every string of the front page the story's copy rules cover (scripts/story/check-copy.mts's banned phrases, headings in sentence case)
   {
@@ -881,7 +884,7 @@ async function failureCases() {
     const listed = await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 }).then(() => true).catch(() => false);
     const cards = await page.$$eval('#grid .card:not(.skel)', (els: Element[]) => els.length);
     const jargon = await page.$$eval('#grid .card h3', (els: Element[]) => els.filter(e => /base\s*game|basegame|\bBG\b/i.test(e.textContent || '')).length);
-    ok(listed && cards === 30 && jargon === 0, `home-names.js not downloading: the gallery still lists ${cards} homes (${jargon} with Sims jargon)`);
+    ok(listed && cards === HOMES && jargon === 0, `home-names.js not downloading: the gallery still lists ${cards} homes (${jargon} with Sims jargon)`);
     await shot(page, 'failure-names-gallery');
     await page.goto(srv.url('room-creator.html?mode=view&house=cocoon'));
     const card = await page.waitForSelector('.vh-fail', { timeout: 60000 }).catch(() => null);
@@ -1029,7 +1032,7 @@ async function webkit() {
       await page.goto(srv.url('index.html'));
       await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 30000 });
       const cards = await page.$$eval('#grid .card', (els: Element[]) => els.length);
-      ok(cards === 30, `WebKit gallery: ${cards} cards`);
+      ok(cards === HOMES, `WebKit gallery: ${cards} cards`);
       await shot(page, 'webkit-gallery');
       ok(errors.length === 0, `WebKit gallery: no console errors${errors.length ? ': ' + errors.join(' | ') : ''}`);
       await close();

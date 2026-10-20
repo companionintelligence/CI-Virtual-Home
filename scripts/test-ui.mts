@@ -47,7 +47,7 @@ import http from 'node:http';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { decodePNG } from './vendor/png.mjs';
-import { loadPlaywright, LAUNCH_ARGS, FONT_FILES } from './portal-lib.mts';
+import { loadPlaywright, LAUNCH_ARGS, FONT_FILES, houseIds } from './portal-lib.mts';
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, x, i, arr) => { if (x.startsWith('--')) a.push([x.slice(2), arr[i + 1] && !arr[i + 1].startsWith('--') ? arr[i + 1] : 'true']); return a; }, [] as string[][]));
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -493,7 +493,7 @@ try {
       await p2.keyboard.type('mirage');
       await sleep(150);
       const hits = await p2.$$eval('#gallery-grid .rc-home-card', (els: Element[]) => els.map(e => e.querySelector('.rc-home-name')!.textContent));
-      ok(all === 30 && hits.length === 1, `the picker lists the 30 homes and searches them ("mirage": ${hits.join(', ')})`);
+      ok(all === houseIds().length && hits.length === 1, `the picker lists the ${houseIds().length} homes and searches them ("mirage": ${hits.join(', ')})`);
       await shot(p2, 'picker');
       await p2.keyboard.press('ArrowDown');
       await p2.keyboard.press('Enter');
@@ -778,7 +778,7 @@ try {
     await page.click('#btn-house-picker');
     await page.click('#gallery-compare');
     await sleep(300);
-    ok(await page.isVisible('#compare-dialog') && (await page.$$eval('#compare-grid .rc-compare-card', (els: Element[]) => els.length)) === 30, 'the picker opens Compare homes: 30 homes, none drawn yet');
+    ok(await page.isVisible('#compare-dialog') && (await page.$$eval('#compare-grid .rc-compare-card', (els: Element[]) => els.length)) === houseIds().length, `the picker opens Compare homes: ${houseIds().length} homes, none drawn yet`);
     ok((await page.inputValue('#compare-shot')) === 'orbit' && Math.abs(Number(await page.inputValue('#compare-t')) - 30) <= 1, 'it starts from the shot and the moment on screen');
     await page.evaluate(() => (window as any).__houseUi.compare.run(['aurora', 'mirage']));
     const cards = await page.$$eval('#compare-grid .rc-compare-card', (els: HTMLElement[]) => els.filter(e => e.dataset.state === 'done').map(e => ({ name: e.querySelector('.rc-home-name')!.textContent, w: (e.querySelector('img') as HTMLImageElement).naturalWidth, src: (e.querySelector('img') as HTMLImageElement).src.slice(-60) })));

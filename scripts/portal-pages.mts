@@ -37,14 +37,33 @@ export const shortStyle = (s?: string): string => (s || '').split(/[:;,(]| with 
 
 const ONES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-// 30 → "thirty": the copy says "thirty homes" in words; this is what the data's count reads as, so a page that still says
-// "thirty" after the collection changes is found by the build (build-portal.mts checks index.html's hand-written copy)
+// 36 → "thirty-six": the copy says "thirty-six homes" in words; this is what the data's count reads as. galleryCountCopy (below) writes it into
+// index.html (pnpm run index), and a page that still says another number is found by the build (build-portal.mts checks index.html's hand-written copy)
 export function numberWord(n: number): string {
   if (!Number.isInteger(n) || n < 0 || n > 99) return String(n);
   if (n < 20) return ONES[n];
   return TENS[Math.floor(n / 10)] + (n % 10 ? `-${ONES[n % 10]}` : '');
 }
 export const capital = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
+
+/**
+ * index.html's hand-written copy that carries the NUMBER of homes, written as the data says it: the hero's two figures
+ * (`data-stat="homes"` and `"area"`, which gallery.js recomputes from index.json), the count in words that opens the heading
+ * ("Thirty-six homes.") and the descriptions ("Thirty-six homes, ..."). `pnpm run index` writes it into index.html (scripts/build-house-index.mts)
+ * so adding a home never means finding the word by hand; `portal:build` (step 5b) holds the file to it and says to run the command when it
+ * is not. A page that has no such copy is returned as it is (the build says so in its own words).
+ */
+export function galleryCountCopy(html: string, houses: House[]): string {
+  const word = capital(numberWord(houses.length));
+  const area = nf.format(Math.round(houses.reduce((a, h) => a + (h.areaSqm || 0), 0) / 10) * 10);
+  const lead = '[A-Za-z0-9]+(?:-[a-z]+)?';   // "Thirty", "Thirty-six", or digits past ninety-nine
+  return html
+    .replace(/(data-stat="homes">)[^<]*(<)/, (_m, a: string, z: string) => `${a}${houses.length}${z}`)
+    .replace(/(data-stat="area">)[^<]*(<)/, (_m, a: string, z: string) => `${a}${area}${z}`)
+    .replace(new RegExp(`(<h1 id="hero-title">)${lead}( homes\\.)`), (_m, a: string, z: string) => `${a}${word}${z}`)
+    .replace(new RegExp(`(<meta name="description" content=")${lead}( homes,)`), (_m, a: string, z: string) => `${a}${word}${z}`)
+    .replace(new RegExp(`(<meta property="og:description" content=")${lead}( homes,)`), (_m, a: string, z: string) => `${a}${word}${z}`);
+}
 
 // a link-preview description fits a search result: one sentence on the style, one on what the page does, under 160 characters.
 export function homeDescription(h: House): string {

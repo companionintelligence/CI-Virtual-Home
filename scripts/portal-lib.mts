@@ -32,9 +32,13 @@ export async function loadPlaywright(): Promise<any> {
 }
 
 // The GPU is part of the render; these are test-goldens.mts's launch flags for each platform.
+// PORTAL_GL=default (Linux only): the machine's own GPU through ANGLE, as render-house-shots.mts does, for a box where SwiftShader takes minutes a page (the portal
+// test's player and editor legs, shot-worlds, build-thumbs). Unset, the launch is the committed one, so nothing that is already checked in depends on it.
 export const LAUNCH_ARGS: string[] = process.platform === 'darwin'
   ? ['--use-angle=metal', '--ignore-gpu-blocklist', '--enable-gpu-rasterization']
-  : ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--disable-gpu-watchdog', '--no-sandbox'];
+  : process.env.PORTAL_GL === 'default'
+    ? ['--use-gl=angle', '--use-angle=default', '--ignore-gpu-blocklist', '--enable-gpu-rasterization', '--no-sandbox']
+    : ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--disable-gpu-watchdog', '--no-sandbox'];
 
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json',

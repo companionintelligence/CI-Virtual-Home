@@ -27,8 +27,11 @@ let names = FALLBACK_NAMES;
 // Style tags: the words a visitor would filter by, matched against each spec's one-paragraph `style`. A tag is
 // shown when it matches three or more homes and no more than half of them (a tag that fits most homes, like
 // gables, narrows nothing), so the row follows the collection as it grows. Waterfront means open water: a pond
-// in the garden does not make a lake house.
+// in the garden does not make a lake house. Apartment is a home that is one unit in a block (reference/APARTMENTS.md): the style
+// paragraph of each says "apartment" (the loft, the flat, the penthouse and the duplex are each one), and only that word counts,
+// because "flat" and "loft" alone also name a flat roof, a flat lawn and a loft dormer on houses.
 const TAGS = [
+  ['Apartment', /\bapartments?\b/i],
   ['Modern', /\bmodern|contemporary/i],
   ['Cottage', /\bcottage|cape cod|\bcabin|farmhouse/i],
   ['Mediterranean', /mediterranean|spanish|stucco|terracotta|desert|adobe/i],

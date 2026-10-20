@@ -314,6 +314,17 @@ test('casting.json: 30 unique slugs, no creator name in a slug, narrators add up
   for (const [k, v] of Object.entries(ctx.voices.voices)) assert.equal(narrators.get(k) || 0, v.narratorFor, `narrator count for ${k}`);
 });
 
+test('every home has a family or is declared without one: the plan\'s homesWithoutFamily is exactly the homes casting.json does not cast', () => {
+  const homes: string[] = J('content', 'houses', 'index.json').houses.map((h: { id: string }) => h.id);
+  const cast = new Set(ctx.casting.families.map((f) => f.house));
+  const without = Object.keys(J('content', 'story', 'cast-plan.json').homesWithoutFamily ?? {}).sort();
+  assert.deepEqual(homes.filter((id) => !cast.has(id)).sort(), without, 'a home with no family is in the plan\'s homesWithoutFamily, and only such a home (story:cast-lint says which)');
+  for (const id of without) assert.ok(homes.includes(id), `${id} is declared without a family but is not a home`);
+  assert.ok(homes.length >= cast.size, 'the story fleet is never larger than the gallery');
+  // casting.json stays the 30 families: the apartments are not in it until a family moves in
+  assert.equal(without.length, homes.length - cast.size);
+});
+
 test('casting.json: signature apps exist in the catalog, are story-safe and were boot-tested', () => {
   for (const f of ctx.casting.families) {
     assert.ok(f.signatureApps.length >= 3, `${f.slug}: at least three signature apps`);

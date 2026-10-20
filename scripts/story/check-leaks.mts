@@ -16,6 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT as REPO, readJson, storyFiles } from './site-lib.mts';
 import type { Story } from '../../assets/story/types.ts';
+import { isOwnAuthor } from '../own-authors.mts';
 
 const escRe = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -26,7 +27,8 @@ export function needles(root = REPO): Needles {
   const homeNames = fs.readFileSync(path.join(root, 'assets', 'home-names.ts'), 'utf8');
   const picked = [...homeNames.matchAll(/^\s*'[a-z0-9-]+':\s*'([^']+)'/gm)].map(m => m[1]);
   const specNames = houses.map(h => h.name).filter(Boolean) as string[];
-  const names = [...new Set([...houses.map(h => h.author).filter(Boolean) as string[], ...houses.map(h => h.source).filter(Boolean) as string[], ...specNames, ...picked])];
+  // (the company's own name is a home's author when Companion Intelligence wrote it itself, scripts/own-authors.mts: a family's text may say it)
+  const names = [...new Set([...houses.map(h => h.author).filter(a => a && !isOwnAuthor(a)) as string[], ...houses.map(h => h.source).filter(Boolean) as string[], ...specNames, ...picked])];
   const ids = houses.map(h => h.id);
   return {
     names, ids,

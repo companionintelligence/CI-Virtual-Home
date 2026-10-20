@@ -73,7 +73,7 @@ import {
 } from './portal-pages.mts';
 import { buildStorySite } from './story/site.mts';
 // ---- front page ----
-import { HERO, readFamilies, frontCards, personaButtons, meetFamily, pickPerson, logoWall, runsBand } from './portal-front.mts';
+import { HERO, readFamilies, frontCards, personaButtons, meetFamily, pickPerson, logoWall, runsBand, homesWithoutFamily } from './portal-front.mts';
 import { MEET_MARKER } from './portal-pages.mts';
 import { displayName } from '../assets/home-names.js';
 
@@ -186,7 +186,7 @@ if (!fs.existsSync(path.join(ROOT, 'portal', 'hero.jpg'))) problems.push('no por
 // 5b. the gallery's static hero figures must be the data's (gallery.js stats(): homes and floor
 // area rounded to 10 m²), or a visitor sees them change as the page hydrates and a crawler keeps the wrong ones; and the
 // hand-written copy's count in words ("Walk into thirty homes", "Thirty homes, each built live …") must be the number of homes
-// (the generated pages take the word from the data, this one is written by hand)
+// (the generated pages take the word from the data; the hand-written one is written by `pnpm run index`, galleryCountCopy in portal-pages.mts, and held to it here)
 const houses: House[] = index.houses || [];
 const COUNT_WORD = numberWord(houses.length);
 {
@@ -198,12 +198,12 @@ const COUNT_WORD = numberWord(houses.length);
   for (const [k, v] of Object.entries(want)) {
     const got = html.match(new RegExp(`data-stat="${k}">([^<]*)<`));
     if (!got) problems.push(`index.html: no data-stat="${k}" figure`);
-    else if (got[1] !== v) problems.push(`index.html: the static ${k} figure is ${got[1]}, index.json says ${v}`);
+    else if (got[1] !== v) problems.push(`index.html: the static ${k} figure is ${got[1]}, index.json says ${v} (pnpm run index writes it)`);
   }
   const h1 = (html.match(/<h1[^>]*>([^<]*)<\/h1>/) || [])[1] || '';
   const description = (html.match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
-  if (!new RegExp(`\\b${COUNT_WORD}\\b`, 'i').test(h1)) problems.push(`index.html: the heading "${h1}" does not say "${COUNT_WORD}", the number of homes in index.json`);
-  if (!description.startsWith(`${capital(COUNT_WORD)} homes`)) problems.push(`index.html: the description does not start "${capital(COUNT_WORD)} homes", the number of homes in index.json`);
+  if (!new RegExp(`\\b${COUNT_WORD}\\b`, 'i').test(h1)) problems.push(`index.html: the heading "${h1}" does not say "${COUNT_WORD}", the number of homes in index.json (pnpm run index writes it)`);
+  if (!description.startsWith(`${capital(COUNT_WORD)} homes`)) problems.push(`index.html: the description does not start "${capital(COUNT_WORD)} homes", the number of homes in index.json (pnpm run index writes it)`);
 }
 
 // 5c. a home's own page: homes/<id>.html, one per home (portal-pages.mts, see the header), and the tag that tells the player they exist
@@ -248,7 +248,17 @@ for (const h of houses) {
   const f = front.find(x => x.house === h.id);
   fs.writeFileSync(file, text.replace(MEET_MARKER, () => (f ? meetFamily(f) : '')));
 }
-console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on the front page, ${houses.filter(h => !front.some(f => f.house === h.id)).length} home${houses.filter(h => !front.some(f => f.house === h.id)).length === 1 ? '' : 's'} with none`);
+{
+  // The homes with no current family keep a plain card (it opens the player) and a page of their own. Some are declared so by the cast plan (the
+  // apartments: no family has moved in); that is the plan's say and never a failure. A home that is neither current nor declared is a family that
+  // went stale (listed under "story:" above) or a home the plan does not know (cast-lint's error); --strict-families makes either an error.
+  const none = houses.filter(h => !front.some(f => f.house === h.id));
+  const declared = homesWithoutFamily(ROOT), planned = none.filter(h => h.id in declared), other = none.filter(h => !(h.id in declared));
+  console.log(`front: ${front.length} famil${front.length === 1 ? 'y' : 'ies'} on the front page, ${none.length} home${none.length === 1 ? '' : 's'} with none`);
+  if (planned.length) console.log(`front: ${planned.length} of them ${planned.length === 1 ? 'has' : 'have'} no family yet by the cast plan (content/story/cast-plan.json homesWithoutFamily), a plain card and a page of ${planned.length === 1 ? 'its' : 'their'} own, no tour: ${planned.map(h => h.id).join(', ')}`);
+  if (other.length) console.log(`front: ${other.length} ${other.length === 1 ? 'has' : 'have'} no current family and ${other.length === 1 ? 'is' : 'are'} not declared without one (a stale family: see story: above; or pnpm run story:cast-lint): ${other.map(h => h.id).join(', ')}`);
+  if (story.strict) for (const h of other) problems.push(`front: ${h.id} has no current family and is not in the cast plan's homesWithoutFamily (--strict-families wants the whole cast there)`);
+}
 // ---- end front page ----
 
 // 5d. link previews for the site's own pages. The gallery's og:image is relative in the source (a checkout has no

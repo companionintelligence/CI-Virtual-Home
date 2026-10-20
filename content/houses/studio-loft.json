@@ -1,0 +1,2158 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "studio-loft",
+  "name": "Warehouse Loft",
+  "author": "Companion Intelligence",
+  "source": "original piece: CI apartments",
+  "style": "A converted brick warehouse on a city street, three storeys of red brick with soldier-course arches over tall steel-framed windows, a deep parapet and a stair core with its own street door; the loft apartment takes the west bay of the first two floors, one tall open room with a steel-railed sleeping platform on a ladder-stair, a kitchen run along the back wall and a workbench by the street door, with its neighbours' bays closed beside it and a steel balcony over the walled back court",
+  "emoji": "🏭",
+  "styleKey": "industrial",
+  "defaults": 2,
+  "lot": {
+    "w": 22,
+    "d": 16,
+    "ground": "urban",
+    "context": "city",
+    "street": "S",
+    "sidewalk": {
+      "material": "brick",
+      "width": 2.2
+    },
+    "streetFurniture": [
+      "bollard",
+      "bike-rack",
+      "bench"
+    ]
+  },
+  "palette": {
+    "wall": "#9a5a46",
+    "trim": "#2a2f33",
+    "roof": "#4b4947",
+    "accent": "#c9772e",
+    "material": "brick",
+    "door": "#2a2f33",
+    "interior": "#e9e3d8",
+    "keep": [
+      "wall",
+      "trim",
+      "accent",
+      "door"
+    ]
+  },
+  "lighting": {
+    "preset": "day",
+    "sunBearing": 200
+  },
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Loft Floor",
+      "sheet": "A-101",
+      "y": 0,
+      "height": 2.9,
+      "floor": "concrete",
+      "interior": "#e9e3d8",
+      "trimColor": "#2a2f33",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -1.5,
+          "w": 6.5,
+          "d": 8,
+          "material": "brick",
+          "color": "#9a5a46"
+        },
+        {
+          "x": -1.5,
+          "z": -1.5,
+          "w": 5,
+          "d": 8,
+          "material": "brick",
+          "color": "#8a4f40"
+        },
+        {
+          "x": 3.5,
+          "z": -1.5,
+          "w": 4.5,
+          "d": 8,
+          "material": "brick",
+          "color": "#a86a52"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -6.2,
+          "type": "door",
+          "w": 1.4,
+          "h": 2.3,
+          "style": "entry",
+          "leaf": "double",
+          "transom": 0.4,
+          "frame": "#2a2f33",
+          "color": "#2a2f33",
+          "id": "front",
+          "surround": {
+            "kind": "brick-soldier",
+            "color": "#6e3b30"
+          }
+        },
+        {
+          "side": "S",
+          "at": -4.2,
+          "type": "window",
+          "w": 2,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "S",
+          "at": -2.4,
+          "type": "window",
+          "w": 1.4,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "S",
+          "at": 0.9,
+          "type": "garage",
+          "w": 2.2,
+          "h": 2.3,
+          "color": "#3b4147"
+        },
+        {
+          "side": "S",
+          "at": 2.8,
+          "type": "window",
+          "w": 1,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 5.5,
+          "type": "door",
+          "w": 1.5,
+          "h": 2.3,
+          "style": "entry",
+          "leaf": "double",
+          "transom": 0.4,
+          "frame": "#2a2f33",
+          "color": "#3f5a52",
+          "surround": {
+            "kind": "brick-soldier",
+            "color": "#6e3b30"
+          }
+        },
+        {
+          "side": "S",
+          "at": 7.2,
+          "type": "window",
+          "w": 0.9,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 5,
+          "type": "window",
+          "w": 2.4,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "W",
+          "at": 0.3,
+          "type": "window",
+          "w": 0.7,
+          "h": 0.6,
+          "sill": 1.6,
+          "frame": "#2a2f33",
+          "grid": "none",
+          "head": "flat"
+        },
+        {
+          "side": "N",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.6,
+          "h": 1.2,
+          "sill": 1,
+          "frame": "#2a2f33",
+          "grid": "none",
+          "head": "segmental"
+        },
+        {
+          "side": "N",
+          "at": -6.8,
+          "type": "window",
+          "w": 0.7,
+          "h": 0.6,
+          "sill": 1.7,
+          "frame": "#2a2f33"
+        },
+        {
+          "side": "N",
+          "at": 0.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 2.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "N",
+          "at": 6.9,
+          "type": "window",
+          "w": 0.8,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "E",
+          "at": 1.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.45,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -1.5,
+            -1.5
+          ],
+          "to": [
+            -1.5,
+            6.5
+          ],
+          "door": null,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            3.5,
+            -1.5
+          ],
+          "to": [
+            3.5,
+            6.5
+          ],
+          "door": null,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            -5.6,
+            -1.5
+          ],
+          "to": [
+            -5.6,
+            1.5
+          ],
+          "door": null,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            -8,
+            1.5
+          ],
+          "to": [
+            -5.6,
+            1.5
+          ],
+          "door": 1.7,
+          "doorW": 0.7,
+          "doorColor": "#3a3f44"
+        }
+      ],
+      "stairs": [
+        {
+          "type": "timber",
+          "at": [
+            -7,
+            3.9
+          ],
+          "rot": 180,
+          "to": "l2",
+          "w": 0.6,
+          "run": 2.2,
+          "riser": "open",
+          "stringer": "#2a2f33",
+          "treadWood": "oak",
+          "autoVoid": true
+        },
+        {
+          "type": "timber",
+          "at": [
+            7,
+            4.8
+          ],
+          "rot": 180,
+          "to": "l2",
+          "w": 1.1,
+          "run": 3.36,
+          "stringer": "#2a2f33",
+          "treadWood": "oak",
+          "autoVoid": true
+        }
+      ],
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Living Loft",
+          "bounds": {
+            "x": -8,
+            "z": 1.5,
+            "w": 4,
+            "d": 5
+          },
+          "program": "living",
+          "style": "industrial",
+          "density": 0.9,
+          "ceiling": {
+            "kind": "double",
+            "rail": false
+          },
+          "floor": {
+            "kind": "concrete",
+            "color": "#8d8a84"
+          },
+          "walls": {
+            "kind": "painted-brick",
+            "color": "#e7e1d6"
+          },
+          "items": [
+            {
+              "type": "mid-century-sofa",
+              "at": [
+                -5.4,
+                2.895
+              ],
+              "w": 1.76,
+              "color": "#605953",
+              "src": "compose@1"
+            },
+            {
+              "type": "ottoman",
+              "at": [
+                -5.4,
+                4.07
+              ],
+              "w": 0.9,
+              "d": 0.6,
+              "color": "#605953",
+              "src": "compose@1"
+            },
+            {
+              "type": "hide-rug",
+              "at": [
+                -5.412,
+                4.514
+              ],
+              "w": 2.36,
+              "d": 3,
+              "color": "#65797e",
+              "src": "compose@1"
+            },
+            {
+              "type": "bookshelf",
+              "at": [
+                -7.73,
+                3.16
+              ],
+              "rot": 90,
+              "src": "compose@1"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                -7.656,
+                1.829
+              ],
+              "color": "#605953",
+              "src": "compose@1"
+            },
+            {
+              "type": "plant-stand",
+              "at": [
+                -4.21,
+                6.198
+              ],
+              "rot": 180,
+              "color": "#65797e",
+              "src": "compose@1"
+            },
+            {
+              "type": "plant-stand",
+              "at": [
+                -7.698,
+                5.98
+              ],
+              "rot": 90,
+              "color": "#65797e",
+              "src": "compose@1"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "02",
+          "name": "Desk & Workshop",
+          "bounds": {
+            "x": -4,
+            "z": 1.5,
+            "w": 2.5,
+            "d": 5
+          },
+          "program": "studio",
+          "style": "industrial",
+          "ceiling": {
+            "kind": "double",
+            "rail": false
+          },
+          "floor": {
+            "kind": "concrete",
+            "color": "#8d8a84"
+          },
+          "walls": {
+            "kind": "painted-brick",
+            "color": "#e7e1d6",
+            "feature": {
+              "side": "E",
+              "kind": "brick",
+              "color": "#8a4f40"
+            }
+          },
+          "items": [
+            {
+              "type": "workbench",
+              "at": [
+                -1.95,
+                2.6
+              ],
+              "rot": 270
+            },
+            {
+              "type": "ladder-shelf",
+              "at": [
+                -3.6,
+                6.157
+              ],
+              "rot": 180,
+              "src": "compose@1"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                -2.551,
+                6.161
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.02:lamp:0"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "03",
+          "name": "Kitchen",
+          "bounds": {
+            "x": -5.6,
+            "z": -1.5,
+            "w": 4.1,
+            "d": 3
+          },
+          "program": "kitchen",
+          "style": "industrial",
+          "kitchen": {
+            "layout": "single",
+            "island": true,
+            "peninsula": false,
+            "sinkWall": "N",
+            "windowOverSink": true,
+            "top": "concrete",
+            "color": "#3b4147"
+          },
+          "floor": {
+            "kind": "concrete",
+            "color": "#8d8a84"
+          },
+          "walls": {
+            "kind": "painted-brick",
+            "color": "#e7e1d6",
+            "feature": {
+              "side": "E",
+              "kind": "brick",
+              "color": "#8a4f40"
+            }
+          },
+          "items": [
+            {
+              "type": "range",
+              "at": [
+                -1.895,
+                -0.96
+              ],
+              "rot": 270,
+              "w": 0.6,
+              "src": "compose@1"
+            },
+            {
+              "type": "sink-run",
+              "at": [
+                -1.895,
+                0.04
+              ],
+              "rot": 270,
+              "w": 0.8,
+              "color": "#3b4147",
+              "top": "concrete",
+              "src": "compose@1"
+            },
+            {
+              "type": "counter-run",
+              "at": [
+                -1.885,
+                0.67
+              ],
+              "rot": 270,
+              "w": 0.46,
+              "color": "#3b4147",
+              "top": "concrete",
+              "src": "compose@1"
+            },
+            {
+              "type": "fridge",
+              "at": [
+                -1.945,
+                1.2
+              ],
+              "rot": 270,
+              "w": 0.6,
+              "src": "compose@1"
+            },
+            {
+              "type": "range-hood",
+              "at": [
+                -1.573,
+                -0.96
+              ],
+              "rot": 270,
+              "w": 0.6,
+              "y": 1.5,
+              "src": "compose@1"
+            },
+            {
+              "type": "upper-cabinets",
+              "at": [
+                -1.573,
+                0.67
+              ],
+              "rot": 270,
+              "w": 0.46,
+              "color": "#3b4147",
+              "y": 1.45,
+              "src": "compose@1"
+            },
+            {
+              "type": "breakfast-bar",
+              "at": [
+                -3.863,
+                0.04
+              ],
+              "rot": 270,
+              "w": 2.12,
+              "d": 0.95,
+              "color": "#3b4147",
+              "top": "concrete",
+              "src": "compose@1"
+            },
+            {
+              "type": "saddle-stool",
+              "at": [
+                -4.447,
+                -0.667
+              ],
+              "rot": 450,
+              "src": "compose@1"
+            },
+            {
+              "type": "saddle-stool",
+              "at": [
+                -4.447,
+                0.04
+              ],
+              "rot": 450,
+              "src": "compose@1"
+            },
+            {
+              "type": "saddle-stool",
+              "at": [
+                -4.447,
+                0.747
+              ],
+              "rot": 450,
+              "src": "compose@1"
+            },
+            {
+              "type": "flower-jug",
+              "at": [
+                -3.752,
+                0.543
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "src": "compose@1"
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                -1.865,
+                -0.949
+              ],
+              "rot": 270,
+              "y": 0.918,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l1.03:hob:0"
+            },
+            {
+              "type": "tripod-table-lamp",
+              "at": [
+                -3.576,
+                0.273
+              ],
+              "rot": 270,
+              "y": 0.9,
+              "src": "dress@1",
+              "dk": "l1.03:lamp:0"
+            },
+            {
+              "type": "cafe-curtain",
+              "at": [
+                -3.6,
+                -1.416
+              ],
+              "w": 1.8,
+              "h": 0.881,
+              "y": 0.545,
+              "color": "#ead8c0",
+              "src": "dress@1",
+              "dk": "l1.03:windows:0"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "04",
+          "name": "Bath",
+          "bounds": {
+            "x": -8,
+            "z": -1.5,
+            "w": 2.4,
+            "d": 3
+          },
+          "program": "bath",
+          "style": "industrial",
+          "bath": {
+            "tub": "none",
+            "shower": true,
+            "vanity": "single"
+          },
+          "floor": {
+            "kind": "tile",
+            "color": "#cfcbc2",
+            "scale": 0.6
+          },
+          "walls": {
+            "kind": "tile",
+            "color": "#dedad1",
+            "h": 2.1
+          },
+          "items": [
+            {
+              "type": "vanity-sink",
+              "at": [
+                -5.935,
+                -0.37
+              ],
+              "rot": 270,
+              "src": "compose@1"
+            },
+            {
+              "type": "toilet",
+              "at": [
+                -7.55,
+                -1.025
+              ],
+              "rot": 90,
+              "src": "compose@1"
+            },
+            {
+              "type": "shower-cubicle",
+              "at": [
+                -7.505,
+                0.78
+              ],
+              "rot": 90,
+              "w": 0.8,
+              "d": 0.8,
+              "src": "compose@1"
+            },
+            {
+              "type": "heated-towel-rail",
+              "at": [
+                -7.47,
+                1.427
+              ],
+              "rot": 180,
+              "y": 0.4,
+              "src": "compose@1"
+            },
+            {
+              "type": "bath-rug",
+              "at": [
+                -6.653,
+                0.78
+              ],
+              "rot": 90,
+              "r": 0.35,
+              "src": "compose@1"
+            },
+            {
+              "type": "snake-plant",
+              "at": [
+                -5.882,
+                -1.221
+              ],
+              "src": "compose@1"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                -7.81,
+                -1.041
+              ],
+              "rot": 90,
+              "y": 0.805,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l1.04:tank:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                -7.917,
+                -0.16
+              ],
+              "rot": 90,
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l1.04:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                -7.879,
+                -0.74
+              ],
+              "rot": 90,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l1.04:roll:0"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "09",
+          "name": "Neighbour Loft",
+          "bounds": {
+            "x": -1.5,
+            "z": -1.5,
+            "w": 5,
+            "d": 8
+          }
+        },
+        {
+          "no": "07",
+          "name": "Stair Hall",
+          "bounds": {
+            "x": 3.5,
+            "z": -1.5,
+            "w": 4.5,
+            "d": 8
+          },
+          "program": "hall",
+          "style": "industrial",
+          "floor": {
+            "kind": "concrete",
+            "color": "#8d8a84"
+          },
+          "items": [
+            {
+              "type": "storage-bench",
+              "at": [
+                4.05,
+                0.3
+              ],
+              "rot": 90
+            },
+            {
+              "type": "rubber-plant",
+              "at": [
+                4.25,
+                -1
+              ]
+            },
+            {
+              "type": "flatweave-rug",
+              "at": [
+                5.75,
+                2.6
+              ],
+              "w": 1,
+              "d": 3,
+              "src": "compose@1"
+            },
+            {
+              "type": "console-table",
+              "at": [
+                3.76,
+                2.98
+              ],
+              "rot": 90,
+              "src": "compose@1"
+            },
+            {
+              "type": "ginger-lamp",
+              "at": [
+                3.76,
+                2.98
+              ],
+              "rot": 90,
+              "y": 0.8,
+              "src": "compose@1"
+            },
+            {
+              "type": "sculpture",
+              "at": [
+                3.76,
+                3.28
+              ],
+              "rot": 90,
+              "y": 0.8,
+              "src": "compose@1"
+            },
+            {
+              "type": "plate-set",
+              "at": [
+                3.573,
+                2.975
+              ],
+              "rot": 90,
+              "w": 0.66,
+              "h": 0.598,
+              "y": 1.45,
+              "src": "compose@1"
+            },
+            {
+              "type": "peace-lily",
+              "at": [
+                7.44,
+                -0.911
+              ],
+              "src": "compose@1"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                3.743,
+                3.96
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l1.07:mirror:0"
+            }
+          ],
+          "lock": true
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "name": "Platform Floor",
+      "sheet": "A-102",
+      "y": 2.9,
+      "height": 2.9,
+      "floor": "oak",
+      "interior": "#e9e3d8",
+      "trimColor": "#2a2f33",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -1.5,
+          "w": 6.5,
+          "d": 8,
+          "material": "brick",
+          "color": "#9a5a46"
+        },
+        {
+          "x": -1.5,
+          "z": -1.5,
+          "w": 5,
+          "d": 8,
+          "material": "brick",
+          "color": "#8a4f40"
+        },
+        {
+          "x": 3.5,
+          "z": -1.5,
+          "w": 4.5,
+          "d": 8,
+          "material": "brick",
+          "color": "#a86a52"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -6.2,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "S",
+          "at": -4.2,
+          "type": "window",
+          "w": 2,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "S",
+          "at": -2.4,
+          "type": "window",
+          "w": 1.4,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "S",
+          "at": 0.4,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 2.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 5.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "S",
+          "at": 7.2,
+          "type": "window",
+          "w": 0.9,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 5,
+          "type": "window",
+          "w": 2.4,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "W",
+          "at": 0.3,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.4,
+          "sill": 0.8,
+          "frame": "#2a2f33",
+          "grid": "none",
+          "head": "flat"
+        },
+        {
+          "side": "N",
+          "at": -4.7,
+          "type": "slider",
+          "w": 1.8,
+          "h": 2.2,
+          "frame": "#2a2f33"
+        },
+        {
+          "side": "N",
+          "at": -7,
+          "type": "window",
+          "w": 1,
+          "h": 1.2,
+          "sill": 0.9,
+          "frame": "#2a2f33",
+          "grid": "none",
+          "head": "flat"
+        },
+        {
+          "side": "N",
+          "at": 0.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 2.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "N",
+          "at": 6.9,
+          "type": "window",
+          "w": 0.8,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "E",
+          "at": 1.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -1.5,
+            -1.5
+          ],
+          "to": [
+            -1.5,
+            6.5
+          ],
+          "door": null,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            3.5,
+            -1.5
+          ],
+          "to": [
+            3.5,
+            6.5
+          ],
+          "door": null,
+          "color": "#e9e3d8"
+        }
+      ],
+      "stairs": {
+        "type": "timber",
+        "at": [
+          7,
+          0
+        ],
+        "rot": 0,
+        "to": "l3",
+        "w": 1.1,
+        "run": 3.36,
+        "stringer": "#2a2f33",
+        "treadWood": "oak",
+        "autoVoid": true
+      },
+      "balustrades": [
+        {
+          "from": [
+            -7.9,
+            1.5
+          ],
+          "to": [
+            -7.4,
+            1.5
+          ],
+          "style": "glass"
+        },
+        {
+          "from": [
+            -6.6,
+            1.5
+          ],
+          "to": [
+            -1.6,
+            1.5
+          ],
+          "style": "glass"
+        }
+      ],
+      "rooms": [
+        {
+          "no": "05",
+          "name": "Sleeping Platform",
+          "bounds": {
+            "x": -8,
+            "z": -1.5,
+            "w": 6.5,
+            "d": 3
+          },
+          "program": "bed-primary",
+          "style": "industrial",
+          "items": [
+            {
+              "type": "tall-cabinet",
+              "at": [
+                -6.05,
+                -1.2
+              ],
+              "rot": 0
+            },
+            {
+              "type": "sleigh-bed",
+              "at": [
+                -2.805,
+                0.16
+              ],
+              "rot": 270,
+              "w": 1.2,
+              "quilt": "check",
+              "color": "#aa7f4e",
+              "src": "compose@1"
+            },
+            {
+              "type": "nightstand",
+              "at": [
+                -1.815,
+                -0.82
+              ],
+              "rot": 270,
+              "src": "compose@1"
+            },
+            {
+              "type": "ginger-lamp",
+              "at": [
+                -1.794,
+                -0.82
+              ],
+              "rot": 270,
+              "color": "#85847f",
+              "y": 0.55,
+              "src": "compose@1"
+            },
+            {
+              "type": "nightstand",
+              "at": [
+                -1.815,
+                1.14
+              ],
+              "rot": 270,
+              "src": "compose@1"
+            },
+            {
+              "type": "ginger-lamp",
+              "at": [
+                -1.794,
+                1.14
+              ],
+              "rot": 270,
+              "color": "#85847f",
+              "y": 0.55,
+              "src": "compose@1"
+            },
+            {
+              "type": "canvas-art",
+              "at": [
+                -1.573,
+                0.16
+              ],
+              "rot": 270,
+              "w": 0.748,
+              "h": 0.621,
+              "motif": "line",
+              "y": 1.561,
+              "src": "compose@1"
+            },
+            {
+              "type": "area-rug",
+              "at": [
+                -3.519,
+                0.16
+              ],
+              "rot": 270,
+              "w": 2.56,
+              "d": 2.013,
+              "color": "#aa7f4e",
+              "src": "compose@1"
+            },
+            {
+              "type": "chest",
+              "at": [
+                -4.315,
+                0.16
+              ],
+              "rot": 270,
+              "w": 1.16,
+              "src": "compose@1"
+            },
+            {
+              "type": "lowboy-dresser",
+              "at": [
+                -7.675,
+                -0.52
+              ],
+              "rot": 90,
+              "src": "compose@1"
+            },
+            {
+              "type": "globe-lamp",
+              "at": [
+                -7.659,
+                -0.52
+              ],
+              "rot": 90,
+              "color": "#85847f",
+              "y": 0.72,
+              "src": "compose@1"
+            },
+            {
+              "type": "record-player",
+              "at": [
+                -7.659,
+                -0.22
+              ],
+              "rot": 90,
+              "y": 0.72,
+              "src": "compose@1"
+            },
+            {
+              "type": "plant-stand",
+              "at": [
+                -7.698,
+                0.99
+              ],
+              "rot": 90,
+              "color": "#aa7f4e",
+              "src": "compose@1"
+            },
+            {
+              "type": "dresser-set",
+              "at": [
+                -7.785,
+                -0.931
+              ],
+              "rot": 90,
+              "y": 0.72,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l2.05:dresser:0"
+            }
+          ],
+          "floor": {
+            "kind": "honey-oak"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#ebe6dc",
+            "feature": {
+              "side": "E",
+              "kind": "brick",
+              "color": "#8a4f40"
+            }
+          },
+          "lock": true
+        },
+        {
+          "no": "06",
+          "name": "Back Balcony",
+          "bounds": {
+            "x": -5.6,
+            "z": -2.7,
+            "w": 1.8,
+            "d": 1.2
+          },
+          "program": "outdoor",
+          "fixtures": {
+            "fan": false,
+            "pendants": 0,
+            "ceiling": "none"
+          },
+          "items": [],
+          "lock": true
+        },
+        {
+          "no": "10",
+          "name": "Neighbour Platform",
+          "bounds": {
+            "x": -1.5,
+            "z": -1.5,
+            "w": 5,
+            "d": 8
+          }
+        },
+        {
+          "no": "08",
+          "name": "Upper Stair Hall",
+          "bounds": {
+            "x": 3.5,
+            "z": -1.5,
+            "w": 4.5,
+            "d": 8
+          },
+          "program": "hall",
+          "style": "industrial",
+          "floor": {
+            "kind": "concrete",
+            "color": "#8d8a84"
+          },
+          "items": [
+            {
+              "type": "flatweave-rug",
+              "at": [
+                5.75,
+                2.6
+              ],
+              "w": 1,
+              "d": 3,
+              "src": "compose@1"
+            },
+            {
+              "type": "console-table",
+              "at": [
+                3.76,
+                1.98
+              ],
+              "rot": 90,
+              "src": "compose@1"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                3.76,
+                1.98
+              ],
+              "rot": 90,
+              "y": 0.8,
+              "src": "compose@1"
+            },
+            {
+              "type": "sculpture",
+              "at": [
+                3.76,
+                2.28
+              ],
+              "rot": 90,
+              "y": 0.8,
+              "src": "compose@1"
+            },
+            {
+              "type": "plate-set",
+              "at": [
+                3.573,
+                1.975
+              ],
+              "rot": 90,
+              "w": 0.66,
+              "h": 0.614,
+              "y": 1.45,
+              "src": "compose@1"
+            },
+            {
+              "type": "peace-lily",
+              "at": [
+                4.05,
+                5.911
+              ],
+              "rot": 180,
+              "src": "compose@1"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                3.743,
+                3.16
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l2.08:mirror:0"
+            }
+          ],
+          "lock": true
+        }
+      ]
+    },
+    {
+      "id": "l3",
+      "name": "Top Floor",
+      "sheet": "A-103",
+      "y": 5.8,
+      "height": 2.9,
+      "floor": "oak",
+      "interior": "#e9e3d8",
+      "trimColor": "#2a2f33",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -1.5,
+          "w": 6.5,
+          "d": 8,
+          "material": "brick",
+          "color": "#9a5a46"
+        },
+        {
+          "x": -1.5,
+          "z": -1.5,
+          "w": 5,
+          "d": 8,
+          "material": "brick",
+          "color": "#8a4f40"
+        },
+        {
+          "x": 3.5,
+          "z": -1.5,
+          "w": 4.5,
+          "d": 8,
+          "material": "brick",
+          "color": "#a86a52"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -6.2,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -4.2,
+          "type": "window",
+          "w": 2,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -2.4,
+          "type": "window",
+          "w": 1.4,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 0.4,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 2.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 5.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "S",
+          "at": 7.2,
+          "type": "window",
+          "w": 0.9,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 5,
+          "type": "window",
+          "w": 2.4,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 0.3,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.4,
+          "sill": 0.8,
+          "frame": "#2a2f33",
+          "grid": "none",
+          "head": "flat",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -4.7,
+          "type": "window",
+          "w": 1.8,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 0.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 2.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "N",
+          "at": 6.9,
+          "type": "window",
+          "w": 0.8,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental"
+        },
+        {
+          "side": "E",
+          "at": 1.5,
+          "type": "window",
+          "w": 1.6,
+          "h": 2.2,
+          "sill": 0.35,
+          "frame": "#2a2f33",
+          "grid": "vertical",
+          "head": "segmental",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            -1.5,
+            -1.5
+          ],
+          "to": [
+            -1.5,
+            6.5
+          ],
+          "door": null,
+          "color": "#e9e3d8"
+        },
+        {
+          "from": [
+            3.5,
+            -1.5
+          ],
+          "to": [
+            3.5,
+            6.5
+          ],
+          "door": null,
+          "color": "#e9e3d8"
+        }
+      ],
+      "rooms": [
+        {
+          "no": "11",
+          "name": "Upper Loft West",
+          "bounds": {
+            "x": -8,
+            "z": -1.5,
+            "w": 6.5,
+            "d": 8
+          }
+        },
+        {
+          "no": "12",
+          "name": "Upper Loft East",
+          "bounds": {
+            "x": -1.5,
+            "z": -1.5,
+            "w": 5,
+            "d": 8
+          }
+        },
+        {
+          "no": "13",
+          "name": "Top Stair Hall",
+          "bounds": {
+            "x": 3.5,
+            "z": -1.5,
+            "w": 4.5,
+            "d": 8
+          },
+          "items": [
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                3.829,
+                3.129
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l3.13:lamp:0"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                3.743,
+                0.96
+              ],
+              "rot": 90,
+              "src": "dress@1",
+              "dk": "l3.13:mirror:0"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -8,
+        "z": -1.5,
+        "w": 16,
+        "d": 8
+      },
+      "y": 8.7,
+      "type": "flat",
+      "parapet": 0.6,
+      "overhang": 0,
+      "color": "#4b4947",
+      "trim": "#8f8a82",
+      "finish": "membrane"
+    }
+  ],
+  "features": [
+    {
+      "type": "balcony",
+      "level": "l2",
+      "side": "N",
+      "from": -5.6,
+      "to": -3.8,
+      "depth": 1.2,
+      "rail": "metal",
+      "railColor": "#2a2f33",
+      "floorColor": "#5b5f63"
+    }
+  ],
+  "facade": {
+    "zones": [],
+    "bands": [
+      {
+        "y": 2.78,
+        "h": 0.24,
+        "material": "concrete",
+        "color": "#b9b4a8",
+        "proud": 0.04,
+        "sides": [
+          "S",
+          "W"
+        ]
+      },
+      {
+        "y": 5.68,
+        "h": 0.24,
+        "material": "concrete",
+        "color": "#b9b4a8",
+        "proud": 0.04,
+        "sides": [
+          "S",
+          "W"
+        ]
+      },
+      {
+        "y": 8.35,
+        "h": 0.3,
+        "material": "concrete",
+        "color": "#b9b4a8",
+        "proud": 0.05
+      }
+    ]
+  },
+  "site": [
+    {
+      "type": "path",
+      "path": [
+        [
+          -6.2,
+          6.6
+        ],
+        [
+          -6.2,
+          8.2
+        ]
+      ],
+      "w": 1.6,
+      "surface": "concrete",
+      "color": "#8f8a7e"
+    },
+    {
+      "type": "path",
+      "path": [
+        [
+          5.5,
+          6.6
+        ],
+        [
+          5.5,
+          8.2
+        ]
+      ],
+      "w": 1.7,
+      "surface": "concrete",
+      "color": "#8f8a7e"
+    },
+    {
+      "type": "planter",
+      "at": [
+        -4.2,
+        7.2
+      ],
+      "w": 1.8,
+      "d": 0.6,
+      "color": "#4b4947"
+    },
+    {
+      "type": "bicycle",
+      "at": [
+        -1.9,
+        7.1
+      ],
+      "rot": 90
+    },
+    {
+      "type": "tree",
+      "at": [
+        10.2,
+        7.7
+      ],
+      "species": "birch",
+      "h": 6
+    },
+    {
+      "type": "wall-low",
+      "path": [
+        [
+          -10.8,
+          -7.8
+        ],
+        [
+          -10.8,
+          6.5
+        ]
+      ],
+      "t": 0.3,
+      "h": 2.4,
+      "surface": "brick",
+      "color": "#8a4f40",
+      "cap": "#b9b4a8"
+    },
+    {
+      "type": "wall-low",
+      "path": [
+        [
+          10.8,
+          -7.8
+        ],
+        [
+          10.8,
+          6.5
+        ]
+      ],
+      "t": 0.3,
+      "h": 2.4,
+      "surface": "brick",
+      "color": "#8a4f40",
+      "cap": "#b9b4a8"
+    },
+    {
+      "type": "wall-low",
+      "path": [
+        [
+          -10.8,
+          -7.8
+        ],
+        [
+          10.8,
+          -7.8
+        ]
+      ],
+      "t": 0.3,
+      "h": 2.4,
+      "surface": "brick",
+      "color": "#8a4f40",
+      "cap": "#b9b4a8"
+    },
+    {
+      "type": "patio",
+      "at": [
+        -3,
+        -4.9
+      ],
+      "w": 10,
+      "d": 4.4,
+      "surface": "brick",
+      "color": "#a39a8c"
+    },
+    {
+      "type": "bed",
+      "at": [
+        5.8,
+        -5
+      ],
+      "w": 5,
+      "d": 3.4,
+      "plants": "mixed",
+      "density": 1
+    },
+    {
+      "type": "tree",
+      "at": [
+        9,
+        -6.6
+      ],
+      "species": "birch",
+      "h": 5
+    },
+    {
+      "type": "bench",
+      "at": [
+        -7.2,
+        -6.7
+      ],
+      "rot": 0
+    },
+    {
+      "type": "planter",
+      "at": [
+        -8.5,
+        -3.6
+      ],
+      "w": 1.2,
+      "d": 0.6,
+      "color": "#4b4947"
+    },
+    {
+      "type": "string-lights",
+      "path": [
+        [
+          -9.5,
+          -7.2
+        ],
+        [
+          -3,
+          -5.9
+        ],
+        [
+          3,
+          -7.2
+        ]
+      ],
+      "h": 3
+    }
+  ],
+  "hero": {
+    "level": "l1",
+    "at": [
+      -1.98,
+      4.7
+    ],
+    "rot": 270,
+    "device": "chalk",
+    "pose": "prone",
+    "surface": "desk",
+    "desk": {
+      "style": "oak",
+      "w": 1.6
+    },
+    "monitor": "flat",
+    "chair": {
+      "kind": "task",
+      "pose": "turned"
+    }
+  },
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": -6.2
+  },
+  "shots": [
+    {
+      "id": "door-to-core",
+      "type": "door-to-core",
+      "planner": "v2",
+      "duration": "auto",
+      "establish": "auto"
+    },
+    {
+      "id": "orbit",
+      "type": "orbit",
+      "duration": 10
+    }
+  ],
+  "areaSqm": 52
+}
