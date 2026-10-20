@@ -81,8 +81,8 @@ heritage, and never tied to the architecture.
 1. **One member, one room, one app.** `beat.member` is the persona; `beat.anchor` is where they are; `beat.app` is the
    one store app that does the thing. Each member has at least three beats, a persona with an archetype at least one in
    its own room.
-2. **Name what it replaces.** The chip row is the app name, then `replaces <X>` where X is one of the app's catalog
-   `replaces` names. That is the uncloud argument in four words; do not add adjectives to it.
+2. **Name what it is an alternative to.** The chip row is the app name, then `alternative to <X>` where X is the service's name in `content/story/services.json`.
+   That is the uncloud argument in a few words; do not add adjectives to it.
 3. **Name the mechanism, calmly.** Say what the cloud service would have held and where it lives now: "Sally's contracts
    sit in Nextcloud on the Core, not in a rented drive." Never "private", "secure" or "safe" on their own.
 4. **Persona activity is told, not faked.** No app screenshots, no UI mockups on any screen in the scene, no invented app

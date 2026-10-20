@@ -502,7 +502,7 @@ needed except for the CAD sheets' PNGs.
 | step | command | what it writes |
 |---|---|---|
 | validate and bake | section 2.9 | the spec, baked (composed, dressed, no final newline) |
-| the index, and the count copy | `pnpm run index` | `content/houses/index.json`, and **`index.html`'s count** (the heading's and the descriptions' "Thirty-six homes", the hero's two figures: `galleryCountCopy`, `scripts/portal-pages.mts`) |
+| the index | `pnpm run index` | `content/houses/index.json` (the front page holds no count: `portal:build` writes its counts as words from the list; a home that is an apartment is named in `content/story/lander.json` `types`) |
 | the plan | `pnpm run plans -- --house <id>` | `content/houses/<id>.plan.json` (a browser; the GPU is not used) |
 | the twins | `pnpm run iso` and `pnpm run floorplans` (`--no-png` without `rsvg-convert`) | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json`, `scenes/floorplans/`; the 30 existing sheets come out byte for byte |
 | the planner's track | `pnpm run shot-planner -- --house <id> --update` | `test/shots/<id>.track.json` (the page and Node bake the same track) |

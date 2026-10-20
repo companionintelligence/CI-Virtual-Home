@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { buildPairIndex } from './story/lib/pairs.mts';
 import type { AppLite, ServiceLite } from './story/lib/pairs.mts';
-import { countLine, familiesWord, featuredOf, gateOf, placeTypes, proofOf, validatePlan, computeLander, readInputs, bansOf } from './story/lib/lander.mts';
+import { countLine, familiesWord, featuredOf, gateOf, placeTypes, proofOf, validatePlan, computeLander, readInputs, bansOf, officeProblem } from './story/lib/lander.mts';
 import type { FamilyLite, LanderPlan, StoryFull } from './story/lib/lander.mts';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -50,6 +50,14 @@ test('kinds of place: the plan names the apartments, a house\'s own type wins, a
   assert.deepEqual(t.counts, { home: 1, apartment: 3 });
   assert.deepEqual(t.present, ['home', 'apartment']);
   assert.deepEqual(placeTypes([{ id: 'h1' }], PLAN).present, ['home'], 'with one type there is nothing to choose between');
+});
+
+test('offices: a home of type office needs the fictional-team disclosure; apartments and homes need nothing', () => {
+  const none = { disclosures: [{ id: 'fictional-family', text: 'x' }] }, has = { disclosures: [{ id: 'fictional-team', text: 'x' }] };
+  const withOffice = placeTypes([{ id: 'h1' }, { id: 'o1', type: 'office' }], PLAN);
+  assert.match(officeProblem(withOffice, none), /no fictional-team disclosure/);
+  assert.equal(officeProblem(withOffice, has), '');
+  assert.equal(officeProblem(placeTypes([{ id: 'h1' }, { id: 'h6' }], PLAN), none), '', 'apartments are homes: no disclosure of their own');
 });
 
 test('the gate: an avoid app, a service a story may not name, a home not lit as day each stop a family; a clean one passes', () => {

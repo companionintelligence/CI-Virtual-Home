@@ -8,20 +8,21 @@ and [reference/HOUSE-SPEC.md](reference/HOUSE-SPEC.md) (the schema).
 
 ## Rules
 
-**Source vs derived.** The sources are `content/families/<slug>.json` (the family stories), `content/story/` (the cast plan, personas, claims, catalog, roles, voices, lexicon, schema; `casting.json` is derived, below), `content/houses/<id>.json`, `assets/**/*.ts`, `room-creator.html`,
+**Source vs derived.** The sources are `content/families/<slug>.json` (the family stories), `content/story/` (the cast plan, personas, claims, catalog, roles, voices, lexicon, the lander plan `lander.json`, schema; `casting.json` is derived, below), `content/houses/<id>.json`, `assets/**/*.ts`, `room-creator.html`,
 `index.html`, `portal/*.css` and `portal/*.js`, `scripts/` and `reference/`. Everything else is generated — never hand-edit it; change the source and re-run:
 
 | Derived file | Regenerate with |
 |---|---|
 | `assets/**/*.js` (gitignored) | `pnpm run build` |
 | `content/houses/<id>.plan.json` | `pnpm run plans` |
-| `content/houses/index.json`, and the count copy in `index.html` (the heading's and the descriptions' "Thirty-six homes", the hero's two figures) | `pnpm run index` (`galleryCountCopy`, `scripts/portal-pages.mts`; `portal:build` fails when `index.html` disagrees) |
+| `content/houses/index.json` | `pnpm run index` (the front page holds no count: `portal:build` writes its counts as words from this list) |
 | `content/house-catalog.json`, `assets/props/measured.ts` | `pnpm run catalog` |
 | `assets/site-species-masks.ts` (what each planting species hides of the mulch, and its triangle cost) | `node --experimental-strip-types scripts/measure-species.mts --write` — after a change to a species' geometry (`assets/site-species.ts`, the flower heads and grass tuft in `assets/site.ts`), then `pnpm run build`; `scripts/test-site-species.mts` fails until it is done |
 | `scenes/svg/`, `scenes/lottie-scenes/`, `scenes/manifest.json` | `pnpm run iso` |
 | `scenes/floorplans/` | `pnpm run floorplans` |
 | `test/goldens/<profile>/` | `pnpm run goldens:update` — only on purpose, see below |
 | `portal/thumbs/<id>.webp`, `portal/hero.webp`, `portal/previews/<id>.jpg`, `portal/hero.jpg` | `pnpm run portal:thumbs [--house <id>]` — after a change to how a house looks |
+| `portal/stage/<house>/core-0-{1200,640}.webp` (the Core's picture in the lander's band) | `pnpm run portal:thumbs -- --stage` — after a change to how the Core or the hero's Library looks |
 | `portal/icons/*` (the favicon, the manifest's PNGs, the apple-touch-icon) | `pnpm run portal:icons` — after a change to `assets/brand/ci-logo-mark.svg` |
 | `content/story/casting.json`, `reference/story/cast.md` | `pnpm run story:cast` (from `content/story/cast-plan.json`, the house files and `roles.json`; after the plan or a house changed; `--check` fails when stale; `story:cast-lint` holds the plan to the fleet rules) |
 | `content/families/<slug>.voice.json`, `content/families/<slug>/audio/*.m4a` | `pnpm run story:voice -- <slug>` (local Kokoro; after the story text changed: `--stale`) |
@@ -49,7 +50,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
 - The Python generators are deterministic too (`random.Random(spec id)`); re-running one on an unchanged tree
   must leave `git status` clean.
 
-**The public site.** The gallery of 36 homes (`index.html`), a home's own page (`homes/<id>`), a fictional family's page
+**The public site.** The lander (`index.html`: the Companion Core's argument, then the families and their homes), a home's own page (`homes/<id>`), a fictional family's page
 (`family/<slug>`, one per current family) and the player (`room-creator.html?mode=view&house=<id>`, `assets/viewer.ts`; with
 `&family=<slug>` it plays that family's narrated tour) are deployed to Cloudflare Pages at <https://homes.ci.computer/>:
 
@@ -105,28 +106,31 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   in `room-creator.html`) and the player's end card and About panel send a visitor to exactly `https://ci.computer`, `https://ci.computer/core` (Buy Companion Core), `https://ci.computer/download`
   (Download Companion) and the docs (`LINKS` in `portal-pages.mts`; `assets/viewer.ts` has the same four); `portal:build` fails without them.
   No prices, specs or availability on these pages: reuse the wording ci.computer and the docs use. Say it once: Buy and Download are offered
-  by the header, the band after the homes and the footer (the gallery's hero only says what a Core is and points at the band), and the
+  by the sticky header, the one Core band and the footer (the hero only says what a Core is and points at the band), and the
   main site is linked from the header and the footer list only. On a phone the player's About panel is More > About (the "?" button
   needs the room a phone's top bar has not), its links are 44 px targets, and it does not list keyboard shortcuts; the end card's two
   links are a row of 32 px (44 px on touch) targets.
 <!-- front page -->
-- **The front page is the story's lander** (`index.html`, `portal/gallery.js`, `scripts/portal-front.mts`; `portal:build` writes the cards at step 5d from the
-  current families, `story.built`). A family's card goes to its page (`family/<slug>`, which goes on to the tour); a home with no current family keeps its
-  plain card, which goes to the player. The family cards are **static HTML in the built `index.html`** (`gallery.js` adopts them and does not draw them
-  again), so a crawler, a visitor without JavaScript and an in-app browser with a slow script see them. The hero says "Fictional family. Real software.",
-  `Take the tour` is its one action (the Brennans' tour, `HERO` in `portal-front.mts`), `See Companion Core` only points at the one Core band, and the
-  band, the header and the footer keep `Buy Companion Core` and `Download Companion`: say it once. No UI mockup, no invented screen (the real, labelled app media of the block below is the only third-party image), no price, daylight
-  only, the beta line with every software claim, and a card's app line is `<app> replaces <service>` from the story, never a line `claims.json` stops.
-  A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). The hero's count in words ("Thirty-six homes.") and the description's are
-  checked against the number of homes (step 5b) and written by `pnpm run index`, never by hand. A home with no current family keeps its plain card and its page:
-  the six apartments are declared so in `content/story/cast-plan.json` (`homesWithoutFamily`; `portal:build` names them, `story:cast-lint` holds the list to the homes,
-  `--strict-families` errors on a home that is neither current nor declared), so the copy never says every home has a family.
+- **The front page is the story's lander** (`index.html`, `portal/gallery.js`, `scripts/portal-front.mts`, `scripts/story/lib/lander.mts` and `pairs.mts`, the plan `content/story/lander.json`; the contract and the checks are
+  `reference/story/lander.md`; `portal:build` writes it at step 5d from the current families, `story.built`). Six blocks and a sticky header, in this order: the hero ("Stop renting your intelligence.", the claim `rent-line` of
+  `claims.json`; what a Core is in one sentence; "Fictional family. Real software." and the full beta line; `Take the tour` is its one action, the Brennans' tour, `hero` in the plan; `See Companion Core` only points at the band),
+  "From rented to kept" (claims.json's words), "One pair, in full" (a beat of a family file, with `Watch this moment` into the tour), the one Core band (`#core`: the claims, the engine's stylised Core, Buy, Download, the docs, what a Core
+  is not), the chooser "What do you rent today?" and the families (six featured cards, then every other family and home in a native `<details>`). Say it once: the header, the band and the footer keep `Buy Companion Core` and
+  `Download Companion`. A family's card goes to its page (`family/<slug>`, which goes on to the tour); a home with no current family keeps its plain card, which goes to the player. The cards are **static HTML in the built
+  `index.html`** (`gallery.js` adopts them and draws a card only for a home with none), so a crawler, a visitor without JavaScript and an in-app browser with a slow script see them, and the chooser's controls are `disabled` until the
+  script runs. No UI mockup, no invented screen, no logo or screenshot on this page (the family pages keep their labelled real media), no price, daylight only. A pair is written `<app>, alternative to <service>`, never "replaces", and
+  never one `claims.json` stops or the plan holds (`hold`: pairs counsel has not cleared; releasing one is deleting its entry). A card names a family by the place of its address ("The Brennan family of Wrenfield"). The featured
+  families must pass the ad-ready gate (no `avoid` app, no service a story may not name, a home lit as day): the page is the destination of paid traffic, so a family that fails is never put in a slot. Counts are words, always
+  beside "fictional" and never a digit ("Thirty fictional families in thirty-six homes."), written by the build from the data; `portal:build` fails on a count typed in `index.html` (step 5b) and runs
+  `scripts/story/lib/lander-check.mts` on the built page (step 7). A phone's hero picture is the 640 px thumbnail, never a 1600 px image (it drove the LCP to 3.5 s). The six apartments are declared without a family in
+  `content/story/cast-plan.json` (`homesWithoutFamily`; `portal:build` names them, `story:cast-lint` holds the list to the homes, `--strict-families` errors on a home that is neither current nor declared), so the copy never says
+  every home has a family. The H1's claim `rent-line` is on hold in `claims.json` until the owner signs it off: the page builds with a warning, and a strict build (a push to main) fails.
 - The homes' own pages are linked by the footer's "Every home, on its own page" list, which `portal:build` writes at the `<!-- foot-homes: -->` marker in
   `index.html` and `gallery.js` leaves alone, so the rendered DOM links them and not only the sitemap does. A home's page carries "Meet the family" when a
   current family lives there (`<!-- meet-family: -->`, written by the same step).
-- The lander's Core sentence and fine print are `claims.json`'s words, never retyped in `index.html`: `portal:build` writes them at the `<!-- fine-hero: -->`,
-  `<!-- core-line: -->`, `<!-- fine-core: -->` and `<!-- fine-foot: -->` markers from `scripts/story/lib/fine-print.mts` (surfaces `lander-hero`, `lander-core`,
-  `lander-footer`; `reference/story/fine-print.md`). Every row of `DISCLOSURES` in `scripts/story/lib/site-copy.mts` is enforced, so `story:copy` fails a page that drops one.
+- The lander's claims and fine print are `claims.json`'s words, never retyped in `index.html`: `portal:build` writes a claim at its `<!-- claim:<id> -->` marker (the page marks it `data-claim`, and the build checks it word for word)
+  and the fine print at `<!-- fine-hero: -->`, `<!-- fine-core: -->` and `<!-- fine-foot: -->` from `scripts/story/lib/fine-print.mts` (surfaces `lander-hero`, `lander-core`, `lander-footer`; `reference/story/fine-print.md`). Every
+  row of `DISCLOSURES` in `scripts/story/lib/site-copy.mts` is enforced, so `story:copy` fails a page that drops one.
 - **Campaign passthrough** (`portal/campaign.js`, plain script, no imports): the ad's tags (`utm_source`, `utm_medium`, `utm_campaign`, `utm_content`,
   `utm_term`, `fbclid`, `ttclid`, `gclid`, `msclkid`) are kept in `sessionStorage` (`ci-campaign`) and added, **at run time only**, to every link to
   `https://ci.computer`, `/core` and `/download` and to every relative link marked `data-campaign`. The built hrefs never carry a query (step 7 fails on
@@ -231,7 +235,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   blob id is in `VETTED` (a changed source stops the build until someone looks again), and every candidate left out is in `rejected` with its reason (a person's name, an email, a login
   secret, a token, an internal host or address, a payment detail, an error page, a blank page, a different product, a claim the site does not make). Only ffmpeg with libwebp makes the
   files (no image library, none may be added); a rerun on the same ffmpeg gives the same bytes. Page generators read the manifest through `scripts/story/lib/media.mts` (`logoImg`,
-  `shotFigure`: lazy, width and height set, alt text, the caption; the front page loads none above the fold). `portal:build` (the `app media` blocks of `scripts/build-portal.mts`)
+  `shotFigure`: lazy, width and height set, alt text, the caption; the front page shows none). `portal:build` (the `app media` blocks of `scripts/build-portal.mts`)
   ships only the files the manifest names, fails on a manifest or page that names a missing file, an image without alt text, size or loading, or a screenshot without its caption,
   warns with the list of apps a family uses that have no entry, and scans the manifest's words with the credit guard; `portal/_headers` keeps `/portal/apps/*` and `/portal/ci/*`
   for a year. `pnpm run story:media:test` (quick, in `test:node`) holds all of it. Each source is a THIRD_PARTY.md row. A new app a family uses: `story:media`; a screenshot that
@@ -245,9 +249,7 @@ one existing patch is documented in THIRD_PARTY.md) and do not run the build ove
   `data-shot`, with the manifest's exact caption; `portal/shots.js` opens it in the page's one `<dialog>`). After the people: "A day in the house" (`family.day`), "The home" (`family.home`, and from the spec: storeys, floor
   area, rooms and the floor plan, one SVG for each storey in one shared view box with a 44 px pin for each person as an HTML link laid over it by percentage; a room's name is the spec's in sentence case, "Master" is "Primary",
   "Portal" is "Archway", and a name that does not fit its room at 7 units is a tooltip only), the apps with their logos, "How it runs" and how the Core starts. The **plan is a diagram** (it says so): never a plan of walls, doors or
-  stairs, and the pin is where the casting puts the person. The front page's "Pick a person", logo wall and "How it runs" band are written at three markers in `index.html` by the `story v2` block of `scripts/build-portal.mts`
-  (a card's button is the persona filter; the lists, the dimming and the cards are CSS and `aria-pressed`; with no script the cards and the lists read). Real media is lazy and sized (`checkPageImages` in the build); the
-  front page requests no media image in its first screen. In the tour the card's "More" button takes no height (negative margins on a 44 px box), pauses the tour when it opens, and on a phone a sheet (up to 55 % of the height) never grows into the
+  stairs, and the pin is where the casting puts the person. Real media is lazy and sized (`checkPageImages` in the build); the front page carries none. In the tour the card's "More" button takes no height (negative margins on a 44 px box), pauses the tour when it opens, and on a phone a sheet (up to 55 % of the height) never grows into the
   subject. Never put a screenshot in the tour, a scene or an ad cut; never an app's logo without its name beside it. Tests: `pnpm run test:node` (`test-story-pages.mts`) and `portal:test -- --only hooks`.
 <!-- ---- end layout (story v2) ---- -->
 <!-- ---- type scale (live pass 3) ---- -->

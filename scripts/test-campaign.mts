@@ -313,7 +313,7 @@ console.log('pages');
   const index = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   const cam = index.indexOf('<script src="./portal/campaign.js" defer data-cfasync="false"></script>'), gal = index.indexOf('<script type="module" src="./portal/gallery.js"');
   ok(cam > 0 && gal > cam, 'index.html loads campaign.js with defer and data-cfasync="false", before gallery.js');
-  ok(/id="hero-play" data-campaign href="\.\/room-creator/.test(index) && /id="hero-media" data-campaign href="\.\/room-creator/.test(index), 'its hero links into the tour are marked data-campaign');
+  ok(/<a\b(?=[^>]*\bid="hero-play")(?=[^>]*\bdata-campaign\b)[^>]*\bhref="\.\/room-creator/.test(index) && /<a\b(?=[^>]*\bid="hero-media")(?=[^>]*\bdata-campaign\b)[^>]*\bhref="\.\/room-creator/.test(index), 'its hero links into the tour are marked data-campaign');
   const h = { id: 'aurora', name: 'Aurora', storeys: 3, areaSqm: 336, style: 'A modern villa' };
   const home = homePage(h, 'https://homes.ci.computer/');
   ok(home.includes('<script src="../portal/campaign.js" defer data-cfasync="false"></script>') && /<a class="btn btn-primary" href="\.\.\/room-creator\?mode=view&amp;house=aurora" data-campaign>/.test(home), 'a home\'s page loads it one level down and marks its way into the player');

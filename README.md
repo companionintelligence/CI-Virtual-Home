@@ -336,8 +336,8 @@ in a script, a stylesheet, a spec or a data file. The pieces are our own, so the
 Every URL in the site is relative, so the same tree works at the root of any host (the live site, a preview's
 `pages.dev` address) and under a sub-path; `portal:preview` and `portal:test` serve it at `/ci-virtual-home/` to
 prove it. `portal:build` copies only what the site loads into `dist/` (and refuses stale compiled assets, a missing
-spec or thumbnail, a link to a file it does not ship, a root-relative URL, hero figures in `index.html` that
-disagree with `index.json`, a written-out count ("thirty-six") that is not the number of homes (`pnpm run index` writes it into `index.html`), and a built page without the four
+spec or thumbnail, a link to a file it does not ship, a root-relative URL, a count typed in
+`index.html` (the lander writes its counts as words from the data), a lander that breaks its own checks (`scripts/story/lib/lander-check.mts`), and a built page without the four
 links above, a `<script>` without `data-cfasync="false"`, a second `<h1>` or invalid JSON-LD); CI runs it on every PR. Nothing renders in CI: when a house's look changes, re-run
 `pnpm run portal:thumbs --house <id>` on a GPU and commit the new thumbnail and preview with the change.
 `portal:test` is the check to run before pushing portal work.
@@ -408,10 +408,9 @@ on your own hardware. The contract for the writers, the validator and the film i
   their moments replace against the apps that do the job, with the apps' real logos), their moments with "More about this moment" (a native `<details>`: before, now, the steps, one fact about the app),
   a strip of up to three real screenshots of their apps (each opens larger in a native `<dialog>`: `portal/shots.js`), then "A day in the house" (`family.day` as a timeline), "The home" (the lede, the spots,
   the storeys, the floor area and the rooms from the spec, and a schematic floor plan with a pin for each person: `scripts/story/lib/plan-map.mts`) and "How it runs" (real Companion Hub and Companion
-  account screenshots). The **front page** adds "Pick a person" (a card for the organiser, builder, gamer and learner: the persona filter), the list "Rented before, on the Core now" for the one chosen, a
-  logo wall of the apps the families run (dimmed to the one chosen), the families' cards with their logos, and the "How it runs" band. The **tour's card** wears the app's logo on its chip and has a "More"
+  account screenshots). The **front page** shows none of this media (it names apps in text; see the front page bullet below). The **tour's card** wears the app's logo on its chip and has a "More"
   toggle that opens the beat's before and after (`reference/story/player.md`). The Brennan family (`content/families/brennan.json`) is the showcase and the model for the other families' details, home, day and bios.
-  Node tests: `scripts/test-story-pages.mts` (the page writer and the plan); browser tests: `family-v2.mts`, `front-v2.mts` and `player-more.mts` in `scripts/story/portal-tests/` (`pnpm run portal:test -- --only hooks`).
+  Node tests: `scripts/test-story-pages.mts` (the page writer and the plan); browser tests: `family-v2.mts`, `lander.mts` and `player-more.mts` in `scripts/story/portal-tests/` (`pnpm run portal:test -- --only hooks`).
 <!-- ---- end layout (story v2) ---- -->
 <!-- ---- type scale (live pass 3) ---- -->
 - **The tour's cards and dialogs are set in the CI canon's type scale** (the owner asked for a 36 px minimum and, seeing it, for 30 percent less, "reference the website"): rem of the canon's 17 px root, reading text in a
@@ -435,22 +434,18 @@ on your own hardware. The contract for the writers, the validator and the film i
 - **The order after an edit:** `pnpm run story:validate -- <slug>`, `story:voice -- <slug> --stale`, `story:bake -- <slug>`, `portal:og`, then `portal:build` and `portal:test`.
   The `.voice.json`, `.bake.json`, audio and link-preview images are generated and committed; never hand-edit them.
 <!-- front page -->
-- **The front page** (`index.html`, `portal/gallery.js`, `portal/gallery.css`, `scripts/portal-front.mts`, the `front page` blocks of `scripts/build-portal.mts`)
-  is the story's lander. The hero says "Thirty-six homes. Each family's life, on one Companion Core." (the count in words is written by `pnpm run index`, which also keeps the descriptions' and the two hero figures to the list), the label "Fictional family. Real software.", who
-  lives there in a line (Sally's planner, John's code, Steve's games, Jean's homework), one action (`Take the tour`: the Brennan family's tour in the
-  player) and a pointer to the one Core band (`See Companion Core`); the band, the header and the footer keep `Buy Companion Core` and `Download
-  Companion`, and the beta line sits with every software claim. Under it, one card for each current family (`story.built`, flagship first): the home's picture,
-  "The Brennan family", the home's display name, who lives there as monogram discs with the job each does (organiser, builder, gamer, learner, maker,
-  host), the two or three apps that tell the story (one per person, `<app> replaces <service>`, from `content/story/personas.json`'s pools; a line
-  that `claims.json` would stop is left off) and `Take the tour`, which goes to the family's page (`family/<slug>`, where `Open in 3D` goes on to
-  the player). A home with no current family keeps its plain card (the player). **The cards are written into `index.html` as static HTML at build
-  time** (`scripts/portal-front.mts`, step 5d), so a crawler, a visitor without JavaScript and an in-app browser with a slow script see them;
-  `gallery.js` adopts them and draws a card only for a home with no family. Filters: what they do (`?persona=organiser|builder|gamer|learner|maker|host`,
-  worded Work from home, Code, Play, Study, Make, Host; a button only for a job some current family does), the search (a family, a person, a job, an app
-  or what it replaces, a home), and, in a `<details>` that is open on a wide screen, storeys and home style; the address carries them and keeps every
-  parameter that is not theirs. A phone's hero picture is the 640 px thumbnail of the family's home (about 50 KB), a wide screen's the 1200 px preview.
-  A home's page (`homes/<id>`) has "Meet the family" when a current family lives there. The hero tours `HERO` (`scripts/portal-front.mts`: the
-  Brennans at Seraphine); when that family is not current the hero plays the home.
+- **The front page** (`index.html`, `portal/gallery.js`, `portal/gallery.css`, `scripts/portal-front.mts`, `scripts/story/lib/lander.mts`, `pairs.mts` and `lander-check.mts`, the plan `content/story/lander.json`, the `lander` blocks of
+  `scripts/build-portal.mts`; the contract is [`reference/story/lander.md`](reference/story/lander.md)) is the Companion Core's lander. It says what a Core is in the hero ("Stop renting your intelligence."; a small personal server
+  that runs the household's apps and local AI at home; "Fictional family. Real software." and the full beta line; one action, `Take the tour`, the Brennan family's tour in the player), argues in three steps ("From rented to kept",
+  `claims.json`'s own words), shows one pair in full (a beat of the Brennan file, with `Watch this moment` into the tour), offers the Core in one band (the claims, the engine's stylised Core, `Buy Companion Core`, `Download Companion`,
+  the docs, what a Core is not), and then lets a visitor choose by the service they rent ("What do you rent today?": a chip for each service with the app that is an alternative to it, a chip for each job, a search, and the kind of
+  place when there is more than one), under six featured families and, in a native `<details>`, every other family and home. The Core's offer is about 1.5 screens down on a desktop and 2.4 on a phone (the page it replaced:
+  9.6 and 23.5). Every claim and line of fine print is `claims.json`'s, written at a marker; the cards, the proof and the chips are written into `index.html` as static HTML at build time (a crawler, a visitor without JavaScript and an
+  in-app browser with a slow script read them; the chooser's controls are `disabled` until `gallery.js` runs). A pair reads "<app>, alternative to <service>"; the six counsel has not cleared are on the plan's `hold` list and
+  appear nowhere on the page. Featured families pass the ad-ready gate (no `avoid` app, no service a story may not name, a home lit as day), so only a few of the thirty can be featured today. Counts are words ("Thirty fictional
+  families in thirty-six homes."), written from the data. The filters live in the address (`?service=<id>&persona=<category>&type=<kind>&q=`), keep every parameter that is not theirs, and let an ad link to the exact pair
+  (`/?service=google-photos`). The Core's picture is `pnpm run portal:thumbs -- --stage`. A home's page (`homes/<id>`) has "Meet the family" when a current family lives there. The hero tours the plan's `hero` (the Brennans at
+  Seraphine); when that family is not current the hero plays the home. The headline's claim, `rent-line`, is on hold in `claims.json` until the owner signs it off, so a push to main fails until then.
 - **Campaign passthrough** (`portal/campaign.js`, `scripts/test-campaign.mts`, `pnpm run test:campaign`; the `campaign` leg of `portal:test`). An ad's
   `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `fbclid`, `ttclid`, `gclid` and `msclkid` are read from the address, kept in
   `sessionStorage` under `ci-campaign` and put, **in the browser only** (the built hrefs stay exactly `https://ci.computer`, `/core` and `/download`: step 7

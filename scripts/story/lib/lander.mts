@@ -86,6 +86,12 @@ export function placeTypes(houses: readonly { id: string; type?: string }[], pla
   return { of, counts, present: PLACE_TYPES.filter((t) => (counts[t] ?? 0) > 0) };
 }
 
+/** A home of type office is a team, not a family: the page may not draw one until claims.json has the disclosure that says the team is fictional too. Empty when there is nothing to say. */
+export function officeProblem(types: ReturnType<typeof placeTypes>, claims: Pick<ClaimsLite, 'disclosures'>): string {
+  return (types.counts.office ?? 0) > 0 && !claims.disclosures.some((d) => d.id === 'fictional-team')
+    ? 'a home of type office, but claims.json has no fictional-team disclosure (a team is fictional too, and the page may not call it a family)' : '';
+}
+
 // ---------------------------------------------------------------------------------------------------------------- the ad-ready gate and the featured families
 
 export interface Gate { ok: boolean; reasons: string[] }
@@ -281,6 +287,8 @@ export function computeLander(inp: { root?: string; stories: readonly StoryFull[
   const { proof, skipped } = proofOf(plan, inp.stories, index);
   const types = placeTypes(inp.houses, plan);
   const check = validatePlan(plan, { schema: f.schema, stories: inp.stories, services: f.services, apps: f.apps, claims: f.claims, houses: inp.houses });
+  const office = officeProblem(types, f.claims);
+  if (office) check.errors.push(`lander.json types: ${office}`);
   const messages: LanderData['messages'] = {};
   for (const m of plan.messages) {
     const c = f.claims.allowedClaims.find((x) => x.id === m.claim);
