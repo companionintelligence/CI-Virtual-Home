@@ -189,9 +189,11 @@ test('the footer says nothing about analytics (the deployed site has some), and 
 });
 
 // The flagship family, when it is in the tree (the three Brennan homes are the contract's own; nothing else is relied on)
-const BRENNAN = path.join(ROOT, 'content', 'families', 'brennan.json');
+// (pinned to a frozen copy of the Brennan story and its casting entry, test/fixtures/site/frozen/: these tests hold the page's structure, and a rewrite of the live family file must not fail them)
+const BRENNAN = path.join(ROOT, 'test', 'fixtures', 'site', 'frozen', 'brennan.json');
+const BRENNAN_CASTING = path.join(ROOT, 'test', 'fixtures', 'site', 'frozen', 'brennan.casting.json');
 test('the Brennan page: four people, each in their own room, and John opens in his', { skip: !fs.existsSync(BRENNAN) }, () => {
-  const s: Story = readJson(BRENNAN), casting = readJson(path.join(ROOT, 'content', 'story', 'casting.json')).families.find((f: any) => f.slug === 'brennan');
+  const s: Story = readJson(BRENNAN), casting = readJson(BRENNAN_CASTING);
   const t = pageOf(s, {}, { casting });
   const secs = sections(t);
   assert.deepEqual([...secs.keys()], ['sally', 'john', 'steve', 'jean']);
@@ -283,7 +285,7 @@ test('the floor plan: every home of the fleet draws, every label fits its room, 
 });
 
 const media: MediaManifest | null = readMedia(ROOT);
-const CASTING = fs.existsSync(path.join(ROOT, 'content', 'story', 'casting.json')) ? readJson(path.join(ROOT, 'content', 'story', 'casting.json')).families.find((f: any) => f.slug === 'brennan') : null;
+const CASTING = fs.existsSync(BRENNAN_CASTING) ? readJson(BRENNAN_CASTING) : null;
 const V2 = fs.existsSync(BRENNAN) && !!media;
 /** one moment's block out of a person's section: from its <li> to the next moment, the screenshot strip or the section's end */
 const block = (sec: string, id: string): string => {

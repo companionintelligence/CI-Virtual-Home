@@ -1,0 +1,333 @@
+{
+  "slug": "brennan",
+  "house": "seraphine",
+  "flagship": true,
+  "surname": "Brennan",
+  "place": "Wrenfield",
+  "household": "older-kids",
+  "business": true,
+  "businessText": "Sally's small consultancy",
+  "narrator": "v-clear-f",
+  "tenure": "owner",
+  "storeys": 2,
+  "areaSqm": 331,
+  "homeStyle": "Queen Anne brick farmhouse: a cascade of front gables over a dark shingle roof with twin chimneys and dormers, white-columned front porch, book-lined open ground floor, lakeside pool garden",
+  "lotGround": "waterfront",
+  "household_text": "Two parents and two teens: the flagship family in the house that suits them best.",
+  "care": "Jean's schoolwork and reading stay on the Core, in tools that each do one job, told without fear.",
+  "ftueExtra": "The front door is above ground, up some steps. The Core is on a writing-desk in the Library.",
+  "reason": "Native fit for all four: two kids' rooms with a desk each, a Library for the Core, a Master Suite with a laptop desk; the Nursery is a spare room and is never a stage.",
+  "members": [
+    {
+      "id": "sally",
+      "name": "Sally",
+      "age": 43,
+      "role": "parent",
+      "archetype": "organiser",
+      "work": "consultant, runs her own small practice",
+      "room": "Library",
+      "level": "l1",
+      "roomRoles": [
+        "living",
+        "office"
+      ],
+      "anchors": [
+        "desk",
+        "room:office"
+      ],
+      "sleepsIn": "Master Suite",
+      "companion": "Juniper"
+    },
+    {
+      "id": "john",
+      "name": "John",
+      "age": 45,
+      "role": "parent",
+      "archetype": "builder",
+      "work": "software engineer",
+      "room": "Master Suite",
+      "level": "l1",
+      "roomLabel": "Primary suite",
+      "roomRoles": [
+        "bedroom"
+      ],
+      "anchors": [
+        "desk",
+        "room:bedroom"
+      ],
+      "sleepsIn": "Master Suite",
+      "companion": "Quill"
+    },
+    {
+      "id": "steve",
+      "name": "Steve",
+      "age": 16,
+      "role": "teen",
+      "archetype": "gamer",
+      "work": "secondary school",
+      "room": "Boy's Room",
+      "level": "l2",
+      "roomLabel": "Steve's room",
+      "roomRoles": [
+        "bedroom",
+        "kids"
+      ],
+      "anchors": [
+        "bed",
+        "desk",
+        "room:kids"
+      ],
+      "sleepsIn": "Boy's Room"
+    },
+    {
+      "id": "jean",
+      "name": "Jean",
+      "age": 14,
+      "role": "teen",
+      "archetype": "learner",
+      "work": "secondary school",
+      "room": "Girl's Room",
+      "level": "l2",
+      "roomLabel": "Jean's room",
+      "roomRoles": [
+        "bedroom",
+        "kids"
+      ],
+      "anchors": [
+        "desk",
+        "room:kids"
+      ],
+      "sleepsIn": "Girl's Room"
+    }
+  ],
+  "signatureApps": [
+    "ci-hermes",
+    "ci-planning",
+    "nextcloud",
+    "code-server",
+    "open-webui",
+    "steam-headless",
+    "libretranslate"
+  ],
+  "beatApps": {
+    "iot": "home-assistant",
+    "food": "yuvomi"
+  },
+  "reviewNeeded": [
+    "code-server"
+  ],
+  "coreRoom": "Library",
+  "coreSpot": {
+    "room": "Library",
+    "level": "l1",
+    "surface": "desk",
+    "furniture": "writing-desk",
+    "pose": "prone"
+  },
+  "frontDoor": {
+    "side": "S",
+    "aboveGround": true
+  },
+  "coreWalk": {
+    "metres": 15.5,
+    "roomsPassed": [
+      "Chess Hall",
+      "Living Room",
+      "Library"
+    ],
+    "seenFromDoor": false,
+    "awkwardScore": 0,
+    "approx": true
+  },
+  "rooms": [
+    {
+      "name": "Entry Hall",
+      "level": "l1",
+      "kinds": [
+        "circulation"
+      ],
+      "areaSqm": 17.2
+    },
+    {
+      "name": "Master Suite",
+      "level": "l1",
+      "kinds": [
+        "bedroom"
+      ],
+      "areaSqm": 37.5
+    },
+    {
+      "name": "Kitchen",
+      "level": "l1",
+      "kinds": [
+        "kitchen"
+      ],
+      "areaSqm": 25.6
+    },
+    {
+      "name": "Dining",
+      "level": "l1",
+      "kinds": [
+        "dining"
+      ],
+      "areaSqm": 15.1
+    },
+    {
+      "name": "Chess Hall",
+      "level": "l1",
+      "kinds": [
+        "circulation",
+        "lounge"
+      ],
+      "areaSqm": 30.9
+    },
+    {
+      "name": "Window Bay",
+      "level": "l1",
+      "kinds": [
+        "living"
+      ],
+      "areaSqm": 9.6
+    },
+    {
+      "name": "Living Room",
+      "level": "l1",
+      "kinds": [
+        "living"
+      ],
+      "areaSqm": 23.5
+    },
+    {
+      "name": "Library",
+      "level": "l1",
+      "kinds": [
+        "living",
+        "office"
+      ],
+      "areaSqm": 17.6
+    },
+    {
+      "name": "Dark Bedroom",
+      "level": "l2",
+      "kinds": [
+        "bedroom"
+      ],
+      "areaSqm": 17.2
+    },
+    {
+      "name": "Dark Bath",
+      "level": "l2",
+      "kinds": [
+        "bath"
+      ],
+      "areaSqm": 4.2
+    },
+    {
+      "name": "Guest Room",
+      "level": "l2",
+      "kinds": [
+        "bedroom"
+      ],
+      "areaSqm": 16.7
+    },
+    {
+      "name": "Family Bath",
+      "level": "l2",
+      "kinds": [
+        "bath"
+      ],
+      "areaSqm": 8.5
+    },
+    {
+      "name": "Girl's Room",
+      "level": "l2",
+      "kinds": [
+        "bedroom"
+      ],
+      "areaSqm": 14.8
+    },
+    {
+      "name": "Boy's Room",
+      "level": "l2",
+      "kinds": [
+        "bedroom"
+      ],
+      "areaSqm": 12.7
+    },
+    {
+      "name": "Nursery",
+      "level": "l2",
+      "kinds": [
+        "bedroom"
+      ],
+      "areaSqm": 13.8
+    },
+    {
+      "name": "Landing Lounge",
+      "level": "l2",
+      "kinds": [
+        "circulation",
+        "living",
+        "lounge"
+      ],
+      "areaSqm": 19.9
+    },
+    {
+      "name": "Gable Nook",
+      "level": "l2",
+      "kinds": [],
+      "areaSqm": 7.4
+    },
+    {
+      "name": "Stair Landing",
+      "level": "l2",
+      "kinds": [
+        "circulation"
+      ],
+      "areaSqm": 31.5
+    }
+  ],
+  "roles": {
+    "couch": 5,
+    "tv": 1,
+    "fireplace": 2,
+    "bookshelf": 3,
+    "fridge": 1,
+    "range": 2,
+    "kitchen-island": 1,
+    "counter": 3,
+    "dining-table": 2,
+    "desk": 5,
+    "bed": 5,
+    "crib": 1,
+    "toys": 3,
+    "music": 1,
+    "laundry": 0,
+    "bicycle": 0,
+    "easel": 0,
+    "telescope": 1,
+    "patio-seat": 3,
+    "garden": 3,
+    "driveway": 1,
+    "pool": 1,
+    "deck": 2
+  },
+  "homeFlags": [],
+  "categoryHints": [
+    "home",
+    "food",
+    "iot",
+    "productivity",
+    "privacy",
+    "kids",
+    "media",
+    "small-business"
+  ],
+  "anchorsToUse": [
+    "writing-desk/master-suite/1",
+    "single-bed/boy-s-room/1",
+    "kids-desk/boy-s-room/1",
+    "kids-desk/girl-s-room/1"
+  ],
+  "eyelessAnchors": []
+}

@@ -11,7 +11,8 @@
 //   * the canvas type floor (live pass 3): nothing a cut prints to be read is under 36 design px at the 1080 px short edge (the live modals took the canon's 25.5 px, a cut is shown scaled
 //     down so it keeps 36), the name is a kicker by drawing only, a card is offered as variants and never in smaller type, the solver refuses a variant under the floor; the browser half
 //     of it (what was really painted, in every cut of every family) is scripts/film/canvas-fit.mts
-// Needs `pnpm run build` (the assets compile to .js), content/families/brennan.json and its bake lock, and content/story/claims.json.
+// Needs `pnpm run build` (the assets compile to .js), the frozen Brennan story and bake lock in test/fixtures/site/frozen/ (these tests are pinned to them, so a rewrite of the live
+// content/families/brennan.json cannot fail them; the live plan is held by `pnpm run story:ads -- --check`), and content/story/claims.json.
 // @check-house node-test
 // @check-house quick
 import { test } from 'node:test';
@@ -38,7 +39,8 @@ import { LAUNCH_ARGS } from './portal-lib.mts';
 
 const claims: any = JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'claims.json'), 'utf8'));
 const catalog: Record<string, any> = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(ROOT, 'content', 'story', 'catalog-apps.json'), 'utf8')).apps.map((a: any) => [a.id, a]));
-const fam = (() => { const f = loadAdFamily('brennan'); if (!isFamily(f)) throw new Error(`brennan: ${f.why}`); return f as AdFamily; })();
+const FROZEN = path.join(ROOT, 'test', 'fixtures', 'site', 'frozen');
+const fam = (() => { const f = loadAdFamily('brennan', FROZEN); if (!isFamily(f)) throw new Error(`brennan: ${f.why}`); return f as AdFamily; })();
 const planOf = (story: Story = fam.story, times = fam.rs ? timesOf(fam.rs) : null) => planFamilyCuts(story, times);
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 const BRENNAN = planOf().cuts;
@@ -401,7 +403,7 @@ test('a sheet takes tighter padding before it takes another place, and the botto
 
 // ---- the manifest ---------------------------------------------------------------------------------------------------------------------------
 test('the manifest: well formed, one entry per cut, a hash that moves with the words, nothing absolute and no timestamp', () => {
-  const built = buildPlans(['brennan'], claims), m = buildManifest(built, claims);
+  const built = buildPlans(['brennan'], claims, FROZEN), m = buildManifest(built, claims);
   assert.deepEqual(manifestProblems(m), []);
   const cuts = m.families.brennan.cuts;
   assert.deepEqual(cuts.map(c => c.id), BRENNAN.map(c => c.id));
@@ -413,7 +415,7 @@ test('the manifest: well formed, one entry per cut, a hash that moves with the w
   assert.equal(new Set(cuts.map(c => c.hash)).size, cuts.length, 'one hash a cut');
   const text = manifestText(m);
   assert.ok(!/\/home\/|\/tmp\/|C:\\|\d{4}-\d{2}-\d{2}T/.test(text), 'no absolute path and no timestamp');
-  assert.equal(manifestText(buildManifest(buildPlans(['brennan'], claims), claims)), text, 'the same files give the same bytes');
+  assert.equal(manifestText(buildManifest(buildPlans(['brennan'], claims, FROZEN), claims)), text, 'the same files give the same bytes');
   // the hash moves with the words, the camera and the claims
   const sally = BRENNAN[0], h0 = cutHash(sally, fam, claims);
   assert.equal(cutHash(clone(sally), fam, claims), h0);
@@ -437,7 +439,7 @@ test('the committed content/story/ads.json is a manifest of this shape and has t
 test('a family in progress is skipped and never fatal: a file that does not parse, one without members, one with no bake lock', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ads-fam-'));
   try {
-    fs.copyFileSync(path.join(ROOT, 'content', 'families', 'brennan.json'), path.join(dir, 'brennan.json'));
+    fs.copyFileSync(path.join(FROZEN, 'brennan.json'), path.join(dir, 'brennan.json'));
     fs.writeFileSync(path.join(dir, 'broken.json'), '{ "schema": "family/v1", ');
     fs.writeFileSync(path.join(dir, 'empty.json'), JSON.stringify({ schema: 'family/v1', slug: 'empty', house: 'x' }));
     fs.writeFileSync(path.join(dir, 'wrong-slug.json'), JSON.stringify({ ...fam.story, slug: 'someone-else' }));
