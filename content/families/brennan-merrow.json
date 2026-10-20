@@ -5,15 +5,82 @@
   "fictional": true,
   "family": {
     "surname": "Brennan",
-    "tagline": "A kitchen whiteboard, a garage workbench and a Companion Core, four lives.",
+    "tagline": "One Companion Core, one kitchen whiteboard, and two teens sharing a room.",
     "household": "older-kids",
     "business": true,
-    "story": "Sally runs her small consulting practice from the craft room. John writes software at the garage workbench, Steve claims the den, and Jean studies in her shared bedroom. The apps they use run on one Companion Core in the kitchen.",
+    "story": "Sally runs a small consultancy from the craft room, and John writes software at the garage workbench. Steve claims the den downstairs, and Jean studies at the desk in the room she shares with him. One Companion Core stands in the kitchen, beside the whiteboard.",
     "address": {
       "line": "18 Fieldfare Lane",
       "place": "Merrow Ford"
     },
-    "narrator": "v-warm-f"
+    "narrator": "v-warm-f",
+    "home": {
+      "lede": "A mid-century raised ranch with a garage tucked under it, between fieldstone piers. The main floor sits a storey up, behind a brick-walled loggia. Stepping stones cross a lavender garden to the stoop.",
+      "spots": [
+        {
+          "room": "Kitchen & Dining",
+          "line": "A whiteboard on the wall, the Core beside it, and a glass table."
+        },
+        {
+          "room": "Craft Room",
+          "line": "A standing desk, an easel and two ladder shelves."
+        },
+        {
+          "room": "Garage",
+          "line": "A workbench, a bicycle and a wheelbarrow."
+        },
+        {
+          "room": "Den",
+          "line": "A sofa, two barrel chairs, the TV and a drum kit."
+        },
+        {
+          "room": "Kids Bedroom",
+          "line": "Two single beds, one desk and a rocking horse."
+        }
+      ]
+    },
+    "day": [
+      {
+        "at": "morning",
+        "beat": "office-notes",
+        "line": "Monday starts with Friday's calls and a fresh to-do list."
+      },
+      {
+        "at": "morning",
+        "beat": "garage-code",
+        "line": "John opens the cut list at the workbench."
+      },
+      {
+        "at": "midday",
+        "beat": "kitchen-board",
+        "line": "At lunch the family reads the week off the whiteboard."
+      },
+      {
+        "at": "afternoon",
+        "beat": "office-invoice",
+        "line": "The month's invoices go out before the weekend."
+      },
+      {
+        "at": "after-school",
+        "beat": "kitchen-vocab",
+        "line": "Jean writes up her French test at the glass table."
+      },
+      {
+        "at": "after-school",
+        "beat": "den-steam",
+        "line": "Steve starts a session in the den."
+      },
+      {
+        "at": "weekend",
+        "beat": "den-take",
+        "line": "Steve trims Saturday's drum take."
+      },
+      {
+        "at": "weekend",
+        "beat": "garden-lavender",
+        "line": "Jean takes the August picture from the stepping stone."
+      }
+    ]
   },
   "members": [
     {
@@ -27,7 +94,7 @@
       "companion": {
         "name": "Juniper",
         "runtime": "Hermes",
-        "job": "Drafts replies and proposals for Sally's clients, using the context she connected.",
+        "job": "Drafts replies and proposals for Sally's clients from the context she connected.",
         "personality": [
           "calm",
           "careful",
@@ -35,7 +102,10 @@
         ],
         "voice": "v-clear-f",
         "memory": true,
-        "limits": "Juniper only drafts in this home. Sally reads and sends every message."
+        "limits": "Drafts only. Sally reads and sends every message."
+      },
+      "profile": {
+        "bio": "Sally runs a small consultancy from the craft room. Her call notes, client sign-ins and invoices sit on the Core, and Juniper drafts replies that she reads before she sends them."
       }
     },
     {
@@ -49,7 +119,7 @@
       "companion": {
         "name": "Quill",
         "runtime": "OpenClaw",
-        "job": "Opens supplier websites in its own browser and fills in the forms John asks for.",
+        "job": "Opens supplier order forms and fills in the details John typed.",
         "personality": [
           "dry",
           "patient",
@@ -57,7 +127,10 @@
         ],
         "voice": "v-deep-m",
         "memory": false,
-        "limits": "One form at a time. John reads each one and sends it himself."
+        "limits": "One form at a time. John reads each field and sends it himself."
+      },
+      "profile": {
+        "bio": "John writes software and builds shelves in the garage. His code sits in Gitea on the Core, and Quill fills in the order forms that he checks and sends himself."
       }
     },
     {
@@ -67,7 +140,10 @@
       "role": "teen",
       "work": "secondary school",
       "colour": "chart-3",
-      "archetype": "gamer"
+      "archetype": "gamer",
+      "profile": {
+        "bio": "Steve plays on the den TV, drums in the same room and shares a bedroom with his sister. His headphones keep that room quiet for her."
+      }
     },
     {
       "id": "jean",
@@ -76,7 +152,10 @@
       "role": "teen",
       "work": "secondary school",
       "colour": "chart-4",
-      "archetype": "learner"
+      "archetype": "learner",
+      "profile": {
+        "bio": "Jean studies at the desk she shares with her brother. She keeps a note for every French test, draws her maths in a browser and reads her set text, with tools that each do one job on the Core."
+      }
     }
   ],
   "chapters": [
@@ -86,22 +165,22 @@
       "title": "First run"
     },
     {
-      "id": "living",
-      "kind": "room",
-      "room": "living",
-      "title": "The living room"
-    },
-    {
       "id": "kitchen",
       "kind": "room",
       "room": "kitchen",
       "title": "The kitchen"
     },
     {
+      "id": "living",
+      "kind": "room",
+      "room": "living",
+      "title": "The living room"
+    },
+    {
       "id": "kids",
       "kind": "room",
       "room": "kids",
-      "title": "The kids' bedroom"
+      "title": "Two beds, one desk"
     },
     {
       "id": "office",
@@ -152,8 +231,8 @@
         "from": "front"
       },
       "popup": {
-        "title": "A parcel at the door",
-        "body": "A parcel waits at the front door, at the top of the stone steps. John carries it past the loggia to the kitchen, where Sally clears the sideboard."
+        "title": "A parcel halfway up the steps",
+        "body": "The courier leaves a parcel on the stoop landing, halfway up the steps. John carries it up to the loggia and through the living room to the kitchen."
       }
     },
     {
@@ -168,8 +247,8 @@
         "framing": "medium"
       },
       "popup": {
-        "title": "Unbox the Companion Core",
-        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Jean ticks each item off the guide as Steve unwraps it."
+        "title": "Four things in the parcel",
+        "body": "Inside: the Companion Core, a power cable, a quick-start guide and a recovery USB drive. Jean reads the guide aloud while Steve cuts the tape."
       }
     },
     {
@@ -188,8 +267,8 @@
         "wake": true
       },
       "popup": {
-        "title": "Plug it in",
-        "body": "Sally plugs the cable into the Core and presses its button. It wakes and opens its own Wi-Fi network.",
+        "title": "Plugged in beside the whiteboard",
+        "body": "Sally plugs the cable in by the whiteboard. The Core wakes and opens its own Wi-Fi network.",
         "note": "Companion OS is in beta."
       },
       "film": true
@@ -209,7 +288,7 @@
       "popup": {
         "kind": "phone",
         "title": "Join it from a phone",
-        "body": "John joins the Core's own network from his phone's Wi-Fi settings, then picks the home network.",
+        "body": "John joins the Core's own network from his phone, then picks the home network.",
         "phone": {
           "header": "Wi-Fi",
           "rows": [
@@ -228,6 +307,7 @@
       "segment": "consumer",
       "with": [
         "ci-memory",
+        "yuvomi",
         "joplin",
         "gitea"
       ],
@@ -240,15 +320,15 @@
       },
       "popup": {
         "kind": "phone",
-        "title": "Pick your first agents and apps",
-        "body": "In the Companion Hub store, Sally picks Hermes and John picks OpenClaw. Companion Memory (beta) comes along, with Joplin Server and Gitea. Then they walk away.",
+        "title": "Pick the first agents and apps",
+        "body": "In the Companion Hub store, Sally picks Hermes and John picks OpenClaw. Companion Memory (beta) comes along, with Yuvomi, Joplin Server and Gitea. Then they walk away.",
         "note": "Installing apps uses the internet.",
         "phone": {
           "header": "Companion Hub",
           "rows": [
             "Agents: Hermes, OpenClaw",
             "Companion Memory (beta)",
-            "Apps: Joplin Server, Gitea"
+            "Apps: Yuvomi, Joplin Server, Gitea"
           ]
         }
       }
@@ -274,52 +354,32 @@
       },
       "popup": {
         "title": "Juniper says hello",
-        "body": "Sally messages the agent she named Juniper. A reply comes back, and the Core is running.",
+        "body": "Sally messages the agent she named Juniper. The reply comes from the Core, a floor above her craft room.",
+        "chips": [
+          "Hermes"
+        ],
         "note": "Messages pass through the chat service you choose."
       },
       "say": {
         "speaker": "sally",
-        "text": "Hello, Sally. I am Juniper. What should we do first?"
+        "text": "Hello, Sally. I am Juniper. What should we start with?"
       },
-      "film": true
-    },
-    {
-      "id": "living-couch",
-      "chapter": "living",
-      "member": "john",
-      "category": "iot",
-      "segment": "consumer",
-      "app": {
-        "id": "pi-hole",
-        "replaces": [
-          "NextDNS"
-        ]
-      },
-      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
-      "anchor": {
-        "role": "couch",
-        "room": "living",
-        "nth": 1
-      },
-      "camera": {
-        "framing": "medium",
-        "from": "front",
-        "side": "right"
-      },
-      "popup": {
-        "title": "One ad blocker for home Wi-Fi",
-        "body": "After supper, four screens share the couch and the home Wi-Fi. John set up Pi-hole on the Core to block ad and tracker domains for devices that use it.",
-        "chips": [
-          "Pi-hole",
-          "replaces NextDNS"
-        ]
+      "film": true,
+      "detail": {
+        "before": "Without an agent, Sally wrote every reply and reminder herself, one app at a time.",
+        "after": "Juniper runs in a sandbox on the Core and replies through the messaging app Sally picked. Those messages travel through that chat service.",
+        "steps": [
+          "Pick Hermes in the Companion Hub store",
+          "Give the agent a name",
+          "Send it a first message"
+        ],
+        "fact": "Hermes runs in its own sandbox on your Core and talks to you through the messaging platform you pick."
       }
     },
     {
-      "id": "kitchen-week",
+      "id": "kitchen-board",
       "chapter": "kitchen",
-      "member": "sally",
-      "category": "home",
+      "category": "food",
       "segment": "consumer",
       "app": {
         "id": "yuvomi",
@@ -343,27 +403,45 @@
         "side": "right"
       },
       "popup": {
-        "title": "The whiteboard has a twin",
-        "body": "Sally copies the whiteboard's week into Yuvomi, the family planner. Its calendar and shopping list sit on the Core, not in a calendar service.",
+        "title": "Thursday survives the sleeve",
+        "body": "A sleeve wipes Thursday off the whiteboard. Its twin in Yuvomi on the Core still has the dentist and the dinner.",
         "chips": [
           "Yuvomi"
         ]
+      },
+      "film": true,
+      "detail": {
+        "before": "The week lived on the whiteboard and, copied by hand, in a calendar service on each phone. When they disagreed, nobody knew which was right.",
+        "after": "Yuvomi keeps the calendar, tasks, shopping and meals in a database on the Core. The whiteboard stays on the wall as the copy everyone reads.",
+        "steps": [
+          "Copy Sunday's whiteboard into Yuvomi",
+          "Add the dinners and the shopping list",
+          "Read Thursday back when the board is wiped"
+        ],
+        "fact": "Yuvomi is a family planner with a shared calendar, tasks, shopping, meals and notes, stored in SQLite on your Core."
       }
     },
     {
-      "id": "kitchen-meals",
+      "id": "kitchen-hood",
       "chapter": "kitchen",
-      "member": "steve",
-      "category": "food",
+      "category": "home",
       "segment": "consumer",
       "app": {
-        "id": "yuvomi",
-        "replaces": []
+        "id": "papra",
+        "replaces": [
+          "Google Drive"
+        ]
       },
-      "capability": "a family planner with a shared calendar, tasks, shopping, meals and notes",
+      "service": "google-drive",
+      "capability": "archive the receipts, warranties and contracts you rarely look at, until you need them",
       "anchor": {
         "role": "range",
+        "nth": 1,
         "fallback": [
+          {
+            "role": "range",
+            "nth": 0
+          },
           {
             "role": "counter"
           }
@@ -371,38 +449,137 @@
       },
       "camera": {
         "framing": "close",
-        "side": "auto"
+        "from": "front",
+        "side": "left"
       },
       "popup": {
-        "title": "Saturday dinner, one shared list",
-        "body": "It is Steve's turn to cook on Saturday. He checks the week's meals in Yuvomi, then adds lemons to the shopping list on the Core that everyone shares.",
+        "title": "The hood's warranty was waiting",
+        "body": "When the range hood stops humming, the warranty filed last spring is waiting in Papra. The family's receipts, warranties and contracts are archived there, on the Core.",
         "chips": [
-          "Yuvomi"
+          "Papra",
+          "alternative to Google Drive"
         ]
+      },
+      "detail": {
+        "before": "Receipts went into one Google Drive folder called house, and the range hood's warranty was somewhere among the photos.",
+        "after": "Papra archives each receipt, warranty and contract on the Core, so the one the family needs is there when the hood stops.",
+        "steps": [
+          "Add the receipt to Papra",
+          "File it with the warranty",
+          "Open it when the hood stops"
+        ],
+        "fact": "Papra archives the receipts, warranties and contracts you rarely look at, until you need them."
       }
     },
     {
-      "id": "kids-lookup",
-      "chapter": "kids",
+      "id": "kitchen-vocab",
+      "chapter": "kitchen",
       "member": "jean",
       "category": "kids",
       "segment": "consumer",
       "app": {
-        "id": "kiwix",
+        "id": "memos",
         "replaces": [
-          "Google Search"
+          "Google Keep"
         ]
       },
-      "capability": "read Wikipedia and other reference sites served from your Core",
+      "service": "google-keep",
+      "capability": "capture quick notes and journal entries in Markdown",
       "anchor": {
-        "role": "desk",
-        "room": "kids",
+        "role": "dining-table",
         "fallback": [
           {
-            "role": "bookshelf",
-            "room": "kids",
-            "nth": 2
-          },
+            "role": "counter"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "A note for every missed word",
+        "body": "At the glass table, Jean writes a note for each French test, with the words she missed. Memos keeps them as Markdown on the Core, not in a notes service.",
+        "chips": [
+          "Memos",
+          "alternative to Google Keep"
+        ]
+      },
+      "detail": {
+        "before": "Jean's missed words went into Google Keep, in one pile with every other quick note.",
+        "after": "Memos keeps one note for each test on the Core, in Markdown. Jean reads back through them before the next test.",
+        "steps": [
+          "Write down the words she missed",
+          "Save the note for that test",
+          "Read the old notes before the next one"
+        ],
+        "fact": "Memos captures quick notes and journal entries in Markdown."
+      }
+    },
+    {
+      "id": "living-dns",
+      "chapter": "living",
+      "member": "john",
+      "category": "iot",
+      "segment": "consumer",
+      "app": {
+        "id": "pi-hole",
+        "replaces": [
+          "NextDNS"
+        ]
+      },
+      "service": "nextdns",
+      "capability": "block ads, trackers and bad domains for every device on your network at the DNS level",
+      "anchor": {
+        "role": "couch",
+        "room": "living",
+        "nth": 1
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The homework site comes back",
+        "body": "Jean's vocabulary site stops loading on the sofa. John adds it to the Pi-hole allow list, and the page opens.",
+        "chips": [
+          "Pi-hole",
+          "alternative to NextDNS"
+        ],
+        "note": "Lookups it does not block still go to the DNS provider the family picked."
+      },
+      "detail": {
+        "before": "NextDNS answered the house's DNS lookups, and the allow list lived in its settings.",
+        "after": "Pi-hole answers the house's DNS on the Core. John keeps the allow list there and adds a site when the family needs a page back.",
+        "steps": [
+          "Find the blocked site",
+          "Add it to the allow list",
+          "Reload the page on the sofa"
+        ],
+        "fact": "Pi-hole blocks ads, trackers and bad domains for every device on your network at the DNS level."
+      }
+    },
+    {
+      "id": "kids-headphones",
+      "chapter": "kids",
+      "member": "steve",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "navidrome",
+        "replaces": [
+          "Spotify"
+        ]
+      },
+      "service": "spotify",
+      "capability": "stream your own music collection to any device",
+      "anchor": {
+        "role": "bed",
+        "room": "kids",
+        "nth": 1,
+        "fallback": [
           {
             "role": "room",
             "room": "kids",
@@ -413,87 +590,45 @@
       "camera": {
         "framing": "medium",
         "from": "front",
-        "side": "left"
-      },
-      "popup": {
-        "title": "A biology question, asked at home",
-        "body": "Jean checks how a cell divides in Kiwix, which serves Wikipedia from the Core. No search engine sees her question.",
-        "chips": [
-          "Kiwix",
-          "replaces Google Search"
-        ],
-        "note": "The Wikipedia file is downloaded once."
-      },
-      "film": true
-    },
-    {
-      "id": "kids-question",
-      "chapter": "kids",
-      "member": "jean",
-      "category": "kids",
-      "segment": "consumer",
-      "app": {
-        "id": "obsidian",
-        "replaces": [
-          "Notion"
-        ]
-      },
-      "with": [
-        "open-webui"
-      ],
-      "capability": "the Obsidian note app in your browser; notes stay as local Markdown files",
-      "anchor": {
-        "role": "desk",
-        "room": "kids",
-        "fallback": [
-          {
-            "role": "bookshelf",
-            "room": "kids",
-            "nth": 2
-          },
-          {
-            "role": "room",
-            "room": "kids",
-            "nth": 1
-          }
-        ]
-      },
-      "camera": {
-        "framing": "close",
-        "from": "left",
         "side": "right"
       },
       "popup": {
-        "title": "A proof that finally makes sense",
-        "body": "Jean asks a model on the Core, in Open WebUI, why a proof works. The chat stays on the Core by default. She rewrites the answer in Obsidian.",
+        "title": "Headphones on, the shared room quiet",
+        "body": "Steve streams the family's music from the Core to his phone, and his headphones keep the room quiet for Jean. Navidrome plays only the files the family holds.",
         "chips": [
-          "Obsidian",
-          "replaces Notion"
+          "Navidrome",
+          "alternative to Spotify"
         ]
+      },
+      "detail": {
+        "before": "Steve played his music through Spotify on his phone.",
+        "after": "Navidrome streams the family's music files from the Core to his phone over the home Wi-Fi.",
+        "steps": [
+          "Open Navidrome on the phone",
+          "Pick a folder of the family's music",
+          "Put the headphones on"
+        ],
+        "fact": "Navidrome streams your own music collection to any device."
       }
     },
     {
-      "id": "kids-french",
+      "id": "kids-clip",
       "chapter": "kids",
-      "member": "jean",
-      "category": "kids",
+      "member": "steve",
+      "category": "media",
       "segment": "consumer",
       "app": {
-        "id": "libretranslate",
+        "id": "pairdrop",
         "replaces": [
-          "Google Translate"
+          "AirDrop"
         ]
       },
-      "capability": "translate text and documents on your own Core",
+      "service": "airdrop",
+      "capability": "send files between phones and laptops on the same Wi-Fi",
       "anchor": {
         "role": "desk",
         "room": "kids",
         "fallback": [
-          {
-            "role": "bookshelf",
-            "room": "kids",
-            "nth": 2
-          },
           {
             "role": "room",
             "room": "kids",
@@ -504,16 +639,75 @@
       "camera": {
         "framing": "medium",
         "from": "right",
-        "side": "auto"
+        "side": "left"
       },
       "popup": {
-        "title": "French homework, checked on the Core",
-        "body": "Jean writes a paragraph in French, then pastes it into LibreTranslate to see what it says in English. The words are translated on the Core, not on a translation website.",
+        "title": "Three paces from bed to desk",
+        "body": "The video of Jean's school concert is too big for the family chat. Steve sends it past the old rocking horse to her laptop with PairDrop, over the home Wi-Fi.",
         "chips": [
-          "LibreTranslate",
-          "replaces Google Translate"
+          "PairDrop",
+          "alternative to AirDrop"
+        ]
+      },
+      "detail": {
+        "before": "Steve's phone and Jean's school laptop are different makes, so a video too big for the family chat went by cable.",
+        "after": "PairDrop sends the file straight from Steve's phone to Jean's laptop over the home Wi-Fi, with no chat app between.",
+        "steps": [
+          "Open PairDrop on the phone and the laptop",
+          "Choose the laptop from the phone",
+          "Send the video across the room"
         ],
-        "note": "Language models are downloaded once."
+        "fact": "PairDrop sends files between phones and laptops on the same Wi-Fi."
+      }
+    },
+    {
+      "id": "kids-floorplan",
+      "chapter": "kids",
+      "member": "jean",
+      "category": "kids",
+      "segment": "consumer",
+      "app": {
+        "id": "drawio",
+        "replaces": [
+          "Lucidchart"
+        ]
+      },
+      "service": "lucidchart",
+      "capability": "draw flowcharts, floor plans and network maps in the browser",
+      "anchor": {
+        "role": "room",
+        "room": "kids",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "kids"
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The shared room, drawn to scale",
+        "body": "Jean measures the room she shares with Steve for a maths scale drawing. In draw.io she draws the beds, the desk and the shelf.",
+        "chips": [
+          "draw.io",
+          "alternative to Lucidchart"
+        ]
+      },
+      "film": true,
+      "detail": {
+        "before": "Jean's diagrams for school were drawn in Lucidchart.",
+        "after": "draw.io opens in her browser from the Core. Jean draws the two beds, the desk and the shelf to scale.",
+        "steps": [
+          "Measure the beds, the desk and the shelf",
+          "Draw the plan to scale in draw.io",
+          "Check the drawing against the room"
+        ],
+        "fact": "draw.io draws flowcharts, floor plans and network maps in the browser."
       }
     },
     {
@@ -545,12 +739,73 @@
         "side": "right"
       },
       "popup": {
-        "title": "Jean goes looking for a project",
-        "body": "Jean wants a project for the school fair, so she searches Spellbook. It is a catalog of local-AI and self-hosting tools, and it runs on the Core.",
+        "title": "A shortlist for the school fair",
+        "body": "Jean browses Spellbook on the Core, a catalog of local-AI and self-hosting tools, for a school-fair project. She writes down three names to show John.",
         "chips": [
           "Spellbook"
         ],
         "note": "Crash reports go to Companion Intelligence unless switched off."
+      },
+      "detail": {
+        "before": "A project idea meant a search engine and a dozen open tabs.",
+        "after": "Spellbook is a searchable catalog on the Core. Jean reads a few entries and writes down the three she likes.",
+        "steps": [
+          "Search the catalog for a topic",
+          "Read a few entries",
+          "Write down three names for John"
+        ],
+        "fact": "Spellbook is a searchable catalog of local-AI and self-hosting tools."
+      }
+    },
+    {
+      "id": "kids-reader",
+      "chapter": "kids",
+      "member": "jean",
+      "category": "media",
+      "segment": "consumer",
+      "app": {
+        "id": "koodo-reader",
+        "replaces": [
+          "Apple Books"
+        ]
+      },
+      "service": "apple-books",
+      "capability": "read ebooks in your browser, with notes, highlights and text-to-speech",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "kids",
+        "nth": 0,
+        "fallback": [
+          {
+            "role": "room",
+            "room": "kids",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "front",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The set text joins the library",
+        "body": "The school sends the set text as a file. Jean keeps it in a Koodo Reader library on the Core. She reads on the beanbag in the old playroom.",
+        "chips": [
+          "Koodo Reader",
+          "alternative to Apple Books"
+        ],
+        "note": "It opens the family's own ebook files."
+      },
+      "detail": {
+        "before": "Jean read her set texts in Apple Books, with her notes kept in that app.",
+        "after": "Koodo Reader opens the school's file in a browser, from a library on the Core. Jean's notes sit there with it.",
+        "steps": [
+          "Put the school's file in the library",
+          "Open it in Koodo Reader",
+          "Highlight the lines she wants"
+        ],
+        "fact": "Koodo Reader reads ebooks in your browser, with notes, highlights and text-to-speech, and keeps the library on your Core."
       }
     },
     {
@@ -565,6 +820,7 @@
           "Evernote"
         ]
       },
+      "service": "evernote",
       "capability": "take notes and keep to-dos that sync across your devices through your own server",
       "anchor": {
         "role": "desk",
@@ -573,7 +829,7 @@
           {
             "role": "room",
             "room": "office",
-            "nth": 1
+            "nth": 0
           }
         ]
       },
@@ -583,12 +839,23 @@
         "side": "left"
       },
       "popup": {
-        "title": "Call notes sync to the Core",
-        "body": "The client call ends, and Sally types up the notes at her standing desk. They sync to Joplin Server, which sits on the Core, not with a note service.",
+        "title": "Last week's calls, this week's list",
+        "body": "Sally keeps four years of client notes in Joplin Server on the Core. On Monday she turns Friday's calls into the week's to-do list.",
         "chips": [
           "Joplin Server",
-          "replaces Evernote"
-        ]
+          "alternative to Evernote"
+        ],
+        "note": "Joplin Server is the server. The Joplin apps are separate."
+      },
+      "detail": {
+        "before": "Four years of call notes sat in Evernote, one notebook per client, and the to-do list lived somewhere else.",
+        "after": "Joplin Server syncs the notes and the to-do list between her laptop and her phone, through the server on the Core.",
+        "steps": [
+          "Open Friday's call notes",
+          "Turn each action into a to-do",
+          "Check the list on her phone"
+        ],
+        "fact": "Joplin Server lets you take notes and keep to-dos that sync across your devices through your own server."
       }
     },
     {
@@ -600,13 +867,10 @@
       "category": "small-business",
       "segment": "small-business",
       "app": {
-        "id": "ci-hermes",
+        "id": "ci-memory",
         "replaces": []
       },
-      "with": [
-        "ci-memory"
-      ],
-      "capability": "an agent that connects to chat apps, email and more from one self-hosted app",
+      "capability": "keeps your digital life on your own disk and gives your agents individual context",
       "anchor": {
         "role": "desk",
         "room": "office",
@@ -614,7 +878,7 @@
           {
             "role": "room",
             "room": "office",
-            "nth": 1
+            "nth": 0
           }
         ]
       },
@@ -623,88 +887,23 @@
         "side": "left"
       },
       "popup": {
-        "title": "Juniper drafts, Sally sends",
-        "body": "A client wants a proposal by lunch. Juniper, her agent on the Core, drafts it from context in Companion Memory (beta). Sally reads it and sends it herself.",
-        "note": "Companion Agents and Companion Memory are in beta."
-      },
-      "film": true
-    },
-    {
-      "id": "office-pdf",
-      "chapter": "office",
-      "member": "sally",
-      "category": "small-business",
-      "segment": "small-business",
-      "app": {
-        "id": "stirling-pdf",
-        "replaces": [
-          "Smallpdf"
-        ]
-      },
-      "capability": "merge, split, compress and convert PDFs on your own Core",
-      "anchor": {
-        "role": "desk",
-        "room": "office",
-        "fallback": [
-          {
-            "role": "room",
-            "room": "office",
-            "nth": 1
-          }
-        ]
-      },
-      "camera": {
-        "framing": "wide",
-        "from": "behind"
-      },
-      "popup": {
-        "title": "One proposal, one file",
-        "body": "Before the proposal goes out, Sally merges it with the fee schedule in Stirling-PDF. The merge runs on the Core, not on a PDF website.",
+        "title": "Juniper drafts the renewal, Sally checks",
+        "body": "Juniper drafts a renewal reply from last spring's thread, which Sally connected to Companion Memory (beta). Sally checks the figures, then sends it herself.",
         "chips": [
-          "Stirling-PDF",
-          "replaces Smallpdf"
-        ]
-      }
-    },
-    {
-      "id": "office-paper",
-      "chapter": "office",
-      "member": "sally",
-      "category": "home",
-      "segment": "small-business",
-      "app": {
-        "id": "paperless",
-        "replaces": [
-          "Google Drive"
-        ]
+          "Companion Memory"
+        ],
+        "note": "Messages pass through the chat service you choose. Companion Agents are in beta."
       },
-      "capability": "scan and file your paperwork; it reads every page, tags it and makes it searchable",
-      "anchor": {
-        "role": "bookshelf",
-        "room": "office",
-        "fallback": [
-          {
-            "role": "desk",
-            "room": "office"
-          },
-          {
-            "role": "room",
-            "room": "office",
-            "nth": 1
-          }
-        ]
-      },
-      "camera": {
-        "framing": "close",
-        "side": "right"
-      },
-      "popup": {
-        "title": "An invoice and a school form",
-        "body": "Sally scans a client invoice and a school form. Paperless-ngx reads and tags each page. The scans sit on the Core, not in a rented drive.",
-        "chips": [
-          "Paperless-ngx",
-          "replaces Google Drive"
-        ]
+      "film": true,
+      "detail": {
+        "before": "A renewal reply meant digging out last spring's thread and rebuilding the figures by hand.",
+        "after": "Juniper drafts the reply on the Core from the thread Sally connected in Companion Memory. She checks every figure, then sends it herself.",
+        "steps": [
+          "Ask Juniper for the renewal reply",
+          "Check each figure against the thread",
+          "Send the reply herself"
+        ],
+        "fact": "Companion Memory keeps your digital life on your disk, so your agents know your context."
       }
     },
     {
@@ -719,6 +918,7 @@
           "LastPass"
         ]
       },
+      "service": "lastpass",
       "capability": "store every password in a vault you host that works with the Bitwarden apps",
       "anchor": {
         "role": "desk",
@@ -727,7 +927,7 @@
           {
             "role": "room",
             "room": "office",
-            "nth": 1
+            "nth": 0
           }
         ]
       },
@@ -737,12 +937,126 @@
         "side": "auto"
       },
       "popup": {
-        "title": "A sign-in goes in the vault",
-        "body": "A client gives Sally a portal sign-in. She saves it in a VaultWarden vault, which works with the Bitwarden apps. It sits on the Core, not with a password service.",
+        "title": "The old account closes last",
+        "body": "Before Sally closes her old password account, she opens every client sign-in from the new vault. VaultWarden runs on the Core and works with the Bitwarden apps.",
         "chips": [
           "VaultWarden",
-          "replaces LastPass"
+          "alternative to LastPass"
         ]
+      },
+      "detail": {
+        "before": "Client portal sign-ins lived in LastPass, and the family's shared ones sat on a sticky note by the whiteboard.",
+        "after": "VaultWarden keeps the sign-ins in a vault on the Core. Sally opens them with the Bitwarden apps, and the sticky note goes in the bin.",
+        "steps": [
+          "Open each client sign-in from VaultWarden",
+          "Check that every one works",
+          "Close the old account"
+        ],
+        "fact": "VaultWarden stores every password in a vault you host and works with the Bitwarden apps."
+      }
+    },
+    {
+      "id": "office-invoice",
+      "chapter": "office",
+      "member": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "invoice-ninja",
+        "replaces": [
+          "FreshBooks"
+        ]
+      },
+      "service": "freshbooks",
+      "capability": "send invoices and quotes, track expenses and time",
+      "anchor": {
+        "role": "bookshelf",
+        "room": "office",
+        "nth": 1,
+        "fallback": [
+          {
+            "role": "desk",
+            "room": "office"
+          },
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "close",
+        "from": "front",
+        "side": "right"
+      },
+      "popup": {
+        "title": "The month's hours become invoices",
+        "body": "On the last Friday of the month, Sally turns her tracked hours into invoices in Invoice Ninja. Clients, quotes and invoices sit on the Core, not in a bookkeeping service.",
+        "chips": [
+          "Invoice Ninja",
+          "alternative to FreshBooks"
+        ]
+      },
+      "detail": {
+        "before": "Invoices were built in FreshBooks, and the client list and every past quote lived there too.",
+        "after": "Invoice Ninja holds the clients, quotes, invoices and tracked time on the Core. Sally builds the month's invoices from what is already there.",
+        "steps": [
+          "Open the client in Invoice Ninja",
+          "Add the month's tracked hours",
+          "Send the invoice"
+        ],
+        "fact": "Invoice Ninja sends invoices and quotes and tracks expenses and time."
+      }
+    },
+    {
+      "id": "office-newsletter",
+      "chapter": "office",
+      "member": "sally",
+      "category": "small-business",
+      "segment": "small-business",
+      "app": {
+        "id": "listmonk",
+        "replaces": [
+          "Mailchimp"
+        ]
+      },
+      "service": "mailchimp",
+      "capability": "write and send newsletters to your own mailing list",
+      "anchor": {
+        "role": "desk",
+        "room": "office",
+        "fallback": [
+          {
+            "role": "room",
+            "room": "office",
+            "nth": 0
+          }
+        ]
+      },
+      "camera": {
+        "framing": "wide",
+        "from": "left",
+        "side": "auto"
+      },
+      "popup": {
+        "title": "The mailing list stays at home",
+        "body": "Sally writes the practice's quarterly newsletter in Listmonk, and the subscriber list sits on the Core. Sending still goes through an outside mail provider.",
+        "chips": [
+          "Listmonk",
+          "alternative to Mailchimp"
+        ],
+        "note": "Delivery depends on the mail provider."
+      },
+      "detail": {
+        "before": "The subscriber list lived in Mailchimp, along with the draft of every issue.",
+        "after": "Listmonk holds the subscriber list and the drafts on the Core. An outside mail provider sends each issue.",
+        "steps": [
+          "Write the issue in Listmonk",
+          "Check the subscriber list",
+          "Send it through the mail provider"
+        ],
+        "fact": "Listmonk writes and sends newsletters to your own mailing list."
       }
     },
     {
@@ -757,6 +1071,7 @@
           "Cursor"
         ]
       },
+      "service": "cursor",
       "capability": "write code in VS Code in your browser, with the editor and your files on your Core",
       "anchor": {
         "role": "room",
@@ -768,13 +1083,22 @@
         "side": "right"
       },
       "popup": {
-        "title": "An editor at the workbench",
-        "body": "John's laptop opens Code Server in a browser. The editor and his project files sit on the Core.",
+        "title": "One extension comes from outside",
+        "body": "John writes a cut-list script in Code Server, and its folder sits on the Core. The one extension he adds comes from an outside registry.",
         "chips": [
           "Code Server",
-          "replaces Cursor"
+          "alternative to Cursor"
+        ]
+      },
+      "detail": {
+        "before": "John coded in Cursor on the laptop, and the project folder lived on that one machine.",
+        "after": "Code Server gives John the editor in a browser tab. The editor and his files are on the Core, and extensions are fetched from an outside registry.",
+        "steps": [
+          "Open the editor in a browser",
+          "Open the cut-list folder",
+          "Add the one extension he needs"
         ],
-        "note": "Installing an extension reaches an outside registry."
+        "fact": "Code Server runs VS Code in your browser, with the editor and your files on your Core."
       }
     },
     {
@@ -789,6 +1113,7 @@
           "GitHub"
         ]
       },
+      "service": "github",
       "capability": "host private Git repositories, pull requests and issues on your Core",
       "anchor": {
         "role": "room",
@@ -800,14 +1125,24 @@
         "side": "left"
       },
       "popup": {
-        "title": "John pushes the last branch",
-        "body": "At the workbench, John pushes the day's last branch to Gitea. Its pull requests and issues sit on the family's Companion Core, not on a rented code host.",
+        "title": "Shelf-jig lands in Gitea",
+        "body": "John's last push today, a branch called shelf-jig, lands in Gitea on the Core, issues and pull requests beside it.",
         "chips": [
           "Gitea",
-          "replaces GitHub"
+          "alternative to GitHub"
         ]
       },
-      "film": true
+      "film": true,
+      "detail": {
+        "before": "John pushed his side projects to GitHub, with their issues and pull requests kept there too.",
+        "after": "Gitea hosts the repository on the Core, with its issues and pull requests beside it.",
+        "steps": [
+          "Point the repository at Gitea",
+          "Push the shelf-jig branch",
+          "Open the pull request in Gitea"
+        ],
+        "fact": "Gitea hosts private Git repositories, pull requests and issues on your Core."
+      }
     },
     {
       "id": "garage-errand",
@@ -821,7 +1156,7 @@
         "id": "ci-openclaw",
         "replaces": []
       },
-      "capability": "browser automation and tool use in a sandboxed app on your Core",
+      "capability": "an agent with browser automation and tool use, running in a sandboxed app on your Core",
       "anchor": {
         "role": "room",
         "room": "garage"
@@ -832,17 +1167,72 @@
         "side": "auto"
       },
       "popup": {
-        "title": "Quill fills in the form",
-        "body": "John needs brackets for the workbench. Quill opens the supplier's website and fills in the order form. John reads every field, then sends it himself.",
+        "title": "Quill fills in the order form",
+        "body": "Quill opens the supplier's order form and fills it in for the shelf brackets John needs. John checks every field, then sends it himself.",
+        "chips": [
+          "OpenClaw"
+        ],
         "note": "OpenClaw reaches websites over your home internet."
       },
       "say": {
         "speaker": "john",
-        "text": "The form is ready. Check the delivery address before you send it."
+        "text": "The order form is filled in. Please check the delivery address before you send it."
+      },
+      "detail": {
+        "before": "Ordering hardware meant typing the same details into a supplier's form, field by field.",
+        "after": "Quill opens the supplier's page in its browser and fills in the form from what John typed. John reads every field and sends it himself.",
+        "steps": [
+          "Type what he needs",
+          "Let Quill fill in the form",
+          "Read every field, then send it"
+        ],
+        "fact": "OpenClaw is an agent with browser automation and tool use, running in a sandboxed app on your Core."
       }
     },
     {
-      "id": "den-session",
+      "id": "garage-backup",
+      "chapter": "garage",
+      "member": "john",
+      "category": "home",
+      "segment": "consumer",
+      "app": {
+        "id": "duplicati",
+        "replaces": [
+          "Carbonite"
+        ]
+      },
+      "service": "carbonite",
+      "capability": "back up your files with encryption before they leave your Core",
+      "anchor": {
+        "role": "room",
+        "room": "garage"
+      },
+      "camera": {
+        "framing": "medium",
+        "from": "right",
+        "side": "left"
+      },
+      "popup": {
+        "title": "The spare lives in the garage",
+        "body": "Duplicati backs up the Core's folders, with encryption, to a labelled drive. John keeps the drive in the garage, a floor away from the Core.",
+        "chips": [
+          "Duplicati",
+          "alternative to Carbonite"
+        ]
+      },
+      "detail": {
+        "before": "Backups went to a Carbonite account, and the second copy lived with that service.",
+        "after": "Duplicati backs up the Core's folders with encryption to a local drive that John labels. The Core keeps the files, and the drive keeps the second copy.",
+        "steps": [
+          "Plug the labelled drive into the Core",
+          "Set the backup in Duplicati",
+          "Carry the drive down to the garage"
+        ],
+        "fact": "Duplicati backs up your files with encryption before they leave your Core."
+      }
+    },
+    {
+      "id": "den-steam",
       "chapter": "den",
       "member": "steve",
       "category": "media",
@@ -853,6 +1243,7 @@
           "GeForce Now"
         ]
       },
+      "service": "geforce-now",
       "capability": "run Steam on your Core and play it in a browser on a screen in the house",
       "anchor": {
         "role": "tv",
@@ -870,92 +1261,88 @@
         "side": "left"
       },
       "popup": {
-        "title": "Steve's game runs in the house",
-        "body": "After school, Steve signs in with his own Valve account. Steam Headless runs the session on the Core at home and shows it in a browser on the Den TV.",
+        "title": "The game runs by the whiteboard",
+        "body": "Steve's game runs on the Core, beside the kitchen whiteboard. He signs in with his own Valve account, and the den TV shows it.",
         "chips": [
           "Steam Headless",
-          "replaces GeForce Now"
+          "alternative to GeForce Now"
         ],
         "note": "Steam needs a Valve account. A Core may lack the graphics power a game wants."
       },
-      "film": true
-    },
-    {
-      "id": "den-friday",
-      "chapter": "den",
-      "member": "steve",
-      "category": "media",
-      "segment": "consumer",
-      "app": {
-        "id": "jellyfin",
-        "replaces": [
-          "Plex"
-        ]
-      },
-      "capability": "stream your own movies, shows and music to every screen in the house",
-      "anchor": {
-        "role": "couch",
-        "room": "living",
-        "nth": 0
-      },
-      "camera": {
-        "framing": "wide",
-        "from": "front",
-        "side": "auto"
-      },
-      "popup": {
-        "title": "Friday's film in the den",
-        "body": "Steve picks Friday's film. Jellyfin plays the family's own collection from the Core to the Den TV, not from a streaming service.",
-        "chips": [
-          "Jellyfin",
-          "replaces Plex"
-        ]
+      "film": true,
+      "detail": {
+        "before": "Steve played his Steam library through GeForce Now, with the session running somewhere else.",
+        "after": "Steam Headless runs Steam on the Core. The session shows in a browser on the den TV, and Valve still keeps the account and the library.",
+        "steps": [
+          "Sign in with the Valve account",
+          "Open the session in the TV's browser",
+          "Pick a game from the library"
+        ],
+        "fact": "Steam Headless runs Steam on your Core and plays it in a browser on a screen in the house."
       }
     },
     {
-      "id": "den-photos",
+      "id": "den-take",
       "chapter": "den",
       "member": "steve",
-      "category": "privacy",
+      "category": "creative",
       "segment": "consumer",
       "app": {
-        "id": "immich",
+        "id": "audiomass",
         "replaces": [
-          "Google Photos"
+          "TwistedWave"
         ]
       },
-      "capability": "back up, search and organise your family photos and videos on your own Core",
+      "service": "twistedwave",
+      "capability": "edit audio in a browser tab: cut, fade, normalise and export",
       "anchor": {
-        "role": "room",
-        "room": "living",
-        "nth": 0
+        "role": "music",
+        "fallback": [
+          {
+            "role": "couch",
+            "room": "living",
+            "nth": 0
+          }
+        ]
       },
       "camera": {
         "framing": "medium",
-        "from": "above",
+        "from": "front",
         "side": "right"
       },
       "popup": {
-        "title": "School trip photos, backed up",
-        "body": "The school trip left Steve with a few hundred photos. They back up from his phone to Immich on the Core, not to a photo cloud.",
+        "title": "The take loses its count-in",
+        "body": "The count-in comes off Steve's drum take in AudioMass, in a browser tab. The Core serves the editor, and he saves the file where he chooses.",
         "chips": [
-          "Immich",
-          "replaces Google Photos"
+          "AudioMass",
+          "alternative to TwistedWave"
+        ]
+      },
+      "detail": {
+        "before": "Steve trimmed his drum takes in TwistedWave.",
+        "after": "AudioMass opens in a browser tab served by the Core. Steve cuts the count-in, fades the end and saves the file where he chooses.",
+        "steps": [
+          "Open the take in AudioMass",
+          "Cut the count-in and fade the end",
+          "Save the file where he chooses"
         ],
-        "note": "The first start takes a while."
+        "fact": "AudioMass edits audio in a browser tab: cut, fade, normalise and export."
       }
     },
     {
       "id": "garden-lavender",
       "chapter": "garden",
-      "member": "steve",
-      "category": "home",
+      "member": "jean",
+      "category": "privacy",
       "segment": "consumer",
       "app": {
-        "id": "hortusfox",
-        "replaces": []
+        "id": "photoprism",
+        "replaces": [
+          "iCloud Photos"
+        ]
       },
-      "capability": "track your plants, watering and care history across rooms and beds",
+      "service": "icloud-photos",
+      "capability": "browse and share your photo library, with automatic tagging, without uploading it anywhere",
       "anchor": {
         "role": "garden",
         "nth": 1
@@ -965,11 +1352,23 @@
         "eye": "standing"
       },
       "popup": {
-        "title": "The lavender has a journal",
-        "body": "It is Steve's job to water the lavender by the stoop. He logs each watering in HortusFox, and the plant journal sits on the Core.",
+        "title": "Same stone, same lavender, three summers",
+        "body": "Every August Jean takes one picture of the lavender from the same stepping stone. PhotoPrism keeps all three summers side by side on the Core, without uploading them anywhere.",
         "chips": [
-          "HortusFox"
-        ]
+          "PhotoPrism",
+          "alternative to iCloud Photos"
+        ],
+        "note": "A photo library is not a backup. Keep the originals."
+      },
+      "detail": {
+        "before": "The lavender pictures sat in iCloud Photos among everything else, and nobody had lined the summers up.",
+        "after": "PhotoPrism browses the family library on the Core, so Jean can set the three Augusts next to each other.",
+        "steps": [
+          "Take the August picture from the stepping stone",
+          "Add it to the family library",
+          "Set the three summers side by side"
+        ],
+        "fact": "PhotoPrism browses and shares your photo library, with automatic tagging, without uploading it anywhere."
       }
     },
     {
@@ -986,25 +1385,24 @@
         "eye": "aerial"
       },
       "popup": {
-        "title": "One Core, four lives",
-        "body": "Paperwork, code, games and homework, all on one Companion Core beside the kitchen whiteboard."
+        "title": "One Core, four different days",
+        "body": "A whiteboard, a workbench, a den and a shared bedroom, on one Companion Core."
       },
       "film": true
     }
   ],
   "closing": {
-    "body": "Your planner, paperwork, code and homework can run on a Companion Core at home. Browse the Companion Hub store and pick your first apps.",
+    "body": "Your family's week, notes and homework can live on a Companion Core. Browse the Companion Hub store and pick your first apps.",
     "cta": {
       "label": "See Companion Core",
       "url": "https://ci.computer/core"
     }
   },
   "notes": [
-    "garage-code uses Code Server, which has no QA screenshot: the owner must list garage-code (app-qa-screenshot) in reviewed.json. Not added here.",
-    "Open WebUI replaces ChatGPT and Claude, and the chip text 'replaces ChatGPT' trips cap-parity, so Open WebUI is only ever named in a beat's with, never as app.",
-    "den-session: Steam needs a Valve account (note), the Core may lack the GPU a game wants, no game titles, no frame rate; the session shows in a browser on the Den TV.",
-    "garage-errand: OpenClaw prepares the form, John reads every field and sends it. Carries the OpenClaw website note. No cloud key is mentioned anywhere.",
-    "Film (eight beats): plug-in, join, hello, kids-lookup, office-draft, garage-repos, den-session, outro. garage-code is kept out of the film because it needs owner review.",
-    "Sally, John, Steve and Jean are the flagship Brennan family; this home tells them in the Craft Room, Garage, Den and Kids Bedroom with the Core in Kitchen and Dining."
+    "garage-code uses Code Server, which has no QA screenshot: the owner has signed it off in content/story/reviewed.json (slug brennan-merrow, at garage-code, app-qa-screenshot). Not edited here.",
+    "Told in the v3 shape: 17 of 21 room beats are pair beats naming a service from content/story/services.json; the four pair-less ones are the Yuvomi whiteboard twin, Spellbook, the Companion Memory draft and Quill's order form.",
+    "Age rule 16: Jean (14) and Steve (16) use no chat model or agent in their own beats; Juniper and Quill work only for Sally and John, who approve every result.",
+    "Honest edges carried: Steam needs a Valve account; Pi-hole forwards unblocked lookups to the family's DNS provider; Listmonk sends through an outside mail provider; a photo library is not a backup, so John copies to a local drive.",
+    "Apps chosen to stay clear of the other two Brennan tours: only Yuvomi, Code Server, Steam Headless and the first-party agents are shared, as the cast plan assigns them."
   ]
 }

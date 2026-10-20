@@ -18,7 +18,7 @@
       "incumbentNameList": true,
       "apps": ["affine", "appflowy", "blinko", "bookstack", "colanode", "docmost", "dumbpad", "focalboard", "leafwiki", "logseq", "novel", "obsidian", "operately", "outline", "poznote", "wikijs"],
       "storyApps": ["affine", "appflowy", "blinko", "bookstack", "docmost", "logseq", "obsidian"],
-      "fleetHomes": ["adeniran", "brennan", "brennan-hollin", "brennan-merrow", "dekker", "hwang", "iyer", "kovacs", "moreau", "nguyen", "quintero", "rahimi", "salazar", "tesfaye", "watanabe"],
+      "fleetHomes": ["adeniran", "brennan", "brennan-hollin", "dekker", "hwang", "iyer", "kovacs", "moreau", "nguyen", "quintero", "rahimi", "salazar", "tesfaye", "watanabe"],
       "rank": 1,
       "top80": true
     },
@@ -37,7 +37,7 @@
       "incumbentNameList": true,
       "apps": ["agent-zero", "agentzero", "anything-llm", "cmproxy", "fastgpt", "librechat", "lobe-chat", "maxkb", "odysseus", "ollama", "open-webui", "openclaw", "ragflow", "sillytavern"],
       "storyApps": ["anything-llm", "ollama", "open-webui"],
-      "fleetHomes": ["chaudhry", "hovsepian", "jankowski", "kovacs", "mbatha", "nguyen", "tuala"],
+      "fleetHomes": ["brennan", "chaudhry", "hovsepian", "jankowski", "kovacs", "mbatha", "nguyen", "tuala"],
       "rank": 2,
       "top80": true
     },
@@ -56,7 +56,7 @@
       "incumbentNameList": true,
       "apps": ["cloudreve", "copyparty", "dropgate", "file-browser", "hermitstash", "mydrive", "nextcloud", "owncloud", "oxicloud", "seafile", "syncthing"],
       "storyApps": ["copyparty", "nextcloud", "syncthing"],
-      "fleetHomes": ["haddad", "petrov"],
+      "fleetHomes": ["brennan", "haddad", "petrov"],
       "rank": 3,
       "top80": true
     },
@@ -75,7 +75,7 @@
       "incumbentNameList": true,
       "apps": ["cloudreve", "copyparty", "file-browser", "mydrive", "nextcloud", "owncloud", "oxicloud", "paperless", "papra", "seafile"],
       "storyApps": ["copyparty", "nextcloud", "paperless", "papra"],
-      "fleetHomes": ["adeniran", "adler", "banerjee", "brennan", "brennan-hollin", "brennan-merrow", "dekker", "hovsepian", "iyer", "jankowski", "moreau", "nwachukwu", "petrov", "rahimi", "tesfaye", "whitaker"],
+      "fleetHomes": ["adeniran", "adler", "banerjee", "brennan-merrow", "dekker", "hovsepian", "iyer", "jankowski", "moreau", "nwachukwu", "petrov", "rahimi", "tesfaye", "whitaker"],
       "rank": 4,
       "top80": true
     },
@@ -132,7 +132,7 @@
       "incumbentNameList": false,
       "apps": ["fizzy", "focalboard", "jotty", "kan", "openproject", "plane", "planka", "taiga"],
       "storyApps": ["jotty", "planka"],
-      "fleetHomes": ["banerjee"],
+      "fleetHomes": ["banerjee", "brennan-hollin"],
       "rank": 7,
       "top80": true
     },
@@ -227,7 +227,7 @@
       "incumbentNameList": true,
       "apps": ["joplin", "obsidian", "paperless", "papra", "poznote", "standard-notes"],
       "storyApps": ["joplin", "obsidian", "paperless", "papra", "standard-notes"],
-      "fleetHomes": ["adler", "banerjee", "brennan", "brennan-hollin", "brennan-merrow", "gill", "hovsepian", "hwang", "kamau", "kovacs", "petrov", "quintero", "tuala", "whitaker"],
+      "fleetHomes": ["adler", "banerjee", "brennan", "brennan-merrow", "gill", "hovsepian", "hwang", "kamau", "kovacs", "petrov", "quintero", "tuala", "whitaker"],
       "rank": 12,
       "top80": true
     },
@@ -265,7 +265,7 @@
       "incumbentNameList": false,
       "apps": ["baserow", "grist", "nocobase", "nocodb", "seatable", "teable"],
       "storyApps": ["baserow", "grist", "nocodb"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-hollin"],
       "rank": 14,
       "top80": true
     },
@@ -322,7 +322,7 @@
       "incumbentNameList": false,
       "apps": ["aider", "arkanum", "code-server", "opencode", "opencode-web", "pi-web"],
       "storyApps": ["aider", "code-server", "opencode"],
-      "fleetHomes": ["brennan", "brennan-hollin", "brennan-merrow"],
+      "fleetHomes": ["brennan", "brennan-merrow"],
       "rank": 17,
       "top80": true
     },
@@ -341,7 +341,7 @@
       "incumbentNameList": true,
       "apps": ["immich", "librephotos", "photoprism", "photoview"],
       "storyApps": ["immich", "librephotos", "photoprism", "photoview"],
-      "fleetHomes": ["adeniran", "adler", "banerjee", "brennan", "brennan-merrow", "cardoso", "dekker", "gill", "iyer", "kamau", "kovacs", "mbatha", "nguyen", "nwachukwu", "petrov", "quintero", "rahimi", "tesfaye", "tuala", "watanabe", "whitaker"],
+      "fleetHomes": ["adeniran", "adler", "banerjee", "brennan", "cardoso", "dekker", "gill", "iyer", "kamau", "kovacs", "mbatha", "nguyen", "nwachukwu", "petrov", "quintero", "rahimi", "tesfaye", "tuala", "watanabe", "whitaker"],
       "rank": 18,
       "top80": true
     },
@@ -379,7 +379,7 @@
       "incumbentNameList": false,
       "apps": ["habitica", "jotty", "super-productivity", "vikunja"],
       "storyApps": ["habitica", "jotty", "super-productivity", "vikunja"],
-      "fleetHomes": ["tesfaye", "tuala"],
+      "fleetHomes": ["brennan", "tesfaye", "tuala"],
       "rank": 19,
       "top80": true
     },
@@ -398,7 +398,7 @@
       "incumbentNameList": true,
       "apps": ["booklore", "calibre", "calibre-web", "koodo-reader"],
       "storyApps": ["booklore", "calibre-web", "koodo-reader"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-merrow"],
       "rank": 21,
       "top80": true
     },
@@ -417,7 +417,7 @@
       "incumbentNameList": true,
       "apps": ["booklore", "calibre", "calibre-web", "koodo-reader"],
       "storyApps": ["booklore", "calibre-web", "koodo-reader"],
-      "fleetHomes": ["haddad", "hovsepian", "hwang", "jankowski", "kamau", "moreau", "nwachukwu", "whitaker"],
+      "fleetHomes": ["brennan", "haddad", "hovsepian", "hwang", "jankowski", "kamau", "moreau", "nwachukwu", "whitaker"],
       "rank": 22,
       "top80": true
     },
@@ -569,7 +569,7 @@
       "incumbentNameList": true,
       "apps": ["immich", "librephotos", "photoprism"],
       "storyApps": ["immich", "librephotos", "photoprism"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-merrow"],
       "rank": 32,
       "top80": true
     },
@@ -607,7 +607,7 @@
       "incumbentNameList": true,
       "apps": ["ghost", "keila", "listmonk"],
       "storyApps": ["ghost", "keila", "listmonk"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-merrow"],
       "rank": 34,
       "top80": true
     },
@@ -626,7 +626,7 @@
       "incumbentNameList": true,
       "apps": ["espocrm", "odoo", "twenty"],
       "storyApps": ["espocrm", "odoo", "twenty"],
-      "fleetHomes": ["adler", "haddad", "halvorsen", "jankowski", "mbatha"],
+      "fleetHomes": ["adler", "brennan-hollin", "haddad", "halvorsen", "jankowski", "mbatha"],
       "rank": 36,
       "top80": true
     },
@@ -702,7 +702,7 @@
       "incumbentNameList": false,
       "apps": ["akaunting", "invio", "invoice-ninja"],
       "storyApps": ["akaunting", "invio", "invoice-ninja"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-merrow"],
       "rank": 30,
       "top80": true
     },
@@ -740,7 +740,7 @@
       "incumbentNameList": false,
       "apps": ["forgejo", "gitea", "gitlab"],
       "storyApps": ["forgejo", "gitea"],
-      "fleetHomes": ["adeniran", "adler", "banerjee", "brennan", "brennan-hollin", "brennan-merrow", "chaudhry", "haddad", "halvorsen", "hovsepian", "hwang", "jankowski", "kamau", "kovacs", "mbatha", "moreau", "nguyen", "quintero", "salazar", "tesfaye", "watanabe"],
+      "fleetHomes": ["adeniran", "adler", "banerjee", "brennan-hollin", "brennan-merrow", "chaudhry", "haddad", "halvorsen", "hovsepian", "hwang", "jankowski", "kamau", "kovacs", "mbatha", "moreau", "nguyen", "quintero", "salazar", "tesfaye", "watanabe"],
       "rank": 40,
       "top80": true
     },
@@ -778,7 +778,7 @@
       "incumbentNameList": true,
       "apps": ["degoog", "kiwix", "searxng"],
       "storyApps": ["searxng"],
-      "fleetHomes": ["adeniran", "brennan", "brennan-hollin", "brennan-merrow", "cardoso", "dekker", "haddad", "hovsepian", "hwang", "iyer", "kovacs", "moreau", "nguyen", "nwachukwu", "quintero", "tesfaye", "watanabe", "whitaker"],
+      "fleetHomes": ["adeniran", "cardoso", "dekker", "haddad", "hovsepian", "hwang", "iyer", "kovacs", "moreau", "nguyen", "nwachukwu", "quintero", "tesfaye", "watanabe", "whitaker"],
       "rank": 51,
       "top80": true
     },
@@ -873,7 +873,7 @@
       "incumbentNameList": false,
       "apps": ["activepieces", "flowise", "n8n"],
       "storyApps": ["activepieces", "n8n"],
-      "fleetHomes": ["adler", "jankowski", "kamau", "salazar", "tuala"],
+      "fleetHomes": ["adler", "brennan-hollin", "jankowski", "kamau", "salazar", "tuala"],
       "rank": 48,
       "top80": true
     },
@@ -892,7 +892,7 @@
       "incumbentNameList": true,
       "apps": ["mstream", "navidrome", "swingmusic"],
       "storyApps": ["mstream", "navidrome"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-hollin"],
       "rank": 39,
       "top80": true
     },
@@ -949,7 +949,7 @@
       "incumbentNameList": true,
       "apps": ["mstream", "navidrome", "swingmusic"],
       "storyApps": ["mstream", "navidrome"],
-      "fleetHomes": ["adeniran", "adler", "chaudhry", "hwang", "iyer", "jankowski", "nguyen", "rahimi", "tesfaye", "watanabe", "whitaker"],
+      "fleetHomes": ["adeniran", "adler", "brennan-merrow", "chaudhry", "hwang", "iyer", "jankowski", "nguyen", "rahimi", "tesfaye", "watanabe", "whitaker"],
       "rank": 47,
       "top80": true
     },
@@ -987,7 +987,7 @@
       "incumbentNameList": false,
       "apps": ["asciiflow", "drawio", "mermaid-live"],
       "storyApps": ["drawio"],
-      "fleetHomes": ["haddad"],
+      "fleetHomes": ["brennan-merrow", "haddad"],
       "rank": 52,
       "top80": true
     },
@@ -1101,7 +1101,7 @@
       "incumbentNameList": false,
       "apps": ["emby", "jellyfin", "jellyseerr"],
       "storyApps": ["jellyfin"],
-      "fleetHomes": ["banerjee", "brennan", "brennan-hollin", "brennan-merrow", "cardoso", "gill", "hovsepian", "kovacs", "mbatha", "nwachukwu", "petrov", "quintero", "rahimi", "salazar", "tuala"],
+      "fleetHomes": ["banerjee", "brennan", "cardoso", "gill", "hovsepian", "kovacs", "mbatha", "nwachukwu", "petrov", "quintero", "rahimi", "salazar", "tuala"],
       "rank": 57,
       "top80": true
     },
@@ -1234,7 +1234,7 @@
       "incumbentNameList": true,
       "apps": ["bentopdf", "stirling-pdf"],
       "storyApps": ["bentopdf", "stirling-pdf"],
-      "fleetHomes": ["adler", "brennan", "brennan-hollin", "cardoso", "halvorsen", "salazar", "whitaker"],
+      "fleetHomes": ["adler", "cardoso", "halvorsen", "salazar", "whitaker"],
       "rank": 65,
       "top80": true
     },
@@ -1291,7 +1291,7 @@
       "incumbentNameList": false,
       "apps": ["documenso", "docuseal"],
       "storyApps": ["documenso", "docuseal"],
-      "fleetHomes": ["jankowski"],
+      "fleetHomes": ["brennan", "jankowski"],
       "rank": 69,
       "top80": true
     },
@@ -1405,7 +1405,7 @@
       "incumbentNameList": false,
       "apps": ["bentopdf", "stirling-pdf"],
       "storyApps": ["bentopdf", "stirling-pdf"],
-      "fleetHomes": ["brennan-merrow"],
+      "fleetHomes": ["brennan"],
       "rank": 82,
       "top80": false
     },
@@ -1500,7 +1500,7 @@
       "incumbentNameList": true,
       "apps": ["blinko", "memos"],
       "storyApps": ["blinko", "memos"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-merrow"],
       "rank": 71,
       "top80": true
     },
@@ -1614,7 +1614,7 @@
       "incumbentNameList": false,
       "apps": ["karakeep", "linkwarden"],
       "storyApps": ["karakeep", "linkwarden"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan"],
       "rank": 80,
       "top80": true
     },
@@ -1633,7 +1633,7 @@
       "incumbentNameList": false,
       "apps": ["endurain", "sparkyfitness"],
       "storyApps": ["endurain", "sparkyfitness"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-hollin"],
       "rank": 83,
       "top80": false
     },
@@ -1747,7 +1747,7 @@
       "incumbentNameList": false,
       "apps": ["arkanum", "code-server"],
       "storyApps": ["code-server"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-hollin"],
       "rank": 96,
       "top80": false
     },
@@ -1823,7 +1823,7 @@
       "incumbentNameList": true,
       "apps": ["libretranslate", "lingva-translate"],
       "storyApps": ["libretranslate"],
-      "fleetHomes": ["adeniran", "brennan", "brennan-hollin", "brennan-merrow", "dekker", "haddad", "hovsepian", "hwang", "iyer", "kovacs", "moreau", "nguyen", "quintero", "tesfaye"],
+      "fleetHomes": ["adeniran", "brennan", "dekker", "haddad", "hovsepian", "hwang", "iyer", "kovacs", "moreau", "nguyen", "quintero", "tesfaye"],
       "rank": 92,
       "top80": false
     },
@@ -2146,7 +2146,7 @@
       "incumbentNameList": false,
       "apps": ["pairdrop"],
       "storyApps": ["pairdrop"],
-      "fleetHomes": ["nguyen"],
+      "fleetHomes": ["brennan-merrow", "nguyen"],
       "rank": 114,
       "top80": false
     },
@@ -2298,7 +2298,7 @@
       "incumbentNameList": false,
       "apps": ["penpot"],
       "storyApps": ["penpot"],
-      "fleetHomes": ["adler"],
+      "fleetHomes": ["adler", "brennan-hollin"],
       "rank": 134,
       "top80": false
     },
@@ -2374,7 +2374,7 @@
       "incumbentNameList": false,
       "apps": ["blockbench"],
       "storyApps": ["blockbench"],
-      "fleetHomes": ["moreau", "quintero"],
+      "fleetHomes": ["brennan-hollin", "moreau", "quintero"],
       "rank": 148,
       "top80": false
     },
@@ -2450,7 +2450,7 @@
       "incumbentNameList": false,
       "apps": ["wallos"],
       "storyApps": ["wallos"],
-      "fleetHomes": ["cardoso", "haddad", "petrov", "tuala"],
+      "fleetHomes": ["brennan-hollin", "cardoso", "haddad", "petrov", "tuala"],
       "rank": 161,
       "top80": false
     },
@@ -2545,7 +2545,7 @@
       "incumbentNameList": false,
       "apps": ["audiomass"],
       "storyApps": ["audiomass"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-merrow"],
       "rank": 171,
       "top80": false
     },
@@ -2697,7 +2697,7 @@
       "incumbentNameList": false,
       "apps": ["audiobookshelf"],
       "storyApps": ["audiobookshelf"],
-      "fleetHomes": ["cardoso", "dekker", "gill", "nwachukwu", "watanabe"],
+      "fleetHomes": ["brennan", "cardoso", "dekker", "gill", "nwachukwu", "watanabe"],
       "rank": 122,
       "top80": false
     },
@@ -2754,7 +2754,7 @@
       "incumbentNameList": false,
       "apps": ["duplicati"],
       "storyApps": ["duplicati"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-merrow"],
       "rank": 127,
       "top80": false
     },
@@ -2830,7 +2830,7 @@
       "incumbentNameList": false,
       "apps": ["lubelogger"],
       "storyApps": ["lubelogger"],
-      "fleetHomes": [],
+      "fleetHomes": ["brennan-hollin"],
       "rank": 132,
       "top80": false
     },
