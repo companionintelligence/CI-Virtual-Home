@@ -25,7 +25,8 @@ import { ROOM_BEATS } from './story/lib/structure.mts';
 import { castingDisagreements } from './story/lib/house.mts';
 import { applyDiff, diffBlocks, diffCatalog } from './story/lib/catalog-diff.mts';
 import { PHASED_RULES, isV3Story, v3Severity } from './story/lib/v3.mts';
-import { ARCHETYPES as CAST_ARCHETYPES } from './story/build-casting.mts';
+import { ARCHETYPES as CAST_ARCHETYPES, PREFS, ROOM_PREF } from './story/build-casting.mts';
+import { BLURB_WORDS, LABEL_MAX, categoryOf, checkCategories, loadCategories, repoRules, type CategoriesFile } from './story/lib/categories.mts';
 
 // `ctx` is the shipped content (the schema, claims, catalog and casting as they are). `fx` is the same with the casting and the
 // houses of the test world (test/fixtures/stories/world), so the exemplar and the negative cases stay valid however the shipped
@@ -430,12 +431,81 @@ test('catalog-apps.json: the first-party trio and the story-rich apps exist, avo
 // ---------------------------------------------------------------------------------------------------------------------
 // Story v3 foundation (decisions of 2026-10-19): fourteen archetypes, age rule 16, Kiwix removed
 // ---------------------------------------------------------------------------------------------------------------------
-test('the fourteen archetypes: the original six, then the eight of story v3 in the owner\'s order, in types.ts, the schema, personas.json and the casting build', () => {
+test('the twenty-six archetypes: the original six, the eight of story v3 in the owner\'s order, then the twelve of the persona expansion, in types.ts, the schema, personas.json and the casting build', () => {
   const eight = ['tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator'];
-  assert.deepEqual([...T.ARCHETYPES], ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host', ...eight]);
+  const twelve = ['money-keeper', 'housemate', 'carer', 'community-lead', 'researcher', 'seller', 'translator', 'archivist', 'traveller', 'athlete', 'collector', 'shift-worker'];
+  assert.deepEqual([...T.ARCHETYPES], ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host', ...eight, ...twelve]);
   assert.deepEqual([...CAST_ARCHETYPES], [...T.ARCHETYPES], 'scripts/story/build-casting.mts lists the same archetypes as types.ts');
   assert.deepEqual(Object.keys(ctx.personas.archetypes), [...T.ARCHETYPES], 'personas.json lists them in the same order');
-  for (const k of eight) assert.ok(ctx.personas.archetypes[k as T.Archetype].apps.every((id) => ctx.apps.get(id)!.storySafe !== 'avoid'), `${k}: no avoid app in the pool`);
+  for (const k of [...eight, ...twelve]) assert.ok(ctx.personas.archetypes[k as T.Archetype].apps.every((id) => ctx.apps.get(id)!.storySafe !== 'avoid'), `${k}: no avoid app in the pool`);
+});
+
+test('the casting build knows every archetype: anchor and room preferences, and the twelve new ones follow their personas.json row', () => {
+  for (const a of T.ARCHETYPES) {
+    const def = ctx.personas.archetypes[a];
+    assert.ok(PREFS[a]?.length > 0, `${a}: anchor preferences`);
+    assert.ok(ROOM_PREF[a]?.length > 0, `${a}: room preferences`);
+    // an anchor the casting walks is an item role (roles.json items): never a zone, the front door, the Core or "room"
+    for (const r of PREFS[a]) assert.ok(r in ctx.roles.items || r === 'garden', `${a}: ${r} is an item role`);
+  }
+  for (const a of T.ARCHETYPES.slice(14)) {
+    const def = ctx.personas.archetypes[a];
+    assert.deepEqual(ROOM_PREF[a], [...def.rooms, ...def.fallbackRooms], `${a}: the casting's room order is the row's rooms, then its fallback rooms`);
+    const anchors = [...def.anchorRoles, ...def.fallbackAnchorRoles];
+    for (const r of PREFS[a]) assert.ok(anchors.includes(r as T.RoleId), `${a}: ${r} is one of the row's anchor roles`);
+    assert.deepEqual(PREFS[a], def.anchorRoles.filter((r) => r in ctx.roles.items), `${a}: the casting's anchors are the row's item roles, in its order`);
+  }
+});
+
+// ---------------------------------------------------------------------------------------------------------------------
+// The front page's categories (content/story/categories.json, scripts/story/lib/categories.mts)
+// ---------------------------------------------------------------------------------------------------------------------
+const catRules = repoRules(ROOT);
+const catFile = (): CategoriesFile => structuredClone(loadCategories(ROOT));
+const catProblems = (f: unknown): string => checkCategories(f, catRules).join('\n');
+
+test('categories.json: the shipped file passes, every archetype is in exactly one category, ids and labels are unique, labels are short sentence case without a dash', () => {
+  const f = loadCategories(ROOT);
+  assert.deepEqual(checkCategories(f, catRules), []);
+  const held = f.categories.flatMap((c) => c.personas);
+  assert.deepEqual([...held].sort(), [...T.ARCHETYPES].sort(), 'each archetype once');
+  for (const a of T.ARCHETYPES) assert.equal(f.categories.filter((c) => c.personas.includes(a)).length, 1, `${a}: in exactly one category`);
+  assert.equal(new Set(f.categories.map((c) => c.id)).size, f.categories.length, 'ids are unique');
+  assert.equal(new Set(f.categories.map((c) => c.label.toLowerCase())).size, f.categories.length, 'labels are unique');
+  for (const c of f.categories) {
+    assert.ok(c.label.length <= LABEL_MAX, `${c.id}: label at most ${LABEL_MAX} characters`);
+    assert.match(c.label, /^\p{Lu}[^\p{Lu}]*$/u, `${c.id}: label is sentence case`);
+    assert.doesNotMatch(`${c.label} ${c.blurb}`, /[\u2013\u2014]|\s-\s|!/, `${c.id}: no dash and no exclamation mark`);
+    assert.ok(c.blurb.split(/\s+/).length <= BLURB_WORDS && c.blurb.endsWith('.'), `${c.id}: blurb of at most ${BLURB_WORDS} words that ends with a full stop`);
+    assert.ok(!(T.ARCHETYPES as readonly string[]).includes(c.id), `${c.id}: a category id is not an archetype id`);
+  }
+  assert.deepEqual(f.typeFilters.map((t) => t.id), ['home', 'apartment', 'office']);
+  assert.equal(categoryOf(f, 'organiser')!.id, 'household');
+  assert.equal(categoryOf(f, 'host')!.id, 'care');
+});
+
+test('categories.json: the checker names each kind of mistake', () => {
+  const bad = (mutate: (f: CategoriesFile) => void): string => { const f = catFile(); mutate(f); return catProblems(f); };
+  assert.match(bad((f) => { f.categories[0].personas.pop(); }), /translator is in no category/, 'an archetype left out');
+  assert.match(bad((f) => { f.categories[1].personas.push('marketer'); }), /marketer is also in work-from-home/, 'an archetype in two');
+  assert.match(bad((f) => { f.categories[0].personas.push('astronaut'); }), /astronaut is not an archetype/, 'an unknown archetype');
+  assert.match(bad((f) => { f.categories[0].personas.push('marketer'); }), /marketer is listed twice/, 'listed twice in one category');
+  assert.match(bad((f) => { f.categories[1].id = 'work-from-home'; }), /the id is used twice/, 'a duplicate id');
+  assert.match(bad((f) => { f.categories[1].id = 'organiser'; }), /also an archetype id/, 'an id that is an archetype');
+  assert.match(bad((f) => { f.categories[1].label = 'Work from home'; }), /used twice/, 'a duplicate label');
+  assert.match(bad((f) => { f.categories[1].label = 'Run a small business'; }), /longer than 18 characters/, 'a long label');
+  assert.match(bad((f) => { f.categories[1].label = 'Run a Business'; }), /not sentence case/, 'a title case label');
+  assert.match(bad((f) => { f.categories[1].label = 'run a business'; }), /not sentence case/, 'a lower case label');
+  assert.match(bad((f) => { f.categories[1].label = 'Run \u2013 a business'; }), /has a dash/, 'an en dash');
+  assert.match(bad((f) => { f.categories[1].label = 'Run a business!'; }), /exclamation/, 'an exclamation mark');
+  assert.match(bad((f) => { f.categories[1].blurb = 'Shops, trades and stalls \u2014 run from a garage.'; }), /blurb has a dash/, 'an em dash in a blurb');
+  assert.match(bad((f) => { f.categories[1].blurb = 'Shops, trades and stalls'; }), /full stop/, 'a blurb with no full stop');
+  assert.match(bad((f) => { f.categories[1].blurb = Array(21).fill('word').join(' ') + '.'; }), /21 words \(at most 20\)/, 'a long blurb');
+  assert.match(bad((f) => { f.categories[1].blurb = 'Seamless shops, trades and stalls.'; }), /trips the claims rule/, 'a banned phrase');
+  assert.match(bad((f) => { f.typeFilters.reverse(); }), /home, apartment, office, in that order/, 'type filters out of order');
+  assert.match(bad((f) => { f.typeFilters.pop(); }), /home, apartment, office, in that order/, 'a missing type filter');
+  assert.match(catProblems({ version: 1, categories: [], typeFilters: [] }), /fewer than 1/, 'the schema is checked first');
+  assert.match(catProblems({ ...catFile(), extra: 1 }), /unknown property extra/, 'an unknown key');
 });
 
 test('catalog-apps.json: chat and agent apps carry ai "chat" (the age rule), non-chat AI tools do not, and Kiwix is avoid with a claims caveat', () => {

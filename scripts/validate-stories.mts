@@ -20,6 +20,7 @@ import { loadContext, ROOT } from './story/lib/context.mts';
 import { validateStory } from './story/lib/validate.mts';
 import { checkSchema } from './story/lib/schema-lite.mts';
 import { fleetMetrics, renderFleet, type FleetResult } from './story/lib/fleet.mts';
+import { checkCategories, loadCategories, repoRules } from './story/lib/categories.mts';
 import type { Finding, Report } from './story/lib/report.mts';
 import type { Story } from '../assets/story/types.ts';
 
@@ -81,10 +82,19 @@ if (FLEET) {
   fleet = fleetMetrics(stories, ctx, { complete: COMPLETE });
 }
 
+// ---- the front page's categories (content/story/categories.json): every archetype in exactly one, labels and blurbs in the house voice.
+// It is not a family, so it is checked on every run; a world (fixtures) is the family's, the categories are the repository's own.
+function categoryProblems(): string[] {
+  if (world) return [];
+  try { return checkCategories(loadCategories(ROOT), repoRules(ROOT)); }
+  catch (e) { return [`content/story/categories.json could not be read: ${(e as Error).message}`]; }
+}
+
 // ---- totals
 const count = (k: 'errors' | 'review' | 'warn' | 'allowed'): number => results.reduce((n, r) => n + (r.report ? r.report[k].length : 0), 0);
 const problems: string[] = [
   ...ctx.reviewedProblems,
+  ...categoryProblems(),
   ...notFound.map((f) => `no such family file: ${rel(f)}`),
   ...results.filter((r) => r.parseError).map((r) => `${rel(r.file)} is not valid JSON: ${r.parseError}`),
   ...(fleet ? fleet.findings.filter((f) => f.severity === 'error').map((f) => `${f.rule} ${f.message}`) : []),

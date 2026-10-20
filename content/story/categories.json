@@ -1,0 +1,59 @@
+{
+  "$comment": "The front page's categories: the chips a visitor filters the families by, and which archetypes (content/story/personas.json) each one holds. Authored. An archetype is in exactly one category; checked by scripts/story/lib/categories.mts (story:validate, scripts/test-categories.mts). A chip with no current family is not drawn (scripts/portal-front.mts). The category id is also the filter value (?persona=), so it never equals an archetype id. typeFilters are the second filter, the kind of place; no persona is tied to one. Labels are sentence case, at most 18 characters; blurbs are at most 20 words and end with a full stop.",
+  "version": 1,
+  "categories": [
+    {
+      "id": "work-from-home",
+      "label": "Work from home",
+      "blurb": "Desk work done from a spare room or kitchen table: briefs, clients, sources and deadlines.",
+      "personas": ["marketer", "journalist", "lawyer", "translator"]
+    },
+    {
+      "id": "run-a-business",
+      "label": "Run a business",
+      "blurb": "Shops, trades and stalls run from a garage, a back room or a small office.",
+      "personas": ["business-owner", "contractor", "seller"]
+    },
+    {
+      "id": "code",
+      "label": "Code and tinker",
+      "blurb": "Writing software and running the house network, with the local model on the Core.",
+      "personas": ["builder", "tech-family"]
+    },
+    {
+      "id": "study",
+      "label": "Study and research",
+      "blurb": "Homework, lesson plans, papers and sources, for pupils, teachers and anyone chasing a question.",
+      "personas": ["learner", "educator", "researcher"]
+    },
+    {
+      "id": "make",
+      "label": "Make and keep",
+      "blurb": "Painting, design, music and photographs, and the family archive that outlives the project.",
+      "personas": ["maker", "creative", "archivist"]
+    },
+    {
+      "id": "play",
+      "label": "Play and explore",
+      "blurb": "Games, collections, training logs and trips: the hours kept for fun, and the record of them.",
+      "personas": ["gamer", "collector", "athlete", "traveller"]
+    },
+    {
+      "id": "household",
+      "label": "Run the household",
+      "blurb": "Paperwork, shared costs and a week that different people live on different clocks.",
+      "personas": ["organiser", "money-keeper", "housemate", "shift-worker"]
+    },
+    {
+      "id": "care",
+      "label": "Host and care",
+      "blurb": "Feeding the house, looking after a relative, and keeping a club or committee going.",
+      "personas": ["host", "carer", "community-lead"]
+    }
+  ],
+  "typeFilters": [
+    { "id": "home", "label": "Homes" },
+    { "id": "apartment", "label": "Apartments" },
+    { "id": "office", "label": "Offices" }
+  ]
+}

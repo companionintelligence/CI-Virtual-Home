@@ -50,8 +50,8 @@ the portal's gallery, `./` (Cloudflare Pages answers `./index.html` with a 308);
 | `pnpm run validate` | All 30 specs against the schema, the prop catalog and the registry, then every `scripts/validate/*.mts` plugin. `--shots` adds the headless camera-path QA; `--layout` the layout lints. |
 | `pnpm run test` | `scripts/test-floorplan-graph.mts` and `scripts/test-stories.mts` under `node --test`: the floor-plan graph, mitres, and the wall compiler over every spec; the story validator against its good and bad fixtures. Needs `build`. |
 | `pnpm run check` | **The gate** — every check below, in order (`pnpm run typecheck` is separate). `--house a,b`, `--jobs N`, `--res`, `--update-goldens`, `--no-perf`. |
-| `pnpm run check:quick` | assets + specs + shots, and the 31 test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site, the story validator, bake, voice locks and film …): the fast loop while editing. |
-| `pnpm run test:node` | Only those 31 quick tests: pure Node, no browser, no GPU (a few minutes). CI runs it. |
+| `pnpm run check:quick` | assets + specs + shots, and the test scripts marked `@check-house quick` (floor-plan graph, spec types, kit rules, QA v2's fault injection, composer, site, the story validator, bake, voice locks and film …): the fast loop while editing. |
+| `pnpm run test:node` | Only those quick tests (every `scripts/test-*.mts` marked `@check-house quick`, found by glob, so the number moves: the run lists them): pure Node, no browser, no GPU (a few minutes). CI runs it. |
 | `pnpm run shots` | Render product shots to `video/houses/` (`--house`, `--shot`, `--res 1080`, `--aspect 16:9`, `--poster-only`, `--qa-only`, `--jobs`). |
 | `pnpm run goldens` / `goldens:update` | Compare 150 frames with the committed baselines / re-bless them. |
 | `pnpm run frame-hash` | Two fresh browser contexts must render the same frames. |
@@ -87,6 +87,7 @@ the portal's gallery, `./` (Cloudflare Pages answers `./index.html` with a 308);
 | `pnpm run portal:og` | Draw the families' link-preview images → `portal/og/<slug>.jpg`, with `portal/og/manifest.json` (Chromium's 2D canvas, no GPU; `--only`, `--families`). Re-run it when a family's text or its preview picture changes: a stale one is not shipped (that page uses its home's own picture) and is an error with `--strict-families`. Commit the output. |
 | `pnpm run portal:build` | Assemble the site in `dist/` (only what it loads, the specs redacted: no author, no source) and check its links and that nothing credits a builder ([Credits](#credits-none-on-the-site)). Needs `build`. `--families <dir>` reads other family files; `--strict-families` makes a stale family an error (see [The family stories](#the-family-stories)); `--stale-report` lists every reason. |
 | `pnpm run portal:preview` | `portal:build`, then serve `dist/` at <http://127.0.0.1:8081/ci-virtual-home/> (`--port`). `-- --tailscale` also listens on this machine's Tailscale address (the one `tailscale ip -4` prints), so a phone or laptop on the same tailnet opens `http://<that address>:<port>/ci-virtual-home/` (the command prints it and the MagicDNS name); never on `0.0.0.0`, so the local network does not see it. `-- --host <ipv4>` listens on that one address instead. The preview stops with Ctrl-C. |
+| `pnpm run story:copy -- <dist>` | The copy lint over a built site (`scripts/story/check-copy.mts`, rules in `scripts/story/lib/site-copy.mts`): every word a visitor reads, held to `content/story/claims.json`. It reads the front page, each home's page, each family's page, the 404, the player's HTML, every tour's data (`story/<slug>.json`), the cards, the ad plan (`content/story/ads.json`) and the strings of the player's source (`assets/viewer.ts`, `assets/story/**`, found with the TypeScript parser). Banned phrases at their severity (`error` fails; `review` fails unless the finding is in `SITE_REVIEWED`; `warn` prints, with the extra rules of `scripts/story/lib/extra-bans.mts`), headings in sentence case, the disclosures each kind of page owes (`DISCLOSURES` in `site-copy.mts`: a disclosure that `claims.json` owes and nothing prints yet is listed as pending; `--strict` or `CI_COPY_STRICT=1` makes it an error). A home's display name is the portal's own words and is not read by the two internal-id rules. CI runs it after `portal:build`; `portal:test`'s `gallery` and `hooks` legs call it too. `scripts/test-site-copy.mts` (quick) holds the lint itself. |
 | `pnpm run portal:test` | Drive the built site under `/ci-virtual-home/` in Chromium: gallery, player, fly, share, the editor (`--house`, `--shots`, `--only <legs>`), the campaign's tags (the `campaign` leg), the family pages and the narrated tour (the `hooks` leg, `scripts/story/portal-tests/`); and in WebKit when Playwright's build for the pinned version is installed (`pnpm exec playwright install webkit`; `--webkit` requires it). |
 | `pnpm run test:campaign` | `portal/campaign.js` run in a tiny DOM stub, and the pages that load it (no browser): the tags captured, only the listed ones, the right links rewritten and no others, no double append, storage blocked, links added later, an organic visit. A quick Node test. |
 | `pnpm run ui:test` | Drive the editor end to end (layout at four sizes in both schemes, contrast, the top bar, the checks, the timeline, the tree, the catalog, Compare, stills at 4K, a recorded MP4 checked with ffprobe and by PSNR) — `--only <sections>`, `--shots <dir>`. Needs a GPU and ffmpeg. |
@@ -338,13 +339,24 @@ links above, a `<script>` without `data-cfasync="false"`, a second `<h1>` or inv
 `pnpm run portal:thumbs --house <id>` on a GPU and commit the new thumbnail and preview with the change.
 `portal:test` is the check to run before pushing portal work.
 
+**What CI runs of it, and what stays by hand.** `ci.yml` runs the copy lint over the built `dist/` and, without blocking yet, `portal:test --only gallery,pages,previews,caching,failures,campaign,hooks,webkit` on
+Chromium and software GL (and on WebKit when Playwright's build is installed; there is no Firefox leg). The player, motion and editor legs need a GPU and stay with you: run `pnpm run portal:test` on one
+before a push that touches them. Paid traffic lands in engines no leg covers, so before each campaign someone records a pass on real devices, and writes the result in the pull request:
+
+| Device or app | Open | Pass when |
+|---|---|---|
+| iOS Safari | the front page, a family page, `family/<slug>` then "Take the tour" | the page reads, the tour starts or ends on the failure card with a way back, the links to ci.computer open |
+| Instagram, Facebook and TikTok in-app browsers (iOS and Android) | a family page from an ad link with `utm_source` set | the page reads without script, the tour starts or says why not, the campaign tags ride on the Core and Download links |
+| Android Chrome | the same three | the same, and the seek bar and the tour card are 44 px targets |
+| A desktop browser with WebGL off | `room-creator?mode=view&house=aurora&family=brennan` | the failure card, with "Read the family's story" |
+
 The site is public to anyone with its address, and it serves what a browser needs to draw the homes: the
 compiled engine (`assets/**/*.js`), three.js, the fonts and the 30 specs.
 
 ### The family stories
 
 <a id="the-family-stories"></a>Every one of the thirty homes is lived in by a **fictional family**: two to six people, each with an archetype, the job they
-do on the family's one Companion Core (organiser, builder, gamer, learner, maker, host, tech-family, business-owner, creative, contractor, marketer, lawyer, journalist, educator). A room tells that member's story: what they
+do on the family's one Companion Core (organiser, builder, gamer, learner, maker, host, tech-family, business-owner, creative, contractor, marketer, lawyer, journalist, educator, and twelve more; the list and the eight front-page categories that group them are in [`reference/story/personas/index.md`](reference/story/personas/index.md)). A room tells that member's story: what they
 do there, which Companion Hub store app does it and which cloud service it replaces. The tour is the argument for uncloud: the same life,
 on your own hardware. The contract for the writers, the validator and the film is
 [`reference/story/personas.md`](reference/story/personas.md); the label is "Fictional family. Real software." and the campaign's rules
@@ -442,9 +454,20 @@ on your own hardware. The contract for the writers, the validator and the film i
   family cards, a family's way into the tour, a home's page), so a campaign survives front page → family page → tour. Every page loads it with
   `<script src="./portal/campaign.js" defer data-cfasync="false"></script>` (`../portal/` in `homes/` and `family/`; the 404, served at any depth, by the site's
   absolute address), before `gallery.js`; `portal:build` adds `?v=<hash>` and fails when a page lacks it. With storage blocked it still works from the
-  address. `window.CICampaign.decorate(url)` is there for a script that sets an address itself. The player (`assets/viewer.ts` `url()`) rebuilds its query from
-  `mode`, `house`, `family`, `shot`, `t` and `tod` and so drops these tags on its first address sync; the live `https://ci.computer/core` redirect may drop the query
+  address. `window.CICampaign.decorate(url)` is there for a script that sets an address itself. The player (`assets/viewer.ts` `url()`) writes its own parameters
+  (`OWN_PARAMS`, the same list as `assets/story/url.ts`) and keeps every other one, a campaign's tags included; the live `https://ci.computer/core` redirect may drop the query
   (see the report).
+- **The player and the Buy link: campaign tags and link rules** (`portal/campaign.js`, `portal/campaign.json`). The player is `room-creator.html`, which is main's and
+  is not edited; `portal:build` adds the same `campaign.js` tag (hashed, `defer`, `data-cfasync="false"`, ahead of the module that writes the address) to the built
+  page's head, so the end card, the About panel and the header, which the player draws after load, are tagged as they arrive and when clicked (step 7 checks the tag;
+  `scripts/story/portal-tests/campaign-player.mts` drives it; `scripts/test-campaign.mts` has the stub). The same build step shows only the message under the `<noscript>`
+  when JavaScript is off. **Link rules** (`portal/campaign.json`, shipped EMPTY) are the mechanism for the owner's decision on where Buy Companion Core should go (the live
+  `https://ci.computer/core` redirect drops the query): `{"version": 1, "rules": [{"match": "https://ci.computer/core", "to": "https://...", "from": "YYYY-MM-DD", "until": "YYYY-MM-DD"}]}`.
+  `campaign.js` reads it with one same-origin fetch and, between `from` and `until` (UTC, both days included), maps a link to `match` (only `https://ci.computer`, `/core` or
+  `/download`; never the docs, privacy, terms or hub links) to `to`, keeping the link's own query and fragment and adding the visitor's tags when `to` is on ci.computer
+  (a campaign's click ids are not sent to another host). The built pages never change, and a failed or missing file changes nothing. `portal:build` copies the file and holds it to
+  `CICampaign.validate()`: an expired rule, one longer than 180 days, two overlapping rules on one address, an unknown key or a bad address fail the build, so a stale rule cannot
+  live on. `pnpm run test:campaign` proves a rule applies, expires and leaves the docs, privacy and terms links alone.
 <!-- end front page -->
 
 **The first preview deploy must confirm** (not verifiable from here): that Pages serves `family/<slug>.html` at `/family/<slug>` without an extension, as it does
@@ -635,12 +658,13 @@ How to take a number that means something:
    report-only, it never fails the gate.
 
 Baselines belong to a renderer profile (GPU + Chromium build), which is why `playwright` is pinned exactly.
+The pin is a pre-release build (`1.64.0-alpha-…` in `package.json`) because that is the Chromium the baselines were blessed on. If the registry prunes it, every `pnpm install` fails: the way out is to move the pin to the nearest release on the profile machine and re-bless once, on purpose (`PROFILE.json` records the build), never to loosen the range. The CI browser job installs Chromium for it with `pnpm exec playwright install --with-deps chromium` and is allowed to fail until that is proven on a runner.
 They are re-blessed **only on purpose** — `pnpm run goldens:update` after a change meant to alter the look,
 reviewed frame by frame, committed with that change. Failing runs leave `*.actual/expected/diff.png` in
 `test/diff/`.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs what needs no GPU: install, build, typecheck,
-spec validation, the floor-plan-graph tests, `pnpm run test:node` (the 31 quick test scripts) and the portal build. 150 frames through a software rasteriser would cost the better
+spec validation, the floor-plan-graph tests, `pnpm run test:node` (the quick test scripts), the story gates (every family against the validator, the cast, the services registry, the bake locks), the portal build and the copy lint over what it built (`pnpm run story:copy -- dist`). 150 frames through a software rasteriser would cost the better
 part of an hour of runner time per push, so the render gate runs locally before you push, as it did in
 CI-Common.
 

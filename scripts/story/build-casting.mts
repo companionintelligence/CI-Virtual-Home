@@ -29,11 +29,14 @@ const S = (...p: string[]): string => path.join(ROOT, 'content', 'story', ...p);
 const readJson = (p: string): any => JSON.parse(fs.readFileSync(p, 'utf8'));
 
 // ---- the plan ---------------------------------------------------------------------------------------------------------
-// The fourteen archetypes of content/story/personas.json (the first six are the original cast; the other eight are story v3, in the owner's order).
+// The twenty-six archetypes of content/story/personas.json (the first six are the original cast; the next eight are story v3, in the owner's order;
+// the last twelve are the persona expansion of reference/story/personas/index.md). A test keeps this list equal to assets/story/types.ts.
 export type Archetype = 'organiser' | 'builder' | 'gamer' | 'learner' | 'maker' | 'host'
-  | 'tech-family' | 'business-owner' | 'creative' | 'contractor' | 'marketer' | 'lawyer' | 'journalist' | 'educator';
+  | 'tech-family' | 'business-owner' | 'creative' | 'contractor' | 'marketer' | 'lawyer' | 'journalist' | 'educator'
+  | 'money-keeper' | 'housemate' | 'carer' | 'community-lead' | 'researcher' | 'seller' | 'translator' | 'archivist' | 'traveller' | 'athlete' | 'collector' | 'shift-worker';
 export const ARCHETYPES: Archetype[] = ['organiser', 'builder', 'gamer', 'learner', 'maker', 'host',
-  'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator'];
+  'tech-family', 'business-owner', 'creative', 'contractor', 'marketer', 'lawyer', 'journalist', 'educator',
+  'money-keeper', 'housemate', 'carer', 'community-lead', 'researcher', 'seller', 'translator', 'archivist', 'traveller', 'athlete', 'collector', 'shift-worker'];
 export interface PlanMember {
   id: string; name: string; age: number; role: string; archetype: Archetype | null; work?: string;
   room: string; sleepsIn: string | null; roomLabel?: string; companion?: string;
@@ -63,10 +66,23 @@ export const PREFS: Record<Archetype, string[]> = {
   lawyer: ['desk', 'bookshelf', 'dining-table'],
   journalist: ['desk', 'bookshelf', 'dining-table'],
   educator: ['dining-table', 'desk', 'bookshelf', 'kitchen-island'],
+  // the persona expansion (reference/story/personas/<id>.md): the persona row's item roles; `pool` and `front-door` are not furniture and `room` is not an item
+  'money-keeper': ['dining-table', 'desk', 'kitchen-island', 'bookshelf'],
+  housemate: ['fridge', 'kitchen-island', 'dining-table', 'couch', 'tv'],
+  carer: ['dining-table', 'desk', 'counter', 'fridge', 'bookshelf'],
+  'community-lead': ['dining-table', 'desk', 'bookshelf', 'counter', 'fridge'],
+  researcher: ['desk', 'bookshelf', 'dining-table'],
+  seller: ['dining-table', 'desk', 'bookshelf'],
+  translator: ['desk', 'bookshelf', 'dining-table'],
+  archivist: ['dining-table', 'bookshelf', 'desk', 'music'],
+  traveller: ['dining-table', 'bookshelf', 'desk'],
+  athlete: ['bicycle', 'bed'],
+  collector: ['bookshelf', 'music', 'tv'],
+  'shift-worker': ['counter', 'fridge', 'dining-table', 'couch'],
   host: ['kitchen-island', 'fridge', 'range', 'garden', 'couch', 'tv'],
 };
 /** the room role a member's chapter is set in, most fitting first, per archetype */
-const ROOM_PREF: Record<Archetype, string[]> = {
+export const ROOM_PREF: Record<Archetype, string[]> = {
   organiser: ['office', 'dining', 'living', 'bedroom', 'kitchen'],
   builder: ['office', 'bedroom', 'living', 'dining', 'garage', 'kitchen'],
   gamer: ['living', 'kids', 'bedroom'],
@@ -80,6 +96,19 @@ const ROOM_PREF: Record<Archetype, string[]> = {
   lawyer: ['office', 'dining', 'living', 'bedroom', 'kitchen'],
   journalist: ['office', 'dining', 'kitchen', 'living', 'bedroom'],
   educator: ['dining', 'office', 'living', 'kitchen', 'kids', 'bedroom'],
+  // the persona expansion: the persona row's rooms, then its fallback rooms
+  'money-keeper': ['dining', 'office', 'kitchen', 'living', 'bedroom', 'laundry'],
+  housemate: ['kitchen', 'living', 'dining', 'entry', 'laundry', 'bedroom'],
+  carer: ['dining', 'office', 'kitchen', 'living', 'entry'],
+  'community-lead': ['dining', 'kitchen', 'office', 'living', 'entry', 'bedroom'],
+  researcher: ['office', 'dining', 'living', 'bedroom', 'kitchen'],
+  seller: ['dining', 'office', 'garage', 'kitchen', 'living', 'bedroom', 'entry'],
+  translator: ['office', 'bedroom', 'dining', 'living', 'kitchen'],
+  archivist: ['dining', 'living', 'office', 'bedroom', 'kitchen', 'garage'],
+  traveller: ['dining', 'living', 'office', 'bedroom', 'kitchen', 'entry'],
+  athlete: ['garage', 'entry', 'bedroom', 'living', 'patio', 'garden', 'laundry', 'dining'],
+  collector: ['living', 'office', 'bedroom', 'dining', 'kids'],
+  'shift-worker': ['kitchen', 'dining', 'entry', 'living', 'laundry', 'bedroom', 'patio', 'garden'],
   host: ['kitchen', 'living', 'dining', 'garden'],
 };
 /** furniture the specs place that roles.json does not list under the role it plainly serves (reported, never used in a chain) */
