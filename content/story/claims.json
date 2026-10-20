@@ -669,6 +669,14 @@
       "status": "ok-verbatim"
     },
     {
+      "id": "rent-line",
+      "text": "Stop renting your intelligence.",
+      "source": "lander spec decision D1 B (proposed); the exact line is not in CAMPAIGN.md or COPY.md",
+      "tag": "E",
+      "status": "hold",
+      "note": "The lander's H1 and the ad kit's last line (content/story/lander.json messages). The owner delegated D1 to the audit, which recommended this line. It stays on hold until the owner sets status to ok-verbatim and names its source; the lander builds with a warning meanwhile, and a strict (push to main) build fails while it is on hold."
+    },
+    {
       "id": "signoff",
       "text": "UnCloud your life.",
       "source": "CAMPAIGN.md 1",
@@ -1160,7 +1168,8 @@
       "where": [
         "family page footer",
         "film end card",
-        "About page"
+        "About page",
+        "landing page footer (the page quotes a written scene)"
       ],
       "required": true,
       "notes": "Sheet rule 3: no simulated capability. An agent line on screen is scripted, not captured."
@@ -1219,7 +1228,8 @@
       "text": "The Companion Core is drawn as a stylised illustration, not a photograph.",
       "where": [
         "family page footer",
-        "film end card"
+        "film end card",
+        "landing page, beside the Core picture"
       ],
       "required": true
     },
@@ -1274,7 +1284,8 @@
       "id": "third-party-apps",
       "text": "The other apps in these stories are made by other people, most of them open-source projects. Companion Intelligence did not make them.",
       "where": [
-        "credits page"
+        "credits page",
+        "landing page footer (the page names apps)"
       ],
       "required": true,
       "notes": "Do not call them \"our apps\". Sixteen apps carry the companion-intelligence category; the rest are community packages. Not all of them are open source: the catalog says Obsidian is not, n8n is fair-code, and Joplin Server, Invoice Ninja, Akaunting and monetr carry licences with limits. The earlier text (\"are open-source projects by other people\") was false for those."

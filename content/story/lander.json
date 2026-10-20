@@ -1,0 +1,26 @@
+{
+  "$comment": "The front page's plan. scripts/story/lib/lander.mts reads it, portal:build writes the page from it, scripts/test-lander.mts checks it. Authored. Every family, beat, service and app named here must exist and be current: a miss falls back with a log line, and fails the build in strict mode (a push to main). It holds no copy: every word of the page is claims.json's, a family file's or scripts/portal-front.mts's.",
+  "version": 1,
+  "hero": { "slug": "brennan", "house": "seraphine" },
+  "messages": [ { "key": "rent", "claim": "rent-line" } ],
+  "proof": {
+    "candidates": [
+      { "slug": "brennan", "beat": "suite-ask" },
+      { "slug": "brennan", "beat": "office-letter" },
+      { "slug": "brennan", "beat": "steve-photos" }
+    ]
+  },
+  "hold": [
+    "chatgpt|open-webui",
+    "cursor|code-server",
+    "ring|frigate",
+    "backblaze|duplicati",
+    "spotify|navidrome",
+    "plex|jellyfin",
+    "geforce-now|steam-headless"
+  ],
+  "primary": { "google-drive": "nextcloud" },
+  "strip": { "size": 10, "minFamilies": 2, "maxPerApp": 1, "maxPerRegistryCategory": 2, "maxPerBrand": 2, "pin": [] },
+  "featured": { "count": 6, "override": null },
+  "types": { "apartment": ["city-one-bed", "corner-penthouse", "garden-flat", "studio-loft", "two-bed-flat", "walkup-duplex"] }
+}

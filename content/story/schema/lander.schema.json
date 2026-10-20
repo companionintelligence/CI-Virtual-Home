@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://homes.ci.computer/schema/lander.schema.json",
+  "$comment": "The shape of content/story/lander.json. Checked by scripts/story/lib/schema-lite.mts, so only the keywords it supports are used (it cannot describe an open map, so `primary` and `types` are checked in code). What a schema cannot say (a family, beat, service or app that exists and is current, a hold entry that names a real pair, a type that names real houses) is scripts/story/lib/lander.mts validatePlan.",
+  "title": "The front page's plan",
+  "type": "object",
+  "required": ["version", "hero", "messages", "proof", "hold", "primary", "strip", "featured", "types"],
+  "additionalProperties": false,
+  "properties": {
+    "$comment": { "type": "string" },
+    "version": { "const": 1 },
+    "hero": {
+      "type": "object",
+      "required": ["slug", "house"],
+      "additionalProperties": false,
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z]+(-[a-z]+){0,2}$", "description": "The family whose tour the hero's one action starts." },
+        "house": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "The home that family lives in (the picture)." }
+      }
+    },
+    "messages": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["key", "claim"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string", "pattern": "^[a-z]+$" },
+          "claim": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "An id of claims.json allowedClaims. The first message is the H1." }
+        }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "required": ["candidates"],
+      "additionalProperties": false,
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "required": ["slug", "beat"],
+            "additionalProperties": false,
+            "properties": {
+              "slug": { "type": "string", "pattern": "^[a-z]+(-[a-z]+){0,2}$" },
+              "beat": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" }
+            }
+          }
+        }
+      }
+    },
+    "hold": {
+      "type": "array",
+      "maxItems": 24,
+      "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*\\|[a-z0-9]+(-[a-z0-9]+)*$", "description": "service|app, a pair not cleared for the lander." }
+    },
+    "primary": { "type": "object", "description": "service id -> the app id its chip shows when the stories use several." },
+    "strip": {
+      "type": "object",
+      "required": ["size", "minFamilies", "maxPerApp", "maxPerRegistryCategory", "maxPerBrand", "pin"],
+      "additionalProperties": false,
+      "properties": {
+        "size": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "minFamilies": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "maxPerApp": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "maxPerRegistryCategory": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "maxPerBrand": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "pin": { "type": "array", "maxItems": 12, "items": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" } }
+      }
+    },
+    "featured": {
+      "type": "object",
+      "required": ["count", "override"],
+      "additionalProperties": false,
+      "properties": {
+        "count": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "override": { "description": "null (the build picks) or an array of family slugs, which must pass the same gate." }
+      }
+    },
+    "types": { "type": "object", "description": "place type (apartment, office) -> the house ids of that type; every other house is a home." }
+  }
+}
