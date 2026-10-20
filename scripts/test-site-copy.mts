@@ -89,6 +89,18 @@ test('a banned phrase is caught in a home page, a family page, the 404, the play
   }
 });
 
+test('a home\'s own note is read (it is ordinary copy there); a family page\'s note names the home and is not', () => {
+  const s = makeSite();
+  try {
+    s.write('homes/newcrest.html', s.read('homes/newcrest.html').replace('</main>', '<p class="home-note">Built live from one spec file \u2014 change the hour!</p></main>'));
+    const r = lint(s);
+    assert.ok(r.errors.some((e) => e.startsWith('homes/newcrest.html') && e.includes('dash-em-en')), r.errors.join('\n'));
+    assert.ok(r.errors.some((e) => e.startsWith('homes/newcrest.html') && e.includes('exclamation')), r.errors.join('\n'));
+  } finally { done(s); }
+  const f = makeSite();
+  try { assert.deepEqual(lint(f).errors, [], 'the family page\'s note, which names the home, is fine'); } finally { done(f); }
+});
+
 test('a tour is read: a banned phrase in it is an error, and a pass 1 "replaces" chip is a warning until the family is told in v3', () => {
   const s = makeSite({ tourBody: 'Ada owns the app outright.' });
   try { assert.ok(lint(s).errors.some((e) => e.startsWith('story/okafor kitchen-photos.body')), 'a banned phrase in the body'); } finally { done(s); }

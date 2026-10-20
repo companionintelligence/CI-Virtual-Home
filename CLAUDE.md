@@ -293,6 +293,7 @@ passes those goes live on its own. The render gate needs a GPU and runs here:
 ```bash
 pnpm run build && pnpm run typecheck
 pnpm run check          # assets, specs, shots (144 / 0 errors), determinism, goldens (150 / 150; the six apartments are named as without a baseline until `goldens:update --house` is run on the Mac)
+
 pnpm run check:quick    # while iterating: assets + specs + shots + the quick tests
 ```
 

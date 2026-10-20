@@ -186,7 +186,9 @@ export function siteCopy(opts: SiteCopyOptions): SiteCopyResult {
   };
   for (const p of pageFiles) {
     res.counts.pages++;
-    const html = fs.readFileSync(path.join(dir, p), 'utf8').replace(/<p class="home-note">[\s\S]*?<\/p>/, ' ');
+    // (a family page's home-note names the home it lives in, which is the portal's own word for it; a home's own page's note is ordinary copy and is read)
+    const raw = fs.readFileSync(path.join(dir, p), 'utf8');
+    const html = surfaceOf(p) === 'family' ? raw.replace(/<p class="home-note">[\s\S]*?<\/p>/, ' ') : raw;
     const r = readable(html);
     const surface = surfaceOf(p)!;
     check(p, r.text, { exempt: ['©'] });
