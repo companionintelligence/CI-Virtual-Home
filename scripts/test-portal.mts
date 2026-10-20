@@ -211,11 +211,11 @@ async function gallery(viewport: { width: number; height: number }, mobile: bool
     const bytes = (await (await fetch(front.heroSrc)).arrayBuffer()).byteLength;
     ok(bytes < 80 * 1024, `and it is ${Math.round(bytes / 1024)} KB`);
   }
-  // the persona filter: the address carries it (and keeps every other parameter), the cards narrow, and clearing puts it back
-  await page.click('#personas .persona[data-persona="builder"]');
+  // the persona filter (a chip is a category of content/story/categories.json): the address carries it (and keeps every other parameter), the cards narrow, and clearing puts it back
+  await page.click('#personas .persona[data-persona="code"]');
   const builders = await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length);
-  ok(builders > 0 && builders < HOMES && (await page.evaluate(() => location.search)).includes('persona=builder'), `Code narrows to ${builders} and the address says persona=builder`);
-  await page.click('#personas .persona[data-persona="builder"]');
+  ok(builders > 0 && builders < HOMES && (await page.evaluate(() => location.search)).includes('persona=code'), `Code narrows to ${builders} and the address says persona=code`);
+  await page.click('#personas .persona[data-persona="code"]');
   ok((await page.$$eval('#grid .card', (els: HTMLElement[]) => els.filter(e => !e.hidden).length)) === HOMES && !(await page.evaluate(() => location.search)).includes('persona'), 'pressing it again lets it go');
   // the cards go to their family's page; the homes' own pages are linked from the footer, in the rendered DOM a crawler that runs the page reads
   const pageLinks: string[] = await page.$$eval('a[href*="homes/"]', (els: HTMLAnchorElement[]) => els.map(a => new URL(a.href).pathname));
@@ -323,7 +323,7 @@ async function pages() {
   const homeCards = chunks.filter(c => c.startsWith('<li class="card" ')).map(c => c.match(/^<li class="card" data-id="([^"]+)"><a href="\.\/homes\/([^"]+)"/)).filter(Boolean) as RegExpMatchArray[];
   ok(homeCards.every(m => m[1] === m[2]) && [...famCards.map(c => c.house), ...homeCards.map(m => m[1])].sort().join() === [...ids].sort().join(), `and a card linking its page (./homes/<id>) for each of the ${homeCards.length} homes with no family: every one of the ${ids.length} homes is there once`);
   ok(famCards.every(c => c.discs >= 2 && c.replaces && c.home), 'each family card has its home, its people (monogram discs, each with a job) and the apps that tell the story');
-  ok(/<div class="personas"[^>]*>\s*<button[^>]*data-persona="(organiser|builder|gamer|learner|maker|host)"/.test(gallery.text) && /name="vh-clean-urls"/.test(gallery.text), 'and the persona buttons for the jobs the families do');
+  ok(/<div class="personas"[^>]*>\s*<button[^>]*data-persona="[a-z][a-z-]*"/.test(gallery.text) && /name="vh-clean-urls"/.test(gallery.text), 'and the persona buttons for the jobs the families do');
   ok(links.every(l => gallery.text.includes(`href="${l}"`)) && gallery.text.includes('href="https://ci.computer/privacy-policy"') && gallery.text.includes('href="https://ci.computer/terms-of-service"'), 'and carries the main site, /core, /download, the docs, privacy and terms');
   // one callout, not four: the header, the band and the footer offer Buy and Download (the hero only says what the Core is, and
   // points at the band), the main site is linked from the header and the footer, and no sentence is said twice
@@ -931,7 +931,7 @@ async function campaign() {
   const tags = 'utm_source=meta&utm_campaign=test';
   {
     const { page, errors, close } = await open({ width: 1440, height: 900 });
-    await page.goto(srv.url(`index.html?${tags}&fbclid=AbC_123-xyz%2B&persona=builder`));
+    await page.goto(srv.url(`index.html?${tags}&fbclid=AbC_123-xyz%2B&persona=code`));
     await page.waitForFunction(() => document.documentElement.dataset.gallery === 'ready', null, { timeout: 20000 });
     const hrefs = async (sel: string): Promise<string[]> => page.$$eval(sel, (as: HTMLAnchorElement[]) => as.map(a => a.getAttribute('href') || ''));
     const core = await hrefs('a[href^="https://ci.computer/core"]'), dl = await hrefs('a[href^="https://ci.computer/download"]'), site = await hrefs('a[href^="https://ci.computer?"], a[href="https://ci.computer"]');
@@ -942,9 +942,9 @@ async function campaign() {
     ok(tour.length > 2 && tour.every(h => h.includes(tags)) && tour[0].includes('&fbclid=AbC_123-xyz%2B'), `the hero's tour and every card carry them into the player and the family pages (${tour[0]})`);
     const stored = await page.evaluate(() => JSON.parse(sessionStorage.getItem('ci-campaign') || '{}'));
     ok(Object.keys(stored).join() === 'utm_source,utm_campaign,fbclid' && stored.fbclid === 'AbC_123-xyz+', `sessionStorage "ci-campaign" holds only the listed tags (${Object.keys(stored).join(', ')})`);
-    ok((await page.evaluate(() => location.search)) === `?${tags}&fbclid=AbC_123-xyz%2B&persona=builder` && (await page.getAttribute('#personas [data-persona="builder"]', 'aria-pressed')) === 'true', 'the address keeps the tags byte for byte beside the filter');
-    await page.click('#personas [data-persona="gamer"]');
-    ok((await page.evaluate(() => location.search)) === `?${tags}&fbclid=AbC_123-xyz%2B&persona=gamer`, 'a filter changes only its own parameter');
+    ok((await page.evaluate(() => location.search)) === `?${tags}&fbclid=AbC_123-xyz%2B&persona=code` && (await page.getAttribute('#personas [data-persona="code"]', 'aria-pressed')) === 'true', 'the address keeps the tags byte for byte beside the filter');
+    await page.click('#personas [data-persona="play"]');
+    ok((await page.evaluate(() => location.search)) === `?${tags}&fbclid=AbC_123-xyz%2B&persona=play`, 'a filter changes only its own parameter');
     // the campaign survives a click from the front page to a family's page, and from there to ci.computer and a home's page
     await page.click('#grid .card:not([hidden]) h3 a');
     await page.waitForURL(/\/family\/[a-z-]+\?/, { waitUntil: 'commit', timeout: 30000 });

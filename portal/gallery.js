@@ -68,7 +68,7 @@ function readUrl() {
   state.q = q.get('q') || '';
   state.storeys = q.get('storeys') || '';
   state.tag = q.get('tag') || '';
-  state.persona = /^[a-z]{1,16}$/.test(q.get('persona') || '') ? q.get('persona') : '';
+  state.persona = /^[a-z0-9]+(-[a-z0-9]+){0,4}$/.test(q.get('persona') || '') ? q.get('persona') : '';
 }
 // The address keeps every parameter that is not one of ours, byte for byte (an ad's utm_ tags and a click id: portal/campaign.js reads
 // them, and a platform may check the id as it was sent), and ours are written after them.
