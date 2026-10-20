@@ -6,10 +6,10 @@
 //   static    every family that has a page has family/<slug>.html and a sitemap entry without ".html"; the slugs are unique, the
 //             pattern, and name no house; each page carries the four links, privacy and terms, one h1 and one main, a canonical
 //             and a tour link that names the house and the family; a title no other page has; its fine print names the home and links
-//             homes/<id> and credits no one (no builder, no build); the copy lint (banned phrases, sentence case headings, the disclosures);
+//             homes/<id> and credits no one (no builder, no build); the copy lint of the whole built site (scripts/story/lib/site-copy.mts: banned phrases, sentence case headings, the disclosures);
 //             the story's words name no home and no builder; every app is in the Companion Hub catalog and the live store
 //             the lander: the name, the tagline and the picture; "Take the tour" and "See Companion Core" (exactly https://ci.computer/core);
-//             the one honest line about the 3D, and nothing "streamed"; the disclosure strip from claims.json; a section for each person
+//             the one honest line about the 3D, and nothing "streamed"; the label, the beta strip and the footer's fine print from claims.json; a section for each person
 //             whose id is theirs, "Start with <name>" (&member=) and, for each of their moments, "Watch this moment" (&beat=); what runs on
 //             the Core; the chrome's own labels (Buy Companion Core, Download Companion) and the story's calls (See Companion Core); every
 //             link into the player carries data-campaign, and portal/campaign.js loads first when the build has it; no price, no customer, no
@@ -79,7 +79,7 @@ export default async function familyPages(ctx: TestCtx): Promise<void> {
   ok(preview.length === 0, `each family page previews with an absolute JPEG that is in the output, and carries the card's tags${preview[0] ? `: ${preview.slice(0, 3).join(' | ')}` : ''}`);
   ok(problems.length === 0, `each family page carries the four links, privacy and terms, one h1 and one main, a canonical, a tour link, the home's name in the fine print and no credit${problems[0] ? `: ${problems.slice(0, 3).join(' | ')}` : ''}`);
   const lint = copyLint({ dir: OUT });
-  ok(lint.length === 0, `the copy lint is clean over ${slugs.length} family pages and the card data${lint.length ? `: ${lint.slice(0, 3).join(' | ')}` : ''}`);
+  ok(lint.length === 0, `the copy lint is clean over the whole built site (the front page, the homes' pages, ${slugs.length} family pages, the 404, the player's HTML, the tours' data, the cards and the strings of the player's source)${lint.length ? `: ${lint.slice(0, 3).join(' | ')}` : ''}`);
   const L = loadAll(ROOT, path.join(ROOT, 'content', 'families'));
   const n = needles(ROOT);
   const leaks = L.stories.filter(s => by[s.slug]).flatMap(s => storyCopyLeaks(s, n));
@@ -97,8 +97,11 @@ export default async function familyPages(ctx: TestCtx): Promise<void> {
     const need = (cond: unknown, what: string): void => { if (!cond) lander.push(`${s.slug}: ${what}`); };
     need(hero.includes(`>The ${s.family.surname} family</h1>`) && words.includes(s.family.tagline) && hero.includes(`/portal/previews/${s.house}.jpg"`.replace(/^\//, '')), 'the hero: the name, the tagline and the home\'s picture');
     need(/<span>Take the tour<\/span>/.test(hero) && hero.includes(`href="${LINKS[1]}" data-campaign>See Companion Core</a>`) && (hero.match(/btn-primary/g) || []).length === 1, 'the hero: one primary button, "Take the tour", and "See Companion Core" to exactly https://ci.computer/core');
-    need(hero.includes(TOUR_NOTE) && !/streamed/i.test(words), `the one honest line (${TOUR_NOTE}) and nothing "streamed"`);
-    for (const id of ['fictional-family', 'beta-short', 'scripted-scenes', 'stylised-art']) need(words.includes(claim(id)), `the strip's ${id} line, from claims.json`);
+    need(hero.includes(TOUR_NOTE) && !/streamed/i.test(hero), `the one honest line (${TOUR_NOTE}) and nothing "streamed" in the hero (a moment may say what a rival cloud service streams: brennan-hollin's GeForce Now)`);
+    // the label is the header's chip (once), the beta line is the strip, and the rest of the fine print is the footer's (scripts/story/lib/fine-print.mts, surfaces family-fold and family-footer)
+    for (const id of ['fictional-family', 'beta-short']) need(words.includes(claim(id)), `the first screen's ${id} line, from claims.json`);
+    const footWords = decode(foot.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ');
+    for (const id of ['launch-not-offer', 'beta-full', 'scripted-scenes', 'stylised-art']) need(footWords.includes(claim(id)), `the footer's ${id} line, from claims.json`);
     for (const m of s.members) {
       const sec = (t.match(new RegExp(`<section class="who[^"]*" id="${m.id}"[\\s\\S]*?</section>`)) || [''])[0];
       need(sec && sec.includes(`<h2 id="${m.id}-h" class="nm">${m.name}</h2>`) && sec.includes(`Age ${m.age}`), `${m.id}: a section with their id, their name (as written: the kicker's capitals are CSS) and age`);
@@ -178,7 +181,7 @@ export default async function familyPages(ctx: TestCtx): Promise<void> {
     await page.goto(ctx.url(`family/${slug}${second ? `#${second.id}` : ''}`)); await sleep(500);
     const info = await page.evaluate((id: string | null) => ({
       people: Array.from(document.querySelectorAll('section.who')).map(e => e.id), moments: document.querySelectorAll('.moment').length,
-      tour: !!document.querySelector('.hero-actions a.btn-primary[href*="room-creator"]'), strip: (document.querySelector('.strip')?.textContent || '').includes('Fictional family. Real software.'),
+      tour: !!document.querySelector('.hero-actions a.btn-primary[href*="room-creator"]'), strip: (document.querySelector('.strip')?.textContent || '').includes('are in beta.') && (document.querySelector('.hero .disclosure')?.textContent || '').includes('Fictional family. Real software.'),
       at: id ? (document.getElementById(id)?.getBoundingClientRect().top ?? 9999) : 0, bar: getComputedStyle(document.getElementById('tourbar')!).display,
     }), second ? second.id : null);
     ok(story ? story.members.every(m => info.people.includes(m.id)) && info.moments > 0 && info.tour && info.strip : info.tour, 'with JavaScript off the page is whole: the people, their moments, the tour link and the strip');

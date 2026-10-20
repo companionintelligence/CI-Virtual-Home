@@ -111,12 +111,12 @@ for (const s of L.stories) {
     assert.equal((hero.match(/btn-primary/g) || []).length, 1, 'one primary button above the fold');
     assert.ok(hero.includes(`<p class="hero-note">${pg.TOUR_NOTE}</p>`) && pg.TOUR_NOTE === 'The tour draws the home in 3D in your browser.', 'the one honest line');
     assert.ok(!/streamed/i.test(words), 'it does not say anything is streamed');
-    // the strip is the claims file's own words
-    const strip = (t.match(/<section class="strip"[\s\S]*?<\/section>/) || [''])[0];
-    for (const id of ['fictional-family', 'beta-short', 'scripted-scenes', 'stylised-art']) {
-      const d = (L.claims.disclosures as { id: string; text: string }[]).find(x => x.id === id)!.text;
-      assert.ok(q(strip).includes(d), `the strip has the ${id} disclosure, word for word: ${d}`);
-    }
+    // the label is the header's chip, once; the strip is the claims file's beta line; the rest of the fine print is the footer's (claims.json `where`; scripts/test-fine-print.mts holds every surface)
+    const claim = (id: string): string => (L.claims.disclosures as { id: string; text: string }[]).find(x => x.id === id)!.text;
+    assert.ok(hero.includes(`<p class="disclosure" data-fine="fictional-family"><strong>${claim('fictional-family')}</strong></p>`), 'the label, in the header');
+    const strip = (t.match(/<section class="strip"[\s\S]*?<\/section>/) || [''])[0], foot = (t.match(/<footer[\s\S]*<\/footer>/) || [''])[0];
+    assert.ok(q(strip).includes(claim('beta-short')) && !q(strip).includes(claim('fictional-family')), 'the strip has the beta line, word for word, and does not say the label again');
+    for (const id of ['scripted-scenes', 'stylised-art', 'launch-not-offer', 'beta-full']) assert.ok(q(foot).includes(claim(id)) && !q(strip).includes(claim(id)), `the footer has the ${id} disclosure, word for word, and the strip does not`);
     // a person's section, whose id is theirs; their moments each link the tour at that beat; "Start with <name>"
     const secs = sections(t);
     for (const m of s.members) {

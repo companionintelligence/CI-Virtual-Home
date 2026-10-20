@@ -75,6 +75,7 @@ import { buildStorySite } from './story/site.mts';
 // ---- front page ----
 import { HERO, readFamilies, frontCards, personaButtons, meetFamily, pickPerson, logoWall, runsBand, homesWithoutFamily } from './portal-front.mts';
 import { MEET_MARKER } from './portal-pages.mts';
+import { coreLine, finePrint } from './story/lib/fine-print.mts';
 import { displayName } from '../assets/home-names.js';
 
 const args = parseArgs(process.argv.slice(2));
@@ -125,6 +126,23 @@ copy(path.join('portal', 'icons', 'apple-touch-icon.png'), 'apple-touch-icon.png
 // 3. portal: styles, script, the hero, the thumbnails, the icons and the manifest. (portal/og/ and portal/fonts/ are the story's:
 //    scripts/story/site.mts ships them under a hash of their content, which _headers lets a cache keep for a year)
 for (const f of walk('portal', f => /\.(css|js|webp|jpg|png|ico|webmanifest)$/.test(f) && !f.startsWith(path.join('portal', 'og') + path.sep))) copy(f);
+
+// ---- campaign link rules ---- portal/campaign.json (portal/campaign.js reads it at run time; README -> Campaign link rules): a short authored list of
+// {match, to, from, until} mappings for the sanctioned ci.computer links, EMPTY by default. It is copied as it is (it is not a script or a style, so
+// the walk above did not take it) and held to campaign.js's own validator, so a rule that has expired, runs too long or names anything but the three
+// sanctioned addresses fails the build and a stale rule cannot live forever. The built pages never carry the mapped address (step 7).
+{
+  const cj = path.join(ROOT, 'portal', 'campaign.json');
+  if (!fs.existsSync(cj)) problems.push('missing portal/campaign.json');
+  else {
+    copy(path.join('portal', 'campaign.json'));
+    try {
+      const sandbox: Record<string, any> = {};
+      (await import('node:vm')).runInNewContext(fs.readFileSync(path.join(ROOT, 'portal', 'campaign.js'), 'utf8'), sandbox, { filename: 'portal/campaign.js' });
+      problems.push(...sandbox.CICampaign.validate(JSON.parse(fs.readFileSync(cj, 'utf8')), new Date().toISOString().slice(0, 10)));
+    } catch (err) { problems.push(`portal/campaign.json: ${(err as Error).message}`); }
+  }
+}
 
 // ---- app media ---- (scripts/story/lib/media.mts, scripts/story/build-app-media.mts, reference/story/story-v2.md "App media")
 // The real logos and screenshots under portal/apps/ and portal/ci/, every one named <name>.<hash10>.webp. Step 3's walk copied every .webp under portal/,
@@ -219,7 +237,16 @@ const SITE = ((args['site-url'] && args['site-url'] !== 'true' ? args['site-url'
   const rc = path.join(OUT, 'room-creator.html');
   const text = fs.readFileSync(rc, 'utf8');
   if (!text.includes('</head>')) problems.push('room-creator.html has no </head> for the share tag');
-  else fs.writeFileSync(rc, text.replace('</head>', '  <meta name="vh-share" content="homes/">\n</head>'));
+  else fs.writeFileSync(rc, text.replace('</head>', () => [
+    '  <meta name="vh-share" content="homes/">',
+    // The player carries the ad's tags too (portal/campaign.js; the source page is the editor's and is not touched). A deferred classic script in the head runs
+    // after the page is parsed and before the module at the end of the body, so the tags are read before the player writes its address; the player draws
+    // its end card and About panel later, and campaign.js tags those links as they arrive and when they are clicked. The fingerprinting step below names the file by its hash.
+    // Without JavaScript nothing of the editor or the player can be used: the page shows the message in its <noscript> and nothing under it.
+    '  <script src="./portal/campaign.js" defer data-cfasync="false"></script>',
+    '  <noscript><style>body > :not(noscript) { display: none !important; }</style></noscript>',
+    '</head>',
+  ].join('\n')));
 }
 
 // 5c2. the families: a page each (family/<slug>), the tour's data and files, the manifest the player reads (scripts/story/site.mts).
@@ -300,6 +327,12 @@ for (const h of houses) {
     at(/<!-- pick-person:[\s\S]*?-->/, front.length ? pickPerson(front, mediaNow) : '', 'pick-person');
     at(/<!-- logo-wall:[\s\S]*?-->/, front.length ? logoWall(front, mediaNow) : '', 'logo-wall');
     at(/<!-- how-it-runs:[\s\S]*?-->/, front.length ? runsBand(mediaNow) : '', 'how-it-runs');
+    // the fine print and the Core sentence are claims.json's words, never retyped here (scripts/story/lib/fine-print.mts; surfaces lander-hero, lander-core, lander-footer)
+    const esc1 = (v: string): string => v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    at(/<!-- fine-hero:[\s\S]*?-->/, finePrint('lander-hero').html.replace(/<p data-fine="fictional-family">.*?<\/p>/, '').replace(/<p /, '<p class="core-fine" '), 'fine-hero');
+    at(/<!-- core-line:[\s\S]*?-->/, `<p>${esc1(coreLine('your desk'))}</p>`, 'core-line');
+    at(/<!-- fine-core:[\s\S]*?-->/, finePrint('lander-core').html.replace(/<p data-fine="beta-short">.*?<\/p>/, '').replace(/<p /g, '<p class="cta-note" '), 'fine-core');
+    at(/<!-- fine-foot:[\s\S]*?-->/, `<div class="foot-notes">${finePrint('lander-footer').html}</div>`, 'fine-foot');
   }
   // ---- end story v2 ----
   // every home's own page, linked from the footer (the cards go to the player; gallery.js leaves this list as it is)
@@ -315,7 +348,7 @@ for (const h of houses) {
   let page = fs.readFileSync(rc, 'utf8');
   const galleryDesc = (gallery.match(/<meta name="description" content="([^"]*)">/) || [])[1] || '';
   const alt = (gallery.match(/<meta property="og:image:alt" content="([^"]*)">/) || [])[1] || '';
-  const playerDesc = `Fly through one of ${COUNT_WORD} virtual homes in 3D, built live in your browser from one spec file. Change the hour and meet the Companion Core.`;
+  const playerDesc = `Fly through one of ${COUNT_WORD} virtual homes in 3D in your browser and meet the Companion Core.`;
   // The player and the editor are one file, a viewer and a tool rather than pages to find: out of the index in the page's own
   // HTML, where a crawler that never runs the page's script reads it (the pages to find are the gallery and each home's page,
   // which link the player). "follow": the links on the page, the way back to the gallery and the Core's, still count.
@@ -594,6 +627,11 @@ for (const p of ['index.html', 'room-creator.html', ...homePages, ...familyPages
   for (const f of front) if (!g.includes(`<a href="./family/${f.slug}" data-campaign `)) problems.push(`index.html: the ${f.slug} family's card does not link ./family/${f.slug}`);
   if (front.length && !/<div class="personas"[^>]*>\s*<button/.test(g)) problems.push('index.html: families, but no persona buttons');
   if (!/<script src="\.\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/.test(g)) problems.push('index.html: no portal/campaign.js (with its content hash, defer and data-cfasync="false")');
+  // the player loads it too, before the module that writes its address (the page's one module is at the end of its body)
+  { const rcText = read('room-creator.html'), at = rcText.search(/<script src="\.\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/), mod = rcText.search(/<script type="module"/);
+    if (at < 0) problems.push('room-creator.html: no portal/campaign.js (with its content hash, defer and data-cfasync="false")');
+    else if (mod >= 0 && at > mod) problems.push('room-creator.html: portal/campaign.js comes after the first module');
+    if (!/<noscript><style>body > :not\(noscript\)/.test(rcText)) problems.push('room-creator.html: no <noscript> style that leaves only the message when JavaScript is off'); }
   for (const f of ['404.html', ...homePages.filter(p => p.endsWith('.html'))]) if (!/<script src="[^"]*\/portal\/campaign\.js\?v=[0-9a-f]{10}" defer data-cfasync="false"><\/script>/.test(read(f))) problems.push(`${f}: no portal/campaign.js (with its content hash, defer and data-cfasync="false")`);
   // a campaign's tags are added in the browser, never in the built page: every link to ci.computer is exactly as step 7 above requires
   for (const f of [...pages, 'room-creator.html']) if (/href="https:\/\/ci\.computer\/?[?#]/.test(read(f))) problems.push(`${f}: a link to ci.computer carries a query or fragment (portal/campaign.js adds a campaign's tags at run time)`);

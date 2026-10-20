@@ -39,6 +39,8 @@
 import { displayName } from './home-names.js';
 import { createGlassSwap } from './viewer-glass.js';
 import { bakeStatic, restoreStatic } from './viewer-batch.js';
+// the fine print each panel owes, from claims.json's words (assets/story/fine-print.ts: one rule table for the page writers and the player)
+import { CLAIMS_SNAPSHOT, coreLine, disclosureText, finePrintHtml, finePrintItems } from './story/fine-print.js';
 
 type Api = {
   THREE: any; scene: any; renderer: any; canvas: HTMLCanvasElement; camera: any; controls: any;
@@ -118,6 +120,14 @@ const newTab = (href: string, label: string, short = ''): string =>
 const DEFAULT_SHOT = 'orbit';   // what a link without shot= opens on (onHouse)
 const CORE_NAME = 'Companion Core (Hero)';   // the house builder's name for the desk's Core (the QA gate finds it by it too)
 const FLY_FLOOR = 0.25;       // m: the lowest the free camera goes (the lot's ground is y = 0)
+// the type of the fine print in the About panel and on the end card (portal/viewer.css is not edited for it; the player's own template carries these few rules)
+const FINE_CSS = `.vh-help-fine { margin: 0.9rem 0 0; padding-top: 0.9rem; border-top: 1px solid var(--vh-ring); color: var(--muted-foreground); }
+    .vh-help-fine p { margin: 0 0 0.6rem; font-size: var(--st-min); line-height: 1.34; }
+    .vh-help-fine p:last-child { margin-bottom: 0; }
+    .vh-end .vh-end-fine { margin: 2px 0 8px; font-size: 12px; line-height: 1.45; }
+    .vh-fiction { display: none; position: absolute; z-index: 5; pointer-events: none; left: calc(var(--vh-gap) + env(safe-area-inset-left, 0px)); top: calc(var(--vh-gap) + var(--vh-top-h) + 8px + env(safe-area-inset-top, 0px));
+      padding: 4px 12px; border-radius: 999px; background: var(--vh-glass-strong); box-shadow: inset 0 0 0 1px var(--vh-ring); color: var(--foreground); font-size: calc(var(--st-min) * 0.62); font-weight: 700; line-height: 1.3; }
+    html[data-story] .vh[data-state="ready"] .vh-fiction { display: block; }`;
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 // whole seconds: the elapsed time counts up in them (floor), a duration is rounded
@@ -167,6 +177,7 @@ export function mountViewer(api: Api) {
   root.className = 'vh';
   root.dataset.state = 'loading';
   root.innerHTML = `
+    <style>${FINE_CSS}</style>
     <div class="vh-loading" role="status" aria-live="polite">
       <div class="vh-loading-card">
         <img class="vh-mark" src="./assets/brand/ci-logo-mark.svg" alt="" width="28" height="28">
@@ -183,6 +194,7 @@ export function mountViewer(api: Api) {
       </div>
     </div>
 
+    ${storyP ? `<p class="vh-fiction" data-fine="fictional-family">${disclosureText(CLAIMS_SNAPSHOT, 'fictional-family')}</p>` : ''}
     <header class="vh-top">
       <a class="vh-iconbtn vh-back" href="./" aria-label="All homes" title="All homes">${icon('back')}</a>
       <div class="vh-title">
@@ -211,7 +223,8 @@ export function mountViewer(api: Api) {
     <div class="vh-dock" role="group" aria-label="Player">
       <div class="vh-end" hidden role="group" aria-labelledby="vh-end-title">
         <h2 id="vh-end-title">Meet the Companion Core.</h2>
-        <p class="vh-end-body">The small computer on the desk runs your own AI, apps and memory at home, not in someone else's cloud.</p>
+        <p class="vh-end-body">${coreLine(CLAIMS_SNAPSHOT, 'the desk')}</p>
+        ${finePrintHtml(finePrintItems(CLAIMS_SNAPSHOT, 'player-end'), { cls: 'vh-end-fine' })}
         <p class="vh-end-links">${newTab(BUY_URL, 'Buy Companion Core', 'Buy Core')}${newTab(DOWNLOAD_URL, 'Download Companion', 'Download')}</p>
         <div class="vh-end-actions">
           <button class="vh-end-btn" data-act="replay">${icon('replay')}<span>Replay</span></button>
@@ -246,8 +259,9 @@ export function mountViewer(api: Api) {
 
     <div class="vh-help" hidden role="dialog" aria-labelledby="vh-help-title">
       <div class="vh-help-head"><b id="vh-help-title">About</b><button class="vh-iconbtn" data-act="help" aria-label="Close">${icon('x')}</button></div>
-      <p class="vh-help-about">The small computer on the desk is a Companion Core: your own AI, apps and memory, running at home, not in someone else's cloud.</p>
+      <p class="vh-help-about">${coreLine(CLAIMS_SNAPSHOT, 'the desk')}</p>
       <p class="vh-help-links">${newTab(SITE_URL, 'Companion Intelligence')}${newTab(BUY_URL, 'Buy Companion Core')}${newTab(DOWNLOAD_URL, 'Download Companion')}${newTab(DOCS_URL, 'Docs')}</p>
+      <div class="vh-help-fine">${finePrintHtml(finePrintItems(CLAIMS_SNAPSHOT, 'player-about', { tour: storyP !== null }))}</div>
       <div class="vh-help-keys vh-hide-coarse">
         <p class="vh-help-sub">Keyboard</p>
         <dl>

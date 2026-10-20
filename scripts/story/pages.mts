@@ -5,7 +5,9 @@
 //
 // THE PAGE (an ad's landing page: it reads with no JavaScript and no WebGL, in an in-app browser too; the tour is an enhancement):
 //   above the fold   the family's name, the tagline, a picture of the home, "Take the tour" (the player) and "See Companion Core"
-//                    (https://ci.computer/core, awareness, not "Buy"), one honest line about the 3D, and the disclosure strip
+//                    (https://ci.computer/core, awareness, not "Buy"), one honest line about the 3D, the label ("Fictional family. Real software.") once as the
+//                    header's chip and the beta line as a compact strip. The rest of the fine print claims.json asks for is the footer's, and every line of
+//                    it comes from scripts/story/lib/fine-print.mts (the rule table is assets/story/fine-print.ts; reference/story/fine-print.md)
 //   the family       one section per person (id = the member's id, so family/<slug>#sally is a link): who they are, the archetype word, the
 //                    room they use, their moments (title, words, the apps with what each replaces, "Watch this moment" into the tour at
 //                    that beat) and "Start with <name>" (the tour at the first beat of their room)
@@ -43,6 +45,8 @@ import type { Loaded, Card } from './site-lib.mts';
 import { esc, addressLine, disclosure } from './site-lib.mts';
 import type { MediaManifest, MediaShot, CiShot } from './lib/media.mts';
 import { appMedia, ciShots, imageTag, logoImg, mediaUrl } from './lib/media.mts';
+import { finePrintHtml, finePrintItems } from './lib/fine-print.mts';
+import type { Facts } from './lib/fine-print.mts';
 import { readPlan, placePins, levelSvg, aspect, roomLabel } from './lib/plan-map.mts';
 
 export const PRODUCT = 'Companion Core';
@@ -103,10 +107,20 @@ export function homeNote(h: House): string {
   return `<p class="home-note">The home is <a href="${rel}homes/${esc(encodeURIComponent(h.id))}">${esc(displayName(h))}</a>.</p>`;
 }
 
-/** `agents`: a member's companion is named on the page, so the attribution the fact sheet asks for goes with it (claims.json attribution-agents). */
-export function footer(claims: any, house: House, o: { agents?: boolean; narration?: boolean } = {}): string {
-  const d = (id: string) => esc(disclosure(claims, id));
+/**
+ * Until scripts/story/check-copy.mts asks for claims.json's `beta-short` instead of the OS-only line (its `must(BETA_LINE)`), the footer keeps that line too, so the
+ * copy lint stays green. Set to false (and delete the line it prints) in the commit that moves the lint: the footer then says the beta once, in `beta-full`.
+ */
+export const LEGACY_BETA_LINE = true;
+
+/**
+ * The footer's fine print: what claims.json's `where` puts in "the footer" of a family page, from scripts/story/lib/fine-print.mts (the 'family-footer' surface).
+ * `agents`: a member's companion is named on the page (attribution-agents, not-frontier); `narration`: the tour has a voice (synthetic-voice); `logos`: the page shows an
+ * app's logo (names-logos-owners, which stands with names-owners until the pages say "alternative to").
+ */
+export function footer(claims: any, house: House, o: { agents?: boolean; narration?: boolean; logos?: boolean } = {}): string {
   // (site-practises, "no third-party requests, no cookies, no analytics", is not said here: the deployed site adds Google Analytics, so the line would be false there)
+  const facts: Facts = { agents: !!o.agents, narration: !!o.narration, logos: !!o.logos };
   return `<footer class="site-foot">
     <div class="foot-grid">
       <div>
@@ -123,10 +137,8 @@ export function footer(claims: any, house: House, o: { agents?: boolean; narrati
       </div>
       <div class="foot-notes">
         <p><b>${esc(FICTIONAL_LINE)}</b> The families on this site are made up. They are not customers.</p>
-        <p>${esc(BETA_LINE)} ${d('apps-availability')}</p>
-        ${o.narration ? `<p>${d('synthetic-voice')}</p>` : ''}
-        ${o.agents ? `<p>${d('attribution-agents')}</p>` : ''}
-        <p>${d('names-owners')}</p>
+        ${LEGACY_BETA_LINE ? `<p>${esc(BETA_LINE)}</p>` : ''}
+        ${finePrintHtml(finePrintItems('family-footer', facts, claims))}
       </div>
     </div>
     ${homeNote(house)}
@@ -474,6 +486,10 @@ export function familyPage(c: FamilyPageCtx): string {
   const d = (id: string) => esc(disclosure(claims, id));
   const { own, shared } = momentsOf(s);
   const agents = s.members.some(m => m.companion);
+  // the fine print this page owes (scripts/story/lib/fine-print.mts): the label is the header's chip, once; the beta line is the strip; the rest is the footer's
+  const fold = finePrintItems('family-fold', {}, claims), label1 = fold.find(i => i.id === 'fictional-family')!.text;
+  const facts: Facts = { agents, narration: !!c.narration, logos: !!media };
+  const startNote = finePrintHtml(finePrintItems('family-start', facts, claims), { cls: 'note' });
   const apps = card.apps.map(a => {
     const cat = catalog[a.id];
     // (a service the story's copy rules stop beside an app, such as "ChatGPT" beside Open WebUI, is left out here as on the cards)
@@ -550,7 +566,7 @@ export function familyPage(c: FamilyPageCtx): string {
   <main id="main">
     <section class="hero" aria-labelledby="family-h">
       <div class="hero-copy">
-        <p class="disclosure"><strong>${esc(FICTIONAL_LINE)}</strong></p>
+        <p class="disclosure" data-fine="fictional-family"><strong>${esc(label1)}</strong></p>
         <h1 id="family-h" class="nm nm-family">${esc(card.title)}</h1>
         <p class="tagline">${esc(s.family.tagline)}</p>
         <p class="address">${esc(addressLine(s))}</p>
@@ -570,10 +586,7 @@ export function familyPage(c: FamilyPageCtx): string {
 
     <section class="strip" aria-label="What this page is">
       <ul>
-        <li class="strip-label"><strong>${d('fictional-family')}</strong></li>
-        <li>${d('beta-short')}</li>
-        <li>${d('scripted-scenes')}</li>
-        <li>${d('stylised-art')}</li>
+        ${fold.filter(i => i.id !== 'fictional-family').map(i => `<li data-fine="${esc(i.id)}">${esc(i.text)}</li>`).join('\n        ')}
       </ul>
     </section>
 
@@ -619,6 +632,7 @@ export function familyPage(c: FamilyPageCtx): string {
       <ol class="steps steps-compact">
           ${stepsHtml(true)}
       </ol>
+      ${startNote}
     </section>
 
     <nav class="siblings" aria-label="Other families">
@@ -634,7 +648,7 @@ export function familyPage(c: FamilyPageCtx): string {
   </main>
   ${hasShot ? SHOT_DIALOG : ''}
   <div class="tourbar" id="tourbar" hidden>${tour('btn btn-primary', `${icon('play', 'i-fill')}<span>Take the tour</span>`)}</div>
-  ${footer(claims, house, { agents, narration: c.narration })}
+  ${footer(claims, house, { agents, narration: facts.narration, logos: facts.logos })}
   <script data-cfasync="false">
     (function () {
       // the page is whole without this. It adds the film's own button (when the film is hosted) and, on a phone, the tour button that stays

@@ -46,6 +46,21 @@ export function checkAgeChat(story: Story, ctx: Ctx, members: Map<string, Member
       out.add(sev, 'age-chat', b.id, `${who.name} is ${who.age} and the beat uses ${chat.map((id) => ctx.apps.get(id)!.name).join(' and ')}, a chat or agent app (age ${CHAT_MIN_AGE} or older)`,
         `Make the beat a parent-led one: the beat's member is the adult and ${who.name} is named in the body as the one being helped, or give ${who.name} an app that is not a chat model.`);
     }
+    // A beat whose `member` is an adult can still put a child at the keyboard in its words ("Nare asks Open WebUI why ice floats", W5-compliance-05):
+    // a sentence of the popup, the spoken line or the detail that opens with a member under 16 doing something, and names a chat app of the beat.
+    if (chat.length && (!who || who.age >= CHAT_MIN_AGE)) {
+      const names = chat.map((id) => ctx.apps.get(id)!.name);
+      const minors = [...members.values()].filter((m) => m.age < CHAT_MIN_AGE && m.id !== b.member);
+      const prose = [b.popup.title, b.popup.body, b.popup.note, b.say?.text, ...(b.detail ? [b.detail.before, b.detail.after, ...b.detail.steps, b.detail.fact] : [])].filter((x): x is string => !!x);
+      for (const sentence of prose.flatMap((t) => t.split(/(?<=[.!?])\s+/))) {
+        const minor = minors.find((m) => new RegExp(`^(?:(?:Then|Later|Now|Next|After[^,]{0,30}|When[^,]{0,30}|At[^,]{0,30}),?\\s+)?${m.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s+(?!(?:watches|listens|waits|sits|stands|looks|is|was|has|does|gets a|goes|comes|laughs|smiles)\\b)\\w+`).test(sentence));
+        if (minor && names.some((n) => sentence.includes(n))) {
+          out.add(sev, 'age-chat', b.id, `${minor.name} is ${minor.age} and the sentence "${sentence.length > 70 ? `${sentence.slice(0, 70)}...` : sentence}" puts ${minor.name} at ${names.find((n) => sentence.includes(n))}, a chat or agent app (age ${CHAT_MIN_AGE} or older)`,
+            `Let the beat's adult ask and read, and ${minor.name} write, draw or do something by hand; ${minor.name} is never the one who asks the model.`);
+          break;
+        }
+      }
+    }
     if (b.agent) {
       const owner = members.get(b.agent);
       if (owner && owner.age < CHAT_MIN_AGE) out.add(sev, 'age-chat', b.id, `the agent is ${owner.name}'s and ${owner.name} is ${owner.age} (an agent needs an owner of ${CHAT_MIN_AGE} or older)`, 'Let a member of 16 or older own the agent in this beat.');

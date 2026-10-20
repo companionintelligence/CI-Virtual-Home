@@ -12,7 +12,7 @@
 //     down so it keeps 36), the name is a kicker by drawing only, a card is offered as variants and never in smaller type, the solver refuses a variant under the floor; the browser half
 //     of it (what was really painted, in every cut of every family) is scripts/film/canvas-fit.mts
 // Needs `pnpm run build` (the assets compile to .js), the frozen Brennan story and bake lock in test/fixtures/site/frozen/ (these tests are pinned to them, so a rewrite of the live
-// content/families/brennan.json cannot fail them; the live plan is held by `pnpm run story:ads -- --check`), and content/story/claims.json.
+// content/families/brennan.json cannot fail them; the live plan is held by `pnpm run story:ads -- --check`, a CI step), and content/story/claims.json.
 // @check-house node-test
 // @check-house quick
 import { test } from 'node:test';

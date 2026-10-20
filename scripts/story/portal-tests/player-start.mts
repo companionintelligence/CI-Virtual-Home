@@ -80,7 +80,9 @@ export default async function playerStart(ctx: TestCtx): Promise<void> {
     // the end card: the one call to action, the one download link, replay, the next family with its tags, share
     await page.evaluate(() => (window as any).__houseStory.measureEnd()); await sleep(600);
     const end = await page.$$eval('.st-end a, .st-end button', (els: HTMLElement[]) => els.map(e => ({ t: (e.textContent || '').trim(), href: e.getAttribute('href'), h: e.getBoundingClientRect().height })));
-    ok(end.filter(e => e.href === 'https://ci.computer/core' && e.t === 'See Companion Core').length === 1 && end.filter(e => e.href === 'https://ci.computer/download' && e.t === 'Download Companion').length === 1, 'the end card has See Companion Core and the one Download Companion link, exactly');
+    // (the player loads portal/campaign.js now, so the visit's tags ride on these links: the address is read without its query)
+    const bare = (h: string | null): string | null => (h ? h.replace(/[?#].*$/, '') : h);
+    ok(end.filter(e => bare(e.href) === 'https://ci.computer/core' && e.t === 'See Companion Core').length === 1 && end.filter(e => bare(e.href) === 'https://ci.computer/download' && e.t === 'Download Companion').length === 1, 'the end card has See Companion Core and the one Download Companion link, exactly');
     ok(['Replay', 'Share this family'].every(t => end.some(e => e.t === t)) && end.every(e => e.h >= 43.5), `and Replay and Share, every one a 44 px target (${end.map(e => e.t).join(', ')})`);
     ok(!end.some(e => /Buy|price|\$/.test(e.t)), 'and no Buy and no price');
     const other = tours.find(t => t !== SLUG);
