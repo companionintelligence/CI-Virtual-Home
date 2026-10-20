@@ -191,3 +191,14 @@ The spec keeps the builders' own room names. These are Sims-era or gendered and 
 - `flowerycottage` (tuala, solo-or-couple, business): Seven day rooms and no bedroom: a studio cottage for two. The Sunroom has the easel and the Study the desk; sleeping is never told. The spec has no bedroom: the stories are daytime only and never show anyone asleep.
 - `valleyview` (gill, solo-or-couple): One bedroom and many lounging rooms: a retired couple who host, with a Reading Lounge and a Kitchen with two islands.
 - `vanilla` (mbatha, solo-or-couple, business): A 24 m2 Greenhouse and a Library with the Core desk: a grower who runs a plant business and a developer.
+
+## Homes without a family
+
+6 homes of the gallery have no family yet. The site shows each with a plain card that opens the player, and a page of its own, and no tour; adding a family means a plan entry above and removing the home from `homesWithoutFamily` in the plan.
+
+- `city-one-bed` (City One-Bedroom): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `corner-penthouse` (Corner Penthouse): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `garden-flat` (Garden Flat): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `studio-loft` (Warehouse Loft): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `two-bed-flat` (Two-Bedroom Flat): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.
+- `walkup-duplex` (Walk-up Duplex): An apartment written by Companion Intelligence (reference/APARTMENTS.md); no family has moved in yet.

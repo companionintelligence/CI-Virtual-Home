@@ -12,11 +12,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { ROOT } from './portal-lib.mts';
 import { GUARD_ALLOW, REDACTED_KEYS, builderHandles, guardOutput, guardTerms, redactIndex, redactSpecText, scanText } from './portal-redact.mts';
+import { OWN_AUTHORS, isOwnAuthor } from './own-authors.mts';
 import { displayName } from '../assets/home-names.js';
 
 const housesDir = path.join(ROOT, 'content', 'houses');
 const index = JSON.parse(fs.readFileSync(path.join(housesDir, 'index.json'), 'utf8'));
 const ids: string[] = index.houses.map((h: { id: string }) => h.id);
+// the specs on disk: the list must be all of them (a count written here would have to move with every home added)
+const specIds = fs.readdirSync(housesDir).filter(f => f.endsWith('.json') && f !== 'index.json' && !f.endsWith('.plan.json')).map(f => f.replace(/\.json$/, '')).sort();
 const tmp = (): string => fs.mkdtempSync(path.join(os.tmpdir(), 'portal-redact-'));
 const put = (dir: string, rel: string, text: string): void => { fs.mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true }); fs.writeFileSync(path.join(dir, rel), text); };
 
@@ -25,7 +28,7 @@ test('the allowlist is empty: nothing is exempt from the guard', () => {
 });
 
 test('a shipped spec has no author and no source, and the portal\'s name for the home; the rest is the repository\'s, byte for byte', () => {
-  assert.equal(ids.length, 30);
+  assert.deepEqual([...ids].sort(), specIds, 'index.json lists every spec in content/houses/ (pnpm run index)');
   for (const id of ids) {
     const text = fs.readFileSync(path.join(housesDir, `${id}.json`), 'utf8');
     const src = JSON.parse(text);
@@ -54,7 +57,7 @@ test('a spec that is not shaped line by line is still redacted (parsed and writt
 
 test('the shipped list has no author and no source, and every name is a display name', () => {
   const red = redactIndex(index);
-  assert.equal(red.houses.length, 30);
+  assert.equal(red.houses.length, ids.length);
   for (const h of red.houses) {
     for (const k of REDACTED_KEYS) assert.ok(!(k in h), `${h.id}: ${k} is shipped`);
     assert.equal(displayName(h), h.name);
@@ -65,13 +68,44 @@ test('the shipped list has no author and no source, and every name is a display 
 test('the handles are read from the specs, never listed in the guard', () => {
   const real = builderHandles(ROOT);
   assert.ok(real.length >= 12, `${real.length} handles`);
-  const authors = new Set(ids.map(id => JSON.parse(fs.readFileSync(path.join(housesDir, `${id}.json`), 'utf8')).author));
+  // (every author but the company's own name: scripts/own-authors.mts)
+  const authors = new Set(ids.map(id => JSON.parse(fs.readFileSync(path.join(housesDir, `${id}.json`), 'utf8')).author).filter(a => !isOwnAuthor(a)));
   assert.deepEqual(real, [...authors].sort());
   const dir = tmp();
   put(dir, 'content/houses/a.json', JSON.stringify({ id: 'a', author: 'ZzHandle99' }));
   put(dir, 'content/houses/a.plan.json', JSON.stringify({ id: 'a', author: 'NotASpec' }));
   put(dir, 'content/houses/index.json', JSON.stringify({ houses: [{ id: 'b', author: 'OnlyInIndex' }] }));
   assert.deepEqual(builderHandles(dir), ['OnlyInIndex', 'ZzHandle99']);
+});
+
+test('the company\'s own name is not a builder handle: a home Companion Intelligence wrote itself is credited to it, and every other handle is still guarded', () => {
+  assert.deepEqual([...OWN_AUTHORS], ['Companion Intelligence'], 'one name, the company\'s');
+  assert.ok(isOwnAuthor('Companion Intelligence') && isOwnAuthor('  companion intelligence ') && isOwnAuthor('COMPANION INTELLIGENCE'), 'matched whole, in any case');
+  for (const not of ['ci-original', 'Companion Intelligence Fan', 'Companion', 'Intelligence', 'SimsWithNora', '', undefined, null, 7]) assert.ok(!isOwnAuthor(not), `${String(not)} is not the company`);
+  // the apartments are the company's own: their specs name it, and the repository's list keeps it (an internal record, redacted from the output)
+  for (const id of ['studio-loft', 'city-one-bed', 'two-bed-flat', 'corner-penthouse', 'garden-flat', 'walkup-duplex']) {
+    assert.ok(ids.includes(id), `${id} is in the list`);
+    assert.ok(isOwnAuthor(JSON.parse(fs.readFileSync(path.join(housesDir, `${id}.json`), 'utf8')).author), `${id}: authored by the company`);
+  }
+  const root = tmp();
+  put(root, 'content/houses/a.json', JSON.stringify({ id: 'a', author: 'Companion Intelligence' }));
+  put(root, 'content/houses/b.json', JSON.stringify({ id: 'b', author: 'ZzHandle99' }));
+  put(root, 'content/houses/index.json', JSON.stringify({ houses: [{ id: 'a', author: 'Companion Intelligence' }, { id: 'c', author: 'companion intelligence' }, { id: 'b', author: 'ZzHandle99' }] }));
+  assert.deepEqual(builderHandles(root), ['ZzHandle99'], 'the company is read from the files and left out; the builder stays');
+  // a page may say the company\'s name (every page does), and a builder\'s handle on the same page is still found
+  const out = tmp();
+  put(out, 'index.html', '<footer>© 2026 LifeScope Inc., DBA Companion Intelligence. Companion Intelligence</footer>');
+  assert.deepEqual(guardOutput(out, root).problems, [], 'the company\'s name on a page is not a finding');
+  assert.equal(guardOutput(out, root).handles, 1, 'one handle is guarded');
+  put(out, 'homes/b.html', '<p>Companion Intelligence, with ZzHandle99</p>');
+  const g = guardOutput(out, root);
+  // (the handle, and its letters alone: two findings, both in the one file, and neither about the company)
+  assert.ok(g.problems.length >= 1 && g.problems.every(p => p.startsWith('homes/b.html') && !/companion intelligence/i.test(p.split(' ("')[0])), g.problems.join(' | '));
+  assert.ok(g.problems[0].includes('ZzHandle99'), g.problems[0]);
+  // a root with only the company\'s homes guards no handle (the guard says so; it never reads "Companion Intelligence" as one)
+  const only = tmp();
+  put(only, 'content/houses/a.json', JSON.stringify({ id: 'a', author: 'Companion Intelligence' }));
+  assert.ok(guardOutput(out, only).problems[0].includes('no builder handle'));
 });
 
 test('the guard finds a handle (any case, and its letters alone), "Sims", "Base Game" and "BG ", and leaves other text alone', () => {

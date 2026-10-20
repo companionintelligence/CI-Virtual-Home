@@ -214,14 +214,27 @@ if (!UPDATE && fs.existsSync(MANIFEST)) {
 // a failing one, and saying so is the difference between "go baseline this" and "you broke 150 shots".
 const expected = HOUSES.flatMap(h => SHOTS.flatMap(s => FRAMES[s].map(t => goldenPath(h, s, t))));
 const present = expected.filter(p => fs.existsSync(p));
-if (!UPDATE && present.length === 0) {
+// Does this profile have baselines at all (any PNG under its folder)? Not the same question as "do these houses": a home added to the
+// collection (the apartments, reference/APARTMENTS.md) has none on a profile that holds the other 30.
+const profileHasBaselines = fs.existsSync(GOLDEN_DIR) && fs.readdirSync(GOLDEN_DIR, { withFileTypes: true }).some(d => d.isDirectory() && fs.readdirSync(path.join(GOLDEN_DIR, d.name)).some(f => f.endsWith('.png')));
+if (!UPDATE && !profileHasBaselines) {
   console.error(`no baselines for profile "${PROFILE}" under ${path.relative(process.cwd(), GOLDEN_DIR)}`);
   console.error(`run:  pnpm run goldens:update --profile ${PROFILE}`);
   await browser.close(); server.close(); process.exit(3);
 }
 
 const results = [];
-const queue = [...HOUSES];
+// A house that has no baseline frame at all (of the shots asked for) is not rendered: there is nothing to compare it with, and the gate never
+// blesses a frame by itself. It is reported once, by name, as a house without a baseline, and the run fails (a frame nobody has blessed is a frame
+// nobody is checking). Blessing is a decision made on the machine of the committed profile, and only for the houses named: --update --house <ids>.
+const unbaselined = UPDATE ? [] : HOUSES.filter(h => !SHOTS.some(s => FRAMES[s].some(t => fs.existsSync(goldenPath(h, s, t)))));
+for (const h of unbaselined) for (const s of SHOTS) for (const t of FRAMES[s]) results.push({ house: h, shot: s, t, state: 'missing', whole: true });
+if (unbaselined.length) {
+  console.log(`\n${unbaselined.length} house${unbaselined.length === 1 ? ' has' : 's have'} no golden baseline on "${PROFILE}" (${present.length ? `the profile holds ${new Set(fs.readdirSync(GOLDEN_DIR, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name)).size} other houses` : 'and none of the houses asked for has one'}): ${unbaselined.join(', ')}`);
+  console.log(`  not rendered and not blessed here; to cover ${unbaselined.length === 1 ? 'it' : 'them'}, on the machine of the committed profile (${fs.existsSync(MANIFEST) ? 'test/goldens/' + PROFILE + '/PROFILE.json' : PROFILE}):`);
+  console.log(`    pnpm run goldens:update --house ${unbaselined.join(',')}   (then look at the frames, and commit them)\n`);
+}
+const queue = HOUSES.filter(h => !unbaselined.includes(h));
 const t0 = Date.now();
 
 async function worker() {
@@ -364,7 +377,7 @@ async function worker() {
   if (ctx) await ctx.close().catch(() => {});
 }
 
-await Promise.all(Array.from({ length: Math.min(JOBS, HOUSES.length) }, worker));
+await Promise.all(Array.from({ length: Math.min(JOBS, Math.max(1, queue.length)) }, worker));
 await browser.close();
 server.close();
 
@@ -426,9 +439,13 @@ if (missing.length) {
   // Not a pass. A frame nobody has blessed is a frame nobody is checking, and the ways to get here — a new
   // house, a new shot, a half-finished re-baseline, a deleted file — are exactly the ways coverage rots
   // silently. (A profile with NO baselines at all is the different, louder case handled above with exit 3.)
-  console.log(`\n${missing.length} frames have no baseline:`);
-  for (const r of missing) console.log(`  ${r.house}/${r.shot}@${r.t}`);
-  console.log(`Add them with:  pnpm run goldens:update`);
+  const partial = missing.filter(r => !r.whole);
+  if (unbaselined.length) console.log(`\n${unbaselined.length} house${unbaselined.length === 1 ? '' : 's'} without a baseline (${unbaselined.length * SHOTS.reduce((n, sh) => n + FRAMES[sh].length, 0)} frames), listed above: pnpm run goldens:update --house ${unbaselined.join(',')}`);
+  if (partial.length) {
+    console.log(`\n${partial.length} frames have no baseline:`);
+    for (const r of partial) console.log(`  ${r.house}/${r.shot}@${r.t}`);
+    console.log(`Add them with:  pnpm run goldens:update --house ${[...new Set(partial.map(r => r.house))].join(',')}`);
+  }
 }
 console.log(`report: ${path.relative(process.cwd(), reportPath)}`);
 process.exit(errors.length ? 2 : (differ.length || missing.length || unmoved.length || unrecorded.length || elsewhere.length) ? 1 : 0);

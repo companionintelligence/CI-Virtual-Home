@@ -35,6 +35,17 @@ export const PERSONAS = [
 export type Archetype = (typeof PERSONAS)[number]['archetype'];
 const ARCHETYPES: readonly string[] = PERSONAS.map(p => p.archetype);
 
+/**
+ * The homes the cast plan says have no family (yet): house id → why (content/story/cast-plan.json `homesWithoutFamily`; the six apartments).
+ * Such a home is a home like any other on the site: a plain card that opens the player, a page of its own, no tour. scripts/story/cast-lint.mts
+ * holds the list to the homes, so a home with neither a family nor a line here is the cast's error, not a surprise of the build.
+ */
+export function homesWithoutFamily(root: string): Record<string, string> {
+  const file = path.join(root, 'content', 'story', 'cast-plan.json');
+  if (!fs.existsSync(file)) return {};
+  try { return (JSON.parse(fs.readFileSync(file, 'utf8')).homesWithoutFamily as Record<string, string>) || {}; } catch { return {}; }
+}
+
 /** The hero's tour: index.html's source has these (a checkout plays the home); the build checks them and points the hero elsewhere when the family is not current. */
 export const HERO = { slug: 'brennan', house: 'seraphine' } as const;
 

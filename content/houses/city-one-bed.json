@@ -1,0 +1,3266 @@
+{
+  "$schema": "house-spec/v1",
+  "id": "city-one-bed",
+  "name": "City One-Bedroom",
+  "author": "Companion Intelligence",
+  "source": "original piece: CI apartments",
+  "style": "A mid-rise of pale render on a city street, five floors under a flat roof with a stair head, shops behind tall shopfront glass on the ground floor, a teal lobby door in the stair core, charcoal-framed windows and a steel-railed balcony band on every floor above; the one-bedroom apartment is the street-side bay of the first floor up, about 58 square metres for a couple who both work from home, with a short entry hall, an open living room and kitchen that open onto the street balcony, a desk nook by a west window, a bedroom and bathroom at the back and a laundry closet, its neighbours' flats closed beside it and behind it",
+  "emoji": "🏙️",
+  "styleKey": "scandi",
+  "defaults": 2,
+  "lot": {
+    "w": 26,
+    "d": 20,
+    "ground": "urban",
+    "context": "city",
+    "street": "S",
+    "sidewalk": {
+      "material": "concrete",
+      "width": 2.4
+    },
+    "streetFurniture": [
+      "bollard",
+      "bike-rack",
+      "bench"
+    ]
+  },
+  "palette": {
+    "wall": "#ece6da",
+    "trim": "#33383c",
+    "roof": "#4b4947",
+    "accent": "#2f6f6a",
+    "material": "stucco",
+    "door": "#33383c",
+    "interior": "#f0ece3",
+    "keep": [
+      "wall",
+      "trim",
+      "accent",
+      "door"
+    ]
+  },
+  "lighting": {
+    "preset": "day",
+    "sunBearing": 245
+  },
+  "levels": [
+    {
+      "id": "l1",
+      "name": "Ground Floor",
+      "sheet": "A-101",
+      "y": 0,
+      "height": 3.5,
+      "floor": "concrete",
+      "interior": "#f0ece3",
+      "trimColor": "#33383c",
+      "plinth": {
+        "h": 0.45,
+        "material": "stone",
+        "color": "#8b867d",
+        "proud": 0.03
+      },
+      "footprint": [
+        {
+          "x": -8,
+          "z": -6,
+          "w": 8.3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#cfc8ba"
+        },
+        {
+          "x": 0,
+          "z": -6,
+          "w": 3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#bcb5a6"
+        },
+        {
+          "x": 3,
+          "z": -6,
+          "w": 5,
+          "d": 12,
+          "material": "stucco",
+          "color": "#d6d0c2"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -6.6,
+          "type": "window",
+          "w": 2,
+          "h": 2.4,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "vertical",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -4,
+          "type": "window",
+          "w": 2.4,
+          "h": 2.4,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "vertical",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -1.5,
+          "type": "garage",
+          "w": 1.4,
+          "h": 2.4,
+          "color": "#565b60"
+        },
+        {
+          "side": "S",
+          "at": 1.5,
+          "type": "door",
+          "w": 1.4,
+          "h": 2.4,
+          "style": "entry",
+          "leaf": "double",
+          "transom": 0.5,
+          "frame": "#33383c",
+          "color": "#2f6f6a",
+          "id": "front",
+          "surround": {
+            "kind": "casing",
+            "color": "#33383c"
+          },
+          "canopy": {
+            "kind": "flat",
+            "depth": 1,
+            "color": "#2f6f6a",
+            "extend": 0.3
+          }
+        },
+        {
+          "side": "S",
+          "at": 4.4,
+          "type": "window",
+          "w": 1.8,
+          "h": 2.4,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "vertical",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 6.2,
+          "type": "garage",
+          "w": 1.4,
+          "h": 2.4,
+          "color": "#565b60"
+        },
+        {
+          "side": "W",
+          "at": -4.4,
+          "type": "window",
+          "w": 2,
+          "h": 2.4,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "vertical",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": -0.8,
+          "type": "window",
+          "w": 2.4,
+          "h": 2.4,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "vertical",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 3.4,
+          "type": "window",
+          "w": 2.4,
+          "h": 2.4,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "vertical",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -5.5,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.4,
+          "sill": 1,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -2.3,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.4,
+          "sill": 1,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 1.5,
+          "type": "door",
+          "w": 1,
+          "h": 2.2,
+          "style": "entry",
+          "frame": "#33383c",
+          "color": "#33383c"
+        },
+        {
+          "side": "N",
+          "at": 4.6,
+          "type": "window",
+          "w": 1.8,
+          "h": 1.4,
+          "sill": 1,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 6.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.4,
+          "sill": 1,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": -4.2,
+          "type": "window",
+          "w": 2,
+          "h": 2.4,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "vertical",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 0,
+          "type": "window",
+          "w": 2.4,
+          "h": 2.4,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "vertical",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 3.6,
+          "type": "window",
+          "w": 2.4,
+          "h": 2.4,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "vertical",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            0,
+            -6
+          ],
+          "to": [
+            0,
+            6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            3,
+            -6
+          ],
+          "to": [
+            3,
+            6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        }
+      ],
+      "stairs": {
+        "type": "U",
+        "style": "timber",
+        "at": [
+          2.1,
+          1.34
+        ],
+        "rot": 180,
+        "turn": "left",
+        "w": 1,
+        "to": "l2",
+        "treadWood": "oak",
+        "stringer": "#33383c",
+        "autoVoid": true
+      },
+      "rooms": [
+        {
+          "no": "01",
+          "name": "Shop West",
+          "bounds": {
+            "x": -8,
+            "z": -6,
+            "w": 8,
+            "d": 12
+          }
+        },
+        {
+          "no": "02",
+          "name": "Entrance Lobby",
+          "bounds": {
+            "x": 0,
+            "z": -6,
+            "w": 3,
+            "d": 12
+          },
+          "program": "hall",
+          "style": "scandi",
+          "floor": {
+            "kind": "terrazzo",
+            "color": "#d9d3c7"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#ebe5d9"
+          },
+          "items": [
+            {
+              "type": "runner-rug",
+              "at": [
+                1.5,
+                2.9
+              ],
+              "w": 1,
+              "d": 3,
+              "src": "compose@1"
+            },
+            {
+              "type": "sofa-table",
+              "at": [
+                0.265,
+                2.48
+              ],
+              "rot": 90,
+              "src": "compose@1"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                0.265,
+                2.48
+              ],
+              "rot": 90,
+              "y": 0.78,
+              "src": "compose@1"
+            },
+            {
+              "type": "sculpture",
+              "at": [
+                0.265,
+                2.78
+              ],
+              "rot": 90,
+              "y": 0.78,
+              "src": "compose@1"
+            },
+            {
+              "type": "round-mirror",
+              "at": [
+                0.073,
+                2.48
+              ],
+              "rot": 90,
+              "r": 0.42,
+              "y": 1.38,
+              "src": "compose@1"
+            },
+            {
+              "type": "pampas-vase",
+              "at": [
+                0.251,
+                -5.551
+              ],
+              "rot": 90,
+              "src": "compose@1"
+            },
+            {
+              "type": "door-mat",
+              "at": [
+                1.5,
+                5.64
+              ],
+              "rot": 180,
+              "w": 0.9,
+              "d": 0.45,
+              "src": "dress@1",
+              "dk": "l1.02:entry:0"
+            },
+            {
+              "type": "umbrella-stand",
+              "at": [
+                2.82,
+                5.389
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l1.02:entry:1"
+            },
+            {
+              "type": "shoe-row",
+              "at": [
+                0.41,
+                5.776
+              ],
+              "rot": 180,
+              "src": "dress@1",
+              "dk": "l1.02:entry:2"
+            },
+            {
+              "type": "leaner-mirror",
+              "at": [
+                2.757,
+                1.96
+              ],
+              "rot": 270,
+              "src": "dress@1",
+              "dk": "l1.02:mirror:0"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "03",
+          "name": "Shop East",
+          "bounds": {
+            "x": 3,
+            "z": -6,
+            "w": 5,
+            "d": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "name": "First Floor",
+      "sheet": "A-102",
+      "y": 3.5,
+      "height": 2.7,
+      "floor": "oak",
+      "interior": "#f0ece3",
+      "trimColor": "#33383c",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -6,
+          "w": 8.3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#ece6da"
+        },
+        {
+          "x": 0,
+          "z": -6,
+          "w": 3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#ddd6c8"
+        },
+        {
+          "x": 3,
+          "z": -6,
+          "w": 5,
+          "d": 12,
+          "material": "stucco",
+          "color": "#f1ece1"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -6.9,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "S",
+          "at": -4,
+          "type": "slider",
+          "w": 2.4,
+          "h": 2.3,
+          "frame": "#33383c"
+        },
+        {
+          "side": "S",
+          "at": -1.1,
+          "type": "window",
+          "w": 1,
+          "h": 1.2,
+          "sill": 1,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "S",
+          "at": 1.5,
+          "type": "window",
+          "w": 1,
+          "h": 1.6,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "S",
+          "at": 4.6,
+          "type": "glass",
+          "w": 2,
+          "h": 2.3,
+          "frame": "#33383c",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 6.9,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 0.2,
+          "type": "window",
+          "w": 2,
+          "h": 1.6,
+          "sill": 0.7,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "W",
+          "at": 3.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.4,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "N",
+          "at": -5.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -2.4,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 1.5,
+          "type": "window",
+          "w": 1,
+          "h": 1.6,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "N",
+          "at": 4.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 6.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 0.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 4.2,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            0,
+            -6
+          ],
+          "to": [
+            0,
+            6
+          ],
+          "door": 8,
+          "doorW": 0.9,
+          "doorColor": "#2f6f6a",
+          "doorSwing": "in",
+          "id": "flat-door",
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            3,
+            -6
+          ],
+          "to": [
+            3,
+            6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            -8,
+            -1.2
+          ],
+          "to": [
+            0,
+            -1.2
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            -3.6,
+            -1.2
+          ],
+          "to": [
+            -3.6,
+            1.6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            -2.2,
+            -1.2
+          ],
+          "to": [
+            -2.2,
+            1.6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            -8,
+            1.6
+          ],
+          "to": [
+            -3.6,
+            1.6
+          ],
+          "door": 3.8,
+          "doorW": 0.8,
+          "doorColor": "#c9b79c",
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            -3.6,
+            1.6
+          ],
+          "to": [
+            -2.2,
+            1.6
+          ],
+          "door": 0.7,
+          "doorW": 0.7,
+          "doorColor": "#c9b79c",
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            -2.2,
+            1
+          ],
+          "to": [
+            0,
+            1
+          ],
+          "door": 1.1,
+          "doorW": 0.7,
+          "doorColor": "#c9b79c",
+          "color": "#f0ece3"
+        }
+      ],
+      "stairs": {
+        "type": "U",
+        "style": "timber",
+        "at": [
+          2.1,
+          1
+        ],
+        "rot": 180,
+        "turn": "left",
+        "w": 1,
+        "to": "l3",
+        "treadWood": "oak",
+        "stringer": "#33383c",
+        "autoVoid": true
+      },
+      "rooms": [
+        {
+          "no": "04",
+          "name": "Bedroom",
+          "bounds": {
+            "x": -8,
+            "z": -1.2,
+            "w": 4.4,
+            "d": 2.8
+          },
+          "program": "bed-primary",
+          "style": "scandi",
+          "floor": {
+            "kind": "white-oak"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#dde2d9"
+          },
+          "items": [
+            {
+              "type": "sleigh-bed",
+              "at": [
+                -6.54,
+                0.105
+              ],
+              "w": 1.2,
+              "quilt": "solid",
+              "color": "#586d77",
+              "src": "compose@1"
+            },
+            {
+              "type": "bedside-cabinet",
+              "at": [
+                -7.49,
+                -0.895
+              ],
+              "src": "compose@1"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                -7.49,
+                -0.913
+              ],
+              "color": "#edece8",
+              "y": 0.62,
+              "src": "compose@1"
+            },
+            {
+              "type": "bedside-cabinet",
+              "at": [
+                -5.59,
+                -0.895
+              ],
+              "src": "compose@1"
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                -5.59,
+                -0.913
+              ],
+              "color": "#edece8",
+              "y": 0.62,
+              "src": "compose@1"
+            },
+            {
+              "type": "wall-art",
+              "at": [
+                -6.54,
+                -1.127
+              ],
+              "w": 0.748,
+              "h": 0.696,
+              "motif": "line",
+              "color": "#edece8",
+              "y": 1.598,
+              "src": "compose@1"
+            },
+            {
+              "type": "dresser",
+              "at": [
+                -3.935,
+                0.185
+              ],
+              "rot": 270,
+              "src": "compose@1"
+            },
+            {
+              "type": "column-lamp",
+              "at": [
+                -3.953,
+                0.185
+              ],
+              "rot": 270,
+              "color": "#edece8",
+              "y": 0.85,
+              "src": "compose@1"
+            },
+            {
+              "type": "table-clock",
+              "at": [
+                -3.952,
+                -0.115
+              ],
+              "rot": 270,
+              "y": 0.85,
+              "src": "compose@1"
+            },
+            {
+              "type": "arch-mirror",
+              "at": [
+                -3.673,
+                0.185
+              ],
+              "rot": 270,
+              "w": 0.615,
+              "h": 1.1,
+              "y": 1.55,
+              "src": "compose@1"
+            },
+            {
+              "type": "rubber-plant",
+              "at": [
+                -7.66,
+                1.252
+              ],
+              "rot": 180,
+              "color": "#586d77",
+              "src": "compose@1"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "05",
+          "name": "Laundry Closet",
+          "bounds": {
+            "x": -3.6,
+            "z": -1.2,
+            "w": 1.4,
+            "d": 2.8
+          },
+          "program": "laundry",
+          "style": "scandi",
+          "floor": {
+            "kind": "tile",
+            "color": "#d8d4ca",
+            "scale": 0.6
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#f2efe8"
+          },
+          "items": [
+            {
+              "type": "washing-machine",
+              "at": [
+                -3.21,
+                -0.815
+              ],
+              "src": "compose@1"
+            },
+            {
+              "type": "dryer",
+              "at": [
+                -2.59,
+                -0.815
+              ],
+              "src": "compose@1"
+            },
+            {
+              "type": "wall-hooks",
+              "at": [
+                -3.527,
+                0.27
+              ],
+              "rot": 90,
+              "y": 1.6,
+              "src": "compose@1"
+            },
+            {
+              "type": "towel-stack",
+              "at": [
+                -2.591,
+                -0.824
+              ],
+              "y": 0.85,
+              "src": "dress@1",
+              "dk": "l2.05:tops:0"
+            },
+            {
+              "type": "tea-towel",
+              "at": [
+                -3.211,
+                -0.815
+              ],
+              "y": 0.85,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l2.05:tops:1"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "06",
+          "name": "Bath",
+          "bounds": {
+            "x": -2.2,
+            "z": -1.2,
+            "w": 2.2,
+            "d": 2.2
+          },
+          "program": "bath",
+          "style": "scandi",
+          "bath": {
+            "tub": "built-in",
+            "shower": true,
+            "vanity": "single"
+          },
+          "floor": {
+            "kind": "tile",
+            "color": "#c9cecb",
+            "scale": 0.3
+          },
+          "walls": {
+            "kind": "tile",
+            "color": "#e4e8e6",
+            "h": 2.1
+          },
+          "items": [
+            {
+              "type": "shower-cubicle",
+              "at": [
+                -0.535,
+                -0.665
+              ],
+              "src": "compose@1"
+            },
+            {
+              "type": "toilet",
+              "at": [
+                -1.735,
+                -0.76
+              ],
+              "src": "compose@1"
+            },
+            {
+              "type": "pedestal-sink",
+              "at": [
+                -1.885,
+                0.45
+              ],
+              "rot": 90,
+              "src": "compose@1"
+            },
+            {
+              "type": "heated-towel-rail",
+              "at": [
+                -1.28,
+                -1.127
+              ],
+              "y": 0.4,
+              "src": "compose@1"
+            },
+            {
+              "type": "bath-rug",
+              "at": [
+                -0.535,
+                0.237
+              ],
+              "r": 0.35,
+              "src": "compose@1"
+            },
+            {
+              "type": "tissue-candle",
+              "at": [
+                -1.719,
+                -1.02
+              ],
+              "y": 0.805,
+              "variant": 2,
+              "src": "dress@1",
+              "dk": "l2.06:tank:0"
+            },
+            {
+              "type": "robe-hook",
+              "at": [
+                -2.127,
+                -0.17
+              ],
+              "rot": 90,
+              "y": 0.55,
+              "src": "dress@1",
+              "dk": "l2.06:hook:0"
+            },
+            {
+              "type": "roll-holder",
+              "at": [
+                -2.089,
+                -0.65
+              ],
+              "rot": 90,
+              "y": 0.75,
+              "src": "dress@1",
+              "dk": "l2.06:roll:0"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "07",
+          "name": "Entry Hall",
+          "bounds": {
+            "x": -2.2,
+            "z": 1,
+            "w": 2.2,
+            "d": 2
+          },
+          "program": "foyer",
+          "style": "scandi",
+          "floor": {
+            "kind": "tile",
+            "color": "#cfcac0",
+            "scale": 0.45
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#eeeae0"
+          },
+          "items": [
+            {
+              "type": "wall-hooks",
+              "at": [
+                -0.55,
+                1.12
+              ],
+              "rot": 0,
+              "y": 1.5
+            },
+            {
+              "type": "side-table",
+              "at": [
+                -0.4,
+                1.31
+              ]
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                -0.4,
+                1.31
+              ],
+              "y": 0.55
+            },
+            {
+              "type": "runner-rug",
+              "at": [
+                -1.1,
+                2
+              ],
+              "rot": 90,
+              "w": 1,
+              "d": 1.4,
+              "color": "#869e93",
+              "src": "compose@1"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "08",
+          "name": "Kitchen",
+          "bounds": {
+            "x": -2.2,
+            "z": 3,
+            "w": 2.2,
+            "d": 3
+          },
+          "program": "kitchen",
+          "style": "scandi",
+          "kitchen": {
+            "layout": "L",
+            "island": false,
+            "peninsula": false,
+            "windowOverSink": true,
+            "top": "butcher",
+            "color": "#eceae4"
+          },
+          "floor": {
+            "kind": "tile",
+            "color": "#d8d4ca",
+            "scale": 0.6
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#f2efe8"
+          },
+          "items": [
+            {
+              "type": "counter-run",
+              "at": [
+                -1.977,
+                5.605
+              ],
+              "rot": 180,
+              "w": 0.445,
+              "color": "#eceae4",
+              "top": "butcher",
+              "src": "compose@1"
+            },
+            {
+              "type": "range",
+              "at": [
+                -1.455,
+                5.595
+              ],
+              "rot": 180,
+              "w": 0.6,
+              "src": "compose@1"
+            },
+            {
+              "type": "counter-run",
+              "at": [
+                -0.932,
+                5.605
+              ],
+              "rot": 180,
+              "w": 0.445,
+              "color": "#eceae4",
+              "top": "butcher",
+              "src": "compose@1"
+            },
+            {
+              "type": "fridge",
+              "at": [
+                -0.445,
+                3.8
+              ],
+              "rot": 270,
+              "src": "compose@1"
+            },
+            {
+              "type": "sink-run",
+              "at": [
+                -0.395,
+                4.75
+              ],
+              "rot": 270,
+              "w": 1,
+              "color": "#eceae4",
+              "top": "butcher",
+              "src": "compose@1"
+            },
+            {
+              "type": "corner-run",
+              "at": [
+                -0.395,
+                5.606
+              ],
+              "rot": 180,
+              "hand": "left",
+              "color": "#eceae4",
+              "top": "butcher",
+              "src": "compose@1"
+            },
+            {
+              "type": "aloe-pot",
+              "at": [
+                -0.932,
+                5.744
+              ],
+              "rot": 180,
+              "y": 0.9,
+              "src": "compose@1"
+            },
+            {
+              "type": "pot-on-hob",
+              "at": [
+                -1.466,
+                5.625
+              ],
+              "rot": 180,
+              "y": 0.918,
+              "variant": 0,
+              "src": "dress@1",
+              "dk": "l2.08:hob:0"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "09",
+          "name": "Living Room",
+          "bounds": {
+            "x": -5.8,
+            "z": 1.6,
+            "w": 3.6,
+            "d": 4.4
+          },
+          "program": "living",
+          "style": "scandi",
+          "density": 0.8,
+          "floor": {
+            "kind": "white-oak"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#efe9dd"
+          },
+          "items": [
+            {
+              "type": "sofa",
+              "at": [
+                -3.8,
+                3.4
+              ],
+              "w": 2.1,
+              "color": "#8999a1"
+            },
+            {
+              "type": "area-rug",
+              "at": [
+                -3.8,
+                4.55
+              ],
+              "w": 2.6,
+              "d": 2.1,
+              "color": "#526671"
+            },
+            {
+              "type": "trunk-coffee-table",
+              "at": [
+                -3.8,
+                4.7
+              ],
+              "color": "#bba98b"
+            },
+            {
+              "type": "club-chair",
+              "at": [
+                -5.15,
+                4.8
+              ],
+              "rot": 62,
+              "color": "#8999a1"
+            },
+            {
+              "type": "tripod-floor-lamp",
+              "at": [
+                -5.525,
+                5.661
+              ],
+              "rot": 180,
+              "color": "#8999a1",
+              "src": "compose@1"
+            },
+            {
+              "type": "tall-cactus",
+              "at": [
+                -2.475,
+                5.735
+              ],
+              "rot": 180,
+              "color": "#526671",
+              "src": "compose@1"
+            },
+            {
+              "type": "tray-vignette",
+              "at": [
+                -3.8,
+                4.71
+              ],
+              "y": 0.46,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l2.09:coffee:0"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "10",
+          "name": "Desk Nook",
+          "bounds": {
+            "x": -8,
+            "z": 1.6,
+            "w": 2.2,
+            "d": 4.4
+          },
+          "program": "study",
+          "style": "scandi",
+          "floor": {
+            "kind": "white-oak"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#e4e7e3"
+          },
+          "items": [
+            {
+              "type": "writing-desk",
+              "at": [
+                -6.9,
+                5.55
+              ],
+              "rot": 180
+            },
+            {
+              "type": "task-chair",
+              "at": [
+                -6.9,
+                4.85
+              ],
+              "rot": 0
+            },
+            {
+              "type": "laptop",
+              "at": [
+                -6.9,
+                5.55
+              ],
+              "y": 0.75,
+              "rot": 180
+            },
+            {
+              "type": "desk-lamp",
+              "at": [
+                -7.32,
+                5.6
+              ],
+              "y": 0.75,
+              "rot": 180
+            },
+            {
+              "type": "ladder-shelf",
+              "at": [
+                -7.657,
+                2.87
+              ],
+              "rot": 90,
+              "color": "#c3a995",
+              "src": "compose@1"
+            },
+            {
+              "type": "tall-cactus",
+              "at": [
+                -6.02,
+                5.735
+              ],
+              "rot": 180,
+              "color": "#556372",
+              "src": "compose@1"
+            },
+            {
+              "type": "side-set",
+              "at": [
+                -6.571,
+                5.55
+              ],
+              "rot": 180,
+              "y": 0.75,
+              "variant": 1,
+              "src": "dress@1",
+              "dk": "l2.10:desk:0"
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "11",
+          "name": "Street Balcony",
+          "bounds": {
+            "x": -7.4,
+            "z": 6,
+            "w": 5.2,
+            "d": 1.3
+          },
+          "program": "outdoor",
+          "fixtures": {
+            "fan": false,
+            "pendants": 0,
+            "ceiling": "none"
+          },
+          "items": [
+            {
+              "type": "bistro-table",
+              "at": [
+                -6.8,
+                6.7
+              ]
+            },
+            {
+              "type": "lantern",
+              "at": [
+                -6.8,
+                6.7
+              ],
+              "y": 0.72
+            },
+            {
+              "type": "bentwood-chair",
+              "at": [
+                -7.3,
+                6.7
+              ],
+              "rot": 90
+            },
+            {
+              "type": "bentwood-chair",
+              "at": [
+                -6.3,
+                6.7
+              ],
+              "rot": 270
+            },
+            {
+              "type": "snake-plant",
+              "at": [
+                -2.55,
+                7
+              ]
+            },
+            {
+              "type": "zz-plant",
+              "at": [
+                -3.25,
+                7
+              ]
+            }
+          ],
+          "lock": true
+        },
+        {
+          "no": "12",
+          "name": "Rear Flat Two",
+          "bounds": {
+            "x": -8,
+            "z": -6,
+            "w": 8,
+            "d": 4.8
+          }
+        },
+        {
+          "no": "13",
+          "name": "East Flat Two",
+          "bounds": {
+            "x": 3,
+            "z": -6,
+            "w": 5,
+            "d": 12
+          }
+        },
+        {
+          "no": "14",
+          "name": "Common Two",
+          "bounds": {
+            "x": 0,
+            "z": -6,
+            "w": 3,
+            "d": 12
+          },
+          "floor": {
+            "kind": "terrazzo",
+            "color": "#d9d3c7"
+          },
+          "walls": {
+            "kind": "paint",
+            "color": "#ebe5d9"
+          },
+          "items": [
+            {
+              "type": "console-table",
+              "at": [
+                0.26,
+                3.9
+              ],
+              "rot": 90
+            },
+            {
+              "type": "table-lamp",
+              "at": [
+                0.26,
+                3.7
+              ],
+              "rot": 90,
+              "y": 0.8
+            },
+            {
+              "type": "ceramic-bowl",
+              "at": [
+                0.26,
+                4.1
+              ],
+              "rot": 90,
+              "y": 0.8
+            },
+            {
+              "type": "wall-art",
+              "at": [
+                0.1,
+                3.9
+              ],
+              "rot": 90,
+              "y": 1.45,
+              "w": 0.77,
+              "h": 0.5,
+              "motif": "line"
+            },
+            {
+              "type": "rubber-plant",
+              "at": [
+                2.55,
+                5.55
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "l3",
+      "name": "Floor Three",
+      "sheet": "A-103",
+      "y": 6.2,
+      "height": 2.7,
+      "floor": "oak",
+      "interior": "#f0ece3",
+      "trimColor": "#33383c",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -6,
+          "w": 8.3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#ece6da"
+        },
+        {
+          "x": 0,
+          "z": -6,
+          "w": 3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#ddd6c8"
+        },
+        {
+          "x": 3,
+          "z": -6,
+          "w": 5,
+          "d": 12,
+          "material": "stucco",
+          "color": "#f1ece1"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -6.9,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -4,
+          "type": "glass",
+          "w": 2.4,
+          "h": 2.3,
+          "frame": "#33383c",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -1.1,
+          "type": "window",
+          "w": 1,
+          "h": 1.2,
+          "sill": 1,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 1.5,
+          "type": "window",
+          "w": 1,
+          "h": 1.6,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "S",
+          "at": 4.6,
+          "type": "glass",
+          "w": 2,
+          "h": 2.3,
+          "frame": "#33383c",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 6.9,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 0.2,
+          "type": "window",
+          "w": 2,
+          "h": 1.6,
+          "sill": 0.7,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 3.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.4,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -5.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -2.4,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 1.5,
+          "type": "window",
+          "w": 1,
+          "h": 1.6,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "N",
+          "at": 4.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 6.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 0.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 4.2,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            0,
+            -6
+          ],
+          "to": [
+            0,
+            6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            3,
+            -6
+          ],
+          "to": [
+            3,
+            6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            -8,
+            -1.2
+          ],
+          "to": [
+            0,
+            -1.2
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        }
+      ],
+      "stairs": {
+        "type": "U",
+        "style": "timber",
+        "at": [
+          2.1,
+          1
+        ],
+        "rot": 180,
+        "turn": "left",
+        "w": 1,
+        "to": "l4",
+        "treadWood": "oak",
+        "stringer": "#33383c",
+        "autoVoid": true
+      },
+      "rooms": [
+        {
+          "no": "15",
+          "name": "Front Flat Three",
+          "bounds": {
+            "x": -8,
+            "z": -1.2,
+            "w": 8,
+            "d": 7.2
+          }
+        },
+        {
+          "no": "16",
+          "name": "Rear Flat Three",
+          "bounds": {
+            "x": -8,
+            "z": -6,
+            "w": 8,
+            "d": 4.8
+          }
+        },
+        {
+          "no": "17",
+          "name": "East Flat Three",
+          "bounds": {
+            "x": 3,
+            "z": -6,
+            "w": 5,
+            "d": 12
+          }
+        },
+        {
+          "no": "18",
+          "name": "Common Three",
+          "bounds": {
+            "x": 0,
+            "z": -6,
+            "w": 3,
+            "d": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "l4",
+      "name": "Floor Four",
+      "sheet": "A-104",
+      "y": 8.9,
+      "height": 2.7,
+      "floor": "oak",
+      "interior": "#f0ece3",
+      "trimColor": "#33383c",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -6,
+          "w": 8.3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#ece6da"
+        },
+        {
+          "x": 0,
+          "z": -6,
+          "w": 3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#ddd6c8"
+        },
+        {
+          "x": 3,
+          "z": -6,
+          "w": 5,
+          "d": 12,
+          "material": "stucco",
+          "color": "#f1ece1"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -6.9,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -4,
+          "type": "glass",
+          "w": 2.4,
+          "h": 2.3,
+          "frame": "#33383c",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -1.1,
+          "type": "window",
+          "w": 1,
+          "h": 1.2,
+          "sill": 1,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 1.5,
+          "type": "window",
+          "w": 1,
+          "h": 1.6,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "S",
+          "at": 4.6,
+          "type": "glass",
+          "w": 2,
+          "h": 2.3,
+          "frame": "#33383c",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 6.9,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 0.2,
+          "type": "window",
+          "w": 2,
+          "h": 1.6,
+          "sill": 0.7,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 3.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.4,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -5.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -2.4,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 1.5,
+          "type": "window",
+          "w": 1,
+          "h": 1.6,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "N",
+          "at": 4.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 6.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 0.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 4.2,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            0,
+            -6
+          ],
+          "to": [
+            0,
+            6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            3,
+            -6
+          ],
+          "to": [
+            3,
+            6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            -8,
+            -1.2
+          ],
+          "to": [
+            0,
+            -1.2
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        }
+      ],
+      "stairs": {
+        "type": "U",
+        "style": "timber",
+        "at": [
+          2.1,
+          1
+        ],
+        "rot": 180,
+        "turn": "left",
+        "w": 1,
+        "to": "l5",
+        "treadWood": "oak",
+        "stringer": "#33383c",
+        "autoVoid": true
+      },
+      "rooms": [
+        {
+          "no": "19",
+          "name": "Front Flat Four",
+          "bounds": {
+            "x": -8,
+            "z": -1.2,
+            "w": 8,
+            "d": 7.2
+          }
+        },
+        {
+          "no": "20",
+          "name": "Rear Flat Four",
+          "bounds": {
+            "x": -8,
+            "z": -6,
+            "w": 8,
+            "d": 4.8
+          }
+        },
+        {
+          "no": "21",
+          "name": "East Flat Four",
+          "bounds": {
+            "x": 3,
+            "z": -6,
+            "w": 5,
+            "d": 12
+          }
+        },
+        {
+          "no": "22",
+          "name": "Common Four",
+          "bounds": {
+            "x": 0,
+            "z": -6,
+            "w": 3,
+            "d": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "l5",
+      "name": "Floor Five",
+      "sheet": "A-105",
+      "y": 11.600000000000001,
+      "height": 2.7,
+      "floor": "oak",
+      "interior": "#f0ece3",
+      "trimColor": "#33383c",
+      "footprint": [
+        {
+          "x": -8,
+          "z": -6,
+          "w": 8.3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#ece6da"
+        },
+        {
+          "x": 0,
+          "z": -6,
+          "w": 3,
+          "d": 12,
+          "material": "stucco",
+          "color": "#ddd6c8"
+        },
+        {
+          "x": 3,
+          "z": -6,
+          "w": 5,
+          "d": 12,
+          "material": "stucco",
+          "color": "#f1ece1"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": -6.9,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -4,
+          "type": "glass",
+          "w": 2.4,
+          "h": 2.3,
+          "frame": "#33383c",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": -1.1,
+          "type": "window",
+          "w": 1,
+          "h": 1.2,
+          "sill": 1,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 1.5,
+          "type": "window",
+          "w": 1,
+          "h": 1.6,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "S",
+          "at": 4.6,
+          "type": "glass",
+          "w": 2,
+          "h": 2.3,
+          "frame": "#33383c",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "S",
+          "at": 6.9,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 0.2,
+          "type": "window",
+          "w": 2,
+          "h": 1.6,
+          "sill": 0.7,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "W",
+          "at": 3.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.4,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -5.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": -2.4,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 1.5,
+          "type": "window",
+          "w": 1,
+          "h": 1.6,
+          "sill": 0.5,
+          "frame": "#33383c",
+          "grid": "none"
+        },
+        {
+          "side": "N",
+          "at": 4.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "N",
+          "at": 6.8,
+          "type": "window",
+          "w": 1.2,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": -3.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 0.6,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        },
+        {
+          "side": "E",
+          "at": 4.2,
+          "type": "window",
+          "w": 1.4,
+          "h": 1.5,
+          "sill": 0.9,
+          "frame": "#33383c",
+          "grid": "none",
+          "blinds": {
+            "color": "#d9d2c3",
+            "drop": 0.9
+          }
+        }
+      ],
+      "partitions": [
+        {
+          "from": [
+            0,
+            -6
+          ],
+          "to": [
+            0,
+            6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            3,
+            -6
+          ],
+          "to": [
+            3,
+            6
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        },
+        {
+          "from": [
+            -8,
+            -1.2
+          ],
+          "to": [
+            0,
+            -1.2
+          ],
+          "door": null,
+          "color": "#f0ece3"
+        }
+      ],
+      "stairs": {
+        "type": "U",
+        "style": "timber",
+        "at": [
+          2.1,
+          1
+        ],
+        "rot": 180,
+        "turn": "left",
+        "w": 1,
+        "to": "l6",
+        "treadWood": "oak",
+        "stringer": "#33383c",
+        "autoVoid": true
+      },
+      "rooms": [
+        {
+          "no": "23",
+          "name": "Front Flat Five",
+          "bounds": {
+            "x": -8,
+            "z": -1.2,
+            "w": 8,
+            "d": 7.2
+          }
+        },
+        {
+          "no": "24",
+          "name": "Rear Flat Five",
+          "bounds": {
+            "x": -8,
+            "z": -6,
+            "w": 8,
+            "d": 4.8
+          }
+        },
+        {
+          "no": "25",
+          "name": "East Flat Five",
+          "bounds": {
+            "x": 3,
+            "z": -6,
+            "w": 5,
+            "d": 12
+          }
+        },
+        {
+          "no": "26",
+          "name": "Common Five",
+          "bounds": {
+            "x": 0,
+            "z": -6,
+            "w": 3,
+            "d": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "l6",
+      "name": "Roof",
+      "sheet": "A-106",
+      "y": 14.3,
+      "height": 2.4,
+      "floor": "concrete",
+      "interior": "#f0ece3",
+      "trimColor": "#33383c",
+      "footprint": [
+        {
+          "x": 0,
+          "z": -2.4,
+          "w": 3,
+          "d": 5,
+          "material": "stucco",
+          "color": "#ddd6c8"
+        }
+      ],
+      "openings": [
+        {
+          "side": "S",
+          "at": 1.5,
+          "type": "door",
+          "w": 0.9,
+          "h": 2,
+          "style": "entry",
+          "frame": "#33383c",
+          "color": "#33383c"
+        },
+        {
+          "side": "E",
+          "at": -0.5,
+          "type": "window",
+          "w": 0.8,
+          "h": 0.5,
+          "sill": 1.5,
+          "frame": "#33383c"
+        }
+      ],
+      "rooms": [
+        {
+          "no": "27",
+          "name": "Roof Access",
+          "bounds": {
+            "x": 0,
+            "z": -2.4,
+            "w": 3,
+            "d": 5
+          }
+        }
+      ]
+    }
+  ],
+  "roofs": [
+    {
+      "over": {
+        "x": -8,
+        "z": -6,
+        "w": 16,
+        "d": 12
+      },
+      "y": 14.3,
+      "type": "flat",
+      "parapet": 0.5,
+      "overhang": 0,
+      "color": "#4b4947",
+      "trim": "#c9c3b6",
+      "finish": "membrane"
+    },
+    {
+      "over": {
+        "x": 0,
+        "z": -2.4,
+        "w": 3,
+        "d": 5
+      },
+      "y": 16.7,
+      "type": "flat",
+      "parapet": 0.15,
+      "overhang": 0.1,
+      "color": "#4b4947",
+      "trim": "#c9c3b6",
+      "finish": "membrane"
+    }
+  ],
+  "features": [
+    {
+      "type": "balcony",
+      "level": "l2",
+      "side": "S",
+      "from": -7.6,
+      "to": -0.4,
+      "depth": 1.3,
+      "rail": "metal",
+      "railColor": "#33383c",
+      "floorColor": "#8d8a84"
+    },
+    {
+      "type": "balcony",
+      "level": "l2",
+      "side": "S",
+      "from": 3.4,
+      "to": 7.6,
+      "depth": 1.3,
+      "rail": "metal",
+      "railColor": "#33383c",
+      "floorColor": "#8d8a84"
+    },
+    {
+      "type": "balcony",
+      "level": "l3",
+      "side": "S",
+      "from": -7.6,
+      "to": -0.4,
+      "depth": 1.3,
+      "rail": "metal",
+      "railColor": "#33383c",
+      "floorColor": "#8d8a84"
+    },
+    {
+      "type": "balcony",
+      "level": "l3",
+      "side": "S",
+      "from": 3.4,
+      "to": 7.6,
+      "depth": 1.3,
+      "rail": "metal",
+      "railColor": "#33383c",
+      "floorColor": "#8d8a84"
+    },
+    {
+      "type": "balcony",
+      "level": "l4",
+      "side": "S",
+      "from": -7.6,
+      "to": -0.4,
+      "depth": 1.3,
+      "rail": "metal",
+      "railColor": "#33383c",
+      "floorColor": "#8d8a84"
+    },
+    {
+      "type": "balcony",
+      "level": "l4",
+      "side": "S",
+      "from": 3.4,
+      "to": 7.6,
+      "depth": 1.3,
+      "rail": "metal",
+      "railColor": "#33383c",
+      "floorColor": "#8d8a84"
+    },
+    {
+      "type": "balcony",
+      "level": "l5",
+      "side": "S",
+      "from": -7.6,
+      "to": -0.4,
+      "depth": 1.3,
+      "rail": "metal",
+      "railColor": "#33383c",
+      "floorColor": "#8d8a84"
+    },
+    {
+      "type": "balcony",
+      "level": "l5",
+      "side": "S",
+      "from": 3.4,
+      "to": 7.6,
+      "depth": 1.3,
+      "rail": "metal",
+      "railColor": "#33383c",
+      "floorColor": "#8d8a84"
+    }
+  ],
+  "facade": {
+    "zones": [],
+    "bands": [
+      {
+        "y": 2.95,
+        "h": 0.5,
+        "material": "stucco",
+        "color": "#3a3f43",
+        "proud": 0.06,
+        "sides": [
+          "S"
+        ]
+      },
+      {
+        "y": 3.38,
+        "h": 0.24,
+        "material": "stucco",
+        "color": "#cfc9bc",
+        "proud": 0.04,
+        "sides": [
+          "W",
+          "E",
+          "N"
+        ]
+      },
+      {
+        "y": 6.08,
+        "h": 0.24,
+        "material": "stucco",
+        "color": "#cfc9bc",
+        "proud": 0.04,
+        "sides": [
+          "W",
+          "E",
+          "N"
+        ]
+      },
+      {
+        "y": 8.780000000000001,
+        "h": 0.24,
+        "material": "stucco",
+        "color": "#cfc9bc",
+        "proud": 0.04,
+        "sides": [
+          "W",
+          "E",
+          "N"
+        ]
+      },
+      {
+        "y": 11.480000000000002,
+        "h": 0.24,
+        "material": "stucco",
+        "color": "#cfc9bc",
+        "proud": 0.04,
+        "sides": [
+          "W",
+          "E",
+          "N"
+        ]
+      },
+      {
+        "y": 14,
+        "h": 0.3,
+        "material": "stucco",
+        "color": "#cfc9bc",
+        "proud": 0.05
+      }
+    ]
+  },
+  "site": [
+    {
+      "type": "path",
+      "path": [
+        [
+          1.5,
+          6.1
+        ],
+        [
+          1.5,
+          9.9
+        ]
+      ],
+      "w": 1.8,
+      "surface": "concrete",
+      "color": "#a09b90"
+    },
+    {
+      "type": "path",
+      "path": [
+        [
+          -1.5,
+          6.1
+        ],
+        [
+          -1.5,
+          9.9
+        ]
+      ],
+      "w": 1.4,
+      "surface": "concrete",
+      "color": "#a09b90"
+    },
+    {
+      "type": "path",
+      "path": [
+        [
+          6.2,
+          6.1
+        ],
+        [
+          6.2,
+          9.9
+        ]
+      ],
+      "w": 1.4,
+      "surface": "concrete",
+      "color": "#a09b90"
+    },
+    {
+      "type": "planter",
+      "at": [
+        -0.2,
+        7
+      ],
+      "w": 0.9,
+      "d": 0.6,
+      "color": "#4b4947"
+    },
+    {
+      "type": "planter",
+      "at": [
+        3.2,
+        7
+      ],
+      "w": 0.9,
+      "d": 0.6,
+      "color": "#4b4947"
+    },
+    {
+      "type": "bicycle",
+      "at": [
+        -4.2,
+        8.1
+      ],
+      "rot": 90
+    },
+    {
+      "type": "bicycle",
+      "at": [
+        -3.4,
+        8.1
+      ],
+      "rot": 90
+    },
+    {
+      "type": "tree",
+      "at": [
+        9.8,
+        8.4
+      ],
+      "species": "birch",
+      "h": 6
+    },
+    {
+      "type": "tree",
+      "at": [
+        -9.8,
+        8.4
+      ],
+      "species": "birch",
+      "h": 6
+    },
+    {
+      "type": "wall-low",
+      "path": [
+        [
+          -11.8,
+          -9.8
+        ],
+        [
+          -11.8,
+          6.4
+        ]
+      ],
+      "t": 0.3,
+      "h": 2,
+      "surface": "render",
+      "color": "#d9d2c4",
+      "cap": "#b9b4a8"
+    },
+    {
+      "type": "wall-low",
+      "path": [
+        [
+          11.8,
+          -9.8
+        ],
+        [
+          11.8,
+          6.4
+        ]
+      ],
+      "t": 0.3,
+      "h": 2,
+      "surface": "render",
+      "color": "#d9d2c4",
+      "cap": "#b9b4a8"
+    },
+    {
+      "type": "wall-low",
+      "path": [
+        [
+          -11.8,
+          -9.8
+        ],
+        [
+          11.8,
+          -9.8
+        ]
+      ],
+      "t": 0.3,
+      "h": 2,
+      "surface": "render",
+      "color": "#d9d2c4",
+      "cap": "#b9b4a8"
+    },
+    {
+      "type": "patio",
+      "at": [
+        0,
+        -8
+      ],
+      "w": 12,
+      "d": 3.4,
+      "surface": "concrete",
+      "color": "#a8a398"
+    },
+    {
+      "type": "bed",
+      "at": [
+        8,
+        -8.2
+      ],
+      "w": 5,
+      "d": 3,
+      "plants": "mixed",
+      "density": 1
+    },
+    {
+      "type": "tree",
+      "at": [
+        -9.2,
+        -8.2
+      ],
+      "species": "birch",
+      "h": 5
+    },
+    {
+      "type": "bench",
+      "at": [
+        -5,
+        -9.2
+      ],
+      "rot": 0
+    },
+    {
+      "type": "bicycle",
+      "at": [
+        3,
+        -7.6
+      ],
+      "rot": 0
+    }
+  ],
+  "hero": {
+    "level": "l2",
+    "upstairs": true,
+    "at": [
+      -6.9,
+      2.08
+    ],
+    "rot": 0,
+    "device": "charcoal",
+    "pose": "prone",
+    "surface": "desk",
+    "desk": {
+      "style": "oak",
+      "w": 1.5
+    },
+    "monitor": "flat",
+    "chair": {
+      "kind": "task",
+      "pose": "turned"
+    }
+  },
+  "entry": {
+    "level": "l1",
+    "side": "S",
+    "at": 1.5
+  },
+  "shots": [
+    {
+      "id": "door-to-core",
+      "type": "door-to-core",
+      "planner": "v2",
+      "duration": "auto",
+      "establish": "auto"
+    },
+    {
+      "id": "orbit",
+      "type": "orbit",
+      "duration": 10
+    }
+  ],
+  "areaSqm": 58
+}

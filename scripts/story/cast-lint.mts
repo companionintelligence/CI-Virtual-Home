@@ -110,7 +110,16 @@ if (fams.length !== N) E('plan', `${fams.length} families (need ${N})`);
 const dup = (xs: string[]): string[] => xs.filter((x, i) => xs.indexOf(x) !== i);
 for (const d of dup(fams.map((f) => f.slug))) E('slug', `${d} appears twice`);
 for (const d of dup(fams.map((f) => f.house))) E('house', `${d} appears twice`);
-for (const h of index) if (!fams.some((f) => f.house === h.id)) E('house', `${h.id} has no family`);
+// A home has a family, or the plan says it has none yet (`homesWithoutFamily`: the apartments). A home that is in neither is an error, so a
+// new spec cannot ship family-less by accident; a home that is in both is an error, so the list cannot go stale when a family moves in.
+const without = plan.homesWithoutFamily ?? {};
+for (const h of index) if (!fams.some((f) => f.house === h.id) && !(h.id in without)) E('house', `${h.id} has no family and is not listed in the plan's homesWithoutFamily`);
+for (const [id, why] of Object.entries(without)) {
+  if (!index.some((h) => h.id === id)) E('homesWithoutFamily', `${id} is not a home in content/houses/index.json`);
+  const lives = fams.find((f) => f.house === id);
+  if (lives) E('homesWithoutFamily', `${id} has the ${lives.surname} family (${lives.slug}): take it out of homesWithoutFamily`);
+  if (typeof why !== 'string' || why.trim().length < 10) E('homesWithoutFamily', `${id}: say why no family lives there (a sentence)`);
+}
 for (const f of fams) if (!houseInfo.has(f.house)) E(f.slug, `house ${f.house} is not in content/houses/index.json`);
 
 const flagFams = fams.filter((f) => f.flagship);
