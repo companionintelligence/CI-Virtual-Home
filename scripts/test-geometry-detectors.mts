@@ -176,6 +176,26 @@ const kinds = (d: SceneDump) => findCollisions(d, CAT);
   check(kinds(tall).findings.some(f => f.kind === 'ceiling' && near(f.depth_cm, 42, 0.5)), 'an item 3.2 m tall under a 2.8 m ceiling: a ceiling finding', JSON.stringify(kinds(tall).findings.map(f => [f.kind, f.depth_cm])));
 }
 {
+  // the ceiling check (D2): a column is meant to be taller than its storey, and an outdoor room has no ceiling to go through; anything else still does
+  const ceilings = (d: SceneDump) => kinds(d).findings.filter(f => f.kind === 'ceiling');
+  const mk = (type: string, h: number, program: string, extra: Partial<Ent> = {}) => {
+    const d = dump(); d.rooms[0].program = program;
+    const e = ent(d, 'item', type, extra); box(d, e, [0.3, h, 0.3], [0, h / 2, 0]);
+    return d;
+  };
+  check(ceilings(mk('column', 6.1, 'living')).length === 0, 'a 6.1 m column in a living room: no ceiling finding (it carries the storeys above)');
+  check(ceilings(mk('sofa', 3.2, 'outdoor')).length === 0, 'a 3.2 m item in a room whose program is outdoor: no ceiling finding');
+  check(ceilings(mk('sofa', 3.2, 'living')).length === 1, 'the same item in a living room still goes through the ceiling (the check is only skipped, not removed)', JSON.stringify(ceilings(mk('sofa', 3.2, 'living')).map(f => f.depth_cm)));
+  check(ceilings(mk('column', 6.1, 'outdoor')).length === 0 && ceilings(mk('hanging-plant', 3.2, 'sunroom')).length === 1, 'a hanging plant through a sunroom ceiling is still found; the skip is not "any room that opens to the outside"');
+}
+{
+  // D1, the level of an entity (the page reads it in scripts/review/geom-page.mts `levelOfObj`; its self-test is collide.mts --selftest, part C): a
+  // cord on the second storey given to the engine as level 0 is 99.5 cm through the first storey's ceiling, given as level 1 it is clear
+  const cord = (level: number) => { const d = dump(); const e = ent(d, 'item', null, { level, room: null, at: [0, 0, 0] }, 'Hero Power Cord'); box(d, e, [0.02, 0.75, 0.02], [1, 3.4, 1]); return kinds(d).findings.filter(f => f.kind === 'ceiling'); };
+  check(cord(0).length === 1 && near(cord(0)[0].depth_cm, 99.5, 0.2), 'a cord up to y 3.775 read as level 0 is 99.5 cm through its ceiling (the page used to say so for 13 hero cords)', JSON.stringify(cord(0).map(f => f.depth_cm)));
+  check(cord(1).length === 0, 'the same cord on its own storey (level 1) is clear');
+}
+{
   // determinism: the same dump twice is the same findings, byte for byte
   const { d } = scene(); const s = ent(d, 'item', 'sofa'); box(d, s, [2.2, 0.8, 0.95], [3, 0.4, 3.95]);
   check(JSON.stringify(kinds(d)) === JSON.stringify(kinds(d)), 'the same scene dump gives the same findings twice');

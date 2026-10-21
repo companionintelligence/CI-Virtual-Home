@@ -44,6 +44,14 @@ export function installGeo() {
     lv.forEach((l: any, i: number) => { if (y >= (l.y || 0) - 0.05) best = i; });
     return best;
   };
+  // the storey an object stands on: its origin's, except for an object AT the world origin. A group there holds world-space geometry (the hero's
+  // power cord and display lead: AssetFactory.createCable builds the tube in world coordinates, put() at 0,0,0), so its origin says nothing of the
+  // storey and read as level 0 on every home whose hero is upstairs (13 false `ceiling` findings, up to 389 cm); the centre of its box does.
+  const _lbb = new T.Box3(), _lc = new T.Vector3();
+  const levelOfObj = (o: any, wp: any) => {
+    if (Math.abs(wp.x) + Math.abs(wp.y) + Math.abs(wp.z) < 1e-6) { _lbb.setFromObject(o); if (!_lbb.isEmpty()) return levelOfY(_lbb.getCenter(_lc).y); }
+    return levelOfY(wp.y);
+  };
   const matOf = (m: any) => m ? ({
     n: m.name || '', t: String(m.type).replace('Material', ''), c: m.color ? m.color.getHexString() : null,
     tr: !!m.transparent, op: +(+m.opacity).toFixed(3), side: m.side, dw: m.depthWrite, dt: m.depthTest,
@@ -79,7 +87,7 @@ export function installGeo() {
     const idx = g && g.index ? g.index.count : g && g.attributes && g.attributes.position ? g.attributes.position.count : 0;
     return {
       id: geo.ids.get(mesh) || 0, name: mesh.name || '', top: top.name || top.type, role: u.role || (u.isWall ? 'wall' : u.isRoof ? 'roof' : u.isCeiling ? 'ceiling' : u.category === 'Site' ? 'site' : null),
-      cat: u.category || null, itemType: u.itemType || null, room: u.room || null, level: levelOfY(wp.y),
+      cat: u.category || null, itemType: u.itemType || null, room: u.room || null, level: levelOfObj(mesh, wp),
       chain: chain.join(' > '), geom: g ? g.type : null, size: sz, tris: Math.round(idx / 3), instanced: !!mesh.isInstancedMesh,
       mats: mats.slice(0, 4), unit: unitName(mesh, top), wallPart: wallPartOf(mesh, top), glass: !!(mesh.userData && mesh.userData.windowGlow),
       ro: mesh.renderOrder || 0, shadow: !!mesh.castShadow, at: [+wp.x.toFixed(3), +wp.y.toFixed(3), +wp.z.toFixed(3)],
@@ -324,7 +332,7 @@ export function installGeo() {
       if (ei === undefined) {
         ei = ents.length; tops.set(top, ei); geo.tops[ei] = top;
         const wp = new T.Vector3(); top.getWorldPosition(wp);
-        ents.push({ i: ei, name: top.name || top.type, role, cat: u.category || null, itemType: u.itemType || null, room: u.room || null, level: levelOfY(wp.y), onSurface: !!u.onSurface, mounted: !!u.mounted, foliage: !!u.foliage, dress: !!u.dress, stair: !!u.stair, isWall: !!u.isWall, at: [+wp.x.toFixed(4), +wp.y.toFixed(4), +wp.z.toFixed(4)], rotY: +top.rotation.y.toFixed(5) });
+        ents.push({ i: ei, name: top.name || top.type, role, cat: u.category || null, itemType: u.itemType || null, room: u.room || null, level: levelOfObj(top, wp), onSurface: !!u.onSurface, mounted: !!u.mounted, foliage: !!u.foliage, dress: !!u.dress, stair: !!u.stair, isWall: !!u.isWall, at: [+wp.x.toFixed(4), +wp.y.toFixed(4), +wp.z.toFixed(4)], rotY: +top.rotation.y.toFixed(5) });
       }
       const g = mesh.geometry; if (!g || !g.attributes || !g.attributes.position) continue;
       if (!g.boundingBox) g.computeBoundingBox();
@@ -527,6 +535,16 @@ export function installGeo() {
     m.name = d.name || 'sandbox'; m.userData = { ...(d.userData || {}), planted: true }; m.castShadow = true; m.receiveShadow = true;
     sc.add(m); added.push(m); m.updateMatrixWorld(true);
     return m.id;
+  };
+  // a box built in WORLD coordinates under a group left at the origin, as AssetFactory.createCable builds the hero's power cord and display lead
+  // (hero-build.ts: put(..., 0, 0, 0)): the mesh and its group are at (0,0,0) and only the vertices say where it is
+  geo.sandboxAddWorldSpace = (d: any) => {
+    const sc = scene();
+    const geom = new T.BoxGeometry(d.size[0], d.size[1], d.size[2]); geom.translate(d.pos[0], d.pos[1], d.pos[2]);
+    const m = new T.Mesh(geom, new T.MeshStandardMaterial({ color: d.color ?? 0x222222, roughness: 0.8 }));
+    const holder = new T.Group(); holder.name = d.name || 'sandbox'; holder.userData = { ...(d.userData || {}), planted: true }; holder.add(m);
+    sc.add(holder); added.push(holder); holder.updateMatrixWorld(true);
+    return holder.id;
   };
   geo.sandboxOff = () => {
     const sc = scene();
