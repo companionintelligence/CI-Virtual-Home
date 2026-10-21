@@ -445,7 +445,7 @@ on your own hardware. The contract for the writers, the validator and the film i
   appear nowhere on the page. Featured families pass the ad-ready gate (no `avoid` app, no service a story may not name, a home lit as day), so only a few of the thirty can be featured today. Counts are words ("Thirty fictional
   families in thirty-six homes."), written from the data. The filters live in the address (`?service=<id>&persona=<category>&type=<kind>&q=`), keep every parameter that is not theirs, and let an ad link to the exact pair
   (`/?service=google-photos`). The Core's picture is `pnpm run portal:thumbs -- --stage`. A home's page (`homes/<id>`) has "Meet the family" when a current family lives there. The hero tours the plan's `hero` (the Brennans at
-  Seraphine); when that family is not current the hero plays the home. The headline's claim, `rent-line`, is on hold in `claims.json` until the owner signs it off, so a push to main fails until then.
+  Seraphine); when that family is not current the hero plays the home. The headline's claim, `rent-line`, is the owner's own wording (approved 2026-10-20, `ok-verbatim`). A claim the plan names that is on `hold` in `claims.json` builds with a warning and fails a push to main, so an unsanctioned line cannot go live.
 - **Campaign passthrough** (`portal/campaign.js`, `scripts/test-campaign.mts`, `pnpm run test:campaign`; the `campaign` leg of `portal:test`). An ad's
   `utm_source`, `utm_medium`, `utm_campaign`, `utm_content`, `utm_term`, `fbclid`, `ttclid`, `gclid` and `msclkid` are read from the address, kept in
   `sessionStorage` under `ci-campaign` and put, **in the browser only** (the built hrefs stay exactly `https://ci.computer`, `/core` and `/download`: step 7
