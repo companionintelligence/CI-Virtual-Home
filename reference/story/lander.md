@@ -42,7 +42,7 @@ nothing is an error (it would hold nothing and nobody would know); a hero family
 | Field | What it does |
 |---|---|
 | `hero` | the family whose tour `Take the tour` starts, and its home (the picture). Not current: the hero plays the home |
-| `messages[0]` | the H1: the id of a claim. **`rent-line` is on hold in `claims.json`** (the exact line is not in CAMPAIGN.md or COPY.md): the owner sets its `status` to `ok-verbatim` and names the source to release it; until then the page builds with a warning and a push to main fails |
+| `messages[0]` | the H1: the id of a claim. `rent-line` is the owner's own wording (approved 2026-10-20, `ok-verbatim`; the exact line is not in CAMPAIGN.md or COPY.md). A claim on `hold` builds with a warning, and a push to main fails, so an unsanctioned line cannot go live |
 | `proof.candidates` | beats in order; the first whose pair may show is the proof. None: the block is left out, with the reason in the build log |
 | `hold` | `service\|app` pairs not cleared for the lander (counsel). They are off the chips, the cards, the proof and the search words, never off the family pages or the tour. Release one by deleting its entry |
 | `primary` | which app a chip shows when the stories use several |
