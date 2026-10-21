@@ -32,7 +32,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { ROOT, loadPlaywright, serve, stubGoogleFonts, type Served } from './portal-lib.mts';
 import { FILM, FILM_KEYS, filmClock, audioPlacements, captionCues, toVtt, overCap, formatFor, type FilmKey } from '../assets/story/film/layout.js';
 import {
-  loadFamily, filmableSlugs, filmText, clipPath, familiesDir, videoDir, readFilms, writeFilms, aspectLabel, webFileName, sideName, posterFileName, vttFileName, sha256, inputsShaOf, toolSha,
+  loadFamily, filmableSlugs, filmText, clipPath, familiesDir, videoDir, readFilms, writeFilms, aspectLabel, webFileName, sideName, posterFileName, vttFileName, sha256, inputsShaOf, isFilmLighting, FILM_LIGHTING, FILM_LIGHTINGS,
   filmsProblems, hasVoiceLock, captionProblems, type Family, type FilmEntry, type FilmAspect,
 } from './film/lib.mts';
 import { buildAudio, encodeArgs } from './film/mux.mts';
@@ -60,8 +60,9 @@ const PROBE = !!flags.probe, PROBE_S = flags.probe && flags.probe !== 'true' ? +
 const RES = +(flags.res || (PROBE ? 540 : 1080)), JOBS = Math.max(1, +(flags.jobs || 1));
 let GL: GlMode; try { GL = glMode(flags.gl || process.env.FILM_GL); } catch (e: any) { console.error(e.message); process.exit(2); }
 // the hour the film is lit at: the page's own ?lighting= override ("re-lights every house the page builds, whatever its spec says"), as the ad cuts do. A house's own preset may be dusk, which a film (held to daylight and warm light like the ads) may not use.
-const LIGHTING = flags.lighting || process.env.FILM_LIGHTING || 'day';
-if (!['day', 'golden'].includes(LIGHTING)) { console.error(`--lighting must be day or golden: a film is held to daylight and warm light (got ${LIGHTING})`); process.exit(2); }
+const LIGHTING_ASKED = flags.lighting || process.env.FILM_LIGHTING || FILM_LIGHTING;
+if (!isFilmLighting(LIGHTING_ASKED)) { console.error(`--lighting must be ${FILM_LIGHTINGS.join(' or ')}: a film is held to daylight and warm light (got ${LIGHTING_ASKED})`); process.exit(2); }
+const LIGHTING = LIGHTING_ASKED;
 const ASPECTS: FilmKey[] = !flags.aspect || flags.aspect === 'both' ? FILM_KEYS : [flags.aspect as FilmKey];
 if (ASPECTS.some(a => !FILM_KEYS.includes(a))) { console.error(`--aspect must be 16x9, 9x16 or both (got ${flags.aspect})`); process.exit(2); }
 const log = (slug: string, msg: string) => console.log(`${JOBS > 1 ? `[${slug}] ` : ''}${msg}`);
@@ -123,7 +124,7 @@ async function renderFamily(browser: any, srv: Served, slug: string): Promise<Re
   const t0 = Date.now(), res: Result = { slug, ok: false, seconds: {} };
   try {
     const silent = silentFor(slug), fam = await loadFamily(slug, { silent }), P = plan(fam), vdir = videoDir();
-    const films = readFilms(), tool = toolSha(), inputsSha = inputsShaOf(fam, RES, `${tool}|lighting=${LIGHTING}`), prev = films.families[slug];
+    const films = readFilms(), inputsSha = inputsShaOf(fam, RES, { lighting: LIGHTING }), prev = films.families[slug];   // the pin: scripts/film/lib.mts, which the ship step's freshness check uses too
     const webDir = path.join(vdir, 'web'), masterDir = path.join(vdir, 'master'), scratch = path.join(vdir, '.scratch', slug);
     fs.mkdirSync(webDir, { recursive: true }); fs.mkdirSync(scratch, { recursive: true });
     log(slug, `${slug}: ${fam.rs.beats.length} beats, ${P.clock.parts.length} in the film, ${P.clock.duration.toFixed(1)} s (title ${FILM.titleS} s, end card ${(P.clock.outro.t1 - P.clock.outro.t0).toFixed(1)} s), ${P.cues.length} captions${silent ? ', silent' : ''}`);
