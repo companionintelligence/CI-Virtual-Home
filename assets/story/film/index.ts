@@ -16,7 +16,7 @@ import type { StoryTrack } from '../track.js';
 import { trackFrameAt } from '../track.js';
 import { focusRect, leaderTo, type Rect } from '../place.js';
 import { planDoors } from '../../shot-doors.js';
-import { FILM, filmClock, sceneAt, powerForFilm, audioPlacements, captionCues, placeForFilm, formatFor, cardAlpha, ramp, badgeBox, captionBox, canvasCardWidths, canvasVariants, type FilmClock, type FilmFormat, type FilmKey, type Cue, type Placement, type FilmPlace, type Scene } from './layout.js';
+import { FILM, filmClock, silentStory, sceneAt, powerForFilm, audioPlacements, captionCues, placeForFilm, formatFor, cardAlpha, ramp, badgeBox, captionBox, canvasCardWidths, canvasVariants, type FilmClock, type FilmFormat, type FilmKey, type Cue, type Placement, type FilmPlace, type Scene } from './layout.js';
 import { measureCard, drawCard, drawTitle, drawEnd, WEIGHTS, font, nativeTracking, auditType, type TypeAudit, type CardLayout, type CardModel, type TitleModel, type EndModel, type Ctx } from './cards.js';
 import { drawBadge, drawCaption, drawLeader, drawDip, cueAt } from './overlay.js';
 
@@ -28,12 +28,16 @@ export type PrepareOpts = {
   title: TitleModel;
   end: EndModel;
   badge: string;
+  /** a silent film: the clock and the captions come from the estimated durations (layout.ts silentStory); there is no sound under it */
+  silent?: boolean;
 };
 type BeatPlan = { layout: CardLayout; place: FilmPlace; narr: Placement | null; focus: Rect | null; core: Rect | null; variant: number; tag: string };
 type State = {
   rs: RuntimeStory; f: FilmFormat; clock: FilmClock; cues: Cue[]; placements: Placement[];
   g: Ctx; cv: HTMLCanvasElement; gl: HTMLCanvasElement; plans: Map<number, BeatPlan>;
   title: TitleModel; end: EndModel; badge: string; key: string; frames: number; last: number; audit: TypeAudit;
+  /** the luma mean and spread of the room in the last frame drawn, before the overlay (a blank render has no spread, whatever the overlay says) */
+  probe: Ctx; stats: { mean: number; std: number };
 };
 let S: State | null = null;
 const W: any = window;
@@ -83,7 +87,7 @@ async function loadFonts(sample = '') {
 
 export async function prepare(o: PrepareOpts) {
   if (S) end();
-  const rs = o.rs, res = o.res ?? 1080, f = formatFor(o.format, res), clock = filmClock(rs);
+  const rs = o.silent ? silentStory(o.rs) : o.rs, res = o.res ?? 1080, f = formatFor(o.format, res), clock = filmClock(rs, { silent: !!o.silent });
   await loadFonts([o.badge, o.title.heading, o.title.address, o.title.tagline, o.end.signoff, ...o.end.lines, ...rs.members.map(m => m.name)].join(' '));
   const { placements, problems } = audioPlacements(rs, clock);
   if (problems.length) throw new Error(`audio does not fit the film: ${problems.join('; ')}`);
@@ -118,8 +122,10 @@ export async function prepare(o: PrepareOpts) {
   for (const p of clock.parts) { const pl = plans.get(p.idx)!; if (!inside(pl.place.rect) || pl.layout.h > pl.place.rect.h + 1) unsafe.push(`card ${p.id}`); }
   if (!inside(endRect)) unsafe.push('end card');
   if (!inside(cb)) unsafe.push('captions');
-  S = { rs, f, clock, cues, placements, g, cv, gl: dbg.renderer.domElement, plans, title: o.title, end: o.end, badge: o.badge, key, frames: clock.frames, last: -1, audit };
+  const pc = document.createElement('canvas'); pc.width = 64; pc.height = Math.max(8, Math.round(64 * f.h / f.w));
+  S = { rs, f, clock, cues, placements, g, cv, gl: dbg.renderer.domElement, plans, title: o.title, end: o.end, badge: o.badge, key, frames: clock.frames, last: -1, audit, probe: pc.getContext('2d', { willReadFrequently: true })! as Ctx, stats: { mean: 0, std: 0 } };
   return {
+    silent: !!o.silent,
     w: f.w, h: f.h, fps: clock.fps, frames: clock.frames, duration: clock.duration,
     placements: placements.map(p => ({ id: p.id, kind: p.kind, atS: p.atS, durS: p.durS, endS: p.endS, file: p.clip.file, sha256: p.clip.sha256 })),
     cues: cues.map(c => ({ start: c.start, end: c.end, text: c.text, speaker: c.speaker, clip: c.clip, words: c.words })),
@@ -137,11 +143,22 @@ export function frame(i: number, quality = 0.95): string {
   W.__houseRenderFrames(i, 1, null);                         // draws the 3D frame (and the page's own composer) onto the WebGL canvas
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
   g.drawImage(gl, 0, 0, f.w, f.h);
+  st.stats = lumaStats(st);                                  // the room alone, before the overlay
   const ft = i / clock.fps, sc = sceneAt(clock, ft);
   drawScene(st, sc, ft);
   st.last = i;
   return cv.toDataURL('image/jpeg', quality).slice(23);
 }
+
+function lumaStats(st: State): { mean: number; std: number } {
+  const p = st.probe, w = p.canvas.width, h = p.canvas.height;
+  p.drawImage(st.cv, 0, 0, st.f.w, st.f.h, 0, 0, w, h);
+  const d = p.getImageData(0, 0, w, h).data; let sum = 0, sq = 0; const n = w * h;
+  for (let i = 0; i < d.length; i += 4) { const y = 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]; sum += y; sq += y * y; }
+  const mean = sum / n; return { mean: +mean.toFixed(2), std: +Math.sqrt(Math.max(0, sq / n - mean * mean)).toFixed(2) };
+}
+/** The luma mean and standard deviation (0 to 255) of the room in the last frame drawn, before the overlay: the renderer checks the first frame for a spread (the GPU path that draws nothing). */
+export function stats(): { mean: number; std: number } { return S ? S.stats : { mean: 0, std: 0 }; }
 
 /** The smallest type painted so far, in design units (the floor is 36), the string it was painted for and every size drawn: the render fails the floor on what was painted. */
 export function typeAudit(): TypeAudit { return S ? S.audit : { min: Infinity, text: '', sizes: {}, drawn: 0 }; }

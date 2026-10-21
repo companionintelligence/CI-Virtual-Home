@@ -10,6 +10,8 @@
 //   --check             write nothing: say whether each existing bake lock is fresh (exit 1 if any is stale or missing)
 //   --strip <n>         also a film strip per family: n frames across every beat (its walk and its rest), to judge the camera's moves
 //   --res 540|720|1080  still size (default 540)       --aspects 16:9,9:16     (default both)
+//   --gl default|software   the GPU path of the stills (BAKE_GL; default `default`): `default` is the machine's own GPU through ANGLE, `software` the repo's SwiftShader (the
+//                       CPU: hours a film on this machine); the same two modes, flags and Chromium lookup as the ad-cut renderer (scripts/film/ads-lib.mts)
 //
 // Inputs: content/families/<slug>.json (the story), content/houses/<house>.json (the HouseSpec: its bytes are hashed, its lot list gives the zones),
 // content/houses/<house>.plan.json (the world digest the planner and the page share), content/story/roles.json, and <slug>.voice.json if present.
@@ -18,7 +20,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { ROOT, loadPlaywright, LAUNCH_ARGS, serve, stubGoogleFonts } from './portal-lib.mts';
+import { ROOT, loadPlaywright, serve, stubGoogleFonts } from './portal-lib.mts';
+import { glArgs, glMode, chromiumFor, type GlMode } from './film/ads-lib.mts';
 import { createAnchorWorld, resolveChain, type Resolved } from '../assets/story/anchors.js';
 import { createPoseCtx, solvePose, type Solved, type PoseCtx } from '../assets/story/poses.js';
 import { bakeTrack, trackSha, trackFrameAt, type BakeBeat, type StoryTrack } from '../assets/story/track.js';
@@ -116,16 +119,23 @@ export function formatLock(lock: BakeLock): string {
 // ---- the contact sheet ---------------------------------------------------------------------------------------------------------------------
 type Tile = { id: string; label: string; sub: string; flags: string; overlay: { focus: Rect | null; grown: Rect | null; card: Rect | null; core: Rect | null }; jpg: string };
 
-async function renderStills(items: Baked[], outDir: string, aspects: string[], res: string, strip = 0) {
-  const pw = await loadPlaywright(), srv = await serve(ROOT), browser = await pw.chromium.launch({ headless: true, args: LAUNCH_ARGS });
+async function renderStills(items: Baked[], outDir: string, aspects: string[], res: string, strip = 0, gl: GlMode = 'default') {
+  const pw = await loadPlaywright(), cr = chromiumFor(pw);
+  if (!cr.executablePath && cr.note.startsWith('no Chromium')) { console.error(cr.note); process.exit(2); }
+  console.log(`browser: ${cr.note}; gl: ${gl}${process.platform === 'linux' && gl === 'software' ? ' (SwiftShader on the CPU: slow; --gl default uses the GPU)' : ''}`);
+  const srv = await serve(ROOT), browser = await pw.chromium.launch({ headless: true, executablePath: cr.executablePath, args: glArgs(gl) });
   try {
     for (const it of items) {
       const { story, lock } = it, track = lock.track as StoryTrack;
       const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
       const page = await ctx.newPage(); page.on('pageerror', (e: Error) => console.error('  page error:', e.message));
       await stubGoogleFonts(page, srv.origin);
-      await page.goto(`${srv.origin}/room-creator.html?house=${story.house}&shot=orbit&res=${res}&aspect=16:9`, { waitUntil: 'domcontentloaded', timeout: 180000 });
+      await page.goto(`${srv.origin}/room-creator.html?house=${story.house}&shot=orbit&res=${res}&aspect=16:9&lighting=${process.env.BAKE_LIGHTING || 'day'}`, { waitUntil: 'domcontentloaded', timeout: 180000 });
       await page.waitForFunction((h: string) => document.documentElement.dataset.houseReady === h, story.house, { timeout: 240000 });
+      if (items.indexOf(it) === 0) {   // (what the page really draws with: a `default` that fell back to the CPU is said, not hidden)
+        const gpu: string = await page.evaluate(() => { const c = document.createElement('canvas'); const g: any = c.getContext('webgl2') || c.getContext('webgl'); const e = g && g.getExtension('WEBGL_debug_renderer_info'); return e ? String(g.getParameter(e.UNMASKED_RENDERER_WEBGL)) : 'unknown'; });
+        console.log(`  renderer: ${gpu}${gl === 'default' && /swiftshader|llvmpipe|software/i.test(gpu) ? '  (WARNING: --gl default fell back to software rendering; expect hours, not minutes)' : ''}`);
+      }
       for (const aspect of aspects) {
         await page.evaluate(([r, a]: string[]) => (window as any).__houseComposerWarm({ res: r, aspect: a }), [res, aspect]);
         const info = await page.evaluate(async ({ track, house, res, aspect }: any) => {
@@ -208,9 +218,10 @@ async function renderStills(items: Baked[], outDir: string, aspects: string[], r
 
 // ---- main ---------------------------------------------------------------------------------------------------------------------------------------
 async function main() {
-  const argv = process.argv.slice(2), flagVal = new Set(['stills', 'aspects', 'res', 'strip']);
+  const argv = process.argv.slice(2), flagVal = new Set(['stills', 'aspects', 'res', 'strip', 'gl']);
   const flags: Record<string, string> = {}, slugs: string[] = [];
   for (let i = 0; i < argv.length; i++) { const a = argv[i]; if (a.startsWith('--')) { const k = a.slice(2); if (flagVal.has(k)) flags[k] = argv[++i]; else flags[k] = 'true'; } else slugs.push(a); }
+  let gl: GlMode; try { gl = glMode(flags.gl, { PERSONA_CUT_GL: process.env.BAKE_GL }); } catch (e: any) { console.error(String(e.message).replace('(or PERSONA_CUT_GL)', '(or BAKE_GL)')); process.exit(2); }   // (before any bake: a typo costs nothing)
   const all = flags.all === 'true' || (!slugs.length);
   const list = all ? fs.readdirSync(FAMILIES).filter(f => f.endsWith('.json') && !/\.(voice|bake)\.json$/.test(f) && f !== 'films.json').map(f => f.replace(/\.json$/, '')).sort() : slugs;
   if (!list.length) { console.log('no stories in content/families/ (a story is content/families/<slug>.json)'); process.exit(0); }
@@ -237,7 +248,7 @@ async function main() {
   if (flags.stills && done.length) {
     const aspects = (flags.aspects || '16:9,9:16').split(','), out = path.resolve(flags.stills);
     fs.mkdirSync(out, { recursive: true });
-    await renderStills(done, out, aspects, flags.res || '540', +(flags.strip || 0));
+    await renderStills(done, out, aspects, flags.res || '540', +(flags.strip || 0), gl);
   }
   process.exit(bad ? 1 : 0);
 }

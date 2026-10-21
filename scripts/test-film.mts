@@ -11,6 +11,8 @@
 //   * the mux: the timeline in samples, the loudness chain, the encode command line (caps, bitexact, no metadata), and (with ffmpeg) a real normalisation to -14 LUFS
 //   * films.json: the shape, the content-hashed names, the 24 MiB guard
 //   * the words the film prints are the Uncloud voice's (no dash, no exclamation mark) and the disclosures are all there
+//   * the SILENT film (story:film --silent, and the fallback for a family with no voice lock): a clock and karaoke captions timed by the bake's estimated durations, refused by a voiced film;
+//     no audio stream and no sound gates (the picture gates stay); `sound: false` in films.json and a file name of its own; the caption reading-speed check; the end card without the voice line
 // Needs `pnpm run build` (the assets compile to .js) and content/story/claims.json.
 // @check-house node-test
 // @check-house quick
@@ -21,11 +23,13 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import type { RuntimeStory } from '../assets/story/runtime.js';
-import { FILM, filmClock, sceneAt, audioPlacements, captionCues, chunkTokens, tokensWithTiming, toVtt, powerForFilm, filmTimeOfTour, formatFor, captionBox, badgeBox, placeForFilm, overCap, CAPTION, cardAlpha, canvasCardWidths, canvasCardWidth, canvasVariants } from '../assets/story/film/layout.js';
+import { FILM, filmClock, silentStory, sceneAt, audioPlacements, captionCues, chunkTokens, tokensWithTiming, toVtt, powerForFilm, filmTimeOfTour, formatFor, captionBox, badgeBox, placeForFilm, overCap, CAPTION, cardAlpha, canvasCardWidths, canvasCardWidth, canvasVariants } from '../assets/story/film/layout.js';
 import { TYPE, FLOOR, DISC_D, caps } from '../assets/story/film/cards.js';
 import { inter, CANVAS_TYPE_MIN } from '../assets/story/place.js';
 import { mixTimeline, floatWav, normaliseChain, encodeArgs, buildAudio, measure, TARGET, CLIP_RATE } from './film/mux.mts';
-import { filmsProblems, sizeGuard, WEB_MAX_BYTES, webFileName, posterFileName, vttFileName, filmText, loadClaims, namesAgentRuntime, FILM_FILE_RE, type FilmsFile } from './film/lib.mts';
+import { filmsProblems, sizeGuard, WEB_MAX_BYTES, webFileName, sideName, posterFileName, vttFileName, filmText, loadClaims, namesAgentRuntime, FILM_FILE_RE, loadFamily, hasVoiceLock, inputsShaOf, captionProblems, READ_CPS, type FilmsFile } from './film/lib.mts';
+import { gate } from './film/qa.mts';
+import { estimateMs } from '../assets/story/runtime.js';
 import shipFilms from './story/ship/films.mts';
 
 // ---- a small family, as the runtime joins it -------------------------------------------------------------------------------------------------------------
@@ -373,4 +377,222 @@ test('what the film prints is in the Uncloud voice and carries every disclosure'
   assert.ok(!/Nous Research/.test(joined), 'no attribution when neither agent is named');
   // the captions never carry a house id or a builder name: the words are the family's own
   assert.ok(!/aurora|sims/i.test(JSON.stringify(t)));
+});
+
+// ---- the silent film ----------------------------------------------------------------------------------------------------------------------------------------
+/** the family as a bake with ESTIMATED durations joins it: no clips at all in `audio` (a lock with no voice has none) */
+function estimatedFamily(): RuntimeStory {
+  const rs: any = family();
+  // the bake with estimates puts the agent's line after the ESTIMATED narration (runtime.ts joinRuntime), not after a recorded one
+  rs.beats = rs.beats.map((b: any) => (b.say ? { ...b, sayAt: +(b.speechAt + estimateMs(b.popup.body) / 1000 + 0.35).toFixed(3) } : b));
+  return { ...rs, durations: 'estimated', audio: {} };
+}
+
+test('silent: the clock and the clip lengths come from the estimate; a voiced film still refuses estimated durations', () => {
+  const rs = estimatedFamily();
+  assert.throws(() => filmClock(rs), /recorded voice/, 'a voiced film refuses estimated durations');
+  assert.throws(() => filmClock(rs, { silent: false }), /recorded voice/);
+  assert.throws(() => filmClock(rs, { silent: true }), /closing/, 'silent still needs its clips: silentStory supplies them');
+  const sr = silentStory(rs);
+  assert.equal(sr.durations, 'estimated', 'it is still an estimate, and says so');
+  for (const b of rs.beats) assert.equal(sr.audio[b.id]?.durationMs, estimateMs(b.popup.body), `${b.id} is the estimate`);
+  assert.equal(sr.audio['b2.say'].durationMs, estimateMs('Hello Mika.')); assert.equal(sr.audio['b2.say'].speaker, 'mika');
+  assert.equal(sr.audio.closing.durationMs, estimateMs(`${rs.closing.body} UnCloud your life.`));
+  assert.ok(Object.values(sr.audio).every(c => c.words.length === 0 && c.file === ''), 'nothing is pretended to be a recording');
+  const c = filmClock(sr, { silent: true });
+  assert.deepEqual(c.parts.map(p => p.id), ['b1', 'b2', 'b4']);
+  assert.ok(Math.abs(c.outro.closingEnd - (c.outro.closingAt + sr.audio.closing.durationMs / 1000)) < 1e-3, 'the end card holds for the estimated closing');
+  assert.equal(c.frames / c.fps, c.duration); assert.ok(c.duration > FILM.titleS + FILM.outroMinS);
+  // the parts follow the estimate: a longer text makes a longer part, never past the tour's own span
+  const longer: any = { ...rs, beats: rs.beats.map(b => (b.id === 'b1' ? { ...b, popup: { ...b.popup, body: `${b.popup.body} ${'And one more word. '.repeat(3)}` } } : b)) };
+  const c2 = filmClock(silentStory(longer), { silent: true });
+  assert.ok(c2.parts[0].end - c2.parts[0].at >= c.parts[0].end - c.parts[0].at);
+  // a clip the lock really recorded is kept (a voiced bake can be filmed without sound)
+  const voiced = family(), kept = silentStory(voiced);
+  assert.equal(kept.audio.b1.durationMs, voiced.audio.b1.durationMs); assert.equal(kept.audio.b1.file, voiced.audio.b1.file);
+  assert.deepEqual(filmClock(kept, { silent: true }), filmClock(voiced), 'and the clock is the voiced one');
+});
+
+test('silent: the placements and the captions are timed by the estimate and are the captions the voiced film would print', () => {
+  const sr = silentStory(estimatedFamily()), c = filmClock(sr, { silent: true }), { placements, problems } = audioPlacements(sr, c);
+  assert.deepEqual(problems, []);
+  assert.deepEqual(placements.map(p => p.id), ['b1', 'b2', 'b2.say', 'b4', 'closing']);
+  for (let i = 1; i < placements.length; i++) assert.ok(placements[i].atS >= placements[i - 1].endS - 1e-6);
+  const cues = captionCues(sr, placements, { mika: 'Odette' });
+  assert.ok(cues.length >= 5);
+  for (let i = 0; i < cues.length; i++) {
+    assert.ok(cues[i].end > cues[i].start); if (i) assert.ok(cues[i].start >= cues[i - 1].end - 1e-9, `cue ${i} after cue ${i - 1}`);
+    assert.ok(cues[i].words.every((w, k) => w.e >= w.s && (!k || w.s >= cues[i].words[k - 1].s)), 'karaoke times run forward');
+  }
+  assert.equal(cues.find(q => q.clip === 'b2.say')!.speaker, 'Odette');
+  assert.ok(cues.at(-1)!.end <= c.duration, 'the last caption ends inside the film');
+  // every word of every line is captioned, in order
+  const said = placements.filter(p => p.clip.speaker === 'narrator' && p.id !== 'closing' && p.id === 'b1').flatMap(p => cues.filter(q => q.clip === p.id).flatMap(q => q.words.map(w => w.text)));
+  assert.deepEqual(said, BODY(1).split(' '));
+  // the estimate is slow enough to read: well under the reading-speed limit
+  const cp = captionProblems(cues, c.duration);
+  assert.deepEqual(cp.errors, []); assert.deepEqual(cp.warnings, []); assert.ok(cp.maxCps < READ_CPS.warn, `${cp.maxCps} characters a second`);
+  const vtt = toVtt(cues); assert.match(vtt, /^WEBVTT\n/); assert.match(vtt, /UnCloud your life\./); assert.ok(!/[—–!]/.test(vtt));
+  // the clip's length is the estimate, so the karaoke runs the whole clip (a clip with no word timings shares its length by the words' size)
+  const last = cues.filter(q => q.clip === 'b1').at(-1)!; assert.ok(Math.abs(last.words.at(-1)!.e - (placements[0].atS + placements[0].durS)) < 0.01);
+});
+
+test('silent: the caption reading-speed check names a caption that cannot be read', () => {
+  const w = (t: string, s: number, e: number) => ({ text: t, s, e });
+  const ok = { start: 0, end: 4, words: [w('One', 0, 1), w('two', 1, 2), w('three', 2, 3)], text: 'One two three', speaker: null, clip: 'a', scripted: false };
+  assert.deepEqual(captionProblems([ok], 10), { errors: [], warnings: [], maxCps: 3.3 });
+  const fast = { ...ok, start: 4, end: 5, text: 'x'.repeat(26) };
+  assert.ok(captionProblems([ok, fast], 10).warnings.some(m => /26 characters a second/.test(m)));
+  const way = { ...ok, start: 4, end: 5, text: 'x'.repeat(40) };
+  assert.ok(captionProblems([ok, way], 10).errors.some(m => /40 characters a second/.test(m)));
+  assert.ok(captionProblems([ok, { ...ok, start: 3.5, end: 6 }], 10).errors.some(m => /before the caption before it ends/.test(m)));
+  assert.ok(captionProblems([ok], 3).errors.some(m => /after the film does/.test(m)));
+  assert.ok(captionProblems([{ ...ok, end: 1.2 }], 10).warnings.some(m => /is up for 1\.20 s/.test(m)));
+});
+
+test('silent: the end card does not claim a voice; a voiced one does', () => {
+  const rs = family(), claims = loadClaims();
+  assert.ok(filmText(rs, claims).end.lines.some(l => /generated locally with an open text-to-speech model/.test(l)));
+  const t = filmText(rs, claims, { silent: true });
+  assert.ok(!t.end.lines.some(l => /text-to-speech|Narration/.test(l)), 'no voice line under a silent film');
+  assert.match(t.end.lines.join(' '), /in beta\./); assert.match(t.end.lines.join(' '), /Scenes are written for this site\./); assert.match(t.end.lines.join(' '), /stylised illustration/);
+  assert.deepEqual(filmText(rs, claims).title, t.title);
+});
+
+test('silent: the file name has its own form, so a silent film never overwrites a voiced one; films.json records sound false', () => {
+  const bytes = Buffer.from('some bytes');
+  const v = webFileName('okafor-reyes', '16x9', bytes), s = webFileName('okafor-reyes', '16x9', bytes, true);
+  assert.notEqual(v, s); assert.match(s, /^okafor-reyes\.16x9\.silent\.[0-9a-f]{10}\.mp4$/); assert.match(v, FILM_FILE_RE); assert.match(s, FILM_FILE_RE);
+  assert.equal(FILM_FILE_RE.exec(s)!.groups!.silent, '.silent'); assert.equal(FILM_FILE_RE.exec(v)!.groups!.silent, undefined);
+  assert.notEqual(sideName('a', '9x16', true), sideName('a', '9x16', false));
+  const silentAspect = (slug: string, k: '16x9' | '9x16') => { const a: any = { ...aspect(slug, k) }; a.file = `${slug}.${k}.silent.ab12cd34ef.mp4`; delete a.loudness; return a; };
+  const good = (): FilmsFile => ({ v: 1, families: { brennan: { sound: false, durationMs: 104600, inputsSha: 'f'.repeat(64), vtt: 'film/captions.0011223344.vtt', aspects: { '16x9': silentAspect('brennan', '16x9'), '9x16': silentAspect('brennan', '9x16') } } } });
+  assert.deepEqual(filmsProblems(good()), [], 'a silent entry: sound false, silent names, no loudness');
+  assert.deepEqual(filmsProblems(goodFilms()), [], 'a voiced entry with no `sound` is still voiced');
+  const voicedExplicit = goodFilms(); voicedExplicit.families['vance-takahashi'].sound = true; assert.deepEqual(filmsProblems(voicedExplicit), []);
+  const a = good(); a.families.brennan.aspects['16x9']!.loudness = { I: -14, TP: -2 };
+  assert.ok(filmsProblems(a).some(m => /silent film has no loudness/.test(m)));
+  const b = good(); b.families.brennan.aspects['9x16']!.file = 'brennan.9x16.ab12cd34ef.mp4';
+  assert.ok(filmsProblems(b).some(m => /silent film's file must be brennan\.9x16\.silent\./.test(m)));
+  const c = goodFilms(); c.families['vance-takahashi'].aspects['16x9']!.file = 'vance-takahashi.16x9.silent.ab12cd34ef.mp4';
+  assert.ok(filmsProblems(c).some(m => /named as a silent film but the entry has sound/.test(m)));
+  const d = good(); (d.families.brennan as any).sound = 'no'; assert.ok(filmsProblems(d).some(m => /sound must be true or false/.test(m)));
+  const e = good(); delete e.families.brennan.aspects['16x9']!.loudness; e.families.brennan.sound = true; e.families.brennan.aspects['16x9']!.file = 'brennan.16x9.ab12cd34ef.mp4';
+  assert.ok(filmsProblems(e).some(m => /16x9: no loudness/.test(m)), 'a film with sound needs its loudness');
+});
+
+test('silent: the encode has one input, no audio codec and one stream; a voiced encode is what it was', { skip: !haveFfmpeg && 'no ffmpeg on PATH' }, () => {
+  const silentArgs = encodeArgs({ wav: null, fps: 30, web: 'w.mp4', master: 'm.mp4' });
+  assert.equal(silentArgs.filter(a => a === '-i').length, 1, 'only the frames'); assert.ok(silentArgs.includes('-an')); assert.ok(!silentArgs.includes('-c:a') && !silentArgs.includes('1:a'));
+  assert.equal(silentArgs.filter(a => a === '-an').length, 2, 'both outputs');
+  const voiced = encodeArgs({ wav: 'a.wav', fps: 30, web: 'w.mp4' }); assert.ok(voiced.includes('-c:a') && voiced.includes('1:a') && !voiced.includes('-an'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'film-silent-'));
+  try {
+    // 3 s of a moving test picture as JPEG frames on stdin, as the page sends them
+    const jpgs = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'testsrc2=size=160x90:rate=30', '-t', '3', '-f', 'image2pipe', '-c:v', 'mjpeg', '-'], { maxBuffer: 64 << 20 });
+    assert.equal(jpgs.status, 0);
+    const out = path.join(dir, 'silent.web.mp4');
+    const enc = spawnSync('ffmpeg', encodeArgs({ wav: null, fps: 30, web: out }), { input: jpgs.stdout, maxBuffer: 64 << 20 });
+    assert.equal(enc.status, 0, String(enc.stderr));
+    const exp = { w: 160, h: 90, fps: 30, frames: 90, durationS: 3, titleEnd: 4.35, outroTail: 5.5, web: true, channels: 1 };
+    const ok = gate(out, { ...exp, silent: true });
+    assert.deepEqual(ok.errors, [], 'the picture gates pass on a silent film');
+    assert.equal(ok.probe.streams, 1); assert.equal(ok.probe.audio, null); assert.equal(ok.loudness, null, 'no loudness is measured'); assert.deepEqual(ok.silences, [], 'no dead-air check');
+    assert.equal(ok.probe.video!.codec, 'h264'); assert.equal(ok.probe.video!.pix, 'yuv420p'); assert.equal(ok.probe.video!.frames, 90);
+    // the same file is not a voiced film
+    assert.ok(gate(out, { ...exp, silent: false }).errors.some(m => /one video and one audio stream/.test(m)));
+    // the picture gates still bite: the wrong size, the wrong count, the wrong length, a frozen picture, a file over the size limit
+    const bad = gate(out, { ...exp, silent: true, w: 320, frames: 91, durationS: 4 }).errors.join('|');
+    assert.match(bad, /picture is 160x90, not 320x90/); assert.match(bad, /90 frames, not 91/); assert.match(bad, /length 3\.0\d s, not 4\.00 s/);
+    assert.ok(gate(out, { ...exp, silent: true }, { maxBytes: 100 }).errors.some(m => /MiB|limit/.test(m) || /web film/.test(m)));
+    const still = path.join(dir, 'still.mp4');
+    const stillJpgs = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'color=c=0x336699:size=160x90:rate=30', '-t', '3', '-f', 'image2pipe', '-c:v', 'mjpeg', '-'], { maxBuffer: 64 << 20 });
+    assert.equal(spawnSync('ffmpeg', encodeArgs({ wav: null, fps: 30, web: still }), { input: stillJpgs.stdout, maxBuffer: 64 << 20 }).status, 0);
+    assert.ok(gate(still, { ...exp, silent: true }).errors.some(m => /frozen/.test(m)), 'freezedetect still applies');
+    // a file with an audio stream is refused by a silent gate
+    const withAudio = path.join(dir, 'audio.mp4');
+    assert.equal(spawnSync('ffmpeg', ['-y', '-hide_banner', '-loglevel', 'error', '-i', out, '-f', 'lavfi', '-i', 'sine=frequency=300:duration=3', '-c:v', 'copy', '-c:a', 'aac', '-ac', '1', withAudio]).status, 0);
+    assert.ok(gate(withAudio, { ...exp, silent: true }).errors.some(m => /no audio/.test(m)));
+  } finally { fs.rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('silent: a family with a bake lock and no voice lock loads as a silent film; a voiced load refuses it', async () => {
+  const src = path.resolve(import.meta.dirname, '..', 'content', 'families');
+  if (!fs.existsSync(path.join(src, 'brennan.bake.json')) || JSON.parse(fs.readFileSync(path.join(src, 'brennan.bake.json'), 'utf8')).durations !== 'estimated') return;   // (needs a lock made from estimates)
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'film-family-')), prev = process.env.CI_STORY_FAMILIES_DIR;
+  try {
+    process.env.CI_STORY_FAMILIES_DIR = dir;
+    for (const f of ['brennan.json', 'brennan.bake.json']) fs.copyFileSync(path.join(src, f), path.join(dir, f));
+    assert.equal(hasVoiceLock('brennan'), false);
+    await assert.rejects(loadFamily('brennan'), /no the voice lock|voice lock/, 'a voiced film needs the voice lock');
+    const fam = await loadFamily('brennan', { silent: true });
+    assert.equal(fam.silent, true); assert.equal(fam.voice, null); assert.equal(fam.rs.durations, 'estimated'); assert.equal(fam.shas.voice, '');
+    assert.ok(fam.rs.audio.closing && fam.rs.audio.closing.durationMs > 0);
+    const clock = filmClock(fam.rs, { silent: true }); assert.ok(clock.parts.length > 0 && clock.duration <= FILM.maxS, `${clock.duration} s`);
+    const { problems } = audioPlacements(fam.rs, clock); assert.deepEqual(problems, []);
+    // a voice lock beside an estimated bake does not time the picture (the bake's offsets are the estimate's), and the hash says silent
+    fs.writeFileSync(path.join(dir, 'brennan.voice.json'), JSON.stringify({ v: 1, clips: {} }));
+    assert.equal(hasVoiceLock('brennan'), true);
+    const again = await loadFamily('brennan', { silent: true });
+    assert.equal(again.voice, null); assert.equal(again.shas.voice, '');
+    assert.equal(inputsShaOf(fam, 1080, 'tool'), inputsShaOf(again, 1080, 'tool'));
+    assert.notEqual(inputsShaOf(fam, 1080, 'tool'), inputsShaOf({ ...fam, silent: false }, 1080, 'tool'), 'silent and voiced are never the same film');
+    assert.notEqual(inputsShaOf(fam, 1080, 'tool'), inputsShaOf(fam, 540, 'tool'));
+    await assert.rejects(loadFamily('brennan'), /estimated durations/, 'with a voice lock but an estimated bake a voiced film still refuses');
+  } finally {
+    if (prev === undefined) delete process.env.CI_STORY_FAMILIES_DIR; else process.env.CI_STORY_FAMILIES_DIR = prev;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('silent: the ship step links a silent film like any other, and sees it as stale when its inputs moved', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'film-ship-silent-')), prevDir = process.env.CI_STORY_FAMILIES_DIR, prevBase = process.env.FILM_BASE_URL;
+  try {
+    process.env.CI_STORY_FAMILIES_DIR = dir; process.env.FILM_BASE_URL = 'https://films.example.test/f';
+    fs.mkdirSync(path.join(dir, 'brennan', 'film'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'brennan', 'film', 'poster.0011223344.jpg'), 'poster'); fs.writeFileSync(path.join(dir, 'brennan', 'film', 'captions.0011223344.vtt'), 'WEBVTT');
+    const sa = (k: '16x9' | '9x16') => { const a: any = { ...aspect('brennan', k) }; a.file = `brennan.${k}.silent.ab12cd34ef.mp4`; delete a.loudness; return a; };
+    fs.writeFileSync(path.join(dir, 'films.json'), JSON.stringify({ v: 1, families: { brennan: { sound: false, durationMs: 104600, inputsSha: 'f'.repeat(64), vtt: 'film/captions.0011223344.vtt', aspects: { '16x9': sa('16x9'), '9x16': sa('9x16') } } } }));
+    const reg: Array<[string, string, string]> = [], films: any[] = [], problems: string[] = [];
+    await shipFilms({ addHashed: (src, d) => `${d}/${path.basename(src)}`, register: (s, k, u) => reg.push([s, k, u]), registerFilm: (s, f) => films.push([s, f]), problem: m => problems.push(m), stories: [{ slug: 'brennan' }] });
+    assert.deepEqual(problems, []);
+    assert.equal(reg.find(r => r[1] === 'film.src169')![2], 'https://films.example.test/f/brennan.16x9.silent.ab12cd34ef.mp4');
+    assert.equal(reg.find(r => r[1] === 'film.src916')![2], 'https://films.example.test/f/brennan.9x16.silent.ab12cd34ef.mp4');
+    assert.deepEqual(reg.map(r => r[1]).sort(), ['film.poster', 'film.src169', 'film.src916', 'film.vtt']); assert.equal(films[0][1].durationMs, 104600);
+    // freshness is judged in the entry's own mode: a silent film is compared with the story and the bake, with no voice lock in the dir
+    const src = path.resolve(import.meta.dirname, '..', 'content', 'families');
+    if (fs.existsSync(path.join(src, 'brennan.bake.json')) && JSON.parse(fs.readFileSync(path.join(src, 'brennan.bake.json'), 'utf8')).durations === 'estimated') {
+      for (const f of ['brennan.json', 'brennan.bake.json']) fs.copyFileSync(path.join(src, f), path.join(dir, f));
+      const fresh = inputsShaOf(await loadFamily('brennan', { silent: true }), 1080), cur = JSON.parse(fs.readFileSync(path.join(dir, 'films.json'), 'utf8'));
+      const said: string[] = [], log = console.log; console.log = (...a: any[]) => { said.push(a.join(' ')); };
+      const ship = () => shipFilms({ addHashed: (s2, d) => `${d}/${path.basename(s2)}`, register: () => {}, registerFilm: () => {}, problem: () => {}, stories: [{ slug: 'brennan' }] });
+      try {
+        await ship(); assert.ok(said.some(m => /cannot check freshness|older than its story/.test(m)), 'the placeholder inputsSha is stale');
+        assert.ok(!said.some(m => /cannot check freshness/.test(m)), 'a silent film is loadable by the ship step (no voice lock needed)');
+        said.length = 0; cur.families.brennan.inputsSha = fresh; fs.writeFileSync(path.join(dir, 'films.json'), JSON.stringify(cur));
+        await ship(); assert.ok(!said.some(m => /older than its story|cannot check/.test(m)), `a film made from these inputs is current: ${said.join(' | ')}`);
+      } finally { console.log = log; }
+    }
+    // an entry that breaks the silent rules is reported by the ship step, as a voiced one is
+    const bad = JSON.parse(fs.readFileSync(path.join(dir, 'films.json'), 'utf8')); bad.families.brennan.aspects['16x9'].file = 'brennan.16x9.ab12cd34ef.mp4';
+    fs.writeFileSync(path.join(dir, 'films.json'), JSON.stringify(bad));
+    const p2: string[] = []; await shipFilms({ addHashed: (src, d) => `${d}/${path.basename(src)}`, register: () => {}, registerFilm: () => {}, problem: m => p2.push(m), stories: [{ slug: 'brennan' }] });
+    assert.ok(p2.some(m => /silent film's file must be/.test(m)));
+  } finally {
+    if (prevDir === undefined) delete process.env.CI_STORY_FAMILIES_DIR; else process.env.CI_STORY_FAMILIES_DIR = prevDir;
+    if (prevBase === undefined) delete process.env.FILM_BASE_URL; else process.env.FILM_BASE_URL = prevBase;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the GPU path: --gl is the cut renderer\'s choice, default on Linux, never Vulkan', async () => {
+  const { glArgs, glMode } = await import('./film/ads-lib.mts');
+  assert.equal(glMode(undefined, {}), 'default'); assert.equal(glMode('software', {}), 'software'); assert.equal(glMode(undefined, { PERSONA_CUT_GL: 'software' }), 'software');
+  assert.throws(() => glMode('vulkan', {}), /must be one of/);
+  const g = glArgs('default', 'linux'); assert.ok(g.includes('--use-angle=default')); assert.ok(!g.some(a => /vulkan|swiftshader/.test(a)));
+  assert.ok(glArgs('software', 'linux').some(a => /swiftshader/.test(a)), 'software is the repo\'s own SwiftShader flags');
+  // the film script reads the same choice: --gl, FILM_GL, and says so in its header
+  const src = fs.readFileSync(path.resolve(import.meta.dirname, 'render-family-film.mts'), 'utf8');
+  assert.match(src, /glMode\(flags\.gl \|\| process\.env\.FILM_GL\)/); assert.match(src, /glArgs\(GL\)/); assert.match(src, /swiftshader\|llvmpipe\|software/); assert.match(src, /BLANK_STD/);
+  assert.ok(!/use-angle=vulkan'/.test(src.replace(/never[^\n]*/gi, '')), 'no Vulkan flag');
 });
