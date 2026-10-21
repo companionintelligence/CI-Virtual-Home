@@ -159,7 +159,8 @@ registerProps({
       const body = it.color ? hex(it.color) : colors.cabinet, mat = std(body, { roughness: 0.55 });
       g.add(box(w, T, d, mat, 0, T / 2, 0)); g.add(box(w, T, d, mat, 0, h - T / 2, 0));
       for (const sx of [-1, 1]) g.add(box(T, h - 2 * T, d, mat, sx * (w / 2 - T / 2), h / 2, 0));
-      g.add(box(w - 2 * T, h - 2 * T, 0.012, std(relief(mix, body), { roughness: 0.6 }), 0, h / 2, -d / 2 + 0.006));
+      // (the unit stands against a wall liner, whose face the back panel's front is flush with: a depth bias makes the panel win the plane)
+      g.add(box(w - 2 * T, h - 2 * T, 0.012, std(relief(mix, body), { roughness: 0.6, polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: -8 }), 0, h / 2, -d / 2 + 0.006));   // (stronger than the liner's own bias, which it has to beat)
       for (let c = 1; c < cols; c++) g.add(box(T, h - 2 * T, d - 0.012, mat, -w / 2 + c * P + T / 2, h / 2, 0.006));
       for (let r = 1; r < rows; r++) g.add(box(w - 2 * T, T, d - 0.012, mat, 0, r * P + T / 2, 0.006));
       const bins = [colors.fabric, colors.fabric2, colors.accent, colors.linen], bz = d / 2 - 0.155 - 0.03;

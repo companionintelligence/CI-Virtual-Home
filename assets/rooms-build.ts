@@ -22,6 +22,33 @@ import { DRESS_SRC, isDress, dressOff, dressOptIn, dressHouse } from './room-dre
 /** the offset of a composed item's room floor over the storey's (see buildRooms) */
 const ON_FLOOR = Symbol('onFloor');
 
+// ---- rug on rug --------------------------------------------------------------------------------------------------------------------
+// Every rug is a 12 mm slab with its top at the same height, so one laid over another (a runner across an area rug, a patterned rug over a
+// shag) shares its top plane with the rug under it and the two flicker. A rug lies RUG_LAYER higher for each rug under it in the room.
+export const RUG_LAYER = 0.001;
+const isRug = (type: string) => /(^|-)rug$/.test(type);
+/** the plan box (axis-aligned round the turned rect) of a rug item, in the room's frame */
+function rugBox(it: any) {
+  const fp = (PROPS.get(it.type) || {}).footprint || (it.type === 'area-rug' ? [3.2, 2.2] : [2, 1.4]);   // (the page's area rug is 3.2 x 2.2 unless it says)
+  const round = /^(circular|concentric)-rug$/.test(it.type) || (it.type === 'patterned-rug' && it.shape === 'round');
+  const w = round ? 2 * (it.r ?? (it.w || fp[0]) / 2) : (it.w || fp[0]), d = round ? w : (it.d || fp[1]), a = (it.rot || 0) * DEG;
+  const hx = (Math.abs(Math.cos(a)) * w + Math.abs(Math.sin(a)) * d) / 2, hz = (Math.abs(Math.sin(a)) * w + Math.abs(Math.cos(a)) * d) / 2;
+  return { x0: it.at[0] - hx, x1: it.at[0] + hx, z0: it.at[1] - hz, z1: it.at[1] + hz };
+}
+/** how many rug layers lie under each rug of a room: 0 for one that overlaps no earlier rug, else one above the highest earlier rug it overlaps */
+export function rugLayers(items: any[]) {
+  const layers = new Map<any, number>(), seen: Array<{ b: ReturnType<typeof rugBox>; k: number }> = [];
+  for (const it of items) {
+    if (!isRug(it.type) || !Array.isArray(it.at)) continue;
+    const b = rugBox(it);
+    let k = 0;
+    for (const q of seen) if (q.b.x0 < b.x1 - 0.01 && q.b.x1 > b.x0 + 0.01 && q.b.z0 < b.z1 - 0.01 && q.b.z1 > b.z0 + 0.01) k = Math.max(k, q.k + 1);
+    seen.push({ b, k });
+    if (k) layers.set(it, k);
+  }
+  return layers;
+}
+
 export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
   const { THREE, AssetFactory, std, box, group } = bctx;
 
@@ -77,11 +104,12 @@ export function createRoomsBuild(bctx, { ITEMS, DESK_TOP, ON_SURFACE, kitb }) {
         const geo = analyzeRoom(spec, lv, room);
         items = items.map(it => { if (it.src === SRC || it.src === DRESS_SRC) return it; const a = snapWallMount(it, geo) || it; return stackOnSurface(a, items) || a; });
       }
+      const rugOver = rugLayers(items);
       for (const it of items) {
         if (heroHere && HERO_SET.has(it.type) && Math.hypot(it.at[0] - spec.hero.at[0], it.at[1] - spec.hero.at[1]) < 1.3) continue;
         const prop = PROPS.get(it.type);
         const fn = ITEMS[it.type] || (prop && (p => prop.create(p, propCtx(it, H)))); if (!fn) continue;
-        const yy = y + (it[ON_FLOOR] || 0) + ((ON_SURFACE.has(it.type) || (prop && prop.surface)) ? (it.y ?? DESK_TOP) : (it.y ?? (prop && prop.mountY) ?? 0));   // mountY: a wall-mounted prop's default height
+        const yy = y + (it[ON_FLOOR] || 0) + (rugOver.get(it) || 0) * RUG_LAYER + ((ON_SURFACE.has(it.type) || (prop && prop.surface)) ? (it.y ?? DESK_TOP) : (it.y ?? (prop && prop.mountY) ?? 0));   // mountY: a wall-mounted prop's default height
         const o = put(() => fn(it, { H, y, palette }), it.at[0], it.at[1], yy, null, 'item');
         o.rotation.y = (it.rot || 0) * DEG;   // core-shelf: rot is the wall heading, the plank extends the other way
         o.userData.room = room.name;

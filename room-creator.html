@@ -2499,7 +2499,10 @@
         // config.cladding (a material from the house's material kit) goes on the outward face — local +z, box
         // face index 4 — while the inside and the ends keep the paint; without it the wall is paint all round
         const wallMat = [wallPaint, wallPaint, capMat, wallPaint, config.cladding || wallPaint, wallPaint];
-        const baseMat = new THREE.MeshStandardMaterial({ color: baseboardColor, roughness: 0.5 });
+        // The baseboard is a box on the pier's foot: its end faces and its underside lie on the pier's own planes (the jamb, the floor), and two
+        // flat faces on one plane flicker. A depth bias makes the baseboard win them, and unlike a 2 mm cut it moves no box of the world digest
+        // (plan.json shots.world and the bake locks' worldSha are mm-rounded boxes of every wall mesh).
+        const baseMat = new THREE.MeshStandardMaterial({ color: baseboardColor, roughness: 0.5, polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: -4 });
         const trimMat = new THREE.MeshStandardMaterial({ color: trimColor, roughness: 0.4 });
         // indoors every casing, stool and jamb is the baseboard white
         const intTrimMat = new THREE.MeshStandardMaterial({ color: baseboardColor, roughness: 0.55 });
@@ -4699,12 +4702,14 @@
         group.add(top);
 
         // Left & Right Waterfall sides
-        const leftWaterfall = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.90, d), stoneMat);
+        // (the sides' front and back faces are the top's own planes: the sides get a copy of the stone with a depth bias, so one of the two wins)
+        const sideMat = stoneMat.clone(); sideMat.polygonOffset = true; sideMat.polygonOffsetFactor = 0; sideMat.polygonOffsetUnits = -4;
+        const leftWaterfall = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.90, d), sideMat);
         leftWaterfall.position.set(-w / 2 + 0.04, 0.45, 0);
         leftWaterfall.castShadow = true;
         group.add(leftWaterfall);
 
-        const rightWaterfall = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.90, d), stoneMat);
+        const rightWaterfall = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.90, d), sideMat);
         rightWaterfall.position.set(w / 2 - 0.04, 0.45, 0);
         rightWaterfall.castShadow = true;
         group.add(rightWaterfall);
@@ -5155,7 +5160,8 @@
         group.name = `Industrial Metal & Wood Bookshelf (${w}m × ${h}m)`;
         group.userData = { category: "Interiors", tags: "bookshelf, storage, shelving" };
 
-        const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.3 });
+        // (the posts' outer faces are the shelves' end faces: a depth bias makes the posts win the plane)
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.3, polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: -4 });
         const shelfMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.5 });
         shelfMat.userData.colorParam = true;
         const bookMat1 = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 });
@@ -6012,7 +6018,8 @@
         group.userData = { category: "Architecture", tags: "garden, vegetable, farming, planter, outdoor" };
 
         const cedarMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.7 });
-        const soilMat = new THREE.MeshStandardMaterial({ color: 0x292524, roughness: 0.95 });
+        // (the soil's top is the frame's top, 0.28 m: a depth bias makes the soil win the plane inside the frame)
+        const soilMat = new THREE.MeshStandardMaterial({ color: 0x292524, roughness: 0.95, polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: -4 });
         const cropMat1 = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.5 });
         const cropMat2 = new THREE.MeshStandardMaterial({ color: 0x4ade80, roughness: 0.5 });
         const cropMat3 = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.6 });

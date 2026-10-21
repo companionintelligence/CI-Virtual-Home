@@ -279,7 +279,10 @@ export function createSiteStructures({ THREE, std, box, group, ProceduralArchite
     const cp = coping === false ? null : { ...copingDefault, ...(typeof coping === 'object' && coping ? coping : {}) };
     if (cp) {
       const outer = offsetLoop(poly, cp.w), cm = cp.material && mat(cp.material, cp.color != null ? hex(cp.color) : null) || std(cp.color != null ? hex(cp.color) : 0xd9d4c8, { roughness: 0.8 });
-      const shape = new THREE.Shape(ccw(outer).map(p => new THREE.Vector2(p[0], p[1]))); shape.holes.push(new THREE.Path(poly.slice().reverse().map(p => new THREE.Vector2(p[0], p[1]))));
+      const shape = new THREE.Shape(ccw(outer).map(p => new THREE.Vector2(p[0], p[1])));
+      // the coping's inner edge overhangs the pool's wall by 2 mm: with the hole exactly on the outline, the coping's inner face (rim - 2 cm to
+      // rim + 3 cm) and the wall's (down from the rim) were one plane for 2 cm, and the pool's lip flickered
+      shape.holes.push(new THREE.Path(offsetLoop(poly, -0.002).reverse().map(p => new THREE.Vector2(p[0], p[1]))));
       const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.05, bevelEnabled: false, curveSegments: 4 }); geo.rotateX(Math.PI / 2);
       const m = new THREE.Mesh(geo, cm); m.position.y = rim + 0.03; m.castShadow = false; m.receiveShadow = true; m.name = 'Coping'; g.add(m);
     }

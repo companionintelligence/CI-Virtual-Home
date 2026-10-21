@@ -27,6 +27,11 @@ export const floorOf = (room: any) => (typeof room.floor === 'string' ? { kind: 
 const SIDE_ORI = { S: 'south', N: 'north', E: 'east', W: 'west' };
 // the room's boundary side → the direction into the room
 const INTO = { N: [0, 1], S: [0, -1], W: [1, 0], E: [-1, 0] };
+/** A depth bias for the liners' materials. A liner's panel ends on the same plane as the wall pier it lies on (an opening's jamb, a partition's
+ *  end), and two flat faces on one plane flicker. The bias makes the liner win those planes. It is a draw state: unlike ending the panels 2 mm
+ *  short it moves no box of the world digest (plan.json shots.world, and the bake locks' worldSha, are mm-rounded boxes of every liner near
+ *  the Core). */
+const BIAS = { polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: -4 };
 
 // ---- defaults: 2 — program-appropriate floors, neighbours differ --------------------------------------------------------
 const PROGRAM_FLOORS = {
@@ -115,6 +120,7 @@ export function noteRoom(anchors: any, lv: any, room: any, patch: Record<string,
 
 export function createRoomFinish(bctx) {
   const { THREE, registerTrackedWall, registerCeiling, group } = bctx;
+  const biasedOf = new WeakMap<any, Map<any, any>>();   // a house's material kit -> (a kit wall material -> its biased copy)
 
   // a thin panel the size of a rect, flat on the floor (world XZ), top at local y 0
   const floorPanel = (r: Rect, mat) => {
@@ -210,8 +216,11 @@ export function createRoomFinish(bctx) {
     const face = w.line + (horiz ? into[1] : into[0]) * (w.half + 0.004);
     const base = 0.1;   // over the baseboard
     const paintColor = color !== undefined ? color : lv.interior || null;
-    const mainMat = kind === 'wainscot' || kind === 'board-and-batten' ? am.wall('paint', paintColor ?? '#f1eee8') : am.wall(kind, color);
-    const lowerMat = kind === 'wainscot' ? am.wall('paint', lower ?? '#e9e4da') : null;
+    // (the kit's wall materials are shared with every liner of the colour, and some with floors: the liner gets a private copy to bias, one per material)
+    let copies = biasedOf.get(am); if (!copies) biasedOf.set(am, copies = new Map());
+    const biased = (m: any) => { if (!m) return m; let c = copies.get(m); if (!c) copies.set(m, c = Object.assign(am.own(m), BIAS)); return c; };
+    const mainMat = biased(kind === 'wainscot' || kind === 'board-and-batten' ? am.wall('paint', paintColor ?? '#f1eee8') : am.wall(kind, color));
+    const lowerMat = biased(kind === 'wainscot' ? am.wall('paint', lower ?? '#e9e4da') : null);
     const band = kind === 'wainscot' ? (bandH || 0.95) : 0;
     const railMat = am.paint(kind === 'wainscot' ? (lower ?? '#e9e4da') : (paintColor ?? '#f1eee8'), { roughness: 0.55 });
     // a liner is a 6 mm skin on the wall face, built 9 cm deep into the wall behind it: the scene check that finds furniture
@@ -330,12 +339,15 @@ export function createRoomFinish(bctx) {
           const m = new THREE.Mesh(geo, m2); m.receiveShadow = true; gg.add(m); return m;
         };
         const vm = am.ceiling('flat', col ?? '#f1f5f9'), em = am.ceiling('flat', lv.interior || '#f1eee8');
+        // the gable caps close the vault 8 cm in from the room's line, which is the wall's inner face, and the roof's gable wall and a parapet
+        // end on that same face: 3 mm further in, the cap is no longer one plane with them (z-fighting over the whole gable end)
+        const CAP = 0.08 + 0.003;
         if (ridgeX) {
           mesh([[x0, v, z0], [x1, v, z0], [x1, v + rise, cz], [x0, v + rise, cz]], vm); mesh([[x0, v, z1], [x0, v + rise, cz], [x1, v + rise, cz], [x1, v, z1]], vm);
-          mesh([[x0 + 0.08, v, z0], [x0 + 0.08, v + rise, cz], [x0 + 0.08, v, z1]], em); mesh([[x1 - 0.08, v, z0], [x1 - 0.08, v, z1], [x1 - 0.08, v + rise, cz]], em);
+          mesh([[x0 + CAP, v, z0], [x0 + CAP, v + rise, cz], [x0 + CAP, v, z1]], em); mesh([[x1 - CAP, v, z0], [x1 - CAP, v, z1], [x1 - CAP, v + rise, cz]], em);
         } else {
           mesh([[x0, v, z0], [cx, v + rise, z0], [cx, v + rise, z1], [x0, v, z1]], vm); mesh([[x1, v, z0], [x1, v, z1], [cx, v + rise, z1], [cx, v + rise, z0]], vm);
-          mesh([[x0, v, z0 + 0.08], [x1, v, z0 + 0.08], [cx, v + rise, z0 + 0.08]], em); mesh([[x0, v, z1 - 0.08], [cx, v + rise, z1 - 0.08], [x1, v, z1 - 0.08]], em);
+          mesh([[x0, v, z0 + CAP], [x1, v, z0 + CAP], [cx, v + rise, z0 + CAP]], em); mesh([[x0, v, z1 - CAP], [cx, v + rise, z1 - CAP], [x1, v, z1 - CAP]], em);
         }
         if (c.color === undefined) {   // a ridge beam
           const rb = new THREE.Mesh(new THREE.BoxGeometry(ridgeX ? b.w : 0.14, 0.18, ridgeX ? 0.14 : b.d), beamMat); rb.position.set(cx, v + rise - 0.09, cz); gg.add(rb);

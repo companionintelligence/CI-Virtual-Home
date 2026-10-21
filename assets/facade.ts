@@ -22,6 +22,10 @@ import { mulberry32, fnv1a } from './materials.js';
 const SIDE_ROT = { S: 0, N: Math.PI, E: Math.PI / 2, W: -Math.PI / 2 };
 const SIDE_ORI = { S: 'south', N: 'north', E: 'east', W: 'west' };
 const hexOf = (c: any, d: number) => (c === undefined || c === null ? d : typeof c === 'number' ? c : parseInt(String(c).replace('#', ''), 16));
+/** A depth bias for the dressing's own materials. A surround, a head or a shutter is drawn flush with the wall's own casing (0.03 proud) and
+ *  shares its planes with it, and two flat faces on one plane flicker. The bias makes the dressing win them; unlike a 2 mm move of the boxes it
+ *  leaves the world digest alone (plan.json shots.world, and the bake locks' worldSha, are mm-rounded boxes of every structure mesh). */
+const BIAS = { polygonOffset: true, polygonOffsetFactor: 0, polygonOffsetUnits: -4 };
 export const facadeOf = (spec: any) => (Array.isArray(spec.facade) ? { zones: spec.facade, bands: [] } : { zones: (spec.facade || {}).zones || [], bands: (spec.facade || {}).bands || [] });
 /** does this storey need the facade module at all? */
 export function facadeWanted(spec: any, lv: any, lowestY: number) {
@@ -196,7 +200,7 @@ export function createFacade(bctx) {
     const r = mulberry32(fnv1a(`${spec.id}:${lv.id}:${f.side}:${op.at}:dress`));
     // shutters: a leaf each side, half the opening wide, standing just off the wall
     if (op.shutters) {
-      const s = typeof op.shutters === 'object' ? op.shutters : {}, col = am.paint(hexOf(s.color, accent), { roughness: 0.6 }), dark = am.paint(hexOf(s.color, accent) === 0 ? 0x111111 : mixHex(hexOf(s.color, accent), 0x000000, 0.25), { roughness: 0.7 });
+      const s = typeof op.shutters === 'object' ? op.shutters : {}, col = am.paint(hexOf(s.color, accent), { roughness: 0.6, ...BIAS }), dark = am.paint(hexOf(s.color, accent) === 0 ? 0x111111 : mixHex(hexOf(s.color, accent), 0x000000, 0.25), { roughness: 0.7, ...BIAS });
       const sw = Math.min(0.6, Math.max(0.3, w / 2)), sh = win ? h : Math.min(h, 2.1);
       for (const sd of [-1, 1]) {
         const cx = sd * (w / 2 + 0.08 + sw / 2), cy = (win ? sill : 0) + sh / 2, z = 0.03;
@@ -218,7 +222,7 @@ export function createFacade(bctx) {
     }
     // a window box under the sill, with seeded planting
     if (op.box && win) {
-      const b = typeof op.box === 'object' ? op.box : {}, col = am.paint(hexOf(b.color, trim), { roughness: 0.7 });
+      const b = typeof op.box === 'object' ? op.box : {}, col = am.paint(hexOf(b.color, trim), { roughness: 0.7, ...BIAS });
       const bw = w + 0.1, y0 = sill - 0.04;
       box(bw, 0.22, 0.22, 0, y0 - 0.11, 0.13, col); box(bw - 0.04, 0.02, 0.18, 0, y0 - 0.02, 0.13, am.paint(0x4a3a2c), false);
       const leaf = am.paint(0x4f6b3a, { roughness: 0.9 }), bloom = am.paint(hexOf(b.bloom, [0xd1495b, 0xe9c46a, 0xf4a3b5, 0xffffff][Math.floor(r() * 4)]), { roughness: 0.8 });
@@ -238,7 +242,8 @@ export function createFacade(bctx) {
     // a surround over the wall's own trim, and its sill
     if (op.surround && op.surround.kind !== 'none') {
       const s = op.surround, kind = s.kind;
-      const col = kind === 'stone' ? am.cladding({ kind: 'stone', color: s.color || '#cfc8bb' }) : kind === 'brick-soldier' ? am.cladding({ kind: 'brick', color: s.color || '#8f4d3a' }) : am.paint(hexOf(s.color, trim === 0 ? 0xf2efe9 : 0xf2efe9), { roughness: 0.55 });
+      const own = (m: any) => Object.assign(am.own(m), BIAS);   // the cladding kit's material is shared with the wall: the dressing gets a private copy to bias
+      const col = kind === 'stone' ? own(am.cladding({ kind: 'stone', color: s.color || '#cfc8bb' })) : kind === 'brick-soldier' ? own(am.cladding({ kind: 'brick', color: s.color || '#8f4d3a' })) : am.paint(hexOf(s.color, trim === 0 ? 0xf2efe9 : 0xf2efe9), { roughness: 0.55, ...BIAS });
       const bw = s.w ?? (kind === 'stone' ? 0.16 : kind === 'box-reveal' ? 0.06 : 0.1), dp = s.depth ?? (kind === 'stone' ? 0.05 : kind === 'box-reveal' ? 0.22 : 0.03);
       const y0 = win ? sill : 0, y1 = top;
       if (kind === 'box-reveal') {
@@ -256,7 +261,7 @@ export function createFacade(bctx) {
     }
     // the head's dressing
     if (op.head && op.head !== 'flat') {
-      const col = am.paint(hexOf(op.surround && op.surround.color, 0xf2efe9), { roughness: 0.55 });
+      const col = am.paint(hexOf(op.surround && op.surround.color, 0xf2efe9), { roughness: 0.55, ...BIAS });
       const yh = top + (op.surround && op.surround.kind !== 'none' ? 0.1 : 0.03);
       if (op.head === 'crown') {
         box(w + 0.3, 0.12, 0.05, 0, yh + 0.06, 0.025, col); box(w + 0.42, 0.06, 0.14, 0, yh + 0.15, 0.07, col);
